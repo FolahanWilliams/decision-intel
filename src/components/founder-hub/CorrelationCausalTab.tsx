@@ -1,15 +1,41 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Network, AlertTriangle, Target, BarChart3, Shield, CheckCircle, Zap, TrendingUp } from 'lucide-react';
-import { computeCrossCaseCorrelations, getTopDangerousBiasPairs, getTopSeverityPredictors, getIndustryProfile } from '@/lib/data/case-correlations';
+import {
+  Network,
+  AlertTriangle,
+  Target,
+  BarChart3,
+  Shield,
+  CheckCircle,
+  Zap,
+  TrendingUp,
+} from 'lucide-react';
+import {
+  computeCrossCaseCorrelations,
+  getTopDangerousBiasPairs,
+  getTopSeverityPredictors,
+  getIndustryProfile,
+} from '@/lib/data/case-correlations';
 // Types used implicitly via the computed correlation data
 // import type { BiasCooccurrenceEntry, IndustryRiskProfile, SeverityPredictor, ContextAmplifier, BiasOutcomeDivergence, SuccessPatternCorrelation } from '@/lib/data/case-correlations';
 import { computeSeedWeights } from '@/lib/data/seed-weights';
-import { computeStaticCausalWeights, getStaticCausalGraph, getStaticCausalInsights } from '@/lib/data/case-study-causal-weights';
+import {
+  computeStaticCausalWeights,
+  getStaticCausalGraph,
+  getStaticCausalInsights,
+} from '@/lib/data/case-study-causal-weights';
 // Types used implicitly via the graph data
 // import type { CausalGraphNode, CausalGraphEdge } from '@/lib/data/case-study-causal-weights';
-import { card, sectionTitle, label, stat, badge, formatBias, formatIndustry } from './shared-styles';
+import {
+  card,
+  sectionTitle,
+  label,
+  stat,
+  badge,
+  formatBias,
+  formatIndustry,
+} from './shared-styles';
 
 // ---------------------------------------------------------------------------
 // Component
@@ -20,11 +46,14 @@ export function CorrelationCausalTab() {
   const topPairs = useMemo(() => getTopDangerousBiasPairs(15), []);
   const topPredictors = useMemo(() => getTopSeverityPredictors(10), []);
   const seedWeights = useMemo(() => computeSeedWeights(), []);
-  const causalGraph = useMemo(() => { computeStaticCausalWeights(); return getStaticCausalGraph(); }, []);
+  const causalGraph = useMemo(() => {
+    computeStaticCausalWeights();
+    return getStaticCausalGraph();
+  }, []);
   const causalInsights = useMemo(() => getStaticCausalInsights(), []);
 
   const [selectedIndustry, setSelectedIndustry] = useState<string>(
-    correlations.industryProfiles[0]?.industry ?? '',
+    correlations.industryProfiles[0]?.industry ?? ''
   );
 
   const industryProfile = selectedIndustry ? getIndustryProfile(selectedIndustry) : undefined;
@@ -32,8 +61,8 @@ export function CorrelationCausalTab() {
   // Helpers ------------------------------------------------------------------
 
   const maxAmplification = useMemo(
-    () => topPairs.length > 0 ? Math.max(...topPairs.map(p => p.amplificationRatio)) : 1,
-    [topPairs],
+    () => (topPairs.length > 0 ? Math.max(...topPairs.map(p => p.amplificationRatio)) : 1),
+    [topPairs]
   );
 
   function barColor(ratio: number): string {
@@ -43,10 +72,11 @@ export function CorrelationCausalTab() {
   }
 
   const sortedDivergence = useMemo(
-    () => [...correlations.biasOutcomeDivergence]
-      .sort((a, b) => (b.failureRate - b.successRate) - (a.failureRate - a.successRate))
-      .slice(0, 12),
-    [correlations],
+    () =>
+      [...correlations.biasOutcomeDivergence]
+        .sort((a, b) => b.failureRate - b.successRate - (a.failureRate - a.successRate))
+        .slice(0, 12),
+    [correlations]
   );
 
   // Active / inactive button styles
@@ -83,7 +113,8 @@ export function CorrelationCausalTab() {
           Correlation &amp; Causal Analysis
         </div>
         <div style={{ fontSize: 13, color: 'var(--text-secondary, #b4b4bc)' }}>
-          Visualizing {correlations.totalCases} case studies — {correlations.totalFailureCases} failures, {correlations.totalSuccessCases} successes
+          Visualizing {correlations.totalCases} case studies — {correlations.totalFailureCases}{' '}
+          failures, {correlations.totalSuccessCases} successes
         </div>
       </div>
 
@@ -113,7 +144,14 @@ export function CorrelationCausalTab() {
               <span style={{ ...badge(barColor(pair.amplificationRatio)), textAlign: 'center' }}>
                 &times;{pair.amplificationRatio.toFixed(1)}
               </span>
-              <div style={{ position: 'relative', height: 10, borderRadius: 5, background: 'var(--bg-tertiary, #0a0a0a)' }}>
+              <div
+                style={{
+                  position: 'relative',
+                  height: 10,
+                  borderRadius: 5,
+                  background: 'var(--bg-tertiary, #0a0a0a)',
+                }}
+              >
                 <div
                   style={{
                     position: 'absolute',
@@ -127,7 +165,9 @@ export function CorrelationCausalTab() {
                   }}
                 />
               </div>
-              <span style={{ color: 'var(--text-muted, #71717a)', fontSize: 11, textAlign: 'right' }}>
+              <span
+                style={{ color: 'var(--text-muted, #71717a)', fontSize: 11, textAlign: 'right' }}
+              >
                 n={pair.count}
               </span>
             </div>
@@ -148,11 +188,7 @@ export function CorrelationCausalTab() {
             <button
               key={p.industry}
               onClick={() => setSelectedIndustry(p.industry)}
-              style={
-                p.industry === selectedIndustry
-                  ? btnActive('#3b82f6')
-                  : btnInactive
-              }
+              style={p.industry === selectedIndustry ? btnActive('#3b82f6') : btnInactive}
             >
               {formatIndustry(p.industry)}
             </button>
@@ -185,10 +221,25 @@ export function CorrelationCausalTab() {
                   const maxFreq = industryProfile.topBiases[0]?.frequency ?? 1;
                   return (
                     <div key={b.bias} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ width: 140, fontSize: 12, color: 'var(--text-primary, #fff)', fontWeight: 500 }}>
+                      <span
+                        style={{
+                          width: 140,
+                          fontSize: 12,
+                          color: 'var(--text-primary, #fff)',
+                          fontWeight: 500,
+                        }}
+                      >
                         {formatBias(b.bias)}
                       </span>
-                      <div style={{ flex: 1, height: 8, borderRadius: 4, background: 'var(--bg-tertiary, #0a0a0a)', position: 'relative' }}>
+                      <div
+                        style={{
+                          flex: 1,
+                          height: 8,
+                          borderRadius: 4,
+                          background: 'var(--bg-tertiary, #0a0a0a)',
+                          position: 'relative',
+                        }}
+                      >
                         <div
                           style={{
                             position: 'absolute',
@@ -202,7 +253,14 @@ export function CorrelationCausalTab() {
                           }}
                         />
                       </div>
-                      <span style={{ fontSize: 11, color: 'var(--text-muted, #71717a)', minWidth: 32, textAlign: 'right' }}>
+                      <span
+                        style={{
+                          fontSize: 11,
+                          color: 'var(--text-muted, #71717a)',
+                          minWidth: 32,
+                          textAlign: 'right',
+                        }}
+                      >
                         {(b.frequency * 100).toFixed(0)}%
                       </span>
                     </div>
@@ -227,17 +285,34 @@ export function CorrelationCausalTab() {
             <div>
               <div style={label}>Context Profile</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                {([
-                  ['High Stakes', industryProfile.contextProfile.highStakesRate],
-                  ['Dissent Absent', industryProfile.contextProfile.dissentAbsentRate],
-                  ['Time Pressure', industryProfile.contextProfile.timePressureRate],
-                  ['Unanimous', industryProfile.contextProfile.unanimousRate],
-                ] as [string, number][]).map(([name, rate]) => (
+                {(
+                  [
+                    ['High Stakes', industryProfile.contextProfile.highStakesRate],
+                    ['Dissent Absent', industryProfile.contextProfile.dissentAbsentRate],
+                    ['Time Pressure', industryProfile.contextProfile.timePressureRate],
+                    ['Unanimous', industryProfile.contextProfile.unanimousRate],
+                  ] as [string, number][]
+                ).map(([name, rate]) => (
                   <div key={name} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ width: 110, fontSize: 12, color: 'var(--text-primary, #fff)', fontWeight: 500 }}>
+                    <span
+                      style={{
+                        width: 110,
+                        fontSize: 12,
+                        color: 'var(--text-primary, #fff)',
+                        fontWeight: 500,
+                      }}
+                    >
                       {name}
                     </span>
-                    <div style={{ flex: 1, height: 8, borderRadius: 4, background: 'var(--bg-tertiary, #0a0a0a)', position: 'relative' }}>
+                    <div
+                      style={{
+                        flex: 1,
+                        height: 8,
+                        borderRadius: 4,
+                        background: 'var(--bg-tertiary, #0a0a0a)',
+                        position: 'relative',
+                      }}
+                    >
                       <div
                         style={{
                           position: 'absolute',
@@ -251,16 +326,32 @@ export function CorrelationCausalTab() {
                         }}
                       />
                     </div>
-                    <span style={{ fontSize: 11, color: 'var(--text-muted, #71717a)', minWidth: 32, textAlign: 'right' }}>
+                    <span
+                      style={{
+                        fontSize: 11,
+                        color: 'var(--text-muted, #71717a)',
+                        minWidth: 32,
+                        textAlign: 'right',
+                      }}
+                    >
                       {(rate * 100).toFixed(0)}%
                     </span>
                   </div>
                 ))}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
-                  <span style={{ width: 110, fontSize: 12, color: 'var(--text-primary, #fff)', fontWeight: 500 }}>
+                  <span
+                    style={{
+                      width: 110,
+                      fontSize: 12,
+                      color: 'var(--text-primary, #fff)',
+                      fontWeight: 500,
+                    }}
+                  >
                     Avg Participants
                   </span>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary, #fff)' }}>
+                  <span
+                    style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary, #fff)' }}
+                  >
                     {industryProfile.contextProfile.avgParticipantCount.toFixed(1)}
                   </span>
                 </div>
@@ -350,17 +441,34 @@ export function CorrelationCausalTab() {
                 border: '1px solid var(--border-primary, #222)',
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: 8,
+                }}
+              >
                 <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary, #fff)' }}>
                   {formatBias(amp.contextFactor)}
                 </span>
-                <span style={badge('#f59e0b')}>
-                  &times;{amp.lift.toFixed(1)} lift
-                </span>
+                <span style={badge('#f59e0b')}>&times;{amp.lift.toFixed(1)} lift</span>
               </div>
-              <div style={{ display: 'flex', gap: 16, fontSize: 11, color: 'var(--text-secondary, #b4b4bc)', marginBottom: 8 }}>
-                <span>With: {amp.avgImpactWithFactor.toFixed(1)} impact (n={amp.countWith})</span>
-                <span>Without: {amp.avgImpactWithoutFactor.toFixed(1)} (n={amp.countWithout})</span>
+              <div
+                style={{
+                  display: 'flex',
+                  gap: 16,
+                  fontSize: 11,
+                  color: 'var(--text-secondary, #b4b4bc)',
+                  marginBottom: 8,
+                }}
+              >
+                <span>
+                  With: {amp.avgImpactWithFactor.toFixed(1)} impact (n={amp.countWith})
+                </span>
+                <span>
+                  Without: {amp.avgImpactWithoutFactor.toFixed(1)} (n={amp.countWithout})
+                </span>
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                 {amp.amplifiedBiases.slice(0, 3).map(b => (
@@ -399,7 +507,15 @@ export function CorrelationCausalTab() {
               </span>
               <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
                 {/* Failure bar (red) */}
-                <div style={{ flex: 1, position: 'relative', height: 10, borderRadius: 5, background: 'var(--bg-tertiary, #0a0a0a)' }}>
+                <div
+                  style={{
+                    flex: 1,
+                    position: 'relative',
+                    height: 10,
+                    borderRadius: 5,
+                    background: 'var(--bg-tertiary, #0a0a0a)',
+                  }}
+                >
                   <div
                     style={{
                       position: 'absolute',
@@ -414,7 +530,15 @@ export function CorrelationCausalTab() {
                   />
                 </div>
                 {/* Success bar (green) */}
-                <div style={{ flex: 1, position: 'relative', height: 10, borderRadius: 5, background: 'var(--bg-tertiary, #0a0a0a)' }}>
+                <div
+                  style={{
+                    flex: 1,
+                    position: 'relative',
+                    height: 10,
+                    borderRadius: 5,
+                    background: 'var(--bg-tertiary, #0a0a0a)',
+                  }}
+                >
                   <div
                     style={{
                       position: 'absolute',
@@ -429,15 +553,45 @@ export function CorrelationCausalTab() {
                   />
                 </div>
               </div>
-              <span style={badge('#8b5cf6')}>
-                {(d.mitigationFrequency * 100).toFixed(0)}%
-              </span>
+              <span style={badge('#8b5cf6')}>{(d.mitigationFrequency * 100).toFixed(0)}%</span>
             </div>
           ))}
           {/* Legend */}
-          <div style={{ display: 'flex', gap: 16, fontSize: 11, color: 'var(--text-muted, #71717a)', marginTop: 4 }}>
-            <span><span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: 3, background: '#ef4444', marginRight: 4 }} /> Failure Rate</span>
-            <span><span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: 3, background: '#22c55e', marginRight: 4 }} /> Success Rate</span>
+          <div
+            style={{
+              display: 'flex',
+              gap: 16,
+              fontSize: 11,
+              color: 'var(--text-muted, #71717a)',
+              marginTop: 4,
+            }}
+          >
+            <span>
+              <span
+                style={{
+                  display: 'inline-block',
+                  width: 10,
+                  height: 10,
+                  borderRadius: 3,
+                  background: '#ef4444',
+                  marginRight: 4,
+                }}
+              />{' '}
+              Failure Rate
+            </span>
+            <span>
+              <span
+                style={{
+                  display: 'inline-block',
+                  width: 10,
+                  height: 10,
+                  borderRadius: 3,
+                  background: '#22c55e',
+                  marginRight: 4,
+                }}
+              />{' '}
+              Success Rate
+            </span>
             <span>Badge = Mitigation Frequency</span>
           </div>
         </div>
@@ -463,7 +617,15 @@ export function CorrelationCausalTab() {
               <div style={{ fontSize: 13, fontWeight: 700, color: '#22c55e', marginBottom: 6 }}>
                 {sp.pattern}
               </div>
-              <div style={{ display: 'flex', gap: 12, fontSize: 11, color: 'var(--text-secondary, #b4b4bc)', marginBottom: 8 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  gap: 12,
+                  fontSize: 11,
+                  color: 'var(--text-secondary, #b4b4bc)',
+                  marginBottom: 8,
+                }}
+              >
                 <span>Freq: {(sp.frequency * 100).toFixed(0)}%</span>
                 <span>Avg +Impact: {sp.avgPositiveImpact.toFixed(1)}</span>
                 <span>n={sp.sampleSize}</span>
@@ -521,7 +683,15 @@ export function CorrelationCausalTab() {
                 {sw.patternLabel}
               </span>
               {/* Stacked bar: red = failure, green = success */}
-              <div style={{ display: 'flex', height: 10, borderRadius: 5, overflow: 'hidden', background: 'var(--bg-tertiary, #0a0a0a)' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  height: 10,
+                  borderRadius: 5,
+                  overflow: 'hidden',
+                  background: 'var(--bg-tertiary, #0a0a0a)',
+                }}
+              >
                 <div
                   style={{
                     width: `${sw.baseFailureRate * 100}%`,
@@ -537,18 +707,58 @@ export function CorrelationCausalTab() {
                   }}
                 />
               </div>
-              <span style={{ color: 'var(--text-muted, #71717a)', fontSize: 11, textAlign: 'right' }}>
+              <span
+                style={{ color: 'var(--text-muted, #71717a)', fontSize: 11, textAlign: 'right' }}
+              >
                 n={sw.sampleSize}
               </span>
-              <span style={{ color: 'var(--text-secondary, #b4b4bc)', fontSize: 11, textAlign: 'right' }}>
+              <span
+                style={{
+                  color: 'var(--text-secondary, #b4b4bc)',
+                  fontSize: 11,
+                  textAlign: 'right',
+                }}
+              >
                 Impact: {sw.avgImpactScore.toFixed(1)}
               </span>
             </div>
           ))}
           {/* Legend */}
-          <div style={{ display: 'flex', gap: 16, fontSize: 11, color: 'var(--text-muted, #71717a)', marginTop: 4 }}>
-            <span><span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: 3, background: '#ef4444', marginRight: 4 }} /> Failure Rate</span>
-            <span><span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: 3, background: '#22c55e', marginRight: 4 }} /> Success Rate</span>
+          <div
+            style={{
+              display: 'flex',
+              gap: 16,
+              fontSize: 11,
+              color: 'var(--text-muted, #71717a)',
+              marginTop: 4,
+            }}
+          >
+            <span>
+              <span
+                style={{
+                  display: 'inline-block',
+                  width: 10,
+                  height: 10,
+                  borderRadius: 3,
+                  background: '#ef4444',
+                  marginRight: 4,
+                }}
+              />{' '}
+              Failure Rate
+            </span>
+            <span>
+              <span
+                style={{
+                  display: 'inline-block',
+                  width: 10,
+                  height: 10,
+                  borderRadius: 3,
+                  background: '#22c55e',
+                  marginRight: 4,
+                }}
+              />{' '}
+              Success Rate
+            </span>
           </div>
         </div>
       </div>
@@ -568,7 +778,12 @@ export function CorrelationCausalTab() {
           }}
         >
           {causalGraph.nodes.length > 0 ? (
-            <svg width={800} height={500} viewBox="0 0 800 500" style={{ width: '100%', height: 'auto' }}>
+            <svg
+              width={800}
+              height={500}
+              viewBox="0 0 800 500"
+              style={{ width: '100%', height: 'auto' }}
+            >
               {/* Edges */}
               {causalGraph.edges.map((edge, i) => {
                 const fromNode = causalGraph.nodes.find(n => n.id === edge.from);
@@ -576,9 +791,7 @@ export function CorrelationCausalTab() {
                 if (!fromNode || !toNode) return null;
                 const x1 = fromNode.x + fromNode.size / 2;
                 const y1 = fromNode.y;
-                const x2 = toNode.type === 'outcome'
-                  ? toNode.x - 30
-                  : toNode.x - toNode.size / 2;
+                const x2 = toNode.type === 'outcome' ? toNode.x - 30 : toNode.x - toNode.size / 2;
                 const y2 = toNode.y;
                 return (
                   <line
@@ -627,7 +840,14 @@ export function CorrelationCausalTab() {
               ))}
             </svg>
           ) : (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted, #71717a)', fontSize: 13 }}>
+            <div
+              style={{
+                padding: 40,
+                textAlign: 'center',
+                color: 'var(--text-muted, #71717a)',
+                fontSize: 13,
+              }}
+            >
               No causal graph data available.
             </div>
           )}
@@ -661,12 +881,8 @@ export function CorrelationCausalTab() {
                     fontSize: 12,
                   }}
                 >
-                  <span style={{ color: 'var(--text-primary, #fff)' }}>
-                    {insight.message}
-                  </span>
-                  <span style={badge(borderColor)}>
-                    {(insight.confidence * 100).toFixed(0)}%
-                  </span>
+                  <span style={{ color: 'var(--text-primary, #fff)' }}>{insight.message}</span>
+                  <span style={badge(borderColor)}>{(insight.confidence * 100).toFixed(0)}%</span>
                 </div>
               );
             })}

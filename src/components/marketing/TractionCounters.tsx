@@ -32,7 +32,7 @@ export function TractionCounters() {
 
   return (
     <div className="w-full max-w-6xl mx-auto">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -40,8 +40,8 @@ export function TractionCounters() {
       >
         <div className="grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-slate-200">
           {metrics.map((m, idx) => (
-            <div 
-              key={m.label} 
+            <div
+              key={m.label}
               className="px-8 py-10 flex flex-col items-center justify-center text-center hover:bg-slate-50/50 transition-colors"
             >
               <div className="flex items-center gap-1.5 mb-1">
@@ -58,10 +58,7 @@ export function TractionCounters() {
                 </span>
               </div>
               {/* Subtle accent dot */}
-              <div 
-                className="mt-4 w-1.5 h-1.5 rounded-full"
-                style={{ backgroundColor: m.color }}
-              />
+              <div className="mt-4 w-1.5 h-1.5 rounded-full" style={{ backgroundColor: m.color }} />
             </div>
           ))}
         </div>

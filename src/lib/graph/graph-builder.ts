@@ -739,9 +739,7 @@ export async function findSimilarDecisions(
     const candidateAnalyses = await prisma.analysis.findMany({
       where: {
         documentId: { in: candidateDocIds },
-        ...(analysis.document.orgId
-          ? { document: { orgId: analysis.document.orgId } }
-          : {}),
+        ...(analysis.document.orgId ? { document: { orgId: analysis.document.orgId } } : {}),
       },
       include: {
         document: { select: { id: true, filename: true, content: true } },
@@ -967,8 +965,7 @@ export async function getPersonProfile(
       scoreCount++;
     }
 
-    const resolved =
-      outcomeCounts.success + outcomeCounts.partial_success + outcomeCounts.failure;
+    const resolved = outcomeCounts.success + outcomeCounts.partial_success + outcomeCounts.failure;
     const successRate =
       resolved > 0
         ? (outcomeCounts.success + outcomeCounts.partial_success * 0.5) / resolved
@@ -988,9 +985,7 @@ export async function getPersonProfile(
       .slice(0, 5);
 
     // 7. Recent decisions — most recent first, capped at 20
-    decisions.sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+    decisions.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     return {
       canonicalName: nameLower,

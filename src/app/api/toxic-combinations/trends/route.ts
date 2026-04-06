@@ -29,9 +29,7 @@ export async function GET(req: NextRequest) {
     const since = new Date();
     since.setDate(since.getDate() - days);
 
-    const trends = await prisma.$queryRaw<
-      Array<{ date: Date; avg_score: number; count: bigint }>
-    >`
+    const trends = await prisma.$queryRaw<Array<{ date: Date; avg_score: number; count: bigint }>>`
       SELECT
         DATE_TRUNC('day', "createdAt") as date,
         AVG("toxicScore") as avg_score,

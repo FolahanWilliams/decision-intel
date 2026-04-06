@@ -144,13 +144,11 @@ export function SampleDataBanner() {
             Explore Decision Intel with sample data
           </div>
           <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
-            Populate your workspace with 3 anonymized sample analyses (Nokia acquisition, a
-            strategy expansion, and a Series B investment) so you can see the Decision Graph, Bias
-            Library, and Team Cognitive Profile in action. Remove them any time.
+            Populate your workspace with 3 anonymized sample analyses (Nokia acquisition, a strategy
+            expansion, and a Series B investment) so you can see the Decision Graph, Bias Library,
+            and Team Cognitive Profile in action. Remove them any time.
           </div>
-          {error && (
-            <div style={{ fontSize: 12, color: '#ef4444', marginTop: 6 }}>{error}</div>
-          )}
+          {error && <div style={{ fontSize: 12, color: '#ef4444', marginTop: 6 }}>{error}</div>}
         </div>
         <button
           onClick={handleSeed}
@@ -207,9 +205,7 @@ export function SampleDataBanner() {
             {status.sampleCount} sample {status.sampleCount === 1 ? 'analysis' : 'analyses'} we
             seeded at signup?
           </div>
-          {error && (
-            <div style={{ fontSize: 12, color: '#ef4444', marginTop: 6 }}>{error}</div>
-          )}
+          {error && <div style={{ fontSize: 12, color: '#ef4444', marginTop: 6 }}>{error}</div>}
         </div>
         <button
           onClick={handleClear}

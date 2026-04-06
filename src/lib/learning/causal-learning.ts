@@ -191,9 +191,7 @@ export async function computeOrgCausalWeights(
         if (interactionStrength > 1.3) {
           weights.push({
             biasType: [biasA, biasB].sort().join('+'),
-            outcomeCorrelation: Number(
-              (jointFailureRate - baseFailureRate).toFixed(3)
-            ),
+            outcomeCorrelation: Number((jointFailureRate - baseFailureRate).toFixed(3)),
             failureCount: jointFailures,
             successCount: jointSuccesses,
             dangerMultiplier: Number(interactionStrength.toFixed(2)),
@@ -485,9 +483,7 @@ export async function learnCausalEdges(orgId: string): Promise<CausalWeight[]> {
     // expected from individual rates (super-additive risk).
     const biasTypesList = Array.from(biasOutcomes.keys());
     const outcomeBiasSets = outcomes.map(o => ({
-      biasTypes: new Set(
-        o.analysis.biases.map((b: { biasType: string }) => b.biasType)
-      ),
+      biasTypes: new Set(o.analysis.biases.map((b: { biasType: string }) => b.biasType)),
       outcome: o.outcome,
     }));
 
@@ -525,9 +521,7 @@ export async function learnCausalEdges(orgId: string): Promise<CausalWeight[]> {
         if (interactionStrength > 1.3) {
           weights.push({
             biasType: [biasA, biasB].sort().join('+'),
-            outcomeCorrelation: Number(
-              (jointFailureRate - baseFailureRate).toFixed(3)
-            ),
+            outcomeCorrelation: Number((jointFailureRate - baseFailureRate).toFixed(3)),
             failureCount: jointFailures,
             successCount: jointSuccesses,
             dangerMultiplier: Number(interactionStrength.toFixed(2)),

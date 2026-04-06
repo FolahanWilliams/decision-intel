@@ -144,7 +144,9 @@ export default function Dashboard() {
     'all'
   );
   const [docsPage, setDocsPage] = useState(1);
-  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'scoreHigh' | 'scoreLow' | 'name'>('newest');
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'scoreHigh' | 'scoreLow' | 'name'>(
+    'newest'
+  );
   const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
   const [batchDeleting, setBatchDeleting] = useState(false);
 
@@ -209,7 +211,14 @@ export default function Dashboard() {
   const [deleting, setDeleting] = useState(false);
 
   const { addNotification } = useNotifications();
-  const { startTracking, updateProgress, completeTracking, errorTracking, updateBiasCount, updateNoiseScore } = useAnalysisProgress();
+  const {
+    startTracking,
+    updateProgress,
+    completeTracking,
+    errorTracking,
+    updateBiasCount,
+    updateNoiseScore,
+  } = useAnalysisProgress();
   const [showActivityFeed, setShowActivityFeed] = useState(false);
   const {
     activities,
@@ -255,7 +264,7 @@ export default function Dashboard() {
       biasCountRef.current += 1;
       updateBiasCount(biasCountRef.current);
     },
-    onNoiseUpdate: (score) => {
+    onNoiseUpdate: score => {
       updateNoiseScore(score);
     },
     onOutcomeReminder: (count, ids) => {
@@ -341,7 +350,9 @@ export default function Dashboard() {
     const docs = [...filteredDocs];
     switch (sortBy) {
       case 'oldest':
-        return docs.sort((a, b) => new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime());
+        return docs.sort(
+          (a, b) => new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime()
+        );
       case 'scoreHigh':
         return docs.sort((a, b) => (b.score ?? -1) - (a.score ?? -1));
       case 'scoreLow':
@@ -350,7 +361,9 @@ export default function Dashboard() {
         return docs.sort((a, b) => a.filename.localeCompare(b.filename));
       case 'newest':
       default:
-        return docs.sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime());
+        return docs.sort(
+          (a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
+        );
     }
   }, [filteredDocs, sortBy]);
 
@@ -365,9 +378,7 @@ export default function Dashboard() {
     setBatchDeleting(true);
     try {
       await Promise.all(
-        Array.from(selectedDocs).map(id =>
-          fetch(`/api/documents/${id}`, { method: 'DELETE' })
-        )
+        Array.from(selectedDocs).map(id => fetch(`/api/documents/${id}`, { method: 'DELETE' }))
       );
       setSelectedDocs(new Set());
       mutateDocs();
@@ -724,58 +735,58 @@ export default function Dashboard() {
         </div>
         {/* Only show view switcher when user has documents */}
         {uploadedDocs.length > 0 && (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '2px',
-            background: 'var(--bg-card-hover)',
-            border: '1px solid var(--border-color)',
-            borderRadius: 'var(--radius-full)',
-            padding: '3px',
-          }}
-        >
-          <button
-            onClick={() => setActiveView('upload')}
+          <div
             style={{
-              padding: '6px 16px',
-              fontSize: '13px',
-              fontWeight: activeView === 'upload' ? 600 : 400,
-              borderRadius: 'var(--radius-full)',
-              border: 'none',
-              cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
-              transition: 'all 0.15s',
-              background: activeView === 'upload' ? 'var(--bg-active)' : 'transparent',
-              color: activeView === 'upload' ? 'var(--text-highlight)' : 'var(--text-muted)',
-            }}
-          >
-            <Upload size={14} />
-            Upload &amp; Monitor
-          </button>
-          <button
-            onClick={() => setActiveView('browse')}
-            style={{
-              padding: '6px 16px',
-              fontSize: '13px',
-              fontWeight: activeView === 'browse' ? 600 : 400,
+              gap: '2px',
+              background: 'var(--bg-card-hover)',
+              border: '1px solid var(--border-color)',
               borderRadius: 'var(--radius-full)',
-              border: 'none',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              transition: 'all 0.15s',
-              background: activeView === 'browse' ? 'var(--bg-active)' : 'transparent',
-              color: activeView === 'browse' ? 'var(--text-highlight)' : 'var(--text-muted)',
+              padding: '3px',
             }}
           >
-            <Search size={14} />
-            Browse &amp; Analyze
-          </button>
-        </div>
+            <button
+              onClick={() => setActiveView('upload')}
+              style={{
+                padding: '6px 16px',
+                fontSize: '13px',
+                fontWeight: activeView === 'upload' ? 600 : 400,
+                borderRadius: 'var(--radius-full)',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                transition: 'all 0.15s',
+                background: activeView === 'upload' ? 'var(--bg-active)' : 'transparent',
+                color: activeView === 'upload' ? 'var(--text-highlight)' : 'var(--text-muted)',
+              }}
+            >
+              <Upload size={14} />
+              Upload &amp; Monitor
+            </button>
+            <button
+              onClick={() => setActiveView('browse')}
+              style={{
+                padding: '6px 16px',
+                fontSize: '13px',
+                fontWeight: activeView === 'browse' ? 600 : 400,
+                borderRadius: 'var(--radius-full)',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                transition: 'all 0.15s',
+                background: activeView === 'browse' ? 'var(--bg-active)' : 'transparent',
+                color: activeView === 'browse' ? 'var(--text-highlight)' : 'var(--text-muted)',
+              }}
+            >
+              <Search size={14} />
+              Browse &amp; Analyze
+            </button>
+          </div>
         )}
       </div>
 
@@ -832,31 +843,11 @@ export default function Dashboard() {
                 isCustom: true,
               },
             ].map(stat => {
-                // Decision IQ uses its own self-contained component
-                if ((stat as Record<string, unknown>).isCustom) {
-                  return (
-                    <motion.div
-                      key={stat.label}
-                      variants={{
-                        hidden: { opacity: 0, y: 20, scale: 0.97 },
-                        visible: { opacity: 1, y: 0, scale: 1 },
-                      }}
-                      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                      whileHover={{
-                        y: -4,
-                        boxShadow:
-                          '0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 255, 255, 0.04)',
-                      }}
-                    >
-                      <DecisionIQCard />
-                    </motion.div>
-                  );
-                }
-
+              // Decision IQ uses its own self-contained component
+              if ((stat as Record<string, unknown>).isCustom) {
                 return (
                   <motion.div
                     key={stat.label}
-                    className="stat-card liquid-glass-premium"
                     variants={{
                       hidden: { opacity: 0, y: 20, scale: 0.97 },
                       visible: { opacity: 1, y: 0, scale: 1 },
@@ -868,44 +859,63 @@ export default function Dashboard() {
                         '0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 255, 255, 0.04)',
                     }}
                   >
-                    <div
-                      className="flex items-center justify-between"
-                      style={{ marginBottom: 'var(--spacing-md)' }}
-                    >
-                      <div
-                        className="stat-card-icon"
-                        style={{
-                          background: stat.iconBg,
-                          color: stat.iconColor,
-                          marginBottom: 0,
-                        }}
-                      >
-                        {stat.icon}
-                      </div>
-                      {stat.showSparkline && sparklineData.length >= 2 && (
-                        <SparklineChart
-                          data={sparklineData}
-                          color={stat.sparkColor}
-                          width={72}
-                          height={28}
-                        />
-                      )}
-                    </div>
-                    <div className="stat-card-value" style={{ color: 'var(--text-highlight)' }}>
-                      {riskSummary.total > 0 || stat.label === 'Total Documents' ? (
-                        <AnimatedNumber
-                          value={stat.numericValue}
-                          suffix={stat.suffix || ''}
-                          duration={900}
-                        />
-                      ) : (
-                        '—'
-                      )}
-                    </div>
-                    <div className="stat-card-label">{stat.label}</div>
+                    <DecisionIQCard />
                   </motion.div>
                 );
-              })}
+              }
+
+              return (
+                <motion.div
+                  key={stat.label}
+                  className="stat-card liquid-glass-premium"
+                  variants={{
+                    hidden: { opacity: 0, y: 20, scale: 0.97 },
+                    visible: { opacity: 1, y: 0, scale: 1 },
+                  }}
+                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                  whileHover={{
+                    y: -4,
+                    boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 255, 255, 0.04)',
+                  }}
+                >
+                  <div
+                    className="flex items-center justify-between"
+                    style={{ marginBottom: 'var(--spacing-md)' }}
+                  >
+                    <div
+                      className="stat-card-icon"
+                      style={{
+                        background: stat.iconBg,
+                        color: stat.iconColor,
+                        marginBottom: 0,
+                      }}
+                    >
+                      {stat.icon}
+                    </div>
+                    {stat.showSparkline && sparklineData.length >= 2 && (
+                      <SparklineChart
+                        data={sparklineData}
+                        color={stat.sparkColor}
+                        width={72}
+                        height={28}
+                      />
+                    )}
+                  </div>
+                  <div className="stat-card-value" style={{ color: 'var(--text-highlight)' }}>
+                    {riskSummary.total > 0 || stat.label === 'Total Documents' ? (
+                      <AnimatedNumber
+                        value={stat.numericValue}
+                        suffix={stat.suffix || ''}
+                        duration={900}
+                      />
+                    ) : (
+                      '—'
+                    )}
+                  </div>
+                  <div className="stat-card-label">{stat.label}</div>
+                </motion.div>
+              );
+            })}
           </motion.div>
         </>
       )}
@@ -1009,7 +1019,6 @@ export default function Dashboard() {
       {/* ═══════ UPLOAD & MONITOR VIEW ═══════ */}
       {activeView === 'upload' && (
         <>
-
           {/* Upload Confirmation Dialog */}
           <Dialog
             open={!!pendingFile && !uploading}
@@ -1035,7 +1044,15 @@ export default function Dashboard() {
               {pendingFile && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                   {/* File preview */}
-                  <div className="flex items-center gap-md" style={{ padding: 'var(--spacing-md)', background: 'var(--bg-card)', borderRadius: 8, border: '1px solid var(--border-color)' }}>
+                  <div
+                    className="flex items-center gap-md"
+                    style={{
+                      padding: 'var(--spacing-md)',
+                      background: 'var(--bg-card)',
+                      borderRadius: 8,
+                      border: '1px solid var(--border-color)',
+                    }}
+                  >
                     <div
                       style={{
                         width: 44,
@@ -1052,7 +1069,16 @@ export default function Dashboard() {
                       <FileText size={22} className="text-accent-primary" />
                     </div>
                     <div style={{ minWidth: 0 }}>
-                      <p className="font-medium text-sm" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{pendingFile.name}</p>
+                      <p
+                        className="font-medium text-sm"
+                        style={{
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {pendingFile.name}
+                      </p>
                       <p className="text-xs text-muted">
                         {(pendingFile.size / 1024).toFixed(1)} KB ·{' '}
                         {pendingFile.type || pendingFile.name.split('.').pop()?.toUpperCase()}
@@ -1063,7 +1089,10 @@ export default function Dashboard() {
                   {/* Document type + Deal selectors — stacked for clarity */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                     <div>
-                      <label className="text-xs text-muted font-medium" style={{ display: 'block', marginBottom: 'var(--spacing-xs)' }}>
+                      <label
+                        className="text-xs text-muted font-medium"
+                        style={{ display: 'block', marginBottom: 'var(--spacing-xs)' }}
+                      >
                         Document Type <span className="text-muted">(optional)</span>
                       </label>
                       <select
@@ -1089,7 +1118,10 @@ export default function Dashboard() {
                       </select>
                     </div>
                     <div>
-                      <label className="text-xs text-muted font-medium" style={{ display: 'block', marginBottom: 'var(--spacing-xs)' }}>
+                      <label
+                        className="text-xs text-muted font-medium"
+                        style={{ display: 'block', marginBottom: 'var(--spacing-xs)' }}
+                      >
                         Link to Deal <span className="text-muted">(optional)</span>
                       </label>
                       <select
@@ -1230,9 +1262,7 @@ export default function Dashboard() {
                       alignItems: 'center',
                       justifyContent: 'center',
                       borderRadius: 'var(--radius-lg)',
-                      background: isDragOver
-                        ? 'var(--bg-active-hover)'
-                        : 'var(--bg-card-hover)',
+                      background: isDragOver ? 'var(--bg-active-hover)' : 'var(--bg-card-hover)',
                       border: `1px solid ${isDragOver ? 'var(--border-hover)' : 'var(--border-color)'}`,
                       transition: 'all 0.2s ease',
                       transform: isDragOver ? 'scale(1.1)' : 'scale(1)',
@@ -1258,7 +1288,8 @@ export default function Dashboard() {
                     {billingData &&
                       billingData.limits.analysesPerMonth > 0 &&
                       billingData.planName?.toLowerCase() === 'starter' &&
-                      billingData.usage.analysesThisMonth / billingData.limits.analysesPerMonth >= 0.8 && (
+                      billingData.usage.analysesThisMonth / billingData.limits.analysesPerMonth >=
+                        0.8 && (
                         <Link
                           href="/dashboard/settings"
                           className="text-xs"
@@ -1272,7 +1303,8 @@ export default function Dashboard() {
                           }}
                         >
                           <AlertTriangle size={12} />
-                          {billingData.usage.analysesThisMonth >= billingData.limits.analysesPerMonth
+                          {billingData.usage.analysesThisMonth >=
+                          billingData.limits.analysesPerMonth
                             ? 'Limit reached — upgrade to continue analyzing'
                             : 'Approaching limit — upgrade for more analyses'}
                         </Link>
@@ -1785,7 +1817,10 @@ export default function Dashboard() {
               ) : (
                 <div className="divide-y divide-border">
                   {/* Select all header */}
-                  <div className="flex items-center gap-md p-md" style={{ background: 'var(--bg-secondary)' }}>
+                  <div
+                    className="flex items-center gap-md p-md"
+                    style={{ background: 'var(--bg-secondary)' }}
+                  >
                     <input
                       type="checkbox"
                       aria-label="Select all documents"
@@ -1797,7 +1832,12 @@ export default function Dashboard() {
                           setSelectedDocs(new Set());
                         }
                       }}
-                      style={{ width: 14, height: 14, accentColor: 'var(--accent-primary)', cursor: 'pointer' }}
+                      style={{
+                        width: 14,
+                        height: 14,
+                        accentColor: 'var(--accent-primary)',
+                        cursor: 'pointer',
+                      }}
                     />
                     <span className="text-xs text-muted">
                       {selectedDocs.size > 0
@@ -1824,7 +1864,13 @@ export default function Dashboard() {
                               return next;
                             });
                           }}
-                          style={{ width: 14, height: 14, accentColor: 'var(--accent-primary)', cursor: 'pointer', flexShrink: 0 }}
+                          style={{
+                            width: 14,
+                            height: 14,
+                            accentColor: 'var(--accent-primary)',
+                            cursor: 'pointer',
+                            flexShrink: 0,
+                          }}
                         />
                         <div
                           style={{
@@ -1946,12 +1992,18 @@ export default function Dashboard() {
                               onClick={handleDelete}
                               disabled={deleting}
                               className="px-2 py-0.5 text-xs rounded"
-                              style={{ background: 'rgba(239,68,68,0.15)', color: 'var(--error)', border: '1px solid rgba(239,68,68,0.3)' }}
+                              style={{
+                                background: 'rgba(239,68,68,0.15)',
+                                color: 'var(--error)',
+                                border: '1px solid rgba(239,68,68,0.3)',
+                              }}
                             >
                               {deleting ? <Loader2 size={10} className="animate-spin" /> : 'Yes'}
                             </button>
                             <button
-                              onClick={() => setDeleteModal({ open: false, docId: '', filename: '' })}
+                              onClick={() =>
+                                setDeleteModal({ open: false, docId: '', filename: '' })
+                              }
                               disabled={deleting}
                               className="px-2 py-0.5 text-xs text-muted rounded"
                               style={{ border: '1px solid var(--border-color)' }}
@@ -2009,7 +2061,11 @@ export default function Dashboard() {
                     color: 'var(--error)',
                   }}
                 >
-                  {batchDeleting ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
+                  {batchDeleting ? (
+                    <Loader2 size={12} className="animate-spin" />
+                  ) : (
+                    <Trash2 size={12} />
+                  )}
                   Delete Selected
                 </button>
               </div>

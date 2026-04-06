@@ -146,9 +146,7 @@ export function BiasDetailModal({
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
-  const [userRating, setUserRating] = useState<number | null>(
-    bias.userRating ?? null
-  );
+  const [userRating, setUserRating] = useState<number | null>(bias.userRating ?? null);
 
   // Reset rating when navigating to a different bias
   useEffect(() => {

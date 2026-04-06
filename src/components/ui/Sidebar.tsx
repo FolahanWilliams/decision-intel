@@ -366,57 +366,56 @@ export default function Sidebar() {
             isOpen={!collapsedSections.Intelligence}
             onToggle={() => toggleSection('Intelligence')}
           >
-          <NavItem
-            href="/dashboard/ask"
-            icon={<Sparkles size={18} />}
-            label="Ask"
-            description="Decision copilot & document chat"
-            active={
-              pathname.startsWith('/dashboard/ask') ||
-              pathname.startsWith('/dashboard/ai-assistant')
-            }
-            collapsed={collapsed}
-            onNavigate={closeMobile}
-          />
-          <NavItem
-            href="/dashboard/analytics"
-            icon={<BarChart3 size={18} />}
-            label="Analytics"
-            description="Trends, quality, outcomes & decision graph"
-            active={
-              pathname.startsWith('/dashboard/analytics') ||
-              pathname.startsWith('/dashboard/outcome-flywheel') ||
-              pathname.startsWith('/dashboard/decision-graph') ||
-              pathname.startsWith('/dashboard/decision-quality') ||
-              pathname.startsWith('/dashboard/cognitive-audits') ||
-              pathname.startsWith('/calibration') ||
-              pathname.startsWith('/dashboard/experiments')
-            }
-            collapsed={collapsed}
-            onNavigate={closeMobile}
-          />
-          <NavItem
-            href="/dashboard/meetings"
-            icon={<Video size={18} />}
-            label="Meetings & Rooms"
-            description="Recordings, transcripts & decision rooms"
-            active={
-              pathname.startsWith('/dashboard/meetings') ||
-              pathname.startsWith('/dashboard/decision-rooms')
-            }
-            collapsed={collapsed}
-            onNavigate={closeMobile}
-          />
-          <NavItem
-            href="/dashboard/journal"
-            icon={<PenLine size={18} />}
-            label="Decision Journal"
-            description="Record and reflect on decisions"
-            active={pathname === '/dashboard/journal'}
-            collapsed={collapsed}
-            onNavigate={closeMobile}
-          />
-
+            <NavItem
+              href="/dashboard/ask"
+              icon={<Sparkles size={18} />}
+              label="Ask"
+              description="Decision copilot & document chat"
+              active={
+                pathname.startsWith('/dashboard/ask') ||
+                pathname.startsWith('/dashboard/ai-assistant')
+              }
+              collapsed={collapsed}
+              onNavigate={closeMobile}
+            />
+            <NavItem
+              href="/dashboard/analytics"
+              icon={<BarChart3 size={18} />}
+              label="Analytics"
+              description="Trends, quality, outcomes & decision graph"
+              active={
+                pathname.startsWith('/dashboard/analytics') ||
+                pathname.startsWith('/dashboard/outcome-flywheel') ||
+                pathname.startsWith('/dashboard/decision-graph') ||
+                pathname.startsWith('/dashboard/decision-quality') ||
+                pathname.startsWith('/dashboard/cognitive-audits') ||
+                pathname.startsWith('/calibration') ||
+                pathname.startsWith('/dashboard/experiments')
+              }
+              collapsed={collapsed}
+              onNavigate={closeMobile}
+            />
+            <NavItem
+              href="/dashboard/meetings"
+              icon={<Video size={18} />}
+              label="Meetings & Rooms"
+              description="Recordings, transcripts & decision rooms"
+              active={
+                pathname.startsWith('/dashboard/meetings') ||
+                pathname.startsWith('/dashboard/decision-rooms')
+              }
+              collapsed={collapsed}
+              onNavigate={closeMobile}
+            />
+            <NavItem
+              href="/dashboard/journal"
+              icon={<PenLine size={18} />}
+              label="Decision Journal"
+              description="Record and reflect on decisions"
+              active={pathname === '/dashboard/journal'}
+              collapsed={collapsed}
+              onNavigate={closeMobile}
+            />
           </CollapsibleSection>
 
           <CollapsibleSection
@@ -633,9 +632,7 @@ function NavItem({
           textDecoration: 'none',
           backdropFilter: active || hovered ? 'blur(12px)' : 'none',
           WebkitBackdropFilter: active || hovered ? 'blur(12px)' : 'none',
-          boxShadow: active
-            ? '0 1px 0 var(--bg-elevated) inset, var(--liquid-shadow)'
-            : 'none',
+          boxShadow: active ? '0 1px 0 var(--bg-elevated) inset, var(--liquid-shadow)' : 'none',
           transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >

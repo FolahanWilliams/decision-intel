@@ -47,8 +47,7 @@ const PERSONA_CONFIG: Record<string, PersonaConfig> = {
   'Aggressive Growth': {
     icon: <TrendingUp size={20} />,
     color: '#16A34A',
-    bgGradient:
-      'linear-gradient(135deg, rgba(22, 163, 74, 0.06) 0%, rgba(22, 163, 74, 0.02) 100%)',
+    bgGradient: 'linear-gradient(135deg, rgba(22, 163, 74, 0.06) 0%, rgba(22, 163, 74, 0.02) 100%)',
     borderColor: 'rgba(22, 163, 74, 0.25)',
     description: 'Prioritizes market capture and competitive advantage',
     avatarInitials: 'AG',
@@ -432,7 +431,9 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                       {config.avatarInitials}
                     </div>
                     <div>
-                      <h4 style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '14px' }}>
+                      <h4
+                        style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '14px' }}
+                      >
                         {twin.name}
                       </h4>
                       <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{twin.role}</p>

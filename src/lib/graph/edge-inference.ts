@@ -725,9 +725,11 @@ export async function addManualEdge(params: {
  * Find historical parallel edges by matching detected biases against
  * the real-world case study database.
  */
-function findHistoricalParallelEdges(
-  analysis: { id: string; biases: Array<{ biasType: string; severity: string }>; document: { id: string } | null }
-): EdgeCandidate[] {
+function findHistoricalParallelEdges(analysis: {
+  id: string;
+  biases: Array<{ biasType: string; severity: string }>;
+  document: { id: string } | null;
+}): EdgeCandidate[] {
   const biasTypes = analysis.biases.map(b => b.biasType);
   if (biasTypes.length === 0) return [];
 

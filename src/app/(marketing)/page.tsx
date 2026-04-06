@@ -43,7 +43,11 @@ const C = {
   tealBg: '#E0F2F1',
 } as const;
 
-const fadeIn = { initial: { opacity: 0, y: 20 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true } };
+const fadeIn = {
+  initial: { opacity: 0, y: 20 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true },
+};
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LANDING PAGE
@@ -53,19 +57,37 @@ const fadeIn = { initial: { opacity: 0, y: 20 }, whileInView: { opacity: 1, y: 0
 
 type CompetitorTab = 'cloverpop' | 'mckinsey';
 
-const COMPETITOR_DATA: Record<CompetitorTab, {
-  name: string;
-  tagline: string;
-  rows: Array<{ dimension: string; them: string; us: string; usWins: boolean }>;
-}> = {
+const COMPETITOR_DATA: Record<
+  CompetitorTab,
+  {
+    name: string;
+    tagline: string;
+    rows: Array<{ dimension: string; them: string; us: string; usWins: boolean }>;
+  }
+> = {
   cloverpop: {
     name: 'Cloverpop',
     tagline: 'Acquired 2023 · Decision tracking, no bias detection',
     rows: [
-      { dimension: 'What they do', them: 'Decision tracking & workflow', us: 'AI bias detection + calibration', usWins: true },
+      {
+        dimension: 'What they do',
+        them: 'Decision tracking & workflow',
+        us: 'AI bias detection + calibration',
+        usWins: true,
+      },
       { dimension: 'Bias detection', them: 'None', us: '20 types, automated', usWins: true },
-      { dimension: 'Outcome flywheel', them: 'Partial (tracking only)', us: 'Full (3-channel passive)', usWins: true },
-      { dimension: 'Compliance mapping', them: 'None', us: '7 frameworks + audit packet', usWins: true },
+      {
+        dimension: 'Outcome flywheel',
+        them: 'Partial (tracking only)',
+        us: 'Full (3-channel passive)',
+        usWins: true,
+      },
+      {
+        dimension: 'Compliance mapping',
+        them: 'None',
+        us: '7 frameworks + audit packet',
+        usWins: true,
+      },
       { dimension: 'Speed', them: 'N/A', us: '<60s per document', usWins: true },
       { dimension: 'Toxic combinations', them: 'None', us: '18 named patterns', usWins: true },
     ],
@@ -74,7 +96,12 @@ const COMPETITOR_DATA: Record<CompetitorTab, {
     name: 'McKinsey / BCG',
     tagline: 'Management consulting · $500K–$2M per engagement',
     rows: [
-      { dimension: 'What they do', them: 'Manual decision review', us: 'AI bias detection + calibration', usWins: true },
+      {
+        dimension: 'What they do',
+        them: 'Manual decision review',
+        us: 'AI bias detection + calibration',
+        usWins: true,
+      },
       { dimension: 'Cost', them: '$500K–$2M / engagement', us: '$129/mo Pro', usWins: true },
       { dimension: 'Speed', them: '6–12 weeks', us: 'Minutes per document', usWins: true },
       { dimension: 'Continuous', them: 'No (point-in-time)', us: 'Yes (always-on)', usWins: true },
@@ -100,7 +127,16 @@ function CompetitorComparisonCard() {
     >
       {/* Header */}
       <div style={{ padding: '20px 24px 0', borderBottom: `1px solid ${C.slate200}` }}>
-        <p style={{ fontSize: 11, fontWeight: 700, color: C.green, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>
+        <p
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            color: C.green,
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+            marginBottom: 8,
+          }}
+        >
           How We Compare
         </p>
         <h3 style={{ fontSize: 20, fontWeight: 700, color: C.slate900, marginBottom: 16 }}>
@@ -135,7 +171,13 @@ function CompetitorComparisonCard() {
       </div>
 
       {/* Competitor tagline */}
-      <div style={{ padding: '12px 24px', background: C.slate50, borderBottom: `1px solid ${C.slate200}` }}>
+      <div
+        style={{
+          padding: '12px 24px',
+          background: C.slate50,
+          borderBottom: `1px solid ${C.slate200}`,
+        }}
+      >
         <p style={{ fontSize: 12, color: C.slate400, margin: 0, fontStyle: 'italic' }}>
           {data.tagline}
         </p>
@@ -155,28 +197,62 @@ function CompetitorComparisonCard() {
               alignItems: 'center',
             }}
           >
-            <div style={{ fontSize: 13, fontWeight: 600, color: C.slate600 }}>
-              {row.dimension}
-            </div>
-            <div style={{ fontSize: 13, color: C.slate400, display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ width: 16, height: 16, borderRadius: 8, background: '#FEE2E2', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: '#EF4444', flexShrink: 0 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: C.slate600 }}>{row.dimension}</div>
+            <div
+              style={{
+                fontSize: 13,
+                color: C.slate400,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+              }}
+            >
+              <span
+                style={{
+                  width: 16,
+                  height: 16,
+                  borderRadius: 8,
+                  background: '#FEE2E2',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 10,
+                  color: '#EF4444',
+                  flexShrink: 0,
+                }}
+              >
                 ✕
               </span>
               {row.them}
             </div>
-            <div style={{
-              fontSize: 13,
-              color: C.slate900,
-              fontWeight: 600,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              background: row.usWins ? '#F0FDF4' : 'transparent',
-              padding: '4px 8px',
-              borderRadius: 6,
-              margin: '-4px -8px',
-            }}>
-              <span style={{ width: 16, height: 16, borderRadius: 8, background: '#DCFCE7', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: C.green, flexShrink: 0 }}>
+            <div
+              style={{
+                fontSize: 13,
+                color: C.slate900,
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                background: row.usWins ? '#F0FDF4' : 'transparent',
+                padding: '4px 8px',
+                borderRadius: 6,
+                margin: '-4px -8px',
+              }}
+            >
+              <span
+                style={{
+                  width: 16,
+                  height: 16,
+                  borderRadius: 8,
+                  background: '#DCFCE7',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 10,
+                  color: C.green,
+                  flexShrink: 0,
+                }}
+              >
                 ✓
               </span>
               {row.us}
@@ -186,7 +262,14 @@ function CompetitorComparisonCard() {
       </div>
 
       {/* Footer CTA */}
-      <div style={{ padding: '16px 24px', borderTop: `1px solid ${C.slate200}`, background: C.slate50, textAlign: 'center' }}>
+      <div
+        style={{
+          padding: '16px 24px',
+          borderTop: `1px solid ${C.slate200}`,
+          background: C.slate50,
+          textAlign: 'center',
+        }}
+      >
         <a
           href="/demo"
           style={{
@@ -281,9 +364,14 @@ export default function LandingPage() {
             justifyContent: 'space-between',
           }}
         >
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
+          <Link
+            href="/"
+            style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}
+          >
             <Brain size={24} style={{ color: C.green }} />
-            <span style={{ fontSize: 18, fontWeight: 700, color: C.white, letterSpacing: '-0.02em' }}>
+            <span
+              style={{ fontSize: 18, fontWeight: 700, color: C.white, letterSpacing: '-0.02em' }}
+            >
               Decision Intel
             </span>
           </Link>
@@ -299,7 +387,12 @@ export default function LandingPage() {
                 <a
                   key={item}
                   href={href}
-                  style={{ fontSize: 14, color: '#CBD5E1', textDecoration: 'none', fontWeight: 500 }}
+                  style={{
+                    fontSize: 14,
+                    color: '#CBD5E1',
+                    textDecoration: 'none',
+                    fontWeight: 500,
+                  }}
                 >
                   {item}
                 </a>
@@ -308,7 +401,10 @@ export default function LandingPage() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }} className="hidden-mobile">
-            <Link href="/login" style={{ fontSize: 14, color: '#CBD5E1', textDecoration: 'none', fontWeight: 500 }}>
+            <Link
+              href="/login"
+              style={{ fontSize: 14, color: '#CBD5E1', textDecoration: 'none', fontWeight: 500 }}
+            >
               Sign In
             </Link>
             <Link
@@ -330,7 +426,13 @@ export default function LandingPage() {
           {/* Mobile Toggle */}
           <button
             onClick={() => setMobileNavOpen(!mobileNavOpen)}
-            style={{ background: 'none', border: 'none', color: C.white, cursor: 'pointer', padding: 4 }}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: C.white,
+              cursor: 'pointer',
+              padding: 4,
+            }}
             className="show-mobile-only"
           >
             {mobileNavOpen ? <X size={24} /> : <Menu size={24} />}
@@ -339,7 +441,15 @@ export default function LandingPage() {
 
         {/* Mobile Menu */}
         {mobileNavOpen && (
-          <div style={{ background: C.navyLight, padding: '16px 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div
+            style={{
+              background: C.navyLight,
+              padding: '16px 24px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 12,
+            }}
+          >
             {['Features', 'How It Works', 'Case Studies', 'Pricing'].map(item => {
               const href =
                 item === 'Case Studies'
@@ -350,13 +460,21 @@ export default function LandingPage() {
                   key={item}
                   href={href}
                   onClick={() => setMobileNavOpen(false)}
-                  style={{ fontSize: 15, color: '#CBD5E1', textDecoration: 'none', padding: '8px 0' }}
+                  style={{
+                    fontSize: 15,
+                    color: '#CBD5E1',
+                    textDecoration: 'none',
+                    padding: '8px 0',
+                  }}
                 >
                   {item}
                 </a>
               );
             })}
-            <Link href="/login" style={{ fontSize: 15, color: '#CBD5E1', textDecoration: 'none', padding: '8px 0' }}>
+            <Link
+              href="/login"
+              style={{ fontSize: 15, color: '#CBD5E1', textDecoration: 'none', padding: '8px 0' }}
+            >
               Sign In
             </Link>
             <Link
@@ -393,7 +511,16 @@ export default function LandingPage() {
           className="hero-grid"
         >
           <div>
-            <p style={{ fontSize: 13, fontWeight: 600, color: C.green, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>
+            <p
+              style={{
+                fontSize: 13,
+                fontWeight: 600,
+                color: C.green,
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                marginBottom: 12,
+              }}
+            >
               Grammarly for strategic decisions
             </p>
             <h1
@@ -410,13 +537,19 @@ export default function LandingPage() {
               <br />
               <span style={{ color: C.green }}>We find them in 60 seconds.</span>
             </h1>
-            <p style={{ fontSize: 18, color: C.slate600, lineHeight: 1.7, marginBottom: 32, maxWidth: 520 }}>
-              Grammarly catches grammar errors before you hit send. Decision Intel
-              catches cognitive biases before you sign the deal. Upload any
-              strategic document &mdash; board memo, deal thesis, strategy
-              proposal &mdash; and get a comprehensive bias audit with compliance
-              mapping, noise measurement, and a calibrated risk score in under
-              a minute.
+            <p
+              style={{
+                fontSize: 18,
+                color: C.slate600,
+                lineHeight: 1.7,
+                marginBottom: 32,
+                maxWidth: 520,
+              }}
+            >
+              Grammarly catches grammar errors before you hit send. Decision Intel catches cognitive
+              biases before you sign the deal. Upload any strategic document &mdash; board memo,
+              deal thesis, strategy proposal &mdash; and get a comprehensive bias audit with
+              compliance mapping, noise measurement, and a calibrated risk score in under a minute.
             </p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <Link
@@ -479,10 +612,9 @@ export default function LandingPage() {
                 The job you&rsquo;re hiring us for
               </div>
               <p style={{ fontSize: 14, color: C.slate600, lineHeight: 1.6, margin: 0 }}>
-                When my team is about to commit on a decision that looks right,
-                help me know whether our conviction survives a blind, unbiased
-                stress test &mdash; so we can move forward with confidence or
-                pause before it&rsquo;s irreversible.
+                When my team is about to commit on a decision that looks right, help me know whether
+                our conviction survives a blind, unbiased stress test &mdash; so we can move forward
+                with confidence or pause before it&rsquo;s irreversible.
               </p>
             </div>
           </div>
@@ -582,7 +714,16 @@ export default function LandingPage() {
                 >
                   {panel.icon}
                 </div>
-                <div style={{ fontSize: 17, fontWeight: 700, color: C.slate900, marginBottom: 4, position: 'relative', zIndex: 1 }}>
+                <div
+                  style={{
+                    fontSize: 17,
+                    fontWeight: 700,
+                    color: C.slate900,
+                    marginBottom: 4,
+                    position: 'relative',
+                    zIndex: 1,
+                  }}
+                >
                   {panel.label}
                 </div>
                 <div style={{ fontSize: 13, color: C.slate600, position: 'relative', zIndex: 1 }}>
@@ -595,7 +736,13 @@ export default function LandingPage() {
       </section>
 
       {/* ── Stats Bar ───────────────────────────────────────────────── */}
-      <section style={{ background: C.slate50, borderTop: `1px solid ${C.slate200}`, borderBottom: `1px solid ${C.slate200}` }}>
+      <section
+        style={{
+          background: C.slate50,
+          borderTop: `1px solid ${C.slate200}`,
+          borderBottom: `1px solid ${C.slate200}`,
+        }}
+      >
         <div
           style={{
             maxWidth: 1200,
@@ -609,10 +756,34 @@ export default function LandingPage() {
           className="stats-grid"
         >
           {[
-            { icon: BarChart3, value: '55%', label: 'Decision variance hidden from teams', sub: 'Kahneman, "Noise" (2021)', href: null as string | null },
-            { icon: AlertTriangle, value: '$1.3T', label: 'Annual enterprise value eroded by cognitive bias', sub: 'McKinsey, Malmendier & Tate', href: null as string | null },
-            { icon: TrendingUp, value: '146', label: 'Annotated failure case studies', sub: '8 industries, SEC filings & NTSB reports', href: '/case-studies' as string | null },
-            { icon: Zap, value: '<60s', label: 'Full cognitive audit per document', sub: '11-agent pipeline, 20+ biases', href: null as string | null },
+            {
+              icon: BarChart3,
+              value: '55%',
+              label: 'Decision variance hidden from teams',
+              sub: 'Kahneman, "Noise" (2021)',
+              href: null as string | null,
+            },
+            {
+              icon: AlertTriangle,
+              value: '$1.3T',
+              label: 'Annual enterprise value eroded by cognitive bias',
+              sub: 'McKinsey, Malmendier & Tate',
+              href: null as string | null,
+            },
+            {
+              icon: TrendingUp,
+              value: '146',
+              label: 'Annotated failure case studies',
+              sub: '8 industries, SEC filings & NTSB reports',
+              href: '/case-studies' as string | null,
+            },
+            {
+              icon: Zap,
+              value: '<60s',
+              label: 'Full cognitive audit per document',
+              sub: '11-agent pipeline, 20+ biases',
+              href: null as string | null,
+            },
           ].map(({ icon: Icon, value, label, sub, href }) => {
             const content = (
               <>
@@ -631,13 +802,20 @@ export default function LandingPage() {
                   <Icon size={22} style={{ color: C.teal }} />
                 </div>
                 <div style={{ textAlign: 'left' }}>
-                  <div style={{ fontSize: 32, fontWeight: 800, color: C.slate900, lineHeight: 1 }}>{value}</div>
+                  <div style={{ fontSize: 32, fontWeight: 800, color: C.slate900, lineHeight: 1 }}>
+                    {value}
+                  </div>
                   <div style={{ fontSize: 13, color: C.slate600, marginTop: 2 }}>{label}</div>
                   <div style={{ fontSize: 11, color: C.slate400, marginTop: 1 }}>{sub}</div>
                 </div>
               </>
             );
-            const baseStyle = { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 } as const;
+            const baseStyle = {
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 16,
+            } as const;
             if (href) {
               return (
                 <Link
@@ -665,10 +843,27 @@ export default function LandingPage() {
       {/* ── How It Works ────────────────────────────────────────────── */}
       <section id="how-it-works" style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}>
         <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
-          <p style={{ fontSize: 14, fontWeight: 600, color: C.green, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+          <p
+            style={{
+              fontSize: 14,
+              fontWeight: 600,
+              color: C.green,
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              marginBottom: 8,
+            }}
+          >
             How it Works
           </p>
-          <h2 style={{ fontSize: 36, fontWeight: 700, color: C.slate900, marginBottom: 16, letterSpacing: '-0.01em' }}>
+          <h2
+            style={{
+              fontSize: 36,
+              fontWeight: 700,
+              color: C.slate900,
+              marginBottom: 16,
+              letterSpacing: '-0.01em',
+            }}
+          >
             Decision Hygiene in Three Steps
           </h2>
           <p style={{ fontSize: 18, color: C.slate600, marginBottom: 48, maxWidth: 560 }}>
@@ -676,7 +871,10 @@ export default function LandingPage() {
           </p>
         </motion.div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }} className="cards-grid">
+        <div
+          style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}
+          className="cards-grid"
+        >
           {[
             {
               icon: FileSearch,
@@ -684,7 +882,12 @@ export default function LandingPage() {
               num: '01',
               title: 'Upload the document',
               desc: 'Drop in board memos, deal theses, strategy proposals, diligence reports, or any decision document. Capture each stakeholder\u2019s prior belief privately, before the room starts reinforcing itself.',
-              bullets: ['PDF, DOCX, Excel, CSV support', 'Decision framing with success/failure criteria', 'Blind prior collection before group discussion', 'Slack integration for real-time capture'],
+              bullets: [
+                'PDF, DOCX, Excel, CSV support',
+                'Decision framing with success/failure criteria',
+                'Blind prior collection before group discussion',
+                'Slack integration for real-time capture',
+              ],
               color: '#3B82F6',
               colorBg: '#EFF6FF',
             },
@@ -694,7 +897,12 @@ export default function LandingPage() {
               num: '02',
               title: 'Get the blind second opinion',
               desc: 'An 11-agent pipeline stress-tests the document: 20+ biases detected, a three-judge statistical jury measures noise, and a simulated boardroom argues against your proposal before your real one does.',
-              bullets: ['20+ cognitive biases with confidence scores', '3 independent noise judges (Kahneman)', 'Boardroom simulation with custom personas', 'Fact-checking via Google Search grounding'],
+              bullets: [
+                '20+ cognitive biases with confidence scores',
+                '3 independent noise judges (Kahneman)',
+                'Boardroom simulation with custom personas',
+                'Fact-checking via Google Search grounding',
+              ],
               color: '#8B5CF6',
               colorBg: '#F5F3FF',
             },
@@ -704,7 +912,12 @@ export default function LandingPage() {
               num: '03',
               title: 'Know why your team believed what they believed',
               desc: 'Outcomes are detected automatically from follow-up documents, Slack, and web intelligence. Every deal closes the feedback loop, so your next conviction is measurably more trustworthy than your last.',
-              bullets: ['Autonomous outcome detection', 'Calibration dashboards', 'Bias cost estimates', 'Toxic combination alerts with mitigation playbooks'],
+              bullets: [
+                'Autonomous outcome detection',
+                'Calibration dashboards',
+                'Bias cost estimates',
+                'Toxic combination alerts with mitigation playbooks',
+              ],
               color: C.green,
               colorBg: C.greenLight,
             },
@@ -729,9 +942,17 @@ export default function LandingPage() {
                 }}
                 onClick={() => setExpandedCard(isOpen ? null : i)}
               >
-
                 {/* Icon */}
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20, position: 'relative', zIndex: 1 }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    justifyContent: 'space-between',
+                    marginBottom: 20,
+                    position: 'relative',
+                    zIndex: 1,
+                  }}
+                >
                   <div
                     style={{
                       width: 48,
@@ -766,26 +987,77 @@ export default function LandingPage() {
 
                 {/* Content */}
                 <div style={{ position: 'relative', zIndex: 1 }}>
-                  <p style={{ fontSize: 12, fontWeight: 600, color: C.slate400, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>
+                  <p
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: C.slate400,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.1em',
+                      marginBottom: 8,
+                    }}
+                  >
                     {card.phase}
                   </p>
-                  <h3 style={{ fontSize: 22, fontWeight: 700, color: C.slate900, marginBottom: 12 }}>
+                  <h3
+                    style={{ fontSize: 22, fontWeight: 700, color: C.slate900, marginBottom: 12 }}
+                  >
                     {card.title}
                   </h3>
-                  <p style={{ fontSize: 15, color: C.slate600, lineHeight: 1.6 }}>
-                    {card.desc}
-                  </p>
+                  <p style={{ fontSize: 15, color: C.slate600, lineHeight: 1.6 }}>{card.desc}</p>
 
                   {/* Expanded Content */}
                   {isOpen && (
-                    <div style={{ marginTop: 20, paddingTop: 20, borderTop: `1px solid ${C.slate200}` }}>
-                      <p style={{ fontSize: 11, fontWeight: 700, color: C.slate400, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>
+                    <div
+                      style={{
+                        marginTop: 20,
+                        paddingTop: 20,
+                        borderTop: `1px solid ${C.slate200}`,
+                      }}
+                    >
+                      <p
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 700,
+                          color: C.slate400,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.1em',
+                          marginBottom: 12,
+                        }}
+                      >
                         Key Capabilities
                       </p>
-                      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      <ul
+                        style={{
+                          listStyle: 'none',
+                          padding: 0,
+                          margin: 0,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 10,
+                        }}
+                      >
                         {card.bullets.map(b => (
-                          <li key={b} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 14, color: C.slate600 }}>
-                            <div style={{ width: 6, height: 6, borderRadius: 3, background: C.green, marginTop: 7, flexShrink: 0 }} />
+                          <li
+                            key={b}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'flex-start',
+                              gap: 10,
+                              fontSize: 14,
+                              color: C.slate600,
+                            }}
+                          >
+                            <div
+                              style={{
+                                width: 6,
+                                height: 6,
+                                borderRadius: 3,
+                                background: C.green,
+                                marginTop: 7,
+                                flexShrink: 0,
+                              }}
+                            />
                             {b}
                           </li>
                         ))}
@@ -805,11 +1077,19 @@ export default function LandingPage() {
         </div>
       </section>
 
-
       {/* ── Features ────────────────────────────────────────────────── */}
       <section id="features" style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}>
         <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
-          <p style={{ fontSize: 14, fontWeight: 600, color: C.green, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+          <p
+            style={{
+              fontSize: 14,
+              fontWeight: 600,
+              color: C.green,
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              marginBottom: 8,
+            }}
+          >
             Features
           </p>
           <h2 style={{ fontSize: 36, fontWeight: 700, color: C.slate900, marginBottom: 48 }}>
@@ -817,14 +1097,53 @@ export default function LandingPage() {
           </h2>
         </motion.div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }} className="cards-grid">
+        <div
+          style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}
+          className="cards-grid"
+        >
           {[
-            { icon: Brain, title: 'Cognitive Bias Detection', desc: '20+ biases detected with confidence scores, excerpts, and research-backed explanations. 11 additional investment-specific biases for PE/VC.', color: '#8B5CF6', bg: '#F5F3FF' },
-            { icon: BarChart3, title: 'Noise Measurement', desc: '3 independent AI judges score your document — just like Kahneman\'s insurance underwriter study. Measures the variance your team doesn\'t see.', color: '#3B82F6', bg: '#EFF6FF' },
-            { icon: Users, title: 'Decision Rooms', desc: 'Blind prior collection before group discussion. Consensus scoring reveals when agreement is genuine vs. groupthink.', color: C.teal, bg: C.tealBg },
-            { icon: Target, title: 'Toxic Combinations', desc: '10 named compound risk patterns (Echo Chamber, Sunk Ship, etc.) with auto-generated mitigation playbooks and dollar impact estimates.', color: '#EF4444', bg: '#FEF2F2' },
-            { icon: Network, title: 'Decision Knowledge Graph', desc: 'Every decision becomes a node. Edges reveal influence chains, shared biases, and cascading risks across your portfolio.', color: '#F59E0B', bg: '#FFFBEB' },
-            { icon: Shield, title: 'Compliance Mapping', desc: 'SOX, GDPR, MiFID II, and FCA Consumer Duty frameworks. Cross-maps detected biases to regulatory risks with audit trails.', color: C.green, bg: C.greenLight },
+            {
+              icon: Brain,
+              title: 'Cognitive Bias Detection',
+              desc: '20+ biases detected with confidence scores, excerpts, and research-backed explanations. 11 additional investment-specific biases for PE/VC.',
+              color: '#8B5CF6',
+              bg: '#F5F3FF',
+            },
+            {
+              icon: BarChart3,
+              title: 'Noise Measurement',
+              desc: "3 independent AI judges score your document — just like Kahneman's insurance underwriter study. Measures the variance your team doesn't see.",
+              color: '#3B82F6',
+              bg: '#EFF6FF',
+            },
+            {
+              icon: Users,
+              title: 'Decision Rooms',
+              desc: 'Blind prior collection before group discussion. Consensus scoring reveals when agreement is genuine vs. groupthink.',
+              color: C.teal,
+              bg: C.tealBg,
+            },
+            {
+              icon: Target,
+              title: 'Toxic Combinations',
+              desc: '10 named compound risk patterns (Echo Chamber, Sunk Ship, etc.) with auto-generated mitigation playbooks and dollar impact estimates.',
+              color: '#EF4444',
+              bg: '#FEF2F2',
+            },
+            {
+              icon: Network,
+              title: 'Decision Knowledge Graph',
+              desc: 'Every decision becomes a node. Edges reveal influence chains, shared biases, and cascading risks across your portfolio.',
+              color: '#F59E0B',
+              bg: '#FFFBEB',
+            },
+            {
+              icon: Shield,
+              title: 'Compliance Mapping',
+              desc: 'SOX, GDPR, MiFID II, and FCA Consumer Duty frameworks. Cross-maps detected biases to regulatory risks with audit trails.',
+              color: C.green,
+              bg: C.greenLight,
+            },
           ].map((f, i) => {
             const Icon = f.icon;
             return (
@@ -854,7 +1173,9 @@ export default function LandingPage() {
                 >
                   <Icon size={20} style={{ color: f.color }} />
                 </div>
-                <h3 style={{ fontSize: 18, fontWeight: 700, color: C.slate900, marginBottom: 8 }}>{f.title}</h3>
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: C.slate900, marginBottom: 8 }}>
+                  {f.title}
+                </h3>
                 <p style={{ fontSize: 14, color: C.slate600, lineHeight: 1.6 }}>{f.desc}</p>
               </motion.div>
             );
@@ -865,8 +1186,21 @@ export default function LandingPage() {
       {/* ── Pricing ─────────────────────────────────────────────────── */}
       <section id="pricing" style={{ background: C.slate50, borderTop: `1px solid ${C.slate200}` }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}>
-          <motion.div {...fadeIn} transition={{ duration: 0.5 }} style={{ textAlign: 'center', marginBottom: 48 }}>
-            <p style={{ fontSize: 14, fontWeight: 600, color: C.green, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+          <motion.div
+            {...fadeIn}
+            transition={{ duration: 0.5 }}
+            style={{ textAlign: 'center', marginBottom: 48 }}
+          >
+            <p
+              style={{
+                fontSize: 14,
+                fontWeight: 600,
+                color: C.green,
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                marginBottom: 8,
+              }}
+            >
               Pricing
             </p>
             <h2 style={{ fontSize: 36, fontWeight: 700, color: C.slate900, marginBottom: 16 }}>
@@ -874,7 +1208,17 @@ export default function LandingPage() {
             </h2>
 
             {/* Annual/Monthly Toggle */}
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12, background: C.white, border: `1px solid ${C.slate200}`, borderRadius: 999, padding: 4 }}>
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 12,
+                background: C.white,
+                border: `1px solid ${C.slate200}`,
+                borderRadius: 999,
+                padding: 4,
+              }}
+            >
               <button
                 onClick={() => setIsAnnual(false)}
                 style={{
@@ -910,16 +1254,28 @@ export default function LandingPage() {
             </div>
           </motion.div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20 }} className="pricing-grid">
+          <div
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20 }}
+            className="pricing-grid"
+          >
             {[
               {
                 name: 'Starter',
                 price: 0,
                 priceAnnual: 0,
                 desc: 'Try the bias engine on 3 strategic documents',
-                features: ['3 analyses/month', '5 bias types', '10 pages per doc', '3 team seats', 'Community support'],
+                features: [
+                  '3 analyses/month',
+                  '5 bias types',
+                  '10 pages per doc',
+                  '3 team seats',
+                  'Community support',
+                ],
                 cta: 'Get Started',
-                action: () => { window.location.href = '/login?redirect=' + encodeURIComponent('/?scrollTo=pricing'); },
+                action: () => {
+                  window.location.href =
+                    '/login?redirect=' + encodeURIComponent('/?scrollTo=pricing');
+                },
                 outline: true,
                 popular: false,
               },
@@ -928,7 +1284,14 @@ export default function LandingPage() {
                 price: 349,
                 priceAnnual: 279,
                 desc: 'For decision-makers running strategic documents through the gauntlet',
-                features: ['50 analyses/month', '20+ bias types', '100 pages per doc', '10 team seats', 'Outcome tracking', 'Decision Twin'],
+                features: [
+                  '50 analyses/month',
+                  '20+ bias types',
+                  '100 pages per doc',
+                  '10 team seats',
+                  'Outcome tracking',
+                  'Decision Twin',
+                ],
                 cta: 'Start Free Trial',
                 action: () => handleCheckout('pro'),
                 loading: checkoutLoading === 'pro',
@@ -940,7 +1303,15 @@ export default function LandingPage() {
                 price: 999,
                 priceAnnual: 799,
                 desc: 'For decision committees with document pipeline + Slack',
-                features: ['250 analyses/month', 'Everything in Pro', '50 team seats', 'Slack integration', 'Decision Rooms', 'Compliance mapping', 'Team calibration'],
+                features: [
+                  '250 analyses/month',
+                  'Everything in Pro',
+                  '50 team seats',
+                  'Slack integration',
+                  'Decision Rooms',
+                  'Compliance mapping',
+                  'Team calibration',
+                ],
                 cta: 'Start Free Trial',
                 action: () => handleCheckout('team'),
                 loading: checkoutLoading === 'team',
@@ -952,9 +1323,20 @@ export default function LandingPage() {
                 price: -1,
                 priceAnnual: -1,
                 desc: 'For enterprise teams with dedicated support and custom workflows',
-                features: ['Unlimited analyses', 'Everything in Team', 'Unlimited team seats', 'SSO & custom taxonomy', 'Dedicated support', 'Custom playbooks', 'SLA guarantee'],
+                features: [
+                  'Unlimited analyses',
+                  'Everything in Team',
+                  'Unlimited team seats',
+                  'SSO & custom taxonomy',
+                  'Dedicated support',
+                  'Custom playbooks',
+                  'SLA guarantee',
+                ],
                 cta: 'Contact Sales',
-                action: () => { window.location.href = 'mailto:folahanwilliams@gmail.com?subject=Enterprise%20Inquiry'; },
+                action: () => {
+                  window.location.href =
+                    'mailto:folahanwilliams@gmail.com?subject=Enterprise%20Inquiry';
+                },
                 outline: true,
                 popular: false,
               },
@@ -973,7 +1355,9 @@ export default function LandingPage() {
                     display: 'flex',
                     flexDirection: 'column',
                     position: 'relative',
-                    boxShadow: tier.popular ? '0 4px 12px rgba(22,163,74,0.12)' : '0 1px 3px rgba(0,0,0,0.06)',
+                    boxShadow: tier.popular
+                      ? '0 4px 12px rgba(22,163,74,0.12)'
+                      : '0 1px 3px rgba(0,0,0,0.06)',
                   }}
                 >
                   {tier.popular && (
@@ -996,20 +1380,55 @@ export default function LandingPage() {
                       Most Popular
                     </div>
                   )}
-                  <h3 style={{ fontSize: 18, fontWeight: 700, color: C.slate900, marginBottom: 4 }}>{tier.name}</h3>
+                  <h3 style={{ fontSize: 18, fontWeight: 700, color: C.slate900, marginBottom: 4 }}>
+                    {tier.name}
+                  </h3>
                   <div style={{ marginBottom: 12 }}>
                     {displayPrice === -1 ? (
-                      <span style={{ fontSize: 32, fontWeight: 800, color: C.slate900 }}>Custom</span>
+                      <span style={{ fontSize: 32, fontWeight: 800, color: C.slate900 }}>
+                        Custom
+                      </span>
                     ) : displayPrice === 0 ? (
-                      <span style={{ fontSize: 32, fontWeight: 800, color: C.slate900 }}>$0<span style={{ fontSize: 14, fontWeight: 500, color: C.slate400 }}>/mo</span></span>
+                      <span style={{ fontSize: 32, fontWeight: 800, color: C.slate900 }}>
+                        $0
+                        <span style={{ fontSize: 14, fontWeight: 500, color: C.slate400 }}>
+                          /mo
+                        </span>
+                      </span>
                     ) : (
-                      <span style={{ fontSize: 32, fontWeight: 800, color: C.slate900 }}>${displayPrice}<span style={{ fontSize: 14, fontWeight: 500, color: C.slate400 }}>/mo</span></span>
+                      <span style={{ fontSize: 32, fontWeight: 800, color: C.slate900 }}>
+                        ${displayPrice}
+                        <span style={{ fontSize: 14, fontWeight: 500, color: C.slate400 }}>
+                          /mo
+                        </span>
+                      </span>
                     )}
                   </div>
-                  <p style={{ fontSize: 14, color: C.slate600, marginBottom: 20, lineHeight: 1.5 }}>{tier.desc}</p>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
+                  <p style={{ fontSize: 14, color: C.slate600, marginBottom: 20, lineHeight: 1.5 }}>
+                    {tier.desc}
+                  </p>
+                  <ul
+                    style={{
+                      listStyle: 'none',
+                      padding: 0,
+                      margin: '0 0 24px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 10,
+                      flex: 1,
+                    }}
+                  >
                     {tier.features.map(f => (
-                      <li key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: C.slate600 }}>
+                      <li
+                        key={f}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 8,
+                          fontSize: 13,
+                          color: C.slate600,
+                        }}
+                      >
                         <Check size={14} style={{ color: C.green, flexShrink: 0 }} /> {f}
                       </li>
                     ))}
@@ -1059,18 +1478,34 @@ export default function LandingPage() {
           className="faq-grid"
         >
           {/* Left quarter — FAQ heading + accordion */}
-          <div style={{ display: 'flex', flexDirection: 'column', maxWidth: 480, margin: '0 auto' }}>
+          <div
+            style={{ display: 'flex', flexDirection: 'column', maxWidth: 480, margin: '0 auto' }}
+          >
             <motion.div {...fadeIn} transition={{ duration: 0.5 }} style={{ marginBottom: 32 }}>
               <h2 style={{ fontSize: 32, fontWeight: 700, color: C.slate900, lineHeight: 1.2 }}>
-                Frequently Asked<br />Questions
+                Frequently Asked
+                <br />
+                Questions
               </h2>
             </motion.div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {[
-                { q: 'How is sensitive data protected?', a: 'All documents are encrypted with AES-256-GCM at rest and TLS 1.3 in transit. A GDPR anonymization layer removes PII before any AI processing. Your data never leaves our SOC 2 certified infrastructure.' },
-                { q: 'How long does integration take?', a: 'Less than 30 minutes. Upload documents directly, connect via OAuth for Slack, or use our REST API for bulk processing.' },
-                { q: 'How does outcome tracking work?', a: 'Outcomes are detected automatically from follow-up documents, Slack messages, and web intelligence. You confirm with one click. Each reported outcome makes your future analyses more accurate.' },
-                { q: 'How is this different from ChatGPT?', a: 'ChatGPT gives one opinion from one model. We use 3 independent judges for noise measurement, a 20×20 bias interaction matrix for compound scoring, 31 domain-specific biases, and an outcome flywheel that gets smarter with every decision.' },
+                {
+                  q: 'How is sensitive data protected?',
+                  a: 'All documents are encrypted with AES-256-GCM at rest and TLS 1.3 in transit. A GDPR anonymization layer removes PII before any AI processing. Your data never leaves our SOC 2 certified infrastructure.',
+                },
+                {
+                  q: 'How long does integration take?',
+                  a: 'Less than 30 minutes. Upload documents directly, connect via OAuth for Slack, or use our REST API for bulk processing.',
+                },
+                {
+                  q: 'How does outcome tracking work?',
+                  a: 'Outcomes are detected automatically from follow-up documents, Slack messages, and web intelligence. You confirm with one click. Each reported outcome makes your future analyses more accurate.',
+                },
+                {
+                  q: 'How is this different from ChatGPT?',
+                  a: 'ChatGPT gives one opinion from one model. We use 3 independent judges for noise measurement, a 20×20 bias interaction matrix for compound scoring, 31 domain-specific biases, and an outcome flywheel that gets smarter with every decision.',
+                },
               ].map(({ q, a }, i) => {
                 const isOpen = openFAQ === i;
                 return (
@@ -1101,10 +1536,21 @@ export default function LandingPage() {
                       }}
                     >
                       {q}
-                      {isOpen ? <ChevronUp size={18} style={{ color: C.slate400, flexShrink: 0 }} /> : <ChevronDown size={18} style={{ color: C.slate400, flexShrink: 0 }} />}
+                      {isOpen ? (
+                        <ChevronUp size={18} style={{ color: C.slate400, flexShrink: 0 }} />
+                      ) : (
+                        <ChevronDown size={18} style={{ color: C.slate400, flexShrink: 0 }} />
+                      )}
                     </button>
                     {isOpen && (
-                      <div style={{ padding: '0 24px 18px', fontSize: 15, color: C.slate600, lineHeight: 1.7 }}>
+                      <div
+                        style={{
+                          padding: '0 24px 18px',
+                          fontSize: 15,
+                          color: C.slate600,
+                          lineHeight: 1.7,
+                        }}
+                      >
                         {a}
                       </div>
                     )}
@@ -1158,9 +1604,26 @@ export default function LandingPage() {
             >
               Get Started Free <ArrowRight size={18} />
             </Link>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginTop: 24, flexWrap: 'wrap' }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: 24,
+                marginTop: 24,
+                flexWrap: 'wrap',
+              }}
+            >
               {['No credit card required', '14-day free trial', 'SOC 2 infrastructure'].map(t => (
-                <span key={t} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: C.slate400 }}>
+                <span
+                  key={t}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    fontSize: 13,
+                    color: C.slate400,
+                  }}
+                >
                   <Check size={14} style={{ color: C.green }} /> {t}
                 </span>
               ))}
@@ -1188,19 +1651,39 @@ export default function LandingPage() {
               <span style={{ fontSize: 18, fontWeight: 700, color: C.white }}>Decision Intel</span>
             </div>
             <p style={{ fontSize: 14, lineHeight: 1.7, color: '#94A3B8', maxWidth: 280 }}>
-              The Decision Performance OS for M&A and investment teams. Audit cognitive bias, measure decision noise, and track outcomes.
+              The Decision Performance OS for M&A and investment teams. Audit cognitive bias,
+              measure decision noise, and track outcomes.
             </p>
           </div>
 
           <div>
-            <h4 style={{ fontSize: 13, fontWeight: 700, color: C.white, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>Product</h4>
+            <h4
+              style={{
+                fontSize: 13,
+                fontWeight: 700,
+                color: C.white,
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                marginBottom: 16,
+              }}
+            >
+              Product
+            </h4>
             {['Features', 'How It Works', 'Case Studies', 'Pricing', 'Resources'].map(l => {
               const href =
-                l === 'Case Studies'
-                  ? '/case-studies'
-                  : `#${l.toLowerCase().replace(/\s+/g, '-')}`;
+                l === 'Case Studies' ? '/case-studies' : `#${l.toLowerCase().replace(/\s+/g, '-')}`;
               return (
-                <a key={l} href={href} style={{ display: 'block', fontSize: 14, color: '#94A3B8', textDecoration: 'none', marginBottom: 10 }}>
+                <a
+                  key={l}
+                  href={href}
+                  style={{
+                    display: 'block',
+                    fontSize: 14,
+                    color: '#94A3B8',
+                    textDecoration: 'none',
+                    marginBottom: 10,
+                  }}
+                >
                   {l}
                 </a>
               );
@@ -1208,18 +1691,60 @@ export default function LandingPage() {
           </div>
 
           <div>
-            <h4 style={{ fontSize: 13, fontWeight: 700, color: C.white, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>Contact Us</h4>
-            <a href="tel:+447539443572" style={{ display: 'block', fontSize: 14, color: '#94A3B8', textDecoration: 'none', marginBottom: 10 }}>
+            <h4
+              style={{
+                fontSize: 13,
+                fontWeight: 700,
+                color: C.white,
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                marginBottom: 16,
+              }}
+            >
+              Contact Us
+            </h4>
+            <a
+              href="tel:+447539443572"
+              style={{
+                display: 'block',
+                fontSize: 14,
+                color: '#94A3B8',
+                textDecoration: 'none',
+                marginBottom: 10,
+              }}
+            >
               +44 7539 443572
             </a>
-            <a href="mailto:folahanwilliams@gmail.com" style={{ display: 'block', fontSize: 14, color: '#94A3B8', textDecoration: 'none', marginBottom: 10 }}>
+            <a
+              href="mailto:folahanwilliams@gmail.com"
+              style={{
+                display: 'block',
+                fontSize: 14,
+                color: '#94A3B8',
+                textDecoration: 'none',
+                marginBottom: 10,
+              }}
+            >
               folahanwilliams@gmail.com
             </a>
           </div>
 
           <div>
-            <h4 style={{ fontSize: 13, fontWeight: 700, color: C.white, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>Stay Updated</h4>
-            <p style={{ fontSize: 14, color: '#94A3B8', marginBottom: 12 }}>Subscribe to our email information</p>
+            <h4
+              style={{
+                fontSize: 13,
+                fontWeight: 700,
+                color: C.white,
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                marginBottom: 16,
+              }}
+            >
+              Stay Updated
+            </h4>
+            <p style={{ fontSize: 14, color: '#94A3B8', marginBottom: 12 }}>
+              Subscribe to our email information
+            </p>
             <div style={{ display: 'flex', gap: 8 }}>
               <input
                 type="email"

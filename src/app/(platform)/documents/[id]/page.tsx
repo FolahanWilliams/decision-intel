@@ -92,9 +92,7 @@ const EvidenceTab = lazy(() =>
 const PerspectivesTab = lazy(() =>
   import('./tabs/PerspectivesTab').then(m => ({ default: m.PerspectivesTab }))
 );
-const DQChainTab = lazy(() =>
-  import('./tabs/DQChainTab').then(m => ({ default: m.DQChainTab }))
-);
+const DQChainTab = lazy(() => import('./tabs/DQChainTab').then(m => ({ default: m.DQChainTab })));
 const ForgottenQuestionsTab = lazy(() =>
   import('./tabs/ForgottenQuestionsTab').then(m => ({ default: m.ForgottenQuestionsTab }))
 );
@@ -781,10 +779,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
     ];
 
   return (
-    <div
-      className="container"
-      style={{ paddingBottom: 'var(--spacing-2xl)' }}
-    >
+    <div className="container" style={{ paddingBottom: 'var(--spacing-2xl)' }}>
       {/* Breadcrumbs (#11) */}
       <Breadcrumbs
         items={[
@@ -886,9 +881,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 <button
                   onClick={async () => {
                     try {
-                      const res = await fetch(
-                        `/api/compliance/audit-packet/${analysis.id}`
-                      );
+                      const res = await fetch(`/api/compliance/audit-packet/${analysis.id}`);
                       if (res.status === 402) {
                         alert(
                           'Audit Defense Packet export requires the Pro plan or higher. Upgrade to unlock regulator-grade compliance reports.'
@@ -931,7 +924,9 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             decides whether to show the calibrated score or the gamified
             unlock hint based on the org's confirmed-outcome sample size. */}
         {analysis?.compliance?.calibration && (
-          <div style={{ marginTop: 'var(--spacing-sm)', display: 'flex', justifyContent: 'flex-end' }}>
+          <div
+            style={{ marginTop: 'var(--spacing-sm)', display: 'flex', justifyContent: 'flex-end' }}
+          >
             <CalibrationChip calibration={analysis.compliance.calibration} />
           </div>
         )}
@@ -941,8 +936,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           style={{
             height: '2px',
             marginTop: 'var(--spacing-md)',
-            background:
-              'linear-gradient(90deg, var(--border-color), transparent)',
+            background: 'linear-gradient(90deg, var(--border-color), transparent)',
             borderRadius: '1px',
           }}
         />
@@ -2031,9 +2025,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                               idx < biases.length - 1 ? '1px solid var(--border-color)' : 'none',
                             cursor: 'pointer',
                             background:
-                              selectedBias?.id === bias.id
-                                ? 'var(--bg-card)'
-                                : 'transparent',
+                              selectedBias?.id === bias.id ? 'var(--bg-card)' : 'transparent',
                             borderLeft:
                               selectedBias?.id === bias.id
                                 ? '3px solid var(--accent-primary)'

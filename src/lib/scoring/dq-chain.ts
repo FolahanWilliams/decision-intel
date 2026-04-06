@@ -21,11 +21,7 @@
  * AnalysisResult. No external calls.
  */
 
-import type {
-  LogicalAnalysisResult,
-  SwotAnalysisResult,
-  CognitiveAnalysisResult,
-} from '@/types';
+import type { LogicalAnalysisResult, SwotAnalysisResult, CognitiveAnalysisResult } from '@/types';
 
 export type DQChainElementId =
   | 'frame'

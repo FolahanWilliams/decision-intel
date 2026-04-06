@@ -13,7 +13,7 @@ describe('slugify', () => {
   it('lowercases, hyphenates, and strips punctuation', () => {
     expect(slugify('Theranos')).toBe('theranos');
     expect(slugify('AOL Time Warner')).toBe('aol-time-warner');
-    expect(slugify("Long-Term Capital Management")).toBe('long-term-capital-management');
+    expect(slugify('Long-Term Capital Management')).toBe('long-term-capital-management');
     expect(slugify('Boeing 737 MAX')).toBe('boeing-737-max');
   });
 

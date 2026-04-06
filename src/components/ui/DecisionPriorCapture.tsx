@@ -160,7 +160,8 @@ export function DecisionPriorCapture({
                 marginTop: '2px',
               }}
             >
-              Track how your thinking evolves — helps build your personal calibration score over time
+              Track how your thinking evolves — helps build your personal calibration score over
+              time
             </span>
           </div>
         </div>
@@ -173,179 +174,179 @@ export function DecisionPriorCapture({
 
       {/* Form */}
       {!collapsed && (
-      <div
-        style={{
-          padding: compact ? '12px 16px' : '16px 18px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '14px',
-        }}
-      >
-        {/* Default action */}
-        <div>
-          <label
-            style={{
-              fontSize: '11px',
-              fontWeight: 600,
-              color: 'var(--text-secondary)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              display: 'block',
-              marginBottom: '6px',
-            }}
-          >
-            What would you decide right now?
-          </label>
-          <textarea
-            value={defaultAction}
-            onChange={e => setDefaultAction(e.target.value)}
-            placeholder="e.g. Proceed with the proposal as presented..."
-            rows={2}
-            style={{
-              width: '100%',
-              padding: '10px 12px',
-              fontSize: '13px',
-              background: 'var(--bg-card)',
-              border: '1px solid var(--bg-elevated)',
-              borderRadius: '8px',
-              color: 'var(--text-primary)',
-              resize: 'vertical',
-              lineHeight: 1.5,
-            }}
-          />
-        </div>
-
-        {/* Confidence slider */}
-        <div>
-          <label
-            style={{
-              fontSize: '11px',
-              fontWeight: 600,
-              color: 'var(--text-secondary)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              display: 'flex',
-              justifyContent: 'space-between',
-              marginBottom: '8px',
-            }}
-          >
-            <span>How confident are you?</span>
-            <span
+        <div
+          style={{
+            padding: compact ? '12px 16px' : '16px 18px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '14px',
+          }}
+        >
+          {/* Default action */}
+          <div>
+            <label
               style={{
-                color: confidenceLabel.color,
-                fontWeight: 700,
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: '12px',
-                textTransform: 'none',
-                letterSpacing: 'normal',
+                fontSize: '11px',
+                fontWeight: 600,
+                color: 'var(--text-secondary)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                display: 'block',
+                marginBottom: '6px',
               }}
             >
-              {confidence}% — {confidenceLabel.label}
-            </span>
-          </label>
-          <div style={{ position: 'relative' }}>
-            <input
-              type="range"
-              min={0}
-              max={100}
-              value={confidence}
-              onChange={e => setConfidence(Number(e.target.value))}
+              What would you decide right now?
+            </label>
+            <textarea
+              value={defaultAction}
+              onChange={e => setDefaultAction(e.target.value)}
+              placeholder="e.g. Proceed with the proposal as presented..."
+              rows={2}
               style={{
                 width: '100%',
-                accentColor: confidenceLabel.color,
-                height: '4px',
+                padding: '10px 12px',
+                fontSize: '13px',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--bg-elevated)',
+                borderRadius: '8px',
+                color: 'var(--text-primary)',
+                resize: 'vertical',
+                lineHeight: 1.5,
               }}
             />
-            {/* Tick marks at 25, 50, 75 */}
-            <div
+          </div>
+
+          {/* Confidence slider */}
+          <div>
+            <label
               style={{
+                fontSize: '11px',
+                fontWeight: 600,
+                color: 'var(--text-secondary)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
                 display: 'flex',
                 justifyContent: 'space-between',
-                padding: '4px 0 0',
-                fontSize: '9px',
-                color: 'var(--text-muted)',
-                fontFamily: "'JetBrains Mono', monospace",
+                marginBottom: '8px',
               }}
             >
-              <span>0%</span>
-              <span>25%</span>
-              <span>50%</span>
-              <span>75%</span>
-              <span>100%</span>
+              <span>How confident are you?</span>
+              <span
+                style={{
+                  color: confidenceLabel.color,
+                  fontWeight: 700,
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontSize: '12px',
+                  textTransform: 'none',
+                  letterSpacing: 'normal',
+                }}
+              >
+                {confidence}% — {confidenceLabel.label}
+              </span>
+            </label>
+            <div style={{ position: 'relative' }}>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={confidence}
+                onChange={e => setConfidence(Number(e.target.value))}
+                style={{
+                  width: '100%',
+                  accentColor: confidenceLabel.color,
+                  height: '4px',
+                }}
+              />
+              {/* Tick marks at 25, 50, 75 */}
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  padding: '4px 0 0',
+                  fontSize: '9px',
+                  color: 'var(--text-muted)',
+                  fontFamily: "'JetBrains Mono', monospace",
+                }}
+              >
+                <span>0%</span>
+                <span>25%</span>
+                <span>50%</span>
+                <span>75%</span>
+                <span>100%</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Evidence to change */}
-        <div>
-          <label
-            style={{
-              fontSize: '11px',
-              fontWeight: 600,
-              color: 'var(--text-secondary)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              marginBottom: '6px',
-            }}
-          >
-            <Lightbulb size={10} />
-            What would change your mind?
-            <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 'normal' }}>
-              (optional)
+          {/* Evidence to change */}
+          <div>
+            <label
+              style={{
+                fontSize: '11px',
+                fontWeight: 600,
+                color: 'var(--text-secondary)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                marginBottom: '6px',
+              }}
+            >
+              <Lightbulb size={10} />
+              What would change your mind?
+              <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 'normal' }}>
+                (optional)
+              </span>
+            </label>
+            <textarea
+              value={evidenceToChange}
+              onChange={e => setEvidenceToChange(e.target.value)}
+              placeholder="e.g. Evidence of customer churn above 15%, regulatory risk in the target market..."
+              rows={2}
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                fontSize: '13px',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--bg-elevated)',
+                borderRadius: '8px',
+                color: 'var(--text-primary)',
+                resize: 'vertical',
+                lineHeight: 1.5,
+              }}
+            />
+          </div>
+
+          {error && <p style={{ fontSize: '12px', color: '#ef4444', margin: 0 }}>{error}</p>}
+
+          {/* Actions */}
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <button
+              onClick={handleSubmit}
+              disabled={saving || !defaultAction.trim()}
+              style={{
+                padding: '9px 20px',
+                background: defaultAction.trim() ? 'var(--accent-primary)' : 'var(--bg-card-hover)',
+                border: 'none',
+                borderRadius: '8px',
+                color: defaultAction.trim() ? '#fff' : 'var(--text-muted)',
+                fontSize: '13px',
+                fontWeight: 600,
+                cursor: saving || !defaultAction.trim() ? 'not-allowed' : 'pointer',
+                opacity: saving ? 0.7 : 1,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              {saving ? <Loader2 size={14} className="animate-spin" /> : <Target size={14} />}
+              Save Position
+            </button>
+            <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+              Optional — skip if you prefer
             </span>
-          </label>
-          <textarea
-            value={evidenceToChange}
-            onChange={e => setEvidenceToChange(e.target.value)}
-            placeholder="e.g. Evidence of customer churn above 15%, regulatory risk in the target market..."
-            rows={2}
-            style={{
-              width: '100%',
-              padding: '10px 12px',
-              fontSize: '13px',
-              background: 'var(--bg-card)',
-              border: '1px solid var(--bg-elevated)',
-              borderRadius: '8px',
-              color: 'var(--text-primary)',
-              resize: 'vertical',
-              lineHeight: 1.5,
-            }}
-          />
+          </div>
         </div>
-
-        {error && <p style={{ fontSize: '12px', color: '#ef4444', margin: 0 }}>{error}</p>}
-
-        {/* Actions */}
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <button
-            onClick={handleSubmit}
-            disabled={saving || !defaultAction.trim()}
-            style={{
-              padding: '9px 20px',
-              background: defaultAction.trim() ? 'var(--accent-primary)' : 'var(--bg-card-hover)',
-              border: 'none',
-              borderRadius: '8px',
-              color: defaultAction.trim() ? '#fff' : 'var(--text-muted)',
-              fontSize: '13px',
-              fontWeight: 600,
-              cursor: saving || !defaultAction.trim() ? 'not-allowed' : 'pointer',
-              opacity: saving ? 0.7 : 1,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}
-          >
-            {saving ? <Loader2 size={14} className="animate-spin" /> : <Target size={14} />}
-            Save Position
-          </button>
-          <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-            Optional — skip if you prefer
-          </span>
-        </div>
-      </div>
       )}
     </div>
   );

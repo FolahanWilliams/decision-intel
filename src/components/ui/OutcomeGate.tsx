@@ -355,9 +355,7 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
                       style={{
                         padding: '10px 14px',
                         background:
-                          selectedAnalysis === id
-                            ? 'var(--bg-card-hover)'
-                            : 'var(--bg-card)',
+                          selectedAnalysis === id ? 'var(--bg-card-hover)' : 'var(--bg-card)',
                         border: `1px solid ${selectedAnalysis === id ? 'var(--border-hover)' : 'var(--bg-card-hover)'}`,
                         borderRadius: '8px',
                         cursor: 'pointer',

@@ -558,8 +558,7 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
               width: '100%',
               aspectRatio: `${svgWidth} / ${svgHeight}`,
               maxHeight: compact ? '420px' : '520px',
-              background:
-                'radial-gradient(ellipse at center, var(--bg-card) 0%, transparent 70%)',
+              background: 'radial-gradient(ellipse at center, var(--bg-card) 0%, transparent 70%)',
               borderRadius: '8px',
             }}
           >

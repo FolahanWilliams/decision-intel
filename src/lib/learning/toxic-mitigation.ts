@@ -36,7 +36,7 @@ const PATTERN_PLAYBOOKS: Record<string, Omit<MitigationPlaybook, 'patternLabel'>
       'Break the self-reinforcing loop by injecting structured dissent and anonymizing initial positions.',
     steps: [
       {
-        title: 'Appoint a formal Devil\'s Advocate',
+        title: "Appoint a formal Devil's Advocate",
         description:
           'Designate one team member (rotating each meeting) whose explicit job is to argue the opposing case. Give them 10 minutes of uninterrupted time to present the strongest bear case.',
         owner: 'facilitator',
@@ -46,7 +46,7 @@ const PATTERN_PLAYBOOKS: Record<string, Omit<MitigationPlaybook, 'patternLabel'>
       {
         title: 'Collect blind written priors before discussion',
         description:
-          'Before any verbal discussion, have each participant write their position and confidence level independently. Use Decision Intel\'s Blind Prior feature in Decision Rooms to prevent anchoring on the first speaker.',
+          "Before any verbal discussion, have each participant write their position and confidence level independently. Use Decision Intel's Blind Prior feature in Decision Rooms to prevent anchoring on the first speaker.",
         owner: 'all_participants',
         timing: 'immediate',
         priority: 'critical',
@@ -144,7 +144,7 @@ const PATTERN_PLAYBOOKS: Record<string, Omit<MitigationPlaybook, 'patternLabel'>
       {
         title: 'Confidence calibration check',
         description:
-          'Ask each participant to estimate their confidence level and write down what would make them LESS confident. If nobody can articulate a scenario where they\'re wrong, overconfidence is in play.',
+          "Ask each participant to estimate their confidence level and write down what would make them LESS confident. If nobody can articulate a scenario where they're wrong, overconfidence is in play.",
         owner: 'all_participants',
         timing: 'immediate',
         priority: 'medium',
@@ -155,13 +155,12 @@ const PATTERN_PLAYBOOKS: Record<string, Omit<MitigationPlaybook, 'patternLabel'>
   },
 
   'The Yes Committee': {
-    summary:
-      'Neutralize authority dominance by structuring the decision to elevate junior voices.',
+    summary: 'Neutralize authority dominance by structuring the decision to elevate junior voices.',
     steps: [
       {
         title: 'Reverse the speaking order',
         description:
-          'Have the most junior people speak first, working up to seniors. This prevents anchoring on the authority figure\'s position. The MD or Partner speaks last.',
+          "Have the most junior people speak first, working up to seniors. This prevents anchoring on the authority figure's position. The MD or Partner speaks last.",
         owner: 'facilitator',
         timing: 'immediate',
         priority: 'critical',
@@ -169,7 +168,7 @@ const PATTERN_PLAYBOOKS: Record<string, Omit<MitigationPlaybook, 'patternLabel'>
       {
         title: 'Use anonymous voting for the final decision',
         description:
-          'Collect votes via Decision Intel\'s Blind Prior feature. If the anonymous result differs significantly from the verbal consensus, investigate the gap.',
+          "Collect votes via Decision Intel's Blind Prior feature. If the anonymous result differs significantly from the verbal consensus, investigate the gap.",
         owner: 'facilitator',
         timing: 'immediate',
         priority: 'critical',
@@ -188,8 +187,7 @@ const PATTERN_PLAYBOOKS: Record<string, Omit<MitigationPlaybook, 'patternLabel'>
   },
 
   'The Optimism Trap': {
-    summary:
-      'Counter selective evidence gathering by mandating disconfirming evidence search.',
+    summary: 'Counter selective evidence gathering by mandating disconfirming evidence search.',
     steps: [
       {
         title: 'Mandate a "Reasons to Pass" memo',
@@ -202,7 +200,7 @@ const PATTERN_PLAYBOOKS: Record<string, Omit<MitigationPlaybook, 'patternLabel'>
       {
         title: 'Apply reference class forecasting',
         description:
-          'Look up outcomes for similar deals (same sector, size, stage) from the past 5 years. What percentage succeeded? Use this as the baseline, not the team\'s gut feeling.',
+          "Look up outcomes for similar deals (same sector, size, stage) from the past 5 years. What percentage succeeded? Use this as the baseline, not the team's gut feeling.",
         owner: 'analyst',
         timing: 'before_next_meeting',
         priority: 'high',
@@ -254,8 +252,7 @@ const PATTERN_PLAYBOOKS: Record<string, Omit<MitigationPlaybook, 'patternLabel'>
   },
 
   'The Recency Spiral': {
-    summary:
-      'Anchor on long-term base rates instead of recent vivid events.',
+    summary: 'Anchor on long-term base rates instead of recent vivid events.',
     steps: [
       {
         title: 'Present 5-year and 10-year data alongside recent performance',
@@ -268,7 +265,7 @@ const PATTERN_PLAYBOOKS: Record<string, Omit<MitigationPlaybook, 'patternLabel'>
       {
         title: 'Ask "Would we make this decision if last quarter looked different?"',
         description:
-          'Replace the recent data point with the 5-year average and re-evaluate. If the decision changes, you\'re anchored on recency.',
+          "Replace the recent data point with the 5-year average and re-evaluate. If the decision changes, you're anchored on recency.",
         owner: 'facilitator',
         timing: 'immediate',
         priority: 'high',
@@ -309,7 +306,7 @@ const PATTERN_PLAYBOOKS: Record<string, Omit<MitigationPlaybook, 'patternLabel'>
       {
         title: 'Separate due diligence from the pitch',
         description:
-          'Don\'t let the founder\'s charisma influence the DD process. Have a separate team conduct reference checks and financial analysis independently of the pitch meeting.',
+          "Don't let the founder's charisma influence the DD process. Have a separate team conduct reference checks and financial analysis independently of the pitch meeting.",
         owner: 'team_lead',
         timing: 'before_next_meeting',
         priority: 'high',
@@ -353,8 +350,7 @@ const PATTERN_PLAYBOOKS: Record<string, Omit<MitigationPlaybook, 'patternLabel'>
   },
 
   'The Deadline Panic': {
-    summary:
-      'Separate genuine urgency from psychological pressure to achieve closure.',
+    summary: 'Separate genuine urgency from psychological pressure to achieve closure.',
     steps: [
       {
         title: 'Audit the deadline source',
@@ -413,8 +409,7 @@ function getContextAugmentations(context: ContextFactorsForMitigation): Mitigati
   if (context.participantCount !== undefined && context.participantCount < 3) {
     extra.push({
       title: 'Expand the decision group',
-      description:
-        `Only ${context.participantCount} participant(s) involved. Add 2-3 additional perspectives, ideally from different functions or seniority levels, to reduce group-size risk.`,
+      description: `Only ${context.participantCount} participant(s) involved. Add 2-3 additional perspectives, ideally from different functions or seniority levels, to reduce group-size risk.`,
       owner: 'team_lead',
       timing: 'before_next_meeting',
       priority: 'high',

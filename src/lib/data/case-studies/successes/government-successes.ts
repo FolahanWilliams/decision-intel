@@ -24,7 +24,7 @@ export const GOVERNMENT_SUCCESS_CASES: CaseStudy[] = [
     ],
     primaryBias: 'planning_fallacy',
     toxicCombinations: [],
-    beneficialPatterns: ['The Patient Bet', 'The Outsider\'s Lens'],
+    beneficialPatterns: ['The Patient Bet', "The Outsider's Lens"],
     biasesManaged: ['planning_fallacy', 'anchoring_bias'],
     mitigationFactors: [
       'Parallelized manufacturing with clinical trials — managed planning fallacy by not assuming sequential success',
@@ -53,7 +53,7 @@ export const GOVERNMENT_SUCCESS_CASES: CaseStudy[] = [
     sourceType: 'post_mortem',
     keyQuotes: [
       {
-        text: 'We didn\'t cut corners — we took financial risk to compress timelines.',
+        text: "We didn't cut corners — we took financial risk to compress timelines.",
         source: 'Dr. Moncef Slaoui, Operation Warp Speed Chief Advisor',
         date: 'December 2020',
       },
@@ -74,12 +74,7 @@ export const GOVERNMENT_SUCCESS_CASES: CaseStudy[] = [
     impactScore: 94,
     estimatedImpact: '$100M recall cost; brand value preserved; set industry safety standard',
     impactDirection: 'positive',
-    biasesPresent: [
-      'loss_aversion',
-      'anchoring_bias',
-      'authority_bias',
-      'framing_effect',
-    ],
+    biasesPresent: ['loss_aversion', 'anchoring_bias', 'authority_bias', 'framing_effect'],
     primaryBias: 'loss_aversion',
     toxicCombinations: [],
     beneficialPatterns: ['The Honest Mirror'],
@@ -102,7 +97,7 @@ export const GOVERNMENT_SUCCESS_CASES: CaseStudy[] = [
       iterativeProcess: false,
     },
     lessonsLearned: [
-      'Loss aversion (protecting revenue) was actively managed by framing the decision through the company\'s Credo values rather than through financial impact.',
+      "Loss aversion (protecting revenue) was actively managed by framing the decision through the company's Credo values rather than through financial impact.",
       'Authority bias from government agencies (FBI/FDA) was overridden by a CEO who prioritized consumer safety over institutional recommendations.',
       'The honest mirror pattern — publicly acknowledging a crisis and taking decisive action — generated more brand trust than any amount of defensive communication.',
     ],
@@ -127,17 +122,13 @@ export const GOVERNMENT_SUCCESS_CASES: CaseStudy[] = [
     summary:
       'In 2017, Disney decided to pull its content from Netflix and launch its own streaming service, Disney+. This deliberately cannibalized lucrative licensing revenue ($8B+ from Netflix deals) for uncertain direct-to-consumer returns. Disney+ launched in November 2019 at $6.99/month (undercutting Netflix by 50%) and reached 164 million subscribers by 2022, exceeding its 2024 target by two years. The decision required restructuring the entire company around streaming, including a $71.3B acquisition of 21st Century Fox to secure content.',
     decisionContext:
-      'Whether to sacrifice billions in guaranteed licensing revenue from Netflix to build a competing direct-to-consumer streaming platform, risking Disney\'s most valuable content library on an unproven business model.',
+      "Whether to sacrifice billions in guaranteed licensing revenue from Netflix to build a competing direct-to-consumer streaming platform, risking Disney's most valuable content library on an unproven business model.",
     outcome: 'success',
     impactScore: 88,
-    estimatedImpact: '$8B+ licensing revenue sacrificed; 164M+ subscribers gained; company transformed',
+    estimatedImpact:
+      '$8B+ licensing revenue sacrificed; 164M+ subscribers gained; company transformed',
     impactDirection: 'positive',
-    biasesPresent: [
-      'loss_aversion',
-      'sunk_cost_fallacy',
-      'status_quo_bias',
-      'overconfidence_bias',
-    ],
+    biasesPresent: ['loss_aversion', 'sunk_cost_fallacy', 'status_quo_bias', 'overconfidence_bias'],
     primaryBias: 'loss_aversion',
     toxicCombinations: [],
     beneficialPatterns: ['The Controlled Burn'],
@@ -162,7 +153,7 @@ export const GOVERNMENT_SUCCESS_CASES: CaseStudy[] = [
     lessonsLearned: [
       'The controlled burn pattern: Disney deliberately destroyed its licensing revenue model to build direct consumer relationships, following the same playbook Apple used with the iPod→iPhone transition.',
       'Loss aversion was managed by setting measurable milestones (subscriber targets) that made the transition quantifiable rather than emotional.',
-      'Survivorship bias risk is medium: Disney\'s unmatched content library (Marvel, Star Wars, Pixar, Disney Animation) gave it advantages most competitors lack.',
+      "Survivorship bias risk is medium: Disney's unmatched content library (Marvel, Star Wars, Pixar, Disney Animation) gave it advantages most competitors lack.",
     ],
     source:
       'Disney 10-K SEC filings (2017-2022); Bob Iger "The Ride of a Lifetime" (2019); Bloomberg Businessweek Disney+ investigation (2019)',

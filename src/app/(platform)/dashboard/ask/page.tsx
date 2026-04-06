@@ -29,10 +29,7 @@ import { ChatPageContent } from '@/components/chat/ChatPageContent';
 
 type AskMode = 'copilot' | 'chat';
 
-const MODE_META: Record<
-  AskMode,
-  { label: string; tagline: string; icon: typeof Sparkles }
-> = {
+const MODE_META: Record<AskMode, { label: string; tagline: string; icon: typeof Sparkles }> = {
   copilot: {
     label: 'Decision Copilot',
     tagline: 'Structured sessions — frame, challenge, resolve to a DQI score',
@@ -77,8 +74,7 @@ function AskSurfaceInner() {
           padding: '14px 20px 10px',
           flexShrink: 0,
           borderBottom: '1px solid var(--border-color)',
-          background:
-            'linear-gradient(180deg, rgba(59, 130, 246, 0.03) 0%, transparent 100%)',
+          background: 'linear-gradient(180deg, rgba(59, 130, 246, 0.03) 0%, transparent 100%)',
         }}
       >
         <div
@@ -189,7 +185,6 @@ function AskSurfaceInner() {
             })}
           </div>
         </div>
-
       </div>
 
       {/* Delegated body — the existing component trees stay intact.

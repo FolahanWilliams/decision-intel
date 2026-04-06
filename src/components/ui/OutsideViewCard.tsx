@@ -12,7 +12,10 @@
 
 import { useMemo } from 'react';
 import { Telescope, TrendingDown, TrendingUp } from 'lucide-react';
-import { computeReferenceClass, type ReferenceClassInput } from '@/lib/data/reference-class-forecasting';
+import {
+  computeReferenceClass,
+  type ReferenceClassInput,
+} from '@/lib/data/reference-class-forecasting';
 
 interface OutsideViewCardProps {
   sector?: string | null;
@@ -38,14 +41,18 @@ export function OutsideViewCard({ sector, ticketSize }: OutsideViewCardProps) {
           </div>
           <div>
             <h3 className="text-base font-semibold text-foreground">Outside View</h3>
-            <p className="text-xs text-muted-foreground">Reference class base rate (Flyvbjerg &amp; Kahneman)</p>
+            <p className="text-xs text-muted-foreground">
+              Reference class base rate (Flyvbjerg &amp; Kahneman)
+            </p>
           </div>
         </div>
         <MatchBadge matchedBy={rc.matchedBy} />
       </div>
 
       <div className="mb-3">
-        <div className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Reference class</div>
+        <div className="text-xs uppercase tracking-wide text-muted-foreground mb-1">
+          Reference class
+        </div>
         <div className="text-sm text-foreground">{rc.label}</div>
         <div className="text-xs text-muted-foreground mt-1">n = {rc.n} historical cases</div>
       </div>
@@ -83,8 +90,8 @@ export function OutsideViewCard({ sector, ticketSize }: OutsideViewCardProps) {
 
       {/* Callout copy */}
       <div className="mb-4 rounded-lg border border-border/60 bg-muted/30 p-3 text-xs text-muted-foreground">
-        <span className="font-semibold text-foreground">Anchor to the base rate.</span>{' '}
-        Your inside-view estimate of this decision&apos;s chance of success is almost certainly too
+        <span className="font-semibold text-foreground">Anchor to the base rate.</span> Your
+        inside-view estimate of this decision&apos;s chance of success is almost certainly too
         optimistic. Comparable historical cases failed {failurePct}% of the time. Adjust the
         deal-specific case only with strong, concrete reasons.
       </div>
@@ -130,7 +137,10 @@ export function OutsideViewCard({ sector, ticketSize }: OutsideViewCardProps) {
 
 function MatchBadge({ matchedBy }: { matchedBy: 'industry+stakes' | 'industry' | 'global' }) {
   const config = {
-    'industry+stakes': { label: 'Industry + stakes', color: 'bg-green-500/10 text-green-600 border-green-500/30' },
+    'industry+stakes': {
+      label: 'Industry + stakes',
+      color: 'bg-green-500/10 text-green-600 border-green-500/30',
+    },
     industry: { label: 'Industry match', color: 'bg-blue-500/10 text-blue-600 border-blue-500/30' },
     global: { label: 'Global base rate', color: 'bg-muted text-muted-foreground border-border' },
   }[matchedBy];

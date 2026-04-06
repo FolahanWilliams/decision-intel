@@ -1451,9 +1451,7 @@ export async function rpdRecognitionNode(state: AuditState): Promise<Partial<Aud
 // and surfaces the critical questions the memo never asks but its
 // closest analogs had to answer. This is the most legible
 // "unknown unknowns" feature in the product.
-export async function forgottenQuestionsNode(
-  state: AuditState
-): Promise<Partial<AuditState>> {
+export async function forgottenQuestionsNode(state: AuditState): Promise<Partial<AuditState>> {
   // SECURITY: anonymization gate — same pattern as other content-touching nodes
   if (state.anonymizationStatus !== 'success') {
     log.warn('forgottenQuestionsNode: anonymization not confirmed — skipping');
@@ -1491,10 +1489,7 @@ export async function forgottenQuestionsNode(
     const refClass = computeReferenceClass({ sector, ticketSize });
 
     // Use the most representative 6 analogs (3 failures + 3 successes when available)
-    const analogs = [
-      ...refClass.topFailures.slice(0, 3),
-      ...refClass.topSuccesses.slice(0, 3),
-    ];
+    const analogs = [...refClass.topFailures.slice(0, 3), ...refClass.topSuccesses.slice(0, 3)];
 
     if (analogs.length === 0) {
       log.warn('ForgottenQuestions: no analogs in reference class');

@@ -74,7 +74,9 @@ export async function GET(req: NextRequest) {
     const { tokens } = await oauth2Client.getToken(code);
 
     if (!tokens.refresh_token) {
-      log.error('No refresh token received from Google — ensure prompt=consent and access_type=offline');
+      log.error(
+        'No refresh token received from Google — ensure prompt=consent and access_type=offline'
+      );
       settingsUrl.searchParams.set('google', 'error');
       return NextResponse.redirect(settingsUrl.toString());
     }

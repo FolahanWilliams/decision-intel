@@ -87,10 +87,10 @@ const NODE_H = 52;
 
 // Columns per row
 const ROW_COLS: Record<number, number[]> = {
-  0: [0, 1],       // 2 nodes centered
-  1: [0, 1, 2],    // 3 nodes
-  2: [0, 1, 2],    // 3 nodes
-  3: [0, 1],       // 2 nodes centered
+  0: [0, 1], // 2 nodes centered
+  1: [0, 1, 2], // 3 nodes
+  2: [0, 1, 2], // 3 nodes
+  3: [0, 1], // 2 nodes centered
 };
 
 function getNodeCenter(row: number, col: number): { x: number; y: number } {
@@ -218,7 +218,7 @@ export function LivePipelineGraph({
       </svg>
 
       {/* Nodes */}
-      {NODES.map((node) => {
+      {NODES.map(node => {
         const pos = nodePositions[node.label];
         const status = nodeStates[node.label] || 'pending';
         const Icon = node.icon;
@@ -255,9 +255,7 @@ export function LivePipelineGraph({
         }
 
         // Abbreviate long labels
-        const shortLabel = node.label.length > 16
-          ? node.label.slice(0, 14) + '...'
-          : node.label;
+        const shortLabel = node.label.length > 16 ? node.label.slice(0, 14) + '...' : node.label;
 
         return (
           <div
@@ -269,9 +267,7 @@ export function LivePipelineGraph({
               top: pos.y - NODE_H / 2,
               width: NODE_W,
               height: NODE_H,
-              background: isPending
-                ? 'rgba(255,255,255,0.02)'
-                : 'rgba(255,255,255,0.04)',
+              background: isPending ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.04)',
               border: `1px solid ${borderColor}`,
               borderRadius: 8,
               display: 'flex',
@@ -286,7 +282,10 @@ export function LivePipelineGraph({
               WebkitBackdropFilter: 'blur(8px)',
             }}
           >
-            <Icon size={14} style={{ color: iconColor, transition: 'color 0.4s ease', flexShrink: 0 }} />
+            <Icon
+              size={14}
+              style={{ color: iconColor, transition: 'color 0.4s ease', flexShrink: 0 }}
+            />
             <span
               style={{
                 fontSize: 9,

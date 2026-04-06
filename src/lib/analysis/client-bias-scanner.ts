@@ -55,7 +55,7 @@ const BIAS_DEFINITIONS: BiasDefinition[] = [
     explanation:
       'Over-reliance on the first piece of information encountered as a reference point, skewing subsequent judgments.',
     suggestion:
-      'Conduct an independent assessment from scratch without reference to the initial anchor. What would a fair value look like if you hadn\'t seen the first number?',
+      "Conduct an independent assessment from scratch without reference to the initial anchor. What would a fair value look like if you hadn't seen the first number?",
   },
   {
     type: 'confirmation_bias',
@@ -106,7 +106,7 @@ const BIAS_DEFINITIONS: BiasDefinition[] = [
     explanation:
       'Desire for group harmony suppresses dissenting opinions and critical evaluation. Unanimous agreement on major decisions is a red flag.',
     suggestion:
-      'Assign a formal devil\'s advocate with equal presentation time. Require documented dissenting opinions before any final vote.',
+      "Assign a formal devil's advocate with equal presentation time. Require documented dissenting opinions before any final vote.",
   },
   {
     type: 'availability_bias',
@@ -355,7 +355,8 @@ export function scanForBiases(text: string): ScanResult {
 
   let summary: string;
   if (detected.length === 0) {
-    summary = 'No common cognitive biases detected in this text. The full analysis also checks for logical fallacies, decision noise, compliance, and runs a boardroom simulation.';
+    summary =
+      'No common cognitive biases detected in this text. The full analysis also checks for logical fallacies, decision noise, compliance, and runs a boardroom simulation.';
   } else if (riskLevel === 'critical') {
     summary = `Critical risk: ${detected.length} cognitive bias${detected.length > 1 ? 'es' : ''} detected, including ${criticalCount > 0 ? 'critical-severity' : 'multiple high-severity'} patterns. This text warrants careful review before committing to a decision.`;
   } else if (riskLevel === 'high') {

@@ -115,9 +115,13 @@ export default function NewDecisionPage() {
               <Target className="h-6 w-6 text-indigo-400" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">Frame Your Decision <span className="text-sm font-normal text-zinc-500">(optional)</span></h1>
+              <h1 className="text-2xl font-bold text-white">
+                Frame Your Decision{' '}
+                <span className="text-sm font-normal text-zinc-500">(optional)</span>
+              </h1>
               <p className="text-sm text-zinc-400">
-                A one-line decision statement is all we need — or skip framing entirely and upload directly.
+                A one-line decision statement is all we need — or skip framing entirely and upload
+                directly.
               </p>
             </div>
           </div>
@@ -127,9 +131,9 @@ export default function NewDecisionPage() {
         <div className="mb-6 rounded-lg border border-indigo-500/20 bg-indigo-950/20 p-4">
           <p className="text-sm text-indigo-200">
             Framing is <strong>optional but helpful</strong>. If you capture your intent before
-            analysis, the AI audits your document against your stated objectives instead of
-            generic criteria. You can always skip framing, or fill in only the decision statement
-            and enrich the rest later.
+            analysis, the AI audits your document against your stated objectives instead of generic
+            criteria. You can always skip framing, or fill in only the decision statement and enrich
+            the rest later.
           </p>
         </div>
 

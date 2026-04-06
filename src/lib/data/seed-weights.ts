@@ -44,15 +44,15 @@ export function computeSeedWeights(): SeedWeight[] {
       });
 
       const totalCases = failureCases.length + matchingSuccessCases.length;
-      const baseFailureRate = totalCases > 0
-        ? Math.round((failureCases.length / totalCases) * 1000) / 1000
-        : 1.0;
-      const baseSuccessRate = totalCases > 0
-        ? Math.round((matchingSuccessCases.length / totalCases) * 1000) / 1000
-        : 0;
-      const avgPositiveImpact = matchingSuccessCases.length > 0
-        ? matchingSuccessCases.reduce((s, c) => s + c.impactScore, 0) / matchingSuccessCases.length
-        : 0;
+      const baseFailureRate =
+        totalCases > 0 ? Math.round((failureCases.length / totalCases) * 1000) / 1000 : 1.0;
+      const baseSuccessRate =
+        totalCases > 0 ? Math.round((matchingSuccessCases.length / totalCases) * 1000) / 1000 : 0;
+      const avgPositiveImpact =
+        matchingSuccessCases.length > 0
+          ? matchingSuccessCases.reduce((s, c) => s + c.impactScore, 0) /
+            matchingSuccessCases.length
+          : 0;
 
       const biasCooccurrence: Record<string, number> = {};
       for (const c of failureCases) {
@@ -80,11 +80,15 @@ export function getSeedBiasCorrelations(): Record<
   string,
   { failureCorrelation: number; successCorrelation: number; avgImpact: number; sampleSize: number }
 > {
-  const biasStats: Record<string, { failureCount: number; successCount: number; totalImpact: number; totalCount: number }> = {};
+  const biasStats: Record<
+    string,
+    { failureCount: number; successCount: number; totalImpact: number; totalCount: number }
+  > = {};
 
   for (const c of ALL_CASES) {
     for (const bias of c.biasesPresent) {
-      if (!biasStats[bias]) biasStats[bias] = { failureCount: 0, successCount: 0, totalImpact: 0, totalCount: 0 };
+      if (!biasStats[bias])
+        biasStats[bias] = { failureCount: 0, successCount: 0, totalImpact: 0, totalCount: 0 };
       biasStats[bias].totalImpact += c.impactScore;
       biasStats[bias].totalCount++;
       if (isFailureOutcome(c.outcome)) biasStats[bias].failureCount++;
@@ -94,16 +98,23 @@ export function getSeedBiasCorrelations(): Record<
 
   const result: Record<
     string,
-    { failureCorrelation: number; successCorrelation: number; avgImpact: number; sampleSize: number }
+    {
+      failureCorrelation: number;
+      successCorrelation: number;
+      avgImpact: number;
+      sampleSize: number;
+    }
   > = {};
   for (const [bias, stats] of Object.entries(biasStats)) {
     result[bias] = {
-      failureCorrelation: stats.totalCount > 0
-        ? Math.round((stats.failureCount / stats.totalCount) * 1000) / 1000
-        : 1.0,
-      successCorrelation: stats.totalCount > 0
-        ? Math.round((stats.successCount / stats.totalCount) * 1000) / 1000
-        : 0,
+      failureCorrelation:
+        stats.totalCount > 0
+          ? Math.round((stats.failureCount / stats.totalCount) * 1000) / 1000
+          : 1.0,
+      successCorrelation:
+        stats.totalCount > 0
+          ? Math.round((stats.successCount / stats.totalCount) * 1000) / 1000
+          : 0,
       avgImpact: Math.round((stats.totalImpact / stats.totalCount) * 10) / 10,
       sampleSize: stats.totalCount,
     };
@@ -115,7 +126,10 @@ export function getSeedSuccessCorrelations(): Record<
   string,
   { managedRate: number; avgPositiveImpact: number; sampleSize: number }
 > {
-  const biasStats: Record<string, { managedCount: number; totalImpact: number; totalCount: number }> = {};
+  const biasStats: Record<
+    string,
+    { managedCount: number; totalImpact: number; totalCount: number }
+  > = {};
 
   for (const c of SUCCESS_CASES) {
     for (const bias of c.biasesPresent) {
@@ -132,9 +146,10 @@ export function getSeedSuccessCorrelations(): Record<
   > = {};
   for (const [bias, stats] of Object.entries(biasStats)) {
     result[bias] = {
-      managedRate: stats.totalCount > 0
-        ? Math.round((stats.managedCount / stats.totalCount) * 1000) / 1000
-        : 0,
+      managedRate:
+        stats.totalCount > 0
+          ? Math.round((stats.managedCount / stats.totalCount) * 1000) / 1000
+          : 0,
       avgPositiveImpact: Math.round((stats.totalImpact / stats.totalCount) * 10) / 10,
       sampleSize: stats.totalCount,
     };

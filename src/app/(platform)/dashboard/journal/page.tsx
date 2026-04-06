@@ -327,9 +327,7 @@ export default function JournalPage() {
               className="px-3 py-1.5 rounded-full text-xs font-medium transition-colors"
               style={{
                 background:
-                  sourceFilter === filter.key
-                    ? 'var(--border-color)'
-                    : 'rgba(255, 255, 255, 0.04)',
+                  sourceFilter === filter.key ? 'var(--border-color)' : 'rgba(255, 255, 255, 0.04)',
                 border:
                   sourceFilter === filter.key
                     ? '1px solid var(--border-hover)'

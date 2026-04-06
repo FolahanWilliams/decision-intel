@@ -29,7 +29,11 @@ const SECTOR_TO_INDUSTRY: Record<string, Industry[]> = {
 // relaxed a bit since case studies span more stake levels.
 export type StakeBucket = 'small' | 'mid' | 'large' | 'mega';
 
-const STAKE_BUCKETS: Array<{ id: StakeBucket; label: string; monetaryStakes: Array<'low' | 'medium' | 'high' | 'very_high'> }> = [
+const STAKE_BUCKETS: Array<{
+  id: StakeBucket;
+  label: string;
+  monetaryStakes: Array<'low' | 'medium' | 'high' | 'very_high'>;
+}> = [
   { id: 'small', label: 'Emerging (<$10M)', monetaryStakes: ['low', 'medium'] },
   { id: 'mid', label: 'Growth (<$50M)', monetaryStakes: ['medium', 'high'] },
   { id: 'large', label: 'Core (<$200M)', monetaryStakes: ['high', 'very_high'] },
@@ -79,7 +83,7 @@ export interface ReferenceClassInput {
 export function computeReferenceClass(input: ReferenceClassInput): ReferenceClass {
   const MIN_N = 6;
 
-  const industries = input.sector ? SECTOR_TO_INDUSTRY[input.sector] ?? [] : [];
+  const industries = input.sector ? (SECTOR_TO_INDUSTRY[input.sector] ?? []) : [];
   const bucket = bucketForTicketSize(input.ticketSize);
   const bucketDef = bucket ? STAKE_BUCKETS.find(b => b.id === bucket) : null;
 
@@ -91,7 +95,11 @@ export function computeReferenceClass(input: ReferenceClassInput): ReferenceClas
         bucketDef.monetaryStakes.includes(c.contextFactors.monetaryStakes)
     );
     if (narrow.length >= MIN_N) {
-      return buildClass(narrow, `${formatIndustries(industries)}, ${bucketDef.label}`, 'industry+stakes');
+      return buildClass(
+        narrow,
+        `${formatIndustries(industries)}, ${bucketDef.label}`,
+        'industry+stakes'
+      );
     }
   }
 
@@ -107,7 +115,11 @@ export function computeReferenceClass(input: ReferenceClassInput): ReferenceClas
   return buildClass(ALL_CASES, 'All industries and stake levels', 'global');
 }
 
-function buildClass(cases: CaseStudy[], label: string, matchedBy: ReferenceClass['matchedBy']): ReferenceClass {
+function buildClass(
+  cases: CaseStudy[],
+  label: string,
+  matchedBy: ReferenceClass['matchedBy']
+): ReferenceClass {
   const failures = cases.filter(c => isFailureOutcome(c.outcome));
   const successes = cases.filter(c => isSuccessOutcome(c.outcome));
   const n = cases.length;

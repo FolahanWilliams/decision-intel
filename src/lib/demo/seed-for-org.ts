@@ -39,10 +39,7 @@ export interface SeedResult {
  * @param orgId  - Target org. If null, seeds to the user's personal scope.
  * @param userId - The authenticated user that "owns" the seeded rows.
  */
-export async function seedDemoAnalyses(
-  orgId: string | null,
-  userId: string
-): Promise<SeedResult> {
+export async function seedDemoAnalyses(orgId: string | null, userId: string): Promise<SeedResult> {
   // Idempotency check: any existing sample documents in scope → skip
   const existing = await prisma.document.findFirst({
     where: {
@@ -258,9 +255,7 @@ export async function clearSampleData(
   // now sets createdBy=userId for user-scope edges (instead of 'system')
   // so this filter correctly targets only the caller's seed edges.
   const edges = await prisma.decisionEdge.deleteMany({
-    where: orgId
-      ? { isSample: true, orgId }
-      : { isSample: true, orgId: null, createdBy: userId },
+    where: orgId ? { isSample: true, orgId } : { isSample: true, orgId: null, createdBy: userId },
   });
 
   // Delete human decisions (cascades CognitiveAudit, Nudges, etc.)

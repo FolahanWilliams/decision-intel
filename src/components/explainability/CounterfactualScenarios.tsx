@@ -227,4 +227,3 @@ export function CounterfactualScenarios({
     </div>
   );
 }
-

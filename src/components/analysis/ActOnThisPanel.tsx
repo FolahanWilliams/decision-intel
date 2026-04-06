@@ -2,10 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { Play, Sparkles, ChevronRight, Loader2, CheckCircle2, AlertTriangle } from 'lucide-react';
-import {
-  suggestPlaybooksForBiases,
-  type PlaybookSuggestion,
-} from '@/lib/playbooks/suggest';
+import { suggestPlaybooksForBiases, type PlaybookSuggestion } from '@/lib/playbooks/suggest';
 import type { BiasInstance } from '@/types';
 
 /**
@@ -122,9 +119,7 @@ export function ActOnThisPanel({
                 style={{
                   padding: 12,
                   borderRadius: 8,
-                  background: isPrimary
-                    ? 'rgba(139, 92, 246, 0.06)'
-                    : 'rgba(255, 255, 255, 0.02)',
+                  background: isPrimary ? 'rgba(139, 92, 246, 0.06)' : 'rgba(255, 255, 255, 0.02)',
                   border: isPrimary
                     ? '1px solid rgba(139, 92, 246, 0.25)'
                     : '1px solid var(--border-color)',
@@ -229,7 +224,9 @@ export function ActOnThisPanel({
                         type="button"
                         onClick={() => handleRun(s)}
                         disabled={isInvoking}
-                        className={isPrimary ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm'}
+                        className={
+                          isPrimary ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm'
+                        }
                         style={{
                           fontSize: 11,
                           padding: '4px 12px',

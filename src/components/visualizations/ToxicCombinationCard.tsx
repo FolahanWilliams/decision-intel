@@ -259,22 +259,21 @@ export function ToxicCombinationCard({
                   <div className="bg-white/5 rounded-lg p-3 border border-white/10">
                     <div className="flex items-center gap-2 mb-2">
                       <ShieldAlert className="h-4 w-4 text-cyan-400" />
-                      <span className="text-sm font-semibold text-cyan-300">Mitigation Playbook</span>
+                      <span className="text-sm font-semibold text-cyan-300">
+                        Mitigation Playbook
+                      </span>
                     </div>
                     <p className="text-xs text-zinc-400 mb-3">{combo.mitigationPlaybook.summary}</p>
                     <div className="space-y-2">
                       {combo.mitigationPlaybook.steps.map((step, idx) => (
-                        <div
-                          key={idx}
-                          className="flex gap-3 text-xs"
-                        >
+                        <div key={idx} className="flex gap-3 text-xs">
                           <span
                             className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
                               step.priority === 'critical'
                                 ? 'bg-red-500/30 text-red-300'
                                 : step.priority === 'high'
-                                ? 'bg-orange-500/20 text-orange-300'
-                                : 'bg-blue-500/20 text-blue-300'
+                                  ? 'bg-orange-500/20 text-orange-300'
+                                  : 'bg-blue-500/20 text-blue-300'
                             }`}
                           >
                             {idx + 1}
@@ -285,7 +284,9 @@ export function ToxicCombinationCard({
                             <div className="flex gap-2 mt-1 text-[10px]">
                               <span className="text-zinc-600">{step.owner.replace('_', ' ')}</span>
                               <span className="text-zinc-700">·</span>
-                              <span className="text-zinc-600">{step.timing.replace(/_/g, ' ')}</span>
+                              <span className="text-zinc-600">
+                                {step.timing.replace(/_/g, ' ')}
+                              </span>
                             </div>
                           </div>
                         </div>

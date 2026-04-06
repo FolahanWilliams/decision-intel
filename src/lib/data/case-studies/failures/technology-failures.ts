@@ -9,19 +9,14 @@ export const TECHNOLOGY_FAILURE_CASES: CaseStudy[] = [
     year: 2008,
     yearRealized: 2017,
     summary:
-      'Yahoo CEO Jerry Yang rejected Microsoft\'s $44.6 billion acquisition offer ($31/share, a 62% premium) in February 2008, believing Yahoo was worth significantly more. The board backed Yang despite shareholder revolt led by Carl Icahn. Yahoo\'s stock price cratered from $19.18 to under $10 within months. By 2017, Verizon acquired Yahoo\'s core internet business for $4.48 billion — roughly 10% of Microsoft\'s rejected offer.',
+      "Yahoo CEO Jerry Yang rejected Microsoft's $44.6 billion acquisition offer ($31/share, a 62% premium) in February 2008, believing Yahoo was worth significantly more. The board backed Yang despite shareholder revolt led by Carl Icahn. Yahoo's stock price cratered from $19.18 to under $10 within months. By 2017, Verizon acquired Yahoo's core internet business for $4.48 billion — roughly 10% of Microsoft's rejected offer.",
     decisionContext:
-      'Whether to accept Microsoft\'s $44.6B unsolicited acquisition bid or remain independent and execute a turnaround strategy to justify a higher valuation.',
+      "Whether to accept Microsoft's $44.6B unsolicited acquisition bid or remain independent and execute a turnaround strategy to justify a higher valuation.",
     outcome: 'catastrophic_failure',
     impactScore: 92,
     estimatedImpact: '$40B+ in shareholder value destroyed',
     impactDirection: 'negative',
-    biasesPresent: [
-      'overconfidence_bias',
-      'anchoring_bias',
-      'loss_aversion',
-      'status_quo_bias',
-    ],
+    biasesPresent: ['overconfidence_bias', 'anchoring_bias', 'loss_aversion', 'status_quo_bias'],
     primaryBias: 'overconfidence_bias',
     toxicCombinations: ['Status Quo Lock', 'Optimism Trap'],
     beneficialPatterns: [],
@@ -40,7 +35,7 @@ export const TECHNOLOGY_FAILURE_CASES: CaseStudy[] = [
     },
     lessonsLearned: [
       'Anchoring to a desired valuation rather than market reality can destroy tens of billions in shareholder value.',
-      'When activist investors and major shareholders oppose the CEO\'s strategy, it signals a dangerous disconnect between leadership confidence and external reality.',
+      "When activist investors and major shareholders oppose the CEO's strategy, it signals a dangerous disconnect between leadership confidence and external reality.",
       'In rapidly evolving markets, declining a premium acquisition offer requires an exceptionally strong and executable standalone plan — not just optimism.',
     ],
     source:
@@ -49,7 +44,8 @@ export const TECHNOLOGY_FAILURE_CASES: CaseStudy[] = [
     preDecisionEvidence: {
       document:
         'Yahoo board\'s February 11, 2008 letter to Microsoft: "The Yahoo! Board of Directors has concluded that Microsoft\'s proposal substantially undervalues Yahoo." The board stated Yahoo was pursuing a strategic plan that would deliver value "well in excess of the price" Microsoft offered. At the time, Yahoo\'s stock was trading at $19.18 — Microsoft offered $31/share, a 62% premium. Carl Icahn accumulated a 5.5% stake and publicly argued the board was "acting irrationally" by rejecting the offer.',
-      source: 'Yahoo Board Letter to Microsoft (Feb 11, 2008); Carl Icahn open letter to shareholders (May 15, 2008)',
+      source:
+        'Yahoo Board Letter to Microsoft (Feb 11, 2008); Carl Icahn open letter to shareholders (May 15, 2008)',
       date: '2008-02-11',
       documentType: 'public_statement',
       detectableRedFlags: [
@@ -76,7 +72,7 @@ export const TECHNOLOGY_FAILURE_CASES: CaseStudy[] = [
     year: 2011,
     yearRealized: 2012,
     summary:
-      'HP acquired British software company Autonomy for $11.1 billion in August 2011, paying a 64% premium. Within 13 months, HP wrote down $8.8 billion — 79% of the purchase price — alleging that Autonomy had inflated revenues through accounting improprieties. Due diligence had flagged concerns about Autonomy\'s hardware sales being classified as software revenue, but HP leadership dismissed these warnings.',
+      "HP acquired British software company Autonomy for $11.1 billion in August 2011, paying a 64% premium. Within 13 months, HP wrote down $8.8 billion — 79% of the purchase price — alleging that Autonomy had inflated revenues through accounting improprieties. Due diligence had flagged concerns about Autonomy's hardware sales being classified as software revenue, but HP leadership dismissed these warnings.",
     decisionContext:
       'Whether to proceed with the Autonomy acquisition at 12.6x revenue despite due diligence red flags about revenue recognition practices and accounting irregularities.',
     outcome: 'catastrophic_failure',
@@ -117,14 +113,15 @@ export const TECHNOLOGY_FAILURE_CASES: CaseStudy[] = [
     preDecisionEvidence: {
       document:
         'HP\'s August 18, 2011 press release: "HP today announced it has entered into a definitive agreement to purchase Autonomy Corporation plc for approximately $11.1 billion... Autonomy is a leader in the fast-growing area of information management and next-generation enterprise search... HP expects the acquisition to be accretive to HP\'s non-GAAP earnings per share." CEO Léo Apotheker stated: "Autonomy will be a different kind of platform company." Internal due diligence teams had flagged that a significant portion of Autonomy\'s "software" revenue was actually derived from low-margin hardware sales resold as bundled software — a concern that was escalated to leadership but overridden.',
-      source: 'HP press release (Aug 18, 2011); Deloitte due diligence report findings (cited in SEC complaint); HP Board meeting minutes (summarized in proxy filings)',
+      source:
+        'HP press release (Aug 18, 2011); Deloitte due diligence report findings (cited in SEC complaint); HP Board meeting minutes (summarized in proxy filings)',
       date: '2011-08-18',
       documentType: 'press_release',
       detectableRedFlags: [
         'Paying 12.6x revenue for a software company — extreme multiple requires extreme certainty about revenue quality',
         'Internal due diligence flagged hardware revenue classified as software — a fundamental accounting concern dismissed by leadership',
         'CEO framing Autonomy as "a different kind of platform company" without quantitative justification — vague strategic narrative overriding financial analysis',
-        'Deal negotiated rapidly under time pressure after Dell\'s interest in Autonomy was rumored — competitive urgency distorting valuation discipline',
+        "Deal negotiated rapidly under time pressure after Dell's interest in Autonomy was rumored — competitive urgency distorting valuation discipline",
       ],
       flaggableBiases: [
         'confirmation_bias',
@@ -144,7 +141,7 @@ export const TECHNOLOGY_FAILURE_CASES: CaseStudy[] = [
     year: 1979,
     yearRealized: 1984,
     summary:
-      'Xerox PARC invented the graphical user interface, the mouse, Ethernet, and laser printing in the 1970s. Despite having working prototypes, Xerox leadership failed to commercialize these inventions, viewing them as irrelevant to the copier business. Steve Jobs visited PARC in 1979 and recognized the GUI\'s potential; Apple launched the Macintosh in 1984. Xerox\'s failure to capitalize on its own R&D is widely considered the greatest missed commercialization opportunity in technology history.',
+      "Xerox PARC invented the graphical user interface, the mouse, Ethernet, and laser printing in the 1970s. Despite having working prototypes, Xerox leadership failed to commercialize these inventions, viewing them as irrelevant to the copier business. Steve Jobs visited PARC in 1979 and recognized the GUI's potential; Apple launched the Macintosh in 1984. Xerox's failure to capitalize on its own R&D is widely considered the greatest missed commercialization opportunity in technology history.",
     decisionContext:
       'Whether to invest in commercializing the Alto computer and graphical user interface technology developed at PARC, or continue focusing exclusively on the copier and document business.',
     outcome: 'catastrophic_failure',
@@ -222,7 +219,7 @@ export const TECHNOLOGY_FAILURE_CASES: CaseStudy[] = [
       iterativeProcess: false,
     },
     lessonsLearned: [
-      'Authority bias — deferring to a founder\'s past success in a different era — can suppress critical evaluation of fundamentally flawed assumptions.',
+      "Authority bias — deferring to a founder's past success in a different era — can suppress critical evaluation of fundamentally flawed assumptions.",
       'Raising excessive capital before product-market validation creates a false sense of certainty and eliminates the pressure to iterate.',
       'Not building basic social sharing features in a platform competing for attention against TikTok reveals a fundamental misunderstanding of the competitive landscape.',
     ],
@@ -232,7 +229,8 @@ export const TECHNOLOGY_FAILURE_CASES: CaseStudy[] = [
     preDecisionEvidence: {
       document:
         'Quibi SEC registration statement (S-1, filed October 2019): "We believe we are creating an entirely new category of entertainment: premium, short-form content designed for mobile viewing... We believe the mobile device is the most personal screen and the future of entertainment consumption." Katzenberg, at CES January 2020: "Quibi will be to the phone what Netflix is to the TV." The filing disclosed $1.75B raised from investors including every major Hollywood studio, and projected 7.4 million paying subscribers within Year 1. No market validation data was presented — no beta test, no pilot program, no user research results were cited in the registration statement.',
-      source: 'Quibi SEC registration statement (S-1, 2019); CES 2020 keynote transcript; WSJ "Inside Quibi\'s Collapse" (October 2020)',
+      source:
+        'Quibi SEC registration statement (S-1, 2019); CES 2020 keynote transcript; WSJ "Inside Quibi\'s Collapse" (October 2020)',
       date: '2019-10-15',
       documentType: 'sec_filing',
       detectableRedFlags: [
@@ -260,7 +258,7 @@ export const TECHNOLOGY_FAILURE_CASES: CaseStudy[] = [
     year: 2019,
     yearRealized: 2019,
     summary:
-      'WeWork filed for its IPO in August 2019 at a $47 billion valuation. The S-1 filing revealed $1.9 billion in losses on $1.8 billion in revenue, governance failures including CEO Adam Neumann\'s self-dealing, and a business model that was essentially a real estate subletting company disguised as a tech startup. The IPO was pulled within weeks, Neumann was ousted, and the valuation collapsed to $8 billion. SoftBank had invested $18.5 billion.',
+      "WeWork filed for its IPO in August 2019 at a $47 billion valuation. The S-1 filing revealed $1.9 billion in losses on $1.8 billion in revenue, governance failures including CEO Adam Neumann's self-dealing, and a business model that was essentially a real estate subletting company disguised as a tech startup. The IPO was pulled within weeks, Neumann was ousted, and the valuation collapsed to $8 billion. SoftBank had invested $18.5 billion.",
     decisionContext:
       'Whether to proceed with a $47B IPO valuation for a company losing more money than it earned, with extreme governance risks and a CEO who had personally profited from self-dealing transactions.',
     outcome: 'catastrophic_failure',

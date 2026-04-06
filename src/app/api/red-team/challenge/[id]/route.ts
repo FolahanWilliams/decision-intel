@@ -15,10 +15,7 @@ import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('RedTeamChallengeDetailAPI');
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -44,19 +41,12 @@ export async function PATCH(
 
     // Validate rating: -1 (not useful), 0 (neutral), 1 (useful)
     if (body.usefulRating !== undefined) {
-      if (
-        typeof body.usefulRating !== 'number' ||
-        ![-1, 0, 1].includes(body.usefulRating)
-      ) {
-        return NextResponse.json(
-          { error: 'usefulRating must be -1, 0, or 1' },
-          { status: 400 }
-        );
+      if (typeof body.usefulRating !== 'number' || ![-1, 0, 1].includes(body.usefulRating)) {
+        return NextResponse.json({ error: 'usefulRating must be -1, 0, or 1' }, { status: 400 });
       }
     }
 
-    const notes =
-      typeof body.notes === 'string' ? body.notes.slice(0, 2000) : undefined;
+    const notes = typeof body.notes === 'string' ? body.notes.slice(0, 2000) : undefined;
 
     const updated = await prisma.redTeamChallenge.update({
       where: { id },
@@ -66,9 +56,7 @@ export async function PATCH(
       },
     });
 
-    log.info(
-      `Red Team challenge ${id} rated: ${body.usefulRating} by user ${user.id}`
-    );
+    log.info(`Red Team challenge ${id} rated: ${body.usefulRating} by user ${user.id}`);
 
     return NextResponse.json({ challenge: updated });
   } catch (err) {

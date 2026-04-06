@@ -31,12 +31,7 @@ const log = createLogger('OutcomeInference');
  * that builds an OutcomeInferenceResult with the corresponding `source`,
  * (c) wiring a hook in the relevant integration.
  */
-export type OutcomeSource =
-  | 'document'
-  | 'slack'
-  | 'web_intelligence'
-  | 'email'
-  | 'meeting';
+export type OutcomeSource = 'document' | 'slack' | 'web_intelligence' | 'email' | 'meeting';
 
 export interface OutcomeInferenceResult {
   outcomeDetected: boolean;
@@ -669,9 +664,7 @@ export async function detectOutcomeFromEmail(
       where: {
         outcomeStatus: 'pending_outcome',
         createdAt: { gte: ninetyDaysAgo },
-        ...(orgId
-          ? { document: { orgId } }
-          : { document: { userId } }),
+        ...(orgId ? { document: { orgId } } : { document: { userId } }),
       },
       select: {
         id: true,
@@ -796,9 +789,7 @@ export async function detectOutcomeFromMeeting(
       where: {
         outcomeStatus: 'pending_outcome',
         createdAt: { gte: ninetyDaysAgo },
-        ...(orgId
-          ? { document: { orgId } }
-          : { document: { userId } }),
+        ...(orgId ? { document: { orgId } } : { document: { userId } }),
       },
       select: {
         id: true,

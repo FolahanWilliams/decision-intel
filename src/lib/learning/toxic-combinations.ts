@@ -188,7 +188,14 @@ export async function detectToxicCombinations(
     });
 
     if (!analysis || analysis.biases.length < 2) {
-      return { analysisId, combinations: [], threshold: 50, flaggedCount: 0, beneficialPatterns: [], beneficialDampingApplied: 1.0 };
+      return {
+        analysisId,
+        combinations: [],
+        threshold: 50,
+        flaggedCount: 0,
+        beneficialPatterns: [],
+        beneficialDampingApplied: 1.0,
+      };
     }
 
     const biasTypes = analysis.biases.map(b => b.biasType.toLowerCase());
@@ -420,7 +427,14 @@ export async function detectToxicCombinations(
     };
   } catch (error) {
     log.error('Failed to detect toxic combinations:', error);
-    return { analysisId, combinations: [], threshold: 50, flaggedCount: 0, beneficialPatterns: [], beneficialDampingApplied: 1.0 };
+    return {
+      analysisId,
+      combinations: [],
+      threshold: 50,
+      flaggedCount: 0,
+      beneficialPatterns: [],
+      beneficialDampingApplied: 1.0,
+    };
   }
 }
 
@@ -739,7 +753,11 @@ export async function learnToxicPatterns(orgId: string): Promise<number> {
       outcomes.filter(o => o.outcome === 'success').length / outcomes.length;
 
     for (const outcome of outcomes) {
-      const biasTypes: string[] = [...new Set(outcome.analysis.biases.map((b: { biasType: string }) => b.biasType.toLowerCase()))] as string[];
+      const biasTypes: string[] = [
+        ...new Set(
+          outcome.analysis.biases.map((b: { biasType: string }) => b.biasType.toLowerCase())
+        ),
+      ] as string[];
       if (biasTypes.length < 2) continue;
 
       const pairs = generatePairs(biasTypes);
@@ -770,7 +788,11 @@ export async function learnToxicPatterns(orgId: string): Promise<number> {
     >();
 
     for (const outcome of outcomes) {
-      const tripleBiasTypes: string[] = [...new Set(outcome.analysis.biases.map((b: { biasType: string }) => b.biasType.toLowerCase()))] as string[];
+      const tripleBiasTypes: string[] = [
+        ...new Set(
+          outcome.analysis.biases.map((b: { biasType: string }) => b.biasType.toLowerCase())
+        ),
+      ] as string[];
       if (tripleBiasTypes.length < 3) continue;
 
       const triples = generateTriples(tripleBiasTypes);
@@ -794,7 +816,11 @@ export async function learnToxicPatterns(orgId: string): Promise<number> {
     let patternsCreated = 0;
 
     // Helper to upsert a pattern
-    const upsertPattern = async (key: string, stats: { failures: number; successes: number; impactDeltas: number[] }, combinationSize: number) => {
+    const upsertPattern = async (
+      key: string,
+      stats: { failures: number; successes: number; impactDeltas: number[] },
+      combinationSize: number
+    ) => {
       const total = stats.failures + stats.successes;
       if (total < (combinationSize === 3 ? 3 : 5)) return; // Lower threshold for triples
 
@@ -834,7 +860,10 @@ export async function learnToxicPatterns(orgId: string): Promise<number> {
             id: `${orgId}-${key}`,
             orgId,
             biasTypes,
-            contextPattern: { combinationSize, falsePositiveRate: Number(falsePositiveRate.toFixed(3)) },
+            contextPattern: {
+              combinationSize,
+              falsePositiveRate: Number(falsePositiveRate.toFixed(3)),
+            },
             failureRate: Number(adjustedFailureRate.toFixed(3)),
             avgImpactDelta: Number(avgImpactDelta.toFixed(1)),
             sampleSize: total,
@@ -847,7 +876,10 @@ export async function learnToxicPatterns(orgId: string): Promise<number> {
             failureRate: Number(adjustedFailureRate.toFixed(3)),
             avgImpactDelta: Number(avgImpactDelta.toFixed(1)),
             sampleSize: total,
-            contextPattern: { combinationSize, falsePositiveRate: Number(falsePositiveRate.toFixed(3)) },
+            contextPattern: {
+              combinationSize,
+              falsePositiveRate: Number(falsePositiveRate.toFixed(3)),
+            },
           },
         });
         patternsCreated++;

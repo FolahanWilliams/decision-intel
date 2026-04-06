@@ -85,8 +85,8 @@ export function CaseStudyCta({ slug, company, hasDeepAnalysis }: CaseStudyCtaPro
           Got it &mdash; we&apos;ll be in touch shortly.
         </h3>
         <p style={{ fontSize: 14, color: C.slate400, margin: 0 }}>
-          You&apos;ll hear from the founder within a business day with a
-          sample analysis of one of your own deals.
+          You&apos;ll hear from the founder within a business day with a sample analysis of one of
+          your own deals.
         </p>
       </div>
     );
@@ -105,10 +105,9 @@ export function CaseStudyCta({ slug, company, hasDeepAnalysis }: CaseStudyCtaPro
         Get this analysis for one of your own deals.
       </h3>
       <p style={{ fontSize: 14, color: C.slate400, marginBottom: 20, lineHeight: 1.6 }}>
-        We&apos;ll run a memo or deck of your choosing through the same
-        pipeline that produced this {hasDeepAnalysis ? 'hindsight-stripped analysis' : 'case review'},
-        and send you a written readout within a business day. No obligation,
-        pilot slots only.
+        We&apos;ll run a memo or deck of your choosing through the same pipeline that produced this{' '}
+        {hasDeepAnalysis ? 'hindsight-stripped analysis' : 'case review'}, and send you a written
+        readout within a business day. No obligation, pilot slots only.
       </p>
 
       <form

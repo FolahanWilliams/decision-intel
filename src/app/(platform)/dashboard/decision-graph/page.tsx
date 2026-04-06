@@ -508,13 +508,7 @@ export default function DecisionGraphPage() {
  * between 7 and 730 days. Updates are debounced (300ms) so dragging
  * doesn't flood the graph API with requests.
  */
-function TimeRangeSlider({
-  value,
-  onChange,
-}: {
-  value: number;
-  onChange: (days: number) => void;
-}) {
+function TimeRangeSlider({ value, onChange }: { value: number; onChange: (days: number) => void }) {
   const [local, setLocal] = useState(value);
 
   // Keep local in sync when the parent state changes via the dropdown

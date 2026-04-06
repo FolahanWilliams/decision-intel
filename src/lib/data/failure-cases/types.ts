@@ -33,7 +33,17 @@ export interface FailureCase {
     document: string;
     source: string;
     date: string;
-    documentType: 'board_memo' | 'press_release' | 'earnings_call' | 'internal_memo' | 'sec_filing' | 'public_statement' | 'strategy_document' | 'risk_assessment' | 'financial_report' | 'investor_deck';
+    documentType:
+      | 'board_memo'
+      | 'press_release'
+      | 'earnings_call'
+      | 'internal_memo'
+      | 'sec_filing'
+      | 'public_statement'
+      | 'strategy_document'
+      | 'risk_assessment'
+      | 'financial_report'
+      | 'investor_deck';
     detectableRedFlags: string[];
     flaggableBiases: string[];
     hypotheticalAnalysis: string;

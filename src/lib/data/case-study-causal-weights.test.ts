@@ -8,11 +8,7 @@ import {
   getStaticCausalGraph,
   getStaticCausalInsights,
 } from './case-study-causal-weights';
-import type {
-  CausalWeight,
-  CausalInsight,
-  CausalGraphNode,
-} from './case-study-causal-weights';
+import type { CausalWeight, CausalInsight, CausalGraphNode } from './case-study-causal-weights';
 
 vi.mock('@/lib/utils/logger', () => ({
   createLogger: () => ({ info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() }),

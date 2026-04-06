@@ -43,10 +43,22 @@ function getModel() {
   const model = genAI.getGenerativeModel({
     model: modelName,
     safetySettings: [
-      { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-      { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-      { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-      { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+      {
+        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
     ],
     generationConfig: { maxOutputTokens: 8192 },
   });
@@ -150,7 +162,10 @@ export async function POST(request: NextRequest) {
   if (action === 'save') {
     const { contentType, title, body: contentBody, topic, tone, status } = body;
     if (!contentType || !title || !contentBody) {
-      return NextResponse.json({ error: 'contentType, title, and body are required' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'contentType, title, and body are required' },
+        { status: 400 }
+      );
     }
 
     try {
@@ -176,15 +191,22 @@ export async function POST(request: NextRequest) {
     const { contentType, topic, tone, voiceNotes, pillar } = body;
     if (!contentType || !CONTENT_INSTRUCTIONS[contentType]) {
       return NextResponse.json(
-        { error: 'Invalid contentType. Valid: linkedin_post, twitter_thread, blog_draft, snippet, video_script' },
+        {
+          error:
+            'Invalid contentType. Valid: linkedin_post, twitter_thread, blog_draft, snippet, video_script',
+        },
         { status: 400 }
       );
     }
 
     const typeInstructions = CONTENT_INSTRUCTIONS[contentType];
     const toneLabel = tone || 'authoritative';
-    const voiceExtra = voiceNotes ? `\n\nAdditional voice/style notes from the founder:\n${String(voiceNotes).slice(0, 2000)}` : '';
-    const topicLine = topic ? `\n\nTopic/angle to write about: ${String(topic).slice(0, 1000)}` : '';
+    const voiceExtra = voiceNotes
+      ? `\n\nAdditional voice/style notes from the founder:\n${String(voiceNotes).slice(0, 2000)}`
+      : '';
+    const topicLine = topic
+      ? `\n\nTopic/angle to write about: ${String(topic).slice(0, 1000)}`
+      : '';
     const pillarExtra = pillar && PILLAR_CONTEXT[pillar] ? `\n\n${PILLAR_CONTEXT[pillar]}` : '';
 
     const systemPrompt = `${FOUNDER_CONTEXT}

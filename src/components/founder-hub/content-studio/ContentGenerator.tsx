@@ -1,7 +1,17 @@
 'use client';
 
 import { useCallback } from 'react';
-import { Loader2, Copy, Save, Edit3, Linkedin, Twitter, FileText, Quote, Video } from 'lucide-react';
+import {
+  Loader2,
+  Copy,
+  Save,
+  Edit3,
+  Linkedin,
+  Twitter,
+  FileText,
+  Quote,
+  Video,
+} from 'lucide-react';
 import { card, sectionTitle } from '../shared-styles';
 
 const CONTENT_TYPES = [
@@ -28,9 +38,9 @@ const TOPIC_SUGGESTIONS: Record<string, string[]> = {
     'The Gap Between Data Quality and Decision Quality',
   ],
   decision_noise: [
-    'Your Investment Committee Is a Rubber Stamp (Here\'s Proof)',
+    "Your Investment Committee Is a Rubber Stamp (Here's Proof)",
     'The "Statistical Jury" Concept for Better IC Decisions',
-    'Winner\'s Curse: Why 65% of Deals Overpay',
+    "Winner's Curse: Why 65% of Deals Overpay",
     'Simulating the Boardroom: The Decision Twin Concept',
     'Why Your IC Produces Different Answers on Different Days',
   ],
@@ -147,7 +157,18 @@ export function ContentGenerator({
     } finally {
       setIsGenerating(false);
     }
-  }, [founderPass, contentType, topic, tone, voiceNotes, pillar, isGenerating, setIsGenerating, setGeneratedContent, setIsEditing]);
+  }, [
+    founderPass,
+    contentType,
+    topic,
+    tone,
+    voiceNotes,
+    pillar,
+    isGenerating,
+    setIsGenerating,
+    setGeneratedContent,
+    setIsEditing,
+  ]);
 
   const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(generatedContent);
@@ -190,7 +211,14 @@ export function ContentGenerator({
 
       {/* Content pillar selector */}
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted, #71717a)', marginBottom: 8 }}>
+        <div
+          style={{
+            fontSize: 12,
+            fontWeight: 600,
+            color: 'var(--text-muted, #71717a)',
+            marginBottom: 8,
+          }}
+        >
           Content Pillar
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -288,26 +316,30 @@ export function ContentGenerator({
           marginBottom: generatedContent ? 16 : 0,
         }}
       >
-        {isGenerating ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> : null}
+        {isGenerating ? (
+          <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
+        ) : null}
         {isGenerating ? 'Generating...' : 'Generate'}
       </button>
 
       {/* Preview / Edit */}
       {generatedContent && (
         <div>
-          <div style={{
-            padding: 16,
-            borderRadius: 8,
-            border: '1px solid var(--border-primary, #222)',
-            background: 'var(--bg-primary, #0a0a0a)',
-            fontSize: 13,
-            lineHeight: 1.7,
-            color: 'var(--text-primary, #fff)',
-            whiteSpace: 'pre-wrap',
-            maxHeight: 500,
-            overflowY: 'auto',
-            position: 'relative',
-          }}>
+          <div
+            style={{
+              padding: 16,
+              borderRadius: 8,
+              border: '1px solid var(--border-primary, #222)',
+              background: 'var(--bg-primary, #0a0a0a)',
+              fontSize: 13,
+              lineHeight: 1.7,
+              color: 'var(--text-primary, #fff)',
+              whiteSpace: 'pre-wrap',
+              maxHeight: 500,
+              overflowY: 'auto',
+              position: 'relative',
+            }}
+          >
             {isEditing ? (
               <textarea
                 value={generatedContent}
@@ -329,15 +361,17 @@ export function ContentGenerator({
               <>
                 {generatedContent}
                 {isGenerating && (
-                  <span style={{
-                    display: 'inline-block',
-                    width: 8,
-                    height: 16,
-                    background: '#16a34a',
-                    marginLeft: 2,
-                    animation: 'pulse 1s ease-in-out infinite',
-                    verticalAlign: 'text-bottom',
-                  }} />
+                  <span
+                    style={{
+                      display: 'inline-block',
+                      width: 8,
+                      height: 16,
+                      background: '#16a34a',
+                      marginLeft: 2,
+                      animation: 'pulse 1s ease-in-out infinite',
+                      verticalAlign: 'text-bottom',
+                    }}
+                  />
                 )}
               </>
             )}
@@ -349,8 +383,13 @@ export function ContentGenerator({
               <button
                 onClick={() => setIsEditing(!isEditing)}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '6px 14px',
+                  borderRadius: 6,
+                  fontSize: 12,
+                  fontWeight: 600,
                   cursor: 'pointer',
                   border: '1px solid var(--border-primary, #222)',
                   background: isEditing ? '#16a34a20' : 'transparent',
@@ -363,8 +402,13 @@ export function ContentGenerator({
               <button
                 onClick={handleCopy}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '6px 14px',
+                  borderRadius: 6,
+                  fontSize: 12,
+                  fontWeight: 600,
                   cursor: 'pointer',
                   border: '1px solid var(--border-primary, #222)',
                   background: 'transparent',
@@ -377,8 +421,13 @@ export function ContentGenerator({
               <button
                 onClick={() => onSave(generatedContent)}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '6px 14px',
+                  borderRadius: 6,
+                  fontSize: 12,
+                  fontWeight: 600,
                   cursor: 'pointer',
                   border: '1px solid #16a34a40',
                   background: '#16a34a15',

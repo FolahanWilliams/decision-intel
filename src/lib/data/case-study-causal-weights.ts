@@ -33,7 +33,14 @@ function formatBiasName(biasType: string): string {
 
 function getCausalInsights(weights: CausalWeight[], totalOutcomes: number): CausalInsight[] {
   if (weights.length === 0 || totalOutcomes === 0) {
-    return [{ type: 'noise', message: 'Not enough data to generate causal insights.', confidence: 0, dataPoints: 0 }];
+    return [
+      {
+        type: 'noise',
+        message: 'Not enough data to generate causal insights.',
+        confidence: 0,
+        dataPoints: 0,
+      },
+    ];
   }
   const insights: CausalInsight[] = [];
   const dangerous = weights.filter(w => w.dangerMultiplier >= 1.5 && w.sampleSize >= 5);
@@ -119,10 +126,7 @@ export function computeStaticCausalWeights(): CausalWeight[] {
   const baseFailureRate = totalFailures / totalCases;
 
   // Per-bias statistics
-  const biasStats = new Map<
-    string,
-    { failures: number; successes: number; partials: number }
-  >();
+  const biasStats = new Map<string, { failures: number; successes: number; partials: number }>();
 
   for (const c of ALL_CASES) {
     const isFailure = isFailureOutcome(c.outcome);
@@ -201,7 +205,8 @@ export function computeStaticCausalWeights(): CausalWeight[] {
       if (expectedRate === 0) continue;
       const interactionStrength = jointFailureRate / expectedRate;
 
-      if (interactionStrength > 1.2) { // Slightly lower threshold for static data
+      if (interactionStrength > 1.2) {
+        // Slightly lower threshold for static data
         weights.push({
           biasType: [biasA, biasB].sort().join('+'),
           outcomeCorrelation: Number((jointFailureRate - baseFailureRate).toFixed(3)),
@@ -257,11 +262,7 @@ export function getStaticCausalGraph(): CausalGraph {
       y: 40 + i * 30,
       size: Math.max(8, Math.min(20, w.sampleSize * 2)),
       color:
-        w.dangerMultiplier >= 1.5
-          ? '#ef4444'
-          : w.dangerMultiplier >= 1.0
-            ? '#f59e0b'
-            : '#22c55e',
+        w.dangerMultiplier >= 1.5 ? '#ef4444' : w.dangerMultiplier >= 1.0 ? '#f59e0b' : '#22c55e',
     }));
 
   // Outcome nodes (right column)
@@ -301,11 +302,7 @@ export function getStaticCausalGraph(): CausalGraph {
         weight: w.dangerMultiplier,
         label: `×${w.dangerMultiplier.toFixed(1)}`,
         color:
-          w.dangerMultiplier >= 1.5
-            ? '#ef4444'
-            : w.dangerMultiplier >= 1.0
-              ? '#f59e0b'
-              : '#71717a',
+          w.dangerMultiplier >= 1.5 ? '#ef4444' : w.dangerMultiplier >= 1.0 ? '#f59e0b' : '#71717a',
         thickness: Math.max(1, Math.min(4, w.failureCount)),
       });
     }

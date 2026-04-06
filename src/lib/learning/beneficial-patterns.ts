@@ -59,7 +59,7 @@ export const BENEFICIAL_PATTERNS: BeneficialPattern[] = [
   {
     label: "The Outsider's Lens",
     description:
-      'Bringing in external perspectives to challenge entrenched assumptions. Works by introducing viewpoints not anchored to the organization\'s historical decisions, breaking confirmation bias loops.',
+      "Bringing in external perspectives to challenge entrenched assumptions. Works by introducing viewpoints not anchored to the organization's historical decisions, breaking confirmation bias loops.",
     managedBiases: ['confirmation_bias', 'anchoring_bias', 'groupthink'],
     contextRequired: { externalAdvisors: true, dissentEncouraged: true },
     baseScore: 80,
@@ -125,8 +125,11 @@ export function detectBeneficialPatterns(
 
   for (const pattern of BENEFICIAL_PATTERNS) {
     const matchedBiases = pattern.managedBiases.filter(b =>
-      detectedBiases.some(d => d.toLowerCase().includes(b.replace(/_/g, ' ').toLowerCase()) ||
-        b.includes(d.toLowerCase().replace(/\s+/g, '_')))
+      detectedBiases.some(
+        d =>
+          d.toLowerCase().includes(b.replace(/_/g, ' ').toLowerCase()) ||
+          b.includes(d.toLowerCase().replace(/\s+/g, '_'))
+      )
     );
 
     if (matchedBiases.length === 0) continue;
@@ -141,9 +144,10 @@ export function detectBeneficialPatterns(
 
     // Require at least 2 matching biases OR 1 bias + 1 context condition
     const biasMatch = matchedBiases.length / pattern.managedBiases.length;
-    const contextMatch = Object.keys(pattern.contextRequired).length > 0
-      ? matchedContext.length / Object.keys(pattern.contextRequired).length
-      : 0;
+    const contextMatch =
+      Object.keys(pattern.contextRequired).length > 0
+        ? matchedContext.length / Object.keys(pattern.contextRequired).length
+        : 0;
 
     const matchStrength = biasMatch * 0.6 + contextMatch * 0.4;
 
@@ -164,9 +168,7 @@ export function detectBeneficialPatterns(
  * Get the damping factor for a toxic score when beneficial patterns are present.
  * Returns a multiplier (0.5-1.0) to reduce the toxic score.
  */
-export function getBeneficialDampingFactor(
-  beneficialResults: BeneficialPatternResult[]
-): number {
+export function getBeneficialDampingFactor(beneficialResults: BeneficialPatternResult[]): number {
   if (beneficialResults.length === 0) return 1.0;
 
   const strongestMatch = beneficialResults[0].matchStrength;

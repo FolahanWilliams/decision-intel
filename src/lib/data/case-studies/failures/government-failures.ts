@@ -14,7 +14,8 @@ export const GOVERNMENT_FAILURE_CASES: CaseStudy[] = [
       'Whether to launch the healthcare exchange website on the mandated October 1 deadline despite internal testing showing critical failures, or delay the launch and face political consequences.',
     outcome: 'failure',
     impactScore: 78,
-    estimatedImpact: '$1.7B+ wasted; massive political damage; delayed healthcare coverage for millions',
+    estimatedImpact:
+      '$1.7B+ wasted; massive political damage; delayed healthcare coverage for millions',
     impactDirection: 'negative',
     biasesPresent: [
       'planning_fallacy',
@@ -70,12 +71,7 @@ export const GOVERNMENT_FAILURE_CASES: CaseStudy[] = [
     impactScore: 82,
     estimatedImpact: '$170M+ wasted; 5 years lost; intelligence sharing gaps persisted',
     impactDirection: 'negative',
-    biasesPresent: [
-      'sunk_cost_fallacy',
-      'planning_fallacy',
-      'authority_bias',
-      'status_quo_bias',
-    ],
+    biasesPresent: ['sunk_cost_fallacy', 'planning_fallacy', 'authority_bias', 'status_quo_bias'],
     primaryBias: 'sunk_cost_fallacy',
     toxicCombinations: ['The Sunk Ship'],
     beneficialPatterns: [],
@@ -139,7 +135,7 @@ export const GOVERNMENT_FAILURE_CASES: CaseStudy[] = [
       iterativeProcess: false,
     },
     lessonsLearned: [
-      'Planning fallacy in government mega-programmes is structural — Bent Flyvbjerg\'s research shows 90% of large government IT projects exceed budgets by 50%+.',
+      "Planning fallacy in government mega-programmes is structural — Bent Flyvbjerg's research shows 90% of large government IT projects exceed budgets by 50%+.",
       'Anchoring to the original £2.2B budget created a persistent credibility gap that damaged public trust.',
       'Leadership turnover (5 programme directors in 10 years) prevented institutional learning and enabled repeated sunk cost decisions.',
     ],

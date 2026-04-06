@@ -429,9 +429,7 @@ export function CommandPalette() {
             icon: <Zap size={16} style={{ color: 'var(--accent-primary)' }} />,
             action: () => {
               setOpen(false);
-              router.push(
-                `/dashboard/ask?mode=copilot&prompt=${encodeURIComponent(rawQuery)}`
-              );
+              router.push(`/dashboard/ask?mode=copilot&prompt=${encodeURIComponent(rawQuery)}`);
             },
             keywords: [],
           },
@@ -777,8 +775,7 @@ export function CommandPalette() {
                       width: 'calc(100% - 8px)',
                       padding: '8px var(--spacing-md)',
                       margin: '1px 4px',
-                      background:
-                        idx === clampedIndex ? 'var(--bg-active-hover)' : 'transparent',
+                      background: idx === clampedIndex ? 'var(--bg-active-hover)' : 'transparent',
                       border: 'none',
                       borderRadius: 'var(--radius-md)',
                       cursor: 'pointer',

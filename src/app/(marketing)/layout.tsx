@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Decision Intel — Grammarly for Strategic Decisions | AI Bias & Noise Detection',
   description:
-    'Decision Intel is the AI-powered decision hygiene platform that detects cognitive bias, measures decision noise, and calibrates your team\'s judgment — like Grammarly for strategic decisions. Used by M&A teams, corporate strategy, investment committees, and boards.',
+    "Decision Intel is the AI-powered decision hygiene platform that detects cognitive bias, measures decision noise, and calibrates your team's judgment — like Grammarly for strategic decisions. Used by M&A teams, corporate strategy, investment committees, and boards.",
   openGraph: {
     title: 'Decision Intel — Grammarly for Strategic Decisions',
     description:
@@ -86,7 +86,8 @@ const jsonLd = {
       name: 'Starter',
       price: '0',
       priceCurrency: 'USD',
-      description: 'Free — 3 decision analyses per month. Try the bias engine on any strategic document.',
+      description:
+        'Free — 3 decision analyses per month. Try the bias engine on any strategic document.',
     },
     {
       '@type': 'Offer',
@@ -99,7 +100,8 @@ const jsonLd = {
         priceCurrency: 'USD',
         billingDuration: 'P1M',
       },
-      description: 'For decision-makers running strategic documents through the bias engine. 50 analyses/month, 20+ bias types, outcome tracking.',
+      description:
+        'For decision-makers running strategic documents through the bias engine. 50 analyses/month, 20+ bias types, outcome tracking.',
     },
     {
       '@type': 'Offer',
@@ -112,7 +114,8 @@ const jsonLd = {
         priceCurrency: 'USD',
         billingDuration: 'P1M',
       },
-      description: 'For decision committees with pipeline + Slack integration. 250 analyses/month, Decision Rooms, compliance mapping, team calibration.',
+      description:
+        'For decision committees with pipeline + Slack integration. 250 analyses/month, Decision Rooms, compliance mapping, team calibration.',
     },
   ],
   screenshot: process.env.NEXT_PUBLIC_APP_URL

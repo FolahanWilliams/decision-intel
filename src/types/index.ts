@@ -491,14 +491,12 @@ export const BIAS_CATEGORIES: Record<
   },
   halo_effect: {
     name: 'Halo Effect',
-    description:
-      'Letting a positive impression in one area influence judgment in unrelated areas',
+    description: 'Letting a positive impression in one area influence judgment in unrelated areas',
     category: 'Judgment',
   },
   gamblers_fallacy: {
     name: "Gambler's Fallacy",
-    description:
-      'Believing that past random events affect the probability of future random events',
+    description: 'Believing that past random events affect the probability of future random events',
     category: 'Risk Assessment',
   },
   zeigarnik_effect: {
@@ -509,8 +507,7 @@ export const BIAS_CATEGORIES: Record<
   },
   paradox_of_choice: {
     name: 'Paradox of Choice',
-    description:
-      'Decision paralysis or lower satisfaction caused by having too many options',
+    description: 'Decision paralysis or lower satisfaction caused by having too many options',
     category: 'Judgment',
   },
 };

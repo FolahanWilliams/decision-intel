@@ -105,11 +105,14 @@ export function AnalysisProgressProvider({ children }: { children: ReactNode }) 
     setActiveAnalysis(null);
   }, []);
 
-  const updateNodeState = useCallback((label: string, status: 'pending' | 'running' | 'complete') => {
-    setActiveAnalysis(prev =>
-      prev ? { ...prev, nodeStates: { ...prev.nodeStates, [label]: status } } : prev
-    );
-  }, []);
+  const updateNodeState = useCallback(
+    (label: string, status: 'pending' | 'running' | 'complete') => {
+      setActiveAnalysis(prev =>
+        prev ? { ...prev, nodeStates: { ...prev.nodeStates, [label]: status } } : prev
+      );
+    },
+    []
+  );
 
   const updateBiasCount = useCallback((count: number) => {
     setActiveAnalysis(prev => (prev ? { ...prev, biasCount: count } : prev));
@@ -253,7 +256,7 @@ export function AnalysisProgressFloat() {
   // When complete, mark all nodes complete
   const nodeStates = isComplete
     ? Object.fromEntries(PIPELINE_NODE_LABELS.map(l => [l, 'complete' as const]))
-    : (activeAnalysis.nodeStates || {});
+    : activeAnalysis.nodeStates || {};
 
   return (
     <div
@@ -280,7 +283,14 @@ export function AnalysisProgressFloat() {
       }}
     >
       {/* Header row */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: expanded && isAnalyzing ? 12 : 8 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: expanded && isAnalyzing ? 12 : 8,
+        }}
+      >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
           {isComplete ? (
             <CheckCircle size={14} style={{ color: 'var(--success)' }} />

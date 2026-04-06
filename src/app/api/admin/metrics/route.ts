@@ -21,7 +21,10 @@ export async function GET(request: Request) {
   if (!admin) return ADMIN_DENIED;
 
   const url = new URL(request.url);
-  const windowMinutes = Math.max(1, Math.min(parseInt(url.searchParams.get('window') || '5', 10) || 5, 60));
+  const windowMinutes = Math.max(
+    1,
+    Math.min(parseInt(url.searchParams.get('window') || '5', 10) || 5, 60)
+  );
   const windowMs = windowMinutes * 60_000;
 
   // 1. API latency metrics from in-memory buffer

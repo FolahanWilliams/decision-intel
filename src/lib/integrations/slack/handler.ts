@@ -223,12 +223,9 @@ export async function fetchSlackThread(
     });
     if (cursor) params.set('cursor', cursor);
 
-    const response = await fetch(
-      `https://slack.com/api/conversations.replies?${params}`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    const response = await fetch(`https://slack.com/api/conversations.replies?${params}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
     const data = await response.json();
     if (!data.ok) {
@@ -269,7 +266,9 @@ export async function resolveToken(teamId?: string): Promise<string | null> {
       }
       // Installation exists but no encrypted token, or not found / not active
       if (!installation) {
-        log.warn(`No active Slack installation found for team ${teamId} — token may be expired or revoked`);
+        log.warn(
+          `No active Slack installation found for team ${teamId} — token may be expired or revoked`
+        );
       }
     } catch (error) {
       log.error(`Failed to resolve token for team ${teamId}:`, error);
@@ -662,8 +661,7 @@ const PRE_DECISION_NUDGE_TEMPLATES: Record<
     severity: 'info',
   },
   recency_bias: {
-    message:
-      'Recency bias signal — are recent events being overweighted vs long-term patterns?',
+    message: 'Recency bias signal — are recent events being overweighted vs long-term patterns?',
     severity: 'info',
   },
   survivorship_bias: {
@@ -672,8 +670,7 @@ const PRE_DECISION_NUDGE_TEMPLATES: Record<
     severity: 'warning',
   },
   status_quo: {
-    message:
-      'Status quo bias detected — is staying the course truly optimal, or just comfortable?',
+    message: 'Status quo bias detected — is staying the course truly optimal, or just comfortable?',
     severity: 'info',
   },
   framing_effect: {
@@ -1214,7 +1211,14 @@ export async function publishAppHome(slackUserId: string, teamId?: string): Prom
       for (const d of recentDecisions) {
         const score = d.cognitiveAudit?.decisionQualityScore;
         const scoreStr = score != null ? `${score}/100` : 'Pending';
-        const scoreEmoji = score != null ? (score >= 70 ? ':large_green_circle:' : score >= 40 ? ':large_yellow_circle:' : ':red_circle:') : ':white_circle:';
+        const scoreEmoji =
+          score != null
+            ? score >= 70
+              ? ':large_green_circle:'
+              : score >= 40
+                ? ':large_yellow_circle:'
+                : ':red_circle:'
+            : ':white_circle:';
         const title = d.content.slice(0, 60) + (d.content.length > 60 ? '...' : '');
         const type = d.decisionType ? ` · ${d.decisionType.replace(/_/g, ' ')}` : '';
         blocks.push({

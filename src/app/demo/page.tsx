@@ -266,7 +266,8 @@ export default function DemoPage() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
               {DEMO_ANALYSES.map((a, idx) => {
-                const scoreColor = a.overallScore >= 70 ? '#22c55e' : a.overallScore >= 40 ? '#eab308' : '#ef4444';
+                const scoreColor =
+                  a.overallScore >= 70 ? '#22c55e' : a.overallScore >= 40 ? '#eab308' : '#ef4444';
                 return (
                   <button
                     key={a.id}
@@ -310,7 +311,9 @@ export default function DemoPage() {
 
                     {/* Title + description */}
                     <div>
-                      <div className="text-base font-bold text-slate-900 mb-1.5 leading-tight">{a.shortName}</div>
+                      <div className="text-base font-bold text-slate-900 mb-1.5 leading-tight">
+                        {a.shortName}
+                      </div>
                       <div className="text-sm text-slate-500 leading-relaxed line-clamp-2">
                         {a.summary.slice(0, 140)}...
                       </div>
@@ -367,7 +370,13 @@ export default function DemoPage() {
 
         {/* Quick Scan Results (paste mode) */}
         {scanResult && !isSimulating && !showResults && (
-          <QuickScanResults result={scanResult} onBack={() => { setScanResult(null); setPasteText(''); }} />
+          <QuickScanResults
+            result={scanResult}
+            onBack={() => {
+              setScanResult(null);
+              setPasteText('');
+            }}
+          />
         )}
 
         {/* Streaming Simulation */}
@@ -813,9 +822,7 @@ function IntelligenceTab({ analysis }: { analysis: DemoAnalysis }) {
       {/* Pattern Match */}
       <Section icon={<Brain size={16} />} title="Pattern Recognition">
         <div className="bg-indigo-500/[0.06] border border-indigo-500/20 rounded-lg p-4 mb-4">
-          <p className="text-slate-200 text-sm m-0 leading-relaxed">
-            {intelligence.patternMatch}
-          </p>
+          <p className="text-slate-200 text-sm m-0 leading-relaxed">{intelligence.patternMatch}</p>
         </div>
         <div className="flex flex-wrap gap-2">
           {intelligence.recognitionCues.map((cue, idx) => (
@@ -862,11 +869,7 @@ function IntelligenceTab({ analysis }: { analysis: DemoAnalysis }) {
         <div className="flex flex-col gap-3">
           {intelligence.similarCases.map((c, idx) => {
             const outcomeColor =
-              c.outcome === 'SUCCESS'
-                ? '#22c55e'
-                : c.outcome === 'FAILURE'
-                  ? '#ef4444'
-                  : '#eab308';
+              c.outcome === 'SUCCESS' ? '#22c55e' : c.outcome === 'FAILURE' ? '#ef4444' : '#eab308';
             return (
               <div
                 key={idx}
@@ -1329,18 +1332,25 @@ function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () =
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mb-7">
           <div className="bg-white border border-slate-200 rounded-xl py-3 px-3 text-center">
             <div className="text-[10px] text-slate-500 mb-1.5 tracking-wide">BIASES FOUND</div>
-            <div className="text-2xl font-extrabold" style={{ color: riskColors[result.riskLevel] }}>
+            <div
+              className="text-2xl font-extrabold"
+              style={{ color: riskColors[result.riskLevel] }}
+            >
               {result.biasCount}
             </div>
             <div className="text-[11px] text-slate-500 mt-1">of 14 checked</div>
           </div>
           <div className="bg-white border border-slate-200 rounded-xl py-3 px-3 text-center">
             <div className="text-[10px] text-slate-500 mb-1.5 tracking-wide">RISK LEVEL</div>
-            <div className="text-lg font-extrabold uppercase" style={{ color: riskColors[result.riskLevel] }}>
+            <div
+              className="text-lg font-extrabold uppercase"
+              style={{ color: riskColors[result.riskLevel] }}
+            >
               {result.riskLevel}
             </div>
             <div className="text-[11px] text-slate-500 mt-1">
-              {result.biases.filter(b => b.severity === 'critical' || b.severity === 'high').length} high/critical
+              {result.biases.filter(b => b.severity === 'critical' || b.severity === 'high').length}{' '}
+              high/critical
             </div>
           </div>
           <div className="bg-white border border-slate-200 rounded-xl py-3 px-3 text-center col-span-2 sm:col-span-1">

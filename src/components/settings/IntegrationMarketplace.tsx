@@ -105,7 +105,7 @@ const SLASH_COMMANDS = [
   { command: '/di help', description: 'Show all available commands' },
 ];
 
-const swrFetcher = (url: string) => fetch(url).then(r => r.ok ? r.json() : null);
+const swrFetcher = (url: string) => fetch(url).then(r => (r.ok ? r.json() : null));
 
 interface SlackChannel {
   id: string;
@@ -160,7 +160,9 @@ function SlackChannelConfig() {
         mutateConfig();
         setTimeout(() => setSaved(false), 3000);
       }
-    } catch { /* ignore */ } finally {
+    } catch {
+      /* ignore */
+    } finally {
       setSaving(false);
     }
   };
@@ -168,11 +170,14 @@ function SlackChannelConfig() {
   const channelList = channels?.channels || [];
   const hasChanges =
     config &&
-    (JSON.stringify(selectedChannels.sort()) !== JSON.stringify((config.monitoredChannels || []).sort()) ||
+    (JSON.stringify(selectedChannels.sort()) !==
+      JSON.stringify((config.monitoredChannels || []).sort()) ||
       nudgeFrequency !== (config.nudgeFrequency || 'normal'));
 
   return (
-    <div style={{ borderTop: '1px solid var(--liquid-border)', paddingTop: '18px', marginTop: '4px' }}>
+    <div
+      style={{ borderTop: '1px solid var(--liquid-border)', paddingTop: '18px', marginTop: '4px' }}
+    >
       {/* Channel Selector */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
         <Hash size={14} style={{ color: 'var(--text-muted)' }} />
@@ -180,12 +185,28 @@ function SlackChannelConfig() {
           Monitored Channels
         </h4>
       </div>
-      <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '10px', lineHeight: 1.5 }}>
+      <p
+        style={{
+          fontSize: '12px',
+          color: 'var(--text-muted)',
+          marginBottom: '10px',
+          lineHeight: 1.5,
+        }}
+      >
         Select which channels the bot monitors for decisions. Leave empty to monitor all channels.
       </p>
 
       {channelList.length > 0 ? (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px', maxHeight: 140, overflowY: 'auto' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '6px',
+            marginBottom: '16px',
+            maxHeight: 140,
+            overflowY: 'auto',
+          }}
+        >
           {channelList.map(ch => {
             const isSelected = selectedChannels.includes(ch.id);
             return (
@@ -199,7 +220,9 @@ function SlackChannelConfig() {
                   padding: '4px 10px',
                   fontSize: '12px',
                   borderRadius: 'var(--radius-sm)',
-                  border: isSelected ? '1px solid rgba(22, 163, 74, 0.4)' : '1px solid var(--border-color)',
+                  border: isSelected
+                    ? '1px solid rgba(22, 163, 74, 0.4)'
+                    : '1px solid var(--border-color)',
                   background: isSelected ? 'rgba(22, 163, 74, 0.15)' : 'var(--bg-card)',
                   color: isSelected ? 'var(--accent-primary)' : 'var(--text-secondary)',
                   cursor: 'pointer',
@@ -214,7 +237,14 @@ function SlackChannelConfig() {
           })}
         </div>
       ) : (
-        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '16px', fontStyle: 'italic' }}>
+        <div
+          style={{
+            fontSize: '12px',
+            color: 'var(--text-muted)',
+            marginBottom: '16px',
+            fontStyle: 'italic',
+          }}
+        >
           Loading channels...
         </div>
       )}
@@ -234,15 +264,23 @@ function SlackChannelConfig() {
         ].map(opt => (
           <button
             key={opt.value}
-            onClick={() => { setNudgeFrequency(opt.value); setSaved(false); }}
+            onClick={() => {
+              setNudgeFrequency(opt.value);
+              setSaved(false);
+            }}
             style={{
               flex: 1,
               padding: '8px 12px',
               fontSize: '12px',
               borderRadius: 'var(--radius-md)',
-              border: nudgeFrequency === opt.value ? '1px solid rgba(22, 163, 74, 0.4)' : '1px solid var(--border-color)',
-              background: nudgeFrequency === opt.value ? 'rgba(22, 163, 74, 0.15)' : 'var(--bg-card)',
-              color: nudgeFrequency === opt.value ? 'var(--accent-primary)' : 'var(--text-secondary)',
+              border:
+                nudgeFrequency === opt.value
+                  ? '1px solid rgba(22, 163, 74, 0.4)'
+                  : '1px solid var(--border-color)',
+              background:
+                nudgeFrequency === opt.value ? 'rgba(22, 163, 74, 0.15)' : 'var(--bg-card)',
+              color:
+                nudgeFrequency === opt.value ? 'var(--accent-primary)' : 'var(--text-secondary)',
               cursor: 'pointer',
               textAlign: 'left',
               transition: 'all 0.15s',
@@ -275,31 +313,49 @@ function SlackChannelConfig() {
             marginBottom: '4px',
           }}
         >
-          {saving ? <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> : <Save size={12} />}
+          {saving ? (
+            <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} />
+          ) : (
+            <Save size={12} />
+          )}
           {saving ? 'Saving...' : 'Save Configuration'}
         </button>
       )}
       {saved && (
-        <span style={{ fontSize: '11px', color: '#22c55e', marginLeft: '8px' }}>
-          ✓ Saved
-        </span>
+        <span style={{ fontSize: '11px', color: '#22c55e', marginLeft: '8px' }}>✓ Saved</span>
       )}
     </div>
   );
 }
 
 interface SlackActivityData {
-  recentDecisions: Array<{ id: string; content: string; type: string | null; score: number | null; createdAt: string }>;
-  recentNudges: Array<{ id: string; biasType: string; severity: string; wasHelpful: boolean | null; createdAt: string }>;
-  summary: { decisionsThisWeek: number; nudgesThisWeek: number; outcomesThisWeek: number; nudgeHelpfulRate: number | null };
+  recentDecisions: Array<{
+    id: string;
+    content: string;
+    type: string | null;
+    score: number | null;
+    createdAt: string;
+  }>;
+  recentNudges: Array<{
+    id: string;
+    biasType: string;
+    severity: string;
+    wasHelpful: boolean | null;
+    createdAt: string;
+  }>;
+  summary: {
+    decisionsThisWeek: number;
+    nudgesThisWeek: number;
+    outcomesThisWeek: number;
+    nudgeHelpfulRate: number | null;
+  };
 }
 
 function SlackActivityFeed() {
-  const { data } = useSWR<SlackActivityData>(
-    '/api/integrations/slack/activity',
-    swrFetcher,
-    { revalidateOnFocus: false, dedupingInterval: 60_000 }
-  );
+  const { data } = useSWR<SlackActivityData>('/api/integrations/slack/activity', swrFetcher, {
+    revalidateOnFocus: false,
+    dedupingInterval: 60_000,
+  });
   const [expanded, setExpanded] = useState(false);
 
   if (!data) return null;
@@ -308,7 +364,9 @@ function SlackActivityFeed() {
   const hasActivity = summary.decisionsThisWeek > 0 || summary.nudgesThisWeek > 0;
 
   return (
-    <div style={{ borderTop: '1px solid var(--liquid-border)', paddingTop: '18px', marginTop: '4px' }}>
+    <div
+      style={{ borderTop: '1px solid var(--liquid-border)', paddingTop: '18px', marginTop: '4px' }}
+    >
       <button
         onClick={() => setExpanded(!expanded)}
         style={{
@@ -328,12 +386,26 @@ function SlackActivityFeed() {
         <h4 style={{ fontSize: '13px', fontWeight: 600, flex: 1, textAlign: 'left' }}>
           Bot Activity
         </h4>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '11px', color: 'var(--text-muted)' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            fontSize: '11px',
+            color: 'var(--text-muted)',
+          }}
+        >
           <span>{summary.decisionsThisWeek} decisions</span>
           <span>{summary.nudgesThisWeek} nudges</span>
           <span>{summary.outcomesThisWeek} outcomes</span>
           <span style={{ fontSize: '10px' }}>this week</span>
-          <ChevronRight size={14} style={{ transform: expanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }} />
+          <ChevronRight
+            size={14}
+            style={{
+              transform: expanded ? 'rotate(90deg)' : 'none',
+              transition: 'transform 0.15s',
+            }}
+          />
         </div>
       </button>
 
@@ -341,29 +413,68 @@ function SlackActivityFeed() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {/* Summary stats */}
           {summary.nudgeHelpfulRate !== null && (
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', padding: '8px 10px', background: 'var(--bg-card)', borderRadius: 'var(--radius-sm)' }}>
-              Nudge helpfulness rate: <strong style={{ color: '#22c55e' }}>{summary.nudgeHelpfulRate}%</strong>
+            <div
+              style={{
+                fontSize: '12px',
+                color: 'var(--text-secondary)',
+                padding: '8px 10px',
+                background: 'var(--bg-card)',
+                borderRadius: 'var(--radius-sm)',
+              }}
+            >
+              Nudge helpfulness rate:{' '}
+              <strong style={{ color: '#22c55e' }}>{summary.nudgeHelpfulRate}%</strong>
             </div>
           )}
 
           {/* Recent decisions */}
           {data.recentDecisions.length > 0 && (
             <div>
-              <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>
+              <div
+                style={{
+                  fontSize: '11px',
+                  color: 'var(--text-muted)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                  marginBottom: '6px',
+                }}
+              >
                 Recent Decisions
               </div>
               {data.recentDecisions.map(d => (
-                <div key={d.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 10px', borderRadius: 'var(--radius-sm)', background: 'var(--bg-card)', marginBottom: '4px' }}>
+                <div
+                  key={d.id}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '6px 10px',
+                    borderRadius: 'var(--radius-sm)',
+                    background: 'var(--bg-card)',
+                    marginBottom: '4px',
+                  }}
+                >
                   <Brain size={12} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
-                  <span style={{ fontSize: '12px', color: 'var(--text-secondary)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <span
+                    style={{
+                      fontSize: '12px',
+                      color: 'var(--text-secondary)',
+                      flex: 1,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
                     {d.content}
                   </span>
                   {d.score !== null && (
-                    <span style={{
-                      fontSize: '11px',
-                      fontWeight: 600,
-                      color: d.score >= 70 ? '#22c55e' : d.score >= 40 ? '#eab308' : '#ef4444',
-                    }}>
+                    <span
+                      style={{
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        color: d.score >= 70 ? '#22c55e' : d.score >= 40 ? '#eab308' : '#ef4444',
+                      }}
+                    >
                       {d.score}/100
                     </span>
                   )}
@@ -375,17 +486,45 @@ function SlackActivityFeed() {
           {/* Recent nudges */}
           {data.recentNudges.length > 0 && (
             <div>
-              <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>
+              <div
+                style={{
+                  fontSize: '11px',
+                  color: 'var(--text-muted)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                  marginBottom: '6px',
+                }}
+              >
                 Recent Nudges
               </div>
               {data.recentNudges.map(n => (
-                <div key={n.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 10px', borderRadius: 'var(--radius-sm)', background: 'var(--bg-card)', marginBottom: '4px' }}>
-                  <BellRing size={12} style={{ color: n.severity === 'critical' ? '#ef4444' : '#eab308', flexShrink: 0 }} />
+                <div
+                  key={n.id}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '6px 10px',
+                    borderRadius: 'var(--radius-sm)',
+                    background: 'var(--bg-card)',
+                    marginBottom: '4px',
+                  }}
+                >
+                  <BellRing
+                    size={12}
+                    style={{
+                      color: n.severity === 'critical' ? '#ef4444' : '#eab308',
+                      flexShrink: 0,
+                    }}
+                  />
                   <span style={{ fontSize: '12px', color: 'var(--text-secondary)', flex: 1 }}>
                     {n.biasType.replace(/_/g, ' ')}
                   </span>
                   <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
-                    {new Date(n.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                    {new Date(n.createdAt).toLocaleDateString(undefined, {
+                      month: 'short',
+                      day: 'numeric',
+                    })}
                   </span>
                 </div>
               ))}
@@ -393,7 +532,14 @@ function SlackActivityFeed() {
           )}
 
           {!hasActivity && (
-            <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontStyle: 'italic', padding: '8px 0' }}>
+            <div
+              style={{
+                fontSize: '12px',
+                color: 'var(--text-muted)',
+                fontStyle: 'italic',
+                padding: '8px 0',
+              }}
+            >
               No bot activity this week. Start discussing decisions in monitored Slack channels.
             </div>
           )}
@@ -461,7 +607,9 @@ function GoogleDriveFolderConfig() {
         mutateConfig();
         setTimeout(() => setSaved(false), 3000);
       }
-    } catch { /* ignore */ } finally {
+    } catch {
+      /* ignore */
+    } finally {
       setSaving(false);
     }
   };
@@ -469,24 +617,43 @@ function GoogleDriveFolderConfig() {
   const folderList = foldersData?.folders || [];
   const hasChanges =
     config &&
-    JSON.stringify(selectedFolders.sort()) !== JSON.stringify((config.monitoredFolders || []).sort());
+    JSON.stringify(selectedFolders.sort()) !==
+      JSON.stringify((config.monitoredFolders || []).sort());
 
   return (
-    <div style={{ borderTop: '1px solid var(--liquid-border)', paddingTop: '18px', marginTop: '4px' }}>
+    <div
+      style={{ borderTop: '1px solid var(--liquid-border)', paddingTop: '18px', marginTop: '4px' }}
+    >
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
         <FolderOpen size={14} style={{ color: 'var(--text-muted)' }} />
         <h4 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
           Monitored Folders
         </h4>
       </div>
-      <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '10px', lineHeight: 1.5 }}>
+      <p
+        style={{
+          fontSize: '12px',
+          color: 'var(--text-muted)',
+          marginBottom: '10px',
+          lineHeight: 1.5,
+        }}
+      >
         Select which Google Drive folders to watch. New or modified files in these folders are
-        automatically downloaded and analyzed every 10 minutes. Supported: PDF, DOCX, XLSX, CSV, PPTX,
-        Google Docs, Sheets, and Slides.
+        automatically downloaded and analyzed every 10 minutes. Supported: PDF, DOCX, XLSX, CSV,
+        PPTX, Google Docs, Sheets, and Slides.
       </p>
 
       {folderList.length > 0 ? (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px', maxHeight: 160, overflowY: 'auto' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '6px',
+            marginBottom: '16px',
+            maxHeight: 160,
+            overflowY: 'auto',
+          }}
+        >
           {folderList.map(folder => {
             const isSelected = selectedFolders.includes(folder.id);
             return (
@@ -500,7 +667,9 @@ function GoogleDriveFolderConfig() {
                   padding: '4px 10px',
                   fontSize: '12px',
                   borderRadius: 'var(--radius-sm)',
-                  border: isSelected ? '1px solid rgba(66, 133, 244, 0.4)' : '1px solid var(--border-color)',
+                  border: isSelected
+                    ? '1px solid rgba(66, 133, 244, 0.4)'
+                    : '1px solid var(--border-color)',
                   background: isSelected ? 'rgba(66, 133, 244, 0.15)' : 'var(--bg-card)',
                   color: isSelected ? '#4285F4' : 'var(--text-secondary)',
                   cursor: 'pointer',
@@ -515,7 +684,14 @@ function GoogleDriveFolderConfig() {
           })}
         </div>
       ) : (
-        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '16px', fontStyle: 'italic' }}>
+        <div
+          style={{
+            fontSize: '12px',
+            color: 'var(--text-muted)',
+            marginBottom: '16px',
+            fontStyle: 'italic',
+          }}
+        >
           Loading folders...
         </div>
       )}
@@ -540,14 +716,16 @@ function GoogleDriveFolderConfig() {
             marginBottom: '4px',
           }}
         >
-          {saving ? <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> : <Save size={12} />}
+          {saving ? (
+            <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} />
+          ) : (
+            <Save size={12} />
+          )}
           {saving ? 'Saving...' : 'Save Configuration'}
         </button>
       )}
       {saved && (
-        <span style={{ fontSize: '11px', color: '#22c55e', marginLeft: '8px' }}>
-          Saved
-        </span>
+        <span style={{ fontSize: '11px', color: '#22c55e', marginLeft: '8px' }}>Saved</span>
       )}
     </div>
   );
@@ -662,7 +840,15 @@ function GoogleDriveDetailSection({
                 border: '1px solid var(--border-color)',
               }}
             >
-              <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>
+              <div
+                style={{
+                  fontSize: '10px',
+                  color: 'var(--text-muted)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                  marginBottom: '4px',
+                }}
+              >
                 Drive Account
               </div>
               <div style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>
@@ -677,7 +863,15 @@ function GoogleDriveDetailSection({
                 border: '1px solid var(--border-color)',
               }}
             >
-              <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>
+              <div
+                style={{
+                  fontSize: '10px',
+                  color: 'var(--text-muted)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                  marginBottom: '4px',
+                }}
+              >
                 Last Sync
               </div>
               <div style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>
@@ -734,7 +928,8 @@ function GoogleDriveDetailSection({
               marginBottom: '14px',
             }}
           >
-            Connect your Google Drive to automatically analyze new documents added to selected folders.
+            Connect your Google Drive to automatically analyze new documents added to selected
+            folders.
           </p>
           <a
             href="/api/integrations/google/oauth"

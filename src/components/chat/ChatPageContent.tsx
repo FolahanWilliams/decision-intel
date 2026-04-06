@@ -403,8 +403,7 @@ export function ChatPageContent() {
                     style={{
                       padding: '8px 12px',
                       borderBottom: '1px solid var(--border-color)',
-                      background:
-                        s.id === activeSessionId ? 'var(--bg-card-hover)' : 'transparent',
+                      background: s.id === activeSessionId ? 'var(--bg-card-hover)' : 'transparent',
                     }}
                   >
                     <button
@@ -528,8 +527,7 @@ export function ChatPageContent() {
                     style={{
                       width: '100%',
                       padding: '10px 12px',
-                      background:
-                        d.id === pinnedDocId ? 'var(--bg-card-hover)' : 'transparent',
+                      background: d.id === pinnedDocId ? 'var(--bg-card-hover)' : 'transparent',
                       border: 'none',
                       borderBottom: '1px solid var(--border-color)',
                       color: 'var(--text-primary)',

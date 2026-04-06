@@ -325,34 +325,40 @@ export const DEMO_NOKIA: DemoAnalysis = {
         title: 'HP acquires Palm ($1.2B, 2010)',
         outcome: 'FAILURE',
         similarity: 0.89,
-        lesson: 'Acquiring a declining mobile platform did not reverse ecosystem collapse. Palm was shut down within 18 months.',
+        lesson:
+          'Acquiring a declining mobile platform did not reverse ecosystem collapse. Palm was shut down within 18 months.',
       },
       {
         title: 'Google acquires Motorola ($12.5B, 2012)',
         outcome: 'PARTIAL',
         similarity: 0.84,
-        lesson: 'Patent portfolio retained value, but hardware division sold for $2.9B — a 77% loss. Vertical integration did not produce differentiation.',
+        lesson:
+          'Patent portfolio retained value, but hardware division sold for $2.9B — a 77% loss. Vertical integration did not produce differentiation.',
       },
       {
         title: 'BlackBerry pivot to enterprise (2013)',
         outcome: 'FAILURE',
         similarity: 0.71,
-        lesson: 'Dominant smartphone platform that failed to adapt. Market share decline was irreversible once developer ecosystem collapsed below viability threshold.',
+        lesson:
+          'Dominant smartphone platform that failed to adapt. Market share decline was irreversible once developer ecosystem collapsed below viability threshold.',
       },
     ],
     recognitionCues: [
       {
         title: 'Declining Platform Acquisition Pattern',
-        description: 'Acquiring a mobile hardware company with declining market share during an ecosystem transition has a base rate failure rate of >80%.',
+        description:
+          'Acquiring a mobile hardware company with declining market share during an ecosystem transition has a base rate failure rate of >80%.',
         similarity: 0.91,
       },
       {
         title: 'Sunk Cost Escalation Commitment',
-        description: 'This pattern of increasing commitment to protect prior investments is well-documented in M&A literature. It correlates with 2.3x higher write-down probability.',
+        description:
+          'This pattern of increasing commitment to protect prior investments is well-documented in M&A literature. It correlates with 2.3x higher write-down probability.',
         similarity: 0.87,
       },
     ],
-    patternMatch: 'This closely resembles the "Declining Platform Acquisition" archetype seen in HP/Palm and Google/Motorola — high failure rate when acquiring hardware companies during ecosystem collapse.',
+    patternMatch:
+      'This closely resembles the "Declining Platform Acquisition" archetype seen in HP/Palm and Google/Motorola — high failure rate when acquiring hardware companies during ecosystem collapse.',
   },
   outcome: {
     what: 'Microsoft wrote down $7.6B of the acquisition value and laid off 7,800 former Nokia employees.',
@@ -605,28 +611,33 @@ export const DEMO_PHOENIX: DemoAnalysis = {
         title: 'WeWork International Expansion (2018)',
         outcome: 'FAILURE',
         similarity: 0.78,
-        lesson: 'Rapid multi-market international expansion without local market validation led to massive losses. Unit economics that worked domestically failed to translate.',
+        lesson:
+          'Rapid multi-market international expansion without local market validation led to massive losses. Unit economics that worked domestically failed to translate.',
       },
       {
         title: 'Uber European Launch (2014-2016)',
         outcome: 'PARTIAL',
         similarity: 0.72,
-        lesson: 'Regulatory complexity in European markets was severely underestimated. Required 3x the timeline and 5x the legal budget originally planned.',
+        lesson:
+          'Regulatory complexity in European markets was severely underestimated. Required 3x the timeline and 5x the legal budget originally planned.',
       },
     ],
     recognitionCues: [
       {
         title: 'Premature Multi-Market Entry',
-        description: 'Launching in 4+ international markets simultaneously without validated playbook. Reference class suggests 70% probability of retreat from at least 2 markets within 18 months.',
+        description:
+          'Launching in 4+ international markets simultaneously without validated playbook. Reference class suggests 70% probability of retreat from at least 2 markets within 18 months.',
         similarity: 0.83,
       },
       {
         title: 'Best-Case-Only Financial Modeling',
-        description: 'Absence of bear/base case scenarios in financial projections. Historically correlated with 2.8x higher shortfall vs plan.',
+        description:
+          'Absence of bear/base case scenarios in financial projections. Historically correlated with 2.8x higher shortfall vs plan.',
         similarity: 0.79,
       },
     ],
-    patternMatch: 'This resembles the "Overconfident International Expansion" pattern — simultaneous multi-market entry without local validation, driven by board pressure rather than market readiness signals.',
+    patternMatch:
+      'This resembles the "Overconfident International Expansion" pattern — simultaneous multi-market entry without local validation, driven by board pressure rather than market readiness signals.',
   },
 };
 
@@ -875,34 +886,40 @@ export const DEMO_SERIES_B: DemoAnalysis = {
         title: 'Livongo Health Series B ($52.5M, 2016)',
         outcome: 'SUCCESS',
         similarity: 0.81,
-        lesson: 'Chronic condition management platform with clinical validation. Key success factor was securing CMS reimbursement codes early and building payer relationships before scaling. Exited at $18.5B via Teladoc acquisition.',
+        lesson:
+          'Chronic condition management platform with clinical validation. Key success factor was securing CMS reimbursement codes early and building payer relationships before scaling. Exited at $18.5B via Teladoc acquisition.',
       },
       {
         title: 'Theranos Series C ($200M, 2014)',
         outcome: 'FAILURE',
         similarity: 0.62,
-        lesson: 'Clinical validation claims that could not withstand FDA scrutiny. Regulatory pathway assumptions were never independently validated by investors.',
+        lesson:
+          'Clinical validation claims that could not withstand FDA scrutiny. Regulatory pathway assumptions were never independently validated by investors.',
       },
       {
         title: 'Omada Health Series B ($48M, 2016)',
         outcome: 'SUCCESS',
         similarity: 0.77,
-        lesson: 'Digital health prevention platform. Phased FDA approach with initial wellness focus before clinical claims proved effective. Revenue growth sustained through payer partnerships.',
+        lesson:
+          'Digital health prevention platform. Phased FDA approach with initial wellness focus before clinical claims proved effective. Revenue growth sustained through payer partnerships.',
       },
     ],
     recognitionCues: [
       {
         title: 'De Novo FDA Pathway Risk',
-        description: 'The De Novo classification pathway has a median review time of 14-18 months, with recent healthtech AI devices trending longer. The projected 10-month timeline places this in the fastest 15% historically.',
+        description:
+          'The De Novo classification pathway has a median review time of 14-18 months, with recent healthtech AI devices trending longer. The projected 10-month timeline places this in the fastest 15% historically.',
         similarity: 0.88,
       },
       {
         title: 'Peak-Era Healthtech Anchoring',
-        description: 'Valuation comparables are anchored to 2020-2021 peak-era healthtech multiples. Post-2022 multiples contracted 60-70%, making these benchmarks misleading for current exit expectations.',
+        description:
+          'Valuation comparables are anchored to 2020-2021 peak-era healthtech multiples. Post-2022 multiples contracted 60-70%, making these benchmarks misleading for current exit expectations.',
         similarity: 0.85,
       },
     ],
-    patternMatch: 'This resembles the "Promising Digital Health Platform with Regulatory Risk" pattern. Similar companies succeed when FDA timelines are realistic and reimbursement is secured early, but fail when regulatory assumptions are anchored to best-case scenarios.',
+    patternMatch:
+      'This resembles the "Promising Digital Health Platform with Regulatory Risk" pattern. Similar companies succeed when FDA timelines are realistic and reimbursement is secured early, but fail when regulatory assumptions are anchored to best-case scenarios.',
   },
   outcome: {
     what: 'Meridian secured $45M at $380M pre-money. Initial FDA pathway was restructured after 18-month review delay, validating the pre-mortem scenario.',

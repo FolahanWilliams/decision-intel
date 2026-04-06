@@ -92,36 +92,39 @@ export function ContentStudioTab({ founderPass }: ContentStudioTabProps) {
   }, [fetchLibrary]);
 
   // Save handler
-  const handleSave = useCallback(async (content: string) => {
-    const title = content.split('\n')[0]?.slice(0, 100) || 'Untitled';
+  const handleSave = useCallback(
+    async (content: string) => {
+      const title = content.split('\n')[0]?.slice(0, 100) || 'Untitled';
 
-    try {
-      const res = await fetch('/api/founder-hub/content', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-founder-pass': founderPass,
-        },
-        body: JSON.stringify({
-          action: 'save',
-          contentType,
-          title,
-          body: content,
-          topic: pillar
-            ? `[pillar:${pillar}] ${topic.trim() || 'general'}`
-            : topic.trim() || undefined,
-          tone,
-          status: 'draft',
-        }),
-      });
+      try {
+        const res = await fetch('/api/founder-hub/content', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-founder-pass': founderPass,
+          },
+          body: JSON.stringify({
+            action: 'save',
+            contentType,
+            title,
+            body: content,
+            topic: pillar
+              ? `[pillar:${pillar}] ${topic.trim() || 'general'}`
+              : topic.trim() || undefined,
+            tone,
+            status: 'draft',
+          }),
+        });
 
-      if (res.ok) {
-        fetchLibrary();
+        if (res.ok) {
+          fetchLibrary();
+        }
+      } catch {
+        // silent
       }
-    } catch {
-      // silent
-    }
-  }, [founderPass, contentType, pillar, topic, tone, fetchLibrary]);
+    },
+    [founderPass, contentType, pillar, topic, tone, fetchLibrary]
+  );
 
   return (
     <div>

@@ -21,7 +21,11 @@ function makeRequest(
 
 describe('validateOrigin', () => {
   beforeEach(() => {
-    process.env = { ...originalEnv, NODE_ENV: 'production', NEXT_PUBLIC_APP_URL: 'https://app.example.com' };
+    process.env = {
+      ...originalEnv,
+      NODE_ENV: 'production',
+      NEXT_PUBLIC_APP_URL: 'https://app.example.com',
+    };
   });
 
   afterEach(() => {
@@ -49,7 +53,9 @@ describe('validateOrigin', () => {
   });
 
   it('allows referer when origin is absent', () => {
-    const req = makeRequest('POST', '/api/upload', { referer: 'https://app.example.com/dashboard' });
+    const req = makeRequest('POST', '/api/upload', {
+      referer: 'https://app.example.com/dashboard',
+    });
     expect(validateOrigin(req)).toBe(true);
   });
 

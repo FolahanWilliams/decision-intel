@@ -124,7 +124,9 @@ export function BiasHeatmap({ content, biases }: BiasHeatmapProps) {
                                 `}
                 >
                   <div className="flex items-center justify-between mb-2 pb-2 border-b border-white/10">
-                    <p className="font-bold text-warning text-sm">{formatBiasName(part.bias.biasType)}</p>
+                    <p className="font-bold text-warning text-sm">
+                      {formatBiasName(part.bias.biasType)}
+                    </p>
                     <span
                       className={`text-[10px] px-1.5 py-0.5 rounded uppercase font-bold
                                             ${

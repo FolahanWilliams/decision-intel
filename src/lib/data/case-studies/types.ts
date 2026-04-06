@@ -120,9 +120,13 @@ export interface CaseStudy {
 export type FailureCaseOutcome = 'catastrophic_failure' | 'failure' | 'partial_failure';
 
 export function isFailureOutcome(outcome: CaseOutcome): outcome is FailureCaseOutcome {
-  return outcome === 'catastrophic_failure' || outcome === 'failure' || outcome === 'partial_failure';
+  return (
+    outcome === 'catastrophic_failure' || outcome === 'failure' || outcome === 'partial_failure'
+  );
 }
 
 export function isSuccessOutcome(outcome: CaseOutcome): boolean {
-  return outcome === 'success' || outcome === 'exceptional_success' || outcome === 'partial_success';
+  return (
+    outcome === 'success' || outcome === 'exceptional_success' || outcome === 'partial_success'
+  );
 }

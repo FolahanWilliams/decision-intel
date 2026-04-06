@@ -59,7 +59,10 @@ export async function POST() {
       log.info(`Test nudge sent to workspace ${installation.teamName} by user ${user.id}`);
       return NextResponse.json({ success: true, workspace: installation.teamName });
     } else {
-      return NextResponse.json({ error: 'Failed to deliver nudge — check Slack token' }, { status: 502 });
+      return NextResponse.json(
+        { error: 'Failed to deliver nudge — check Slack token' },
+        { status: 502 }
+      );
     }
   } catch (error) {
     log.error('Test nudge failed:', error);

@@ -55,10 +55,7 @@ export function CaseStudyGrid({ cases, industries }: CaseStudyGridProps) {
       if (depthFilter === 'deep' && !c.hasDeepAnalysis) return false;
       if (query) {
         const q = query.toLowerCase();
-        if (
-          !c.company.toLowerCase().includes(q) &&
-          !c.title.toLowerCase().includes(q)
-        )
+        if (!c.company.toLowerCase().includes(q) && !c.title.toLowerCase().includes(q))
           return false;
       }
       return true;

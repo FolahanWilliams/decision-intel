@@ -1,9 +1,5 @@
 import type { Metadata } from 'next';
-import {
-  ALL_CASES,
-  getSlugForCase,
-  type CaseStudy,
-} from '@/lib/data/case-studies';
+import { ALL_CASES, getSlugForCase, type CaseStudy } from '@/lib/data/case-studies';
 import { CaseStudyNav, BRAND_COLORS as C } from './CaseStudyNav';
 import { CaseStudyGrid } from './CaseStudyGrid';
 
@@ -100,10 +96,10 @@ export default function CaseStudyIndexPage() {
               margin: 0,
             }}
           >
-            Curated from SEC filings, NTSB reports, FDA actions, and post-mortems.
-            Every case runs through the same bias and noise framework we apply to
-            live deals &mdash; {deepCount} include the full hindsight-stripped
-            memo analysis. Search by company, industry, or outcome.
+            Curated from SEC filings, NTSB reports, FDA actions, and post-mortems. Every case runs
+            through the same bias and noise framework we apply to live deals &mdash; {deepCount}{' '}
+            include the full hindsight-stripped memo analysis. Search by company, industry, or
+            outcome.
           </p>
 
           <div style={{ display: 'flex', gap: 32, marginTop: 32, flexWrap: 'wrap' }}>
@@ -130,9 +126,7 @@ export default function CaseStudyIndexPage() {
 function Stat({ value, label }: { value: string; label: string }) {
   return (
     <div>
-      <div style={{ fontSize: 32, fontWeight: 800, color: C.white, lineHeight: 1 }}>
-        {value}
-      </div>
+      <div style={{ fontSize: 32, fontWeight: 800, color: C.white, lineHeight: 1 }}>{value}</div>
       <div
         style={{
           fontSize: 11,

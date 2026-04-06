@@ -570,4 +570,3 @@ function BiasDetails({ biasType, weights }: { biasType: string; weights: CausalW
     </div>
   );
 }
-
