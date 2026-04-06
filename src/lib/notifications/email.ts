@@ -8,13 +8,18 @@
  * Falls back to logging when credentials are missing.
  */
 
-import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('EmailNotifications');
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const EMAIL_FROM = process.env.EMAIL_FROM || 'Decision Intel <notifications@decision-intel.com>';
+const EMAIL_FROM = process.env.EMAIL_FROM || 'Decision Intel <team@decision-intel.com>';
+
+/** Lazy-load Prisma to avoid module-level failures when DB is unavailable. */
+async function getPrisma() {
+  const { prisma } = await import('@/lib/prisma');
+  return prisma;
+}
 
 /** Whether email delivery is configured (RESEND_API_KEY is set). */
 export function isEmailConfigured(): boolean {
@@ -103,7 +108,9 @@ async function logNotification(
   error?: string
 ) {
   try {
-    await prisma.notificationLog.create({
+    await (
+      await getPrisma()
+    ).notificationLog.create({
       data: {
         userId,
         channel,
@@ -130,7 +137,7 @@ export async function notifyAnalysisComplete(
   analysisId: string
 ) {
   // Check user settings
-  const settings = await prisma.userSettings
+  const settings = await (await getPrisma()).userSettings
     .findUnique({ where: { userId } })
     .catch((err: unknown) => {
       log.warn('Failed to fetch user settings:', err instanceof Error ? err.message : String(err));
@@ -190,7 +197,7 @@ export async function sendWeeklyDigest(
     nudgesReceived: number;
   }
 ) {
-  const settings = await prisma.userSettings
+  const settings = await (await getPrisma()).userSettings
     .findUnique({ where: { userId } })
     .catch((err: unknown) => {
       log.warn('Failed to fetch user settings:', err instanceof Error ? err.message : String(err));
@@ -285,7 +292,9 @@ export async function notifyTeamInvite(
   const result = await sendEmail({ to: inviteeEmail, subject, html });
   // Log under a system user since invitee may not have an account yet
   try {
-    await prisma.notificationLog.create({
+    await (
+      await getPrisma()
+    ).notificationLog.create({
       data: {
         userId: 'system',
         channel: 'email',
@@ -314,7 +323,7 @@ export async function deliverEmailNudge(
   nudgeType: string,
   severity: string
 ) {
-  const settings = await prisma.userSettings
+  const settings = await (await getPrisma()).userSettings
     .findUnique({ where: { userId } })
     .catch((err: unknown) => {
       log.warn('Failed to fetch user settings:', err instanceof Error ? err.message : String(err));
@@ -384,7 +393,7 @@ export async function notifyOutcomeReminder(
   userId: string,
   items: Array<{ analysisId: string; filename: string }>
 ): Promise<void> {
-  const settings = await prisma.userSettings
+  const settings = await (await getPrisma()).userSettings
     .findUnique({ where: { userId } })
     .catch((err: unknown) => {
       log.warn('Failed to fetch user settings:', err instanceof Error ? err.message : String(err));
@@ -465,7 +474,9 @@ export async function notifyUsageLimit(
     nextPlanCheckoutUrl: string;
   }
 ): Promise<void> {
-  const settings = await prisma.userSettings.findUnique({ where: { userId } }).catch(() => null);
+  const settings = await (await getPrisma()).userSettings
+    .findUnique({ where: { userId } })
+    .catch(() => null);
   if (settings && !settings.emailNotifications) return;
 
   const email = await getUserEmail(userId);

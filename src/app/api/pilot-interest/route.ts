@@ -10,7 +10,6 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { sendNewsletterWelcome } from '@/lib/notifications/email';
 import { z } from 'zod';
@@ -74,6 +73,7 @@ export async function POST(req: NextRequest) {
     const referer = req.headers.get('referer');
 
     try {
+      const { prisma } = await import('@/lib/prisma');
       await prisma.analyticsEvent.create({
         data: {
           name: 'pilot_interest_submitted',
