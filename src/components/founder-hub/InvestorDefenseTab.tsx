@@ -11,8 +11,6 @@ import {
   XCircle,
   AlertTriangle,
   Lock,
-  Network,
-  Brain,
   BarChart3,
   MessageSquare,
 } from 'lucide-react';

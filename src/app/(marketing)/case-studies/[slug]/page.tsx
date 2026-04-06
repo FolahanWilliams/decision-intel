@@ -129,7 +129,7 @@ export default async function CaseStudyDetailPage({
   const { slug } = await params;
   const caseStudy = getCaseBySlug(slug);
   if (!caseStudy) {
-    notFound();
+    return notFound();
   }
 
   const outcome = outcomeColor(caseStudy.outcome);
