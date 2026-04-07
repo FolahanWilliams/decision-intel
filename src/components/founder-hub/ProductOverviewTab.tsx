@@ -169,17 +169,17 @@ export function ProductOverviewTab() {
           }}
         >
           <li>
-            <strong>Email Forwarding Integration</strong> — Unique email address per user
-            (analyze+{'{token}'}@in.decision-intel.com). Forward documents or paste text,
-            auto-analyzed with results emailed back.
+            <strong>Email Forwarding Integration</strong> — Unique email address per user (analyze+
+            {'{token}'}@in.decision-intel.com). Forward documents or paste text, auto-analyzed with
+            results emailed back.
           </li>
           <li>
             <strong>Google Drive Connector</strong> — OAuth 2.0 integration. Watch folders for new
             documents, auto-analyze every 10 minutes. Folder picker UI in Settings.
           </li>
           <li>
-            <strong>Slack Deep Thread Analysis</strong> — <code>/di analyze</code> in threads fetches
-            all messages, runs full analysis, posts rich results back. Zero-friction.
+            <strong>Slack Deep Thread Analysis</strong> — <code>/di analyze</code> in threads
+            fetches all messages, runs full analysis, posts rich results back. Zero-friction.
           </li>
           <li>
             <strong>Forgotten Questions Node</strong> — 12th pipeline node surfaces

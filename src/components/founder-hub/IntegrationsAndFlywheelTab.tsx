@@ -1,6 +1,15 @@
 'use client';
 
-import { MessageSquare, Mail, HardDrive, Zap, BarChart3, Network, TrendingUp, Users } from 'lucide-react';
+import {
+  MessageSquare,
+  Mail,
+  HardDrive,
+  Zap,
+  BarChart3,
+  Network,
+  TrendingUp,
+  Users,
+} from 'lucide-react';
 import { card, sectionTitle, badge } from '@/components/founder-hub/shared-styles';
 
 export function IntegrationsAndFlywheelTab() {
