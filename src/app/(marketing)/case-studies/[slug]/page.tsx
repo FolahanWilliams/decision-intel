@@ -145,9 +145,70 @@ export default async function CaseStudyDetailPage({
     c => c.industry === caseStudy.industry && c.id !== caseStudy.id
   ).slice(0, 3);
 
+  const caseStudyJsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: `${caseStudy.company} (${caseStudy.year}): ${caseStudy.title}`,
+      description: caseStudy.summary,
+      author: { '@type': 'Organization', name: 'Decision Intel' },
+      publisher: {
+        '@type': 'Organization',
+        name: 'Decision Intel',
+        logo: { '@type': 'ImageObject', url: `${siteUrl}/logo.png` },
+      },
+      datePublished: `${caseStudy.year}-01-01`,
+      image: `${siteUrl}/api/og-case-study/${slug}`,
+      mainEntityOfPage: `${siteUrl}/case-studies/${slug}`,
+      about: caseStudy.biasesPresent.map(b => ({
+        '@type': 'Thing',
+        name: formatBiasName(b),
+      })),
+      keywords: [
+        caseStudy.company,
+        formatIndustry(caseStudy.industry),
+        ...caseStudy.biasesPresent.map(formatBiasName),
+        ...(caseStudy.toxicCombinations || []),
+        'cognitive bias',
+        'decision analysis',
+      ].join(', '),
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Decision Intel',
+          item: siteUrl,
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: 'Case Studies',
+          item: `${siteUrl}/case-studies`,
+        },
+        {
+          '@type': 'ListItem',
+          position: 3,
+          name: `${caseStudy.company} (${caseStudy.year})`,
+          item: `${siteUrl}/case-studies/${slug}`,
+        },
+      ],
+    },
+  ];
+
   return (
     <div style={{ background: '#F8FAFC', color: C.slate900, minHeight: '100vh' }}>
       <CaseStudyNav />
+      {caseStudyJsonLd.map((schema, i) => (
+        <script
+          key={i}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+      ))}
 
       <article
         style={{
