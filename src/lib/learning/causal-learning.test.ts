@@ -173,7 +173,13 @@ describe('Causal Learning Service', () => {
           },
         },
         include: {
-          analysis: true,
+          analysis: {
+            include: {
+              document: {
+                select: { documentType: true, deal: { select: { sector: true } } },
+              },
+            },
+          },
         },
       });
     });
