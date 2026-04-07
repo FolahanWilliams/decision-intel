@@ -226,7 +226,7 @@ const EDGES: GraphEdge[] = [
 // ─── Force Simulation ───────────────────────────────────────────────────────
 
 const SVG_W = 700;
-const SVG_H = 560;
+const SVG_H = 680;
 const CENTER_X = SVG_W / 2;
 const CENTER_Y = SVG_H / 2;
 
@@ -238,14 +238,14 @@ function initializeNodes(): GraphNode[] {
 
   decisions.forEach((n, i) => {
     const angle = (2 * Math.PI * i) / decisions.length - Math.PI / 2;
-    const r = 80;
+    const r = 100;
     result.push({
       ...n,
       x: CENTER_X + r * Math.cos(angle),
       y: CENTER_Y + r * Math.sin(angle),
       vx: 0,
       vy: 0,
-      radius: 28,
+      radius: 38,
       fx: CENTER_X + r * Math.cos(angle),
       fy: CENTER_Y + r * Math.sin(angle),
     });
@@ -253,27 +253,27 @@ function initializeNodes(): GraphNode[] {
 
   biases.forEach((n, i) => {
     const angle = (2 * Math.PI * i) / biases.length - Math.PI / 4;
-    const r = 210;
+    const r = 240;
     result.push({
       ...n,
       x: CENTER_X + r * Math.cos(angle),
       y: CENTER_Y + r * Math.sin(angle),
       vx: 0,
       vy: 0,
-      radius: n.severity === 'critical' ? 22 : n.severity === 'high' ? 18 : 15,
+      radius: n.severity === 'critical' ? 30 : n.severity === 'high' ? 25 : 20,
     });
   });
 
   outcomes.forEach((n, i) => {
     const angle = Math.PI * 0.25 + Math.PI * 0.5 * i;
-    const r = 250;
+    const r = 280;
     result.push({
       ...n,
       x: CENTER_X + r * Math.cos(angle),
       y: CENTER_Y + r * Math.sin(angle),
       vx: 0,
       vy: 0,
-      radius: 20,
+      radius: 28,
     });
   });
 
@@ -282,7 +282,7 @@ function initializeNodes(): GraphNode[] {
 
 function simulateStep(nodes: GraphNode[]): GraphNode[] {
   const damping = 0.92;
-  const repulsion = 1200;
+  const repulsion = 1800;
   const centerPull = 0.003;
 
   return nodes.map((node, i) => {
@@ -324,7 +324,7 @@ function simulateStep(nodes: GraphNode[]): GraphNode[] {
       const dx = otherNode.x - node.x;
       const dy = otherNode.y - node.y;
       const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-      const idealDist = edge.type === 'toxic' ? 130 : 150;
+      const idealDist = edge.type === 'toxic' ? 160 : 180;
       const strength = 0.005;
       forceX += (dx / dist) * (dist - idealDist) * strength;
       forceY += (dy / dist) * (dist - idealDist) * strength;
@@ -367,9 +367,9 @@ function DetailPanel({ node, onClose }: { node: GraphNode; onClose: () => void }
         background: '#FFFFFF',
         borderTop: '1px solid #E2E8F0',
         borderRadius: '0 0 16px 16px',
-        padding: '14px 16px',
+        padding: '16px 18px',
         zIndex: 10,
-        maxHeight: '55%',
+        maxHeight: '60%',
         overflowY: 'auto',
       }}
     >
@@ -391,7 +391,7 @@ function DetailPanel({ node, onClose }: { node: GraphNode; onClose: () => void }
               flexShrink: 0,
             }}
           />
-          <div style={{ fontSize: 13, fontWeight: 700, color: COLORS.text, lineHeight: 1.3 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: COLORS.text, lineHeight: 1.3 }}>
             {node.detail.title}
           </div>
           {node.detail.severity && (
@@ -429,7 +429,7 @@ function DetailPanel({ node, onClose }: { node: GraphNode; onClose: () => void }
 
       <div
         style={{
-          fontSize: 11.5,
+          fontSize: 12.5,
           color: '#475569',
           lineHeight: 1.55,
           marginBottom: 10,
@@ -442,7 +442,7 @@ function DetailPanel({ node, onClose }: { node: GraphNode; onClose: () => void }
 
       <div
         style={{
-          fontSize: 11,
+          fontSize: 12,
           color: '#0F172A',
           lineHeight: 1.5,
           background: '#F8FAFC',
@@ -526,7 +526,7 @@ function NodeCircle({
           y={node.y + 1}
           textAnchor="middle"
           dominantBaseline="central"
-          fontSize={10}
+          fontSize={14}
           fontWeight={700}
           fill="#FFFFFF"
           style={{ pointerEvents: 'none', userSelect: 'none' }}
@@ -539,7 +539,7 @@ function NodeCircle({
           y={node.y + 1}
           textAnchor="middle"
           dominantBaseline="central"
-          fontSize={node.radius > 14 ? 9 : 7}
+          fontSize={node.radius > 20 ? 13 : 11}
           fontWeight={700}
           fill="#FFFFFF"
           style={{ pointerEvents: 'none', userSelect: 'none' }}
@@ -549,9 +549,9 @@ function NodeCircle({
       )}
       <text
         x={node.x}
-        y={node.y + node.radius + 13}
+        y={node.y + node.radius + 16}
         textAnchor="middle"
-        fontSize={9}
+        fontSize={12}
         fontWeight={isHovered || isSelected ? 700 : 500}
         fill={isHovered || isSelected ? COLORS.text : COLORS.textMuted}
         style={{ pointerEvents: 'none', userSelect: 'none', transition: 'fill 0.2s' }}
@@ -615,11 +615,11 @@ function EdgeLine({
       {isToxic && isHighlighted && edge.label && (
         <g>
           <rect
-            x={mx - edge.label.length * 3.2 - 6}
-            y={my - 9}
-            width={edge.label.length * 6.4 + 12}
-            height={18}
-            rx={4}
+            x={mx - edge.label.length * 4 - 8}
+            y={my - 12}
+            width={edge.label.length * 8 + 16}
+            height={24}
+            rx={5}
             fill={COLORS.tooltipBg}
             opacity={0.9}
           />
@@ -627,7 +627,7 @@ function EdgeLine({
             x={mx}
             y={my + 3}
             textAnchor="middle"
-            fontSize={9}
+            fontSize={12}
             fontWeight={600}
             fill={COLORS.tooltipText}
             style={{ pointerEvents: 'none' }}
@@ -736,10 +736,10 @@ export function HeroDecisionGraph() {
         }}
       >
         {/* Header */}
-        <div style={{ marginBottom: 8, paddingLeft: 8 }}>
+        <div style={{ marginBottom: 10, paddingLeft: 8 }}>
           <div
             style={{
-              fontSize: 11,
+              fontSize: 'clamp(11px, 2.5vw, 13px)',
               fontWeight: 700,
               textTransform: 'uppercase',
               letterSpacing: '0.5px',
@@ -749,7 +749,7 @@ export function HeroDecisionGraph() {
           >
             Decision Knowledge Graph
           </div>
-          <div style={{ fontSize: 13, color: '#64748B', lineHeight: 1.4 }}>
+          <div style={{ fontSize: 'clamp(13px, 3vw, 15px)', color: '#64748B', lineHeight: 1.4 }}>
             WeWork S-1 IPO Filing (August 2019) &mdash;{' '}
             <span style={{ fontWeight: 600, color: '#DC2626' }}>$39B valuation destroyed</span>
           </div>
@@ -802,12 +802,12 @@ export function HeroDecisionGraph() {
             minHeight: 36,
           }}
         >
-          <div style={{ fontSize: 11, color: COLORS.textMuted }}>
+          <div style={{ fontSize: 'clamp(10px, 2.5vw, 12px)', color: COLORS.textMuted }}>
             {selectedNode
               ? 'Click another node or click again to close'
               : 'Click any node to explore'}
           </div>
-          <div style={{ display: 'flex', gap: 12, fontSize: 10, color: '#94A3B8' }}>
+          <div style={{ display: 'flex', gap: 12, fontSize: 'clamp(10px, 2.5vw, 12px)', color: '#94A3B8' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               <span
                 style={{
