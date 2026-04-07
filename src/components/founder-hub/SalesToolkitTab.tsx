@@ -143,7 +143,7 @@ export function LangGraphPipelineNarrative() {
   return (
     <div style={{ ...card, borderLeft: '3px solid #3b82f6' }}>
       <div style={{ ...sectionTitle, cursor: 'pointer' }} onClick={() => setExpanded(!expanded)}>
-        <Network size={18} style={{ color: '#3b82f6' }} /> The 11-Node LangGraph Pipeline (Not a
+        <Network size={18} style={{ color: '#3b82f6' }} /> The 12-Node LangGraph Pipeline (Not a
         ChatGPT Wrapper)
         <span style={{ marginLeft: 'auto', color: 'var(--text-muted)' }}>
           {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
@@ -157,7 +157,7 @@ export function LangGraphPipelineNarrative() {
             Most &quot;AI bias detection&quot; tools are a single LLM call wrapped in branding. This
             is a{' '}
             <strong style={{ color: 'var(--text-primary)' }}>
-              LangGraph StateGraph with 11 specialized nodes
+              LangGraph StateGraph with 12 specialized nodes
             </strong>{' '}
             in a super-node fan-out/fan-in topology. Each node does one cognitive job; the graph
             orchestrates an adversarial debate between them.
@@ -252,7 +252,7 @@ export function PromptEngineeringMoatNarrative() {
           </p>
           <div style={{ marginBottom: 16 }}>
             <div style={{ fontWeight: 700, color: '#a78bfa', marginBottom: 4, fontSize: 13 }}>
-              1. It&apos;s not one prompt — it&apos;s ~46,000 lines across 11 specialized prompts.
+              1. It&apos;s not one prompt — it&apos;s ~46,000 lines across 12 specialized prompts.
             </div>
             <p style={{ marginLeft: 12, marginBottom: 0 }}>
               Each node has a tuned prompt for a specific cognitive task: the bias detective prompt
@@ -859,7 +859,7 @@ export function SalesToolkitTab() {
             {
               objection: '"Can I try it before committing?"',
               response:
-                "Absolutely — visit /demo right now. Pick from 3 sample documents and watch the full 11-agent pipeline run in real time with streaming progress. No login, no commitment. Or send us 3 of your own strategic documents and we'll run a free pilot with full DQI scoring and bias reports.",
+                "Absolutely — visit /demo right now. Pick from 3 sample documents and watch the full 12-node pipeline run in real time with streaming progress. No login, no commitment. Or send us 3 of your own strategic documents and we'll run a free pilot with full DQI scoring and bias reports.",
               tone: 'Zero friction',
             },
           ].map((item, i) => (
@@ -908,7 +908,7 @@ export function SalesToolkitTab() {
             step: 2,
             title: 'Upload & Analyze (60 sec)',
             action:
-              'Drag the document onto the upload zone. Click "Analyze." While the SSE stream runs, narrate what the 11 agents are doing: "Right now, our noise judge is scoring this document for variance, while our bias detective is scanning for 20 cognitive biases..."',
+              'Drag the document onto the upload zone. Click "Analyze." While the SSE stream runs, narrate what the 12 pipeline nodes are doing: "Right now, our noise judge is scoring this document for variance, while our bias detective is scanning for 20 cognitive biases..."',
             tip: 'The streaming progress bar is your friend — it creates anticipation.',
           },
           {
@@ -1029,12 +1029,12 @@ export function SalesToolkitTab() {
             {
               audience: 'Board / Executive Sponsor (60 sec)',
               pitch:
-                "Decision Intel is the cognitive bias auditing engine for high-stakes executive teams. We sit between analysis and commitment — the one place in the decision workflow where nobody provides quality tools. 11-agent AI pipeline, proprietary Decision Quality Index, and an outcome tracking flywheel. Decision intelligence market is $12.2B going to $46.4B by 2030 — we're creating a new category.",
+                "Decision Intel is the cognitive bias auditing engine for high-stakes executive teams. We sit between analysis and commitment — the one place in the decision workflow where nobody provides quality tools. 12-node AI pipeline, proprietary Decision Quality Index, and an outcome tracking flywheel. Decision intelligence market is $12.2B going to $46.4B by 2030 — we're creating a new category.",
             },
             {
               audience: 'Technical Audience (30 sec)',
               pitch:
-                'LangGraph-based 11-agent pipeline with deterministic compound scoring on top of LLM output. 20x20 bias interaction matrix, Bayesian prior integration, Granger-causal temporal inference for our decision knowledge graph. Not a wrapper — we built the scoring math.',
+                'LangGraph-based 12-node pipeline with deterministic compound scoring on top of LLM output. 20x20 bias interaction matrix, Bayesian prior integration, Granger-causal temporal inference for our decision knowledge graph. Not a wrapper — we built the scoring math.',
             },
           ].map((item, i) => (
             <div

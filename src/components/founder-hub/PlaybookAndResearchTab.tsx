@@ -618,7 +618,7 @@ function PlaybookAndResearch() {
                     summary:
                       'VCs use rapid filtering first ("why NOT invest?" to eliminate red flags), then switch to deep 120-hour due diligence for serious prospects.',
                     product:
-                      'BUILD THIS: Quick Scan mode — a fast, lightweight bias check (30 seconds) that flags top 2-3 red flags before committing to the full 11-agent pipeline (4 minutes). Mirrors how VCs actually work. Reduces adoption friction dramatically.',
+                      'BUILD THIS: Quick Scan mode — a fast, lightweight bias check (30 seconds) that flags top 2-3 red flags before committing to the full 12-node pipeline (4 minutes). Mirrors how VCs actually work. Reduces adoption friction dramatically.',
                     startup:
                       'Apply to your sales process too. Qualify leads fast — "Do you have a decision committee? Do you review strategic documents before major decisions?" If no to either, move on. Don\'t spend 2 hours demoing to someone who doesn\'t have the workflow.',
                     actions: [
@@ -1036,7 +1036,7 @@ function PlaybookAndResearch() {
                 product={
                   'Your contrarian truth: "Executive teams think their decisions are rational, but they\'re riddled with measurable cognitive noise and bias that nobody audits." Your monopoly niche: enterprise decision quality. Your concentric expansion: Enterprise M&A/Strategy → PE/VC → FinServ → Horizontal.'
                 }
-                startup="The best 11-agent pipeline means nothing if you can't get it in front of decision-makers. Distribution strategy matters as much as the product. Conferences, Slack communities, thought leadership content, and referral loops from pilot customers are your channels."
+                startup="The best 12-node pipeline means nothing if you can't get it in front of decision-makers. Distribution strategy matters as much as the product. Conferences, Slack communities, thought leadership content, and referral loops from pilot customers are your channels."
                 actions={[
                   'Write down your contrarian truth and use it in every pitch',
                   'Map your concentric expansion circles (already in Market Strategy tab)',

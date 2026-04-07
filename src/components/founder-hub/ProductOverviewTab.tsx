@@ -37,7 +37,7 @@ export function ProductOverviewTab() {
       >
         {[
           { value: '20', label: 'Standard Biases', sub: '+ 11 investment-specific' },
-          { value: '16', label: 'AI Agent Pipeline', sub: 'Parallel execution' },
+          { value: '12', label: 'Pipeline Nodes', sub: '7-way parallel fan-out' },
           { value: '146', label: 'Case Studies', sub: 'failures + successes' },
           { value: '3', label: 'Outcome Channels', sub: 'Autonomous detection' },
           { value: '2', label: 'AI Providers', sub: 'Gemini + Claude fallback' },
@@ -168,6 +168,43 @@ export function ProductOverviewTab() {
             paddingLeft: 16,
           }}
         >
+          <li>
+            <strong>Email Forwarding Integration</strong> — Unique email address per user
+            (analyze+{'{token}'}@in.decision-intel.com). Forward documents or paste text,
+            auto-analyzed with results emailed back.
+          </li>
+          <li>
+            <strong>Google Drive Connector</strong> — OAuth 2.0 integration. Watch folders for new
+            documents, auto-analyze every 10 minutes. Folder picker UI in Settings.
+          </li>
+          <li>
+            <strong>Slack Deep Thread Analysis</strong> — <code>/di analyze</code> in threads fetches
+            all messages, runs full analysis, posts rich results back. Zero-friction.
+          </li>
+          <li>
+            <strong>Forgotten Questions Node</strong> — 12th pipeline node surfaces
+            unknown-unknowns: questions the document should address but doesn&apos;t.
+          </li>
+          <li>
+            <strong>Per-Deal Audit Pricing</strong> — One-time Stripe payments scaled to deal ticket
+            size ($499–$4,999). Unlimited analyses for deal-linked documents.
+          </li>
+          <li>
+            <strong>Toxic Mitigation Playbooks</strong> — Auto-generated research-backed debiasing
+            steps for all 10 named patterns with owner, timing, and citations.
+          </li>
+          <li>
+            <strong>Dollar Impact Estimation</strong> — Connects toxic combos to deal ticketSize for
+            financial risk estimates (ticketSize × historicalFailRate).
+          </li>
+          <li>
+            <strong>Decision Alpha</strong> — Public CEO bias analysis (Buffett, Musk, Huang,
+            Zuckerberg) with DQI leaderboard.
+          </li>
+          <li>
+            <strong>Investor Defense Tab</strong> — Competitive positioning vs. Cloverpop, moat
+            layers, objection handling with technical proof points.
+          </li>
           <li>
             <strong>Slack → Copilot Auto-Trigger</strong> — Auto-creates CopilotSession seeded with
             decision context after every Slack audit. &quot;Continue in Copilot&quot; button in

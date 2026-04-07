@@ -113,7 +113,7 @@ export function IntegrationsAndFlywheelTab() {
             },
             {
               title: 'Full Pipeline',
-              desc: 'Creates a Document record and runs the same 11-node analysis pipeline as uploaded docs',
+              desc: 'Creates a Document record and runs the same 12-node analysis pipeline as uploaded docs',
             },
             {
               title: 'In-Thread Results',
@@ -250,7 +250,7 @@ export function IntegrationsAndFlywheelTab() {
             to <code>/api/extension/quick-score</code>
           </li>
           <li>
-            <strong>Full Analysis Sidepanel:</strong> Complete 11-agent pipeline from the browser.
+            <strong>Full Analysis Sidepanel:</strong> Complete 12-node pipeline from the browser.
             Calls <code>/api/extension/analyze</code>
           </li>
           <li>

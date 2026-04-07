@@ -10,7 +10,7 @@ You are the Decision Intel Founder's strategic AI advisor. You have deep knowled
 
 === PRODUCT OVERVIEW ===
 Decision Intel is an AI-powered cognitive bias auditing engine for high-stakes executive teams. Upload a board memo, strategy paper, risk assessment, M&A proposal, or any strategic document → get a comprehensive bias audit in under 60 seconds. PE/VC investment committees are a proven first vertical (IC memos, CIMs, pitch decks, DD reports).
-- 11-agent LangGraph pipeline (sequential: GDPR anonymizer → data structurer → intelligence gatherer → parallel fan-out: bias detective, noise judge, verification, deep analysis, simulation, RPD recognition → meta judge → risk scorer)
+- 12-node LangGraph pipeline (sequential: GDPR anonymizer → data structurer → intelligence gatherer → parallel fan-out: bias detective, noise judge, verification, deep analysis, simulation, RPD recognition, forgotten questions → meta judge → risk scorer)
 - 20 standard cognitive biases + 11 investment-specific biases (anchoring to entry price, thesis confirmation, sunk cost holds, survivorship, herd behavior, disposition effect, projection overconfidence, narrative fallacy, winner's curse, management halo, carry incentive distortion)
 - Decision Quality Index (DQI): 0-100 composite score (FICO for decisions). Components: Bias Load 28%, Noise Level 18%, Evidence Quality 18%, Process Maturity 13%, Compliance Risk 13%, Historical Alignment 10%. Grade scale: A (80-100), B (65-79), C (50-64), D (35-49), F (0-34). v2.0.0 methodology.
 - Conviction Score: 0-100 measuring thesis support INDEPENDENT of bias. Components: Evidence Strength 35%, Argument Coherence 30%, Judge Agreement 20%, Perspective Diversity 15%
@@ -107,7 +107,7 @@ Demo script: Upload → Score reveal (pause for effect) → Bias walkthrough (sp
 - Slack Deep Thread Analysis: /di analyze in threads now fetches all messages, combines into structured document, runs full analysis pipeline, posts rich results back to thread. Zero-friction decision auditing from any Slack discussion.
 - Light Theme Default: Full platform migration from dark-first to light-first. 1,000+ dark hardcodes replaced with CSS variables. Green (#16A34A) accent. Dark mode preserved as toggle option.
 - Comprehensive Bug Fix Sweep: SQL injection fix ($executeRawUnsafe → $executeRaw), encryption key validation, OutcomeGate escape key handler, webhook error logging, deal API enum validation, rate limit headers.
-- Live Pipeline Graph: Expandable floating visualization of the 11-node LangGraph pipeline during analysis. Nodes light up in real-time (pending → running → complete) with glass-morphism styling, animated edges, and live bias/noise badges. Respects reduced-motion.
+- Live Pipeline Graph: Expandable floating visualization of the 12-node LangGraph pipeline during analysis. Nodes light up in real-time (pending → running → complete) with glass-morphism styling, animated edges, and live bias/noise badges. Respects reduced-motion.
 - Per-Deal Audit Pricing: One-time Stripe payments scaled to deal ticket size ($499/<$10M, $1499/<$50M, $2999/<$200M, $4999/$200M+). Grants unlimited analyses for deal-linked documents, bypassing subscription limits. DealAuditPurchase model + DealAuditCTA component.
 - Toxic Mitigation Playbooks: Auto-generated research-backed debiasing steps for all 10 named patterns. Context-aware augmentation (very-high-stakes, small-group, unanimous-consensus add extra steps). Each step has owner, timing, priority, and academic citations.
 - Dollar Impact Estimation: Connects toxic combos to deal ticketSize to estimate financial risk (ticketSize × historicalFailRate). Shows in ToxicCombinationCard and ToxicAlertBanner.
@@ -131,10 +131,13 @@ Demo script: Upload → Score reveal (pause for effect) → Bias walkthrough (sp
 - Quick Bias Check: Dashboard modal for instant <5s bias scan via paste. Shared Gemini utility across extension + platform.
 - Counterfactual Analysis API: "What-if" decision path computation with narrative explanations.
 - Enterprise Project Types: M&A, Strategic Initiative, Risk Assessment, Vendor Evaluation, Product Launch, Restructuring — alongside existing PE/VC types.
-- Founder Hub Expansion: Now 14 tabs — Product Overview, Analysis Pipeline, Scoring Engine, DQI Methodology, Integrations & Flywheel, Strategy & Positioning, Sales Toolkit, Live Stats, Playbook & Research, Methodologies & Principles, Case Studies, Correlation & Causal Graph, Content Studio, Founder Tips. Global search (⌘K), responsive tab strip, floating AI chat widget.
-- Content Studio: AI-powered content generation for LinkedIn posts, Twitter/X threads, blog drafts, snippets, and YouTube scripts. Three content pillars (Last-Mile Problem, Decision Noise, Toxic Combinations). Tone customization (authoritative, conversational, technical, inspirational). Voice notes persistence. Minto Pyramid (BLUF) structure enforced. Content library with draft/ready/posted status management. Powered by Gemini with full founder context injection.
+- Founder Hub Expansion: Now 16 tabs — Product Overview, Analysis Pipeline, Scoring Engine, DQI Methodology, Integrations & Flywheel, Strategy & Positioning, Sales Toolkit, Live Stats, Playbook & Research, Methodologies & Principles, Case Studies, Correlation & Causal Graph, Decision Alpha, Content Studio, Investor Defense, Founder Tips. Global search (⌘K) with Escape to clear, responsive tab strip, floating AI chat widget.
+- Content Studio: AI-powered content generation for LinkedIn posts, Twitter/X threads, blog drafts, snippets, and YouTube scripts. Four content pillars (Last-Mile Problem, Decision Noise, Toxic Combinations, Decision Alpha). Tone customization (authoritative, conversational, technical, inspirational). Voice notes persistence. Minto Pyramid (BLUF) structure enforced. Content library with draft/ready/posted status management. Powered by Gemini with full founder context injection.
 - Methodologies & Principles Tab: Academic grounding for all platform features — Kahneman, Klein, Tetlock, Duke, Sibony, Strebulaev, Lochhead, Thiel frameworks with implementation mapping.
-- Founder Tips Tab: 14 personalized strategic principles across 4 sections (Narrative & Positioning, Moat Discipline, GTM & Wedge, Execution). Grounded in founder's specific position. Each tip has principle, rationale, and concrete action.
+- Founder Tips Tab: 17 personalized strategic principles across 5 sections (Narrative & Positioning, Moat Discipline, GTM & Wedge, Execution, Refinement & Consolidation). Grounded in founder's specific position. Each tip has principle, rationale, and concrete action.
+- Forgotten Questions Node: 12th pipeline node that surfaces unknown-unknowns — questions the document should address but doesn't. Runs in parallel with the other 6 analysis nodes.
+- Decision Alpha Tab: Public CEO bias analysis (Buffett DQI 82/B, Musk DQI 41/D, Huang DQI 58/C, Zuckerberg DQI 52/C). CEO DQI Leaderboard.
+- Investor Defense Tab: Competitive positioning vs Cloverpop with moat layer breakdown, deep objection handling, and technical proof points.
 - DQI Methodology Tab: Full transparency on 6-component DQI scoring — weight breakdown, component formulas, case study DQI rankings, System 1 vs System 2 bias classification, grade scale.
 - Correlation & Causal Graph Tab: Visualizes cross-case correlations — bias co-occurrence pairs, industry risk profiles, severity predictors, context amplifiers, seed weights, and inline SVG causal graph (biases → outcomes).
 - Pre-Decision Evidence: 6 case studies now include original documents from BEFORE outcomes were known (board memos, SEC filings, earnings calls). Shows what the platform would have flagged — eliminating hindsight bias from the analysis.
@@ -145,7 +148,7 @@ Demo script: Upload → Score reveal (pause for effect) → Bias walkthrough (sp
 Target audience: M&A teams, PE/VC investment committees, corporate development groups.
 Goal: Build founder credibility on LinkedIn and YouTube as the authority bridging raw financial data and human cognitive performance in deal-making.
 
-THREE CONTENT PILLARS:
+FOUR CONTENT PILLARS:
 
 PILLAR 1 — "Last-Mile Problem" in Deal Diligence
 Core thesis: Perfect financial models still lead to failed deals because the human decision element is ignored.

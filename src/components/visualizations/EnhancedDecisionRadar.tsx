@@ -369,7 +369,7 @@ export function EnhancedDecisionRadar({
             <select
               value={selectedHistorical ?? ''}
               onChange={e =>
-                setSelectedHistorical(e.target.value ? parseInt(e.target.value) : null)
+                setSelectedHistorical(e.target.value ? parseInt(e.target.value, 10) : null)
               }
               className="px-2 py-1 rounded-lg bg-white/10 text-xs border border-white/20"
             >
@@ -580,7 +580,7 @@ export function EnhancedDecisionRadar({
                         min="0"
                         max="100"
                         value={whatIfData[key as keyof DecisionRadarData]}
-                        onChange={e => handleWhatIfChange(key, parseInt(e.target.value))}
+                        onChange={e => handleWhatIfChange(key, parseInt(e.target.value, 10))}
                         className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer"
                         style={{
                           background: `linear-gradient(to right, ${config.color} ${value}%, rgba(255,255,255,0.2) ${value}%)`,

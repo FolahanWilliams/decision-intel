@@ -765,7 +765,7 @@ export default function LandingPage() {
               icon: Zap,
               value: '<60s',
               label: 'To find what your team missed',
-              sub: '11-agent pipeline, 20+ biases',
+              sub: '12-node pipeline, 20+ biases',
               href: null as string | null,
             },
           ].map(({ icon: Icon, value, label, sub, href }) => {
@@ -879,7 +879,7 @@ export default function LandingPage() {
               phase: 'PHASE_02',
               num: '02',
               title: 'Get the blind second opinion',
-              desc: 'An 11-agent pipeline stress-tests the document: 20+ biases detected, a three-judge statistical jury measures noise, and a simulated boardroom argues against your proposal before your real one does.',
+              desc: 'An 12-node pipeline stress-tests the document: 20+ biases detected, a three-judge statistical jury measures noise, and a simulated boardroom argues against your proposal before your real one does.',
               bullets: [
                 '20+ cognitive biases with confidence scores',
                 '3 independent noise judges (Kahneman)',
