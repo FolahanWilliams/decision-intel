@@ -496,7 +496,7 @@ pre {
 /* Layout — fluid container that adapts to screen size */
 .container {
   width: 100% !important;
-  max-width: clamp(640px, 90%, 1600px) !important;
+  max-width: min(90%, 1600px) !important;
   margin-left: auto !important;
   margin-right: auto !important;
   margin-inline: auto !important;
@@ -2203,6 +2203,17 @@ tr:hover td {
 
   .gap-xl {
     gap: var(--spacing-md) !important;
+  }
+
+  /* Platform dashboard — tighter padding on mobile */
+  .platform-content {
+    padding: 16px 14px 32px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .platform-content {
+    padding: 20px 16px 40px !important;
   }
 }
 

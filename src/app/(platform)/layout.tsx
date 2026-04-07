@@ -29,7 +29,7 @@ export default async function PlatformLayout({ children }: { children: React.Rea
             transition: 'color 0.3s, background 0.3s',
           }}
         >
-          <div style={{ maxWidth: 1320, margin: '0 auto', padding: '32px 32px 64px' }}>
+          <div className="platform-content" style={{ maxWidth: 1320, margin: '0 auto', padding: '32px 32px 64px' }}>
             <div
               style={{
                 display: 'flex',

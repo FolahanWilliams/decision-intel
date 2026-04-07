@@ -259,6 +259,7 @@ function LoginContent() {
 
       {/* Right panel — sign in */}
       <div
+        className="login-right-panel"
         style={{
           flex: 1,
           display: 'flex',
@@ -309,6 +310,7 @@ function LoginContent() {
 
           {/* Sign in card */}
           <div
+            className="login-card"
             style={{
               padding: '2rem',
               border: '1px solid rgba(255,255,255,0.12)',
@@ -416,6 +418,19 @@ function LoginContent() {
           </p>
         </div>
       </div>
+
+      {/* Mobile responsive overrides */}
+      <style>{`
+        @media (max-width: 640px) {
+          .login-right-panel {
+            padding: 1.25rem !important;
+          }
+          .login-card {
+            padding: 1.5rem !important;
+            border-radius: 16px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
