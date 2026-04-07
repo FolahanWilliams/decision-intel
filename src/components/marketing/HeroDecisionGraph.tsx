@@ -728,6 +728,8 @@ export function HeroDecisionGraph() {
           borderRadius: 16,
           padding: '20px 12px 0',
           position: 'relative',
+          maxHeight: 480,
+          overflow: 'hidden',
         }}
       >
         {/* Header */}

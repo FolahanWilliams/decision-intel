@@ -600,7 +600,7 @@ export default function LandingPage() {
           transition={{ duration: 0.5 }}
           style={{
             display: 'grid',
-            gridTemplateColumns: '5fr 7fr',
+            gridTemplateColumns: '1fr 1fr',
             gap: 48,
             alignItems: 'center',
           }}
