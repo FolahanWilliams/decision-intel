@@ -471,7 +471,9 @@ export default async function CaseStudyDetailPage({
             </p>
             <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
               <div style={{ minWidth: 0 }}>
-                <div style={{ fontSize: 'clamp(24px, 4vw, 28px)', fontWeight: 800, color: '#DC2626' }}>
+                <div
+                  style={{ fontSize: 'clamp(24px, 4vw, 28px)', fontWeight: 800, color: '#DC2626' }}
+                >
                   {(referenceClass.failureRate * 100).toFixed(0)}%
                 </div>
                 <div style={{ fontSize: 11, color: '#64748B', textTransform: 'uppercase' }}>
@@ -479,7 +481,9 @@ export default async function CaseStudyDetailPage({
                 </div>
               </div>
               <div style={{ minWidth: 0 }}>
-                <div style={{ fontSize: 'clamp(24px, 4vw, 28px)', fontWeight: 800, color: C.green }}>
+                <div
+                  style={{ fontSize: 'clamp(24px, 4vw, 28px)', fontWeight: 800, color: C.green }}
+                >
                   {(referenceClass.successRate * 100).toFixed(0)}%
                 </div>
                 <div style={{ fontSize: 11, color: '#64748B', textTransform: 'uppercase' }}>
