@@ -789,7 +789,9 @@ export default function LandingPage() {
                   <div style={{ fontSize: 28, fontWeight: 800, color: C.slate900, lineHeight: 1 }}>
                     {value}
                   </div>
-                  <div style={{ fontSize: 12, color: C.slate600, marginTop: 2, lineHeight: 1.4 }}>{label}</div>
+                  <div style={{ fontSize: 12, color: C.slate600, marginTop: 2, lineHeight: 1.4 }}>
+                    {label}
+                  </div>
                   <div style={{ fontSize: 10, color: C.slate400, marginTop: 1 }}>{sub}</div>
                 </div>
               </>

@@ -807,7 +807,14 @@ export function HeroDecisionGraph() {
               ? 'Click another node or click again to close'
               : 'Click any node to explore'}
           </div>
-          <div style={{ display: 'flex', gap: 12, fontSize: 'clamp(10px, 2.5vw, 12px)', color: '#94A3B8' }}>
+          <div
+            style={{
+              display: 'flex',
+              gap: 12,
+              fontSize: 'clamp(10px, 2.5vw, 12px)',
+              color: '#94A3B8',
+            }}
+          >
             <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               <span
                 style={{
