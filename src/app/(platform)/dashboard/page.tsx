@@ -797,7 +797,7 @@ export default function Dashboard() {
       {uploadedDocs.length > 0 && (
         <>
           <motion.div
-            className="grid grid-cols-2 md:grid-cols-4 gap-lg mb-xl"
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-md sm:gap-lg mb-xl"
             initial="hidden"
             animate="visible"
             variants={{

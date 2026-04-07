@@ -494,7 +494,10 @@ function NodeCircle({
       opacity={opacity}
       onMouseEnter={() => onHover(node.id)}
       onMouseLeave={() => onHover(null)}
-      onClick={() => onClick(node.id)}
+      onClick={e => {
+        e.stopPropagation();
+        onClick(node.id);
+      }}
     >
       {(isHovered || isSelected) && (
         <circle
@@ -749,11 +752,21 @@ export function HeroDecisionGraph() {
 
         <motion.svg
           viewBox={`0 0 ${SVG_W} ${SVG_H}`}
-          style={{ width: '100%', height: 'auto', display: 'block' }}
+          style={{
+            width: '100%',
+            height: 'auto',
+            display: 'block',
+            cursor: selectedNode ? 'pointer' : 'default',
+          }}
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : {}}
           transition={{ duration: 0.8, delay: 0.2 }}
+          onClick={() => {
+            if (selectedNode) setSelectedNode(null);
+          }}
         >
+          {/* Invisible background rect to capture clicks on empty space */}
+          <rect x="0" y="0" width={SVG_W} height={SVG_H} fill="transparent" />
           {EDGES.map((edge, i) => {
             const isHighlighted =
               !!activeNodeId && (edge.source === activeNodeId || edge.target === activeNodeId);
