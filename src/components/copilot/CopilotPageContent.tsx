@@ -425,36 +425,47 @@ export function CopilotPageContent() {
           />
         ) : (
           /* Empty State with starter questions */
-          <div className="flex-1 flex items-center justify-center p-8">
-            <div className="w-full max-w-2xl space-y-6">
-              <div className="text-center space-y-2">
+          <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-8 overflow-y-auto">
+            <div className="w-full max-w-lg space-y-5">
+              <div className="text-center space-y-3">
                 <div
-                  className="mx-auto w-14 h-14 rounded-full flex items-center justify-center"
-                  style={{ background: 'var(--bg-tertiary)' }}
+                  className="mx-auto w-12 h-12 rounded-xl flex items-center justify-center"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(139, 92, 246, 0.12))',
+                    border: '1px solid rgba(139, 92, 246, 0.2)',
+                  }}
                 >
-                  <Sparkles className="h-7 w-7 text-blue-400" />
+                  <Sparkles className="h-6 w-6 text-blue-400" />
                 </div>
-                <h2 className="text-lg font-medium" style={{ color: 'var(--text-primary)' }}>
+                <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
                   Your AI Advisory Team
                 </h2>
-                <p className="text-sm max-w-md mx-auto" style={{ color: 'var(--text-muted)' }}>
+                <p className="text-sm leading-relaxed mx-auto" style={{ color: 'var(--text-muted)', maxWidth: 380 }}>
                   Start a structured decision session, or ask a question about your documents. Pin a
                   document in the sidebar for focused Q&amp;A with source citations.
                 </p>
               </div>
 
-              <button
-                onClick={handleNewDecision}
-                className="mx-auto flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-500 transition-colors"
-              >
-                <Plus className="h-4 w-4" />
-                New Decision Session
-              </button>
+              <div className="flex justify-center">
+                <button
+                  onClick={handleNewDecision}
+                  className="flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-500 transition-colors"
+                >
+                  <Plus className="h-4 w-4" />
+                  New Decision Session
+                </button>
+              </div>
 
               {/* Starter questions */}
-              <div className="space-y-2">
+              <div
+                className="rounded-xl border p-4 space-y-3"
+                style={{
+                  background: 'var(--bg-card)',
+                  borderColor: 'var(--border-color)',
+                }}
+              >
                 <p
-                  className="text-[10px] uppercase tracking-wider text-center"
+                  className="text-[10px] uppercase tracking-wider font-semibold text-center"
                   style={{ color: 'var(--text-muted)' }}
                 >
                   Or try asking
@@ -474,7 +485,7 @@ export function CopilotPageContent() {
                       }}
                       className="rounded-lg border p-3 text-left text-xs transition-colors ask-card"
                       style={{
-                        background: 'var(--bg-card)',
+                        background: 'var(--bg-secondary)',
                         borderColor: 'var(--border-color)',
                         color: 'var(--text-secondary)',
                       }}
@@ -489,7 +500,7 @@ export function CopilotPageContent() {
               {analyzedDocs.length > 0 && (
                 <div className="text-center">
                   <p
-                    className="text-[10px] uppercase tracking-wider mb-2"
+                    className="text-[10px] uppercase tracking-wider font-semibold mb-2"
                     style={{ color: 'var(--text-muted)' }}
                   >
                     Your documents

@@ -1457,9 +1457,11 @@ export default function Dashboard() {
           </ErrorBoundary>
 
           {/* Bulk Upload */}
-          <ErrorBoundary sectionName="Bulk Upload">
-            <BulkUploadPanel onComplete={() => mutateDocs?.()} />
-          </ErrorBoundary>
+          <div className="mt-lg mb-lg">
+            <ErrorBoundary sectionName="Bulk Upload">
+              <BulkUploadPanel onComplete={() => mutateDocs?.()} />
+            </ErrorBoundary>
+          </div>
 
           {/* Currently Analyzing Section */}
           <ErrorBoundary sectionName="Documents">
