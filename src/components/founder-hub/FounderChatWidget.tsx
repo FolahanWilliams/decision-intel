@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { Brain, MessageSquare } from 'lucide-react';
+import { Brain, MessageSquare, Paperclip, X, FileText } from 'lucide-react';
 
 interface ChatMsg {
   role: 'user' | 'assistant';
@@ -18,42 +18,65 @@ const STARTER_QUESTIONS = [
   'What Kahneman research supports the Decision Noise pillar?',
 ];
 
+const ACCEPTED_TYPES = '.pdf,.txt,.md,.docx,.csv,.xlsx,.pptx,.html';
+
 export function FounderChatWidget({ founderPass }: { founderPass: string }) {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [streaming, setStreaming] = useState(false);
+  const [attachedFile, setAttachedFile] = useState<File | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   const handleSend = useCallback(async () => {
-    if (!input.trim() || streaming) return;
-    const userMsg = input.trim();
+    if ((!input.trim() && !attachedFile) || streaming) return;
+    const userMsg = input.trim() || (attachedFile ? `Analyze this file: ${attachedFile.name}` : '');
+    const file = attachedFile;
     setInput('');
-    setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
+    setAttachedFile(null);
+
+    const displayMsg = file ? `📎 ${file.name}\n${userMsg}` : userMsg;
+    setMessages(prev => [...prev, { role: 'user', content: displayMsg }]);
     setStreaming(true);
 
     try {
-      const res = await fetch('/api/founder-hub/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-founder-pass': founderPass,
-        },
-        body: JSON.stringify({
-          message: userMsg,
-          history: messages.slice(-10),
-        }),
-      });
+      let res: Response;
+
+      if (file) {
+        // Send as FormData when file is attached
+        const formData = new FormData();
+        formData.append('message', userMsg);
+        formData.append('history', JSON.stringify(messages.slice(-10)));
+        formData.append('file', file);
+
+        res = await fetch('/api/founder-hub/chat', {
+          method: 'POST',
+          headers: { 'x-founder-pass': founderPass },
+          body: formData,
+        });
+      } else {
+        res = await fetch('/api/founder-hub/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-founder-pass': founderPass,
+          },
+          body: JSON.stringify({
+            message: userMsg,
+            history: messages.slice(-10),
+          }),
+        });
+      }
 
       if (!res.ok) {
-        setMessages(prev => [
-          ...prev,
-          { role: 'assistant', content: 'Error: ' + (res.statusText || 'Failed to connect') },
-        ]);
+        const errBody = await res.json().catch(() => null);
+        const errMsg = errBody?.error || res.statusText || 'Failed to connect';
+        setMessages(prev => [...prev, { role: 'assistant', content: `Error: ${errMsg}` }]);
         setStreaming(false);
         return;
       }
@@ -104,7 +127,23 @@ export function FounderChatWidget({ founderPass }: { founderPass: string }) {
     } finally {
       setStreaming(false);
     }
-  }, [input, messages, streaming, founderPass]);
+  }, [input, messages, streaming, founderPass, attachedFile]);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        setMessages(prev => [
+          ...prev,
+          { role: 'assistant', content: 'File too large. Maximum size is 10 MB.' },
+        ]);
+        return;
+      }
+      setAttachedFile(file);
+    }
+    // Reset input so same file can be re-selected
+    e.target.value = '';
+  };
 
   if (!open) {
     return (
@@ -206,7 +245,8 @@ export function FounderChatWidget({ founderPass }: { founderPass: string }) {
             }}
           >
             Ask me about content strategy, LinkedIn/YouTube ideas, pillar topics, competitor
-            positioning, or research frameworks for your content.
+            positioning, or research frameworks. You can also upload files (pitch decks, memos,
+            documents) for analysis.
             <div
               style={{
                 display: 'flex',
@@ -257,20 +297,86 @@ export function FounderChatWidget({ founderPass }: { founderPass: string }) {
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Attached file chip */}
+      {attachedFile && (
+        <div
+          style={{
+            padding: '4px 12px',
+            borderTop: '1px solid var(--border-primary, #333)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            fontSize: 11,
+            color: 'var(--text-secondary)',
+          }}
+        >
+          <FileText size={12} style={{ color: '#16A34A', flexShrink: 0 }} />
+          <span
+            style={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              flex: 1,
+            }}
+          >
+            {attachedFile.name}
+          </span>
+          <span style={{ color: 'var(--text-muted)', flexShrink: 0 }}>
+            {(attachedFile.size / 1024).toFixed(0)}KB
+          </span>
+          <button
+            onClick={() => setAttachedFile(null)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--text-muted)',
+              cursor: 'pointer',
+              padding: 2,
+              flexShrink: 0,
+            }}
+          >
+            <X size={12} />
+          </button>
+        </div>
+      )}
+
       {/* Input */}
       <div
         style={{
           padding: '10px 12px',
-          borderTop: '1px solid var(--border-primary, #333)',
+          borderTop: attachedFile ? 'none' : '1px solid var(--border-primary, #333)',
           display: 'flex',
-          gap: 8,
+          gap: 6,
+          alignItems: 'center',
         }}
       >
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept={ACCEPTED_TYPES}
+          onChange={handleFileSelect}
+          hidden
+        />
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          disabled={streaming}
+          title="Attach a file (PDF, DOCX, PPTX, etc.)"
+          style={{
+            background: 'none',
+            border: 'none',
+            color: attachedFile ? '#16A34A' : 'var(--text-muted)',
+            cursor: streaming ? 'wait' : 'pointer',
+            padding: 4,
+            flexShrink: 0,
+          }}
+        >
+          <Paperclip size={16} />
+        </button>
         <input
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
-          placeholder="Ask the Founder AI..."
+          placeholder={attachedFile ? 'Add a message about this file...' : 'Ask the Founder AI...'}
           disabled={streaming}
           style={{
             flex: 1,
@@ -285,15 +391,18 @@ export function FounderChatWidget({ founderPass }: { founderPass: string }) {
         />
         <button
           onClick={handleSend}
-          disabled={streaming || !input.trim()}
+          disabled={streaming || (!input.trim() && !attachedFile)}
           style={{
             padding: '8px 14px',
             fontSize: 12,
             fontWeight: 600,
             borderRadius: 8,
             border: 'none',
-            background: input.trim() && !streaming ? '#16A34A' : 'var(--bg-tertiary, #1a1a1a)',
-            color: input.trim() && !streaming ? '#fff' : 'var(--text-muted)',
+            background:
+              (input.trim() || attachedFile) && !streaming
+                ? '#16A34A'
+                : 'var(--bg-tertiary, #1a1a1a)',
+            color: (input.trim() || attachedFile) && !streaming ? '#fff' : 'var(--text-muted)',
             cursor: streaming ? 'wait' : 'pointer',
           }}
         >
