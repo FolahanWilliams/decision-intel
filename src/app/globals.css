@@ -67,9 +67,9 @@
   );
 
   /* Borders — subtle gray */
-  --border-color: rgba(0, 0, 0, 0.12);
-  --border-active: rgba(0, 0, 0, 0.24);
-  --border-hover: rgba(0, 0, 0, 0.16);
+  --border-color: rgba(0, 0, 0, 0.15);
+  --border-active: rgba(0, 0, 0, 0.28);
+  --border-hover: rgba(0, 0, 0, 0.2);
 
   /* Severity — vivid, saturated */
   --success: #16a34a;
@@ -573,21 +573,21 @@ pre {
 
 /* Elevation tiers — increasingly visible glass */
 .elevation-1 {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-card);
   box-shadow: var(--shadow-sm);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-color);
 }
 
 .elevation-2 {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--bg-card);
   box-shadow: var(--shadow-md);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--border-hover);
 }
 
 .elevation-3 {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--bg-card);
   box-shadow: var(--shadow-lg), var(--shadow-glow);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid var(--border-active);
 }
 
 /* ═══════════════════════════════════════════
@@ -863,11 +863,11 @@ select:focus {
    Upload Zone
    ═══════════════════════════════════════════ */
 .upload-zone {
-  border: 2px dashed rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.04);
+  border: 2px dashed var(--border-hover);
+  background: var(--bg-card);
   backdrop-filter: blur(20px) saturate(150%);
   -webkit-backdrop-filter: blur(20px) saturate(150%);
-  padding: var(--spacing-2xl);
+  padding: clamp(1.25rem, 4vw, 3.5rem);
   text-align: center;
   transition: all var(--transition-normal);
   border-radius: var(--liquid-radius-xl);
@@ -876,11 +876,9 @@ select:focus {
 }
 
 .upload-zone:hover {
-  border-color: rgba(255, 255, 255, 0.35);
-  background: rgba(255, 255, 255, 0.08);
-  box-shadow:
-    var(--liquid-shadow-hover),
-    0 0 40px rgba(255, 255, 255, 0.04);
+  border-color: var(--border-active);
+  background: var(--bg-card-hover);
+  box-shadow: var(--liquid-shadow-hover);
 }
 
 .upload-zone.dragover {
@@ -1363,7 +1361,7 @@ tr:hover td {
 /* Border glow intensifies near cursor */
 .card:hover,
 .stat-card:hover {
-  border-color: rgba(255, 255, 255, calc(0.18 + 0.22 * var(--glass-light-intensity)));
+  border-color: var(--liquid-border-hover);
 }
 
 /* ═══════════════════════════════════════════
@@ -1391,7 +1389,7 @@ tr:hover td {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  background: linear-gradient(90deg, transparent, var(--border-color), transparent);
   opacity: 0.6;
   transition: opacity var(--transition-normal);
 }
@@ -1912,7 +1910,7 @@ tr:hover td {
 
 .section-divider {
   height: 1px;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.06) 100%);
+  background: linear-gradient(90deg, var(--border-color) 0%, transparent 100%);
   margin: var(--spacing-xl) 0;
   border: none;
 }
@@ -2231,12 +2229,12 @@ tr:hover td {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--border-color);
   border-radius: var(--radius-full);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--text-muted);
 }
 
 /* ═══════════════════════════════════════════
