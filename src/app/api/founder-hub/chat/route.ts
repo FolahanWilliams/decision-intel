@@ -7,6 +7,8 @@
  * responses, pricing rationale, sales playbook).
  *
  * Auth: requires NEXT_PUBLIC_FOUNDER_HUB_PASS in x-founder-pass header.
+ *
+ * Accepts either JSON or multipart/form-data (when a file is attached).
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -15,10 +17,14 @@ import { getRequiredEnvVar, getOptionalEnvVar } from '@/lib/env';
 import { formatSSE } from '@/lib/sse';
 import { createLogger } from '@/lib/utils/logger';
 import { safeCompare } from '@/lib/utils/safe-compare';
+import { parseFile } from '@/lib/utils/file-parser';
 import { FOUNDER_CONTEXT } from '../founder-context';
 
 const log = createLogger('FounderHubChat');
 const ENCODER = new TextEncoder();
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+const MAX_FILE_TEXT = 80_000; // ~80K chars to leave room for context + history
 
 // ─── Gemini Setup (cached at module scope) ──────────────────────────────────
 
@@ -56,6 +62,75 @@ function getModel() {
   return model;
 }
 
+// ─── Parse request body (JSON or FormData) ─────────────────────────────────
+
+interface ParsedBody {
+  message: string;
+  history: Array<{ role: string; content: string }>;
+  fileText: string | null;
+  fileName: string | null;
+}
+
+async function parseRequestBody(req: NextRequest): Promise<ParsedBody> {
+  const contentType = req.headers.get('content-type') || '';
+
+  if (contentType.includes('multipart/form-data')) {
+    const formData = await req.formData();
+    const message = (formData.get('message') as string)?.slice(0, 5000) || '';
+    const historyRaw = formData.get('history') as string;
+    let history: Array<{ role: string; content: string }> = [];
+    try {
+      const parsed = JSON.parse(historyRaw || '[]');
+      if (Array.isArray(parsed)) {
+        history = parsed
+          .filter(
+            (m: unknown): m is { role: string; content: string } =>
+              typeof m === 'object' &&
+              m !== null &&
+              typeof (m as Record<string, unknown>).role === 'string' &&
+              typeof (m as Record<string, unknown>).content === 'string'
+          )
+          .slice(-20);
+      }
+    } catch {
+      // Invalid history JSON — ignore
+    }
+
+    const file = formData.get('file') as File | null;
+    let fileText: string | null = null;
+    let fileName: string | null = null;
+
+    if (file && file.size > 0) {
+      if (file.size > MAX_FILE_SIZE) {
+        throw new Error('File too large. Maximum size is 10 MB.');
+      }
+      fileName = file.name;
+      const buffer = Buffer.from(await file.arrayBuffer());
+      const parsed = await parseFile(buffer, file.type, file.name);
+      fileText = parsed.slice(0, MAX_FILE_TEXT);
+    }
+
+    return { message, history, fileText, fileName };
+  }
+
+  // Default: JSON body
+  const body = await req.json();
+  const message = typeof body.message === 'string' ? body.message.slice(0, 5000) : '';
+  const history: Array<{ role: string; content: string }> = Array.isArray(body.history)
+    ? body.history
+        .filter(
+          (m: unknown): m is { role: string; content: string } =>
+            typeof m === 'object' &&
+            m !== null &&
+            typeof (m as Record<string, unknown>).role === 'string' &&
+            typeof (m as Record<string, unknown>).content === 'string'
+        )
+        .slice(-20)
+    : [];
+
+  return { message, history, fileText: null, fileName: null };
+}
+
 // ─── Route Handler ──────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
@@ -70,22 +145,16 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const body = await req.json();
-    const message = typeof body.message === 'string' ? body.message.slice(0, 5000) : '';
-    const history: Array<{ role: string; content: string }> = Array.isArray(body.history)
-      ? body.history
-          .filter(
-            (m: unknown): m is { role: string; content: string } =>
-              typeof m === 'object' &&
-              m !== null &&
-              typeof (m as Record<string, unknown>).role === 'string' &&
-              typeof (m as Record<string, unknown>).content === 'string'
-          )
-          .slice(-20)
-      : [];
+    const { message, history, fileText, fileName } = await parseRequestBody(req);
 
     if (!message) {
       return NextResponse.json({ error: 'message is required' }, { status: 400 });
+    }
+
+    // Build the user message — prepend file content if attached
+    let userMessage = message;
+    if (fileText && fileName) {
+      userMessage = `[Attached file: ${fileName}]\n\nFile content:\n${fileText}\n\nUser message: ${message}`;
     }
 
     const model = getModel();
@@ -111,15 +180,10 @@ export async function POST(req: NextRequest) {
       ],
     });
 
-    const result = await chat.sendMessageStream(message);
+    const result = await chat.sendMessageStream(userMessage);
 
     const stream = new ReadableStream({
       async start(controller) {
-        // Safety net for the chat response-style contract (see FOUNDER_CONTEXT
-        // RESPONSE STYLE block). Even if Gemini ignores the prompt, we strip
-        // markdown bold delimiters and replace em/en dashes on every chunk.
-        // A single trailing `*` or `_` is held back so we correctly detect
-        // `**` / `__` pairs that straddle chunk boundaries.
         let carry = '';
         const sanitize = (raw: string): string => {
           let s = carry + raw;
@@ -168,7 +232,11 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
+    const errMsg = error instanceof Error ? error.message : 'Internal error';
     log.error('Founder chat error:', error);
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+    return NextResponse.json(
+      { error: errMsg },
+      { status: errMsg.includes('too large') ? 413 : 500 }
+    );
   }
 }
