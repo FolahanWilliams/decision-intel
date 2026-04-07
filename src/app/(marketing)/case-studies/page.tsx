@@ -126,7 +126,16 @@ export default function CaseStudyIndexPage() {
 function Stat({ value, label }: { value: string; label: string }) {
   return (
     <div style={{ minWidth: 0 }}>
-      <div style={{ fontSize: 'clamp(24px, 4vw, 32px)', fontWeight: 800, color: C.white, lineHeight: 1 }}>{value}</div>
+      <div
+        style={{
+          fontSize: 'clamp(24px, 4vw, 32px)',
+          fontWeight: 800,
+          color: C.white,
+          lineHeight: 1,
+        }}
+      >
+        {value}
+      </div>
       <div
         style={{
           fontSize: 11,

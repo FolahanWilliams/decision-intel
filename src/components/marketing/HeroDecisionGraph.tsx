@@ -228,7 +228,7 @@ const EDGES: GraphEdge[] = [
 const SVG_W = 580;
 const SVG_H = 560;
 const CENTER_X = SVG_W / 2;
-const CENTER_Y = SVG_H / 2;
+const CENTER_Y = SVG_H * 0.38;
 
 function initializeNodes(): GraphNode[] {
   const decisions = NODES.filter(n => n.type === 'decision');

@@ -101,7 +101,13 @@ export function CaseStudyCarousel() {
               Real decisions, analyzed the same way we analyze yours.
             </h2>
             <p
-              style={{ fontSize: 'clamp(14px, 2.5vw, 17px)', color: C.slate600, margin: 0, maxWidth: 640, lineHeight: 1.5 }}
+              style={{
+                fontSize: 'clamp(14px, 2.5vw, 17px)',
+                color: C.slate600,
+                margin: 0,
+                maxWidth: 640,
+                lineHeight: 1.5,
+              }}
             >
               We took the pre-decision memos from {featured.length} famous deals, stripped the
               hindsight, and ran them through our pipeline. Here&apos;s what we would have flagged.

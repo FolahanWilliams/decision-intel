@@ -431,7 +431,8 @@ export function CopilotPageContent() {
                 <div
                   className="mx-auto w-12 h-12 rounded-xl flex items-center justify-center"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(139, 92, 246, 0.12))',
+                    background:
+                      'linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(139, 92, 246, 0.12))',
                     border: '1px solid rgba(139, 92, 246, 0.2)',
                   }}
                 >
@@ -440,7 +441,10 @@ export function CopilotPageContent() {
                 <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
                   Your AI Advisory Team
                 </h2>
-                <p className="text-sm leading-relaxed mx-auto" style={{ color: 'var(--text-muted)', maxWidth: 380 }}>
+                <p
+                  className="text-sm leading-relaxed mx-auto"
+                  style={{ color: 'var(--text-muted)', maxWidth: 380 }}
+                >
                   Start a structured decision session, or ask a question about your documents. Pin a
                   document in the sidebar for focused Q&amp;A with source citations.
                 </p>
