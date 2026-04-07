@@ -63,7 +63,7 @@ export interface BayesianResult {
  * Derived from meta-analyses of cognitive bias research.
  * These serve as the "population prior" when no user prior exists.
  */
-const BIAS_BASE_RATES: Record<string, number> = {
+export const BIAS_BASE_RATES: Record<string, number> = {
   confirmation_bias: 0.72, // Nickerson (1998): "ubiquitous"
   anchoring_bias: 0.65, // Furnham & Boo (2011): high prevalence
   availability_heuristic: 0.58, // Tversky & Kahneman (1973)

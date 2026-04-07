@@ -15,6 +15,7 @@ import { Prisma } from '@prisma/client';
 import { createLogger } from '@/lib/utils/logger';
 import { DEFAULT_BIAS_SEVERITY_WEIGHTS, DEFAULT_COUNTERFACTUAL_WEIGHTS } from './constants';
 import { updateCausalModel } from './causal-learning';
+import { BIAS_BASE_RATES } from '@/lib/scoring/bayesian-priors';
 
 // Re-export constants so existing imports keep working
 export { DEFAULT_BIAS_SEVERITY_WEIGHTS, DEFAULT_COUNTERFACTUAL_WEIGHTS };
@@ -175,7 +176,7 @@ export async function loadNudgeCalibration(
  */
 export async function recalibrateBiasSeverity(
   orgId?: string | null
-): Promise<{ updated: boolean; sampleSize: number }> {
+): Promise<{ updated: boolean; sampleSize: number; source?: 'empirical' | 'hierarchical_prior' }> {
   const MIN_SAMPLE_SIZE = 5;
 
   try {
@@ -211,10 +212,83 @@ export async function recalibrateBiasSeverity(
     const totalSampleSize = outcomes.length + copilotOutcomeCount;
 
     if (outcomes.length < MIN_SAMPLE_SIZE) {
+      // Cold-start: blend sparse org data with global research-backed priors
+      // using hierarchical Bayesian approach (orgWeight scales with sample count)
+      const PRIOR_STRENGTH = 10;
+      const orgWeight = outcomes.length / (outcomes.length + PRIOR_STRENGTH);
+
+      // Compute org-specific confirmation rates from available data
+      const orgBiasStats: Record<string, { confirmed: number; falsePositive: number }> = {};
+      for (const outcome of outcomes) {
+        for (const bias of outcome.confirmedBiases) {
+          if (!orgBiasStats[bias]) orgBiasStats[bias] = { confirmed: 0, falsePositive: 0 };
+          orgBiasStats[bias].confirmed++;
+        }
+        for (const bias of outcome.falsPositiveBiases) {
+          if (!orgBiasStats[bias]) orgBiasStats[bias] = { confirmed: 0, falsePositive: 0 };
+          orgBiasStats[bias].falsePositive++;
+        }
+      }
+
+      // Blend: effective = orgRate * orgWeight + globalPrior * (1 - orgWeight)
+      const blendedRates: Record<string, number> = {};
+      for (const [biasType, baseRate] of Object.entries(BIAS_BASE_RATES)) {
+        const orgStats = orgBiasStats[biasType];
+        const orgRate = orgStats
+          ? orgStats.confirmed / (orgStats.confirmed + orgStats.falsePositive)
+          : baseRate;
+        blendedRates[biasType] = orgRate * orgWeight + baseRate * (1 - orgWeight);
+      }
+
+      // Build calibration from blended rates
+      const blendedWeights = { ...DEFAULT_BIAS_SEVERITY_WEIGHTS };
+      for (const [biasType, rate] of Object.entries(blendedRates)) {
+        const scaleFactor = 0.5 + rate;
+        for (const [severity, defaultWeight] of Object.entries(DEFAULT_BIAS_SEVERITY_WEIGHTS)) {
+          const key = `${biasType}:${severity}`;
+          blendedWeights[key] = Math.round(defaultWeight * scaleFactor);
+        }
+      }
+
+      // Upsert with hierarchical_prior source flag
+      const coldStartCalibration = {
+        weights: blendedWeights,
+        confirmationRates: blendedRates,
+        defaultWeight: DEFAULT_BIAS_SEVERITY_WEIGHTS.medium,
+        source: 'hierarchical_prior' as const,
+      };
+
+      await prisma.calibrationProfile.upsert({
+        where: {
+          orgId_userId_profileType: {
+            orgId: orgId ?? '',
+            userId: '',
+            profileType: 'bias_severity',
+          },
+        },
+        create: {
+          orgId: orgId || null,
+          userId: null,
+          profileType: 'bias_severity',
+          calibrationData: JSON.parse(
+            JSON.stringify(coldStartCalibration)
+          ) as Prisma.InputJsonValue,
+          sampleSize: totalSampleSize,
+          lastCalibratedAt: new Date(),
+        },
+        update: {
+          calibrationData: JSON.parse(
+            JSON.stringify(coldStartCalibration)
+          ) as Prisma.InputJsonValue,
+          sampleSize: totalSampleSize,
+          lastCalibratedAt: new Date(),
+        },
+      });
+
       log.info(
-        `Insufficient outcome data for bias calibration: ${outcomes.length}/${MIN_SAMPLE_SIZE} (+ ${copilotOutcomeCount} copilot outcomes)`
+        `Cold-start calibration for ${orgId || 'global'}: ${outcomes.length} outcomes blended with global priors (orgWeight: ${orgWeight.toFixed(2)})`
       );
-      return { updated: false, sampleSize: totalSampleSize };
+      return { updated: true, sampleSize: totalSampleSize, source: 'hierarchical_prior' as const };
     }
 
     // Aggregate per-bias-type confirmation rates

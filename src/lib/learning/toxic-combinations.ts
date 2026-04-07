@@ -749,8 +749,17 @@ export async function learnToxicPatterns(orgId: string): Promise<number> {
       { failures: number; successes: number; impactDeltas: number[] }
     >();
 
-    const baselineSuccessRate =
-      outcomes.filter(o => o.outcome === 'success').length / outcomes.length;
+    // Compute time-weighted baseline success rate (consistent with per-pair temporal decay)
+    let weightedSuccesses = 0;
+    let totalWeight = 0;
+    for (const o of outcomes) {
+      const ageMs = Date.now() - new Date(o.reportedAt).getTime();
+      const ageMonths = ageMs / (1000 * 60 * 60 * 24 * 30.44);
+      const w = Math.exp(-0.05 * ageMonths);
+      if (o.outcome === 'success') weightedSuccesses += w;
+      totalWeight += w;
+    }
+    const baselineSuccessRate = totalWeight > 0 ? weightedSuccesses / totalWeight : 0;
 
     for (const outcome of outcomes) {
       const biasTypes: string[] = [
@@ -759,6 +768,11 @@ export async function learnToxicPatterns(orgId: string): Promise<number> {
         ),
       ] as string[];
       if (biasTypes.length < 2) continue;
+
+      // Temporal decay: recent outcomes carry more weight (half-life ~14 months)
+      const ageMs = Date.now() - new Date(outcome.reportedAt).getTime();
+      const ageMonths = ageMs / (1000 * 60 * 60 * 24 * 30.44);
+      const decayWeight = Math.exp(-0.05 * ageMonths);
 
       const pairs = generatePairs(biasTypes);
       const isFailure = outcome.outcome === 'failure';
@@ -769,12 +783,12 @@ export async function learnToxicPatterns(orgId: string): Promise<number> {
         const stats = pairStats.get(key) ?? { failures: 0, successes: 0, impactDeltas: [] };
 
         if (isFailure) {
-          stats.failures++;
+          stats.failures += decayWeight;
           if (outcome.impactScore != null) {
-            stats.impactDeltas.push(outcome.impactScore);
+            stats.impactDeltas.push(outcome.impactScore * decayWeight);
           }
         } else if (isSuccess) {
-          stats.successes++;
+          stats.successes += decayWeight;
         }
 
         pairStats.set(key, stats);
@@ -795,6 +809,11 @@ export async function learnToxicPatterns(orgId: string): Promise<number> {
       ] as string[];
       if (tripleBiasTypes.length < 3) continue;
 
+      // Temporal decay (same as pair stats)
+      const tripleAgeMs = Date.now() - new Date(outcome.reportedAt).getTime();
+      const tripleAgeMonths = tripleAgeMs / (1000 * 60 * 60 * 24 * 30.44);
+      const tripleDecayWeight = Math.exp(-0.05 * tripleAgeMonths);
+
       const triples = generateTriples(tripleBiasTypes);
       const isFailure = outcome.outcome === 'failure';
       const isSuccess = outcome.outcome === 'success';
@@ -803,10 +822,11 @@ export async function learnToxicPatterns(orgId: string): Promise<number> {
         const key = triple.sort().join('+');
         const stats = tripleStats.get(key) ?? { failures: 0, successes: 0, impactDeltas: [] };
         if (isFailure) {
-          stats.failures++;
-          if (outcome.impactScore != null) stats.impactDeltas.push(outcome.impactScore);
+          stats.failures += tripleDecayWeight;
+          if (outcome.impactScore != null)
+            stats.impactDeltas.push(outcome.impactScore * tripleDecayWeight);
         } else if (isSuccess) {
-          stats.successes++;
+          stats.successes += tripleDecayWeight;
         }
         tripleStats.set(key, stats);
       }

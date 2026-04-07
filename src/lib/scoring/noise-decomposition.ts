@@ -99,7 +99,15 @@ const NOISE_THRESHOLDS = {
  * - MSE_level = variance of judge means (systematic severity differences)
  * - MSE_pattern = residual variance after removing level noise
  */
-function decomposeNoise(assessments: JudgeAssessment[]): {
+function decomposeNoise(
+  assessments: JudgeAssessment[],
+  options?: {
+    /** When true, noise signal is amplified 1.3x (multi-model disagreement is more meaningful) */
+    isMultiModel?: boolean;
+    /** Optional per-judge weights (default: equal). Must match assessments length. */
+    judgeWeights?: number[];
+  }
+): {
   levelNoise: number;
   patternNoise: number;
   totalNoise: number;
@@ -108,13 +116,20 @@ function decomposeNoise(assessments: JudgeAssessment[]): {
     return { levelNoise: 0, patternNoise: 0, totalNoise: 0 };
   }
 
-  const scores = assessments.map(a => a.qualityScore);
-  const grandMean = scores.reduce((s, v) => s + v, 0) / scores.length;
+  // Normalize judge weights (default equal)
+  const rawWeights = options?.judgeWeights ?? assessments.map(() => 1);
+  const weightSum = rawWeights.reduce((s, w) => s + w, 0);
+  const weights = rawWeights.map(w => w / weightSum);
 
-  // Level noise: variance of judge means from grand mean
+  const scores = assessments.map(a => a.qualityScore);
+  const grandMean = scores.reduce((s, v, i) => s + v * weights[i], 0);
+
+  // Level noise: weighted variance of judge means from grand mean
   // (In a single-document case, each judge's "mean" is just their score)
-  const levelVariance =
-    scores.reduce((sum, s) => sum + Math.pow(s - grandMean, 2), 0) / scores.length;
+  const levelVariance = scores.reduce(
+    (sum, s, i) => sum + weights[i] * Math.pow(s - grandMean, 2),
+    0
+  );
 
   // Total variance
   // For single document, total = level + pattern (level captures most variance)
@@ -139,11 +154,16 @@ function decomposeNoise(assessments: JudgeAssessment[]): {
   const patternNoise = avgPatternDisagreement * 30; // Jaccard 0-1 → 0-30 range
 
   // Total noise combines level (score disagreement) and pattern (classification disagreement)
-  const totalNoise = Math.sqrt(levelVariance) + patternNoise * 0.5;
+  let totalNoise = Math.sqrt(levelVariance) + patternNoise * 0.5;
+
+  // Multi-model boost: disagreement across different models is analytically
+  // more meaningful than same-model sampling variance (1.3x signal weight)
+  const multiModelBoost = options?.isMultiModel ? 1.3 : 1.0;
+  totalNoise *= multiModelBoost;
 
   return {
-    levelNoise: Math.round(Math.sqrt(levelVariance) * 100) / 100,
-    patternNoise: Math.round(patternNoise * 100) / 100,
+    levelNoise: Math.round(Math.sqrt(levelVariance) * multiModelBoost * 100) / 100,
+    patternNoise: Math.round(patternNoise * multiModelBoost * 100) / 100,
     totalNoise: Math.round(totalNoise * 100) / 100,
   };
 }
@@ -288,8 +308,8 @@ export function decomposeDecisionNoise(assessments: JudgeAssessment[]): NoiseDec
   const providers = new Set(assessments.map(a => a.provider ?? 'same'));
   const isMultiModel = providers.size > 1;
 
-  // Decompose noise
-  const { levelNoise, patternNoise, totalNoise } = decomposeNoise(assessments);
+  // Decompose noise (with multi-model boost when applicable)
+  const { levelNoise, patternNoise, totalNoise } = decomposeNoise(assessments, { isMultiModel });
 
   // Classify disagreements
   const disagreements = classifyDisagreements(assessments);

@@ -29,6 +29,10 @@ export interface CausalWeight {
   dangerMultiplier: number;
   /** Sample size for this bias type */
   sampleSize: number;
+  /** Whether observable confounders were controlled for in this estimate */
+  confoundersControlled?: string[];
+  /** Quality of stratification: 'full' if all outcomes had metadata, 'partial' if some, 'none' if unstratified */
+  stratificationQuality?: 'full' | 'partial' | 'none';
 }
 
 export interface CausalInsight {
@@ -58,6 +62,7 @@ interface OutcomeRecord {
   actualValue?: number | null;
   analysis: {
     biases: BiasRecord;
+    document?: { documentType?: string | null; deal?: { sector?: string | null } | null } | null;
   };
 }
 
@@ -91,7 +96,13 @@ export async function computeOrgCausalWeights(
           : {}),
       },
       include: {
-        analysis: true,
+        analysis: {
+          include: {
+            document: {
+              select: { documentType: true, deal: { select: { sector: true } } },
+            },
+          },
+        },
       },
     });
 
@@ -122,23 +133,108 @@ export async function computeOrgCausalWeights(
       }
     }
 
+    // Stratified correlation (Cochran-Mantel-Haenszel approach)
+    // Group outcomes by observable confounders to protect against Simpson's paradox
+    const stratumKey = (o: OutcomeRecord): string => {
+      const docType = o.analysis?.document?.documentType || 'unknown';
+      const sector = o.analysis?.document?.deal?.sector || 'unknown';
+      return `${docType}::${sector}`;
+    };
+
+    const strata = new Map<string, OutcomeRecord[]>();
+    let hasStratificationMetadata = 0;
+    for (const o of outcomesList) {
+      const key = stratumKey(o);
+      if (key !== 'unknown::unknown') hasStratificationMetadata++;
+      if (!strata.has(key)) strata.set(key, []);
+      strata.get(key)!.push(o);
+    }
+
+    const stratificationQuality: 'full' | 'partial' | 'none' =
+      hasStratificationMetadata === totalOutcomes
+        ? 'full'
+        : hasStratificationMetadata > 0
+          ? 'partial'
+          : 'none';
+
+    const confoundersControlled =
+      stratificationQuality !== 'none' ? ['documentType', 'sector'] : [];
+
     const weights: CausalWeight[] = [];
     for (const [biasType, stats] of biasStats.entries()) {
       const total = stats.failures + stats.successes + stats.partials;
       if (total === 0) continue;
 
-      const biasSuccessRate = stats.successes / total;
-      const biasFailureRate = stats.failures / total;
+      // Compute stratified correlation if metadata available, else use flat
+      let outcomeCorrelation: number;
+      let dangerMultiplier: number;
 
-      // Negative correlation = bias correlates with poor outcomes
-      const outcomeCorrelation = Number((biasSuccessRate - baseSuccessRate).toFixed(3));
+      if (stratificationQuality !== 'none' && strata.size > 1) {
+        // Weighted average of within-stratum correlations
+        let weightedCorr = 0;
+        let weightedDanger = 0;
+        let totalStratumWeight = 0;
 
-      const dangerMultiplier =
-        baseFailureRate > 0
-          ? Number((biasFailureRate / baseFailureRate).toFixed(2))
-          : biasFailureRate > 0
-            ? 2.0
-            : 1.0;
+        for (const [, stratumOutcomes] of strata) {
+          const stratumTotal = stratumOutcomes.length;
+          if (stratumTotal < 2) continue;
+
+          const stratumSuccesses = stratumOutcomes.filter(o => o.outcome === 'success').length;
+          const stratumBaseRate = stratumSuccesses / stratumTotal;
+          const stratumBaseFailRate = 1 - stratumBaseRate;
+
+          let biasSuccInStratum = 0;
+          let biasFailInStratum = 0;
+          let biasTotalInStratum = 0;
+
+          for (const o of stratumOutcomes) {
+            const biases = o.analysis?.biases;
+            if (!biases || typeof biases !== 'object') continue;
+            if (!Object.keys(biases).includes(biasType)) continue;
+            biasTotalInStratum++;
+            if (o.outcome === 'success') biasSuccInStratum++;
+            if (o.outcome === 'failure') biasFailInStratum++;
+          }
+
+          if (biasTotalInStratum === 0) continue;
+
+          const stratumBiasSuccRate = biasSuccInStratum / biasTotalInStratum;
+          const stratumBiasFailRate = biasFailInStratum / biasTotalInStratum;
+
+          weightedCorr += (stratumBiasSuccRate - stratumBaseRate) * stratumTotal;
+          weightedDanger +=
+            (stratumBaseFailRate > 0 ? stratumBiasFailRate / stratumBaseFailRate : 1.0) *
+            stratumTotal;
+          totalStratumWeight += stratumTotal;
+        }
+
+        if (totalStratumWeight > 0) {
+          outcomeCorrelation = Number((weightedCorr / totalStratumWeight).toFixed(3));
+          dangerMultiplier = Number((weightedDanger / totalStratumWeight).toFixed(2));
+        } else {
+          // Fallback to unstratified
+          const biasSuccessRate = stats.successes / total;
+          const biasFailureRate = stats.failures / total;
+          outcomeCorrelation = Number((biasSuccessRate - baseSuccessRate).toFixed(3));
+          dangerMultiplier =
+            baseFailureRate > 0
+              ? Number((biasFailureRate / baseFailureRate).toFixed(2))
+              : biasFailureRate > 0
+                ? 2.0
+                : 1.0;
+        }
+      } else {
+        // Unstratified (original logic)
+        const biasSuccessRate = stats.successes / total;
+        const biasFailureRate = stats.failures / total;
+        outcomeCorrelation = Number((biasSuccessRate - baseSuccessRate).toFixed(3));
+        dangerMultiplier =
+          baseFailureRate > 0
+            ? Number((biasFailureRate / baseFailureRate).toFixed(2))
+            : biasFailureRate > 0
+              ? 2.0
+              : 1.0;
+      }
 
       weights.push({
         biasType,
@@ -147,6 +243,8 @@ export async function computeOrgCausalWeights(
         successCount: stats.successes,
         dangerMultiplier,
         sampleSize: total,
+        confoundersControlled,
+        stratificationQuality,
       });
     }
 

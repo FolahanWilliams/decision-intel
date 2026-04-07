@@ -77,12 +77,17 @@ interface ModelOptions {
    * 'standard' — BLOCK_MEDIUM_AND_ABOVE. Suitable for simulation/creative nodes.
    */
   safetyLevel?: SafetyLevel;
+  /** Override temperature (default: SDK default ~1.0). Use 0.3 for deterministic scoring. */
+  temperature?: number;
+  /** Override model name (for multi-model jury). Defaults to GEMINI_MODEL_NAME env var. */
+  modelName?: string;
 }
 
 function createModelInstance(options: ModelOptions = {}): GenerativeModel {
   const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
   const genAI = new GoogleGenerativeAI(apiKey);
-  const modelName = getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview');
+  const modelName =
+    options.modelName || getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview');
 
   const safetySettings =
     options.safetyLevel === 'standard'
@@ -132,6 +137,7 @@ function createModelInstance(options: ModelOptions = {}): GenerativeModel {
     generationConfig: {
       responseMimeType: 'application/json',
       maxOutputTokens: 16384,
+      ...(options.temperature !== undefined ? { temperature: options.temperature } : {}),
     },
     safetySettings,
   });
@@ -165,6 +171,32 @@ function getStandardSafetyGroundedModel(): GenerativeModel {
     });
   }
   return standardSafetyGroundedInstance;
+}
+
+/**
+ * Create a model by explicit name — used for multi-model noise jury.
+ * Not cached (each call creates a new instance) since model names vary.
+ */
+function createModelByName(name: string, options?: { temperature?: number }): GenerativeModel {
+  return createModelInstance({
+    safetyLevel: 'relaxed',
+    modelName: name,
+    temperature: options?.temperature,
+  });
+}
+
+/**
+ * Parse NOISE_JURY_MODELS env var for multi-model noise jury configuration.
+ * Format: comma-separated model names, e.g. "gemini-2.5-flash,gemini-2.5-pro,gemini-2.0-flash"
+ * Returns empty array if not set (falls back to default single-model jury).
+ */
+function getNoiseJuryModels(): string[] {
+  const envVal = getOptionalEnvVar('NOISE_JURY_MODELS', '');
+  if (!envVal) return [];
+  return envVal
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
 }
 
 // ============================================================
@@ -552,18 +584,30 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
       log.info(`Using investment-specific noise evaluation (docType=${state.documentType})`);
     }
 
+    // Multi-model noise jury: uses NOISE_JURY_MODELS env var for cross-model disagreement
+    // (more meaningful than same-model sampling variance). Falls back to default model.
+    const juryModels = getNoiseJuryModels();
+    const isMultiModelJury = juryModels.length >= 2;
+    if (isMultiModelJury) {
+      log.info(`Multi-model noise jury: ${juryModels.join(', ')}`);
+    }
+
     // Parallel Judges for Noise Scoring (circuit breaker prevents pile-up if Gemini is down)
-    const promises = [1, 2, 3].map(() =>
-      withGeminiResilience(() =>
+    // Temperature 0.3 for deterministic scoring; random seed still injects variance
+    const promises = [0, 1, 2].map(i => {
+      const model = juryModels[i]
+        ? createModelByName(juryModels[i], { temperature: 0.3 })
+        : createModelInstance({ safetyLevel: 'relaxed', temperature: 0.3 });
+      return withGeminiResilience(() =>
         withTimeout(
-          getModel().generateContent([
+          model.generateContent([
             noisePrompt,
             `Decision Text to Rate:\n<input_text>\n${content}\n</input_text>${contextSuffix}`,
             `\n(Random Seed: ${Math.random()})`,
           ])
         )
-      )
-    );
+      );
+    });
 
     const settled = await Promise.allSettled(promises);
 
@@ -652,16 +696,49 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
   }
 }
 
+/**
+ * Deterministic PII pre-redaction — regex-based first pass before LLM anonymization.
+ * Catches structured PII patterns (emails, SSNs, phone numbers, credit cards, IPs)
+ * that LLMs sometimes miss. Defense-in-depth: regex for structure, LLM for context.
+ */
+function preRedactPII(text: string): { redacted: string; count: number } {
+  let count = 0;
+  let result = text;
+  // Email addresses
+  result = result.replace(
+    /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g,
+    () => `[EMAIL_${++count}]`
+  );
+  // SSN (US format: XXX-XX-XXXX)
+  result = result.replace(/\b\d{3}-\d{2}-\d{4}\b/g, () => `[SSN_${++count}]`);
+  // Credit card numbers (4 groups of 4 digits)
+  result = result.replace(/\b(?:\d{4}[-\s]?){3}\d{4}\b/g, () => `[CC_${++count}]`);
+  // Phone numbers (US/UK/international formats)
+  result = result.replace(
+    /(?:\+?\d{1,3}[-.\s]?)?\(?\d{2,4}\)?[-.\s]?\d{3,4}[-.\s]?\d{3,4}\b/g,
+    () => `[PHONE_${++count}]`
+  );
+  // IP addresses
+  result = result.replace(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/g, () => `[IP_${++count}]`);
+  return { redacted: result, count };
+}
+
 export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<AuditState>> {
   const content = state.originalContent;
 
   try {
     log.info('Running GDPR Anonymization...');
 
-    // Use the model to identify and redact PII
+    // Phase 1: Deterministic regex pre-redaction (catches structured PII)
+    const { redacted: preRedacted, count: preRedactCount } = preRedactPII(content || '');
+    if (preRedactCount > 0) {
+      log.info(`Pre-redacted ${preRedactCount} structured PII patterns before LLM anonymization`);
+    }
+
+    // Phase 2: LLM-based contextual anonymization (catches names, addresses in narrative)
     const result = await withGeminiResilience(() =>
       withTimeout(
-        getModel().generateContent([GDPR_ANONYMIZER_PROMPT, `Text to anonymize:\n${content}`])
+        getModel().generateContent([GDPR_ANONYMIZER_PROMPT, `Text to anonymize:\n${preRedacted}`])
       )
     );
 

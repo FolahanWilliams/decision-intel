@@ -49,7 +49,7 @@ export function computePageRank(
     ranks.set(node.id, 1 / n);
   }
 
-  // Iterate
+  // Iterate with convergence check
   for (let i = 0; i < iterations; i++) {
     const newRanks = new Map<string, number>();
     for (const node of nodes) {
@@ -60,7 +60,14 @@ export function computePageRank(
       }
       newRanks.set(node.id, (1 - damping) / n + damping * sum);
     }
+    // Early exit if ranks have converged
+    let maxDelta = 0;
+    for (const node of nodes) {
+      const delta = Math.abs((newRanks.get(node.id) || 0) - (ranks.get(node.id) || 0));
+      if (delta > maxDelta) maxDelta = delta;
+    }
     ranks = newRanks;
+    if (maxDelta < 1e-6) break;
   }
 
   // Normalize to 0-1 range
