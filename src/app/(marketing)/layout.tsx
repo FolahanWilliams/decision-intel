@@ -135,9 +135,7 @@ const jsonLd = [
     description:
       'Decision Intel is the AI-powered cognitive bias detection platform for PE/VC and M&A teams. Audit strategic documents for hidden biases, measure decision noise, and track outcomes.',
     foundingDate: '2024',
-    sameAs: [
-      'https://www.linkedin.com/company/decision-intel',
-    ],
+    sameAs: ['https://www.linkedin.com/company/decision-intel'],
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'sales',
