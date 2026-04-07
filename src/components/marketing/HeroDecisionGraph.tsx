@@ -228,7 +228,7 @@ const EDGES: GraphEdge[] = [
 const SVG_W = 580;
 const SVG_H = 560;
 const CENTER_X = SVG_W / 2;
-const CENTER_Y = SVG_H * 0.38;
+const CENTER_Y = SVG_H / 2;
 
 function initializeNodes(): GraphNode[] {
   const decisions = NODES.filter(n => n.type === 'decision');
@@ -355,22 +355,15 @@ function DetailPanel({ node, onClose }: { node: GraphNode; onClose: () => void }
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 6 }}
-      transition={{ duration: 0.2 }}
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: 'auto' }}
+      exit={{ opacity: 0, height: 0 }}
+      transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
       style={{
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
         background: '#FFFFFF',
         borderTop: '1px solid #E2E8F0',
-        borderRadius: '0 0 16px 16px',
         padding: '16px 18px',
-        zIndex: 10,
-        maxHeight: '60%',
-        overflowY: 'auto',
+        overflow: 'hidden',
       }}
     >
       <div
@@ -730,9 +723,8 @@ export function HeroDecisionGraph() {
           background: COLORS.bg,
           border: '1px solid #E2E8F0',
           borderRadius: 16,
-          padding: '20px 12px 12px',
+          padding: '20px 12px 0',
           position: 'relative',
-          overflow: 'hidden',
         }}
       >
         {/* Header */}
@@ -853,7 +845,7 @@ export function HeroDecisionGraph() {
           </div>
         </div>
 
-        {/* Detail popup */}
+        {/* Detail panel — rendered in flow below the graph so the card expands */}
         <AnimatePresence>
           {selectedNodeData && (
             <DetailPanel node={selectedNodeData} onClose={() => setSelectedNode(null)} />
