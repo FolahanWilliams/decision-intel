@@ -9,7 +9,7 @@ export function CorePipelineTab() {
       {/* Pipeline Diagram */}
       <div style={card}>
         <div style={sectionTitle}>
-          <Zap size={18} style={{ color: '#f59e0b' }} /> 11-Agent Analysis Pipeline
+          <Zap size={18} style={{ color: '#f59e0b' }} /> 12-Node Analysis Pipeline
         </div>
         <pre
           style={{
@@ -25,13 +25,14 @@ export function CorePipelineTab() {
           {`PREPROCESSING (Sequential)
   [GDPR Anonymizer] ──> [Data Structurer] ──> [Intelligence Gatherer]
 
-ANALYSIS (Parallel Fan-Out)
-  ├── [Bias Detective]      ── 20 cognitive biases + 11 investment-specific
-  ├── [Noise Judge]         ── Statistical noise & variance scoring
-  ├── [Verification]        ── Fact checking + compliance mapping
-  ├── [Deep Analysis]       ── Linguistic, strategic & cognitive diversity
-  ├── [Simulation]          ── Decision twin simulation + memory recall
-  └── [RPD Recognition]     ── Klein pattern matching + expert heuristics
+ANALYSIS (Parallel Fan-Out — 7 nodes)
+  ├── [Bias Detective]         ── 20 cognitive biases + 11 investment-specific
+  ├── [Noise Judge]            ── Statistical noise & variance scoring
+  ├── [Verification]           ── Fact checking + compliance mapping
+  ├── [Deep Analysis]          ── Linguistic, strategic & cognitive diversity
+  ├── [Simulation]             ── Decision twin simulation + memory recall
+  ├── [RPD Recognition]        ── Klein pattern matching + expert heuristics
+  └── [Forgotten Questions]    ── Unknown-unknowns surface detection
 
 SYNTHESIS (Sequential)
   [Meta Judge] ──> [Risk Scorer] ──> END`}
@@ -202,7 +203,7 @@ SYNTHESIS (Sequential)
             {
               label: 'AI Pipeline',
               value:
-                '11 agents in LangGraph DAG — preprocessing (sequential) → analysis (parallel fan-out) → synthesis (sequential)',
+                '12 nodes in LangGraph DAG — preprocessing (sequential) → analysis (7-way parallel fan-out) → synthesis (sequential)',
             },
             {
               label: 'Scoring Layer',

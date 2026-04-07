@@ -263,7 +263,7 @@ function LoadingSkeleton() {
 
 /* ── Score distribution helpers ───────────────────────────────── */
 const getScoreBucketColor = (range: string) => {
-  const start = parseInt(range);
+  const start = parseInt(range, 10);
   if (start >= 80) return '#30d158';
   if (start >= 60) return '#ffd60a';
   if (start >= 40) return '#ff9f0a';

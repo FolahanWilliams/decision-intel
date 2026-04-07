@@ -170,6 +170,7 @@ export default function FounderHubPage() {
     }
   }, [passInput]);
 
+  // Keyboard shortcut: Cmd/Ctrl+K to focus search, Escape to clear
   useEffect(() => {
     if (!unlocked) return;
     const handler = (e: KeyboardEvent) => {
@@ -177,10 +178,14 @@ export default function FounderHubPage() {
         e.preventDefault();
         searchRef.current?.focus();
       }
+      if (e.key === 'Escape' && searchQuery) {
+        setSearchQuery('');
+        searchRef.current?.blur();
+      }
     };
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [unlocked]);
+  }, [unlocked, searchQuery]);
 
   if (!unlocked) {
     return (

@@ -133,7 +133,7 @@ const SECTION_MOAT: Tip[] = [
   {
     title: 'Your moat dies the day a better prompt outperforms your pipeline',
     principle:
-      'Plan for the day Gemini 3 or GPT-5 single-shots bias detection as well as your 11-node pipeline. That day is coming. Your long-term moat must not be the model.',
+      'Plan for the day Gemini 3 or GPT-5 single-shots bias detection as well as your 12-node pipeline. That day is coming. Your long-term moat must not be the model.',
     rationale:
       'Every AI startup that positions its moat around "we use a better prompt" gets flattened the moment the underlying foundation model catches up. The prompt engineering corpus is a Day-1 moat — real, valuable, and temporary. The enduring moat is (a) the outcome data you alone are collecting, (b) the compliance framework mapping competitors cannot ship without legal review, and (c) the behavioral-change loop (nudges + playbooks) that turns detection into retention. Start migrating the pitch from "better AI" to "proprietary data" within six months, before a competitor built on a frontier model catches up on the pure-analysis axis.',
     action:
@@ -208,7 +208,7 @@ const SECTION_EXECUTION: Tip[] = [
     principle:
       'Build a golden dataset of 50 hand-labeled IC memos with known biases. Run your pipeline against it in CI. Publish the accuracy number on your marketing site. Reran weekly.',
     rationale:
-      'Right now the codebase has 233 tests but zero that measure end-to-end bias detection accuracy. That means every claim about precision is unfalsifiable — including claims to yourself. An eval harness gives you three things simultaneously: (1) a marketing asset ("72% precision on hand-labeled dataset, up from 58% last quarter"), (2) regression protection for prompt changes, and (3) the single most attractive thing you can show an ML engineer when you eventually hire one. Without an eval harness you cannot safely change a prompt, cannot prove improvement over time, and cannot recruit. With one, every prompt iteration becomes a measurable improvement.',
+      'Right now the codebase has 586 tests but zero that measure end-to-end bias detection accuracy. That means every claim about precision is unfalsifiable — including claims to yourself. An eval harness gives you three things simultaneously: (1) a marketing asset ("72% precision on hand-labeled dataset, up from 58% last quarter"), (2) regression protection for prompt changes, and (3) the single most attractive thing you can show an ML engineer when you eventually hire one. Without an eval harness you cannot safely change a prompt, cannot prove improvement over time, and cannot recruit. With one, every prompt iteration becomes a measurable improvement.',
     action:
       'This week: create /evals/ directory with 10 seed memos (write them yourself, annotate biases manually). Add a Vitest integration test that runs the full pipeline against each, computes precision/recall against the labels, and fails CI if the number drops. Grow to 50 memos over the next month. Publish the current number on decisionintel.com/accuracy.',
   },
@@ -217,7 +217,7 @@ const SECTION_EXECUTION: Tip[] = [
     principle:
       'For a solo teen founder, every week of public building is compounding credibility interest. For a solo teen founder who does not build in public, every week is a month of lost signal.',
     rationale:
-      'You have 342+ commits and 183K lines of code and presumably zero Twitter following. That is career malpractice at your age. The founders who compound reputation fastest are the ones who turn private effort into public artifact. Every Friday: one screenshot, one metric, one sentence about what shipped. Thread it. Tag relevant people. Do not over-explain. The point is not virality — the point is that by the time you raise seed, 10,000 people in the right circles recognize your name, and half of GTM is already done. Geographic arbitrage compounds — the cost of maintaining this habit is 30 minutes a week.',
+      'You have 342+ commits and 199K lines of code and presumably zero Twitter following. That is career malpractice at your age. The founders who compound reputation fastest are the ones who turn private effort into public artifact. Every Friday: one screenshot, one metric, one sentence about what shipped. Thread it. Tag relevant people. Do not over-explain. The point is not virality — the point is that by the time you raise seed, 10,000 people in the right circles recognize your name, and half of GTM is already done. Geographic arbitrage compounds — the cost of maintaining this habit is 30 minutes a week.',
     action:
       'Set a recurring Friday calendar block: 30 minutes for "this week shipped." Post to X, LinkedIn, and an email newsletter (Substack or Beehiiv). First post this Friday. Do not break the streak. The thing that kills solo-founder momentum is the week you skip because nothing felt shippable — that week always has something shippable.',
   },
@@ -245,11 +245,11 @@ const SECTION_EXECUTION: Tip[] = [
 
 const SECTION_REFINEMENT: Tip[] = [
   {
-    title: 'Your 30+ routes are a surface area liability, not a feature count asset',
+    title: 'Your 40+ routes are a surface area liability, not a feature count asset',
     principle:
       'Every route a user never visits is a maintenance burden that slows you down and a cognitive burden that confuses them. Consolidation is not retreat, it is focus.',
     rationale:
-      'You have 30+ dashboard routes, 14 Founder Hub tabs, 45+ visualization components, and 189 total components. At your stage, surface area works against you in three ways: (1) every route needs loading states, error handling, and responsive design maintained separately, (2) new users drown in options before they find the core value, and (3) every new feature you ship has to play nicely with 30 existing pages. The most successful B2B SaaS products at your stage have 5-7 core screens, not 30. The ones that survive past Series A are the ones that ruthlessly consolidated before scaling. Your analysis detail page, copilot, and dashboard are the core trio. Everything else should justify its existence by driving users to one of those three.',
+      'You have 40+ dashboard routes, 16 Founder Hub tabs, 45+ visualization components, and 201 total components. At your stage, surface area works against you in three ways: (1) every route needs loading states, error handling, and responsive design maintained separately, (2) new users drown in options before they find the core value, and (3) every new feature you ship has to play nicely with 40 existing pages. The most successful B2B SaaS products at your stage have 5-7 core screens, not 40. The ones that survive past Series A are the ones that ruthlessly consolidated before scaling. Your analysis detail page, copilot, and dashboard are the core trio. Everything else should justify its existence by driving users to one of those three.',
     action:
       'Run your own analytics (or add them) to identify which routes get <5% of pageviews. For each, decide: merge into a parent page, gate behind a "power user" toggle, or delete. Target: reduce top-level sidebar items by 30% this quarter. Blog the process using Tip 14.',
   },
@@ -265,7 +265,7 @@ const SECTION_REFINEMENT: Tip[] = [
   {
     title: 'Your Founder Hub is your second brain, treat it like a product',
     principle:
-      'The Founder Hub with 14 tabs, Content Studio, and AI chat is the most unusual and potentially most defensible internal tool in your stack. It is also the thing investors will screenshot and share.',
+      'The Founder Hub with 16 tabs, Content Studio, and AI chat is the most unusual and potentially most defensible internal tool in your stack. It is also the thing investors will screenshot and share.',
     rationale:
       'Most founders keep strategy in Notion, content in Google Docs, sales scripts in email drafts, and competitor intel in their head. You built a single integrated tool that connects your product knowledge, sales playbooks, research foundations, case studies, content generation, and strategic principles in one place, with an AI that has full context. This is not just an internal tool. It is a proof point for the product thesis: decision quality improves when context is structured, searchable, and augmented by AI. During a pitch, casually showing the Founder Hub as "how I use Decision Intel on my own company" is the most powerful demo you can give because it eliminates the "does the founder even use this?" question. Keep refining it. Consider eventually productizing the pattern as a "Strategy Hub" template for enterprise customers.',
     action:
@@ -290,7 +290,7 @@ export function FounderTipsTab() {
           }}
         >
           Seventeen principles grounded in your specific position: solo founder, 16, Nigeria, PE/VC
-          wedge, Wiz advisor, 97% gross margins, 183K+ LoC already shipped. Re-read when deciding
+          wedge, Wiz advisor, 97% gross margins, 199K+ LoC already shipped. Re-read when deciding
           what to build next, what to kill, what to say in a pitch, and what to ignore.
         </p>
       </div>

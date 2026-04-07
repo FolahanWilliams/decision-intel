@@ -908,7 +908,7 @@ function DemoVideoSection() {
         See Decision Intel in Action
       </h1>
       <p className="text-slate-400 text-sm sm:text-base max-w-[600px] mx-auto mb-8">
-        Watch how the 11-agent pipeline audits real IC memos for cognitive bias, measures decision
+        Watch how the 12-node pipeline audits real IC memos for cognitive bias, measures decision
         noise, and generates actionable intelligence.
       </p>
 
@@ -928,7 +928,7 @@ function DemoVideoSection() {
             <Play size={28} className="text-slate-400 ml-1" />
           </div>
           <p className="text-slate-500 text-sm max-w-[400px]">
-            Try the interactive demo below — upload a sample document and watch the 11-agent bias
+            Try the interactive demo below — upload a sample document and watch the 12-node bias
             detection pipeline in real time.
           </p>
         </div>

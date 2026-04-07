@@ -190,7 +190,7 @@ function routeAfterAnonymization(state: typeof GraphState.State): string {
 }
 
 // Graph Definition — Optimized Super-Node Architecture with Intelligence Layer
-// Flow: gdprAnonymizer → structurer → intelligenceGatherer → 5 parallel analysis nodes → riskScorer
+// Flow: gdprAnonymizer → structurer → intelligenceGatherer → 7 parallel analysis nodes → metaJudge → riskScorer
 const workflow = new StateGraph(GraphState)
   .addNode('gdprAnonymizer', gdprAnonymizerNode)
   .addNode('structurer', structurerNode)
@@ -217,7 +217,7 @@ const workflow = new StateGraph(GraphState)
   // structurer → intelligence gathering (extracts topics + assembles context)
   .addEdge('structurer', 'intelligenceGatherer')
 
-  // Fan-out: intelligenceGatherer → 6 parallel super-nodes (all receive context via state)
+  // Fan-out: intelligenceGatherer → 7 parallel super-nodes (all receive context via state)
   .addEdge('intelligenceGatherer', 'biasDetective')
   .addEdge('intelligenceGatherer', 'noiseJudge')
   .addEdge('intelligenceGatherer', 'verificationNode')
@@ -226,7 +226,7 @@ const workflow = new StateGraph(GraphState)
   .addEdge('intelligenceGatherer', 'rpdRecognitionNode')
   .addEdge('intelligenceGatherer', 'forgottenQuestionsNode')
 
-  // Fan-in: 7 super-nodes → metaJudgeNode
+  // Fan-in: all 7 parallel super-nodes → metaJudgeNode
   .addEdge('biasDetective', 'metaJudgeNode')
   .addEdge('noiseJudge', 'metaJudgeNode')
   .addEdge('verificationNode', 'metaJudgeNode')

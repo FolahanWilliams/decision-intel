@@ -168,7 +168,7 @@ const COMPARISON_ROWS: Array<{ dim: string; cloverpop: string; di: string }> = [
   {
     dim: 'AI Capabilities',
     cloverpop: 'D-Sight: summarization, KPI synthesis, recommendations',
-    di: '11-agent LangGraph pipeline: bias detection, noise simulation, adversarial debate',
+    di: '12-node LangGraph pipeline: bias detection, noise simulation, adversarial debate',
   },
   { dim: 'Bias Detection', cloverpop: 'None', di: '20+ types with compound interaction matrix' },
   {
@@ -285,9 +285,9 @@ function CloverpopComparison() {
 const QA_ITEMS: Array<{ q: string; a: string; proof?: string }> = [
   {
     q: 'Cloverpop has been around since 2012, raised $12.6M, and was acquired. They just integrated D-Sight AI. What stops them from wiping you out?',
-    a: "Cloverpop built a brilliant workflow tool — essentially Jira for decisions. It relies on humans manually logging what they decided and why. But that is their vulnerability. Cloverpop assumes the humans entering the data are rational. Decision Intel assumes they are not. Our 11-agent pipeline ingests the 50-page IC memo and autonomously audits the invisible flaws in that rationale. By the time a decision makes it into Cloverpop's Decision Bank, the Confirmation Bias and Sunk Cost Fallacy are already baked in. We intercept the cognitive noise before the vote happens.",
+    a: "Cloverpop built a brilliant workflow tool — essentially Jira for decisions. It relies on humans manually logging what they decided and why. But that is their vulnerability. Cloverpop assumes the humans entering the data are rational. Decision Intel assumes they are not. Our 12-node pipeline ingests the 50-page IC memo and autonomously audits the invisible flaws in that rationale. By the time a decision makes it into Cloverpop's Decision Bank, the Confirmation Bias and Sunk Cost Fallacy are already baked in. We intercept the cognitive noise before the vote happens.",
     proof:
-      'src/lib/agents/graph.ts — 11-node LangGraph pipeline with GDPR gating, adversarial debate, compound scoring',
+      'src/lib/agents/graph.ts — 12-node LangGraph pipeline with GDPR gating, adversarial debate, compound scoring',
   },
   {
     q: "You're laser-focused on PE/VC. Aren't you artificially limiting your TAM?",
@@ -297,7 +297,7 @@ const QA_ITEMS: Array<{ q: string; a: string; proof?: string }> = [
   },
   {
     q: "You're a solo founder. They have millions and a massive team. Can't they reverse-engineer your pipeline in two months?",
-    a: "The 11-agent pipeline is my temporary moat to get to market fast. My structural moat is the Decision Knowledge Graph and the Causal Loop, powered by pgvector and our proprietary failure database. If Cloverpop builds 11 agents, they're just doing text analysis. Decision Intel is building a closed-loop causal database. We ingest the deal memo, our agents flag a 94% probability of Groupthink, and then three years later, we tie that specific bias to the actual IRR/MOIC of the exited deal. Once my platform can mathematically prove that 'Memos flagged for Sunk Cost Fallacy correlate with a 12% drop in MOIC,' I have a proprietary dataset that no one can replicate — because that data lives entirely in private financial markets.",
+    a: "The 12-node pipeline is my temporary moat to get to market fast. My structural moat is the Decision Knowledge Graph and the Causal Loop, powered by pgvector and our proprietary failure database. If Cloverpop builds 12 pipeline nodes, they're just doing text analysis. Decision Intel is building a closed-loop causal database. We ingest the deal memo, our agents flag a 94% probability of Groupthink, and then three years later, we tie that specific bias to the actual IRR/MOIC of the exited deal. Once my platform can mathematically prove that 'Memos flagged for Sunk Cost Fallacy correlate with a 12% drop in MOIC,' I have a proprietary dataset that no one can replicate — because that data lives entirely in private financial markets.",
     proof:
       'src/lib/graph/graph-builder.ts — pgvector knowledge graph with PageRank, Union-Find clustering, outcome-weighted edge learning. src/lib/learning/toxic-combinations.ts — org-calibrated toxic pattern engine',
   },
@@ -323,7 +323,7 @@ const QA_ITEMS: Array<{ q: string; a: string; proof?: string }> = [
   },
   {
     q: 'Show me traction.',
-    a: "Working product at production URL. 11-node AI pipeline processing real documents end-to-end. Full auth (Google OAuth), multi-tenant orgs, team collaboration. Compliance frameworks (FCA, SOX, Basel III) fully implemented. Reviewed by the senior consultant who helped take Wiz public at $32B — quote: 'genuinely fascinated by the role of unconscious cognitive biases in decision-making.' LRQA executive (global risk management firm) review in progress. 146 reverse-engineered case studies across 8 industries. And Cloverpop's Inc. 5000 #608 ranking with 300% growth validates that the decision intelligence category has enterprise demand.",
+    a: "Working product at production URL. 12-node AI pipeline processing real documents end-to-end. Full auth (Google OAuth), multi-tenant orgs, team collaboration. Compliance frameworks (FCA, SOX, Basel III) fully implemented. Reviewed by the senior consultant who helped take Wiz public at $32B — quote: 'genuinely fascinated by the role of unconscious cognitive biases in decision-making.' LRQA executive (global risk management firm) review in progress. 146 reverse-engineered case studies across 8 industries. And Cloverpop's Inc. 5000 #608 ranking with 300% growth validates that the decision intelligence category has enterprise demand.",
   },
 ];
 
@@ -539,7 +539,7 @@ const MOAT_ITEMS: Array<{
   why: string;
 }> = [
   {
-    name: '11-Agent LangGraph Pipeline',
+    name: '12-Node LangGraph Pipeline',
     strength: 'High',
     color: '#f59e0b',
     timeline: 'Day 1',
@@ -663,7 +663,7 @@ const OBJECTIONS: Array<{ objection: string; response: string }> = [
   {
     objection: 'Solo founder risk',
     response:
-      '183K+ lines of production TypeScript, 233+ automated tests, standard Next.js/Postgres/LangGraph stack. The codebase IS the company — not tribal knowledge. Any senior full-stack engineer can onboard in weeks. First hire is already scoped. Advised by a senior consultant who helped take Wiz from startup to $32B.',
+      '199K+ lines of production TypeScript, 586+ automated tests, standard Next.js/Postgres/LangGraph stack. The codebase IS the company — not tribal knowledge. Any senior full-stack engineer can onboard in weeks. First hire is already scoped. Advised by a senior consultant who helped take Wiz from startup to $32B.',
   },
   {
     objection: 'Market timing — is decision intelligence a real category?',

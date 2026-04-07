@@ -77,7 +77,7 @@ export function StrategyAndPositioningTab() {
             'Requires extensive outcome data to validate which dissent matters',
           ],
           [
-            '11-Node LangGraph Pipeline',
+            '12-Node LangGraph Pipeline',
             'High',
             'GDPR gate, fan-out/fan-in, per-node safety tiers, meta-judge debate, retry+backoff — architecture alone takes weeks to replicate',
           ],
@@ -246,7 +246,7 @@ export function StrategyAndPositioningTab() {
             <ul
               style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.7, paddingLeft: 14 }}
             >
-              <li>11-agent pipeline with deterministic compound scoring on top</li>
+              <li>12-node pipeline with deterministic compound scoring on top</li>
               <li>Every outcome makes the platform smarter (causal learning)</li>
               <li>Statistical jury with 3 independent judges</li>
               <li>Per-org calibration profiles learned from outcomes</li>
@@ -310,7 +310,7 @@ export function StrategyAndPositioningTab() {
               what: 'AI assistant for PE firms — automates CIM summarization, deal screening, data room analysis.',
               gap: "Summarizes and structures data but doesn't detect cognitive biases, measure noise, or track decision outcomes.",
               response:
-                '"Blueflame reads the documents faster. We read the decision-maker\'s blind spots. Our 11-agent pipeline detects 20 biases they can\'t see."',
+                '"Blueflame reads the documents faster. We read the decision-maker\'s blind spots. Our 12-node pipeline detects 20 biases they can\'t see."',
               color: '#ef4444',
             },
             {
