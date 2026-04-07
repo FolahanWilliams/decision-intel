@@ -172,15 +172,25 @@ export function detectWinnerEffect(content: string): {
   detected: boolean;
   matchCount: number;
   matches: string[];
+  signalDensity: number;
 } {
-  if (!content) return { detected: false, matchCount: 0, matches: [] };
+  if (!content) return { detected: false, matchCount: 0, matches: [], signalDensity: 0 };
   const matches: string[] = [];
   for (const pattern of WINNER_EFFECT_PATTERNS) {
     const match = content.match(pattern);
     if (match) matches.push(match[0]);
   }
-  // Require 2+ pattern matches to reduce false positives
-  return { detected: matches.length >= 2, matchCount: matches.length, matches };
+  // Signal density: matches relative to document length (sentences approximated by periods)
+  const sentenceCount = Math.max((content.match(/[.!?]+/g) || []).length, 1);
+  const signalDensity = matches.length / sentenceCount;
+  // Require 3+ pattern matches AND density > 0.05 to reduce false positives from
+  // factual reporting (e.g., "record profits in Q3" in an earnings summary)
+  return {
+    detected: matches.length >= 3 && signalDensity > 0.05,
+    matchCount: matches.length,
+    matches,
+    signalDensity,
+  };
 }
 
 /**
@@ -192,15 +202,25 @@ export function detectStressSignals(content: string): {
   detected: boolean;
   matchCount: number;
   matches: string[];
+  signalDensity: number;
 } {
-  if (!content) return { detected: false, matchCount: 0, matches: [] };
+  if (!content) return { detected: false, matchCount: 0, matches: [], signalDensity: 0 };
   const matches: string[] = [];
   for (const pattern of STRESS_SIGNAL_PATTERNS) {
     const match = content.match(pattern);
     if (match) matches.push(match[0]);
   }
-  // Require 2+ pattern matches to reduce false positives
-  return { detected: matches.length >= 2, matchCount: matches.length, matches };
+  // Signal density: matches relative to document length
+  const sentenceCount = Math.max((content.match(/[.!?]+/g) || []).length, 1);
+  const signalDensity = matches.length / sentenceCount;
+  // Require 3+ pattern matches AND density > 0.05 to exclude risk-acknowledging
+  // language (e.g., "volatile market conditions require caution" is prudent)
+  return {
+    detected: matches.length >= 3 && signalDensity > 0.05,
+    matchCount: matches.length,
+    matches,
+    signalDensity,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -244,6 +264,12 @@ const DEFAULT_INTERACTION_WEIGHTS: Record<string, number> = {
   'paradox_of_choice::status_quo_bias': 1.4,
   'paradox_of_choice::cognitive_misering': 1.3,
   'paradox_of_choice::loss_aversion': 1.3,
+
+  // Suppression interactions — genuinely opposing biases dampen each other
+  'loss_aversion::overconfidence_bias': 0.8, // Loss Aversion counteracts Overconfidence
+  'status_quo_bias::planning_fallacy': 0.85, // Status Quo resists Planning Fallacy optimism
+  'anchoring_bias::recency_bias': 0.9, // Anchoring resists Recency
+  'loss_aversion::gamblers_fallacy': 0.85, // Loss Aversion dampens Gambler's risk-taking
 };
 
 // ---------------------------------------------------------------------------

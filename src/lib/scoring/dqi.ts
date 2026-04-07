@@ -126,6 +126,12 @@ export interface DQIComponent {
 // Constants
 // ---------------------------------------------------------------------------
 
+/**
+ * Default DQI component weights — expert priors pending empirical validation.
+ * Once 100+ confirmed outcomes are available, run regression of component scores
+ * against outcome quality to derive optimal weights. Until then, these are
+ * research-informed estimates that can be overridden per-org via computeDQI().
+ */
 export const WEIGHTS = {
   biasLoad: 0.28,
   noiseLevel: 0.18,
@@ -134,6 +140,30 @@ export const WEIGHTS = {
   complianceRisk: 0.13,
   historicalAlignment: 0.1,
 };
+
+/** Compute effective weights by blending org overrides with defaults.
+ *  mixCoeff scales with org outcome count: 0 at 0, 0.5 at 50, 0.8 at 200+.
+ */
+export function computeEffectiveWeights(
+  orgOverrides?: Partial<typeof WEIGHTS>,
+  orgOutcomeCount?: number
+): typeof WEIGHTS {
+  if (!orgOverrides || !orgOutcomeCount || orgOutcomeCount === 0) return { ...WEIGHTS };
+  // mixCoeff: sigmoid ramp from 0→0.8 based on org outcome count
+  const mixCoeff = Math.min(0.8, orgOutcomeCount / (orgOutcomeCount + 50));
+  const effective = { ...WEIGHTS };
+  for (const key of Object.keys(WEIGHTS) as Array<keyof typeof WEIGHTS>) {
+    if (orgOverrides[key] !== undefined) {
+      effective[key] = WEIGHTS[key] * (1 - mixCoeff) + orgOverrides[key]! * mixCoeff;
+    }
+  }
+  // Re-normalize so weights still sum to 1.0
+  const total = Object.values(effective).reduce((s, v) => s + v, 0);
+  for (const key of Object.keys(effective) as Array<keyof typeof WEIGHTS>) {
+    effective[key] /= total;
+  }
+  return effective;
+}
 
 const BIAS_SEVERITY_COST: Record<string, number> = {
   critical: 20,
@@ -655,13 +685,21 @@ export function getHistoricalComparisons(dqiScore: number): Array<{
  * Returns a single 0-100 score with component breakdown, letter grade,
  * and actionable improvement recommendations.
  */
-export function computeDQI(input: DQIInput): DQIResult {
+export function computeDQI(
+  input: DQIInput,
+  options?: {
+    /** Org-specific weight overrides (blended with defaults based on outcome count) */
+    orgWeightOverrides?: Partial<typeof WEIGHTS>;
+    /** Number of confirmed outcomes for this org (controls override mix strength) */
+    orgOutcomeCount?: number;
+  }
+): DQIResult {
   // Auto-compute System 1 ratio if not provided
   if (input.process.system1Ratio === undefined) {
     input.process.system1Ratio = computeSystem1Ratio(input.biases) ?? undefined;
   }
 
-  // Compute each component
+  // Compute each component (using default weights for per-component display)
   const biasLoad = scoreBiasLoad(input.biases);
   const noiseLevel = scoreNoiseLevel(input.noiseStats);
   const evidenceQuality = scoreEvidenceQuality(input.factCheck);
@@ -678,14 +716,15 @@ export function computeDQI(input: DQIInput): DQIResult {
     historicalAlignment,
   };
 
-  // Compute weighted total
+  // Compute weighted total using effective weights (org-blended if overrides provided)
+  const ew = computeEffectiveWeights(options?.orgWeightOverrides, options?.orgOutcomeCount);
   const rawScore =
-    biasLoad.weighted +
-    noiseLevel.weighted +
-    evidenceQuality.weighted +
-    processMaturity.weighted +
-    complianceRisk.weighted +
-    historicalAlignment.weighted;
+    biasLoad.score * ew.biasLoad +
+    noiseLevel.score * ew.noiseLevel +
+    evidenceQuality.score * ew.evidenceQuality +
+    processMaturity.score * ew.processMaturity +
+    complianceRisk.score * ew.complianceRisk +
+    historicalAlignment.score * ew.historicalAlignment;
 
   // If compound score is available, blend it in (10% influence)
   let finalScore = rawScore;
