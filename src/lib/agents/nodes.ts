@@ -452,10 +452,10 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
     // Build prompt with ontology context (compound interactions + industry biases)
     let biasPrompt = buildEnrichedBiasPrompt(detectedIndustry);
 
-    // PE/VC Investment Vertical: Append investment-specific bias detection overlay
+    // Corporate Strategy / M&A Vertical: Append strategy-specific bias detection overlay
     const investmentOverlay = buildInvestmentBiasOverlay(state.documentType, state.dealStage);
     if (investmentOverlay) {
-      biasPrompt += `\n\n--- INVESTMENT COMMITTEE CONTEXT ---\n${investmentOverlay}`;
+      biasPrompt += `\n\n--- STRATEGIC DECISION CONTEXT ---\n${investmentOverlay}`;
       log.info(
         `Using investment-specific bias detection (docType=${state.documentType}, stage=${state.dealStage || 'unknown'})`
       );
@@ -575,10 +575,10 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
         ? `\n\nEXTERNAL BENCHMARKS FOR COMPARISON:\n${macroContext ? `Macro: ${macroContext}\n` : ''}${benchmarkContext ? `Industry: ${benchmarkContext}` : ''}`
         : '';
 
-    // PE/VC Investment Vertical: Append investment noise overlay if applicable
+    // Corporate Strategy / M&A Vertical: Append strategy noise overlay if applicable
     const investmentNoiseOverlay = buildInvestmentNoiseOverlay(state.documentType);
     const noisePrompt = investmentNoiseOverlay
-      ? `${NOISE_JUDGE_PROMPT}\n\n--- INVESTMENT COMMITTEE CONTEXT ---\n${investmentNoiseOverlay}`
+      ? `${NOISE_JUDGE_PROMPT}\n\n--- STRATEGIC DECISION CONTEXT ---\n${investmentNoiseOverlay}`
       : NOISE_JUDGE_PROMPT;
     if (investmentNoiseOverlay) {
       log.info(`Using investment-specific noise evaluation (docType=${state.documentType})`);
@@ -1354,11 +1354,11 @@ export async function simulationNode(state: AuditState): Promise<Partial<AuditSt
     }
 
     // Step 4: Build dynamic prompt with custom personas + outcome awareness
-    // PE/VC Investment Vertical: Use PE boardroom personas when no custom personas
-    // are configured and the document is investment-related
+    // Corporate Strategy / M&A Vertical: Use executive personas when no custom personas
+    // are configured and the document is strategy/M&A-related
     if (customPersonas.length === 0 && isInvestmentDocument(state.documentType)) {
       customPersonas = PE_BOARDROOM_PERSONAS;
-      log.info('Using PE/VC boardroom personas for investment document simulation');
+      log.info('Using corporate executive personas for strategy/M&A document simulation');
     }
 
     const { buildSimulationPrompt } = await import('./prompts');
@@ -1816,12 +1816,12 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
       state.cognitiveAnalysis?.blindSpotGap != null && state.cognitiveAnalysis.blindSpotGap > 50;
     const speakers = state.speakers || [];
 
-    // PE/VC Investment Vertical: Auto-set very_high stakes for deal-linked documents
-    // IC review and closing stages get additional weight via the compound engine
+    // Corporate Strategy / M&A Vertical: Auto-set very_high stakes for deal-linked documents
+    // Committee review and closing stages get additional weight via the compound engine
     const monetaryStakes: 'unknown' | 'low' | 'medium' | 'high' | 'very_high' =
       state.dealType || isInvestmentDocument(state.documentType) ? 'very_high' : 'unknown';
     if (monetaryStakes === 'very_high') {
-      log.info('PE/VC context: auto-setting monetary stakes to very_high for compound scoring');
+      log.info('Strategy/M&A context: auto-setting monetary stakes to very_high for compound scoring');
     }
 
     const compoundContext = {

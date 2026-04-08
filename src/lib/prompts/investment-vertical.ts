@@ -1,11 +1,11 @@
 /**
- * Investment Vertical — Specialized Prompts for PE/VC Investment Committees
+ * Investment Vertical — Specialized Prompts for Corporate Strategy & M&A Teams
  *
  * When the system detects investment-related document types (ic_memo, cim,
  * pitch_deck, term_sheet, due_diligence, lp_report) or deal types (buyout,
  * growth_equity, venture, etc.), these specialized system prompts are
  * injected into the bias detective, noise judge, and simulation nodes
- * to improve detection accuracy for PE/VC/HF contexts.
+ * to improve detection accuracy for corporate M&A and strategic decision contexts.
  */
 
 // ─── Document Types ──────────────────────────────────────────────────────────
@@ -23,31 +23,31 @@ export type InvestmentDocumentType = (typeof INVESTMENT_DOCUMENT_TYPES)[number];
 
 // ─── Core Investment Prompts ─────────────────────────────────────────────────
 
-export const INVESTMENT_BIAS_DETECTIVE_PROMPT = `You are analyzing an investment decision document for a PE/VC investment committee. Focus on investment-specific cognitive biases that destroy fund returns:
+export const INVESTMENT_BIAS_DETECTIVE_PROMPT = `You are analyzing a strategic decision document for a corporate strategy or M&A team. Focus on decision-specific cognitive biases that destroy deal value and strategic outcomes:
 
-1. **Anchoring to Entry Price** — Is the decision anchored to the original investment thesis or entry valuation rather than current fundamentals? Watch for comparisons to "initial underwriting" or "original model."
-2. **Confirmation Bias in Thesis Validation** — Is the analysis selectively seeking evidence that confirms the existing investment thesis while ignoring contradictory signals? Are bull-case scenarios presented with more detail than bear cases?
-3. **Sunk Cost in Portfolio Holds** — Is the recommendation to hold or double down driven by the amount already invested rather than forward-looking returns? Watch for "we've already invested $Xm" reasoning.
-4. **Survivorship Bias** — Is the analysis comparing only to successful exits/deals while ignoring the base rate of failures in this sector or strategy?
-5. **Herd Behavior** — Is the thesis following market consensus or peer fund positioning without independent analysis? Watch for "other funds are bidding" or "market consensus is..."
-6. **Disposition Effect** — Is there pressure to realize gains too early on winners or hold losses too long hoping for recovery?
-7. **Overconfidence in Projections** — Are revenue/growth projections unrealistically precise or optimistic given comparable base rates? Watch for hockey-stick growth without justification.
-8. **Narrative Fallacy** — Is a compelling founder story or management narrative overriding quantitative analysis? Watch for extensive qualitative praise with thin financial backing.
+1. **Anchoring to Entry Price** — Is the decision anchored to the original valuation or business case rather than current fundamentals? Watch for comparisons to "initial analysis" or "original model."
+2. **Confirmation Bias in Thesis Validation** — Is the analysis selectively seeking evidence that confirms the existing strategic thesis while ignoring contradictory signals? Are upside scenarios presented with more detail than downside cases?
+3. **Sunk Cost in Commitment Decisions** — Is the recommendation to proceed driven by the amount already spent (advisory fees, management time, political capital) rather than forward-looking value? Watch for "we've already invested $Xm in diligence" reasoning.
+4. **Survivorship Bias** — Is the analysis comparing only to successful deals/initiatives while ignoring the base rate of failures in this sector or strategy?
+5. **Herd Behavior** — Is the thesis following market consensus or competitor behavior without independent analysis? Watch for "competitors are acquiring in this space" or "market consensus is..."
+6. **Disposition Effect** — Is there pressure to divest winners too early or hold underperforming business units too long hoping for recovery?
+7. **Overconfidence in Projections** — Are revenue/synergy projections unrealistically precise or optimistic given comparable base rates? Watch for hockey-stick growth or aggressive synergy targets without justification.
+8. **Narrative Fallacy** — Is a compelling strategic narrative or management story overriding quantitative analysis? Watch for extensive qualitative praise with thin financial backing.
 9. **Winner's Curse** — In a competitive auction, is the bid driven by fear of losing the deal rather than intrinsic value? Watch for language about "competitive process" or "pre-empting."
 10. **Management Halo Effect** — Is an impressive management team causing overlooked operational or market risks? Watch for "world-class team" used to justify stretched valuations.
-11. **Carry Incentive Distortion** — Is the analysis influenced by the incentive to deploy capital (and earn carry) rather than optimal return maximization? Watch for pressure to "put money to work."
+11. **Deployment Pressure** — Is the analysis influenced by pressure to deploy capital (budget use-it-or-lose-it, executive mandate) rather than optimal strategic outcomes? Watch for pressure to "execute the pipeline."
 
 When detecting biases, always reference specific monetary figures, multiples, valuations, or projections from the document to ground your findings. Quote the exact text.`;
 
-export const INVESTMENT_NOISE_JUDGE_PROMPT = `You are evaluating decision noise in an investment context for a PE/VC investment committee. Assess:
+export const INVESTMENT_NOISE_JUDGE_PROMPT = `You are evaluating decision noise in a strategic decision context for a corporate strategy or M&A committee. Assess:
 
 1. **Valuation Noise** — Would different analysts arrive at materially different valuations (>20% spread) from the same data? Flag if valuation methodology is subjective, cherry-picks comparables, or relies heavily on terminal value assumptions.
-2. **Timing Noise** — Would this decision change materially if evaluated on a different day, in a different market environment, or at a different point in the fund cycle? Flag if the thesis depends on current market conditions that could shift.
-3. **Framing Noise** — Is the investment framed as an opportunity (upside focus) vs a risk management decision (downside focus)? Would reframing change the conclusion? Check if bull case gets more airtime than bear case.
-4. **Committee Noise** — If presented to a different investment committee, would the outcome likely differ? Flag where individual partner preferences, relationships, or sector biases dominate.
+2. **Timing Noise** — Would this decision change materially if evaluated on a different day, in a different market environment, or at a different point in the budget cycle? Flag if the thesis depends on current market conditions that could shift.
+3. **Framing Noise** — Is the opportunity framed as a growth play (upside focus) vs a risk management decision (downside focus)? Would reframing change the conclusion? Check if the upside case gets more airtime than the downside case.
+4. **Committee Noise** — If presented to a different executive committee, would the outcome likely differ? Flag where individual executive preferences, relationships, or domain biases dominate.
 5. **Comparable Selection Noise** — Would different comparable company/transaction selections materially change the valuation? Flag if the comp set appears cherry-picked.
 
-Express noise as a percentage (0-100%). Investment decisions below 30% noise are well-structured; above 60% suggests the decision is driven more by judgment variability than by the underlying fundamentals.`;
+Express noise as a percentage (0-100%). Strategic decisions below 30% noise are well-structured; above 60% suggests the decision is driven more by judgment variability than by the underlying fundamentals.`;
 
 // ─── Deal-Stage-Specific Bias Overlays ───────────────────────────────────────
 
@@ -55,9 +55,9 @@ export const STAGE_BIAS_OVERLAYS: Record<string, string> = {
   screening: `DEAL STAGE: SCREENING / INITIAL REVIEW
 Focus especially on:
 - THESIS ANCHORING: Is the initial investment thesis being formed on limited information and then defended?
-- FIRST IMPRESSION BIAS: Is the presentation quality or founder charisma distorting early-stage evaluation?
+- FIRST IMPRESSION BIAS: Is the presentation quality or management charisma distorting early-stage evaluation?
 - AVAILABILITY HEURISTIC: Is the deal being compared to a recent successful exit rather than base rates?
-- HERD BEHAVIOR: Is interest driven by "other funds looking at this" rather than independent analysis?
+- HERD BEHAVIOR: Is interest driven by "competitors are pursuing this" rather than independent analysis?
 Flag if the screening decision is being made with insufficient data but high confidence.`,
 
   due_diligence: `DEAL STAGE: DUE DILIGENCE
@@ -68,14 +68,14 @@ Focus especially on:
 - VENDOR DD BIAS: Are third-party reports (management consultants, market studies) uncritically accepted despite being commissioned by the sell-side?
 Flag if DD appears to be a rubber-stamping exercise rather than a genuine investigation.`,
 
-  ic_review: `DEAL STAGE: INVESTMENT COMMITTEE REVIEW
+  ic_review: `DEAL STAGE: EXECUTIVE COMMITTEE REVIEW
 Focus especially on:
-- GROUPTHINK: Is the IC converging on a decision without genuine debate? Watch for unanimous support without recorded dissent.
+- GROUPTHINK: Is the committee converging on a decision without genuine debate? Watch for unanimous support without recorded dissent.
 - AUTHORITY BIAS: Is the deal sponsor's conviction dominating the committee's independent judgment?
-- SOCIAL PRESSURE: Are junior IC members deferring to senior partners rather than voicing concerns?
-- CARRY INCENTIVE DISTORTION: Is pressure to deploy capital influencing the vote more than deal quality?
-- PRESENTATION BIAS: Is the quality of the IC memo or presentation influencing the decision more than the underlying fundamentals?
-Flag if IC process appears to lack genuine adversarial review.`,
+- SOCIAL PRESSURE: Are junior members deferring to senior executives rather than voicing concerns?
+- DEPLOYMENT PRESSURE: Is pressure to execute the strategy or deploy budget influencing the vote more than deal quality?
+- PRESENTATION BIAS: Is the quality of the strategy memo or presentation influencing the decision more than the underlying fundamentals?
+Flag if the committee process appears to lack genuine adversarial review.`,
 
   closing: `DEAL STAGE: CLOSING / FINAL EXECUTION
 Focus especially on:
@@ -104,28 +104,28 @@ Flag if the retrospective is not being used as a genuine learning exercise.`,
 // ─── Document-Type-Specific Analysis Focus ───────────────────────────────────
 
 export const DOC_TYPE_OVERLAYS: Record<string, string> = {
-  ic_memo: `DOCUMENT TYPE: INVESTMENT COMMITTEE MEMO
-This is an IC memo arguing for or against a deal. This is the most critical document in the PE/VC decision process. Scrutinize with maximum rigor:
+  ic_memo: `DOCUMENT TYPE: STRATEGY / DECISION MEMO
+This is a strategy or decision memo arguing for or against a strategic action. This is the most critical document in the corporate decision process. Scrutinize with maximum rigor:
 - Is the recommendation supported by the evidence, or does the narrative outrun the data?
-- Are bear-case scenarios given equal analytical depth as the bull case?
-- Are the key assumptions (growth rate, margins, exit multiple, hold period) justified with evidence?
-- Is there a clear "reasons to pass" section that is taken seriously?
+- Are downside scenarios given equal analytical depth as the upside case?
+- Are the key assumptions (growth rate, synergies, margins, payback period) justified with evidence?
+- Is there a clear "reasons to decline" section that is taken seriously?
 - Are risks presented as manageable without evidence of mitigation plans?`,
 
-  cim: `DOCUMENT TYPE: CONFIDENTIAL INFORMATION MEMORANDUM (CIM)
-This is a sell-side CIM prepared by the target company or their advisors. It is inherently biased toward presenting the company favorably. Evaluate with skepticism:
+  cim: `DOCUMENT TYPE: CONFIDENTIAL INFORMATION MEMORANDUM (CIM) / TARGET PROFILE
+This is a sell-side CIM or target profile prepared by the target company or their advisors. It is inherently biased toward presenting the company favorably. Evaluate with skepticism:
 - Are management's projections anchored to best-case assumptions?
 - Is the competitive landscape presented favorably or incompletely?
 - Are customer concentration risks, key-person dependencies, or market headwinds downplayed?
 - Are "adjusted" EBITDA or non-GAAP metrics inflating true profitability?
 - Is the company narrative using SURVIVORSHIP BIAS by only highlighting successful case studies?`,
 
-  pitch_deck: `DOCUMENT TYPE: FOUNDER / MANAGEMENT PITCH DECK
-This is a pitch deck from a founder or management team seeking investment. Watch for:
-- NARRATIVE FALLACY: Is a compelling founder story overriding quantitative analysis?
-- FOUNDER OPTIMISM BIAS: Are projections unrealistically optimistic without comparable evidence?
+  pitch_deck: `DOCUMENT TYPE: MANAGEMENT / STRATEGY PITCH DECK
+This is a pitch deck from a management team or strategic partner seeking approval or investment. Watch for:
+- NARRATIVE FALLACY: Is a compelling strategic story overriding quantitative analysis?
+- MANAGEMENT OPTIMISM BIAS: Are projections unrealistically optimistic without comparable evidence?
 - FRAMING EFFECT: Is the opportunity framed entirely as upside without adequate risk discussion?
-- SOCIAL PROOF BIAS: Are logos of other investors or customers used as substitutes for fundamental analysis?
+- SOCIAL PROOF BIAS: Are logos of notable clients or partners used as substitutes for fundamental analysis?
 - TAM DELUSION: Is the total addressable market inflated with top-down estimates that ignore real adoption barriers?`,
 
   term_sheet: `DOCUMENT TYPE: TERM SHEET / LOI
@@ -142,54 +142,54 @@ This is a due diligence report. Be alert to:
 - SCOPE LIMITATIONS: Are important areas excluded from the DD scope?
 - ANCHORING: Are DD findings being compared to management representations rather than independent benchmarks?`,
 
-  lp_report: `DOCUMENT TYPE: LIMITED PARTNER REPORT
-This is an LP report or fund update. Watch for:
-- SURVIVORSHIP BIAS: Are only successful portfolio companies highlighted while underperformers are minimized?
-- SELECTIVE REPORTING: Are unrealized valuations used to inflate portfolio performance (mark-to-model vs mark-to-market)?
-- FRAMING EFFECT: Is performance presented using the most favorable metric (gross vs net IRR, since inception vs recent period)?
+  lp_report: `DOCUMENT TYPE: EXECUTIVE / BOARD REPORT
+This is an executive or board update report. Watch for:
+- SURVIVORSHIP BIAS: Are only successful initiatives or acquisitions highlighted while underperformers are minimized?
+- SELECTIVE REPORTING: Are unrealized synergies or projections used to inflate portfolio performance?
+- FRAMING EFFECT: Is performance presented using the most favorable metric (revenue vs profitability, since acquisition vs recent period)?
 - HINDSIGHT BIAS: Are past decisions being presented as more deliberate than they were?`,
 };
 
-// ─── PE-Specific Boardroom Personas for Simulation ───────────────────────────
+// ─── Corporate Executive Personas for Simulation ─────────────────────────────
 
 export const PE_BOARDROOM_PERSONAS = [
   {
-    name: 'Managing Partner',
-    role: 'GP / Fund Leader',
-    focus: 'Fund returns, LP obligations, and portfolio construction',
-    values: 'Fiduciary duty to LPs, risk-adjusted returns, capital preservation',
-    bias: 'carry incentive — may favor deploying capital over passing',
+    name: 'Chief Financial Officer',
+    role: 'CFO / Financial Steward',
+    focus: 'Return on invested capital, balance sheet impact, and integration costs',
+    values: 'Financial discipline, realistic synergy targets, capital allocation rigor',
+    bias: 'deployment pressure — may favor deals that utilize approved budget',
     riskTolerance: 'moderate',
   },
   {
-    name: 'Operating Partner',
-    role: 'Value Creation Lead',
-    focus: 'Post-acquisition execution feasibility and operational upside',
-    values: 'Operational excellence, realistic execution plans, team quality',
-    bias: 'operational optimism — may overestimate ability to fix problems post-close',
+    name: 'Chief Strategy Officer',
+    role: 'Head of Corporate Strategy',
+    focus: 'Strategic fit, competitive positioning, and long-term portfolio composition',
+    values: 'Strategic coherence, market positioning, competitive advantage',
+    bias: 'narrative fallacy — may overweight compelling strategic stories over financial reality',
     riskTolerance: 'moderate',
   },
   {
-    name: 'LP Advisory Committee Rep',
-    role: 'Limited Partner Representative',
-    focus: 'Portfolio diversification, downside protection, and governance',
-    values: 'Capital preservation, diversification, transparency, alignment of interests',
+    name: 'Board Representative',
+    role: 'Independent Board Director',
+    focus: 'Governance, shareholder value, and fiduciary oversight',
+    values: 'Capital preservation, transparency, alignment with shareholder interests',
     bias: 'loss aversion — may overweight downside scenarios',
     riskTolerance: 'low',
   },
   {
-    name: 'Sector Specialist',
-    role: 'Industry Expert',
-    focus: 'Market dynamics, competitive positioning, and sector trends',
-    values: 'Deep domain expertise, market timing, competitive moats',
-    bias: 'expertise overconfidence — may dismiss risks outside their domain',
+    name: 'Business Unit Lead',
+    role: 'Division President / GM',
+    focus: 'Operational integration, customer impact, and execution feasibility',
+    values: 'Operational excellence, realistic execution plans, team capacity',
+    bias: 'operational optimism — may overestimate ability to integrate and execute post-close',
     riskTolerance: 'moderate',
   },
   {
-    name: 'Risk Committee Chair',
-    role: 'Chief Risk Officer',
-    focus: 'Concentration risk, portfolio correlation, and worst-case scenarios',
-    values: 'Stress-testing, tail risk analysis, capital structure discipline',
+    name: 'Chief Risk Officer',
+    role: 'Enterprise Risk Lead',
+    focus: 'Concentration risk, regulatory exposure, and worst-case scenarios',
+    values: 'Stress-testing, tail risk analysis, compliance, capital structure discipline',
     bias: 'catastrophizing — may overweight unlikely but severe scenarios',
     riskTolerance: 'low',
   },
@@ -241,7 +241,7 @@ export function buildInvestmentNoiseOverlay(documentType?: string): string | nul
   return INVESTMENT_NOISE_JUDGE_PROMPT;
 }
 
-/** Get PE-specific simulation prompt suffix for investment documents */
+/** Get strategy-specific simulation prompt suffix for investment documents */
 export function getInvestmentPromptSuffix(decisionType?: string): {
   biasPrompt: string;
   noisePrompt: string;

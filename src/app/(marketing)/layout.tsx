@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Decision Intel — Grammarly for Strategic Decisions | AI Bias & Noise Detection',
   description:
-    "Decision Intel is the AI-powered decision hygiene platform that detects cognitive bias, measures decision noise, and calibrates your team's judgment — like Grammarly for strategic decisions. Used by M&A teams, corporate strategy, investment committees, and boards.",
+    "Decision Intel is the AI-powered decision hygiene platform that detects cognitive bias, measures decision noise, and calibrates your team's judgment — like Grammarly for strategic decisions. Used by corporate strategy teams, M&A departments, executive committees, and boards.",
   openGraph: {
     title: 'Decision Intel — Grammarly for Strategic Decisions',
     description:
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     // Enterprise audiences
     'M&A decision audit',
     'corporate strategy bias detection',
-    'investment committee analysis',
+    'executive committee analysis',
     'board decision quality',
     'executive decision-making tool',
     // Product capabilities
@@ -71,7 +71,7 @@ const jsonLd = [
     operatingSystem: 'Web',
     url: siteUrl,
     description:
-      'AI-powered decision hygiene platform that detects cognitive bias and noise in high-stakes enterprise decisions. Like Grammarly catches grammar errors before you hit send, Decision Intel catches cognitive biases before you sign the deal. Built for M&A teams, corporate strategy, investment committees, and boards.',
+      'AI-powered decision hygiene platform that detects cognitive bias and noise in high-stakes enterprise decisions. Like Grammarly catches grammar errors before you hit send, Decision Intel catches cognitive biases before you sign the deal. Built for corporate strategy teams, M&A departments, executive committees, and boards.',
     featureList: [
       '20+ cognitive bias types detected automatically',
       'Decision noise measurement via 3-judge AI jury',
@@ -133,7 +133,7 @@ const jsonLd = [
     url: siteUrl,
     logo: `${siteUrl}/logo.png`,
     description:
-      'Decision Intel is the AI-powered cognitive bias detection platform for PE/VC and M&A teams. Audit strategic documents for hidden biases, measure decision noise, and track outcomes.',
+      'Decision Intel is the AI-powered cognitive bias detection platform for corporate strategy and M&A teams. Audit strategic documents for hidden biases, measure decision noise, and track outcomes.',
     foundingDate: '2024',
     sameAs: ['https://www.linkedin.com/company/decision-intel'],
     contactPoint: {

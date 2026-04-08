@@ -7,18 +7,18 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.c
 
 export const metadata: Metadata = {
   title: `${ALL_CASES.length} real decisions we would have flagged | Decision Intel`,
-  description: `A public library of ${ALL_CASES.length} curated case studies — failures and successes — analyzed with the same bias and noise framework we run on live deals. Search by company, industry, or outcome.`,
+  description: `A public library of ${ALL_CASES.length} curated case studies — failures and successes — analyzed with the same bias and noise framework we run on live strategic decisions. Search by company, industry, or outcome.`,
   alternates: { canonical: `${siteUrl}/case-studies` },
   openGraph: {
     title: `${ALL_CASES.length} real decisions we would have flagged`,
-    description: `Curated case studies from SEC filings, NTSB reports, and post-mortems. Failure and success decisions analyzed with the same bias framework we run on live deals.`,
+    description: `Curated case studies from SEC filings, NTSB reports, and post-mortems. Failure and success decisions analyzed with the same bias framework we run on live strategic decisions.`,
     url: `${siteUrl}/case-studies`,
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: `${ALL_CASES.length} real decisions we would have flagged`,
-    description: `A public library of curated case studies analyzed with the same bias framework we run on live deals.`,
+    description: `A public library of curated case studies analyzed with the same bias framework we run on live strategic decisions.`,
   },
 };
 

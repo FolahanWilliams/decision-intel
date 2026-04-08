@@ -2,7 +2,7 @@
 
 ## What This Project Is
 
-Decision Intel is an AI-powered cognitive bias auditing platform for high-stakes decision teams. Users upload strategic documents (IC memos, M&A proposals, board papers) and get a comprehensive bias audit in under 60 seconds. The primary vertical is PE/VC investment committees; the expansion path is enterprise M&A/strategy/risk teams.
+Decision Intel is an AI-powered cognitive bias auditing platform for high-stakes decision teams. Users upload strategic documents (M&A memos, board papers, strategy proposals) and get a comprehensive bias audit in under 60 seconds. The primary vertical is corporate strategy and M&A teams; the expansion path is PE/VC investment committees and broader financial services.
 
 **Current phase: Refinement & consolidation.** The product has 200+ components and 70+ API routes — more features than most Series A companies. The priority is polishing the core flow (upload → analyze → review → track outcomes) to attract pilot users and raise pre/seed funding. Push back on scope creep. If a change doesn't make the first 60 seconds of a demo better, it probably shouldn't be the priority.
 
@@ -17,7 +17,7 @@ Decision Intel is an AI-powered cognitive bias auditing platform for high-stakes
 - No running bug tracker — bugs surface in conversation or via CI/CD failures.
 - Does NOT run `npm run build` locally — relies on Vercel CI to catch build errors. **Claude should always run `npm run build` or at minimum `npx tsc --noEmit` before pushing significant changes.**
 - Was unaware of the Gemini pre-commit hook. It may fail or be slow — use `--no-verify` if it blocks and the changes are tested.
-- No pilot users yet. Actively outreaching to PE/VC firms and M&A teams via advisor network.
+- No pilot users yet. Actively outreaching to corporate strategy and M&A teams via advisor network. PE/VC is a secondary expansion vertical.
 - Raising pre-seed/seed in the next 6 months. Needs a GTM/enterprise-sales co-founder or advisor.
 - No direct competitor in "decision quality auditing" — the closest is Cloverpop (decision management, not bias detection). The real competition is "do nothing" — teams don't audit their decision processes at all.
 - Current priorities: (1) land first paying customer, (2) build brand visibility via Content Studio, (3) polish demo flow.

@@ -196,7 +196,7 @@ export function LangGraphPipelineNarrative() {
               <strong style={{ color: 'var(--text-primary)' }}>Per-node safety calibration.</strong>{' '}
               Bias-detection runs with relaxed safety (BLOCK_NONE) because it must analyze
               potentially harmful content. Simulation runs at BLOCK_MEDIUM_AND_ABOVE. Most
-              competitors use one setting for everything — theirs crash or refuse on IC memos about
+              competitors use one setting for everything — theirs crash or refuse on strategy memos about
               litigation, layoffs, or controversial markets.
             </li>
             <li>
@@ -216,7 +216,7 @@ export function LangGraphPipelineNarrative() {
             </li>
             <li>
               <strong style={{ color: 'var(--text-primary)' }}>Investment vertical overlay.</strong>{' '}
-              PE/VC-specific bias models loaded conditionally based on org context, not a generic
+              Strategy and M&A-specific bias models loaded conditionally based on org context, not a generic
               prompt serving every industry badly.
             </li>
           </ul>
@@ -256,7 +256,7 @@ export function PromptEngineeringMoatNarrative() {
             </div>
             <p style={{ marginLeft: 12, marginBottom: 0 }}>
               Each node has a tuned prompt for a specific cognitive task: the bias detective prompt
-              uses few-shot examples from real IC memos; the noise judge prompt enforces the
+              uses few-shot examples from real strategy and M&A memos; the noise judge prompt enforces the
               three-judge jury structure; the pre-mortem prompt uses the RAND 10th-Man framework;
               the meta-judge prompt runs a structured debate protocol. Each was iterated against{' '}
               <strong style={{ color: 'var(--text-primary)' }}>real memo feedback</strong>, not
@@ -271,7 +271,7 @@ export function PromptEngineeringMoatNarrative() {
               A competitor can copy today&apos;s prompts in an afternoon if they see them. They
               cannot copy{' '}
               <strong style={{ color: 'var(--text-primary)' }}>18 months of tuning</strong> against
-              the specific failure modes that real PE/VC memos trigger. Every false-positive the
+              the specific failure modes that real strategy and M&A memos trigger. Every false-positive the
               thumbs-down button captures refines the next version. Every confirmed bias with a good
               outcome recalibrates severity. This is supervised learning on the prompt surface, not
               vibe-coded instruction text.
@@ -1113,7 +1113,7 @@ export function SalesToolkitTab() {
             </div>
             <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
               Don&apos;t ask &quot;what do you think?&quot; after the demo. Direct the next step:
-              &quot;Send me the last three IC memos that went sideways. I will run them through the
+              &quot;Send me the last three strategy memos that went sideways. I will run them through the
               engine and we will reconvene Thursday.&quot; Constructive tension over consensus.
             </div>
           </div>
@@ -1272,7 +1272,7 @@ export function SalesToolkitTab() {
             stage: 'Need-Payoff',
             color: '#f59e0b',
             questions: [
-              'If you could see the bias and noise profile of every IC memo in under 60 seconds, would you run it on the next three deals?',
+              'If you could see the bias and noise profile of every strategy memo in under 60 seconds, would you run it on the next three decisions?',
               'What would it be worth to catch one Echo Chamber pattern before capital was committed?',
               'If your partners saw a rising Decision Quality Index over two quarters, how would that change your LP narrative?',
             ],

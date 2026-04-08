@@ -84,7 +84,7 @@ export function StrategyAndPositioningTab() {
           [
             'Prompt Engineering Corpus',
             'Very High',
-            '46K+ LoC of prompts across 11 nodes; 18 months of tuning against real IC memos — the corpus is the moat, not the architecture',
+            '46K+ LoC of prompts across 11 nodes; 18 months of tuning against real strategy and M&A memos — the corpus is the moat, not the architecture',
           ],
           [
             'Decision Knowledge Graph',
@@ -376,8 +376,8 @@ export function StrategyAndPositioningTab() {
         <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7 }}>
           Any team making high-stakes, document-driven decisions — M&amp;A, corporate strategy, risk
           assessment, vendor selection, product launches. The competitive white space is real. The
-          buyer is accessible. PE/VC investment committees are a proven first vertical with
-          quantifiable ROI.
+          buyer is accessible. Corporate strategy and M&amp;A teams are the primary vertical with
+          quantifiable ROI and defined budgets.
         </p>
       </div>
 
@@ -496,9 +496,9 @@ export function StrategyAndPositioningTab() {
               'PE/VC ICs',
               '$50-500M/deal',
               '1-2 mo',
-              'Proven vertical',
+              'Secondary vertical',
               'MP / Head of IC',
-              'PROVEN',
+              'EXPANSION',
             ],
             ['Risk & Compliance', '$10M-1B', '2-4 mo', 'Strong fit', 'CRO / GRC Lead', 'Year 1-2'],
             ['Hedge Funds', '$10M-1B/pos', '3-6 mo', 'Moderate', 'PM / CIO', 'Year 2+'],
@@ -570,7 +570,7 @@ export function StrategyAndPositioningTab() {
         </div>
       </div>
 
-      {/* Why PE/VC Wins */}
+      {/* Why Corporate Strategy / M&A Wins */}
       <div style={card}>
         <div style={sectionTitle}>
           <CheckCircle size={18} style={{ color: '#22c55e' }} /> Why This Market Wins
@@ -587,7 +587,7 @@ export function StrategyAndPositioningTab() {
             },
             {
               title: 'Accessible Buyer',
-              desc: 'Strategy teams, M&A groups, and risk committees have decision authority. A VP of Strategy or Head of M&A can greenlight a pilot. PE/VC firms (5-50 people) are the fastest-closing segment.',
+              desc: 'Strategy teams, M&A groups, and risk committees have decision authority and defined budgets. A VP of Strategy or Head of M&A can greenlight a pilot without board approval. Faster sales cycle than PE/VC firms.',
             },
             {
               title: 'Cross-Industry Pull',
@@ -634,7 +634,7 @@ export function StrategyAndPositioningTab() {
             {
               market: 'PE/VC Investment Committees',
               reason:
-                'Proven first vertical with quantifiable ROI ($50M-$500M per avoided bad deal). Product includes 11 investment-specific biases, IC memo analysis, IRR/MOIC outcome tracking. Tight-knit community drives word-of-mouth. Fastest sales cycle (1-2 months).',
+                'Secondary expansion vertical with strong product-market fit. Product includes 11 investment-specific biases, deal memo analysis, IRR/MOIC outcome tracking. Tight-knit community drives word-of-mouth. Note: relationship-driven buying and skepticism of new tools makes this harder as a primary wedge.',
             },
             {
               market: 'Hedge Funds',
@@ -733,7 +733,7 @@ export function StrategyAndPositioningTab() {
           >
             <li>Decision intelligence market: $12.2B → $46.4B by 2030</li>
             <li>Enterprise GRC software: $50B+ and growing at 14% CAGR</li>
-            <li>PE/VC software vertical: $607B → $995B by 2035</li>
+            <li>Corporate M&amp;A advisory market: $40B+ annually</li>
             <li>Fortune 500 + mid-market = 10,000+ addressable organizations</li>
             <li>Cross-industry applicability expands TAM beyond any single vertical</li>
           </ul>
@@ -753,7 +753,7 @@ export function StrategyAndPositioningTab() {
               color: '#22c55e',
               status: 'NOW',
               details:
-                'M&A, corporate strategy, risk assessment, vendor evaluation. Board memos, strategy papers, project pipeline. PE/VC as proven first vertical.',
+                'Corporate strategy, M&A, risk assessment, vendor evaluation. Board memos, strategy papers, project pipeline. Corporate M&A as primary vertical.',
             },
             {
               year: 'Year 2',
@@ -761,7 +761,7 @@ export function StrategyAndPositioningTab() {
               color: '#3b82f6',
               status: 'NEXT',
               details:
-                'Deeper PE/VC penetration, hedge funds, credit committees. Investment-specific biases and IRR/MOIC tracking as differentiators.',
+                'PE/VC investment committees, hedge funds, credit committees. Investment-specific biases and IRR/MOIC tracking as differentiators.',
             },
             {
               year: 'Year 3',

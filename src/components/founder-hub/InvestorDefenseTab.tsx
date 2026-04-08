@@ -184,7 +184,7 @@ const COMPARISON_ROWS: Array<{ dim: string; cloverpop: string; di: string }> = [
   {
     dim: 'Target Market',
     cloverpop: 'Horizontal: Marketing, HR, Ops, Supply Chain',
-    di: 'Vertical: PE/VC, M&A, Corporate Development',
+    di: 'Vertical: Corporate Strategy, M&A, Executive Committees',
   },
   {
     dim: 'Output',
@@ -285,13 +285,13 @@ function CloverpopComparison() {
 const QA_ITEMS: Array<{ q: string; a: string; proof?: string }> = [
   {
     q: 'Cloverpop has been around since 2012, raised $12.6M, and was acquired. They just integrated D-Sight AI. What stops them from wiping you out?',
-    a: "Cloverpop built a brilliant workflow tool — essentially Jira for decisions. It relies on humans manually logging what they decided and why. But that is their vulnerability. Cloverpop assumes the humans entering the data are rational. Decision Intel assumes they are not. Our 12-node pipeline ingests the 50-page IC memo and autonomously audits the invisible flaws in that rationale. By the time a decision makes it into Cloverpop's Decision Bank, the Confirmation Bias and Sunk Cost Fallacy are already baked in. We intercept the cognitive noise before the vote happens.",
+    a: "Cloverpop built a brilliant workflow tool — essentially Jira for decisions. It relies on humans manually logging what they decided and why. But that is their vulnerability. Cloverpop assumes the humans entering the data are rational. Decision Intel assumes they are not. Our 12-node pipeline ingests the 50-page strategy memo and autonomously audits the invisible flaws in that rationale. By the time a decision makes it into Cloverpop's Decision Bank, the Confirmation Bias and Sunk Cost Fallacy are already baked in. We intercept the cognitive noise before the vote happens.",
     proof:
       'src/lib/agents/graph.ts — 12-node LangGraph pipeline with GDPR gating, adversarial debate, compound scoring',
   },
   {
-    q: "You're laser-focused on PE/VC. Aren't you artificially limiting your TAM?",
-    a: "We are applying Peter Thiel's monopoly framework: dominate a high-stakes, high-WTP vertical before expanding horizontally. Cloverpop's generic AI is fine for deciding where to host a corporate retreat. But a generic LLM cannot audit a $500M buyout memo. Our engine has 11 proprietary, investment-specific bias overlays — we hunt for Winner's Curse, Valuation Anchoring, and EBITDA Add-back Overconfidence. When a PE Managing Partner is putting $100M to work, they don't want a horizontal HR collaboration tool. They want a specialized statistical jury. Because we're verticalized, we tie outputs directly to FCA Consumer Duty and SOX compliance — turning our software from nice-to-have into must-have regulatory CYA.",
+    q: "You're laser-focused on corporate strategy and M&A. Aren't you artificially limiting your TAM?",
+    a: "We are applying Peter Thiel's monopoly framework: dominate a high-stakes, high-WTP vertical before expanding horizontally. Cloverpop's generic AI is fine for deciding where to host a corporate retreat. But a generic LLM cannot audit a $500M acquisition memo. Our engine has 11 proprietary, strategy-specific bias overlays — we hunt for Winner's Curse, Valuation Anchoring, and Synergy Overconfidence. When a CFO is approving a $200M acquisition, they don't want a horizontal HR collaboration tool. They want a specialized statistical jury. Because we're verticalized, we tie outputs directly to FCA Consumer Duty and SOX compliance — turning our software from nice-to-have into must-have regulatory CYA.",
     proof:
       'src/lib/compliance/frameworks/ — 7 regulatory framework implementations (SOX, FCA, EU AI Act, Basel III, GDPR, SEC Reg D, LPOA)',
   },
@@ -678,7 +678,7 @@ const OBJECTIONS: Array<{ objection: string; response: string }> = [
   {
     objection: 'Behavior change is hard — enterprises resist new tools',
     response:
-      'Zero behavior change required. Upload a document you already wrote — IC memo, board paper, strategy doc. 60 seconds later, get a score. Slack integration detects decisions in real-time without disrupting flow. Chrome extension works inside existing tools. We are an audit layer, not a replacement process.',
+      'Zero behavior change required. Upload a document you already wrote — M&A memo, board paper, strategy doc. 60 seconds later, get a score. Slack integration detects decisions in real-time without disrupting flow. Chrome extension works inside existing tools. We are an audit layer, not a replacement process.',
   },
   {
     objection: "How do you compete with McKinsey's decision advisory?",

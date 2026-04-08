@@ -355,7 +355,7 @@ export function CopilotPageContent() {
                       handleStartSession();
                     }
                   }}
-                  placeholder="e.g., Should we raise Series A now or wait 6 months? We have 14 months of runway and the market is uncertain..."
+                  placeholder="e.g., Should we proceed with the acquisition at the proposed $200M valuation, or push for a lower price given the integration risks?"
                   rows={4}
                   className="ask-input w-full rounded-lg border px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   style={{

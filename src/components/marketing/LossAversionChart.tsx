@@ -32,7 +32,7 @@ const CHART_COLORS = {
 };
 
 // ─── Data Points ─────────────────────────────────────────────────────────────
-// Realistic cumulative loss curve for a mid-market PE fund over 12 quarters.
+// Realistic cumulative loss curve for a mid-market corporate strategy team over 12 quarters.
 // Derived from 146 case study failure rates and ROI attribution loss rates.
 
 interface DataPoint {
@@ -48,11 +48,11 @@ const DATA: DataPoint[] = [
   { quarter: 'Q3', value: -4.8 },
   { quarter: 'Q4', value: -8.2, label: '-$8.2M', bias: 'Anchoring to entry price' },
   { quarter: 'Q1', value: -10.5 },
-  { quarter: 'Q2', value: -14.1, label: '-$14.1M', bias: 'Undetected groupthink in IC' },
+  { quarter: 'Q2', value: -14.1, label: '-$14.1M', bias: 'Undetected groupthink in committee' },
   { quarter: 'Q3', value: -18.7 },
   { quarter: 'Q4', value: -22.3 },
   { quarter: 'Q1', value: -27.9 },
-  { quarter: 'Q2', value: -33.4, label: '-$33.4M', bias: 'Sunk cost hold on failed thesis' },
+  { quarter: 'Q2', value: -33.4, label: '-$33.4M', bias: 'Sunk cost hold on failed initiative' },
   { quarter: 'Q3', value: -39.2 },
   { quarter: 'Q4', value: -47.0 },
 ];
@@ -375,7 +375,7 @@ export function LossAversionChart() {
               lineHeight: 1.4,
             }}
           >
-            Average mid-market PE fund
+            Average mid-market enterprise
             <br />
             Based on 146 case studies
           </div>
