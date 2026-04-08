@@ -169,6 +169,7 @@ Claude should ask the founder before:
 
 Claude Code sessions should follow this pattern for best results:
 
+0. **Read TODO.md first.** Check `TODO.md` at the start of every session for known bugs, active priorities, and pending tasks. Update it as tasks are completed or new issues are discovered.
 1. **Start small.** One focused task per session beats a mega-batch across 20 files. Context quality degrades past ~15 file modifications.
 2. **Build-check before pushing.** Always run `npx tsc --noEmit` (fast, type-errors only) or `npm run build` (full build) before committing. The founder doesn't run builds locally — Claude IS the local build check.
 3. **Commit after each logical unit.** Don't batch 12 changes into one commit. Ship fix → commit → next fix → commit.
@@ -217,6 +218,8 @@ For mechanical checks — type-checking, test runs, build verification, counting
 ## Environment Variables
 
 Required for development: `DATABASE_URL`, `DIRECT_URL`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `GOOGLE_API_KEY`.
+
+Optional: `FOUNDER_EMAIL` (for daily LinkedIn post emails via `/api/cron/daily-linkedin`).
 
 See `.env.example` for the full list with descriptions.
 
