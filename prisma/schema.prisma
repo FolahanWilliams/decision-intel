@@ -365,6 +365,7 @@ model Meeting {
   @@index([orgId])
   @@index([status])
   @@index([createdAt])
+  @@index([userId, status])
 }
 
 model MeetingTranscript {
@@ -410,6 +411,7 @@ model HumanDecision {
   @@index([createdAt])
   @@index([contentHash])
   @@index([orgId, isSample])
+  @@index([userId, createdAt])
 }
 
 model CognitiveAudit {
@@ -467,7 +469,7 @@ model Nudge {
   failureCount  Int       @default(0)
   lastAttemptAt DateTime?
   nextRetryAt   DateTime?
-  humanDecision   HumanDecision? @relation(fields: [humanDecisionId], references: [id])
+  humanDecision   HumanDecision? @relation(fields: [humanDecisionId], references: [id], onDelete: SetNull)
 
   @@index([humanDecisionId])
   @@index([analysisId])
@@ -918,6 +920,7 @@ model JournalEntry {
   @@index([status])
   @@index([createdAt])
   @@index([linkedDecisionId])
+  @@index([userId, createdAt])
 }
 
 // ─── Public API Keys ──────────────────────────────────────────────────────
