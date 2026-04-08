@@ -490,13 +490,24 @@ function NodeCircle({
 
   return (
     <g
-      style={{ cursor: 'pointer', transition: 'opacity 0.2s' }}
+      role="button"
+      tabIndex={0}
+      aria-label={`${node.type === 'bias' ? 'Bias' : 'Decision'}: ${node.label}`}
+      style={{ cursor: 'pointer', transition: 'opacity 0.2s', outline: 'none' }}
       opacity={opacity}
       onMouseEnter={() => onHover(node.id)}
       onMouseLeave={() => onHover(null)}
+      onFocus={() => onHover(node.id)}
+      onBlur={() => onHover(null)}
       onClick={e => {
         e.stopPropagation();
         onClick(node.id);
+      }}
+      onKeyDown={e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick(node.id);
+        }
       }}
     >
       {(isHovered || isSelected) && (
@@ -753,6 +764,8 @@ export function HeroDecisionGraph() {
         </div>
 
         <motion.svg
+          role="img"
+          aria-label="Interactive decision graph showing how cognitive biases connect to strategic decisions"
           viewBox={`0 0 ${SVG_W} ${SVG_H}`}
           style={{
             width: '100%',

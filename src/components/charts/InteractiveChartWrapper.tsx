@@ -21,7 +21,8 @@ import { cn } from '@/lib/utils';
 import { createClientLogger } from '@/lib/utils/logger';
 import { Button } from '@/components/ui/button';
 import { useDensity } from '@/components/DensityProvider';
-import html2canvas from 'html2canvas';
+// Lazy-loaded to keep out of initial bundle (~150KB)
+const loadHtml2Canvas = () => import('html2canvas').then(m => m.default);
 
 const log = createClientLogger('ChartWrapper');
 
@@ -109,6 +110,7 @@ export function InteractiveChartWrapper({
     async (format: 'png' | 'svg' | 'csv' | 'json') => {
       if (format === 'png' && chartRef.current) {
         try {
+          const html2canvas = await loadHtml2Canvas();
           const canvas = await html2canvas(chartRef.current, {
             backgroundColor: null,
             scale: 2,

@@ -147,7 +147,10 @@ export async function POST() {
         analysis = JSON.parse(cleanText);
       } catch {
         log.error('Failed to parse Gemini response: ' + responseText.slice(0, 200));
-        return apiError({ error: 'Market analysis returned an unparseable response. Please try again.', status: 500 });
+        return apiError({
+          error: 'Market analysis returned an unparseable response. Please try again.',
+          status: 500,
+        });
       }
     }
 
@@ -198,6 +201,10 @@ export async function POST() {
     });
   } catch (error) {
     log.error('Market Analyst failed:', error);
-    return apiError({ error: 'Market analysis failed', status: 500, cause: error instanceof Error ? error : undefined });
+    return apiError({
+      error: 'Market analysis failed',
+      status: 500,
+      cause: error instanceof Error ? error : undefined,
+    });
   }
 }

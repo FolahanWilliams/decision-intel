@@ -70,7 +70,10 @@ export async function POST(req: NextRequest) {
     if (!rl.success) {
       return NextResponse.json(
         { error: 'Too many requests. Please try again later.' },
-        { status: 429, headers: { 'Retry-After': String(rl.reset - Math.floor(Date.now() / 1000)) } }
+        {
+          status: 429,
+          headers: { 'Retry-After': String(rl.reset - Math.floor(Date.now() / 1000)) },
+        }
       );
     }
 
@@ -119,6 +122,10 @@ export async function POST(req: NextRequest) {
     return apiSuccess({ data: { ok: true } });
   } catch (err) {
     log.error('Failed to record pilot interest', { error: err });
-    return apiError({ error: 'Submission failed', status: 500, cause: err instanceof Error ? err : undefined });
+    return apiError({
+      error: 'Submission failed',
+      status: 500,
+      cause: err instanceof Error ? err : undefined,
+    });
   }
 }
