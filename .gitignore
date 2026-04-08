@@ -61,7 +61,6 @@ dev.db-journal
 # Internal documentation (not for public)
 AGENTS.md
 GEMINI.md
-CLAUDE.md
 
 # Sample/test data
 sample_decision.txt
