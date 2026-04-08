@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useTransition, useEffect, useCallback } from 'react';
+import { useState, useTransition, useEffect, useCallback, Suspense, lazy } from 'react';
+import dynamic from 'next/dynamic';
 import {
   Settings,
   Bell,
@@ -27,6 +28,21 @@ import { PersonaManager } from './PersonaManager';
 import { BillingSection } from '@/components/ui/BillingSection';
 import { ApiKeysSection } from '@/components/ui/ApiKeysSection';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+
+const IntegrationsTabContent = dynamic(
+  () => import('@/components/settings/IntegrationMarketplace').then(m => ({ default: m.IntegrationMarketplace })),
+  { loading: () => <div style={{ padding: 32, textAlign: 'center', color: 'var(--text-muted)' }}>Loading integrations...</div> }
+);
+
+const ComplianceTabContent = dynamic(
+  () => import('@/app/(platform)/dashboard/settings/compliance/page'),
+  { loading: () => <div style={{ padding: 32, textAlign: 'center', color: 'var(--text-muted)' }}>Loading compliance...</div> }
+);
+
+const AuditLogTabContent = dynamic(
+  () => import('@/components/settings/AuditLogInline').then(m => ({ default: m.AuditLogInline })),
+  { loading: () => <div style={{ padding: 32, textAlign: 'center', color: 'var(--text-muted)' }}>Loading audit log...</div> }
+);
 
 const log = createClientLogger('Settings');
 
@@ -207,6 +223,15 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
           </TabsTrigger>
           <TabsTrigger value="connections" className="flex items-center gap-xs">
             <Plug size={14} /> Connections
+          </TabsTrigger>
+          <TabsTrigger value="integrations" className="flex items-center gap-xs">
+            <ExternalLink size={14} /> Integrations
+          </TabsTrigger>
+          <TabsTrigger value="compliance" className="flex items-center gap-xs">
+            <Shield size={14} /> Compliance
+          </TabsTrigger>
+          <TabsTrigger value="audit-log" className="flex items-center gap-xs">
+            <Settings size={14} /> Audit Log
           </TabsTrigger>
         </TabsList>
 
@@ -598,6 +623,21 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
 
           {/* API Keys */}
           <ApiKeysSection />
+        </TabsContent>
+
+        {/* ── Integrations Tab ──────────────────────── */}
+        <TabsContent value="integrations">
+          <IntegrationsTabContent />
+        </TabsContent>
+
+        {/* ── Compliance Tab ──────────────────────── */}
+        <TabsContent value="compliance">
+          <ComplianceTabContent />
+        </TabsContent>
+
+        {/* ── Audit Log Tab ──────────────────────── */}
+        <TabsContent value="audit-log">
+          <AuditLogTabContent />
         </TabsContent>
       </Tabs>
 

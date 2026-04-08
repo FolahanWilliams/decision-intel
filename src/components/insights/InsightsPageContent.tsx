@@ -359,7 +359,7 @@ export function InsightsPageContent() {
   if (!insights || insights.empty) {
     return (
       <div className="container" style={{ paddingTop: 'var(--spacing-2xl)' }}>
-        <EnhancedEmptyState type="insights" />
+        <EnhancedEmptyState type="insights" showBrief briefContext="analytics" />
       </div>
     );
   }

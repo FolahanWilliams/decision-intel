@@ -29,6 +29,15 @@ const DecisionIntelligenceContent = lazy(() =>
 const BiasLibraryContent = lazy(() =>
   import('@/components/insights/BiasLibraryContent').then(m => ({ default: m.BiasLibraryContent }))
 );
+const AuditsPageContent = lazy(() =>
+  import('@/components/audits/AuditsPageContent').then(m => ({ default: m.AuditsPageContent }))
+);
+const NudgesPageContent = lazy(() =>
+  import('@/components/nudges/NudgesPageContent').then(m => ({ default: m.NudgesPageContent }))
+);
+const CalibrationContent = lazy(() =>
+  import('@/components/calibration/CalibrationContent').then(m => ({ default: m.CalibrationContent }))
+);
 
 const TABS = [
   { key: 'trends', label: 'Trends & Insights', icon: <BarChart3 size={15} /> },
@@ -50,9 +59,8 @@ const VALID_VIEWS = new Set([
   'graph',
 ]);
 
-// Tabs that navigate to separate pages instead of rendering inline
+// Heavy visualizations navigate to separate pages; quality renders inline
 const NAV_TABS: Record<string, string> = {
-  quality: '/dashboard/decision-quality',
   flywheel: '/dashboard/outcome-flywheel',
   graph: '/dashboard/decision-graph',
 };
@@ -102,7 +110,7 @@ function AnalyticsInner() {
       </div>
       {hasNoData ? (
         <div className="container" style={{ paddingTop: 'var(--spacing-xl)' }}>
-          <EnhancedEmptyState type="insights" />
+          <EnhancedEmptyState type="insights" showBrief briefContext="analytics" />
         </div>
       ) : (
         <Suspense fallback={<PageSkeleton />}>
@@ -111,6 +119,17 @@ function AnalyticsInner() {
             {view === 'intelligence' && <DecisionIntelligenceContent />}
             {view === 'explainability' && <ExplainabilityContent />}
             {view === 'library' && <BiasLibraryContent />}
+            {view === 'quality' && (
+              <div>
+                <AuditsPageContent />
+                <div style={{ marginTop: 'var(--spacing-xl)' }}>
+                  <NudgesPageContent />
+                </div>
+                <div style={{ marginTop: 'var(--spacing-xl)' }}>
+                  <CalibrationContent />
+                </div>
+              </div>
+            )}
           </div>
         </Suspense>
       )}

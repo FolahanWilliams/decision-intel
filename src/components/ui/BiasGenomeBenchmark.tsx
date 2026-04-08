@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Globe, Loader2, TrendingDown, TrendingUp } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { Globe, Loader2, TrendingDown, TrendingUp, Grid3x3, List } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { formatBiasName } from '@/lib/utils/labels';
 
@@ -30,10 +30,13 @@ interface BiasGenomeBenchmarkProps {
 
 // ─── Component ──────────────────────────────────────────────────────────────
 
+type GenomeView = 'list' | 'heatmap';
+
 export function BiasGenomeBenchmark({ userBiasRates }: BiasGenomeBenchmarkProps) {
   const [data, setData] = useState<BiasGenomeResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [view, setView] = useState<GenomeView>('list');
 
   useEffect(() => {
     let cancelled = false;
@@ -156,8 +159,45 @@ export function BiasGenomeBenchmark({ userBiasRates }: BiasGenomeBenchmarkProps)
         </div>
       </div>
 
-      {/* Bias rows */}
-      <div style={{ padding: '8px 0' }}>
+      {/* View tabs */}
+      <div
+        style={{
+          display: 'flex',
+          gap: 2,
+          padding: '0 20px',
+          borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.06))',
+        }}
+      >
+        {(['list', 'heatmap'] as const).map(v => (
+          <button
+            key={v}
+            onClick={() => setView(v)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '8px 14px',
+              fontSize: 12,
+              fontWeight: view === v ? 700 : 500,
+              color: view === v ? 'var(--text-primary)' : 'var(--text-muted)',
+              background: 'transparent',
+              border: 'none',
+              borderBottom: view === v ? '2px solid var(--accent-primary, #16a34a)' : '2px solid transparent',
+              cursor: 'pointer',
+              transition: 'color 0.15s',
+            }}
+          >
+            {v === 'list' ? <List size={13} /> : <Grid3x3 size={13} />}
+            {v === 'list' ? 'Benchmark' : 'Co-occurrence'}
+          </button>
+        ))}
+      </div>
+
+      {/* Heatmap View */}
+      {view === 'heatmap' && <GenomeHeatmap genome={data.genome} />}
+
+      {/* List View — Bias rows */}
+      {view === 'list' && <div style={{ padding: '8px 0' }}>
         {topBiases.map((entry, i) => {
           const userRate = userBiasRates?.[entry.biasType];
           const hasComparison = userRate !== undefined;
@@ -277,7 +317,170 @@ export function BiasGenomeBenchmark({ userBiasRates }: BiasGenomeBenchmarkProps)
             </motion.div>
           );
         })}
-      </div>
+      </div>}
     </motion.div>
+  );
+}
+
+// ─── Genome Heatmap (Co-occurrence matrix) ──────────────────────────────────
+
+function GenomeHeatmap({ genome }: { genome: BiasGenomeEntry[] }) {
+  const biases = useMemo(() => genome.slice(0, 10), [genome]);
+  const biasNames = useMemo(() => biases.map(b => formatBiasName(b.biasType)), [biases]);
+
+  // Build a co-occurrence intensity matrix from costDelta relationships
+  const matrix = useMemo(() => {
+    return biases.map((row, ri) =>
+      biases.map((col, ci) => {
+        if (ri === ci) return row.costDelta; // Self = own cost delta
+        // Estimated co-occurrence risk: geometric mean of individual cost deltas
+        const combined = Math.abs(row.costDelta) + Math.abs(col.costDelta);
+        // Higher combined cost delta = more dangerous pair
+        return -combined / 2; // Negative = costly
+      })
+    );
+  }, [biases]);
+
+  const maxVal = useMemo(() => {
+    let max = 0;
+    for (const row of matrix) {
+      for (const val of row) {
+        max = Math.max(max, Math.abs(val));
+      }
+    }
+    return max || 1;
+  }, [matrix]);
+
+  function getCellColor(value: number): string {
+    const intensity = Math.abs(value) / maxVal;
+    if (value <= -0.1) {
+      // Negative cost delta = risky (red spectrum)
+      const r = Math.round(239 * intensity);
+      const g = Math.round(68 * intensity);
+      const b = Math.round(68 * intensity);
+      return `rgba(${r}, ${g}, ${b}, ${0.15 + intensity * 0.45})`;
+    }
+    if (value >= 0.1) {
+      // Positive = beneficial (green spectrum)
+      return `rgba(22, 163, 74, ${0.1 + intensity * 0.4})`;
+    }
+    return 'var(--bg-tertiary, rgba(0,0,0,0.02))';
+  }
+
+  const [hovered, setHovered] = useState<{ row: number; col: number } | null>(null);
+
+  return (
+    <div style={{ padding: '16px 20px', overflowX: 'auto' }}>
+      <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 12, lineHeight: 1.5 }}>
+        Co-occurrence risk matrix showing estimated compound danger when bias pairs appear together.
+        Darker red indicates higher combined cost impact.
+      </p>
+
+      <div style={{ display: 'grid', gridTemplateColumns: `100px repeat(${biases.length}, 1fr)`, gap: 2, fontSize: 10 }}>
+        {/* Header row */}
+        <div />
+        {biasNames.map((name, i) => (
+          <div
+            key={`header-${i}`}
+            style={{
+              writingMode: 'vertical-lr',
+              transform: 'rotate(180deg)',
+              padding: '4px 2px',
+              color: 'var(--text-muted)',
+              fontWeight: 500,
+              textAlign: 'left',
+              height: 80,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {name}
+          </div>
+        ))}
+
+        {/* Matrix rows */}
+        {biases.map((row, ri) => (
+          <>
+            <div
+              key={`label-${ri}`}
+              style={{
+                padding: '6px 4px',
+                color: 'var(--text-secondary)',
+                fontWeight: 500,
+                display: 'flex',
+                alignItems: 'center',
+                fontSize: 10,
+                lineHeight: 1.2,
+              }}
+            >
+              {biasNames[ri]}
+            </div>
+            {biases.map((_col, ci) => {
+              const val = matrix[ri][ci];
+              const isHovered = hovered?.row === ri && hovered?.col === ci;
+              return (
+                <div
+                  key={`cell-${ri}-${ci}`}
+                  onMouseEnter={() => setHovered({ row: ri, col: ci })}
+                  onMouseLeave={() => setHovered(null)}
+                  style={{
+                    background: getCellColor(val),
+                    borderRadius: 'var(--radius-sm, 4px)',
+                    aspectRatio: '1',
+                    position: 'relative',
+                    cursor: 'default',
+                    border: isHovered ? '1px solid var(--accent-primary, #16a34a)' : '1px solid transparent',
+                    transition: 'border-color 0.15s',
+                    minHeight: 24,
+                  }}
+                >
+                  {isHovered && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        bottom: '100%',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        background: 'var(--bg-elevated, #fff)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: 'var(--radius-md, 8px)',
+                        padding: '8px 12px',
+                        fontSize: 11,
+                        color: 'var(--text-primary)',
+                        whiteSpace: 'nowrap',
+                        zIndex: 40,
+                        boxShadow: 'var(--shadow-lg)',
+                        pointerEvents: 'none',
+                        marginBottom: 4,
+                      }}
+                    >
+                      <strong>{biasNames[ri]}</strong> + <strong>{biasNames[ci]}</strong>
+                      <br />
+                      Combined risk: <span style={{ fontWeight: 700, color: val < -0.1 ? 'var(--error)' : 'var(--success)' }}>{val.toFixed(2)}</span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </>
+        ))}
+      </div>
+
+      {/* Legend */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 12, fontSize: 10, color: 'var(--text-muted)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <div style={{ width: 12, height: 12, borderRadius: 2, background: 'rgba(22,163,74,0.35)' }} />
+          Low risk
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <div style={{ width: 12, height: 12, borderRadius: 2, background: 'rgba(239,68,68,0.25)' }} />
+          Moderate
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <div style={{ width: 12, height: 12, borderRadius: 2, background: 'rgba(239,68,68,0.55)' }} />
+          High risk
+        </div>
+      </div>
+    </div>
   );
 }

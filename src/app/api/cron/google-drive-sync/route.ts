@@ -85,11 +85,17 @@ export async function GET() {
           const parsableMimeType = MIME_MAP[file.mimeType];
           if (!parsableMimeType) continue;
 
-          // Check if already processed
+          // Check if already processed — if file updated, create new version
           const existing = await prisma.document.findFirst({
             where: { sourceRef: file.id, source: 'google_drive' },
+            orderBy: { uploadedAt: 'desc' },
+            select: { id: true, contentHash: true, uploadedAt: true },
           });
-          if (existing) continue;
+
+          // Cooldown: skip if existing was uploaded within the last 24 hours
+          if (existing && existing.uploadedAt > new Date(Date.now() - 24 * 60 * 60 * 1000)) {
+            continue;
+          }
 
           try {
             const buffer = await downloadFileContent(drive, file.id, file.mimeType);
@@ -98,6 +104,16 @@ export async function GET() {
             if (!content.trim()) {
               log.warn(`Empty content from Google Drive file ${file.name} (${file.id})`);
               continue;
+            }
+
+            // If file already exists, compare content hash to detect real changes
+            if (existing) {
+              const { createHash } = await import('crypto');
+              const newHash = createHash('sha256').update(content).digest('hex');
+              if (existing.contentHash && newHash === existing.contentHash) {
+                continue; // Same content, skip
+              }
+              log.info(`Detected updated version of ${file.name} (${file.id}), creating new analysis`);
             }
 
             // Resolve org for the installation owner
@@ -114,21 +130,28 @@ export async function GET() {
               }
             }
 
+            const versionLabel = existing
+              ? ` (updated ${new Date().toISOString().slice(0, 10)})`
+              : '';
             const document = await prisma.document.create({
               data: {
                 userId: installation.userId,
                 orgId: userOrgId,
-                filename: file.name,
+                filename: `${file.name}${versionLabel}`,
                 fileType: parsableMimeType,
                 fileSize: parseInt(file.size || '0', 10),
                 content,
                 status: 'pending',
                 source: 'google_drive',
-                sourceRef: file.id,
+                sourceRef: existing ? `${file.id}:${Date.now()}` : file.id,
               },
             });
 
-            log.info(`Created document ${document.id} from Google Drive file ${file.name}`);
+            log.info(
+              existing
+                ? `Created updated version ${document.id} of ${file.name} (previous: ${existing.id})`
+                : `Created document ${document.id} from Google Drive file ${file.name}`
+            );
             totalFilesProcessed++;
 
             // Fire-and-forget analysis

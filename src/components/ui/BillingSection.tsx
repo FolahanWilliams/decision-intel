@@ -347,29 +347,53 @@ export function BillingSection() {
           </span>
         </div>
 
-        {/* Upgrade CTA for free users (only when billing is configured) */}
-        {data.plan === 'free' && data.upgradeAvailable !== false && (
-          <button
-            onClick={() => handleUpgrade('pro')}
-            disabled={portalLoading}
-            className="flex items-center gap-sm"
-            style={{
-              marginTop: 'var(--spacing-sm)',
-              width: '100%',
-              padding: '10px',
-              background: `${PLAN_COLORS.pro}15`,
-              border: `1px solid ${PLAN_COLORS.pro}30`,
-              borderRadius: 'var(--radius-sm)',
-              color: PLAN_COLORS.pro,
-              fontSize: '13px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              justifyContent: 'center',
-            }}
-          >
-            {portalLoading ? <Loader2 size={14} className="animate-spin" /> : <Zap size={14} />}
-            Upgrade to Pro — 14-day free trial
-          </button>
+        {/* Upgrade CTA for free users */}
+        {data.plan === 'free' && (
+          data.upgradeAvailable ? (
+            <button
+              onClick={() => handleUpgrade('pro')}
+              disabled={portalLoading}
+              className="flex items-center gap-sm"
+              style={{
+                marginTop: 'var(--spacing-sm)',
+                width: '100%',
+                padding: '10px',
+                background: `${PLAN_COLORS.pro}15`,
+                border: `1px solid ${PLAN_COLORS.pro}30`,
+                borderRadius: 'var(--radius-sm)',
+                color: PLAN_COLORS.pro,
+                fontSize: '13px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                justifyContent: 'center',
+              }}
+            >
+              {portalLoading ? <Loader2 size={14} className="animate-spin" /> : <Zap size={14} />}
+              Upgrade to Pro — 14-day free trial
+            </button>
+          ) : (
+            <Link
+              href="/#pricing"
+              className="flex items-center gap-sm"
+              style={{
+                marginTop: 'var(--spacing-sm)',
+                width: '100%',
+                padding: '10px',
+                background: `${PLAN_COLORS.pro}15`,
+                border: `1px solid ${PLAN_COLORS.pro}30`,
+                borderRadius: 'var(--radius-sm)',
+                color: PLAN_COLORS.pro,
+                fontSize: '13px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                justifyContent: 'center',
+                textDecoration: 'none',
+              }}
+            >
+              <Zap size={14} />
+              View Plans & Pricing
+            </Link>
+          )
         )}
 
         {/* Compare plans link */}

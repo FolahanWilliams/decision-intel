@@ -328,6 +328,7 @@ export default function Sidebar() {
             href="/dashboard"
             icon={<LayoutDashboard size={18} />}
             label="Dashboard"
+            description="Upload, browse & analyze"
             active={pathname === '/dashboard'}
             collapsed={collapsed}
             onNavigate={closeMobile}
@@ -345,17 +346,8 @@ export default function Sidebar() {
             href="/dashboard?view=browse"
             icon={<FileText size={18} />}
             label="Documents"
+            description="Browse uploaded documents"
             active={pathname.startsWith('/documents')}
-            collapsed={collapsed}
-            onNavigate={closeMobile}
-          />
-
-          <NavItem
-            href="/dashboard/playbooks"
-            icon={<BookTemplate size={18} />}
-            label="Playbooks"
-            description="Pre-configured analysis templates"
-            active={pathname.startsWith('/dashboard/playbooks')}
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
@@ -369,7 +361,7 @@ export default function Sidebar() {
             <NavItem
               href="/dashboard/ask"
               icon={<Sparkles size={18} />}
-              label="Ask"
+              label="AI Copilot"
               description="Decision copilot & document chat"
               active={
                 pathname.startsWith('/dashboard/ask') ||
@@ -413,6 +405,15 @@ export default function Sidebar() {
               label="Decision Journal"
               description="Record and reflect on decisions"
               active={pathname === '/dashboard/journal'}
+              collapsed={collapsed}
+              onNavigate={closeMobile}
+            />
+            <NavItem
+              href="/dashboard/playbooks"
+              icon={<BookTemplate size={18} />}
+              label="Playbooks"
+              description="Pre-configured analysis templates"
+              active={pathname.startsWith('/dashboard/playbooks')}
               collapsed={collapsed}
               onNavigate={closeMobile}
             />

@@ -523,6 +523,8 @@ function PlaybooksPageContent() {
               type="generic"
               title={selectedCategory ? 'No playbooks in this category' : 'No playbooks yet'}
               description="Decision playbooks are pre-configured analysis templates for common high-stakes decisions. Create one to optimize your bias detection pipeline."
+              showBrief
+              briefContext="playbooks"
               actions={[
                 {
                   label: 'New Playbook',

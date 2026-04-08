@@ -414,6 +414,8 @@ export default function JournalPage() {
             type="generic"
             title="No journal entries found"
             description="Create a manual entry or connect email/calendar/Slack integrations."
+            showBrief
+            briefContext="journal"
           />
         ) : (
           <div className="relative">

@@ -22,6 +22,8 @@ export interface AcademicReference {
 }
 
 export interface BiasEducationContent {
+  /** Stable taxonomy ID (e.g., "DI-B-001"). Once assigned, never changes. */
+  taxonomyId: string;
   realWorldExample: {
     title: string;
     description: string;
@@ -37,6 +39,7 @@ export interface BiasEducationContent {
 
 export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
   confirmation_bias: {
+    taxonomyId: 'DI-B-001',
     realWorldExample: {
       title: 'Kodak and Digital Photography',
       description:
@@ -73,6 +76,7 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     difficulty: 'hard',
   },
   anchoring_bias: {
+    taxonomyId: 'DI-B-002',
     realWorldExample: {
       title: 'Real Estate Pricing Experiments',
       description:
@@ -109,6 +113,7 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     difficulty: 'moderate',
   },
   availability_heuristic: {
+    taxonomyId: 'DI-B-003',
     realWorldExample: {
       title: 'Post-9/11 Driving Deaths',
       description:
@@ -141,6 +146,7 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     difficulty: 'moderate',
   },
   groupthink: {
+    taxonomyId: 'DI-B-004',
     realWorldExample: {
       title: 'Bay of Pigs Invasion',
       description:
@@ -174,6 +180,7 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     difficulty: 'hard',
   },
   authority_bias: {
+    taxonomyId: 'DI-B-005',
     realWorldExample: {
       title: 'Milgram Obedience Experiments',
       description:
@@ -209,6 +216,7 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     difficulty: 'moderate',
   },
   bandwagon_effect: {
+    taxonomyId: 'DI-B-006',
     realWorldExample: {
       title: 'Dot-Com Bubble',
       description:
@@ -242,6 +250,7 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     difficulty: 'easy',
   },
   overconfidence_bias: {
+    taxonomyId: 'DI-B-007',
     realWorldExample: {
       title: 'Long-Term Capital Management Collapse',
       description:
@@ -271,6 +280,7 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     difficulty: 'hard',
   },
   hindsight_bias: {
+    taxonomyId: 'DI-B-008',
     realWorldExample: {
       title: '2008 Financial Crisis "Predictors"',
       description:
@@ -308,6 +318,7 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     difficulty: 'moderate',
   },
   planning_fallacy: {
+    taxonomyId: 'DI-B-009',
     realWorldExample: {
       title: 'Sydney Opera House',
       description:
@@ -344,6 +355,7 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     difficulty: 'moderate',
   },
   loss_aversion: {
+    taxonomyId: 'DI-B-010',
     realWorldExample: {
       title: 'New Coke Reversal',
       description:
@@ -377,6 +389,7 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     difficulty: 'moderate',
   },
   sunk_cost_fallacy: {
+    taxonomyId: 'DI-B-011',
     realWorldExample: {
       title: 'Concorde Supersonic Jet',
       description:
@@ -413,6 +426,7 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     difficulty: 'moderate',
   },
   status_quo_bias: {
+    taxonomyId: 'DI-B-012',
     realWorldExample: {
       title: 'Blockbuster vs. Netflix',
       description:
@@ -448,6 +462,7 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     difficulty: 'easy',
   },
   framing_effect: {
+    taxonomyId: 'DI-B-013',
     realWorldExample: {
       title: 'Asian Disease Problem',
       description:
@@ -481,6 +496,7 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     difficulty: 'easy',
   },
   selective_perception: {
+    taxonomyId: 'DI-B-014',
     realWorldExample: {
       title: 'Dartmouth vs. Princeton Football Study',
       description:
@@ -517,6 +533,7 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     difficulty: 'hard',
   },
   recency_bias: {
+    taxonomyId: 'DI-B-015',
     realWorldExample: {
       title: 'Performance Review Season',
       description:
@@ -547,6 +564,7 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     difficulty: 'easy',
   },
   cognitive_misering: {
+    taxonomyId: 'DI-B-016',
     realWorldExample: {
       title: 'Theranos Due Diligence Failures',
       description:
@@ -580,6 +598,7 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     difficulty: 'moderate',
   },
   halo_effect: {
+    taxonomyId: 'DI-B-017',
     realWorldExample: {
       title: 'Enron and the "Smartest Guys in the Room"',
       description:
@@ -613,6 +632,7 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     difficulty: 'moderate',
   },
   gamblers_fallacy: {
+    taxonomyId: 'DI-B-018',
     realWorldExample: {
       title: 'Monte Carlo Casino, 1913',
       description:
@@ -649,6 +669,7 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     difficulty: 'moderate',
   },
   zeigarnik_effect: {
+    taxonomyId: 'DI-B-019',
     realWorldExample: {
       title: "Yahoo's Incomplete Acquisitions",
       description:
@@ -686,6 +707,7 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     difficulty: 'hard',
   },
   paradox_of_choice: {
+    taxonomyId: 'DI-B-020',
     realWorldExample: {
       title: 'Jam Study and Enterprise Software Selection',
       description:

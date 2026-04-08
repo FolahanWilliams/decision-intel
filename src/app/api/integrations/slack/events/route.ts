@@ -712,6 +712,59 @@ async function processSlackDecision(
       log.warn('CopilotSession auto-creation failed:', copilotErr);
     }
 
+    // ─── I2: Auto-create DecisionRoom from Slack thread decisions ──────
+    let decisionRoomId: string | null = null;
+    try {
+      const roomInstallation = teamId
+        ? await prisma.slackInstallation.findFirst({
+            where: { teamId, status: 'active' },
+            select: { installedByUserId: true, orgId: true },
+          })
+        : null;
+
+      const roomUserId = roomInstallation?.installedByUserId;
+      if (roomUserId) {
+        const roomOrgMember = await prisma.teamMember.findFirst({
+          where: { userId: roomUserId },
+          select: { orgId: true },
+        });
+
+        const biasArray = Array.isArray(auditResult.biasFindings) ? auditResult.biasFindings : [];
+        const room = await prisma.decisionRoom.create({
+          data: {
+            title: `Slack: ${input.content.slice(0, 60)}`,
+            createdBy: roomUserId,
+            orgId: roomOrgMember?.orgId,
+            status: 'open',
+            decisionType: input.decisionType || 'general',
+            biasBriefing: {
+              overallScore: auditResult.decisionQualityScore,
+              noiseScore: auditResult.noiseScore,
+              topBiases: biasArray.slice(0, 10).map((b: Record<string, unknown>) => ({
+                biasType: b.biasType,
+                severity: b.severity,
+              })),
+              source: 'slack_auto',
+              generatedAt: new Date().toISOString(),
+            },
+          },
+        });
+        decisionRoomId = room.id;
+
+        await prisma.roomParticipant.create({
+          data: {
+            roomId: room.id,
+            userId: roomUserId,
+            role: 'creator',
+          },
+        });
+
+        log.info(`DecisionRoom ${room.id} auto-created for Slack decision ${decisionId}`);
+      }
+    } catch (roomErr) {
+      log.warn('DecisionRoom auto-creation failed (non-critical):', roomErr);
+    }
+
     // Deliver audit summary with copilot link to Slack thread
     if (sourceRef) {
       const [summaryChannel, summaryThreadTs] = sourceRef.split(':');
@@ -719,6 +772,9 @@ async function processSlackDecision(
         const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://app.decisionintel.ai';
         const copilotUrl = copilotSessionId
           ? `${appUrl}/dashboard/ask?mode=copilot&session=${copilotSessionId}`
+          : undefined;
+        const roomUrl = decisionRoomId
+          ? `${appUrl}/dashboard/meetings?room=${decisionRoomId}`
           : undefined;
 
         const summaryPayload = formatAuditSummaryForSlack(
@@ -728,6 +784,7 @@ async function processSlackDecision(
             biasFindings: Array.isArray(auditResult.biasFindings) ? auditResult.biasFindings : [],
             summary: auditResult.summary,
             copilotUrl,
+            roomUrl,
           },
           summaryThreadTs
         );

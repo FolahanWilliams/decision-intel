@@ -28,6 +28,7 @@ import {
   Filter,
   Download,
   Copy,
+  Shield,
 } from 'lucide-react';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useTheme } from 'next-themes';
@@ -231,6 +232,54 @@ export function CommandPalette() {
         icon: <ClipboardList size={16} />,
         action: () => navigate('/dashboard/audit-log'),
         keywords: ['activity', 'log'],
+      },
+      {
+        id: 'decision-rooms',
+        label: 'Decision Rooms',
+        description: 'Collaborative decision spaces with blind priors',
+        icon: <Users size={16} />,
+        action: () => navigate('/dashboard/meetings?tab=rooms'),
+        keywords: ['rooms', 'blind', 'prior', 'voting', 'committee'],
+      },
+      {
+        id: 'playbooks',
+        label: 'Playbooks',
+        description: 'Pre-configured analysis templates',
+        icon: <BookOpen size={16} />,
+        action: () => navigate('/dashboard/playbooks'),
+        keywords: ['templates', 'playbook', 'framework'],
+      },
+      {
+        id: 'journal',
+        label: 'Decision Journal',
+        description: 'Record and reflect on decisions',
+        icon: <FileText size={16} />,
+        action: () => navigate('/dashboard/journal'),
+        keywords: ['journal', 'diary', 'record', 'reflect'],
+      },
+      {
+        id: 'decision-graph',
+        label: 'Decision Graph',
+        description: 'Knowledge graph of decisions, biases & outcomes',
+        icon: <GitCompareArrows size={16} />,
+        action: () => navigate('/dashboard/decision-graph'),
+        keywords: ['graph', 'network', 'knowledge', 'edges', 'nodes'],
+      },
+      {
+        id: 'compliance',
+        label: 'Compliance Posture',
+        description: 'SOC 2, ISO 27001, GDPR framework mapping',
+        icon: <Shield size={16} />,
+        action: () => navigate('/dashboard/settings/compliance'),
+        keywords: ['compliance', 'soc2', 'iso', 'gdpr', 'governance', 'framework'],
+      },
+      {
+        id: 'taxonomy',
+        label: 'Bias Taxonomy',
+        description: 'Published cognitive bias taxonomy (DI-B-001 through DI-B-020)',
+        icon: <BookOpen size={16} />,
+        action: () => navigate('/taxonomy'),
+        keywords: ['taxonomy', 'bias', 'catalog', 'DI-B', 'reference'],
       },
       {
         id: 'settings',

@@ -21,7 +21,7 @@ export const PLANS = {
   free: {
     name: 'Starter',
     description: 'One-time diagnostic — see hidden bias and noise in your strategic documents',
-    analysesPerMonth: 3,
+    analysesPerMonth: 4,
     maxPages: 10,
     biasTypes: 5,
     maxTeamMembers: 3,

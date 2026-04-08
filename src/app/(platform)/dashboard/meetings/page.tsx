@@ -130,6 +130,8 @@ function RecordingsContent() {
         ) : meetings.length === 0 ? (
           <EnhancedEmptyState
             type="meetings"
+            showBrief
+            briefContext="meetings"
             actions={[
               {
                 label: 'Upload First Meeting',
