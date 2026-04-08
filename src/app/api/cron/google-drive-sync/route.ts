@@ -88,12 +88,12 @@ export async function GET() {
           // Check if already processed — if file updated, create new version
           const existing = await prisma.document.findFirst({
             where: { sourceRef: file.id, source: 'google_drive' },
-            orderBy: { createdAt: 'desc' },
-            select: { id: true, contentHash: true, createdAt: true },
+            orderBy: { uploadedAt: 'desc' },
+            select: { id: true, contentHash: true, uploadedAt: true },
           });
 
-          // Cooldown: skip if existing was created within the last 24 hours
-          if (existing && existing.createdAt > new Date(Date.now() - 24 * 60 * 60 * 1000)) {
+          // Cooldown: skip if existing was uploaded within the last 24 hours
+          if (existing && existing.uploadedAt > new Date(Date.now() - 24 * 60 * 60 * 1000)) {
             continue;
           }
 

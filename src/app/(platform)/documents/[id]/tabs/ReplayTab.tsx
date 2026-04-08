@@ -9,13 +9,30 @@ import {
   CheckCircle,
   SkipForward,
   TrendingDown,
+  Eye,
+  X as XIcon,
+  ThumbsUp,
+  ThumbsDown,
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { AnalysisResult } from '@/types';
 import { decomposeAnalysis } from '@/lib/replay/score-calculator';
 import { CounterfactualPanel } from '@/components/replay/CounterfactualPanel';
 
+interface OutcomeData {
+  outcome: string;
+  confirmedBiases: string[];
+  falsPositiveBiases: string[];
+  lessonsLearned?: string | null;
+  notes?: string | null;
+  impactScore?: number | null;
+  mostAccurateTwin?: string | null;
+}
+
 interface ReplayTabProps {
   analysisData: AnalysisResult;
+  outcome?: OutcomeData | null;
+  recalibratedDqi?: { originalScore: number; recalibratedScore: number; delta: number; recalibratedGrade: string } | null;
 }
 
 const STEP_ICONS: Record<string, React.ReactNode> = {
@@ -28,10 +45,25 @@ const STEP_ICONS: Record<string, React.ReactNode> = {
   'final-score': <CheckCircle size={14} />,
 };
 
-export function ReplayTab({ analysisData }: ReplayTabProps) {
+const OUTCOME_COLORS: Record<string, string> = {
+  success: '#16a34a',
+  partial_success: '#84cc16',
+  failure: '#ef4444',
+  too_early: '#94a3b8',
+};
+
+const OUTCOME_LABELS: Record<string, string> = {
+  success: 'Success',
+  partial_success: 'Partial Success',
+  failure: 'Failure',
+  too_early: 'Too Early to Tell',
+};
+
+export function ReplayTab({ analysisData, outcome, recalibratedDqi }: ReplayTabProps) {
   const steps = decomposeAnalysis(analysisData);
   const [expandedStep, setExpandedStep] = useState<string | null>(steps[0]?.id || null);
   const [counterfactualStep, setCounterfactualStep] = useState<string | null>(null);
+  const [outcomeRevealed, setOutcomeRevealed] = useState(false);
 
   // Calculate running score through steps
   let runningScore = 100;
@@ -352,6 +384,181 @@ export function ReplayTab({ analysisData }: ReplayTabProps) {
           );
         })}
       </div>
+
+      {/* ── Outcome Reveal — "Tape Review" ──────────────────────────────── */}
+      {outcome && (
+        <div style={{ marginTop: 'var(--spacing-xl)' }}>
+          {!outcomeRevealed ? (
+            <button
+              onClick={() => setOutcomeRevealed(true)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 10,
+                width: '100%',
+                padding: '14px 20px',
+                background: 'var(--bg-card-hover)',
+                border: '1px dashed var(--border-active)',
+                borderRadius: 'var(--radius-lg)',
+                color: 'var(--text-primary)',
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+            >
+              <Eye size={16} />
+              Reveal What Actually Happened
+            </button>
+          ) : (
+            <AnimatePresence>
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                transition={{ duration: 0.4, ease: 'easeOut' }}
+                className="card"
+                style={{ overflow: 'hidden' }}
+              >
+                <div className="card-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <h3 className="flex items-center gap-sm" style={{ fontSize: 14 }}>
+                    <Eye size={15} style={{ color: 'var(--accent-primary)' }} />
+                    What Actually Happened
+                  </h3>
+                  <button
+                    onClick={() => setOutcomeRevealed(false)}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: 4 }}
+                  >
+                    <XIcon size={14} />
+                  </button>
+                </div>
+                <div className="card-body" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  {/* Outcome badge */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        padding: '6px 14px',
+                        borderRadius: 'var(--radius-full)',
+                        fontSize: 13,
+                        fontWeight: 700,
+                        background: `${OUTCOME_COLORS[outcome.outcome] || '#94a3b8'}18`,
+                        color: OUTCOME_COLORS[outcome.outcome] || '#94a3b8',
+                        border: `1px solid ${OUTCOME_COLORS[outcome.outcome] || '#94a3b8'}30`,
+                      }}
+                    >
+                      {OUTCOME_LABELS[outcome.outcome] || outcome.outcome}
+                    </span>
+                    {outcome.impactScore != null && (
+                      <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                        Impact: {outcome.impactScore}/100
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Recalibrated DQI */}
+                  {recalibratedDqi && (
+                    <div
+                      style={{
+                        padding: 14,
+                        borderRadius: 'var(--radius-md)',
+                        background: recalibratedDqi.delta > 0 ? 'rgba(22,163,74,0.06)' : 'rgba(239,68,68,0.06)',
+                        border: `1px solid ${recalibratedDqi.delta > 0 ? 'rgba(22,163,74,0.2)' : 'rgba(239,68,68,0.2)'}`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 16,
+                      }}
+                    >
+                      <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Recalibrated DQI:</div>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                        <span style={{ fontSize: 13, color: 'var(--text-muted)', textDecoration: 'line-through' }}>
+                          {recalibratedDqi.originalScore}
+                        </span>
+                        <span style={{ fontSize: 13 }}>→</span>
+                        <span style={{ fontSize: 18, fontWeight: 700, color: recalibratedDqi.delta > 0 ? 'var(--success)' : 'var(--error)' }}>
+                          {recalibratedDqi.recalibratedScore}/100
+                        </span>
+                        <span style={{ fontSize: 12, color: recalibratedDqi.delta > 0 ? 'var(--success)' : 'var(--error)', fontWeight: 600 }}>
+                          ({recalibratedDqi.delta > 0 ? '+' : ''}{recalibratedDqi.delta})
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Confirmed & False-Positive Biases */}
+                  {(outcome.confirmedBiases.length > 0 || outcome.falsPositiveBiases.length > 0) && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        Bias Accuracy
+                      </div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                        {outcome.confirmedBiases.map(bias => (
+                          <span
+                            key={`confirmed-${bias}`}
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 4,
+                              padding: '4px 10px',
+                              borderRadius: 'var(--radius-full)',
+                              fontSize: 12,
+                              background: 'rgba(22,163,74,0.1)',
+                              color: 'var(--success)',
+                              border: '1px solid rgba(22,163,74,0.2)',
+                            }}
+                          >
+                            <ThumbsUp size={10} />
+                            {bias.replace(/_/g, ' ')}
+                          </span>
+                        ))}
+                        {outcome.falsPositiveBiases.map(bias => (
+                          <span
+                            key={`false-${bias}`}
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 4,
+                              padding: '4px 10px',
+                              borderRadius: 'var(--radius-full)',
+                              fontSize: 12,
+                              background: 'rgba(239,68,68,0.1)',
+                              color: 'var(--error)',
+                              border: '1px solid rgba(239,68,68,0.2)',
+                            }}
+                          >
+                            <ThumbsDown size={10} />
+                            {bias.replace(/_/g, ' ')}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Lessons Learned */}
+                  {outcome.lessonsLearned && (
+                    <div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>
+                        Lessons Learned
+                      </div>
+                      <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6, margin: 0 }}>
+                        {outcome.lessonsLearned}
+                      </p>
+                    </div>
+                  )}
+
+                  {outcome.mostAccurateTwin && (
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                      Most accurate boardroom persona: <strong style={{ color: 'var(--text-primary)' }}>{outcome.mostAccurateTwin}</strong>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          )}
+        </div>
+      )}
     </div>
   );
 }

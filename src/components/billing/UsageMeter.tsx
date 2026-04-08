@@ -104,7 +104,7 @@ export function UsageMeter() {
       </span>
       {isNearLimit && (
         <Link
-          href="/pricing"
+          href="/#pricing"
           onClick={() =>
             trackEvent('usage_meter_upgrade_click', {
               plan: data.plan,

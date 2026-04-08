@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { Compass, Target, Shield, Rocket, Hammer, Wrench } from 'lucide-react';
+import { Compass, Target, Shield, Rocket, Hammer, Wrench, Map } from 'lucide-react';
 
 /**
  * Founder Tips — personalized strategic principles for the Decision Intel
@@ -305,6 +305,20 @@ const SECTION_PHASE: Tip[] = [
   },
 ];
 
+// ─── Section 7 — Product Roadmap ─────────────────────────────────────────
+
+const SECTION_ROADMAP: Tip[] = [
+  {
+    title: 'Real-time meeting bias detection is the ultimate shift-left play',
+    principle:
+      'You already support meeting transcript upload and post-hoc analysis. The next step: a meeting bot that joins calls and provides real-time bias nudges during the meeting, not after the document is written.',
+    rationale:
+      'The difference between post-hoc analysis and real-time coaching is the difference between a doctor reviewing your charts and a coach whispering in your ear during the game. Every PE partner who sees real-time bias detection during an IC meeting will immediately understand the value. The technical path is: Recall.ai or similar meeting bot SDK for meeting join, streaming transcription, lightweight bias signal detection (reuse existing client-bias-scanner.ts patterns), and in-meeting Slack DMs or overlay notifications. This is a 6-month engineering project but a 6-second sales pitch: "We detect groupthink forming in your IC meeting before the vote."',
+    action:
+      'Phase 1: Build a prototype that takes a live transcript feed (simulated from a recorded meeting) and detects bias signals in real-time with a 3-second delay. Show it at the next investor meeting as a vision slide. Phase 2: Integrate Recall.ai for actual meeting join. Phase 3: Build the in-meeting notification UX. Do not start Phase 2 until you have your first paying customer for the core document analysis product.',
+  },
+];
+
 export function FounderTipsTab() {
   return (
     <div>
@@ -321,7 +335,7 @@ export function FounderTipsTab() {
             marginBottom: 0,
           }}
         >
-          Twenty principles grounded in your specific position: solo founder, 16, Nigeria, PE/VC
+          Twenty-one principles grounded in your specific position: solo founder, 16, Nigeria, PE/VC
           wedge, Wiz advisor, 97% gross margins, 199K+ LoC already shipped. Re-read when deciding
           what to build next, what to kill, what to say in a pitch, and what to ignore.
         </p>
@@ -379,6 +393,15 @@ export function FounderTipsTab() {
         </div>
         {SECTION_PHASE.map((t, i) => (
           <TipBlock key={t.title} t={t} idx={i + 18} />
+        ))}
+      </div>
+
+      <div style={{ ...card, borderLeft: '3px solid #a855f7' }}>
+        <div style={sectionTitle}>
+          <Map size={18} style={{ color: '#a855f7' }} /> Section 7 — Product Roadmap
+        </div>
+        {SECTION_ROADMAP.map((t, i) => (
+          <TipBlock key={t.title} t={t} idx={i + 21} />
         ))}
       </div>
     </div>

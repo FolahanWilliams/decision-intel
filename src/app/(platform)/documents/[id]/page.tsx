@@ -1956,6 +1956,8 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                             : {}),
                         }}
                         logicalAnalysis={analysis?.logicalAnalysis}
+                        outcome={analysis?.outcomeStatus === 'outcome_logged' ? (analysis as unknown as { outcome?: { outcome: string; confirmedBiases: string[]; falsPositiveBiases: string[]; lessonsLearned?: string; notes?: string; impactScore?: number; mostAccurateTwin?: string } }).outcome : null}
+                        recalibratedDqi={(analysis as unknown as { recalibratedDqi?: { originalScore: number; recalibratedScore: number; delta: number; recalibratedGrade: string } }).recalibratedDqi}
                       />
                     </ErrorBoundary>
                   )}
