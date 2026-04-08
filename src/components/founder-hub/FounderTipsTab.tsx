@@ -6,7 +6,7 @@ import { Compass, Target, Shield, Rocket, Hammer, Wrench, Map } from 'lucide-rea
 /**
  * Founder Tips — personalized strategic principles for the Decision Intel
  * founder to refer back to. Content is grounded in the founder's specific
- * position (16-year-old solo founder, Nigeria, PE/VC wedge, Wiz advisor).
+ * position (16-year-old solo founder, Nigeria, corporate strategy/M&A wedge, Wiz advisor).
  */
 
 const card: React.CSSProperties = {
@@ -176,9 +176,9 @@ const SECTION_GTM: Tip[] = [
     principle:
       'At your stage, three wedges means three fractional wedges means zero traction. Use the warmest door, not the best-looking ICP.',
     rationale:
-      'The pitch deck lists tech → PE/VC → risk firms as the sequence. That is three wedges dressed as one. PE/VC is romantic because of the "Every IC memo has 3-5 hidden biases" story, but PE/VC sales cycles are 9-18 months, partners are culturally skeptical of tools, and they LOVE being the smartest person in the room (bias audits threaten ego). Meanwhile you have a Wiz-connected advisor who opens doors into pre-IPO tech strategy/risk teams in one phone call. That is the warmest wedge by far. Wedge selection is about relationship temperature, not ICP quality on paper. Come back to PE/VC at Series A when you can afford a GTM hire who owns that motion.',
+      'Corporate strategy and M&A teams are the primary wedge — they have defined budgets, make high-frequency decisions, and the ego-threat problem is much lower than PE/VC. A VP of Strategy or Head of M&A can greenlight a pilot without LP politics. PE/VC sales cycles are 9-18 months, partners are culturally skeptical of tools, and they believe their edge IS judgment (bias audits threaten ego). Corporate teams are more receptive: they already use consultants for strategic reviews, so an AI audit layer is a natural evolution. Come back to PE/VC at Series A when you can afford a GTM hire who owns that relationship-driven motion.',
     action:
-      'Rewrite the GTM section of the pitch deck around pre-IPO tech strategy/risk teams, not PE/VC. Keep PE/VC in an appendix slide as a secondary expansion motion. Ask the Wiz advisor for 5 specific warm intros this month and treat those 5 conversations as your north star.',
+      'Rewrite the GTM section of the pitch deck around corporate strategy and M&A teams as the primary wedge. Keep PE/VC in an appendix slide as a secondary expansion motion. Ask the Wiz advisor for 5 specific warm intros to corporate strategy/M&A leaders this month and treat those 5 conversations as your north star.',
   },
   {
     title: 'Use the Wiz advisor network as your warmest wedge — ask for specific names',
@@ -206,7 +206,7 @@ const SECTION_EXECUTION: Tip[] = [
   {
     title: 'Ship an eval harness this month — turn "trust us" into a public number',
     principle:
-      'Build a golden dataset of 50 hand-labeled IC memos with known biases. Run your pipeline against it in CI. Publish the accuracy number on your marketing site. Reran weekly.',
+      'Build a golden dataset of 50 hand-labeled strategy and M&A memos with known biases. Run your pipeline against it in CI. Publish the accuracy number on your marketing site. Reran weekly.',
     rationale:
       'Right now the codebase has 586 tests but zero that measure end-to-end bias detection accuracy. That means every claim about precision is unfalsifiable — including claims to yourself. An eval harness gives you three things simultaneously: (1) a marketing asset ("72% precision on hand-labeled dataset, up from 58% last quarter"), (2) regression protection for prompt changes, and (3) the single most attractive thing you can show an ML engineer when you eventually hire one. Without an eval harness you cannot safely change a prompt, cannot prove improvement over time, and cannot recruit. With one, every prompt iteration becomes a measurable improvement.',
     action:
@@ -336,8 +336,8 @@ export function FounderTipsTab() {
             marginBottom: 0,
           }}
         >
-          Twenty-one principles grounded in your specific position: solo founder, 16, Nigeria, PE/VC
-          wedge, Wiz advisor, 97% gross margins, 199K+ LoC already shipped. Re-read when deciding
+          Twenty-one principles grounded in your specific position: solo founder, 16, Nigeria, corporate
+          strategy/M&amp;A wedge, Wiz advisor, 97% gross margins, 199K+ LoC already shipped. Re-read when deciding
           what to build next, what to kill, what to say in a pitch, and what to ignore.
         </p>
       </div>

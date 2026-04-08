@@ -18,11 +18,11 @@ export function ProductOverviewTab() {
             lineHeight: 1.3,
           }}
         >
-          The Decision Performance OS for M&amp;A &amp; Investment Teams
+          The Decision Performance OS for Corporate Strategy &amp; M&amp;A Teams
         </h2>
         <p style={{ fontSize: 14, color: 'var(--text-secondary, #b4b4bc)', lineHeight: 1.6 }}>
-          Audit every deal thesis for cognitive bias and decision noise. Protect investment
-          outcomes. AI-powered cognitive auditing purpose-built for M&amp;A and PE/VC teams.
+          Audit every strategic decision for cognitive bias and decision noise. Protect business
+          outcomes. AI-powered cognitive auditing purpose-built for corporate strategy and M&amp;A teams.
         </p>
       </div>
 

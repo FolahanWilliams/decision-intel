@@ -4,11 +4,11 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'Privacy Policy | Decision Intel',
   description:
-    'How Decision Intel collects, uses, and protects your data. GDPR-compliant data processing for M&A and investment decision analysis.',
+    'How Decision Intel collects, uses, and protects your data. GDPR-compliant data processing for corporate strategy and M&A decision analysis.',
   openGraph: {
     title: 'Privacy Policy | Decision Intel',
     description:
-      'How Decision Intel collects, uses, and protects your data. GDPR-compliant data processing for M&A and investment decision analysis.',
+      'How Decision Intel collects, uses, and protects your data. GDPR-compliant data processing for corporate strategy and M&A decision analysis.',
   },
 };
 
@@ -116,7 +116,7 @@ export default function PrivacyPolicyPage() {
               4. Data Protection &amp; Security
             </h2>
             <p style={{ marginBottom: '12px' }}>
-              We take the security of your investment data seriously. Our platform implements:
+              We take the security of your strategic data seriously. Our platform implements:
             </p>
             <ul
               style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}

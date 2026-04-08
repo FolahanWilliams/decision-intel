@@ -145,7 +145,7 @@ export function SampleDataBanner() {
           </div>
           <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
             Populate your workspace with 3 anonymized sample analyses (Nokia acquisition, a strategy
-            expansion, and a Series B investment) so you can see the Decision Graph, Bias Library,
+            expansion, and a capital allocation decision) so you can see the Decision Graph, Bias Library,
             and Team Cognitive Profile in action. Remove them any time.
           </div>
           {error && <div style={{ fontSize: 12, color: '#ef4444', marginTop: 6 }}>{error}</div>}

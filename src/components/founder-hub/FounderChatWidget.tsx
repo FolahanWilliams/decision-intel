@@ -10,11 +10,11 @@ interface ChatMsg {
 
 const STARTER_QUESTIONS = [
   'Brainstorm LinkedIn posts for the Last-Mile Problem pillar',
-  'Draft a YouTube hook about rubber-stamp investment committees',
+  'Draft a YouTube hook about rubber-stamp executive committees',
   'What toxic combination case studies work best for content?',
-  'Elevator pitch for a CSO?',
-  'Content ideas targeting PE/VC investment committees',
-  'How to frame Decision Intel without threatening IC members?',
+  'Elevator pitch for a VP of Strategy or Head of M&A?',
+  'Content ideas targeting corporate strategy and M&A teams',
+  'How to frame Decision Intel for M&A teams without threatening egos?',
   'What Kahneman research supports the Decision Noise pillar?',
 ];
 

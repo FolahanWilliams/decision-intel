@@ -643,8 +643,8 @@ export default function LandingPage() {
               }}
             >
               Grammarly catches grammar errors before you hit send. Decision Intel catches cognitive
-              biases before you sign the deal. Upload any strategic document &mdash; board memo,
-              deal thesis, strategy proposal &mdash; and get a comprehensive bias audit with
+              biases before you sign the deal. Upload any strategic document &mdash; M&amp;A memo,
+              board paper, strategy proposal &mdash; and get a comprehensive bias audit with
               compliance mapping, noise measurement, and a calibrated risk score in under a minute.
             </p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
@@ -866,7 +866,7 @@ export default function LandingPage() {
               phase: 'PHASE_01',
               num: '01',
               title: 'Upload the document',
-              desc: 'Drop in board memos, deal theses, strategy proposals, diligence reports, or any decision document. Capture each stakeholder\u2019s prior belief privately, before the room starts reinforcing itself.',
+              desc: 'Drop in M&A memos, board papers, strategy proposals, diligence reports, or any decision document. Capture each stakeholder\u2019s prior belief privately, before the room starts reinforcing itself.',
               bullets: [
                 'PDF, DOCX, Excel, CSV support',
                 'Decision framing with success/failure criteria',
@@ -881,7 +881,7 @@ export default function LandingPage() {
               phase: 'PHASE_02',
               num: '02',
               title: 'Get the blind second opinion',
-              desc: 'An 12-node pipeline stress-tests the document: 20+ biases detected, a three-judge statistical jury measures noise, and a simulated boardroom argues against your proposal before your real one does.',
+              desc: 'A 12-node pipeline stress-tests the document: 20+ biases detected, a three-judge statistical jury measures noise, and a simulated executive challenge argues against your proposal before the real committee does.',
               bullets: [
                 '20+ cognitive biases with confidence scores',
                 '3 independent noise judges (Kahneman)',
@@ -896,7 +896,7 @@ export default function LandingPage() {
               phase: 'PHASE_03',
               num: '03',
               title: 'Know why your team believed what they believed',
-              desc: 'Outcomes are detected automatically from follow-up documents, Slack, and web intelligence. Every deal closes the feedback loop, so your next conviction is measurably more trustworthy than your last.',
+              desc: 'Outcomes are detected automatically from follow-up documents, Slack, and web intelligence. Every decision closes the feedback loop, so your next strategic call is measurably more trustworthy than your last.',
               bullets: [
                 'Autonomous outcome detection',
                 'Calibration dashboards',
@@ -1090,7 +1090,7 @@ export default function LandingPage() {
             {
               icon: Brain,
               title: 'Cognitive Bias Detection',
-              desc: '20+ biases detected with confidence scores, excerpts, and research-backed explanations. 11 additional investment-specific biases for PE/VC.',
+              desc: '20+ biases detected with confidence scores, excerpts, and research-backed explanations. 11 additional domain-specific biases for M&A and corporate strategy.',
               color: '#8B5CF6',
               bg: '#F5F3FF',
             },
@@ -1200,7 +1200,7 @@ export default function LandingPage() {
                 lineHeight: 1.5,
               }}
             >
-              The average bad deal costs{' '}
+              The average bad strategic decision costs{' '}
               <span style={{ fontWeight: 700, color: C.slate900 }}>$8.2M</span>. Your team&apos;s
               decision audit costs{' '}
               <span style={{ fontWeight: 700, color: C.green }}>$349/month</span>.
@@ -1694,7 +1694,7 @@ export default function LandingPage() {
               <span style={{ fontSize: 18, fontWeight: 700, color: C.white }}>Decision Intel</span>
             </div>
             <p style={{ fontSize: 14, lineHeight: 1.7, color: '#94A3B8', maxWidth: 280 }}>
-              The Decision Performance OS for M&A and investment teams. Audit cognitive bias,
+              The Decision Performance OS for corporate strategy and M&amp;A teams. Audit cognitive bias,
               measure decision noise, and track outcomes.
             </p>
           </div>

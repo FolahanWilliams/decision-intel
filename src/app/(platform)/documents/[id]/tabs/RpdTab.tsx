@@ -443,7 +443,7 @@ export function RpdTab({ recognitionCues, narrativePreMortem, documentId }: RpdT
                   <textarea
                     value={chosenAction}
                     onChange={e => setChosenAction(e.target.value)}
-                    placeholder='e.g., "Lead the round at $40M pre-money with a $8M check" or "Pass on this deal and wait for Series B"'
+                    placeholder='e.g., "Proceed with the acquisition at the proposed valuation" or "Request renegotiation of key terms before committee approval"'
                     className="w-full p-3 bg-card border border-border text-sm text-foreground placeholder:text-muted resize-none"
                     rows={3}
                     maxLength={500}

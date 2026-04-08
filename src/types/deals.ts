@@ -22,12 +22,12 @@ export const DEAL_TYPES: SelectOption[] = [
   { value: 'vendor_evaluation', label: 'Vendor Evaluation' },
   { value: 'product_launch', label: 'Product Launch' },
   { value: 'restructuring', label: 'Restructuring' },
-  // PE/VC vertical
+  // Additional deal types (PE/VC compatible)
   { value: 'buyout', label: 'Buyout' },
   { value: 'growth_equity', label: 'Growth Equity' },
   { value: 'venture', label: 'Venture' },
   { value: 'secondary', label: 'Secondary' },
-  { value: 'add_on', label: 'Add-On' },
+  { value: 'add_on', label: 'Add-On / Bolt-On' },
   { value: 'recapitalization', label: 'Recapitalization' },
 ];
 
@@ -39,7 +39,7 @@ export const DEAL_TYPE_COLORS: Record<string, string> = {
   vendor_evaluation: '#8b5cf6',
   product_launch: '#3b82f6',
   restructuring: '#ec4899',
-  // PE/VC
+  // Additional deal types
   buyout: '#6366f1',
   growth_equity: '#10b981',
   venture: '#f59e0b',
@@ -59,10 +59,10 @@ export const DEAL_STAGES: SelectOption[] = [
   { value: 'execution', label: 'Execution' },
   { value: 'monitoring', label: 'Monitoring' },
   { value: 'closed', label: 'Closed' },
-  // PE/VC stages
+  // Deal-specific stages
   { value: 'screening', label: 'Screening' },
   { value: 'due_diligence', label: 'Due Diligence' },
-  { value: 'ic_review', label: 'IC Review' },
+  { value: 'ic_review', label: 'Committee Review' },
   { value: 'closing', label: 'Closing' },
   { value: 'portfolio', label: 'Portfolio' },
   { value: 'exited', label: 'Exited' },
@@ -79,7 +79,7 @@ export const STAGE_COLORS: Record<string, string> = {
   execution: '#10b981',
   monitoring: '#14b8a6',
   closed: '#6b7280',
-  // PE/VC
+  // Deal-specific
   screening: '#6366f1',
   due_diligence: '#f59e0b',
   ic_review: '#8b5cf6',
@@ -96,7 +96,7 @@ export const DEAL_STATUSES: SelectOption[] = [
   { value: 'approved', label: 'Approved' },
   { value: 'rejected', label: 'Rejected' },
   { value: 'completed', label: 'Completed' },
-  // PE/VC legacy
+  // Deal-specific statuses
   { value: 'passed', label: 'Passed' },
   { value: 'invested', label: 'Invested' },
   { value: 'written_off', label: 'Written Off' },
@@ -126,13 +126,13 @@ export const DOCUMENT_TYPES: SelectOption[] = [
   { value: 'policy_document', label: 'Policy Document' },
   { value: 'project_charter', label: 'Project Charter' },
   { value: 'budget_proposal', label: 'Budget Proposal' },
-  // PE/VC vertical
-  { value: 'ic_memo', label: 'IC Memo' },
-  { value: 'cim', label: 'CIM' },
+  // Deal / M&A document types
+  { value: 'ic_memo', label: 'Decision Memo' },
+  { value: 'cim', label: 'CIM / Target Profile' },
   { value: 'pitch_deck', label: 'Pitch Deck' },
   { value: 'term_sheet', label: 'Term Sheet' },
   { value: 'due_diligence', label: 'DD Report' },
-  { value: 'lp_report', label: 'LP Report' },
+  { value: 'lp_report', label: 'Executive Report' },
   { value: 'other', label: 'Other' },
 ];
 
@@ -145,7 +145,7 @@ export const EXIT_TYPES: SelectOption[] = [
   { value: 'failed', label: 'Failed' },
   { value: 'cancelled', label: 'Cancelled' },
   { value: 'ongoing', label: 'Ongoing' },
-  // PE/VC exit types
+  // Additional outcome types
   { value: 'ipo', label: 'IPO' },
   { value: 'trade_sale', label: 'Trade Sale' },
   { value: 'secondary', label: 'Secondary' },
@@ -172,7 +172,7 @@ export const CURRENCIES: SelectOption[] = [
   { value: 'GBP', label: 'GBP' },
 ];
 
-// ─── PE/VC Project Type Detection ───────────────────────────────────────────
+// ─── Investment Project Type Detection ──────────────────────────────────────
 
 const PE_VC_TYPES = new Set([
   'buyout',
@@ -183,7 +183,7 @@ const PE_VC_TYPES = new Set([
   'recapitalization',
 ]);
 
-/** Returns true if the project type belongs to the PE/VC vertical */
+/** Returns true if the project type belongs to the investment vertical */
 export function isPeVcProjectType(dealType?: string | null): boolean {
   if (!dealType) return false;
   return PE_VC_TYPES.has(dealType);

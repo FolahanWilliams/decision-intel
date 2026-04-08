@@ -175,7 +175,7 @@ const SECTION_C: Entry[] = [
     origin: 'Bent Flyvbjerg and Daniel Kahneman, multiple papers on megaproject forecasting.',
     summary:
       'Instead of forecasting from project-specific details (inside view), look at the base rate of comparable projects (outside view). Humans wildly over-rely on the inside view.',
-    why: 'For a PE buyer staring at an IC memo, the single most persuasive number is the historical base rate of deals with this ticket size, sector, and sponsor profile.',
+    why: 'For a strategy executive reviewing an M&A memo, the single most persuasive number is the historical base rate of deals with this size, sector, and acquirer profile.',
     surface:
       'src/lib/data/reference-class-forecasting.ts, src/components/ui/OutsideViewCard.tsx, shown on the document Overview tab',
     shipped: true,
@@ -223,7 +223,7 @@ const SECTION_C: Entry[] = [
     origin: 'John Boyd, US Air Force strategist.',
     summary:
       'Observe, Orient, Decide, Act. Decision tempo under uncertainty. Whoever cycles faster with correct orientation wins.',
-    why: 'Frames Decision Intel as a tool that speeds OODA cycles for investment committees. A useful sales metaphor for military-trained or operator buyers.',
+    why: 'Frames Decision Intel as a tool that speeds OODA cycles for executive committees. A useful sales metaphor for military-trained or operator buyers.',
     surface: 'Roadmap: OODA framing in Sales Toolkit for operator buyers',
     shipped: false,
   },
@@ -318,7 +318,7 @@ const SECTION_E: Entry[] = [
     origin: 'Crossing the Chasm (1991).',
     summary:
       'Early markets (innovators, early adopters) require radically different go-to-market motions than mainstream markets (early majority). Most startups die in the chasm between them.',
-    why: 'The proven PE/VC IC vertical is a beachhead. The enterprise M&A expansion path is the chasm crossing. Having this framing explicit prevents premature horizontal expansion.',
+    why: 'The corporate strategy and M&A vertical is the beachhead. The PE/VC and broader financial services expansion is the chasm crossing. Having this framing explicit prevents premature horizontal expansion.',
     surface: 'Roadmap: beachhead strategy doc in Sales Toolkit',
     shipped: false,
   },
