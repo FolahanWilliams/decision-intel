@@ -73,7 +73,9 @@ export async function POST(req: NextRequest) {
       where: { id: analysisId },
       select: {
         id: true,
+        overallScore: true,
         document: { select: { userId: true, orgId: true } },
+        biases: { select: { id: true } },
       },
     });
 
@@ -125,6 +127,62 @@ export async function POST(req: NextRequest) {
         'Failed to update outcomeStatus to outcome_logged:',
         err instanceof Error ? err.message : String(err)
       );
+    }
+
+    // Recalibrate DQI with outcome data (fire-and-forget)
+    try {
+      const originalScore = analysis.overallScore;
+      // Adjust Bias Load: remove false positives, boost confirmed bias weights
+      const confirmedCount = (confirmedBiases || []).length;
+      const falsePositiveCount = (falsPositiveBiases || []).length;
+      const totalBiases = analysis.biases?.length || 0;
+
+      // Recalibrated score adjusts for outcome knowledge
+      let recalibratedScore = originalScore;
+
+      // False positives were overpenalized → score should be higher
+      if (totalBiases > 0 && falsePositiveCount > 0) {
+        const falsePositiveRatio = falsePositiveCount / totalBiases;
+        recalibratedScore += falsePositiveRatio * 12; // Recover some of the bias penalty
+      }
+
+      // Confirmed biases were real → score should be lower (validated the detection)
+      if (confirmedCount > 0) {
+        recalibratedScore -= confirmedCount * 1.5; // Small additional penalty for confirmed danger
+      }
+
+      // Outcome tracking boosts process maturity (+5 for having outcome data)
+      recalibratedScore += 3;
+
+      // Outcome success/failure adjusts historical alignment
+      if (outcome === 'failure') recalibratedScore -= 5;
+      else if (outcome === 'success') recalibratedScore += 4;
+
+      recalibratedScore = Math.max(0, Math.min(100, Math.round(recalibratedScore)));
+      const delta = recalibratedScore - Math.round(originalScore);
+
+      // Determine grade
+      const grade =
+        recalibratedScore >= 85 ? 'A' :
+        recalibratedScore >= 70 ? 'B' :
+        recalibratedScore >= 55 ? 'C' :
+        recalibratedScore >= 40 ? 'D' : 'F';
+
+      await prisma.analysis.update({
+        where: { id: analysisId },
+        data: {
+          recalibratedDqi: {
+            originalScore: Math.round(originalScore),
+            recalibratedScore,
+            recalibratedGrade: grade,
+            delta,
+            recalibratedAt: new Date().toISOString(),
+          },
+        },
+      });
+      log.info(`Recalibrated DQI for ${analysisId}: ${Math.round(originalScore)} → ${recalibratedScore} (${delta > 0 ? '+' : ''}${delta})`);
+    } catch (recalErr) {
+      log.warn('DQI recalibration failed (non-critical):', recalErr);
     }
 
     // Adjust graph edge weights from outcome (fire-and-forget flywheel)

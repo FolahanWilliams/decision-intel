@@ -102,7 +102,7 @@ function AnalyticsInner() {
       </div>
       {hasNoData ? (
         <div className="container" style={{ paddingTop: 'var(--spacing-xl)' }}>
-          <EnhancedEmptyState type="insights" />
+          <EnhancedEmptyState type="insights" showBrief briefContext="analytics" />
         </div>
       ) : (
         <Suspense fallback={<PageSkeleton />}>

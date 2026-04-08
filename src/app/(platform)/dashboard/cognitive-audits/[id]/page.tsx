@@ -2,10 +2,20 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
-import { cn } from '@/lib/utils';
 import { RelatedDecisions } from '@/components/ui/RelatedDecisions';
 import { RootCauseSection } from '@/components/ui/RootCauseSection';
+import { ScoreReveal } from '@/components/ui/ScoreReveal';
+import { SectionMiniNav } from '@/components/ui/SectionMiniNav';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+
+const DETAIL_SECTIONS = [
+  { id: 'section-scores', label: 'Scores' },
+  { id: 'section-summary', label: 'Summary' },
+  { id: 'section-biases', label: 'Biases' },
+  { id: 'section-graph', label: 'Graph' },
+  { id: 'section-root-cause', label: 'Root Cause' },
+  { id: 'section-related', label: 'Related' },
+];
 
 interface PageProps {
   params: {
@@ -61,72 +71,176 @@ export default async function CognitiveAuditDetailPage({ params }: PageProps) {
 
   return (
     <ErrorBoundary sectionName="Cognitive Audit Detail">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Cognitive Audit Detail</h1>
-          <p className="text-gray-400">{analysis.document.filename}</p>
+      <SectionMiniNav sections={DETAIL_SECTIONS} />
+      <div className="container mx-auto px-4 py-8" style={{ maxWidth: 900 }}>
+        <div style={{ marginBottom: 32 }}>
+          <h1
+            style={{
+              fontSize: 'clamp(24px, 4vw, 30px)',
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+              marginBottom: 8,
+            }}
+          >
+            Cognitive Audit Detail
+          </h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>
+            {analysis.document.filename}
+          </p>
         </div>
 
         {/* Overall Scores */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <div className={cn('p-6 rounded-xl', 'liquid-glass-premium', 'border border-white/10')}>
-            <h3 className="text-sm font-medium text-gray-400 mb-2">Overall Score</h3>
-            <p className="text-3xl font-bold text-white">{Math.round(analysis.overallScore)}/100</p>
+        <section id="section-scores">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" style={{ marginBottom: 32 }}>
+          <div
+            style={{
+              padding: 24,
+              borderRadius: 'var(--radius-xl)',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+            }}
+          >
+            <ScoreReveal score={analysis.overallScore} label="Overall Score" showGrade />
+            {analysis.recalibratedDqi && typeof analysis.recalibratedDqi === 'object' && (
+              <div
+                style={{
+                  marginTop: 10,
+                  padding: '6px 10px',
+                  borderRadius: 'var(--radius-md)',
+                  background: (analysis.recalibratedDqi as Record<string, unknown>).delta && Number((analysis.recalibratedDqi as Record<string, unknown>).delta) > 0
+                    ? 'rgba(22,163,74,0.08)'
+                    : 'rgba(239,68,68,0.08)',
+                  fontSize: 12,
+                  color: (analysis.recalibratedDqi as Record<string, unknown>).delta && Number((analysis.recalibratedDqi as Record<string, unknown>).delta) > 0
+                    ? 'var(--success)'
+                    : 'var(--error)',
+                }}
+              >
+                Recalibrated: {String((analysis.recalibratedDqi as Record<string, unknown>).recalibratedScore)}/100
+                {' '}({Number((analysis.recalibratedDqi as Record<string, unknown>).delta) > 0 ? '+' : ''}{String((analysis.recalibratedDqi as Record<string, unknown>).delta)} after outcome)
+              </div>
+            )}
           </div>
 
-          <div className={cn('p-6 rounded-xl', 'liquid-glass-premium', 'border border-white/10')}>
-            <h3 className="text-sm font-medium text-gray-400 mb-2">Noise Score</h3>
-            <p className="text-3xl font-bold text-white">{Math.round(analysis.noiseScore)}/100</p>
+          <div
+            style={{
+              padding: 24,
+              borderRadius: 'var(--radius-xl)',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+            }}
+          >
+            <ScoreReveal score={analysis.noiseScore} label="Noise Score" duration={1200} />
           </div>
 
-          <div className={cn('p-6 rounded-xl', 'liquid-glass-premium', 'border border-white/10')}>
-            <h3 className="text-sm font-medium text-gray-400 mb-2">Biases Detected</h3>
-            <p className="text-3xl font-bold text-white">{analysis.biases.length}</p>
+          <div
+            style={{
+              padding: 24,
+              borderRadius: 'var(--radius-xl)',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+            }}
+          >
+            <h3 style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-muted)', marginBottom: 8 }}>
+              Biases Detected
+            </h3>
+            <p style={{ fontSize: 30, fontWeight: 700, color: 'var(--text-primary)' }}>
+              {analysis.biases.length}
+            </p>
           </div>
         </div>
+        </section>
 
         {/* Summary */}
-        <div className={cn('p-6 rounded-xl mb-8', 'liquid-glass', 'border border-white/10')}>
-          <h2 className="text-xl font-semibold text-white mb-4">Summary</h2>
-          <p className="text-gray-300 leading-relaxed">{analysis.summary}</p>
+        <section id="section-summary">
+        <div
+          style={{
+            padding: 24,
+            borderRadius: 'var(--radius-xl)',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            marginBottom: 32,
+          }}
+        >
+          <h2 style={{ fontSize: 20, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 16 }}>
+            Summary
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', lineHeight: 1.7 }}>{analysis.summary}</p>
         </div>
+        </section>
 
         {/* Detected Biases */}
+        <section id="section-biases">
         {analysis.biases.length > 0 && (
-          <div className={cn('p-6 rounded-xl', 'liquid-glass', 'border border-white/10')}>
-            <h2 className="text-xl font-semibold text-white mb-4">Detected Biases</h2>
-            <div className="space-y-4">
+          <div
+            style={{
+              padding: 24,
+              borderRadius: 'var(--radius-xl)',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+            }}
+          >
+            <h2 style={{ fontSize: 20, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 16 }}>
+              Detected Biases
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {analysis.biases.map(bias => (
                 <div
                   key={bias.id}
-                  className={cn('p-4 rounded-lg', 'bg-white/5', 'border border-white/10')}
+                  style={{
+                    padding: 16,
+                    borderRadius: 'var(--radius-lg)',
+                    background: 'var(--bg-tertiary)',
+                    border: '1px solid var(--border-color)',
+                  }}
                 >
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-medium text-white">{bias.biasType}</h3>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <h3 style={{ fontWeight: 500, color: 'var(--text-primary)' }}>{bias.biasType}</h3>
                     <span
-                      className={cn(
-                        'px-2 py-1 rounded text-xs font-medium',
-                        bias.severity === 'critical' && 'bg-red-500/20 text-red-400',
-                        bias.severity === 'high' && 'bg-orange-500/20 text-orange-400',
-                        bias.severity === 'medium' && 'bg-yellow-500/20 text-yellow-400',
-                        bias.severity === 'low' && 'bg-green-500/20 text-green-400'
-                      )}
+                      style={{
+                        padding: '2px 8px',
+                        borderRadius: 'var(--radius-sm)',
+                        fontSize: 12,
+                        fontWeight: 500,
+                        ...(bias.severity === 'critical' && { background: 'rgba(239,68,68,0.15)', color: 'var(--error)' }),
+                        ...(bias.severity === 'high' && { background: 'rgba(234,88,12,0.15)', color: 'var(--severity-high)' }),
+                        ...(bias.severity === 'medium' && { background: 'rgba(217,119,6,0.15)', color: 'var(--warning)' }),
+                        ...(bias.severity === 'low' && { background: 'rgba(22,163,74,0.15)', color: 'var(--success)' }),
+                      }}
                     >
                       {bias.severity}
                     </span>
                   </div>
 
-                  <p className="text-gray-400 text-sm mb-2">{bias.explanation}</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 8 }}>
+                    {bias.explanation}
+                  </p>
 
                   {bias.excerpt && (
-                    <blockquote className="pl-4 border-l-2 border-white/20 text-gray-500 text-sm italic">
+                    <blockquote
+                      style={{
+                        paddingLeft: 16,
+                        borderLeft: '2px solid var(--border-hover)',
+                        color: 'var(--text-muted)',
+                        fontSize: 14,
+                        fontStyle: 'italic',
+                      }}
+                    >
                       &ldquo;{bias.excerpt}&rdquo;
                     </blockquote>
                   )}
 
                   {bias.suggestion && (
-                    <div className="mt-3 p-3 bg-blue-500/10 rounded border border-blue-500/20">
-                      <p className="text-blue-400 text-sm">
+                    <div
+                      style={{
+                        marginTop: 12,
+                        padding: 12,
+                        background: 'rgba(2,132,199,0.08)',
+                        borderRadius: 'var(--radius-md)',
+                        border: '1px solid rgba(2,132,199,0.2)',
+                      }}
+                    >
+                      <p style={{ color: 'var(--info)', fontSize: 14 }}>
                         <strong>Suggestion:</strong> {bias.suggestion}
                       </p>
                     </div>
@@ -136,28 +250,44 @@ export default async function CognitiveAuditDetailPage({ params }: PageProps) {
             </div>
           </div>
         )}
+        </section>
 
         {/* Decision Graph Links */}
-        <div className="flex items-center gap-4 mt-8 mb-4">
+        <section id="section-graph">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 32, marginBottom: 16 }}>
           <Link
             href={`/dashboard/decision-graph?highlight=${params.id}`}
-            className={cn(
-              'inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium',
-              'bg-blue-500/10 text-blue-400 border border-blue-500/20',
-              'hover:bg-blue-500/20 transition-colors'
-            )}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '8px 16px',
+              borderRadius: 'var(--radius-lg)',
+              fontSize: 14,
+              fontWeight: 500,
+              background: 'rgba(2,132,199,0.08)',
+              color: 'var(--info)',
+              border: '1px solid rgba(2,132,199,0.2)',
+              textDecoration: 'none',
+              transition: 'background 0.15s',
+            }}
           >
             View in Decision Graph
           </Link>
         </div>
+        </section>
 
         {/* Root Cause Attribution */}
+        <section id="section-root-cause">
         {analysis.document.orgId && (
           <RootCauseSection analysisId={params.id} orgId={analysis.document.orgId} />
         )}
+        </section>
 
         {/* Related Decisions from Knowledge Graph */}
+        <section id="section-related">
         <RelatedDecisions analysisId={params.id} />
+        </section>
       </div>
     </ErrorBoundary>
   );

@@ -183,6 +183,8 @@ export function DecisionRoomsContent() {
             type="generic"
             title="No decision rooms yet"
             description="Create a decision room from a document analysis to enable blind prior voting and collaborative decision-making."
+            showBrief
+            briefContext="rooms"
             actions={[
               {
                 label: 'Create Room',

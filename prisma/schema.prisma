@@ -84,6 +84,7 @@ model Analysis {
   // Outcome tracking — mandatory flywheel
   outcomeStatus   String          @default("pending_outcome") // pending_outcome | outcome_logged | outcome_overdue
   outcomeDueAt    DateTime?       // When outcome should be reported
+  recalibratedDqi Json?           // { originalScore, recalibratedScore, recalibratedGrade, delta, recalibratedAt }
 
   // Synthetic seed analysis — flagged SAMPLE, clearable via /api/demo/clear-samples
   isSample        Boolean         @default(false)
