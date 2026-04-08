@@ -265,7 +265,16 @@ interface EnhancedEmptyStateProps {
   /** Show an intelligence brief based on org data */
   showBrief?: boolean;
   /** Context for the intelligence brief */
-  briefContext?: 'documents' | 'deals' | 'nudges' | 'effectiveness' | 'meetings' | 'rooms' | 'playbooks' | 'journal' | 'analytics';
+  briefContext?:
+    | 'documents'
+    | 'deals'
+    | 'nudges'
+    | 'effectiveness'
+    | 'meetings'
+    | 'rooms'
+    | 'playbooks'
+    | 'journal'
+    | 'analytics';
 }
 
 export function EnhancedEmptyState({

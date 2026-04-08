@@ -27,7 +27,16 @@ interface IntelligenceData {
   } | null;
 }
 
-type BriefContext = 'documents' | 'deals' | 'nudges' | 'effectiveness' | 'meetings' | 'rooms' | 'playbooks' | 'journal' | 'analytics';
+type BriefContext =
+  | 'documents'
+  | 'deals'
+  | 'nudges'
+  | 'effectiveness'
+  | 'meetings'
+  | 'rooms'
+  | 'playbooks'
+  | 'journal'
+  | 'analytics';
 
 const CONTEXT_ICONS: Record<BriefContext, React.ReactNode> = {
   documents: <Target size={16} className="text-blue-400" />,

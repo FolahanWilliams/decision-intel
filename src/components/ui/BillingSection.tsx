@@ -348,8 +348,8 @@ export function BillingSection() {
         </div>
 
         {/* Upgrade CTA for free users */}
-        {data.plan === 'free' && (
-          data.upgradeAvailable ? (
+        {data.plan === 'free' &&
+          (data.upgradeAvailable ? (
             <button
               onClick={() => handleUpgrade('pro')}
               disabled={portalLoading}
@@ -393,8 +393,7 @@ export function BillingSection() {
               <Zap size={14} />
               View Plans & Pricing
             </Link>
-          )
-        )}
+          ))}
 
         {/* Compare plans link */}
         <Link

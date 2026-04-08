@@ -37,7 +37,9 @@ async function checkLLMHealth(): Promise<{ status: string; model?: string; error
       model.generateContent({
         contents: [{ role: 'user', parts: [{ text: 'ping' }] }],
       }),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('LLM health check timed out after 5s')), 5000)),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('LLM health check timed out after 5s')), 5000)
+      ),
     ]);
 
     const health = {

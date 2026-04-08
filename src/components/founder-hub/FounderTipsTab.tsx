@@ -295,7 +295,8 @@ const SECTION_PHASE: Tip[] = [
       'Add the Audit Log and Compare tools to the enterprise section of your demo script in the Sales Toolkit tab. When a prospect asks about compliance or SOC2, show the Audit Log immediately — do not explain it, just show it. The CSV export button is your closing argument.',
   },
   {
-    title: 'Consolidate before you fundraise — investors fund focused products, not feature catalogs',
+    title:
+      'Consolidate before you fundraise — investors fund focused products, not feature catalogs',
     principle:
       'A product with 10 polished screens tells a clearer story than one with 40 functional screens. Investors evaluate clarity of vision, not completeness of backlog.',
     rationale:

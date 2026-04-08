@@ -81,7 +81,9 @@ export function SectionMiniNav({ sections }: SectionMiniNavProps) {
                 width: 6,
                 height: 6,
                 borderRadius: '50%',
-                background: isActive ? 'var(--accent-primary, #16a34a)' : 'var(--border-color, rgba(0,0,0,0.2))',
+                background: isActive
+                  ? 'var(--accent-primary, #16a34a)'
+                  : 'var(--border-color, rgba(0,0,0,0.2))',
                 flexShrink: 0,
                 transition: 'background 0.2s',
               }}

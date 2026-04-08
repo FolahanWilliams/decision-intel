@@ -1,7 +1,16 @@
 'use client';
 
 import React, { useState, useRef, useCallback } from 'react';
-import { ArrowLeft, Download, Copy, FileText, Check, Loader2, Linkedin, Clipboard } from 'lucide-react';
+import {
+  ArrowLeft,
+  Download,
+  Copy,
+  FileText,
+  Check,
+  Loader2,
+  Linkedin,
+  Clipboard,
+} from 'lucide-react';
 import type { CaseStudy } from '@/lib/data/case-studies/types';
 import { getSlugForCase } from '@/lib/data/case-studies/slugs';
 import { CaseStudyBiasGraphExport } from './CaseStudyBiasGraphExport';
@@ -112,7 +121,10 @@ export function CaseStudyAnalyzer({ caseStudy, onBack, onUseInPost, founderPass 
       }
 
       const reader = res.body?.getReader();
-      if (!reader) { setGeneratingPost(false); return; }
+      if (!reader) {
+        setGeneratingPost(false);
+        return;
+      }
 
       const decoder = new TextDecoder();
       let accumulated = '';
@@ -131,7 +143,9 @@ export function CaseStudyAnalyzer({ caseStudy, onBack, onUseInPost, founderPass 
                 accumulated += data.text;
                 setLinkedinPost(accumulated);
               }
-            } catch { /* malformed SSE line */ }
+            } catch {
+              /* malformed SSE line */
+            }
           }
         }
       } finally {
@@ -420,7 +434,14 @@ export function CaseStudyAnalyzer({ caseStudy, onBack, onUseInPost, founderPass 
             border: '1px solid var(--border-primary, #222)',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 12,
+            }}
+          >
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <Linkedin size={16} style={{ color: '#0A66C2' }} />
               <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary, #fff)' }}>
@@ -447,7 +468,11 @@ export function CaseStudyAnalyzer({ caseStudy, onBack, onUseInPost, founderPass 
                     opacity: generatingPost ? 0.7 : 1,
                   }}
                 >
-                  {generatingPost ? <Loader2 size={12} className="animate-spin" /> : <Linkedin size={12} />}
+                  {generatingPost ? (
+                    <Loader2 size={12} className="animate-spin" />
+                  ) : (
+                    <Linkedin size={12} />
+                  )}
                   {generatingPost ? 'Generating...' : 'Generate Post'}
                 </button>
               )}
@@ -538,7 +563,8 @@ export function CaseStudyAnalyzer({ caseStudy, onBack, onUseInPost, founderPass 
 
           {!linkedinPost && !generatingPost && (
             <p style={{ fontSize: 11, color: 'var(--text-muted, #71717a)', margin: 0 }}>
-              Generate a LinkedIn post about this case study. Includes summary, key biases, and a link to the full analysis on your website.
+              Generate a LinkedIn post about this case study. Includes summary, key biases, and a
+              link to the full analysis on your website.
             </p>
           )}
         </div>

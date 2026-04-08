@@ -763,52 +763,52 @@ export function HeroDecisionGraph() {
 
         {/* SVG container — constrained height, but DetailPanel below expands freely */}
         <div style={{ maxHeight: 400, overflow: 'hidden' }}>
-        <motion.svg
-          role="img"
-          aria-label="Interactive decision graph showing how cognitive biases connect to strategic decisions"
-          viewBox={`0 0 ${SVG_W} ${SVG_H}`}
-          style={{
-            width: '100%',
-            height: 'auto',
-            display: 'block',
-            cursor: selectedNode ? 'pointer' : 'default',
-          }}
-          initial={{ opacity: 0 }}
-          animate={isInView ? { opacity: 1 } : {}}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          onClick={() => {
-            if (selectedNode) setSelectedNode(null);
-          }}
-        >
-          {/* Invisible background rect to capture clicks on empty space */}
-          <rect x="0" y="0" width={SVG_W} height={SVG_H} fill="transparent" />
-          {EDGES.map((edge, i) => {
-            const isHighlighted =
-              !!activeNodeId && (edge.source === activeNodeId || edge.target === activeNodeId);
-            const isDimmed = !!activeNodeId && !isHighlighted;
-            return (
-              <EdgeLine
-                key={`${edge.source}-${edge.target}-${i}`}
-                edge={edge}
-                nodes={nodes}
-                isHighlighted={isHighlighted}
-                isDimmed={isDimmed}
-              />
-            );
-          })}
+          <motion.svg
+            role="img"
+            aria-label="Interactive decision graph showing how cognitive biases connect to strategic decisions"
+            viewBox={`0 0 ${SVG_W} ${SVG_H}`}
+            style={{
+              width: '100%',
+              height: 'auto',
+              display: 'block',
+              cursor: selectedNode ? 'pointer' : 'default',
+            }}
+            initial={{ opacity: 0 }}
+            animate={isInView ? { opacity: 1 } : {}}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            onClick={() => {
+              if (selectedNode) setSelectedNode(null);
+            }}
+          >
+            {/* Invisible background rect to capture clicks on empty space */}
+            <rect x="0" y="0" width={SVG_W} height={SVG_H} fill="transparent" />
+            {EDGES.map((edge, i) => {
+              const isHighlighted =
+                !!activeNodeId && (edge.source === activeNodeId || edge.target === activeNodeId);
+              const isDimmed = !!activeNodeId && !isHighlighted;
+              return (
+                <EdgeLine
+                  key={`${edge.source}-${edge.target}-${i}`}
+                  edge={edge}
+                  nodes={nodes}
+                  isHighlighted={isHighlighted}
+                  isDimmed={isDimmed}
+                />
+              );
+            })}
 
-          {nodes.map((node: GraphNode) => (
-            <NodeCircle
-              key={node.id}
-              node={node}
-              isHovered={hoveredNode === node.id}
-              isSelected={selectedNode === node.id}
-              isDimmed={!!activeNodeId && !connectedIds.has(node.id)}
-              onHover={setHoveredNode}
-              onClick={handleNodeClick}
-            />
-          ))}
-        </motion.svg>
+            {nodes.map((node: GraphNode) => (
+              <NodeCircle
+                key={node.id}
+                node={node}
+                isHovered={hoveredNode === node.id}
+                isSelected={selectedNode === node.id}
+                isDimmed={!!activeNodeId && !connectedIds.has(node.id)}
+                onHover={setHoveredNode}
+                onClick={handleNodeClick}
+              />
+            ))}
+          </motion.svg>
         </div>
 
         {/* Bottom bar */}

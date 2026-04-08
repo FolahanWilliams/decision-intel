@@ -44,7 +44,11 @@ export function CaseStudyGraphSection({ biases, primaryBias, toxicCombinations, 
         <p style={{ fontSize: 13, color: '#64748B', marginTop: 4 }}>
           Interactive visualization — hover to explore bias relationships
           {toxicCombinations.length > 0 && (
-            <> &middot; {toxicCombinations.length} toxic combination{toxicCombinations.length !== 1 ? 's' : ''} detected</>
+            <>
+              {' '}
+              &middot; {toxicCombinations.length} toxic combination
+              {toxicCombinations.length !== 1 ? 's' : ''} detected
+            </>
           )}
         </p>
       </div>

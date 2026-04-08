@@ -182,7 +182,8 @@ export function BiasGenomeBenchmark({ userBiasRates }: BiasGenomeBenchmarkProps)
               color: view === v ? 'var(--text-primary)' : 'var(--text-muted)',
               background: 'transparent',
               border: 'none',
-              borderBottom: view === v ? '2px solid var(--accent-primary, #16a34a)' : '2px solid transparent',
+              borderBottom:
+                view === v ? '2px solid var(--accent-primary, #16a34a)' : '2px solid transparent',
               cursor: 'pointer',
               transition: 'color 0.15s',
             }}
@@ -197,70 +198,93 @@ export function BiasGenomeBenchmark({ userBiasRates }: BiasGenomeBenchmarkProps)
       {view === 'heatmap' && <GenomeHeatmap genome={data.genome} />}
 
       {/* List View — Bias rows */}
-      {view === 'list' && <div style={{ padding: '8px 0' }}>
-        {topBiases.map((entry, i) => {
-          const userRate = userBiasRates?.[entry.biasType];
-          const hasComparison = userRate !== undefined;
-          const industryAvg = entry.prevalence;
-          const isAboveAvg = hasComparison && userRate > industryAvg;
-          const isBelowAvg = hasComparison && userRate <= industryAvg;
+      {view === 'list' && (
+        <div style={{ padding: '8px 0' }}>
+          {topBiases.map((entry, i) => {
+            const userRate = userBiasRates?.[entry.biasType];
+            const hasComparison = userRate !== undefined;
+            const industryAvg = entry.prevalence;
+            const isAboveAvg = hasComparison && userRate > industryAvg;
+            const isBelowAvg = hasComparison && userRate <= industryAvg;
 
-          return (
-            <motion.div
-              key={entry.biasType}
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.2, delay: i * 0.04 }}
-              style={{
-                padding: '10px 20px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                borderBottom:
-                  i < topBiases.length - 1 ? '1px solid rgba(255, 255, 255, 0.03)' : 'none',
-              }}
-            >
-              {/* Bias name */}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <span
-                  style={{
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    color: 'var(--text-primary)',
-                    display: 'block',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {formatBiasName(entry.biasType)}
-                </span>
-                <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
-                  {entry.sampleSize} data point{entry.sampleSize !== 1 ? 's' : ''}
-                  {entry.costDelta !== 0 && (
-                    <span
-                      style={{
-                        marginLeft: '6px',
-                        color: entry.costDelta < 0 ? '#ef4444' : '#22c55e',
-                      }}
-                    >
-                      {entry.costDelta > 0 ? '+' : ''}
-                      {entry.costDelta}% success delta
-                    </span>
-                  )}
-                </span>
-              </div>
-
-              {/* Rates comparison */}
-              <div
+            return (
+              <motion.div
+                key={entry.biasType}
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.2, delay: i * 0.04 }}
                 style={{
+                  padding: '10px 20px',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '16px',
-                  flexShrink: 0,
+                  gap: '12px',
+                  borderBottom:
+                    i < topBiases.length - 1 ? '1px solid rgba(255, 255, 255, 0.03)' : 'none',
                 }}
               >
-                {hasComparison && (
+                {/* Bias name */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <span
+                    style={{
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      color: 'var(--text-primary)',
+                      display: 'block',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {formatBiasName(entry.biasType)}
+                  </span>
+                  <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                    {entry.sampleSize} data point{entry.sampleSize !== 1 ? 's' : ''}
+                    {entry.costDelta !== 0 && (
+                      <span
+                        style={{
+                          marginLeft: '6px',
+                          color: entry.costDelta < 0 ? '#ef4444' : '#22c55e',
+                        }}
+                      >
+                        {entry.costDelta > 0 ? '+' : ''}
+                        {entry.costDelta}% success delta
+                      </span>
+                    )}
+                  </span>
+                </div>
+
+                {/* Rates comparison */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '16px',
+                    flexShrink: 0,
+                  }}
+                >
+                  {hasComparison && (
+                    <div style={{ textAlign: 'right' }}>
+                      <span
+                        style={{
+                          fontSize: '10px',
+                          color: 'var(--text-muted)',
+                          display: 'block',
+                        }}
+                      >
+                        Your rate
+                      </span>
+                      <span
+                        style={{
+                          fontSize: '13px',
+                          fontWeight: 700,
+                          color: isAboveAvg ? '#ef4444' : '#22c55e',
+                          fontFamily: "'JetBrains Mono', monospace",
+                        }}
+                      >
+                        {userRate.toFixed(0)}%
+                      </span>
+                    </div>
+                  )}
                   <div style={{ textAlign: 'right' }}>
                     <span
                       style={{
@@ -269,55 +293,34 @@ export function BiasGenomeBenchmark({ userBiasRates }: BiasGenomeBenchmarkProps)
                         display: 'block',
                       }}
                     >
-                      Your rate
+                      Industry avg
                     </span>
                     <span
                       style={{
                         fontSize: '13px',
                         fontWeight: 700,
-                        color: isAboveAvg ? '#ef4444' : '#22c55e',
+                        color: 'var(--text-secondary)',
                         fontFamily: "'JetBrains Mono', monospace",
                       }}
                     >
-                      {userRate.toFixed(0)}%
+                      {industryAvg.toFixed(0)}%
                     </span>
                   </div>
-                )}
-                <div style={{ textAlign: 'right' }}>
-                  <span
-                    style={{
-                      fontSize: '10px',
-                      color: 'var(--text-muted)',
-                      display: 'block',
-                    }}
-                  >
-                    Industry avg
-                  </span>
-                  <span
-                    style={{
-                      fontSize: '13px',
-                      fontWeight: 700,
-                      color: 'var(--text-secondary)',
-                      fontFamily: "'JetBrains Mono', monospace",
-                    }}
-                  >
-                    {industryAvg.toFixed(0)}%
-                  </span>
+                  {hasComparison && (
+                    <div style={{ flexShrink: 0, width: '16px' }}>
+                      {isAboveAvg ? (
+                        <TrendingUp size={14} style={{ color: '#ef4444' }} />
+                      ) : isBelowAvg ? (
+                        <TrendingDown size={14} style={{ color: '#22c55e' }} />
+                      ) : null}
+                    </div>
+                  )}
                 </div>
-                {hasComparison && (
-                  <div style={{ flexShrink: 0, width: '16px' }}>
-                    {isAboveAvg ? (
-                      <TrendingUp size={14} style={{ color: '#ef4444' }} />
-                    ) : isBelowAvg ? (
-                      <TrendingDown size={14} style={{ color: '#22c55e' }} />
-                    ) : null}
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          );
-        })}
-      </div>}
+              </motion.div>
+            );
+          })}
+        </div>
+      )}
     </motion.div>
   );
 }
@@ -376,7 +379,14 @@ function GenomeHeatmap({ genome }: { genome: BiasGenomeEntry[] }) {
         Darker red indicates higher combined cost impact.
       </p>
 
-      <div style={{ display: 'grid', gridTemplateColumns: `100px repeat(${biases.length}, 1fr)`, gap: 2, fontSize: 10 }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: `100px repeat(${biases.length}, 1fr)`,
+          gap: 2,
+          fontSize: 10,
+        }}
+      >
         {/* Header row */}
         <div />
         {biasNames.map((name, i) => (
@@ -429,7 +439,9 @@ function GenomeHeatmap({ genome }: { genome: BiasGenomeEntry[] }) {
                     aspectRatio: '1',
                     position: 'relative',
                     cursor: 'default',
-                    border: isHovered ? '1px solid var(--accent-primary, #16a34a)' : '1px solid transparent',
+                    border: isHovered
+                      ? '1px solid var(--accent-primary, #16a34a)'
+                      : '1px solid transparent',
                     transition: 'border-color 0.15s',
                     minHeight: 24,
                   }}
@@ -456,7 +468,15 @@ function GenomeHeatmap({ genome }: { genome: BiasGenomeEntry[] }) {
                     >
                       <strong>{biasNames[ri]}</strong> + <strong>{biasNames[ci]}</strong>
                       <br />
-                      Combined risk: <span style={{ fontWeight: 700, color: val < -0.1 ? 'var(--error)' : 'var(--success)' }}>{val.toFixed(2)}</span>
+                      Combined risk:{' '}
+                      <span
+                        style={{
+                          fontWeight: 700,
+                          color: val < -0.1 ? 'var(--error)' : 'var(--success)',
+                        }}
+                      >
+                        {val.toFixed(2)}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -467,17 +487,32 @@ function GenomeHeatmap({ genome }: { genome: BiasGenomeEntry[] }) {
       </div>
 
       {/* Legend */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 12, fontSize: 10, color: 'var(--text-muted)' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          marginTop: 12,
+          fontSize: 10,
+          color: 'var(--text-muted)',
+        }}
+      >
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <div style={{ width: 12, height: 12, borderRadius: 2, background: 'rgba(22,163,74,0.35)' }} />
+          <div
+            style={{ width: 12, height: 12, borderRadius: 2, background: 'rgba(22,163,74,0.35)' }}
+          />
           Low risk
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <div style={{ width: 12, height: 12, borderRadius: 2, background: 'rgba(239,68,68,0.25)' }} />
+          <div
+            style={{ width: 12, height: 12, borderRadius: 2, background: 'rgba(239,68,68,0.25)' }}
+          />
           Moderate
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <div style={{ width: 12, height: 12, borderRadius: 2, background: 'rgba(239,68,68,0.55)' }} />
+          <div
+            style={{ width: 12, height: 12, borderRadius: 2, background: 'rgba(239,68,68,0.55)' }}
+          />
           High risk
         </div>
       </div>

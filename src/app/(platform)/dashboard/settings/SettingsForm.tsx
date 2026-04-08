@@ -30,18 +30,39 @@ import { ApiKeysSection } from '@/components/ui/ApiKeysSection';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 const IntegrationsTabContent = dynamic(
-  () => import('@/components/settings/IntegrationMarketplace').then(m => ({ default: m.IntegrationMarketplace })),
-  { loading: () => <div style={{ padding: 32, textAlign: 'center', color: 'var(--text-muted)' }}>Loading integrations...</div> }
+  () =>
+    import('@/components/settings/IntegrationMarketplace').then(m => ({
+      default: m.IntegrationMarketplace,
+    })),
+  {
+    loading: () => (
+      <div style={{ padding: 32, textAlign: 'center', color: 'var(--text-muted)' }}>
+        Loading integrations...
+      </div>
+    ),
+  }
 );
 
 const ComplianceTabContent = dynamic(
   () => import('@/app/(platform)/dashboard/settings/compliance/page'),
-  { loading: () => <div style={{ padding: 32, textAlign: 'center', color: 'var(--text-muted)' }}>Loading compliance...</div> }
+  {
+    loading: () => (
+      <div style={{ padding: 32, textAlign: 'center', color: 'var(--text-muted)' }}>
+        Loading compliance...
+      </div>
+    ),
+  }
 );
 
 const AuditLogTabContent = dynamic(
   () => import('@/components/settings/AuditLogInline').then(m => ({ default: m.AuditLogInline })),
-  { loading: () => <div style={{ padding: 32, textAlign: 'center', color: 'var(--text-muted)' }}>Loading audit log...</div> }
+  {
+    loading: () => (
+      <div style={{ padding: 32, textAlign: 'center', color: 'var(--text-muted)' }}>
+        Loading audit log...
+      </div>
+    ),
+  }
 );
 
 const log = createClientLogger('Settings');
