@@ -158,12 +158,33 @@ async function checkSchemaDrift(): Promise<{
   }
 }
 
+/**
+ * Check cron recency — verifies dispatcher ran within expected window
+ */
+async function checkCronHealth(): Promise<{ status: string; lastRun?: string; error?: string }> {
+  try {
+    const lastAudit = await prisma.auditLog.findFirst({
+      where: { action: { startsWith: 'cron.' } },
+      orderBy: { createdAt: 'desc' },
+      select: { createdAt: true },
+    });
+    if (!lastAudit) return { status: 'unknown', error: 'No cron audit records found' };
+    const hoursSince = (Date.now() - lastAudit.createdAt.getTime()) / (1000 * 60 * 60);
+    return {
+      status: hoursSince < 36 ? 'healthy' : 'stale',
+      lastRun: lastAudit.createdAt.toISOString(),
+    };
+  } catch {
+    return { status: 'unknown', error: 'Failed to check cron recency' };
+  }
+}
+
 export async function GET() {
   const startTime = Date.now();
 
   try {
     // Parallel health checks
-    const [dbHealthy, poolStats, cacheStats, llmHealth, storageHealth, schemaDrift] =
+    const [dbHealthy, poolStats, cacheStats, llmHealth, storageHealth, schemaDrift, cronHealth] =
       await Promise.all([
         testDatabaseConnection(),
         getPoolStats(),
@@ -171,6 +192,7 @@ export async function GET() {
         checkLLMHealth(),
         checkStorageHealth(),
         checkSchemaDrift(),
+        checkCronHealth(),
       ]);
 
     // Determine overall health status
@@ -203,6 +225,7 @@ export async function GET() {
         llm: llmHealth,
         storage: storageHealth,
         schemaDrift,
+        cron: cronHealth,
       },
     };
 

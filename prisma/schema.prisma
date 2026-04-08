@@ -101,6 +101,7 @@ model Analysis {
 
   @@index([documentId])
   @@index([createdAt])
+  @@index([documentId, createdAt])
   @@index([isSample])
 }
 
@@ -119,6 +120,7 @@ model BiasInstance {
   analysis    Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
 
   @@index([analysisId])
+  @@index([analysisId, severity])
 }
 
 model DecisionEmbedding {
@@ -857,6 +859,8 @@ model DecisionRoom {
   @@index([status])
   @@index([decisionType])
   @@index([outcomeId])
+  @@index([documentId])
+  @@index([analysisId])
 }
 
 model RoomParticipant {

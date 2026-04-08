@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
+import { apiError } from '@/lib/utils/api-response';
 
 const log = createLogger('DocumentsRoute');
 
@@ -31,7 +32,7 @@ export async function GET(request: Request) {
     const userId = user?.id;
 
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return apiError({ error: 'Unauthorized', status: 401 });
     }
 
     // Rate limit: 60 requests per minute (generous for dashboard polling)
@@ -180,6 +181,6 @@ export async function GET(request: Request) {
     );
   } catch (error) {
     log.error('Error fetching documents:', error);
-    return NextResponse.json({ error: 'Failed to fetch documents' }, { status: 500 });
+    return apiError({ error: 'Failed to fetch documents', status: 500 });
   }
 }

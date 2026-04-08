@@ -7,6 +7,7 @@
 
 import { NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
+import { trackError } from './error-tracker';
 
 interface SuccessOptions<T> {
   data: T;
@@ -19,6 +20,8 @@ interface ErrorOptions {
   error: string;
   status: number;
   headers?: Record<string, string>;
+  /** Original error — auto-tracked for 5xx responses. */
+  cause?: Error;
 }
 
 function generateRequestId(): string {
@@ -51,7 +54,12 @@ export function apiSuccess<T>({ data, status = 200, meta }: SuccessOptions<T>) {
  *   return apiError({ error: 'Unauthorized', status: 401 });
  *   return apiError({ error: 'Rate limit exceeded', status: 429, headers: { 'Retry-After': '60' } });
  */
-export function apiError({ error, status, headers }: ErrorOptions) {
+export function apiError({ error, status, headers, cause }: ErrorOptions) {
+  // Auto-track server errors for monitoring
+  if (status >= 500 && cause) {
+    void trackError(cause, { statusCode: status });
+  }
+
   return NextResponse.json(
     {
       success: false,
