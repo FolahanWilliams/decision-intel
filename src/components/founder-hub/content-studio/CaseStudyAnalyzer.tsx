@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useRef, useCallback } from 'react';
-import { ArrowLeft, Download, Copy, FileText, Check } from 'lucide-react';
+import { ArrowLeft, Download, Copy, FileText, Check, Loader2, Linkedin, Clipboard } from 'lucide-react';
 import type { CaseStudy } from '@/lib/data/case-studies/types';
+import { getSlugForCase } from '@/lib/data/case-studies/slugs';
 import { CaseStudyBiasGraphExport } from './CaseStudyBiasGraphExport';
 import { CaseStudyKnowledgeGraphExport } from './CaseStudyKnowledgeGraphExport';
 import { downloadSvgAsPng, copySvgToClipboard } from '@/lib/utils/svg-to-image';
@@ -27,15 +28,21 @@ interface Props {
   caseStudy: CaseStudy;
   onBack: () => void;
   onUseInPost: (topic: string) => void;
+  founderPass?: string;
 }
 
-export function CaseStudyAnalyzer({ caseStudy, onBack, onUseInPost }: Props) {
+export function CaseStudyAnalyzer({ caseStudy, onBack, onUseInPost, founderPass }: Props) {
   const [tab, setTab] = useState<Tab>('bias_web');
   const [format, setFormat] = useState<FormatId>('linkedin');
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const biasRef = useRef<SVGSVGElement>(null);
   const knowledgeRef = useRef<SVGSVGElement>(null);
+
+  // LinkedIn post generator state
+  const [linkedinPost, setLinkedinPost] = useState('');
+  const [generatingPost, setGeneratingPost] = useState(false);
+  const [postCopied, setPostCopied] = useState(false);
 
   const currentFormat = FORMATS.find(f => f.id === format)!;
   const activeSvgRef = tab === 'bias_web' ? biasRef : knowledgeRef;
@@ -72,6 +79,101 @@ export function CaseStudyAnalyzer({ caseStudy, onBack, onUseInPost }: Props) {
     const topic = `${caseStudy.company} (${caseStudy.year}): ${caseStudy.title}. Biases detected: ${caseStudy.biasesPresent.map(formatBias).join(', ')}. ${caseStudy.toxicCombinations.length > 0 ? `Toxic combinations: ${caseStudy.toxicCombinations.join(', ')}.` : ''} Outcome: ${caseStudy.estimatedImpact}.`;
     onUseInPost(topic);
   }, [caseStudy, onUseInPost]);
+
+  const caseSlug = getSlugForCase(caseStudy);
+  const caseUrl = `https://www.decision-intel.com/case-studies/${caseSlug}`;
+
+  const handleGenerateLinkedinPost = useCallback(async () => {
+    if (!founderPass) return;
+    setGeneratingPost(true);
+    setLinkedinPost('');
+
+    const topic = `Write a LinkedIn post about the ${caseStudy.company} (${caseStudy.year}) case study. Key facts: ${caseStudy.title}. Biases detected: ${caseStudy.biasesPresent.map(formatBias).join(', ')}. Primary bias: ${formatBias(caseStudy.primaryBias)}. ${caseStudy.toxicCombinations.length > 0 ? `Toxic combinations: ${caseStudy.toxicCombinations.join(', ')}.` : ''} Outcome: ${caseStudy.estimatedImpact}. Summary: ${caseStudy.summary}. End the post with: "Read the full case study: ${caseUrl}" and relevant hashtags.`;
+
+    try {
+      const res = await fetch('/api/founder-hub/content', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-founder-pass': founderPass,
+        },
+        body: JSON.stringify({
+          action: 'generate',
+          contentType: 'linkedin_post',
+          topic,
+          tone: 'authoritative',
+        }),
+      });
+
+      if (!res.ok) {
+        setLinkedinPost('Error: Failed to generate post.');
+        setGeneratingPost(false);
+        return;
+      }
+
+      const reader = res.body?.getReader();
+      if (!reader) { setGeneratingPost(false); return; }
+
+      const decoder = new TextDecoder();
+      let accumulated = '';
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const text = decoder.decode(value, { stream: true });
+          const lines = text.split('\n');
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            try {
+              const data = JSON.parse(line.slice(6));
+              if (data.type === 'chunk' && data.text) {
+                accumulated += data.text;
+                setLinkedinPost(accumulated);
+              }
+            } catch { /* malformed SSE line */ }
+          }
+        }
+      } finally {
+        reader.cancel();
+      }
+    } catch {
+      setLinkedinPost('Error: Network error during generation.');
+    } finally {
+      setGeneratingPost(false);
+    }
+  }, [caseStudy, founderPass, caseUrl]);
+
+  const handleCopyPost = useCallback(() => {
+    if (!linkedinPost) return;
+    navigator.clipboard.writeText(linkedinPost).then(() => {
+      setPostCopied(true);
+      setTimeout(() => setPostCopied(false), 2000);
+    });
+  }, [linkedinPost]);
+
+  const handleDownloadAndCopyPost = useCallback(async () => {
+    // Download the graph image
+    const svg = activeSvgRef.current;
+    if (svg) {
+      setDownloading(true);
+      try {
+        const slug = caseStudy.company.toLowerCase().replace(/\s+/g, '-');
+        const name = `${slug}-${tab === 'bias_web' ? 'bias-web' : 'knowledge-graph'}-${format}`;
+        await downloadSvgAsPng(svg, name, currentFormat.w, currentFormat.h);
+      } catch (err) {
+        console.error('Download failed:', err);
+      } finally {
+        setDownloading(false);
+      }
+    }
+    // Copy the post text
+    if (linkedinPost) {
+      await navigator.clipboard.writeText(linkedinPost);
+      setPostCopied(true);
+      setTimeout(() => setPostCopied(false), 2000);
+    }
+  }, [activeSvgRef, caseStudy.company, tab, format, currentFormat, linkedinPost]);
 
   const tabStyle = (active: boolean): React.CSSProperties => ({
     padding: '6px 16px',
@@ -306,6 +408,141 @@ export function CaseStudyAnalyzer({ caseStudy, onBack, onUseInPost }: Props) {
           Use in Post
         </button>
       </div>
+
+      {/* ── LinkedIn Post Generator ────────────────────────────────── */}
+      {founderPass && (
+        <div
+          style={{
+            marginTop: 16,
+            padding: 16,
+            borderRadius: 12,
+            background: 'var(--bg-tertiary, #0a0a0a)',
+            border: '1px solid var(--border-primary, #222)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Linkedin size={16} style={{ color: '#0A66C2' }} />
+              <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary, #fff)' }}>
+                LinkedIn Post
+              </span>
+            </div>
+            <div style={{ display: 'flex', gap: 6 }}>
+              {!linkedinPost && (
+                <button
+                  onClick={handleGenerateLinkedinPost}
+                  disabled={generatingPost}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    padding: '6px 14px',
+                    borderRadius: 8,
+                    border: 'none',
+                    background: '#0A66C2',
+                    color: '#fff',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: generatingPost ? 'wait' : 'pointer',
+                    opacity: generatingPost ? 0.7 : 1,
+                  }}
+                >
+                  {generatingPost ? <Loader2 size={12} className="animate-spin" /> : <Linkedin size={12} />}
+                  {generatingPost ? 'Generating...' : 'Generate Post'}
+                </button>
+              )}
+              {linkedinPost && (
+                <>
+                  <button
+                    onClick={handleCopyPost}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 5,
+                      padding: '6px 12px',
+                      borderRadius: 8,
+                      border: '1px solid var(--border-primary, #222)',
+                      background: 'transparent',
+                      color: postCopied ? '#22C55E' : 'var(--text-secondary, #a1a1aa)',
+                      fontSize: 11,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {postCopied ? <Check size={12} /> : <Clipboard size={12} />}
+                    {postCopied ? 'Copied!' : 'Copy Post'}
+                  </button>
+                  <button
+                    onClick={handleDownloadAndCopyPost}
+                    disabled={downloading}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 5,
+                      padding: '6px 12px',
+                      borderRadius: 8,
+                      border: 'none',
+                      background: '#16A34A',
+                      color: '#fff',
+                      fontSize: 11,
+                      fontWeight: 600,
+                      cursor: downloading ? 'wait' : 'pointer',
+                    }}
+                  >
+                    <Download size={12} />
+                    Graph + Post
+                  </button>
+                  <button
+                    onClick={handleGenerateLinkedinPost}
+                    disabled={generatingPost}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 5,
+                      padding: '6px 12px',
+                      borderRadius: 8,
+                      border: '1px solid var(--border-primary, #222)',
+                      background: 'transparent',
+                      color: 'var(--text-muted, #71717a)',
+                      fontSize: 11,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {generatingPost ? <Loader2 size={12} className="animate-spin" /> : null}
+                    Regenerate
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+
+          {linkedinPost && (
+            <div
+              style={{
+                padding: 14,
+                borderRadius: 8,
+                background: 'var(--bg-secondary, #111)',
+                border: '1px solid var(--border-primary, #222)',
+                fontSize: 13,
+                color: 'var(--text-secondary, #a1a1aa)',
+                lineHeight: 1.7,
+                whiteSpace: 'pre-wrap',
+                maxHeight: 300,
+                overflowY: 'auto',
+              }}
+            >
+              {linkedinPost}
+            </div>
+          )}
+
+          {!linkedinPost && !generatingPost && (
+            <p style={{ fontSize: 11, color: 'var(--text-muted, #71717a)', margin: 0 }}>
+              Generate a LinkedIn post about this case study. Includes summary, key biases, and a link to the full analysis on your website.
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 }

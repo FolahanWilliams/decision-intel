@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition, useEffect, useCallback, Suspense, lazy } from 'react';
+import { useState, useTransition, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import {
   Settings,

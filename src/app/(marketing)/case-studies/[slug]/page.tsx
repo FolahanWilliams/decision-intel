@@ -14,6 +14,7 @@ import {
 import { computeReferenceClass } from '@/lib/data/reference-class-forecasting';
 import { CaseStudyNav, BRAND_COLORS as C } from '../CaseStudyNav';
 import { CaseStudyCta } from './CaseStudyCta';
+import { CaseStudyGraphSection } from './CaseStudyGraphSection';
 import { formatIndustry, formatDocumentType, formatBiasName, humanize } from '@/lib/utils/labels';
 
 export const dynamicParams = false;
@@ -506,6 +507,18 @@ export default async function CaseStudyDetailPage({
                 </span>
               ))}
             </div>
+          </section>
+        )}
+
+        {/* Interactive Bias Knowledge Graph */}
+        {caseStudy.biasesPresent.length >= 2 && (
+          <section style={{ marginBottom: 40 }}>
+            <CaseStudyGraphSection
+              biases={caseStudy.biasesPresent}
+              primaryBias={caseStudy.primaryBias}
+              toxicCombinations={caseStudy.toxicCombinations}
+              company={caseStudy.company}
+            />
           </section>
         )}
 
