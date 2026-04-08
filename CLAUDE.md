@@ -169,12 +169,29 @@ Claude should ask the founder before:
 
 Claude Code sessions should follow this pattern for best results:
 
+0. **Read TODO.md first.** Check `TODO.md` at the start of every session for known bugs, active priorities, and pending tasks. Update it as tasks are completed or new issues are discovered.
 1. **Start small.** One focused task per session beats a mega-batch across 20 files. Context quality degrades past ~15 file modifications.
 2. **Build-check before pushing.** Always run `npx tsc --noEmit` (fast, type-errors only) or `npm run build` (full build) before committing. The founder doesn't run builds locally — Claude IS the local build check.
 3. **Commit after each logical unit.** Don't batch 12 changes into one commit. Ship fix → commit → next fix → commit.
 4. **Don't rediscover — read CLAUDE.md.** The conventions here (CSS variables, `uploadedAt` not `createdAt`, `safeCompare` import) have all been learned the hard way.
 5. **Pre-commit hook note:** There is a Gemini AI audit hook in `.husky/pre-commit` that runs `npm run audit:ai`. It can be slow. If it blocks and the changes are reviewed, use `--no-verify`.
 6. **Keep CLAUDE.md current — proactively, not at session end.** Whenever a change introduces a new convention, renames a field, adds a critical file, changes a workflow pattern, or discovers a gotcha that cost time — update CLAUDE.md **in the same commit** as that change. Don't wait until the session ends. Don't ask permission. Just include the CLAUDE.md edit alongside the code change. Examples: adding a new Prisma field → update the Database section. Creating a new shared utility → add it to Key Files. Discovering a build error caused by a naming convention → add it to Critical Conventions. The goal is that the next session (which has zero memory of this one) starts with every lesson already learned.
+
+## Sub-Agent Strategy
+
+Use the right model for the right job. Never use Opus for tasks Haiku can handle.
+
+**Exploration (Haiku, 3 in parallel):**
+Use Haiku sub-agents for all read-only codebase exploration — file reading, grep searches, structure mapping, "find all places X is used" pattern analysis. Haiku reads files and reports back just as accurately as Opus. Launch up to 3 in parallel for maximum speed. Always specify `model: "haiku"` and `subagent_type: "Explore"` for these.
+
+**Planning (Opus, main thread):**
+Do implementation planning in the main conversation thread, not in sub-agents. The main thread has the full conversation context, user intent, and prior decisions. Delegating planning to a sub-agent loses this context and produces generic results. The one exception: use a Plan sub-agent (Opus) for very complex multi-file architectural decisions where a fresh perspective helps.
+
+**Implementation (Opus, main thread, direct edits):**
+Never delegate code implementation to sub-agents. Always edit files directly in the main thread. The main thread has the conversation history, knows what was tried, and can make judgment calls. Sub-agents writing code produce lower-quality output because they lack this context.
+
+**Verification (Sonnet or direct Bash):**
+For mechanical checks — type-checking, test runs, build verification, counting occurrences — use direct Bash commands (preferred) or Sonnet sub-agents if parallel checking is needed. These tasks don't need Opus-level reasoning.
 
 ## Key Files Quick Reference
 
@@ -201,6 +218,8 @@ Claude Code sessions should follow this pattern for best results:
 ## Environment Variables
 
 Required for development: `DATABASE_URL`, `DIRECT_URL`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `GOOGLE_API_KEY`.
+
+Optional: `FOUNDER_EMAIL` (for daily LinkedIn post emails via `/api/cron/daily-linkedin`).
 
 See `.env.example` for the full list with descriptions.
 

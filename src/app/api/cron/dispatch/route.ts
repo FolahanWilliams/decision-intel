@@ -95,6 +95,7 @@ export async function GET() {
     '/api/cron/infer-graph-edges',
     '/api/cron/retry-nudges',
     '/api/cron/google-drive-sync',
+    '/api/cron/daily-linkedin',
     '/api/cache/cleanup',
   ];
 

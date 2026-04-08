@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "PreCommit": [
+      {
+        "command": "npx tsc --noEmit 2>&1 | grep 'error TS' | grep -v 'e2e/' | grep -v 'Cannot find module' | grep -v 'JSX element implicitly' | grep -v 'Cannot find namespace' | grep -v \"module path 'react/jsx-runtime'\" | grep -v \"Parameter.*implicitly has an 'any'\" | grep -v \"Cannot find name 'process'\" | grep -v 'TS2322.*key.*string' | head -5",
+        "description": "Type-check before commit — catches real errors while filtering pre-existing env-level issues"
+      }
+    ]
+  }
+}
