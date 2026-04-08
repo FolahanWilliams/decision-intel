@@ -169,6 +169,7 @@ Claude Code sessions should follow this pattern for best results:
 3. **Commit after each logical unit.** Don't batch 12 changes into one commit. Ship fix → commit → next fix → commit.
 4. **Don't rediscover — read CLAUDE.md.** The conventions here (CSS variables, `uploadedAt` not `createdAt`, `safeCompare` import) have all been learned the hard way.
 5. **Pre-commit hook note:** There is a Gemini AI audit hook in `.husky/pre-commit` that runs `npm run audit:ai`. It can be slow. If it blocks and the changes are reviewed, use `--no-verify`.
+6. **Keep CLAUDE.md current.** At the end of any session that introduces new conventions, renames fields, adds critical files, changes workflow patterns, or discovers gotchas that cost time — update this file. Examples: a new CSS variable convention, a renamed Prisma field, a new utility function that should be reused, a pattern that caused a build error. The goal is that the next session (which has zero memory of this one) starts with every lesson already learned. Don't ask — just update it alongside the working commit.
 
 ## Key Files Quick Reference
 
