@@ -1,24 +1,121 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { FounderChatWidget } from '@/components/founder-hub/FounderChatWidget';
-import { ProductOverviewTab } from '@/components/founder-hub/ProductOverviewTab';
-import { CorePipelineTab } from '@/components/founder-hub/CorePipelineTab';
-import { ScoringEngineTab } from '@/components/founder-hub/ScoringEngineTab';
-import { DqiMethodologyTab } from '@/components/founder-hub/DqiMethodologyTab';
-import { IntegrationsAndFlywheelTab } from '@/components/founder-hub/IntegrationsAndFlywheelTab';
-import { StrategyAndPositioningTab } from '@/components/founder-hub/StrategyAndPositioningTab';
-import { SalesToolkitTab } from '@/components/founder-hub/SalesToolkitTab';
-import { LiveStatsTab } from '@/components/founder-hub/LiveStatsTab';
-import { PlaybookAndResearchTab } from '@/components/founder-hub/PlaybookAndResearchTab';
-import { MethodologiesAndPrinciplesTab } from '@/components/founder-hub/MethodologiesAndPrinciplesTab';
-import { CaseStudiesTab } from '@/components/founder-hub/CaseStudiesTab';
-import { CorrelationCausalTab } from '@/components/founder-hub/CorrelationCausalTab';
-import { DecisionAlphaTab } from '@/components/founder-hub/DecisionAlphaTab';
-import { ContentStudioTab } from '@/components/founder-hub/ContentStudioTab';
-import { InvestorDefenseTab } from '@/components/founder-hub/InvestorDefenseTab';
-import { FounderTipsTab } from '@/components/founder-hub/FounderTipsTab';
+import { Loader2 } from 'lucide-react';
+
+// ─── Lazy-loaded tabs (~12,000 lines total — only active tab is loaded) ─────
+const tabLoader = () => (
+  <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
+    <Loader2
+      size={24}
+      style={{ animation: 'spin 1s linear infinite', color: 'var(--text-muted)' }}
+    />
+  </div>
+);
+const ProductOverviewTab = dynamic(
+  () =>
+    import('@/components/founder-hub/ProductOverviewTab').then(m => ({
+      default: m.ProductOverviewTab,
+    })),
+  { loading: tabLoader }
+);
+const CorePipelineTab = dynamic(
+  () =>
+    import('@/components/founder-hub/CorePipelineTab').then(m => ({ default: m.CorePipelineTab })),
+  { loading: tabLoader }
+);
+const ScoringEngineTab = dynamic(
+  () =>
+    import('@/components/founder-hub/ScoringEngineTab').then(m => ({
+      default: m.ScoringEngineTab,
+    })),
+  { loading: tabLoader }
+);
+const DqiMethodologyTab = dynamic(
+  () =>
+    import('@/components/founder-hub/DqiMethodologyTab').then(m => ({
+      default: m.DqiMethodologyTab,
+    })),
+  { loading: tabLoader }
+);
+const IntegrationsAndFlywheelTab = dynamic(
+  () =>
+    import('@/components/founder-hub/IntegrationsAndFlywheelTab').then(m => ({
+      default: m.IntegrationsAndFlywheelTab,
+    })),
+  { loading: tabLoader }
+);
+const StrategyAndPositioningTab = dynamic(
+  () =>
+    import('@/components/founder-hub/StrategyAndPositioningTab').then(m => ({
+      default: m.StrategyAndPositioningTab,
+    })),
+  { loading: tabLoader }
+);
+const SalesToolkitTab = dynamic(
+  () =>
+    import('@/components/founder-hub/SalesToolkitTab').then(m => ({ default: m.SalesToolkitTab })),
+  { loading: tabLoader }
+);
+const LiveStatsTab = dynamic(
+  () => import('@/components/founder-hub/LiveStatsTab').then(m => ({ default: m.LiveStatsTab })),
+  { loading: tabLoader }
+);
+const PlaybookAndResearchTab = dynamic(
+  () =>
+    import('@/components/founder-hub/PlaybookAndResearchTab').then(m => ({
+      default: m.PlaybookAndResearchTab,
+    })),
+  { loading: tabLoader }
+);
+const MethodologiesAndPrinciplesTab = dynamic(
+  () =>
+    import('@/components/founder-hub/MethodologiesAndPrinciplesTab').then(m => ({
+      default: m.MethodologiesAndPrinciplesTab,
+    })),
+  { loading: tabLoader }
+);
+const CaseStudiesTab = dynamic(
+  () =>
+    import('@/components/founder-hub/CaseStudiesTab').then(m => ({ default: m.CaseStudiesTab })),
+  { loading: tabLoader }
+);
+const CorrelationCausalTab = dynamic(
+  () =>
+    import('@/components/founder-hub/CorrelationCausalTab').then(m => ({
+      default: m.CorrelationCausalTab,
+    })),
+  { loading: tabLoader }
+);
+const DecisionAlphaTab = dynamic(
+  () =>
+    import('@/components/founder-hub/DecisionAlphaTab').then(m => ({
+      default: m.DecisionAlphaTab,
+    })),
+  { loading: tabLoader }
+);
+const ContentStudioTab = dynamic(
+  () =>
+    import('@/components/founder-hub/ContentStudioTab').then(m => ({
+      default: m.ContentStudioTab,
+    })),
+  { loading: tabLoader }
+);
+const InvestorDefenseTab = dynamic(
+  () =>
+    import('@/components/founder-hub/InvestorDefenseTab').then(m => ({
+      default: m.InvestorDefenseTab,
+    })),
+  { loading: tabLoader }
+);
+const FounderTipsTab = dynamic(
+  () =>
+    import('@/components/founder-hub/FounderTipsTab').then(m => ({ default: m.FounderTipsTab })),
+  { loading: tabLoader }
+);
 import {
   Rocket,
   Brain,

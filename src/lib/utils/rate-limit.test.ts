@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { checkRateLimit, getRateLimitStatus } from './rate-limit';
+import { checkRateLimit, getRateLimitStatus, _resetDenyCache } from './rate-limit';
 
 // ---------------------------------------------------------------------------
 // Prisma mock
@@ -24,6 +24,7 @@ vi.mock('@/lib/prisma', () => ({
 
 beforeEach(() => {
   vi.clearAllMocks();
+  _resetDenyCache();
 });
 
 // ---------------------------------------------------------------------------

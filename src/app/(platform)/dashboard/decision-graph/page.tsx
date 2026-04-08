@@ -9,7 +9,10 @@ const DecisionKnowledgeGraph = dynamic(
     })),
   { ssr: false }
 );
-import { CausalDAG } from '@/components/visualizations/CausalDAG';
+const CausalDAG = dynamic(
+  () => import('@/components/visualizations/CausalDAG').then(m => ({ default: m.CausalDAG })),
+  { ssr: false }
+);
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { CrossSiloAlertCards } from '@/components/ui/CrossSiloAlertCards';

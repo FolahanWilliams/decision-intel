@@ -100,6 +100,10 @@ function buildAreaPath(): string {
   return `${line} L ${lastX} ${zeroY} L ${firstX} ${zeroY} Z`;
 }
 
+// Pre-compute paths once at module load (pure functions of constants)
+const LINE_PATH = buildLinePath();
+const AREA_PATH = buildAreaPath();
+
 // ─── Animated Counter ────────────────────────────────────────────────────────
 
 function CountUp({
@@ -144,8 +148,8 @@ export function LossAversionChart() {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-50px' });
 
-  const linePath = buildLinePath();
-  const areaPath = buildAreaPath();
+  const linePath = LINE_PATH;
+  const areaPath = AREA_PATH;
 
   // Y-axis tick values
   const yTicks = [0, -10, -20, -30, -40, -50];

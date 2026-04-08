@@ -170,7 +170,14 @@ export function CaseStudyBiasGraph({ biases, primaryBias, toxicCombinations, siz
       style={{ position: 'relative', width: size, height: size + 28, margin: '0 auto' }}
       onMouseLeave={() => setHoveredBias(null)}
     >
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ display: 'block' }}>
+      <svg
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+        style={{ display: 'block' }}
+        role="img"
+        aria-label="Bias interaction network for this case study"
+      >
         {/* Edges */}
         {edges.map((e: BiasEdge, i: number) => {
           const from = nodeMap[e.from];
@@ -204,11 +211,16 @@ export function CaseStudyBiasGraph({ biases, primaryBias, toxicCombinations, siz
           return (
             <motion.g
               key={node.id}
+              role="button"
+              tabIndex={0}
+              aria-label={`Bias: ${node.label}${node.isPrimary ? ' (primary)' : ''}`}
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3, delay: 0.1 + i * 0.06 }}
-              style={{ cursor: 'pointer' }}
+              style={{ cursor: 'pointer', outline: 'none' }}
               onMouseEnter={() => setHoveredBias(node.id)}
+              onFocus={() => setHoveredBias(node.id)}
+              onBlur={() => setHoveredBias(null)}
             >
               {/* Outer glow for primary */}
               {node.isPrimary && (

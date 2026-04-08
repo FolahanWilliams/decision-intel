@@ -24,6 +24,11 @@ function isDeniedInMemory(identifier: string, route: string): boolean {
   return false;
 }
 
+/** @internal Exported for test cleanup only. */
+export function _resetDenyCache(): void {
+  DENY_CACHE.clear();
+}
+
 function cacheDenial(identifier: string, route: string, resetMs: number): void {
   if (DENY_CACHE.size >= DENY_CACHE_MAX) {
     const firstKey = DENY_CACHE.keys().next().value;
