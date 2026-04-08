@@ -13,6 +13,15 @@ Decision Intel is an AI-powered cognitive bias auditing platform for high-stakes
 - The codebase IS the company — any senior full-stack engineer can onboard in weeks
 - Pre-revenue; working toward first paid design partner before raising
 - 97% gross margins ($0.03-0.07 API cost per analysis)
+- Uses Claude Code multiple times daily (4-5 sessions, 1-2 hours each). Context between sessions matters a lot.
+- No running bug tracker — bugs surface in conversation or via CI/CD failures.
+- Does NOT run `npm run build` locally — relies on Vercel CI to catch build errors. **Claude should always run `npm run build` or at minimum `npx tsc --noEmit` before pushing significant changes.**
+- Was unaware of the Gemini pre-commit hook. It may fail or be slow — use `--no-verify` if it blocks and the changes are tested.
+- No pilot users yet. Actively outreaching to PE/VC firms and M&A teams via advisor network.
+- Raising pre-seed/seed in the next 6 months. Needs a GTM/enterprise-sales co-founder or advisor.
+- No direct competitor in "decision quality auditing" — the closest is Cloverpop (decision management, not bias detection). The real competition is "do nothing" — teams don't audit their decision processes at all.
+- Current priorities: (1) land first paying customer, (2) build brand visibility via Content Studio, (3) polish demo flow.
+- All features should stay — nothing should be cut, but features should be consolidated and surfaced contextually rather than via separate nav items.
 
 ## Tech Stack
 
@@ -150,6 +159,16 @@ Claude should ask the founder before:
 3. **Changing pricing, plan limits, or billing logic** — revenue-sensitive.
 4. **Deleting any route or component** — may have external links, bookmarks, or Slack deep links pointing to it.
 5. **Making changes visible to end users** (copy, labels, flow changes) — the founder has specific positioning and language preferences.
+
+## Session Workflow
+
+Claude Code sessions should follow this pattern for best results:
+
+1. **Start small.** One focused task per session beats a mega-batch across 20 files. Context quality degrades past ~15 file modifications.
+2. **Build-check before pushing.** Always run `npx tsc --noEmit` (fast, type-errors only) or `npm run build` (full build) before committing. The founder doesn't run builds locally — Claude IS the local build check.
+3. **Commit after each logical unit.** Don't batch 12 changes into one commit. Ship fix → commit → next fix → commit.
+4. **Don't rediscover — read CLAUDE.md.** The conventions here (CSS variables, `uploadedAt` not `createdAt`, `safeCompare` import) have all been learned the hard way.
+5. **Pre-commit hook note:** There is a Gemini AI audit hook in `.husky/pre-commit` that runs `npm run audit:ai`. It can be slow. If it blocks and the changes are reviewed, use `--no-verify`.
 
 ## Key Files Quick Reference
 
