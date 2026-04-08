@@ -171,6 +171,7 @@ export function ContentStudioTab({ founderPass }: ContentStudioTabProps) {
             setPillar('toxic_combos');
             setSelectedCaseStudy(null);
           }}
+          founderPass={founderPass}
         />
       ) : (
         <CaseStudyPicker onSelectCase={setSelectedCaseStudy} />
