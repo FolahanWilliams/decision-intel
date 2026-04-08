@@ -202,6 +202,7 @@ See `.env.example` for the full list with descriptions.
 
 - Branch naming: `feature/...`, `fix/...`, `audit/...`
 - Commit style: conventional commits (`feat:`, `fix:`, `refactor:`)
+- **Always rebase onto main before pushing:** `git fetch origin main && git rebase origin/main` before every push. This keeps history linear and PRs clean. Never push without rebasing first.
 - Pre-commit hook runs AI audit (can be slow). Use `--no-verify` only when confident.
 - Push with `-u origin <branch>` for new branches.
 - CI/CD: GitHub Actions (`.github/workflows/ci-cd.yml`)
