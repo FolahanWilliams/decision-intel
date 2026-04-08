@@ -22,7 +22,6 @@ import {
   Shield,
   Zap,
   Target,
-  Network,
   AlertTriangle,
 } from 'lucide-react';
 
@@ -629,9 +628,9 @@ export default function LandingPage() {
                 marginBottom: 20,
               }}
             >
-              Every memo has biases.
+              Stop missing the questions
               <br />
-              <span style={{ color: C.green }}>We find them in 60 seconds.</span>
+              <span style={{ color: C.green }}>that killed similar deals.</span>
             </h1>
             <p
               style={{
@@ -642,10 +641,11 @@ export default function LandingPage() {
                 maxWidth: 520,
               }}
             >
-              Grammarly catches grammar errors before you hit send. Decision Intel catches cognitive
-              biases before you sign the deal. Upload any strategic document &mdash; M&amp;A memo,
-              board paper, strategy proposal &mdash; and get a comprehensive bias audit with
-              compliance mapping, noise measurement, and a calibrated risk score in under a minute.
+              Three weeks after close, your team finds the diligence question that cost you $40M in
+              integration overruns. Decision Intel surfaces those gaps before the vote &mdash; not in
+              the post-mortem. Upload your M&amp;A memo or board paper and get the questions
+              comparable historical decisions answered (or fatally ignored) &mdash; in under 60
+              seconds.
             </p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <Link
@@ -881,7 +881,7 @@ export default function LandingPage() {
               phase: 'PHASE_02',
               num: '02',
               title: 'Get the blind second opinion',
-              desc: 'A 12-node pipeline stress-tests the document: 20+ biases detected, a three-judge statistical jury measures noise, and a simulated executive challenge argues against your proposal before the real committee does.',
+              desc: 'A 12-node pipeline stress-tests the document: 20+ biases detected, a three-judge noise jury measures variability, a simulated executive challenge argues against your proposal — and a Forgotten Questions engine surfaces the diligence gaps drawn from comparable historical decisions.',
               bullets: [
                 '20+ cognitive biases with confidence scores',
                 '3 independent noise judges (Kahneman)',
@@ -1116,9 +1116,9 @@ export default function LandingPage() {
               bg: '#FEF2F2',
             },
             {
-              icon: Network,
-              title: 'Decision Knowledge Graph',
-              desc: 'Every decision becomes a node. Edges reveal influence chains, shared biases, and cascading risks across your portfolio.',
+              icon: FileSearch,
+              title: 'Forgotten Questions',
+              desc: "Surfaces the diligence questions your memo never asks — drawn from the gap between your document and its closest historical analogs. Every question was answered (or fatally ignored) in a comparable real decision.",
               color: '#F59E0B',
               bg: '#FFFBEB',
             },
@@ -1200,9 +1200,9 @@ export default function LandingPage() {
                 lineHeight: 1.5,
               }}
             >
-              The average bad strategic decision costs{' '}
-              <span style={{ fontWeight: 700, color: C.slate900 }}>$8.2M</span>. Your team&apos;s
-              decision audit costs{' '}
+              The average M&amp;A diligence gap costs{' '}
+              <span style={{ fontWeight: 700, color: C.slate900 }}>$8.2M</span> in integration
+              overruns. Your team&apos;s comprehensive bias audit:{' '}
               <span style={{ fontWeight: 700, color: C.green }}>$349/month</span>.
             </p>
 

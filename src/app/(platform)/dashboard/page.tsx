@@ -1644,22 +1644,42 @@ export default function Dashboard() {
 
           {/* Empty state - only show when no documents */}
           {uploadedDocs.length === 0 && !loadingDocs && (
-            <div className="card">
-              <EnhancedEmptyState
-                type="documents"
-                title="Upload your first document"
-                description="Drop a PDF, TXT, MD, or DOCX file in the upload zone above. Our AI will scan for cognitive biases, decision noise, logical fallacies, and compliance risks."
-                showBrief
-                briefContext="documents"
-                actions={[
-                  {
-                    label: 'Choose a File',
-                    onClick: () => document.getElementById('file-input')?.click(),
-                    variant: 'primary' as const,
-                  },
-                ]}
-              />
-            </div>
+            <>
+              <div className="card">
+                <EnhancedEmptyState
+                  type="documents"
+                  title="Upload your first document"
+                  description="Drop a PDF, TXT, MD, or DOCX file in the upload zone above. Our AI will scan for cognitive biases, decision noise, logical fallacies, and compliance risks."
+                  showBrief
+                  briefContext="documents"
+                  actions={[
+                    {
+                      label: 'Choose a File',
+                      onClick: () => document.getElementById('file-input')?.click(),
+                      variant: 'primary' as const,
+                    },
+                  ]}
+                />
+              </div>
+              <div
+                style={{
+                  marginTop: 12,
+                  padding: '16px 20px',
+                  background: 'var(--bg-elevated)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 'var(--radius-lg)',
+                  textAlign: 'center',
+                }}
+              >
+                <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: 6 }}>
+                  Or start with a retrospective
+                </p>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: 0 }}>
+                  Upload a past memo or strategy doc to understand what went wrong &mdash; post-mortem
+                  analysis in 60 seconds.
+                </p>
+              </div>
+            </>
           )}
         </>
       )}
