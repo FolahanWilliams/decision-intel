@@ -75,9 +75,10 @@ export async function GET() {
     });
 
     const biasNames = caseStudy.biasesPresent.map(formatBiasName).join(', ');
-    const toxicCombos = caseStudy.toxicCombinations.length > 0
-      ? `Toxic combinations detected: ${caseStudy.toxicCombinations.join(', ')}.`
-      : '';
+    const toxicCombos =
+      caseStudy.toxicCombinations.length > 0
+        ? `Toxic combinations detected: ${caseStudy.toxicCombinations.join(', ')}.`
+        : '';
 
     const prompt = `Write a LinkedIn post (1300-1800 characters) about this real-world case study in cognitive bias and decision-making.
 
@@ -100,7 +101,8 @@ Rules:
 - Do NOT use em dashes. Use commas or periods instead.`;
 
     const result = await model.generateContent(prompt);
-    const postText = result.response.text()
+    const postText = result.response
+      .text()
       .replace(/\*\*/g, '')
       .replace(/__/g, '')
       .replace(/[\u2014\u2013]/g, ', ');

@@ -25,13 +25,7 @@ const DIFFICULTY_COLORS: Record<string, { bg: string; text: string }> = {
   hard: { bg: 'rgba(239,68,68,0.12)', text: '#ef4444' },
 };
 
-function BiasCard({
-  biasKey,
-  bias,
-}: {
-  biasKey: string;
-  bias: BiasEducationContent;
-}) {
+function BiasCard({ biasKey, bias }: { biasKey: string; bias: BiasEducationContent }) {
   const diffColor = DIFFICULTY_COLORS[bias.difficulty] || DIFFICULTY_COLORS.moderate;
 
   return (
@@ -46,7 +40,14 @@ function BiasCard({
       }}
     >
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: 12,
+        }}
+      >
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <span
             style={{
@@ -62,7 +63,14 @@ function BiasCard({
           >
             {bias.taxonomyId}
           </span>
-          <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary, #0f172a)', margin: 0 }}>
+          <h3
+            style={{
+              fontSize: 18,
+              fontWeight: 700,
+              color: 'var(--text-primary, #0f172a)',
+              margin: 0,
+            }}
+          >
             {formatBiasName(biasKey)}
           </h3>
         </div>
@@ -91,10 +99,27 @@ function BiasCard({
           marginBottom: 16,
         }}
       >
-        <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-muted, #94a3b8)', marginBottom: 6 }}>
-          Case Study{bias.realWorldExample.company ? ` | ${bias.realWorldExample.company}` : ''}{bias.realWorldExample.year ? ` (${bias.realWorldExample.year})` : ''}
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px',
+            color: 'var(--text-muted, #94a3b8)',
+            marginBottom: 6,
+          }}
+        >
+          Case Study{bias.realWorldExample.company ? ` | ${bias.realWorldExample.company}` : ''}
+          {bias.realWorldExample.year ? ` (${bias.realWorldExample.year})` : ''}
         </div>
-        <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary, #0f172a)', marginBottom: 6 }}>
+        <div
+          style={{
+            fontSize: 14,
+            fontWeight: 600,
+            color: 'var(--text-primary, #0f172a)',
+            marginBottom: 6,
+          }}
+        >
           {bias.realWorldExample.title}
         </div>
         <div style={{ fontSize: 13, color: 'var(--text-secondary, #475569)', lineHeight: 1.6 }}>
@@ -103,13 +128,30 @@ function BiasCard({
       </div>
 
       {/* Quick tip */}
-      <div style={{ fontSize: 13, color: 'var(--text-secondary, #475569)', lineHeight: 1.6, marginBottom: 16 }}>
-        <strong style={{ color: 'var(--text-primary, #0f172a)' }}>Quick Tip:</strong> {bias.quickTip}
+      <div
+        style={{
+          fontSize: 13,
+          color: 'var(--text-secondary, #475569)',
+          lineHeight: 1.6,
+          marginBottom: 16,
+        }}
+      >
+        <strong style={{ color: 'var(--text-primary, #0f172a)' }}>Quick Tip:</strong>{' '}
+        {bias.quickTip}
       </div>
 
       {/* Debiasing techniques */}
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-muted, #94a3b8)', marginBottom: 8 }}>
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px',
+            color: 'var(--text-muted, #94a3b8)',
+            marginBottom: 8,
+          }}
+        >
           Detection & Debiasing
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
@@ -213,9 +255,10 @@ export default function TaxonomyPage() {
             maxWidth: 640,
           }}
         >
-          20 cognitive biases with stable, citeable identifiers (DI-B-001 through DI-B-020).
-          Each bias includes academic grounding, real-world case studies, and debiasing techniques.
-          These IDs are permanent and can be referenced in research, compliance audits, and regulatory filings.
+          20 cognitive biases with stable, citeable identifiers (DI-B-001 through DI-B-020). Each
+          bias includes academic grounding, real-world case studies, and debiasing techniques. These
+          IDs are permanent and can be referenced in research, compliance audits, and regulatory
+          filings.
         </p>
       </div>
 
@@ -229,10 +272,23 @@ export default function TaxonomyPage() {
           marginBottom: 32,
         }}
       >
-        <h2 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary, #0f172a)', marginBottom: 12 }}>
+        <h2
+          style={{
+            fontSize: 16,
+            fontWeight: 700,
+            color: 'var(--text-primary, #0f172a)',
+            marginBottom: 12,
+          }}
+        >
           Quick Reference
         </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 6 }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+            gap: 6,
+          }}
+        >
           {biasEntries.map(([key, bias]) => (
             <a
               key={key}
@@ -283,7 +339,8 @@ export default function TaxonomyPage() {
         }}
       >
         <p style={{ fontSize: 13, color: 'var(--text-muted, #94a3b8)', lineHeight: 1.6 }}>
-          Taxonomy IDs are permanent and will never change. Cite as: &quot;Decision Intel Bias Taxonomy, {new Date().getFullYear()}. [DI-B-XXX].&quot;
+          Taxonomy IDs are permanent and will never change. Cite as: &quot;Decision Intel Bias
+          Taxonomy, {new Date().getFullYear()}. [DI-B-XXX].&quot;
         </p>
       </div>
     </div>

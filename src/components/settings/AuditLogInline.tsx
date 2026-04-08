@@ -1,7 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ShieldCheck, Download, Search, FileText, LogIn, ClipboardList, Loader2 } from 'lucide-react';
+import {
+  ShieldCheck,
+  Download,
+  Search,
+  FileText,
+  LogIn,
+  ClipboardList,
+  Loader2,
+} from 'lucide-react';
 import Link from 'next/link';
 
 interface AuditEntry {
@@ -51,7 +59,9 @@ export function AuditLogInline() {
         </div>
         <div className="card-body">
           {logs.length === 0 ? (
-            <p style={{ color: 'var(--text-muted)', fontSize: 13, textAlign: 'center', padding: 24 }}>
+            <p
+              style={{ color: 'var(--text-muted)', fontSize: 13, textAlign: 'center', padding: 24 }}
+            >
               No audit log entries yet.
             </p>
           ) : (

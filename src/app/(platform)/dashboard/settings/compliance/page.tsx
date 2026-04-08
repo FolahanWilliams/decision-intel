@@ -1,7 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Shield, CheckCircle, AlertTriangle, ExternalLink, ChevronDown, ChevronRight } from 'lucide-react';
+import {
+  Shield,
+  CheckCircle,
+  AlertTriangle,
+  ExternalLink,
+  ChevronDown,
+  ChevronRight,
+} from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 // ─── Static compliance mapping: DI features → framework controls ────────────
@@ -33,42 +40,48 @@ const FRAMEWORKS: FrameworkPosture[] = [
         controlId: 'CC6.1',
         controlName: 'Logical Access',
         description: 'Restricts logical access to information assets',
-        diFeature: 'Supabase Auth with Google OAuth, role-based TeamMember access, API key scoping with granular permissions',
+        diFeature:
+          'Supabase Auth with Google OAuth, role-based TeamMember access, API key scoping with granular permissions',
         status: 'pass',
       },
       {
         controlId: 'CC6.3',
         controlName: 'Access Removal',
         description: 'Removes access when no longer required',
-        diFeature: 'Team invite revocation, API key expiration, session management via Supabase Auth',
+        diFeature:
+          'Team invite revocation, API key expiration, session management via Supabase Auth',
         status: 'pass',
       },
       {
         controlId: 'CC7.2',
         controlName: 'System Monitoring',
         description: 'Monitors system components for anomalies',
-        diFeature: 'AuditLog model tracking all actions, /api/health endpoint with 7 service checks, Sentry error tracking, error fingerprinting with deduplication',
+        diFeature:
+          'AuditLog model tracking all actions, /api/health endpoint with 7 service checks, Sentry error tracking, error fingerprinting with deduplication',
         status: 'pass',
       },
       {
         controlId: 'CC8.1',
         controlName: 'Change Management',
         description: 'Authorizes, documents, and controls changes',
-        diFeature: 'AnalysisVersion model for result versioning, PromptVersion model for prompt tracking, Git-based CI/CD with automated tests',
+        diFeature:
+          'AnalysisVersion model for result versioning, PromptVersion model for prompt tracking, Git-based CI/CD with automated tests',
         status: 'pass',
       },
       {
         controlId: 'CC6.6',
         controlName: 'Encryption',
         description: 'Protects data in transit and at rest',
-        diFeature: 'AES-256-GCM encryption for documents (DOCUMENT_ENCRYPTION_KEY) and Slack tokens (SLACK_TOKEN_ENCRYPTION_KEY), HTTPS enforced via HSTS headers',
+        diFeature:
+          'AES-256-GCM encryption for documents (DOCUMENT_ENCRYPTION_KEY) and Slack tokens (SLACK_TOKEN_ENCRYPTION_KEY), HTTPS enforced via HSTS headers',
         status: 'pass',
       },
       {
         controlId: 'CC7.4',
         controlName: 'Incident Response',
         description: 'Responds to identified security incidents',
-        diFeature: 'Error tracking with fingerprinting, critical error auto-logging to AuditLog, structured logging with severity levels',
+        diFeature:
+          'Error tracking with fingerprinting, critical error auto-logging to AuditLog, structured logging with severity levels',
         status: 'configured',
       },
     ],
@@ -83,35 +96,40 @@ const FRAMEWORKS: FrameworkPosture[] = [
         controlId: 'A.8.2',
         controlName: 'Information Classification',
         description: 'Classifies information according to business needs',
-        diFeature: 'GDPR anonymizer strips PII before LLM processing, document encryption at rest, content classification via analysis pipeline',
+        diFeature:
+          'GDPR anonymizer strips PII before LLM processing, document encryption at rest, content classification via analysis pipeline',
         status: 'pass',
       },
       {
         controlId: 'A.8.10',
         controlName: 'Information Deletion',
         description: 'Deletes information when no longer required',
-        diFeature: 'Document deletion API with cascade cleanup, CacheEntry TTL-based expiration with probabilistic pruning',
+        diFeature:
+          'Document deletion API with cascade cleanup, CacheEntry TTL-based expiration with probabilistic pruning',
         status: 'pass',
       },
       {
         controlId: 'A.9.4',
         controlName: 'System Access Control',
         description: 'Restricts access to systems and applications',
-        diFeature: 'Rate limiting (Postgres-backed with in-memory deny cache), CSRF protection, API key authentication with scope validation',
+        diFeature:
+          'Rate limiting (Postgres-backed with in-memory deny cache), CSRF protection, API key authentication with scope validation',
         status: 'pass',
       },
       {
         controlId: 'A.12.4',
         controlName: 'Logging and Monitoring',
         description: 'Produces, stores, and reviews event logs',
-        diFeature: 'AuditLog model with action/resource/timestamp tracking, CSV export for compliance audits, NotificationLog for delivery tracking',
+        diFeature:
+          'AuditLog model with action/resource/timestamp tracking, CSV export for compliance audits, NotificationLog for delivery tracking',
         status: 'pass',
       },
       {
         controlId: 'A.14.2',
         controlName: 'Security in Development',
         description: 'Ensures security in the development lifecycle',
-        diFeature: '586+ automated tests, Vitest + Playwright E2E, pre-commit hooks via Husky, dependency vulnerability scanning',
+        diFeature:
+          '586+ automated tests, Vitest + Playwright E2E, pre-commit hooks via Husky, dependency vulnerability scanning',
         status: 'configured',
       },
     ],
@@ -126,28 +144,32 @@ const FRAMEWORKS: FrameworkPosture[] = [
         controlId: 'Art. 25',
         controlName: 'Data Protection by Design',
         description: 'Implements appropriate technical measures for data protection',
-        diFeature: 'GDPR anonymizer as first pipeline node, PII never reaches LLM layer, AES-256-GCM encryption for stored documents',
+        diFeature:
+          'GDPR anonymizer as first pipeline node, PII never reaches LLM layer, AES-256-GCM encryption for stored documents',
         status: 'pass',
       },
       {
         controlId: 'Art. 30',
         controlName: 'Records of Processing',
         description: 'Maintains records of processing activities',
-        diFeature: 'AuditLog captures all document access, analysis runs, and data exports with timestamps and user IDs',
+        diFeature:
+          'AuditLog captures all document access, analysis runs, and data exports with timestamps and user IDs',
         status: 'pass',
       },
       {
         controlId: 'Art. 32',
         controlName: 'Security of Processing',
         description: 'Ensures appropriate security for personal data processing',
-        diFeature: 'Encryption at rest and in transit, timing-safe secret comparison, HMAC-signed webhooks, SSRF protection on outbound requests',
+        diFeature:
+          'Encryption at rest and in transit, timing-safe secret comparison, HMAC-signed webhooks, SSRF protection on outbound requests',
         status: 'pass',
       },
       {
         controlId: 'Art. 17',
         controlName: 'Right to Erasure',
         description: 'Enables deletion of personal data on request',
-        diFeature: 'Document deletion with cascade to Analysis, BiasInstance, and related records. Cache cleanup via TTL expiration.',
+        diFeature:
+          'Document deletion with cascade to Analysis, BiasInstance, and related records. Cache cleanup via TTL expiration.',
         status: 'configured',
       },
     ],
@@ -162,28 +184,32 @@ const FRAMEWORKS: FrameworkPosture[] = [
         controlId: 'Art. 10',
         controlName: 'Data Governance',
         description: 'Training data must be relevant, representative, and free of errors',
-        diFeature: '146 annotated case studies with pre-decision evidence, curated bias taxonomy (DI-B-001 through DI-B-020), academic citations for all bias detection methodology',
+        diFeature:
+          '146 annotated case studies with pre-decision evidence, curated bias taxonomy (DI-B-001 through DI-B-020), academic citations for all bias detection methodology',
         status: 'pass',
       },
       {
         controlId: 'Art. 13',
         controlName: 'Transparency',
         description: 'AI systems must be sufficiently transparent',
-        diFeature: 'DQI score breakdown (6 components with exact weights), bias detection with excerpt highlighting, Explainability tab in Analytics, PromptVersion tracking',
+        diFeature:
+          'DQI score breakdown (6 components with exact weights), bias detection with excerpt highlighting, Explainability tab in Analytics, PromptVersion tracking',
         status: 'pass',
       },
       {
         controlId: 'Art. 14',
         controlName: 'Human Oversight',
         description: 'AI systems must enable human oversight',
-        diFeature: 'Human-in-the-loop via Outcome Gate (confirmed/false-positive bias ratings), Decision Rooms with blind priors, thumbs-up/down on nudges',
+        diFeature:
+          'Human-in-the-loop via Outcome Gate (confirmed/false-positive bias ratings), Decision Rooms with blind priors, thumbs-up/down on nudges',
         status: 'pass',
       },
       {
         controlId: 'Art. 15',
         controlName: 'Accuracy & Robustness',
         description: 'AI systems must be accurate, robust, and cybersecure',
-        diFeature: 'Multi-model fallback (Gemini → Claude), 3-judge noise scoring, A/B prompt testing with Thompson sampling, circuit breaker resilience patterns',
+        diFeature:
+          'Multi-model fallback (Gemini → Claude), 3-judge noise scoring, A/B prompt testing with Thompson sampling, circuit breaker resilience patterns',
         status: 'pass',
       },
     ],
@@ -261,14 +287,24 @@ function FrameworkCard({ framework }: { framework: FrameworkPosture }) {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 20, fontWeight: 800, color: coveragePercent === 100 ? 'var(--success)' : 'var(--text-primary)' }}>
+            <div
+              style={{
+                fontSize: 20,
+                fontWeight: 800,
+                color: coveragePercent === 100 ? 'var(--success)' : 'var(--text-primary)',
+              }}
+            >
               {coveragePercent}%
             </div>
             <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
               {passCount}/{framework.controls.length} controls
             </div>
           </div>
-          {expanded ? <ChevronDown size={16} style={{ color: 'var(--text-muted)' }} /> : <ChevronRight size={16} style={{ color: 'var(--text-muted)' }} />}
+          {expanded ? (
+            <ChevronDown size={16} style={{ color: 'var(--text-muted)' }} />
+          ) : (
+            <ChevronRight size={16} style={{ color: 'var(--text-muted)' }} />
+          )}
         </div>
       </button>
 
@@ -285,7 +321,14 @@ function FrameworkCard({ framework }: { framework: FrameworkPosture }) {
                 border: '1px solid var(--border-color, rgba(0,0,0,0.08))',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: 8,
+                }}
+              >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span
                     style={{
@@ -348,8 +391,8 @@ export default function CompliancePosturePage() {
             </h1>
           </div>
           <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.6 }}>
-            Decision Intel maps to {totalControls} compliance controls across {FRAMEWORKS.length} frameworks.
-            {' '}{passControls} controls are fully satisfied by existing platform features.
+            Decision Intel maps to {totalControls} compliance controls across {FRAMEWORKS.length}{' '}
+            frameworks. {passControls} controls are fully satisfied by existing platform features.
           </p>
         </div>
 
@@ -375,10 +418,25 @@ export default function CompliancePosturePage() {
                   textAlign: 'center',
                 }}
               >
-                <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: 'var(--text-muted)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                    marginBottom: 6,
+                  }}
+                >
                   {f.name}
                 </div>
-                <div style={{ fontSize: 24, fontWeight: 800, color: pass === f.controls.length ? 'var(--success)' : 'var(--text-primary)' }}>
+                <div
+                  style={{
+                    fontSize: 24,
+                    fontWeight: 800,
+                    color: pass === f.controls.length ? 'var(--success)' : 'var(--text-primary)',
+                  }}
+                >
                   {pass}/{f.controls.length}
                 </div>
                 <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>controls satisfied</div>
@@ -406,11 +464,15 @@ export default function CompliancePosturePage() {
           }}
         >
           <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.6, margin: 0 }}>
-            This compliance posture is indicative and based on platform feature analysis.
-            Consult your compliance team for formal certification requirements.
-            For enterprise audit packet generation, see{' '}
-            <a href="/dashboard/audit-log" style={{ color: 'var(--accent-primary)', textDecoration: 'none' }}>
-              Audit Log <ExternalLink size={10} style={{ display: 'inline', verticalAlign: 'middle' }} />
+            This compliance posture is indicative and based on platform feature analysis. Consult
+            your compliance team for formal certification requirements. For enterprise audit packet
+            generation, see{' '}
+            <a
+              href="/dashboard/audit-log"
+              style={{ color: 'var(--accent-primary)', textDecoration: 'none' }}
+            >
+              Audit Log{' '}
+              <ExternalLink size={10} style={{ display: 'inline', verticalAlign: 'middle' }} />
             </a>
           </p>
         </div>

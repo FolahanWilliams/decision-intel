@@ -113,7 +113,9 @@ export async function GET() {
               if (existing.contentHash && newHash === existing.contentHash) {
                 continue; // Same content, skip
               }
-              log.info(`Detected updated version of ${file.name} (${file.id}), creating new analysis`);
+              log.info(
+                `Detected updated version of ${file.name} (${file.id}), creating new analysis`
+              );
             }
 
             // Resolve org for the installation owner

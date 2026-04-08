@@ -32,7 +32,12 @@ interface OutcomeData {
 interface ReplayTabProps {
   analysisData: AnalysisResult;
   outcome?: OutcomeData | null;
-  recalibratedDqi?: { originalScore: number; recalibratedScore: number; delta: number; recalibratedGrade: string } | null;
+  recalibratedDqi?: {
+    originalScore: number;
+    recalibratedScore: number;
+    delta: number;
+    recalibratedGrade: string;
+  } | null;
 }
 
 const STEP_ICONS: Record<string, React.ReactNode> = {
@@ -420,19 +425,31 @@ export function ReplayTab({ analysisData, outcome, recalibratedDqi }: ReplayTabP
                 className="card"
                 style={{ overflow: 'hidden' }}
               >
-                <div className="card-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div
+                  className="card-header"
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                >
                   <h3 className="flex items-center gap-sm" style={{ fontSize: 14 }}>
                     <Eye size={15} style={{ color: 'var(--accent-primary)' }} />
                     What Actually Happened
                   </h3>
                   <button
                     onClick={() => setOutcomeRevealed(false)}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: 4 }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: 'var(--text-muted)',
+                      padding: 4,
+                    }}
                   >
                     <XIcon size={14} />
                   </button>
                 </div>
-                <div className="card-body" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div
+                  className="card-body"
+                  style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
+                >
                   {/* Outcome badge */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <span
@@ -464,33 +481,66 @@ export function ReplayTab({ analysisData, outcome, recalibratedDqi }: ReplayTabP
                       style={{
                         padding: 14,
                         borderRadius: 'var(--radius-md)',
-                        background: recalibratedDqi.delta > 0 ? 'rgba(22,163,74,0.06)' : 'rgba(239,68,68,0.06)',
+                        background:
+                          recalibratedDqi.delta > 0
+                            ? 'rgba(22,163,74,0.06)'
+                            : 'rgba(239,68,68,0.06)',
                         border: `1px solid ${recalibratedDqi.delta > 0 ? 'rgba(22,163,74,0.2)' : 'rgba(239,68,68,0.2)'}`,
                         display: 'flex',
                         alignItems: 'center',
                         gap: 16,
                       }}
                     >
-                      <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Recalibrated DQI:</div>
+                      <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                        Recalibrated DQI:
+                      </div>
                       <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                        <span style={{ fontSize: 13, color: 'var(--text-muted)', textDecoration: 'line-through' }}>
+                        <span
+                          style={{
+                            fontSize: 13,
+                            color: 'var(--text-muted)',
+                            textDecoration: 'line-through',
+                          }}
+                        >
                           {recalibratedDqi.originalScore}
                         </span>
                         <span style={{ fontSize: 13 }}>→</span>
-                        <span style={{ fontSize: 18, fontWeight: 700, color: recalibratedDqi.delta > 0 ? 'var(--success)' : 'var(--error)' }}>
+                        <span
+                          style={{
+                            fontSize: 18,
+                            fontWeight: 700,
+                            color: recalibratedDqi.delta > 0 ? 'var(--success)' : 'var(--error)',
+                          }}
+                        >
                           {recalibratedDqi.recalibratedScore}/100
                         </span>
-                        <span style={{ fontSize: 12, color: recalibratedDqi.delta > 0 ? 'var(--success)' : 'var(--error)', fontWeight: 600 }}>
-                          ({recalibratedDqi.delta > 0 ? '+' : ''}{recalibratedDqi.delta})
+                        <span
+                          style={{
+                            fontSize: 12,
+                            color: recalibratedDqi.delta > 0 ? 'var(--success)' : 'var(--error)',
+                            fontWeight: 600,
+                          }}
+                        >
+                          ({recalibratedDqi.delta > 0 ? '+' : ''}
+                          {recalibratedDqi.delta})
                         </span>
                       </div>
                     </div>
                   )}
 
                   {/* Confirmed & False-Positive Biases */}
-                  {(outcome.confirmedBiases.length > 0 || outcome.falsPositiveBiases.length > 0) && (
+                  {(outcome.confirmedBiases.length > 0 ||
+                    outcome.falsPositiveBiases.length > 0) && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      <div
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 600,
+                          color: 'var(--text-muted)',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px',
+                        }}
+                      >
                         Bias Accuracy
                       </div>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
@@ -539,10 +589,26 @@ export function ReplayTab({ analysisData, outcome, recalibratedDqi }: ReplayTabP
                   {/* Lessons Learned */}
                   {outcome.lessonsLearned && (
                     <div>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>
+                      <div
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 600,
+                          color: 'var(--text-muted)',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px',
+                          marginBottom: 6,
+                        }}
+                      >
                         Lessons Learned
                       </div>
-                      <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6, margin: 0 }}>
+                      <p
+                        style={{
+                          fontSize: 13,
+                          color: 'var(--text-secondary)',
+                          lineHeight: 1.6,
+                          margin: 0,
+                        }}
+                      >
                         {outcome.lessonsLearned}
                       </p>
                     </div>
@@ -550,7 +616,10 @@ export function ReplayTab({ analysisData, outcome, recalibratedDqi }: ReplayTabP
 
                   {outcome.mostAccurateTwin && (
                     <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                      Most accurate boardroom persona: <strong style={{ color: 'var(--text-primary)' }}>{outcome.mostAccurateTwin}</strong>
+                      Most accurate boardroom persona:{' '}
+                      <strong style={{ color: 'var(--text-primary)' }}>
+                        {outcome.mostAccurateTwin}
+                      </strong>
                     </div>
                   )}
                 </div>

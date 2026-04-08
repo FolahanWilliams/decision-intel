@@ -36,7 +36,9 @@ const NudgesPageContent = lazy(() =>
   import('@/components/nudges/NudgesPageContent').then(m => ({ default: m.NudgesPageContent }))
 );
 const CalibrationContent = lazy(() =>
-  import('@/components/calibration/CalibrationContent').then(m => ({ default: m.CalibrationContent }))
+  import('@/components/calibration/CalibrationContent').then(m => ({
+    default: m.CalibrationContent,
+  }))
 );
 
 const TABS = [

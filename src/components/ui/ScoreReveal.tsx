@@ -25,7 +25,12 @@ interface ScoreRevealProps {
   duration?: number;
 }
 
-export function ScoreReveal({ score, label, showGrade = false, duration = 1500 }: ScoreRevealProps) {
+export function ScoreReveal({
+  score,
+  label,
+  showGrade = false,
+  duration = 1500,
+}: ScoreRevealProps) {
   const { grade, color } = getGrade(Math.round(score));
 
   return (
@@ -51,7 +56,12 @@ export function ScoreReveal({ score, label, showGrade = false, duration = 1500 }
           <motion.span
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: duration / 1000 + 0.1, type: 'spring', stiffness: 200, damping: 12 }}
+            transition={{
+              delay: duration / 1000 + 0.1,
+              type: 'spring',
+              stiffness: 200,
+              damping: 12,
+            }}
             style={{
               display: 'inline-flex',
               alignItems: 'center',

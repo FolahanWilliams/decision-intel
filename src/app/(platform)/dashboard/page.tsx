@@ -1651,11 +1651,13 @@ export default function Dashboard() {
                 description="Drop a PDF, TXT, MD, or DOCX file in the upload zone above. Our AI will scan for cognitive biases, decision noise, logical fallacies, and compliance risks."
                 showBrief
                 briefContext="documents"
-                actions={[{
-                  label: 'Choose a File',
-                  onClick: () => document.getElementById('file-input')?.click(),
-                  variant: 'primary' as const,
-                }]}
+                actions={[
+                  {
+                    label: 'Choose a File',
+                    onClick: () => document.getElementById('file-input')?.click(),
+                    variant: 'primary' as const,
+                  },
+                ]}
               />
             </div>
           )}

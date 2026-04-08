@@ -163,10 +163,15 @@ export async function POST(req: NextRequest) {
 
       // Determine grade
       const grade =
-        recalibratedScore >= 85 ? 'A' :
-        recalibratedScore >= 70 ? 'B' :
-        recalibratedScore >= 55 ? 'C' :
-        recalibratedScore >= 40 ? 'D' : 'F';
+        recalibratedScore >= 85
+          ? 'A'
+          : recalibratedScore >= 70
+            ? 'B'
+            : recalibratedScore >= 55
+              ? 'C'
+              : recalibratedScore >= 40
+                ? 'D'
+                : 'F';
 
       await prisma.analysis.update({
         where: { id: analysisId },
@@ -180,7 +185,9 @@ export async function POST(req: NextRequest) {
           },
         },
       });
-      log.info(`Recalibrated DQI for ${analysisId}: ${Math.round(originalScore)} → ${recalibratedScore} (${delta > 0 ? '+' : ''}${delta})`);
+      log.info(
+        `Recalibrated DQI for ${analysisId}: ${Math.round(originalScore)} → ${recalibratedScore} (${delta > 0 ? '+' : ''}${delta})`
+      );
     } catch (recalErr) {
       log.warn('DQI recalibration failed (non-critical):', recalErr);
     }
