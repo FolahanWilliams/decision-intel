@@ -739,8 +739,6 @@ export function HeroDecisionGraph() {
           borderRadius: 16,
           padding: '20px 12px 0',
           position: 'relative',
-          maxHeight: 480,
-          overflow: 'hidden',
         }}
       >
         {/* Header */}
@@ -763,6 +761,8 @@ export function HeroDecisionGraph() {
           </div>
         </div>
 
+        {/* SVG container — constrained height, but DetailPanel below expands freely */}
+        <div style={{ maxHeight: 400, overflow: 'hidden' }}>
         <motion.svg
           role="img"
           aria-label="Interactive decision graph showing how cognitive biases connect to strategic decisions"
@@ -809,6 +809,7 @@ export function HeroDecisionGraph() {
             />
           ))}
         </motion.svg>
+        </div>
 
         {/* Bottom bar */}
         <div

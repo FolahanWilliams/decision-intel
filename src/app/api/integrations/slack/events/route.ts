@@ -713,7 +713,7 @@ async function processSlackDecision(
     }
 
     // ─── I2: Auto-create DecisionRoom from Slack thread decisions ──────
-    let decisionRoomId: string | null = null;
+    let _decisionRoomId: string | null = null;
     try {
       const roomInstallation = teamId
         ? await prisma.slackInstallation.findFirst({
@@ -730,6 +730,16 @@ async function processSlackDecision(
         });
 
         const biasArray = Array.isArray(auditResult.biasFindings) ? auditResult.biasFindings : [];
+        const briefing = {
+          overallScore: auditResult.decisionQualityScore,
+          noiseScore: auditResult.noiseScore,
+          topBiases: biasArray.slice(0, 10).map(b => ({
+            biasType: String(b.biasType ?? ''),
+            severity: String(b.severity ?? ''),
+          })),
+          source: 'slack_auto',
+          generatedAt: new Date().toISOString(),
+        };
         const room = await prisma.decisionRoom.create({
           data: {
             title: `Slack: ${input.content.slice(0, 60)}`,
@@ -737,19 +747,10 @@ async function processSlackDecision(
             orgId: roomOrgMember?.orgId,
             status: 'open',
             decisionType: input.decisionType || 'general',
-            biasBriefing: {
-              overallScore: auditResult.decisionQualityScore,
-              noiseScore: auditResult.noiseScore,
-              topBiases: biasArray.slice(0, 10).map((b: Record<string, unknown>) => ({
-                biasType: b.biasType,
-                severity: b.severity,
-              })),
-              source: 'slack_auto',
-              generatedAt: new Date().toISOString(),
-            },
+            biasBriefing: briefing as unknown as Record<string, unknown>,
           },
         });
-        decisionRoomId = room.id;
+        _decisionRoomId = room.id;
 
         await prisma.roomParticipant.create({
           data: {
@@ -773,9 +774,6 @@ async function processSlackDecision(
         const copilotUrl = copilotSessionId
           ? `${appUrl}/dashboard/ask?mode=copilot&session=${copilotSessionId}`
           : undefined;
-        const roomUrl = decisionRoomId
-          ? `${appUrl}/dashboard/meetings?room=${decisionRoomId}`
-          : undefined;
 
         const summaryPayload = formatAuditSummaryForSlack(
           {
@@ -784,7 +782,6 @@ async function processSlackDecision(
             biasFindings: Array.isArray(auditResult.biasFindings) ? auditResult.biasFindings : [],
             summary: auditResult.summary,
             copilotUrl,
-            roomUrl,
           },
           summaryThreadTs
         );
