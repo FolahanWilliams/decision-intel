@@ -713,7 +713,6 @@ async function processSlackDecision(
     }
 
     // ─── I2: Auto-create DecisionRoom from Slack thread decisions ──────
-    let _decisionRoomId: string | null = null;
     try {
       const roomInstallation = teamId
         ? await prisma.slackInstallation.findFirst({
@@ -747,11 +746,9 @@ async function processSlackDecision(
             orgId: roomOrgMember?.orgId,
             status: 'open',
             decisionType: input.decisionType || 'general',
-            biasBriefing: briefing as unknown as Record<string, unknown>,
+            biasBriefing: JSON.parse(JSON.stringify(briefing)),
           },
         });
-        _decisionRoomId = room.id;
-
         await prisma.roomParticipant.create({
           data: {
             roomId: room.id,

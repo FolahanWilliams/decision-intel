@@ -27,13 +27,18 @@ interface IntelligenceData {
   } | null;
 }
 
-type BriefContext = 'documents' | 'deals' | 'nudges' | 'effectiveness';
+type BriefContext = 'documents' | 'deals' | 'nudges' | 'effectiveness' | 'meetings' | 'rooms' | 'playbooks' | 'journal' | 'analytics';
 
 const CONTEXT_ICONS: Record<BriefContext, React.ReactNode> = {
   documents: <Target size={16} className="text-blue-400" />,
   deals: <AlertTriangle size={16} className="text-orange-400" />,
   nudges: <Zap size={16} className="text-purple-400" />,
   effectiveness: <TrendingUp size={16} className="text-emerald-400" />,
+  meetings: <Target size={16} className="text-blue-400" />,
+  rooms: <AlertTriangle size={16} className="text-orange-400" />,
+  playbooks: <Zap size={16} className="text-purple-400" />,
+  journal: <TrendingUp size={16} className="text-emerald-400" />,
+  analytics: <TrendingUp size={16} className="text-blue-400" />,
 };
 
 function getContextualTip(context: BriefContext, data: IntelligenceData): string {
@@ -74,6 +79,27 @@ function getContextualTip(context: BriefContext, data: IntelligenceData): string
       }
       return "Track decision outcomes to build your team's calibration profile and measure improvement over time.";
     }
+
+    case 'meetings':
+      return 'Record your next IC meeting to detect biases in real-time deliberation. Upload audio or video files for automatic transcription and analysis.';
+
+    case 'rooms':
+      if (biasName) {
+        return `Decision rooms use blind priors to prevent ${biasName} from influencing group consensus. Create one from any completed analysis.`;
+      }
+      return 'Decision rooms enable structured decision-making with blind prior voting and dissent tracking.';
+
+    case 'playbooks':
+      return 'Playbooks are step-by-step debiasing guides for common decision patterns. They activate automatically when toxic combinations are detected.';
+
+    case 'journal':
+      return 'Your decision journal captures decisions from email, Slack, and calendar automatically. Connect integrations in Settings to start logging.';
+
+    case 'analytics':
+      if (biasName && dangerX) {
+        return `Your most dangerous bias is ${biasName} (${dangerX}x failure rate). Upload more documents to refine this signal.`;
+      }
+      return 'Analytics will populate as you analyze documents and track outcomes. Start with your first upload.';
   }
 }
 
