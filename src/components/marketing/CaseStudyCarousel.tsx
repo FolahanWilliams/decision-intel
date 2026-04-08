@@ -240,9 +240,25 @@ export function CaseStudyCarousel() {
                     {c.year} &middot; {formatIndustry(c.industry)}
                   </p>
 
+                  {c.lessonsLearned[0] && (
+                    <div
+                      style={{
+                        fontSize: 12,
+                        color: C.slate600,
+                        marginBottom: 8,
+                        lineHeight: 1.5,
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      <strong style={{ color: C.slate900 }}>What went wrong:</strong>{' '}
+                      {c.lessonsLearned[0]}
+                    </div>
+                  )}
                   {c.primaryBias && (
-                    <div style={{ fontSize: 12, color: C.slate600, marginBottom: 8 }}>
-                      <strong style={{ color: C.slate900 }}>Flagged:</strong>{' '}
+                    <div style={{ fontSize: 11, color: C.slate400, marginBottom: 8 }}>
                       {formatBiasName(c.primaryBias)}
                     </div>
                   )}
@@ -266,22 +282,6 @@ export function CaseStudyCarousel() {
                     </div>
                   )}
 
-                  {c.lessonsLearned[0] && (
-                    <p
-                      style={{
-                        fontSize: 13,
-                        color: C.slate600,
-                        margin: 0,
-                        lineHeight: 1.5,
-                        display: '-webkit-box',
-                        WebkitLineClamp: 3,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
-                      }}
-                    >
-                      {c.lessonsLearned[0]}
-                    </p>
-                  )}
                 </Link>
               </motion.div>
             );

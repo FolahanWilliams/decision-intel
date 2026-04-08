@@ -708,9 +708,9 @@ export default function LandingPage() {
                 The job you&rsquo;re hiring us for
               </div>
               <p style={{ fontSize: 14, color: C.slate600, lineHeight: 1.6, margin: 0 }}>
-                When my team is about to commit on a decision that looks right, help me know whether
-                our conviction survives a blind, unbiased stress test &mdash; so we can move forward
-                with confidence or pause before it&rsquo;s irreversible.
+                The night before the IC votes on a deal we&rsquo;ve worked for months: what question
+                is this memo not asking? What did teams in similar situations get wrong &mdash; and
+                did we just repeat it?
               </p>
             </div>
           </div>
