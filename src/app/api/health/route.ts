@@ -32,10 +32,13 @@ async function checkLLMHealth(): Promise<{ status: string; model?: string; error
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: modelName });
 
-    // Lightweight check - just verify model is accessible
-    await model.generateContent({
-      contents: [{ role: 'user', parts: [{ text: 'ping' }] }],
-    });
+    // Lightweight check with 5s timeout to prevent health check hanging
+    await Promise.race([
+      model.generateContent({
+        contents: [{ role: 'user', parts: [{ text: 'ping' }] }],
+      }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('LLM health check timed out after 5s')), 5000)),
+    ]);
 
     const health = {
       status: 'healthy',

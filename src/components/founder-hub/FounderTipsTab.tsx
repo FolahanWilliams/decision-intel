@@ -273,6 +273,38 @@ const SECTION_REFINEMENT: Tip[] = [
   },
 ];
 
+// ─── Section 6 — Phase Awareness ─────────────────────────────────────────
+
+const SECTION_PHASE: Tip[] = [
+  {
+    title: 'You are in the "make it undeniable" phase — every feature should earn its screen space',
+    principle:
+      'Before you shipped 30 features, the risk was doing too little. Now the risk is doing too much. Every feature that stays should pass the test: "Would a prospect remember this from a 15-minute demo?"',
+    rationale:
+      'You have more features than most Series A companies. That is both an asset and a liability. The asset: you can demo anything a prospect asks about. The liability: you are spreading your own attention across surfaces that do not compound. At your stage, the highest-leverage move is not shipping feature 31 — it is making features 1 through 5 so polished, so fast, so visually compelling that nobody can look at a competitor and feel the same level of confidence. The companies that win at pre-seed are the ones that feel "finished" even though they are early. Linear felt finished at seed. Figma felt finished at seed. That feeling comes from relentless polish on the core loop, not from feature count.',
+    action:
+      'Walk through the entire app as if you are a first-time user with zero context. Time every interaction. Write down every moment of friction or confusion. Fix the top 5 friction points before building anything new. Repeat monthly.',
+  },
+  {
+    title: 'Your Audit Log and Compare features are enterprise-closer gold — surface them in demos',
+    principle:
+      'The Audit Log (compliance tracking with CSV export) and Compare Analyses (side-by-side delta scoring) are exactly what enterprise buyers ask about in security reviews and POCs. They exist but are not in your pitch flow.',
+    rationale:
+      'Enterprise deals die in procurement, not in the demo. The features that close enterprise deals are not the flashy ones (pipeline visualization, boardroom simulation) but the boring ones (audit trails, export capabilities, comparison tools, SSO). You built the Audit Log and Compare features but they are buried in the nav. In your next enterprise conversation, when they ask "how do we track who accessed what," you should be able to show the Audit Log in under 3 seconds. When they ask "how do we measure improvement," the Compare tool is the answer. These are closing features, not discovery features. Sequence them accordingly in the demo.',
+    action:
+      'Add the Audit Log and Compare tools to the enterprise section of your demo script in the Sales Toolkit tab. When a prospect asks about compliance or SOC2, show the Audit Log immediately — do not explain it, just show it. The CSV export button is your closing argument.',
+  },
+  {
+    title: 'Consolidate before you fundraise — investors fund focused products, not feature catalogs',
+    principle:
+      'A product with 10 polished screens tells a clearer story than one with 40 functional screens. Investors evaluate clarity of vision, not completeness of backlog.',
+    rationale:
+      'When an investor opens your product, they form an opinion in 60 seconds. If they see a dense sidebar with 15+ items, the mental model they build is "this founder ships a lot but has not yet found focus." If they see 5-7 crisp sections that flow logically (Upload → Analyze → Review → Track → Improve), the mental model is "this founder knows exactly what the product is." Both impressions are formed before they read a single bias result. The sidebar IS the pitch. Consolidate analytics tabs into one, merge overlapping pages, and hide power-user features behind contextual actions rather than top-level nav items.',
+    action:
+      'Target: reduce sidebar nav items by 30% before the next investor conversation. Merge Trends & Insights, Decision Intelligence, and Explainability into the Analytics tab (which already exists). Move Calibration and Decision Rooms into a "Teams" section. Keep the core flow to 5 items: Dashboard, Analyze, History, Analytics, Settings.',
+  },
+];
+
 export function FounderTipsTab() {
   return (
     <div>
@@ -289,7 +321,7 @@ export function FounderTipsTab() {
             marginBottom: 0,
           }}
         >
-          Seventeen principles grounded in your specific position: solo founder, 16, Nigeria, PE/VC
+          Twenty principles grounded in your specific position: solo founder, 16, Nigeria, PE/VC
           wedge, Wiz advisor, 97% gross margins, 199K+ LoC already shipped. Re-read when deciding
           what to build next, what to kill, what to say in a pitch, and what to ignore.
         </p>
@@ -338,6 +370,15 @@ export function FounderTipsTab() {
         </div>
         {SECTION_REFINEMENT.map((t, i) => (
           <TipBlock key={t.title} t={t} idx={i + 15} />
+        ))}
+      </div>
+
+      <div style={{ ...card, borderLeft: '3px solid #06b6d4' }}>
+        <div style={sectionTitle}>
+          <Compass size={18} style={{ color: '#06b6d4' }} /> Section 6 — Phase Awareness
+        </div>
+        {SECTION_PHASE.map((t, i) => (
+          <TipBlock key={t.title} t={t} idx={i + 18} />
         ))}
       </div>
     </div>

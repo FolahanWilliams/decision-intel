@@ -54,9 +54,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { email, role } = InviteSchema.parse(body);
 
-    // Must be owner or admin
+    // Must be owner or admin — include org to avoid extra query when sending invite email
     const membership = await prisma.teamMember.findFirst({
       where: { userId: user.id, role: { in: ['owner', 'admin'] } },
+      include: { organization: { select: { id: true, name: true } } },
     });
     if (!membership) {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
@@ -115,8 +116,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Send invite email (fire and forget)
-    const org = await prisma.organization.findUnique({ where: { id: membership.orgId } });
+    // Send invite email (fire and forget) — org already loaded with membership query
     import('@/lib/notifications/email')
       .then(({ notifyTeamInvite }) =>
         notifyTeamInvite(
@@ -124,7 +124,7 @@ export async function POST(req: NextRequest) {
           (user.user_metadata as Record<string, string> | undefined)?.full_name ||
             user.email ||
             'A teammate',
-          org?.name || 'a team',
+          membership.organization?.name || 'a team',
           invite.token
         )
       )
