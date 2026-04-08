@@ -12,6 +12,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createLogger } from '@/lib/utils/logger';
 import { sendNewsletterWelcome } from '@/lib/notifications/email';
+import { checkRateLimit } from '@/lib/utils/rate-limit';
+import { apiError, apiSuccess } from '@/lib/utils/api-response';
 import { z } from 'zod';
 
 const log = createLogger('PilotInterest');
@@ -58,15 +60,26 @@ async function notifySlack(payload: {
 
 export async function POST(req: NextRequest) {
   try {
+    // Rate limit by IP — public endpoint, prevent abuse
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    const rl = await checkRateLimit(ip, '/api/pilot-interest', {
+      windowMs: 60 * 60 * 1000, // 1 hour
+      maxRequests: 10,
+      failMode: 'open', // Don't block leads on DB errors
+    });
+    if (!rl.success) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429, headers: { 'Retry-After': String(rl.reset - Math.floor(Date.now() / 1000)) } }
+      );
+    }
+
     const body = await req.json().catch(() => null);
     const parsed = PilotInterestSchema.safeParse(body);
 
     if (!parsed.success) {
       const first = parsed.error.issues[0];
-      return NextResponse.json(
-        { error: first?.message ?? 'Invalid request', details: parsed.error.flatten() },
-        { status: 400 }
-      );
+      return apiError({ error: first?.message ?? 'Invalid request', status: 400 });
     }
 
     const { email, caseSlug, company, source } = parsed.data;
@@ -103,9 +116,9 @@ export async function POST(req: NextRequest) {
       void sendNewsletterWelcome(email);
     }
 
-    return NextResponse.json({ ok: true });
+    return apiSuccess({ data: { ok: true } });
   } catch (err) {
     log.error('Failed to record pilot interest', { error: err });
-    return NextResponse.json({ error: 'Submission failed' }, { status: 500 });
+    return apiError({ error: 'Submission failed', status: 500, cause: err instanceof Error ? err : undefined });
   }
 }

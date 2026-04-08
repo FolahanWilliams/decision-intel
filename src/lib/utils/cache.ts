@@ -49,7 +49,7 @@ export const CACHE_TTL = {
 // Low-level helpers
 // ---------------------------------------------------------------------------
 
-async function cacheGet(key: string): Promise<string | null> {
+export async function cacheGet(key: string): Promise<string | null> {
   logCacheReady();
   try {
     const entry = await prisma.cacheEntry.findUnique({
@@ -69,7 +69,7 @@ async function cacheGet(key: string): Promise<string | null> {
   }
 }
 
-async function cacheSet(key: string, value: string, ttlSeconds: number): Promise<void> {
+export async function cacheSet(key: string, value: string, ttlSeconds: number): Promise<void> {
   logCacheReady();
   const expiresAt = new Date(Date.now() + ttlSeconds * 1000);
   try {

@@ -15,6 +15,7 @@ import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { createLogger } from '@/lib/utils/logger';
 import { safeCompare } from '@/lib/utils/safe-compare';
+import { acquireCronLock, releaseCronLock } from '@/lib/utils/cron-lock';
 
 const log = createLogger('CronDispatch');
 
@@ -64,6 +65,13 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  // Concurrency guard — prevent duplicate dispatch if Vercel retries
+  const locked = await acquireCronLock('dispatch', 300);
+  if (!locked) {
+    log.info('Skipping dispatch — another instance is already running');
+    return NextResponse.json({ skipped: true, reason: 'Another dispatch in progress' });
+  }
+
   const baseUrl =
     process.env.NEXT_PUBLIC_APP_URL ||
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
@@ -101,31 +109,35 @@ export async function GET() {
 
   // Run jobs sequentially to avoid overwhelming the server.
   // Failed jobs get one retry after a short delay.
-  const results: JobResult[] = [];
-  for (const job of jobsToRun) {
-    let result = await runJob(baseUrl, job, cronSecret);
-    if (result.status === 'error') {
-      log.warn(`Cron job ${job} failed, retrying in 2s: ${result.error}`);
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      result = await runJob(baseUrl, job, cronSecret);
+  try {
+    const results: JobResult[] = [];
+    for (const job of jobsToRun) {
+      let result = await runJob(baseUrl, job, cronSecret);
+      if (result.status === 'error') {
+        log.warn(`Cron job ${job} failed, retrying in 2s: ${result.error}`);
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        result = await runJob(baseUrl, job, cronSecret);
+      }
+      results.push(result);
+      if (result.status === 'error') {
+        log.error(`Cron job ${job} failed after retry: ${result.error}`);
+      } else {
+        log.info(`Cron job ${job} completed in ${result.ms}ms`);
+      }
     }
-    results.push(result);
-    if (result.status === 'error') {
-      log.error(`Cron job ${job} failed after retry: ${result.error}`);
-    } else {
-      log.info(`Cron job ${job} completed in ${result.ms}ms`);
-    }
+
+    const failed = results.filter(r => r.status === 'error');
+
+    return NextResponse.json(
+      {
+        dispatched: jobsToRun.length,
+        succeeded: results.filter(r => r.status === 'ok').length,
+        failed: failed.length,
+        results,
+      },
+      { status: failed.length === jobsToRun.length ? 500 : 200 }
+    );
+  } finally {
+    await releaseCronLock('dispatch');
   }
-
-  const failed = results.filter(r => r.status === 'error');
-
-  return NextResponse.json(
-    {
-      dispatched: jobsToRun.length,
-      succeeded: results.filter(r => r.status === 'ok').length,
-      failed: failed.length,
-      results,
-    },
-    { status: failed.length === jobsToRun.length ? 500 : 200 }
-  );
 }

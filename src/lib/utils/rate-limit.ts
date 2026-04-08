@@ -9,6 +9,29 @@ import { createLogger } from './logger';
 
 const log = createLogger('RateLimit');
 
+// ---------------------------------------------------------------------------
+// In-memory deny cache — avoids a DB roundtrip for repeat offenders within
+// the same serverless instance. Evicts oldest entry when full.
+// ---------------------------------------------------------------------------
+const DENY_CACHE = new Map<string, number>(); // key → expiry timestamp (ms)
+const DENY_CACHE_MAX = 1000;
+
+function isDeniedInMemory(identifier: string, route: string): boolean {
+  const key = `${identifier}:${route}`;
+  const expiry = DENY_CACHE.get(key);
+  if (expiry && expiry > Date.now()) return true;
+  if (expiry) DENY_CACHE.delete(key);
+  return false;
+}
+
+function cacheDenial(identifier: string, route: string, resetMs: number): void {
+  if (DENY_CACHE.size >= DENY_CACHE_MAX) {
+    const firstKey = DENY_CACHE.keys().next().value;
+    if (firstKey) DENY_CACHE.delete(firstKey);
+  }
+  DENY_CACHE.set(`${identifier}:${route}`, resetMs);
+}
+
 export interface RateLimitResult {
   success: boolean;
   limit: number;
@@ -46,6 +69,16 @@ export async function checkRateLimit(
   const windowStart = new Date(now.getTime() - config.windowMs);
   const failMode = config.failMode ?? 'closed';
 
+  // Fast path: check in-memory deny cache before hitting the DB
+  if (isDeniedInMemory(identifier, route)) {
+    return {
+      success: false,
+      limit: config.maxRequests,
+      remaining: 0,
+      reset: Math.floor((now.getTime() + config.windowMs) / 1000),
+    };
+  }
+
   try {
     // Clean up old expired rate limit entries in the background.
     // Fire-and-forget: logging is best-effort; failure does not block the request.
@@ -81,6 +114,9 @@ export async function checkRateLimit(
     const currentResetAt = row?.reset_at ?? resetAt;
 
     if (currentCount > config.maxRequests) {
+      // Cache the denial so subsequent requests from this identifier
+      // skip the DB roundtrip within this serverless instance
+      cacheDenial(identifier, route, currentResetAt.getTime());
       return {
         success: false,
         limit: config.maxRequests,

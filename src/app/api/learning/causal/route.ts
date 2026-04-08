@@ -71,6 +71,7 @@ export async function GET(request: NextRequest) {
       if (globalOutcomeCount >= 10) {
         const globalOutcomes = await prisma.decisionOutcome.findMany({
           select: { outcome: true },
+          take: 1000,
         });
         const globalFailureRate =
           globalOutcomes.filter(o => o.outcome === 'failure').length / globalOutcomes.length;

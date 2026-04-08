@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
 import { createLogger } from '@/lib/utils/logger';
 import { normalizeBiasType, getBiasDisplayName } from '@/lib/utils/bias-normalize';
+import { apiError } from '@/lib/utils/api-response';
 
 const log = createLogger('InsightsRoute');
 
@@ -17,7 +18,7 @@ export async function GET() {
     } = await supabase.auth.getUser();
     const userId = user?.id;
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return apiError({ error: 'Unauthorized', status: 401 });
     }
 
     // All queries scoped to user's documents
@@ -25,6 +26,8 @@ export async function GET() {
       await prisma.document.findMany({
         where: { userId },
         select: { id: true },
+        take: 200,
+        orderBy: { uploadedAt: 'desc' },
       })
     ).map((d: { id: string }) => d.id);
 
@@ -472,6 +475,6 @@ export async function GET() {
     });
   } catch (error) {
     log.error('Error:', error);
-    return NextResponse.json({ error: 'Failed to generate insights' }, { status: 500 });
+    return apiError({ error: 'Failed to generate insights', status: 500 });
   }
 }

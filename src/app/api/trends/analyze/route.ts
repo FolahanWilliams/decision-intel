@@ -7,6 +7,9 @@ import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
 import { logAudit } from '@/lib/audit';
 import { trackApiUsage, estimateCost } from '@/lib/utils/cost-tracker';
+import { cacheGet, cacheSet } from '@/lib/utils/cache';
+import { hashContent } from '@/lib/utils/resilience';
+import { apiError } from '@/lib/utils/api-response';
 
 const log = createLogger('TrendsAnalyzeRoute');
 
@@ -32,7 +35,7 @@ export async function POST() {
     } = await supabase.auth.getUser();
     const userId = user?.id;
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return apiError({ error: 'Unauthorized', status: 401 });
     }
 
     // Rate limit: 5 market analyses per hour (LLM-backed, expensive)
@@ -89,6 +92,20 @@ export async function POST() {
       });
     }
 
+    // Check response cache — expensive LLM + grounding call, 1 hour TTL
+    const cacheKey = `trends:${userId}:${hashContent(activeTopics.join(','))}`;
+    const cached = await cacheGet(cacheKey);
+    if (cached) {
+      try {
+        log.debug('Cache hit for trends/analyze');
+        return NextResponse.json(JSON.parse(cached), {
+          headers: { 'X-Cache': 'HIT', 'Cache-Control': 'private, max-age=3600' },
+        });
+      } catch {
+        // Corrupted cache entry — fall through to fresh computation
+      }
+    }
+
     // 2. Perform Market Analysis (Grounded)
     log.info('Running Market Analysis for: ' + activeTopics.join(', '));
     const model = getMarketAnalystModel();
@@ -130,10 +147,7 @@ export async function POST() {
         analysis = JSON.parse(cleanText);
       } catch {
         log.error('Failed to parse Gemini response: ' + responseText.slice(0, 200));
-        return NextResponse.json(
-          { error: 'Market analysis returned an unparseable response. Please try again.' },
-          { status: 500 }
-        );
+        return apiError({ error: 'Market analysis returned an unparseable response. Please try again.', status: 500 });
       }
     }
 
@@ -170,13 +184,20 @@ export async function POST() {
 
     // Only forward expected fields to the client — the LLM may return
     // arbitrary keys that could break the frontend or leak prompt details.
-    return NextResponse.json({
+    const responseBody = {
       summary: typeof analysis.summary === 'string' ? analysis.summary : '',
       impactAssessment: Array.isArray(analysis.impactAssessment) ? analysis.impactAssessment : [],
       searchSources,
+    };
+
+    // Cache successful response for 1 hour
+    void cacheSet(cacheKey, JSON.stringify(responseBody), 3600);
+
+    return NextResponse.json(responseBody, {
+      headers: { 'X-Cache': 'MISS', 'Cache-Control': 'private, max-age=3600' },
     });
   } catch (error) {
     log.error('Market Analyst failed:', error);
-    return NextResponse.json({ error: 'Market analysis failed' }, { status: 500 });
+    return apiError({ error: 'Market analysis failed', status: 500, cause: error instanceof Error ? error : undefined });
   }
 }

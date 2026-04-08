@@ -11,6 +11,7 @@ import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
+import { apiError } from '@/lib/utils/api-response';
 import { DecisionOutcome } from '@prisma/client';
 
 const log = createLogger('OutcomeTracking');
@@ -23,7 +24,7 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return apiError({ error: 'Unauthorized', status: 401 });
     }
 
     const rateLimitResult = await checkRateLimit(user.id, '/api/outcomes/track', {
@@ -31,7 +32,7 @@ export async function POST(req: NextRequest) {
       maxRequests: 20,
     });
     if (!rateLimitResult.success) {
-      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+      return apiError({ error: 'Rate limit exceeded', status: 429 });
     }
 
     const body = await req.json();
@@ -48,13 +49,13 @@ export async function POST(req: NextRequest) {
     } = body;
 
     if (!analysisId || !outcome) {
-      return NextResponse.json({ error: 'Analysis ID and outcome are required' }, { status: 400 });
+      return apiError({ error: 'Analysis ID and outcome are required', status: 400 });
     }
 
     // Validate outcome value
     const validOutcomes = ['success', 'partial_success', 'failure', 'too_early'];
     if (!validOutcomes.includes(outcome)) {
-      return NextResponse.json({ error: 'Invalid outcome value' }, { status: 400 });
+      return apiError({ error: 'Invalid outcome value', status: 400 });
     }
 
     // Verify the analysis exists and user has access
@@ -67,7 +68,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!analysis) {
-      return NextResponse.json({ error: 'Analysis not found' }, { status: 404 });
+      return apiError({ error: 'Analysis not found', status: 404 });
     }
 
     // Verify ownership
@@ -78,7 +79,7 @@ export async function POST(req: NextRequest) {
       });
 
       if (!membership || membership.orgId !== orgId) {
-        return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+        return apiError({ error: 'Access denied', status: 403 });
       }
     }
 
@@ -197,6 +198,7 @@ export async function POST(req: NextRequest) {
     const outcomes = await prisma.decisionOutcome.findMany({
       where: orgId ? { orgId } : { userId: user.id },
       select: { outcome: true, impactScore: true },
+      take: 500,
     });
 
     const withImpact = outcomes.filter(o => o.impactScore !== null);
@@ -226,7 +228,7 @@ export async function POST(req: NextRequest) {
       );
     }
     log.error('Failed to track outcome:', error);
-    return NextResponse.json({ error: 'Failed to track outcome' }, { status: 500 });
+    return apiError({ error: 'Failed to track outcome', status: 500 });
   }
 }
 
@@ -238,7 +240,7 @@ export async function GET(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return apiError({ error: 'Unauthorized', status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
@@ -296,7 +298,7 @@ export async function GET(req: NextRequest) {
         });
 
         if (!membership || membership.orgId !== analysis?.document.orgId) {
-          return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+          return apiError({ error: 'Access denied', status: 403 });
         }
       }
 
@@ -314,13 +316,13 @@ export async function GET(req: NextRequest) {
     // If a different userId was requested, verify they're in the same org
     if (userId && userId !== user.id) {
       if (!membership?.orgId) {
-        return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+        return apiError({ error: 'Access denied', status: 403 });
       }
       const targetMembership = await prisma.teamMember.findFirst({
         where: { userId, orgId: membership.orgId },
       });
       if (!targetMembership) {
-        return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+        return apiError({ error: 'Access denied', status: 403 });
       }
     }
 
@@ -333,6 +335,7 @@ export async function GET(req: NextRequest) {
         },
       },
       orderBy: { reportedAt: 'desc' },
+      take: 500,
       include: {
         analysis: {
           include: {
@@ -367,7 +370,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ outcomes: [], metrics: null });
     }
     log.error('Failed to fetch outcomes:', error);
-    return NextResponse.json({ error: 'Failed to fetch outcomes' }, { status: 500 });
+    return apiError({ error: 'Failed to fetch outcomes', status: 500 });
   }
 }
 
@@ -415,7 +418,7 @@ export async function PUT(_req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return apiError({ error: 'Unauthorized', status: 401 });
     }
 
     // Get outcomes with twin accuracy data
@@ -429,6 +432,7 @@ export async function PUT(_req: NextRequest) {
         outcome: true,
         impactScore: true,
       },
+      take: 500,
     });
 
     // Group by digital twin
@@ -471,6 +475,6 @@ export async function PUT(_req: NextRequest) {
       return NextResponse.json({ twinAccuracy: {}, mostAccurate: [] });
     }
     log.error('Failed to analyze twin accuracy:', error);
-    return NextResponse.json({ error: 'Failed to analyze accuracy' }, { status: 500 });
+    return apiError({ error: 'Failed to analyze accuracy', status: 500 });
   }
 }
