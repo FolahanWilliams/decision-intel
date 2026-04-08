@@ -40,7 +40,6 @@ import { useAnalysisStream } from '@/hooks/useAnalysisStream';
 import type { OutcomeGateInfo } from '@/hooks/useAnalysisStream';
 import { useNotifications } from '@/components/ui/NotificationCenter';
 import { useAnalysisProgress } from '@/components/ui/AnalysisProgressBar';
-import { EmptyState } from '@/components/ui/EmptyState';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { OutcomeGateBanner } from '@/components/ui/OutcomeGate';
 import { DraftOutcomeBanner } from '@/components/ui/DraftOutcomeBanner';
@@ -1646,16 +1645,17 @@ export default function Dashboard() {
           {/* Empty state - only show when no documents */}
           {uploadedDocs.length === 0 && !loadingDocs && (
             <div className="card">
-              <EmptyState
-                icon={Upload}
+              <EnhancedEmptyState
+                type="documents"
                 title="Upload your first document"
                 description="Drop a PDF, TXT, MD, or DOCX file in the upload zone above. Our AI will scan for cognitive biases, decision noise, logical fallacies, and compliance risks."
-                badges={['Bias Detection', 'Noise Analysis', 'Fact Checking', 'Compliance']}
-                action={{
+                showBrief
+                briefContext="documents"
+                actions={[{
                   label: 'Choose a File',
                   onClick: () => document.getElementById('file-input')?.click(),
-                  icon: Upload,
-                }}
+                  variant: 'primary' as const,
+                }]}
               />
             </div>
           )}
