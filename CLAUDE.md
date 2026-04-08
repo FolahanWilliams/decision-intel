@@ -105,11 +105,12 @@ src/
 - Inline `style={{}}` objects are the dominant pattern (not Tailwind utilities). Follow the existing pattern.
 
 ### Database
-- **Document model uses `uploadedAt`**, NOT `createdAt`, for the creation timestamp.
+- **Document model uses `uploadedAt`**, NOT `createdAt`, for the creation timestamp. This has caused build errors multiple times — always double-check.
 - **Analysis model uses `createdAt`** (standard Prisma).
 - Always handle schema drift: wrap Prisma queries in try-catch, check for P2021/P2022 error codes.
 - Use `onDelete: Cascade` or `onDelete: SetNull` on all new relations — never leave onDelete unspecified.
 - The `recalibratedDqi` field on Analysis is a nullable JSON field (added April 2026).
+- **Prisma JSON fields need explicit casting.** When writing objects to nullable JSON columns (e.g., `biasBriefing`, `recalibratedDqi`), arrays with inferred types cause `InputJsonValue` errors. Fix: cast with `as unknown as Record<string, unknown>`.
 
 ### Security
 - **Always use `safeCompare` from `@/lib/utils/safe-compare`** for secret comparisons. Never write a local implementation — a buggy duplicate was the cause of a critical auth bypass that was fixed.
@@ -124,6 +125,10 @@ src/
 - Use `AnimatedNumber` from `@/components/ui/AnimatedNumber` for animating numeric values.
 - Use `createLogger('ContextName')` for structured logging in API routes and lib code.
 - Standardized API responses: use `apiSuccess()` and `apiError()` from `@/lib/utils/api-response.ts`.
+- **Unused imports cause build failures.** Next.js strict mode treats them as errors. Always clean up imports after refactoring (e.g., removing `Suspense, lazy` when switching to `dynamic()`).
+- **Founder Hub API calls require `founderPass` prop.** Any component calling `/api/founder-hub/*` must receive and pass the `founderPass` string via props from the hub page.
+- **Case study slugs:** Use `getSlugForCase()` from `src/lib/data/case-studies/slugs.ts` for URL-safe slugs. Case study URLs: `/case-studies/{slug}`.
+- **Landing page hero graph:** `src/components/marketing/HeroDecisionGraph.tsx` — interactive D3-like knowledge graph. The `CaseStudyBiasGraph` at `src/components/marketing/CaseStudyBiasGraph.tsx` is the simpler radial bias web used on case study cards and detail pages.
 
 ### Bias Taxonomy
 - 20 biases with stable taxonomy IDs: DI-B-001 through DI-B-020 (defined in `src/lib/constants/bias-education.ts`).
