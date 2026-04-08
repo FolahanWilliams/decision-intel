@@ -1,16 +1,7 @@
 import { createClient } from '@/utils/supabase/server';
-import { timingSafeEqual } from 'crypto';
+import { safeCompare } from '@/lib/utils/safe-compare';
 
 const EXTENSION_API_KEY = process.env.EXTENSION_API_KEY?.trim();
-
-function safeCompare(a: string, b: string): boolean {
-  const maxLen = Math.max(a.length, b.length);
-  const bufA = Buffer.alloc(maxLen, 0);
-  const bufB = Buffer.alloc(maxLen, 0);
-  Buffer.from(a).copy(bufA);
-  Buffer.from(b).copy(bufB);
-  return timingSafeEqual(bufA, bufB);
-}
 
 export interface AuthResult {
   userId?: string;

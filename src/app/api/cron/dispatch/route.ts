@@ -28,13 +28,19 @@ interface JobResult {
   error?: string;
 }
 
+const PER_JOB_TIMEOUT = 45_000; // 45s per job to stay within 5-minute total dispatch
+
 async function runJob(baseUrl: string, path: string, cronSecret: string): Promise<JobResult> {
   const start = Date.now();
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), PER_JOB_TIMEOUT);
     const res = await fetch(`${baseUrl}${path}`, {
       method: 'GET',
       headers: { Authorization: `Bearer ${cronSecret}` },
+      signal: controller.signal,
     });
+    clearTimeout(timeout);
     const ms = Date.now() - start;
     if (!res.ok) {
       const body = await res.text().catch(() => '');
@@ -42,11 +48,14 @@ async function runJob(baseUrl: string, path: string, cronSecret: string): Promis
     }
     return { job: path, status: 'ok', ms };
   } catch (err) {
+    const ms = Date.now() - start;
+    const message = err instanceof Error ? err.message : String(err);
+    const isTimeout = err instanceof Error && err.name === 'AbortError';
     return {
       job: path,
       status: 'error',
-      ms: Date.now() - start,
-      error: err instanceof Error ? err.message : String(err),
+      ms,
+      error: isTimeout ? `Job timed out after ${PER_JOB_TIMEOUT}ms` : message,
     };
   }
 }
