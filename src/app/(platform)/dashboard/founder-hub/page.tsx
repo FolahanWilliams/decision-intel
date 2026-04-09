@@ -116,6 +116,11 @@ const FounderTipsTab = dynamic(
     import('@/components/founder-hub/FounderTipsTab').then(m => ({ default: m.FounderTipsTab })),
   { loading: tabLoader }
 );
+const MeetingPrepTab = dynamic(
+  () =>
+    import('@/components/founder-hub/MeetingPrepTab').then(m => ({ default: m.MeetingPrepTab })),
+  { loading: tabLoader }
+);
 import {
   Rocket,
   Brain,
@@ -156,9 +161,11 @@ type TabId =
   | 'decision_alpha'
   | 'content_studio'
   | 'investor_defense'
-  | 'founder_tips';
+  | 'founder_tips'
+  | 'meeting_prep';
 
 const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode }> = [
+  { id: 'meeting_prep', label: 'Meeting Prep', icon: <Search size={16} /> },
   { id: 'overview', label: 'Product Overview', icon: <Rocket size={16} /> },
   { id: 'pipeline', label: 'Analysis Pipeline', icon: <Brain size={16} /> },
   { id: 'scoring', label: 'Scoring Engine', icon: <BarChart3 size={16} /> },
@@ -247,7 +254,7 @@ function SearchResults({
 const FOUNDER_PASS = process.env.NEXT_PUBLIC_FOUNDER_HUB_PASS || '';
 
 export default function FounderHubPage() {
-  const [activeTab, setActiveTab] = useState<TabId>('overview');
+  const [activeTab, setActiveTab] = useState<TabId>('meeting_prep');
   const [unlocked, setUnlocked] = useState(false);
   const [passInput, setPassInput] = useState('');
   const [passError, setPassError] = useState(false);
@@ -363,6 +370,7 @@ export default function FounderHubPage() {
   }
 
   const TAB_CONTENT: Record<TabId, React.ReactNode> = {
+    meeting_prep: <MeetingPrepTab />,
     overview: <ProductOverviewTab />,
     pipeline: <CorePipelineTab />,
     scoring: <ScoringEngineTab />,
