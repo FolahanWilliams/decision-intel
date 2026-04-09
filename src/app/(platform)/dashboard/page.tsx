@@ -1675,8 +1675,8 @@ export default function Dashboard() {
                   Or start with a retrospective
                 </p>
                 <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: 0 }}>
-                  Upload a past memo or strategy doc to understand what went wrong &mdash; post-mortem
-                  analysis in 60 seconds.
+                  Upload a past memo or strategy doc to understand what went wrong &mdash;
+                  post-mortem analysis in 60 seconds.
                 </p>
               </div>
             </>

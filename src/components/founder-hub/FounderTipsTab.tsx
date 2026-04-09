@@ -336,9 +336,10 @@ export function FounderTipsTab() {
             marginBottom: 0,
           }}
         >
-          Twenty-one principles grounded in your specific position: solo founder, 16, Nigeria, corporate
-          strategy/M&amp;A wedge, Wiz advisor, 97% gross margins, 199K+ LoC already shipped. Re-read when deciding
-          what to build next, what to kill, what to say in a pitch, and what to ignore.
+          Twenty-one principles grounded in your specific position: solo founder, 16, Nigeria,
+          corporate strategy/M&amp;A wedge, Wiz advisor, 97% gross margins, 199K+ LoC already
+          shipped. Re-read when deciding what to build next, what to kill, what to say in a pitch,
+          and what to ignore.
         </p>
       </div>
 

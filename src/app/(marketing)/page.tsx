@@ -642,8 +642,8 @@ export default function LandingPage() {
               }}
             >
               Three weeks after close, your team finds the diligence question that cost you $40M in
-              integration overruns. Decision Intel surfaces those gaps before the vote &mdash; not in
-              the post-mortem. Upload your M&amp;A memo or board paper and get the questions
+              integration overruns. Decision Intel surfaces those gaps before the vote &mdash; not
+              in the post-mortem. Upload your M&amp;A memo or board paper and get the questions
               comparable historical decisions answered (or fatally ignored) &mdash; in under 60
               seconds.
             </p>
@@ -1118,7 +1118,7 @@ export default function LandingPage() {
             {
               icon: FileSearch,
               title: 'Forgotten Questions',
-              desc: "Surfaces the diligence questions your memo never asks — drawn from the gap between your document and its closest historical analogs. Every question was answered (or fatally ignored) in a comparable real decision.",
+              desc: 'Surfaces the diligence questions your memo never asks — drawn from the gap between your document and its closest historical analogs. Every question was answered (or fatally ignored) in a comparable real decision.',
               color: '#F59E0B',
               bg: '#FFFBEB',
             },
@@ -1207,7 +1207,13 @@ export default function LandingPage() {
           </motion.div>
 
           <div
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 24, maxWidth: 800, margin: '0 auto' }}
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: 24,
+              maxWidth: 800,
+              margin: '0 auto',
+            }}
             className="pricing-grid"
           >
             {[
@@ -1600,8 +1606,8 @@ export default function LandingPage() {
               <span style={{ fontSize: 18, fontWeight: 700, color: C.white }}>Decision Intel</span>
             </div>
             <p style={{ fontSize: 14, lineHeight: 1.7, color: '#94A3B8', maxWidth: 280 }}>
-              The Decision Performance OS for corporate strategy and M&amp;A teams. Audit cognitive bias,
-              measure decision noise, and track outcomes.
+              The Decision Performance OS for corporate strategy and M&amp;A teams. Audit cognitive
+              bias, measure decision noise, and track outcomes.
             </p>
           </div>
 

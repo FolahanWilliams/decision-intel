@@ -109,8 +109,9 @@ export function CaseStudyCarousel() {
                 lineHeight: 1.5,
               }}
             >
-              We took the pre-decision memos from {featured.length} famous strategic decisions, stripped the
-              hindsight, and ran them through our pipeline. Here&apos;s what we would have flagged.
+              We took the pre-decision memos from {featured.length} famous strategic decisions,
+              stripped the hindsight, and ran them through our pipeline. Here&apos;s what we would
+              have flagged.
             </p>
           </div>
 
@@ -281,7 +282,6 @@ export function CaseStudyCarousel() {
                       />
                     </div>
                   )}
-
                 </Link>
               </motion.div>
             );

@@ -22,7 +22,8 @@ export function ProductOverviewTab() {
         </h2>
         <p style={{ fontSize: 14, color: 'var(--text-secondary, #b4b4bc)', lineHeight: 1.6 }}>
           Audit every strategic decision for cognitive bias and decision noise. Protect business
-          outcomes. AI-powered cognitive auditing purpose-built for corporate strategy and M&amp;A teams.
+          outcomes. AI-powered cognitive auditing purpose-built for corporate strategy and M&amp;A
+          teams.
         </p>
       </div>
 
