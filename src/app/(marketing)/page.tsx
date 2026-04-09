@@ -1204,6 +1204,7 @@ export default function LandingPage() {
               <span style={{ fontWeight: 700, color: C.slate900 }}>$8.2M</span> in integration
               overruns. Start with a free 30-day pilot on your next live deal.
             </p>
+          </motion.div>
 
           <div
             style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 24, maxWidth: 800, margin: '0 auto' }}
