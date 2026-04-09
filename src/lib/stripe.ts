@@ -37,17 +37,19 @@ export const PLANS = {
     maxTeamMembers: 10,
   },
   team: {
-    name: 'Team',
-    description: 'For executive teams and decision committees managing project portfolios',
+    name: 'Corp Dev',
+    description:
+      'For corporate strategy and M&A teams running multiple deals — $2,499/month',
     priceId: process.env.STRIPE_TEAM_PRICE_ID || '',
-    analysesPerMonth: 250,
+    analysesPerMonth: Infinity,
     maxPages: 200,
     biasTypes: 20,
     maxTeamMembers: 50,
   },
   enterprise: {
     name: 'Enterprise',
-    description: 'For organizations managing multiple teams with dedicated decision workflows',
+    description:
+      'For Fortune 500 teams with multi-division workflows, SSO, and compliance requirements',
     analysesPerMonth: Infinity,
     maxPages: Infinity,
     biasTypes: 20,
@@ -59,32 +61,25 @@ export type PlanType = keyof typeof PLANS;
 
 export const DEAL_AUDIT_TIERS = [
   {
-    id: 'small',
-    label: 'Emerging',
-    maxTicket: 10_000_000,
-    price: 499,
+    id: 'standard',
+    label: 'Standard',
+    maxTicket: 50_000_000,
+    price: 999,
     priceId: process.env.STRIPE_DEAL_SMALL_PRICE_ID || '',
   },
   {
     id: 'mid',
-    label: 'Growth',
-    maxTicket: 50_000_000,
-    price: 1499,
+    label: 'Mid-Market',
+    maxTicket: 500_000_000,
+    price: 4999,
     priceId: process.env.STRIPE_DEAL_MID_PRICE_ID || '',
   },
   {
     id: 'large',
-    label: 'Core',
-    maxTicket: 200_000_000,
-    price: 2999,
-    priceId: process.env.STRIPE_DEAL_LARGE_PRICE_ID || '',
-  },
-  {
-    id: 'mega',
-    label: 'Flagship',
+    label: 'Large-Cap',
     maxTicket: Infinity,
-    price: 4999,
-    priceId: process.env.STRIPE_DEAL_MEGA_PRICE_ID || '',
+    price: 14999,
+    priceId: process.env.STRIPE_DEAL_LARGE_PRICE_ID || '',
   },
 ] as const;
 

@@ -1202,8 +1202,8 @@ export default function LandingPage() {
             >
               The average M&amp;A diligence gap costs{' '}
               <span style={{ fontWeight: 700, color: C.slate900 }}>$8.2M</span> in integration
-              overruns. Your team&apos;s comprehensive bias audit:{' '}
-              <span style={{ fontWeight: 700, color: C.green }}>$349/month</span>.
+              overruns. One full deal audit starts at{' '}
+              <span style={{ fontWeight: 700, color: C.green }}>$999</span>.
             </p>
 
             {/* Annual/Monthly Toggle */}
@@ -1262,15 +1262,15 @@ export default function LandingPage() {
                 name: 'Starter',
                 price: 0,
                 priceAnnual: 0,
-                desc: 'Try the bias engine on 3 strategic documents',
+                desc: 'Try the bias engine on your first strategic document',
                 features: [
-                  '3 analyses/month',
+                  '4 analyses/month',
                   '5 bias types',
                   '10 pages per doc',
                   '3 team seats',
                   'Community support',
                 ],
-                cta: 'Get Started',
+                cta: 'Get Started Free',
                 action: () => {
                   window.location.href =
                     '/login?redirect=' + encodeURIComponent('/?scrollTo=pricing');
@@ -1279,37 +1279,18 @@ export default function LandingPage() {
                 popular: false,
               },
               {
-                name: 'Professional',
-                price: 349,
-                priceAnnual: 279,
-                desc: 'For decision-makers running strategic documents through the gauntlet',
+                name: 'Corp Dev',
+                price: 2499,
+                priceAnnual: 1999,
+                desc: 'For M&A and corporate strategy teams running multiple deals per quarter',
                 features: [
-                  '50 analyses/month',
-                  '20+ bias types',
-                  '100 pages per doc',
-                  '10 team seats',
-                  'Outcome tracking',
-                  'Decision Twin',
-                ],
-                cta: 'Start Free Trial',
-                action: () => handleCheckout('pro'),
-                loading: checkoutLoading === 'pro',
-                outline: false,
-                popular: false,
-              },
-              {
-                name: 'Team',
-                price: 999,
-                priceAnnual: 799,
-                desc: 'For decision committees with document pipeline + Slack',
-                features: [
-                  '250 analyses/month',
-                  'Everything in Pro',
-                  '50 team seats',
-                  'Slack integration',
-                  'Decision Rooms',
-                  'Compliance mapping',
-                  'Team calibration',
+                  'Unlimited analyses',
+                  '20+ bias types + M&A-specific',
+                  'Forgotten Questions engine',
+                  'Decision Rooms & Slack',
+                  'Compliance mapping (SOX, MiFID II)',
+                  'Outcome tracking & calibration',
+                  'Up to 50 team seats',
                 ],
                 cta: 'Start Free Trial',
                 action: () => handleCheckout('team'),
@@ -1318,18 +1299,40 @@ export default function LandingPage() {
                 popular: true,
               },
               {
+                name: 'Per-Deal Audit',
+                price: -2,
+                priceAnnual: -2,
+                desc: 'One deal, no subscription. Expense it on the deal. Full audit, one payment.',
+                features: [
+                  '$999 · deals under $50M',
+                  '$4,999 · $50M–$500M deals',
+                  '$14,999 · $500M+ deals',
+                  'Full bias + noise analysis',
+                  'Forgotten Questions report',
+                  'Boardroom simulation',
+                  'Downloadable PDF report',
+                ],
+                cta: 'Get a Deal Audit',
+                action: () => {
+                  window.location.href =
+                    '/login?redirect=' + encodeURIComponent('/?scrollTo=pricing');
+                },
+                outline: true,
+                popular: false,
+              },
+              {
                 name: 'Enterprise',
                 price: -1,
                 priceAnnual: -1,
-                desc: 'For enterprise teams with dedicated support and custom workflows',
+                desc: 'For Fortune 500 teams with multi-division workflows and compliance requirements',
                 features: [
                   'Unlimited analyses',
-                  'Everything in Team',
+                  'Everything in Corp Dev',
                   'Unlimited team seats',
                   'SSO & custom taxonomy',
-                  'Dedicated support',
-                  'Custom playbooks',
-                  'SLA guarantee',
+                  'Multi-division management',
+                  'Dedicated support & SLA',
+                  'Annual contract pricing',
                 ],
                 cta: 'Contact Sales',
                 action: () => {
@@ -1387,6 +1390,23 @@ export default function LandingPage() {
                       <span style={{ fontSize: 32, fontWeight: 800, color: C.slate900 }}>
                         Custom
                       </span>
+                    ) : displayPrice === -2 ? (
+                      <div>
+                        <span style={{ fontSize: 28, fontWeight: 800, color: C.slate900 }}>
+                          $999
+                        </span>
+                        <span style={{ fontSize: 16, fontWeight: 500, color: C.slate400 }}>
+                          {' '}–{' '}
+                        </span>
+                        <span style={{ fontSize: 28, fontWeight: 800, color: C.slate900 }}>
+                          $14,999
+                        </span>
+                        <span
+                          style={{ fontSize: 13, fontWeight: 500, color: C.slate400, display: 'block', marginTop: 2 }}
+                        >
+                          per deal
+                        </span>
+                      </div>
                     ) : displayPrice === 0 ? (
                       <span style={{ fontSize: 32, fontWeight: 800, color: C.slate900 }}>
                         $0
@@ -1396,7 +1416,7 @@ export default function LandingPage() {
                       </span>
                     ) : (
                       <span style={{ fontSize: 32, fontWeight: 800, color: C.slate900 }}>
-                        ${displayPrice}
+                        ${displayPrice.toLocaleString()}
                         <span style={{ fontSize: 14, fontWeight: 500, color: C.slate400 }}>
                           /mo
                         </span>
