@@ -201,8 +201,7 @@ export function IntegrationsAndFlywheelTab() {
         </div>
         <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 12 }}>
           Connect Google Drive, select folders to watch. New documents are auto-analyzed every 10
-          minutes. For M&A teams, deal memos landing in Drive are analyzed before anyone opens
-          them.
+          minutes. For M&A teams, deal memos landing in Drive are analyzed before anyone opens them.
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           {[

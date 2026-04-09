@@ -759,7 +759,9 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
       // If the LLM echoes back the original text without redacting, that's
       // a silent failure — treat it as failed to prevent PII leakage.
       const hasRedactionPlaceholders =
-        /\[(PERSON|EMAIL|PHONE|ADDRESS|COMPANY|IP|FINANCIAL|SSN|CC)_\d+\]/.test(data.structuredContent);
+        /\[(PERSON|EMAIL|PHONE|ADDRESS|COMPANY|IP|FINANCIAL|SSN|CC)_\d+\]/.test(
+          data.structuredContent
+        );
       const hasRedactionsList = Array.isArray(data.redactions) && data.redactions.length > 0;
 
       // Also check for pre-redaction markers from Phase 1 (regex pass)
@@ -1825,7 +1827,9 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
     const monetaryStakes: 'unknown' | 'low' | 'medium' | 'high' | 'very_high' =
       state.dealType || isInvestmentDocument(state.documentType) ? 'very_high' : 'unknown';
     if (monetaryStakes === 'very_high') {
-      log.info('Strategy/M&A context: auto-setting monetary stakes to very_high for compound scoring');
+      log.info(
+        'Strategy/M&A context: auto-setting monetary stakes to very_high for compound scoring'
+      );
     }
 
     const compoundContext = {

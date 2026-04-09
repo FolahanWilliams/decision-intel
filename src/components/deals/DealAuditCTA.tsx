@@ -11,9 +11,7 @@ interface DealAuditCTAProps {
   hasPurchase?: boolean;
 }
 
-const TIERS = [
-  { id: 'standard', label: 'Full Deal Audit', maxTicket: Infinity, price: 4999 },
-];
+const TIERS = [{ id: 'standard', label: 'Full Deal Audit', maxTicket: Infinity, price: 4999 }];
 
 function getTier(ticketSize: number) {
   return TIERS.find(t => ticketSize <= t.maxTicket) || TIERS[TIERS.length - 1];

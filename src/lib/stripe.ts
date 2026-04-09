@@ -38,8 +38,7 @@ export const PLANS = {
   },
   team: {
     name: 'Corp Dev',
-    description:
-      'For corporate strategy and M&A teams running multiple deals — $2,499/month',
+    description: 'For corporate strategy and M&A teams running multiple deals — $2,499/month',
     priceId: process.env.STRIPE_TEAM_PRICE_ID || '',
     analysesPerMonth: Infinity,
     maxPages: 200,
