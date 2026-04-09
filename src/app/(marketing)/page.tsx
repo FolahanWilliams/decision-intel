@@ -22,7 +22,6 @@ import {
   Shield,
   Zap,
   Target,
-  Network,
   AlertTriangle,
 } from 'lucide-react';
 
@@ -629,9 +628,9 @@ export default function LandingPage() {
                 marginBottom: 20,
               }}
             >
-              Every memo has biases.
+              Stop missing the questions
               <br />
-              <span style={{ color: C.green }}>We find them in 60 seconds.</span>
+              <span style={{ color: C.green }}>that killed similar deals.</span>
             </h1>
             <p
               style={{
@@ -642,10 +641,11 @@ export default function LandingPage() {
                 maxWidth: 520,
               }}
             >
-              Grammarly catches grammar errors before you hit send. Decision Intel catches cognitive
-              biases before you sign the deal. Upload any strategic document &mdash; M&amp;A memo,
-              board paper, strategy proposal &mdash; and get a comprehensive bias audit with
-              compliance mapping, noise measurement, and a calibrated risk score in under a minute.
+              Three weeks after close, your team finds the diligence question that cost you $40M in
+              integration overruns. Decision Intel surfaces those gaps before the vote &mdash; not in
+              the post-mortem. Upload your M&amp;A memo or board paper and get the questions
+              comparable historical decisions answered (or fatally ignored) &mdash; in under 60
+              seconds.
             </p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <Link
@@ -708,9 +708,9 @@ export default function LandingPage() {
                 The job you&rsquo;re hiring us for
               </div>
               <p style={{ fontSize: 14, color: C.slate600, lineHeight: 1.6, margin: 0 }}>
-                When my team is about to commit on a decision that looks right, help me know whether
-                our conviction survives a blind, unbiased stress test &mdash; so we can move forward
-                with confidence or pause before it&rsquo;s irreversible.
+                The night before the IC votes on a deal we&rsquo;ve worked for months: what question
+                is this memo not asking? What did teams in similar situations get wrong &mdash; and
+                did we just repeat it?
               </p>
             </div>
           </div>
@@ -881,7 +881,7 @@ export default function LandingPage() {
               phase: 'PHASE_02',
               num: '02',
               title: 'Get the blind second opinion',
-              desc: 'A 12-node pipeline stress-tests the document: 20+ biases detected, a three-judge statistical jury measures noise, and a simulated executive challenge argues against your proposal before the real committee does.',
+              desc: 'A 12-node pipeline stress-tests the document: 20+ biases detected, a three-judge noise jury measures variability, a simulated executive challenge argues against your proposal — and a Forgotten Questions engine surfaces the diligence gaps drawn from comparable historical decisions.',
               bullets: [
                 '20+ cognitive biases with confidence scores',
                 '3 independent noise judges (Kahneman)',
@@ -1116,9 +1116,9 @@ export default function LandingPage() {
               bg: '#FEF2F2',
             },
             {
-              icon: Network,
-              title: 'Decision Knowledge Graph',
-              desc: 'Every decision becomes a node. Edges reveal influence chains, shared biases, and cascading risks across your portfolio.',
+              icon: FileSearch,
+              title: 'Forgotten Questions',
+              desc: "Surfaces the diligence questions your memo never asks — drawn from the gap between your document and its closest historical analogs. Every question was answered (or fatally ignored) in a comparable real decision.",
               color: '#F59E0B',
               bg: '#FFFBEB',
             },
@@ -1200,10 +1200,10 @@ export default function LandingPage() {
                 lineHeight: 1.5,
               }}
             >
-              The average bad strategic decision costs{' '}
-              <span style={{ fontWeight: 700, color: C.slate900 }}>$8.2M</span>. Your team&apos;s
-              decision audit costs{' '}
-              <span style={{ fontWeight: 700, color: C.green }}>$349/month</span>.
+              The average M&amp;A diligence gap costs{' '}
+              <span style={{ fontWeight: 700, color: C.slate900 }}>$8.2M</span> in integration
+              overruns. One full deal audit starts at{' '}
+              <span style={{ fontWeight: 700, color: C.green }}>$999</span>.
             </p>
 
             {/* Annual/Monthly Toggle */}
@@ -1262,15 +1262,15 @@ export default function LandingPage() {
                 name: 'Starter',
                 price: 0,
                 priceAnnual: 0,
-                desc: 'Try the bias engine on 3 strategic documents',
+                desc: 'Try the bias engine on your first strategic document',
                 features: [
-                  '3 analyses/month',
+                  '4 analyses/month',
                   '5 bias types',
                   '10 pages per doc',
                   '3 team seats',
                   'Community support',
                 ],
-                cta: 'Get Started',
+                cta: 'Get Started Free',
                 action: () => {
                   window.location.href =
                     '/login?redirect=' + encodeURIComponent('/?scrollTo=pricing');
@@ -1279,37 +1279,18 @@ export default function LandingPage() {
                 popular: false,
               },
               {
-                name: 'Professional',
-                price: 349,
-                priceAnnual: 279,
-                desc: 'For decision-makers running strategic documents through the gauntlet',
+                name: 'Corp Dev',
+                price: 2499,
+                priceAnnual: 1999,
+                desc: 'For M&A and corporate strategy teams running multiple deals per quarter',
                 features: [
-                  '50 analyses/month',
-                  '20+ bias types',
-                  '100 pages per doc',
-                  '10 team seats',
-                  'Outcome tracking',
-                  'Decision Twin',
-                ],
-                cta: 'Start Free Trial',
-                action: () => handleCheckout('pro'),
-                loading: checkoutLoading === 'pro',
-                outline: false,
-                popular: false,
-              },
-              {
-                name: 'Team',
-                price: 999,
-                priceAnnual: 799,
-                desc: 'For decision committees with document pipeline + Slack',
-                features: [
-                  '250 analyses/month',
-                  'Everything in Pro',
-                  '50 team seats',
-                  'Slack integration',
-                  'Decision Rooms',
-                  'Compliance mapping',
-                  'Team calibration',
+                  'Unlimited analyses',
+                  '20+ bias types + M&A-specific',
+                  'Forgotten Questions engine',
+                  'Decision Rooms & Slack',
+                  'Compliance mapping (SOX, MiFID II)',
+                  'Outcome tracking & calibration',
+                  'Up to 50 team seats',
                 ],
                 cta: 'Start Free Trial',
                 action: () => handleCheckout('team'),
@@ -1318,18 +1299,40 @@ export default function LandingPage() {
                 popular: true,
               },
               {
+                name: 'Per-Deal Audit',
+                price: -2,
+                priceAnnual: -2,
+                desc: 'One deal, no subscription. Expense it on the deal. Full audit, one payment.',
+                features: [
+                  '$999 · deals under $50M',
+                  '$4,999 · $50M–$500M deals',
+                  '$14,999 · $500M+ deals',
+                  'Full bias + noise analysis',
+                  'Forgotten Questions report',
+                  'Boardroom simulation',
+                  'Downloadable PDF report',
+                ],
+                cta: 'Get a Deal Audit',
+                action: () => {
+                  window.location.href =
+                    '/login?redirect=' + encodeURIComponent('/?scrollTo=pricing');
+                },
+                outline: true,
+                popular: false,
+              },
+              {
                 name: 'Enterprise',
                 price: -1,
                 priceAnnual: -1,
-                desc: 'For enterprise teams with dedicated support and custom workflows',
+                desc: 'For Fortune 500 teams with multi-division workflows and compliance requirements',
                 features: [
                   'Unlimited analyses',
-                  'Everything in Team',
+                  'Everything in Corp Dev',
                   'Unlimited team seats',
                   'SSO & custom taxonomy',
-                  'Dedicated support',
-                  'Custom playbooks',
-                  'SLA guarantee',
+                  'Multi-division management',
+                  'Dedicated support & SLA',
+                  'Annual contract pricing',
                 ],
                 cta: 'Contact Sales',
                 action: () => {
@@ -1387,6 +1390,23 @@ export default function LandingPage() {
                       <span style={{ fontSize: 32, fontWeight: 800, color: C.slate900 }}>
                         Custom
                       </span>
+                    ) : displayPrice === -2 ? (
+                      <div>
+                        <span style={{ fontSize: 28, fontWeight: 800, color: C.slate900 }}>
+                          $999
+                        </span>
+                        <span style={{ fontSize: 16, fontWeight: 500, color: C.slate400 }}>
+                          {' '}–{' '}
+                        </span>
+                        <span style={{ fontSize: 28, fontWeight: 800, color: C.slate900 }}>
+                          $14,999
+                        </span>
+                        <span
+                          style={{ fontSize: 13, fontWeight: 500, color: C.slate400, display: 'block', marginTop: 2 }}
+                        >
+                          per deal
+                        </span>
+                      </div>
                     ) : displayPrice === 0 ? (
                       <span style={{ fontSize: 32, fontWeight: 800, color: C.slate900 }}>
                         $0
@@ -1396,7 +1416,7 @@ export default function LandingPage() {
                       </span>
                     ) : (
                       <span style={{ fontSize: 32, fontWeight: 800, color: C.slate900 }}>
-                        ${displayPrice}
+                        ${displayPrice.toLocaleString()}
                         <span style={{ fontSize: 14, fontWeight: 500, color: C.slate400 }}>
                           /mo
                         </span>

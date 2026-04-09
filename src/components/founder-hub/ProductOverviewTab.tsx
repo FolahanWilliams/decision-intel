@@ -187,7 +187,7 @@ export function ProductOverviewTab() {
           </li>
           <li>
             <strong>Per-Deal Audit Pricing</strong> — One-time Stripe payments scaled to deal ticket
-            size ($499–$4,999). Unlimited analyses for deal-linked documents.
+            size ($999–$14,999). Unlimited analyses for deal-linked documents.
           </li>
           <li>
             <strong>Toxic Mitigation Playbooks</strong> — Auto-generated research-backed debiasing

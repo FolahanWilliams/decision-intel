@@ -7,10 +7,10 @@ import { Upload, BarChart3, Shield, X, ArrowRight, CheckCircle, FileText } from 
 const STEPS = [
   {
     icon: Upload,
-    title: 'Upload a Decision Document',
+    title: 'Upload the IC Memo or Board Paper',
     description:
-      'Start by uploading a board memo, strategy paper, risk assessment, or any decision document.',
-    action: 'Use the upload zone above',
+      'Before your next committee vote, drop in the deal brief, strategy memo, or board paper. We surface the questions it never asks — and whether your team has seen this pattern before.',
+    action: 'Use the upload zone above, or try the sample M&A memo',
     hasSampleAction: true,
   },
   {
@@ -23,10 +23,10 @@ const STEPS = [
   },
   {
     icon: Shield,
-    title: 'Track Decision Quality Over Time',
+    title: 'Close the Loop on Past Decisions',
     description:
-      "Link project outcomes to detected biases. Build your organization's institutional memory of what biases actually hurt performance.",
-    action: 'Explore project pipeline and outcomes',
+      "Report what happened — whether the deal closed as expected, how the committee's conviction held up, or what the post-mortem revealed. Every outcome makes your next audit more accurate.",
+    action: 'Go to any analyzed document and report the outcome',
     hasSampleAction: false,
   },
 ];
