@@ -315,7 +315,7 @@ const QA_ITEMS: Array<{ q: string; a: string; proof?: string }> = [
   },
   {
     q: "How do you actually make money? What's the unit economics?",
-    a: "API cost per analysis: $0.03-0.07 using Gemini Flash. Corp Dev plan: $2,499/month. That's ~97% gross margin at every tier. The motion: land with a per-deal audit ($999–$14,999 expensed on the deal — no procurement cycle), prove ROI with outcome data, convert to Corp Dev subscription ($2,499/mo), then negotiate enterprise ($50K–$200K/yr ACV). Outcome tracking creates natural switching costs — historical calibration profiles and decision knowledge graphs become org-specific assets that can't transfer to a competitor.",
+    a: "API cost per analysis: $0.03-0.07 using Gemini Flash. Corp Dev plan: $2,499/month. That's ~97% gross margin. The motion: free 30-day pilot on a live deal — the Knowledge Graph seeds during the trial. Then convert to Corp Dev subscription ($2,499/mo) or negotiate enterprise ($50K–$200K/yr ACV). The pilot converts because they'd lose their KG data by not subscribing. Outcome tracking creates additional switching costs — calibration profiles and decision knowledge graphs become org-specific assets that can't transfer to a competitor.",
   },
   {
     q: 'What if OpenAI or Anthropic just builds this into their platform?',
@@ -683,7 +683,7 @@ const OBJECTIONS: Array<{ objection: string; response: string }> = [
   {
     objection: "How do you compete with McKinsey's decision advisory?",
     response:
-      "We don't replace consulting — we make their most expensive service 1,000x cheaper and always-on. McKinsey charges $500K-$2M per strategic review, takes 6-12 weeks, and their consultants carry their own cognitive biases into the analysis. We deliver the same core service — decision quality assessment — in 60 seconds, continuously, for $2,499/month or $999 per deal.",
+      "We don't replace consulting — we make their most expensive service 1,000x cheaper and always-on. McKinsey charges $500K-$2M per strategic review, takes 6-12 weeks, and their consultants carry their own cognitive biases into the analysis. We deliver the same core service — decision quality assessment — in 60 seconds, continuously, for $2,499/month. And unlike McKinsey, we get smarter with every deal your team runs.",
   },
   {
     objection: 'AI is commoditizing — LLMs are a race to the bottom',

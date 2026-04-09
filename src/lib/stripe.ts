@@ -44,7 +44,7 @@ export const PLANS = {
     analysesPerMonth: Infinity,
     maxPages: 200,
     biasTypes: 20,
-    maxTeamMembers: 50,
+    maxTeamMembers: 15,
   },
   enterprise: {
     name: 'Enterprise',
@@ -62,24 +62,10 @@ export type PlanType = keyof typeof PLANS;
 export const DEAL_AUDIT_TIERS = [
   {
     id: 'standard',
-    label: 'Standard',
-    maxTicket: 50_000_000,
-    price: 999,
-    priceId: process.env.STRIPE_DEAL_SMALL_PRICE_ID || '',
-  },
-  {
-    id: 'mid',
-    label: 'Mid-Market',
-    maxTicket: 500_000_000,
-    price: 4999,
-    priceId: process.env.STRIPE_DEAL_MID_PRICE_ID || '',
-  },
-  {
-    id: 'large',
-    label: 'Large-Cap',
+    label: 'Full Deal Audit',
     maxTicket: Infinity,
-    price: 14999,
-    priceId: process.env.STRIPE_DEAL_LARGE_PRICE_ID || '',
+    price: 4999,
+    priceId: process.env.STRIPE_DEAL_PRICE_ID || '',
   },
 ] as const;
 

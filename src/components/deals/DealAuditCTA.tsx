@@ -12,9 +12,7 @@ interface DealAuditCTAProps {
 }
 
 const TIERS = [
-  { id: 'standard', label: 'Standard', maxTicket: 50_000_000, price: 999 },
-  { id: 'mid', label: 'Mid-Market', maxTicket: 500_000_000, price: 4999 },
-  { id: 'large', label: 'Large-Cap', maxTicket: Infinity, price: 14999 },
+  { id: 'standard', label: 'Full Deal Audit', maxTicket: Infinity, price: 4999 },
 ];
 
 function getTier(ticketSize: number) {

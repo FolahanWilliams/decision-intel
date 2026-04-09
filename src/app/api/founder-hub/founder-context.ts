@@ -53,7 +53,7 @@ General AI:
 === MARKET STRATEGY ===
 Primary market: Enterprise Decision Teams — any team making high-stakes, document-driven decisions (M&A, corporate strategy, risk assessment, vendor selection, product launches).
 Primary vertical: Corporate Strategy & M&A Teams — defined budgets, high-frequency decisions, lower ego-threat than PE/VC. Secondary: PE/VC Investment Committees as expansion vertical.
-Pricing: Starter (Free, 4 analyses) → Corp Dev ($2,499/mo, unlimited) → Enterprise (Custom). ALSO: Per-Deal Audit pricing ($999/<$50M, $4,999/$50M–$500M, $14,999/$500M+, one-time). Grants unlimited analyses for all documents linked to that deal. Price lever: per-deal bypasses procurement — a VP can expense it on a single deal, then convert to subscription once value is proven.
+Pricing: Corp Dev ($2,499/mo, unlimited analyses, full platform) → Enterprise (Custom, multi-division, SSO, SLA). Two tiers only — clean and premium. The trial mechanism is a free 30-day pilot on the buyer's next live deal (no credit card). The Knowledge Graph compounds over time, creating switching costs — this is why per-deal / transactional pricing was removed. The product's value IS the longitudinal learning.
 Market: Decision intelligence $12.2B → $46.4B by 2030. Enterprise GRC $50B+. Corporate M&A advisory market $40B+ annually.
 Expansion: Year 1 Corporate Strategy & M&A → Year 2 PE/VC, Hedge Funds, Financial Services → Year 3 Government/Insurance → Year 4+ Horizontal platform.
 
@@ -108,7 +108,7 @@ Demo script: Upload → Score reveal (pause for effect) → Bias walkthrough (sp
 - Light Theme Default: Full platform migration from dark-first to light-first. 1,000+ dark hardcodes replaced with CSS variables. Green (#16A34A) accent. Dark mode preserved as toggle option.
 - Comprehensive Bug Fix Sweep: SQL injection fix ($executeRawUnsafe → $executeRaw), encryption key validation, OutcomeGate escape key handler, webhook error logging, deal API enum validation, rate limit headers.
 - Live Pipeline Graph: Expandable floating visualization of the 12-node LangGraph pipeline during analysis. Nodes light up in real-time (pending → running → complete) with glass-morphism styling, animated edges, and live bias/noise badges. Respects reduced-motion.
-- Per-Deal Audit Pricing: One-time Stripe payments scaled to deal ticket size ($999/<$50M, $4,999/$50M–$500M, $14,999/$500M+). Grants unlimited analyses for deal-linked documents, bypassing subscription limits. DealAuditPurchase model + DealAuditCTA component.
+- Per-Deal Audit Pricing: One-time Stripe payment of $4,999 per deal (flat rate, any deal size). Grants unlimited analyses for deal-linked documents, bypassing subscription limits. DealAuditPurchase model + DealAuditCTA component.
 - Toxic Mitigation Playbooks: Auto-generated research-backed debiasing steps for all 10 named patterns. Context-aware augmentation (very-high-stakes, small-group, unanimous-consensus add extra steps). Each step has owner, timing, priority, and academic citations.
 - Dollar Impact Estimation: Connects toxic combos to deal ticketSize to estimate financial risk (ticketSize × historicalFailRate). Shows in ToxicCombinationCard and ToxicAlertBanner.
 - Toxic Score Trends API: Daily avg toxic scores for sparkline visualization (/api/toxic-combinations/trends).
@@ -221,9 +221,9 @@ Beat 10 — TRACTION (Signals That Matter): "199K+ lines of production TypeScrip
 Beat 11 — TEAM (Why You): "Solo technical founder, 16, Nigeria. Built entire platform solo. Advised by senior consultant who helped take Wiz from startup to $32B. The codebase IS the company, not tribal knowledge. Any senior full-stack engineer can onboard in weeks."
 
 PHASE 4 — VIABILITY (Reduce Risk):
-Beat 12 — BUSINESS MODEL: "SaaS subscription (Starter free, Corp Dev $2,499/mo, Enterprise custom) PLUS per-deal audit pricing ($999–$14,999 one-time scaled to deal ticket size). Per-deal bypasses procurement — expense it on the deal. 97% gross margins at $0.03-0.07 API cost. Corp dev VP can approve $2,499/mo without a procurement cycle."
+Beat 12 — BUSINESS MODEL: "Two tiers: Corp Dev $2,499/mo (unlimited, full platform) and Enterprise custom. 97% gross margins at $0.03-0.07 API cost per analysis. Land motion: free 30-day pilot on their next live deal — they see the Knowledge Graph seed, understand the compounding value, then subscribe. No transactional pricing because the product's entire value is longitudinal learning."
 Beat 13 — COMPETITION: "McKinsey consults quarterly, we audit every document in real time. Palantir analyzes data, we analyze the decision-makers analyzing the data. Affinity finds the deal, we audit the decision to invest. ChatGPT gives one opinion from one model, we use 3 judges, 20x20 matrix, and an outcome flywheel."
-Beat 14 — UNIT ECONOMICS: "~97% gross margins. $0.03-0.07 API cost per analysis. Per-deal audit at $14,999 on a $500M+ deal is a rounding error for the buyer and pure margin for us. CAC for corporate M&A is relationship-driven (advisor network) and accessible via compliance/risk channels."
+Beat 14 — UNIT ECONOMICS: "~97% gross margins. $0.03-0.07 API cost per analysis. $2,499/mo subscription = $30K ARR per customer minimum. CAC for corporate M&A is relationship-driven (advisor network) and accessible via compliance/risk channels. Free pilot converts at high rate because the Knowledge Graph seeds during the trial — they'd lose their data by not subscribing."
 
 PHASE 5 — DECISION (Make It Easy to Act):
 Beat 15 — ASK: State clearly how much you are raising, at what terms, and why this amount. Tie to specific milestones (first 10 paying customers, first enterprise contract, first ML hire).
@@ -264,7 +264,7 @@ Step 3 PRODUCT FIT: Strong for PE/VC IC memos, M&A proposals, strategy papers, r
 Step 4 PAIN: Extremely painful. One bad deal costs $50M-500M+. The cost of NOT catching anchoring bias in a board memo is existential.
 Step 5 ACCESSIBILITY: PE/VC is relationship-driven (Wiz advisor opens doors). Enterprise M&A reachable via compliance and risk channels. Both accessible.
 Step 6 BUYING BEHAVIOUR: PE/VC buys point solutions (DealCloud, Affinity, Grata). Enterprise buys GRC tools. Both segments buy software like DI.
-Step 7 DECISION SPEED: Per-deal audit ($999–$14,999) bypasses procurement. A VP can expense it on a single deal. Subscription ($2,499/mo) requires slightly longer cycle but per-deal is the wedge — prove value, then convert.
+Step 7 DECISION SPEED: Free 30-day pilot on a live deal — no procurement cycle, no budget approval needed. VP sees the Knowledge Graph seed and the Forgotten Questions output, then converts to $2,499/mo subscription. The pilot IS the wedge.
 Step 8 VALUE CREATION: One avoided bad deal = $50M-500M saved. 100-1000x ROI on subscription. Meaningful revenue per customer.
 Step 9 RETENTION: Outcome flywheel makes the platform smarter with each decision. Switching cost increases over time. Causal learning data is non-portable.
 ICP conclusion: PE/VC firms making $50M+ deals, with 3+ IC members, running 10+ deals per year, accessible via warm intro from advisor network. Start here, expand to enterprise M&A at Series A.

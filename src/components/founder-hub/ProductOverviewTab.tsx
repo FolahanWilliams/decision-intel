@@ -186,8 +186,8 @@ export function ProductOverviewTab() {
             unknown-unknowns: questions the document should address but doesn&apos;t.
           </li>
           <li>
-            <strong>Per-Deal Audit Pricing</strong> — One-time Stripe payments scaled to deal ticket
-            size ($999–$14,999). Unlimited analyses for deal-linked documents.
+            <strong>Free 30-Day Pilot</strong> — Full platform access on a live deal to seed the
+            Knowledge Graph. Converts to Corp Dev subscription ($2,499/mo) at trial end.
           </li>
           <li>
             <strong>Toxic Mitigation Playbooks</strong> — Auto-generated research-backed debiasing

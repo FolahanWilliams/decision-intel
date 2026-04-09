@@ -762,7 +762,7 @@ export function HeroDecisionGraph() {
         </div>
 
         {/* SVG container — constrained height, but DetailPanel below expands freely */}
-        <div style={{ maxHeight: 400, overflow: 'hidden' }}>
+        <div style={{ maxHeight: 480, overflow: 'hidden' }}>
           <motion.svg
             role="img"
             aria-label="Interactive decision graph showing how cognitive biases connect to strategic decisions"
