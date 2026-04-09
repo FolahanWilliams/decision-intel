@@ -44,7 +44,7 @@ export const PLANS = {
     analysesPerMonth: Infinity,
     maxPages: 200,
     biasTypes: 20,
-    maxTeamMembers: 50,
+    maxTeamMembers: 15,
   },
   enterprise: {
     name: 'Enterprise',

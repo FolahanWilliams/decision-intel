@@ -1222,7 +1222,7 @@ export default function LandingPage() {
                   'Knowledge Graph (compounds over time)',
                   'Compliance mapping (SOX, MiFID II)',
                   'Outcome tracking & calibration',
-                  'Up to 50 team seats',
+                  'Up to 15 team seats',
                 ],
                 cta: 'Start 30-Day Pilot',
                 action: () => handleCheckout('team'),
