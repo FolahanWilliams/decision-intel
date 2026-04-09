@@ -12,10 +12,7 @@ const S = {
   blue: '#3B82F6',
   amber: '#F59E0B',
   purple: '#8B5CF6',
-  slate900: '#0F172A',
-  slate600: '#475569',
   slate400: '#94A3B8',
-  slate100: '#F1F5F9',
 } as const;
 
 const sectionCard = (borderColor: string): React.CSSProperties => ({
@@ -87,6 +84,14 @@ const statLabel: React.CSSProperties = {
   marginTop: 2,
 };
 
+const scriptLine: React.CSSProperties = {
+  ...body,
+  background: 'var(--bg-elevated)',
+  padding: '16px 20px',
+  borderRadius: 'var(--radius-md)',
+  fontStyle: 'italic',
+};
+
 export function MeetingPrepTab() {
   return (
     <div style={{ maxWidth: 800 }}>
@@ -101,7 +106,7 @@ export function MeetingPrepTab() {
           color: '#FFFFFF',
         }}
       >
-        <div style={{ ...label, color: S.green }}>MEETING PREP — LIVE CHEAT SHEET</div>
+        <div style={{ ...label, color: S.green }}>CALL PREP — LIVE CHEAT SHEET</div>
         <h2
           style={{
             fontSize: '1.3rem',
@@ -112,163 +117,161 @@ export function MeetingPrepTab() {
         >
           Yumiko Oka — Antler
         </h2>
-        <p style={{ fontSize: '0.8rem', color: '#94A3B8', margin: 0, lineHeight: 1.5 }}>
-          Program Manager · Manages Residency Programs, Portfolio Management &amp; Investor Relations · Tokyo
+        <p style={{ fontSize: '0.8rem', color: S.slate400, margin: 0, lineHeight: 1.5 }}>
+          Program Manager · Residency Programs, Portfolio Management &amp; Investor Relations
           <br />
-          Background: L&apos;Oréal, Estée Lauder, Rakuten · University of Tsukuba · Connected
-          via Andrew Goldner
+          Background: L&apos;Oréal, Estée Lauder, Rakuten · University of Tsukuba
+          <br />
+          <span style={{ color: S.green }}>How you got here: Cold LinkedIn outreach → she replied. That&apos;s already a signal.</span>
         </p>
         <div
           style={{
             display: 'flex',
-            gap: 12,
+            gap: 10,
             marginTop: 14,
             flexWrap: 'wrap',
           }}
         >
-          <span
-            style={{
-              fontSize: '0.7rem',
-              fontWeight: 600,
-              padding: '4px 10px',
-              borderRadius: 999,
-              background: 'rgba(22,163,74,0.15)',
-              color: S.green,
-            }}
-          >
-            EARLY-STAGE VC
-          </span>
-          <span
-            style={{
-              fontSize: '0.7rem',
-              fontWeight: 600,
-              padding: '4px 10px',
-              borderRadius: 999,
-              background: 'rgba(59,130,246,0.15)',
-              color: S.blue,
-            }}
-          >
-            RESIDENCY PROGRAMS
-          </span>
-          <span
-            style={{
-              fontSize: '0.7rem',
-              fontWeight: 600,
-              padding: '4px 10px',
-              borderRadius: 999,
-              background: 'rgba(245,158,11,0.15)',
-              color: S.amber,
-            }}
-          >
-            PORTFOLIO MGMT &amp; IR
-          </span>
-          <span
-            style={{
-              fontSize: '0.7rem',
-              fontWeight: 600,
-              padding: '4px 10px',
-              borderRadius: 999,
-              background: 'rgba(139,92,246,0.15)',
-              color: S.purple,
-            }}
-          >
-            CORPORATE BACKGROUND
-          </span>
+          {[
+            { text: 'INTRO PITCH', color: S.green },
+            { text: 'EARLY-STAGE VC', color: S.blue },
+            { text: 'RESIDENCY PROGRAMS', color: S.purple },
+            { text: 'PORTFOLIO MGMT & IR', color: S.amber },
+          ].map(t => (
+            <span
+              key={t.text}
+              style={{
+                fontSize: '0.7rem',
+                fontWeight: 600,
+                padding: '4px 10px',
+                borderRadius: 999,
+                background: `${t.color}22`,
+                color: t.color,
+              }}
+            >
+              {t.text}
+            </span>
+          ))}
         </div>
       </div>
 
-      {/* ── CONNECTION BRIDGE ─────────────────────────────────── */}
+      {/* ── WHO YOU'RE MEETING ────────────────────────────────── */}
       <div style={{
-        ...sectionCard(S.purple),
-        background: 'linear-gradient(135deg, rgba(139,92,246,0.05) 0%, var(--bg-card) 100%)',
+        ...sectionCard(S.blue),
+        background: 'linear-gradient(135deg, rgba(59,130,246,0.05) 0%, var(--bg-card) 100%)',
       }}>
-        <div style={{ ...label, color: S.purple }}>YOUR ANGLE INTO HER WORLD</div>
-        <div style={sectionTitle}>The Connection Bridge</div>
-        <div style={{
-          ...body,
-          background: 'var(--bg-elevated)',
-          padding: '16px 20px',
-          borderRadius: 'var(--radius-md)',
-          borderLeft: `3px solid ${S.purple}`,
-          marginBottom: 12,
-        }}>
-          Yumiko co-oversees <strong style={{ color: 'var(--text-primary)' }}>portfolio management
-          and investor relations</strong> at Antler. That means she watches founders pitch, watches
-          ICs vote, and watches portfolio companies make strategic decisions every day. She has
-          almost certainly concluded that <strong style={{ color: 'var(--text-primary)' }}>humans
-          are not 100% rational decision-makers</strong> — she&apos;s lived it from every angle.
-        </div>
-        <ul style={{ ...body, paddingLeft: 18, margin: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ ...label, color: S.blue }}>UNDERSTAND HER ROLE</div>
+        <div style={sectionTitle}>Who You&apos;re Meeting</div>
+        <ul style={{ ...body, paddingLeft: 18, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
           <li>
-            <strong style={{ color: 'var(--text-primary)' }}>From the investor side:</strong>{' '}
-            She&apos;s seen ICs disagree on the same founder for different reasons (that&apos;s
-            decision noise). She&apos;s seen portfolio companies overvalue sunk costs or anchor to
-            initial valuations.
+            Yumiko runs Residency programs and co-oversees portfolio management &amp; investor
+            relations. <strong style={{ color: 'var(--text-primary)' }}>She is not a GP — she
+            does not write the cheques.</strong> Her job is to find and develop great founders, then
+            connect the best ones to the investment team.
           </li>
           <li>
-            <strong style={{ color: 'var(--text-primary)' }}>From the corporate side:</strong>{' '}
-            7 years at L&apos;Oréal, Estée Lauder, Rakuten — she&apos;s watched executives
-            approve projects based on who presented them, not what was presented (authority bias,
-            halo effect).
+            <strong style={{ color: 'var(--text-primary)' }}>The goal isn&apos;t to close investment.</strong>{' '}
+            The goal is to make Yumiko want to champion you internally. She replied to a cold
+            message — she&apos;s already curious. Your job is to make her feel like she discovered
+            someone special.
           </li>
           <li>
-            <strong style={{ color: 'var(--text-primary)' }}>The bridge:</strong>{' '}
-            &ldquo;You&apos;ve seen this from both sides — corporate teams making biased decisions,
-            and investors evaluating those same teams. We built the tool that makes the bias
-            visible and measurable before the decision is final.&rdquo;
+            Her corporate background (L&apos;Oréal, Estée Lauder, Rakuten) means she&apos;s worked
+            inside large multinational corporations with exactly the kind of corp dev and strategy
+            apparatus you&apos;re targeting.{' '}
+            <strong style={{ color: 'var(--text-primary)' }}>She&apos;ll immediately understand
+            the buyer persona — she&apos;s lived inside one.</strong>
           </li>
         </ul>
       </div>
 
-      {/* ── WHY SHE MATTERS ───────────────────────────────────── */}
-      <div style={sectionCard(S.blue)}>
-        <div style={sectionTitle}>Why This Meeting Matters</div>
-        <ul style={{ ...body, paddingLeft: 18, margin: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+      {/* ── ANTLER CONTEXT ────────────────────────────────────── */}
+      <div style={sectionCard(S.purple)}>
+        <div style={{ ...label, color: S.purple }}>KNOW THIS GOING IN</div>
+        <div style={sectionTitle}>Antler Context</div>
+        <ul style={{ ...body, paddingLeft: 18, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
           <li>
-            <strong style={{ color: 'var(--text-primary)' }}>Antler is a global startup generator</strong>{' '}
-            — they invest at pre-seed and run residency programs. If she sees product-market fit signal, it
-            could mean residency placement, funding, or warm intros to their LP network.
+            <strong style={{ color: 'var(--text-primary)' }}>$510M in new global funds</strong>{' '}
+            (January 2026), half earmarked for US founders. New San Francisco residency actively
+            expanding — directly aligns with your US-first strategy.
           </li>
           <li>
-            <strong style={{ color: 'var(--text-primary)' }}>She co-oversees portfolio management &amp; investor relations</strong>{' '}
-            — she watches decisions from every angle: founders pitching, ICs voting, portfolio
-            companies executing. She&apos;s already concluded humans aren&apos;t fully rational.
-            Position Decision Intel as the tool that validates what she already believes.
+            Spring 2025 London residency invested{' '}
+            <strong style={{ color: 'var(--text-primary)' }}>£1.7M across 14 AI startups</strong>.
+            UK cohort is active.
           </li>
           <li>
-            <strong style={{ color: 'var(--text-primary)' }}>Her corporate background</strong> (L&apos;Oréal,
-            Estée Lauder, Rakuten) means she personally understands corporate decision-making pain. She
-            doesn&apos;t need to imagine the ICP — she lived it.
+            Antler invests at pre-seed (idea → MVP). You&apos;re at the{' '}
+            <strong style={{ color: 'var(--text-primary)' }}>strong end</strong> of their range — you have a
+            functioning 190K LOC platform, not just a pitch.
           </li>
           <li>
-            <strong style={{ color: 'var(--text-primary)' }}>Connected via Andrew Goldner</strong> — the
-            same advisor who helped shape the pivot to corporate strategy/M&amp;A. Warm intro context.
+            <strong style={{ color: 'var(--text-primary)' }}>20–45% of residency founders</strong>{' '}
+            receive investment. Residency is free, no equity upfront — Antler invests after the
+            cohort if they believe in you.
+          </li>
+          <li>
+            Their 2025 AI portfolio leans enterprise: compliance, legal, financial, reliability
+            infrastructure.{' '}
+            <strong style={{ color: 'var(--text-primary)' }}>Decision Intel fits that pattern cleanly.</strong>
           </li>
         </ul>
       </div>
 
-      {/* ── 30-SECOND PITCH ───────────────────────────────────── */}
-      <div style={sectionCard(S.green)}>
-        <div style={{ ...label, color: S.green }}>MEMORIZE THIS</div>
-        <div style={sectionTitle}>Your 30-Second Pitch</div>
-        <div
-          style={{
-            ...body,
-            background: 'var(--bg-elevated)',
-            padding: '16px 20px',
-            borderRadius: 'var(--radius-md)',
-            borderLeft: `3px solid ${S.green}`,
-            fontStyle: 'italic',
-          }}
-        >
-          &ldquo;You manage portfolios and investor relations — so you&apos;ve probably
-          already seen that the smartest people in the room still make predictably irrational
-          decisions. Decision Intel makes that visible. We audit strategic documents — M&amp;A
-          memos, board papers, investment theses — for cognitive bias, decision noise, and
-          missing diligence questions, in under 60 seconds. We surface the questions the memo
-          never asks, drawn from comparable historical decisions. Think of it as Grammarly for
-          high-stakes decisions — except the mistakes we catch cost $8M on average, not a
-          typo.&rdquo;
+      {/* ── 90-SECOND VERBAL HOOK ─────────────────────────────── */}
+      <div style={{
+        ...sectionCard(S.green),
+        background: 'linear-gradient(135deg, rgba(22,163,74,0.08) 0%, var(--bg-card) 100%)',
+      }}>
+        <div style={{ ...label, color: S.green }}>PRACTISE THIS OUT LOUD TONIGHT</div>
+        <div style={sectionTitle}>Your 90-Second Verbal Hook</div>
+        <p style={{ ...body, marginBottom: 12, fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+          This is for when she says &ldquo;tell me about it, just talk me through it.&rdquo;
+          Don&apos;t read slides. Go: problem → why now → why you → ask.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div>
+            <div style={{ ...label, color: S.amber, marginBottom: 4 }}>THE PROBLEM (20s)</div>
+            <div style={{ ...scriptLine, borderLeft: `3px solid ${S.amber}` }}>
+              &ldquo;70 to 90 percent of M&amp;A deals destroy shareholder value. Not because of bad
+              data — the data is usually fine. Because of bad reasoning. Anchoring bias, confirmation
+              bias, groupthink — these are predictable, well-documented cognitive errors. And nobody
+              audits for them. Every memo gets a financial review, a legal review, a compliance
+              review. Nobody reviews the quality of the thinking itself.&rdquo;
+            </div>
+          </div>
+          <div>
+            <div style={{ ...label, color: S.blue, marginBottom: 4 }}>WHY NOW (20s)</div>
+            <div style={{ ...scriptLine, borderLeft: `3px solid ${S.blue}` }}>
+              &ldquo;LLMs made this possible for the first time. You couldn&apos;t automate bias
+              detection before because it requires reading a 40-page memo, understanding the
+              argument structure, and stress-testing the reasoning against 20 different cognitive
+              biases simultaneously. That used to take a team of psychologists and a week. We do it
+              in under 60 seconds.&rdquo;
+            </div>
+          </div>
+          <div>
+            <div style={{ ...label, color: S.green, marginBottom: 4 }}>WHY ME (25s)</div>
+            <div style={{ ...scriptLine, borderLeft: `3px solid ${S.green}` }}>
+              &ldquo;I published a research paper connecting cognitive bias to the 2008 financial
+              crisis — that proved the problem exists at a systemic level. Then I built Decision
+              Intel to fix it. 190,000 lines of production TypeScript, solo, at 16. A 12-node AI
+              pipeline that detects 20-plus biases, measures decision noise with a three-judge
+              statistical jury, maps to 7 compliance frameworks, and — the feature I&apos;m most
+              proud of — surfaces the diligence questions your memo never asks, drawn from
+              comparable historical decisions. My advisor is Josh Rainer, a senior consultant who
+              helped take Wiz from startup to 32 billion. He&apos;s committed 10 to 15 warm Fortune
+              500 intros for Q2.&rdquo;
+            </div>
+          </div>
+          <div>
+            <div style={{ ...label, color: S.purple, marginBottom: 4 }}>THE ASK (15s)</div>
+            <div style={{ ...scriptLine, borderLeft: `3px solid ${S.purple}` }}>
+              &ldquo;I&apos;m looking at Antler&apos;s UK and SF residency cohorts this summer.
+              I&apos;d love your honest read on whether this is a fit — and if it is, who on the
+              investment team I should be speaking with.&rdquo;
+            </div>
+          </div>
         </div>
       </div>
 
@@ -278,14 +281,14 @@ export function MeetingPrepTab() {
         <div style={sectionTitle}>Key Numbers</div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
           {[
-            { num: '~97%', label: 'Gross margins' },
+            { num: '190K', label: 'Lines of TypeScript' },
             { num: '<60s', label: 'Time to full audit' },
-            { num: '$0.03–0.07', label: 'Cost per analysis' },
+            { num: '~97%', label: 'Gross margins' },
+            { num: '$0.03', label: 'Cost per analysis' },
             { num: '20+', label: 'Cognitive biases' },
-            { num: '146', label: 'Historical case studies' },
             { num: '12', label: 'Pipeline nodes' },
-            { num: '7', label: 'Compliance frameworks' },
             { num: '$8.2M', label: 'Avg diligence gap cost' },
+            { num: '$510M', label: 'Antler new funds (Jan 2026)' },
           ].map(s => (
             <div key={s.label} style={statBox}>
               <div style={statNum}>{s.num}</div>
@@ -295,10 +298,10 @@ export function MeetingPrepTab() {
         </div>
       </div>
 
-      {/* ── DEMO FLOW ─────────────────────────────────────────── */}
+      {/* ── MEETING AGENDA ────────────────────────────────────── */}
       <div style={sectionCard(S.purple)}>
-        <div style={{ ...label, color: S.purple }}>YOUR DECK + LIVE DEMO SCRIPT</div>
-        <div style={sectionTitle}>Meeting Flow</div>
+        <div style={{ ...label, color: S.purple }}>SUGGESTED FLOW — ~20 MIN TOTAL</div>
+        <div style={sectionTitle}>Meeting Agenda</div>
         <ol
           style={{
             ...body,
@@ -306,118 +309,116 @@ export function MeetingPrepTab() {
             margin: 0,
             display: 'flex',
             flexDirection: 'column',
-            gap: 10,
+            gap: 12,
           }}
         >
           <li>
-            <strong style={{ color: 'var(--text-primary)' }}>Open with her world</strong> (2 min)
-            — &ldquo;You manage portfolios and see investment decisions from both sides — the
-            founders making them and the ICs evaluating them. Have you noticed patterns where
-            smart people consistently miss the same things?&rdquo; Let her answer. Then:
-            &ldquo;That&apos;s exactly what we built this for.&rdquo;
+            <strong style={{ color: 'var(--text-primary)' }}>Open — Make it personal</strong> (2 min)
+            <br />
+            Thank her genuinely for replying. Ask one question about her before pitching:{' '}
+            <em>&ldquo;You work across Japan and global programs — how do you think about where
+            the most interesting founders are coming from right now?&rdquo;</em>{' '}
+            Shows you&apos;re curious about her perspective, not just there to pitch.
           </li>
           <li>
-            <strong style={{ color: 'var(--text-primary)' }}>Walk the pitch deck</strong> (8–10
-            min) — Problem → Solution → Product → Market → Business Model → Traction → Ask. Pause
-            on the product slides for the live demo.
+            <strong style={{ color: 'var(--text-primary)' }}>The problem — Lead with this, not the product</strong> (2–3 min)
+            <br />
+            &ldquo;70–90% of M&amp;A deals destroy value. Not because of bad data. Because of bad
+            reasoning — and nobody audits for it.&rdquo; She&apos;ll get it immediately given her
+            corporate background.
           </li>
           <li>
-            <strong style={{ color: 'var(--text-primary)' }}>Live demo</strong> (5 min) — Upload
-            the sample memo → Watch the pipeline run (the live graph is the wow moment) → DQI
-            score reveal (pause for effect) → Walk through 2–3 biases with excerpts → Show the{' '}
-            <strong>Forgotten Questions</strong> tab — &ldquo;These are the questions the memo
-            never asked.&rdquo; → Show the Boardroom Simulation.
+            <strong style={{ color: 'var(--text-primary)' }}>Your founder story — This is your edge</strong> (1–2 min)
+            <br />
+            16 years old, solo built 190K lines of production TypeScript, published academic
+            research paper connecting cognitive bias to the 2008 financial crisis — the paper proved
+            the problem, Decision Intel is the product.{' '}
+            <strong style={{ color: S.amber }}>Don&apos;t rush this. Antler invests in founders
+            first, products second.</strong>
           </li>
           <li>
-            <strong style={{ color: 'var(--text-primary)' }}>Close</strong> (3 min) — &ldquo;We&apos;re
-            looking for our first design partner. I&apos;d love your perspective on whether
-            Antler sees this kind of decision quality tooling as a category.&rdquo;
+            <strong style={{ color: 'var(--text-primary)' }}>Walk the deck</strong> (5–7 min)
+            <br />
+            Problem → Product → Market → Traction/Validation → Team (you + Josh Rainer) → Ask.
+            Don&apos;t read the slides — talk through them. Pause on the product slides for the
+            live demo: upload sample memo → pipeline graph (wow moment) → DQI score reveal →
+            2–3 biases with excerpts → <strong>Forgotten Questions</strong> tab →
+            Boardroom Simulation.
+          </li>
+          <li>
+            <strong style={{ color: 'var(--text-primary)' }}>The ask — Be specific</strong> (1 min)
+            <br />
+            Don&apos;t end with &ldquo;so yeah, that&apos;s Decision Intel.&rdquo; End with the
+            direct ask (see close section below).
+          </li>
+          <li>
+            <strong style={{ color: 'var(--text-primary)' }}>Her questions — Listen hard</strong> (5–10 min)
+            <br />
+            What she probes on tells you exactly what Antler looks for and where your story has
+            gaps. Take mental notes.
           </li>
         </ol>
       </div>
 
-      {/* ── WHAT TO EMPHASIZE FOR ANTLER ──────────────────────── */}
-      <div style={sectionCard(S.green)}>
-        <div style={{ ...label, color: S.green }}>TAILORED FOR ANTLER</div>
-        <div style={sectionTitle}>What to Emphasize</div>
-        <ul style={{ ...body, paddingLeft: 18, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <li>
-            <strong style={{ color: 'var(--text-primary)' }}>Solo founder who built the entire platform.</strong>{' '}
-            Antler invests in founders, not just ideas. 199K+ lines of production TypeScript,
-            solo. That&apos;s the signal.
-          </li>
-          <li>
-            <strong style={{ color: 'var(--text-primary)' }}>Category creation, not feature competition.</strong>{' '}
-            No one is doing decision quality auditing. Closest is Cloverpop (acquired 2023, no
-            bias detection). The real competition is &ldquo;do nothing.&rdquo;
-          </li>
-          <li>
-            <strong style={{ color: 'var(--text-primary)' }}>The Knowledge Graph compounds.</strong>{' '}
-            Every decision makes the platform smarter. This is the moat — not features, not
-            prompts, but org-specific calibration data that can&apos;t transfer to a competitor.
-          </li>
-          <li>
-            <strong style={{ color: 'var(--text-primary)' }}>Corporate → enterprise expansion path.</strong>{' '}
-            Land with corp dev/M&amp;A teams ($2,499/mo), expand to PE/VC, financial services,
-            government. $12.2B → $46.4B decision intelligence market by 2030.
-          </li>
-          <li>
-            <strong style={{ color: 'var(--text-primary)' }}>Advised by the person who helped scale Wiz to $32B.</strong>{' '}
-            Not just a kid building in a room — connected to enterprise GTM expertise.
-          </li>
-        </ul>
-      </div>
-
-      {/* ── LIKELY QUESTIONS ──────────────────────────────────── */}
-      <div style={sectionCard(S.red)}>
-        <div style={{ ...label, color: S.red }}>PREPARE FOR THESE</div>
-        <div style={sectionTitle}>Likely Questions &amp; Your Answers</div>
+      {/* ── QUESTIONS TO ASK HER ──────────────────────────────── */}
+      <div style={sectionCard(S.blue)}>
+        <div style={{ ...label, color: S.blue }}>HAVE THESE READY</div>
+        <div style={sectionTitle}>Questions to Ask Her</div>
         <div>
           {[
             {
-              q: '"What traction do you have?"',
-              a: 'Pre-revenue — we\'re actively outreaching to corporate strategy and M&A teams for our first design partner. The product is live, fully built, 199K+ lines of TypeScript, 70+ API routes, 200+ components. We\'re offering a free 30-day pilot on a live deal to prove value before asking for budget.',
+              q: '"What separates the founders Antler backs from the ones who don\'t get investment?"',
+              why: 'Gets you inside her evaluation lens. Makes her articulate what she values — then you can map your story to it.',
             },
             {
-              q: '"How do you know this is a real problem?"',
-              a: 'Kahneman and Sibony proved that decision noise — the random variability in how teams evaluate the same information — costs organizations billions annually. Their insurance underwriter study found 55% variability where executives expected 10%. Nobody audits this. We make it measurable and fixable.',
+              q: '"Decision Intel already has an MVP and early validation from a senior consultant who worked on the Wiz deal. Does that change how you\'d think about residency fit, or is earlier always better for Antler?"',
+              why: 'Proactively addresses "are you too late for Antler?" before it becomes an objection.',
             },
             {
-              q: '"What\'s the go-to-market?"',
-              a: 'Free 30-day pilot on a live deal. The Knowledge Graph seeds during the trial — they\'d lose their data by not subscribing. Land with M&A or corp dev VPs who can approve $2,499/mo without procurement. Expand to enterprise ($50K–$200K ACV). Advisor network (Wiz consultant) opens doors.',
+              q: '"What does the next UK and SF cohort timeline look like?"',
+              why: 'Practical, shows you\'re serious and ready to commit.',
             },
             {
-              q: '"Why corporate strategy and not PE/VC?"',
-              a: 'Andrew Goldner\'s advice — PE/VC has small budgets, relationship-driven buying, and their identity is "our edge is judgment." Bias auditing feels threatening. Corporate M&A teams have defined budgets, use consultants for strategic reviews already, and have accessible VPs who can greenlight pilots.',
+              q: '"What\'s the most common mistake you see founders make in their first meeting with you?"',
+              why: 'Slightly disarming, builds rapport, and gives you live coaching you can act on immediately.',
+            },
+          ].map((item, i) => (
+            <div key={i} style={{ ...qaRow, borderBottom: i < 3 ? '1px solid var(--border-color)' : 'none' }}>
+              <div style={qText}>{item.q}</div>
+              <div style={{ ...aText, fontStyle: 'italic', color: 'var(--text-muted)' }}>
+                Why: {item.why}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── LIKELY OBJECTIONS ─────────────────────────────────── */}
+      <div style={sectionCard(S.red)}>
+        <div style={{ ...label, color: S.red }}>HANDLE THESE CALMLY</div>
+        <div style={sectionTitle}>Likely Objections &amp; Your Responses</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+          {[
+            {
+              obj: '"You\'re very young — can you execute enterprise sales?"',
+              resp: '"That\'s exactly why Josh Rainer is on the team — he helped take Wiz to $32B and has committed 10–15 warm Fortune 500 intros for Q2. I build the product, he opens the doors."',
             },
             {
-              q: '"How is this different from ChatGPT?"',
-              a: 'ChatGPT gives one opinion from one model. We use 3 independent judges for noise measurement, a 20×20 bias interaction matrix, 146 historical case studies with outcome correlations, and a Forgotten Questions engine that surfaces diligence gaps from comparable past decisions. Plus compliance mapping, outcome tracking, and an org-specific Knowledge Graph.',
+              obj: '"Corp dev at Fortune 500 is a long sales cycle"',
+              resp: '"The free pilot bypasses procurement entirely — a VP runs their next live deal memo through the platform, no credit card, no commitment. First 5 pilots close Q2."',
             },
             {
-              q: '"What if someone just copies your prompts?"',
-              a: 'They can copy prompts but not the 5 proprietary layers above the LLM: compound scoring engine, toxic combination detection, noise decomposition, knowledge graph, and 7 compliance frameworks. And they absolutely cannot copy 18 months of org-specific outcome data. We swap LLM models freely — that\'s by design.',
+              obj: '"Is this the right stage for Antler?"',
+              resp: '"I have the product. I need the network and GTM support to land the first pilots. That\'s exactly what the residency provides."',
             },
             {
-              q: '"You\'re 16 — can you actually sell to Fortune 500?"',
-              a: 'The product sells itself in the demo. We\'re not cold-calling — we lead with a free pilot. The platform does the talking. And I have a senior advisor who helped take Wiz from startup to $32B guiding the enterprise GTM. What I need is a GTM co-founder, and that\'s part of what I\'m looking for.',
+              obj: '"You\'re in the UK — are you open to SF?"',
+              resp: '"Absolutely. My US-first strategy means SF is actually ideal."',
             },
-            {
-              q: '"What are you raising?"',
-              a: 'Pre-seed, looking at the $500K–$1.5M range. Milestones: first 10 paying customers, first enterprise contract, first ML hire. The capital goes to sales (GTM co-founder), infrastructure, and getting to $100K ARR.',
-            },
-            {
-              q: '"Could this work for VC investment committees too?"',
-              a: 'Absolutely — and that\'s actually the expansion path. VCs have the same problem: IC members evaluating the same pitch reach different conclusions for different reasons. That\'s textbook decision noise. We start with corporate M&A because they have bigger budgets and faster procurement, but VC/PE is where we expand next. Imagine running every investment memo through a bias audit before the IC votes.',
-            },
-            {
-              q: '"What do you need from Antler specifically?"',
-              a: 'Three things: (1) Perspective on whether Antler sees decision quality tooling as a fundable category, (2) If there\'s a fit with Antler\'s residency or investment model, and (3) Introductions to corporate strategy leaders in Antler\'s portfolio or network who might be design partners.',
-            },
-          ].map((qa, i) => (
-            <div key={i} style={{ ...qaRow, borderBottom: i < 9 ? '1px solid var(--border-color)' : 'none' }}>
-              <div style={qText}>{qa.q}</div>
-              <div style={aText}>{qa.a}</div>
+          ].map((item, i) => (
+            <div key={i} style={{ padding: '14px 0', borderBottom: i < 3 ? '1px solid var(--border-color)' : 'none' }}>
+              <div style={{ ...qText, color: S.red }}>{item.obj}</div>
+              <div style={aText}>{item.resp}</div>
             </div>
           ))}
         </div>
@@ -428,24 +429,26 @@ export function MeetingPrepTab() {
         <div style={sectionCard(S.green)}>
           <div style={{ ...label, color: S.green }}>DO</div>
           <ul style={{ ...body, paddingLeft: 16, margin: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <li>Thank her for replying — acknowledge the cold outreach honestly</li>
+            <li>Ask about her before pitching — show curiosity</li>
+            <li>Lead with the problem, not the product</li>
+            <li>Tell your founder story — Antler invests in founders first</li>
             <li>Let the demo speak — pause after the DQI score reveal</li>
-            <li>Bridge from her portfolio/IR role — &ldquo;you&apos;ve seen irrational decisions from every angle&rdquo;</li>
-            <li>Ask her what decision patterns she&apos;s noticed across Antler&apos;s portfolio</li>
             <li>Be honest about being pre-revenue</li>
-            <li>Show the Forgotten Questions tab — it&apos;s the killer feature</li>
-            <li>Ask for specific intros, not vague &ldquo;help&rdquo;</li>
-            <li>Follow up within 24 hours with a thank-you and one specific ask</li>
+            <li>End with a specific ask (residency fit + investment team intro)</li>
+            <li>Follow up within 24 hours</li>
           </ul>
         </div>
         <div style={sectionCard(S.red)}>
           <div style={{ ...label, color: S.red }}>DON&apos;T</div>
           <ul style={{ ...body, paddingLeft: 16, margin: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
             <li>Don&apos;t apologize for your age — lead with the product</li>
+            <li>Don&apos;t read your slides — talk through them</li>
             <li>Don&apos;t oversell traction you don&apos;t have</li>
             <li>Don&apos;t get lost in technical details (pipeline nodes, etc.)</li>
             <li>Don&apos;t talk for more than 2 minutes without asking a question</li>
-            <li>Don&apos;t be defensive about &ldquo;just prompts&rdquo; — redirect to the 5 layers</li>
-            <li>Don&apos;t forget to ask what she thinks — her perspective matters</li>
+            <li>Don&apos;t end with &ldquo;so yeah, that&apos;s Decision Intel&rdquo;</li>
+            <li>Don&apos;t forget: she&apos;s not the GP — make her want to champion you</li>
           </ul>
         </div>
       </div>
@@ -454,10 +457,10 @@ export function MeetingPrepTab() {
       <div
         style={{
           ...sectionCard(S.green),
-          background: 'linear-gradient(135deg, rgba(22,163,74,0.05) 0%, var(--bg-card) 100%)',
+          background: 'linear-gradient(135deg, rgba(22,163,74,0.08) 0%, var(--bg-card) 100%)',
         }}
       >
-        <div style={{ ...label, color: S.green }}>END THE MEETING WITH THIS</div>
+        <div style={{ ...label, color: S.green }}>BE DIRECT — END WITH THIS</div>
         <div style={sectionTitle}>Your Close</div>
         <div
           style={{
@@ -467,15 +470,34 @@ export function MeetingPrepTab() {
             borderRadius: 'var(--radius-md)',
             borderLeft: `3px solid ${S.green}`,
             fontStyle: 'italic',
+            fontSize: '0.85rem',
           }}
         >
-          &ldquo;Yumiko, you see decision-making from every angle — founders pitching, ICs
-          evaluating, portfolio companies executing. Three things I&apos;d love your perspective
-          on: First, does Antler see decision quality tooling as a fundable category? Second, is
-          there a fit with Antler&apos;s residency model for something like this? And third,
-          would you be open to introducing me to 1–2 corporate strategy leaders in your network
-          who might want to pilot this on a live deal?&rdquo;
+          &ldquo;I&apos;m actively looking at Antler&apos;s UK and SF residency cohorts for this
+          summer. Given what you&apos;ve seen today, do you think Decision Intel is a fit — and if
+          so, is there someone on the investment team I should be speaking with?&rdquo;
         </div>
+        <p style={{ ...body, marginTop: 10, fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+          That&apos;s two questions in one: get her read on fit, and request the warm intro in
+          the same breath.
+        </p>
+      </div>
+
+      {/* ── ONE THING TO FIX ──────────────────────────────────── */}
+      <div style={{
+        background: 'var(--bg-elevated)',
+        border: `2px solid ${S.amber}`,
+        borderRadius: 'var(--radius-md)',
+        padding: '16px 20px',
+        textAlign: 'center',
+      }}>
+        <div style={{ ...label, color: S.amber, marginBottom: 6 }}>TONIGHT</div>
+        <p style={{ ...body, margin: 0, fontWeight: 600, color: 'var(--text-primary)' }}>
+          Practise the 90-second verbal hook once, out loud.
+        </p>
+        <p style={{ ...body, margin: '4px 0 0', fontSize: '0.78rem' }}>
+          Problem → Why now → Why you → Ask. No slides, no screen — just you talking.
+        </p>
       </div>
     </div>
   );
