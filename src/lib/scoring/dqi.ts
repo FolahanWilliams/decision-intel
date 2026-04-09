@@ -626,6 +626,7 @@ function getCaseBenchmarks(): Array<{ company: string; dqi: number; outcome: str
  */
 export function computeHistoricalPercentile(dqiScore: number): number {
   const benchmarks = getCaseBenchmarks();
+  if (benchmarks.length === 0) return 50;
   const belowCount = benchmarks.filter(b => b.dqi < dqiScore).length;
   return Math.round((belowCount / benchmarks.length) * 100);
 }
@@ -647,18 +648,18 @@ export function getHistoricalComparisons(dqiScore: number): Array<{
     relation: 'below' | 'comparable' | 'above';
   }> = [];
 
-  // Find closest failure case below
+  // Find closest failure case below the user's score
   const failureBelow = benchmarks
     .filter(b => b.dqi < dqiScore && b.outcome.includes('failure'))
     .pop();
   if (failureBelow) {
-    comparisons.push({ ...failureBelow, relation: 'above' });
+    comparisons.push({ ...failureBelow, relation: 'below' });
   }
 
-  // Find closest success case above
+  // Find closest success case above the user's score
   const successAbove = benchmarks.find(b => b.dqi > dqiScore && b.outcome.includes('success'));
   if (successAbove) {
-    comparisons.push({ ...successAbove, relation: 'below' });
+    comparisons.push({ ...successAbove, relation: 'above' });
   }
 
   // Find comparable case (within 5 points)
