@@ -735,10 +735,19 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
       log.info(`Pre-redacted ${preRedactCount} structured PII patterns before LLM anonymization`);
     }
 
+    // Truncate to fit LLM context window — same limit as other nodes.
+    // The regex pre-redaction already ran on the full text above.
+    const truncated = truncateText(preRedacted);
+    if (preRedacted.length > MAX_INPUT_CHARS) {
+      log.info(
+        `GDPR Anonymizer: truncated input from ${preRedacted.length} to ${MAX_INPUT_CHARS} chars`
+      );
+    }
+
     // Phase 2: LLM-based contextual anonymization (catches names, addresses in narrative)
     const result = await withGeminiResilience(() =>
       withTimeout(
-        getModel().generateContent([GDPR_ANONYMIZER_PROMPT, `Text to anonymize:\n${preRedacted}`])
+        getModel().generateContent([GDPR_ANONYMIZER_PROMPT, `Text to anonymize:\n${truncated}`])
       )
     );
 
@@ -750,29 +759,24 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
       // If the LLM echoes back the original text without redacting, that's
       // a silent failure — treat it as failed to prevent PII leakage.
       const hasRedactionPlaceholders =
-        /\[(PERSON|EMAIL|PHONE|ADDRESS|COMPANY|IP|FINANCIAL)_\d+\]/.test(data.structuredContent);
+        /\[(PERSON|EMAIL|PHONE|ADDRESS|COMPANY|IP|FINANCIAL|SSN|CC)_\d+\]/.test(data.structuredContent);
       const hasRedactionsList = Array.isArray(data.redactions) && data.redactions.length > 0;
 
-      if (!hasRedactionPlaceholders && !hasRedactionsList) {
-        // Content may still contain PII — the LLM may have returned it
-        // verbatim. Only trust a "no PII found" result if the content is
-        // short enough that it plausibly contains no personal data.
-        const contentLength = (content || '').length;
-        if (contentLength > 200) {
-          log.error(
-            'GDPR Anonymizer returned content with no redaction markers for a large document — treating as failure to protect PII'
-          );
-        } else {
-          log.info('GDPR Anonymization complete. No PII detected in short document.');
-          return {
-            anonymizationStatus: 'success',
-            structuredContent: data.structuredContent,
-            speakers: [],
-          };
-        }
+      // Also check for pre-redaction markers from Phase 1 (regex pass)
+      const hasPreRedactionMarkers = preRedactCount > 0;
+
+      if (!hasRedactionPlaceholders && !hasRedactionsList && !hasPreRedactionMarkers) {
+        // No PII found by either phase. Accept the result — many corporate/public
+        // documents (SEC filings, analyst reports) contain no personal PII.
+        log.info('GDPR Anonymization complete. No PII detected in document.');
+        return {
+          anonymizationStatus: 'success',
+          structuredContent: data.structuredContent,
+          speakers: [],
+        };
       } else {
         log.info(
-          `GDPR Anonymization complete. Redacted ${data.redactions?.length || 0} PII instances.`
+          `GDPR Anonymization complete. Redacted ${data.redactions?.length || 0} PII instances (${preRedactCount} via regex).`
         );
         return {
           anonymizationStatus: 'success',
