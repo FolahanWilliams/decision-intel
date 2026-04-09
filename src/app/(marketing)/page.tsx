@@ -379,7 +379,7 @@ export default function LandingPage() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [expandedCard, setExpandedCard] = useState<number | null>(null);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
-  const [isAnnual, setIsAnnual] = useState(false);
+
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
 
   // After login redirects back to /?scrollTo=pricing, scroll to the
@@ -1202,127 +1202,37 @@ export default function LandingPage() {
             >
               The average M&amp;A diligence gap costs{' '}
               <span style={{ fontWeight: 700, color: C.slate900 }}>$8.2M</span> in integration
-              overruns. One full deal audit:{' '}
-              <span style={{ fontWeight: 700, color: C.green }}>$4,999</span>.
+              overruns. Start with a free 30-day pilot on your next live deal.
             </p>
 
-            {/* Annual/Monthly Toggle */}
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 12,
-                background: C.white,
-                border: `1px solid ${C.slate200}`,
-                borderRadius: 999,
-                padding: 4,
-              }}
-            >
-              <button
-                onClick={() => setIsAnnual(false)}
-                style={{
-                  padding: '8px 20px',
-                  borderRadius: 999,
-                  border: 'none',
-                  fontSize: 14,
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  background: !isAnnual ? C.green : 'transparent',
-                  color: !isAnnual ? C.white : C.slate600,
-                  transition: 'all 0.2s',
-                }}
-              >
-                Monthly
-              </button>
-              <button
-                onClick={() => setIsAnnual(true)}
-                style={{
-                  padding: '8px 20px',
-                  borderRadius: 999,
-                  border: 'none',
-                  fontSize: 14,
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  background: isAnnual ? C.green : 'transparent',
-                  color: isAnnual ? C.white : C.slate600,
-                  transition: 'all 0.2s',
-                }}
-              >
-                Annual <span style={{ fontSize: 11, opacity: 0.8 }}>Save 20%</span>
-              </button>
-            </div>
-          </motion.div>
-
           <div
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20 }}
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 24, maxWidth: 800, margin: '0 auto' }}
             className="pricing-grid"
           >
             {[
               {
-                name: 'Starter',
-                price: 0,
-                priceAnnual: 0,
-                desc: 'Try the bias engine on your first strategic document',
-                features: [
-                  '4 analyses/month',
-                  '5 bias types',
-                  '10 pages per doc',
-                  '3 team seats',
-                  'Community support',
-                ],
-                cta: 'Get Started Free',
-                action: () => {
-                  window.location.href =
-                    '/login?redirect=' + encodeURIComponent('/?scrollTo=pricing');
-                },
-                outline: true,
-                popular: false,
-              },
-              {
                 name: 'Corp Dev',
                 price: 2499,
-                priceAnnual: 1999,
                 desc: 'For M&A and corporate strategy teams running multiple deals per quarter',
                 features: [
                   'Unlimited analyses',
                   '20+ bias types + M&A-specific',
                   'Forgotten Questions engine',
                   'Decision Rooms & Slack',
+                  'Knowledge Graph (compounds over time)',
                   'Compliance mapping (SOX, MiFID II)',
                   'Outcome tracking & calibration',
                   'Up to 50 team seats',
                 ],
-                cta: 'Start Free Trial',
+                cta: 'Start 30-Day Pilot',
                 action: () => handleCheckout('team'),
                 loading: checkoutLoading === 'team',
                 outline: false,
                 popular: true,
               },
               {
-                name: 'Per-Deal Audit',
-                price: -2,
-                priceAnnual: -2,
-                desc: 'One deal, no subscription. Expense it on the deal. Full audit, one payment.',
-                features: [
-                  'Full bias + noise analysis',
-                  'Forgotten Questions report',
-                  'Boardroom simulation',
-                  'Toxic combination detection',
-                  'Compliance mapping',
-                  'Downloadable PDF report',
-                ],
-                cta: 'Get a Deal Audit',
-                action: () => {
-                  window.location.href =
-                    '/login?redirect=' + encodeURIComponent('/?scrollTo=pricing');
-                },
-                outline: true,
-                popular: false,
-              },
-              {
                 name: 'Enterprise',
                 price: -1,
-                priceAnnual: -1,
                 desc: 'For Fortune 500 teams with multi-division workflows and compliance requirements',
                 features: [
                   'Unlimited analyses',
@@ -1342,7 +1252,7 @@ export default function LandingPage() {
                 popular: false,
               },
             ].map((tier, i) => {
-              const displayPrice = isAnnual ? tier.priceAnnual : tier.price;
+              const displayPrice = tier.price;
               return (
                 <motion.div
                   key={tier.name}
@@ -1388,20 +1298,6 @@ export default function LandingPage() {
                     {displayPrice === -1 ? (
                       <span style={{ fontSize: 32, fontWeight: 800, color: C.slate900 }}>
                         Custom
-                      </span>
-                    ) : displayPrice === -2 ? (
-                      <span style={{ fontSize: 32, fontWeight: 800, color: C.slate900 }}>
-                        $4,999
-                        <span style={{ fontSize: 14, fontWeight: 500, color: C.slate400 }}>
-                          {' '}one-time
-                        </span>
-                      </span>
-                    ) : displayPrice === 0 ? (
-                      <span style={{ fontSize: 32, fontWeight: 800, color: C.slate900 }}>
-                        $0
-                        <span style={{ fontSize: 14, fontWeight: 500, color: C.slate400 }}>
-                          /mo
-                        </span>
                       </span>
                     ) : (
                       <span style={{ fontSize: 32, fontWeight: 800, color: C.slate900 }}>
@@ -1466,7 +1362,7 @@ export default function LandingPage() {
           </div>
 
           <p style={{ textAlign: 'center', fontSize: 13, color: C.slate400, marginTop: 24 }}>
-            All paid plans include a 14-day free trial. No credit card required to start.
+            30-day pilot on your next live deal. No credit card required to start.
           </p>
         </div>
       </section>
