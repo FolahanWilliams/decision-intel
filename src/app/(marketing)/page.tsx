@@ -1202,8 +1202,8 @@ export default function LandingPage() {
             >
               The average M&amp;A diligence gap costs{' '}
               <span style={{ fontWeight: 700, color: C.slate900 }}>$8.2M</span> in integration
-              overruns. One full deal audit starts at{' '}
-              <span style={{ fontWeight: 700, color: C.green }}>$999</span>.
+              overruns. One full deal audit:{' '}
+              <span style={{ fontWeight: 700, color: C.green }}>$4,999</span>.
             </p>
 
             {/* Annual/Monthly Toggle */}
@@ -1304,12 +1304,11 @@ export default function LandingPage() {
                 priceAnnual: -2,
                 desc: 'One deal, no subscription. Expense it on the deal. Full audit, one payment.',
                 features: [
-                  '$999 · deals under $50M',
-                  '$4,999 · $50M–$500M deals',
-                  '$14,999 · $500M+ deals',
                   'Full bias + noise analysis',
                   'Forgotten Questions report',
                   'Boardroom simulation',
+                  'Toxic combination detection',
+                  'Compliance mapping',
                   'Downloadable PDF report',
                 ],
                 cta: 'Get a Deal Audit',
@@ -1391,22 +1390,12 @@ export default function LandingPage() {
                         Custom
                       </span>
                     ) : displayPrice === -2 ? (
-                      <div>
-                        <span style={{ fontSize: 28, fontWeight: 800, color: C.slate900 }}>
-                          $999
+                      <span style={{ fontSize: 32, fontWeight: 800, color: C.slate900 }}>
+                        $4,999
+                        <span style={{ fontSize: 14, fontWeight: 500, color: C.slate400 }}>
+                          {' '}one-time
                         </span>
-                        <span style={{ fontSize: 16, fontWeight: 500, color: C.slate400 }}>
-                          {' '}–{' '}
-                        </span>
-                        <span style={{ fontSize: 28, fontWeight: 800, color: C.slate900 }}>
-                          $14,999
-                        </span>
-                        <span
-                          style={{ fontSize: 13, fontWeight: 500, color: C.slate400, display: 'block', marginTop: 2 }}
-                        >
-                          per deal
-                        </span>
-                      </div>
+                      </span>
                     ) : displayPrice === 0 ? (
                       <span style={{ fontSize: 32, fontWeight: 800, color: C.slate900 }}>
                         $0
