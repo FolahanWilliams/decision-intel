@@ -637,8 +637,10 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
         `Noise scoring: only ${validScores.length}/3 judges returned valid scores — insufficient for reliable measurement`
       );
       const fallbackScore = validScores.length === 1 ? validScores[0] : 50;
+      // Pad to 3 elements so downstream consumers get a consistent array shape
+      const paddedScores = [...validScores, ...Array(3 - validScores.length).fill(fallbackScore)];
       return {
-        noiseScores: validScores,
+        noiseScores: paddedScores,
         noiseStats: { mean: Number(fallbackScore.toFixed(1)), stdDev: 0, variance: 0 },
         noiseBenchmarks: [],
       };
@@ -1867,7 +1869,7 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
     );
   } catch {
     // Fallback to simple additive scoring if compound engine fails
-    log.debug('Compound scoring unavailable — using simple additive penalties');
+    log.warn('Compound scoring unavailable — using simple additive penalties');
     biasDeductions = (state.biasAnalysis || []).reduce(
       (acc: number, b: { severity?: string; biasType?: string }) => {
         const severity = (b.severity || 'low').toLowerCase();
