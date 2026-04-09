@@ -113,7 +113,7 @@ export function MeetingPrepTab() {
           Yumiko Oka — Antler
         </h2>
         <p style={{ fontSize: '0.8rem', color: '#94A3B8', margin: 0, lineHeight: 1.5 }}>
-          Program Manager · Corporate Innovation &amp; Venture Building at Ibex · Tokyo
+          Program Manager · Manages Residency Programs, Portfolio Management &amp; Investor Relations · Tokyo
           <br />
           Background: L&apos;Oréal, Estée Lauder, Rakuten · University of Tsukuba · Connected
           via Andrew Goldner
@@ -156,6 +156,18 @@ export function MeetingPrepTab() {
               fontWeight: 600,
               padding: '4px 10px',
               borderRadius: 999,
+              background: 'rgba(245,158,11,0.15)',
+              color: S.amber,
+            }}
+          >
+            PORTFOLIO MGMT &amp; IR
+          </span>
+          <span
+            style={{
+              fontSize: '0.7rem',
+              fontWeight: 600,
+              padding: '4px 10px',
+              borderRadius: 999,
               background: 'rgba(139,92,246,0.15)',
               color: S.purple,
             }}
@@ -163,6 +175,49 @@ export function MeetingPrepTab() {
             CORPORATE BACKGROUND
           </span>
         </div>
+      </div>
+
+      {/* ── CONNECTION BRIDGE ─────────────────────────────────── */}
+      <div style={{
+        ...sectionCard(S.purple),
+        background: 'linear-gradient(135deg, rgba(139,92,246,0.05) 0%, var(--bg-card) 100%)',
+      }}>
+        <div style={{ ...label, color: S.purple }}>YOUR ANGLE INTO HER WORLD</div>
+        <div style={sectionTitle}>The Connection Bridge</div>
+        <div style={{
+          ...body,
+          background: 'var(--bg-elevated)',
+          padding: '16px 20px',
+          borderRadius: 'var(--radius-md)',
+          borderLeft: `3px solid ${S.purple}`,
+          marginBottom: 12,
+        }}>
+          Yumiko co-oversees <strong style={{ color: 'var(--text-primary)' }}>portfolio management
+          and investor relations</strong> at Antler. That means she watches founders pitch, watches
+          ICs vote, and watches portfolio companies make strategic decisions every day. She has
+          almost certainly concluded that <strong style={{ color: 'var(--text-primary)' }}>humans
+          are not 100% rational decision-makers</strong> — she&apos;s lived it from every angle.
+        </div>
+        <ul style={{ ...body, paddingLeft: 18, margin: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <li>
+            <strong style={{ color: 'var(--text-primary)' }}>From the investor side:</strong>{' '}
+            She&apos;s seen ICs disagree on the same founder for different reasons (that&apos;s
+            decision noise). She&apos;s seen portfolio companies overvalue sunk costs or anchor to
+            initial valuations.
+          </li>
+          <li>
+            <strong style={{ color: 'var(--text-primary)' }}>From the corporate side:</strong>{' '}
+            7 years at L&apos;Oréal, Estée Lauder, Rakuten — she&apos;s watched executives
+            approve projects based on who presented them, not what was presented (authority bias,
+            halo effect).
+          </li>
+          <li>
+            <strong style={{ color: 'var(--text-primary)' }}>The bridge:</strong>{' '}
+            &ldquo;You&apos;ve seen this from both sides — corporate teams making biased decisions,
+            and investors evaluating those same teams. We built the tool that makes the bias
+            visible and measurable before the decision is final.&rdquo;
+          </li>
+        </ul>
       </div>
 
       {/* ── WHY SHE MATTERS ───────────────────────────────────── */}
@@ -173,6 +228,12 @@ export function MeetingPrepTab() {
             <strong style={{ color: 'var(--text-primary)' }}>Antler is a global startup generator</strong>{' '}
             — they invest at pre-seed and run residency programs. If she sees product-market fit signal, it
             could mean residency placement, funding, or warm intros to their LP network.
+          </li>
+          <li>
+            <strong style={{ color: 'var(--text-primary)' }}>She co-oversees portfolio management &amp; investor relations</strong>{' '}
+            — she watches decisions from every angle: founders pitching, ICs voting, portfolio
+            companies executing. She&apos;s already concluded humans aren&apos;t fully rational.
+            Position Decision Intel as the tool that validates what she already believes.
           </li>
           <li>
             <strong style={{ color: 'var(--text-primary)' }}>Her corporate background</strong> (L&apos;Oréal,
@@ -200,12 +261,14 @@ export function MeetingPrepTab() {
             fontStyle: 'italic',
           }}
         >
-          &ldquo;M&amp;A teams make billion-dollar decisions based on memos that nobody
-          stress-tests. Decision Intel is the first platform that audits a strategic document for
-          cognitive bias, decision noise, and missing diligence questions — in under 60 seconds.
-          We surface the questions your memo never asks, drawn from comparable historical
-          decisions. Think of it as Grammarly for strategic decisions — except the mistakes we
-          catch cost $8M on average, not a typo.&rdquo;
+          &ldquo;You manage portfolios and investor relations — so you&apos;ve probably
+          already seen that the smartest people in the room still make predictably irrational
+          decisions. Decision Intel makes that visible. We audit strategic documents — M&amp;A
+          memos, board papers, investment theses — for cognitive bias, decision noise, and
+          missing diligence questions, in under 60 seconds. We surface the questions the memo
+          never asks, drawn from comparable historical decisions. Think of it as Grammarly for
+          high-stakes decisions — except the mistakes we catch cost $8M on average, not a
+          typo.&rdquo;
         </div>
       </div>
 
@@ -247,10 +310,11 @@ export function MeetingPrepTab() {
           }}
         >
           <li>
-            <strong style={{ color: 'var(--text-primary)' }}>Open with the pain</strong> (2 min)
-            — &ldquo;Have you ever seen a deal close that everyone felt great about, only to
-            discover 6 months later that the diligence missed something obvious?&rdquo; Let her
-            answer. Her L&apos;Oréal/Estée Lauder background means she&apos;s seen this.
+            <strong style={{ color: 'var(--text-primary)' }}>Open with her world</strong> (2 min)
+            — &ldquo;You manage portfolios and see investment decisions from both sides — the
+            founders making them and the ICs evaluating them. Have you noticed patterns where
+            smart people consistently miss the same things?&rdquo; Let her answer. Then:
+            &ldquo;That&apos;s exactly what we built this for.&rdquo;
           </li>
           <li>
             <strong style={{ color: 'var(--text-primary)' }}>Walk the pitch deck</strong> (8–10
@@ -343,11 +407,15 @@ export function MeetingPrepTab() {
               a: 'Pre-seed, looking at the $500K–$1.5M range. Milestones: first 10 paying customers, first enterprise contract, first ML hire. The capital goes to sales (GTM co-founder), infrastructure, and getting to $100K ARR.',
             },
             {
+              q: '"Could this work for VC investment committees too?"',
+              a: 'Absolutely — and that\'s actually the expansion path. VCs have the same problem: IC members evaluating the same pitch reach different conclusions for different reasons. That\'s textbook decision noise. We start with corporate M&A because they have bigger budgets and faster procurement, but VC/PE is where we expand next. Imagine running every investment memo through a bias audit before the IC votes.',
+            },
+            {
               q: '"What do you need from Antler specifically?"',
               a: 'Three things: (1) Perspective on whether Antler sees decision quality tooling as a fundable category, (2) If there\'s a fit with Antler\'s residency or investment model, and (3) Introductions to corporate strategy leaders in Antler\'s portfolio or network who might be design partners.',
             },
           ].map((qa, i) => (
-            <div key={i} style={{ ...qaRow, borderBottom: i < 8 ? '1px solid var(--border-color)' : 'none' }}>
+            <div key={i} style={{ ...qaRow, borderBottom: i < 9 ? '1px solid var(--border-color)' : 'none' }}>
               <div style={qText}>{qa.q}</div>
               <div style={aText}>{qa.a}</div>
             </div>
@@ -361,8 +429,8 @@ export function MeetingPrepTab() {
           <div style={{ ...label, color: S.green }}>DO</div>
           <ul style={{ ...body, paddingLeft: 16, margin: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
             <li>Let the demo speak — pause after the DQI score reveal</li>
-            <li>Reference her corporate background naturally</li>
-            <li>Ask her what decision mistakes she&apos;s seen at L&apos;Oréal/Rakuten</li>
+            <li>Bridge from her portfolio/IR role — &ldquo;you&apos;ve seen irrational decisions from every angle&rdquo;</li>
+            <li>Ask her what decision patterns she&apos;s noticed across Antler&apos;s portfolio</li>
             <li>Be honest about being pre-revenue</li>
             <li>Show the Forgotten Questions tab — it&apos;s the killer feature</li>
             <li>Ask for specific intros, not vague &ldquo;help&rdquo;</li>
@@ -401,11 +469,12 @@ export function MeetingPrepTab() {
             fontStyle: 'italic',
           }}
         >
-          &ldquo;Yumiko, I really value your time and perspective. Three things I&apos;d love to
-          explore: First, does Antler see decision quality tooling as a fundable category?
-          Second, is there a fit with Antler&apos;s residency model for something like this?
-          And third, would you be open to introducing me to 1–2 corporate strategy leaders in
-          your network who might want to pilot this on a live deal?&rdquo;
+          &ldquo;Yumiko, you see decision-making from every angle — founders pitching, ICs
+          evaluating, portfolio companies executing. Three things I&apos;d love your perspective
+          on: First, does Antler see decision quality tooling as a fundable category? Second, is
+          there a fit with Antler&apos;s residency model for something like this? And third,
+          would you be open to introducing me to 1–2 corporate strategy leaders in your network
+          who might want to pilot this on a live deal?&rdquo;
         </div>
       </div>
     </div>
