@@ -1,12 +1,10 @@
 {
   "mcpServers": {
-    "stitch": {
-      "command": "stitch-mcp",
-      "args": [],
+    "vercel": {
+      "command": "npx",
+      "args": ["@vercel/mcp-server"],
       "env": {
-        "GOOGLE_CLOUD_PROJECT": "amazing-pipe-459222-e9",
-        "GOOGLE_APPLICATION_CREDENTIALS": "/root/.config/gcloud/application_default_credentials.json",
-        "PATH": "/opt/google-cloud-sdk/bin:/opt/node22/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        "VERCEL_API_TOKEN": "${VERCEL_API_TOKEN}"
       }
     }
   }
