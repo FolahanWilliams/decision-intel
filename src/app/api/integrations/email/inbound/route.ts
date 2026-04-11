@@ -35,8 +35,14 @@ interface InboundEmailPayload {
 function verifyWebhookSignature(req: NextRequest, body: string): boolean {
   const secret = process.env.RESEND_WEBHOOK_SECRET;
   if (!secret) {
-    log.warn('RESEND_WEBHOOK_SECRET not configured — skipping signature verification');
-    return true; // Allow in development
+    // Dev-only bypass. In production this MUST be configured — missing
+    // secret means anyone can inject inbound-email payloads.
+    if (process.env.NODE_ENV === 'production') {
+      log.error('RESEND_WEBHOOK_SECRET missing in production — rejecting request');
+      return false;
+    }
+    log.warn('RESEND_WEBHOOK_SECRET not configured — skipping signature verification (dev only)');
+    return true;
   }
 
   const svixId = req.headers.get('svix-id');
