@@ -7,14 +7,38 @@ Claude reads this file at the start of every session. Update it as tasks are com
 - [ ] Post 1 case study per day on LinkedIn (use Content Studio → Generate LinkedIn Post, or wait for daily email from `/api/cron/daily-linkedin`)
 - [ ] Polish the first 60 seconds of the demo (upload → pipeline animation → score reveal)
 - [ ] Set `FOUNDER_EMAIL` env var on Vercel to activate daily LinkedIn post emails
+- [ ] Pre-seed/seed fundraise: target first paying design partner + 2-3 reference logos before kickoff
+- [ ] Find GTM / enterprise-sales co-founder or advisor
 
 ## Known Bugs
 - [ ] Decision Graph on `/dashboard/decision-graph` — verify D3 rendering works correctly after recent layout changes
 - [ ] Test Outcome Gate flow end-to-end (submit outcome → recalibrated DQI appears on analysis detail page)
 - [ ] Verify Google Drive auto-compare works with updated files (24h cooldown + content hash comparison)
+- [ ] `DealAuditPurchase.dealId` is missing a Prisma FK relation — deal deletion leaves orphan audit purchases. Needs a migration to add `deal Deal @relation(fields: [dealId], references: [id], onDelete: Cascade)`. Not auto-fixed because schema changes require migration approval.
+- [ ] `/api/analyze/stream` and `/api/upload` don't share the `checkAnalysisLimit` guard — auto-analysis from Slack/Drive/email may bypass the free-tier 4/month cap. Audit all `prisma.analysis.create()` sites.
+- [ ] Plan-limit `biasTypes` gating (Free=5, Pro=20) is declared in `src/lib/stripe.ts` but not actually enforced anywhere. Either remove from PLANS or wire into the analysis pipeline.
+- [ ] `Analysis` is queried by `document.userId` for plan limits but only indexed on `[documentId, createdAt]` — add `@@index([userId, createdAt])` or denormalize userId onto Analysis.
+- [ ] Slack command rate limiting uses an in-memory `Map` — bypassable across Vercel serverless instances. Move to Postgres-backed rate limit.
+- [ ] Encryption keys (DOCUMENT_ENCRYPTION_KEY, SLACK_TOKEN_ENCRYPTION_KEY) have no rotation scheme — rotating them today would brick all existing encrypted rows. Add a `keyVersion` field to encrypted records.
 
 ## Technical Debt
 - [ ] Marketing pages use hardcoded color constants (`C.navy`, `C.green`) — this is intentional (light-theme-only pages), NOT a bug. Do not convert to CSS variables.
+- [ ] `riskScorerNode` in `src/lib/agents/nodes.ts` is ~1,200 lines and does six separate jobs (compound scoring, Bayesian priors, outcome feedback, calibration, report assembly, causal weights). Refactor into composable sub-functions — hard to test and debug today.
+- [ ] Bias-insight cache in `src/lib/utils/cache.ts` is keyed on `bias_insight:${biasType}` with no `orgId` prefix — cross-tenant cache leak. Prefix cache keys with orgId.
+- [ ] Hardcoded `bg-white/X`, `text-white`, `border-white/X` still lurk in: `SalesToolkitTab` (intentional light-only?), `ExperimentsContent`, `meetings/[id]`, `cognitive-audits/effectiveness`, several dashboard pages. Sweep with codemod.
+
+## Recently Completed (audit sweep, 2026-04-11)
+- [x] Fixed `causal-learning.ts` — replaced stale `prisma.outcomeRecord` cast with `prisma.decisionOutcome`, fixed bias iteration to use `BiasInstance[]` array shape. This moat feature was silently broken in production.
+- [x] Fixed DQI synthetic weights drift — `computeSyntheticDQI` now derives from canonical `WEIGHTS` constant (renormalised without historicalAlignment).
+- [x] Added P2021/P2022 specific handling to 3 schema-drift catch blocks in `nodes.ts` (boardroomPersona, decisionPrior, decisionOutcome count).
+- [x] Added rate limiting + metric whitelist + value clamping to `/api/admin/vitals` (was unauthenticated fire-and-forget).
+- [x] Fixed `/api/integrations/email/inbound` to deny requests when `RESEND_WEBHOOK_SECRET` is missing in production.
+- [x] Fixed Founder Hub default tab from `meeting_prep` (stale) to `overview`.
+- [x] Fixed Slack HumanDecision dedup race condition — rely on `contentHash @unique` via create + P2002 catch instead of check-then-insert.
+- [x] Fixed `QuickScanModal` stable keys — was using index, now uses `${type}-${i}`.
+- [x] Lazy-loaded `IntegrationMarketplace` (1,715 LOC) on `/dashboard/settings/integrations`.
+- [x] Migrated `RootCauseSection`, `RelatedDecisions`, `DecisionTriageWidget`, `EnhancedToast` off hardcoded `bg-white/5`, `text-white`, `border-white/10` — now use CSS variables via new utility classes (`toast-action-btn`, `related-decisions-*`) in `globals.css`.
+- [x] Updated `founder-context.ts` with: raising timeline, AI infrastructure stack, engineering lessons learned, explicit "no direct competitor / real competition is 'do nothing'" framing, and scale reality (200+ components, 70+ routes, 61 models).
 
 ## Feature Ideas (Backlog)
 - [ ] E3: Real-time meeting bias detection (Phase 1: prototype with simulated transcript feed) — saved in Founder Hub Tips Section 7
