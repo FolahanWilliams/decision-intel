@@ -23,16 +23,16 @@ model Document {
   updatedAt        DateTime            @updatedAt
   contentHash      String?             @unique
   orgId            String?
-  documentType String?            // ic_memo | cim | pitch_deck | term_sheet | due_diligence | lp_report | other
-  dealId      String?
-  source     String?
-  sourceRef  String?
-  isSample   Boolean             @default(false) // Synthetic seed doc — clearable via /api/demo/clear-samples
-  deal        Deal?               @relation(fields: [dealId], references: [id], onDelete: SetNull)
-  analyses    Analysis[]
-  embeddings  DecisionEmbedding[]
-  failedAnalyses FailedAnalysis[]
-  decisionFrame DecisionFrame?
+  documentType     String? // ic_memo | cim | pitch_deck | term_sheet | due_diligence | lp_report | other
+  dealId           String?
+  source           String?
+  sourceRef        String?
+  isSample         Boolean             @default(false) // Synthetic seed doc — clearable via /api/demo/clear-samples
+  deal             Deal?               @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  analyses         Analysis[]
+  embeddings       DecisionEmbedding[]
+  failedAnalyses   FailedAnalysis[]
+  decisionFrame    DecisionFrame?
 
   @@index([userId])
   @@index([orgId])
@@ -46,20 +46,20 @@ model Document {
 }
 
 model Analysis {
-  id                  String         @id @default(cuid())
+  id                  String   @id @default(cuid())
   documentId          String
   overallScore        Float
   noiseScore          Float
-  summary             String        @db.Text
-  createdAt           DateTime       @default(now())
+  summary             String   @db.Text
+  createdAt           DateTime @default(now())
   compliance          Json?
   factCheck           Json?
   noiseStats          Json?
   preMortem           Json?
   sentiment           Json?
   speakers            String[]
-  structuredContent   String?        @db.Text
-  updatedAt           DateTime       @updatedAt
+  structuredContent   String?  @db.Text
+  updatedAt           DateTime @updatedAt
   logicalAnalysis     Json?
   swotAnalysis        Json?
   cognitiveAnalysis   Json?
@@ -68,7 +68,7 @@ model Analysis {
   modelVersion        String?
   noiseBenchmarks     Json?
   intelligenceContext Json?
-  metaVerdict         String?        @db.Text
+  metaVerdict         String?  @db.Text
   biasWebImageUrl     String?
   preMortemImageUrl   String?
   preMortemRating     Int?
@@ -77,27 +77,27 @@ model Analysis {
   forgottenQuestions  Json?
 
   // Version tracking and prompt reference
-  version         Int             @default(1)
+  version         Int            @default(1)
   promptVersionId String?
-  promptVersion   PromptVersion?  @relation(fields: [promptVersionId], references: [id], onDelete: SetNull)
+  promptVersion   PromptVersion? @relation(fields: [promptVersionId], references: [id], onDelete: SetNull)
 
   // Outcome tracking — mandatory flywheel
-  outcomeStatus   String          @default("pending_outcome") // pending_outcome | outcome_logged | outcome_overdue
-  outcomeDueAt    DateTime?       // When outcome should be reported
-  recalibratedDqi Json?           // { originalScore, recalibratedScore, recalibratedGrade, delta, recalibratedAt }
+  outcomeStatus   String    @default("pending_outcome") // pending_outcome | outcome_logged | outcome_overdue
+  outcomeDueAt    DateTime? // When outcome should be reported
+  recalibratedDqi Json? // { originalScore, recalibratedScore, recalibratedGrade, delta, recalibratedAt }
 
   // Synthetic seed analysis — flagged SAMPLE, clearable via /api/demo/clear-samples
-  isSample        Boolean         @default(false)
+  isSample Boolean @default(false)
 
-  document            Document       @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  biases              BiasInstance[]
-  versions     AnalysisVersion[]
-  shareLinks   ShareLink[]
-  outcome      DecisionOutcome?
-  prior        DecisionPrior?
+  document   Document          @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  biases     BiasInstance[]
+  versions   AnalysisVersion[]
+  shareLinks ShareLink[]
+  outcome    DecisionOutcome?
+  prior      DecisionPrior?
 
-  toxicCombinations ToxicCombination[]
-  draftOutcomes     DraftOutcome[]
+  toxicCombinations   ToxicCombination[]
+  draftOutcomes       DraftOutcome[]
   fingerprintWarnings FingerprintWarning[]
 
   @@index([documentId])
@@ -153,15 +153,15 @@ model AuditLog {
 }
 
 model UserSettings {
-  id                  String   @id @default(cuid())
-  userId              String   @unique
-  updatedAt           DateTime @updatedAt
-  analysisAlerts      Boolean  @default(true)
-  createdAt           DateTime @default(now())
-  darkMode            Boolean  @default(false)
-  emailNotifications  Boolean  @default(true)
-  weeklyDigest        Boolean  @default(false)
-  notificationSeverity String  @default("all")
+  id                   String   @id @default(cuid())
+  userId               String   @unique
+  updatedAt            DateTime @updatedAt
+  analysisAlerts       Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  darkMode             Boolean  @default(false)
+  emailNotifications   Boolean  @default(true)
+  weeklyDigest         Boolean  @default(false)
+  notificationSeverity String   @default("all")
   onboardingCompleted  Boolean  @default(false)
   onboardingStep       Int      @default(0)
   emailForwardToken    String?  @unique
@@ -261,10 +261,10 @@ model IntelligenceSync {
 }
 
 model Organization {
-  id        String       @id @default(cuid())
-  name      String
-  slug      String       @unique
-  avatarUrl String?
+  id           String       @id @default(cuid())
+  name         String
+  slug         String       @unique
+  avatarUrl    String?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   isAnonymized Boolean      @default(false) // Consent to anonymous aggregation
@@ -401,8 +401,8 @@ model HumanDecision {
   cognitiveAudit   CognitiveAudit?
   meeting          Meeting?
   nudges           Nudge[]
-  decisionFrames   DecisionFrame[]  @relation("DecisionFrameLinkedDecision")
-  journalEntries   JournalEntry[]   @relation("JournalLinkedDecision")
+  decisionFrames   DecisionFrame[] @relation("DecisionFrameLinkedDecision")
+  journalEntries   JournalEntry[]  @relation("JournalLinkedDecision")
 
   @@index([userId])
   @@index([orgId])
@@ -442,34 +442,34 @@ model CognitiveAudit {
 }
 
 model Nudge {
-  id              String         @id @default(cuid())
+  id              String           @id @default(cuid())
   targetUserId    String?
   orgId           String?
   humanDecisionId String?
-  analysisId      String?        // M6: nudges sourced from analysis completion path
+  analysisId      String? // M6: nudges sourced from analysis completion path
   nudgeType       String
   message         String
-  createdAt       DateTime       @default(now())
+  createdAt       DateTime         @default(now())
   acknowledgedAt  DateTime?
-  channel         String         @default("dashboard")
+  channel         String           @default("dashboard")
   deliveredAt     DateTime?
   outcomeNotes    String?
-  severity        String         @default("info")
+  severity        String           @default("info")
   triggerReason   String
   wasHelpful      Boolean?
   experimentId    String?
   experiment      NudgeExperiment? @relation(fields: [experimentId], references: [id], onDelete: SetNull)
-  variantId       String?        // Which variant was served
+  variantId       String? // Which variant was served
   decisionFrameId String?
-  decisionFrame   DecisionFrame? @relation(fields: [decisionFrameId], references: [id], onDelete: SetNull)
+  decisionFrame   DecisionFrame?   @relation(fields: [decisionFrameId], references: [id], onDelete: SetNull)
   parentNudgeId   String?
-  parentNudge     Nudge?         @relation("NudgeEscalation", fields: [parentNudgeId], references: [id], onDelete: SetNull)
-  childNudges     Nudge[]        @relation("NudgeEscalation")
-  phase           String         @default("post_decision") // "pre_decision" | "post_decision"
-  failureCount  Int       @default(0)
-  lastAttemptAt DateTime?
-  nextRetryAt   DateTime?
-  humanDecision   HumanDecision? @relation(fields: [humanDecisionId], references: [id], onDelete: SetNull)
+  parentNudge     Nudge?           @relation("NudgeEscalation", fields: [parentNudgeId], references: [id], onDelete: SetNull)
+  childNudges     Nudge[]          @relation("NudgeEscalation")
+  phase           String           @default("post_decision") // "pre_decision" | "post_decision"
+  failureCount    Int              @default(0)
+  lastAttemptAt   DateTime?
+  nextRetryAt     DateTime?
+  humanDecision   HumanDecision?   @relation(fields: [humanDecisionId], references: [id], onDelete: SetNull)
 
   @@index([humanDecisionId])
   @@index([analysisId])
@@ -484,17 +484,17 @@ model Nudge {
 }
 
 model NudgeExperiment {
-  id            String   @id @default(cuid())
-  name          String
-  nudgeType     String   // which nudge type is being tested
-  status        String   @default("active") // active, paused, completed
-  variants      Json     // Array<{ id: string, label: string, template: string, severity: string }>
-  trafficSplit  Json     // { [variantId]: number } — percentage allocation (must sum to 100)
-  startedAt     DateTime @default(now())
-  endedAt       DateTime?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  nudges        Nudge[]
+  id           String    @id @default(cuid())
+  name         String
+  nudgeType    String // which nudge type is being tested
+  status       String    @default("active") // active, paused, completed
+  variants     Json // Array<{ id: string, label: string, template: string, severity: string }>
+  trafficSplit Json // { [variantId]: number } — percentage allocation (must sum to 100)
+  startedAt    DateTime  @default(now())
+  endedAt      DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  nudges       Nudge[]
 
   @@index([nudgeType])
   @@index([status])
@@ -535,7 +535,7 @@ model DecisionOutcome {
   reportedAt         DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
-  analysis Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  analysis      Analysis       @relation(fields: [analysisId], references: [id], onDelete: Cascade)
   decisionRooms DecisionRoom[]
 
   @@index([analysisId])
@@ -581,8 +581,8 @@ model ShareLink {
   isCaseStudy  Boolean   @default(false)
   createdAt    DateTime  @default(now())
 
-  analysis   Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
-  accesses   ShareLinkAccess[]
+  analysis Analysis          @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  accesses ShareLinkAccess[]
 
   @@index([token])
   @@index([analysisId])
@@ -624,75 +624,75 @@ model RateLimit {
 // ─── Versioning & Observability Models ─────────────────────────────────────
 
 model AnalysisVersion {
-  id            String   @id @default(cuid())
-  analysisId    String
-  analysis      Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
-  version       Int      @default(1)
-  overallScore  Float
-  noiseScore    Float
-  summary       String   @db.Text
-  biases        Json     // snapshot of BiasInstance[] at this version
-  fullSnapshot  Json     // complete analysis output snapshot
-  createdAt     DateTime @default(now())
+  id           String   @id @default(cuid())
+  analysisId   String
+  analysis     Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  version      Int      @default(1)
+  overallScore Float
+  noiseScore   Float
+  summary      String   @db.Text
+  biases       Json // snapshot of BiasInstance[] at this version
+  fullSnapshot Json // complete analysis output snapshot
+  createdAt    DateTime @default(now())
 
   @@unique([analysisId, version])
   @@index([analysisId])
 }
 
 model PromptVersion {
-  id          String   @id @default(cuid())
-  name        String   // e.g. "BIAS_DETECTIVE_PROMPT", "SIMULATION_SUPER_PROMPT"
-  version     Int
-  hash        String   // SHA-256 of prompt content for change detection
-  content     String   @db.Text
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  analyses    Analysis[]
+  id        String     @id @default(cuid())
+  name      String // e.g. "BIAS_DETECTIVE_PROMPT", "SIMULATION_SUPER_PROMPT"
+  version   Int
+  hash      String // SHA-256 of prompt content for change detection
+  content   String     @db.Text
+  isActive  Boolean    @default(true)
+  createdAt DateTime   @default(now())
+  analyses  Analysis[]
 
   @@unique([name, version])
   @@index([name, isActive])
 }
 
 model FailedAnalysis {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   documentId  String
-  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  document    Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
   userId      String
-  error       String   @db.Text
+  error       String    @db.Text
   errorCode   String?
-  input       Json     // serialized pipeline input for retry
-  retryCount  Int      @default(0)
-  maxRetries  Int      @default(3)
+  input       Json // serialized pipeline input for retry
+  retryCount  Int       @default(0)
+  maxRetries  Int       @default(3)
   nextRetryAt DateTime?
   resolvedAt  DateTime?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
 
   @@index([resolvedAt])
   @@index([nextRetryAt])
 }
 
 model ShareLinkAccess {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   shareLinkId String
   shareLink   ShareLink @relation(fields: [shareLinkId], references: [id], onDelete: Cascade)
   ipAddress   String?
   userAgent   String?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
 
   @@index([shareLinkId])
 }
 
 model BatchUpload {
-  id          String   @id @default(cuid())
-  userId      String
-  orgId       String?
-  status      String   @default("pending") // pending, processing, completed, failed
-  totalFiles  Int
-  completed   Int      @default(0)
-  failed      Int      @default(0)
-  errors      Json?    // [{filename, error}]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String   @id @default(cuid())
+  userId     String
+  orgId      String?
+  status     String   @default("pending") // pending, processing, completed, failed
+  totalFiles Int
+  completed  Int      @default(0)
+  failed     Int      @default(0)
+  errors     Json? // [{filename, error}]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@index([userId, status])
 }
@@ -703,8 +703,8 @@ model CalibrationProfile {
   id               String   @id @default(cuid())
   orgId            String?
   userId           String?
-  profileType      String   // "bias_severity" | "nudge_threshold" | "twin_weight"
-  calibrationData  Json     // org-specific learned weights
+  profileType      String // "bias_severity" | "nudge_threshold" | "twin_weight"
+  calibrationData  Json // org-specific learned weights
   sampleSize       Int      @default(0)
   lastCalibratedAt DateTime @default(now())
   createdAt        DateTime @default(now())
@@ -721,10 +721,10 @@ model CalibrationProfile {
 model CausalEdge {
   id         String   @id @default(cuid())
   orgId      String?
-  fromVar    String   // e.g., "confirmation_bias"
-  toVar      String   // e.g., "noise_score"
-  strength   Float    // learned from outcome data (-1 to 1)
-  confidence Float    // sample size confidence (0-1)
+  fromVar    String // e.g., "confirmation_bias"
+  toVar      String // e.g., "noise_score"
+  strength   Float // learned from outcome data (-1 to 1)
+  confidence Float // sample size confidence (0-1)
   sampleSize Int
   updatedAt  DateTime @updatedAt
   createdAt  DateTime @default(now())
@@ -736,8 +736,8 @@ model CausalEdge {
 model OrgCausalModel {
   id            String   @id @default(cuid())
   orgId         String   @unique
-  weights       Json     // CausalWeight[] — per-bias danger multipliers
-  insights      Json     // CausalInsight[] — human-readable findings
+  weights       Json // CausalWeight[] — per-bias danger multipliers
+  insights      Json // CausalInsight[] — human-readable findings
   totalOutcomes Int      @default(0)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -752,10 +752,10 @@ model DecisionPrior {
   analysisId         String   @unique
   userId             String
   defaultAction      String   @db.Text // "What would you do with no info?"
-  confidence         Float              // 0-100
+  confidence         Float // 0-100
   evidenceToChange   String?  @db.Text // "What would change your mind?"
   postAnalysisAction String?  @db.Text // What they actually decided
-  beliefDelta        Float?             // Calculated shift
+  beliefDelta        Float? // Calculated shift
   createdAt          DateTime @default(now())
 
   analysis Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
@@ -766,26 +766,26 @@ model DecisionPrior {
 // ─── Outcomes-First Workflow (Moat 4) ─────────────────────────────────────
 
 model DecisionFrame {
-  id                String   @id @default(cuid())
+  id                String         @id @default(cuid())
   userId            String
   orgId             String?
-  decisionStatement String   @db.Text
-  defaultAction     String   @db.Text
+  decisionStatement String         @db.Text
+  defaultAction     String         @db.Text
   successCriteria   String[]
   failureCriteria   String[]
   stakeholders      String[]
-  monetaryValue     Decimal?  // Estimated decision value
-  currency          String?   @default("GBP") // ISO currency code
-  documentId        String?  @unique
-  threadTs          String?  // Slack thread timestamp for pre-decision monitoring
-  channelId         String?  // Slack channel ID for thread tracking
+  monetaryValue     Decimal? // Estimated decision value
+  currency          String?        @default("GBP") // ISO currency code
+  documentId        String?        @unique
+  threadTs          String? // Slack thread timestamp for pre-decision monitoring
+  channelId         String? // Slack channel ID for thread tracking
   linkedDecisionId  String?
   linkedDecision    HumanDecision? @relation("DecisionFrameLinkedDecision", fields: [linkedDecisionId], references: [id], onDelete: SetNull)
-  nudgeCount        Int      @default(0) // How many nudges delivered in this thread
-  escalationLevel   String   @default("none") // "none" | "info" | "warning" | "critical"
-  accumulatedBiases Json?    // Array of {bias, signal, detectedAt} across all thread messages
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  nudgeCount        Int            @default(0) // How many nudges delivered in this thread
+  escalationLevel   String         @default("none") // "none" | "info" | "warning" | "critical"
+  accumulatedBiases Json? // Array of {bias, signal, detectedAt} across all thread messages
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
 
   document Document? @relation(fields: [documentId], references: [id], onDelete: SetNull)
   nudges   Nudge[]
@@ -815,20 +815,20 @@ model DecisionFrame {
 //       follow-up nudges against these challenges ("did you answer the
 //       question Dr. Red Team asked you?").
 model RedTeamChallenge {
-  id                  String    @id @default(cuid())
-  userId              String    // who invoked Dr. Red Team
+  id                  String   @id @default(cuid())
+  userId              String // who invoked Dr. Red Team
   orgId               String?
-  analysisId          String?   // scope: the analysis being challenged
-  decisionRoomId      String?   // scope: the decision room being challenged
-  targetClaim         String    @db.Text // the single load-bearing assumption
-  primaryObjection    String    @db.Text
-  secondaryObjections String[]  // flexible array — 0..N
+  analysisId          String? // scope: the analysis being challenged
+  decisionRoomId      String? // scope: the decision room being challenged
+  targetClaim         String   @db.Text // the single load-bearing assumption
+  primaryObjection    String   @db.Text
+  secondaryObjections String[] // flexible array — 0..N
   structuralQuestions String[]
-  closingLine         String    @db.Text
-  usefulRating        Int?      // null | -1 (not useful) | 0 (neutral) | 1 (useful)
-  notes               String?   @db.Text // free-text reaction
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  closingLine         String   @db.Text
+  usefulRating        Int? // null | -1 (not useful) | 0 (neutral) | 1 (useful)
+  notes               String?  @db.Text // free-text reaction
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   @@index([userId])
   @@index([orgId])
@@ -838,24 +838,24 @@ model RedTeamChallenge {
 }
 
 model DecisionRoom {
-  id            String          @id @default(cuid())
-  documentId    String?
-  analysisId    String?
-  title         String
-  createdBy     String          // userId
-  orgId         String?
-  status        String          @default("open") // open, closed, archived
-  decisionType  String?         // "investment_committee" | "board_review" | "deal_committee" | "risk_committee" | "general"
-  consensusScore Float?         // 0-100, computed from blind prior convergence on close
-  dissenterWeight Json?         // { userId: predictionAccuracy } — learned from outcomes
-  outcomeId     String?
-  outcome       DecisionOutcome? @relation(fields: [outcomeId], references: [id], onDelete: SetNull)
-  biasBriefing  Json?           // Auto-generated pre-meeting bias context from linked analysis
-  closedAt      DateTime?
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  participants  RoomParticipant[]
-  blindPriors   BlindPrior[]
+  id              String            @id @default(cuid())
+  documentId      String?
+  analysisId      String?
+  title           String
+  createdBy       String // userId
+  orgId           String?
+  status          String            @default("open") // open, closed, archived
+  decisionType    String? // "investment_committee" | "board_review" | "deal_committee" | "risk_committee" | "general"
+  consensusScore  Float? // 0-100, computed from blind prior convergence on close
+  dissenterWeight Json? // { userId: predictionAccuracy } — learned from outcomes
+  outcomeId       String?
+  outcome         DecisionOutcome?  @relation(fields: [outcomeId], references: [id], onDelete: SetNull)
+  biasBriefing    Json? // Auto-generated pre-meeting bias context from linked analysis
+  closedAt        DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  participants    RoomParticipant[]
+  blindPriors     BlindPrior[]
 
   @@index([createdBy])
   @@index([orgId])
@@ -867,12 +867,12 @@ model DecisionRoom {
 }
 
 model RoomParticipant {
-  id            String       @id @default(cuid())
-  roomId        String
-  userId        String
-  role          String       @default("member") // creator, member, observer
-  joinedAt      DateTime     @default(now())
-  room          DecisionRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  id       String       @id @default(cuid())
+  roomId   String
+  userId   String
+  role     String       @default("member") // creator, member, observer
+  joinedAt DateTime     @default(now())
+  room     DecisionRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
 
   @@unique([roomId, userId])
   @@index([userId])
@@ -883,7 +883,7 @@ model BlindPrior {
   roomId        String
   userId        String
   defaultAction String       @db.Text
-  confidence    Float        // 0-100
+  confidence    Float // 0-100
   reasoning     String?      @db.Text
   isRevealed    Boolean      @default(false) // blind until all submit
   submittedAt   DateTime     @default(now())
@@ -896,23 +896,23 @@ model BlindPrior {
 // ─── Automated Decision Journal ──────────────────────────────────────────
 
 model JournalEntry {
-  id            String   @id @default(cuid())
-  userId        String
-  orgId         String?
-  source        String   // email_forward, calendar_webhook, manual, slack_digest
-  sourceRef     String?  // message-id for email, event-id for calendar
-  title         String
-  content       String   @db.Text
+  id                 String         @id @default(cuid())
+  userId             String
+  orgId              String?
+  source             String // email_forward, calendar_webhook, manual, slack_digest
+  sourceRef          String? // message-id for email, event-id for calendar
+  title              String
+  content            String         @db.Text
   extractedDecisions String[] // AI-extracted decision statements
-  decisionType  String?
-  participants  String[]
-  scheduledAt   DateTime? // for calendar events
-  processedAt   DateTime?
-  status        String   @default("pending") // pending, processed, dismissed
-  linkedDecisionId String?
-  linkedDecision   HumanDecision? @relation("JournalLinkedDecision", fields: [linkedDecisionId], references: [id], onDelete: SetNull)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  decisionType       String?
+  participants       String[]
+  scheduledAt        DateTime? // for calendar events
+  processedAt        DateTime?
+  status             String         @default("pending") // pending, processed, dismissed
+  linkedDecisionId   String?
+  linkedDecision     HumanDecision? @relation("JournalLinkedDecision", fields: [linkedDecisionId], references: [id], onDelete: SetNull)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
 
   @@index([userId])
   @@index([orgId])
@@ -926,21 +926,21 @@ model JournalEntry {
 // ─── Public API Keys ──────────────────────────────────────────────────────
 
 model ApiKey {
-  id          String    @id @default(cuid())
-  userId      String
-  orgId       String?
-  name        String
-  keyHash     String    @unique
-  keyPrefix   String    // First 8 chars of the key for display (e.g., "di_live_a1b2...")
-  scopes      String[]  // ["analyze", "documents", "outcomes", "insights"]
-  rateLimit   Int       @default(100) // requests per hour
-  lastUsedAt  DateTime?
-  expiresAt   DateTime?
-  revokedAt   DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id         String    @id @default(cuid())
+  userId     String
+  orgId      String?
+  name       String
+  keyHash    String    @unique
+  keyPrefix  String // First 8 chars of the key for display (e.g., "di_live_a1b2...")
+  scopes     String[] // ["analyze", "documents", "outcomes", "insights"]
+  rateLimit  Int       @default(100) // requests per hour
+  lastUsedAt DateTime?
+  expiresAt  DateTime?
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
-  usages      ApiKeyUsage[]
+  usages ApiKeyUsage[]
 
   @@index([keyHash])
   @@index([userId])
@@ -956,7 +956,7 @@ model ApiKeyUsage {
   responseTime Int
   createdAt    DateTime @default(now())
 
-  apiKey       ApiKey   @relation(fields: [keyId], references: [id], onDelete: Cascade)
+  apiKey ApiKey @relation(fields: [keyId], references: [id], onDelete: Cascade)
 
   @@index([keyId])
   @@index([createdAt])
@@ -965,21 +965,21 @@ model ApiKeyUsage {
 // ─── Toxic Combination Detection (Wiz-Inspired Moat) ─────────────────────
 
 model ToxicCombination {
-  id                String    @id @default(cuid())
-  orgId             String?
-  analysisId        String?
-  biasTypes         String[]  // e.g., ["confirmation_bias", "anchoring"]
-  contextFactors    Json      // { monetaryStakes: "high", dissentAbsent: true, timePressure: true }
-  toxicScore        Float     // compound risk score (0-100)
-  historicalFailRate Float?   // how often this combo led to failures
-  sampleSize        Int       @default(0)
-  patternLabel      String?   // e.g., "The Echo Chamber"
-  status            String    @default("active") // active, acknowledged, mitigated
-  acknowledgedAt    DateTime?
-  acknowledgedBy    String?
-  mitigationNotes   String?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  id                 String    @id @default(cuid())
+  orgId              String?
+  analysisId         String?
+  biasTypes          String[] // e.g., ["confirmation_bias", "anchoring"]
+  contextFactors     Json // { monetaryStakes: "high", dissentAbsent: true, timePressure: true }
+  toxicScore         Float // compound risk score (0-100)
+  historicalFailRate Float? // how often this combo led to failures
+  sampleSize         Int       @default(0)
+  patternLabel       String? // e.g., "The Echo Chamber"
+  status             String    @default("active") // active, acknowledged, mitigated
+  acknowledgedAt     DateTime?
+  acknowledgedBy     String?
+  mitigationNotes    String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
   analysis Analysis? @relation(fields: [analysisId], references: [id], onDelete: Cascade)
 
@@ -991,14 +991,14 @@ model ToxicCombination {
 
 model ToxicPattern {
   id             String   @id @default(cuid())
-  orgId          String?  // null = global pattern
+  orgId          String? // null = global pattern
   biasTypes      String[] // the bias combination
-  contextPattern Json     // required context factors for match
-  failureRate    Float    // 0-1, from historical outcomes
-  avgImpactDelta Float    // avg impact score difference vs baseline
+  contextPattern Json // required context factors for match
+  failureRate    Float // 0-1, from historical outcomes
+  avgImpactDelta Float // avg impact score difference vs baseline
   sampleSize     Int
-  label          String?  // human-readable name, e.g., "The Echo Chamber"
-  description    String?  // why this combo is dangerous
+  label          String? // human-readable name, e.g., "The Echo Chamber"
+  description    String? // why this combo is dangerous
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -1009,31 +1009,31 @@ model ToxicPattern {
 // ─── Decision Knowledge Graph (Moat: Wiz-Inspired Decision Graph) ────────
 
 model DecisionEdge {
-  id            String   @id @default(cuid())
-  orgId         String?
+  id    String  @id @default(cuid())
+  orgId String?
 
   // Source node (polymorphic: can be Analysis or HumanDecision)
-  sourceType    String   // "analysis" | "human_decision"
-  sourceId      String
+  sourceType String // "analysis" | "human_decision"
+  sourceId   String
 
   // Target node (polymorphic)
-  targetType    String   // "analysis" | "human_decision"
-  targetId      String
+  targetType String // "analysis" | "human_decision"
+  targetId   String
 
   // Edge metadata
-  edgeType      String   // "influenced_by" | "escalated_from" | "reversed" | "depends_on" | "similar_to" | "shared_bias" | "same_participants"
-  strength      Float    // 0-1
-  confidence    Float    // 0-1
-  description   String?
-  metadata      Json?
+  edgeType    String // "influenced_by" | "escalated_from" | "reversed" | "depends_on" | "similar_to" | "shared_bias" | "same_participants"
+  strength    Float // 0-1
+  confidence  Float // 0-1
+  description String?
+  metadata    Json?
 
   // Provenance
-  createdBy     String   @default("system") // "system" | userId
-  isManual      Boolean  @default(false)
-  isSample      Boolean  @default(false) // Synthetic seed edge — clearable via /api/demo/clear-samples
+  createdBy String  @default("system") // "system" | userId
+  isManual  Boolean @default(false)
+  isSample  Boolean @default(false) // Synthetic seed edge — clearable via /api/demo/clear-samples
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([sourceType, sourceId, targetType, targetId, edgeType])
   @@index([orgId])
@@ -1048,16 +1048,16 @@ model DecisionEdge {
 // ─── Autonomous Outcome Detection ────────────────────────────────────────
 
 model DraftOutcome {
-  id              String   @id @default(cuid())
+  id              String    @id @default(cuid())
   analysisId      String
-  outcome         String   // success | partial_success | failure | inconclusive
+  outcome         String // success | partial_success | failure | inconclusive
   confidence      Float
   evidence        String[] // quotes or article titles
   matchedCriteria String[]
-  source          String   // document | slack | web_intelligence
-  sourceRef       String   // document ID, slack ts, or URL
-  status          String   @default("pending_review") // pending_review | confirmed | dismissed
-  createdAt       DateTime @default(now())
+  source          String // document | slack | web_intelligence
+  sourceRef       String // document ID, slack ts, or URL
+  status          String    @default("pending_review") // pending_review | confirmed | dismissed
+  createdAt       DateTime  @default(now())
   reviewedAt      DateTime?
 
   analysis Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
@@ -1069,24 +1069,24 @@ model DraftOutcome {
 // ─── PE/VC Deal Management ───────────────────────────────────────────────
 
 model Deal {
-  id            String        @id @default(cuid())
+  id            String       @id @default(cuid())
   orgId         String
-  name          String                          // "Acme Corp Series B"
-  dealType      String                          // buyout | growth_equity | venture | secondary | add_on | recapitalization
-  stage         String        @default("screening") // screening | due_diligence | ic_review | closing | portfolio | exited
-  sector        String?                         // technology | healthcare | industrials | consumer | financial_services | energy
-  ticketSize    Decimal?                        // Investment amount
-  currency      String        @default("USD")
-  fundName      String?                         // "Fund IV"
-  vintage       Int?                            // Fund vintage year
-  targetCompany String?                         // Company being evaluated
-  status        String        @default("active") // active | passed | invested | written_off | exited
+  name          String // "Acme Corp Series B"
+  dealType      String // buyout | growth_equity | venture | secondary | add_on | recapitalization
+  stage         String       @default("screening") // screening | due_diligence | ic_review | closing | portfolio | exited
+  sector        String? // technology | healthcare | industrials | consumer | financial_services | energy
+  ticketSize    Decimal? // Investment amount
+  currency      String       @default("USD")
+  fundName      String? // "Fund IV"
+  vintage       Int? // Fund vintage year
+  targetCompany String? // Company being evaluated
+  status        String       @default("active") // active | passed | invested | written_off | exited
   exitDate      DateTime?
   documents     Document[]
   outcome       DealOutcome?
 
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([orgId, stage])
   @@index([orgId, status])
@@ -1098,14 +1098,14 @@ model DealOutcome {
   dealId     String   @unique
   irr        Float?
   moic       Float?
-  exitType   String?                         // ipo | trade_sale | secondary | write_off | partial_exit
+  exitType   String? // ipo | trade_sale | secondary | write_off | partial_exit
   exitValue  Decimal?
-  holdPeriod Int?                            // months
+  holdPeriod Int? // months
   notes      String?  @db.Text
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  deal       Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  deal Deal @relation(fields: [dealId], references: [id], onDelete: Cascade)
 }
 
 model DecisionBriefRecord {
@@ -1113,14 +1113,14 @@ model DecisionBriefRecord {
   dealId    String
   userId    String
   orgId     String
-  brief     Json                              // Full validated brief JSON
+  brief     Json // Full validated brief JSON
   version   Int      @default(1)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([dealId, version])
   @@index([dealId])
   @@index([userId])
-  @@unique([dealId, version])
 }
 
 // ─── Decision Fingerprint ─────────────────────────────────────────────────
@@ -1129,14 +1129,14 @@ model ContextualBiasPattern {
   id              String   @id @default(cuid())
   orgId           String
   biasType        String
-  documentType    String?                         // ic_memo | cim | pitch_deck | etc.
-  dealType        String?                         // buyout | growth_equity | venture | etc.
-  quarter         String                          // "2026-Q1" format
+  documentType    String? // ic_memo | cim | pitch_deck | etc.
+  dealType        String? // buyout | growth_equity | venture | etc.
+  quarter         String // "2026-Q1" format
   occurrenceCount Int
   avgSeverity     Float
-  totalAnalyses   Int                             // denominator for prevalence
-  prevalenceRate  Float                           // occurrenceCount / totalAnalyses
-  trend           String?                         // "increasing" | "decreasing" | "stable"
+  totalAnalyses   Int // denominator for prevalence
+  prevalenceRate  Float // occurrenceCount / totalAnalyses
+  trend           String? // "increasing" | "decreasing" | "stable"
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -1149,14 +1149,14 @@ model FingerprintWarning {
   id             String   @id @default(cuid())
   orgId          String
   analysisId     String
-  warningType    String                           // "contextual_pattern" | "seasonal" | "deal_type"
+  warningType    String // "contextual_pattern" | "seasonal" | "deal_type"
   message        String   @db.Text
-  severity       String                           // "info" | "warning" | "critical"
-  matchedPattern Json                             // the pattern(s) that triggered it
+  severity       String // "info" | "warning" | "critical"
+  matchedPattern Json // the pattern(s) that triggered it
   acknowledged   Boolean  @default(false)
   createdAt      DateTime @default(now())
 
-  analysis       Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  analysis Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
 
   @@index([orgId])
   @@index([analysisId])
@@ -1165,13 +1165,12 @@ model FingerprintWarning {
 // ─── Chat Persistence ─────────────────────────────────────────────────────
 
 model ChatSession {
-  id              String        @id @default(cuid())
-  userId          String
-  title           String        @default("New Chat")
-  pinnedDocId     String?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-
+  id          String   @id @default(cuid())
+  userId      String
+  title       String   @default("New Chat")
+  pinnedDocId String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@index([userId, updatedAt])
 }
@@ -1180,10 +1179,10 @@ model ApiUsage {
   id        String   @id @default(cuid())
   userId    String?
   orgId     String?
-  provider  String   // "gemini", "slack", "resend", etc.
-  operation String   // "generate", "embed", "send_email", etc.
-  tokens    Int?     // for LLM calls
-  cost      Float?   // estimated cost in USD
+  provider  String // "gemini", "slack", "resend", etc.
+  operation String // "generate", "embed", "send_email", etc.
+  tokens    Int? // for LLM calls
+  cost      Float? // estimated cost in USD
   metadata  Json?
   createdAt DateTime @default(now())
 
@@ -1195,19 +1194,19 @@ model ApiUsage {
 // ─── Decision Copilot ────────────────────────────────────────────────────
 
 model CopilotSession {
-  id              String        @id @default(cuid())
+  id              String          @id @default(cuid())
   userId          String
   orgId           String?
-  title           String        @default("New Decision")
-  decisionPrompt  String        @db.Text
-  status          String        @default("active") // active, resolved, archived
+  title           String          @default("New Decision")
+  decisionPrompt  String          @db.Text
+  status          String          @default("active") // active, resolved, archived
   resolvedAt      DateTime?
-  decisionSummary String?       @db.Text
+  decisionSummary String?         @db.Text
   dqiScore        Float?
-  chosenOption    String?       // Which option the user ultimately chose
+  chosenOption    String? // Which option the user ultimately chose
   metadata        Json?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
   turns           CopilotTurn[]
   outcome         CopilotOutcome?
 
@@ -1221,13 +1220,13 @@ model CopilotOutcome {
   sessionId       String         @unique
   userId          String
   orgId           String?
-  outcome         String         // success | partial_success | failure | inconclusive
-  impactScore     Int?           // 1-10
+  outcome         String // success | partial_success | failure | inconclusive
+  impactScore     Int? // 1-10
   lessonsLearned  String?        @db.Text
   whatWorked      String?        @db.Text
   whatFailed      String?        @db.Text
-  wouldChooseSame Boolean?       // Would you make the same decision again?
-  helpfulAgents   String[]       // Which copilot agents were most helpful?
+  wouldChooseSame Boolean? // Would you make the same decision again?
+  helpfulAgents   String[] // Which copilot agents were most helpful?
   reportedAt      DateTime       @default(now())
   session         CopilotSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
@@ -1240,8 +1239,8 @@ model CopilotOutcome {
 model CopilotTurn {
   id        String         @id @default(cuid())
   sessionId String
-  role      String         // "user" | "agent"
-  agentType String?        // null for user; "idea_builder" | "devils_advocate" | "scenario_explorer" | "synthesizer"
+  role      String // "user" | "agent"
+  agentType String? // null for user; "idea_builder" | "devils_advocate" | "scenario_explorer" | "synthesizer"
   content   String         @db.Text
   sources   Json?
   toolCalls Json?
@@ -1289,38 +1288,38 @@ model Subscription {
 // ─── Integration Ecosystem ─────────────────────────────────────────────────
 
 model WebhookSubscription {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   orgId       String
   userId      String
-  url         String   // Target URL
-  secret      String   // HMAC signing secret (encrypted)
+  url         String // Target URL
+  secret      String // HMAC signing secret (encrypted)
   events      String[] // e.g., ["analysis.completed", "outcome.reported"]
-  active      Boolean  @default(true)
-  failCount   Int      @default(0)
+  active      Boolean   @default(true)
+  failCount   Int       @default(0)
   lastError   String?
   lastSuccess DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
-  deliveries  WebhookDelivery[]
+  deliveries WebhookDelivery[]
 
   @@index([orgId])
   @@index([active])
 }
 
 model WebhookDelivery {
-  id              String   @id @default(cuid())
-  subscriptionId  String
-  event           String
-  payload         Json
-  statusCode      Int?
-  responseBody    String?  @db.Text
-  durationMs      Int?
-  attempt         Int      @default(1)
-  success         Boolean  @default(false)
-  createdAt       DateTime @default(now())
+  id             String   @id @default(cuid())
+  subscriptionId String
+  event          String
+  payload        Json
+  statusCode     Int?
+  responseBody   String?  @db.Text
+  durationMs     Int?
+  attempt        Int      @default(1)
+  success        Boolean  @default(false)
+  createdAt      DateTime @default(now())
 
-  subscription    WebhookSubscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  subscription WebhookSubscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
 
   @@index([subscriptionId])
   @@index([createdAt])
@@ -1330,12 +1329,12 @@ model WebhookDelivery {
 
 model DecisionAttribution {
   id                String   @id @default(cuid())
-  outcomeAnalysisId String   // The analysis whose outcome triggered attribution
-  sourceAnalysisId  String   // A contributing analysis in the path
-  contributionPct   Float    // 0-100 — this source's share of influence
-  pathLength        Int      // Hops from source to outcome
+  outcomeAnalysisId String // The analysis whose outcome triggered attribution
+  sourceAnalysisId  String // A contributing analysis in the path
+  contributionPct   Float // 0-100 — this source's share of influence
+  pathLength        Int // Hops from source to outcome
   pathEdgeTypes     String[] // Edge types traversed along the path
-  edgeStrengthAvg   Float    // Average edge strength along path
+  edgeStrengthAvg   Float // Average edge strength along path
   orgId             String?
   computedAt        DateTime @default(now())
 
@@ -1348,24 +1347,24 @@ model DecisionAttribution {
 // ─── Decision Playbooks ─────────────────────────────────────────────────
 
 model DecisionPlaybook {
-  id                   String   @id @default(cuid())
+  id                   String    @id @default(cuid())
   orgId                String?
   userId               String
   name                 String
-  description          String   @db.Text
-  category             String   // m_and_a | board_review | risk_assessment | strategic_planning | investment_committee | custom
-  industry             String?  // Links to INDUSTRY_PROFILES key
-  documentType         String?  // Recommended document type
+  description          String    @db.Text
+  category             String // m_and_a | board_review | risk_assessment | strategic_planning | investment_committee | custom
+  industry             String? // Links to INDUSTRY_PROFILES key
+  documentType         String? // Recommended document type
   complianceFrameworks String[] // e.g. ["fca_consumer_duty", "gdpr_art22"]
   biasFocus            String[] // Specific bias IDs to emphasize
-  personaConfig        Json?    // Pre-configured persona settings
-  templateData         Json?    // Additional analysis options
-  isBuiltIn            Boolean  @default(false)
-  isPublic             Boolean  @default(false)
-  usageCount           Int      @default(0)
+  personaConfig        Json? // Pre-configured persona settings
+  templateData         Json? // Additional analysis options
+  isBuiltIn            Boolean   @default(false)
+  isPublic             Boolean   @default(false)
+  usageCount           Int       @default(0)
   lastUsedAt           DateTime?
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
   @@index([orgId])
   @@index([userId])
@@ -1387,25 +1386,29 @@ model DecisionPlaybook {
 // it as a string (not a relation) avoids a forced FK to DecisionPlaybook
 // for the 6 built-in templates that don't have DB rows.
 model PlaybookInvocation {
-  id                   String    @id @default(cuid())
-  userId               String
-  orgId                String?
-  analysisId           String?   // Source bias fingerprint (optional for direct invocations)
-  humanDecisionId      String?   // Or sourced from a human decision audit
-  playbookId           String    // "builtin_0" | DecisionPlaybook.id
-  playbookName         String    // Denormalized for display + analytics stability
-  playbookCategory     String?   // Denormalized for funnel slicing
-  matchedToxicCombo    String?   // If suggested because of a named toxic pattern
-  source               String    @default("suggestion") // suggestion | manual | nudge
-  status               String    @default("started")    // started | completed | abandoned
-  startedAt            DateTime  @default(now())
-  completedAt          DateTime?
-  /** User-reported 1–5 rating: did this playbook help? Fed into feedback loop. */
-  effectivenessRating  Int?
-  /** Free-text notes from the user after running the playbook. */
-  notes                String?   @db.Text
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
+  id                  String    @id @default(cuid())
+  userId              String
+  orgId               String?
+  analysisId          String? // Source bias fingerprint (optional for direct invocations)
+  humanDecisionId     String? // Or sourced from a human decision audit
+  playbookId          String // "builtin_0" | DecisionPlaybook.id
+  playbookName        String // Denormalized for display + analytics stability
+  playbookCategory    String? // Denormalized for funnel slicing
+  matchedToxicCombo   String? // If suggested because of a named toxic pattern
+  source              String    @default("suggestion") // suggestion | manual | nudge
+  status              String    @default("started") // started | completed | abandoned
+  startedAt           DateTime  @default(now())
+  completedAt         DateTime?
+  /**
+   * User-reported 1–5 rating: did this playbook help? Fed into feedback loop.
+   */
+  effectivenessRating Int?
+  /**
+   * Free-text notes from the user after running the playbook.
+   */
+  notes               String?   @db.Text
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
   @@index([userId])
   @@index([orgId])
@@ -1420,14 +1423,14 @@ model PlaybookInvocation {
 // ─── Calibration Journey (Outcome Gate Gamification) ─────────────────────
 
 model CalibrationMilestone {
-  id              String   @id @default(cuid())
-  userId          String
-  orgId           String?
-  milestoneType   String   // "outcomes_reported" | "accuracy_improvement" | "calibration_level"
-  milestoneValue  Int      // e.g., 5, 10, 25 outcomes reported
-  metricBefore    Float?   // accuracy rate before this milestone
-  metricAfter     Float?   // accuracy rate after this milestone
-  unlockedAt      DateTime @default(now())
+  id             String   @id @default(cuid())
+  userId         String
+  orgId          String?
+  milestoneType  String // "outcomes_reported" | "accuracy_improvement" | "calibration_level"
+  milestoneValue Int // e.g., 5, 10, 25 outcomes reported
+  metricBefore   Float? // accuracy rate before this milestone
+  metricAfter    Float? // accuracy rate after this milestone
+  unlockedAt     DateTime @default(now())
 
   @@index([userId])
   @@index([orgId])
@@ -1439,10 +1442,10 @@ model DealAuditPurchase {
   orgId           String?
   dealId          String
   stripePaymentId String   @unique
-  tier            String   // "small" | "mid" | "large" | "mega"
-  amount          Int      // cents
+  tier            String // "small" | "mid" | "large" | "mega"
+  amount          Int // cents
   currency        String   @default("USD")
-  ticketSize      Decimal  // deal's ticket size at time of purchase
+  ticketSize      Decimal // deal's ticket size at time of purchase
   status          String   @default("active") // active | refunded
   createdAt       DateTime @default(now())
 
@@ -1488,3 +1491,26 @@ model FounderContent {
   @@index([createdAt])
 }
 
+model OutreachArtifact {
+  id               String    @id @default(cuid())
+  userId           String
+  intent           String
+  contactName      String?
+  contactTitle     String?
+  contactCompany   String?
+  sourceUrl        String?
+  sourceText       String?   @db.Text
+  extractedProfile Json
+  generatedMessage String    @db.Text
+  talkingPoints    Json
+  warmOpeners      Json
+  intentCallouts   Json
+  status           String    @default("draft")
+  sentAt           DateTime?
+  outcome          String?   @db.Text
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([userId, status])
+}

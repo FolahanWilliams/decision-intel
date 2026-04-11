@@ -14,6 +14,14 @@ const log = createClientLogger('AnalysisStream');
  *  Matches the server-side `maxDuration` (240s) in /api/analyze/stream. */
 const STREAM_TIMEOUT_MS = 4 * 60 * 1000; // 4 minutes
 
+/** Minimum time a step must remain visible before a new step transition is applied.
+ *  Prevents fast Gemini responses from flashing past the user. The animation runs
+ *  on its own schedule; if the backend catches up, queued transitions flush through. */
+const MIN_STEP_DWELL_MS = 400;
+/** Catch-up mode threshold — if we're >= N steps behind, halve the dwell time. */
+const CATCHUP_THRESHOLD = 2;
+const CATCHUP_DWELL_MS = 180;
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -79,6 +87,57 @@ export function useAnalysisStream(options: StreamOptions) {
   const lastEventIdRef = useRef<string | null>(null);
   const seenEventIdsRef = useRef<Set<string>>(new Set());
 
+  // Dwell-floor queue: buffered step transitions so fast nodes don't flash past.
+  const stepQueueRef = useRef<Array<() => void>>([]);
+  const stepTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastStepFlushRef = useRef<number>(0);
+
+  const enqueueStepUpdate = useCallback((apply: () => void) => {
+    const now = Date.now();
+    const sinceLast = now - lastStepFlushRef.current;
+    const queueDepth = stepQueueRef.current.length;
+    const dwell = queueDepth >= CATCHUP_THRESHOLD ? CATCHUP_DWELL_MS : MIN_STEP_DWELL_MS;
+
+    if (sinceLast >= dwell && queueDepth === 0) {
+      // No backlog and floor satisfied — apply immediately.
+      apply();
+      lastStepFlushRef.current = now;
+      return;
+    }
+
+    stepQueueRef.current.push(apply);
+    if (stepTimerRef.current) return;
+
+    const flushNext = () => {
+      const next = stepQueueRef.current.shift();
+      if (!next) {
+        stepTimerRef.current = null;
+        return;
+      }
+      next();
+      lastStepFlushRef.current = Date.now();
+      if (stepQueueRef.current.length > 0) {
+        const nextDwell =
+          stepQueueRef.current.length >= CATCHUP_THRESHOLD ? CATCHUP_DWELL_MS : MIN_STEP_DWELL_MS;
+        stepTimerRef.current = setTimeout(flushNext, nextDwell);
+      } else {
+        stepTimerRef.current = null;
+      }
+    };
+
+    const delay = Math.max(0, dwell - sinceLast);
+    stepTimerRef.current = setTimeout(flushNext, delay);
+  }, []);
+
+  const clearStepQueue = useCallback(() => {
+    if (stepTimerRef.current) {
+      clearTimeout(stepTimerRef.current);
+      stepTimerRef.current = null;
+    }
+    stepQueueRef.current = [];
+    lastStepFlushRef.current = 0;
+  }, []);
+
   // Store callbacks in refs to avoid recreating readStream when callers pass new arrow functions
   const onBiasDetectedRef = useRef(onBiasDetected);
   const onNoiseUpdateRef = useRef(onNoiseUpdate);
@@ -89,6 +148,7 @@ export function useAnalysisStream(options: StreamOptions) {
 
   // Initialize steps to "pending"
   const resetSteps = useCallback(() => {
+    clearStepQueue();
     setSteps(stepNames.map(name => ({ name, status: 'pending' })));
     setProgress(0);
     setError(null);
@@ -96,7 +156,7 @@ export function useAnalysisStream(options: StreamOptions) {
     setTimedOut(false);
     lastEventIdRef.current = null;
     seenEventIdsRef.current.clear();
-  }, [stepNames]);
+  }, [stepNames, clearStepQueue]);
 
   /**
    * Core stream reader — extracted so retries can call it recursively.
@@ -178,32 +238,26 @@ export function useAnalysisStream(options: StreamOptions) {
                 const stepName = update.step as string;
                 const stepStatus = update.status as 'running' | 'complete';
                 const stepDesc = update.description as string | undefined;
-                setProgress(Math.max(0, Number(update.progress) || 0));
+                const nextProgress = Math.max(0, Number(update.progress) || 0);
 
-                setSteps(prev => {
-                  // Find if step already exists
-                  const existingIndex = prev.findIndex(s => s.name === stepName);
-
-                  if (existingIndex >= 0) {
-                    // Update existing step
-                    const next = [...prev];
-                    next[existingIndex] = {
-                      ...next[existingIndex],
-                      status: stepStatus,
-                      ...(stepDesc && { description: stepDesc }),
-                    };
-                    return next;
-                  }
-
-                  // Add new step dynamically
-                  return [
-                    ...prev,
-                    {
-                      name: stepName,
-                      description: stepDesc,
-                      status: stepStatus,
-                    },
-                  ];
+                enqueueStepUpdate(() => {
+                  setProgress(nextProgress);
+                  setSteps(prev => {
+                    const existingIndex = prev.findIndex(s => s.name === stepName);
+                    if (existingIndex >= 0) {
+                      const next = [...prev];
+                      next[existingIndex] = {
+                        ...next[existingIndex],
+                        status: stepStatus,
+                        ...(stepDesc && { description: stepDesc }),
+                      };
+                      return next;
+                    }
+                    return [
+                      ...prev,
+                      { name: stepName, description: stepDesc, status: stepStatus },
+                    ];
+                  });
                 });
                 break;
               }
@@ -236,6 +290,9 @@ export function useAnalysisStream(options: StreamOptions) {
 
               case 'complete':
                 streamResult = update.result as StreamResult;
+                // Flush any queued step updates immediately so the final
+                // "complete" state isn't stuck waiting for the dwell floor.
+                clearStepQueue();
                 setSteps(prev => prev.map(s => ({ ...s, status: 'complete' })));
                 setProgress(100);
                 break;
@@ -253,7 +310,9 @@ export function useAnalysisStream(options: StreamOptions) {
 
       return streamResult;
     },
-    [] // Callbacks accessed via refs — no dependencies needed
+    // enqueueStepUpdate + clearStepQueue are stable (useCallback with []).
+    // Listed here so the dep array is exhaustive; won't cause re-renders.
+    [enqueueStepUpdate, clearStepQueue]
   );
 
   /**
@@ -341,13 +400,17 @@ export function useAnalysisStream(options: StreamOptions) {
     setIsAnalyzing(false);
   }, []);
 
-  // Cleanup on unmount: abort any in-flight stream and clear timeout
+  // Cleanup on unmount: abort any in-flight stream, clear timeout and step queue
   useEffect(() => {
     return () => {
       abortRef.current?.abort();
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
+      }
+      if (stepTimerRef.current) {
+        clearTimeout(stepTimerRef.current);
+        stepTimerRef.current = null;
       }
     };
   }, []);
