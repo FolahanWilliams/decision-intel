@@ -8,6 +8,7 @@ import { getCachedAnalysis, cacheAnalysis, generateAnalysisCacheKey } from '@/li
 import { validateContent } from '@/lib/utils/resilience';
 import { createLogger } from '@/lib/utils/logger';
 import { getDocumentContent } from '@/lib/utils/encryption';
+import { checkAnalysisLimit } from '@/lib/utils/plan-limits';
 
 import {
   NoiseStatsSchema,
@@ -84,6 +85,18 @@ export async function analyzeDocument(
       onProgress({ type: 'step', step: 'Retrieved from cache', status: 'complete', progress: 100 });
     }
     return cached as unknown as AnalysisResult;
+  }
+
+  // Enforce plan analysis limit before running the expensive pipeline.
+  // dealId is a newer column — cast defensively against schema drift.
+  const dealId = (document as Record<string, unknown>).dealId as string | undefined;
+  const planCheck = await checkAnalysisLimit(document.userId, dealId ?? null);
+  if (!planCheck.allowed) {
+    const err = new Error(
+      `Analysis limit reached (${planCheck.used}/${planCheck.limit} this month on the ${planCheck.plan} plan)`
+    );
+    (err as NodeJS.ErrnoException).code = 'PLAN_LIMIT_EXCEEDED';
+    throw err;
   }
 
   // Run analysis within a transaction for atomicity

@@ -1082,8 +1082,9 @@ model Deal {
   targetCompany String? // Company being evaluated
   status        String       @default("active") // active | passed | invested | written_off | exited
   exitDate      DateTime?
-  documents     Document[]
-  outcome       DealOutcome?
+  documents          Document[]
+  outcome            DealOutcome?
+  auditPurchases     DealAuditPurchase[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1448,6 +1449,8 @@ model DealAuditPurchase {
   ticketSize      Decimal // deal's ticket size at time of purchase
   status          String   @default("active") // active | refunded
   createdAt       DateTime @default(now())
+
+  deal Deal @relation(fields: [dealId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([dealId])
