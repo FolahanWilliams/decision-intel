@@ -116,73 +116,84 @@ const FounderTipsTab = dynamic(
     import('@/components/founder-hub/FounderTipsTab').then(m => ({ default: m.FounderTipsTab })),
   { loading: tabLoader }
 );
-const MeetingPrepTab = dynamic(
+const OutreachAndMeetingsTab = dynamic(
   () =>
-    import('@/components/founder-hub/MeetingPrepTab').then(m => ({ default: m.MeetingPrepTab })),
+    import('@/components/founder-hub/OutreachAndMeetingsTab').then(m => ({
+      default: m.OutreachAndMeetingsTab,
+    })),
   { loading: tabLoader }
 );
 import {
   Rocket,
   Brain,
-  BarChart3,
   Plug,
   Shield,
   BookOpen,
-  Target,
   MessageSquare,
   Zap,
-  TrendingUp,
-  Network,
   Lock,
   Crosshair,
   Search,
   X,
   Library,
   Lightbulb,
-  GraduationCap,
 } from 'lucide-react';
 import { card } from '@/components/founder-hub/shared-styles';
+import { AccordionSection } from '@/components/founder-hub/AccordionSection';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 type TabId =
   | 'overview'
-  | 'pipeline'
-  | 'scoring'
-  | 'dqi_methodology'
-  | 'integrations'
-  | 'strategy'
+  | 'product_deep'
+  | 'research'
+  | 'positioning'
   | 'sales'
-  | 'stats'
-  | 'playbook'
-  | 'methodologies'
-  | 'case_studies'
-  | 'correlation_causal'
-  | 'decision_alpha'
-  | 'content_studio'
-  | 'investor_defense'
-  | 'founder_tips'
-  | 'meeting_prep';
+  | 'outreach'
+  | 'content'
+  | 'data_ecosystem'
+  | 'case_library'
+  | 'founder_tips';
 
-const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode }> = [
-  { id: 'meeting_prep', label: 'Meeting Prep', icon: <Search size={16} /> },
-  { id: 'overview', label: 'Product Overview', icon: <Rocket size={16} /> },
-  { id: 'pipeline', label: 'Analysis Pipeline', icon: <Brain size={16} /> },
-  { id: 'scoring', label: 'Scoring Engine', icon: <BarChart3 size={16} /> },
-  { id: 'dqi_methodology', label: 'DQI Methodology', icon: <Target size={16} /> },
-  { id: 'integrations', label: 'Integrations & Flywheel', icon: <Plug size={16} /> },
-  { id: 'strategy', label: 'Strategy & Positioning', icon: <Shield size={16} /> },
-  { id: 'sales', label: 'Sales Toolkit', icon: <MessageSquare size={16} /> },
-  { id: 'stats', label: 'Live Stats', icon: <TrendingUp size={16} /> },
-  { id: 'playbook', label: 'Playbook & Research', icon: <BookOpen size={16} /> },
-  { id: 'methodologies', label: 'Methodologies & Principles', icon: <GraduationCap size={16} /> },
-  { id: 'case_studies', label: 'Case Studies', icon: <Library size={16} /> },
-  { id: 'correlation_causal', label: 'Correlation & Causal Graph', icon: <Network size={16} /> },
-  { id: 'decision_alpha', label: 'Decision Alpha', icon: <TrendingUp size={16} /> },
-  { id: 'content_studio', label: 'Content Studio', icon: <Zap size={16} /> },
-  { id: 'investor_defense', label: 'Investor Defense', icon: <Crosshair size={16} /> },
-  { id: 'founder_tips', label: 'Founder Tips', icon: <Lightbulb size={16} /> },
+type TabGroup = 'Product' | 'Go-to-Market' | 'Intelligence' | 'Tools';
+
+// Maps old tab slugs (from 17-tab era) to new 10-tab slugs so bookmarks and
+// deep links don't break after consolidation.
+const LEGACY_TAB_REDIRECTS: Record<string, TabId> = {
+  pipeline: 'product_deep',
+  scoring: 'product_deep',
+  dqi_methodology: 'product_deep',
+  methodologies: 'research',
+  playbook: 'research',
+  strategy: 'positioning',
+  investor_defense: 'positioning',
+  integrations: 'data_ecosystem',
+  stats: 'data_ecosystem',
+  case_studies: 'case_library',
+  correlation_causal: 'case_library',
+  decision_alpha: 'case_library',
+  content_studio: 'content',
+  meeting_prep: 'outreach',
+};
+
+const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabGroup }> = [
+  // Product
+  { id: 'overview', label: 'Product Overview', icon: <Rocket size={16} />, group: 'Product' },
+  { id: 'product_deep', label: 'Pipeline & Scoring', icon: <Brain size={16} />, group: 'Product' },
+  { id: 'research', label: 'Research & Foundations', icon: <BookOpen size={16} />, group: 'Product' },
+  // Go-to-Market
+  { id: 'positioning', label: 'Competitive Positioning', icon: <Shield size={16} />, group: 'Go-to-Market' },
+  { id: 'sales', label: 'Sales Toolkit', icon: <MessageSquare size={16} />, group: 'Go-to-Market' },
+  { id: 'outreach', label: 'Outreach & Meetings', icon: <Crosshair size={16} />, group: 'Go-to-Market' },
+  { id: 'content', label: 'Content Studio', icon: <Zap size={16} />, group: 'Go-to-Market' },
+  // Intelligence
+  { id: 'data_ecosystem', label: 'Data Ecosystem', icon: <Plug size={16} />, group: 'Intelligence' },
+  { id: 'case_library', label: 'Case Library', icon: <Library size={16} />, group: 'Intelligence' },
+  // Tools
+  { id: 'founder_tips', label: 'Founder Tips', icon: <Lightbulb size={16} />, group: 'Tools' },
 ];
+
+const TAB_GROUPS: TabGroup[] = ['Product', 'Go-to-Market', 'Intelligence', 'Tools'];
 
 // ─── Search Results ────────────────────────────────────────────────────────
 
@@ -256,7 +267,16 @@ const FOUNDER_PASS = process.env.NEXT_PUBLIC_FOUNDER_HUB_PASS || '';
 export default function FounderHubPage() {
   // Default to Product Overview — Meeting Prep is time-sensitive and goes
   // stale after each investor meeting. Use the tab strip to switch.
-  const [activeTab, setActiveTab] = useState<TabId>('overview');
+  // Resolve initial tab from ?tab=X query param, supporting both current 10-tab
+  // slugs and legacy 17-tab slugs (LEGACY_TAB_REDIRECTS) so bookmarks keep working.
+  const [activeTab, setActiveTab] = useState<TabId>(() => {
+    if (typeof window === 'undefined') return 'overview';
+    const raw = new URLSearchParams(window.location.search).get('tab');
+    if (!raw) return 'overview';
+    const validIds = TABS.map(t => t.id);
+    if (validIds.includes(raw as TabId)) return raw as TabId;
+    return LEGACY_TAB_REDIRECTS[raw] ?? 'overview';
+  });
   const [unlocked, setUnlocked] = useState(false);
   const [passInput, setPassInput] = useState('');
   const [passError, setPassError] = useState(false);
@@ -372,45 +392,100 @@ export default function FounderHubPage() {
   }
 
   const TAB_CONTENT: Record<TabId, React.ReactNode> = {
-    meeting_prep: <MeetingPrepTab />,
     overview: <ProductOverviewTab />,
-    pipeline: <CorePipelineTab />,
-    scoring: <ScoringEngineTab />,
-    dqi_methodology: (
-      <ErrorBoundary sectionName="DQI Methodology">
-        <DqiMethodologyTab />
-      </ErrorBoundary>
+    product_deep: (
+      <>
+        <AccordionSection title="Analysis Pipeline" subtitle="12-node LangGraph sequence">
+          <CorePipelineTab />
+        </AccordionSection>
+        <AccordionSection title="Scoring Engine" subtitle="Toxic patterns and risk multipliers">
+          <ScoringEngineTab />
+        </AccordionSection>
+        <AccordionSection title="DQI Methodology" subtitle="Formula, percentiles, calibration">
+          <ErrorBoundary sectionName="DQI Methodology">
+            <DqiMethodologyTab />
+          </ErrorBoundary>
+        </AccordionSection>
+      </>
     ),
-    integrations: <IntegrationsAndFlywheelTab />,
-    strategy: <StrategyAndPositioningTab />,
+    research: (
+      <>
+        <AccordionSection
+          title="Methodologies & Principles"
+          subtitle="Kahneman, Sibony, Strebulaev — academic foundations"
+        >
+          <ErrorBoundary sectionName="Methodologies & Principles">
+            <MethodologiesAndPrinciplesTab />
+          </ErrorBoundary>
+        </AccordionSection>
+        <AccordionSection
+          title="Playbook & Research"
+          subtitle="Cited papers, research library, decision playbook"
+        >
+          <PlaybookAndResearchTab />
+        </AccordionSection>
+      </>
+    ),
+    positioning: (
+      <>
+        <AccordionSection
+          title="External Story"
+          subtitle="Moat narrative, market sizing, 'why now' hook"
+        >
+          <StrategyAndPositioningTab />
+        </AccordionSection>
+        <AccordionSection
+          title="Investor Defense"
+          subtitle="Kill-shot objections, Q&A, competitive responses"
+        >
+          <ErrorBoundary sectionName="Investor Defense">
+            <InvestorDefenseTab />
+          </ErrorBoundary>
+        </AccordionSection>
+      </>
+    ),
     sales: <SalesToolkitTab />,
-    stats: <LiveStatsTab />,
-    playbook: <PlaybookAndResearchTab />,
-    methodologies: (
-      <ErrorBoundary sectionName="Methodologies & Principles">
-        <MethodologiesAndPrinciplesTab />
-      </ErrorBoundary>
-    ),
-    case_studies: <CaseStudiesTab />,
-    correlation_causal: (
-      <ErrorBoundary sectionName="Correlation & Causal">
-        <CorrelationCausalTab />
-      </ErrorBoundary>
-    ),
-    decision_alpha: (
-      <ErrorBoundary sectionName="Decision Alpha">
-        <DecisionAlphaTab />
-      </ErrorBoundary>
-    ),
-    content_studio: (
+    outreach: <OutreachAndMeetingsTab founderPass={FOUNDER_PASS} />,
+    content: (
       <ErrorBoundary sectionName="Content Studio">
         <ContentStudioTab founderPass={FOUNDER_PASS} />
       </ErrorBoundary>
     ),
-    investor_defense: (
-      <ErrorBoundary sectionName="Investor Defense">
-        <InvestorDefenseTab />
-      </ErrorBoundary>
+    data_ecosystem: (
+      <>
+        <AccordionSection
+          title="Integrations & Flywheel"
+          subtitle="Input channels: Slack, Drive, email, webhooks"
+        >
+          <IntegrationsAndFlywheelTab />
+        </AccordionSection>
+        <AccordionSection title="Live Stats" subtitle="Output metrics, usage, activation">
+          <LiveStatsTab />
+        </AccordionSection>
+      </>
+    ),
+    case_library: (
+      <>
+        <AccordionSection title="Historical Cases" subtitle="14 case studies with pre-decision evidence">
+          <CaseStudiesTab />
+        </AccordionSection>
+        <AccordionSection
+          title="Correlation & Causal Graph"
+          subtitle="Bias interaction matrix, toxic combinations"
+        >
+          <ErrorBoundary sectionName="Correlation & Causal">
+            <CorrelationCausalTab />
+          </ErrorBoundary>
+        </AccordionSection>
+        <AccordionSection
+          title="Decision Alpha"
+          subtitle="CEO decision quality leaderboard"
+        >
+          <ErrorBoundary sectionName="Decision Alpha">
+            <DecisionAlphaTab />
+          </ErrorBoundary>
+        </AccordionSection>
+      </>
     ),
     founder_tips: (
       <ErrorBoundary sectionName="Founder Tips">
@@ -497,48 +572,74 @@ export default function FounderHubPage() {
           </p>
         </header>
 
-        {/* Tab Navigation */}
+        {/* Tab Navigation — grouped by category (Product / GTM / Intelligence / Tools) */}
         <div
           style={{
             display: 'flex',
-            gap: 2,
+            gap: 16,
             marginBottom: 24,
             overflowX: 'auto',
             borderBottom: '1px solid var(--border-primary, #222)',
-            paddingBottom: 0,
+            paddingBottom: 6,
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
           }}
         >
-          {TABS.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => {
-                setActiveTab(tab.id);
-                setSearchQuery('');
-              }}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                padding: '10px 14px',
-                fontSize: 13,
-                fontWeight: activeTab === tab.id ? 700 : 500,
-                color:
-                  activeTab === tab.id ? 'var(--text-primary, #fff)' : 'var(--text-muted, #71717a)',
-                background: 'none',
-                border: 'none',
-                borderBottom: activeTab === tab.id ? '2px solid #16A34A' : '2px solid transparent',
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                transition: 'color 0.15s, border-color 0.15s',
-                flexShrink: 0,
-              }}
-            >
-              {tab.icon}
-              {tab.label}
-            </button>
-          ))}
+          {TAB_GROUPS.map(group => {
+            const groupTabs = TABS.filter(t => t.group === group);
+            if (groupTabs.length === 0) return null;
+            return (
+              <div key={group} style={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+                <div
+                  style={{
+                    fontSize: 9,
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em',
+                    color: 'var(--text-muted, #71717a)',
+                    marginBottom: 4,
+                    paddingLeft: 4,
+                  }}
+                >
+                  {group}
+                </div>
+                <div style={{ display: 'flex', gap: 2 }}>
+                  {groupTabs.map(tab => (
+                    <button
+                      key={tab.id}
+                      onClick={() => {
+                        setActiveTab(tab.id);
+                        setSearchQuery('');
+                      }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        padding: '8px 12px',
+                        fontSize: 13,
+                        fontWeight: activeTab === tab.id ? 700 : 500,
+                        color:
+                          activeTab === tab.id
+                            ? 'var(--text-primary, #fff)'
+                            : 'var(--text-muted, #71717a)',
+                        background: 'none',
+                        border: 'none',
+                        borderBottom:
+                          activeTab === tab.id ? '2px solid #16A34A' : '2px solid transparent',
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap',
+                        transition: 'color 0.15s, border-color 0.15s',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {tab.icon}
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         {/* Tab Content */}
