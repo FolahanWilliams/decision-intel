@@ -7,6 +7,7 @@ import { ContentLibrary } from './content-studio/ContentLibrary';
 import { CaseStudyPicker } from './content-studio/CaseStudyPicker';
 import { CaseStudyAnalyzer } from './content-studio/CaseStudyAnalyzer';
 import { ContentOpportunities } from './content-studio/ContentOpportunities';
+import { WeeklyBrief } from './content-studio/WeeklyBrief';
 import type { CaseStudy } from '@/lib/data/case-studies/types';
 
 const STORAGE_KEY = 'founder-content-studio-voice';
@@ -147,6 +148,8 @@ export function ContentStudioTab({ founderPass }: ContentStudioTabProps) {
 
   return (
     <div>
+      <WeeklyBrief founderPass={founderPass} onDraft={handleDraft} />
+
       <ContentOpportunities founderPass={founderPass} onDraft={handleDraft} />
 
       <VoiceConfig

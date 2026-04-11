@@ -6,6 +6,7 @@ import { OutreachComposer } from './outreach/OutreachComposer';
 import { OutreachPipelineViz } from './outreach/OutreachPipelineViz';
 import { OutreachResult } from './outreach/OutreachResult';
 import { OutreachHistory } from './outreach/OutreachHistory';
+import { ProspectPipeline } from './outreach/ProspectPipeline';
 
 interface Props {
   founderPass: string;
@@ -14,6 +15,7 @@ interface Props {
 export function OutreachAndMeetingsTab({ founderPass }: Props) {
   const { state, generate, reset } = useOutreachGeneration(founderPass);
   const [historyRefresh, setHistoryRefresh] = useState(0);
+  const [pipelineRefresh, setPipelineRefresh] = useState(0);
 
   const handleGenerate = (input: Parameters<typeof generate>[0]) => {
     generate(input);
@@ -23,17 +25,24 @@ export function OutreachAndMeetingsTab({ founderPass }: Props) {
     setHistoryRefresh(v => v + 1);
   };
 
+  const handleSavedToPipeline = () => {
+    setPipelineRefresh(v => v + 1);
+  };
+
   const showPipeline = state.isRunning || state.step === 'error';
   const showResult = state.result && state.step === 'done';
 
   return (
     <div style={wrap}>
+      {/* Prospect Pipeline — always visible at the top */}
+      <ProspectPipeline founderPass={founderPass} refreshKey={pipelineRefresh} />
+
       <div style={intro}>
-        <div style={kicker}>Outreach & Meetings</div>
-        <h2 style={title}>Draft outreach, not just meeting notes</h2>
+        <div style={kicker}>Generate Outreach</div>
+        <h2 style={title}>Draft tailored messages in seconds</h2>
         <p style={subtitle}>
           Paste a LinkedIn URL or profile text, pick an intent, and get a tailored message
-          backed by your positioning. Replaces hardcoded meeting prep with something dynamic.
+          backed by your positioning. Save to the pipeline above to track every prospect.
         </p>
       </div>
 
@@ -57,9 +66,8 @@ export function OutreachAndMeetingsTab({ founderPass }: Props) {
                 artifactId={state.artifactId}
                 founderPass={founderPass}
                 onRegenerate={reset}
-                onStatusChanged={() => {
-                  handleStatusChanged();
-                }}
+                onStatusChanged={handleStatusChanged}
+                onSavedToPipeline={handleSavedToPipeline}
               />
             </div>
           )}
