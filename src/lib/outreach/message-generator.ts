@@ -27,11 +27,25 @@ WRITING STYLE RULES (mandatory for every message):
 - Reference at least one specific detail from the recipient's profile.
 - Reference at least one specific detail from this positioning context.
 - End with a clear, small ask — never a demo request in a first-touch message.
-- Maximum 140 words for the message body.`;
+- Always open with a formal time-of-day salutation on its own line: "Good Afternoon Mr./Ms. [Last Name]," (use Afternoon unless profile context suggests otherwise)
+- Always include this sentence near the start: "I hope this message finds you well. I know you have a busy schedule, so I'll keep this brief."
+- Always self-introduce with age: "My name is Folahan Williams, and I am a 16-year-old startup founder currently building [one-sentence description of Decision Intel]."
+- Always end with this exact sign-off (preserve the line breaks): "Warm regards,\\nFolahan Williams\\n\\ndecision-intel.com"
+- Word limit is specified per intent — stay within it.`;
 
 const INTENT_INSTRUCTIONS: Record<OutreachIntent, string> = {
-  connect: `INTENT: Connect.
-Warm, curiosity-led, no ask beyond starting a conversation. Open with a specific observation about something the recipient has written or worked on. Mid-paragraph, mention what you build in one sentence. Close by asking a short question that invites a reply — not a meeting. Goal: reply, not call.`,
+  connect: `INTENT: Connect (seeking guidance or expertise).
+The tone is warm and deferential — Folahan is reaching out to a more experienced professional for advice, not pitching. Follow this structure exactly:
+
+1. Salutation line: "Good Afternoon [Title] [Last Name]," (on its own line)
+2. Opening: "I hope this message finds you well! I know you have a busy schedule, so I'll keep this brief."
+3. Self-introduction: "My name is Folahan Williams, and I am a 16-year-old startup founder currently building an enterprise B2B SaaS platform focused on cognitive auditing for enterprise decisions at Decision Intel."
+4. Why this person specifically: 1-2 sentences referencing their specific experience, role, company, or background from the profile — explain why their perspective is uniquely valuable to someone navigating this space.
+5. The ask: "If you have just five minutes to spare, I would greatly appreciate the opportunity to discuss your experiences and any advice you could share."
+6. Closing: "Thank you very much for considering my request. I look forward to the possibility of connecting with you!"
+7. Sign-off: "Warm regards,\nFolahan Williams\n\ndecision-intel.com"
+
+Maximum 200 words including the salutation and sign-off. Goal: a reply, not a meeting.`,
 
   pilot: `INTENT: Pilot Customer.
 Open with a specific observation about their company's recent strategic moves or M&A activity (inferred from profile). Explain in one sentence that you run a bias-auditing tool. Offer a concrete, free 30-day pilot for their team with a specific proof point ("I'll run your last three board memos through it and send you the findings — no login required, no cost"). Close with "Is next week too soon?" or similar low-friction ask.`,
@@ -54,7 +68,7 @@ RECIPIENT PROFILE (structured):
 
 Return this exact JSON shape:
 {
-  "message": string,         // The full outreach message body. Follow ALL writing style rules. Max 140 words.
+  "message": string,         // The full outreach message body including salutation and sign-off. Follow ALL writing style rules. Stay within the intent-specific word limit.
   "talkingPoints": string[], // Up to 3 talking points the founder can use if they get a reply. Specific, not generic.
   "warmOpeners": string[],   // 2 alternate first-line openers the founder can swap in if the primary one feels off.
   "callouts": {
@@ -67,8 +81,9 @@ Return this exact JSON shape:
 Hard requirements — validation will reject outputs that fail these:
 1. The message MUST reference at least one specific detail from the profile (name, role, company, recent topic, or inferred priority).
 2. The message MUST reference at least one specific detail from the founder context (the 60-second audit, the Wiz advisor, the 18-month causal moat, the 97% gross margins, the "do nothing" competitor, or the "why now" hook).
-3. The message MUST be under 150 words.
-4. No emojis, no em dashes, no markdown.`;
+3. The message MUST stay within the word limit specified by the intent (200 words for connect, 150 words for all other intents).
+4. The message MUST include a formal salutation on the first line (e.g. "Good Afternoon Ms. Smith,") and end with the "Warm regards, Folahan Williams, decision-intel.com" sign-off.
+5. No emojis, no em dashes, no markdown.`;
 
 export async function generateOutreach(
   profile: ExtractedProfile,
@@ -149,8 +164,9 @@ function validateOutput(
     .trim();
 
   const wordCount = cleanMessage.split(/\s+/).filter(Boolean).length;
-  if (wordCount > 180) {
-    log.warn(`Generated message was ${wordCount} words — trimming`);
+  const limit = intent === 'connect' ? 220 : 170;
+  if (wordCount > limit) {
+    log.warn(`Generated message was ${wordCount} words (limit: ${limit} for ${intent})`);
   }
 
   return {
