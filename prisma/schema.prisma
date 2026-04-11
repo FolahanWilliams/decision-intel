@@ -1514,3 +1514,30 @@ model OutreachArtifact {
   @@index([userId, createdAt])
   @@index([userId, status])
 }
+
+// ─── Founder Prospect Pipeline ────────────────────────────────────────────
+//
+// Tracks every outreach contact from first message through conversion.
+// Created automatically when the founder saves a generated outreach message,
+// or added manually. Powers the Pipeline tab in the Founder Hub.
+
+model FounderProspect {
+  id               String    @id @default(cuid())
+  name             String
+  company          String?
+  role             String?
+  linkedInUrl      String?
+  intent           String    // connect | pilot | poc | investor
+  status           String    @default("cold") // cold | warm | active | converted | archived
+  outreachDate     DateTime  @default(now())
+  lastContact      DateTime?
+  followUpDue      DateTime? // auto-set to outreachDate + 5 days on creation
+  notes            String?   @db.Text
+  sourceArtifactId String?   // links to OutreachArtifact.id when saved from generator
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([status])
+  @@index([followUpDue])
+  @@index([createdAt])
+}

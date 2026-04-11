@@ -10,6 +10,7 @@ interface Props {
   founderPass: string;
   onRegenerate: () => void;
   onStatusChanged?: () => void;
+  onSavedToPipeline?: () => void;
 }
 
 export function OutreachResult({
@@ -18,11 +19,14 @@ export function OutreachResult({
   founderPass,
   onRegenerate,
   onStatusChanged,
+  onSavedToPipeline,
 }: Props) {
   const [editedMessage, setEditedMessage] = useState(outreach.message);
   const [copied, setCopied] = useState(false);
   const [markingSent, setMarkingSent] = useState(false);
   const [sentStatus, setSentStatus] = useState<'draft' | 'sent'>('draft');
+  const [savingPipeline, setSavingPipeline] = useState(false);
+  const [savedPipeline, setSavedPipeline] = useState(false);
 
   const handleCopy = async () => {
     try {
@@ -49,6 +53,28 @@ export function OutreachResult({
       }
     } finally {
       setMarkingSent(false);
+    }
+  };
+
+  const handleSaveToPipeline = async () => {
+    if (savingPipeline || savedPipeline) return;
+    setSavingPipeline(true);
+    try {
+      await fetch('/api/founder-hub/prospects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-founder-pass': founderPass },
+        body: JSON.stringify({
+          name: outreach.profile.name ?? 'Unknown',
+          company: outreach.profile.company ?? undefined,
+          role: outreach.profile.role ?? undefined,
+          intent: outreach.callouts.kind,
+          sourceArtifactId: artifactId ?? undefined,
+        }),
+      });
+      setSavedPipeline(true);
+      onSavedToPipeline?.();
+    } finally {
+      setSavingPipeline(false);
     }
   };
 
@@ -98,6 +124,14 @@ export function OutreachResult({
             style={sentStatus === 'sent' ? sentBtn : secondaryBtn}
           >
             {sentStatus === 'sent' ? 'Marked sent' : markingSent ? 'Marking...' : 'Mark as sent'}
+          </button>
+          <button
+            type="button"
+            onClick={handleSaveToPipeline}
+            disabled={savingPipeline || savedPipeline}
+            style={savedPipeline ? sentBtn : secondaryBtn}
+          >
+            {savedPipeline ? 'In pipeline' : savingPipeline ? 'Saving...' : 'Save to pipeline'}
           </button>
           <button type="button" onClick={onRegenerate} style={secondaryBtn}>
             Regenerate
