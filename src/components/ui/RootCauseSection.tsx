@@ -60,9 +60,17 @@ export function RootCauseSection({ analysisId, orgId }: RootCauseSectionProps) {
   const maxScore = Math.max(...attributions.map(a => Math.abs(a.contributionScore)), 0.01);
 
   return (
-    <div className={cn('p-6 rounded-xl mt-8', 'liquid-glass', 'border border-white/10')}>
-      <h2 className="text-xl font-semibold text-white mb-4">Root Cause Analysis</h2>
-      <p className="text-sm text-gray-400 mb-4">
+    <div
+      className={cn('p-6 rounded-xl mt-8', 'liquid-glass')}
+      style={{ border: '1px solid var(--border-color)' }}
+    >
+      <h2
+        className="text-xl font-semibold mb-4"
+        style={{ color: 'var(--text-primary)' }}
+      >
+        Root Cause Analysis
+      </h2>
+      <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>
         How much each detected bias contributed to the decision outcome, based on historical
         patterns and graph topology.
       </p>
@@ -80,7 +88,10 @@ export function RootCauseSection({ analysisId, orgId }: RootCauseSectionProps) {
                   ) : (
                     <TrendingUp size={12} className="text-red-400" />
                   )}
-                  <span className="text-sm font-medium text-white">
+                  <span
+                    className="text-sm font-medium"
+                    style={{ color: 'var(--text-primary)' }}
+                  >
                     {formatBiasName(attr.biasType)}
                   </span>
                   <span
@@ -105,7 +116,10 @@ export function RootCauseSection({ analysisId, orgId }: RootCauseSectionProps) {
                   {Math.round(attr.contributionScore * 100)}%
                 </span>
               </div>
-              <div className="h-2 rounded-full bg-white/5 overflow-hidden">
+              <div
+                className="h-2 rounded-full overflow-hidden"
+                style={{ background: 'var(--bg-card-hover)' }}
+              >
                 <div
                   className="h-full rounded-full transition-all duration-500"
                   style={{

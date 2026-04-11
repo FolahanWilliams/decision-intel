@@ -87,14 +87,14 @@ export function DecisionTriageWidget() {
           </h3>
         </div>
         <div className="card-body p-0">
-          <div className="divide-y divide-white/5">
+          <div className="related-decisions-list">
             {triage.decisions.map(d => {
               const RiskIcon = getRiskIcon(d.topRiskFactor);
               return (
                 <Link
                   key={d.analysisId}
                   href={`/documents/${d.documentId}`}
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 transition-colors related-decisions-row"
                 >
                   <div className={`flex-shrink-0 ${getScoreColor(d.triageScore)}`}>
                     <RiskIcon size={18} />

@@ -130,9 +130,7 @@ function ToastItem({ toast, onRemove, index }: ToastItemProps) {
                     onRemove();
                   }}
                   className={cn(
-                    'text-xs font-medium px-2 py-1 rounded',
-                    'bg-white/20 hover:bg-white/30',
-                    'transition-colors'
+                    'text-xs font-medium px-2 py-1 rounded transition-colors toast-action-btn'
                   )}
                 >
                   {toast.action.label}
@@ -145,10 +143,7 @@ function ToastItem({ toast, onRemove, index }: ToastItemProps) {
                     onRemove();
                   }}
                   className={cn(
-                    'inline-flex items-center gap-1',
-                    'text-xs font-medium px-2 py-1 rounded',
-                    'bg-white/20 hover:bg-white/30',
-                    'transition-colors'
+                    'inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded transition-colors toast-action-btn'
                   )}
                 >
                   <Undo className="w-3 h-3" />
@@ -165,8 +160,7 @@ function ToastItem({ toast, onRemove, index }: ToastItemProps) {
         onClick={onRemove}
         className={cn(
           'absolute top-3 right-3',
-          'p-1 rounded-md',
-          'hover:bg-white/20 transition-colors'
+          'p-1 rounded-md transition-colors toast-action-btn'
         )}
         aria-label="Close notification"
       >
@@ -175,7 +169,10 @@ function ToastItem({ toast, onRemove, index }: ToastItemProps) {
 
       {/* Progress bar */}
       {toast.progress && !toast.persistent && toast.duration && (
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10 rounded-b-lg overflow-hidden">
+        <div
+          className="absolute bottom-0 left-0 right-0 h-1 rounded-b-lg overflow-hidden"
+          style={{ background: 'var(--bg-card-hover)' }}
+        >
           <motion.div
             className="h-full bg-current opacity-50"
             initial={{ width: '100%' }}
