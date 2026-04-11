@@ -254,7 +254,9 @@ function SearchResults({
 const FOUNDER_PASS = process.env.NEXT_PUBLIC_FOUNDER_HUB_PASS || '';
 
 export default function FounderHubPage() {
-  const [activeTab, setActiveTab] = useState<TabId>('meeting_prep');
+  // Default to Product Overview — Meeting Prep is time-sensitive and goes
+  // stale after each investor meeting. Use the tab strip to switch.
+  const [activeTab, setActiveTab] = useState<TabId>('overview');
   const [unlocked, setUnlocked] = useState(false);
   const [passInput, setPassInput] = useState('');
   const [passError, setPassError] = useState(false);

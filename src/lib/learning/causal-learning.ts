@@ -53,42 +53,43 @@ export interface OrgCausalProfile {
 
 // ─── New API (test-aligned) ─────────────────────────────────────────────────
 
-type BiasRecord = Record<string, { score: number; instances: unknown[] }>;
-
 interface OutcomeRecord {
   id: string;
   analysisId: string;
   outcome: string;
-  actualValue?: number | null;
+  impactScore?: number | null;
   analysis: {
-    biases: BiasRecord;
+    biases: Array<{ biasType: string; severity: string }>;
     document?: { documentType?: string | null; deal?: { sector?: string | null } | null } | null;
   };
 }
 
 /**
- * Compute org-specific causal weights from outcome records.
+ * Compute org/user-specific causal weights from outcome records.
  *
- * Each outcome record carries a `biases` object keyed by bias type.
- * Computes per-bias success rate vs baseline to derive correlation
- * and danger multiplier.
+ * Queries `DecisionOutcome` rows for the given scope. When `scope` (orgId or
+ * userId) is missing returns empty. Computes per-bias success rate vs
+ * baseline to derive correlation and danger multiplier.
+ *
+ * NOTE: This previously pointed at a non-existent `prisma.outcomeRecord` via
+ * an unsafe cast, which meant the causal-learning moat was silently disabled
+ * in production. Fixed to use the real `prisma.decisionOutcome` model and
+ * the correct `BiasInstance[]` shape for `analysis.biases`.
  */
 export async function computeOrgCausalWeights(
-  orgId: string,
+  scope: string,
   from?: Date,
   to?: Date
 ): Promise<CausalWeight[]> {
+  if (!scope) return [];
   try {
-    const outcomes: OutcomeRecord[] = await (
-      prisma as unknown as {
-        outcomeRecord: { findMany: (args: unknown) => Promise<OutcomeRecord[]> };
-      }
-    ).outcomeRecord.findMany({
+    // scope can be an orgId (preferred) or a userId when no org is attached.
+    const outcomes: OutcomeRecord[] = await prisma.decisionOutcome.findMany({
       where: {
-        orgId,
+        OR: [{ orgId: scope }, { userId: scope }],
         ...(from || to
           ? {
-              createdAt: {
+              reportedAt: {
                 ...(from && { gte: from }),
                 ...(to && { lte: to }),
               },
@@ -98,6 +99,7 @@ export async function computeOrgCausalWeights(
       include: {
         analysis: {
           include: {
+            biases: { select: { biasType: true, severity: true } },
             document: {
               select: { documentType: true, deal: { select: { sector: true } } },
             },
@@ -116,13 +118,18 @@ export async function computeOrgCausalWeights(
     const baseSuccessRate = totalSuccesses / totalOutcomes;
     const baseFailureRate = 1 - baseSuccessRate;
 
-    // Accumulate per-bias statistics
+    // Accumulate per-bias statistics. biases is a BiasInstance[] array — each
+    // bias type may appear multiple times per analysis, so dedupe per-outcome.
     const biasStats = new Map<string, { failures: number; successes: number; partials: number }>();
+    const biasTypesForOutcome = (o: OutcomeRecord): string[] => {
+      const biases = o.analysis?.biases;
+      if (!Array.isArray(biases) || biases.length === 0) return [];
+      return Array.from(new Set(biases.map(b => b.biasType).filter(Boolean)));
+    };
 
     for (const outcome of outcomesList) {
-      const biases = outcome.analysis?.biases;
-      if (!biases || typeof biases !== 'object') continue;
-      const biasTypes = Object.keys(biases);
+      const biasTypes = biasTypesForOutcome(outcome);
+      if (biasTypes.length === 0) continue;
 
       for (const biasType of biasTypes) {
         const stats = biasStats.get(biasType) ?? { failures: 0, successes: 0, partials: 0 };
@@ -188,9 +195,8 @@ export async function computeOrgCausalWeights(
           let biasTotalInStratum = 0;
 
           for (const o of stratumOutcomes) {
-            const biases = o.analysis?.biases;
-            if (!biases || typeof biases !== 'object') continue;
-            if (!Object.keys(biases).includes(biasType)) continue;
+            const biasTypesInOutcome = biasTypesForOutcome(o);
+            if (!biasTypesInOutcome.includes(biasType)) continue;
             biasTotalInStratum++;
             if (o.outcome === 'success') biasSuccInStratum++;
             if (o.outcome === 'failure') biasFailInStratum++;
@@ -251,11 +257,11 @@ export async function computeOrgCausalWeights(
     // --- Pairwise interaction detection ---
     const biasTypesList = Array.from(biasStats.keys());
     const outcomeBiasSets = outcomesList
-      .filter(o => o.analysis?.biases && typeof o.analysis.biases === 'object')
       .map(o => ({
-        biasTypes: new Set(Object.keys(o.analysis!.biases as object)),
+        biasTypes: new Set(biasTypesForOutcome(o)),
         outcome: o.outcome,
-      }));
+      }))
+      .filter(entry => entry.biasTypes.size > 0);
 
     for (let i = 0; i < biasTypesList.length; i++) {
       for (let j = i + 1; j < biasTypesList.length; j++) {
@@ -445,17 +451,12 @@ export function getCausalInsights(weights: CausalWeight[], totalOutcomes: number
  * Recompute and persist the causal model for an org.
  */
 export async function updateCausalModel(orgId: string): Promise<unknown | null> {
+  if (!orgId) return null;
   try {
     const weights = await computeOrgCausalWeights(orgId);
-    const outcomes = await (
-      prisma as unknown as {
-        outcomeRecord: { findMany: (args: unknown) => Promise<OutcomeRecord[]> };
-      }
-    ).outcomeRecord.findMany({
+    const totalOutcomes = await prisma.decisionOutcome.count({
       where: { orgId },
-      include: { analysis: true },
     });
-    const totalOutcomes = outcomes.length;
     const insights = getCausalInsights(weights, totalOutcomes);
 
     const weightsJson = JSON.parse(JSON.stringify(weights));

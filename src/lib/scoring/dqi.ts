@@ -596,13 +596,23 @@ export function computeSyntheticDQI(c: CaseStudy): number {
   // Compliance (15%): neutral estimate
   const complianceScore = 60;
 
-  // Weighted total (same weights as DQI)
+  // Synthetic DQI re-uses the canonical WEIGHTS constant so historical
+  // percentiles stay calibrated against the same methodology as live scores.
+  // historicalAlignment is excluded (can't recurse), so the remaining five
+  // weights are renormalised to sum to 1.0.
+  const denom =
+    WEIGHTS.biasLoad +
+    WEIGHTS.noiseLevel +
+    WEIGHTS.evidenceQuality +
+    WEIGHTS.processMaturity +
+    WEIGHTS.complianceRisk;
   const syntheticDQI =
-    biasScore * 0.3 +
-    noiseScore * 0.2 +
-    evidenceScore * 0.2 +
-    processScore * 0.15 +
-    complianceScore * 0.15;
+    (biasScore * WEIGHTS.biasLoad +
+      noiseScore * WEIGHTS.noiseLevel +
+      evidenceScore * WEIGHTS.evidenceQuality +
+      processScore * WEIGHTS.processMaturity +
+      complianceScore * WEIGHTS.complianceRisk) /
+    denom;
 
   return Math.round(Math.max(0, Math.min(100, syntheticDQI)));
 }

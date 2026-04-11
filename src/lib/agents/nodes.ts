@@ -1253,9 +1253,17 @@ export async function simulationNode(state: AuditState): Promise<Partial<AuditSt
       } else {
         log.info('No custom personas found — AI will generate document-specific personas');
       }
-    } catch {
+    } catch (personaErr) {
       // Schema drift — BoardroomPersona table may not exist yet
-      log.warn('Custom persona lookup failed (schema drift) — AI will generate personas');
+      const code = (personaErr as { code?: string })?.code;
+      if (code === 'P2021' || code === 'P2022') {
+        log.warn('BoardroomPersona schema drift — AI will generate personas');
+      } else {
+        log.warn(
+          'Custom persona lookup failed — AI will generate personas:',
+          personaErr instanceof Error ? personaErr.message : String(personaErr)
+        );
+      }
     }
 
     // Step 2: RAG vector search WITH outcome data (self-improving loop)
@@ -1943,8 +1951,16 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
         );
       }
     }
-  } catch {
-    log.debug('Bayesian priors unavailable — continuing without prior integration');
+  } catch (bayesErr) {
+    const code = (bayesErr as { code?: string })?.code;
+    if (code === 'P2021' || code === 'P2022') {
+      log.debug('DecisionPrior schema drift — continuing without prior integration');
+    } else {
+      log.debug(
+        'Bayesian priors unavailable — continuing without prior integration:',
+        bayesErr instanceof Error ? bayesErr.message : String(bayesErr)
+      );
+    }
   }
 
   // 2. Noise Penalty (StdDev * 5)
@@ -2050,8 +2066,15 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
         ? { orgId: effectiveOrgId, outcome: { in: ['success', 'partial_success', 'failure'] } }
         : { userId: state.userId, outcome: { in: ['success', 'partial_success', 'failure'] } },
     });
-  } catch {
+  } catch (calErr) {
     // DecisionOutcome table may not exist — treat as cold start
+    const code = (calErr as { code?: string })?.code;
+    if (code !== 'P2021' && code !== 'P2022') {
+      log.debug(
+        'Calibration sample count failed (non-fatal):',
+        calErr instanceof Error ? calErr.message : String(calErr)
+      );
+    }
   }
   const calibrationSource: 'causal' | 'default' =
     causalWeightsForReport.length > 0 ? 'causal' : 'default';

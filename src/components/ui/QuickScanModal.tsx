@@ -275,7 +275,7 @@ export function QuickScanModal({ open, onClose }: QuickScanModalProps) {
                   const colors = SEVERITY_COLORS[bias.severity] || SEVERITY_COLORS.medium;
                   return (
                     <div
-                      key={i}
+                      key={`${bias.type}-${i}`}
                       style={{
                         padding: '10px 14px',
                         borderRadius: 'var(--radius-md)',

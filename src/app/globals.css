@@ -1212,6 +1212,28 @@ tr:hover td {
   overflow: hidden;
 }
 
+/* Toast action buttons — theme-aware neutral tint that works on both the
+   dark liquid-glass backdrop and any severity-tinted variant in light mode. */
+.toast-action-btn {
+  background: var(--bg-card-hover);
+  color: inherit;
+}
+.toast-action-btn:hover {
+  background: var(--bg-elevated);
+}
+
+/* Related-decisions card — theme-aware hover/divider replacements for the
+   old hardcoded `bg-white/5` and `divide-white/5` classes. */
+.related-decisions-toggle:hover {
+  background: var(--bg-card-hover);
+}
+.related-decisions-row:hover {
+  background: var(--bg-card-hover);
+}
+.related-decisions-list > * + * {
+  border-top: 1px solid var(--border-color);
+}
+
 .liquid-glass:hover {
   border-color: var(--liquid-border-hover);
   box-shadow: var(--liquid-shadow-hover);

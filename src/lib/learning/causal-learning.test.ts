@@ -17,8 +17,9 @@ import { prisma } from '@/lib/prisma';
 // Mock dependencies
 vi.mock('@/lib/prisma', () => ({
   prisma: {
-    outcomeRecord: {
+    decisionOutcome: {
       findMany: vi.fn(),
+      count: vi.fn(),
       create: vi.fn(),
     },
     analysis: {
@@ -31,6 +32,12 @@ vi.mock('@/lib/prisma', () => ({
     $transaction: vi.fn(),
   },
 }));
+
+// Helper: convert the old `{ biasName: { score } }` fixture shape into the
+// real Prisma shape `BiasInstance[]`. Keeps the existing fixtures readable
+// while matching the schema the production code now uses.
+const biasArr = (biases: Record<string, unknown>) =>
+  Object.keys(biases).map(biasType => ({ biasType, severity: 'medium' }));
 
 vi.mock('@/lib/utils/logger', () => ({
   createLogger: () => ({
@@ -86,7 +93,8 @@ describe('Causal Learning Service', () => {
         },
       ];
 
-      vi.mocked((prisma as any).outcomeRecord.findMany).mockResolvedValue(mockOutcomes as any);
+      const mapped = mockOutcomes.map(o => ({ ...o, analysis: { ...o.analysis, biases: biasArr(o.analysis.biases as Record<string, unknown>) } }));
+      vi.mocked((prisma as any).decisionOutcome.findMany).mockResolvedValue(mapped as any);
 
       const result = await computeOrgCausalWeights('org_123');
 
@@ -105,7 +113,7 @@ describe('Causal Learning Service', () => {
     });
 
     it('should handle empty outcome data', async () => {
-      vi.mocked((prisma as any).outcomeRecord.findMany).mockResolvedValue([]);
+      vi.mocked((prisma as any).decisionOutcome.findMany).mockResolvedValue([]);
 
       const result = await computeOrgCausalWeights('org_123');
 
@@ -149,7 +157,8 @@ describe('Causal Learning Service', () => {
         },
       ];
 
-      vi.mocked((prisma as any).outcomeRecord.findMany).mockResolvedValue(mockOutcomes as any);
+      const mapped = mockOutcomes.map(o => ({ ...o, analysis: { ...o.analysis, biases: biasArr(o.analysis.biases as Record<string, unknown>) } }));
+      vi.mocked((prisma as any).decisionOutcome.findMany).mockResolvedValue(mapped as any);
 
       const result = await computeOrgCausalWeights('org_123');
 
@@ -161,13 +170,14 @@ describe('Causal Learning Service', () => {
     it('should filter by date range', async () => {
       const from = new Date('2024-01-01');
       const to = new Date('2024-12-31');
+      vi.mocked((prisma as any).decisionOutcome.findMany).mockResolvedValue([] as any);
 
       await computeOrgCausalWeights('org_123', from, to);
 
-      expect((prisma as any).outcomeRecord.findMany).toHaveBeenCalledWith({
+      expect((prisma as any).decisionOutcome.findMany).toHaveBeenCalledWith({
         where: {
-          orgId: 'org_123',
-          createdAt: {
+          OR: [{ orgId: 'org_123' }, { userId: 'org_123' }],
+          reportedAt: {
             gte: from,
             lte: to,
           },
@@ -175,6 +185,7 @@ describe('Causal Learning Service', () => {
         include: {
           analysis: {
             include: {
+              biases: { select: { biasType: true, severity: true } },
               document: {
                 select: { documentType: true, deal: { select: { sector: true } } },
               },
@@ -371,7 +382,9 @@ describe('Causal Learning Service', () => {
         },
       ];
 
-      vi.mocked((prisma as any).outcomeRecord.findMany).mockResolvedValue(mockOutcomes as any);
+      const mapped = mockOutcomes.map(o => ({ ...o, analysis: { ...o.analysis, biases: biasArr(o.analysis.biases as Record<string, unknown>) } }));
+      vi.mocked((prisma as any).decisionOutcome.findMany).mockResolvedValue(mapped as any);
+      vi.mocked((prisma as any).decisionOutcome.count).mockResolvedValue(mapped.length as any);
       vi.mocked((prisma as any).orgCausalModel.upsert).mockResolvedValue({
         id: 'model_1',
         orgId: 'org_123',
@@ -401,7 +414,10 @@ describe('Causal Learning Service', () => {
     });
 
     it('should handle errors gracefully', async () => {
-      vi.mocked((prisma as any).outcomeRecord.findMany).mockRejectedValue(
+      vi.mocked((prisma as any).decisionOutcome.findMany).mockRejectedValue(
+        new Error('Database error')
+      );
+      vi.mocked((prisma as any).decisionOutcome.count).mockRejectedValue(
         new Error('Database error')
       );
 
@@ -439,7 +455,8 @@ describe('Causal Learning Service', () => {
         },
       ];
 
-      vi.mocked((prisma as any).outcomeRecord.findMany).mockResolvedValue(mockOutcomes as any);
+      const mapped = mockOutcomes.map(o => ({ ...o, analysis: { ...o.analysis, biases: biasArr(o.analysis.biases as Record<string, unknown>) } }));
+      vi.mocked((prisma as any).decisionOutcome.findMany).mockResolvedValue(mapped as any);
 
       const weights = await computeOrgCausalWeights('org_123');
       const insights = getCausalInsights(weights, 2);

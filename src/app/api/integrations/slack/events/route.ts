@@ -488,37 +488,40 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ ok: true });
       }
 
-      // Deduplicate
+      // Deduplicate. Rely on the DB's `contentHash @unique` constraint rather
+      // than a check-then-insert (which has a TOCTOU race between concurrent
+      // Slack deliveries of the same message).
       const contentHash = crypto.createHash('sha256').update(decisionInput.content).digest('hex');
-
-      const existing = await prisma.humanDecision.findUnique({
-        where: { contentHash },
-        select: { id: true },
-      });
-
-      if (existing) {
-        return NextResponse.json({ ok: true, deduplicated: true });
-      }
 
       // Use installation context or fall back to legacy env vars
       const userId =
         installation?.installedByUserId || process.env.SLACK_SYSTEM_USER_ID || 'system-slack';
       const orgId = installation?.orgId || teamId;
 
-      const humanDecision = await prisma.humanDecision.create({
-        data: {
-          userId,
-          orgId,
-          source: 'slack',
-          sourceRef: decisionInput.sourceRef,
-          channel: decisionInput.channel,
-          decisionType: decisionInput.decisionType,
-          participants: toPrismaStringArray(decisionInput.participants),
-          content: decisionInput.content,
-          contentHash,
-          status: 'pending',
-        },
-      });
+      let humanDecision;
+      try {
+        humanDecision = await prisma.humanDecision.create({
+          data: {
+            userId,
+            orgId,
+            source: 'slack',
+            sourceRef: decisionInput.sourceRef,
+            channel: decisionInput.channel,
+            decisionType: decisionInput.decisionType,
+            participants: toPrismaStringArray(decisionInput.participants),
+            content: decisionInput.content,
+            contentHash,
+            status: 'pending',
+          },
+        });
+      } catch (createErr) {
+        // P2002 = unique constraint violation → dedupe hit
+        const code = (createErr as { code?: string })?.code;
+        if (code === 'P2002') {
+          return NextResponse.json({ ok: true, deduplicated: true });
+        }
+        throw createErr;
+      }
 
       // Run audit in background (don't block Slack's 3-second timeout)
       processSlackDecision(

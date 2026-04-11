@@ -123,7 +123,8 @@ export function RelatedDecisions({ analysisId }: RelatedDecisionsProps) {
       <button
         onClick={() => setExpanded(!expanded)}
         aria-expanded={expanded}
-        className="card-header w-full flex items-center justify-between hover:bg-white/5 transition-colors"
+        aria-label={expanded ? 'Collapse related decisions' : 'Expand related decisions'}
+        className="card-header w-full flex items-center justify-between transition-colors related-decisions-toggle"
       >
         <h3 className="flex items-center gap-2 text-sm font-semibold">
           <GitBranch size={16} className="text-blue-400" />
@@ -140,7 +141,7 @@ export function RelatedDecisions({ analysisId }: RelatedDecisionsProps) {
       </button>
 
       {expanded && (
-        <div className="divide-y divide-white/5">
+        <div className="related-decisions-list">
           {connectedNodes.slice(0, 10).map(node => {
             // Find the edge connecting this node
             const edge = connectedEdges.find(
@@ -154,7 +155,7 @@ export function RelatedDecisions({ analysisId }: RelatedDecisionsProps) {
               <Link
                 key={node.id}
                 href={node.type === 'analysis' ? `/documents/${node.id}` : '#'}
-                className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors"
+                className="flex items-center gap-3 px-4 py-3 transition-colors related-decisions-row"
               >
                 <div className="flex-1 min-w-0">
                   <div className="text-sm text-zinc-200 truncate">{node.label}</div>
