@@ -78,6 +78,7 @@ const BiasNetwork = dynamic(
 );
 import { ShareModal } from '@/components/ui/ShareModal';
 import { Share2, ShieldCheck } from 'lucide-react';
+import { ScoreReveal } from '@/components/ui/ScoreReveal';
 
 // Lazy-loaded tab components
 const OverviewTab = lazy(() =>
@@ -841,36 +842,16 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           </div>
 
           <div className="flex items-center gap-md">
-            {/* Prominent score display */}
+            {/* Prominent score display — animated reveal when arriving from a fresh analysis */}
             {analysis && (
-              <div style={{ textAlign: 'center', marginRight: '8px' }}>
-                <div
-                  style={{
-                    fontSize: '10px',
-                    color: 'var(--text-muted)',
-                    fontWeight: 500,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                  }}
-                >
-                  Score
-                </div>
-                <div
-                  style={{
-                    fontSize: '36px',
-                    fontWeight: 700,
-                    lineHeight: 1,
-                    fontFamily: "'JetBrains Mono', monospace",
-                    color:
-                      analysis.overallScore >= 70
-                        ? '#22c55e'
-                        : analysis.overallScore >= 40
-                          ? '#f59e0b'
-                          : '#ef4444',
-                  }}
-                >
-                  {Math.round(analysis.overallScore)}
-                </div>
+              <div style={{ marginRight: '8px' }}>
+                <ScoreReveal
+                  score={analysis.overallScore}
+                  label="DQI Score"
+                  showGrade
+                  duration={1200}
+                  suspenseMs={searchParams.get('fresh') === '1' ? 800 : 0}
+                />
               </div>
             )}
 
