@@ -123,6 +123,13 @@ const OutreachAndMeetingsTab = dynamic(
     })),
   { loading: tabLoader }
 );
+const FounderSchoolTab = dynamic(
+  () =>
+    import('@/components/founder-hub/FounderSchoolTab').then(m => ({
+      default: m.FounderSchoolTab,
+    })),
+  { loading: tabLoader }
+);
 import {
   Rocket,
   Brain,
@@ -137,6 +144,7 @@ import {
   X,
   Library,
   Lightbulb,
+  GraduationCap,
 } from 'lucide-react';
 import { card } from '@/components/founder-hub/shared-styles';
 import { AccordionSection } from '@/components/founder-hub/AccordionSection';
@@ -153,7 +161,8 @@ type TabId =
   | 'content'
   | 'data_ecosystem'
   | 'case_library'
-  | 'founder_tips';
+  | 'founder_tips'
+  | 'founder_school';
 
 type TabGroup = 'Product' | 'Go-to-Market' | 'Intelligence' | 'Tools';
 
@@ -191,6 +200,7 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
   { id: 'case_library', label: 'Case Library', icon: <Library size={16} />, group: 'Intelligence' },
   // Tools
   { id: 'founder_tips', label: 'Founder Tips', icon: <Lightbulb size={16} />, group: 'Tools' },
+  { id: 'founder_school', label: 'Founder School', icon: <GraduationCap size={16} />, group: 'Tools' },
 ];
 
 const TAB_GROUPS: TabGroup[] = ['Product', 'Go-to-Market', 'Intelligence', 'Tools'];
@@ -490,6 +500,11 @@ export default function FounderHubPage() {
     founder_tips: (
       <ErrorBoundary sectionName="Founder Tips">
         <FounderTipsTab />
+      </ErrorBoundary>
+    ),
+    founder_school: (
+      <ErrorBoundary sectionName="Founder School">
+        <FounderSchoolTab founderPass={FOUNDER_PASS} />
       </ErrorBoundary>
     ),
   };
