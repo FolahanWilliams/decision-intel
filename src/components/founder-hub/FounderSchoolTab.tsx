@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { BookOpen, CheckCircle, Circle, ChevronRight, ChevronLeft, Loader2, ExternalLink, GraduationCap } from 'lucide-react';
 import { TRACKS, getProgress, type Track, type Lesson } from '@/lib/data/founder-school/lessons';
 
@@ -372,16 +372,14 @@ const navBtn: React.CSSProperties = {
 // ─── Main Tab ─────────────────────────────────────────────────────────────────
 
 export function FounderSchoolTab({ founderPass }: FounderSchoolTabProps) {
-  const [completed, setCompleted] = useState<string[]>([]);
-  const [selectedTrackId, setSelectedTrackId] = useState(TRACKS[0].id);
-  const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
-
-  useEffect(() => {
+  const [completed, setCompleted] = useState<string[]>(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setCompleted(JSON.parse(raw));
-    } catch { /* ignore */ }
-  }, []);
+      return raw ? JSON.parse(raw) : [];
+    } catch { return []; }
+  });
+  const [selectedTrackId, setSelectedTrackId] = useState(TRACKS[0].id);
+  const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
 
   const toggleComplete = useCallback((id: string) => {
     setCompleted(prev => {

@@ -39,7 +39,7 @@ export function TractionCounters() {
         className="relative bg-white/50 backdrop-blur-sm border border-slate-200 rounded-2xl overflow-hidden shadow-sm"
       >
         <div className="grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-slate-200">
-          {metrics.map((m, idx) => (
+          {metrics.map((m, _idx) => (
             <div
               key={m.label}
               className="px-8 py-10 flex flex-col items-center justify-center text-center hover:bg-slate-50/50 transition-colors"

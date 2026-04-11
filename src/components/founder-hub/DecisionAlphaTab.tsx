@@ -477,7 +477,7 @@ export function DecisionAlphaTab() {
         </div>
 
         {/* Leaderboard Rows */}
-        {leaderboard.map((analysis, idx) => {
+        {leaderboard.map((analysis, _idx) => {
           const isExpanded = expandedId === analysis.id;
           return (
             <div key={analysis.id}>

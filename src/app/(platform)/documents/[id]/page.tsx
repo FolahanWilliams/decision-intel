@@ -2066,7 +2066,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                     aria-label="Detected biases"
                   >
                     {biases.length > 0 ? (
-                      biases.map((bias, idx) => (
+                      biases.map((bias, _idx) => (
                         <div
                           key={bias.id}
                           role="listitem"

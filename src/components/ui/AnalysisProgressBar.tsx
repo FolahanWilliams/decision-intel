@@ -218,7 +218,7 @@ function useDerivedNodeStates(activeAnalysis: ActiveAnalysis | null) {
     }
 
     prevStepRef.current = currentStep;
-  }, [activeAnalysis?.currentStep, activeAnalysis?.status, updateNodeState]);
+  }, [activeAnalysis, updateNodeState]);
 }
 
 /** Map SSE step names to pipeline node labels */
