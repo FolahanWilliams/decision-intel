@@ -81,18 +81,30 @@ export function AnalysisProgressProvider({ children }: { children: ReactNode }) 
   }, []);
 
   const completeTracking = useCallback((documentId: string) => {
+    // Suspense pause: let the final pipeline node linger at 100% progress
+    // before flipping to the completion state — this is where the "wow" happens.
+    // The backend result is already in hand; this is pure UX pacing.
+    const SUSPENSE_MS = 1200;
+
     setActiveAnalysis(prev => {
       if (!prev || prev.documentId !== documentId) return prev;
-      return { ...prev, progress: 100, currentStep: 'Analysis complete', status: 'complete' };
+      return { ...prev, progress: 100, currentStep: 'Scoring decision quality...' };
     });
-    // Auto-dismiss after 8 seconds (outside the setState updater)
+
     if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current);
     dismissTimerRef.current = setTimeout(() => {
-      setActiveAnalysis(current =>
-        current?.documentId === documentId && current.status === 'complete' ? null : current
-      );
-      dismissTimerRef.current = null;
-    }, 8000);
+      setActiveAnalysis(current => {
+        if (!current || current.documentId !== documentId) return current;
+        return { ...current, currentStep: 'Analysis complete', status: 'complete' };
+      });
+      // Auto-dismiss after 14s of visible completion state
+      dismissTimerRef.current = setTimeout(() => {
+        setActiveAnalysis(current =>
+          current?.documentId === documentId && current.status === 'complete' ? null : current
+        );
+        dismissTimerRef.current = null;
+      }, 14_000);
+    }, SUSPENSE_MS);
   }, []);
 
   const errorTracking = useCallback(() => {
@@ -397,8 +409,56 @@ export function AnalysisProgressFloat() {
             <span>{activeAnalysis.currentStep}</span>
             <span>{Math.round(activeAnalysis.progress)}%</span>
           </div>
+
+          {isComplete && (
+            <div
+              style={{
+                display: 'flex',
+                gap: 6,
+                marginTop: 10,
+                paddingTop: 10,
+                borderTop: '1px solid var(--border-color)',
+              }}
+            >
+              <Link
+                href={`/documents/${activeAnalysis.documentId}`}
+                style={endStateActionStyle('primary')}
+              >
+                View report
+              </Link>
+              <Link
+                href={`/documents/${activeAnalysis.documentId}?tab=counterfactual`}
+                style={endStateActionStyle('secondary')}
+              >
+                Run counterfactual
+              </Link>
+              <button
+                type="button"
+                onClick={dismiss}
+                style={endStateActionStyle('secondary')}
+                aria-label="Upload another"
+              >
+                Upload another
+              </button>
+            </div>
+          )}
         </>
       )}
     </div>
   );
 }
+
+const endStateActionStyle = (kind: 'primary' | 'secondary'): React.CSSProperties => ({
+  flex: 1,
+  padding: '6px 10px',
+  borderRadius: 'var(--radius-sm)',
+  border: kind === 'primary' ? 'none' : '1px solid var(--border-color)',
+  background: kind === 'primary' ? 'var(--accent-primary)' : 'transparent',
+  color: kind === 'primary' ? '#fff' : 'var(--text-primary)',
+  fontSize: 11,
+  fontWeight: 600,
+  cursor: 'pointer',
+  textAlign: 'center',
+  textDecoration: 'none',
+  whiteSpace: 'nowrap',
+});
