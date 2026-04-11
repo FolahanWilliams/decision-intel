@@ -8,6 +8,7 @@ import { CaseStudyPicker } from './content-studio/CaseStudyPicker';
 import { CaseStudyAnalyzer } from './content-studio/CaseStudyAnalyzer';
 import { ContentOpportunities } from './content-studio/ContentOpportunities';
 import { WeeklyBrief } from './content-studio/WeeklyBrief';
+import { ContentPerformanceWidget } from './content-studio/ContentPerformanceWidget';
 import type { CaseStudy } from '@/lib/data/case-studies/types';
 
 const STORAGE_KEY = 'founder-content-studio-voice';
@@ -206,6 +207,8 @@ export function ContentStudioTab({ founderPass }: ContentStudioTabProps) {
         onRefresh={fetchLibrary}
         loading={libraryLoading}
       />
+
+      <ContentPerformanceWidget />
     </div>
   );
 }
