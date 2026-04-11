@@ -6,6 +6,7 @@ import { ContentGenerator } from './content-studio/ContentGenerator';
 import { ContentLibrary } from './content-studio/ContentLibrary';
 import { CaseStudyPicker } from './content-studio/CaseStudyPicker';
 import { CaseStudyAnalyzer } from './content-studio/CaseStudyAnalyzer';
+import { ContentOpportunities } from './content-studio/ContentOpportunities';
 import type { CaseStudy } from '@/lib/data/case-studies/types';
 
 const STORAGE_KEY = 'founder-content-studio-voice';
@@ -132,8 +133,22 @@ export function ContentStudioTab({ founderPass }: ContentStudioTabProps) {
     [founderPass, contentType, pillar, topic, tone, fetchLibrary]
   );
 
+  const handleDraft = useCallback(
+    (draftType: string, draftTopic: string) => {
+      setContentType(draftType);
+      setTopic(draftTopic);
+      setGeneratedContent('');
+      setTimeout(() => {
+        document.getElementById('content-generator-anchor')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 50);
+    },
+    []
+  );
+
   return (
     <div>
+      <ContentOpportunities founderPass={founderPass} onDraft={handleDraft} />
+
       <VoiceConfig
         tone={tone}
         setTone={setTone}
@@ -143,6 +158,7 @@ export function ContentStudioTab({ founderPass }: ContentStudioTabProps) {
         setIsOpen={setVoiceOpen}
       />
 
+      <div id="content-generator-anchor" />
       <ContentGenerator
         founderPass={founderPass}
         contentType={contentType}
