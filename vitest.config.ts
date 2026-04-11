@@ -1,6 +1,6 @@
 import path from 'path';
 
-export default {
+const vitestConfig = {
   test: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -21,3 +21,5 @@ export default {
     },
   },
 };
+
+export default vitestConfig;

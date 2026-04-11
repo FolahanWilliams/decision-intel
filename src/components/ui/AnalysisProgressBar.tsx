@@ -218,7 +218,7 @@ function useDerivedNodeStates(activeAnalysis: ActiveAnalysis | null) {
     }
 
     prevStepRef.current = currentStep;
-  }, [activeAnalysis?.currentStep, activeAnalysis?.status, updateNodeState]);
+  }, [activeAnalysis, updateNodeState]);
 }
 
 /** Map SSE step names to pipeline node labels */
@@ -248,6 +248,21 @@ function findPipelineLabel(stepName: string): string | null {
 export function AnalysisProgressFloat() {
   const { activeAnalysis, dismiss } = useAnalysisProgress();
   const [expanded, setExpanded] = usePipelineExpanded();
+
+  // Auto-expand the pipeline graph whenever a new analysis begins so the
+  // visual pipeline is immediately visible in demos and first-time use.
+  const prevDocIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (activeAnalysis?.documentId && activeAnalysis.documentId !== prevDocIdRef.current) {
+      prevDocIdRef.current = activeAnalysis.documentId;
+      if (activeAnalysis.status === 'analyzing') {
+        setExpanded(true);
+      }
+    }
+    if (!activeAnalysis) {
+      prevDocIdRef.current = null;
+    }
+  }, [activeAnalysis, setExpanded]);
 
   // Derive node states from step progression
   useDerivedNodeStates(activeAnalysis);
@@ -318,7 +333,7 @@ export function AnalysisProgressFloat() {
           <span style={{ fontWeight: 500 }}>
             {isComplete ? (
               <Link
-                href={`/documents/${activeAnalysis.documentId}`}
+                href={`/documents/${activeAnalysis.documentId}?fresh=1`}
                 style={{ color: 'var(--accent-primary)', textDecoration: 'none' }}
               >
                 {activeAnalysis.filename}
@@ -421,7 +436,7 @@ export function AnalysisProgressFloat() {
               }}
             >
               <Link
-                href={`/documents/${activeAnalysis.documentId}`}
+                href={`/documents/${activeAnalysis.documentId}?fresh=1`}
                 style={endStateActionStyle('primary')}
               >
                 View report

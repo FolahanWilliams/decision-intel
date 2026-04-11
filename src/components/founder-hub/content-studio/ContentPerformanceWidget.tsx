@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { TrendingUp, Plus, Trash2, BarChart2 } from 'lucide-react';
 
 const STORAGE_KEY = 'founder-content-performance';
@@ -71,16 +71,14 @@ const emptyForm = {
 };
 
 export function ContentPerformanceWidget() {
-  const [entries, setEntries] = useState<PerformanceEntry[]>([]);
-  const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState(emptyForm);
-
-  useEffect(() => {
+  const [entries, setEntries] = useState<PerformanceEntry[]>(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setEntries(JSON.parse(raw));
-    } catch { /* ignore */ }
-  }, []);
+      return raw ? JSON.parse(raw) : [];
+    } catch { return []; }
+  });
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState(emptyForm);
 
   const save = useCallback((next: PerformanceEntry[]) => {
     setEntries(next);

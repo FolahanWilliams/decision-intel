@@ -125,7 +125,7 @@ export function CorrelationCausalTab() {
           Dangerous Bias Pairs
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {topPairs.map((pair, i) => (
+          {topPairs.map((pair, _i) => (
             <div
               key={`${pair.biasA}-${pair.biasB}`}
               style={{
