@@ -176,11 +176,11 @@ export default function DemoPage() {
   }, [showResults]);
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
-      {/* Header — matches the marketing site's white nav (not the old dark bar) */}
-      <div className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 sticky top-0 z-50">
-        <div className="max-w-[960px] mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 no-underline text-inherit">
+    <div style={{ minHeight: '100vh', background: '#0A0F1A', color: '#E2E8F0' }}>
+      {/* Header */}
+      <div style={{ background: '#0F172A', borderBottom: '1px solid #1E293B', padding: '12px 24px', position: 'sticky', top: 0, zIndex: 50 }}>
+        <div style={{ maxWidth: 960, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', color: 'inherit' }}>
             <Image
               src="/logo.png"
               alt="Decision Intel"
@@ -188,23 +188,23 @@ export default function DemoPage() {
               height={24}
               style={{ borderRadius: 6, objectFit: 'cover' }}
             />
-            <span className="text-sm font-semibold">
-              <span className="text-slate-900">Decision</span>
-              <span className="text-slate-400 ml-1">Intel</span>
+            <span style={{ fontSize: 14, fontWeight: 600 }}>
+              <span style={{ color: '#E2E8F0' }}>Decision</span>
+              <span style={{ color: '#64748B', marginLeft: 4 }}>Intel</span>
             </span>
           </Link>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <span className="hidden sm:inline text-[11px] px-2.5 py-1 rounded-full bg-green-50 text-green-600 font-semibold tracking-wide border border-green-100">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: 11, padding: '4px 10px', borderRadius: 9999, background: 'rgba(22, 163, 74, 0.1)', color: '#16A34A', fontWeight: 700, letterSpacing: '0.5px', border: '1px solid rgba(22, 163, 74, 0.2)' }}>
               INTERACTIVE DEMO
             </span>
             <button
               onClick={handleTryNow}
               disabled={loadingSample}
               aria-busy={loadingSample}
-              className="text-xs sm:text-[13px] px-3 sm:px-4 py-1.5 rounded-lg bg-green-600 text-white font-semibold border-none cursor-pointer disabled:opacity-70 disabled:cursor-wait hover:bg-green-700 transition-colors"
+              style={{ fontSize: 13, padding: '6px 16px', borderRadius: 8, background: '#16A34A', color: '#FFFFFF', fontWeight: 600, border: 'none', cursor: loadingSample ? 'wait' : 'pointer', opacity: loadingSample ? 0.7 : 1 }}
             >
               {loadingSample ? (
-                <span className="flex items-center gap-1.5">
+                <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <Loader2 size={14} className="animate-spin" /> Loading...
                 </span>
               ) : (
@@ -216,104 +216,80 @@ export default function DemoPage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-[960px] mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-20">
-        {/* Video Demo Section — always visible when not in simulation/results/scan */}
+      <div style={{ maxWidth: 960, margin: '0 auto', padding: '24px 16px 80px' }}>
+        {/* Video Demo Section */}
         {!isSimulating && !showResults && !scanResult && (
           <>
             <DemoVideoSection />
-
-            {/* Divider */}
-            <div className="flex items-center gap-4 my-8">
-              <div className="flex-1 h-px bg-slate-100" />
-              <span className="text-xs text-slate-500 font-semibold tracking-widest uppercase">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, margin: '32px 0' }}>
+              <div style={{ flex: 1, height: 1, background: '#1E293B' }} />
+              <span style={{ fontSize: 11, color: '#64748B', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
                 Or try it yourself
               </span>
-              <div className="flex-1 h-px bg-slate-100" />
+              <div style={{ flex: 1, height: 1, background: '#1E293B' }} />
             </div>
           </>
         )}
 
         {/* Interactive Demo Section */}
         {!isSimulating && !showResults && !scanResult && (
-          <div className="mb-10">
-            <div className="text-center mb-10">
-              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3 leading-tight">
-                Interactive <span className="text-green-600">Demo</span>
+          <div style={{ marginBottom: 40 }}>
+            <div style={{ textAlign: 'center', marginBottom: 40 }}>
+              <h2 style={{ fontSize: 'clamp(24px, 4vw, 32px)', fontWeight: 800, color: '#E2E8F0', marginBottom: 12, lineHeight: 1.2 }}>
+                Interactive <span style={{ color: '#16A34A' }}>Demo</span>
               </h2>
-              <p className="text-slate-500 text-sm sm:text-base max-w-[600px] mx-auto leading-relaxed">
-                Pick a real-world case study and watch the AI pipeline analyze it in real time. No
-                login required.
+              <p style={{ color: '#94A3B8', fontSize: 15, maxWidth: 600, margin: '0 auto', lineHeight: 1.6 }}>
+                Pick a real-world case study and watch the AI pipeline analyze it in real time. No login required.
               </p>
             </div>
 
-            {/* Sample Document Cards */}
-            <div className="text-[11px] text-green-600 mb-4 tracking-widest uppercase font-semibold flex items-center gap-2">
+            <div style={{ fontSize: 11, color: '#16A34A', marginBottom: 16, letterSpacing: '1.5px', textTransform: 'uppercase', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
               <FileText size={13} />
               Choose a document to analyze
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16, marginBottom: 32 }}>
               {DEMO_ANALYSES.map((a, idx) => {
-                const scoreColor =
-                  a.overallScore >= 70 ? '#22c55e' : a.overallScore >= 40 ? '#eab308' : '#ef4444';
+                const sc = a.overallScore >= 70 ? '#22c55e' : a.overallScore >= 40 ? '#eab308' : '#ef4444';
                 return (
                   <button
                     key={a.id}
                     onClick={() => startSimulation(idx)}
-                    className="text-left rounded-2xl bg-white border border-slate-200 cursor-pointer transition-all duration-200 hover:border-green-200 hover:shadow-lg group"
                     style={{
+                      textAlign: 'left',
+                      borderRadius: 16,
+                      background: '#0F172A',
+                      border: '1px solid #1E293B',
+                      cursor: 'pointer',
                       display: 'flex',
                       flexDirection: 'column',
-                      gap: '16px',
-                      padding: '28px 24px',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                      gap: 16,
+                      padding: '24px 20px',
+                      transition: 'border-color 0.2s, box-shadow 0.2s',
+                      color: 'inherit',
                     }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#16A34A40'; (e.currentTarget as HTMLElement).style.boxShadow = '0 0 20px rgba(22,163,74,0.08)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '#1E293B'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
                   >
-                    {/* Icon + DQI badge row */}
-                    <div className="flex items-start justify-between">
-                      <div
-                        className="shrink-0"
-                        style={{
-                          width: 44,
-                          height: 44,
-                          borderRadius: 12,
-                          background: '#F0FDF4',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(22, 163, 74, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                         <FileText size={20} style={{ color: '#16A34A' }} />
                       </div>
-                      <span
-                        className="text-xs px-2.5 py-1 rounded-lg font-bold"
-                        style={{
-                          background: `${scoreColor}12`,
-                          color: scoreColor,
-                          border: `1px solid ${scoreColor}30`,
-                        }}
-                      >
+                      <span style={{ fontSize: 12, padding: '4px 10px', borderRadius: 8, fontWeight: 700, background: `${sc}15`, color: sc, border: `1px solid ${sc}30` }}>
                         DQI {a.overallScore}/100
                       </span>
                     </div>
-
-                    {/* Title + description */}
                     <div>
-                      <div className="text-base font-bold text-slate-900 mb-1.5 leading-tight">
+                      <div style={{ fontSize: 16, fontWeight: 700, color: '#E2E8F0', marginBottom: 6, lineHeight: 1.3 }}>
                         {a.shortName}
                       </div>
-                      <div className="text-sm text-slate-500 leading-relaxed line-clamp-2">
+                      <div style={{ fontSize: 13, color: '#94A3B8', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                         {a.summary.slice(0, 140)}...
                       </div>
                     </div>
-
-                    {/* CTA footer */}
-                    <div className="flex items-center gap-2 text-xs text-green-600 font-semibold group-hover:text-green-700 transition-colors mt-auto pt-2 border-t border-slate-100">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#16A34A', fontWeight: 600, marginTop: 'auto', paddingTop: 8, borderTop: '1px solid #1E293B' }}>
                       <Upload size={13} />
                       <span>Click to analyze</span>
-                      <ArrowRight
-                        size={13}
-                        className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity"
-                      />
+                      <ArrowRight size={13} style={{ marginLeft: 'auto' }} />
                     </div>
                   </button>
                 );
@@ -321,33 +297,33 @@ export default function DemoPage() {
             </div>
 
             {/* Paste Your Own Text */}
-            <div className="text-center">
+            <div style={{ textAlign: 'center' }}>
               <button
                 onClick={() => setPasteMode(!pasteMode)}
-                className="text-xs text-slate-500 hover:text-slate-900 transition-colors cursor-pointer bg-transparent border-none flex items-center gap-1.5 mx-auto"
+                style={{ fontSize: 12, color: '#64748B', background: 'transparent', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}
               >
                 <ClipboardPaste size={14} />
                 {pasteMode ? 'Hide text input' : 'Or paste your own text for a preview'}
               </button>
             </div>
             {pasteMode && !scanResult && (
-              <div className="mt-4">
+              <div style={{ marginTop: 16 }}>
                 <textarea
                   value={pasteText}
                   onChange={e => setPasteText(e.target.value)}
-                  className="w-full h-32 bg-slate-50 border border-slate-300 rounded-xl p-4 text-sm text-slate-300 resize-none focus:outline-none focus:border-slate-300 placeholder:text-slate-600"
+                  style={{ width: '100%', height: 128, background: '#0F172A', border: '1px solid #1E293B', borderRadius: 12, padding: 16, fontSize: 14, color: '#E2E8F0', resize: 'none', outline: 'none', fontFamily: 'inherit' }}
                   placeholder="Paste a decision memo, investment thesis, or strategic rationale..."
                 />
-                <div className="flex justify-between items-center mt-3">
-                  <span className="text-[11px] text-slate-600">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12 }}>
+                  <span style={{ fontSize: 11, color: '#64748B' }}>
                     Real-time bias scan — results generated from your text
                   </span>
                   <button
                     onClick={handlePasteAnalyze}
                     disabled={pasteText.trim().length < 15}
-                    className="px-4 py-2 rounded-lg bg-white text-black text-xs font-semibold cursor-pointer border-none disabled:opacity-40 disabled:cursor-not-allowed"
+                    style={{ padding: '8px 16px', borderRadius: 8, background: '#16A34A', color: '#FFFFFF', fontSize: 12, fontWeight: 600, border: 'none', cursor: pasteText.trim().length < 15 ? 'not-allowed' : 'pointer', opacity: pasteText.trim().length < 15 ? 0.4 : 1 }}
                   >
-                    Scan for Biases <ArrowRight size={12} className="inline ml-1" />
+                    Scan for Biases <ArrowRight size={12} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: 4 }} />
                   </button>
                 </div>
               </div>
@@ -368,68 +344,55 @@ export default function DemoPage() {
 
         {/* Streaming Simulation */}
         {isSimulating && (
-          <div className="mb-10">
-            <div className="text-center mb-8">
-              <Loader2 size={32} className="text-slate-900 animate-spin mx-auto mb-4" />
-              <h2 className="text-xl font-bold text-slate-900 mb-2">Analyzing document...</h2>
-              <p className="text-slate-500 text-sm">{analysis?.shortName ?? 'Document'}</p>
+          <div style={{ marginBottom: 40 }}>
+            <div style={{ textAlign: 'center', marginBottom: 32 }}>
+              <Loader2 size={32} style={{ color: '#16A34A' }} className="animate-spin" />
+              <h2 style={{ fontSize: 20, fontWeight: 700, color: '#E2E8F0', marginTop: 16, marginBottom: 8 }}>Analyzing document...</h2>
+              <p style={{ fontSize: 14, color: '#94A3B8', margin: 0 }}>{analysis?.shortName ?? 'Document'}</p>
             </div>
 
-            {/* Progress Pipeline */}
-            <div className="max-w-[480px] mx-auto">
+            <div style={{ maxWidth: 480, margin: '0 auto' }}>
               {PIPELINE_STAGES.map((stage, idx) => {
                 const StageIcon = stage.icon;
                 const isComplete = idx < currentStage;
                 const isActive = idx === currentStage;
                 const isPending = idx > currentStage;
-
                 return (
                   <div
                     key={stage.id}
-                    className="flex items-center gap-3 py-2.5 transition-all duration-300"
-                    style={{ opacity: isPending ? 0.3 : 1 }}
+                    style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', transition: 'opacity 0.3s', opacity: isPending ? 0.3 : 1 }}
                   >
                     <div
-                      className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all duration-300"
                       style={{
-                        background: isComplete
-                          ? 'rgba(34, 197, 94, 0.15)'
-                          : isActive
-                            ? 'rgba(0, 0, 0, 0.04)'
-                            : 'rgba(0, 0, 0, 0.02)',
-                        border: isActive
-                          ? '1px solid rgba(0, 0, 0, 0.1)'
-                          : '1px solid rgba(0, 0, 0, 0.04)',
+                        width: 32, height: 32, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.3s',
+                        background: isComplete ? 'rgba(34, 197, 94, 0.15)' : isActive ? 'rgba(22, 163, 74, 0.08)' : 'rgba(255,255,255,0.03)',
+                        border: isActive ? '1px solid rgba(22, 163, 74, 0.3)' : '1px solid rgba(255,255,255,0.05)',
                       }}
                     >
                       {isComplete ? (
-                        <CheckCircle2 size={16} className="text-green-500" />
+                        <CheckCircle2 size={16} style={{ color: '#22c55e' }} />
                       ) : isActive ? (
-                        <Loader2 size={16} className="text-slate-900 animate-spin" />
+                        <Loader2 size={16} style={{ color: '#16A34A' }} className="animate-spin" />
                       ) : (
-                        <StageIcon size={16} className="text-slate-600" />
+                        <StageIcon size={16} style={{ color: '#475569' }} />
                       )}
                     </div>
-                    <span
-                      className={`text-[13px] font-medium ${isComplete ? 'text-green-500' : isActive ? 'text-slate-900' : 'text-slate-600'}`}
-                    >
+                    <span style={{ fontSize: 13, fontWeight: 500, color: isComplete ? '#22c55e' : isActive ? '#E2E8F0' : '#475569' }}>
                       {stage.label}
-                      {isActive && <span className="text-slate-500 ml-1.5 animate-pulse">...</span>}
+                      {isActive && <span style={{ color: '#64748B', marginLeft: 6 }} className="animate-pulse">...</span>}
                     </span>
                   </div>
                 );
               })}
             </div>
 
-            {/* Overall progress bar */}
-            <div className="max-w-[480px] mx-auto mt-6">
-              <div className="h-1 rounded-full bg-slate-100">
+            <div style={{ maxWidth: 480, margin: '24px auto 0' }}>
+              <div style={{ height: 3, borderRadius: 2, background: '#1E293B' }}>
                 <div
-                  className="h-full rounded-full bg-[#16A34A] transition-all duration-500"
-                  style={{ width: `${((currentStage + 1) / PIPELINE_STAGES.length) * 100}%` }}
+                  style={{ height: '100%', borderRadius: 2, background: '#16A34A', transition: 'width 0.5s', width: `${((currentStage + 1) / PIPELINE_STAGES.length) * 100}%` }}
                 />
               </div>
-              <div className="text-[11px] text-slate-500 mt-2 text-center">
+              <div style={{ fontSize: 11, color: '#64748B', marginTop: 8, textAlign: 'center' }}>
                 Step {currentStage + 1} of {PIPELINE_STAGES.length}
               </div>
             </div>
@@ -1000,59 +963,56 @@ const DEMO_BOOKING_URL = process.env.NEXT_PUBLIC_DEMO_BOOKING_URL;
 
 function DemoVideoSection() {
   return (
-    <div className="text-center">
-      <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3 leading-tight">
+    <div style={{ textAlign: 'center' }}>
+      <h1 style={{ fontSize: 'clamp(24px, 4vw, 32px)', fontWeight: 800, color: '#E2E8F0', marginBottom: 12, lineHeight: 1.2 }}>
         See Decision Intel in Action
       </h1>
-      <p className="text-slate-400 text-sm sm:text-base max-w-[600px] mx-auto mb-8">
-        Watch how the 12-node pipeline audits real IC memos for cognitive bias, measures decision
-        noise, and generates actionable intelligence.
+      <p style={{ color: '#94A3B8', fontSize: 15, maxWidth: 600, margin: '0 auto 32px', lineHeight: 1.6 }}>
+        Watch how the 12-node pipeline audits real IC memos for cognitive bias, measures decision noise, and generates actionable intelligence.
       </p>
 
       {DEMO_VIDEO_URL ? (
-        <div className="rounded-2xl overflow-hidden border border-slate-200 bg-white mb-8">
+        <div style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid #1E293B', background: '#0F172A', marginBottom: 32 }}>
           <iframe
             src={DEMO_VIDEO_URL}
             allowFullScreen
-            className="w-full border-none"
-            style={{ aspectRatio: '16/9' }}
+            style={{ width: '100%', border: 'none', aspectRatio: '16/9', display: 'block' }}
             title="Decision Intel Demo"
           />
         </div>
       ) : (
-        <div className="rounded-2xl border border-slate-200 bg-white p-12 sm:p-16 mb-8 flex flex-col items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center">
-            <Play size={28} className="text-slate-400 ml-1" />
+        <div style={{ borderRadius: 16, border: '1px solid #1E293B', background: '#0F172A', padding: '48px 32px', marginBottom: 32, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+          <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(22, 163, 74, 0.1)', border: '1px solid rgba(22, 163, 74, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Play size={28} style={{ color: '#16A34A', marginLeft: 3 }} />
           </div>
-          <p className="text-slate-500 text-sm max-w-[400px]">
-            Try the interactive demo below — upload a sample document and watch the 12-node bias
-            detection pipeline in real time.
+          <p style={{ color: '#94A3B8', fontSize: 14, maxWidth: 400, margin: 0 }}>
+            Try the interactive demo below — pick a sample document and watch the 12-node bias detection pipeline in real time.
           </p>
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+      <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
         <Link
           href="/login"
-          className="px-7 py-3 rounded-[10px] bg-white text-black font-bold text-sm no-underline text-center"
+          style={{ padding: '12px 28px', borderRadius: 10, background: '#16A34A', color: '#FFFFFF', fontWeight: 700, fontSize: 14, textDecoration: 'none', textAlign: 'center' }}
           onClick={() => trackEvent('demo_video_cta_clicked', { target: 'start_trial' })}
         >
-          Start Free Trial <ArrowRight size={14} className="inline align-middle ml-1" />
+          Start Free Trial <ArrowRight size={14} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: 4 }} />
         </Link>
         {DEMO_BOOKING_URL ? (
           <a
             href={DEMO_BOOKING_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-7 py-3 rounded-[10px] bg-transparent border border-slate-200 text-slate-900 font-semibold text-sm no-underline text-center"
+            style={{ padding: '12px 28px', borderRadius: 10, background: 'transparent', border: '1px solid #334155', color: '#E2E8F0', fontWeight: 600, fontSize: 14, textDecoration: 'none', textAlign: 'center' }}
             onClick={() => trackEvent('demo_video_cta_clicked', { target: 'book_call' })}
           >
-            Book a Call <ExternalLink size={14} className="inline align-middle ml-1" />
+            Book a Call <ExternalLink size={14} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: 4 }} />
           </a>
         ) : (
           <Link
             href="/#pricing"
-            className="px-7 py-3 rounded-[10px] bg-transparent border border-slate-200 text-slate-900 font-semibold text-sm no-underline text-center"
+            style={{ padding: '12px 28px', borderRadius: 10, background: 'transparent', border: '1px solid #334155', color: '#E2E8F0', fontWeight: 600, fontSize: 14, textDecoration: 'none', textAlign: 'center' }}
           >
             View Pricing
           </Link>
@@ -1166,21 +1126,26 @@ function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () =
   };
 
   return (
-    <div className="mb-10">
-      {/* Back button */}
+    <div style={{ marginBottom: 40 }}>
       <button
         onClick={onBack}
-        className="text-xs text-slate-500 hover:text-slate-900 transition-colors cursor-pointer bg-transparent border-none flex items-center gap-1.5 mb-6"
+        style={{ fontSize: 12, color: '#64748B', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 24 }}
       >
-        <ArrowRight size={12} className="rotate-180" />
+        <ArrowRight size={12} style={{ transform: 'rotate(180deg)' }} />
         Scan different text
       </button>
 
-      {/* Header */}
-      <div className="text-center mb-8">
+      <div style={{ textAlign: 'center', marginBottom: 32 }}>
         <div
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold mb-4"
           style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '8px 16px',
+            borderRadius: 9999,
+            fontSize: 14,
+            fontWeight: 700,
+            marginBottom: 16,
             background: `${riskColors[result.riskLevel]}15`,
             color: riskColors[result.riskLevel],
           }}
@@ -1190,7 +1155,7 @@ function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () =
             ? 'No Biases Detected'
             : `${result.biasCount} Bias${result.biasCount > 1 ? 'es' : ''} Detected`}
         </div>
-        <p className="text-slate-400 text-sm max-w-[600px] mx-auto">{result.summary}</p>
+        <p style={{ color: '#94A3B8', fontSize: 14, maxWidth: 600, margin: '0 auto' }}>{result.summary}</p>
       </div>
 
       {/* Score Cards */}
