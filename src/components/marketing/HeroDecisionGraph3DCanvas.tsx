@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useEffect } from 'react';
 import { DoubleSide } from 'three';
 import {
   GraphCanvas,
@@ -283,6 +283,16 @@ export default function HeroDecisionGraph3DCanvas({
 }: HeroDecisionGraph3DCanvasProps) {
   const graphRef = useRef<GraphCanvasRef | null>(null);
 
+  // Workaround: reagraph's isCentered gate gets permanently stuck at false in React strict mode
+  // (strict mode resets state but preserves refs, so mounted.current=true blocks re-centering).
+  // Calling centerGraph() after mount forces isCentered=true regardless of mounted.current.
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      graphRef.current?.centerGraph();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []);
+
   const { selections, actives, onNodeClick, onCanvasClick, onNodePointerOver, onNodePointerOut } =
     useSelection({
       ref: graphRef,
@@ -299,11 +309,19 @@ export default function HeroDecisionGraph3DCanvas({
 
   const renderNode = useCallback(({ node, size, opacity, active, selected }: NodeRendererProps) => {
     const data = node.data as NodeData | undefined;
-    if (!data) return null;
+    const o = opacity ?? 1;
+    const emissiveFallback = selected ? 0.8 : active ? 0.5 : 0.35;
+    if (!data?.type) {
+      return (
+        <mesh>
+          <sphereGeometry args={[size, 10, 8]} />
+          <meshPhongMaterial color="#60A5FA" emissive="#60A5FA" emissiveIntensity={emissiveFallback} side={DoubleSide} transparent opacity={o} />
+        </mesh>
+      );
+    }
 
     const col = getNodeColor(data);
-    const emissive = selected ? 0.8 : active ? 0.5 : 0.35;
-    const o = opacity ?? 1;
+    const emissive = emissiveFallback;
 
     // Decision → dodecahedron (12-face crystal)
     if (data.type === 'decision') {

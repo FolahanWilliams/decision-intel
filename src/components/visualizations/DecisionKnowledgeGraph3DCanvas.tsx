@@ -16,7 +16,7 @@
  * Node size is supplied by the parent (encodes sizeMetric).
  */
 
-import { useRef, useCallback, forwardRef, useImperativeHandle } from 'react';
+import { useRef, useCallback, forwardRef, useImperativeHandle, useEffect } from 'react';
 import { DoubleSide } from 'three';
 import {
   GraphCanvas,
@@ -100,6 +100,15 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
   DecisionKnowledgeGraph3DCanvasProps
 >(function DecisionKnowledgeGraph3DCanvas({ nodes, edges, onNodeSelect }, ref) {
   const graphRef = useRef<GraphCanvasRef | null>(null);
+
+  // Workaround: reagraph's isCentered gate gets permanently stuck at false in React strict mode
+  // (strict mode resets state but preserves refs, so mounted.current=true blocks re-centering).
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      graphRef.current?.centerGraph();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Expose camera helpers to shell
   useImperativeHandle(ref, () => ({
