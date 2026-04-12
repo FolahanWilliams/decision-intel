@@ -269,80 +269,7 @@ const GRAPH_THEME: Theme = {
   },
 };
 
-// ─── Custom node renderer ────────────────────────────────────────────────────
-
-function HeroNodeRenderer({ node, size, opacity, active, selected }: NodeRendererProps) {
-  const data = node.data as NodeData | undefined;
-  if (!data) return null;
-
-  const col = getNodeColor(data);
-  const emissive = selected ? 0.8 : active ? 0.4 : 0.12;
-  const o = opacity ?? 1;
-
-  const mat = (metalness: number, roughness: number) => (
-    <meshStandardMaterial
-      color={col}
-      emissive={col}
-      emissiveIntensity={emissive}
-      metalness={metalness}
-      roughness={roughness}
-      transparent
-      opacity={o}
-    />
-  );
-
-  // Decision → dodecahedron (12-face crystal) — metallic, commanding
-  if (data.type === 'decision') {
-    return (
-      <group>
-        <mesh>
-          <dodecahedronGeometry args={[size, 0]} />
-          {mat(0.65, 0.2)}
-        </mesh>
-        {selected && (
-          <mesh>
-            <dodecahedronGeometry args={[size * 1.55, 0]} />
-            <meshStandardMaterial color={col} transparent opacity={0.1} />
-          </mesh>
-        )}
-      </group>
-    );
-  }
-
-  // Bias → octahedron (8-face spike) — jagged, dangerous
-  if (data.type === 'bias') {
-    return (
-      <group>
-        <mesh>
-          <octahedronGeometry args={[size, 0]} />
-          {mat(0.1, 0.8)}
-        </mesh>
-        {(active || selected) && (
-          <mesh>
-            <octahedronGeometry args={[size * 1.65, 0]} />
-            <meshStandardMaterial color={col} transparent opacity={0.07} />
-          </mesh>
-        )}
-      </group>
-    );
-  }
-
-  // Outcome → cylinder — grounded, final
-  return (
-    <group>
-      <mesh>
-        <cylinderGeometry args={[size * 0.82, size * 0.82, size * 2.2, 8]} />
-        {mat(0.45, 0.45)}
-      </mesh>
-      {selected && (
-        <mesh>
-          <cylinderGeometry args={[size * 1.3, size * 1.3, size * 2.6, 8]} />
-          <meshStandardMaterial color={col} transparent opacity={0.1} />
-        </mesh>
-      )}
-    </group>
-  );
-}
+// ─── Custom node renderer (inlined — no React component wrapper) ─────────────
 
 // ─── Canvas component (loaded via dynamic — no SSR) ──────────────────────────
 
@@ -369,10 +296,66 @@ export default function HeroDecisionGraph3DCanvas({
       },
     });
 
-  const renderNode = useCallback(
-    (props: NodeRendererProps) => <HeroNodeRenderer {...props} />,
-    []
-  );
+  const renderNode = useCallback(({ node, size, opacity, active, selected }: NodeRendererProps) => {
+    const data = node.data as NodeData | undefined;
+    if (!data) return null;
+
+    const col = getNodeColor(data);
+    const emissive = selected ? 0.8 : active ? 0.4 : 0.12;
+    const o = opacity ?? 1;
+
+    // Decision → dodecahedron (12-face crystal)
+    if (data.type === 'decision') {
+      return (
+        <group>
+          <mesh>
+            <dodecahedronGeometry args={[size, 0]} />
+            <meshStandardMaterial color={col} emissive={col} emissiveIntensity={emissive} metalness={0.65} roughness={0.2} transparent opacity={o} />
+          </mesh>
+          {selected && (
+            <mesh>
+              <dodecahedronGeometry args={[size * 1.55, 0]} />
+              <meshStandardMaterial color={col} transparent opacity={0.1} />
+            </mesh>
+          )}
+        </group>
+      );
+    }
+
+    // Bias → octahedron (8-face spike)
+    if (data.type === 'bias') {
+      return (
+        <group>
+          <mesh>
+            <octahedronGeometry args={[size, 0]} />
+            <meshStandardMaterial color={col} emissive={col} emissiveIntensity={emissive} metalness={0.1} roughness={0.8} transparent opacity={o} />
+          </mesh>
+          {(active || selected) && (
+            <mesh>
+              <octahedronGeometry args={[size * 1.65, 0]} />
+              <meshStandardMaterial color={col} transparent opacity={0.07} />
+            </mesh>
+          )}
+        </group>
+      );
+    }
+
+    // Outcome → cylinder
+    return (
+      <group>
+        <mesh>
+          <cylinderGeometry args={[size * 0.82, size * 0.82, size * 2.2, 8]} />
+          <meshStandardMaterial color={col} emissive={col} emissiveIntensity={emissive} metalness={0.45} roughness={0.45} transparent opacity={o} />
+        </mesh>
+        {selected && (
+          <mesh>
+            <cylinderGeometry args={[size * 1.3, size * 1.3, size * 2.6, 8]} />
+            <meshStandardMaterial color={col} transparent opacity={0.1} />
+          </mesh>
+        )}
+      </group>
+    );
+  }, []);
 
   return (
     <GraphCanvas

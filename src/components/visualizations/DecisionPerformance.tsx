@@ -23,6 +23,7 @@ import {
   CheckCircle,
   Award,
   Brain,
+  type LucideIcon,
 } from 'lucide-react';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -121,7 +122,7 @@ function KpiCard({
   index,
   accentColor,
 }: {
-  icon: React.ElementType;
+  icon: LucideIcon;
   label: string;
   value: string;
   subtext?: string;

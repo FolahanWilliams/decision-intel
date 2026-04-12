@@ -73,120 +73,9 @@ const DARK_THEME: Theme = {
   },
 };
 
-// ─── Node renderer ───────────────────────────────────────────────────────────
+// ─── Node renderer (inlined — no React component wrapper) ────────────────────
 
 type DKGNodeType = 'analysis' | 'human_decision' | 'person' | 'bias_pattern' | 'outcome';
-
-function DKGNodeRenderer({ node, size, opacity, active, selected }: NodeRendererProps) {
-  const type: DKGNodeType = (node.data?.type as DKGNodeType) ?? 'analysis';
-  // Parent already computed the fill color (score/path/search encoding)
-  const col = (node.fill as string | undefined) ?? '#60A5FA';
-  const o = opacity ?? 1;
-  const emissive = selected ? 0.75 : active ? 0.38 : 0.1;
-
-  const mat = (metalness: number, roughness: number) => (
-    <meshStandardMaterial
-      color={col}
-      emissive={col}
-      emissiveIntensity={emissive}
-      metalness={metalness}
-      roughness={roughness}
-      transparent
-      opacity={o}
-    />
-  );
-
-  // Glow ring on select/active (outer ghost mesh)
-  const glowRing = (shape: React.ReactNode) =>
-    selected || active ? (
-      <mesh scale={[1.55, 1.55, 1.55]}>
-        {shape}
-        <meshStandardMaterial color={col} transparent opacity={0.07} />
-      </mesh>
-    ) : null;
-
-  switch (type) {
-    // analysis → low-poly icosahedron (complex data entity)
-    case 'analysis': {
-      const geo = <icosahedronGeometry args={[size, 1]} />;
-      return (
-        <group>
-          <mesh>
-            {geo}
-            {mat(0.5, 0.3)}
-          </mesh>
-          {glowRing(geo)}
-        </group>
-      );
-    }
-
-    // human_decision → box (structured, deliberate, human-made)
-    case 'human_decision': {
-      const s = size * 1.4;
-      const geo = <boxGeometry args={[s, s, s]} />;
-      return (
-        <group>
-          <mesh>
-            {geo}
-            {mat(0.55, 0.25)}
-          </mesh>
-          {glowRing(geo)}
-        </group>
-      );
-    }
-
-    // person → smooth sphere (organic, human)
-    case 'person': {
-      const geo = <sphereGeometry args={[size * 0.85, 12, 8]} />;
-      return (
-        <group>
-          <mesh>
-            {geo}
-            {mat(0.2, 0.65)}
-          </mesh>
-          {glowRing(geo)}
-        </group>
-      );
-    }
-
-    // bias_pattern → tetrahedron (sharpest shape — most dangerous)
-    case 'bias_pattern': {
-      const geo = <tetrahedronGeometry args={[size, 0]} />;
-      return (
-        <group>
-          <mesh>
-            {geo}
-            {mat(0.05, 0.85)}
-          </mesh>
-          {glowRing(geo)}
-        </group>
-      );
-    }
-
-    // outcome → cylinder (grounded, final result)
-    case 'outcome': {
-      const geo = <cylinderGeometry args={[size * 0.8, size * 0.8, size * 2, 8]} />;
-      return (
-        <group>
-          <mesh>
-            {geo}
-            {mat(0.4, 0.45)}
-          </mesh>
-          {glowRing(geo)}
-        </group>
-      );
-    }
-
-    default: {
-      return (
-        <mesh>
-          <sphereGeometry args={[size, 10, 8]} />
-          {mat(0.3, 0.5)}
-        </mesh>
-      );
-    }
-  }
-}
 
 // ─── Canvas ref (exposed to shell for camera control) ────────────────────────
 
@@ -244,10 +133,75 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
       },
     });
 
-  const renderNode = useCallback(
-    (props: NodeRendererProps) => <DKGNodeRenderer {...props} />,
-    []
-  );
+  const renderNode = useCallback(({ node, size, opacity, active, selected }: NodeRendererProps) => {
+    const type: DKGNodeType = (node.data?.type as DKGNodeType) ?? 'analysis';
+    const col = (node.fill as string | undefined) ?? '#60A5FA';
+    const o = opacity ?? 1;
+    const emissive = selected ? 0.75 : active ? 0.38 : 0.1;
+    const glow = selected || active;
+
+    switch (type) {
+      case 'analysis':
+        return (
+          <group>
+            <mesh>
+              <icosahedronGeometry args={[size, 1]} />
+              <meshStandardMaterial color={col} emissive={col} emissiveIntensity={emissive} metalness={0.5} roughness={0.3} transparent opacity={o} />
+            </mesh>
+            {glow && <mesh scale={[1.55, 1.55, 1.55]}><icosahedronGeometry args={[size, 1]} /><meshStandardMaterial color={col} transparent opacity={0.07} /></mesh>}
+          </group>
+        );
+      case 'human_decision': {
+        const s = size * 1.4;
+        return (
+          <group>
+            <mesh>
+              <boxGeometry args={[s, s, s]} />
+              <meshStandardMaterial color={col} emissive={col} emissiveIntensity={emissive} metalness={0.55} roughness={0.25} transparent opacity={o} />
+            </mesh>
+            {glow && <mesh scale={[1.55, 1.55, 1.55]}><boxGeometry args={[s, s, s]} /><meshStandardMaterial color={col} transparent opacity={0.07} /></mesh>}
+          </group>
+        );
+      }
+      case 'person':
+        return (
+          <group>
+            <mesh>
+              <sphereGeometry args={[size * 0.85, 12, 8]} />
+              <meshStandardMaterial color={col} emissive={col} emissiveIntensity={emissive} metalness={0.2} roughness={0.65} transparent opacity={o} />
+            </mesh>
+            {glow && <mesh scale={[1.55, 1.55, 1.55]}><sphereGeometry args={[size * 0.85, 12, 8]} /><meshStandardMaterial color={col} transparent opacity={0.07} /></mesh>}
+          </group>
+        );
+      case 'bias_pattern':
+        return (
+          <group>
+            <mesh>
+              <tetrahedronGeometry args={[size, 0]} />
+              <meshStandardMaterial color={col} emissive={col} emissiveIntensity={emissive} metalness={0.05} roughness={0.85} transparent opacity={o} />
+            </mesh>
+            {glow && <mesh scale={[1.55, 1.55, 1.55]}><tetrahedronGeometry args={[size, 0]} /><meshStandardMaterial color={col} transparent opacity={0.07} /></mesh>}
+          </group>
+        );
+      case 'outcome':
+        return (
+          <group>
+            <mesh>
+              <cylinderGeometry args={[size * 0.8, size * 0.8, size * 2, 8]} />
+              <meshStandardMaterial color={col} emissive={col} emissiveIntensity={emissive} metalness={0.4} roughness={0.45} transparent opacity={o} />
+            </mesh>
+            {glow && <mesh scale={[1.55, 1.55, 1.55]}><cylinderGeometry args={[size * 0.8, size * 0.8, size * 2, 8]} /><meshStandardMaterial color={col} transparent opacity={0.07} /></mesh>}
+          </group>
+        );
+      default:
+        return (
+          <mesh>
+            <sphereGeometry args={[size, 10, 8]} />
+            <meshStandardMaterial color={col} emissive={col} emissiveIntensity={emissive} metalness={0.3} roughness={0.5} transparent opacity={o} />
+          </mesh>
+        );
+    }
+  }, []);
 
   return (
     <GraphCanvas

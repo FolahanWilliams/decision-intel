@@ -9,6 +9,7 @@ import {
   ArrowRight,
   Loader2,
   CheckCircle,
+  type LucideIcon,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -27,7 +28,7 @@ interface JournalEntry {
 
 // ─── Component ──────────────────────────────────────────────────────────────
 
-const SOURCE_ICONS: Record<string, React.ElementType> = {
+const SOURCE_ICONS: Record<string, LucideIcon> = {
   email_forward: Mail,
   calendar_webhook: Calendar,
   slack_digest: MessageSquare,

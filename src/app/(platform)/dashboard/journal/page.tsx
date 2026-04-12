@@ -15,6 +15,7 @@ import {
   Clock,
   Send,
   AlertTriangle,
+  type LucideIcon,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -61,7 +62,7 @@ const STATUS_TABS: { key: StatusFilter; label: string }[] = [
   { key: 'dismissed', label: 'Dismissed' },
 ];
 
-const SOURCE_ICONS: Record<string, React.ElementType> = {
+const SOURCE_ICONS: Record<string, LucideIcon> = {
   email_forward: Mail,
   calendar_webhook: Calendar,
   manual: Edit,
