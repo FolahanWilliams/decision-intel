@@ -403,31 +403,35 @@ export default function DemoPage() {
         {showResults && analysis && (
           <div
             ref={resultsRef}
-            className="py-8"
-            style={{ scrollBehavior: 'smooth', color: 'var(--text-primary)' }}
+            style={{ paddingTop: 32, paddingBottom: 32, scrollBehavior: 'smooth', color: '#E2E8F0' }}
           >
             {/* Back / Re-select */}
-            <div className="flex items-center justify-between mb-6">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
               <button
                 onClick={() => {
                   setShowResults(false);
                   setSelectedIdx(null);
                 }}
-                className="text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer bg-transparent border-none flex items-center gap-1.5"
+                style={{ fontSize: 12, color: '#64748B', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
               >
-                <ArrowRight size={12} className="rotate-180" />
+                <ArrowRight size={12} style={{ transform: 'rotate(180deg)' }} />
                 Try another document
               </button>
-              <div className="flex gap-2">
+              <div style={{ display: 'flex', gap: 8 }}>
                 {DEMO_ANALYSES.map((a, idx) => (
                   <button
                     key={a.id}
                     onClick={() => startSimulation(idx)}
-                    className={`px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer border transition-all ${
-                      idx === selectedIdx
-                        ? 'border-[var(--border-active)] bg-[var(--bg-tertiary)] text-[var(--text-primary)]'
-                        : 'border-[var(--border-color)] bg-transparent text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-                    }`}
+                    style={{
+                      padding: '4px 10px',
+                      borderRadius: 6,
+                      fontSize: 11,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      border: idx === selectedIdx ? '1px solid #334155' : '1px solid #1E293B',
+                      background: idx === selectedIdx ? '#1E293B' : 'transparent',
+                      color: idx === selectedIdx ? '#E2E8F0' : '#64748B',
+                    }}
                   >
                     {a.shortName}
                   </button>
@@ -463,14 +467,14 @@ export default function DemoPage() {
               </nav>
 
               {/* Section 1: Score Hero */}
-              <div id="score" className="scroll-mt-20">
-                <div className="flex items-start gap-5 mb-6">
+              <div id="score" style={{ scrollMarginTop: 80 }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 20, marginBottom: 24 }}>
                   <DQIBadge score={analysis.overallScore} size="lg" showGrade animate />
-                  <div className="flex-1 min-w-0">
-                    <h1 className="text-lg sm:text-xl font-bold mb-1.5 leading-snug text-[var(--text-primary)]">
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <h1 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6, lineHeight: 1.3, color: '#E2E8F0' }}>
                       {analysis.documentName}
                     </h1>
-                    <p className="text-[var(--text-muted)] text-xs sm:text-[13px] m-0">
+                    <p style={{ color: '#64748B', fontSize: 13, margin: 0 }}>
                       Analyzed by Decision Intel &middot;{' '}
                       {new Date(analysis.createdAt).toLocaleDateString('en-US', {
                         year: 'numeric',
@@ -480,7 +484,7 @@ export default function DemoPage() {
                     </p>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 mb-8">
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 32 }} className="grid-cols-2 sm:grid-cols-4">
                   <ScoreCard
                     label="DECISION QUALITY"
                     value={`${analysis.overallScore}`}
@@ -528,37 +532,36 @@ export default function DemoPage() {
               </div>
 
               {/* Section 2: Biases */}
-              <div id="biases" className="scroll-mt-20">
+              <div id="biases" style={{ scrollMarginTop: 80 }}>
                 <Section
                   icon={<Brain size={16} />}
                   title={`Cognitive Biases Detected (${analysis.biases.length})`}
                 >
-                  <div className="flex flex-col gap-3">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {(showAllBiases ? analysis.biases : analysis.biases.slice(0, 4)).map(
                       (bias, idx) => (
                         <div
                           key={idx}
-                          className="bg-[var(--bg-tertiary)] rounded-[10px] p-4 sm:p-[18px] border border-[var(--border-color)]"
+                          style={{ background: '#1E293B', borderRadius: 10, padding: '16px 18px', border: '1px solid #334155' }}
                         >
-                          <div className="flex flex-wrap items-center gap-2 mb-2.5">
-                            <span className="font-bold text-sm text-[var(--text-primary)]">
+                          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                            <span style={{ fontWeight: 700, fontSize: 14, color: '#E2E8F0', textTransform: 'capitalize' }}>
                               {bias.biasType.replace(/_/g, ' ')}
                             </span>
                             <SeverityBadge severity={bias.severity} />
-                            <span className="text-[11px] text-[var(--text-muted)] sm:ml-auto">
+                            <span style={{ fontSize: 11, color: '#64748B', marginLeft: 'auto' }}>
                               {Math.round(bias.confidence * 100)}% confidence
                             </span>
                           </div>
                           <p
-                            className="text-[var(--text-secondary)] text-[13px] m-0 mb-2.5 italic leading-relaxed pl-3"
-                            style={{ borderLeft: `2px solid ${sevColor(bias.severity)}30` }}
+                            style={{ color: '#94A3B8', fontSize: 13, margin: '0 0 10px', fontStyle: 'italic', lineHeight: 1.6, paddingLeft: 12, borderLeft: `2px solid ${sevColor(bias.severity)}30` }}
                           >
                             &ldquo;{bias.excerpt}&rdquo;
                           </p>
-                          <p className="text-[var(--text-secondary)] text-[13px] m-0 mb-2.5 leading-relaxed">
+                          <p style={{ color: '#94A3B8', fontSize: 13, margin: '0 0 10px', lineHeight: 1.6 }}>
                             {bias.explanation}
                           </p>
-                          <p className="text-green-500/80 text-[13px] m-0 leading-relaxed">
+                          <p style={{ color: 'rgba(34, 197, 94, 0.8)', fontSize: 13, margin: 0, lineHeight: 1.6 }}>
                             <strong>Recommendation:</strong> {bias.suggestion}
                           </p>
                         </div>
@@ -568,7 +571,7 @@ export default function DemoPage() {
                   {analysis.biases.length > 4 && !showAllBiases && (
                     <button
                       onClick={() => setShowAllBiases(true)}
-                      className="mt-3 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors bg-transparent border border-[var(--border-color)] rounded-lg px-3 py-1.5 cursor-pointer"
+                      style={{ marginTop: 12, fontSize: 12, color: '#94A3B8', background: 'transparent', border: '1px solid #334155', borderRadius: 8, padding: '6px 12px', cursor: 'pointer' }}
                     >
                       Show all {analysis.biases.length} biases
                     </button>
@@ -654,59 +657,29 @@ export default function DemoPage() {
               )}
 
               {/* Section 3: Noise */}
-              <div id="noise" className="scroll-mt-20">
+              <div id="noise" style={{ scrollMarginTop: 80 }}>
                 <Section icon={<Target size={16} />} title="Decision Noise Analysis">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5 mb-6">
-                    <div className="text-center">
-                      <div
-                        className="text-4xl sm:text-5xl font-extrabold leading-none"
-                        style={{
-                          color:
-                            analysis.noiseScore <= 30
-                              ? '#22c55e'
-                              : analysis.noiseScore <= 60
-                                ? '#eab308'
-                                : '#ef4444',
-                        }}
-                      >
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 20, marginBottom: 24 }}>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: 48, fontWeight: 800, lineHeight: 1, color: analysis.noiseScore <= 30 ? '#22c55e' : analysis.noiseScore <= 60 ? '#eab308' : '#ef4444' }}>
                         {analysis.noiseScore}
                       </div>
-                      <div className="text-xs text-[var(--text-muted)] mt-1">/ 100</div>
+                      <div style={{ fontSize: 12, color: '#64748B', marginTop: 4 }}>/ 100</div>
                     </div>
-                    <div className="flex-1 w-full">
-                      <div className="flex flex-wrap gap-2 mb-3">
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
                         <StatPill label="Mean" value={analysis.noiseStats.mean.toString()} />
                         <StatPill label="Std Dev" value={analysis.noiseStats.stdDev.toFixed(1)} />
-                        <StatPill
-                          label="Variance"
-                          value={analysis.noiseStats.variance.toFixed(0)}
-                        />
+                        <StatPill label="Variance" value={analysis.noiseStats.variance.toFixed(0)} />
                       </div>
-                      <div className="flex flex-col gap-2">
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                         {analysis.noiseBenchmarks.map((b, i) => (
-                          <div key={i} className="flex items-center gap-2.5">
-                            <span className="text-[11px] sm:text-xs text-[var(--text-secondary)] w-20 sm:w-[120px] shrink-0">
-                              {b.label}
-                            </span>
-                            <div className="flex-1 h-1.5 rounded-sm bg-[var(--bg-tertiary)]">
-                              <div
-                                className="h-full rounded-sm transition-[width] duration-300"
-                                style={{
-                                  width: `${Math.min(b.value, 100)}%`,
-                                  background:
-                                    i === 0
-                                      ? b.value <= 30
-                                        ? '#22c55e'
-                                        : b.value <= 60
-                                          ? '#eab308'
-                                          : '#ef4444'
-                                      : 'rgba(255,255,255,0.15)',
-                                }}
-                              />
+                          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <span style={{ fontSize: 12, color: '#94A3B8', width: 120, flexShrink: 0 }}>{b.label}</span>
+                            <div style={{ flex: 1, height: 5, borderRadius: 2, background: '#1E293B' }}>
+                              <div style={{ height: '100%', borderRadius: 2, width: `${Math.min(b.value, 100)}%`, transition: 'width 0.3s', background: i === 0 ? (b.value <= 30 ? '#22c55e' : b.value <= 60 ? '#eab308' : '#ef4444') : 'rgba(255,255,255,0.15)' }} />
                             </div>
-                            <span className="text-xs font-semibold text-[var(--text-primary)] w-[30px] text-right">
-                              {b.value}
-                            </span>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#E2E8F0', width: 30, textAlign: 'right' }}>{b.value}</span>
                           </div>
                         ))}
                       </div>
@@ -716,54 +689,27 @@ export default function DemoPage() {
               </div>
 
               {/* Section 4: Boardroom Simulation */}
-              <div id="boardroom" className="scroll-mt-20">
+              <div id="boardroom" style={{ scrollMarginTop: 80 }}>
                 <Section icon={<Users size={16} />} title="Boardroom Simulation — Decision Twins">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 12 }}>
                     {analysis.simulation.twins.map((twin, idx) => {
-                      const voteColor =
-                        twin.vote === 'REJECT'
-                          ? '#ef4444'
-                          : twin.vote === 'CONDITIONAL APPROVE'
-                            ? '#eab308'
-                            : '#22c55e';
+                      const voteColor = twin.vote === 'REJECT' ? '#ef4444' : twin.vote === 'CONDITIONAL APPROVE' ? '#eab308' : '#22c55e';
                       return (
-                        <div
-                          key={idx}
-                          className="bg-[var(--bg-tertiary)] rounded-[10px] p-4 border border-[var(--border-color)]"
-                        >
-                          <div className="flex justify-between items-center mb-2.5">
+                        <div key={idx} style={{ background: '#1E293B', borderRadius: 10, padding: 16, border: '1px solid #334155' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                             <div>
-                              <div className="font-bold text-[13px] text-[var(--text-primary)]">
-                                {twin.name}
-                              </div>
-                              <div className="text-[11px] text-[var(--text-muted)]">
-                                {twin.role}
-                              </div>
+                              <div style={{ fontWeight: 700, fontSize: 13, color: '#E2E8F0' }}>{twin.name}</div>
+                              <div style={{ fontSize: 11, color: '#64748B' }}>{twin.role}</div>
                             </div>
-                            <span
-                              className="text-[10px] px-2 py-0.5 rounded-md font-bold"
-                              style={{ background: `${voteColor}15`, color: voteColor }}
-                            >
-                              {twin.vote}
-                            </span>
+                            <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 6, fontWeight: 700, background: `${voteColor}15`, color: voteColor }}>{twin.vote}</span>
                           </div>
-                          <div className="mb-2.5">
-                            <div className="h-[3px] rounded-sm bg-[var(--bg-tertiary)]">
-                              <div
-                                className="h-full rounded-sm"
-                                style={{
-                                  width: `${twin.confidence * 100}%`,
-                                  background: voteColor,
-                                }}
-                              />
+                          <div style={{ marginBottom: 10 }}>
+                            <div style={{ height: 3, borderRadius: 2, background: '#334155' }}>
+                              <div style={{ height: '100%', borderRadius: 2, width: `${twin.confidence * 100}%`, background: voteColor }} />
                             </div>
-                            <div className="text-[10px] text-[var(--text-muted)] mt-0.5">
-                              {Math.round(twin.confidence * 100)}% confidence
-                            </div>
+                            <div style={{ fontSize: 10, color: '#64748B', marginTop: 2 }}>{Math.round(twin.confidence * 100)}% confidence</div>
                           </div>
-                          <p className="text-[var(--text-secondary)] text-xs m-0 leading-relaxed">
-                            {twin.rationale}
-                          </p>
+                          <p style={{ color: '#94A3B8', fontSize: 12, margin: 0, lineHeight: 1.5 }}>{twin.rationale}</p>
                         </div>
                       );
                     })}
@@ -773,52 +719,29 @@ export default function DemoPage() {
 
               {/* Section 5: Toxic Combinations */}
               {analysis.toxicCombinations && analysis.toxicCombinations.length > 0 && (
-                <div id="toxic" className="scroll-mt-20">
+                <div id="toxic" style={{ scrollMarginTop: 80 }}>
                   <Section
-                    icon={<AlertTriangle size={16} className="text-red-500" />}
+                    icon={<AlertTriangle size={16} style={{ color: '#ef4444' }} />}
                     title="Toxic Combinations — Compound Risk Patterns"
                   >
-                    <p className="text-[var(--text-secondary)] text-[13px] mb-4 leading-relaxed">
-                      Individual biases are manageable. When they combine with contextual factors,
-                      compound risk can be 8x worse than any single factor.
+                    <p style={{ color: '#94A3B8', fontSize: 13, marginBottom: 16, lineHeight: 1.6 }}>
+                      Individual biases are manageable. When they combine with contextual factors, compound risk can be 8x worse than any single factor.
                     </p>
-                    <div className="flex flex-col gap-3">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                       {analysis.toxicCombinations.map((tc, idx) => (
-                        <div
-                          key={idx}
-                          className="bg-[var(--bg-tertiary)] rounded-[10px] p-4 sm:p-[18px] border border-[var(--border-color)]"
-                        >
-                          <div className="flex flex-wrap items-center gap-2 mb-2.5">
-                            <span className="font-bold text-sm text-[var(--text-primary)]">
-                              {tc.name}
-                            </span>
-                            <span
-                              className="text-[10px] px-2.5 py-0.5 rounded-xl font-bold uppercase tracking-wide"
-                              style={{
-                                background: tc.riskLevel === 'critical' ? '#ef444415' : '#f9731615',
-                                color: tc.riskLevel === 'critical' ? '#ef4444' : '#f97316',
-                              }}
-                            >
-                              {tc.riskLevel}
-                            </span>
+                        <div key={idx} style={{ background: '#1E293B', borderRadius: 10, padding: '16px 18px', border: '1px solid #334155' }}>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                            <span style={{ fontWeight: 700, fontSize: 14, color: '#E2E8F0' }}>{tc.name}</span>
+                            <span style={{ fontSize: 10, padding: '2px 10px', borderRadius: 20, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', background: tc.riskLevel === 'critical' ? '#ef444415' : '#f9731615', color: tc.riskLevel === 'critical' ? '#ef4444' : '#f97316' }}>{tc.riskLevel}</span>
                           </div>
-                          <div className="flex flex-wrap gap-1.5 mb-2.5">
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 10 }}>
                             {tc.biases.map((b, bi) => (
-                              <span
-                                key={bi}
-                                className="text-[10px] px-2 py-0.5 rounded-md bg-[var(--bg-tertiary)] text-[var(--text-secondary)] border border-[var(--border-color)]"
-                              >
-                                {b}
-                              </span>
+                              <span key={bi} style={{ fontSize: 10, padding: '2px 8px', borderRadius: 6, background: '#334155', color: '#94A3B8', border: '1px solid #475569' }}>{b}</span>
                             ))}
                           </div>
-                          <p className="text-[var(--text-secondary)] text-[13px] m-0 leading-relaxed">
-                            {tc.description}
-                          </p>
+                          <p style={{ color: '#94A3B8', fontSize: 13, margin: 0, lineHeight: 1.6 }}>{tc.description}</p>
                           {tc.historicalExample && (
-                            <p className="text-red-400/70 text-[12px] m-0 mt-2 leading-relaxed italic">
-                              {tc.historicalExample}
-                            </p>
+                            <p style={{ color: 'rgba(239, 68, 68, 0.7)', fontSize: 12, margin: '8px 0 0', lineHeight: 1.5, fontStyle: 'italic' }}>{tc.historicalExample}</p>
                           )}
                         </div>
                       ))}
@@ -828,96 +751,65 @@ export default function DemoPage() {
               )}
 
               {/* Section 6: Pre-Mortem */}
-              <div id="premortem" className="scroll-mt-20">
+              <div id="premortem" style={{ scrollMarginTop: 80 }}>
                 <Section icon={<Skull size={16} />} title="Pre-Mortem Analysis">
-                  <p className="text-[var(--text-secondary)] text-[13px] mb-4 leading-relaxed">
-                    Imagine it&apos;s 2 years from now and this decision has failed spectacularly.
-                    What went wrong?
+                  <p style={{ color: '#94A3B8', fontSize: 13, marginBottom: 16, lineHeight: 1.6 }}>
+                    Imagine it&apos;s 2 years from now and this decision has failed spectacularly. What went wrong?
                   </p>
-                  <div className="flex flex-col gap-3">
-                    {analysis.preMortem.scenarios.map((s, idx) => (
-                      <div
-                        key={idx}
-                        className="bg-[var(--bg-tertiary)] rounded-[10px] p-4 sm:p-[18px] border border-[var(--border-color)]"
-                      >
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2.5">
-                          <span className="font-bold text-sm text-[var(--text-primary)]">
-                            {s.title}
-                          </span>
-                          <div className="flex gap-2">
-                            <span className="text-[10px] px-2.5 py-0.5 rounded-xl bg-yellow-500/10 text-yellow-500 font-bold">
-                              {Math.round(s.probability * 100)}% likely
-                            </span>
-                            <span
-                              className="text-[10px] px-2.5 py-0.5 rounded-xl font-bold uppercase"
-                              style={{
-                                background: `${s.impact === 'catastrophic' ? '#ef4444' : s.impact === 'severe' ? '#f97316' : '#eab308'}15`,
-                                color:
-                                  s.impact === 'catastrophic'
-                                    ? '#ef4444'
-                                    : s.impact === 'severe'
-                                      ? '#f97316'
-                                      : '#eab308',
-                              }}
-                            >
-                              {s.impact}
-                            </span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    {analysis.preMortem.scenarios.map((s, idx) => {
+                      const impactColor = s.impact === 'catastrophic' ? '#ef4444' : s.impact === 'severe' ? '#f97316' : '#eab308';
+                      return (
+                        <div key={idx} style={{ background: '#1E293B', borderRadius: 10, padding: '16px 18px', border: '1px solid #334155' }}>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 10 }}>
+                            <span style={{ fontWeight: 700, fontSize: 14, color: '#E2E8F0' }}>{s.title}</span>
+                            <div style={{ display: 'flex', gap: 8 }}>
+                              <span style={{ fontSize: 10, padding: '2px 10px', borderRadius: 20, fontWeight: 700, background: 'rgba(234, 179, 8, 0.1)', color: '#eab308' }}>{Math.round(s.probability * 100)}% likely</span>
+                              <span style={{ fontSize: 10, padding: '2px 10px', borderRadius: 20, fontWeight: 700, textTransform: 'uppercase', background: `${impactColor}15`, color: impactColor }}>{s.impact}</span>
+                            </div>
                           </div>
+                          <p style={{ color: '#94A3B8', fontSize: 13, margin: 0, lineHeight: 1.6 }}>{s.description}</p>
                         </div>
-                        <p className="text-[var(--text-secondary)] text-[13px] m-0 leading-relaxed">
-                          {s.description}
-                        </p>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </Section>
               </div>
 
               {/* Known Outcome Banner */}
               {analysis.outcome && (
-                <div className="mt-8 p-4 sm:p-5 bg-red-500/[0.06] border border-red-500/20 rounded-xl">
-                  <div className="flex items-center gap-2 mb-2.5">
-                    <TrendingUp size={16} className="text-red-500" />
-                    <span className="text-[13px] font-bold text-red-500 tracking-wide">
-                      KNOWN OUTCOME
-                    </span>
+                <div style={{ marginTop: 32, padding: '16px 20px', background: 'rgba(239, 68, 68, 0.06)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                    <TrendingUp size={16} style={{ color: '#ef4444' }} />
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#ef4444', letterSpacing: '0.5px' }}>KNOWN OUTCOME</span>
                   </div>
-                  <p className="text-[var(--text-secondary)] text-sm m-0 mb-1.5 leading-relaxed">
-                    {analysis.outcome.what}
-                  </p>
-                  <p className="text-[var(--text-muted)] text-xs m-0">
-                    {analysis.outcome.when} &middot; {analysis.outcome.impact}
-                  </p>
+                  <p style={{ color: '#94A3B8', fontSize: 14, margin: '0 0 6px', lineHeight: 1.6 }}>{analysis.outcome.what}</p>
+                  <p style={{ color: '#64748B', fontSize: 12, margin: 0 }}>{analysis.outcome.when} &middot; {analysis.outcome.impact}</p>
                 </div>
               )}
             </div>
 
             {/* CTA */}
-            <div
-              className="mt-12 text-center p-6 sm:p-10 rounded-2xl border border-[var(--border-color)]"
-              style={{ background: 'var(--bg-secondary)' }}
-            >
-              <h3 className="text-lg sm:text-[22px] font-bold text-[var(--text-primary)] mb-2">
+            <div style={{ marginTop: 48, textAlign: 'center', padding: '32px 40px', borderRadius: 16, border: '1px solid #1E293B', background: '#0F172A' }}>
+              <h3 style={{ fontSize: 22, fontWeight: 700, color: '#E2E8F0', marginBottom: 8 }}>
                 This was a demo. Now try it on your own documents.
               </h3>
-              <p className="text-[var(--text-secondary)] text-sm mb-6 max-w-[500px] mx-auto">
-                Upload any strategic document &mdash; board memo, M&amp;A rationale, investment
-                thesis, market analysis &mdash; and get a comprehensive cognitive bias audit in
-                minutes.
+              <p style={{ color: '#94A3B8', fontSize: 14, marginBottom: 24, maxWidth: 500, margin: '0 auto 24px', lineHeight: 1.6 }}>
+                Upload any strategic document &mdash; board memo, M&amp;A rationale, investment thesis, market analysis &mdash; and get a comprehensive cognitive bias audit in minutes.
               </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
                 <button
                   onClick={handleTryNow}
                   disabled={loadingSample}
                   aria-busy={loadingSample}
-                  className="px-7 py-3 rounded-[10px] bg-green-600 text-white font-bold text-sm border-none cursor-pointer disabled:cursor-wait hover:bg-green-500 transition-colors"
+                  style={{ padding: '12px 28px', borderRadius: 10, background: '#16A34A', color: '#FFFFFF', fontWeight: 700, fontSize: 14, border: 'none', cursor: loadingSample ? 'wait' : 'pointer' }}
                 >
                   {loadingSample ? 'Loading...' : 'Try with Sample Document'}{' '}
-                  <ArrowRight size={14} className="inline align-middle ml-1" />
+                  <ArrowRight size={14} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: 4 }} />
                 </button>
                 <Link
                   href="/login"
-                  className="px-7 py-3 rounded-[10px] bg-transparent border border-[var(--border-color)] text-[var(--text-primary)] font-semibold text-sm no-underline text-center hover:border-[var(--border-active)] transition-colors"
+                  style={{ padding: '12px 28px', borderRadius: 10, background: 'transparent', border: '1px solid #334155', color: '#E2E8F0', fontWeight: 600, fontSize: 14, textDecoration: 'none', textAlign: 'center' }}
                 >
                   Sign Up Free
                 </Link>
@@ -926,21 +818,20 @@ export default function DemoPage() {
                     href={DEMO_BOOKING_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-7 py-3 rounded-[10px] bg-transparent border border-indigo-500/30 text-indigo-400 font-semibold text-sm no-underline text-center"
+                    style={{ padding: '12px 28px', borderRadius: 10, background: 'transparent', border: '1px solid rgba(99, 102, 241, 0.3)', color: '#818CF8', fontWeight: 600, fontSize: 14, textDecoration: 'none', textAlign: 'center' }}
                     onClick={() => trackEvent('demo_cta_clicked', { target: 'book_demo' })}
                   >
-                    Book a Demo <ExternalLink size={14} className="inline align-middle ml-1" />
+                    Book a Demo <ExternalLink size={14} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: 4 }} />
                   </a>
                 )}
               </div>
-              <p className="text-[var(--text-muted)] text-[11px] mt-4">
+              <p style={{ color: '#64748B', fontSize: 11, marginTop: 16 }}>
                 No credit card required &middot; 3 free analyses &middot; 14-day trial on paid plans
               </p>
             </div>
 
-            <p className="text-[var(--text-muted)] text-[11px] text-center mt-8 leading-relaxed">
-              Demo analyses are generated by Decision Intel&apos;s cognitive bias detection engine
-              to demonstrate product capabilities. They are not financial or investment advice.
+            <p style={{ color: '#64748B', fontSize: 11, textAlign: 'center', marginTop: 32, lineHeight: 1.6 }}>
+              Demo analyses are generated by Decision Intel&apos;s cognitive bias detection engine to demonstrate product capabilities. They are not financial or investment advice.
             </p>
           </div>
         )}
@@ -1021,16 +912,32 @@ function Section({
   icon,
   title,
   children,
-  borderColor = 'border-[var(--border-color)]',
 }: {
   icon: React.ReactNode;
   title: string;
   children: React.ReactNode;
-  borderColor?: string;
 }) {
   return (
-    <div className={`bg-[var(--bg-secondary)] border ${borderColor} rounded-xl p-4 sm:p-6 mb-6`}>
-      <h3 className="text-[15px] font-bold mb-4 flex items-center gap-2 text-[var(--text-primary)]">
+    <div
+      style={{
+        background: '#0F172A',
+        border: '1px solid #1E293B',
+        borderRadius: 12,
+        padding: '16px 20px',
+        marginBottom: 24,
+      }}
+    >
+      <h3
+        style={{
+          fontSize: 15,
+          fontWeight: 700,
+          marginBottom: 16,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          color: '#E2E8F0',
+        }}
+      >
         {icon} {title}
       </h3>
       {children}
@@ -1052,15 +959,27 @@ function ScoreCard({
   smallValue?: boolean;
 }) {
   return (
-    <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl py-3 sm:py-[18px] px-3 sm:px-3.5 text-center">
-      <div className="text-[10px] text-[var(--text-muted)] mb-1.5 tracking-wide">{label}</div>
+    <div
+      style={{
+        background: '#0F172A',
+        border: '1px solid #1E293B',
+        borderRadius: 12,
+        padding: '12px 14px',
+        textAlign: 'center',
+      }}
+    >
+      <div style={{ fontSize: 10, color: '#64748B', marginBottom: 6, letterSpacing: '0.5px' }}>{label}</div>
       <div
-        className={`${smallValue ? 'text-lg sm:text-2xl' : 'text-2xl sm:text-4xl'} font-extrabold leading-none`}
-        style={{ color }}
+        style={{
+          fontSize: smallValue ? 20 : 32,
+          fontWeight: 800,
+          lineHeight: 1,
+          color,
+        }}
       >
         {value}
       </div>
-      <div className="text-[11px] text-[var(--text-muted)] mt-1">{sub}</div>
+      <div style={{ fontSize: 11, color: '#64748B', marginTop: 4 }}>{sub}</div>
     </div>
   );
 }
@@ -1068,8 +987,13 @@ function ScoreCard({
 function SeverityBadge({ severity }: { severity: string }) {
   return (
     <span
-      className="text-[10px] px-2.5 py-0.5 rounded-xl font-bold uppercase tracking-wide"
       style={{
+        fontSize: 10,
+        padding: '2px 10px',
+        borderRadius: 20,
+        fontWeight: 700,
+        textTransform: 'uppercase',
+        letterSpacing: '0.5px',
         background: `${sevColor(severity)}15`,
         color: sevColor(severity),
       }}
@@ -1081,9 +1005,9 @@ function SeverityBadge({ severity }: { severity: string }) {
 
 function StatPill({ label, value }: { label: string; value: string }) {
   return (
-    <div className="px-2.5 py-1 rounded-md bg-[var(--bg-tertiary)] border border-[var(--border-color)]">
-      <span className="text-[10px] text-[var(--text-muted)]">{label} </span>
-      <span className="text-xs font-semibold text-[var(--text-primary)]">{value}</span>
+    <div style={{ padding: '4px 10px', borderRadius: 6, background: '#1E293B', border: '1px solid #334155' }}>
+      <span style={{ fontSize: 10, color: '#64748B' }}>{label} </span>
+      <span style={{ fontSize: 12, fontWeight: 600, color: '#E2E8F0' }}>{value}</span>
     </div>
   );
 }
