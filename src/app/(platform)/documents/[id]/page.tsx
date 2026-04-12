@@ -99,6 +99,11 @@ const DQChainTab = lazy(() => import('./tabs/DQChainTab').then(m => ({ default: 
 const ForgottenQuestionsTab = lazy(() =>
   import('./tabs/ForgottenQuestionsTab').then(m => ({ default: m.ForgottenQuestionsTab }))
 );
+const BiasAnnotatedPDFViewer = lazy(() =>
+  import('@/components/visualizations/BiasAnnotatedPDFViewer').then(m => ({
+    default: m.BiasAnnotatedPDFViewer,
+  }))
+);
 
 interface VerificationSource {
   ticker?: string;
@@ -221,7 +226,8 @@ type TabId =
   | 'dq-chain'
   | 'perspectives'
   | 'intelligence'
-  | 'forgotten-questions';
+  | 'forgotten-questions'
+  | 'pdf-view';
 
 const VALID_TABS: TabId[] = [
   'overview',
@@ -232,6 +238,7 @@ const VALID_TABS: TabId[] = [
   'perspectives',
   'intelligence',
   'forgotten-questions',
+  'pdf-view',
 ];
 
 // Map old tab IDs to new ones for backward compatibility
@@ -807,6 +814,15 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             {
               label: 'Context',
               tabs: [{ id: 'intelligence' as const, label: 'Intelligence', icon: Globe }],
+            },
+          ]
+        : []),
+      ...(document.fileType === 'application/pdf' ||
+      document.filename?.toLowerCase().endsWith('.pdf')
+        ? [
+            {
+              label: 'Document',
+              tabs: [{ id: 'pdf-view' as const, label: 'PDF View', icon: FileText }],
             },
           ]
         : []),
@@ -2015,6 +2031,14 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                       <ForgottenQuestionsTab
                         forgottenQuestions={analysis?.forgottenQuestions}
                         analysisId={analysis?.id}
+                      />
+                    </ErrorBoundary>
+                  )}
+                  {activeTab === 'pdf-view' && (
+                    <ErrorBoundary sectionName="PDF Viewer">
+                      <BiasAnnotatedPDFViewer
+                        documentId={document.id}
+                        biases={biases}
                       />
                     </ErrorBoundary>
                   )}

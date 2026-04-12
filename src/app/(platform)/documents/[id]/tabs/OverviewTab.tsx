@@ -13,6 +13,13 @@ const BiasNetwork = dynamic(
   { ssr: false }
 );
 import { RiskHeatMap } from '@/components/visualizations/RiskHeatMap';
+const BiasProfileRadar = dynamic(
+  () =>
+    import('@/components/visualizations/BiasProfileRadar').then(m => ({
+      default: m.BiasProfileRadar,
+    })),
+  { ssr: false },
+);
 import { DecisionTimeline } from '@/components/visualizations/DecisionTimeline';
 import { DQIBadge } from '@/components/visualizations/DQIBadge';
 import { System1GaugeBar } from '@/components/visualizations/System1GaugeBar';
@@ -193,9 +200,17 @@ export function OverviewTab({
         <DocumentTextHighlighter content={documentContent} biases={biases} />
       </ErrorBoundary>
 
-      {/* 2. Bias Network + Risk Landscape side-by-side */}
-      <ErrorBoundary sectionName="Bias Network & Risk Map">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-lg" style={{ minHeight: '400px' }}>
+      {/* 2. Bias Profile Radar + Network + Risk Landscape */}
+      <ErrorBoundary sectionName="Bias Visualizations">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-lg" style={{ minHeight: '400px' }}>
+          <div className="card">
+            <div className="card-header">
+              <h4>Bias Intensity Profile</h4>
+            </div>
+            <div className="card-body">
+              <BiasProfileRadar biases={biases} />
+            </div>
+          </div>
           <div className="card overflow-hidden">
             <div className="card-header">
               <h4>Bias Network Map</h4>
