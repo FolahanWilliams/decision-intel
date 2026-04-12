@@ -177,9 +177,9 @@ export default function DemoPage() {
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
-      {/* Header — matches the marketing site's white nav (not the old dark bar) */}
-      <div className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 sticky top-0 z-50">
-        <div className="max-w-[960px] mx-auto flex items-center justify-between">
+      {/* Header */}
+      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E2E8F0', padding: '12px 24px', position: 'sticky', top: 0, zIndex: 50 }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Link href="/" className="flex items-center gap-2 no-underline text-inherit">
             <Image
               src="/logo.png"
@@ -216,7 +216,7 @@ export default function DemoPage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-[960px] mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-20">
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px 24px 80px' }}>
         {/* Video Demo Section — always visible when not in simulation/results/scan */}
         {!isSimulating && !showResults && !scanResult && (
           <>
