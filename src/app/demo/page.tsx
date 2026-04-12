@@ -176,11 +176,11 @@ export default function DemoPage() {
   }, [showResults]);
 
   return (
-    <div className="dark" style={{ minHeight: '100vh', background: 'var(--bg-primary, #0A0F1A)', color: 'var(--text-primary, #E2E8F0)' }}>
-      {/* Header */}
-      <div style={{ background: '#0F172A', borderBottom: '1px solid #1E293B', padding: '12px 24px', position: 'sticky', top: 0, zIndex: 50 }}>
-        <div style={{ maxWidth: 960, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', color: 'inherit' }}>
+    <div className="min-h-screen bg-white text-slate-900">
+      {/* Header — matches the marketing site's white nav (not the old dark bar) */}
+      <div className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 sticky top-0 z-50">
+        <div className="max-w-[960px] mx-auto flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2 no-underline text-inherit">
             <Image
               src="/logo.png"
               alt="Decision Intel"
@@ -188,23 +188,23 @@ export default function DemoPage() {
               height={24}
               style={{ borderRadius: 6, objectFit: 'cover' }}
             />
-            <span style={{ fontSize: 14, fontWeight: 600 }}>
-              <span style={{ color: '#E2E8F0' }}>Decision</span>
-              <span style={{ color: '#64748B', marginLeft: 4 }}>Intel</span>
+            <span className="text-sm font-semibold">
+              <span className="text-slate-900">Decision</span>
+              <span className="text-slate-400 ml-1">Intel</span>
             </span>
           </Link>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontSize: 11, padding: '4px 10px', borderRadius: 9999, background: 'rgba(22, 163, 74, 0.1)', color: '#16A34A', fontWeight: 700, letterSpacing: '0.5px', border: '1px solid rgba(22, 163, 74, 0.2)' }}>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <span className="hidden sm:inline text-[11px] px-2.5 py-1 rounded-full bg-green-50 text-green-600 font-semibold tracking-wide border border-green-100">
               INTERACTIVE DEMO
             </span>
             <button
               onClick={handleTryNow}
               disabled={loadingSample}
               aria-busy={loadingSample}
-              style={{ fontSize: 13, padding: '6px 16px', borderRadius: 8, background: '#16A34A', color: '#FFFFFF', fontWeight: 600, border: 'none', cursor: loadingSample ? 'wait' : 'pointer', opacity: loadingSample ? 0.7 : 1 }}
+              className="text-xs sm:text-[13px] px-3 sm:px-4 py-1.5 rounded-lg bg-green-600 text-white font-semibold border-none cursor-pointer disabled:opacity-70 disabled:cursor-wait hover:bg-green-700 transition-colors"
             >
               {loadingSample ? (
-                <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span className="flex items-center gap-1.5">
                   <Loader2 size={14} className="animate-spin" /> Loading...
                 </span>
               ) : (
@@ -216,80 +216,104 @@ export default function DemoPage() {
       </div>
 
       {/* Content */}
-      <div style={{ maxWidth: 960, margin: '0 auto', padding: '24px 16px 80px' }}>
-        {/* Video Demo Section */}
+      <div className="max-w-[960px] mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-20">
+        {/* Video Demo Section — always visible when not in simulation/results/scan */}
         {!isSimulating && !showResults && !scanResult && (
           <>
             <DemoVideoSection />
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16, margin: '32px 0' }}>
-              <div style={{ flex: 1, height: 1, background: '#1E293B' }} />
-              <span style={{ fontSize: 11, color: '#64748B', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
+
+            {/* Divider */}
+            <div className="flex items-center gap-4 my-8">
+              <div className="flex-1 h-px bg-slate-100" />
+              <span className="text-xs text-slate-500 font-semibold tracking-widest uppercase">
                 Or try it yourself
               </span>
-              <div style={{ flex: 1, height: 1, background: '#1E293B' }} />
+              <div className="flex-1 h-px bg-slate-100" />
             </div>
           </>
         )}
 
         {/* Interactive Demo Section */}
         {!isSimulating && !showResults && !scanResult && (
-          <div style={{ marginBottom: 40 }}>
-            <div style={{ textAlign: 'center', marginBottom: 40 }}>
-              <h2 style={{ fontSize: 'clamp(24px, 4vw, 32px)', fontWeight: 800, color: '#E2E8F0', marginBottom: 12, lineHeight: 1.2 }}>
-                Interactive <span style={{ color: '#16A34A' }}>Demo</span>
+          <div className="mb-10">
+            <div className="text-center mb-10">
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3 leading-tight">
+                Interactive <span className="text-green-600">Demo</span>
               </h2>
-              <p style={{ color: '#94A3B8', fontSize: 15, maxWidth: 600, margin: '0 auto', lineHeight: 1.6 }}>
-                Pick a real-world case study and watch the AI pipeline analyze it in real time. No login required.
+              <p className="text-slate-500 text-sm sm:text-base max-w-[600px] mx-auto leading-relaxed">
+                Pick a real-world case study and watch the AI pipeline analyze it in real time. No
+                login required.
               </p>
             </div>
 
-            <div style={{ fontSize: 11, color: '#16A34A', marginBottom: 16, letterSpacing: '1.5px', textTransform: 'uppercase', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
+            {/* Sample Document Cards */}
+            <div className="text-[11px] text-green-600 mb-4 tracking-widest uppercase font-semibold flex items-center gap-2">
               <FileText size={13} />
               Choose a document to analyze
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16, marginBottom: 32 }}>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
               {DEMO_ANALYSES.map((a, idx) => {
-                const sc = a.overallScore >= 70 ? '#22c55e' : a.overallScore >= 40 ? '#eab308' : '#ef4444';
+                const scoreColor =
+                  a.overallScore >= 70 ? '#22c55e' : a.overallScore >= 40 ? '#eab308' : '#ef4444';
                 return (
                   <button
                     key={a.id}
                     onClick={() => startSimulation(idx)}
+                    className="text-left rounded-2xl bg-white border border-slate-200 cursor-pointer transition-all duration-200 hover:border-green-200 hover:shadow-lg group"
                     style={{
-                      textAlign: 'left',
-                      borderRadius: 16,
-                      background: '#0F172A',
-                      border: '1px solid #1E293B',
-                      cursor: 'pointer',
                       display: 'flex',
                       flexDirection: 'column',
-                      gap: 16,
-                      padding: '24px 20px',
-                      transition: 'border-color 0.2s, box-shadow 0.2s',
-                      color: 'inherit',
+                      gap: '16px',
+                      padding: '28px 24px',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
                     }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#16A34A40'; (e.currentTarget as HTMLElement).style.boxShadow = '0 0 20px rgba(22,163,74,0.08)'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '#1E293B'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
                   >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(22, 163, 74, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    {/* Icon + DQI badge row */}
+                    <div className="flex items-start justify-between">
+                      <div
+                        className="shrink-0"
+                        style={{
+                          width: 44,
+                          height: 44,
+                          borderRadius: 12,
+                          background: '#F0FDF4',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
                         <FileText size={20} style={{ color: '#16A34A' }} />
                       </div>
-                      <span style={{ fontSize: 12, padding: '4px 10px', borderRadius: 8, fontWeight: 700, background: `${sc}15`, color: sc, border: `1px solid ${sc}30` }}>
+                      <span
+                        className="text-xs px-2.5 py-1 rounded-lg font-bold"
+                        style={{
+                          background: `${scoreColor}12`,
+                          color: scoreColor,
+                          border: `1px solid ${scoreColor}30`,
+                        }}
+                      >
                         DQI {a.overallScore}/100
                       </span>
                     </div>
+
+                    {/* Title + description */}
                     <div>
-                      <div style={{ fontSize: 16, fontWeight: 700, color: '#E2E8F0', marginBottom: 6, lineHeight: 1.3 }}>
+                      <div className="text-base font-bold text-slate-900 mb-1.5 leading-tight">
                         {a.shortName}
                       </div>
-                      <div style={{ fontSize: 13, color: '#94A3B8', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      <div className="text-sm text-slate-500 leading-relaxed line-clamp-2">
                         {a.summary.slice(0, 140)}...
                       </div>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#16A34A', fontWeight: 600, marginTop: 'auto', paddingTop: 8, borderTop: '1px solid #1E293B' }}>
+
+                    {/* CTA footer */}
+                    <div className="flex items-center gap-2 text-xs text-green-600 font-semibold group-hover:text-green-700 transition-colors mt-auto pt-2 border-t border-slate-100">
                       <Upload size={13} />
                       <span>Click to analyze</span>
-                      <ArrowRight size={13} style={{ marginLeft: 'auto' }} />
+                      <ArrowRight
+                        size={13}
+                        className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity"
+                      />
                     </div>
                   </button>
                 );
@@ -297,33 +321,33 @@ export default function DemoPage() {
             </div>
 
             {/* Paste Your Own Text */}
-            <div style={{ textAlign: 'center' }}>
+            <div className="text-center">
               <button
                 onClick={() => setPasteMode(!pasteMode)}
-                style={{ fontSize: 12, color: '#64748B', background: 'transparent', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                className="text-xs text-slate-500 hover:text-slate-900 transition-colors cursor-pointer bg-transparent border-none flex items-center gap-1.5 mx-auto"
               >
                 <ClipboardPaste size={14} />
                 {pasteMode ? 'Hide text input' : 'Or paste your own text for a preview'}
               </button>
             </div>
             {pasteMode && !scanResult && (
-              <div style={{ marginTop: 16 }}>
+              <div className="mt-4">
                 <textarea
                   value={pasteText}
                   onChange={e => setPasteText(e.target.value)}
-                  style={{ width: '100%', height: 128, background: '#0F172A', border: '1px solid #1E293B', borderRadius: 12, padding: 16, fontSize: 14, color: '#E2E8F0', resize: 'none', outline: 'none', fontFamily: 'inherit' }}
+                  className="w-full h-32 bg-slate-50 border border-slate-300 rounded-xl p-4 text-sm text-slate-300 resize-none focus:outline-none focus:border-slate-300 placeholder:text-slate-600"
                   placeholder="Paste a decision memo, investment thesis, or strategic rationale..."
                 />
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12 }}>
-                  <span style={{ fontSize: 11, color: '#64748B' }}>
+                <div className="flex justify-between items-center mt-3">
+                  <span className="text-[11px] text-slate-600">
                     Real-time bias scan — results generated from your text
                   </span>
                   <button
                     onClick={handlePasteAnalyze}
                     disabled={pasteText.trim().length < 15}
-                    style={{ padding: '8px 16px', borderRadius: 8, background: '#16A34A', color: '#FFFFFF', fontSize: 12, fontWeight: 600, border: 'none', cursor: pasteText.trim().length < 15 ? 'not-allowed' : 'pointer', opacity: pasteText.trim().length < 15 ? 0.4 : 1 }}
+                    className="px-4 py-2 rounded-lg bg-white text-black text-xs font-semibold cursor-pointer border-none disabled:opacity-40 disabled:cursor-not-allowed"
                   >
-                    Scan for Biases <ArrowRight size={12} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: 4 }} />
+                    Scan for Biases <ArrowRight size={12} className="inline ml-1" />
                   </button>
                 </div>
               </div>
@@ -344,55 +368,68 @@ export default function DemoPage() {
 
         {/* Streaming Simulation */}
         {isSimulating && (
-          <div style={{ marginBottom: 40 }}>
-            <div style={{ textAlign: 'center', marginBottom: 32 }}>
-              <Loader2 size={32} style={{ color: '#16A34A' }} className="animate-spin" />
-              <h2 style={{ fontSize: 20, fontWeight: 700, color: '#E2E8F0', marginTop: 16, marginBottom: 8 }}>Analyzing document...</h2>
-              <p style={{ fontSize: 14, color: '#94A3B8', margin: 0 }}>{analysis?.shortName ?? 'Document'}</p>
+          <div className="mb-10">
+            <div className="text-center mb-8">
+              <Loader2 size={32} className="text-slate-900 animate-spin mx-auto mb-4" />
+              <h2 className="text-xl font-bold text-slate-900 mb-2">Analyzing document...</h2>
+              <p className="text-slate-500 text-sm">{analysis?.shortName ?? 'Document'}</p>
             </div>
 
-            <div style={{ maxWidth: 480, margin: '0 auto' }}>
+            {/* Progress Pipeline */}
+            <div className="max-w-[480px] mx-auto">
               {PIPELINE_STAGES.map((stage, idx) => {
                 const StageIcon = stage.icon;
                 const isComplete = idx < currentStage;
                 const isActive = idx === currentStage;
                 const isPending = idx > currentStage;
+
                 return (
                   <div
                     key={stage.id}
-                    style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', transition: 'opacity 0.3s', opacity: isPending ? 0.3 : 1 }}
+                    className="flex items-center gap-3 py-2.5 transition-all duration-300"
+                    style={{ opacity: isPending ? 0.3 : 1 }}
                   >
                     <div
+                      className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all duration-300"
                       style={{
-                        width: 32, height: 32, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.3s',
-                        background: isComplete ? 'rgba(34, 197, 94, 0.15)' : isActive ? 'rgba(22, 163, 74, 0.08)' : 'rgba(255,255,255,0.03)',
-                        border: isActive ? '1px solid rgba(22, 163, 74, 0.3)' : '1px solid rgba(255,255,255,0.05)',
+                        background: isComplete
+                          ? 'rgba(34, 197, 94, 0.15)'
+                          : isActive
+                            ? 'rgba(0, 0, 0, 0.04)'
+                            : 'rgba(0, 0, 0, 0.02)',
+                        border: isActive
+                          ? '1px solid rgba(0, 0, 0, 0.1)'
+                          : '1px solid rgba(0, 0, 0, 0.04)',
                       }}
                     >
                       {isComplete ? (
-                        <CheckCircle2 size={16} style={{ color: '#22c55e' }} />
+                        <CheckCircle2 size={16} className="text-green-500" />
                       ) : isActive ? (
-                        <Loader2 size={16} style={{ color: '#16A34A' }} className="animate-spin" />
+                        <Loader2 size={16} className="text-slate-900 animate-spin" />
                       ) : (
-                        <StageIcon size={16} style={{ color: '#475569' }} />
+                        <StageIcon size={16} className="text-slate-600" />
                       )}
                     </div>
-                    <span style={{ fontSize: 13, fontWeight: 500, color: isComplete ? '#22c55e' : isActive ? '#E2E8F0' : '#475569' }}>
+                    <span
+                      className={`text-[13px] font-medium ${isComplete ? 'text-green-500' : isActive ? 'text-slate-900' : 'text-slate-600'}`}
+                    >
                       {stage.label}
-                      {isActive && <span style={{ color: '#64748B', marginLeft: 6 }} className="animate-pulse">...</span>}
+                      {isActive && <span className="text-slate-500 ml-1.5 animate-pulse">...</span>}
                     </span>
                   </div>
                 );
               })}
             </div>
 
-            <div style={{ maxWidth: 480, margin: '24px auto 0' }}>
-              <div style={{ height: 3, borderRadius: 2, background: '#1E293B' }}>
+            {/* Overall progress bar */}
+            <div className="max-w-[480px] mx-auto mt-6">
+              <div className="h-1 rounded-full bg-slate-100">
                 <div
-                  style={{ height: '100%', borderRadius: 2, background: '#16A34A', transition: 'width 0.5s', width: `${((currentStage + 1) / PIPELINE_STAGES.length) * 100}%` }}
+                  className="h-full rounded-full bg-[#16A34A] transition-all duration-500"
+                  style={{ width: `${((currentStage + 1) / PIPELINE_STAGES.length) * 100}%` }}
                 />
               </div>
-              <div style={{ fontSize: 11, color: '#64748B', marginTop: 8, textAlign: 'center' }}>
+              <div className="text-[11px] text-slate-500 mt-2 text-center">
                 Step {currentStage + 1} of {PIPELINE_STAGES.length}
               </div>
             </div>
@@ -403,35 +440,31 @@ export default function DemoPage() {
         {showResults && analysis && (
           <div
             ref={resultsRef}
-            style={{ paddingTop: 32, paddingBottom: 32, scrollBehavior: 'smooth', color: '#E2E8F0' }}
+            className="py-8"
+            style={{ scrollBehavior: 'smooth', color: 'var(--text-primary)' }}
           >
             {/* Back / Re-select */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+            <div className="flex items-center justify-between mb-6">
               <button
                 onClick={() => {
                   setShowResults(false);
                   setSelectedIdx(null);
                 }}
-                style={{ fontSize: 12, color: '#64748B', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+                className="text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer bg-transparent border-none flex items-center gap-1.5"
               >
-                <ArrowRight size={12} style={{ transform: 'rotate(180deg)' }} />
+                <ArrowRight size={12} className="rotate-180" />
                 Try another document
               </button>
-              <div style={{ display: 'flex', gap: 8 }}>
+              <div className="flex gap-2">
                 {DEMO_ANALYSES.map((a, idx) => (
                   <button
                     key={a.id}
                     onClick={() => startSimulation(idx)}
-                    style={{
-                      padding: '4px 10px',
-                      borderRadius: 6,
-                      fontSize: 11,
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      border: idx === selectedIdx ? '1px solid #334155' : '1px solid #1E293B',
-                      background: idx === selectedIdx ? '#1E293B' : 'transparent',
-                      color: idx === selectedIdx ? '#E2E8F0' : '#64748B',
-                    }}
+                    className={`px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer border transition-all ${
+                      idx === selectedIdx
+                        ? 'border-[var(--border-active)] bg-[var(--bg-tertiary)] text-[var(--text-primary)]'
+                        : 'border-[var(--border-color)] bg-transparent text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                    }`}
                   >
                     {a.shortName}
                   </button>
@@ -467,14 +500,14 @@ export default function DemoPage() {
               </nav>
 
               {/* Section 1: Score Hero */}
-              <div id="score" style={{ scrollMarginTop: 80 }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 20, marginBottom: 24 }}>
+              <div id="score" className="scroll-mt-20">
+                <div className="flex items-start gap-5 mb-6">
                   <DQIBadge score={analysis.overallScore} size="lg" showGrade animate />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <h1 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6, lineHeight: 1.3, color: '#E2E8F0' }}>
+                  <div className="flex-1 min-w-0">
+                    <h1 className="text-lg sm:text-xl font-bold mb-1.5 leading-snug text-[var(--text-primary)]">
                       {analysis.documentName}
                     </h1>
-                    <p style={{ color: '#64748B', fontSize: 13, margin: 0 }}>
+                    <p className="text-[var(--text-muted)] text-xs sm:text-[13px] m-0">
                       Analyzed by Decision Intel &middot;{' '}
                       {new Date(analysis.createdAt).toLocaleDateString('en-US', {
                         year: 'numeric',
@@ -484,7 +517,7 @@ export default function DemoPage() {
                     </p>
                   </div>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 32 }} className="grid-cols-2 sm:grid-cols-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 mb-8">
                   <ScoreCard
                     label="DECISION QUALITY"
                     value={`${analysis.overallScore}`}
@@ -532,36 +565,37 @@ export default function DemoPage() {
               </div>
 
               {/* Section 2: Biases */}
-              <div id="biases" style={{ scrollMarginTop: 80 }}>
+              <div id="biases" className="scroll-mt-20">
                 <Section
                   icon={<Brain size={16} />}
                   title={`Cognitive Biases Detected (${analysis.biases.length})`}
                 >
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <div className="flex flex-col gap-3">
                     {(showAllBiases ? analysis.biases : analysis.biases.slice(0, 4)).map(
                       (bias, idx) => (
                         <div
                           key={idx}
-                          style={{ background: '#1E293B', borderRadius: 10, padding: '16px 18px', border: '1px solid #334155' }}
+                          className="bg-[var(--bg-tertiary)] rounded-[10px] p-4 sm:p-[18px] border border-[var(--border-color)]"
                         >
-                          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                            <span style={{ fontWeight: 700, fontSize: 14, color: '#E2E8F0', textTransform: 'capitalize' }}>
+                          <div className="flex flex-wrap items-center gap-2 mb-2.5">
+                            <span className="font-bold text-sm text-[var(--text-primary)]">
                               {bias.biasType.replace(/_/g, ' ')}
                             </span>
                             <SeverityBadge severity={bias.severity} />
-                            <span style={{ fontSize: 11, color: '#64748B', marginLeft: 'auto' }}>
+                            <span className="text-[11px] text-[var(--text-muted)] sm:ml-auto">
                               {Math.round(bias.confidence * 100)}% confidence
                             </span>
                           </div>
                           <p
-                            style={{ color: '#94A3B8', fontSize: 13, margin: '0 0 10px', fontStyle: 'italic', lineHeight: 1.6, paddingLeft: 12, borderLeft: `2px solid ${sevColor(bias.severity)}30` }}
+                            className="text-[var(--text-secondary)] text-[13px] m-0 mb-2.5 italic leading-relaxed pl-3"
+                            style={{ borderLeft: `2px solid ${sevColor(bias.severity)}30` }}
                           >
                             &ldquo;{bias.excerpt}&rdquo;
                           </p>
-                          <p style={{ color: '#94A3B8', fontSize: 13, margin: '0 0 10px', lineHeight: 1.6 }}>
+                          <p className="text-[var(--text-secondary)] text-[13px] m-0 mb-2.5 leading-relaxed">
                             {bias.explanation}
                           </p>
-                          <p style={{ color: 'rgba(34, 197, 94, 0.8)', fontSize: 13, margin: 0, lineHeight: 1.6 }}>
+                          <p className="text-green-500/80 text-[13px] m-0 leading-relaxed">
                             <strong>Recommendation:</strong> {bias.suggestion}
                           </p>
                         </div>
@@ -571,7 +605,7 @@ export default function DemoPage() {
                   {analysis.biases.length > 4 && !showAllBiases && (
                     <button
                       onClick={() => setShowAllBiases(true)}
-                      style={{ marginTop: 12, fontSize: 12, color: '#94A3B8', background: 'transparent', border: '1px solid #334155', borderRadius: 8, padding: '6px 12px', cursor: 'pointer' }}
+                      className="mt-3 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors bg-transparent border border-[var(--border-color)] rounded-lg px-3 py-1.5 cursor-pointer"
                     >
                       Show all {analysis.biases.length} biases
                     </button>
@@ -582,7 +616,14 @@ export default function DemoPage() {
               {/* Section 2b: 3D Bias Visualizations */}
               {analysis.biases.length >= 3 && (
                 <div className="scroll-mt-20 mb-10">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: 16,
+                    }}
+                    className="grid-cols-1 sm:grid-cols-2"
+                  >
                     {/* 3D Bias Network */}
                     <div
                       style={{
@@ -657,29 +698,59 @@ export default function DemoPage() {
               )}
 
               {/* Section 3: Noise */}
-              <div id="noise" style={{ scrollMarginTop: 80 }}>
+              <div id="noise" className="scroll-mt-20">
                 <Section icon={<Target size={16} />} title="Decision Noise Analysis">
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 20, marginBottom: 24 }}>
-                    <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: 48, fontWeight: 800, lineHeight: 1, color: analysis.noiseScore <= 30 ? '#22c55e' : analysis.noiseScore <= 60 ? '#eab308' : '#ef4444' }}>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5 mb-6">
+                    <div className="text-center">
+                      <div
+                        className="text-4xl sm:text-5xl font-extrabold leading-none"
+                        style={{
+                          color:
+                            analysis.noiseScore <= 30
+                              ? '#22c55e'
+                              : analysis.noiseScore <= 60
+                                ? '#eab308'
+                                : '#ef4444',
+                        }}
+                      >
                         {analysis.noiseScore}
                       </div>
-                      <div style={{ fontSize: 12, color: '#64748B', marginTop: 4 }}>/ 100</div>
+                      <div className="text-xs text-[var(--text-muted)] mt-1">/ 100</div>
                     </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+                    <div className="flex-1 w-full">
+                      <div className="flex flex-wrap gap-2 mb-3">
                         <StatPill label="Mean" value={analysis.noiseStats.mean.toString()} />
                         <StatPill label="Std Dev" value={analysis.noiseStats.stdDev.toFixed(1)} />
-                        <StatPill label="Variance" value={analysis.noiseStats.variance.toFixed(0)} />
+                        <StatPill
+                          label="Variance"
+                          value={analysis.noiseStats.variance.toFixed(0)}
+                        />
                       </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <div className="flex flex-col gap-2">
                         {analysis.noiseBenchmarks.map((b, i) => (
-                          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                            <span style={{ fontSize: 12, color: '#94A3B8', width: 120, flexShrink: 0 }}>{b.label}</span>
-                            <div style={{ flex: 1, height: 5, borderRadius: 2, background: '#1E293B' }}>
-                              <div style={{ height: '100%', borderRadius: 2, width: `${Math.min(b.value, 100)}%`, transition: 'width 0.3s', background: i === 0 ? (b.value <= 30 ? '#22c55e' : b.value <= 60 ? '#eab308' : '#ef4444') : 'rgba(255,255,255,0.15)' }} />
+                          <div key={i} className="flex items-center gap-2.5">
+                            <span className="text-[11px] sm:text-xs text-[var(--text-secondary)] w-20 sm:w-[120px] shrink-0">
+                              {b.label}
+                            </span>
+                            <div className="flex-1 h-1.5 rounded-sm bg-[var(--bg-tertiary)]">
+                              <div
+                                className="h-full rounded-sm transition-[width] duration-300"
+                                style={{
+                                  width: `${Math.min(b.value, 100)}%`,
+                                  background:
+                                    i === 0
+                                      ? b.value <= 30
+                                        ? '#22c55e'
+                                        : b.value <= 60
+                                          ? '#eab308'
+                                          : '#ef4444'
+                                      : 'rgba(255,255,255,0.15)',
+                                }}
+                              />
                             </div>
-                            <span style={{ fontSize: 12, fontWeight: 600, color: '#E2E8F0', width: 30, textAlign: 'right' }}>{b.value}</span>
+                            <span className="text-xs font-semibold text-[var(--text-primary)] w-[30px] text-right">
+                              {b.value}
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -689,27 +760,54 @@ export default function DemoPage() {
               </div>
 
               {/* Section 4: Boardroom Simulation */}
-              <div id="boardroom" style={{ scrollMarginTop: 80 }}>
+              <div id="boardroom" className="scroll-mt-20">
                 <Section icon={<Users size={16} />} title="Boardroom Simulation — Decision Twins">
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 12 }}>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {analysis.simulation.twins.map((twin, idx) => {
-                      const voteColor = twin.vote === 'REJECT' ? '#ef4444' : twin.vote === 'CONDITIONAL APPROVE' ? '#eab308' : '#22c55e';
+                      const voteColor =
+                        twin.vote === 'REJECT'
+                          ? '#ef4444'
+                          : twin.vote === 'CONDITIONAL APPROVE'
+                            ? '#eab308'
+                            : '#22c55e';
                       return (
-                        <div key={idx} style={{ background: '#1E293B', borderRadius: 10, padding: 16, border: '1px solid #334155' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                        <div
+                          key={idx}
+                          className="bg-[var(--bg-tertiary)] rounded-[10px] p-4 border border-[var(--border-color)]"
+                        >
+                          <div className="flex justify-between items-center mb-2.5">
                             <div>
-                              <div style={{ fontWeight: 700, fontSize: 13, color: '#E2E8F0' }}>{twin.name}</div>
-                              <div style={{ fontSize: 11, color: '#64748B' }}>{twin.role}</div>
+                              <div className="font-bold text-[13px] text-[var(--text-primary)]">
+                                {twin.name}
+                              </div>
+                              <div className="text-[11px] text-[var(--text-muted)]">
+                                {twin.role}
+                              </div>
                             </div>
-                            <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 6, fontWeight: 700, background: `${voteColor}15`, color: voteColor }}>{twin.vote}</span>
+                            <span
+                              className="text-[10px] px-2 py-0.5 rounded-md font-bold"
+                              style={{ background: `${voteColor}15`, color: voteColor }}
+                            >
+                              {twin.vote}
+                            </span>
                           </div>
-                          <div style={{ marginBottom: 10 }}>
-                            <div style={{ height: 3, borderRadius: 2, background: '#334155' }}>
-                              <div style={{ height: '100%', borderRadius: 2, width: `${twin.confidence * 100}%`, background: voteColor }} />
+                          <div className="mb-2.5">
+                            <div className="h-[3px] rounded-sm bg-[var(--bg-tertiary)]">
+                              <div
+                                className="h-full rounded-sm"
+                                style={{
+                                  width: `${twin.confidence * 100}%`,
+                                  background: voteColor,
+                                }}
+                              />
                             </div>
-                            <div style={{ fontSize: 10, color: '#64748B', marginTop: 2 }}>{Math.round(twin.confidence * 100)}% confidence</div>
+                            <div className="text-[10px] text-[var(--text-muted)] mt-0.5">
+                              {Math.round(twin.confidence * 100)}% confidence
+                            </div>
                           </div>
-                          <p style={{ color: '#94A3B8', fontSize: 12, margin: 0, lineHeight: 1.5 }}>{twin.rationale}</p>
+                          <p className="text-[var(--text-secondary)] text-xs m-0 leading-relaxed">
+                            {twin.rationale}
+                          </p>
                         </div>
                       );
                     })}
@@ -719,29 +817,52 @@ export default function DemoPage() {
 
               {/* Section 5: Toxic Combinations */}
               {analysis.toxicCombinations && analysis.toxicCombinations.length > 0 && (
-                <div id="toxic" style={{ scrollMarginTop: 80 }}>
+                <div id="toxic" className="scroll-mt-20">
                   <Section
-                    icon={<AlertTriangle size={16} style={{ color: '#ef4444' }} />}
+                    icon={<AlertTriangle size={16} className="text-red-500" />}
                     title="Toxic Combinations — Compound Risk Patterns"
                   >
-                    <p style={{ color: '#94A3B8', fontSize: 13, marginBottom: 16, lineHeight: 1.6 }}>
-                      Individual biases are manageable. When they combine with contextual factors, compound risk can be 8x worse than any single factor.
+                    <p className="text-[var(--text-secondary)] text-[13px] mb-4 leading-relaxed">
+                      Individual biases are manageable. When they combine with contextual factors,
+                      compound risk can be 8x worse than any single factor.
                     </p>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <div className="flex flex-col gap-3">
                       {analysis.toxicCombinations.map((tc, idx) => (
-                        <div key={idx} style={{ background: '#1E293B', borderRadius: 10, padding: '16px 18px', border: '1px solid #334155' }}>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                            <span style={{ fontWeight: 700, fontSize: 14, color: '#E2E8F0' }}>{tc.name}</span>
-                            <span style={{ fontSize: 10, padding: '2px 10px', borderRadius: 20, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', background: tc.riskLevel === 'critical' ? '#ef444415' : '#f9731615', color: tc.riskLevel === 'critical' ? '#ef4444' : '#f97316' }}>{tc.riskLevel}</span>
+                        <div
+                          key={idx}
+                          className="bg-[var(--bg-tertiary)] rounded-[10px] p-4 sm:p-[18px] border border-[var(--border-color)]"
+                        >
+                          <div className="flex flex-wrap items-center gap-2 mb-2.5">
+                            <span className="font-bold text-sm text-[var(--text-primary)]">
+                              {tc.name}
+                            </span>
+                            <span
+                              className="text-[10px] px-2.5 py-0.5 rounded-xl font-bold uppercase tracking-wide"
+                              style={{
+                                background: tc.riskLevel === 'critical' ? '#ef444415' : '#f9731615',
+                                color: tc.riskLevel === 'critical' ? '#ef4444' : '#f97316',
+                              }}
+                            >
+                              {tc.riskLevel}
+                            </span>
                           </div>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 10 }}>
+                          <div className="flex flex-wrap gap-1.5 mb-2.5">
                             {tc.biases.map((b, bi) => (
-                              <span key={bi} style={{ fontSize: 10, padding: '2px 8px', borderRadius: 6, background: '#334155', color: '#94A3B8', border: '1px solid #475569' }}>{b}</span>
+                              <span
+                                key={bi}
+                                className="text-[10px] px-2 py-0.5 rounded-md bg-[var(--bg-tertiary)] text-[var(--text-secondary)] border border-[var(--border-color)]"
+                              >
+                                {b}
+                              </span>
                             ))}
                           </div>
-                          <p style={{ color: '#94A3B8', fontSize: 13, margin: 0, lineHeight: 1.6 }}>{tc.description}</p>
+                          <p className="text-[var(--text-secondary)] text-[13px] m-0 leading-relaxed">
+                            {tc.description}
+                          </p>
                           {tc.historicalExample && (
-                            <p style={{ color: 'rgba(239, 68, 68, 0.7)', fontSize: 12, margin: '8px 0 0', lineHeight: 1.5, fontStyle: 'italic' }}>{tc.historicalExample}</p>
+                            <p className="text-red-400/70 text-[12px] m-0 mt-2 leading-relaxed italic">
+                              {tc.historicalExample}
+                            </p>
                           )}
                         </div>
                       ))}
@@ -751,65 +872,96 @@ export default function DemoPage() {
               )}
 
               {/* Section 6: Pre-Mortem */}
-              <div id="premortem" style={{ scrollMarginTop: 80 }}>
+              <div id="premortem" className="scroll-mt-20">
                 <Section icon={<Skull size={16} />} title="Pre-Mortem Analysis">
-                  <p style={{ color: '#94A3B8', fontSize: 13, marginBottom: 16, lineHeight: 1.6 }}>
-                    Imagine it&apos;s 2 years from now and this decision has failed spectacularly. What went wrong?
+                  <p className="text-[var(--text-secondary)] text-[13px] mb-4 leading-relaxed">
+                    Imagine it&apos;s 2 years from now and this decision has failed spectacularly.
+                    What went wrong?
                   </p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    {analysis.preMortem.scenarios.map((s, idx) => {
-                      const impactColor = s.impact === 'catastrophic' ? '#ef4444' : s.impact === 'severe' ? '#f97316' : '#eab308';
-                      return (
-                        <div key={idx} style={{ background: '#1E293B', borderRadius: 10, padding: '16px 18px', border: '1px solid #334155' }}>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 10 }}>
-                            <span style={{ fontWeight: 700, fontSize: 14, color: '#E2E8F0' }}>{s.title}</span>
-                            <div style={{ display: 'flex', gap: 8 }}>
-                              <span style={{ fontSize: 10, padding: '2px 10px', borderRadius: 20, fontWeight: 700, background: 'rgba(234, 179, 8, 0.1)', color: '#eab308' }}>{Math.round(s.probability * 100)}% likely</span>
-                              <span style={{ fontSize: 10, padding: '2px 10px', borderRadius: 20, fontWeight: 700, textTransform: 'uppercase', background: `${impactColor}15`, color: impactColor }}>{s.impact}</span>
-                            </div>
+                  <div className="flex flex-col gap-3">
+                    {analysis.preMortem.scenarios.map((s, idx) => (
+                      <div
+                        key={idx}
+                        className="bg-[var(--bg-tertiary)] rounded-[10px] p-4 sm:p-[18px] border border-[var(--border-color)]"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2.5">
+                          <span className="font-bold text-sm text-[var(--text-primary)]">
+                            {s.title}
+                          </span>
+                          <div className="flex gap-2">
+                            <span className="text-[10px] px-2.5 py-0.5 rounded-xl bg-yellow-500/10 text-yellow-500 font-bold">
+                              {Math.round(s.probability * 100)}% likely
+                            </span>
+                            <span
+                              className="text-[10px] px-2.5 py-0.5 rounded-xl font-bold uppercase"
+                              style={{
+                                background: `${s.impact === 'catastrophic' ? '#ef4444' : s.impact === 'severe' ? '#f97316' : '#eab308'}15`,
+                                color:
+                                  s.impact === 'catastrophic'
+                                    ? '#ef4444'
+                                    : s.impact === 'severe'
+                                      ? '#f97316'
+                                      : '#eab308',
+                              }}
+                            >
+                              {s.impact}
+                            </span>
                           </div>
-                          <p style={{ color: '#94A3B8', fontSize: 13, margin: 0, lineHeight: 1.6 }}>{s.description}</p>
                         </div>
-                      );
-                    })}
+                        <p className="text-[var(--text-secondary)] text-[13px] m-0 leading-relaxed">
+                          {s.description}
+                        </p>
+                      </div>
+                    ))}
                   </div>
                 </Section>
               </div>
 
               {/* Known Outcome Banner */}
               {analysis.outcome && (
-                <div style={{ marginTop: 32, padding: '16px 20px', background: 'rgba(239, 68, 68, 0.06)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: 12 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                    <TrendingUp size={16} style={{ color: '#ef4444' }} />
-                    <span style={{ fontSize: 13, fontWeight: 700, color: '#ef4444', letterSpacing: '0.5px' }}>KNOWN OUTCOME</span>
+                <div className="mt-8 p-4 sm:p-5 bg-red-500/[0.06] border border-red-500/20 rounded-xl">
+                  <div className="flex items-center gap-2 mb-2.5">
+                    <TrendingUp size={16} className="text-red-500" />
+                    <span className="text-[13px] font-bold text-red-500 tracking-wide">
+                      KNOWN OUTCOME
+                    </span>
                   </div>
-                  <p style={{ color: '#94A3B8', fontSize: 14, margin: '0 0 6px', lineHeight: 1.6 }}>{analysis.outcome.what}</p>
-                  <p style={{ color: '#64748B', fontSize: 12, margin: 0 }}>{analysis.outcome.when} &middot; {analysis.outcome.impact}</p>
+                  <p className="text-[var(--text-secondary)] text-sm m-0 mb-1.5 leading-relaxed">
+                    {analysis.outcome.what}
+                  </p>
+                  <p className="text-[var(--text-muted)] text-xs m-0">
+                    {analysis.outcome.when} &middot; {analysis.outcome.impact}
+                  </p>
                 </div>
               )}
             </div>
 
             {/* CTA */}
-            <div style={{ marginTop: 48, textAlign: 'center', padding: '32px 40px', borderRadius: 16, border: '1px solid #1E293B', background: '#0F172A' }}>
-              <h3 style={{ fontSize: 22, fontWeight: 700, color: '#E2E8F0', marginBottom: 8 }}>
+            <div
+              className="mt-12 text-center p-6 sm:p-10 rounded-2xl border border-[var(--border-color)]"
+              style={{ background: 'var(--bg-secondary)' }}
+            >
+              <h3 className="text-lg sm:text-[22px] font-bold text-[var(--text-primary)] mb-2">
                 This was a demo. Now try it on your own documents.
               </h3>
-              <p style={{ color: '#94A3B8', fontSize: 14, marginBottom: 24, maxWidth: 500, margin: '0 auto 24px', lineHeight: 1.6 }}>
-                Upload any strategic document &mdash; board memo, M&amp;A rationale, investment thesis, market analysis &mdash; and get a comprehensive cognitive bias audit in minutes.
+              <p className="text-[var(--text-secondary)] text-sm mb-6 max-w-[500px] mx-auto">
+                Upload any strategic document &mdash; board memo, M&amp;A rationale, investment
+                thesis, market analysis &mdash; and get a comprehensive cognitive bias audit in
+                minutes.
               </p>
-              <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <button
                   onClick={handleTryNow}
                   disabled={loadingSample}
                   aria-busy={loadingSample}
-                  style={{ padding: '12px 28px', borderRadius: 10, background: '#16A34A', color: '#FFFFFF', fontWeight: 700, fontSize: 14, border: 'none', cursor: loadingSample ? 'wait' : 'pointer' }}
+                  className="px-7 py-3 rounded-[10px] bg-green-600 text-white font-bold text-sm border-none cursor-pointer disabled:cursor-wait hover:bg-green-500 transition-colors"
                 >
                   {loadingSample ? 'Loading...' : 'Try with Sample Document'}{' '}
-                  <ArrowRight size={14} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: 4 }} />
+                  <ArrowRight size={14} className="inline align-middle ml-1" />
                 </button>
                 <Link
                   href="/login"
-                  style={{ padding: '12px 28px', borderRadius: 10, background: 'transparent', border: '1px solid #334155', color: '#E2E8F0', fontWeight: 600, fontSize: 14, textDecoration: 'none', textAlign: 'center' }}
+                  className="px-7 py-3 rounded-[10px] bg-transparent border border-[var(--border-color)] text-[var(--text-primary)] font-semibold text-sm no-underline text-center hover:border-[var(--border-active)] transition-colors"
                 >
                   Sign Up Free
                 </Link>
@@ -818,20 +970,21 @@ export default function DemoPage() {
                     href={DEMO_BOOKING_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{ padding: '12px 28px', borderRadius: 10, background: 'transparent', border: '1px solid rgba(99, 102, 241, 0.3)', color: '#818CF8', fontWeight: 600, fontSize: 14, textDecoration: 'none', textAlign: 'center' }}
+                    className="px-7 py-3 rounded-[10px] bg-transparent border border-indigo-500/30 text-indigo-400 font-semibold text-sm no-underline text-center"
                     onClick={() => trackEvent('demo_cta_clicked', { target: 'book_demo' })}
                   >
-                    Book a Demo <ExternalLink size={14} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: 4 }} />
+                    Book a Demo <ExternalLink size={14} className="inline align-middle ml-1" />
                   </a>
                 )}
               </div>
-              <p style={{ color: '#64748B', fontSize: 11, marginTop: 16 }}>
+              <p className="text-[var(--text-muted)] text-[11px] mt-4">
                 No credit card required &middot; 3 free analyses &middot; 14-day trial on paid plans
               </p>
             </div>
 
-            <p style={{ color: '#64748B', fontSize: 11, textAlign: 'center', marginTop: 32, lineHeight: 1.6 }}>
-              Demo analyses are generated by Decision Intel&apos;s cognitive bias detection engine to demonstrate product capabilities. They are not financial or investment advice.
+            <p className="text-[var(--text-muted)] text-[11px] text-center mt-8 leading-relaxed">
+              Demo analyses are generated by Decision Intel&apos;s cognitive bias detection engine
+              to demonstrate product capabilities. They are not financial or investment advice.
             </p>
           </div>
         )}
@@ -847,56 +1000,59 @@ const DEMO_BOOKING_URL = process.env.NEXT_PUBLIC_DEMO_BOOKING_URL;
 
 function DemoVideoSection() {
   return (
-    <div style={{ textAlign: 'center' }}>
-      <h1 style={{ fontSize: 'clamp(24px, 4vw, 32px)', fontWeight: 800, color: '#E2E8F0', marginBottom: 12, lineHeight: 1.2 }}>
+    <div className="text-center">
+      <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3 leading-tight">
         See Decision Intel in Action
       </h1>
-      <p style={{ color: '#94A3B8', fontSize: 15, maxWidth: 600, margin: '0 auto 32px', lineHeight: 1.6 }}>
-        Watch how the 12-node pipeline audits real IC memos for cognitive bias, measures decision noise, and generates actionable intelligence.
+      <p className="text-slate-400 text-sm sm:text-base max-w-[600px] mx-auto mb-8">
+        Watch how the 12-node pipeline audits real IC memos for cognitive bias, measures decision
+        noise, and generates actionable intelligence.
       </p>
 
       {DEMO_VIDEO_URL ? (
-        <div style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid #1E293B', background: '#0F172A', marginBottom: 32 }}>
+        <div className="rounded-2xl overflow-hidden border border-slate-200 bg-white mb-8">
           <iframe
             src={DEMO_VIDEO_URL}
             allowFullScreen
-            style={{ width: '100%', border: 'none', aspectRatio: '16/9', display: 'block' }}
+            className="w-full border-none"
+            style={{ aspectRatio: '16/9' }}
             title="Decision Intel Demo"
           />
         </div>
       ) : (
-        <div style={{ borderRadius: 16, border: '1px solid #1E293B', background: '#0F172A', padding: '48px 32px', marginBottom: 32, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-          <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(22, 163, 74, 0.1)', border: '1px solid rgba(22, 163, 74, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Play size={28} style={{ color: '#16A34A', marginLeft: 3 }} />
+        <div className="rounded-2xl border border-slate-200 bg-white p-12 sm:p-16 mb-8 flex flex-col items-center gap-4">
+          <div className="w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center">
+            <Play size={28} className="text-slate-400 ml-1" />
           </div>
-          <p style={{ color: '#94A3B8', fontSize: 14, maxWidth: 400, margin: 0 }}>
-            Try the interactive demo below — pick a sample document and watch the 12-node bias detection pipeline in real time.
+          <p className="text-slate-500 text-sm max-w-[400px]">
+            Try the interactive demo below — upload a sample document and watch the 12-node bias
+            detection pipeline in real time.
           </p>
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+      <div className="flex flex-col sm:flex-row gap-3 justify-center">
         <Link
           href="/login"
-          style={{ padding: '12px 28px', borderRadius: 10, background: '#16A34A', color: '#FFFFFF', fontWeight: 700, fontSize: 14, textDecoration: 'none', textAlign: 'center' }}
+          className="px-7 py-3 rounded-[10px] bg-white text-black font-bold text-sm no-underline text-center"
           onClick={() => trackEvent('demo_video_cta_clicked', { target: 'start_trial' })}
         >
-          Start Free Trial <ArrowRight size={14} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: 4 }} />
+          Start Free Trial <ArrowRight size={14} className="inline align-middle ml-1" />
         </Link>
         {DEMO_BOOKING_URL ? (
           <a
             href={DEMO_BOOKING_URL}
             target="_blank"
             rel="noopener noreferrer"
-            style={{ padding: '12px 28px', borderRadius: 10, background: 'transparent', border: '1px solid #334155', color: '#E2E8F0', fontWeight: 600, fontSize: 14, textDecoration: 'none', textAlign: 'center' }}
+            className="px-7 py-3 rounded-[10px] bg-transparent border border-slate-200 text-slate-900 font-semibold text-sm no-underline text-center"
             onClick={() => trackEvent('demo_video_cta_clicked', { target: 'book_call' })}
           >
-            Book a Call <ExternalLink size={14} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: 4 }} />
+            Book a Call <ExternalLink size={14} className="inline align-middle ml-1" />
           </a>
         ) : (
           <Link
             href="/#pricing"
-            style={{ padding: '12px 28px', borderRadius: 10, background: 'transparent', border: '1px solid #334155', color: '#E2E8F0', fontWeight: 600, fontSize: 14, textDecoration: 'none', textAlign: 'center' }}
+            className="px-7 py-3 rounded-[10px] bg-transparent border border-slate-200 text-slate-900 font-semibold text-sm no-underline text-center"
           >
             View Pricing
           </Link>
@@ -912,32 +1068,16 @@ function Section({
   icon,
   title,
   children,
+  borderColor = 'border-[var(--border-color)]',
 }: {
   icon: React.ReactNode;
   title: string;
   children: React.ReactNode;
+  borderColor?: string;
 }) {
   return (
-    <div
-      style={{
-        background: '#0F172A',
-        border: '1px solid #1E293B',
-        borderRadius: 12,
-        padding: '16px 20px',
-        marginBottom: 24,
-      }}
-    >
-      <h3
-        style={{
-          fontSize: 15,
-          fontWeight: 700,
-          marginBottom: 16,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          color: '#E2E8F0',
-        }}
-      >
+    <div className={`bg-[var(--bg-secondary)] border ${borderColor} rounded-xl p-4 sm:p-6 mb-6`}>
+      <h3 className="text-[15px] font-bold mb-4 flex items-center gap-2 text-[var(--text-primary)]">
         {icon} {title}
       </h3>
       {children}
@@ -959,27 +1099,15 @@ function ScoreCard({
   smallValue?: boolean;
 }) {
   return (
-    <div
-      style={{
-        background: '#0F172A',
-        border: '1px solid #1E293B',
-        borderRadius: 12,
-        padding: '12px 14px',
-        textAlign: 'center',
-      }}
-    >
-      <div style={{ fontSize: 10, color: '#64748B', marginBottom: 6, letterSpacing: '0.5px' }}>{label}</div>
+    <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl py-3 sm:py-[18px] px-3 sm:px-3.5 text-center">
+      <div className="text-[10px] text-[var(--text-muted)] mb-1.5 tracking-wide">{label}</div>
       <div
-        style={{
-          fontSize: smallValue ? 20 : 32,
-          fontWeight: 800,
-          lineHeight: 1,
-          color,
-        }}
+        className={`${smallValue ? 'text-lg sm:text-2xl' : 'text-2xl sm:text-4xl'} font-extrabold leading-none`}
+        style={{ color }}
       >
         {value}
       </div>
-      <div style={{ fontSize: 11, color: '#64748B', marginTop: 4 }}>{sub}</div>
+      <div className="text-[11px] text-[var(--text-muted)] mt-1">{sub}</div>
     </div>
   );
 }
@@ -987,13 +1115,8 @@ function ScoreCard({
 function SeverityBadge({ severity }: { severity: string }) {
   return (
     <span
+      className="text-[10px] px-2.5 py-0.5 rounded-xl font-bold uppercase tracking-wide"
       style={{
-        fontSize: 10,
-        padding: '2px 10px',
-        borderRadius: 20,
-        fontWeight: 700,
-        textTransform: 'uppercase',
-        letterSpacing: '0.5px',
         background: `${sevColor(severity)}15`,
         color: sevColor(severity),
       }}
@@ -1005,9 +1128,9 @@ function SeverityBadge({ severity }: { severity: string }) {
 
 function StatPill({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{ padding: '4px 10px', borderRadius: 6, background: '#1E293B', border: '1px solid #334155' }}>
-      <span style={{ fontSize: 10, color: '#64748B' }}>{label} </span>
-      <span style={{ fontSize: 12, fontWeight: 600, color: '#E2E8F0' }}>{value}</span>
+    <div className="px-2.5 py-1 rounded-md bg-[var(--bg-tertiary)] border border-[var(--border-color)]">
+      <span className="text-[10px] text-[var(--text-muted)]">{label} </span>
+      <span className="text-xs font-semibold text-[var(--text-primary)]">{value}</span>
     </div>
   );
 }
@@ -1043,26 +1166,21 @@ function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () =
   };
 
   return (
-    <div style={{ marginBottom: 40 }}>
+    <div className="mb-10">
+      {/* Back button */}
       <button
         onClick={onBack}
-        style={{ fontSize: 12, color: '#64748B', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 24 }}
+        className="text-xs text-slate-500 hover:text-slate-900 transition-colors cursor-pointer bg-transparent border-none flex items-center gap-1.5 mb-6"
       >
-        <ArrowRight size={12} style={{ transform: 'rotate(180deg)' }} />
+        <ArrowRight size={12} className="rotate-180" />
         Scan different text
       </button>
 
-      <div style={{ textAlign: 'center', marginBottom: 32 }}>
+      {/* Header */}
+      <div className="text-center mb-8">
         <div
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold mb-4"
           style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 8,
-            padding: '8px 16px',
-            borderRadius: 9999,
-            fontSize: 14,
-            fontWeight: 700,
-            marginBottom: 16,
             background: `${riskColors[result.riskLevel]}15`,
             color: riskColors[result.riskLevel],
           }}
@@ -1072,7 +1190,7 @@ function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () =
             ? 'No Biases Detected'
             : `${result.biasCount} Bias${result.biasCount > 1 ? 'es' : ''} Detected`}
         </div>
-        <p style={{ color: '#94A3B8', fontSize: 14, maxWidth: 600, margin: '0 auto' }}>{result.summary}</p>
+        <p className="text-slate-400 text-sm max-w-[600px] mx-auto">{result.summary}</p>
       </div>
 
       {/* Score Cards */}
