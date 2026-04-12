@@ -8,9 +8,9 @@ import { Brain, Lightbulb, ExternalLink, BarChart3, Eye, ChevronDown } from 'luc
 import { DocumentTextHighlighter } from '@/components/visualizations/DocumentTextHighlighter';
 import { BiasSparklineWithData } from '@/components/visualizations/BiasSparkline';
 import dynamic from 'next/dynamic';
-const BiasNetwork = dynamic(
-  () => import('@/components/visualizations/BiasNetwork').then(m => ({ default: m.BiasNetwork })),
-  { ssr: false }
+const BiasNetwork3D = dynamic(
+  () => import('@/components/visualizations/BiasNetwork3DCanvas'),
+  { ssr: false },
 );
 import { RiskHeatMap } from '@/components/visualizations/RiskHeatMap';
 const BiasProfileRadar = dynamic(
@@ -215,14 +215,13 @@ export function OverviewTab({
             <div className="card-header">
               <h4>Bias Network Map</h4>
             </div>
-            <div className="card-body overflow-hidden">
-              <BiasNetwork
+            <div className="card-body overflow-hidden" style={{ height: 360, padding: 0 }}>
+              <BiasNetwork3D
                 biases={biases.map((b, i) => ({
                   ...b,
                   id: b.id || `bias-${i}`,
                   category: 'cognitive',
                 }))}
-                compact
               />
             </div>
           </div>

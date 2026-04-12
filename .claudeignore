@@ -1,0 +1,43 @@
+# Lock files — 28,853 lines of dependency hashes, never useful in context
+package-lock.json
+
+# Minified/generated bundles — binary noise in search results
+public/pdf.worker.min.mjs
+extension/pdf.worker.min.js
+extension/pdf.min.js
+*.min.js
+*.min.mjs
+*.map
+
+# Other AI tool configs — not relevant to Claude Code
+.cursorrules
+.windsurfrules
+.serena/
+
+# Prisma generated client (if generated locally)
+src/generated/
+
+# Large static assets
+public/fonts/
+public/images/
+*.woff
+*.woff2
+*.ttf
+*.ico
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.webp
+*.mp4
+*.mp3
+
+# Build/cache artifacts already in .gitignore but being explicit
+.next/
+node_modules/
+*.tsbuildinfo
+coverage/
+.vercel/
+build/
+out/

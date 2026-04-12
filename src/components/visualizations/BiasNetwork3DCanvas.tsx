@@ -1,0 +1,211 @@
+'use client';
+
+import { useRef, useCallback, useEffect } from 'react';
+import { DoubleSide } from 'three';
+import {
+  GraphCanvas,
+  type GraphCanvasRef,
+  type GraphNode,
+  type GraphEdge,
+  type NodeRendererProps,
+  type InternalGraphNode,
+  type Theme,
+  useSelection,
+} from 'reagraph';
+
+const SEVERITY_COLORS: Record<string, string> = {
+  critical: '#EF4444',
+  high: '#F97316',
+  medium: '#EAB308',
+  low: '#84CC16',
+};
+
+interface BiasInput {
+  biasType: string;
+  severity: string;
+  category?: string;
+  excerpt?: string;
+  explanation?: string;
+  id?: string;
+}
+
+function formatBiasLabel(type: string): string {
+  return type
+    .replace(/_bias$/, '')
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function buildKeywords(type: string): string[] {
+  return type.replace(/_bias$/, '').split('_');
+}
+
+function buildGraphFromBiases(biases: BiasInput[]): { nodes: GraphNode[]; edges: GraphEdge[] } {
+  const nodes: GraphNode[] = biases.map(b => ({
+    id: b.biasType,
+    label: formatBiasLabel(b.biasType),
+    fill: SEVERITY_COLORS[b.severity] ?? '#EAB308',
+    size: b.severity === 'critical' ? 8 : b.severity === 'high' ? 7 : 5.5,
+    data: { type: 'bias', severity: b.severity, excerpt: b.excerpt, explanation: b.explanation },
+  }));
+
+  const edges: GraphEdge[] = [];
+  let edgeId = 0;
+
+  for (let i = 0; i < biases.length; i++) {
+    const kwA = buildKeywords(biases[i].biasType);
+    for (let j = i + 1; j < biases.length; j++) {
+      const kwB = buildKeywords(biases[j].biasType);
+      const overlap = kwA.filter(k => kwB.includes(k)).length;
+      if (overlap > 0 || biases[i].category === biases[j].category) {
+        edges.push({
+          id: `e${edgeId++}`,
+          source: biases[i].biasType,
+          target: biases[j].biasType,
+          fill: '#475569',
+          size: overlap > 0 ? 1.5 : 0.8,
+          dashed: overlap === 0,
+          arrowPlacement: 'none',
+        });
+      }
+    }
+  }
+
+  if (edges.length === 0 && biases.length >= 2) {
+    for (let i = 0; i < biases.length; i++) {
+      const next = (i + 1) % biases.length;
+      edges.push({
+        id: `e${edgeId++}`,
+        source: biases[i].biasType,
+        target: biases[next].biasType,
+        fill: '#334155',
+        dashed: true,
+        arrowPlacement: 'none',
+      });
+    }
+  }
+
+  return { nodes, edges };
+}
+
+const DARK_THEME: Theme = {
+  canvas: { background: '#080c14', fog: null },
+  node: {
+    fill: '#334155',
+    activeFill: '#64748B',
+    opacity: 1,
+    selectedOpacity: 1,
+    inactiveOpacity: 0.2,
+    label: { color: '#94A3B8', activeColor: '#FFFFFF', stroke: '#080c14', strokeWidth: 5 },
+  },
+  ring: { fill: '#16A34A', activeFill: '#22C55E' },
+  edge: {
+    fill: '#1E293B',
+    activeFill: '#475569',
+    opacity: 1,
+    selectedOpacity: 1,
+    inactiveOpacity: 0.08,
+    label: { color: '#475569', activeColor: '#CBD5E1' },
+  },
+  arrow: { fill: '#334155', activeFill: '#64748B' },
+  lasso: { background: 'rgba(22,163,74,0.08)', border: '#16A34A' },
+};
+
+export interface BiasNetwork3DCanvasProps {
+  biases: BiasInput[];
+  onBiasSelect?: (biasType: string | null) => void;
+}
+
+export default function BiasNetwork3DCanvas({ biases, onBiasSelect }: BiasNetwork3DCanvasProps) {
+  const graphRef = useRef<GraphCanvasRef | null>(null);
+  const { nodes, edges } = buildGraphFromBiases(biases);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      graphRef.current?.centerGraph();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const {
+    selections,
+    actives,
+    toggleSelection,
+    onCanvasClick,
+    onNodePointerOver,
+    onNodePointerOut,
+  } = useSelection({
+    ref: graphRef,
+    nodes,
+    edges,
+    type: 'single',
+    pathHoverType: 'all',
+    focusOnSelect: false,
+    onSelection: ids => {
+      onBiasSelect?.(ids.length > 0 ? ids[0] : null);
+    },
+  });
+
+  const onNodeClick = useCallback(
+    (node: InternalGraphNode) => {
+      const wasSelected = selections.includes(node.id);
+      toggleSelection(node.id);
+      if (!wasSelected) {
+        graphRef.current?.centerGraph([node.id]);
+      }
+    },
+    [selections, toggleSelection],
+  );
+
+  const renderNode = useCallback(({ node, size, opacity, active, selected }: NodeRendererProps) => {
+    const col = (node.fill as string) ?? '#EAB308';
+    const o = opacity ?? 1;
+    const emissive = selected ? 0.8 : active ? 0.5 : 0.35;
+    const glow = selected || active;
+
+    return (
+      <group>
+        <mesh>
+          <octahedronGeometry args={[size, 0]} />
+          <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} side={DoubleSide} transparent opacity={o} />
+        </mesh>
+        {glow && (
+          <mesh scale={[1.6, 1.6, 1.6]}>
+            <octahedronGeometry args={[size, 0]} />
+            <meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} />
+          </mesh>
+        )}
+      </group>
+    );
+  }, []);
+
+  return (
+    <GraphCanvas
+      ref={graphRef}
+      nodes={nodes}
+      edges={edges}
+      layoutType="forceDirected3d"
+      cameraMode="rotate"
+      animated={false}
+      theme={DARK_THEME}
+      renderNode={renderNode}
+      selections={selections}
+      actives={actives}
+      onNodeClick={onNodeClick}
+      onCanvasClick={onCanvasClick}
+      onNodePointerOver={onNodePointerOver}
+      onNodePointerOut={onNodePointerOut}
+      labelType="auto"
+      draggable
+      defaultNodeSize={5}
+      minDistance={200}
+      maxDistance={6000}
+    >
+      <ambientLight intensity={0.55} />
+      <directionalLight position={[20, 20, 10]} intensity={1.6} />
+      <directionalLight position={[-15, -10, -8]} intensity={0.45} color="#4F46E5" />
+      <pointLight position={[0, 30, 10]} intensity={1.0} color="#60A5FA" />
+      <pointLight position={[0, -20, -5]} intensity={0.35} color="#A78BFA" />
+    </GraphCanvas>
+  );
+}
