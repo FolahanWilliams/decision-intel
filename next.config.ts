@@ -51,6 +51,7 @@ const nextConfig: NextConfig = {
     const cspHeader = `
       default-src 'self';
       script-src 'self' 'unsafe-eval' 'unsafe-inline';
+      worker-src 'self' blob:;
       style-src 'self' 'unsafe-inline';
       img-src 'self' data: blob: https:;
       font-src 'self' data:;
