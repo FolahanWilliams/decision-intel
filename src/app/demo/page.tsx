@@ -335,17 +335,17 @@ export default function DemoPage() {
                 <textarea
                   value={pasteText}
                   onChange={e => setPasteText(e.target.value)}
-                  className="w-full h-32 bg-slate-50 border border-slate-300 rounded-xl p-4 text-sm text-slate-300 resize-none focus:outline-none focus:border-slate-300 placeholder:text-slate-600"
+                  className="w-full h-32 bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-900 resize-none focus:outline-none focus:border-green-300 placeholder:text-slate-400"
                   placeholder="Paste a decision memo, investment thesis, or strategic rationale..."
                 />
                 <div className="flex justify-between items-center mt-3">
-                  <span className="text-[11px] text-slate-600">
+                  <span className="text-[11px] text-slate-500">
                     Real-time bias scan — results generated from your text
                   </span>
                   <button
                     onClick={handlePasteAnalyze}
                     disabled={pasteText.trim().length < 15}
-                    className="px-4 py-2 rounded-lg bg-white text-black text-xs font-semibold cursor-pointer border-none disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="px-4 py-2 rounded-lg bg-green-600 text-white text-xs font-semibold cursor-pointer border-none disabled:opacity-40 disabled:cursor-not-allowed hover:bg-green-700 transition-colors"
                   >
                     Scan for Biases <ArrowRight size={12} className="inline ml-1" />
                   </button>
@@ -493,7 +493,7 @@ export default function DemoPage() {
                       {s.label}
                     </span>
                     <span
-                      className={`w-2 h-2 rounded-full transition-all ${activeSection === s.id ? 'bg-green-500 scale-125' : 'bg-slate-50 group-hover:bg-green-500'}`}
+                      className={`w-2 h-2 rounded-full transition-all ${activeSection === s.id ? 'bg-green-500 scale-125' : 'bg-slate-300 group-hover:bg-green-500'}`}
                     />
                   </a>
                 ))}
@@ -507,7 +507,7 @@ export default function DemoPage() {
                     <h1 className="text-lg sm:text-xl font-bold mb-1.5 leading-snug text-slate-900">
                       {analysis.documentName}
                     </h1>
-                    <p className="text-slate-400 text-xs sm:text-[13px] m-0">
+                    <p className="text-slate-500 text-xs sm:text-[13px] m-0">
                       Analyzed by Decision Intel &middot;{' '}
                       {new Date(analysis.createdAt).toLocaleDateString('en-US', {
                         year: 'numeric',
@@ -614,15 +614,15 @@ export default function DemoPage() {
 
               {/* Section 2b: 3D Bias Visualizations */}
               {analysis.biases.length >= 3 && (
-                <div className="scroll-mt-20 mb-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div style={{ marginBottom: 24, scrollMarginTop: 80 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
                     {/* 3D Bias Network */}
                     <div
                       style={{
                         border: '1px solid #E2E8F0',
                         borderRadius: 16,
                         overflow: 'hidden',
-                        boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
+                        boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
                       }}
                     >
                       <div
@@ -639,7 +639,7 @@ export default function DemoPage() {
                           Interactive bias relationship map
                         </div>
                       </div>
-                      <div style={{ height: 340 }}>
+                      <div style={{ height: 300 }}>
                         <BiasNetwork3D
                           biases={analysis.biases.map(b => ({
                             biasType: b.biasType,
@@ -661,7 +661,7 @@ export default function DemoPage() {
                         borderRadius: 16,
                         overflow: 'hidden',
                         background: '#FFFFFF',
-                        boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
+                        boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
                       }}
                     >
                       <div
@@ -677,7 +677,7 @@ export default function DemoPage() {
                           Severity × confidence across {analysis.biases.length} biases
                         </div>
                       </div>
-                      <div style={{ height: 340 }}>
+                      <div style={{ height: 300 }}>
                         <BiasProfileRadar
                           biases={analysis.biases.map(b => ({
                             id: b.biasType,
@@ -730,10 +730,12 @@ export default function DemoPage() {
                             <span className="text-[11px] sm:text-xs text-slate-600 w-20 sm:w-[120px] shrink-0">
                               {b.label}
                             </span>
-                            <div className="flex-1 h-1.5 rounded-sm bg-slate-50">
+                            <div style={{ flex: 1, height: 6, borderRadius: 3, background: '#F1F5F9' }}>
                               <div
-                                className="h-full rounded-sm transition-[width] duration-300"
                                 style={{
+                                  height: '100%',
+                                  borderRadius: 3,
+                                  transition: 'width 0.3s',
                                   width: `${Math.min(b.value, 100)}%`,
                                   background:
                                     i === 0
@@ -742,7 +744,7 @@ export default function DemoPage() {
                                         : b.value <= 60
                                           ? '#eab308'
                                           : '#ef4444'
-                                      : 'rgba(255,255,255,0.15)',
+                                      : '#CBD5E1',
                                 }}
                               />
                             </div>
@@ -790,7 +792,7 @@ export default function DemoPage() {
                             </span>
                           </div>
                           <div className="mb-2.5">
-                            <div className="h-[3px] rounded-sm bg-slate-50">
+                            <div className="h-[3px] rounded-sm bg-slate-200">
                               <div
                                 className="h-full rounded-sm"
                                 style={{
@@ -858,7 +860,7 @@ export default function DemoPage() {
                             {tc.description}
                           </p>
                           {tc.historicalExample && (
-                            <p className="text-red-400/70 text-[12px] m-0 mt-2 leading-relaxed italic">
+                            <p className="text-red-600 text-[12px] m-0 mt-2 leading-relaxed italic">
                               {tc.historicalExample}
                             </p>
                           )}
@@ -1002,7 +1004,7 @@ function DemoVideoSection() {
       <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3 leading-tight">
         See Decision Intel in Action
       </h1>
-      <p className="text-slate-400 text-sm sm:text-base max-w-[600px] mx-auto mb-8">
+      <p className="text-slate-500 text-sm sm:text-base max-w-[600px] mx-auto mb-8">
         Watch how the 12-node pipeline audits real IC memos for cognitive bias, measures decision
         noise, and generates actionable intelligence.
       </p>
@@ -1032,7 +1034,7 @@ function DemoVideoSection() {
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
         <Link
           href="/login"
-          className="px-7 py-3 rounded-[10px] bg-white text-black font-bold text-sm no-underline text-center"
+          className="px-7 py-3 rounded-[10px] bg-green-600 text-white font-bold text-sm no-underline text-center hover:bg-green-700 transition-colors"
           onClick={() => trackEvent('demo_video_cta_clicked', { target: 'start_trial' })}
         >
           Start Free Trial <ArrowRight size={14} className="inline align-middle ml-1" />
@@ -1214,7 +1216,7 @@ function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () =
             ? 'No Biases Detected'
             : `${result.biasCount} Bias${result.biasCount > 1 ? 'es' : ''} Detected`}
         </div>
-        <p className="text-slate-400 text-sm max-w-[600px] mx-auto">{result.summary}</p>
+        <p className="text-slate-600 text-sm max-w-[600px] mx-auto">{result.summary}</p>
       </div>
 
       {/* Score Cards */}
@@ -1245,7 +1247,7 @@ function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () =
           </div>
           <div className="bg-white border border-slate-200 rounded-xl py-3 px-3 text-center col-span-2 sm:col-span-1">
             <div className="text-[10px] text-slate-500 mb-1.5 tracking-wide">SCAN TYPE</div>
-            <div className="text-lg font-extrabold text-slate-300">Quick</div>
+            <div className="text-lg font-extrabold text-slate-900">Quick</div>
             <div className="text-[11px] text-slate-500 mt-1">
               {result.isPreDecision ? 'Pre-decision detected' : '14-bias pattern scan'}
             </div>
@@ -1270,15 +1272,15 @@ function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () =
                   <SeverityBadge severity={bias.severity} />
                 </div>
                 <p
-                  className="text-slate-400 text-[13px] m-0 mb-2.5 italic leading-relaxed pl-3"
-                  style={{ borderLeft: `2px solid ${sevColor(bias.severity)}30` }}
+                  className="text-slate-500 text-[13px] m-0 mb-2.5 italic leading-relaxed pl-3"
+                  style={{ borderLeft: `2px solid ${sevColor(bias.severity)}60` }}
                 >
                   &ldquo;...{bias.signal}...&rdquo;
                 </p>
-                <p className="text-slate-300 text-[13px] m-0 mb-2.5 leading-relaxed">
+                <p className="text-slate-600 text-[13px] m-0 mb-2.5 leading-relaxed">
                   {bias.explanation}
                 </p>
-                <p className="text-green-500/80 text-[13px] m-0 leading-relaxed">
+                <p className="text-green-700 text-[13px] m-0 leading-relaxed">
                   <strong>Recommendation:</strong> {bias.suggestion}
                 </p>
               </div>
@@ -1292,7 +1294,7 @@ function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () =
         <div className="bg-white border border-green-500/20 rounded-xl p-6 sm:p-8 mb-4 text-center">
           <CheckCircle2 size={32} className="text-green-500 mx-auto mb-3" />
           <h3 className="text-lg font-bold text-slate-900 mb-2">Looking Good</h3>
-          <p className="text-slate-400 text-sm max-w-[500px] mx-auto">
+          <p className="text-slate-600 text-sm max-w-[500px] mx-auto">
             No common cognitive biases detected in this text. The full analysis also checks for
             logical fallacies, decision noise, regulatory compliance, fact verification, and runs a
             boardroom simulation with AI decision twins.
@@ -1322,7 +1324,7 @@ function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () =
           ].map(feature => (
             <span
               key={feature}
-              className="text-[11px] px-2.5 py-1 rounded-full bg-slate-100 text-slate-400 border border-slate-200"
+              className="text-[11px] px-2.5 py-1 rounded-full bg-green-50 text-green-700 border border-green-100"
             >
               {feature}
             </span>
@@ -1332,7 +1334,7 @@ function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () =
           <button
             onClick={handleTryNow}
             disabled={loadingSample}
-            className="px-7 py-3 rounded-[10px] bg-white text-black font-bold text-sm border-none cursor-pointer disabled:cursor-wait"
+            className="px-7 py-3 rounded-[10px] bg-green-600 text-white font-bold text-sm border-none cursor-pointer disabled:cursor-wait hover:bg-green-700 transition-colors"
           >
             {loadingSample ? 'Loading...' : 'Try Full Analysis'}{' '}
             <ArrowRight size={14} className="inline align-middle ml-1" />
@@ -1344,7 +1346,7 @@ function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () =
             Sign Up Free
           </Link>
         </div>
-        <p className="text-slate-600 text-[11px] mt-4">
+        <p className="text-slate-500 text-[11px] mt-4">
           No credit card required &middot; 3 free analyses &middot; 14-day trial on paid plans
         </p>
       </div>

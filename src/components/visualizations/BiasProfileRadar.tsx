@@ -73,7 +73,7 @@ export function BiasProfileRadar({ biases }: BiasProfileRadarProps) {
         gridLabelOffset={14}
         enableDots
         dotSize={8}
-        dotColor="var(--bg-primary)"
+        dotColor="#FFFFFF"
         dotBorderWidth={2}
         dotBorderColor={{ from: 'color', modifiers: [] }}
         colors={[dominantColor, 'rgba(148, 163, 184, 0.25)']}
@@ -94,17 +94,17 @@ export function BiasProfileRadar({ biases }: BiasProfileRadarProps) {
           },
         ]}
         theme={{
-          text: { fill: '#94A3B8', fontSize: 11, fontFamily: 'inherit' },
-          grid: { line: { stroke: 'rgba(148, 163, 184, 0.08)' } },
+          text: { fill: '#475569', fontSize: 11, fontFamily: 'inherit' },
+          grid: { line: { stroke: 'rgba(148, 163, 184, 0.25)' } },
           tooltip: {
             container: {
-              background: 'var(--bg-elevated, #0F172A)',
-              color: 'var(--text-primary, #E2E8F0)',
-              border: '1px solid var(--border-color, rgba(148, 163, 184, 0.2))',
+              background: '#FFFFFF',
+              color: '#0F172A',
+              border: '1px solid #E2E8F0',
               borderRadius: '8px',
               fontSize: 12,
               padding: '8px 12px',
-              boxShadow: 'var(--shadow-md)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
             },
           },
         }}
