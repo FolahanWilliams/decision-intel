@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useCallback } from 'react';
+import { DoubleSide } from 'three';
 import {
   GraphCanvas,
   type GraphCanvasRef,
@@ -301,7 +302,7 @@ export default function HeroDecisionGraph3DCanvas({
     if (!data) return null;
 
     const col = getNodeColor(data);
-    const emissive = selected ? 0.8 : active ? 0.4 : 0.12;
+    const emissive = selected ? 0.8 : active ? 0.5 : 0.35;
     const o = opacity ?? 1;
 
     // Decision → dodecahedron (12-face crystal)
@@ -310,12 +311,12 @@ export default function HeroDecisionGraph3DCanvas({
         <group>
           <mesh>
             <dodecahedronGeometry args={[size, 0]} />
-            <meshStandardMaterial color={col} emissive={col} emissiveIntensity={emissive} metalness={0.65} roughness={0.2} transparent opacity={o} />
+            <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} side={DoubleSide} transparent opacity={o} />
           </mesh>
           {selected && (
             <mesh>
               <dodecahedronGeometry args={[size * 1.55, 0]} />
-              <meshStandardMaterial color={col} transparent opacity={0.1} />
+              <meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.1} />
             </mesh>
           )}
         </group>
@@ -328,12 +329,12 @@ export default function HeroDecisionGraph3DCanvas({
         <group>
           <mesh>
             <octahedronGeometry args={[size, 0]} />
-            <meshStandardMaterial color={col} emissive={col} emissiveIntensity={emissive} metalness={0.1} roughness={0.8} transparent opacity={o} />
+            <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} side={DoubleSide} transparent opacity={o} />
           </mesh>
           {(active || selected) && (
             <mesh>
               <octahedronGeometry args={[size * 1.65, 0]} />
-              <meshStandardMaterial color={col} transparent opacity={0.07} />
+              <meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} />
             </mesh>
           )}
         </group>
@@ -345,12 +346,12 @@ export default function HeroDecisionGraph3DCanvas({
       <group>
         <mesh>
           <cylinderGeometry args={[size * 0.82, size * 0.82, size * 2.2, 8]} />
-          <meshStandardMaterial color={col} emissive={col} emissiveIntensity={emissive} metalness={0.45} roughness={0.45} transparent opacity={o} />
+          <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} side={DoubleSide} transparent opacity={o} />
         </mesh>
         {selected && (
           <mesh>
             <cylinderGeometry args={[size * 1.3, size * 1.3, size * 2.6, 8]} />
-            <meshStandardMaterial color={col} transparent opacity={0.1} />
+            <meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.1} />
           </mesh>
         )}
       </group>

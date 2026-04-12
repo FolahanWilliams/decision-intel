@@ -17,6 +17,7 @@
  */
 
 import { useRef, useCallback, forwardRef, useImperativeHandle } from 'react';
+import { DoubleSide } from 'three';
 import {
   GraphCanvas,
   type GraphCanvasRef,
@@ -137,7 +138,7 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
     const type: DKGNodeType = (node.data?.type as DKGNodeType) ?? 'analysis';
     const col = (node.fill as string | undefined) ?? '#60A5FA';
     const o = opacity ?? 1;
-    const emissive = selected ? 0.75 : active ? 0.38 : 0.1;
+    const emissive = selected ? 0.75 : active ? 0.5 : 0.35;
     const glow = selected || active;
 
     switch (type) {
@@ -146,9 +147,9 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
           <group>
             <mesh>
               <icosahedronGeometry args={[size, 1]} />
-              <meshStandardMaterial color={col} emissive={col} emissiveIntensity={emissive} metalness={0.5} roughness={0.3} transparent opacity={o} />
+              <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} side={DoubleSide} transparent opacity={o} />
             </mesh>
-            {glow && <mesh scale={[1.55, 1.55, 1.55]}><icosahedronGeometry args={[size, 1]} /><meshStandardMaterial color={col} transparent opacity={0.07} /></mesh>}
+            {glow && <mesh scale={[1.55, 1.55, 1.55]}><icosahedronGeometry args={[size, 1]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
           </group>
         );
       case 'human_decision': {
@@ -157,9 +158,9 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
           <group>
             <mesh>
               <boxGeometry args={[s, s, s]} />
-              <meshStandardMaterial color={col} emissive={col} emissiveIntensity={emissive} metalness={0.55} roughness={0.25} transparent opacity={o} />
+              <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} side={DoubleSide} transparent opacity={o} />
             </mesh>
-            {glow && <mesh scale={[1.55, 1.55, 1.55]}><boxGeometry args={[s, s, s]} /><meshStandardMaterial color={col} transparent opacity={0.07} /></mesh>}
+            {glow && <mesh scale={[1.55, 1.55, 1.55]}><boxGeometry args={[s, s, s]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
           </group>
         );
       }
@@ -168,9 +169,9 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
           <group>
             <mesh>
               <sphereGeometry args={[size * 0.85, 12, 8]} />
-              <meshStandardMaterial color={col} emissive={col} emissiveIntensity={emissive} metalness={0.2} roughness={0.65} transparent opacity={o} />
+              <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} side={DoubleSide} transparent opacity={o} />
             </mesh>
-            {glow && <mesh scale={[1.55, 1.55, 1.55]}><sphereGeometry args={[size * 0.85, 12, 8]} /><meshStandardMaterial color={col} transparent opacity={0.07} /></mesh>}
+            {glow && <mesh scale={[1.55, 1.55, 1.55]}><sphereGeometry args={[size * 0.85, 12, 8]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
           </group>
         );
       case 'bias_pattern':
@@ -178,9 +179,9 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
           <group>
             <mesh>
               <tetrahedronGeometry args={[size, 0]} />
-              <meshStandardMaterial color={col} emissive={col} emissiveIntensity={emissive} metalness={0.05} roughness={0.85} transparent opacity={o} />
+              <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} side={DoubleSide} transparent opacity={o} />
             </mesh>
-            {glow && <mesh scale={[1.55, 1.55, 1.55]}><tetrahedronGeometry args={[size, 0]} /><meshStandardMaterial color={col} transparent opacity={0.07} /></mesh>}
+            {glow && <mesh scale={[1.55, 1.55, 1.55]}><tetrahedronGeometry args={[size, 0]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
           </group>
         );
       case 'outcome':
@@ -188,16 +189,16 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
           <group>
             <mesh>
               <cylinderGeometry args={[size * 0.8, size * 0.8, size * 2, 8]} />
-              <meshStandardMaterial color={col} emissive={col} emissiveIntensity={emissive} metalness={0.4} roughness={0.45} transparent opacity={o} />
+              <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} side={DoubleSide} transparent opacity={o} />
             </mesh>
-            {glow && <mesh scale={[1.55, 1.55, 1.55]}><cylinderGeometry args={[size * 0.8, size * 0.8, size * 2, 8]} /><meshStandardMaterial color={col} transparent opacity={0.07} /></mesh>}
+            {glow && <mesh scale={[1.55, 1.55, 1.55]}><cylinderGeometry args={[size * 0.8, size * 0.8, size * 2, 8]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
           </group>
         );
       default:
         return (
           <mesh>
             <sphereGeometry args={[size, 10, 8]} />
-            <meshStandardMaterial color={col} emissive={col} emissiveIntensity={emissive} metalness={0.3} roughness={0.5} transparent opacity={o} />
+            <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} side={DoubleSide} transparent opacity={o} />
           </mesh>
         );
     }
