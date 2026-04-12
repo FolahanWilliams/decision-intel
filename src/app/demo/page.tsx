@@ -612,7 +612,7 @@ export default function DemoPage() {
                 </Section>
               </div>
 
-              {/* Section 2b: 3D Bias Visualizations */}
+              {/* Section 2b: Bias Visualizations */}
               {analysis.biases.length >= 3 && (
                 <div style={{ marginBottom: 24, scrollMarginTop: 80 }}>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
@@ -623,6 +623,7 @@ export default function DemoPage() {
                         borderRadius: 16,
                         overflow: 'hidden',
                         boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+                        minWidth: 0,
                       }}
                     >
                       <div
@@ -639,15 +640,17 @@ export default function DemoPage() {
                           Interactive bias relationship map
                         </div>
                       </div>
-                      <div style={{ height: 300 }}>
-                        <BiasNetwork3D
-                          biases={analysis.biases.map(b => ({
-                            biasType: b.biasType,
-                            severity: b.severity,
-                            excerpt: b.excerpt,
-                            explanation: b.explanation,
-                          }))}
-                        />
+                      <div style={{ height: 300, position: 'relative', overflow: 'hidden' }}>
+                        <div style={{ position: 'absolute', inset: 0 }}>
+                          <BiasNetwork3D
+                            biases={analysis.biases.map(b => ({
+                              biasType: b.biasType,
+                              severity: b.severity,
+                              excerpt: b.excerpt,
+                              explanation: b.explanation,
+                            }))}
+                          />
+                        </div>
                       </div>
                       <div style={{ padding: '8px 16px', borderTop: '1px solid #E2E8F0', background: '#FFFFFF', fontSize: 11, color: '#94A3B8' }}>
                         Drag to rotate · Scroll to zoom · Click to explore
@@ -662,6 +665,7 @@ export default function DemoPage() {
                         overflow: 'hidden',
                         background: '#FFFFFF',
                         boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+                        minWidth: 0,
                       }}
                     >
                       <div
@@ -677,18 +681,20 @@ export default function DemoPage() {
                           Severity × confidence across {analysis.biases.length} biases
                         </div>
                       </div>
-                      <div style={{ height: 300 }}>
-                        <BiasProfileRadar
-                          biases={analysis.biases.map(b => ({
-                            id: b.biasType,
-                            biasType: b.biasType,
-                            severity: b.severity,
-                            excerpt: b.excerpt,
-                            explanation: b.explanation,
-                            suggestion: b.suggestion,
-                            confidence: b.confidence,
-                          }))}
-                        />
+                      <div style={{ height: 300, position: 'relative', overflow: 'hidden' }}>
+                        <div style={{ position: 'absolute', inset: 0 }}>
+                          <BiasProfileRadar
+                            biases={analysis.biases.map(b => ({
+                              id: b.biasType,
+                              biasType: b.biasType,
+                              severity: b.severity,
+                              excerpt: b.excerpt,
+                              explanation: b.explanation,
+                              suggestion: b.suggestion,
+                              confidence: b.confidence,
+                            }))}
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
