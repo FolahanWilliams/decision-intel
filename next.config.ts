@@ -55,7 +55,7 @@ const nextConfig: NextConfig = {
       style-src 'self' 'unsafe-inline';
       img-src 'self' data: blob: https:;
       font-src 'self' data:;
-      connect-src 'self' https://*.supabase.co https://generativelanguage.googleapis.com;
+      connect-src 'self' https://*.supabase.co https://generativelanguage.googleapis.com https://cdn.jsdelivr.net https://fonts.gstatic.com;
       frame-ancestors 'none';
       base-uri 'self';
       form-action 'self';
