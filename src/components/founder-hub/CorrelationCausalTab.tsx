@@ -23,7 +23,6 @@ import { computeSeedWeights } from '@/lib/data/seed-weights';
 import dynamic from 'next/dynamic';
 import {
   computeStaticCausalWeights,
-  getStaticCausalGraph,
   getStaticCausalInsights,
 } from '@/lib/data/case-study-causal-weights';
 import type { CausalNodeData } from '@/components/visualizations/CausalGraph3DCanvas';
@@ -54,9 +53,6 @@ export function CorrelationCausalTab() {
   const topPredictors = useMemo(() => getTopSeverityPredictors(10), []);
   const seedWeights = useMemo(() => computeSeedWeights(), []);
   const causalWeights = useMemo(() => computeStaticCausalWeights(), []);
-  const causalGraph = useMemo(() => {
-    return getStaticCausalGraph();
-  }, []);
   const [selectedCausalNode, setSelectedCausalNode] = useState<CausalNodeData | null>(null);
   const causalInsights = useMemo(() => getStaticCausalInsights(), []);
 

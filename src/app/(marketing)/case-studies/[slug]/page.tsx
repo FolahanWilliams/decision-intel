@@ -12,19 +12,11 @@ import {
   type CaseStudy,
 } from '@/lib/data/case-studies';
 import { computeReferenceClass } from '@/lib/data/reference-class-forecasting';
-import dynamic from 'next/dynamic';
 import { CaseStudyNav, BRAND_COLORS as C } from '../CaseStudyNav';
 import { CaseStudyCta } from './CaseStudyCta';
 import { CaseStudyGraphSection } from './CaseStudyGraphSection';
+import { BiasProfileRadarWrapper as BiasProfileRadar } from '@/components/visualizations/BiasProfileRadarWrapper';
 import { formatIndustry, formatDocumentType, formatBiasName, humanize } from '@/lib/utils/labels';
-
-const BiasProfileRadar = dynamic(
-  () =>
-    import('@/components/visualizations/BiasProfileRadar').then(m => ({
-      default: m.BiasProfileRadar,
-    })),
-  { ssr: false },
-);
 
 export const dynamicParams = false;
 
