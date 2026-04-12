@@ -23,10 +23,23 @@ import {
   Play,
   ExternalLink,
 } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { DEMO_ANALYSES } from './data';
 import { DQIBadge } from '@/components/ui/DQIBadge';
 import { trackEvent } from '@/lib/analytics/track';
 import { scanForBiases, type ScanResult } from '@/lib/analysis/client-bias-scanner';
+
+const BiasNetwork3D = dynamic(
+  () => import('@/components/visualizations/BiasNetwork3DCanvas'),
+  { ssr: false },
+);
+const BiasProfileRadar = dynamic(
+  () =>
+    import('@/components/visualizations/BiasProfileRadar').then(m => ({
+      default: m.BiasProfileRadar,
+    })),
+  { ssr: false },
+);
 
 const FLOW_SECTIONS = [
   { id: 'score', label: 'Score' },
@@ -599,6 +612,90 @@ export default function DemoPage() {
                   )}
                 </Section>
               </div>
+
+              {/* Section 2b: 3D Bias Visualizations */}
+              {analysis.biases.length >= 3 && (
+                <div className="scroll-mt-20 mb-10">
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: 16,
+                    }}
+                    className="grid-cols-1 sm:grid-cols-2"
+                  >
+                    {/* 3D Bias Network */}
+                    <div
+                      style={{
+                        border: '1px solid var(--border-color, #1E293B)',
+                        borderRadius: 12,
+                        overflow: 'hidden',
+                      }}
+                    >
+                      <div
+                        style={{
+                          padding: '10px 14px',
+                          borderBottom: '1px solid var(--border-color, #1E293B)',
+                          fontSize: 11,
+                          fontWeight: 700,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px',
+                          color: 'var(--accent-primary, #16A34A)',
+                        }}
+                      >
+                        3D Bias Network
+                      </div>
+                      <div style={{ height: 320 }}>
+                        <BiasNetwork3D
+                          biases={analysis.biases.map(b => ({
+                            biasType: b.biasType,
+                            severity: b.severity,
+                            excerpt: b.excerpt,
+                            explanation: b.explanation,
+                          }))}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Bias Intensity Radar */}
+                    <div
+                      style={{
+                        border: '1px solid var(--border-color, #E2E8F0)',
+                        borderRadius: 12,
+                        overflow: 'hidden',
+                        background: 'var(--bg-card, #FFFFFF)',
+                      }}
+                    >
+                      <div
+                        style={{
+                          padding: '10px 14px',
+                          borderBottom: '1px solid var(--border-color, #E2E8F0)',
+                          fontSize: 11,
+                          fontWeight: 700,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px',
+                          color: '#7C3AED',
+                        }}
+                      >
+                        Bias Intensity Profile
+                      </div>
+                      <div style={{ height: 320 }}>
+                        <BiasProfileRadar
+                          biases={analysis.biases.map(b => ({
+                            id: b.biasType,
+                            biasType: b.biasType,
+                            severity: b.severity,
+                            excerpt: b.excerpt,
+                            explanation: b.explanation,
+                            suggestion: b.suggestion,
+                            confidence: b.confidence,
+                          }))}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Section 3: Noise */}
               <div id="noise" className="scroll-mt-20">
