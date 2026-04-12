@@ -112,7 +112,7 @@ export function CaseStudyCta({ slug, company, hasDeepAnalysis }: CaseStudyCtaPro
 
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 16 }}>
         <a
-          href="/login"
+          href="/demo"
           onClick={() => trackEvent('case_study_try_demo', { slug, company })}
           style={{
             display: 'inline-flex',
