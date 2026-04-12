@@ -12,10 +12,19 @@ import {
   type CaseStudy,
 } from '@/lib/data/case-studies';
 import { computeReferenceClass } from '@/lib/data/reference-class-forecasting';
+import dynamic from 'next/dynamic';
 import { CaseStudyNav, BRAND_COLORS as C } from '../CaseStudyNav';
 import { CaseStudyCta } from './CaseStudyCta';
 import { CaseStudyGraphSection } from './CaseStudyGraphSection';
 import { formatIndustry, formatDocumentType, formatBiasName, humanize } from '@/lib/utils/labels';
+
+const BiasProfileRadar = dynamic(
+  () =>
+    import('@/components/visualizations/BiasProfileRadar').then(m => ({
+      default: m.BiasProfileRadar,
+    })),
+  { ssr: false },
+);
 
 export const dynamicParams = false;
 
@@ -106,6 +115,37 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   );
 }
 
+const OUTCOME_DQI: Record<string, number> = {
+  catastrophic_failure: 22,
+  failure: 38,
+  partial_failure: 52,
+  partial_success: 67,
+  success: 79,
+  exceptional_success: 88,
+};
+
+function computeSimulatedDQI(outcome: string, biasCount: number, toxicCount: number) {
+  const base = OUTCOME_DQI[outcome] ?? 50;
+  const biasMod = Math.max(-8, (4 - biasCount) * 2);
+  const toxicMod = Math.max(-6, -toxicCount * 3);
+  return Math.max(12, Math.min(96, base + biasMod + toxicMod));
+}
+
+function dqiGrade(score: number): { grade: string; color: string; label: string } {
+  if (score >= 85) return { grade: 'A', color: '#22c55e', label: 'Excellent' };
+  if (score >= 70) return { grade: 'B', color: '#84cc16', label: 'Good' };
+  if (score >= 55) return { grade: 'C', color: '#eab308', label: 'Fair' };
+  if (score >= 40) return { grade: 'D', color: '#f97316', label: 'Poor' };
+  return { grade: 'F', color: '#ef4444', label: 'Critical' };
+}
+
+function guessSeverity(bias: string, isPrimary: boolean): string {
+  if (isPrimary) return 'critical';
+  if (['overconfidence_bias', 'groupthink', 'confirmation_bias', 'sunk_cost_fallacy', 'anchoring_bias', 'authority_bias'].includes(bias)) return 'high';
+  if (['framing_effect', 'loss_aversion', 'bandwagon_effect'].includes(bias)) return 'medium';
+  return 'medium';
+}
+
 function Card({ children, accent }: { children: React.ReactNode; accent?: string }) {
   return (
     <div
@@ -145,6 +185,23 @@ export default async function CaseStudyDetailPage({
   const related = ALL_CASES.filter(
     c => c.industry === caseStudy.industry && c.id !== caseStudy.id
   ).slice(0, 3);
+
+  const dqiScore = computeSimulatedDQI(
+    caseStudy.outcome,
+    caseStudy.biasesPresent.length,
+    caseStudy.toxicCombinations.length,
+  );
+  const dqi = dqiGrade(dqiScore);
+
+  const simulatedBiases = caseStudy.biasesPresent.map(bias => ({
+    id: bias,
+    biasType: bias,
+    severity: guessSeverity(bias, bias === caseStudy.primaryBias),
+    excerpt: '',
+    explanation: '',
+    suggestion: '',
+    confidence: bias === caseStudy.primaryBias ? 0.95 : 0.75,
+  }));
 
   const caseStudyJsonLd = [
     {
@@ -308,6 +365,46 @@ export default async function CaseStudyDetailPage({
           >
             Estimated impact: {caseStudy.estimatedImpact}
           </p>
+
+          {/* Simulated DQI Score */}
+          <div
+            style={{
+              marginTop: 20,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 12,
+              background: '#0F172A',
+              borderRadius: 12,
+              padding: '12px 20px',
+            }}
+          >
+            <div
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: '50%',
+                border: `3px solid ${dqi.color}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexDirection: 'column',
+              }}
+            >
+              <span style={{ fontSize: 18, fontWeight: 800, color: dqi.color, lineHeight: 1 }}>
+                {dqi.grade}
+              </span>
+              <span style={{ fontSize: 9, color: '#94A3B8', lineHeight: 1 }}>{dqiScore}</span>
+            </div>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#16A34A', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Decision Quality Index
+              </div>
+              <div style={{ fontSize: 13, color: '#94A3B8', marginTop: 2 }}>
+                {dqi.label} &mdash; {caseStudy.biasesPresent.length} biases detected
+                {caseStudy.toxicCombinations.length > 0 && `, ${caseStudy.toxicCombinations.length} toxic combinations`}
+              </div>
+            </div>
+          </div>
         </header>
 
         {/* Summary */}
@@ -336,12 +433,44 @@ export default async function CaseStudyDetailPage({
         {/* Deep section — hindsight-stripped memo analysis */}
         {deep ? (
           <section style={{ marginBottom: 40 }}>
-            <SectionTitle>What we would have flagged at decision time</SectionTitle>
-            <p style={{ fontSize: 14, color: '#475569', marginBottom: 20, lineHeight: 1.6 }}>
-              The analysis below was produced from the pre-decision document only &mdash; no
-              hindsight. This is what the platform would have surfaced if it had been running{' '}
-              {caseStudy.year > 2000 ? `in ${deep.date}` : `at the time`}.
-            </p>
+            {/* Platform Analysis banner */}
+            <div
+              style={{
+                background: '#0F172A',
+                borderRadius: '12px 12px 0 0',
+                padding: '14px 20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: 8,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <Shield size={16} style={{ color: '#16A34A' }} />
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#16A34A', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+                  Decision Intel Platform Analysis
+                </span>
+              </div>
+              <span style={{ fontSize: 11, color: '#64748B' }}>
+                Source: {formatDocumentType(deep.documentType)} · {deep.date}
+              </span>
+            </div>
+            <div
+              style={{
+                border: '1px solid #1E293B',
+                borderTop: 'none',
+                borderRadius: '0 0 12px 12px',
+                padding: '24px 20px',
+                background: '#FFFFFF',
+                marginBottom: 20,
+              }}
+            >
+              <p style={{ fontSize: 14, color: '#475569', marginBottom: 20, lineHeight: 1.6, margin: '0 0 20px' }}>
+                The analysis below was produced from the pre-decision document only &mdash; no
+                hindsight. This is what the platform would have surfaced if it had been running{' '}
+                {caseStudy.year > 2000 ? `in ${deep.date}` : `at the time`}.
+              </p>
 
             <div style={{ display: 'grid', gap: 20 }}>
               <Card accent={C.navy}>
@@ -463,6 +592,7 @@ export default async function CaseStudyDetailPage({
                 </p>
               </Card>
             </div>
+            </div>
           </section>
         ) : (
           <section style={{ marginBottom: 40 }}>
@@ -510,15 +640,54 @@ export default async function CaseStudyDetailPage({
           </section>
         )}
 
-        {/* Interactive Bias Knowledge Graph */}
+        {/* Analysis Dashboard: 3D Graph + Bias Radar */}
         {caseStudy.biasesPresent.length >= 2 && (
           <section style={{ marginBottom: 40 }}>
-            <CaseStudyGraphSection
-              biases={caseStudy.biasesPresent}
-              primaryBias={caseStudy.primaryBias}
-              toxicCombinations={caseStudy.toxicCombinations}
-              company={caseStudy.company}
-            />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 20 }}>
+              <CaseStudyGraphSection
+                biases={caseStudy.biasesPresent}
+                primaryBias={caseStudy.primaryBias}
+                toxicCombinations={caseStudy.toxicCombinations}
+                company={caseStudy.company}
+              />
+              {simulatedBiases.length >= 3 && (
+                <div
+                  style={{
+                    background: '#FFFFFF',
+                    border: '1px solid #E2E8F0',
+                    borderRadius: 16,
+                    overflow: 'hidden',
+                    boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
+                  }}
+                >
+                  <div
+                    style={{
+                      padding: '14px 16px 12px',
+                      borderBottom: '1px solid #E2E8F0',
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.6px',
+                        color: '#7C3AED',
+                        marginBottom: 3,
+                      }}
+                    >
+                      Bias Intensity Profile
+                    </div>
+                    <div style={{ fontSize: 14, color: '#64748B' }}>
+                      Severity × confidence across {simulatedBiases.length} detected biases
+                    </div>
+                  </div>
+                  <div style={{ height: 360, padding: '8px 0' }}>
+                    <BiasProfileRadar biases={simulatedBiases} />
+                  </div>
+                </div>
+              )}
+            </div>
           </section>
         )}
 

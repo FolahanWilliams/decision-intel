@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { ArrowRight, Upload } from 'lucide-react';
 import { trackEvent } from '@/lib/analytics/track';
 
 interface CaseStudyCtaProps {
@@ -17,12 +18,7 @@ const C = {
   white: '#FFFFFF',
   green: '#16A34A',
   greenDark: '#15803D',
-  slate100: '#F1F5F9',
-  slate200: '#E2E8F0',
   slate400: '#94A3B8',
-  slate600: '#475569',
-  slate900: '#0F172A',
-  red: '#DC2626',
 } as const;
 
 export function CaseStudyCta({ slug, company, hasDeepAnalysis }: CaseStudyCtaProps) {
@@ -50,11 +46,7 @@ export function CaseStudyCta({ slug, company, hasDeepAnalysis }: CaseStudyCtaPro
       const res = await fetch('/api/pilot-interest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          caseSlug: slug,
-          company,
-        }),
+        body: JSON.stringify({ email, caseSlug: slug, company }),
       });
 
       if (!res.ok) {
@@ -93,78 +85,135 @@ export function CaseStudyCta({ slug, company, hasDeepAnalysis }: CaseStudyCtaPro
   }
 
   return (
-    <div
-      style={{
-        background: C.navy,
-        color: C.white,
-        padding: 32,
-        borderRadius: 14,
-      }}
-    >
+    <div style={{ background: C.navy, color: C.white, padding: 32, borderRadius: 14 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+        <div
+          style={{
+            width: 6,
+            height: 6,
+            borderRadius: '50%',
+            background: C.green,
+            animation: 'pulse 2s infinite',
+          }}
+        />
+        <span style={{ fontSize: 11, fontWeight: 700, color: C.green, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+          Pilot slots available
+        </span>
+      </div>
+
       <h3 style={{ fontSize: 22, fontWeight: 700, marginBottom: 8, lineHeight: 1.3 }}>
-        Get this analysis for one of your own deals.
+        See what we&apos;d flag in <em>your</em> next deal.
       </h3>
       <p style={{ fontSize: 14, color: C.slate400, marginBottom: 20, lineHeight: 1.6 }}>
-        We&apos;ll run a memo or deck of your choosing through the same pipeline that produced this{' '}
-        {hasDeepAnalysis ? 'hindsight-stripped analysis' : 'case review'}, and send you a written
-        readout within a business day. No obligation, pilot slots only.
+        Upload a memo or board paper. Get the same{' '}
+        {hasDeepAnalysis ? 'hindsight-stripped analysis' : 'bias audit'} you just saw for{' '}
+        {company} &mdash; on your own deal, in under 60 seconds.
       </p>
 
-      <form
-        onSubmit={handleSubmit}
-        style={{
-          display: 'flex',
-          gap: 8,
-          flexWrap: 'wrap',
-        }}
-      >
-        <input
-          type="email"
-          value={email}
-          onChange={e => {
-            setEmail(e.target.value);
-            if (status === 'error') {
-              setStatus('idle');
-              setErrorMessage(null);
-            }
-          }}
-          placeholder="your-email@firm.com"
-          required
-          disabled={status === 'submitting'}
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 16 }}>
+        <a
+          href="/login"
+          onClick={() => trackEvent('case_study_try_demo', { slug, company })}
           style={{
-            flex: '1 1 200px',
-            minWidth: 0,
-            padding: '12px 16px',
-            borderRadius: 8,
-            border: '1px solid rgba(255,255,255,0.18)',
-            background: C.navyLight,
-            color: C.white,
-            fontSize: 14,
-            outline: 'none',
-          }}
-          aria-label="Work email"
-        />
-        <button
-          type="submit"
-          disabled={status === 'submitting'}
-          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
             padding: '12px 24px',
             borderRadius: 8,
             border: 'none',
-            background: status === 'submitting' ? C.greenDark : C.green,
+            background: C.green,
             color: C.white,
             fontSize: 14,
             fontWeight: 600,
-            cursor: status === 'submitting' ? 'wait' : 'pointer',
+            textDecoration: 'none',
+            cursor: 'pointer',
           }}
         >
-          {status === 'submitting' ? 'Sending…' : 'Request a pilot'}
-        </button>
-      </form>
+          <Upload size={15} />
+          Try the Demo &mdash; Free
+        </a>
+        <a
+          href="#pilot-form"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '12px 24px',
+            borderRadius: 8,
+            border: '1px solid rgba(255,255,255,0.18)',
+            background: 'transparent',
+            color: C.white,
+            fontSize: 14,
+            fontWeight: 500,
+            textDecoration: 'none',
+            cursor: 'pointer',
+          }}
+        >
+          Request a Pilot
+          <ArrowRight size={14} />
+        </a>
+      </div>
 
-      {status === 'error' && errorMessage && (
-        <p style={{ marginTop: 12, fontSize: 13, color: '#FCA5A5' }}>{errorMessage}</p>
-      )}
+      <div
+        id="pilot-form"
+        style={{
+          borderTop: '1px solid rgba(255,255,255,0.08)',
+          paddingTop: 16,
+        }}
+      >
+        <p style={{ fontSize: 12, color: C.slate400, marginBottom: 10 }}>
+          Or leave your email &mdash; we&apos;ll run a deal of your choosing and send the readout within a business day.
+        </p>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <input
+            type="email"
+            value={email}
+            onChange={e => {
+              setEmail(e.target.value);
+              if (status === 'error') {
+                setStatus('idle');
+                setErrorMessage(null);
+              }
+            }}
+            placeholder="your-email@firm.com"
+            required
+            disabled={status === 'submitting'}
+            style={{
+              flex: '1 1 200px',
+              minWidth: 0,
+              padding: '10px 14px',
+              borderRadius: 8,
+              border: '1px solid rgba(255,255,255,0.18)',
+              background: C.navyLight,
+              color: C.white,
+              fontSize: 13,
+              outline: 'none',
+            }}
+            aria-label="Work email"
+          />
+          <button
+            type="submit"
+            disabled={status === 'submitting'}
+            style={{
+              padding: '10px 20px',
+              borderRadius: 8,
+              border: 'none',
+              background: status === 'submitting' ? C.greenDark : C.green,
+              color: C.white,
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: status === 'submitting' ? 'wait' : 'pointer',
+            }}
+          >
+            {status === 'submitting' ? 'Sending…' : 'Send'}
+          </button>
+        </form>
+        {status === 'error' && errorMessage && (
+          <p style={{ marginTop: 8, fontSize: 12, color: '#FCA5A5' }}>{errorMessage}</p>
+        )}
+      </div>
+
+      <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }`}</style>
     </div>
   );
 }
