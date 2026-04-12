@@ -176,7 +176,7 @@ export default function DemoPage() {
   }, [showResults]);
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0A0F1A', color: '#E2E8F0' }}>
+    <div className="dark" style={{ minHeight: '100vh', background: 'var(--bg-primary, #0A0F1A)', color: 'var(--text-primary, #E2E8F0)' }}>
       {/* Header */}
       <div style={{ background: '#0F172A', borderBottom: '1px solid #1E293B', padding: '12px 24px', position: 'sticky', top: 0, zIndex: 50 }}>
         <div style={{ maxWidth: 960, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -579,14 +579,7 @@ export default function DemoPage() {
               {/* Section 2b: 3D Bias Visualizations */}
               {analysis.biases.length >= 3 && (
                 <div className="scroll-mt-20 mb-10">
-                  <div
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 1fr',
-                      gap: 16,
-                    }}
-                    className="grid-cols-1 sm:grid-cols-2"
-                  >
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* 3D Bias Network */}
                     <div
                       style={{
