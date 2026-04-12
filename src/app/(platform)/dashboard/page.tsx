@@ -65,6 +65,19 @@ import { useDeals } from '@/hooks/useDeals';
 import { DOCUMENT_TYPES } from '@/types/deals';
 import { QuickScanModal } from '@/components/ui/QuickScanModal';
 import { Zap } from 'lucide-react';
+import dynamic from 'next/dynamic';
+
+const DecisionPerformance = dynamic(
+  () => import('@/components/visualizations/DecisionPerformance'),
+  { ssr: false },
+);
+const EnhancedDashboardCharts = dynamic(
+  () =>
+    import('@/components/visualizations/EnhancedDashboardCharts').then(m => ({
+      default: m.EnhancedDashboardCharts,
+    })),
+  { ssr: false },
+);
 
 const ANALYSIS_STEPS: { name: string; icon: React.ReactNode }[] = [
   { name: 'Preparing document', icon: <FileText size={16} /> },
@@ -76,7 +89,7 @@ const ANALYSIS_STEPS: { name: string; icon: React.ReactNode }[] = [
   { name: 'Finalizing report', icon: <CheckCircle size={16} /> },
 ];
 
-type DashboardView = 'upload' | 'browse';
+type DashboardView = 'upload' | 'browse' | 'analytics';
 
 /** Map HTTP status codes and error patterns to user-friendly messages. */
 function getDetailedErrorMessage(err: unknown, uploadRes?: Response | null): string {
@@ -787,6 +800,26 @@ export default function Dashboard() {
             >
               <Search size={14} />
               Browse &amp; Analyze
+            </button>
+            <button
+              onClick={() => setActiveView('analytics')}
+              style={{
+                padding: '6px 16px',
+                fontSize: '13px',
+                fontWeight: activeView === 'analytics' ? 600 : 400,
+                borderRadius: 'var(--radius-full)',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                transition: 'all 0.15s',
+                background: activeView === 'analytics' ? 'var(--bg-active)' : 'transparent',
+                color: activeView === 'analytics' ? 'var(--text-highlight)' : 'var(--text-muted)',
+              }}
+            >
+              <BarChart3 size={14} />
+              Analytics
             </button>
           </div>
         )}
@@ -2122,6 +2155,36 @@ export default function Dashboard() {
             </div>
           )}
         </>
+      )}
+
+      {/* ── Analytics View ─────────────────────────────────────────────── */}
+      {activeView === 'analytics' && (
+        <div className="flex flex-col gap-xl">
+          <ErrorBoundary sectionName="Decision Performance">
+            <DecisionPerformance />
+          </ErrorBoundary>
+          {uploadedDocs.length > 0 && (
+            <ErrorBoundary sectionName="Dashboard Charts">
+              <EnhancedDashboardCharts
+                riskDistribution={{
+                  highRisk: riskSummary.high,
+                  mediumRisk: riskSummary.medium,
+                  lowRisk: riskSummary.low,
+                }}
+                scoreTrend={uploadedDocs
+                  .filter((d: { status: string; analyses?: { overallScore?: number; createdAt?: string }[] }) => d.status === 'complete' && d.analyses?.[0]?.overallScore != null)
+                  .map((d: { analyses?: { overallScore?: number; createdAt?: string }[]; uploadedAt: string }) => ({
+                    date: d.analyses?.[0]?.createdAt ?? d.uploadedAt,
+                    score: d.analyses?.[0]?.overallScore ?? 0,
+                  }))
+                  .sort((a: { date: string }, b: { date: string }) => new Date(a.date).getTime() - new Date(b.date).getTime())}
+                topBiases={[]}
+                totalAnalyzed={riskSummary.total}
+                avgScore={riskSummary.avg}
+              />
+            </ErrorBoundary>
+          )}
+        </div>
       )}
 
       {/* Delete Confirmation Modal */}
