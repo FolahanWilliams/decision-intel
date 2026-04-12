@@ -400,7 +400,7 @@ export default function HeroDecisionGraph3DCanvas({
       nodes={NODES}
       edges={EDGES}
       layoutType="forceDirected3d"
-      cameraMode="orbit"
+      cameraMode="rotate"
       animated={false}
       theme={GRAPH_THEME}
       renderNode={renderNode}
