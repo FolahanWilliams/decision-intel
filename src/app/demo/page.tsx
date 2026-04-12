@@ -441,7 +441,7 @@ export default function DemoPage() {
           <div
             ref={resultsRef}
             className="py-8"
-            style={{ scrollBehavior: 'smooth', color: 'var(--text-primary)' }}
+            style={{ scrollBehavior: 'smooth', color: '#0F172A' }}
           >
             {/* Back / Re-select */}
             <div className="flex items-center justify-between mb-6">
@@ -450,7 +450,7 @@ export default function DemoPage() {
                   setShowResults(false);
                   setSelectedIdx(null);
                 }}
-                className="text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer bg-transparent border-none flex items-center gap-1.5"
+                className="text-xs text-slate-400 hover:text-slate-900 transition-colors cursor-pointer bg-transparent border-none flex items-center gap-1.5"
               >
                 <ArrowRight size={12} className="rotate-180" />
                 Try another document
@@ -462,8 +462,8 @@ export default function DemoPage() {
                     onClick={() => startSimulation(idx)}
                     className={`px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer border transition-all ${
                       idx === selectedIdx
-                        ? 'border-[var(--border-active)] bg-[var(--bg-tertiary)] text-[var(--text-primary)]'
-                        : 'border-[var(--border-color)] bg-transparent text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                        ? 'border-slate-300 bg-slate-50 text-slate-900'
+                        : 'border-slate-200 bg-transparent text-slate-400 hover:text-slate-900'
                     }`}
                   >
                     {a.shortName}
@@ -488,12 +488,12 @@ export default function DemoPage() {
                     }}
                   >
                     <span
-                      className={`text-[10px] opacity-0 group-hover:opacity-100 transition-opacity ${activeSection === s.id ? '!opacity-100 text-[var(--text-primary)]' : 'text-[var(--text-muted)]'}`}
+                      className={`text-[10px] opacity-0 group-hover:opacity-100 transition-opacity ${activeSection === s.id ? '!opacity-100 text-slate-900' : 'text-slate-400'}`}
                     >
                       {s.label}
                     </span>
                     <span
-                      className={`w-2 h-2 rounded-full transition-all ${activeSection === s.id ? 'bg-green-500 scale-125' : 'bg-[var(--bg-tertiary)] group-hover:bg-[var(--accent-primary)]'}`}
+                      className={`w-2 h-2 rounded-full transition-all ${activeSection === s.id ? 'bg-green-500 scale-125' : 'bg-slate-50 group-hover:bg-green-500'}`}
                     />
                   </a>
                 ))}
@@ -504,10 +504,10 @@ export default function DemoPage() {
                 <div className="flex items-start gap-5 mb-6">
                   <DQIBadge score={analysis.overallScore} size="lg" showGrade animate />
                   <div className="flex-1 min-w-0">
-                    <h1 className="text-lg sm:text-xl font-bold mb-1.5 leading-snug text-[var(--text-primary)]">
+                    <h1 className="text-lg sm:text-xl font-bold mb-1.5 leading-snug text-slate-900">
                       {analysis.documentName}
                     </h1>
-                    <p className="text-[var(--text-muted)] text-xs sm:text-[13px] m-0">
+                    <p className="text-slate-400 text-xs sm:text-[13px] m-0">
                       Analyzed by Decision Intel &middot;{' '}
                       {new Date(analysis.createdAt).toLocaleDateString('en-US', {
                         year: 'numeric',
@@ -558,7 +558,7 @@ export default function DemoPage() {
                 </div>
                 {/* Executive summary */}
                 <Section icon={<BarChart3 size={16} />} title="Executive Summary">
-                  <p className="text-[var(--text-secondary)] leading-relaxed m-0 text-sm">
+                  <p className="text-slate-600 leading-relaxed m-0 text-sm">
                     {analysis.summary}
                   </p>
                 </Section>
@@ -570,32 +570,31 @@ export default function DemoPage() {
                   icon={<Brain size={16} />}
                   title={`Cognitive Biases Detected (${analysis.biases.length})`}
                 >
-                  <div className="flex flex-col gap-3">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {(showAllBiases ? analysis.biases : analysis.biases.slice(0, 4)).map(
                       (bias, idx) => (
                         <div
                           key={idx}
-                          className="bg-[var(--bg-tertiary)] rounded-[10px] p-4 sm:p-[18px] border border-[var(--border-color)]"
+                          style={{ background: '#F8FAFC', borderRadius: 10, padding: '16px 18px', border: '1px solid #E2E8F0' }}
                         >
-                          <div className="flex flex-wrap items-center gap-2 mb-2.5">
-                            <span className="font-bold text-sm text-[var(--text-primary)]">
+                          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                            <span style={{ fontWeight: 700, fontSize: 14, color: '#0F172A', textTransform: 'capitalize' }}>
                               {bias.biasType.replace(/_/g, ' ')}
                             </span>
                             <SeverityBadge severity={bias.severity} />
-                            <span className="text-[11px] text-[var(--text-muted)] sm:ml-auto">
+                            <span style={{ fontSize: 11, color: '#94A3B8', marginLeft: 'auto' }}>
                               {Math.round(bias.confidence * 100)}% confidence
                             </span>
                           </div>
                           <p
-                            className="text-[var(--text-secondary)] text-[13px] m-0 mb-2.5 italic leading-relaxed pl-3"
-                            style={{ borderLeft: `2px solid ${sevColor(bias.severity)}30` }}
+                            style={{ color: '#475569', fontSize: 13, margin: '0 0 10px', fontStyle: 'italic', lineHeight: 1.6, paddingLeft: 12, borderLeft: `2px solid ${sevColor(bias.severity)}40` }}
                           >
                             &ldquo;{bias.excerpt}&rdquo;
                           </p>
-                          <p className="text-[var(--text-secondary)] text-[13px] m-0 mb-2.5 leading-relaxed">
+                          <p style={{ color: '#475569', fontSize: 13, margin: '0 0 10px', lineHeight: 1.6 }}>
                             {bias.explanation}
                           </p>
-                          <p className="text-green-500/80 text-[13px] m-0 leading-relaxed">
+                          <p style={{ color: '#15803D', fontSize: 13, margin: 0, lineHeight: 1.6 }}>
                             <strong>Recommendation:</strong> {bias.suggestion}
                           </p>
                         </div>
@@ -605,7 +604,7 @@ export default function DemoPage() {
                   {analysis.biases.length > 4 && !showAllBiases && (
                     <button
                       onClick={() => setShowAllBiases(true)}
-                      className="mt-3 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors bg-transparent border border-[var(--border-color)] rounded-lg px-3 py-1.5 cursor-pointer"
+                      style={{ marginTop: 12, fontSize: 12, color: '#475569', background: 'transparent', border: '1px solid #E2E8F0', borderRadius: 8, padding: '6px 12px', cursor: 'pointer' }}
                     >
                       Show all {analysis.biases.length} biases
                     </button>
@@ -615,37 +614,32 @@ export default function DemoPage() {
 
               {/* Section 2b: 3D Bias Visualizations */}
               {analysis.biases.length >= 3 && (
-                <div className="scroll-mt-20 mb-10">
-                  <div
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 1fr',
-                      gap: 16,
-                    }}
-                    className="grid-cols-1 sm:grid-cols-2"
-                  >
+                <div className="scroll-mt-20 mb-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* 3D Bias Network */}
                     <div
                       style={{
-                        border: '1px solid var(--border-color, #1E293B)',
-                        borderRadius: 12,
+                        border: '1px solid #E2E8F0',
+                        borderRadius: 16,
                         overflow: 'hidden',
+                        boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
                       }}
                     >
                       <div
                         style={{
-                          padding: '10px 14px',
-                          borderBottom: '1px solid var(--border-color, #1E293B)',
-                          fontSize: 11,
-                          fontWeight: 700,
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.5px',
-                          color: 'var(--accent-primary, #16A34A)',
+                          padding: '12px 16px',
+                          borderBottom: '1px solid #E2E8F0',
+                          background: '#FFFFFF',
                         }}
                       >
-                        3D Bias Network
+                        <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px', color: '#16A34A', marginBottom: 2 }}>
+                          3D Bias Network
+                        </div>
+                        <div style={{ fontSize: 13, color: '#64748B' }}>
+                          Interactive bias relationship map
+                        </div>
                       </div>
-                      <div style={{ height: 320 }}>
+                      <div style={{ height: 340 }}>
                         <BiasNetwork3D
                           biases={analysis.biases.map(b => ({
                             biasType: b.biasType,
@@ -655,31 +649,35 @@ export default function DemoPage() {
                           }))}
                         />
                       </div>
+                      <div style={{ padding: '8px 16px', borderTop: '1px solid #E2E8F0', background: '#FFFFFF', fontSize: 11, color: '#94A3B8' }}>
+                        Drag to rotate · Scroll to zoom · Click to explore
+                      </div>
                     </div>
 
                     {/* Bias Intensity Radar */}
                     <div
                       style={{
-                        border: '1px solid var(--border-color, #E2E8F0)',
-                        borderRadius: 12,
+                        border: '1px solid #E2E8F0',
+                        borderRadius: 16,
                         overflow: 'hidden',
-                        background: 'var(--bg-card, #FFFFFF)',
+                        background: '#FFFFFF',
+                        boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
                       }}
                     >
                       <div
                         style={{
-                          padding: '10px 14px',
-                          borderBottom: '1px solid var(--border-color, #E2E8F0)',
-                          fontSize: 11,
-                          fontWeight: 700,
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.5px',
-                          color: '#7C3AED',
+                          padding: '12px 16px',
+                          borderBottom: '1px solid #E2E8F0',
                         }}
                       >
-                        Bias Intensity Profile
+                        <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px', color: '#7C3AED', marginBottom: 2 }}>
+                          Bias Intensity Profile
+                        </div>
+                        <div style={{ fontSize: 13, color: '#64748B' }}>
+                          Severity × confidence across {analysis.biases.length} biases
+                        </div>
                       </div>
-                      <div style={{ height: 320 }}>
+                      <div style={{ height: 340 }}>
                         <BiasProfileRadar
                           biases={analysis.biases.map(b => ({
                             id: b.biasType,
@@ -715,7 +713,7 @@ export default function DemoPage() {
                       >
                         {analysis.noiseScore}
                       </div>
-                      <div className="text-xs text-[var(--text-muted)] mt-1">/ 100</div>
+                      <div className="text-xs text-slate-400 mt-1">/ 100</div>
                     </div>
                     <div className="flex-1 w-full">
                       <div className="flex flex-wrap gap-2 mb-3">
@@ -729,10 +727,10 @@ export default function DemoPage() {
                       <div className="flex flex-col gap-2">
                         {analysis.noiseBenchmarks.map((b, i) => (
                           <div key={i} className="flex items-center gap-2.5">
-                            <span className="text-[11px] sm:text-xs text-[var(--text-secondary)] w-20 sm:w-[120px] shrink-0">
+                            <span className="text-[11px] sm:text-xs text-slate-600 w-20 sm:w-[120px] shrink-0">
                               {b.label}
                             </span>
-                            <div className="flex-1 h-1.5 rounded-sm bg-[var(--bg-tertiary)]">
+                            <div className="flex-1 h-1.5 rounded-sm bg-slate-50">
                               <div
                                 className="h-full rounded-sm transition-[width] duration-300"
                                 style={{
@@ -748,7 +746,7 @@ export default function DemoPage() {
                                 }}
                               />
                             </div>
-                            <span className="text-xs font-semibold text-[var(--text-primary)] w-[30px] text-right">
+                            <span className="text-xs font-semibold text-slate-900 w-[30px] text-right">
                               {b.value}
                             </span>
                           </div>
@@ -773,14 +771,14 @@ export default function DemoPage() {
                       return (
                         <div
                           key={idx}
-                          className="bg-[var(--bg-tertiary)] rounded-[10px] p-4 border border-[var(--border-color)]"
+                          className="bg-slate-50 rounded-[10px] p-4 border border-slate-200"
                         >
                           <div className="flex justify-between items-center mb-2.5">
                             <div>
-                              <div className="font-bold text-[13px] text-[var(--text-primary)]">
+                              <div className="font-bold text-[13px] text-slate-900">
                                 {twin.name}
                               </div>
-                              <div className="text-[11px] text-[var(--text-muted)]">
+                              <div className="text-[11px] text-slate-400">
                                 {twin.role}
                               </div>
                             </div>
@@ -792,7 +790,7 @@ export default function DemoPage() {
                             </span>
                           </div>
                           <div className="mb-2.5">
-                            <div className="h-[3px] rounded-sm bg-[var(--bg-tertiary)]">
+                            <div className="h-[3px] rounded-sm bg-slate-50">
                               <div
                                 className="h-full rounded-sm"
                                 style={{
@@ -801,11 +799,11 @@ export default function DemoPage() {
                                 }}
                               />
                             </div>
-                            <div className="text-[10px] text-[var(--text-muted)] mt-0.5">
+                            <div className="text-[10px] text-slate-400 mt-0.5">
                               {Math.round(twin.confidence * 100)}% confidence
                             </div>
                           </div>
-                          <p className="text-[var(--text-secondary)] text-xs m-0 leading-relaxed">
+                          <p className="text-slate-600 text-xs m-0 leading-relaxed">
                             {twin.rationale}
                           </p>
                         </div>
@@ -822,7 +820,7 @@ export default function DemoPage() {
                     icon={<AlertTriangle size={16} className="text-red-500" />}
                     title="Toxic Combinations — Compound Risk Patterns"
                   >
-                    <p className="text-[var(--text-secondary)] text-[13px] mb-4 leading-relaxed">
+                    <p className="text-slate-600 text-[13px] mb-4 leading-relaxed">
                       Individual biases are manageable. When they combine with contextual factors,
                       compound risk can be 8x worse than any single factor.
                     </p>
@@ -830,10 +828,10 @@ export default function DemoPage() {
                       {analysis.toxicCombinations.map((tc, idx) => (
                         <div
                           key={idx}
-                          className="bg-[var(--bg-tertiary)] rounded-[10px] p-4 sm:p-[18px] border border-[var(--border-color)]"
+                          className="bg-slate-50 rounded-[10px] p-4 sm:p-[18px] border border-slate-200"
                         >
                           <div className="flex flex-wrap items-center gap-2 mb-2.5">
-                            <span className="font-bold text-sm text-[var(--text-primary)]">
+                            <span className="font-bold text-sm text-slate-900">
                               {tc.name}
                             </span>
                             <span
@@ -850,13 +848,13 @@ export default function DemoPage() {
                             {tc.biases.map((b, bi) => (
                               <span
                                 key={bi}
-                                className="text-[10px] px-2 py-0.5 rounded-md bg-[var(--bg-tertiary)] text-[var(--text-secondary)] border border-[var(--border-color)]"
+                                className="text-[10px] px-2 py-0.5 rounded-md bg-slate-50 text-slate-600 border border-slate-200"
                               >
                                 {b}
                               </span>
                             ))}
                           </div>
-                          <p className="text-[var(--text-secondary)] text-[13px] m-0 leading-relaxed">
+                          <p className="text-slate-600 text-[13px] m-0 leading-relaxed">
                             {tc.description}
                           </p>
                           {tc.historicalExample && (
@@ -874,7 +872,7 @@ export default function DemoPage() {
               {/* Section 6: Pre-Mortem */}
               <div id="premortem" className="scroll-mt-20">
                 <Section icon={<Skull size={16} />} title="Pre-Mortem Analysis">
-                  <p className="text-[var(--text-secondary)] text-[13px] mb-4 leading-relaxed">
+                  <p className="text-slate-600 text-[13px] mb-4 leading-relaxed">
                     Imagine it&apos;s 2 years from now and this decision has failed spectacularly.
                     What went wrong?
                   </p>
@@ -882,10 +880,10 @@ export default function DemoPage() {
                     {analysis.preMortem.scenarios.map((s, idx) => (
                       <div
                         key={idx}
-                        className="bg-[var(--bg-tertiary)] rounded-[10px] p-4 sm:p-[18px] border border-[var(--border-color)]"
+                        className="bg-slate-50 rounded-[10px] p-4 sm:p-[18px] border border-slate-200"
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2.5">
-                          <span className="font-bold text-sm text-[var(--text-primary)]">
+                          <span className="font-bold text-sm text-slate-900">
                             {s.title}
                           </span>
                           <div className="flex gap-2">
@@ -908,7 +906,7 @@ export default function DemoPage() {
                             </span>
                           </div>
                         </div>
-                        <p className="text-[var(--text-secondary)] text-[13px] m-0 leading-relaxed">
+                        <p className="text-slate-600 text-[13px] m-0 leading-relaxed">
                           {s.description}
                         </p>
                       </div>
@@ -926,10 +924,10 @@ export default function DemoPage() {
                       KNOWN OUTCOME
                     </span>
                   </div>
-                  <p className="text-[var(--text-secondary)] text-sm m-0 mb-1.5 leading-relaxed">
+                  <p className="text-slate-600 text-sm m-0 mb-1.5 leading-relaxed">
                     {analysis.outcome.what}
                   </p>
-                  <p className="text-[var(--text-muted)] text-xs m-0">
+                  <p className="text-slate-400 text-xs m-0">
                     {analysis.outcome.when} &middot; {analysis.outcome.impact}
                   </p>
                 </div>
@@ -938,13 +936,13 @@ export default function DemoPage() {
 
             {/* CTA */}
             <div
-              className="mt-12 text-center p-6 sm:p-10 rounded-2xl border border-[var(--border-color)]"
-              style={{ background: 'var(--bg-secondary)' }}
+              className="mt-12 text-center p-6 sm:p-10 rounded-2xl border border-slate-200"
+              style={{ background: '#F8FAFC' }}
             >
-              <h3 className="text-lg sm:text-[22px] font-bold text-[var(--text-primary)] mb-2">
+              <h3 className="text-lg sm:text-[22px] font-bold text-slate-900 mb-2">
                 This was a demo. Now try it on your own documents.
               </h3>
-              <p className="text-[var(--text-secondary)] text-sm mb-6 max-w-[500px] mx-auto">
+              <p className="text-slate-600 text-sm mb-6 max-w-[500px] mx-auto">
                 Upload any strategic document &mdash; board memo, M&amp;A rationale, investment
                 thesis, market analysis &mdash; and get a comprehensive cognitive bias audit in
                 minutes.
@@ -961,7 +959,7 @@ export default function DemoPage() {
                 </button>
                 <Link
                   href="/login"
-                  className="px-7 py-3 rounded-[10px] bg-transparent border border-[var(--border-color)] text-[var(--text-primary)] font-semibold text-sm no-underline text-center hover:border-[var(--border-active)] transition-colors"
+                  className="px-7 py-3 rounded-[10px] bg-transparent border border-slate-200 text-slate-900 font-semibold text-sm no-underline text-center hover:border-slate-300 transition-colors"
                 >
                   Sign Up Free
                 </Link>
@@ -977,12 +975,12 @@ export default function DemoPage() {
                   </a>
                 )}
               </div>
-              <p className="text-[var(--text-muted)] text-[11px] mt-4">
+              <p className="text-slate-400 text-[11px] mt-4">
                 No credit card required &middot; 3 free analyses &middot; 14-day trial on paid plans
               </p>
             </div>
 
-            <p className="text-[var(--text-muted)] text-[11px] text-center mt-8 leading-relaxed">
+            <p className="text-slate-400 text-[11px] text-center mt-8 leading-relaxed">
               Demo analyses are generated by Decision Intel&apos;s cognitive bias detection engine
               to demonstrate product capabilities. They are not financial or investment advice.
             </p>
@@ -1068,16 +1066,33 @@ function Section({
   icon,
   title,
   children,
-  borderColor = 'border-[var(--border-color)]',
 }: {
   icon: React.ReactNode;
   title: string;
   children: React.ReactNode;
-  borderColor?: string;
 }) {
   return (
-    <div className={`bg-[var(--bg-secondary)] border ${borderColor} rounded-xl p-4 sm:p-6 mb-6`}>
-      <h3 className="text-[15px] font-bold mb-4 flex items-center gap-2 text-[var(--text-primary)]">
+    <div
+      style={{
+        background: '#FFFFFF',
+        border: '1px solid #E2E8F0',
+        borderRadius: 12,
+        padding: '16px 20px',
+        marginBottom: 24,
+        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+      }}
+    >
+      <h3
+        style={{
+          fontSize: 15,
+          fontWeight: 700,
+          marginBottom: 16,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          color: '#0F172A',
+        }}
+      >
         {icon} {title}
       </h3>
       {children}
@@ -1099,15 +1114,19 @@ function ScoreCard({
   smallValue?: boolean;
 }) {
   return (
-    <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl py-3 sm:py-[18px] px-3 sm:px-3.5 text-center">
-      <div className="text-[10px] text-[var(--text-muted)] mb-1.5 tracking-wide">{label}</div>
-      <div
-        className={`${smallValue ? 'text-lg sm:text-2xl' : 'text-2xl sm:text-4xl'} font-extrabold leading-none`}
-        style={{ color }}
-      >
-        {value}
-      </div>
-      <div className="text-[11px] text-[var(--text-muted)] mt-1">{sub}</div>
+    <div
+      style={{
+        background: '#FFFFFF',
+        border: '1px solid #E2E8F0',
+        borderRadius: 12,
+        padding: '12px 14px',
+        textAlign: 'center',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+      }}
+    >
+      <div style={{ fontSize: 10, color: '#94A3B8', marginBottom: 6, letterSpacing: '0.5px' }}>{label}</div>
+      <div style={{ fontSize: smallValue ? 20 : 32, fontWeight: 800, lineHeight: 1, color }}>{value}</div>
+      <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>{sub}</div>
     </div>
   );
 }
@@ -1115,8 +1134,13 @@ function ScoreCard({
 function SeverityBadge({ severity }: { severity: string }) {
   return (
     <span
-      className="text-[10px] px-2.5 py-0.5 rounded-xl font-bold uppercase tracking-wide"
       style={{
+        fontSize: 10,
+        padding: '2px 10px',
+        borderRadius: 20,
+        fontWeight: 700,
+        textTransform: 'uppercase',
+        letterSpacing: '0.5px',
         background: `${sevColor(severity)}15`,
         color: sevColor(severity),
       }}
@@ -1128,9 +1152,9 @@ function SeverityBadge({ severity }: { severity: string }) {
 
 function StatPill({ label, value }: { label: string; value: string }) {
   return (
-    <div className="px-2.5 py-1 rounded-md bg-[var(--bg-tertiary)] border border-[var(--border-color)]">
-      <span className="text-[10px] text-[var(--text-muted)]">{label} </span>
-      <span className="text-xs font-semibold text-[var(--text-primary)]">{value}</span>
+    <div style={{ padding: '4px 10px', borderRadius: 6, background: '#F1F5F9', border: '1px solid #E2E8F0' }}>
+      <span style={{ fontSize: 10, color: '#94A3B8' }}>{label} </span>
+      <span style={{ fontSize: 12, fontWeight: 600, color: '#0F172A' }}>{value}</span>
     </div>
   );
 }
