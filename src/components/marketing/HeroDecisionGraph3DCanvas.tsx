@@ -8,6 +8,7 @@ import {
   type GraphNode,
   type GraphEdge,
   type NodeRendererProps,
+  type InternalGraphNode,
   type Theme,
   useSelection,
 } from 'reagraph';
@@ -293,19 +294,36 @@ export default function HeroDecisionGraph3DCanvas({
     return () => clearTimeout(timer);
   }, []);
 
-  const { selections, actives, onNodeClick, onCanvasClick, onNodePointerOver, onNodePointerOut } =
-    useSelection({
-      ref: graphRef,
-      nodes: NODES,
-      edges: EDGES,
-      type: 'single',
-      pathHoverType: 'all',
-      focusOnSelect: true,
-      onSelection: ids => {
-        const found = ids.length > 0 ? (NODES.find(n => n.id === ids[0]) ?? null) : null;
-        onNodeSelect(found);
-      },
-    });
+  const {
+    selections,
+    actives,
+    toggleSelection,
+    onCanvasClick,
+    onNodePointerOver,
+    onNodePointerOut,
+  } = useSelection({
+    ref: graphRef,
+    nodes: NODES,
+    edges: EDGES,
+    type: 'single',
+    pathHoverType: 'all',
+    focusOnSelect: false,
+    onSelection: ids => {
+      const found = ids.length > 0 ? (NODES.find(n => n.id === ids[0]) ?? null) : null;
+      onNodeSelect(found);
+    },
+  });
+
+  const onNodeClick = useCallback(
+    (node: InternalGraphNode) => {
+      const wasSelected = selections.includes(node.id);
+      toggleSelection(node.id);
+      if (!wasSelected) {
+        graphRef.current?.centerGraph([node.id]);
+      }
+    },
+    [selections, toggleSelection],
+  );
 
   const renderNode = useCallback(({ node, size, opacity, active, selected }: NodeRendererProps) => {
     const data = node.data as NodeData | undefined;
@@ -383,6 +401,7 @@ export default function HeroDecisionGraph3DCanvas({
       edges={EDGES}
       layoutType="forceDirected3d"
       cameraMode="orbit"
+      animated={false}
       theme={GRAPH_THEME}
       renderNode={renderNode}
       selections={selections}

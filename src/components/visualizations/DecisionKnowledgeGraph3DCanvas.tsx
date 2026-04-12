@@ -116,32 +116,46 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
     exportCanvas: () => graphRef.current?.exportCanvas() ?? '',
   }));
 
-  const { selections, actives, onNodeClick, onCanvasClick, onNodePointerOver, onNodePointerOut } =
-    useSelection({
-      ref: graphRef,
-      nodes,
-      edges,
-      type: 'single',
-      pathHoverType: 'all',
-      focusOnSelect: true,
-      onSelection: ids => {
-        if (ids.length === 0) {
-          onNodeSelect(null);
-          return;
-        }
-        // Find internal node from reagraph store
-        const internalNode = graphRef.current
-          ?.getGraph()
-          ?.getNodeAttribute(ids[0], 'data') as InternalGraphNode | undefined;
-        // Fallback: just pass the id — parent can reconcile
-        if (internalNode) {
-          onNodeSelect(internalNode);
-        } else {
-          // Pass a minimal node-like object the parent can handle
-          onNodeSelect({ id: ids[0] } as InternalGraphNode);
-        }
-      },
-    });
+  const {
+    selections,
+    actives,
+    toggleSelection,
+    onCanvasClick,
+    onNodePointerOver,
+    onNodePointerOut,
+  } = useSelection({
+    ref: graphRef,
+    nodes,
+    edges,
+    type: 'single',
+    pathHoverType: 'all',
+    focusOnSelect: false,
+    onSelection: ids => {
+      if (ids.length === 0) {
+        onNodeSelect(null);
+        return;
+      }
+      const internalNode = graphRef.current
+        ?.getGraph()
+        ?.getNodeAttribute(ids[0], 'data') as InternalGraphNode | undefined;
+      if (internalNode) {
+        onNodeSelect(internalNode);
+      } else {
+        onNodeSelect({ id: ids[0] } as InternalGraphNode);
+      }
+    },
+  });
+
+  const onNodeClick = useCallback(
+    (node: InternalGraphNode) => {
+      const wasSelected = selections.includes(node.id);
+      toggleSelection(node.id);
+      if (!wasSelected) {
+        graphRef.current?.centerGraph([node.id]);
+      }
+    },
+    [selections, toggleSelection],
+  );
 
   const renderNode = useCallback(({ node, size, opacity, active, selected }: NodeRendererProps) => {
     const type: DKGNodeType = (node.data?.type as DKGNodeType) ?? 'analysis';
@@ -220,6 +234,7 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
       edges={edges}
       layoutType="forceDirected3d"
       cameraMode="orbit"
+      animated={false}
       theme={DARK_THEME}
       renderNode={renderNode}
       selections={selections}
