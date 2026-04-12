@@ -20,11 +20,18 @@ import {
 // Types used implicitly via the computed correlation data
 // import type { BiasCooccurrenceEntry, IndustryRiskProfile, SeverityPredictor, ContextAmplifier, BiasOutcomeDivergence, SuccessPatternCorrelation } from '@/lib/data/case-correlations';
 import { computeSeedWeights } from '@/lib/data/seed-weights';
+import dynamic from 'next/dynamic';
 import {
   computeStaticCausalWeights,
   getStaticCausalGraph,
   getStaticCausalInsights,
 } from '@/lib/data/case-study-causal-weights';
+import type { CausalNodeData } from '@/components/visualizations/CausalGraph3DCanvas';
+
+const CausalGraph3D = dynamic(
+  () => import('@/components/visualizations/CausalGraph3DCanvas'),
+  { ssr: false },
+);
 // Types used implicitly via the graph data
 // import type { CausalGraphNode, CausalGraphEdge } from '@/lib/data/case-study-causal-weights';
 import {
@@ -46,10 +53,11 @@ export function CorrelationCausalTab() {
   const topPairs = useMemo(() => getTopDangerousBiasPairs(15), []);
   const topPredictors = useMemo(() => getTopSeverityPredictors(10), []);
   const seedWeights = useMemo(() => computeSeedWeights(), []);
+  const causalWeights = useMemo(() => computeStaticCausalWeights(), []);
   const causalGraph = useMemo(() => {
-    computeStaticCausalWeights();
     return getStaticCausalGraph();
   }, []);
+  const [selectedCausalNode, setSelectedCausalNode] = useState<CausalNodeData | null>(null);
   const causalInsights = useMemo(() => getStaticCausalInsights(), []);
 
   const [selectedIndustry, setSelectedIndustry] = useState<string>(
@@ -763,88 +771,109 @@ export function CorrelationCausalTab() {
         </div>
       </div>
 
-      {/* ── Section 9: Causal Graph ──────────────────────────────────────────── */}
+      {/* ── Section 9: 3D Causal Knowledge Graph ────────────────────────────── */}
       <div style={card}>
         <div style={sectionTitle}>
           <Network size={18} color="#8b5cf6" />
-          Causal Graph: Bias &rarr; Outcome Relationships
+          3D Causal Knowledge Graph: Bias &rarr; Outcome Relationships
         </div>
         <div
           style={{
             position: 'relative',
-            background: 'var(--bg-tertiary, #0a0a0a)',
+            background: '#080c14',
             borderRadius: 12,
-            padding: 20,
+            overflow: 'hidden',
           }}
         >
-          {causalGraph.nodes.length > 0 ? (
-            <svg
-              width={800}
-              height={500}
-              viewBox="0 0 800 500"
-              style={{ width: '100%', height: 'auto' }}
-            >
-              {/* Edges */}
-              {causalGraph.edges.map((edge, i) => {
-                const fromNode = causalGraph.nodes.find(n => n.id === edge.from);
-                const toNode = causalGraph.nodes.find(n => n.id === edge.to);
-                if (!fromNode || !toNode) return null;
-                const x1 = fromNode.x + fromNode.size / 2;
-                const y1 = fromNode.y;
-                const x2 = toNode.type === 'outcome' ? toNode.x - 30 : toNode.x - toNode.size / 2;
-                const y2 = toNode.y;
-                return (
-                  <line
-                    key={`edge-${i}`}
-                    x1={x1}
-                    y1={y1}
-                    x2={x2}
-                    y2={y2}
-                    stroke={edge.color}
-                    strokeWidth={edge.thickness}
-                    opacity={0.5}
-                  />
-                );
-              })}
-              {/* Nodes */}
-              {causalGraph.nodes.map(node => (
-                <g key={node.id}>
-                  {node.type === 'bias' ? (
-                    <circle
-                      cx={node.x}
-                      cy={node.y}
-                      r={node.size / 2}
-                      fill={node.color}
-                      opacity={0.8}
-                    />
-                  ) : (
-                    <rect
-                      x={node.x - 30}
-                      y={node.y - 15}
-                      width={60}
-                      height={30}
-                      rx={6}
-                      fill={node.color}
-                      opacity={0.8}
-                    />
-                  )}
-                  <text
-                    x={node.x + (node.type === 'bias' ? node.size / 2 + 6 : 40)}
-                    y={node.y + 4}
-                    fill="var(--text-secondary, #b4b4bc)"
-                    fontSize={10}
-                  >
-                    {node.label}
-                  </text>
-                </g>
-              ))}
-            </svg>
+          {causalWeights.length > 0 ? (
+            <>
+              <div style={{ height: 500 }}>
+                <CausalGraph3D
+                  weights={causalWeights}
+                  onNodeSelect={setSelectedCausalNode}
+                />
+              </div>
+              {/* Legend */}
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '8px 14px',
+                  borderTop: '1px solid #1E293B',
+                  flexWrap: 'wrap',
+                  gap: 6,
+                  fontSize: 11,
+                  color: '#64748B',
+                }}
+              >
+                <span>Drag to rotate · Scroll to zoom · Click to explore</span>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <span style={{ width: 8, height: 8, background: '#DC2626', display: 'inline-block', clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)' }} />
+                    High danger
+                  </span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <span style={{ width: 8, height: 8, background: '#EAB308', borderRadius: 1, display: 'inline-block', transform: 'rotate(45deg)' }} />
+                    Moderate
+                  </span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <span style={{ width: 8, height: 8, background: '#EF4444', borderRadius: '50%', display: 'inline-block' }} />
+                    Failure
+                  </span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <span style={{ width: 8, height: 8, background: '#22C55E', borderRadius: '50%', display: 'inline-block' }} />
+                    Success
+                  </span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <span style={{ width: 16, height: 2, background: '#DC2626', borderRadius: 1, display: 'inline-block' }} />
+                    Toxic pair
+                  </span>
+                </div>
+              </div>
+              {/* Detail panel */}
+              {selectedCausalNode?.nodeType === 'bias' && selectedCausalNode.biasType && (
+                <div style={{ padding: '12px 16px', borderTop: '1px solid #1E293B', background: '#0F172A' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: '#E2E8F0' }}>
+                      {formatBias(selectedCausalNode.biasType)}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        padding: '2px 8px',
+                        borderRadius: 4,
+                        background: (selectedCausalNode.dangerMultiplier ?? 1) >= 1.3 ? '#DC262620' : '#22C55E20',
+                        color: (selectedCausalNode.dangerMultiplier ?? 1) >= 1.3 ? '#EF4444' : '#22C55E',
+                      }}
+                    >
+                      {(selectedCausalNode.dangerMultiplier ?? 1).toFixed(2)}× danger
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#94A3B8' }}>
+                    <span>
+                      Failures: <strong style={{ color: '#EF4444' }}>{selectedCausalNode.failureCount ?? 0}</strong>
+                    </span>
+                    <span>
+                      Successes: <strong style={{ color: '#22C55E' }}>{selectedCausalNode.successCount ?? 0}</strong>
+                    </span>
+                    <span>
+                      Sample: <strong style={{ color: '#E2E8F0' }}>n={selectedCausalNode.sampleSize ?? 0}</strong>
+                    </span>
+                    <span>
+                      Correlation: <strong style={{ color: '#E2E8F0' }}>{(selectedCausalNode.outcomeCorrelation ?? 0).toFixed(3)}</strong>
+                    </span>
+                  </div>
+                </div>
+              )}
+            </>
           ) : (
             <div
               style={{
                 padding: 40,
                 textAlign: 'center',
-                color: 'var(--text-muted, #71717a)',
+                color: '#71717a',
                 fontSize: 13,
               }}
             >
