@@ -110,8 +110,8 @@ export function CaseStudyCarousel() {
               }}
             >
               We took the pre-decision memos from {featured.length} famous strategic decisions,
-              stripped the hindsight, and ran them through our pipeline. Here&apos;s what we would
-              have flagged.
+              stripped the hindsight, and ran them through the same bias and noise framework we
+              apply to your memos today. Here&apos;s what we would have flagged.
             </p>
           </div>
 

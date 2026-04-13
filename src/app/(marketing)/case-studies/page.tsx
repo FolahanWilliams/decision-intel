@@ -97,7 +97,7 @@ export default function CaseStudyIndexPage() {
             }}
           >
             Curated from SEC filings, NTSB reports, FDA actions, and post-mortems. Every case runs
-            through the same bias and noise framework we apply to live deals &mdash; {deepCount}{' '}
+            through the same bias and noise framework we apply to live strategic memos. {deepCount}{' '}
             include the full hindsight-stripped memo analysis. Search by company, industry, or
             outcome.
           </p>
