@@ -47,7 +47,22 @@ Claude reads this file at the start of every session. Update it as tasks are com
 - [ ] Analyst certification program (revenue opportunity)
 - [ ] CRM integration for auto-pulling deal outcomes (Salesforce, HubSpot)
 
+## Recently Completed (polish sweep, 2026-04-13/14)
+- [x] Usage meter light-theme, `/pricing` destination, Pro-tier "Go Strategy" copy at ≥80%, paired with "THIS MONTH" caption
+- [x] Funnel audit: 3 stale `/#pricing` anchors → `/pricing`, self-serve "Create a free account" link added to case-study CTA
+- [x] Onboarding unified: `WelcomeModal` + `OnboardingGuide` now share `decision-intel-onboarding-completed` localStorage key; vocabulary updated to locked positioning (30+ biases, strategic memo, CEO/board/parent-company, DQI)
+- [x] Mobile polish: platform padding moved to globals.css, landing hero uses `clamp(30px, 5.5vw, 48px)`, pricing comparison table wrapped in horizontal-scroll container, onboarding stepper stacks vertically ≤600px
+- [x] Upload zone animated green conic-gradient halo on hover/dragover
+- [x] All 5 reagraph canvases switched to white background + light-theme tokens + `shininess={90}` + `specular="#FFFFFF"` materials
+- [x] Shared `src/components/visualizations/reagraph-helpers.tsx` with `SlowOrbit` (5°/sec, 1.5s start delay, 3.5s user-pause) + `ResetViewButton` (RotateCcw icon). Applied to all 5 canvases.
+- [x] Hero WeWork graph expanded to 21 nodes / 34 edges (6 decisions, 10 biases, 6 outcomes + 4 toxic combos + outcome cascade chain). "SAMPLE OUTPUT" badge + explanatory copy added.
+- [x] `fitNodesInView` retry chain extended to 6 attempts through 3.8s on all graphs (fixes the black-canvas failure on denser layouts)
+- [x] Scroll-reveal: new `useScrollReveal` hook + `Reveal` wrapper; Four-Moments, How-It-Works, Features, and FAQ sections fade in on scroll. Respects `prefers-reduced-motion`.
+- [x] `.hover-card` CSS class on CaseStudyGrid cards; content-card border-radius standardized to 16px
+- [x] KG merge consent flow: schema (`TeamMember.kgMergeConsent`, `kgMergeDecidedAt`), API route, modal shipped. Background worker still stubbed — see memory `kg-merge-worker-pending.md`
+
 ## Recently Completed
+
 - [x] TODO.md created + `.claude/settings.json` with type-check hook
 - [x] Daily LinkedIn post cron (`/api/cron/daily-linkedin`) — auto-generates and emails case study posts
 - [x] Legacy `EmptyState` migrated to `EnhancedEmptyState` on dashboard page
