@@ -168,7 +168,7 @@ const COMPARISON_ROWS: Array<{ dim: string; cloverpop: string; di: string }> = [
   {
     dim: 'AI Capabilities',
     cloverpop: 'D-Sight: summarization, KPI synthesis, recommendations',
-    di: '12-node LangGraph pipeline: bias detection, noise simulation, adversarial debate',
+    di: 'Decision Knowledge Graph + LangGraph engine: bias detection, noise simulation, adversarial debate',
   },
   { dim: 'Bias Detection', cloverpop: 'None', di: '20+ types with compound interaction matrix' },
   {
@@ -285,9 +285,9 @@ function CloverpopComparison() {
 const QA_ITEMS: Array<{ q: string; a: string; proof?: string }> = [
   {
     q: 'Cloverpop has been around since 2012, raised $12.6M, and was acquired. They just integrated D-Sight AI. What stops them from wiping you out?',
-    a: "Cloverpop built a brilliant workflow tool — essentially Jira for decisions. It relies on humans manually logging what they decided and why. But that is their vulnerability. Cloverpop assumes the humans entering the data are rational. Decision Intel assumes they are not. Our 12-node pipeline ingests the 50-page strategy memo and autonomously audits the invisible flaws in that rationale. By the time a decision makes it into Cloverpop's Decision Bank, the Confirmation Bias and Sunk Cost Fallacy are already baked in. We intercept the cognitive noise before the vote happens.",
+    a: "Cloverpop built a brilliant workflow tool, essentially Jira for decisions. It relies on humans manually logging what they decided and why. But that is their vulnerability. Cloverpop assumes the humans entering the data are rational. Decision Intel assumes they are not. Our Decision Knowledge Graph ingests the strategic memo and autonomously audits the invisible flaws in the reasoning, then connects every assumption, bias, and outcome into a living network. By the time a decision makes it into Cloverpop's Decision Bank, Confirmation Bias and Sunk Cost Fallacy are already baked in. We intercept the cognitive noise before the board signs off.",
     proof:
-      'src/lib/agents/graph.ts — 12-node LangGraph pipeline with GDPR gating, adversarial debate, compound scoring',
+      'src/lib/agents/graph.ts — LangGraph analysis engine with GDPR gating, adversarial debate, and compound scoring that feeds the Decision Knowledge Graph',
   },
   {
     q: "You're laser-focused on corporate strategy and M&A. Aren't you artificially limiting your TAM?",
@@ -297,13 +297,13 @@ const QA_ITEMS: Array<{ q: string; a: string; proof?: string }> = [
   },
   {
     q: "You're a solo founder. They have millions and a massive team. Can't they reverse-engineer your pipeline in two months?",
-    a: "The 12-node pipeline is my temporary moat to get to market fast. My structural moat is the Decision Knowledge Graph and the Causal Loop, powered by pgvector and our proprietary failure database. If Cloverpop builds 12 pipeline nodes, they're just doing text analysis. Decision Intel is building a closed-loop causal database. We ingest the deal memo, our agents flag a 94% probability of Groupthink, and then three years later, we tie that specific bias to the actual IRR/MOIC of the exited deal. Once my platform can mathematically prove that 'Memos flagged for Sunk Cost Fallacy correlate with a 12% drop in MOIC,' I have a proprietary dataset that no one can replicate — because that data lives entirely in private financial markets.",
+    a: "The analysis engine is my temporary moat to get to market fast. My structural moat is the Decision Knowledge Graph and the Causal Loop, powered by pgvector and our proprietary failure database. If Cloverpop replicates the engine, they are still just doing text analysis. Decision Intel is building a closed-loop causal database. We ingest the strategic memo, our agents flag a 94% probability of Groupthink, and three years later we tie that specific bias to the actual outcome (revenue impact, initiative success, post-mortem findings). Once the platform can mathematically prove that 'Memos flagged for Sunk Cost Fallacy correlate with a 12% drop in initiative ROI,' I have a proprietary dataset nobody can replicate because that data lives inside enterprise strategy functions.",
     proof:
       'src/lib/graph/graph-builder.ts — pgvector knowledge graph with PageRank, Union-Find clustering, outcome-weighted edge learning. src/lib/learning/toxic-combinations.ts — org-calibrated toxic pattern engine',
   },
   {
     q: "PE partners have massive egos. They won't log into a dashboard to have an AI tell them their judgment is noisy. How do you get adoption?",
-    a: "You're completely right — they won't log into a dashboard. That's why Cloverpop's Decision Playbooks require heavy change management and top-down mandates. I designed Decision Intel to require zero behavior change. We built native Slack and Teams integrations directly into the pipeline. The AI lives where the deal chatter is already happening. When an associate uploads a CIM or drops a thesis in Slack, our background agents run the audit and deliver a localized nudge. We don't ask them to learn a new workflow; we augment the workflow they are currently using.",
+    a: "You are completely right, they will not log into a dashboard. That is why Cloverpop's Decision Playbooks require heavy change management and top-down mandates. I designed Decision Intel to require zero behavior change. Native Slack, Email, and Google Drive integrations wire the audit directly into the existing workflow. The AI lives where the strategy discussion is already happening. When a strategy manager uploads a board deck, pastes a market-entry memo, or drops a strategic recommendation in Slack, background agents run the audit and deliver a localized nudge. We do not ask anyone to learn a new workflow. We augment the workflow they are already using.",
     proof:
       'src/lib/integrations/slack/handler.ts — HMAC-verified, pattern-based decision detection with real-time bias nudging',
   },
@@ -315,7 +315,7 @@ const QA_ITEMS: Array<{ q: string; a: string; proof?: string }> = [
   },
   {
     q: "How do you actually make money? What's the unit economics?",
-    a: "API cost per analysis: $0.03-0.07 using Gemini Flash. Corp Dev plan: $2,499/month. That's ~97% gross margin. The motion: free 30-day pilot on a live deal — the Knowledge Graph seeds during the trial. Then convert to Corp Dev subscription ($2,499/mo) or negotiate enterprise ($50K–$200K/yr ACV). The pilot converts because they'd lose their KG data by not subscribing. Outcome tracking creates additional switching costs — calibration profiles and decision knowledge graphs become org-specific assets that can't transfer to a competitor.",
+    a: "API cost per analysis: $0.03-0.07 using Gemini Flash. Strategy plan: $2,499/month. That is ~97% gross margin. The motion: free 30-day pilot on the buyer's next high-stakes strategic memo. The Knowledge Graph seeds during the trial. Then convert to Strategy subscription ($2,499/mo) or negotiate enterprise ($50K to $200K/yr ACV). The pilot converts because they would lose their Knowledge Graph data by not subscribing. Outcome tracking creates additional switching costs: calibration profiles and the Decision Knowledge Graph become org-specific assets that cannot transfer to a competitor.",
   },
   {
     q: 'What if OpenAI or Anthropic just builds this into their platform?',
@@ -323,7 +323,7 @@ const QA_ITEMS: Array<{ q: string; a: string; proof?: string }> = [
   },
   {
     q: 'Show me traction.',
-    a: "Working product at production URL. 12-node AI pipeline processing real documents end-to-end. Full auth (Google OAuth), multi-tenant orgs, team collaboration. Compliance frameworks (FCA, SOX, Basel III) fully implemented. Reviewed by the senior consultant who helped take Wiz public at $32B — quote: 'genuinely fascinated by the role of unconscious cognitive biases in decision-making.' LRQA executive (global risk management firm) review in progress. 146 reverse-engineered case studies across 8 industries. And Cloverpop's Inc. 5000 #608 ranking with 300% growth validates that the decision intelligence category has enterprise demand.",
+    a: "Working product at production URL. Full analysis engine processing real strategic memos end-to-end, with the Decision Knowledge Graph seeding from document one. Full auth (Google OAuth), multi-tenant orgs, team collaboration. Compliance frameworks (FCA, SOX, Basel III) fully implemented. Reviewed by the senior consultant who helped take Wiz public at $32B, quote: 'genuinely fascinated by the role of unconscious cognitive biases in decision-making.' LRQA executive (global risk management firm) review in progress. 146 reverse-engineered case studies across 8 industries. Cloverpop's Inc. 5000 #608 ranking with 300% growth validates that the decision intelligence category has enterprise demand.",
   },
 ];
 

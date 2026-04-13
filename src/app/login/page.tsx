@@ -246,13 +246,17 @@ function LoginContent() {
             }}
           >
             <span style={{ opacity: 0.4 }}>14:02:42</span>{' '}
-            <span style={{ color: '#3b82f6' }}>AI</span> Scanning for cognitive anomalies...
+            <span style={{ color: '#3b82f6' }}>AI</span> Auditing strategic memo reasoning...
             <br />
-            <span style={{ color: '#f59e0b' }}>Warning:</span> Confirmatory Bias detected (94%)
+            <span style={{ color: '#f59e0b' }}>Warning:</span> Confirmation Bias detected (94%)
             <br />
             <span style={{ opacity: 0.4 }}>14:02:43</span>{' '}
-            <span style={{ color: '#22c55e' }}>RES</span> Decision Quality:{' '}
+            <span style={{ color: '#22c55e' }}>RES</span> Decision Quality Index:{' '}
             <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>42/100</span>
+            <br />
+            <span style={{ opacity: 0.4 }}>14:02:44</span>{' '}
+            <span style={{ color: '#8b5cf6' }}>KG</span> Added to Knowledge Graph. 5 related memos
+            linked.
           </div>
         </div>
       </div>
@@ -334,7 +338,7 @@ function LoginContent() {
                 Welcome back
               </h1>
               <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                Sign in to continue to your dashboard
+                Sign in to your Decision Knowledge Graph
               </p>
             </div>
 

@@ -9,7 +9,7 @@ export function CorePipelineTab() {
       {/* Pipeline Diagram */}
       <div style={card}>
         <div style={sectionTitle}>
-          <Zap size={18} style={{ color: '#f59e0b' }} /> 12-Node Analysis Pipeline
+          <Zap size={18} style={{ color: '#f59e0b' }} /> Decision Knowledge Graph · Analysis Engine
         </div>
         <pre
           style={{
