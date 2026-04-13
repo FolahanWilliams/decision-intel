@@ -68,6 +68,7 @@ function LoginContent() {
 
   return (
     <div
+      className="login-root"
       style={{
         minHeight: '100vh',
         display: 'flex',
@@ -89,6 +90,7 @@ function LoginContent() {
 
       {/* Left panel — branding & features */}
       <div
+        className="login-left-panel"
         style={{
           flex: 1,
           display: 'flex',
@@ -99,7 +101,6 @@ function LoginContent() {
           position: 'relative',
           zIndex: 1,
         }}
-        className="hidden md:flex"
       >
         <div style={{ maxWidth: 480 }}>
           {/* Brand */}
@@ -231,33 +232,6 @@ function LoginContent() {
             ))}
           </div>
 
-          {/* Mini terminal preview */}
-          <div
-            style={{
-              marginTop: '2rem',
-              padding: '14px 16px',
-              background: 'rgba(8, 11, 20, 0.6)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '12px',
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: '0.7rem',
-              color: 'var(--text-muted)',
-              lineHeight: 1.8,
-            }}
-          >
-            <span style={{ opacity: 0.4 }}>14:02:42</span>{' '}
-            <span style={{ color: '#3b82f6' }}>AI</span> Auditing strategic memo reasoning...
-            <br />
-            <span style={{ color: '#f59e0b' }}>Warning:</span> Confirmation Bias detected (94%)
-            <br />
-            <span style={{ opacity: 0.4 }}>14:02:43</span>{' '}
-            <span style={{ color: '#22c55e' }}>RES</span> Decision Quality Index:{' '}
-            <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>42/100</span>
-            <br />
-            <span style={{ opacity: 0.4 }}>14:02:44</span>{' '}
-            <span style={{ color: '#8b5cf6' }}>KG</span> Added to Knowledge Graph. 5 related memos
-            linked.
-          </div>
         </div>
       </div>
 
@@ -276,42 +250,6 @@ function LoginContent() {
         }}
       >
         <div style={{ width: '100%', maxWidth: 400 }}>
-          {/* Mobile brand (hidden on desktop) */}
-          <div className="md:hidden" style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            <Link href="/" style={{ textDecoration: 'none' }}>
-              <div className="flex items-center justify-center gap-3">
-                <Image
-                  src="/logo.png"
-                  alt="Decision Intel"
-                  width={36}
-                  height={36}
-                  style={{
-                    borderRadius: '10px',
-                    objectFit: 'cover',
-                  }}
-                />
-                <span
-                  style={{
-                    fontWeight: 700,
-                    fontSize: '1.1rem',
-                    color: 'var(--text-primary)',
-                  }}
-                >
-                  Decision Intel
-                </span>
-              </div>
-            </Link>
-            <p
-              style={{
-                fontSize: '0.8rem',
-                color: 'var(--text-muted)',
-                marginTop: '8px',
-              }}
-            >
-              Decision intelligence for strategic memos
-            </p>
-          </div>
-
           {/* Sign in card */}
           <div
             className="login-card"
@@ -425,9 +363,21 @@ function LoginContent() {
 
       {/* Mobile responsive overrides */}
       <style>{`
-        @media (max-width: 640px) {
+        @media (max-width: 767px) {
+          .login-root {
+            flex-direction: column !important;
+            min-height: 100vh !important;
+          }
+          .login-left-panel {
+            flex: 0 0 auto !important;
+            padding: 2rem 1.5rem 1.5rem !important;
+            border-right: none !important;
+            border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+            justify-content: flex-start !important;
+          }
           .login-right-panel {
-            padding: 1.25rem !important;
+            flex: 0 0 auto !important;
+            padding: 1.5rem 1.25rem 2.5rem !important;
           }
           .login-card {
             padding: 1.5rem !important;
