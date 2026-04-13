@@ -496,7 +496,7 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
         severeBiases.slice(0, 3),
         async (bias: BiasDetectionResult) => {
           // Check cache first
-          const cachedInsight = await getCachedBiasInsight(bias.biasType);
+          const cachedInsight = await getCachedBiasInsight(bias.biasType, state.orgId);
           if (cachedInsight) {
             log.debug(`Cache hit for bias insight: ${bias.biasType}`);
             bias.researchInsight = JSON.parse(cachedInsight);
@@ -535,7 +535,7 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
               bias.researchInsight = researchInsight;
 
               // Cache the insight for future use
-              await cacheBiasInsight(bias.biasType, JSON.stringify(researchInsight));
+              await cacheBiasInsight(bias.biasType, JSON.stringify(researchInsight), state.orgId);
             }
           } catch (e) {
             log.error(`Failed to fetch insight for ${bias.biasType}`, e);

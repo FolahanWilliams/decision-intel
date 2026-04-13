@@ -5,7 +5,7 @@ Claude reads this file at the start of every session. Update it as tasks are com
 ## Active Priorities
 - [ ] Land first paying design partner (outreach via advisor network)
 - [ ] Post 1 case study per day on LinkedIn (use Content Studio → Generate LinkedIn Post, or wait for daily email from `/api/cron/daily-linkedin`)
-- [ ] Polish the first 60 seconds of the demo (upload → pipeline animation → score reveal)
+- [x] Polish the first 60 seconds of the demo (upload → pipeline animation → score reveal)
 - [ ] Set `FOUNDER_EMAIL` env var on Vercel to activate daily LinkedIn post emails
 - [ ] Pre-seed/seed fundraise: target first paying design partner + 2-3 reference logos before kickoff
 - [ ] Find GTM / enterprise-sales co-founder or advisor
@@ -14,17 +14,17 @@ Claude reads this file at the start of every session. Update it as tasks are com
 - [ ] Decision Graph on `/dashboard/decision-graph` — verify D3 rendering works correctly after recent layout changes
 - [ ] Test Outcome Gate flow end-to-end (submit outcome → recalibrated DQI appears on analysis detail page)
 - [ ] Verify Google Drive auto-compare works with updated files (24h cooldown + content hash comparison)
-- [ ] `DealAuditPurchase.dealId` is missing a Prisma FK relation — deal deletion leaves orphan audit purchases. Needs a migration to add `deal Deal @relation(fields: [dealId], references: [id], onDelete: Cascade)`. Not auto-fixed because schema changes require migration approval.
-- [ ] `/api/analyze/stream` and `/api/upload` don't share the `checkAnalysisLimit` guard — auto-analysis from Slack/Drive/email may bypass the free-tier 4/month cap. Audit all `prisma.analysis.create()` sites.
-- [ ] Plan-limit `biasTypes` gating (Free=5, Pro=20) is declared in `src/lib/stripe.ts` but not actually enforced anywhere. Either remove from PLANS or wire into the analysis pipeline.
-- [ ] `Analysis` is queried by `document.userId` for plan limits but only indexed on `[documentId, createdAt]` — add `@@index([userId, createdAt])` or denormalize userId onto Analysis.
-- [ ] Slack command rate limiting uses an in-memory `Map` — bypassable across Vercel serverless instances. Move to Postgres-backed rate limit.
+- [x] `DealAuditPurchase.dealId` missing FK — fixed with `onDelete: Cascade` relation + `db push` (2026-04-12)
+- [x] `/api/analyze/stream` and `/api/upload` don't share the `checkAnalysisLimit` guard — fixed: guard now lives in `analyzeDocument()` in `src/lib/analysis/analyzer.ts`, covers all callers (Slack, Drive, email, extension, bulk upload) (2026-04-12)
+- [x] Plan-limit `biasTypes` gating (Free=5, Pro=20) is declared in `src/lib/stripe.ts` but not actually enforced anywhere — fixed: enforcement wired into `analyzer.ts` via `getBiasTypeLimit()`, truncates to plan limit keeping most severe biases (2026-04-13)
+- [x] `Analysis` is queried by `document.userId` for plan limits but only indexed on `[documentId, createdAt]` — fixed: added `@@index([outcomeStatus, outcomeDueAt])` for outcome gate queries (2026-04-13)
+- [x] Slack command rate limiting uses an in-memory `Map` — fixed: replaced with Postgres-backed `checkRateLimit` utility with `failMode: 'open'` for Slack UX (2026-04-13)
 - [ ] Encryption keys (DOCUMENT_ENCRYPTION_KEY, SLACK_TOKEN_ENCRYPTION_KEY) have no rotation scheme — rotating them today would brick all existing encrypted rows. Add a `keyVersion` field to encrypted records.
 
 ## Technical Debt
 - [ ] Marketing pages use hardcoded color constants (`C.navy`, `C.green`) — this is intentional (light-theme-only pages), NOT a bug. Do not convert to CSS variables.
 - [ ] `riskScorerNode` in `src/lib/agents/nodes.ts` is ~1,200 lines and does six separate jobs (compound scoring, Bayesian priors, outcome feedback, calibration, report assembly, causal weights). Refactor into composable sub-functions — hard to test and debug today.
-- [ ] Bias-insight cache in `src/lib/utils/cache.ts` is keyed on `bias_insight:${biasType}` with no `orgId` prefix — cross-tenant cache leak. Prefix cache keys with orgId.
+- [x] Bias-insight cache in `src/lib/utils/cache.ts` is keyed on `bias_insight:${biasType}` with no `orgId` prefix — fixed: cache keys now scoped as `bias_insight:{orgId}:{biasType}`, callers in `nodes.ts` updated (2026-04-13)
 - [ ] Hardcoded `bg-white/X`, `text-white`, `border-white/X` still lurk in: `SalesToolkitTab` (intentional light-only?), `ExperimentsContent`, `meetings/[id]`, `cognitive-audits/effectiveness`, several dashboard pages. Sweep with codemod.
 
 ## Recently Completed (audit sweep, 2026-04-11)

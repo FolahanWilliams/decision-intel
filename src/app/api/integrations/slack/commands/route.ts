@@ -21,25 +21,28 @@ import {
 } from '@/lib/integrations/slack/handler';
 import { prisma } from '@/lib/prisma';
 import { isSchemaDrift } from '@/lib/utils/error';
+import { checkRateLimit as checkRateLimitDb } from '@/lib/utils/rate-limit';
 
 const log = createLogger('SlackCommands');
 
-// ─── Per-User Rate Limiting (instance-local, best-effort for serverless) ────
+// ─── Per-User Rate Limiting (Postgres-backed, consistent across instances) ──
 
 const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute
 const RATE_LIMIT_MAX = 10; // 10 commands per minute per user
 
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-
-function checkRateLimit(userId: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(userId);
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(userId, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+async function checkSlackRateLimit(userId: string): Promise<boolean> {
+  try {
+    const result = await checkRateLimitDb(
+      `slack:${userId}`,
+      '/api/integrations/slack/commands',
+      { maxRequests: RATE_LIMIT_MAX, windowMs: RATE_LIMIT_WINDOW_MS, failMode: 'open' }
+    );
+    return result.success;
+  } catch (err) {
+    // If DB is unavailable, allow the request (fail open for Slack UX)
+    log.warn('Slack rate limit check failed, allowing request:', err instanceof Error ? err.message : String(err));
     return true;
   }
-  entry.count++;
-  return entry.count <= RATE_LIMIT_MAX;
 }
 
 const BIAS_LABELS: Record<string, string> = {
@@ -82,8 +85,8 @@ export async function POST(req: NextRequest) {
     const userId = params.get('user_id') || '';
     const teamId = params.get('team_id') || '';
 
-    // Rate limit check (best-effort, instance-local)
-    if (!checkRateLimit(userId)) {
+    // Rate limit check (Postgres-backed, consistent across serverless instances)
+    if (!(await checkSlackRateLimit(userId))) {
       return NextResponse.json({
         response_type: 'ephemeral',
         text: "You're sending commands too quickly. Please wait a moment and try again.",

@@ -187,15 +187,17 @@ export async function cacheEmbedding(textHash: string, embedding: number[]): Pro
 /**
  * Get cached bias research insight
  */
-export async function getCachedBiasInsight(biasType: string): Promise<string | null> {
-  return cacheGet(`${CACHE_KEYS.BIAS_INSIGHT}${biasType}`);
+export async function getCachedBiasInsight(biasType: string, orgId?: string): Promise<string | null> {
+  const prefix = orgId ? `${orgId}:` : '';
+  return cacheGet(`${CACHE_KEYS.BIAS_INSIGHT}${prefix}${biasType}`);
 }
 
 /**
  * Cache bias research insight
  */
-export async function cacheBiasInsight(biasType: string, insight: string): Promise<void> {
-  await cacheSet(`${CACHE_KEYS.BIAS_INSIGHT}${biasType}`, insight, CACHE_TTL.BIAS_INSIGHT);
+export async function cacheBiasInsight(biasType: string, insight: string, orgId?: string): Promise<void> {
+  const prefix = orgId ? `${orgId}:` : '';
+  await cacheSet(`${CACHE_KEYS.BIAS_INSIGHT}${prefix}${biasType}`, insight, CACHE_TTL.BIAS_INSIGHT);
 }
 
 /**

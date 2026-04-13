@@ -104,6 +104,7 @@ model Analysis {
   @@index([createdAt])
   @@index([documentId, createdAt])
   @@index([isSample])
+  @@index([outcomeStatus, outcomeDueAt]) // Outcome gate reminders query
 }
 
 model BiasInstance {

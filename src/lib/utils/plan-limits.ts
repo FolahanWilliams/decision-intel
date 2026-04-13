@@ -129,3 +129,13 @@ export async function checkAnalysisLimit(
     return { allowed: false, plan, used: 0, limit: limits.analysesPerMonth };
   }
 }
+
+/**
+ * Get the maximum number of bias types allowed for a user's plan.
+ * Used to truncate bias results to plan limits (Free=5, Pro/Team/Enterprise=30).
+ * Biases should be kept in severity order: critical > high > medium > low.
+ */
+export async function getBiasTypeLimit(userId: string): Promise<{ plan: PlanType; maxBiasTypes: number }> {
+  const plan = await getUserPlan(userId);
+  return { plan, maxBiasTypes: PLANS[plan].biasTypes };
+}

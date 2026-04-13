@@ -8,7 +8,7 @@ import { getCachedAnalysis, cacheAnalysis, generateAnalysisCacheKey } from '@/li
 import { validateContent } from '@/lib/utils/resilience';
 import { createLogger } from '@/lib/utils/logger';
 import { getDocumentContent } from '@/lib/utils/encryption';
-import { checkAnalysisLimit } from '@/lib/utils/plan-limits';
+import { checkAnalysisLimit, getBiasTypeLimit } from '@/lib/utils/plan-limits';
 
 import {
   NoiseStatsSchema,
@@ -137,12 +137,25 @@ export async function analyzeDocument(
     );
 
     // Store analysis in database with Schema Drift Protection
-    const foundBiases = result.biases.filter(b => b.found);
+    let foundBiases = result.biases.filter(b => b.found);
 
-    // Visualization URLs no longer generated (static images replaced
-    // with interactive BiasNetwork component in the frontend)
-    const biasWebImageUrl: string | null = null;
-    const preMortemImageUrl: string | null = null;
+    // Enforce biasTypes plan limit: truncate to the plan-allowed number
+    // of bias types, keeping the most severe biases first.
+    try {
+      const { maxBiasTypes, plan } = await getBiasTypeLimit(document.userId);
+      if (foundBiases.length > maxBiasTypes) {
+        const severityOrder: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 };
+        foundBiases = foundBiases
+          .sort((a, b) => (severityOrder[a.severity] ?? 4) - (severityOrder[b.severity] ?? 4))
+          .slice(0, maxBiasTypes);
+        log.info(`Bias types capped to ${maxBiasTypes} for ${plan} plan (${foundBiases.length} kept)`);
+      }
+    } catch {
+      // Non-fatal: if limit check fails, keep all biases
+    }
+
+    // Also update the result object so the SSE response reflects the cap
+    result.biases = foundBiases;
 
     // Try saving with ALL fields first. If the DB is missing newer
     // columns (schema drift / P2022), the transaction is poisoned —
@@ -200,8 +213,8 @@ export async function analyzeDocument(
                 : SentimentSchema.parse({})
             ),
             speakers: result.speakers || [],
-            biasWebImageUrl,
-            preMortemImageUrl,
+            biasWebImageUrl: null,
+            preMortemImageUrl: null,
             // Phase 4 Extensions
             logicalAnalysis: toPrismaJson(
               LogicalSchema.safeParse(result.logicalAnalysis).success
