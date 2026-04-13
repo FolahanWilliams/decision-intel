@@ -324,7 +324,7 @@ export default function CaseStudyBiasGraph3DCanvas({
         ref={graphRef}
         nodes={nodes}
         edges={edges}
-        layoutType="forceDirected3d"
+        layoutType="radialOut3d"
         cameraMode="rotate"
         animated={false}
         theme={GRAPH_THEME}
