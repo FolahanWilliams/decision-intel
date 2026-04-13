@@ -660,7 +660,7 @@ export default function HeroDecisionGraph3DCanvas({
         ref={graphRef}
         nodes={NODES}
         edges={EDGES}
-        layoutType="radialOut3d"
+        layoutType="forceDirected3d"
         cameraMode="rotate"
         animated={false}
         theme={GRAPH_THEME}
