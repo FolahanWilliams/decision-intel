@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useToast } from '@/components/ui/EnhancedToast';
+import { TeammateWallModal } from '@/components/pricing/TeammateWallModal';
 import dynamic from 'next/dynamic';
 
 const TeamIntelligenceTab = dynamic(() => import('@/components/ui/TeamIntelligenceTab'), {
@@ -88,7 +89,20 @@ export default function TeamPage() {
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
+  const [showTeammateWall, setShowTeammateWall] = useState(false);
+  const [plan, setPlan] = useState<string>('free');
   const [activeTab, setActiveTab] = useState<'members' | 'activity' | 'intelligence'>('members');
+
+  useEffect(() => {
+    fetch('/api/billing')
+      .then(r => (r.ok ? r.json() : null))
+      .then(data => {
+        if (data?.plan) setPlan(data.plan);
+      })
+      .catch(() => {});
+  }, []);
+
+  const isTeamPlan = plan === 'team' || plan === 'enterprise';
 
   const fetchTeam = useCallback(async () => {
     setFetchError(null);
@@ -278,7 +292,13 @@ export default function TeamPage() {
           {isAdmin && (
             <button
               className="btn btn-primary flex items-center gap-sm"
-              onClick={() => setShowInviteModal(true)}
+              onClick={() => {
+                if (isTeamPlan) {
+                  setShowInviteModal(true);
+                } else {
+                  setShowTeammateWall(true);
+                }
+              }}
             >
               <UserPlus size={16} />
               Invite Member
@@ -420,6 +440,12 @@ export default function TeamPage() {
           }}
         />
       )}
+
+      <TeammateWallModal
+        open={showTeammateWall}
+        onClose={() => setShowTeammateWall(false)}
+        source="team-page-invite"
+      />
     </div>
   );
 }

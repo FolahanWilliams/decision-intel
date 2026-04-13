@@ -477,7 +477,9 @@ export default function LandingPage() {
               const href =
                 item === 'Case Studies'
                   ? '/case-studies'
-                  : `#${item.toLowerCase().replace(/\s+/g, '-')}`;
+                  : item === 'Pricing'
+                    ? '/pricing'
+                    : `#${item.toLowerCase().replace(/\s+/g, '-')}`;
               return (
                 <a
                   key={item}
@@ -549,7 +551,9 @@ export default function LandingPage() {
               const href =
                 item === 'Case Studies'
                   ? '/case-studies'
-                  : `#${item.toLowerCase().replace(/\s+/g, '-')}`;
+                  : item === 'Pricing'
+                    ? '/pricing'
+                    : `#${item.toLowerCase().replace(/\s+/g, '-')}`;
               return (
                 <a
                   key={item}
@@ -1383,29 +1387,47 @@ export default function LandingPage() {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
-              gap: 24,
-              maxWidth: 800,
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: 20,
+              maxWidth: 1100,
               margin: '0 auto',
             }}
             className="pricing-grid"
           >
             {[
               {
+                name: 'Professional',
+                price: 99,
+                priceSuffix: '/mo',
+                desc: 'For the high-stakes strategist who wants the career-defining edge.',
+                features: [
+                  '10 audits per month',
+                  'Full DQI + 30+ biases',
+                  'Boardroom Simulation',
+                  'Forgotten Questions engine',
+                  'Personal Decision History',
+                  'Personal Calibration Dashboard',
+                ],
+                cta: 'Start Professional',
+                action: () => handleCheckout('pro'),
+                loading: checkoutLoading === 'pro',
+                outline: true,
+                popular: false,
+              },
+              {
                 name: 'Strategy',
                 price: 2499,
-                desc: 'For corporate strategy and M&A teams producing multiple board-level memos per quarter',
+                priceSuffix: '/mo',
+                desc: 'For corporate strategy teams producing multiple board-level memos per quarter.',
                 features: [
-                  'Unlimited memo audits',
-                  '30+ bias types including corp-strat-specific',
-                  'Forgotten Questions engine',
-                  'Decision Rooms & Slack',
-                  'Decision Knowledge Graph (compounds over time)',
-                  'Compliance mapping (SOX, MiFID II)',
-                  'Outcome tracking & DQI calibration',
-                  'Up to 15 team seats',
+                  'Everything in Professional',
+                  'Unlimited audits, 15 seats',
+                  'Shared Decision Knowledge Graph',
+                  'Decision Rooms + team consensus',
+                  'Slack, Drive, Email integrations',
+                  'Compliance mapping + audit logs',
                 ],
-                cta: 'Start 30-Day Pilot',
+                cta: 'Start 30-day pilot',
                 action: () => handleCheckout('team'),
                 loading: checkoutLoading === 'team',
                 outline: false,
@@ -1414,17 +1436,17 @@ export default function LandingPage() {
               {
                 name: 'Enterprise',
                 price: -1,
-                desc: 'For Fortune 500 strategy functions with multi-division workflows and compliance requirements',
+                priceSuffix: '',
+                desc: 'For Fortune 500 strategy functions with multi-division workflows and compliance requirements.',
                 features: [
-                  'Unlimited memo audits',
                   'Everything in Strategy',
                   'Unlimited team seats',
-                  'SSO & custom taxonomy',
+                  'SSO + custom taxonomy',
                   'Multi-division management',
-                  'Dedicated support & SLA',
+                  'Dedicated support + SLA',
                   'Annual contract pricing',
                 ],
-                cta: 'Contact Sales',
+                cta: 'Contact sales',
                 action: () => {
                   window.location.href =
                     'mailto:folahanwilliams@gmail.com?subject=Enterprise%20Inquiry';
@@ -1484,7 +1506,7 @@ export default function LandingPage() {
                       <span style={{ fontSize: 32, fontWeight: 800, color: C.slate900 }}>
                         ${displayPrice.toLocaleString()}
                         <span style={{ fontSize: 14, fontWeight: 500, color: C.slate400 }}>
-                          /mo
+                          {tier.priceSuffix}
                         </span>
                       </span>
                     )}
@@ -1542,9 +1564,45 @@ export default function LandingPage() {
             })}
           </div>
 
-          <p style={{ textAlign: 'center', fontSize: 13, color: C.slate400, marginTop: 24 }}>
-            30-day pilot on your next high-stakes memo. No credit card required to start.
-          </p>
+          <div
+            style={{
+              textAlign: 'center',
+              marginTop: 32,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 10,
+            }}
+          >
+            <p style={{ fontSize: 13, color: C.slate600, margin: 0 }}>
+              Just exploring?{' '}
+              <Link
+                href="/login"
+                style={{ color: C.green, fontWeight: 600, textDecoration: 'none' }}
+              >
+                Start free
+              </Link>{' '}
+              with 4 audits a month, no card required.
+            </p>
+            <Link
+              href="/pricing"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                fontSize: 13,
+                fontWeight: 600,
+                color: C.slate900,
+                textDecoration: 'none',
+                padding: '8px 16px',
+                border: `1px solid ${C.slate200}`,
+                borderRadius: 8,
+                background: C.white,
+              }}
+            >
+              See full feature comparison <ArrowRight size={13} />
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -1801,7 +1859,11 @@ export default function LandingPage() {
             </h4>
             {['Features', 'How It Works', 'Case Studies', 'Pricing', 'Resources'].map(l => {
               const href =
-                l === 'Case Studies' ? '/case-studies' : `#${l.toLowerCase().replace(/\s+/g, '-')}`;
+                l === 'Case Studies'
+                  ? '/case-studies'
+                  : l === 'Pricing'
+                    ? '/pricing'
+                    : `#${l.toLowerCase().replace(/\s+/g, '-')}`;
               return (
                 <a
                   key={l}

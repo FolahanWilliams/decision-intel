@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@/utils/supabase/server';
-import { getStripe, PLANS } from '@/lib/stripe';
+import { getStripe, getPriceId, type BillingCycle } from '@/lib/stripe';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 
@@ -23,12 +23,17 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const plan = body.plan as 'pro' | 'team';
+    const cycle = (body.cycle as BillingCycle) || 'monthly';
 
     if (!plan || !['pro', 'team'].includes(plan)) {
       return NextResponse.json({ error: 'Invalid plan' }, { status: 400 });
     }
 
-    const priceId = PLANS[plan].priceId;
+    if (!['monthly', 'annual'].includes(cycle)) {
+      return NextResponse.json({ error: 'Invalid billing cycle' }, { status: 400 });
+    }
+
+    const priceId = getPriceId(plan, cycle);
     if (!priceId) {
       return NextResponse.json({ error: 'Price not configured' }, { status: 503 });
     }

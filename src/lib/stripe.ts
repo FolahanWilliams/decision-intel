@@ -3,7 +3,7 @@ import Stripe from 'stripe';
 let _stripe: Stripe | null = null;
 
 /**
- * Lazily initialize the Stripe client — only throws when actually called,
+ * Lazily initialize the Stripe client. Only throws when actually called,
  * not at module import / build time.
  */
 export function getStripe(): Stripe {
@@ -17,46 +17,178 @@ export function getStripe(): Stripe {
   return _stripe;
 }
 
+/**
+ * Feature flags per plan. Used for gating dashboard UI, API endpoints,
+ * and upgrade prompts (the Teammate Wall and similar).
+ */
+export interface PlanFeatures {
+  boardroomSimulation: boolean | 'limited';
+  forgottenQuestions: boolean;
+  personalDecisionHistory: boolean;
+  personalCalibration: boolean;
+  teamKnowledgeGraph: boolean;
+  decisionRooms: boolean;
+  slackIntegration: boolean;
+  driveIntegration: boolean;
+  complianceMapping: boolean;
+  customToxicWeights: boolean;
+  teamDqiAnalytics: boolean;
+  sso: boolean;
+  multiDivision: boolean;
+  customTaxonomy: boolean;
+}
+
 export const PLANS = {
   free: {
-    name: 'Starter',
-    description: 'One-time diagnostic — see hidden bias and noise in your strategic documents',
+    name: 'Free',
+    tagline: 'See what we flag',
+    description: '4 audits a month on us. No card required.',
+    priceMonthly: 0,
+    priceAnnual: 0,
+    priceIdMonthly: '',
+    priceIdAnnual: '',
+    // Legacy alias kept for existing callers (checkout route, billing route)
+    priceId: '',
     analysesPerMonth: 4,
     maxPages: 10,
     biasTypes: 5,
-    maxTeamMembers: 3,
+    maxTeamMembers: 1,
+    features: {
+      boardroomSimulation: 'limited',
+      forgottenQuestions: false,
+      personalDecisionHistory: false,
+      personalCalibration: false,
+      teamKnowledgeGraph: false,
+      decisionRooms: false,
+      slackIntegration: false,
+      driveIntegration: false,
+      complianceMapping: false,
+      customToxicWeights: false,
+      teamDqiAnalytics: false,
+      sso: false,
+      multiDivision: false,
+      customTaxonomy: false,
+    } satisfies PlanFeatures,
   },
   pro: {
     name: 'Professional',
+    tagline: 'For the high-stakes strategist',
     description:
-      'For individual decision-makers running strategic documents through the bias engine',
-    priceId: process.env.STRIPE_PRO_PRICE_ID || '',
-    analysesPerMonth: 50,
+      'Walk into your next meeting with the one question the CSO missed. Full audit plus your Personal Decision History.',
+    priceMonthly: 99,
+    priceAnnual: 999,
+    priceIdMonthly:
+      process.env.STRIPE_PRO_PRICE_MONTHLY_ID || 'price_1TLh8pJHs8Ws3oeL7VzAcJgA',
+    priceIdAnnual:
+      process.env.STRIPE_PRO_PRICE_ANNUAL_ID || 'price_1TLhBhJHs8Ws3oeLgB24ycVf',
+    // Legacy alias points to monthly for existing callers
+    priceId:
+      process.env.STRIPE_PRO_PRICE_MONTHLY_ID || 'price_1TLh8pJHs8Ws3oeL7VzAcJgA',
+    analysesPerMonth: 10,
     maxPages: 100,
-    biasTypes: 20,
-    maxTeamMembers: 10,
+    biasTypes: 30,
+    maxTeamMembers: 1,
+    features: {
+      boardroomSimulation: true,
+      forgottenQuestions: true,
+      personalDecisionHistory: true,
+      personalCalibration: true,
+      teamKnowledgeGraph: false,
+      decisionRooms: false,
+      slackIntegration: false,
+      driveIntegration: false,
+      complianceMapping: false,
+      customToxicWeights: false,
+      teamDqiAnalytics: false,
+      sso: false,
+      multiDivision: false,
+      customTaxonomy: false,
+    } satisfies PlanFeatures,
   },
   team: {
-    name: 'Corp Dev',
-    description: 'For corporate strategy and M&A teams running multiple deals — $2,499/month',
+    name: 'Strategy',
+    tagline: 'For corporate strategy teams',
+    description:
+      'Everything Professional has, plus a living Decision Knowledge Graph that connects every strategic memo your team produces.',
+    priceMonthly: 2499,
+    priceAnnual: null,
+    priceIdMonthly: process.env.STRIPE_TEAM_PRICE_ID || '',
+    priceIdAnnual: '',
     priceId: process.env.STRIPE_TEAM_PRICE_ID || '',
     analysesPerMonth: Infinity,
     maxPages: 200,
-    biasTypes: 20,
+    biasTypes: 30,
     maxTeamMembers: 15,
+    features: {
+      boardroomSimulation: true,
+      forgottenQuestions: true,
+      personalDecisionHistory: true,
+      personalCalibration: true,
+      teamKnowledgeGraph: true,
+      decisionRooms: true,
+      slackIntegration: true,
+      driveIntegration: true,
+      complianceMapping: true,
+      customToxicWeights: true,
+      teamDqiAnalytics: true,
+      sso: false,
+      multiDivision: false,
+      customTaxonomy: false,
+    } satisfies PlanFeatures,
   },
   enterprise: {
     name: 'Enterprise',
+    tagline: 'For Fortune 500 strategy functions',
     description:
-      'For Fortune 500 teams with multi-division workflows, SSO, and compliance requirements',
+      'Multi-division deployment, SSO, custom taxonomy, dedicated support, SLA. For regulated workflows and multiple business units.',
+    priceMonthly: null,
+    priceAnnual: null,
+    priceIdMonthly: '',
+    priceIdAnnual: '',
+    priceId: '',
     analysesPerMonth: Infinity,
     maxPages: Infinity,
-    biasTypes: 20,
+    biasTypes: 30,
     maxTeamMembers: Infinity,
+    features: {
+      boardroomSimulation: true,
+      forgottenQuestions: true,
+      personalDecisionHistory: true,
+      personalCalibration: true,
+      teamKnowledgeGraph: true,
+      decisionRooms: true,
+      slackIntegration: true,
+      driveIntegration: true,
+      complianceMapping: true,
+      customToxicWeights: true,
+      teamDqiAnalytics: true,
+      sso: true,
+      multiDivision: true,
+      customTaxonomy: true,
+    } satisfies PlanFeatures,
   },
 } as const;
 
 export type PlanType = keyof typeof PLANS;
+export type BillingCycle = 'monthly' | 'annual';
+
+/**
+ * Resolve the Stripe price ID for a plan + billing cycle combo.
+ * Returns an empty string if not configured.
+ */
+export function getPriceId(plan: PlanType, cycle: BillingCycle = 'monthly'): string {
+  const p = PLANS[plan];
+  if (cycle === 'annual') return p.priceIdAnnual || '';
+  return p.priceIdMonthly || '';
+}
+
+/**
+ * Check whether a plan has a specific feature enabled.
+ */
+export function hasFeature(plan: PlanType, feature: keyof PlanFeatures): boolean {
+  const value = PLANS[plan].features[feature];
+  return value === true;
+}
 
 export const DEAL_AUDIT_TIERS = [
   {

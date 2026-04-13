@@ -30,10 +30,23 @@ export default function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [plan, setPlan] = useState<string>('free');
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
     Intelligence: true,
     'Team & Settings': true,
   });
+
+  // Fetch plan for feature-gating team-only nav items
+  useEffect(() => {
+    fetch('/api/billing')
+      .then(r => (r.ok ? r.json() : null))
+      .then(data => {
+        if (data?.plan) setPlan(data.plan);
+      })
+      .catch(() => {});
+  }, []);
+
+  const isTeamPlan = plan === 'team' || plan === 'enterprise';
 
   // Persist collapsed sections to localStorage
   useEffect(() => {
@@ -387,18 +400,20 @@ export default function Sidebar() {
               collapsed={collapsed}
               onNavigate={closeMobile}
             />
-            <NavItem
-              href="/dashboard/meetings"
-              icon={<Video size={18} />}
-              label="Meetings & Rooms"
-              description="Recordings, transcripts & decision rooms"
-              active={
-                pathname.startsWith('/dashboard/meetings') ||
-                pathname.startsWith('/dashboard/decision-rooms')
-              }
-              collapsed={collapsed}
-              onNavigate={closeMobile}
-            />
+            {isTeamPlan && (
+              <NavItem
+                href="/dashboard/meetings"
+                icon={<Video size={18} />}
+                label="Meetings & Rooms"
+                description="Recordings, transcripts & decision rooms"
+                active={
+                  pathname.startsWith('/dashboard/meetings') ||
+                  pathname.startsWith('/dashboard/decision-rooms')
+                }
+                collapsed={collapsed}
+                onNavigate={closeMobile}
+              />
+            )}
             <NavItem
               href="/dashboard/journal"
               icon={<PenLine size={18} />}
