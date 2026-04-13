@@ -93,7 +93,8 @@ function AnalyticsInner() {
             <h1>Analytics</h1>
           </div>
           <p className="text-muted">
-            Trends, decision intelligence, explainability, and industry benchmarks
+            Track how your Decision Quality Index compounds, quarter after quarter, across every
+            strategic memo your team produces.
           </p>
         </header>
         {!hasNoData && (

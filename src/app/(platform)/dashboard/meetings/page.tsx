@@ -551,7 +551,8 @@ function MeetingsInner() {
               <h1>Meetings & Rooms</h1>
             </div>
             <p className="text-muted">
-              Meeting recordings, cognitive auditing, and group decision rooms
+              Capture the strategic discussions your memos never document. Turn meetings into
+              audited decision nodes on your Knowledge Graph.
             </p>
           </div>
           {tab === 'recordings' && (

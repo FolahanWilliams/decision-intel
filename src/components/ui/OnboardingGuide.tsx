@@ -7,26 +7,26 @@ import { Upload, BarChart3, Shield, X, ArrowRight, CheckCircle, FileText } from 
 const STEPS = [
   {
     icon: Upload,
-    title: 'Upload the IC Memo or Board Paper',
+    title: 'Upload your strategic memo',
     description:
-      'Before your next committee vote, drop in the deal brief, strategy memo, or board paper. We surface the questions it never asks — and whether your team has seen this pattern before.',
-    action: 'Use the upload zone above, or try the sample M&A memo',
+      'Before your next steering committee or board review, drop in the strategic memo, board deck, or market-entry recommendation. We surface the questions it never asks, and whether your team has seen this pattern before.',
+    action: 'Use the upload zone above, or try a sample strategic memo',
     hasSampleAction: true,
   },
   {
     icon: BarChart3,
-    title: 'Review Your Bias Analysis',
+    title: 'Review your bias audit',
     description:
-      'Our AI detects cognitive biases: anchoring, confirmation bias, sunk cost fallacy, groupthink, and 16 more — with severity scores, excerpts, and actionable suggestions.',
-    action: 'Click on a document to view results',
+      'Decision Intel scores 30+ cognitive biases with confidence, excerpts, and recommendations, converting narrative judgment into measurable risk signal so you walk into the board with analytical confidence in the strategy.',
+    action: 'Click on a memo to view results',
     hasSampleAction: false,
   },
   {
     icon: Shield,
-    title: 'Close the Loop on Past Decisions',
+    title: 'Close the loop most teams never close',
     description:
-      "Report what happened — whether the deal closed as expected, how the committee's conviction held up, or what the post-mortem revealed. Every outcome makes your next audit more accurate.",
-    action: 'Go to any analyzed document and report the outcome',
+      'Report what happened. Every outcome feeds your Decision Quality Index and your Knowledge Graph, so today\u2019s decision always inherits yesterday\u2019s lessons. Quarter after quarter, your judgment compounds.',
+    action: 'Go to any analyzed memo and report the outcome',
     hasSampleAction: false,
   },
 ];

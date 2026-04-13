@@ -137,8 +137,8 @@ export default function DecisionGraphPage() {
             Decision Knowledge Graph
           </h1>
           <p className="text-sm text-zinc-500 mt-1">
-            Explore how decisions connect, cascade, and influence each other across your
-            organization.
+            Every strategic memo your team has produced, connected by assumption, bias, and
+            outcome. Today&rsquo;s decision always inherits yesterday&rsquo;s lessons.
           </p>
         </div>
 

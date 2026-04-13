@@ -203,7 +203,8 @@ export default function JournalPage() {
               Decision Journal
             </h1>
             <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
-              Capture, review, and convert decisions from across your workflow.
+              Capture decisions across your workflow and convert them into audited strategic
+              memos. Every entry becomes a searchable node on your Knowledge Graph.
               {pagination && (
                 <span className="ml-2" style={{ color: 'var(--text-secondary)' }}>
                   {pagination.total} total entries

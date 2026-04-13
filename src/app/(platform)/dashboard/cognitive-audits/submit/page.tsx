@@ -217,11 +217,12 @@ export default function SubmitDecisionPage() {
         <header className="mb-xl animate-fade-in">
           <div className="flex items-center gap-md mb-sm">
             <BrainCircuit size={28} style={{ color: 'var(--text-secondary)' }} />
-            <h1>Submit Decision for Audit</h1>
+            <h1>Submit a strategic memo for audit</h1>
           </div>
           <p className="text-muted">
-            Paste a decision, upload a meeting recording, or submit a transcript for cognitive bias
-            analysis.
+            Paste a strategic memo, upload a board deck, or submit a meeting transcript. We score
+            the reasoning, predict the objections your steering committee will raise, and add it
+            to your Knowledge Graph.
           </p>
         </header>
 

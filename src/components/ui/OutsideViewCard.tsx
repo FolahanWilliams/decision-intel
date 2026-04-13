@@ -93,7 +93,7 @@ export function OutsideViewCard({ sector, ticketSize }: OutsideViewCardProps) {
         <span className="font-semibold text-foreground">Anchor to the base rate.</span> Your
         inside-view estimate of this decision&apos;s chance of success is almost certainly too
         optimistic. Comparable historical cases failed {failurePct}% of the time. Adjust the
-        deal-specific case only with strong, concrete reasons.
+        memo-specific case only with strong, concrete reasons.
       </div>
 
       {/* Representative comparables */}

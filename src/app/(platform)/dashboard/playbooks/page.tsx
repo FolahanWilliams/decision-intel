@@ -167,9 +167,9 @@ function PlaybooksPageContent() {
             Decision Playbooks
           </h1>
           <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
-            Pre-configured analysis templates for common high-stakes decision types. Each playbook
-            optimizes the bias detection pipeline with tailored personas, compliance frameworks, and
-            bias focus areas.
+            Pre-configured audit templates for the strategic memos your team runs most: market
+            entries, acquisitions, capital allocations, and board reviews. Each playbook tunes the
+            bias taxonomy, simulation personas, and compliance frameworks to the decision type.
           </p>
         </div>
         <button
