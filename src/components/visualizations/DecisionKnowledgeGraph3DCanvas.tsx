@@ -33,19 +33,19 @@ import {
 
 const DARK_THEME: Theme = {
   canvas: {
-    background: '#080c14',
+    background: '#FFFFFF',
     fog: null,
   },
   node: {
-    fill: '#334155',
-    activeFill: '#64748B',
+    fill: '#94A3B8',
+    activeFill: '#475569',
     opacity: 1,
     selectedOpacity: 1,
-    inactiveOpacity: 0.2,
+    inactiveOpacity: 0.35,
     label: {
-      color: '#94A3B8',
-      activeColor: '#FFFFFF',
-      stroke: '#080c14',
+      color: '#475569',
+      activeColor: '#0F172A',
+      stroke: '#FFFFFF',
       strokeWidth: 5,
     },
   },
@@ -54,19 +54,19 @@ const DARK_THEME: Theme = {
     activeFill: '#22C55E',
   },
   edge: {
-    fill: '#1E293B',
-    activeFill: '#475569',
-    opacity: 1,
+    fill: '#CBD5E1',
+    activeFill: '#64748B',
+    opacity: 0.9,
     selectedOpacity: 1,
-    inactiveOpacity: 0.08,
+    inactiveOpacity: 0.18,
     label: {
-      color: '#475569',
-      activeColor: '#CBD5E1',
+      color: '#64748B',
+      activeColor: '#0F172A',
     },
   },
   arrow: {
-    fill: '#334155',
-    activeFill: '#64748B',
+    fill: '#94A3B8',
+    activeFill: '#475569',
   },
   lasso: {
     background: 'rgba(22,163,74,0.08)',
@@ -101,18 +101,22 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
 >(function DecisionKnowledgeGraph3DCanvas({ nodes, edges, onNodeSelect }, ref) {
   const graphRef = useRef<GraphCanvasRef | null>(null);
 
-  // Workaround: reagraph's isCentered gate gets permanently stuck at false in React strict mode
-  // (strict mode resets state but preserves refs, so mounted.current=true blocks re-centering).
+  // Force-directed 3D layout settles over multiple ticks. Retry fitNodesInView
+  // at 200/600/1200/2000ms so whichever call lands post-stabilization frames
+  // the camera on all nodes.
   useEffect(() => {
-    const timer = setTimeout(() => {
-      graphRef.current?.centerGraph();
-    }, 300);
-    return () => clearTimeout(timer);
+    const delays = [200, 600, 1200, 2000];
+    const timers = delays.map(ms =>
+      setTimeout(() => {
+        graphRef.current?.fitNodesInView(undefined, { animated: false });
+      }, ms),
+    );
+    return () => timers.forEach(clearTimeout);
   }, []);
 
   // Expose camera helpers to shell
   useImperativeHandle(ref, () => ({
-    fitGraph: () => graphRef.current?.centerGraph(),
+    fitGraph: () => graphRef.current?.fitNodesInView(undefined, { animated: true }),
     exportCanvas: () => graphRef.current?.exportCanvas() ?? '',
   }));
 
@@ -161,7 +165,7 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
     const type: DKGNodeType = (node.data?.type as DKGNodeType) ?? 'analysis';
     const col = (node.fill as string | undefined) ?? '#60A5FA';
     const o = opacity ?? 1;
-    const emissive = selected ? 0.75 : active ? 0.5 : 0.35;
+    const emissive = selected ? 0.4 : active ? 0.25 : 0.12;
     const glow = selected || active;
 
     switch (type) {
@@ -170,7 +174,7 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
           <group>
             <mesh>
               <icosahedronGeometry args={[size, 1]} />
-              <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} side={DoubleSide} transparent opacity={o} />
+              <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
             </mesh>
             {glow && <mesh scale={[1.55, 1.55, 1.55]}><icosahedronGeometry args={[size, 1]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
           </group>
@@ -181,7 +185,7 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
           <group>
             <mesh>
               <boxGeometry args={[s, s, s]} />
-              <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} side={DoubleSide} transparent opacity={o} />
+              <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
             </mesh>
             {glow && <mesh scale={[1.55, 1.55, 1.55]}><boxGeometry args={[s, s, s]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
           </group>
@@ -192,7 +196,7 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
           <group>
             <mesh>
               <sphereGeometry args={[size * 0.85, 12, 8]} />
-              <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} side={DoubleSide} transparent opacity={o} />
+              <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
             </mesh>
             {glow && <mesh scale={[1.55, 1.55, 1.55]}><sphereGeometry args={[size * 0.85, 12, 8]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
           </group>
@@ -202,7 +206,7 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
           <group>
             <mesh>
               <tetrahedronGeometry args={[size, 0]} />
-              <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} side={DoubleSide} transparent opacity={o} />
+              <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
             </mesh>
             {glow && <mesh scale={[1.55, 1.55, 1.55]}><tetrahedronGeometry args={[size, 0]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
           </group>
@@ -212,7 +216,7 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
           <group>
             <mesh>
               <cylinderGeometry args={[size * 0.8, size * 0.8, size * 2, 8]} />
-              <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} side={DoubleSide} transparent opacity={o} />
+              <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
             </mesh>
             {glow && <mesh scale={[1.55, 1.55, 1.55]}><cylinderGeometry args={[size * 0.8, size * 0.8, size * 2, 8]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
           </group>
@@ -221,7 +225,7 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
         return (
           <mesh>
             <sphereGeometry args={[size, 10, 8]} />
-            <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} side={DoubleSide} transparent opacity={o} />
+            <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
           </mesh>
         );
     }
@@ -243,18 +247,17 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
       onCanvasClick={onCanvasClick}
       onNodePointerOver={onNodePointerOver}
       onNodePointerOut={onNodePointerOut}
-      labelType="auto"
+      labelType="nodes"
       draggable
       defaultNodeSize={5}
       minDistance={200}
       maxDistance={8000}
     >
       {/* Three-point lighting rig */}
-      <ambientLight intensity={0.55} />
-      <directionalLight position={[20, 20, 10]} intensity={1.6} />
-      <directionalLight position={[-15, -10, -8]} intensity={0.45} color="#4F46E5" />
-      <pointLight position={[0, 30, 10]} intensity={1.0} color="#60A5FA" />
-      <pointLight position={[0, -20, -5]} intensity={0.35} color="#A78BFA" />
+      <ambientLight intensity={0.9} />
+      <directionalLight position={[20, 20, 10]} intensity={1.2} />
+      <directionalLight position={[-15, -10, -8]} intensity={0.4} color="#FFFFFF" />
+      <pointLight position={[0, 30, 10]} intensity={0.6} color="#FFFFFF" />
     </GraphCanvas>
   );
 });

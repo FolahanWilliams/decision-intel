@@ -19,7 +19,7 @@ const Graph3DCanvas = dynamic(() => import('./HeroDecisionGraph3DCanvas'), {
         alignItems: 'center',
         justifyContent: 'center',
         gap: 12,
-        background: '#060d1a',
+        background: '#FFFFFF',
       }}
     >
       <div
@@ -27,12 +27,12 @@ const Graph3DCanvas = dynamic(() => import('./HeroDecisionGraph3DCanvas'), {
           width: 40,
           height: 40,
           borderRadius: '50%',
-          border: '2px solid #1E3A5F',
-          borderTopColor: '#60A5FA',
+          border: '2px solid #E2E8F0',
+          borderTopColor: '#16A34A',
           animation: 'spin 0.8s linear infinite',
         }}
       />
-      <span style={{ fontSize: 12, color: '#334155', letterSpacing: '0.5px' }}>
+      <span style={{ fontSize: 12, color: '#64748B', letterSpacing: '0.5px' }}>
         Rendering graph...
       </span>
     </div>
@@ -295,6 +295,22 @@ export function HeroDecisionGraph() {
           {/* 3D Canvas */}
           <div style={{ height: 460, position: 'relative' }}>
             <Graph3DCanvas onNodeSelect={handleNodeSelect} />
+            {/* Subtle analytical grid overlay */}
+            <div
+              aria-hidden
+              style={{
+                position: 'absolute',
+                inset: 0,
+                pointerEvents: 'none',
+                backgroundImage:
+                  'linear-gradient(to right, rgba(15,23,42,0.06) 1px, transparent 1px), linear-gradient(to bottom, rgba(15,23,42,0.06) 1px, transparent 1px)',
+                backgroundSize: '40px 40px',
+                maskImage:
+                  'radial-gradient(ellipse at center, rgba(0,0,0,0.7) 30%, rgba(0,0,0,0.15) 80%, transparent 100%)',
+                WebkitMaskImage:
+                  'radial-gradient(ellipse at center, rgba(0,0,0,0.7) 30%, rgba(0,0,0,0.15) 80%, transparent 100%)',
+              }}
+            />
           </div>
 
           {/* Legend */}

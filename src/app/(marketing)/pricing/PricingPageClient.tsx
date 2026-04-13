@@ -596,9 +596,17 @@ export function PricingPageClient() {
 
           <div
             style={{
-              background: C.white,
-              border: `1px solid ${C.slate200}`,
+              overflowX: 'auto',
+              WebkitOverflowScrolling: 'touch',
               borderRadius: 12,
+              border: `1px solid ${C.slate200}`,
+              background: C.white,
+            }}
+          >
+          <div
+            style={{
+              minWidth: 720,
+              background: C.white,
               overflow: 'hidden',
             }}
           >
@@ -665,6 +673,7 @@ export function PricingPageClient() {
                 </div>
               );
             })}
+          </div>
           </div>
         </div>
       </section>

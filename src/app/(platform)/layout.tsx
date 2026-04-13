@@ -31,15 +31,24 @@ export default async function PlatformLayout({ children }: { children: React.Rea
         >
           <div
             className="platform-content"
-            style={{ maxWidth: 1320, margin: '0 auto', padding: '32px 32px 64px' }}
+            style={{ maxWidth: 1320, margin: '0 auto' }}
           >
             <div
+              className="platform-header-row"
               style={{
                 display: 'flex',
+                alignItems: 'center',
                 justifyContent: 'flex-end',
+                gap: 10,
                 marginBottom: 16,
+                color: 'var(--text-muted)',
+                fontSize: 11,
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
               }}
             >
+              <span className="usage-meter-label">This month</span>
               <UsageMeter />
             </div>
             {children}

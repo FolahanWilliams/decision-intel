@@ -373,7 +373,7 @@ export function BillingSection() {
             </button>
           ) : (
             <Link
-              href="/#pricing"
+              href="/pricing"
               className="flex items-center gap-sm"
               style={{
                 marginTop: 'var(--spacing-sm)',
@@ -397,7 +397,7 @@ export function BillingSection() {
 
         {/* Compare plans link */}
         <Link
-          href="/#pricing"
+          href="/pricing"
           className="flex items-center gap-xs"
           style={{
             marginTop: 'var(--spacing-xs)',

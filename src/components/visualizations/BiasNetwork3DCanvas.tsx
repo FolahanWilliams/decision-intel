@@ -89,25 +89,25 @@ function buildGraphFromBiases(biases: BiasInput[]): { nodes: GraphNode[]; edges:
 }
 
 const DARK_THEME: Theme = {
-  canvas: { background: '#080c14', fog: null },
+  canvas: { background: '#FFFFFF', fog: null },
   node: {
-    fill: '#334155',
-    activeFill: '#64748B',
-    opacity: 1,
-    selectedOpacity: 1,
-    inactiveOpacity: 0.2,
-    label: { color: '#94A3B8', activeColor: '#FFFFFF', stroke: '#080c14', strokeWidth: 5 },
-  },
-  ring: { fill: '#16A34A', activeFill: '#22C55E' },
-  edge: {
-    fill: '#1E293B',
+    fill: '#94A3B8',
     activeFill: '#475569',
     opacity: 1,
     selectedOpacity: 1,
-    inactiveOpacity: 0.08,
-    label: { color: '#475569', activeColor: '#CBD5E1' },
+    inactiveOpacity: 0.35,
+    label: { color: '#475569', activeColor: '#0F172A', stroke: '#FFFFFF', strokeWidth: 5 },
   },
-  arrow: { fill: '#334155', activeFill: '#64748B' },
+  ring: { fill: '#16A34A', activeFill: '#22C55E' },
+  edge: {
+    fill: '#CBD5E1',
+    activeFill: '#64748B',
+    opacity: 0.9,
+    selectedOpacity: 1,
+    inactiveOpacity: 0.18,
+    label: { color: '#64748B', activeColor: '#0F172A' },
+  },
+  arrow: { fill: '#94A3B8', activeFill: '#475569' },
   lasso: { background: 'rgba(22,163,74,0.08)', border: '#16A34A' },
 };
 
@@ -121,10 +121,13 @@ export default function BiasNetwork3DCanvas({ biases, onBiasSelect }: BiasNetwor
   const { nodes, edges } = buildGraphFromBiases(biases);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      graphRef.current?.centerGraph();
-    }, 300);
-    return () => clearTimeout(timer);
+    const delays = [200, 600, 1200, 2000];
+    const timers = delays.map(ms =>
+      setTimeout(() => {
+        graphRef.current?.fitNodesInView(undefined, { animated: false });
+      }, ms),
+    );
+    return () => timers.forEach(clearTimeout);
   }, []);
 
   const {
@@ -160,14 +163,14 @@ export default function BiasNetwork3DCanvas({ biases, onBiasSelect }: BiasNetwor
   const renderNode = useCallback(({ node, size, opacity, active, selected }: NodeRendererProps) => {
     const col = (node.fill as string) ?? '#EAB308';
     const o = opacity ?? 1;
-    const emissive = selected ? 0.8 : active ? 0.5 : 0.35;
+    const emissive = selected ? 0.4 : active ? 0.25 : 0.12;
     const glow = selected || active;
 
     return (
       <group>
         <mesh>
           <octahedronGeometry args={[size, 0]} />
-          <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} side={DoubleSide} transparent opacity={o} />
+          <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
         </mesh>
         {glow && (
           <mesh scale={[1.6, 1.6, 1.6]}>
@@ -201,11 +204,10 @@ export default function BiasNetwork3DCanvas({ biases, onBiasSelect }: BiasNetwor
       minDistance={200}
       maxDistance={6000}
     >
-      <ambientLight intensity={0.55} />
-      <directionalLight position={[20, 20, 10]} intensity={1.6} />
-      <directionalLight position={[-15, -10, -8]} intensity={0.45} color="#4F46E5" />
-      <pointLight position={[0, 30, 10]} intensity={1.0} color="#60A5FA" />
-      <pointLight position={[0, -20, -5]} intensity={0.35} color="#A78BFA" />
+      <ambientLight intensity={0.9} />
+      <directionalLight position={[20, 20, 10]} intensity={1.2} />
+      <directionalLight position={[-15, -10, -8]} intensity={0.4} color="#FFFFFF" />
+      <pointLight position={[0, 30, 10]} intensity={0.6} color="#FFFFFF" />
     </GraphCanvas>
   );
 }

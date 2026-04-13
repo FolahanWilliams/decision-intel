@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { LossAversionChart } from './LossAversionChart';
 import { HeroDecisionGraph } from './HeroDecisionGraph';
 
@@ -35,6 +35,11 @@ const C = {
 
 export function HeroTabs() {
   const [activeTab, setActiveTab] = useState<TabId>('costs');
+  // Graph is expensive (WebGL). Keep it unmounted until the user shows intent
+  // (hover/focus on the Graph tab, or a click). Once mounted, it stays mounted
+  // so subsequent tab switches are instant and WebGL context isn't re-created.
+  const [graphPrimed, setGraphPrimed] = useState(false);
+  const primeGraph = () => setGraphPrimed(true);
 
   return (
     <div>
@@ -55,7 +60,12 @@ export function HeroTabs() {
           return (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => {
+                if (tab.id === 'graph') primeGraph();
+                setActiveTab(tab.id);
+              }}
+              onMouseEnter={tab.id === 'graph' ? primeGraph : undefined}
+              onFocus={tab.id === 'graph' ? primeGraph : undefined}
               style={{
                 flex: 1,
                 padding: '8px 12px',
@@ -92,18 +102,25 @@ export function HeroTabs() {
         })}
       </div>
 
-      {/* Tab content */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.25 }}
+      {/* Tab content — both stay mounted once primed so switching is instant */}
+      <div style={{ position: 'relative' }}>
+        <div
+          style={{
+            display: activeTab === 'costs' ? 'block' : 'none',
+          }}
         >
-          {activeTab === 'costs' ? <LossAversionChart /> : <HeroDecisionGraph />}
-        </motion.div>
-      </AnimatePresence>
+          <LossAversionChart />
+        </div>
+        {graphPrimed && (
+          <div
+            style={{
+              display: activeTab === 'graph' ? 'block' : 'none',
+            }}
+          >
+            <HeroDecisionGraph />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -11,6 +11,12 @@ import {
 } from '@/components/ui/dialog';
 import { Upload, BarChart3, Users, Sparkles, ArrowRight, FileText } from 'lucide-react';
 
+/**
+ * First-login gate. Shown once per user; dismissing it marks onboarding complete
+ * both in localStorage and via PATCH /api/onboarding. After dismissal, the inline
+ * OnboardingGuide takes over for ongoing progress tracking. Both components share
+ * this same localStorage key so a user never sees both at once.
+ */
 const STORAGE_KEY = 'decision-intel-onboarding-completed';
 
 interface WelcomeModalProps {
@@ -20,21 +26,21 @@ interface WelcomeModalProps {
 const TOUR_STEPS = [
   {
     icon: Sparkles,
-    title: 'AI-Powered Bias Detection',
+    title: 'Audit the strategic memo before the board sees it',
     description:
-      'Upload board memos, strategy papers, risk assessments, or any decision document. Our AI pipeline detects 20 cognitive biases including anchoring, confirmation bias, and groupthink.',
+      'Upload strategic memos, board decks, or market-entry recommendations. Our 12-node pipeline surfaces 30+ cognitive biases \u2014 anchoring, confirmation, groupthink \u2014 with excerpts and recommendations, in under 60 seconds.',
   },
   {
     icon: BarChart3,
-    title: 'Decision-Level Quality Scoring',
+    title: 'Decision Quality Index, quarter after quarter',
     description:
-      'Get a Decision Quality Index (DQI) for every document. Track bias patterns across your projects and identify which biases cost your organization the most.',
+      'Every memo gets a DQI score. Track which biases repeat, which assumptions predict outcomes, and which calls compound your edge \u2014 all against 146 historical decisions.',
   },
   {
     icon: Users,
-    title: 'Team Decision Intelligence',
+    title: 'Predict the room. Close the loop.',
     description:
-      'Run blind votes, simulate boardroom deliberations with custom personas, and build institutional memory that makes your team sharper with every decision.',
+      'Predict the CEO, board, or parent-company questions before the room does \u2014 and close the outcome loop with the Decision Quality Index. Every decision joins your Decision Knowledge Graph.',
   },
 ];
 
@@ -147,9 +153,9 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, margin: '8px 0' }}>
               {[
-                'Detect cognitive biases and logical fallacies in any document',
-                'Get actionable risk scores and compliance checks',
-                'Track and improve your decision quality over time',
+                'Detect 30+ cognitive biases across any strategic memo or board deck',
+                'Predict the CEO, board, or parent-company questions before the room does',
+                'Track Decision Quality Index across every call, quarter after quarter',
               ].map((item, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                   <div

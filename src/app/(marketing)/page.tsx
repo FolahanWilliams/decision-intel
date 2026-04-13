@@ -624,7 +624,7 @@ export default function LandingPage() {
             </p>
             <h1
               style={{
-                fontSize: 48,
+                fontSize: 'clamp(30px, 5.5vw, 48px)',
                 fontWeight: 700,
                 color: C.slate900,
                 lineHeight: 1.1,

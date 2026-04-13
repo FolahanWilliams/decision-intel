@@ -1,7 +1,8 @@
 'use client';
 
 import { useRef, useCallback, useEffect } from 'react';
-import { DoubleSide } from 'three';
+import { DoubleSide, type Mesh, type MeshBasicMaterial } from 'three';
+import { useFrame } from '@react-three/fiber';
 import {
   GraphCanvas,
   type GraphCanvasRef,
@@ -209,13 +210,13 @@ const NODES: GraphNode[] = [
 ];
 
 const EDGES: GraphEdge[] = [
-  { id: 'e1', source: 'ipo_decision', target: 'overconfidence', fill: '#1E3A5F', dashed: true, arrowPlacement: 'end' },
-  { id: 'e2', source: 'ipo_decision', target: 'anchoring', fill: '#1E3A5F', dashed: true, arrowPlacement: 'end' },
-  { id: 'e3', source: 'ipo_decision', target: 'authority', fill: '#1E3A5F', dashed: true, arrowPlacement: 'end' },
-  { id: 'e4', source: 'governance', target: 'authority', fill: '#1E3A5F', dashed: true, arrowPlacement: 'end' },
-  { id: 'e5', source: 'governance', target: 'groupthink', fill: '#1E3A5F', dashed: true, arrowPlacement: 'end' },
-  { id: 'e6', source: 'unit_economics', target: 'overconfidence', fill: '#1E3A5F', dashed: true, arrowPlacement: 'end' },
-  { id: 'e7', source: 'unit_economics', target: 'halo_effect', fill: '#1E3A5F', dashed: true, arrowPlacement: 'end' },
+  { id: 'e1', source: 'ipo_decision', target: 'overconfidence', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
+  { id: 'e2', source: 'ipo_decision', target: 'anchoring', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
+  { id: 'e3', source: 'ipo_decision', target: 'authority', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
+  { id: 'e4', source: 'governance', target: 'authority', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
+  { id: 'e5', source: 'governance', target: 'groupthink', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
+  { id: 'e6', source: 'unit_economics', target: 'overconfidence', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
+  { id: 'e7', source: 'unit_economics', target: 'halo_effect', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
   // Toxic combinations — solid red, labeled
   { id: 'e8', source: 'groupthink', target: 'authority', fill: '#DC2626', size: 2.5, label: 'Echo Chamber', arrowPlacement: 'end' },
   { id: 'e9', source: 'overconfidence', target: 'halo_effect', fill: '#DC2626', size: 2.5, label: 'Optimism Trap', arrowPlacement: 'end' },
@@ -230,19 +231,19 @@ const EDGES: GraphEdge[] = [
 
 const GRAPH_THEME: Theme = {
   canvas: {
-    background: '#060d1a',
+    background: '#FFFFFF',
     fog: null,
   },
   node: {
-    fill: '#334155',
-    activeFill: '#64748B',
+    fill: '#94A3B8',
+    activeFill: '#475569',
     opacity: 1,
     selectedOpacity: 1,
-    inactiveOpacity: 0.25,
+    inactiveOpacity: 0.35,
     label: {
-      color: '#94A3B8',
-      activeColor: '#FFFFFF',
-      stroke: '#060d1a',
+      color: '#475569',
+      activeColor: '#0F172A',
+      stroke: '#FFFFFF',
       strokeWidth: 4,
     },
   },
@@ -251,25 +252,57 @@ const GRAPH_THEME: Theme = {
     activeFill: '#22C55E',
   },
   edge: {
-    fill: '#1E293B',
-    activeFill: '#475569',
-    opacity: 1,
+    fill: '#CBD5E1',
+    activeFill: '#64748B',
+    opacity: 0.9,
     selectedOpacity: 1,
-    inactiveOpacity: 0.12,
+    inactiveOpacity: 0.18,
     label: {
       color: '#64748B',
-      activeColor: '#E2E8F0',
+      activeColor: '#0F172A',
     },
   },
   arrow: {
-    fill: '#334155',
-    activeFill: '#64748B',
+    fill: '#94A3B8',
+    activeFill: '#475569',
   },
   lasso: {
     background: 'rgba(22,163,74,0.08)',
     border: '#16A34A',
   },
 };
+
+// ─── Pulsing halo (applied to primary/critical node) ─────────────────────────
+
+function PulsingHalo({
+  size,
+  color,
+  shape,
+}: {
+  size: number;
+  color: string;
+  shape: 'octahedron' | 'dodecahedron';
+}) {
+  const ref = useRef<Mesh | null>(null);
+  useFrame(({ clock }) => {
+    if (!ref.current) return;
+    const t = clock.elapsedTime;
+    const s = 1.45 + Math.sin(t * 2.2) * 0.18;
+    ref.current.scale.setScalar(s);
+    const mat = ref.current.material as MeshBasicMaterial | undefined;
+    if (mat) mat.opacity = 0.14 + Math.sin(t * 2.2) * 0.08;
+  });
+  return (
+    <mesh ref={ref}>
+      {shape === 'octahedron' ? (
+        <octahedronGeometry args={[size, 0]} />
+      ) : (
+        <dodecahedronGeometry args={[size, 0]} />
+      )}
+      <meshBasicMaterial color={color} transparent opacity={0.18} depthWrite={false} />
+    </mesh>
+  );
+}
 
 // ─── Custom node renderer (inlined — no React component wrapper) ─────────────
 
@@ -284,14 +317,19 @@ export default function HeroDecisionGraph3DCanvas({
 }: HeroDecisionGraph3DCanvasProps) {
   const graphRef = useRef<GraphCanvasRef | null>(null);
 
-  // Workaround: reagraph's isCentered gate gets permanently stuck at false in React strict mode
-  // (strict mode resets state but preserves refs, so mounted.current=true blocks re-centering).
-  // Calling centerGraph() after mount forces isCentered=true regardless of mounted.current.
+  // Force-directed 3D layout needs several ticks before node positions stabilize.
+  // A single centerGraph() call at 300ms can fire before the layout has produced
+  // visible coords — the result is a black canvas with nodes clumped at origin.
+  // Retry fitNodesInView() at 200/600/1200/2000ms so whichever call lands after
+  // layout stabilizes successfully frames the camera on all nodes.
   useEffect(() => {
-    const timer = setTimeout(() => {
-      graphRef.current?.centerGraph();
-    }, 300);
-    return () => clearTimeout(timer);
+    const delays = [200, 600, 1200, 2000];
+    const timers = delays.map(ms =>
+      setTimeout(() => {
+        graphRef.current?.fitNodesInView(undefined, { animated: false });
+      }, ms),
+    );
+    return () => timers.forEach(clearTimeout);
   }, []);
 
   const {
@@ -328,18 +366,19 @@ export default function HeroDecisionGraph3DCanvas({
   const renderNode = useCallback(({ node, size, opacity, active, selected }: NodeRendererProps) => {
     const data = node.data as NodeData | undefined;
     const o = opacity ?? 1;
-    const emissiveFallback = selected ? 0.8 : active ? 0.5 : 0.35;
+    const emissiveFallback = selected ? 0.4 : active ? 0.25 : 0.12;
     if (!data?.type) {
       return (
         <mesh>
           <sphereGeometry args={[size, 10, 8]} />
-          <meshPhongMaterial color="#60A5FA" emissive="#60A5FA" emissiveIntensity={emissiveFallback} side={DoubleSide} transparent opacity={o} />
+          <meshPhongMaterial color="#60A5FA" emissive="#60A5FA" emissiveIntensity={emissiveFallback} shininess={80} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
         </mesh>
       );
     }
 
     const col = getNodeColor(data);
     const emissive = emissiveFallback;
+    const isPrimary = data.type === 'bias' && data.severity === 'critical';
 
     // Decision → dodecahedron (12-face crystal)
     if (data.type === 'decision') {
@@ -347,7 +386,7 @@ export default function HeroDecisionGraph3DCanvas({
         <group>
           <mesh>
             <dodecahedronGeometry args={[size, 0]} />
-            <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} side={DoubleSide} transparent opacity={o} />
+            <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
           </mesh>
           {selected && (
             <mesh>
@@ -365,7 +404,7 @@ export default function HeroDecisionGraph3DCanvas({
         <group>
           <mesh>
             <octahedronGeometry args={[size, 0]} />
-            <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} side={DoubleSide} transparent opacity={o} />
+            <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
           </mesh>
           {(active || selected) && (
             <mesh>
@@ -373,6 +412,7 @@ export default function HeroDecisionGraph3DCanvas({
               <meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} />
             </mesh>
           )}
+          {isPrimary && !selected && <PulsingHalo size={size} color={col} shape="octahedron" />}
         </group>
       );
     }
@@ -382,7 +422,7 @@ export default function HeroDecisionGraph3DCanvas({
       <group>
         <mesh>
           <cylinderGeometry args={[size * 0.82, size * 0.82, size * 2.2, 8]} />
-          <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} side={DoubleSide} transparent opacity={o} />
+          <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
         </mesh>
         {selected && (
           <mesh>
@@ -410,18 +450,18 @@ export default function HeroDecisionGraph3DCanvas({
       onCanvasClick={onCanvasClick}
       onNodePointerOver={onNodePointerOver}
       onNodePointerOut={onNodePointerOut}
-      labelType="all"
+      labelType="nodes"
+      edgeLabelPosition="natural"
       draggable
       defaultNodeSize={7}
       minDistance={300}
       maxDistance={4000}
     >
-      {/* Lighting rig — three-point setup for the 3D shapes */}
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[15, 15, 10]} intensity={1.8} />
-      <directionalLight position={[-10, -8, -5]} intensity={0.5} color="#4F46E5" />
-      <pointLight position={[0, 20, 5]} intensity={1.2} color="#60A5FA" />
-      <pointLight position={[0, -15, -5]} intensity={0.4} color="#A78BFA" />
+      {/* Lighting rig — tuned for white background: neutral key + soft fill */}
+      <ambientLight intensity={0.9} />
+      <directionalLight position={[15, 15, 10]} intensity={1.2} />
+      <directionalLight position={[-10, -8, -5]} intensity={0.4} color="#FFFFFF" />
+      <pointLight position={[0, 20, 5]} intensity={0.6} color="#FFFFFF" />
     </GraphCanvas>
   );
 }

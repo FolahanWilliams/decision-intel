@@ -41,7 +41,7 @@ const DKGCanvas3D = dynamic(() => import('./DecisionKnowledgeGraph3DCanvas'), {
         alignItems: 'center',
         justifyContent: 'center',
         gap: 14,
-        background: '#080c14',
+        background: '#FFFFFF',
       }}
     >
       <div
@@ -49,12 +49,12 @@ const DKGCanvas3D = dynamic(() => import('./DecisionKnowledgeGraph3DCanvas'), {
           width: 44,
           height: 44,
           borderRadius: '50%',
-          border: '2px solid #1E3A5F',
-          borderTopColor: '#60A5FA',
+          border: '2px solid #E2E8F0',
+          borderTopColor: '#16A34A',
           animation: 'spin 0.85s linear infinite',
         }}
       />
-      <span style={{ fontSize: 12, color: '#334155', letterSpacing: '0.5px' }}>
+      <span style={{ fontSize: 12, color: '#64748B', letterSpacing: '0.5px' }}>
         Initialising 3D graph…
       </span>
     </div>

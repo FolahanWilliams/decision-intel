@@ -3,9 +3,11 @@
 /**
  * UsageMeter — compact pill showing analyses used / monthly limit.
  *
- * Hidden for enterprise / unlimited plans. Shows an "Upgrade" CTA once
- * usage ≥ 80%. Fetches from /api/billing on mount; re-fetches when the
- * window regains focus so the meter stays fresh after a new analysis.
+ * Hidden for enterprise / unlimited plans. At 80%+ usage shows a plan-aware
+ * upgrade CTA: Free users see "Upgrade →"; Pro users see "Need more? Go Strategy →"
+ * (mirrors the Teammate Wall language so the Pro → Strategy ladder reads as one
+ * story). Fetches from /api/billing on mount; re-fetches when the window regains
+ * focus so the meter stays fresh after a new analysis.
  */
 
 import { useEffect, useState } from 'react';
@@ -54,39 +56,54 @@ export function UsageMeter() {
   }, []);
 
   if (!loaded || !data) return null;
-  // Hide for unlimited plans
   if (data.usage.analysesLimit < 0) return null;
 
   const { analysesUsed, analysesLimit, percentUsed } = data.usage;
   const isNearLimit = percentUsed >= 80;
   const isAtLimit = percentUsed >= 100;
 
-  const color = isAtLimit ? '#ef4444' : isNearLimit ? '#eab308' : '#16A34A';
-  const trackColor = isAtLimit ? '#7f1d1d' : isNearLimit ? '#713f12' : '#14532d';
+  const fillColor = isAtLimit
+    ? 'var(--error, #DC2626)'
+    : isNearLimit
+      ? 'var(--warning, #D97706)'
+      : 'var(--accent-primary, #16A34A)';
+  const borderColor = isAtLimit
+    ? 'var(--error, #DC2626)'
+    : isNearLimit
+      ? 'var(--warning, #D97706)'
+      : 'var(--border-color, #E2E8F0)';
+
+  const isPro = data.plan === 'pro';
+  const upgradeLabel = isPro ? 'Need more? Go Strategy \u2192' : 'Upgrade \u2192';
 
   return (
     <div
+      className="usage-meter"
       style={{
-        display: 'flex',
+        display: 'inline-flex',
         alignItems: 'center',
         gap: 10,
         padding: '6px 12px',
-        background: 'rgba(15, 15, 35, 0.6)',
-        border: `1px solid ${trackColor}`,
+        background: 'var(--bg-card, #FFFFFF)',
+        border: `1px solid ${borderColor}`,
         borderRadius: 999,
         fontSize: 12,
-        color: 'var(--text-primary, #e2e8f0)',
+        color: 'var(--text-primary, #0F172A)',
+        flexWrap: 'wrap',
+        maxWidth: '100%',
       }}
       role="status"
       aria-label={`${analysesUsed} of ${analysesLimit} analyses used this month`}
     >
       <div
+        className="usage-meter__track"
         style={{
           width: 48,
           height: 4,
-          background: trackColor,
+          background: '#E2E8F0',
           borderRadius: 2,
           overflow: 'hidden',
+          flexShrink: 0,
         }}
         aria-hidden
       >
@@ -94,7 +111,7 @@ export function UsageMeter() {
           style={{
             width: `${Math.min(100, percentUsed)}%`,
             height: '100%',
-            background: color,
+            background: fillColor,
             transition: 'width 0.4s ease',
           }}
         />
@@ -104,7 +121,7 @@ export function UsageMeter() {
       </span>
       {isNearLimit && (
         <Link
-          href="/#pricing"
+          href="/pricing"
           onClick={() =>
             trackEvent('usage_meter_upgrade_click', {
               plan: data.plan,
@@ -112,16 +129,24 @@ export function UsageMeter() {
             })
           }
           style={{
-            color: color,
+            color: fillColor,
             fontWeight: 600,
             textDecoration: 'none',
-            borderLeft: `1px solid ${trackColor}`,
+            borderLeft: `1px solid ${borderColor}`,
             paddingLeft: 10,
+            whiteSpace: 'nowrap',
           }}
         >
-          Upgrade →
+          {upgradeLabel}
         </Link>
       )}
+      <style jsx>{`
+        @media (max-width: 480px) {
+          .usage-meter__track {
+            width: 32px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

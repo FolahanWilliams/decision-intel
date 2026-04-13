@@ -110,6 +110,21 @@ export function CaseStudyGraphSection({ biases, primaryBias, toxicCombinations, 
             toxicCombinations={toxicCombinations}
             onNodeSelect={handleNodeSelect}
           />
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              pointerEvents: 'none',
+              backgroundImage:
+                'linear-gradient(to right, rgba(15,23,42,0.06) 1px, transparent 1px), linear-gradient(to bottom, rgba(15,23,42,0.06) 1px, transparent 1px)',
+              backgroundSize: '40px 40px',
+              maskImage:
+                'radial-gradient(ellipse at center, rgba(0,0,0,0.7) 30%, rgba(0,0,0,0.15) 80%, transparent 100%)',
+              WebkitMaskImage:
+                'radial-gradient(ellipse at center, rgba(0,0,0,0.7) 30%, rgba(0,0,0,0.15) 80%, transparent 100%)',
+            }}
+          />
         </div>
 
         {/* Legend */}

@@ -1058,7 +1058,7 @@ function DemoVideoSection() {
           </a>
         ) : (
           <Link
-            href="/#pricing"
+            href="/pricing"
             className="px-7 py-3 rounded-[10px] bg-transparent border border-slate-200 text-slate-900 font-semibold text-sm no-underline text-center"
           >
             View Pricing

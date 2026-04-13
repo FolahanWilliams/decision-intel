@@ -31,7 +31,12 @@ const STEPS = [
   },
 ];
 
-const STORAGE_KEY = 'decision-intel-onboarding-dismissed';
+/**
+ * Inline progress tracker for new users. Shown after WelcomeModal is dismissed;
+ * both components share this storage key so a user never sees both at once.
+ * Hides once the user marks onboarding complete (PATCH /api/onboarding).
+ */
+const STORAGE_KEY = 'decision-intel-onboarding-completed';
 
 /** Fire-and-forget PATCH to persist onboarding state to the API. */
 function persistOnboardingState(data: { onboardingCompleted?: boolean; onboardingStep?: number }) {
@@ -144,6 +149,7 @@ export function OnboardingGuide({ documentCount = 0 }: { documentCount?: number 
       <div className="card-body" style={{ padding: 'var(--spacing-lg)' }}>
         {/* Step indicators */}
         <div
+          className="onboarding-stepper"
           style={{ display: 'flex', gap: 'var(--spacing-lg)', marginBottom: 'var(--spacing-lg)' }}
         >
           {STEPS.map((step, index) => (
@@ -206,7 +212,10 @@ export function OnboardingGuide({ documentCount = 0 }: { documentCount?: number 
         </div>
 
         {/* Current step detail */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-lg)' }}>
+        <div
+          className="onboarding-step-detail"
+          style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-lg)' }}
+        >
           {(() => {
             const Icon = STEPS[currentStep].icon;
             return <Icon size={40} style={{ color: 'var(--text-secondary)', flexShrink: 0 }} />;
@@ -249,6 +258,18 @@ export function OnboardingGuide({ documentCount = 0 }: { documentCount?: number 
           )}
         </div>
       </div>
+      <style jsx>{`
+        @media (max-width: 600px) {
+          :global(.onboarding-stepper) {
+            flex-direction: column !important;
+            gap: var(--spacing-sm) !important;
+          }
+          :global(.onboarding-step-detail) {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

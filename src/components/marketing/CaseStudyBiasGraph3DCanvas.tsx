@@ -1,7 +1,8 @@
 'use client';
 
 import { useRef, useCallback, useEffect } from 'react';
-import { DoubleSide } from 'three';
+import { DoubleSide, type Mesh, type MeshBasicMaterial } from 'three';
+import { useFrame } from '@react-three/fiber';
 import {
   GraphCanvas,
   type GraphCanvasRef,
@@ -135,7 +136,7 @@ function buildGraphData(
       id: `e${edgeId++}`,
       source: '_decision',
       target: bias,
-      fill: '#1E3A5F',
+      fill: '#CBD5E1',
       dashed: true,
       arrowPlacement: 'end',
     });
@@ -148,7 +149,7 @@ function buildGraphData(
         id: `e${edgeId++}`,
         source: biases[i],
         target: biases[next],
-        fill: '#475569',
+        fill: '#94A3B8',
         dashed: true,
         arrowPlacement: 'none',
       });
@@ -161,27 +162,47 @@ function buildGraphData(
 // ─── Theme ──────────────────────────────────────────────────────────────────
 
 const GRAPH_THEME: Theme = {
-  canvas: { background: '#060d1a', fog: null },
+  canvas: { background: '#FFFFFF', fog: null },
   node: {
-    fill: '#334155',
-    activeFill: '#64748B',
-    opacity: 1,
-    selectedOpacity: 1,
-    inactiveOpacity: 0.25,
-    label: { color: '#94A3B8', activeColor: '#FFFFFF', stroke: '#060d1a', strokeWidth: 4 },
-  },
-  ring: { fill: '#16A34A', activeFill: '#22C55E' },
-  edge: {
-    fill: '#1E293B',
+    fill: '#94A3B8',
     activeFill: '#475569',
     opacity: 1,
     selectedOpacity: 1,
-    inactiveOpacity: 0.12,
-    label: { color: '#64748B', activeColor: '#E2E8F0' },
+    inactiveOpacity: 0.35,
+    label: { color: '#475569', activeColor: '#0F172A', stroke: '#FFFFFF', strokeWidth: 4 },
   },
-  arrow: { fill: '#334155', activeFill: '#64748B' },
+  ring: { fill: '#16A34A', activeFill: '#22C55E' },
+  edge: {
+    fill: '#CBD5E1',
+    activeFill: '#64748B',
+    opacity: 0.9,
+    selectedOpacity: 1,
+    inactiveOpacity: 0.18,
+    label: { color: '#64748B', activeColor: '#0F172A' },
+  },
+  arrow: { fill: '#94A3B8', activeFill: '#475569' },
   lasso: { background: 'rgba(22,163,74,0.08)', border: '#16A34A' },
 };
+
+// ─── Pulsing halo (applied to primary bias) ─────────────────────────────────
+
+function PulsingHalo({ size, color }: { size: number; color: string }) {
+  const ref = useRef<Mesh | null>(null);
+  useFrame(({ clock }) => {
+    if (!ref.current) return;
+    const t = clock.elapsedTime;
+    const s = 1.45 + Math.sin(t * 2.2) * 0.18;
+    ref.current.scale.setScalar(s);
+    const mat = ref.current.material as MeshBasicMaterial | undefined;
+    if (mat) mat.opacity = 0.14 + Math.sin(t * 2.2) * 0.08;
+  });
+  return (
+    <mesh ref={ref}>
+      <octahedronGeometry args={[size, 0]} />
+      <meshBasicMaterial color={color} transparent opacity={0.18} depthWrite={false} />
+    </mesh>
+  );
+}
 
 // ─── Node renderer ──────────────────────────────────────────────────────────
 
@@ -189,7 +210,7 @@ function renderNode({ node, size, opacity, active, selected }: NodeRendererProps
   const data = node.data as CaseStudyNodeData | undefined;
   const col = (node.fill as string) ?? '#60A5FA';
   const o = opacity ?? 1;
-  const emissive = selected ? 0.8 : active ? 0.5 : 0.35;
+  const emissive = selected ? 0.4 : active ? 0.25 : 0.12;
   const glow = selected || active;
 
   if (data?.type === 'decision') {
@@ -197,7 +218,7 @@ function renderNode({ node, size, opacity, active, selected }: NodeRendererProps
       <group>
         <mesh>
           <dodecahedronGeometry args={[size, 0]} />
-          <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} side={DoubleSide} transparent opacity={o} />
+          <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
         </mesh>
         {glow && (
           <mesh scale={[1.55, 1.55, 1.55]}>
@@ -209,11 +230,13 @@ function renderNode({ node, size, opacity, active, selected }: NodeRendererProps
     );
   }
 
+  const isPrimary = data?.type === 'bias' && data.isPrimary;
+
   return (
     <group>
       <mesh>
         <octahedronGeometry args={[size, 0]} />
-        <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} side={DoubleSide} transparent opacity={o} />
+        <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
       </mesh>
       {glow && (
         <mesh scale={[1.6, 1.6, 1.6]}>
@@ -221,6 +244,7 @@ function renderNode({ node, size, opacity, active, selected }: NodeRendererProps
           <meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} />
         </mesh>
       )}
+      {isPrimary && !selected && <PulsingHalo size={size} color={col} />}
     </group>
   );
 }
@@ -243,11 +267,17 @@ export default function CaseStudyBiasGraph3DCanvas({
   const graphRef = useRef<GraphCanvasRef | null>(null);
   const { nodes, edges } = buildGraphData(biases, primaryBias, toxicCombinations);
 
+  // Force-directed 3D layout needs several ticks before node positions stabilize.
+  // Retry fitNodesInView() at 200/600/1200/2000ms so whichever call lands after
+  // layout stabilizes successfully frames the camera on all nodes.
   useEffect(() => {
-    const timer = setTimeout(() => {
-      graphRef.current?.centerGraph();
-    }, 300);
-    return () => clearTimeout(timer);
+    const delays = [200, 600, 1200, 2000];
+    const timers = delays.map(ms =>
+      setTimeout(() => {
+        graphRef.current?.fitNodesInView(undefined, { animated: false });
+      }, ms),
+    );
+    return () => timers.forEach(clearTimeout);
   }, []);
 
   const {
@@ -303,17 +333,16 @@ export default function CaseStudyBiasGraph3DCanvas({
       onCanvasClick={onCanvasClick}
       onNodePointerOver={onNodePointerOver}
       onNodePointerOut={onNodePointerOut}
-      labelType="all"
+      labelType="nodes"
       draggable
       defaultNodeSize={6}
       minDistance={200}
       maxDistance={4000}
     >
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[15, 15, 10]} intensity={1.8} />
-      <directionalLight position={[-10, -8, -5]} intensity={0.5} color="#4F46E5" />
-      <pointLight position={[0, 20, 5]} intensity={1.2} color="#60A5FA" />
-      <pointLight position={[0, -15, -5]} intensity={0.4} color="#A78BFA" />
+      <ambientLight intensity={0.9} />
+      <directionalLight position={[15, 15, 10]} intensity={1.2} />
+      <directionalLight position={[-10, -8, -5]} intensity={0.4} color="#FFFFFF" />
+      <pointLight position={[0, 20, 5]} intensity={0.6} color="#FFFFFF" />
     </GraphCanvas>
   );
 }

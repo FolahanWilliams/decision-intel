@@ -71,6 +71,8 @@ export function CaseStudyCta({ slug, company, hasDeepAnalysis }: CaseStudyCtaPro
           padding: 32,
           borderRadius: 14,
           textAlign: 'center',
+          border: '1px solid rgba(22, 163, 74, 0.35)',
+          boxShadow: '0 0 0 3px rgba(22, 163, 74, 0.08), 0 8px 32px rgba(15, 23, 42, 0.12)',
         }}
       >
         <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>
@@ -85,7 +87,16 @@ export function CaseStudyCta({ slug, company, hasDeepAnalysis }: CaseStudyCtaPro
   }
 
   return (
-    <div style={{ background: C.navy, color: C.white, padding: 32, borderRadius: 14 }}>
+    <div
+      style={{
+        background: C.navy,
+        color: C.white,
+        padding: 32,
+        borderRadius: 14,
+        border: '1px solid rgba(22, 163, 74, 0.35)',
+        boxShadow: '0 0 0 3px rgba(22, 163, 74, 0.08), 0 8px 32px rgba(15, 23, 42, 0.12)',
+      }}
+    >
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
         <div
           style={{
@@ -212,6 +223,17 @@ export function CaseStudyCta({ slug, company, hasDeepAnalysis }: CaseStudyCtaPro
         {status === 'error' && errorMessage && (
           <p style={{ marginTop: 8, fontSize: 12, color: '#FCA5A5' }}>{errorMessage}</p>
         )}
+
+        <p style={{ marginTop: 14, fontSize: 12, color: C.slate400 }}>
+          Ready to audit your own memo right now?{' '}
+          <a
+            href="/login?redirect=/dashboard"
+            onClick={() => trackEvent('case_study_signup_click', { slug, company })}
+            style={{ color: C.white, fontWeight: 600, textDecoration: 'underline' }}
+          >
+            Create a free account &rarr;
+          </a>
+        </p>
       </div>
 
       <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }`}</style>
