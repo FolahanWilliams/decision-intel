@@ -336,7 +336,7 @@ export default function DemoPage() {
                   value={pasteText}
                   onChange={e => setPasteText(e.target.value)}
                   className="w-full h-32 bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-900 resize-none focus:outline-none focus:border-green-300 placeholder:text-slate-400"
-                  placeholder="Paste a decision memo, investment thesis, or strategic rationale..."
+                  placeholder="Paste a strategic memo, board deck excerpt, or market-entry recommendation..."
                 />
                 <div className="flex justify-between items-center mt-3">
                   <span className="text-[11px] text-slate-500">
@@ -948,12 +948,12 @@ export default function DemoPage() {
               style={{ background: '#F8FAFC' }}
             >
               <h3 className="text-lg sm:text-[22px] font-bold text-slate-900 mb-2">
-                This was a demo. Now try it on your own documents.
+                Now run this on your own strategic memo.
               </h3>
-              <p className="text-slate-600 text-sm mb-6 max-w-[500px] mx-auto">
-                Upload any strategic document &mdash; board memo, M&amp;A rationale, investment
-                thesis, market analysis &mdash; and get a comprehensive cognitive bias audit in
-                minutes.
+              <p className="text-slate-600 text-sm mb-6 max-w-[520px] mx-auto">
+                Upload a board deck, market-entry recommendation, or any high-stakes strategy
+                paper. Get the bias audit, the objections your steering committee will raise, and
+                your first node in the Decision Knowledge Graph.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <button
@@ -1008,11 +1008,12 @@ function DemoVideoSection() {
   return (
     <div className="text-center">
       <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3 leading-tight">
-        See Decision Intel in Action
+        Audit your next strategic memo in 60 seconds.
       </h1>
-      <p className="text-slate-500 text-sm sm:text-base max-w-[600px] mx-auto mb-8">
-        Watch how the 12-node pipeline audits real IC memos for cognitive bias, measures decision
-        noise, and generates actionable intelligence.
+      <p className="text-slate-500 text-sm sm:text-base max-w-[620px] mx-auto mb-8">
+        Pick a famous corporate decision below, or paste your own text. Watch Decision Intel score
+        the cognitive biases, predict the questions your steering committee will raise, and map
+        the decision into your Knowledge Graph.
       </p>
 
       {DEMO_VIDEO_URL ? (
@@ -1030,9 +1031,9 @@ function DemoVideoSection() {
           <div className="w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center">
             <Play size={28} className="text-slate-400 ml-1" />
           </div>
-          <p className="text-slate-500 text-sm max-w-[400px]">
-            Try the interactive demo below — upload a sample document and watch the 12-node bias
-            detection pipeline in real time.
+          <p className="text-slate-500 text-sm max-w-[440px]">
+            Try the interactive demo below. Pick a real-world strategic decision and watch the
+            bias audit, objection simulation, and Knowledge Graph come to life.
           </p>
         </div>
       )}

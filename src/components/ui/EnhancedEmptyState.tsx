@@ -54,13 +54,13 @@ interface EmptyStateConfig {
 const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
   documents: {
     icon: <FileText className="w-12 h-12" />,
-    title: 'No documents yet',
+    title: 'Your Decision Knowledge Graph starts here',
     description:
-      'Start by uploading your first document to analyze for cognitive biases and decision quality.',
+      'Upload your first strategic memo, board deck, or market-entry recommendation. We\u2019ll audit the reasoning, score the biases, and add it to your Knowledge Graph.',
     suggestions: [
-      'Upload PDFs, Word docs, or text files',
-      'Drag and drop multiple files at once',
-      'Documents are analyzed automatically',
+      'Strategic memos, board decks, market-entry papers',
+      'PDF, Word, Excel, or plain text',
+      'First audit takes under 60 seconds',
     ],
     actions: [
       {
@@ -116,13 +116,13 @@ const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
   },
   'cognitive-audits': {
     icon: <Brain className="w-12 h-12" />,
-    title: 'No cognitive audits yet',
+    title: 'No strategic memos audited yet',
     description:
-      'Submit a document or decision for comprehensive bias analysis and get actionable insights.',
+      'Run your first audit and see the reasoning behind the numbers, scored against 146 historical decisions and 30+ cognitive biases.',
     suggestions: [
-      'Each audit checks for 30+ cognitive biases',
-      'Get severity scores and recommendations',
-      'Track decision quality over time',
+      'Walk into the board with rigor that matches your data',
+      'Predict steering-committee objections before the meeting',
+      'Build your Decision Quality Index, quarter over quarter',
     ],
     actions: [
       {

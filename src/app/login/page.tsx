@@ -138,7 +138,7 @@ function LoginContent() {
               letterSpacing: '-0.02em',
             }}
           >
-            Audit decisions for
+            Audit the reasoning behind every
             <span
               style={{
                 background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
@@ -147,9 +147,8 @@ function LoginContent() {
               }}
             >
               {' '}
-              cognitive bias
-            </span>{' '}
-            and noise
+              strategic memo
+            </span>
           </h2>
           <p
             style={{
@@ -157,11 +156,11 @@ function LoginContent() {
               color: 'var(--text-muted)',
               lineHeight: 1.7,
               marginBottom: '2rem',
-              maxWidth: '420px',
+              maxWidth: '440px',
             }}
           >
-            Upload documents, detect hidden biases, and get actionable insights powered by
-            multi-agent AI analysis.
+            Score cognitive biases, predict steering-committee objections, and turn every major
+            call your team makes into a living Decision Knowledge Graph.
           </p>
 
           {/* Feature list */}
@@ -171,20 +170,21 @@ function LoginContent() {
                 icon: Brain,
                 title: 'Bias Detection',
                 description:
-                  'Identify 20 cognitive biases including confirmation, anchoring, and groupthink',
+                  'Score 30+ cognitive biases with confidence, excerpts, and research-backed explanations',
                 color: '#f59e0b',
               },
               {
                 icon: BarChart3,
-                title: 'Decision Quality Scoring',
+                title: 'Decision Quality Index',
                 description:
-                  'Quantified scores with noise measurement and statistical jury analysis',
+                  'Auditable, board-ready evidence that your process was rigorous, compounding quarter over quarter',
                 color: '#16A34A',
               },
               {
                 icon: Search,
-                title: 'Semantic Search & Chat',
-                description: 'Ask questions about your documents with RAG-powered Q&A',
+                title: 'Knowledge Graph',
+                description:
+                  'Every memo becomes a searchable, traceable node connected by assumption, bias, and outcome',
                 color: '#3b82f6',
               },
               {
@@ -304,7 +304,7 @@ function LoginContent() {
                 marginTop: '8px',
               }}
             >
-              AI-powered cognitive auditing
+              Decision intelligence for strategic memos
             </p>
           </div>
 

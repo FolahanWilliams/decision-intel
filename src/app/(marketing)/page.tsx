@@ -628,9 +628,9 @@ export default function LandingPage() {
                 marginBottom: 20,
               }}
             >
-              Stop missing the questions
+              Catch the questions
               <br />
-              <span style={{ color: C.green }}>that killed similar deals.</span>
+              <span style={{ color: C.green }}>that kill strategic decisions.</span>
             </h1>
             <p
               style={{
@@ -641,11 +641,10 @@ export default function LandingPage() {
                 maxWidth: 520,
               }}
             >
-              Three weeks after close, your team finds the diligence question that cost you $40M in
-              integration overruns. Decision Intel surfaces those gaps before the vote &mdash; not
-              in the post-mortem. Upload your M&amp;A memo or board paper and get the questions
-              comparable historical decisions answered (or fatally ignored) &mdash; in under 60
-              seconds.
+              Months after the board signs off, your team finds the assumption that killed the
+              market entry, or the bias that drove the wrong acquisition. Decision Intel audits
+              every strategic memo for the cognitive gaps your team has normalized, in 60 seconds,
+              before the meeting that actually matters.
             </p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <Link
@@ -664,10 +663,10 @@ export default function LandingPage() {
                   textDecoration: 'none',
                 }}
               >
-                Find what your team missed <ArrowRight size={16} />
+                Audit your next strategic memo <ArrowRight size={16} />
               </Link>
               <Link
-                href="/login"
+                href="/case-studies"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -682,7 +681,7 @@ export default function LandingPage() {
                   textDecoration: 'none',
                 }}
               >
-                See your hidden risk &mdash; free
+                See a live bias case study
               </Link>
             </div>
             <div
@@ -708,9 +707,9 @@ export default function LandingPage() {
                 The job you&rsquo;re hiring us for
               </div>
               <p style={{ fontSize: 14, color: C.slate600, lineHeight: 1.6, margin: 0 }}>
-                The night before the IC votes on a deal we&rsquo;ve worked for months: what question
-                is this memo not asking? What did teams in similar situations get wrong &mdash; and
-                did we just repeat it?
+                The night before the steering committee reviews the strategic memo your team has
+                worked on for months: what question is this paper not asking? What did teams in
+                comparable situations get wrong, and did we just repeat it?
               </p>
             </div>
           </div>
@@ -765,7 +764,7 @@ export default function LandingPage() {
               icon: Zap,
               value: '<60s',
               label: 'To find what your team missed',
-              sub: '12-node pipeline, 20+ biases',
+              sub: 'From strategic memo to measurable risk signal',
               href: null as string | null,
             },
           ].map(({ icon: Icon, value, label, sub, href }) => {
@@ -822,6 +821,180 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Four Moments (core value proposition) ───────────────────── */}
+      <section
+        id="four-moments"
+        style={{ maxWidth: 1200, margin: '0 auto', padding: '96px 24px' }}
+      >
+        <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
+          <p
+            style={{
+              fontSize: 15,
+              color: C.slate600,
+              lineHeight: 1.7,
+              maxWidth: 820,
+              marginBottom: 32,
+              fontStyle: 'italic',
+            }}
+          >
+            The same lens that exposed Kodak&rsquo;s missed digital pivot, Blockbuster&rsquo;s
+            Netflix rejection, and Nokia&rsquo;s smartphone blind spot now audits your strategic
+            memos in 60 seconds, turning every major call your team makes into a living, navigable
+            Decision Knowledge Graph.
+          </p>
+          <p
+            style={{
+              fontSize: 14,
+              fontWeight: 600,
+              color: C.green,
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              marginBottom: 8,
+            }}
+          >
+            What you get
+          </p>
+          <h2
+            style={{
+              fontSize: 36,
+              fontWeight: 700,
+              color: C.slate900,
+              marginBottom: 56,
+              letterSpacing: '-0.01em',
+              maxWidth: 820,
+              lineHeight: 1.15,
+            }}
+          >
+            The Four Moments We Catch What Others Miss
+          </h2>
+        </motion.div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 32 }} className="cards-grid">
+          {[
+            {
+              num: '01',
+              title: 'Your full Decision Knowledge Graph: every major strategic call, connected.',
+              body: (
+                <>
+                  Every strategic memo, board deck, and market-entry recommendation your team
+                  produces becomes a node in one navigable graph, connected by assumption, bias,
+                  and outcome. No more strategy archaeology across SharePoint, email, and the last
+                  analyst&rsquo;s laptop. Your team&rsquo;s collective judgment becomes a
+                  searchable, traceable asset. Today&rsquo;s decision always inherits
+                  yesterday&rsquo;s lessons.
+                </>
+              ),
+            },
+            {
+              num: '02',
+              title: 'See the questions before the CEO asks them.',
+              body: (
+                <>
+                  Reworking the same board deck three times because new questions keep surfacing in
+                  the steering committee. That&rsquo;s time your team never gets back. Our
+                  simulation engine runs your memo against 146 historical decisions with known
+                  outcomes, predicting the objections, forgotten angles, and counterarguments
+                  before the meeting. Walk in prepared, walk out faster, and hand the CEO
+                  answers&mdash;not revisions.
+                </>
+              ),
+            },
+            {
+              num: '03',
+              title: 'Audit the reasoning behind every strategic memo.',
+              body: (
+                <>
+                  Strategy papers live or die on the logic behind the numbers. We score the 30+
+                  cognitive biases that quietly derail even the strongest-looking recommendations,
+                  converting narrative judgment into measurable risk signal. You walk into the
+                  board with the same analytical confidence in the{' '}
+                  <em style={{ color: C.slate900, fontStyle: 'italic' }}>strategy</em> that you
+                  already have in the{' '}
+                  <em style={{ color: C.slate900, fontStyle: 'italic' }}>data</em>.
+                </>
+              ),
+            },
+            {
+              num: '04',
+              title: 'Close the loop most teams never close.',
+              body: (
+                <>
+                  Most strategy teams recommend something and then wonder, months later, whether it
+                  actually worked. Every high-stakes call gets a Decision Quality Index: auditable
+                  evidence for your board, CEO, or parent company that the process was rigorous,
+                  not just that the outcome was lucky. Memo after memo, quarter after quarter,
+                  your DQI becomes proprietary proof that your team&rsquo;s judgment isn&rsquo;t
+                  just strong&mdash;it&rsquo;s{' '}
+                  <em style={{ color: C.green, fontStyle: 'italic', fontWeight: 600 }}>
+                    compounding
+                  </em>
+                  .
+                </>
+              ),
+            },
+          ].map((m, i) => (
+            <motion.div
+              key={m.num}
+              {...fadeIn}
+              transition={{ duration: 0.5, delay: i * 0.05 }}
+              style={{
+                background: C.white,
+                border: `1px solid ${C.slate200}`,
+                borderRadius: 16,
+                padding: '36px 32px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 16,
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: C.green,
+                    background: C.greenLight,
+                    padding: '4px 10px',
+                    borderRadius: 6,
+                    letterSpacing: '0.04em',
+                  }}
+                >
+                  {m.num}
+                </span>
+              </div>
+              <h3
+                style={{
+                  fontSize: 20,
+                  fontWeight: 700,
+                  color: C.slate900,
+                  lineHeight: 1.3,
+                  letterSpacing: '-0.01em',
+                  margin: 0,
+                }}
+              >
+                {m.title}
+              </h3>
+              <p
+                style={{
+                  fontSize: 15,
+                  color: C.slate600,
+                  lineHeight: 1.7,
+                  margin: 0,
+                }}
+              >
+                {m.body}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
       {/* ── Case Study Carousel ─────────────────────────────────────── */}
       <CaseStudyCarousel />
 
@@ -865,8 +1038,8 @@ export default function LandingPage() {
               icon: FileSearch,
               phase: 'PHASE_01',
               num: '01',
-              title: 'Upload the document',
-              desc: 'Drop in M&A memos, board papers, strategy proposals, diligence reports, or any decision document. Capture each stakeholder\u2019s prior belief privately, before the room starts reinforcing itself.',
+              title: 'Upload the strategic memo',
+              desc: 'Drop in strategic memos, board decks, market-entry recommendations, or any high-stakes decision document. Capture each stakeholder\u2019s prior belief privately, before the room starts reinforcing itself.',
               bullets: [
                 'PDF, DOCX, Excel, CSV support',
                 'Decision framing with success/failure criteria',
@@ -881,9 +1054,9 @@ export default function LandingPage() {
               phase: 'PHASE_02',
               num: '02',
               title: 'Get the blind second opinion',
-              desc: 'A 12-node pipeline stress-tests the document: 20+ biases detected, a three-judge noise jury measures variability, a simulated executive challenge argues against your proposal — and a Forgotten Questions engine surfaces the diligence gaps drawn from comparable historical decisions.',
+              desc: 'The reasoning layer gets stress-tested: 30+ biases scored with confidence, a three-judge noise jury measures variability, a simulated steering committee argues against your recommendation, and a Forgotten Questions engine surfaces the gaps drawn from 146 comparable historical decisions.',
               bullets: [
-                '20+ cognitive biases with confidence scores',
+                '30+ cognitive biases with confidence scores',
                 '3 independent noise judges (Kahneman)',
                 'Boardroom simulation with custom personas',
                 'Fact-checking via Google Search grounding',
@@ -1090,7 +1263,7 @@ export default function LandingPage() {
             {
               icon: Brain,
               title: 'Cognitive Bias Detection',
-              desc: '20+ biases detected with confidence scores, excerpts, and research-backed explanations. 11 additional domain-specific biases for M&A and corporate strategy.',
+              desc: '30+ biases detected with confidence scores, excerpts, and research-backed explanations. Includes domain-specific biases for corporate strategy, M&A, and market-entry decisions.',
               color: '#8B5CF6',
               bg: '#F5F3FF',
             },
@@ -1118,7 +1291,7 @@ export default function LandingPage() {
             {
               icon: FileSearch,
               title: 'Forgotten Questions',
-              desc: 'Surfaces the diligence questions your memo never asks — drawn from the gap between your document and its closest historical analogs. Every question was answered (or fatally ignored) in a comparable real decision.',
+              desc: 'Surfaces the questions your memo never asks, drawn from the gap between your document and its closest historical analogs. Every question was answered (or fatally ignored) in a comparable real decision.',
               color: '#F59E0B',
               bg: '#FFFBEB',
             },
@@ -1200,9 +1373,10 @@ export default function LandingPage() {
                 lineHeight: 1.5,
               }}
             >
-              The average M&amp;A diligence gap costs{' '}
-              <span style={{ fontWeight: 700, color: C.slate900 }}>$8.2M</span> in integration
-              overruns. Start with a free 30-day pilot on your next live deal.
+              The average failed strategic initiative costs{' '}
+              <span style={{ fontWeight: 700, color: C.slate900 }}>40%</span> more than the
+              next-best alternative your team never scored. Start with a free 30-day pilot on your
+              next high-stakes memo.
             </p>
           </motion.div>
 
@@ -1218,17 +1392,17 @@ export default function LandingPage() {
           >
             {[
               {
-                name: 'Corp Dev',
+                name: 'Strategy',
                 price: 2499,
-                desc: 'For M&A and corporate strategy teams running multiple deals per quarter',
+                desc: 'For corporate strategy and M&A teams producing multiple board-level memos per quarter',
                 features: [
-                  'Unlimited analyses',
-                  '20+ bias types + M&A-specific',
+                  'Unlimited memo audits',
+                  '30+ bias types including corp-strat-specific',
                   'Forgotten Questions engine',
                   'Decision Rooms & Slack',
-                  'Knowledge Graph (compounds over time)',
+                  'Decision Knowledge Graph (compounds over time)',
                   'Compliance mapping (SOX, MiFID II)',
-                  'Outcome tracking & calibration',
+                  'Outcome tracking & DQI calibration',
                   'Up to 15 team seats',
                 ],
                 cta: 'Start 30-Day Pilot',
@@ -1240,10 +1414,10 @@ export default function LandingPage() {
               {
                 name: 'Enterprise',
                 price: -1,
-                desc: 'For Fortune 500 teams with multi-division workflows and compliance requirements',
+                desc: 'For Fortune 500 strategy functions with multi-division workflows and compliance requirements',
                 features: [
-                  'Unlimited analyses',
-                  'Everything in Corp Dev',
+                  'Unlimited memo audits',
+                  'Everything in Strategy',
                   'Unlimited team seats',
                   'SSO & custom taxonomy',
                   'Multi-division management',
@@ -1369,7 +1543,7 @@ export default function LandingPage() {
           </div>
 
           <p style={{ textAlign: 'center', fontSize: 13, color: C.slate400, marginTop: 24 }}>
-            30-day pilot on your next live deal. No credit card required to start.
+            30-day pilot on your next high-stakes memo. No credit card required to start.
           </p>
         </div>
       </section>
@@ -1492,10 +1666,10 @@ export default function LandingPage() {
         <div style={{ maxWidth: 640, margin: '0 auto', padding: '80px 24px', textAlign: 'center' }}>
           <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
             <h2 style={{ fontSize: 36, fontWeight: 700, color: C.slate900, marginBottom: 16 }}>
-              Ready to Audit Your Decision Process?
+              Ready to compound your team&rsquo;s judgment?
             </h2>
             <p style={{ fontSize: 18, color: C.slate600, marginBottom: 32 }}>
-              Start with a free analysis. No credit card needed.
+              Audit your next strategic memo in 60 seconds. No credit card required.
             </p>
             <Link
               href="/login"
@@ -1606,8 +1780,9 @@ export default function LandingPage() {
               <span style={{ fontSize: 18, fontWeight: 700, color: C.white }}>Decision Intel</span>
             </div>
             <p style={{ fontSize: 14, lineHeight: 1.7, color: '#94A3B8', maxWidth: 280 }}>
-              The Decision Performance OS for corporate strategy and M&amp;A teams. Audit cognitive
-              bias, measure decision noise, and track outcomes.
+              Decision intelligence for corporate strategy and M&amp;A teams. Audit the reasoning
+              in every strategic memo, see the questions the board will ask, and compound your
+              team&rsquo;s judgment over time.
             </p>
           </div>
 

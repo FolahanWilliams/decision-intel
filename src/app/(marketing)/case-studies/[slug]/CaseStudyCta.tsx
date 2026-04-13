@@ -77,8 +77,8 @@ export function CaseStudyCta({ slug, company, hasDeepAnalysis }: CaseStudyCtaPro
           Got it &mdash; we&apos;ll be in touch shortly.
         </h3>
         <p style={{ fontSize: 14, color: C.slate400, margin: 0 }}>
-          You&apos;ll hear from the founder within a business day with a sample analysis of one of
-          your own deals.
+          You&apos;ll hear from the founder within a business day with a sample audit of one of
+          your own strategic memos.
         </p>
       </div>
     );
@@ -102,12 +102,12 @@ export function CaseStudyCta({ slug, company, hasDeepAnalysis }: CaseStudyCtaPro
       </div>
 
       <h3 style={{ fontSize: 22, fontWeight: 700, marginBottom: 8, lineHeight: 1.3 }}>
-        See what we&apos;d flag in <em>your</em> next deal.
+        See what we&apos;d flag in <em>your</em> next strategic memo.
       </h3>
       <p style={{ fontSize: 14, color: C.slate400, marginBottom: 20, lineHeight: 1.6 }}>
-        Upload a memo or board paper. Get the same{' '}
+        Upload a strategic memo or board deck. Get the same{' '}
         {hasDeepAnalysis ? 'hindsight-stripped analysis' : 'bias audit'} you just saw for{' '}
-        {company} &mdash; on your own deal, in under 60 seconds.
+        {company}, on your own high-stakes call, in under 60 seconds.
       </p>
 
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 16 }}>
@@ -162,7 +162,8 @@ export function CaseStudyCta({ slug, company, hasDeepAnalysis }: CaseStudyCtaPro
         }}
       >
         <p style={{ fontSize: 12, color: C.slate400, marginBottom: 10 }}>
-          Or leave your email &mdash; we&apos;ll run a deal of your choosing and send the readout within a business day.
+          Or leave your email, we&apos;ll run a strategic memo of your choosing and send the
+          readout within a business day.
         </p>
         <form onSubmit={handleSubmit} style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <input

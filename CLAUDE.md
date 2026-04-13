@@ -2,9 +2,41 @@
 
 ## What This Project Is
 
-Decision Intel is an AI-powered cognitive bias auditing platform for high-stakes decision teams. Users upload strategic documents (M&A memos, board papers, strategy proposals) and get a comprehensive bias audit in under 60 seconds. The primary vertical is corporate strategy and M&A teams; the expansion path is PE/VC investment committees and broader financial services.
+Decision Intel is a decision intelligence platform for corporate strategy teams. Users upload strategic memos, board decks, and market-entry recommendations and get a 60-second audit that scores cognitive biases, predicts steering-committee objections, and adds every decision to a living Decision Knowledge Graph that compounds over time.
+
+**Primary buyer: Chief Strategy Officer / Head of Corporate Strategy** (signs the contract, cares about compounding edge + board-ready evidence). Secondary: M&A teams. Tertiary: BizOps/FP&A, sales forecasting. PE/VC is NOT a target audience — budgets are small, buying is relationship-driven, and funds are skeptical of unknown tools.
 
 **Current phase: Refinement & consolidation.** The product has 200+ components and 70+ API routes — more features than most Series A companies. The priority is polishing the core flow (upload → analyze → review → track outcomes) to attract pilot users and raise pre/seed funding. Push back on scope creep. If a change doesn't make the first 60 seconds of a demo better, it probably shouldn't be the priority.
+
+## Positioning & Vocabulary (locked 2026-04-13)
+
+**Core value proposition:** "The Four Moments We Catch What Others Miss" — a Decision Knowledge Graph as the foundation, with (1) the Graph itself, (2) predicting CEO/steering-committee questions, (3) auditing reasoning, and (4) closing the outcome loop via DQI.
+
+**LinkedIn content → landing page bridge:** Bias case studies on famous corporate decisions (Kodak, Blockbuster, Nokia, etc.) warm up the traffic. The landing page says: "The same lens that exposed [X] now audits your strategic memos in 60 seconds."
+
+**Native vocabulary to use:**
+
+- "strategic memo" (primary artifact — the analog to "investment memo")
+- "board deck" (the artifact that gets presented)
+- "strategic recommendation" / "market-entry recommendation"
+- "steering committee" / "executive review" / "board"
+- "CEO, board, or parent company" (the stakeholders)
+- "Decision Knowledge Graph" (always full name)
+- "Decision Quality Index" / "DQI"
+- "quarter after quarter" (cadence)
+- "146 historical decisions" (benchmark number — defensible)
+- "30+ cognitive biases" (taxonomy scope)
+
+**Vocabulary to AVOID:**
+
+- "thesis" (PE/VC-coded)
+- "investment memo" / "IC" / "investment committee" (PE-coded)
+- "LP" / "fund" (PE-coded)
+- "deal" as a headline term (too M&A-narrow; use "call" or "memo")
+- "M&A documents" as primary artifact (use "strategic memo" first; M&A is secondary)
+- "12-node pipeline" in headline positions (too technical for CSO buyer; fine as technical detail only)
+
+**Tone:** Calm CSO 1:1 voice with manager-level pain included. Never critique the buyer's judgment. Frame as additive rigor, not a report card. Lead with gain, not deficit. Use em dashes sparingly (one or two for emphasis); prefer commas and sentence breaks.
 
 ## Founder Context
 
@@ -231,3 +263,13 @@ See `.env.example` for the full list with descriptions.
 - Pre-commit hook runs AI audit (can be slow). Use `--no-verify` only when confident.
 - Push with `-u origin <branch>` for new branches.
 - CI/CD: GitHub Actions (`.github/workflows/ci-cd.yml`)
+
+## MCP Tools: code-review-graph
+
+This repo has a knowledge graph (~5K nodes / ~39K edges, embeddings built). **Always use the graph before Grep/Glob/Read for code exploration** — faster, cheaper, and returns callers/dependents/test coverage. Graph auto-updates on file changes via the PostToolUse hook. Tool cheatsheet + workflow live in `~/.claude/CLAUDE.md` → "Codebase Awareness".
+
+**Project-specific cautions:**
+
+- `get_architecture_overview` returns ~1.7MB on this repo — it exceeds the tool-result cap and dumps to a file. Start with `list_graph_stats` + `list_communities`; only call the overview if you truly need the full community map, and summarize it via an isolated Agent.
+- `query_graph` / `semantic_search_nodes` — always pass `detail_level: "minimal"` and an explicit `limit`.
+- General rule for any MCP tool: start with stats/summary, then drill down.

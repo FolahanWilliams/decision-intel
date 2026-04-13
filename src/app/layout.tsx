@@ -21,32 +21,34 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.c
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'Decision Intel | Cognitive Bias Auditing Platform',
+    default: 'Decision Intel | Decision Intelligence for Corporate Strategy',
     template: '%s | Decision Intel',
   },
   description:
-    'AI-powered decision performance platform that audits strategic memos and M&A documents for cognitive bias and decision noise, protecting business outcomes.',
+    'Audit the reasoning in every strategic memo, predict steering-committee objections before the meeting, and turn every high-stakes call your team makes into a living Decision Knowledge Graph.',
   keywords: [
     'decision intelligence',
-    'cognitive bias',
-    'M&A due diligence',
     'corporate strategy',
-    'strategic decision-making',
-    'decision auditing',
+    'strategic memo',
+    'cognitive bias auditing',
+    'decision quality index',
+    'decision knowledge graph',
+    'board deck review',
+    'M&A decision auditing',
   ],
   openGraph: {
     type: 'website',
     siteName: 'Decision Intel',
-    title: 'Decision Intel | Cognitive Bias Auditing Platform',
+    title: 'Decision Intel | Decision Intelligence for Corporate Strategy',
     description:
-      'AI-powered decision performance platform for corporate strategy and M&A teams. Audit strategic documents for cognitive bias and noise.',
+      'Audit the reasoning in every strategic memo. See the questions the board will ask. Compound your team\u2019s judgment, quarter over quarter.',
     url: siteUrl,
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Decision Intel | Cognitive Bias Auditing Platform',
+    title: 'Decision Intel | Decision Intelligence for Corporate Strategy',
     description:
-      'AI-powered decision performance platform for corporate strategy and M&A teams. Audit strategic documents for cognitive bias and noise.',
+      'Audit the reasoning in every strategic memo. See the questions the board will ask. Compound your team\u2019s judgment.',
   },
   robots: { index: true, follow: true },
   icons: {

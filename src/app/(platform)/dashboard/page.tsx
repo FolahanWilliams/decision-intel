@@ -1681,8 +1681,8 @@ export default function Dashboard() {
               <div className="card">
                 <EnhancedEmptyState
                   type="documents"
-                  title="Upload your first document"
-                  description="Drop a PDF, TXT, MD, or DOCX file in the upload zone above. Our AI will scan for cognitive biases, decision noise, logical fallacies, and compliance risks."
+                  title="Start your Decision Knowledge Graph"
+                  description="Drop a strategic memo, board deck, or market-entry recommendation in the upload zone. Get the bias audit, steering-committee objection simulation, and your first Knowledge Graph node in 60 seconds."
                   showBrief
                   briefContext="documents"
                   actions={[
@@ -1708,8 +1708,8 @@ export default function Dashboard() {
                   Or start with a retrospective
                 </p>
                 <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: 0 }}>
-                  Upload a past memo or strategy doc to understand what went wrong &mdash;
-                  post-mortem analysis in 60 seconds.
+                  Upload a past strategic memo to close the loop your team never closed.
+                  Post-mortem audit in 60 seconds.
                 </p>
               </div>
             </>
