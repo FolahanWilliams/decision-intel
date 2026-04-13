@@ -276,19 +276,54 @@ export function HeroDecisionGraph() {
           >
             <div
               style={{
-                fontSize: 'clamp(11px, 2.5vw, 12px)',
-                fontWeight: 700,
-                textTransform: 'uppercase',
-                letterSpacing: '0.6px',
-                color: '#7C3AED',
-                marginBottom: 3,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                marginBottom: 4,
+                flexWrap: 'wrap',
               }}
             >
-              3D Decision Knowledge Graph
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.6px',
+                  color: '#16A34A',
+                  background: 'rgba(22, 163, 74, 0.10)',
+                  border: '1px solid rgba(22, 163, 74, 0.25)',
+                  padding: '2px 7px',
+                  borderRadius: 4,
+                }}
+              >
+                Sample output
+              </span>
+              <span
+                style={{
+                  fontSize: 'clamp(11px, 2.5vw, 12px)',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.6px',
+                  color: '#7C3AED',
+                }}
+              >
+                3D Decision Knowledge Graph
+              </span>
             </div>
-            <div style={{ fontSize: 'clamp(12px, 3vw, 14px)', color: '#64748B', lineHeight: 1.4 }}>
-              WeWork S-1 IPO Filing (Aug 2019) &mdash;{' '}
-              <span style={{ fontWeight: 600, color: '#DC2626' }}>$39B valuation destroyed</span>
+            <div
+              style={{
+                fontSize: 'clamp(12px, 3vw, 14px)',
+                color: '#475569',
+                lineHeight: 1.45,
+              }}
+            >
+              What Decision Intel would have flagged in{' '}
+              <span style={{ fontWeight: 600, color: '#0F172A' }}>
+                WeWork&rsquo;s S-1 IPO Filing (Aug 2019)
+              </span>{' '}
+              &mdash;{' '}
+              <span style={{ fontWeight: 600, color: '#DC2626' }}>$39B valuation destroyed</span>.
+              Click any node to explore.
             </div>
           </div>
 

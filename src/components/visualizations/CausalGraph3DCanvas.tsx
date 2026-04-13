@@ -13,6 +13,7 @@ import {
   useSelection,
 } from 'reagraph';
 import type { CausalWeight } from '@/lib/learning/causal-learning';
+import { SlowOrbit, ResetViewButton } from './reagraph-helpers';
 
 export interface CausalNodeData {
   nodeType: 'bias' | 'outcome';
@@ -172,7 +173,7 @@ export default function CausalGraph3DCanvas({ weights, onNodeSelect }: CausalGra
   const { nodes, edges } = useMemo(() => buildGraph(weights), [weights]);
 
   useEffect(() => {
-    const delays = [200, 600, 1200, 2000];
+    const delays = [250, 700, 1300, 2000, 2800, 3800];
     const timers = delays.map(ms =>
       setTimeout(() => {
         graphRef.current?.fitNodesInView(undefined, { animated: false });
@@ -275,31 +276,35 @@ export default function CausalGraph3DCanvas({ weights, onNodeSelect }: CausalGra
   }, []);
 
   return (
-    <GraphCanvas
-      ref={graphRef}
-      nodes={nodes}
-      edges={edges}
-      layoutType="forceDirected3d"
-      cameraMode="rotate"
-      animated={false}
-      theme={GRAPH_THEME}
-      renderNode={renderNode}
-      selections={selections}
-      actives={actives}
-      onNodeClick={onNodeClick}
-      onCanvasClick={onCanvasClick}
-      onNodePointerOver={onNodePointerOver}
-      onNodePointerOut={onNodePointerOut}
-      labelType="nodes"
-      draggable
-      defaultNodeSize={5}
-      minDistance={200}
-      maxDistance={8000}
-    >
-      <ambientLight intensity={0.9} />
-      <directionalLight position={[20, 20, 10]} intensity={1.2} />
-      <directionalLight position={[-15, -10, -8]} intensity={0.4} color="#FFFFFF" />
-      <pointLight position={[0, 30, 10]} intensity={0.6} color="#FFFFFF" />
-    </GraphCanvas>
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+      <GraphCanvas
+        ref={graphRef}
+        nodes={nodes}
+        edges={edges}
+        layoutType="forceDirected3d"
+        cameraMode="rotate"
+        animated={false}
+        theme={GRAPH_THEME}
+        renderNode={renderNode}
+        selections={selections}
+        actives={actives}
+        onNodeClick={onNodeClick}
+        onCanvasClick={onCanvasClick}
+        onNodePointerOver={onNodePointerOver}
+        onNodePointerOut={onNodePointerOut}
+        labelType="nodes"
+        draggable
+        defaultNodeSize={5}
+        minDistance={200}
+        maxDistance={8000}
+      >
+        <ambientLight intensity={0.9} />
+        <directionalLight position={[20, 20, 10]} intensity={1.2} />
+        <directionalLight position={[-15, -10, -8]} intensity={0.4} color="#FFFFFF" />
+        <pointLight position={[0, 30, 10]} intensity={0.6} color="#FFFFFF" />
+        <SlowOrbit graphRef={graphRef} />
+      </GraphCanvas>
+      <ResetViewButton graphRef={graphRef} />
+    </div>
   );
 }

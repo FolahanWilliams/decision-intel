@@ -3,6 +3,7 @@
 import { useRef, useCallback, useEffect } from 'react';
 import { DoubleSide, type Mesh, type MeshBasicMaterial } from 'three';
 import { useFrame } from '@react-three/fiber';
+import { SlowOrbit, ResetViewButton } from '@/components/visualizations/reagraph-helpers';
 import {
   GraphCanvas,
   type GraphCanvasRef,
@@ -268,10 +269,10 @@ export default function CaseStudyBiasGraph3DCanvas({
   const { nodes, edges } = buildGraphData(biases, primaryBias, toxicCombinations);
 
   // Force-directed 3D layout needs several ticks before node positions stabilize.
-  // Retry fitNodesInView() at 200/600/1200/2000ms so whichever call lands after
-  // layout stabilizes successfully frames the camera on all nodes.
+  // Retry through ~4s so whichever call lands after layout has produced
+  // visible coords successfully frames the camera on all nodes.
   useEffect(() => {
-    const delays = [200, 600, 1200, 2000];
+    const delays = [250, 700, 1300, 2000, 2800, 3800];
     const timers = delays.map(ms =>
       setTimeout(() => {
         graphRef.current?.fitNodesInView(undefined, { animated: false });
@@ -318,31 +319,35 @@ export default function CaseStudyBiasGraph3DCanvas({
   const memoRenderNode = useCallback(renderNode, []);
 
   return (
-    <GraphCanvas
-      ref={graphRef}
-      nodes={nodes}
-      edges={edges}
-      layoutType="forceDirected3d"
-      cameraMode="rotate"
-      animated={false}
-      theme={GRAPH_THEME}
-      renderNode={memoRenderNode}
-      selections={selections}
-      actives={actives}
-      onNodeClick={onNodeClick}
-      onCanvasClick={onCanvasClick}
-      onNodePointerOver={onNodePointerOver}
-      onNodePointerOut={onNodePointerOut}
-      labelType="nodes"
-      draggable
-      defaultNodeSize={6}
-      minDistance={200}
-      maxDistance={4000}
-    >
-      <ambientLight intensity={0.9} />
-      <directionalLight position={[15, 15, 10]} intensity={1.2} />
-      <directionalLight position={[-10, -8, -5]} intensity={0.4} color="#FFFFFF" />
-      <pointLight position={[0, 20, 5]} intensity={0.6} color="#FFFFFF" />
-    </GraphCanvas>
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+      <GraphCanvas
+        ref={graphRef}
+        nodes={nodes}
+        edges={edges}
+        layoutType="forceDirected3d"
+        cameraMode="rotate"
+        animated={false}
+        theme={GRAPH_THEME}
+        renderNode={memoRenderNode}
+        selections={selections}
+        actives={actives}
+        onNodeClick={onNodeClick}
+        onCanvasClick={onCanvasClick}
+        onNodePointerOver={onNodePointerOver}
+        onNodePointerOut={onNodePointerOut}
+        labelType="nodes"
+        draggable
+        defaultNodeSize={6}
+        minDistance={200}
+        maxDistance={4000}
+      >
+        <ambientLight intensity={0.9} />
+        <directionalLight position={[15, 15, 10]} intensity={1.2} />
+        <directionalLight position={[-10, -8, -5]} intensity={0.4} color="#FFFFFF" />
+        <pointLight position={[0, 20, 5]} intensity={0.6} color="#FFFFFF" />
+        <SlowOrbit graphRef={graphRef} />
+      </GraphCanvas>
+      <ResetViewButton graphRef={graphRef} />
+    </div>
   );
 }
