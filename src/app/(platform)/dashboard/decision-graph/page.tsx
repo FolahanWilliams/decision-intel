@@ -16,6 +16,7 @@ const CausalDAG = dynamic(
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { CrossSiloAlertCards } from '@/components/ui/CrossSiloAlertCards';
+import { usePlanLabels } from '@/hooks/usePlanLabels';
 import {
   Network,
   FileText,
@@ -69,6 +70,7 @@ const RISK_COLORS: Record<string, string> = {
 };
 
 export default function DecisionGraphPage() {
+  const { knowledgeGraphLabel, knowledgeGraphDescription } = usePlanLabels();
   const [orgId, setOrgId] = useState<string | null>(null);
   const [timeRange, setTimeRange] = useState(90);
   const [activeTab, setActiveTab] = useState<'graph' | 'report'>('graph');
@@ -127,19 +129,16 @@ export default function DecisionGraphPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
       <Breadcrumbs
-        items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Decision Graph' }]}
+        items={[{ label: 'Dashboard', href: '/dashboard' }, { label: knowledgeGraphLabel }]}
       />
 
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-white flex items-center gap-2">
             <Network className="h-6 w-6 text-blue-400" />
-            Decision Knowledge Graph
+            {knowledgeGraphLabel}
           </h1>
-          <p className="text-sm text-zinc-500 mt-1">
-            Every strategic memo your team has produced, connected by assumption, bias, and
-            outcome. Today&rsquo;s decision always inherits yesterday&rsquo;s lessons.
-          </p>
+          <p className="text-sm text-zinc-500 mt-1">{knowledgeGraphDescription}</p>
         </div>
 
         <div className="flex items-center gap-3">

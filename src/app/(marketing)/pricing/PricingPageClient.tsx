@@ -57,7 +57,7 @@ function buildTiers(cycle: BillingCycle): Tier[] {
       priceMonthly: 99,
       priceAnnual: 999,
       highlights: [
-        '10 audits per month',
+        '15 audits per month',
         'Full DQI + 30+ cognitive biases',
         'Boardroom Simulation + Forgotten Questions',
         'Personal Decision History',
@@ -114,7 +114,7 @@ const COMPARISON_ROWS: Array<{
   {
     label: 'Audits per month',
     free: '4',
-    pro: '10',
+    pro: '15',
     team: 'Unlimited',
     enterprise: 'Unlimited',
   },

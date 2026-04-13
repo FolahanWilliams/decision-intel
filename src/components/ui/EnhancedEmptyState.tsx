@@ -54,9 +54,9 @@ interface EmptyStateConfig {
 const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
   documents: {
     icon: <FileText className="w-12 h-12" />,
-    title: 'Your Decision Knowledge Graph starts here',
+    title: 'Start your first audit',
     description:
-      'Upload your first strategic memo, board deck, or market-entry recommendation. We\u2019ll audit the reasoning, score the biases, and add it to your Knowledge Graph.',
+      'Upload a strategic memo, board deck, or market-entry recommendation. We\u2019ll audit the reasoning, score the biases, and surface the questions your CEO is about to ask in under 60 seconds.',
     suggestions: [
       'Strategic memos, board decks, market-entry papers',
       'PDF, Word, Excel, or plain text',

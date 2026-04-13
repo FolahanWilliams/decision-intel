@@ -84,7 +84,7 @@ export const PLANS = {
     // Legacy alias points to monthly for existing callers
     priceId:
       process.env.STRIPE_PRO_PRICE_MONTHLY_ID || 'price_1TLh8pJHs8Ws3oeL7VzAcJgA',
-    analysesPerMonth: 10,
+    analysesPerMonth: 15,
     maxPages: 100,
     biasTypes: 30,
     maxTeamMembers: 1,

@@ -1401,7 +1401,7 @@ export default function LandingPage() {
                 priceSuffix: '/mo',
                 desc: 'For the high-stakes strategist who wants the career-defining edge.',
                 features: [
-                  '10 audits per month',
+                  '15 audits per month',
                   'Full DQI + 30+ biases',
                   'Boardroom Simulation',
                   'Forgotten Questions engine',

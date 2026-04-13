@@ -275,15 +275,21 @@ model Organization {
 }
 
 model TeamMember {
-  id           String       @id @default(cuid())
-  orgId        String
-  userId       String
-  email        String
-  displayName  String?
-  role         String       @default("member")
-  joinedAt     DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  id               String       @id @default(cuid())
+  orgId            String
+  userId           String
+  email            String
+  displayName      String?
+  role             String       @default("member")
+  joinedAt         DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  // Knowledge Graph merge consent. Set when an individual Pro user's
+  // org upgrades to Strategy/Enterprise and they have personal memos
+  // that could merge into the team graph.
+  // Values: null (not applicable), "pending", "merged", "private".
+  kgMergeConsent   String?
+  kgMergeDecidedAt DateTime?
+  organization     Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
   @@unique([orgId, userId])
   @@unique([orgId, email])

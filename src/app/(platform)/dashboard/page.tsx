@@ -41,6 +41,8 @@ import type { OutcomeGateInfo } from '@/hooks/useAnalysisStream';
 import { useNotifications } from '@/components/ui/NotificationCenter';
 import { useAnalysisProgress } from '@/components/ui/AnalysisProgressBar';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
+import { usePlanLabels } from '@/hooks/usePlanLabels';
+import { KGMergeConsentModal } from '@/components/pricing/KGMergeConsentModal';
 import { OutcomeGateBanner } from '@/components/ui/OutcomeGate';
 import { DraftOutcomeBanner } from '@/components/ui/DraftOutcomeBanner';
 import { SampleDataBanner } from '@/components/ui/SampleDataBanner';
@@ -129,7 +131,29 @@ function getDetailedErrorMessage(err: unknown, uploadRes?: Response | null): str
 }
 
 export default function Dashboard() {
+  const { knowledgeGraphLabel, isTeamPlan } = usePlanLabels();
   const [isDragOver, setIsDragOver] = useState(false);
+  const [kgConsent, setKgConsent] = useState<{
+    status: 'pending' | 'merged' | 'private' | 'not_applicable';
+    memoCount: number;
+  } | null>(null);
+
+  // Fetch KG merge consent status. If the user is on a team plan, had
+  // prior memos on Pro, and has not made a decision, show the modal.
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/knowledge-graph/consent')
+      .then(r => (r.ok ? r.json() : null))
+      .then(data => {
+        if (!cancelled && data?.status) {
+          setKgConsent({ status: data.status, memoCount: data.memoCount ?? 0 });
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
   const [globalDrag, setGlobalDrag] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -1681,8 +1705,12 @@ export default function Dashboard() {
               <div className="card">
                 <EnhancedEmptyState
                   type="documents"
-                  title="Start your Decision Knowledge Graph"
-                  description="Drop a strategic memo, board deck, or market-entry recommendation in the upload zone. Get the bias audit, steering-committee objection simulation, and your first Knowledge Graph node in 60 seconds."
+                  title={`Start your ${knowledgeGraphLabel}`}
+                  description={
+                    isTeamPlan
+                      ? 'Drop a strategic memo, board deck, or market-entry recommendation in the upload zone. Get the bias audit, steering-committee objection simulation, and your first Knowledge Graph node in 60 seconds.'
+                      : 'Drop a strategic memo, board deck, or market-entry recommendation in the upload zone. Get the bias audit, the questions your CEO will ask, and your first entry in your Personal Decision History in 60 seconds.'
+                  }
                   showBrief
                   briefContext="documents"
                   actions={[
@@ -2234,6 +2262,18 @@ export default function Dashboard() {
 
       {/* Quick Scan Panel */}
       <QuickScanModal open={quickScanOpen} onClose={() => setQuickScanOpen(false)} />
+
+      {/* Knowledge Graph merge consent (shown when a Pro user's org
+          upgraded to Strategy and they have personal memos to decide on) */}
+      <KGMergeConsentModal
+        open={kgConsent?.status === 'pending'}
+        memoCount={kgConsent?.memoCount ?? 0}
+        onDecision={decision =>
+          setKgConsent(prev =>
+            prev ? { ...prev, status: decision === 'merged' ? 'merged' : 'private' } : prev
+          )
+        }
+      />
     </div>
   );
 }
