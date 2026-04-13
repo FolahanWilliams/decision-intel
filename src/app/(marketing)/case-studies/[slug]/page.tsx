@@ -145,7 +145,7 @@ function Card({ children, accent }: { children: React.ReactNode; accent?: string
         background: '#FFFFFF',
         border: `1px solid #E2E8F0`,
         borderLeft: accent ? `4px solid ${accent}` : '1px solid #E2E8F0',
-        borderRadius: 12,
+        borderRadius: 16,
         padding: 24,
       }}
     >
@@ -592,7 +592,7 @@ export default async function CaseStudyDetailPage({
               style={{
                 background: '#FEF3C7',
                 border: '1px solid #FCD34D',
-                borderRadius: 12,
+                borderRadius: 16,
                 padding: 16,
                 fontSize: 13,
                 color: '#92400E',

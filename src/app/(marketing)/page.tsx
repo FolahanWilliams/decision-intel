@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { trackEvent } from '@/lib/analytics/track';
 import { CaseStudyCarousel } from '@/components/marketing/CaseStudyCarousel';
 import { HeroTabs } from '@/components/marketing/HeroTabs';
+import { Reveal } from '@/components/ui/Reveal';
 import {
   Brain,
   FileSearch,
@@ -826,6 +827,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Four Moments (core value proposition) ───────────────────── */}
+      <Reveal>
       <section
         id="four-moments"
         style={{ maxWidth: 1200, margin: '0 auto', padding: '96px 24px' }}
@@ -998,11 +1000,13 @@ export default function LandingPage() {
           ))}
         </div>
       </section>
+      </Reveal>
 
       {/* ── Case Study Carousel ─────────────────────────────────────── */}
       <CaseStudyCarousel />
 
       {/* ── How It Works ────────────────────────────────────────────── */}
+      <Reveal>
       <section id="how-it-works" style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}>
         <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
           <p
@@ -1238,8 +1242,10 @@ export default function LandingPage() {
           </p>
         </div>
       </section>
+      </Reveal>
 
       {/* ── Features ────────────────────────────────────────────────── */}
+      <Reveal>
       <section id="features" style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}>
         <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
           <p
@@ -1344,6 +1350,7 @@ export default function LandingPage() {
           })}
         </div>
       </section>
+      </Reveal>
 
       {/* ── Pricing ─────────────────────────────────────────────────── */}
       <section id="pricing" style={{ background: C.slate50, borderTop: `1px solid ${C.slate200}` }}>
@@ -1607,6 +1614,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── FAQ + Competitor Comparison (quarter-point centered layout) ── */}
+      <Reveal>
       <section id="faq" style={{ maxWidth: 1400, margin: '0 auto', padding: '80px 24px' }}>
         {/* Two-column grid: each column centered at the page quarter-points
             (25% and 75% of the full width). The grid uses equal 1fr columns
@@ -1709,6 +1717,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+      </Reveal>
 
       {/* Responsive override for the 2-column FAQ layout on mobile */}
       <style>{`

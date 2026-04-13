@@ -13,7 +13,7 @@
 import { useEffect, useRef, useCallback, type MutableRefObject } from 'react';
 import { useFrame } from '@react-three/fiber';
 import type { GraphCanvasRef } from 'reagraph';
-import { Maximize2 } from 'lucide-react';
+import { RotateCcw } from 'lucide-react';
 
 // ─── SlowOrbit ───────────────────────────────────────────────────────────────
 
@@ -111,7 +111,7 @@ export function ResetViewButton({ graphRef, variant = 'light', style }: ResetVie
         e.currentTarget.style.color = isDark ? '#E2E8F0' : '#475569';
       }}
     >
-      <Maximize2 size={14} />
+      <RotateCcw size={14} />
     </button>
   );
 }

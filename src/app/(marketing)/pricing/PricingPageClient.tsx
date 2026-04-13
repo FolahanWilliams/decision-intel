@@ -598,7 +598,7 @@ export function PricingPageClient() {
             style={{
               overflowX: 'auto',
               WebkitOverflowScrolling: 'touch',
-              borderRadius: 12,
+              borderRadius: 16,
               border: `1px solid ${C.slate200}`,
               background: C.white,
             }}

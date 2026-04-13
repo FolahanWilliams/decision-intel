@@ -172,6 +172,7 @@ export function CaseStudyGrid({ cases, industries }: CaseStudyGridProps) {
             <Link
               key={c.slug}
               href={`/case-studies/${c.slug}`}
+              className="hover-card"
               onClick={() =>
                 trackEvent('case_study_grid_click', {
                   slug: c.slug,
@@ -186,9 +187,8 @@ export function CaseStudyGrid({ cases, industries }: CaseStudyGridProps) {
                 color: 'inherit',
                 background: '#FFFFFF',
                 border: `1px solid ${C.slate200}`,
-                borderRadius: 12,
+                borderRadius: 16,
                 padding: 20,
-                transition: 'transform 0.15s, box-shadow 0.15s',
               }}
             >
               <div
