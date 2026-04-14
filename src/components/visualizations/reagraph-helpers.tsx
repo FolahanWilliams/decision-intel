@@ -36,7 +36,7 @@ interface SlowOrbitProps {
 export function SlowOrbit({
   graphRef,
   degreesPerSecond = 5,
-  pauseMs = 3500,
+  pauseMs = 2000,
   startDelayMs = 1500,
 }: SlowOrbitProps) {
   const pausedUntilRef = useRef(0);
@@ -45,13 +45,45 @@ export function SlowOrbit({
   }, [startDelayMs]);
 
   useEffect(() => {
+    // Only pause orbit when the user actually drags or zooms — not on a
+    // simple click. We track pointerdown + distance: if the pointer moves
+    // more than a threshold before lifting, treat it as a drag and pause.
+    // Clicks (select a node, release in place) keep the graph in motion.
+    let downX = 0;
+    let downY = 0;
+    let dragging = false;
+    const DRAG_THRESHOLD_PX = 6;
+
     const pause = () => {
       pausedUntilRef.current = performance.now() + pauseMs;
     };
-    window.addEventListener('pointerdown', pause);
+
+    const onDown = (e: PointerEvent) => {
+      downX = e.clientX;
+      downY = e.clientY;
+      dragging = false;
+    };
+    const onMove = (e: PointerEvent) => {
+      if (dragging) return;
+      const dx = e.clientX - downX;
+      const dy = e.clientY - downY;
+      if (dx * dx + dy * dy > DRAG_THRESHOLD_PX * DRAG_THRESHOLD_PX) {
+        dragging = true;
+        pause();
+      }
+    };
+    const onUp = () => {
+      dragging = false;
+    };
+
+    window.addEventListener('pointerdown', onDown);
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
     window.addEventListener('wheel', pause, { passive: true });
     return () => {
-      window.removeEventListener('pointerdown', pause);
+      window.removeEventListener('pointerdown', onDown);
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
       window.removeEventListener('wheel', pause);
     };
   }, [pauseMs]);
@@ -232,6 +264,32 @@ export function withNarrativeTheme(base: Theme): Theme {
       : base.edge,
     arrow: base.arrow,
   };
+}
+
+// ─── SelectedGlow ────────────────────────────────────────────────────────────
+// Pulsing spherical halo rendered around the currently-selected node so the
+// selection reads at a glance without having to dim the rest of the graph.
+// Shape-agnostic: a bounding sphere works for boxes, octahedra, cylinders,
+// tetrahedra, etc. Drop it inside the renderNode group when `selected` is true.
+
+import type { Mesh, MeshBasicMaterial } from 'three';
+
+export function SelectedGlow({ size, color }: { size: number; color: string }) {
+  const ref = useRef<Mesh | null>(null);
+  useFrame(({ clock }) => {
+    if (!ref.current) return;
+    const t = clock.elapsedTime;
+    const s = 1.7 + Math.sin(t * 3.2) * 0.12;
+    ref.current.scale.setScalar(s);
+    const mat = ref.current.material as MeshBasicMaterial | undefined;
+    if (mat) mat.opacity = 0.28 + Math.sin(t * 3.2) * 0.1;
+  });
+  return (
+    <mesh ref={ref}>
+      <sphereGeometry args={[size, 24, 18]} />
+      <meshBasicMaterial color={color} transparent opacity={0.3} depthWrite={false} />
+    </mesh>
+  );
 }
 
 // ─── NodeHoverTooltip ────────────────────────────────────────────────────────

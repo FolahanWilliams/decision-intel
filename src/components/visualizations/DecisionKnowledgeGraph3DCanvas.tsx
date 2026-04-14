@@ -32,6 +32,7 @@ import {
   useEdgeNarrativeReveal,
   withNarrativeTheme,
   NodeHoverTooltip,
+  SelectedGlow,
 } from './reagraph-helpers';
 import {
   GraphCanvas,
@@ -56,7 +57,7 @@ const DARK_THEME: Theme = {
     activeFill: '#475569',
     opacity: 1,
     selectedOpacity: 1,
-    inactiveOpacity: 0.35,
+    inactiveOpacity: 1,
     label: {
       color: '#475569',
       activeColor: '#0F172A',
@@ -73,7 +74,7 @@ const DARK_THEME: Theme = {
     activeFill: '#64748B',
     opacity: 0.9,
     selectedOpacity: 1,
-    inactiveOpacity: 0.18,
+    inactiveOpacity: 1,
     label: {
       color: '#64748B',
       activeColor: '#0F172A',
@@ -218,7 +219,6 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
     const col = (node.fill as string | undefined) ?? '#60A5FA';
     const o = opacity ?? 1;
     const emissive = selected ? 0.4 : active ? 0.25 : 0.12;
-    const glow = selected || active;
 
     switch (type) {
       case 'analysis':
@@ -228,7 +228,8 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
               <icosahedronGeometry args={[size, 1]} />
               <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
             </mesh>
-            {glow && <mesh scale={[1.55, 1.55, 1.55]}><icosahedronGeometry args={[size, 1]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
+            {selected && <SelectedGlow size={size} color={col} />}
+            {!selected && active && <mesh scale={[1.55, 1.55, 1.55]}><icosahedronGeometry args={[size, 1]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
           </group>
         );
       case 'human_decision': {
@@ -239,7 +240,8 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
               <boxGeometry args={[s, s, s]} />
               <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
             </mesh>
-            {glow && <mesh scale={[1.55, 1.55, 1.55]}><boxGeometry args={[s, s, s]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
+            {selected && <SelectedGlow size={size} color={col} />}
+            {!selected && active && <mesh scale={[1.55, 1.55, 1.55]}><boxGeometry args={[s, s, s]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
           </group>
         );
       }
@@ -250,7 +252,8 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
               <sphereGeometry args={[size * 0.85, 12, 8]} />
               <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
             </mesh>
-            {glow && <mesh scale={[1.55, 1.55, 1.55]}><sphereGeometry args={[size * 0.85, 12, 8]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
+            {selected && <SelectedGlow size={size} color={col} />}
+            {!selected && active && <mesh scale={[1.55, 1.55, 1.55]}><sphereGeometry args={[size * 0.85, 12, 8]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
           </group>
         );
       case 'bias_pattern':
@@ -260,7 +263,8 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
               <tetrahedronGeometry args={[size, 0]} />
               <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
             </mesh>
-            {glow && <mesh scale={[1.55, 1.55, 1.55]}><tetrahedronGeometry args={[size, 0]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
+            {selected && <SelectedGlow size={size} color={col} />}
+            {!selected && active && <mesh scale={[1.55, 1.55, 1.55]}><tetrahedronGeometry args={[size, 0]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
           </group>
         );
       case 'outcome':
@@ -270,7 +274,8 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
               <cylinderGeometry args={[size * 0.8, size * 0.8, size * 2, 8]} />
               <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
             </mesh>
-            {glow && <mesh scale={[1.55, 1.55, 1.55]}><cylinderGeometry args={[size * 0.8, size * 0.8, size * 2, 8]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
+            {selected && <SelectedGlow size={size} color={col} />}
+            {!selected && active && <mesh scale={[1.55, 1.55, 1.55]}><cylinderGeometry args={[size * 0.8, size * 0.8, size * 2, 8]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
           </group>
         );
       default:

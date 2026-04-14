@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useCallback, useEffect, useMemo } from 'react';
+import { useRef, useCallback, useEffect, useMemo, useState } from 'react';
 import { DoubleSide, type Mesh, type MeshBasicMaterial } from 'three';
 import { useFrame } from '@react-three/fiber';
 import {
@@ -8,6 +8,8 @@ import {
   ResetViewButton,
   useEdgeNarrativeReveal,
   withNarrativeTheme,
+  NodeHoverTooltip,
+  SelectedGlow,
 } from '@/components/visualizations/reagraph-helpers';
 import {
   GraphCanvas,
@@ -174,7 +176,7 @@ const GRAPH_THEME: Theme = {
     activeFill: '#475569',
     opacity: 1,
     selectedOpacity: 1,
-    inactiveOpacity: 0.35,
+    inactiveOpacity: 1,
     label: { color: '#475569', activeColor: '#0F172A', stroke: '#FFFFFF', strokeWidth: 4 },
   },
   ring: { fill: '#16A34A', activeFill: '#22C55E' },
@@ -183,7 +185,7 @@ const GRAPH_THEME: Theme = {
     activeFill: '#64748B',
     opacity: 0.9,
     selectedOpacity: 1,
-    inactiveOpacity: 0.18,
+    inactiveOpacity: 1,
     label: { color: '#64748B', activeColor: '#0F172A' },
   },
   arrow: { fill: '#94A3B8', activeFill: '#475569' },
@@ -226,7 +228,8 @@ function renderNode({ node, size, opacity, active, selected }: NodeRendererProps
           <dodecahedronGeometry args={[size, 0]} />
           <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
         </mesh>
-        {glow && (
+        {selected && <SelectedGlow size={size} color={col} />}
+        {!selected && glow && (
           <mesh scale={[1.55, 1.55, 1.55]}>
             <dodecahedronGeometry args={[size, 0]} />
             <meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.08} />
@@ -244,7 +247,8 @@ function renderNode({ node, size, opacity, active, selected }: NodeRendererProps
         <octahedronGeometry args={[size, 0]} />
         <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
       </mesh>
-      {glow && (
+      {selected && <SelectedGlow size={size} color={col} />}
+      {!selected && glow && (
         <mesh scale={[1.6, 1.6, 1.6]}>
           <octahedronGeometry args={[size, 0]} />
           <meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} />
@@ -330,10 +334,43 @@ export default function CaseStudyBiasGraph3DCanvas({
     [selections, toggleSelection],
   );
 
+  // Hover tooltip
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const [hoverNodeId, setHoverNodeId] = useState<string | null>(null);
+  const [pointerPos, setPointerPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const handleNodePointerOver = useCallback(
+    (node: InternalGraphNode) => {
+      onNodePointerOver?.(node);
+      setHoverNodeId(node.id);
+    },
+    [onNodePointerOver],
+  );
+  const handleNodePointerOut = useCallback(
+    (node: InternalGraphNode) => {
+      onNodePointerOut?.(node);
+      setHoverNodeId(null);
+    },
+    [onNodePointerOut],
+  );
+  const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    const rect = wrapperRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    setPointerPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  }, []);
+  const hoveredNode = useMemo(
+    () => (hoverNodeId ? (nodes.find(n => n.id === hoverNodeId) ?? null) : null),
+    [hoverNodeId, nodes],
+  );
+  const hoveredData = hoveredNode?.data as CaseStudyNodeData | undefined;
+
   const memoRenderNode = useCallback(renderNode, []);
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <div
+      ref={wrapperRef}
+      onPointerMove={handlePointerMove}
+      style={{ position: 'relative', width: '100%', height: '100%' }}
+    >
       <GraphCanvas
         ref={graphRef}
         nodes={nodes}
@@ -347,8 +384,8 @@ export default function CaseStudyBiasGraph3DCanvas({
         actives={isRevealing && narrativeActives ? narrativeActives : actives}
         onNodeClick={onNodeClick}
         onCanvasClick={onCanvasClick}
-        onNodePointerOver={onNodePointerOver}
-        onNodePointerOut={onNodePointerOut}
+        onNodePointerOver={handleNodePointerOver}
+        onNodePointerOut={handleNodePointerOut}
         labelType="nodes"
         draggable
         defaultNodeSize={6}
@@ -362,6 +399,14 @@ export default function CaseStudyBiasGraph3DCanvas({
         <SlowOrbit graphRef={graphRef} startDelayMs={isRevealing ? 6500 : 1500} />
       </GraphCanvas>
       <ResetViewButton graphRef={graphRef} />
+      {hoveredNode && !isRevealing && (
+        <NodeHoverTooltip
+          title={(hoveredNode.label as string) ?? hoveredNode.id}
+          subtitle={hoveredData?.severity}
+          x={pointerPos.x}
+          y={pointerPos.y}
+        />
+      )}
     </div>
   );
 }

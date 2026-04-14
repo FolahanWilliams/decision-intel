@@ -19,6 +19,7 @@ import {
   useEdgeNarrativeReveal,
   withNarrativeTheme,
   NodeHoverTooltip,
+  SelectedGlow,
 } from '@/components/visualizations/reagraph-helpers';
 
 // ─── Shared types (exported so parent can access .data) ──────────────────────
@@ -467,7 +468,7 @@ const GRAPH_THEME: Theme = {
     activeFill: '#475569',
     opacity: 1,
     selectedOpacity: 1,
-    inactiveOpacity: 0.35,
+    inactiveOpacity: 1,
     label: {
       color: '#475569',
       activeColor: '#0F172A',
@@ -484,7 +485,7 @@ const GRAPH_THEME: Theme = {
     activeFill: '#64748B',
     opacity: 0.9,
     selectedOpacity: 1,
-    inactiveOpacity: 0.18,
+    inactiveOpacity: 1,
     label: {
       color: '#64748B',
       activeColor: '#0F172A',
@@ -674,12 +675,7 @@ export default function HeroDecisionGraph3DCanvas({
             <dodecahedronGeometry args={[size, 0]} />
             <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
           </mesh>
-          {selected && (
-            <mesh>
-              <dodecahedronGeometry args={[size * 1.55, 0]} />
-              <meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.1} />
-            </mesh>
-          )}
+          {selected && <SelectedGlow size={size} color={col} />}
         </group>
       );
     }
@@ -692,12 +688,7 @@ export default function HeroDecisionGraph3DCanvas({
             <octahedronGeometry args={[size, 0]} />
             <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
           </mesh>
-          {(active || selected) && (
-            <mesh>
-              <octahedronGeometry args={[size * 1.65, 0]} />
-              <meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} />
-            </mesh>
-          )}
+          {selected && <SelectedGlow size={size} color={col} />}
           {isPrimary && !selected && <PulsingHalo size={size} color={col} shape="octahedron" />}
         </group>
       );
@@ -710,12 +701,7 @@ export default function HeroDecisionGraph3DCanvas({
           <cylinderGeometry args={[size * 0.82, size * 0.82, size * 2.2, 8]} />
           <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
         </mesh>
-        {selected && (
-          <mesh>
-            <cylinderGeometry args={[size * 1.3, size * 1.3, size * 2.6, 8]} />
-            <meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.1} />
-          </mesh>
-        )}
+        {selected && <SelectedGlow size={size * 1.15} color={col} />}
       </group>
     );
   }, []);

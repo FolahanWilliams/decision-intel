@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useCallback, useEffect, useMemo } from 'react';
+import { useRef, useCallback, useEffect, useMemo, useState } from 'react';
 import { DoubleSide } from 'three';
 import {
   GraphCanvas,
@@ -17,6 +17,8 @@ import {
   ResetViewButton,
   useEdgeNarrativeReveal,
   withNarrativeTheme,
+  NodeHoverTooltip,
+  SelectedGlow,
 } from './reagraph-helpers';
 
 const SEVERITY_COLORS: Record<string, string> = {
@@ -101,7 +103,7 @@ const DARK_THEME: Theme = {
     activeFill: '#475569',
     opacity: 1,
     selectedOpacity: 1,
-    inactiveOpacity: 0.35,
+    inactiveOpacity: 1,
     label: { color: '#475569', activeColor: '#0F172A', stroke: '#FFFFFF', strokeWidth: 5 },
   },
   ring: { fill: '#16A34A', activeFill: '#22C55E' },
@@ -110,7 +112,7 @@ const DARK_THEME: Theme = {
     activeFill: '#64748B',
     opacity: 0.9,
     selectedOpacity: 1,
-    inactiveOpacity: 0.18,
+    inactiveOpacity: 1,
     label: { color: '#64748B', activeColor: '#0F172A' },
   },
   arrow: { fill: '#94A3B8', activeFill: '#475569' },
@@ -179,7 +181,6 @@ export default function BiasNetwork3DCanvas({ biases, onBiasSelect }: BiasNetwor
     const col = (node.fill as string) ?? '#EAB308';
     const o = opacity ?? 1;
     const emissive = selected ? 0.4 : active ? 0.25 : 0.12;
-    const glow = selected || active;
 
     return (
       <group>
@@ -187,7 +188,8 @@ export default function BiasNetwork3DCanvas({ biases, onBiasSelect }: BiasNetwor
           <octahedronGeometry args={[size, 0]} />
           <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
         </mesh>
-        {glow && (
+        {selected && <SelectedGlow size={size} color={col} />}
+        {!selected && active && (
           <mesh scale={[1.6, 1.6, 1.6]}>
             <octahedronGeometry args={[size, 0]} />
             <meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} />
@@ -197,8 +199,38 @@ export default function BiasNetwork3DCanvas({ biases, onBiasSelect }: BiasNetwor
     );
   }, []);
 
+  // Hover tooltip
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const [hoverNodeId, setHoverNodeId] = useState<string | null>(null);
+  const [hoverLabel, setHoverLabel] = useState<string>('');
+  const [pointerPos, setPointerPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const handleNodePointerOver = useCallback(
+    (node: InternalGraphNode) => {
+      onNodePointerOver?.(node);
+      setHoverNodeId(node.id);
+      setHoverLabel((node.label as string) ?? node.id);
+    },
+    [onNodePointerOver],
+  );
+  const handleNodePointerOut = useCallback(
+    (node: InternalGraphNode) => {
+      onNodePointerOut?.(node);
+      setHoverNodeId(null);
+    },
+    [onNodePointerOut],
+  );
+  const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    const rect = wrapperRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    setPointerPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  }, []);
+
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <div
+      ref={wrapperRef}
+      onPointerMove={handlePointerMove}
+      style={{ position: 'relative', width: '100%', height: '100%' }}
+    >
       <GraphCanvas
         ref={graphRef}
         nodes={nodes}
@@ -212,8 +244,8 @@ export default function BiasNetwork3DCanvas({ biases, onBiasSelect }: BiasNetwor
         actives={isRevealing && narrativeActives ? narrativeActives : actives}
         onNodeClick={onNodeClick}
         onCanvasClick={onCanvasClick}
-        onNodePointerOver={onNodePointerOver}
-        onNodePointerOut={onNodePointerOut}
+        onNodePointerOver={handleNodePointerOver}
+        onNodePointerOut={handleNodePointerOut}
         labelType="auto"
         draggable
         defaultNodeSize={5}
@@ -227,6 +259,9 @@ export default function BiasNetwork3DCanvas({ biases, onBiasSelect }: BiasNetwor
         <SlowOrbit graphRef={graphRef} startDelayMs={isRevealing ? 6500 : 1500} />
       </GraphCanvas>
       <ResetViewButton graphRef={graphRef} />
+      {hoverNodeId && !isRevealing && (
+        <NodeHoverTooltip title={hoverLabel} x={pointerPos.x} y={pointerPos.y} />
+      )}
     </div>
   );
 }
