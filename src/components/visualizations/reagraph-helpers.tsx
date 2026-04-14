@@ -86,6 +86,16 @@ interface UseEdgeNarrativeRevealOpts {
   durationMs?: number;
   /** If true, skip the narrative entirely (e.g., reduced-motion). */
   disabled?: boolean;
+  /**
+   * Optional semantic grouping of edges. Each inner array reveals together
+   * with a pause between groups — turns the reveal into a narrative beat
+   * (e.g., decisions appear, pause, toxic combos flash red, pause, outcomes
+   * cascade). Edges not listed in any group are appended as a final group.
+   */
+  edgeGroups?: string[][];
+  /** Pause between groups, in ms. Only applies when edgeGroups is provided. */
+  groupPauseMs?: number;
+  /** Current phase (0-indexed group) — useful for gating UI beats (labels). */
 }
 
 export function useEdgeNarrativeReveal({
@@ -94,8 +104,11 @@ export function useEdgeNarrativeReveal({
   storageKey,
   durationMs = 6000,
   disabled = false,
+  edgeGroups,
+  groupPauseMs = 500,
 }: UseEdgeNarrativeRevealOpts) {
-  const [revealedEdgeCount, setRevealedEdgeCount] = useState(0);
+  const [revealedIds, setRevealedIds] = useState<string[]>([]);
+  const [currentGroup, setCurrentGroup] = useState<number>(-1);
   const [done, setDone] = useState<boolean>(() => {
     if (disabled) return true;
     if (typeof window === 'undefined') return false;
@@ -106,9 +119,33 @@ export function useEdgeNarrativeReveal({
     }
   });
 
+  // Compute the ordered reveal schedule (group-aware if edgeGroups given).
+  const schedule = useMemo<Array<{ id: string; group: number }>>(() => {
+    if (!edgeGroups || edgeGroups.length === 0) {
+      return edgeIds.map(id => ({ id, group: 0 }));
+    }
+    const seen = new Set<string>();
+    const out: Array<{ id: string; group: number }> = [];
+    edgeGroups.forEach((grp, gi) => {
+      grp.forEach(id => {
+        if (!seen.has(id) && edgeIds.includes(id)) {
+          seen.add(id);
+          out.push({ id, group: gi });
+        }
+      });
+    });
+    // Any edges not listed in any group get appended as a final group.
+    const leftover = edgeIds.filter(id => !seen.has(id));
+    if (leftover.length > 0) {
+      const gi = edgeGroups.length;
+      leftover.forEach(id => out.push({ id, group: gi }));
+    }
+    return out;
+  }, [edgeIds, edgeGroups]);
+
   useEffect(() => {
     if (done || disabled) return;
-    if (edgeIds.length === 0) {
+    if (schedule.length === 0) {
       setDone(true);
       return;
     }
@@ -119,30 +156,57 @@ export function useEdgeNarrativeReveal({
       setDone(true);
       return;
     }
-    const perEdge = Math.max(60, durationMs / edgeIds.length);
+
+    // Budget: subtract pause slots from total duration, split remaining
+    // time across edge count. Each edge fires at its cumulative offset;
+    // the first edge of a new group lands after a groupPauseMs gap.
+    const groupCount = edgeGroups ? edgeGroups.length : 1;
+    const totalPauseMs = edgeGroups ? Math.max(0, groupCount - 1) * groupPauseMs : 0;
+    const perEdge = Math.max(60, (durationMs - totalPauseMs) / schedule.length);
+
     const timers: number[] = [];
-    for (let i = 1; i <= edgeIds.length; i++) {
-      timers.push(window.setTimeout(() => setRevealedEdgeCount(i), perEdge * i));
-    }
+    let cursor = 0;
+    let prevGroup = schedule[0].group;
+    setCurrentGroup(prevGroup);
+    schedule.forEach((item, i) => {
+      if (item.group !== prevGroup) {
+        cursor += groupPauseMs;
+        prevGroup = item.group;
+      }
+      cursor += perEdge;
+      const at = cursor;
+      timers.push(
+        window.setTimeout(() => {
+          setRevealedIds(prev => (prev.includes(item.id) ? prev : [...prev, item.id]));
+          setCurrentGroup(item.group);
+        }, at),
+      );
+      // dependency unused — keep lint quiet on `i`
+      void i;
+    });
+
     timers.push(
-      window.setTimeout(() => {
-        setDone(true);
-        try {
-          window.sessionStorage.setItem(storageKey, '1');
-        } catch {
-          /* storage blocked — ignore */
-        }
-      }, durationMs + 150),
+      window.setTimeout(
+        () => {
+          setDone(true);
+          try {
+            window.sessionStorage.setItem(storageKey, '1');
+          } catch {
+            /* storage blocked — ignore */
+          }
+        },
+        cursor + 150,
+      ),
     );
     return () => timers.forEach(t => window.clearTimeout(t));
-  }, [done, disabled, edgeIds, durationMs, storageKey]);
+  }, [done, disabled, schedule, edgeGroups, durationMs, groupPauseMs, storageKey]);
 
   const narrativeActives = useMemo<string[] | null>(() => {
     if (done) return null;
-    return [...nodeIds, ...edgeIds.slice(0, revealedEdgeCount)];
-  }, [done, nodeIds, edgeIds, revealedEdgeCount]);
+    return [...nodeIds, ...revealedIds];
+  }, [done, nodeIds, revealedIds]);
 
-  return { narrativeActives, isRevealing: !done };
+  return { narrativeActives, isRevealing: !done, currentGroup };
 }
 
 // ─── withNarrativeTheme ──────────────────────────────────────────────────────

@@ -559,9 +559,24 @@ export default function HeroDecisionGraph3DCanvas({
 
   const nodeIds = useMemo(() => NODES.map(n => n.id), []);
   const edgeIds = useMemo(() => EDGES.map(e => e.id), []);
-  const { narrativeActives, isRevealing } = useEdgeNarrativeReveal({
+  // Narrative groups: decisions→biases (gaps), toxic combos (compounds),
+  // bias→outcome + cascade (cost). Pausing between each makes the reveal
+  // read as reasoning unfolding instead of one continuous sweep.
+  const edgeGroups = useMemo<string[][]>(() => {
+    const decisionToBias: string[] = [];
+    const toxicCombos: string[] = [];
+    const outcomes: string[] = [];
+    for (const e of EDGES) {
+      if (e.fill === '#DC2626') toxicCombos.push(e.id);
+      else if (e.fill === '#7C3AED' || e.fill === '#A78BFA') outcomes.push(e.id);
+      else decisionToBias.push(e.id);
+    }
+    return [decisionToBias, toxicCombos, outcomes];
+  }, []);
+  const { narrativeActives, isRevealing, currentGroup } = useEdgeNarrativeReveal({
     nodeIds,
     edgeIds,
+    edgeGroups,
     storageKey: 'di-graph-narrative:hero-decision',
   });
   const narrativeTheme = useMemo(() => withNarrativeTheme(GRAPH_THEME), []);
@@ -685,7 +700,7 @@ export default function HeroDecisionGraph3DCanvas({
         onCanvasClick={onCanvasClick}
         onNodePointerOver={onNodePointerOver}
         onNodePointerOut={onNodePointerOut}
-        labelType="nodes"
+        labelType={isRevealing && currentGroup === 1 ? 'all' : 'nodes'}
         edgeLabelPosition="natural"
         draggable
         defaultNodeSize={7}
