@@ -493,20 +493,20 @@ export function SelectedGlow({
       {/* Inner glass core — fixed size, light tint of node color. The
          halo's "body" — visible at rest, but never solid. */}
       <FresnelShell
-        size={size * 1.3}
+        size={size * 1.15}
         color={color}
         shape={shape}
         cylinder={cylinder}
         power={2.4}
         intensity={0.45}
         baseTint={0.11}
-        pulseSpeed={1.6}
+        pulseSpeed={1.0}
         pulseDepth={0.18}
       />
       {/* Two radiating waves, half a cycle apart, so a new wave is always
          emerging while the previous one fades into the background. */}
       <RadiatingShell
-        baseSize={size * 1.3}
+        baseSize={size * 1.15}
         color={color}
         shape={shape}
         cylinder={cylinder}
@@ -514,12 +514,12 @@ export function SelectedGlow({
         peakIntensity={0.5}
         peakBaseTint={0.1}
         startScale={1}
-        endScale={2.4}
-        cycleSeconds={2.6}
+        endScale={1.65}
+        cycleSeconds={4.3}
         phase={0}
       />
       <RadiatingShell
-        baseSize={size * 1.3}
+        baseSize={size * 1.15}
         color={color}
         shape={shape}
         cylinder={cylinder}
@@ -527,9 +527,9 @@ export function SelectedGlow({
         peakIntensity={0.5}
         peakBaseTint={0.1}
         startScale={1}
-        endScale={2.4}
-        cycleSeconds={2.6}
-        phase={1.3}
+        endScale={1.65}
+        cycleSeconds={4.3}
+        phase={2.15}
       />
     </group>
   );
