@@ -1,7 +1,7 @@
 'use client';
 
 import { createClient } from '@/utils/supabase/client';
-import { Suspense, useState, type FormEvent } from 'react';
+import { Suspense, useState, useEffect, type FormEvent } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import {
@@ -53,11 +53,36 @@ function LoginContent() {
   const [formError, setFormError] = useState<string | null>(null);
   const [signupSuccess, setSignupSuccess] = useState(false);
 
+  // Errors delivered in the URL hash fragment by Supabase (e.g. otp_expired).
+  // The server callback redirects to /login?error=true and Supabase appends
+  // #error_code=...&error_description=... — only the client can read the hash.
+  const [hashError, setHashError] = useState<{ code: string; description: string } | null>(null);
+  const [resending, setResending] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState(false);
+
   const searchParams = useSearchParams();
   const authError = searchParams.get('error');
   const errorMessage = getErrorMessage(authError);
 
   const redirectTo = searchParams.get('redirect');
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const raw = window.location.hash.slice(1);
+    if (!raw) return;
+    const params = new URLSearchParams(raw);
+    const code = params.get('error_code');
+    const description = params.get('error_description') ?? '';
+    if (code) {
+      setHashError({ code, description });
+      // Clean the hash so refresh / back-nav doesn't re-show a stale error.
+      window.history.replaceState(
+        null,
+        '',
+        window.location.pathname + window.location.search
+      );
+    }
+  }, []);
 
   const handleGoogleLogin = async () => {
     setLoading(true);
@@ -123,6 +148,53 @@ function LoginContent() {
     setMode(m => (m === 'signin' ? 'signup' : 'signin'));
     setFormError(null);
   };
+
+  const handleResendConfirmation = async () => {
+    if (!email) {
+      setFormError('Enter your email below, then click resend.');
+      return;
+    }
+    setResending(true);
+    setFormError(null);
+    try {
+      const supabase = createClient();
+      const callbackUrl = new URL('/api/auth/callback', location.origin);
+      if (redirectTo) callbackUrl.searchParams.set('redirect', redirectTo);
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+        options: { emailRedirectTo: callbackUrl.toString() },
+      });
+      if (error) throw error;
+      setResendSuccess(true);
+      setHashError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Could not resend confirmation email.';
+      setFormError(message);
+    } finally {
+      setResending(false);
+    }
+  };
+
+  // Translate Supabase hash-error codes into user-facing copy.
+  const hashErrorMessage = (() => {
+    if (!hashError) return null;
+    const { code, description } = hashError;
+    const lowerDesc = description.toLowerCase();
+    if (code === 'otp_expired' || (code === 'access_denied' && lowerDesc.includes('email link'))) {
+      return 'This confirmation link expired, was already used, or was opened in a different browser. Enter your email below to send a new one.';
+    }
+    if (code === 'access_denied') {
+      return 'Sign-in was cancelled or denied.';
+    }
+    return description || 'Authentication failed. Please try again.';
+  })();
+
+  const canResend =
+    !!hashError &&
+    (hashError.code === 'otp_expired' ||
+      (hashError.code === 'access_denied' &&
+        hashError.description.toLowerCase().includes('email link')));
 
   return (
     <div
@@ -397,8 +469,82 @@ function LoginContent() {
                   </p>
                 </div>
 
+                {/* Hash-fragment error (Supabase auth flow failures like otp_expired).
+                    Takes priority over the URL-level error because it carries the specific
+                    reason; the URL-level ?error=true is only the generic fallback. */}
+                {hashError && !resendSuccess && (
+                  <div
+                    role="alert"
+                    style={{
+                      padding: '12px 14px',
+                      marginBottom: '1rem',
+                      fontSize: '0.82rem',
+                      color: 'var(--error)',
+                      background: 'rgba(239, 68, 68, 0.08)',
+                      border: '1px solid rgba(239, 68, 68, 0.2)',
+                      borderRadius: '12px',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '8px',
+                    }}
+                  >
+                    <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: '1px' }} />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ lineHeight: 1.5 }}>{hashErrorMessage}</div>
+                      {canResend && (
+                        <button
+                          type="button"
+                          onClick={handleResendConfirmation}
+                          disabled={resending}
+                          style={{
+                            marginTop: 10,
+                            padding: 0,
+                            background: 'none',
+                            border: 'none',
+                            color: 'var(--accent-primary, #16A34A)',
+                            textDecoration: 'underline',
+                            textUnderlineOffset: '2px',
+                            cursor: resending ? 'not-allowed' : 'pointer',
+                            fontSize: '0.8rem',
+                            fontWeight: 600,
+                            fontFamily: 'inherit',
+                            opacity: resending ? 0.6 : 1,
+                          }}
+                        >
+                          {resending ? 'Sending…' : 'Resend confirmation email'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Success state after resend */}
+                {resendSuccess && (
+                  <div
+                    role="status"
+                    style={{
+                      padding: '12px 14px',
+                      marginBottom: '1rem',
+                      fontSize: '0.82rem',
+                      color: 'var(--accent-primary, #16A34A)',
+                      background: 'rgba(22,163,74,0.08)',
+                      border: '1px solid rgba(22,163,74,0.25)',
+                      borderRadius: '12px',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '8px',
+                    }}
+                  >
+                    <CheckCircle size={16} style={{ flexShrink: 0, marginTop: '1px' }} />
+                    <span>
+                      Confirmation email sent to <strong>{email}</strong>. Check your inbox and
+                      click the link from the same browser.
+                    </span>
+                  </div>
+                )}
+
                 {/* URL-level error (OAuth failures, expired sessions, etc.) */}
-                {errorMessage && !formError && (
+                {errorMessage && !formError && !hashError && (
                   <div
                     role="alert"
                     style={{
