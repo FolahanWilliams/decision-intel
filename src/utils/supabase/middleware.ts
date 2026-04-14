@@ -68,8 +68,10 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // If user is signed in and current path is / or /login route, redirect to /dashboard
-  if (user && (request.nextUrl.pathname === '/' || request.nextUrl.pathname === '/login')) {
+  // If user is signed in and lands on /login, bounce to /dashboard.
+  // The landing page (/) stays accessible so returning visitors can revisit
+  // marketing copy, share links, or check the demo without being kicked out.
+  if (user && request.nextUrl.pathname === '/login') {
     const url = request.nextUrl.clone();
     url.pathname = '/dashboard';
     return NextResponse.redirect(url);
