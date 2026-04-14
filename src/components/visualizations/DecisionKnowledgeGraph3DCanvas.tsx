@@ -25,7 +25,12 @@ import {
   useMemo,
 } from 'react';
 import { DoubleSide } from 'three';
-import { SlowOrbit, ResetViewButton, useEdgeNarrativeReveal } from './reagraph-helpers';
+import {
+  SlowOrbit,
+  ResetViewButton,
+  useEdgeNarrativeReveal,
+  withNarrativeTheme,
+} from './reagraph-helpers';
 import {
   GraphCanvas,
   type GraphCanvasRef,
@@ -134,6 +139,7 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
     edgeIds,
     storageKey: 'di-graph-narrative:decision-knowledge',
   });
+  const narrativeTheme = useMemo(() => withNarrativeTheme(DARK_THEME), []);
 
   const {
     selections,
@@ -255,7 +261,7 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
         layoutType="forceDirected3d"
         cameraMode="rotate"
         animated={false}
-        theme={DARK_THEME}
+        theme={isRevealing ? narrativeTheme : DARK_THEME}
         renderNode={renderNode}
         selections={selections}
         actives={isRevealing && narrativeActives ? narrativeActives : actives}
@@ -274,7 +280,7 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
         <directionalLight position={[20, 20, 10]} intensity={1.2} />
         <directionalLight position={[-15, -10, -8]} intensity={0.4} color="#FFFFFF" />
         <pointLight position={[0, 30, 10]} intensity={0.6} color="#FFFFFF" />
-        <SlowOrbit graphRef={graphRef} startDelayMs={isRevealing ? 4500 : 1500} />
+        <SlowOrbit graphRef={graphRef} startDelayMs={isRevealing ? 6500 : 1500} />
       </GraphCanvas>
       <ResetViewButton graphRef={graphRef} />
     </div>

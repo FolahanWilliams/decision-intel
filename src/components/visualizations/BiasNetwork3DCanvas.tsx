@@ -12,7 +12,12 @@ import {
   type Theme,
   useSelection,
 } from 'reagraph';
-import { SlowOrbit, ResetViewButton, useEdgeNarrativeReveal } from './reagraph-helpers';
+import {
+  SlowOrbit,
+  ResetViewButton,
+  useEdgeNarrativeReveal,
+  withNarrativeTheme,
+} from './reagraph-helpers';
 
 const SEVERITY_COLORS: Record<string, string> = {
   critical: '#EF4444',
@@ -138,6 +143,7 @@ export default function BiasNetwork3DCanvas({ biases, onBiasSelect }: BiasNetwor
     edgeIds,
     storageKey: 'di-graph-narrative:bias-network',
   });
+  const narrativeTheme = useMemo(() => withNarrativeTheme(DARK_THEME), []);
 
   const {
     selections,
@@ -200,7 +206,7 @@ export default function BiasNetwork3DCanvas({ biases, onBiasSelect }: BiasNetwor
         layoutType="forceDirected3d"
         cameraMode="rotate"
         animated={false}
-        theme={DARK_THEME}
+        theme={isRevealing ? narrativeTheme : DARK_THEME}
         renderNode={renderNode}
         selections={selections}
         actives={isRevealing && narrativeActives ? narrativeActives : actives}
@@ -218,7 +224,7 @@ export default function BiasNetwork3DCanvas({ biases, onBiasSelect }: BiasNetwor
         <directionalLight position={[20, 20, 10]} intensity={1.2} />
         <directionalLight position={[-15, -10, -8]} intensity={0.4} color="#FFFFFF" />
         <pointLight position={[0, 30, 10]} intensity={0.6} color="#FFFFFF" />
-        <SlowOrbit graphRef={graphRef} startDelayMs={isRevealing ? 4500 : 1500} />
+        <SlowOrbit graphRef={graphRef} startDelayMs={isRevealing ? 6500 : 1500} />
       </GraphCanvas>
       <ResetViewButton graphRef={graphRef} />
     </div>

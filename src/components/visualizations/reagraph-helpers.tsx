@@ -19,7 +19,7 @@ import {
   type MutableRefObject,
 } from 'react';
 import { useFrame } from '@react-three/fiber';
-import type { GraphCanvasRef } from 'reagraph';
+import type { GraphCanvasRef, Theme } from 'reagraph';
 import { RotateCcw } from 'lucide-react';
 
 // ─── SlowOrbit ───────────────────────────────────────────────────────────────
@@ -92,7 +92,7 @@ export function useEdgeNarrativeReveal({
   nodeIds,
   edgeIds,
   storageKey,
-  durationMs = 4000,
+  durationMs = 6000,
   disabled = false,
 }: UseEdgeNarrativeRevealOpts) {
   const [revealedEdgeCount, setRevealedEdgeCount] = useState(0);
@@ -143,6 +143,31 @@ export function useEdgeNarrativeReveal({
   }, [done, nodeIds, edgeIds, revealedEdgeCount]);
 
   return { narrativeActives, isRevealing: !done };
+}
+
+// ─── withNarrativeTheme ──────────────────────────────────────────────────────
+// Clone a reagraph theme with aggressively dimmed `inactiveOpacity` so edges
+// and nodes not yet revealed are nearly invisible during the narrative reveal.
+// After the reveal ends, callers switch back to the base theme, so normal
+// hover behavior (inactive ≈ 0.18–0.35) is preserved.
+
+export function withNarrativeTheme(base: Theme): Theme {
+  return {
+    ...base,
+    node: base.node
+      ? {
+          ...base.node,
+          inactiveOpacity: 0.22,
+        }
+      : base.node,
+    edge: base.edge
+      ? {
+          ...base.edge,
+          inactiveOpacity: 0.03,
+        }
+      : base.edge,
+    arrow: base.arrow,
+  };
 }
 
 // ─── ResetViewButton ─────────────────────────────────────────────────────────

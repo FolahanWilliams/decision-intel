@@ -17,6 +17,7 @@ import {
   SlowOrbit,
   ResetViewButton,
   useEdgeNarrativeReveal,
+  withNarrativeTheme,
 } from '@/components/visualizations/reagraph-helpers';
 
 // ─── Shared types (exported so parent can access .data) ──────────────────────
@@ -563,6 +564,7 @@ export default function HeroDecisionGraph3DCanvas({
     edgeIds,
     storageKey: 'di-graph-narrative:hero-decision',
   });
+  const narrativeTheme = useMemo(() => withNarrativeTheme(GRAPH_THEME), []);
 
   const {
     selections,
@@ -675,7 +677,7 @@ export default function HeroDecisionGraph3DCanvas({
         layoutType="forceDirected3d"
         cameraMode="rotate"
         animated={false}
-        theme={GRAPH_THEME}
+        theme={isRevealing ? narrativeTheme : GRAPH_THEME}
         renderNode={renderNode}
         selections={selections}
         actives={isRevealing && narrativeActives ? narrativeActives : actives}
@@ -695,7 +697,7 @@ export default function HeroDecisionGraph3DCanvas({
         <directionalLight position={[15, 15, 10]} intensity={1.2} />
         <directionalLight position={[-10, -8, -5]} intensity={0.4} color="#FFFFFF" />
         <pointLight position={[0, 20, 5]} intensity={0.6} color="#FFFFFF" />
-        <SlowOrbit graphRef={graphRef} startDelayMs={isRevealing ? 4500 : 1500} />
+        <SlowOrbit graphRef={graphRef} startDelayMs={isRevealing ? 6500 : 1500} />
       </GraphCanvas>
       <ResetViewButton graphRef={graphRef} />
     </div>
