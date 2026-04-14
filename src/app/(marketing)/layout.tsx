@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Decision Intel — Grammarly for Strategic Decisions | AI Bias & Noise Detection',
+  title: 'Decision Intel — Audit Strategic Memos Before the Board Sees Them',
   description:
-    "Decision Intel is the AI-powered decision hygiene platform that detects cognitive bias, measures decision noise, and calibrates your team's judgment — like Grammarly for strategic decisions. Used by corporate strategy teams, M&A departments, executive committees, and boards.",
+    'Decision Intel audits strategic memos, board decks, and market-entry recommendations in 60 seconds. 30+ cognitive biases detected, steering-committee questions predicted, outcomes tracked in a living Decision Knowledge Graph. Built for corporate strategy teams.',
   openGraph: {
-    title: 'Decision Intel — Grammarly for Strategic Decisions',
+    title: 'Decision Intel — Audit Strategic Memos Before the Board Sees Them',
     description:
-      'Detect cognitive bias and decision noise in any strategic document — board memos, deal theses, strategy proposals. AI-powered, always-on, <60 seconds per audit.',
+      'Audit any strategic memo, board deck, or market-entry recommendation in 60 seconds. 30+ cognitive biases, predicted CEO/board questions, and a Decision Knowledge Graph that compounds quarter after quarter.',
     url: '/',
     siteName: 'Decision Intel',
     type: 'website',
@@ -15,31 +15,30 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Decision Intel — Grammarly for Strategic Decisions',
+    title: 'Decision Intel — Audit Strategic Memos Before the Board Sees Them',
     description:
-      'Every strategic memo has hidden biases. We find them in <60 seconds — before they cost your organization millions.',
+      'The same lens that exposed Kodak, Blockbuster, and Nokia now audits your strategic memos in 60 seconds.',
   },
   keywords: [
     // Core positioning
-    'grammarly for decisions',
-    'decision hygiene platform',
+    'strategic memo audit',
+    'decision intelligence platform',
     'cognitive bias detection AI',
-    'decision noise reduction',
+    'decision knowledge graph',
     // Enterprise audiences
-    'M&A decision audit',
-    'corporate strategy bias detection',
-    'executive committee analysis',
-    'board decision quality',
-    'executive decision-making tool',
+    'corporate strategy tool',
+    'chief strategy officer software',
+    'steering committee preparation',
+    'board deck review',
+    'market entry analysis',
     // Product capabilities
     'AI bias detection',
-    'decision intelligence platform',
+    'decision quality index',
     'strategic risk assessment',
     'cognitive audit software',
     'decision playbooks',
     'compliance mapping SOX FCA',
     'outcome tracking',
-    'decision knowledge graph',
     // Research-backed
     'Kahneman decision noise',
     'cognitive bias enterprise',
@@ -65,61 +64,67 @@ const jsonLd = [
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
     name: 'Decision Intel',
-    alternateName: 'Grammarly for Strategic Decisions',
     applicationCategory: 'BusinessApplication',
     applicationSubCategory: 'Decision Intelligence',
     operatingSystem: 'Web',
     url: siteUrl,
     description:
-      'AI-powered decision hygiene platform that detects cognitive bias and noise in high-stakes enterprise decisions. Like Grammarly catches grammar errors before you hit send, Decision Intel catches cognitive biases before you sign the deal. Built for corporate strategy teams, M&A departments, executive committees, and boards.',
+      'Decision intelligence platform for corporate strategy teams. Upload strategic memos, board decks, and market-entry recommendations; get a 60-second audit that scores 30+ cognitive biases, predicts steering-committee objections, and adds every decision to a living Decision Knowledge Graph that compounds quarter after quarter.',
     featureList: [
-      '20+ cognitive bias types detected automatically',
-      'Decision noise measurement via 3-judge AI jury',
+      '30+ cognitive biases detected automatically',
+      'Steering-committee question prediction (CEO, board, parent company)',
+      'Decision Knowledge Graph — compounds across every memo',
+      'Decision Quality Index (DQI) — score every memo, benchmark across 146 historical decisions',
       'Toxic combination detection (compound bias patterns)',
       'Compliance mapping: SOX, FCA, EU AI Act, Basel III, GDPR, SEC, LPOA',
       'Audit Defense Packet PDF export with regulatory citations',
       'Passive outcome inference from documents, Slack, and web intelligence',
-      'Decision knowledge graph with entity resolution',
       'Calibrated risk scoring that improves with every confirmed outcome',
-      'Dr. Red Team adversarial challenge persona',
-      'Playbook auto-suggestion based on detected bias fingerprint',
+      'Boardroom Simulation — rehearse objections before the real meeting',
     ],
     offers: [
       {
         '@type': 'Offer',
-        name: 'Starter',
+        name: 'Free',
         price: '0',
         priceCurrency: 'USD',
         description:
-          'Free — 3 decision analyses per month. Try the bias engine on any strategic document.',
+          'Free — 4 memo audits per month. See what we flag on any strategic document.',
       },
       {
         '@type': 'Offer',
         name: 'Professional',
-        price: '349',
+        price: '99',
         priceCurrency: 'USD',
         priceSpecification: {
           '@type': 'UnitPriceSpecification',
-          price: '349',
+          price: '99',
           priceCurrency: 'USD',
           billingDuration: 'P1M',
         },
         description:
-          'For decision-makers running strategic documents through the bias engine. 50 analyses/month, 20+ bias types, outcome tracking.',
+          'For the high-stakes strategist. 15 audits/month, 30+ bias types, forgotten-question prediction, and your Personal Decision History.',
       },
       {
         '@type': 'Offer',
-        name: 'Team',
-        price: '999',
+        name: 'Strategy',
+        price: '2499',
         priceCurrency: 'USD',
         priceSpecification: {
           '@type': 'UnitPriceSpecification',
-          price: '999',
+          price: '2499',
           priceCurrency: 'USD',
           billingDuration: 'P1M',
         },
         description:
-          'For decision committees with pipeline + Slack integration. 250 analyses/month, Decision Rooms, compliance mapping, team calibration.',
+          'For corporate strategy teams. Unlimited audits, team Decision Knowledge Graph, Decision Rooms, Slack + Drive integrations, compliance mapping, and team calibration.',
+      },
+      {
+        '@type': 'Offer',
+        name: 'Enterprise',
+        priceCurrency: 'USD',
+        description:
+          'For Fortune 500 strategy functions. Multi-division deployment, SSO, custom taxonomy, dedicated support, SLA. Contact sales.',
       },
     ],
     screenshot: `${siteUrl}/opengraph-image`,
@@ -133,13 +138,13 @@ const jsonLd = [
     url: siteUrl,
     logo: `${siteUrl}/logo.png`,
     description:
-      'Decision Intel is the AI-powered cognitive bias detection platform for corporate strategy and M&A teams. Audit strategic documents for hidden biases, measure decision noise, and track outcomes.',
+      'Decision Intel is a decision intelligence platform for corporate strategy teams. Audit strategic memos and board decks for 30+ cognitive biases, predict steering-committee questions, and compound every decision into a living Decision Knowledge Graph.',
     foundingDate: '2024',
     sameAs: ['https://www.linkedin.com/company/decision-intel'],
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'sales',
-      url: `${siteUrl}/#pricing`,
+      url: `${siteUrl}/pricing`,
     },
   },
 
@@ -177,7 +182,7 @@ const jsonLd = [
         name: 'How is Decision Intel different from ChatGPT?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'ChatGPT gives one opinion from one model. Decision Intel uses 3 independent judges for noise measurement, a 20×20 bias interaction matrix for compound scoring, 31 domain-specific biases, and an outcome flywheel that gets smarter with every decision.',
+          text: 'ChatGPT gives one opinion from one model. Decision Intel uses 3 independent judges for noise measurement, a bias interaction matrix for compound scoring, 30+ cognitive biases benchmarked across 146 historical decisions, and an outcome flywheel that gets smarter with every confirmed decision.',
         },
       },
     ],

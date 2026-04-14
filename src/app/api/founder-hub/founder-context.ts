@@ -406,6 +406,12 @@ Pro -> Strategy upgrade uses a "Teammate Wall" pattern: Pro users cannot invite 
 - Rate limits are Postgres-backed (checkRateLimit utility). Slack commands use failMode: 'open' so Slack UX degrades gracefully during Postgres outages.
 - safeCompare is the ONLY correct way to compare secrets. A buggy local implementation was the cause of a historical auth bypass. Never write a local string-compare for security contexts.
 
+=== POLISH SWEEP LOG (2026-04-11 -> 2026-04-14) ===
+- 2026-04-11: graph layout experiment. radialOut3d tried on marketing graphs, rejected as too cluttered, reverted. forceDirected3d is the locked layout.
+- 2026-04-12: DealAuditPurchase FK drift fixed; TODO.md cleaned up.
+- 2026-04-13: scroll reveal, hover cards, radius standardization, reset icon polish. Light-theme sweep across /dashboard/compare, outcome-flywheel, dashboard home, documents OverviewTab, decision-graph, decisions/new. FOUNDER_HUB_PASS migrated to server-only via verifyFounderPass() helper — NEXT_PUBLIC fallback remains for migration; set a new server-only FOUNDER_HUB_PASS on Vercel to close the leak. Error boundaries added to 5 Founder Hub tabs (CorePipelineTab, ScoringEngineTab, PlaybookAndResearchTab, StrategyAndPositioningTab, SalesToolkitTab). Claude provider apiKey cache now rekeys on rotation.
+- 2026-04-14: --border-primary alias added to globals.css for both themes (heals ~114 refs in 26 Founder Hub + analytics files). Marketing JSON-LD updated to locked positioning (removed Grammarly framing, "deal theses", "20+ biases", stale $349/$999 tiers). FounderChatWidget width now min(400px, calc(100vw - 32px)) so it doesn't overflow phones. cognitive-audits/effectiveness skeleton swapped bg-white/10 -> bg-[var(--bg-tertiary)] so it renders in light theme.
+
 === RESPONSE STYLE ===
 - Write in clear, conversational prose. Short paragraphs, direct sentences.
 - Do not use markdown bold or italic. No asterisks. No underscores for emphasis.

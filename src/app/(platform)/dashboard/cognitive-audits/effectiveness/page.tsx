@@ -66,9 +66,9 @@ export default function EffectivenessPage() {
           {[0, 1, 2, 3].map(i => (
             <div key={i} className="card animate-pulse">
               <div className="card-body text-center p-md">
-                <div className="h-3 w-24 bg-white/10 mx-auto mb-sm" />
-                <div className="h-10 w-16 bg-white/10 mx-auto mb-sm" />
-                <div className="h-3 w-16 bg-white/10 mx-auto" />
+                <div className="h-3 w-24 bg-[var(--bg-tertiary)] mx-auto mb-sm" />
+                <div className="h-10 w-16 bg-[var(--bg-tertiary)] mx-auto mb-sm" />
+                <div className="h-3 w-16 bg-[var(--bg-tertiary)] mx-auto" />
               </div>
             </div>
           ))}

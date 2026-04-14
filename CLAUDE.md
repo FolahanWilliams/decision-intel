@@ -130,7 +130,7 @@ src/
   - Text: `--text-primary`, `--text-secondary`, `--text-muted`, `--text-highlight`
   - Accent: `--accent-primary` (#16A34A green), `--accent-secondary`, `--accent-tertiary`
   - Severity: `--success`, `--warning`, `--error`, `--info`, `--severity-high`, `--severity-critical`
-  - Borders: `--border-color`, `--border-active`, `--border-hover`
+  - Borders: `--border-color`, `--border-active`, `--border-hover`, `--border-primary` (alias for `--border-color`; used by ~114 refs across Founder Hub + analytics components — must stay defined in BOTH `:root` and `.dark` blocks, otherwise those components fall through to browser default #333 in light theme)
   - Shadows: `--shadow-sm`, `--shadow-md`, `--shadow-lg`, `--liquid-shadow`
   - Radius: `--radius-sm` (4px), `--radius-md` (8px), `--radius-lg` (12px), `--radius-xl` (16px), `--radius-full` (9999px)
 - Dark mode uses `.dark` class via next-themes. Both themes are fully supported.

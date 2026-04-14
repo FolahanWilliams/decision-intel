@@ -70,6 +70,10 @@
   --border-color: rgba(0, 0, 0, 0.15);
   --border-active: rgba(0, 0, 0, 0.28);
   --border-hover: rgba(0, 0, 0, 0.2);
+  /* Alias: --border-primary is used by Founder Hub + analytics components.
+     Keep it synced with --border-color so those components render correctly
+     in light theme (previously fell back to browser default #333). */
+  --border-primary: rgba(0, 0, 0, 0.15);
 
   /* Severity — vivid, saturated */
   --success: #16a34a;
@@ -214,6 +218,7 @@
   --border-color: rgba(22, 163, 74, 0.12);
   --border-active: rgba(22, 163, 74, 0.5);
   --border-hover: rgba(22, 163, 74, 0.25);
+  --border-primary: rgba(22, 163, 74, 0.12);
 
   /* Severity — vivid, saturated */
   --success: #34d399;
