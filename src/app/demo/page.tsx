@@ -346,7 +346,7 @@ export default function DemoPage() {
                   <Loader2 size={14} className="animate-spin" /> Loading...
                 </span>
               ) : (
-                'Try Your Own Document'
+                'Audit Your Own Memo'
               )}
             </button>
           </div>
@@ -365,17 +365,6 @@ export default function DemoPage() {
         <SectionBand bg={C.slate50} borderTop paddingY={72}>
           <Reveal>
             <div style={{ textAlign: 'center', marginBottom: 40 }}>
-              <div
-                style={{
-                  fontSize: 11,
-                  color: C.green,
-                  marginBottom: 12,
-                  letterSpacing: '0.12em',
-                  fontWeight: 700,
-                }}
-              >
-                INTERACTIVE DEMO
-              </div>
               <h2
                 style={{
                   fontSize: 'clamp(28px, 5vw, 38px)',
@@ -386,7 +375,7 @@ export default function DemoPage() {
                   letterSpacing: '-0.02em',
                 }}
               >
-                Pick a famous corporate decision.
+                Audit a famous corporate decision in 60 seconds.
               </h2>
               <p
                 style={{
@@ -397,8 +386,9 @@ export default function DemoPage() {
                   lineHeight: 1.6,
                 }}
               >
-                Watch Decision Intel score the cognitive biases, predict the questions a steering
-                committee would raise, and map the decision into your Knowledge Graph — in 60 seconds.
+                Pick one below. Decision Intel will score 30+ cognitive biases, predict the
+                questions your steering committee would raise, and map the decision into a
+                Knowledge Graph that compounds across every audit you run.
               </p>
             </div>
 
@@ -459,8 +449,8 @@ export default function DemoPage() {
                       <div className="text-base font-bold text-slate-900 mb-1.5 leading-tight">
                         {a.shortName}
                       </div>
-                      <div className="text-sm text-slate-500 leading-relaxed line-clamp-2">
-                        {a.summary.slice(0, 140)}...
+                      <div className="text-sm text-slate-500 leading-relaxed">
+                        {a.teaser}
                       </div>
                     </div>
 
@@ -591,22 +581,45 @@ export default function DemoPage() {
                       alignItems: 'center',
                       justifyContent: 'center',
                       flexShrink: 0,
+                      position: 'relative',
                       background: isComplete
                         ? C.greenSoft
                         : isActive
                           ? C.slate50
                           : C.white,
                       border: `1px solid ${isComplete ? C.greenLight : isActive ? C.slate200 : C.slate100}`,
-                      transition: 'all 0.3s',
+                      transition: 'background 0.4s, border-color 0.4s',
                     }}
                   >
-                    {isComplete ? (
-                      <CheckCircle2 size={16} style={{ color: C.green }} />
-                    ) : isActive ? (
-                      <Loader2 size={16} style={{ color: C.green }} className="animate-spin" />
-                    ) : (
+                    {/* Crossfaded icon stack — three layered icons at different
+                       opacities prevent the jarring instant icon swap. */}
+                    <span
+                      style={{
+                        position: 'absolute',
+                        opacity: isPending ? 1 : 0,
+                        transition: 'opacity 0.35s',
+                      }}
+                    >
                       <StageIcon size={16} style={{ color: C.slate500 }} />
-                    )}
+                    </span>
+                    <span
+                      style={{
+                        position: 'absolute',
+                        opacity: isActive ? 1 : 0,
+                        transition: 'opacity 0.35s',
+                      }}
+                    >
+                      <Loader2 size={16} style={{ color: C.green }} className="animate-spin" />
+                    </span>
+                    <span
+                      style={{
+                        position: 'absolute',
+                        opacity: isComplete ? 1 : 0,
+                        transition: 'opacity 0.35s',
+                      }}
+                    >
+                      <CheckCircle2 size={16} style={{ color: C.green }} />
+                    </span>
                   </div>
                   <span
                     style={{
@@ -688,32 +701,34 @@ export default function DemoPage() {
                 onMouseLeave={e => (e.currentTarget.style.color = C.slate500)}
               >
                 <ArrowRight size={12} style={{ transform: 'rotate(180deg)' }} />
-                Try another document
+                Audit a different memo
               </button>
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                {DEMO_ANALYSES.map((a, idx) => {
-                  const isActive = idx === selectedIdx;
-                  return (
-                    <button
-                      key={a.id}
-                      onClick={() => startSimulation(idx)}
-                      style={{
-                        padding: '5px 12px',
-                        borderRadius: 8,
-                        fontSize: 11,
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        border: `1px solid ${isActive ? C.slate400 : C.slate200}`,
-                        background: isActive ? C.white : 'transparent',
-                        color: isActive ? C.slate900 : C.slate500,
-                        transition: 'all 0.15s',
-                      }}
-                    >
-                      {a.shortName}
-                    </button>
-                  );
-                })}
-              </div>
+              <select
+                value={selectedIdx ?? 0}
+                onChange={e => startSimulation(Number(e.target.value))}
+                aria-label="Switch sample audit"
+                style={{
+                  padding: '7px 28px 7px 12px',
+                  borderRadius: 8,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: C.slate900,
+                  background: `${C.white} url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 8px center`,
+                  border: `1px solid ${C.slate200}`,
+                  cursor: 'pointer',
+                  appearance: 'none',
+                  outline: 'none',
+                  transition: 'border-color 0.15s',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.borderColor = C.slate400)}
+                onMouseLeave={e => (e.currentTarget.style.borderColor = C.slate200)}
+              >
+                {DEMO_ANALYSES.map((a, idx) => (
+                  <option key={a.id} value={idx}>
+                    {a.shortName}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* ── Scrollable Decision Flow ── */}
@@ -877,7 +892,11 @@ export default function DemoPage() {
                   </div>
                 </div>
                 {/* Executive summary */}
-                <Section icon={<BarChart3 size={16} />} title="Executive Summary">
+                <Section
+                  icon={<BarChart3 size={16} />}
+                  title="Executive Summary"
+                  subtitle="What the audit caught, in two minutes — written for the strategist about to walk into the room."
+                >
                   <p style={{ color: C.slate600, lineHeight: 1.65, margin: 0, fontSize: 14 }}>
                     {analysis.summary}
                   </p>
@@ -889,6 +908,7 @@ export default function DemoPage() {
                 <Section
                   icon={<Brain size={16} />}
                   title={`Cognitive Biases Detected (${analysis.biases.length})`}
+                  subtitle="Each bias is grounded in a specific quote from the memo, with a recommended counter-move you can hand to your team."
                 >
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {(showAllBiases ? analysis.biases : analysis.biases.slice(0, 4)).map(
@@ -1113,7 +1133,11 @@ export default function DemoPage() {
 
               {/* Section 3: Noise */}
               <div id="noise" style={{ scrollMarginTop: 80 }}>
-                <Section icon={<Target size={16} />} title="Decision Noise Analysis">
+                <Section
+                  icon={<Target size={16} />}
+                  title="Decision Noise"
+                  subtitle="How much the same memo would score differently if a fresh team read it cold. Lower noise means your reasoning travels well."
+                >
                   <div
                     style={{
                       display: 'flex',
@@ -1213,7 +1237,7 @@ export default function DemoPage() {
                 <Section
                   icon={<Users size={16} />}
                   title="Boardroom Simulation"
-                  subtitle="Decision-maker personas independently vote on the proposal."
+                  subtitle="See which board member would push back, on what, and why — before the meeting happens."
                 >
                   <div
                     style={{
@@ -1309,7 +1333,7 @@ export default function DemoPage() {
                   <Section
                     icon={<AlertTriangle size={16} />}
                     title="Toxic Combinations"
-                    subtitle="Individual biases are manageable. When they combine with contextual factors, compound risk can be 8× worse than any single factor."
+                    subtitle="One bias is recoverable. Compound bias patterns are how $100M strategic decisions become $1B regrets — the audit calls them out by name."
                   >
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                       {analysis.toxicCombinations.map((tc, idx) => {
@@ -1397,8 +1421,8 @@ export default function DemoPage() {
               <div id="premortem" style={{ scrollMarginTop: 80 }}>
                 <Section
                   icon={<Skull size={16} />}
-                  title="Pre-Mortem Analysis"
-                  subtitle="Imagine it's two years from now and this decision has failed spectacularly. What went wrong?"
+                  title="Pre-Mortem"
+                  subtitle="Two years from now, this decision has failed and you're in front of the CEO. The audit names the failure modes — so you can pre-empt them."
                 >
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {analysis.preMortem.scenarios.map((s, idx) => {
@@ -1583,8 +1607,9 @@ function DemoVideoSection() {
           lineHeight: 1.6,
         }}
       >
-        Decision Intel scores 30+ cognitive biases, predicts the questions your steering committee
-        will raise, and maps every decision into a living Knowledge Graph.
+        The audit your CSO never had time to run. 30+ cognitive biases scored, the question your
+        CEO will raise predicted, and every decision dropped into a Knowledge Graph that
+        compounds quarter after quarter.
       </p>
 
       {DEMO_VIDEO_URL ? (
@@ -2425,7 +2450,7 @@ function DemoConversionCTA({
             }}
           >
             <Shield size={13} />
-            PERSONALIZED REPORT
+            FOR YOUR NEXT MEMO
           </div>
           <h3
             style={{
@@ -2437,7 +2462,7 @@ function DemoConversionCTA({
               lineHeight: 1.2,
             }}
           >
-            Audit your own strategic memo next.
+            Walk into your next steering committee with the question nobody else caught.
           </h3>
           <p
             style={{
@@ -2448,8 +2473,8 @@ function DemoConversionCTA({
               lineHeight: 1.55,
             }}
           >
-            Drop your email and we&apos;ll send a personalized bias audit guide plus best
-            practices for improving decision quality.
+            Drop your work email. We&apos;ll send a one-page audit primer for your next strategic
+            memo, plus an invite to run a real audit on a document of your own.
           </p>
 
           <form
@@ -2589,7 +2614,7 @@ function DemoConversionCTA({
               if (!loadingSample) e.currentTarget.style.background = C.green;
             }}
           >
-            {loadingSample ? 'Loading...' : 'Try with Your Document'}
+            {loadingSample ? 'Loading...' : 'Audit My Own Memo'}
             {!loadingSample && <ArrowRight size={14} />}
           </button>
           <Link

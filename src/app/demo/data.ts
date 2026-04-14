@@ -54,6 +54,9 @@ export interface DemoAnalysis {
   id: string;
   documentName: string;
   shortName: string;
+  /** One-line CSO-coded teaser shown on the picker card. Replaces the
+   *  legacy 140-char truncation of `summary`. Keep ~110 chars max. */
+  teaser: string;
   overallScore: number;
   noiseScore: number;
   summary: string;
@@ -106,6 +109,7 @@ export const DEMO_NOKIA: DemoAnalysis = {
   documentName:
     'Microsoft Corporation \u2014 Strategic Rationale for Nokia Devices & Services Acquisition (2013)',
   shortName: 'Microsoft-Nokia Acquisition',
+  teaser: 'A $7.2B acquisition memo with six cognitive biases the board never named — and a $7.6B write-down 22 months later.',
   overallScore: 38,
   noiseScore: 67,
   createdAt: '2013-09-02T14:00:00Z',
@@ -409,6 +413,7 @@ export const DEMO_PHOENIX: DemoAnalysis = {
   id: 'demo-phoenix-expansion',
   documentName: 'Strategic Initiative: Project Phoenix \u2014 European Market Expansion',
   shortName: 'Project Phoenix Expansion',
+  teaser: 'A four-country market-entry plan built on one partnership case study, $15M in sunk cost, and a 95% team consensus.',
   overallScore: 29,
   noiseScore: 74,
   createdAt: '2025-11-15T10:00:00Z',
@@ -703,24 +708,26 @@ export const DEMO_PHOENIX: DemoAnalysis = {
   ],
 };
 
-// ─── Example 3: Series B Investment Memo ────────────────────────────
+// ─── Example 3: Strategic Partnership: Meridian Health JV ──────────────
 
 export const DEMO_SERIES_B: DemoAnalysis = {
-  id: 'demo-meridian-series-b',
-  documentName: 'Meridian Health Technologies — Series B Investment Thesis ($45M Round)',
-  shortName: 'Meridian Series B',
+  id: 'demo-meridian-strategic-partnership',
+  documentName:
+    'Meridian Health Technologies — Strategic Partnership & Equity Stake Recommendation ($45M)',
+  shortName: 'Meridian Strategic Partnership',
+  teaser: 'A $45M strategic partnership memo that anchors on top-down TAM, optimistic regulatory timing, and outdated comparables.',
   overallScore: 58,
   noiseScore: 42,
   createdAt: '2025-06-12T09:00:00Z',
   summary:
-    'This Series B investment memo presents a mixed-quality thesis for a $45M round at $380M pre-money valuation. Meridian Health Technologies has demonstrated genuine product-market fit in remote patient monitoring with $12M ARR growing 140% YoY, and its FDA 510(k) clearance for two device classes is a meaningful regulatory moat. However, the memo exhibits moderate cognitive bias contamination across 5 dimensions. TAM estimates are anchored to top-down projections without bottom-up validation, the regulatory timeline for the De Novo pathway assumes best-case FDA review cadence, and recent high-profile healthtech exits (Livongo, Nuvance) are used as comparable benchmarks without adjusting for materially different market conditions. The investment case has substance but the risk analysis is underweight relative to the capital being deployed.',
+    'This strategic partnership recommendation evaluates a $45M equity stake plus joint go-to-market commitment with Meridian Health Technologies. Meridian has demonstrated genuine product-market fit in remote patient monitoring with $12M ARR growing 140% YoY, and its FDA 510(k) clearance for two device classes is a meaningful regulatory moat. However, the memo exhibits moderate cognitive bias contamination across 5 dimensions. TAM estimates are anchored to top-down projections without bottom-up validation, the regulatory timeline for the De Novo pathway assumes best-case FDA review cadence, and recent high-profile healthtech outcomes (Livongo, Nuvance) are used as comparable benchmarks without adjusting for materially different market conditions. The strategic case has substance but the risk analysis is underweight relative to the capital and reputation being committed.',
   metaVerdict:
-    "CONDITIONAL APPROVE — The underlying business has defensible strengths: real clinical validation, meaningful revenue traction, and a regulatory moat that takes 18–24 months to replicate. However, approval should be contingent on specific due diligence: (1) Commission independent bottom-up TAM analysis for the three target therapeutic areas, ignoring management's top-down $28B figure, (2) Engage a regulatory affairs consultant to stress-test the De Novo classification timeline under realistic FDA backlog assumptions, (3) Require key-person insurance and retention packages for the CTO and VP of Regulatory Affairs before close, (4) Negotiate milestone-based tranche structure tied to FDA submission milestones rather than a single close, (5) Obtain reimbursement pre-authorization letters from at least two major payers before committing the full round.",
+    "CONDITIONAL APPROVE — The underlying business has defensible strengths: real clinical validation, meaningful revenue traction, and a regulatory moat that takes 18–24 months to replicate. However, approval should be contingent on specific diligence: (1) Commission independent bottom-up TAM analysis for the three target therapeutic areas, ignoring management's top-down $28B figure, (2) Engage a regulatory affairs consultant to stress-test the De Novo classification timeline under realistic FDA backlog assumptions, (3) Require key-person insurance and retention packages for the CTO and VP of Regulatory Affairs before close, (4) Negotiate milestone-based tranche structure tied to FDA submission milestones rather than a single close, (5) Obtain reimbursement pre-authorization letters from at least two major payers before committing the full round.",
   noiseStats: { mean: 42, stdDev: 9.6, variance: 92.16 },
   noiseBenchmarks: [
     { label: 'This Document', value: 42 },
-    { label: 'Series B Average', value: 35 },
-    { label: 'Healthcare VC Best', value: 14 },
+    { label: 'Strategic Investment Avg', value: 35 },
+    { label: 'Best-in-Class Strategy', value: 14 },
   ],
   biases: [
     {
@@ -760,11 +767,11 @@ export const DEMO_SERIES_B: DemoAnalysis = {
       biasType: 'groupthink',
       severity: 'medium',
       excerpt:
-        "The investment committee reviewed the opportunity across three sessions and reached strong consensus that Meridian represents a compelling risk-adjusted return. All partners noted the strength of the clinical data and the management team's execution track record.",
+        "The steering committee reviewed the opportunity across three sessions and reached strong consensus that Meridian represents a compelling strategic fit. All members noted the strength of the clinical data and the management team's execution track record.",
       explanation:
-        'Three committee sessions reaching "strong consensus" with all partners aligned is presented as validation of the thesis quality. However, unanimous agreement in a venture partnership evaluating a $45M commitment should raise questions about whether dissenting views were adequately surfaced. No red team analysis, no documentation of the strongest bear case arguments, and no discussion of what would make this investment fail.',
+        'Three committee sessions reaching "strong consensus" with all members aligned is presented as validation of the strategic case. However, unanimous agreement on a $45M commitment with reputational exposure should raise questions about whether dissenting views were adequately surfaced. No red team analysis, no documentation of the strongest bear case arguments, and no discussion of what would make this partnership fail.',
       suggestion:
-        "Before final commitment, require one partner to formally present the bear case with equal rigor and time allocation as the bull case. Document the top three reasons this investment could result in a total loss and the committee's specific responses to each.",
+        "Before final commitment, require one committee member to formally present the bear case with equal rigor and time allocation as the bull case. Document the top three reasons this partnership could result in a write-down and the committee's specific responses to each.",
       confidence: 0.82,
     },
     {
