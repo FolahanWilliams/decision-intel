@@ -558,8 +558,17 @@ export default function HeroDecisionGraph3DCanvas({
     return () => timers.forEach(clearTimeout);
   }, []);
 
+  // Density toggle: "Narrative" trims the graph to the causal spine
+  // (decision -> bias -> outcome), hiding toxic combos and outcome cascades
+  // for clearer reading. Full shows everything (the default first view).
+  const [density, setDensity] = useState<'full' | 'narrative'>('full');
+  const displayEdges = useMemo(() => {
+    if (density === 'full') return EDGES;
+    return EDGES.filter(e => e.fill !== '#DC2626' && e.fill !== '#A78BFA');
+  }, [density]);
+
   const nodeIds = useMemo(() => NODES.map(n => n.id), []);
-  const edgeIds = useMemo(() => EDGES.map(e => e.id), []);
+  const edgeIds = useMemo(() => displayEdges.map(e => e.id), [displayEdges]);
   // Narrative groups: decisions→biases (gaps), toxic combos (compounds),
   // bias→outcome + cascade (cost). Pausing between each makes the reveal
   // read as reasoning unfolding instead of one continuous sweep.
@@ -567,13 +576,13 @@ export default function HeroDecisionGraph3DCanvas({
     const decisionToBias: string[] = [];
     const toxicCombos: string[] = [];
     const outcomes: string[] = [];
-    for (const e of EDGES) {
+    for (const e of displayEdges) {
       if (e.fill === '#DC2626') toxicCombos.push(e.id);
       else if (e.fill === '#7C3AED' || e.fill === '#A78BFA') outcomes.push(e.id);
       else decisionToBias.push(e.id);
     }
     return [decisionToBias, toxicCombos, outcomes];
-  }, []);
+  }, [displayEdges]);
   const { narrativeActives, isRevealing, currentGroup } = useEdgeNarrativeReveal({
     nodeIds,
     edgeIds,
@@ -726,7 +735,7 @@ export default function HeroDecisionGraph3DCanvas({
       <GraphCanvas
         ref={graphRef}
         nodes={NODES}
-        edges={EDGES}
+        edges={displayEdges}
         layoutType="forceDirected3d"
         cameraMode="rotate"
         animated={false}
@@ -753,6 +762,7 @@ export default function HeroDecisionGraph3DCanvas({
         <SlowOrbit graphRef={graphRef} startDelayMs={isRevealing ? 6500 : 1500} />
       </GraphCanvas>
       <ResetViewButton graphRef={graphRef} />
+      {!isRevealing && <DensityToggle value={density} onChange={setDensity} />}
       {hoveredNode && hoveredData && !isRevealing && (
         <NodeHoverTooltip
           title={hoveredData.detail.title}
@@ -763,6 +773,75 @@ export default function HeroDecisionGraph3DCanvas({
           accent={getNodeColor(hoveredData)}
         />
       )}
+    </div>
+  );
+}
+
+// ─── DensityToggle ──────────────────────────────────────────────────────────
+// Segmented control to swap between "Narrative" (decision -> bias -> outcome
+// causal spine only) and "Full" (all connections including toxic combinations
+// and outcome cascades). Narrative reduces 34 edges to 26 for clearer reading.
+
+function DensityToggle({
+  value,
+  onChange,
+}: {
+  value: 'full' | 'narrative';
+  onChange: (v: 'full' | 'narrative') => void;
+}) {
+  const options: Array<{ id: 'narrative' | 'full'; label: string }> = [
+    { id: 'narrative', label: 'Narrative' },
+    { id: 'full', label: 'Full graph' },
+  ];
+  return (
+    <div
+      role="tablist"
+      aria-label="Graph density"
+      style={{
+        position: 'absolute',
+        top: 10,
+        left: 10,
+        display: 'flex',
+        padding: 3,
+        borderRadius: 8,
+        border: '1px solid #E2E8F0',
+        background: 'rgba(255,255,255,0.85)',
+        backdropFilter: 'blur(6px)',
+        WebkitBackdropFilter: 'blur(6px)',
+        boxShadow: '0 2px 8px rgba(15,23,42,0.06)',
+        zIndex: 5,
+        fontSize: 11,
+        fontWeight: 600,
+      }}
+    >
+      {options.map(opt => {
+        const active = value === opt.id;
+        return (
+          <button
+            key={opt.id}
+            role="tab"
+            aria-selected={active}
+            onClick={() => onChange(opt.id)}
+            style={{
+              padding: '5px 10px',
+              borderRadius: 6,
+              border: 'none',
+              background: active ? '#16A34A' : 'transparent',
+              color: active ? '#FFFFFF' : '#475569',
+              cursor: 'pointer',
+              transition: 'background 0.15s, color 0.15s',
+            }}
+            onMouseEnter={e => {
+              if (!active) e.currentTarget.style.color = '#0F172A';
+            }}
+            onMouseLeave={e => {
+              if (!active) e.currentTarget.style.color = '#475569';
+            }}
+          >
+            {opt.label}
+          </button>
+        );
+      })}
     </div>
   );
 }
