@@ -1,7 +1,7 @@
 'use client';
 
 import { createClient } from '@/utils/supabase/client';
-import { Suspense, useState } from 'react';
+import { Suspense, useState, type FormEvent } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import {
@@ -12,6 +12,8 @@ import {
   Loader2,
   AlertTriangle,
   ArrowRight,
+  Mail,
+  CheckCircle,
 } from 'lucide-react';
 import Link from 'next/link';
 import { trackEvent } from '@/lib/analytics/track';
@@ -44,6 +46,13 @@ function getErrorMessage(code: string | null): string | null {
 
 function LoginContent() {
   const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [formLoading, setFormLoading] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [signupSuccess, setSignupSuccess] = useState(false);
+
   const searchParams = useSearchParams();
   const authError = searchParams.get('error');
   const errorMessage = getErrorMessage(authError);
@@ -64,6 +73,55 @@ function LoginContent() {
         redirectTo: callbackUrl.toString(),
       },
     });
+  };
+
+  const handleEmailAuth = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setFormError(null);
+
+    if (!email || !password) {
+      setFormError('Email and password are required.');
+      return;
+    }
+    if (mode === 'signup' && password.length < 8) {
+      setFormError('Password must be at least 8 characters.');
+      return;
+    }
+
+    setFormLoading(true);
+    const supabase = createClient();
+    trackEvent(mode === 'signin' ? 'signin_started' : 'signup_started', {
+      provider: 'email',
+    });
+
+    try {
+      if (mode === 'signin') {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        const safeRedirect = redirectTo && /^\/[^/]/.test(redirectTo) ? redirectTo : '/dashboard';
+        window.location.href = safeRedirect;
+      } else {
+        const callbackUrl = new URL('/api/auth/callback', location.origin);
+        if (redirectTo) callbackUrl.searchParams.set('redirect', redirectTo);
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { emailRedirectTo: callbackUrl.toString() },
+        });
+        if (error) throw error;
+        setSignupSuccess(true);
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Authentication failed.';
+      setFormError(message);
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const toggleMode = () => {
+    setMode(m => (m === 'signin' ? 'signup' : 'signin'));
+    setFormError(null);
   };
 
   return (
@@ -261,87 +319,338 @@ function LoginContent() {
               boxShadow: '0 20px 48px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04)',
             }}
           >
-            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-              <h1
-                style={{
-                  fontSize: '1.4rem',
-                  fontWeight: 700,
-                  color: 'var(--text-primary)',
-                  marginBottom: '6px',
-                  letterSpacing: '-0.02em',
-                }}
-              >
-                Welcome back
-              </h1>
-              <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                Sign in to your Decision Knowledge Graph
-              </p>
-            </div>
-
-            {/* Error message */}
-            {errorMessage && (
-              <div
-                role="alert"
-                style={{
-                  padding: '10px 14px',
-                  marginBottom: '1rem',
-                  fontSize: '0.82rem',
-                  color: 'var(--error)',
-                  background: 'rgba(239, 68, 68, 0.08)',
-                  border: '1px solid rgba(239, 68, 68, 0.2)',
-                  borderRadius: '12px',
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '8px',
-                }}
-              >
-                <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: '1px' }} />
-                <span>{errorMessage}</span>
+            {signupSuccess ? (
+              <div style={{ textAlign: 'center', padding: '0.5rem 0 1rem' }}>
+                <div
+                  style={{
+                    width: 48,
+                    height: 48,
+                    margin: '0 auto 1rem',
+                    borderRadius: '50%',
+                    background: 'rgba(22,163,74,0.12)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Mail size={22} style={{ color: 'var(--accent-primary, #16A34A)' }} />
+                </div>
+                <h1
+                  style={{
+                    fontSize: '1.25rem',
+                    fontWeight: 700,
+                    color: 'var(--text-primary)',
+                    marginBottom: '8px',
+                    letterSpacing: '-0.02em',
+                  }}
+                >
+                  Check your email
+                </h1>
+                <p
+                  style={{
+                    fontSize: '0.85rem',
+                    color: 'var(--text-muted)',
+                    lineHeight: 1.6,
+                    marginBottom: '1.25rem',
+                  }}
+                >
+                  We sent a confirmation link to <strong>{email}</strong>. Click it to finish
+                  creating your account.
+                </p>
+                <button
+                  onClick={() => {
+                    setSignupSuccess(false);
+                    setMode('signin');
+                    setPassword('');
+                  }}
+                  style={{
+                    fontSize: '0.8rem',
+                    color: 'var(--accent-primary, #16A34A)',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                    textUnderlineOffset: '2px',
+                  }}
+                >
+                  Back to sign in
+                </button>
               </div>
+            ) : (
+              <>
+                <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                  <h1
+                    style={{
+                      fontSize: '1.4rem',
+                      fontWeight: 700,
+                      color: 'var(--text-primary)',
+                      marginBottom: '6px',
+                      letterSpacing: '-0.02em',
+                    }}
+                  >
+                    {mode === 'signin' ? 'Welcome back' : 'Create your account'}
+                  </h1>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                    {mode === 'signin'
+                      ? 'Sign in to your Decision Knowledge Graph'
+                      : 'Start auditing strategic memos in 60 seconds'}
+                  </p>
+                </div>
+
+                {/* URL-level error (OAuth failures, expired sessions, etc.) */}
+                {errorMessage && !formError && (
+                  <div
+                    role="alert"
+                    style={{
+                      padding: '10px 14px',
+                      marginBottom: '1rem',
+                      fontSize: '0.82rem',
+                      color: 'var(--error)',
+                      background: 'rgba(239, 68, 68, 0.08)',
+                      border: '1px solid rgba(239, 68, 68, 0.2)',
+                      borderRadius: '12px',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '8px',
+                    }}
+                  >
+                    <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: '1px' }} />
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
+
+                {/* Form-level error (bad credentials, email already taken, etc.) */}
+                {formError && (
+                  <div
+                    role="alert"
+                    style={{
+                      padding: '10px 14px',
+                      marginBottom: '1rem',
+                      fontSize: '0.82rem',
+                      color: 'var(--error)',
+                      background: 'rgba(239, 68, 68, 0.08)',
+                      border: '1px solid rgba(239, 68, 68, 0.2)',
+                      borderRadius: '12px',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '8px',
+                    }}
+                  >
+                    <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: '1px' }} />
+                    <span>{formError}</span>
+                  </div>
+                )}
+
+                {/* Google sign in button */}
+                <button
+                  onClick={handleGoogleLogin}
+                  disabled={loading || formLoading}
+                  aria-label={mode === 'signin' ? 'Sign in with Google' : 'Sign up with Google'}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '10px',
+                    padding: '14px 16px',
+                    fontSize: '0.9rem',
+                    fontWeight: 600,
+                    color: '#fff',
+                    background:
+                      'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)',
+                    border: '1px solid rgba(22, 163, 74, 0.4)',
+                    borderRadius: '14px',
+                    boxShadow:
+                      '0 4px 16px rgba(22, 163, 74, 0.35), 0 1px 0 rgba(255,255,255,0.12) inset',
+                    cursor: loading || formLoading ? 'not-allowed' : 'pointer',
+                    opacity: loading || formLoading ? 0.7 : 1,
+                    transition: 'all 0.15s',
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  {loading ? <Loader2 size={18} className="animate-spin" /> : <GoogleIcon />}
+                  {loading
+                    ? 'Redirecting...'
+                    : mode === 'signin'
+                      ? 'Sign in with Google'
+                      : 'Sign up with Google'}
+                  {!loading && <ArrowRight size={16} style={{ opacity: 0.6 }} />}
+                </button>
+
+                {/* Divider */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    margin: '1.25rem 0',
+                  }}
+                >
+                  <div
+                    style={{ flex: 1, height: 1, background: 'var(--border-color, #E2E8F0)' }}
+                  />
+                  <span
+                    style={{
+                      fontSize: '0.72rem',
+                      color: 'var(--text-muted)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.08em',
+                      fontWeight: 600,
+                    }}
+                  >
+                    or
+                  </span>
+                  <div
+                    style={{ flex: 1, height: 1, background: 'var(--border-color, #E2E8F0)' }}
+                  />
+                </div>
+
+                {/* Email / password form */}
+                <form onSubmit={handleEmailAuth} style={{ display: 'grid', gap: 12 }}>
+                  <label style={{ display: 'grid', gap: 6 }}>
+                    <span
+                      style={{
+                        fontSize: '0.78rem',
+                        fontWeight: 600,
+                        color: 'var(--text-secondary, #475569)',
+                      }}
+                    >
+                      Work email
+                    </span>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={e => setEmail(e.target.value)}
+                      required
+                      autoComplete="email"
+                      placeholder="you@company.com"
+                      disabled={formLoading || loading}
+                      style={{
+                        padding: '11px 14px',
+                        fontSize: '0.88rem',
+                        color: 'var(--text-primary)',
+                        background: 'var(--bg-card, #FFFFFF)',
+                        border: '1px solid var(--border-color, #E2E8F0)',
+                        borderRadius: 10,
+                        outline: 'none',
+                        fontFamily: 'inherit',
+                      }}
+                    />
+                  </label>
+                  <label style={{ display: 'grid', gap: 6 }}>
+                    <span
+                      style={{
+                        fontSize: '0.78rem',
+                        fontWeight: 600,
+                        color: 'var(--text-secondary, #475569)',
+                      }}
+                    >
+                      Password
+                    </span>
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={e => setPassword(e.target.value)}
+                      required
+                      minLength={mode === 'signup' ? 8 : undefined}
+                      autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
+                      placeholder={mode === 'signup' ? 'At least 8 characters' : 'Your password'}
+                      disabled={formLoading || loading}
+                      style={{
+                        padding: '11px 14px',
+                        fontSize: '0.88rem',
+                        color: 'var(--text-primary)',
+                        background: 'var(--bg-card, #FFFFFF)',
+                        border: '1px solid var(--border-color, #E2E8F0)',
+                        borderRadius: 10,
+                        outline: 'none',
+                        fontFamily: 'inherit',
+                      }}
+                    />
+                  </label>
+                  <button
+                    type="submit"
+                    disabled={formLoading || loading}
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      fontSize: '0.88rem',
+                      fontWeight: 600,
+                      color: 'var(--text-primary)',
+                      background: 'var(--bg-card, #FFFFFF)',
+                      border: '1px solid var(--border-color, #CBD5E1)',
+                      borderRadius: 12,
+                      cursor: formLoading || loading ? 'not-allowed' : 'pointer',
+                      opacity: formLoading || loading ? 0.7 : 1,
+                      transition: 'all 0.15s',
+                      fontFamily: 'inherit',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8,
+                    }}
+                  >
+                    {formLoading ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin" />
+                        {mode === 'signin' ? 'Signing in…' : 'Creating account…'}
+                      </>
+                    ) : mode === 'signin' ? (
+                      <>
+                        Sign in with email
+                        <ArrowRight size={14} style={{ opacity: 0.6 }} />
+                      </>
+                    ) : (
+                      <>
+                        Create account
+                        <CheckCircle size={14} style={{ opacity: 0.6 }} />
+                      </>
+                    )}
+                  </button>
+                </form>
+
+                {/* Mode toggle */}
+                <p
+                  style={{
+                    fontSize: '0.78rem',
+                    color: 'var(--text-muted)',
+                    textAlign: 'center',
+                    marginTop: '1rem',
+                  }}
+                >
+                  {mode === 'signin' ? "Don't have an account?" : 'Already have an account?'}{' '}
+                  <button
+                    type="button"
+                    onClick={toggleMode}
+                    style={{
+                      color: 'var(--accent-primary, #16A34A)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontWeight: 600,
+                      fontSize: 'inherit',
+                      padding: 0,
+                      textDecoration: 'underline',
+                      textUnderlineOffset: '2px',
+                    }}
+                  >
+                    {mode === 'signin' ? 'Sign up' : 'Sign in'}
+                  </button>
+                </p>
+              </>
             )}
 
-            {/* Google sign in button */}
-            <button
-              onClick={handleGoogleLogin}
-              disabled={loading}
-              aria-label="Sign in with Google"
-              style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '10px',
-                padding: '14px 16px',
-                fontSize: '0.9rem',
-                fontWeight: 600,
-                color: '#fff',
-                background:
-                  'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)',
-                border: '1px solid rgba(22, 163, 74, 0.4)',
-                borderRadius: '14px',
-                boxShadow:
-                  '0 4px 16px rgba(22, 163, 74, 0.35), 0 1px 0 rgba(255,255,255,0.12) inset',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                opacity: loading ? 0.7 : 1,
-                transition: 'all 0.15s',
-                fontFamily: 'inherit',
-              }}
-            >
-              {loading ? <Loader2 size={18} className="animate-spin" /> : <GoogleIcon />}
-              {loading ? 'Redirecting...' : 'Sign in with Google'}
-              {!loading && <ArrowRight size={16} style={{ opacity: 0.6 }} />}
-            </button>
-
-            <p
-              style={{
-                fontSize: '0.7rem',
-                color: 'var(--text-muted)',
-                textAlign: 'center',
-                marginTop: '1rem',
-                lineHeight: 1.5,
-              }}
-            >
-              By signing in, you agree to our{' '}
+            {!signupSuccess && (
+              <p
+                style={{
+                  fontSize: '0.7rem',
+                  color: 'var(--text-muted)',
+                  textAlign: 'center',
+                  marginTop: '1rem',
+                  lineHeight: 1.5,
+                }}
+              >
+                By signing in, you agree to our{' '}
               <Link
                 href="/terms"
                 style={{
@@ -364,7 +673,8 @@ function LoginContent() {
                 privacy policy
               </Link>
               .
-            </p>
+              </p>
+            )}
           </div>
 
           <p
