@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useCallback, useEffect, useMemo } from 'react';
+import { useRef, useCallback, useEffect, useMemo, useState } from 'react';
 import { DoubleSide, type Mesh, type MeshBasicMaterial } from 'three';
 import { useFrame } from '@react-three/fiber';
 import {
@@ -18,6 +18,7 @@ import {
   ResetViewButton,
   useEdgeNarrativeReveal,
   withNarrativeTheme,
+  NodeHoverTooltip,
 } from '@/components/visualizations/reagraph-helpers';
 
 // ─── Shared types (exported so parent can access .data) ──────────────────────
@@ -581,6 +582,11 @@ export default function HeroDecisionGraph3DCanvas({
   });
   const narrativeTheme = useMemo(() => withNarrativeTheme(GRAPH_THEME), []);
 
+  // Hover tooltip state — lightweight preview, complementary to click-to-select.
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const [hoverNodeId, setHoverNodeId] = useState<string | null>(null);
+  const [pointerPos, setPointerPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+
   const {
     selections,
     actives,
@@ -611,6 +617,28 @@ export default function HeroDecisionGraph3DCanvas({
     },
     [selections, toggleSelection],
   );
+
+  // Hover handlers augment useSelection's path-hover without replacing it.
+  const handleNodePointerOver = useCallback(
+    (node: InternalGraphNode) => {
+      onNodePointerOver?.(node);
+      setHoverNodeId(node.id);
+    },
+    [onNodePointerOver],
+  );
+  const handleNodePointerOut = useCallback(
+    (node: InternalGraphNode) => {
+      onNodePointerOut?.(node);
+      setHoverNodeId(null);
+    },
+    [onNodePointerOut],
+  );
+
+  const hoveredNode = useMemo(() => {
+    if (!hoverNodeId) return null;
+    return NODES.find(n => n.id === hoverNodeId) ?? null;
+  }, [hoverNodeId]);
+  const hoveredData = hoveredNode?.data as NodeData | undefined;
 
   const renderNode = useCallback(({ node, size, opacity, active, selected }: NodeRendererProps) => {
     const data = node.data as NodeData | undefined;
@@ -683,8 +711,18 @@ export default function HeroDecisionGraph3DCanvas({
     );
   }, []);
 
+  const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    const rect = wrapperRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    setPointerPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  }, []);
+
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <div
+      ref={wrapperRef}
+      onPointerMove={handlePointerMove}
+      style={{ position: 'relative', width: '100%', height: '100%' }}
+    >
       <GraphCanvas
         ref={graphRef}
         nodes={NODES}
@@ -698,8 +736,8 @@ export default function HeroDecisionGraph3DCanvas({
         actives={isRevealing && narrativeActives ? narrativeActives : actives}
         onNodeClick={onNodeClick}
         onCanvasClick={onCanvasClick}
-        onNodePointerOver={onNodePointerOver}
-        onNodePointerOut={onNodePointerOut}
+        onNodePointerOver={handleNodePointerOver}
+        onNodePointerOut={handleNodePointerOut}
         labelType={isRevealing && currentGroup === 1 ? 'all' : 'nodes'}
         edgeLabelPosition="natural"
         draggable
@@ -715,6 +753,16 @@ export default function HeroDecisionGraph3DCanvas({
         <SlowOrbit graphRef={graphRef} startDelayMs={isRevealing ? 6500 : 1500} />
       </GraphCanvas>
       <ResetViewButton graphRef={graphRef} />
+      {hoveredNode && hoveredData && !isRevealing && (
+        <NodeHoverTooltip
+          title={hoveredData.detail.title}
+          subtitle={hoveredData.detail.severity}
+          body={hoveredData.detail.excerpt}
+          x={pointerPos.x}
+          y={pointerPos.y}
+          accent={getNodeColor(hoveredData)}
+        />
+      )}
     </div>
   );
 }

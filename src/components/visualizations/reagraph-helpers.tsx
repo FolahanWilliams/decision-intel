@@ -234,6 +234,93 @@ export function withNarrativeTheme(base: Theme): Theme {
   };
 }
 
+// ─── NodeHoverTooltip ────────────────────────────────────────────────────────
+// Lightweight floating tooltip that follows the pointer. Intended for hover
+// preview — complementary to click-to-select. Each canvas owns its hover
+// state (so it can map its NodeData shape to `title`/`subtitle`/`body`) and
+// renders this inside the relative-positioned canvas wrapper.
+
+export interface NodeHoverTooltipProps {
+  title: string;
+  subtitle?: string;
+  body?: string;
+  /** Pointer position in CSS pixels relative to the wrapping container. */
+  x: number;
+  y: number;
+  /** Accent color for the subtitle/label row (severity color, etc.). */
+  accent?: string;
+  variant?: 'light' | 'dark';
+}
+
+export function NodeHoverTooltip({
+  title,
+  subtitle,
+  body,
+  x,
+  y,
+  accent,
+  variant = 'light',
+}: NodeHoverTooltipProps) {
+  const isDark = variant === 'dark';
+  // Offset slightly so the tooltip doesn't sit under the cursor / block clicks.
+  const left = x + 14;
+  const top = y + 14;
+  return (
+    <div
+      role="tooltip"
+      style={{
+        position: 'absolute',
+        left,
+        top,
+        maxWidth: 280,
+        padding: '10px 12px',
+        borderRadius: 10,
+        pointerEvents: 'none',
+        zIndex: 4,
+        background: isDark ? 'rgba(15,23,42,0.94)' : 'rgba(255,255,255,0.96)',
+        border: `1px solid ${isDark ? 'rgba(255,255,255,0.14)' : '#E2E8F0'}`,
+        boxShadow: isDark
+          ? '0 6px 20px rgba(0,0,0,0.45)'
+          : '0 6px 20px rgba(15,23,42,0.12)',
+        backdropFilter: 'blur(6px)',
+        WebkitBackdropFilter: 'blur(6px)',
+        color: isDark ? '#F1F5F9' : '#0F172A',
+        fontSize: 12,
+        lineHeight: 1.4,
+      }}
+    >
+      <div
+        style={{
+          fontSize: 13,
+          fontWeight: 700,
+          marginBottom: subtitle || body ? 3 : 0,
+        }}
+      >
+        {title}
+      </div>
+      {subtitle && (
+        <div
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.04em',
+            textTransform: 'uppercase',
+            color: accent ?? (isDark ? '#94A3B8' : '#64748B'),
+            marginBottom: body ? 4 : 0,
+          }}
+        >
+          {subtitle}
+        </div>
+      )}
+      {body && (
+        <div style={{ color: isDark ? '#CBD5E1' : '#475569' }}>
+          {body.length > 160 ? body.slice(0, 157) + '…' : body}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── ResetViewButton ─────────────────────────────────────────────────────────
 
 interface ResetViewButtonProps {

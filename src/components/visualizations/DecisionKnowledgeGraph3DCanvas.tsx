@@ -23,6 +23,7 @@ import {
   useImperativeHandle,
   useEffect,
   useMemo,
+  useState,
 } from 'react';
 import { DoubleSide } from 'three';
 import {
@@ -30,6 +31,7 @@ import {
   ResetViewButton,
   useEdgeNarrativeReveal,
   withNarrativeTheme,
+  NodeHoverTooltip,
 } from './reagraph-helpers';
 import {
   GraphCanvas,
@@ -182,6 +184,35 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
     [selections, toggleSelection],
   );
 
+  // Hover tooltip state — preview complementary to click-to-select.
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const [hoverNodeId, setHoverNodeId] = useState<string | null>(null);
+  const [hoverLabel, setHoverLabel] = useState<string>('');
+  const [hoverType, setHoverType] = useState<string>('');
+  const [pointerPos, setPointerPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const handleNodePointerOver = useCallback(
+    (node: InternalGraphNode) => {
+      onNodePointerOver?.(node);
+      setHoverNodeId(node.id);
+      setHoverLabel((node.label as string) ?? node.id);
+      const t = (node.data as { type?: string } | undefined)?.type ?? '';
+      setHoverType(t);
+    },
+    [onNodePointerOver],
+  );
+  const handleNodePointerOut = useCallback(
+    (node: InternalGraphNode) => {
+      onNodePointerOut?.(node);
+      setHoverNodeId(null);
+    },
+    [onNodePointerOut],
+  );
+  const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    const rect = wrapperRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    setPointerPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  }, []);
+
   const renderNode = useCallback(({ node, size, opacity, active, selected }: NodeRendererProps) => {
     const type: DKGNodeType = (node.data?.type as DKGNodeType) ?? 'analysis';
     const col = (node.fill as string | undefined) ?? '#60A5FA';
@@ -253,7 +284,11 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
   }, []);
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <div
+      ref={wrapperRef}
+      onPointerMove={handlePointerMove}
+      style={{ position: 'relative', width: '100%', height: '100%' }}
+    >
       <GraphCanvas
         ref={graphRef}
         nodes={nodes}
@@ -267,8 +302,8 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
         actives={isRevealing && narrativeActives ? narrativeActives : actives}
         onNodeClick={onNodeClick}
         onCanvasClick={onCanvasClick}
-        onNodePointerOver={onNodePointerOver}
-        onNodePointerOut={onNodePointerOut}
+        onNodePointerOver={handleNodePointerOver}
+        onNodePointerOut={handleNodePointerOut}
         labelType="nodes"
         draggable
         defaultNodeSize={5}
@@ -283,6 +318,14 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
         <SlowOrbit graphRef={graphRef} startDelayMs={isRevealing ? 6500 : 1500} />
       </GraphCanvas>
       <ResetViewButton graphRef={graphRef} />
+      {hoverNodeId && !isRevealing && (
+        <NodeHoverTooltip
+          title={hoverLabel}
+          subtitle={hoverType ? hoverType.replace(/_/g, ' ').toUpperCase() : undefined}
+          x={pointerPos.x}
+          y={pointerPos.y}
+        />
+      )}
     </div>
   );
 });
