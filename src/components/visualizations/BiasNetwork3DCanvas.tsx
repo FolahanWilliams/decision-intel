@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useCallback, useEffect } from 'react';
+import { useRef, useCallback, useEffect, useMemo } from 'react';
 import { DoubleSide } from 'three';
 import {
   GraphCanvas,
@@ -12,7 +12,7 @@ import {
   type Theme,
   useSelection,
 } from 'reagraph';
-import { SlowOrbit, ResetViewButton } from './reagraph-helpers';
+import { SlowOrbit, ResetViewButton, useEdgeNarrativeReveal } from './reagraph-helpers';
 
 const SEVERITY_COLORS: Record<string, string> = {
   critical: '#EF4444',
@@ -131,6 +131,14 @@ export default function BiasNetwork3DCanvas({ biases, onBiasSelect }: BiasNetwor
     return () => timers.forEach(clearTimeout);
   }, []);
 
+  const nodeIds = useMemo(() => nodes.map(n => n.id), [nodes]);
+  const edgeIds = useMemo(() => edges.map(e => e.id), [edges]);
+  const { narrativeActives, isRevealing } = useEdgeNarrativeReveal({
+    nodeIds,
+    edgeIds,
+    storageKey: 'di-graph-narrative:bias-network',
+  });
+
   const {
     selections,
     actives,
@@ -195,7 +203,7 @@ export default function BiasNetwork3DCanvas({ biases, onBiasSelect }: BiasNetwor
         theme={DARK_THEME}
         renderNode={renderNode}
         selections={selections}
-        actives={actives}
+        actives={isRevealing && narrativeActives ? narrativeActives : actives}
         onNodeClick={onNodeClick}
         onCanvasClick={onCanvasClick}
         onNodePointerOver={onNodePointerOver}
@@ -210,7 +218,7 @@ export default function BiasNetwork3DCanvas({ biases, onBiasSelect }: BiasNetwor
         <directionalLight position={[20, 20, 10]} intensity={1.2} />
         <directionalLight position={[-15, -10, -8]} intensity={0.4} color="#FFFFFF" />
         <pointLight position={[0, 30, 10]} intensity={0.6} color="#FFFFFF" />
-        <SlowOrbit graphRef={graphRef} />
+        <SlowOrbit graphRef={graphRef} startDelayMs={isRevealing ? 4500 : 1500} />
       </GraphCanvas>
       <ResetViewButton graphRef={graphRef} />
     </div>

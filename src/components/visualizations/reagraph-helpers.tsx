@@ -10,7 +10,14 @@
  * wrapper that hosts the canvas (position: relative required).
  */
 
-import { useEffect, useRef, useCallback, type MutableRefObject } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useCallback,
+  type MutableRefObject,
+} from 'react';
 import { useFrame } from '@react-three/fiber';
 import type { GraphCanvasRef } from 'reagraph';
 import { RotateCcw } from 'lucide-react';
@@ -58,6 +65,84 @@ export function SlowOrbit({
     controls.azimuthAngle += degreesPerSecond * delta * (Math.PI / 180);
   });
   return null;
+}
+
+// ─── useEdgeNarrativeReveal ──────────────────────────────────────────────────
+// First-view narrative: reveal edges one at a time over ~4 seconds so the
+// graph feels like reasoning unfolding, not just a snapshot dropped in.
+//
+// Mechanic: feed reagraph's `actives` prop progressively. All node IDs are
+// always included (nodes stay bright); edges are added one-by-one. Edges
+// not yet revealed fall through to the theme's `inactiveOpacity` (≈0.18),
+// so the reveal reads as dim-to-bright without needing custom edge renderers.
+//
+// Gated by sessionStorage per graph so repeat visits in the same session
+// skip straight to the final state.
+
+interface UseEdgeNarrativeRevealOpts {
+  nodeIds: string[];
+  edgeIds: string[];
+  storageKey: string;
+  durationMs?: number;
+  /** If true, skip the narrative entirely (e.g., reduced-motion). */
+  disabled?: boolean;
+}
+
+export function useEdgeNarrativeReveal({
+  nodeIds,
+  edgeIds,
+  storageKey,
+  durationMs = 4000,
+  disabled = false,
+}: UseEdgeNarrativeRevealOpts) {
+  const [revealedEdgeCount, setRevealedEdgeCount] = useState(0);
+  const [done, setDone] = useState<boolean>(() => {
+    if (disabled) return true;
+    if (typeof window === 'undefined') return false;
+    try {
+      return window.sessionStorage.getItem(storageKey) === '1';
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    if (done || disabled) return;
+    if (edgeIds.length === 0) {
+      setDone(true);
+      return;
+    }
+    const prefersReducedMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      setDone(true);
+      return;
+    }
+    const perEdge = Math.max(60, durationMs / edgeIds.length);
+    const timers: number[] = [];
+    for (let i = 1; i <= edgeIds.length; i++) {
+      timers.push(window.setTimeout(() => setRevealedEdgeCount(i), perEdge * i));
+    }
+    timers.push(
+      window.setTimeout(() => {
+        setDone(true);
+        try {
+          window.sessionStorage.setItem(storageKey, '1');
+        } catch {
+          /* storage blocked — ignore */
+        }
+      }, durationMs + 150),
+    );
+    return () => timers.forEach(t => window.clearTimeout(t));
+  }, [done, disabled, edgeIds, durationMs, storageKey]);
+
+  const narrativeActives = useMemo<string[] | null>(() => {
+    if (done) return null;
+    return [...nodeIds, ...edgeIds.slice(0, revealedEdgeCount)];
+  }, [done, nodeIds, edgeIds, revealedEdgeCount]);
+
+  return { narrativeActives, isRevealing: !done };
 }
 
 // ─── ResetViewButton ─────────────────────────────────────────────────────────

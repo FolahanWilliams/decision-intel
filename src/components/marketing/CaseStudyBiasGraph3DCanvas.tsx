@@ -1,9 +1,13 @@
 'use client';
 
-import { useRef, useCallback, useEffect } from 'react';
+import { useRef, useCallback, useEffect, useMemo } from 'react';
 import { DoubleSide, type Mesh, type MeshBasicMaterial } from 'three';
 import { useFrame } from '@react-three/fiber';
-import { SlowOrbit, ResetViewButton } from '@/components/visualizations/reagraph-helpers';
+import {
+  SlowOrbit,
+  ResetViewButton,
+  useEdgeNarrativeReveal,
+} from '@/components/visualizations/reagraph-helpers';
 import {
   GraphCanvas,
   type GraphCanvasRef,
@@ -281,6 +285,14 @@ export default function CaseStudyBiasGraph3DCanvas({
     return () => timers.forEach(clearTimeout);
   }, []);
 
+  const nodeIds = useMemo(() => nodes.map(n => n.id), [nodes]);
+  const edgeIds = useMemo(() => edges.map(e => e.id), [edges]);
+  const { narrativeActives, isRevealing } = useEdgeNarrativeReveal({
+    nodeIds,
+    edgeIds,
+    storageKey: `di-graph-narrative:case-study:${primaryBias}`,
+  });
+
   const {
     selections,
     actives,
@@ -330,7 +342,7 @@ export default function CaseStudyBiasGraph3DCanvas({
         theme={GRAPH_THEME}
         renderNode={memoRenderNode}
         selections={selections}
-        actives={actives}
+        actives={isRevealing && narrativeActives ? narrativeActives : actives}
         onNodeClick={onNodeClick}
         onCanvasClick={onCanvasClick}
         onNodePointerOver={onNodePointerOver}
@@ -345,7 +357,7 @@ export default function CaseStudyBiasGraph3DCanvas({
         <directionalLight position={[15, 15, 10]} intensity={1.2} />
         <directionalLight position={[-10, -8, -5]} intensity={0.4} color="#FFFFFF" />
         <pointLight position={[0, 20, 5]} intensity={0.6} color="#FFFFFF" />
-        <SlowOrbit graphRef={graphRef} />
+        <SlowOrbit graphRef={graphRef} startDelayMs={isRevealing ? 4500 : 1500} />
       </GraphCanvas>
       <ResetViewButton graphRef={graphRef} />
     </div>

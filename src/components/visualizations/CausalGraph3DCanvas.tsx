@@ -13,7 +13,7 @@ import {
   useSelection,
 } from 'reagraph';
 import type { CausalWeight } from '@/lib/learning/causal-learning';
-import { SlowOrbit, ResetViewButton } from './reagraph-helpers';
+import { SlowOrbit, ResetViewButton, useEdgeNarrativeReveal } from './reagraph-helpers';
 
 export interface CausalNodeData {
   nodeType: 'bias' | 'outcome';
@@ -182,6 +182,14 @@ export default function CausalGraph3DCanvas({ weights, onNodeSelect }: CausalGra
     return () => timers.forEach(clearTimeout);
   }, []);
 
+  const nodeIds = useMemo(() => nodes.map(n => n.id), [nodes]);
+  const edgeIds = useMemo(() => edges.map(e => e.id), [edges]);
+  const { narrativeActives, isRevealing } = useEdgeNarrativeReveal({
+    nodeIds,
+    edgeIds,
+    storageKey: 'di-graph-narrative:causal',
+  });
+
   const {
     selections,
     actives,
@@ -287,7 +295,7 @@ export default function CausalGraph3DCanvas({ weights, onNodeSelect }: CausalGra
         theme={GRAPH_THEME}
         renderNode={renderNode}
         selections={selections}
-        actives={actives}
+        actives={isRevealing && narrativeActives ? narrativeActives : actives}
         onNodeClick={onNodeClick}
         onCanvasClick={onCanvasClick}
         onNodePointerOver={onNodePointerOver}
@@ -302,7 +310,7 @@ export default function CausalGraph3DCanvas({ weights, onNodeSelect }: CausalGra
         <directionalLight position={[20, 20, 10]} intensity={1.2} />
         <directionalLight position={[-15, -10, -8]} intensity={0.4} color="#FFFFFF" />
         <pointLight position={[0, 30, 10]} intensity={0.6} color="#FFFFFF" />
-        <SlowOrbit graphRef={graphRef} />
+        <SlowOrbit graphRef={graphRef} startDelayMs={isRevealing ? 4500 : 1500} />
       </GraphCanvas>
       <ResetViewButton graphRef={graphRef} />
     </div>
