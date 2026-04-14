@@ -1959,12 +1959,27 @@ export default function LandingPage() {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 16,
             fontSize: 13,
             color: '#64748B',
           }}
         >
-          <span>Flat. Resolution. Desktop Landing page UI</span>
-          <span>All rights reserved</span>
+          <span>© {new Date().getFullYear()} Decision Intel. All rights reserved.</span>
+          <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+            <Link
+              href="/terms"
+              style={{ color: '#94A3B8', textDecoration: 'none' }}
+            >
+              Terms of Service
+            </Link>
+            <Link
+              href="/privacy"
+              style={{ color: '#94A3B8', textDecoration: 'none' }}
+            >
+              Privacy Policy
+            </Link>
+          </div>
         </div>
       </footer>
 

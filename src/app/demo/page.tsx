@@ -2618,7 +2618,7 @@ function DemoConversionCTA({
             {!loadingSample && <ArrowRight size={14} />}
           </button>
           <Link
-            href="/login"
+            href="/login?redirect=/dashboard"
             onClick={() => trackEvent('demo_cta_clicked', { target: 'signup', submitted })}
             style={ctaSecondary}
             onMouseEnter={e => {

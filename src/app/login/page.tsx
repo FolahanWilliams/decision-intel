@@ -97,7 +97,7 @@ function LoginContent() {
           flexDirection: 'column',
           justifyContent: 'center',
           padding: '3rem',
-          borderRight: '1px solid rgba(255,255,255,0.08)',
+          borderRight: '1px solid var(--border-color, #E2E8F0)',
           position: 'relative',
           zIndex: 1,
         }}
@@ -255,12 +255,10 @@ function LoginContent() {
             className="login-card"
             style={{
               padding: '2rem',
-              border: '1px solid rgba(255,255,255,0.12)',
-              background: 'rgba(8, 11, 20, 0.65)',
-              backdropFilter: 'blur(40px) saturate(180%)',
-              WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+              border: '1px solid var(--border-color, #E2E8F0)',
+              background: 'var(--bg-card, #FFFFFF)',
               borderRadius: '20px',
-              boxShadow: '0 16px 56px rgba(0,0,0,0.45), 0 1px 0 rgba(255,255,255,0.08) inset',
+              boxShadow: '0 20px 48px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04)',
             }}
           >
             <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
@@ -343,7 +341,29 @@ function LoginContent() {
                 lineHeight: 1.5,
               }}
             >
-              By signing in, you agree to our terms of service and privacy policy.
+              By signing in, you agree to our{' '}
+              <Link
+                href="/terms"
+                style={{
+                  color: 'var(--accent-primary, #16A34A)',
+                  textDecoration: 'underline',
+                  textUnderlineOffset: '2px',
+                }}
+              >
+                terms of service
+              </Link>{' '}
+              and{' '}
+              <Link
+                href="/privacy"
+                style={{
+                  color: 'var(--accent-primary, #16A34A)',
+                  textDecoration: 'underline',
+                  textUnderlineOffset: '2px',
+                }}
+              >
+                privacy policy
+              </Link>
+              .
             </p>
           </div>
 
@@ -372,7 +392,7 @@ function LoginContent() {
             flex: 0 0 auto !important;
             padding: 2rem 1.5rem 1.5rem !important;
             border-right: none !important;
-            border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+            border-bottom: 1px solid var(--border-color, #E2E8F0) !important;
             justify-content: flex-start !important;
           }
           .login-right-panel {
