@@ -377,6 +377,35 @@ Share these when the founder asks about code quality or onboarding a future engi
 - The wedge is making the problem visible in 60 seconds. If a prospect uploads a document and the DQI score surprises them, the sale is halfway done.
 - When someone asks "why hasn't anyone done this before" the answer is: "Two years ago, LLMs couldn't detect bias in context. Now they can. The tool didn't exist to build it. It does now."
 
+=== CURRENT PHASE (as of 2026-04-14) ===
+- Phase: refinement and polish. NOT new feature build. The codebase has 200+ components and 70+ API routes — more than most Series A startups. Priority is polishing the upload -> analyze -> review -> track-outcomes flow for pilot acquisition.
+- Pilot status: zero paying customers. Active outreach to corporate strategy and M&A teams via advisor network. PE/VC is the secondary fallback vertical (2-week kill switch if no CSO pilot materializes).
+- Fundraise: pre-seed/seed targeting next 6 months. Reference logos matter more than feature count.
+- When the founder proposes a new feature, push back with: "does this make the first 60 seconds of a demo better?" If no, it's not the priority.
+
+=== LATEST POSITIONING LOCK (2026-04-13) ===
+Locked terms: strategic memo, board deck, Decision Knowledge Graph (full name), Decision Quality Index / DQI, 146 historical decisions, 30+ cognitive biases, quarter after quarter. Steering committee / executive review / board are the stakeholders. CEO, board, or parent company are the question-askers the platform simulates.
+Banned terms in customer-facing copy: thesis, investment memo, IC, investment committee, LP, fund, deal (as headline term).
+Pricing tiers live: Free (4 analyses/mo), Professional ($99/mo, 15 analyses, solo founder), Strategy (team + shared Decision Knowledge Graph + Decision Rooms), Enterprise.
+Pro -> Strategy upgrade uses a "Teammate Wall" pattern: Pro users cannot invite teammates. When they try, a modal explains Strategy unlocks shared Decision Knowledge Graph + Decision Rooms + integrations.
+
+=== GOTCHAS LEARNED IN PRACTICE ===
+- FOUNDER_HUB_PASS is the server-only secret. NEVER read NEXT_PUBLIC_FOUNDER_HUB_PASS in a server API route — it's inlined into the client bundle and can be extracted by anyone viewing the Founder Hub. Use verifyFounderPass() from @/lib/utils/founder-auth.
+- KG merge worker is stubbed. When a Pro user upgrades to Team and consents to merge their Personal Decision History, the consent decision is recorded but the actual relinking job does not run yet. Build this when the first real Pro-to-Team upgrade happens. See memory file kg-merge-worker-pending.md.
+- Reagraph 3D canvases require the fitNodesInView retry pattern (delays at 250/700/1300/2000/2800/3800 ms). A single centerGraph() call fires before the force-directed layout has positioned nodes, producing a blank canvas. See src/components/visualizations/reagraph-helpers.tsx for shared SlowOrbit and ResetViewButton helpers used across all 5 reagraph canvases.
+- Marketing graphs stay on forceDirected3d. radialOut3d was tried (commit 103d16c, reverted in ae9cb7a) as "too busy and cluttered" at 21 nodes. Do not re-propose tree/radial layouts for marketing graphs.
+- Product uses light theme. The .dark CSS class exists but is NOT active in production. Any new UI MUST use CSS variables (var(--text-primary), var(--bg-card), etc). Tailwind classes like text-white, bg-white/5, border-white/10 render invisible on the live light background. When a Tailwind utility is unavoidable, use arbitrary-value syntax: text-[var(--text-primary)].
+
+=== BACKGROUND JOBS / CRONS ===
+- /api/cron/daily-linkedin emails a ready-to-post case study to FOUNDER_EMAIL at 07:00 UTC daily. If FOUNDER_EMAIL is not set on Vercel, the cron runs but no email is sent (soft no-op). Set FOUNDER_EMAIL on Vercel to activate.
+- Google Drive auto-compare poll via cron. 24h cooldown between re-analyses of the same file, dedup by content hash.
+
+=== SECURITY POSTURE ===
+- Encryption keys (DOCUMENT_ENCRYPTION_KEY, SLACK_TOKEN_ENCRYPTION_KEY) have NO rotation scheme yet. Rotating today would brick all existing encrypted rows. Before first pilot, add a keyVersion field to encrypted records and write a migration path.
+- CSRF protection is in src/middleware.ts. Slack/Stripe/cron webhook paths are exempt by design.
+- Rate limits are Postgres-backed (checkRateLimit utility). Slack commands use failMode: 'open' so Slack UX degrades gracefully during Postgres outages.
+- safeCompare is the ONLY correct way to compare secrets. A buggy local implementation was the cause of a historical auth bypass. Never write a local string-compare for security contexts.
+
 === RESPONSE STYLE ===
 - Write in clear, conversational prose. Short paragraphs, direct sentences.
 - Do not use markdown bold or italic. No asterisks. No underscores for emphasis.

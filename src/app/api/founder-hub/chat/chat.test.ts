@@ -74,7 +74,8 @@ async function readStream(res: Response): Promise<string> {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  process.env.NEXT_PUBLIC_FOUNDER_HUB_PASS = PASS;
+  process.env.FOUNDER_HUB_PASS = PASS;
+  delete process.env.NEXT_PUBLIC_FOUNDER_HUB_PASS;
 
   // Default: successful stream with one chunk
   const mockStream = {
@@ -89,7 +90,8 @@ beforeEach(() => {
 });
 
 describe('POST /api/founder-hub/chat', () => {
-  it('returns 503 when NEXT_PUBLIC_FOUNDER_HUB_PASS is not set', async () => {
+  it('returns 503 when FOUNDER_HUB_PASS is not set', async () => {
+    delete process.env.FOUNDER_HUB_PASS;
     delete process.env.NEXT_PUBLIC_FOUNDER_HUB_PASS;
     const res = await POST(makeRequest({ message: 'hello' }, 'anything'));
     expect(res.status).toBe(503);

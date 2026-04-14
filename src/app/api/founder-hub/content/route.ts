@@ -14,7 +14,7 @@ import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/ge
 import { getRequiredEnvVar, getOptionalEnvVar } from '@/lib/env';
 import { formatSSE } from '@/lib/sse';
 import { createLogger } from '@/lib/utils/logger';
-import { safeCompare } from '@/lib/utils/safe-compare';
+import { verifyFounderPass as checkFounderPass } from '@/lib/utils/founder-auth';
 import { prisma } from '@/lib/prisma';
 import { FOUNDER_CONTEXT } from '../founder-context';
 
@@ -24,10 +24,7 @@ const ENCODER = new TextEncoder();
 // ─── Auth helper ────────────────────────────────────────────────────────────
 
 function verifyFounderPass(req: NextRequest): boolean {
-  const founderPass = process.env.NEXT_PUBLIC_FOUNDER_HUB_PASS;
-  if (!founderPass) return false;
-  const headerPass = req.headers.get('x-founder-pass') || '';
-  return safeCompare(headerPass, founderPass);
+  return checkFounderPass(req.headers.get('x-founder-pass')).ok;
 }
 
 // ─── Gemini Setup ───────────────────────────────────────────────────────────

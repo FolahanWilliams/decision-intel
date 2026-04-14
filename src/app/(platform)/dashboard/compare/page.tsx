@@ -94,7 +94,7 @@ export default function ComparePage() {
     <ErrorBoundary sectionName="Compare Analyses">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Compare Analyses</h1>
+          <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">Compare Analyses</h1>
           <p className="text-gray-400">
             Compare multiple cognitive audits side by side to identify patterns and trends.
           </p>
@@ -102,8 +102,8 @@ export default function ComparePage() {
 
         <div className="grid gap-6">
           {/* Selection Area */}
-          <div className={cn('p-6 rounded-xl', 'liquid-glass-premium', 'border border-white/10')}>
-            <h2 className="text-xl font-semibold text-white mb-4">
+          <div className={cn('p-6 rounded-xl', 'liquid-glass-premium', 'border border-[var(--border-color)]')}>
+            <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-4">
               Select Analyses to Compare{' '}
               <span className="text-sm text-gray-400 font-normal">({selectedIds.length}/3)</span>
             </h2>
@@ -116,7 +116,7 @@ export default function ComparePage() {
                   return (
                     <span
                       key={id}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 text-white text-sm border border-white/20"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--bg-card-hover)] text-[var(--text-primary)] text-sm border border-[var(--border-color)]"
                     >
                       {doc?.filename || id.slice(0, 8)}
                       <button
@@ -136,7 +136,7 @@ export default function ComparePage() {
             {docsLoading ? (
               <p className="text-gray-500 text-sm">Loading documents...</p>
             ) : completeDocs.length === 0 && selectedIds.length === 0 ? (
-              <div className="mt-4 p-12 text-center border-2 border-dashed border-white/20 rounded-lg">
+              <div className="mt-4 p-12 text-center border-2 border-dashed border-[var(--border-color)] rounded-lg">
                 <p className="text-gray-500">
                   No completed analyses available. Upload and analyze documents first.
                 </p>
@@ -150,15 +150,15 @@ export default function ComparePage() {
                     disabled={selectedIds.length >= 3}
                     className={cn(
                       'flex items-center gap-3 p-3 rounded-lg text-left transition-all',
-                      'border border-white/10 hover:border-white/30',
+                      'border border-[var(--border-color)] hover:border-[var(--border-hover)]',
                       selectedIds.length >= 3
                         ? 'opacity-50 cursor-not-allowed'
-                        : 'hover:bg-white/5 cursor-pointer'
+                        : 'hover:bg-[var(--bg-card-hover)] cursor-pointer'
                     )}
                   >
                     <Plus size={16} className="text-gray-400 flex-shrink-0" />
                     <div className="min-w-0">
-                      <p className="text-sm text-white truncate">{doc.filename}</p>
+                      <p className="text-sm text-[var(--text-primary)] truncate">{doc.filename}</p>
                       <p className="text-xs text-gray-500">Score: {doc.score ?? 'N/A'}</p>
                     </div>
                   </button>
@@ -170,7 +170,7 @@ export default function ComparePage() {
           {/* Empty state — nothing selected */}
           {!loading && selectedIds.length === 0 && completeDocs.length > 0 && (
             <div
-              className={cn('p-8 rounded-xl text-center', 'liquid-glass', 'border border-white/10')}
+              className={cn('p-8 rounded-xl text-center', 'liquid-glass', 'border border-[var(--border-color)]')}
             >
               <GitCompareArrows size={32} className="mx-auto mb-3 text-gray-500" />
               <p className="text-gray-400 text-sm">
@@ -185,8 +185,8 @@ export default function ComparePage() {
           )}
 
           {!loading && analyses.length >= 2 && (
-            <div className={cn('p-6 rounded-xl', 'liquid-glass', 'border border-white/10')}>
-              <h2 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
+            <div className={cn('p-6 rounded-xl', 'liquid-glass', 'border border-[var(--border-color)]')}>
+              <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-6 flex items-center gap-2">
                 <GitCompareArrows size={20} />
                 Comparison Results
               </h2>
@@ -195,10 +195,10 @@ export default function ComparePage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-white/10">
+                    <tr className="border-b border-[var(--border-color)]">
                       <th className="text-left text-gray-400 py-3 px-4 font-medium">Metric</th>
                       {analyses.map(a => (
-                        <th key={a.id} className="text-center text-white py-3 px-4 font-medium">
+                        <th key={a.id} className="text-center text-[var(--text-primary)] py-3 px-4 font-medium">
                           <span className="block truncate max-w-[180px]">{a.filename}</span>
                         </th>
                       ))}
@@ -209,7 +209,7 @@ export default function ComparePage() {
                   </thead>
                   <tbody>
                     {/* Overall Score */}
-                    <tr className="border-b border-white/5">
+                    <tr className="border-b border-[var(--border-color)]">
                       <td className="py-3 px-4 text-gray-300">Overall Score</td>
                       {analyses.map(a => (
                         <td key={a.id} className="text-center py-3 px-4">
@@ -242,10 +242,10 @@ export default function ComparePage() {
                     </tr>
 
                     {/* Noise Score */}
-                    <tr className="border-b border-white/5">
+                    <tr className="border-b border-[var(--border-color)]">
                       <td className="py-3 px-4 text-gray-300">Noise Score</td>
                       {analyses.map(a => (
-                        <td key={a.id} className="text-center py-3 px-4 text-white">
+                        <td key={a.id} className="text-center py-3 px-4 text-[var(--text-primary)]">
                           {a.noiseScore}
                         </td>
                       ))}
@@ -264,10 +264,10 @@ export default function ComparePage() {
                     </tr>
 
                     {/* Bias Count */}
-                    <tr className="border-b border-white/5">
+                    <tr className="border-b border-[var(--border-color)]">
                       <td className="py-3 px-4 text-gray-300">Biases Detected</td>
                       {analyses.map(a => (
-                        <td key={a.id} className="text-center py-3 px-4 text-white">
+                        <td key={a.id} className="text-center py-3 px-4 text-[var(--text-primary)]">
                           {a.biasCount}
                         </td>
                       ))}
@@ -279,10 +279,10 @@ export default function ComparePage() {
                     </tr>
 
                     {/* Fact Check Score */}
-                    <tr className="border-b border-white/5">
+                    <tr className="border-b border-[var(--border-color)]">
                       <td className="py-3 px-4 text-gray-300">Fact Check Score</td>
                       {analyses.map(a => (
-                        <td key={a.id} className="text-center py-3 px-4 text-white">
+                        <td key={a.id} className="text-center py-3 px-4 text-[var(--text-primary)]">
                           {a.factCheckScore !== null ? a.factCheckScore : 'N/A'}
                         </td>
                       ))}
@@ -315,8 +315,8 @@ export default function ComparePage() {
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {analyses.map(a => (
-                    <div key={a.id} className="p-4 rounded-lg bg-white/5 border border-white/10">
-                      <p className="text-sm text-white font-medium mb-2 truncate">{a.filename}</p>
+                    <div key={a.id} className="p-4 rounded-lg bg-[var(--bg-card-hover)] border border-[var(--border-color)]">
+                      <p className="text-sm text-[var(--text-primary)] font-medium mb-2 truncate">{a.filename}</p>
                       {a.topBiases.length > 0 ? (
                         <ul className="space-y-1">
                           {a.topBiases.map((bias, i) => (
@@ -358,7 +358,7 @@ export default function ComparePage() {
 
           {!loading && analyses.length === 1 && (
             <div
-              className={cn('p-6 rounded-xl text-center', 'liquid-glass', 'border border-white/10')}
+              className={cn('p-6 rounded-xl text-center', 'liquid-glass', 'border border-[var(--border-color)]')}
             >
               <p className="text-gray-400">Select at least one more analysis to compare.</p>
             </div>

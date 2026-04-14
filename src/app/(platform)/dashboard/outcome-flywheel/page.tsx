@@ -417,7 +417,7 @@ function FlywheelInner() {
                     <Link
                       key={d.id}
                       href={`/documents/${d.id}`}
-                      className="flex items-center gap-sm hover:bg-white/5 transition-colors"
+                      className="flex items-center gap-sm hover:bg-[var(--bg-card-hover)] transition-colors"
                       style={{
                         padding: '10px var(--spacing-md)',
                         borderBottom: '1px solid rgba(255,255,255,0.04)',
@@ -508,7 +508,7 @@ function FlywheelInner() {
                     <Link
                       key={d.id}
                       href={`/documents/${d.id}`}
-                      className="flex items-center gap-sm hover:bg-white/5 transition-colors"
+                      className="flex items-center gap-sm hover:bg-[var(--bg-card-hover)] transition-colors"
                       style={{
                         padding: '10px var(--spacing-md)',
                         borderBottom: '1px solid rgba(255,255,255,0.04)',

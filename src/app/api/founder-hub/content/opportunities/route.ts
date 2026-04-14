@@ -12,15 +12,13 @@ import { NextRequest } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { apiError, apiSuccess } from '@/lib/utils/api-response';
 import { createLogger } from '@/lib/utils/logger';
-import { safeCompare } from '@/lib/utils/safe-compare';
+import { verifyFounderPass as checkFounderPass } from '@/lib/utils/founder-auth';
 import { FOUNDER_CONTEXT } from '../../founder-context';
 
 const log = createLogger('ContentOpportunities');
 
 function verifyFounderPass(req: NextRequest): boolean {
-  const founderPass = process.env.NEXT_PUBLIC_FOUNDER_HUB_PASS;
-  if (!founderPass) return false;
-  return safeCompare(req.headers.get('x-founder-pass') || '', founderPass);
+  return checkFounderPass(req.headers.get('x-founder-pass')).ok;
 }
 
 export interface ContentOpportunity {

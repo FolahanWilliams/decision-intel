@@ -6,7 +6,8 @@
  * leaking founder-internal content (moat assessment, competitor
  * responses, pricing rationale, sales playbook).
  *
- * Auth: requires NEXT_PUBLIC_FOUNDER_HUB_PASS in x-founder-pass header.
+ * Auth: requires FOUNDER_HUB_PASS (server-only) in x-founder-pass header.
+ * Falls back to NEXT_PUBLIC_FOUNDER_HUB_PASS during migration.
  *
  * Accepts either JSON or multipart/form-data (when a file is attached).
  */
@@ -16,7 +17,7 @@ import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/ge
 import { getRequiredEnvVar, getOptionalEnvVar } from '@/lib/env';
 import { formatSSE } from '@/lib/sse';
 import { createLogger } from '@/lib/utils/logger';
-import { safeCompare } from '@/lib/utils/safe-compare';
+import { verifyFounderPass } from '@/lib/utils/founder-auth';
 import { parseFile } from '@/lib/utils/file-parser';
 import { FOUNDER_CONTEXT } from '../founder-context';
 
@@ -134,14 +135,13 @@ async function parseRequestBody(req: NextRequest): Promise<ParsedBody> {
 // ─── Route Handler ──────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
-  // Auth: verify founder password
-  const founderPass = process.env.NEXT_PUBLIC_FOUNDER_HUB_PASS;
-  if (!founderPass) {
-    return NextResponse.json({ error: 'Not configured' }, { status: 503 });
-  }
-  const headerPass = req.headers.get('x-founder-pass') || '';
-  if (!safeCompare(headerPass, founderPass)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  // Auth: verify founder password via server-only FOUNDER_HUB_PASS.
+  const auth = verifyFounderPass(req.headers.get('x-founder-pass'));
+  if (!auth.ok) {
+    return NextResponse.json(
+      { error: auth.reason === 'not_configured' ? 'Not configured' : 'Unauthorized' },
+      { status: auth.reason === 'not_configured' ? 503 : 401 },
+    );
   }
 
   try {

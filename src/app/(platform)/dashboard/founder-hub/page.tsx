@@ -406,10 +406,14 @@ export default function FounderHubPage() {
     product_deep: (
       <>
         <AccordionSection title="Analysis Pipeline" subtitle="12-node LangGraph sequence">
-          <CorePipelineTab />
+          <ErrorBoundary sectionName="Analysis Pipeline">
+            <CorePipelineTab />
+          </ErrorBoundary>
         </AccordionSection>
         <AccordionSection title="Scoring Engine" subtitle="Toxic patterns and risk multipliers">
-          <ScoringEngineTab />
+          <ErrorBoundary sectionName="Scoring Engine">
+            <ScoringEngineTab />
+          </ErrorBoundary>
         </AccordionSection>
         <AccordionSection title="DQI Methodology" subtitle="Formula, percentiles, calibration">
           <ErrorBoundary sectionName="DQI Methodology">
@@ -432,7 +436,9 @@ export default function FounderHubPage() {
           title="Playbook & Research"
           subtitle="Cited papers, research library, decision playbook"
         >
-          <PlaybookAndResearchTab />
+          <ErrorBoundary sectionName="Playbook & Research">
+            <PlaybookAndResearchTab />
+          </ErrorBoundary>
         </AccordionSection>
       </>
     ),
@@ -442,7 +448,9 @@ export default function FounderHubPage() {
           title="External Story"
           subtitle="Moat narrative, market sizing, 'why now' hook"
         >
-          <StrategyAndPositioningTab />
+          <ErrorBoundary sectionName="Strategy & Positioning">
+            <StrategyAndPositioningTab />
+          </ErrorBoundary>
         </AccordionSection>
         <AccordionSection
           title="Investor Defense"
@@ -454,7 +462,11 @@ export default function FounderHubPage() {
         </AccordionSection>
       </>
     ),
-    sales: <SalesToolkitTab />,
+    sales: (
+      <ErrorBoundary sectionName="Sales Toolkit">
+        <SalesToolkitTab />
+      </ErrorBoundary>
+    ),
     outreach: <OutreachAndMeetingsTab founderPass={FOUNDER_PASS} />,
     content: (
       <ErrorBoundary sectionName="Content Studio">

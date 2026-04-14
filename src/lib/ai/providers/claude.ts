@@ -23,11 +23,16 @@ export interface GenerateTextOptions {
   temperature?: number;
 }
 
-// Module-level singleton to avoid recreating the SDK client on every call
+// Module-level singleton to avoid recreating the SDK client on every call.
+// Keyed on the apiKey so a rotated ANTHROPIC_API_KEY picks up on the next call
+// instead of requiring a cold start (previous behavior stored only the first
+// key seen and ignored rotations until the process restarted).
 let _client: Anthropic | null = null;
+let _clientKey: string | null = null;
 function getClient(apiKey: string): Anthropic {
-  if (!_client) {
+  if (!_client || _clientKey !== apiKey) {
     _client = new Anthropic({ apiKey });
+    _clientKey = apiKey;
   }
   return _client;
 }

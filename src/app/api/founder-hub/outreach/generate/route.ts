@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import type { Prisma } from '@prisma/client';
 import { formatSSE } from '@/lib/sse';
 import { createLogger } from '@/lib/utils/logger';
-import { safeCompare } from '@/lib/utils/safe-compare';
+import { verifyFounderPass } from '@/lib/utils/founder-auth';
 import { prisma } from '@/lib/prisma';
 import { fetchLinkedInProfile } from '@/lib/outreach/linkedin-parser';
 import { extractProfile } from '@/lib/outreach/profile-extractor';
@@ -24,13 +24,12 @@ interface GenerateBody {
 }
 
 export async function POST(req: NextRequest) {
-  const founderPass = process.env.NEXT_PUBLIC_FOUNDER_HUB_PASS;
-  if (!founderPass) {
-    return NextResponse.json({ error: 'Not configured' }, { status: 503 });
-  }
-  const headerPass = req.headers.get('x-founder-pass') || '';
-  if (!safeCompare(headerPass, founderPass)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = verifyFounderPass(req.headers.get('x-founder-pass'));
+  if (!auth.ok) {
+    return NextResponse.json(
+      { error: auth.reason === 'not_configured' ? 'Not configured' : 'Unauthorized' },
+      { status: auth.reason === 'not_configured' ? 503 : 401 },
+    );
   }
 
   let body: GenerateBody;

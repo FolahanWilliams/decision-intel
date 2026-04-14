@@ -370,7 +370,7 @@ export function OverviewTab({
         <div className="card mt-lg">
           <button
             onClick={() => setShowRpd(prev => !prev)}
-            className="w-full card-header flex items-center justify-between hover:bg-white/5 transition-colors"
+            className="w-full card-header flex items-center justify-between hover:bg-[var(--bg-card-hover)] transition-colors"
             aria-expanded={showRpd}
           >
             <h3 className="flex items-center gap-2 text-base">

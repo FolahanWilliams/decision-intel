@@ -1628,7 +1628,7 @@ export default function Dashboard() {
                       >
                         <Link
                           href={`/documents/${doc.id}`}
-                          className="card group hover:border-white/20 transition-all"
+                          className="card group hover:border-[var(--border-hover)] transition-all"
                           style={{ textDecoration: 'none', display: 'block' }}
                         >
                           <div className="card-body">
@@ -1752,7 +1752,7 @@ export default function Dashboard() {
           <div className="card mb-xl">
             <button
               onClick={() => setShowActivityFeed(prev => !prev)}
-              className="w-full card-header flex items-center justify-between hover:bg-white/5 transition-colors"
+              className="w-full card-header flex items-center justify-between hover:bg-[var(--bg-card-hover)] transition-colors"
               aria-expanded={showActivityFeed}
             >
               <h3 className="flex items-center gap-2 text-base">

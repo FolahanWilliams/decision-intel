@@ -9,16 +9,14 @@ import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { apiError, apiSuccess } from '@/lib/utils/api-response';
 import { createLogger } from '@/lib/utils/logger';
-import { safeCompare } from '@/lib/utils/safe-compare';
+import { verifyFounderPass } from '@/lib/utils/founder-auth';
 
 const log = createLogger('FounderProspectsId');
 
 const VALID_STATUSES = ['cold', 'warm', 'active', 'converted', 'archived'];
 
 function verify(req: NextRequest): boolean {
-  const pass = process.env.NEXT_PUBLIC_FOUNDER_HUB_PASS;
-  if (!pass) return false;
-  return safeCompare(req.headers.get('x-founder-pass') || '', pass);
+  return verifyFounderPass(req.headers.get('x-founder-pass')).ok;
 }
 
 interface PatchBody {

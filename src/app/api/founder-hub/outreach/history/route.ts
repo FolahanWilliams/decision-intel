@@ -2,23 +2,19 @@ import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { apiError, apiSuccess } from '@/lib/utils/api-response';
 import { createLogger } from '@/lib/utils/logger';
-import { safeCompare } from '@/lib/utils/safe-compare';
+import { verifyFounderPass } from '@/lib/utils/founder-auth';
 
 const log = createLogger('OutreachHistory');
 const FOUNDER_USER_ID = 'founder';
 
-function requireFounderPass(req: NextRequest) {
-  const founderPass = process.env.NEXT_PUBLIC_FOUNDER_HUB_PASS;
-  if (!founderPass) return { ok: false as const, status: 503, reason: 'Not configured' };
-  const headerPass = req.headers.get('x-founder-pass') || '';
-  if (!safeCompare(headerPass, founderPass))
-    return { ok: false as const, status: 401, reason: 'Unauthorized' };
-  return { ok: true as const };
-}
-
 export async function GET(req: NextRequest) {
-  const auth = requireFounderPass(req);
-  if (!auth.ok) return apiError({ error: auth.reason, status: auth.status });
+  const auth = verifyFounderPass(req.headers.get('x-founder-pass'));
+  if (!auth.ok) {
+    return apiError({
+      error: auth.reason === 'not_configured' ? 'Not configured' : 'Unauthorized',
+      status: auth.reason === 'not_configured' ? 503 : 401,
+    });
+  }
 
   try {
     const artifacts = await prisma.outreachArtifact.findMany({
@@ -52,8 +48,13 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const auth = requireFounderPass(req);
-  if (!auth.ok) return apiError({ error: auth.reason, status: auth.status });
+  const auth = verifyFounderPass(req.headers.get('x-founder-pass'));
+  if (!auth.ok) {
+    return apiError({
+      error: auth.reason === 'not_configured' ? 'Not configured' : 'Unauthorized',
+      status: auth.reason === 'not_configured' ? 503 : 401,
+    });
+  }
 
   let body: { id?: string; status?: string; outcome?: string };
   try {
@@ -89,8 +90,13 @@ export async function PATCH(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const auth = requireFounderPass(req);
-  if (!auth.ok) return apiError({ error: auth.reason, status: auth.status });
+  const auth = verifyFounderPass(req.headers.get('x-founder-pass'));
+  if (!auth.ok) {
+    return apiError({
+      error: auth.reason === 'not_configured' ? 'Not configured' : 'Unauthorized',
+      status: auth.reason === 'not_configured' ? 503 : 401,
+    });
+  }
 
   const { searchParams } = new URL(req.url);
   const id = searchParams.get('id');

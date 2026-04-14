@@ -134,11 +134,11 @@ export default function DecisionGraphPage() {
 
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-[var(--text-primary)] flex items-center gap-2">
             <Network className="h-6 w-6 text-blue-400" />
             {knowledgeGraphLabel}
           </h1>
-          <p className="text-sm text-zinc-500 mt-1">{knowledgeGraphDescription}</p>
+          <p className="text-sm text-[var(--text-muted)] mt-1">{knowledgeGraphDescription}</p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -157,7 +157,7 @@ export default function DecisionGraphPage() {
               a.click();
               URL.revokeObjectURL(url);
             }}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-white/5 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] transition-colors"
             title="Export as SVG"
           >
             <Download size={14} />
@@ -192,7 +192,7 @@ export default function DecisionGraphPage() {
               };
               img.src = url;
             }}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-white/5 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] transition-colors"
             title="Export as PNG"
           >
             <Download size={14} />
@@ -200,13 +200,13 @@ export default function DecisionGraphPage() {
           </button>
 
           {/* Tab switcher */}
-          <div className="flex rounded-lg overflow-hidden border border-white/10">
+          <div className="flex rounded-lg overflow-hidden border border-[var(--border-color)]">
             <button
               onClick={() => setActiveTab('graph')}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors ${
                 activeTab === 'graph'
-                  ? 'bg-white/10 text-white'
-                  : 'text-zinc-500 hover:text-zinc-300'
+                  ? 'bg-[var(--bg-card-hover)] text-[var(--text-primary)]'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
             >
               <Network size={12} /> Graph
@@ -215,8 +215,8 @@ export default function DecisionGraphPage() {
               onClick={() => setActiveTab('report')}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors ${
                 activeTab === 'report'
-                  ? 'bg-white/10 text-white'
-                  : 'text-zinc-500 hover:text-zinc-300'
+                  ? 'bg-[var(--bg-card-hover)] text-[var(--text-primary)]'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
             >
               <FileText size={12} /> Report
@@ -229,7 +229,7 @@ export default function DecisionGraphPage() {
               setTimeRange(parseInt(e.target.value, 10));
               setReport(null); // Reset report on time change
             }}
-            className="text-sm px-3 py-1.5 rounded bg-white/5 border border-white/10 text-zinc-300"
+            className="text-sm px-3 py-1.5 rounded bg-[var(--bg-card-hover)] border border-[var(--border-color)] text-[var(--text-primary)]"
           >
             <option value="30">Last 30 days</option>
             <option value="90">Last 90 days</option>
@@ -267,7 +267,7 @@ export default function DecisionGraphPage() {
             }}
           >
             <AlertTriangle size={18} style={{ color: '#ef4444', flexShrink: 0 }} />
-            <span className="text-sm text-zinc-400" style={{ flex: 1 }}>
+            <span className="text-sm text-[var(--text-secondary)]" style={{ flex: 1 }}>
               {orgError}
             </span>
             <button
@@ -284,7 +284,7 @@ export default function DecisionGraphPage() {
           </div>
         ) : !orgId ? (
           <div className="card">
-            <div className="card-body flex items-center justify-center h-64 text-zinc-500">
+            <div className="card-body flex items-center justify-center h-64 text-[var(--text-muted)]">
               <p>Join an organization to view the decision graph.</p>
             </div>
           </div>
@@ -292,7 +292,7 @@ export default function DecisionGraphPage() {
           <DecisionKnowledgeGraph orgId={orgId} timeRange={timeRange} />
         ) : reportLoading ? (
           <div className="card">
-            <div className="card-body flex items-center justify-center h-64 text-zinc-500">
+            <div className="card-body flex items-center justify-center h-64 text-[var(--text-muted)]">
               <Loader2 size={20} className="animate-spin mr-2" />
               Generating network analysis report...
             </div>
@@ -310,7 +310,7 @@ export default function DecisionGraphPage() {
             }}
           >
             <AlertTriangle size={18} style={{ color: '#ef4444', flexShrink: 0 }} />
-            <span className="text-sm text-zinc-400" style={{ flex: 1 }}>
+            <span className="text-sm text-[var(--text-secondary)]" style={{ flex: 1 }}>
               {reportError || 'Failed to load report.'}
             </span>
             <button
@@ -334,12 +334,12 @@ export default function DecisionGraphPage() {
             {report.narrative && (
               <div className="card">
                 <div className="card-header">
-                  <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                  <span className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
                     AI Executive Summary
                   </span>
                 </div>
                 <div className="card-body">
-                  <p className="text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap">
+                  <p className="text-sm text-[var(--text-primary)] leading-relaxed whitespace-pre-wrap">
                     {report.narrative}
                   </p>
                 </div>
@@ -363,12 +363,12 @@ export default function DecisionGraphPage() {
                     >
                       {report.report.riskState.overallRisk} Risk
                     </span>
-                    <span className="text-xs text-zinc-500 ml-2">
+                    <span className="text-xs text-[var(--text-muted)] ml-2">
                       Score: {report.report.riskState.riskScore}/100
                     </span>
                   </div>
                 </div>
-                <div className="flex items-center gap-1 text-xs text-zinc-400">
+                <div className="flex items-center gap-1 text-xs text-[var(--text-secondary)]">
                   {report.report.riskState.trend === 'improving' && (
                     <TrendingDown size={14} className="text-green-400" />
                   )}
@@ -376,7 +376,7 @@ export default function DecisionGraphPage() {
                     <TrendingUp size={14} className="text-red-400" />
                   )}
                   {report.report.riskState.trend === 'stable' && (
-                    <Minus size={14} className="text-zinc-500" />
+                    <Minus size={14} className="text-[var(--text-muted)]" />
                   )}
                   <span className="capitalize">{report.report.riskState.trend}</span>
                 </div>
@@ -384,7 +384,7 @@ export default function DecisionGraphPage() {
               {report.report.riskState.factors.length > 0 && (
                 <div className="px-4 pb-3 space-y-1">
                   {report.report.riskState.factors.map((f, i) => (
-                    <p key={i} className="text-xs text-zinc-500">
+                    <p key={i} className="text-xs text-[var(--text-muted)]">
                       {f.description}
                     </p>
                   ))}
@@ -414,12 +414,12 @@ export default function DecisionGraphPage() {
               ].map((m, i) => (
                 <div key={i} className="card text-center" style={{ padding: '12px 8px' }}>
                   <div
-                    className="text-lg font-bold text-white"
+                    className="text-lg font-bold text-[var(--text-primary)]"
                     style={{ fontFamily: "'JetBrains Mono'" }}
                   >
                     {m.value}
                   </div>
-                  <div className="text-[10px] text-zinc-500">{m.label}</div>
+                  <div className="text-[10px] text-[var(--text-muted)]">{m.label}</div>
                 </div>
               ))}
             </div>
@@ -428,14 +428,14 @@ export default function DecisionGraphPage() {
             {report.report.topNodes.length > 0 && (
               <div className="card">
                 <div className="card-header">
-                  <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                  <span className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
                     Most Influential Decisions (PageRank)
                   </span>
                 </div>
                 <div className="card-body p-0">
                   <table className="w-full text-xs">
                     <thead>
-                      <tr className="border-b border-white/5 text-zinc-500">
+                      <tr className="border-b border-[var(--border-color)] text-[var(--text-muted)]">
                         <th className="text-left p-2 pl-4">Decision</th>
                         <th className="text-left p-2">Type</th>
                         <th className="text-right p-2">PageRank</th>
@@ -445,21 +445,21 @@ export default function DecisionGraphPage() {
                     </thead>
                     <tbody>
                       {report.report.topNodes.map((n, i) => (
-                        <tr key={i} className="border-b border-white/5">
-                          <td className="p-2 pl-4 text-zinc-300 truncate max-w-[200px]">
+                        <tr key={i} className="border-b border-[var(--border-color)]">
+                          <td className="p-2 pl-4 text-[var(--text-primary)] truncate max-w-[200px]">
                             {n.label}
                           </td>
-                          <td className="p-2 text-zinc-500 capitalize">
+                          <td className="p-2 text-[var(--text-muted)] capitalize">
                             {n.type.replace('_', ' ')}
                           </td>
                           <td
-                            className="p-2 text-right text-zinc-300"
+                            className="p-2 text-right text-[var(--text-primary)]"
                             style={{ fontFamily: "'JetBrains Mono'" }}
                           >
                             {n.pageRank.toFixed(2)}
                           </td>
                           <td
-                            className="p-2 text-right text-zinc-300"
+                            className="p-2 text-right text-[var(--text-primary)]"
                             style={{ fontFamily: "'JetBrains Mono'" }}
                           >
                             {n.degree}

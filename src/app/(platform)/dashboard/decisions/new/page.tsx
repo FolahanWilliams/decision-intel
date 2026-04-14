@@ -105,7 +105,7 @@ export default function NewDecisionPage() {
         <div className="mb-8">
           <Link
             href="/dashboard"
-            className="mb-4 inline-flex items-center gap-1 text-sm text-zinc-400 hover:text-white"
+            className="mb-4 inline-flex items-center gap-1 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Dashboard
@@ -115,11 +115,11 @@ export default function NewDecisionPage() {
               <Target className="h-6 w-6 text-indigo-400" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">
+              <h1 className="text-2xl font-bold text-[var(--text-primary)]">
                 Frame Your Decision{' '}
-                <span className="text-sm font-normal text-zinc-500">(optional)</span>
+                <span className="text-sm font-normal text-[var(--text-muted)]">(optional)</span>
               </h1>
-              <p className="text-sm text-zinc-400">
+              <p className="text-sm text-[var(--text-secondary)]">
                 A one-line decision statement is all we need — or skip framing entirely and upload
                 directly.
               </p>
@@ -140,43 +140,43 @@ export default function NewDecisionPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Decision Statement */}
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-zinc-300">
+            <label className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">
               Decision Statement <span className="text-indigo-400">*</span>
             </label>
-            <p className="mb-2 text-xs text-zinc-500">What are you deciding?</p>
+            <p className="mb-2 text-xs text-[var(--text-muted)]">What are you deciding?</p>
             <textarea
               value={decisionStatement}
               onChange={e => setDecisionStatement(e.target.value)}
               placeholder="We are deciding whether to approve the Q3 acquisition of Acme Corp..."
-              className="w-full rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              className="w-full rounded-md border border-[var(--border-color)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
               rows={3}
             />
           </div>
 
           {/* Default Action */}
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-zinc-300">
-              Default Action <span className="text-xs font-normal text-zinc-500">(optional)</span>
+            <label className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">
+              Default Action <span className="text-xs font-normal text-[var(--text-muted)]">(optional)</span>
             </label>
-            <p className="mb-2 text-xs text-zinc-500">
+            <p className="mb-2 text-xs text-[var(--text-muted)]">
               Without further analysis, what would you do?
             </p>
             <textarea
               value={defaultAction}
               onChange={e => setDefaultAction(e.target.value)}
               placeholder="I would approve the acquisition based on the management team's recommendation..."
-              className="w-full rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              className="w-full rounded-md border border-[var(--border-color)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
               rows={2}
             />
           </div>
 
           {/* Success Criteria */}
           <div>
-            <label className="mb-1.5 flex items-center gap-2 text-sm font-medium text-zinc-300">
+            <label className="mb-1.5 flex items-center gap-2 text-sm font-medium text-[var(--text-primary)]">
               <CheckCircle2 className="h-4 w-4 text-green-400" />
-              Success Criteria <span className="text-xs font-normal text-zinc-500">(optional)</span>
+              Success Criteria <span className="text-xs font-normal text-[var(--text-muted)]">(optional)</span>
             </label>
-            <p className="mb-2 text-xs text-zinc-500">This decision succeeds if...</p>
+            <p className="mb-2 text-xs text-[var(--text-muted)]">This decision succeeds if...</p>
             {successCriteria.map((criterion, i) => (
               <div key={i} className="mb-2 flex gap-2">
                 <input
@@ -185,13 +185,13 @@ export default function NewDecisionPage() {
                     updateCriterion(successCriteria, setSuccessCriteria, i, e.target.value)
                   }
                   placeholder={`Success criterion ${i + 1}`}
-                  className="flex-1 rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                  className="flex-1 rounded-md border border-[var(--border-color)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-green-500 focus:ring-1 focus:ring-green-500"
                 />
                 {successCriteria.length > 1 && (
                   <button
                     type="button"
                     onClick={() => removeCriterion(successCriteria, setSuccessCriteria, i)}
-                    className="text-zinc-500 hover:text-red-400"
+                    className="text-[var(--text-muted)] hover:text-red-400"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -209,11 +209,11 @@ export default function NewDecisionPage() {
 
           {/* Failure Criteria */}
           <div>
-            <label className="mb-1.5 flex items-center gap-2 text-sm font-medium text-zinc-300">
+            <label className="mb-1.5 flex items-center gap-2 text-sm font-medium text-[var(--text-primary)]">
               <AlertTriangle className="h-4 w-4 text-red-400" />
-              Failure Criteria <span className="text-xs font-normal text-zinc-500">(optional)</span>
+              Failure Criteria <span className="text-xs font-normal text-[var(--text-muted)]">(optional)</span>
             </label>
-            <p className="mb-2 text-xs text-zinc-500">This decision fails if...</p>
+            <p className="mb-2 text-xs text-[var(--text-muted)]">This decision fails if...</p>
             {failureCriteria.map((criterion, i) => (
               <div key={i} className="mb-2 flex gap-2">
                 <input
@@ -222,13 +222,13 @@ export default function NewDecisionPage() {
                     updateCriterion(failureCriteria, setFailureCriteria, i, e.target.value)
                   }
                   placeholder={`Failure criterion ${i + 1}`}
-                  className="flex-1 rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-red-500 focus:ring-1 focus:ring-red-500"
+                  className="flex-1 rounded-md border border-[var(--border-color)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-red-500 focus:ring-1 focus:ring-red-500"
                 />
                 {failureCriteria.length > 1 && (
                   <button
                     type="button"
                     onClick={() => removeCriterion(failureCriteria, setFailureCriteria, i)}
-                    className="text-zinc-500 hover:text-red-400"
+                    className="text-[var(--text-muted)] hover:text-red-400"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -246,24 +246,24 @@ export default function NewDecisionPage() {
 
           {/* Stakeholders */}
           <div>
-            <label className="mb-1.5 flex items-center gap-2 text-sm font-medium text-zinc-300">
+            <label className="mb-1.5 flex items-center gap-2 text-sm font-medium text-[var(--text-primary)]">
               <Users className="h-4 w-4 text-blue-400" />
               Stakeholders Affected (optional)
             </label>
-            <p className="mb-2 text-xs text-zinc-500">Maps to boardroom simulation personas</p>
+            <p className="mb-2 text-xs text-[var(--text-muted)]">Maps to boardroom simulation personas</p>
             {stakeholders.map((stakeholder, i) => (
               <div key={i} className="mb-2 flex gap-2">
                 <input
                   value={stakeholder}
                   onChange={e => updateCriterion(stakeholders, setStakeholders, i, e.target.value)}
                   placeholder={`e.g., Shareholders, Customers, Employees...`}
-                  className="flex-1 rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="flex-1 rounded-md border border-[var(--border-color)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 />
                 {stakeholders.length > 1 && (
                   <button
                     type="button"
                     onClick={() => removeCriterion(stakeholders, setStakeholders, i)}
-                    className="text-zinc-500 hover:text-red-400"
+                    className="text-[var(--text-muted)] hover:text-red-400"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -289,14 +289,14 @@ export default function NewDecisionPage() {
             <button
               type="submit"
               disabled={!canSubmit || isSubmitting}
-              className="flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-medium text-[var(--text-primary)] hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
               {isSubmitting ? 'Submitting...' : 'Save Frame & Upload Document'}
             </button>
             <Link
               href="/dashboard?view=browse"
-              className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900 px-5 py-2.5 text-sm font-medium text-zinc-200 hover:border-zinc-500 hover:bg-zinc-800 hover:text-white"
+              className="inline-flex items-center gap-2 rounded-lg border border-[var(--border-color)] bg-[var(--bg-card)] px-5 py-2.5 text-sm font-medium text-[var(--text-primary)] hover:border-[var(--border-hover)] hover:bg-[var(--bg-card)] hover:text-[var(--text-primary)]"
             >
               Skip framing — upload directly
               <ArrowLeft className="h-4 w-4 rotate-180" />
