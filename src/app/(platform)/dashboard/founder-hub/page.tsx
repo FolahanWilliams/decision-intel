@@ -205,17 +205,170 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
 
 const TAB_GROUPS: TabGroup[] = ['Product', 'Go-to-Market', 'Intelligence', 'Tools'];
 
-// ─── Search Results ────────────────────────────────────────────────────────
+// ─── Search Index ─────────────────────────────────────────────────────────
+// Flat keyword index over tab sections. Previously, typing in search rendered
+// TAB_CONTENT for all 11 tabs at once — defeating lazy loading. Now search
+// hits this static index and the user jumps to the matching tab.
+
+type SearchEntry = {
+  tabId: TabId;
+  section: string;
+  preview: string;
+  keywords: string;
+};
+
+const SEARCH_INDEX: SearchEntry[] = [
+  {
+    tabId: 'overview',
+    section: 'Product Overview',
+    preview: 'High-level narrative: the four moments we catch what others miss.',
+    keywords:
+      'overview narrative moat four moments elevator pitch positioning compounding decision knowledge graph dqi',
+  },
+  {
+    tabId: 'product_deep',
+    section: 'Analysis Pipeline',
+    preview: '12-node LangGraph sequence that produces every audit.',
+    keywords:
+      'pipeline langgraph 12 node analysis extract detect score bias flow graph architecture nodes prompts',
+  },
+  {
+    tabId: 'product_deep',
+    section: 'Scoring Engine',
+    preview: 'Toxic patterns, risk multipliers, compound bias interactions.',
+    keywords:
+      'scoring engine toxic combinations interaction matrix risk multipliers weights composite',
+  },
+  {
+    tabId: 'product_deep',
+    section: 'DQI Methodology',
+    preview: 'Decision Quality Index formula, percentiles, calibration.',
+    keywords:
+      'dqi decision quality index methodology formula percentile calibration 146 historical decisions benchmark',
+  },
+  {
+    tabId: 'research',
+    section: 'Methodologies & Principles',
+    preview: 'Kahneman, Sibony, Strebulaev — academic foundations.',
+    keywords:
+      'kahneman sibony strebulaev noise thinking fast slow behavioral economics academic research principles',
+  },
+  {
+    tabId: 'research',
+    section: 'Playbook & Research',
+    preview: 'Cited papers, research library, decision playbook.',
+    keywords: 'playbook research library papers citations decision protocol checklist method',
+  },
+  {
+    tabId: 'positioning',
+    section: 'External Story',
+    preview: 'Moat narrative, market sizing, "why now" hook.',
+    keywords:
+      'positioning external story moat narrative market sizing why now pitch fundraise tam sam som',
+  },
+  {
+    tabId: 'positioning',
+    section: 'Investor Defense',
+    preview: 'Kill-shot objections, Q&A, competitive responses.',
+    keywords:
+      'investor defense objections q&a kill shot competitive responses fundraise pitch pushback',
+  },
+  {
+    tabId: 'sales',
+    section: 'Sales Toolkit',
+    preview: 'Discovery questions, email templates, demo flow.',
+    keywords:
+      'sales toolkit discovery questions email templates demo flow outreach prospecting qualification',
+  },
+  {
+    tabId: 'outreach',
+    section: 'Outreach & Meetings',
+    preview: 'Prospect pipeline, weekly brief, meeting prep.',
+    keywords:
+      'outreach meetings prospects pipeline weekly brief meeting prep calendar stakeholders linkedin',
+  },
+  {
+    tabId: 'content',
+    section: 'Content Studio',
+    preview: 'LinkedIn post generator, case study analyzer, voice config.',
+    keywords:
+      'content studio linkedin post generator case study analyzer voice config ideas scanner',
+  },
+  {
+    tabId: 'data_ecosystem',
+    section: 'Integrations & Flywheel',
+    preview: 'Input channels: Slack, Drive, email, webhooks.',
+    keywords:
+      'integrations flywheel slack google drive email webhook ingestion sources data ecosystem connections',
+  },
+  {
+    tabId: 'data_ecosystem',
+    section: 'Live Stats',
+    preview: 'Output metrics, usage, activation.',
+    keywords: 'live stats metrics usage activation kpi analytics dashboard numbers',
+  },
+  {
+    tabId: 'case_library',
+    section: 'Historical Cases',
+    preview: '14 case studies with pre-decision evidence.',
+    keywords:
+      'historical cases kodak blockbuster nokia enron case studies library evidence corporate decisions',
+  },
+  {
+    tabId: 'case_library',
+    section: 'Correlation & Causal',
+    preview: 'Bias interaction matrix, toxic combinations.',
+    keywords: 'correlation causal bias interaction matrix toxic combinations compound patterns',
+  },
+  {
+    tabId: 'case_library',
+    section: 'Decision Alpha',
+    preview: 'CEO decision quality leaderboard.',
+    keywords: 'decision alpha ceo leaderboard quality buffett musk huang zuck rankings',
+  },
+  {
+    tabId: 'founder_tips',
+    section: 'Founder Tips',
+    preview: 'Playbook notes, session learnings, self-reflection.',
+    keywords: 'founder tips playbook notes session learnings self-reflection personal advice',
+  },
+  {
+    tabId: 'founder_school',
+    section: 'Founder School',
+    preview: 'Curated learning library for a solo technical founder.',
+    keywords:
+      'founder school learning library curriculum sources reading list curated education lessons',
+  },
+];
 
 function SearchResults({
   query,
-  tabContent,
+  onJump,
 }: {
   query: string;
-  tabContent: Record<TabId, React.ReactNode>;
+  onJump: (tabId: TabId) => void;
 }) {
   const q = query.toLowerCase().trim();
   if (!q) return null;
+
+  const matches = SEARCH_INDEX.filter(entry => {
+    const haystack = `${entry.section} ${entry.preview} ${entry.keywords}`.toLowerCase();
+    return haystack.includes(q);
+  });
+
+  if (matches.length === 0) {
+    return (
+      <div style={{ ...card, textAlign: 'center', padding: 32 }}>
+        <Search size={20} style={{ color: 'var(--text-muted)', marginBottom: 8 }} />
+        <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
+          No sections match &quot;{query}&quot;
+        </div>
+        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>
+          Try a broader term, or press Escape to clear.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -231,41 +384,60 @@ function SearchResults({
       >
         <Search size={14} style={{ color: '#16A34A', flexShrink: 0 }} />
         <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
-          Showing all tabs filtered by &quot;<strong style={{ color: '#16A34A' }}>{query}</strong>
-          &quot; — use{' '}
-          <kbd
-            style={{
-              padding: '1px 5px',
-              borderRadius: 4,
-              border: '1px solid var(--border-primary, #333)',
-              fontSize: 11,
-            }}
-          >
-            Ctrl+F
-          </kbd>{' '}
-          to jump to matches
+          {matches.length} section{matches.length === 1 ? '' : 's'} match &quot;
+          <strong style={{ color: '#16A34A' }}>{query}</strong>&quot; — click to jump.
         </span>
       </div>
-      {TABS.map(tab => (
-        <div key={tab.id} style={{ marginBottom: 24 }}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              marginBottom: 8,
-              padding: '8px 0',
-              borderBottom: '1px solid var(--border-primary, #222)',
-            }}
-          >
-            {tab.icon}
-            <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>
-              {tab.label}
-            </span>
-          </div>
-          {tabContent[tab.id]}
-        </div>
-      ))}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {matches.map(entry => {
+          const tab = TABS.find(t => t.id === entry.tabId);
+          return (
+            <button
+              key={`${entry.tabId}-${entry.section}`}
+              onClick={() => onJump(entry.tabId)}
+              style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 12,
+                padding: 14,
+                borderRadius: 10,
+                border: '1px solid var(--border-primary, #222)',
+                background: 'var(--bg-secondary, #111)',
+                color: 'var(--text-primary)',
+                textAlign: 'left',
+                cursor: 'pointer',
+                transition: 'border-color 0.15s, transform 0.15s',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = '#16A34A';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = 'var(--border-primary, #222)';
+              }}
+            >
+              <div style={{ marginTop: 2, color: '#16A34A' }}>{tab?.icon}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    color: 'var(--text-muted)',
+                    marginBottom: 2,
+                  }}
+                >
+                  {tab?.label}
+                </div>
+                <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 2 }}>
+                  {entry.section}
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{entry.preview}</div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -401,6 +573,185 @@ export default function FounderHubPage() {
     );
   }
 
+  // Only build TAB_CONTENT when NOT searching. Building this record
+  // instantiates every dynamic() component, defeating lazy loading.
+  const tabContent: React.ReactNode = searchQuery ? null : renderTab(activeTab, FOUNDER_PASS);
+
+  return (
+    <ErrorBoundary sectionName="Founder Hub">
+      <div className="max-w-6xl mx-auto px-4 py-6">
+        {renderHeader()}
+        {renderTabStrip()}
+        {searchQuery ? (
+          <SearchResults
+            query={searchQuery}
+            onJump={tabId => {
+              setActiveTab(tabId);
+              setSearchQuery('');
+            }}
+          />
+        ) : (
+          tabContent
+        )}
+        <FounderChatWidget founderPass={FOUNDER_PASS} />
+      </div>
+    </ErrorBoundary>
+  );
+
+  // ─── Header / Tab Strip / Tab dispatch ─────────────────────────────────
+  function renderHeader() {
+    return (
+      <header style={{ marginBottom: 20 }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: 6,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <Rocket size={26} style={{ color: '#16A34A' }} />
+            <h1
+              style={{
+                fontSize: 24,
+                fontWeight: 800,
+                color: 'var(--text-primary, #fff)',
+                margin: 0,
+              }}
+            >
+              Founder Hub
+            </h1>
+          </div>
+          <div style={{ position: 'relative', width: 260 }}>
+            <Search
+              size={14}
+              style={{
+                position: 'absolute',
+                left: 10,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: 'var(--text-muted, #71717a)',
+              }}
+            />
+            <input
+              ref={searchRef}
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="Search content... (⌘K)"
+              style={{
+                width: '100%',
+                padding: '8px 32px 8px 30px',
+                fontSize: 12,
+                borderRadius: 8,
+                border: '1px solid var(--border-primary, #333)',
+                background: 'var(--bg-secondary, #111)',
+                color: 'var(--text-primary, #fff)',
+                outline: 'none',
+              }}
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                style={{
+                  position: 'absolute',
+                  right: 8,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  cursor: 'pointer',
+                  padding: 2,
+                }}
+              >
+                <X size={12} />
+              </button>
+            )}
+          </div>
+        </div>
+        <p style={{ fontSize: 13, color: 'var(--text-muted, #71717a)', margin: 0 }}>
+          Your living knowledge board — product features, strategy, sales playbook, and research.
+        </p>
+      </header>
+    );
+  }
+
+  function renderTabStrip() {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          gap: 16,
+          marginBottom: 24,
+          overflowX: 'auto',
+          borderBottom: '1px solid var(--border-primary, #222)',
+          paddingBottom: 6,
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+        }}
+      >
+        {TAB_GROUPS.map(group => {
+          const groupTabs = TABS.filter(t => t.group === group);
+          if (groupTabs.length === 0) return null;
+          return (
+            <div key={group} style={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+              <div
+                style={{
+                  fontSize: 9,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                  color: 'var(--text-muted, #71717a)',
+                  marginBottom: 4,
+                  paddingLeft: 4,
+                }}
+              >
+                {group}
+              </div>
+              <div style={{ display: 'flex', gap: 2 }}>
+                {groupTabs.map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      setActiveTab(tab.id);
+                      setSearchQuery('');
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      padding: '8px 12px',
+                      fontSize: 13,
+                      fontWeight: activeTab === tab.id ? 700 : 500,
+                      color:
+                        activeTab === tab.id
+                          ? 'var(--text-primary, #fff)'
+                          : 'var(--text-muted, #71717a)',
+                      background: 'none',
+                      border: 'none',
+                      borderBottom:
+                        activeTab === tab.id ? '2px solid #16A34A' : '2px solid transparent',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      transition: 'color 0.15s, border-color 0.15s',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {tab.icon}
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+}
+
+function renderTab(activeTab: TabId, FOUNDER_PASS: string): React.ReactNode {
   const TAB_CONTENT: Record<TabId, React.ReactNode> = {
     overview: <ProductOverviewTab />,
     product_deep: (
@@ -521,164 +872,5 @@ export default function FounderHubPage() {
     ),
   };
 
-  return (
-    <ErrorBoundary sectionName="Founder Hub">
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        {/* Header + Search */}
-        <header style={{ marginBottom: 20 }}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: 6,
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <Rocket size={26} style={{ color: '#16A34A' }} />
-              <h1
-                style={{
-                  fontSize: 24,
-                  fontWeight: 800,
-                  color: 'var(--text-primary, #fff)',
-                  margin: 0,
-                }}
-              >
-                Founder Hub
-              </h1>
-            </div>
-            <div style={{ position: 'relative', width: 260 }}>
-              <Search
-                size={14}
-                style={{
-                  position: 'absolute',
-                  left: 10,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  color: 'var(--text-muted, #71717a)',
-                }}
-              />
-              <input
-                ref={searchRef}
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Search content... (⌘K)"
-                style={{
-                  width: '100%',
-                  padding: '8px 32px 8px 30px',
-                  fontSize: 12,
-                  borderRadius: 8,
-                  border: '1px solid var(--border-primary, #333)',
-                  background: 'var(--bg-secondary, #111)',
-                  color: 'var(--text-primary, #fff)',
-                  outline: 'none',
-                }}
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  style={{
-                    position: 'absolute',
-                    right: 8,
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'none',
-                    border: 'none',
-                    color: 'var(--text-muted)',
-                    cursor: 'pointer',
-                    padding: 2,
-                  }}
-                >
-                  <X size={12} />
-                </button>
-              )}
-            </div>
-          </div>
-          <p style={{ fontSize: 13, color: 'var(--text-muted, #71717a)', margin: 0 }}>
-            Your living knowledge board — product features, strategy, sales playbook, and research.
-          </p>
-        </header>
-
-        {/* Tab Navigation — grouped by category (Product / GTM / Intelligence / Tools) */}
-        <div
-          style={{
-            display: 'flex',
-            gap: 16,
-            marginBottom: 24,
-            overflowX: 'auto',
-            borderBottom: '1px solid var(--border-primary, #222)',
-            paddingBottom: 6,
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-          }}
-        >
-          {TAB_GROUPS.map(group => {
-            const groupTabs = TABS.filter(t => t.group === group);
-            if (groupTabs.length === 0) return null;
-            return (
-              <div key={group} style={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
-                <div
-                  style={{
-                    fontSize: 9,
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.1em',
-                    color: 'var(--text-muted, #71717a)',
-                    marginBottom: 4,
-                    paddingLeft: 4,
-                  }}
-                >
-                  {group}
-                </div>
-                <div style={{ display: 'flex', gap: 2 }}>
-                  {groupTabs.map(tab => (
-                    <button
-                      key={tab.id}
-                      onClick={() => {
-                        setActiveTab(tab.id);
-                        setSearchQuery('');
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 6,
-                        padding: '8px 12px',
-                        fontSize: 13,
-                        fontWeight: activeTab === tab.id ? 700 : 500,
-                        color:
-                          activeTab === tab.id
-                            ? 'var(--text-primary, #fff)'
-                            : 'var(--text-muted, #71717a)',
-                        background: 'none',
-                        border: 'none',
-                        borderBottom:
-                          activeTab === tab.id ? '2px solid #16A34A' : '2px solid transparent',
-                        cursor: 'pointer',
-                        whiteSpace: 'nowrap',
-                        transition: 'color 0.15s, border-color 0.15s',
-                        flexShrink: 0,
-                      }}
-                    >
-                      {tab.icon}
-                      {tab.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Tab Content */}
-        {searchQuery ? (
-          <SearchResults query={searchQuery} tabContent={TAB_CONTENT} />
-        ) : (
-          TAB_CONTENT[activeTab]
-        )}
-
-        {/* AI Chat Widget */}
-        <FounderChatWidget founderPass={FOUNDER_PASS} />
-      </div>
-    </ErrorBoundary>
-  );
+  return TAB_CONTENT[activeTab];
 }
