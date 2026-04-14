@@ -54,8 +54,8 @@ function buildTiers(cycle: BillingCycle): Tier[] {
       id: 'pro',
       name: 'Professional',
       tagline: 'For the high-stakes strategist',
-      priceMonthly: 99,
-      priceAnnual: 999,
+      priceMonthly: 149,
+      priceAnnual: 1499,
       highlights: [
         '15 audits per month',
         'Full DQI + 30+ cognitive biases',
@@ -225,7 +225,7 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: 'Do you offer annual discounts?',
-    a: 'Professional is $99/mo or $999/yr (save ~16%). Strategy is billed monthly at $2,499. Enterprise is negotiated annually.',
+    a: 'Professional is $149/mo or $1,499/yr (save ~16%). Strategy is billed monthly at $2,499. Enterprise is negotiated annually.',
   },
   {
     q: 'Are you SOC 2 compliant?',

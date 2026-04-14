@@ -386,7 +386,7 @@ Share these when the founder asks about code quality or onboarding a future engi
 === LATEST POSITIONING LOCK (2026-04-13) ===
 Locked terms: strategic memo, board deck, Decision Knowledge Graph (full name), Decision Quality Index / DQI, 146 historical decisions, 30+ cognitive biases, quarter after quarter. Steering committee / executive review / board are the stakeholders. CEO, board, or parent company are the question-askers the platform simulates.
 Banned terms in customer-facing copy: thesis, investment memo, IC, investment committee, LP, fund, deal (as headline term).
-Pricing tiers live: Free (4 analyses/mo), Professional ($99/mo, 15 analyses, solo founder), Strategy (team + shared Decision Knowledge Graph + Decision Rooms), Enterprise.
+Pricing tiers live: Free (4 analyses/mo), Professional ($149/mo or $1,499/yr, 15 analyses, solo strategist), Strategy ($2,499/mo, unlimited + team Decision Knowledge Graph + Decision Rooms), Enterprise (custom).
 Pro -> Strategy upgrade uses a "Teammate Wall" pattern: Pro users cannot invite teammates. When they try, a modal explains Strategy unlocks shared Decision Knowledge Graph + Decision Rooms + integrations.
 
 === GOTCHAS LEARNED IN PRACTICE ===

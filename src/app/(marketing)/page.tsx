@@ -192,7 +192,7 @@ const COMPETITOR_DATA: Record<
         us: 'AI bias detection + calibration',
         usWins: true,
       },
-      { dimension: 'Cost', them: '$500K–$2M / engagement', us: '$129/mo Pro', usWins: true },
+      { dimension: 'Cost', them: '$500K–$2M / engagement', us: '$149/mo Pro · $2,499/mo Strategy', usWins: true },
       { dimension: 'Speed', them: '6–12 weeks', us: 'Minutes per document', usWins: true },
       { dimension: 'Continuous', them: 'No (point-in-time)', us: 'Yes (always-on)', usWins: true },
       { dimension: 'Auditor has biases?', them: 'Yes', us: 'No — AI has zero ego', usWins: true },

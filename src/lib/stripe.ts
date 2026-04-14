@@ -75,8 +75,8 @@ export const PLANS = {
     tagline: 'For the high-stakes strategist',
     description:
       'Walk into your next meeting with the one question the CSO missed. Full audit plus your Personal Decision History.',
-    priceMonthly: 99,
-    priceAnnual: 999,
+    priceMonthly: 149,
+    priceAnnual: 1499,
     priceIdMonthly:
       process.env.STRIPE_PRO_PRICE_MONTHLY_ID || 'price_1TLh8pJHs8Ws3oeL7VzAcJgA',
     priceIdAnnual:

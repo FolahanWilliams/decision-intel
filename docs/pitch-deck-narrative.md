@@ -109,7 +109,7 @@ Document Upload
 |---|---|---|---|---|
 | **What they do** | Manual decision review | Decision tracking | Data analytics | AI bias detection |
 | **Bias detection** | Subjective, consultant-dependent | None | None | 20 types, automated |
-| **Cost** | $500K–$2M / engagement | ~$50K/yr enterprise | $1M+ / yr | $499/mo per team |
+| **Cost** | $500K–$2M / engagement | ~$50K/yr enterprise | $1M+ / yr | $2,499/mo per team |
 | **Speed** | 6–12 weeks | N/A (tracking only) | Weeks to deploy | Minutes per document |
 | **Continuous** | No — point-in-time | Yes (tracking) | Yes (analytics) | Yes (detection + tracking) |
 | **Outcome flywheel** | No | Partial | No | Yes — improves with data |
@@ -139,7 +139,7 @@ Why tech first:
 - **Risk/compliance firms** (like LRQA) as channel partners — they embed our tool in their service offering, we get distribution without building a sales team
 
 **Pricing wedge:**
-- Free (3 analyses/mo) → Pro ($129/mo) → Team ($499/mo) → Enterprise (custom)
+- Free (4 analyses/mo) → Professional ($149/mo) → Strategy ($2,499/mo) → Enterprise (custom)
 - Land with one strategist on Pro → prove ROI with outcome data → expand to team → negotiate enterprise contract
 
 ---
@@ -151,7 +151,7 @@ Why tech first:
 | Metric | Value |
 |--------|-------|
 | API cost per analysis | ~$0.03–0.07 (Gemini Flash) |
-| Pro price per analysis | ~$2.58 ($129 / 50) |
+| Pro price per analysis | ~$9.93 ($149 / 15) |
 | **Gross margin** | **~97%** |
 | Target SMB ACV | $6,000–$15,000/yr |
 | Target Enterprise ACV | $50,000–$200,000/yr |

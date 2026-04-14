@@ -701,7 +701,7 @@ export function StrategyAndPositioningTab() {
               paddingLeft: 14,
             }}
           >
-            <li>Starter: Free (3 analyses) → Professional: $349/mo → Team: $999/mo</li>
+            <li>Free (4 analyses) → Professional: $149/mo → Strategy: $2,499/mo</li>
             <li>Avoid 1 bad decision per year = millions saved</li>
             <li>
               ROI: <strong style={{ color: '#22c55e' }}>100-1000x</strong> the subscription cost

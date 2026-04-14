@@ -110,7 +110,7 @@ const SECTION_NARRATIVE: Tip[] = [
   {
     title: 'Your gross-margin slide is your best slide — stop burying it',
     principle:
-      "At ~97% gross margins with $0.03–0.07 API cost against $129 Pro pricing, you are a pre-seed investor's dream. Most AI startups at your stage are underwater on gross margin. You are not.",
+      "At ~97% gross margins with $0.03–0.07 API cost against $149 Pro pricing ($2,499 on Strategy), you are a pre-seed investor's dream. Most AI startups at your stage are underwater on gross margin. You are not.",
     rationale:
       'Pre-seed investors have been burned by AI wrapper companies whose unit economics are terrible once you back out the API costs. Your unit economics are the opposite of that pattern, and you buried them on slide 8. The most durable thing you can show a skeptical investor in 2026 is that you will not run out of money and you do not need to raise again at any particular price. Gross margin is how you prove it without saying it.',
     action:

@@ -65,10 +65,10 @@ The platform runs documents through an **11-agent analysis pipeline** with deal-
 
 | Plan | Price | Best For |
 |:-----|:------|:---------|
-| **Starter** | Free | Try the bias engine on 3 strategic documents |
-| **Professional** | $349/mo | Strategy teams and analysts running M&A memos and diligence reports through the gauntlet |
-| **Team** | $999/mo | Executive committees with deal pipeline + Slack integration |
-| **Enterprise** | Custom | Corporate strategy and M&A teams with SSO + custom taxonomies + dedicated support |
+| **Free** | $0 | 4 audits/month — see what the engine flags on any strategic memo |
+| **Professional** | $149/mo ($1,499/yr) | The high-stakes strategist: 15 audits/mo, 30+ biases, Personal Decision History |
+| **Strategy** | $2,499/mo | Corporate strategy teams — unlimited audits, shared Decision Knowledge Graph, Decision Rooms, integrations |
+| **Enterprise** | Custom | Fortune 500 strategy functions with SSO, custom taxonomy, SLA, dedicated support |
 
 All paid plans include a 14-day free trial. No credit card required to start.
 
