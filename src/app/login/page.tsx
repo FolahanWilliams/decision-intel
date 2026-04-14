@@ -467,8 +467,8 @@ function LoginContent() {
                       marginBottom: '1.5rem',
                     }}
                   >
-                    We sent a confirmation email to <strong>{email}</strong>. Click the link — or
-                    enter the 6-digit code from the email below.
+                    We sent a 6-digit code to <strong>{email}</strong>. Enter it below to finish
+                    creating your account.
                   </p>
                 </div>
 
