@@ -26,8 +26,71 @@ import {
 import dynamic from 'next/dynamic';
 import { DEMO_ANALYSES } from './data';
 import { DQIBadge } from '@/components/ui/DQIBadge';
+import { Reveal } from '@/components/ui/Reveal';
 import { trackEvent } from '@/lib/analytics/track';
 import { scanForBiases, type ScanResult } from '@/lib/analysis/client-bias-scanner';
+
+/* ─── Color tokens (mirror landing page so the demo feels like the same product) ── */
+const C = {
+  navy: '#0F172A',
+  white: '#FFFFFF',
+  slate50: '#F8FAFC',
+  slate100: '#F1F5F9',
+  slate200: '#E2E8F0',
+  slate400: '#94A3B8',
+  slate500: '#64748B',
+  slate600: '#475569',
+  slate900: '#0F172A',
+  green: '#16A34A',
+  greenLight: '#DCFCE7',
+  greenSoft: '#F0FDF4',
+  greenDark: '#15803D',
+  warning: '#EAB308',
+  danger: '#EF4444',
+  orange: '#F97316',
+} as const;
+
+/* Shared card recipe: matches the landing page card style. */
+const cardStyle: React.CSSProperties = {
+  background: C.white,
+  border: `1px solid ${C.slate200}`,
+  borderRadius: 16,
+  boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
+};
+
+/* Section band: full-width strip with optional alternating bg. */
+function SectionBand({
+  bg = C.white,
+  borderTop = false,
+  children,
+  paddingY = 64,
+  maxWidth = 1200,
+}: {
+  bg?: string;
+  borderTop?: boolean;
+  children: React.ReactNode;
+  paddingY?: number;
+  maxWidth?: number;
+}) {
+  return (
+    <section
+      style={{
+        background: bg,
+        borderTop: borderTop ? `1px solid ${C.slate200}` : undefined,
+      }}
+    >
+      <div
+        style={{
+          maxWidth,
+          margin: '0 auto',
+          padding: `${paddingY}px 24px`,
+        }}
+      >
+        {children}
+      </div>
+    </section>
+  );
+}
 
 const BiasNetwork3D = dynamic(
   () => import('@/components/visualizations/BiasNetwork3DCanvas'),
@@ -175,11 +238,30 @@ export default function DemoPage() {
     return () => observers.forEach(o => o.disconnect());
   }, [showResults]);
 
+  const idleState = !isSimulating && !showResults && !scanResult;
+
   return (
-    <div className="min-h-screen bg-white text-slate-900">
-      {/* Header */}
-      <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E2E8F0', padding: '12px 24px', position: 'sticky', top: 0, zIndex: 50 }}>
-        <div style={{ maxWidth: 1400, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    <div style={{ minHeight: '100vh', background: C.white, color: C.slate900 }}>
+      {/* ─── Header (sticky) ──────────────────────────────────────────── */}
+      <header
+        style={{
+          background: C.white,
+          borderBottom: `1px solid ${C.slate200}`,
+          padding: '12px 24px',
+          position: 'sticky',
+          top: 0,
+          zIndex: 50,
+        }}
+      >
+        <div
+          style={{
+            maxWidth: 1400,
+            margin: '0 auto',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
           <Link href="/" className="flex items-center gap-2 no-underline text-inherit">
             <Image
               src="/logo.png"
@@ -188,23 +270,52 @@ export default function DemoPage() {
               height={24}
               style={{ borderRadius: 6, objectFit: 'cover' }}
             />
-            <span className="text-sm font-semibold">
-              <span className="text-slate-900">Decision</span>
-              <span className="text-slate-400 ml-1">Intel</span>
+            <span style={{ fontSize: 14, fontWeight: 600 }}>
+              <span style={{ color: C.slate900 }}>Decision</span>
+              <span style={{ color: C.slate400, marginLeft: 4 }}>Intel</span>
             </span>
           </Link>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <span className="hidden sm:inline text-[11px] px-2.5 py-1 rounded-full bg-green-50 text-green-600 font-semibold tracking-wide border border-green-100">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span
+              style={{
+                fontSize: 11,
+                padding: '4px 10px',
+                borderRadius: 999,
+                background: C.greenSoft,
+                color: C.green,
+                fontWeight: 600,
+                letterSpacing: '0.04em',
+                border: `1px solid ${C.greenLight}`,
+              }}
+              className="hidden sm:inline"
+            >
               INTERACTIVE DEMO
             </span>
             <button
               onClick={handleTryNow}
               disabled={loadingSample}
               aria-busy={loadingSample}
-              className="text-xs sm:text-[13px] px-3 sm:px-4 py-1.5 rounded-lg bg-green-600 text-white font-semibold border-none cursor-pointer disabled:opacity-70 disabled:cursor-wait hover:bg-green-700 transition-colors"
+              style={{
+                fontSize: 13,
+                padding: '7px 14px',
+                borderRadius: 8,
+                background: C.green,
+                color: C.white,
+                fontWeight: 600,
+                border: 'none',
+                cursor: loadingSample ? 'wait' : 'pointer',
+                opacity: loadingSample ? 0.7 : 1,
+                transition: 'background 0.15s',
+              }}
+              onMouseEnter={e => {
+                if (!loadingSample) e.currentTarget.style.background = C.greenDark;
+              }}
+              onMouseLeave={e => {
+                if (!loadingSample) e.currentTarget.style.background = C.green;
+              }}
             >
               {loadingSample ? (
-                <span className="flex items-center gap-1.5">
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                   <Loader2 size={14} className="animate-spin" /> Loading...
                 </span>
               ) : (
@@ -213,45 +324,65 @@ export default function DemoPage() {
             </button>
           </div>
         </div>
-      </div>
+      </header>
 
-      {/* Content */}
-      <div style={{ maxWidth: 1400, margin: '0 auto', padding: '32px 24px 80px' }}>
-        {/* Video Demo Section — always visible when not in simulation/results/scan */}
-        {!isSimulating && !showResults && !scanResult && (
-          <>
-            <DemoVideoSection />
+      {/* ─── Idle: Video hero on white band ──────────────────────────── */}
+      {idleState && (
+        <SectionBand bg={C.white} paddingY={56}>
+          <DemoVideoSection />
+        </SectionBand>
+      )}
 
-            {/* Divider */}
-            <div className="flex items-center gap-4 my-8">
-              <div className="flex-1 h-px bg-slate-100" />
-              <span className="text-xs text-slate-500 font-semibold tracking-widest uppercase">
-                Or try it yourself
-              </span>
-              <div className="flex-1 h-px bg-slate-100" />
-            </div>
-          </>
-        )}
-
-        {/* Interactive Demo Section */}
-        {!isSimulating && !showResults && !scanResult && (
-          <div className="mb-10">
-            <div className="text-center mb-10">
-              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3 leading-tight">
-                Interactive <span className="text-green-600">Demo</span>
+      {/* ─── Idle: Interactive picker on slate50 band ────────────────── */}
+      {idleState && (
+        <SectionBand bg={C.slate50} borderTop paddingY={72}>
+          <Reveal>
+            <div style={{ textAlign: 'center', marginBottom: 40 }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: C.green,
+                  marginBottom: 12,
+                  letterSpacing: '0.12em',
+                  fontWeight: 700,
+                }}
+              >
+                INTERACTIVE DEMO
+              </div>
+              <h2
+                style={{
+                  fontSize: 'clamp(28px, 5vw, 38px)',
+                  fontWeight: 800,
+                  color: C.slate900,
+                  margin: '0 0 14px',
+                  lineHeight: 1.15,
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                Pick a famous corporate decision.
               </h2>
-              <p className="text-slate-500 text-sm sm:text-base max-w-[600px] mx-auto leading-relaxed">
-                Pick a real-world case study and watch the AI pipeline analyze it in real time. No
-                login required.
+              <p
+                style={{
+                  fontSize: 16,
+                  color: C.slate500,
+                  maxWidth: 600,
+                  margin: '0 auto',
+                  lineHeight: 1.6,
+                }}
+              >
+                Watch Decision Intel score the cognitive biases, predict the questions a steering
+                committee would raise, and map the decision into your Knowledge Graph — in 60 seconds.
               </p>
             </div>
 
-            {/* Sample Document Cards */}
-            <div className="text-[11px] text-green-600 mb-4 tracking-widest uppercase font-semibold flex items-center gap-2">
-              <FileText size={13} />
-              Choose a document to analyze
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                gap: 20,
+                marginBottom: 32,
+              }}
+            >
               {DEMO_ANALYSES.map((a, idx) => {
                 const scoreColor =
                   a.overallScore >= 70 ? '#22c55e' : a.overallScore >= 40 ? '#eab308' : '#ef4444';
@@ -352,11 +483,13 @@ export default function DemoPage() {
                 </div>
               </div>
             )}
-          </div>
-        )}
+          </Reveal>
+        </SectionBand>
+      )}
 
-        {/* Quick Scan Results (paste mode) */}
-        {scanResult && !isSimulating && !showResults && (
+      {/* Quick Scan Results (paste mode) */}
+      {scanResult && !isSimulating && !showResults && (
+        <SectionBand bg={C.slate50} borderTop paddingY={56}>
           <QuickScanResults
             result={scanResult}
             onBack={() => {
@@ -364,160 +497,319 @@ export default function DemoPage() {
               setPasteText('');
             }}
           />
-        )}
+        </SectionBand>
+      )}
 
-        {/* Streaming Simulation */}
-        {isSimulating && (
-          <div className="mb-10">
-            <div className="text-center mb-8">
-              <Loader2 size={32} className="text-slate-900 animate-spin mx-auto mb-4" />
-              <h2 className="text-xl font-bold text-slate-900 mb-2">Analyzing document...</h2>
-              <p className="text-slate-500 text-sm">{analysis?.shortName ?? 'Document'}</p>
+      {/* Streaming Simulation */}
+      {isSimulating && (
+        <SectionBand bg={C.slate50} paddingY={88} maxWidth={720}>
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
+            <div
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: 999,
+                background: C.white,
+                border: `1px solid ${C.slate200}`,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: 16,
+                boxShadow: '0 1px 3px rgba(15,23,42,0.06)',
+              }}
+            >
+              <Loader2 size={26} style={{ color: C.green }} className="animate-spin" />
             </div>
+            <h2
+              style={{
+                fontSize: 'clamp(22px, 3.5vw, 28px)',
+                fontWeight: 700,
+                color: C.slate900,
+                margin: '0 0 8px',
+                letterSpacing: '-0.01em',
+              }}
+            >
+              Analyzing your document
+            </h2>
+            <p style={{ fontSize: 14, color: C.slate500, margin: 0 }}>
+              {analysis?.shortName ?? 'Document'}
+            </p>
+          </div>
 
-            {/* Progress Pipeline */}
-            <div className="max-w-[480px] mx-auto">
-              {PIPELINE_STAGES.map((stage, idx) => {
-                const StageIcon = stage.icon;
-                const isComplete = idx < currentStage;
-                const isActive = idx === currentStage;
-                const isPending = idx > currentStage;
+          <div style={{ ...cardStyle, padding: '24px 28px' }}>
+            {PIPELINE_STAGES.map((stage, idx) => {
+              const StageIcon = stage.icon;
+              const isComplete = idx < currentStage;
+              const isActive = idx === currentStage;
+              const isPending = idx > currentStage;
 
-                return (
-                  <div
-                    key={stage.id}
-                    className="flex items-center gap-3 py-2.5 transition-all duration-300"
-                    style={{ opacity: isPending ? 0.3 : 1 }}
-                  >
-                    <div
-                      className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all duration-300"
-                      style={{
-                        background: isComplete
-                          ? 'rgba(34, 197, 94, 0.15)'
-                          : isActive
-                            ? 'rgba(0, 0, 0, 0.04)'
-                            : 'rgba(0, 0, 0, 0.02)',
-                        border: isActive
-                          ? '1px solid rgba(0, 0, 0, 0.1)'
-                          : '1px solid rgba(0, 0, 0, 0.04)',
-                      }}
-                    >
-                      {isComplete ? (
-                        <CheckCircle2 size={16} className="text-green-500" />
-                      ) : isActive ? (
-                        <Loader2 size={16} className="text-slate-900 animate-spin" />
-                      ) : (
-                        <StageIcon size={16} className="text-slate-600" />
-                      )}
-                    </div>
-                    <span
-                      className={`text-[13px] font-medium ${isComplete ? 'text-green-500' : isActive ? 'text-slate-900' : 'text-slate-600'}`}
-                    >
-                      {stage.label}
-                      {isActive && <span className="text-slate-500 ml-1.5 animate-pulse">...</span>}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Overall progress bar */}
-            <div className="max-w-[480px] mx-auto mt-6">
-              <div className="h-1 rounded-full bg-slate-100">
+              return (
                 <div
-                  className="h-full rounded-full bg-[#16A34A] transition-all duration-500"
-                  style={{ width: `${((currentStage + 1) / PIPELINE_STAGES.length) * 100}%` }}
+                  key={stage.id}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 14,
+                    padding: '10px 0',
+                    opacity: isPending ? 0.35 : 1,
+                    transition: 'opacity 0.3s',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 8,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                      background: isComplete
+                        ? C.greenSoft
+                        : isActive
+                          ? C.slate50
+                          : C.white,
+                      border: `1px solid ${isComplete ? C.greenLight : isActive ? C.slate200 : C.slate100}`,
+                      transition: 'all 0.3s',
+                    }}
+                  >
+                    {isComplete ? (
+                      <CheckCircle2 size={16} style={{ color: C.green }} />
+                    ) : isActive ? (
+                      <Loader2 size={16} style={{ color: C.green }} className="animate-spin" />
+                    ) : (
+                      <StageIcon size={16} style={{ color: C.slate500 }} />
+                    )}
+                  </div>
+                  <span
+                    style={{
+                      fontSize: 14,
+                      fontWeight: isActive ? 600 : 500,
+                      color: isComplete ? C.green : isActive ? C.slate900 : C.slate500,
+                    }}
+                  >
+                    {stage.label}
+                    {isActive && (
+                      <span style={{ color: C.slate400, marginLeft: 6 }} className="animate-pulse">
+                        …
+                      </span>
+                    )}
+                  </span>
+                </div>
+              );
+            })}
+
+            <div style={{ marginTop: 20 }}>
+              <div
+                style={{
+                  height: 4,
+                  borderRadius: 2,
+                  background: C.slate100,
+                  overflow: 'hidden',
+                }}
+              >
+                <div
+                  style={{
+                    height: '100%',
+                    borderRadius: 2,
+                    background: C.green,
+                    width: `${((currentStage + 1) / PIPELINE_STAGES.length) * 100}%`,
+                    transition: 'width 0.5s',
+                  }}
                 />
               </div>
-              <div className="text-[11px] text-slate-500 mt-2 text-center">
+              <div style={{ fontSize: 11, color: C.slate500, marginTop: 8, textAlign: 'center' }}>
                 Step {currentStage + 1} of {PIPELINE_STAGES.length}
               </div>
             </div>
           </div>
-        )}
+        </SectionBand>
+      )}
 
-        {/* Results (shown after simulation or when revisiting) */}
-        {showResults && analysis && (
-          <div
-            ref={resultsRef}
-            className="py-8"
-            style={{ scrollBehavior: 'smooth', color: '#0F172A' }}
-          >
+      {/* Results (shown after simulation or when revisiting) */}
+      {showResults && analysis && (
+        <SectionBand bg={C.slate50} borderTop paddingY={56}>
+          <div ref={resultsRef} style={{ scrollBehavior: 'smooth', color: C.slate900 }}>
             {/* Back / Re-select */}
-            <div className="flex items-center justify-between mb-6">
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: 28,
+                flexWrap: 'wrap',
+                gap: 12,
+              }}
+            >
               <button
                 onClick={() => {
                   setShowResults(false);
                   setSelectedIdx(null);
                 }}
-                className="text-xs text-slate-400 hover:text-slate-900 transition-colors cursor-pointer bg-transparent border-none flex items-center gap-1.5"
+                style={{
+                  fontSize: 12,
+                  color: C.slate500,
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: 0,
+                }}
+                onMouseEnter={e => (e.currentTarget.style.color = C.slate900)}
+                onMouseLeave={e => (e.currentTarget.style.color = C.slate500)}
               >
-                <ArrowRight size={12} className="rotate-180" />
+                <ArrowRight size={12} style={{ transform: 'rotate(180deg)' }} />
                 Try another document
               </button>
-              <div className="flex gap-2">
-                {DEMO_ANALYSES.map((a, idx) => (
-                  <button
-                    key={a.id}
-                    onClick={() => startSimulation(idx)}
-                    className={`px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer border transition-all ${
-                      idx === selectedIdx
-                        ? 'border-slate-300 bg-slate-50 text-slate-900'
-                        : 'border-slate-200 bg-transparent text-slate-400 hover:text-slate-900'
-                    }`}
-                  >
-                    {a.shortName}
-                  </button>
-                ))}
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                {DEMO_ANALYSES.map((a, idx) => {
+                  const isActive = idx === selectedIdx;
+                  return (
+                    <button
+                      key={a.id}
+                      onClick={() => startSimulation(idx)}
+                      style={{
+                        padding: '5px 12px',
+                        borderRadius: 8,
+                        fontSize: 11,
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        border: `1px solid ${isActive ? C.slate400 : C.slate200}`,
+                        background: isActive ? C.white : 'transparent',
+                        color: isActive ? C.slate900 : C.slate500,
+                        transition: 'all 0.15s',
+                      }}
+                    >
+                      {a.shortName}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
             {/* ── Scrollable Decision Flow ── */}
-            <div className="relative">
+            <div style={{ position: 'relative' }}>
               {/* Floating section nav (desktop) */}
-              <nav className="hidden lg:flex fixed right-6 top-1/2 -translate-y-1/2 z-40 flex-col gap-2">
-                {FLOW_SECTIONS.map(s => (
-                  <a
-                    key={s.id}
-                    href={`#${s.id}`}
-                    title={s.label}
-                    className="group flex items-center gap-2"
-                    onClick={e => {
-                      e.preventDefault();
-                      document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                  >
-                    <span
-                      className={`text-[10px] opacity-0 group-hover:opacity-100 transition-opacity ${activeSection === s.id ? '!opacity-100 text-slate-900' : 'text-slate-400'}`}
+              <nav
+                className="hidden lg:flex"
+                style={{
+                  position: 'fixed',
+                  right: 24,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  zIndex: 40,
+                  flexDirection: 'column',
+                  gap: 10,
+                }}
+              >
+                {FLOW_SECTIONS.map(s => {
+                  const isActive = activeSection === s.id;
+                  return (
+                    <a
+                      key={s.id}
+                      href={`#${s.id}`}
+                      title={s.label}
+                      onClick={e => {
+                        e.preventDefault();
+                        document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        textDecoration: 'none',
+                      }}
                     >
-                      {s.label}
-                    </span>
-                    <span
-                      className={`w-2 h-2 rounded-full transition-all ${activeSection === s.id ? 'bg-green-500 scale-125' : 'bg-slate-300 group-hover:bg-green-500'}`}
-                    />
-                  </a>
-                ))}
+                      <span
+                        style={{
+                          fontSize: 10,
+                          fontWeight: 600,
+                          opacity: isActive ? 1 : 0,
+                          color: isActive ? C.slate900 : C.slate400,
+                          transition: 'opacity 0.15s',
+                        }}
+                      >
+                        {s.label}
+                      </span>
+                      <span
+                        style={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: 999,
+                          background: isActive ? C.green : C.slate200,
+                          transform: isActive ? 'scale(1.25)' : 'scale(1)',
+                          transition: 'all 0.2s',
+                        }}
+                      />
+                    </a>
+                  );
+                })}
               </nav>
 
               {/* Section 1: Score Hero */}
-              <div id="score" className="scroll-mt-20">
-                <div className="flex items-start gap-5 mb-6">
-                  <DQIBadge score={analysis.overallScore} size="lg" showGrade animate />
-                  <div className="flex-1 min-w-0">
-                    <h1 className="text-lg sm:text-xl font-bold mb-1.5 leading-snug text-slate-900">
-                      {analysis.documentName}
-                    </h1>
-                    <p className="text-slate-500 text-xs sm:text-[13px] m-0">
-                      Analyzed by Decision Intel &middot;{' '}
-                      {new Date(analysis.createdAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
-                    </p>
+              <div id="score" style={{ scrollMarginTop: 80 }}>
+                <div
+                  style={{
+                    ...cardStyle,
+                    padding: '32px 32px',
+                    marginBottom: 24,
+                    background: C.white,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 28,
+                      flexWrap: 'wrap',
+                      marginBottom: 28,
+                    }}
+                  >
+                    <DQIBadge score={analysis.overallScore} size="lg" showGrade animate />
+                    <div style={{ flex: 1, minWidth: 240 }}>
+                      <div
+                        style={{
+                          fontSize: 11,
+                          color: C.green,
+                          letterSpacing: '0.1em',
+                          fontWeight: 700,
+                          marginBottom: 8,
+                        }}
+                      >
+                        DECISION INTEL AUDIT
+                      </div>
+                      <h1
+                        style={{
+                          fontSize: 'clamp(20px, 3vw, 26px)',
+                          fontWeight: 700,
+                          margin: '0 0 8px',
+                          lineHeight: 1.25,
+                          color: C.slate900,
+                          letterSpacing: '-0.01em',
+                        }}
+                      >
+                        {analysis.documentName}
+                      </h1>
+                      <p style={{ fontSize: 13, color: C.slate500, margin: 0 }}>
+                        {new Date(analysis.createdAt).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        })}{' '}
+                        · {analysis.biases.length} biases · {analysis.simulation.twins.length}{' '}
+                        boardroom personas
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 mb-8">
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+                      gap: 12,
+                    }}
+                  >
                   <ScoreCard
                     label="DECISION QUALITY"
                     value={`${analysis.overallScore}`}
@@ -555,10 +847,11 @@ export default function DemoPage() {
                     }
                     smallValue
                   />
+                  </div>
                 </div>
                 {/* Executive summary */}
                 <Section icon={<BarChart3 size={16} />} title="Executive Summary">
-                  <p className="text-slate-600 leading-relaxed m-0 text-sm">
+                  <p style={{ color: C.slate600, lineHeight: 1.65, margin: 0, fontSize: 14 }}>
                     {analysis.summary}
                   </p>
                 </Section>
@@ -615,7 +908,7 @@ export default function DemoPage() {
               {/* Section 2b: Bias Visualizations */}
               {analysis.biases.length >= 3 && (
                 <div style={{ marginBottom: 24, scrollMarginTop: 80 }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 16 }}>
                     {/* 3D Bias Network */}
                     <div
                       style={{
@@ -951,13 +1244,13 @@ export default function DemoPage() {
               loadingSample={loadingSample}
             />
 
-            <p className="text-slate-400 text-[11px] text-center mt-8 leading-relaxed">
+            <p style={{ color: C.slate400, fontSize: 11, textAlign: 'center', marginTop: 32, lineHeight: 1.6 }}>
               Demo analyses are generated by Decision Intel&apos;s cognitive bias detection engine
               to demonstrate product capabilities. They are not financial or investment advice.
             </p>
           </div>
-        )}
-      </div>
+        </SectionBand>
+      )}
     </div>
   );
 }
@@ -1038,35 +1331,57 @@ function Section({
   icon,
   title,
   children,
+  subtitle,
 }: {
   icon: React.ReactNode;
   title: string;
   children: React.ReactNode;
+  subtitle?: string;
 }) {
   return (
-    <div
-      style={{
-        background: '#FFFFFF',
-        border: '1px solid #E2E8F0',
-        borderRadius: 12,
-        padding: '16px 20px',
-        marginBottom: 24,
-        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-      }}
-    >
-      <h3
-        style={{
-          fontSize: 15,
-          fontWeight: 700,
-          marginBottom: 16,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          color: '#0F172A',
-        }}
-      >
-        {icon} {title}
-      </h3>
+    <div style={{ ...cardStyle, padding: '24px 28px', marginBottom: 24 }}>
+      <div style={{ marginBottom: 20 }}>
+        <h3
+          style={{
+            fontSize: 17,
+            fontWeight: 700,
+            margin: 0,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            color: C.slate900,
+            letterSpacing: '-0.01em',
+          }}
+        >
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 28,
+              height: 28,
+              borderRadius: 8,
+              background: C.greenSoft,
+              color: C.green,
+            }}
+          >
+            {icon}
+          </span>
+          {title}
+        </h3>
+        {subtitle && (
+          <p
+            style={{
+              fontSize: 13,
+              color: C.slate500,
+              margin: '6px 0 0 38px',
+              lineHeight: 1.55,
+            }}
+          >
+            {subtitle}
+          </p>
+        )}
+      </div>
       {children}
     </div>
   );
@@ -1088,17 +1403,34 @@ function ScoreCard({
   return (
     <div
       style={{
-        background: '#FFFFFF',
-        border: '1px solid #E2E8F0',
-        borderRadius: 12,
-        padding: '12px 14px',
-        textAlign: 'center',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+        ...cardStyle,
+        padding: '16px 18px',
       }}
     >
-      <div style={{ fontSize: 10, color: '#94A3B8', marginBottom: 6, letterSpacing: '0.5px' }}>{label}</div>
-      <div style={{ fontSize: smallValue ? 20 : 32, fontWeight: 800, lineHeight: 1, color }}>{value}</div>
-      <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>{sub}</div>
+      <div
+        style={{
+          fontSize: 10,
+          color: C.slate500,
+          marginBottom: 8,
+          letterSpacing: '0.06em',
+          textTransform: 'uppercase',
+          fontWeight: 600,
+        }}
+      >
+        {label}
+      </div>
+      <div
+        style={{
+          fontSize: smallValue ? 22 : 36,
+          fontWeight: 800,
+          lineHeight: 1,
+          color,
+          letterSpacing: '-0.02em',
+        }}
+      >
+        {value}
+      </div>
+      <div style={{ fontSize: 12, color: C.slate500, marginTop: 6 }}>{sub}</div>
     </div>
   );
 }
@@ -1108,13 +1440,14 @@ function SeverityBadge({ severity }: { severity: string }) {
     <span
       style={{
         fontSize: 10,
-        padding: '2px 10px',
+        padding: '3px 10px',
         borderRadius: 20,
         fontWeight: 700,
         textTransform: 'uppercase',
-        letterSpacing: '0.5px',
+        letterSpacing: '0.06em',
         background: `${sevColor(severity)}15`,
         color: sevColor(severity),
+        border: `1px solid ${sevColor(severity)}30`,
       }}
     >
       {severity}
@@ -1124,9 +1457,21 @@ function SeverityBadge({ severity }: { severity: string }) {
 
 function StatPill({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{ padding: '4px 10px', borderRadius: 6, background: '#F1F5F9', border: '1px solid #E2E8F0' }}>
-      <span style={{ fontSize: 10, color: '#94A3B8' }}>{label} </span>
-      <span style={{ fontSize: 12, fontWeight: 600, color: '#0F172A' }}>{value}</span>
+    <div
+      style={{
+        padding: '5px 12px',
+        borderRadius: 8,
+        background: C.slate50,
+        border: `1px solid ${C.slate200}`,
+        display: 'inline-flex',
+        alignItems: 'baseline',
+        gap: 6,
+      }}
+    >
+      <span style={{ fontSize: 10, color: C.slate500, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+        {label}
+      </span>
+      <span style={{ fontSize: 13, fontWeight: 700, color: C.slate900 }}>{value}</span>
     </div>
   );
 }
