@@ -46,7 +46,7 @@ function getErrorMessage(code: string | null): string | null {
 
 function LoginContent() {
   const [loading, setLoading] = useState(false);
-  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+  const [mode, setMode] = useState<'signin' | 'signup' | 'forgot' | 'reset'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [formLoading, setFormLoading] = useState(false);
@@ -183,6 +183,71 @@ function LoginContent() {
       window.location.href = safeRedirect;
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Could not verify code.';
+      setOtpError(message);
+    } finally {
+      setVerifyingOtp(false);
+    }
+  };
+
+  const handleSendResetCode = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setFormError(null);
+    if (!email) {
+      setFormError('Enter your email to receive a reset code.');
+      return;
+    }
+    setFormLoading(true);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      if (error) throw error;
+      trackEvent('password_reset_requested', { provider: 'email' });
+      setMode('reset');
+      setPassword('');
+      setOtpCode('');
+      setOtpError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Could not send reset code.';
+      setFormError(message);
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setOtpError(null);
+    const token = otpCode.replace(/\s+/g, '');
+    if (!email) {
+      setOtpError('Missing email — start the reset flow again.');
+      return;
+    }
+    if (!token || token.length < 6) {
+      setOtpError('Enter the 6-digit code from your email.');
+      return;
+    }
+    if (password.length < 8) {
+      setOtpError('New password must be at least 8 characters.');
+      return;
+    }
+    setVerifyingOtp(true);
+    try {
+      const supabase = createClient();
+      // Step 1: verify recovery OTP — establishes a recovery-authenticated session
+      const { error: verifyError } = await supabase.auth.verifyOtp({
+        email,
+        token,
+        type: 'recovery',
+      });
+      if (verifyError) throw verifyError;
+      // Step 2: use the recovery session to update the password
+      const { error: updateError } = await supabase.auth.updateUser({ password });
+      if (updateError) throw updateError;
+      trackEvent('password_reset_completed', { provider: 'email' });
+      const safeRedirect = redirectTo && /^\/[^/]/.test(redirectTo) ? redirectTo : '/dashboard';
+      window.location.href = safeRedirect;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Could not reset password.';
       setOtpError(message);
     } finally {
       setVerifyingOtp(false);
@@ -579,6 +644,374 @@ function LoginContent() {
                   </button>
                 </div>
               </div>
+            ) : mode === 'forgot' ? (
+              <div style={{ padding: '0.5rem 0 1rem' }}>
+                <div style={{ textAlign: 'center' }}>
+                  <div
+                    style={{
+                      width: 48,
+                      height: 48,
+                      margin: '0 auto 1rem',
+                      borderRadius: '50%',
+                      background: 'rgba(22,163,74,0.12)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Mail size={22} style={{ color: 'var(--accent-primary, #16A34A)' }} />
+                  </div>
+                  <h1
+                    style={{
+                      fontSize: '1.25rem',
+                      fontWeight: 700,
+                      color: 'var(--text-primary)',
+                      marginBottom: '8px',
+                      letterSpacing: '-0.02em',
+                    }}
+                  >
+                    Forgot your password?
+                  </h1>
+                  <p
+                    style={{
+                      fontSize: '0.85rem',
+                      color: 'var(--text-muted)',
+                      lineHeight: 1.6,
+                      marginBottom: '1.5rem',
+                    }}
+                  >
+                    Enter your email and we&rsquo;ll send you a 6-digit code to reset it.
+                  </p>
+                </div>
+
+                {formError && (
+                  <div
+                    role="alert"
+                    style={{
+                      padding: '10px 14px',
+                      marginBottom: '1rem',
+                      fontSize: '0.82rem',
+                      color: 'var(--error)',
+                      background: 'rgba(239, 68, 68, 0.08)',
+                      border: '1px solid rgba(239, 68, 68, 0.2)',
+                      borderRadius: '12px',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '8px',
+                    }}
+                  >
+                    <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: '1px' }} />
+                    <span>{formError}</span>
+                  </div>
+                )}
+
+                <form onSubmit={handleSendResetCode} style={{ display: 'grid', gap: 12 }}>
+                  <label style={{ display: 'grid', gap: 6 }}>
+                    <span
+                      style={{
+                        fontSize: '0.78rem',
+                        fontWeight: 600,
+                        color: 'var(--text-secondary, #475569)',
+                      }}
+                    >
+                      Work email
+                    </span>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={e => setEmail(e.target.value)}
+                      required
+                      autoComplete="email"
+                      placeholder="you@company.com"
+                      disabled={formLoading}
+                      style={{
+                        padding: '11px 14px',
+                        fontSize: '0.88rem',
+                        color: 'var(--text-primary)',
+                        background: 'var(--bg-card, #FFFFFF)',
+                        border: '1px solid var(--border-color, #E2E8F0)',
+                        borderRadius: 10,
+                        outline: 'none',
+                        fontFamily: 'inherit',
+                      }}
+                    />
+                  </label>
+                  <button
+                    type="submit"
+                    disabled={formLoading}
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      fontSize: '0.9rem',
+                      fontWeight: 600,
+                      color: '#fff',
+                      background:
+                        'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)',
+                      border: '1px solid rgba(22, 163, 74, 0.4)',
+                      borderRadius: 12,
+                      cursor: formLoading ? 'not-allowed' : 'pointer',
+                      opacity: formLoading ? 0.7 : 1,
+                      transition: 'all 0.15s',
+                      fontFamily: 'inherit',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8,
+                    }}
+                  >
+                    {formLoading ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin" /> Sending…
+                      </>
+                    ) : (
+                      <>
+                        Send reset code
+                        <ArrowRight size={14} style={{ opacity: 0.7 }} />
+                      </>
+                    )}
+                  </button>
+                </form>
+
+                <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode('signin');
+                      setFormError(null);
+                    }}
+                    style={{
+                      fontSize: '0.78rem',
+                      color: 'var(--text-muted)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      textUnderlineOffset: '2px',
+                    }}
+                  >
+                    ← Back to sign in
+                  </button>
+                </div>
+              </div>
+            ) : mode === 'reset' ? (
+              <div style={{ padding: '0.5rem 0 1rem' }}>
+                <div style={{ textAlign: 'center' }}>
+                  <div
+                    style={{
+                      width: 48,
+                      height: 48,
+                      margin: '0 auto 1rem',
+                      borderRadius: '50%',
+                      background: 'rgba(22,163,74,0.12)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Mail size={22} style={{ color: 'var(--accent-primary, #16A34A)' }} />
+                  </div>
+                  <h1
+                    style={{
+                      fontSize: '1.25rem',
+                      fontWeight: 700,
+                      color: 'var(--text-primary)',
+                      marginBottom: '8px',
+                      letterSpacing: '-0.02em',
+                    }}
+                  >
+                    Enter your reset code
+                  </h1>
+                  <p
+                    style={{
+                      fontSize: '0.85rem',
+                      color: 'var(--text-muted)',
+                      lineHeight: 1.6,
+                      marginBottom: '1.5rem',
+                    }}
+                  >
+                    We sent a 6-digit code to <strong>{email}</strong>. Enter it below along with
+                    your new password.
+                  </p>
+                </div>
+
+                {otpError && (
+                  <div
+                    role="alert"
+                    style={{
+                      padding: '10px 14px',
+                      marginBottom: '1rem',
+                      fontSize: '0.82rem',
+                      color: 'var(--error)',
+                      background: 'rgba(239, 68, 68, 0.08)',
+                      border: '1px solid rgba(239, 68, 68, 0.2)',
+                      borderRadius: '12px',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '8px',
+                    }}
+                  >
+                    <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: '1px' }} />
+                    <span>{otpError}</span>
+                  </div>
+                )}
+
+                <form onSubmit={handleResetPassword} style={{ display: 'grid', gap: 12 }}>
+                  <label style={{ display: 'grid', gap: 6 }}>
+                    <span
+                      style={{
+                        fontSize: '0.78rem',
+                        fontWeight: 600,
+                        color: 'var(--text-secondary, #475569)',
+                      }}
+                    >
+                      6-digit code
+                    </span>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      value={otpCode}
+                      onChange={e => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      placeholder="123456"
+                      autoComplete="one-time-code"
+                      maxLength={6}
+                      disabled={verifyingOtp}
+                      aria-label="6-digit reset code"
+                      style={{
+                        padding: '12px 14px',
+                        fontSize: '1.1rem',
+                        fontWeight: 600,
+                        letterSpacing: '0.25em',
+                        textAlign: 'center',
+                        color: 'var(--text-primary)',
+                        background: 'var(--bg-card, #FFFFFF)',
+                        border: '1px solid var(--border-color, #E2E8F0)',
+                        borderRadius: 10,
+                        outline: 'none',
+                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                      }}
+                    />
+                  </label>
+                  <label style={{ display: 'grid', gap: 6 }}>
+                    <span
+                      style={{
+                        fontSize: '0.78rem',
+                        fontWeight: 600,
+                        color: 'var(--text-secondary, #475569)',
+                      }}
+                    >
+                      New password
+                    </span>
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={e => setPassword(e.target.value)}
+                      required
+                      minLength={8}
+                      autoComplete="new-password"
+                      placeholder="At least 8 characters"
+                      disabled={verifyingOtp}
+                      style={{
+                        padding: '11px 14px',
+                        fontSize: '0.88rem',
+                        color: 'var(--text-primary)',
+                        background: 'var(--bg-card, #FFFFFF)',
+                        border: '1px solid var(--border-color, #E2E8F0)',
+                        borderRadius: 10,
+                        outline: 'none',
+                        fontFamily: 'inherit',
+                      }}
+                    />
+                  </label>
+                  <button
+                    type="submit"
+                    disabled={verifyingOtp || otpCode.length < 6 || password.length < 8}
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      fontSize: '0.9rem',
+                      fontWeight: 600,
+                      color: '#fff',
+                      background:
+                        'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)',
+                      border: '1px solid rgba(22, 163, 74, 0.4)',
+                      borderRadius: 12,
+                      cursor:
+                        verifyingOtp || otpCode.length < 6 || password.length < 8
+                          ? 'not-allowed'
+                          : 'pointer',
+                      opacity:
+                        verifyingOtp || otpCode.length < 6 || password.length < 8 ? 0.7 : 1,
+                      transition: 'all 0.15s',
+                      fontFamily: 'inherit',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8,
+                    }}
+                  >
+                    {verifyingOtp ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin" /> Resetting…
+                      </>
+                    ) : (
+                      <>
+                        Reset password
+                        <ArrowRight size={14} style={{ opacity: 0.7 }} />
+                      </>
+                    )}
+                  </button>
+                </form>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    gap: '1rem',
+                    marginTop: '1rem',
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={e => handleSendResetCode(e as unknown as FormEvent<HTMLFormElement>)}
+                    disabled={formLoading}
+                    style={{
+                      fontSize: '0.78rem',
+                      color: 'var(--accent-primary, #16A34A)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: formLoading ? 'not-allowed' : 'pointer',
+                      textDecoration: 'underline',
+                      textUnderlineOffset: '2px',
+                      fontWeight: 600,
+                      opacity: formLoading ? 0.6 : 1,
+                    }}
+                  >
+                    {formLoading ? 'Sending…' : 'Resend code'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode('signin');
+                      setFormError(null);
+                      setOtpError(null);
+                      setOtpCode('');
+                      setPassword('');
+                    }}
+                    style={{
+                      fontSize: '0.78rem',
+                      color: 'var(--text-muted)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      textUnderlineOffset: '2px',
+                    }}
+                  >
+                    ← Back to sign in
+                  </button>
+                </div>
+              </div>
             ) : (
               <>
                 <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
@@ -885,6 +1318,34 @@ function LoginContent() {
                     )}
                   </button>
                 </form>
+
+                {/* Forgot password link (sign-in only) */}
+                {mode === 'signin' && (
+                  <p style={{ textAlign: 'center', marginTop: '0.75rem' }}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMode('forgot');
+                        setFormError(null);
+                        setOtpError(null);
+                        setPassword('');
+                      }}
+                      style={{
+                        fontSize: '0.78rem',
+                        color: 'var(--text-muted)',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        textDecoration: 'underline',
+                        textUnderlineOffset: '2px',
+                        padding: 0,
+                        fontFamily: 'inherit',
+                      }}
+                    >
+                      Forgot your password?
+                    </button>
+                  </p>
+                )}
 
                 {/* Mode toggle */}
                 <p
