@@ -228,7 +228,7 @@ function renderNode({ node, size, opacity, active, selected }: NodeRendererProps
           <dodecahedronGeometry args={[size, 0]} />
           <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
         </mesh>
-        {selected && <SelectedGlow size={size} color={col} />}
+        {selected && <SelectedGlow size={size} color={col} shape="dodecahedron" />}
         {!selected && glow && (
           <mesh scale={[1.55, 1.55, 1.55]}>
             <dodecahedronGeometry args={[size, 0]} />
@@ -247,7 +247,7 @@ function renderNode({ node, size, opacity, active, selected }: NodeRendererProps
         <octahedronGeometry args={[size, 0]} />
         <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
       </mesh>
-      {selected && <SelectedGlow size={size} color={col} />}
+      {selected && <SelectedGlow size={size} color={col} shape="octahedron" />}
       {!selected && glow && (
         <mesh scale={[1.6, 1.6, 1.6]}>
           <octahedronGeometry args={[size, 0]} />

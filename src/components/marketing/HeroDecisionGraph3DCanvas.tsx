@@ -675,7 +675,7 @@ export default function HeroDecisionGraph3DCanvas({
             <dodecahedronGeometry args={[size, 0]} />
             <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
           </mesh>
-          {selected && <SelectedGlow size={size} color={col} />}
+          {selected && <SelectedGlow size={size} color={col} shape="dodecahedron" />}
         </group>
       );
     }
@@ -688,7 +688,7 @@ export default function HeroDecisionGraph3DCanvas({
             <octahedronGeometry args={[size, 0]} />
             <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
           </mesh>
-          {selected && <SelectedGlow size={size} color={col} />}
+          {selected && <SelectedGlow size={size} color={col} shape="octahedron" />}
           {isPrimary && !selected && <PulsingHalo size={size} color={col} shape="octahedron" />}
         </group>
       );
@@ -701,7 +701,14 @@ export default function HeroDecisionGraph3DCanvas({
           <cylinderGeometry args={[size * 0.82, size * 0.82, size * 2.2, 8]} />
           <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
         </mesh>
-        {selected && <SelectedGlow size={size * 1.15} color={col} />}
+        {selected && (
+          <SelectedGlow
+            size={size}
+            color={col}
+            shape="cylinder"
+            cylinder={{ radiusFactor: 0.82, heightFactor: 2.2, segments: 8 }}
+          />
+        )}
       </group>
     );
   }, []);

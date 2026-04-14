@@ -246,7 +246,14 @@ export default function CausalGraph3DCanvas({ weights, onNodeSelect }: CausalGra
             <cylinderGeometry args={[size * 0.9, size * 0.9, size * 1.8, 8]} />
             <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
           </mesh>
-          {selected && <SelectedGlow size={size} color={col} />}
+          {selected && (
+            <SelectedGlow
+              size={size}
+              color={col}
+              shape="cylinder"
+              cylinder={{ radiusFactor: 0.9, heightFactor: 1.8, segments: 8 }}
+            />
+          )}
           {!selected && active && (
             <mesh scale={[1.5, 1.5, 1.5]}>
               <cylinderGeometry args={[size * 0.9, size * 0.9, size * 1.8, 8]} />
@@ -265,7 +272,7 @@ export default function CausalGraph3DCanvas({ weights, onNodeSelect }: CausalGra
             <tetrahedronGeometry args={[size, 0]} />
             <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
           </mesh>
-          {selected && <SelectedGlow size={size} color={col} />}
+          {selected && <SelectedGlow size={size} color={col} shape="tetrahedron" />}
           {!selected && active && (
             <mesh scale={[1.6, 1.6, 1.6]}>
               <tetrahedronGeometry args={[size, 0]} />
@@ -282,7 +289,7 @@ export default function CausalGraph3DCanvas({ weights, onNodeSelect }: CausalGra
           <octahedronGeometry args={[size, 0]} />
           <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
         </mesh>
-        {selected && <SelectedGlow size={size} color={col} />}
+        {selected && <SelectedGlow size={size} color={col} shape="octahedron" />}
         {!selected && active && (
           <mesh scale={[1.6, 1.6, 1.6]}>
             <octahedronGeometry args={[size, 0]} />

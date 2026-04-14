@@ -228,7 +228,7 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
               <icosahedronGeometry args={[size, 1]} />
               <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
             </mesh>
-            {selected && <SelectedGlow size={size} color={col} />}
+            {selected && <SelectedGlow size={size} color={col} shape="icosahedron" />}
             {!selected && active && <mesh scale={[1.55, 1.55, 1.55]}><icosahedronGeometry args={[size, 1]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
           </group>
         );
@@ -240,7 +240,7 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
               <boxGeometry args={[s, s, s]} />
               <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
             </mesh>
-            {selected && <SelectedGlow size={size} color={col} />}
+            {selected && <SelectedGlow size={s} color={col} shape="box" />}
             {!selected && active && <mesh scale={[1.55, 1.55, 1.55]}><boxGeometry args={[s, s, s]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
           </group>
         );
@@ -252,7 +252,7 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
               <sphereGeometry args={[size * 0.85, 12, 8]} />
               <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
             </mesh>
-            {selected && <SelectedGlow size={size} color={col} />}
+            {selected && <SelectedGlow size={size * 0.85} color={col} shape="sphere" />}
             {!selected && active && <mesh scale={[1.55, 1.55, 1.55]}><sphereGeometry args={[size * 0.85, 12, 8]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
           </group>
         );
@@ -263,7 +263,7 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
               <tetrahedronGeometry args={[size, 0]} />
               <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
             </mesh>
-            {selected && <SelectedGlow size={size} color={col} />}
+            {selected && <SelectedGlow size={size} color={col} shape="tetrahedron" />}
             {!selected && active && <mesh scale={[1.55, 1.55, 1.55]}><tetrahedronGeometry args={[size, 0]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
           </group>
         );
@@ -274,7 +274,14 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
               <cylinderGeometry args={[size * 0.8, size * 0.8, size * 2, 8]} />
               <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
             </mesh>
-            {selected && <SelectedGlow size={size} color={col} />}
+            {selected && (
+              <SelectedGlow
+                size={size}
+                color={col}
+                shape="cylinder"
+                cylinder={{ radiusFactor: 0.8, heightFactor: 2, segments: 8 }}
+              />
+            )}
             {!selected && active && <mesh scale={[1.55, 1.55, 1.55]}><cylinderGeometry args={[size * 0.8, size * 0.8, size * 2, 8]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
           </group>
         );

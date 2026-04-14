@@ -267,21 +267,68 @@ export function withNarrativeTheme(base: Theme): Theme {
 }
 
 // ─── SelectedGlow ────────────────────────────────────────────────────────────
-// Layered fresnel-shaded halos around the selected node. Premium "energy
-// field" look, not a flat alpha balloon. Two ingredients:
+// Three coordinated layers around a selected node:
 //
-//   1. Custom fresnel shader — brightens edges, fades center. Sphere reads
-//      as a glow emanating from the node rather than a ball on top of it.
-//   2. Additive blending — the shells *emit* light instead of occluding,
-//      so background colors bleed through and motion stays visible.
+//   1. Inner glass core (static): a fresnel-shaded shell that mirrors the
+//      node's geometry (dodecahedron, octahedron, cylinder, etc.) at a
+//      slight outset, with a light tint of the node color.
+//   2. Two radiating waves: copies of the same geometry that continuously
+//      grow outward from the node and fade out, with offset phases so a
+//      new wave is always emerging. Reads as energy radiating, not a
+//      static glow.
 //
-// Two concentric shells (inner bright core + outer soft bloom) with offset
-// pulse phases create a subtle breathing depth without the "balloon" feel.
-//
-// Shape-agnostic: bounding sphere works for boxes, octahedra, cylinders,
-// tetrahedra, etc. Drop inside the renderNode group when `selected` is true.
+// Custom fresnel shader brightens silhouette edges, NormalBlending so the
+// tint is preserved on a white background (additive saturates to white).
 
+import type { Mesh } from 'three';
 import { Color, DoubleSide, NormalBlending, ShaderMaterial } from 'three';
+
+export type GlowShape =
+  | 'sphere'
+  | 'dodecahedron'
+  | 'octahedron'
+  | 'icosahedron'
+  | 'tetrahedron'
+  | 'box'
+  | 'cylinder';
+
+interface CylinderArgs {
+  radiusFactor?: number;
+  heightFactor?: number;
+  segments?: number;
+}
+
+function ShellGeometry({
+  shape,
+  size,
+  cylinder = {},
+}: {
+  shape: GlowShape;
+  size: number;
+  cylinder?: CylinderArgs;
+}) {
+  switch (shape) {
+    case 'dodecahedron':
+      return <dodecahedronGeometry args={[size, 0]} />;
+    case 'octahedron':
+      return <octahedronGeometry args={[size, 0]} />;
+    case 'icosahedron':
+      return <icosahedronGeometry args={[size, 1]} />;
+    case 'tetrahedron':
+      return <tetrahedronGeometry args={[size, 0]} />;
+    case 'box':
+      return <boxGeometry args={[size, size, size]} />;
+    case 'cylinder': {
+      const r = (cylinder.radiusFactor ?? 0.85) * size;
+      const h = (cylinder.heightFactor ?? 2) * size;
+      const seg = cylinder.segments ?? 16;
+      return <cylinderGeometry args={[r, r, h, seg]} />;
+    }
+    case 'sphere':
+    default:
+      return <sphereGeometry args={[size, 32, 24]} />;
+  }
+}
 
 const FRESNEL_VERTEX = /* glsl */ `
   varying vec3 vNormal;
@@ -310,12 +357,35 @@ const FRESNEL_FRAGMENT = /* glsl */ `
   }
 `;
 
+function makeFresnelMaterial(color: string, intensity: number, power: number, baseTint: number) {
+  return new ShaderMaterial({
+    uniforms: {
+      uColor: { value: new Color(color) },
+      uIntensity: { value: intensity },
+      uPower: { value: power },
+      uBaseTint: { value: baseTint },
+    },
+    vertexShader: FRESNEL_VERTEX,
+    fragmentShader: FRESNEL_FRAGMENT,
+    transparent: true,
+    // NormalBlending (not Additive): canvas background is white, and
+    // additive math (dest + source) saturates to white on a white
+    // surface, eating any tint. Normal alpha blending preserves color.
+    blending: NormalBlending,
+    depthWrite: false,
+    side: DoubleSide,
+  });
+}
+
+// Static breathing shell: holds at a fixed scale, gently pulses intensity.
 function FresnelShell({
   size,
   color,
   power,
   intensity,
   baseTint = 0,
+  shape,
+  cylinder,
   pulseSpeed = 1.8,
   pulseDepth = 0.18,
   phase = 0,
@@ -324,33 +394,15 @@ function FresnelShell({
   color: string;
   power: number;
   intensity: number;
-  /** Constant alpha across the whole shell — gives glass-like body tint. */
   baseTint?: number;
+  shape: GlowShape;
+  cylinder?: CylinderArgs;
   pulseSpeed?: number;
   pulseDepth?: number;
   phase?: number;
 }) {
-  // ShaderMaterial is recreated only when inputs change (stable for a
-  // given selected node). useMemo keeps the GPU program cached.
   const material = useMemo(
-    () =>
-      new ShaderMaterial({
-        uniforms: {
-          uColor: { value: new Color(color) },
-          uIntensity: { value: intensity },
-          uPower: { value: power },
-          uBaseTint: { value: baseTint },
-        },
-        vertexShader: FRESNEL_VERTEX,
-        fragmentShader: FRESNEL_FRAGMENT,
-        transparent: true,
-        // NormalBlending (not Additive): canvas background is white, and
-        // additive math (dest + source) saturates to white on a white
-        // surface, eating any tint. Normal alpha blending preserves color.
-        blending: NormalBlending,
-        depthWrite: false,
-        side: DoubleSide,
-      }),
+    () => makeFresnelMaterial(color, intensity, power, baseTint),
     [color, intensity, power, baseTint],
   );
   const matRef = useRef<ShaderMaterial | null>(null);
@@ -358,43 +410,126 @@ function FresnelShell({
     const m = matRef.current;
     if (!m) return;
     const t = clock.elapsedTime + phase;
-    m.uniforms.uIntensity.value = intensity * (1 - pulseDepth + Math.sin(t * pulseSpeed) * pulseDepth);
+    m.uniforms.uIntensity.value =
+      intensity * (1 - pulseDepth + Math.sin(t * pulseSpeed) * pulseDepth);
   });
   return (
     <mesh>
-      <sphereGeometry args={[size, 40, 28]} />
+      <ShellGeometry shape={shape} size={size} cylinder={cylinder} />
       <primitive ref={matRef} object={material} attach="material" />
     </mesh>
   );
 }
 
-export function SelectedGlow({ size, color }: { size: number; color: string }) {
+// Radiating shell: continuously grows outward from `startScale` to `endScale`
+// over `cycleSeconds`, fading opacity to 0 as it expands. Loops forever.
+// Use 2-3 of these with offset phases so a new wave is always emerging.
+function RadiatingShell({
+  baseSize,
+  color,
+  power,
+  peakIntensity,
+  peakBaseTint,
+  shape,
+  cylinder,
+  startScale = 1,
+  endScale = 2.4,
+  cycleSeconds = 2.6,
+  phase = 0,
+}: {
+  baseSize: number;
+  color: string;
+  power: number;
+  peakIntensity: number;
+  peakBaseTint: number;
+  shape: GlowShape;
+  cylinder?: CylinderArgs;
+  startScale?: number;
+  endScale?: number;
+  cycleSeconds?: number;
+  phase?: number;
+}) {
+  const material = useMemo(
+    () => makeFresnelMaterial(color, peakIntensity, power, peakBaseTint),
+    [color, peakIntensity, power, peakBaseTint],
+  );
+  const meshRef = useRef<Mesh | null>(null);
+  const matRef = useRef<ShaderMaterial | null>(null);
+  useFrame(({ clock }) => {
+    const mesh = meshRef.current;
+    const mat = matRef.current;
+    if (!mesh || !mat) return;
+    // t in [0, 1) walking forward over the cycle, with optional phase offset.
+    const t = (((clock.elapsedTime + phase) % cycleSeconds) + cycleSeconds) % cycleSeconds;
+    const u = t / cycleSeconds; // 0 → 1
+    const scale = startScale + (endScale - startScale) * u;
+    mesh.scale.setScalar(scale);
+    // Ease-out fade: bright on emergence, decays to zero by cycle end.
+    const fade = Math.pow(1 - u, 1.4);
+    mat.uniforms.uIntensity.value = peakIntensity * fade;
+    mat.uniforms.uBaseTint.value = peakBaseTint * fade;
+  });
+  return (
+    <mesh ref={meshRef}>
+      <ShellGeometry shape={shape} size={baseSize} cylinder={cylinder} />
+      <primitive ref={matRef} object={material} attach="material" />
+    </mesh>
+  );
+}
+
+export function SelectedGlow({
+  size,
+  color,
+  shape = 'sphere',
+  cylinder,
+}: {
+  size: number;
+  color: string;
+  shape?: GlowShape;
+  cylinder?: CylinderArgs;
+}) {
   return (
     <group>
-      {/* Inner glass core — saturated tint over the node, with a bright
-         fresnel rim. Higher base alpha than additive version because we
-         need it to stand against a white background. */}
+      {/* Inner glass core — fixed size, light tint of node color. The
+         halo's "body" — visible at rest, but never solid. */}
       <FresnelShell
-        size={size * 1.45}
+        size={size * 1.3}
         color={color}
-        power={2.6}
-        intensity={0.55}
-        baseTint={0.38}
-        pulseSpeed={1.8}
-        pulseDepth={0.12}
+        shape={shape}
+        cylinder={cylinder}
+        power={2.4}
+        intensity={0.45}
+        baseTint={0.11}
+        pulseSpeed={1.6}
+        pulseDepth={0.18}
       />
-      {/* Outer refractive bloom — wider, softer, half-cycle phase offset.
-         Lower alpha so the node behind the inner core still reads, while
-         the surrounding airspace gets a gentle tinted halo. */}
-      <FresnelShell
-        size={size * 2.1}
+      {/* Two radiating waves, half a cycle apart, so a new wave is always
+         emerging while the previous one fades into the background. */}
+      <RadiatingShell
+        baseSize={size * 1.3}
         color={color}
-        power={1.7}
-        intensity={0.4}
-        baseTint={0.14}
-        pulseSpeed={1.8}
-        pulseDepth={0.2}
-        phase={Math.PI / 2}
+        shape={shape}
+        cylinder={cylinder}
+        power={2.0}
+        peakIntensity={0.5}
+        peakBaseTint={0.1}
+        startScale={1}
+        endScale={2.4}
+        cycleSeconds={2.6}
+        phase={0}
+      />
+      <RadiatingShell
+        baseSize={size * 1.3}
+        color={color}
+        shape={shape}
+        cylinder={cylinder}
+        power={2.0}
+        peakIntensity={0.5}
+        peakBaseTint={0.1}
+        startScale={1}
+        endScale={2.4}
+        cycleSeconds={2.6}
+        phase={1.3}
       />
     </group>
   );

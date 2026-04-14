@@ -188,7 +188,7 @@ export default function BiasNetwork3DCanvas({ biases, onBiasSelect }: BiasNetwor
           <octahedronGeometry args={[size, 0]} />
           <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
         </mesh>
-        {selected && <SelectedGlow size={size} color={col} />}
+        {selected && <SelectedGlow size={size} color={col} shape="octahedron" />}
         {!selected && active && (
           <mesh scale={[1.6, 1.6, 1.6]}>
             <octahedronGeometry args={[size, 0]} />
