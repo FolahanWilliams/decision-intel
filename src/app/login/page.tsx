@@ -26,6 +26,28 @@ export default function LoginPage() {
   );
 }
 
+/**
+ * Supabase's password-strength error dumps the raw character sets into the
+ * message ("... abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ
+ * 0123456789"), which reads as noise. Translate into a clean human sentence
+ * based on which sets appear in the raw error, so the message stays accurate
+ * even if password requirements change on the Supabase side.
+ */
+function cleanAuthError(message: string): string {
+  if (!/password should contain/i.test(message)) return message;
+  const needs: string[] = [];
+  if (/[a-z]{10,}/.test(message)) needs.push('a lowercase letter');
+  if (/[A-Z]{10,}/.test(message)) needs.push('an uppercase letter');
+  if (/[0-9]{8,}/.test(message)) needs.push('a digit');
+  if (/[!@#$%^&*()\-_=+[\]{};:'"\\|,.<>/?]{5,}/.test(message))
+    needs.push('a special character');
+
+  if (needs.length === 0) return 'Password does not meet the requirements.';
+  if (needs.length === 1) return `Password must include ${needs[0]}.`;
+  const last = needs.pop();
+  return `Password must include ${needs.join(', ')}, and ${last}.`;
+}
+
 function getErrorMessage(code: string | null): string | null {
   if (!code) return null;
   switch (code) {
@@ -147,7 +169,7 @@ function LoginContent() {
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Authentication failed.';
-      setFormError(message);
+      setFormError(cleanAuthError(message));
     } finally {
       setFormLoading(false);
     }
@@ -183,7 +205,7 @@ function LoginContent() {
       window.location.href = safeRedirect;
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Could not verify code.';
-      setOtpError(message);
+      setOtpError(cleanAuthError(message));
     } finally {
       setVerifyingOtp(false);
     }
@@ -208,7 +230,7 @@ function LoginContent() {
       setOtpError(null);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Could not send reset code.';
-      setFormError(message);
+      setFormError(cleanAuthError(message));
     } finally {
       setFormLoading(false);
     }
@@ -248,7 +270,7 @@ function LoginContent() {
       window.location.href = safeRedirect;
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Could not reset password.';
-      setOtpError(message);
+      setOtpError(cleanAuthError(message));
     } finally {
       setVerifyingOtp(false);
     }
@@ -275,7 +297,7 @@ function LoginContent() {
       setHashError(null);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Could not resend confirmation email.';
-      setFormError(message);
+      setFormError(cleanAuthError(message));
     } finally {
       setResending(false);
     }
