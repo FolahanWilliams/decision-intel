@@ -58,6 +58,33 @@ const cardStyle: React.CSSProperties = {
   boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
 };
 
+/* Inner card recipe — used inside Section components for grouped items
+ * (bias details, boardroom twins, toxic combos, pre-mortem scenarios). */
+const innerCardStyle: React.CSSProperties = {
+  background: C.slate50,
+  border: `1px solid ${C.slate200}`,
+  borderRadius: 12,
+  padding: '18px 20px',
+};
+
+/* Soft-tint pill — used for vote badges, severity tags, etc. */
+function tintedPill(color: string, opts: { size?: 'sm' | 'md' } = {}): React.CSSProperties {
+  const sm = opts.size === 'sm';
+  return {
+    fontSize: sm ? 10 : 11,
+    padding: sm ? '3px 8px' : '4px 10px',
+    borderRadius: 999,
+    fontWeight: 700,
+    textTransform: 'uppercase',
+    letterSpacing: '0.06em',
+    background: `${color}15`,
+    color,
+    border: `1px solid ${color}30`,
+    display: 'inline-flex',
+    alignItems: 'center',
+  };
+}
+
 /* Section band: full-width strip with optional alternating bg. */
 function SectionBand({
   bg = C.white,
@@ -866,30 +893,86 @@ export default function DemoPage() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {(showAllBiases ? analysis.biases : analysis.biases.slice(0, 4)).map(
                       (bias, idx) => (
-                        <div
-                          key={idx}
-                          style={{ background: '#F8FAFC', borderRadius: 10, padding: '16px 18px', border: '1px solid #E2E8F0' }}
-                        >
-                          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                            <span style={{ fontWeight: 700, fontSize: 14, color: '#0F172A', textTransform: 'capitalize' }}>
+                        <div key={idx} style={innerCardStyle}>
+                          <div
+                            style={{
+                              display: 'flex',
+                              flexWrap: 'wrap',
+                              alignItems: 'center',
+                              gap: 10,
+                              marginBottom: 12,
+                            }}
+                          >
+                            <span
+                              style={{
+                                fontWeight: 700,
+                                fontSize: 14,
+                                color: C.slate900,
+                                textTransform: 'capitalize',
+                                letterSpacing: '-0.01em',
+                              }}
+                            >
                               {bias.biasType.replace(/_/g, ' ')}
                             </span>
                             <SeverityBadge severity={bias.severity} />
-                            <span style={{ fontSize: 11, color: '#94A3B8', marginLeft: 'auto' }}>
+                            <span
+                              style={{
+                                fontSize: 11,
+                                color: C.slate500,
+                                marginLeft: 'auto',
+                                fontWeight: 600,
+                              }}
+                            >
                               {Math.round(bias.confidence * 100)}% confidence
                             </span>
                           </div>
                           <p
-                            style={{ color: '#475569', fontSize: 13, margin: '0 0 10px', fontStyle: 'italic', lineHeight: 1.6, paddingLeft: 12, borderLeft: `2px solid ${sevColor(bias.severity)}40` }}
+                            style={{
+                              color: C.slate600,
+                              fontSize: 13,
+                              margin: '0 0 12px',
+                              fontStyle: 'italic',
+                              lineHeight: 1.65,
+                              paddingLeft: 14,
+                              borderLeft: `3px solid ${sevColor(bias.severity)}55`,
+                            }}
                           >
                             &ldquo;{bias.excerpt}&rdquo;
                           </p>
-                          <p style={{ color: '#475569', fontSize: 13, margin: '0 0 10px', lineHeight: 1.6 }}>
+                          <p
+                            style={{
+                              color: C.slate600,
+                              fontSize: 13,
+                              margin: '0 0 12px',
+                              lineHeight: 1.65,
+                            }}
+                          >
                             {bias.explanation}
                           </p>
-                          <p style={{ color: '#15803D', fontSize: 13, margin: 0, lineHeight: 1.6 }}>
-                            <strong>Recommendation:</strong> {bias.suggestion}
-                          </p>
+                          <div
+                            style={{
+                              padding: '10px 14px',
+                              borderRadius: 8,
+                              background: C.greenSoft,
+                              border: `1px solid ${C.greenLight}`,
+                            }}
+                          >
+                            <span
+                              style={{
+                                fontSize: 10,
+                                fontWeight: 700,
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.06em',
+                                color: C.greenDark,
+                                marginRight: 8,
+                              }}
+                            >
+                              Recommend
+                            </span>
+                            <span style={{ color: C.greenDark, fontSize: 13, lineHeight: 1.6 }}>
+                              {bias.suggestion}
+                            </span>
+                          </div>
                         </div>
                       )
                     )}
@@ -897,7 +980,26 @@ export default function DemoPage() {
                   {analysis.biases.length > 4 && !showAllBiases && (
                     <button
                       onClick={() => setShowAllBiases(true)}
-                      style={{ marginTop: 12, fontSize: 12, color: '#475569', background: 'transparent', border: '1px solid #E2E8F0', borderRadius: 8, padding: '6px 12px', cursor: 'pointer' }}
+                      style={{
+                        marginTop: 14,
+                        fontSize: 12,
+                        fontWeight: 600,
+                        color: C.slate600,
+                        background: C.white,
+                        border: `1px solid ${C.slate200}`,
+                        borderRadius: 8,
+                        padding: '8px 14px',
+                        cursor: 'pointer',
+                        transition: 'border-color 0.15s, color 0.15s',
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.borderColor = C.slate400;
+                        e.currentTarget.style.color = C.slate900;
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.borderColor = C.slate200;
+                        e.currentTarget.style.color = C.slate600;
+                      }}
                     >
                       Show all {analysis.biases.length} biases
                     </button>
@@ -908,28 +1010,35 @@ export default function DemoPage() {
               {/* Section 2b: Bias Visualizations */}
               {analysis.biases.length >= 3 && (
                 <div style={{ marginBottom: 24, scrollMarginTop: 80 }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 16 }}>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                      gap: 16,
+                    }}
+                  >
                     {/* 3D Bias Network */}
-                    <div
-                      style={{
-                        border: '1px solid #E2E8F0',
-                        borderRadius: 16,
-                        overflow: 'hidden',
-                        boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-                        minWidth: 0,
-                      }}
-                    >
+                    <div style={{ ...cardStyle, overflow: 'hidden', minWidth: 0 }}>
                       <div
                         style={{
-                          padding: '12px 16px',
-                          borderBottom: '1px solid #E2E8F0',
-                          background: '#FFFFFF',
+                          padding: '14px 18px',
+                          borderBottom: `1px solid ${C.slate200}`,
+                          background: C.white,
                         }}
                       >
-                        <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px', color: '#16A34A', marginBottom: 2 }}>
+                        <div
+                          style={{
+                            fontSize: 10,
+                            fontWeight: 700,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.08em',
+                            color: C.green,
+                            marginBottom: 4,
+                          }}
+                        >
                           3D Bias Network
                         </div>
-                        <div style={{ fontSize: 13, color: '#64748B' }}>
+                        <div style={{ fontSize: 13, color: C.slate500 }}>
                           Interactive bias relationship map
                         </div>
                       </div>
@@ -945,32 +1054,40 @@ export default function DemoPage() {
                           />
                         </div>
                       </div>
-                      <div style={{ padding: '8px 16px', borderTop: '1px solid #E2E8F0', background: '#FFFFFF', fontSize: 11, color: '#94A3B8' }}>
+                      <div
+                        style={{
+                          padding: '10px 18px',
+                          borderTop: `1px solid ${C.slate200}`,
+                          background: C.slate50,
+                          fontSize: 11,
+                          color: C.slate500,
+                        }}
+                      >
                         Drag to rotate · Scroll to zoom · Click to explore
                       </div>
                     </div>
 
                     {/* Bias Intensity Radar */}
-                    <div
-                      style={{
-                        border: '1px solid #E2E8F0',
-                        borderRadius: 16,
-                        overflow: 'hidden',
-                        background: '#FFFFFF',
-                        boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-                        minWidth: 0,
-                      }}
-                    >
+                    <div style={{ ...cardStyle, overflow: 'hidden', minWidth: 0 }}>
                       <div
                         style={{
-                          padding: '12px 16px',
-                          borderBottom: '1px solid #E2E8F0',
+                          padding: '14px 18px',
+                          borderBottom: `1px solid ${C.slate200}`,
                         }}
                       >
-                        <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px', color: '#7C3AED', marginBottom: 2 }}>
+                        <div
+                          style={{
+                            fontSize: 10,
+                            fontWeight: 700,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.08em',
+                            color: '#7C3AED',
+                            marginBottom: 4,
+                          }}
+                        >
                           Bias Intensity Profile
                         </div>
-                        <div style={{ fontSize: 13, color: '#64748B' }}>
+                        <div style={{ fontSize: 13, color: C.slate500 }}>
                           Severity × confidence across {analysis.biases.length} biases
                         </div>
                       </div>
@@ -995,27 +1112,33 @@ export default function DemoPage() {
               )}
 
               {/* Section 3: Noise */}
-              <div id="noise" className="scroll-mt-20">
+              <div id="noise" style={{ scrollMarginTop: 80 }}>
                 <Section icon={<Target size={16} />} title="Decision Noise Analysis">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5 mb-6">
-                    <div className="text-center">
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'flex-start',
+                      gap: 28,
+                      flexWrap: 'wrap',
+                    }}
+                  >
+                    <div style={{ textAlign: 'center', minWidth: 80 }}>
                       <div
-                        className="text-4xl sm:text-5xl font-extrabold leading-none"
                         style={{
-                          color:
-                            analysis.noiseScore <= 30
-                              ? '#22c55e'
-                              : analysis.noiseScore <= 60
-                                ? '#eab308'
-                                : '#ef4444',
+                          fontSize: 'clamp(40px, 6vw, 56px)',
+                          fontWeight: 800,
+                          lineHeight: 1,
+                          letterSpacing: '-0.02em',
+                          color: noiseColor,
                         }}
                       >
                         {analysis.noiseScore}
                       </div>
-                      <div className="text-xs text-slate-400 mt-1">/ 100</div>
+                      <div style={{ fontSize: 11, color: C.slate500, marginTop: 6 }}>/ 100</div>
                     </div>
-                    <div className="flex-1 w-full">
-                      <div className="flex flex-wrap gap-2 mb-3">
+                    <div style={{ flex: 1, minWidth: 240 }}>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
                         <StatPill label="Mean" value={analysis.noiseStats.mean.toString()} />
                         <StatPill label="Std Dev" value={analysis.noiseStats.stdDev.toFixed(1)} />
                         <StatPill
@@ -1023,31 +1146,58 @@ export default function DemoPage() {
                           value={analysis.noiseStats.variance.toFixed(0)}
                         />
                       </div>
-                      <div className="flex flex-col gap-2">
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                         {analysis.noiseBenchmarks.map((b, i) => (
-                          <div key={i} className="flex items-center gap-2.5">
-                            <span className="text-[11px] sm:text-xs text-slate-600 w-20 sm:w-[120px] shrink-0">
+                          <div
+                            key={i}
+                            style={{ display: 'flex', alignItems: 'center', gap: 12 }}
+                          >
+                            <span
+                              style={{
+                                fontSize: 12,
+                                color: C.slate600,
+                                width: 130,
+                                flexShrink: 0,
+                                fontWeight: 500,
+                              }}
+                            >
                               {b.label}
                             </span>
-                            <div style={{ flex: 1, height: 6, borderRadius: 3, background: '#F1F5F9' }}>
+                            <div
+                              style={{
+                                flex: 1,
+                                height: 8,
+                                borderRadius: 4,
+                                background: C.slate100,
+                                overflow: 'hidden',
+                              }}
+                            >
                               <div
                                 style={{
                                   height: '100%',
-                                  borderRadius: 3,
+                                  borderRadius: 4,
                                   transition: 'width 0.3s',
                                   width: `${Math.min(b.value, 100)}%`,
                                   background:
                                     i === 0
                                       ? b.value <= 30
-                                        ? '#22c55e'
+                                        ? C.green
                                         : b.value <= 60
-                                          ? '#eab308'
-                                          : '#ef4444'
+                                          ? C.warning
+                                          : C.danger
                                       : '#CBD5E1',
                                 }}
                               />
                             </div>
-                            <span className="text-xs font-semibold text-slate-900 w-[30px] text-right">
+                            <span
+                              style={{
+                                fontSize: 13,
+                                fontWeight: 700,
+                                color: C.slate900,
+                                width: 32,
+                                textAlign: 'right',
+                              }}
+                            >
                               {b.value}
                             </span>
                           </div>
@@ -1059,52 +1209,91 @@ export default function DemoPage() {
               </div>
 
               {/* Section 4: Boardroom Simulation */}
-              <div id="boardroom" className="scroll-mt-20">
-                <Section icon={<Users size={16} />} title="Boardroom Simulation — Decision Twins">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div id="boardroom" style={{ scrollMarginTop: 80 }}>
+                <Section
+                  icon={<Users size={16} />}
+                  title="Boardroom Simulation"
+                  subtitle="Decision-maker personas independently vote on the proposal."
+                >
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+                      gap: 12,
+                    }}
+                  >
                     {analysis.simulation.twins.map((twin, idx) => {
                       const voteColor =
                         twin.vote === 'REJECT'
-                          ? '#ef4444'
+                          ? C.danger
                           : twin.vote === 'CONDITIONAL APPROVE'
-                            ? '#eab308'
-                            : '#22c55e';
+                            ? C.warning
+                            : C.green;
                       return (
-                        <div
-                          key={idx}
-                          className="bg-slate-50 rounded-[10px] p-4 border border-slate-200"
-                        >
-                          <div className="flex justify-between items-center mb-2.5">
-                            <div>
-                              <div className="font-bold text-[13px] text-slate-900">
+                        <div key={idx} style={innerCardStyle}>
+                          <div
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'flex-start',
+                              gap: 10,
+                              marginBottom: 12,
+                            }}
+                          >
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div
+                                style={{
+                                  fontWeight: 700,
+                                  fontSize: 13,
+                                  color: C.slate900,
+                                  letterSpacing: '-0.01em',
+                                }}
+                              >
                                 {twin.name}
                               </div>
-                              <div className="text-[11px] text-slate-400">
+                              <div style={{ fontSize: 11, color: C.slate500, marginTop: 2 }}>
                                 {twin.role}
                               </div>
                             </div>
-                            <span
-                              className="text-[10px] px-2 py-0.5 rounded-md font-bold"
-                              style={{ background: `${voteColor}15`, color: voteColor }}
-                            >
-                              {twin.vote}
-                            </span>
+                            <span style={tintedPill(voteColor, { size: 'sm' })}>{twin.vote}</span>
                           </div>
-                          <div className="mb-2.5">
-                            <div className="h-[3px] rounded-sm bg-slate-200">
+                          <div style={{ marginBottom: 12 }}>
+                            <div
+                              style={{
+                                height: 4,
+                                borderRadius: 2,
+                                background: C.slate200,
+                                overflow: 'hidden',
+                              }}
+                            >
                               <div
-                                className="h-full rounded-sm"
                                 style={{
+                                  height: '100%',
                                   width: `${twin.confidence * 100}%`,
                                   background: voteColor,
+                                  borderRadius: 2,
                                 }}
                               />
                             </div>
-                            <div className="text-[10px] text-slate-400 mt-0.5">
+                            <div
+                              style={{
+                                fontSize: 10,
+                                color: C.slate500,
+                                marginTop: 4,
+                                fontWeight: 600,
+                              }}
+                            >
                               {Math.round(twin.confidence * 100)}% confidence
                             </div>
                           </div>
-                          <p className="text-slate-600 text-xs m-0 leading-relaxed">
+                          <p
+                            style={{
+                              color: C.slate600,
+                              fontSize: 12,
+                              margin: 0,
+                              lineHeight: 1.6,
+                            }}
+                          >
                             {twin.rationale}
                           </p>
                         </div>
@@ -1116,120 +1305,217 @@ export default function DemoPage() {
 
               {/* Section 5: Toxic Combinations */}
               {analysis.toxicCombinations && analysis.toxicCombinations.length > 0 && (
-                <div id="toxic" className="scroll-mt-20">
+                <div id="toxic" style={{ scrollMarginTop: 80 }}>
                   <Section
-                    icon={<AlertTriangle size={16} className="text-red-500" />}
-                    title="Toxic Combinations — Compound Risk Patterns"
+                    icon={<AlertTriangle size={16} />}
+                    title="Toxic Combinations"
+                    subtitle="Individual biases are manageable. When they combine with contextual factors, compound risk can be 8× worse than any single factor."
                   >
-                    <p className="text-slate-600 text-[13px] mb-4 leading-relaxed">
-                      Individual biases are manageable. When they combine with contextual factors,
-                      compound risk can be 8x worse than any single factor.
-                    </p>
-                    <div className="flex flex-col gap-3">
-                      {analysis.toxicCombinations.map((tc, idx) => (
-                        <div
-                          key={idx}
-                          className="bg-slate-50 rounded-[10px] p-4 sm:p-[18px] border border-slate-200"
-                        >
-                          <div className="flex flex-wrap items-center gap-2 mb-2.5">
-                            <span className="font-bold text-sm text-slate-900">
-                              {tc.name}
-                            </span>
-                            <span
-                              className="text-[10px] px-2.5 py-0.5 rounded-xl font-bold uppercase tracking-wide"
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      {analysis.toxicCombinations.map((tc, idx) => {
+                        const tcColor = tc.riskLevel === 'critical' ? C.danger : C.orange;
+                        return (
+                          <div key={idx} style={innerCardStyle}>
+                            <div
                               style={{
-                                background: tc.riskLevel === 'critical' ? '#ef444415' : '#f9731615',
-                                color: tc.riskLevel === 'critical' ? '#ef4444' : '#f97316',
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                alignItems: 'center',
+                                gap: 10,
+                                marginBottom: 12,
                               }}
                             >
-                              {tc.riskLevel}
-                            </span>
-                          </div>
-                          <div className="flex flex-wrap gap-1.5 mb-2.5">
-                            {tc.biases.map((b, bi) => (
                               <span
-                                key={bi}
-                                className="text-[10px] px-2 py-0.5 rounded-md bg-slate-50 text-slate-600 border border-slate-200"
+                                style={{
+                                  fontWeight: 700,
+                                  fontSize: 14,
+                                  color: C.slate900,
+                                  letterSpacing: '-0.01em',
+                                }}
                               >
-                                {b}
+                                {tc.name}
                               </span>
-                            ))}
-                          </div>
-                          <p className="text-slate-600 text-[13px] m-0 leading-relaxed">
-                            {tc.description}
-                          </p>
-                          {tc.historicalExample && (
-                            <p className="text-red-600 text-[12px] m-0 mt-2 leading-relaxed italic">
-                              {tc.historicalExample}
+                              <span style={tintedPill(tcColor, { size: 'sm' })}>{tc.riskLevel}</span>
+                            </div>
+                            <div
+                              style={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                gap: 6,
+                                marginBottom: 12,
+                              }}
+                            >
+                              {tc.biases.map((b, bi) => (
+                                <span
+                                  key={bi}
+                                  style={{
+                                    fontSize: 11,
+                                    padding: '3px 9px',
+                                    borderRadius: 6,
+                                    background: C.white,
+                                    color: C.slate600,
+                                    border: `1px solid ${C.slate200}`,
+                                    fontWeight: 500,
+                                  }}
+                                >
+                                  {b}
+                                </span>
+                              ))}
+                            </div>
+                            <p
+                              style={{
+                                color: C.slate600,
+                                fontSize: 13,
+                                margin: 0,
+                                lineHeight: 1.65,
+                              }}
+                            >
+                              {tc.description}
                             </p>
-                          )}
-                        </div>
-                      ))}
+                            {tc.historicalExample && (
+                              <p
+                                style={{
+                                  color: C.danger,
+                                  fontSize: 12,
+                                  margin: '10px 0 0',
+                                  lineHeight: 1.6,
+                                  fontStyle: 'italic',
+                                }}
+                              >
+                                {tc.historicalExample}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </Section>
                 </div>
               )}
 
               {/* Section 6: Pre-Mortem */}
-              <div id="premortem" className="scroll-mt-20">
-                <Section icon={<Skull size={16} />} title="Pre-Mortem Analysis">
-                  <p className="text-slate-600 text-[13px] mb-4 leading-relaxed">
-                    Imagine it&apos;s 2 years from now and this decision has failed spectacularly.
-                    What went wrong?
-                  </p>
-                  <div className="flex flex-col gap-3">
-                    {analysis.preMortem.scenarios.map((s, idx) => (
-                      <div
-                        key={idx}
-                        className="bg-slate-50 rounded-[10px] p-4 sm:p-[18px] border border-slate-200"
-                      >
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2.5">
-                          <span className="font-bold text-sm text-slate-900">
-                            {s.title}
-                          </span>
-                          <div className="flex gap-2">
-                            <span className="text-[10px] px-2.5 py-0.5 rounded-xl bg-yellow-500/10 text-yellow-500 font-bold">
-                              {Math.round(s.probability * 100)}% likely
-                            </span>
+              <div id="premortem" style={{ scrollMarginTop: 80 }}>
+                <Section
+                  icon={<Skull size={16} />}
+                  title="Pre-Mortem Analysis"
+                  subtitle="Imagine it's two years from now and this decision has failed spectacularly. What went wrong?"
+                >
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    {analysis.preMortem.scenarios.map((s, idx) => {
+                      const impactColor =
+                        s.impact === 'catastrophic'
+                          ? C.danger
+                          : s.impact === 'severe'
+                            ? C.orange
+                            : C.warning;
+                      return (
+                        <div key={idx} style={innerCardStyle}>
+                          <div
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              alignItems: 'flex-start',
+                              justifyContent: 'space-between',
+                              gap: 10,
+                              marginBottom: 12,
+                              flexWrap: 'wrap',
+                            }}
+                          >
                             <span
-                              className="text-[10px] px-2.5 py-0.5 rounded-xl font-bold uppercase"
                               style={{
-                                background: `${s.impact === 'catastrophic' ? '#ef4444' : s.impact === 'severe' ? '#f97316' : '#eab308'}15`,
-                                color:
-                                  s.impact === 'catastrophic'
-                                    ? '#ef4444'
-                                    : s.impact === 'severe'
-                                      ? '#f97316'
-                                      : '#eab308',
+                                fontWeight: 700,
+                                fontSize: 14,
+                                color: C.slate900,
+                                letterSpacing: '-0.01em',
+                                flex: 1,
+                                minWidth: 200,
                               }}
                             >
-                              {s.impact}
+                              {s.title}
                             </span>
+                            <div style={{ display: 'flex', gap: 6 }}>
+                              <span style={tintedPill(C.warning, { size: 'sm' })}>
+                                {Math.round(s.probability * 100)}% likely
+                              </span>
+                              <span style={tintedPill(impactColor, { size: 'sm' })}>
+                                {s.impact}
+                              </span>
+                            </div>
                           </div>
+                          <p
+                            style={{
+                              color: C.slate600,
+                              fontSize: 13,
+                              margin: 0,
+                              lineHeight: 1.65,
+                            }}
+                          >
+                            {s.description}
+                          </p>
                         </div>
-                        <p className="text-slate-600 text-[13px] m-0 leading-relaxed">
-                          {s.description}
-                        </p>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </Section>
               </div>
 
               {/* Known Outcome Banner */}
               {analysis.outcome && (
-                <div className="mt-8 p-4 sm:p-5 bg-red-500/[0.06] border border-red-500/20 rounded-xl">
-                  <div className="flex items-center gap-2 mb-2.5">
-                    <TrendingUp size={16} className="text-red-500" />
-                    <span className="text-[13px] font-bold text-red-500 tracking-wide">
-                      KNOWN OUTCOME
+                <div
+                  style={{
+                    marginTop: 32,
+                    padding: '20px 24px',
+                    background: `${C.danger}0A`,
+                    border: `1px solid ${C.danger}33`,
+                    borderRadius: 16,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                      marginBottom: 12,
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: 8,
+                        background: `${C.danger}1F`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <TrendingUp size={16} style={{ color: C.danger }} />
+                    </div>
+                    <span
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 700,
+                        color: C.danger,
+                        letterSpacing: '0.1em',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      Known Outcome
                     </span>
                   </div>
-                  <p className="text-slate-600 text-sm m-0 mb-1.5 leading-relaxed">
+                  <p
+                    style={{
+                      color: C.slate900,
+                      fontSize: 14,
+                      margin: '0 0 8px',
+                      lineHeight: 1.6,
+                      fontWeight: 500,
+                    }}
+                  >
                     {analysis.outcome.what}
                   </p>
-                  <p className="text-slate-400 text-xs m-0">
-                    {analysis.outcome.when} &middot; {analysis.outcome.impact}
+                  <p style={{ color: C.slate500, fontSize: 12, margin: 0 }}>
+                    {analysis.outcome.when} · {analysis.outcome.impact}
                   </p>
                 </div>
               )}
@@ -1262,60 +1548,191 @@ const DEMO_BOOKING_URL = process.env.NEXT_PUBLIC_DEMO_BOOKING_URL;
 
 function DemoVideoSection() {
   return (
-    <div className="text-center">
-      <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3 leading-tight">
-        Audit your next strategic memo in 60 seconds.
+    <div style={{ textAlign: 'center' }}>
+      <div
+        style={{
+          fontSize: 11,
+          color: C.green,
+          letterSpacing: '0.12em',
+          fontWeight: 700,
+          marginBottom: 14,
+        }}
+      >
+        SEE IT IN 60 SECONDS
+      </div>
+      <h1
+        style={{
+          fontSize: 'clamp(34px, 6vw, 52px)',
+          fontWeight: 800,
+          color: C.slate900,
+          margin: '0 auto 18px',
+          lineHeight: 1.08,
+          letterSpacing: '-0.025em',
+          maxWidth: 820,
+        }}
+      >
+        Audit your next strategic memo{' '}
+        <span style={{ color: C.green }}>before the board sees it.</span>
       </h1>
-      <p className="text-slate-500 text-sm sm:text-base max-w-[620px] mx-auto mb-8">
-        Pick a famous corporate decision below, or paste your own text. Watch Decision Intel score
-        the cognitive biases, predict the questions your steering committee will raise, and map
-        the decision into your Knowledge Graph.
+      <p
+        style={{
+          fontSize: 17,
+          color: C.slate500,
+          maxWidth: 640,
+          margin: '0 auto 36px',
+          lineHeight: 1.6,
+        }}
+      >
+        Decision Intel scores 30+ cognitive biases, predicts the questions your steering committee
+        will raise, and maps every decision into a living Knowledge Graph.
       </p>
 
       {DEMO_VIDEO_URL ? (
-        <div className="rounded-2xl overflow-hidden border border-slate-200 bg-white mb-8">
+        <div
+          style={{
+            ...cardStyle,
+            overflow: 'hidden',
+            marginBottom: 32,
+            padding: 0,
+          }}
+        >
           <iframe
             src={DEMO_VIDEO_URL}
             allowFullScreen
-            className="w-full border-none"
-            style={{ aspectRatio: '16/9' }}
+            style={{ width: '100%', border: 'none', display: 'block', aspectRatio: '16/9' }}
             title="Decision Intel Demo"
           />
         </div>
       ) : (
-        <div className="rounded-2xl border border-slate-200 bg-white p-12 sm:p-16 mb-8 flex flex-col items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center">
-            <Play size={28} className="text-slate-400 ml-1" />
+        <div
+          style={{
+            ...cardStyle,
+            padding: '56px 32px',
+            marginBottom: 32,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 18,
+            background: `linear-gradient(180deg, ${C.white} 0%, ${C.slate50} 100%)`,
+          }}
+        >
+          <div
+            style={{
+              width: 64,
+              height: 64,
+              borderRadius: 999,
+              background: C.greenSoft,
+              border: `1px solid ${C.greenLight}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 4px 14px rgba(22,163,74,0.15)',
+            }}
+          >
+            <Play size={26} style={{ color: C.green, marginLeft: 3 }} />
           </div>
-          <p className="text-slate-500 text-sm max-w-[440px]">
-            Try the interactive demo below. Pick a real-world strategic decision and watch the
-            bias audit, objection simulation, and Knowledge Graph come to life.
+          <p
+            style={{
+              fontSize: 15,
+              color: C.slate600,
+              maxWidth: 460,
+              margin: 0,
+              lineHeight: 1.55,
+            }}
+          >
+            Pick a famous corporate decision below to watch the bias audit, objection simulation,
+            and Knowledge Graph unfold in real time.
           </p>
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          gap: 12,
+          justifyContent: 'center',
+          flexWrap: 'wrap',
+        }}
+      >
         <Link
           href="/login"
-          className="px-7 py-3 rounded-[10px] bg-green-600 text-white font-bold text-sm no-underline text-center hover:bg-green-700 transition-colors"
           onClick={() => trackEvent('demo_video_cta_clicked', { target: 'start_trial' })}
+          style={{
+            padding: '14px 24px',
+            borderRadius: 10,
+            background: C.green,
+            color: C.white,
+            fontWeight: 700,
+            fontSize: 14,
+            textDecoration: 'none',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            transition: 'background 0.15s',
+            boxShadow: '0 4px 12px rgba(22,163,74,0.25)',
+          }}
+          onMouseEnter={e => (e.currentTarget.style.background = C.greenDark)}
+          onMouseLeave={e => (e.currentTarget.style.background = C.green)}
         >
-          Start Free Trial <ArrowRight size={14} className="inline align-middle ml-1" />
+          Start Free Trial <ArrowRight size={14} />
         </Link>
         {DEMO_BOOKING_URL ? (
           <a
             href={DEMO_BOOKING_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-7 py-3 rounded-[10px] bg-transparent border border-slate-200 text-slate-900 font-semibold text-sm no-underline text-center"
             onClick={() => trackEvent('demo_video_cta_clicked', { target: 'book_call' })}
+            style={{
+              padding: '14px 24px',
+              borderRadius: 10,
+              background: C.white,
+              border: `1px solid ${C.slate200}`,
+              color: C.slate900,
+              fontWeight: 600,
+              fontSize: 14,
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              transition: 'border-color 0.15s, background 0.15s',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.borderColor = C.slate400;
+              e.currentTarget.style.background = C.slate50;
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = C.slate200;
+              e.currentTarget.style.background = C.white;
+            }}
           >
-            Book a Call <ExternalLink size={14} className="inline align-middle ml-1" />
+            Book a Call <ExternalLink size={14} />
           </a>
         ) : (
           <Link
             href="/pricing"
-            className="px-7 py-3 rounded-[10px] bg-transparent border border-slate-200 text-slate-900 font-semibold text-sm no-underline text-center"
+            style={{
+              padding: '14px 24px',
+              borderRadius: 10,
+              background: C.white,
+              border: `1px solid ${C.slate200}`,
+              color: C.slate900,
+              fontWeight: 600,
+              fontSize: 14,
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              transition: 'border-color 0.15s, background 0.15s',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.borderColor = C.slate400;
+              e.currentTarget.style.background = C.slate50;
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = C.slate200;
+              e.currentTarget.style.background = C.white;
+            }}
           >
             View Pricing
           </Link>
@@ -1506,126 +1923,293 @@ function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () =
     setLoadingSample(false);
   };
 
+  const riskColor = riskColors[result.riskLevel];
+
   return (
-    <div className="mb-10">
+    <div>
       {/* Back button */}
       <button
         onClick={onBack}
-        className="text-xs text-slate-500 hover:text-slate-900 transition-colors cursor-pointer bg-transparent border-none flex items-center gap-1.5 mb-6"
+        style={{
+          fontSize: 12,
+          color: C.slate500,
+          background: 'transparent',
+          border: 'none',
+          cursor: 'pointer',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 6,
+          padding: 0,
+          marginBottom: 28,
+          transition: 'color 0.15s',
+        }}
+        onMouseEnter={e => (e.currentTarget.style.color = C.slate900)}
+        onMouseLeave={e => (e.currentTarget.style.color = C.slate500)}
       >
-        <ArrowRight size={12} className="rotate-180" />
+        <ArrowRight size={12} style={{ transform: 'rotate(180deg)' }} />
         Scan different text
       </button>
 
       {/* Header */}
-      <div className="text-center mb-8">
+      <div style={{ textAlign: 'center', marginBottom: 36 }}>
         <div
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold mb-4"
           style={{
-            background: `${riskColors[result.riskLevel]}15`,
-            color: riskColors[result.riskLevel],
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '8px 16px',
+            borderRadius: 999,
+            background: `${riskColor}15`,
+            border: `1px solid ${riskColor}33`,
+            color: riskColor,
+            fontSize: 13,
+            fontWeight: 700,
+            letterSpacing: '0.02em',
+            marginBottom: 16,
           }}
         >
-          <Brain size={16} />
+          <Brain size={15} />
           {result.biasCount === 0
             ? 'No Biases Detected'
             : `${result.biasCount} Bias${result.biasCount > 1 ? 'es' : ''} Detected`}
         </div>
-        <p className="text-slate-600 text-sm max-w-[600px] mx-auto">{result.summary}</p>
+        <p
+          style={{
+            color: C.slate600,
+            fontSize: 15,
+            maxWidth: 620,
+            margin: '0 auto',
+            lineHeight: 1.6,
+          }}
+        >
+          {result.summary}
+        </p>
       </div>
 
       {/* Score Cards */}
       {result.biasCount > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mb-7">
-          <div className="bg-white border border-slate-200 rounded-xl py-3 px-3 text-center">
-            <div className="text-[10px] text-slate-500 mb-1.5 tracking-wide">BIASES FOUND</div>
-            <div
-              className="text-2xl font-extrabold"
-              style={{ color: riskColors[result.riskLevel] }}
-            >
-              {result.biasCount}
-            </div>
-            <div className="text-[11px] text-slate-500 mt-1">of 14 checked</div>
-          </div>
-          <div className="bg-white border border-slate-200 rounded-xl py-3 px-3 text-center">
-            <div className="text-[10px] text-slate-500 mb-1.5 tracking-wide">RISK LEVEL</div>
-            <div
-              className="text-lg font-extrabold uppercase"
-              style={{ color: riskColors[result.riskLevel] }}
-            >
-              {result.riskLevel}
-            </div>
-            <div className="text-[11px] text-slate-500 mt-1">
-              {result.biases.filter(b => b.severity === 'critical' || b.severity === 'high').length}{' '}
-              high/critical
-            </div>
-          </div>
-          <div className="bg-white border border-slate-200 rounded-xl py-3 px-3 text-center col-span-2 sm:col-span-1">
-            <div className="text-[10px] text-slate-500 mb-1.5 tracking-wide">SCAN TYPE</div>
-            <div className="text-lg font-extrabold text-slate-900">Quick</div>
-            <div className="text-[11px] text-slate-500 mt-1">
-              {result.isPreDecision ? 'Pre-decision detected' : '14-bias pattern scan'}
-            </div>
-          </div>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+            gap: 12,
+            marginBottom: 28,
+          }}
+        >
+          <ScoreCard
+            label="BIASES FOUND"
+            value={`${result.biasCount}`}
+            sub="of 14 checked"
+            color={riskColor}
+          />
+          <ScoreCard
+            label="RISK LEVEL"
+            value={result.riskLevel.toUpperCase()}
+            sub={`${result.biases.filter(b => b.severity === 'critical' || b.severity === 'high').length} high/critical`}
+            color={riskColor}
+            smallValue
+          />
+          <ScoreCard
+            label="SCAN TYPE"
+            value="Quick"
+            sub={result.isPreDecision ? 'Pre-decision detected' : '14-bias pattern scan'}
+            color={C.slate900}
+            smallValue
+          />
         </div>
       )}
 
       {/* Detected Biases */}
       {result.biases.length > 0 && (
-        <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 mb-4">
-          <h3 className="text-[15px] font-bold mb-4 flex items-center gap-2 text-slate-900">
-            <Brain size={16} /> Detected Biases
-          </h3>
-          <div className="flex flex-col gap-3">
+        <Section icon={<Brain size={16} />} title="Detected Biases">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {result.biases.map((bias, idx) => (
-              <div
-                key={idx}
-                className="bg-slate-50 rounded-[10px] p-4 sm:p-[18px] border border-slate-200"
-              >
-                <div className="flex flex-wrap items-center gap-2 mb-2.5">
-                  <span className="font-bold text-sm text-slate-900">{bias.label}</span>
+              <div key={idx} style={innerCardStyle}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    alignItems: 'center',
+                    gap: 10,
+                    marginBottom: 12,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontWeight: 700,
+                      fontSize: 14,
+                      color: C.slate900,
+                      letterSpacing: '-0.01em',
+                    }}
+                  >
+                    {bias.label}
+                  </span>
                   <SeverityBadge severity={bias.severity} />
                 </div>
                 <p
-                  className="text-slate-500 text-[13px] m-0 mb-2.5 italic leading-relaxed pl-3"
-                  style={{ borderLeft: `2px solid ${sevColor(bias.severity)}60` }}
+                  style={{
+                    color: C.slate600,
+                    fontSize: 13,
+                    margin: '0 0 12px',
+                    fontStyle: 'italic',
+                    lineHeight: 1.65,
+                    paddingLeft: 14,
+                    borderLeft: `3px solid ${sevColor(bias.severity)}55`,
+                  }}
                 >
                   &ldquo;...{bias.signal}...&rdquo;
                 </p>
-                <p className="text-slate-600 text-[13px] m-0 mb-2.5 leading-relaxed">
+                <p
+                  style={{
+                    color: C.slate600,
+                    fontSize: 13,
+                    margin: '0 0 12px',
+                    lineHeight: 1.65,
+                  }}
+                >
                   {bias.explanation}
                 </p>
-                <p className="text-green-700 text-[13px] m-0 leading-relaxed">
-                  <strong>Recommendation:</strong> {bias.suggestion}
-                </p>
+                <div
+                  style={{
+                    padding: '10px 14px',
+                    borderRadius: 8,
+                    background: C.greenSoft,
+                    border: `1px solid ${C.greenLight}`,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 700,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.06em',
+                      color: C.greenDark,
+                      marginRight: 8,
+                    }}
+                  >
+                    Recommend
+                  </span>
+                  <span style={{ color: C.greenDark, fontSize: 13, lineHeight: 1.6 }}>
+                    {bias.suggestion}
+                  </span>
+                </div>
               </div>
             ))}
           </div>
-        </div>
+        </Section>
       )}
 
       {/* No biases state */}
       {result.biases.length === 0 && (
-        <div className="bg-white border border-green-500/20 rounded-xl p-6 sm:p-8 mb-4 text-center">
-          <CheckCircle2 size={32} className="text-green-500 mx-auto mb-3" />
-          <h3 className="text-lg font-bold text-slate-900 mb-2">Looking Good</h3>
-          <p className="text-slate-600 text-sm max-w-[500px] mx-auto">
+        <div
+          style={{
+            ...cardStyle,
+            padding: '32px 28px',
+            textAlign: 'center',
+            marginBottom: 24,
+            border: `1px solid ${C.greenLight}`,
+          }}
+        >
+          <div
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: 999,
+              background: C.greenSoft,
+              border: `1px solid ${C.greenLight}`,
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: 14,
+            }}
+          >
+            <CheckCircle2 size={26} style={{ color: C.green }} />
+          </div>
+          <h3
+            style={{
+              fontSize: 20,
+              fontWeight: 700,
+              color: C.slate900,
+              margin: '0 0 10px',
+              letterSpacing: '-0.01em',
+            }}
+          >
+            Looking Good
+          </h3>
+          <p
+            style={{
+              color: C.slate600,
+              fontSize: 14,
+              maxWidth: 520,
+              margin: '0 auto',
+              lineHeight: 1.6,
+            }}
+          >
             No common cognitive biases detected in this text. The full analysis also checks for
-            logical fallacies, decision noise, regulatory compliance, fact verification, and runs a
-            boardroom simulation with AI decision twins.
+            logical fallacies, decision noise, regulatory compliance, fact verification, and runs
+            a boardroom simulation with AI decision twins.
           </p>
         </div>
       )}
 
       {/* Upsell CTA */}
-      <div className="mt-8 p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 text-center">
-        <h3 className="text-lg font-bold text-slate-900 mb-2">
-          This quick scan checks 14 common biases.
+      <div
+        style={{
+          marginTop: 32,
+          padding: '36px 32px',
+          borderRadius: 20,
+          background: `linear-gradient(160deg, ${C.white} 0%, ${C.greenSoft} 100%)`,
+          border: `1px solid ${C.slate200}`,
+          textAlign: 'center',
+          boxShadow: '0 4px 24px rgba(15,23,42,0.05)',
+        }}
+      >
+        <div
+          style={{
+            fontSize: 11,
+            color: C.green,
+            letterSpacing: '0.1em',
+            fontWeight: 700,
+            marginBottom: 12,
+          }}
+        >
+          UNLOCK THE FULL ANALYSIS
+        </div>
+        <h3
+          style={{
+            fontSize: 'clamp(20px, 2.6vw, 26px)',
+            fontWeight: 700,
+            color: C.slate900,
+            margin: '0 0 10px',
+            letterSpacing: '-0.015em',
+            lineHeight: 1.2,
+          }}
+        >
+          This quick scan only checked 14 biases.
         </h3>
-        <p className="text-slate-500 text-sm mb-2 max-w-[550px] mx-auto">
+        <p
+          style={{
+            color: C.slate600,
+            fontSize: 14,
+            margin: '0 auto 20px',
+            maxWidth: 560,
+            lineHeight: 1.55,
+          }}
+        >
           The full Decision Intel analysis goes much deeper:
         </p>
-        <div className="flex flex-wrap justify-center gap-2 mb-6">
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            gap: 6,
+            marginBottom: 28,
+            maxWidth: 640,
+            marginLeft: 'auto',
+            marginRight: 'auto',
+          }}
+        >
           {[
             '30+ cognitive biases',
             'Decision noise scoring',
@@ -1639,30 +2223,87 @@ function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () =
           ].map(feature => (
             <span
               key={feature}
-              className="text-[11px] px-2.5 py-1 rounded-full bg-green-50 text-green-700 border border-green-100"
+              style={{
+                fontSize: 11,
+                padding: '4px 10px',
+                borderRadius: 999,
+                background: C.white,
+                color: C.greenDark,
+                border: `1px solid ${C.greenLight}`,
+                fontWeight: 500,
+              }}
             >
               {feature}
             </span>
           ))}
         </div>
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            gap: 10,
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+          }}
+        >
           <button
             onClick={handleTryNow}
             disabled={loadingSample}
-            className="px-7 py-3 rounded-[10px] bg-green-600 text-white font-bold text-sm border-none cursor-pointer disabled:cursor-wait hover:bg-green-700 transition-colors"
+            style={{
+              padding: '14px 24px',
+              borderRadius: 10,
+              background: C.green,
+              color: C.white,
+              fontWeight: 700,
+              fontSize: 14,
+              border: 'none',
+              cursor: loadingSample ? 'wait' : 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              boxShadow: '0 4px 12px rgba(22,163,74,0.25)',
+              transition: 'background 0.15s',
+            }}
+            onMouseEnter={e => {
+              if (!loadingSample) e.currentTarget.style.background = C.greenDark;
+            }}
+            onMouseLeave={e => {
+              if (!loadingSample) e.currentTarget.style.background = C.green;
+            }}
           >
-            {loadingSample ? 'Loading...' : 'Try Full Analysis'}{' '}
-            <ArrowRight size={14} className="inline align-middle ml-1" />
+            {loadingSample ? 'Loading...' : 'Try Full Analysis'}
+            {!loadingSample && <ArrowRight size={14} />}
           </button>
           <Link
             href="/login"
-            className="px-7 py-3 rounded-[10px] bg-transparent border border-slate-200 text-slate-900 font-semibold text-sm no-underline text-center"
+            style={{
+              padding: '14px 24px',
+              borderRadius: 10,
+              background: C.white,
+              border: `1px solid ${C.slate200}`,
+              color: C.slate900,
+              fontWeight: 600,
+              fontSize: 14,
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              transition: 'border-color 0.15s, background 0.15s',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.borderColor = C.slate400;
+              e.currentTarget.style.background = C.slate50;
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = C.slate200;
+              e.currentTarget.style.background = C.white;
+            }}
           >
             Sign Up Free
           </Link>
         </div>
-        <p className="text-slate-500 text-[11px] mt-4">
-          No credit card required &middot; 3 free analyses &middot; 14-day trial on paid plans
+        <p style={{ color: C.slate400, fontSize: 11, marginTop: 18 }}>
+          No credit card required · 4 free analyses · 14-day trial on paid plans
         </p>
       </div>
     </div>
@@ -1723,76 +2364,216 @@ function DemoConversionCTA({
     }
   };
 
+  const ctaPrimary: React.CSSProperties = {
+    padding: '14px 24px',
+    borderRadius: 10,
+    background: C.green,
+    color: C.white,
+    fontWeight: 700,
+    fontSize: 14,
+    border: 'none',
+    cursor: loadingSample ? 'wait' : 'pointer',
+    textDecoration: 'none',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 8,
+    transition: 'background 0.15s',
+    boxShadow: '0 4px 12px rgba(22,163,74,0.25)',
+  };
+  const ctaSecondary: React.CSSProperties = {
+    padding: '14px 24px',
+    borderRadius: 10,
+    background: C.white,
+    border: `1px solid ${C.slate200}`,
+    color: C.slate900,
+    fontWeight: 600,
+    fontSize: 14,
+    textDecoration: 'none',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 8,
+    transition: 'border-color 0.15s, background 0.15s',
+  };
+
   return (
     <div
-      className="mt-12 rounded-2xl border border-slate-200 overflow-hidden"
-      style={{ background: 'linear-gradient(135deg, #F8FAFC 0%, #F0FDF4 100%)' }}
+      style={{
+        marginTop: 40,
+        borderRadius: 20,
+        overflow: 'hidden',
+        border: `1px solid ${C.slate200}`,
+        background: `linear-gradient(160deg, ${C.white} 0%, ${C.greenSoft} 100%)`,
+        boxShadow: '0 4px 24px rgba(15,23,42,0.05)',
+      }}
     >
-      {/* Top section: Email capture */}
       {!submitted ? (
-        <div className="p-6 sm:p-10 text-center">
+        <div style={{ padding: '40px 32px 24px', textAlign: 'center' }}>
           <div
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold mb-5"
-            style={{ background: 'rgba(22, 163, 74, 0.1)', color: '#16A34A' }}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '6px 14px',
+              borderRadius: 999,
+              background: C.greenSoft,
+              border: `1px solid ${C.greenLight}`,
+              color: C.green,
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: '0.1em',
+              marginBottom: 20,
+            }}
           >
             <Shield size={13} />
             PERSONALIZED REPORT
           </div>
-          <h3 className="text-lg sm:text-[22px] font-bold text-slate-900 mb-2">
-            Get a custom audit on your own strategic memo.
+          <h3
+            style={{
+              fontSize: 'clamp(22px, 3vw, 28px)',
+              fontWeight: 700,
+              color: C.slate900,
+              margin: '0 0 12px',
+              letterSpacing: '-0.015em',
+              lineHeight: 1.2,
+            }}
+          >
+            Audit your own strategic memo next.
           </h3>
-          <p className="text-slate-600 text-sm mb-6 max-w-[520px] mx-auto">
-            Enter your email to receive a personalized bias audit report.
-            We&apos;ll also send you best practices for improving decision quality.
+          <p
+            style={{
+              color: C.slate600,
+              fontSize: 15,
+              margin: '0 auto 28px',
+              maxWidth: 540,
+              lineHeight: 1.55,
+            }}
+          >
+            Drop your email and we&apos;ll send a personalized bias audit guide plus best
+            practices for improving decision quality.
           </p>
 
-          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2.5 max-w-[440px] mx-auto mb-4">
+          <form
+            onSubmit={handleSubmit}
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              gap: 8,
+              maxWidth: 460,
+              margin: '0 auto 12px',
+              flexWrap: 'wrap',
+            }}
+          >
             <input
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="your@company.com"
               required
-              className="flex-1 px-4 py-3 rounded-[10px] border border-slate-200 text-sm text-slate-900 bg-white placeholder:text-slate-400 focus:outline-none focus:border-green-300 transition-colors"
               id="demo-email-capture"
+              style={{
+                flex: 1,
+                minWidth: 220,
+                padding: '13px 16px',
+                borderRadius: 10,
+                border: `1px solid ${C.slate200}`,
+                fontSize: 14,
+                color: C.slate900,
+                background: C.white,
+                outline: 'none',
+                transition: 'border-color 0.15s',
+              }}
+              onFocus={e => (e.currentTarget.style.borderColor = C.green)}
+              onBlur={e => (e.currentTarget.style.borderColor = C.slate200)}
             />
             <button
               type="submit"
               disabled={submitting || !email}
-              className="px-6 py-3 rounded-[10px] bg-green-600 text-white font-bold text-sm border-none cursor-pointer disabled:opacity-50 disabled:cursor-wait hover:bg-green-700 transition-colors whitespace-nowrap"
+              style={{
+                ...ctaPrimary,
+                padding: '13px 22px',
+                opacity: submitting || !email ? 0.5 : 1,
+                cursor: submitting || !email ? 'not-allowed' : 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+              onMouseEnter={e => {
+                if (!submitting && email) e.currentTarget.style.background = C.greenDark;
+              }}
+              onMouseLeave={e => {
+                if (!submitting && email) e.currentTarget.style.background = C.green;
+              }}
             >
               {submitting ? (
-                <span className="flex items-center gap-1.5">
+                <>
                   <Loader2 size={14} className="animate-spin" /> Sending...
-                </span>
+                </>
               ) : (
-                <>Get Report <ArrowRight size={14} className="inline align-middle ml-1" /></>
+                <>
+                  Get Report <ArrowRight size={14} />
+                </>
               )}
             </button>
           </form>
           {error && (
-            <p className="text-red-500 text-xs mt-2">{error}</p>
+            <p style={{ color: C.danger, fontSize: 12, margin: '8px 0 0' }}>{error}</p>
           )}
-          <p className="text-slate-400 text-[11px]">
+          <p style={{ color: C.slate400, fontSize: 11, marginTop: 8 }}>
             No spam. Just insights. Unsubscribe anytime.
           </p>
         </div>
       ) : (
-        <div className="p-6 sm:p-10 text-center">
-          <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-            <CheckCircle2 size={24} className="text-green-600" />
+        <div style={{ padding: '40px 32px 24px', textAlign: 'center' }}>
+          <div
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: 999,
+              background: C.greenSoft,
+              border: `1px solid ${C.greenLight}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 16px',
+            }}
+          >
+            <CheckCircle2 size={26} style={{ color: C.green }} />
           </div>
-          <h3 className="text-lg font-bold text-slate-900 mb-2">You&apos;re in.</h3>
-          <p className="text-slate-600 text-sm mb-6 max-w-[450px] mx-auto">
-            We&apos;ll send your personalized bias audit guide to <strong>{email}</strong>.
-            In the meantime, try a full analysis on your own document:
+          <h3
+            style={{
+              fontSize: 22,
+              fontWeight: 700,
+              color: C.slate900,
+              margin: '0 0 10px',
+              letterSpacing: '-0.015em',
+            }}
+          >
+            You&apos;re in.
+          </h3>
+          <p
+            style={{
+              color: C.slate600,
+              fontSize: 14,
+              margin: '0 auto 24px',
+              maxWidth: 460,
+              lineHeight: 1.55,
+            }}
+          >
+            We&apos;ll send your personalized bias audit guide to <strong>{email}</strong>. In
+            the meantime, try a full analysis on your own document.
           </p>
         </div>
       )}
 
-      {/* Bottom section: Action buttons */}
-      <div className="px-6 sm:px-10 pb-6 sm:pb-10 text-center">
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+      {/* Action buttons */}
+      <div style={{ padding: '0 32px 36px', textAlign: 'center' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            gap: 10,
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+          }}
+        >
           <button
             onClick={() => {
               trackEvent('demo_cta_clicked', { target: 'try_sample', submitted });
@@ -1800,15 +2581,29 @@ function DemoConversionCTA({
             }}
             disabled={loadingSample}
             aria-busy={loadingSample}
-            className="px-7 py-3 rounded-[10px] bg-green-600 text-white font-bold text-sm border-none cursor-pointer disabled:cursor-wait hover:bg-green-500 transition-colors"
+            style={ctaPrimary}
+            onMouseEnter={e => {
+              if (!loadingSample) e.currentTarget.style.background = C.greenDark;
+            }}
+            onMouseLeave={e => {
+              if (!loadingSample) e.currentTarget.style.background = C.green;
+            }}
           >
-            {loadingSample ? 'Loading...' : 'Try with Your Document'}{' '}
-            <ArrowRight size={14} className="inline align-middle ml-1" />
+            {loadingSample ? 'Loading...' : 'Try with Your Document'}
+            {!loadingSample && <ArrowRight size={14} />}
           </button>
           <Link
             href="/login"
-            className="px-7 py-3 rounded-[10px] bg-transparent border border-slate-200 text-slate-900 font-semibold text-sm no-underline text-center hover:border-slate-300 transition-colors"
             onClick={() => trackEvent('demo_cta_clicked', { target: 'signup', submitted })}
+            style={ctaSecondary}
+            onMouseEnter={e => {
+              e.currentTarget.style.borderColor = C.slate400;
+              e.currentTarget.style.background = C.slate50;
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = C.slate200;
+              e.currentTarget.style.background = C.white;
+            }}
           >
             Sign Up Free
           </Link>
@@ -1817,15 +2612,27 @@ function DemoConversionCTA({
               href={DEMO_BOOKING_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-7 py-3 rounded-[10px] bg-transparent border border-indigo-200 text-indigo-600 font-semibold text-sm no-underline text-center hover:border-indigo-300 transition-colors"
               onClick={() => trackEvent('demo_cta_clicked', { target: 'book_demo', submitted })}
+              style={{
+                ...ctaSecondary,
+                color: '#4F46E5',
+                borderColor: '#C7D2FE',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = '#818CF8';
+                e.currentTarget.style.background = '#EEF2FF';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = '#C7D2FE';
+                e.currentTarget.style.background = C.white;
+              }}
             >
-              Book a Demo <ExternalLink size={14} className="inline align-middle ml-1" />
+              Book a Demo <ExternalLink size={14} />
             </a>
           )}
         </div>
-        <p className="text-slate-400 text-[11px] mt-4">
-          No credit card required &middot; 4 free analyses &middot; 14-day trial on paid plans
+        <p style={{ color: C.slate400, fontSize: 11, marginTop: 18 }}>
+          No credit card required · 4 free analyses · 14-day trial on paid plans
         </p>
       </div>
     </div>
