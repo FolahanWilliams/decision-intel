@@ -60,6 +60,15 @@ function LoginContent() {
   const [resending, setResending] = useState(false);
   const [resendSuccess, setResendSuccess] = useState(false);
 
+  // OTP fallback: when the PKCE magic-link flow fails (most commonly because
+  // the flow-state TTL expires before the user clicks, or the email scanner
+  // consumes the token), users can type the 6-digit code from the email
+  // instead. Verified via supabase.auth.verifyOtp, which doesn't need the
+  // PKCE code verifier cookie.
+  const [otpCode, setOtpCode] = useState('');
+  const [verifyingOtp, setVerifyingOtp] = useState(false);
+  const [otpError, setOtpError] = useState<string | null>(null);
+
   const searchParams = useSearchParams();
   const authError = searchParams.get('error');
   const errorMessage = getErrorMessage(authError);
@@ -147,6 +156,37 @@ function LoginContent() {
   const toggleMode = () => {
     setMode(m => (m === 'signin' ? 'signup' : 'signin'));
     setFormError(null);
+  };
+
+  const handleVerifyOtp = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setOtpError(null);
+    const token = otpCode.replace(/\s+/g, '');
+    if (!token || token.length < 6) {
+      setOtpError('Enter the 6-digit code from your email.');
+      return;
+    }
+    if (!email) {
+      setOtpError('Missing email — please sign up again.');
+      return;
+    }
+    setVerifyingOtp(true);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.verifyOtp({
+        email,
+        token,
+        type: 'signup',
+      });
+      if (error) throw error;
+      const safeRedirect = redirectTo && /^\/[^/]/.test(redirectTo) ? redirectTo : '/dashboard';
+      window.location.href = safeRedirect;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Could not verify code.';
+      setOtpError(message);
+    } finally {
+      setVerifyingOtp(false);
+    }
   };
 
   const handleResendConfirmation = async () => {
@@ -392,61 +432,152 @@ function LoginContent() {
             }}
           >
             {signupSuccess ? (
-              <div style={{ textAlign: 'center', padding: '0.5rem 0 1rem' }}>
-                <div
-                  style={{
-                    width: 48,
-                    height: 48,
-                    margin: '0 auto 1rem',
-                    borderRadius: '50%',
-                    background: 'rgba(22,163,74,0.12)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Mail size={22} style={{ color: 'var(--accent-primary, #16A34A)' }} />
+              <div style={{ padding: '0.5rem 0 1rem' }}>
+                <div style={{ textAlign: 'center' }}>
+                  <div
+                    style={{
+                      width: 48,
+                      height: 48,
+                      margin: '0 auto 1rem',
+                      borderRadius: '50%',
+                      background: 'rgba(22,163,74,0.12)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Mail size={22} style={{ color: 'var(--accent-primary, #16A34A)' }} />
+                  </div>
+                  <h1
+                    style={{
+                      fontSize: '1.25rem',
+                      fontWeight: 700,
+                      color: 'var(--text-primary)',
+                      marginBottom: '8px',
+                      letterSpacing: '-0.02em',
+                    }}
+                  >
+                    Check your email
+                  </h1>
+                  <p
+                    style={{
+                      fontSize: '0.85rem',
+                      color: 'var(--text-muted)',
+                      lineHeight: 1.6,
+                      marginBottom: '1.5rem',
+                    }}
+                  >
+                    We sent a confirmation email to <strong>{email}</strong>. Click the link — or
+                    enter the 6-digit code from the email below.
+                  </p>
                 </div>
-                <h1
-                  style={{
-                    fontSize: '1.25rem',
-                    fontWeight: 700,
-                    color: 'var(--text-primary)',
-                    marginBottom: '8px',
-                    letterSpacing: '-0.02em',
-                  }}
-                >
-                  Check your email
-                </h1>
-                <p
-                  style={{
-                    fontSize: '0.85rem',
-                    color: 'var(--text-muted)',
-                    lineHeight: 1.6,
-                    marginBottom: '1.25rem',
-                  }}
-                >
-                  We sent a confirmation link to <strong>{email}</strong>. Click it to finish
-                  creating your account.
-                </p>
-                <button
-                  onClick={() => {
-                    setSignupSuccess(false);
-                    setMode('signin');
-                    setPassword('');
-                  }}
-                  style={{
-                    fontSize: '0.8rem',
-                    color: 'var(--accent-primary, #16A34A)',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    textDecoration: 'underline',
-                    textUnderlineOffset: '2px',
-                  }}
-                >
-                  Back to sign in
-                </button>
+
+                {otpError && (
+                  <div
+                    role="alert"
+                    style={{
+                      padding: '10px 14px',
+                      marginBottom: '1rem',
+                      fontSize: '0.82rem',
+                      color: 'var(--error)',
+                      background: 'rgba(239, 68, 68, 0.08)',
+                      border: '1px solid rgba(239, 68, 68, 0.2)',
+                      borderRadius: '12px',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '8px',
+                    }}
+                  >
+                    <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: '1px' }} />
+                    <span>{otpError}</span>
+                  </div>
+                )}
+
+                <form onSubmit={handleVerifyOtp} style={{ display: 'grid', gap: 12 }}>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={otpCode}
+                    onChange={e => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="123456"
+                    autoComplete="one-time-code"
+                    maxLength={6}
+                    disabled={verifyingOtp}
+                    aria-label="6-digit verification code"
+                    style={{
+                      padding: '12px 14px',
+                      fontSize: '1.1rem',
+                      fontWeight: 600,
+                      letterSpacing: '0.25em',
+                      textAlign: 'center',
+                      color: 'var(--text-primary)',
+                      background: 'var(--bg-card, #FFFFFF)',
+                      border: '1px solid var(--border-color, #E2E8F0)',
+                      borderRadius: 10,
+                      outline: 'none',
+                      fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                    }}
+                  />
+                  <button
+                    type="submit"
+                    disabled={verifyingOtp || otpCode.length < 6}
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      fontSize: '0.9rem',
+                      fontWeight: 600,
+                      color: '#fff',
+                      background:
+                        'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)',
+                      border: '1px solid rgba(22, 163, 74, 0.4)',
+                      borderRadius: 12,
+                      cursor:
+                        verifyingOtp || otpCode.length < 6 ? 'not-allowed' : 'pointer',
+                      opacity: verifyingOtp || otpCode.length < 6 ? 0.7 : 1,
+                      transition: 'all 0.15s',
+                      fontFamily: 'inherit',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8,
+                    }}
+                  >
+                    {verifyingOtp ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin" /> Verifying…
+                      </>
+                    ) : (
+                      <>
+                        Verify code
+                        <ArrowRight size={14} style={{ opacity: 0.7 }} />
+                      </>
+                    )}
+                  </button>
+                </form>
+
+                <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+                  <button
+                    onClick={() => {
+                      setSignupSuccess(false);
+                      setOtpCode('');
+                      setOtpError(null);
+                      setMode('signin');
+                      setPassword('');
+                    }}
+                    style={{
+                      fontSize: '0.78rem',
+                      color: 'var(--text-muted)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      textUnderlineOffset: '2px',
+                    }}
+                  >
+                    Back to sign in
+                  </button>
+                </div>
               </div>
             ) : (
               <>
