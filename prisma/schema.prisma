@@ -165,6 +165,8 @@ model UserSettings {
   notificationSeverity String   @default("all")
   onboardingCompleted  Boolean  @default(false)
   onboardingStep       Int      @default(0)
+  onboardingRole       String?
+  onboardingTourSeen   Boolean  @default(false)
   emailForwardToken    String?  @unique
 
   @@index([userId])

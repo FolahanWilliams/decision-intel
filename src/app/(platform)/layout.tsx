@@ -8,8 +8,10 @@ import { CommandPalette } from '@/components/ui/CommandPalette';
 import { NewDecisionModal } from '@/components/ui/NewDecisionModal';
 import { AuthGuard } from '@/components/ui/AuthGuard';
 import { UsageMeter } from '@/components/billing/UsageMeter';
+import { OnboardingTourProvider } from '@/components/onboarding/OnboardingTour';
 export default async function PlatformLayout({ children }: { children: React.ReactNode }) {
   return (
+    <OnboardingTourProvider>
     <AnalysisProgressProvider>
       <AuthGuard />
       <a href="#main-content" className="skip-nav">
@@ -49,7 +51,9 @@ export default async function PlatformLayout({ children }: { children: React.Rea
               }}
             >
               <span className="usage-meter-label">This month</span>
-              <UsageMeter />
+              <span id="onborda-usage-meter" style={{ display: 'inline-flex' }}>
+                <UsageMeter />
+              </span>
             </div>
             {children}
           </div>
@@ -59,5 +63,6 @@ export default async function PlatformLayout({ children }: { children: React.Rea
       <CommandPalette />
       <NewDecisionModal />
     </AnalysisProgressProvider>
+    </OnboardingTourProvider>
   );
 }

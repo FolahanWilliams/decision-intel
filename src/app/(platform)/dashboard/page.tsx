@@ -189,8 +189,9 @@ export default function Dashboard() {
   const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
   const [batchDeleting, setBatchDeleting] = useState(false);
 
-  // Welcome modal for first-time users (triggered via ?welcome=true from auth callback)
-  const [showWelcome, setShowWelcome] = useState(false);
+  // Welcome modal self-gates via /api/onboarding; rendering is unconditional.
+  // The `?welcome=true` param is still honored (legacy) but no longer required.
+  const [showWelcome, setShowWelcome] = useState(true);
   const [quickScanOpen, setQuickScanOpen] = useState(false);
 
   // Handle Stripe checkout redirects (?upgraded=true or ?frameId=...) and welcome flow
@@ -212,7 +213,6 @@ export default function Dashboard() {
       window.history.replaceState({}, '', '/dashboard');
     }
     if (params.get('welcome') === 'true') {
-      setShowWelcome(true);
       window.history.replaceState({}, '', '/dashboard');
     }
     const fId = params.get('frameId');
@@ -1291,6 +1291,7 @@ export default function Dashboard() {
           <ErrorBoundary sectionName="Upload">
             {!uploading && !pendingFile ? (
               <div
+                id="onborda-upload"
                 className={`upload-zone mb-xl liquid-glass-iridescent liquid-glass-shimmer ${isDragOver ? 'dragover' : ''}`}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}

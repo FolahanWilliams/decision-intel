@@ -384,6 +384,7 @@ export default function Sidebar() {
               onNavigate={closeMobile}
             />
             <NavItem
+              id="onborda-nav-analytics"
               href="/dashboard/analytics"
               icon={<BarChart3 size={18} />}
               label="Analytics"
@@ -584,6 +585,7 @@ function SectionLabel({ collapsed, children }: { collapsed: boolean; children: R
 }
 
 function NavItem({
+  id,
   href,
   icon,
   label,
@@ -593,6 +595,7 @@ function NavItem({
   onNavigate,
   badge,
 }: {
+  id?: string;
   href: string;
   icon: React.ReactNode;
   label: string;
@@ -608,6 +611,7 @@ function NavItem({
   return (
     <div style={{ position: 'relative' }}>
       <Link
+        id={id}
         href={href}
         onClick={onNavigate}
         aria-current={active ? 'page' : undefined}

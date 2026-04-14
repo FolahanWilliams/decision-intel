@@ -2,99 +2,94 @@
 
 import { useState, useEffect, useCallback, startTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { Upload, BarChart3, Shield, X, ArrowRight, CheckCircle, FileText } from 'lucide-react';
+import {
+  Upload,
+  Compass,
+  Share2,
+  UserPlus,
+  X,
+  ArrowRight,
+  CheckCircle2,
+  Circle,
+} from 'lucide-react';
 
-const STEPS = [
-  {
-    icon: Upload,
-    title: 'Upload your strategic memo',
-    description:
-      'Before your next steering committee or board review, drop in the strategic memo, board deck, or market-entry recommendation. We surface the questions it never asks, and whether your team has seen this pattern before.',
-    action: 'Use the upload zone above, or try a sample strategic memo',
-    hasSampleAction: true,
-  },
-  {
-    icon: BarChart3,
-    title: 'Review your bias audit',
-    description:
-      'Decision Intel scores 30+ cognitive biases with confidence, excerpts, and recommendations, converting narrative judgment into measurable risk signal so you walk into the board with analytical confidence in the strategy.',
-    action: 'Click on a memo to view results',
-    hasSampleAction: false,
-  },
-  {
-    icon: Shield,
-    title: 'Close the loop most teams never close',
-    description:
-      'Report what happened. Every outcome feeds your Decision Quality Index and your Knowledge Graph, so today\u2019s decision always inherits yesterday\u2019s lessons. Quarter after quarter, your judgment compounds.',
-    action: 'Go to any analyzed memo and report the outcome',
-    hasSampleAction: false,
-  },
-];
-
-/**
- * Inline progress tracker for new users. Shown after WelcomeModal is dismissed;
- * both components share this storage key so a user never sees both at once.
- * Hides once the user marks onboarding complete (PATCH /api/onboarding).
- */
 const STORAGE_KEY = 'decision-intel-onboarding-completed';
+const GRAPH_VISITED_KEY = 'decision-intel-graph-visited';
+const TEAM_VISITED_KEY = 'decision-intel-team-visited';
 
-/** Fire-and-forget PATCH to persist onboarding state to the API. */
-function persistOnboardingState(data: { onboardingCompleted?: boolean; onboardingStep?: number }) {
+interface OnboardingState {
+  onboardingCompleted: boolean;
+  onboardingStep: number;
+  onboardingRole: string | null;
+  onboardingTourSeen: boolean;
+}
+
+function persistOnboardingState(data: Partial<OnboardingState>) {
   fetch('/api/onboarding', {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
-  }).catch(() => {}); // best-effort
+  }).catch(() => {});
+}
+
+interface ChecklistItem {
+  key: string;
+  icon: typeof Upload;
+  title: string;
+  description: string;
+  cta: string;
+  action: () => void;
+  isComplete: boolean;
 }
 
 export function OnboardingGuide({ documentCount = 0 }: { documentCount?: number }) {
   const router = useRouter();
   const [dismissed, setDismissed] = useState(true);
   const [loadingSample, setLoadingSample] = useState(false);
+  const [tourSeen, setTourSeen] = useState(false);
+  const [graphVisited, setGraphVisited] = useState(false);
+  const [teamVisited, setTeamVisited] = useState(false);
 
   useEffect(() => {
-    // Check localStorage first for instant decision
-    if (localStorage.getItem(STORAGE_KEY)) return;
+    // Client-only visit flags
+    if (typeof window !== 'undefined') {
+      setGraphVisited(localStorage.getItem(GRAPH_VISITED_KEY) === 'true');
+      setTeamVisited(localStorage.getItem(TEAM_VISITED_KEY) === 'true');
+    }
 
-    // Then verify with API (fall back to showing guide if API fails)
+    // Hide if the full onboarding was explicitly dismissed via the checklist itself.
+    // We use a DIFFERENT key than WelcomeModal so the checklist persists after the
+    // modal is dismissed (modal = first-touch gate, checklist = ongoing nudge).
+    if (localStorage.getItem('decision-intel-checklist-dismissed') === 'true') {
+      return;
+    }
+
     fetch('/api/onboarding')
-      .then(res => {
-        if (!res.ok) throw new Error(`Onboarding API returned ${res.status}`);
-        return res.json();
-      })
-      .then(data => {
-        if (data.onboardingCompleted) {
-          localStorage.setItem(STORAGE_KEY, 'true');
-        } else {
+      .then(res => (res.ok ? res.json() : Promise.reject(new Error(`status ${res.status}`))))
+      .then((data: OnboardingState) => {
+        setTourSeen(Boolean(data.onboardingTourSeen));
+        // Show the checklist to any user who hasn't completed BOTH onboarding and the tour.
+        // That way even users who skipped the welcome modal still get the checklist.
+        const fullyDone =
+          data.onboardingCompleted &&
+          data.onboardingTourSeen &&
+          documentCount > 0 &&
+          localStorage.getItem(GRAPH_VISITED_KEY) === 'true';
+        if (!fullyDone) {
           startTransition(() => setDismissed(false));
-          if (data.onboardingStep > 0) {
-            setCurrentStep(data.onboardingStep);
-          }
         }
       })
       .catch(() => {
         startTransition(() => setDismissed(false));
       });
-  }, []);
-  const hasDocuments = documentCount > 0;
-  const [currentStep, setCurrentStep] = useState(hasDocuments ? 1 : 0);
+  }, [documentCount]);
 
-  const isStepCompleted = (index: number): boolean => {
-    if (index === 0) return hasDocuments;
-    if (index === 1) return documentCount >= 1 && currentStep > 1;
-    return false;
-  };
-
-  const handleStepChange = useCallback((newStep: number) => {
-    setCurrentStep(newStep);
-    persistOnboardingState({ onboardingStep: newStep });
-  }, []);
-
-  const handleDismiss = () => {
+  const handleDismiss = useCallback(() => {
     setDismissed(true);
+    localStorage.setItem('decision-intel-checklist-dismissed', 'true');
     localStorage.setItem(STORAGE_KEY, 'true');
     persistOnboardingState({ onboardingCompleted: true });
-  };
+  }, []);
 
   const handleTrySample = useCallback(async () => {
     setLoadingSample(true);
@@ -102,174 +97,314 @@ export function OnboardingGuide({ documentCount = 0 }: { documentCount?: number 
       const res = await fetch('/api/onboarding/sample', { method: 'POST' });
       const data = await res.json();
       if (data.documentId) {
-        handleDismiss();
         router.push(`/documents/${data.documentId}`);
       }
     } catch {
-      // Silently fail — user can still upload manually
+      // silent — user can still upload manually
     } finally {
       setLoadingSample(false);
     }
   }, [router]);
 
+  const handleLaunchTour = useCallback(() => {
+    localStorage.setItem('decision-intel-launch-tour', 'pending');
+    window.dispatchEvent(new CustomEvent('di:launch-tour'));
+  }, []);
+
+  const handleVisitGraph = useCallback(() => {
+    localStorage.setItem(GRAPH_VISITED_KEY, 'true');
+    setGraphVisited(true);
+    router.push('/dashboard/analytics');
+  }, [router]);
+
+  const handleInviteTeam = useCallback(() => {
+    localStorage.setItem(TEAM_VISITED_KEY, 'true');
+    setTeamVisited(true);
+    router.push('/dashboard/team');
+  }, [router]);
+
+  const items: ChecklistItem[] = [
+    {
+      key: 'upload',
+      icon: Upload,
+      title: 'Upload your first strategic memo',
+      description:
+        'Drop in a memo, board deck, or market-entry recommendation to see the 60-second audit in action.',
+      cta: loadingSample ? 'Loading...' : 'Try a sample memo',
+      action: handleTrySample,
+      isComplete: documentCount > 0,
+    },
+    {
+      key: 'tour',
+      icon: Compass,
+      title: 'Take the 60-second product tour',
+      description:
+        'We spotlight the upload zone, audit tabs, and Knowledge Graph so you know what you\u2019re looking at.',
+      cta: 'Start tour',
+      action: handleLaunchTour,
+      isComplete: tourSeen,
+    },
+    {
+      key: 'graph',
+      icon: Share2,
+      title: 'Explore the Decision Knowledge Graph',
+      description:
+        'Every audit joins the graph. Today\u2019s decision inherits yesterday\u2019s lessons, quarter after quarter.',
+      cta: 'Open Analytics',
+      action: handleVisitGraph,
+      isComplete: graphVisited,
+    },
+    {
+      key: 'team',
+      icon: UserPlus,
+      title: 'Invite your team',
+      description:
+        'Bring in the colleagues who own the decision so outcomes and lessons accrue to the whole group.',
+      cta: 'Invite teammates',
+      action: handleInviteTeam,
+      isComplete: teamVisited,
+    },
+  ];
+
+  const completedCount = items.filter(i => i.isComplete).length;
+  const progressPct = Math.round((completedCount / items.length) * 100);
+
   if (dismissed) return null;
 
   return (
-    <div
-      className="card mb-xl animate-fade-in"
-      style={{ borderColor: 'var(--border-color)', borderWidth: '1px' }}
+    <section
+      className="onboarding-checklist animate-fade-in"
       role="region"
-      aria-label="Getting started guide"
+      aria-label="Onboarding checklist"
+      style={{
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-color)',
+        borderTop: '3px solid var(--accent-primary)',
+        borderRadius: 12,
+        marginBottom: 'var(--spacing-xl, 24px)',
+        overflow: 'hidden',
+      }}
     >
-      <div className="card-header" style={{ background: 'var(--bg-card)' }}>
-        <h3
-          style={{
-            color: 'var(--text-secondary)',
-            fontSize: '12px',
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-          }}
-        >
-          Getting Started
-        </h3>
-        <button
-          onClick={handleDismiss}
-          aria-label="Dismiss getting started guide"
-          style={{
-            background: 'transparent',
-            border: 'none',
-            color: 'var(--text-muted)',
-            cursor: 'pointer',
-            padding: '4px',
-          }}
-        >
-          <X size={16} />
-        </button>
-      </div>
-      <div className="card-body" style={{ padding: 'var(--spacing-lg)' }}>
-        {/* Step indicators */}
+      {/* Header */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '16px 20px 12px',
+          borderBottom: '1px solid var(--border-color)',
+          gap: 12,
+          flexWrap: 'wrap',
+        }}
+      >
+        <div>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: 'var(--accent-primary)',
+              marginBottom: 2,
+            }}
+          >
+            Getting started
+          </div>
+          <div
+            style={{
+              fontSize: 14,
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+              letterSpacing: '-0.01em',
+            }}
+          >
+            {completedCount === items.length
+              ? 'You\u2019re all set \u2014 nice work.'
+              : `${completedCount} of ${items.length} steps complete`}
+          </div>
+        </div>
+
         <div
-          className="onboarding-stepper"
-          style={{ display: 'flex', gap: 'var(--spacing-lg)', marginBottom: 'var(--spacing-lg)' }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+          }}
         >
-          {STEPS.map((step, index) => (
-            <button
-              key={index}
-              onClick={() => handleStepChange(index)}
+          <div
+            style={{
+              width: 120,
+              height: 6,
+              borderRadius: 999,
+              background: 'var(--bg-tertiary)',
+              overflow: 'hidden',
+            }}
+            aria-label={`Progress: ${progressPct}%`}
+          >
+            <div
               style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '8px',
-                padding: 'var(--spacing-md)',
-                background: index === currentStep ? 'var(--bg-card-hover)' : 'transparent',
-                border:
-                  index === currentStep
-                    ? '1px solid var(--border-color)'
-                    : '1px solid var(--border-color)',
-                cursor: 'pointer',
-                color: 'inherit',
-                transition: 'all 0.2s',
+                width: `${progressPct}%`,
+                height: '100%',
+                background: 'var(--accent-primary)',
+                transition: 'width 0.3s',
               }}
-              aria-current={index === currentStep ? 'step' : undefined}
+            />
+          </div>
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              color: 'var(--text-muted)',
+              minWidth: 32,
+              textAlign: 'right',
+            }}
+          >
+            {progressPct}%
+          </span>
+          <button
+            onClick={handleDismiss}
+            aria-label="Dismiss checklist"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--text-muted)',
+              cursor: 'pointer',
+              padding: 4,
+              display: 'flex',
+              marginLeft: 4,
+            }}
+          >
+            <X size={16} />
+          </button>
+        </div>
+      </div>
+
+      {/* Items */}
+      <ul
+        style={{
+          listStyle: 'none',
+          margin: 0,
+          padding: 0,
+        }}
+      >
+        {items.map((item, i) => {
+          const Icon = item.icon;
+          const isLast = i === items.length - 1;
+          return (
+            <li
+              key={item.key}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 14,
+                padding: '14px 20px',
+                borderBottom: isLast ? 'none' : '1px solid var(--border-color)',
+                background: item.isComplete ? 'rgba(22, 163, 74, 0.04)' : 'transparent',
+                transition: 'background 0.2s',
+              }}
             >
               <div
                 style={{
-                  width: '32px',
-                  height: '32px',
+                  width: 22,
+                  height: 22,
+                  flexShrink: 0,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  background: isStepCompleted(index)
+                  color: item.isComplete
                     ? 'var(--accent-primary)'
-                    : index <= currentStep
-                      ? '#FFFFFF'
-                      : 'var(--bg-tertiary)',
-                  color: isStepCompleted(index)
-                    ? '#FFFFFF'
-                    : index <= currentStep
-                      ? '#080808'
-                      : 'var(--text-muted)',
-                  fontSize: '12px',
-                  fontWeight: 700,
-                  borderRadius: '50%',
+                    : 'var(--text-muted)',
                 }}
+                aria-hidden
               >
-                {isStepCompleted(index) ? <CheckCircle size={18} /> : index + 1}
+                {item.isComplete ? <CheckCircle2 size={20} /> : <Circle size={20} />}
               </div>
-              <span
-                style={{
-                  fontSize: '11px',
-                  fontWeight: 600,
-                  color: index === currentStep ? 'var(--text-highlight)' : 'var(--text-muted)',
-                }}
-              >
-                {step.title}
-              </span>
-            </button>
-          ))}
-        </div>
 
-        {/* Current step detail */}
-        <div
-          className="onboarding-step-detail"
-          style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-lg)' }}
-        >
-          {(() => {
-            const Icon = STEPS[currentStep].icon;
-            return <Icon size={40} style={{ color: 'var(--text-secondary)', flexShrink: 0 }} />;
-          })()}
-          <div style={{ flex: 1 }}>
-            <p style={{ fontSize: '14px', marginBottom: '4px', color: 'var(--text-primary)' }}>
-              {STEPS[currentStep].description}
-            </p>
-            <p style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: 600 }}>
-              {STEPS[currentStep].action}
-            </p>
-          </div>
-          {STEPS[currentStep].hasSampleAction && !hasDocuments && (
-            <button
-              onClick={handleTrySample}
-              disabled={loadingSample}
-              className="btn btn-secondary flex items-center gap-sm"
-              style={{ flexShrink: 0, opacity: loadingSample ? 0.7 : 1 }}
-            >
-              <FileText size={14} /> {loadingSample ? 'Loading...' : 'Try Sample'}
-            </button>
-          )}
-          {currentStep < STEPS.length - 1 && (
-            <button
-              onClick={() => handleStepChange(currentStep + 1)}
-              className="btn btn-secondary flex items-center gap-sm"
-              style={{ flexShrink: 0 }}
-            >
-              Next <ArrowRight size={14} />
-            </button>
-          )}
-          {currentStep === STEPS.length - 1 && (
-            <button
-              onClick={handleDismiss}
-              className="btn btn-primary flex items-center gap-sm"
-              style={{ flexShrink: 0 }}
-            >
-              Got it
-            </button>
-          )}
-        </div>
-      </div>
+              <div
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 9,
+                  background: item.isComplete
+                    ? 'rgba(22, 163, 74, 0.12)'
+                    : 'var(--bg-tertiary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+                aria-hidden
+              >
+                <Icon
+                  size={16}
+                  style={{
+                    color: item.isComplete
+                      ? 'var(--accent-primary)'
+                      : 'var(--text-secondary)',
+                  }}
+                />
+              </div>
+
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: 'var(--text-primary)',
+                    marginBottom: 2,
+                    textDecoration: item.isComplete ? 'line-through' : 'none',
+                    textDecorationColor: 'var(--text-muted)',
+                    opacity: item.isComplete ? 0.7 : 1,
+                  }}
+                >
+                  {item.title}
+                </div>
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: 'var(--text-muted)',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {item.description}
+                </div>
+              </div>
+
+              {!item.isComplete && (
+                <button
+                  onClick={item.action}
+                  className="btn btn-secondary"
+                  style={{
+                    flexShrink: 0,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    padding: '7px 12px',
+                  }}
+                >
+                  {item.cta}
+                  <ArrowRight size={13} />
+                </button>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+
       <style jsx>{`
-        @media (max-width: 600px) {
-          :global(.onboarding-stepper) {
-            flex-direction: column !important;
-            gap: var(--spacing-sm) !important;
+        @media (max-width: 640px) {
+          :global(.onboarding-checklist li) {
+            flex-wrap: wrap !important;
           }
-          :global(.onboarding-step-detail) {
-            flex-direction: column !important;
-            align-items: flex-start !important;
+          :global(.onboarding-checklist li button) {
+            width: 100% !important;
+            justify-content: center !important;
+            margin-top: 4px;
           }
         }
       `}</style>
-    </div>
+    </section>
   );
 }
