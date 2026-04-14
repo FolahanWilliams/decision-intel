@@ -281,7 +281,7 @@ export function withNarrativeTheme(base: Theme): Theme {
 // Shape-agnostic: bounding sphere works for boxes, octahedra, cylinders,
 // tetrahedra, etc. Drop inside the renderNode group when `selected` is true.
 
-import { AdditiveBlending, Color, DoubleSide, ShaderMaterial } from 'three';
+import { Color, DoubleSide, NormalBlending, ShaderMaterial } from 'three';
 
 const FRESNEL_VERTEX = /* glsl */ `
   varying vec3 vNormal;
@@ -344,7 +344,10 @@ function FresnelShell({
         vertexShader: FRESNEL_VERTEX,
         fragmentShader: FRESNEL_FRAGMENT,
         transparent: true,
-        blending: AdditiveBlending,
+        // NormalBlending (not Additive): canvas background is white, and
+        // additive math (dest + source) saturates to white on a white
+        // surface, eating any tint. Normal alpha blending preserves color.
+        blending: NormalBlending,
         depthWrite: false,
         side: DoubleSide,
       }),
@@ -368,39 +371,29 @@ function FresnelShell({
 export function SelectedGlow({ size, color }: { size: number; color: string }) {
   return (
     <group>
-      {/* Inner glass core — strong base tint + sharp bright rim. This is
-         what gives the "liquid glass" body color across the full shell. */}
+      {/* Inner glass core — saturated tint over the node, with a bright
+         fresnel rim. Higher base alpha than additive version because we
+         need it to stand against a white background. */}
       <FresnelShell
-        size={size * 1.4}
+        size={size * 1.45}
         color={color}
-        power={2.4}
-        intensity={2.6}
-        baseTint={0.22}
+        power={2.6}
+        intensity={0.55}
+        baseTint={0.38}
         pulseSpeed={1.8}
-        pulseDepth={0.1}
+        pulseDepth={0.12}
       />
-      {/* Mid refractive band — softer rim, modest tint, half-cycle offset
-         so the two layers breathe against each other (depth without
-         overpowering motion). */}
+      {/* Outer refractive bloom — wider, softer, half-cycle phase offset.
+         Lower alpha so the node behind the inner core still reads, while
+         the surrounding airspace gets a gentle tinted halo. */}
       <FresnelShell
-        size={size * 1.75}
+        size={size * 2.1}
         color={color}
-        power={1.9}
-        intensity={1.4}
-        baseTint={0.1}
+        power={1.7}
+        intensity={0.4}
+        baseTint={0.14}
         pulseSpeed={1.8}
-        pulseDepth={0.18}
-        phase={Math.PI / 3}
-      />
-      {/* Outer soft bloom — wide falloff for the ambient halo. */}
-      <FresnelShell
-        size={size * 2.3}
-        color={color}
-        power={1.5}
-        intensity={0.9}
-        baseTint={0.04}
-        pulseSpeed={1.8}
-        pulseDepth={0.22}
+        pulseDepth={0.2}
         phase={Math.PI / 2}
       />
     </group>
