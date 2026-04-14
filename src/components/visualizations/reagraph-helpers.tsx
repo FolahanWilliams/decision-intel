@@ -298,12 +298,15 @@ const FRESNEL_FRAGMENT = /* glsl */ `
   uniform vec3 uColor;
   uniform float uIntensity;
   uniform float uPower;
+  uniform float uBaseTint;
   varying vec3 vNormal;
   varying vec3 vViewDir;
   void main() {
     float rim = 1.0 - max(dot(vNormal, vViewDir), 0.0);
-    float f = pow(rim, uPower);
-    gl_FragColor = vec4(uColor, f * uIntensity);
+    // Bright rim from fresnel + uniform base tint so the whole shell
+    // carries the node color (not just the silhouette).
+    float a = pow(rim, uPower) * uIntensity + uBaseTint;
+    gl_FragColor = vec4(uColor, clamp(a, 0.0, 1.0));
   }
 `;
 
@@ -312,6 +315,7 @@ function FresnelShell({
   color,
   power,
   intensity,
+  baseTint = 0,
   pulseSpeed = 1.8,
   pulseDepth = 0.18,
   phase = 0,
@@ -320,6 +324,8 @@ function FresnelShell({
   color: string;
   power: number;
   intensity: number;
+  /** Constant alpha across the whole shell — gives glass-like body tint. */
+  baseTint?: number;
   pulseSpeed?: number;
   pulseDepth?: number;
   phase?: number;
@@ -333,6 +339,7 @@ function FresnelShell({
           uColor: { value: new Color(color) },
           uIntensity: { value: intensity },
           uPower: { value: power },
+          uBaseTint: { value: baseTint },
         },
         vertexShader: FRESNEL_VERTEX,
         fragmentShader: FRESNEL_FRAGMENT,
@@ -341,7 +348,7 @@ function FresnelShell({
         depthWrite: false,
         side: DoubleSide,
       }),
-    [color, intensity, power],
+    [color, intensity, power, baseTint],
   );
   const matRef = useRef<ShaderMaterial | null>(null);
   useFrame(({ clock }) => {
@@ -361,10 +368,41 @@ function FresnelShell({
 export function SelectedGlow({ size, color }: { size: number; color: string }) {
   return (
     <group>
-      {/* Inner concentrated rim — tight power curve, bright edges */}
-      <FresnelShell size={size * 1.35} color={color} power={2.6} intensity={1.4} pulseSpeed={1.8} pulseDepth={0.12} />
-      {/* Outer soft bloom — wider falloff, lower intensity, offset phase */}
-      <FresnelShell size={size * 2.1} color={color} power={1.7} intensity={0.55} pulseSpeed={1.8} pulseDepth={0.22} phase={Math.PI / 2} />
+      {/* Inner glass core — strong base tint + sharp bright rim. This is
+         what gives the "liquid glass" body color across the full shell. */}
+      <FresnelShell
+        size={size * 1.4}
+        color={color}
+        power={2.4}
+        intensity={2.6}
+        baseTint={0.22}
+        pulseSpeed={1.8}
+        pulseDepth={0.1}
+      />
+      {/* Mid refractive band — softer rim, modest tint, half-cycle offset
+         so the two layers breathe against each other (depth without
+         overpowering motion). */}
+      <FresnelShell
+        size={size * 1.75}
+        color={color}
+        power={1.9}
+        intensity={1.4}
+        baseTint={0.1}
+        pulseSpeed={1.8}
+        pulseDepth={0.18}
+        phase={Math.PI / 3}
+      />
+      {/* Outer soft bloom — wide falloff for the ambient halo. */}
+      <FresnelShell
+        size={size * 2.3}
+        color={color}
+        power={1.5}
+        intensity={0.9}
+        baseTint={0.04}
+        pulseSpeed={1.8}
+        pulseDepth={0.22}
+        phase={Math.PI / 2}
+      />
     </group>
   );
 }
