@@ -144,15 +144,41 @@ function createModelInstance(options: ModelOptions = {}): GenerativeModel {
 }
 
 // Lazy singletons
-let modelInstance: GenerativeModel | null = null;
+let cheapModelInstance: GenerativeModel | null = null;
+let proStandardSafetyGroundedInstance: GenerativeModel | null = null;
 let groundedModelInstance: GenerativeModel | null = null;
 let standardSafetyGroundedInstance: GenerativeModel | null = null;
 
-function getModel(): GenerativeModel {
-  if (!modelInstance) {
-    modelInstance = createModelInstance({ safetyLevel: 'relaxed' });
+/**
+ * Cheaper model for mechanical / low-judgment nodes (anonymization, structuring,
+ * topic extraction). Defaults to gemini-3.1-flash-lite — half the per-token cost
+ * of the main model with marginal quality loss on these task shapes. Override
+ * with GEMINI_MODEL_CHEAP env var.
+ */
+function getCheapModel(): GenerativeModel {
+  if (!cheapModelInstance) {
+    cheapModelInstance = createModelInstance({
+      safetyLevel: 'relaxed',
+      modelName: getOptionalEnvVar('GEMINI_MODEL_CHEAP', 'gemini-3.1-flash-lite'),
+    });
   }
-  return modelInstance;
+  return cheapModelInstance;
+}
+
+/**
+ * Pro model with standard safety + grounding — reserved for the highest-leverage
+ * single call in the pipeline (metaJudge's final verdict over 7 parallel signals).
+ * Defaults to gemini-2.5-pro. Override with GEMINI_MODEL_PRO env var.
+ */
+function getProStandardSafetyGroundedModel(): GenerativeModel {
+  if (!proStandardSafetyGroundedInstance) {
+    proStandardSafetyGroundedInstance = createModelInstance({
+      grounded: true,
+      safetyLevel: 'standard',
+      modelName: getOptionalEnvVar('GEMINI_MODEL_PRO', 'gemini-2.5-pro'),
+    });
+  }
+  return proStandardSafetyGroundedInstance;
 }
 
 function getGroundedModel(): GenerativeModel {
@@ -306,7 +332,10 @@ export async function structurerNode(state: AuditState): Promise<Partial<AuditSt
 
     const result = await withGeminiResilience(() =>
       withTimeout(
-        getModel().generateContent([STRUCTURER_PROMPT, `<input_text>\n${content}\n</input_text>`])
+        getCheapModel().generateContent([
+          STRUCTURER_PROMPT,
+          `<input_text>\n${content}\n</input_text>`,
+        ])
       )
     );
 
@@ -347,7 +376,7 @@ export async function intelligenceNode(state: AuditState): Promise<Partial<Audit
     const extractionResult = await withGeminiResilience(
       () =>
         withTimeout(
-          getModel().generateContent([
+          getCheapModel().generateContent([
             INTELLIGENCE_EXTRACTION_PROMPT,
             `<input_text>\n${content.slice(0, 8000)}\n</input_text>`,
           ]),
@@ -749,7 +778,10 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
     // Phase 2: LLM-based contextual anonymization (catches names, addresses in narrative)
     const result = await withGeminiResilience(() =>
       withTimeout(
-        getModel().generateContent([GDPR_ANONYMIZER_PROMPT, `Text to anonymize:\n${truncated}`])
+        getCheapModel().generateContent([
+          GDPR_ANONYMIZER_PROMPT,
+          `Text to anonymize:\n${truncated}`,
+        ])
       )
     );
 
@@ -1686,7 +1718,7 @@ export async function metaJudgeNode(state: AuditState): Promise<Partial<AuditSta
     const result = await withGeminiResilience(
       () =>
         withTimeout(
-          getStandardSafetyGroundedModel().generateContent([
+          getProStandardSafetyGroundedModel().generateContent([
             buildMetaJudgePrompt(
               content,
               sanitizeForPrompt(failureScenarios, 'failure_scenarios'),
