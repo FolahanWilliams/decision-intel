@@ -275,20 +275,34 @@ export default function CaseStudyBiasGraph3DCanvas({
   onNodeSelect,
 }: CaseStudyBiasGraph3DCanvasProps) {
   const graphRef = useRef<GraphCanvasRef | null>(null);
-  const { nodes, edges } = buildGraphData(biases, primaryBias, toxicCombinations);
+  // Memoize so node/edge identities are stable across re-renders. New
+  // refs each render forced reagraph to re-layout from scratch, breaking
+  // fitNodesInView ("fitTo() cannot be used with an empty box").
+  const { nodes, edges } = useMemo(
+    () => buildGraphData(biases, primaryBias, toxicCombinations),
+    [biases, primaryBias, toxicCombinations],
+  );
+  const hasGraph = nodes.length > 0;
 
   // Force-directed 3D layout needs several ticks before node positions stabilize.
   // Retry through ~4s so whichever call lands after layout has produced
   // visible coords successfully frames the camera on all nodes.
   useEffect(() => {
+    if (!hasGraph) return;
     const delays = [250, 700, 1300, 2000, 2800, 3800];
     const timers = delays.map(ms =>
       setTimeout(() => {
-        graphRef.current?.fitNodesInView(undefined, { animated: false });
+        const ref = graphRef.current;
+        if (!ref) return;
+        try {
+          ref.fitNodesInView(undefined, { animated: false });
+        } catch {
+          // Layout hasn't placed nodes yet — next retry will catch it.
+        }
       }, ms),
     );
     return () => timers.forEach(clearTimeout);
-  }, []);
+  }, [hasGraph]);
 
   const nodeIds = useMemo(() => nodes.map(n => n.id), [nodes]);
   const edgeIds = useMemo(() => edges.map(e => e.id), [edges]);

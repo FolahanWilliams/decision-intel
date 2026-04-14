@@ -126,17 +126,32 @@ export interface BiasNetwork3DCanvasProps {
 
 export default function BiasNetwork3DCanvas({ biases, onBiasSelect }: BiasNetwork3DCanvasProps) {
   const graphRef = useRef<GraphCanvasRef | null>(null);
-  const { nodes, edges } = buildGraphFromBiases(biases);
+  // Memoize so node/edge identities are stable across re-renders. Without
+  // this, every parent re-render produced new array refs, forcing reagraph
+  // to re-layout from scratch — fitNodesInView then fired against an empty
+  // bbox ("fitTo() cannot be used with an empty box") and the canvas
+  // appeared as an empty grey box.
+  const { nodes, edges } = useMemo(() => buildGraphFromBiases(biases), [biases]);
+  const hasGraph = nodes.length > 0;
 
   useEffect(() => {
+    if (!hasGraph) return;
     const delays = [250, 700, 1300, 2000, 2800, 3800];
     const timers = delays.map(ms =>
       setTimeout(() => {
-        graphRef.current?.fitNodesInView(undefined, { animated: false });
+        const ref = graphRef.current;
+        if (!ref) return;
+        try {
+          ref.fitNodesInView(undefined, { animated: false });
+        } catch {
+          // Layout hasn't placed nodes yet — next retry will catch it.
+        }
       }, ms),
     );
     return () => timers.forEach(clearTimeout);
-  }, []);
+    // hasGraph swap re-runs the retry sequence when biases prop changes
+    // from empty to populated (e.g., async data arrival).
+  }, [hasGraph]);
 
   const nodeIds = useMemo(() => nodes.map(n => n.id), [nodes]);
   const edgeIds = useMemo(() => edges.map(e => e.id), [edges]);
@@ -224,6 +239,27 @@ export default function BiasNetwork3DCanvas({ biases, onBiasSelect }: BiasNetwor
     if (!rect) return;
     setPointerPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
   }, []);
+
+  // Don't mount GraphCanvas with zero nodes — reagraph throws "fitTo()
+  // cannot be used with an empty box" when its layout has nothing to lay out.
+  if (!hasGraph) {
+    return (
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'var(--text-muted, #94A3B8)',
+          fontSize: 12,
+          background: 'var(--bg-card, #F8FAFC)',
+        }}
+      >
+        Awaiting bias data…
+      </div>
+    );
+  }
 
   return (
     <div

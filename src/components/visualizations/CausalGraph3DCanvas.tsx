@@ -178,16 +178,24 @@ export interface CausalGraph3DCanvasProps {
 export default function CausalGraph3DCanvas({ weights, onNodeSelect }: CausalGraph3DCanvasProps) {
   const graphRef = useRef<GraphCanvasRef | null>(null);
   const { nodes, edges } = useMemo(() => buildGraph(weights), [weights]);
+  const hasGraph = nodes.length > 0;
 
   useEffect(() => {
+    if (!hasGraph) return;
     const delays = [250, 700, 1300, 2000, 2800, 3800];
     const timers = delays.map(ms =>
       setTimeout(() => {
-        graphRef.current?.fitNodesInView(undefined, { animated: false });
+        const ref = graphRef.current;
+        if (!ref) return;
+        try {
+          ref.fitNodesInView(undefined, { animated: false });
+        } catch {
+          // Layout not converged yet — next retry will catch it.
+        }
       }, ms),
     );
     return () => timers.forEach(clearTimeout);
-  }, []);
+  }, [hasGraph]);
 
   const nodeIds = useMemo(() => nodes.map(n => n.id), [nodes]);
   const edgeIds = useMemo(() => edges.map(e => e.id), [edges]);

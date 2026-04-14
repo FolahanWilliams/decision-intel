@@ -116,18 +116,26 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
   DecisionKnowledgeGraph3DCanvasProps
 >(function DecisionKnowledgeGraph3DCanvas({ nodes, edges, onNodeSelect }, ref) {
   const graphRef = useRef<GraphCanvasRef | null>(null);
+  const hasGraph = nodes.length > 0;
 
   // Force-directed 3D layout settles over multiple ticks. Retry fitNodesInView
   // through ~4s so whichever call lands post-stabilization frames the camera.
   useEffect(() => {
+    if (!hasGraph) return;
     const delays = [250, 700, 1300, 2000, 2800, 3800];
     const timers = delays.map(ms =>
       setTimeout(() => {
-        graphRef.current?.fitNodesInView(undefined, { animated: false });
+        const r = graphRef.current;
+        if (!r) return;
+        try {
+          r.fitNodesInView(undefined, { animated: false });
+        } catch {
+          // Layout not converged yet — next retry will catch it.
+        }
       }, ms),
     );
     return () => timers.forEach(clearTimeout);
-  }, []);
+  }, [hasGraph]);
 
   // Expose camera helpers to shell
   useImperativeHandle(ref, () => ({

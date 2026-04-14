@@ -553,7 +553,13 @@ export default function HeroDecisionGraph3DCanvas({
     const delays = [250, 700, 1300, 2000, 2800, 3800];
     const timers = delays.map(ms =>
       setTimeout(() => {
-        graphRef.current?.fitNodesInView(undefined, { animated: false });
+        const r = graphRef.current;
+        if (!r) return;
+        try {
+          r.fitNodesInView(undefined, { animated: false });
+        } catch {
+          // Layout not converged yet — next retry will catch it.
+        }
       }, ms),
     );
     return () => timers.forEach(clearTimeout);
