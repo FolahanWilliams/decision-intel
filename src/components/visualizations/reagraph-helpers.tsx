@@ -267,28 +267,105 @@ export function withNarrativeTheme(base: Theme): Theme {
 }
 
 // ─── SelectedGlow ────────────────────────────────────────────────────────────
-// Pulsing spherical halo rendered around the currently-selected node so the
-// selection reads at a glance without having to dim the rest of the graph.
-// Shape-agnostic: a bounding sphere works for boxes, octahedra, cylinders,
-// tetrahedra, etc. Drop it inside the renderNode group when `selected` is true.
+// Layered fresnel-shaded halos around the selected node. Premium "energy
+// field" look, not a flat alpha balloon. Two ingredients:
+//
+//   1. Custom fresnel shader — brightens edges, fades center. Sphere reads
+//      as a glow emanating from the node rather than a ball on top of it.
+//   2. Additive blending — the shells *emit* light instead of occluding,
+//      so background colors bleed through and motion stays visible.
+//
+// Two concentric shells (inner bright core + outer soft bloom) with offset
+// pulse phases create a subtle breathing depth without the "balloon" feel.
+//
+// Shape-agnostic: bounding sphere works for boxes, octahedra, cylinders,
+// tetrahedra, etc. Drop inside the renderNode group when `selected` is true.
 
-import type { Mesh, MeshBasicMaterial } from 'three';
+import { AdditiveBlending, Color, DoubleSide, ShaderMaterial } from 'three';
 
-export function SelectedGlow({ size, color }: { size: number; color: string }) {
-  const ref = useRef<Mesh | null>(null);
+const FRESNEL_VERTEX = /* glsl */ `
+  varying vec3 vNormal;
+  varying vec3 vViewDir;
+  void main() {
+    vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+    vNormal = normalize(normalMatrix * normal);
+    vViewDir = normalize(-mvPos.xyz);
+    gl_Position = projectionMatrix * mvPos;
+  }
+`;
+
+const FRESNEL_FRAGMENT = /* glsl */ `
+  uniform vec3 uColor;
+  uniform float uIntensity;
+  uniform float uPower;
+  varying vec3 vNormal;
+  varying vec3 vViewDir;
+  void main() {
+    float rim = 1.0 - max(dot(vNormal, vViewDir), 0.0);
+    float f = pow(rim, uPower);
+    gl_FragColor = vec4(uColor, f * uIntensity);
+  }
+`;
+
+function FresnelShell({
+  size,
+  color,
+  power,
+  intensity,
+  pulseSpeed = 1.8,
+  pulseDepth = 0.18,
+  phase = 0,
+}: {
+  size: number;
+  color: string;
+  power: number;
+  intensity: number;
+  pulseSpeed?: number;
+  pulseDepth?: number;
+  phase?: number;
+}) {
+  // ShaderMaterial is recreated only when inputs change (stable for a
+  // given selected node). useMemo keeps the GPU program cached.
+  const material = useMemo(
+    () =>
+      new ShaderMaterial({
+        uniforms: {
+          uColor: { value: new Color(color) },
+          uIntensity: { value: intensity },
+          uPower: { value: power },
+        },
+        vertexShader: FRESNEL_VERTEX,
+        fragmentShader: FRESNEL_FRAGMENT,
+        transparent: true,
+        blending: AdditiveBlending,
+        depthWrite: false,
+        side: DoubleSide,
+      }),
+    [color, intensity, power],
+  );
+  const matRef = useRef<ShaderMaterial | null>(null);
   useFrame(({ clock }) => {
-    if (!ref.current) return;
-    const t = clock.elapsedTime;
-    const s = 1.7 + Math.sin(t * 3.2) * 0.12;
-    ref.current.scale.setScalar(s);
-    const mat = ref.current.material as MeshBasicMaterial | undefined;
-    if (mat) mat.opacity = 0.28 + Math.sin(t * 3.2) * 0.1;
+    const m = matRef.current;
+    if (!m) return;
+    const t = clock.elapsedTime + phase;
+    m.uniforms.uIntensity.value = intensity * (1 - pulseDepth + Math.sin(t * pulseSpeed) * pulseDepth);
   });
   return (
-    <mesh ref={ref}>
-      <sphereGeometry args={[size, 24, 18]} />
-      <meshBasicMaterial color={color} transparent opacity={0.3} depthWrite={false} />
+    <mesh>
+      <sphereGeometry args={[size, 40, 28]} />
+      <primitive ref={matRef} object={material} attach="material" />
     </mesh>
+  );
+}
+
+export function SelectedGlow({ size, color }: { size: number; color: string }) {
+  return (
+    <group>
+      {/* Inner concentrated rim — tight power curve, bright edges */}
+      <FresnelShell size={size * 1.35} color={color} power={2.6} intensity={1.4} pulseSpeed={1.8} pulseDepth={0.12} />
+      {/* Outer soft bloom — wider falloff, lower intensity, offset phase */}
+      <FresnelShell size={size * 2.1} color={color} power={1.7} intensity={0.55} pulseSpeed={1.8} pulseDepth={0.22} phase={Math.PI / 2} />
+    </group>
   );
 }
 
