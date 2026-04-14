@@ -27,7 +27,7 @@ The plugin **cannot** be installed while inside a `.zip` file.
 2.  Pin it to your toolbar for easy access.
 3.  Navigate to a news article (e.g., CNN, BBC, TechCrunch).
 4.  Click the extension icon and hit **"Analyze Page"**.
-5.  It should connect to your live Vercel app (`https://decision-intel-ppj3.vercel.app`) and return a score.
+5.  It should connect to your live app (`https://decision-intel.com`) and return a score.
 
 ---
 
@@ -38,5 +38,5 @@ The plugin **cannot** be installed while inside a `.zip` file.
 -   **Fix**: Go into the folder you selected. Does it contain `manifest.json`? If not, the actual extension might be one folder deeper (e.g., `production-extension/extension/`). Select that inner folder.
 
 **"Connection Failed"**
--   **Cause**: The extension can't reach your Vercel URL.
--   **Fix**: Visit `https://decision-intel-ppj3.vercel.app` in your browser to make sure the site is up. If the site works, the extension should work.
+-   **Cause**: The extension can't reach the app.
+-   **Fix**: Visit `https://decision-intel.com` in your browser to make sure the site is up. If the site works, the extension should work.

@@ -220,7 +220,7 @@ jobs:
       - name: Health check
         run: |
           sleep 30
-          curl -f https://decision-intel.vercel.app/api/health || echo "Health check skipped"
+          curl -f https://decision-intel.com/api/health || echo "Health check skipped"
         continue-on-error: true
 
   # ============================================

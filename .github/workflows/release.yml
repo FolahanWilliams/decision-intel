@@ -24,7 +24,7 @@ jobs:
           git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 HEAD^)..HEAD >> release_notes.md
           echo "" >> release_notes.md
           echo "## Deployment" >> release_notes.md
-          echo "- Production URL: https://decision-intel.vercel.app" >> release_notes.md
+          echo "- Production URL: https://decision-intel.com" >> release_notes.md
           
           cat release_notes.md
 
