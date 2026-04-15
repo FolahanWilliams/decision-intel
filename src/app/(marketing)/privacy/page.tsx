@@ -77,9 +77,9 @@ export default function PrivacyPolicyPage() {
               <strong style={{ color: 'var(--text-primary)' }}>
                 Documents &amp; Analysis Data:
               </strong>{' '}
-              Investment memos, IC papers, and other documents you upload for analysis. These are
-              processed by our AI pipeline and stored in encrypted form (AES-256-GCM) when
-              encryption is enabled.
+              Strategic memos, board decks, market-entry recommendations, and other documents you
+              upload for analysis. These are processed by our AI pipeline and stored in encrypted
+              form (AES-256-GCM) when encryption is enabled.
             </p>
             <p style={{ marginBottom: '12px' }}>
               <strong style={{ color: 'var(--text-primary)' }}>Usage Data:</strong> We collect

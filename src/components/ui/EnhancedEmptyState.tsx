@@ -307,10 +307,11 @@ export function EnhancedEmptyState({
       className={cn(
         'flex flex-col items-center justify-center text-center',
         'py-12 px-6 rounded-xl',
-        'liquid-glass border border-white/10',
+        'liquid-glass',
         isCompact ? 'py-8 px-4' : 'py-12 px-6',
         className
       )}
+      style={{ border: '1px solid var(--border-color)' }}
     >
       {/* Icon with animation */}
       <motion.div
@@ -319,9 +320,12 @@ export function EnhancedEmptyState({
         transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
         className={cn(
           'mb-6 p-4 rounded-full',
-          'bg-white/5 border border-white/10',
           isCompact && 'mb-4 p-3'
         )}
+        style={{
+          background: 'var(--bg-tertiary)',
+          border: '1px solid var(--border-color)',
+        }}
       >
         <div className="text-muted">{finalIcon}</div>
       </motion.div>
@@ -398,6 +402,14 @@ export function EnhancedEmptyState({
           className="flex flex-wrap gap-3 justify-center"
         >
           {finalActions.map((action, index) => {
+            const secondaryStyle =
+              action.variant === 'primary'
+                ? undefined
+                : {
+                    background: 'var(--bg-tertiary)',
+                    color: 'var(--text-primary)',
+                    border: '1px solid var(--border-color)',
+                  };
             if (action.href) {
               return (
                 <Link
@@ -408,9 +420,10 @@ export function EnhancedEmptyState({
                     'transition-all duration-200',
                     action.variant === 'primary'
                       ? 'bg-accent-primary text-black hover:bg-accent-secondary'
-                      : 'bg-white/10 text-white hover:bg-white/20',
+                      : 'hover:opacity-80',
                     isCompact && 'px-3 py-1.5 text-sm'
                   )}
+                  style={secondaryStyle}
                 >
                   {action.icon}
                   <span>{action.label}</span>
@@ -428,9 +441,10 @@ export function EnhancedEmptyState({
                   'transition-all duration-200',
                   action.variant === 'primary'
                     ? 'bg-accent-primary text-black hover:bg-accent-secondary'
-                    : 'bg-white/10 text-white hover:bg-white/20',
+                    : 'hover:opacity-80',
                   isCompact && 'px-3 py-1.5 text-sm'
                 )}
+                style={secondaryStyle}
               >
                 {action.icon}
                 <span>{action.label}</span>

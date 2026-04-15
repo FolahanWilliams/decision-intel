@@ -132,7 +132,7 @@ export function CommandPalette() {
         label: 'Documents',
         description: 'All uploaded files',
         icon: <FileText size={16} />,
-        action: () => navigate('/'),
+        action: () => navigate('/dashboard?view=browse'),
         keywords: ['files', 'uploads'],
       },
       {

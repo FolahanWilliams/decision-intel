@@ -1864,12 +1864,12 @@ export default function Dashboard() {
                   {[0, 1, 2, 3].map(i => (
                     <div key={i} className="flex items-center justify-between p-md animate-pulse">
                       <div className="flex items-center gap-md">
-                        <div className="w-5 h-5 bg-white/10" />
-                        <div className="h-4 w-48 bg-white/10" />
+                        <div className="w-5 h-5 skeleton-shimmer" />
+                        <div className="h-4 w-48 skeleton-shimmer" />
                       </div>
                       <div className="flex items-center gap-md">
-                        <div className="h-3 w-20 bg-white/10" />
-                        <div className="h-7 w-24 bg-white/10" />
+                        <div className="h-3 w-20 skeleton-shimmer" />
+                        <div className="h-7 w-24 skeleton-shimmer" />
                       </div>
                     </div>
                   ))}

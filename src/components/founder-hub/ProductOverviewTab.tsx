@@ -42,7 +42,7 @@ export function ProductOverviewTab() {
           { value: '146', label: 'Case Studies', sub: 'failures + successes' },
           { value: '3', label: 'Outcome Channels', sub: 'Autonomous detection' },
           { value: '2', label: 'AI Providers', sub: 'Gemini + Claude fallback' },
-          { value: '4', label: 'Touchpoints', sub: 'Web, Slack, Extension, API' },
+          { value: '6', label: 'Touchpoints', sub: 'Web, Slack, Drive, Email, Extension, API' },
         ].map((m, i) => (
           <div key={i} style={card}>
             <div style={stat}>{m.value}</div>
