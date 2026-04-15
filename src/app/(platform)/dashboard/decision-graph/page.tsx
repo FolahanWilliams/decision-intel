@@ -62,11 +62,12 @@ interface GraphReport {
   };
 }
 
+// Brand-aligned risk palette — matches the hero graph's severity colours.
 const RISK_COLORS: Record<string, string> = {
-  low: '#22c55e',
-  moderate: '#eab308',
-  high: '#f97316',
-  critical: '#ef4444',
+  low: '#84CC16',
+  moderate: '#EAB308',
+  high: '#F97316',
+  critical: '#EF4444',
 };
 
 export default function DecisionGraphPage() {
@@ -126,98 +127,133 @@ export default function DecisionGraphPage() {
     };
   }, [activeTab, orgId, timeRange, report]);
 
+  const exportSvg = () => {
+    const svg = document.querySelector('.card svg') as SVGSVGElement | null;
+    if (!svg) return;
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(svg);
+    const blob = new Blob([svgString], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'decision-graph.svg';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportPng = () => {
+    const svg = document.querySelector('.card svg') as SVGSVGElement | null;
+    if (!svg) return;
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(svg);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(svgBlob);
+    img.onload = () => {
+      canvas.width = img.width * 2;
+      canvas.height = img.height * 2;
+      ctx?.scale(2, 2);
+      ctx?.drawImage(img, 0, 0);
+      canvas.toBlob(blob => {
+        if (!blob) return;
+        const pngUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = pngUrl;
+        a.download = 'decision-graph.png';
+        a.click();
+        URL.revokeObjectURL(pngUrl);
+      }, 'image/png');
+      URL.revokeObjectURL(url);
+    };
+    img.src = url;
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
+    <div
+      className="container"
+      style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}
+    >
       <Breadcrumbs
         items={[{ label: 'Dashboard', href: '/dashboard' }, { label: knowledgeGraphLabel }]}
       />
 
-      <div className="flex items-center justify-between mb-6">
+      {/* Hero-style header — brand-green accent chip + clean title/subtitle */}
+      <header className="page-header" style={{ alignItems: 'flex-start' }}>
         <div>
-          <h1 className="text-2xl font-bold text-[var(--text-primary)] flex items-center gap-2">
-            <Network className="h-6 w-6 text-blue-400" />
-            {knowledgeGraphLabel}
+          <div
+            className="flex items-center gap-sm"
+            style={{ flexWrap: 'wrap', marginBottom: 4 }}
+          >
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.6px',
+                color: 'var(--accent-primary)',
+                background: 'rgba(22, 163, 74, 0.10)',
+                border: '1px solid rgba(22, 163, 74, 0.25)',
+                padding: '2px 8px',
+                borderRadius: 4,
+              }}
+            >
+              Live graph
+            </span>
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 600,
+                color: 'var(--text-muted)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+              }}
+            >
+              {orgId ? 'Organization scope' : 'Personal scope'}
+            </span>
+          </div>
+          <h1 className="flex items-center gap-md" style={{ margin: 0 }}>
+            <Network size={26} style={{ color: 'var(--accent-primary)' }} />
+            <span className="text-gradient">{knowledgeGraphLabel}</span>
           </h1>
-          <p className="text-sm text-[var(--text-muted)] mt-1">{knowledgeGraphDescription}</p>
+          <p className="page-subtitle">{knowledgeGraphDescription}</p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-sm" style={{ flexWrap: 'wrap' }}>
           {/* Export buttons */}
           <button
-            onClick={() => {
-              const svg = document.querySelector('.card svg') as SVGSVGElement;
-              if (!svg) return;
-              const serializer = new XMLSerializer();
-              const svgString = serializer.serializeToString(svg);
-              const blob = new Blob([svgString], { type: 'image/svg+xml' });
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement('a');
-              a.href = url;
-              a.download = 'decision-graph.svg';
-              a.click();
-              URL.revokeObjectURL(url);
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] transition-colors"
+            onClick={exportSvg}
+            className="btn btn-secondary btn-sm flex items-center gap-xs"
+            style={{ fontSize: '11px' }}
             title="Export as SVG"
           >
-            <Download size={14} />
-            SVG
+            <Download size={12} /> SVG
           </button>
           <button
-            onClick={() => {
-              const svg = document.querySelector('.card svg') as SVGSVGElement;
-              if (!svg) return;
-              const serializer = new XMLSerializer();
-              const svgString = serializer.serializeToString(svg);
-              const canvas = document.createElement('canvas');
-              const ctx = canvas.getContext('2d');
-              const img = new Image();
-              const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
-              const url = URL.createObjectURL(svgBlob);
-              img.onload = () => {
-                canvas.width = img.width * 2;
-                canvas.height = img.height * 2;
-                ctx?.scale(2, 2);
-                ctx?.drawImage(img, 0, 0);
-                canvas.toBlob(blob => {
-                  if (!blob) return;
-                  const pngUrl = URL.createObjectURL(blob);
-                  const a = document.createElement('a');
-                  a.href = pngUrl;
-                  a.download = 'decision-graph.png';
-                  a.click();
-                  URL.revokeObjectURL(pngUrl);
-                }, 'image/png');
-                URL.revokeObjectURL(url);
-              };
-              img.src = url;
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] transition-colors"
+            onClick={exportPng}
+            className="btn btn-secondary btn-sm flex items-center gap-xs"
+            style={{ fontSize: '11px' }}
             title="Export as PNG"
           >
-            <Download size={14} />
-            PNG
+            <Download size={12} /> PNG
           </button>
 
-          {/* Tab switcher */}
-          <div className="flex rounded-lg overflow-hidden border border-[var(--border-color)]">
+          {/* Tab switcher — reuses the same chip styles as Settings */}
+          <div className="tab-chips">
             <button
               onClick={() => setActiveTab('graph')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors ${
-                activeTab === 'graph'
-                  ? 'bg-[var(--bg-card-hover)] text-[var(--text-primary)]'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-              }`}
+              type="button"
+              className="tab-chip"
+              data-state={activeTab === 'graph' ? 'active' : undefined}
             >
               <Network size={12} /> Graph
             </button>
             <button
               onClick={() => setActiveTab('report')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors ${
-                activeTab === 'report'
-                  ? 'bg-[var(--bg-card-hover)] text-[var(--text-primary)]'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-              }`}
+              type="button"
+              className="tab-chip"
+              data-state={activeTab === 'report' ? 'active' : undefined}
             >
               <FileText size={12} /> Report
             </button>
@@ -227,9 +263,16 @@ export default function DecisionGraphPage() {
             value={timeRange}
             onChange={e => {
               setTimeRange(parseInt(e.target.value, 10));
-              setReport(null); // Reset report on time change
+              setReport(null);
             }}
-            className="text-sm px-3 py-1.5 rounded bg-[var(--bg-card-hover)] border border-[var(--border-color)] text-[var(--text-primary)]"
+            style={{
+              fontSize: '12px',
+              padding: '6px 10px',
+              borderRadius: 'var(--radius-sm)',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+              color: 'var(--text-primary)',
+            }}
           >
             <option value="30">Last 30 days</option>
             <option value="90">Last 90 days</option>
@@ -238,13 +281,9 @@ export default function DecisionGraphPage() {
             <option value="730">Last 2 years</option>
           </select>
         </div>
-      </div>
+      </header>
 
-      {/* M9.3 — Continuous temporal slider. Lets users scrub the graph's
-          time window at day-level granularity between 7 and 730 days.
-          The dropdown above handles the 5 common presets; this slider
-          handles everything else. Debounced update so dragging doesn't
-          flood the graph API. */}
+      {/* Continuous temporal slider — complements the dropdown with day-level granularity (7–730 days). Debounced so dragging doesn't flood the graph API. */}
       <TimeRangeSlider
         value={timeRange}
         onChange={days => {
@@ -266,44 +305,53 @@ export default function DecisionGraphPage() {
               border: '1px solid rgba(239, 68, 68, 0.25)',
             }}
           >
-            <AlertTriangle size={18} style={{ color: '#ef4444', flexShrink: 0 }} />
-            <span className="text-sm text-[var(--text-secondary)]" style={{ flex: 1 }}>
+            <AlertTriangle size={18} style={{ color: 'var(--error)', flexShrink: 0 }} />
+            <span style={{ flex: 1, color: 'var(--text-secondary)', fontSize: 13 }}>
               {orgError}
             </span>
             <button
               onClick={() => window.location.reload()}
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg"
               style={{
-                color: '#ef4444',
+                fontSize: 12,
+                fontWeight: 600,
+                padding: '6px 12px',
+                borderRadius: 'var(--radius-sm)',
+                color: 'var(--error)',
                 background: 'rgba(239, 68, 68, 0.1)',
                 border: '1px solid rgba(239, 68, 68, 0.3)',
+                cursor: 'pointer',
               }}
             >
               Try Again
             </button>
           </div>
         ) : activeTab === 'graph' ? (
-          // Personal scope when orgId is null — solo users see their own
-          // documents; team users see the org-wide graph.
           <DecisionKnowledgeGraph orgId={orgId} timeRange={timeRange} />
         ) : !orgId ? (
-          // Network analysis report aggregates across an org — not meaningful
-          // for solo users. Direct them to the graph or to upgrade for teams.
           <div className="card">
-            <div className="card-body flex flex-col items-center justify-center h-64 gap-3 text-[var(--text-muted)] text-center px-6">
-              <Network size={28} style={{ opacity: 0.5 }} />
-              <p className="text-sm">
-                Network analysis aggregates patterns across a team&rsquo;s decisions. Switch to
-                the Graph tab to see your personal decision history, or upgrade to Strategy to
-                unlock team reports.
+            <div
+              className="card-body flex flex-col items-center justify-center gap-sm"
+              style={{ minHeight: 240, padding: '0 24px', textAlign: 'center' }}
+            >
+              <Network
+                size={28}
+                style={{ color: 'var(--text-muted)', opacity: 0.5 }}
+              />
+              <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+                Network analysis aggregates patterns across a team&rsquo;s decisions. Switch to the
+                Graph tab to see your personal decision history, or upgrade to Strategy to unlock
+                team reports.
               </p>
             </div>
           </div>
         ) : reportLoading ? (
           <div className="card">
-            <div className="card-body flex items-center justify-center h-64 text-[var(--text-muted)]">
-              <Loader2 size={20} className="animate-spin mr-2" />
-              Generating network analysis report...
+            <div
+              className="card-body flex items-center justify-center"
+              style={{ height: 240, color: 'var(--text-muted)' }}
+            >
+              <Loader2 size={20} className="animate-spin" style={{ marginRight: 8 }} />
+              Generating network analysis report…
             </div>
           </div>
         ) : reportError || !report ? (
@@ -318,8 +366,8 @@ export default function DecisionGraphPage() {
               border: '1px solid rgba(239, 68, 68, 0.25)',
             }}
           >
-            <AlertTriangle size={18} style={{ color: '#ef4444', flexShrink: 0 }} />
-            <span className="text-sm text-[var(--text-secondary)]" style={{ flex: 1 }}>
+            <AlertTriangle size={18} style={{ color: 'var(--error)', flexShrink: 0 }} />
+            <span style={{ flex: 1, color: 'var(--text-secondary)', fontSize: 13 }}>
               {reportError || 'Failed to load report.'}
             </span>
             <button
@@ -327,28 +375,48 @@ export default function DecisionGraphPage() {
                 setReport(null);
                 setReportError(null);
               }}
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg"
               style={{
-                color: '#ef4444',
+                fontSize: 12,
+                fontWeight: 600,
+                padding: '6px 12px',
+                borderRadius: 'var(--radius-sm)',
+                color: 'var(--error)',
                 background: 'rgba(239, 68, 68, 0.1)',
                 border: '1px solid rgba(239, 68, 68, 0.3)',
+                cursor: 'pointer',
               }}
             >
               Try Again
             </button>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="stack-lg">
             {/* AI Narrative */}
             {report.narrative && (
               <div className="card">
                 <div className="card-header">
-                  <span className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
+                  <span
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: 'var(--text-secondary)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.08em',
+                    }}
+                  >
                     AI Executive Summary
                   </span>
                 </div>
                 <div className="card-body">
-                  <p className="text-sm text-[var(--text-primary)] leading-relaxed whitespace-pre-wrap">
+                  <p
+                    style={{
+                      fontSize: 13.5,
+                      color: 'var(--text-primary)',
+                      lineHeight: 1.6,
+                      whiteSpace: 'pre-wrap',
+                      margin: 0,
+                    }}
+                  >
                     {report.narrative}
                   </p>
                 </div>
@@ -357,43 +425,59 @@ export default function DecisionGraphPage() {
 
             {/* Risk State */}
             <div className="card">
-              <div className="card-body flex items-center justify-between">
-                <div className="flex items-center gap-3">
+              <div
+                className="card-body flex items-center justify-between"
+                style={{ padding: '14px 18px' }}
+              >
+                <div className="flex items-center gap-md">
                   <Shield
                     size={20}
-                    style={{ color: RISK_COLORS[report.report.riskState.overallRisk] || '#71717a' }}
+                    style={{
+                      color: RISK_COLORS[report.report.riskState.overallRisk] || 'var(--text-muted)',
+                    }}
                   />
                   <div>
                     <span
-                      className="text-lg font-bold capitalize"
                       style={{
-                        color: RISK_COLORS[report.report.riskState.overallRisk] || '#71717a',
+                        fontSize: 17,
+                        fontWeight: 700,
+                        textTransform: 'capitalize',
+                        color:
+                          RISK_COLORS[report.report.riskState.overallRisk] || 'var(--text-muted)',
                       }}
                     >
                       {report.report.riskState.overallRisk} Risk
                     </span>
-                    <span className="text-xs text-[var(--text-muted)] ml-2">
+                    <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 8 }}>
                       Score: {report.report.riskState.riskScore}/100
                     </span>
                   </div>
                 </div>
-                <div className="flex items-center gap-1 text-xs text-[var(--text-secondary)]">
+                <div
+                  className="flex items-center gap-xs"
+                  style={{ fontSize: 12, color: 'var(--text-secondary)' }}
+                >
                   {report.report.riskState.trend === 'improving' && (
-                    <TrendingDown size={14} className="text-green-400" />
+                    <TrendingDown size={14} style={{ color: 'var(--success)' }} />
                   )}
                   {report.report.riskState.trend === 'worsening' && (
-                    <TrendingUp size={14} className="text-red-400" />
+                    <TrendingUp size={14} style={{ color: 'var(--error)' }} />
                   )}
                   {report.report.riskState.trend === 'stable' && (
-                    <Minus size={14} className="text-[var(--text-muted)]" />
+                    <Minus size={14} style={{ color: 'var(--text-muted)' }} />
                   )}
-                  <span className="capitalize">{report.report.riskState.trend}</span>
+                  <span style={{ textTransform: 'capitalize' }}>
+                    {report.report.riskState.trend}
+                  </span>
                 </div>
               </div>
               {report.report.riskState.factors.length > 0 && (
-                <div className="px-4 pb-3 space-y-1">
+                <div style={{ padding: '0 18px 14px' }} className="stack-xs">
                   {report.report.riskState.factors.map((f, i) => (
-                    <p key={i} className="text-xs text-[var(--text-muted)]">
+                    <p
+                      key={i}
+                      style={{ fontSize: 11, color: 'var(--text-muted)', margin: '2px 0' }}
+                    >
                       {f.description}
                     </p>
                   ))}
@@ -402,33 +486,46 @@ export default function DecisionGraphPage() {
             </div>
 
             {/* Key Metrics */}
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+                gap: 12,
+              }}
+            >
               {[
                 { label: 'Nodes', value: report.report.metrics.nodeCount },
                 { label: 'Edges', value: report.report.metrics.edgeCount },
-                {
-                  label: 'Density',
-                  value: report.report.metrics.density.toFixed(3),
-                },
-                {
-                  label: 'Avg Degree',
-                  value: report.report.metrics.avgDegree,
-                },
+                { label: 'Density', value: report.report.metrics.density.toFixed(3) },
+                { label: 'Avg Degree', value: report.report.metrics.avgDegree },
                 { label: 'Clusters', value: report.report.metrics.clusterCount },
-                {
-                  label: 'Avg Cluster',
-                  value: report.report.metrics.avgClusterSize,
-                },
+                { label: 'Avg Cluster', value: report.report.metrics.avgClusterSize },
                 { label: 'Isolated', value: report.report.metrics.isolatedNodes },
               ].map((m, i) => (
-                <div key={i} className="card text-center" style={{ padding: '12px 8px' }}>
+                <div
+                  key={i}
+                  className="card"
+                  style={{ padding: '14px 10px', textAlign: 'center' }}
+                >
                   <div
-                    className="text-lg font-bold text-[var(--text-primary)]"
-                    style={{ fontFamily: "'JetBrains Mono'" }}
+                    style={{
+                      fontSize: 19,
+                      fontWeight: 700,
+                      color: 'var(--text-primary)',
+                      fontFamily: "'JetBrains Mono'",
+                    }}
                   >
                     {m.value}
                   </div>
-                  <div className="text-[10px] text-[var(--text-muted)]">{m.label}</div>
+                  <div
+                    style={{
+                      fontSize: 10,
+                      color: 'var(--text-muted)',
+                      marginTop: 2,
+                    }}
+                  >
+                    {m.label}
+                  </div>
                 </div>
               ))}
             </div>
@@ -437,48 +534,92 @@ export default function DecisionGraphPage() {
             {report.report.topNodes.length > 0 && (
               <div className="card">
                 <div className="card-header">
-                  <span className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
+                  <span
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: 'var(--text-secondary)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.08em',
+                    }}
+                  >
                     Most Influential Decisions (PageRank)
                   </span>
                 </div>
-                <div className="card-body p-0">
-                  <table className="w-full text-xs">
+                <div className="card-body" style={{ padding: 0 }}>
+                  <table style={{ width: '100%', fontSize: 12, borderCollapse: 'collapse' }}>
                     <thead>
-                      <tr className="border-b border-[var(--border-color)] text-[var(--text-muted)]">
-                        <th className="text-left p-2 pl-4">Decision</th>
-                        <th className="text-left p-2">Type</th>
-                        <th className="text-right p-2">PageRank</th>
-                        <th className="text-right p-2">Connections</th>
-                        <th className="text-right p-2 pr-4">Score</th>
+                      <tr
+                        style={{
+                          borderBottom: '1px solid var(--border-color)',
+                          color: 'var(--text-muted)',
+                        }}
+                      >
+                        <th style={{ textAlign: 'left', padding: '8px 16px' }}>Decision</th>
+                        <th style={{ textAlign: 'left', padding: '8px' }}>Type</th>
+                        <th style={{ textAlign: 'right', padding: '8px' }}>PageRank</th>
+                        <th style={{ textAlign: 'right', padding: '8px' }}>Connections</th>
+                        <th style={{ textAlign: 'right', padding: '8px 16px' }}>Score</th>
                       </tr>
                     </thead>
                     <tbody>
                       {report.report.topNodes.map((n, i) => (
-                        <tr key={i} className="border-b border-[var(--border-color)]">
-                          <td className="p-2 pl-4 text-[var(--text-primary)] truncate max-w-[200px]">
+                        <tr
+                          key={i}
+                          style={{ borderBottom: '1px solid var(--border-color)' }}
+                        >
+                          <td
+                            style={{
+                              padding: '8px 16px',
+                              color: 'var(--text-primary)',
+                              maxWidth: 200,
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                            }}
+                          >
                             {n.label}
                           </td>
-                          <td className="p-2 text-[var(--text-muted)] capitalize">
+                          <td
+                            style={{
+                              padding: '8px',
+                              color: 'var(--text-muted)',
+                              textTransform: 'capitalize',
+                            }}
+                          >
                             {n.type.replace('_', ' ')}
                           </td>
                           <td
-                            className="p-2 text-right text-[var(--text-primary)]"
-                            style={{ fontFamily: "'JetBrains Mono'" }}
+                            style={{
+                              padding: '8px',
+                              textAlign: 'right',
+                              color: 'var(--text-primary)',
+                              fontFamily: "'JetBrains Mono'",
+                            }}
                           >
                             {n.pageRank.toFixed(2)}
                           </td>
                           <td
-                            className="p-2 text-right text-[var(--text-primary)]"
-                            style={{ fontFamily: "'JetBrains Mono'" }}
+                            style={{
+                              padding: '8px',
+                              textAlign: 'right',
+                              color: 'var(--text-primary)',
+                              fontFamily: "'JetBrains Mono'",
+                            }}
                           >
                             {n.degree}
                           </td>
                           <td
-                            className="p-2 pr-4 text-right"
                             style={{
+                              padding: '8px 16px',
+                              textAlign: 'right',
                               fontFamily: "'JetBrains Mono'",
                               color:
-                                n.score >= 75 ? '#22c55e' : n.score >= 50 ? '#eab308' : '#ef4444',
+                                n.score >= 75
+                                  ? 'var(--success)'
+                                  : n.score >= 50
+                                    ? 'var(--warning)'
+                                    : 'var(--error)',
                             }}
                           >
                             {Math.round(n.score)}
@@ -501,7 +642,7 @@ export default function DecisionGraphPage() {
 
       {/* Causal DAG — Learned causal structure */}
       {orgId && (
-        <div className="mt-6">
+        <div style={{ marginTop: 'var(--spacing-xl)' }}>
           <ErrorBoundary>
             <CausalDAG orgId={orgId} />
           </ErrorBoundary>
@@ -511,23 +652,15 @@ export default function DecisionGraphPage() {
   );
 }
 
-// ─── M9.3 — Temporal Range Slider ─────────────────────────────────────────
+// ─── Temporal Range Slider ────────────────────────────────────────────────
 
-/**
- * Continuous time-window slider for the Decision Graph. Complements the
- * preset dropdown by letting users scrub the window at day granularity
- * between 7 and 730 days. Updates are debounced (300ms) so dragging
- * doesn't flood the graph API with requests.
- */
 function TimeRangeSlider({ value, onChange }: { value: number; onChange: (days: number) => void }) {
   const [local, setLocal] = useState(value);
 
-  // Keep local in sync when the parent state changes via the dropdown
   useEffect(() => {
     setLocal(value);
   }, [value]);
 
-  // Debounce outward updates: commit only after 300ms of no further changes
   useEffect(() => {
     if (local === value) return;
     const handle = setTimeout(() => {
@@ -556,9 +689,9 @@ function TimeRangeSlider({ value, onChange }: { value: number; onChange: (days: 
         gap: 12,
         padding: '10px 14px',
         marginBottom: 16,
-        background: 'rgba(255, 255, 255, 0.02)',
-        border: '1px solid rgba(255, 255, 255, 0.06)',
-        borderRadius: 8,
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-color)',
+        borderRadius: 'var(--radius-md)',
       }}
     >
       <span
@@ -583,7 +716,7 @@ function TimeRangeSlider({ value, onChange }: { value: number; onChange: (days: 
         aria-label="Time range in days"
         style={{
           flex: 1,
-          accentColor: '#8b5cf6',
+          accentColor: 'var(--accent-primary)',
         }}
       />
       <span

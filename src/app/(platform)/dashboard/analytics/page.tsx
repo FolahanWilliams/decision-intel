@@ -1,8 +1,17 @@
 'use client';
 
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { BarChart3, BrainCircuit, Network, TrendingUp } from 'lucide-react';
+import {
+  BarChart3,
+  BrainCircuit,
+  Network,
+  TrendingUp,
+  Activity,
+  Lightbulb,
+  Gauge,
+  BookOpen,
+} from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { PageSkeleton } from '@/components/ui/LoadingSkeleton';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -47,10 +56,10 @@ const OutcomeFlywheelContent = lazy(() =>
 );
 
 // Consolidated from 7 → 3 tabs. Each tab now rolls up its previous
-// siblings into one surface: Performance = DQI trends + quality audits +
-// outcome loop; Intelligence = fingerprint + explainability + taxonomy;
-// Graph = the Decision Knowledge Graph (still its own page for the full
-// visualization, linked out via NAV_TABS).
+// siblings into one surface: Performance = DQI trends + outcome loop +
+// decision signals (audits/nudges merged) + calibration; Intelligence =
+// fingerprint + explainability + taxonomy; Graph = the Decision Knowledge
+// Graph (own page for the full visualization, linked via NAV_TABS).
 const TABS = [
   { key: 'performance', label: 'Performance', icon: <BarChart3 size={15} /> },
   { key: 'intelligence', label: 'Intelligence', icon: <BrainCircuit size={15} /> },
@@ -77,21 +86,88 @@ const NAV_TABS: Record<string, string> = {
   graph: '/dashboard/decision-graph',
 };
 
-function SectionHeading({ children }: { children: React.ReactNode }) {
+function SectionHeading({
+  icon,
+  children,
+}: {
+  icon?: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
     <h2
-      className="mb-md"
       style={{
         fontSize: '0.75rem',
         fontWeight: 700,
         letterSpacing: '0.08em',
         textTransform: 'uppercase',
         color: 'var(--text-muted)',
-        marginTop: 'var(--spacing-xl)',
+        margin: 0,
+        marginBottom: 'var(--spacing-md)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
       }}
     >
-      {children}
+      {icon && (
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 22,
+            height: 22,
+            borderRadius: 6,
+            background: 'rgba(22, 163, 74, 0.08)',
+            color: 'var(--accent-primary)',
+          }}
+        >
+          {icon}
+        </span>
+      )}
+      <span>{children}</span>
     </h2>
+  );
+}
+
+// Inline toggle card that merges the old Cognitive Audits and Behavioural
+// Nudges sections into one surface. Shares the .tab-chips styling so it
+// visually matches the Settings chip-bar.
+function DecisionSignals() {
+  const [signal, setSignal] = useState<'audits' | 'nudges'>('audits');
+  return (
+    <div>
+      <div className="mb-md" style={{ display: 'inline-flex' }}>
+        <div className="tab-chips">
+          <button
+            type="button"
+            className="tab-chip"
+            data-state={signal === 'audits' ? 'active' : undefined}
+            onClick={() => setSignal('audits')}
+          >
+            <Activity size={13} /> Cognitive Audits
+          </button>
+          <button
+            type="button"
+            className="tab-chip"
+            data-state={signal === 'nudges' ? 'active' : undefined}
+            onClick={() => setSignal('nudges')}
+          >
+            <Lightbulb size={13} /> Behavioural Nudges
+          </button>
+        </div>
+      </div>
+      <Suspense
+        fallback={
+          <div className="card">
+            <div className="card-body" style={{ height: 200 }}>
+              <div className="skeleton" style={{ width: '100%', height: '100%' }} />
+            </div>
+          </div>
+        }
+      >
+        {signal === 'audits' ? <AuditsPageContent /> : <NudgesPageContent />}
+      </Suspense>
+    </div>
   );
 }
 
@@ -147,48 +223,53 @@ function AnalyticsInner() {
       ) : (
         <Suspense fallback={<PageSkeleton />}>
           <div
-            className="container"
-            style={{ marginTop: 'var(--spacing-md)', paddingBottom: 'var(--spacing-2xl)' }}
+            className="container stack-xl"
+            style={{ marginTop: 'var(--spacing-lg)', paddingBottom: 'var(--spacing-2xl)' }}
           >
             {view === 'performance' && (
-              <div>
-                <SectionHeading>Trends &amp; Quality</SectionHeading>
-                <InsightsPageContent />
+              <>
+                <section>
+                  <SectionHeading icon={<TrendingUp size={13} />}>
+                    Trends &amp; Quality
+                  </SectionHeading>
+                  <InsightsPageContent />
+                </section>
 
-                <SectionHeading>
-                  <TrendingUp
-                    size={13}
-                    style={{ display: 'inline', marginRight: 6, verticalAlign: '-2px' }}
-                  />
-                  Outcome Flywheel
-                </SectionHeading>
-                <OutcomeFlywheelContent />
+                <section>
+                  <SectionHeading icon={<TrendingUp size={13} />}>Outcome Flywheel</SectionHeading>
+                  <OutcomeFlywheelContent />
+                </section>
 
-                <SectionHeading>Cognitive Audits</SectionHeading>
-                <AuditsPageContent />
+                <section>
+                  <SectionHeading icon={<Activity size={13} />}>Decision Signals</SectionHeading>
+                  <DecisionSignals />
+                </section>
 
-                <SectionHeading>Nudges</SectionHeading>
-                <div style={{ marginTop: 'var(--spacing-md)' }}>
-                  <NudgesPageContent />
-                </div>
-
-                <SectionHeading>Calibration</SectionHeading>
-                <div style={{ marginTop: 'var(--spacing-md)' }}>
+                <section>
+                  <SectionHeading icon={<Gauge size={13} />}>Calibration</SectionHeading>
                   <CalibrationContent />
-                </div>
-              </div>
+                </section>
+              </>
             )}
             {view === 'intelligence' && (
-              <div>
-                <SectionHeading>Decision Intelligence</SectionHeading>
-                <DecisionIntelligenceContent />
+              <>
+                <section>
+                  <SectionHeading icon={<BrainCircuit size={13} />}>
+                    Decision Intelligence
+                  </SectionHeading>
+                  <DecisionIntelligenceContent />
+                </section>
 
-                <SectionHeading>Explainability</SectionHeading>
-                <ExplainabilityContent />
+                <section>
+                  <SectionHeading icon={<Lightbulb size={13} />}>Explainability</SectionHeading>
+                  <ExplainabilityContent />
+                </section>
 
-                <SectionHeading>Bias Library</SectionHeading>
-                <BiasLibraryContent />
-              </div>
+                <section>
+                  <SectionHeading icon={<BookOpen size={13} />}>Bias Library</SectionHeading>
+                  <BiasLibraryContent />
+                </section>
+              </>
             )}
           </div>
         </Suspense>

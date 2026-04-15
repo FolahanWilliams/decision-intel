@@ -7,7 +7,6 @@ import { DecisionRadar } from '@/components/visualizations/DecisionRadar';
 import { BiasTreemap } from '@/components/visualizations/BiasTreemap';
 import { SwotQuadrant } from '@/components/visualizations/SwotQuadrant';
 import { FactVerificationBar } from '@/components/visualizations/FactVerificationBar';
-import { SentimentGauge } from '@/components/visualizations/SentimentGauge';
 import { ComplianceGrid } from '@/components/visualizations/ComplianceGrid';
 import {
   BarChart,
@@ -25,8 +24,6 @@ import {
   ReferenceArea,
   AreaChart,
   Area,
-  LineChart,
-  Line,
 } from 'recharts';
 import {
   Brain,
@@ -38,7 +35,6 @@ import {
   Cpu,
   Zap,
   TrendingUp,
-  TrendingDown,
   Download,
   Loader2,
   ExternalLink,
@@ -479,140 +475,387 @@ export function InsightsPageContent() {
         ))}
       </div>
 
-      {/* ── [02] PERFORMANCE TRAJECTORY ─────────────────── */}
+      {/* ── [02] PERFORMANCE TRAJECTORY (merged w/ historical trends) ─ */}
       <SectionLabel index={2}>PERFORMANCE TRAJECTORY</SectionLabel>
-      <div
-        className="animate-slide-up card card-glow"
-        style={{ animationDelay: '0.28s', marginBottom: 'var(--spacing-lg)' }}
-      >
-        <div className="card-header flex items-center justify-between">
-          <h3 style={{ fontSize: '12px', fontWeight: 600 }}>
-            <TrendingUp
-              size={14}
+      <div className="animate-slide-up" style={{ animationDelay: '0.28s' }}>
+        {/* Time range + actions */}
+        <div className="flex items-center justify-between mb-md" style={{ flexWrap: 'wrap', gap: 8 }}>
+          <div className="flex items-center gap-sm">
+            {['1W', '1M', '3M', 'YTD', 'ALL'].map(range => (
+              <button
+                key={range}
+                onClick={() => setTrendRange(range)}
+                className={`btn btn-sm ${trendRange === range ? 'btn-primary' : 'btn-secondary'}`}
+                style={{ minWidth: '36px', fontSize: '11px' }}
+              >
+                {range}
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center gap-sm">
+            <button
+              className="btn btn-sm flex items-center gap-xs"
+              onClick={handleRunMarketAnalysis}
+              disabled={marketAnalysisLoading}
               style={{
-                display: 'inline',
-                marginRight: '6px',
-                verticalAlign: 'middle',
+                background: 'rgba(22, 163, 74, 0.08)',
+                border: '1px solid rgba(22, 163, 74, 0.25)',
                 color: 'var(--accent-primary)',
-              }}
-            />
-            QUALITY &amp; NOISE OVER TIME
-          </h3>
-          {insights.trendDelta !== 0 && (
-            <div
-              style={{
-                fontSize: '10px',
-                fontFamily: "'JetBrains Mono', monospace",
-                padding: '2px 8px',
-                border: `1px solid ${insights.trendDelta >= 0 ? 'var(--success)' : 'var(--error)'}40`,
-                color: insights.trendDelta >= 0 ? 'var(--success)' : 'var(--error)',
-                background: `${insights.trendDelta >= 0 ? 'var(--success)' : 'var(--error)'}08`,
+                fontSize: '11px',
+                fontWeight: 600,
               }}
             >
-              {insights.trendDelta >= 0 ? '↑' : '↓'} {Math.abs(insights.trendDelta)} pts TREND
+              {marketAnalysisLoading ? (
+                <Loader2 size={12} className="animate-spin" />
+              ) : (
+                <Globe size={12} />
+              )}
+              {marketAnalysisLoading ? 'Analyzing…' : 'Market Intelligence'}
+            </button>
+            {trendData && trendData.trendData.length > 0 && (
+              <button
+                className="btn btn-secondary btn-sm flex items-center gap-xs"
+                onClick={() => {
+                  const csvContent = [
+                    ['Date', 'Score', 'Noise', 'Volume'].join(','),
+                    ...trendData.trendData.map(d => [d.date, d.score, d.noise, d.volume].join(',')),
+                  ].join('\n');
+                  const blob = new Blob([csvContent], { type: 'text/csv' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `trajectory-${trendRange}.csv`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                style={{ fontSize: '11px' }}
+              >
+                <Download size={12} /> Export
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Market Intelligence overlay */}
+        {marketAnalysisError && (
+          <div
+            className="card mb-md"
+            style={{ border: '1px solid rgba(239, 68, 68, 0.3)' }}
+          >
+            <div className="card-body flex items-center gap-sm" style={{ padding: '12px 16px' }}>
+              <AlertTriangle size={14} style={{ color: 'var(--error)', flexShrink: 0 }} />
+              <span style={{ fontSize: '12px', color: 'var(--error)' }}>{marketAnalysisError}</span>
             </div>
+          </div>
+        )}
+        {marketAnalysis && (
+          <div
+            className="card mb-md"
+            style={{ border: '1px solid rgba(22, 163, 74, 0.2)' }}
+          >
+            <div className="card-header flex items-center justify-between">
+              <div className="flex items-center gap-sm">
+                <Globe size={14} style={{ color: 'var(--accent-primary)' }} />
+                <h3 style={{ fontSize: '13px', color: 'var(--accent-primary)' }}>
+                  Market Intelligence
+                </h3>
+              </div>
+              <button
+                className="btn btn-sm btn-secondary"
+                onClick={() => setMarketAnalysis(null)}
+                style={{ fontSize: '10px', padding: '2px 8px' }}
+              >
+                Dismiss
+              </button>
+            </div>
+            <div className="card-body" style={{ padding: '12px 16px' }}>
+              <div
+                style={{
+                  fontSize: '12px',
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.6,
+                  marginBottom: '12px',
+                }}
+              >
+                {marketAnalysis.summary.split('\n').map((line, i) => (
+                  <span key={i}>
+                    {line}
+                    {i < marketAnalysis.summary.split('\n').length - 1 && <br />}
+                  </span>
+                ))}
+              </div>
+              {marketAnalysis.impactAssessment.length > 0 && (
+                <div className="grid grid-3 gap-sm" style={{ marginBottom: '12px' }}>
+                  {marketAnalysis.impactAssessment.map(item => {
+                    const statusColor =
+                      item.status === 'High'
+                        ? 'var(--error)'
+                        : item.status === 'Medium'
+                          ? 'var(--warning)'
+                          : 'var(--success)';
+                    return (
+                      <div
+                        key={item.category}
+                        style={{
+                          padding: '10px 12px',
+                          background: 'var(--bg-card)',
+                          borderRadius: 'var(--radius-sm)',
+                          border: `1px solid ${statusColor}33`,
+                        }}
+                      >
+                        <div
+                          className="flex items-center justify-between"
+                          style={{ marginBottom: '4px' }}
+                        >
+                          <span
+                            style={{
+                              fontSize: '11px',
+                              fontWeight: 600,
+                              color: 'var(--text-secondary)',
+                            }}
+                          >
+                            {item.category}
+                          </span>
+                          <span
+                            style={{
+                              fontSize: '10px',
+                              fontWeight: 700,
+                              color: statusColor,
+                              padding: '1px 6px',
+                              borderRadius: '4px',
+                              background: `${statusColor}22`,
+                            }}
+                          >
+                            {item.status}
+                          </span>
+                        </div>
+                        <p
+                          style={{
+                            fontSize: '11px',
+                            color: 'var(--text-muted)',
+                            lineHeight: 1.4,
+                            margin: 0,
+                          }}
+                        >
+                          {item.details}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              {marketAnalysis.searchSources.length > 0 && (
+                <div className="flex items-center gap-sm" style={{ flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Sources:</span>
+                  {marketAnalysis.searchSources.slice(0, 5).map((url, i) => (
+                    <a
+                      key={i}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-xs"
+                      style={{
+                        fontSize: '10px',
+                        color: 'var(--accent-primary)',
+                        textDecoration: 'none',
+                        padding: '2px 6px',
+                        borderRadius: '4px',
+                        background: 'rgba(22, 163, 74, 0.08)',
+                      }}
+                    >
+                      <ExternalLink size={8} />
+                      {new URL(url).hostname.replace('www.', '')}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Main double-line chart: quality + noise over trendRange */}
+        <div className="card card-glow" style={{ marginBottom: 'var(--spacing-md)' }}>
+          <div className="card-header flex items-center justify-between">
+            <h3 style={{ fontSize: '12px', fontWeight: 600 }}>
+              <TrendingUp
+                size={14}
+                style={{
+                  display: 'inline',
+                  marginRight: '6px',
+                  verticalAlign: 'middle',
+                  color: 'var(--accent-primary)',
+                }}
+              />
+              QUALITY &amp; NOISE OVER TIME
+            </h3>
+            {trendData && trendData.stats && (
+              <div
+                style={{
+                  fontSize: '10px',
+                  fontFamily: "'JetBrains Mono', monospace",
+                  padding: '2px 8px',
+                  border: `1px solid ${trendData.stats.trend >= 0 ? 'var(--success)' : 'var(--error)'}40`,
+                  color: trendData.stats.trend >= 0 ? 'var(--success)' : 'var(--error)',
+                  background: `${trendData.stats.trend >= 0 ? 'var(--success)' : 'var(--error)'}14`,
+                }}
+              >
+                {trendData.stats.trend >= 0 ? '↑' : '↓'} {Math.abs(trendData.stats.trend)}%
+              </div>
+            )}
+          </div>
+          {trendsLoading ? (
+            <div className="card-body" style={{ height: 260 }}>
+              <div className="skeleton" style={{ width: '100%', height: '100%' }} />
+            </div>
+          ) : !trendData || trendData.trendData.length === 0 ? (
+            <div
+              className="card-body flex items-center justify-center"
+              style={{ height: 160 }}
+            >
+              <p
+                style={{
+                  fontSize: '11px',
+                  color: 'var(--text-muted)',
+                  fontFamily: 'JetBrains Mono, monospace',
+                }}
+              >
+                NOT ENOUGH DATA — run more analyses to see trajectory
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="card-body" style={{ height: 260 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart
+                    data={trendData.trendData}
+                    margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+                  >
+                    <defs>
+                      <linearGradient id="qualityGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="var(--success)" stopOpacity={0.22} />
+                        <stop offset="95%" stopColor="var(--success)" stopOpacity={0} />
+                      </linearGradient>
+                      <linearGradient id="noiseGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="var(--error)" stopOpacity={0.16} />
+                        <stop offset="95%" stopColor="var(--error)" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      vertical={false}
+                      stroke="var(--border-color)"
+                    />
+                    <XAxis
+                      dataKey="date"
+                      tickFormatter={str => String(str).slice(5)}
+                      tick={{ fill: 'var(--text-muted)', fontSize: 9, fontFamily: 'JetBrains Mono' }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis
+                      domain={[0, 100]}
+                      tick={{ fill: 'var(--text-muted)', fontSize: 9, fontFamily: 'JetBrains Mono' }}
+                      axisLine={false}
+                      tickLine={false}
+                      width={28}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        background: 'var(--bg-card)',
+                        border: '1px solid var(--border-color)',
+                        fontSize: '11px',
+                        fontFamily: "'JetBrains Mono', monospace",
+                      }}
+                      labelFormatter={label => `Date: ${label}`}
+                      formatter={(value, name) => [
+                        `${value ?? 0}${name === 'noise' ? '%' : ''}`,
+                        name === 'score' ? 'Quality' : 'Noise',
+                      ]}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="score"
+                      stroke="var(--success)"
+                      strokeWidth={1.8}
+                      fill="url(#qualityGrad)"
+                      dot={false}
+                      activeDot={{ r: 3, fill: 'var(--success)' }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="noise"
+                      stroke="var(--error)"
+                      strokeWidth={1.5}
+                      fill="url(#noiseGrad)"
+                      dot={false}
+                      activeDot={{ r: 3, fill: 'var(--error)' }}
+                      strokeDasharray="4 4"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+              <div
+                style={{
+                  padding: '6px 16px 10px',
+                  fontSize: '9px',
+                  color: 'var(--text-muted)',
+                  fontFamily: "'JetBrains Mono', monospace",
+                  display: 'flex',
+                  gap: '16px',
+                  borderTop: '1px solid var(--border-color)',
+                }}
+              >
+                <span>
+                  <span style={{ color: 'var(--success)' }}>—</span> Quality Score
+                </span>
+                <span>
+                  <span style={{ color: 'var(--error)' }}>- -</span> Noise Level
+                </span>
+                <span style={{ marginLeft: 'auto' }}>
+                  {trendData.stats.totalAnalyses} analyses · range {trendRange}
+                </span>
+              </div>
+            </>
           )}
         </div>
-        {insights.weeklyTrend.length > 1 ? (
-          <>
-            <div className="card-body" style={{ height: 200 }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={insights.weeklyTrend}>
-                  <defs>
-                    <linearGradient id="qualityGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="var(--success)" stopOpacity={0.15} />
-                      <stop offset="95%" stopColor="var(--success)" stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id="noiseGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="var(--error)" stopOpacity={0.12} />
-                      <stop offset="95%" stopColor="var(--error)" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    vertical={false}
-                    stroke="var(--border-color)"
-                  />
-                  <XAxis
-                    dataKey="week"
-                    tick={{ fill: 'var(--text-muted)', fontSize: 9, fontFamily: 'JetBrains Mono' }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <YAxis
-                    domain={[0, 100]}
-                    tick={{ fill: 'var(--text-muted)', fontSize: 9, fontFamily: 'JetBrains Mono' }}
-                    axisLine={false}
-                    tickLine={false}
-                    width={28}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      background: 'var(--bg-secondary)',
-                      border: '1px solid var(--glass-border)',
-                      fontSize: '11px',
-                      fontFamily: "'JetBrains Mono', monospace",
-                    }}
-                    formatter={(value, name) => [
-                      `${value ?? 0}`,
-                      name === 'avgScore' ? 'Quality' : 'Noise',
-                    ]}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="avgScore"
-                    stroke="var(--success)"
-                    strokeWidth={1.5}
-                    fill="url(#qualityGrad)"
-                    dot={false}
-                    activeDot={{ r: 3, fill: 'var(--success)' }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="avgNoise"
-                    stroke="var(--error)"
-                    strokeWidth={1.5}
-                    fill="url(#noiseGrad)"
-                    dot={false}
-                    activeDot={{ r: 3, fill: 'var(--error)' }}
-                    strokeDasharray="4 4"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+
+        {/* Stats row */}
+        {trendData && trendData.trendData.length > 0 && (
+          <div className="grid grid-4 gap-md" style={{ marginBottom: 'var(--spacing-md)' }}>
+            <div className="card">
+              <div className="card-body text-center p-md">
+                <div
+                  style={{ fontSize: '22px', fontWeight: 700, color: 'var(--accent-primary)' }}
+                >
+                  {trendData.stats.avgScore}
+                </div>
+                <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Avg Score</div>
+              </div>
             </div>
-            <div
-              style={{
-                padding: '6px 16px 10px',
-                fontSize: '9px',
-                color: 'var(--text-muted)',
-                fontFamily: "'JetBrains Mono', monospace",
-                display: 'flex',
-                gap: '16px',
-                borderTop: '1px solid var(--border-color)',
-              }}
-            >
-              <span>
-                <span style={{ color: 'var(--success)' }}>—</span> Quality Score
-              </span>
-              <span>
-                <span style={{ color: 'var(--error)' }}>- -</span> Noise Level
-              </span>
-              <span style={{ marginLeft: 'auto' }}>
-                {insights.weeklyTrend.reduce((s, w) => s + w.count, 0)} analyses in period
-              </span>
+            <div className="card">
+              <div className="card-body text-center p-md">
+                <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--error)' }}>
+                  {trendData.stats.avgNoise}%
+                </div>
+                <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Avg Noise</div>
+              </div>
             </div>
-          </>
-        ) : (
-          <div className="card-body flex items-center justify-center" style={{ height: 120 }}>
-            <p
-              style={{
-                fontSize: '11px',
-                color: 'var(--text-muted)',
-                fontFamily: 'JetBrains Mono, monospace',
-              }}
-            >
-              NOT ENOUGH DATA — run more analyses to see trajectory
-            </p>
+            <div className="card">
+              <div className="card-body text-center p-md">
+                <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--warning)' }}>
+                  {trendData.stats.totalBiases}
+                </div>
+                <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Total Biases</div>
+              </div>
+            </div>
+            <div className="card">
+              <div className="card-body text-center p-md">
+                <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--success)' }}>
+                  {trendData.stats.totalAnalyses}
+                </div>
+                <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Analyses</div>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -640,19 +883,9 @@ export function InsightsPageContent() {
             <SwotQuadrant data={insights.swot} />
           </ErrorBoundary>
         </div>
-        <div
-          className="animate-slide-up card-glow flex flex-col gap-md"
-          style={{ animationDelay: '0.48s' }}
-        >
+        <div className="animate-slide-up card-glow" style={{ animationDelay: '0.48s' }}>
           <ErrorBoundary sectionName="Fact Verification">
             <FactVerificationBar data={insights.factVerification} compact />
-          </ErrorBoundary>
-          <ErrorBoundary sectionName="Sentiment Gauge">
-            <SentimentGauge
-              score={insights.sentiment.score}
-              label={insights.sentiment.label}
-              compact
-            />
           </ErrorBoundary>
         </div>
         <div className="animate-slide-up card-glow" style={{ animationDelay: '0.54s' }}>
@@ -1314,465 +1547,11 @@ export function InsightsPageContent() {
         </ErrorBoundary>
       </div>
 
-      {/* ── [09] HISTORICAL TRENDS ────────────────────────── */}
-      <SectionLabel index={9}>HISTORICAL TRENDS</SectionLabel>
-      <div className="animate-slide-up" style={{ animationDelay: '0.8s' }}>
-        {/* Time range selector */}
-        <div className="flex items-center justify-between mb-md">
-          <div className="flex items-center gap-sm">
-            {['1W', '1M', '3M', 'YTD', 'ALL'].map(range => (
-              <button
-                key={range}
-                onClick={() => setTrendRange(range)}
-                className={`btn btn-sm ${trendRange === range ? 'btn-primary' : 'btn-secondary'}`}
-                style={{ minWidth: '36px', fontSize: '11px' }}
-              >
-                {range}
-              </button>
-            ))}
-          </div>
-          <div className="flex items-center gap-sm">
-            <button
-              className="btn btn-sm"
-              onClick={handleRunMarketAnalysis}
-              disabled={marketAnalysisLoading}
-              style={{
-                background: 'rgba(99, 102, 241, 0.1)',
-                border: '1px solid rgba(99, 102, 241, 0.3)',
-                color: '#818cf8',
-                fontSize: '11px',
-                fontWeight: 600,
-              }}
-            >
-              {marketAnalysisLoading ? (
-                <Loader2 size={12} className="animate-spin" />
-              ) : (
-                <Globe size={12} />
-              )}
-              {marketAnalysisLoading ? 'Analyzing...' : 'Market Intelligence'}
-            </button>
-            {trendData && trendData.trendData.length > 0 && (
-              <button
-                className="btn btn-secondary btn-sm"
-                onClick={() => {
-                  const csvContent = [
-                    ['Date', 'Score', 'Noise', 'Volume'].join(','),
-                    ...trendData.trendData.map(d => [d.date, d.score, d.noise, d.volume].join(',')),
-                  ].join('\n');
-                  const blob = new Blob([csvContent], { type: 'text/csv' });
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement('a');
-                  a.href = url;
-                  a.download = `trends-${trendRange}.csv`;
-                  a.click();
-                  URL.revokeObjectURL(url);
-                }}
-              >
-                <Download size={12} /> Export
-              </button>
-            )}
-          </div>
-        </div>
 
-        {/* Market Analysis Results */}
-        {marketAnalysisError && (
-          <div className="card mb-md" style={{ border: '1px solid rgba(248, 113, 113, 0.3)' }}>
-            <div className="card-body flex items-center gap-sm" style={{ padding: '12px 16px' }}>
-              <AlertTriangle size={14} style={{ color: '#f87171', flexShrink: 0 }} />
-              <span style={{ fontSize: '12px', color: '#f87171' }}>{marketAnalysisError}</span>
-            </div>
-          </div>
-        )}
-
-        {marketAnalysis && (
-          <div className="card mb-md" style={{ border: '1px solid rgba(99, 102, 241, 0.2)' }}>
-            <div className="card-header flex items-center justify-between">
-              <div className="flex items-center gap-sm">
-                <Globe size={14} style={{ color: '#818cf8' }} />
-                <h3 style={{ fontSize: '13px', color: '#818cf8' }}>Market Intelligence</h3>
-              </div>
-              <button
-                className="btn btn-sm btn-secondary"
-                onClick={() => setMarketAnalysis(null)}
-                style={{ fontSize: '10px', padding: '2px 8px' }}
-              >
-                Dismiss
-              </button>
-            </div>
-            <div className="card-body" style={{ padding: '12px 16px' }}>
-              {/* Summary */}
-              <div
-                style={{
-                  fontSize: '12px',
-                  color: 'var(--text-secondary)',
-                  lineHeight: 1.6,
-                  marginBottom: '12px',
-                }}
-              >
-                {marketAnalysis.summary.split('\n').map((line, i) => (
-                  <span key={i}>
-                    {line}
-                    {i < marketAnalysis.summary.split('\n').length - 1 && <br />}
-                  </span>
-                ))}
-              </div>
-
-              {/* Impact Assessment Grid */}
-              {marketAnalysis.impactAssessment.length > 0 && (
-                <div className="grid grid-3 gap-sm" style={{ marginBottom: '12px' }}>
-                  {marketAnalysis.impactAssessment.map(item => {
-                    const statusColor =
-                      item.status === 'High'
-                        ? '#f87171'
-                        : item.status === 'Medium'
-                          ? '#fbbf24'
-                          : '#34d399';
-                    return (
-                      <div
-                        key={item.category}
-                        style={{
-                          padding: '10px 12px',
-                          background: 'var(--bg-card)',
-                          borderRadius: 'var(--radius-sm)',
-                          border: `1px solid ${statusColor}20`,
-                        }}
-                      >
-                        <div
-                          className="flex items-center justify-between"
-                          style={{ marginBottom: '4px' }}
-                        >
-                          <span
-                            style={{
-                              fontSize: '11px',
-                              fontWeight: 600,
-                              color: 'var(--text-secondary)',
-                            }}
-                          >
-                            {item.category}
-                          </span>
-                          <span
-                            style={{
-                              fontSize: '10px',
-                              fontWeight: 700,
-                              color: statusColor,
-                              padding: '1px 6px',
-                              borderRadius: '4px',
-                              background: `${statusColor}15`,
-                            }}
-                          >
-                            {item.status}
-                          </span>
-                        </div>
-                        <p
-                          style={{
-                            fontSize: '11px',
-                            color: 'var(--text-muted)',
-                            lineHeight: 1.4,
-                            margin: 0,
-                          }}
-                        >
-                          {item.details}
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* Sources */}
-              {marketAnalysis.searchSources.length > 0 && (
-                <div className="flex items-center gap-sm" style={{ flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Sources:</span>
-                  {marketAnalysis.searchSources.slice(0, 5).map((url, i) => (
-                    <a
-                      key={i}
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-xs"
-                      style={{
-                        fontSize: '10px',
-                        color: '#818cf8',
-                        textDecoration: 'none',
-                        padding: '2px 6px',
-                        borderRadius: '4px',
-                        background: 'rgba(99, 102, 241, 0.08)',
-                      }}
-                    >
-                      <ExternalLink size={8} />
-                      {new URL(url).hostname.replace('www.', '')}
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {trendsLoading ? (
-          <div className="card animate-pulse">
-            <div className="card-body" style={{ height: 300 }}>
-              <div className="skeleton" style={{ width: '100%', height: '100%' }} />
-            </div>
-          </div>
-        ) : !trendData || trendData.trendData.length === 0 ? (
-          <div className="card">
-            <div className="card-body text-center" style={{ padding: 'var(--spacing-xl)' }}>
-              <Activity size={32} style={{ color: 'var(--text-muted)', margin: '0 auto 8px' }} />
-              <p className="text-sm text-muted">
-                No trend data yet. Analyze documents to see historical patterns.
-              </p>
-            </div>
-          </div>
-        ) : (
-          <>
-            {/* Decision Quality Index */}
-            <ErrorBoundary sectionName="Decision Quality Index">
-              <div className="card mb-md">
-                <div className="card-header flex justify-between">
-                  <div className="flex items-center gap-md">
-                    <h3 style={{ fontSize: '13px', color: 'var(--accent-primary)' }}>
-                      DQ-IDX (Decision Quality Index)
-                    </h3>
-                    <span
-                      className={`badge ${trendData.stats.trend >= 0 ? 'badge-complete' : 'badge-error'}`}
-                    >
-                      {trendData.stats.trend >= 0 ? (
-                        <>
-                          <TrendingUp size={10} /> +{trendData.stats.trend}%
-                        </>
-                      ) : (
-                        <>
-                          <TrendingDown size={10} /> {trendData.stats.trend}%
-                        </>
-                      )}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-md text-xs text-muted">
-                    <span>Avg: {trendData.stats.avgScore}</span>
-                    <span>H: {trendData.stats.highScore}</span>
-                    <span>L: {trendData.stats.lowScore}</span>
-                  </div>
-                </div>
-                <div className="card-body" style={{ height: 280, padding: 0 }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart
-                      data={trendData.trendData}
-                      margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
-                    >
-                      <defs>
-                        <linearGradient id="colorTrendScore" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="var(--accent-primary)" stopOpacity={0.3} />
-                          <stop offset="95%" stopColor="var(--accent-primary)" stopOpacity={0} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#222" />
-                      <XAxis
-                        dataKey="date"
-                        tickFormatter={str => str.slice(5)}
-                        stroke="var(--text-muted)"
-                        fontSize={10}
-                        tickLine={false}
-                        axisLine={false}
-                      />
-                      <YAxis
-                        stroke="var(--text-muted)"
-                        fontSize={10}
-                        tickLine={false}
-                        axisLine={false}
-                        domain={[0, 100]}
-                      />
-                      <Tooltip
-                        contentStyle={{
-                          background: 'var(--bg-card)',
-                          border: '1px solid var(--border-color)',
-                        }}
-                        itemStyle={{ color: 'var(--text-primary)' }}
-                        labelFormatter={label => `Date: ${label}`}
-                        formatter={(value, name) => {
-                          if (name === 'score') return [`${value}`, 'DQ Score'];
-                          return [value, name];
-                        }}
-                      />
-                      <Area
-                        type="monotone"
-                        dataKey="score"
-                        stroke="var(--accent-primary)"
-                        strokeWidth={2}
-                        fillOpacity={1}
-                        fill="url(#colorTrendScore)"
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </ErrorBoundary>
-
-            {/* Stats row */}
-            <div className="grid grid-4 mb-md gap-md">
-              <div className="card">
-                <div className="card-body text-center p-md">
-                  <div
-                    style={{ fontSize: '22px', fontWeight: 'bold', color: 'var(--accent-primary)' }}
-                  >
-                    {trendData.stats.avgScore}
-                  </div>
-                  <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Avg Score</div>
-                </div>
-              </div>
-              <div className="card">
-                <div className="card-body text-center p-md">
-                  <div
-                    style={{
-                      fontSize: '22px',
-                      fontWeight: 'bold',
-                      color: 'var(--accent-secondary)',
-                    }}
-                  >
-                    {trendData.stats.avgNoise}%
-                  </div>
-                  <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Avg Noise</div>
-                </div>
-              </div>
-              <div className="card">
-                <div className="card-body text-center p-md">
-                  <div style={{ fontSize: '22px', fontWeight: 'bold', color: 'var(--error)' }}>
-                    {trendData.stats.totalBiases}
-                  </div>
-                  <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Total Biases</div>
-                </div>
-              </div>
-              <div className="card">
-                <div className="card-body text-center p-md">
-                  <div style={{ fontSize: '22px', fontWeight: 'bold', color: 'var(--success)' }}>
-                    {trendData.stats.totalAnalyses}
-                  </div>
-                  <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Analyses</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-2 gap-md mb-md">
-              {/* Noise Volatility */}
-              <ErrorBoundary sectionName="Noise Volatility">
-                <div className="card">
-                  <div className="card-header">
-                    <h3 style={{ fontSize: '13px' }}>Noise Volatility</h3>
-                  </div>
-                  <div className="card-body" style={{ height: 200 }}>
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={trendData.trendData}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#222" />
-                        <XAxis dataKey="date" hide />
-                        <YAxis hide domain={[0, 100]} />
-                        <Tooltip
-                          contentStyle={{
-                            background: 'var(--bg-secondary)',
-                            border: '1px solid var(--glass-border)',
-                          }}
-                          labelFormatter={label => `Date: ${label}`}
-                          formatter={value => [`${value}%`, 'Noise Level']}
-                        />
-                        <Line
-                          type="step"
-                          dataKey="noise"
-                          stroke="var(--accent-secondary)"
-                          strokeWidth={2}
-                          dot={false}
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-              </ErrorBoundary>
-
-              {/* Bias Distribution */}
-              <ErrorBoundary sectionName="Bias Distribution">
-                <div className="card">
-                  <div className="card-header">
-                    <h3 style={{ fontSize: '13px' }}>Bias Frequency</h3>
-                  </div>
-                  <div className="card-body" style={{ height: 200 }}>
-                    {trendData.biasDistribution.length > 0 ? (
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={trendData.biasDistribution} layout="vertical">
-                          <XAxis type="number" hide />
-                          <YAxis
-                            dataKey="name"
-                            type="category"
-                            width={100}
-                            tick={{ fill: 'var(--text-secondary)', fontSize: 10 }}
-                            axisLine={false}
-                            tickLine={false}
-                          />
-                          <Tooltip
-                            contentStyle={{
-                              background: 'var(--bg-secondary)',
-                              border: '1px solid var(--glass-border)',
-                            }}
-                            formatter={value => [`${value} occurrences`, 'Count']}
-                          />
-                          <Bar dataKey="value" barSize={14}>
-                            {trendData.biasDistribution.map((entry, index) => (
-                              <Cell
-                                key={`cell-${entry.name}`}
-                                fill={
-                                  index % 2 === 0
-                                    ? 'var(--accent-primary)'
-                                    : 'var(--accent-secondary)'
-                                }
-                              />
-                            ))}
-                          </Bar>
-                        </BarChart>
-                      </ResponsiveContainer>
-                    ) : (
-                      <div className="flex items-center justify-center h-full text-sm text-muted">
-                        No biases detected in this period
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </ErrorBoundary>
-            </div>
-
-            {/* Volume Chart */}
-            <ErrorBoundary sectionName="Analysis Volume">
-              <div className="card">
-                <div className="card-header">
-                  <h3 style={{ fontSize: '13px' }}>Analysis Volume</h3>
-                </div>
-                <div className="card-body" style={{ height: 120 }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={trendData.trendData}>
-                      <XAxis
-                        dataKey="date"
-                        tickFormatter={str => str.slice(5)}
-                        stroke="var(--text-muted)"
-                        fontSize={10}
-                      />
-                      <Tooltip
-                        contentStyle={{
-                          background: 'var(--bg-secondary)',
-                          border: '1px solid var(--glass-border)',
-                        }}
-                        labelFormatter={label => `Date: ${label}`}
-                        formatter={value => [`${value} documents`, 'Analyzed']}
-                      />
-                      <Bar dataKey="volume" fill="var(--accent-tertiary)" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </ErrorBoundary>
-          </>
-        )}
-      </div>
-
-      {/* ── [10] NETWORK INTELLIGENCE ────────────────────── */}
+      {/* ── [09] NETWORK INTELLIGENCE ────────────────────── */}
       {graphTrends && graphTrends.weeklyData.length > 0 && (
         <>
-          <SectionLabel index={10}>NETWORK INTELLIGENCE</SectionLabel>
+          <SectionLabel index={9}>NETWORK INTELLIGENCE</SectionLabel>
           <div className="animate-slide-up" style={{ animationDelay: '0.85s' }}>
             <div className="grid grid-3 gap-md" style={{ marginBottom: 'var(--spacing-md)' }}>
               <StatCard

@@ -451,7 +451,7 @@ export function DecisionKnowledgeGraph({
     return (
       <div className="card">
         <div className="card-body flex items-center justify-center h-96">
-          <div className="animate-pulse text-zinc-500">Loading decision graph…</div>
+          <div className="animate-pulse" style={{ color: 'var(--text-muted)' }}>Loading decision graph…</div>
         </div>
       </div>
     );
@@ -460,7 +460,7 @@ export function DecisionKnowledgeGraph({
   if (!graphData || graphData.nodes.length === 0) {
     return (
       <div className="card">
-        <div className="card-body flex flex-col items-center justify-center h-64 text-zinc-500">
+        <div className="card-body flex flex-col items-center justify-center h-64" style={{ color: 'var(--text-muted)' }}>
           <Network className="h-10 w-10 mb-3 opacity-40" />
           <p>No decisions to graph yet.</p>
           <p className="text-xs mt-1">Upload documents or submit decisions to build the graph.</p>
@@ -478,9 +478,9 @@ export function DecisionKnowledgeGraph({
         <div className="card-header flex flex-col gap-2">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <h3 className="flex items-center gap-2 text-sm font-semibold">
-              <Network size={16} className="text-blue-400" />
+              <Network size={16} style={{ color: 'var(--accent-primary)' }} />
               Decision Knowledge Graph
-              <span className="text-xs font-normal text-zinc-500">
+              <span className="text-xs font-normal" style={{ color: 'var(--text-muted)' }}>
                 {graphData.stats.totalNodes} nodes · {graphData.stats.totalEdges} edges ·{' '}
                 {graphData.stats.clusters} cluster(s)
               </span>
@@ -491,7 +491,8 @@ export function DecisionKnowledgeGraph({
               <select
                 value={edgeFilter}
                 onChange={e => setEdgeFilter(e.target.value)}
-                className="text-xs px-2 py-1 rounded bg-white/5 border border-white/10 text-zinc-300"
+                style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-secondary)' }}
+                className="text-xs px-2 py-1 rounded border"
               >
                 <option value="all">All edges</option>
                 {Object.entries(EDGE_STYLES).map(([key, style]) => (
@@ -503,7 +504,8 @@ export function DecisionKnowledgeGraph({
               <select
                 value={sizeMetric}
                 onChange={e => setSizeMetric(e.target.value as typeof sizeMetric)}
-                className="text-xs px-2 py-1 rounded bg-white/5 border border-white/10 text-zinc-300"
+                style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-secondary)' }}
+                className="text-xs px-2 py-1 rounded border"
               >
                 <option value="biasCount">Size: Bias count</option>
                 <option value="pageRank">Size: PageRank</option>
@@ -512,20 +514,22 @@ export function DecisionKnowledgeGraph({
 
               {/* Strength filter */}
               <div className="flex items-center gap-1">
-                <Filter size={12} className="text-zinc-500" />
+                <Filter size={12} style={{ color: 'var(--text-muted)' }} />
                 <input
                   type="range" min="0" max="1" step="0.1"
                   value={minStrength}
                   onChange={e => setMinStrength(parseFloat(e.target.value))}
-                  className="w-16 h-1 accent-blue-500"
+                  style={{ accentColor: 'var(--accent-primary)' }}
+                  className="w-16 h-1"
                 />
-                <span className="text-xs text-zinc-500">{minStrength.toFixed(1)}</span>
+                <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{minStrength.toFixed(1)}</span>
               </div>
 
               {/* Fit view */}
               <button
                 onClick={() => canvasRef.current?.fitGraph()}
-                className="p-1 rounded hover:bg-white/10 text-zinc-400"
+                style={{ color: 'var(--text-secondary)' }}
+                className="p-1 rounded"
                 title="Fit graph (F)"
               >
                 <Maximize2 size={14} />
@@ -534,7 +538,11 @@ export function DecisionKnowledgeGraph({
               {/* Path mode */}
               <button
                 onClick={() => { setPathMode(!pathMode); setPathStart(null); setPathEnd(null); }}
-                className={`p-1 rounded text-zinc-400 ${pathMode ? 'bg-green-500/20 text-green-400' : 'hover:bg-white/10'}`}
+                style={{
+                  color: pathMode ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                  background: pathMode ? 'rgba(22, 163, 74, 0.12)' : 'transparent'
+                }}
+                className="p-1 rounded"
                 title="Path finding mode"
               >
                 <Route size={14} />
@@ -544,7 +552,11 @@ export function DecisionKnowledgeGraph({
               {playback.hasPlayback && (
                 <button
                   onClick={() => setPlaybackEnabled(!playbackEnabled)}
-                  className={`p-1 rounded text-zinc-400 ${playbackEnabled ? 'bg-blue-500/20 text-blue-400' : 'hover:bg-white/10'}`}
+                  style={{
+                    color: playbackEnabled ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                    background: playbackEnabled ? 'rgba(22, 163, 74, 0.12)' : 'transparent'
+                  }}
+                  className="p-1 rounded"
                   title="Temporal playback"
                 >
                   <Clock size={14} />
@@ -553,17 +565,26 @@ export function DecisionKnowledgeGraph({
 
               {/* Export dropdown */}
               <div className="relative group">
-                <button className="p-1 rounded hover:bg-white/10 text-zinc-400" title="Export">
+                <button style={{ color: 'var(--text-secondary)' }} className="p-1 rounded" title="Export">
                   <Download size={14} />
                 </button>
-                <div className="absolute right-0 top-full mt-1 hidden group-hover:block bg-zinc-900 border border-white/10 rounded shadow-lg z-20">
+                <div
+                  style={{
+                    background: 'var(--bg-card)',
+                    borderColor: 'var(--border-color)',
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.08)'
+                  }}
+                  className="absolute right-0 top-full mt-1 hidden group-hover:block border rounded z-20"
+                >
                   <button
                     onClick={() => handleExport('png')}
-                    className="block w-full px-3 py-1.5 text-xs text-zinc-300 hover:bg-white/5 text-left"
+                    style={{ color: 'var(--text-secondary)' }}
+                    className="block w-full px-3 py-1.5 text-xs text-left"
                   >PNG</button>
                   <button
                     onClick={() => handleExport('dot')}
-                    className="block w-full px-3 py-1.5 text-xs text-zinc-300 hover:bg-white/5 text-left"
+                    style={{ color: 'var(--text-secondary)' }}
+                    className="block w-full px-3 py-1.5 text-xs text-left"
                   >DOT</button>
                 </div>
               </div>
@@ -572,7 +593,7 @@ export function DecisionKnowledgeGraph({
 
           {/* Node type toggles */}
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-[10px] text-zinc-500 uppercase tracking-wider mr-1">Show:</span>
+            <span className="text-[10px] uppercase tracking-wider mr-1" style={{ color: 'var(--text-muted)' }}>Show:</span>
             {(Object.entries(NODE_TYPE_CONFIG) as [NodeType, (typeof NODE_TYPE_CONFIG)[NodeType]][]).map(
               ([type, config]) => {
                 const isVisible = visibleNodeTypes.has(type);
@@ -608,23 +629,28 @@ export function DecisionKnowledgeGraph({
           {/* Search + Path mode + Playback row */}
           <div className="flex items-center gap-2 flex-wrap">
             <div className="flex items-center gap-1 flex-1 min-w-[150px] max-w-[250px]">
-              <Search size={12} className="text-zinc-500" />
+              <Search size={12} style={{ color: 'var(--text-muted)' }} />
               <input
                 data-graph-search
                 type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder="Search nodes… (press /)"
-                className="w-full text-xs px-2 py-1 rounded bg-white/5 border border-white/10 text-zinc-300 outline-none focus:border-white/30"
+                style={{
+                  background: 'var(--bg-secondary)',
+                  borderColor: 'var(--border-color)',
+                  color: 'var(--text-secondary)'
+                }}
+                className="w-full text-xs px-2 py-1 rounded border outline-none"
               />
             </div>
 
             {pathMode && (
-              <div className="flex items-center gap-2 text-[10px] text-green-400">
+              <div className="flex items-center gap-2 text-[10px]" style={{ color: 'var(--accent-primary)' }}>
                 <Route size={10} />
                 {!pathStart ? 'Click start node' : !pathEnd ? 'Click end node' : `Path: ${highlightedPath.size} nodes`}
                 {(pathStart || pathEnd) && (
-                  <button onClick={() => { setPathStart(null); setPathEnd(null); }} className="text-zinc-500 hover:text-zinc-300">
+                  <button onClick={() => { setPathStart(null); setPathEnd(null); }} style={{ color: 'var(--text-muted)' }}>
                     <X size={10} />
                   </button>
                 )}
@@ -632,12 +658,13 @@ export function DecisionKnowledgeGraph({
             )}
 
             {isolatedClusterId && (
-              <div className="flex items-center gap-1.5 text-[10px] text-blue-400">
+              <div className="flex items-center gap-1.5 text-[10px]" style={{ color: 'var(--accent-primary)' }}>
                 <Boxes size={10} />
                 Cluster isolated
                 <button
                   onClick={() => setIsolatedClusterId(null)}
-                  className="px-1.5 py-0.5 rounded bg-white/5 text-zinc-400 hover:text-zinc-200"
+                  style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)' }}
+                  className="px-1.5 py-0.5 rounded"
                 >Show all</button>
               </div>
             )}
@@ -646,7 +673,8 @@ export function DecisionKnowledgeGraph({
               <div className="flex items-center gap-2 ml-auto">
                 <button
                   onClick={playback.isPlaying ? playback.pause : playback.play}
-                  className="p-1 rounded hover:bg-white/10 text-zinc-400"
+                  style={{ color: 'var(--text-secondary)' }}
+                  className="p-1 rounded"
                 >
                   {playback.isPlaying ? <Pause size={12} /> : <Play size={12} />}
                 </button>
@@ -654,9 +682,10 @@ export function DecisionKnowledgeGraph({
                   type="range" min="0" max={playback.totalWeeks - 1}
                   value={playback.currentWeek}
                   onChange={e => playback.seekTo(parseInt(e.target.value))}
-                  className="w-24 h-1 accent-blue-500"
+                  style={{ accentColor: 'var(--accent-primary)' }}
+                  className="w-24 h-1"
                 />
-                <span className="text-[10px] text-zinc-500" style={{ fontFamily: "'JetBrains Mono'" }}>
+                <span className="text-[10px]" style={{ color: 'var(--text-muted)', fontFamily: "'JetBrains Mono'" }}>
                   {playback.currentDate.toLocaleDateString()}
                 </span>
               </div>
@@ -666,29 +695,36 @@ export function DecisionKnowledgeGraph({
 
         {/* Anti-pattern warnings */}
         {graphData.antiPatterns && graphData.antiPatterns.length > 0 && (
-          <div className="px-4 py-2 border-b border-white/5">
+          <div style={{ borderColor: 'var(--border-color)' }} className="px-4 py-2 border-b">
             <button
               onClick={() => setAntiPatternsExpanded(!antiPatternsExpanded)}
               className="flex items-center gap-2 text-xs w-full"
             >
-              <AlertTriangle size={14} className="text-amber-400" />
-              <span className="text-amber-400 font-semibold">
+              <AlertTriangle size={14} style={{ color: 'var(--warning)' }} />
+              <span style={{ color: 'var(--warning)' }} className="font-semibold">
                 {graphData.antiPatterns.length} structural risk
                 {graphData.antiPatterns.length !== 1 ? 's' : ''} detected
               </span>
-              <ChevronDown size={12} className={`text-zinc-500 transition-transform ${antiPatternsExpanded ? 'rotate-180' : ''}`} />
+              <ChevronDown size={12} style={{ color: 'var(--text-muted)' }} className={`transition-transform ${antiPatternsExpanded ? 'rotate-180' : ''}`} />
             </button>
             {antiPatternsExpanded && (
               <div className="mt-2 space-y-2">
                 {graphData.antiPatterns.map(
                   (pattern: { patternType: string; severity: number; description: string; recommendation: string }, i: number) => (
-                    <div key={i} className="p-2 rounded bg-amber-500/5 border border-amber-500/10 text-xs">
+                    <div
+                      key={i}
+                      style={{
+                        background: 'rgba(234, 179, 8, 0.08)',
+                        borderColor: 'rgba(234, 179, 8, 0.22)'
+                      }}
+                      className="p-2 rounded border text-xs"
+                    >
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-semibold text-amber-400 capitalize">{pattern.patternType.replace(/_/g, ' ')}</span>
-                        <span className="text-zinc-500">severity: {pattern.severity}</span>
+                        <span style={{ color: 'var(--warning)' }} className="font-semibold capitalize">{pattern.patternType.replace(/_/g, ' ')}</span>
+                        <span style={{ color: 'var(--text-muted)' }}>severity: {pattern.severity}</span>
                       </div>
-                      <p className="text-zinc-400 mb-1">{pattern.description}</p>
-                      <p className="text-zinc-500 italic">{pattern.recommendation}</p>
+                      <p style={{ color: 'var(--text-secondary)' }} className="mb-1">{pattern.description}</p>
+                      <p style={{ color: 'var(--text-muted)' }} className="italic">{pattern.recommendation}</p>
                     </div>
                   )
                 )}
@@ -735,8 +771,8 @@ export function DecisionKnowledgeGraph({
         </div>
 
         {/* Legend */}
-        <div className="px-4 py-2 border-t border-white/5 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-zinc-500">
-          <span className="text-[10px] uppercase tracking-wider text-zinc-600 w-full mb-0.5">3D Shapes</span>
+        <div style={{ borderColor: 'var(--border-color)', color: 'var(--text-muted)' }} className="px-4 py-2 border-t flex flex-wrap gap-x-4 gap-y-1.5 text-xs">
+          <span className="text-[10px] uppercase tracking-wider w-full mb-0.5" style={{ color: 'var(--text-muted)' }}>3D Shapes</span>
           {(Object.entries(NODE_TYPE_CONFIG) as [NodeType, (typeof NODE_TYPE_CONFIG)[NodeType]][]).map(
             ([type, config]) => (
               <div key={type} className="flex items-center gap-1.5">
@@ -745,7 +781,7 @@ export function DecisionKnowledgeGraph({
               </div>
             )
           )}
-          <span className="text-[10px] uppercase tracking-wider text-zinc-600 w-full mt-1 mb-0.5">Edges</span>
+          <span className="text-[10px] uppercase tracking-wider w-full mt-1 mb-0.5" style={{ color: 'var(--text-muted)' }}>Edges</span>
           {Object.entries(EDGE_STYLES).map(([key, style]) => (
             <div key={key} className="flex items-center gap-1.5">
               <svg width="16" height="4" viewBox="0 0 16 4">
@@ -754,7 +790,7 @@ export function DecisionKnowledgeGraph({
               <span>{style.label}</span>
             </div>
           ))}
-          <span className="text-[10px] text-zinc-600 w-full mt-0.5">Scroll to zoom · Drag to orbit · Click to inspect</span>
+          <span className="text-[10px] w-full mt-0.5" style={{ color: 'var(--text-muted)' }}>Scroll to zoom · Drag to orbit · Click to inspect</span>
         </div>
       </div>
     </>

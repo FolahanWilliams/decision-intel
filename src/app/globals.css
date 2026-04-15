@@ -1012,6 +1012,11 @@ tr:hover td {
      margin-based rhythm silently crunches on some pages. Gap never
      collapses. Apply to any vertical container:
          <div className="stack-lg"> … </div>  */
+  .stack-xs {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
   .stack-sm {
     display: flex;
     flex-direction: column;
