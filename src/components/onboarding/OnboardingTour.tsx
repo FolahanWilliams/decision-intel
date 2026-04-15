@@ -15,7 +15,7 @@ const TOUR_STEPS: Step[] = [
     content: (
       <>
         Start here. Upload a strategic memo, board deck, or market-entry recommendation —
-        PDF, DOCX, TXT, or MD. The 60-second audit starts the moment it lands.
+        PDF, DOCX, or PPTX (speaker notes included). The 60-second audit starts the moment it lands.
       </>
     ),
     selector: '#onborda-upload',

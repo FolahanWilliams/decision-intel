@@ -494,7 +494,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                   <div
                     style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}
                   >
-                    PDF, TXT, MD, or DOCX — up to 5MB
+                    PDF, DOCX, PPTX, XLSX — up to 5MB
                   </div>
                 </div>
               </button>

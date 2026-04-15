@@ -95,27 +95,59 @@ export async function parseFile(
   if (isPptx) {
     try {
       const zip = await JSZip.loadAsync(buffer);
-      const slides: { index: number; text: string }[] = [];
+      const extractTextNodes = (xml: string): string[] => {
+        const texts: string[] = [];
+        const regex = /<a:t>([\s\S]*?)<\/a:t>/g;
+        let m;
+        while ((m = regex.exec(xml)) !== null) {
+          if (m[1].trim()) texts.push(m[1]);
+        }
+        return texts;
+      };
+
+      type Slide = { index: number; text: string; notes: string };
+      const slidesByIndex = new Map<number, Slide>();
+
       for (const [path, file] of Object.entries(zip.files)) {
-        const match = path.match(/^ppt\/slides\/slide(\d+)\.xml$/);
-        if (match && file) {
+        const slideMatch = path.match(/^ppt\/slides\/slide(\d+)\.xml$/);
+        if (slideMatch && file) {
           const xml = await file.async('text');
-          const texts: string[] = [];
-          // Extract text from <a:t> tags (OOXML text nodes)
-          const regex = /<a:t>([\s\S]*?)<\/a:t>/g;
-          let m;
-          while ((m = regex.exec(xml)) !== null) {
-            if (m[1].trim()) texts.push(m[1]);
-          }
-          slides.push({ index: parseInt(match[1], 10), text: texts.join(' ') });
+          const idx = parseInt(slideMatch[1], 10);
+          const existing = slidesByIndex.get(idx) ?? { index: idx, text: '', notes: '' };
+          existing.text = extractTextNodes(xml).join(' ');
+          slidesByIndex.set(idx, existing);
+          continue;
+        }
+
+        // Speaker notes often carry the actual argument behind a deck —
+        // the narrative the presenter will say out loud. For board decks
+        // this is frequently where the decision logic lives, so include
+        // them in the extracted content rather than dropping them.
+        const notesMatch = path.match(/^ppt\/notesSlides\/notesSlide(\d+)\.xml$/);
+        if (notesMatch && file) {
+          const xml = await file.async('text');
+          const idx = parseInt(notesMatch[1], 10);
+          const existing = slidesByIndex.get(idx) ?? { index: idx, text: '', notes: '' };
+          existing.notes = extractTextNodes(xml).join(' ');
+          slidesByIndex.set(idx, existing);
         }
       }
-      slides.sort((a, b) => a.index - b.index);
+
+      const slides = Array.from(slidesByIndex.values()).sort((a, b) => a.index - b.index);
       if (slides.length === 0) {
         log.warn(`PPTX contains no extractable slide text: ${filename}`);
         return '';
       }
-      return slides.map(s => `--- Slide ${s.index} ---\n${s.text}`).join('\n\n');
+
+      return slides
+        .map(s => {
+          const body = s.text || '(no slide text)';
+          const notesSection = s.notes?.trim()
+            ? `\n[Speaker notes] ${s.notes}`
+            : '';
+          return `--- Slide ${s.index} ---\n${body}${notesSection}`;
+        })
+        .join('\n\n');
     } catch (error) {
       throw new Error(
         `Failed to parse PPTX: ${error instanceof Error ? error.message : String(error)}`

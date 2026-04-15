@@ -102,7 +102,7 @@ function getDetailedErrorMessage(err: unknown, uploadRes?: Response | null): str
       return 'File is too large. Please upload a document under 5 MB.';
     }
     if (uploadRes.status === 415) {
-      return 'Unsupported file type. Accepted formats: PDF, TXT, MD, DOCX.';
+      return 'Unsupported file type. Accepted formats: PDF, DOCX, PPTX, XLSX, CSV, HTML, TXT, MD.';
     }
     if (uploadRes.status === 401) {
       return 'Your session has expired. Please sign in again.';
@@ -1316,7 +1316,7 @@ export default function Dashboard() {
                   type="file"
                   id="file-input"
                   hidden
-                  accept=".pdf,.txt,.md,.docx"
+                  accept=".pdf,.txt,.md,.docx,.pptx,.xlsx,.csv,.html,.htm"
                   disabled={uploading}
                   onChange={handleFileSelect}
                 />
@@ -1345,7 +1345,7 @@ export default function Dashboard() {
                     <p className="font-medium">
                       {isDragOver ? 'Drop to upload' : 'Drop document here or click to browse'}
                     </p>
-                    <p className="text-sm text-muted">PDF, TXT, MD, DOCX · Max 5 MB</p>
+                    <p className="text-sm text-muted">PDF, DOCX, PPTX, XLSX, CSV, HTML, TXT, MD · Max 5 MB</p>
                     {billingData && billingData.limits.analysesPerMonth > 0 && (
                       <p className="text-xs text-muted" style={{ marginTop: '4px' }}>
                         {billingData.usage.analysesThisMonth}/{billingData.limits.analysesPerMonth}{' '}
@@ -2132,7 +2132,7 @@ export default function Dashboard() {
             <CloudUpload size={48} style={{ color: 'var(--accent-primary)' }} />
             <div className="text-center">
               <p className="font-semibold text-lg">Drop your document here</p>
-              <p className="text-sm text-muted mt-1">PDF, TXT, MD, DOCX · Max 5 MB</p>
+              <p className="text-sm text-muted mt-1">PDF, DOCX, PPTX, XLSX, CSV, HTML, TXT, MD · Max 5 MB</p>
               {billingData && billingData.limits.analysesPerMonth > 0 && (
                 <p className="text-xs text-muted" style={{ marginTop: '4px' }}>
                   {billingData.usage.analysesThisMonth}/{billingData.limits.analysesPerMonth}{' '}
