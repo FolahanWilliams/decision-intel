@@ -67,10 +67,7 @@ import { useDeals } from '@/hooks/useDeals';
 import { DOCUMENT_TYPES } from '@/types/deals';
 import { QuickScanModal } from '@/components/ui/QuickScanModal';
 import { Zap } from 'lucide-react';
-import dynamic from 'next/dynamic';
 import { AnalysisShell } from '@/components/analysis/AnalysisShell';
-
-const AnalyticsView = dynamic(() => import('./_views/AnalyticsView'), { ssr: false });
 
 const ANALYSIS_STEPS: { name: string; icon: React.ReactNode }[] = [
   { name: 'Preparing document', icon: <FileText size={16} /> },
@@ -82,7 +79,7 @@ const ANALYSIS_STEPS: { name: string; icon: React.ReactNode }[] = [
   { name: 'Finalizing report', icon: <CheckCircle size={16} /> },
 ];
 
-type DashboardView = 'upload' | 'browse' | 'analytics';
+type DashboardView = 'upload' | 'browse';
 
 /** Map HTTP status codes and error patterns to user-friendly messages. */
 function getDetailedErrorMessage(err: unknown, uploadRes?: Response | null): string {
@@ -152,8 +149,7 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const viewParam = searchParams.get('view');
-  const initialView: DashboardView =
-    viewParam === 'browse' || viewParam === 'analytics' ? viewParam : 'upload';
+  const initialView: DashboardView = viewParam === 'browse' ? 'browse' : 'upload';
   const [activeView, setActiveView] = useState<DashboardView>(initialView);
 
   // Keep URL in sync with the active view so the page is shareable/bookmarkable.
@@ -779,19 +775,21 @@ export default function Dashboard() {
             Quick Bias Check
           </button>
         </div>
-        {/* Only show view switcher when user has documents */}
-        {uploadedDocs.length > 0 && (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '2px',
-              background: 'var(--bg-card-hover)',
-              border: '1px solid var(--border-color)',
-              borderRadius: 'var(--radius-full)',
-              padding: '3px',
-            }}
-          >
+        {/* View switcher — always rendered so the layout is stable from
+            first paint (prevents a content shift when the SWR docs list
+            resolves). Buttons remain functional for empty state too;
+            Browse just shows its own empty state when there are no docs. */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '2px',
+            background: 'var(--bg-card-hover)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-full)',
+            padding: '3px',
+          }}
+        >
             <button
               onClick={() => switchView('upload')}
               style={{
@@ -832,33 +830,13 @@ export default function Dashboard() {
               <Search size={14} />
               Browse &amp; Analyze
             </button>
-            <button
-              onClick={() => switchView('analytics')}
-              style={{
-                padding: '6px 16px',
-                fontSize: '13px',
-                fontWeight: activeView === 'analytics' ? 600 : 400,
-                borderRadius: 'var(--radius-full)',
-                border: 'none',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                transition: 'all 0.15s',
-                background: activeView === 'analytics' ? 'var(--bg-active)' : 'transparent',
-                color: activeView === 'analytics' ? 'var(--text-highlight)' : 'var(--text-muted)',
-              }}
-            >
-              <BarChart3 size={14} />
-              Analytics
-            </button>
           </div>
-        )}
       </div>
 
-      {/* Hero KPI Cards */}
-      {uploadedDocs.length > 0 && (
-        <>
+      {/* Hero KPI Cards — always rendered so first paint matches the
+          post-load layout (prevents the content-shift flash when SWR
+          resolves). Empty / zero values are handled by the —/0 fallbacks. */}
+      <>
           <motion.div
             className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-md sm:gap-lg mb-xl"
             initial="hidden"
@@ -983,8 +961,7 @@ export default function Dashboard() {
               );
             })}
           </motion.div>
-        </>
-      )}
+      </>
 
       {/* Stream timed out banner */}
       <AnimatePresence>
@@ -2094,10 +2071,6 @@ export default function Dashboard() {
         </>
       )}
 
-      {/* ── Analytics View (lazy-loaded) ───────────────────────────────── */}
-      {activeView === 'analytics' && (
-        <AnalyticsView uploadedDocs={uploadedDocs} riskSummary={riskSummary} />
-      )}
 
       {/* Delete Confirmation Modal */}
       {/* Global drag overlay — appears when dragging files anywhere on the page */}
