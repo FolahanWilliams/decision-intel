@@ -26,6 +26,9 @@ vi.mock('next/server', () => ({
       body,
     }),
   },
+  // after() is a no-op in tests; the route calls it with a promise that
+  // we don't need to resolve during unit testing of the response shape.
+  after: (_promise: unknown) => undefined,
 }));
 
 const mockGetUser = vi.fn();
