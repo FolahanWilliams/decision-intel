@@ -147,6 +147,14 @@ export default function Dashboard() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadPhase, setUploadPhase] = useState<'uploading' | 'analyzing'>('uploading');
   const [error, setError] = useState<string | null>(null);
+  // Upload/delete errors auto-dismiss after 8s so the error banner doesn't
+  // persist indefinitely after a failed action — users can still dismiss
+  // manually via the × button on the banner.
+  useEffect(() => {
+    if (!error) return;
+    const handle = setTimeout(() => setError(null), 8000);
+    return () => clearTimeout(handle);
+  }, [error]);
   const searchParams = useSearchParams();
   const viewParam = searchParams.get('view');
   const initialView: DashboardView = viewParam === 'browse' ? 'browse' : 'upload';

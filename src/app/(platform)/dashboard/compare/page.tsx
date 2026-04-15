@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useDocuments } from '@/hooks/useDocuments';
@@ -19,7 +20,13 @@ interface AnalysisData {
 }
 
 export default function ComparePage() {
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const searchParams = useSearchParams();
+  // Pre-seed the compare page when a user arrives via the "Compare with…"
+  // link on the document detail page (/dashboard/compare?doc=<id>).
+  const initialDocId = searchParams.get('doc');
+  const [selectedIds, setSelectedIds] = useState<string[]>(
+    initialDocId ? [initialDocId] : []
+  );
   const [analyses, setAnalyses] = useState<AnalysisData[]>([]);
   const [loading, setLoading] = useState(false);
   const { documents, isLoading: docsLoading } = useDocuments(true, 1, 50);

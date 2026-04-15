@@ -7,6 +7,7 @@ import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { isFileTypeSupported } from '@/lib/constants/file-types';
 import { encryptDocumentContent, isDocumentEncryptionEnabled } from '@/lib/utils/encryption';
 import { resolveUserFromToken } from '@/lib/integrations/email/token';
+import { safeCompare } from '@/lib/utils/safe-compare';
 
 const log = createLogger('EmailInbound');
 
@@ -71,9 +72,11 @@ function verifyWebhookSignature(req: NextRequest, body: string): boolean {
   const signatures = svixSignature.split(' ');
   const hmac = createHmac('sha256', secretBytes).update(signedContent).digest('base64');
 
+  // Timing-safe comparison — prevents signature-oracle attacks where an
+  // attacker learns the valid HMAC byte-by-byte via response-time deltas.
   return signatures.some((sig: string) => {
     const sigValue = sig.replace(/^v1,/, '');
-    return sigValue === hmac;
+    return safeCompare(sigValue, hmac);
   });
 }
 

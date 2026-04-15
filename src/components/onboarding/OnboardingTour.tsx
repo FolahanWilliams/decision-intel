@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { OnbordaProvider, Onborda, useOnborda } from 'onborda';
 import type { Step, CardComponentProps } from 'onborda';
-import { Upload, BarChart3, Gauge, Share2, X, ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { Upload, BarChart3, Gauge, X, ArrowLeft, ArrowRight, Check } from 'lucide-react';
 
 const TOUR_TRIGGER_KEY = 'decision-intel-launch-tour';
 
@@ -41,27 +41,12 @@ const TOUR_STEPS: Step[] = [
   },
   {
     icon: <BarChart3 size={18} />,
-    title: 'Trends & decision quality',
+    title: 'Analytics + your Decision Graph',
     content: (
       <>
-        Analytics surfaces Decision Quality Index across quarters, repeat biases by theme,
-        and outcome patterns from your Knowledge Graph. This is where compounding shows up.
-      </>
-    ),
-    selector: '#onborda-nav-analytics',
-    side: 'right',
-    showControls: true,
-    pointerPadding: 6,
-    pointerRadius: 10,
-  },
-  {
-    icon: <Share2 size={18} />,
-    title: 'Your Decision Knowledge Graph',
-    content: (
-      <>
-        Every audited memo joins your Decision Knowledge Graph — the context compounds over
-        time so today&apos;s decision inherits yesterday&apos;s lessons. Explore it from
-        Analytics.
+        Analytics surfaces Decision Quality Index across quarters, repeat biases by theme, and
+        the Decision Knowledge Graph — every audited memo joins it, so today&apos;s decision
+        inherits yesterday&apos;s lessons. This is where compounding shows up.
       </>
     ),
     selector: '#onborda-nav-analytics',

@@ -4,8 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { createHash } from 'crypto';
 import { encryptDocumentContent, isDocumentEncryptionEnabled } from '@/lib/utils/encryption';
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { getSeedCorpus } from '@/lib/demo/corpus';
 
 const log = createLogger('OnboardingSampleRoute');
 
@@ -15,6 +14,8 @@ const SAMPLE_FILENAME = 'Sample - Project Phoenix Expansion.txt';
  * POST /api/onboarding/sample
  * Creates a sample document for the authenticated user so they can
  * experience the analysis pipeline without uploading their own content.
+ * Content is synthesized in-process from the demo corpus — no filesystem
+ * reads (previously depended on a sample_decision.txt that wasn't shipped).
  */
 export async function POST() {
   try {
@@ -39,18 +40,19 @@ export async function POST() {
       return NextResponse.json({ documentId: existing.id, alreadyExists: true });
     }
 
-    // Read sample content from repo root
-    let content: string;
-    try {
-      content = readFileSync(join(process.cwd(), 'sample_decision.txt'), 'utf-8');
-    } catch {
-      log.error('sample_decision.txt not found');
+    // Pull Phoenix entry from the seed corpus — content is synthesized from
+    // the same DemoAnalysis used on the /demo marketing page, so the sample
+    // always stays in sync with what marketing ships.
+    const phoenix = getSeedCorpus().find(e => e.demoId === 'demo-phoenix-expansion');
+    if (!phoenix) {
+      log.error('Phoenix seed entry missing from demo corpus');
       return NextResponse.json({ error: 'Sample document not available' }, { status: 500 });
     }
+    const content = phoenix.documentContent;
 
     const contentHash = createHash('sha256').update(content).digest('hex');
-
     const encFields = isDocumentEncryptionEnabled() ? encryptDocumentContent(content) : {};
+
     const doc = await prisma.document.create({
       data: {
         userId: user.id,
