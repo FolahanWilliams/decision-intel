@@ -129,7 +129,12 @@ const MAX_LIMIT = 500;
 // ─── Main Builder ────────────────────────────────────────────────────────────
 
 export async function buildDecisionGraph(params: {
-  orgId: string;
+  /**
+   * Organization scope. Pass `null` for solo users with no org membership —
+   * the builder then scopes everything to the user's personal documents
+   * (orgId: null). Team users continue to get org-wide scope.
+   */
+  orgId: string | null;
   userId: string;
   timeRangeDays?: number;
   highlightNodeId?: string | null;
@@ -139,6 +144,7 @@ export async function buildDecisionGraph(params: {
 }): Promise<DecisionGraphResult> {
   const {
     orgId,
+    userId,
     timeRangeDays = DEFAULT_TIME_RANGE_DAYS,
     highlightNodeId,
     depth = 0,
@@ -146,13 +152,26 @@ export async function buildDecisionGraph(params: {
     nodeTypes,
   } = params;
 
+  // Scope filters used across every node-fetching query below.
+  // - Team scope (orgId !== null): match by orgId across the org.
+  // - Personal scope (orgId === null): match the user's docs only,
+  //   restricted to those without an org (orgId: null) so we never bleed
+  //   org-owned documents into a personal view.
+  const documentScope = orgId
+    ? { orgId }
+    : { userId, orgId: null };
+  const humanDecisionScope = orgId
+    ? { orgId }
+    : { userId, orgId: null };
+  const edgeScopeOrgId = orgId ?? null;
+
   const includeType = (type: string) => !nodeTypes || nodeTypes.includes(type);
 
   const safeLimit = Math.min(limit, MAX_LIMIT);
   const since = new Date(Date.now() - timeRangeDays * 24 * 60 * 60 * 1000);
 
   log.info(
-    `Building graph for org=${orgId} timeRange=${timeRangeDays}d limit=${safeLimit}` +
+    `Building graph for ${orgId ? `org=${orgId}` : `user=${userId} (personal)`} timeRange=${timeRangeDays}d limit=${safeLimit}` +
       (highlightNodeId ? ` highlight=${highlightNodeId} depth=${depth}` : '')
   );
 
@@ -200,7 +219,7 @@ export async function buildDecisionGraph(params: {
     ? []
     : await prisma.analysis.findMany({
         where: {
-          document: { orgId },
+          document: documentScope,
           createdAt: { gte: since },
         },
         include: {
@@ -252,7 +271,7 @@ export async function buildDecisionGraph(params: {
     ? []
     : await prisma.humanDecision.findMany({
         where: {
-          orgId,
+          ...humanDecisionScope,
           createdAt: { gte: since },
         },
         include: {
@@ -311,7 +330,7 @@ export async function buildDecisionGraph(params: {
   try {
     const meetings = await prisma.meeting.findMany({
       where: {
-        orgId: params.orgId,
+        ...(orgId ? { orgId } : { userId, orgId: null }),
         createdAt: { gte: since },
         participants: { isEmpty: false },
       },
@@ -475,11 +494,11 @@ export async function buildDecisionGraph(params: {
     const edgeWhere =
       highlightNodeId && depth === 1
         ? {
-            orgId,
+            orgId: edgeScopeOrgId,
             OR: [{ sourceId: highlightNodeId }, { targetId: highlightNodeId }],
           }
         : {
-            orgId,
+            orgId: edgeScopeOrgId,
             OR: [{ sourceId: { in: allNodeIds } }, { targetId: { in: allNodeIds } }],
           };
 

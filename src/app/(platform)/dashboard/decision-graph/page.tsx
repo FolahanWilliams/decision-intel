@@ -282,14 +282,23 @@ export default function DecisionGraphPage() {
               Try Again
             </button>
           </div>
+        ) : activeTab === 'graph' ? (
+          // Personal scope when orgId is null — solo users see their own
+          // documents; team users see the org-wide graph.
+          <DecisionKnowledgeGraph orgId={orgId} timeRange={timeRange} />
         ) : !orgId ? (
+          // Network analysis report aggregates across an org — not meaningful
+          // for solo users. Direct them to the graph or to upgrade for teams.
           <div className="card">
-            <div className="card-body flex items-center justify-center h-64 text-[var(--text-muted)]">
-              <p>Join an organization to view the decision graph.</p>
+            <div className="card-body flex flex-col items-center justify-center h-64 gap-3 text-[var(--text-muted)] text-center px-6">
+              <Network size={28} style={{ opacity: 0.5 }} />
+              <p className="text-sm">
+                Network analysis aggregates patterns across a team&rsquo;s decisions. Switch to
+                the Graph tab to see your personal decision history, or upgrade to Strategy to
+                unlock team reports.
+              </p>
             </div>
           </div>
-        ) : activeTab === 'graph' ? (
-          <DecisionKnowledgeGraph orgId={orgId} timeRange={timeRange} />
         ) : reportLoading ? (
           <div className="card">
             <div className="card-body flex items-center justify-center h-64 text-[var(--text-muted)]">

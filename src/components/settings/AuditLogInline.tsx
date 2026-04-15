@@ -109,7 +109,7 @@ export function AuditLogInline() {
           )}
 
           <Link
-            href="/dashboard/audit-log"
+            href="/dashboard/settings?tab=audit-log"
             style={{
               display: 'block',
               textAlign: 'center',

@@ -96,13 +96,16 @@ function TourCard({
   return (
     <div
       style={{
-        background: 'var(--bg-card, #FFFFFF)',
+        // NB: intentionally NOT using var(--bg-card) — that token is
+        // rgba(0,0,0,0.01) in light theme, which makes the tour card
+        // unreadable over Onborda's dimmed shadow. Solid white instead.
+        background: '#FFFFFF',
         border: '1px solid var(--border-color, #E2E8F0)',
         borderTop: '3px solid var(--accent-primary, #16A34A)',
         borderRadius: 12,
         padding: 20,
         maxWidth: 360,
-        boxShadow: '0 20px 48px rgba(15, 23, 42, 0.18)',
+        boxShadow: '0 20px 48px rgba(15, 23, 42, 0.28)',
         color: 'var(--text-primary, #0F172A)',
         fontFamily:
           "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif",

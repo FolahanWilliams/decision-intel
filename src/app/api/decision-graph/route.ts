@@ -51,13 +51,14 @@ export async function GET(req: NextRequest) {
         .filter(Boolean)
     : null;
 
-  if (!orgId) {
-    return NextResponse.json({ error: 'orgId is required' }, { status: 400 });
-  }
+  // orgId is optional. When omitted, the builder runs in personal scope
+  // (filters to documents owned by this user with no org). This unblocks
+  // solo Free/Individual users who never join an org but still want to
+  // see their Personal Decision History.
 
   try {
     const result = await buildDecisionGraph({
-      orgId,
+      orgId: orgId || null,
       userId: user.id,
       timeRangeDays: timeRange,
       highlightNodeId: highlightNode,

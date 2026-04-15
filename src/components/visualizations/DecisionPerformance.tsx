@@ -440,7 +440,7 @@ export default function DecisionPerformance() {
             </span>
           </div>
           <a
-            href="/outcomes/report"
+            href="/dashboard/outcome-flywheel"
             style={{
               color: CHART_COLORS.white,
               background: 'var(--bg-elevated)',

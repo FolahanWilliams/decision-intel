@@ -468,7 +468,7 @@ export default function CompliancePosturePage() {
             your compliance team for formal certification requirements. For enterprise audit packet
             generation, see{' '}
             <a
-              href="/dashboard/audit-log"
+              href="/dashboard/settings?tab=audit-log"
               style={{ color: 'var(--accent-primary)', textDecoration: 'none' }}
             >
               Audit Log{' '}

@@ -101,7 +101,8 @@ interface GraphStats {
 }
 
 interface DecisionKnowledgeGraphProps {
-  orgId: string;
+  /** Org-scope when set; null = personal scope (solo Free/Individual users) */
+  orgId: string | null;
   timeRange?: number;
   highlightNodeId?: string;
   onNodeSelect?: (nodeId: string, nodeType: string) => void;
@@ -211,7 +212,9 @@ export function DecisionKnowledgeGraph({
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
-    const params = new URLSearchParams({ orgId, timeRange: String(timeRange) });
+    const params = new URLSearchParams({ timeRange: String(timeRange) });
+    // Omit orgId when null — the API will scope to the user's personal documents.
+    if (orgId) params.set('orgId', orgId);
     if (highlightNodeId) {
       params.set('highlightNode', highlightNodeId);
       params.set('depth', '1');
