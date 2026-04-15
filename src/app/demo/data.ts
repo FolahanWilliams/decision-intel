@@ -1025,8 +1025,379 @@ export const DEMO_SERIES_B: DemoAnalysis = {
   },
 };
 
+// ─── Example 4: WeWork S-1 ────────────────────────────────────────────
+
+export const DEMO_WEWORK: DemoAnalysis = {
+  id: 'demo-wework-s1',
+  documentName:
+    'The We Company — Form S-1 Registration Statement: Strategic Rationale & Financial Disclosures (August 2019)',
+  shortName: 'WeWork S-1 Filing',
+  teaser:
+    'The IPO prospectus with 11 pre-decision biases the market caught in 30 days — and a $39B valuation reset.',
+  overallScore: 24,
+  noiseScore: 81,
+  createdAt: '2019-08-14T09:00:00Z',
+  summary:
+    'The We Company S-1 exhibits the most severe cognitive bias contamination of any contemporary public filing. Eleven pre-decision biases converge across valuation, governance, financial presentation, and market positioning. The $47B private valuation is anchored to SoftBank\u2019s earlier rounds rather than comparables. "Community-Adjusted EBITDA" cherry-picks metrics that frame a commercial real-estate arbitrage as a tech platform. Supervoting founder shares (20:1) combined with self-dealing transactions (building leases, "We" trademark sale) concentrate decision rights on a single person whose charisma masks operational fragility. The filing withdrew within 33 days and Adam Neumann was removed as CEO within 45.',
+  metaVerdict:
+    'REJECT \u2014 This IPO document contains catastrophic cognitive bias contamination across 11 dimensions that invalidate the underlying strategic rationale. The $47B valuation cannot survive cyclical stress-testing; the "tech company" framing is contradicted by an 83% gross lease obligation on a 10-year average tenor against flexible member agreements. Recommendations: (1) Re-anchor valuation to comparable real-estate arbitrage businesses (IWG trades at ~1.5x revenue, implying ~$4-6B), (2) Demand elimination of supervoting share structure and all related-party transactions, (3) Replace "Community-Adjusted EBITDA" with GAAP measures only, (4) Commission independent cyclical stress test assuming commercial real estate downturn, (5) Require documented dissenting views from non-executive directors.',
+  noiseStats: { mean: 81, stdDev: 18.4, variance: 338.56 },
+  noiseBenchmarks: [
+    { label: 'This Document', value: 81 },
+    { label: 'Tech IPO Average', value: 34 },
+    { label: 'Industry Best', value: 14 },
+  ],
+  biases: [
+    {
+      biasType: 'anchoring_bias',
+      severity: 'critical',
+      excerpt:
+        'Our most recent equity financing valued the Company at $47 billion on a pre-money basis, reflecting the transformative potential of our space-as-a-service platform.',
+      explanation:
+        'The $47B valuation anchors to SoftBank\u2019s January 2019 primary round rather than any public-market comparable. IWG plc, the only at-scale publicly-traded competitor, trades at ~1.5x revenue — implying WeWork is worth $4-6B on the same methodology. No DCF, precedent transaction, or peer-multiple analysis is offered to justify the private-round anchor.',
+      suggestion:
+        'Re-price from comparables: IWG (flexible workspace, at scale) and Boston Properties (commercial real-estate lessor). The $47B figure should be disclosed as an artifact of a specific private financing, not a market valuation.',
+      confidence: 0.96,
+    },
+    {
+      biasType: 'confirmation_bias',
+      severity: 'critical',
+      excerpt:
+        'Community-Adjusted EBITDA, a key metric we use to evaluate our performance, was $467 million for the year ended December 31, 2018.',
+      explanation:
+        'The filing introduces "Community-Adjusted EBITDA" — a non-GAAP metric that excludes core operating costs including marketing, G&A, and building-level operating expenses. GAAP operating loss for 2018 was $1.69B. The custom metric systematically cherry-picks inputs that confirm a "path to profitability" narrative while omitting the structural economics (lease obligations at 10-year average tenor versus flexible member agreements) that make profitability architecturally difficult.',
+      suggestion:
+        'Strike all non-GAAP "community-adjusted" metrics from the investor communication. Require presentation using GAAP operating income and a cash-burn runway calculation that includes minimum lease payments.',
+      confidence: 0.95,
+    },
+    {
+      biasType: 'narrative_fallacy',
+      severity: 'critical',
+      excerpt:
+        'Our mission is to elevate the world\u2019s consciousness. We have built a worldwide platform that supports growth, shared experiences and true success.',
+      explanation:
+        'The "elevate the world\u2019s consciousness" framing reframes a commercial real-estate arbitrage (long-term leases sublet short-term) as a consciousness-raising mission. Mission-coded language is consistently invoked where financial disclosures would be expected, creating a narrative scaffold that makes the business resistant to ordinary accounting scrutiny.',
+      suggestion:
+        'Require the S-1 narrative sections to be replaced with factual descriptions of the business model: "We lease commercial real estate on long-term contracts and sublet it on short-term member agreements." Any mission language must be supported by a measurable outcome metric.',
+      confidence: 0.92,
+    },
+    {
+      biasType: 'halo_effect',
+      severity: 'high',
+      excerpt:
+        'Our Founder and Chief Executive Officer, Adam Neumann, has an unrivaled vision for what our company can become and the role it can play in the world.',
+      explanation:
+        'Executive biographical framing emphasizes "unrivaled vision" across 15+ occurrences in the S-1 while governance red flags (supervoting shares at 20:1, trust structure surviving founder\u2019s death, related-party real-estate leases to entities controlled by Neumann, $5.9M paid to acquire the "We" trademark from Neumann) are disclosed but not contextualized. Positive founder attributes halo onto operational judgment that independent directors should evaluate separately.',
+      suggestion:
+        'Require the S-1 to group all founder-related transactions into a single "Related-Party Risks" section with aggregate dollar exposure. Separate founder vision from operational-execution capability in the risk factors.',
+      confidence: 0.89,
+    },
+    {
+      biasType: 'overconfidence_bias',
+      severity: 'high',
+      excerpt:
+        'We believe the addressable market for our core Space-as-a-Service membership offering in the 280 target cities is $1.6 trillion.',
+      explanation:
+        'The $1.6 trillion TAM is computed by multiplying office-worker counts across 280 cities by average occupancy costs, with no adjustment for penetration realism, competitive capture, or cyclical compression. WeWork\u2019s 2018 revenue ($1.82B) implies a 0.1% share of this TAM — the framing makes hypergrowth feel easy when the structural limits (lease capacity, build-out pace, churn-adjusted LTV) make it architecturally constrained.',
+      suggestion:
+        'Present TAM adjusted for realistic penetration ceilings (e.g., IWG at peak achieved <1% of its TAM globally). Include a sensitivity chart showing revenue under 0.5%, 1%, and 2% penetration scenarios with corresponding capital requirements.',
+      confidence: 0.91,
+    },
+    {
+      biasType: 'authority_bias',
+      severity: 'high',
+      excerpt:
+        'Our high-vote stock structure ensures that our founder continues to provide visionary leadership as we execute on our long-term strategy.',
+      explanation:
+        'The dual-class share structure grants 20 votes per share to Neumann-held stock versus 1 vote per public share, providing concentrated decision authority with no external accountability. The framing ("ensures founder provides visionary leadership") treats governance concentration as a feature rather than a risk. Post-IPO public shareholders would hold <2% of voting power despite holding a majority of economic interest.',
+      suggestion:
+        'Require standard 1:1 voting structure or disclose voting concentration prominently in the summary risk factors. Benchmark against Facebook (10:1, widely criticized) and Google (10:1, lost GIC investor over it) as the upper bounds of acceptable governance concentration.',
+      confidence: 0.90,
+    },
+    {
+      biasType: 'sunk_cost_fallacy',
+      severity: 'high',
+      excerpt:
+        'We have invested $12.8 billion to build our global community platform — capital that positions us for the next phase of growth.',
+      explanation:
+        'Prior invested capital ($12.8B across SoftBank and preceding rounds) is framed as a foundation that justifies the IPO valuation and continued capital absorption. This is classic sunk cost reasoning: past expenditure does not establish forward value. Comparable analysis would ask what the business is worth to a buyer who has spent $0 previously.',
+      suggestion:
+        'Reframe as a clean-sheet valuation: "If a new buyer acquired this business today with no prior investment, what would it be worth?" This exercise typically produces valuations 70-80% below the cumulative-invested-capital framing.',
+      confidence: 0.88,
+    },
+    {
+      biasType: 'illusion_of_control',
+      severity: 'high',
+      excerpt:
+        'Our member experience is designed and operated entirely by us, giving us full control over the quality and consistency of community value we deliver.',
+      explanation:
+        'The filing claims operational control over the member experience while omitting that the underlying real-estate economics are entirely determined by commercial-office market cycles. WeWork is exposed to occupancy risk, build-out cost inflation, and municipal lease regulations — none of which it controls. The "full control" language creates a false sense of operational resilience.',
+      suggestion:
+        'Add a dedicated section quantifying exogenous risk factors: percent of portfolio in rent-controlled markets, blended lease duration, build-out cost volatility, and occupancy sensitivity to GDP. Avoid "control" language where cyclical dependency exists.',
+      confidence: 0.86,
+    },
+    {
+      biasType: 'optimism_bias',
+      severity: 'medium',
+      excerpt:
+        'As we scale, we expect significant operating leverage from fixed cost absorption and a continued trajectory toward profitability.',
+      explanation:
+        'Profitability projections assume simultaneous (1) revenue growth continuing at 100%+ YoY, (2) gross margin improvement of 500-700 bps, (3) G&A leverage of 15%+ of revenue, and (4) no cyclical commercial-real-estate disruption. Each assumption is plausible in isolation; their joint probability is not disclosed. Historically, businesses that require all of multiple concurrent improvements to hit projections miss on at least one.',
+      suggestion:
+        'Present a joint-probability sensitivity: what is the probability of hitting all four improvements simultaneously, given base rates from comparable businesses? Include a downside scenario where only two of the four improvements materialize.',
+      confidence: 0.83,
+    },
+    {
+      biasType: 'bandwagon_effect',
+      severity: 'medium',
+      excerpt:
+        'We are a community company committed to maximum global impact, similar to how Airbnb has redefined hospitality and Uber has redefined transportation.',
+      explanation:
+        'The S-1 positions WeWork alongside Airbnb (peer-to-peer hospitality) and Uber (peer-to-peer transportation) to inherit their valuation frameworks. The underlying business models differ categorically: Airbnb and Uber are asset-light marketplace businesses; WeWork owns long-dated lease liabilities. The peer-group framing is chosen to justify valuation multiples the actual business does not earn on its own economics.',
+      suggestion:
+        'Force explicit peer-set disclosure based on operational similarity: IWG (flexible workspace, real-estate-heavy), Realogy (real-estate services), Boston Properties (commercial lessor). Disclose how the proposed valuation multiple compares to each.',
+      confidence: 0.85,
+    },
+    {
+      biasType: 'survivorship_bias',
+      severity: 'medium',
+      excerpt:
+        'Building on the success of our core membership offering, we have expanded into adjacent categories including WeLive, WeGrow, Powered by We, and our strategic investments portfolio.',
+      explanation:
+        'The filing presents adjacent-category expansion (WeLive residential, WeGrow education, Powered by We enterprise, Meetup acquisition) as evidence of platform leverage. The base rate of successful horizontal expansion at pre-IPO scale is historically <25%. No evidence is presented that these adjacencies have achieved unit economics comparable to the core — in fact, WeLive had 2 locations after 4 years and WeGrow served ~100 students.',
+      suggestion:
+        'Require disclosure of unit economics for each adjacency separately. Treat expansion-as-validation framing as a bias signal rather than evidence of platform leverage until independent financials demonstrate comparable margins.',
+      confidence: 0.81,
+    },
+  ],
+  simulation: {
+    overallVerdict: 'REJECT',
+    twins: [
+      {
+        name: 'CFO Alex',
+        role: 'Financial Rigor',
+        vote: 'REJECT',
+        confidence: 0.95,
+        rationale:
+          'GAAP operating loss of $1.69B on $1.82B revenue. The "Community-Adjusted EBITDA" metric systematically excludes the largest recurring costs. The $47B valuation implies 26x revenue — IWG, the only comparable at-scale operator, trades at ~1.5x. The valuation is unsupportable under any conventional framework.',
+      },
+      {
+        name: 'Governance Director Maya',
+        role: 'Board Oversight',
+        vote: 'REJECT',
+        confidence: 0.94,
+        rationale:
+          'Supervoting shares (20:1), founder trust surviving death, related-party real-estate leases, and the $5.9M "We" trademark payment to Neumann collectively represent the most concentrated governance structure in a contemporary major IPO. No independent director could exercise meaningful oversight under this architecture.',
+      },
+      {
+        name: 'Real-Estate Specialist James',
+        role: 'Sector Benchmark',
+        vote: 'REJECT',
+        confidence: 0.89,
+        rationale:
+          'Average lease tenor of 10+ years against month-to-month member agreements creates severe cyclical exposure. The occupancy sensitivity to GDP is not disclosed. A 20% GDP contraction in any major market produces a revenue shortfall the capital structure cannot absorb.',
+      },
+      {
+        name: 'Growth Advocate Priya',
+        role: 'Opportunity Assessment',
+        vote: 'CONDITIONAL APPROVE',
+        confidence: 0.38,
+        rationale:
+          'The core flexible-workspace thesis is valid and has category growth ahead. However, conditional on: (1) valuation reset to $6-8B, (2) elimination of supervoting shares, (3) removal of all adjacencies, (4) founder transitioning out of CEO role. Without these four conditions, cannot approve.',
+      },
+    ],
+  },
+  logicalFallacies: [
+    {
+      name: 'Equivocation',
+      severity: 'critical',
+      excerpt: '"Community-Adjusted EBITDA"',
+      explanation:
+        'Uses the word "EBITDA" — which has a standardized accounting definition — then redefines it to exclude operating costs that are unambiguously operating costs. Trading on the term\u2019s established meaning while substituting a custom definition is a textbook equivocation fallacy.',
+      score: 22,
+    },
+    {
+      name: 'False Analogy',
+      severity: 'high',
+      excerpt: '"similar to how Airbnb has redefined hospitality and Uber has redefined transportation"',
+      explanation:
+        'The analogy maps WeWork (capital-intensive, long-lease liability) onto asset-light marketplace platforms (Airbnb, Uber). The operational economics differ categorically; the analogy exists to inherit valuation multiples without earning them.',
+      score: 30,
+    },
+    {
+      name: 'Appeal to Emotion',
+      severity: 'medium',
+      excerpt: '"elevate the world\u2019s consciousness"',
+      explanation:
+        'Mission-coded language substitutes for business-model description in an SEC filing. The emotional framing makes ordinary accounting scrutiny feel reductive or hostile to a valid purpose.',
+      score: 38,
+    },
+  ],
+  swot: {
+    strengths: [
+      'Category leadership in flexible workspace — largest private operator globally',
+      'Brand recognition disproportionate to revenue scale',
+      'Portfolio of prime real-estate locations in 100+ cities',
+    ],
+    weaknesses: [
+      'GAAP operating loss of $1.69B on $1.82B revenue (2018)',
+      '83% of forward obligations are fixed-rate lease payments with 10+ year average tenor',
+      'Member agreements are short-dated (many month-to-month), creating severe duration mismatch',
+      'Dual-class share structure excludes public shareholders from governance',
+    ],
+    opportunities: [
+      'Enterprise (Powered by We) segment has validated 50%+ gross margins in pilot locations',
+      'Flexible workspace secular growth (~15% category CAGR)',
+      'International markets still under-penetrated',
+    ],
+    threats: [
+      'Commercial real-estate downturn would expose duration mismatch immediately',
+      'IWG plc trades at ~1.5x revenue — the public-market anchor for the sector',
+      'Adjacency businesses (WeLive, WeGrow) consume capital without validated unit economics',
+      'Founder governance structure may prevent critical course corrections',
+    ],
+    strategicAdvice:
+      'Pursue the core flexible-workspace thesis at appropriate valuation (~$6-8B). Divest all adjacencies. Eliminate supervoting shares. Replace founder with operator CEO. The business is viable; the filing architecture is not.',
+  },
+  compliance: {
+    frameworks: [
+      {
+        name: 'SEC Regulation S-K',
+        status: 'non_compliant',
+        score: 28,
+        findings: [
+          'Non-GAAP "Community-Adjusted EBITDA" does not reconcile to GAAP operating income in the required format',
+          'Related-party transactions disclosed but not aggregated or presented with risk assessment',
+          'Dual-class share structure justifications lack comparable peer benchmarking',
+        ],
+      },
+      {
+        name: 'NYSE Corporate Governance',
+        status: 'non_compliant',
+        score: 31,
+        findings: [
+          'Independent director composition inadequate for founder-dominated voting structure',
+          'Related-party transaction approval process not documented',
+          'Audit committee independence compromised by founder-controlled board composition',
+        ],
+      },
+      {
+        name: 'Sarbanes-Oxley Section 404',
+        status: 'partial',
+        score: 58,
+        findings: [
+          'Internal controls framework exists but cyclical stress-testing not documented',
+          'Revenue recognition policy for member agreements adequate but lease obligation disclosure insufficient',
+        ],
+      },
+    ],
+    overallRisk:
+      'The filing presents severe regulatory risk across governance and non-GAAP disclosure dimensions. The SEC review process is likely to require material revisions before effectiveness, and the governance structure may not satisfy NYSE listing requirements without material amendment.',
+  },
+  preMortem: {
+    scenarios: [
+      {
+        title: 'Valuation Reset During SEC Review',
+        probability: 0.75,
+        impact: 'catastrophic',
+        description:
+          'Public-market scrutiny during the SEC review period forces repricing from $47B to $8-15B, triggering employee equity repricing, loss of institutional anchor orders, and potential withdrawal of filing. IPO postponed or cancelled.',
+      },
+      {
+        title: 'Founder Governance Crisis',
+        probability: 0.60,
+        impact: 'severe',
+        description:
+          'Institutional investor opposition to supervoting shares and related-party transactions forces founder CEO to exit. Board transition creates 6-12 month strategic uncertainty, delaying operational execution on core flexible-workspace thesis.',
+      },
+      {
+        title: 'Commercial Real-Estate Downturn',
+        probability: 0.40,
+        impact: 'catastrophic',
+        description:
+          'GDP contraction in major markets (US coastal cities, London, Tel Aviv) produces 15-25% occupancy decline while lease obligations remain fixed. Duration mismatch consumes remaining cash reserves; requires distressed equity raise at 80-90% discount.',
+      },
+    ],
+  },
+  intelligence: {
+    recallScore: 94,
+    similarCases: [
+      {
+        title: 'Regus (now IWG) near-bankruptcy (2003)',
+        outcome: 'NEAR-FAILURE',
+        similarity: 0.92,
+        lesson:
+          'The flexible-workspace duration mismatch (long leases vs. flexible memberships) caused Regus to file for US Chapter 11 protection when the 2001 recession hit. Recovery required complete recapitalization. WeWork has the identical structural exposure.',
+      },
+      {
+        title: 'Theranos (2015-2018)',
+        outcome: 'FAILURE',
+        similarity: 0.71,
+        lesson:
+          'Mission-coded narrative ("democratize healthcare") substituted for operational and financial transparency. Founder supervoting control prevented internal course correction. Private-market valuation ($9B peak) disconnected from underlying economics.',
+      },
+      {
+        title: 'Blue Apron IPO (2017)',
+        outcome: 'FAILURE',
+        similarity: 0.58,
+        lesson:
+          'Private valuation ($2B) did not survive public-market scrutiny. Shares lost 50% in six months as public investors applied conventional unit-economics frameworks the private-round narrative had been insulated from.',
+      },
+    ],
+    recognitionCues: [
+      {
+        title: 'Founder Halo + Supervoting Shares + Related-Party Transactions',
+        description:
+          'This three-way combination is the canonical "governance failure" signature in pre-IPO filings. Historical base rate: 80%+ result in material post-IPO governance intervention (founder transition, board restructuring, or going-private transaction).',
+        similarity: 0.94,
+      },
+      {
+        title: 'Non-GAAP Metric as Primary Performance Indicator',
+        description:
+          'When management introduces a custom non-GAAP metric ("Community-Adjusted EBITDA") and emphasizes it over GAAP equivalents in the S-1, the base rate of material restatement or SEC intervention within 24 months is ~65%.',
+        similarity: 0.89,
+      },
+    ],
+    patternMatch:
+      'This closely resembles the "Mission-Coded Governance Concentration" archetype. Historical comparables (Theranos, Uber pre-governance-reset, Facebook\u2019s 2012 IPO controversy) all required post-filing governance intervention before business stabilization.',
+  },
+  toxicCombinations: [
+    {
+      name: 'Mission Shield',
+      biases: ['Narrative Fallacy', 'Halo Effect', 'Appeal to Emotion'],
+      riskLevel: 'critical',
+      description:
+        '"Elevating the world\u2019s consciousness" framing combined with founder halo makes operational scrutiny feel hostile to a valid purpose. The three-way combination disarms the analytical apparatus that would normally challenge governance and financial disclosures.',
+      historicalExample:
+        'Theranos used the same pattern ("democratize healthcare") to shield board-level financial disclosures for years before public collapse.',
+    },
+    {
+      name: 'Valuation Isolation',
+      biases: ['Anchoring Bias', 'Bandwagon Effect', 'Sunk Cost Fallacy'],
+      riskLevel: 'critical',
+      description:
+        'Private-round valuation ($47B) anchors to SoftBank framework, bandwagon framing inherits Airbnb/Uber multiples, and sunk-cost framing invokes $12.8B prior investment as justification — together producing a valuation insulated from public-market comparables.',
+      historicalExample:
+        'Blue Apron\u2019s $2B private valuation survived inside its round-to-round narrative but lost 50% within six months of public scrutiny.',
+    },
+    {
+      name: 'Governance Opacity',
+      biases: ['Authority Bias', 'Illusion of Control', 'Overconfidence Bias'],
+      riskLevel: 'critical',
+      description:
+        '20:1 supervoting founder shares combined with "visionary leadership" framing and overconfident TAM projections create a governance structure that cannot self-correct. The founder has both the authority and the confidence to reject all dissenting input, while the board structure removes independent accountability.',
+    },
+  ],
+  outcome: {
+    what: 'IPO withdrawn September 30, 2019. Adam Neumann removed as CEO on September 24 (6 days after S-1 filing). SoftBank intervened with $9.5B bailout package. Valuation reset to $8B.',
+    when: 'September 2019 — 33 days after S-1 filing',
+    impact:
+      '$39B valuation destruction in 33 days. Subsequent SPAC merger in October 2021 valued the company at $9B. Filed for Chapter 11 bankruptcy on November 6, 2023 — the single largest valuation reversal of a private-market darling in US capital markets history.',
+  },
+};
+
 // Combined list for the demo selector
-export const DEMO_ANALYSES: DemoAnalysis[] = [DEMO_NOKIA, DEMO_PHOENIX, DEMO_SERIES_B];
+export const DEMO_ANALYSES: DemoAnalysis[] = [DEMO_NOKIA, DEMO_WEWORK, DEMO_PHOENIX, DEMO_SERIES_B];
 
 // Backwards compatibility
 export const DEMO_ANALYSIS = DEMO_NOKIA;

@@ -74,6 +74,8 @@ function synthesizeMemoBody(analysis: DemoAnalysis, header: string): string {
 const HEADERS: Record<string, string> = {
   'demo-nokia-acquisition':
     'MEMORANDUM — BOARD OF DIRECTORS\nSubject: Strategic Rationale for Nokia Devices & Services Acquisition\nClassification: CONFIDENTIAL',
+  'demo-wework-s1':
+    'THE WE COMPANY — FORM S-1 REGISTRATION STATEMENT\nStrategic Rationale & Financial Disclosures\nFiled: August 14, 2019\nClassification: PUBLIC (SEC EDGAR)',
   'demo-phoenix-expansion':
     'STRATEGIC INITIATIVE PROPOSAL\nProject Phoenix — European Market Expansion\nPrepared for: Executive Leadership Team\nClassification: INTERNAL USE ONLY',
   'demo-meridian-series-b':
@@ -82,6 +84,7 @@ const HEADERS: Record<string, string> = {
 
 const PARTICIPANTS: Record<string, string[]> = {
   'demo-nokia-acquisition': ['Steve Ballmer', 'Kevin Turner', 'Amy Hood', 'Craig Mundie'],
+  'demo-wework-s1': ['Adam Neumann', 'Artie Minson', 'Masayoshi Son', 'Bruce Dunlevie'],
   'demo-phoenix-expansion': ['Jordan Park', 'Alex Chen', 'Morgan Rios', 'Taylor Kim'],
   'demo-meridian-series-b': ['Riley Donovan', 'Sam Okafor', 'Priya Venkatesan', 'David Cho'],
 };
@@ -95,6 +98,21 @@ const OUTCOMES: Record<string, CorpusEntry['seedOutcome']> = {
     notes:
       'Sample data — mirrors the real Microsoft write-down of $7.6B on the Nokia Devices & Services acquisition (July 2015). Kept as a worked example so the calibration flywheel has signal from day one.',
     confirmedBiases: ['anchoring_bias', 'sunk_cost_fallacy', 'overconfidence_bias'],
+  },
+  // WeWork S-1 — withdrawn within 33 days; SoftBank bailout; eventual 2023 bankruptcy
+  'demo-wework-s1': {
+    outcome: 'failure',
+    timeframe: '1-3 months',
+    impactScore: -10,
+    notes:
+      'Sample data — mirrors the real WeWork S-1 withdrawal (September 30, 2019), $39B valuation reset in 33 days, Neumann removal, $9.5B SoftBank bailout, and ultimate Chapter 11 bankruptcy in November 2023. Kept as a worked example so the calibration flywheel has signal on the largest contemporary private-to-public valuation reversal.',
+    confirmedBiases: [
+      'anchoring_bias',
+      'confirmation_bias',
+      'narrative_fallacy',
+      'halo_effect',
+      'authority_bias',
+    ],
   },
   // Fictional expansion proposal — failure mode matches the bias profile
   'demo-phoenix-expansion': {
@@ -121,9 +139,11 @@ export function getSeedCorpus(): CorpusEntry[] {
       documentType:
         analysis.id === 'demo-nokia-acquisition'
           ? 'm_and_a_memo'
-          : analysis.id === 'demo-phoenix-expansion'
-            ? 'strategy_proposal'
-            : 'ic_memo',
+          : analysis.id === 'demo-wework-s1'
+            ? 's1_filing'
+            : analysis.id === 'demo-phoenix-expansion'
+              ? 'strategy_proposal'
+              : 'ic_memo',
       documentContent: synthesizeMemoBody(analysis, header),
       analysis,
       seedOutcome: OUTCOMES[analysis.id],
