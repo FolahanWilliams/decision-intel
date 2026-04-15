@@ -9,8 +9,14 @@ import { prisma } from '@/lib/prisma';
 import { GoogleGenerativeAI, TaskType } from '@google/generative-ai';
 import { getRequiredEnvVar } from '@/lib/env';
 import { createLogger } from '@/lib/utils/logger';
+import { getCachedEmbedding, cacheEmbedding } from '@/lib/utils/cache';
+import { createHash } from 'crypto';
 
 const log = createLogger('Embeddings');
+
+function hashEmbeddingInput(text: string): string {
+  return createHash('sha256').update(text).digest('hex');
+}
 
 // Lazy initialization of Gemini client
 let genAI: GoogleGenerativeAI | null = null;
@@ -135,6 +141,14 @@ export async function generateEmbedding(text: string): Promise<number[]> {
     // Truncate text to avoid token limits (roughly 8k tokens ~ 32k chars)
     const truncatedText = text.slice(0, 30000);
 
+    // Check cache first — pre-warmed on upload, hit saves a Gemini round-trip
+    // during the analysis pipeline's RAG query (typically 300-800ms).
+    const cacheKey = hashEmbeddingInput(truncatedText);
+    const cached = await getCachedEmbedding(cacheKey).catch(() => null);
+    if (cached && cached.length === 1536) {
+      return cached;
+    }
+
     const result = await model.embedContent({
       content: { role: 'user', parts: [{ text: truncatedText }] },
       taskType: TaskType.RETRIEVAL_DOCUMENT,
@@ -150,6 +164,10 @@ export async function generateEmbedding(text: string): Promise<number[]> {
       );
     }
 
+    void cacheEmbedding(cacheKey, embedding).catch(err =>
+      log.warn('Embedding cache write failed:', err)
+    );
+
     return embedding;
   } catch (error) {
     log.error('Embedding generation failed:', error);
@@ -158,6 +176,21 @@ export async function generateEmbedding(text: string): Promise<number[]> {
     throw new Error(
       `Failed to generate embedding: ${error instanceof Error ? error.message : String(error)}`
     );
+  }
+}
+
+/**
+ * Pre-warm the embedding cache for a document's content. Safe to call
+ * fire-and-forget — failures are logged but never thrown. Intended for
+ * use inside Next.js `after()` so the upload response returns immediately
+ * while the embedding warms up in the background.
+ */
+export async function prewarmDocumentEmbedding(content: string): Promise<void> {
+  try {
+    if (!content?.trim()) return;
+    await generateEmbedding(content);
+  } catch (err) {
+    log.warn('Embedding pre-warm failed (non-critical):', err);
   }
 }
 

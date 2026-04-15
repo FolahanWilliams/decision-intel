@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { after } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import path from 'path';
 import { createClient } from '@/utils/supabase/server';
@@ -10,6 +11,7 @@ import { createLogger } from '@/lib/utils/logger';
 import { encryptDocumentContent, isDocumentEncryptionEnabled } from '@/lib/utils/encryption';
 import { logAudit } from '@/lib/audit';
 import { isFileTypeSupported, FILE_TYPE_LABELS } from '@/lib/constants/file-types';
+import { prewarmDocumentEmbedding } from '@/lib/rag/embeddings';
 
 const log = createLogger('UploadRoute');
 
@@ -320,6 +322,11 @@ export async function POST(request: NextRequest) {
         dealId: dealId || undefined,
       },
     });
+
+    // Pre-warm embedding cache so the analysis pipeline's RAG query
+    // hits a warm entry instead of paying the Gemini round-trip live.
+    // `after()` keeps the serverless invocation alive past the response.
+    after(prewarmDocumentEmbedding(content));
 
     return NextResponse.json({
       id: document.id,
