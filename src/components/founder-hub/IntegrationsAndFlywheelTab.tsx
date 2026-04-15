@@ -9,12 +9,237 @@ import {
   Network,
   TrendingUp,
   Users,
+  CheckCircle2,
+  Circle,
+  ExternalLink,
+  Loader2,
 } from 'lucide-react';
+import useSWR from 'swr';
+import Link from 'next/link';
 import { card, sectionTitle, badge } from '@/components/founder-hub/shared-styles';
+
+const statusFetcher = (url: string) =>
+  fetch(url).then(r => (r.ok ? r.json() : null));
+
+type SlackStatus = { connected?: boolean; teamName?: string; installedAt?: string };
+type DriveStatus = { connected?: boolean; driveEmail?: string; monitoredFolders?: string[] };
+type EmailStatus = { token?: string | null; address?: string | null };
+
+function StatusTile({
+  icon,
+  label,
+  color,
+  state,
+  detail,
+  href,
+  cta,
+  external,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  color: string;
+  state: 'connected' | 'disconnected' | 'loading' | 'available';
+  detail: string;
+  href: string;
+  cta: string;
+  external?: boolean;
+}) {
+  const stateColor =
+    state === 'connected' ? '#22c55e' : state === 'loading' ? '#6b7280' : 'var(--text-muted)';
+  const StateIcon =
+    state === 'loading' ? Loader2 : state === 'connected' ? CheckCircle2 : Circle;
+
+  return (
+    <div
+      style={{
+        padding: 14,
+        borderRadius: 10,
+        background: 'var(--bg-card, #fff)',
+        border: '1px solid var(--border-primary, #e5e7eb)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 10,
+        minHeight: 128,
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ color }}>{icon}</span>
+        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
+          {label}
+        </span>
+        <span style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+          <StateIcon
+            size={14}
+            style={{
+              color: stateColor,
+              animation: state === 'loading' ? 'spin 1s linear infinite' : undefined,
+            }}
+          />
+          <span style={{ fontSize: 11, fontWeight: 600, color: stateColor }}>
+            {state === 'connected'
+              ? 'Connected'
+              : state === 'loading'
+                ? 'Checking…'
+                : state === 'available'
+                  ? 'Available'
+                  : 'Not connected'}
+          </span>
+        </span>
+      </div>
+      <div
+        style={{
+          fontSize: 11,
+          color: 'var(--text-muted)',
+          lineHeight: 1.5,
+          flex: 1,
+        }}
+      >
+        {detail}
+      </div>
+      {external ? (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            fontSize: 12,
+            fontWeight: 600,
+            color: 'var(--accent-primary, #16A34A)',
+            textDecoration: 'none',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+          }}
+        >
+          {cta} <ExternalLink size={11} />
+        </a>
+      ) : (
+        <Link
+          href={href}
+          style={{
+            fontSize: 12,
+            fontWeight: 600,
+            color: 'var(--accent-primary, #16A34A)',
+            textDecoration: 'none',
+          }}
+        >
+          {cta} →
+        </Link>
+      )}
+    </div>
+  );
+}
+
+function IntegrationStatusTiles() {
+  const { data: slack, isLoading: slackLoading } = useSWR<SlackStatus>(
+    '/api/integrations/slack/status',
+    statusFetcher,
+    { revalidateOnFocus: false }
+  );
+  const { data: drive, isLoading: driveLoading } = useSWR<DriveStatus>(
+    '/api/integrations/google/config',
+    statusFetcher,
+    { revalidateOnFocus: false }
+  );
+  const { data: email, isLoading: emailLoading } = useSWR<EmailStatus>(
+    '/api/integrations/email/token',
+    statusFetcher,
+    { revalidateOnFocus: false }
+  );
+
+  const slackState: 'connected' | 'disconnected' | 'loading' = slackLoading
+    ? 'loading'
+    : slack?.connected
+      ? 'connected'
+      : 'disconnected';
+  const folderCount = drive?.monitoredFolders?.length ?? 0;
+  const driveState: 'connected' | 'disconnected' | 'loading' = driveLoading
+    ? 'loading'
+    : drive?.connected
+      ? 'connected'
+      : 'disconnected';
+  const emailState: 'connected' | 'disconnected' | 'loading' = emailLoading
+    ? 'loading'
+    : email?.address
+      ? 'connected'
+      : 'disconnected';
+
+  return (
+    <div style={{ ...card, marginBottom: 20 }}>
+      <div style={sectionTitle}>
+        <Zap size={18} style={{ color: 'var(--accent-primary, #16A34A)' }} /> Live Connection Status
+      </div>
+      <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 14 }}>
+        Real-time status of your integrations. Click any tile to connect or manage in Settings.
+      </p>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+          gap: 10,
+        }}
+      >
+        <StatusTile
+          icon={<MessageSquare size={16} />}
+          label="Slack"
+          color="#4A154B"
+          state={slackState}
+          detail={
+            slackState === 'connected'
+              ? slack?.teamName
+                ? `${slack.teamName} — /di commands & thread analysis live.`
+                : '/di commands, thread analysis, and nudges are live.'
+              : 'Connect to enable /di commands and thread analysis.'
+          }
+          href="/dashboard/settings/integrations"
+          cta={slackState === 'connected' ? 'Manage' : 'Connect'}
+        />
+        <StatusTile
+          icon={<HardDrive size={16} />}
+          label="Google Drive"
+          color="#4285F4"
+          state={driveState}
+          detail={
+            driveState === 'connected'
+              ? `${folderCount} folder${folderCount === 1 ? '' : 's'} watched, polled every 10 min.`
+              : 'Connect Drive to auto-analyze new memos in watched folders.'
+          }
+          href="/dashboard/settings/integrations"
+          cta={driveState === 'connected' ? 'Manage folders' : 'Connect Drive'}
+        />
+        <StatusTile
+          icon={<Mail size={16} />}
+          label="Email Forwarding"
+          color="#16A34A"
+          state={emailState}
+          detail={
+            emailState === 'connected' && email?.address
+              ? `Forward to ${email.address}`
+              : 'Generate a unique forwarding address to analyze by email.'
+          }
+          href="/dashboard/settings/integrations"
+          cta={emailState === 'connected' ? 'Manage address' : 'Generate address'}
+        />
+        <StatusTile
+          icon={<Zap size={16} />}
+          label="Browser Extension"
+          color="#f59e0b"
+          state="available"
+          detail="Quick-score any webpage in <5s. Install from the Chrome Web Store."
+          href="https://chrome.google.com/webstore"
+          cta="Install extension"
+          external
+        />
+      </div>
+    </div>
+  );
+}
 
 export function IntegrationsAndFlywheelTab() {
   return (
     <div>
+      <IntegrationStatusTiles />
+
       {/* Slack */}
       <div style={{ ...card, borderTop: '3px solid #4A154B' }}>
         <div style={sectionTitle}>
