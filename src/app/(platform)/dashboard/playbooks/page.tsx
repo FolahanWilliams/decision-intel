@@ -141,32 +141,14 @@ function PlaybooksPageContent() {
   };
 
   return (
-    <div style={{ padding: '32px 24px', maxWidth: 960, margin: '0 auto' }}>
-      {/* Header */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: 24,
-        }}
-      >
+    <div style={{ maxWidth: 960, margin: '0 auto' }}>
+      {/* Header — shared .page-header rhythm */}
+      <div className="page-header">
         <div>
-          <h1
-            style={{
-              fontSize: 22,
-              fontWeight: 700,
-              color: 'var(--text-primary)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              margin: 0,
-            }}
-          >
-            <BookTemplate size={22} />
-            Decision Playbooks
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.03em', margin: 0 }}>
+            <span className="text-gradient">Decision Playbooks</span>
           </h1>
-          <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
+          <p className="page-subtitle" style={{ maxWidth: 640 }}>
             Pre-configured audit templates for the strategic memos your team runs most: market
             entries, acquisitions, capital allocations, and board reviews. Each playbook tunes the
             bias taxonomy, simulation personas, and compliance frameworks to the decision type.
@@ -174,20 +156,8 @@ function PlaybooksPageContent() {
         </div>
         <button
           onClick={() => setShowCreate(true)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            padding: '8px 16px',
-            background: 'var(--accent)',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 8,
-            fontSize: 13,
-            fontWeight: 600,
-            cursor: 'pointer',
-            whiteSpace: 'nowrap',
-          }}
+          className="btn btn-primary"
+          style={{ gap: 8, whiteSpace: 'nowrap' }}
         >
           <Plus size={16} />
           New Playbook
@@ -398,9 +368,9 @@ function PlaybooksPageContent() {
                               fontSize: 11,
                               padding: '3px 8px',
                               borderRadius: 4,
-                              background: 'rgba(59, 130, 246, 0.08)',
-                              color: '#60a5fa',
-                              border: '1px solid rgba(59, 130, 246, 0.15)',
+                              background: 'var(--bg-tertiary)',
+                              color: 'var(--text-secondary)',
+                              border: '1px solid var(--border-color)',
                             }}
                           >
                             {fw.replace(/_/g, ' ')}

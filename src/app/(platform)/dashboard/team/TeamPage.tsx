@@ -214,14 +214,15 @@ export default function TeamPage() {
               width: 64,
               height: 64,
               margin: '0 auto var(--spacing-lg)',
-              background: 'rgba(255, 255, 255, 0.06)',
+              background: 'rgba(22, 163, 74, 0.10)',
+              border: '1px solid rgba(22, 163, 74, 0.22)',
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Users size={28} style={{ color: 'var(--text-secondary)' }} />
+            <Users size={28} style={{ color: 'var(--accent-primary)' }} />
           </div>
           <h2 style={{ marginBottom: 'var(--spacing-sm)' }}>Create Your Team</h2>
           <p className="text-muted" style={{ maxWidth: 440, margin: '0 auto var(--spacing-xl)' }}>
@@ -261,56 +262,57 @@ export default function TeamPage() {
       <Breadcrumbs items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Team' }]} />
 
       {/* Header */}
-      <header className="mb-lg">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-md">
-            <div
-              style={{
-                width: 48,
-                height: 48,
-                background:
-                  'linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.06))',
-                borderRadius: '14px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '20px',
-                fontWeight: 700,
-                color: '#fff',
-              }}
-            >
-              {org.name.charAt(0).toUpperCase()}
-            </div>
-            <div>
-              <h1 style={{ marginBottom: '2px' }}>{org.name}</h1>
-              <p className="text-muted text-xs">
-                {org.members.length} member{org.members.length !== 1 ? 's' : ''} &middot; /
-                {org.slug}
-              </p>
-            </div>
+      <header className="page-header">
+        <div className="flex items-center gap-md">
+          <div
+            style={{
+              width: 48,
+              height: 48,
+              background: 'var(--accent-gradient)',
+              borderRadius: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '20px',
+              fontWeight: 700,
+              color: '#fff',
+              flexShrink: 0,
+            }}
+          >
+            {org.name.charAt(0).toUpperCase()}
           </div>
-          {isAdmin && (
-            <button
-              className="btn btn-primary flex items-center gap-sm"
-              onClick={() => {
-                if (isTeamPlan) {
-                  setShowInviteModal(true);
-                } else {
-                  setShowTeammateWall(true);
-                }
-              }}
-            >
-              <UserPlus size={16} />
-              Invite Member
-            </button>
-          )}
+          <div>
+            <h1 style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.03em', margin: 0 }}>
+              <span className="text-gradient">{org.name}</span>
+            </h1>
+            <p className="page-subtitle">
+              {org.members.length} member{org.members.length !== 1 ? 's' : ''} &middot; /
+              {org.slug}
+            </p>
+          </div>
         </div>
+        {isAdmin && (
+          <button
+            className="btn btn-primary"
+            style={{ gap: 8 }}
+            onClick={() => {
+              if (isTeamPlan) {
+                setShowInviteModal(true);
+              } else {
+                setShowTeammateWall(true);
+              }
+            }}
+          >
+            <UserPlus size={16} />
+            Invite Member
+          </button>
+        )}
       </header>
 
       {/* Tabs */}
       <div
         className="flex items-center gap-sm mb-lg"
-        style={{ borderBottom: '1px solid var(--liquid-border)', paddingBottom: '0' }}
+        style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0' }}
       >
         {(['members', 'activity', 'intelligence'] as const).map(tab => (
           <button
@@ -383,9 +385,9 @@ export default function TeamPage() {
                     style={{
                       fontSize: '11px',
                       padding: '2px 8px',
-                      background: 'rgba(255, 255, 255, 0.1)',
+                      background: 'rgba(22, 163, 74, 0.12)',
                       borderRadius: '12px',
-                      color: 'var(--text-highlight)',
+                      color: 'var(--accent-primary)',
                       fontWeight: 600,
                     }}
                   >
@@ -568,7 +570,7 @@ function MemberRow({
             padding: '3px 10px',
             borderRadius: '12px',
             background:
-              member.role === 'owner' ? 'rgba(234, 179, 8, 0.12)' : 'rgba(255, 255, 255, 0.06)',
+              member.role === 'owner' ? 'rgba(234, 179, 8, 0.12)' : 'var(--bg-tertiary)',
             color: ROLE_COLORS[member.role],
             fontWeight: 600,
           }}

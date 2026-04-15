@@ -222,13 +222,16 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
         maxWidth: 800,
       }}
     >
-      {/* Header */}
-      <header className="mb-xl">
-        <div className="flex items-center gap-md mb-sm">
-          <Settings size={28} style={{ color: 'var(--text-secondary)' }} />
-          <h1>Settings</h1>
+      {/* Header — shared .page-header rhythm */}
+      <header className="page-header">
+        <div>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.03em', margin: 0 }}>
+            <span className="text-gradient">Settings</span>
+          </h1>
+          <p className="page-subtitle">
+            Manage your account preferences and notifications
+          </p>
         </div>
-        <p className="text-muted">Manage your account preferences and notifications</p>
       </header>
 
       <Tabs

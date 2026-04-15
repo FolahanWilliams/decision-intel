@@ -191,18 +191,14 @@ export default function JournalPage() {
 
   return (
     <ErrorBoundary sectionName="Decision Journal">
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+      <div className="max-w-4xl mx-auto">
+        {/* Header — shared .page-header rhythm */}
+        <div className="page-header">
           <div>
-            <h1
-              className="text-2xl font-bold flex items-center gap-2"
-              style={{ color: 'var(--text-primary)' }}
-            >
-              <BookOpen className="h-6 w-6" style={{ color: 'var(--warning)' }} />
-              Decision Journal
+            <h1 style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.03em', margin: 0 }}>
+              <span className="text-gradient">Decision Journal</span>
             </h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
+            <p className="page-subtitle" style={{ maxWidth: 640 }}>
               Capture decisions across your workflow and convert them into audited strategic
               memos. Every entry becomes a searchable node on your Knowledge Graph.
               {pagination && (
@@ -214,13 +210,8 @@ export default function JournalPage() {
           </div>
           <button
             onClick={() => setShowNewEntry(!showNewEntry)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-            style={{
-              background: showNewEntry ? 'rgba(251, 191, 36, 0.15)' : 'var(--bg-card-hover)',
-              border: '1px solid var(--border-color)',
-              color: 'var(--text-primary)',
-              cursor: 'pointer',
-            }}
+            className={showNewEntry ? 'btn btn-secondary' : 'btn btn-primary'}
+            style={{ gap: 8, whiteSpace: 'nowrap' }}
           >
             <Plus size={16} />
             New Entry
