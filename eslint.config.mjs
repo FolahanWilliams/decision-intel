@@ -17,6 +17,8 @@ const eslintConfig = defineConfig([
     // Browser extension (minified vendor bundles):
     "extension/**",
     "extension 2/**",
+    // Minified vendor bundles served from /public:
+    "public/**",
   ]),
   {
     files: ["src/app/(platform)/documents/[id]/page.tsx"],

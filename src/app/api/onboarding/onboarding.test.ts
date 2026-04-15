@@ -161,7 +161,12 @@ describe('PATCH /api/onboarding', () => {
       where: { userId: 'user_123' },
       create: { userId: 'user_123', onboardingCompleted: true },
       update: { onboardingCompleted: true },
-      select: { onboardingCompleted: true, onboardingStep: true },
+      select: {
+        onboardingCompleted: true,
+        onboardingStep: true,
+        onboardingRole: true,
+        onboardingTourSeen: true,
+      },
     });
   });
 
@@ -177,7 +182,12 @@ describe('PATCH /api/onboarding', () => {
       where: { userId: 'user_123' },
       create: { userId: 'user_123', onboardingStep: 5 },
       update: { onboardingStep: 5 },
-      select: { onboardingCompleted: true, onboardingStep: true },
+      select: {
+        onboardingCompleted: true,
+        onboardingStep: true,
+        onboardingRole: true,
+        onboardingTourSeen: true,
+      },
     });
   });
 

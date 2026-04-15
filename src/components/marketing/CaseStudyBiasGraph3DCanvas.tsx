@@ -377,8 +377,6 @@ export default function CaseStudyBiasGraph3DCanvas({
   );
   const hoveredData = hoveredNode?.data as CaseStudyNodeData | undefined;
 
-  const memoRenderNode = useCallback(renderNode, []);
-
   return (
     <div
       ref={wrapperRef}
@@ -393,7 +391,7 @@ export default function CaseStudyBiasGraph3DCanvas({
         cameraMode="rotate"
         animated={false}
         theme={isRevealing ? narrativeTheme : GRAPH_THEME}
-        renderNode={memoRenderNode}
+        renderNode={renderNode}
         selections={selections}
         actives={isRevealing && narrativeActives ? narrativeActives : actives}
         onNodeClick={onNodeClick}
