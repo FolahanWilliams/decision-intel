@@ -112,34 +112,21 @@ export default function DealsPage() {
 
   return (
     <ErrorBoundary sectionName="Project Pipeline">
-      <div className="container" style={{ maxWidth: 1200, padding: '24px 20px' }}>
-        {/* Header */}
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 20,
-          }}
-        >
+      <div className="container" style={{ maxWidth: 1200, padding: '0 20px' }}>
+        {/* Header — aligned to the shared .page-header rhythm */}
+        <div className="page-header">
           <div>
-            <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
-              Project Pipeline
+            <h1 style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.03em', margin: 0 }}>
+              <span className="text-gradient">Project Pipeline</span>
             </h1>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: '4px 0 0' }}>
+            <p className="page-subtitle">
               {total} project{total !== 1 ? 's' : ''} tracked
             </p>
           </div>
           <button
             onClick={() => setShowForm(true)}
             className="btn btn-primary"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              padding: '8px 16px',
-              fontSize: 13,
-            }}
+            style={{ gap: 6 }}
           >
             <Plus size={14} /> New Project
           </button>
