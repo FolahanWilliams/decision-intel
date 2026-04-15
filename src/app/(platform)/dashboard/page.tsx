@@ -755,23 +755,10 @@ export default function Dashboard() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <button
             onClick={() => setQuickScanOpen(true)}
-            className="btn"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              padding: '7px 14px',
-              fontSize: '0.8125rem',
-              fontWeight: 600,
-              background: 'rgba(168, 85, 247, 0.15)',
-              border: '1px solid rgba(168, 85, 247, 0.3)',
-              color: '#c084fc',
-              borderRadius: 'var(--radius-full)',
-              cursor: 'pointer',
-              transition: 'all 0.15s',
-            }}
+            className="btn btn-secondary btn-sm"
+            style={{ gap: 6 }}
           >
-            <Zap size={14} />
+            <Zap size={14} style={{ color: 'var(--accent-primary)' }} />
             Quick Bias Check
           </button>
         </div>
@@ -1041,18 +1028,21 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Onboarding Guide — persists across view switches */}
-      <OnboardingGuide documentCount={totalDocs ?? 0} />
+      {/* Stacked widget region — consistent mb-lg rhythm between each */}
+      <div className="mb-lg">
+        <OnboardingGuide documentCount={totalDocs ?? 0} />
+      </div>
 
-      {/* Decision Triage — top decisions needing attention */}
-      <DecisionTriageWidget />
+      <div className="mb-lg">
+        <DecisionTriageWidget />
+      </div>
 
-      {/* Active Nudges — unacknowledged behavioral nudges */}
-      <ErrorBoundary sectionName="Nudges">
-        <NudgeWidget />
-      </ErrorBoundary>
+      <div className="mb-lg">
+        <ErrorBoundary sectionName="Nudges">
+          <NudgeWidget />
+        </ErrorBoundary>
+      </div>
 
-      {/* Decision Journal — captured decisions from email/calendar */}
       <div className="mb-lg">
         <ErrorBoundary sectionName="Journal">
           <JournalWidget />

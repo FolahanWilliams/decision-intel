@@ -870,14 +870,12 @@ select:focus {
   position: relative;
   border: 2px dashed var(--border-hover);
   background: var(--bg-card);
-  backdrop-filter: blur(20px) saturate(150%);
-  -webkit-backdrop-filter: blur(20px) saturate(150%);
   padding: clamp(1.25rem, 4vw, 3.5rem);
   text-align: center;
   transition: all var(--transition-normal);
-  border-radius: var(--liquid-radius-xl);
+  border-radius: var(--radius-xl);
   cursor: pointer;
-  box-shadow: var(--liquid-shadow);
+  box-shadow: var(--shadow-sm);
 }
 
 /* Animated conic-gradient halo on hover — signals "drop here" without copy */
@@ -922,7 +920,7 @@ select:focus {
 .upload-zone:hover {
   border-color: transparent;
   background: var(--bg-card-hover);
-  box-shadow: var(--liquid-shadow-hover);
+  box-shadow: var(--shadow-md);
 }
 
 .upload-zone.dragover {
