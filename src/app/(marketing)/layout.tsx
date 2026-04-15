@@ -93,12 +93,12 @@ const jsonLd = [
       },
       {
         '@type': 'Offer',
-        name: 'Professional',
-        price: '149',
+        name: 'Individual',
+        price: '249',
         priceCurrency: 'USD',
         priceSpecification: {
           '@type': 'UnitPriceSpecification',
-          price: '149',
+          price: '249',
           priceCurrency: 'USD',
           billingDuration: 'P1M',
         },

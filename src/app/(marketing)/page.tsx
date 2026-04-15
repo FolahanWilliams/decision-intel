@@ -192,7 +192,7 @@ const COMPETITOR_DATA: Record<
         us: 'AI bias detection + calibration',
         usWins: true,
       },
-      { dimension: 'Cost', them: '$500K–$2M / engagement', us: '$149/mo Pro · $2,499/mo Strategy', usWins: true },
+      { dimension: 'Cost', them: '$500K–$2M / engagement', us: '$249/mo Individual · $2,499/mo Strategy', usWins: true },
       { dimension: 'Speed', them: '6–12 weeks', us: 'Minutes per document', usWins: true },
       { dimension: 'Continuous', them: 'No (point-in-time)', us: 'Yes (always-on)', usWins: true },
       { dimension: 'Auditor has biases?', them: 'Yes', us: 'No — AI has zero ego', usWins: true },
@@ -1403,8 +1403,8 @@ export default function LandingPage() {
           >
             {[
               {
-                name: 'Professional',
-                price: 99,
+                name: 'Individual',
+                price: 249,
                 priceSuffix: '/mo',
                 desc: 'For the high-stakes strategist who wants the career-defining edge.',
                 features: [
@@ -1415,7 +1415,7 @@ export default function LandingPage() {
                   'Personal Decision History',
                   'Personal Calibration Dashboard',
                 ],
-                cta: 'Start Professional',
+                cta: 'Start Individual',
                 action: () => handleCheckout('pro'),
                 loading: checkoutLoading === 'pro',
                 outline: true,
@@ -1427,7 +1427,7 @@ export default function LandingPage() {
                 priceSuffix: '/mo',
                 desc: 'For corporate strategy teams producing multiple board-level memos per quarter.',
                 features: [
-                  'Everything in Professional',
+                  'Everything in Individual',
                   'Unlimited audits, 15 seats',
                   'Shared Decision Knowledge Graph',
                   'Decision Rooms + team consensus',

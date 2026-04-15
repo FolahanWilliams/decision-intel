@@ -28,7 +28,7 @@ interface Props {
 }
 
 const UPGRADE_TARGET: Record<string, { plan: string; label: string }> = {
-  free: { plan: 'pro', label: 'Professional' },
+  free: { plan: 'pro', label: 'Individual' },
   pro: { plan: 'team', label: 'Team' },
   team: { plan: 'enterprise', label: 'Enterprise' },
 };

@@ -52,10 +52,10 @@ function buildTiers(cycle: BillingCycle): Tier[] {
     },
     {
       id: 'pro',
-      name: 'Professional',
+      name: 'Individual',
       tagline: 'For the high-stakes strategist',
-      priceMonthly: 149,
-      priceAnnual: 1499,
+      priceMonthly: 249,
+      priceAnnual: 2490,
       highlights: [
         '15 audits per month',
         'Full DQI + 30+ cognitive biases',
@@ -63,7 +63,7 @@ function buildTiers(cycle: BillingCycle): Tier[] {
         'Personal Decision History',
         'Personal Calibration Dashboard',
       ],
-      cta: { label: 'Start Professional', action: 'checkout-pro' },
+      cta: { label: 'Start Individual', action: 'checkout-pro' },
     },
     {
       id: 'team',
@@ -212,7 +212,7 @@ const FAQ: Array<{ q: string; a: string }> = [
     a: 'Yes. Upgrades apply immediately and are prorated. Downgrades take effect at the end of your current billing period. Your Personal Decision History and Knowledge Graph data travel with you.',
   },
   {
-    q: 'What happens to my data if I upgrade from Professional to Strategy?',
+    q: 'What happens to my data if I upgrade from Individual to Strategy?',
     a: 'Your Personal Decision History stays yours by default. During team onboarding, you explicitly opt in (per user) to merge your memos into the team Decision Knowledge Graph. If you decline, your private memos stay private and your seat still counts against the team plan.',
   },
   {
@@ -220,12 +220,12 @@ const FAQ: Array<{ q: string; a: string }> = [
     a: 'Strategy includes a 30-day pilot. No card required to start. During the pilot, your team\u2019s Knowledge Graph hydrates from each user\u2019s Personal Decision History as they opt in. At the end of the pilot, you either subscribe or revert cleanly with your personal data intact.',
   },
   {
-    q: 'What team features can I not access on Professional?',
-    a: 'Professional is intentionally solo: no Decision Rooms, no shared Knowledge Graph, no Slack/Drive/Email integrations, no compliance mapping, no custom toxic combination weights. These are team-only features that unlock on Strategy.',
+    q: 'What team features can I not access on Individual?',
+    a: 'Individual is intentionally solo: no Decision Rooms, no shared Knowledge Graph, no Slack/Drive/Email integrations, no compliance mapping, no custom toxic combination weights. These are team-only features that unlock on Strategy.',
   },
   {
     q: 'Do you offer annual discounts?',
-    a: 'Professional is $149/mo or $1,499/yr (save ~16%). Strategy is billed monthly at $2,499. Enterprise is negotiated annually.',
+    a: 'Individual is $249/mo or $2,490/yr (save ~16%). Strategy is billed monthly at $2,499. Enterprise is negotiated annually.',
   },
   {
     q: 'Are you SOC 2 compliant?',
@@ -306,7 +306,7 @@ export function PricingPageClient() {
               margin: 0,
             }}
           >
-            Start free. Upgrade to Professional when you want the career-defining edge. Bring your
+            Start free. Upgrade to Individual when you want the career-defining edge. Bring your
             team on Strategy when judgment needs to compound across the function.
           </p>
         </div>
@@ -626,7 +626,7 @@ export function PricingPageClient() {
             >
               <div>Feature</div>
               <div style={{ textAlign: 'center' }}>Free</div>
-              <div style={{ textAlign: 'center' }}>Professional</div>
+              <div style={{ textAlign: 'center' }}>Individual</div>
               <div style={{ textAlign: 'center', color: C.green }}>Strategy</div>
               <div style={{ textAlign: 'center' }}>Enterprise</div>
             </div>

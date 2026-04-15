@@ -71,12 +71,12 @@ export const PLANS = {
     } satisfies PlanFeatures,
   },
   pro: {
-    name: 'Professional',
+    name: 'Individual',
     tagline: 'For the high-stakes strategist',
     description:
       'Walk into your next meeting with the one question the CSO missed. Full audit plus your Personal Decision History.',
-    priceMonthly: 149,
-    priceAnnual: 1499,
+    priceMonthly: 249,
+    priceAnnual: 2490,
     priceIdMonthly:
       process.env.STRIPE_PRO_PRICE_MONTHLY_ID || 'price_1TLh8pJHs8Ws3oeL7VzAcJgA',
     priceIdAnnual:
@@ -109,7 +109,7 @@ export const PLANS = {
     name: 'Strategy',
     tagline: 'For corporate strategy teams',
     description:
-      'Everything Professional has, plus a living Decision Knowledge Graph that connects every strategic memo your team produces.',
+      'Everything Individual has, plus a living Decision Knowledge Graph that connects every strategic memo your team produces.',
     priceMonthly: 2499,
     priceAnnual: null,
     priceIdMonthly: process.env.STRIPE_TEAM_PRICE_ID || '',

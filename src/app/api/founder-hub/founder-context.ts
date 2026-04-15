@@ -386,8 +386,8 @@ Share these when the founder asks about code quality or onboarding a future engi
 === LATEST POSITIONING LOCK (2026-04-13) ===
 Locked terms: strategic memo, board deck, Decision Knowledge Graph (full name), Decision Quality Index / DQI, 146 historical decisions, 30+ cognitive biases, quarter after quarter. Steering committee / executive review / board are the stakeholders. CEO, board, or parent company are the question-askers the platform simulates.
 Banned terms in customer-facing copy: thesis, investment memo, IC, investment committee, LP, fund, deal (as headline term).
-Pricing tiers live: Free (4 analyses/mo), Professional ($149/mo or $1,499/yr, 15 analyses, solo strategist), Strategy ($2,499/mo, unlimited + team Decision Knowledge Graph + Decision Rooms), Enterprise (custom).
-Pro -> Strategy upgrade uses a "Teammate Wall" pattern: Pro users cannot invite teammates. When they try, a modal explains Strategy unlocks shared Decision Knowledge Graph + Decision Rooms + integrations.
+Pricing tiers live: Free (4 analyses/mo), Individual ($249/mo or $2,490/yr, 15 analyses, solo strategist), Strategy ($2,499/mo, unlimited + team Decision Knowledge Graph + Decision Rooms), Enterprise (custom). Individual was renamed from "Professional" and repriced from $149 to $249 on 2026-04-15 to re-anchor away from productivity-SaaS ($99-tier) and toward consulting-replacement positioning.
+Individual -> Strategy upgrade uses a "Teammate Wall" pattern: Individual users cannot invite teammates. When they try, a modal explains Strategy unlocks shared Decision Knowledge Graph + Decision Rooms + integrations.
 
 === GOTCHAS LEARNED IN PRACTICE ===
 - FOUNDER_HUB_PASS is the server-only secret. NEVER read NEXT_PUBLIC_FOUNDER_HUB_PASS in a server API route — it's inlined into the client bundle and can be extracted by anyone viewing the Founder Hub. Use verifyFounderPass() from @/lib/utils/founder-auth.

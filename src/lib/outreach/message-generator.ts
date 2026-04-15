@@ -14,7 +14,7 @@ Moat: 18 months of causal outcome data per org — once a team logs enough decis
 
 Competitor reality: There is no direct competitor in "decision quality auditing." Cloverpop does decision tracking (not bias detection). The real competition is "do nothing" — teams don't audit their decision processes at all.
 
-Economics: 97% gross margins ($0.03-0.07 per analysis). Pricing: $2,499/mo for corporate strategy teams, $149/mo for Professional (solo strategist).
+Economics: 97% gross margins ($0.03-0.07 per analysis). Pricing: $2,499/mo for corporate strategy teams, $249/mo for Individual (solo strategist).
 
 The "why now" hook: Boards are demanding decision rigor after a decade of bad M&A (Boeing MAX, WeWork, Microsoft-Nokia). Compliance frameworks are citing cognitive hygiene. LLMs finally make real-time bias detection feasible at <$0.10 per document. The 18-month causal flywheel just turned on (production code path that was silently broken for months is now live).
 

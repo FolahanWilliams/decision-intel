@@ -701,13 +701,13 @@ export function StrategyAndPositioningTab() {
               paddingLeft: 14,
             }}
           >
-            <li>Free (4 analyses) → Professional: $149/mo → Strategy: $2,499/mo</li>
+            <li>Free (4 analyses) → Individual: $249/mo → Strategy: $2,499/mo</li>
             <li>Avoid 1 bad decision per year = millions saved</li>
             <li>
               ROI: <strong style={{ color: '#22c55e' }}>100-1000x</strong> the subscription cost
             </li>
             <li>Enterprise: Custom pricing for SSO, unlimited, dedicated support</li>
-            <li>Land with Professional, expand to Team seats + Enterprise</li>
+            <li>Land with Individual, expand to Team seats + Enterprise</li>
           </ul>
         </div>
         <div style={card}>

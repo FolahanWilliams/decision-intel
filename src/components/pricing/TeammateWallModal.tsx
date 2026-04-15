@@ -145,7 +145,7 @@ export function TeammateWallModal({ open, onClose, source = 'unknown' }: Teammat
               letterSpacing: '-0.01em',
             }}
           >
-            Your Personal Decision History stays yours on Professional.
+            Your Personal Decision History stays yours on Individual.
           </h2>
           <p
             style={{
