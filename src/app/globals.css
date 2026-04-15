@@ -108,9 +108,12 @@
   --spacing-xs: 0.25rem;
   --spacing-sm: 0.5rem;
   --spacing-md: 1rem;
-  --spacing-lg: 2rem; /* was 1.5rem — section-to-section */
-  --spacing-xl: 3rem; /* was 2.5rem — hero-row and page blocks */
-  --spacing-2xl: 4.5rem; /* was 3.5rem — major page breaks */
+  /* Larger rhythm tokens scale with viewport so 27"+ monitors get roomier
+     section breaks and laptops don't feel spread out. Caps are tuned so a
+     2560px screen reads as "calmly spaced", not "empty". */
+  --spacing-lg: clamp(1.5rem, 1.8vw, 2.25rem); /* section-to-section */
+  --spacing-xl: clamp(2.25rem, 2.6vw, 3.25rem); /* hero-row and page blocks */
+  --spacing-2xl: clamp(3.25rem, 4vw, 5rem); /* major page breaks */
 
   /* Radii */
   --radius-sm: 4px;
@@ -512,16 +515,29 @@ pre {
   font-variant-numeric: tabular-nums;
 }
 
-/* Layout — fluid container that adapts to screen size */
+/* Layout — fluid container that adapts to screen size. Scales from ~900px
+   up to 1760px on 27"+ monitors, with horizontal padding that grows with
+   viewport so content never feels cramped on laptops or sparse on large
+   desktops. */
 .container {
   width: 100% !important;
-  max-width: min(90%, 1600px) !important;
+  max-width: min(96%, 1720px) !important;
   margin-left: auto !important;
   margin-right: auto !important;
   margin-inline: auto !important;
   padding-left: clamp(1rem, 2vw, 3rem) !important;
   padding-right: clamp(1rem, 2vw, 3rem) !important;
   box-sizing: border-box !important;
+}
+
+/* Platform content wrapper — scales with viewport so 27"+ monitors aren't
+   left with a narrow 1320px gutter. Padding and max-width both use clamp/min
+   so the layout remains comfortable between 1280px laptop screens and
+   2560px studio displays. */
+.platform-content {
+  width: 100%;
+  max-width: min(96%, 1760px);
+  margin-inline: auto;
 }
 
 /* ═══════════════════════════════════════════
@@ -1961,7 +1977,7 @@ tr:hover td {
 }
 
 .page-header h1 {
-  font-size: 1.75rem;
+  font-size: clamp(1.5rem, 1.6vw, 2.125rem);
   font-weight: 800;
   letter-spacing: -0.03em;
   margin: 0;

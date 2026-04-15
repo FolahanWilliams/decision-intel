@@ -80,7 +80,9 @@ export default function Sidebar() {
     return () => window.removeEventListener('keydown', handleKey);
   }, [mobileOpen]);
 
-  const sidebarWidth = collapsed ? '72px' : '260px';
+  // Scales subtly with viewport so the sidebar doesn't look undersized on
+  // 27"+ monitors. Stays fixed at 72px when collapsed.
+  const sidebarWidth = collapsed ? '72px' : 'clamp(260px, 15vw, 300px)';
 
   return (
     <>

@@ -33,7 +33,13 @@ export default async function PlatformLayout({ children }: { children: React.Rea
         >
           <div
             className="platform-content"
-            style={{ maxWidth: 1320, margin: '0 auto' }}
+            style={{
+              width: '100%',
+              maxWidth: 'min(96%, 1760px)',
+              margin: '0 auto',
+              paddingLeft: 'clamp(16px, 1.6vw, 40px)',
+              paddingRight: 'clamp(16px, 1.6vw, 40px)',
+            }}
           >
             <div
               className="platform-header-row"

@@ -5,12 +5,12 @@
  * WebGL canvas rendered by reagraph (react-three-fiber under the hood).
  * Loaded via dynamic() in the shell — no SSR.
  *
- * Node shape encoding:
- *   analysis       → low-poly sphere    (IcosahedronGeometry detail=1)
- *   human_decision → box/cube           (BoxGeometry)
- *   person         → smooth sphere      (SphereGeometry)
- *   bias_pattern   → tetrahedron        (TetrahedronGeometry) — sharpest, most dangerous
- *   outcome        → cylinder           (CylinderGeometry)
+ * Node shape encoding (matches the marketing hero graph):
+ *   analysis       → dodecahedron (12-face crystal — audited memos)
+ *   human_decision → dodecahedron (same — both are "decisions")
+ *   person         → smooth sphere
+ *   bias_pattern   → octahedron   (8-face spike — the risk)
+ *   outcome        → cylinder     (pillar — realised result)
  *
  * Node colour is supplied by the parent (already encodes score / path / search highlight).
  * Node size is supplied by the parent (encodes sizeMetric).
@@ -25,7 +25,8 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { DoubleSide } from 'three';
+import { DoubleSide, type Mesh, type MeshBasicMaterial } from 'three';
+import { useFrame } from '@react-three/fiber';
 import {
   SlowOrbit,
   ResetViewButton,
@@ -93,6 +94,38 @@ const DARK_THEME: Theme = {
 // ─── Node renderer (inlined — no React component wrapper) ────────────────────
 
 type DKGNodeType = 'analysis' | 'human_decision' | 'person' | 'bias_pattern' | 'outcome';
+
+// Pulsing halo used around critical bias nodes — matches the hero graph's
+// attention-drawing effect. Animates scale + opacity in a gentle sine wave.
+function PulsingHalo({
+  size,
+  color,
+  shape,
+}: {
+  size: number;
+  color: string;
+  shape: 'octahedron' | 'dodecahedron';
+}) {
+  const ref = useRef<Mesh | null>(null);
+  useFrame(({ clock }) => {
+    if (!ref.current) return;
+    const t = clock.elapsedTime;
+    const s = 1.45 + Math.sin(t * 2.2) * 0.18;
+    ref.current.scale.setScalar(s);
+    const mat = ref.current.material as MeshBasicMaterial | undefined;
+    if (mat) mat.opacity = 0.14 + Math.sin(t * 2.2) * 0.08;
+  });
+  return (
+    <mesh ref={ref}>
+      {shape === 'octahedron' ? (
+        <octahedronGeometry args={[size, 0]} />
+      ) : (
+        <dodecahedronGeometry args={[size, 0]} />
+      )}
+      <meshBasicMaterial color={color} transparent opacity={0.18} depthWrite={false} />
+    </mesh>
+  );
+}
 
 // ─── Canvas ref (exposed to shell for camera control) ────────────────────────
 
@@ -227,80 +260,71 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
     const col = (node.fill as string | undefined) ?? '#60A5FA';
     const o = opacity ?? 1;
     const emissive = selected ? 0.4 : active ? 0.25 : 0.12;
+    // Severity is optional on the node payload — only bias_pattern nodes
+    // carry one. Promote critical biases with a pulsing halo, matching the
+    // hero graph's attention-drawing treatment.
+    const severity = (node.data as { severity?: string } | undefined)?.severity;
+    const isCriticalBias = type === 'bias_pattern' && severity === 'critical';
 
-    switch (type) {
-      case 'analysis':
-        return (
-          <group>
-            <mesh>
-              <icosahedronGeometry args={[size, 1]} />
-              <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
-            </mesh>
-            {selected && <SelectedGlow size={size} color={col} shape="icosahedron" />}
-            {!selected && active && <mesh scale={[1.55, 1.55, 1.55]}><icosahedronGeometry args={[size, 1]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
-          </group>
-        );
-      case 'human_decision': {
-        const s = size * 1.4;
-        return (
-          <group>
-            <mesh>
-              <boxGeometry args={[s, s, s]} />
-              <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
-            </mesh>
-            {selected && <SelectedGlow size={s} color={col} shape="box" />}
-            {!selected && active && <mesh scale={[1.55, 1.55, 1.55]}><boxGeometry args={[s, s, s]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
-          </group>
-        );
-      }
-      case 'person':
-        return (
-          <group>
-            <mesh>
-              <sphereGeometry args={[size * 0.85, 12, 8]} />
-              <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
-            </mesh>
-            {selected && <SelectedGlow size={size * 0.85} color={col} shape="sphere" />}
-            {!selected && active && <mesh scale={[1.55, 1.55, 1.55]}><sphereGeometry args={[size * 0.85, 12, 8]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
-          </group>
-        );
-      case 'bias_pattern':
-        return (
-          <group>
-            <mesh>
-              <tetrahedronGeometry args={[size, 0]} />
-              <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
-            </mesh>
-            {selected && <SelectedGlow size={size} color={col} shape="tetrahedron" />}
-            {!selected && active && <mesh scale={[1.55, 1.55, 1.55]}><tetrahedronGeometry args={[size, 0]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
-          </group>
-        );
-      case 'outcome':
-        return (
-          <group>
-            <mesh>
-              <cylinderGeometry args={[size * 0.8, size * 0.8, size * 2, 8]} />
-              <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
-            </mesh>
-            {selected && (
-              <SelectedGlow
-                size={size}
-                color={col}
-                shape="cylinder"
-                cylinder={{ radiusFactor: 0.8, heightFactor: 2, segments: 8 }}
-              />
-            )}
-            {!selected && active && <mesh scale={[1.55, 1.55, 1.55]}><cylinderGeometry args={[size * 0.8, size * 0.8, size * 2, 8]} /><meshPhongMaterial color={col} side={DoubleSide} transparent opacity={0.07} /></mesh>}
-          </group>
-        );
-      default:
-        return (
+    // Both analysis and human_decision are "decisions" → dodecahedron.
+    if (type === 'analysis' || type === 'human_decision') {
+      return (
+        <group>
           <mesh>
-            <sphereGeometry args={[size, 10, 8]} />
+            <dodecahedronGeometry args={[size, 0]} />
             <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
           </mesh>
-        );
+          {selected && <SelectedGlow size={size} color={col} shape="dodecahedron" />}
+        </group>
+      );
     }
+
+    // Bias → octahedron. Critical biases get the pulsing halo.
+    if (type === 'bias_pattern') {
+      return (
+        <group>
+          <mesh>
+            <octahedronGeometry args={[size, 0]} />
+            <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
+          </mesh>
+          {selected && <SelectedGlow size={size} color={col} shape="octahedron" />}
+          {isCriticalBias && !selected && (
+            <PulsingHalo size={size} color={col} shape="octahedron" />
+          )}
+        </group>
+      );
+    }
+
+    // Outcome → cylinder (pillar).
+    if (type === 'outcome') {
+      return (
+        <group>
+          <mesh>
+            <cylinderGeometry args={[size * 0.82, size * 0.82, size * 2.2, 8]} />
+            <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
+          </mesh>
+          {selected && (
+            <SelectedGlow
+              size={size}
+              color={col}
+              shape="cylinder"
+              cylinder={{ radiusFactor: 0.82, heightFactor: 2.2, segments: 8 }}
+            />
+          )}
+        </group>
+      );
+    }
+
+    // Person (and fallback) → smooth sphere.
+    return (
+      <group>
+        <mesh>
+          <sphereGeometry args={[size * 0.85, 16, 12]} />
+          <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
+        </mesh>
+        {selected && <SelectedGlow size={size * 0.85} color={col} shape="sphere" />}
+      </group>
+    );
   }, []);
 
   return (
@@ -326,8 +350,8 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
         onNodePointerOut={handleNodePointerOut}
         labelType="nodes"
         draggable
-        defaultNodeSize={5}
-        minDistance={200}
+        defaultNodeSize={7}
+        minDistance={400}
         maxDistance={8000}
       >
         {/* Three-point lighting rig */}
