@@ -93,18 +93,18 @@ function CustomTooltip({ active, payload, label }: ChartTooltipProps) {
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      className={cn(
-        'p-3 rounded-lg',
-        'bg-black/90 backdrop-blur-xl',
-        'border border-white/20',
-        'shadow-xl'
-      )}
+      className="p-3 rounded-lg shadow-xl"
+      style={{
+        background: 'var(--bg-card)',
+        backdropFilter: 'blur(12px)',
+        border: '1px solid var(--border-color)',
+      }}
     >
-      <p className="text-xs font-semibold text-white">{label}</p>
+      <p className="text-xs font-semibold" style={{ color: 'var(--text-primary)' }}>{label}</p>
       {payload.map((entry, index: number) => (
         <div key={index} className="flex items-center gap-2 mt-1">
           <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
-          <span className="text-xs text-white/80">
+          <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
             {entry.name}: {entry.value}
           </span>
         </div>
@@ -327,12 +327,17 @@ export function EnhancedDashboardCharts({
             <button
               key={mode}
               onClick={() => setViewMode(mode)}
-              className={cn(
-                'px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
-                viewMode === mode
-                  ? 'bg-white/20 text-white'
-                  : 'bg-white/5 text-white/60 hover:bg-white/10'
-              )}
+              className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+              style={viewMode === mode
+                ? {
+                    background: 'var(--bg-tertiary)',
+                    color: 'var(--text-primary)',
+                  }
+                : {
+                    background: 'var(--bg-secondary)',
+                    color: 'var(--text-secondary)',
+                  }
+              }
             >
               {mode.charAt(0).toUpperCase() + mode.slice(1)}
             </button>
@@ -345,25 +350,26 @@ export function EnhancedDashboardCharts({
             <button
               key={level}
               onClick={() => setSelectedRiskLevel(level)}
-              className={cn(
-                'px-3 py-1.5 rounded-full text-xs font-medium transition-all',
+              className="px-3 py-1.5 rounded-full text-xs font-medium transition-all"
+              style={
                 selectedRiskLevel === level
                   ? level === 'all'
-                    ? 'bg-white/20 text-white border border-white/30'
-                    : `bg-opacity-20 border`
-                  : 'bg-white/5 text-white/60 hover:bg-white/10',
-                selectedRiskLevel === level && level !== 'all' && 'border-opacity-50'
-              )}
-              style={{
-                backgroundColor:
-                  selectedRiskLevel === level && level !== 'all'
-                    ? `${RISK_COLORS[level]}20`
-                    : undefined,
-                borderColor:
-                  selectedRiskLevel === level && level !== 'all' ? RISK_COLORS[level] : undefined,
-                color:
-                  selectedRiskLevel === level && level !== 'all' ? RISK_COLORS[level] : undefined,
-              }}
+                    ? {
+                        background: 'var(--bg-tertiary)',
+                        color: 'var(--text-primary)',
+                        border: '1px solid var(--border-active)',
+                      }
+                    : {
+                        backgroundColor: `${RISK_COLORS[level]}20`,
+                        borderColor: RISK_COLORS[level],
+                        color: RISK_COLORS[level],
+                        border: `1px solid ${RISK_COLORS[level]}`,
+                      }
+                  : {
+                      background: 'var(--bg-secondary)',
+                      color: 'var(--text-secondary)',
+                    }
+              }
             >
               <span className="capitalize">{level}</span>
               {level !== 'all' && (
@@ -394,8 +400,8 @@ export function EnhancedDashboardCharts({
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold">Risk Distribution</h3>
             <div className="flex items-center gap-2">
-              <Activity className="w-4 h-4 text-white/40" />
-              <span className="text-xs text-white/60">{totalAnalyzed} analyzed</span>
+              <Activity className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
+              <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{totalAnalyzed} analyzed</span>
             </div>
           </div>
 
@@ -436,7 +442,7 @@ export function EnhancedDashboardCharts({
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="text-center">
                   <div className="text-2xl font-bold">{avgScore}</div>
-                  <div className="text-xs text-white/60">Avg Score</div>
+                  <div className="text-xs" style={{ color: 'var(--text-muted)' }}>Avg Score</div>
                 </div>
               </div>
             )}
@@ -457,11 +463,10 @@ export function EnhancedDashboardCharts({
                     initial={{ x: -20, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: index * 0.1 }}
-                    className={cn(
-                      'flex items-center justify-between p-2 rounded-lg',
-                      'bg-white/5 hover:bg-white/10 transition-colors cursor-pointer',
-                      activeRiskIndex === index && 'bg-white/15'
-                    )}
+                    className="flex items-center justify-between p-2 rounded-lg transition-colors cursor-pointer"
+                    style={{
+                      background: activeRiskIndex === index ? 'var(--bg-elevated)' : 'var(--bg-secondary)',
+                    }}
                     onClick={() => handleRiskSegmentClick(item, index)}
                   >
                     <div className="flex items-center gap-2">
@@ -472,7 +477,7 @@ export function EnhancedDashboardCharts({
                       <span className="text-sm">{item.name}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-white/60">{item.description}</span>
+                      <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{item.description}</span>
                       <span className="text-sm font-semibold">{item.percentage.toFixed(1)}%</span>
                     </div>
                   </motion.div>
@@ -499,7 +504,7 @@ export function EnhancedDashboardCharts({
               ) : (
                 <TrendingDown className="w-4 h-4 text-error" />
               )}
-              <span className="text-xs text-white/60">
+              <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
                 {scoreTrend.length > 1
                   ? `${scoreTrend[scoreTrend.length - 1].score - scoreTrend[0].score > 0 ? '+' : ''}${(scoreTrend[scoreTrend.length - 1].score - scoreTrend[0].score).toFixed(1)}`
                   : 'N/A'}
@@ -587,7 +592,8 @@ export function EnhancedDashboardCharts({
             <h3 className="text-sm font-semibold">Top Biases</h3>
             <button
               onClick={() => setShowBiasDetails(!showBiasDetails)}
-              className="text-xs text-white/60 hover:text-white transition-colors"
+              className="text-xs transition-colors"
+              style={{ color: 'var(--text-muted)' }}
             >
               {showBiasDetails ? 'Hide' : 'Show'} Details
             </button>
@@ -602,11 +608,11 @@ export function EnhancedDashboardCharts({
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: index * 0.05 }}
-                  className={cn(
-                    'p-3 rounded-lg cursor-pointer transition-all',
-                    'bg-white/5 hover:bg-white/10',
-                    selectedBias === bias.name && 'bg-white/15 ring-1 ring-white/30'
-                  )}
+                  className="p-3 rounded-lg cursor-pointer transition-all"
+                  style={{
+                    background: selectedBias === bias.name ? 'var(--bg-elevated)' : 'var(--bg-secondary)',
+                    border: selectedBias === bias.name ? '1px solid var(--border-active)' : 'none',
+                  }}
                   onClick={() => handleBiasClick(bias.name)}
                   onMouseEnter={() => setHoveredBias(bias.name)}
                   onMouseLeave={() => setHoveredBias(null)}
@@ -619,7 +625,7 @@ export function EnhancedDashboardCharts({
                       />
                       <div>
                         <div className="font-medium text-sm">{bias.name}</div>
-                        <div className="text-xs text-white/60">
+                        <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
                           {bias.count} occurrences • Impact: {bias.impact}
                         </div>
                       </div>
@@ -637,7 +643,7 @@ export function EnhancedDashboardCharts({
                           {bias.trend}%
                         </span>
                       )}
-                      <ChevronRight className="w-4 h-4 text-white/40" />
+                      <ChevronRight className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
                     </div>
                   </div>
 
@@ -649,14 +655,16 @@ export function EnhancedDashboardCharts({
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: 'auto', opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
-                          className="mt-2 pt-2 border-t border-white/10"
+                          className="mt-2 pt-2"
+                          style={{ borderTop: '1px solid var(--border-color)' }}
                         >
-                          <div className="text-xs text-white/60 mb-1">Related biases:</div>
+                          <div className="text-xs mb-1" style={{ color: 'var(--text-muted)' }}>Related biases:</div>
                           <div className="flex flex-wrap gap-1">
                             {bias.connections.map(conn => (
                               <span
                                 key={conn}
-                                className="px-2 py-0.5 bg-white/10 rounded-full text-xs"
+                                className="px-2 py-0.5 rounded-full text-xs"
+                                style={{ background: 'var(--bg-tertiary)' }}
                               >
                                 {conn}
                               </span>
@@ -676,9 +684,9 @@ export function EnhancedDashboardCharts({
                         className="mt-2 space-y-1"
                       >
                         {bias.instances.slice(0, 2).map((instance, i) => (
-                          <div key={i} className="p-2 bg-white/5 rounded text-xs">
-                            <div className="font-medium text-white/80">{instance.document}</div>
-                            <div className="text-white/60 truncate">{instance.excerpt}</div>
+                          <div key={i} className="p-2 rounded text-xs" style={{ background: 'var(--bg-secondary)' }}>
+                            <div className="font-medium" style={{ color: 'var(--text-secondary)' }}>{instance.document}</div>
+                            <div className="truncate" style={{ color: 'var(--text-muted)' }}>{instance.excerpt}</div>
                           </div>
                         ))}
                       </motion.div>

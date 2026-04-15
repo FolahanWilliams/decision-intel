@@ -191,11 +191,12 @@ export function InteractiveChartWrapper({
       ref={chartRef}
       className={cn(
         'relative group',
-        'liquid-glass border border-white/10 rounded-xl',
+        'liquid-glass border rounded-xl',
         isCompact ? 'p-3' : 'p-4',
         isFullscreen && 'fixed inset-0 z-50 m-0 rounded-none',
         className
       )}
+      style={{ borderColor: 'var(--border-color)' }}
     >
       {/* Header */}
       <div className={cn('flex items-start justify-between mb-4', isCompact && 'mb-2')}>
@@ -228,12 +229,12 @@ export function InteractiveChartWrapper({
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
                     placeholder="Search..."
-                    className={cn(
-                      'px-3 py-1.5 pr-8',
-                      'bg-white/10 border border-white/20 rounded-md',
-                      'text-xs text-white placeholder-white/50',
-                      'focus:outline-none focus:border-white/40'
-                    )}
+                    className="px-3 py-1.5 pr-8 border rounded-md text-xs focus:outline-none"
+                    style={{
+                      background: 'var(--bg-tertiary)',
+                      borderColor: 'var(--border-active)',
+                      color: 'var(--text-primary)',
+                    }}
                     autoFocus
                   />
                   <button
@@ -243,7 +244,7 @@ export function InteractiveChartWrapper({
                     }}
                     className="absolute right-2 top-1/2 -translate-y-1/2"
                   >
-                    <X className="w-3 h-3 text-white/50" />
+                    <X className="w-3 h-3" style={{ color: 'var(--text-muted)' }} />
                   </button>
                 </div>
               ) : (
@@ -329,37 +330,41 @@ export function InteractiveChartWrapper({
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className={cn(
-                      'absolute top-10 right-0 z-10',
-                      'bg-black/90 backdrop-blur-xl',
-                      'border border-white/20 rounded-lg',
-                      'p-2 min-w-[120px]'
-                    )}
+                    className="absolute top-10 right-0 z-10 border rounded-lg p-2 min-w-[120px]"
+                    style={{
+                      background: 'var(--bg-card)',
+                      backdropFilter: 'blur(12px)',
+                      borderColor: 'var(--border-active)',
+                    }}
                   >
                     <button
                       onClick={() => handleExport('png')}
-                      className="w-full text-left px-3 py-1.5 text-xs hover:bg-white/10 rounded"
+                      className="w-full text-left px-3 py-1.5 text-xs rounded"
+                      style={{ color: 'var(--text-primary)' }}
                     >
                       <Camera className="w-3 h-3 inline mr-2" />
                       PNG Image
                     </button>
                     <button
                       onClick={() => handleExport('svg')}
-                      className="w-full text-left px-3 py-1.5 text-xs hover:bg-white/10 rounded"
+                      className="w-full text-left px-3 py-1.5 text-xs rounded"
+                      style={{ color: 'var(--text-primary)' }}
                     >
                       <Layers className="w-3 h-3 inline mr-2" />
                       SVG Vector
                     </button>
                     <button
                       onClick={() => handleExport('csv')}
-                      className="w-full text-left px-3 py-1.5 text-xs hover:bg-white/10 rounded"
+                      className="w-full text-left px-3 py-1.5 text-xs rounded"
+                      style={{ color: 'var(--text-primary)' }}
                     >
                       <FileText className="w-3 h-3 inline mr-2" />
                       CSV Data
                     </button>
                     <button
                       onClick={() => handleExport('json')}
-                      className="w-full text-left px-3 py-1.5 text-xs hover:bg-white/10 rounded"
+                      className="w-full text-left px-3 py-1.5 text-xs rounded"
+                      style={{ color: 'var(--text-primary)' }}
                     >
                       <Code className="w-3 h-3 inline mr-2" />
                       JSON Data
@@ -420,11 +425,12 @@ export function InteractiveChartWrapper({
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className={cn(
-              'mb-4 p-3 rounded-lg',
-              'bg-white/5 border border-white/10',
-              'text-xs text-muted'
-            )}
+            className="mb-4 p-3 rounded-lg border text-xs"
+            style={{
+              background: 'var(--bg-secondary)',
+              borderColor: 'var(--border-color)',
+              color: 'var(--text-muted)',
+            }}
           >
             {description}
           </motion.div>
@@ -444,7 +450,7 @@ export function InteractiveChartWrapper({
 
       {/* Legend */}
       {showLegend && legend && (
-        <div className={cn('mt-4 pt-4 border-t border-white/10', isCompact && 'mt-2 pt-2')}>
+        <div className={cn('mt-4 pt-4 border-t', isCompact && 'mt-2 pt-2')} style={{ borderColor: 'var(--border-color)' }}>
           {legend}
         </div>
       )}

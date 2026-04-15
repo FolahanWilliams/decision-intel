@@ -150,9 +150,10 @@ export function CopilotChat({
             <div
               className={`max-w-[80%] rounded-lg px-4 py-3 ${
                 msg.role === 'user'
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-blue-600'
                   : 'bg-zinc-800 text-zinc-100 border border-zinc-700'
               }`}
+              style={msg.role === 'user' ? { color: 'var(--text-primary)' } : undefined}
             >
               {msg.role === 'agent' && msg.agentType && (
                 <div className="mb-2">
@@ -248,7 +249,8 @@ export function CopilotChat({
           <button
             type="submit"
             disabled={!input.trim() || isStreaming}
-            className="flex h-11 w-11 items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex h-11 w-11 items-center justify-center rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            style={{ color: 'var(--text-primary)' }}
           >
             {isStreaming ? (
               <Loader2 className="h-4 w-4 animate-spin" />

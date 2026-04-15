@@ -104,16 +104,16 @@ export function AuditsPageContent() {
           {[0, 1, 2, 3].map(i => (
             <div key={i} className="card animate-pulse">
               <div className="card-body text-center p-md">
-                <div className="h-3 w-24 bg-white/10 mx-auto mb-sm" />
-                <div className="h-10 w-16 bg-white/10 mx-auto mb-sm" />
-                <div className="h-3 w-16 bg-white/10 mx-auto" />
+                <div className="h-3 w-24 mx-auto mb-sm" style={{ background: 'var(--bg-tertiary)' }} />
+                <div className="h-10 w-16 mx-auto mb-sm" style={{ background: 'var(--bg-tertiary)' }} />
+                <div className="h-3 w-16 mx-auto" style={{ background: 'var(--bg-tertiary)' }} />
               </div>
             </div>
           ))}
         </div>
         <div className="card animate-pulse">
           <div className="card-header">
-            <div className="h-4 w-40 bg-white/10" />
+            <div className="h-4 w-40" style={{ background: 'var(--bg-tertiary)' }} />
           </div>
           <div className="card-body" style={{ padding: 0 }}>
             {[0, 1, 2].map(i => (
@@ -123,16 +123,16 @@ export function AuditsPageContent() {
                 style={{ borderBottom: '1px solid var(--border-color)' }}
               >
                 <div className="flex items-center gap-lg">
-                  <div className="w-12 h-12 bg-white/10" />
+                  <div className="w-12 h-12" style={{ background: 'var(--bg-tertiary)' }} />
                   <div>
-                    <div className="h-4 w-40 bg-white/10 mb-sm" />
-                    <div className="h-3 w-24 bg-white/10" />
+                    <div className="h-4 w-40 mb-sm" style={{ background: 'var(--bg-tertiary)' }} />
+                    <div className="h-3 w-24" style={{ background: 'var(--bg-tertiary)' }} />
                   </div>
                 </div>
                 <div className="flex items-center gap-xl">
-                  <div className="h-8 w-12 bg-white/10" />
-                  <div className="h-8 w-12 bg-white/10" />
-                  <div className="h-8 w-20 bg-white/10" />
+                  <div className="h-8 w-12" style={{ background: 'var(--bg-tertiary)' }} />
+                  <div className="h-8 w-12" style={{ background: 'var(--bg-tertiary)' }} />
+                  <div className="h-8 w-20" style={{ background: 'var(--bg-tertiary)' }} />
                 </div>
               </div>
             ))}
@@ -337,7 +337,7 @@ export function AuditsPageContent() {
                 style={{
                   position: 'absolute',
                   inset: 0,
-                  background: 'rgba(0,0,0,0.3)',
+                  background: 'rgba(0, 0, 0, 0.15)',
                   zIndex: 10,
                   display: 'flex',
                   alignItems: 'center',

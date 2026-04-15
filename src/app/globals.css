@@ -1600,16 +1600,17 @@ tr:hover td {
   animation: rotateGradient 6s linear infinite;
 }
 
-/* Apply animated gradient border to all cards and stat-cards on hover */
+/* Gradient angle custom property for any card opting in via .card-glow-border */
 .card,
 .stat-card {
   --gradient-angle: 0deg;
 }
 
-.card:hover,
-.stat-card:hover {
-  animation: rotateGradient 6s linear infinite;
-}
+/* NOTE: Do NOT apply `animation: rotateGradient ...` to .card:hover / .stat-card:hover.
+   The `animation` shorthand resets ALL animation properties, which overrides the
+   `slideUp` fill-mode on any card that also has `.animate-slide-up` — collapsing
+   opacity back to 0 and making the card appear to vanish on hover. The rotating
+   gradient border is scoped to `.card-glow-border::before` (above) by design. */
 
 /* ═══════════════════════════════════════════
    Noise/Grain Texture — adds physical realism to glass
@@ -1965,6 +1966,87 @@ tr:hover td {
   font-size: 0.8125rem;
   color: var(--text-muted);
   margin-top: 2px;
+}
+
+/* ═══════════════════════════════════════════
+   Tab Chips — pill-card tab switchers with icons, accent bar,
+   vertical separators, and active-state brand-green glow.
+   Used in Settings (and anywhere else we want inline chip-style
+   tabs instead of underline tabs).
+   ═══════════════════════════════════════════ */
+.tab-chips {
+  display: inline-flex !important;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0;
+  height: auto !important;
+  padding: 6px !important;
+  background: var(--bg-card) !important;
+  border: 1px solid rgba(22, 163, 74, 0.12);
+  border-radius: var(--radius-full) !important;
+  color: var(--text-secondary) !important;
+  box-shadow:
+    0 0 0 1px rgba(22, 163, 74, 0.02),
+    var(--shadow-sm);
+}
+
+.tab-chip {
+  position: relative;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px !important;
+  border-radius: var(--radius-full) !important;
+  background: transparent !important;
+  border: 1px solid transparent;
+  color: var(--text-secondary) !important;
+  font-size: 0.8125rem !important;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: none !important;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.tab-chip:hover {
+  color: var(--text-primary);
+  background: rgba(22, 163, 74, 0.04);
+}
+
+/* Vertical separator bar between adjacent chips (but not around active chip) */
+.tab-chip + .tab-chip::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 22%;
+  bottom: 22%;
+  width: 1px;
+  background: rgba(22, 163, 74, 0.14);
+  pointer-events: none;
+  transition: opacity var(--transition-fast);
+}
+
+.tab-chip[data-state='active'],
+.tab-chip[data-state='active']:hover {
+  background: #ffffff !important;
+  color: var(--accent-primary) !important;
+  border-color: rgba(22, 163, 74, 0.28);
+  box-shadow:
+    0 0 0 1px rgba(22, 163, 74, 0.06),
+    0 1px 3px rgba(22, 163, 74, 0.08) !important;
+}
+
+.tab-chip[data-state='active']::before,
+.tab-chip[data-state='active'] + .tab-chip::before {
+  opacity: 0;
+}
+
+.tab-chip svg {
+  color: currentColor;
 }
 
 /* ═══════════════════════════════════════════

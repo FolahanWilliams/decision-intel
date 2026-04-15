@@ -78,7 +78,8 @@ export function ThemeToggleCompact({ className }: { className?: string }) {
   if (!mounted) {
     return (
       <button
-        className={cn('p-1.5 rounded-md hover:bg-white/10 transition-colors', className)}
+        className={cn('p-1.5 rounded-md transition-colors', className)}
+        style={{}}
         aria-label="Toggle theme"
       >
         <Sun className="h-3.5 w-3.5" />
@@ -93,7 +94,8 @@ export function ThemeToggleCompact({ className }: { className?: string }) {
   return (
     <button
       onClick={toggleTheme}
-      className={cn('p-1.5 rounded-md hover:bg-white/10 transition-colors', className)}
+      className={cn('p-1.5 rounded-md transition-colors', className)}
+      style={{}}
       aria-label="Toggle theme"
     >
       {resolvedTheme === 'dark' ? (

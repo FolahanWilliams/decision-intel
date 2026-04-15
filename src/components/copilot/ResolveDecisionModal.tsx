@@ -59,7 +59,7 @@ export function ResolveDecisionModal({ onResolve, onClose }: ResolveDecisionModa
 
   if (success) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+      <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0, 0, 0, 0.6)' }}>
         <div className="mx-4 w-full max-w-md rounded-xl border border-zinc-700 bg-zinc-900 p-8 text-center">
           <CheckCircle2 className="mx-auto h-12 w-12 text-green-400 mb-4" />
           <h3 className="text-lg font-semibold text-zinc-100 mb-2">Decision Logged</h3>
@@ -68,7 +68,8 @@ export function ResolveDecisionModal({ onResolve, onClose }: ResolveDecisionModa
           </p>
           <button
             onClick={onClose}
-            className="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-500 transition-colors"
+            className="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium transition-colors"
+            style={{ color: 'var(--text-primary)' }}
           >
             Done
           </button>
@@ -78,7 +79,7 @@ export function ResolveDecisionModal({ onResolve, onClose }: ResolveDecisionModa
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+    <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0, 0, 0, 0.6)' }}>
       <div className="mx-4 w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl border border-zinc-700 bg-zinc-900 p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-zinc-100">Resolve Decision</h3>
@@ -203,7 +204,8 @@ export function ResolveDecisionModal({ onResolve, onClose }: ResolveDecisionModa
             <button
               type="submit"
               disabled={!chosenOption.trim() || isSubmitting}
-              className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              style={{ color: 'var(--text-primary)' }}
             >
               {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Resolve Decision'}
             </button>

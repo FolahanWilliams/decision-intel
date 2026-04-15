@@ -121,7 +121,7 @@ function CreateExperimentModal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0, 0, 0, 0.5)' }}>
       <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-xl w-full max-w-lg mx-4 p-6 max-h-[90vh] overflow-y-auto">
         <h2 className="text-xl font-bold mb-4">Create Experiment</h2>
 
@@ -204,7 +204,8 @@ function CreateExperimentModal({
             <button
               onClick={handleSubmit}
               disabled={submitting}
-              className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              className="px-4 py-2 text-sm bg-blue-600 rounded-lg disabled:opacity-50"
+              style={{ color: 'var(--text-primary)' }}
             >
               {submitting ? 'Creating...' : 'Create Experiment'}
             </button>
@@ -406,7 +407,8 @@ function ExperimentDetail({
               <button
                 onClick={handleOptimize}
                 disabled={optimizing}
-                className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                className="px-3 py-1.5 text-sm bg-blue-600 rounded-lg disabled:opacity-50"
+                style={{ color: 'var(--text-primary)' }}
               >
                 {optimizing ? 'Optimizing...' : 'Auto-Optimize'}
               </button>
@@ -416,7 +418,8 @@ function ExperimentDetail({
             <button
               onClick={() => handleStatusChange('active')}
               disabled={updating}
-              className="px-3 py-1.5 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+              className="px-3 py-1.5 text-sm bg-green-600 rounded-lg disabled:opacity-50"
+              style={{ color: 'var(--text-primary)' }}
             >
               Resume
             </button>
@@ -543,7 +546,8 @@ export function ExperimentsContent() {
           </div>
           <button
             onClick={() => setShowCreate(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+            className="px-4 py-2 bg-blue-600 rounded-lg text-sm"
+            style={{ color: 'var(--text-primary)' }}
           >
             New Experiment
           </button>

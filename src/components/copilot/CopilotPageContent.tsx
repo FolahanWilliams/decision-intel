@@ -563,7 +563,8 @@ export function CopilotPageContent() {
       {/* Mobile sidebar backdrop */}
       {showSidebar && (
         <div
-          className="fixed inset-0 z-20 bg-black/40 lg:hidden"
+          className="fixed inset-0 z-20 lg:hidden"
+          style={{ background: 'rgba(0, 0, 0, 0.4)' }}
           onClick={() => setShowSidebar(false)}
         />
       )}

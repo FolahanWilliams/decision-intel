@@ -171,7 +171,7 @@ export function WeightedSwot({ data }: WeightedSwotProps) {
               {/* Quadrant header */}
               <button
                 onClick={() => setExpandedQuadrant(isExpanded ? null : key)}
-                className="w-full flex items-center justify-between p-3 hover:bg-white/5 transition-colors"
+                className="w-full flex items-center justify-between p-3 transition-colors hover:bg-secondary"
                 aria-expanded={isExpanded}
               >
                 <div className="flex items-center gap-2">

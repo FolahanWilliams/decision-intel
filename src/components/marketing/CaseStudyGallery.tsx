@@ -69,7 +69,7 @@ function RiskBadge({ score }: { score: number }) {
   return (
     <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-slate-50 border border-slate-200 shadow-sm">
       <div className="w-1.5 h-1.5 rounded-full" style={{ background: getColor(score) }} />
-      <span className="text-[10px] font-bold text-slate-500 tracking-tight">DQI {score}</span>
+      <span className="text-[10px] font-bold tracking-tight" style={{ color: 'var(--text-muted)' }}>DQI {score}</span>
     </div>
   );
 }
@@ -88,7 +88,7 @@ export function CaseStudyGallery() {
           >
             {/* Minimal Header */}
             <div className="px-10 pt-8 pb-0 flex items-center justify-between">
-              <span className="font-mono text-[9px] font-bold text-slate-400 tracking-widest bg-slate-50 px-2.5 py-1 rounded-md">
+              <span className="font-mono text-[9px] font-bold tracking-widest bg-slate-50 px-2.5 py-1 rounded-md" style={{ color: 'var(--text-muted)' }}>
                 {c.caseId} / {c.year}
               </span>
               <RiskBadge score={c.dqiScore} />
@@ -100,7 +100,7 @@ export function CaseStudyGallery() {
                 <p className="text-[10px] font-bold text-red-600 uppercase tracking-[0.2em] mb-2">
                   Material Loss Estimate
                 </p>
-                <h2 className="text-4xl font-black text-slate-900 tracking-tight">{c.impact}</h2>
+                <h2 className="text-4xl font-black tracking-tight" style={{ color: 'var(--text-primary)' }}>{c.impact}</h2>
               </div>
 
               {/* Company & Title */}
@@ -108,7 +108,7 @@ export function CaseStudyGallery() {
                 <span className="text-[10px] font-bold text-green-600 uppercase tracking-widest block mb-2">
                   {c.industry}
                 </span>
-                <h3 className="text-2xl font-bold text-slate-900 leading-tight mb-3">
+                <h3 className="text-2xl font-bold leading-tight mb-3" style={{ color: 'var(--text-primary)' }}>
                   {c.company}
                 </h3>
                 <div className="inline-flex px-3 py-1 bg-red-50 text-[10px] font-extrabold text-red-700 uppercase tracking-tighter rounded-full border border-red-100">
@@ -119,7 +119,7 @@ export function CaseStudyGallery() {
 
               {/* Concise Narrative */}
               <div className="pt-6 border-t border-slate-100 w-full">
-                <p className="text-[13px] font-medium text-slate-500 leading-relaxed italic px-2">
+                <p className="text-[13px] font-medium leading-relaxed italic px-2" style={{ color: 'var(--text-secondary)' }}>
                   &ldquo;{c.summary}&rdquo;
                 </p>
               </div>
@@ -128,9 +128,10 @@ export function CaseStudyGallery() {
               <div className="mt-auto pt-10 w-full">
                 <Link
                   href={`#audit-${c.id}`}
-                  className="flex items-center justify-center gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-[0.15em] hover:text-slate-900 transition-colors group/link"
+                  className="flex items-center justify-center gap-2 text-[11px] font-bold uppercase tracking-[0.15em] transition-colors group/link"
+                  style={{ color: 'var(--text-muted)' }}
                 >
-                  <ShieldCheck className="w-4 h-4 text-slate-300 group-hover/link:text-green-500 transition-colors" />
+                  <ShieldCheck className="w-4 h-4 transition-colors" style={{ color: 'var(--text-secondary)' }} />
                   View Full Forensic Audit
                   <ArrowUpRight className="w-3.5 h-3.5 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" />
                 </Link>
@@ -142,7 +143,7 @@ export function CaseStudyGallery() {
 
       <div className="mt-20 flex flex-col items-center text-center">
         <div className="w-16 h-px bg-slate-100 mb-8" />
-        <p className="text-xs text-slate-400 font-medium max-w-2xl leading-relaxed uppercase tracking-[0.1em]">
+        <p className="text-xs font-medium max-w-2xl leading-relaxed uppercase tracking-[0.1em]" style={{ color: 'var(--text-muted)' }}>
           All historical failures audited and verified by our proprietary Intelligence Audit
           Pipeline. Results indicate a 94.2% detection rate for cognitive distortions prior to
           material loss.

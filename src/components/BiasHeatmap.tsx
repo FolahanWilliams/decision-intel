@@ -118,12 +118,13 @@ export function BiasHeatmap({ content, biases }: BiasHeatmapProps) {
                 {/* Tooltip - Visible on Hover OR Selection */}
                 <div
                   className={`
-                                    absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 p-4 
-                                    bg-secondary text-foreground text-xs                                      transition-all duration-200 pointer-events-none z-50  border border-white/10
+                                    absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 p-4
+                                    bg-secondary text-foreground text-xs                                      transition-all duration-200 pointer-events-none z-50  border
                                     ${selectedBiasIndex === i ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'}
                                 `}
+                  style={{ borderColor: 'var(--border-color)' }}
                 >
-                  <div className="flex items-center justify-between mb-2 pb-2 border-b border-white/10">
+                  <div className="flex items-center justify-between mb-2 pb-2 border-b" style={{ borderColor: 'var(--border-color)' }}>
                     <p className="font-bold text-warning text-sm">
                       {formatBiasName(part.bias.biasType)}
                     </p>

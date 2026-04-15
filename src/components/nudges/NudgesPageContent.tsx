@@ -72,16 +72,16 @@ export function NudgesPageContent() {
           {[0, 1, 2, 3].map(i => (
             <div key={i} className="card animate-pulse">
               <div className="card-body text-center p-md">
-                <div className="h-3 w-24 bg-white/10 mx-auto mb-sm" />
-                <div className="h-10 w-16 bg-white/10 mx-auto mb-sm" />
-                <div className="h-3 w-16 bg-white/10 mx-auto" />
+                <div className="h-3 w-24 mx-auto mb-sm" style={{ background: 'var(--bg-tertiary)' }} />
+                <div className="h-10 w-16 mx-auto mb-sm" style={{ background: 'var(--bg-tertiary)' }} />
+                <div className="h-3 w-16 mx-auto" style={{ background: 'var(--bg-tertiary)' }} />
               </div>
             </div>
           ))}
         </div>
         <div className="card animate-pulse">
           <div className="card-header">
-            <div className="h-4 w-40 bg-white/10" />
+            <div className="h-4 w-40" style={{ background: 'var(--bg-tertiary)' }} />
           </div>
           <div className="card-body" style={{ padding: 0 }}>
             {[0, 1, 2].map(i => (
@@ -91,15 +91,15 @@ export function NudgesPageContent() {
                 style={{ borderBottom: '1px solid var(--border-color)' }}
               >
                 <div className="flex items-center gap-lg">
-                  <div className="w-10 h-10 bg-white/10" />
+                  <div className="w-10 h-10" style={{ background: 'var(--bg-tertiary)' }} />
                   <div>
-                    <div className="h-4 w-64 bg-white/10 mb-sm" />
-                    <div className="h-3 w-32 bg-white/10" />
+                    <div className="h-4 w-64 mb-sm" style={{ background: 'var(--bg-tertiary)' }} />
+                    <div className="h-3 w-32" style={{ background: 'var(--bg-tertiary)' }} />
                   </div>
                 </div>
                 <div className="flex items-center gap-md">
-                  <div className="h-8 w-20 bg-white/10" />
-                  <div className="h-8 w-20 bg-white/10" />
+                  <div className="h-8 w-20" style={{ background: 'var(--bg-tertiary)' }} />
+                  <div className="h-8 w-20" style={{ background: 'var(--bg-tertiary)' }} />
                 </div>
               </div>
             ))}

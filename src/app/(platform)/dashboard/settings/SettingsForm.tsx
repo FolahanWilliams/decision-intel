@@ -17,6 +17,7 @@ import {
   ExternalLink,
   Unplug,
   Plug,
+  PlayCircle,
 } from 'lucide-react';
 import { updateUserSettings, UserSettingsData } from '@/app/actions/settings';
 import { useTheme } from 'next-themes';
@@ -102,6 +103,28 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  // Onboarding replay state
+  const [replayingTour, setReplayingTour] = useState(false);
+
+  const handleReplayOnboarding = async () => {
+    setReplayingTour(true);
+    try {
+      const res = await fetch('/api/onboarding', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ onboardingCompleted: false, onboardingTourSeen: false }),
+      });
+      if (!res.ok) throw new Error('Failed to reset onboarding');
+      localStorage.setItem('decision-intel-launch-tour', 'pending');
+      showToast('Starting onboarding — redirecting to dashboard', 'success');
+      router.push('/dashboard');
+    } catch (err) {
+      log.error('Failed to replay onboarding:', err);
+      showToast('Failed to replay onboarding', 'error');
+      setReplayingTour(false);
+    }
+  };
 
   // Sync theme with state
   useEffect(() => {
@@ -238,23 +261,23 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
         value={activeTab}
         onValueChange={tab => router.replace(`/dashboard/settings?tab=${tab}`, { scroll: false })}
       >
-        <TabsList className="mb-lg" style={{ display: 'flex', gap: '4px' }}>
-          <TabsTrigger value="account" className="flex items-center gap-xs">
+        <TabsList className="tab-chips mb-lg">
+          <TabsTrigger value="account" className="tab-chip">
             <User size={14} /> Account
           </TabsTrigger>
-          <TabsTrigger value="preferences" className="flex items-center gap-xs">
+          <TabsTrigger value="preferences" className="tab-chip">
             <Bell size={14} /> Preferences
           </TabsTrigger>
-          <TabsTrigger value="connections" className="flex items-center gap-xs">
+          <TabsTrigger value="connections" className="tab-chip">
             <Plug size={14} /> Connections
           </TabsTrigger>
-          <TabsTrigger value="integrations" className="flex items-center gap-xs">
+          <TabsTrigger value="integrations" className="tab-chip">
             <ExternalLink size={14} /> Integrations
           </TabsTrigger>
-          <TabsTrigger value="compliance" className="flex items-center gap-xs">
+          <TabsTrigger value="compliance" className="tab-chip">
             <Shield size={14} /> Compliance
           </TabsTrigger>
-          <TabsTrigger value="audit-log" className="flex items-center gap-xs">
+          <TabsTrigger value="audit-log" className="tab-chip">
             <Settings size={14} /> Audit Log
           </TabsTrigger>
         </TabsList>
@@ -336,6 +359,40 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                   </div>
                   <p className="text-xs text-muted">AES-256 at rest</p>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Product Tour */}
+          <div className="card mb-lg animate-fade-in" style={{ animationDelay: '0.15s' }}>
+            <div className="card-header">
+              <h3 className="flex items-center gap-sm">
+                <PlayCircle size={18} />
+                Product Tour
+              </h3>
+            </div>
+            <div className="card-body">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div style={{ fontWeight: 500, marginBottom: '4px' }}>Replay onboarding</div>
+                  <div className="text-xs text-muted">
+                    Rerun the welcome modal and guided product tour. Useful if you skipped it or
+                    want a refresher on the core flow.
+                  </div>
+                </div>
+                <button
+                  onClick={handleReplayOnboarding}
+                  disabled={replayingTour}
+                  className="btn btn-primary flex items-center gap-sm"
+                  style={{ flexShrink: 0, marginLeft: '24px' }}
+                >
+                  {replayingTour ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <PlayCircle size={14} />
+                  )}
+                  {replayingTour ? 'Starting…' : 'Replay tour'}
+                </button>
               </div>
             </div>
           </div>
