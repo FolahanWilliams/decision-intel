@@ -317,12 +317,13 @@ export function HeroDecisionGraph() {
                 lineHeight: 1.45,
               }}
             >
-              What Decision Intel would have flagged in{' '}
+              <span style={{ fontWeight: 600, color: '#0F172A' }}>11 pre-decision biases</span>{' '}
+              Decision Intel would have flagged in{' '}
               <span style={{ fontWeight: 600, color: '#0F172A' }}>
-                WeWork&rsquo;s S-1 IPO Filing (Aug 2019)
+                WeWork&rsquo;s S-1 (Aug 2019)
               </span>{' '}
-              &mdash;{' '}
-              <span style={{ fontWeight: 600, color: '#DC2626' }}>$39B valuation destroyed</span>.
+              &mdash; before{' '}
+              <span style={{ fontWeight: 600, color: '#DC2626' }}>$39B was destroyed</span>.
               Click any node to explore.
             </div>
           </div>

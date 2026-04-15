@@ -318,6 +318,23 @@ const NODES: GraphNode[] = [
       },
     } satisfies NodeData,
   },
+  {
+    id: 'confirmation',
+    label: 'Confirmation Bias',
+    size: 6.5,
+    data: {
+      type: 'bias',
+      severity: 'critical',
+      detail: {
+        title: 'Confirmation Bias',
+        severity: 'Critical',
+        excerpt:
+          '"Community Adjusted EBITDA" \u2014 the S-1 introduced a non-GAAP metric that excluded rent, marketing, G&A, and construction costs, then emphasized it over GAAP operating income throughout the filing.',
+        insight:
+          'When management invents a custom profitability metric and leads the investor narrative with it, the disclosure systematically confirms the "path to profitability" story while omitting the structural lease obligations that made profitability architecturally difficult.',
+      },
+    } satisfies NodeData,
+  },
 
   // ─── Outcomes (what actually happened) ─────────────────────────────────────
   {
@@ -431,6 +448,8 @@ const EDGES: GraphEdge[] = [
   { id: 'e21', source: 'self_dealing', target: 'groupthink', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
   { id: 'e22', source: 'governance', target: 'self_serving', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
   { id: 'e23', source: 'ipo_decision', target: 'narrative_fallacy', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
+  { id: 'e35', source: 'unit_economics', target: 'confirmation', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
+  { id: 'e36', source: 'softbank_reliance', target: 'confirmation', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
 
   // ─── Toxic bias combinations (solid red, labeled) ──────────────────────────
   { id: 'e8', source: 'groupthink', target: 'authority', fill: '#DC2626', size: 2.5, label: 'Echo Chamber', arrowPlacement: 'end' },
@@ -448,6 +467,7 @@ const EDGES: GraphEdge[] = [
   { id: 'e28', source: 'escalation', target: 'softbank_writedown', fill: '#7C3AED', size: 2, arrowPlacement: 'end' },
   { id: 'e29', source: 'sunk_cost', target: 'softbank_writedown', fill: '#7C3AED', size: 2, arrowPlacement: 'end' },
   { id: 'e30', source: 'planning_fallacy', target: 'bankruptcy', fill: '#7C3AED', size: 2, arrowPlacement: 'end' },
+  { id: 'e37', source: 'confirmation', target: 'valuation_collapse', fill: '#7C3AED', size: 2, arrowPlacement: 'end' },
 
   // ─── Outcome \u2192 outcome (cascade chain) ─────────────────────────────────────
   { id: 'e31', source: 'ipo_pulled', target: 'neumann_ousted', fill: '#A78BFA', size: 1.5, arrowPlacement: 'end' },
