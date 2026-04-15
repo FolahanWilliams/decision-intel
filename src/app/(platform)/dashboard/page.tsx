@@ -68,6 +68,7 @@ import { DOCUMENT_TYPES } from '@/types/deals';
 import { QuickScanModal } from '@/components/ui/QuickScanModal';
 import { Zap } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import { AnalysisShell } from '@/components/analysis/AnalysisShell';
 
 const AnalyticsView = dynamic(() => import('./_views/AnalyticsView'), { ssr: false });
 
@@ -1379,143 +1380,44 @@ export default function Dashboard() {
                 </div>
               </div>
             ) : uploading ? (
-              <div className="card mb-xl">
-                <div className="card-body">
-                  {/* Progress Header — two-phase: uploading then analyzing */}
-                  <div className="flex items-center justify-between mb-md">
-                    <div className="flex items-center gap-sm">
-                      {uploadPhase === 'uploading' ? (
+              uploadPhase === 'uploading' ? (
+                // While the file is still transferring, show a compact
+                // upload-progress bar. The unified AnalysisShell takes over
+                // once the server has accepted the upload and streaming begins.
+                <div className="card mb-xl">
+                  <div className="card-body">
+                    <div className="flex items-center justify-between mb-md">
+                      <div className="flex items-center gap-sm">
                         <CloudUpload size={16} className="text-accent-primary" />
-                      ) : (
-                        <Loader2 size={16} className="animate-spin text-accent-primary" />
-                      )}
-                      <span className="text-sm font-medium">
-                        {uploadPhase === 'uploading'
-                          ? 'Uploading document...'
-                          : 'Analyzing document...'}
+                        <span className="text-sm font-medium">Uploading document…</span>
+                      </div>
+                      <span
+                        className="text-sm font-semibold"
+                        style={{ color: 'var(--text-highlight)' }}
+                      >
+                        {uploadProgress}%
                       </span>
                     </div>
-                    <span
-                      className="text-sm font-semibold"
-                      style={{ color: 'var(--text-highlight)' }}
-                    >
-                      {uploadPhase === 'uploading' ? `${uploadProgress}%` : `${currentProgress}%`}
-                    </span>
-                  </div>
-
-                  {/* Progress Bar - Enhanced */}
-                  <div className="progress-bar mb-md">
-                    <div
-                      className="progress-bar-fill"
-                      style={{
-                        width: `${uploadPhase === 'uploading' ? uploadProgress : currentProgress}%`,
-                        transition: 'width 0.3s ease',
-                      }}
-                    />
-                  </div>
-
-                  {/* Phase indicator */}
-                  <div className="flex items-center gap-md mb-md text-xs text-muted">
-                    <span
-                      className={
-                        uploadPhase === 'uploading'
-                          ? 'text-accent-primary font-medium'
-                          : 'text-success'
-                      }
-                    >
-                      {uploadPhase === 'analyzing' ? '✓ ' : ''}Upload
-                    </span>
-                    <span style={{ color: 'var(--border-hover)' }}>→</span>
-                    <span
-                      className={
-                        uploadPhase === 'analyzing' ? 'text-accent-primary font-medium' : ''
-                      }
-                    >
-                      Analysis
-                    </span>
-                  </div>
-
-                  {/* Analysis Steps */}
-                  <div className="grid grid-cols-3 md:grid-cols-7 gap-xs mt-md">
-                    {analysisSteps.map((step, i) => (
+                    <div className="progress-bar">
                       <div
-                        key={i}
-                        className="flex flex-col items-center gap-1 text-center"
-                        title={step.name}
-                      >
-                        <div
-                          style={{
-                            width: 28,
-                            height: 28,
-                            borderRadius: 'var(--radius-full)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            background:
-                              step.status === 'complete'
-                                ? 'rgba(34, 197, 94, 0.15)'
-                                : step.status === 'running'
-                                  ? 'rgba(255, 255, 255, 0.10)'
-                                  : 'var(--bg-tertiary)',
-                            border: `1px solid ${
-                              step.status === 'complete'
-                                ? 'rgba(34, 197, 94, 0.3)'
-                                : step.status === 'running'
-                                  ? 'rgba(255, 255, 255, 0.25)'
-                                  : 'var(--border-color)'
-                            }`,
-                            transition: 'all var(--transition-normal)',
-                          }}
-                        >
-                          {step.status === 'complete' ? (
-                            <CheckCircle size={14} style={{ color: 'var(--success)' }} />
-                          ) : step.status === 'running' ? (
-                            <Loader2
-                              size={14}
-                              className="animate-spin"
-                              style={{ color: 'var(--accent-primary)' }}
-                            />
-                          ) : (
-                            <div
-                              style={{
-                                width: 6,
-                                height: 6,
-                                borderRadius: '50%',
-                                background: 'var(--border-hover)',
-                              }}
-                            />
-                          )}
-                        </div>
-                        <span
-                          className="text-xs text-muted hidden md:block"
-                          style={{ lineHeight: 1.2, maxWidth: 60 }}
-                        >
-                          {ANALYSIS_STEPS[i]?.name.split(' ').slice(0, 2).join(' ')}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Cancel */}
-                  <div className="flex justify-end mt-md">
-                    <button
-                      onClick={() => {
-                        cancelAnalysis();
-                        setUploading(false);
-                      }}
-                      className="btn btn-ghost text-xs flex items-center gap-xs"
-                      style={{
-                        color: 'var(--text-muted)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        padding: '6px 12px',
-                      }}
-                    >
-                      <X size={12} />
-                      Cancel Analysis
-                    </button>
+                        className="progress-bar-fill"
+                        style={{ width: `${uploadProgress}%`, transition: 'width 0.3s ease' }}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <AnalysisShell
+                  filename={pendingFile?.name ?? 'Strategic memo'}
+                  currentProgress={currentProgress}
+                  steps={analysisSteps}
+                  biasCount={biasCountRef.current}
+                  onCancel={() => {
+                    cancelAnalysis();
+                    setUploading(false);
+                  }}
+                />
+              )
             ) : null}
           </ErrorBoundary>
 
