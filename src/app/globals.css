@@ -525,17 +525,20 @@ pre {
 }
 
 /* ═══════════════════════════════════════════
-   Cards — Solid white with hairline border + subtle shadow.
-   Matches the marketing-page treatment (Linear/Stripe elevation).
-   The old glassmorphism treatment was designed for dark mode; on a
-   light page it read as muddy translucent panels with no edge.
+   Cards — Solid white with a subtle brand-green-tinted border + soft
+   shadow. Matches the marketing-page treatment (Linear/Stripe
+   elevation) with a whisper of brand color on every card edge so the
+   whole product feels like one green-accented system instead of a
+   generic grayscale app.
    ═══════════════════════════════════════════ */
 .card {
   background: var(--bg-card);
-  border: 1px solid var(--border-color);
+  border: 1px solid rgba(22, 163, 74, 0.12);
   border-radius: var(--radius-xl);
   position: relative;
-  box-shadow: var(--shadow-sm);
+  box-shadow:
+    0 0 0 1px rgba(22, 163, 74, 0.02),
+    var(--shadow-sm);
   transition:
     border-color var(--transition-normal),
     box-shadow var(--transition-normal),
@@ -543,8 +546,10 @@ pre {
 }
 
 .card:hover {
-  border-color: var(--border-hover);
-  box-shadow: var(--shadow-md);
+  border-color: rgba(22, 163, 74, 0.28);
+  box-shadow:
+    0 0 0 1px rgba(22, 163, 74, 0.06),
+    var(--shadow-md);
 }
 
 /* Card accent-border variants. The previous rule painted a white border
@@ -872,14 +877,26 @@ select:focus {
    ═══════════════════════════════════════════ */
 .upload-zone {
   position: relative;
-  border: 2px dashed var(--border-hover);
+  border: 2px dashed rgba(22, 163, 74, 0.28);
   background: var(--bg-card);
   padding: clamp(1.25rem, 4vw, 3.5rem);
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all var(--transition-normal);
   border-radius: var(--radius-xl);
   cursor: pointer;
-  box-shadow: var(--shadow-sm);
+  box-shadow:
+    0 0 0 1px rgba(22, 163, 74, 0.02),
+    var(--shadow-sm);
+}
+
+/* Direct child flex-row (icon + text copy) centers itself within the zone.
+   Previously the inner cluster floated left because the zone's flex
+   didn't propagate. */
+.upload-zone > * {
+  justify-content: center;
 }
 
 /* Animated conic-gradient halo on hover — signals "drop here" without copy */
@@ -987,6 +1004,36 @@ tr:hover td {
 /* ═══════════════════════════════════════════
    Utility Grids & Flex
    ═══════════════════════════════════════════ */
+@layer utilities {
+  /* Vertical-stack primitives — use these instead of .mb-* on siblings
+     when you want predictable, non-collapsing spacing. Margin-collapse
+     between adjacent siblings (especially when AnimatePresence or
+     conditional renders leave empty wrapper divs between them) means
+     margin-based rhythm silently crunches on some pages. Gap never
+     collapses. Apply to any vertical container:
+         <div className="stack-lg"> … </div>  */
+  .stack-sm {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  .stack-md {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  .stack-lg {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+  }
+  .stack-xl {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+  }
+}
+
 @layer base {
   .grid {
     display: grid;
@@ -1436,20 +1483,24 @@ tr:hover td {
    ═══════════════════════════════════════════ */
 .stat-card {
   background: var(--bg-card);
-  border: 1px solid var(--border-color);
+  border: 1px solid rgba(22, 163, 74, 0.12);
   border-radius: var(--radius-xl);
   padding: var(--spacing-lg);
   transition:
     border-color var(--transition-normal),
     box-shadow var(--transition-normal),
     transform var(--transition-normal);
-  box-shadow: var(--shadow-sm);
+  box-shadow:
+    0 0 0 1px rgba(22, 163, 74, 0.02),
+    var(--shadow-sm);
   position: relative;
 }
 
 .stat-card:hover {
-  border-color: var(--border-hover);
-  box-shadow: var(--shadow-md);
+  border-color: rgba(22, 163, 74, 0.28);
+  box-shadow:
+    0 0 0 1px rgba(22, 163, 74, 0.06),
+    var(--shadow-md);
   transform: translateY(-1px);
 }
 

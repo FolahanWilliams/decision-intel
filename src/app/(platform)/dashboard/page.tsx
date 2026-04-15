@@ -738,12 +738,17 @@ export default function Dashboard() {
   };
 
   return (
-    <div>
+    // stack-xl gives predictable, non-collapsing vertical rhythm between
+    // every direct child (page-header → KPI cards → banners → onboarding
+    // → widgets → view content). Replaces the fragile margin-based
+    // approach that was silently crunching when empty AnimatePresence
+    // containers sat between siblings.
+    <div className="stack-xl">
       {/* Welcome modal for first-time users */}
       {showWelcome && <WelcomeModal onClose={() => setShowWelcome(false)} />}
 
       {/* Header with view tabs */}
-      <div className="page-header">
+      <div className="page-header" style={{ marginBottom: 0 }}>
         <div>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.03em' }}>
             <span className="text-gradient">Dashboard</span>
@@ -825,7 +830,7 @@ export default function Dashboard() {
           resolves). Empty / zero values are handled by the —/0 fallbacks. */}
       <>
           <motion.div
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-md sm:gap-lg mb-xl"
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-md sm:gap-lg"
             initial="hidden"
             animate="visible"
             variants={{
@@ -950,11 +955,14 @@ export default function Dashboard() {
           </motion.div>
       </>
 
-      {/* Stream timed out banner */}
+      {/* Banners / widgets — rendered bare (no mb-lg wrapper divs) so null
+          returns don't create empty flex items that inflate stack-xl's
+          gap. AnimatePresence contributes no DOM when empty; each child
+          component self-conditionally returns null. */}
       <AnimatePresence>
         {streamTimedOut && !uploading && (
           <motion.div
-            className="mb-lg p-md bg-warning/10 border border-warning/30 rounded-lg flex items-center gap-sm"
+            className="p-md bg-warning/10 border border-warning/30 rounded-lg flex items-center gap-sm"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
@@ -969,11 +977,10 @@ export default function Dashboard() {
         )}
       </AnimatePresence>
 
-      {/* Error Message - Compact */}
       <AnimatePresence>
         {error && (
           <motion.div
-            className="mb-lg p-md bg-error/10 border border-error/30 rounded-lg flex items-center gap-sm"
+            className="p-md bg-error/10 border border-error/30 rounded-lg flex items-center gap-sm"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
@@ -992,62 +999,34 @@ export default function Dashboard() {
         )}
       </AnimatePresence>
 
-      {/* Outcome Gate Banner (soft gate — 3-4 pending outcomes) */}
-      <AnimatePresence>
-        {outcomeReminder && (
-          <div className="mb-lg">
-            <OutcomeGateBanner
-              pendingCount={outcomeReminder.pendingCount}
-              pendingAnalysisIds={outcomeReminder.analysisIds}
-              onDismiss={() => setOutcomeReminder(null)}
-            />
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* Sample Data Banner — offers seed-in-one-click for cold-start orgs
-          and "ready to clear" once user has enough real analyses (M4) */}
-      <div className="mb-lg">
-        <SampleDataBanner />
-      </div>
-
-      {/* Draft Outcome Detection Banner */}
-      <div className="mb-lg">
-        <DraftOutcomeBanner />
-      </div>
-
-      {/* Outcome Gate Banner (hard reminder — 5+ pending outcomes, non-blocking) */}
-      {hardGateInfo && (
-        <div className="mb-lg">
-          <OutcomeGateBanner
-            pendingCount={hardGateInfo.pendingCount}
-            pendingAnalysisIds={hardGateInfo.pendingAnalysisIds}
-            level="hard"
-            onDismiss={() => setHardGateInfo(null)}
-          />
-        </div>
+      {outcomeReminder && (
+        <OutcomeGateBanner
+          pendingCount={outcomeReminder.pendingCount}
+          pendingAnalysisIds={outcomeReminder.analysisIds}
+          onDismiss={() => setOutcomeReminder(null)}
+        />
       )}
 
-      {/* Stacked widget region — consistent mb-lg rhythm between each */}
-      <div className="mb-lg">
-        <OnboardingGuide documentCount={totalDocs ?? 0} />
-      </div>
+      <SampleDataBanner />
+      <DraftOutcomeBanner />
 
-      <div className="mb-lg">
-        <DecisionTriageWidget />
-      </div>
+      {hardGateInfo && (
+        <OutcomeGateBanner
+          pendingCount={hardGateInfo.pendingCount}
+          pendingAnalysisIds={hardGateInfo.pendingAnalysisIds}
+          level="hard"
+          onDismiss={() => setHardGateInfo(null)}
+        />
+      )}
 
-      <div className="mb-lg">
-        <ErrorBoundary sectionName="Nudges">
-          <NudgeWidget />
-        </ErrorBoundary>
-      </div>
-
-      <div className="mb-lg">
-        <ErrorBoundary sectionName="Journal">
-          <JournalWidget />
-        </ErrorBoundary>
-      </div>
+      <OnboardingGuide documentCount={totalDocs ?? 0} />
+      <DecisionTriageWidget />
+      <ErrorBoundary sectionName="Nudges">
+        <NudgeWidget />
+      </ErrorBoundary>
+      <ErrorBoundary sectionName="Journal">
+        <JournalWidget />
+      </ErrorBoundary>
 
       {/* ═══════ UPLOAD & MONITOR VIEW ═══════ */}
       {activeView === 'upload' && (
@@ -1266,7 +1245,7 @@ export default function Dashboard() {
             {!uploading && !pendingFile ? (
               <div
                 id="onborda-upload"
-                className={`upload-zone mb-xl liquid-glass-iridescent liquid-glass-shimmer ${isDragOver ? 'dragover' : ''}`}
+                className={`upload-zone liquid-glass-iridescent liquid-glass-shimmer ${isDragOver ? 'dragover' : ''}`}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
@@ -1287,32 +1266,47 @@ export default function Dashboard() {
                   disabled={uploading}
                   onChange={handleFileSelect}
                 />
-                <div className="flex items-center gap-md">
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 'var(--spacing-md)',
+                    textAlign: 'center',
+                  }}
+                >
                   <div
                     style={{
-                      width: 48,
-                      height: 48,
+                      width: 56,
+                      height: 56,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       borderRadius: 'var(--radius-lg)',
-                      background: isDragOver ? 'var(--bg-active-hover)' : 'var(--bg-card-hover)',
-                      border: `1px solid ${isDragOver ? 'var(--border-hover)' : 'var(--border-color)'}`,
+                      background: isDragOver
+                        ? 'rgba(22, 163, 74, 0.14)'
+                        : 'rgba(22, 163, 74, 0.08)',
+                      border: `1px solid rgba(22, 163, 74, ${isDragOver ? 0.38 : 0.22})`,
                       transition: 'all 0.2s ease',
                       transform: isDragOver ? 'scale(1.1)' : 'scale(1)',
                     }}
                   >
                     {isDragOver ? (
-                      <CloudUpload size={24} className="text-accent-primary" />
+                      <CloudUpload size={26} style={{ color: 'var(--accent-primary)' }} />
                     ) : (
-                      <Upload size={24} className="text-accent-primary" />
+                      <Upload size={26} style={{ color: 'var(--accent-primary)' }} />
                     )}
                   </div>
                   <div>
-                    <p className="font-medium">
+                    <p className="font-medium" style={{ fontSize: 15 }}>
                       {isDragOver ? 'Drop to upload' : 'Drop document here or click to browse'}
                     </p>
-                    <p className="text-sm text-muted">PDF, DOCX, PPTX, XLSX, CSV, HTML, TXT, MD · Max 5 MB</p>
+                    <p
+                      className="text-sm text-muted"
+                      style={{ marginTop: 4 }}
+                    >
+                      PDF, DOCX, PPTX, XLSX, CSV, HTML, TXT, MD · Max 5 MB
+                    </p>
                     {billingData && billingData.limits.analysesPerMonth > 0 && (
                       <p className="text-xs text-muted" style={{ marginTop: '4px' }}>
                         {billingData.usage.analysesThisMonth}/{billingData.limits.analysesPerMonth}{' '}
@@ -1351,7 +1345,7 @@ export default function Dashboard() {
                 // While the file is still transferring, show a compact
                 // upload-progress bar. The unified AnalysisShell takes over
                 // once the server has accepted the upload and streaming begins.
-                <div className="card mb-xl">
+                <div className="card">
                   <div className="card-body">
                     <div className="flex items-center justify-between mb-md">
                       <div className="flex items-center gap-sm">
@@ -1388,12 +1382,12 @@ export default function Dashboard() {
             ) : null}
           </ErrorBoundary>
 
-          {/* Bulk Upload */}
-          <div className="mt-lg mb-lg">
-            <ErrorBoundary sectionName="Bulk Upload">
-              <BulkUploadPanel onComplete={() => mutateDocs?.()} />
-            </ErrorBoundary>
-          </div>
+          {/* Bulk Upload — direct sibling under the stack-xl fragment
+              so the stack gap governs spacing between upload zone and
+              bulk upload card. No explicit mt/mb needed. */}
+          <ErrorBoundary sectionName="Bulk Upload">
+            <BulkUploadPanel onComplete={() => mutateDocs?.()} />
+          </ErrorBoundary>
 
           {/* Currently Analyzing Section */}
           <ErrorBoundary sectionName="Documents">
@@ -1625,7 +1619,7 @@ export default function Dashboard() {
       {activeView === 'browse' && (
         <>
           {/* Activity Feed - Collapsible */}
-          <div className="card mb-xl">
+          <div className="card">
             <button
               onClick={() => setShowActivityFeed(prev => !prev)}
               className="w-full card-header flex items-center justify-between hover:bg-[var(--bg-card-hover)] transition-colors"
