@@ -8,6 +8,7 @@ import { CommandPalette } from '@/components/ui/CommandPalette';
 import { NewDecisionModal } from '@/components/ui/NewDecisionModal';
 import { AuthGuard } from '@/components/ui/AuthGuard';
 import { UsageMeter } from '@/components/billing/UsageMeter';
+import { NotificationBell } from '@/components/ui/NotificationCenter';
 import { OnboardingTourProvider } from '@/components/onboarding/OnboardingTour';
 export default async function PlatformLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -47,7 +48,7 @@ export default async function PlatformLayout({ children }: { children: React.Rea
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'flex-end',
-                gap: 10,
+                gap: 14,
                 marginBottom: 16,
                 color: 'var(--text-muted)',
                 fontSize: 11,
@@ -60,6 +61,7 @@ export default async function PlatformLayout({ children }: { children: React.Rea
               <span id="onborda-usage-meter" style={{ display: 'inline-flex' }}>
                 <UsageMeter />
               </span>
+              <NotificationBell />
             </div>
             {children}
           </div>

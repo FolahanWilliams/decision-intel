@@ -277,9 +277,9 @@ export function InsightsPageContent() {
   const [graphOrgId, setGraphOrgId] = useState<string | null>(null);
   const { graphTrends } = useGraphTrends(graphOrgId);
   const [marketAnalysis, setMarketAnalysis] = useState<{
-    summary: string;
-    impactAssessment: { category: string; status: string; details: string }[];
-    searchSources: string[];
+    summary?: string;
+    impactAssessment?: { category: string; status: string; details: string }[];
+    searchSources?: string[];
   } | null>(null);
   const [marketAnalysisLoading, setMarketAnalysisLoading] = useState(false);
   const [marketAnalysisError, setMarketAnalysisError] = useState<string | null>(null);
@@ -577,16 +577,16 @@ export function InsightsPageContent() {
                   marginBottom: '12px',
                 }}
               >
-                {marketAnalysis.summary.split('\n').map((line, i) => (
+                {(marketAnalysis.summary ?? '').split('\n').map((line, i, arr) => (
                   <span key={i}>
                     {line}
-                    {i < marketAnalysis.summary.split('\n').length - 1 && <br />}
+                    {i < arr.length - 1 && <br />}
                   </span>
                 ))}
               </div>
-              {marketAnalysis.impactAssessment.length > 0 && (
+              {(marketAnalysis.impactAssessment?.length ?? 0) > 0 && (
                 <div className="grid grid-3 gap-sm" style={{ marginBottom: '12px' }}>
-                  {marketAnalysis.impactAssessment.map(item => {
+                  {marketAnalysis.impactAssessment!.map(item => {
                     const statusColor =
                       item.status === 'High'
                         ? 'var(--error)'
@@ -644,10 +644,10 @@ export function InsightsPageContent() {
                   })}
                 </div>
               )}
-              {marketAnalysis.searchSources.length > 0 && (
+              {(marketAnalysis.searchSources?.length ?? 0) > 0 && (
                 <div className="flex items-center gap-sm" style={{ flexWrap: 'wrap' }}>
                   <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Sources:</span>
-                  {marketAnalysis.searchSources.slice(0, 5).map((url, i) => (
+                  {marketAnalysis.searchSources!.slice(0, 5).map((url, i) => (
                     <a
                       key={i}
                       href={url}

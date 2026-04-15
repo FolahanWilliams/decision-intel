@@ -84,10 +84,12 @@ export async function POST() {
     const activeTopics = Array.from(topics).slice(0, 3); // Top 3
 
     if (activeTopics.length === 0) {
+      // Always include impactAssessment (even if empty) so the frontend's
+      // `.impactAssessment.length > 0` guards don't crash on this shape.
       return NextResponse.json({
         summary:
-          'No sufficient data to generate market intelligence. Upload documents with financial data first.',
-        risks: [],
+          'No sufficient data to generate market intelligence. Upload a strategic memo that mentions a company or market, then try again.',
+        impactAssessment: [],
         searchSources: [],
       });
     }

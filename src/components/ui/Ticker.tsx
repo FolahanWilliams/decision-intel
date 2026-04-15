@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { NotificationBell } from '@/components/ui/NotificationCenter';
 
 interface TickerStats {
   avgScore: string;
@@ -73,9 +72,6 @@ export default function Ticker() {
         <TickerItem label="Documents" value={stats.totalDocs} color="var(--info)" />
         <TickerItem label="Analyzed" value={stats.analyzedDocs} color="var(--text-primary)" />
         <TickerItem label="Status" value="Operational" color="var(--success)" />
-      </div>
-      <div style={{ flexShrink: 0, padding: '0 12px', zIndex: 10 }}>
-        <NotificationBell />
       </div>
       <style jsx>{`
         .ticker-track {

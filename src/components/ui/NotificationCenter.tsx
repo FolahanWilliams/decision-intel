@@ -183,29 +183,37 @@ export function NotificationBell() {
   return (
     <div style={{ position: 'relative' }}>
       <button
+        type="button"
         onClick={handleToggle}
         aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
         style={{
-          background: 'transparent',
-          border: 'none',
-          color: 'var(--text-muted)',
+          background: open ? 'rgba(22, 163, 74, 0.08)' : 'var(--bg-card)',
+          border: `1px solid ${open ? 'rgba(22, 163, 74, 0.28)' : 'var(--border-color)'}`,
+          borderRadius: 'var(--radius-full)',
+          color: open ? 'var(--accent-primary)' : 'var(--text-secondary)',
           cursor: 'pointer',
           padding: '6px',
           display: 'flex',
           alignItems: 'center',
+          justifyContent: 'center',
+          width: 32,
+          height: 32,
           position: 'relative',
+          transition: 'background 0.15s, border-color 0.15s, color 0.15s',
         }}
       >
-        <Bell size={18} />
+        <Bell size={15} />
         {unreadCount > 0 && (
           <span
+            aria-hidden
             style={{
               position: 'absolute',
-              top: '2px',
-              right: '2px',
-              width: '8px',
-              height: '8px',
+              top: '1px',
+              right: '1px',
+              width: '9px',
+              height: '9px',
               background: 'var(--error)',
+              border: '1.5px solid var(--bg-card)',
               borderRadius: '50%',
             }}
           />

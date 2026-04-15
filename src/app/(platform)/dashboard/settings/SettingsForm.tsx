@@ -235,7 +235,10 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
     });
   };
 
-  const activeTab = searchParams.get('tab') || 'account';
+  const rawTab = searchParams.get('tab') || 'account';
+  // Legacy: "connections" tab was merged into "integrations" — remap silently
+  // so old Slack/email deep-links still land on a valid tab.
+  const activeTab = rawTab === 'connections' ? 'integrations' : rawTab;
 
   return (
     <div
@@ -268,11 +271,8 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
           <TabsTrigger value="preferences" className="tab-chip">
             <Bell size={14} /> Preferences
           </TabsTrigger>
-          <TabsTrigger value="connections" className="tab-chip">
-            <Plug size={14} /> Connections
-          </TabsTrigger>
           <TabsTrigger value="integrations" className="tab-chip">
-            <ExternalLink size={14} /> Integrations
+            <Plug size={14} /> Integrations
           </TabsTrigger>
           <TabsTrigger value="compliance" className="tab-chip">
             <Shield size={14} /> Compliance
@@ -561,8 +561,8 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
           </div>
         </TabsContent>
 
-        {/* ── Connections Tab ──────────────────────────── */}
-        <TabsContent value="connections">
+        {/* ── Integrations Tab (merged Connections + Marketplace) ────── */}
+        <TabsContent value="integrations">
           {/* Integrations */}
           <div className="card mb-xl animate-fade-in">
             <div className="card-header">
@@ -704,11 +704,11 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
 
           {/* API Keys */}
           <ApiKeysSection />
-        </TabsContent>
 
-        {/* ── Integrations Tab ──────────────────────── */}
-        <TabsContent value="integrations">
-          <IntegrationsTabContent />
+          {/* Full integration marketplace (connect, disconnect, manage scopes) */}
+          <div className="mt-xl">
+            <IntegrationsTabContent />
+          </div>
         </TabsContent>
 
         {/* ── Compliance Tab ──────────────────────── */}

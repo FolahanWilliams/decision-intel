@@ -26,15 +26,44 @@ import { useState, useEffect, useCallback } from 'react';
 import { ThemeToggle, ThemeToggleCompact } from '@/components/ThemeToggle';
 import { DensityToggle } from '@/components/DensityProvider';
 
+const SIDEBAR_COLLAPSED_KEY = 'di-sidebar-main-collapsed';
+const SIDEBAR_SECTIONS_KEY = 'di-sidebar-collapsed';
+
 export default function Sidebar() {
   const pathname = usePathname();
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsedState] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [plan, setPlan] = useState<string>('free');
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
     Intelligence: true,
     'Team & Settings': true,
   });
+
+  // Persist the full-sidebar collapse state so the hamburger's effect is
+  // durable — previously the button toggled state that reset on every page
+  // load, which made it look broken. Wrapped setter so every call writes
+  // through to localStorage.
+  const setCollapsed = useCallback((next: boolean | ((prev: boolean) => boolean)) => {
+    setCollapsedState(prev => {
+      const value = typeof next === 'function' ? next(prev) : next;
+      try {
+        localStorage.setItem(SIDEBAR_COLLAPSED_KEY, value ? '1' : '0');
+      } catch {
+        /* quota or privacy mode — ignore */
+      }
+      return value;
+    });
+  }, []);
+
+  // Hydrate from localStorage on first mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
+      if (saved === '1') setCollapsedState(true);
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   // Fetch plan for feature-gating team-only nav items
   useEffect(() => {
@@ -51,7 +80,7 @@ export default function Sidebar() {
   // Persist collapsed sections to localStorage
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('di-sidebar-collapsed');
+      const saved = localStorage.getItem(SIDEBAR_SECTIONS_KEY);
       if (saved) setCollapsedSections(JSON.parse(saved));
     } catch {
       /* ignore */
@@ -62,7 +91,7 @@ export default function Sidebar() {
     setCollapsedSections(prev => {
       const next = { ...prev, [section]: !prev[section] };
       try {
-        localStorage.setItem('di-sidebar-collapsed', JSON.stringify(next));
+        localStorage.setItem(SIDEBAR_SECTIONS_KEY, JSON.stringify(next));
       } catch {
         /* ignore */
       }
