@@ -30,17 +30,21 @@
 }
 
 :root {
-  /* Default to light theme */
+  /* Default to light theme.
+     Elevation strategy: pages sit on --bg-secondary (a subtle gray),
+     cards render pure white so they actually look like cards. Prior token
+     had --bg-card at rgba(0,0,0,0.01) — 99% transparent — which meant
+     cards disappeared into the page and the whole product read flat. */
   --bg-primary: #ffffff;
-  --bg-secondary: #f9fafb;
+  --bg-secondary: #f7f8fa;
   --bg-tertiary: #f3f4f6;
-  --bg-card: rgba(0, 0, 0, 0.01);
-  --bg-card-hover: rgba(0, 0, 0, 0.03);
+  --bg-card: #ffffff;
+  --bg-card-hover: #f7f8fa;
   --bg-elevated: #ffffff;
-  --bg-active: rgba(0, 0, 0, 0.06);
-  --bg-active-hover: rgba(0, 0, 0, 0.08);
-  --overlay-backdrop: rgba(0, 0, 0, 0.3);
-  --overlay-heavy: rgba(0, 0, 0, 0.6);
+  --bg-active: #f3f4f6;
+  --bg-active-hover: #eceef1;
+  --overlay-backdrop: rgba(15, 23, 42, 0.32);
+  --overlay-heavy: rgba(15, 23, 42, 0.56);
 
   /* Text — dark on light */
   --text-primary: #0f172a;
@@ -66,14 +70,18 @@
     rgba(22, 101, 52, 0.05)
   );
 
-  /* Borders — subtle gray */
-  --border-color: rgba(0, 0, 0, 0.15);
-  --border-active: rgba(0, 0, 0, 0.28);
-  --border-hover: rgba(0, 0, 0, 0.2);
+  /* Borders — subtle gray, softened to match the marketing-page treatment
+     (Linear/Stripe-style cards where the shadow does most of the
+     elevation work and the border is a hairline). Previous values were
+     almost 2× too dark and made the authenticated app feel heavier than
+     the marketing pages. */
+  --border-color: rgba(15, 23, 42, 0.08);
+  --border-active: rgba(15, 23, 42, 0.18);
+  --border-hover: rgba(15, 23, 42, 0.12);
   /* Alias: --border-primary is used by Founder Hub + analytics components.
      Keep it synced with --border-color so those components render correctly
      in light theme (previously fell back to browser default #333). */
-  --border-primary: rgba(0, 0, 0, 0.15);
+  --border-primary: rgba(15, 23, 42, 0.08);
 
   /* Severity — vivid, saturated */
   --success: #16a34a;
@@ -108,12 +116,14 @@
   --radius-2xl: 20px;
   --radius-full: 9999px;
 
-  /* Shadows — softer for light mode */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.12), 0 5px 10px rgba(0, 0, 0, 0.08);
-  --shadow-glow: 0 0 20px rgba(0, 0, 0, 0.04), 0 0 40px rgba(0, 0, 0, 0.02);
-  --shadow-glow-white: 0 0 30px rgba(0, 0, 0, 0.03);
+  /* Shadows — calibrated for white cards on a gray-50 page. sm/md cover
+     most UI; lg reserved for modals and floating panels. Matches the
+     elevation rhythm of the marketing pages. */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 1px rgba(15, 23, 42, 0.02);
+  --shadow-md: 0 2px 6px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.08), 0 4px 8px rgba(15, 23, 42, 0.04);
+  --shadow-glow: 0 0 0 1px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.05);
+  --shadow-glow-white: 0 1px 2px rgba(15, 23, 42, 0.03);
 
   /* Glass — adapted for light mode */
   --glass-bg: rgba(0, 0, 0, 0.03);
@@ -511,40 +521,38 @@ pre {
 }
 
 /* ═══════════════════════════════════════════
-   Cards — Glassmorphism with depth tiers
+   Cards — Solid white with hairline border + subtle shadow.
+   Matches the marketing-page treatment (Linear/Stripe elevation).
+   The old glassmorphism treatment was designed for dark mode; on a
+   light page it read as muddy translucent panels with no edge.
    ═══════════════════════════════════════════ */
 .card {
-  background: var(--liquid-bg);
-  background-color: var(--liquid-tint);
-  border: 1px solid var(--liquid-border);
-  border-radius: var(--liquid-radius);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
   position: relative;
-  backdrop-filter: blur(var(--liquid-blur)) saturate(140%);
-  -webkit-backdrop-filter: blur(var(--liquid-blur)) saturate(140%);
-  box-shadow: var(--liquid-shadow);
+  box-shadow: var(--shadow-sm);
   transition:
     border-color var(--transition-normal),
     box-shadow var(--transition-normal),
-    transform var(--transition-normal),
-    background var(--transition-normal);
+    transform var(--transition-normal);
 }
 
 .card:hover {
-  border-color: var(--liquid-border-hover);
-  box-shadow: var(--liquid-shadow-hover);
-  transform: translateY(-2px);
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-md);
 }
 
-/* Card with accent border-top — neutral specular highlight, no color glow */
+/* Card accent-border variants. The previous rule painted a white border
+   over the card's top edge — invisible on white cards. Keeping the
+   selectors so existing markup doesn't break, but letting the accent
+   colour come from inline `border-top` on the element itself. */
 .card-accent-orange,
 .card-accent-lime,
 .card-accent-amber,
 .card-accent-green,
 .card-accent-red {
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow:
-    var(--liquid-shadow),
-    0 -2px 12px rgba(255, 255, 255, 0.04);
+  box-shadow: var(--shadow-sm);
 }
 
 /* Card with gradient left border */
@@ -555,16 +563,17 @@ pre {
 
 .card-header {
   padding: var(--spacing-md) var(--spacing-lg);
-  border-bottom: 1px solid var(--liquid-border);
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-radius: var(--liquid-radius) var(--liquid-radius) 0 0;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
 }
 
 .card-header h3 {
   font-size: 0.8125rem;
   font-weight: 600;
+  color: var(--text-primary);
 }
 
 .card-body {
@@ -615,49 +624,42 @@ pre {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #00d2ff, #0ea5e9);
-  color: #000000;
-  border: 1px solid rgba(0, 210, 255, 0.6);
-  box-shadow:
-    0 2px 16px rgba(0, 210, 255, 0.25),
-    0 0 40px rgba(0, 210, 255, 0.08);
-  font-weight: 700;
+  background: var(--accent-primary);
+  color: #ffffff;
+  border: 1px solid var(--accent-primary);
+  box-shadow: var(--shadow-sm);
+  font-weight: 600;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #33dbff, #38bdf8);
-  border-color: rgba(0, 210, 255, 0.8);
-  box-shadow:
-    0 6px 30px rgba(0, 210, 255, 0.35),
-    0 0 60px rgba(0, 210, 255, 0.12);
+  background: var(--accent-secondary);
+  border-color: var(--accent-secondary);
+  box-shadow: var(--shadow-md);
   transform: translateY(-1px);
 }
 
 .btn-primary:active:not(:disabled) {
   transform: translateY(0);
-  background: linear-gradient(135deg, #00b8e0, #0284c7);
-  box-shadow: 0 2px 8px rgba(0, 210, 255, 0.12);
+  background: var(--accent-tertiary);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-secondary {
-  background: var(--liquid-bg);
+  background: var(--bg-card);
   color: var(--text-primary);
-  border: 1px solid var(--liquid-border);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 1px 0 var(--liquid-specular) inset;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  border-color: var(--liquid-border-hover);
-  background: var(--liquid-bg-hover);
+  border-color: var(--border-hover);
+  background: var(--bg-card-hover);
   transform: translateY(-1px);
 }
 
 .btn-secondary:active:not(:disabled) {
   transform: translateY(0);
-  background: var(--liquid-bg-strong);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) inset;
+  background: var(--bg-active);
 }
 
 .btn-ghost {
@@ -667,15 +669,12 @@ pre {
 }
 
 .btn-ghost:hover:not(:disabled) {
-  background: var(--liquid-bg);
-  border-color: var(--liquid-border);
+  background: var(--bg-card-hover);
   color: var(--text-primary);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 
 .btn-ghost:active:not(:disabled) {
-  background: var(--liquid-bg-hover);
+  background: var(--bg-active);
 }
 
 .btn-sm {
@@ -684,7 +683,7 @@ pre {
 }
 
 .btn:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline: 2px solid rgba(22, 163, 74, 0.5);
   outline-offset: 2px;
 }
 
@@ -1371,8 +1370,10 @@ tr:hover td {
 
 /* ═══════════════════════════════════════════
    Interactive Light Refraction — mouse-tracked
-   CSS vars set by LiquidGlassEffect.tsx
-   SVG filters defined in LiquidGlassEffect component
+   Only enabled in dark mode. In light mode these effects (white rim
+   lights, screen-blend specular, backdrop-filter over a flat page)
+   contribute no visible polish and cost measurable paint time, so we
+   keep the CSS var defaults but skip the actual effects.
    ═══════════════════════════════════════════ */
 .card,
 .glass,
@@ -1386,36 +1387,26 @@ tr:hover td {
   --glass-light-intensity: 0;
 }
 
-/* Apply SVG lens refraction via backdrop-filter — distorts what's BEHIND the glass.
-   This is the key to real Apple-style liquid glass: the background warps through
-   a convex lens displacement map, not the element itself.
-   Note: backdrop-filter: url() only works reliably in Chromium. Safari/Firefox
-   fall back to the blur-only backdrop-filter on .glass/.liquid-glass classes. */
-.liquid-glass,
-.liquid-glass-float {
+.dark .liquid-glass,
+.dark .liquid-glass-float {
   backdrop-filter: url(#liquid-glass-refraction) blur(var(--liquid-blur-strong)) saturate(160%);
   -webkit-backdrop-filter: url(#liquid-glass-refraction) blur(var(--liquid-blur-strong))
     saturate(160%);
 }
 
-/* Card-optimized lens refraction (wider aspect ratio displacement map) */
-.card,
-.stat-card {
+.dark .card,
+.dark .stat-card {
   backdrop-filter: url(#liquid-glass-card) blur(var(--liquid-blur)) saturate(140%);
   -webkit-backdrop-filter: url(#liquid-glass-card) blur(var(--liquid-blur)) saturate(140%);
 }
 
-/* Specular highlight overlay — cursor-tracked radial gradient + edge rim light.
-   The rim light (inset shadow-like gradient at edges) makes the glass feel 3D,
-   while the cursor highlight creates the interactive light response. */
-.card::after,
-.stat-card::after {
+.dark .card::after,
+.dark .stat-card::after {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: inherit;
   background:
-    /* Cursor-tracked specular highlight */
     radial-gradient(
       350px circle at var(--glass-light-x) var(--glass-light-y),
       rgba(255, 255, 255, calc(0.18 * var(--glass-light-intensity))) 0%,
@@ -1425,64 +1416,39 @@ tr:hover td {
       rgba(255, 255, 255, calc(0.01 * var(--glass-light-intensity))) 55%,
       transparent 70%
     ),
-    /* Static rim light — bright at top edge, dark at bottom (glass depth) */
     linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.08) 0%,
-        transparent 20%,
-        transparent 80%,
-        rgba(0, 0, 0, 0.05) 100%
-      );
+      180deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      transparent 20%,
+      transparent 80%,
+      rgba(0, 0, 0, 0.05) 100%
+    );
   pointer-events: none;
   z-index: 2;
   mix-blend-mode: screen;
   transition: opacity 0.1s ease;
 }
 
-/* Border glow intensifies near cursor */
-.card:hover,
-.stat-card:hover {
-  border-color: var(--liquid-border-hover);
-}
-
 /* ═══════════════════════════════════════════
    Stat Cards — Hero KPI cards
    ═══════════════════════════════════════════ */
 .stat-card {
-  background: var(--liquid-bg);
-  border: 1px solid var(--liquid-border);
-  border-radius: var(--liquid-radius);
-  padding: var(--spacing-lg) var(--spacing-lg);
-  transition: all var(--transition-normal);
-  /* backdrop-filter set in interactive refraction section with SVG lens */
-  box-shadow:
-    var(--liquid-shadow),
-    0 1px 0 rgba(255, 255, 255, 0.15) inset,
-    0 -1px 0 rgba(0, 0, 0, 0.15) inset;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-lg);
+  transition:
+    border-color var(--transition-normal),
+    box-shadow var(--transition-normal),
+    transform var(--transition-normal);
+  box-shadow: var(--shadow-sm);
   position: relative;
-  overflow: hidden;
-}
-
-.stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--border-color), transparent);
-  opacity: 0.6;
-  transition: opacity var(--transition-normal);
 }
 
 .stat-card:hover {
-  border-color: var(--liquid-border-hover);
-  box-shadow: var(--liquid-shadow-hover), var(--shadow-glow);
-  transform: translateY(-3px);
-}
-
-.stat-card:hover::before {
-  opacity: 1;
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
 .stat-card-icon {
@@ -1928,28 +1894,11 @@ tr:hover td {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--spacing-lg) 0;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg) 0 var(--spacing-md);
   margin-bottom: var(--spacing-xl);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  position: relative;
-}
-
-.page-header::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.2) 20%,
-    rgba(255, 255, 255, 0.3) 50%,
-    rgba(255, 255, 255, 0.2) 80%,
-    transparent 100%
-  );
-  pointer-events: none;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .page-header h1 {
