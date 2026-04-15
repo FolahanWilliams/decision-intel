@@ -172,7 +172,8 @@ export function CopilotPageContent() {
         <div className="p-4 border-b space-y-2" style={{ borderColor: 'var(--border-color)' }}>
           <button
             onClick={handleNewDecision}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-500 transition-colors"
+            className="btn btn-primary w-full"
+            style={{ gap: 8 }}
           >
             <Plus className="h-4 w-4" />
             New Decision
@@ -333,8 +334,14 @@ export function CopilotPageContent() {
           <div className="flex-1 flex items-center justify-center p-8">
             <div className="w-full max-w-2xl space-y-6">
               <div className="text-center space-y-2">
-                <div className="mx-auto w-12 h-12 rounded-full bg-blue-600/20 flex items-center justify-center">
-                  <Sparkles className="h-6 w-6 text-blue-400" />
+                <div
+                  className="mx-auto w-12 h-12 rounded-full flex items-center justify-center"
+                  style={{
+                    background: 'rgba(22, 163, 74, 0.10)',
+                    border: '1px solid rgba(22, 163, 74, 0.22)',
+                  }}
+                >
+                  <Sparkles className="h-6 w-6" style={{ color: 'var(--accent-primary)' }} />
                 </div>
                 <h2 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
                   What decision are you working on?
@@ -357,11 +364,19 @@ export function CopilotPageContent() {
                   }}
                   placeholder="e.g., Should we proceed with the acquisition at the proposed $200M valuation, or push for a lower price given the integration risks?"
                   rows={4}
-                  className="ask-input w-full rounded-lg border px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="ask-input w-full rounded-lg border px-4 py-3 text-sm focus:outline-none"
                   style={{
                     background: 'var(--bg-card)',
                     borderColor: 'var(--border-color)',
                     color: 'var(--text-primary)',
+                  }}
+                  onFocus={e => {
+                    e.currentTarget.style.borderColor = 'var(--accent-primary)';
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(22, 163, 74, 0.15)';
+                  }}
+                  onBlur={e => {
+                    e.currentTarget.style.borderColor = 'var(--border-color)';
+                    e.currentTarget.style.boxShadow = 'none';
                   }}
                   autoFocus
                 />
@@ -376,7 +391,8 @@ export function CopilotPageContent() {
                   <button
                     onClick={handleStartSession}
                     disabled={!promptInput.trim()}
-                    className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="btn btn-primary"
+                    style={{ gap: 8 }}
                   >
                     Start Session
                     <ChevronRight className="h-4 w-4" />
@@ -431,12 +447,11 @@ export function CopilotPageContent() {
                 <div
                   className="mx-auto w-12 h-12 rounded-xl flex items-center justify-center"
                   style={{
-                    background:
-                      'linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(139, 92, 246, 0.12))',
-                    border: '1px solid rgba(139, 92, 246, 0.2)',
+                    background: 'rgba(22, 163, 74, 0.10)',
+                    border: '1px solid rgba(22, 163, 74, 0.22)',
                   }}
                 >
-                  <Sparkles className="h-6 w-6 text-blue-400" />
+                  <Sparkles className="h-6 w-6" style={{ color: 'var(--accent-primary)' }} />
                 </div>
                 <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
                   Your AI Advisory Team
@@ -453,7 +468,8 @@ export function CopilotPageContent() {
               <div className="flex justify-center">
                 <button
                   onClick={handleNewDecision}
-                  className="flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-500 transition-colors"
+                  className="btn btn-primary"
+                  style={{ gap: 8 }}
                 >
                   <Plus className="h-4 w-4" />
                   New Decision Session

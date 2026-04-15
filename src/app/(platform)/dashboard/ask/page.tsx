@@ -26,13 +26,14 @@ function AskSurfaceInner() {
         height: 'calc(100vh - 44px)',
       }}
     >
-      {/* Header */}
+      {/* Header — compact (sits above a scrolling chat surface) but now on
+          the brand green palette instead of the previous blue/purple mix. */}
       <div
         style={{
-          padding: '14px 20px 10px',
+          padding: '16px 24px 14px',
           flexShrink: 0,
           borderBottom: '1px solid var(--border-color)',
-          background: 'linear-gradient(180deg, rgba(59, 130, 246, 0.03) 0%, transparent 100%)',
+          background: 'var(--bg-card)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -40,17 +41,16 @@ function AskSurfaceInner() {
             style={{
               width: 36,
               height: 36,
-              borderRadius: 8,
-              background:
-                'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15))',
-              border: '1px solid rgba(139, 92, 246, 0.25)',
+              borderRadius: 'var(--radius-md)',
+              background: 'rgba(22, 163, 74, 0.10)',
+              border: '1px solid rgba(22, 163, 74, 0.22)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               flexShrink: 0,
             }}
           >
-            <Sparkles size={18} style={{ color: '#a78bfa' }} />
+            <Sparkles size={18} style={{ color: 'var(--accent-primary)' }} />
           </div>
           <div>
             <h1
@@ -59,14 +59,14 @@ function AskSurfaceInner() {
                 fontWeight: 700,
                 margin: 0,
                 color: 'var(--text-primary)',
-                letterSpacing: '-0.01em',
+                letterSpacing: '-0.015em',
               }}
             >
               Ask
             </h1>
             <p
               style={{
-                fontSize: 11,
+                fontSize: 12,
                 color: 'var(--text-muted)',
                 margin: '2px 0 0 0',
                 lineHeight: 1.4,
