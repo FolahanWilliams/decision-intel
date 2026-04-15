@@ -69,17 +69,7 @@ import { QuickScanModal } from '@/components/ui/QuickScanModal';
 import { Zap } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
-const DecisionPerformance = dynamic(
-  () => import('@/components/visualizations/DecisionPerformance'),
-  { ssr: false },
-);
-const EnhancedDashboardCharts = dynamic(
-  () =>
-    import('@/components/visualizations/EnhancedDashboardCharts').then(m => ({
-      default: m.EnhancedDashboardCharts,
-    })),
-  { ssr: false },
-);
+const AnalyticsView = dynamic(() => import('./_views/AnalyticsView'), { ssr: false });
 
 const ANALYSIS_STEPS: { name: string; icon: React.ReactNode }[] = [
   { name: 'Preparing document', icon: <FileText size={16} /> },
@@ -160,8 +150,24 @@ export default function Dashboard() {
   const [uploadPhase, setUploadPhase] = useState<'uploading' | 'analyzing'>('uploading');
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
-  const initialView = searchParams.get('view') === 'browse' ? 'browse' : 'upload';
+  const viewParam = searchParams.get('view');
+  const initialView: DashboardView =
+    viewParam === 'browse' || viewParam === 'analytics' ? viewParam : 'upload';
   const [activeView, setActiveView] = useState<DashboardView>(initialView);
+
+  // Keep URL in sync with the active view so the page is shareable/bookmarkable.
+  // replaceState avoids adding to browser history on every tab click.
+  const switchView = useCallback((next: DashboardView) => {
+    setActiveView(next);
+    if (typeof window === 'undefined') return;
+    const url = new URL(window.location.href);
+    if (next === 'upload') {
+      url.searchParams.delete('view');
+    } else {
+      url.searchParams.set('view', next);
+    }
+    window.history.replaceState({}, '', url.toString());
+  }, []);
   const globalDragCounter = useRef(0);
 
   // Upload confirmation state
@@ -786,7 +792,7 @@ export default function Dashboard() {
             }}
           >
             <button
-              onClick={() => setActiveView('upload')}
+              onClick={() => switchView('upload')}
               style={{
                 padding: '6px 16px',
                 fontSize: '13px',
@@ -806,7 +812,7 @@ export default function Dashboard() {
               Upload &amp; Monitor
             </button>
             <button
-              onClick={() => setActiveView('browse')}
+              onClick={() => switchView('browse')}
               style={{
                 padding: '6px 16px',
                 fontSize: '13px',
@@ -826,7 +832,7 @@ export default function Dashboard() {
               Browse &amp; Analyze
             </button>
             <button
-              onClick={() => setActiveView('analytics')}
+              onClick={() => switchView('analytics')}
               style={{
                 padding: '6px 16px',
                 fontSize: '13px',
@@ -2186,34 +2192,9 @@ export default function Dashboard() {
         </>
       )}
 
-      {/* ── Analytics View ─────────────────────────────────────────────── */}
+      {/* ── Analytics View (lazy-loaded) ───────────────────────────────── */}
       {activeView === 'analytics' && (
-        <div className="flex flex-col gap-xl">
-          <ErrorBoundary sectionName="Decision Performance">
-            <DecisionPerformance />
-          </ErrorBoundary>
-          {uploadedDocs.length > 0 && (
-            <ErrorBoundary sectionName="Dashboard Charts">
-              <EnhancedDashboardCharts
-                riskDistribution={{
-                  highRisk: riskSummary.high,
-                  mediumRisk: riskSummary.medium,
-                  lowRisk: riskSummary.low,
-                }}
-                scoreTrend={uploadedDocs
-                  .filter((d: { status: string; analyses?: { overallScore?: number; createdAt?: string }[] }) => d.status === 'complete' && d.analyses?.[0]?.overallScore != null)
-                  .map((d: { analyses?: { overallScore?: number; createdAt?: string }[]; uploadedAt: string }) => ({
-                    date: d.analyses?.[0]?.createdAt ?? d.uploadedAt,
-                    score: d.analyses?.[0]?.overallScore ?? 0,
-                  }))
-                  .sort((a: { date: string }, b: { date: string }) => new Date(a.date).getTime() - new Date(b.date).getTime())}
-                topBiases={[]}
-                totalAnalyzed={riskSummary.total}
-                avgScore={riskSummary.avg}
-              />
-            </ErrorBoundary>
-          )}
-        </div>
+        <AnalyticsView uploadedDocs={uploadedDocs} riskSummary={riskSummary} />
       )}
 
       {/* Delete Confirmation Modal */}

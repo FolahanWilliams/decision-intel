@@ -24,6 +24,7 @@ Claude reads this file at the start of every session. Update it as tasks are com
 ## Technical Debt
 - [ ] Marketing pages use hardcoded color constants (`C.navy`, `C.green`) — this is intentional (light-theme-only pages), NOT a bug. Do not convert to CSS variables.
 - [ ] `riskScorerNode` in `src/lib/agents/nodes.ts` is ~1,200 lines and does six separate jobs (compound scoring, Bayesian priors, outcome feedback, calibration, report assembly, causal weights). Refactor into composable sub-functions — hard to test and debug today.
+- [ ] **Dashboard three-view full refactor (B6-full)** — `src/app/(platform)/dashboard/page.tsx` is 2,200+ LOC with Upload (670 LOC, ~25 state deps) and Browse (440 LOC, ~15 state deps) views inlined. B6-lite (2026-04-15) extracted Analytics + wired `?view=` URL sync; still TODO: extract UploadView + BrowseView into `_views/` with either prop-drilling or a new DashboardContext. Bundle win is modest (heavy deps already `dynamic()`), main benefit is readability. Dedicated 2-3h session; regression surface on the most-used page is high.
 - [x] Bias-insight cache in `src/lib/utils/cache.ts` is keyed on `bias_insight:${biasType}` with no `orgId` prefix — fixed: cache keys now scoped as `bias_insight:{orgId}:{biasType}`, callers in `nodes.ts` updated (2026-04-13)
 - [ ] Hardcoded `bg-white/X`, `text-white`, `border-white/X` still lurk in: `SalesToolkitTab` (intentional light-only?), `ExperimentsContent`, `meetings/[id]`, `cognitive-audits/effectiveness`, several dashboard pages. Sweep with codemod.
 
