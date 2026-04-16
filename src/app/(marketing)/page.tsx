@@ -1237,9 +1237,27 @@ export default function LandingPage() {
         </div>
 
         <div style={{ textAlign: 'center', marginTop: 24 }}>
-          <p style={{ fontSize: 13, color: C.slate400, fontFamily: 'monospace' }}>
+          <p style={{ fontSize: 13, color: C.slate400, fontFamily: 'monospace', marginBottom: 16 }}>
             ── Fully automated pipeline ──
           </p>
+          <a
+            href="/how-it-works"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '10px 20px',
+              borderRadius: 999,
+              background: C.white,
+              border: `1px solid ${C.slate200}`,
+              color: C.slate900,
+              fontSize: 13,
+              fontWeight: 600,
+              textDecoration: 'none',
+            }}
+          >
+            See the full 12-node breakdown →
+          </a>
         </div>
       </section>
       </Reveal>
@@ -1876,15 +1894,17 @@ export default function LandingPage() {
               'Resources',
             ].map(l => {
               const href =
-                l === 'Case Studies'
-                  ? '/case-studies'
-                  : l === 'Proof'
-                    ? '/proof'
-                    : l === 'Bias Genome'
-                      ? '/bias-genome'
-                      : l === 'Pricing'
-                        ? '/pricing'
-                        : `#${l.toLowerCase().replace(/\s+/g, '-')}`;
+                l === 'How It Works'
+                  ? '/how-it-works'
+                  : l === 'Case Studies'
+                    ? '/case-studies'
+                    : l === 'Proof'
+                      ? '/proof'
+                      : l === 'Bias Genome'
+                        ? '/bias-genome'
+                        : l === 'Pricing'
+                          ? '/pricing'
+                          : `#${l.toLowerCase().replace(/\s+/g, '-')}`;
               return (
                 <a
                   key={l}
