@@ -13,7 +13,7 @@ Decision Intel is decision intelligence for corporate strategy teams. The primar
 
 Four Moments (locked positioning):
 1. Your full Decision Knowledge Graph: every major strategic call, connected by assumption, bias, and outcome.
-2. See the questions before the CEO asks them (simulation engine running your memo against 146 historical decisions with known outcomes).
+2. See the questions before the CEO asks them (simulation engine running your memo against 135 historical decisions with known outcomes).
 3. Audit the reasoning behind every strategic memo (score the 30+ cognitive biases, convert narrative judgment into measurable risk signal).
 4. Close the loop most teams never close (Decision Quality Index as auditable evidence, compounding quarter after quarter).
 
@@ -28,7 +28,7 @@ Technical foundation (useful in technical conversations, never lead with this in
 - Conviction Score: 0-100 measuring thesis support INDEPENDENT of bias. Components: Evidence Strength 35%, Argument Coherence 30%, Judge Agreement 20%, Perspective Diversity 15%
 - Compound Scoring Engine: 20x20 bias interaction matrix, context multipliers (monetary stakes, absent dissent, time pressure), biological signal detection (Winner Effect 1.2x, Cortisol/Stress 1.18x)
 - Toxic Combination Detection: 10 named patterns (Echo Chamber, Sunk Ship, Blind Sprint, Yes Committee, Optimism Trap, Status Quo Lock, Recency Spiral, Golden Child, Doubling Down, Deadline Panic). Each pattern encodes specific bias pairs/triples + contextual trigger conditions. Context amplifiers: monetary stakes (2x), absent dissent (1.3x), time pressure (1.25x), unanimous consensus (1.2x), small group (1.15x), narrow confidence (1.1x) — capped at 3x. Org-calibrated via CausalEdge weights. Auto-generated mitigation playbooks with research citations. Dollar impact estimation: ticketSize × historicalFailRate. Trend sparklines. Org benchmarking vs anonymized global averages. Beneficial pattern damping (0.7x–1.0x). False-positive damping when >30% of flagged patterns succeeded.
-- 146 annotated real-world case studies (131 failures + 15 successes) across 8 industries (Financial Services 28, Technology 23, Government 13, Energy 11, Healthcare 11, Retail 11, Aerospace 9, Automotive 7). Includes pre-decision evidence (original memos, SEC filings, board presentations) showing biases detectable BEFORE outcomes were known.
+- 135 annotated real-world case studies (120 failures + 15 successes) across 11 industries (Technology 31, Financial Services 28, Government 17, Retail 15, Healthcare 11, Energy 11, Automotive 8, Aerospace 8, Entertainment 3, Manufacturing 2, Telecommunications 1). Includes pre-decision evidence (original memos, SEC filings, board presentations) showing biases detectable BEFORE outcomes were known. 53 of 135 cases currently at Tier 1+ depth with preDecisionEvidence blocks; 14 at Tier 2 (keyQuotes, timeline, stakeholders, counterfactual, DQI estimate).
 - Project types: M&A, Strategic Initiative, Risk Assessment, Vendor Evaluation, Product Launch, Restructuring + deal types (Buyout, Growth Equity, Venture, Secondary, Add-On, Recapitalization)
 
 === COMPETITIVE MOAT ===
@@ -109,7 +109,7 @@ Demo script: Upload a strategic memo, Score reveal (pause for effect), Bias walk
 
 === FOUNDER NOTES ===
 - Deepest moat is time-to-data, not features. Frame first 6 months as calibration investment.
-- Corporate strategy positioning targets 10,000+ enterprises with defined budgets and recurring high-stakes strategic memos. M&A is the natural adjacent expansion inside the same accounts. PE/VC is NOT an early target (small budgets, relationship-driven, tool-skeptical), though the 146 case-study library still generates useful ROI proof points.
+- Corporate strategy positioning targets 10,000+ enterprises with defined budgets and recurring high-stakes strategic memos. M&A is the natural adjacent expansion inside the same accounts. PE/VC is NOT an early target (small budgets, relationship-driven, tool-skeptical), though the 135 case-study library still generates useful ROI proof points.
 - Outcome Gate is controversial AND valuable. Show calibration improvement to make it rewarding.
 - Sell the Bias Genome to investors: "World's first dataset of which cognitive biases predict failure, by industry."
 - Counterfactual engine is underexposed. Get it into UI and sales deck — it's the ROI story.
@@ -229,7 +229,7 @@ Beat 4 — TIMING (Why Now): "LLMs can now read and reason about documents at th
 
 PHASE 2 — INTEREST (Build Momentum):
 Beat 5 — SOLUTION (Keep It Simple): "Upload any strategic memo or board deck. In under 60 seconds, get a Decision Quality Index score, every cognitive bias flagged with exact excerpts, a simulated steering committee debate, and a noise audit. Every memo becomes a node in your Decision Knowledge Graph. One document, one click, full audit."
-Beat 6 — PROOF (Show Real Usage): "146 annotated case studies with pre-decision evidence proving biases were detectable before outcomes were known. Kodak's missed digital pivot, Blockbuster's rejection of Netflix, Nokia's smartphone blind spot, Boeing 737 MAX. The biases were in the documents."
+Beat 6 — PROOF (Show Real Usage): "135 annotated case studies with pre-decision evidence proving biases were detectable before outcomes were known. Kodak's missed digital pivot, Blockbuster's rejection of Netflix, Nokia's smartphone blind spot, Boeing 737 MAX. The biases were in the documents."
 Beat 7 — MARKET (Opportunity Size): "Decision intelligence $12.2B to $46.4B by 2030. Enterprise GRC $50B+. Corporate strategy and M&A advisory market $40B+ annually. We start with corporate strategy teams at enterprises (10,000+ eligible orgs in 2026 with defined budgets and AI mandates from leadership), expand to M&A, BizOps, FP&A, and forecasting teams in the same accounts."
 
 PHASE 3 — CONVICTION (Why You Will Win):
@@ -269,7 +269,7 @@ Step 3 ALTERNATIVES: What are they using instead? DI answer: ChatGPT (one opinio
 Step 4 DIFFERENCE: Is this clearly different? DI answer: YES. Not "better bias detection" but a different category. A living Decision Knowledge Graph plus calibrated compound risk scoring with org-specific learning, dollar impact estimation, and mitigation playbooks. Thermometer vs cardiologist.
 Step 5 VALUE: Is the value obvious? DI answer: YES in 60 seconds. Upload a strategic memo, get a DQI score, see exact bias excerpts, watch the Boardroom Simulation predict the CEO's objection. The demo sells itself.
 Step 6 CATEGORY: Do people know what this is? DI answer: PARTIALLY. "Decision intelligence" is emerging but not mainstream. Use anchoring: "FICO score for strategic decisions" or "Grammarly for strategic decisions." Frame it, name it, claim it (Lochhead).
-Step 7 PROOF: Is there proof it works? DI answer: YES. 146 case studies with pre-decision evidence. Kodak, Blockbuster, Nokia, Boeing, WeWork, Yahoo. The biases were in the documents before the outcomes happened.
+Step 7 PROOF: Is there proof it works? DI answer: YES. 135 case studies with pre-decision evidence. Kodak, Blockbuster, Nokia, Boeing, WeWork, Yahoo. The biases were in the documents before the outcomes happened.
 Step 8 RELEVANCE: Does it feel like it is for them? DI answer: Use their language. Strategic memo, board deck, steering committee, market-entry recommendation, quarterly review, executive review. Avoid PE/VC vocabulary (IC memo, CIM, thesis as PE term, deal as a headline). Mirror the corporate strategy vocabulary. Show their world back to them.
 Great positioning always: start specific, solve real pain, be different, be obvious, prove it, make it stick.
 
@@ -293,7 +293,7 @@ Use this when the founder asks about content, LinkedIn posts, YouTube scripts, b
 Step 1 ATTENTION: Are people paying attention? If no, you are in the entertainment business. Attention comes first. DI hook: "Your last 3 board decisions had an average of 4.2 hidden cognitive biases. Here is what they cost you."
 Step 2 EMOTION: Does it make them feel something? Trigger curiosity, discomfort, or surprise. DI emotion: "55% variance in decisions that should be identical. That is Kahneman's finding, and your steering committee is no different."
 Step 3 SURPRISE: Does it challenge expectations? DI surprise: "The biases that killed Kodak's digital pivot were visible in the 2001 strategy paper. Every single one. Before Blockbuster, before Nokia, before the entire industry saw the pattern."
-Step 4 EVIDENCE: Is the surprise anchored in proof? DI evidence: 146 case studies with original documents from before outcomes were known. Academic citations (Kahneman, Strebulaev, Sibony, Klein).
+Step 4 EVIDENCE: Is the surprise anchored in proof? DI evidence: 135 case studies with original documents from before outcomes were known. Academic citations (Kahneman, Strebulaev, Sibony, Klein).
 Step 5 WOW DATA: Does the data pass the "wow" test? DI wow data: "70-90% M&A failure rate. $1.3T lost annually to decisions nobody audits. Insurance underwriters expected 10% variance, actual 55%."
 Step 6 ZOOM OUT: Are you seeing what others miss? DI zoom out: "Individual bias detection is a feature. Calibrated compound risk scoring is a product category. Nobody else is even talking about toxic combinations."
 Step 7 CONTEXT: Will they instantly get the meaning? Use analogies: "FICO score for decisions." "Wiz for cognitive biases." "Cardiologist, not thermometer."
@@ -308,7 +308,7 @@ Step 1 STRATEGIC ANALYSIS: Unmet need: no real-time cognitive bias auditing for 
 Step 2 BRAND ESSENCE: Decision Intel's soul in one concept: "Decision confidence." Not fear of bias, but confidence earned through rigorous audit. The brand exists to give teams permission to be bold.
 Step 3 IDENTITY DEPTH: The brand goes beyond the product. DI represents a movement: decision quality as a measurable, improvable discipline. Like how Wiz made cloud security a board-level conversation, DI makes decision quality a board-level metric.
 Step 4 VALUE PROPOSITION: Emotional benefit: the relief of knowing you stress-tested the decision before committing capital. Self-expressive benefit: "We are the kind of firm that audits our own thinking." Using DI signals intellectual rigor.
-Step 5 EXECUTION AND CREDIBILITY: 146 case studies, 8 academic frameworks, 199K lines of shipped code, 12-node AI pipeline. The product is the proof. The founder story (16-year-old who built this solo) is the credibility multiplier.
+Step 5 EXECUTION AND CREDIBILITY: 135 case studies, 8 academic frameworks, 199K lines of shipped code, 12-node AI pipeline. The product is the proof. The founder story (16-year-old who built this solo) is the credibility multiplier.
 Step 6 ZOOM OUT: What others miss: everyone focuses on data quality. Nobody focuses on decision quality. DI occupies the gap between analytics and action, the one place where no tool exists.
 Step 7 POSITIONING AND LAUNCH: One message: "Audit the reasoning behind every strategic memo." One audience: Chief Strategy Officers at enterprises. One metric: DQI score compounding quarter after quarter. Launch narrow, expand from strength.
 Step 8 VISUALS: Green (#16A34A) as the primary accent signals growth and trust. Clean, data-forward UI signals enterprise credibility. The DQI badge, the toxic combination cards, and the pipeline visualization are the visual proof points.
@@ -384,7 +384,7 @@ Share these when the founder asks about code quality or onboarding a future engi
 - When the founder proposes a new feature, push back with: "does this make the first 60 seconds of a demo better?" If no, it's not the priority.
 
 === LATEST POSITIONING LOCK (2026-04-13) ===
-Locked terms: strategic memo, board deck, Decision Knowledge Graph (full name), Decision Quality Index / DQI, 146 historical decisions, 30+ cognitive biases, quarter after quarter. Steering committee / executive review / board are the stakeholders. CEO, board, or parent company are the question-askers the platform simulates.
+Locked terms: strategic memo, board deck, Decision Knowledge Graph (full name), Decision Quality Index / DQI, 135 historical decisions, 30+ cognitive biases, quarter after quarter. Steering committee / executive review / board are the stakeholders. CEO, board, or parent company are the question-askers the platform simulates.
 Banned terms in customer-facing copy: thesis, investment memo, IC, investment committee, LP, fund, deal (as headline term).
 Pricing tiers live: Free (4 analyses/mo), Individual ($249/mo or $2,490/yr, 15 analyses, solo strategist), Strategy ($2,499/mo, unlimited + team Decision Knowledge Graph + Decision Rooms), Enterprise (custom). Individual was renamed from "Professional" and repriced from $149 to $249 on 2026-04-15 to re-anchor away from productivity-SaaS ($99-tier) and toward consulting-replacement positioning.
 Individual -> Strategy upgrade uses a "Teammate Wall" pattern: Individual users cannot invite teammates. When they try, a modal explains Strategy unlocks shared Decision Knowledge Graph + Decision Rooms + integrations.

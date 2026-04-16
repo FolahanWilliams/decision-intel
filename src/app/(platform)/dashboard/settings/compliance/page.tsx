@@ -185,7 +185,7 @@ const FRAMEWORKS: FrameworkPosture[] = [
         controlName: 'Data Governance',
         description: 'Training data must be relevant, representative, and free of errors',
         diFeature:
-          '146 annotated case studies with pre-decision evidence, curated bias taxonomy (DI-B-001 through DI-B-020), academic citations for all bias detection methodology',
+          '135 annotated case studies with pre-decision evidence, curated bias taxonomy (DI-B-001 through DI-B-020), academic citations for all bias detection methodology',
         status: 'pass',
       },
       {

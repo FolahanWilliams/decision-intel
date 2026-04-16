@@ -762,7 +762,7 @@ export default function LandingPage() {
             },
             {
               icon: TrendingUp,
-              value: '146',
+              value: '135',
               label: 'Preventable failures we reverse-engineered',
               sub: '8 industries, SEC filings & NTSB reports',
               href: '/case-studies' as string | null,
@@ -900,7 +900,7 @@ export default function LandingPage() {
                 <>
                   Reworking the same board deck three times because new questions keep surfacing in
                   the steering committee. That&rsquo;s time your team never gets back. Our
-                  simulation engine runs your memo against 146 historical decisions with known
+                  simulation engine runs your memo against 135 historical decisions with known
                   outcomes, predicting the objections, forgotten angles, and counterarguments
                   before the meeting. Walk in prepared, walk out faster, and hand the CEO
                   answers&mdash;not revisions.

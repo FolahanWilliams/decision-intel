@@ -309,7 +309,7 @@ const QA_ITEMS: Array<{ q: string; a: string; proof?: string }> = [
   },
   {
     q: "What's your moat? I can build this with OpenAI's API in a weekend hackathon.",
-    a: 'A weekend gets you one LLM opinion with zero noise measurement. We use 3 independent judges for Kahneman noise decomposition. We have a 20x20 bias interaction matrix with contextual multipliers — dissent absent amplifies groupthink 1.25x, time pressure shifts scoring 1.15x. We detect biological signals like Winner Effect language and cortisol stress patterns. We have 146 curated case studies with cross-correlation patterns and reference class forecasting. The compound scoring engine alone is 10,000+ LOC of proprietary IP. A weekend hackathon gets you layer zero. Our moat is five layers deep.',
+    a: 'A weekend gets you one LLM opinion with zero noise measurement. We use 3 independent judges for Kahneman noise decomposition. We have a 20x20 bias interaction matrix with contextual multipliers — dissent absent amplifies groupthink 1.25x, time pressure shifts scoring 1.15x. We detect biological signals like Winner Effect language and cortisol stress patterns. We have 135 curated case studies with cross-correlation patterns and reference class forecasting. The compound scoring engine alone is 10,000+ LOC of proprietary IP. A weekend hackathon gets you layer zero. Our moat is five layers deep.',
     proof:
       'src/lib/scoring/compound-engine.ts — deterministic post-LLM scoring with bio-signal detection. src/lib/scoring/noise-decomposition.ts — ANOVA-framework noise measurement. src/lib/data/case-correlations.ts — cross-case statistical patterns',
   },
@@ -319,11 +319,11 @@ const QA_ITEMS: Array<{ q: string; a: string; proof?: string }> = [
   },
   {
     q: 'What if OpenAI or Anthropic just builds this into their platform?',
-    a: "LLM providers are infrastructure, not vertical SaaS. They don't have 7 compliance frameworks implemented, 146 case studies with outcome correlations, or an org-specific calibration flywheel. It's like asking 'What if AWS builds Datadog?' The platform layer and the domain layer are different businesses. Our value is the compound scoring engine + regulatory mapping + outcome learning, not the LLM inference. We swap LLM models freely — that's by design.",
+    a: "LLM providers are infrastructure, not vertical SaaS. They don't have 7 compliance frameworks implemented, 135 case studies with outcome correlations, or an org-specific calibration flywheel. It's like asking 'What if AWS builds Datadog?' The platform layer and the domain layer are different businesses. Our value is the compound scoring engine + regulatory mapping + outcome learning, not the LLM inference. We swap LLM models freely — that's by design.",
   },
   {
     q: 'Show me traction.',
-    a: "Working product at production URL. Full analysis engine processing real strategic memos end-to-end, with the Decision Knowledge Graph seeding from document one. Full auth (Google OAuth), multi-tenant orgs, team collaboration. Compliance frameworks (FCA, SOX, Basel III) fully implemented. Reviewed by the senior consultant who helped take Wiz public at $32B, quote: 'genuinely fascinated by the role of unconscious cognitive biases in decision-making.' LRQA executive (global risk management firm) review in progress. 146 reverse-engineered case studies across 8 industries. Cloverpop's Inc. 5000 #608 ranking with 300% growth validates that the decision intelligence category has enterprise demand.",
+    a: "Working product at production URL. Full analysis engine processing real strategic memos end-to-end, with the Decision Knowledge Graph seeding from document one. Full auth (Google OAuth), multi-tenant orgs, team collaboration. Compliance frameworks (FCA, SOX, Basel III) fully implemented. Reviewed by the senior consultant who helped take Wiz public at $32B, quote: 'genuinely fascinated by the role of unconscious cognitive biases in decision-making.' LRQA executive (global risk management firm) review in progress. 135 reverse-engineered case studies across 11 industries. Cloverpop's Inc. 5000 #608 ranking with 300% growth validates that the decision intelligence category has enterprise demand.",
   },
 ];
 
@@ -693,7 +693,7 @@ const OBJECTIONS: Array<{ objection: string; response: string }> = [
   {
     objection: "What's your unfair advantage as a founder?",
     response:
-      'Deep domain expertise at the intersection of cognitive science and financial decision-making — a rare combination. A proprietary failure database (146 cases with computed correlations) that cannot be scraped or reproduced. A compliance framework stack that took months of legal mapping. And the hunger of a solo founder who has built a $0 to production-grade enterprise SaaS platform alone.',
+      'Deep domain expertise at the intersection of cognitive science and financial decision-making — a rare combination. A proprietary failure database (135 cases with computed correlations) that cannot be scraped or reproduced. A compliance framework stack that took months of legal mapping. And the hunger of a solo founder who has built a $0 to production-grade enterprise SaaS platform alone.',
   },
 ];
 

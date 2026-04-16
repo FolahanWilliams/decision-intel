@@ -24,7 +24,7 @@ Decision Intel is a decision intelligence platform for corporate strategy teams.
 - "Decision Knowledge Graph" (always full name)
 - "Decision Quality Index" / "DQI"
 - "quarter after quarter" (cadence)
-- "146 historical decisions" (benchmark number — defensible)
+- "135 historical decisions" (benchmark number — defensible; deduped 2026-04-16 from 146)
 - "30+ cognitive biases" (taxonomy scope)
 
 **Vocabulary to AVOID:**

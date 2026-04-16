@@ -120,53 +120,6 @@ export const AUTOMOTIVE_MANUFACTURING_CASES: FailureCase[] = [
     sourceType: 'post_mortem',
   },
   {
-    id: 'auto-004',
-    title: 'Boeing 737 MAX MCAS Crashes',
-    company: 'Boeing',
-    industry: 'aerospace',
-    year: 2018,
-    yearDiscovered: 2019,
-    summary:
-      'Two Boeing 737 MAX crashes (Lion Air 610 and Ethiopian Airlines 302) killed 346 people. The MCAS flight control system, designed to compensate for engine placement changes, relied on a single angle-of-attack sensor and could override pilot inputs. Boeing did not adequately disclose MCAS to airlines or pilots.',
-    decisionContext:
-      'Whether to certify the 737 MAX with a single-sensor MCAS system, classify it as a minor change to avoid pilot retraining requirements, and whether to ground the fleet after the first crash.',
-    outcome: 'catastrophic_failure',
-    impactScore: 100,
-    estimatedLoss: '$20B+ in costs; 346 deaths; 20-month grounding',
-    biasesPresent: [
-      'loss_aversion',
-      'framing_effect',
-      'overconfidence_bias',
-      'authority_bias',
-      'planning_fallacy',
-      'halo_effect',
-      'zeigarnik_effect',
-    ],
-    primaryBias: 'framing_effect',
-    toxicCombinations: [
-      'Blind Sprint',
-      'Yes Committee',
-      'Optimism Trap',
-      'Golden Child',
-      'Deadline Panic',
-    ],
-    contextFactors: {
-      monetaryStakes: 'very_high',
-      dissentAbsent: false,
-      timePressure: true,
-      unanimousConsensus: false,
-      participantCount: 30,
-    },
-    lessonsLearned: [
-      'Framing MCAS as a minor change avoided simulator training requirements but hid a system that could override pilots',
-      "Loss aversion: Boeing's competitive pressure from Airbus A320neo drove schedule-first decisions that compromised safety margins",
-      'After Lion Air, availability heuristic failure: Boeing and FAA did not ground the fleet because a single crash was not seen as systemic',
-    ],
-    source:
-      'U.S. House Committee on Transportation and Infrastructure Report (2020); JATR Report (2019); Indonesian KNKT and Ethiopian AIB reports',
-    sourceType: 'post_mortem',
-  },
-  {
     id: 'auto-005',
     title: 'Toyota Unintended Acceleration Crisis',
     company: 'Toyota Motor Corporation',

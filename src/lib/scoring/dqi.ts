@@ -12,7 +12,7 @@
  *  Evidence Quality       18%   Fact-check verification rate
  *  Process Maturity       13%   Dissent, priors, outcome tracking, System 1 ratio
  *  Compliance Risk        13%   Regulatory alignment score
- *  Historical Alignment   10%   Correlation with 146-case study database
+ *  Historical Alignment   10%   Correlation with 135-case study database
  * ─────────────────────────────────────────────
  *
  * Grades: A (85-100), B (70-84), C (55-69), D (40-54), F (0-39)

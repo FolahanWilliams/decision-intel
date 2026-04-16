@@ -70,7 +70,7 @@ const VALUE_PROPS_BY_ROLE: Record<Role, string[]> = {
   cso: [
     'Audit strategic memos and board decks in 60 seconds — surface 30+ cognitive biases with excerpts.',
     'Predict the CEO, board, or parent-company questions before the room does.',
-    'Track Decision Quality Index quarter after quarter, against 146 historical decisions.',
+    'Track Decision Quality Index quarter after quarter, against 135 historical decisions.',
   ],
   ma: [
     'Pressure-test the deal memo — flag anchoring, sunk-cost, and overconfidence before IC.',

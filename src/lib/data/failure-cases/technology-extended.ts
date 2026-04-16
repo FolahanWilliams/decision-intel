@@ -1,44 +1,8 @@
 import type { FailureCase } from './types';
 
+// Deduped 2026-04-16: tech-ext-001 HP-Autonomy (richer cs-fail-tech-002 kept).
+
 export const TECHNOLOGY_EXTENDED_CASES: FailureCase[] = [
-  {
-    id: 'tech-ext-001',
-    title: 'HP-Autonomy Acquisition Write-Down',
-    company: 'Hewlett-Packard',
-    industry: 'technology',
-    year: 2011,
-    yearDiscovered: 2012,
-    summary:
-      "HP acquired UK software firm Autonomy for $11.1B, then wrote down $8.8B just one year later, alleging Autonomy had inflated revenue through fraudulent accounting. HP's due diligence failed to detect alleged channel stuffing and hardware sales disguised as software licenses.",
-    decisionContext:
-      "Whether to proceed with the acquisition at a 64% premium despite concerns raised by Autonomy's own CFO (who was later fired) and short seller warnings about revenue quality.",
-    outcome: 'catastrophic_failure',
-    impactScore: 88,
-    estimatedLoss: '$8.8B write-down',
-    biasesPresent: [
-      'confirmation_bias',
-      'anchoring_bias',
-      'overconfidence_bias',
-      'authority_bias',
-      'planning_fallacy',
-    ],
-    primaryBias: 'confirmation_bias',
-    toxicCombinations: ['Blind Sprint', 'Optimism Trap'],
-    contextFactors: {
-      monetaryStakes: 'very_high',
-      dissentAbsent: false,
-      timePressure: true,
-      unanimousConsensus: false,
-      participantCount: 12,
-    },
-    lessonsLearned: [
-      'Confirmation bias in M&A due diligence means deal teams seek to validate the acquisition thesis rather than stress-test it',
-      'Anchoring to a strategic narrative (pivot to software) can override financial red flags in target company metrics',
-      'When a CFO of the target raises concerns and is fired, acquirers should treat this as a major red flag, not a resolved issue',
-    ],
-    source: 'HP SEC filing (2012); U.S. DOJ fraud charges against Autonomy executives (2018)',
-    sourceType: 'sec_filing',
-  },
   {
     id: 'tech-ext-002',
     title: 'AOL-Time Warner Merger',

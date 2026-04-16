@@ -142,7 +142,7 @@ export const PIPELINE_NODES: PipelineNode[] = [
     tagline: 'Pattern-matches against a historical decision library.',
     iconName: 'Eye',
     purpose:
-      'Recognition-Primed Decision pattern matching against 146 curated historical cases across eight industries. When the memo\'s situation resembles a prior decision with a known outcome, we surface the resemblance and the outcome — so the author can weigh their own path against history.',
+      'Recognition-Primed Decision pattern matching against 135 curated historical cases across eleven industries. When the memo\'s situation resembles a prior decision with a known outcome, we surface the resemblance and the outcome — so the author can weigh their own path against history.',
     output: 'Pattern matches with confidence, historical outcome, and narrative war stories.',
     academicAnchor: 'Gary Klein — Sources of Power (1998); Flyvbjerg on reference-class forecasting.',
   },

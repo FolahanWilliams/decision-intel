@@ -118,7 +118,7 @@ const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
     icon: <Brain className="w-12 h-12" />,
     title: 'No strategic memos audited yet',
     description:
-      'Run your first audit and see the reasoning behind the numbers, scored against 146 historical decisions and 30+ cognitive biases.',
+      'Run your first audit and see the reasoning behind the numbers, scored against 135 historical decisions and 30+ cognitive biases.',
     suggestions: [
       'Walk into the board with rigor that matches your data',
       'Predict steering-committee objections before the meeting',

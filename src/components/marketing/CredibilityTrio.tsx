@@ -51,7 +51,7 @@ const CARDS = [
     href: '/bias-genome',
     eyebrow: 'Cross-decision intel',
     title: 'Which biases actually break decisions?',
-    body: 'The bias genome ranks every taxonomy entry by how often it appears in failed memos, with a failure-lift multiplier grounded in 146 audited historical cases. A leaderboard, not a glossary.',
+    body: 'The bias genome ranks every taxonomy entry by how often it appears in failed memos, with a failure-lift multiplier grounded in 135 audited historical cases. A leaderboard, not a glossary.',
     cta: 'See the leaderboard',
     thumb: 'genome' as const,
   },

@@ -244,7 +244,7 @@ const SEARCH_INDEX: SearchEntry[] = [
     section: 'DQI Methodology',
     preview: 'Decision Quality Index formula, percentiles, calibration.',
     keywords:
-      'dqi decision quality index methodology formula percentile calibration 146 historical decisions benchmark',
+      'dqi decision quality index methodology formula percentile calibration 135 historical decisions benchmark',
   },
   {
     tabId: 'research',

@@ -338,7 +338,7 @@ export function ScoringEngineTab() {
             </li>
             <li>Org-calibrated: thresholds adjust from your outcome data via CausalEdge weights</li>
             <li>
-              Historical failure &amp; success rates from 146-case database with false-positive
+              Historical failure &amp; success rates from 135-case database with false-positive
               damping
             </li>
             <li>
@@ -415,8 +415,8 @@ export function ScoringEngineTab() {
               desc: 'Org-specific learned weights amplifying severity from historical impact',
             },
             {
-              title: '146 Case Studies',
-              desc: '131 failures + 15 successes across 8 industries, with pre-decision evidence',
+              title: '135 Case Studies',
+              desc: '120 failures + 15 successes across 11 industries, with pre-decision evidence',
             },
             {
               title: 'Bio Signals',

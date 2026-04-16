@@ -152,47 +152,6 @@ export const HEALTHCARE_CASES: FailureCase[] = [
     sourceType: 'news_investigation',
   },
   {
-    id: 'health-004',
-    title: 'Boeing 737 MAX MCAS Design Failures',
-    company: 'Boeing',
-    industry: 'aerospace',
-    year: 2018,
-    yearDiscovered: 2019,
-    summary:
-      "Boeing's 737 MAX aircraft crashed twice in five months, killing 346 people. The MCAS flight control system, designed to compensate for engine placement changes, relied on a single angle-of-attack sensor and was not disclosed to pilots. Boeing prioritized schedule and cost over safety, committing sunk cost fallacy by building on the aging 737 platform rather than designing a new aircraft.",
-    decisionContext:
-      'Whether to design a new narrowbody aircraft or retrofit the 50-year-old 737 airframe with larger engines, adding software patches to compensate for aerodynamic compromises.',
-    outcome: 'catastrophic_failure',
-    impactScore: 100,
-    estimatedLoss: '$20B',
-    biasesPresent: [
-      'overconfidence_bias',
-      'sunk_cost_fallacy',
-      'authority_bias',
-      'groupthink',
-      'planning_fallacy',
-      'halo_effect',
-      'zeigarnik_effect',
-    ],
-    primaryBias: 'sunk_cost_fallacy',
-    toxicCombinations: ['Sunk Ship', 'Yes Committee', 'Golden Child', 'Deadline Panic'],
-    contextFactors: {
-      monetaryStakes: 'very_high',
-      dissentAbsent: true,
-      timePressure: true,
-      unanimousConsensus: true,
-      participantCount: 20,
-    },
-    lessonsLearned: [
-      'Sunk cost fallacy in the 737 platform investment led Boeing to patch an aging design rather than invest in a purpose-built replacement.',
-      'Overconfidence in software solutions to compensate for hardware compromises introduced single points of failure.',
-      "Authority bias within the FAA's delegated inspection program allowed Boeing to self-certify safety-critical systems.",
-    ],
-    source:
-      'U.S. House Committee on Transportation and Infrastructure, "Final Committee Report on the Boeing 737 MAX" (2020)',
-    sourceType: 'case_study',
-  },
-  {
     id: 'health-005',
     title: 'VA Health System Wait Time Scandal',
     company: 'U.S. Department of Veterans Affairs',
@@ -229,46 +188,6 @@ export const HEALTHCARE_CASES: FailureCase[] = [
     ],
     source: 'VA Office of Inspector General Report No. 14-02603-267 (2014)',
     sourceType: 'case_study',
-  },
-  {
-    id: 'health-006',
-    title: 'Theranos Blood Testing Patient Safety Failures',
-    company: 'Theranos',
-    industry: 'healthcare',
-    year: 2014,
-    yearDiscovered: 2018,
-    summary:
-      'Theranos deployed its unreliable Edison blood testing devices in Walgreens stores, delivering inaccurate results to real patients. Patients received false positives and negatives for conditions including cancer and HIV, leading to unnecessary treatments, emotional distress, and delayed diagnoses for serious conditions.',
-    decisionContext:
-      'Whether to deploy blood testing devices in retail pharmacies for patient use before the technology had been validated through proper clinical trials and regulatory review.',
-    outcome: 'catastrophic_failure',
-    impactScore: 80,
-    estimatedLoss: '$9B valuation destroyed; patient safety compromised',
-    biasesPresent: [
-      'authority_bias',
-      'confirmation_bias',
-      'groupthink',
-      'overconfidence_bias',
-      'planning_fallacy',
-      'halo_effect',
-    ],
-    primaryBias: 'authority_bias',
-    toxicCombinations: ['Yes Committee', 'Echo Chamber', 'Golden Child'],
-    contextFactors: {
-      monetaryStakes: 'very_high',
-      dissentAbsent: true,
-      timePressure: true,
-      unanimousConsensus: true,
-      participantCount: 6,
-    },
-    lessonsLearned: [
-      "Authority bias led Walgreens to trust Theranos's claims and deploy unvalidated medical devices in their pharmacies.",
-      'Confirmation bias caused Theranos to cherry-pick quality control results and dismiss failed test runs.',
-      'Patient safety must never be subordinated to commercial launch timelines, regardless of investor pressure.',
-    ],
-    source:
-      'FDA Warning Letter to Theranos Inc. (2015); CMS Inspection Report (2016); John Carreyrou, "Bad Blood" (2018)',
-    sourceType: 'fda_action',
   },
 ];
 

@@ -39,7 +39,7 @@ export function ProductOverviewTab() {
         {[
           { value: '20', label: 'Standard Biases', sub: '+ 11 investment-specific' },
           { value: '12', label: 'Pipeline Nodes', sub: '7-way parallel fan-out' },
-          { value: '146', label: 'Case Studies', sub: 'failures + successes' },
+          { value: '135', label: 'Case Studies', sub: 'failures + successes' },
           { value: '3', label: 'Outcome Channels', sub: 'Autonomous detection' },
           { value: '2', label: 'AI Providers', sub: 'Gemini + Claude fallback' },
           { value: '6', label: 'Touchpoints', sub: 'Web, Slack, Drive, Email, Extension, API' },

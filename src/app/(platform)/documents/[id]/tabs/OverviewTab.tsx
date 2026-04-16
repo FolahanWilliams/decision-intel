@@ -190,7 +190,7 @@ export function OverviewTab({
         </ErrorBoundary>
       )}
 
-      {/* 0.5 Outside View — reference class forecasting from 146 historical cases */}
+      {/* 0.5 Outside View — reference class forecasting from 135 historical cases */}
       <ErrorBoundary sectionName="Outside View">
         <OutsideViewCard sector={dealSector} ticketSize={dealTicketSize} />
       </ErrorBoundary>

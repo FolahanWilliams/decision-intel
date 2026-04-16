@@ -74,7 +74,7 @@ const jsonLd = [
       '30+ cognitive biases detected automatically',
       'Steering-committee question prediction (CEO, board, parent company)',
       'Decision Knowledge Graph — compounds across every memo',
-      'Decision Quality Index (DQI) — score every memo, benchmark across 146 historical decisions',
+      'Decision Quality Index (DQI) — score every memo, benchmark across 135 historical decisions',
       'Toxic combination detection (compound bias patterns)',
       'Compliance mapping: SOX, FCA, EU AI Act, Basel III, GDPR, SEC, LPOA',
       'Audit Defense Packet PDF export with regulatory citations',
@@ -182,7 +182,7 @@ const jsonLd = [
         name: 'How is Decision Intel different from ChatGPT?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'ChatGPT gives one opinion from one model. Decision Intel uses 3 independent judges for noise measurement, a bias interaction matrix for compound scoring, 30+ cognitive biases benchmarked across 146 historical decisions, and an outcome flywheel that gets smarter with every confirmed decision.',
+          text: 'ChatGPT gives one opinion from one model. Decision Intel uses 3 independent judges for noise measurement, a bias interaction matrix for compound scoring, 30+ cognitive biases benchmarked across 135 historical decisions, and an outcome flywheel that gets smarter with every confirmed decision.',
         },
       },
     ],
