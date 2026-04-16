@@ -1866,13 +1866,25 @@ export default function LandingPage() {
             >
               Product
             </h4>
-            {['Features', 'How It Works', 'Case Studies', 'Pricing', 'Resources'].map(l => {
+            {[
+              'Features',
+              'How It Works',
+              'Case Studies',
+              'Proof',
+              'Bias Genome',
+              'Pricing',
+              'Resources',
+            ].map(l => {
               const href =
                 l === 'Case Studies'
                   ? '/case-studies'
-                  : l === 'Pricing'
-                    ? '/pricing'
-                    : `#${l.toLowerCase().replace(/\s+/g, '-')}`;
+                  : l === 'Proof'
+                    ? '/proof'
+                    : l === 'Bias Genome'
+                      ? '/bias-genome'
+                      : l === 'Pricing'
+                        ? '/pricing'
+                        : `#${l.toLowerCase().replace(/\s+/g, '-')}`;
               return (
                 <a
                   key={l}

@@ -61,6 +61,30 @@ export function CaseStudyNav() {
         </Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexShrink: 0 }}>
           <Link
+            href="/proof"
+            className="nav-link-hide-mobile"
+            style={{
+              fontSize: 14,
+              color: '#CBD5E1',
+              textDecoration: 'none',
+              fontWeight: 500,
+            }}
+          >
+            Proof
+          </Link>
+          <Link
+            href="/bias-genome"
+            className="nav-link-hide-mobile"
+            style={{
+              fontSize: 14,
+              color: '#CBD5E1',
+              textDecoration: 'none',
+              fontWeight: 500,
+            }}
+          >
+            Bias Genome
+          </Link>
+          <Link
             href="/case-studies"
             className="nav-link-hide-mobile"
             style={{
