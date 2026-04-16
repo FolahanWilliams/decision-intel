@@ -243,15 +243,23 @@ function Thumbnail({ variant }: { variant: 'proof' | 'genome' | 'privacy' }) {
   );
 }
 
-/** Proof thumbnail: stylized memo with 3 numbered red flags pinned to it. */
+/** Proof thumbnail: stylized memo with 3 numbered red flags and an outcome
+ *  tick — all inline INSIDE the memo bounds so nothing reads as bleeding
+ *  off the page. Memo widened to x=30..210 to give the flag column and the
+ *  tick room to sit in the left/top-right margins without overlapping copy. */
 function ProofThumb() {
+  const memoX = 30;
+  const memoY = 8;
+  const memoW = 180;
+  const flagX = memoX + 12; // flag column sits inside the memo's left margin
+  const textX = memoX + 28; // text copy starts after the flag column
   return (
     <svg viewBox="0 0 240 96" width="100%" height="100%" style={{ maxHeight: 96 }}>
       {/* Memo card */}
       <rect
-        x="58"
-        y="8"
-        width="124"
+        x={memoX}
+        y={memoY}
+        width={memoW}
         height="80"
         rx="6"
         fill={C.white}
@@ -259,30 +267,30 @@ function ProofThumb() {
         strokeWidth="1"
       />
       {/* Memo header line */}
-      <rect x="68" y="18" width="60" height="4" rx="2" fill={C.slate700} />
+      <rect x={textX} y="18" width="72" height="4" rx="2" fill={C.slate700} />
       {/* Text lines */}
       {[30, 40, 50, 60, 70].map((y, i) => (
         <rect
           key={i}
-          x="68"
+          x={textX}
           y={y}
-          width={i === 2 ? 100 : i === 4 ? 72 : 104}
+          width={i === 2 ? 118 : i === 4 ? 86 : 126}
           height="3"
           rx="1.5"
           fill={C.slate200}
         />
       ))}
-      {/* Red-flag markers */}
+      {/* Red-flag markers — INSIDE the memo's left margin */}
       {[
-        { cx: 64, cy: 32, n: '1' },
-        { cx: 64, cy: 50, n: '2' },
-        { cx: 64, cy: 66, n: '3' },
+        { cx: flagX, cy: 32, n: '1' },
+        { cx: flagX, cy: 50, n: '2' },
+        { cx: flagX, cy: 66, n: '3' },
       ].map(f => (
         <g key={f.n}>
-          <circle cx={f.cx} cy={f.cy} r="8" fill={C.red} />
+          <circle cx={f.cx} cy={f.cy} r="7" fill={C.red} />
           <text
             x={f.cx}
-            y={f.cy + 3}
+            y={f.cy + 2.5}
             textAnchor="middle"
             fontSize="9"
             fontWeight="700"
@@ -293,16 +301,18 @@ function ProofThumb() {
           </text>
         </g>
       ))}
-      {/* Small outcome tick top-right */}
-      <circle cx="194" cy="16" r="9" fill={C.green} />
-      <path
-        d="M189 16 L193 20 L199 13"
-        stroke={C.white}
-        strokeWidth="2"
-        fill="none"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      {/* Outcome tick — INSIDE the memo's top-right corner */}
+      <g transform={`translate(${memoX + memoW - 20}, ${memoY + 12})`}>
+        <circle cx="0" cy="0" r="7.5" fill={C.green} />
+        <path
+          d="M -3.2 0 L -0.6 2.5 L 3.4 -2.2"
+          stroke={C.white}
+          strokeWidth="1.7"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
     </svg>
   );
 }

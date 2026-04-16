@@ -67,7 +67,7 @@ const PROFILES: CompetitorProfile[] = [
         dimension: 'Bias detection',
         themLabel: 'Not offered',
         themRating: 'none',
-        usLabel: '20 types, automated',
+        usLabel: '30+ types, automated',
         usRating: 'full',
       },
       {

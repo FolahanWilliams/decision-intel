@@ -1533,7 +1533,7 @@ export default function LandingPage() {
               Product
             </h4>
             {[
-              'Features',
+              'Privacy',
               'How It Works',
               'Case Studies',
               'Proof',
@@ -1552,7 +1552,9 @@ export default function LandingPage() {
                         ? '/bias-genome'
                         : l === 'Pricing'
                           ? '/pricing'
-                          : `#${l.toLowerCase().replace(/\s+/g, '-')}`;
+                          : l === 'Privacy'
+                            ? '/privacy'
+                            : `#${l.toLowerCase().replace(/\s+/g, '-')}`;
               return (
                 <a
                   key={l}
