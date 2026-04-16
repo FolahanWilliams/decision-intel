@@ -104,6 +104,8 @@ const BiasAnnotatedPDFViewer = lazy(() =>
     default: m.BiasAnnotatedPDFViewer,
   }))
 );
+// Board-ready inline preview — mirrors the exported PDF.
+import { BoardReportView } from './tabs/BoardReportView';
 
 interface VerificationSource {
   ticker?: string;
@@ -342,8 +344,41 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [toxicCombinations, setToxicCombinations] = useState<any[]>([]);
 
-  // Focused/Full view toggle
-  const [viewMode, setViewMode] = useState<'focused' | 'full'>('focused');
+  // View-as toggle: Analyst (full detail) / CSO (condensed) / Board (inline report).
+  // Persisted via ?view= URL param (primary source) + localStorage fallback so the
+  // same user keeps their preferred density across documents. Default: CSO — the
+  // most demo-ready view and the closest match to the previous "focused" default.
+  type ViewMode = 'analyst' | 'cso' | 'board';
+  const resolveInitialViewMode = (): ViewMode => {
+    if (typeof window === 'undefined') return 'cso';
+    const param = new URLSearchParams(window.location.search).get('view');
+    if (param === 'analyst' || param === 'cso' || param === 'board') return param;
+    // Legacy values from the previous Focused/Full toggle
+    if (param === 'focused') return 'cso';
+    if (param === 'full') return 'analyst';
+    try {
+      const saved = localStorage.getItem('di-doc-view-mode');
+      if (saved === 'analyst' || saved === 'cso' || saved === 'board') return saved;
+    } catch {
+      /* ignore */
+    }
+    return 'cso';
+  };
+  const [viewMode, setViewModeState] = useState<ViewMode>(resolveInitialViewMode);
+  const setViewMode = useCallback((next: ViewMode) => {
+    setViewModeState(next);
+    try {
+      localStorage.setItem('di-doc-view-mode', next);
+    } catch {
+      /* ignore */
+    }
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.set('view', next);
+      window.history.replaceState({}, '', url.toString());
+    }
+  }, []);
+  const [isExportingBoardView, setIsExportingBoardView] = useState(false);
 
   // URL-based tab state (#7)
   const tabFromUrl = searchParams.get('tab') ?? '';
@@ -1072,50 +1107,95 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         </ErrorBoundary>
       )}
 
-      {/* View Mode Toggle */}
+      {/* Featured Counterfactual — ROI hero card for the top-impact bias.
+          Renders in every view (Analyst / CSO / Board). Null if backend has
+          no scenarios or no positive-impact bias. */}
+      {analysis && (
+        <ErrorBoundary sectionName="Counterfactual Hero">
+          <CounterfactualPanel analysisId={analysis.id} variant="featured" />
+        </ErrorBoundary>
+      )}
+
+      {/* View-as Toggle: Analyst / CSO / Board */}
       {analysis && (
         <div
           className="flex items-center justify-between mb-lg"
-          style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: 12 }}
+          style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: 12, flexWrap: 'wrap', gap: 8 }}
         >
-          <div className="flex items-center gap-sm">
-            <button
-              onClick={() => setViewMode('focused')}
-              className="text-sm font-medium px-3 py-1"
+          <div
+            className="flex items-center"
+            style={{
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-md)',
+              overflow: 'hidden',
+            }}
+            role="tablist"
+            aria-label="View as"
+          >
+            <span
               style={{
-                borderRadius: 6,
-                background: viewMode === 'focused' ? 'rgba(22, 163, 74, 0.15)' : 'transparent',
-                color: viewMode === 'focused' ? '#16A34A' : 'var(--text-muted)',
-                border: 'none',
-                cursor: 'pointer',
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                color: 'var(--text-muted)',
+                padding: '0 12px',
+                borderRight: '1px solid var(--border-color)',
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
               }}
             >
-              Focused
-            </button>
-            <button
-              onClick={() => setViewMode('full')}
-              className="text-sm font-medium px-3 py-1"
-              style={{
-                borderRadius: 6,
-                background: viewMode === 'full' ? 'rgba(22, 163, 74, 0.15)' : 'transparent',
-                color: viewMode === 'full' ? '#16A34A' : 'var(--text-muted)',
-                border: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              Full Analysis
-            </button>
-          </div>
-          {viewMode === 'focused' && (
-            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-              Showing key findings only
+              View as
             </span>
-          )}
+            {(
+              [
+                { key: 'analyst', label: 'Analyst', hint: 'Everything — every tab, every metric' },
+                { key: 'cso', label: 'CSO', hint: 'Summary + DQI + top risk + recommended action' },
+                { key: 'board', label: 'Board', hint: '2-page board-ready preview, inline' },
+              ] as Array<{ key: ViewMode; label: string; hint: string }>
+            ).map((opt, idx) => {
+              const active = viewMode === opt.key;
+              return (
+                <button
+                  key={opt.key}
+                  onClick={() => setViewMode(opt.key)}
+                  role="tab"
+                  aria-selected={active}
+                  title={opt.hint}
+                  style={{
+                    padding: '8px 16px',
+                    fontSize: 13,
+                    fontWeight: active ? 600 : 500,
+                    color: active ? 'var(--text-highlight)' : 'var(--text-muted)',
+                    background: active ? 'var(--bg-elevated)' : 'transparent',
+                    border: 'none',
+                    borderLeft: idx === 0 ? 'none' : '1px solid var(--border-color)',
+                    borderBottom: active
+                      ? '2px solid var(--accent-primary)'
+                      : '2px solid transparent',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
+          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+            {viewMode === 'analyst'
+              ? 'Full analyst view — every surface'
+              : viewMode === 'cso'
+                ? 'Condensed for the Chief Strategy Officer'
+                : 'Board-ready report — export as PDF above'}
+          </span>
         </div>
       )}
 
-      {/* Focused View: Actionable Nudges + Recommendation */}
-      {analysis && viewMode === 'focused' && (
+      {/* CSO View: Actionable Nudges + Recommendation */}
+      {analysis && viewMode === 'cso' && (
         <div className="mb-xl" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <ActionableNudges biases={biases} />
 
@@ -1164,19 +1244,68 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             </div>
           </div>
 
-          {/* Deep Dive CTA */}
-          <button
-            onClick={() => setViewMode('full')}
-            className="btn btn-ghost flex items-center gap-sm"
-            style={{ alignSelf: 'center', fontSize: 13 }}
+          {/* Deep Dive CTA — lateral switchers */}
+          <div
+            className="flex items-center justify-center gap-md"
+            style={{ flexWrap: 'wrap' }}
           >
-            View Full Analysis →
-          </button>
+            <button
+              onClick={() => setViewMode('analyst')}
+              className="btn btn-ghost flex items-center gap-sm"
+              style={{ fontSize: 13 }}
+            >
+              View Full Analysis →
+            </button>
+            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>or</span>
+            <button
+              onClick={() => setViewMode('board')}
+              className="btn btn-secondary flex items-center gap-sm"
+              style={{ fontSize: 13 }}
+            >
+              View Board-Ready Report →
+            </button>
+          </div>
         </div>
       )}
 
-      {/* === Full Analysis View === */}
-      {viewMode === 'full' && (
+      {/* === Board View: inline 2-page preview of the board-ready PDF === */}
+      {analysis && viewMode === 'board' && (
+        <ErrorBoundary sectionName="Board Report View">
+          <BoardReportView
+            title={document.filename.replace(/\.[^.]+$/, '')}
+            overallScore={analysis.overallScore}
+            summary={analysis.summary}
+            biases={biases}
+            simulation={
+              analysis.simulation as
+                | {
+                    twins?: Array<{
+                      name: string;
+                      role: string;
+                      vote: string;
+                      confidence: number;
+                      rationale: string;
+                    }>;
+                  }
+                | undefined
+            }
+            exporting={isExportingBoardView}
+            onExportPdf={async () => {
+              setIsExportingBoardView(true);
+              try {
+                await handleBoardReportExport();
+              } catch {
+                /* toast already shown by handler */
+              } finally {
+                setIsExportingBoardView(false);
+              }
+            }}
+          />
+        </ErrorBoundary>
+      )}
+
+      {/* === Analyst (full) Analysis View === */}
+      {viewMode === 'analyst' && (
         <>
           {/* Bias Network Map */}
           {analysis && biases.length > 0 && (

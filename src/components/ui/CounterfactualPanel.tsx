@@ -33,6 +33,12 @@ interface CounterfactualResult {
 
 interface CounterfactualPanelProps {
   analysisId: string;
+  /**
+   * `full` — default, shows all scenarios in a scrollable list (original behavior).
+   * `featured` — hero card with the single highest-impact scenario, meant to sit
+   * above the analysis tabs as a demo-grade ROI statement.
+   */
+  variant?: 'full' | 'featured';
 }
 
 function formatBiasName(s: string): string {
@@ -45,7 +51,10 @@ function getConfidenceColor(c: number): string {
   return '#ef4444';
 }
 
-export function CounterfactualPanel({ analysisId }: CounterfactualPanelProps) {
+export function CounterfactualPanel({
+  analysisId,
+  variant = 'full',
+}: CounterfactualPanelProps) {
   const [data, setData] = useState<CounterfactualResult | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -89,6 +98,126 @@ export function CounterfactualPanel({ analysisId }: CounterfactualPanelProps) {
   }
 
   if (!data || data.scenarios.length === 0) return null;
+
+  // ─── Featured variant — hero ROI card for the top-impact scenario ────────
+  if (variant === 'featured') {
+    const top = [...data.scenarios].sort(
+      (a, b) => b.expectedImprovement - a.expectedImprovement
+    )[0];
+    if (!top || top.expectedImprovement <= 0) return null;
+
+    const currencySymbol =
+      top.currency === 'GBP' ? '£' : top.currency === 'USD' ? '$' : top.currency;
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="card"
+        style={{
+          borderLeft: '3px solid var(--accent-primary)',
+          marginBottom: 'var(--spacing-lg)',
+        }}
+      >
+        <div
+          className="card-body"
+          style={{ display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 260 }}>
+            <div
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 'var(--radius-full)',
+                background: 'rgba(22, 163, 74, 0.12)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              <GitBranch size={18} style={{ color: 'var(--accent-primary)' }} />
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <div
+                className="section-heading"
+                style={{ marginBottom: 2 }}
+              >
+                Counterfactual — What If
+              </div>
+              <div
+                style={{
+                  fontSize: 15,
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                  lineHeight: 1.35,
+                }}
+              >
+                Remove {formatBiasName(top.biasRemoved)} →{' '}
+                <span
+                  style={{
+                    color: 'var(--accent-primary)',
+                    fontFamily: "'JetBrains Mono', monospace",
+                  }}
+                >
+                  +{top.expectedImprovement.toFixed(1)}pp
+                </span>{' '}
+                success lift
+              </div>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: 'var(--text-muted)',
+                  marginTop: 4,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  flexWrap: 'wrap',
+                }}
+              >
+                <span>
+                  Based on {top.historicalSampleSize} similar decisions
+                </span>
+                <span style={{ color: getConfidenceColor(top.confidence), fontWeight: 600 }}>
+                  · {(top.confidence * 100).toFixed(0)}% confidence
+                </span>
+                {data.scenarios.length > 1 && (
+                  <span>
+                    · {data.scenarios.length - 1} more scenario
+                    {data.scenarios.length - 1 === 1 ? '' : 's'} below
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+          {top.estimatedMonetaryImpact != null && top.estimatedMonetaryImpact > 0 && (
+            <div
+              style={{
+                borderLeft: '1px solid var(--border-color)',
+                paddingLeft: 20,
+                minWidth: 140,
+              }}
+            >
+              <div className="section-heading" style={{ marginBottom: 2 }}>
+                Estimated Impact
+              </div>
+              <div
+                style={{
+                  fontSize: 18,
+                  fontWeight: 700,
+                  color: 'var(--accent-primary)',
+                  fontFamily: "'JetBrains Mono', monospace",
+                }}
+              >
+                ~{currencySymbol}
+                {top.estimatedMonetaryImpact.toLocaleString()}
+              </div>
+            </div>
+          )}
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
