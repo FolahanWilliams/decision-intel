@@ -52,7 +52,8 @@ import { DecisionScorecard } from '@/components/analysis/DecisionScorecard';
 import { DrRedTeamCard } from '@/components/analysis/DrRedTeamCard';
 import { RecommendationsPanel } from '@/components/ui/RecommendationsPanel';
 import { ExecutiveSummary } from '@/components/visualizations/ExecutiveSummary';
-import { ActionableNudges } from '@/components/analysis/ActionableNudges';
+import { LiveRedFlagsAlert } from '@/components/analysis/LiveRedFlagsAlert';
+import { LivePredictedQuestions } from '@/components/analysis/LivePredictedQuestions';
 import { NoiseTaxCard } from '@/components/analysis/NoiseTaxCard';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { trackEvent } from '@/lib/analytics/track';
@@ -78,7 +79,6 @@ const BiasNetwork = dynamic(
 );
 import { ShareModal } from '@/components/ui/ShareModal';
 import { Share2, ShieldCheck } from 'lucide-react';
-import { ScoreReveal } from '@/components/ui/ScoreReveal';
 
 // Lazy-loaded tab components
 const OverviewTab = lazy(() =>
@@ -915,43 +915,63 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             <Link href="/dashboard" className="btn btn-ghost p-2" aria-label="Back to dashboard">
               <ArrowLeft size={20} />
             </Link>
-            <div>
-              <h1 className="text-xl font-semibold inline-flex items-center gap-sm">
+            <div style={{ minWidth: 0 }}>
+              <h1
+                style={{
+                  fontSize: 'clamp(22px, 3vw, 30px)',
+                  fontWeight: 700,
+                  letterSpacing: '-0.01em',
+                  lineHeight: 1.2,
+                  color: 'var(--text-primary)',
+                  margin: 0,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  flexWrap: 'wrap',
+                }}
+              >
                 {document.filename}
                 {document.isSample && <SampleBadge />}
               </h1>
-              <p className="text-sm text-muted">
-                {formatDate(document.uploadedAt)} • {(document.fileSize / 1024).toFixed(1)} KB
-              </p>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  marginTop: 6,
+                  flexWrap: 'wrap',
+                }}
+              >
+                <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+                  {formatDate(document.uploadedAt)} • {(document.fileSize / 1024).toFixed(1)} KB
+                </span>
+                {document.status === 'complete' && (
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: 'var(--success)',
+                      padding: '2px 8px',
+                      borderRadius: 999,
+                      background: 'rgba(22,163,74,0.1)',
+                      border: '1px solid rgba(22,163,74,0.25)',
+                    }}
+                  >
+                    <CheckCircle size={11} /> Analyzed
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
           <div className="flex items-center gap-md">
-            {/* Prominent score display — animated reveal when arriving from a fresh analysis */}
-            {analysis && (
-              <div style={{ marginRight: '8px' }}>
-                <ScoreReveal
-                  score={analysis.overallScore}
-                  label="DQI Score"
-                  showGrade
-                  duration={1200}
-                  suspenseMs={searchParams.get('fresh') === '1' ? 800 : 0}
-                />
-              </div>
-            )}
-
-            {/* Conviction Score — computed client-side from existing analysis data */}
+            {/* Conviction Score — complementary to DQI (shown in ExecutiveSummary hero) */}
             {analysis && <ConvictionBadge analysis={analysis} />}
 
             <div className="flex items-center gap-sm">
-              {document.status === 'complete' && (
-                <span
-                  className="flex items-center gap-sm text-sm"
-                  style={{ color: 'var(--success)' }}
-                >
-                  <CheckCircle size={16} /> Complete
-                </span>
-              )}
               {analysis && (
                 <Link
                   href={`/dashboard/analytics?view=explainability&analysisId=${analysis.id}`}
@@ -1194,50 +1214,70 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         </div>
       )}
 
-      {/* CSO View: Actionable Nudges + Recommendation */}
+      {/* CSO View: Red Flags → Predicted Questions → Recommendation → CTAs.
+          The shared hero above (ExecutiveSummary + featured counterfactual)
+          already handles the DQI top-line, so CSO focuses on what an exec
+          actually walks into the meeting with: the risks, the expected
+          objections, and a clear "proceed / caution / review" verdict. */}
       {analysis && viewMode === 'cso' && (
-        <div className="mb-xl" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <ActionableNudges biases={biases} />
+        <div className="mb-xl" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <LiveRedFlagsAlert
+            biases={biases}
+            onSelect={bias => setSelectedBias(bias)}
+          />
 
-          {/* Recommendation Card */}
+          <LivePredictedQuestions
+            biases={biases}
+            summary={analysis.summary}
+            topRecommendation={biases[0]?.suggestion}
+          />
+
+          {/* Recommendation verdict card */}
           <div
             className="card animate-fade-in"
             style={{
-              borderLeft: `3px solid ${
+              borderLeft: `4px solid ${
                 analysis.overallScore > 80
-                  ? '#34d399'
+                  ? '#16A34A'
                   : analysis.overallScore > 60
                     ? '#eab308'
                     : '#ef4444'
               }`,
+              marginBottom: 32,
             }}
           >
             <div className="card-body" style={{ padding: '20px 24px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
                 <span
                   style={{
                     fontSize: 11,
                     fontWeight: 700,
                     textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
+                    letterSpacing: '0.12em',
                     color:
                       analysis.overallScore > 80
-                        ? '#34d399'
+                        ? '#16A34A'
                         : analysis.overallScore > 60
                           ? '#eab308'
                           : '#ef4444',
                   }}
                 >
+                  Recommendation ·{' '}
                   {analysis.simulation?.overallVerdict ||
                     (analysis.overallScore > 80
-                      ? 'PROCEED'
+                      ? 'Proceed'
                       : analysis.overallScore > 60
-                        ? 'PROCEED WITH CAUTION'
-                        : 'REVIEW REQUIRED')}
+                        ? 'Proceed with caution'
+                        : 'Review required')}
                 </span>
               </div>
               <p
-                style={{ fontSize: 13, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.6 }}
+                style={{
+                  fontSize: 15,
+                  color: 'var(--text-primary)',
+                  margin: 0,
+                  lineHeight: 1.6,
+                }}
               >
                 {analysis.summary}
               </p>
@@ -1535,82 +1575,68 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             </button>
           </div>
 
-          {/* Summary & Live Stream */}
-          <div className="grid grid-3 mb-xl">
-            <div className="col-span-2">
-              {analysis?.summary ? (
-                <div className="card h-full animate-fade-in" style={{ animationDelay: '0.3s' }}>
-                  <div className="card-header">
-                    <h3>Executive Summary</h3>
-                  </div>
-                  <div className="card-body">
-                    <p style={{ fontSize: '1rem', lineHeight: 1.6 }}>{analysis.summary}</p>
-                  </div>
-                </div>
-              ) : (
-                <div className="card h-full flex items-center justify-center p-xl">
-                  <p className="text-muted">Initiate LIVE SCAN to generate audit summary.</p>
-                </div>
-              )}
-            </div>
-
-            {/* Scan Terminal */}
-            <div
-              className="card animate-fade-in"
-              style={{ animationDelay: '0.4s', background: 'var(--bg-card)' }}
-            >
+          {/* Live Scan Feed — only shown while actively scanning or when logs exist.
+              The executive summary renders above in the shared ExecutiveSummary hero, so
+              we don't duplicate it here. */}
+          {(isScanning || streamLogs.length > 0) && (
+            <div className="mb-xl">
               <div
-                className="card-header"
-                style={{ background: 'var(--bg-secondary)', padding: '18px 20px' }}
+                className="card animate-fade-in"
+                style={{ background: 'var(--bg-card)' }}
               >
-                <h3 className="flex items-center gap-sm text-xs">
-                  <Terminal size={14} /> Live Scan Feed
-                </h3>
-              </div>
-              <div
-                className="card-body"
-                style={{
-                  padding: 'var(--spacing-md)',
-                  fontSize: '10px',
-                  height: '200px',
-                  overflowY: 'auto',
-                  fontFamily: 'monospace',
-                }}
-              >
-                {isScanning && (
-                  <div className="mb-md">
-                    <div className="progress-bar" style={{ marginBottom: '4px' }}>
-                      <div
-                        className="progress-bar-fill"
-                        style={{ width: `${scanProgress}%` }}
-                        role="progressbar"
-                        aria-valuenow={scanProgress}
-                        aria-valuemin={0}
-                        aria-valuemax={100}
-                      />
+                <div
+                  className="card-header"
+                  style={{ background: 'var(--bg-secondary)', padding: '18px 20px' }}
+                >
+                  <h3 className="flex items-center gap-sm text-xs">
+                    <Terminal size={14} /> Live Scan Feed
+                  </h3>
+                </div>
+                <div
+                  className="card-body"
+                  style={{
+                    padding: 'var(--spacing-md)',
+                    fontSize: '10px',
+                    maxHeight: '260px',
+                    overflowY: 'auto',
+                    fontFamily: 'monospace',
+                  }}
+                >
+                  {isScanning && (
+                    <div className="mb-md">
+                      <div className="progress-bar" style={{ marginBottom: '4px' }}>
+                        <div
+                          className="progress-bar-fill"
+                          style={{ width: `${scanProgress}%` }}
+                          role="progressbar"
+                          aria-valuenow={scanProgress}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                        />
+                      </div>
+                      <div className="text-muted">Progress: {scanProgress}%</div>
                     </div>
-                    <div className="text-muted">Progress: {scanProgress}%</div>
-                  </div>
-                )}
-                {streamLogs.map((log, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      marginBottom: '4px',
-                      color:
-                        log.type === 'bias'
-                          ? 'var(--error)'
-                          : log.type === 'success'
-                            ? 'var(--success)'
-                            : 'var(--text-secondary)',
-                    }}
-                  >
-                    <span style={{ color: 'var(--text-muted)' }}>[{log.ts}]</span> {log.msg}
-                  </div>
-                ))}
+                  )}
+                  {streamLogs.map((log, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        marginBottom: '4px',
+                        color:
+                          log.type === 'bias'
+                            ? 'var(--error)'
+                            : log.type === 'success'
+                              ? 'var(--success)'
+                              : 'var(--text-secondary)',
+                      }}
+                    >
+                      <span style={{ color: 'var(--text-muted)' }}>[{log.ts}]</span> {log.msg}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Financial Fact Check */}
           {analysis?.factCheck && (

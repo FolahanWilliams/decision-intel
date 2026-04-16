@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { ArrowRight, Upload } from 'lucide-react';
 import { trackEvent } from '@/lib/analytics/track';
 
@@ -122,8 +123,8 @@ export function CaseStudyCta({ slug, company, hasDeepAnalysis }: CaseStudyCtaPro
       </p>
 
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 16 }}>
-        <a
-          href="/demo"
+        <Link
+          href="/login"
           onClick={() => trackEvent('case_study_try_demo', { slug, company })}
           style={{
             display: 'inline-flex',
@@ -142,7 +143,7 @@ export function CaseStudyCta({ slug, company, hasDeepAnalysis }: CaseStudyCtaPro
         >
           <Upload size={15} />
           Try the Demo &mdash; Free
-        </a>
+        </Link>
         <a
           href="#pilot-form"
           style={{

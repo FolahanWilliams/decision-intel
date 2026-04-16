@@ -363,8 +363,8 @@ function CompetitorComparisonCard() {
           textAlign: 'center',
         }}
       >
-        <a
-          href="/demo"
+        <Link
+          href="/case-studies"
           style={{
             fontSize: 13,
             fontWeight: 600,
@@ -373,7 +373,7 @@ function CompetitorComparisonCard() {
           }}
         >
           See it in action →
-        </a>
+        </Link>
       </div>
     </div>
   );
