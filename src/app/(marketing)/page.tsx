@@ -9,6 +9,7 @@ import { CaseStudyCarousel } from '@/components/marketing/CaseStudyCarousel';
 import { HeroTabs } from '@/components/marketing/HeroTabs';
 import { PipelineLandingTeaser } from '@/components/marketing/how-it-works/PipelineLandingTeaser';
 import { OutcomeDetectionViz } from '@/components/marketing/how-it-works/OutcomeDetectionViz';
+import { CredibilityTrio } from '@/components/marketing/CredibilityTrio';
 import { Reveal } from '@/components/ui/Reveal';
 import {
   Brain,
@@ -1048,6 +1049,11 @@ export default function LandingPage() {
           <OutcomeDetectionViz />
         </motion.div>
       </section>
+      </Reveal>
+
+      {/* ── Credibility trio (Proof / Bias Genome / Privacy) ────────── */}
+      <Reveal>
+        <CredibilityTrio />
       </Reveal>
 
       {/* ── Features ────────────────────────────────────────────────── */}
