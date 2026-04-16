@@ -2385,6 +2385,19 @@ tr:hover td {
   outline-offset: 3px;
 }
 
+/* Case-studies list hero — two columns on desktop, stacks on mobile. */
+.case-studies-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 360px);
+  column-gap: 48px;
+  row-gap: 32px;
+}
+@media (max-width: 900px) {
+  .case-studies-hero-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Scroll reveal — pair with useScrollReveal hook; children add
    .scroll-reveal and the hook toggles .is-visible when intersected. */
 .scroll-reveal {
