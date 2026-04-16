@@ -17,6 +17,14 @@ import { CaseStudyCta } from './CaseStudyCta';
 import { CaseStudyGraphSection } from './CaseStudyGraphSection';
 import { BiasProfileRadarWrapper as BiasProfileRadar } from '@/components/visualizations/BiasProfileRadarWrapper';
 import { formatIndustry, formatDocumentType, formatBiasName, humanize } from '@/lib/utils/labels';
+import { PatternFamilyBadge } from '@/components/marketing/case-study/PatternFamilyBadge';
+import { DqiEstimateCard } from '@/components/marketing/case-study/DqiEstimateCard';
+import { KeyQuotesStrip } from '@/components/marketing/case-study/KeyQuotesStrip';
+import { TimelineSection } from '@/components/marketing/case-study/TimelineSection';
+import { StakeholderGrid } from '@/components/marketing/case-study/StakeholderGrid';
+import { CounterfactualCallout } from '@/components/marketing/case-study/CounterfactualCallout';
+import { PostMortemCitationsList } from '@/components/marketing/case-study/PostMortemCitationsList';
+import { RelatedCasesStrip } from '@/components/marketing/case-study/RelatedCasesStrip';
 
 export const dynamicParams = false;
 
@@ -322,6 +330,9 @@ export default async function CaseStudyDetailPage({
               {formatIndustry(caseStudy.industry)}
             </span>
             <span style={{ fontSize: 13, color: '#64748B' }}>{caseStudy.year}</span>
+            {caseStudy.patternFamily && (
+              <PatternFamilyBadge family={caseStudy.patternFamily} />
+            )}
           </div>
 
           <h1
@@ -358,44 +369,49 @@ export default async function CaseStudyDetailPage({
             Estimated impact: {caseStudy.estimatedImpact}
           </p>
 
-          {/* Simulated DQI Score */}
-          <div
-            style={{
-              marginTop: 20,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 12,
-              background: '#0F172A',
-              borderRadius: 12,
-              padding: '12px 20px',
-            }}
-          >
-            <div
-              style={{
-                width: 48,
-                height: 48,
-                borderRadius: '50%',
-                border: `3px solid ${dqi.color}`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexDirection: 'column',
-              }}
-            >
-              <span style={{ fontSize: 18, fontWeight: 800, color: dqi.color, lineHeight: 1 }}>
-                {dqi.grade}
-              </span>
-              <span style={{ fontSize: 9, color: '#94A3B8', lineHeight: 1 }}>{dqiScore}</span>
-            </div>
-            <div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#16A34A', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                Decision Quality Index
+          {/* DQI Score — prefer canonical (Tier 2) estimate, fallback to simulated */}
+          <div style={{ marginTop: 24 }}>
+            {caseStudy.dqiEstimate ? (
+              <DqiEstimateCard dqi={caseStudy.dqiEstimate} />
+            ) : (
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  background: '#0F172A',
+                  borderRadius: 12,
+                  padding: '12px 20px',
+                }}
+              >
+                <div
+                  style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: '50%',
+                    border: `3px solid ${dqi.color}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexDirection: 'column',
+                  }}
+                >
+                  <span style={{ fontSize: 18, fontWeight: 800, color: dqi.color, lineHeight: 1 }}>
+                    {dqi.grade}
+                  </span>
+                  <span style={{ fontSize: 9, color: '#94A3B8', lineHeight: 1 }}>{dqiScore}</span>
+                </div>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#16A34A', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    Decision Quality Index (simulated)
+                  </div>
+                  <div style={{ fontSize: 13, color: '#94A3B8', marginTop: 2 }}>
+                    {dqi.label} &mdash; {caseStudy.biasesPresent.length} biases detected
+                    {caseStudy.toxicCombinations.length > 0 && `, ${caseStudy.toxicCombinations.length} toxic combinations`}
+                  </div>
+                </div>
               </div>
-              <div style={{ fontSize: 13, color: '#94A3B8', marginTop: 2 }}>
-                {dqi.label} &mdash; {caseStudy.biasesPresent.length} biases detected
-                {caseStudy.toxicCombinations.length > 0 && `, ${caseStudy.toxicCombinations.length} toxic combinations`}
-              </div>
-            </div>
+            )}
           </div>
         </header>
 
@@ -606,6 +622,21 @@ export default async function CaseStudyDetailPage({
           </section>
         )}
 
+        {/* Tier 2: Timeline — "what was visible, and when" */}
+        {caseStudy.timeline && caseStudy.timeline.length > 0 && (
+          <TimelineSection timeline={caseStudy.timeline} />
+        )}
+
+        {/* Tier 2: Key quotes — primary-source voices */}
+        {caseStudy.keyQuotes && caseStudy.keyQuotes.length > 0 && (
+          <KeyQuotesStrip quotes={caseStudy.keyQuotes} />
+        )}
+
+        {/* Tier 2: Stakeholders — who advocated, dissented, stayed silent */}
+        {caseStudy.stakeholders && caseStudy.stakeholders.length > 0 && (
+          <StakeholderGrid stakeholders={caseStudy.stakeholders} />
+        )}
+
         {/* Biases present */}
         {caseStudy.biasesPresent.length > 0 && (
           <section style={{ marginBottom: 40 }}>
@@ -697,6 +728,11 @@ export default async function CaseStudyDetailPage({
           </section>
         )}
 
+        {/* Tier 2: Counterfactual — what a bias-adjusted process would have done */}
+        {caseStudy.counterfactual && (
+          <CounterfactualCallout cf={caseStudy.counterfactual} />
+        )}
+
         {/* Reference class */}
         <section style={{ marginBottom: 40 }}>
           <SectionTitle>Reference class base rates</SectionTitle>
@@ -743,6 +779,11 @@ export default async function CaseStudyDetailPage({
           </section>
         )}
 
+        {/* Tier 2: Post-mortem citations — primary-source discipline marker */}
+        {caseStudy.postMortemCitations && caseStudy.postMortemCitations.length > 0 && (
+          <PostMortemCitationsList citations={caseStudy.postMortemCitations} />
+        )}
+
         {/* Source */}
         <section style={{ marginBottom: 40 }}>
           <p style={{ fontSize: 12, color: '#64748B', margin: 0 }}>
@@ -755,8 +796,10 @@ export default async function CaseStudyDetailPage({
           <CaseStudyCta slug={slug} company={caseStudy.company} hasDeepAnalysis={!!deep} />
         </section>
 
-        {/* Related */}
-        {related.length > 0 && (
+        {/* Related — prefer explicit cross-links (Tier 2), fallback to industry */}
+        {caseStudy.relatedCases && caseStudy.relatedCases.length > 0 ? (
+          <RelatedCasesStrip ids={caseStudy.relatedCases} />
+        ) : related.length > 0 ? (
           <section>
             <SectionTitle>Related cases in {formatIndustry(caseStudy.industry)}</SectionTitle>
             <div style={{ display: 'grid', gap: 12 }}>
@@ -813,7 +856,7 @@ export default async function CaseStudyDetailPage({
               })}
             </div>
           </section>
-        )}
+        ) : null}
       </article>
     </div>
   );
