@@ -8,6 +8,7 @@ import { trackEvent } from '@/lib/analytics/track';
 import { CaseStudyCarousel } from '@/components/marketing/CaseStudyCarousel';
 import { HeroTabs } from '@/components/marketing/HeroTabs';
 import { PipelineLandingTeaser } from '@/components/marketing/how-it-works/PipelineLandingTeaser';
+import { OutcomeDetectionViz } from '@/components/marketing/how-it-works/OutcomeDetectionViz';
 import { Reveal } from '@/components/ui/Reveal';
 import {
   Brain,
@@ -379,7 +380,6 @@ function CompetitorComparisonCard() {
 
 export default function LandingPage() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [expandedCard, setExpandedCard] = useState<number | null>(null);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
 
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
@@ -1038,233 +1038,15 @@ export default function LandingPage() {
           </p>
         </motion.div>
 
-        {/* 12-node pipeline teaser — compact, animated, links to /how-it-works */}
-        <motion.div {...fadeIn} transition={{ duration: 0.5, delay: 0.1 }} style={{ marginBottom: 48 }}>
+        {/* 12-node pipeline teaser — what happens INSIDE the 60-second audit */}
+        <motion.div {...fadeIn} transition={{ duration: 0.5, delay: 0.1 }} style={{ marginBottom: 24 }}>
           <PipelineLandingTeaser />
         </motion.div>
 
-        <div
-          style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}
-          className="cards-grid"
-        >
-          {[
-            {
-              icon: FileSearch,
-              phase: 'PHASE_01',
-              num: '01',
-              title: 'Upload the strategic memo',
-              desc: 'Drop in strategic memos, board decks, market-entry recommendations, or any high-stakes decision document. Capture each stakeholder\u2019s prior belief privately, before the room starts reinforcing itself.',
-              bullets: [
-                'PDF, DOCX, Excel, CSV support',
-                'Decision framing with success/failure criteria',
-                'Blind prior collection before group discussion',
-                'Slack integration for real-time capture',
-              ],
-              color: '#3B82F6',
-              colorBg: '#EFF6FF',
-            },
-            {
-              icon: Brain,
-              phase: 'PHASE_02',
-              num: '02',
-              title: 'Get the blind second opinion',
-              desc: 'The reasoning layer gets stress-tested: 30+ biases scored with confidence, a three-judge noise jury measures variability, a simulated steering committee argues against your recommendation, and a Forgotten Questions engine surfaces the gaps drawn from 146 comparable historical decisions.',
-              bullets: [
-                '30+ cognitive biases with confidence scores',
-                '3 independent noise judges (Kahneman)',
-                'Boardroom simulation with custom personas',
-                'Fact-checking via Google Search grounding',
-              ],
-              color: '#8B5CF6',
-              colorBg: '#F5F3FF',
-            },
-            {
-              icon: TrendingUp,
-              phase: 'PHASE_03',
-              num: '03',
-              title: 'Know why your team believed what they believed',
-              desc: 'Outcomes are detected automatically from follow-up documents, Slack, and web intelligence. Every decision closes the feedback loop, so your next strategic call is measurably more trustworthy than your last.',
-              bullets: [
-                'Autonomous outcome detection',
-                'Calibration dashboards',
-                'Bias cost estimates',
-                'Toxic combination alerts with mitigation playbooks',
-              ],
-              color: C.green,
-              colorBg: C.greenLight,
-            },
-          ].map((card, i) => {
-            const Icon = card.icon;
-            const isOpen = expandedCard === i;
-            return (
-              <motion.div
-                key={card.title}
-                {...fadeIn}
-                transition={{ duration: 0.4, delay: i * 0.1 }}
-                style={{
-                  background: C.white,
-                  border: `1px solid ${isOpen ? card.color : C.slate200}`,
-                  borderRadius: 16,
-                  padding: 32,
-                  position: 'relative',
-                  overflow: 'hidden',
-                  cursor: 'pointer',
-                  transition: 'border-color 0.2s, box-shadow 0.2s',
-                  boxShadow: isOpen ? `0 4px 12px rgba(0,0,0,0.08)` : '0 1px 3px rgba(0,0,0,0.06)',
-                }}
-                onClick={() => setExpandedCard(isOpen ? null : i)}
-              >
-                {/* Icon */}
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    justifyContent: 'space-between',
-                    marginBottom: 20,
-                    position: 'relative',
-                    zIndex: 1,
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 48,
-                      height: 48,
-                      borderRadius: 12,
-                      background: card.colorBg,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Icon size={22} style={{ color: card.color }} />
-                  </div>
-                  <div
-                    style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: 16,
-                      background: isOpen ? C.slate900 : C.green,
-                      color: C.white,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: 18,
-                      fontWeight: 600,
-                      transition: 'background 0.2s',
-                    }}
-                  >
-                    {isOpen ? '−' : '+'}
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div style={{ position: 'relative', zIndex: 1 }}>
-                  <p
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 600,
-                      color: C.slate400,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.1em',
-                      marginBottom: 8,
-                    }}
-                  >
-                    {card.phase}
-                  </p>
-                  <h3
-                    style={{ fontSize: 22, fontWeight: 700, color: C.slate900, marginBottom: 12 }}
-                  >
-                    {card.title}
-                  </h3>
-                  <p style={{ fontSize: 15, color: C.slate600, lineHeight: 1.6 }}>{card.desc}</p>
-
-                  {/* Expanded Content */}
-                  {isOpen && (
-                    <div
-                      style={{
-                        marginTop: 20,
-                        paddingTop: 20,
-                        borderTop: `1px solid ${C.slate200}`,
-                      }}
-                    >
-                      <p
-                        style={{
-                          fontSize: 11,
-                          fontWeight: 700,
-                          color: C.slate400,
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.1em',
-                          marginBottom: 12,
-                        }}
-                      >
-                        Key Capabilities
-                      </p>
-                      <ul
-                        style={{
-                          listStyle: 'none',
-                          padding: 0,
-                          margin: 0,
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: 10,
-                        }}
-                      >
-                        {card.bullets.map(b => (
-                          <li
-                            key={b}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'flex-start',
-                              gap: 10,
-                              fontSize: 14,
-                              color: C.slate600,
-                            }}
-                          >
-                            <div
-                              style={{
-                                width: 6,
-                                height: 6,
-                                borderRadius: 3,
-                                background: C.green,
-                                marginTop: 7,
-                                flexShrink: 0,
-                              }}
-                            />
-                            {b}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-
-        <div style={{ textAlign: 'center', marginTop: 24 }}>
-          <p style={{ fontSize: 13, color: C.slate400, fontFamily: 'monospace', marginBottom: 16 }}>
-            ── Fully automated pipeline ──
-          </p>
-          <a
-            href="/how-it-works"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '10px 20px',
-              borderRadius: 999,
-              background: C.white,
-              border: `1px solid ${C.slate200}`,
-              color: C.slate900,
-              fontSize: 13,
-              fontWeight: 600,
-              textDecoration: 'none',
-            }}
-          >
-            See the full 12-node breakdown →
-          </a>
-        </div>
+        {/* Outcome loop viz — what happens AFTER the audit (complements the teaser) */}
+        <motion.div {...fadeIn} transition={{ duration: 0.5, delay: 0.15 }}>
+          <OutcomeDetectionViz />
+        </motion.div>
       </section>
       </Reveal>
 
@@ -1965,6 +1747,31 @@ export default function LandingPage() {
               }}
             >
               folahanwilliams@gmail.com
+            </a>
+            <a
+              href="https://www.linkedin.com/in/folahan-williams-13a7b03a2/"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                fontSize: 14,
+                color: '#94A3B8',
+                textDecoration: 'none',
+                marginBottom: 10,
+              }}
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden
+              >
+                <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.95v5.66H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.61 0 4.28 2.38 4.28 5.47v6.27ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0Z" />
+              </svg>
+              LinkedIn
             </a>
           </div>
 
