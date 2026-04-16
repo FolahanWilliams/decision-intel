@@ -442,6 +442,23 @@ export const ADDITIONAL_TECH_CASES: FailureCase[] = [
       'Growth targets must not override model recalibration signals',
       'Real estate markets have latency that algorithmic models underestimate',
     ],
+    preDecisionEvidence: {
+      document:
+        "Zillow Offers expanded from 20 markets to 25, with CEO Rich Barton publicly committing to purchasing 5,000+ homes per month by end of 2021. Internal data scientists had raised concerns that the Zestimate algorithm — designed for advertising-supported price display — exhibited systematic positive bias when repurposed as a buying signal in a rising market. Q2 2021 earnings described iBuying as 'a transformational growth opportunity.' Inventory grew faster than disposal capacity, creating a growing stock of homes held at above-market prices.",
+      source: 'Zillow Group Q2 2021 shareholder letter and earnings call; Bloomberg reporting (Patrick Clark)',
+      date: '2021-08-05',
+      documentType: 'earnings_call',
+      detectableRedFlags: [
+        'Inventory (homes held for resale) growing materially faster than disposition cadence',
+        'Zestimate algorithm repurposed from display-ads to capital-allocation with no retrained validation',
+        'Data-science escalations about model drift were deprioritized in favor of volume targets',
+        'Renovation-cost overruns reported anecdotally but not systematically re-incorporated into underwriting',
+        'Scaling from 20 to 25 markets accelerated during a period of accelerating inventory backlog',
+      ],
+      flaggableBiases: ['overconfidence_bias', 'anchoring_bias', 'confirmation_bias', 'sunk_cost_fallacy'],
+      hypotheticalAnalysis:
+        "DI would flag the decision to scale iBuying volume while inventory backlog was growing as a canonical sunk-cost + overconfidence failure. Once Zillow had committed to iBuying as a public strategic pillar, management reframed each new overpayment as 'market latency' rather than 'model error.' A decision process that treated rising inventory age as a bright-line pause-gate — rather than an accelerant for the growth narrative — would have halted expansion in Q1 2021 and limited losses to a fraction of the final $881M write-down.",
+    },
     source: 'Zillow Q3 2021 Earnings Call; SEC Filing 10-Q 2021; Bloomberg investigation',
     sourceType: 'sec_filing',
   },
@@ -480,6 +497,23 @@ export const ADDITIONAL_TECH_CASES: FailureCase[] = [
       'Capital investment decisions require base-rate analysis, not trend extrapolation',
       'Manufacturing capacity commitments should use scenario planning, not single-point forecasts',
     ],
+    preDecisionEvidence: {
+      document:
+        "Peloton's Q4 FY2021 shareholder letter projected connected-fitness subscriber growth above 5M by end of FY2022 and announced the $400M Peloton Output Park manufacturing facility in Troy, Ohio alongside the $420M acquisition of Precor. The projections extrapolated 2020-2021 pandemic growth rates while acknowledging a return to in-person fitness. The investments assumed durable demand at pandemic-peak levels despite gyms reopening.",
+      source: 'Peloton Interactive Q4 FY2021 shareholder letter and earnings call',
+      date: '2021-08-26',
+      documentType: 'earnings_call',
+      detectableRedFlags: [
+        'Capital commitments ($820M combined) premised on pandemic demand as a permanent baseline',
+        'No published sensitivity analysis for a return-to-gyms scenario',
+        'Treadmill recall + Tread+ product failures in Q2 FY2021 signaled operational strain',
+        'Inventory buildup (subsequently $1.1B) as gym reopening accelerated',
+        'Internal finance team projections reportedly more conservative than public guidance',
+      ],
+      flaggableBiases: ['recency_bias', 'availability_heuristic', 'overconfidence_bias', 'planning_fallacy'],
+      hypotheticalAnalysis:
+        "DI would flag the Peloton FY2022 capital commitments as the canonical recency-bias + availability-heuristic pair. Extrapolating a step-function pandemic demand spike as a permanent growth trajectory is exactly the decision the availability heuristic produces — vivid, recent data overwhelming base-rate reasoning. A bias-adjusted process would have modeled at least three demand scenarios (pandemic-permanent, partial retention, full reversion) with capital commitments scaled to the conservative case.",
+    },
     source: 'Peloton SEC Filing 10-K 2022; WSJ investigation Feb 2022',
     sourceType: 'sec_filing',
   },

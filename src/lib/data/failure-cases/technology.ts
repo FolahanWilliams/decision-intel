@@ -576,6 +576,23 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       'Board members must evaluate offers against realistic future scenarios, not best-case projections.',
       'Overconfidence in a turnaround strategy without concrete evidence is not a substitute for a certain premium offer.',
     ],
+    preDecisionEvidence: {
+      document:
+        "Yahoo's board rejected Microsoft's $31/share unsolicited proposal, stating it 'substantially undervalues Yahoo' and 'would not be in the best interests of Yahoo and our stockholders.' Yahoo's own internal valuation framework anchored to a pre-2008-crisis peer-multiple analysis. Google's offer to provide a search-advertising partnership was being used as an alternative justification — a deal the DOJ subsequently blocked on antitrust grounds.",
+      source: 'Yahoo 14D-9 response to Microsoft acquisition proposal',
+      date: '2008-02-11',
+      documentType: 'sec_filing',
+      detectableRedFlags: [
+        'Rejection language ("substantially undervalues") anchored to a valuation framework predating the market downturn',
+        'No credible standalone plan to close the gap between the $31/share offer and Yahoo\'s claimed intrinsic value',
+        'Alternative Google search-advertising partnership had unresolved antitrust risk',
+        'Founder-CEO Jerry Yang\'s personal anchoring to Yahoo\'s 1999-2000 peak valuation framed "undervaluation"',
+        'Search-market share had declined from 30% (2004) to 21% (2008) with no clear turnaround catalyst',
+      ],
+      flaggableBiases: ['anchoring_bias', 'loss_aversion', 'overconfidence_bias'],
+      hypotheticalAnalysis:
+        "DI would flag the Yahoo rejection as the canonical anchor-to-peak-valuation decision. A bias-adjusted board review would have decomposed the $31 offer into the premium over current market price (+62%), the standalone base case, and the probability-weighted downside without a deal. The Google ad-partnership alternative was an unhedged bet on antitrust approval — a decision process demanding scenario analysis would have surfaced the asymmetric risk profile Yahoo ultimately realized.",
+    },
     source:
       'Microsoft SEC filing of acquisition proposal (2008); Yahoo-Verizon acquisition agreement (2017)',
     sourceType: 'sec_filing',

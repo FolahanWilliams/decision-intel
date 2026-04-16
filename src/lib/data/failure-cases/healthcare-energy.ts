@@ -275,6 +275,23 @@ export const ENERGY_INDUSTRIAL_CASES: FailureCase[] = [
       'Sunk cost fallacy in well completion means teams push forward with a compromised well rather than abandoning costly work.',
       'Multiple independent warning signs dismissed in sequence represent a systemic failure of organizational decision-making.',
     ],
+    preDecisionEvidence: {
+      document:
+        "The Macondo well's negative pressure test on April 20 2010 showed anomalous results — high pressure on the drill pipe line (1,400 psi) while the kill line read 0 psi. BP\'s well-site leader interpreted the discrepancy through the 'bladder effect' — a phenomenon with no engineering basis — rather than concluding the cement barrier had failed. The rig was $1M/day over schedule and $58M over budget. Halliburton's own testing had shown the cement formulation was unstable but results were not escalated to Transocean or BP leadership.",
+      source: 'National Commission on the BP Deepwater Horizon Oil Spill Final Report, Ch. 4',
+      date: '2010-04-20',
+      documentType: 'risk_assessment',
+      detectableRedFlags: [
+        'Negative pressure test showed 1,400 psi on drill pipe but 0 psi on kill line — a textbook cement-failure signal',
+        'Rig was $1M/day over schedule with 43 days elapsed on a 21-day plan',
+        'Halliburton lab tests showing unstable cement foam not communicated to decision-makers',
+        'Hydrocarbon detection during cement displacement dismissed as "expected" — no contingency escalation',
+        'Negative pressure test interpreted via "bladder effect" — a concept with no engineering documentation',
+      ],
+      flaggableBiases: ['overconfidence_bias', 'sunk_cost_fallacy', 'cognitive_misering', 'groupthink'],
+      hypotheticalAnalysis:
+        "DI would flag the Macondo negative-pressure interpretation as the textbook case of schedule-induced cognitive misering. With $1M/day overruns, decision-makers shortcut analysis to reach the answer that let drilling continue. The invention of the 'bladder effect' explanation is what the DQI framework flags as motivated reasoning — the team searched for any framework that justified proceeding. A bias-adjusted decision process would have required a second independent pressure test as a bright-line gate.",
+    },
     source:
       'National Commission on the BP Deepwater Horizon Oil Spill and Offshore Drilling, Final Report (2011)',
     sourceType: 'case_study',
@@ -318,6 +335,23 @@ export const ENERGY_INDUSTRIAL_CASES: FailureCase[] = [
     source:
       'EPA Notice of Violation to VW (2015); German Bundestag Investigation Committee Report (2017)',
     sourceType: 'case_study',
+    preDecisionEvidence: {
+      document:
+        "Volkswagen Group committed to an 'American Diesel Offensive' to capture the US clean-diesel market with the EA189 and later EA288 engines. Engineering teams informed management that the technical combination of high power, fuel economy, and Tier 2 Bin 5 NOx compliance could not be achieved with the available urea-tank packaging. Senior engineering leadership instructed the team to 'find a solution' rather than revise the performance-or-emissions tradeoff upward in management reporting.",
+      source: "VW internal engineering briefings (cited in Jones Day internal investigation summary); US DOJ Statement of Facts, U.S. v. Volkswagen AG",
+      date: '2006',
+      documentType: 'strategy_document',
+      detectableRedFlags: [
+        'Performance + fuel-economy + emissions targets explicitly described as technically unachievable by engineering teams',
+        "Clear chain-of-command pressure to 'find a solution' after escalation — rather than a target revision",
+        'No whistleblower protection channel — engineers raising concerns faced career risk',
+        'Culture of fear under CEO Martin Winterkorn documented by multiple former executives',
+        'Defeat-device technology well-known in automotive-engineering community as a dead-end compliance path',
+      ],
+      flaggableBiases: ['authority_bias', 'groupthink', 'framing_effect', 'sunk_cost_fallacy'],
+      hypotheticalAnalysis:
+        "DI would flag the 'find a solution' instruction as the canonical moment where a decision process should have required either a technical feasibility study or a target revision. Instead, VW's culture of authority bias under Winterkorn meant engineers treated the impossible target as the constraint and the compliance path as the variable. The DQI framework would have identified the no-dissent engineering culture as a bright-line process risk incompatible with regulatory compliance.",
+    },
   },
   {
     id: 'energy-003',

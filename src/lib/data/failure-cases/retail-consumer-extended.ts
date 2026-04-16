@@ -37,6 +37,23 @@ export const RETAIL_CONSUMER_EXTENDED_CASES: FailureCase[] = [
       'Blind Sprint: implementing across all stores without pilot testing eliminated the ability to learn and course-correct',
       'Authority bias toward a high-profile hire suppressed internal voices who understood the JCP customer',
     ],
+    preDecisionEvidence: {
+      document:
+        "Ron Johnson's January 2012 investor presentation announced the elimination of JCPenney's 590 annual sales events and coupons in favor of a three-tier 'Fair & Square' pricing structure with everyday low prices. The strategy was announced to roll out across all 1,100 stores simultaneously in February 2012. Johnson publicly stated: 'We don't need to test. I know this works.' The presentation offered no customer-research basis and no pilot-test results from a subset of JCP stores.",
+      source: "J.C. Penney 'Fair & Square' Strategy Investor Presentation; Business Insider reporting on Johnson's 'we don't need to test' statement",
+      date: '2012-01-25',
+      documentType: 'investor_deck',
+      detectableRedFlags: [
+        'All-stores, single-step rollout with no pilot program',
+        'Elimination of coupons removed the primary purchase-trigger for the established JCP customer base',
+        'Internal research on JCP customer promotion sensitivity reportedly disregarded',
+        '"We don\'t need to test" — explicit rejection of the experimentation that made Apple Stores successful',
+        'Board dominated by Johnson-aligned directors; Myron "Mike" Ullman (incumbent CEO) replaced without transition',
+      ],
+      flaggableBiases: ['overconfidence_bias', 'authority_bias', 'halo_effect', 'confirmation_bias'],
+      hypotheticalAnalysis:
+        "DI would flag the JCPenney 2012 rollout as the canonical halo-effect + overconfidence failure. Johnson's Apple Store success was the halo that made the board wave the usual change-management controls. The decision process exhibited classic Blind Sprint signals: all-stores rollout, explicit rejection of testing, no customer-research backing. A bias-adjusted review would have required a 50-store pilot with 90-day same-store-sales measurement before any broader commitment. The absence of that gate is the decision-intelligence failure, not the strategy itself.",
+    },
     source:
       'J.C. Penney SEC filing 10-K (2013); Walter Loeb, "Why J.C. Penney Failed Under Ron Johnson" (Forbes, 2013)',
     sourceType: 'case_study',

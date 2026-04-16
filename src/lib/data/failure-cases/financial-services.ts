@@ -292,6 +292,23 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       'Authority bias led management to trust a profitable trader without questioning the source of returns.',
       'Remote offices with insufficient oversight can become vectors for catastrophic risk accumulation.',
     ],
+    preDecisionEvidence: {
+      document:
+        "Barings' internal audit report on the Singapore futures operation identified that trader Nick Leeson had unsupervised control over both trading and back-office settlement functions — a fundamental violation of segregation-of-duties control. The report flagged the error account (88888) where losses were accumulating but was not escalated with urgency. Leeson's reported profits ($30M in 1994) were inconsistent with the documented arbitrage strategy he was authorized to execute. London management continued to wire margin payments to Singapore on Leeson's request.",
+      source: "Barings internal audit report; Bank of England 'Board of Banking Supervision' Report, Ch. 4",
+      date: '1994-08',
+      documentType: 'risk_assessment',
+      detectableRedFlags: [
+        'Single trader controlling both trading and settlement with no segregation of duties',
+        'Account 88888 ("five-eights") used to hide losses — visible to anyone checking reconciliation reports',
+        'Reported P&L of $30M from "arbitrage" was implausibly high for the authorized strategy',
+        'Margin payments from London to Singapore grew from £30M to £500M in 12 months',
+        'SIMEX inquiries about unusually large Nikkei futures positions were routed through Leeson himself',
+      ],
+      flaggableBiases: ['authority_bias', 'gamblers_fallacy', 'overconfidence_bias', 'cognitive_misering'],
+      hypotheticalAnalysis:
+        "DI would flag Barings as the canonical gambler's-fallacy + authority-bias combination. Leeson's escalating doubling-down after losses is textbook gambler's fallacy ('the next trade will reverse my losses'). London management's authority bias toward Leeson's reported profits caused them to keep funding the error account even as margin calls grew exponentially. Segregation-of-duties is a bright-line control that no bias-adjusted review of Barings' operations would have left unaddressed.",
+    },
     source: 'Bank of England Board of Banking Supervision Report on Barings (1995)',
     sourceType: 'case_study',
   },
@@ -833,6 +850,23 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       "The absence of a functioning board of directors is a critical governance red flag regardless of a company's valuation.",
       'Commingling customer funds with proprietary trading is a fundamental violation of fiduciary duty that no amount of innovation justifies.',
     ],
+    preDecisionEvidence: {
+      document:
+        "FTX raised $400M at a $32B valuation from investors including Sequoia, Paradigm, SoftBank, Temasek, and the Ontario Teachers' Pension Plan. The company had no board of directors. CEO Sam Bankman-Fried was the sole signatory on corporate actions. No independent audit of the relationship between FTX and sister trading firm Alameda Research had been performed. Sequoia's published profile described SBF playing League of Legends during the pitch meeting as a positive trait.",
+      source: 'FTX Series C press release; Sequoia Capital published profile of Sam Bankman-Fried (archived, deleted November 2022)',
+      date: '2022-01-31',
+      documentType: 'press_release',
+      detectableRedFlags: [
+        'No board of directors at a company holding billions of dollars in customer assets',
+        'Founder-controlled holding companies commingling corporate and personal funds',
+        'No segregation of customer crypto deposits from sister trading firm balance sheet',
+        'Unaudited relationship between FTX exchange and Alameda Research',
+        'Sequoia published profile celebrating founder attention-splitting as a virtue',
+      ],
+      flaggableBiases: ['authority_bias', 'halo_effect', 'bandwagon_effect', 'groupthink'],
+      hypotheticalAnalysis:
+        'DI would flag the absence of a functioning board of directors at a $32B financial-services company as a binary governance failure. The Sequoia profile\'s framing of founder-as-genius as substitute for institutional due diligence is a textbook halo-effect signal. Customer funds commingling is a bright-line fiduciary red flag — no bias-adjusted valuation could survive basic audit-trail verification of customer-asset segregation.',
+    },
     source:
       "FTX Debtors' First Interim Report, Chapter 11 Case No. 22-11068 (2023); SEC v. Samuel Bankman-Fried complaint",
     sourceType: 'sec_filing',
@@ -866,6 +900,23 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       'Concentrated depositor bases in a single industry amplify run risk when that industry faces a downturn.',
       'Recency bias in risk models that rely on recent low-volatility periods systematically underestimate tail risks.',
     ],
+    preDecisionEvidence: {
+      document:
+        "SVB's Q4 2021 earnings commentary emphasized the bank's strategy of investing incoming deposits into high-quality long-duration agency MBS and Treasuries with the expectation that its tech/VC deposit base would remain stable. Hedging of interest-rate risk on the held-to-maturity portfolio was explicitly described as unnecessary given the rate outlook. The bank operated without a Chief Risk Officer for eight months in 2022.",
+      source: 'SVB Financial Group Q4 2021 earnings call and 10-K; Federal Reserve SVB Review (April 2023)',
+      date: '2022-01-27',
+      documentType: 'earnings_call',
+      detectableRedFlags: [
+        'Held-to-maturity book extended to 5.6-year average duration with no interest-rate hedging',
+        '~90% of deposits uninsured (above FDIC $250K limit), concentrated in a single industry',
+        'No Chief Risk Officer in place from April to December 2022',
+        '2021 deposit growth of $87B (doubling) was assumed to be durable despite tech-sector cyclicality',
+        'Federal Reserve supervisors had flagged issues but ratings actions lagged',
+      ],
+      flaggableBiases: ['anchoring_bias', 'status_quo_bias', 'recency_bias', 'groupthink'],
+      hypotheticalAnalysis:
+        'DI would flag two compounding decisions: (1) extending HTM duration to 5.6 years during a near-zero-rate environment without hedging was a classic recency-bias mistake — treating a decade of low rates as permanent. (2) The concentrated uninsured deposit base meant a run was a single-industry event away. The vacant CRO seat through most of 2022 is a governance signal that reliably precedes crisis.',
+    },
     source:
       "Federal Reserve Board Review of the Federal Reserve's Supervision and Regulation of SVB (2023)",
     sourceType: 'case_study',
@@ -1024,6 +1075,23 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       'Bandwagon effect among investors created social proof that substituted for independent due diligence.',
       'Consistent, market-beating returns with no drawdowns are themselves a red flag that should trigger deeper scrutiny.',
     ],
+    preDecisionEvidence: {
+      document:
+        "Harry Markopolos submitted a detailed analysis to the SEC titled 'The World's Largest Hedge Fund is a Fraud' documenting 29 specific red flags, including the mathematical impossibility of Madoff's claimed split-strike conversion strategy at his reported AUM, the absence of any audit trail for the claimed trades, and the obscure two-person Friehling & Horowitz audit firm reviewing a multi-billion-dollar enterprise. The SEC took no substantive action.",
+      source: 'Harry Markopolos submission to SEC Boston Regional Office',
+      date: '2005-11-07',
+      documentType: 'risk_assessment',
+      detectableRedFlags: [
+        'Claimed options-market volume exceeded actual CBOE volume for the relevant contracts',
+        'Audit firm Friehling & Horowitz had three employees — one semi-retired — for a claimed multi-billion-dollar audit',
+        'Returns were uncorrelated with market conditions and showed near-zero drawdowns for 15+ years',
+        'Fund-of-funds feeders (Fairfield Greenwich, Tremont) took massive fees but performed no independent trade verification',
+        'Investors were explicitly told not to discuss the investment publicly',
+      ],
+      flaggableBiases: ['authority_bias', 'bandwagon_effect', 'halo_effect', 'confirmation_bias'],
+      hypotheticalAnalysis:
+        "DI would flag the Markopolos submission itself as the canonical 'external dissenter was ignored' pattern. Every structural red flag was documented 3+ years before collapse. The SEC's failure was not information — it was authority bias toward Madoff's NASDAQ chairmanship role. The fund-of-funds ecosystem that fed Madoff exhibited pure bandwagon effect: each feeder took comfort from other feeders' endorsements rather than performing independent verification.",
+    },
     source:
       'SEC Office of Inspector General Report No. 509 (2009); Harry Markopolos, "No One Would Listen" (2010)',
     sourceType: 'sec_filing',
