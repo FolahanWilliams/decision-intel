@@ -24,11 +24,14 @@ const C = {
 interface Tier {
   id: 'free' | 'pro' | 'team' | 'enterprise';
   name: string;
+  role: string;
   tagline: string;
   priceMonthly: number | null;
   priceAnnual: number | null;
   customPrice?: string;
-  highlights: string[];
+  /** Shown under the price — one calm anchor line (annual equivalent or similar). */
+  anchor?: string;
+  highlights: Array<{ label: string; strong?: boolean }>;
   cta: { label: string; href?: string; action?: 'checkout-pro' | 'checkout-team' | 'contact' };
   badge?: string;
   featured?: boolean;
@@ -39,63 +42,72 @@ function buildTiers(_cycle: BillingCycle): Tier[] {
     {
       id: 'free',
       name: 'Free',
-      tagline: 'See what we flag',
+      role: 'Just exploring',
+      tagline: 'See what we flag on your first memo — no card needed.',
       priceMonthly: 0,
       priceAnnual: 0,
+      anchor: 'Forever free · upgrade any time',
       highlights: [
-        '4 audits per month',
-        'Core DQI + bias detection',
-        'Boardroom Simulation (limited)',
-        'Export to PDF',
+        { label: '4 audits per month', strong: true },
+        { label: 'Core DQI + bias detection' },
+        { label: 'Boardroom Simulation (limited)' },
+        { label: 'Export to PDF' },
       ],
       cta: { label: 'Sign up free', href: '/login' },
     },
     {
       id: 'pro',
       name: 'Individual',
-      tagline: 'For the high-stakes strategist',
+      role: 'Solo strategy operator',
+      tagline: 'The career-defining edge for a Head of Strategy, CorpDev lead, or M&A operator.',
       priceMonthly: 249,
       priceAnnual: 2490,
+      anchor: '$2,490/year (save ~16%) on annual',
       highlights: [
-        '15 audits per month',
-        'Full DQI + 30+ cognitive biases',
-        'Boardroom Simulation + Forgotten Questions',
-        'Personal Decision History',
-        'Personal Calibration Dashboard',
+        { label: '15 audits per month', strong: true },
+        { label: 'Full DQI + 30+ cognitive biases' },
+        { label: 'Boardroom Simulation + Forgotten Questions' },
+        { label: 'Personal Decision History' },
+        { label: 'Calibration dashboard' },
       ],
       cta: { label: 'Start Individual', action: 'checkout-pro' },
     },
     {
       id: 'team',
       name: 'Strategy',
-      tagline: 'For corporate strategy teams',
+      role: 'Corporate strategy team',
+      tagline: 'For teams producing multiple board-level memos a quarter.',
       priceMonthly: 2499,
       priceAnnual: null,
+      anchor: '$24,990/year · ~10× cheaper than one consulting week',
       highlights: [
-        'Unlimited audits, 15 seats',
-        'Shared Decision Knowledge Graph',
-        'Decision Rooms + team consensus',
-        'Slack, Drive, Email integrations',
-        'Compliance mapping + audit logs',
-        'Team DQI analytics',
+        { label: 'Unlimited audits, 15 seats', strong: true },
+        { label: 'Shared Decision Knowledge Graph', strong: true },
+        { label: 'Decision Rooms + team consensus' },
+        { label: 'Slack, Drive, Email integrations' },
+        { label: 'Compliance mapping + audit logs' },
+        { label: 'Team DQI analytics' },
       ],
       cta: { label: 'Start 30-day pilot', action: 'checkout-team' },
-      badge: 'Most popular for teams',
+      badge: 'Most popular',
       featured: true,
     },
     {
       id: 'enterprise',
       name: 'Enterprise',
-      tagline: 'For Fortune 500 strategy functions',
+      role: 'Fortune 500 strategy function',
+      tagline: 'Multi-division workflows, compliance SLAs, and a deployment partner.',
       priceMonthly: null,
       priceAnnual: null,
       customPrice: 'Custom',
+      anchor: 'Annual · negotiated per seat',
       highlights: [
-        'Everything in Strategy',
-        'Unlimited seats + multi-division',
-        'SSO + custom taxonomy',
-        'Dedicated support + SLA',
-        'Annual contract pricing',
+        { label: 'Unlimited team seats', strong: true },
+        { label: 'SSO + SCIM + custom taxonomy' },
+        { label: 'Multi-division management' },
+        { label: 'Signed DPA + audit-log retention SLA' },
+        { label: 'EU-region hosting option' },
+        { label: 'Everything in Strategy' },
       ],
       cta: { label: 'Contact sales', action: 'contact' },
     },
@@ -390,39 +402,43 @@ export function PricingPageClient() {
                     ? ''
                     : '';
 
+            const isFeatured = !!tier.featured;
             return (
               <div
                 key={tier.id}
                 style={{
-                  background: tier.featured ? C.slate900 : C.white,
-                  color: tier.featured ? C.white : C.slate900,
-                  border: tier.featured ? `1px solid ${C.slate900}` : `1px solid ${C.slate200}`,
-                  borderRadius: 16,
-                  padding: '28px 24px',
+                  background: C.white,
+                  color: C.slate900,
+                  border: isFeatured
+                    ? `2px solid ${C.green}`
+                    : `1px solid ${C.slate200}`,
+                  borderRadius: 20,
+                  padding: 32,
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 16,
+                  gap: 14,
                   position: 'relative',
-                  boxShadow: tier.featured
-                    ? '0 12px 32px rgba(15, 23, 42, 0.18)'
-                    : '0 1px 3px rgba(0,0,0,0.05)',
+                  boxShadow: isFeatured
+                    ? '0 12px 36px rgba(22,163,74,0.14)'
+                    : '0 4px 18px rgba(15,23,42,0.05)',
                 }}
               >
                 {tier.badge && (
                   <div
                     style={{
                       position: 'absolute',
-                      top: -12,
+                      top: -13,
                       left: '50%',
                       transform: 'translateX(-50%)',
                       background: C.green,
                       color: C.white,
-                      fontSize: 11,
-                      fontWeight: 700,
-                      padding: '4px 12px',
+                      fontSize: 10,
+                      fontWeight: 800,
+                      padding: '5px 14px',
                       borderRadius: 999,
                       textTransform: 'uppercase',
-                      letterSpacing: '0.06em',
+                      letterSpacing: '0.14em',
+                      boxShadow: '0 4px 14px rgba(22,163,74,0.35)',
                       whiteSpace: 'nowrap',
                     }}
                   >
@@ -430,34 +446,37 @@ export function PricingPageClient() {
                   </div>
                 )}
 
-                <div>
-                  <div
-                    style={{
-                      fontSize: 18,
-                      fontWeight: 700,
-                      color: tier.featured ? C.white : C.slate900,
-                      marginBottom: 4,
-                    }}
-                  >
-                    {tier.name}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 12,
-                      color: tier.featured ? 'rgba(255,255,255,0.65)' : C.slate500,
-                      lineHeight: 1.5,
-                    }}
-                  >
-                    {tier.tagline}
-                  </div>
+                {/* Role chip */}
+                <div
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    color: isFeatured ? C.green : C.slate500,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.12em',
+                  }}
+                >
+                  {tier.role}
+                </div>
+
+                <div
+                  style={{
+                    fontSize: 22,
+                    fontWeight: 800,
+                    color: C.slate900,
+                    margin: 0,
+                    letterSpacing: '-0.01em',
+                  }}
+                >
+                  {tier.name}
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
                   <span
                     style={{
-                      fontSize: 36,
-                      fontWeight: 700,
-                      color: tier.featured ? C.white : C.slate900,
+                      fontSize: 40,
+                      fontWeight: 800,
+                      color: C.slate900,
                       lineHeight: 1,
                       letterSpacing: '-0.02em',
                     }}
@@ -467,36 +486,67 @@ export function PricingPageClient() {
                   {priceSuffix && (
                     <span
                       style={{
-                        fontSize: 14,
-                        color: tier.featured ? 'rgba(255,255,255,0.55)' : C.slate500,
+                        fontSize: 15,
+                        fontWeight: 500,
+                        color: C.slate400,
                       }}
                     >
                       {priceSuffix}
                     </span>
                   )}
                 </div>
+                {tier.anchor && (
+                  <div
+                    style={{
+                      fontSize: 12,
+                      color: C.slate400,
+                      marginTop: -6,
+                    }}
+                  >
+                    {tier.anchor}
+                  </div>
+                )}
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <p
+                  style={{
+                    fontSize: 13.5,
+                    color: C.slate600,
+                    lineHeight: 1.55,
+                    margin: '2px 0 4px',
+                  }}
+                >
+                  {tier.tagline}
+                </p>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {tier.highlights.map(h => (
                     <div
-                      key={h}
-                      style={{ display: 'flex', gap: 8, alignItems: 'flex-start', fontSize: 13 }}
+                      key={h.label}
+                      style={{ display: 'flex', gap: 10, alignItems: 'center', fontSize: 13.5 }}
                     >
-                      <Check
-                        size={14}
-                        style={{
-                          color: tier.featured ? '#22c55e' : C.green,
-                          flexShrink: 0,
-                          marginTop: 3,
-                        }}
-                      />
                       <span
                         style={{
-                          color: tier.featured ? 'rgba(255,255,255,0.88)' : C.slate600,
+                          width: 18,
+                          height: 18,
+                          borderRadius: 9,
+                          background: C.greenLight,
+                          color: C.green,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                        }}
+                      >
+                        <Check size={11} strokeWidth={3} />
+                      </span>
+                      <span
+                        style={{
+                          color: h.strong ? C.slate900 : C.slate600,
+                          fontWeight: h.strong ? 600 : 500,
                           lineHeight: 1.5,
                         }}
                       >
-                        {h}
+                        {h.label}
                       </span>
                     </div>
                   ))}
@@ -515,13 +565,17 @@ export function PricingPageClient() {
                         justifyContent: 'center',
                         gap: 6,
                         width: '100%',
-                        padding: '12px 16px',
-                        borderRadius: 10,
-                        background: tier.featured ? C.green : C.slate900,
-                        color: C.white,
+                        padding: '14px 18px',
+                        borderRadius: 12,
+                        background: isFeatured ? C.green : C.white,
+                        border: isFeatured ? 'none' : `1px solid ${C.slate200}`,
+                        color: isFeatured ? C.white : C.slate900,
                         fontSize: 14,
-                        fontWeight: 600,
+                        fontWeight: 700,
                         textDecoration: 'none',
+                        boxShadow: isFeatured
+                          ? '0 6px 20px rgba(22,163,74,0.28)'
+                          : 'none',
                       }}
                     >
                       {tier.cta.label} <ArrowRight size={14} />
@@ -540,18 +594,21 @@ export function PricingPageClient() {
                         justifyContent: 'center',
                         gap: 6,
                         width: '100%',
-                        padding: '12px 16px',
-                        borderRadius: 10,
-                        background: tier.featured ? C.green : C.slate900,
-                        color: C.white,
+                        padding: '14px 18px',
+                        borderRadius: 12,
+                        background: isFeatured ? C.green : C.white,
+                        border: isFeatured ? 'none' : `1px solid ${C.slate200}`,
+                        color: isFeatured ? C.white : C.slate900,
                         fontSize: 14,
-                        fontWeight: 600,
-                        border: 'none',
+                        fontWeight: 700,
                         cursor: checkoutLoading === tier.id ? 'wait' : 'pointer',
                         opacity: checkoutLoading === tier.id ? 0.7 : 1,
+                        boxShadow: isFeatured
+                          ? '0 6px 20px rgba(22,163,74,0.28)'
+                          : 'none',
                       }}
                     >
-                      {checkoutLoading === tier.id ? 'Redirecting...' : tier.cta.label}
+                      {checkoutLoading === tier.id ? 'Redirecting…' : tier.cta.label}
                       {checkoutLoading !== tier.id && <ArrowRight size={14} />}
                     </button>
                   )}
@@ -559,6 +616,68 @@ export function PricingPageClient() {
               </div>
             );
           })}
+        </div>
+
+        {/* Trust band — mirrors the landing page pricing section */}
+        <div
+          style={{
+            maxWidth: 1160,
+            margin: '40px auto 0',
+            padding: '20px 24px',
+            background: C.white,
+            border: `1px solid ${C.slate200}`,
+            borderRadius: 16,
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gap: 20,
+            alignItems: 'center',
+          }}
+        >
+          {[
+            { label: 'SOC 2 ready', sub: 'AES-256-GCM + TLS 1.3' },
+            { label: 'Signed DPA', sub: 'on any paid tier' },
+            { label: 'No training on your data', sub: 'ever, by contract' },
+            { label: '30-day pilot', sub: 'on Strategy tier' },
+          ].map(item => (
+            <div
+              key={item.label}
+              style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}
+            >
+              <span
+                style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: 10,
+                  background: C.greenLight,
+                  color: C.green,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  marginTop: 2,
+                }}
+              >
+                <Check size={12} strokeWidth={3} />
+              </span>
+              <div style={{ minWidth: 0 }}>
+                <div
+                  style={{ fontSize: 13, fontWeight: 700, color: C.slate900, lineHeight: 1.3 }}
+                >
+                  {item.label}
+                </div>
+                <div
+                  style={{
+                    fontSize: 11.5,
+                    color: C.slate500,
+                    lineHeight: 1.35,
+                    marginTop: 1,
+                  }}
+                >
+                  {item.sub}
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 

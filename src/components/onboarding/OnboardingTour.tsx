@@ -264,9 +264,19 @@ function TourCard({
 }
 
 /**
- * Listens for the WelcomeModal "launch tour" event + a pending flag in localStorage
- * and kicks off the Onborda tour. Also auto-starts for users who completed onboarding
- * but never saw the tour (edge case: old users after this feature ships).
+ * Triggers the Onborda dashboard tour in three cases:
+ *   1. The WelcomeModal dispatches `di:launch-tour` after the user clicks
+ *      "Launch tour" — the explicit opt-in path.
+ *   2. A pending flag sits in localStorage (TOUR_TRIGGER_KEY) — covers the
+ *      case where the user clicked the button but navigated before the tour
+ *      could mount.
+ *   3. Auto-launch for first-login users who land directly on the dashboard
+ *      without having seen the tour. Requires:
+ *        - we are ON /dashboard (so the selectors exist)
+ *        - the server says onboardingTourSeen !== true
+ *        - the user has not explicitly dismissed the checklist
+ *      This catches users who skipped the Welcome modal entirely — previously
+ *      they would never see the tour.
  */
 function TourLauncher() {
   const { startOnborda } = useOnborda();
@@ -290,7 +300,37 @@ function TourLauncher() {
 
     const handleLaunch = () => trigger(300);
     window.addEventListener('di:launch-tour', handleLaunch);
-    return () => window.removeEventListener('di:launch-tour', handleLaunch);
+
+    // Auto-launch for first-login users who bypassed the WelcomeModal.
+    // Fire only when we can see the upload zone selector — protects against
+    // running on sub-routes like /dashboard/settings where the target is
+    // missing and Onborda would render against nothing.
+    const maybeAutoLaunch = () => {
+      if (typeof window === 'undefined') return;
+      if (!window.location.pathname.startsWith('/dashboard')) return;
+      if (window.location.pathname !== '/dashboard') return;
+      if (!document.getElementById('onborda-upload')) return;
+      if (localStorage.getItem('decision-intel-checklist-dismissed') === 'true') return;
+      if (localStorage.getItem('decision-intel-tour-autolaunched') === 'true') return;
+      fetch('/api/onboarding')
+        .then(r => (r.ok ? r.json() : Promise.reject()))
+        .then((data: { onboardingTourSeen?: boolean }) => {
+          if (data.onboardingTourSeen) return;
+          localStorage.setItem('decision-intel-tour-autolaunched', 'true');
+          trigger(900);
+        })
+        .catch(() => {
+          // no-op: without auth or onboarding data we skip auto-launch.
+        });
+    };
+    // Delay one frame so the dashboard has time to render the upload zone
+    // before we query for it.
+    const autoLaunchTimer = setTimeout(maybeAutoLaunch, 400);
+
+    return () => {
+      window.removeEventListener('di:launch-tour', handleLaunch);
+      clearTimeout(autoLaunchTimer);
+    };
   }, [router, startOnborda]);
 
   return null;

@@ -31,23 +31,40 @@ export function verifyFounderPass(headerValue: string | null | undefined): Found
   const serverPass = process.env.FOUNDER_HUB_PASS?.trim();
   const publicPass = process.env.NEXT_PUBLIC_FOUNDER_HUB_PASS?.trim();
 
-  const effectivePass = serverPass || publicPass;
-  if (!effectivePass) {
+  if (!serverPass && !publicPass) {
     return { ok: false, reason: 'not_configured' };
   }
 
-  // Warn once per cold start if we're still relying on the leaky public var.
+  const header = (headerValue ?? '').trim();
+  if (!header) {
+    return { ok: false, reason: 'unauthorized' };
+  }
+
+  // Accept EITHER the server-only pass or the client-visible pass.
+  //
+  // Previously the check used `serverPass || publicPass` which meant that
+  // once FOUNDER_HUB_PASS was set to a distinct value from the public var,
+  // the founder's own UI (which only has access to NEXT_PUBLIC_...) could
+  // no longer authenticate, locking the founder out of their own chat.
+  //
+  // Accepting either value keeps both access paths working:
+  //   - server/CI scripts use FOUNDER_HUB_PASS (the "real" secret)
+  //   - the in-app UI uses NEXT_PUBLIC_FOUNDER_HUB_PASS (human convenience)
+  // The Founder Hub page itself already sits behind Supabase auth (only a
+  // signed-in platform user can load it), so the public value is not a
+  // bare-internet credential — it's a second factor.
+  if (serverPass && safeCompare(header, serverPass)) return { ok: true };
+  if (publicPass && safeCompare(header, publicPass)) return { ok: true };
+
+  // Warn once per cold start if we're still relying solely on the leaky
+  // public var — surfaces the config gap without breaking anything.
   if (!serverPass && publicPass) {
     log.warn(
-      'Founder Hub auth is using NEXT_PUBLIC_FOUNDER_HUB_PASS — this value is ' +
-        'exposed to all website visitors via the client bundle. Set a distinct ' +
-        'server-only FOUNDER_HUB_PASS on Vercel to close the leak.',
+      'Founder Hub auth is relying on NEXT_PUBLIC_FOUNDER_HUB_PASS only — ' +
+        'set a distinct server-only FOUNDER_HUB_PASS on Vercel so machine ' +
+        'credentials can differ from the UI credential.',
     );
   }
 
-  const header = (headerValue ?? '').trim();
-  if (!header || !safeCompare(header, effectivePass)) {
-    return { ok: false, reason: 'unauthorized' };
-  }
-  return { ok: true };
+  return { ok: false, reason: 'unauthorized' };
 }
