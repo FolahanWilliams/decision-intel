@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
-  TrendingUp,
   CheckCircle,
   XCircle,
   Activity,
@@ -15,6 +14,7 @@ import {
   ArrowDownRight,
 } from 'lucide-react';
 import { IntelligenceBrief } from '@/components/ui/IntelligenceBrief';
+import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 
 interface FlywheelData {
   successDecisions: Array<{
@@ -695,33 +695,18 @@ export function OutcomeFlywheelContent() {
         </div>
       )}
 
-      {/* Empty state */}
+      {/* Empty state — uses the canonical EnhancedEmptyState pattern so the
+          flywheel page matches the rest of the platform (decision-log,
+          playbooks, analytics) and plugs into IntelligenceBrief for
+          context-specific nudges. */}
       {!hasOutcomes && (
-        <div
-          className="card"
-          style={{
-            padding: 'var(--spacing-2xl)',
-            textAlign: 'center',
-          }}
-        >
-          <TrendingUp size={32} style={{ color: 'var(--text-muted)', margin: '0 auto 12px' }} />
-          <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: 8 }}>
-            No outcomes tracked yet
-          </h3>
-          <p
-            style={{
-              fontSize: '13px',
-              color: 'var(--text-muted)',
-              maxWidth: 400,
-              margin: '0 auto',
-              lineHeight: 1.6,
-            }}
-          >
-            The flywheel gets smarter with every outcome you record. Analyze a document, then come
-            back later to report whether the decision was successful. The more outcomes you track,
-            the better your bias detection becomes.
-          </p>
-        </div>
+        <EnhancedEmptyState
+          type="generic"
+          title="No outcomes confirmed yet"
+          description="The flywheel compounds every time you confirm what happened. Audit a memo, mark whether the decision produced the result you expected, and watch your DQI tighten to your org's actual outcome history over the next 12 months."
+          showBrief
+          briefContext="outcomes"
+        />
       )}
     </div>
   );

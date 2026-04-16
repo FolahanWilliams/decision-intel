@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { BookOpen, CheckCircle, Circle, ChevronRight, ChevronLeft, Loader2, ExternalLink, GraduationCap } from 'lucide-react';
-import { TRACKS, getProgress, type Track, type Lesson } from '@/lib/data/founder-school/lessons';
+import { TRACKS, TOTAL_LESSONS, getProgress, type Track, type Lesson } from '@/lib/data/founder-school/lessons';
 
 const STORAGE_KEY = 'founder-school-progress';
 
@@ -270,6 +270,113 @@ function LessonDetail({
             {lesson.reflection}
           </p>
         </div>
+
+        {/* Primary sources — only shown on lessons that carry them
+            (currently: Platform Foundations track). */}
+        {lesson.sources && lesson.sources.length > 0 && (
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 8 }}>
+              Primary sources
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {lesson.sources.map((src, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: 'flex',
+                    gap: 10,
+                    padding: '8px 12px',
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: 'var(--radius-md)',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: 'var(--text-primary)',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {src.label}
+                  </span>
+                  {src.detail && (
+                    <span style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                      {src.detail}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Ready-to-use CSO / VC pitches — Platform Foundations lessons
+            carry these so you can walk into the meeting already fluent. */}
+        {(lesson.csoPitch || lesson.vcPitch) && (
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              gap: 12,
+              marginBottom: 20,
+            }}
+          >
+            {lesson.csoPitch && (
+              <div
+                style={{
+                  background: 'rgba(22,163,74,0.06)',
+                  border: '1px solid rgba(22,163,74,0.24)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '12px 14px',
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    color: 'var(--accent-primary)',
+                    marginBottom: 6,
+                  }}
+                >
+                  60-second pitch · CSO
+                </div>
+                <p style={{ fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.6, margin: 0 }}>
+                  &ldquo;{lesson.csoPitch}&rdquo;
+                </p>
+              </div>
+            )}
+            {lesson.vcPitch && (
+              <div
+                style={{
+                  background: 'rgba(15,23,42,0.04)',
+                  border: '1px solid rgba(15,23,42,0.14)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '12px 14px',
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    color: '#0F172A',
+                    marginBottom: 6,
+                  }}
+                >
+                  60-second pitch · VC
+                </div>
+                <p style={{ fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.6, margin: 0 }}>
+                  &ldquo;{lesson.vcPitch}&rdquo;
+                </p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Actions */}
@@ -403,7 +510,9 @@ export function FounderSchoolTab({ founderPass }: FounderSchoolTabProps) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <GraduationCap size={16} style={{ color: 'var(--accent-primary)' }} />
           <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>Founder School</span>
-          <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 2 }}>7 tracks · 49 lessons · tuned to Decision Intel</span>
+          <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 2 }}>
+            {TRACKS.length} tracks · {TOTAL_LESSONS} lessons · tuned to Decision Intel
+          </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 100, height: 4, background: 'var(--bg-tertiary)', borderRadius: 2, overflow: 'hidden' }}>

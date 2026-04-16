@@ -13,6 +13,19 @@ export interface Lesson {
   whyItMatters: string;
   action: string;
   reflection: string;
+  /** Primary-source references (books, papers, authors). Optional —
+   *  Platform Foundations lessons carry these so the founder can read the
+   *  canonical research behind their own product. */
+  sources?: Array<{
+    label: string;
+    detail?: string;
+  }>;
+  /** The 60-second pitch to a Chief Strategy Officer. Short, confident,
+   *  pain-focused. Optional — populated on methodology lessons. */
+  csoPitch?: string;
+  /** The 60-second pitch to a VC. Short, confident, moat-focused.
+   *  Optional — populated on methodology lessons. */
+  vcPitch?: string;
 }
 
 export interface Track {
@@ -624,6 +637,179 @@ export const TRACKS: Track[] = [
         whyItMatters: 'The founders who reach unicorn scale are almost universally exceptional learners. It\'s not their initial knowledge — it\'s the rate at which they close the gap between where they are and where they need to be. You\'ve already demonstrated this with Decision Intel. Systematize it.',
         action: 'Set a 12-month learning goal: one book per month (send a reading list request to your advisor), 3 conversations with exceptional people per quarter, one new domain studied per quarter.',
         reflection: 'Who is one person that, if you had a 1-hour quarterly conversation with them, would most accelerate Decision Intel\'s success? How do you get that conversation?',
+      },
+    ],
+  },
+  {
+    id: 'platform_foundations',
+    title: 'Platform Foundations',
+    description: 'The methodologies Decision Intel is built on — so you can explain them at CSO depth and VC depth',
+    color: '#0F172A',
+    emoji: '🏛️',
+    lessons: [
+      {
+        id: 'pf_1',
+        order: 1,
+        title: 'The Heuristics & Biases Program',
+        readTime: '6 min',
+        summary: 'Decision Intel\'s 30+ bias taxonomy descends directly from Kahneman & Tversky\'s Nobel-winning research program. You should be able to trace every bias back to it.',
+        insight: 'Amos Tversky and Daniel Kahneman\'s 1974 paper "Judgment Under Uncertainty: Heuristics and Biases" launched the entire field of behavioural decision science. The core finding: people don\'t compute probabilities; they substitute harder questions with easier ones (availability, representativeness, anchoring). Each substitution produces a systematic error — a bias. Over 50 years of peer-reviewed research has catalogued these errors, and Decision Intel\'s taxonomy (DI-B-001 through DI-B-020, plus the broader 30+ marketing scope) maps each one to that literature. Confirmation bias, anchoring, overconfidence, optimism, sunk cost, availability, representativeness — these are not our inventions. We operationalised what already existed. Kahneman\'s 2011 "Thinking, Fast and Slow" is the layperson synthesis; the 1982 "Judgment Under Uncertainty" collection (Kahneman, Slovic, Tversky) is the academic canon.',
+        whyItMatters: 'When a CSO asks "how do you know these biases are real?" you need to answer with names, dates, and papers — not "our AI detects them." The credibility of the whole product rests on the credibility of the underlying research. You are not asking prospects to trust your algorithm; you are asking them to trust 50 years of cognitive science, and your job is to make them confident that your platform applies it correctly.',
+        action: 'Read the opening chapter of "Thinking, Fast and Slow" this week. Then write a 2-paragraph answer to: "What research is Decision Intel built on?" — as if answering a skeptical CSO.',
+        reflection: 'If a VC asks "what prevents GPT-5 from replacing Decision Intel?" — how do you use the bias taxonomy provenance to answer that?',
+        sources: [
+          { label: 'Tversky & Kahneman (1974)', detail: '"Judgment under Uncertainty: Heuristics and Biases" — Science, 185(4157). The founding paper.' },
+          { label: 'Kahneman, Slovic & Tversky (1982)', detail: '"Judgment Under Uncertainty: Heuristics and Biases" — Cambridge University Press. The academic canon collection.' },
+          { label: 'Kahneman (2011)', detail: '"Thinking, Fast and Slow" — Farrar, Straus and Giroux. The layperson synthesis; System 1 / System 2.' },
+          { label: 'Malmendier & Tate (2005, 2008)', detail: '"CEO Overconfidence and Corporate Investment" and follow-up papers applying bias research directly to CEO decision-making at public companies.' },
+        ],
+        csoPitch: 'Decision Intel didn\'t invent its bias taxonomy. It operationalises fifty years of Nobel-winning research — Kahneman, Tversky, Thaler — and applies it to the exact artefacts your team already produces: strategic memos, board decks, market-entry recommendations. Every flag we surface cites the published literature behind it. Your audit committee can defend the rigour.',
+        vcPitch: 'The moat isn\'t the model. It\'s the methodology. GPT can identify a bias; it cannot tell you which of the 30+ canonical biases is present, at what severity, in which section, mapped to which regulatory framework, with which compound-risk interaction. That mapping is three academic lineages deep and updates as the research updates. LLM wrappers can\'t reconstruct that.',
+      },
+      {
+        id: 'pf_2',
+        order: 2,
+        title: 'Noise: The Other Kind of Judgment Error',
+        readTime: '5 min',
+        summary: 'Bias is the average error; noise is the variance. Kahneman\'s 2021 book argued noise is the larger, unmeasured problem. Decision Intel is the first product to quantify it in strategic memos.',
+        insight: 'Kahneman, Sibony and Sunstein\'s "Noise: A Flaw in Human Judgment" (2021) is the sequel to "Thinking, Fast and Slow" and the intellectual foundation for our 3-judge noise measurement. Their thesis: in any system of professional judgment (underwriters, radiologists, judges, executives), if you show the same case to different experts, or the same expert on different days, you get wildly different answers. That variance is noise. Their field studies across insurance, law, medicine, and HR found noise typically accounts for as much error as bias — sometimes more. Decision Intel addresses noise directly: the pipeline runs three independent LLM "judges" over the same memo and surfaces the standard deviation of their verdicts. A low-noise memo says what it means; a high-noise memo is ambiguous and the disagreement is a signal of work to do.',
+        whyItMatters: 'No competitor measures noise. McKinsey doesn\'t; BCG doesn\'t; Cloverpop doesn\'t; ChatGPT definitely doesn\'t (it\'s a single judge by architecture). Noise is the unclaimed half of judgment error. Owning it is a durable positioning. When you describe Decision Intel, lead with noise after DQI — it\'s the feature no one else has a good answer to.',
+        action: 'Re-read chapters 1–3 of "Noise." Then practice a 2-minute pitch that explains to a CSO why noise matters and why your 3-judge architecture is the fix. Time yourself.',
+        reflection: 'If a competitor builds a single-LLM "decision auditor," what do you say when asked what makes you different? Your answer must survive 10 seconds of scrutiny.',
+        sources: [
+          { label: 'Kahneman, Sibony & Sunstein (2021)', detail: '"Noise: A Flaw in Human Judgment" — Little, Brown Spark. Canonical.' },
+          { label: 'Kahneman, Rosenfield, Gandhi & Blaser (2016)', detail: '"Noise: How to Overcome the High, Hidden Cost of Inconsistent Decision Making" — Harvard Business Review. 18-page condensed version.' },
+          { label: 'Bohnet (2016)', detail: '"What Works: Gender Equality by Design" — Harvard University Press. Applied-noise intervention case studies.' },
+        ],
+        csoPitch: 'Your board already asks you to reduce bias. Almost none of them ask you to reduce noise — the variance you\'d see if three equally qualified analysts read the same memo on the same morning. Kahneman\'s 2021 research showed noise often accounts for more judgment error than bias. We measure both. It\'s the half of the problem your current process has never named.',
+        vcPitch: 'The bias-detection category is becoming commoditised. Noise measurement is not. Kahneman\'s 2021 book put noise on the map, and no incumbent — McKinsey, Cloverpop, or a ChatGPT prompt — architecturally measures it. Our 3-judge pipeline is a defensible product surface, not a marketing claim.',
+      },
+      {
+        id: 'pf_3',
+        order: 3,
+        title: 'The Decision Quality Index — Why Those Six Components',
+        readTime: '6 min',
+        summary: 'DQI is a weighted composite of six inputs. Each weight has a reason. You should be able to defend every weight the way a CFO defends a cap-ex allocation.',
+        insight: 'DQI is Decision Intel\'s single most-cited output. It grades a decision A–F on a 0–100 scale, boundaries A ≥ 85, B ≥ 70, C ≥ 55, D ≥ 40, F < 40. Under the hood it weights six components: (1) bias profile — presence and severity across the 30+ taxonomy, (2) noise — cross-judge variance, (3) logical coherence — internal consistency of the argument, (4) evidence grounding — claims that survive fact-check, (5) pre-mortem robustness — how many failure modes the memo has considered, (6) stakeholder coverage — whether the dissenting voice is represented. The weights aren\'t arbitrary. Each comes from published research on what predicts good outcomes: noise and bias carry the most weight because Kahneman-Sibony showed they\'re the largest error sources; stakeholder coverage is weighted because Mercier & Sperber\'s argumentative theory of reasoning showed individual cognition is worst when uncontested. DQI is to strategic decisions what FICO is to credit: a transparent composite grounded in predictive research, not a vibe.',
+        whyItMatters: 'The DQI is the single artefact you will be asked about most often — by prospects, by investors, by the press. You should know every weight from memory and be able to defend it in two sentences. If a CSO says "these weights look arbitrary," that\'s a product-level credibility attack and it needs a 30-second answer. The weights are in `src/lib/scoring/dqi.ts` and mapped against FOUNDER_CONTEXT; re-read them before any investor meeting.',
+        action: 'Memorise the six components and their weights. Practice explaining each weight\'s rationale out loud — as if you were the CFO defending a budget allocation.',
+        reflection: 'Which DQI component is hardest for you to defend the weighting of? That is probably where a sophisticated prospect will push — prepare the answer now.',
+        sources: [
+          { label: 'Keeney (1992)', detail: '"Value-Focused Thinking" — Harvard University Press. Foundational work on how to weight multi-criteria decision models defensibly.' },
+          { label: 'Howard & Matheson (2004)', detail: '"Influence Diagrams, Decision Diagrams, and Decision Quality" — Strategic Decisions Group. The "Six Elements of Decision Quality" framework.' },
+          { label: 'Internal', detail: 'src/lib/scoring/dqi.ts (792 lines) — the canonical implementation. FOUNDER_CONTEXT.dqiWeights is the source of truth.' },
+        ],
+        csoPitch: 'DQI is a weighted composite of six decision-quality components — each weight grounded in a specific published finding about what predicts good strategic outcomes. Every memo you run comes back with its DQI, its sub-scores, and the exact weightings that produced them. Your audit committee doesn\'t have to take our word for anything; the methodology is transparent and re-runnable.',
+        vcPitch: 'FICO took a decade to become the reference score for consumer credit. DQI is our bid for that position in strategic decisions. Every confirmed outcome customers report recalibrates their DQI — meaning after 12 months, the score is specifically tuned to that customer\'s actual outcome history. That recalibration is the moat.',
+      },
+      {
+        id: 'pf_4',
+        order: 4,
+        title: 'Pre-Mortems & Red-Teams — Klein, Mercier, Sperber',
+        readTime: '5 min',
+        summary: 'The pre-mortem and the red-team are both adversarial-cognition techniques with specific research provenance. Decision Intel\'s pipeline operationalises both — and the research tells us why they work.',
+        insight: 'Gary Klein introduced the pre-mortem in a 2007 Harvard Business Review piece: before committing, imagine the decision has failed and write the most plausible cause. The technique works because of "prospective hindsight" — shifting the brain from defence to diagnosis bypasses optimism bias. Klein\'s field tests showed pre-mortems surface failure modes that traditional risk reviews miss by 30%+. The red-team is adjacent: assign a person or process to argue against the decision, with the specific brief of finding weaknesses. Mercier and Sperber\'s "The Enigma of Reason" (2017) argues that individual reasoning evolved for argumentation, not truth-seeking; reasoning is most accurate under adversarial pressure, which is why red-teams work. Decision Intel runs both natively: our pre-mortem node (src/lib/agents/nodes.ts) generates failure scenarios; Dr. Red Team surfaces the single most-damaging objection against the weakest load-bearing assumption.',
+        whyItMatters: 'A CSO who has run a pre-mortem before will recognise the technique instantly. The 20% who haven\'t need you to explain it in two sentences and attribute it to Klein. When you do that crisply, you sound like someone who has thought deeply about the tooling, not just built it.',
+        action: 'Pick one current high-stakes decision of your own (fundraising timing, hire, roadmap). Run Klein\'s pre-mortem on it. Write the failure story. See what changes.',
+        reflection: 'When you pitch Decision Intel, do you currently use the word "pre-mortem" or the phrase "imagine the failure"? Both work — but the first is positioning, and the second is explanation. Know when to use which.',
+        sources: [
+          { label: 'Klein (2007)', detail: '"Performing a Project Premortem" — Harvard Business Review, September. The founding article.' },
+          { label: 'Mitchell, Russo & Pennington (1989)', detail: '"Back to the Future: Temporal Perspective in the Explanation of Events" — Journal of Behavioral Decision Making. The prospective-hindsight research underneath.' },
+          { label: 'Mercier & Sperber (2017)', detail: '"The Enigma of Reason" — Harvard University Press. Argumentative theory of reasoning; why red-teams work.' },
+        ],
+        csoPitch: 'Every memo we audit gets a pre-mortem — Gary Klein\'s 2007 technique, used inside most Fortune 500 strategy functions — plus a Red Team pass that synthesises the single most damaging objection against your weakest load-bearing assumption. Your board walks in with the dissent already surfaced. There\'s no "what did we miss?" moment.',
+        vcPitch: 'This is a good example of what we mean by "operationalising the research." The pre-mortem has been in the management canon since 2007. Nobody has packaged it as a mandatory, automated step inside a strategic-memo audit. We did — and it ships on Individual, not just Enterprise.',
+      },
+      {
+        id: 'pf_5',
+        order: 5,
+        title: 'The Outcome Loop — Tetlock, Brier, and Bayesian Calibration',
+        readTime: '6 min',
+        summary: 'Decision Intel\'s outcome flywheel is the Tetlock superforecasting research, applied to corporate strategy. Confirmed outcomes recalibrate the org\'s DQI so scores get sharper over time. This is the compounding moat.',
+        insight: 'Philip Tetlock\'s 20-year "Good Judgment Project" showed that forecasting skill is trainable — but only when judgments are scored by their actual outcomes, with Brier scores (a proper scoring rule that rewards both accuracy and calibration), and the feedback loop is fast enough to learn from. Tetlock\'s superforecasters outperformed CIA analysts by 30%+ on the same geopolitical questions, using the same public information, because they had a working outcome loop. Decision Intel\'s outcome flywheel is that research applied to corporate strategy: when an analysed memo produces an outcome, the customer confirms it, the system measures the gap between our prediction and reality, and the org-specific DQI model recalibrates. After 12 months of outcomes, the customer\'s DQI is specifically tuned to their decisions, not a generic baseline. This is Bayesian updating in production. It is also the reason "LLM + prompt" competitors cannot catch up — they have no outcome data per customer, and without it, they can\'t calibrate.',
+        whyItMatters: 'The outcome loop is the single hardest thing for a competitor to replicate and the single easiest thing for an investor to misunderstand. You need a 30-second explanation that uses the word "calibration" and the name "Tetlock." When a VC asks "what\'s the moat?" — this is the answer, delivered without hedging.',
+        action: 'Read the introduction to Tetlock & Gardner\'s "Superforecasting" this week. Then rewrite your VC moat paragraph using the words "calibration," "Brier," and "per-org recalibration."',
+        reflection: 'If Cloverpop announced an "outcome tracker" feature tomorrow, why would Decision Intel still win? Your answer has to be better than "we got here first."',
+        sources: [
+          { label: 'Tetlock & Gardner (2015)', detail: '"Superforecasting: The Art and Science of Prediction" — Crown. Canonical.' },
+          { label: 'Tetlock (2005)', detail: '"Expert Political Judgment: How Good Is It? How Can We Know?" — Princeton University Press. The original 20-year study.' },
+          { label: 'Brier (1950)', detail: '"Verification of Forecasts Expressed in Terms of Probability" — Monthly Weather Review, 78(1). The proper scoring rule the whole field uses.' },
+        ],
+        csoPitch: 'Your DQI starts at an industry baseline. Every confirmed outcome your team reports — good or bad — tunes the model to your specific decision patterns. After 12 months, the score is calibrated to the way your organisation actually makes calls, not a generic average. That\'s not a feature; that\'s how Tetlock\'s superforecasters outperformed CIA analysts by 30% on the same information.',
+        vcPitch: 'The outcome flywheel is what makes this business defensible. Every confirmed outcome per customer is a data point a competitor cannot replicate without running a full 12-month engagement of their own. The cost of replication compounds, and our per-customer DQI becomes more accurate the longer they use us. This is a data-network moat, not a feature moat.',
+      },
+      {
+        id: 'pf_6',
+        order: 6,
+        title: 'The 20×20 Bias Interaction Matrix — Why Biases Are Toxic in Combination',
+        readTime: '5 min',
+        summary: 'Biases rarely appear alone. The research on bias interactions — why overconfidence × confirmation is lethal — is recent but robust, and it\'s the intellectual basis for our "toxic combinations" feature.',
+        insight: 'The solo-bias literature (Tversky-Kahneman and descendants) treats each bias independently. The 2010s research asks the harder question: how do biases compound when they appear together? The answer is: multiplicatively, not additively. Confirmation bias paired with overconfidence produces catastrophic decision-making: you only look at evidence that supports your view (confirmation), and you trust that view more than the evidence warrants (overconfidence). You can predict the failure before it happens. Bazerman & Chugh (2022) "Better, Not Perfect" consolidates the interaction research; Kogut & Zander showed similar compounding effects in M&A contexts. Decision Intel\'s 20×20 interaction matrix encodes 18 named toxic combinations from this literature — "overconfidence + confirmation," "sunk cost + optimism," "anchoring + availability" — each with a severity weight and a mapped historical case showing the pattern in the wild (Kodak, Blockbuster, Nokia, etc.). The compound DQI penalty for a toxic combination is larger than the sum of its parts.',
+        whyItMatters: 'Single-bias tooling (any LLM prompt) can identify a confirmation bias. It cannot identify that confirmation + overconfidence + sunk cost is the specific pattern that preceded Kodak\'s 2012 collapse. That pattern-matching is the step between "bias detection" and "decision intelligence" — and it\'s where a sophisticated buyer realises we\'re a different category of product.',
+        action: 'Memorise 3 named toxic combinations and their historical cases. When a CSO asks "what\'s an example?" — you should not hesitate.',
+        reflection: 'Which toxic combination is most present in your own current decision-making about Decision Intel? (Seriously — go look at the matrix.)',
+        sources: [
+          { label: 'Bazerman & Chugh (2022)', detail: '"Better, Not Perfect: A Realist\'s Guide to Maximum Sustainable Goodness" — Harper Business. Consolidates the bias-interaction research.' },
+          { label: 'Kogut & Zander (1996)', detail: '"What Firms Do? Coordination, Identity, and Learning" — Organization Science. Compounding effects of cognitive biases in M&A.' },
+          { label: 'Internal', detail: 'src/lib/scoring/toxic-combinations.ts — the 18 canonical patterns and their severity weights.' },
+        ],
+        csoPitch: 'Single biases are manageable. The dangerous thing is the combination. When overconfidence layers on top of confirmation bias on top of sunk cost, you\'ve reproduced the decision pattern that preceded Kodak, Nokia, and Blockbuster — and the failure rate compounds multiplicatively. We price the compound risk directly: 18 named toxic combinations with historical exemplars. Your existing tooling gives you a bias; we give you the bias pattern.',
+        vcPitch: 'The toxic-combinations feature is a good example of why we refuse to call ourselves an "LLM bias detector." An LLM can find a single bias in text. It cannot tell you that the specific triad of biases present is the one that killed Kodak. That requires a matrix of named combinations, calibrated severities, and a case library — three assets that don\'t exist outside our product.',
+      },
+      {
+        id: 'pf_7',
+        order: 7,
+        title: 'The 12-Node Pipeline — Why Not Just One LLM Call',
+        readTime: '6 min',
+        summary: 'Decision Intel\'s LangGraph pipeline runs 12 specialised nodes over each memo, not one generalist LLM prompt. This is the architectural reason we exist.',
+        insight: 'Every memo goes through 12 nodes in our LangGraph pipeline. They split into roughly 8 sequential + 4 parallel, driven by data dependencies. The sequence: (1) GDPR anonymiser strips PII, (2) structurer parses the memo into sections, (3) intelligence gatherer pulls relevant external context, (4) bias detection flags the 30+ taxonomy matches, (5) three-judge noise measurement runs in parallel, (6) logical coherence analysis checks argument validity, (7) pre-mortem generates failure scenarios, (8) Red Team surfaces the top adversarial objection, (9) fact-check verifies quantitative claims against external sources, (10) compliance mapper cross-links flags to 7 regulatory frameworks, (11) compound-risk scorer applies the 20×20 matrix, (12) verdict synthesiser produces DQI + summary. Each node has a specialised prompt and a specialised output schema; the outputs feed forward. A single LLM call cannot hit this depth because the model has to do everything at once with no specialised context per step. The pipeline is the product. It\'s also why per-audit cost is ~£0.30–0.50 — we\'re firing ~17 LLM calls, not one.',
+        whyItMatters: 'When a VC asks "what stops OpenAI from replacing you?" or a CSO asks "isn\'t this just a ChatGPT wrapper?" — you need the pipeline in your head. Twelve specialised nodes, each with distinct prompts, each calibrated to a specific decision-quality dimension, each with schema-validated outputs. Describe it, name three nodes by function, and you\'ve ended the ChatGPT-wrapper question.',
+        action: 'Read src/lib/agents/graph.ts and src/lib/agents/nodes.ts. Then write a 3-sentence architecture answer for "is this just GPT-4?" Memorise it.',
+        reflection: 'If you had to cut one node from the pipeline to reduce per-audit cost, which is least load-bearing? Your answer reveals how well you understand the architecture.',
+        sources: [
+          { label: 'LangGraph docs', detail: 'LangChain\'s graph-based orchestration framework — the substrate we\'re built on.' },
+          { label: 'Anthropic (2024)', detail: '"Building effective agents" — Anthropic Engineering Blog. Sequential vs. parallel agent patterns.' },
+          { label: 'Internal', detail: 'src/lib/agents/nodes.ts (2,297 lines), src/lib/agents/graph.ts, src/lib/agents/prompts.ts.' },
+        ],
+        csoPitch: 'Every strategic memo goes through twelve specialised analyses: anonymisation, structure parsing, intelligence enrichment, bias detection, noise measurement across three judges, logical coherence, pre-mortem, red team, fact-check, compliance mapping, compound-risk scoring, and final verdict. Each step has a different prompt, a different output schema, and a different validation pass. A single ChatGPT call can give you an opinion on the memo. This gives you twelve calibrated answers, composed into a DQI your audit committee can defend.',
+        vcPitch: 'We\'re an agent pipeline, not an LLM wrapper. Twelve specialised nodes across LangGraph, with schema-validated outputs between each step, fallback model routing, and a per-node cost model. Our cost per audit is £0.30–0.50 because we\'re running seventeen LLM calls end-to-end. The architecture is the defensibility — anyone trying to catch up has to rebuild all twelve specialised prompt-output pairs and the glue between them. That\'s twelve specialised products, not one.',
+      },
+      {
+        id: 'pf_8',
+        order: 8,
+        title: 'Regulatory Frameworks — The Seven We Map Against',
+        readTime: '5 min',
+        summary: 'Every flag Decision Intel surfaces is cross-linked to the specific section of the specific framework it touches. Without that, enterprise sales is blocked. With it, we unlock procurement.',
+        insight: 'We map against seven frameworks: GDPR (data processing + Article 22 automated-decision provisions), SOC 2 Type II (trust services criteria — security, availability, confidentiality, processing integrity, privacy), HIPAA (health-sector decisions), CCPA (California residents), SOX (financial materiality), the EU AI Act (risk tiers + transparency obligations), and NIST AI Risk Management Framework (Govern/Map/Measure/Manage). Each framework appears because a category of Fortune 500 customer cannot purchase without it. GDPR gates EU deals; SOC 2 gates any regulated industry; HIPAA gates healthcare; SOX gates public-company CFO approval; the EU AI Act is the rising gate on any AI-involved decision process; NIST is becoming the US federal standard. Each flag in our taxonomy carries a mapped reference — "this overconfidence flag in a quarterly earnings memo is material under SOX § 404." That mapping is the product surface that turns a strategy tool into one the audit committee will sign off on.',
+        whyItMatters: 'Compliance mapping is the single most underrated product moat in our category. Cloverpop doesn\'t have it. Consulting doesn\'t bundle it. ChatGPT can\'t credibly provide it. Any Fortune 500 buyer\'s procurement team will require it within 48 hours of the decision to buy. You should name all seven frameworks and explain which gates which customer — when a CSO starts visualising their audit committee meeting, that is the moment of purchase intent.',
+        action: 'For each of the seven frameworks, write one sentence on what it requires and which customer category it gates. Keep that card close before any enterprise call.',
+        reflection: 'Which of the seven do you currently understand least? Learn it this week — it will come up in a CSO call, and you don\'t want that first time to be the meeting.',
+        sources: [
+          { label: 'EU AI Act (2024)', detail: 'Regulation (EU) 2024/1689. Risk tiers + obligations for high-risk AI systems.' },
+          { label: 'NIST AI RMF (2023)', detail: '"AI Risk Management Framework 1.0" — NIST. Govern/Map/Measure/Manage.' },
+          { label: 'AICPA TSC', detail: 'SOC 2 Trust Services Criteria. The five trust principles that define the audit scope.' },
+          { label: 'Internal', detail: 'src/lib/compliance/* — our seven framework mappers and the Audit Defense Packet exporter.' },
+        ],
+        csoPitch: 'Every flag comes with a regulatory citation. If we detect confirmation bias in a quarterly earnings memo, the flag carries a SOX §404 materiality reference. If we detect automated-decision influence in a GDPR-scope pipeline, the flag carries Article 22. Your audit committee doesn\'t have to take the tool on faith; they can review each flag against its cited regulatory source. That\'s the standard required to put AI inside a regulated decision process.',
+        vcPitch: 'Every Fortune 500 procurement team vetoes a tool that can\'t produce regulator-grade defence documents. We ship the Audit Defense Packet on Pro tier — a regulator-grade PDF citing every framework section our flags touch. This isn\'t a "compliance feature"; it\'s the thing that unblocks the procurement gate. Our enterprise sales motion is built around it.',
+      },
+      {
+        id: 'pf_9',
+        order: 9,
+        title: 'The 135 Case Library — Cross-Decision Intelligence',
+        readTime: '6 min',
+        summary: 'Our library of 135 audited historical decisions is not a marketing asset — it\'s the training prior for every new audit. Pattern-matching a new memo against known failures is the research contribution.',
+        insight: 'Our library currently holds 135 deduplicated historical strategic decisions — Kodak digital delay, Blockbuster rejecting Netflix, Nokia on touchscreen, Kraft-Heinz 3G merger, Wirecard fraud, Theranos, Quibi, Meta metaverse pivot, etc. Each case carries the pre-decision memo (or reconstructed equivalent), the biases present at decision time, the red flags detectable without hindsight, and the eventual outcome. Tier 2 cases carry DQI estimate, timeline, stakeholders, counterfactual, post-mortem citations, and pattern-family classification. The library powers two distinct product behaviours: (1) Bias Genome — a ranked leaderboard of which biases appear most often in failed decisions, with failure-lift multipliers computed against baseline, and (2) cross-decision intelligence on the audit page — "this memo\'s bias profile matches 12 historical cases; 9 of 12 produced negative outcomes." Number matters: 135 is large enough to reject "anecdotal" objections, small enough that each entry is hand-verified and primary-source cited. We deliberately fight survivorship bias by including cases where the same pattern produced good outcomes.',
+        whyItMatters: 'The case library is the answer to "isn\'t this all speculative?" If a CSO pushes back on the bias framework as theoretical, the case library is the deflection: "Your memo\'s profile is structurally identical to Case A, Case B, Case C — here are the outcomes each produced." That\'s concrete enough to shift the conversation from \'do I believe this\' to \'how confident am I that I\'m not in that pattern.\' That is a different sale entirely.',
+        action: 'Read five Tier 2 cases in full (Kodak, Blockbuster, Wirecard, Theranos, Meta). Memorise each pattern family. You should be able to invoke them by name on a call.',
+        reflection: 'If a VC said "135 cases is small — McKinsey has thousands," what is your two-sentence answer? If you don\'t have one, write it now.',
+        sources: [
+          { label: 'Internal', detail: 'src/lib/data/case-studies/* — the full 135-case library, deduplicated and primary-source cited.' },
+          { label: 'Lovallo & Sibony (2010)', detail: '"The Case for Behavioral Strategy" — McKinsey Quarterly. Frames the behavioural-strategy opportunity at scale.' },
+          { label: 'Finkelstein (2004)', detail: '"Why Smart Executives Fail" — Portfolio. Pattern-family taxonomy for corporate decision failures.' },
+        ],
+        csoPitch: 'Your decision is not novel. We have 135 structurally similar memos in the library, each with the pre-decision document, the bias profile, and the confirmed outcome. When we audit your memo, we surface the five closest historical matches and show you what each produced. That\'s the step your quarterly strategy review cannot replicate — it\'s lookup against five decades of corporate decision history, not one analyst\'s opinion.',
+        vcPitch: 'The case library is the training prior for every new audit. Each new confirmed customer outcome extends it, making subsequent audits more accurate. 135 is the deduplicated count — every case is hand-verified, primary-source cited, and includes a counter-exemplar where available to defuse survivorship bias. Building this library took years and is the kind of content moat that compounds, not depreciates.',
       },
     ],
   },
