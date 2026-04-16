@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, AlertTriangle, CheckCircle, BookOpen, Shield } from 'lucide-react';
+import { ArrowLeft, ArrowRight, AlertTriangle, CheckCircle, BookOpen, Shield } from 'lucide-react';
 import {
   ALL_CASES,
   getCaseBySlug,
@@ -413,6 +413,31 @@ export default async function CaseStudyDetailPage({
               </div>
             )}
           </div>
+
+          {/* Tier 2: Live demo CTA — eligibility = has preDecisionEvidence + dqiEstimate */}
+          {caseStudy.dqiEstimate && deep && (
+            <Link
+              href={`/demo/${slug}`}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 10,
+                marginTop: 16,
+                padding: '12px 18px',
+                background: 'linear-gradient(135deg, #16A34A 0%, #15803D 100%)',
+                color: '#FFFFFF',
+                borderRadius: 999,
+                textDecoration: 'none',
+                fontSize: 13,
+                fontWeight: 700,
+                letterSpacing: '0.01em',
+                boxShadow: '0 4px 18px rgba(22, 163, 74, 0.28)',
+              }}
+            >
+              See this case as a live audit
+              <ArrowRight size={14} />
+            </Link>
+          )}
         </header>
 
         {/* Summary */}
