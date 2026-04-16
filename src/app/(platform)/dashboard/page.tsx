@@ -68,7 +68,7 @@ import { useDeals } from '@/hooks/useDeals';
 import { DOCUMENT_TYPES } from '@/types/deals';
 import { getBiasPreview } from '@/lib/utils/bias-preview';
 import { QuickScanModal } from '@/components/ui/QuickScanModal';
-import { Zap } from 'lucide-react';
+import { Zap, Lock as LockIcon } from 'lucide-react';
 import { AnalysisShell } from '@/components/analysis/AnalysisShell';
 
 const ANALYSIS_STEPS: { name: string; icon: React.ReactNode }[] = [
@@ -1284,6 +1284,7 @@ export default function Dashboard() {
           {/* Upload Zone - Enhanced with drag feedback */}
           <ErrorBoundary sectionName="Upload">
             {!uploading && !pendingFile ? (
+              <>
               <div
                 id="onborda-upload"
                 className={`upload-zone liquid-glass-iridescent liquid-glass-shimmer ${isDragOver ? 'dragover' : ''}`}
@@ -1312,44 +1313,82 @@ export default function Dashboard() {
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    gap: 'var(--spacing-md)',
+                    gap: 18,
                     textAlign: 'center',
+                    padding: '12px 0',
                   }}
                 >
                   <div
                     style={{
-                      width: 56,
-                      height: 56,
+                      fontSize: 11,
+                      fontWeight: 700,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.14em',
+                      color: 'var(--accent-primary)',
+                    }}
+                  >
+                    Upload · 60-second audit
+                  </div>
+                  <div
+                    style={{
+                      width: 84,
+                      height: 84,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      borderRadius: 'var(--radius-lg)',
+                      borderRadius: 'var(--radius-xl)',
                       background: isDragOver
-                        ? 'rgba(22, 163, 74, 0.14)'
-                        : 'rgba(22, 163, 74, 0.08)',
-                      border: `1px solid rgba(22, 163, 74, ${isDragOver ? 0.38 : 0.22})`,
+                        ? 'rgba(22, 163, 74, 0.18)'
+                        : 'linear-gradient(135deg, rgba(22,163,74,0.14) 0%, rgba(22,163,74,0.06) 100%)',
+                      border: `2px solid rgba(22, 163, 74, ${isDragOver ? 0.5 : 0.24})`,
                       transition: 'all 0.2s ease',
-                      transform: isDragOver ? 'scale(1.1)' : 'scale(1)',
+                      transform: isDragOver ? 'scale(1.08)' : 'scale(1)',
+                      boxShadow: isDragOver
+                        ? '0 10px 30px rgba(22, 163, 74, 0.24)'
+                        : '0 4px 18px rgba(22, 163, 74, 0.08)',
                     }}
                   >
                     {isDragOver ? (
-                      <CloudUpload size={26} style={{ color: 'var(--accent-primary)' }} />
+                      <CloudUpload size={36} style={{ color: 'var(--accent-primary)' }} />
                     ) : (
-                      <Upload size={26} style={{ color: 'var(--accent-primary)' }} />
+                      <Upload size={36} style={{ color: 'var(--accent-primary)' }} />
                     )}
                   </div>
-                  <div>
-                    <p className="font-medium" style={{ fontSize: 15 }}>
-                      {isDragOver ? 'Drop to upload' : 'Drop document here or click to browse'}
+                  <div style={{ maxWidth: 480 }}>
+                    <p
+                      style={{
+                        fontSize: 'clamp(18px, 2.2vw, 22px)',
+                        fontWeight: 700,
+                        color: 'var(--text-primary)',
+                        letterSpacing: '-0.01em',
+                        lineHeight: 1.25,
+                        margin: 0,
+                      }}
+                    >
+                      {isDragOver
+                        ? 'Drop to upload'
+                        : 'Drop your strategic memo, or click to browse'}
                     </p>
                     <p
-                      className="text-sm text-muted"
-                      style={{ marginTop: 4 }}
+                      style={{
+                        fontSize: 14,
+                        color: 'var(--text-secondary)',
+                        marginTop: 8,
+                        lineHeight: 1.55,
+                      }}
                     >
-                      PDF, DOCX, PPTX, XLSX, CSV, HTML, TXT, MD · Max 5 MB
+                      Board decks, market-entry recommendations, M&amp;A memos, investment
+                      theses. You&apos;ll have a full DQI grade, flagged biases, and predicted
+                      CEO questions before your next meeting.
+                    </p>
+                    <p
+                      className="text-xs text-muted"
+                      style={{ marginTop: 10 }}
+                    >
+                      PDF, DOCX, PPTX, XLSX, CSV, HTML, TXT, MD · up to 5 MB
                     </p>
                     {billingData && billingData.limits.analysesPerMonth > 0 && (
-                      <p className="text-xs text-muted" style={{ marginTop: '4px' }}>
+                      <p className="text-xs text-muted" style={{ marginTop: 6 }}>
                         {billingData.usage.analysesThisMonth}/{billingData.limits.analysesPerMonth}{' '}
                         analyses used this month ({billingData.planName})
                       </p>
@@ -1363,7 +1402,7 @@ export default function Dashboard() {
                           href="/dashboard/settings"
                           className="text-xs"
                           style={{
-                            marginTop: '4px',
+                            marginTop: '6px',
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: '4px',
@@ -1381,6 +1420,49 @@ export default function Dashboard() {
                   </div>
                 </div>
               </div>
+
+              {/* Reassurance chip strip — calms first-time anxiety. Shows only
+                  on the empty dropzone state (not during upload / analyzing
+                  so we don't duplicate feedback). */}
+              {!uploading && !pendingFile && (
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    gap: 8,
+                    flexWrap: 'wrap',
+                    marginTop: 14,
+                  }}
+                >
+                  {[
+                    { label: 'Under 60 seconds', icon: <Zap size={12} /> },
+                    { label: 'SOC 2-ready · AES-256', icon: <Shield size={12} /> },
+                    { label: 'Never used for training', icon: <LockIcon size={12} /> },
+                  ].map(chip => (
+                    <span
+                      key={chip.label}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        fontSize: 11.5,
+                        fontWeight: 600,
+                        color: 'var(--text-secondary)',
+                        background: 'var(--bg-card)',
+                        border: '1px solid var(--border-color)',
+                        padding: '6px 12px',
+                        borderRadius: 999,
+                      }}
+                    >
+                      <span style={{ color: 'var(--accent-primary)', display: 'inline-flex' }}>
+                        {chip.icon}
+                      </span>
+                      {chip.label}
+                    </span>
+                  ))}
+                </div>
+              )}
+              </>
             ) : uploading ? (
               uploadPhase === 'uploading' ? (
                 // While the file is still transferring, show a compact

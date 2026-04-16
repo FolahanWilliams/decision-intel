@@ -39,6 +39,7 @@ const C = {
   slate100: '#F1F5F9',
   slate200: '#E2E8F0',
   slate400: '#94A3B8',
+  slate500: '#64748B',
   slate600: '#475569',
   slate900: '#0F172A',
   green: '#16A34A',
@@ -934,49 +935,57 @@ export default function LandingPage() {
 
       {/* ── Pricing ─────────────────────────────────────────────────── */}
       <section id="pricing" style={{ background: C.slate50, borderTop: `1px solid ${C.slate200}` }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}>
+        <div style={{ maxWidth: 1240, margin: '0 auto', padding: '96px 24px' }}>
           <motion.div
             {...fadeIn}
             transition={{ duration: 0.5 }}
-            style={{ textAlign: 'center', marginBottom: 48 }}
+            style={{ textAlign: 'center', marginBottom: 56 }}
           >
             <p
               style={{
-                fontSize: 14,
-                fontWeight: 600,
+                fontSize: 11,
+                fontWeight: 700,
                 color: C.green,
                 textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                marginBottom: 8,
+                letterSpacing: '0.14em',
+                marginBottom: 12,
               }}
             >
               Pricing
             </p>
-            <h2 style={{ fontSize: 36, fontWeight: 700, color: C.slate900, marginBottom: 12 }}>
-              Simple, Transparent Pricing
+            <h2
+              style={{
+                fontSize: 'clamp(28px, 4vw, 40px)',
+                fontWeight: 800,
+                color: C.slate900,
+                letterSpacing: '-0.02em',
+                lineHeight: 1.15,
+                marginBottom: 14,
+              }}
+            >
+              One avoided bad call pays for the year.
             </h2>
             <p
               style={{
-                fontSize: 15,
+                fontSize: 17,
                 color: C.slate600,
-                margin: '0 auto 24px',
-                maxWidth: 520,
-                lineHeight: 1.5,
+                margin: '0 auto',
+                maxWidth: 640,
+                lineHeight: 1.6,
               }}
             >
-              The average failed strategic initiative costs{' '}
-              <span style={{ fontWeight: 700, color: C.slate900 }}>40%</span> more than the
-              next-best alternative your team never scored. Start with a free 30-day pilot on your
-              next high-stakes memo.
+              Every tier includes the full bias taxonomy, Decision Quality Index, and outcome
+              flywheel. You&apos;re choosing the audit volume and the team surface — not a
+              feature-gated product.
             </p>
           </motion.div>
 
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
+              gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
               gap: 20,
-              maxWidth: 1100,
+              maxWidth: 1140,
               margin: '0 auto',
             }}
             className="pricing-grid"
@@ -984,16 +993,18 @@ export default function LandingPage() {
             {[
               {
                 name: 'Individual',
+                role: 'Solo strategy operator',
                 price: 249,
                 priceSuffix: '/mo',
-                desc: 'For the high-stakes strategist who wants the career-defining edge.',
+                anchor: 'or $2,490/year (save ~16%)',
+                desc: 'The career-defining edge for a Head of Strategy, CorpDev lead, or M&A operator who owns the memo.',
                 features: [
-                  '15 audits per month',
-                  'Full DQI + 30+ biases',
-                  'Boardroom Simulation',
-                  'Forgotten Questions engine',
-                  'Personal Decision History',
-                  'Personal Calibration Dashboard',
+                  { label: '15 audits per month', strong: true },
+                  { label: 'Full DQI + 30+ biases', strong: false },
+                  { label: 'Boardroom simulation', strong: false },
+                  { label: 'Forgotten Questions engine', strong: false },
+                  { label: 'Personal Decision History', strong: false },
+                  { label: 'Calibration dashboard', strong: false },
                 ],
                 cta: 'Start Individual',
                 action: () => handleCheckout('pro'),
@@ -1003,16 +1014,18 @@ export default function LandingPage() {
               },
               {
                 name: 'Strategy',
+                role: 'Corporate strategy team',
                 price: 2499,
                 priceSuffix: '/mo',
-                desc: 'For corporate strategy teams producing multiple board-level memos per quarter.',
+                anchor: 'or $24,990/year · ~10× cheaper than one consulting week',
+                desc: 'For teams producing multiple board-level memos a quarter. Built around the shared Decision Knowledge Graph.',
                 features: [
-                  'Everything in Individual',
-                  'Unlimited audits, 15 seats',
-                  'Shared Decision Knowledge Graph',
-                  'Decision Rooms + team consensus',
-                  'Slack, Drive, Email integrations',
-                  'Compliance mapping + audit logs',
+                  { label: 'Unlimited audits, 15 seats', strong: true },
+                  { label: 'Shared Decision Knowledge Graph', strong: true },
+                  { label: 'Decision Rooms + blind priors', strong: false },
+                  { label: 'Slack, Drive, Email integrations', strong: false },
+                  { label: 'Compliance mapping + audit logs', strong: false },
+                  { label: 'Everything in Individual', strong: false },
                 ],
                 cta: 'Start 30-day pilot',
                 action: () => handleCheckout('team'),
@@ -1022,16 +1035,18 @@ export default function LandingPage() {
               },
               {
                 name: 'Enterprise',
+                role: 'Fortune 500 strategy function',
                 price: -1,
                 priceSuffix: '',
-                desc: 'For Fortune 500 strategy functions with multi-division workflows and compliance requirements.',
+                anchor: 'Annual · negotiated per seat',
+                desc: 'Multi-division workflows, compliance SLAs, and a dedicated deployment partner.',
                 features: [
-                  'Everything in Strategy',
-                  'Unlimited team seats',
-                  'SSO + custom taxonomy',
-                  'Multi-division management',
-                  'Dedicated support + SLA',
-                  'Annual contract pricing',
+                  { label: 'Unlimited team seats', strong: true },
+                  { label: 'SSO + SCIM + custom taxonomy', strong: false },
+                  { label: 'Multi-division management', strong: false },
+                  { label: 'Signed DPA + audit-log retention SLA', strong: false },
+                  { label: 'EU-region hosting option', strong: false },
+                  { label: 'Everything in Strategy', strong: false },
                 ],
                 cta: 'Contact sales',
                 action: () => {
@@ -1050,80 +1065,128 @@ export default function LandingPage() {
                   transition={{ duration: 0.4, delay: i * 0.08 }}
                   style={{
                     background: C.white,
-                    border: tier.popular ? `2px solid ${C.green}` : `1px solid ${C.slate200}`,
-                    borderRadius: 16,
-                    padding: 28,
+                    border: tier.popular
+                      ? `2px solid ${C.green}`
+                      : `1px solid ${C.slate200}`,
+                    borderRadius: 20,
+                    padding: 32,
                     display: 'flex',
                     flexDirection: 'column',
                     position: 'relative',
                     boxShadow: tier.popular
-                      ? '0 4px 12px rgba(22,163,74,0.12)'
-                      : '0 1px 3px rgba(0,0,0,0.06)',
+                      ? '0 12px 36px rgba(22,163,74,0.14)'
+                      : '0 4px 18px rgba(15,23,42,0.05)',
                   }}
                 >
                   {tier.popular && (
                     <div
                       style={{
                         position: 'absolute',
-                        top: -12,
+                        top: -13,
                         left: '50%',
                         transform: 'translateX(-50%)',
                         background: C.green,
                         color: C.white,
-                        fontSize: 11,
-                        fontWeight: 700,
-                        padding: '4px 14px',
+                        fontSize: 10,
+                        fontWeight: 800,
+                        padding: '5px 14px',
                         borderRadius: 999,
                         textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
+                        letterSpacing: '0.14em',
+                        boxShadow: '0 4px 14px rgba(22,163,74,0.35)',
                       }}
                     >
-                      Most Popular
+                      Most popular
                     </div>
                   )}
-                  <h3 style={{ fontSize: 18, fontWeight: 700, color: C.slate900, marginBottom: 4 }}>
+
+                  {/* Role chip */}
+                  <div
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 700,
+                      color: tier.popular ? C.green : C.slate500,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.12em',
+                      marginBottom: 6,
+                    }}
+                  >
+                    {tier.role}
+                  </div>
+
+                  <h3
+                    style={{
+                      fontSize: 22,
+                      fontWeight: 800,
+                      color: C.slate900,
+                      margin: 0,
+                      marginBottom: 12,
+                      letterSpacing: '-0.01em',
+                    }}
+                  >
                     {tier.name}
                   </h3>
-                  <div style={{ marginBottom: 12 }}>
+
+                  <div style={{ marginBottom: 6 }}>
                     {displayPrice === -1 ? (
-                      <span style={{ fontSize: 32, fontWeight: 800, color: C.slate900 }}>
+                      <span style={{ fontSize: 36, fontWeight: 800, color: C.slate900 }}>
                         Custom
                       </span>
                     ) : (
-                      <span style={{ fontSize: 32, fontWeight: 800, color: C.slate900 }}>
+                      <span style={{ fontSize: 40, fontWeight: 800, color: C.slate900, letterSpacing: '-0.02em' }}>
                         ${displayPrice.toLocaleString()}
-                        <span style={{ fontSize: 14, fontWeight: 500, color: C.slate400 }}>
+                        <span style={{ fontSize: 15, fontWeight: 500, color: C.slate400 }}>
                           {tier.priceSuffix}
                         </span>
                       </span>
                     )}
                   </div>
-                  <p style={{ fontSize: 14, color: C.slate600, marginBottom: 20, lineHeight: 1.5 }}>
+                  <p style={{ fontSize: 12, color: C.slate400, margin: 0, marginBottom: 16 }}>
+                    {tier.anchor}
+                  </p>
+
+                  <p style={{ fontSize: 14, color: C.slate600, marginBottom: 22, lineHeight: 1.55 }}>
                     {tier.desc}
                   </p>
                   <ul
                     style={{
                       listStyle: 'none',
                       padding: 0,
-                      margin: '0 0 24px',
+                      margin: '0 0 26px',
                       display: 'flex',
                       flexDirection: 'column',
-                      gap: 10,
+                      gap: 11,
                       flex: 1,
                     }}
                   >
                     {tier.features.map(f => (
                       <li
-                        key={f}
+                        key={f.label}
                         style={{
                           display: 'flex',
                           alignItems: 'center',
-                          gap: 8,
-                          fontSize: 13,
-                          color: C.slate600,
+                          gap: 10,
+                          fontSize: 13.5,
+                          fontWeight: f.strong ? 600 : 500,
+                          color: f.strong ? C.slate900 : C.slate600,
                         }}
                       >
-                        <Check size={14} style={{ color: C.green, flexShrink: 0 }} /> {f}
+                        <span
+                          style={{
+                            width: 18,
+                            height: 18,
+                            borderRadius: 9,
+                            background: C.greenLight,
+                            color: C.green,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                          }}
+                        >
+                          <Check size={11} strokeWidth={3} />
+                        </span>
+                        {f.label}
                       </li>
                     ))}
                   </ul>
@@ -1132,23 +1195,80 @@ export default function LandingPage() {
                     disabled={tier.loading}
                     style={{
                       width: '100%',
-                      padding: '12px 16px',
+                      padding: '14px 18px',
                       fontSize: 14,
-                      fontWeight: 600,
-                      borderRadius: 10,
+                      fontWeight: 700,
+                      borderRadius: 12,
                       border: tier.outline ? `1px solid ${C.slate200}` : 'none',
                       background: tier.outline ? C.white : C.green,
                       color: tier.outline ? C.slate900 : C.white,
                       cursor: tier.loading ? 'wait' : 'pointer',
                       opacity: tier.loading ? 0.7 : 1,
                       transition: 'all 0.2s',
+                      boxShadow: tier.outline
+                        ? 'none'
+                        : '0 6px 20px rgba(22,163,74,0.28)',
                     }}
                   >
-                    {tier.loading ? 'Redirecting...' : tier.cta}
+                    {tier.loading ? 'Redirecting…' : tier.cta}
                   </button>
                 </motion.div>
               );
             })}
+          </div>
+
+          {/* Trust band below the cards — stops the pricing grid from hanging
+              in space and gives a calm closing beat. */}
+          <div
+            style={{
+              maxWidth: 1140,
+              margin: '40px auto 0',
+              padding: '20px 24px',
+              background: C.white,
+              border: `1px solid ${C.slate200}`,
+              borderRadius: 16,
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: 20,
+              alignItems: 'center',
+            }}
+          >
+            {[
+              { label: 'SOC 2 ready', sub: 'AES-256-GCM + TLS 1.3' },
+              { label: 'Signed DPA', sub: 'on any paid tier' },
+              { label: 'No training on your data', sub: 'ever, by contract' },
+              { label: '30-day pilot', sub: 'on Strategy tier' },
+            ].map(item => (
+              <div
+                key={item.label}
+                style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}
+              >
+                <span
+                  style={{
+                    width: 20,
+                    height: 20,
+                    borderRadius: 10,
+                    background: C.greenLight,
+                    color: C.green,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    marginTop: 2,
+                  }}
+                >
+                  <Check size={12} strokeWidth={3} />
+                </span>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: C.slate900, lineHeight: 1.3 }}>
+                    {item.label}
+                  </div>
+                  <div style={{ fontSize: 11.5, color: C.slate500, lineHeight: 1.35, marginTop: 1 }}>
+                    {item.sub}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
 
           <div
