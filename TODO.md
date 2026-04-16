@@ -50,6 +50,12 @@ Claude reads this file at the start of every session. Update it as tasks are com
 - [ ] Analyst certification program (revenue opportunity)
 - [ ] CRM integration for auto-pulling deal outcomes (Salesforce, HubSpot)
 
+## Recently Completed (audit sweep, 2026-04-16)
+- [x] DQI docstring drift — `src/lib/scoring/dqi.ts` JSDoc said A 80+, `GRADE_THRESHOLDS` enforced 85+. Updated doc to canonical A 85+/B 70+/C 55+/D 40+/F 0+ matching CLAUDE.md + founder-context.
+- [x] `ToxicCombinationCard.tsx:142` — header `text-white` on standalone surface (outside dark severity wrapper) invisible in light theme. Fixed to `var(--text-primary)`. Internals on dark severity cards left intact.
+- [x] `ActivityFeed.tsx` — rendered inside platform `.card` (light surface) but titles used `text-white`, descriptions used `text-gray-400/500`, hover used `bg-white/5`. Every row was effectively invisible on Browse view of dashboard. Migrated to CSS tokens (`var(--text-primary/secondary/muted)` + JS-driven hover).
+- [x] CLAUDE.md + founder-context.ts — added "Visualization Components (light-theme audit rule)" note so interior dark classes on severity cards aren't re-flagged as bugs in future sweeps. Added "DQI Grade Boundaries (locked)" block warning that both the JSDoc + constant must be updated together.
+
 ## Recently Completed (polish sweep, 2026-04-13/14)
 - [x] Usage meter light-theme, `/pricing` destination, Pro-tier "Go Strategy" copy at ≥80%, paired with "THIS MONTH" caption
 - [x] Funnel audit: 3 stale `/#pricing` anchors → `/pricing`, self-serve "Create a free account" link added to case-study CTA

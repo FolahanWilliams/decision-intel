@@ -68,7 +68,10 @@ const activityColors: Record<string, string> = {
 export function ActivityFeed({ activities, className, compact = false }: ActivityFeedProps) {
   if (!activities || activities.length === 0) {
     return (
-      <div className={cn('text-center py-8 text-gray-500', className)}>
+      <div
+        className={cn('text-center py-8', className)}
+        style={{ color: 'var(--text-muted)' }}
+      >
         <Clock className="w-12 h-12 mx-auto mb-2 opacity-30" />
         <p className="text-sm">No recent activity</p>
       </div>
@@ -85,11 +88,17 @@ export function ActivityFeed({ activities, className, compact = false }: Activit
           <div
             key={activity.id}
             className={cn(
-              'flex gap-3 p-3 rounded-lg',
+              'flex gap-3 p-3 rounded-lg transition-colors',
               'liquid-glass',
-              'hover:bg-white/5 transition-colors',
               compact && 'p-2'
             )}
+            style={{ background: 'transparent' }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = 'var(--bg-card-hover, rgba(0,0,0,0.03))';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'transparent';
+            }}
           >
             <div className={cn('flex-shrink-0 mt-0.5', iconColor)}>
               <Icon className={cn('w-5 h-5', compact && 'w-4 h-4')} />
@@ -98,21 +107,29 @@ export function ActivityFeed({ activities, className, compact = false }: Activit
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
-                  <p className={cn('font-medium text-white truncate', compact && 'text-sm')}>
+                  <p
+                    className={cn('font-medium truncate', compact && 'text-sm')}
+                    style={{ color: 'var(--text-primary)' }}
+                  >
                     {activity.title}
                   </p>
 
                   {!compact && activity.description && (
-                    <p className="text-sm text-gray-400 mt-0.5 line-clamp-2">
+                    <p
+                      className="text-sm mt-0.5 line-clamp-2"
+                      style={{ color: 'var(--text-secondary)' }}
+                    >
                       {activity.description}
                     </p>
                   )}
 
                   <div className="flex items-center gap-2 mt-1">
                     {activity.user && (
-                      <span className="text-xs text-gray-500">{activity.user}</span>
+                      <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                        {activity.user}
+                      </span>
                     )}
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
                       {formatDistanceToNow(
                         typeof activity.timestamp === 'string'
                           ? new Date(activity.timestamp)
