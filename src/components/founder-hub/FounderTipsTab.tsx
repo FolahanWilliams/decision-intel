@@ -198,6 +198,24 @@ const SECTION_GTM: Tip[] = [
     action:
       'Identify 3 candidate design partners from warm intros. Pitch each with the explicit deal: 12 months free Team tier in exchange for logo + quote + quarterly case study. Close one before the next pitch meeting. If none bite after 5 conversations, rethink the wedge, not the offer.',
   },
+  {
+    title: 'First paying customer is the only milestone before fundraise',
+    principle:
+      'Everything else is theater. Pricing is locked, margin is locked, product is locked. The fundraise is downstream of one logo. Every week ask: did I do something that moves that needle?',
+    rationale:
+      'Content generation, CLAUDE.md updates, auditing dashboards, feature polish — none of those move the milestone. Only conversations with Chief Strategy Officers do. When weeks pass without a CSO conversation, the real metric (time-to-first-check) stalls silently while internal metrics (commits shipped, features added) keep rising. The two diverge without anyone noticing, and by month four the fundraise is harder than it was at month one despite looking more polished. The only leading indicator for pre-revenue is CSO-conversations-per-week. Track that number and force yourself to look at it every Friday.',
+    action:
+      'Weekly Friday ritual: write down every CSO conversation had that week (name, company, stage, next step). If the list is empty or frozen from last week, flag it as the week\u2019s emergency and rebook before Monday. Put the list at the top of TODO.md so every session starts with it visible.',
+  },
+  {
+    title: 'GTM co-founder is a 6-month recruiting project, not a 1-month one',
+    principle:
+      "Don't wait until the fundraise to start looking. Every CSO pitched is also a potential advisor / co-founder signal. The best GTM partner is someone who already loves the product but can't buy it yet.",
+    rationale:
+      'Technical founders almost universally wait until after their pre-seed to hire a GTM co-founder — and then discover the search takes 6 months of its own, extending the runway gap by exactly that much. The ones who compound fastest flip the order: they use the pre-revenue customer conversations as a live funnel for GTM talent. When a prospect says "I love this but I couldn\u2019t buy it right now," that\u2019s the exact signal of a potential GTM partner: they understand the buyer, they believe in the product, and they have zero political reason to block. Treat every positive-but-no-budget conversation as a candidate lead, not a dead deal.',
+    action:
+      'Maintain a private spreadsheet: name, company, role, date, signal strength (1-5). Every "interested but not now" conversation gets a row. Top 3 highest-signal contacts get a targeted re-engagement every 6 weeks with a specific ask ("4 hours a week for advisor equity" after 2-3 touchpoints). Review the sheet quarterly with the Wiz advisor.',
+  },
 ];
 
 // ─── Section 4 — Execution ────────────────────────────────────────────────
@@ -336,7 +354,7 @@ export function FounderTipsTab() {
             marginBottom: 0,
           }}
         >
-          Twenty-one principles grounded in your specific position: solo founder, 16, Nigeria,
+          Twenty-three principles grounded in your specific position: solo founder, 16, Nigeria,
           corporate strategy/M&amp;A wedge, Wiz advisor, 97% gross margins, 199K+ LoC already
           shipped. Re-read when deciding what to build next, what to kill, what to say in a pitch,
           and what to ignore.
@@ -375,7 +393,7 @@ export function FounderTipsTab() {
           <Hammer size={18} style={{ color: '#f59e0b' }} /> Section 4 — Execution
         </div>
         {SECTION_EXECUTION.map((t, i) => (
-          <TipBlock key={t.title} t={t} idx={i + 11} />
+          <TipBlock key={t.title} t={t} idx={i + 13} />
         ))}
       </div>
 
@@ -385,7 +403,7 @@ export function FounderTipsTab() {
           Consolidation
         </div>
         {SECTION_REFINEMENT.map((t, i) => (
-          <TipBlock key={t.title} t={t} idx={i + 15} />
+          <TipBlock key={t.title} t={t} idx={i + 17} />
         ))}
       </div>
 
@@ -394,7 +412,7 @@ export function FounderTipsTab() {
           <Compass size={18} style={{ color: '#06b6d4' }} /> Section 6 — Phase Awareness
         </div>
         {SECTION_PHASE.map((t, i) => (
-          <TipBlock key={t.title} t={t} idx={i + 18} />
+          <TipBlock key={t.title} t={t} idx={i + 20} />
         ))}
       </div>
 
@@ -403,7 +421,7 @@ export function FounderTipsTab() {
           <Map size={18} style={{ color: '#a855f7' }} /> Section 7 — Product Roadmap
         </div>
         {SECTION_ROADMAP.map((t, i) => (
-          <TipBlock key={t.title} t={t} idx={i + 21} />
+          <TipBlock key={t.title} t={t} idx={i + 23} />
         ))}
       </div>
     </div>

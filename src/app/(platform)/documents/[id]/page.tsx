@@ -406,6 +406,30 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
     };
   }, []);
 
+  const handleBoardReportExport = async () => {
+    if (!document || !analysis) return;
+    try {
+      const { BoardReportGenerator } = await import('@/lib/reports/board-report-generator');
+      const generator = new BoardReportGenerator();
+      generator.generateReport({ filename: document.filename, analysis });
+      fetch('/api/audit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'EXPORT_BOARD_REPORT',
+          resource: 'Document',
+          resourceId: document.id,
+          details: { filename: document.filename },
+        }),
+      }).catch(() => {});
+      showToast('Board report generated', 'success');
+    } catch (error) {
+      log.error('Failed to generate board report:', error);
+      showToast('Failed to generate board report', 'error');
+      throw error;
+    }
+  };
+
   const handleExport = async () => {
     if (!document || !analysis) return;
     setIsExportingPdf(true);
@@ -583,6 +607,16 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
   const analysis = document?.analyses?.[0];
   const biases = useMemo(() => analysis?.biases || [], [analysis]);
   const selectedBiasIndex = selectedBias ? biases.findIndex(b => b.id === selectedBias.id) : -1;
+
+  // Listen for command-palette-triggered board report export
+  useEffect(() => {
+    const handler = () => {
+      void handleBoardReportExport();
+    };
+    window.addEventListener('command-palette-export-board-report', handler);
+    return () => window.removeEventListener('command-palette-export-board-report', handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [document, analysis]);
 
   // Compute DQ Chain on the client from available analysis data
   const dqChain = useMemo(() => {
@@ -2229,6 +2263,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             summary: analysis.summary,
           }}
           onExportPdf={handleExport}
+          onExportBoardReport={handleBoardReportExport}
           onExportCsv={handleCsvExport}
           onExportMarkdown={handleMarkdownExport}
           onExportJson={handleJsonExport}

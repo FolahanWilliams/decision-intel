@@ -65,6 +65,7 @@ import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 import { SparklineChart } from '@/components/ui/SparklineChart';
 import { useDeals } from '@/hooks/useDeals';
 import { DOCUMENT_TYPES } from '@/types/deals';
+import { getBiasPreview } from '@/lib/utils/bias-preview';
 import { QuickScanModal } from '@/components/ui/QuickScanModal';
 import { Zap } from 'lucide-react';
 import { AnalysisShell } from '@/components/analysis/AnalysisShell';
@@ -1105,6 +1106,36 @@ export default function Dashboard() {
                       </p>
                     </div>
                   </div>
+
+                  {(() => {
+                    const preview = getBiasPreview(pendingFile.name, selectedDocType);
+                    return (
+                      <div
+                        style={{
+                          fontSize: 12,
+                          color: 'var(--text-muted)',
+                          lineHeight: 1.5,
+                          padding: '8px 12px',
+                          background: 'rgba(22, 163, 74, 0.06)',
+                          border: '1px solid rgba(22, 163, 74, 0.18)',
+                          borderRadius: 8,
+                        }}
+                      >
+                        Looks like a {preview.docTypeLabel} — we&apos;ll check for{' '}
+                        {preview.biasLabels.map((b, idx) => (
+                          <span key={b}>
+                            <span
+                              style={{ color: 'var(--accent-primary)', fontWeight: 600 }}
+                            >
+                              {b}
+                            </span>
+                            {idx < preview.biasLabels.length - 1 ? ' + ' : ''}
+                          </span>
+                        ))}{' '}
+                        first.
+                      </div>
+                    );
+                  })()}
 
                   {/* Document type + Deal selectors — stacked for clarity */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

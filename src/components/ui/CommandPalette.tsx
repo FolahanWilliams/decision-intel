@@ -29,6 +29,8 @@ import {
   Download,
   Copy,
   Shield,
+  Target,
+  Presentation,
 } from 'lucide-react';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useTheme } from 'next-themes';
@@ -293,6 +295,10 @@ export function CommandPalette() {
     [navigate]
   );
 
+  const firstDocId = documents?.[0]?.id;
+  const isOnDocumentDetailPage =
+    typeof window !== 'undefined' && /\/documents\/[^/]+/.test(window.location.pathname);
+
   // Action commands
   const actionCommands: CommandItem[] = useMemo(
     () => [
@@ -310,6 +316,48 @@ export function CommandPalette() {
         },
         keywords: ['new', 'add', 'file'],
       },
+      {
+        id: 'start-decision-room',
+        label: 'Start a Decision Room',
+        description: 'Collaborative space with blind priors',
+        icon: <Users size={16} />,
+        action: () => navigate('/dashboard/meetings?tab=rooms'),
+        keywords: ['room', 'decision room', 'committee', 'blind', 'prior'],
+      },
+      {
+        id: 'report-outcome',
+        label: 'Report an Outcome',
+        description: 'Close the loop on a prior decision',
+        icon: <Target size={16} />,
+        action: () => navigate('/dashboard/outcome-flywheel'),
+        keywords: ['outcome', 'result', 'follow up', 'flywheel'],
+      },
+      {
+        id: 'open-last-analysis',
+        label: firstDocId ? 'Open Last Analysis' : 'Open Last Analysis (no documents yet)',
+        description: firstDocId ? 'Jump to your most recent document' : 'Upload a doc to get started',
+        icon: <FileText size={16} />,
+        action: () => {
+          if (firstDocId) navigate(`/documents/${firstDocId}`);
+          else navigate('/dashboard');
+        },
+        keywords: ['last', 'recent', 'latest', 'analysis', 'resume'],
+      },
+      ...(isOnDocumentDetailPage
+        ? [
+            {
+              id: 'export-board-report',
+              label: 'Export Board Report',
+              description: 'Generate the 2-page board-ready PDF for this analysis',
+              icon: <Presentation size={16} />,
+              action: () => {
+                setOpen(false);
+                window.dispatchEvent(new Event('command-palette-export-board-report'));
+              },
+              keywords: ['board', 'export', 'pdf', 'report'],
+            },
+          ]
+        : []),
       {
         id: 'new-chat',
         label: 'New Chat Session',
@@ -433,7 +481,7 @@ export function CommandPalette() {
         rightHint: '⌘+F',
       },
     ],
-    [navigate, theme, setTheme]
+    [navigate, theme, setTheme, firstDocId, isOnDocumentDetailPage]
   );
 
   // Build groups with filtering

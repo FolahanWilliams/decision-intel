@@ -605,6 +605,22 @@ pre {
   padding: var(--spacing-lg);
 }
 
+/* Inline section label for subheadings inside card bodies.
+   Keeps the visual rhythm quieter than a full card-header h3 — used for
+   "Recognition Cues", "Top Actionable Findings", etc. Intentionally scoped
+   to body subheads, NOT card titles (those keep their larger h3 styling). */
+.section-heading {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .card-glow:hover {
   border-color: var(--liquid-border-active);
   box-shadow: var(--liquid-shadow-hover), var(--liquid-shadow-glow), var(--shadow-glow);

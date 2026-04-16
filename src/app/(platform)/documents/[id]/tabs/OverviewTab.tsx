@@ -306,7 +306,7 @@ export function OverviewTab({
                 const borderStyle = SEVERITY_BORDER_STYLES[severityKey] ?? 'border-border';
 
                 return (
-                  <div key={i} className={`p-4 border bg-card/50 ${borderStyle}`}>
+                  <div key={i} className={`liquid-glass p-4 border ${borderStyle}`}>
                     <div className="flex justify-between items-start mb-2 flex-wrap gap-2">
                       <div className="flex items-center gap-3">
                         <span className={`text-xs font-bold uppercase px-2 py-0.5 ${badgeStyle}`}>
@@ -386,7 +386,7 @@ export function OverviewTab({
             <div className="card-body">
               {recognitionCues && (
                 <div style={{ marginBottom: 'var(--spacing-lg)' }}>
-                  <h4 className="text-sm font-semibold mb-md">Recognition Cues</h4>
+                  <h4 className="section-heading">Recognition Cues</h4>
                   <p className="text-xs text-muted mb-sm">
                     Pattern: {recognitionCues.patternMatch} (confidence:{' '}
                     {Math.round(recognitionCues.confidenceLevel * 100)}%)
@@ -424,7 +424,7 @@ export function OverviewTab({
               )}
               {narrativePreMortem && (
                 <div>
-                  <h4 className="text-sm font-semibold mb-md">Narrative Pre-Mortem</h4>
+                  <h4 className="section-heading">Narrative Pre-Mortem</h4>
                   {narrativePreMortem.warStories && narrativePreMortem.warStories.length > 0 ? (
                     <div className="space-y-2">
                       {narrativePreMortem.warStories.map((story, i) => (

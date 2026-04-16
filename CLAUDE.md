@@ -162,6 +162,9 @@ src/
 - **Founder Hub API calls require `founderPass` prop.** Any component calling `/api/founder-hub/*` must receive and pass the `founderPass` string via props from the hub page.
 - **Case study slugs:** Use `getSlugForCase()` from `src/lib/data/case-studies/slugs.ts` for URL-safe slugs. Case study URLs: `/case-studies/{slug}`.
 - **Landing page hero graph:** `src/components/marketing/HeroDecisionGraph.tsx` — interactive D3-like knowledge graph. The `CaseStudyBiasGraph` at `src/components/marketing/CaseStudyBiasGraph.tsx` is the simpler radial bias web used on case study cards and detail pages.
+- **Section heading utility:** use `.section-heading` (globals.css) for inline subheadings inside `.card-body` — uppercase, tracking-widest, muted. Card titles stay as `.card-header h3`.
+- **Board-ready PDF export:** `src/lib/reports/board-report-generator.ts` (`BoardReportGenerator`). 2-page client-side jsPDF export (exec summary ≤500 chars, DQI card, top-3 biases, simulated CEO question, top mitigation). Wired into `ShareModal` via the optional `onExportBoardReport` prop and triggerable from the Command Palette on any `/documents/:id` page via the `command-palette-export-board-report` window event.
+- **Upload bias preview:** `getBiasPreview(filename, selectedDocType)` from `@/lib/utils/bias-preview` — pure client-side regex → likely biases. Prefer `selectedDocType` over filename when present.
 
 ### Visualization Components (light-theme audit rule)
 - Visualization cards (`ToxicCombinationCard`, `RiskHeatMap`, `GraphDetailPanel`, `DecisionTimeline`, `StakeholderMap`) keep dark-theme Tailwind classes **inside** their colored severity wrappers (`bg-red-950/40`, `bg-amber-950/20`) — that is correct, the interior is dark.

@@ -25,6 +25,7 @@ import {
 import { useState, useEffect, useCallback } from 'react';
 import { ThemeToggle, ThemeToggleCompact } from '@/components/ThemeToggle';
 import { DensityToggle } from '@/components/DensityProvider';
+import { UsageMeter } from '@/components/billing/UsageMeter';
 
 const SIDEBAR_COLLAPSED_KEY = 'di-sidebar-main-collapsed';
 const SIDEBAR_SECTIONS_KEY = 'di-sidebar-collapsed';
@@ -495,6 +496,16 @@ export default function Sidebar() {
             />
           </CollapsibleSection>
         </nav>
+
+        {!collapsed && (
+          <div
+            style={{
+              padding: '10px 14px 0',
+            }}
+          >
+            <UsageMeter variant="compact" />
+          </div>
+        )}
 
         <div
           style={{

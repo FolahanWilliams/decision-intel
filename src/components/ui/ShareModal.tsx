@@ -12,6 +12,7 @@ import {
   Mail,
   Loader2,
   BookOpen,
+  Presentation,
 } from 'lucide-react';
 import { useToast } from '@/components/ui/EnhancedToast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -24,6 +25,7 @@ interface ShareModalProps {
   analysisData: Record<string, unknown>;
   analysisId?: string;
   onExportPdf: () => Promise<void>;
+  onExportBoardReport?: () => Promise<void>;
   onExportCsv: () => void;
   onExportMarkdown: () => void;
   onExportJson: () => void;
@@ -38,12 +40,14 @@ export function ShareModal({
   analysisData,
   analysisId,
   onExportPdf,
+  onExportBoardReport,
   onExportCsv,
   onExportMarkdown,
   onExportJson,
 }: ShareModalProps) {
   const [activeTab, setActiveTab] = useState<ActiveTab>('export');
   const [exportingPdf, setExportingPdf] = useState(false);
+  const [exportingBoard, setExportingBoard] = useState(false);
   const [copied, setCopied] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [creatingLink, setCreatingLink] = useState(false);
@@ -64,6 +68,19 @@ export function ShareModal({
       setExportingPdf(false);
     }
   }, [onExportPdf, showToast]);
+
+  const handleBoardExport = useCallback(async () => {
+    if (!onExportBoardReport) return;
+    setExportingBoard(true);
+    try {
+      await onExportBoardReport();
+      showToast('Board report exported', 'success');
+    } catch {
+      showToast('Board report export failed', 'error');
+    } finally {
+      setExportingBoard(false);
+    }
+  }, [onExportBoardReport, showToast]);
 
   const handleCopySummary = useCallback(async () => {
     try {
@@ -195,6 +212,33 @@ export function ShareModal({
           {/* Export Tab */}
           {activeTab === 'export' && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+              {onExportBoardReport && (
+                <Button
+                  variant="outline"
+                  onClick={handleBoardExport}
+                  disabled={exportingBoard}
+                  className="h-auto flex-col gap-2 p-4"
+                  style={{
+                    gridColumn: '1 / -1',
+                    borderColor: 'var(--accent-primary)',
+                    background: 'rgba(22, 163, 74, 0.06)',
+                  }}
+                >
+                  {exportingBoard ? (
+                    <Loader2
+                      size={24}
+                      className="animate-spin"
+                      style={{ color: 'var(--accent-primary)' }}
+                    />
+                  ) : (
+                    <Presentation size={24} style={{ color: 'var(--accent-primary)' }} />
+                  )}
+                  <span style={{ fontSize: '13px', fontWeight: 600 }}>Board-Ready Report</span>
+                  <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                    2-page executive summary — DQI, top risks, CEO question, mitigation
+                  </span>
+                </Button>
+              )}
               <Button
                 variant="outline"
                 onClick={handlePdfExport}
@@ -206,9 +250,9 @@ export function ShareModal({
                 ) : (
                   <FileText size={24} style={{ color: 'var(--error)' }} />
                 )}
-                <span style={{ fontSize: '13px', fontWeight: 500 }}>PDF Report</span>
+                <span style={{ fontSize: '13px', fontWeight: 500 }}>Full PDF Report</span>
                 <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
-                  Full formatted report
+                  Every section, every bias
                 </span>
               </Button>
 

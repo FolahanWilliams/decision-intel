@@ -41,17 +41,7 @@ export function ActionableNudges({ biases }: ActionableNudgesProps) {
 
   return (
     <div className="animate-fade-in">
-      <h3
-        style={{
-          fontSize: 13,
-          fontWeight: 600,
-          color: 'var(--text-secondary)',
-          marginBottom: 12,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-        }}
-      >
+      <h3 className="section-heading">
         <Shield size={14} />
         Top Actionable Findings
       </h3>

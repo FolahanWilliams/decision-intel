@@ -24,7 +24,11 @@ interface BillingResponse {
   };
 }
 
-export function UsageMeter() {
+interface UsageMeterProps {
+  variant?: 'full' | 'compact';
+}
+
+export function UsageMeter({ variant = 'full' }: UsageMeterProps = {}) {
   const [data, setData] = useState<BillingResponse | null>(null);
   const [loaded, setLoaded] = useState(false);
 
@@ -56,7 +60,8 @@ export function UsageMeter() {
   }, []);
 
   if (!loaded || !data) return null;
-  if (data.usage.analysesLimit < 0) return null;
+  // For compact (sidebar) variant, still render a plan chip even if unlimited.
+  if (data.usage.analysesLimit < 0 && variant === 'full') return null;
 
   const { analysesUsed, analysesLimit, percentUsed } = data.usage;
   const isNearLimit = percentUsed >= 80;
@@ -75,6 +80,97 @@ export function UsageMeter() {
 
   const isPro = data.plan === 'pro';
   const upgradeLabel = isPro ? 'Need more? Go Strategy \u2192' : 'Upgrade \u2192';
+
+  if (variant === 'compact') {
+    const isUnlimited = analysesLimit < 0;
+    const planLabel = data.planName || data.plan;
+    return (
+      <Link
+        href="/dashboard/settings?tab=billing"
+        onClick={() =>
+          trackEvent('usage_meter_sidebar_click', {
+            plan: data.plan,
+            percentUsed,
+          })
+        }
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 6,
+          padding: '10px 12px',
+          borderRadius: 'var(--radius-lg, 12px)',
+          border: '1px solid var(--border-color)',
+          background: 'var(--bg-card)',
+          color: 'var(--text-primary)',
+          textDecoration: 'none',
+          fontSize: 11,
+          transition: 'border-color 0.15s, background 0.15s',
+        }}
+      >
+        <span
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 8,
+          }}
+        >
+          <span
+            style={{
+              fontSize: 9,
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: fillColor,
+            }}
+          >
+            {planLabel}
+          </span>
+          {isUnlimited ? (
+            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>&infin; audits</span>
+          ) : (
+            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+              {analysesUsed}/{analysesLimit}
+            </span>
+          )}
+        </span>
+        {!isUnlimited && (
+          <span
+            style={{
+              display: 'block',
+              width: '100%',
+              height: 3,
+              borderRadius: 2,
+              background: 'var(--bg-tertiary, #E2E8F0)',
+              overflow: 'hidden',
+            }}
+            aria-hidden
+          >
+            <span
+              style={{
+                display: 'block',
+                width: `${Math.min(100, percentUsed)}%`,
+                height: '100%',
+                background: fillColor,
+                transition: 'width 0.4s ease',
+              }}
+            />
+          </span>
+        )}
+        {!isUnlimited && isNearLimit && (
+          <span
+            style={{
+              fontSize: 10,
+              color: fillColor,
+              fontWeight: 600,
+            }}
+          >
+            {upgradeLabel}
+          </span>
+        )}
+      </Link>
+    );
+  }
 
   return (
     <div
