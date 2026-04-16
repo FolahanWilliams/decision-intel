@@ -10,6 +10,8 @@ import { HeroTabs } from '@/components/marketing/HeroTabs';
 import { PipelineLandingTeaser } from '@/components/marketing/how-it-works/PipelineLandingTeaser';
 import { OutcomeDetectionViz } from '@/components/marketing/how-it-works/OutcomeDetectionViz';
 import { CredibilityTrio } from '@/components/marketing/CredibilityTrio';
+import { CompetitorComparisonCard } from '@/components/marketing/CompetitorComparisonCard';
+import { LandingFaq } from '@/components/marketing/LandingFaq';
 import { Reveal } from '@/components/ui/Reveal';
 import {
   Brain,
@@ -18,8 +20,6 @@ import {
   ArrowRight,
   Menu,
   X,
-  ChevronDown,
-  ChevronUp,
   Check,
   BarChart3,
   Users,
@@ -146,244 +146,12 @@ function NewsletterForm({ source = 'footer' }: { source?: string }) {
    LANDING PAGE
    ═══════════════════════════════════════════════════════════════════════════ */
 
-// ── Competitor Comparison Card (FAQ right panel) ──────────────────────────
-
-type CompetitorTab = 'cloverpop' | 'mckinsey';
-
-const COMPETITOR_DATA: Record<
-  CompetitorTab,
-  {
-    name: string;
-    tagline: string;
-    rows: Array<{ dimension: string; them: string; us: string; usWins: boolean }>;
-  }
-> = {
-  cloverpop: {
-    name: 'Cloverpop',
-    tagline: 'Acquired 2023 · Decision tracking, no bias detection',
-    rows: [
-      {
-        dimension: 'What they do',
-        them: 'Decision tracking & workflow',
-        us: 'AI bias detection + calibration',
-        usWins: true,
-      },
-      { dimension: 'Bias detection', them: 'None', us: '20 types, automated', usWins: true },
-      {
-        dimension: 'Outcome flywheel',
-        them: 'Partial (tracking only)',
-        us: 'Full (3-channel passive)',
-        usWins: true,
-      },
-      {
-        dimension: 'Compliance mapping',
-        them: 'None',
-        us: '7 frameworks + audit packet',
-        usWins: true,
-      },
-      { dimension: 'Speed', them: 'N/A', us: '<60s per document', usWins: true },
-      { dimension: 'Toxic combinations', them: 'None', us: '18 named patterns', usWins: true },
-    ],
-  },
-  mckinsey: {
-    name: 'McKinsey / BCG',
-    tagline: 'Management consulting · $500K–$2M per engagement',
-    rows: [
-      {
-        dimension: 'What they do',
-        them: 'Manual decision review',
-        us: 'AI bias detection + calibration',
-        usWins: true,
-      },
-      { dimension: 'Cost', them: '$500K–$2M / engagement', us: '$249/mo Individual · $2,499/mo Strategy', usWins: true },
-      { dimension: 'Speed', them: '6–12 weeks', us: 'Minutes per document', usWins: true },
-      { dimension: 'Continuous', them: 'No (point-in-time)', us: 'Yes (always-on)', usWins: true },
-      { dimension: 'Auditor has biases?', them: 'Yes', us: 'No — AI has zero ego', usWins: true },
-      { dimension: 'Outcome flywheel', them: 'No', us: 'Yes — improves with data', usWins: true },
-    ],
-  },
-};
-
-function CompetitorComparisonCard() {
-  const [activeTab, setActiveTab] = useState<CompetitorTab>('cloverpop');
-  const data = COMPETITOR_DATA[activeTab];
-
-  return (
-    <div
-      style={{
-        border: `1px solid ${C.slate200}`,
-        borderRadius: 16,
-        background: C.white,
-        boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-        overflow: 'hidden',
-      }}
-    >
-      {/* Header */}
-      <div style={{ padding: '20px 24px 0', borderBottom: `1px solid ${C.slate200}` }}>
-        <p
-          style={{
-            fontSize: 11,
-            fontWeight: 700,
-            color: C.green,
-            textTransform: 'uppercase',
-            letterSpacing: '0.1em',
-            marginBottom: 8,
-          }}
-        >
-          How We Compare
-        </p>
-        <h3 style={{ fontSize: 20, fontWeight: 700, color: C.slate900, marginBottom: 16 }}>
-          Decision Intel vs
-        </h3>
-
-        {/* Tab switcher */}
-        <div style={{ display: 'flex', gap: 0 }}>
-          {(Object.keys(COMPETITOR_DATA) as CompetitorTab[]).map(tab => {
-            const isActive = tab === activeTab;
-            return (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                style={{
-                  padding: '10px 20px',
-                  border: 'none',
-                  borderBottom: isActive ? `2px solid ${C.green}` : '2px solid transparent',
-                  background: 'none',
-                  cursor: 'pointer',
-                  fontSize: 14,
-                  fontWeight: isActive ? 700 : 500,
-                  color: isActive ? C.green : C.slate400,
-                  transition: 'all 0.15s',
-                }}
-              >
-                {COMPETITOR_DATA[tab].name}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Competitor tagline */}
-      <div
-        style={{
-          padding: '12px 24px',
-          background: C.slate50,
-          borderBottom: `1px solid ${C.slate200}`,
-        }}
-      >
-        <p style={{ fontSize: 12, color: C.slate400, margin: 0, fontStyle: 'italic' }}>
-          {data.tagline}
-        </p>
-      </div>
-
-      {/* Comparison rows */}
-      <div style={{ padding: '0 24px' }}>
-        {data.rows.map((row, i) => (
-          <div
-            key={row.dimension}
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr 1fr',
-              gap: 12,
-              padding: '14px 0',
-              borderTop: i === 0 ? 'none' : `1px solid ${C.slate100}`,
-              alignItems: 'center',
-            }}
-          >
-            <div style={{ fontSize: 13, fontWeight: 600, color: C.slate600 }}>{row.dimension}</div>
-            <div
-              style={{
-                fontSize: 13,
-                color: C.slate400,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-              }}
-            >
-              <span
-                style={{
-                  width: 16,
-                  height: 16,
-                  borderRadius: 8,
-                  background: '#FEE2E2',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 10,
-                  color: '#EF4444',
-                  flexShrink: 0,
-                }}
-              >
-                ✕
-              </span>
-              {row.them}
-            </div>
-            <div
-              style={{
-                fontSize: 13,
-                color: C.slate900,
-                fontWeight: 600,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                background: row.usWins ? '#F0FDF4' : 'transparent',
-                padding: '4px 8px',
-                borderRadius: 6,
-                margin: '-4px -8px',
-              }}
-            >
-              <span
-                style={{
-                  width: 16,
-                  height: 16,
-                  borderRadius: 8,
-                  background: '#DCFCE7',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 10,
-                  color: C.green,
-                  flexShrink: 0,
-                }}
-              >
-                ✓
-              </span>
-              {row.us}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Footer CTA */}
-      <div
-        style={{
-          padding: '16px 24px',
-          borderTop: `1px solid ${C.slate200}`,
-          background: C.slate50,
-          textAlign: 'center',
-        }}
-      >
-        <Link
-          href="/case-studies"
-          style={{
-            fontSize: 13,
-            fontWeight: 600,
-            color: C.green,
-            textDecoration: 'none',
-          }}
-        >
-          See it in action →
-        </Link>
-      </div>
-    </div>
-  );
-}
+// ── Competitor Comparison + FAQ (extracted to components/marketing/ for
+//    maintainability — the landing page file was already 1500+ lines).
 
 export default function LandingPage() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
-
-  const [openFAQ, setOpenFAQ] = useState<number | null>(null);
 
   // After login redirects back to /?scrollTo=pricing, scroll to the
   // pricing section so the user picks up where they left off.
@@ -1425,106 +1193,69 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── FAQ + Competitor Comparison (quarter-point centered layout) ── */}
+      {/* ── FAQ + Competitor Comparison ───────────────────────────────── */}
       <Reveal>
-      <section id="faq" style={{ maxWidth: 1400, margin: '0 auto', padding: '80px 24px' }}>
-        {/* Two-column grid: each column centered at the page quarter-points
-            (25% and 75% of the full width). The grid uses equal 1fr columns
-            with generous internal padding so content sits at the visual
-            center of each half-space. */}
+      <section id="faq" style={{ maxWidth: 1320, margin: '0 auto', padding: '96px 24px' }}>
+        <motion.div
+          {...fadeIn}
+          transition={{ duration: 0.5 }}
+          style={{ textAlign: 'center', marginBottom: 48 }}
+        >
+          <div
+            style={{
+              display: 'inline-block',
+              fontSize: 11,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.14em',
+              color: C.green,
+              marginBottom: 12,
+            }}
+          >
+            Answers & alternatives
+          </div>
+          <h2
+            style={{
+              fontSize: 'clamp(28px, 4vw, 40px)',
+              fontWeight: 800,
+              color: C.slate900,
+              lineHeight: 1.15,
+              letterSpacing: '-0.02em',
+              marginBottom: 12,
+            }}
+          >
+            Everything a buyer asks before signing.
+          </h2>
+          <p
+            style={{
+              fontSize: 17,
+              color: C.slate600,
+              maxWidth: 640,
+              margin: '0 auto',
+              lineHeight: 1.6,
+            }}
+          >
+            The questions corporate strategy teams actually bring — plus an honest side-by-side
+            against the alternatives we lose deals to.
+          </p>
+        </motion.div>
+
         <div
+          className="faq-grid"
           style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: 64,
+            gridTemplateColumns: 'minmax(0, 1.05fr) minmax(0, 1fr)',
+            gap: 48,
+            alignItems: 'start',
           }}
-          className="faq-grid"
         >
-          {/* Left quarter — FAQ heading + accordion */}
-          <div
-            style={{ display: 'flex', flexDirection: 'column', maxWidth: 480, margin: '0 auto' }}
-          >
-            <motion.div {...fadeIn} transition={{ duration: 0.5 }} style={{ marginBottom: 32 }}>
-              <h2 style={{ fontSize: 32, fontWeight: 700, color: C.slate900, lineHeight: 1.2 }}>
-                Frequently Asked
-                <br />
-                Questions
-              </h2>
-            </motion.div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {[
-                {
-                  q: 'How is sensitive data protected?',
-                  a: 'All documents are encrypted with AES-256-GCM at rest and TLS 1.3 in transit. A GDPR anonymization layer removes PII before any AI processing. Your data never leaves our SOC 2 certified infrastructure.',
-                },
-                {
-                  q: 'How long does integration take?',
-                  a: 'Less than 30 minutes. Upload documents directly, connect via OAuth for Slack, or use our REST API for bulk processing.',
-                },
-                {
-                  q: 'How does outcome tracking work?',
-                  a: 'Outcomes are detected automatically from follow-up documents, Slack messages, and web intelligence. You confirm with one click. Each reported outcome makes your future analyses more accurate.',
-                },
-                {
-                  q: 'How is this different from ChatGPT?',
-                  a: 'ChatGPT gives one opinion from one model. We use 3 independent judges for noise measurement, a 20×20 bias interaction matrix for compound scoring, 31 domain-specific biases, and an outcome flywheel that gets smarter with every decision.',
-                },
-              ].map(({ q, a }, i) => {
-                const isOpen = openFAQ === i;
-                return (
-                  <div
-                    key={q}
-                    style={{
-                      border: `1px solid ${C.slate200}`,
-                      borderRadius: 12,
-                      overflow: 'hidden',
-                      background: C.white,
-                    }}
-                  >
-                    <button
-                      onClick={() => setOpenFAQ(isOpen ? null : i)}
-                      style={{
-                        width: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '18px 24px',
-                        border: 'none',
-                        background: 'none',
-                        cursor: 'pointer',
-                        fontSize: 16,
-                        fontWeight: 600,
-                        color: C.slate900,
-                        textAlign: 'left',
-                      }}
-                    >
-                      {q}
-                      {isOpen ? (
-                        <ChevronUp size={18} style={{ color: C.slate400, flexShrink: 0 }} />
-                      ) : (
-                        <ChevronDown size={18} style={{ color: C.slate400, flexShrink: 0 }} />
-                      )}
-                    </button>
-                    {isOpen && (
-                      <div
-                        style={{
-                          padding: '0 24px 18px',
-                          fontSize: 15,
-                          color: C.slate600,
-                          lineHeight: 1.7,
-                        }}
-                      >
-                        {a}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+          {/* Left column — FAQ accordion with category chips */}
+          <div style={{ minWidth: 0 }}>
+            <LandingFaq />
           </div>
 
-          {/* Right quarter — Competitor Comparison Card */}
-          <div style={{ maxWidth: 480, margin: '0 auto', width: '100%' }}>
+          {/* Right column — Competitor Comparison Card */}
+          <div style={{ minWidth: 0, position: 'sticky', top: 24 }}>
             <CompetitorComparisonCard />
           </div>
         </div>
@@ -1533,9 +1264,12 @@ export default function LandingPage() {
 
       {/* Responsive override for the 2-column FAQ layout on mobile */}
       <style>{`
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
           .faq-grid {
             grid-template-columns: 1fr !important;
+          }
+          .faq-grid > div:last-child {
+            position: static !important;
           }
         }
       `}</style>
