@@ -93,6 +93,23 @@ export const RETAIL_CONSUMER_EXTENDED_CASES: FailureCase[] = [
       'Blind taste tests measured sensory preference in isolation but failed to capture the holistic brand experience',
       'The speed of reversal (79 days) showed the company could correct course, but the damage to trust was real',
     ],
+    preDecisionEvidence: {
+      document:
+        "Coca-Cola's 1984-85 'Project Kansas' research program conducted 190,000 blind taste tests across 13 cities. Results showed a 55-47 preference for the sweeter 'Merchandise 7X' reformulation vs. original Coke, and a 61-39 preference vs. Pepsi. These results drove the April 23, 1985 decision to replace the original formula entirely. Critics inside Coca-Cola, including bottlers, had raised concerns that blind-taste tests measured initial sip preference rather than brand-experience preference — concerns explicitly overruled by the Project Kansas team.",
+      source: "Thomas Oliver, 'The Real Coke, The Real Story' (1986); Mark Pendergrast, 'For God, Country and Coca-Cola' (1993); Coca-Cola Company archives",
+      date: '1985-04-23',
+      documentType: 'strategy_document',
+      detectableRedFlags: [
+        'Test methodology (blind sip preference) did not reproduce actual consumption context',
+        'Research did not test "replace original with new" framing — only "do you prefer A or B"',
+        'Bottler network concerns about brand-loyalty effects documented but overruled',
+        '99-year-old formula being replaced entirely rather than offered alongside',
+        'No canary market test — single national launch premised on 190,000 blind-test data points',
+      ],
+      flaggableBiases: ['framing_effect', 'confirmation_bias', 'overconfidence_bias', 'selective_perception'],
+      hypotheticalAnalysis:
+        "DI would flag the New Coke decision as the canonical methodology-framing failure. The research question was 'which formulation tastes better in a blind test' — but the business question was 'should we replace the iconic American brand formula.' A bias-adjusted research protocol would have tested the actual decision: frame-test the reformulation vs. reformulation-alongside-original. The 79-day reversal proves the original product-market fit was always there — the methodology failure was in how Project Kansas framed what it was measuring.",
+    },
     source: 'Thomas Oliver, "The Real Coke, The Real Story" (1986); Coca-Cola Company archives',
     sourceType: 'case_study',
   },

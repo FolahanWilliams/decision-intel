@@ -355,6 +355,23 @@ export const TECHNOLOGY_SUCCESS_CASES: CaseStudy[] = [
       "Embracing Linux and open source — the opposite of Microsoft's historical competitive strategy — showed that overcoming status quo bias sometimes requires doing the most culturally uncomfortable thing.",
       'The "growth mindset" framework gave employees a psychological model for understanding why change was necessary, reducing resistance at every level.',
     ],
+    preDecisionEvidence: {
+      document:
+        "Satya Nadella's February 4 2014 memo to all Microsoft employees ('Our Industry Does Not Respect Tradition — It Only Respects Innovation') named the strategic pivot: 'We will reinvent productivity to empower every person and every organization on the planet to do more and achieve more.' Within the first year, Nadella publicly embraced Linux (October 2014 'Microsoft Loves Linux' event), open-sourced .NET Core, launched Office for iPad (March 2014), and wrote down the $7.6B Nokia acquisition in Q4 FY2015. Every action was visible cultural signaling that Windows-first was ending.",
+      source: "Satya Nadella, 'Hit Refresh' (2017); Nadella employee memos Feb 2014, July 2014; Microsoft 10-K FY2015 (Nokia impairment)",
+      date: '2014-02-04',
+      documentType: 'internal_memo',
+      detectableRedFlags: [
+        '(Here the "red flags" are positive decision-intelligence markers — the mitigation factors)',
+        'CEO explicitly named the status quo bias ("Windows first") to overcome it',
+        'Nokia $7.6B writedown in first 18 months — sunk-cost management demonstrated visibly',
+        'External cultural framework (Carol Dweck growth mindset) adopted as organizational language',
+        'Office for iPad launched within first 50 days — prior leadership had blocked this for years',
+      ],
+      flaggableBiases: ['status_quo_bias', 'sunk_cost_fallacy', 'loss_aversion'],
+      hypotheticalAnalysis:
+        "DI would flag this as the canonical case of 'biases present AND actively managed.' Status quo bias (Windows dominance), sunk-cost fallacy (Nokia), and loss aversion (revenue cannibalization from Office subscription) were all operative. Nadella's decision process named each bias explicitly, took visible counter-actions in the first 18 months, and used cultural framework language (growth mindset) to give middle management an explanation for why previously-heretical decisions were now mandatory. The Nokia writedown in particular is the most instructive single action — it eliminated the sunk-cost escalation pathway before it could compound.",
+    },
     source:
       'Satya Nadella, "Hit Refresh" (2017); Microsoft 10-K filings (2014-2020); Mary Jo Foley, "Microsoft 2.0" (2019)',
     sourceType: 'biography',

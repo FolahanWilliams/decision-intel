@@ -219,6 +219,23 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       'Leverage amplifies losses exponentially when underlying asset correlations increase during stress.',
       'Liquidity risk in structured products is often underestimated until a crisis materializes.',
     ],
+    preDecisionEvidence: {
+      document:
+        "Bear Stearns High-Grade Structured Credit Strategies Fund Q1 2007 investor letter reported positive returns and described subprime mortgage default rates as 'consistent with historical norms adjusted for loan-to-value considerations.' The letter defended continued use of 10:1 fund-level leverage on AAA and AA CDO tranches and stated that 'market dislocations create opportunity' as subprime spreads widened. The funds' internal risk models used 2001-2005 default data as the baseline despite 2006 originations being of visibly lower credit quality.",
+      source: 'Bear Stearns Asset Management — High-Grade Structured Credit Fund Q1 2007 investor letter; SEC v. Cioffi & Tannin (2008)',
+      date: '2007-04',
+      documentType: 'investor_deck',
+      detectableRedFlags: [
+        'Internal risk models used 2001-2005 default data as baseline for 2006-vintage subprime exposures',
+        "'Market dislocations create opportunity' — classic doubling-down framing as losses accumulated",
+        '10:1 fund-level leverage on structured products whose correlations were materially untested in stress',
+        'Fund managers made private investor communications inconsistent with marks being reported to repo counterparties',
+        'Cioffi shifted personal money out of the fund while publicly maintaining bullish stance',
+      ],
+      flaggableBiases: ['anchoring_bias', 'overconfidence_bias', 'confirmation_bias', 'recency_bias'],
+      hypotheticalAnalysis:
+        "DI would flag the Bear Stearns CDO funds as an anchoring-to-benign-history failure. Using 2001-2005 subprime default data to model 2006-vintage loans is like using pre-crisis Lehman leverage to justify 2008 positions. The SEC complaint against Cioffi/Tannin later documented private-vs-public inconsistency — a decision process audit would have flagged marks-discrepancy between investor letters and repo pricing as a bright-line red flag requiring escalation outside the portfolio management team.",
+    },
     source:
       'SEC Litigation Release No. 22306 (2012); Bear Stearns Asset Management investor communications',
     sourceType: 'sec_filing',
@@ -252,6 +269,23 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       'When traders mark their own positions, conflicts of interest can obscure true risk exposure.',
       'A culture where challenging senior traders is discouraged allows losses to compound.',
     ],
+    preDecisionEvidence: {
+      document:
+        "Internal JPMorgan Chief Investment Office risk reports from Q4 2011 and Q1 2012 documented that the Synthetic Credit Portfolio (SCP) was breaching Value-at-Risk limits on more than 100 days in the first quarter of 2012. The bank switched from a proven VaR model to a new 'VaR model 2' on January 30, 2012 — which halved reported VaR almost overnight. Positions in the CDX.NA.IG.9 index were so large that the portfolio effectively WAS the market, making hedging impossible without moving prices against itself.",
+      source: 'U.S. Senate PSI "JPMorgan Chase Whale Trades" Report (2013), Exhibits 7-12; JPMorgan 10-K FY2012 restatement',
+      date: '2012-01-30',
+      documentType: 'risk_assessment',
+      detectableRedFlags: [
+        'Risk model switched mid-stream (Jan 30, 2012) — new model halved reported VaR on unchanged positions',
+        'Portfolio exceeded VaR limits more than 100 times in Q1 2012 — breaches suppressed rather than escalated',
+        'CIO positions in CDX.NA.IG.9 were large enough to constitute a material share of outstanding — no liquid exit',
+        'Traders marked their own positions — senior risk management did not perform independent verification',
+        "Dimon publicly dismissed the Bloomberg/WSJ reporting as a 'tempest in a teapot' (April 2012) while losses were actively accumulating",
+      ],
+      flaggableBiases: ['overconfidence_bias', 'anchoring_bias', 'groupthink', 'authority_bias'],
+      hypotheticalAnalysis:
+        "DI would flag the January 2012 risk model switch as the canonical 'change the measurement to avoid the constraint' moment. A decision process with working independent risk review would have required documenting model-change impact on reported VaR before deployment — the 50% overnight reduction is the kind of signal that cannot survive an honest audit. Dimon's April 2012 public dismissal is the authority-bias amplifier: once the CEO frames the issue as overblown, internal challenge becomes career-limiting.",
+    },
     source:
       'U.S. Senate Permanent Subcommittee on Investigations, "JPMorgan Chase Whale Trades" Report (2013)',
     sourceType: 'case_study',
@@ -517,6 +551,23 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       'Confirmation bias in auditing relationships (Arthur Andersen) allowed accounting irregularities to persist for years.',
       "Whistleblower protections are essential; Sherron Watkins' warnings were ignored because the culture punished dissent.",
     ],
+    preDecisionEvidence: {
+      document:
+        "Enron board meeting minutes from June 1999 document the approval of CFO Andrew Fastow's role as managing partner of LJM Cayman L.P. — a special purpose entity that would transact with Enron. The board waived Enron's Code of Ethics specifically to permit Fastow's dual role. Minutes reflect no challenging questions about the inherent conflict of interest. Similar waivers were granted for LJM2 (October 1999) and Chewco.",
+      source: 'Powers Report (Special Investigative Committee of the Board of Directors of Enron Corp.)',
+      date: '1999-06-28',
+      documentType: 'board_memo',
+      detectableRedFlags: [
+        "Formal waiver of Enron's Code of Ethics to allow CFO to run a counterparty to Enron",
+        'Board approval of LJM transactions without independent legal and financial review',
+        'Arthur Andersen auditors received ~$25M in consulting fees annually — larger than audit fees',
+        "Sherron Watkins' August 2001 memo to Ken Lay warning 'Enron could implode in a wave of accounting scandals' was not escalated to the board",
+        'Mark-to-market accounting on Raptors hedged Enron stock — making hedges worthless when stock fell',
+      ],
+      flaggableBiases: ['groupthink', 'authority_bias', 'halo_effect', 'confirmation_bias'],
+      hypotheticalAnalysis:
+        "DI would flag the Code of Ethics waiver as the canonical authority-bias + halo-effect decision. Skilling/Fastow's perceived brilliance caused the board to treat the fundamental conflict-of-interest as an administrative detail rather than a governance red flag. A bias-adjusted review would have required independent outside counsel plus a non-management board committee veto on any CFO-counterparty structure. Sherron Watkins' memo in August 2001 represents the canonical 'ignored dissenter' pattern — had any governance circuit-breaker been working, her warning alone would have paused operations.",
+    },
     source:
       'U.S. Senate Committee on Governmental Affairs, "The Role of the Board of Directors in Enron\'s Collapse" (2002)',
     sourceType: 'case_study',
@@ -817,6 +868,23 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       'Status quo bias in risk management means limits that should be tightened remain unchanged until it is too late.',
       'When multiple banks have the same exposure, the first to act minimizes losses while the last absorbs the worst.',
     ],
+    preDecisionEvidence: {
+      document:
+        "Credit Suisse prime services risk committee reviewed Archegos Capital exposure in late 2020 and early 2021. The committee documented that Archegos's aggregate gross exposure across prime brokers exceeded $50B against reported family-office equity of ~$10B, implying effective leverage of 5-8x on concentrated single-stock positions. Credit Suisse's initial margin requirements on Archegos total return swaps were set materially below Goldman Sachs and Morgan Stanley — a competitive-intensity decision rather than a risk-based one. Earlier internal recommendations to raise margin were deferred pending relationship-revenue discussions.",
+      source: 'Credit Suisse Special Committee Report on Archegos (Paul, Weiss, July 2021), pp. 26-58',
+      date: '2021-01',
+      documentType: 'risk_assessment',
+      detectableRedFlags: [
+        'Initial margin below peer banks on identical counterparty — competitive-pricing decision overriding risk',
+        "Knowledge that Bill Hwang's prior Tiger Asia vehicle settled SEC insider-trading charges in 2012",
+        'Archegos aggregate gross exposure across prime brokers estimated at 5x+ reported family-office capital',
+        'Prime services risk function did not have authority to force margin increases over relationship-banker objection',
+        "CRO pushback on Archegos limits deferred to relationship-revenue discussions",
+      ],
+      flaggableBiases: ['anchoring_bias', 'loss_aversion', 'authority_bias', 'overconfidence_bias'],
+      hypotheticalAnalysis:
+        "DI would flag Credit Suisse's Archegos risk decisions as the canonical revenue-anchor override of risk function. The bank's below-peer margin was a commercially-motivated choice that a bias-adjusted process would have required competitive/risk trade-off documentation for — 'we accept $X of additional tail risk to compete with GS on this specific counterparty' should have been an explicit ratified decision, not an emergent drift. Hwang's 2012 SEC settlement made the halo-effect operative: 'we know this counterparty' overrode base-rate concern about concentrated leverage.",
+    },
     source:
       'Credit Suisse Special Committee Report on Archegos (2021); SEC complaint against Archegos principals',
     sourceType: 'case_study',
@@ -956,6 +1024,23 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       'Concentrated directional bets funded by customer money violate the fundamental trust of brokerage operations.',
       'Anchoring to past success in government bond markets ignores the different risk profile of sovereign credit exposure.',
     ],
+    preDecisionEvidence: {
+      document:
+        "MF Global's Q3 FY2011 board materials documented a $6.3B gross exposure to European sovereign debt (Italy, Spain, Portugal, Ireland, Belgium) through repo-to-maturity transactions. The structure was disclosed as 'off-balance-sheet' despite carrying full market risk. CEO Jon Corzine personally directed the trades, overruling Chief Risk Officer Michael Roseman's objections — Roseman was replaced in January 2011 after refusing to approve increased sovereign exposure. CFO Henri Steenkamp's balance sheet reports understated the true liquidity risk of the RTM structure.",
+      source: "SIPA Trustee's Report on MF Global (2013); CFTC v. MF Global Inc. complaint; House Financial Services Committee testimony",
+      date: '2011-06',
+      documentType: 'board_memo',
+      detectableRedFlags: [
+        'Chief Risk Officer (Roseman) removed in Jan 2011 after objecting to sovereign exposure — replaced by successor more receptive to CEO strategy',
+        'Repo-to-maturity structure reported as off-balance-sheet while carrying full market risk',
+        "CEO Corzine's personal direction of proprietary trades from executive office — blurring line between CEO and trader roles",
+        'Initial board approvals set limit at $1B — breached multiple times before limit was raised retroactively to $4.75B, then $5B',
+        'Financial Industry Regulatory Authority (FINRA) raised concerns about capital treatment of the RTM positions in summer 2011',
+      ],
+      flaggableBiases: ['overconfidence_bias', 'authority_bias', 'sunk_cost_fallacy', 'gamblers_fallacy'],
+      hypotheticalAnalysis:
+        "DI would flag Corzine's removal of the CRO as the single most diagnostic event. A decision process where the CEO replaces the risk officer who challenges him — and the board allows it — is structurally incapable of circuit-breaking. The retroactive limit raises (rather than forced unwinds) is the signature of gambler's fallacy: each loss cycle produces a 'we're closer to the reversal' rationalization rather than a mandatory trim. The $1.6B customer-fund shortfall that ended the firm was the final-stage expression of a decision process that had already ceased functioning.",
+    },
     source: "CFTC v. MF Global Inc. complaint; SIPA Trustee's Report on MF Global (2013)",
     sourceType: 'sec_filing',
   },
@@ -1043,6 +1128,23 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       'Cognitive misering in AML processes leads teams to check boxes rather than critically analyze transaction patterns.',
       'Decentralized operations across jurisdictions create oversight gaps that enable illicit activity to persist.',
     ],
+    preDecisionEvidence: {
+      document:
+        "Deutsche Bank Moscow equity desk from 2011 onward executed a pattern of same-day matched trades: the Moscow office bought Russian equities from clients for rubles while the London office sold the same securities for dollars or euros to related counterparties. Internal compliance teams flagged the pattern as 'economically meaningless from a trading perspective' multiple times between 2012 and 2014. Trade volume reached approximately $10B. Moscow head of equities Tim Wiswell's personal relationships with client counterparties were documented in internal communications that went unaddressed.",
+      source: 'FCA Final Notice to Deutsche Bank AG (2017); NY DFS Consent Order (2017) ¶¶ 21-45',
+      date: '2014-06',
+      documentType: 'risk_assessment',
+      detectableRedFlags: [
+        "Compliance team described the mirror-trade pattern as 'economically meaningless' in writing — yet trades continued",
+        'Revenue from the trades was material to Moscow equity desk P&L — creating escalation disincentive',
+        'Sanctioned clients appeared in trade counterparty chains',
+        'Head of equities Moscow (Wiswell) had personal relationships with counterparty firms, flagged but not reviewed',
+        'No jurisdictional KYC review correlated Moscow-client identities with London-counterparty identities',
+      ],
+      flaggableBiases: ['status_quo_bias', 'selective_perception', 'cognitive_misering', 'loss_aversion'],
+      hypotheticalAnalysis:
+        "DI would flag Deutsche Bank's mirror-trading case as the canonical 'revenue-generating activity evades compliance scrutiny' failure. When a compliance team calls transactions 'economically meaningless' and they continue, a decision process with working circuit-breakers would have required either a documented business-purpose explanation or a halt. The organizational status quo — 'this desk makes money, other desks don't, let the experts manage it' — is the bias. A bias-adjusted AML review would have required cross-jurisdiction identity matching as a mandatory bright-line check that would have surfaced the pattern in months, not years.",
+    },
     source: 'FCA Final Notice to Deutsche Bank AG (2017); NY DFS Consent Order (2017)',
     sourceType: 'fca_enforcement',
   },

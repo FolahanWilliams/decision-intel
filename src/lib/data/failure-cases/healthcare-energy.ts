@@ -36,6 +36,23 @@ export const HEALTHCARE_CASES: FailureCase[] = [
       'Confirmation bias in pharmaceutical research leads to study designs that are more likely to produce favorable results rather than accurate ones.',
       'Post-market surveillance systems must be independent of commercial interests to detect safety signals early.',
     ],
+    preDecisionEvidence: {
+      document:
+        "The VIGOR study published in NEJM (November 2000) compared Vioxx to naproxen and found a 5x higher rate of heart attacks in the Vioxx arm. Merck's published interpretation attributed the difference to naproxen having a cardioprotective effect — a hypothesis not established by prior cardiovascular trials. Internal Merck email correspondence later released in litigation showed scientists had raised concerns about the cardioprotective hypothesis as early as 1996 in response to the rat studies and 1997 planning memos. The APPROVe trial (confirming cardiovascular risk) was not run until 2001-2004.",
+      source: 'FDA NDA 21-042/S-007; Bombardier et al., NEJM 343:1520 (2000); Merck internal emails disclosed in Vioxx MDL 1657',
+      date: '2000-11-23',
+      documentType: 'risk_assessment',
+      detectableRedFlags: [
+        'VIGOR study showed 5x higher heart attacks in Vioxx arm — attributed to naproxen cardioprotection with no prior evidence base',
+        'Internal 1996-1997 correspondence about cardiovascular risk signals not disclosed to FDA at approval',
+        'Commercial pressure — Vioxx was a $2.5B annual revenue product',
+        '"Dodge ball" marketing playbook instructed reps how to avoid discussing cardiovascular data',
+        'FDA safety review of VIGOR deferred while Merck continued aggressive Vioxx marketing',
+      ],
+      flaggableBiases: ['confirmation_bias', 'selective_perception', 'loss_aversion', 'groupthink'],
+      hypotheticalAnalysis:
+        "DI would flag the Vioxx VIGOR interpretation as textbook motivated reasoning. A 5x increase in heart attacks in the treatment arm is the kind of signal that a bias-adjusted review would treat as the primary finding, not as a secondary interpretation requiring the invention of a cardioprotective-comparator hypothesis. The 'dodge ball' sales-training playbook is an organizational-level signal: when marketing materials actively coach reps to avoid discussing safety data, decision-intelligence has already failed. The APPROVe trial should have been initiated in 2001 rather than used as late-stage confirmation.",
+    },
     source: 'FDA NDA 21-042/S-007; Merck SEC filings; Bombardier et al., NEJM (2000)',
     sourceType: 'fda_action',
   },
@@ -74,6 +91,23 @@ export const HEALTHCARE_CASES: FailureCase[] = [
       'Loss aversion around a profitable product line can cause companies to ignore catastrophic societal harm.',
       'Regulatory capture and aggressive lobbying can delay corrective action by years, amplifying public health damage.',
     ],
+    preDecisionEvidence: {
+      document:
+        "Purdue Pharma's 1996 OxyContin launch materials cited a 1980 Porter & Jick letter-to-the-editor in NEJM claiming 'less than 1 percent' of hospitalized patients receiving opioids became addicted. The letter was a single-paragraph retrospective observation not designed or peer-reviewed as an addiction-risk study. Purdue's sales force training materials used this citation as the foundation for the claim that OxyContin had low addiction potential. Internal documents later released in Commonwealth v. Purdue (2019) showed the Sackler family was aware by 2001 of widespread diversion and addiction but expanded marketing intensity rather than reducing it.",
+      source: 'DOJ Settlement with Purdue Pharma (2020); Commonwealth of Massachusetts v. Purdue Pharma, Complaint 18-1808 (2019); Keefe, "Empire of Pain" (2021)',
+      date: '1996-01',
+      documentType: 'investor_deck',
+      detectableRedFlags: [
+        "1980 Porter & Jick letter cited as addiction-risk evidence — not a study, not designed for that question",
+        'Marketing claims outpaced clinical addiction-risk evidence by orders of magnitude',
+        'Internal awareness by 2001 of diversion/addiction epidemic documented in sales force communications',
+        'Sales incentive structures rewarded volume over appropriate prescribing patterns',
+        "Sackler family took $10B+ in distributions while litigation liability mounted — extracting value ahead of settlement",
+      ],
+      flaggableBiases: ['confirmation_bias', 'loss_aversion', 'selective_perception', 'authority_bias'],
+      hypotheticalAnalysis:
+        "DI would flag Purdue's use of Porter & Jick as the canonical selective-perception failure. A bias-adjusted clinical evidence review would have recognized that a 5-sentence retrospective letter cannot carry the weight of a blockbuster-drug safety claim. The organizational decision process failure runs deeper: internal documents showing awareness of real-world harm paired with *expanded* marketing intensity is the pattern that distinguishes negligence from intentional maximization of harm. A working decision-intelligence review would have required annual independent epidemiological updates as a marketing precondition.",
+    },
     source:
       'DOJ Settlement with Purdue Pharma (2020); Patrick Radden Keefe, "Empire of Pain" (2021)',
     sourceType: 'case_study',
@@ -505,6 +539,23 @@ export const ENERGY_INDUSTRIAL_CASES: FailureCase[] = [
       'Authority bias caused Thiokol engineers to reverse their no-launch recommendation when pressured by NASA management.',
       'Availability heuristic led NASA to treat prior successful launches with O-ring erosion as evidence of safety rather than warning signs.',
     ],
+    preDecisionEvidence: {
+      document:
+        "On January 27, 1986 (the evening before the Challenger launch), Morton Thiokol engineers held a teleconference with NASA's Marshall Space Flight Center management. Thiokol engineers Roger Boisjoly and Arnie Thompson presented data showing O-ring erosion correlated with low launch-pad temperatures. Their recommendation was NO LAUNCH below 53°F. Forecast for January 28 was 29-36°F at launch time. NASA Marshall management pushed back, asking Thiokol to reconsider. After Thiokol management caucused away from the engineering team, they reversed the no-launch recommendation and cleared the launch. Boisjoly and Thompson were not polled in the reversed recommendation.",
+      source: 'Rogers Commission Report (1986), Chapter V; Diane Vaughan, "The Challenger Launch Decision" (1996)',
+      date: '1986-01-27',
+      documentType: 'risk_assessment',
+      detectableRedFlags: [
+        'Engineering recommendation: NO LAUNCH below 53°F. Forecast: 29-36°F at launch.',
+        'Burden of proof inverted — "prove it is unsafe" rather than "prove it is safe"',
+        "Thiokol management caucused WITHOUT the engineers who raised the objection",
+        'Prior launches had shown O-ring erosion — treated as successes rather than warning signs',
+        'Schedule pressure from State of the Union address and "Teacher in Space" political commitment',
+      ],
+      flaggableBiases: ['groupthink', 'authority_bias', 'availability_heuristic', 'framing_effect'],
+      hypotheticalAnalysis:
+        "DI would flag the Challenger launch decision as the canonical groupthink + availability heuristic failure. The availability heuristic is operative in 'prior flights with O-ring erosion were successful, therefore the problem is tolerable' — a decision-process where a bright-line engineering specification (NO LAUNCH below 53°F) was treated as a negotiable threshold. Vaughan termed this 'normalization of deviance' — incremental acceptance of out-of-spec conditions. A bias-adjusted review would have treated the engineering recommendation as a non-negotiable constraint, not a starting position for managerial negotiation.",
+    },
     source:
       'Presidential Commission on the Space Shuttle Challenger Accident (Rogers Commission Report, 1986); NASA Report RSC-86-0137',
     sourceType: 'ntsb_report',

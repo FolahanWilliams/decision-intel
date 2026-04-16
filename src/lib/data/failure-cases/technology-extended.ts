@@ -222,6 +222,23 @@ export const TECHNOLOGY_EXTENDED_CASES: FailureCase[] = [
       'Anchoring to current user numbers masked the underlying engagement decline that preceded user exodus',
       'Corporate ownership that prioritizes revenue extraction over product innovation accelerates platform death',
     ],
+    preDecisionEvidence: {
+      document:
+        "Myspace's 2006-2008 strategic documents under News Corp ownership specified annual revenue targets of $500M+ growing to $1B by 2009, with advertising yield-per-user as the primary KPI. CEO Chris DeWolfe's initiatives to improve platform experience (redesign, anti-spam, developer platform) were repeatedly deprioritized when they conflicted with short-term revenue metrics. When Facebook opened registration beyond universities (September 2006), Myspace internal reports dismissed Facebook as a 'college market' competitor through early 2008 despite declining Myspace engagement.",
+      source: "News Corp 10-K filings (2005-2010); Felix Gillette 'The Rise and Inglorious Fall of Myspace' (Bloomberg Businessweek, 2011)",
+      date: '2008-06',
+      documentType: 'strategy_document',
+      detectableRedFlags: [
+        'Ad yield as primary KPI in a platform where user engagement directly determines ad value',
+        "Facebook dismissed as 'college market' through 2008 despite broader registration open since Sept 2006",
+        'Platform improvements deprioritized when conflicting with quarterly revenue targets',
+        'Engagement metrics (sessions, time on site) declining while user-count metrics held — vanity-metric trap',
+        'Corporate ownership (News Corp) lacked consumer-internet instinct — social network treated as media property',
+      ],
+      flaggableBiases: ['status_quo_bias', 'anchoring_bias', 'loss_aversion', 'confirmation_bias'],
+      hypotheticalAnalysis:
+        "DI would flag Myspace as the canonical revenue-extraction-vs-product-investment failure. Measuring ad yield as the primary KPI in a social network is structurally incompatible with the underlying business — user engagement IS the product, and ads that degrade it destroy the revenue source. The dismissal of Facebook as a college-only competitor through mid-2008 was the decision-intelligence failure: Facebook's registration had been open for 18+ months by then, and Myspace engagement data was already declining. A bias-adjusted review would have required monitoring competitive net-migration as a leading indicator.",
+    },
     source: 'Felix Gillette, "The Rise and Inglorious Fall of Myspace" (Bloomberg, 2011)',
     sourceType: 'case_study',
   },

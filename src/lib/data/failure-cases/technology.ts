@@ -1039,6 +1039,23 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       'Planning fallacy led to overly optimistic subscriber projections that never materialized.',
       'Confirmation bias in market research means hearing what you want from focus groups rather than what the data actually shows.',
     ],
+    preDecisionEvidence: {
+      document:
+        "Quibi's 2019 investor deck projected 7M paid subscribers within the first year at $4.99/$7.99/month. The plan was premised on three assumptions: (1) consumers would pay for premium short-form content competing with free YouTube/TikTok, (2) mobile-only consumption would be preserved via technical DRM, and (3) commute-time viewing would be the primary use case. Internal product prototypes launched April 2020 as COVID-19 shelter-in-place eliminated commutes. Social-sharing features were intentionally omitted — despite focus-group feedback identifying shareability as a top-3 user request.",
+      source: "Quibi investor materials (2019-2020); Bloomberg Businessweek 'Inside the Meltdown of Quibi' (Lucas Shaw, 2020); Vanity Fair reporting",
+      date: '2019-08',
+      documentType: 'investor_deck',
+      detectableRedFlags: [
+        '7M first-year paid subscriber projection in a market with zero comparable freemium-to-paid conversion data',
+        'No social sharing — contradicting direct user-research input about Gen Z content consumption',
+        'Premium mobile-only premise in market with successful free-tier alternatives (TikTok launched US in 2017)',
+        'Commute-time use case as primary engagement driver — single-point forecast with no pandemic or WFH sensitivity',
+        'Founder duo (Katzenberg/Whitman) raising $1.75B before validating product-market fit',
+      ],
+      flaggableBiases: ['overconfidence_bias', 'halo_effect', 'confirmation_bias', 'planning_fallacy'],
+      hypotheticalAnalysis:
+        "DI would flag Quibi as the canonical halo-effect product failure. Katzenberg's DreamWorks prestige and Whitman's eBay operational reputation caused investors to treat a fragile hypothesis (Gen Z will pay for short-form premium) as a known quantity. A bias-adjusted process would have staged-gated the capital: raise $200M, build MVP, validate conversion in a single market, *then* scale. Raising $1.75B pre-launch locked in the premium-mobile-only strategy so tightly that when COVID invalidated the commute-time core thesis, there was no pivot runway.",
+    },
     source:
       'Quibi investor communications (2020); Lucas Shaw, "Inside the Meltdown of Quibi" (Bloomberg Businessweek, 2020)',
     sourceType: 'news_investigation',
@@ -1137,6 +1154,23 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       'Planning fallacy in AI healthcare deployments consistently underestimates the difficulty of working with messy, unstructured clinical data.',
       'Confirmation bias led IBM to showcase cherry-picked success stories while ignoring systemic accuracy failures.',
     ],
+    preDecisionEvidence: {
+      document:
+        "IBM's Watson Health marketing materials and MD Anderson partnership agreements (2013-2016) claimed Watson for Oncology could provide evidence-based treatment recommendations from unstructured patient records. Internal IBM engineering reports acknowledged the system's training dataset was largely synthetic cases rather than real patients. STAT News (July 2018) obtained internal documents showing Watson recommended 'multiple examples of unsafe and incorrect cancer treatments,' including drugs that could worsen bleeding in a patient with severe bleeding. MD Anderson terminated the Watson partnership in 2017 after spending $62M.",
+      source: "STAT News investigation (Ross & Swetlitz, July 2018); University of Texas System internal audit of MD Anderson Watson contract (2017)",
+      date: '2016-09',
+      documentType: 'risk_assessment',
+      detectableRedFlags: [
+        'Training data was synthetic cases, not real patient records — acknowledged internally',
+        'MD Anderson internal audit (2017) found $62M spent with no production deployment',
+        'Marketing claims outpaced clinical validation by 24+ months',
+        'Oncology recommendations flagged by physicians as inconsistent with evidence-based guidelines',
+        'IBM Watson demos curated to avoid known failure modes rather than surfacing them',
+      ],
+      flaggableBiases: ['overconfidence_bias', 'confirmation_bias', 'planning_fallacy', 'halo_effect'],
+      hypotheticalAnalysis:
+        "DI would flag IBM Watson Health as a canonical 'marketing-preceded-product' halo-effect failure. Watson's 2011 Jeopardy! win created a public perception of competence that IBM then leveraged into healthcare without validating the technology transfer. Synthetic training data is a binary red flag — any medical AI deployment using non-real patient data should face an escalated review gate. A bias-adjusted process would have required MD Anderson and other customer deployments to demonstrate documented clinical accuracy on real cases before further investment, rather than compounding the sunk cost as problems emerged.",
+    },
     source:
       'Casey Ross and Ike Swetlitz, "IBM\'s Watson Supercomputer Recommended Unsafe and Incorrect Cancer Treatments" (STAT News, 2018)',
     sourceType: 'news_investigation',
@@ -1176,6 +1210,23 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       'Planning fallacy in hardware startups is especially dangerous because physical products cannot pivot as easily as software.',
       'Basic product validation (can a human squeeze the pouch by hand?) should precede any significant capital investment.',
     ],
+    preDecisionEvidence: {
+      document:
+        "Juicero's Series B pitch deck (June 2016) raised $70M at $270M valuation on the premise that a $699 Wi-Fi-connected juice press would sell to home and commercial customers through proprietary subscription juice pouches. The device contained four microprocessors, QR-code scanners, network connectivity, and a 4-ton pressing mechanism. No internal user-testing documented a comparison between the machine and hand-squeezing the pouches. Investors included Google Ventures, Kleiner Perkins, and Campbell Soup Co.",
+      source: "Juicero Series B investor materials; Bloomberg investigation (Huet & Zaleski, April 2017) — 'Silicon Valley's $400 Juicer May Be Feeling the Squeeze'",
+      date: '2016-06',
+      documentType: 'investor_deck',
+      detectableRedFlags: [
+        'No documented comparison between $699 machine and hand-squeezing the same pouches',
+        'Marketing claimed 4 tons of pressure — a specification with no user-experience correlation',
+        '$699 hardware + $5-8/pouch subscription — subscription COGS likely >50% of MSRP',
+        'QR-scanning DRM preventing out-of-date pouches from being pressed — adding failure modes without adding value',
+        'Google Ventures + Kleiner Perkins led rounds without demanding a hand-squeeze comparison test',
+      ],
+      flaggableBiases: ['overconfidence_bias', 'bandwagon_effect', 'halo_effect', 'planning_fallacy'],
+      hypotheticalAnalysis:
+        "DI would flag Juicero as the canonical 'tier-1-VC bandwagon + over-engineered product' failure. Google Ventures' lead investment created social proof that subsequent investors relied on rather than performing independent product validation. A bias-adjusted due diligence process would have required the most basic comparison test — does the machine provide meaningful value over manual pressing? — as a precondition for capital commitment. The Bloomberg reporters' video of hand-squeezing the pouches was a 30-second experiment that could have been done in any due-diligence meeting.",
+    },
     source:
       'Ellen Huet and Olivia Zaleski, "Silicon Valley\'s $400 Juicer May Be Feeling the Squeeze" (Bloomberg, 2017)',
     sourceType: 'news_investigation',
