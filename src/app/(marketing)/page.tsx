@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { trackEvent } from '@/lib/analytics/track';
 import { CaseStudyCarousel } from '@/components/marketing/CaseStudyCarousel';
 import { HeroTabs } from '@/components/marketing/HeroTabs';
+import { PipelineLandingTeaser } from '@/components/marketing/how-it-works/PipelineLandingTeaser';
 import { Reveal } from '@/components/ui/Reveal';
 import {
   Brain,
@@ -1032,9 +1033,14 @@ export default function LandingPage() {
           >
             Decision Hygiene in Three Steps
           </h2>
-          <p style={{ fontSize: 18, color: C.slate600, marginBottom: 48, maxWidth: 560 }}>
+          <p style={{ fontSize: 18, color: C.slate600, marginBottom: 32, maxWidth: 560 }}>
             From strategic document to verified outcome &mdash; for any decision-critical team.
           </p>
+        </motion.div>
+
+        {/* 12-node pipeline teaser — compact, animated, links to /how-it-works */}
+        <motion.div {...fadeIn} transition={{ duration: 0.5, delay: 0.1 }} style={{ marginBottom: 48 }}>
+          <PipelineLandingTeaser />
         </motion.div>
 
         <div

@@ -34,7 +34,7 @@ interface Tier {
   featured?: boolean;
 }
 
-function buildTiers(cycle: BillingCycle): Tier[] {
+function buildTiers(_cycle: BillingCycle): Tier[] {
   return [
     {
       id: 'free',

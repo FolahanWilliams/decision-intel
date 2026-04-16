@@ -186,7 +186,6 @@ export function useEdgeNarrativeReveal({
       typeof window !== 'undefined' &&
       window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDone(true);
       return;
     }

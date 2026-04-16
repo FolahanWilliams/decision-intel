@@ -15,6 +15,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useReducedMotion } from './useReducedMotion';
 import {
   Shield,
   Layers,
@@ -167,16 +168,7 @@ export function PipelineFlowDiagram({
   onSelectNode,
 }: PipelineFlowDiagramProps) {
   const [activeZone, setActiveZone] = useState<PipelineZone>('preprocessing');
-  const [reducedMotion, setReducedMotion] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setReducedMotion(mq.matches);
-    const listener = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
-    mq.addEventListener?.('change', listener);
-    return () => mq.removeEventListener?.('change', listener);
-  }, []);
+  const reducedMotion = useReducedMotion();
 
   // Loop through the three zones to create a breathing "alive" feel
   useEffect(() => {

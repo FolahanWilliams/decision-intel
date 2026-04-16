@@ -11,6 +11,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useReducedMotion } from './useReducedMotion';
 
 const C = {
   navy: '#0F172A',
@@ -57,16 +58,7 @@ const ZONES: Array<{
 
 export function PipelineMiniatureViz() {
   const [activeIdx, setActiveIdx] = useState(0);
-  const [reducedMotion, setReducedMotion] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setReducedMotion(mq.matches);
-    const listener = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
-    mq.addEventListener?.('change', listener);
-    return () => mq.removeEventListener?.('change', listener);
-  }, []);
+  const reducedMotion = useReducedMotion();
 
   useEffect(() => {
     if (reducedMotion) return;

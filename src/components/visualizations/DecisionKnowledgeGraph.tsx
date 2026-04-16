@@ -239,7 +239,6 @@ export function DecisionKnowledgeGraph({
       return;
     }
     const q = searchQuery.toLowerCase();
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSearchResults(new Set(
       graphData.nodes.filter(n => n.label.toLowerCase().includes(q) || n.type.includes(q)).map(n => n.id)
     ));
@@ -251,20 +250,15 @@ export function DecisionKnowledgeGraph({
     if (!pathStart || !pathEnd || !graphData) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setHighlightedPath(new Set());
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setHighlightedPathEdges(new Set());
       return;
     }
     const result = bfsShortestPath(graphData.nodes, graphData.edges, pathStart, pathEnd);
     if (result) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setHighlightedPath(new Set(result.path));
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setHighlightedPathEdges(new Set(result.edges.map(e => e.id)));
     } else {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setHighlightedPath(new Set());
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setHighlightedPathEdges(new Set());
     }
   }, [pathStart, pathEnd, graphData]);
