@@ -136,6 +136,11 @@ export function CaseStudyNav() {
           </Link>
         </div>
       </div>
+      <style>{`
+        @media (max-width: 760px) {
+          .nav-link-hide-mobile { display: none !important; }
+        }
+      `}</style>
     </nav>
   );
 }

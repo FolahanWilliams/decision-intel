@@ -104,7 +104,7 @@ export function UpgradeFromAudit({ dealId }: Props) {
         </div>
       </div>
       <Link
-        href={`/#pricing`}
+        href={`/pricing`}
         onClick={() =>
           trackEvent('deal_audit_upgrade_click', {
             dealId,

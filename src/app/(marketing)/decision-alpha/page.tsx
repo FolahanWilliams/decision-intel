@@ -537,7 +537,7 @@ export default function DecisionAlphaPage() {
           Decision Knowledge Graph that compounds quarter after quarter.
         </p>
         <Link
-          href="/#pricing"
+          href="/pricing"
           style={{
             display: 'inline-flex',
             alignItems: 'center',
