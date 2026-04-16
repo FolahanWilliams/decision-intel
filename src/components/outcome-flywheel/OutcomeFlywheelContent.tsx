@@ -14,6 +14,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
 } from 'lucide-react';
+import { IntelligenceBrief } from '@/components/ui/IntelligenceBrief';
 
 interface FlywheelData {
   successDecisions: Array<{
@@ -144,8 +145,22 @@ export function OutcomeFlywheelContent() {
   const healthDashOffset =
     healthCircumference - (flywheelHealth.loopClosureRate / 100) * healthCircumference;
 
+  const pendingOutcomes = Math.max(
+    0,
+    flywheelHealth.totalDecisions - flywheelHealth.outcomesLogged
+  );
+
   return (
     <div>
+      {/* Contextual Intelligence Brief — what to do next */}
+      <IntelligenceBrief
+        context="outcomes"
+        metrics={{
+          pendingOutcomes,
+          loopClosureRate: flywheelHealth.loopClosureRate / 100,
+        }}
+      />
+
       {/* Row 1: Quarterly Impact + Flywheel Health + Accuracy Trend */}
       <div
         style={{

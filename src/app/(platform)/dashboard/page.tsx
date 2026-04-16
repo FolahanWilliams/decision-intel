@@ -21,10 +21,11 @@ import {
   TrendingUp,
   Clock,
   CloudUpload,
+  GitCompareArrows,
 } from 'lucide-react';
 import { DecisionIQCard } from '@/components/ui/DecisionIQCard';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Dialog,
@@ -157,6 +158,7 @@ export default function Dashboard() {
     return () => clearTimeout(handle);
   }, [error]);
   const searchParams = useSearchParams();
+  const router = useRouter();
   const viewParam = searchParams.get('view');
   const initialView: DashboardView = viewParam === 'browse' ? 'browse' : 'upload';
   const [activeView, setActiveView] = useState<DashboardView>(initialView);
@@ -2048,6 +2050,36 @@ export default function Dashboard() {
                 >
                   Clear
                 </button>
+                {selectedDocs.size >= 2 && selectedDocs.size <= 3 && (
+                  <button
+                    onClick={() => {
+                      const ids = Array.from(selectedDocs).slice(0, 3).join(',');
+                      router.push(`/dashboard/compare?doc=${ids}`);
+                    }}
+                    className="btn btn-sm flex items-center gap-xs text-sm"
+                    style={{
+                      background: 'rgba(22, 163, 74, 0.1)',
+                      border: '1px solid rgba(22, 163, 74, 0.3)',
+                      color: 'var(--accent-primary)',
+                    }}
+                    title={
+                      selectedDocs.size > 3
+                        ? 'Compare accepts up to 3 documents — only the first 3 will be used'
+                        : undefined
+                    }
+                  >
+                    <GitCompareArrows size={12} />
+                    Compare Selected
+                  </button>
+                )}
+                {selectedDocs.size > 3 && (
+                  <span
+                    className="text-xs"
+                    style={{ color: 'var(--text-muted)', whiteSpace: 'nowrap' }}
+                  >
+                    Select 2–3 to compare
+                  </span>
+                )}
                 <button
                   onClick={handleBatchDelete}
                   disabled={batchDeleting}

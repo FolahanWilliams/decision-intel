@@ -426,7 +426,6 @@ export default function Sidebar() {
                 pathname.startsWith('/dashboard/outcome-flywheel') ||
                 pathname.startsWith('/dashboard/decision-graph') ||
                 pathname.startsWith('/dashboard/decision-quality') ||
-                pathname.startsWith('/dashboard/cognitive-audits') ||
                 pathname.startsWith('/calibration') ||
                 pathname.startsWith('/dashboard/experiments')
               }
@@ -448,11 +447,15 @@ export default function Sidebar() {
               />
             )}
             <NavItem
-              href="/dashboard/journal"
+              href="/dashboard/decision-log"
               icon={<PenLine size={18} />}
-              label="Decision Journal"
-              description="Record and reflect on decisions"
-              active={pathname === '/dashboard/journal'}
+              label="Decision Log"
+              description="Journal entries + cognitive audits in one feed"
+              active={
+                pathname === '/dashboard/decision-log' ||
+                pathname === '/dashboard/journal' ||
+                pathname.startsWith('/dashboard/cognitive-audits')
+              }
               collapsed={collapsed}
               onNavigate={closeMobile}
             />

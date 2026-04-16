@@ -579,22 +579,63 @@ export default function FounderHubPage() {
 
   return (
     <ErrorBoundary sectionName="Founder Hub">
-      <div className="max-w-6xl mx-auto px-4 py-6">
+      <div className="founder-hub-root max-w-6xl mx-auto px-4 py-6">
         {renderHeader()}
-        {renderTabStrip()}
-        {searchQuery ? (
-          <SearchResults
-            query={searchQuery}
-            onJump={tabId => {
-              setActiveTab(tabId);
-              setSearchQuery('');
-            }}
-          />
-        ) : (
-          tabContent
-        )}
+        <div className="founder-hub-layout">
+          <aside className="founder-hub-rail" aria-label="Founder Hub navigation">
+            {renderHubRail()}
+          </aside>
+          <main className="founder-hub-main">
+            {searchQuery ? (
+              <SearchResults
+                query={searchQuery}
+                onJump={tabId => {
+                  setActiveTab(tabId);
+                  setSearchQuery('');
+                }}
+              />
+            ) : (
+              tabContent
+            )}
+          </main>
+        </div>
         <FounderChatWidget founderPass={FOUNDER_PASS} />
       </div>
+      <style jsx global>{`
+        .founder-hub-layout {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+          align-items: stretch;
+        }
+        .founder-hub-rail {
+          width: 100%;
+          padding: 12px;
+          border: 1px solid var(--border-color);
+          border-radius: var(--radius-lg);
+          background: var(--bg-card);
+        }
+        .founder-hub-main {
+          flex: 1;
+          min-width: 0;
+          width: 100%;
+        }
+        @media (min-width: 900px) {
+          .founder-hub-layout {
+            flex-direction: row;
+            gap: 24px;
+            align-items: flex-start;
+          }
+          .founder-hub-rail {
+            width: 240px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 16px;
+            max-height: calc(100vh - 32px);
+            overflow-y: auto;
+          }
+        }
+      `}</style>
     </ErrorBoundary>
   );
 
@@ -677,76 +718,109 @@ export default function FounderHubPage() {
     );
   }
 
-  function renderTabStrip() {
+  function renderHubRail() {
     return (
-      <div
-        style={{
-          display: 'flex',
-          gap: 16,
-          marginBottom: 24,
-          overflowX: 'auto',
-          borderBottom: '1px solid var(--border-primary, #222)',
-          paddingBottom: 6,
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-        }}
-      >
-        {TAB_GROUPS.map(group => {
+      <nav>
+        {TAB_GROUPS.map((group, groupIdx) => {
           const groupTabs = TABS.filter(t => t.group === group);
           if (groupTabs.length === 0) return null;
           return (
-            <div key={group} style={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+            <div
+              key={group}
+              style={{
+                marginBottom: groupIdx < TAB_GROUPS.length - 1 ? 12 : 0,
+              }}
+            >
               <div
                 style={{
-                  fontSize: 9,
+                  fontSize: 10,
                   fontWeight: 700,
                   textTransform: 'uppercase',
-                  letterSpacing: '0.1em',
-                  color: 'var(--text-muted, #71717a)',
-                  marginBottom: 4,
-                  paddingLeft: 4,
+                  letterSpacing: '0.08em',
+                  color: 'var(--text-muted)',
+                  padding: '8px 10px 6px',
                 }}
               >
                 {group}
               </div>
-              <div style={{ display: 'flex', gap: 2 }}>
-                {groupTabs.map(tab => (
-                  <button
-                    key={tab.id}
-                    onClick={() => {
-                      setActiveTab(tab.id);
-                      setSearchQuery('');
-                    }}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 6,
-                      padding: '8px 12px',
-                      fontSize: 13,
-                      fontWeight: activeTab === tab.id ? 700 : 500,
-                      color:
-                        activeTab === tab.id
-                          ? 'var(--text-primary, #fff)'
-                          : 'var(--text-muted, #71717a)',
-                      background: 'none',
-                      border: 'none',
-                      borderBottom:
-                        activeTab === tab.id ? '2px solid #16A34A' : '2px solid transparent',
-                      cursor: 'pointer',
-                      whiteSpace: 'nowrap',
-                      transition: 'color 0.15s, border-color 0.15s',
-                      flexShrink: 0,
-                    }}
-                  >
-                    {tab.icon}
-                    {tab.label}
-                  </button>
-                ))}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {groupTabs.map(tab => {
+                  const isActive = activeTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => {
+                        setActiveTab(tab.id);
+                        setSearchQuery('');
+                      }}
+                      aria-current={isActive ? 'page' : undefined}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 10,
+                        padding: '8px 10px',
+                        fontSize: 13,
+                        fontWeight: isActive ? 600 : 500,
+                        color: isActive
+                          ? 'var(--text-highlight)'
+                          : 'var(--text-secondary)',
+                        background: isActive ? 'var(--bg-elevated)' : 'transparent',
+                        border: isActive
+                          ? '1px solid var(--border-color)'
+                          : '1px solid transparent',
+                        borderLeft: isActive
+                          ? '3px solid var(--accent-primary)'
+                          : '3px solid transparent',
+                        borderRadius: 'var(--radius-md)',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                        textAlign: 'left',
+                        width: '100%',
+                      }}
+                      onMouseEnter={e => {
+                        if (!isActive) {
+                          e.currentTarget.style.background = 'var(--bg-card-hover)';
+                          e.currentTarget.style.color = 'var(--text-primary)';
+                        }
+                      }}
+                      onMouseLeave={e => {
+                        if (!isActive) {
+                          e.currentTarget.style.background = 'transparent';
+                          e.currentTarget.style.color = 'var(--text-secondary)';
+                        }
+                      }}
+                    >
+                      <span
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          color: isActive
+                            ? 'var(--accent-primary)'
+                            : 'var(--text-muted)',
+                          flexShrink: 0,
+                        }}
+                      >
+                        {tab.icon}
+                      </span>
+                      <span
+                        style={{
+                          flex: 1,
+                          minWidth: 0,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {tab.label}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           );
         })}
-      </div>
+      </nav>
     );
   }
 }

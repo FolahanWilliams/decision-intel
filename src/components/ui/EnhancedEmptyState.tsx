@@ -274,7 +274,8 @@ interface EnhancedEmptyStateProps {
     | 'rooms'
     | 'playbooks'
     | 'journal'
-    | 'analytics';
+    | 'analytics'
+    | 'outcomes';
 }
 
 export function EnhancedEmptyState({

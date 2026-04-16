@@ -21,11 +21,18 @@ interface AnalysisData {
 
 export default function ComparePage() {
   const searchParams = useSearchParams();
-  // Pre-seed the compare page when a user arrives via the "Compare with…"
-  // link on the document detail page (/dashboard/compare?doc=<id>).
-  const initialDocId = searchParams.get('doc');
+  // Pre-seed the compare page when a user arrives via:
+  //   (a) the "Compare with…" link on the document detail page → ?doc=<id>
+  //   (b) the "Compare Selected" action on the browse view → ?doc=<id1>,<id2>,<id3>
+  const initialDocParam = searchParams.get('doc');
   const [selectedIds, setSelectedIds] = useState<string[]>(
-    initialDocId ? [initialDocId] : []
+    initialDocParam
+      ? initialDocParam
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean)
+          .slice(0, 3)
+      : []
   );
   const [analyses, setAnalyses] = useState<AnalysisData[]>([]);
   const [loading, setLoading] = useState(false);

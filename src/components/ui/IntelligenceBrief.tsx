@@ -36,7 +36,13 @@ type BriefContext =
   | 'rooms'
   | 'playbooks'
   | 'journal'
-  | 'analytics';
+  | 'analytics'
+  | 'outcomes';
+
+interface BriefMetrics {
+  pendingOutcomes?: number;
+  loopClosureRate?: number;
+}
 
 const CONTEXT_ICONS: Record<BriefContext, React.ReactNode> = {
   documents: <Target size={16} className="text-blue-400" />,
@@ -48,9 +54,14 @@ const CONTEXT_ICONS: Record<BriefContext, React.ReactNode> = {
   playbooks: <Zap size={16} className="text-purple-400" />,
   journal: <TrendingUp size={16} className="text-emerald-400" />,
   analytics: <TrendingUp size={16} className="text-blue-400" />,
+  outcomes: <TrendingUp size={16} className="text-emerald-400" />,
 };
 
-function getContextualTip(context: BriefContext, data: IntelligenceData): string {
+function getContextualTip(
+  context: BriefContext,
+  data: IntelligenceData,
+  metrics?: BriefMetrics
+): string {
   const topBias = data.causalWeights[0];
   const biasName = topBias ? formatBiasName(topBias.biasType) : null;
   const dangerX = topBias ? topBias.dangerMultiplier.toFixed(1) : null;
@@ -101,22 +112,45 @@ function getContextualTip(context: BriefContext, data: IntelligenceData): string
     case 'playbooks':
       return 'Playbooks are step-by-step debiasing guides for common decision patterns. They activate automatically when toxic combinations are detected.';
 
-    case 'journal':
+    case 'journal': {
+      const quality = data.profile?.avgDecisionQuality;
+      const logged = data.profile?.totalDecisions ?? 0;
+      if (quality && quality > 0 && logged >= 5) {
+        const calibrationLabel =
+          quality >= 80 ? 'well-calibrated' : quality >= 60 ? 'improving' : 'under-calibrated';
+        return `Your calibration is ${Math.round(quality)}/100 across ${logged} logged decisions — ${calibrationLabel}. Convert pending journal entries into full audits to tighten the signal.`;
+      }
       return 'Your decision journal captures decisions from email, Slack, and calendar automatically. Connect integrations in Settings to start logging.';
+    }
 
     case 'analytics':
       if (biasName && dangerX) {
         return `Your most dangerous bias is ${biasName} (${dangerX}x failure rate). Upload more documents to refine this signal.`;
       }
       return 'Analytics will populate as you analyze documents and track outcomes. Start with your first upload.';
+
+    case 'outcomes': {
+      const pending = metrics?.pendingOutcomes ?? 0;
+      const closure = metrics?.loopClosureRate;
+      if (pending > 0) {
+        const closurePct =
+          closure != null ? ` Loop closure: ${Math.round(closure * 100)}%.` : '';
+        return `${pending} decision${pending === 1 ? '' : 's'} awaiting outcome reports. Each one you close recalibrates the DQI signal for the bias${pending === 1 ? '' : 'es'} involved.${closurePct}`;
+      }
+      if (closure != null) {
+        return `Loop closure at ${Math.round(closure * 100)}%. Keep reporting outcomes — calibration compounds quarter after quarter.`;
+      }
+      return 'Report outcomes on your analyzed decisions to start the recalibration flywheel.';
+    }
   }
 }
 
 interface IntelligenceBriefProps {
   context: BriefContext;
+  metrics?: BriefMetrics;
 }
 
-export function IntelligenceBrief({ context }: IntelligenceBriefProps) {
+export function IntelligenceBrief({ context, metrics }: IntelligenceBriefProps) {
   const [data, setData] = useState<IntelligenceData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -149,7 +183,7 @@ export function IntelligenceBrief({ context }: IntelligenceBriefProps) {
     return null;
   }
 
-  const tip = getContextualTip(context, data);
+  const tip = getContextualTip(context, data, metrics);
   const topBiases = data.causalWeights.slice(0, 3);
   const profile = data.profile;
   const maturity = data.maturityScore;
