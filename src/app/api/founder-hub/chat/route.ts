@@ -172,7 +172,7 @@ export async function POST(req: NextRequest) {
           role: 'model',
           parts: [
             {
-              text: "Understood. I'm your Decision Intel strategic advisor. I will answer in clear prose without markdown bold, em dashes, or section headers, and lead with the answer rather than preamble.",
+              text: "Understood. I'm your decision-quality advisor, not a generic assistant. I'll lead with the answer, name biases in your framing when they appear, run pre-mortems on high-stakes decisions, and push back when the reasoning is thin. When you're rehearsing a CSO or VC pitch, I'll take the skeptical side hard. Clear prose, no markdown bold, no em dashes, no section headers.",
             },
           ],
         },

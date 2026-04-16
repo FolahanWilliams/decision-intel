@@ -1,24 +1,55 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { Brain, MessageSquare, Paperclip, X, FileText } from 'lucide-react';
+import { Brain, MessageSquare, Paperclip, X, FileText, Trash2 } from 'lucide-react';
 
 interface ChatMsg {
   role: 'user' | 'assistant';
   content: string;
 }
 
+/** Local storage key for persisting the chat across page loads. Scoped so
+ *  the mentor conversation survives refresh, tab switches, and browser
+ *  restarts — the mentor loses its value if every session starts cold. */
+const STORAGE_KEY = 'founder-chat-messages';
+const MAX_STORED_MESSAGES = 100;
+const MAX_SENT_HISTORY = 30;
+
+/** Starter prompts framed for a decision-coach, not a content ideation
+ *  tool. Grouped so the founder can pick a mode — rehearsal, live
+ *  decision audit, knowledge deepening, or execution check-in. */
 const STARTER_QUESTIONS = [
-  'Brainstorm LinkedIn posts for the Last-Mile Problem pillar',
-  'Draft a YouTube hook about rubber-stamp executive committees',
-  'What toxic combination case studies work best for content?',
-  'Elevator pitch for a VP of Strategy or Head of M&A?',
-  'Content ideas targeting corporate strategy and M&A teams',
-  'How to frame Decision Intel for M&A teams without threatening egos?',
-  'What Kahneman research supports the Decision Noise pillar?',
+  'Run a pre-mortem on my biggest open decision this week',
+  'What bias am I most at risk of right now? Audit my last few messages',
+  'Play a skeptical CSO — ask me the hardest buyer questions',
+  'Play a skeptical VC — challenge my moat story until it holds',
+  'Quiz me on the Platform Foundations — start with the DQI weightings',
+  "Reference-class forecast: how long does pre-seed close usually take?",
+  "Red-team my current week plan. Where am I avoiding customer conversations?",
 ];
 
 const ACCEPTED_TYPES = '.pdf,.txt,.md,.docx,.csv,.xlsx,.pptx,.html';
+
+function loadStoredMessages(): ChatMsg[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter(
+        (m: unknown): m is ChatMsg =>
+          typeof m === 'object' &&
+          m !== null &&
+          (m as ChatMsg).role !== undefined &&
+          typeof (m as ChatMsg).content === 'string',
+      )
+      .slice(-MAX_STORED_MESSAGES);
+  } catch {
+    return [];
+  }
+}
 
 export function FounderChatWidget({ founderPass }: { founderPass: string }) {
   const [open, setOpen] = useState(false);
@@ -28,10 +59,46 @@ export function FounderChatWidget({ founderPass }: { founderPass: string }) {
   const [attachedFile, setAttachedFile] = useState<File | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const hydrated = useRef(false);
+
+  // Hydrate from localStorage on mount so the conversation continues
+  // across sessions. Only runs once; subsequent state changes go through
+  // setMessages and the persistence effect below.
+  useEffect(() => {
+    setMessages(loadStoredMessages());
+    hydrated.current = true;
+  }, []);
+
+  // Persist every message change to localStorage. Skipped on the first
+  // render so we don't overwrite the hydrated value with an empty array.
+  useEffect(() => {
+    if (!hydrated.current) return;
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages.slice(-MAX_STORED_MESSAGES)));
+    } catch {
+      // storage quota hit — non-fatal, the chat keeps working in-memory
+    }
+  }, [messages]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  const handleClear = useCallback(() => {
+    if (streaming) return;
+    const shouldClear =
+      messages.length === 0
+        ? true
+        : window.confirm('Clear the whole conversation? The mentor loses all session memory.');
+    if (shouldClear) {
+      setMessages([]);
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch {
+        // ignore
+      }
+    }
+  }, [messages.length, streaming]);
 
   const handleSend = useCallback(async () => {
     if ((!input.trim() && !attachedFile) || streaming) return;
@@ -51,7 +118,7 @@ export function FounderChatWidget({ founderPass }: { founderPass: string }) {
         // Send as FormData when file is attached
         const formData = new FormData();
         formData.append('message', userMsg);
-        formData.append('history', JSON.stringify(messages.slice(-10)));
+        formData.append('history', JSON.stringify(messages.slice(-MAX_SENT_HISTORY)));
         formData.append('file', file);
 
         res = await fetch('/api/founder-hub/chat', {
@@ -68,7 +135,7 @@ export function FounderChatWidget({ founderPass }: { founderPass: string }) {
           },
           body: JSON.stringify({
             message: userMsg,
-            history: messages.slice(-10),
+            history: messages.slice(-MAX_SENT_HISTORY),
           }),
         });
       }
@@ -205,24 +272,59 @@ export function FounderChatWidget({ founderPass }: { founderPass: string }) {
           background: 'rgba(22, 163, 74, 0.08)',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Brain size={16} style={{ color: '#16A34A' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+          <Brain size={16} style={{ color: '#16A34A', flexShrink: 0 }} />
           <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
             Founder AI
           </span>
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              color: '#16A34A',
+              background: 'rgba(22,163,74,0.12)',
+              border: '1px solid rgba(22,163,74,0.25)',
+              padding: '2px 6px',
+              borderRadius: 999,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Decision Coach
+          </span>
         </div>
-        <button
-          onClick={() => setOpen(false)}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: 'var(--text-muted)',
-            cursor: 'pointer',
-            padding: 4,
-          }}
-        >
-          &times;
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
+          <button
+            onClick={handleClear}
+            disabled={streaming || messages.length === 0}
+            title="Clear conversation"
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--text-muted)',
+              cursor: streaming || messages.length === 0 ? 'default' : 'pointer',
+              opacity: streaming || messages.length === 0 ? 0.4 : 1,
+              padding: 4,
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <Trash2 size={13} />
+          </button>
+          <button
+            onClick={() => setOpen(false)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--text-muted)',
+              cursor: 'pointer',
+              padding: 4,
+            }}
+          >
+            &times;
+          </button>
+        </div>
       </div>
 
       {/* Messages */}
@@ -240,15 +342,16 @@ export function FounderChatWidget({ founderPass }: { founderPass: string }) {
           <div
             style={{
               textAlign: 'center',
-              padding: '30px 10px',
+              padding: '28px 10px',
               color: 'var(--text-muted)',
               fontSize: 12,
-              lineHeight: 1.6,
+              lineHeight: 1.65,
             }}
           >
-            Ask me about content strategy, LinkedIn/YouTube ideas, pillar topics, competitor
-            positioning, or research frameworks. You can also upload files (pitch decks, memos,
-            documents) for analysis.
+            Your decision-quality coach, not a generic chat. I&apos;ll push back on fuzzy reasoning,
+            run pre-mortems on high-stakes calls, play a skeptical CSO or VC when you rehearse,
+            and quiz you on the methodologies behind Decision Intel. Attach a memo or deck to
+            audit it in-thread.
             <div
               style={{
                 display: 'flex',
@@ -378,7 +481,11 @@ export function FounderChatWidget({ founderPass }: { founderPass: string }) {
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
-          placeholder={attachedFile ? 'Add a message about this file...' : 'Ask the Founder AI...'}
+          placeholder={
+            attachedFile
+              ? 'What do you want me to audit in this file?'
+              : 'Bring a decision, a pitch to rehearse, or a question…'
+          }
           disabled={streaming}
           style={{
             flex: 1,
