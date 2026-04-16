@@ -139,7 +139,9 @@ export function ToxicCombinationCard({
     <div className="space-y-3">
       <div className="flex items-center gap-2 mb-4">
         <ShieldAlert className="h-5 w-5 text-red-400" />
-        <h3 className="text-lg font-semibold text-white">Toxic Combinations</h3>
+        <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
+          Toxic Combinations
+        </h3>
         <span className="text-xs px-2 py-0.5 rounded-full bg-red-500/20 text-red-300">
           {combinations.length} detected
         </span>

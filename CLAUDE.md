@@ -163,6 +163,15 @@ src/
 - **Case study slugs:** Use `getSlugForCase()` from `src/lib/data/case-studies/slugs.ts` for URL-safe slugs. Case study URLs: `/case-studies/{slug}`.
 - **Landing page hero graph:** `src/components/marketing/HeroDecisionGraph.tsx` — interactive D3-like knowledge graph. The `CaseStudyBiasGraph` at `src/components/marketing/CaseStudyBiasGraph.tsx` is the simpler radial bias web used on case study cards and detail pages.
 
+### Visualization Components (light-theme audit rule)
+- Visualization cards (`ToxicCombinationCard`, `RiskHeatMap`, `GraphDetailPanel`, `DecisionTimeline`, `StakeholderMap`) keep dark-theme Tailwind classes **inside** their colored severity wrappers (`bg-red-950/40`, `bg-amber-950/20`) — that is correct, the interior is dark.
+- The audit rule: check only the **outermost** heading and elements that sit directly on the page surface. Any `text-white` on a standalone heading outside a dark wrapper is a bug. Interiors on red/amber/yellow severity cards can stay dark.
+- Same rule for `ActivityFeed` — rendered inside a platform `.card` (light), so its row content uses `var(--text-primary/secondary/muted)`, not `text-white` or `text-gray-400`.
+
+### DQI Grade Boundaries (locked)
+- Canonical grade scale: A 85+, B 70+, C 55+, D 40+, F 0+ — matches `src/lib/scoring/dqi.ts` → `GRADE_THRESHOLDS`.
+- The JSDoc at the top of `dqi.ts` is the external reference. **Update both** the comment AND `GRADE_THRESHOLDS` when changing boundaries, or the published contract drifts from runtime.
+
 ### Bias Taxonomy
 - 20 biases with stable taxonomy IDs: DI-B-001 through DI-B-020 (defined in `src/lib/constants/bias-education.ts`).
 - These IDs are permanent and published at `/taxonomy`. Never renumber or reassign them.

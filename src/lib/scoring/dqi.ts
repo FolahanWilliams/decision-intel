@@ -15,7 +15,7 @@
  *  Historical Alignment   10%   Correlation with 146-case study database
  * ─────────────────────────────────────────────
  *
- * Grades: A (80-100), B (65-79), C (50-64), D (35-49), F (0-34)
+ * Grades: A (85-100), B (70-84), C (55-69), D (40-54), F (0-39)
  */
 
 import { createLogger } from '@/lib/utils/logger';
