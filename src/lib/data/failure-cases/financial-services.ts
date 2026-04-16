@@ -53,6 +53,139 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       hypotheticalAnalysis:
         "DI would have flagged extreme overconfidence in housing market stability, anchoring to peer leverage ratios as justification (31:1 is dangerous regardless of peers), groupthink pattern of sidelining the CRO who raised concerns, and confirmation bias in selective use of 'regional softness' framing to dismiss systemic risk.",
     },
+    keyQuotes: [
+      {
+        text: "The real estate market, the bond market, in the short term have had such a major drop that it's kind of hard to believe. In the long run, the real estate market will be fine.",
+        source: 'Lehman Brothers Q2 2008 earnings call',
+        date: '2008-06-16',
+        speaker: 'Richard S. Fuld Jr., CEO',
+      },
+      {
+        text: 'Do we have a bazooka? No. Do we have a pea-shooter? Yes.',
+        source: 'Internal description of Lehman risk-management capability, cited in FCIC Report',
+        date: '2008',
+        speaker: 'Anonymous Lehman risk officer',
+      },
+      {
+        text: 'We have a huge brand with tremendous value that is based on our culture and our people. And those things we will never lose.',
+        source: 'Lehman Brothers Q1 2008 earnings call',
+        date: '2008-03-18',
+        speaker: 'Richard S. Fuld Jr., CEO',
+      },
+    ],
+    timeline: [
+      {
+        date: '2006-Q4',
+        event: 'Lehman becomes the #1 underwriter of U.S. MBS, aggressively expanding commercial real estate via Archstone acquisition commitments.',
+        source: 'FCIC Report, Chapter 9',
+      },
+      {
+        date: '2007-03',
+        event: 'Risk Committee memo recommends maintaining MBS exposure; cites "peer leverage" as benchmark.',
+        source: 'Valukas Report, Vol. 1',
+      },
+      {
+        date: '2007-Q2',
+        event: 'CRO Madelyn Antoncic raises concerns about leverage; is sidelined from risk decisions.',
+        source: 'Valukas Report, Vol. 3 (Antoncic testimony)',
+      },
+      {
+        date: '2007-12',
+        event: 'Repo 105 transactions escalate — $38.6B in assets temporarily removed from balance sheet at quarter-end.',
+        source: 'Valukas Report, Vol. 3',
+      },
+      {
+        date: '2008-03-16',
+        event: 'Bear Stearns collapse; Fuld tells staff Lehman is "not Bear Stearns." No material deleveraging follows.',
+        source: 'FCIC Report, Chapter 17',
+      },
+      {
+        date: '2008-06',
+        event: 'Lehman reports first quarterly loss ($2.8B); still pays $128M in dividends that quarter.',
+        source: 'Lehman Brothers Q2 2008 10-Q',
+      },
+      {
+        date: '2008-09-10',
+        event: 'Lehman preannounces $3.9B Q3 loss and $5.3B writedown; stock falls 45% in one day.',
+        source: 'Lehman Brothers September 10, 2008 press release',
+      },
+      {
+        date: '2008-09-15',
+        event: 'Lehman Brothers Holdings Inc. files Chapter 11 — largest bankruptcy in U.S. history ($691B in assets).',
+        source: 'SDNY Case No. 08-13555',
+      },
+    ],
+    stakeholders: [
+      {
+        name: 'Richard S. Fuld Jr.',
+        role: 'Chairman & CEO',
+        position: 'advocate',
+        notes: 'Dominated board discussion; publicly rejected multiple buyout approaches (Korea Development Bank, Warren Buffett in 2008).',
+      },
+      {
+        name: 'Joseph Gregory',
+        role: 'President & COO',
+        position: 'advocate',
+        notes: 'Pushed aggressive expansion into commercial real estate. Fired by Fuld in June 2008 after Q2 loss.',
+      },
+      {
+        name: 'Madelyn Antoncic',
+        role: 'Chief Risk Officer (to 2007)',
+        position: 'overruled',
+        notes: 'Raised concerns about leverage and CRE exposure through 2006–2007; moved out of risk role in late 2007.',
+      },
+      {
+        name: 'Erin Callan',
+        role: 'CFO (Dec 2007 – June 2008)',
+        position: 'advocate',
+        notes: 'Publicly defended balance sheet through Q1/Q2 2008. Departed shortly before collapse.',
+      },
+      {
+        name: 'Henry "Hank" Kaufman',
+        role: 'Board Director (Finance & Risk Committee chair)',
+        position: 'silent',
+        notes: 'Economist with deep market expertise; committee met twice in 2006 and twice in 2007 despite the exposure buildup.',
+      },
+    ],
+    counterfactual: {
+      recommendation:
+        'Cut gross leverage from 31:1 toward 15:1 by Q4 2007 via asset sales and equity raise; hedge MBS concentration via CDX indices; reinstate CRO authority over exposure limits; halt Archstone acquisition closing.',
+      rationale:
+        'Lehman had three distinct windows (March 2007 peer concerns, August 2007 Bear hedge-fund collapse, March 2008 Bear bailout) where a less-biased process would have forced deleveraging. The decision to keep expanding through all three is what made failure catastrophic rather than merely painful.',
+      estimatedOutcome:
+        'Survival as a significantly smaller firm — likely acquired or recapitalized in 2008 rather than liquidated, preserving ~$600B of counterparty value and avoiding the global credit freeze that Lehman\'s uncontrolled failure triggered.',
+    },
+    dqiEstimate: {
+      score: 22,
+      grade: 'F',
+      topBiases: ['overconfidence_bias', 'groupthink', 'anchoring_bias'],
+      rationale:
+        'Near-unanimous board, dissenting CRO sidelined rather than escalated, leverage framed against peers rather than absolute risk tolerance, and explicit dismissal of Bear Stearns as an applicable signal — all hallmarks of an F-grade decision process.',
+    },
+    postMortemCitations: [
+      {
+        label: 'Valukas Report (Report of Examiner Anton R. Valukas)',
+        year: 2010,
+        excerpt:
+          'Lehman repeatedly exceeded its own internal risk limits and concentration limits... senior management intentionally exceeded these limits in pursuit of its growth strategy.',
+      },
+      {
+        label: 'Financial Crisis Inquiry Commission Report, Chapter 17 ("The Fall of Lehman")',
+        year: 2011,
+      },
+      {
+        label: 'SEC vs. Fuld et al., SDNY (investigation closed without charges, 2012)',
+        year: 2012,
+      },
+      {
+        label: 'House Committee on Oversight testimony, October 6, 2008',
+        year: 2008,
+        excerpt:
+          "Fuld: 'Until the day they put me in the ground, I will wonder' — on what caused the collapse.",
+      },
+    ],
+    relatedCases: ['fin-002', 'fin-005', 'fin-007', 'fin-008'],
+    patternFamily: 'Leveraged Hubris + Sidelined Risk Function',
     source:
       'Lehman Brothers Holdings Inc. Chapter 11 Proceedings, SDNY Case No. 08-13555; Financial Crisis Inquiry Commission Report (2011)',
     sourceType: 'sec_filing',
@@ -221,6 +354,119 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       hypotheticalAnalysis:
         "A decision intelligence system would have flagged the fundamental model risk — VaR calculations assuming normal distributions while the fund's own leverage amplified tail-risk exposure. The 'negligible risk' characterization in the investor letter, contradicted by 25:1 leverage ratios, would have triggered overconfidence and authority bias warnings.",
     },
+    keyQuotes: [
+      {
+        text: 'The fund returned capital of $2.7 billion to investors... because the opportunities had become too few.',
+        source: 'LTCM 1997 Annual Letter to Investors',
+        date: '1997-12',
+        speaker: 'John Meriwether, Founding Principal',
+      },
+      {
+        text: 'Our results should not be too different from the market, and our long-term record is one of minimum drawdowns.',
+        source: 'LTCM investor communication, Q2 1998',
+        date: '1998-07',
+        speaker: 'John Meriwether, Founding Principal',
+      },
+      {
+        text: 'What we did will be seen as completely sensible to a dispassionate observer... we had the right strategy — we simply had too much leverage.',
+        source: 'Interview with Myron Scholes, cited in "When Genius Failed"',
+        date: '1999',
+        speaker: 'Myron Scholes, Nobel Laureate & LTCM Principal',
+      },
+    ],
+    timeline: [
+      {
+        date: '1994-02',
+        event: 'LTCM launches with $1.25B from 80 investors at 25× leverage; initial principals include Meriwether, Scholes, Merton, and ex-Fed Vice Chairman David Mullins.',
+        source: 'PWG Report, Appendix A',
+      },
+      {
+        date: '1996',
+        event: 'Returns of 41% net of fees; fund becomes unable to deploy new capital at same convergence spreads, signaling trade crowding.',
+        source: 'Lowenstein, "When Genius Failed", ch. 7',
+      },
+      {
+        date: '1997-12',
+        event: 'Fund returns $2.7B to investors — but retains full trading book, actually *increasing* leverage relative to equity base.',
+        source: 'LTCM 1997 investor letter',
+      },
+      {
+        date: '1998-05',
+        event: 'Salomon Smith Barney closes its arbitrage desk, unwinding positions similar to LTCM — the first warning that "convergence" strategies were becoming divergent.',
+        source: 'PWG Report, ch. 3',
+      },
+      {
+        date: '1998-08-17',
+        event: 'Russia defaults on ruble-denominated debt; flight-to-quality drives spreads wider rather than narrower. LTCM loses 44% of capital in one month.',
+        source: 'Federal Reserve Board staff study (Kambhu et al., 2007)',
+      },
+      {
+        date: '1998-09-23',
+        event: 'Fed-organized consortium of 14 banks injects $3.625B to prevent forced liquidation; LTCM effectively dissolved.',
+        source: "PWG Report, ch. 4",
+      },
+    ],
+    stakeholders: [
+      {
+        name: 'John Meriwether',
+        role: 'Founding Principal & CEO',
+        position: 'advocate',
+        notes: 'Pushed to return capital in 1997 to keep per-partner returns high rather than shrink leverage.',
+      },
+      {
+        name: 'Myron Scholes',
+        role: 'Principal (Nobel Laureate, Options Pricing)',
+        position: 'advocate',
+        notes: 'Publicly defended the model framework; later acknowledged leverage as the core error.',
+      },
+      {
+        name: 'Robert Merton',
+        role: 'Principal (Nobel Laureate, Continuous-Time Finance)',
+        position: 'advocate',
+      },
+      {
+        name: 'David Mullins',
+        role: 'Principal (former Fed Vice Chair)',
+        position: 'silent',
+        notes: 'Brought regulatory gravitas but did not publicly flag leverage or crowding concerns.',
+      },
+      {
+        name: 'Eric Rosenfeld',
+        role: 'Principal (risk & trading systems)',
+        position: 'advocate',
+      },
+    ],
+    counterfactual: {
+      recommendation:
+        'Retain 1997 capital base (avoid the forced leverage increase); cap gross leverage at 10:1; diversify across strategies with genuinely uncorrelated drivers; install an independent non-principal risk officer with veto power.',
+      rationale:
+        'Every bias LTCM exhibited traces to a closed-loop where the same people who designed the models also signed off on leverage and rejected external challenge. The model wasn\'t the problem — absence of any external risk voice was.',
+      estimatedOutcome:
+        'Fund survives Russia default with 15–20% drawdown rather than 44%; likely continues operating through the early 2000s before gradual wind-down.',
+    },
+    dqiEstimate: {
+      score: 28,
+      grade: 'F',
+      topBiases: ['overconfidence_bias', 'authority_bias', 'groupthink'],
+      rationale:
+        'The presence of two Nobel laureates made the model un-challengeable internally (authority bias), external risk voices were absent (no non-principal risk committee), and the 1997 capital return increased rather than decreased effective leverage — a decision only explicable under overconfidence.',
+    },
+    postMortemCitations: [
+      {
+        label: "President's Working Group on Financial Markets Report",
+        year: 1999,
+      },
+      {
+        label: 'Roger Lowenstein, "When Genius Failed: The Rise and Fall of Long-Term Capital Management"',
+        year: 2000,
+      },
+      {
+        label: 'Kambhu, Schuermann & Stiroh, "Hedge Funds, Financial Intermediation, and Systemic Risk" (Federal Reserve Bank of New York Staff Reports, No. 291)',
+        year: 2007,
+      },
+    ],
+    relatedCases: ['fin-001', 'fin-002', 'fin-008'],
+    patternFamily: 'Model-Worship + Unchallenged Expertise',
     source:
       'Roger Lowenstein, "When Genius Failed" (2000); President\'s Working Group on Financial Markets Report (1999)',
     sourceType: 'academic_paper',
@@ -376,6 +622,145 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       hypotheticalAnalysis:
         'Decision intelligence would have flagged the unusual trustee account structure as a verification gap — the inability to independently confirm €1.9B in assets through standard audit procedures was a critical red flag. The pattern of attacking short-sellers rather than providing transparent rebuttals would have triggered authority bias and confirmation bias warnings.',
     },
+    keyQuotes: [
+      {
+        text: 'There is zero truth to the allegations... the report is not only wrong, but it is a baseless attack on our company.',
+        source: 'Wirecard response to FT "House of Wirecard" investigation',
+        date: '2019-02',
+        speaker: 'Markus Braun, CEO',
+      },
+      {
+        text: 'BaFin stands on the side of Wirecard.',
+        source: 'BaFin short-selling ban announcement (paraphrased across German press)',
+        date: '2019-02-18',
+        speaker: 'Felix Hufeld, BaFin President',
+      },
+      {
+        text: 'The missing €1.9 billion probably does not exist.',
+        source: 'Wirecard AG ad-hoc disclosure',
+        date: '2020-06-22',
+        speaker: 'Wirecard management board',
+      },
+    ],
+    timeline: [
+      {
+        date: '2015-04',
+        event: 'FT Alphaville publishes first "House of Wirecard" posts raising concerns about Asian subsidiaries.',
+        source: 'Financial Times, Dan McCrum',
+      },
+      {
+        date: '2018-09',
+        event: 'Wirecard joins the DAX 30, replacing Commerzbank — market cap peaks near €24B.',
+        source: 'Deutsche Börse press release',
+      },
+      {
+        date: '2019-01',
+        event: 'FT publishes leaked internal documents alleging accounting fraud at Wirecard Singapore.',
+        source: 'FT investigation, Jan 30 2019',
+      },
+      {
+        date: '2019-02-18',
+        event: 'BaFin imposes a two-month ban on short selling Wirecard stock and files criminal complaint against FT journalists for market manipulation.',
+        source: 'BaFin official announcement',
+      },
+      {
+        date: '2019-04',
+        event: 'EY issues unqualified 2018 audit opinion despite not obtaining direct confirmation from the Philippine trustee banks.',
+        source: 'German Parliamentary Inquiry testimony, 2021',
+      },
+      {
+        date: '2019-10',
+        event: 'Wirecard commissions KPMG special audit in response to FT reporting.',
+        source: 'Wirecard ad-hoc disclosure',
+      },
+      {
+        date: '2020-04-28',
+        event: 'KPMG special audit report: could not verify the existence of the €1.9B or the revenue from three key partner businesses.',
+        source: 'KPMG Special Investigation Report, April 2020',
+      },
+      {
+        date: '2020-06-18',
+        event: 'BDO confirms from Philippine central bank that the €1.9B never existed in the named accounts.',
+        source: 'FT, BSP statement',
+      },
+      {
+        date: '2020-06-25',
+        event: 'Wirecard files for insolvency; Braun arrested.',
+        source: 'Munich District Court filings',
+      },
+    ],
+    stakeholders: [
+      {
+        name: 'Markus Braun',
+        role: 'CEO (2002–2020)',
+        position: 'advocate',
+        notes: 'Arrested June 2020; convicted on fraud and market-manipulation charges in 2024.',
+      },
+      {
+        name: 'Jan Marsalek',
+        role: 'COO',
+        position: 'advocate',
+        notes: 'Fled Germany June 2020; believed to be in Russia.',
+      },
+      {
+        name: 'Alexander von Knoop',
+        role: 'CFO',
+        position: 'silent',
+      },
+      {
+        name: 'Thomas Eichelmann',
+        role: 'Supervisory Board Chair (from Jan 2020)',
+        position: 'dissenter',
+        notes: 'Commissioned the KPMG special audit that ultimately exposed the fraud.',
+      },
+      {
+        name: 'Felix Hufeld',
+        role: 'BaFin President (2015–2021)',
+        position: 'overruled',
+        notes: 'Forced to resign January 2021 after acknowledging BaFin "was not effective enough."',
+      },
+      {
+        name: 'Dan McCrum',
+        role: 'Financial Times investigative reporter',
+        position: 'dissenter',
+        notes: 'Subject of BaFin criminal complaint; reporting vindicated by KPMG and BDO findings.',
+      },
+    ],
+    counterfactual: {
+      recommendation:
+        'BaFin investigates the FT allegations on their merits rather than shorting the messengers; EY refuses to sign the 2018 audit without direct bank confirmations from BDO Unibank and BPI; supervisory board commissions independent audit in 2019 rather than 2020.',
+      rationale:
+        'Every escalation point — regulator, auditor, board — chose institutional defense over independent verification. A decision process with even one working circuit-breaker would have shortened the fraud window by 18–24 months and prevented the DAX 30 listing.',
+      estimatedOutcome:
+        'Fraud exposed at ~€500M scale in 2019 rather than €1.9B in 2020. Wirecard delisted but not the systemic failure it became; BaFin retains credibility.',
+    },
+    dqiEstimate: {
+      score: 18,
+      grade: 'F',
+      topBiases: ['confirmation_bias', 'authority_bias', 'halo_effect'],
+      rationale:
+        'DAX 30 status (halo), regulator alignment with the company (authority), and active hostility toward critics (confirmation bias as organizational posture) made the decision process structurally incapable of self-correction.',
+    },
+    postMortemCitations: [
+      {
+        label: 'German Parliamentary Inquiry into Wirecard (Untersuchungsausschuss)',
+        year: 2021,
+      },
+      {
+        label: 'KPMG Special Investigation Report on Wirecard AG',
+        year: 2020,
+      },
+      {
+        label: 'Dan McCrum, "Money Men: A Hot Startup, A Billion Dollar Fraud, A Fight for the Truth"',
+        year: 2022,
+      },
+      {
+        label: 'EY disciplinary proceedings by Abschlussprüferaufsichtsstelle (APAS)',
+        year: 2023,
+      },
+    ],
+    relatedCases: ['fin-001', 'fin-005', 'fin-006'],
+    patternFamily: 'Regulator Capture + Shoot-the-Messenger',
     source:
       'German Parliamentary Inquiry into Wirecard (2021); FT investigative series by Dan McCrum (2015-2020)',
     sourceType: 'news_investigation',

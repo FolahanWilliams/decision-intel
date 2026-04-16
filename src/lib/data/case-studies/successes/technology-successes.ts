@@ -131,6 +131,140 @@ export const TECHNOLOGY_SUCCESS_CASES: CaseStudy[] = [
       hypotheticalAnalysis:
         'DI Platform would flag: "Patient Bet" + "Controlled Burn" beneficial patterns detected. Key distinction: this decision acknowledges risk transparently (CEO publicly warning about margin compression) rather than hiding it. Status quo bias is present in the organization (DVD still growing) but leadership is ACTIVELY managing it by studying Blockbuster\'s failure. Planning fallacy risk: streaming profitability timeline likely underestimated — platform would recommend maintaining DVD cash flow bridge for 3-5 years longer than management projects. Verdict: biases present but mitigation factors are strong. Iterative rollout (streaming free for existing subscribers) de-risks the bet. Recommendation: Proceed with caution on timeline — ensure DVD business is not prematurely cannibalized before streaming economics are proven.',
     },
+    keyQuotes: [
+      {
+        text: 'Most companies that are great at something don\'t become great at new things... because they don\'t want to disrupt themselves.',
+        source: 'Reed Hastings interview, Charlie Rose',
+        date: '2013',
+        speaker: 'Reed Hastings, CEO',
+      },
+      {
+        text: 'Why are we launching a new service with a worse user experience... Because we would rather be cannibalized by ourselves than by someone else.',
+        source: 'Reed Hastings internal memo, paraphrased in "No Rules Rules"',
+        date: '2011',
+        speaker: 'Reed Hastings, CEO',
+      },
+      {
+        text: 'In hindsight, I slid into arrogance based upon past success.',
+        source: 'Reed Hastings public apology re: Qwikster',
+        date: '2011-10-10',
+        speaker: 'Reed Hastings, CEO',
+      },
+      {
+        text: 'We didn\'t want to become the next Blockbuster.',
+        source: 'Reed Hastings, "No Rules Rules"',
+        date: '2020',
+        speaker: 'Reed Hastings, CEO',
+      },
+    ],
+    timeline: [
+      {
+        date: '2007-01',
+        event: 'Netflix launches "Watch Now" streaming as free add-on for DVD subscribers — 1,000 titles initially.',
+        source: 'Netflix Q1 2007 shareholder letter',
+      },
+      {
+        date: '2008-10',
+        event: 'Netflix signs Starz Play content deal — ~$30M/year for streaming rights to premium content.',
+        source: 'Netflix Q4 2008 earnings call',
+      },
+      {
+        date: '2010-11',
+        event: 'Netflix launches standalone streaming plan ($7.99/mo) — decoupling streaming from DVD pricing.',
+        source: 'Netflix Q4 2010 shareholder letter',
+      },
+      {
+        date: '2011-07-12',
+        event: 'Price hike splits DVD and streaming plans — customer backlash loses ~800K subscribers.',
+        source: 'Netflix Q3 2011 shareholder letter',
+      },
+      {
+        date: '2011-09-18',
+        event: 'Hastings announces Qwikster spinoff of DVD business.',
+        source: 'Netflix blog post, September 18 2011',
+      },
+      {
+        date: '2011-10-10',
+        event: 'Netflix abandons Qwikster after 23 days — Hastings publicly apologizes.',
+        source: 'Netflix press release, October 10 2011',
+      },
+      {
+        date: '2013-02-01',
+        event: 'House of Cards launches — first high-profile Netflix Original Series, committing the company to original content.',
+        source: 'Netflix press release, February 1 2013',
+      },
+      {
+        date: '2013-12',
+        event: 'International streaming expansion into 41 Latin American countries; streaming revenue overtakes DVD for the first time.',
+        source: 'Netflix Q4 2013 shareholder letter',
+      },
+    ],
+    stakeholders: [
+      {
+        name: 'Reed Hastings',
+        role: 'Co-founder & CEO',
+        position: 'advocate',
+        notes: 'Drove the streaming pivot and owned the Qwikster reversal publicly.',
+      },
+      {
+        name: 'Ted Sarandos',
+        role: 'Chief Content Officer',
+        position: 'advocate',
+        notes: 'Led the bet on original content; later co-CEO.',
+      },
+      {
+        name: 'Andy Rendich',
+        role: 'CEO, Qwikster (briefly) / former operations lead',
+        position: 'overruled',
+        notes: 'Was tapped to run the spun-off DVD business; role eliminated when Qwikster was reversed.',
+      },
+      {
+        name: 'Netflix Board (including Jay Hoag, Richard Barton)',
+        role: 'Board of Directors',
+        position: 'advocate',
+        notes: 'Tolerated multi-year margin compression and the Qwikster reversal without ousting Hastings — rare governance patience.',
+      },
+      {
+        name: 'Wall Street analysts (e.g., Michael Pachter)',
+        role: 'External skeptics',
+        position: 'dissenter',
+        notes: 'Repeatedly downgraded Netflix through 2011–2013; vindicated a subscriber-base view of value only after 2014.',
+      },
+    ],
+    counterfactual: {
+      recommendation:
+        '(This IS the counterfactual to Blockbuster.) Netflix\'s process — transparent margin compression guidance, iterative launch, deliberate study of Blockbuster\'s failure, willingness to reverse Qwikster within 23 days — is the canonical "good decision under biased conditions" model.',
+      rationale:
+        'The informative feature of this case is not what went right in 2007, but what Hastings *could have gotten wrong* and caught. The Qwikster reversal is the most important data point — a board tolerant of strategic reversal is the ultimate anti-sunk-cost institutional asset.',
+      estimatedOutcome:
+        'Netflix becomes what it actually became — $200B+ market cap category-definer — precisely because the biases present (status quo, loss aversion, planning fallacy) were *named and actively managed* rather than denied.',
+    },
+    dqiEstimate: {
+      score: 84,
+      grade: 'B',
+      topBiases: ['planning_fallacy', 'anchoring_bias'],
+      rationale:
+        'Not a perfect A (the 2011 Qwikster misstep is a real planning-fallacy failure) but an exceptional B — dissent-welcoming process, deliberate de-biasing via studying Blockbuster, transparent risk communication to shareholders, and organizational willingness to reverse course.',
+    },
+    postMortemCitations: [
+      {
+        label: 'Reed Hastings & Erin Meyer, "No Rules Rules: Netflix and the Culture of Reinvention"',
+        year: 2020,
+      },
+      {
+        label: 'Gina Keating, "Netflixed: The Epic Battle for America\'s Eyeballs"',
+        year: 2012,
+      },
+      {
+        label: 'Harvard Business School Case 615-007: Netflix: Designing, Pricing, and Managing Its Streaming Service',
+        year: 2014,
+      },
+      {
+        label: 'Netflix 10-K filings (2007–2013)',
+      },
+    ],
+    relatedCases: ['tech-003', 'tech-001'],
+    patternFamily: 'Self-Disruption with Dissent-Tolerant Governance',
   },
   {
     id: 'cs-success-tech-003',

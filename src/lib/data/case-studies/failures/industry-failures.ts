@@ -72,6 +72,156 @@ export const INDUSTRY_FAILURE_CASES: CaseStudy[] = [
       hypotheticalAnalysis:
         'DI Platform would flag: CRITICAL "Blind Sprint" toxic combination — time pressure + groupthink + planning fallacy. The decision to re-engine rather than design new is defensible, but the DOWNSTREAM framing of MCAS as "minor" is where catastrophic risk accumulates. Red flag: classifying a system that can override pilot control authority as a "minor modification" is the framing effect at its most dangerous. Second red flag: zero documented dissent among 20 participants on a safety-critical aerospace decision — in any healthy engineering culture, this unanimity itself is a warning sign. The platform would generate an IMMEDIATE ESCALATION: "This decision involves safety-of-flight systems where failure modes include loss of life. The combination of time pressure, framing effects, and unanimous consensus requires independent safety review outside the program management chain." Recommendation: Require dual-sensor redundancy as a non-negotiable design constraint before program approval.',
     },
+    keyQuotes: [
+      {
+        text: "Designed by clowns who in turn are supervised by monkeys.",
+        source: 'Boeing internal instant message, released by House Committee',
+        date: '2017-06',
+        speaker: 'Boeing 737 MAX engineer (internal Slack-equivalent)',
+      },
+      {
+        text: "I still haven't been forgiven by God for the covering up I did last year.",
+        source: 'Boeing internal instant message, released by House Committee',
+        date: '2018',
+        speaker: 'Mark Forkner, Chief Technical Pilot (later acquitted at trial)',
+      },
+      {
+        text: 'We are not going to rush to make a decision just because of pressure.',
+        source: 'Statement to analysts after Lion Air 610',
+        date: '2018-11',
+        speaker: 'Dennis Muilenburg, CEO',
+      },
+      {
+        text: "I sincerely apologize from the bottom of my heart.",
+        source: 'Senate Commerce Committee testimony',
+        date: '2019-10-29',
+        speaker: 'Dennis Muilenburg, CEO (to families of crash victims)',
+      },
+    ],
+    timeline: [
+      {
+        date: '2011-08',
+        event: 'American Airlines signals it will order Airbus A320neo unless Boeing responds — forcing Boeing to commit to re-engined 737 (MAX) rather than clean-sheet design.',
+        source: 'House Committee report, Ch. 2',
+      },
+      {
+        date: '2012',
+        event: 'Engineers discover larger CFM LEAP engines require mounting forward/higher — creates nose-up pitch tendency under certain conditions. MCAS is designed as a software fix.',
+        source: 'House Committee report, Ch. 3',
+      },
+      {
+        date: '2013',
+        event: 'Boeing internal decision to rely on a single Angle-of-Attack sensor for MCAS inputs (rather than both) to avoid triggering a new simulator training requirement.',
+        source: 'DOJ Deferred Prosecution Agreement, January 2021',
+      },
+      {
+        date: '2016-11',
+        event: 'Chief Technical Pilot Mark Forkner asks FAA to remove MCAS from the 737 MAX Flight Crew Operations Manual — approved.',
+        source: 'FAA correspondence, cited in House Committee report',
+      },
+      {
+        date: '2017-03-08',
+        event: 'FAA grants amended type certificate for 737 MAX — without requiring new simulator training.',
+        source: 'FAA Type Certificate, 737-8',
+      },
+      {
+        date: '2018-10-29',
+        event: 'Lion Air Flight 610 crashes into Java Sea, killing 189.',
+        source: 'KNKT (Indonesia) final report',
+      },
+      {
+        date: '2019-03-10',
+        event: 'Ethiopian Airlines Flight 302 crashes after takeoff, killing 157. Fleet grounded globally within 72 hours.',
+        source: 'EAIB Interim Report; FAA emergency order',
+      },
+      {
+        date: '2020-11-18',
+        event: 'FAA approves return to service after 20-month grounding and MCAS redesign to use both AoA sensors.',
+        source: 'FAA Airworthiness Directive 2020-24-02',
+      },
+      {
+        date: '2021-01-07',
+        event: 'DOJ Deferred Prosecution Agreement — Boeing agrees to $2.5B penalty for conspiracy to defraud the FAA.',
+        source: 'DOJ press release, January 7 2021',
+      },
+    ],
+    stakeholders: [
+      {
+        name: 'Dennis Muilenburg',
+        role: 'CEO (2015–2019)',
+        position: 'advocate',
+        notes: 'Oversaw MAX program through both crashes. Fired December 2019; received ~$62M in severance and stock.',
+      },
+      {
+        name: 'Kevin McAllister',
+        role: 'CEO, Boeing Commercial Airplanes',
+        position: 'advocate',
+        notes: 'Fired October 2019 amid MAX crisis.',
+      },
+      {
+        name: 'Mark Forkner',
+        role: 'Chief Technical Pilot',
+        position: 'overruled',
+        notes: 'Asked FAA to drop MCAS from pilot training docs. Acquitted at trial 2022 — jury accepted he was scapegoated for systemic decisions made above him.',
+      },
+      {
+        name: 'Curtis Ewbank',
+        role: 'Boeing engineer',
+        position: 'dissenter',
+        notes: 'Raised concerns about MCAS single-sensor design during development; concerns were dismissed.',
+      },
+      {
+        name: 'Ali Bahrami',
+        role: 'FAA Associate Administrator for Aviation Safety',
+        position: 'silent',
+        notes: 'Previously Boeing lobbyist; symbolizes the FAA-industry revolving door flagged by NTSB.',
+      },
+      {
+        name: 'Edward Pierson',
+        role: 'Boeing 737 production manager (dissenter & whistleblower)',
+        position: 'dissenter',
+        notes: 'Warned senior leadership in 2018 about production-line quality breakdown at Renton facility.',
+      },
+    ],
+    counterfactual: {
+      recommendation:
+        'Require dual-sensor AoA redundancy for MCAS from inception; disclose MCAS in the Flight Crew Operations Manual and require differences training for 737 NG pilots; escalate Curtis Ewbank\'s concerns to independent safety review outside the 737 MAX program office; separate the Boeing Designated Engineering Representative (DER) function from program schedule pressure; ground the fleet after Lion Air 610 pending root-cause analysis rather than after Ethiopian 302.',
+      rationale:
+        'This is the clearest "framing effect kills people" case in the modern dataset. Classifying a flight-critical automated system as a "minor modification" to avoid simulator training is the bias in its most concrete form. The single-sensor design was knowable, documentable, and dissent was actively present — it was overridden by schedule/cost framing.',
+      estimatedOutcome:
+        '737 MAX program ships 12–18 months later with dual-sensor MCAS and disclosed training. Both crashes avoided. Boeing avoids $20B+ in direct costs and its certification credibility stays intact — avoiding the subsequent 737 MAX 9 door plug, 787 quality, and leadership turnover cascade.',
+    },
+    dqiEstimate: {
+      score: 16,
+      grade: 'F',
+      topBiases: ['framing_effect', 'planning_fallacy', 'groupthink'],
+      rationale:
+        'A safety-of-flight decision made under time pressure with unanimous consensus, zero documented dissent among 20 participants, and explicit framing of a flight-control override system as a "minor change" to manufacture a regulatory outcome. Every dimension of the DQI framework is simultaneously failing.',
+    },
+    postMortemCitations: [
+      {
+        label: 'House Committee on Transportation & Infrastructure, "The Design, Development & Certification of the Boeing 737 MAX"',
+        year: 2020,
+      },
+      {
+        label: 'DOJ Deferred Prosecution Agreement (U.S. v. The Boeing Company)',
+        year: 2021,
+      },
+      {
+        label: 'KNKT (Indonesia NTSC) Aircraft Accident Investigation Report PK-LQP',
+        year: 2019,
+      },
+      {
+        label: 'EAIB Interim Investigation Report ET-AVJ',
+        year: 2019,
+      },
+      {
+        label: 'Netflix documentary "Downfall: The Case Against Boeing"',
+        year: 2022,
+      },
+    ],
+    relatedCases: ['fin-001', 'tech-005'],
+    patternFamily: 'Schedule-Driven Safety Framing',
   },
   {
     id: 'cs-fail-ind-002',

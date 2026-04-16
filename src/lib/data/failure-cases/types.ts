@@ -58,4 +58,49 @@ export interface FailureCase {
     | 'post_mortem'
     | 'academic_paper'
     | 'news_investigation';
+
+  // ---------- Tier 2 depth fields (optional — flow through adapter) ----------
+
+  /** Key quotes from primary sources. */
+  keyQuotes?: Array<{ text: string; source: string; date?: string; speaker?: string }>;
+
+  /** Dated pre-decision signals. */
+  timeline?: Array<{ date: string; event: string; source?: string }>;
+
+  /** Named board/exec participants and their positions on the decision. */
+  stakeholders?: Array<{
+    name: string;
+    role: string;
+    position: 'advocate' | 'dissenter' | 'silent' | 'overruled' | 'unknown';
+    notes?: string;
+  }>;
+
+  /** What a competent audit process would have recommended instead. */
+  counterfactual?: {
+    recommendation: string;
+    rationale: string;
+    estimatedOutcome?: string;
+  };
+
+  /** Hypothetical DQI score the platform would have assigned pre-decision. */
+  dqiEstimate?: {
+    score: number;
+    grade: 'A' | 'B' | 'C' | 'D' | 'F';
+    topBiases: string[];
+    rationale?: string;
+  };
+
+  /** Primary-source post-mortem citations. */
+  postMortemCitations?: Array<{
+    label: string;
+    url?: string;
+    excerpt?: string;
+    year?: number;
+  }>;
+
+  /** IDs of other cases that share a decision pattern. */
+  relatedCases?: string[];
+
+  /** Named archetype (e.g. "Founder Hubris + Capital Abundance"). */
+  patternFamily?: string;
 }
