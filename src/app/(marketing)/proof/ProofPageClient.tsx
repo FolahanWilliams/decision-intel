@@ -15,6 +15,8 @@ import { CaseSelector } from '@/components/marketing/proof/CaseSelector';
 import { PreDecisionDocument } from '@/components/marketing/proof/PreDecisionDocument';
 import { FlaggedAnalysisPanel } from '@/components/marketing/proof/FlaggedAnalysisPanel';
 import { OutcomeReveal } from '@/components/marketing/proof/OutcomeReveal';
+import { DecisionTimeline } from '@/components/marketing/proof/DecisionTimeline';
+import { CaseBiasWeb } from '@/components/marketing/proof/CaseBiasWeb';
 
 const C = {
   navy: '#0F172A',
@@ -65,6 +67,20 @@ export function ProofPageClient() {
         company: c.company,
         year: c.year,
         outcome: c.outcome,
+      })),
+    [deepCases]
+  );
+
+  const timelineEntries = useMemo(
+    () =>
+      deepCases.map(c => ({
+        slug: getSlugForCase(c),
+        company: c.company,
+        year: c.year,
+        yearRealized: c.yearRealized,
+        outcome: c.outcome,
+        impactScore: c.impactScore,
+        industry: c.industry,
       })),
     [deepCases]
   );
@@ -164,11 +180,20 @@ export function ProofPageClient() {
         </div>
       </section>
 
-      {/* CASE SELECTOR — sticky ─────────────────────────────────── */}
-      <CaseSelector cases={caseEntries} activeSlug={activeSlug} />
+      {/* DECISION TIMELINE — hero visualization of the full set ───── */}
+      <section style={{ padding: '40px 24px 0' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+          <DecisionTimeline cases={timelineEntries} activeSlug={activeSlug} />
+        </div>
+      </section>
+
+      {/* CASE SELECTOR — sticky quick-jump ───────────────────────── */}
+      <div style={{ marginTop: 24 }}>
+        <CaseSelector cases={caseEntries} activeSlug={activeSlug} />
+      </div>
 
       {/* FEATURED CASE ──────────────────────────────────────────── */}
-      <main style={{ maxWidth: 1280, margin: '0 auto', padding: '48px 24px 80px' }}>
+      <main style={{ maxWidth: 1280, margin: '0 auto', padding: '40px 24px 80px' }}>
         {/* Featured case header */}
         <div style={{ marginBottom: 28 }}>
           <div
@@ -235,7 +260,7 @@ export function ProofPageClient() {
         </div>
 
         {/* Outcome reveal */}
-        <div style={{ marginBottom: 56 }}>
+        <div style={{ marginBottom: 32 }}>
           <OutcomeReveal
             company={active.company}
             outcome={active.outcome}
@@ -244,6 +269,16 @@ export function ProofPageClient() {
             estimatedImpact={active.estimatedImpact}
             summary={active.summary}
             detailHref={`/case-studies/${activeSlug}`}
+          />
+        </div>
+
+        {/* BIAS WEB for the featured case ─────────────────────────── */}
+        <div style={{ marginBottom: 56 }}>
+          <CaseBiasWeb
+            biases={evidence.flaggableBiases}
+            primaryBias={active.primaryBias}
+            caseLabel={`${active.company}, ${active.year}`}
+            activePatterns={active.toxicCombinations}
           />
         </div>
 

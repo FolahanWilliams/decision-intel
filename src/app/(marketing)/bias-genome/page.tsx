@@ -5,6 +5,8 @@ import { computeGenomeFromSeed } from '@/lib/data/bias-genome-seed';
 import { CaseStudyNav } from '../case-studies/CaseStudyNav';
 import { HeadlineStatCard } from '@/components/marketing/genome/HeadlineStatCard';
 import { ToxicComboCard } from '@/components/marketing/genome/ToxicComboCard';
+import { RiskLandscape } from '@/components/marketing/genome/RiskLandscape';
+import { ToxicNetworkGraph } from '@/components/marketing/genome/ToxicNetworkGraph';
 import { BiasGenomeClient } from './BiasGenomeClient';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
@@ -212,6 +214,40 @@ export default function BiasGenomePage() {
         </div>
       </section>
 
+      {/* RISK LANDSCAPE ──────────────────────────────────────────── */}
+      <section style={{ padding: '56px 24px 0' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <h2
+            style={{
+              fontSize: 'clamp(24px, 3vw, 32px)',
+              fontWeight: 700,
+              letterSpacing: '-0.02em',
+              margin: 0,
+              marginBottom: 8,
+              color: C.slate900,
+            }}
+          >
+            The risk landscape.
+          </h2>
+          <p
+            style={{
+              fontSize: 14.5,
+              color: C.slate500,
+              margin: 0,
+              marginBottom: 24,
+              maxWidth: 680,
+            }}
+          >
+            Every bias plotted on two axes — how often it appears, how much it lifts the failure
+            rate. The top-right quadrant is where your audit energy pays off.
+          </p>
+          <RiskLandscape
+            entries={genome.entries}
+            baselineFailureRate={meta.baselineFailureRate}
+          />
+        </div>
+      </section>
+
       {/* LEADERBOARD ─────────────────────────────────────────────── */}
       <section style={{ padding: '56px 24px 0' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
@@ -270,6 +306,13 @@ export default function BiasGenomePage() {
             Named patterns where two biases compound. Detection in live memos is 8x worse than
             either bias alone — the product category our toxic-combination engine was built for.
           </p>
+
+          {/* Network viz first — shows which biases are the hubs */}
+          <div style={{ marginBottom: 24 }}>
+            <ToxicNetworkGraph patterns={toxicPatterns} />
+          </div>
+
+          {/* Detail cards beneath */}
           <div
             style={{
               display: 'grid',
