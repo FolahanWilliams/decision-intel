@@ -42,8 +42,6 @@ const C = {
   green: '#16A34A',
   greenSoft: 'rgba(22, 163, 74, 0.08)',
   greenBorder: 'rgba(22, 163, 74, 0.25)',
-  violet: '#7C3AED',
-  amber: '#D97706',
 };
 
 type Signal = {
@@ -54,10 +52,10 @@ type Signal = {
 };
 
 const SIGNALS: Signal[] = [
-  { id: 'slack', label: 'Slack', detail: '#strategy-emea · "shipped Q2"', icon: MessageSquare },
-  { id: 'drive', label: 'Drive', detail: 'Q3_board_update.pdf', icon: FileText },
-  { id: 'web', label: 'Web', detail: 'Press release · Oct 15', icon: Globe },
-  { id: 'email', label: 'Email', detail: 'Post-mortem draft v1', icon: Mail },
+  { id: 'slack', label: 'Slack', detail: 'listening to threads', icon: MessageSquare },
+  { id: 'drive', label: 'Drive', detail: 'watching folders', icon: FileText },
+  { id: 'web', label: 'Web', detail: 'scanning public signals', icon: Globe },
+  { id: 'email', label: 'Email', detail: 'monitoring replies', icon: Mail },
 ];
 
 const CYCLE_MS = 7400;
@@ -240,11 +238,15 @@ export function OutcomeDetectionViz() {
           <CheckCircle2 size={13} strokeWidth={2.4} />
         </motion.div>
         <span>
-          <span style={{ color: C.slate900, fontWeight: 600 }}>Calibration written back</span>
+          <span style={{ color: C.slate900, fontWeight: 600 }}>
+            {loopPulsing ? 'Calibration written back' : 'Calibration pending'}
+          </span>
           <span style={{ margin: '0 8px', color: C.slate300 }}>·</span>
-          Decision Knowledge Graph now knows this team over-weights optimism on EMEA plays by 0.08.
-          <span style={{ margin: '0 8px', color: C.slate300 }}>·</span>
-          <span style={{ color: C.slate500 }}>Next memo gets audited against the updated baseline.</span>
+          <span style={{ color: C.slate500 }}>
+            {loopPulsing
+              ? 'The Decision Knowledge Graph updates. Your next memo is audited against the new baseline.'
+              : 'Once the outcome is detected, the loop writes back to the Decision Knowledge Graph.'}
+          </span>
         </span>
       </div>
 
@@ -262,7 +264,7 @@ export function OutcomeDetectionViz() {
         }}
       >
         <span style={{ fontSize: 12, color: C.slate500 }}>
-          Four detection channels. Zero manual logging. 146-case benchmark gets one record richer every close.
+          Four detection channels. Zero manual logging. Every outcome compounds the baseline.
         </span>
         <Link
           href="/how-it-works"
@@ -306,7 +308,7 @@ function DecisionCard({ calibrationStamped }: { calibrationStamped: boolean }) {
         background: C.white,
         display: 'flex',
         flexDirection: 'column',
-        gap: 10,
+        gap: 12,
         position: 'relative',
       }}
     >
@@ -320,61 +322,96 @@ function DecisionCard({ calibrationStamped }: { calibrationStamped: boolean }) {
           fontFamily: 'var(--font-mono, monospace)',
         }}
       >
-        Q1 &middot; decision at rest
+        Earlier memo &middot; decision at rest
       </div>
-      <div style={{ fontSize: 14, fontWeight: 700, color: C.slate900, lineHeight: 1.3 }}>
-        EMEA expansion recommendation
-      </div>
+
+      {/* Abstract document */}
       <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          padding: '7px 10px',
+          padding: '12px 12px 14px',
+          borderRadius: 10,
           background: C.slate50,
-          borderRadius: 8,
           border: `1px solid ${C.slate200}`,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 6,
         }}
+        aria-hidden
       >
-        <span
+        <div
           style={{
-            width: 22,
-            height: 22,
-            borderRadius: 6,
-            background: C.slate900,
-            color: C.white,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 10,
-            fontWeight: 800,
-            fontFamily: 'var(--font-mono, monospace)',
+            gap: 6,
+            marginBottom: 4,
           }}
         >
-          B
-        </span>
-        <span style={{ fontSize: 11, color: C.slate600 }}>
-          <span style={{ fontWeight: 700, color: C.slate900 }}>DQI 74</span> at decision time
-        </span>
+          <div
+            style={{
+              width: 18,
+              height: 22,
+              borderRadius: 3,
+              background: C.white,
+              border: `1px solid ${C.slate300}`,
+              position: 'relative',
+            }}
+          >
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                width: 6,
+                height: 6,
+                background: C.slate200,
+                borderBottomLeftRadius: 3,
+              }}
+            />
+          </div>
+          <div
+            style={{
+              height: 4,
+              borderRadius: 2,
+              background: C.slate300,
+              width: '60%',
+            }}
+          />
+        </div>
+        {[82, 70, 88, 64].map((w, i) => (
+          <div
+            key={i}
+            style={{
+              height: 4,
+              borderRadius: 2,
+              background: C.slate200,
+              width: `${w}%`,
+            }}
+          />
+        ))}
       </div>
+
+      {/* Status row (no numbers) */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
-        {['Planning fallacy', 'Confirmation', 'Optimism'].map(bias => (
+        {['audited', 'scored', 'logged'].map(label => (
           <span
-            key={bias}
+            key={label}
             style={{
               fontSize: 10,
-              fontWeight: 500,
-              padding: '3px 7px',
+              fontWeight: 600,
+              padding: '3px 8px',
               borderRadius: 999,
               background: C.slate100,
               color: C.slate600,
               border: `1px solid ${C.slate200}`,
+              fontFamily: 'var(--font-mono, monospace)',
+              letterSpacing: '0.04em',
             }}
           >
-            {bias}
+            {label}
           </span>
         ))}
       </div>
+
       <motion.div
         animate={{
           opacity: calibrationStamped ? 1 : 0,
@@ -395,7 +432,7 @@ function DecisionCard({ calibrationStamped }: { calibrationStamped: boolean }) {
         }}
         aria-hidden={!calibrationStamped}
       >
-        <CheckCircle2 size={11} strokeWidth={2.4} /> Calibration updated
+        <CheckCircle2 size={11} strokeWidth={2.4} /> Loop closed
       </motion.div>
     </div>
   );
@@ -543,9 +580,10 @@ function OutcomeCard({ ready, reducedMotion }: { ready: boolean; reducedMotion: 
           : C.white,
         display: 'flex',
         flexDirection: 'column',
-        gap: 10,
+        gap: 12,
         position: 'relative',
         transition: 'background 0.5s',
+        minHeight: 160,
       }}
     >
       <div
@@ -567,7 +605,7 @@ function OutcomeCard({ ready, reducedMotion }: { ready: boolean; reducedMotion: 
             transition: 'color 0.4s',
           }}
         >
-          Q3 &middot; outcome auto-detected
+          {ready ? 'Outcome auto-detected' : 'Awaiting convergence'}
         </div>
         {ready && !reducedMotion && (
           <motion.div
@@ -575,9 +613,9 @@ function OutcomeCard({ ready, reducedMotion }: { ready: boolean; reducedMotion: 
             animate={{ scale: 1 }}
             transition={{ duration: 0.35, type: 'spring', stiffness: 220 }}
             style={{
-              width: 20,
-              height: 20,
-              borderRadius: 10,
+              width: 22,
+              height: 22,
+              borderRadius: 11,
               background: C.green,
               color: C.white,
               display: 'flex',
@@ -585,150 +623,72 @@ function OutcomeCard({ ready, reducedMotion }: { ready: boolean; reducedMotion: 
               justifyContent: 'center',
             }}
           >
-            <CheckCircle2 size={12} strokeWidth={2.6} />
+            <CheckCircle2 size={13} strokeWidth={2.6} />
           </motion.div>
         )}
       </div>
 
+      {/* Abstract outcome body — fills in when ready, skeleton otherwise */}
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          gap: 8,
+          padding: '6px 0 2px',
+        }}
+        aria-hidden
+      >
+        {[78, 62, 48].map((targetWidth, i) => (
+          <motion.div
+            key={i}
+            animate={{
+              width: ready ? `${targetWidth}%` : `${Math.max(targetWidth - 30, 20)}%`,
+              backgroundColor: ready
+                ? [C.green, C.slate700, C.slate400][i]
+                : C.slate100,
+            }}
+            transition={{
+              duration: 0.5,
+              delay: ready ? 0.15 + i * 0.08 : 0,
+            }}
+            style={{
+              height: 8,
+              borderRadius: 4,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Verdict footer */}
       <motion.div
-        animate={{ opacity: ready ? 1 : 0 }}
-        transition={{ duration: 0.4, delay: ready ? 0.1 : 0 }}
-        style={{ display: 'flex', flexDirection: 'column', gap: 8 }}
+        animate={{
+          opacity: ready ? 1 : 0.5,
+        }}
+        transition={{ duration: 0.4, delay: ready ? 0.35 : 0 }}
+        style={{
+          fontSize: 11,
+          color: ready ? C.slate700 : C.slate400,
+          lineHeight: 1.4,
+          paddingTop: 4,
+          borderTop: `1px dashed ${C.slate200}`,
+        }}
       >
-        <div
-          style={{
-            padding: '8px 10px',
-            borderRadius: 8,
-            background: C.white,
-            border: `1px solid ${C.slate200}`,
-          }}
-        >
-          <div
-            style={{
-              fontSize: 9.5,
-              color: C.slate500,
-              fontWeight: 600,
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              marginBottom: 3,
-            }}
-          >
-            Revenue vs forecast
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'baseline',
-              gap: 8,
-            }}
-          >
-            <span
-              style={{
-                fontSize: 18,
-                fontWeight: 800,
-                color: C.slate900,
-                fontFamily: 'var(--font-mono, monospace)',
-                letterSpacing: '-0.02em',
-              }}
-            >
-              $4.2M
+        {ready ? (
+          <>
+            <span style={{ color: C.slate900, fontWeight: 700 }}>Verdict assembled</span>
+            <span style={{ margin: '0 6px', color: C.slate300 }}>·</span>
+            <span style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 10.5 }}>
+              multi-channel, zero manual logging
             </span>
-            <span
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                color: C.green,
-                fontFamily: 'var(--font-mono, monospace)',
-              }}
-            >
-              +11% vs modeled
-            </span>
-          </div>
-        </div>
-
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: 6,
-          }}
-        >
-          <MiniStat label="Verdict" value="Beat model" tone="green" />
-          <MiniStat label="DQI delta" value="+0.03" tone="green" />
-          <MiniStat label="Benchmark" value="147th case" tone="slate" />
-          <MiniStat label="Bias profile" value="Optimism −0.08" tone="violet" />
-        </div>
+          </>
+        ) : (
+          <span style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 10.5 }}>
+            Signals still arriving&hellip;
+          </span>
+        )}
       </motion.div>
-
-      {!ready && (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 8,
-            padding: '8px 4px 12px',
-          }}
-          aria-hidden
-        >
-          {[0, 1, 2].map(i => (
-            <div
-              key={i}
-              style={{
-                height: 10,
-                borderRadius: 5,
-                background: C.slate100,
-                width: i === 0 ? '80%' : i === 1 ? '62%' : '70%',
-              }}
-            />
-          ))}
-        </div>
-      )}
     </motion.div>
-  );
-}
-
-function MiniStat({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: string;
-  tone: 'green' | 'slate' | 'violet';
-}) {
-  const color = tone === 'green' ? C.green : tone === 'violet' ? C.violet : C.slate700;
-  return (
-    <div
-      style={{
-        padding: '7px 9px',
-        borderRadius: 7,
-        background: C.white,
-        border: `1px solid ${C.slate200}`,
-      }}
-    >
-      <div
-        style={{
-          fontSize: 9,
-          color: C.slate500,
-          fontWeight: 600,
-          textTransform: 'uppercase',
-          letterSpacing: '0.08em',
-          marginBottom: 2,
-        }}
-      >
-        {label}
-      </div>
-      <div
-        style={{
-          fontSize: 11.5,
-          fontWeight: 700,
-          color,
-          fontFamily: 'var(--font-mono, monospace)',
-          letterSpacing: '-0.01em',
-        }}
-      >
-        {value}
-      </div>
-    </div>
   );
 }
