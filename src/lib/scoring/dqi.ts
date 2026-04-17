@@ -159,6 +159,7 @@ export function computeEffectiveWeights(
   }
   // Re-normalize so weights still sum to 1.0
   const total = Object.values(effective).reduce((s, v) => s + v, 0);
+  if (total === 0) return { ...WEIGHTS };
   for (const key of Object.keys(effective) as Array<keyof typeof WEIGHTS>) {
     effective[key] /= total;
   }
