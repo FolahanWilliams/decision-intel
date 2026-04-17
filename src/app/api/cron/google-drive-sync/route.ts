@@ -106,13 +106,19 @@ export async function GET() {
               continue;
             }
 
-            // If file already exists, compare content hash to detect real changes
+            // Always compute the content hash. Previously the hash was only
+            // computed inside `if (existing)` and never persisted on create,
+            // so subsequent syncs would compare against `null` and re-ingest
+            // the same file forever.
+            const { createHash } = await import('crypto');
+            const newHash = createHash('sha256').update(content).digest('hex');
+
+            // If a prior version exists and the hash matches, the file hasn't
+            // actually changed — skip.
+            if (existing?.contentHash && newHash === existing.contentHash) {
+              continue;
+            }
             if (existing) {
-              const { createHash } = await import('crypto');
-              const newHash = createHash('sha256').update(content).digest('hex');
-              if (existing.contentHash && newHash === existing.contentHash) {
-                continue; // Same content, skip
-              }
               log.info(
                 `Detected updated version of ${file.name} (${file.id}), creating new analysis`
               );
@@ -135,19 +141,41 @@ export async function GET() {
             const versionLabel = existing
               ? ` (updated ${new Date().toISOString().slice(0, 10)})`
               : '';
-            const document = await prisma.document.create({
-              data: {
-                userId: installation.userId,
-                orgId: userOrgId,
-                filename: `${file.name}${versionLabel}`,
-                fileType: parsableMimeType,
-                fileSize: parseInt(file.size || '0', 10),
-                content,
-                status: 'pending',
-                source: 'google_drive',
-                sourceRef: existing ? `${file.id}:${Date.now()}` : file.id,
-              },
-            });
+            // Keep sourceRef stable at file.id so the next sync's lookup
+            // (`findFirst({ sourceRef: file.id, orderBy: uploadedAt desc })`)
+            // still finds the most recent version and the 24h cooldown below
+            // can compare against a timestamp that actually advances when the
+            // file updates. Previously we appended `:${Date.now()}` which
+            // orphaned every update and silently broke the cooldown.
+            let document;
+            try {
+              document = await prisma.document.create({
+                data: {
+                  userId: installation.userId,
+                  orgId: userOrgId,
+                  filename: `${file.name}${versionLabel}`,
+                  fileType: parsableMimeType,
+                  fileSize: parseInt(file.size || '0', 10),
+                  content,
+                  contentHash: newHash,
+                  status: 'pending',
+                  source: 'google_drive',
+                  sourceRef: file.id,
+                },
+              });
+            } catch (createErr) {
+              // Document.contentHash is `@unique` across the whole table.
+              // A cross-org collision is rare but possible; log and skip so a
+              // single collision doesn't abort the whole sync run.
+              const code = (createErr as { code?: string }).code;
+              if (code === 'P2002') {
+                log.warn(
+                  `Skipping ${file.name} (${file.id}) — contentHash collides with an existing document`
+                );
+                continue;
+              }
+              throw createErr;
+            }
 
             log.info(
               existing

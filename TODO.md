@@ -11,9 +11,9 @@ Claude reads this file at the start of every session. Update it as tasks are com
 - [ ] Find GTM / enterprise-sales co-founder or advisor
 
 ## Known Bugs
-- [ ] Decision Graph on `/dashboard/decision-graph` — verify D3 rendering works correctly after recent layout changes
+- [x] Decision Graph on `/dashboard/decision-graph` — verified Apr 2026; `minHeight: 560` + `flex-1` on the graph container prevents the "width:0 on first mount" class of regression after recent layout changes. No active bugs.
 - [ ] Test Outcome Gate flow end-to-end (submit outcome → recalibrated DQI appears on analysis detail page)
-- [ ] Verify Google Drive auto-compare works with updated files (24h cooldown + content hash comparison)
+- [x] Google Drive auto-compare fixed Apr 2026: `contentHash` was being computed but never persisted on create, so subsequent syncs compared against null and re-ingested forever. Also, updated files mutated `sourceRef` to `${fileId}:${timestamp}`, which orphaned every update and silently broke the 24h cooldown query. Fix: compute hash unconditionally, save `contentHash` on create, keep `sourceRef` stable at `file.id`, added P2002 handling for cross-org hash collisions. ([google-drive-sync/route.ts:100-180](src/app/api/cron/google-drive-sync/route.ts#L100-L180))
 - [x] `DealAuditPurchase.dealId` missing FK — fixed with `onDelete: Cascade` relation + `db push` (2026-04-12)
 - [x] `/api/analyze/stream` and `/api/upload` don't share the `checkAnalysisLimit` guard — fixed: guard now lives in `analyzeDocument()` in `src/lib/analysis/analyzer.ts`, covers all callers (Slack, Drive, email, extension, bulk upload) (2026-04-12)
 - [x] Plan-limit `biasTypes` gating (Free=5, Pro=20) is declared in `src/lib/stripe.ts` but not actually enforced anywhere — fixed: enforcement wired into `analyzer.ts` via `getBiasTypeLimit()`, truncates to plan limit keeping most severe biases (2026-04-13)
