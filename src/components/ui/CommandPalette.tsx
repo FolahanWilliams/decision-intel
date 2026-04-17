@@ -154,14 +154,6 @@ export function CommandPalette() {
         keywords: ['profile', 'dna', 'fingerprint', 'style', 'bias', 'intelligence'],
       },
       {
-        id: 'search',
-        label: 'Semantic Search',
-        description: 'Search across documents',
-        icon: <Search size={16} />,
-        action: () => navigate('/dashboard/search'),
-        keywords: ['find', 'query'],
-      },
-      {
         id: 'compare',
         label: 'Compare',
         description: 'Side-by-side comparison',

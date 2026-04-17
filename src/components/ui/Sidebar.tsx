@@ -425,9 +425,7 @@ export default function Sidebar() {
                 pathname.startsWith('/dashboard/analytics') ||
                 pathname.startsWith('/dashboard/outcome-flywheel') ||
                 pathname.startsWith('/dashboard/decision-graph') ||
-                pathname.startsWith('/dashboard/decision-quality') ||
-                pathname.startsWith('/calibration') ||
-                pathname.startsWith('/dashboard/experiments')
+                pathname.startsWith('/dashboard/decision-quality')
               }
               collapsed={collapsed}
               onNavigate={closeMobile}
@@ -438,10 +436,7 @@ export default function Sidebar() {
                 icon={<Video size={18} />}
                 label="Meetings & Rooms"
                 description="Recordings, transcripts & decision rooms"
-                active={
-                  pathname.startsWith('/dashboard/meetings') ||
-                  pathname.startsWith('/dashboard/decision-rooms')
-                }
+                active={pathname.startsWith('/dashboard/meetings')}
                 collapsed={collapsed}
                 onNavigate={closeMobile}
               />
@@ -453,7 +448,6 @@ export default function Sidebar() {
               description="Journal entries + cognitive audits in one feed"
               active={
                 pathname === '/dashboard/decision-log' ||
-                pathname === '/dashboard/journal' ||
                 pathname.startsWith('/dashboard/cognitive-audits')
               }
               collapsed={collapsed}

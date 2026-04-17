@@ -70,6 +70,10 @@ import { getBiasPreview } from '@/lib/utils/bias-preview';
 import { QuickScanModal } from '@/components/ui/QuickScanModal';
 import { Zap, Lock as LockIcon } from 'lucide-react';
 import { AnalysisShell } from '@/components/analysis/AnalysisShell';
+import {
+  InlineAnalysisResultCard,
+  type CompletedAnalysisSummary,
+} from '@/components/analysis/InlineAnalysisResultCard';
 
 const ANALYSIS_STEPS: { name: string; icon: React.ReactNode }[] = [
   { name: 'Preparing document', icon: <FileText size={16} /> },
@@ -301,6 +305,12 @@ export default function Dashboard() {
 
   // Bias count accumulator for pipeline graph badges
   const biasCountRef = useRef(0);
+  // Accumulated bias types + noise score so the inline result card can show
+  // key findings without a second fetch after SSE completion.
+  const detectedBiasesRef = useRef<Array<{ type: string; severity: string }>>([]);
+  const noiseScoreRef = useRef<number | undefined>(undefined);
+  const [lastCompletedAnalysis, setLastCompletedAnalysis] =
+    useState<CompletedAnalysisSummary | null>(null);
 
   // SSE: streaming analysis with typed events, auto-retry, AbortController cleanup
   const {
@@ -312,12 +322,14 @@ export default function Dashboard() {
     outcomeGate,
   } = useAnalysisStream({
     stepNames: ANALYSIS_STEPS.map(s => s.name),
-    onBiasDetected: () => {
+    onBiasDetected: (biasType, severity) => {
       // Increment bias count in the progress context (called per bias event)
       biasCountRef.current += 1;
       updateBiasCount(biasCountRef.current);
+      detectedBiasesRef.current.push({ type: biasType, severity });
     },
     onNoiseUpdate: score => {
+      noiseScoreRef.current = score;
       updateNoiseScore(score);
     },
     onOutcomeReminder: (count, ids) => {
@@ -608,12 +620,23 @@ export default function Dashboard() {
 
       // Stream analysis via the hook (auto-retry, typed events, AbortController cleanup)
       biasCountRef.current = 0;
+      detectedBiasesRef.current = [];
+      noiseScoreRef.current = undefined;
+      setLastCompletedAnalysis(null);
       startTracking(uploadData.id, uploadData.filename);
       const finalResult = await startAnalysis(uploadData.id);
 
       if (finalResult) {
         const score = finalResult?.overallScore as number;
         completeTracking(uploadData.id);
+        setLastCompletedAnalysis({
+          docId: uploadData.id,
+          filename: uploadData.filename,
+          overallScore: score,
+          biasCount: biasCountRef.current,
+          noiseScore: noiseScoreRef.current,
+          detectedBiases: [...detectedBiasesRef.current],
+        });
         addNotification({
           type: score < 40 ? 'low_score' : 'analysis_complete',
           title: score < 40 ? 'Low Score Alert' : 'Analysis Complete',
@@ -683,12 +706,23 @@ export default function Dashboard() {
 
       const retryDoc = uploadedDocs.find(d => d.id === docId);
       biasCountRef.current = 0;
+      detectedBiasesRef.current = [];
+      noiseScoreRef.current = undefined;
+      setLastCompletedAnalysis(null);
       startTracking(docId, retryDoc?.filename || 'Document');
       const finalResult = await startAnalysis(docId);
 
       if (finalResult) {
         const retryScore = finalResult?.overallScore as number;
         completeTracking(docId);
+        setLastCompletedAnalysis({
+          docId,
+          filename: retryDoc?.filename || 'Document',
+          overallScore: retryScore,
+          biasCount: biasCountRef.current,
+          noiseScore: noiseScoreRef.current,
+          detectedBiases: [...detectedBiasesRef.current],
+        });
         addNotification({
           type: retryScore < 40 ? 'low_score' : 'analysis_complete',
           title: retryScore < 40 ? 'Low Score Alert' : 'Analysis Complete',
@@ -1283,7 +1317,12 @@ export default function Dashboard() {
 
           {/* Upload Zone - Enhanced with drag feedback */}
           <ErrorBoundary sectionName="Upload">
-            {!uploading && !pendingFile ? (
+            {!uploading && !pendingFile && lastCompletedAnalysis ? (
+              <InlineAnalysisResultCard
+                analysis={lastCompletedAnalysis}
+                onDismiss={() => setLastCompletedAnalysis(null)}
+              />
+            ) : !uploading && !pendingFile ? (
               <>
               <div
                 id="onborda-upload"

@@ -141,7 +141,7 @@ export async function POST(req: NextRequest) {
           where: { id: body.playbookId },
           data: { usageCount: { increment: 1 }, lastUsedAt: new Date() },
         })
-        .catch(() => {});
+        .catch(err => log.warn('Playbook usage counter update failed:', err));
     }
 
     // Audit trail
@@ -162,7 +162,7 @@ export async function POST(req: NextRequest) {
           },
         },
       })
-      .catch(() => {});
+      .catch(err => log.warn('Audit log write failed for playbook.invoke:', err));
 
     return NextResponse.json({ invocation }, { status: 201 });
   } catch (err: unknown) {

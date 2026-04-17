@@ -122,7 +122,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
           },
         },
       })
-      .catch(() => {});
+      .catch(err => log.warn('Audit log write failed for playbook_invocation update:', err));
 
     return NextResponse.json({ invocation: updated });
   } catch (err) {

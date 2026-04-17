@@ -129,7 +129,7 @@ export async function PATCH(req: NextRequest) {
       resource: 'Nudge',
       resourceId: body.nudgeId,
       details: { wasHelpful: body.wasHelpful },
-    }).catch(() => {});
+    }).catch(err => log.warn('Audit log write failed for ACKNOWLEDGE_NUDGE:', err));
 
     // Adjust graph edge weights from nudge feedback (fire-and-forget flywheel)
     if (body.wasHelpful !== undefined) {
@@ -137,7 +137,7 @@ export async function PATCH(req: NextRequest) {
         .then(({ adjustEdgeWeightsFromNudgeFeedback }) =>
           adjustEdgeWeightsFromNudgeFeedback(body.nudgeId, body.wasHelpful!)
         )
-        .catch(() => {});
+        .catch(err => log.warn('Graph edge-weight adjustment from nudge feedback failed:', err));
     }
 
     return NextResponse.json({ acknowledged: true });

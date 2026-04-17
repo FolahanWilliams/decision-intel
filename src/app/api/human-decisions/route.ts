@@ -188,7 +188,7 @@ export async function POST(req: NextRequest) {
       resource: 'HumanDecision',
       resourceId: humanDecision!.id,
       details: { source: body.source, channel: body.channel },
-    }).catch(() => {});
+    }).catch(err => log.warn('Audit log write failed for SUBMIT_HUMAN_DECISION:', err));
 
     return NextResponse.json(
       {
@@ -385,7 +385,9 @@ async function runCognitiveAudit(decisionId: string, input: HumanDecisionInput, 
     if (schemaDrift) {
       await prisma.humanDecision
         .update({ where: { id: decisionId }, data: { status: 'error' } })
-        .catch(() => {});
+        .catch(err =>
+          log.warn('Failed to mark HumanDecision as error (schema drift path):', err)
+        );
       return;
     }
 
@@ -436,7 +438,9 @@ async function runCognitiveAudit(decisionId: string, input: HumanDecisionInput, 
                     where: { id: persisted.id },
                     data: { deliveredAt: new Date() },
                   })
-                  .catch(() => {});
+                  .catch(err =>
+                    log.warn('Failed to stamp Nudge.deliveredAt after Slack delivery:', err)
+                  );
               }
             })
             .catch(err => log.error('Slack nudge delivery failed:', err));
@@ -461,7 +465,9 @@ async function runCognitiveAudit(decisionId: string, input: HumanDecisionInput, 
                 );
                 await prisma.nudge
                   .update({ where: { id: persisted.id }, data: { deliveredAt: new Date() } })
-                  .catch(() => {});
+                  .catch(err =>
+                    log.warn('Failed to stamp Nudge.deliveredAt after email delivery:', err)
+                  );
               }
             })
             .catch(err => log.error('Email nudge delivery failed:', err));
@@ -478,6 +484,8 @@ async function runCognitiveAudit(decisionId: string, input: HumanDecisionInput, 
     log.error(`Cognitive audit failed for ${decisionId}:`, error);
     await prisma.humanDecision
       .update({ where: { id: decisionId }, data: { status: 'error' } })
-      .catch(() => {});
+      .catch(err =>
+        log.warn('Failed to mark HumanDecision as error after cognitive audit failure:', err)
+      );
   }
 }

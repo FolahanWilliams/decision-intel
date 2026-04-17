@@ -213,7 +213,9 @@ export async function POST(req: NextRequest) {
                             event?.ts
                           );
                           summaryCard.channel = threadChannel;
-                          deliverSlackNudge(summaryCard, teamId).catch(() => {});
+                          deliverSlackNudge(summaryCard, teamId).catch(err =>
+                            log.warn('Slack audit summary delivery failed:', err)
+                          );
                         }
                       })
                       .catch(err => {
@@ -386,7 +388,9 @@ export async function POST(req: NextRequest) {
                   priorThreadTs
                 );
                 priorPrompt.channel = priorChannel;
-                deliverSlackNudge(priorPrompt, frameTeamId).catch(() => {});
+                deliverSlackNudge(priorPrompt, frameTeamId).catch(err =>
+                  log.warn('Slack prior-prompt delivery failed:', err)
+                );
               }
 
               log.info(`DecisionFrame auto-created from Slack pre-decision in channel ${channel}`);
@@ -607,7 +611,7 @@ async function processSlackDecision(
     if (schemaDrift) {
       await prisma.humanDecision
         .update({ where: { id: decisionId }, data: { status: 'error' } })
-        .catch(() => {});
+        .catch(err => log.warn('Failed to mark HumanDecision as error (schema drift path):', err));
       return null;
     }
 
@@ -655,7 +659,9 @@ async function processSlackDecision(
                 where: { id: nudgeRecord.id },
                 data: { deliveredAt: new Date() },
               })
-              .catch(() => {});
+              .catch(err =>
+                log.warn('Failed to stamp Nudge.deliveredAt after Slack delivery:', err)
+              );
           }
         }
       }
@@ -801,7 +807,7 @@ async function processSlackDecision(
     log.error(`Slack decision audit failed for ${decisionId}:`, error);
     await prisma.humanDecision
       .update({ where: { id: decisionId }, data: { status: 'error' } })
-      .catch(() => {});
+      .catch(err => log.warn('Failed to mark HumanDecision as error after Slack audit failure:', err));
     return null;
   }
 }

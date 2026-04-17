@@ -175,7 +175,9 @@ export async function GET(request: NextRequest) {
               channel: 'slack',
             });
             reminderPayload.channel = slackChannel;
-            await deliverSlackNudge(reminderPayload, slackInstall?.teamId).catch(() => {});
+            await deliverSlackNudge(reminderPayload, slackInstall?.teamId).catch(err =>
+              log.warn('Slack outcome reminder delivery failed:', err)
+            );
             slackRemindersSent++;
           }
         }

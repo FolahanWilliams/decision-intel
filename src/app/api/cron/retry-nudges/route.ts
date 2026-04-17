@@ -107,7 +107,7 @@ export async function GET(request: NextRequest) {
               nextRetryAt: newFailureCount < MAX_RETRIES ? nextRetry : null,
             },
           })
-          .catch(() => {});
+          .catch(err => log.warn('Failed to update Nudge failure counters on retry:', err));
 
         log.warn(
           `Nudge ${nudge.id} retry failed (attempt ${newFailureCount}/${MAX_RETRIES}):`,

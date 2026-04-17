@@ -566,7 +566,7 @@ async function handleAnalyzeCommand(params: {
                 thread_ts: params.threadTs,
               },
               params.teamId
-            ).catch(() => {});
+            ).catch(err => log.warn('Slack thread-error notification delivery failed:', err));
           }
         })();
 
@@ -646,7 +646,9 @@ async function handleAnalyzeCommand(params: {
       summaryCard.channel = params.channelId;
 
       // Post audit card to channel
-      void deliverSlackNudge(summaryCard, params.teamId).catch(() => {});
+      void deliverSlackNudge(summaryCard, params.teamId).catch(err =>
+        log.warn('Slack audit card delivery failed:', err)
+      );
 
       const analyzeActions: Array<Record<string, unknown>> = [
         {
