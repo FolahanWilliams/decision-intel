@@ -12,6 +12,7 @@ import { FeaturedBiasCard } from '@/components/marketing/how-it-works/FeaturedBi
 import { DqiComponentBars } from '@/components/marketing/how-it-works/DqiComponentBars';
 import { NoiseDistributionViz } from '@/components/marketing/how-it-works/NoiseDistributionViz';
 import { BoardroomSimViz } from '@/components/marketing/how-it-works/BoardroomSimViz';
+import { OutcomeDetectionViz } from '@/components/marketing/how-it-works/OutcomeDetectionViz';
 import { ResearchCitationCard } from '@/components/marketing/how-it-works/ResearchCitationCard';
 import { ToxicNetworkGraph } from '@/components/marketing/genome/ToxicNetworkGraph';
 import { computeGenomeFromSeed } from '@/lib/data/bias-genome-seed';
@@ -513,7 +514,19 @@ export function HowItWorksClient() {
         </div>
       </section>
 
-      {/* SECTION 7 — ACADEMIC FOUNDATION ────────────────────────── */}
+      {/* SECTION 7 — OUTCOME LOOP ───────────────────────────────── */}
+      <section id="outcome-loop" style={{ padding: '72px 24px 0' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+          <SectionHeader
+            eyebrow="Closing the loop"
+            title="Every decision becomes signal for the next one."
+            body="An audit is only half the work. After a decision gets made, Decision Intel listens for the outcome through the tools your team already uses — Slack threads, Drive folders, inbox replies, public announcements — and writes what actually happened back into your Decision Knowledge Graph. Your team's calibration improves quarter after quarter, on your own data."
+          />
+          <OutcomeDetectionViz />
+        </div>
+      </section>
+
+      {/* SECTION 8 — ACADEMIC FOUNDATION ────────────────────────── */}
       <section id="research" style={{ padding: '72px 24px 0' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <SectionHeader
@@ -535,7 +548,7 @@ export function HowItWorksClient() {
         </div>
       </section>
 
-      {/* SECTION 8 — SECURITY & PRIVACY ─────────────────────────── */}
+      {/* SECTION 9 — SECURITY & PRIVACY ─────────────────────────── */}
       <section style={{ padding: '72px 24px 0' }}>
         <div style={{ maxWidth: 1000, margin: '0 auto' }}>
           <div
