@@ -246,15 +246,17 @@ export default function LandingPage() {
 
           {/* Desktop Nav */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 32 }} className="hidden-mobile">
-            {['Features', 'How It Works', 'Case Studies', 'Pricing'].map(item => {
+            {['Features', 'How It Works', 'Case Studies', 'Bias Genome', 'Pricing'].map(item => {
               const href =
                 item === 'Case Studies'
                   ? '/case-studies'
-                  : item === 'Pricing'
-                    ? '/pricing'
-                    : item === 'How It Works'
-                      ? '/how-it-works'
-                      : `#${item.toLowerCase().replace(/\s+/g, '-')}`;
+                  : item === 'Bias Genome'
+                    ? '/bias-genome'
+                    : item === 'Pricing'
+                      ? '/pricing'
+                      : item === 'How It Works'
+                        ? '/how-it-works'
+                        : `#${item.toLowerCase().replace(/\s+/g, '-')}`;
               return (
                 <a
                   key={item}
@@ -322,15 +324,17 @@ export default function LandingPage() {
               gap: 12,
             }}
           >
-            {['Features', 'How It Works', 'Case Studies', 'Pricing'].map(item => {
+            {['Features', 'How It Works', 'Case Studies', 'Bias Genome', 'Pricing'].map(item => {
               const href =
                 item === 'Case Studies'
                   ? '/case-studies'
-                  : item === 'Pricing'
-                    ? '/pricing'
-                    : item === 'How It Works'
-                      ? '/how-it-works'
-                      : `#${item.toLowerCase().replace(/\s+/g, '-')}`;
+                  : item === 'Bias Genome'
+                    ? '/bias-genome'
+                    : item === 'Pricing'
+                      ? '/pricing'
+                      : item === 'How It Works'
+                        ? '/how-it-works'
+                        : `#${item.toLowerCase().replace(/\s+/g, '-')}`;
               return (
                 <a
                   key={item}

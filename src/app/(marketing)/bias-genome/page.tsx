@@ -7,6 +7,7 @@ import { HeadlineStatCard } from '@/components/marketing/genome/HeadlineStatCard
 import { ToxicComboCard } from '@/components/marketing/genome/ToxicComboCard';
 import { RiskLandscape } from '@/components/marketing/genome/RiskLandscape';
 import { ToxicNetworkGraph } from '@/components/marketing/genome/ToxicNetworkGraph';
+import { GenomeMethodologyViz } from '@/components/marketing/genome/GenomeMethodologyViz';
 import { BiasGenomeClient } from './BiasGenomeClient';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
@@ -211,6 +212,37 @@ export default function BiasGenomePage() {
               />
             )}
           </div>
+        </div>
+      </section>
+
+      {/* METHODOLOGY VIZ ─────────────────────────────────────────── */}
+      <section style={{ padding: '56px 24px 0' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <h2
+            style={{
+              fontSize: 'clamp(24px, 3vw, 32px)',
+              fontWeight: 700,
+              letterSpacing: '-0.02em',
+              margin: 0,
+              marginBottom: 8,
+              color: C.slate900,
+            }}
+          >
+            How the genome is built.
+          </h2>
+          <p
+            style={{
+              fontSize: 14.5,
+              color: C.slate500,
+              margin: 0,
+              marginBottom: 24,
+              maxWidth: 680,
+            }}
+          >
+            Four steps from a documented real-world decision to a ranked bias, with an outcome loop
+            that recalibrates the weights as consenting customer orgs share results.
+          </p>
+          <GenomeMethodologyViz />
         </div>
       </section>
 
