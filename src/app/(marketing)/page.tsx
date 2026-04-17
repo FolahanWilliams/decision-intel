@@ -397,7 +397,7 @@ export default function LandingPage() {
                 marginBottom: 12,
               }}
             >
-              For corporate strategy teams
+              Grammarly for strategic decisions
             </p>
             <h1
               style={{
