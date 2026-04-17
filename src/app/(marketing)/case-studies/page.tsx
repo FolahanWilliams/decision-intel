@@ -41,6 +41,10 @@ export default function CaseStudyIndexPage() {
     primaryBias: c.primaryBias,
     lessonPreview: lessonPreview(c),
     hasDeepAnalysis: !!c.preDecisionEvidence,
+    biasCount: c.biasesPresent.length,
+    toxicCount: c.toxicCombinations.length,
+    impactScore: c.impactScore,
+    estimatedImpact: c.estimatedImpact,
   }));
 
   const industries = Array.from(new Set(ALL_CASES.map(c => c.industry))).sort();

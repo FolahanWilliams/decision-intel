@@ -156,6 +156,31 @@ function guessSeverity(bias: string, isPrimary: boolean): string {
   return 'medium';
 }
 
+const SEV_META: Record<string, { bar: string; bg: string; text: string; fill: number }> = {
+  critical: { bar: '#DC2626', bg: '#FEE2E2', text: '#991B1B', fill: 88 },
+  high: { bar: '#F97316', bg: '#FFF7ED', text: '#C2410C', fill: 62 },
+  medium: { bar: '#EAB308', bg: '#FEF3C7', text: '#A16207', fill: 38 },
+};
+
+const TOXIC_DESCRIPTIONS: Record<string, string> = {
+  'Echo Chamber':
+    "Group members reinforce each other's views, systematically filtering out dissenting signals.",
+  'Sunk Ship':
+    'Commitment to a failing course escalates to justify sunk costs, even as evidence mounts.',
+  'Blind Sprint':
+    'Overconfidence combined with planning fallacy creates unstoppable momentum toward failure.',
+  'Yes Committee':
+    'Authority bias meets groupthink — the group converges on whatever leadership signals it wants.',
+  'Optimism Trap':
+    'Overconfidence and availability bias create a systematically positive outlook that ignores base rates.',
+  'Status Quo Lock':
+    'Loss aversion combined with status quo bias makes even clearly beneficial change feel impossible.',
+  'Doubling Down':
+    'Confirmation bias reinforces sunk cost thinking into an escalating commitment loop.',
+  'Golden Child':
+    'A favored initiative receives uncritical support, with scrutiny reserved for alternatives.',
+};
+
 function Card({ children, accent }: { children: React.ReactNode; accent?: string }) {
   return (
     <div
@@ -480,6 +505,103 @@ export default async function CaseStudyDetailPage({
           </p>
         </section>
 
+        {/* Context factors — decision anatomy */}
+        <section style={{ marginBottom: 40 }}>
+          <SectionTitle>Decision anatomy</SectionTitle>
+          <div
+            style={{
+              background: '#FFFFFF',
+              border: '1px solid #E2E8F0',
+              borderRadius: 16,
+              padding: '20px 24px',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+              gap: 16,
+            }}
+          >
+            {(
+              [
+                {
+                  label: 'Monetary stakes',
+                  value:
+                    caseStudy.contextFactors.monetaryStakes === 'very_high'
+                      ? 'Very high'
+                      : caseStudy.contextFactors.monetaryStakes === 'high'
+                        ? 'High'
+                        : caseStudy.contextFactors.monetaryStakes === 'medium'
+                          ? 'Medium'
+                          : 'Low',
+                  risk:
+                    caseStudy.contextFactors.monetaryStakes === 'very_high' ||
+                    caseStudy.contextFactors.monetaryStakes === 'high',
+                },
+                {
+                  label: 'Dissent suppressed',
+                  value: caseStudy.contextFactors.dissentAbsent ? 'Yes' : 'No',
+                  risk: caseStudy.contextFactors.dissentAbsent,
+                },
+                {
+                  label: 'Time pressure',
+                  value: caseStudy.contextFactors.timePressure ? 'Present' : 'None',
+                  risk: caseStudy.contextFactors.timePressure,
+                },
+                {
+                  label: 'Unanimous consensus',
+                  value: caseStudy.contextFactors.unanimousConsensus ? 'Yes' : 'No',
+                  risk: caseStudy.contextFactors.unanimousConsensus,
+                },
+                {
+                  label: 'Decision participants',
+                  value: String(caseStudy.contextFactors.participantCount),
+                  risk: caseStudy.contextFactors.participantCount <= 2,
+                },
+                {
+                  label: 'Dissent encouraged',
+                  value: caseStudy.contextFactors.dissentEncouraged ? 'Yes' : 'No',
+                  risk: !caseStudy.contextFactors.dissentEncouraged,
+                },
+                {
+                  label: 'External advisors',
+                  value: caseStudy.contextFactors.externalAdvisors ? 'Yes' : 'No',
+                  risk: !caseStudy.contextFactors.externalAdvisors,
+                },
+                {
+                  label: 'Iterative process',
+                  value: caseStudy.contextFactors.iterativeProcess ? 'Yes' : 'No',
+                  risk: !caseStudy.contextFactors.iterativeProcess,
+                },
+              ] as Array<{ label: string; value: string; risk: boolean }>
+            ).map(({ label, value, risk }) => (
+              <div key={label}>
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: '#94A3B8',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.06em',
+                    marginBottom: 4,
+                  }}
+                >
+                  {label}
+                </div>
+                <div
+                  style={{
+                    fontSize: 15,
+                    fontWeight: 700,
+                    color: risk ? '#DC2626' : '#16A34A',
+                  }}
+                >
+                  {value}
+                </div>
+              </div>
+            ))}
+          </div>
+          <p style={{ fontSize: 12, color: '#94A3B8', marginTop: 10, margin: '10px 0 0' }}>
+            Red = risk factor present · Green = protective factor present
+          </p>
+        </section>
+
         {/* Deep section — hindsight-stripped memo analysis */}
         {deep ? (
           <section style={{ marginBottom: 40 }}>
@@ -695,29 +817,91 @@ export default async function CaseStudyDetailPage({
           <StakeholderGrid stakeholders={caseStudy.stakeholders} />
         )}
 
-        {/* Biases present */}
+        {/* Biases present — severity bar chart */}
         {caseStudy.biasesPresent.length > 0 && (
           <section style={{ marginBottom: 40 }}>
             <SectionTitle>Biases present in the decision</SectionTitle>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {caseStudy.biasesPresent.map((bias, i) => (
-                <span
-                  key={i}
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 500,
-                    background: '#F1F5F9',
-                    color: '#334155',
-                    border: '1px solid #E2E8F0',
-                    padding: '6px 12px',
-                    borderRadius: 8,
-                  }}
-                >
-                  {bias === caseStudy.primaryBias ? '★ ' : ''}
-                  {formatBiasName(bias)}
-                </span>
-              ))}
+            <div
+              style={{
+                background: '#FFFFFF',
+                border: '1px solid #E2E8F0',
+                borderRadius: 16,
+                padding: '20px 24px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 14,
+              }}
+            >
+              {caseStudy.biasesPresent.map(bias => {
+                const sev = guessSeverity(bias, bias === caseStudy.primaryBias);
+                const m = SEV_META[sev] || SEV_META.medium;
+                return (
+                  <div key={bias} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div
+                      style={{
+                        width: 160,
+                        flexShrink: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 5,
+                      }}
+                    >
+                      {bias === caseStudy.primaryBias && (
+                        <span style={{ color: '#DC2626', fontSize: 11, flexShrink: 0 }}>★</span>
+                      )}
+                      <span
+                        style={{
+                          fontSize: 13,
+                          fontWeight: bias === caseStudy.primaryBias ? 700 : 500,
+                          color: '#1E293B',
+                          lineHeight: 1.3,
+                        }}
+                      >
+                        {formatBiasName(bias)}
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        flex: 1,
+                        background: '#F1F5F9',
+                        borderRadius: 4,
+                        height: 8,
+                        overflow: 'hidden',
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: `${m.fill}%`,
+                          height: '100%',
+                          background: m.bar,
+                          borderRadius: 4,
+                        }}
+                      />
+                    </div>
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        color: m.text,
+                        background: m.bg,
+                        padding: '3px 9px',
+                        borderRadius: 999,
+                        flexShrink: 0,
+                        minWidth: 58,
+                        textAlign: 'center',
+                      }}
+                    >
+                      {sev}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
+            <p style={{ fontSize: 12, color: '#94A3B8', marginTop: 10, margin: '10px 0 0' }}>
+              ★ Primary driver · Severity estimated from bias type and decision outcome
+            </p>
           </section>
         )}
 
@@ -772,17 +956,65 @@ export default async function CaseStudyDetailPage({
           </section>
         )}
 
-        {/* Toxic combinations */}
+        {/* Toxic combinations — pattern cards */}
         {caseStudy.toxicCombinations.length > 0 && (
           <section style={{ marginBottom: 40 }}>
             <SectionTitle>Toxic combinations</SectionTitle>
-            <ul style={{ margin: 0, paddingLeft: 20, fontSize: 14, color: '#334155' }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+                gap: 12,
+              }}
+            >
               {caseStudy.toxicCombinations.map((combo, i) => (
-                <li key={i} style={{ marginBottom: 6, lineHeight: 1.6 }}>
-                  {combo}
-                </li>
+                <div
+                  key={i}
+                  style={{
+                    background: '#FFF7ED',
+                    border: '1px solid #FED7AA',
+                    borderLeft: '4px solid #EA580C',
+                    borderRadius: 12,
+                    padding: '14px 16px',
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 700,
+                      color: '#C2410C',
+                      marginBottom: 6,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: 20,
+                        height: 20,
+                        borderRadius: '50%',
+                        background: '#EA580C',
+                        color: '#FFFFFF',
+                        fontSize: 10,
+                        fontWeight: 800,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                      }}
+                    >
+                      !
+                    </span>
+                    {combo}
+                  </div>
+                  <div style={{ fontSize: 13, color: '#7C2D12', lineHeight: 1.55 }}>
+                    {TOXIC_DESCRIPTIONS[combo] ||
+                      'Compound cognitive failure pattern identified in this decision.'}
+                  </div>
+                </div>
               ))}
-            </ul>
+            </div>
           </section>
         )}
 
@@ -793,10 +1025,10 @@ export default async function CaseStudyDetailPage({
         <section style={{ marginBottom: 40 }}>
           <SectionTitle>Reference class base rates</SectionTitle>
           <Card>
-            <p style={{ fontSize: 13, color: '#64748B', margin: 0, marginBottom: 8 }}>
+            <p style={{ fontSize: 13, color: '#64748B', margin: '0 0 16px' }}>
               Across all {referenceClass.n} curated case studies in our library:
             </p>
-            <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', marginBottom: 20 }}>
               <div style={{ minWidth: 0 }}>
                 <div
                   style={{ fontSize: 'clamp(24px, 4vw, 28px)', fontWeight: 800, color: '#DC2626' }}
@@ -809,6 +1041,21 @@ export default async function CaseStudyDetailPage({
               </div>
               <div style={{ minWidth: 0 }}>
                 <div
+                  style={{
+                    fontSize: 'clamp(24px, 4vw, 28px)',
+                    fontWeight: 800,
+                    color: '#F59E0B',
+                  }}
+                >
+                  {((1 - referenceClass.failureRate - referenceClass.successRate) * 100).toFixed(0)}
+                  %
+                </div>
+                <div style={{ fontSize: 11, color: '#64748B', textTransform: 'uppercase' }}>
+                  partial / mixed
+                </div>
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <div
                   style={{ fontSize: 'clamp(24px, 4vw, 28px)', fontWeight: 800, color: C.green }}
                 >
                   {(referenceClass.successRate * 100).toFixed(0)}%
@@ -817,6 +1064,57 @@ export default async function CaseStudyDetailPage({
                   base success rate
                 </div>
               </div>
+            </div>
+            {/* Stacked bar */}
+            <div
+              style={{
+                display: 'flex',
+                height: 10,
+                borderRadius: 8,
+                overflow: 'hidden',
+                gap: 2,
+              }}
+            >
+              <div
+                style={{
+                  flex: referenceClass.failureRate,
+                  background: '#DC2626',
+                  borderRadius: '8px 0 0 8px',
+                }}
+              />
+              <div
+                style={{
+                  flex: 1 - referenceClass.failureRate - referenceClass.successRate,
+                  background: '#F59E0B',
+                }}
+              />
+              <div
+                style={{
+                  flex: referenceClass.successRate,
+                  background: '#16A34A',
+                  borderRadius: '0 8px 8px 0',
+                }}
+              />
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                gap: 16,
+                marginTop: 8,
+                fontSize: 11,
+                color: '#94A3B8',
+                flexWrap: 'wrap',
+              }}
+            >
+              <span>
+                <span style={{ color: '#DC2626' }}>■</span> Failure
+              </span>
+              <span>
+                <span style={{ color: '#F59E0B' }}>■</span> Partial
+              </span>
+              <span>
+                <span style={{ color: '#16A34A' }}>■</span> Success
+              </span>
             </div>
           </Card>
         </section>

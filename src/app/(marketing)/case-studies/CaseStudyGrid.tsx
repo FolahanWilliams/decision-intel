@@ -17,6 +17,10 @@ interface GridCase {
   primaryBias: string;
   lessonPreview: string;
   hasDeepAnalysis: boolean;
+  biasCount: number;
+  toxicCount: number;
+  impactScore: number;
+  estimatedImpact: string;
 }
 
 interface CaseStudyGridProps {
@@ -182,15 +186,32 @@ export function CaseStudyGrid({ cases, industries }: CaseStudyGridProps) {
                 })
               }
               style={{
-                display: 'block',
+                display: 'flex',
+                flexDirection: 'column',
                 textDecoration: 'none',
                 color: 'inherit',
                 background: '#FFFFFF',
                 border: `1px solid ${C.slate200}`,
                 borderRadius: 16,
                 padding: 20,
+                position: 'relative',
+                overflow: 'hidden',
               }}
             >
+              {/* Outcome accent strip */}
+              <span
+                aria-hidden
+                style={{
+                  position: 'absolute',
+                  inset: '0 0 auto 0',
+                  height: 3,
+                  background: isFailureOutcome(c.outcome)
+                    ? '#DC2626'
+                    : isSuccessOutcome(c.outcome)
+                      ? C.green
+                      : '#F59E0B',
+                }}
+              />
               <div
                 style={{
                   display: 'flex',
@@ -254,18 +275,10 @@ export function CaseStudyGrid({ cases, industries }: CaseStudyGridProps) {
               >
                 {c.company}
               </h3>
-              <p style={{ fontSize: 13, color: C.slate500, margin: 0, marginBottom: 10 }}>
-                {c.title}
-              </p>
+              <p style={{ fontSize: 13, color: C.slate500, margin: '0 0 10px' }}>{c.title}</p>
 
               {c.primaryBias && (
-                <div
-                  style={{
-                    fontSize: 11,
-                    color: C.slate700,
-                    marginBottom: 8,
-                  }}
-                >
+                <div style={{ fontSize: 11, color: C.slate700, marginBottom: 8 }}>
                   <strong>Primary bias:</strong> {formatBiasName(c.primaryBias)}
                 </div>
               )}
@@ -275,17 +288,72 @@ export function CaseStudyGrid({ cases, industries }: CaseStudyGridProps) {
                   style={{
                     fontSize: 12,
                     color: C.slate500,
-                    margin: 0,
+                    margin: '0 0 14px',
                     lineHeight: 1.5,
                     display: '-webkit-box',
                     WebkitLineClamp: 2,
                     WebkitBoxOrient: 'vertical',
                     overflow: 'hidden',
+                    flex: 1,
                   }}
                 >
                   {c.lessonPreview}
                 </p>
               )}
+
+              {/* Stats footer */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  paddingTop: 12,
+                  borderTop: `1px solid ${C.slate200}`,
+                  marginTop: 'auto',
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: isFailureOutcome(c.outcome) ? '#DC2626' : C.slate500,
+                  }}
+                >
+                  {c.biasCount} bias{c.biasCount !== 1 ? 'es' : ''}
+                </span>
+                {c.toxicCount > 0 && (
+                  <span
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: '#EA580C',
+                    }}
+                  >
+                    {c.toxicCount} toxic
+                  </span>
+                )}
+                <div
+                  style={{
+                    flex: 1,
+                    height: 4,
+                    background: '#F1F5F9',
+                    borderRadius: 2,
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${c.impactScore}%`,
+                      height: '100%',
+                      background: isFailureOutcome(c.outcome) ? '#DC2626' : C.green,
+                      borderRadius: 2,
+                    }}
+                  />
+                </div>
+                <span style={{ fontSize: 10, color: C.slate500, flexShrink: 0 }}>
+                  {c.impactScore}/100
+                </span>
+              </div>
             </Link>
           );
         })}

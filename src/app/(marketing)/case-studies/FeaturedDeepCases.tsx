@@ -195,19 +195,64 @@ export function FeaturedDeepCases({ cases }: { cases: CaseStudy[] }) {
                 </div>
               )}
 
+              {/* Bias count + DQI footer */}
               <div
                 style={{
-                  display: 'inline-flex',
+                  display: 'flex',
                   alignItems: 'center',
-                  gap: 4,
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: C.green,
-                  marginTop: 4,
+                  gap: 8,
+                  marginTop: 12,
+                  paddingTop: 10,
+                  borderTop: '1px solid #E2E8F0',
                 }}
               >
-                Read the full analysis
-                <ArrowRight size={11} />
+                <span style={{ fontSize: 11, color: C.slate500 }}>
+                  {c.biasesPresent.length} bias{c.biasesPresent.length !== 1 ? 'es' : ''}
+                </span>
+                {c.toxicCombinations.length > 0 && (
+                  <span style={{ fontSize: 11, color: '#EA580C', fontWeight: 600 }}>
+                    {c.toxicCombinations.length} toxic
+                  </span>
+                )}
+                {c.dqiEstimate && (
+                  <span
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 800,
+                      color:
+                        c.dqiEstimate.grade === 'F' || c.dqiEstimate.grade === 'D'
+                          ? '#DC2626'
+                          : c.dqiEstimate.grade === 'A' || c.dqiEstimate.grade === 'B'
+                            ? C.green
+                            : '#F59E0B',
+                      background:
+                        c.dqiEstimate.grade === 'F' || c.dqiEstimate.grade === 'D'
+                          ? '#FEE2E2'
+                          : c.dqiEstimate.grade === 'A' || c.dqiEstimate.grade === 'B'
+                            ? '#DCFCE7'
+                            : '#FEF3C7',
+                      padding: '2px 8px',
+                      borderRadius: 999,
+                      marginLeft: 'auto',
+                    }}
+                  >
+                    DQI {c.dqiEstimate.grade} · {c.dqiEstimate.score}
+                  </span>
+                )}
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: C.green,
+                    marginLeft: c.dqiEstimate ? 0 : 'auto',
+                  }}
+                >
+                  Read analysis
+                  <ArrowRight size={11} />
+                </div>
               </div>
             </Link>
           );

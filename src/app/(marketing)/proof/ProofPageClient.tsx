@@ -254,6 +254,7 @@ export function ProofPageClient() {
             detectableRedFlags={evidence.detectableRedFlags}
             flaggableBiases={evidence.flaggableBiases}
             hypotheticalAnalysis={evidence.hypotheticalAnalysis}
+            dqiEstimate={active.dqiEstimate}
           />
         </div>
 

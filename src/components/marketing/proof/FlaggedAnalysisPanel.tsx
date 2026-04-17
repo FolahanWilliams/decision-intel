@@ -38,14 +38,26 @@ interface FlaggedAnalysisPanelProps {
   detectableRedFlags: string[];
   flaggableBiases: string[];
   hypotheticalAnalysis: string;
+  dqiEstimate?: { score: number; grade: string };
 }
 
 export function FlaggedAnalysisPanel({
   detectableRedFlags,
   flaggableBiases,
   hypotheticalAnalysis,
+  dqiEstimate,
 }: FlaggedAnalysisPanelProps) {
-  const dqi = projectDqi(flaggableBiases.length);
+  const projected = projectDqi(flaggableBiases.length);
+  const dqi = dqiEstimate
+    ? {
+        score: dqiEstimate.score,
+        label:
+          dqiEstimate.score < 40 ? 'HIGH RISK' : dqiEstimate.score < 70 ? 'MODERATE' : 'DEFENSIBLE',
+        color: dqiEstimate.score < 40 ? C.red : dqiEstimate.score < 70 ? C.amber : C.green,
+        canonical: true,
+        grade: dqiEstimate.grade,
+      }
+    : { ...projected, canonical: false, grade: null };
 
   return (
     <div
@@ -126,28 +138,39 @@ export function FlaggedAnalysisPanel({
           >
             {dqi.label}
           </div>
-          <div
-            style={{
-              fontSize: 28,
-              fontWeight: 800,
-              color: dqi.color,
-              fontFamily: 'var(--font-mono, monospace)',
-              lineHeight: 1,
-            }}
-          >
-            {dqi.score}
-            <span
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+            <div
               style={{
-                fontSize: 13,
-                fontWeight: 500,
-                color: C.slate400,
-                fontFamily: 'inherit',
+                fontSize: 28,
+                fontWeight: 800,
+                color: dqi.color,
+                fontFamily: 'var(--font-mono, monospace)',
+                lineHeight: 1,
               }}
             >
-              /100
-            </span>
+              {dqi.score}
+              <span
+                style={{ fontSize: 13, fontWeight: 500, color: C.slate400, fontFamily: 'inherit' }}
+              >
+                /100
+              </span>
+            </div>
+            {dqi.grade && (
+              <span
+                style={{
+                  fontSize: 18,
+                  fontWeight: 800,
+                  color: dqi.color,
+                  fontFamily: 'var(--font-mono, monospace)',
+                }}
+              >
+                {dqi.grade}
+              </span>
+            )}
           </div>
-          <div style={{ fontSize: 10, color: C.slate400, marginTop: 2 }}>Projected DQI</div>
+          <div style={{ fontSize: 10, color: C.slate400, marginTop: 2 }}>
+            {dqi.canonical ? 'Canonical DQI' : 'Projected DQI'}
+          </div>
         </div>
       </div>
 
