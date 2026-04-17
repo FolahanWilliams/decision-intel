@@ -601,6 +601,14 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Case Study Carousel ─────────────────────────────────────── */}
+      <CaseStudyCarousel />
+
+      {/* ── Credibility trio (Proof / Bias Genome / Privacy) ────────── */}
+      <Reveal>
+        <CredibilityTrio />
+      </Reveal>
+
       {/* ── Four Moments (core value proposition) ───────────────────── */}
       <Reveal>
       <section
@@ -777,9 +785,6 @@ export default function LandingPage() {
       </section>
       </Reveal>
 
-      {/* ── Case Study Carousel ─────────────────────────────────────── */}
-      <CaseStudyCarousel />
-
       {/* ── How It Works ────────────────────────────────────────────── */}
       <Reveal>
       <section id="how-it-works" style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}>
@@ -822,11 +827,6 @@ export default function LandingPage() {
           <OutcomeDetectionViz />
         </motion.div>
       </section>
-      </Reveal>
-
-      {/* ── Credibility trio (Proof / Bias Genome / Privacy) ────────── */}
-      <Reveal>
-        <CredibilityTrio />
       </Reveal>
 
       {/* ── Features ────────────────────────────────────────────────── */}
@@ -1398,9 +1398,9 @@ export default function LandingPage() {
         }
       `}</style>
 
-      {/* ── Final CTA ───────────────────────────────────────────────── */}
+      {/* ── Final CTA + Newsletter ──────────────────────────────────── */}
       <section style={{ background: C.slate50, borderTop: `1px solid ${C.slate200}` }}>
-        <div style={{ maxWidth: 640, margin: '0 auto', padding: '80px 24px', textAlign: 'center' }}>
+        <div style={{ maxWidth: 640, margin: '0 auto', padding: '80px 24px 48px', textAlign: 'center' }}>
           <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
             <h2 style={{ fontSize: 36, fontWeight: 700, color: C.slate900, marginBottom: 16 }}>
               Ready to compound your team&rsquo;s judgment?
@@ -1452,37 +1452,49 @@ export default function LandingPage() {
             </div>
           </motion.div>
         </div>
-      </section>
 
-      {/* ── Newsletter ─────────────────────────────────────────────── */}
-      <section style={{ background: '#0B1120', borderTop: '1px solid #1E293B' }}>
+        {/* Secondary: newsletter capture for the not-ready-yet segment */}
+        <div style={{ maxWidth: 640, margin: '0 auto', padding: '0 24px' }}>
+          <div style={{ borderTop: `1px solid ${C.slate200}` }} />
+        </div>
         <div
           style={{
-            maxWidth: 720,
+            maxWidth: 640,
             margin: '0 auto',
-            padding: '64px 24px',
+            padding: '48px 24px 80px',
             textAlign: 'center',
           }}
         >
-          <h3
+          <p
             style={{
-              fontSize: 24,
+              fontSize: 12,
               fontWeight: 700,
-              color: C.white,
-              marginBottom: 8,
+              color: C.slate500,
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              margin: '0 0 10px',
             }}
           >
-            The Decision Intelligence Brief
+            Not ready for a pilot?
+          </p>
+          <h3
+            style={{
+              fontSize: 22,
+              fontWeight: 700,
+              color: C.slate900,
+              margin: '0 0 10px',
+              letterSpacing: '-0.01em',
+            }}
+          >
+            Get one corporate-decision post-mortem a week.
           </h3>
           <p
             style={{
-              fontSize: 15,
-              color: '#94A3B8',
-              lineHeight: 1.7,
-              marginBottom: 24,
-              maxWidth: 520,
-              marginLeft: 'auto',
-              marginRight: 'auto',
+              fontSize: 14,
+              color: C.slate600,
+              lineHeight: 1.65,
+              margin: '0 auto 20px',
+              maxWidth: 480,
             }}
           >
             One real-world case study per week, broken down with the cognitive biases that were
