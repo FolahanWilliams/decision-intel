@@ -201,6 +201,7 @@ src/
 - Free tier: 4 analyses/month (defined in `src/lib/stripe.ts` → `PLANS.free.analysesPerMonth`)
 - Limit enforced by `checkAnalysisLimit()` in `src/lib/utils/plan-limits.ts`
 - Stripe price IDs may not be configured yet. Upgrade buttons must fall back gracefully to `/#pricing` when `PLANS.pro.priceId` is empty.
+- **Admin full-access bypass.** Supabase user IDs listed in `ADMIN_USER_IDS` (Vercel env var, comma-separated) resolve to the `enterprise` plan in `getUserPlan()` / `getOrgPlan()` / `/api/billing` — no Stripe subscription needed. Intended for founder dogfooding and end-to-end testing. Bootstrap: set `ADMIN_EMAILS` first, deploy, visit `/api/admin/whoami` to discover your Supabase UUID, then paste into `ADMIN_USER_IDS` and redeploy. Helper: `isAdminUserId(userId)` in `src/lib/utils/admin.ts`.
 
 ### Integrations
 - **Slack:** 7 slash commands, thread monitoring, auto-creates CopilotSession + DecisionRoom after audits. Handler in `src/app/api/integrations/slack/events/route.ts`.

@@ -1,10 +1,17 @@
 import { prisma } from '@/lib/prisma';
 import { PLANS, PlanType } from '@/lib/stripe';
+import { isAdminUserId } from './admin';
 import { createLogger } from './logger';
 
 const log = createLogger('PlanLimits');
 
 export async function getUserPlan(userId: string): Promise<PlanType> {
+  // Founder / admin bypass — users listed in ADMIN_USER_IDS always resolve
+  // to the enterprise plan so they can exercise gated features end-to-end
+  // (full bias taxonomy, unlimited audits, team features) without burning
+  // real money. Safe because the env var is server-only and explicit.
+  if (isAdminUserId(userId)) return 'enterprise';
+
   try {
     const sub = await prisma.subscription.findFirst({
       where: {

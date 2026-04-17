@@ -25,4 +25,24 @@ export async function verifyAdmin(): Promise<{ id: string; email: string } | nul
   return { id: user.id, email: user.email };
 }
 
+/**
+ * Synchronous admin check by Supabase user ID. Used by server code paths
+ * that already have a userId (e.g. plan-limits.ts, billing APIs) to grant
+ * full-access plan without hitting Supabase's admin API on every call.
+ *
+ * Configuration: set `ADMIN_USER_IDS` on Vercel to a comma-separated list
+ * of Supabase user UUIDs. The founder can look up their own ID by hitting
+ * `/api/admin/whoami` while logged in.
+ *
+ * Returns false if the env var isn't set or the userId isn't in the list.
+ */
+export function isAdminUserId(userId: string | null | undefined): boolean {
+  if (!userId) return false;
+  const ids = (process.env.ADMIN_USER_IDS?.split(',') || [])
+    .map(id => id.trim())
+    .filter(Boolean);
+  if (ids.length === 0) return false;
+  return ids.includes(userId);
+}
+
 export { ADMIN_DENIED };

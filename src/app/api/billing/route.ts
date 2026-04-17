@@ -8,6 +8,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { PLANS, PlanType } from '@/lib/stripe';
+import { isAdminUserId } from '@/lib/utils/admin';
 import { createLogger } from '@/lib/utils/logger';
 import { isSchemaDrift } from '@/lib/utils/error';
 
@@ -51,9 +52,14 @@ export async function GET() {
       }
     }
 
-    const plan = (subscription?.plan as PlanType) || 'free';
+    // Admins (ADMIN_USER_IDS) always resolve to enterprise so the dashboard
+    // UI reflects the same bypass that plan-limits applies server-side.
+    const isAdmin = isAdminUserId(user.id);
+    const plan: PlanType = isAdmin
+      ? 'enterprise'
+      : ((subscription?.plan as PlanType) || 'free');
     const limits = PLANS[plan];
-    const status = subscription?.status || 'none';
+    const status = isAdmin ? 'admin' : subscription?.status || 'none';
 
     // Count analyses this month
     const startOfMonth = new Date();
