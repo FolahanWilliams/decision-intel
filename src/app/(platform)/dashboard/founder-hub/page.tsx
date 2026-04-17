@@ -130,6 +130,13 @@ const FounderSchoolTab = dynamic(
     })),
   { loading: tabLoader }
 );
+const CronControlsTab = dynamic(
+  () =>
+    import('@/components/founder-hub/CronControlsTab').then(m => ({
+      default: m.CronControlsTab,
+    })),
+  { loading: tabLoader }
+);
 import {
   Rocket,
   Brain,
@@ -145,6 +152,7 @@ import {
   Library,
   Lightbulb,
   GraduationCap,
+  Terminal,
 } from 'lucide-react';
 import { card } from '@/components/founder-hub/shared-styles';
 import { AccordionSection } from '@/components/founder-hub/AccordionSection';
@@ -162,7 +170,8 @@ type TabId =
   | 'data_ecosystem'
   | 'case_library'
   | 'founder_tips'
-  | 'founder_school';
+  | 'founder_school'
+  | 'cron_controls';
 
 type TabGroup = 'Product' | 'Go-to-Market' | 'Intelligence' | 'Tools';
 
@@ -224,6 +233,12 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
     id: 'founder_school',
     label: 'Founder School',
     icon: <GraduationCap size={16} />,
+    group: 'Tools',
+  },
+  {
+    id: 'cron_controls',
+    label: 'Cron Controls',
+    icon: <Terminal size={16} />,
     group: 'Tools',
   },
 ];
@@ -363,6 +378,13 @@ const SEARCH_INDEX: SearchEntry[] = [
     preview: 'Curated learning library for a solo technical founder.',
     keywords:
       'founder school learning library curriculum sources reading list curated education lessons',
+  },
+  {
+    tabId: 'cron_controls',
+    section: 'Cron Controls',
+    preview: 'Manually fire scheduled jobs: LinkedIn email, Drive sync, outcome reminders.',
+    keywords:
+      'cron controls trigger manual run linkedin email drive sync outcome reminders dispatcher schedule jobs test admin',
   },
 ];
 
@@ -957,6 +979,11 @@ function renderTab(activeTab: TabId, FOUNDER_PASS: string): React.ReactNode {
     founder_school: (
       <ErrorBoundary sectionName="Founder School">
         <FounderSchoolTab founderPass={FOUNDER_PASS} />
+      </ErrorBoundary>
+    ),
+    cron_controls: (
+      <ErrorBoundary sectionName="Cron Controls">
+        <CronControlsTab />
       </ErrorBoundary>
     ),
   };
