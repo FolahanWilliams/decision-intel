@@ -397,7 +397,7 @@ export default function LandingPage() {
                 marginBottom: 12,
               }}
             >
-              Grammarly for strategic decisions
+              For corporate strategy teams
             </p>
             <h1
               style={{
@@ -687,8 +687,7 @@ export default function LandingPage() {
                     in the steering committee. That&rsquo;s time your team never gets back. Our
                     simulation engine runs your memo against 135 historical decisions with known
                     outcomes, predicting the objections, forgotten angles, and counterarguments
-                    before the meeting. Walk in prepared, walk out faster, and hand the CEO
-                    answers&mdash;not revisions.
+                    before the meeting. You walk in with the objections already answered.
                   </>
                 ),
               },
@@ -978,7 +977,7 @@ export default function LandingPage() {
                 marginBottom: 14,
               }}
             >
-              One avoided bad call pays for the year.
+              A fraction of what a single misjudged decision costs.
             </h2>
             <p
               style={{

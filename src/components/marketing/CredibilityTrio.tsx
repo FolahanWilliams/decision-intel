@@ -3,7 +3,7 @@
 /**
  * CredibilityTrio
  *
- * Landing-page section surfacing the three "receipts" pages (/proof,
+ * Landing-page section surfacing the three evidence pages (/proof,
  * /bias-genome, /privacy) as a clean horizontal trio, each with a
  * purpose-built SVG thumbnail and a CTA to the full page. Upgrades the
  * Bias Genome from a footer link to a first-class landing slot alongside
@@ -41,25 +41,25 @@ const C = {
 const CARDS = [
   {
     href: '/proof',
-    eyebrow: 'Case evidence',
-    title: 'See the red flags that preceded real outcomes.',
-    body: 'Every case in our library ships with the pre-decision memo, the biases our pipeline would have flagged, and the outcome that actually happened. No cherry-picking — just the receipts.',
-    cta: 'Browse the proof',
+    eyebrow: 'Case library',
+    title: 'The red flags that preceded real outcomes.',
+    body: 'Each case pairs the pre-decision memo, the biases the pipeline flagged, and what happened next. The source documents are public, so you can check our reading against them.',
+    cta: 'See the cases',
     thumb: 'proof' as const,
   },
   {
     href: '/bias-genome',
-    eyebrow: 'Cross-decision intel',
-    title: 'Which biases actually break decisions?',
-    body: 'The bias genome ranks every taxonomy entry by how often it appears in failed memos, with a failure-lift multiplier grounded in 135 audited historical cases. A leaderboard, not a glossary.',
-    cta: 'See the leaderboard',
+    eyebrow: 'Across 135 decisions',
+    title: 'Which biases most often precede failure.',
+    body: 'Every bias in the taxonomy is ranked by how often it appears in failed strategic decisions, across 135 audited cases and thirteen industries. Methodology and data are open.',
+    cta: 'See the rankings',
     thumb: 'genome' as const,
   },
   {
     href: '/privacy',
     eyebrow: 'Security posture',
     title: 'Your memos are evidence. We treat them that way.',
-    body: 'GDPR anonymization runs first — before any analysis LLM sees your text. AES-256-GCM at rest, TLS 1.2+ in transit, no training on your content, 30-day hard-delete.',
+    body: 'GDPR anonymization runs first, before any analysis model sees your text. AES-256-GCM at rest, TLS 1.2+ in transit, no training on your content, 30-day hard-delete when you are done.',
     cta: 'Read the policy',
     thumb: 'privacy' as const,
   },
@@ -85,7 +85,7 @@ export function CredibilityTrio() {
             marginBottom: 8,
           }}
         >
-          Trust, not trust-us
+          The evidence
         </div>
         <h2
           style={{
@@ -96,11 +96,12 @@ export function CredibilityTrio() {
             letterSpacing: '-0.01em',
           }}
         >
-          Every claim we make is a page.
+          The underlying evidence.
         </h2>
         <p style={{ fontSize: 18, color: C.slate600, margin: 0, maxWidth: 620 }}>
-          Click in &mdash; read the receipts. Case evidence, cross-decision intel, and our full
-          security posture all live in public.
+          The cases behind the methodology, the bias patterns that most often precede failure, and
+          exactly how your documents are handled. Every claim on this site traces back to one of
+          these pages.
         </p>
       </div>
 
