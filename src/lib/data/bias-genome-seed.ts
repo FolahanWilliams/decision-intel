@@ -94,8 +94,7 @@ const TOXIC_PAIR_DEFS: Record<string, { biases: [string, string]; description: s
   },
   'Blind Sprint': {
     biases: ['overconfidence_bias', 'planning_fallacy'],
-    description:
-      'Overconfidence meets systematic underestimation of time and complexity.',
+    description: 'Overconfidence meets systematic underestimation of time and complexity.',
   },
   'Yes Committee': {
     biases: ['groupthink', 'authority_bias'],
@@ -109,13 +108,11 @@ const TOXIC_PAIR_DEFS: Record<string, { biases: [string, string]; description: s
   },
   'Status Quo Lock': {
     biases: ['status_quo_bias', 'loss_aversion'],
-    description:
-      'The fear of loss from any change outweighs the documented cost of inaction.',
+    description: 'The fear of loss from any change outweighs the documented cost of inaction.',
   },
   'Doubling Down': {
     biases: ['sunk_cost_fallacy', 'loss_aversion'],
-    description:
-      'Escalating commitment to a losing course to avoid realizing the loss.',
+    description: 'Escalating commitment to a losing course to avoid realizing the loss.',
   },
 };
 
@@ -185,10 +182,7 @@ export function computeGenomeFromSeed(): BiasGenomeResult {
       for (const pattern of c.toxicCombinations) {
         const def = TOXIC_PAIR_DEFS[pattern];
         if (def && (def.biases[0] === bias || def.biases[1] === bias)) {
-          bucket.toxicCooccurrence.set(
-            pattern,
-            (bucket.toxicCooccurrence.get(pattern) ?? 0) + 1
-          );
+          bucket.toxicCooccurrence.set(pattern, (bucket.toxicCooccurrence.get(pattern) ?? 0) + 1);
         }
       }
     }
@@ -204,15 +198,11 @@ export function computeGenomeFromSeed(): BiasGenomeResult {
       .map(c => c.impactScore)
       .filter((n): n is number => typeof n === 'number' && n > 0);
     const avgFailureImpact =
-      impacts.length > 0
-        ? Math.round(impacts.reduce((a, b) => a + b, 0) / impacts.length)
-        : null;
+      impacts.length > 0 ? Math.round(impacts.reduce((a, b) => a + b, 0) / impacts.length) : null;
 
     let topToxicPattern: string | null = null;
     if (bucket.toxicCooccurrence.size > 0) {
-      topToxicPattern = [...bucket.toxicCooccurrence.entries()].sort(
-        (a, b) => b[1] - a[1]
-      )[0][0];
+      topToxicPattern = [...bucket.toxicCooccurrence.entries()].sort((a, b) => b[1] - a[1])[0][0];
     }
 
     let topIndustry: Industry | null = null;
@@ -264,8 +254,7 @@ export function computeGenomeFromSeed(): BiasGenomeResult {
     reliable
       .filter(e => e.failureLift != null)
       .sort((a, b) => (b.failureLift ?? 0) - (a.failureLift ?? 0))[0] ?? null;
-  const mostPrevalent =
-    [...entries].sort((a, b) => b.sampleSize - a.sampleSize)[0] ?? null;
+  const mostPrevalent = [...entries].sort((a, b) => b.sampleSize - a.sampleSize)[0] ?? null;
   const mostCostly =
     reliable
       .filter(e => e.avgFailureImpact != null)
@@ -273,9 +262,7 @@ export function computeGenomeFromSeed(): BiasGenomeResult {
   // "Underestimated": lower prevalence but high lift (n>=3, prevalence<20%)
   const mostUnderestimated =
     entries
-      .filter(
-        e => e.failureLift != null && e.sampleSize >= 3 && e.prevalence < 0.2
-      )
+      .filter(e => e.failureLift != null && e.sampleSize >= 3 && e.prevalence < 0.2)
       .sort((a, b) => (b.failureLift ?? 0) - (a.failureLift ?? 0))[0] ?? null;
 
   // Toxic pattern summaries
@@ -298,7 +285,9 @@ export function computeGenomeFromSeed(): BiasGenomeResult {
   }
   toxicPatterns.sort((a, b) => b.caseCount - a.caseCount);
 
-  const industriesCovered = Array.from(new Set(ALL_CASES.map(c => c.industry))).sort() as Industry[];
+  const industriesCovered = Array.from(
+    new Set(ALL_CASES.map(c => c.industry))
+  ).sort() as Industry[];
 
   return {
     meta: {

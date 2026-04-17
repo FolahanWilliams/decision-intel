@@ -39,8 +39,7 @@ function cleanAuthError(message: string): string {
   if (/[a-z]{10,}/.test(message)) needs.push('a lowercase letter');
   if (/[A-Z]{10,}/.test(message)) needs.push('an uppercase letter');
   if (/[0-9]{8,}/.test(message)) needs.push('a digit');
-  if (/[!@#$%^&*()\-_=+[\]{};:'"\\|,.<>/?]{5,}/.test(message))
-    needs.push('a special character');
+  if (/[!@#$%^&*()\-_=+[\]{};:'"\\|,.<>/?]{5,}/.test(message)) needs.push('a special character');
 
   if (needs.length === 0) return 'Password does not meet the requirements.';
   if (needs.length === 1) return `Password must include ${needs[0]}.`;
@@ -107,11 +106,7 @@ function LoginContent() {
     if (code) {
       setHashError({ code, description });
       // Clean the hash so refresh / back-nav doesn't re-show a stale error.
-      window.history.replaceState(
-        null,
-        '',
-        window.location.pathname + window.location.search
-      );
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
     }
   }, []);
 
@@ -417,8 +412,8 @@ function LoginContent() {
               maxWidth: '440px',
             }}
           >
-            Score cognitive biases, predict steering-committee objections, and turn every major
-            call your team makes into a living Decision Knowledge Graph.
+            Score cognitive biases, predict steering-committee objections, and turn every major call
+            your team makes into a living Decision Knowledge Graph.
           </p>
 
           {/* Feature list */}
@@ -488,7 +483,6 @@ function LoginContent() {
               </div>
             ))}
           </div>
-
         </div>
       </div>
 
@@ -619,8 +613,7 @@ function LoginContent() {
                         'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)',
                       border: '1px solid rgba(22, 163, 74, 0.4)',
                       borderRadius: 12,
-                      cursor:
-                        verifyingOtp || otpCode.length < 6 ? 'not-allowed' : 'pointer',
+                      cursor: verifyingOtp || otpCode.length < 6 ? 'not-allowed' : 'pointer',
                       opacity: verifyingOtp || otpCode.length < 6 ? 0.7 : 1,
                       transition: 'all 0.15s',
                       fontFamily: 'inherit',
@@ -962,8 +955,7 @@ function LoginContent() {
                         verifyingOtp || otpCode.length < 6 || password.length < 8
                           ? 'not-allowed'
                           : 'pointer',
-                      opacity:
-                        verifyingOtp || otpCode.length < 6 || password.length < 8 ? 0.7 : 1,
+                      opacity: verifyingOtp || otpCode.length < 6 || password.length < 8 ? 0.7 : 1,
                       transition: 'all 0.15s',
                       fontFamily: 'inherit',
                       display: 'flex',
@@ -1218,9 +1210,7 @@ function LoginContent() {
                     margin: '1.25rem 0',
                   }}
                 >
-                  <div
-                    style={{ flex: 1, height: 1, background: 'var(--border-color, #E2E8F0)' }}
-                  />
+                  <div style={{ flex: 1, height: 1, background: 'var(--border-color, #E2E8F0)' }} />
                   <span
                     style={{
                       fontSize: '0.72rem',
@@ -1232,9 +1222,7 @@ function LoginContent() {
                   >
                     or
                   </span>
-                  <div
-                    style={{ flex: 1, height: 1, background: 'var(--border-color, #E2E8F0)' }}
-                  />
+                  <div style={{ flex: 1, height: 1, background: 'var(--border-color, #E2E8F0)' }} />
                 </div>
 
                 {/* Email / password form */}
@@ -1411,28 +1399,28 @@ function LoginContent() {
                 }}
               >
                 By signing in, you agree to our{' '}
-              <Link
-                href="/terms"
-                style={{
-                  color: 'var(--accent-primary, #16A34A)',
-                  textDecoration: 'underline',
-                  textUnderlineOffset: '2px',
-                }}
-              >
-                terms of service
-              </Link>{' '}
-              and{' '}
-              <Link
-                href="/privacy"
-                style={{
-                  color: 'var(--accent-primary, #16A34A)',
-                  textDecoration: 'underline',
-                  textUnderlineOffset: '2px',
-                }}
-              >
-                privacy policy
-              </Link>
-              .
+                <Link
+                  href="/terms"
+                  style={{
+                    color: 'var(--accent-primary, #16A34A)',
+                    textDecoration: 'underline',
+                    textUnderlineOffset: '2px',
+                  }}
+                >
+                  terms of service
+                </Link>{' '}
+                and{' '}
+                <Link
+                  href="/privacy"
+                  style={{
+                    color: 'var(--accent-primary, #16A34A)',
+                    textDecoration: 'underline',
+                    textUnderlineOffset: '2px',
+                  }}
+                >
+                  privacy policy
+                </Link>
+                .
               </p>
             )}
           </div>

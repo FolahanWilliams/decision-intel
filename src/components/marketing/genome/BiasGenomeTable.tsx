@@ -41,11 +41,7 @@ interface BiasGenomeTableProps {
   scopeLabel?: string;
 }
 
-export function BiasGenomeTable({
-  entries,
-  maxLift,
-  scopeLabel,
-}: BiasGenomeTableProps) {
+export function BiasGenomeTable({ entries, maxLift, scopeLabel }: BiasGenomeTableProps) {
   const safeMax = Math.max(maxLift, 1.2);
 
   return (
@@ -114,8 +110,7 @@ export function BiasGenomeTable({
                 padding: '14px 24px',
                 alignItems: 'center',
                 fontSize: 13,
-                borderBottom:
-                  i === entries.length - 1 ? 'none' : `1px solid ${C.slate100}`,
+                borderBottom: i === entries.length - 1 ? 'none' : `1px solid ${C.slate100}`,
                 opacity: lowSample ? 0.78 : 1,
               }}
             >
@@ -249,9 +244,7 @@ export function BiasGenomeTable({
                 )}
               </span>
 
-              <span style={{ fontSize: 12, color: C.slate500, lineHeight: 1.5 }}>
-                {e.insight}
-              </span>
+              <span style={{ fontSize: 12, color: C.slate500, lineHeight: 1.5 }}>{e.insight}</span>
             </div>
           );
         })

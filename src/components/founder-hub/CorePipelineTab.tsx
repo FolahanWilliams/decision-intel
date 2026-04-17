@@ -17,15 +17,27 @@ const NODE_ROUTING: Array<{ node: string; tier: ModelTier; why: string }> = [
   { node: 'gdprAnonymizer', tier: 'cheap', why: 'Mechanical PII redaction; pattern-matching task' },
   { node: 'structurer', tier: 'cheap', why: 'Sectioning + speaker turns; no judgment required' },
   { node: 'intelligenceGatherer', tier: 'cheap', why: 'Topic + industry extraction; short output' },
-  { node: 'biasDetective', tier: 'main', why: '20-bias taxonomy; needs reasoning + grounded search' },
+  {
+    node: 'biasDetective',
+    tier: 'main',
+    why: '20-bias taxonomy; needs reasoning + grounded search',
+  },
   { node: 'noiseJudge', tier: 'main', why: 'Multi-instance jury for variance measurement' },
   { node: 'verificationNode', tier: 'main', why: 'Fact-check via search + compliance mapping' },
   { node: 'deepAnalysisNode', tier: 'main', why: 'Sentiment + logic + SWOT + cognitive diversity' },
   { node: 'simulationNode', tier: 'main', why: 'Boardroom twin simulation; creative reasoning' },
   { node: 'rpdRecognitionNode', tier: 'main', why: 'Klein RPD pattern matching against history' },
   { node: 'forgottenQuestionsNode', tier: 'main', why: 'Unknown-unknowns surfacing; creative' },
-  { node: 'metaJudgeNode', tier: 'pro', why: 'Final verdict over 7 parallel signals — highest leverage' },
-  { node: 'riskScorer', tier: 'none', why: 'Compound scoring + Bayesian + report assembly (pure math)' },
+  {
+    node: 'metaJudgeNode',
+    tier: 'pro',
+    why: 'Final verdict over 7 parallel signals — highest leverage',
+  },
+  {
+    node: 'riskScorer',
+    tier: 'none',
+    why: 'Compound scoring + Bayesian + report assembly (pure math)',
+  },
 ];
 
 export function CorePipelineTab() {

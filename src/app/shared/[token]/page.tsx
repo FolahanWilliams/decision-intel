@@ -94,9 +94,7 @@ const SEV_META: Record<string, { bg: string; fg: string; border: string; label: 
 };
 
 function formatBiasLabel(key: string): string {
-  return key
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase());
+  return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
 function extractPreviewText(data: unknown, maxLength = 200): string {
@@ -119,19 +117,21 @@ function extractPreviewText(data: unknown, maxLength = 200): string {
 function synthesisedQuestions(analysis: SharedAnalysis): string[] {
   const out: string[] = [];
   const primary = [...analysis.biases].sort(
-    (a, b) => (SEV_ORDER[a.severity] ?? 4) - (SEV_ORDER[b.severity] ?? 4),
+    (a, b) => (SEV_ORDER[a.severity] ?? 4) - (SEV_ORDER[b.severity] ?? 4)
   )[0];
 
   if (primary) {
     const name = formatBiasLabel(primary.biasType).toLowerCase();
     out.push(
-      `Is there a chance we're underestimating ${name} on this call — and what would change our mind if so?`,
+      `Is there a chance we're underestimating ${name} on this call — and what would change our mind if so?`
     );
     if (primary.suggestion) {
       const stripped = primary.suggestion.replace(/^(A |The )/i, '').replace(/\.$/, '');
       const lower = stripped.charAt(0).toLowerCase() + stripped.slice(1);
       const trimmed = lower.length > 170 ? lower.slice(0, 167) + '…' : lower;
-      out.push(`Walk me through "${trimmed}" — what's our defensible answer if the board raises it?`);
+      out.push(
+        `Walk me through "${trimmed}" — what's our defensible answer if the board raises it?`
+      );
     }
   }
 
@@ -144,7 +144,7 @@ function synthesisedQuestions(analysis: SharedAnalysis): string[] {
   }
 
   out.push(
-    `If this memo were re-run in six months with the outcome revealed, what do we think would embarrass us most?`,
+    `If this memo were re-run in six months with the outcome revealed, what do we think would embarrass us most?`
   );
 
   return out.slice(0, 4);
@@ -226,10 +226,19 @@ function LockedSectionsTeaser({ analysis }: { analysis: SharedAnalysis }) {
                 padding: '14px 18px',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: 6,
+                }}
+              >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   {section.icon}
-                  <span style={{ fontWeight: 600, fontSize: 14, color: C.slate900 }}>{section.title}</span>
+                  <span style={{ fontWeight: 600, fontSize: 14, color: C.slate900 }}>
+                    {section.title}
+                  </span>
                 </div>
                 <Lock size={13} style={{ color: C.slate400 }} />
               </div>
@@ -387,11 +396,11 @@ export default function SharedAnalysisPage() {
 
   const formattedExpiry = useMemo(
     () => (expiresAt ? new Date(expiresAt).toLocaleDateString() : null),
-    [expiresAt],
+    [expiresAt]
   );
   const formattedCreatedAt = useMemo(
     () => (analysis ? new Date(analysis.createdAt).toLocaleDateString() : ''),
-    [analysis],
+    [analysis]
   );
 
   /* ─── Password gate ──────────────────────────────────────────── */
@@ -612,7 +621,15 @@ export default function SharedAnalysisPage() {
               {isCaseStudy ? 'Case study' : 'Shared audit'}
             </span>
           </Link>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, fontSize: 12, color: C.slate500 }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 14,
+              fontSize: 12,
+              color: C.slate500,
+            }}
+          >
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
               <Eye size={12} /> Read-only
             </span>
@@ -783,7 +800,8 @@ export default function SharedAnalysisPage() {
                 letterSpacing: '-0.01em',
               }}
             >
-              {analysis.biases.length} red flag{analysis.biases.length === 1 ? '' : 's'} in this decision
+              {analysis.biases.length} red flag{analysis.biases.length === 1 ? '' : 's'} in this
+              decision
             </h2>
             <p style={{ fontSize: 13, color: C.slate500, margin: '0 0 16px' }}>
               Each flag below was detected from the document alone — no outcome data, no hindsight.
@@ -808,7 +826,8 @@ export default function SharedAnalysisPage() {
                       alignItems: 'flex-start',
                       gap: 14,
                       padding: '14px 12px',
-                      borderBottom: i < rankedBiases.length - 1 ? `1px solid ${C.slate100}` : 'none',
+                      borderBottom:
+                        i < rankedBiases.length - 1 ? `1px solid ${C.slate100}` : 'none',
                     }}
                   >
                     <div
@@ -872,10 +891,25 @@ export default function SharedAnalysisPage() {
                           &ldquo;{bias.excerpt}&rdquo;
                         </p>
                       )}
-                      <p style={{ fontSize: 13, color: C.slate700, margin: '0 0 4px', lineHeight: 1.55 }}>
+                      <p
+                        style={{
+                          fontSize: 13,
+                          color: C.slate700,
+                          margin: '0 0 4px',
+                          lineHeight: 1.55,
+                        }}
+                      >
                         {bias.explanation}
                       </p>
-                      <p style={{ fontSize: 13, color: C.green, fontWeight: 600, margin: 0, lineHeight: 1.55 }}>
+                      <p
+                        style={{
+                          fontSize: 13,
+                          color: C.green,
+                          fontWeight: 600,
+                          margin: 0,
+                          lineHeight: 1.55,
+                        }}
+                      >
                         {bias.suggestion}
                       </p>
                     </div>
@@ -1059,9 +1093,9 @@ export default function SharedAnalysisPage() {
               lineHeight: 1.55,
             }}
           >
-            Same bias framework, same pre-decision discipline. Upload a strategic memo or board
-            deck — get the DQI grade, flagged biases, predicted questions, and recommended actions
-            before your next meeting.
+            Same bias framework, same pre-decision discipline. Upload a strategic memo or board deck
+            — get the DQI grade, flagged biases, predicted questions, and recommended actions before
+            your next meeting.
           </p>
           <div
             style={{

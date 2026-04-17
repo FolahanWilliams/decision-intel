@@ -189,18 +189,43 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
   // Product
   { id: 'overview', label: 'Product Overview', icon: <Rocket size={16} />, group: 'Product' },
   { id: 'product_deep', label: 'Pipeline & Scoring', icon: <Brain size={16} />, group: 'Product' },
-  { id: 'research', label: 'Research & Foundations', icon: <BookOpen size={16} />, group: 'Product' },
+  {
+    id: 'research',
+    label: 'Research & Foundations',
+    icon: <BookOpen size={16} />,
+    group: 'Product',
+  },
   // Go-to-Market
-  { id: 'positioning', label: 'Competitive Positioning', icon: <Shield size={16} />, group: 'Go-to-Market' },
+  {
+    id: 'positioning',
+    label: 'Competitive Positioning',
+    icon: <Shield size={16} />,
+    group: 'Go-to-Market',
+  },
   { id: 'sales', label: 'Sales Toolkit', icon: <MessageSquare size={16} />, group: 'Go-to-Market' },
-  { id: 'outreach', label: 'Outreach & Meetings', icon: <Crosshair size={16} />, group: 'Go-to-Market' },
+  {
+    id: 'outreach',
+    label: 'Outreach & Meetings',
+    icon: <Crosshair size={16} />,
+    group: 'Go-to-Market',
+  },
   { id: 'content', label: 'Content Studio', icon: <Zap size={16} />, group: 'Go-to-Market' },
   // Intelligence
-  { id: 'data_ecosystem', label: 'Data Ecosystem', icon: <Plug size={16} />, group: 'Intelligence' },
+  {
+    id: 'data_ecosystem',
+    label: 'Data Ecosystem',
+    icon: <Plug size={16} />,
+    group: 'Intelligence',
+  },
   { id: 'case_library', label: 'Case Library', icon: <Library size={16} />, group: 'Intelligence' },
   // Tools
   { id: 'founder_tips', label: 'Founder Tips', icon: <Lightbulb size={16} />, group: 'Tools' },
-  { id: 'founder_school', label: 'Founder School', icon: <GraduationCap size={16} />, group: 'Tools' },
+  {
+    id: 'founder_school',
+    label: 'Founder School',
+    icon: <GraduationCap size={16} />,
+    group: 'Tools',
+  },
 ];
 
 const TAB_GROUPS: TabGroup[] = ['Product', 'Go-to-Market', 'Intelligence', 'Tools'];
@@ -341,13 +366,7 @@ const SEARCH_INDEX: SearchEntry[] = [
   },
 ];
 
-function SearchResults({
-  query,
-  onJump,
-}: {
-  query: string;
-  onJump: (tabId: TabId) => void;
-}) {
+function SearchResults({ query, onJump }: { query: string; onJump: (tabId: TabId) => void }) {
   const q = query.toLowerCase().trim();
   if (!q) return null;
 
@@ -761,9 +780,7 @@ export default function FounderHubPage() {
                         padding: '8px 10px',
                         fontSize: 13,
                         fontWeight: isActive ? 600 : 500,
-                        color: isActive
-                          ? 'var(--text-highlight)'
-                          : 'var(--text-secondary)',
+                        color: isActive ? 'var(--text-highlight)' : 'var(--text-secondary)',
                         background: isActive ? 'var(--bg-elevated)' : 'transparent',
                         border: isActive
                           ? '1px solid var(--border-color)'
@@ -794,9 +811,7 @@ export default function FounderHubPage() {
                         style={{
                           display: 'flex',
                           alignItems: 'center',
-                          color: isActive
-                            ? 'var(--accent-primary)'
-                            : 'var(--text-muted)',
+                          color: isActive ? 'var(--accent-primary)' : 'var(--text-muted)',
                           flexShrink: 0,
                         }}
                       >
@@ -913,7 +928,10 @@ function renderTab(activeTab: TabId, FOUNDER_PASS: string): React.ReactNode {
     ),
     case_library: (
       <>
-        <AccordionSection title="Historical Cases" subtitle="14 case studies with pre-decision evidence">
+        <AccordionSection
+          title="Historical Cases"
+          subtitle="14 case studies with pre-decision evidence"
+        >
           <CaseStudiesTab />
         </AccordionSection>
         <AccordionSection
@@ -924,10 +942,7 @@ function renderTab(activeTab: TabId, FOUNDER_PASS: string): React.ReactNode {
             <CorrelationCausalTab />
           </ErrorBoundary>
         </AccordionSection>
-        <AccordionSection
-          title="Decision Alpha"
-          subtitle="CEO decision quality leaderboard"
-        >
+        <AccordionSection title="Decision Alpha" subtitle="CEO decision quality leaderboard">
           <ErrorBoundary sectionName="Decision Alpha">
             <DecisionAlphaTab />
           </ErrorBoundary>

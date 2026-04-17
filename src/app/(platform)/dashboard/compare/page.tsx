@@ -116,7 +116,13 @@ export default function ComparePage() {
 
         <div className="grid gap-6">
           {/* Selection Area */}
-          <div className={cn('p-6 rounded-xl', 'liquid-glass-premium', 'border border-[var(--border-color)]')}>
+          <div
+            className={cn(
+              'p-6 rounded-xl',
+              'liquid-glass-premium',
+              'border border-[var(--border-color)]'
+            )}
+          >
             <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-4">
               Select Analyses to Compare{' '}
               <span className="text-sm text-gray-400 font-normal">({selectedIds.length}/3)</span>
@@ -184,7 +190,11 @@ export default function ComparePage() {
           {/* Empty state — nothing selected */}
           {!loading && selectedIds.length === 0 && completeDocs.length > 0 && (
             <div
-              className={cn('p-8 rounded-xl text-center', 'liquid-glass', 'border border-[var(--border-color)]')}
+              className={cn(
+                'p-8 rounded-xl text-center',
+                'liquid-glass',
+                'border border-[var(--border-color)]'
+              )}
             >
               <GitCompareArrows size={32} className="mx-auto mb-3 text-gray-500" />
               <p className="text-gray-400 text-sm">
@@ -199,7 +209,13 @@ export default function ComparePage() {
           )}
 
           {!loading && analyses.length >= 2 && (
-            <div className={cn('p-6 rounded-xl', 'liquid-glass', 'border border-[var(--border-color)]')}>
+            <div
+              className={cn(
+                'p-6 rounded-xl',
+                'liquid-glass',
+                'border border-[var(--border-color)]'
+              )}
+            >
               <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-6 flex items-center gap-2">
                 <GitCompareArrows size={20} />
                 Comparison Results
@@ -212,7 +228,10 @@ export default function ComparePage() {
                     <tr className="border-b border-[var(--border-color)]">
                       <th className="text-left text-gray-400 py-3 px-4 font-medium">Metric</th>
                       {analyses.map(a => (
-                        <th key={a.id} className="text-center text-[var(--text-primary)] py-3 px-4 font-medium">
+                        <th
+                          key={a.id}
+                          className="text-center text-[var(--text-primary)] py-3 px-4 font-medium"
+                        >
                           <span className="block truncate max-w-[180px]">{a.filename}</span>
                         </th>
                       ))}
@@ -329,8 +348,13 @@ export default function ComparePage() {
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {analyses.map(a => (
-                    <div key={a.id} className="p-4 rounded-lg bg-[var(--bg-card-hover)] border border-[var(--border-color)]">
-                      <p className="text-sm text-[var(--text-primary)] font-medium mb-2 truncate">{a.filename}</p>
+                    <div
+                      key={a.id}
+                      className="p-4 rounded-lg bg-[var(--bg-card-hover)] border border-[var(--border-color)]"
+                    >
+                      <p className="text-sm text-[var(--text-primary)] font-medium mb-2 truncate">
+                        {a.filename}
+                      </p>
                       {a.topBiases.length > 0 ? (
                         <ul className="space-y-1">
                           {a.topBiases.map((bias, i) => (
@@ -372,7 +396,11 @@ export default function ComparePage() {
 
           {!loading && analyses.length === 1 && (
             <div
-              className={cn('p-6 rounded-xl text-center', 'liquid-glass', 'border border-[var(--border-color)]')}
+              className={cn(
+                'p-6 rounded-xl text-center',
+                'liquid-glass',
+                'border border-[var(--border-color)]'
+              )}
             >
               <p className="text-gray-400">Select at least one more analysis to compare.</p>
             </div>

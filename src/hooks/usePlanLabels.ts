@@ -49,9 +49,7 @@ export function usePlanLabels(): PlanLabels {
     plan,
     isTeamPlan,
     isLoading,
-    knowledgeGraphLabel: isTeamPlan
-      ? 'Decision Knowledge Graph'
-      : 'Personal Decision History',
+    knowledgeGraphLabel: isTeamPlan ? 'Decision Knowledge Graph' : 'Personal Decision History',
     knowledgeGraphShortLabel: isTeamPlan ? 'Knowledge Graph' : 'Decision History',
     knowledgeGraphDescription: isTeamPlan
       ? 'Every strategic memo your team produces, connected by assumption, bias, and outcome. Today\u2019s decision always inherits yesterday\u2019s lessons.'

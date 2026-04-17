@@ -10,14 +10,7 @@
  * wrapper that hosts the canvas (position: relative required).
  */
 
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  useCallback,
-  type MutableRefObject,
-} from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback, type MutableRefObject } from 'react';
 import { useFrame } from '@react-three/fiber';
 import type { GraphCanvasRef, Theme } from 'reagraph';
 import { RotateCcw } from 'lucide-react';
@@ -212,24 +205,21 @@ export function useEdgeNarrativeReveal({
         window.setTimeout(() => {
           setRevealedIds(prev => (prev.includes(item.id) ? prev : [...prev, item.id]));
           setCurrentGroup(item.group);
-        }, at),
+        }, at)
       );
       // dependency unused — keep lint quiet on `i`
       void i;
     });
 
     timers.push(
-      window.setTimeout(
-        () => {
-          setDone(true);
-          try {
-            window.sessionStorage.setItem(storageKey, '1');
-          } catch {
-            /* storage blocked — ignore */
-          }
-        },
-        cursor + 150,
-      ),
+      window.setTimeout(() => {
+        setDone(true);
+        try {
+          window.sessionStorage.setItem(storageKey, '1');
+        } catch {
+          /* storage blocked — ignore */
+        }
+      }, cursor + 150)
     );
     return () => timers.forEach(t => window.clearTimeout(t));
   }, [done, disabled, schedule, edgeGroups, durationMs, groupPauseMs, storageKey]);
@@ -404,7 +394,7 @@ function FresnelShell({
 }) {
   const material = useMemo(
     () => makeFresnelMaterial(color, intensity, power, baseTint),
-    [color, intensity, power, baseTint],
+    [color, intensity, power, baseTint]
   );
   const matRef = useRef<ShaderMaterial | null>(null);
   useFrame(({ clock }) => {
@@ -452,7 +442,7 @@ function RadiatingShell({
 }) {
   const material = useMemo(
     () => makeFresnelMaterial(color, peakIntensity, power, peakBaseTint),
-    [color, peakIntensity, power, peakBaseTint],
+    [color, peakIntensity, power, peakBaseTint]
   );
   const meshRef = useRef<Mesh | null>(null);
   const matRef = useRef<ShaderMaterial | null>(null);
@@ -581,9 +571,7 @@ export function NodeHoverTooltip({
         zIndex: 4,
         background: isDark ? 'rgba(15,23,42,0.94)' : 'rgba(255,255,255,0.96)',
         border: `1px solid ${isDark ? 'rgba(255,255,255,0.14)' : '#E2E8F0'}`,
-        boxShadow: isDark
-          ? '0 6px 20px rgba(0,0,0,0.45)'
-          : '0 6px 20px rgba(15,23,42,0.12)',
+        boxShadow: isDark ? '0 6px 20px rgba(0,0,0,0.45)' : '0 6px 20px rgba(15,23,42,0.12)',
         backdropFilter: 'blur(6px)',
         WebkitBackdropFilter: 'blur(6px)',
         color: isDark ? '#F1F5F9' : '#0F172A',
@@ -670,7 +658,9 @@ export function ResetViewButton({ graphRef, variant = 'light', style }: ResetVie
         e.currentTarget.style.color = isDark ? '#FFFFFF' : '#0F172A';
       }}
       onMouseLeave={e => {
-        e.currentTarget.style.background = isDark ? 'rgba(15,23,42,0.65)' : 'rgba(255,255,255,0.85)';
+        e.currentTarget.style.background = isDark
+          ? 'rgba(15,23,42,0.65)'
+          : 'rgba(255,255,255,0.85)';
         e.currentTarget.style.color = isDark ? '#E2E8F0' : '#475569';
       }}
     >

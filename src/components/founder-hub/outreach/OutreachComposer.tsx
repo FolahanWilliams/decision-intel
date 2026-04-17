@@ -41,25 +41,19 @@ export function OutreachComposer({ onGenerate, isRunning }: Props) {
   };
 
   const canSubmit =
-    !isRunning && ((mode === 'url' && url.trim().length > 0) || (mode === 'paste' && rawText.trim().length >= 50));
+    !isRunning &&
+    ((mode === 'url' && url.trim().length > 0) ||
+      (mode === 'paste' && rawText.trim().length >= 50));
 
   return (
     <form onSubmit={handleSubmit} style={formCard}>
       <div style={sectionHeading}>New Outreach</div>
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-        <button
-          type="button"
-          onClick={() => setMode('paste')}
-          style={modeTab(mode === 'paste')}
-        >
+        <button type="button" onClick={() => setMode('paste')} style={modeTab(mode === 'paste')}>
           Paste profile text
         </button>
-        <button
-          type="button"
-          onClick={() => setMode('url')}
-          style={modeTab(mode === 'url')}
-        >
+        <button type="button" onClick={() => setMode('url')} style={modeTab(mode === 'url')}>
           LinkedIn URL
         </button>
       </div>
@@ -75,7 +69,8 @@ export function OutreachComposer({ onGenerate, isRunning }: Props) {
             style={inputStyle}
           />
           <div style={hint}>
-            LinkedIn gates most profiles behind login — if the URL fetch fails, paste the profile text instead.
+            LinkedIn gates most profiles behind login — if the URL fetch fails, paste the profile
+            text instead.
           </div>
         </div>
       ) : (
@@ -94,7 +89,9 @@ export function OutreachComposer({ onGenerate, isRunning }: Props) {
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 16 }}>
+      <div
+        style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 16 }}
+      >
         <div>
           <label style={labelStyle}>Name</label>
           <input

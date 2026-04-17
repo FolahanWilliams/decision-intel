@@ -64,7 +64,7 @@ function DetailPanel({ data, onClose }: { data: NodeData; onClose: () => void })
   const accentColor =
     data.type === 'bias' && data.detail.severity
       ? (SEVERITY_COLORS[data.detail.severity] ?? '#EF4444')
-      : TYPE_COLORS[data.type] ?? '#64748B';
+      : (TYPE_COLORS[data.type] ?? '#64748B');
 
   return (
     <motion.div
@@ -323,8 +323,8 @@ export function HeroDecisionGraph() {
                 WeWork&rsquo;s S-1 (Aug 2019)
               </span>{' '}
               &mdash; before{' '}
-              <span style={{ fontWeight: 600, color: '#DC2626' }}>$39B was destroyed</span>.
-              Click any node to explore.
+              <span style={{ fontWeight: 600, color: '#DC2626' }}>$39B was destroyed</span>. Click
+              any node to explore.
             </div>
           </div>
 

@@ -141,7 +141,17 @@ function dqiGrade(score: number): { grade: string; color: string; label: string 
 
 function guessSeverity(bias: string, isPrimary: boolean): string {
   if (isPrimary) return 'critical';
-  if (['overconfidence_bias', 'groupthink', 'confirmation_bias', 'sunk_cost_fallacy', 'anchoring_bias', 'authority_bias'].includes(bias)) return 'high';
+  if (
+    [
+      'overconfidence_bias',
+      'groupthink',
+      'confirmation_bias',
+      'sunk_cost_fallacy',
+      'anchoring_bias',
+      'authority_bias',
+    ].includes(bias)
+  )
+    return 'high';
   if (['framing_effect', 'loss_aversion', 'bandwagon_effect'].includes(bias)) return 'medium';
   return 'medium';
 }
@@ -189,7 +199,7 @@ export default async function CaseStudyDetailPage({
   const dqiScore = computeSimulatedDQI(
     caseStudy.outcome,
     caseStudy.biasesPresent.length,
-    caseStudy.toxicCombinations.length,
+    caseStudy.toxicCombinations.length
   );
   const dqi = dqiGrade(dqiScore);
 
@@ -330,9 +340,7 @@ export default async function CaseStudyDetailPage({
               {formatIndustry(caseStudy.industry)}
             </span>
             <span style={{ fontSize: 13, color: '#64748B' }}>{caseStudy.year}</span>
-            {caseStudy.patternFamily && (
-              <PatternFamilyBadge family={caseStudy.patternFamily} />
-            )}
+            {caseStudy.patternFamily && <PatternFamilyBadge family={caseStudy.patternFamily} />}
           </div>
 
           <h1
@@ -402,12 +410,21 @@ export default async function CaseStudyDetailPage({
                   <span style={{ fontSize: 9, color: '#94A3B8', lineHeight: 1 }}>{dqiScore}</span>
                 </div>
                 <div>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#16A34A', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      color: '#16A34A',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                    }}
+                  >
                     Decision Quality Index (simulated)
                   </div>
                   <div style={{ fontSize: 13, color: '#94A3B8', marginTop: 2 }}>
                     {dqi.label} &mdash; {caseStudy.biasesPresent.length} biases detected
-                    {caseStudy.toxicCombinations.length > 0 && `, ${caseStudy.toxicCombinations.length} toxic combinations`}
+                    {caseStudy.toxicCombinations.length > 0 &&
+                      `, ${caseStudy.toxicCombinations.length} toxic combinations`}
                   </div>
                 </div>
               </div>
@@ -481,7 +498,15 @@ export default async function CaseStudyDetailPage({
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <Shield size={16} style={{ color: '#16A34A' }} />
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#16A34A', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+                <span
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 700,
+                    color: '#16A34A',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.6px',
+                  }}
+                >
                   Decision Intel Platform Analysis
                 </span>
               </div>
@@ -499,132 +524,140 @@ export default async function CaseStudyDetailPage({
                 marginBottom: 20,
               }}
             >
-              <p style={{ fontSize: 14, color: '#475569', marginBottom: 20, lineHeight: 1.6, margin: '0 0 20px' }}>
+              <p
+                style={{
+                  fontSize: 14,
+                  color: '#475569',
+                  marginBottom: 20,
+                  lineHeight: 1.6,
+                  margin: '0 0 20px',
+                }}
+              >
                 The analysis below was produced from the pre-decision document only &mdash; no
                 hindsight. This is what the platform would have surfaced if it had been running{' '}
                 {caseStudy.year > 2000 ? `in ${deep.date}` : `at the time`}.
               </p>
 
-            <div style={{ display: 'grid', gap: 20 }}>
-              <Card accent={C.navy}>
-                <div
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
-                    color: '#64748B',
-                    marginBottom: 8,
-                  }}
-                >
-                  {formatDocumentType(deep.documentType)} &middot; {deep.date}
-                </div>
-                <blockquote
-                  style={{
-                    fontSize: 15,
-                    color: '#1E293B',
-                    lineHeight: 1.65,
-                    margin: 0,
-                    paddingLeft: 16,
-                    borderLeft: `3px solid ${C.slate200}`,
-                    fontStyle: 'italic',
-                  }}
-                >
-                  &ldquo;{deep.document}&rdquo;
-                </blockquote>
-                <p
-                  style={{
-                    marginTop: 12,
-                    fontSize: 12,
-                    color: '#64748B',
-                  }}
-                >
-                  Source: {deep.source}
-                </p>
-              </Card>
-
-              {deep.detectableRedFlags.length > 0 && (
-                <Card accent="#DC2626">
-                  <h3
+              <div style={{ display: 'grid', gap: 20 }}>
+                <Card accent={C.navy}>
+                  <div
                     style={{
-                      fontSize: 14,
+                      fontSize: 11,
                       fontWeight: 700,
-                      color: '#991B1B',
                       textTransform: 'uppercase',
-                      letterSpacing: '0.05em',
-                      marginBottom: 12,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 6,
+                      letterSpacing: '0.08em',
+                      color: '#64748B',
+                      marginBottom: 8,
                     }}
                   >
-                    <AlertTriangle size={14} /> Red flags detectable at decision time
-                  </h3>
-                  <ul style={{ margin: 0, paddingLeft: 20, fontSize: 14, color: '#334155' }}>
-                    {deep.detectableRedFlags.map((flag, i) => (
-                      <li key={i} style={{ marginBottom: 8, lineHeight: 1.6 }}>
-                        {flag}
-                      </li>
-                    ))}
-                  </ul>
-                </Card>
-              )}
-
-              {deep.flaggableBiases.length > 0 && (
-                <Card accent="#7C3AED">
-                  <h3
-                    style={{
-                      fontSize: 14,
-                      fontWeight: 700,
-                      color: '#5B21B6',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.05em',
-                      marginBottom: 12,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 6,
-                    }}
-                  >
-                    <Shield size={14} /> Cognitive biases the platform would have flagged
-                  </h3>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                    {deep.flaggableBiases.map((bias, i) => (
-                      <span
-                        key={i}
-                        style={{
-                          fontSize: 12,
-                          fontWeight: 600,
-                          background: '#EDE9FE',
-                          color: '#5B21B6',
-                          padding: '6px 12px',
-                          borderRadius: 999,
-                        }}
-                      >
-                        {formatBiasName(bias)}
-                      </span>
-                    ))}
+                    {formatDocumentType(deep.documentType)} &middot; {deep.date}
                   </div>
+                  <blockquote
+                    style={{
+                      fontSize: 15,
+                      color: '#1E293B',
+                      lineHeight: 1.65,
+                      margin: 0,
+                      paddingLeft: 16,
+                      borderLeft: `3px solid ${C.slate200}`,
+                      fontStyle: 'italic',
+                    }}
+                  >
+                    &ldquo;{deep.document}&rdquo;
+                  </blockquote>
+                  <p
+                    style={{
+                      marginTop: 12,
+                      fontSize: 12,
+                      color: '#64748B',
+                    }}
+                  >
+                    Source: {deep.source}
+                  </p>
                 </Card>
-              )}
 
-              <Card accent={C.green}>
-                <h3
-                  style={{
-                    fontSize: 14,
-                    fontWeight: 700,
-                    color: '#15803D',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                    marginBottom: 12,
-                  }}
-                >
-                  Hypothetical analysis
-                </h3>
-                <p style={{ fontSize: 15, color: '#334155', lineHeight: 1.7, margin: 0 }}>
-                  {deep.hypotheticalAnalysis}
-                </p>
-              </Card>
-            </div>
+                {deep.detectableRedFlags.length > 0 && (
+                  <Card accent="#DC2626">
+                    <h3
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 700,
+                        color: '#991B1B',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        marginBottom: 12,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                      }}
+                    >
+                      <AlertTriangle size={14} /> Red flags detectable at decision time
+                    </h3>
+                    <ul style={{ margin: 0, paddingLeft: 20, fontSize: 14, color: '#334155' }}>
+                      {deep.detectableRedFlags.map((flag, i) => (
+                        <li key={i} style={{ marginBottom: 8, lineHeight: 1.6 }}>
+                          {flag}
+                        </li>
+                      ))}
+                    </ul>
+                  </Card>
+                )}
+
+                {deep.flaggableBiases.length > 0 && (
+                  <Card accent="#7C3AED">
+                    <h3
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 700,
+                        color: '#5B21B6',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        marginBottom: 12,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                      }}
+                    >
+                      <Shield size={14} /> Cognitive biases the platform would have flagged
+                    </h3>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                      {deep.flaggableBiases.map((bias, i) => (
+                        <span
+                          key={i}
+                          style={{
+                            fontSize: 12,
+                            fontWeight: 600,
+                            background: '#EDE9FE',
+                            color: '#5B21B6',
+                            padding: '6px 12px',
+                            borderRadius: 999,
+                          }}
+                        >
+                          {formatBiasName(bias)}
+                        </span>
+                      ))}
+                    </div>
+                  </Card>
+                )}
+
+                <Card accent={C.green}>
+                  <h3
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 700,
+                      color: '#15803D',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      marginBottom: 12,
+                    }}
+                  >
+                    Hypothetical analysis
+                  </h3>
+                  <p style={{ fontSize: 15, color: '#334155', lineHeight: 1.7, margin: 0 }}>
+                    {deep.hypotheticalAnalysis}
+                  </p>
+                </Card>
+              </div>
             </div>
           </section>
         ) : (
@@ -754,9 +787,7 @@ export default async function CaseStudyDetailPage({
         )}
 
         {/* Tier 2: Counterfactual — what a bias-adjusted process would have done */}
-        {caseStudy.counterfactual && (
-          <CounterfactualCallout cf={caseStudy.counterfactual} />
-        )}
+        {caseStudy.counterfactual && <CounterfactualCallout cf={caseStudy.counterfactual} />}
 
         {/* Reference class */}
         <section style={{ marginBottom: 40 }}>

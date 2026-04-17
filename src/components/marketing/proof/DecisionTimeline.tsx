@@ -93,14 +93,11 @@ export function DecisionTimeline({ cases, activeSlug }: DecisionTimelineProps) {
     const minImpact = Math.min(...impacts);
     const impactSpan = Math.max(1, maxImpact - minImpact);
 
-    const xScale = (y: number) =>
-      padL + ((y - minYear) / yearSpan) * plotW;
+    const xScale = (y: number) => padL + ((y - minYear) / yearSpan) * plotW;
     // Higher impact → higher on chart (i.e., smaller SVG y)
-    const yScale = (impact: number) =>
-      padT + plotH - ((impact - minImpact) / impactSpan) * plotH;
+    const yScale = (impact: number) => padT + plotH - ((impact - minImpact) / impactSpan) * plotH;
     // Bubble radius 8 → 20 based on impact
-    const rScale = (impact: number) =>
-      8 + ((impact - minImpact) / impactSpan) * 12;
+    const rScale = (impact: number) => 8 + ((impact - minImpact) / impactSpan) * 12;
 
     // Decade-ish ticks
     const roundedMin = Math.floor(minYear / 5) * 5;
@@ -173,14 +170,7 @@ export function DecisionTimeline({ cases, activeSlug }: DecisionTimelineProps) {
           if (x < padL - 1 || x > vbW - padR + 1) return null;
           return (
             <g key={t}>
-              <line
-                x1={x}
-                x2={x}
-                y1={padT}
-                y2={padT + plotH}
-                stroke={C.slate100}
-                strokeWidth={1}
-              />
+              <line x1={x} x2={x} y1={padT} y2={padT + plotH} stroke={C.slate100} strokeWidth={1} />
               <text
                 x={x}
                 y={vbH - padB + 18}

@@ -55,15 +55,11 @@ const TAB_STAGES: Array<{
   { id: 'perspectives', label: 'Perspectives', icon: Users, stepIndexes: [5] },
 ];
 
-function tabStatus(
-  steps: StepStatus[],
-  indexes: number[]
-): 'pending' | 'running' | 'complete' {
+function tabStatus(steps: StepStatus[], indexes: number[]): 'pending' | 'running' | 'complete' {
   const relevant = indexes.map(i => steps[i]).filter(Boolean);
   if (relevant.length === 0) return 'pending';
   if (relevant.every(s => s.status === 'complete')) return 'complete';
-  if (relevant.some(s => s.status === 'running' || s.status === 'complete'))
-    return 'running';
+  if (relevant.some(s => s.status === 'running' || s.status === 'complete')) return 'running';
   return 'pending';
 }
 
@@ -287,10 +283,7 @@ export function AnalysisShell({
                       ? 'var(--accent-primary, #16A34A)'
                       : 'var(--border-color)'
                 }`,
-                boxShadow:
-                  step.status === 'running'
-                    ? '0 0 0 4px rgba(22, 163, 74, 0.12)'
-                    : 'none',
+                boxShadow: step.status === 'running' ? '0 0 0 4px rgba(22, 163, 74, 0.12)' : 'none',
                 transition: 'all 0.3s ease',
               }}
             >
@@ -318,10 +311,7 @@ export function AnalysisShell({
         </div>
 
         {/* Progress bar */}
-        <div
-          className="progress-bar"
-          style={{ maxWidth: 520, margin: '0 auto 24px' }}
-        >
+        <div className="progress-bar" style={{ maxWidth: 520, margin: '0 auto 24px' }}>
           <div
             className="progress-bar-fill"
             style={{

@@ -2,14 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import {
-  ArrowRight,
-  FileText,
-  ShieldCheck,
-  Microscope,
-  BookOpen,
-  ChevronDown,
-} from 'lucide-react';
+import { ArrowRight, FileText, ShieldCheck, Microscope, BookOpen, ChevronDown } from 'lucide-react';
 
 import { CaseStudyNav } from '../case-studies/CaseStudyNav';
 import { PipelineMiniatureViz } from '@/components/marketing/how-it-works/PipelineMiniatureViz';
@@ -324,10 +317,7 @@ export function HowItWorksClient() {
             activeNodeId={activeNodeId}
             onSelectNode={id => setActiveNodeId(id === activeNodeId ? null : id)}
           />
-          <PipelineNodeDetail
-            nodeId={activeNodeId}
-            onClose={() => setActiveNodeId(null)}
-          />
+          <PipelineNodeDetail nodeId={activeNodeId} onClose={() => setActiveNodeId(null)} />
         </div>
       </section>
 
@@ -368,7 +358,11 @@ export function HowItWorksClient() {
                 biasKey={b.biasKey}
                 label={b.label}
                 description={b.description}
-                example={{ title: b.example.title, company: b.example.company, year: b.example.year }}
+                example={{
+                  title: b.example.title,
+                  company: b.example.company,
+                  year: b.example.year,
+                }}
               />
             ))}
           </div>
@@ -819,4 +813,3 @@ function StatPill({ value, label }: { value: string; label: string }) {
     </div>
   );
 }
-

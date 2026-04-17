@@ -146,7 +146,7 @@ export default function BiasNetwork3DCanvas({ biases, onBiasSelect }: BiasNetwor
         } catch {
           // Layout hasn't placed nodes yet — next retry will catch it.
         }
-      }, ms),
+      }, ms)
     );
     return () => timers.forEach(clearTimeout);
     // hasGraph swap re-runs the retry sequence when biases prop changes
@@ -189,7 +189,7 @@ export default function BiasNetwork3DCanvas({ biases, onBiasSelect }: BiasNetwor
         graphRef.current?.centerGraph([node.id]);
       }
     },
-    [selections, toggleSelection],
+    [selections, toggleSelection]
   );
 
   const renderNode = useCallback(({ node, size, opacity, active, selected }: NodeRendererProps) => {
@@ -201,7 +201,16 @@ export default function BiasNetwork3DCanvas({ biases, onBiasSelect }: BiasNetwor
       <group>
         <mesh>
           <octahedronGeometry args={[size, 0]} />
-          <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
+          <meshPhongMaterial
+            color={col}
+            emissive={col}
+            emissiveIntensity={emissive}
+            shininess={90}
+            specular="#FFFFFF"
+            side={DoubleSide}
+            transparent
+            opacity={o}
+          />
         </mesh>
         {selected && <SelectedGlow size={size} color={col} shape="octahedron" />}
         {!selected && active && (
@@ -225,14 +234,14 @@ export default function BiasNetwork3DCanvas({ biases, onBiasSelect }: BiasNetwor
       setHoverNodeId(node.id);
       setHoverLabel((node.label as string) ?? node.id);
     },
-    [onNodePointerOver],
+    [onNodePointerOver]
   );
   const handleNodePointerOut = useCallback(
     (node: InternalGraphNode) => {
       onNodePointerOut?.(node);
       setHoverNodeId(null);
     },
-    [onNodePointerOut],
+    [onNodePointerOut]
   );
   const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     const rect = wrapperRef.current?.getBoundingClientRect();

@@ -74,7 +74,7 @@ export const INDUSTRY_FAILURE_CASES: CaseStudy[] = [
     },
     keyQuotes: [
       {
-        text: "Designed by clowns who in turn are supervised by monkeys.",
+        text: 'Designed by clowns who in turn are supervised by monkeys.',
         source: 'Boeing internal instant message, released by House Committee',
         date: '2017-06',
         speaker: 'Boeing 737 MAX engineer (internal Slack-equivalent)',
@@ -92,7 +92,7 @@ export const INDUSTRY_FAILURE_CASES: CaseStudy[] = [
         speaker: 'Dennis Muilenburg, CEO',
       },
       {
-        text: "I sincerely apologize from the bottom of my heart.",
+        text: 'I sincerely apologize from the bottom of my heart.',
         source: 'Senate Commerce Committee testimony',
         date: '2019-10-29',
         speaker: 'Dennis Muilenburg, CEO (to families of crash victims)',
@@ -101,27 +101,32 @@ export const INDUSTRY_FAILURE_CASES: CaseStudy[] = [
     timeline: [
       {
         date: '2011-08',
-        event: 'American Airlines signals it will order Airbus A320neo unless Boeing responds — forcing Boeing to commit to re-engined 737 (MAX) rather than clean-sheet design.',
+        event:
+          'American Airlines signals it will order Airbus A320neo unless Boeing responds — forcing Boeing to commit to re-engined 737 (MAX) rather than clean-sheet design.',
         source: 'House Committee report, Ch. 2',
       },
       {
         date: '2012',
-        event: 'Engineers discover larger CFM LEAP engines require mounting forward/higher — creates nose-up pitch tendency under certain conditions. MCAS is designed as a software fix.',
+        event:
+          'Engineers discover larger CFM LEAP engines require mounting forward/higher — creates nose-up pitch tendency under certain conditions. MCAS is designed as a software fix.',
         source: 'House Committee report, Ch. 3',
       },
       {
         date: '2013',
-        event: 'Boeing internal decision to rely on a single Angle-of-Attack sensor for MCAS inputs (rather than both) to avoid triggering a new simulator training requirement.',
+        event:
+          'Boeing internal decision to rely on a single Angle-of-Attack sensor for MCAS inputs (rather than both) to avoid triggering a new simulator training requirement.',
         source: 'DOJ Deferred Prosecution Agreement, January 2021',
       },
       {
         date: '2016-11',
-        event: 'Chief Technical Pilot Mark Forkner asks FAA to remove MCAS from the 737 MAX Flight Crew Operations Manual — approved.',
+        event:
+          'Chief Technical Pilot Mark Forkner asks FAA to remove MCAS from the 737 MAX Flight Crew Operations Manual — approved.',
         source: 'FAA correspondence, cited in House Committee report',
       },
       {
         date: '2017-03-08',
-        event: 'FAA grants amended type certificate for 737 MAX — without requiring new simulator training.',
+        event:
+          'FAA grants amended type certificate for 737 MAX — without requiring new simulator training.',
         source: 'FAA Type Certificate, 737-8',
       },
       {
@@ -131,17 +136,20 @@ export const INDUSTRY_FAILURE_CASES: CaseStudy[] = [
       },
       {
         date: '2019-03-10',
-        event: 'Ethiopian Airlines Flight 302 crashes after takeoff, killing 157. Fleet grounded globally within 72 hours.',
+        event:
+          'Ethiopian Airlines Flight 302 crashes after takeoff, killing 157. Fleet grounded globally within 72 hours.',
         source: 'EAIB Interim Report; FAA emergency order',
       },
       {
         date: '2020-11-18',
-        event: 'FAA approves return to service after 20-month grounding and MCAS redesign to use both AoA sensors.',
+        event:
+          'FAA approves return to service after 20-month grounding and MCAS redesign to use both AoA sensors.',
         source: 'FAA Airworthiness Directive 2020-24-02',
       },
       {
         date: '2021-01-07',
-        event: 'DOJ Deferred Prosecution Agreement — Boeing agrees to $2.5B penalty for conspiracy to defraud the FAA.',
+        event:
+          'DOJ Deferred Prosecution Agreement — Boeing agrees to $2.5B penalty for conspiracy to defraud the FAA.',
         source: 'DOJ press release, January 7 2021',
       },
     ],
@@ -150,7 +158,8 @@ export const INDUSTRY_FAILURE_CASES: CaseStudy[] = [
         name: 'Dennis Muilenburg',
         role: 'CEO (2015–2019)',
         position: 'advocate',
-        notes: 'Oversaw MAX program through both crashes. Fired December 2019; received ~$62M in severance and stock.',
+        notes:
+          'Oversaw MAX program through both crashes. Fired December 2019; received ~$62M in severance and stock.',
       },
       {
         name: 'Kevin McAllister',
@@ -162,30 +171,34 @@ export const INDUSTRY_FAILURE_CASES: CaseStudy[] = [
         name: 'Mark Forkner',
         role: 'Chief Technical Pilot',
         position: 'overruled',
-        notes: 'Asked FAA to drop MCAS from pilot training docs. Acquitted at trial 2022 — jury accepted he was scapegoated for systemic decisions made above him.',
+        notes:
+          'Asked FAA to drop MCAS from pilot training docs. Acquitted at trial 2022 — jury accepted he was scapegoated for systemic decisions made above him.',
       },
       {
         name: 'Curtis Ewbank',
         role: 'Boeing engineer',
         position: 'dissenter',
-        notes: 'Raised concerns about MCAS single-sensor design during development; concerns were dismissed.',
+        notes:
+          'Raised concerns about MCAS single-sensor design during development; concerns were dismissed.',
       },
       {
         name: 'Ali Bahrami',
         role: 'FAA Associate Administrator for Aviation Safety',
         position: 'silent',
-        notes: 'Previously Boeing lobbyist; symbolizes the FAA-industry revolving door flagged by NTSB.',
+        notes:
+          'Previously Boeing lobbyist; symbolizes the FAA-industry revolving door flagged by NTSB.',
       },
       {
         name: 'Edward Pierson',
         role: 'Boeing 737 production manager (dissenter & whistleblower)',
         position: 'dissenter',
-        notes: 'Warned senior leadership in 2018 about production-line quality breakdown at Renton facility.',
+        notes:
+          'Warned senior leadership in 2018 about production-line quality breakdown at Renton facility.',
       },
     ],
     counterfactual: {
       recommendation:
-        'Require dual-sensor AoA redundancy for MCAS from inception; disclose MCAS in the Flight Crew Operations Manual and require differences training for 737 NG pilots; escalate Curtis Ewbank\'s concerns to independent safety review outside the 737 MAX program office; separate the Boeing Designated Engineering Representative (DER) function from program schedule pressure; ground the fleet after Lion Air 610 pending root-cause analysis rather than after Ethiopian 302.',
+        "Require dual-sensor AoA redundancy for MCAS from inception; disclose MCAS in the Flight Crew Operations Manual and require differences training for 737 NG pilots; escalate Curtis Ewbank's concerns to independent safety review outside the 737 MAX program office; separate the Boeing Designated Engineering Representative (DER) function from program schedule pressure; ground the fleet after Lion Air 610 pending root-cause analysis rather than after Ethiopian 302.",
       rationale:
         'This is the clearest "framing effect kills people" case in the modern dataset. Classifying a flight-critical automated system as a "minor modification" to avoid simulator training is the bias in its most concrete form. The single-sensor design was knowable, documentable, and dissent was actively present — it was overridden by schedule/cost framing.',
       estimatedOutcome:
@@ -200,7 +213,8 @@ export const INDUSTRY_FAILURE_CASES: CaseStudy[] = [
     },
     postMortemCitations: [
       {
-        label: 'House Committee on Transportation & Infrastructure, "The Design, Development & Certification of the Boeing 737 MAX"',
+        label:
+          'House Committee on Transportation & Infrastructure, "The Design, Development & Certification of the Boeing 737 MAX"',
         year: 2020,
       },
       {

@@ -86,13 +86,7 @@ const NAV_TABS: Record<string, string> = {
   graph: '/dashboard/decision-graph',
 };
 
-function SectionHeading({
-  icon,
-  children,
-}: {
-  icon?: React.ReactNode;
-  children: React.ReactNode;
-}) {
+function SectionHeading({ icon, children }: { icon?: React.ReactNode; children: React.ReactNode }) {
   return (
     <h2
       style={{

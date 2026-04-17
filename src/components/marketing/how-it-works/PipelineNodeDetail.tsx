@@ -126,11 +126,7 @@ export function PipelineNodeDetail({ nodeId, onClose }: PipelineNodeDetailProps)
             >
               <DetailField label="What it does" body={node.purpose} />
               <DetailField label="What it produces" body={node.output} mono />
-              <DetailField
-                label="Academic anchor"
-                body={node.academicAnchor}
-                italic
-              />
+              <DetailField label="Academic anchor" body={node.academicAnchor} italic />
             </div>
 
             <style>{`

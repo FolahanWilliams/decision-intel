@@ -62,7 +62,7 @@ export function verifyFounderPass(headerValue: string | null | undefined): Found
     log.warn(
       'Founder Hub auth is relying on NEXT_PUBLIC_FOUNDER_HUB_PASS only — ' +
         'set a distinct server-only FOUNDER_HUB_PASS on Vercel so machine ' +
-        'credentials can differ from the UI credential.',
+        'credentials can differ from the UI credential.'
     );
   }
 

@@ -243,7 +243,10 @@ export function CalibrationContent() {
                           width: `${(profile.outcomeRate.success / totalOutcomes) * 100}%`,
                         }}
                       >
-                        <span className="text-[10px] font-bold" style={{ color: 'var(--text-primary)' }}>
+                        <span
+                          className="text-[10px] font-bold"
+                          style={{ color: 'var(--text-primary)' }}
+                        >
                           {profile.outcomeRate.success}
                         </span>
                       </div>
@@ -255,7 +258,10 @@ export function CalibrationContent() {
                           width: `${(profile.outcomeRate.mixed / totalOutcomes) * 100}%`,
                         }}
                       >
-                        <span className="text-[10px] font-bold" style={{ color: 'var(--text-primary)' }}>
+                        <span
+                          className="text-[10px] font-bold"
+                          style={{ color: 'var(--text-primary)' }}
+                        >
                           {profile.outcomeRate.mixed}
                         </span>
                       </div>
@@ -267,7 +273,10 @@ export function CalibrationContent() {
                           width: `${(profile.outcomeRate.failure / totalOutcomes) * 100}%`,
                         }}
                       >
-                        <span className="text-[10px] font-bold" style={{ color: 'var(--text-primary)' }}>
+                        <span
+                          className="text-[10px] font-bold"
+                          style={{ color: 'var(--text-primary)' }}
+                        >
                           {profile.outcomeRate.failure}
                         </span>
                       </div>

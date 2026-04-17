@@ -31,11 +31,7 @@ import {
   Calculator,
   type LucideIcon,
 } from 'lucide-react';
-import {
-  PIPELINE_NODES,
-  type PipelineNode,
-  type PipelineZone,
-} from '@/lib/data/pipeline-nodes';
+import { PIPELINE_NODES, type PipelineNode, type PipelineZone } from '@/lib/data/pipeline-nodes';
 
 const C = {
   white: '#FFFFFF',
@@ -163,10 +159,7 @@ interface PipelineFlowDiagramProps {
   onSelectNode?: (id: string) => void;
 }
 
-export function PipelineFlowDiagram({
-  activeNodeId,
-  onSelectNode,
-}: PipelineFlowDiagramProps) {
+export function PipelineFlowDiagram({ activeNodeId, onSelectNode }: PipelineFlowDiagramProps) {
   const [activeZone, setActiveZone] = useState<PipelineZone>('preprocessing');
   const reducedMotion = useReducedMotion();
 
@@ -209,14 +202,7 @@ export function PipelineFlowDiagram({
         <defs>
           {/* Glow filters per zone */}
           {(['preprocessing', 'analysis', 'synthesis'] as PipelineZone[]).map(z => (
-            <filter
-              key={z}
-              id={`glow-${z}`}
-              x="-50%"
-              y="-50%"
-              width="200%"
-              height="200%"
-            >
+            <filter key={z} id={`glow-${z}`} x="-50%" y="-50%" width="200%" height="200%">
               <feGaussianBlur stdDeviation="4" result="blur" />
               <feMerge>
                 <feMergeNode in="blur" />
@@ -232,9 +218,30 @@ export function PipelineFlowDiagram({
         </defs>
 
         {/* Zone bands */}
-        <ZoneBand x={0} w={360} label="Preprocessing" accent={ZONE_COLOR.preprocessing.accent} active={activeZone === 'preprocessing'} reducedMotion={reducedMotion} />
-        <ZoneBand x={380} w={540} label="Analysis · 7 parallel agents" accent={ZONE_COLOR.analysis.accent} active={activeZone === 'analysis'} reducedMotion={reducedMotion} />
-        <ZoneBand x={920} w={260} label="Synthesis" accent={ZONE_COLOR.synthesis.accent} active={activeZone === 'synthesis'} reducedMotion={reducedMotion} />
+        <ZoneBand
+          x={0}
+          w={360}
+          label="Preprocessing"
+          accent={ZONE_COLOR.preprocessing.accent}
+          active={activeZone === 'preprocessing'}
+          reducedMotion={reducedMotion}
+        />
+        <ZoneBand
+          x={380}
+          w={540}
+          label="Analysis · 7 parallel agents"
+          accent={ZONE_COLOR.analysis.accent}
+          active={activeZone === 'analysis'}
+          reducedMotion={reducedMotion}
+        />
+        <ZoneBand
+          x={920}
+          w={260}
+          label="Synthesis"
+          accent={ZONE_COLOR.synthesis.accent}
+          active={activeZone === 'synthesis'}
+          reducedMotion={reducedMotion}
+        />
 
         {/* Edges */}
         {EDGES.map(e => {
@@ -371,11 +378,7 @@ export function PipelineFlowDiagram({
                   }}
                   aria-hidden
                 >
-                  <Icon
-                    size={22}
-                    color={zoneActive ? C.white : accent}
-                    strokeWidth={2}
-                  />
+                  <Icon size={22} color={zoneActive ? C.white : accent} strokeWidth={2} />
                 </div>
               </foreignObject>
               {/* Label */}
@@ -390,13 +393,7 @@ export function PipelineFlowDiagram({
                 {node.label}
               </text>
               {/* Tagline */}
-              <text
-                x={pos.x + 68}
-                y={pos.y + 50}
-                fontSize={11}
-                fontWeight={500}
-                fill={C.slate500}
-              >
+              <text x={pos.x + 68} y={pos.y + 50} fontSize={11} fontWeight={500} fill={C.slate500}>
                 {truncate(node.tagline, 32)}
               </text>
               {/* Active pulse dot */}
@@ -416,8 +413,18 @@ export function PipelineFlowDiagram({
         })}
 
         {/* Zone header labels */}
-        <ZoneLabel x={180} y={90} text="01 · Preprocessing" accent={ZONE_COLOR.preprocessing.accent} />
-        <ZoneLabel x={650} y={90} text="02 · Analysis (parallel)" accent={ZONE_COLOR.analysis.accent} />
+        <ZoneLabel
+          x={180}
+          y={90}
+          text="01 · Preprocessing"
+          accent={ZONE_COLOR.preprocessing.accent}
+        />
+        <ZoneLabel
+          x={650}
+          y={90}
+          text="02 · Analysis (parallel)"
+          accent={ZONE_COLOR.analysis.accent}
+        />
         <ZoneLabel x={1050} y={90} text="03 · Synthesis" accent={ZONE_COLOR.synthesis.accent} />
 
         {/* Footer caption — the loop */}
@@ -430,7 +437,8 @@ export function PipelineFlowDiagram({
           fill={C.slate400}
           style={{ letterSpacing: '0.04em' }}
         >
-          Each zone runs in order. Inside Analysis, all seven agents run simultaneously against the same shared context.
+          Each zone runs in order. Inside Analysis, all seven agents run simultaneously against the
+          same shared context.
         </text>
       </svg>
     </div>
@@ -476,17 +484,7 @@ function ZoneBand({
   );
 }
 
-function ZoneLabel({
-  x,
-  y,
-  text,
-  accent,
-}: {
-  x: number;
-  y: number;
-  text: string;
-  accent: string;
-}) {
+function ZoneLabel({ x, y, text, accent }: { x: number; y: number; text: string; accent: string }) {
   return (
     <text
       x={x}

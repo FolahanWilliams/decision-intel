@@ -24,7 +24,12 @@ function verify(req: NextRequest): boolean {
 export interface PostBrief {
   id: string;
   day: string;
-  pillar: 'decision_science' | 'founder_journey' | 'enterprise_ai' | 'market_insight' | 'social_proof';
+  pillar:
+    | 'decision_science'
+    | 'founder_journey'
+    | 'enterprise_ai'
+    | 'market_insight'
+    | 'social_proof';
   pillarLabel: string;
   platform: string;
   contentType: 'linkedin_post' | 'twitter_thread' | 'newsletter' | 'blog_post';
@@ -97,7 +102,10 @@ export async function GET(req: NextRequest) {
 
     const result = await model.generateContent(SYSTEM_PROMPT);
     const text = result.response.text().trim();
-    const cleaned = text.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim();
+    const cleaned = text
+      .replace(/^```(?:json)?\n?/, '')
+      .replace(/\n?```$/, '')
+      .trim();
 
     let briefs: PostBrief[];
     try {

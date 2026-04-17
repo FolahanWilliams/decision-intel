@@ -51,10 +51,7 @@ function getConfidenceColor(c: number): string {
   return '#ef4444';
 }
 
-export function CounterfactualPanel({
-  analysisId,
-  variant = 'full',
-}: CounterfactualPanelProps) {
+export function CounterfactualPanel({ analysisId, variant = 'full' }: CounterfactualPanelProps) {
   const [data, setData] = useState<CounterfactualResult | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -139,10 +136,7 @@ export function CounterfactualPanel({
               <GitBranch size={18} style={{ color: 'var(--accent-primary)' }} />
             </div>
             <div style={{ minWidth: 0 }}>
-              <div
-                className="section-heading"
-                style={{ marginBottom: 2 }}
-              >
+              <div className="section-heading" style={{ marginBottom: 2 }}>
                 Counterfactual — What If
               </div>
               <div
@@ -175,9 +169,7 @@ export function CounterfactualPanel({
                   flexWrap: 'wrap',
                 }}
               >
-                <span>
-                  Based on {top.historicalSampleSize} similar decisions
-                </span>
+                <span>Based on {top.historicalSampleSize} similar decisions</span>
                 <span style={{ color: getConfidenceColor(top.confidence), fontWeight: 600 }}>
                   · {(top.confidence * 100).toFixed(0)}% confidence
                 </span>

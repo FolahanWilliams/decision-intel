@@ -94,7 +94,9 @@ export function ToxicNetworkGraph({ patterns }: ToxicNetworkGraphProps) {
     });
     periphery.forEach((b, i) => {
       const angle =
-        (2 * Math.PI * i) / Math.max(1, periphery.length) - Math.PI / 2 + Math.PI / periphery.length;
+        (2 * Math.PI * i) / Math.max(1, periphery.length) -
+        Math.PI / 2 +
+        Math.PI / periphery.length;
       map.set(b, {
         x: cx + outerR * Math.cos(angle),
         y: cy + outerR * Math.sin(angle),
@@ -146,7 +148,15 @@ export function ToxicNetworkGraph({ patterns }: ToxicNetworkGraphProps) {
             Hover a pattern below to isolate its edges.
           </div>
         </div>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', maxWidth: 440, justifyContent: 'flex-end' }}>
+        <div
+          style={{
+            display: 'flex',
+            gap: 8,
+            flexWrap: 'wrap',
+            maxWidth: 440,
+            justifyContent: 'flex-end',
+          }}
+        >
           {patterns.map(p => {
             const color = PATTERN_COLORS[p.name] ?? C.slate400;
             const isHover = hoverPattern === p.name;
@@ -216,8 +226,7 @@ export function ToxicNetworkGraph({ patterns }: ToxicNetworkGraphProps) {
 
           const isHoveredPattern = hoverPattern === e.pattern;
           const isAnyPatternHover = hoverPattern !== null;
-          const isBiasHover =
-            hoverBias !== null && (hoverBias === e.from || hoverBias === e.to);
+          const isBiasHover = hoverBias !== null && (hoverBias === e.from || hoverBias === e.to);
 
           // Visual priority: hovered pattern > bias hover > default
           const opacity = isAnyPatternHover

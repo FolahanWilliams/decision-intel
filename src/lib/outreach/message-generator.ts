@@ -124,7 +124,8 @@ function parseGeneratorOutput(text: string): RawGeneratorOutput {
     .trim();
   const firstBrace = cleaned.indexOf('{');
   const lastBrace = cleaned.lastIndexOf('}');
-  const jsonSlice = firstBrace === -1 || lastBrace === -1 ? cleaned : cleaned.slice(firstBrace, lastBrace + 1);
+  const jsonSlice =
+    firstBrace === -1 || lastBrace === -1 ? cleaned : cleaned.slice(firstBrace, lastBrace + 1);
 
   try {
     const obj = JSON.parse(jsonSlice);

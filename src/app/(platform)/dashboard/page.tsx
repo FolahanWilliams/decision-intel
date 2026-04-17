@@ -827,128 +827,108 @@ export default function Dashboard() {
             padding: '3px',
           }}
         >
-            <button
-              onClick={() => switchView('upload')}
-              style={{
-                padding: '6px 16px',
-                fontSize: '13px',
-                fontWeight: activeView === 'upload' ? 600 : 400,
-                borderRadius: 'var(--radius-full)',
-                border: 'none',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                transition: 'all 0.15s',
-                background: activeView === 'upload' ? 'var(--bg-active)' : 'transparent',
-                color: activeView === 'upload' ? 'var(--text-highlight)' : 'var(--text-muted)',
-              }}
-            >
-              <Upload size={14} />
-              Upload &amp; Monitor
-            </button>
-            <button
-              onClick={() => switchView('browse')}
-              style={{
-                padding: '6px 16px',
-                fontSize: '13px',
-                fontWeight: activeView === 'browse' ? 600 : 400,
-                borderRadius: 'var(--radius-full)',
-                border: 'none',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                transition: 'all 0.15s',
-                background: activeView === 'browse' ? 'var(--bg-active)' : 'transparent',
-                color: activeView === 'browse' ? 'var(--text-highlight)' : 'var(--text-muted)',
-              }}
-            >
-              <Search size={14} />
-              Browse &amp; Analyze
-            </button>
-          </div>
+          <button
+            onClick={() => switchView('upload')}
+            style={{
+              padding: '6px 16px',
+              fontSize: '13px',
+              fontWeight: activeView === 'upload' ? 600 : 400,
+              borderRadius: 'var(--radius-full)',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.15s',
+              background: activeView === 'upload' ? 'var(--bg-active)' : 'transparent',
+              color: activeView === 'upload' ? 'var(--text-highlight)' : 'var(--text-muted)',
+            }}
+          >
+            <Upload size={14} />
+            Upload &amp; Monitor
+          </button>
+          <button
+            onClick={() => switchView('browse')}
+            style={{
+              padding: '6px 16px',
+              fontSize: '13px',
+              fontWeight: activeView === 'browse' ? 600 : 400,
+              borderRadius: 'var(--radius-full)',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.15s',
+              background: activeView === 'browse' ? 'var(--bg-active)' : 'transparent',
+              color: activeView === 'browse' ? 'var(--text-highlight)' : 'var(--text-muted)',
+            }}
+          >
+            <Search size={14} />
+            Browse &amp; Analyze
+          </button>
+        </div>
       </div>
 
       {/* Hero KPI Cards — always rendered so first paint matches the
           post-load layout (prevents the content-shift flash when SWR
           resolves). Empty / zero values are handled by the —/0 fallbacks. */}
       <>
-          <motion.div
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-md sm:gap-lg"
-            initial="hidden"
-            animate="visible"
-            variants={{
-              hidden: {},
-              visible: { transition: { staggerChildren: 0.08 } },
-            }}
-          >
-            {[
-              {
-                label: 'Total Documents',
-                value: totalDocs,
-                numericValue: totalDocs,
-                icon: <FileText size={18} />,
-                iconBg: 'var(--bg-card-hover)',
-                iconColor: 'var(--text-secondary)',
-                sparkColor: 'var(--text-muted)',
-              },
-              {
-                label: 'Analyzed',
-                value: uploadedDocs.filter(d => d.status === 'complete').length,
-                numericValue: uploadedDocs.filter(d => d.status === 'complete').length,
-                icon: <CheckCircle size={18} />,
-                iconBg: 'var(--bg-card-hover)',
-                iconColor: 'var(--text-secondary)',
-                sparkColor: 'var(--text-muted)',
-              },
-              {
-                label: 'Avg Quality',
-                value: riskSummary.avg,
-                numericValue: riskSummary.avg,
-                suffix: '%',
-                icon: <TrendingUp size={18} />,
-                iconBg: 'var(--bg-card-hover)',
-                iconColor: 'var(--text-secondary)',
-                sparkColor: 'var(--text-muted)',
-                showSparkline: true,
-              },
-              {
-                label: 'Decision IQ',
-                value: -1, // Sentinel: replaced by custom component
-                numericValue: -1,
-                icon: <Brain size={18} />,
-                iconBg: 'var(--bg-card-hover)',
-                iconColor: 'var(--text-secondary)',
-                sparkColor: 'var(--text-muted)',
-                isCustom: true,
-              },
-            ].map(stat => {
-              // Decision IQ uses its own self-contained component
-              if ((stat as Record<string, unknown>).isCustom) {
-                return (
-                  <motion.div
-                    key={stat.label}
-                    variants={{
-                      hidden: { opacity: 0, y: 20, scale: 0.97 },
-                      visible: { opacity: 1, y: 0, scale: 1 },
-                    }}
-                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                    whileHover={{
-                      y: -4,
-                      boxShadow:
-                        '0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 255, 255, 0.04)',
-                    }}
-                  >
-                    <DecisionIQCard />
-                  </motion.div>
-                );
-              }
-
+        <motion.div
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-md sm:gap-lg"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: {},
+            visible: { transition: { staggerChildren: 0.08 } },
+          }}
+        >
+          {[
+            {
+              label: 'Total Documents',
+              value: totalDocs,
+              numericValue: totalDocs,
+              icon: <FileText size={18} />,
+              iconBg: 'var(--bg-card-hover)',
+              iconColor: 'var(--text-secondary)',
+              sparkColor: 'var(--text-muted)',
+            },
+            {
+              label: 'Analyzed',
+              value: uploadedDocs.filter(d => d.status === 'complete').length,
+              numericValue: uploadedDocs.filter(d => d.status === 'complete').length,
+              icon: <CheckCircle size={18} />,
+              iconBg: 'var(--bg-card-hover)',
+              iconColor: 'var(--text-secondary)',
+              sparkColor: 'var(--text-muted)',
+            },
+            {
+              label: 'Avg Quality',
+              value: riskSummary.avg,
+              numericValue: riskSummary.avg,
+              suffix: '%',
+              icon: <TrendingUp size={18} />,
+              iconBg: 'var(--bg-card-hover)',
+              iconColor: 'var(--text-secondary)',
+              sparkColor: 'var(--text-muted)',
+              showSparkline: true,
+            },
+            {
+              label: 'Decision IQ',
+              value: -1, // Sentinel: replaced by custom component
+              numericValue: -1,
+              icon: <Brain size={18} />,
+              iconBg: 'var(--bg-card-hover)',
+              iconColor: 'var(--text-secondary)',
+              sparkColor: 'var(--text-muted)',
+              isCustom: true,
+            },
+          ].map(stat => {
+            // Decision IQ uses its own self-contained component
+            if ((stat as Record<string, unknown>).isCustom) {
               return (
                 <motion.div
                   key={stat.label}
-                  className="stat-card liquid-glass-premium"
                   variants={{
                     hidden: { opacity: 0, y: 20, scale: 0.97 },
                     visible: { opacity: 1, y: 0, scale: 1 },
@@ -959,45 +939,64 @@ export default function Dashboard() {
                     boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 255, 255, 0.04)',
                   }}
                 >
-                  <div
-                    className="flex items-center justify-between"
-                    style={{ marginBottom: 'var(--spacing-md)' }}
-                  >
-                    <div
-                      className="stat-card-icon"
-                      style={{
-                        background: stat.iconBg,
-                        color: stat.iconColor,
-                        marginBottom: 0,
-                      }}
-                    >
-                      {stat.icon}
-                    </div>
-                    {stat.showSparkline && sparklineData.length >= 2 && (
-                      <SparklineChart
-                        data={sparklineData}
-                        color={stat.sparkColor}
-                        width={72}
-                        height={28}
-                      />
-                    )}
-                  </div>
-                  <div className="stat-card-value" style={{ color: 'var(--text-highlight)' }}>
-                    {riskSummary.total > 0 || stat.label === 'Total Documents' ? (
-                      <AnimatedNumber
-                        value={stat.numericValue}
-                        suffix={stat.suffix || ''}
-                        duration={900}
-                      />
-                    ) : (
-                      '—'
-                    )}
-                  </div>
-                  <div className="stat-card-label">{stat.label}</div>
+                  <DecisionIQCard />
                 </motion.div>
               );
-            })}
-          </motion.div>
+            }
+
+            return (
+              <motion.div
+                key={stat.label}
+                className="stat-card liquid-glass-premium"
+                variants={{
+                  hidden: { opacity: 0, y: 20, scale: 0.97 },
+                  visible: { opacity: 1, y: 0, scale: 1 },
+                }}
+                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                whileHover={{
+                  y: -4,
+                  boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 255, 255, 0.04)',
+                }}
+              >
+                <div
+                  className="flex items-center justify-between"
+                  style={{ marginBottom: 'var(--spacing-md)' }}
+                >
+                  <div
+                    className="stat-card-icon"
+                    style={{
+                      background: stat.iconBg,
+                      color: stat.iconColor,
+                      marginBottom: 0,
+                    }}
+                  >
+                    {stat.icon}
+                  </div>
+                  {stat.showSparkline && sparklineData.length >= 2 && (
+                    <SparklineChart
+                      data={sparklineData}
+                      color={stat.sparkColor}
+                      width={72}
+                      height={28}
+                    />
+                  )}
+                </div>
+                <div className="stat-card-value" style={{ color: 'var(--text-highlight)' }}>
+                  {riskSummary.total > 0 || stat.label === 'Total Documents' ? (
+                    <AnimatedNumber
+                      value={stat.numericValue}
+                      suffix={stat.suffix || ''}
+                      duration={900}
+                    />
+                  ) : (
+                    '—'
+                  )}
+                </div>
+                <div className="stat-card-label">{stat.label}</div>
+              </motion.div>
+            );
+          })}
+        </motion.div>
       </>
 
       {/* Banners / widgets — rendered bare (no mb-lg wrapper divs) so null
@@ -1160,9 +1159,7 @@ export default function Dashboard() {
                         Looks like a {preview.docTypeLabel} — we&apos;ll check for{' '}
                         {preview.biasLabels.map((b, idx) => (
                           <span key={b}>
-                            <span
-                              style={{ color: 'var(--accent-primary)', fontWeight: 600 }}
-                            >
+                            <span style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>
                               {b}
                             </span>
                             {idx < preview.biasLabels.length - 1 ? ' + ' : ''}
@@ -1324,183 +1321,181 @@ export default function Dashboard() {
               />
             ) : !uploading && !pendingFile ? (
               <>
-              <div
-                id="onborda-upload"
-                className={`upload-zone liquid-glass-iridescent liquid-glass-shimmer ${isDragOver ? 'dragover' : ''}`}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                onClick={() => document.getElementById('file-input')?.click()}
-                role="button"
-                tabIndex={0}
-                aria-label="Upload document. Drop a file or click to browse."
-                onKeyDown={e => {
-                  if (e.key === 'Enter' || e.key === ' ')
-                    document.getElementById('file-input')?.click();
-                }}
-              >
-                <input
-                  type="file"
-                  id="file-input"
-                  hidden
-                  accept=".pdf,.txt,.md,.docx,.pptx,.xlsx,.csv,.html,.htm"
-                  disabled={uploading}
-                  onChange={handleFileSelect}
-                />
                 <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: 18,
-                    textAlign: 'center',
-                    padding: '12px 0',
+                  id="onborda-upload"
+                  className={`upload-zone liquid-glass-iridescent liquid-glass-shimmer ${isDragOver ? 'dragover' : ''}`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  onClick={() => document.getElementById('file-input')?.click()}
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Upload document. Drop a file or click to browse."
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ')
+                      document.getElementById('file-input')?.click();
                   }}
                 >
+                  <input
+                    type="file"
+                    id="file-input"
+                    hidden
+                    accept=".pdf,.txt,.md,.docx,.pptx,.xlsx,.csv,.html,.htm"
+                    disabled={uploading}
+                    onChange={handleFileSelect}
+                  />
                   <div
                     style={{
-                      fontSize: 11,
-                      fontWeight: 700,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.14em',
-                      color: 'var(--accent-primary)',
-                    }}
-                  >
-                    Upload · 60-second audit
-                  </div>
-                  <div
-                    style={{
-                      width: 84,
-                      height: 84,
                       display: 'flex',
+                      flexDirection: 'column',
                       alignItems: 'center',
-                      justifyContent: 'center',
-                      borderRadius: 'var(--radius-xl)',
-                      background: isDragOver
-                        ? 'rgba(22, 163, 74, 0.18)'
-                        : 'linear-gradient(135deg, rgba(22,163,74,0.14) 0%, rgba(22,163,74,0.06) 100%)',
-                      border: `2px solid rgba(22, 163, 74, ${isDragOver ? 0.5 : 0.24})`,
-                      transition: 'all 0.2s ease',
-                      transform: isDragOver ? 'scale(1.08)' : 'scale(1)',
-                      boxShadow: isDragOver
-                        ? '0 10px 30px rgba(22, 163, 74, 0.24)'
-                        : '0 4px 18px rgba(22, 163, 74, 0.08)',
+                      gap: 18,
+                      textAlign: 'center',
+                      padding: '12px 0',
                     }}
                   >
-                    {isDragOver ? (
-                      <CloudUpload size={36} style={{ color: 'var(--accent-primary)' }} />
-                    ) : (
-                      <Upload size={36} style={{ color: 'var(--accent-primary)' }} />
-                    )}
-                  </div>
-                  <div style={{ maxWidth: 480 }}>
-                    <p
+                    <div
                       style={{
-                        fontSize: 'clamp(18px, 2.2vw, 22px)',
+                        fontSize: 11,
                         fontWeight: 700,
-                        color: 'var(--text-primary)',
-                        letterSpacing: '-0.01em',
-                        lineHeight: 1.25,
-                        margin: 0,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.14em',
+                        color: 'var(--accent-primary)',
                       }}
                     >
-                      {isDragOver
-                        ? 'Drop to upload'
-                        : 'Drop your strategic memo, or click to browse'}
-                    </p>
-                    <p
+                      Upload · 60-second audit
+                    </div>
+                    <div
                       style={{
-                        fontSize: 14,
-                        color: 'var(--text-secondary)',
-                        marginTop: 8,
-                        lineHeight: 1.55,
+                        width: 84,
+                        height: 84,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: 'var(--radius-xl)',
+                        background: isDragOver
+                          ? 'rgba(22, 163, 74, 0.18)'
+                          : 'linear-gradient(135deg, rgba(22,163,74,0.14) 0%, rgba(22,163,74,0.06) 100%)',
+                        border: `2px solid rgba(22, 163, 74, ${isDragOver ? 0.5 : 0.24})`,
+                        transition: 'all 0.2s ease',
+                        transform: isDragOver ? 'scale(1.08)' : 'scale(1)',
+                        boxShadow: isDragOver
+                          ? '0 10px 30px rgba(22, 163, 74, 0.24)'
+                          : '0 4px 18px rgba(22, 163, 74, 0.08)',
                       }}
                     >
-                      Board decks, market-entry recommendations, M&amp;A memos, investment
-                      theses. You&apos;ll have a full DQI grade, flagged biases, and predicted
-                      CEO questions before your next meeting.
-                    </p>
-                    <p
-                      className="text-xs text-muted"
-                      style={{ marginTop: 10 }}
-                    >
-                      PDF, DOCX, PPTX, XLSX, CSV, HTML, TXT, MD · up to 5 MB
-                    </p>
-                    {billingData && billingData.limits.analysesPerMonth > 0 && (
-                      <p className="text-xs text-muted" style={{ marginTop: 6 }}>
-                        {billingData.usage.analysesThisMonth}/{billingData.limits.analysesPerMonth}{' '}
-                        analyses used this month ({billingData.planName})
-                      </p>
-                    )}
-                    {billingData &&
-                      billingData.limits.analysesPerMonth > 0 &&
-                      billingData.planName?.toLowerCase() === 'starter' &&
-                      billingData.usage.analysesThisMonth / billingData.limits.analysesPerMonth >=
-                        0.8 && (
-                        <Link
-                          href="/dashboard/settings"
-                          className="text-xs"
-                          style={{
-                            marginTop: '6px',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                            color: 'var(--warning, #eab308)',
-                            fontWeight: 600,
-                          }}
-                        >
-                          <AlertTriangle size={12} />
-                          {billingData.usage.analysesThisMonth >=
-                          billingData.limits.analysesPerMonth
-                            ? 'Limit reached — upgrade to continue analyzing'
-                            : 'Approaching limit — upgrade for more analyses'}
-                        </Link>
+                      {isDragOver ? (
+                        <CloudUpload size={36} style={{ color: 'var(--accent-primary)' }} />
+                      ) : (
+                        <Upload size={36} style={{ color: 'var(--accent-primary)' }} />
                       )}
+                    </div>
+                    <div style={{ maxWidth: 480 }}>
+                      <p
+                        style={{
+                          fontSize: 'clamp(18px, 2.2vw, 22px)',
+                          fontWeight: 700,
+                          color: 'var(--text-primary)',
+                          letterSpacing: '-0.01em',
+                          lineHeight: 1.25,
+                          margin: 0,
+                        }}
+                      >
+                        {isDragOver
+                          ? 'Drop to upload'
+                          : 'Drop your strategic memo, or click to browse'}
+                      </p>
+                      <p
+                        style={{
+                          fontSize: 14,
+                          color: 'var(--text-secondary)',
+                          marginTop: 8,
+                          lineHeight: 1.55,
+                        }}
+                      >
+                        Board decks, market-entry recommendations, M&amp;A memos, investment theses.
+                        You&apos;ll have a full DQI grade, flagged biases, and predicted CEO
+                        questions before your next meeting.
+                      </p>
+                      <p className="text-xs text-muted" style={{ marginTop: 10 }}>
+                        PDF, DOCX, PPTX, XLSX, CSV, HTML, TXT, MD · up to 5 MB
+                      </p>
+                      {billingData && billingData.limits.analysesPerMonth > 0 && (
+                        <p className="text-xs text-muted" style={{ marginTop: 6 }}>
+                          {billingData.usage.analysesThisMonth}/
+                          {billingData.limits.analysesPerMonth} analyses used this month (
+                          {billingData.planName})
+                        </p>
+                      )}
+                      {billingData &&
+                        billingData.limits.analysesPerMonth > 0 &&
+                        billingData.planName?.toLowerCase() === 'starter' &&
+                        billingData.usage.analysesThisMonth / billingData.limits.analysesPerMonth >=
+                          0.8 && (
+                          <Link
+                            href="/dashboard/settings"
+                            className="text-xs"
+                            style={{
+                              marginTop: '6px',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              color: 'var(--warning, #eab308)',
+                              fontWeight: 600,
+                            }}
+                          >
+                            <AlertTriangle size={12} />
+                            {billingData.usage.analysesThisMonth >=
+                            billingData.limits.analysesPerMonth
+                              ? 'Limit reached — upgrade to continue analyzing'
+                              : 'Approaching limit — upgrade for more analyses'}
+                          </Link>
+                        )}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Reassurance chip strip — calms first-time anxiety. Shows only
+                {/* Reassurance chip strip — calms first-time anxiety. Shows only
                   on the empty dropzone state (not during upload / analyzing
                   so we don't duplicate feedback). */}
-              {!uploading && !pendingFile && (
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    gap: 8,
-                    flexWrap: 'wrap',
-                    marginTop: 14,
-                  }}
-                >
-                  {[
-                    { label: 'Under 60 seconds', icon: <Zap size={12} /> },
-                    { label: 'SOC 2-ready · AES-256', icon: <Shield size={12} /> },
-                    { label: 'Never used for training', icon: <LockIcon size={12} /> },
-                  ].map(chip => (
-                    <span
-                      key={chip.label}
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 6,
-                        fontSize: 11.5,
-                        fontWeight: 600,
-                        color: 'var(--text-secondary)',
-                        background: 'var(--bg-card)',
-                        border: '1px solid var(--border-color)',
-                        padding: '6px 12px',
-                        borderRadius: 999,
-                      }}
-                    >
-                      <span style={{ color: 'var(--accent-primary)', display: 'inline-flex' }}>
-                        {chip.icon}
+                {!uploading && !pendingFile && (
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      gap: 8,
+                      flexWrap: 'wrap',
+                      marginTop: 14,
+                    }}
+                  >
+                    {[
+                      { label: 'Under 60 seconds', icon: <Zap size={12} /> },
+                      { label: 'SOC 2-ready · AES-256', icon: <Shield size={12} /> },
+                      { label: 'Never used for training', icon: <LockIcon size={12} /> },
+                    ].map(chip => (
+                      <span
+                        key={chip.label}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 6,
+                          fontSize: 11.5,
+                          fontWeight: 600,
+                          color: 'var(--text-secondary)',
+                          background: 'var(--bg-card)',
+                          border: '1px solid var(--border-color)',
+                          padding: '6px 12px',
+                          borderRadius: 999,
+                        }}
+                      >
+                        <span style={{ color: 'var(--accent-primary)', display: 'inline-flex' }}>
+                          {chip.icon}
+                        </span>
+                        {chip.label}
                       </span>
-                      {chip.label}
-                    </span>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                )}
               </>
             ) : uploading ? (
               uploadPhase === 'uploading' ? (
@@ -1768,8 +1763,8 @@ export default function Dashboard() {
                   Or start with a retrospective
                 </p>
                 <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: 0 }}>
-                  Upload a past strategic memo to close the loop your team never closed.
-                  Post-mortem audit in 60 seconds.
+                  Upload a past strategic memo to close the loop your team never closed. Post-mortem
+                  audit in 60 seconds.
                 </p>
               </div>
             </>
@@ -2247,7 +2242,6 @@ export default function Dashboard() {
         </>
       )}
 
-
       {/* Delete Confirmation Modal */}
       {/* Global drag overlay — appears when dragging files anywhere on the page */}
       {globalDrag && !uploading && (
@@ -2281,7 +2275,9 @@ export default function Dashboard() {
             <CloudUpload size={48} style={{ color: 'var(--accent-primary)' }} />
             <div className="text-center">
               <p className="font-semibold text-lg">Drop your document here</p>
-              <p className="text-sm text-muted mt-1">PDF, DOCX, PPTX, XLSX, CSV, HTML, TXT, MD · Max 5 MB</p>
+              <p className="text-sm text-muted mt-1">
+                PDF, DOCX, PPTX, XLSX, CSV, HTML, TXT, MD · Max 5 MB
+              </p>
               {billingData && billingData.limits.analysesPerMonth > 0 && (
                 <p className="text-xs text-muted" style={{ marginTop: '4px' }}>
                   {billingData.usage.analysesThisMonth}/{billingData.limits.analysesPerMonth}{' '}

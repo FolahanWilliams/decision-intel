@@ -134,7 +134,8 @@ export const TECHNOLOGY_FAILURE_CASES: CaseStudy[] = [
       'Whether to commit tens of billions of dollars per year to build an entirely new computing platform (VR/AR + social "metaverse") before consumer demand, developer ecosystem, or hardware maturity had validated the category — while the core Family of Apps business faced its first-ever user-growth decline and ATT/Apple privacy headwinds.',
     outcome: 'partial_failure',
     impactScore: 72,
-    estimatedImpact: '$60B+ Reality Labs cumulative operating losses (2019–2024); ~70% stock decline 2021–2022 before recovery',
+    estimatedImpact:
+      '$60B+ Reality Labs cumulative operating losses (2019–2024); ~70% stock decline 2021–2022 before recovery',
     impactDirection: 'negative',
     biasesPresent: [
       'authority_bias',
@@ -170,7 +171,8 @@ export const TECHNOLOGY_FAILURE_CASES: CaseStudy[] = [
     preDecisionEvidence: {
       document:
         "Mark Zuckerberg's October 28 2021 Connect keynote announced the Meta rebrand and committed to the metaverse as the company's defining bet. Reality Labs was reorganized as a separately-reported segment with operating losses of $10.2B for 2021 (disclosed Feb 2022) and projected higher spending in 2022. No public metrics, milestones, or disconfirmation criteria were defined. Consumer VR penetration in 2021 stood at approximately 3% of US households — the category had not crossed early-majority thresholds since Oculus launched in 2016.",
-      source: "Meta Platforms 'Founder's Letter' and Connect 2021 Keynote; Meta Q4 2021 shareholder letter (first Reality Labs segment disclosure)",
+      source:
+        "Meta Platforms 'Founder's Letter' and Connect 2021 Keynote; Meta Q4 2021 shareholder letter (first Reality Labs segment disclosure)",
       date: '2021-10-28',
       documentType: 'public_statement',
       detectableRedFlags: [
@@ -179,7 +181,7 @@ export const TECHNOLOGY_FAILURE_CASES: CaseStudy[] = [
         'Super-voting-share structure (Zuckerberg ~58%) insulates strategy from institutional shareholder feedback',
         'Corporate rebrand (FB→META) is asymmetric: easy to announce, reputationally costly to reverse',
         'Timing collides with Apple ATT tracking changes cutting core-ad-targeting precision — Reality Labs bet accelerates into core-business headwind',
-        "Internal product launches (Horizon Worlds) fell short of user targets but spending was not proportionally recalibrated",
+        'Internal product launches (Horizon Worlds) fell short of user targets but spending was not proportionally recalibrated',
       ],
       flaggableBiases: [
         'authority_bias',
@@ -194,7 +196,7 @@ export const TECHNOLOGY_FAILURE_CASES: CaseStudy[] = [
     keyQuotes: [
       {
         text: "I'm proud to announce that starting today, our company is now Meta. Our mission remains the same — still about bringing people together. Our apps and their brands aren't changing either. But it's time to adopt a new company brand to encompass everything that we do.",
-        source: "Mark Zuckerberg, Meta Connect 2021 Keynote",
+        source: 'Mark Zuckerberg, Meta Connect 2021 Keynote',
         date: '2021-10-28',
         speaker: 'Mark Zuckerberg, CEO',
       },
@@ -205,7 +207,7 @@ export const TECHNOLOGY_FAILURE_CASES: CaseStudy[] = [
         speaker: 'Mark Zuckerberg, CEO',
       },
       {
-        text: 'Meta has been the subject of investor concerns over the outsize spending, especially in Reality Labs, where we\'ve been investing in the long-term vision for the metaverse.',
+        text: "Meta has been the subject of investor concerns over the outsize spending, especially in Reality Labs, where we've been investing in the long-term vision for the metaverse.",
         source: 'Meta Q3 2022 shareholder letter',
         date: '2022-10-26',
         speaker: 'Meta Q3 2022 shareholder letter',
@@ -219,37 +221,44 @@ export const TECHNOLOGY_FAILURE_CASES: CaseStudy[] = [
       },
       {
         date: '2020-Q4',
-        event: 'Reality Labs disclosed as separate segment for the first time — 2020 operating loss of $6.6B.',
+        event:
+          'Reality Labs disclosed as separate segment for the first time — 2020 operating loss of $6.6B.',
         source: 'Meta 10-K FY2021 (retrospective)',
       },
       {
         date: '2021-10-28',
-        event: 'Facebook rebrands to Meta Platforms; Zuckerberg commits to metaverse as strategic identity.',
+        event:
+          'Facebook rebrands to Meta Platforms; Zuckerberg commits to metaverse as strategic identity.',
         source: 'Meta Connect 2021 Keynote',
       },
       {
         date: '2022-02-02',
-        event: 'Meta reports Q4 2021 — Reality Labs FY2021 operating loss of $10.2B; stock falls 26% next day on combined DAU decline + investment guidance.',
+        event:
+          'Meta reports Q4 2021 — Reality Labs FY2021 operating loss of $10.2B; stock falls 26% next day on combined DAU decline + investment guidance.',
         source: 'Meta Q4 2021 earnings release',
       },
       {
         date: '2022-10-26',
-        event: 'Horizon Worlds monthly active users reported at <200K vs 500K internal target; investor backlash accelerates.',
+        event:
+          'Horizon Worlds monthly active users reported at <200K vs 500K internal target; investor backlash accelerates.',
         source: 'WSJ, "Company Documents Show Meta\'s Flagship Metaverse Falling Short"',
       },
       {
         date: '2022-11-09',
-        event: 'Meta announces 11,000 layoffs (~13% of workforce) — "Year of Efficiency" era begins.',
+        event:
+          'Meta announces 11,000 layoffs (~13% of workforce) — "Year of Efficiency" era begins.',
         source: 'Mark Zuckerberg public letter to employees',
       },
       {
         date: '2023-02-01',
-        event: 'Q4 2022 reports Reality Labs loss of $13.7B for the year — continues to forecast growing losses in 2023.',
+        event:
+          'Q4 2022 reports Reality Labs loss of $13.7B for the year — continues to forecast growing losses in 2023.',
         source: 'Meta Q4 2022 shareholder letter',
       },
       {
         date: '2024-02-01',
-        event: 'Q4 2023 reports Reality Labs loss of $16.1B for FY2023; cumulative RL losses since 2019 exceed $50B.',
+        event:
+          'Q4 2023 reports Reality Labs loss of $16.1B for FY2023; cumulative RL losses since 2019 exceed $50B.',
         source: 'Meta Q4 2023 shareholder letter',
       },
     ],
@@ -258,7 +267,8 @@ export const TECHNOLOGY_FAILURE_CASES: CaseStudy[] = [
         name: 'Mark Zuckerberg',
         role: 'Founder & CEO',
         position: 'advocate',
-        notes: 'Sole architect of the metaverse commitment; ~58% voting power via super-voting shares insulates the decision from institutional shareholder pushback.',
+        notes:
+          'Sole architect of the metaverse commitment; ~58% voting power via super-voting shares insulates the decision from institutional shareholder pushback.',
       },
       {
         name: 'Andrew Bosworth',
@@ -276,13 +286,15 @@ export const TECHNOLOGY_FAILURE_CASES: CaseStudy[] = [
         name: 'David Wehner',
         role: 'CFO (to 2022)',
         position: 'silent',
-        notes: 'Oversaw Reality Labs segment disclosure; transitioned to Chief Strategy Officer role in 2022.',
+        notes:
+          'Oversaw Reality Labs segment disclosure; transitioned to Chief Strategy Officer role in 2022.',
       },
       {
         name: 'Brad Gerstner (Altimeter Capital)',
         role: 'External shareholder activist',
         position: 'dissenter',
-        notes: 'October 2022 open letter "Time to Get Fit" called for 20% headcount cuts and halving Reality Labs spend.',
+        notes:
+          'October 2022 open letter "Time to Get Fit" called for 20% headcount cuts and halving Reality Labs spend.',
       },
       {
         name: 'Institutional shareholders',
@@ -295,7 +307,7 @@ export const TECHNOLOGY_FAILURE_CASES: CaseStudy[] = [
       recommendation:
         'Maintain Reality Labs as an R&D division without the corporate rebrand. Define explicit user-adoption milestones (e.g., 20M MAU on a flagship consumer app by EOY 2023) as continue/pause gates. Cap Reality Labs annual opex at 10% of Family of Apps operating income rather than the effective 20%+ it reached in 2022–23. Respond to Apple ATT headwind with core-business investment before metaverse speculation.',
       rationale:
-        'The underlying VR/AR R&D bet is defensible — Apple\'s 2024 Vision Pro launch confirms the category has legitimacy. The decision-process failure was three-fold: the corporate rebrand raised reversal cost, the absence of disconfirmation criteria made the bet unboundable, and the super-voting-share structure removed the dissent circuit-breaker. A bias-adjusted process would have protected the research while preventing the loss acceleration.',
+        "The underlying VR/AR R&D bet is defensible — Apple's 2024 Vision Pro launch confirms the category has legitimacy. The decision-process failure was three-fold: the corporate rebrand raised reversal cost, the absence of disconfirmation criteria made the bet unboundable, and the super-voting-share structure removed the dissent circuit-breaker. A bias-adjusted process would have protected the research while preventing the loss acceleration.",
       estimatedOutcome:
         'Meta preserves ~$25–35B of the $60B+ Reality Labs cumulative loss while maintaining the underlying VR/AR R&D capability. Stock avoids the 70% 2021–22 drawdown; executive credibility preserved for future transitions (e.g., AI 2023+).',
     },

@@ -1,8 +1,23 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { BookOpen, CheckCircle, Circle, ChevronRight, ChevronLeft, Loader2, ExternalLink, GraduationCap } from 'lucide-react';
-import { TRACKS, TOTAL_LESSONS, getProgress, type Track, type Lesson } from '@/lib/data/founder-school/lessons';
+import {
+  BookOpen,
+  CheckCircle,
+  Circle,
+  ChevronRight,
+  ChevronLeft,
+  Loader2,
+  ExternalLink,
+  GraduationCap,
+} from 'lucide-react';
+import {
+  TRACKS,
+  TOTAL_LESSONS,
+  getProgress,
+  type Track,
+  type Lesson,
+} from '@/lib/data/founder-school/lessons';
 
 const STORAGE_KEY = 'founder-school-progress';
 
@@ -57,30 +72,36 @@ function TrackList({
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <span style={{ fontSize: 14 }}>{track.emoji}</span>
-              <span style={{
-                fontSize: 12,
-                fontWeight: isActive ? 700 : 500,
-                color: isActive ? track.color : 'var(--text-secondary)',
-                lineHeight: 1.3,
-              }}>
+              <span
+                style={{
+                  fontSize: 12,
+                  fontWeight: isActive ? 700 : 500,
+                  color: isActive ? track.color : 'var(--text-secondary)',
+                  lineHeight: 1.3,
+                }}
+              >
                 {track.title}
               </span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <div style={{
-                flex: 1,
-                height: 3,
-                background: 'var(--bg-tertiary)',
-                borderRadius: 2,
-                overflow: 'hidden',
-              }}>
-                <div style={{
-                  width: `${pct}%`,
-                  height: '100%',
-                  background: track.color,
+              <div
+                style={{
+                  flex: 1,
+                  height: 3,
+                  background: 'var(--bg-tertiary)',
                   borderRadius: 2,
-                  transition: 'width 0.3s',
-                }} />
+                  overflow: 'hidden',
+                }}
+              >
+                <div
+                  style={{
+                    width: `${pct}%`,
+                    height: '100%',
+                    background: track.color,
+                    borderRadius: 2,
+                    transition: 'width 0.3s',
+                  }}
+                />
               </div>
               <span style={{ fontSize: 10, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
                 {tp?.done ?? 0}/{tp?.total ?? 7}
@@ -107,10 +128,20 @@ function LessonsList({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
       <div style={{ marginBottom: 8 }}>
-        <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: track.color }}>
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            color: track.color,
+          }}
+        >
           {track.emoji} {track.title}
         </span>
-        <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '4px 0 0' }}>{track.description}</p>
+        <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '4px 0 0' }}>
+          {track.description}
+        </p>
       </div>
       {track.lessons.map(lesson => {
         const done = completed.includes(lesson.id);
@@ -131,11 +162,20 @@ function LessonsList({
               transition: 'border-color 0.15s',
             }}
           >
-            {done
-              ? <CheckCircle size={16} style={{ color: track.color, flexShrink: 0 }} />
-              : <Circle size={16} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />}
+            {done ? (
+              <CheckCircle size={16} style={{ color: track.color, flexShrink: 0 }} />
+            ) : (
+              <Circle size={16} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
+            )}
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                  marginBottom: 2,
+                }}
+              >
                 {lesson.order}. {lesson.title}
               </div>
               <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{lesson.summary}</div>
@@ -201,15 +241,21 @@ function LessonDetail({
 
   const section = (label: string, content: string, accent?: string) => (
     <div style={{ marginBottom: 16 }}>
-      <div style={{
-        fontSize: 10,
-        fontWeight: 700,
-        textTransform: 'uppercase',
-        letterSpacing: '0.08em',
-        color: accent ?? 'var(--text-muted)',
-        marginBottom: 6,
-      }}>{label}</div>
-      <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.65, margin: 0 }}>{content}</p>
+      <div
+        style={{
+          fontSize: 10,
+          fontWeight: 700,
+          textTransform: 'uppercase',
+          letterSpacing: '0.08em',
+          color: accent ?? 'var(--text-muted)',
+          marginBottom: 6,
+        }}
+      >
+        {label}
+      </div>
+      <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.65, margin: 0 }}>
+        {content}
+      </p>
     </div>
   );
 
@@ -219,9 +265,15 @@ function LessonDetail({
       <button
         onClick={onBack}
         style={{
-          display: 'flex', alignItems: 'center', gap: 4,
-          background: 'none', border: 'none', cursor: 'pointer',
-          fontSize: 12, color: 'var(--text-muted)', padding: '0 0 12px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 4,
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          fontSize: 12,
+          color: 'var(--text-muted)',
+          padding: '0 0 12px',
         }}
       >
         <ChevronLeft size={13} /> {track.emoji} {track.title}
@@ -230,18 +282,37 @@ function LessonDetail({
       {/* Header */}
       <div style={{ marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-          <span style={{
-            fontSize: 10, fontWeight: 700, padding: '2px 8px',
-            borderRadius: 'var(--radius-full)',
-            background: track.color + '20', color: track.color,
-            border: `1px solid ${track.color}40`,
-          }}>{lesson.readTime}</span>
-          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Lesson {lesson.order} of {track.lessons.length}</span>
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              padding: '2px 8px',
+              borderRadius: 'var(--radius-full)',
+              background: track.color + '20',
+              color: track.color,
+              border: `1px solid ${track.color}40`,
+            }}
+          >
+            {lesson.readTime}
+          </span>
+          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+            Lesson {lesson.order} of {track.lessons.length}
+          </span>
         </div>
-        <h2 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 6px', letterSpacing: '-0.01em' }}>
+        <h2
+          style={{
+            fontSize: 18,
+            fontWeight: 800,
+            color: 'var(--text-primary)',
+            margin: '0 0 6px',
+            letterSpacing: '-0.01em',
+          }}
+        >
           {lesson.title}
         </h2>
-        <p style={{ fontSize: 13, color: 'var(--text-muted)', fontStyle: 'italic', margin: 0 }}>{lesson.summary}</p>
+        <p style={{ fontSize: 13, color: 'var(--text-muted)', fontStyle: 'italic', margin: 0 }}>
+          {lesson.summary}
+        </p>
       </div>
 
       <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: 16 }}>
@@ -249,24 +320,56 @@ function LessonDetail({
         {section('Why It Matters for Decision Intel', lesson.whyItMatters, track.color)}
 
         <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--accent-primary)', marginBottom: 6 }}>
+          <div
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              color: 'var(--accent-primary)',
+              marginBottom: 6,
+            }}
+          >
             Apply Today
           </div>
-          <div style={{
-            background: 'var(--accent-primary)0D',
-            border: '1px solid var(--accent-primary)30',
-            borderRadius: 'var(--radius-md)',
-            padding: '10px 14px',
-          }}>
-            <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.65, margin: 0 }}>{lesson.action}</p>
+          <div
+            style={{
+              background: 'var(--accent-primary)0D',
+              border: '1px solid var(--accent-primary)30',
+              borderRadius: 'var(--radius-md)',
+              padding: '10px 14px',
+            }}
+          >
+            <p
+              style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.65, margin: 0 }}
+            >
+              {lesson.action}
+            </p>
           </div>
         </div>
 
         <div style={{ marginBottom: 20 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 6 }}>
+          <div
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              color: 'var(--text-muted)',
+              marginBottom: 6,
+            }}
+          >
             Reflect
           </div>
-          <p style={{ fontSize: 13, color: 'var(--text-muted)', fontStyle: 'italic', lineHeight: 1.65, margin: 0 }}>
+          <p
+            style={{
+              fontSize: 13,
+              color: 'var(--text-muted)',
+              fontStyle: 'italic',
+              lineHeight: 1.65,
+              margin: 0,
+            }}
+          >
             {lesson.reflection}
           </p>
         </div>
@@ -275,7 +378,16 @@ function LessonDetail({
             (currently: Platform Foundations track). */}
         {lesson.sources && lesson.sources.length > 0 && (
           <div style={{ marginBottom: 20 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 8 }}>
+            <div
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                color: 'var(--text-muted)',
+                marginBottom: 8,
+              }}
+            >
               Primary sources
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -365,7 +477,16 @@ function LessonDetail({
       </div>
 
       {/* Actions */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', borderTop: '1px solid var(--border-color)', paddingTop: 16 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          flexWrap: 'wrap',
+          borderTop: '1px solid var(--border-color)',
+          paddingTop: 16,
+        }}
+      >
         {onPrev && (
           <button onClick={onPrev} style={navBtn}>
             <ChevronLeft size={13} /> Prev
@@ -411,7 +532,16 @@ function LessonDetail({
       )}
       {sources && sources.length > 0 && (
         <div style={{ marginTop: 16 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 10 }}>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              color: 'var(--text-muted)',
+              marginBottom: 10,
+            }}
+          >
             Curated Resources — {lesson.title}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -432,18 +562,35 @@ function LessonDetail({
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                  <span style={{
-                    fontSize: 9, fontWeight: 700, padding: '1px 6px',
-                    borderRadius: 'var(--radius-full)',
-                    background: 'var(--accent-primary)20', color: 'var(--accent-primary)',
-                    border: '1px solid var(--accent-primary)40',
-                    textTransform: 'uppercase', letterSpacing: '0.06em',
-                  }}>{src.type}</span>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)' }}>{src.title}</span>
-                  <ExternalLink size={11} style={{ color: 'var(--text-muted)', marginLeft: 'auto', flexShrink: 0 }} />
+                  <span
+                    style={{
+                      fontSize: 9,
+                      fontWeight: 700,
+                      padding: '1px 6px',
+                      borderRadius: 'var(--radius-full)',
+                      background: 'var(--accent-primary)20',
+                      color: 'var(--accent-primary)',
+                      border: '1px solid var(--accent-primary)40',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.06em',
+                    }}
+                  >
+                    {src.type}
+                  </span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)' }}>
+                    {src.title}
+                  </span>
+                  <ExternalLink
+                    size={11}
+                    style={{ color: 'var(--text-muted)', marginLeft: 'auto', flexShrink: 0 }}
+                  />
                 </div>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 3 }}>{src.author}</div>
-                <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>{src.description}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 3 }}>
+                  {src.author}
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                  {src.description}
+                </div>
               </a>
             ))}
           </div>
@@ -454,10 +601,16 @@ function LessonDetail({
 }
 
 const navBtn: React.CSSProperties = {
-  display: 'flex', alignItems: 'center', gap: 5,
-  padding: '7px 12px', borderRadius: 'var(--radius-sm)',
-  background: 'var(--bg-secondary)', border: '1px solid var(--border-color)',
-  color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600,
+  display: 'flex',
+  alignItems: 'center',
+  gap: 5,
+  padding: '7px 12px',
+  borderRadius: 'var(--radius-sm)',
+  background: 'var(--bg-secondary)',
+  border: '1px solid var(--border-color)',
+  color: 'var(--text-secondary)',
+  fontSize: 12,
+  fontWeight: 600,
   cursor: 'pointer',
 };
 
@@ -468,7 +621,9 @@ export function FounderSchoolTab({ founderPass }: FounderSchoolTabProps) {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       return raw ? JSON.parse(raw) : [];
-    } catch { return []; }
+    } catch {
+      return [];
+    }
   });
   const [selectedTrackId, setSelectedTrackId] = useState(TRACKS[0].id);
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
@@ -476,7 +631,11 @@ export function FounderSchoolTab({ founderPass }: FounderSchoolTabProps) {
   const toggleComplete = useCallback((id: string) => {
     setCompleted(prev => {
       const next = prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id];
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      } catch {
+        /* ignore */
+      }
       return next;
     });
   }, []);
@@ -484,38 +643,87 @@ export function FounderSchoolTab({ founderPass }: FounderSchoolTabProps) {
   const track = TRACKS.find(t => t.id === selectedTrackId) ?? TRACKS[0];
   const prog = getProgress(completed);
 
-  const lessonIndex = selectedLesson ? track.lessons.findIndex(l => l.id === selectedLesson.id) : -1;
+  const lessonIndex = selectedLesson
+    ? track.lessons.findIndex(l => l.id === selectedLesson.id)
+    : -1;
   const prevLesson = lessonIndex > 0 ? track.lessons[lessonIndex - 1] : null;
-  const nextLesson = lessonIndex >= 0 && lessonIndex < track.lessons.length - 1 ? track.lessons[lessonIndex + 1] : null;
+  const nextLesson =
+    lessonIndex >= 0 && lessonIndex < track.lessons.length - 1
+      ? track.lessons[lessonIndex + 1]
+      : null;
 
   return (
-    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+    <div
+      style={{
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-color)',
+        borderRadius: 'var(--radius-lg)',
+        overflow: 'hidden',
+      }}
+    >
       {/* Header */}
-      <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div
+        style={{
+          padding: '16px 20px',
+          borderBottom: '1px solid var(--border-color)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <GraduationCap size={16} style={{ color: 'var(--accent-primary)' }} />
-          <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>Founder School</span>
+          <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>
+            Founder School
+          </span>
           <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 2 }}>
             {TRACKS.length} tracks · {TOTAL_LESSONS} lessons · tuned to Decision Intel
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 100, height: 4, background: 'var(--bg-tertiary)', borderRadius: 2, overflow: 'hidden' }}>
-            <div style={{ width: `${prog.pct}%`, height: '100%', background: 'var(--accent-primary)', borderRadius: 2, transition: 'width 0.3s' }} />
+          <div
+            style={{
+              width: 100,
+              height: 4,
+              background: 'var(--bg-tertiary)',
+              borderRadius: 2,
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                width: `${prog.pct}%`,
+                height: '100%',
+                background: 'var(--accent-primary)',
+                borderRadius: 2,
+                transition: 'width 0.3s',
+              }}
+            />
           </div>
-          <span style={{ fontSize: 11, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{prog.done}/{prog.total}</span>
+          <span style={{ fontSize: 11, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+            {prog.done}/{prog.total}
+          </span>
         </div>
       </div>
 
       {/* Body — 2-column */}
       <div style={{ display: 'grid', gridTemplateColumns: '210px 1fr', minHeight: 400 }}>
         {/* Track List */}
-        <div style={{ borderRight: '1px solid var(--border-color)', padding: '12px 10px', overflowY: 'auto' }}>
+        <div
+          style={{
+            borderRight: '1px solid var(--border-color)',
+            padding: '12px 10px',
+            overflowY: 'auto',
+          }}
+        >
           <TrackList
             tracks={TRACKS}
             selectedId={selectedTrackId}
             completed={completed}
-            onSelect={(id) => { setSelectedTrackId(id); setSelectedLesson(null); }}
+            onSelect={id => {
+              setSelectedTrackId(id);
+              setSelectedLesson(null);
+            }}
           />
         </div>
 
@@ -533,11 +741,7 @@ export function FounderSchoolTab({ founderPass }: FounderSchoolTabProps) {
               onNext={nextLesson ? () => setSelectedLesson(nextLesson) : null}
             />
           ) : (
-            <LessonsList
-              track={track}
-              completed={completed}
-              onSelect={setSelectedLesson}
-            />
+            <LessonsList track={track} completed={completed} onSelect={setSelectedLesson} />
           )}
         </div>
       </div>

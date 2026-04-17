@@ -40,7 +40,8 @@ export const RETAIL_CONSUMER_EXTENDED_CASES: FailureCase[] = [
     preDecisionEvidence: {
       document:
         "Ron Johnson's January 2012 investor presentation announced the elimination of JCPenney's 590 annual sales events and coupons in favor of a three-tier 'Fair & Square' pricing structure with everyday low prices. The strategy was announced to roll out across all 1,100 stores simultaneously in February 2012. Johnson publicly stated: 'We don't need to test. I know this works.' The presentation offered no customer-research basis and no pilot-test results from a subset of JCP stores.",
-      source: "J.C. Penney 'Fair & Square' Strategy Investor Presentation; Business Insider reporting on Johnson's 'we don't need to test' statement",
+      source:
+        "J.C. Penney 'Fair & Square' Strategy Investor Presentation; Business Insider reporting on Johnson's 'we don't need to test' statement",
       date: '2012-01-25',
       documentType: 'investor_deck',
       detectableRedFlags: [
@@ -50,7 +51,12 @@ export const RETAIL_CONSUMER_EXTENDED_CASES: FailureCase[] = [
         '"We don\'t need to test" — explicit rejection of the experimentation that made Apple Stores successful',
         'Board dominated by Johnson-aligned directors; Myron "Mike" Ullman (incumbent CEO) replaced without transition',
       ],
-      flaggableBiases: ['overconfidence_bias', 'authority_bias', 'halo_effect', 'confirmation_bias'],
+      flaggableBiases: [
+        'overconfidence_bias',
+        'authority_bias',
+        'halo_effect',
+        'confirmation_bias',
+      ],
       hypotheticalAnalysis:
         "DI would flag the JCPenney 2012 rollout as the canonical halo-effect + overconfidence failure. Johnson's Apple Store success was the halo that made the board wave the usual change-management controls. The decision process exhibited classic Blind Sprint signals: all-stores rollout, explicit rejection of testing, no customer-research backing. A bias-adjusted review would have required a 50-store pilot with 90-day same-store-sales measurement before any broader commitment. The absence of that gate is the decision-intelligence failure, not the strategy itself.",
     },
@@ -96,7 +102,8 @@ export const RETAIL_CONSUMER_EXTENDED_CASES: FailureCase[] = [
     preDecisionEvidence: {
       document:
         "Coca-Cola's 1984-85 'Project Kansas' research program conducted 190,000 blind taste tests across 13 cities. Results showed a 55-47 preference for the sweeter 'Merchandise 7X' reformulation vs. original Coke, and a 61-39 preference vs. Pepsi. These results drove the April 23, 1985 decision to replace the original formula entirely. Critics inside Coca-Cola, including bottlers, had raised concerns that blind-taste tests measured initial sip preference rather than brand-experience preference — concerns explicitly overruled by the Project Kansas team.",
-      source: "Thomas Oliver, 'The Real Coke, The Real Story' (1986); Mark Pendergrast, 'For God, Country and Coca-Cola' (1993); Coca-Cola Company archives",
+      source:
+        "Thomas Oliver, 'The Real Coke, The Real Story' (1986); Mark Pendergrast, 'For God, Country and Coca-Cola' (1993); Coca-Cola Company archives",
       date: '1985-04-23',
       documentType: 'strategy_document',
       detectableRedFlags: [
@@ -106,7 +113,12 @@ export const RETAIL_CONSUMER_EXTENDED_CASES: FailureCase[] = [
         '99-year-old formula being replaced entirely rather than offered alongside',
         'No canary market test — single national launch premised on 190,000 blind-test data points',
       ],
-      flaggableBiases: ['framing_effect', 'confirmation_bias', 'overconfidence_bias', 'selective_perception'],
+      flaggableBiases: [
+        'framing_effect',
+        'confirmation_bias',
+        'overconfidence_bias',
+        'selective_perception',
+      ],
       hypotheticalAnalysis:
         "DI would flag the New Coke decision as the canonical methodology-framing failure. The research question was 'which formulation tastes better in a blind test' — but the business question was 'should we replace the iconic American brand formula.' A bias-adjusted research protocol would have tested the actual decision: frame-test the reformulation vs. reformulation-alongside-original. The 79-day reversal proves the original product-market fit was always there — the methodology failure was in how Project Kansas framed what it was measuring.",
     },

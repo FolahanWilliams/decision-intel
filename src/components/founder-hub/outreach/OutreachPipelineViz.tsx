@@ -23,13 +23,14 @@ export function OutreachPipelineViz({ currentStep, error }: Props) {
     <div style={container}>
       <div style={stepRow}>
         {STEPS.map((step, idx) => {
-          const state: 'pending' | 'active' | 'complete' | 'error' = isError && idx >= currentIdx
-            ? 'error'
-            : isDone || idx < currentIdx
-              ? 'complete'
-              : idx === currentIdx
-                ? 'active'
-                : 'pending';
+          const state: 'pending' | 'active' | 'complete' | 'error' =
+            isError && idx >= currentIdx
+              ? 'error'
+              : isDone || idx < currentIdx
+                ? 'complete'
+                : idx === currentIdx
+                  ? 'active'
+                  : 'pending';
 
           return (
             <div key={step.id} style={{ flex: 1, position: 'relative' }}>
@@ -108,10 +109,7 @@ const nodeLabel = (state: 'pending' | 'active' | 'complete' | 'error'): React.CS
   fontSize: 11,
   fontWeight: 600,
   textAlign: 'center',
-  color:
-    state === 'active' || state === 'complete'
-      ? 'var(--text-primary)'
-      : 'var(--text-muted)',
+  color: state === 'active' || state === 'complete' ? 'var(--text-primary)' : 'var(--text-muted)',
 });
 
 const connector = (complete: boolean): React.CSSProperties => ({

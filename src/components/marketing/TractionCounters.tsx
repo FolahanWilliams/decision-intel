@@ -43,22 +43,34 @@ export function TractionCounters() {
           border: `1px solid var(--border-color)`,
         }}
       >
-        <div className="grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x" style={{ borderColor: 'var(--border-color)' }}>
+        <div
+          className="grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x"
+          style={{ borderColor: 'var(--border-color)' }}
+        >
           {metrics.map((m, _idx) => (
             <div
               key={m.label}
               className="px-8 py-10 flex flex-col items-center justify-center text-center transition-colors"
             >
               <div className="flex items-center gap-1.5 mb-1">
-                <span className="text-4xl font-extrabold tracking-tight" style={{ color: 'var(--text-primary)' }}>
+                <span
+                  className="text-4xl font-extrabold tracking-tight"
+                  style={{ color: 'var(--text-primary)' }}
+                >
                   {m.value}
                 </span>
               </div>
               <div className="flex flex-col items-center justify-center">
-                <span className="text-[10px] font-bold uppercase tracking-[0.15em]" style={{ color: 'var(--text-secondary)' }}>
+                <span
+                  className="text-[10px] font-bold uppercase tracking-[0.15em]"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
                   {m.label}
                 </span>
-                <span className="text-[8.5px] font-extrabold uppercase tracking-[0.15em] mt-1" style={{ color: 'var(--text-muted)' }}>
+                <span
+                  className="text-[8.5px] font-extrabold uppercase tracking-[0.15em] mt-1"
+                  style={{ color: 'var(--text-muted)' }}
+                >
                   ({m.citation})
                 </span>
               </div>
@@ -70,8 +82,14 @@ export function TractionCounters() {
       </motion.div>
 
       <div className="mt-8 flex items-center justify-center gap-2">
-        <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--border-color)' }} />
-        <p className="text-[10px] font-bold uppercase tracking-[0.25em]" style={{ color: 'var(--text-muted)' }}>
+        <span
+          className="w-1.5 h-1.5 rounded-full animate-pulse"
+          style={{ backgroundColor: 'var(--border-color)' }}
+        />
+        <p
+          className="text-[10px] font-bold uppercase tracking-[0.25em]"
+          style={{ color: 'var(--text-muted)' }}
+        >
           Audited Intelligence & Behavioral Benchmarks
         </p>
       </div>

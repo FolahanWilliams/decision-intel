@@ -243,14 +243,15 @@ export default function PrivacyPage() {
                   maxWidth: 620,
                 }}
               >
-                GDPR anonymization runs <span style={{ fontWeight: 600, color: C.slate900 }}>first</span>
-                &nbsp;&mdash; before any analysis LLM sees your text. AES-256-GCM at rest.
-                TLS 1.2+ in transit. No training on your content. And a 30-day hard-delete
-                when you&rsquo;re done.
+                GDPR anonymization runs{' '}
+                <span style={{ fontWeight: 600, color: C.slate900 }}>first</span>
+                &nbsp;&mdash; before any analysis LLM sees your text. AES-256-GCM at rest. TLS 1.2+
+                in transit. No training on your content. And a 30-day hard-delete when you&rsquo;re
+                done.
               </p>
               <p style={{ fontSize: 14, color: C.slate500, margin: 0, maxWidth: 620 }}>
-                This page is the full policy and the full security posture, laid out
-                so you can read it in five minutes instead of fifty.
+                This page is the full policy and the full security posture, laid out so you can read
+                it in five minutes instead of fifty.
               </p>
 
               <div style={{ display: 'flex', gap: 10, marginTop: 28, flexWrap: 'wrap' }}>
@@ -425,10 +426,7 @@ export default function PrivacyPage() {
       {/* WHAT WE COLLECT */}
       <section style={{ padding: '72px 24px 0' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-          <SectionHeader
-            eyebrow="What we collect"
-            title="Four categories. Every one justified."
-          />
+          <SectionHeader eyebrow="What we collect" title="Four categories. Every one justified." />
           <div
             style={{
               display: 'grid',
@@ -639,9 +637,7 @@ export default function PrivacyPage() {
                   <div style={{ fontSize: 14, fontWeight: 700, color: C.slate900 }}>
                     Right to {r.label.toLowerCase()}
                   </div>
-                  <div style={{ fontSize: 13, color: C.slate600, lineHeight: 1.55 }}>
-                    {r.body}
-                  </div>
+                  <div style={{ fontSize: 13, color: C.slate600, lineHeight: 1.55 }}>{r.body}</div>
                 </div>
               );
             })}
@@ -1036,4 +1032,3 @@ function FineprintCard({
     </div>
   );
 }
-

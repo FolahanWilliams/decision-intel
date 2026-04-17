@@ -133,7 +133,7 @@ export const TECHNOLOGY_SUCCESS_CASES: CaseStudy[] = [
     },
     keyQuotes: [
       {
-        text: 'Most companies that are great at something don\'t become great at new things... because they don\'t want to disrupt themselves.',
+        text: "Most companies that are great at something don't become great at new things... because they don't want to disrupt themselves.",
         source: 'Reed Hastings interview, Charlie Rose',
         date: '2013',
         speaker: 'Reed Hastings, CEO',
@@ -151,7 +151,7 @@ export const TECHNOLOGY_SUCCESS_CASES: CaseStudy[] = [
         speaker: 'Reed Hastings, CEO',
       },
       {
-        text: 'We didn\'t want to become the next Blockbuster.',
+        text: "We didn't want to become the next Blockbuster.",
         source: 'Reed Hastings, "No Rules Rules"',
         date: '2020',
         speaker: 'Reed Hastings, CEO',
@@ -160,22 +160,26 @@ export const TECHNOLOGY_SUCCESS_CASES: CaseStudy[] = [
     timeline: [
       {
         date: '2007-01',
-        event: 'Netflix launches "Watch Now" streaming as free add-on for DVD subscribers — 1,000 titles initially.',
+        event:
+          'Netflix launches "Watch Now" streaming as free add-on for DVD subscribers — 1,000 titles initially.',
         source: 'Netflix Q1 2007 shareholder letter',
       },
       {
         date: '2008-10',
-        event: 'Netflix signs Starz Play content deal — ~$30M/year for streaming rights to premium content.',
+        event:
+          'Netflix signs Starz Play content deal — ~$30M/year for streaming rights to premium content.',
         source: 'Netflix Q4 2008 earnings call',
       },
       {
         date: '2010-11',
-        event: 'Netflix launches standalone streaming plan ($7.99/mo) — decoupling streaming from DVD pricing.',
+        event:
+          'Netflix launches standalone streaming plan ($7.99/mo) — decoupling streaming from DVD pricing.',
         source: 'Netflix Q4 2010 shareholder letter',
       },
       {
         date: '2011-07-12',
-        event: 'Price hike splits DVD and streaming plans — customer backlash loses ~800K subscribers.',
+        event:
+          'Price hike splits DVD and streaming plans — customer backlash loses ~800K subscribers.',
         source: 'Netflix Q3 2011 shareholder letter',
       },
       {
@@ -190,12 +194,14 @@ export const TECHNOLOGY_SUCCESS_CASES: CaseStudy[] = [
       },
       {
         date: '2013-02-01',
-        event: 'House of Cards launches — first high-profile Netflix Original Series, committing the company to original content.',
+        event:
+          'House of Cards launches — first high-profile Netflix Original Series, committing the company to original content.',
         source: 'Netflix press release, February 1 2013',
       },
       {
         date: '2013-12',
-        event: 'International streaming expansion into 41 Latin American countries; streaming revenue overtakes DVD for the first time.',
+        event:
+          'International streaming expansion into 41 Latin American countries; streaming revenue overtakes DVD for the first time.',
         source: 'Netflix Q4 2013 shareholder letter',
       },
     ],
@@ -216,19 +222,22 @@ export const TECHNOLOGY_SUCCESS_CASES: CaseStudy[] = [
         name: 'Andy Rendich',
         role: 'CEO, Qwikster (briefly) / former operations lead',
         position: 'overruled',
-        notes: 'Was tapped to run the spun-off DVD business; role eliminated when Qwikster was reversed.',
+        notes:
+          'Was tapped to run the spun-off DVD business; role eliminated when Qwikster was reversed.',
       },
       {
         name: 'Netflix Board (including Jay Hoag, Richard Barton)',
         role: 'Board of Directors',
         position: 'advocate',
-        notes: 'Tolerated multi-year margin compression and the Qwikster reversal without ousting Hastings — rare governance patience.',
+        notes:
+          'Tolerated multi-year margin compression and the Qwikster reversal without ousting Hastings — rare governance patience.',
       },
       {
         name: 'Wall Street analysts (e.g., Michael Pachter)',
         role: 'External skeptics',
         position: 'dissenter',
-        notes: 'Repeatedly downgraded Netflix through 2011–2013; vindicated a subscriber-base view of value only after 2014.',
+        notes:
+          'Repeatedly downgraded Netflix through 2011–2013; vindicated a subscriber-base view of value only after 2014.',
       },
     ],
     counterfactual: {
@@ -248,7 +257,8 @@ export const TECHNOLOGY_SUCCESS_CASES: CaseStudy[] = [
     },
     postMortemCitations: [
       {
-        label: 'Reed Hastings & Erin Meyer, "No Rules Rules: Netflix and the Culture of Reinvention"',
+        label:
+          'Reed Hastings & Erin Meyer, "No Rules Rules: Netflix and the Culture of Reinvention"',
         year: 2020,
       },
       {
@@ -256,7 +266,8 @@ export const TECHNOLOGY_SUCCESS_CASES: CaseStudy[] = [
         year: 2012,
       },
       {
-        label: 'Harvard Business School Case 615-007: Netflix: Designing, Pricing, and Managing Its Streaming Service',
+        label:
+          'Harvard Business School Case 615-007: Netflix: Designing, Pricing, and Managing Its Streaming Service',
         year: 2014,
       },
       {
@@ -358,7 +369,8 @@ export const TECHNOLOGY_SUCCESS_CASES: CaseStudy[] = [
     preDecisionEvidence: {
       document:
         "Satya Nadella's February 4 2014 memo to all Microsoft employees ('Our Industry Does Not Respect Tradition — It Only Respects Innovation') named the strategic pivot: 'We will reinvent productivity to empower every person and every organization on the planet to do more and achieve more.' Within the first year, Nadella publicly embraced Linux (October 2014 'Microsoft Loves Linux' event), open-sourced .NET Core, launched Office for iPad (March 2014), and wrote down the $7.6B Nokia acquisition in Q4 FY2015. Every action was visible cultural signaling that Windows-first was ending.",
-      source: "Satya Nadella, 'Hit Refresh' (2017); Nadella employee memos Feb 2014, July 2014; Microsoft 10-K FY2015 (Nokia impairment)",
+      source:
+        "Satya Nadella, 'Hit Refresh' (2017); Nadella employee memos Feb 2014, July 2014; Microsoft 10-K FY2015 (Nokia impairment)",
       date: '2014-02-04',
       documentType: 'internal_memo',
       detectableRedFlags: [

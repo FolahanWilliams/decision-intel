@@ -78,7 +78,10 @@ No markdown, no explanation, no preamble. Raw JSON array only.`;
 
     const result = await model.generateContent(prompt);
     const text = result.response.text().trim();
-    const cleaned = text.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim();
+    const cleaned = text
+      .replace(/^```(?:json)?\n?/, '')
+      .replace(/\n?```$/, '')
+      .trim();
 
     let raw: Array<{
       title: string;

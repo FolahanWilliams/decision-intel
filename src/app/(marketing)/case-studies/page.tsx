@@ -59,7 +59,7 @@ export default function CaseStudyIndexPage() {
     ALL_CASES.reduce<Record<string, number>>((acc, c) => {
       acc[c.industry] = (acc[c.industry] ?? 0) + 1;
       return acc;
-    }, {}),
+    }, {})
   ).map(([industry, count]) => ({ industry, count }));
 
   return (
@@ -125,11 +125,10 @@ export default function CaseStudyIndexPage() {
                 margin: 0,
               }}
             >
-              Curated from SEC filings, NTSB reports, FDA actions, and post-mortems. Every case
-              runs through the same bias and noise framework we apply to live strategic memos.
-              {' '}
-              {deepCount} carry hindsight-stripped pre-decision evidence; {tier2Cases.length} are
-              at full canonical depth with timelines, named stakeholders, and counterfactuals.
+              Curated from SEC filings, NTSB reports, FDA actions, and post-mortems. Every case runs
+              through the same bias and noise framework we apply to live strategic memos.{' '}
+              {deepCount} carry hindsight-stripped pre-decision evidence; {tier2Cases.length} are at
+              full canonical depth with timelines, named stakeholders, and counterfactuals.
             </p>
 
             <div style={{ display: 'flex', gap: 28, marginTop: 32, flexWrap: 'wrap' }}>

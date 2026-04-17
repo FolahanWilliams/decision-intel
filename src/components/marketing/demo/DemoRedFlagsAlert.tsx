@@ -36,8 +36,7 @@ export function DemoRedFlagsAlert({ flags }: { flags: string[] }) {
         {flags.length} red flag{flags.length === 1 ? '' : 's'} in the document
       </h2>
       <p style={{ fontSize: 13, color: '#64748B', margin: '0 0 16px' }}>
-        Each flag below was detectable from the document text alone. No
-        outcome data. No hindsight.
+        Each flag below was detectable from the document text alone. No outcome data. No hindsight.
       </p>
 
       <div
@@ -81,9 +80,7 @@ export function DemoRedFlagsAlert({ flags }: { flags: string[] }) {
               {String(i + 1).padStart(2, '0')}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 14, color: '#0F172A', lineHeight: 1.55 }}>
-                {flag}
-              </div>
+              <div style={{ fontSize: 14, color: '#0F172A', lineHeight: 1.55 }}>{flag}</div>
               <div
                 style={{
                   fontSize: 10,

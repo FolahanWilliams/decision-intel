@@ -319,10 +319,7 @@ export function EnhancedEmptyState({
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
-        className={cn(
-          'mb-6 p-4 rounded-full',
-          isCompact && 'mb-4 p-3'
-        )}
+        className={cn('mb-6 p-4 rounded-full', isCompact && 'mb-4 p-3')}
         style={{
           background: 'var(--bg-tertiary)',
           border: '1px solid var(--border-color)',

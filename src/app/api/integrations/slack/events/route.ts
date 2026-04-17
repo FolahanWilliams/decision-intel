@@ -807,7 +807,9 @@ async function processSlackDecision(
     log.error(`Slack decision audit failed for ${decisionId}:`, error);
     await prisma.humanDecision
       .update({ where: { id: decisionId }, data: { status: 'error' } })
-      .catch(err => log.warn('Failed to mark HumanDecision as error after Slack audit failure:', err));
+      .catch(err =>
+        log.warn('Failed to mark HumanDecision as error after Slack audit failure:', err)
+      );
     return null;
   }
 }

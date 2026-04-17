@@ -27,9 +27,24 @@ function getGradeMeta(score: number) {
 }
 
 const VERDICT_META: Record<string, { bg: string; fg: string; ring: string; copy: string }> = {
-  APPROVED: { bg: 'rgba(34,197,94,0.18)', fg: '#86efac', ring: 'rgba(34,197,94,0.35)', copy: 'Approved' },
-  REJECTED: { bg: 'rgba(239,68,68,0.18)', fg: '#fca5a5', ring: 'rgba(239,68,68,0.35)', copy: 'Review Required' },
-  MIXED: { bg: 'rgba(234,179,8,0.18)', fg: '#fde68a', ring: 'rgba(234,179,8,0.35)', copy: 'Proceed with Caution' },
+  APPROVED: {
+    bg: 'rgba(34,197,94,0.18)',
+    fg: '#86efac',
+    ring: 'rgba(34,197,94,0.35)',
+    copy: 'Approved',
+  },
+  REJECTED: {
+    bg: 'rgba(239,68,68,0.18)',
+    fg: '#fca5a5',
+    ring: 'rgba(239,68,68,0.35)',
+    copy: 'Review Required',
+  },
+  MIXED: {
+    bg: 'rgba(234,179,8,0.18)',
+    fg: '#fde68a',
+    ring: 'rgba(234,179,8,0.35)',
+    copy: 'Proceed with Caution',
+  },
 };
 
 const RISK_COLOR: Record<string, string> = {

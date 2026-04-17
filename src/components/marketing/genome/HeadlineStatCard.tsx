@@ -32,8 +32,7 @@ export function HeadlineStatCard({
   tone = 'info',
   icon: Icon,
 }: HeadlineStatCardProps) {
-  const accent =
-    tone === 'danger' ? C.red : tone === 'warning' ? C.amber : C.green;
+  const accent = tone === 'danger' ? C.red : tone === 'warning' ? C.amber : C.green;
 
   return (
     <div
@@ -119,9 +118,7 @@ export function HeadlineStatCard({
         {value}
       </div>
 
-      <div style={{ fontSize: 12.5, color: C.slate500, lineHeight: 1.5 }}>
-        {supportingLine}
-      </div>
+      <div style={{ fontSize: 12.5, color: C.slate500, lineHeight: 1.5 }}>{supportingLine}</div>
     </div>
   );
 }

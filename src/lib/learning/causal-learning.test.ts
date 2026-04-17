@@ -93,7 +93,10 @@ describe('Causal Learning Service', () => {
         },
       ];
 
-      const mapped = mockOutcomes.map(o => ({ ...o, analysis: { ...o.analysis, biases: biasArr(o.analysis.biases as Record<string, unknown>) } }));
+      const mapped = mockOutcomes.map(o => ({
+        ...o,
+        analysis: { ...o.analysis, biases: biasArr(o.analysis.biases as Record<string, unknown>) },
+      }));
       vi.mocked((prisma as any).decisionOutcome.findMany).mockResolvedValue(mapped as any);
 
       const result = await computeOrgCausalWeights('org_123');
@@ -157,7 +160,10 @@ describe('Causal Learning Service', () => {
         },
       ];
 
-      const mapped = mockOutcomes.map(o => ({ ...o, analysis: { ...o.analysis, biases: biasArr(o.analysis.biases as Record<string, unknown>) } }));
+      const mapped = mockOutcomes.map(o => ({
+        ...o,
+        analysis: { ...o.analysis, biases: biasArr(o.analysis.biases as Record<string, unknown>) },
+      }));
       vi.mocked((prisma as any).decisionOutcome.findMany).mockResolvedValue(mapped as any);
 
       const result = await computeOrgCausalWeights('org_123');
@@ -382,7 +388,10 @@ describe('Causal Learning Service', () => {
         },
       ];
 
-      const mapped = mockOutcomes.map(o => ({ ...o, analysis: { ...o.analysis, biases: biasArr(o.analysis.biases as Record<string, unknown>) } }));
+      const mapped = mockOutcomes.map(o => ({
+        ...o,
+        analysis: { ...o.analysis, biases: biasArr(o.analysis.biases as Record<string, unknown>) },
+      }));
       vi.mocked((prisma as any).decisionOutcome.findMany).mockResolvedValue(mapped as any);
       vi.mocked((prisma as any).decisionOutcome.count).mockResolvedValue(mapped.length as any);
       vi.mocked((prisma as any).orgCausalModel.upsert).mockResolvedValue({
@@ -455,7 +464,10 @@ describe('Causal Learning Service', () => {
         },
       ];
 
-      const mapped = mockOutcomes.map(o => ({ ...o, analysis: { ...o.analysis, biases: biasArr(o.analysis.biases as Record<string, unknown>) } }));
+      const mapped = mockOutcomes.map(o => ({
+        ...o,
+        analysis: { ...o.analysis, biases: biasArr(o.analysis.biases as Record<string, unknown>) },
+      }));
       vi.mocked((prisma as any).decisionOutcome.findMany).mockResolvedValue(mapped as any);
 
       const weights = await computeOrgCausalWeights('org_123');

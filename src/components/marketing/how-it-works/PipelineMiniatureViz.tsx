@@ -198,7 +198,13 @@ export function PipelineMiniatureViz() {
                 ))}
               </div>
 
-              <div style={{ fontSize: 12, color: isActive ? C.white : C.slate400, transition: 'color 0.4s' }}>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: isActive ? C.white : C.slate400,
+                  transition: 'color 0.4s',
+                }}
+              >
                 {z.description}
               </div>
             </div>

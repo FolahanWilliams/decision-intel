@@ -123,16 +123,15 @@ function SectionBand({
   );
 }
 
-const BiasNetwork3D = dynamic(
-  () => import('@/components/visualizations/BiasNetwork3DCanvas'),
-  { ssr: false },
-);
+const BiasNetwork3D = dynamic(() => import('@/components/visualizations/BiasNetwork3DCanvas'), {
+  ssr: false,
+});
 const BiasProfileRadar = dynamic(
   () =>
     import('@/components/visualizations/BiasProfileRadar').then(m => ({
       default: m.BiasProfileRadar,
     })),
-  { ssr: false },
+  { ssr: false }
 );
 
 const FLOW_SECTIONS = [
@@ -393,8 +392,8 @@ export default function DemoPage() {
                 }}
               >
                 Pick one below. Decision Intel will score 30+ cognitive biases, predict the
-                questions your steering committee would raise, and map the decision into a
-                Knowledge Graph that compounds across every audit you run.
+                questions your steering committee would raise, and map the decision into a Knowledge
+                Graph that compounds across every audit you run.
               </p>
             </div>
 
@@ -455,9 +454,7 @@ export default function DemoPage() {
                       <div className="text-base font-bold text-slate-900 mb-1.5 leading-tight">
                         {a.shortName}
                       </div>
-                      <div className="text-sm text-slate-500 leading-relaxed">
-                        {a.teaser}
-                      </div>
+                      <div className="text-sm text-slate-500 leading-relaxed">{a.teaser}</div>
                     </div>
 
                     {/* CTA footer */}
@@ -588,11 +585,7 @@ export default function DemoPage() {
                       justifyContent: 'center',
                       flexShrink: 0,
                       position: 'relative',
-                      background: isComplete
-                        ? C.greenSoft
-                        : isActive
-                          ? C.slate50
-                          : C.white,
+                      background: isComplete ? C.greenSoft : isActive ? C.slate50 : C.white,
                       border: `1px solid ${isComplete ? C.greenLight : isActive ? C.slate200 : C.slate100}`,
                       transition: 'background 0.4s, border-color 0.4s',
                     }}
@@ -840,8 +833,8 @@ export default function DemoPage() {
                       }}
                     >
                       A sequential preprocessing chain, seven parallel analysis agents, and a
-                      two-step synthesis that reconciles the signals and computes the DQI. Click
-                      any node to see what it does.
+                      two-step synthesis that reconciles the signals and computes the DQI. Click any
+                      node to see what it does.
                     </p>
                   </div>
                   <PipelineFlowDiagram
@@ -917,43 +910,43 @@ export default function DemoPage() {
                       gap: 12,
                     }}
                   >
-                  <ScoreCard
-                    label="DECISION QUALITY"
-                    value={`${analysis.overallScore}`}
-                    sub="/100"
-                    color={scoreColor}
-                  />
-                  <ScoreCard
-                    label="NOISE SCORE"
-                    value={`${analysis.noiseScore}`}
-                    sub={
-                      analysis.noiseScore <= 30
-                        ? 'Low noise'
-                        : analysis.noiseScore <= 60
-                          ? 'Moderate'
-                          : 'High inconsistency'
-                    }
-                    color={noiseColor}
-                  />
-                  <ScoreCard
-                    label="BIASES DETECTED"
-                    value={`${analysis.biases.length}`}
-                    sub={`${analysis.biases.filter(b => b.severity === 'critical').length} critical`}
-                    color="#ef4444"
-                  />
-                  <ScoreCard
-                    label="BOARD VERDICT"
-                    value={analysis.simulation.overallVerdict}
-                    sub={`${analysis.simulation.twins.filter(t => t.vote === 'REJECT').length} of ${analysis.simulation.twins.length} reject`}
-                    color={
-                      analysis.simulation.overallVerdict === 'REJECT'
-                        ? '#ef4444'
-                        : analysis.simulation.overallVerdict === 'APPROVE'
-                          ? '#22c55e'
-                          : '#eab308'
-                    }
-                    smallValue
-                  />
+                    <ScoreCard
+                      label="DECISION QUALITY"
+                      value={`${analysis.overallScore}`}
+                      sub="/100"
+                      color={scoreColor}
+                    />
+                    <ScoreCard
+                      label="NOISE SCORE"
+                      value={`${analysis.noiseScore}`}
+                      sub={
+                        analysis.noiseScore <= 30
+                          ? 'Low noise'
+                          : analysis.noiseScore <= 60
+                            ? 'Moderate'
+                            : 'High inconsistency'
+                      }
+                      color={noiseColor}
+                    />
+                    <ScoreCard
+                      label="BIASES DETECTED"
+                      value={`${analysis.biases.length}`}
+                      sub={`${analysis.biases.filter(b => b.severity === 'critical').length} critical`}
+                      color="#ef4444"
+                    />
+                    <ScoreCard
+                      label="BOARD VERDICT"
+                      value={analysis.simulation.overallVerdict}
+                      sub={`${analysis.simulation.twins.filter(t => t.vote === 'REJECT').length} of ${analysis.simulation.twins.length} reject`}
+                      color={
+                        analysis.simulation.overallVerdict === 'REJECT'
+                          ? '#ef4444'
+                          : analysis.simulation.overallVerdict === 'APPROVE'
+                            ? '#22c55e'
+                            : '#eab308'
+                      }
+                      smallValue
+                    />
                   </div>
                 </div>
                 {/* Executive summary */}
@@ -1245,10 +1238,7 @@ export default function DemoPage() {
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                         {analysis.noiseBenchmarks.map((b, i) => (
-                          <div
-                            key={i}
-                            style={{ display: 'flex', alignItems: 'center', gap: 12 }}
-                          >
+                          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                             <span
                               style={{
                                 fontSize: 12,
@@ -1440,7 +1430,9 @@ export default function DemoPage() {
                               >
                                 {tc.name}
                               </span>
-                              <span style={tintedPill(tcColor, { size: 'sm' })}>{tc.riskLevel}</span>
+                              <span style={tintedPill(tcColor, { size: 'sm' })}>
+                                {tc.riskLevel}
+                              </span>
                             </div>
                             <div
                               style={{
@@ -1635,7 +1627,15 @@ export default function DemoPage() {
               loadingSample={loadingSample}
             />
 
-            <p style={{ color: C.slate400, fontSize: 11, textAlign: 'center', marginTop: 32, lineHeight: 1.6 }}>
+            <p
+              style={{
+                color: C.slate400,
+                fontSize: 11,
+                textAlign: 'center',
+                marginTop: 32,
+                lineHeight: 1.6,
+              }}
+            >
               Demo analyses are generated by Decision Intel&apos;s cognitive bias detection engine
               to demonstrate product capabilities. They are not financial or investment advice.
             </p>
@@ -1688,9 +1688,9 @@ function DemoVideoSection() {
           lineHeight: 1.6,
         }}
       >
-        The audit your CSO never had time to run. 30+ cognitive biases scored, the question your
-        CEO will raise predicted, and every decision dropped into a Knowledge Graph that
-        compounds quarter after quarter.
+        The audit your CSO never had time to run. 30+ cognitive biases scored, the question your CEO
+        will raise predicted, and every decision dropped into a Knowledge Graph that compounds
+        quarter after quarter.
       </p>
 
       {DEMO_VIDEO_URL ? (
@@ -1991,7 +1991,15 @@ function StatPill({ label, value }: { label: string; value: string }) {
         gap: 6,
       }}
     >
-      <span style={{ fontSize: 10, color: C.slate500, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+      <span
+        style={{
+          fontSize: 10,
+          color: C.slate500,
+          fontWeight: 600,
+          textTransform: 'uppercase',
+          letterSpacing: '0.04em',
+        }}
+      >
         {label}
       </span>
       <span style={{ fontSize: 13, fontWeight: 700, color: C.slate900 }}>{value}</span>
@@ -2252,8 +2260,8 @@ function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () =
             }}
           >
             No common cognitive biases detected in this text. The full analysis also checks for
-            logical fallacies, decision noise, regulatory compliance, fact verification, and runs
-            a boardroom simulation with AI decision twins.
+            logical fallacies, decision noise, regulatory compliance, fact verification, and runs a
+            boardroom simulation with AI decision twins.
           </p>
         </div>
       )}
@@ -2619,9 +2627,7 @@ function DemoConversionCTA({
               )}
             </button>
           </form>
-          {error && (
-            <p style={{ color: C.danger, fontSize: 12, margin: '8px 0 0' }}>{error}</p>
-          )}
+          {error && <p style={{ color: C.danger, fontSize: 12, margin: '8px 0 0' }}>{error}</p>}
           <p style={{ color: C.slate400, fontSize: 11, marginTop: 8 }}>
             No spam. Just insights. Unsubscribe anytime.
           </p>
@@ -2663,8 +2669,8 @@ function DemoConversionCTA({
               lineHeight: 1.55,
             }}
           >
-            We&apos;ll send your personalized bias audit guide to <strong>{email}</strong>. In
-            the meantime, try a full analysis on your own document.
+            We&apos;ll send your personalized bias audit guide to <strong>{email}</strong>. In the
+            meantime, try a full analysis on your own document.
           </p>
         </div>
       )}

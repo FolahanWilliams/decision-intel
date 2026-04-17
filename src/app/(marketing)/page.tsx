@@ -611,330 +611,340 @@ export default function LandingPage() {
 
       {/* ── Four Moments (core value proposition) ───────────────────── */}
       <Reveal>
-      <section
-        id="four-moments"
-        style={{ maxWidth: 1200, margin: '0 auto', padding: '96px 24px' }}
-      >
-        <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
-          <p
-            style={{
-              fontSize: 15,
-              color: C.slate600,
-              lineHeight: 1.7,
-              maxWidth: 820,
-              marginBottom: 32,
-              fontStyle: 'italic',
-            }}
-          >
-            The same lens that exposed Kodak&rsquo;s missed digital pivot, Blockbuster&rsquo;s
-            Netflix rejection, and Nokia&rsquo;s smartphone blind spot now audits your strategic
-            memos in 60 seconds, turning every major call your team makes into a living, navigable
-            Decision Knowledge Graph.
-          </p>
-          <p
-            style={{
-              fontSize: 14,
-              fontWeight: 600,
-              color: C.green,
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              marginBottom: 8,
-            }}
-          >
-            What you get
-          </p>
-          <h2
-            style={{
-              fontSize: 36,
-              fontWeight: 700,
-              color: C.slate900,
-              marginBottom: 56,
-              letterSpacing: '-0.01em',
-              maxWidth: 820,
-              lineHeight: 1.15,
-            }}
-          >
-            The Four Moments We Catch What Others Miss
-          </h2>
-        </motion.div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 32 }} className="cards-grid">
-          {[
-            {
-              num: '01',
-              title: 'Your full Decision Knowledge Graph: every major strategic call, connected.',
-              body: (
-                <>
-                  Every strategic memo, board deck, and market-entry recommendation your team
-                  produces becomes a node in one navigable graph, connected by assumption, bias,
-                  and outcome. No more strategy archaeology across SharePoint, email, and the last
-                  analyst&rsquo;s laptop. Your team&rsquo;s collective judgment becomes a
-                  searchable, traceable asset. Today&rsquo;s decision always inherits
-                  yesterday&rsquo;s lessons.
-                </>
-              ),
-            },
-            {
-              num: '02',
-              title: 'See the questions before the CEO asks them.',
-              body: (
-                <>
-                  Reworking the same board deck three times because new questions keep surfacing in
-                  the steering committee. That&rsquo;s time your team never gets back. Our
-                  simulation engine runs your memo against 135 historical decisions with known
-                  outcomes, predicting the objections, forgotten angles, and counterarguments
-                  before the meeting. Walk in prepared, walk out faster, and hand the CEO
-                  answers&mdash;not revisions.
-                </>
-              ),
-            },
-            {
-              num: '03',
-              title: 'Audit the reasoning behind every strategic memo.',
-              body: (
-                <>
-                  Strategy papers live or die on the logic behind the numbers. We score the 30+
-                  cognitive biases that quietly derail even the strongest-looking recommendations,
-                  converting narrative judgment into measurable risk signal. You walk into the
-                  board with the same analytical confidence in the{' '}
-                  <em style={{ color: C.slate900, fontStyle: 'italic' }}>strategy</em> that you
-                  already have in the{' '}
-                  <em style={{ color: C.slate900, fontStyle: 'italic' }}>data</em>.
-                </>
-              ),
-            },
-            {
-              num: '04',
-              title: 'Close the loop most teams never close.',
-              body: (
-                <>
-                  Most strategy teams recommend something and then wonder, months later, whether it
-                  actually worked. Every high-stakes call gets a Decision Quality Index: auditable
-                  evidence for your board, CEO, or parent company that the process was rigorous,
-                  not just that the outcome was lucky. Memo after memo, quarter after quarter,
-                  your DQI becomes proprietary proof that your team&rsquo;s judgment isn&rsquo;t
-                  just strong&mdash;it&rsquo;s{' '}
-                  <em style={{ color: C.green, fontStyle: 'italic', fontWeight: 600 }}>
-                    compounding
-                  </em>
-                  .
-                </>
-              ),
-            },
-          ].map((m, i) => (
-            <motion.div
-              key={m.num}
-              {...fadeIn}
-              transition={{ duration: 0.5, delay: i * 0.05 }}
+        <section
+          id="four-moments"
+          style={{ maxWidth: 1200, margin: '0 auto', padding: '96px 24px' }}
+        >
+          <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
+            <p
               style={{
-                background: C.white,
-                border: `1px solid ${C.slate200}`,
-                borderRadius: 16,
-                padding: '36px 32px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 16,
+                fontSize: 15,
+                color: C.slate600,
+                lineHeight: 1.7,
+                maxWidth: 820,
+                marginBottom: 32,
+                fontStyle: 'italic',
               }}
             >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 700,
-                    color: C.green,
-                    background: C.greenLight,
-                    padding: '4px 10px',
-                    borderRadius: 6,
-                    letterSpacing: '0.04em',
-                  }}
-                >
-                  {m.num}
-                </span>
-              </div>
-              <h3
-                style={{
-                  fontSize: 20,
-                  fontWeight: 700,
-                  color: C.slate900,
-                  lineHeight: 1.3,
-                  letterSpacing: '-0.01em',
-                  margin: 0,
-                }}
-              >
-                {m.title}
-              </h3>
-              <p
-                style={{
-                  fontSize: 15,
-                  color: C.slate600,
-                  lineHeight: 1.7,
-                  margin: 0,
-                }}
-              >
-                {m.body}
-              </p>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-      </Reveal>
+              The same lens that exposed Kodak&rsquo;s missed digital pivot, Blockbuster&rsquo;s
+              Netflix rejection, and Nokia&rsquo;s smartphone blind spot now audits your strategic
+              memos in 60 seconds, turning every major call your team makes into a living, navigable
+              Decision Knowledge Graph.
+            </p>
+            <p
+              style={{
+                fontSize: 14,
+                fontWeight: 600,
+                color: C.green,
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                marginBottom: 8,
+              }}
+            >
+              What you get
+            </p>
+            <h2
+              style={{
+                fontSize: 36,
+                fontWeight: 700,
+                color: C.slate900,
+                marginBottom: 56,
+                letterSpacing: '-0.01em',
+                maxWidth: 820,
+                lineHeight: 1.15,
+              }}
+            >
+              The Four Moments We Catch What Others Miss
+            </h2>
+          </motion.div>
 
-      {/* ── How It Works ────────────────────────────────────────────── */}
-      <Reveal>
-      <section id="how-it-works" style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}>
-        <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
-          <p
-            style={{
-              fontSize: 14,
-              fontWeight: 600,
-              color: C.green,
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              marginBottom: 8,
-            }}
+          <div
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 32 }}
+            className="cards-grid"
           >
-            How it Works
-          </p>
-          <h2
-            style={{
-              fontSize: 36,
-              fontWeight: 700,
-              color: C.slate900,
-              marginBottom: 16,
-              letterSpacing: '-0.01em',
-            }}
-          >
-            Decision Hygiene in Three Steps
-          </h2>
-          <p style={{ fontSize: 18, color: C.slate600, marginBottom: 32, maxWidth: 560 }}>
-            From strategic document to verified outcome &mdash; for any decision-critical team.
-          </p>
-        </motion.div>
-
-        {/* 12-node pipeline teaser — what happens INSIDE the 60-second audit */}
-        <motion.div {...fadeIn} transition={{ duration: 0.5, delay: 0.1 }} style={{ marginBottom: 24 }}>
-          <PipelineLandingTeaser />
-        </motion.div>
-
-        {/* Outcome loop viz — what happens AFTER the audit (complements the teaser) */}
-        <motion.div {...fadeIn} transition={{ duration: 0.5, delay: 0.15 }}>
-          <OutcomeDetectionViz />
-        </motion.div>
-      </section>
-      </Reveal>
-
-      {/* ── Features ────────────────────────────────────────────────── */}
-      <Reveal>
-      <section id="features" style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}>
-        <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
-          <p
-            style={{
-              fontSize: 14,
-              fontWeight: 600,
-              color: C.green,
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              marginBottom: 8,
-            }}
-          >
-            Features
-          </p>
-          <h2 style={{ fontSize: 36, fontWeight: 700, color: C.slate900, marginBottom: 48 }}>
-            The Decision Performance OS
-          </h2>
-        </motion.div>
-
-        <div
-          style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}
-          className="cards-grid"
-        >
-          {[
-            {
-              icon: Brain,
-              title: 'Cognitive Bias Detection',
-              desc: '30+ biases detected with confidence scores, excerpts, and research-backed explanations. Includes domain-specific biases for corporate strategy, M&A, and market-entry decisions.',
-              color: '#8B5CF6',
-              bg: '#F5F3FF',
-            },
-            {
-              icon: BarChart3,
-              title: 'Noise Measurement',
-              desc: "3 independent AI judges score your document — just like Kahneman's insurance underwriter study. Measures the variance your team doesn't see.",
-              color: '#3B82F6',
-              bg: '#EFF6FF',
-            },
-            {
-              icon: Users,
-              title: 'Decision Rooms',
-              desc: 'Blind prior collection before group discussion. Consensus scoring reveals when agreement is genuine vs. groupthink.',
-              color: C.teal,
-              bg: C.tealBg,
-            },
-            {
-              icon: Target,
-              title: 'Toxic Combinations',
-              desc: '10 named compound risk patterns (Echo Chamber, Sunk Ship, etc.) with auto-generated mitigation playbooks and dollar impact estimates.',
-              color: '#EF4444',
-              bg: '#FEF2F2',
-            },
-            {
-              icon: FileSearch,
-              title: 'Forgotten Questions',
-              desc: 'Surfaces the questions your memo never asks, drawn from the gap between your document and its closest historical analogs. Every question was answered (or fatally ignored) in a comparable real decision.',
-              color: '#F59E0B',
-              bg: '#FFFBEB',
-            },
-            {
-              icon: Shield,
-              title: 'Compliance Mapping',
-              desc: 'SOX, GDPR, MiFID II, and FCA Consumer Duty frameworks. Cross-maps detected biases to regulatory risks with audit trails.',
-              color: C.green,
-              bg: C.greenLight,
-            },
-          ].map((f, i) => {
-            const Icon = f.icon;
-            return (
+            {[
+              {
+                num: '01',
+                title: 'Your full Decision Knowledge Graph: every major strategic call, connected.',
+                body: (
+                  <>
+                    Every strategic memo, board deck, and market-entry recommendation your team
+                    produces becomes a node in one navigable graph, connected by assumption, bias,
+                    and outcome. No more strategy archaeology across SharePoint, email, and the last
+                    analyst&rsquo;s laptop. Your team&rsquo;s collective judgment becomes a
+                    searchable, traceable asset. Today&rsquo;s decision always inherits
+                    yesterday&rsquo;s lessons.
+                  </>
+                ),
+              },
+              {
+                num: '02',
+                title: 'See the questions before the CEO asks them.',
+                body: (
+                  <>
+                    Reworking the same board deck three times because new questions keep surfacing
+                    in the steering committee. That&rsquo;s time your team never gets back. Our
+                    simulation engine runs your memo against 135 historical decisions with known
+                    outcomes, predicting the objections, forgotten angles, and counterarguments
+                    before the meeting. Walk in prepared, walk out faster, and hand the CEO
+                    answers&mdash;not revisions.
+                  </>
+                ),
+              },
+              {
+                num: '03',
+                title: 'Audit the reasoning behind every strategic memo.',
+                body: (
+                  <>
+                    Strategy papers live or die on the logic behind the numbers. We score the 30+
+                    cognitive biases that quietly derail even the strongest-looking recommendations,
+                    converting narrative judgment into measurable risk signal. You walk into the
+                    board with the same analytical confidence in the{' '}
+                    <em style={{ color: C.slate900, fontStyle: 'italic' }}>strategy</em> that you
+                    already have in the{' '}
+                    <em style={{ color: C.slate900, fontStyle: 'italic' }}>data</em>.
+                  </>
+                ),
+              },
+              {
+                num: '04',
+                title: 'Close the loop most teams never close.',
+                body: (
+                  <>
+                    Most strategy teams recommend something and then wonder, months later, whether
+                    it actually worked. Every high-stakes call gets a Decision Quality Index:
+                    auditable evidence for your board, CEO, or parent company that the process was
+                    rigorous, not just that the outcome was lucky. Memo after memo, quarter after
+                    quarter, your DQI becomes proprietary proof that your team&rsquo;s judgment
+                    isn&rsquo;t just strong&mdash;it&rsquo;s{' '}
+                    <em style={{ color: C.green, fontStyle: 'italic', fontWeight: 600 }}>
+                      compounding
+                    </em>
+                    .
+                  </>
+                ),
+              },
+            ].map((m, i) => (
               <motion.div
-                key={f.title}
+                key={m.num}
                 {...fadeIn}
-                transition={{ duration: 0.4, delay: i * 0.08 }}
+                transition={{ duration: 0.5, delay: i * 0.05 }}
                 style={{
                   background: C.white,
                   border: `1px solid ${C.slate200}`,
                   borderRadius: 16,
-                  padding: 28,
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                  padding: '36px 32px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 16,
                 }}
               >
                 <div
                   style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: 10,
-                    background: f.bg,
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: 16,
+                    gap: 12,
                   }}
                 >
-                  <Icon size={20} style={{ color: f.color }} />
+                  <span
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 700,
+                      color: C.green,
+                      background: C.greenLight,
+                      padding: '4px 10px',
+                      borderRadius: 6,
+                      letterSpacing: '0.04em',
+                    }}
+                  >
+                    {m.num}
+                  </span>
                 </div>
-                <h3 style={{ fontSize: 18, fontWeight: 700, color: C.slate900, marginBottom: 8 }}>
-                  {f.title}
+                <h3
+                  style={{
+                    fontSize: 20,
+                    fontWeight: 700,
+                    color: C.slate900,
+                    lineHeight: 1.3,
+                    letterSpacing: '-0.01em',
+                    margin: 0,
+                  }}
+                >
+                  {m.title}
                 </h3>
-                <p style={{ fontSize: 14, color: C.slate600, lineHeight: 1.6 }}>{f.desc}</p>
+                <p
+                  style={{
+                    fontSize: 15,
+                    color: C.slate600,
+                    lineHeight: 1.7,
+                    margin: 0,
+                  }}
+                >
+                  {m.body}
+                </p>
               </motion.div>
-            );
-          })}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+      </Reveal>
+
+      {/* ── How It Works ────────────────────────────────────────────── */}
+      <Reveal>
+        <section
+          id="how-it-works"
+          style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}
+        >
+          <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
+            <p
+              style={{
+                fontSize: 14,
+                fontWeight: 600,
+                color: C.green,
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                marginBottom: 8,
+              }}
+            >
+              How it Works
+            </p>
+            <h2
+              style={{
+                fontSize: 36,
+                fontWeight: 700,
+                color: C.slate900,
+                marginBottom: 16,
+                letterSpacing: '-0.01em',
+              }}
+            >
+              Decision Hygiene in Three Steps
+            </h2>
+            <p style={{ fontSize: 18, color: C.slate600, marginBottom: 32, maxWidth: 560 }}>
+              From strategic document to verified outcome &mdash; for any decision-critical team.
+            </p>
+          </motion.div>
+
+          {/* 12-node pipeline teaser — what happens INSIDE the 60-second audit */}
+          <motion.div
+            {...fadeIn}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            style={{ marginBottom: 24 }}
+          >
+            <PipelineLandingTeaser />
+          </motion.div>
+
+          {/* Outcome loop viz — what happens AFTER the audit (complements the teaser) */}
+          <motion.div {...fadeIn} transition={{ duration: 0.5, delay: 0.15 }}>
+            <OutcomeDetectionViz />
+          </motion.div>
+        </section>
+      </Reveal>
+
+      {/* ── Features ────────────────────────────────────────────────── */}
+      <Reveal>
+        <section id="features" style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}>
+          <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
+            <p
+              style={{
+                fontSize: 14,
+                fontWeight: 600,
+                color: C.green,
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                marginBottom: 8,
+              }}
+            >
+              Features
+            </p>
+            <h2 style={{ fontSize: 36, fontWeight: 700, color: C.slate900, marginBottom: 48 }}>
+              The Decision Performance OS
+            </h2>
+          </motion.div>
+
+          <div
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}
+            className="cards-grid"
+          >
+            {[
+              {
+                icon: Brain,
+                title: 'Cognitive Bias Detection',
+                desc: '30+ biases detected with confidence scores, excerpts, and research-backed explanations. Includes domain-specific biases for corporate strategy, M&A, and market-entry decisions.',
+                color: '#8B5CF6',
+                bg: '#F5F3FF',
+              },
+              {
+                icon: BarChart3,
+                title: 'Noise Measurement',
+                desc: "3 independent AI judges score your document — just like Kahneman's insurance underwriter study. Measures the variance your team doesn't see.",
+                color: '#3B82F6',
+                bg: '#EFF6FF',
+              },
+              {
+                icon: Users,
+                title: 'Decision Rooms',
+                desc: 'Blind prior collection before group discussion. Consensus scoring reveals when agreement is genuine vs. groupthink.',
+                color: C.teal,
+                bg: C.tealBg,
+              },
+              {
+                icon: Target,
+                title: 'Toxic Combinations',
+                desc: '10 named compound risk patterns (Echo Chamber, Sunk Ship, etc.) with auto-generated mitigation playbooks and dollar impact estimates.',
+                color: '#EF4444',
+                bg: '#FEF2F2',
+              },
+              {
+                icon: FileSearch,
+                title: 'Forgotten Questions',
+                desc: 'Surfaces the questions your memo never asks, drawn from the gap between your document and its closest historical analogs. Every question was answered (or fatally ignored) in a comparable real decision.',
+                color: '#F59E0B',
+                bg: '#FFFBEB',
+              },
+              {
+                icon: Shield,
+                title: 'Compliance Mapping',
+                desc: 'SOX, GDPR, MiFID II, and FCA Consumer Duty frameworks. Cross-maps detected biases to regulatory risks with audit trails.',
+                color: C.green,
+                bg: C.greenLight,
+              },
+            ].map((f, i) => {
+              const Icon = f.icon;
+              return (
+                <motion.div
+                  key={f.title}
+                  {...fadeIn}
+                  transition={{ duration: 0.4, delay: i * 0.08 }}
+                  style={{
+                    background: C.white,
+                    border: `1px solid ${C.slate200}`,
+                    borderRadius: 16,
+                    padding: 28,
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: 10,
+                      background: f.bg,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginBottom: 16,
+                    }}
+                  >
+                    <Icon size={20} style={{ color: f.color }} />
+                  </div>
+                  <h3 style={{ fontSize: 18, fontWeight: 700, color: C.slate900, marginBottom: 8 }}>
+                    {f.title}
+                  </h3>
+                  <p style={{ fontSize: 14, color: C.slate600, lineHeight: 1.6 }}>{f.desc}</p>
+                </motion.div>
+              );
+            })}
+          </div>
+        </section>
       </Reveal>
 
       {/* ── Pricing ─────────────────────────────────────────────────── */}
@@ -1069,9 +1079,7 @@ export default function LandingPage() {
                   transition={{ duration: 0.4, delay: i * 0.08 }}
                   style={{
                     background: C.white,
-                    border: tier.popular
-                      ? `2px solid ${C.green}`
-                      : `1px solid ${C.slate200}`,
+                    border: tier.popular ? `2px solid ${C.green}` : `1px solid ${C.slate200}`,
                     borderRadius: 20,
                     padding: 32,
                     display: 'flex',
@@ -1137,7 +1145,14 @@ export default function LandingPage() {
                         Custom
                       </span>
                     ) : (
-                      <span style={{ fontSize: 40, fontWeight: 800, color: C.slate900, letterSpacing: '-0.02em' }}>
+                      <span
+                        style={{
+                          fontSize: 40,
+                          fontWeight: 800,
+                          color: C.slate900,
+                          letterSpacing: '-0.02em',
+                        }}
+                      >
                         ${displayPrice.toLocaleString()}
                         <span style={{ fontSize: 15, fontWeight: 500, color: C.slate400 }}>
                           {tier.priceSuffix}
@@ -1149,7 +1164,9 @@ export default function LandingPage() {
                     {tier.anchor}
                   </p>
 
-                  <p style={{ fontSize: 14, color: C.slate600, marginBottom: 22, lineHeight: 1.55 }}>
+                  <p
+                    style={{ fontSize: 14, color: C.slate600, marginBottom: 22, lineHeight: 1.55 }}
+                  >
                     {tier.desc}
                   </p>
                   <ul
@@ -1209,9 +1226,7 @@ export default function LandingPage() {
                       cursor: tier.loading ? 'wait' : 'pointer',
                       opacity: tier.loading ? 0.7 : 1,
                       transition: 'all 0.2s',
-                      boxShadow: tier.outline
-                        ? 'none'
-                        : '0 6px 20px rgba(22,163,74,0.28)',
+                      boxShadow: tier.outline ? 'none' : '0 6px 20px rgba(22,163,74,0.28)',
                     }}
                   >
                     {tier.loading ? 'Redirecting…' : tier.cta}
@@ -1243,10 +1258,7 @@ export default function LandingPage() {
               { label: 'No training on your data', sub: 'ever, by contract' },
               { label: '30-day pilot', sub: 'on Strategy tier' },
             ].map(item => (
-              <div
-                key={item.label}
-                style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}
-              >
+              <div key={item.label} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                 <span
                   style={{
                     width: 20,
@@ -1264,10 +1276,14 @@ export default function LandingPage() {
                   <Check size={12} strokeWidth={3} />
                 </span>
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: C.slate900, lineHeight: 1.3 }}>
+                  <div
+                    style={{ fontSize: 13, fontWeight: 700, color: C.slate900, lineHeight: 1.3 }}
+                  >
                     {item.label}
                   </div>
-                  <div style={{ fontSize: 11.5, color: C.slate500, lineHeight: 1.35, marginTop: 1 }}>
+                  <div
+                    style={{ fontSize: 11.5, color: C.slate500, lineHeight: 1.35, marginTop: 1 }}
+                  >
                     {item.sub}
                   </div>
                 </div>
@@ -1319,71 +1335,71 @@ export default function LandingPage() {
 
       {/* ── FAQ + Competitor Comparison ───────────────────────────────── */}
       <Reveal>
-      <section id="faq" style={{ maxWidth: 1320, margin: '0 auto', padding: '96px 24px' }}>
-        <motion.div
-          {...fadeIn}
-          transition={{ duration: 0.5 }}
-          style={{ textAlign: 'center', marginBottom: 48 }}
-        >
+        <section id="faq" style={{ maxWidth: 1320, margin: '0 auto', padding: '96px 24px' }}>
+          <motion.div
+            {...fadeIn}
+            transition={{ duration: 0.5 }}
+            style={{ textAlign: 'center', marginBottom: 48 }}
+          >
+            <div
+              style={{
+                display: 'inline-block',
+                fontSize: 11,
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.14em',
+                color: C.green,
+                marginBottom: 12,
+              }}
+            >
+              Answers & alternatives
+            </div>
+            <h2
+              style={{
+                fontSize: 'clamp(28px, 4vw, 40px)',
+                fontWeight: 800,
+                color: C.slate900,
+                lineHeight: 1.15,
+                letterSpacing: '-0.02em',
+                marginBottom: 12,
+              }}
+            >
+              Everything a buyer asks before signing.
+            </h2>
+            <p
+              style={{
+                fontSize: 17,
+                color: C.slate600,
+                maxWidth: 640,
+                margin: '0 auto',
+                lineHeight: 1.6,
+              }}
+            >
+              The questions corporate strategy teams actually bring — plus an honest side-by-side
+              against the alternatives we lose deals to.
+            </p>
+          </motion.div>
+
           <div
+            className="faq-grid"
             style={{
-              display: 'inline-block',
-              fontSize: 11,
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.14em',
-              color: C.green,
-              marginBottom: 12,
+              display: 'grid',
+              gridTemplateColumns: 'minmax(0, 1.05fr) minmax(0, 1fr)',
+              gap: 48,
+              alignItems: 'start',
             }}
           >
-            Answers & alternatives
-          </div>
-          <h2
-            style={{
-              fontSize: 'clamp(28px, 4vw, 40px)',
-              fontWeight: 800,
-              color: C.slate900,
-              lineHeight: 1.15,
-              letterSpacing: '-0.02em',
-              marginBottom: 12,
-            }}
-          >
-            Everything a buyer asks before signing.
-          </h2>
-          <p
-            style={{
-              fontSize: 17,
-              color: C.slate600,
-              maxWidth: 640,
-              margin: '0 auto',
-              lineHeight: 1.6,
-            }}
-          >
-            The questions corporate strategy teams actually bring — plus an honest side-by-side
-            against the alternatives we lose deals to.
-          </p>
-        </motion.div>
+            {/* Left column — FAQ accordion with category chips */}
+            <div style={{ minWidth: 0 }}>
+              <LandingFaq />
+            </div>
 
-        <div
-          className="faq-grid"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'minmax(0, 1.05fr) minmax(0, 1fr)',
-            gap: 48,
-            alignItems: 'start',
-          }}
-        >
-          {/* Left column — FAQ accordion with category chips */}
-          <div style={{ minWidth: 0 }}>
-            <LandingFaq />
+            {/* Right column — Competitor Comparison Card */}
+            <div style={{ minWidth: 0, position: 'sticky', top: 24 }}>
+              <CompetitorComparisonCard />
+            </div>
           </div>
-
-          {/* Right column — Competitor Comparison Card */}
-          <div style={{ minWidth: 0, position: 'sticky', top: 24 }}>
-            <CompetitorComparisonCard />
-          </div>
-        </div>
-      </section>
+        </section>
       </Reveal>
 
       {/* Responsive override for the 2-column FAQ layout on mobile */}
@@ -1400,7 +1416,14 @@ export default function LandingPage() {
 
       {/* ── Final CTA + Newsletter ──────────────────────────────────── */}
       <section style={{ background: C.slate50, borderTop: `1px solid ${C.slate200}` }}>
-        <div style={{ maxWidth: 640, margin: '0 auto', padding: '80px 24px 48px', textAlign: 'center' }}>
+        <div
+          style={{
+            maxWidth: 640,
+            margin: '0 auto',
+            padding: '80px 24px 48px',
+            textAlign: 'center',
+          }}
+        >
           <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
             <h2 style={{ fontSize: 36, fontWeight: 700, color: C.slate900, marginBottom: 16 }}>
               Ready to compound your team&rsquo;s judgment?
@@ -1529,8 +1552,8 @@ export default function LandingPage() {
               <span style={{ fontSize: 18, fontWeight: 700, color: C.white }}>Decision Intel</span>
             </div>
             <p style={{ fontSize: 14, lineHeight: 1.7, color: '#94A3B8', maxWidth: 280 }}>
-              Decision intelligence for corporate strategy and M&amp;A teams. Audit the reasoning
-              in every strategic memo, see the questions the board will ask, and compound your
+              Decision intelligence for corporate strategy and M&amp;A teams. Audit the reasoning in
+              every strategic memo, see the questions the board will ask, and compound your
               team&rsquo;s judgment over time.
             </p>
           </div>
@@ -1640,13 +1663,7 @@ export default function LandingPage() {
                 marginBottom: 10,
               }}
             >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                aria-hidden
-              >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                 <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.95v5.66H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.61 0 4.28 2.38 4.28 5.47v6.27ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0Z" />
               </svg>
               LinkedIn
@@ -1690,16 +1707,10 @@ export default function LandingPage() {
         >
           <span>© {new Date().getFullYear()} Decision Intel. All rights reserved.</span>
           <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
-            <Link
-              href="/terms"
-              style={{ color: '#94A3B8', textDecoration: 'none' }}
-            >
+            <Link href="/terms" style={{ color: '#94A3B8', textDecoration: 'none' }}>
               Terms of Service
             </Link>
-            <Link
-              href="/privacy"
-              style={{ color: '#94A3B8', textDecoration: 'none' }}
-            >
+            <Link href="/privacy" style={{ color: '#94A3B8', textDecoration: 'none' }}>
               Privacy Policy
             </Link>
           </div>

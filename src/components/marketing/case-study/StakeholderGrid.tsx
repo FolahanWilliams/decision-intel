@@ -49,8 +49,8 @@ export function StakeholderGrid({ stakeholders }: { stakeholders: CaseStakeholde
         Stakeholders and positions
       </h2>
       <p style={{ fontSize: 13, color: '#64748B', margin: '0 0 20px' }}>
-        Who advocated, who dissented, who was overruled, and who stayed silent —
-        the most reliable single signal of decision-process quality.
+        Who advocated, who dissented, who was overruled, and who stayed silent — the most reliable
+        single signal of decision-process quality.
       </p>
 
       <div
@@ -73,7 +73,15 @@ export function StakeholderGrid({ stakeholders }: { stakeholders: CaseStakeholde
                 padding: '14px 16px',
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'flex-start', marginBottom: 6 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  gap: 8,
+                  alignItems: 'flex-start',
+                  marginBottom: 6,
+                }}
+              >
                 <div style={{ fontSize: 14, fontWeight: 700, color: '#0F172A', lineHeight: 1.3 }}>
                   {s.name}
                 </div>
@@ -97,9 +105,7 @@ export function StakeholderGrid({ stakeholders }: { stakeholders: CaseStakeholde
                 {s.role}
               </div>
               {s.notes && (
-                <div style={{ fontSize: 12, color: '#64748B', lineHeight: 1.5 }}>
-                  {s.notes}
-                </div>
+                <div style={{ fontSize: 12, color: '#64748B', lineHeight: 1.5 }}>{s.notes}</div>
               )}
             </div>
           );

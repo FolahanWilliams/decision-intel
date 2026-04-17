@@ -34,9 +34,8 @@ export function TimelineSection({ timeline }: { timeline: CaseTimelineEvent[] })
         What was visible, and when
       </h2>
       <p style={{ fontSize: 13, color: '#64748B', margin: '0 0 24px' }}>
-        Every event below was documentable{' '}
-        <em>before</em> the outcome was known. The platform looks for signals
-        like these in live memos.
+        Every event below was documentable <em>before</em> the outcome was known. The platform looks
+        for signals like these in live memos.
       </p>
 
       <ol
@@ -88,9 +87,7 @@ export function TimelineSection({ timeline }: { timeline: CaseTimelineEvent[] })
                 justifyContent: 'center',
               }}
             >
-              {i === timeline.length - 1 && (
-                <Clock size={9} style={{ color: '#DC2626' }} />
-              )}
+              {i === timeline.length - 1 && <Clock size={9} style={{ color: '#DC2626' }} />}
             </span>
 
             <div
@@ -113,9 +110,7 @@ export function TimelineSection({ timeline }: { timeline: CaseTimelineEvent[] })
               >
                 {event.date}
               </div>
-              <div style={{ fontSize: 14, color: '#1E293B', lineHeight: 1.55 }}>
-                {event.event}
-              </div>
+              <div style={{ fontSize: 14, color: '#1E293B', lineHeight: 1.55 }}>{event.event}</div>
               {event.source && (
                 <div
                   style={{

@@ -111,7 +111,14 @@ function JudgePanel({
       >
         <defs>
           {curves.map((c, i) => (
-            <linearGradient key={i} id={`nc-${title.replace(/\s+/g, '-')}-${i}`} x1="0" y1="0" x2="0" y2="1">
+            <linearGradient
+              key={i}
+              id={`nc-${title.replace(/\s+/g, '-')}-${i}`}
+              x1="0"
+              y1="0"
+              x2="0"
+              y2="1"
+            >
               <stop offset="0%" stopColor={c.color} stopOpacity={0.5} />
               <stop offset="100%" stopColor={c.color} stopOpacity={0} />
             </linearGradient>

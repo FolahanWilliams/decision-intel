@@ -1,10 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import {
-  ALL_CASES,
-  getCaseBySlug,
-  getSlugForCase,
-} from '@/lib/data/case-studies';
+import { ALL_CASES, getCaseBySlug, getSlugForCase } from '@/lib/data/case-studies';
 import { CaseStudyNav, BRAND_COLORS as C } from '../../case-studies/CaseStudyNav';
 import { formatBiasName } from '@/lib/utils/labels';
 
@@ -66,11 +62,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function DemoPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function DemoPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const caseStudy = getCaseBySlug(slug);
   if (!caseStudy) return notFound();
@@ -126,11 +118,7 @@ export default async function DemoPage({
         </section>
 
         {/* The uploaded document excerpt */}
-        <DemoDocumentExcerpt
-          document={deep.document}
-          source={deep.source}
-          date={deep.date}
-        />
+        <DemoDocumentExcerpt document={deep.document} source={deep.source} date={deep.date} />
 
         {/* Red flags — the platform's primary output */}
         <DemoRedFlagsAlert flags={deep.detectableRedFlags} />
@@ -192,9 +180,7 @@ export default async function DemoPage({
         <DemoPredictedQuestions caseStudy={caseStudy} />
 
         {/* Counterfactual recommendation */}
-        {caseStudy.counterfactual && (
-          <CounterfactualCallout cf={caseStudy.counterfactual} />
-        )}
+        {caseStudy.counterfactual && <CounterfactualCallout cf={caseStudy.counterfactual} />}
 
         {/* Evidence timeline */}
         {caseStudy.timeline && caseStudy.timeline.length > 0 && (

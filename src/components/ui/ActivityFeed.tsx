@@ -68,10 +68,7 @@ const activityColors: Record<string, string> = {
 export function ActivityFeed({ activities, className, compact = false }: ActivityFeedProps) {
   if (!activities || activities.length === 0) {
     return (
-      <div
-        className={cn('text-center py-8', className)}
-        style={{ color: 'var(--text-muted)' }}
-      >
+      <div className={cn('text-center py-8', className)} style={{ color: 'var(--text-muted)' }}>
         <Clock className="w-12 h-12 mx-auto mb-2 opacity-30" />
         <p className="text-sm">No recent activity</p>
       </div>

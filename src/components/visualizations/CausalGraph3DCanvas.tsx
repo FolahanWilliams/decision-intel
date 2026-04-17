@@ -192,7 +192,7 @@ export default function CausalGraph3DCanvas({ weights, onNodeSelect }: CausalGra
         } catch {
           // Layout not converged yet — next retry will catch it.
         }
-      }, ms),
+      }, ms)
     );
     return () => timers.forEach(clearTimeout);
   }, [hasGraph]);
@@ -238,7 +238,7 @@ export default function CausalGraph3DCanvas({ weights, onNodeSelect }: CausalGra
         graphRef.current?.centerGraph([node.id]);
       }
     },
-    [selections, toggleSelection],
+    [selections, toggleSelection]
   );
 
   const renderNode = useCallback(({ node, size, opacity, active, selected }: NodeRendererProps) => {
@@ -252,7 +252,16 @@ export default function CausalGraph3DCanvas({ weights, onNodeSelect }: CausalGra
         <group>
           <mesh>
             <cylinderGeometry args={[size * 0.9, size * 0.9, size * 1.8, 8]} />
-            <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
+            <meshPhongMaterial
+              color={col}
+              emissive={col}
+              emissiveIntensity={emissive}
+              shininess={90}
+              specular="#FFFFFF"
+              side={DoubleSide}
+              transparent
+              opacity={o}
+            />
           </mesh>
           {selected && (
             <SelectedGlow
@@ -278,7 +287,16 @@ export default function CausalGraph3DCanvas({ weights, onNodeSelect }: CausalGra
         <group>
           <mesh>
             <tetrahedronGeometry args={[size, 0]} />
-            <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
+            <meshPhongMaterial
+              color={col}
+              emissive={col}
+              emissiveIntensity={emissive}
+              shininess={90}
+              specular="#FFFFFF"
+              side={DoubleSide}
+              transparent
+              opacity={o}
+            />
           </mesh>
           {selected && <SelectedGlow size={size} color={col} shape="tetrahedron" />}
           {!selected && active && (
@@ -295,7 +313,16 @@ export default function CausalGraph3DCanvas({ weights, onNodeSelect }: CausalGra
       <group>
         <mesh>
           <octahedronGeometry args={[size, 0]} />
-          <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
+          <meshPhongMaterial
+            color={col}
+            emissive={col}
+            emissiveIntensity={emissive}
+            shininess={90}
+            specular="#FFFFFF"
+            side={DoubleSide}
+            transparent
+            opacity={o}
+          />
         </mesh>
         {selected && <SelectedGlow size={size} color={col} shape="octahedron" />}
         {!selected && active && (
@@ -322,14 +349,14 @@ export default function CausalGraph3DCanvas({ weights, onNodeSelect }: CausalGra
       const d = node.data as CausalNodeData | undefined;
       setHoverSubtitle(d?.nodeType ?? '');
     },
-    [onNodePointerOver],
+    [onNodePointerOver]
   );
   const handleNodePointerOut = useCallback(
     (node: InternalGraphNode) => {
       onNodePointerOut?.(node);
       setHoverNodeId(null);
     },
-    [onNodePointerOut],
+    [onNodePointerOut]
   );
   const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     const rect = wrapperRef.current?.getBoundingClientRect();

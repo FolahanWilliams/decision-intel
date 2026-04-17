@@ -102,10 +102,7 @@ export function CounterfactualCallout({ cf }: { cf: CaseCounterfactual }) {
               alignItems: 'flex-start',
             }}
           >
-            <TrendingUp
-              size={18}
-              style={{ color: '#15803D', flexShrink: 0, marginTop: 2 }}
-            />
+            <TrendingUp size={18} style={{ color: '#15803D', flexShrink: 0, marginTop: 2 }} />
             <div>
               <div
                 style={{

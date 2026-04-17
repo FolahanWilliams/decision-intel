@@ -135,17 +135,16 @@ export function ContentStudioTab({ founderPass }: ContentStudioTabProps) {
     [founderPass, contentType, pillar, topic, tone, fetchLibrary]
   );
 
-  const handleDraft = useCallback(
-    (draftType: string, draftTopic: string) => {
-      setContentType(draftType);
-      setTopic(draftTopic);
-      setGeneratedContent('');
-      setTimeout(() => {
-        document.getElementById('content-generator-anchor')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 50);
-    },
-    []
-  );
+  const handleDraft = useCallback((draftType: string, draftTopic: string) => {
+    setContentType(draftType);
+    setTopic(draftTopic);
+    setGeneratedContent('');
+    setTimeout(() => {
+      document
+        .getElementById('content-generator-anchor')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  }, []);
 
   return (
     <div>

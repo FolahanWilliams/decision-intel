@@ -142,9 +142,7 @@ export async function parseFile(
       return slides
         .map(s => {
           const body = s.text || '(no slide text)';
-          const notesSection = s.notes?.trim()
-            ? `\n[Speaker notes] ${s.notes}`
-            : '';
+          const notesSection = s.notes?.trim() ? `\n[Speaker notes] ${s.notes}` : '';
           return `--- Slide ${s.index} ---\n${body}${notesSection}`;
         })
         .join('\n\n');

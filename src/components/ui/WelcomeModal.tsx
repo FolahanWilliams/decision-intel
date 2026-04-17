@@ -120,11 +120,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const persistState = useCallback(
-    (data: {
-      onboardingCompleted?: boolean;
-      onboardingRole?: Role;
-      onboardingStep?: number;
-    }) => {
+    (data: { onboardingCompleted?: boolean; onboardingRole?: Role; onboardingStep?: number }) => {
       fetch('/api/onboarding', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -210,8 +206,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                 Welcome to Decision Intel
               </DialogTitle>
               <DialogDescription>
-                One quick question so we tailor the next 60 seconds — what best describes your
-                work?
+                One quick question so we tailor the next 60 seconds — what best describes your work?
               </DialogDescription>
             </DialogHeader>
 
@@ -229,9 +224,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                       alignItems: 'center',
                       gap: 12,
                       padding: '12px 14px',
-                      background: isSelected
-                        ? 'rgba(22, 163, 74, 0.06)'
-                        : 'var(--bg-card)',
+                      background: isSelected ? 'rgba(22, 163, 74, 0.06)' : 'var(--bg-card)',
                       border: `1px solid ${
                         isSelected ? 'var(--accent-primary)' : 'var(--border-color)'
                       }`,
@@ -246,9 +239,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                         width: 34,
                         height: 34,
                         borderRadius: 9,
-                        background: isSelected
-                          ? 'var(--accent-primary)'
-                          : 'var(--bg-tertiary)',
+                        background: isSelected ? 'var(--accent-primary)' : 'var(--bg-tertiary)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -314,14 +305,9 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
               </DialogDescription>
             </DialogHeader>
 
-            <div
-              style={{ display: 'flex', flexDirection: 'column', gap: 10, margin: '8px 0 4px' }}
-            >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, margin: '8px 0 4px' }}>
               {VALUE_PROPS_BY_ROLE[selectedRole].map((item, i) => (
-                <div
-                  key={i}
-                  style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}
-                >
+                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                   <div
                     style={{
                       width: 22,
@@ -389,9 +375,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
               <DialogTitle style={{ fontSize: 18, letterSpacing: '-0.01em' }}>
                 Ready to go
               </DialogTitle>
-              <DialogDescription>
-                Take the 60-second tour, or jump straight in.
-              </DialogDescription>
+              <DialogDescription>Take the 60-second tour, or jump straight in.</DialogDescription>
             </DialogHeader>
 
             {sampleError && (
@@ -409,9 +393,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
               </div>
             )}
 
-            <div
-              style={{ display: 'flex', flexDirection: 'column', gap: 10, margin: '8px 0 4px' }}
-            >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, margin: '8px 0 4px' }}>
               <button
                 onClick={() => completeOnboarding({ launchTour: true })}
                 style={{
@@ -443,9 +425,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                   <Compass size={20} color="#fff" />
                 </div>
                 <div>
-                  <div style={{ fontSize: 14, fontWeight: 600 }}>
-                    Take the 60-second tour
-                  </div>
+                  <div style={{ fontSize: 14, fontWeight: 600 }}>Take the 60-second tour</div>
                   <div style={{ fontSize: 12, opacity: 0.85, marginTop: 2 }}>
                     We&apos;ll spotlight the upload zone, audit tabs, and Knowledge Graph.
                   </div>
@@ -491,9 +471,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                   >
                     Upload a strategic memo now
                   </div>
-                  <div
-                    style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}
-                  >
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
                     PDF, DOCX, PPTX, XLSX — up to 5MB
                   </div>
                 </div>
@@ -540,9 +518,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                   >
                     {loadingSample ? 'Loading sample...' : 'Try with a sample memo'}
                   </div>
-                  <div
-                    style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}
-                  >
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
                     See the platform in action with a pre-loaded example.
                   </div>
                 </div>

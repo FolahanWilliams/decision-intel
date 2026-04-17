@@ -32,15 +32,18 @@ const RATE_LIMIT_MAX = 10; // 10 commands per minute per user
 
 async function checkSlackRateLimit(userId: string): Promise<boolean> {
   try {
-    const result = await checkRateLimitDb(
-      `slack:${userId}`,
-      '/api/integrations/slack/commands',
-      { maxRequests: RATE_LIMIT_MAX, windowMs: RATE_LIMIT_WINDOW_MS, failMode: 'open' }
-    );
+    const result = await checkRateLimitDb(`slack:${userId}`, '/api/integrations/slack/commands', {
+      maxRequests: RATE_LIMIT_MAX,
+      windowMs: RATE_LIMIT_WINDOW_MS,
+      failMode: 'open',
+    });
     return result.success;
   } catch (err) {
     // If DB is unavailable, allow the request (fail open for Slack UX)
-    log.warn('Slack rate limit check failed, allowing request:', err instanceof Error ? err.message : String(err));
+    log.warn(
+      'Slack rate limit check failed, allowing request:',
+      err instanceof Error ? err.message : String(err)
+    );
     return true;
   }
 }

@@ -157,7 +157,8 @@ export const AUTOMOTIVE_MANUFACTURING_CASES: FailureCase[] = [
     preDecisionEvidence: {
       document:
         "NHTSA received over 2,000 unintended-acceleration complaints on Toyota vehicles between 2000-2009. Toyota's internal response in 2007-2009 was consistent: attribute to floor-mat entrapment, then to pedal geometry, then (after initial recalls) to driver error. House Energy and Commerce Committee testimony and subpoenaed internal documents revealed that Toyota's Washington office had celebrated 'saving $100M by limiting scope of 2007 recall' in a presentation to Tokyo executives. DOJ's 2014 Deferred Prosecution Agreement charged Toyota with wire fraud specifically for misleading federal investigators about known defects.",
-      source: 'DOJ Deferred Prosecution Agreement (U.S. v. Toyota Motor Corp., SDNY 2014); House Energy and Commerce Committee Hearing (February 2010)',
+      source:
+        'DOJ Deferred Prosecution Agreement (U.S. v. Toyota Motor Corp., SDNY 2014); House Energy and Commerce Committee Hearing (February 2010)',
       date: '2009-10',
       documentType: 'risk_assessment',
       detectableRedFlags: [
@@ -167,7 +168,12 @@ export const AUTOMOTIVE_MANUFACTURING_CASES: FailureCase[] = [
         'Toyota engineering culture resisted external feedback about defect reports',
         'Communications to NHTSA contained misrepresentations later charged as wire fraud',
       ],
-      flaggableBiases: ['selective_perception', 'confirmation_bias', 'loss_aversion', 'authority_bias'],
+      flaggableBiases: [
+        'selective_perception',
+        'confirmation_bias',
+        'loss_aversion',
+        'authority_bias',
+      ],
       hypotheticalAnalysis:
         "DI would flag the Toyota unintended-acceleration case as the canonical selective-perception + loss-aversion failure. Each successive explanation (floor mat → pedal → driver) was chosen because it minimized recall scope and cost — the decision question was never 'what is causing this' but 'what causes can we plausibly attribute it to that minimize our liability.' The $100M 'savings' presentation is the decision-intelligence smoking gun: an internal document explicitly framing limited-recall decisions in cost-savings terms rather than customer-safety terms.",
     },

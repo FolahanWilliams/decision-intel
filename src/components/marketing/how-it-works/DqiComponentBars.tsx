@@ -32,19 +32,22 @@ const DQI_COMPONENTS: Array<{
   {
     label: 'Bias Load',
     weight: 28,
-    measures: 'Severity-weighted count of detected cognitive biases, normalized to document complexity.',
+    measures:
+      'Severity-weighted count of detected cognitive biases, normalized to document complexity.',
     color: C.red,
   },
   {
     label: 'Noise Level',
     weight: 18,
-    measures: 'Inter-judge variance from the three-judge noise panel. Low variance = stable reasoning.',
+    measures:
+      'Inter-judge variance from the three-judge noise panel. Low variance = stable reasoning.',
     color: C.amber,
   },
   {
     label: 'Evidence Quality',
     weight: 18,
-    measures: 'Share of quantitative claims that verify against grounded search, plus source reliability.',
+    measures:
+      'Share of quantitative claims that verify against grounded search, plus source reliability.',
     color: C.blue,
   },
   {
@@ -56,13 +59,15 @@ const DQI_COMPONENTS: Array<{
   {
     label: 'Compliance Risk',
     weight: 13,
-    measures: 'Inverse of the seven-framework regulatory exposure score from the Verification node.',
+    measures:
+      'Inverse of the seven-framework regulatory exposure score from the Verification node.',
     color: C.green,
   },
   {
     label: 'Historical Alignment',
     weight: 10,
-    measures: 'Pattern match against 135 historical cases. Prior failure signatures drag the score down.',
+    measures:
+      'Pattern match against 135 historical cases. Prior failure signatures drag the score down.',
     color: C.slate600,
   },
 ];

@@ -283,7 +283,7 @@ function RadarChart({ profile }: { profile: CompetitorProfile }) {
         })
         .join(' '),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [profile.key],
+    [profile.key]
   );
 
   const usPath = useMemo(
@@ -295,7 +295,7 @@ function RadarChart({ profile }: { profile: CompetitorProfile }) {
         })
         .join(' '),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [profile.key],
+    [profile.key]
   );
 
   // Background rings at 0.25, 0.5, 0.75, 1.0
@@ -331,7 +331,9 @@ function RadarChart({ profile }: { profile: CompetitorProfile }) {
       {axes.map(({ theta }, i) => {
         const x = cx + Math.cos(theta) * maxRadius;
         const y = cy + Math.sin(theta) * maxRadius;
-        return <line key={i} x1={cx} y1={cy} x2={x} y2={y} stroke={C.slate200} strokeWidth={0.75} />;
+        return (
+          <line key={i} x1={cx} y1={cy} x2={x} y2={y} stroke={C.slate200} strokeWidth={0.75} />
+        );
       })}
 
       {/* Them polygon (navy) */}
@@ -445,7 +447,15 @@ export function CompetitorComparisonCard() {
         >
           Decision Intel vs {profile.name}
         </h3>
-        <p style={{ fontSize: 12, color: C.slate500, margin: 0, marginBottom: 18, fontStyle: 'italic' }}>
+        <p
+          style={{
+            fontSize: 12,
+            color: C.slate500,
+            margin: 0,
+            marginBottom: 18,
+            fontStyle: 'italic',
+          }}
+        >
           {profile.tagline}
         </p>
 

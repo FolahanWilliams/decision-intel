@@ -119,7 +119,7 @@ export function BiasAnnotatedPDFViewer({
       setActiveBias(prev => (prev === bias.id ? null : bias.id));
       onBiasSelect?.(bias);
     },
-    [onBiasSelect],
+    [onBiasSelect]
   );
 
   if (loading) {

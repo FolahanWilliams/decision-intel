@@ -54,9 +54,9 @@ export function DemoCta({ company }: { company: string }) {
           lineHeight: 1.55,
         }}
       >
-        Same bias framework, same pre-decision evidence discipline. Upload a
-        strategic memo or board deck — get the DQI grade, flagged biases,
-        predicted questions, and counterfactual back before your next meeting.
+        Same bias framework, same pre-decision evidence discipline. Upload a strategic memo or board
+        deck — get the DQI grade, flagged biases, predicted questions, and counterfactual back
+        before your next meeting.
       </p>
       <div
         style={{

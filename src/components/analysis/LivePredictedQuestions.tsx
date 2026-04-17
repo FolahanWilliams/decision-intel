@@ -21,7 +21,7 @@ interface LivePredictedQuestionsProps {
 function primaryBias(biases: BiasInstance[]): BiasInstance | null {
   if (biases.length === 0) return null;
   return [...biases].sort(
-    (a, b) => (SEVERITY_ORDER[a.severity] ?? 4) - (SEVERITY_ORDER[b.severity] ?? 4),
+    (a, b) => (SEVERITY_ORDER[a.severity] ?? 4) - (SEVERITY_ORDER[b.severity] ?? 4)
   )[0];
 }
 
@@ -43,31 +43,36 @@ function questionsFor({
   if (top) {
     const name = formatBiasName(top.biasType).toLowerCase();
     out.push(
-      `Is there a chance we're underestimating ${name} risk on this decision — and what would change our mind if so?`,
+      `Is there a chance we're underestimating ${name} risk on this decision — and what would change our mind if so?`
     );
   }
 
   if (top?.suggestion) {
     const stripped = top.suggestion.replace(/^(A |The )/i, '').replace(/\.$/, '');
     const trimmed = stripped.length > 180 ? stripped.slice(0, 177) + '…' : stripped;
-    out.push(`Walk me through "${lowercaseFirst(trimmed)}" — what's our defensible answer if the board raises it?`);
+    out.push(
+      `Walk me through "${lowercaseFirst(trimmed)}" — what's our defensible answer if the board raises it?`
+    );
   }
 
   if (topRecommendation) {
     const firstSentence = topRecommendation.split(/(?<=\.)\s+/)[0]?.replace(/\.$/, '');
     if (firstSentence) {
-      const trimmed = firstSentence.length > 160 ? firstSentence.slice(0, 157) + '…' : firstSentence;
+      const trimmed =
+        firstSentence.length > 160 ? firstSentence.slice(0, 157) + '…' : firstSentence;
       out.push(`What would it cost us to ${lowercaseFirst(trimmed)} before we commit?`);
     }
   } else if (summary) {
     const firstSentence = summary.split(/(?<=\.)\s+/)[0]?.replace(/\.$/, '');
     if (firstSentence && firstSentence.length < 200) {
-      out.push(`If we're wrong about "${lowercaseFirst(firstSentence)}" — what's the fastest way we'd find out?`);
+      out.push(
+        `If we're wrong about "${lowercaseFirst(firstSentence)}" — what's the fastest way we'd find out?`
+      );
     }
   }
 
   out.push(
-    `If this memo were re-run in six months with the outcome revealed, what do we think would embarrass us most?`,
+    `If this memo were re-run in six months with the outcome revealed, what do we think would embarrass us most?`
   );
 
   return out.slice(0, 4);
@@ -108,8 +113,8 @@ export function LivePredictedQuestions(props: LivePredictedQuestionsProps) {
         Questions the steering committee will ask
       </h2>
       <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: '0 0 16px' }}>
-        Synthesised from this decision&apos;s primary bias, top flag, and recommended action —
-        so you can rehearse before the meeting, not during it.
+        Synthesised from this decision&apos;s primary bias, top flag, and recommended action — so
+        you can rehearse before the meeting, not during it.
       </p>
 
       <div style={{ display: 'grid', gap: 10 }}>

@@ -47,7 +47,8 @@ export const RETAIL_CASES: FailureCase[] = [
     preDecisionEvidence: {
       document:
         "Toys R Us 2014 board presentation by CEO Antonio Urcelay framed e-commerce investment as 'premature' given debt covenants. The LBO debt ($5.3B) required $400M/year in interest payments; proposed $1.2B e-commerce transformation was rejected as 'incompatible with current capital structure.' Bain, KKR, and Vornado as PE sponsors pushed for continued dividend recaps through 2014-2016 rather than capex redirection. Management acknowledged Amazon's Prime (2005) and Prime-now (2014) as existential threats in the same presentation that rejected digital transformation investment.",
-      source: 'Toys R Us Inc. S-1 filings; Bloomberg News investigation (2017); U.S. Bankruptcy Court E.D. Va. Case 17-34665',
+      source:
+        'Toys R Us Inc. S-1 filings; Bloomberg News investigation (2017); U.S. Bankruptcy Court E.D. Va. Case 17-34665',
       date: '2014-09',
       documentType: 'board_memo',
       detectableRedFlags: [
@@ -102,7 +103,8 @@ export const RETAIL_CASES: FailureCase[] = [
     preDecisionEvidence: {
       document:
         "Eddie Lampert's restructuring of Sears Holdings from 2008 onward split the company into 30+ internal business units (BUs) that would 'compete' with each other for resources and transact at internal transfer prices. Lampert personally authorized the structure and required the BUs to negotiate bilateral agreements. Financial engineering accelerated through 2012-2018: Lands' End spin-off (2014, $4.6B value extracted), Craftsman brand sold to Stanley Black & Decker (2017, $900M), Seritage REIT spin-off of 235 stores (2015) at above-market rents lease-back to Sears — effectively a cash extraction disguised as a real-estate transaction.",
-      source: 'Sears Holdings SEC filings 2008-2018; ESL Investments letters to Sears shareholders; David Dayen reporting (The American Prospect); Bankruptcy Court SDNY Case 18-23538',
+      source:
+        'Sears Holdings SEC filings 2008-2018; ESL Investments letters to Sears shareholders; David Dayen reporting (The American Prospect); Bankruptcy Court SDNY Case 18-23538',
       date: '2015-04',
       documentType: 'strategy_document',
       detectableRedFlags: [
@@ -112,7 +114,12 @@ export const RETAIL_CASES: FailureCase[] = [
         'Lampert simultaneously CEO, Chairman, and largest creditor via ESL — concentrating governance conflicts',
         'Customer-experience metrics declined consistently 2010-2018 without triggering strategic reconsideration',
       ],
-      flaggableBiases: ['overconfidence_bias', 'authority_bias', 'confirmation_bias', 'framing_effect'],
+      flaggableBiases: [
+        'overconfidence_bias',
+        'authority_bias',
+        'confirmation_bias',
+        'framing_effect',
+      ],
       hypotheticalAnalysis:
         "DI would flag the Sears decision process as the canonical authority-bias + financial-engineering-frame failure. Lampert's hedge-fund success (ESL's Kmart turnaround) created a halo that insulated subsequent decisions from retail-operational scrutiny. A bias-adjusted review would have treated the 30-BU internal-competition structure as an operational red flag requiring independent retail-industry benchmarking — no other successful retailer operates this way. The concentration of CEO, Chairman, and largest-creditor roles in one person should have triggered mandatory independent directors with enhanced authority.",
     },
@@ -362,7 +369,8 @@ export const ADDITIONAL_FINANCIAL_CASES: FailureCase[] = [
     preDecisionEvidence: {
       document:
         "Archegos Capital Management (Bill Hwang family office) built concentrated positions in ViacomCBS, Discovery, Baidu, Tencent Music, and GSX Techedu using total return swaps across Credit Suisse, Nomura, Goldman Sachs, Morgan Stanley, UBS, and MUFG. Each prime broker saw only its own slice of the exposure (typically 5-8x leverage). Aggregate leverage exceeded 20x. When ViacomCBS announced a $3B secondary offering on March 22 2021, the stock fell 50% in a week — triggering margin calls that exceeded Archegos's capacity. Goldman and Morgan Stanley exited positions first; Credit Suisse and Nomura, late to unwind, took the largest losses.",
-      source: "Credit Suisse Special Committee Report on Archegos (Paul, Weiss, July 2021); SEC Complaint v. Hwang & Halligan (2022)",
+      source:
+        'Credit Suisse Special Committee Report on Archegos (Paul, Weiss, July 2021); SEC Complaint v. Hwang & Halligan (2022)',
       date: '2021-03-26',
       documentType: 'risk_assessment',
       detectableRedFlags: [
@@ -370,11 +378,16 @@ export const ADDITIONAL_FINANCIAL_CASES: FailureCase[] = [
         "Bill Hwang's prior Tiger Asia vehicle had SEC insider-trading settlement in 2012",
         'Five prime brokers each at 5-8x leverage — aggregate ~25x across the family office',
         'Concentrated positions in a handful of US-listed Chinese stocks and media names — zero diversification',
-        "ViacomCBS $3B secondary offering announced while Archegos held 20%+ of free float via swaps",
+        'ViacomCBS $3B secondary offering announced while Archegos held 20%+ of free float via swaps',
       ],
-      flaggableBiases: ['overconfidence_bias', 'bandwagon_effect', 'selective_perception', 'authority_bias'],
+      flaggableBiases: [
+        'overconfidence_bias',
+        'bandwagon_effect',
+        'selective_perception',
+        'authority_bias',
+      ],
       hypotheticalAnalysis:
-        "DI would flag Archegos as the canonical cross-counterparty opacity failure. Each prime broker independently underwrote its exposure as reasonable in isolation — a decision process that structurally cannot assess aggregate risk. A bias-adjusted framework would have required each prime broker to demand cross-broker exposure disclosure from family-office counterparties as a precondition for leverage. The bandwagon effect is explicit: later banks (Credit Suisse, Nomura) joined the relationship because earlier banks (Goldman, MS) had validated it — without independent verification.",
+        'DI would flag Archegos as the canonical cross-counterparty opacity failure. Each prime broker independently underwrote its exposure as reasonable in isolation — a decision process that structurally cannot assess aggregate risk. A bias-adjusted framework would have required each prime broker to demand cross-broker exposure disclosure from family-office counterparties as a precondition for leverage. The bandwagon effect is explicit: later banks (Credit Suisse, Nomura) joined the relationship because earlier banks (Goldman, MS) had validated it — without independent verification.',
     },
     source: 'Credit Suisse Special Committee Report on Archegos, July 2021; SEC Complaint 2022',
     sourceType: 'sec_filing',
@@ -417,7 +430,8 @@ export const ADDITIONAL_FINANCIAL_CASES: FailureCase[] = [
     preDecisionEvidence: {
       document:
         "Celsius Network's 2021 marketing materials promised depositors up to 18% annualized yield on stablecoin deposits — in a market where risk-free rates were near zero. CEO Alex Mashinsky hosted weekly AMAs repeatedly stating 'banks are not your friends' and that Celsius funds were safer than traditional banking. Internally, Celsius deployed deposits into DeFi protocols (Anchor 20%, Aave, Compound) and proprietary trading at Celsius KeyFi subsidiary. Internal risk reports flagged a growing mismatch between yield promised to depositors and yield generated by assets, plugged by CEL token appreciation dependencies.",
-      source: "Celsius Network Chapter 11 filings (SDNY Case 22-10964); Alex Mashinsky DOJ Indictment (July 2023); NYAG complaint",
+      source:
+        'Celsius Network Chapter 11 filings (SDNY Case 22-10964); Alex Mashinsky DOJ Indictment (July 2023); NYAG complaint',
       date: '2022-03',
       documentType: 'public_statement',
       detectableRedFlags: [
@@ -427,7 +441,12 @@ export const ADDITIONAL_FINANCIAL_CASES: FailureCase[] = [
         'Proprietary trading losses (Celsius KeyFi) not disclosed to depositors',
         'CEL token price used as solvency mechanism — reflexive dependency between platform and token value',
       ],
-      flaggableBiases: ['overconfidence_bias', 'framing_effect', 'bandwagon_effect', 'confirmation_bias'],
+      flaggableBiases: [
+        'overconfidence_bias',
+        'framing_effect',
+        'bandwagon_effect',
+        'confirmation_bias',
+      ],
       hypotheticalAnalysis:
         "DI would flag Celsius as the canonical framing-effect deception compounded by bandwagon effect. The 'banks are not your friends' framing converted what was functionally an unsecured loan to a crypto operator into a moral positioning statement — disarming normal depositor-risk scrutiny. A bias-adjusted depositor-facing communication would have been required to disclose the sources of the 18% yield, the asset-liability duration profile, and the CEL-token dependency. The bandwagon effect on the depositor side — 'millions of users are doing this' — substituted social proof for independent risk assessment.",
     },
@@ -513,7 +532,8 @@ export const ADDITIONAL_TECH_CASES: FailureCase[] = [
     preDecisionEvidence: {
       document:
         "Zillow Offers expanded from 20 markets to 25, with CEO Rich Barton publicly committing to purchasing 5,000+ homes per month by end of 2021. Internal data scientists had raised concerns that the Zestimate algorithm — designed for advertising-supported price display — exhibited systematic positive bias when repurposed as a buying signal in a rising market. Q2 2021 earnings described iBuying as 'a transformational growth opportunity.' Inventory grew faster than disposal capacity, creating a growing stock of homes held at above-market prices.",
-      source: 'Zillow Group Q2 2021 shareholder letter and earnings call; Bloomberg reporting (Patrick Clark)',
+      source:
+        'Zillow Group Q2 2021 shareholder letter and earnings call; Bloomberg reporting (Patrick Clark)',
       date: '2021-08-05',
       documentType: 'earnings_call',
       detectableRedFlags: [
@@ -523,7 +543,12 @@ export const ADDITIONAL_TECH_CASES: FailureCase[] = [
         'Renovation-cost overruns reported anecdotally but not systematically re-incorporated into underwriting',
         'Scaling from 20 to 25 markets accelerated during a period of accelerating inventory backlog',
       ],
-      flaggableBiases: ['overconfidence_bias', 'anchoring_bias', 'confirmation_bias', 'sunk_cost_fallacy'],
+      flaggableBiases: [
+        'overconfidence_bias',
+        'anchoring_bias',
+        'confirmation_bias',
+        'sunk_cost_fallacy',
+      ],
       hypotheticalAnalysis:
         "DI would flag the decision to scale iBuying volume while inventory backlog was growing as a canonical sunk-cost + overconfidence failure. Once Zillow had committed to iBuying as a public strategic pillar, management reframed each new overpayment as 'market latency' rather than 'model error.' A decision process that treated rising inventory age as a bright-line pause-gate — rather than an accelerant for the growth narrative — would have halted expansion in Q1 2021 and limited losses to a fraction of the final $881M write-down.",
     },
@@ -578,9 +603,14 @@ export const ADDITIONAL_TECH_CASES: FailureCase[] = [
         'Inventory buildup (subsequently $1.1B) as gym reopening accelerated',
         'Internal finance team projections reportedly more conservative than public guidance',
       ],
-      flaggableBiases: ['recency_bias', 'availability_heuristic', 'overconfidence_bias', 'planning_fallacy'],
+      flaggableBiases: [
+        'recency_bias',
+        'availability_heuristic',
+        'overconfidence_bias',
+        'planning_fallacy',
+      ],
       hypotheticalAnalysis:
-        "DI would flag the Peloton FY2022 capital commitments as the canonical recency-bias + availability-heuristic pair. Extrapolating a step-function pandemic demand spike as a permanent growth trajectory is exactly the decision the availability heuristic produces — vivid, recent data overwhelming base-rate reasoning. A bias-adjusted process would have modeled at least three demand scenarios (pandemic-permanent, partial retention, full reversion) with capital commitments scaled to the conservative case.",
+        'DI would flag the Peloton FY2022 capital commitments as the canonical recency-bias + availability-heuristic pair. Extrapolating a step-function pandemic demand spike as a permanent growth trajectory is exactly the decision the availability heuristic produces — vivid, recent data overwhelming base-rate reasoning. A bias-adjusted process would have modeled at least three demand scenarios (pandemic-permanent, partial retention, full reversion) with capital commitments scaled to the conservative case.',
     },
     source: 'Peloton SEC Filing 10-K 2022; WSJ investigation Feb 2022',
     sourceType: 'sec_filing',

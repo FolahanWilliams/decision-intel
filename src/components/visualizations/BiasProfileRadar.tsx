@@ -49,9 +49,7 @@ export function BiasProfileRadar({ biases }: BiasProfileRadarProps) {
 
   const data = biases.map(b => ({
     bias: formatBiasLabel(b.biasType),
-    intensity: Math.round(
-      (SEVERITY_SCORE[b.severity] ?? 50) * (b.confidence ?? 0.8),
-    ),
+    intensity: Math.round((SEVERITY_SCORE[b.severity] ?? 50) * (b.confidence ?? 0.8)),
     baseline: 40,
   }));
 

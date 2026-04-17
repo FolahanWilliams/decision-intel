@@ -260,9 +260,7 @@ export function BoardReportView({
                 <div className="section-heading" style={{ marginBottom: 2 }}>
                   Decision Quality Index
                 </div>
-                <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
-                  {interpretation}
-                </div>
+                <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{interpretation}</div>
               </div>
             </div>
 
@@ -290,10 +288,7 @@ export function BoardReportView({
                 {topBiases.map(bias => {
                   const sev = (bias.severity || 'medium').toLowerCase();
                   const color = SEVERITY_COLOR[sev] || 'var(--text-muted)';
-                  const excerpt = truncate(
-                    bias.excerpt || bias.explanation,
-                    MAX_EXCERPT_CHARS
-                  );
+                  const excerpt = truncate(bias.excerpt || bias.explanation, MAX_EXCERPT_CHARS);
                   return (
                     <div
                       key={bias.biasType}

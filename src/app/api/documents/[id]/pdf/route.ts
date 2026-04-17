@@ -28,16 +28,13 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     }
 
     const isPdf =
-      doc.fileType === 'application/pdf' ||
-      doc.filename?.toLowerCase().endsWith('.pdf');
+      doc.fileType === 'application/pdf' || doc.filename?.toLowerCase().endsWith('.pdf');
 
     if (!isPdf) {
       return apiError({ error: 'Document is not a PDF', status: 400 });
     }
 
-    const ext = doc.filename
-      ? '.' + doc.filename.split('.').pop()
-      : '.pdf';
+    const ext = doc.filename ? '.' + doc.filename.split('.').pop() : '.pdf';
     const storagePath = `${user.id}/${doc.id}${ext}`;
     const bucket = process.env.SUPABASE_DOCUMENT_BUCKET || 'pdf';
 

@@ -311,9 +311,7 @@ export function OnboardingGuide({ documentCount = 0 }: { documentCount?: number 
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: item.isComplete
-                    ? 'var(--accent-primary)'
-                    : 'var(--text-muted)',
+                  color: item.isComplete ? 'var(--accent-primary)' : 'var(--text-muted)',
                 }}
                 aria-hidden
               >
@@ -325,9 +323,7 @@ export function OnboardingGuide({ documentCount = 0 }: { documentCount?: number 
                   width: 36,
                   height: 36,
                   borderRadius: 9,
-                  background: item.isComplete
-                    ? 'rgba(22, 163, 74, 0.12)'
-                    : 'var(--bg-tertiary)',
+                  background: item.isComplete ? 'rgba(22, 163, 74, 0.12)' : 'var(--bg-tertiary)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -338,9 +334,7 @@ export function OnboardingGuide({ documentCount = 0 }: { documentCount?: number 
                 <Icon
                   size={16}
                   style={{
-                    color: item.isComplete
-                      ? 'var(--accent-primary)'
-                      : 'var(--text-secondary)',
+                    color: item.isComplete ? 'var(--accent-primary)' : 'var(--text-secondary)',
                   }}
                 />
               </div>

@@ -52,7 +52,14 @@ export function ContentOpportunities({ founderPass, onDraft }: ContentOpportunit
       }}
     >
       {/* Header row */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: 16,
+        }}
+      >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Sparkles size={15} style={{ color: 'var(--accent-primary)' }} />
           <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
@@ -93,14 +100,13 @@ export function ContentOpportunities({ founderPass, onDraft }: ContentOpportunit
       </div>
 
       {/* Error */}
-      {error && (
-        <p style={{ fontSize: 12, color: 'var(--error)', margin: 0 }}>{error}</p>
-      )}
+      {error && <p style={{ fontSize: 12, color: 'var(--error)', margin: 0 }}>{error}</p>}
 
       {/* Empty state */}
       {!loading && !error && !scanned && (
         <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0 }}>
-          Click scan to get 5 specific content ideas based on your product capabilities and positioning.
+          Click scan to get 5 specific content ideas based on your product capabilities and
+          positioning.
         </p>
       )}
 
@@ -124,7 +130,14 @@ export function ContentOpportunities({ founderPass, onDraft }: ContentOpportunit
                 }}
               >
                 {/* Platform badge + title */}
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    justifyContent: 'space-between',
+                    gap: 8,
+                  }}
+                >
                   <div style={{ flex: 1 }}>
                     <span
                       style={{
@@ -143,7 +156,14 @@ export function ContentOpportunities({ founderPass, onDraft }: ContentOpportunit
                     >
                       {opp.platform}
                     </span>
-                    <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>
+                    <p
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: 'var(--text-primary)',
+                        margin: 0,
+                      }}
+                    >
                       {opp.title}
                     </p>
                   </div>
@@ -190,7 +210,8 @@ export function ContentOpportunities({ founderPass, onDraft }: ContentOpportunit
 
                 {/* Why now */}
                 <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: 0 }}>
-                  <span style={{ fontWeight: 600 }}>Why now: </span>{opp.whyNow}
+                  <span style={{ fontWeight: 600 }}>Why now: </span>
+                  {opp.whyNow}
                 </p>
               </div>
             );

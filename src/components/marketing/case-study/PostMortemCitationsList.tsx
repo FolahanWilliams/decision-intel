@@ -3,11 +3,7 @@ import type { CasePostMortemCitation } from '@/lib/data/case-studies/types';
 
 /** Sourced citations for the case — primary-source discipline marker.
  *  Every factual claim should trace here. */
-export function PostMortemCitationsList({
-  citations,
-}: {
-  citations: CasePostMortemCitation[];
-}) {
+export function PostMortemCitationsList({ citations }: { citations: CasePostMortemCitation[] }) {
   if (!citations.length) return null;
 
   return (
@@ -104,9 +100,7 @@ export function PostMortemCitationsList({
                     <ExternalLink size={12} style={{ color: '#64748B' }} />
                   </a>
                 ) : (
-                  <span style={{ fontSize: 14, fontWeight: 600, color: '#0F172A' }}>
-                    {c.label}
-                  </span>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: '#0F172A' }}>{c.label}</span>
                 )}
                 {c.year && (
                   <span

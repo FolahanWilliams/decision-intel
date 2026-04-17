@@ -71,7 +71,10 @@ export async function GET(req: NextRequest) {
     const text = result.response.text().trim();
 
     // Strip markdown code fences if Gemini wraps the JSON
-    const cleaned = text.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim();
+    const cleaned = text
+      .replace(/^```(?:json)?\n?/, '')
+      .replace(/\n?```$/, '')
+      .trim();
 
     let opportunities: ContentOpportunity[];
     try {

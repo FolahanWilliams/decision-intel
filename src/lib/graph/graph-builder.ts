@@ -157,12 +157,8 @@ export async function buildDecisionGraph(params: {
   // - Personal scope (orgId === null): match the user's docs only,
   //   restricted to those without an org (orgId: null) so we never bleed
   //   org-owned documents into a personal view.
-  const documentScope = orgId
-    ? { orgId }
-    : { userId, orgId: null };
-  const humanDecisionScope = orgId
-    ? { orgId }
-    : { userId, orgId: null };
+  const documentScope = orgId ? { orgId } : { userId, orgId: null };
+  const humanDecisionScope = orgId ? { orgId } : { userId, orgId: null };
   const edgeScopeOrgId = orgId ?? null;
 
   const includeType = (type: string) => !nodeTypes || nodeTypes.includes(type);

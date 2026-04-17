@@ -72,8 +72,14 @@ export function NudgesPageContent() {
           {[0, 1, 2, 3].map(i => (
             <div key={i} className="card animate-pulse">
               <div className="card-body text-center p-md">
-                <div className="h-3 w-24 mx-auto mb-sm" style={{ background: 'var(--bg-tertiary)' }} />
-                <div className="h-10 w-16 mx-auto mb-sm" style={{ background: 'var(--bg-tertiary)' }} />
+                <div
+                  className="h-3 w-24 mx-auto mb-sm"
+                  style={{ background: 'var(--bg-tertiary)' }}
+                />
+                <div
+                  className="h-10 w-16 mx-auto mb-sm"
+                  style={{ background: 'var(--bg-tertiary)' }}
+                />
                 <div className="h-3 w-16 mx-auto" style={{ background: 'var(--bg-tertiary)' }} />
               </div>
             </div>

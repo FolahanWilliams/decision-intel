@@ -7,7 +7,11 @@ import { prisma } from '@/lib/prisma';
 import { fetchLinkedInProfile } from '@/lib/outreach/linkedin-parser';
 import { extractProfile } from '@/lib/outreach/profile-extractor';
 import { generateOutreach } from '@/lib/outreach/message-generator';
-import { OUTREACH_INTENTS, type OutreachIntent, type OutreachStreamEvent } from '@/lib/outreach/types';
+import {
+  OUTREACH_INTENTS,
+  type OutreachIntent,
+  type OutreachStreamEvent,
+} from '@/lib/outreach/types';
 
 const log = createLogger('OutreachGenerate');
 const ENCODER = new TextEncoder();
@@ -28,7 +32,7 @@ export async function POST(req: NextRequest) {
   if (!auth.ok) {
     return NextResponse.json(
       { error: auth.reason === 'not_configured' ? 'Not configured' : 'Unauthorized' },
-      { status: auth.reason === 'not_configured' ? 503 : 401 },
+      { status: auth.reason === 'not_configured' ? 503 : 401 }
     );
   }
 
@@ -46,10 +50,7 @@ export async function POST(req: NextRequest) {
     );
   }
   if (!body.url && !body.rawText) {
-    return NextResponse.json(
-      { error: 'Provide either `url` or `rawText`.' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'Provide either `url` or `rawText`.' }, { status: 400 });
   }
 
   const stream = new ReadableStream({

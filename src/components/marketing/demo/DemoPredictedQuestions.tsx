@@ -15,7 +15,7 @@ function questionsFor(c: CaseStudy): string[] {
 
   if (primary) {
     out.push(
-      `Is there a chance we're underestimating ${primary.toLowerCase()} risk on this decision — and what would change our mind if so?`,
+      `Is there a chance we're underestimating ${primary.toLowerCase()} risk on this decision — and what would change our mind if so?`
     );
   }
   if (topFlag) {
@@ -29,13 +29,13 @@ function questionsFor(c: CaseStudy): string[] {
     if (firstSentence) {
       const lower = firstSentence.charAt(0).toLowerCase() + firstSentence.slice(1);
       out.push(
-        `What would it cost us to do ${lower.length > 160 ? lower.slice(0, 157) + '…' : lower} before we commit?`,
+        `What would it cost us to do ${lower.length > 160 ? lower.slice(0, 157) + '…' : lower} before we commit?`
       );
     }
   }
   // Always end with a crisp meta-question.
   out.push(
-    `If this memo were re-run in six months with the outcome revealed, what do we think would embarrass us most?`,
+    `If this memo were re-run in six months with the outcome revealed, what do we think would embarrass us most?`
   );
 
   return out.slice(0, 4);
@@ -76,8 +76,8 @@ export function DemoPredictedQuestions({ caseStudy }: { caseStudy: CaseStudy }) 
         Questions the steering committee would ask
       </h2>
       <p style={{ fontSize: 13, color: '#64748B', margin: '0 0 16px' }}>
-        Predicted from the document&apos;s own signals. In the live product, these
-        are generated from your memo — no two runs produce the same list.
+        Predicted from the document&apos;s own signals. In the live product, these are generated
+        from your memo — no two runs produce the same list.
       </p>
 
       <div style={{ display: 'grid', gap: 10 }}>

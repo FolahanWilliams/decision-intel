@@ -22,14 +22,62 @@ const QUARTER = 'Q2 2026';
 // earnings-call transcripts. Sectors (not companies) are published so
 // the index is defamation-safe while still being citeable.
 const SECTOR_INDEX = [
-  { sector: 'Industrials', dqi: 71, delta: +3, volatility: 'Low', biasProfile: 'Planning fallacy, optimism' },
-  { sector: 'Healthcare', dqi: 68, delta: -2, volatility: 'Medium', biasProfile: 'Regulatory optimism, anchoring' },
-  { sector: 'Consumer Staples', dqi: 66, delta: +1, volatility: 'Low', biasProfile: 'Status-quo bias, availability' },
-  { sector: 'Financials', dqi: 64, delta: -4, volatility: 'High', biasProfile: 'Overconfidence, narrative fallacy' },
-  { sector: 'Energy', dqi: 58, delta: -6, volatility: 'High', biasProfile: 'Sunk cost, confirmation bias' },
-  { sector: 'Technology', dqi: 54, delta: -8, volatility: 'Critical', biasProfile: 'Narrative fallacy, bandwagon, halo effect' },
-  { sector: 'Communication Services', dqi: 52, delta: -5, volatility: 'High', biasProfile: 'Survivorship, overconfidence' },
-  { sector: 'Real Estate', dqi: 49, delta: -3, volatility: 'High', biasProfile: 'Anchoring, illusion of control' },
+  {
+    sector: 'Industrials',
+    dqi: 71,
+    delta: +3,
+    volatility: 'Low',
+    biasProfile: 'Planning fallacy, optimism',
+  },
+  {
+    sector: 'Healthcare',
+    dqi: 68,
+    delta: -2,
+    volatility: 'Medium',
+    biasProfile: 'Regulatory optimism, anchoring',
+  },
+  {
+    sector: 'Consumer Staples',
+    dqi: 66,
+    delta: +1,
+    volatility: 'Low',
+    biasProfile: 'Status-quo bias, availability',
+  },
+  {
+    sector: 'Financials',
+    dqi: 64,
+    delta: -4,
+    volatility: 'High',
+    biasProfile: 'Overconfidence, narrative fallacy',
+  },
+  {
+    sector: 'Energy',
+    dqi: 58,
+    delta: -6,
+    volatility: 'High',
+    biasProfile: 'Sunk cost, confirmation bias',
+  },
+  {
+    sector: 'Technology',
+    dqi: 54,
+    delta: -8,
+    volatility: 'Critical',
+    biasProfile: 'Narrative fallacy, bandwagon, halo effect',
+  },
+  {
+    sector: 'Communication Services',
+    dqi: 52,
+    delta: -5,
+    volatility: 'High',
+    biasProfile: 'Survivorship, overconfidence',
+  },
+  {
+    sector: 'Real Estate',
+    dqi: 49,
+    delta: -3,
+    volatility: 'High',
+    biasProfile: 'Anchoring, illusion of control',
+  },
 ];
 
 const HISTORICAL_LEADERBOARD = [
@@ -145,9 +193,8 @@ export default function DecisionAlphaPage() {
             marginBottom: 12,
           }}
         >
-          The quarterly index of strategic decision quality. A sector-level
-          benchmark computed from the same 30+ bias taxonomy Decision Intel
-          applies to every memo.
+          The quarterly index of strategic decision quality. A sector-level benchmark computed from
+          the same 30+ bias taxonomy Decision Intel applies to every memo.
         </p>
         <p
           style={{
@@ -156,9 +203,8 @@ export default function DecisionAlphaPage() {
             maxWidth: 720,
           }}
         >
-          Published quarterly. Free to cite. Drawn from public earnings-call
-          transcripts, SEC filings, and investor-day disclosures across the FT
-          500, FTSE 350, and S&amp;P 500.
+          Published quarterly. Free to cite. Drawn from public earnings-call transcripts, SEC
+          filings, and investor-day disclosures across the FT 500, FTSE 350, and S&amp;P 500.
         </p>
       </div>
 
@@ -181,8 +227,8 @@ export default function DecisionAlphaPage() {
             marginBottom: 28,
           }}
         >
-          Aggregate Decision Quality Index by sector. 100 = Kahneman-level
-          deliberation. 0 = the WeWork S-1.
+          Aggregate Decision Quality Index by sector. 100 = Kahneman-level deliberation. 0 = the
+          WeWork S-1.
         </p>
 
         <div
@@ -233,7 +279,15 @@ export default function DecisionAlphaPage() {
                 }}
               >
                 <span style={{ fontWeight: 600 }}>{row.sector}</span>
-                <div style={{ textAlign: 'right', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 10 }}>
+                <div
+                  style={{
+                    textAlign: 'right',
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    alignItems: 'center',
+                    gap: 10,
+                  }}
+                >
                   <div
                     style={{
                       width: 60,
@@ -247,11 +301,18 @@ export default function DecisionAlphaPage() {
                       style={{
                         width: `${dqiBar}%`,
                         height: '100%',
-                        background: row.dqi >= 60 ? '#16a34a' : row.dqi >= 45 ? '#f59e0b' : '#ef4444',
+                        background:
+                          row.dqi >= 60 ? '#16a34a' : row.dqi >= 45 ? '#f59e0b' : '#ef4444',
                       }}
                     />
                   </div>
-                  <span style={{ fontWeight: 700, fontFamily: 'var(--font-mono, monospace)', minWidth: 28 }}>
+                  <span
+                    style={{
+                      fontWeight: 700,
+                      fontFamily: 'var(--font-mono, monospace)',
+                      minWidth: 28,
+                    }}
+                  >
                     {row.dqi}
                   </span>
                 </div>
@@ -315,9 +376,8 @@ export default function DecisionAlphaPage() {
             marginBottom: 28,
           }}
         >
-          The six worst-scoring public corporate decisions of the last 50
-          years. Each was auditable, in retrospect, from documents that existed
-          at the time.
+          The six worst-scoring public corporate decisions of the last 50 years. Each was auditable,
+          in retrospect, from documents that existed at the time.
         </p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -348,7 +408,9 @@ export default function DecisionAlphaPage() {
               <div>
                 <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 4 }}>
                   {row.decision}
-                  <span style={{ color: 'var(--text-muted, #94a3b8)', fontWeight: 400, marginLeft: 8 }}>
+                  <span
+                    style={{ color: 'var(--text-muted, #94a3b8)', fontWeight: 400, marginLeft: 8 }}
+                  >
                     · {row.year}
                   </span>
                 </div>
@@ -422,23 +484,19 @@ export default function DecisionAlphaPage() {
           {[
             {
               title: 'Inputs',
-              body:
-                'Public earnings-call transcripts (last 4 quarters), SEC filings (10-K, 10-Q, 8-K), and investor-day disclosures. Strategic posture signals only — never customer data.',
+              body: 'Public earnings-call transcripts (last 4 quarters), SEC filings (10-K, 10-Q, 8-K), and investor-day disclosures. Strategic posture signals only — never customer data.',
             },
             {
               title: 'Bias detection',
-              body:
-                'The Decision Intel 30+ bias taxonomy (DI-B-001 through DI-B-020 core + toxic combinations). Same scoring model that audits client memos — applied symmetrically to public disclosures.',
+              body: 'The Decision Intel 30+ bias taxonomy (DI-B-001 through DI-B-020 core + toxic combinations). Same scoring model that audits client memos — applied symmetrically to public disclosures.',
             },
             {
               title: 'DQI formula',
-              body:
-                'Weighted composite of bias density, compound interactions, noise (three-judge variance), and narrative clarity. 100 = Kahneman-level deliberation. 0 = the WeWork S-1.',
+              body: 'Weighted composite of bias density, compound interactions, noise (three-judge variance), and narrative clarity. 100 = Kahneman-level deliberation. 0 = the WeWork S-1.',
             },
             {
               title: 'Publication',
-              body:
-                'Quarterly, always within 30 days of sector earnings cycle close. Prior quarters archived for time-series analysis. Revisions are annotated; never silently updated.',
+              body: 'Quarterly, always within 30 days of sector earnings cycle close. Prior quarters archived for time-series analysis. Revisions are annotated; never silently updated.',
             },
           ].map(card => (
             <div
@@ -451,7 +509,9 @@ export default function DecisionAlphaPage() {
               }}
             >
               <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 8 }}>{card.title}</h3>
-              <p style={{ fontSize: 13, lineHeight: 1.55, color: 'var(--text-secondary, #475569)' }}>
+              <p
+                style={{ fontSize: 13, lineHeight: 1.55, color: 'var(--text-secondary, #475569)' }}
+              >
                 {card.body}
               </p>
             </div>
@@ -496,8 +556,8 @@ export default function DecisionAlphaPage() {
               decision-intel.com/decision-alpha.
             </p>
             <p style={{ fontSize: 12, color: 'var(--text-muted, #64748b)' }}>
-              Reuse under CC-BY 4.0. Attribution to Decision Intel required. No editorial
-              permission needed.
+              Reuse under CC-BY 4.0. Attribution to Decision Intel required. No editorial permission
+              needed.
             </p>
           </div>
         </div>
@@ -532,9 +592,9 @@ export default function DecisionAlphaPage() {
             margin: '0 auto 24px',
           }}
         >
-          The same lens that built this index audits your strategic memos in 60
-          seconds. 30+ biases, predicted steering-committee questions, and a
-          Decision Knowledge Graph that compounds quarter after quarter.
+          The same lens that built this index audits your strategic memos in 60 seconds. 30+ biases,
+          predicted steering-committee questions, and a Decision Knowledge Graph that compounds
+          quarter after quarter.
         </p>
         <Link
           href="/pricing"

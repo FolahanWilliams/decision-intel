@@ -26,10 +26,7 @@ interface PatchBody {
   followUpDue?: string | null;
 }
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   if (!verify(req)) return apiError({ error: 'Unauthorized', status: 401 });
 
   const { id } = await params;
@@ -64,10 +61,7 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   if (!verify(req)) return apiError({ error: 'Unauthorized', status: 401 });
 
   const { id } = await params;

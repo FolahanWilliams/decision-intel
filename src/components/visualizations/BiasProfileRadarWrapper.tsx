@@ -8,7 +8,7 @@ const BiasProfileRadar = dynamic(
     import('@/components/visualizations/BiasProfileRadar').then(m => ({
       default: m.BiasProfileRadar,
     })),
-  { ssr: false },
+  { ssr: false }
 );
 
 interface Props {

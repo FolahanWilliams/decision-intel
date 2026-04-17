@@ -189,9 +189,7 @@ export function OutcomeFlywheelContent() {
             </div>
             {quarterlyImpact.estimatedSavings != null ? (
               <>
-                <div
-                  style={{ fontSize: '28px', fontWeight: 700, color: 'var(--success)' }}
-                >
+                <div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--success)' }}>
                   {formatCurrency(quarterlyImpact.estimatedSavings, quarterlyImpact.currency)}
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: 4 }}>
@@ -343,8 +341,7 @@ export function OutcomeFlywheelContent() {
                   className="flex items-center gap-xs"
                   style={{
                     fontSize: '12px',
-                    color:
-                      accuracyTrend.improvementPct > 0 ? 'var(--success)' : 'var(--error)',
+                    color: accuracyTrend.improvementPct > 0 ? 'var(--success)' : 'var(--error)',
                   }}
                 >
                   {accuracyTrend.improvementPct > 0 ? (
@@ -385,9 +382,7 @@ export function OutcomeFlywheelContent() {
             <div className="card-header flex items-center gap-sm">
               <CheckCircle size={16} style={{ color: 'var(--success)' }} />
               <h3 className="text-sm font-semibold">Decisions That Paid Off</h3>
-              <span
-                style={{ fontSize: '11px', color: 'var(--success)', marginLeft: 'auto' }}
-              >
+              <span style={{ fontSize: '11px', color: 'var(--success)', marginLeft: 'auto' }}>
                 {successDecisions.length}
               </span>
             </div>

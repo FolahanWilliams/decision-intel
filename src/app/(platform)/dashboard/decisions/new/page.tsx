@@ -156,7 +156,8 @@ export default function NewDecisionPage() {
           {/* Default Action */}
           <div>
             <label className="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">
-              Default Action <span className="text-xs font-normal text-[var(--text-muted)]">(optional)</span>
+              Default Action{' '}
+              <span className="text-xs font-normal text-[var(--text-muted)]">(optional)</span>
             </label>
             <p className="mb-2 text-xs text-[var(--text-muted)]">
               Without further analysis, what would you do?
@@ -174,7 +175,8 @@ export default function NewDecisionPage() {
           <div>
             <label className="mb-1.5 flex items-center gap-2 text-sm font-medium text-[var(--text-primary)]">
               <CheckCircle2 className="h-4 w-4 text-green-400" />
-              Success Criteria <span className="text-xs font-normal text-[var(--text-muted)]">(optional)</span>
+              Success Criteria{' '}
+              <span className="text-xs font-normal text-[var(--text-muted)]">(optional)</span>
             </label>
             <p className="mb-2 text-xs text-[var(--text-muted)]">This decision succeeds if...</p>
             {successCriteria.map((criterion, i) => (
@@ -211,7 +213,8 @@ export default function NewDecisionPage() {
           <div>
             <label className="mb-1.5 flex items-center gap-2 text-sm font-medium text-[var(--text-primary)]">
               <AlertTriangle className="h-4 w-4 text-red-400" />
-              Failure Criteria <span className="text-xs font-normal text-[var(--text-muted)]">(optional)</span>
+              Failure Criteria{' '}
+              <span className="text-xs font-normal text-[var(--text-muted)]">(optional)</span>
             </label>
             <p className="mb-2 text-xs text-[var(--text-muted)]">This decision fails if...</p>
             {failureCriteria.map((criterion, i) => (
@@ -250,7 +253,9 @@ export default function NewDecisionPage() {
               <Users className="h-4 w-4 text-blue-400" />
               Stakeholders Affected (optional)
             </label>
-            <p className="mb-2 text-xs text-[var(--text-muted)]">Maps to boardroom simulation personas</p>
+            <p className="mb-2 text-xs text-[var(--text-muted)]">
+              Maps to boardroom simulation personas
+            </p>
             {stakeholders.map((stakeholder, i) => (
               <div key={i} className="mb-2 flex gap-2">
                 <input

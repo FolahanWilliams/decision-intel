@@ -78,9 +78,8 @@ export function FeaturedDeepCases({ cases }: { cases: CaseStudy[] }) {
             Featured deep analyses
           </h2>
           <p style={{ fontSize: 13, color: C.slate500, margin: '6px 0 0', maxWidth: 560 }}>
-            {cases.length} cases carry full Tier 2 depth — timelines of
-            evidence, named stakeholders with their positions, counterfactuals,
-            and primary-source citations.
+            {cases.length} cases carry full Tier 2 depth — timelines of evidence, named stakeholders
+            with their positions, counterfactuals, and primary-source citations.
           </p>
         </div>
       </div>

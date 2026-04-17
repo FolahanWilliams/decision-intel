@@ -106,7 +106,8 @@ export function KGMergeConsentModal({
               margin: '0 0 10px',
             }}
           >
-            Merge your Personal Decision History into {orgName ? orgName + '\u2019s' : 'your team\u2019s'} Knowledge Graph?
+            Merge your Personal Decision History into{' '}
+            {orgName ? orgName + '\u2019s' : 'your team\u2019s'} Knowledge Graph?
           </h2>
           <p
             style={{
@@ -117,8 +118,8 @@ export function KGMergeConsentModal({
             }}
           >
             You have <strong style={{ color: '#0F172A' }}>{memoCount}</strong> memo
-            {memoCount === 1 ? '' : 's'} tracked in your Personal Decision History. Your team is
-            now on Strategy, which unlocks a shared Decision Knowledge Graph. Your decision below
+            {memoCount === 1 ? '' : 's'} tracked in your Personal Decision History. Your team is now
+            on Strategy, which unlocks a shared Decision Knowledge Graph. Your decision below
             controls whether your prior memos join that shared graph or stay private to you.
           </p>
         </div>
@@ -225,9 +226,9 @@ export function KGMergeConsentModal({
                 </div>
                 <div style={{ fontSize: 13, color: '#475569', lineHeight: 1.6 }}>
                   Your {memoCount} memo{memoCount === 1 ? '' : 's'} stay visible only to you. Any
-                  new memos you create from now on will live in the team graph. This is a
-                  reasonable choice if prior memos covered sensitive personal calibration or early
-                  drafts you would rather not surface to the team.
+                  new memos you create from now on will live in the team graph. This is a reasonable
+                  choice if prior memos covered sensitive personal calibration or early drafts you
+                  would rather not surface to the team.
                 </div>
               </div>
             </div>
@@ -299,8 +300,8 @@ export function KGMergeConsentModal({
         >
           <strong style={{ color: '#0F172A' }}>One-time decision.</strong> This choice applies only
           to memos captured before your team joined Strategy. New memos you audit from this point
-          forward will automatically live in the team graph. You can contact support if you need
-          to revise this choice later.
+          forward will automatically live in the team graph. You can contact support if you need to
+          revise this choice later.
         </div>
       </div>
     </div>

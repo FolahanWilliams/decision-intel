@@ -52,9 +52,9 @@ export function DemoPageHeader({
           </span>
           <span style={{ fontSize: 13, color: '#CBD5E1', lineHeight: 1.4 }}>
             Every flag below was detectable from a{' '}
-            <strong style={{ color: '#FFFFFF' }}>pre-{caseStudy.year}</strong>{' '}
-            document — no hindsight. This is exactly what Decision Intel would
-            have output if it had run on the original memo.
+            <strong style={{ color: '#FFFFFF' }}>pre-{caseStudy.year}</strong> document — no
+            hindsight. This is exactly what Decision Intel would have output if it had run on the
+            original memo.
           </span>
         </div>
       </div>

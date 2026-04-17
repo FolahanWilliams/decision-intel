@@ -48,10 +48,7 @@ export function IndustryDistributionChart({
       }}
     >
       {sorted.map(({ industry, count }) => (
-        <div
-          key={industry}
-          style={{ display: 'contents' }}
-        >
+        <div key={industry} style={{ display: 'contents' }}>
           <div
             style={{
               fontSize: 11,

@@ -180,9 +180,7 @@ export function FlaggedAnalysisPanel({
           >
             Red Flags Detectable at Decision Time
           </span>
-          <span style={{ fontSize: 11, color: C.slate400 }}>
-            · {detectableRedFlags.length}
-          </span>
+          <span style={{ fontSize: 11, color: C.slate400 }}>· {detectableRedFlags.length}</span>
         </div>
         <ol style={{ margin: 0, padding: 0, listStyle: 'none' }}>
           {detectableRedFlags.map((flag, i) => (

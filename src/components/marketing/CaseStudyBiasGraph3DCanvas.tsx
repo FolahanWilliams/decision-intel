@@ -86,7 +86,7 @@ export interface CaseStudyNodeData {
 function buildGraphData(
   biases: string[],
   primaryBias: string,
-  toxicCombinations: string[],
+  toxicCombinations: string[]
 ): { nodes: GraphNode[]; edges: GraphEdge[] } {
   const biasSet = new Set(biases);
   const nodes: GraphNode[] = [];
@@ -226,7 +226,16 @@ function renderNode({ node, size, opacity, active, selected }: NodeRendererProps
       <group>
         <mesh>
           <dodecahedronGeometry args={[size, 0]} />
-          <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
+          <meshPhongMaterial
+            color={col}
+            emissive={col}
+            emissiveIntensity={emissive}
+            shininess={90}
+            specular="#FFFFFF"
+            side={DoubleSide}
+            transparent
+            opacity={o}
+          />
         </mesh>
         {selected && <SelectedGlow size={size} color={col} shape="dodecahedron" />}
         {!selected && glow && (
@@ -245,7 +254,16 @@ function renderNode({ node, size, opacity, active, selected }: NodeRendererProps
     <group>
       <mesh>
         <octahedronGeometry args={[size, 0]} />
-        <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
+        <meshPhongMaterial
+          color={col}
+          emissive={col}
+          emissiveIntensity={emissive}
+          shininess={90}
+          specular="#FFFFFF"
+          side={DoubleSide}
+          transparent
+          opacity={o}
+        />
       </mesh>
       {selected && <SelectedGlow size={size} color={col} shape="octahedron" />}
       {!selected && glow && (
@@ -280,7 +298,7 @@ export default function CaseStudyBiasGraph3DCanvas({
   // fitNodesInView ("fitTo() cannot be used with an empty box").
   const { nodes, edges } = useMemo(
     () => buildGraphData(biases, primaryBias, toxicCombinations),
-    [biases, primaryBias, toxicCombinations],
+    [biases, primaryBias, toxicCombinations]
   );
   const hasGraph = nodes.length > 0;
 
@@ -299,7 +317,7 @@ export default function CaseStudyBiasGraph3DCanvas({
         } catch {
           // Layout hasn't placed nodes yet — next retry will catch it.
         }
-      }, ms),
+      }, ms)
     );
     return () => timers.forEach(clearTimeout);
   }, [hasGraph]);
@@ -345,7 +363,7 @@ export default function CaseStudyBiasGraph3DCanvas({
         graphRef.current?.centerGraph([node.id]);
       }
     },
-    [selections, toggleSelection],
+    [selections, toggleSelection]
   );
 
   // Hover tooltip
@@ -357,14 +375,14 @@ export default function CaseStudyBiasGraph3DCanvas({
       onNodePointerOver?.(node);
       setHoverNodeId(node.id);
     },
-    [onNodePointerOver],
+    [onNodePointerOver]
   );
   const handleNodePointerOut = useCallback(
     (node: InternalGraphNode) => {
       onNodePointerOut?.(node);
       setHoverNodeId(null);
     },
-    [onNodePointerOut],
+    [onNodePointerOut]
   );
   const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     const rect = wrapperRef.current?.getBoundingClientRect();
@@ -373,7 +391,7 @@ export default function CaseStudyBiasGraph3DCanvas({
   }, []);
   const hoveredNode = useMemo(
     () => (hoverNodeId ? (nodes.find(n => n.id === hoverNodeId) ?? null) : null),
-    [hoverNodeId, nodes],
+    [hoverNodeId, nodes]
   );
   const hoveredData = hoveredNode?.data as CaseStudyNodeData | undefined;
 

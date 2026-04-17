@@ -15,13 +15,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import {
-  UploadCloud,
-  ShieldCheck,
-  Cpu,
-  Lock,
-  type LucideIcon,
-} from 'lucide-react';
+import { UploadCloud, ShieldCheck, Cpu, Lock, type LucideIcon } from 'lucide-react';
 import { useReducedMotion } from '@/components/marketing/how-it-works/useReducedMotion';
 
 const C = {
@@ -228,11 +222,7 @@ export function DataLifecycleViz() {
                   transition: 'background 0.35s, border-color 0.35s',
                 }}
               >
-                <Icon
-                  size={18}
-                  color={isActive || isPast ? C.white : C.slate500}
-                  strokeWidth={2}
-                />
+                <Icon size={18} color={isActive || isPast ? C.white : C.slate500} strokeWidth={2} />
                 {isActive && !reducedMotion && (
                   <motion.span
                     aria-hidden
@@ -306,8 +296,8 @@ export function DataLifecycleViz() {
           <Lock size={11} strokeWidth={2.6} />
         </div>
         <span>
-          <span style={{ color: C.slate900, fontWeight: 600 }}>Your tenant only.</span>{' '}
-          Nothing crosses org boundaries. Nothing trains upstream models.
+          <span style={{ color: C.slate900, fontWeight: 600 }}>Your tenant only.</span> Nothing
+          crosses org boundaries. Nothing trains upstream models.
         </span>
       </div>
     </div>

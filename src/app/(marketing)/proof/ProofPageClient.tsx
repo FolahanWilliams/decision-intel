@@ -4,12 +4,7 @@ import { useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowRight, FileText, ShieldCheck, Gauge } from 'lucide-react';
-import {
-  ALL_CASES,
-  getDeepCases,
-  getSlugForCase,
-  type CaseStudy,
-} from '@/lib/data/case-studies';
+import { ALL_CASES, getDeepCases, getSlugForCase, type CaseStudy } from '@/lib/data/case-studies';
 import { CaseStudyNav } from '../case-studies/CaseStudyNav';
 import { CaseSelector } from '@/components/marketing/proof/CaseSelector';
 import { PreDecisionDocument } from '@/components/marketing/proof/PreDecisionDocument';
@@ -158,8 +153,8 @@ export function ProofPageClient() {
             }}
           >
             {deepCases.length} real documents — memos, SEC filings, earnings calls — from{' '}
-            <strong style={{ color: C.white }}>before</strong> the outcome was known. Run through the
-            same 30+ bias detection methodology we apply to your next strategic memo.
+            <strong style={{ color: C.white }}>before</strong> the outcome was known. Run through
+            the same 30+ bias detection methodology we apply to your next strategic memo.
           </p>
 
           {/* Hero stats */}
@@ -174,7 +169,10 @@ export function ProofPageClient() {
             }}
           >
             <HeroStat value={String(deepCases.length)} label="Pre-decision documents" />
-            <HeroStat value={String(new Set(deepCases.map(c => c.industry)).size)} label="Industries" />
+            <HeroStat
+              value={String(new Set(deepCases.map(c => c.industry)).size)}
+              label="Industries"
+            />
             <HeroStat value="0" label="Hindsight used" />
           </div>
         </div>
@@ -346,8 +344,8 @@ export function ProofPageClient() {
                 at the time.
               </p>
               <p style={{ fontSize: 13, color: C.slate400, margin: 0 }}>
-                Every flaggable bias links to its peer-reviewed academic source. No LLM storytelling —
-                the methodology is fully cited.
+                Every flaggable bias links to its peer-reviewed academic source. No LLM storytelling
+                — the methodology is fully cited.
               </p>
             </div>
           </div>
@@ -500,8 +498,8 @@ export function ProofPageClient() {
         >
           <Gauge size={14} />
           <span>
-            DQI projections calibrated against {ALL_CASES.length} labeled outcomes. Methodology
-            open at{' '}
+            DQI projections calibrated against {ALL_CASES.length} labeled outcomes. Methodology open
+            at{' '}
             <Link
               href="/taxonomy"
               style={{ color: C.slate600, textDecoration: 'none', fontWeight: 600 }}

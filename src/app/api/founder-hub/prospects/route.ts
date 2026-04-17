@@ -28,11 +28,11 @@ export async function GET(req: NextRequest) {
       filter === 'all'
         ? { status: { not: 'archived' } }
         : filter === 'followup_due'
-        ? {
-            status: 'cold',
-            followUpDue: { lte: new Date() },
-          }
-        : { status: filter };
+          ? {
+              status: 'cold',
+              followUpDue: { lte: new Date() },
+            }
+          : { status: filter };
 
     const prospects = await prisma.founderProspect.findMany({
       where,

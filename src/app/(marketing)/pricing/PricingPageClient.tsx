@@ -409,9 +409,7 @@ export function PricingPageClient() {
                 style={{
                   background: C.white,
                   color: C.slate900,
-                  border: isFeatured
-                    ? `2px solid ${C.green}`
-                    : `1px solid ${C.slate200}`,
+                  border: isFeatured ? `2px solid ${C.green}` : `1px solid ${C.slate200}`,
                   borderRadius: 20,
                   padding: 32,
                   display: 'flex',
@@ -573,9 +571,7 @@ export function PricingPageClient() {
                         fontSize: 14,
                         fontWeight: 700,
                         textDecoration: 'none',
-                        boxShadow: isFeatured
-                          ? '0 6px 20px rgba(22,163,74,0.28)'
-                          : 'none',
+                        boxShadow: isFeatured ? '0 6px 20px rgba(22,163,74,0.28)' : 'none',
                       }}
                     >
                       {tier.cta.label} <ArrowRight size={14} />
@@ -603,9 +599,7 @@ export function PricingPageClient() {
                         fontWeight: 700,
                         cursor: checkoutLoading === tier.id ? 'wait' : 'pointer',
                         opacity: checkoutLoading === tier.id ? 0.7 : 1,
-                        boxShadow: isFeatured
-                          ? '0 6px 20px rgba(22,163,74,0.28)'
-                          : 'none',
+                        boxShadow: isFeatured ? '0 6px 20px rgba(22,163,74,0.28)' : 'none',
                       }}
                     >
                       {checkoutLoading === tier.id ? 'Redirecting…' : tier.cta.label}
@@ -639,10 +633,7 @@ export function PricingPageClient() {
             { label: 'No training on your data', sub: 'ever, by contract' },
             { label: '30-day pilot', sub: 'on Strategy tier' },
           ].map(item => (
-            <div
-              key={item.label}
-              style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}
-            >
+            <div key={item.label} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
               <span
                 style={{
                   width: 20,
@@ -660,9 +651,7 @@ export function PricingPageClient() {
                 <Check size={12} strokeWidth={3} />
               </span>
               <div style={{ minWidth: 0 }}>
-                <div
-                  style={{ fontSize: 13, fontWeight: 700, color: C.slate900, lineHeight: 1.3 }}
-                >
+                <div style={{ fontSize: 13, fontWeight: 700, color: C.slate900, lineHeight: 1.3 }}>
                   {item.label}
                 </div>
                 <div
@@ -722,77 +711,77 @@ export function PricingPageClient() {
               background: C.white,
             }}
           >
-          <div
-            style={{
-              minWidth: 720,
-              background: C.white,
-              overflow: 'hidden',
-            }}
-          >
             <div
               style={{
-                display: 'grid',
-                gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr',
-                background: C.slate50,
-                borderBottom: `1px solid ${C.slate200}`,
-                padding: '14px 20px',
-                fontSize: 12,
-                fontWeight: 700,
-                textTransform: 'uppercase',
-                letterSpacing: '0.06em',
-                color: C.slate500,
+                minWidth: 720,
+                background: C.white,
+                overflow: 'hidden',
               }}
             >
-              <div>Feature</div>
-              <div style={{ textAlign: 'center' }}>Free</div>
-              <div style={{ textAlign: 'center' }}>Individual</div>
-              <div style={{ textAlign: 'center', color: C.green }}>Strategy</div>
-              <div style={{ textAlign: 'center' }}>Enterprise</div>
-            </div>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr',
+                  background: C.slate50,
+                  borderBottom: `1px solid ${C.slate200}`,
+                  padding: '14px 20px',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                  color: C.slate500,
+                }}
+              >
+                <div>Feature</div>
+                <div style={{ textAlign: 'center' }}>Free</div>
+                <div style={{ textAlign: 'center' }}>Individual</div>
+                <div style={{ textAlign: 'center', color: C.green }}>Strategy</div>
+                <div style={{ textAlign: 'center' }}>Enterprise</div>
+              </div>
 
-            {COMPARISON_ROWS.map((row, i) => {
-              if (row.section) {
+              {COMPARISON_ROWS.map((row, i) => {
+                if (row.section) {
+                  return (
+                    <div
+                      key={`section-${i}`}
+                      style={{
+                        padding: '16px 20px 8px',
+                        fontSize: 11,
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.08em',
+                        color: C.green,
+                        background: C.slate50,
+                        borderTop: i > 0 ? `1px solid ${C.slate200}` : 'none',
+                      }}
+                    >
+                      {row.section}
+                    </div>
+                  );
+                }
+
                 return (
                   <div
-                    key={`section-${i}`}
+                    key={`row-${i}`}
                     style={{
-                      padding: '16px 20px 8px',
-                      fontSize: 11,
-                      fontWeight: 700,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.08em',
-                      color: C.green,
-                      background: C.slate50,
-                      borderTop: i > 0 ? `1px solid ${C.slate200}` : 'none',
+                      display: 'grid',
+                      gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr',
+                      padding: '14px 20px',
+                      fontSize: 13,
+                      color: C.slate600,
+                      borderTop: `1px solid ${C.slate100}`,
+                      alignItems: 'center',
                     }}
                   >
-                    {row.section}
+                    <div style={{ color: C.slate900, fontWeight: 500 }}>{row.label}</div>
+                    <CellValue value={row.free} />
+                    <CellValue value={row.pro} />
+                    <CellValue value={row.team} />
+                    <CellValue value={row.enterprise} />
                   </div>
                 );
-              }
-
-              return (
-                <div
-                  key={`row-${i}`}
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr',
-                    padding: '14px 20px',
-                    fontSize: 13,
-                    color: C.slate600,
-                    borderTop: `1px solid ${C.slate100}`,
-                    alignItems: 'center',
-                  }}
-                >
-                  <div style={{ color: C.slate900, fontWeight: 500 }}>{row.label}</div>
-                  <CellValue value={row.free} />
-                  <CellValue value={row.pro} />
-                  <CellValue value={row.team} />
-                  <CellValue value={row.enterprise} />
-                </div>
-              );
-            })}
-          </div>
+              })}
+            </div>
           </div>
         </div>
       </section>

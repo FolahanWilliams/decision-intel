@@ -109,7 +109,8 @@ export const DEMO_NOKIA: DemoAnalysis = {
   documentName:
     'Microsoft Corporation \u2014 Strategic Rationale for Nokia Devices & Services Acquisition (2013)',
   shortName: 'Microsoft-Nokia Acquisition',
-  teaser: 'A $7.2B acquisition memo with six cognitive biases the board never named — and a $7.6B write-down 22 months later.',
+  teaser:
+    'A $7.2B acquisition memo with six cognitive biases the board never named — and a $7.6B write-down 22 months later.',
   overallScore: 38,
   noiseScore: 67,
   createdAt: '2013-09-02T14:00:00Z',
@@ -413,7 +414,8 @@ export const DEMO_PHOENIX: DemoAnalysis = {
   id: 'demo-phoenix-expansion',
   documentName: 'Strategic Initiative: Project Phoenix \u2014 European Market Expansion',
   shortName: 'Project Phoenix Expansion',
-  teaser: 'A four-country market-entry plan built on one partnership case study, $15M in sunk cost, and a 95% team consensus.',
+  teaser:
+    'A four-country market-entry plan built on one partnership case study, $15M in sunk cost, and a 95% team consensus.',
   overallScore: 29,
   noiseScore: 74,
   createdAt: '2025-11-15T10:00:00Z',
@@ -715,7 +717,8 @@ export const DEMO_SERIES_B: DemoAnalysis = {
   documentName:
     'Meridian Health Technologies — Strategic Partnership & Equity Stake Recommendation ($45M)',
   shortName: 'Meridian Strategic Partnership',
-  teaser: 'A $45M strategic partnership memo that anchors on top-down TAM, optimistic regulatory timing, and outdated comparables.',
+  teaser:
+    'A $45M strategic partnership memo that anchors on top-down TAM, optimistic regulatory timing, and outdated comparables.',
   overallScore: 58,
   noiseScore: 42,
   createdAt: '2025-06-12T09:00:00Z',
@@ -1112,7 +1115,7 @@ export const DEMO_WEWORK: DemoAnalysis = {
         'The dual-class share structure grants 20 votes per share to Neumann-held stock versus 1 vote per public share, providing concentrated decision authority with no external accountability. The framing ("ensures founder provides visionary leadership") treats governance concentration as a feature rather than a risk. Post-IPO public shareholders would hold <2% of voting power despite holding a majority of economic interest.',
       suggestion:
         'Require standard 1:1 voting structure or disclose voting concentration prominently in the summary risk factors. Benchmark against Facebook (10:1, widely criticized) and Google (10:1, lost GIC investor over it) as the upper bounds of acceptable governance concentration.',
-      confidence: 0.90,
+      confidence: 0.9,
     },
     {
       biasType: 'sunk_cost_fallacy',
@@ -1219,7 +1222,8 @@ export const DEMO_WEWORK: DemoAnalysis = {
     {
       name: 'False Analogy',
       severity: 'high',
-      excerpt: '"similar to how Airbnb has redefined hospitality and Uber has redefined transportation"',
+      excerpt:
+        '"similar to how Airbnb has redefined hospitality and Uber has redefined transportation"',
       explanation:
         'The analogy maps WeWork (capital-intensive, long-lease liability) onto asset-light marketplace platforms (Airbnb, Uber). The operational economics differ categorically; the analogy exists to inherit valuation multiples without earning them.',
       score: 30,
@@ -1305,14 +1309,14 @@ export const DEMO_WEWORK: DemoAnalysis = {
       },
       {
         title: 'Founder Governance Crisis',
-        probability: 0.60,
+        probability: 0.6,
         impact: 'severe',
         description:
           'Institutional investor opposition to supervoting shares and related-party transactions forces founder CEO to exit. Board transition creates 6-12 month strategic uncertainty, delaying operational execution on core flexible-workspace thesis.',
       },
       {
         title: 'Commercial Real-Estate Downturn',
-        probability: 0.40,
+        probability: 0.4,
         impact: 'catastrophic',
         description:
           'GDP contraction in major markets (US coastal cities, London, Tel Aviv) produces 15-25% occupancy decline while lease obligations remain fixed. Duration mismatch consumes remaining cash reserves; requires distressed equity raise at 80-90% discount.',

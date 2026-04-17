@@ -148,7 +148,9 @@ export async function analyzeDocument(
         foundBiases = foundBiases
           .sort((a, b) => (severityOrder[a.severity] ?? 4) - (severityOrder[b.severity] ?? 4))
           .slice(0, maxBiasTypes);
-        log.info(`Bias types capped to ${maxBiasTypes} for ${plan} plan (${foundBiases.length} kept)`);
+        log.info(
+          `Bias types capped to ${maxBiasTypes} for ${plan} plan (${foundBiases.length} kept)`
+        );
       }
     } catch {
       // Non-fatal: if limit check fails, keep all biases

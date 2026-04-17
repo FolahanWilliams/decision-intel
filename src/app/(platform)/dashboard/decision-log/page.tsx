@@ -184,9 +184,7 @@ function AuditSummaryCards({ decisions }: { decisions: HumanDecisionSummary[] })
       <div className="card">
         <div className="card-body text-center p-md">
           <div className="text-xs text-muted mb-sm font-medium">High Risk</div>
-          <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--error)' }}>
-            {highRisk}
-          </div>
+          <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--error)' }}>{highRisk}</div>
         </div>
       </div>
       <div className="card">
@@ -296,10 +294,7 @@ function JournalRow({
           >
             {normalizedStatus}
           </span>
-          <span
-            className="flex items-center gap-xs"
-            style={{ color: 'var(--text-muted)' }}
-          >
+          <span className="flex items-center gap-xs" style={{ color: 'var(--text-muted)' }}>
             <Clock size={11} />
             {formatFullDate(entry.createdAt)}
           </span>
@@ -471,10 +466,7 @@ function AuditRow({
               ANALYZING
             </span>
           )}
-          <span
-            className="flex items-center gap-xs"
-            style={{ color: 'var(--text-muted)' }}
-          >
+          <span className="flex items-center gap-xs" style={{ color: 'var(--text-muted)' }}>
             <Clock size={11} />
             {formatFullDate(decision.createdAt)}
           </span>
@@ -760,10 +752,7 @@ export default function DecisionLogPage() {
                 <div className="card-body">
                   <div className="flex items-center gap-sm" style={{ marginBottom: 12 }}>
                     <Edit size={14} style={{ color: 'var(--warning)' }} />
-                    <span
-                      className="section-heading"
-                      style={{ marginBottom: 0 }}
-                    >
+                    <span className="section-heading" style={{ marginBottom: 0 }}>
                       Manual Journal Entry
                     </span>
                   </div>
@@ -973,10 +962,7 @@ export default function DecisionLogPage() {
             briefContext="journal"
           />
         ) : (
-          <div
-            className="card"
-            style={{ overflow: 'hidden' }}
-          >
+          <div className="card" style={{ overflow: 'hidden' }}>
             <div className="card-header">
               <h3 className="flex items-center gap-sm">
                 <BarChart3 size={16} />
@@ -1081,7 +1067,11 @@ export default function DecisionLogPage() {
                       gap: 6,
                     }}
                   >
-                    {deleting ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
+                    {deleting ? (
+                      <Loader2 size={12} className="animate-spin" />
+                    ) : (
+                      <Trash2 size={12} />
+                    )}
                     Delete
                   </button>
                 </div>

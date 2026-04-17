@@ -125,7 +125,7 @@ const NODES: GraphNode[] = [
       detail: {
         title: 'Unrelated Adjacency Expansion',
         excerpt:
-          'While bleeding cash on the core business, WeWork launched WeGrow (a $42K/yr private school run by Neumann\'s wife), WeLive (co-living), and acquired Meetup for $200M and Flatiron School for $50M.',
+          "While bleeding cash on the core business, WeWork launched WeGrow (a $42K/yr private school run by Neumann's wife), WeLive (co-living), and acquired Meetup for $200M and Flatiron School for $50M.",
         insight:
           'Decision Intel flags: Scope sprawl while unprofitable. Each adjacency consumed capital and management attention with no clear synergy to core office-leasing economics.',
       },
@@ -176,9 +176,9 @@ const NODES: GraphNode[] = [
         title: 'Authority Bias',
         severity: 'Critical',
         excerpt:
-          'SoftBank\'s $18.5B backing created an aura of inevitability. Board members and investors deferred to Neumann\'s vision without challenging unit economics.',
+          "SoftBank's $18.5B backing created an aura of inevitability. Board members and investors deferred to Neumann's vision without challenging unit economics.",
         insight:
-          'SoftBank\'s outsized investment anchored the entire market on a single investor\'s thesis. No independent valuation challenged the $47B figure until the S-1 went public.',
+          "SoftBank's outsized investment anchored the entire market on a single investor's thesis. No independent valuation challenged the $47B figure until the S-1 went public.",
       },
     } satisfies NodeData,
   },
@@ -210,7 +210,7 @@ const NODES: GraphNode[] = [
         title: 'Anchoring Bias',
         severity: 'High',
         excerpt:
-          'The $47B valuation was anchored to SoftBank\'s January 2019 funding round. No DCF model or comparable analysis supported the figure in the S-1.',
+          "The $47B valuation was anchored to SoftBank's January 2019 funding round. No DCF model or comparable analysis supported the figure in the S-1.",
         insight:
           'Private market valuations set by a single dominant investor are not market prices. Public market investors rejected the anchor immediately \u2014 valuation fell 83% before IPO was pulled.',
       },
@@ -227,9 +227,9 @@ const NODES: GraphNode[] = [
         title: 'Groupthink',
         severity: 'High',
         excerpt:
-          'The board included Neumann\'s allies and SoftBank representatives. No independent director raised concerns about self-dealing or losses until after the S-1 backlash.',
+          "The board included Neumann's allies and SoftBank representatives. No independent director raised concerns about self-dealing or losses until after the S-1 backlash.",
         insight:
-          'Zero documented dissent in board minutes prior to filing. When 100% of a board agrees on a $47B valuation for a money-losing company, that\'s a groupthink signal, not consensus.',
+          "Zero documented dissent in board minutes prior to filing. When 100% of a board agrees on a $47B valuation for a money-losing company, that's a groupthink signal, not consensus.",
       },
     } satisfies NodeData,
   },
@@ -244,7 +244,7 @@ const NODES: GraphNode[] = [
         title: 'Sunk Cost Fallacy',
         severity: 'High',
         excerpt:
-          'SoftBank\'s $10.65B already committed shaped every subsequent decision. Pulling support would have forced a write-down; doubling down preserved the paper valuation \u2014 temporarily.',
+          "SoftBank's $10.65B already committed shaped every subsequent decision. Pulling support would have forced a write-down; doubling down preserved the paper valuation \u2014 temporarily.",
         insight:
           'Decision Intel flags: When prior capital becomes the reason to deploy more capital, Softbank\u2019s \u201crescue round\u201d was economically inevitable but strategically catastrophic.',
       },
@@ -263,7 +263,7 @@ const NODES: GraphNode[] = [
         excerpt:
           'After the IPO failure, SoftBank deployed an additional $9.5B in a rescue package \u2014 including a $1.7B exit payout to Neumann \u2014 rather than accept the loss.',
         insight:
-          'Decision Intel flags: The rescue package was less about WeWork\'s fundamentals than about protecting SoftBank\'s existing book value and Vision Fund marketing narrative.',
+          "Decision Intel flags: The rescue package was less about WeWork's fundamentals than about protecting SoftBank's existing book value and Vision Fund marketing narrative.",
       },
     } satisfies NodeData,
   },
@@ -391,7 +391,7 @@ const NODES: GraphNode[] = [
       detail: {
         title: '$39B Valuation Destruction',
         excerpt:
-          'Within 6 weeks of the S-1 filing, WeWork\'s valuation dropped from $47B to $8B. By its 2021 SPAC merger, market cap was $9B; by 2023, WeWork filed for Chapter 11 bankruptcy.',
+          "Within 6 weeks of the S-1 filing, WeWork's valuation dropped from $47B to $8B. By its 2021 SPAC merger, market cap was $9B; by 2023, WeWork filed for Chapter 11 bankruptcy.",
         insight:
           'This is what unaudited decision-making costs. Every bias flagged here was detectable from the S-1 document alone \u2014 before a single public share was sold.',
       },
@@ -406,7 +406,7 @@ const NODES: GraphNode[] = [
       detail: {
         title: 'Echo Chamber Pattern',
         excerpt:
-          'Groupthink + Authority Bias created a closed feedback loop. SoftBank\'s conviction reinforced the board\'s confidence, which reinforced Neumann\'s vision, which reinforced SoftBank.',
+          "Groupthink + Authority Bias created a closed feedback loop. SoftBank's conviction reinforced the board's confidence, which reinforced Neumann's vision, which reinforced SoftBank.",
         insight:
           'Toxic combination: When the largest investor, the board, and the CEO all validate each other without external challenge, the probability of catastrophic failure increases 4.2x.',
       },
@@ -431,49 +431,312 @@ const NODES: GraphNode[] = [
 
 const EDGES: GraphEdge[] = [
   // ─── Decision \u2192 bias (dashed, gray) ────────────────────────────────────────
-  { id: 'e1', source: 'ipo_decision', target: 'overconfidence', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
-  { id: 'e2', source: 'ipo_decision', target: 'anchoring', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
-  { id: 'e3', source: 'ipo_decision', target: 'authority', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
-  { id: 'e4', source: 'governance', target: 'authority', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
-  { id: 'e5', source: 'governance', target: 'groupthink', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
-  { id: 'e6', source: 'unit_economics', target: 'overconfidence', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
-  { id: 'e7', source: 'unit_economics', target: 'halo_effect', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
-  { id: 'e14', source: 'unit_economics', target: 'narrative_fallacy', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
-  { id: 'e15', source: 'softbank_reliance', target: 'anchoring', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
-  { id: 'e16', source: 'softbank_reliance', target: 'sunk_cost', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
-  { id: 'e17', source: 'softbank_reliance', target: 'authority', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
-  { id: 'e18', source: 'adjacency_bets', target: 'overconfidence', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
-  { id: 'e19', source: 'adjacency_bets', target: 'planning_fallacy', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
-  { id: 'e20', source: 'self_dealing', target: 'self_serving', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
-  { id: 'e21', source: 'self_dealing', target: 'groupthink', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
-  { id: 'e22', source: 'governance', target: 'self_serving', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
-  { id: 'e23', source: 'ipo_decision', target: 'narrative_fallacy', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
-  { id: 'e35', source: 'unit_economics', target: 'confirmation', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
-  { id: 'e36', source: 'softbank_reliance', target: 'confirmation', fill: '#CBD5E1', dashed: true, arrowPlacement: 'end' },
+  {
+    id: 'e1',
+    source: 'ipo_decision',
+    target: 'overconfidence',
+    fill: '#CBD5E1',
+    dashed: true,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e2',
+    source: 'ipo_decision',
+    target: 'anchoring',
+    fill: '#CBD5E1',
+    dashed: true,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e3',
+    source: 'ipo_decision',
+    target: 'authority',
+    fill: '#CBD5E1',
+    dashed: true,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e4',
+    source: 'governance',
+    target: 'authority',
+    fill: '#CBD5E1',
+    dashed: true,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e5',
+    source: 'governance',
+    target: 'groupthink',
+    fill: '#CBD5E1',
+    dashed: true,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e6',
+    source: 'unit_economics',
+    target: 'overconfidence',
+    fill: '#CBD5E1',
+    dashed: true,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e7',
+    source: 'unit_economics',
+    target: 'halo_effect',
+    fill: '#CBD5E1',
+    dashed: true,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e14',
+    source: 'unit_economics',
+    target: 'narrative_fallacy',
+    fill: '#CBD5E1',
+    dashed: true,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e15',
+    source: 'softbank_reliance',
+    target: 'anchoring',
+    fill: '#CBD5E1',
+    dashed: true,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e16',
+    source: 'softbank_reliance',
+    target: 'sunk_cost',
+    fill: '#CBD5E1',
+    dashed: true,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e17',
+    source: 'softbank_reliance',
+    target: 'authority',
+    fill: '#CBD5E1',
+    dashed: true,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e18',
+    source: 'adjacency_bets',
+    target: 'overconfidence',
+    fill: '#CBD5E1',
+    dashed: true,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e19',
+    source: 'adjacency_bets',
+    target: 'planning_fallacy',
+    fill: '#CBD5E1',
+    dashed: true,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e20',
+    source: 'self_dealing',
+    target: 'self_serving',
+    fill: '#CBD5E1',
+    dashed: true,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e21',
+    source: 'self_dealing',
+    target: 'groupthink',
+    fill: '#CBD5E1',
+    dashed: true,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e22',
+    source: 'governance',
+    target: 'self_serving',
+    fill: '#CBD5E1',
+    dashed: true,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e23',
+    source: 'ipo_decision',
+    target: 'narrative_fallacy',
+    fill: '#CBD5E1',
+    dashed: true,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e35',
+    source: 'unit_economics',
+    target: 'confirmation',
+    fill: '#CBD5E1',
+    dashed: true,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e36',
+    source: 'softbank_reliance',
+    target: 'confirmation',
+    fill: '#CBD5E1',
+    dashed: true,
+    arrowPlacement: 'end',
+  },
 
   // ─── Toxic bias combinations (solid red, labeled) ──────────────────────────
-  { id: 'e8', source: 'groupthink', target: 'authority', fill: '#DC2626', size: 2.5, label: 'Echo Chamber', arrowPlacement: 'end' },
-  { id: 'e9', source: 'overconfidence', target: 'halo_effect', fill: '#DC2626', size: 2.5, label: 'Optimism Trap', arrowPlacement: 'end' },
-  { id: 'e24', source: 'sunk_cost', target: 'escalation', fill: '#DC2626', size: 2.5, label: 'Doubling Down', arrowPlacement: 'end' },
-  { id: 'e25', source: 'narrative_fallacy', target: 'halo_effect', fill: '#DC2626', size: 2.5, label: 'Story Over Signal', arrowPlacement: 'end' },
+  {
+    id: 'e8',
+    source: 'groupthink',
+    target: 'authority',
+    fill: '#DC2626',
+    size: 2.5,
+    label: 'Echo Chamber',
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e9',
+    source: 'overconfidence',
+    target: 'halo_effect',
+    fill: '#DC2626',
+    size: 2.5,
+    label: 'Optimism Trap',
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e24',
+    source: 'sunk_cost',
+    target: 'escalation',
+    fill: '#DC2626',
+    size: 2.5,
+    label: 'Doubling Down',
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e25',
+    source: 'narrative_fallacy',
+    target: 'halo_effect',
+    fill: '#DC2626',
+    size: 2.5,
+    label: 'Story Over Signal',
+    arrowPlacement: 'end',
+  },
 
   // ─── Bias \u2192 outcome (purple, causal) ─────────────────────────────────────
-  { id: 'e10', source: 'overconfidence', target: 'valuation_collapse', fill: '#7C3AED', size: 2, arrowPlacement: 'end' },
-  { id: 'e11', source: 'anchoring', target: 'valuation_collapse', fill: '#7C3AED', size: 2, arrowPlacement: 'end' },
-  { id: 'e12', source: 'authority', target: 'echo_chamber', fill: '#7C3AED', size: 2, arrowPlacement: 'end' },
-  { id: 'e13', source: 'groupthink', target: 'echo_chamber', fill: '#7C3AED', size: 2, arrowPlacement: 'end' },
-  { id: 'e26', source: 'halo_effect', target: 'ipo_pulled', fill: '#7C3AED', size: 2, arrowPlacement: 'end' },
-  { id: 'e27', source: 'groupthink', target: 'neumann_ousted', fill: '#7C3AED', size: 2, arrowPlacement: 'end' },
-  { id: 'e28', source: 'escalation', target: 'softbank_writedown', fill: '#7C3AED', size: 2, arrowPlacement: 'end' },
-  { id: 'e29', source: 'sunk_cost', target: 'softbank_writedown', fill: '#7C3AED', size: 2, arrowPlacement: 'end' },
-  { id: 'e30', source: 'planning_fallacy', target: 'bankruptcy', fill: '#7C3AED', size: 2, arrowPlacement: 'end' },
-  { id: 'e37', source: 'confirmation', target: 'valuation_collapse', fill: '#7C3AED', size: 2, arrowPlacement: 'end' },
+  {
+    id: 'e10',
+    source: 'overconfidence',
+    target: 'valuation_collapse',
+    fill: '#7C3AED',
+    size: 2,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e11',
+    source: 'anchoring',
+    target: 'valuation_collapse',
+    fill: '#7C3AED',
+    size: 2,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e12',
+    source: 'authority',
+    target: 'echo_chamber',
+    fill: '#7C3AED',
+    size: 2,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e13',
+    source: 'groupthink',
+    target: 'echo_chamber',
+    fill: '#7C3AED',
+    size: 2,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e26',
+    source: 'halo_effect',
+    target: 'ipo_pulled',
+    fill: '#7C3AED',
+    size: 2,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e27',
+    source: 'groupthink',
+    target: 'neumann_ousted',
+    fill: '#7C3AED',
+    size: 2,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e28',
+    source: 'escalation',
+    target: 'softbank_writedown',
+    fill: '#7C3AED',
+    size: 2,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e29',
+    source: 'sunk_cost',
+    target: 'softbank_writedown',
+    fill: '#7C3AED',
+    size: 2,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e30',
+    source: 'planning_fallacy',
+    target: 'bankruptcy',
+    fill: '#7C3AED',
+    size: 2,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e37',
+    source: 'confirmation',
+    target: 'valuation_collapse',
+    fill: '#7C3AED',
+    size: 2,
+    arrowPlacement: 'end',
+  },
 
   // ─── Outcome \u2192 outcome (cascade chain) ─────────────────────────────────────
-  { id: 'e31', source: 'ipo_pulled', target: 'neumann_ousted', fill: '#A78BFA', size: 1.5, arrowPlacement: 'end' },
-  { id: 'e32', source: 'neumann_ousted', target: 'softbank_writedown', fill: '#A78BFA', size: 1.5, arrowPlacement: 'end' },
-  { id: 'e33', source: 'softbank_writedown', target: 'valuation_collapse', fill: '#A78BFA', size: 1.5, arrowPlacement: 'end' },
-  { id: 'e34', source: 'valuation_collapse', target: 'bankruptcy', fill: '#A78BFA', size: 1.5, arrowPlacement: 'end' },
+  {
+    id: 'e31',
+    source: 'ipo_pulled',
+    target: 'neumann_ousted',
+    fill: '#A78BFA',
+    size: 1.5,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e32',
+    source: 'neumann_ousted',
+    target: 'softbank_writedown',
+    fill: '#A78BFA',
+    size: 1.5,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e33',
+    source: 'softbank_writedown',
+    target: 'valuation_collapse',
+    fill: '#A78BFA',
+    size: 1.5,
+    arrowPlacement: 'end',
+  },
+  {
+    id: 'e34',
+    source: 'valuation_collapse',
+    target: 'bankruptcy',
+    fill: '#A78BFA',
+    size: 1.5,
+    arrowPlacement: 'end',
+  },
 ];
 
 // ─── Graph theme (deep-space dark) ──────────────────────────────────────────
@@ -580,7 +843,7 @@ export default function HeroDecisionGraph3DCanvas({
         } catch {
           // Layout not converged yet — next retry will catch it.
         }
-      }, ms),
+      }, ms)
     );
     return () => timers.forEach(clearTimeout);
   }, []);
@@ -651,7 +914,7 @@ export default function HeroDecisionGraph3DCanvas({
         graphRef.current?.centerGraph([node.id]);
       }
     },
-    [selections, toggleSelection],
+    [selections, toggleSelection]
   );
 
   // Hover handlers augment useSelection's path-hover without replacing it.
@@ -660,14 +923,14 @@ export default function HeroDecisionGraph3DCanvas({
       onNodePointerOver?.(node);
       setHoverNodeId(node.id);
     },
-    [onNodePointerOver],
+    [onNodePointerOver]
   );
   const handleNodePointerOut = useCallback(
     (node: InternalGraphNode) => {
       onNodePointerOut?.(node);
       setHoverNodeId(null);
     },
-    [onNodePointerOut],
+    [onNodePointerOut]
   );
 
   const hoveredNode = useMemo(() => {
@@ -684,7 +947,16 @@ export default function HeroDecisionGraph3DCanvas({
       return (
         <mesh>
           <sphereGeometry args={[size, 10, 8]} />
-          <meshPhongMaterial color="#60A5FA" emissive="#60A5FA" emissiveIntensity={emissiveFallback} shininess={80} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
+          <meshPhongMaterial
+            color="#60A5FA"
+            emissive="#60A5FA"
+            emissiveIntensity={emissiveFallback}
+            shininess={80}
+            specular="#FFFFFF"
+            side={DoubleSide}
+            transparent
+            opacity={o}
+          />
         </mesh>
       );
     }
@@ -699,7 +971,16 @@ export default function HeroDecisionGraph3DCanvas({
         <group>
           <mesh>
             <dodecahedronGeometry args={[size, 0]} />
-            <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
+            <meshPhongMaterial
+              color={col}
+              emissive={col}
+              emissiveIntensity={emissive}
+              shininess={90}
+              specular="#FFFFFF"
+              side={DoubleSide}
+              transparent
+              opacity={o}
+            />
           </mesh>
           {selected && <SelectedGlow size={size} color={col} shape="dodecahedron" />}
         </group>
@@ -712,7 +993,16 @@ export default function HeroDecisionGraph3DCanvas({
         <group>
           <mesh>
             <octahedronGeometry args={[size, 0]} />
-            <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
+            <meshPhongMaterial
+              color={col}
+              emissive={col}
+              emissiveIntensity={emissive}
+              shininess={90}
+              specular="#FFFFFF"
+              side={DoubleSide}
+              transparent
+              opacity={o}
+            />
           </mesh>
           {selected && <SelectedGlow size={size} color={col} shape="octahedron" />}
           {isPrimary && !selected && <PulsingHalo size={size} color={col} shape="octahedron" />}
@@ -725,7 +1015,16 @@ export default function HeroDecisionGraph3DCanvas({
       <group>
         <mesh>
           <cylinderGeometry args={[size * 0.82, size * 0.82, size * 2.2, 8]} />
-          <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
+          <meshPhongMaterial
+            color={col}
+            emissive={col}
+            emissiveIntensity={emissive}
+            shininess={90}
+            specular="#FFFFFF"
+            side={DoubleSide}
+            transparent
+            opacity={o}
+          />
         </mesh>
         {selected && (
           <SelectedGlow

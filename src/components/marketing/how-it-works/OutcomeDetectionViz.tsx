@@ -575,9 +575,7 @@ function OutcomeCard({ ready, reducedMotion }: { ready: boolean; reducedMotion: 
         border: `1px solid ${C.slate200}`,
         borderRadius: 14,
         padding: '14px 16px',
-        background: ready
-          ? `linear-gradient(180deg, ${C.white} 0%, ${C.greenSoft} 100%)`
-          : C.white,
+        background: ready ? `linear-gradient(180deg, ${C.white} 0%, ${C.greenSoft} 100%)` : C.white,
         display: 'flex',
         flexDirection: 'column',
         gap: 12,
@@ -645,9 +643,7 @@ function OutcomeCard({ ready, reducedMotion }: { ready: boolean; reducedMotion: 
             key={i}
             animate={{
               width: ready ? `${targetWidth}%` : `${Math.max(targetWidth - 30, 20)}%`,
-              backgroundColor: ready
-                ? [C.green, C.slate700, C.slate400][i]
-                : C.slate100,
+              backgroundColor: ready ? [C.green, C.slate700, C.slate400][i] : C.slate100,
             }}
             transition={{
               duration: 0.5,

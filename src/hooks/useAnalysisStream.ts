@@ -253,10 +253,7 @@ export function useAnalysisStream(options: StreamOptions) {
                       };
                       return next;
                     }
-                    return [
-                      ...prev,
-                      { name: stepName, description: stepDesc, status: stepStatus },
-                    ];
+                    return [...prev, { name: stepName, description: stepDesc, status: stepStatus }];
                   });
                 });
                 break;

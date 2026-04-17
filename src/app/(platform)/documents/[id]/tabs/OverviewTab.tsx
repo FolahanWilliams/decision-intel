@@ -8,17 +8,16 @@ import { Brain, Lightbulb, ExternalLink, BarChart3, Eye, ChevronDown } from 'luc
 import { DocumentTextHighlighter } from '@/components/visualizations/DocumentTextHighlighter';
 import { BiasSparklineWithData } from '@/components/visualizations/BiasSparkline';
 import dynamic from 'next/dynamic';
-const BiasNetwork3D = dynamic(
-  () => import('@/components/visualizations/BiasNetwork3DCanvas'),
-  { ssr: false },
-);
+const BiasNetwork3D = dynamic(() => import('@/components/visualizations/BiasNetwork3DCanvas'), {
+  ssr: false,
+});
 import { RiskHeatMap } from '@/components/visualizations/RiskHeatMap';
 const BiasProfileRadar = dynamic(
   () =>
     import('@/components/visualizations/BiasProfileRadar').then(m => ({
       default: m.BiasProfileRadar,
     })),
-  { ssr: false },
+  { ssr: false }
 );
 import { DecisionTimeline } from '@/components/visualizations/DecisionTimeline';
 import { DQIBadge } from '@/components/visualizations/DQIBadge';

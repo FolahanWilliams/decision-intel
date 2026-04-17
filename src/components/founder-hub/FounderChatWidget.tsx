@@ -24,8 +24,8 @@ const STARTER_QUESTIONS = [
   'Play a skeptical CSO — ask me the hardest buyer questions',
   'Play a skeptical VC — challenge my moat story until it holds',
   'Quiz me on the Platform Foundations — start with the DQI weightings',
-  "Reference-class forecast: how long does pre-seed close usually take?",
-  "Red-team my current week plan. Where am I avoiding customer conversations?",
+  'Reference-class forecast: how long does pre-seed close usually take?',
+  'Red-team my current week plan. Where am I avoiding customer conversations?',
 ];
 
 const ACCEPTED_TYPES = '.pdf,.txt,.md,.docx,.csv,.xlsx,.pptx,.html';
@@ -43,7 +43,7 @@ function loadStoredMessages(): ChatMsg[] {
           typeof m === 'object' &&
           m !== null &&
           (m as ChatMsg).role !== undefined &&
-          typeof (m as ChatMsg).content === 'string',
+          typeof (m as ChatMsg).content === 'string'
       )
       .slice(-MAX_STORED_MESSAGES);
   } catch {
@@ -349,9 +349,9 @@ export function FounderChatWidget({ founderPass }: { founderPass: string }) {
             }}
           >
             Your decision-quality coach, not a generic chat. I&apos;ll push back on fuzzy reasoning,
-            run pre-mortems on high-stakes calls, play a skeptical CSO or VC when you rehearse,
-            and quiz you on the methodologies behind Decision Intel. Attach a memo or deck to
-            audit it in-thread.
+            run pre-mortems on high-stakes calls, play a skeptical CSO or VC when you rehearse, and
+            quiz you on the methodologies behind Decision Intel. Attach a memo or deck to audit it
+            in-thread.
             <div
               style={{
                 display: 'flex',

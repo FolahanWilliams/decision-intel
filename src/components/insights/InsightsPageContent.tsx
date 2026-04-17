@@ -479,7 +479,10 @@ export function InsightsPageContent() {
       <SectionLabel index={2}>PERFORMANCE TRAJECTORY</SectionLabel>
       <div className="animate-slide-up" style={{ animationDelay: '0.28s' }}>
         {/* Time range + actions */}
-        <div className="flex items-center justify-between mb-md" style={{ flexWrap: 'wrap', gap: 8 }}>
+        <div
+          className="flex items-center justify-between mb-md"
+          style={{ flexWrap: 'wrap', gap: 8 }}
+        >
           <div className="flex items-center gap-sm">
             {['1W', '1M', '3M', 'YTD', 'ALL'].map(range => (
               <button
@@ -538,10 +541,7 @@ export function InsightsPageContent() {
 
         {/* Market Intelligence overlay */}
         {marketAnalysisError && (
-          <div
-            className="card mb-md"
-            style={{ border: '1px solid rgba(239, 68, 68, 0.3)' }}
-          >
+          <div className="card mb-md" style={{ border: '1px solid rgba(239, 68, 68, 0.3)' }}>
             <div className="card-body flex items-center gap-sm" style={{ padding: '12px 16px' }}>
               <AlertTriangle size={14} style={{ color: 'var(--error)', flexShrink: 0 }} />
               <span style={{ fontSize: '12px', color: 'var(--error)' }}>{marketAnalysisError}</span>
@@ -549,10 +549,7 @@ export function InsightsPageContent() {
           </div>
         )}
         {marketAnalysis && (
-          <div
-            className="card mb-md"
-            style={{ border: '1px solid rgba(22, 163, 74, 0.2)' }}
-          >
+          <div className="card mb-md" style={{ border: '1px solid rgba(22, 163, 74, 0.2)' }}>
             <div className="card-header flex items-center justify-between">
               <div className="flex items-center gap-sm">
                 <Globe size={14} style={{ color: 'var(--accent-primary)' }} />
@@ -708,10 +705,7 @@ export function InsightsPageContent() {
               <div className="skeleton" style={{ width: '100%', height: '100%' }} />
             </div>
           ) : !trendData || trendData.trendData.length === 0 ? (
-            <div
-              className="card-body flex items-center justify-center"
-              style={{ height: 160 }}
-            >
+            <div className="card-body flex items-center justify-center" style={{ height: 160 }}>
               <p
                 style={{
                   fontSize: '11px',
@@ -748,13 +742,21 @@ export function InsightsPageContent() {
                     <XAxis
                       dataKey="date"
                       tickFormatter={str => String(str).slice(5)}
-                      tick={{ fill: 'var(--text-muted)', fontSize: 9, fontFamily: 'JetBrains Mono' }}
+                      tick={{
+                        fill: 'var(--text-muted)',
+                        fontSize: 9,
+                        fontFamily: 'JetBrains Mono',
+                      }}
                       axisLine={false}
                       tickLine={false}
                     />
                     <YAxis
                       domain={[0, 100]}
-                      tick={{ fill: 'var(--text-muted)', fontSize: 9, fontFamily: 'JetBrains Mono' }}
+                      tick={{
+                        fill: 'var(--text-muted)',
+                        fontSize: 9,
+                        fontFamily: 'JetBrains Mono',
+                      }}
                       axisLine={false}
                       tickLine={false}
                       width={28}
@@ -824,9 +826,7 @@ export function InsightsPageContent() {
           <div className="grid grid-4 gap-md" style={{ marginBottom: 'var(--spacing-md)' }}>
             <div className="card">
               <div className="card-body text-center p-md">
-                <div
-                  style={{ fontSize: '22px', fontWeight: 700, color: 'var(--accent-primary)' }}
-                >
+                <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--accent-primary)' }}>
                   {trendData.stats.avgScore}
                 </div>
                 <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Avg Score</div>
@@ -1546,7 +1546,6 @@ export function InsightsPageContent() {
           <ComplianceGrid data={insights.complianceGrid} />
         </ErrorBoundary>
       </div>
-
 
       {/* ── [09] NETWORK INTELLIGENCE ────────────────────── */}
       {graphTrends && graphTrends.weeklyData.length > 0 && (

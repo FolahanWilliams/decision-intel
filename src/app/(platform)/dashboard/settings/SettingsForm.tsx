@@ -254,9 +254,7 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.03em', margin: 0 }}>
             <span className="text-gradient">Settings</span>
           </h1>
-          <p className="page-subtitle">
-            Manage your account preferences and notifications
-          </p>
+          <p className="page-subtitle">Manage your account preferences and notifications</p>
         </div>
       </header>
 

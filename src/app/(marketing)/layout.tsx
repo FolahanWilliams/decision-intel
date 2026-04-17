@@ -88,8 +88,7 @@ const jsonLd = [
         name: 'Free',
         price: '0',
         priceCurrency: 'USD',
-        description:
-          'Free — 4 memo audits per month. See what we flag on any strategic document.',
+        description: 'Free — 4 memo audits per month. See what we flag on any strategic document.',
       },
       {
         '@type': 'Offer',

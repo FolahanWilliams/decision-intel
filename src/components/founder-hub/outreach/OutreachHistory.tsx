@@ -91,14 +91,10 @@ export function OutreachHistory({ founderPass, refreshKey }: Props) {
         </button>
       </div>
 
-      {loading && items.length === 0 && (
-        <div style={emptyState}>Loading history...</div>
-      )}
+      {loading && items.length === 0 && <div style={emptyState}>Loading history...</div>}
 
       {!loading && items.length === 0 && (
-        <div style={emptyState}>
-          No outreach yet. Generate your first one to start tracking.
-        </div>
+        <div style={emptyState}>No outreach yet. Generate your first one to start tracking.</div>
       )}
 
       {grouped.map(group =>
@@ -108,14 +104,14 @@ export function OutreachHistory({ founderPass, refreshKey }: Props) {
               <span style={{ color: STATUS_COLORS[group.status] }}>
                 {STATUS_LABELS[group.status]}
               </span>
-              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                {group.items.length}
-              </span>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{group.items.length}</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {group.items.map(item => (
                 <div key={item.id} style={itemCard}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <div
+                    style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}
+                  >
                     <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
                       {item.contactName ?? 'Unnamed'}
                       {item.contactCompany && (

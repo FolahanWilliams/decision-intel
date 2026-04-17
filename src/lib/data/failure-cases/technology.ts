@@ -79,32 +79,38 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
     timeline: [
       {
         date: '1975-12',
-        event: 'Kodak engineer Steven Sasson builds the first self-contained digital camera — 0.01 megapixel, 8 lbs, 23-second capture time.',
+        event:
+          'Kodak engineer Steven Sasson builds the first self-contained digital camera — 0.01 megapixel, 8 lbs, 23-second capture time.',
         source: 'Sasson interview, NYT 2008',
       },
       {
         date: '1981',
-        event: 'Internal Kodak research report predicts digital photography will overtake film by ~2010, giving the company a decade to transition.',
+        event:
+          'Internal Kodak research report predicts digital photography will overtake film by ~2010, giving the company a decade to transition.',
         source: 'Chunka Mui, "How Kodak Failed" (Forbes, 2012)',
       },
       {
         date: '1989',
-        event: 'Board passes over Phil Samper (the "digital" candidate) for CEO and chooses Kay R. Whitmore, who recommits to film as core strategy.',
+        event:
+          'Board passes over Phil Samper (the "digital" candidate) for CEO and chooses Kay R. Whitmore, who recommits to film as core strategy.',
         source: 'Harvard Business School case: Kodak (2002)',
       },
       {
         date: '1996',
-        event: 'Kodak launches Advantix film system — a $500M+ investment in a hybrid analog format released the same year Nikon launched its first DSLR.',
+        event:
+          'Kodak launches Advantix film system — a $500M+ investment in a hybrid analog format released the same year Nikon launched its first DSLR.',
         source: 'Kodak 1996 10-K',
       },
       {
         date: '2003',
-        event: 'CEO Daniel Carp announces pivot to digital — but digital cameras already commoditized; Kodak competes on price without its traditional margin advantage.',
+        event:
+          'CEO Daniel Carp announces pivot to digital — but digital cameras already commoditized; Kodak competes on price without its traditional margin advantage.',
         source: 'Kodak 2003 annual report',
       },
       {
         date: '2007',
-        event: 'Smartphone cameras begin displacing dedicated digital cameras. Kodak has no smartphone or sensor-licensing strategy.',
+        event:
+          'Smartphone cameras begin displacing dedicated digital cameras. Kodak has no smartphone or sensor-licensing strategy.',
         source: 'Kodak 2007 10-K',
       },
       {
@@ -118,7 +124,8 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
         name: 'Colby Chandler',
         role: 'CEO (1983–1990)',
         position: 'advocate',
-        notes: 'Defended film-centric strategy through late 1980s despite internal digital prototypes.',
+        notes:
+          'Defended film-centric strategy through late 1980s despite internal digital prototypes.',
       },
       {
         name: 'Kay R. Whitmore',
@@ -130,13 +137,15 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
         name: 'George M. C. Fisher',
         role: 'CEO (1993–1999)',
         position: 'dissenter',
-        notes: 'Recruited from Motorola to drive digital transition; his plans were slowed by entrenched film-division leadership.',
+        notes:
+          'Recruited from Motorola to drive digital transition; his plans were slowed by entrenched film-division leadership.',
       },
       {
         name: 'Steven Sasson',
         role: 'Engineer, digital camera inventor',
         position: 'overruled',
-        notes: '1975 digital camera shelved by management; Sasson remained at Kodak but was never given a commercial product path.',
+        notes:
+          '1975 digital camera shelved by management; Sasson remained at Kodak but was never given a commercial product path.',
       },
       {
         name: 'Phil Samper',
@@ -147,11 +156,11 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
     ],
     counterfactual: {
       recommendation:
-        'Commit in 1981 to commercializing digital alongside film at ~15% of annual R&D; license Kodak\'s sensor patents aggressively rather than defensively; acquire or partner with emerging digital specialists (Casio QV-10 era, 1995); spin digital into an independent subsidiary insulated from film-division politics.',
+        "Commit in 1981 to commercializing digital alongside film at ~15% of annual R&D; license Kodak's sensor patents aggressively rather than defensively; acquire or partner with emerging digital specialists (Casio QV-10 era, 1995); spin digital into an independent subsidiary insulated from film-division politics.",
       rationale:
         'Kodak had 30 years of runway and every piece of evidence it needed. The failure was not seeing the future — the 1981 report saw it correctly. The failure was loss aversion on a profit pool that management could not bring itself to self-cannibalize until competitors did it for them.',
       estimatedOutcome:
-        'Kodak survives as a digital sensor and imaging IP licensing business — comparable to Fujifilm\'s successful pivot to specialty chemicals and cosmetics. Avoids Chapter 11; preserves ~30K jobs in Rochester.',
+        "Kodak survives as a digital sensor and imaging IP licensing business — comparable to Fujifilm's successful pivot to specialty chemicals and cosmetics. Avoids Chapter 11; preserves ~30K jobs in Rochester.",
     },
     dqiEstimate: {
       score: 31,
@@ -267,12 +276,14 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       },
       {
         date: '2007-06',
-        event: 'Nokia internal strategy review dismisses touch-based interfaces as "niche" and commits to evolving Symbian rather than replacing it.',
+        event:
+          'Nokia internal strategy review dismisses touch-based interfaces as "niche" and commits to evolving Symbian rather than replacing it.',
         source: 'Vuori & Huy (2016), Nokia Strategy Review documents',
       },
       {
         date: '2008-09',
-        event: 'Symbian Foundation announced — Nokia open-sources Symbian to counter iPhone/Android. Board-level decision to keep Symbian as flagship.',
+        event:
+          'Symbian Foundation announced — Nokia open-sources Symbian to counter iPhone/Android. Board-level decision to keep Symbian as flagship.',
         source: 'Symbian Foundation press release',
       },
       {
@@ -282,7 +293,8 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       },
       {
         date: '2011-02-11',
-        event: 'Elop announces Windows Phone partnership; abandons Symbian and the in-house MeeGo platform. Nokia stock drops 14% in one day.',
+        event:
+          'Elop announces Windows Phone partnership; abandons Symbian and the in-house MeeGo platform. Nokia stock drops 14% in one day.',
         source: 'Nokia–Microsoft strategic partnership announcement',
       },
       {
@@ -292,7 +304,8 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       },
       {
         date: '2014-04-25',
-        event: 'Acquisition closes. Nokia smartphone unit fully absorbed; Microsoft writes down $7.6B on the deal in 2015.',
+        event:
+          'Acquisition closes. Nokia smartphone unit fully absorbed; Microsoft writes down $7.6B on the deal in 2015.',
         source: 'Microsoft Q4 2015 10-K',
       },
     ],
@@ -307,7 +320,8 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
         name: 'Anssi Vanjoki',
         role: 'EVP, Markets',
         position: 'dissenter',
-        notes: 'Publicly advocated faster pivot to modern smartphone OS; resigned September 2010 after being passed over for CEO.',
+        notes:
+          'Publicly advocated faster pivot to modern smartphone OS; resigned September 2010 after being passed over for CEO.',
       },
       {
         name: 'Jorma Ollila',
@@ -319,18 +333,20 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
         name: 'Stephen Elop',
         role: 'CEO (2010–2014)',
         position: 'dissenter',
-        notes: 'Chose Windows Phone over Android; decision debated to this day as either last hope or trojan horse for Microsoft acquisition.',
+        notes:
+          'Chose Windows Phone over Android; decision debated to this day as either last hope or trojan horse for Microsoft acquisition.',
       },
       {
         name: 'Tero Ojanperä',
         role: 'EVP, Services & CTO',
         position: 'overruled',
-        notes: 'Advocated services/app-ecosystem strategy internally; sidelined as Symbian defense dominated.',
+        notes:
+          'Advocated services/app-ecosystem strategy internally; sidelined as Symbian defense dominated.',
       },
     ],
     counterfactual: {
       recommendation:
-        'In mid-2007, commission an honest six-month Symbian replacement study involving external developers; by 2008 either adopt Android (Samsung\'s 2009 path) or ship the MeeGo N900 as flagship; build a dedicated app-store team in 2008 instead of 2011; retain Vanjoki rather than alienating him.',
+        "In mid-2007, commission an honest six-month Symbian replacement study involving external developers; by 2008 either adopt Android (Samsung's 2009 path) or ship the MeeGo N900 as flagship; build a dedicated app-store team in 2008 instead of 2011; retain Vanjoki rather than alienating him.",
       rationale:
         'Nokia\'s failure was not choosing the wrong OS in 2011 — it was a three-year refusal (2007–2010) to concede that Symbian was architecturally incapable of competing with iOS/Android. The "burning platform" memo came four years too late.',
       estimatedOutcome:
@@ -345,7 +361,8 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
     },
     postMortemCitations: [
       {
-        label: 'Vuori & Huy, "Distributed Attention and Shared Emotions in the Innovation Process" (Administrative Science Quarterly)',
+        label:
+          'Vuori & Huy, "Distributed Attention and Shared Emotions in the Innovation Process" (Administrative Science Quarterly)',
         year: 2016,
       },
       {
@@ -447,17 +464,20 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       },
       {
         date: '2000-04',
-        event: 'Netflix co-founders Reed Hastings and Marc Randolph offer Netflix to Blockbuster for $50M. Blockbuster CEO John Antioco declines.',
+        event:
+          'Netflix co-founders Reed Hastings and Marc Randolph offer Netflix to Blockbuster for $50M. Blockbuster CEO John Antioco declines.',
         source: 'Marc Randolph, "That Will Never Work" (2019)',
       },
       {
         date: '2004-08',
-        event: 'Blockbuster finally launches Blockbuster Online (DVD-by-mail) — four years after rejecting Netflix. By this point Netflix has 2M+ subscribers.',
+        event:
+          'Blockbuster finally launches Blockbuster Online (DVD-by-mail) — four years after rejecting Netflix. By this point Netflix has 2M+ subscribers.',
         source: 'Blockbuster 2004 annual report',
       },
       {
         date: '2005',
-        event: 'Activist investor Carl Icahn wins three board seats; pressures Antioco to cut investment in online and no-late-fees initiatives.',
+        event:
+          'Activist investor Carl Icahn wins three board seats; pressures Antioco to cut investment in online and no-late-fees initiatives.',
         source: 'Blockbuster proxy filings, 2005',
       },
       {
@@ -481,31 +501,35 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
         name: 'John Antioco',
         role: 'CEO (1997–2007)',
         position: 'advocate',
-        notes: 'Rejected 2000 Netflix acquisition. Later (2004–2006) reversed and led the $400M push into online and no-late-fees — but was ousted by Icahn before it matured.',
+        notes:
+          'Rejected 2000 Netflix acquisition. Later (2004–2006) reversed and led the $400M push into online and no-late-fees — but was ousted by Icahn before it matured.',
       },
       {
         name: 'Ed Stead',
         role: 'General Counsel & EVP Business Development',
         position: 'advocate',
-        notes: 'Primary voice dismissing the Netflix offer; argued Blockbuster should build rather than buy.',
+        notes:
+          'Primary voice dismissing the Netflix offer; argued Blockbuster should build rather than buy.',
       },
       {
         name: 'Carl Icahn',
         role: 'Activist shareholder (from 2005)',
         position: 'advocate',
-        notes: 'Fought against online and no-late-fee investment; later called his Blockbuster investment his "worst decision."',
+        notes:
+          'Fought against online and no-late-fee investment; later called his Blockbuster investment his "worst decision."',
       },
       {
         name: 'Jim Keyes',
         role: 'CEO (2007–2011)',
         position: 'advocate',
-        notes: 'Reversed Antioco\'s digital pivot; refocused on store operations.',
+        notes: "Reversed Antioco's digital pivot; refocused on store operations.",
       },
       {
         name: 'Reed Hastings',
         role: 'Netflix CEO (external counterparty)',
         position: 'dissenter',
-        notes: 'Explicitly flagged the disruption during the 2000 meeting; his prediction became a 10-year recording of prescience.',
+        notes:
+          'Explicitly flagged the disruption during the 2000 meeting; his prediction became a 10-year recording of prescience.',
       },
     ],
     counterfactual: {
@@ -584,14 +608,14 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       documentType: 'sec_filing',
       detectableRedFlags: [
         'Rejection language ("substantially undervalues") anchored to a valuation framework predating the market downturn',
-        'No credible standalone plan to close the gap between the $31/share offer and Yahoo\'s claimed intrinsic value',
+        "No credible standalone plan to close the gap between the $31/share offer and Yahoo's claimed intrinsic value",
         'Alternative Google search-advertising partnership had unresolved antitrust risk',
         'Founder-CEO Jerry Yang\'s personal anchoring to Yahoo\'s 1999-2000 peak valuation framed "undervaluation"',
         'Search-market share had declined from 30% (2004) to 21% (2008) with no clear turnaround catalyst',
       ],
       flaggableBiases: ['anchoring_bias', 'loss_aversion', 'overconfidence_bias'],
       hypotheticalAnalysis:
-        "DI would flag the Yahoo rejection as the canonical anchor-to-peak-valuation decision. A bias-adjusted board review would have decomposed the $31 offer into the premium over current market price (+62%), the standalone base case, and the probability-weighted downside without a deal. The Google ad-partnership alternative was an unhedged bet on antitrust approval — a decision process demanding scenario analysis would have surfaced the asymmetric risk profile Yahoo ultimately realized.",
+        'DI would flag the Yahoo rejection as the canonical anchor-to-peak-valuation decision. A bias-adjusted board review would have decomposed the $31 offer into the premium over current market price (+62%), the standalone base case, and the probability-weighted downside without a deal. The Google ad-partnership alternative was an unhedged bet on antitrust approval — a decision process demanding scenario analysis would have surfaced the asymmetric risk profile Yahoo ultimately realized.',
     },
     source:
       'Microsoft SEC filing of acquisition proposal (2008); Yahoo-Verizon acquisition agreement (2017)',
@@ -644,13 +668,13 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
     },
     keyQuotes: [
       {
-        text: 'First they think you\'re crazy, then they fight you, and then all of a sudden you change the world.',
+        text: "First they think you're crazy, then they fight you, and then all of a sudden you change the world.",
         source: 'Elizabeth Holmes, TEDMED 2014',
         date: '2014',
         speaker: 'Elizabeth Holmes, CEO',
       },
       {
-        text: 'I don\'t know anything about her company. But I know she has changed the world.',
+        text: "I don't know anything about her company. But I know she has changed the world.",
         source: 'Henry Kissinger, quoted in Forbes cover story',
         date: '2014-06',
         speaker: 'Henry Kissinger, Theranos board director',
@@ -665,32 +689,38 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
     timeline: [
       {
         date: '2003',
-        event: 'Holmes drops out of Stanford and founds Real-Time Cures (later Theranos) at age 19.',
+        event:
+          'Holmes drops out of Stanford and founds Real-Time Cures (later Theranos) at age 19.',
         source: 'John Carreyrou, "Bad Blood" (2018)',
       },
       {
         date: '2013-09',
-        event: 'Walgreens begins rollout of Theranos "wellness centers" in Arizona and California stores.',
+        event:
+          'Walgreens begins rollout of Theranos "wellness centers" in Arizona and California stores.',
         source: 'Walgreens–Theranos partnership announcement',
       },
       {
         date: '2014-06',
-        event: 'Forbes cover story pegs Holmes\'s net worth at $4.5B based on $9B Theranos valuation.',
+        event:
+          "Forbes cover story pegs Holmes's net worth at $4.5B based on $9B Theranos valuation.",
         source: 'Forbes, June 2014',
       },
       {
         date: '2015-02',
-        event: 'Internal whistleblower Tyler Shultz (grandson of board member George Shultz) files concerns with NY State Department of Health.',
+        event:
+          'Internal whistleblower Tyler Shultz (grandson of board member George Shultz) files concerns with NY State Department of Health.',
         source: 'Tyler Shultz testimony, U.S. v. Holmes',
       },
       {
         date: '2015-10-15',
-        event: 'John Carreyrou publishes WSJ investigation: Theranos running most tests on third-party Siemens machines, not Edison.',
+        event:
+          'John Carreyrou publishes WSJ investigation: Theranos running most tests on third-party Siemens machines, not Edison.',
         source: 'Wall Street Journal, October 15 2015',
       },
       {
         date: '2016-01',
-        event: 'CMS inspection finds deficiencies "jeopardize patient health and safety" at Theranos Newark lab.',
+        event:
+          'CMS inspection finds deficiencies "jeopardize patient health and safety" at Theranos Newark lab.',
         source: 'CMS Form 2567 inspection report',
       },
       {
@@ -726,7 +756,8 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
         name: 'George Shultz',
         role: 'Board Director (former Secretary of State)',
         position: 'silent',
-        notes: 'Initially dismissed grandson Tyler\'s concerns; later acknowledged he had been "deceived."',
+        notes:
+          'Initially dismissed grandson Tyler\'s concerns; later acknowledged he had been "deceived."',
       },
       {
         name: 'Henry Kissinger',
@@ -744,7 +775,8 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
         name: 'Tyler Shultz',
         role: 'Employee & whistleblower',
         position: 'dissenter',
-        notes: 'First internal whistleblower; filed complaint February 2015; faced legal intimidation from family\'s own law firm.',
+        notes:
+          "First internal whistleblower; filed complaint February 2015; faced legal intimidation from family's own law firm.",
       },
       {
         name: 'Erika Cheung',
@@ -755,7 +787,7 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
     ],
     counterfactual: {
       recommendation:
-        'Board requires peer-reviewed validation of Edison technology as a condition of any partnership; Walgreens insists on independent third-party testing before rolling out to stores; early-stage investors (Draper, Oracle\'s Ellison, DeVos family) condition investment on technical due diligence from a diagnostics-specialist firm; board refreshes to include at least two diagnostics or molecular biology experts alongside political figures.',
+        "Board requires peer-reviewed validation of Edison technology as a condition of any partnership; Walgreens insists on independent third-party testing before rolling out to stores; early-stage investors (Draper, Oracle's Ellison, DeVos family) condition investment on technical due diligence from a diagnostics-specialist firm; board refreshes to include at least two diagnostics or molecular biology experts alongside political figures.",
       rationale:
         'Theranos is the modern canonical halo-effect/authority-bias failure. Every due-diligence failure traces to the same structural problem: prestigious board, zero domain expertise. The decision to waive technical validation in the presence of "Kissinger and Shultz" is the bias.',
       estimatedOutcome:
@@ -846,7 +878,7 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
     },
     keyQuotes: [
       {
-        text: 'The We Company\'s mission is to elevate the world\'s consciousness.',
+        text: "The We Company's mission is to elevate the world's consciousness.",
         source: 'WeWork S-1 Registration Statement',
         date: '2019-08-14',
         speaker: 'WeWork S-1, opening line',
@@ -864,7 +896,7 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
         speaker: 'Adam Neumann, co-founder (after removal)',
       },
       {
-        text: 'Adam\'s personal dealings with the company were unacceptable.',
+        text: "Adam's personal dealings with the company were unacceptable.",
         source: 'SoftBank statement on WeWork intervention',
         date: '2019-10-23',
         speaker: 'SoftBank, October 2019 statement',
@@ -878,7 +910,8 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       },
       {
         date: '2017-08',
-        event: 'SoftBank leads $4.4B investment at $20B valuation; Son reportedly doubles the round after a 12-minute tour.',
+        event:
+          'SoftBank leads $4.4B investment at $20B valuation; Son reportedly doubles the round after a 12-minute tour.',
         source: 'Brown & Farrell (2021); Bloomberg reporting',
       },
       {
@@ -888,7 +921,8 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       },
       {
         date: '2019-04',
-        event: 'Neumann sells ~$700M of his shares through loans and secondary transactions before IPO.',
+        event:
+          'Neumann sells ~$700M of his shares through loans and secondary transactions before IPO.',
         source: 'WSJ, July 2019',
       },
       {
@@ -898,7 +932,8 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       },
       {
         date: '2019-09-17',
-        event: 'WeWork postpones IPO amid investor pushback over governance, valuation, related-party transactions.',
+        event:
+          'WeWork postpones IPO amid investor pushback over governance, valuation, related-party transactions.',
         source: 'We Company press release',
       },
       {
@@ -908,7 +943,8 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       },
       {
         date: '2019-10-22',
-        event: 'SoftBank rescue package values WeWork at $8B — an 83% decline from the $47B January round. Neumann receives ~$1.7B exit package.',
+        event:
+          'SoftBank rescue package values WeWork at $8B — an 83% decline from the $47B January round. Neumann receives ~$1.7B exit package.',
         source: 'SoftBank investor presentation, October 2019',
       },
       {
@@ -927,7 +963,8 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
         name: 'Adam Neumann',
         role: 'Co-founder & CEO',
         position: 'advocate',
-        notes: 'Held 20:1 super-voting shares pre-IPO; removed as CEO September 2019 with ~$1.7B exit package.',
+        notes:
+          'Held 20:1 super-voting shares pre-IPO; removed as CEO September 2019 with ~$1.7B exit package.',
       },
       {
         name: 'Miguel McKelvey',
@@ -938,7 +975,8 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
         name: 'Masayoshi Son',
         role: 'SoftBank Group CEO (lead investor)',
         position: 'advocate',
-        notes: 'Pushed WeWork valuation from $5B (2015) to $47B (2019). Later acknowledged "my investment judgment was poor."',
+        notes:
+          'Pushed WeWork valuation from $5B (2015) to $47B (2019). Later acknowledged "my investment judgment was poor."',
       },
       {
         name: 'Rajeev Misra',
@@ -961,7 +999,8 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
         name: 'Public market investors',
         role: 'S-1 audience',
         position: 'dissenter',
-        notes: 'The market itself rejected the IPO — the single clearest "decision intelligence" check in the timeline was the investor community\'s refusal to buy the S-1 narrative.',
+        notes:
+          'The market itself rejected the IPO — the single clearest "decision intelligence" check in the timeline was the investor community\'s refusal to buy the S-1 narrative.',
       },
     ],
     counterfactual: {
@@ -977,15 +1016,17 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       grade: 'F',
       topBiases: ['framing_effect', 'overconfidence_bias', 'authority_bias'],
       rationale:
-        'Community Adjusted EBITDA alone is a framing-effect catastrophe. Combined with Neumann\'s 20:1 voting control, related-party self-dealing, and SoftBank\'s anchor-investor status suppressing independent scrutiny, this is a decision process with no working circuit-breaker — exactly what DQI is designed to identify.',
+        "Community Adjusted EBITDA alone is a framing-effect catastrophe. Combined with Neumann's 20:1 voting control, related-party self-dealing, and SoftBank's anchor-investor status suppressing independent scrutiny, this is a decision process with no working circuit-breaker — exactly what DQI is designed to identify.",
     },
     postMortemCitations: [
       {
-        label: 'Eliot Brown & Maureen Farrell, "The Cult of We: WeWork, Adam Neumann, and the Great Startup Delusion"',
+        label:
+          'Eliot Brown & Maureen Farrell, "The Cult of We: WeWork, Adam Neumann, and the Great Startup Delusion"',
         year: 2021,
       },
       {
-        label: 'Reeves Wiedeman, "Billion Dollar Loser: The Epic Rise and Spectacular Fall of Adam Neumann and WeWork"',
+        label:
+          'Reeves Wiedeman, "Billion Dollar Loser: The Epic Rise and Spectacular Fall of Adam Neumann and WeWork"',
         year: 2020,
       },
       {
@@ -1042,7 +1083,8 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
     preDecisionEvidence: {
       document:
         "Quibi's 2019 investor deck projected 7M paid subscribers within the first year at $4.99/$7.99/month. The plan was premised on three assumptions: (1) consumers would pay for premium short-form content competing with free YouTube/TikTok, (2) mobile-only consumption would be preserved via technical DRM, and (3) commute-time viewing would be the primary use case. Internal product prototypes launched April 2020 as COVID-19 shelter-in-place eliminated commutes. Social-sharing features were intentionally omitted — despite focus-group feedback identifying shareability as a top-3 user request.",
-      source: "Quibi investor materials (2019-2020); Bloomberg Businessweek 'Inside the Meltdown of Quibi' (Lucas Shaw, 2020); Vanity Fair reporting",
+      source:
+        "Quibi investor materials (2019-2020); Bloomberg Businessweek 'Inside the Meltdown of Quibi' (Lucas Shaw, 2020); Vanity Fair reporting",
       date: '2019-08',
       documentType: 'investor_deck',
       detectableRedFlags: [
@@ -1052,7 +1094,12 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
         'Commute-time use case as primary engagement driver — single-point forecast with no pandemic or WFH sensitivity',
         'Founder duo (Katzenberg/Whitman) raising $1.75B before validating product-market fit',
       ],
-      flaggableBiases: ['overconfidence_bias', 'halo_effect', 'confirmation_bias', 'planning_fallacy'],
+      flaggableBiases: [
+        'overconfidence_bias',
+        'halo_effect',
+        'confirmation_bias',
+        'planning_fallacy',
+      ],
       hypotheticalAnalysis:
         "DI would flag Quibi as the canonical halo-effect product failure. Katzenberg's DreamWorks prestige and Whitman's eBay operational reputation caused investors to treat a fragile hypothesis (Gen Z will pay for short-form premium) as a known quantity. A bias-adjusted process would have staged-gated the capital: raise $200M, build MVP, validate conversion in a single market, *then* scale. Raising $1.75B pre-launch locked in the premium-mobile-only strategy so tightly that when COVID invalidated the commute-time core thesis, there was no pivot runway.",
     },
@@ -1157,7 +1204,8 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
     preDecisionEvidence: {
       document:
         "IBM's Watson Health marketing materials and MD Anderson partnership agreements (2013-2016) claimed Watson for Oncology could provide evidence-based treatment recommendations from unstructured patient records. Internal IBM engineering reports acknowledged the system's training dataset was largely synthetic cases rather than real patients. STAT News (July 2018) obtained internal documents showing Watson recommended 'multiple examples of unsafe and incorrect cancer treatments,' including drugs that could worsen bleeding in a patient with severe bleeding. MD Anderson terminated the Watson partnership in 2017 after spending $62M.",
-      source: "STAT News investigation (Ross & Swetlitz, July 2018); University of Texas System internal audit of MD Anderson Watson contract (2017)",
+      source:
+        'STAT News investigation (Ross & Swetlitz, July 2018); University of Texas System internal audit of MD Anderson Watson contract (2017)',
       date: '2016-09',
       documentType: 'risk_assessment',
       detectableRedFlags: [
@@ -1167,7 +1215,12 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
         'Oncology recommendations flagged by physicians as inconsistent with evidence-based guidelines',
         'IBM Watson demos curated to avoid known failure modes rather than surfacing them',
       ],
-      flaggableBiases: ['overconfidence_bias', 'confirmation_bias', 'planning_fallacy', 'halo_effect'],
+      flaggableBiases: [
+        'overconfidence_bias',
+        'confirmation_bias',
+        'planning_fallacy',
+        'halo_effect',
+      ],
       hypotheticalAnalysis:
         "DI would flag IBM Watson Health as a canonical 'marketing-preceded-product' halo-effect failure. Watson's 2011 Jeopardy! win created a public perception of competence that IBM then leveraged into healthcare without validating the technology transfer. Synthetic training data is a binary red flag — any medical AI deployment using non-real patient data should face an escalated review gate. A bias-adjusted process would have required MD Anderson and other customer deployments to demonstrate documented clinical accuracy on real cases before further investment, rather than compounding the sunk cost as problems emerged.",
     },
@@ -1213,7 +1266,8 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
     preDecisionEvidence: {
       document:
         "Juicero's Series B pitch deck (June 2016) raised $70M at $270M valuation on the premise that a $699 Wi-Fi-connected juice press would sell to home and commercial customers through proprietary subscription juice pouches. The device contained four microprocessors, QR-code scanners, network connectivity, and a 4-ton pressing mechanism. No internal user-testing documented a comparison between the machine and hand-squeezing the pouches. Investors included Google Ventures, Kleiner Perkins, and Campbell Soup Co.",
-      source: "Juicero Series B investor materials; Bloomberg investigation (Huet & Zaleski, April 2017) — 'Silicon Valley's $400 Juicer May Be Feeling the Squeeze'",
+      source:
+        "Juicero Series B investor materials; Bloomberg investigation (Huet & Zaleski, April 2017) — 'Silicon Valley's $400 Juicer May Be Feeling the Squeeze'",
       date: '2016-06',
       documentType: 'investor_deck',
       detectableRedFlags: [
@@ -1223,7 +1277,12 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
         'QR-scanning DRM preventing out-of-date pouches from being pressed — adding failure modes without adding value',
         'Google Ventures + Kleiner Perkins led rounds without demanding a hand-squeeze comparison test',
       ],
-      flaggableBiases: ['overconfidence_bias', 'bandwagon_effect', 'halo_effect', 'planning_fallacy'],
+      flaggableBiases: [
+        'overconfidence_bias',
+        'bandwagon_effect',
+        'halo_effect',
+        'planning_fallacy',
+      ],
       hypotheticalAnalysis:
         "DI would flag Juicero as the canonical 'tier-1-VC bandwagon + over-engineered product' failure. Google Ventures' lead investment created social proof that subsequent investors relied on rather than performing independent product validation. A bias-adjusted due diligence process would have required the most basic comparison test — does the machine provide meaningful value over manual pressing? — as a precondition for capital commitment. The Bloomberg reporters' video of hand-squeezing the pouches was a 30-second experiment that could have been done in any due-diligence meeting.",
     },

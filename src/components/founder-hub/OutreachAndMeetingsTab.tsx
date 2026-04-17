@@ -41,8 +41,8 @@ export function OutreachAndMeetingsTab({ founderPass }: Props) {
         <div style={kicker}>Generate Outreach</div>
         <h2 style={title}>Draft tailored messages in seconds</h2>
         <p style={subtitle}>
-          Paste a LinkedIn URL or profile text, pick an intent, and get a tailored message
-          backed by your positioning. Save to the pipeline above to track every prospect.
+          Paste a LinkedIn URL or profile text, pick an intent, and get a tailored message backed by
+          your positioning. Save to the pipeline above to track every prospect.
         </p>
       </div>
 

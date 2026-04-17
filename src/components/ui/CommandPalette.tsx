@@ -337,7 +337,9 @@ export function CommandPalette() {
       {
         id: 'open-last-analysis',
         label: firstDocId ? 'Open Last Analysis' : 'Open Last Analysis (no documents yet)',
-        description: firstDocId ? 'Jump to your most recent document' : 'Upload a doc to get started',
+        description: firstDocId
+          ? 'Jump to your most recent document'
+          : 'Upload a doc to get started',
         icon: <FileText size={16} />,
         action: () => {
           if (firstDocId) navigate(`/documents/${firstDocId}`);

@@ -14,8 +14,8 @@ const TOUR_STEPS: Step[] = [
     title: 'Drop in your strategic memo',
     content: (
       <>
-        Start here. Upload a strategic memo, board deck, or market-entry recommendation —
-        PDF, DOCX, or PPTX (speaker notes included). The 60-second audit starts the moment it lands.
+        Start here. Upload a strategic memo, board deck, or market-entry recommendation — PDF, DOCX,
+        or PPTX (speaker notes included). The 60-second audit starts the moment it lands.
       </>
     ),
     selector: '#onborda-upload',
@@ -29,8 +29,8 @@ const TOUR_STEPS: Step[] = [
     title: 'Your audit usage, at a glance',
     content: (
       <>
-        Every audit counts against your monthly plan. Free tier gets 4 audits/month — this
-        pill shows how many are left and warns you before you hit the cap.
+        Every audit counts against your monthly plan. Free tier gets 4 audits/month — this pill
+        shows how many are left and warns you before you hit the cap.
       </>
     ),
     selector: '#onborda-usage-meter',
@@ -44,9 +44,9 @@ const TOUR_STEPS: Step[] = [
     title: 'Analytics + your Decision Graph',
     content: (
       <>
-        Analytics surfaces Decision Quality Index across quarters, repeat biases by theme, and
-        the Decision Knowledge Graph — every audited memo joins it, so today&apos;s decision
-        inherits yesterday&apos;s lessons. This is where compounding shows up.
+        Analytics surfaces Decision Quality Index across quarters, repeat biases by theme, and the
+        Decision Knowledge Graph — every audited memo joins it, so today&apos;s decision inherits
+        yesterday&apos;s lessons. This is where compounding shows up.
       </>
     ),
     selector: '#onborda-nav-analytics',
@@ -57,13 +57,7 @@ const TOUR_STEPS: Step[] = [
   },
 ];
 
-function TourCard({
-  step,
-  currentStep,
-  totalSteps,
-  nextStep,
-  prevStep,
-}: CardComponentProps) {
+function TourCard({ step, currentStep, totalSteps, nextStep, prevStep }: CardComponentProps) {
   const { closeOnborda } = useOnborda();
 
   const handleFinish = () => {
@@ -92,8 +86,7 @@ function TourCard({
         maxWidth: 360,
         boxShadow: '0 20px 48px rgba(15, 23, 42, 0.28)',
         color: 'var(--text-primary, #0F172A)',
-        fontFamily:
-          "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif",
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif",
       }}
     >
       <div

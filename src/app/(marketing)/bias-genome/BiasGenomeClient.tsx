@@ -1,9 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import {
-  BiasGenomeTable,
-} from '@/components/marketing/genome/BiasGenomeTable';
+import { BiasGenomeTable } from '@/components/marketing/genome/BiasGenomeTable';
 import { IndustryFilter, type IndustryOption } from '@/components/marketing/genome/IndustryFilter';
 import {
   filterGenomeByIndustry,

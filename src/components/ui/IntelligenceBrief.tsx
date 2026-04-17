@@ -133,8 +133,7 @@ function getContextualTip(
       const pending = metrics?.pendingOutcomes ?? 0;
       const closure = metrics?.loopClosureRate;
       if (pending > 0) {
-        const closurePct =
-          closure != null ? ` Loop closure: ${Math.round(closure * 100)}%.` : '';
+        const closurePct = closure != null ? ` Loop closure: ${Math.round(closure * 100)}%.` : '';
         return `${pending} decision${pending === 1 ? '' : 's'} awaiting outcome reports. Each one you close recalibrates the DQI signal for the bias${pending === 1 ? '' : 'es'} involved.${closurePct}`;
       }
       if (closure != null) {

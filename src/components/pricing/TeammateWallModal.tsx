@@ -228,7 +228,12 @@ export function TeammateWallModal({ open, onClose, source = 'unknown' }: Teammat
           >
             <Check
               size={14}
-              style={{ color: '#16A34A', display: 'inline', marginRight: 6, verticalAlign: 'middle' }}
+              style={{
+                color: '#16A34A',
+                display: 'inline',
+                marginRight: 6,
+                verticalAlign: 'middle',
+              }}
             />
             <strong style={{ color: '#0F172A' }}>You stay in control.</strong> Your Personal
             Decision History only merges into the team graph with your explicit opt-in during team

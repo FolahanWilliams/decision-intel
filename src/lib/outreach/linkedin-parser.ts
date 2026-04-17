@@ -36,8 +36,7 @@ export async function fetchLinkedInProfile(input: {
       method: 'GET',
       redirect: 'follow',
       headers: {
-        'User-Agent':
-          'Mozilla/5.0 (compatible; DecisionIntelBot/1.0; +https://decision-intel.com)',
+        'User-Agent': 'Mozilla/5.0 (compatible; DecisionIntelBot/1.0; +https://decision-intel.com)',
         Accept: 'text/html,application/xhtml+xml',
       },
       signal: AbortSignal.timeout(8_000),

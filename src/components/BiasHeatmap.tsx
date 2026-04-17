@@ -124,7 +124,10 @@ export function BiasHeatmap({ content, biases }: BiasHeatmapProps) {
                                 `}
                   style={{ borderColor: 'var(--border-color)' }}
                 >
-                  <div className="flex items-center justify-between mb-2 pb-2 border-b" style={{ borderColor: 'var(--border-color)' }}>
+                  <div
+                    className="flex items-center justify-between mb-2 pb-2 border-b"
+                    style={{ borderColor: 'var(--border-color)' }}
+                  >
                     <p className="font-bold text-warning text-sm">
                       {formatBiasName(part.bias.biasType)}
                     </p>

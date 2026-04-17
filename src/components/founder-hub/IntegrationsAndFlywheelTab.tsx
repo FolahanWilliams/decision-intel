@@ -18,8 +18,7 @@ import useSWR from 'swr';
 import Link from 'next/link';
 import { card, sectionTitle, badge } from '@/components/founder-hub/shared-styles';
 
-const statusFetcher = (url: string) =>
-  fetch(url).then(r => (r.ok ? r.json() : null));
+const statusFetcher = (url: string) => fetch(url).then(r => (r.ok ? r.json() : null));
 
 type SlackStatus = { connected?: boolean; teamName?: string; installedAt?: string };
 type DriveStatus = { connected?: boolean; driveEmail?: string; monitoredFolders?: string[] };
@@ -46,8 +45,7 @@ function StatusTile({
 }) {
   const stateColor =
     state === 'connected' ? '#22c55e' : state === 'loading' ? '#6b7280' : 'var(--text-muted)';
-  const StateIcon =
-    state === 'loading' ? Loader2 : state === 'connected' ? CheckCircle2 : Circle;
+  const StateIcon = state === 'loading' ? Loader2 : state === 'connected' ? CheckCircle2 : Circle;
 
   return (
     <div
@@ -64,9 +62,7 @@ function StatusTile({
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <span style={{ color }}>{icon}</span>
-        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
-          {label}
-        </span>
+        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>{label}</span>
         <span style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
           <StateIcon
             size={14}

@@ -88,8 +88,7 @@ export function BoardroomSimViz() {
       : (votes.REJECT ?? 0) > total / 2
         ? 'REJECTED'
         : 'MIXED';
-  const verdictColor =
-    verdict === 'APPROVED' ? C.green : verdict === 'REJECTED' ? C.red : C.amber;
+  const verdictColor = verdict === 'APPROVED' ? C.green : verdict === 'REJECTED' ? C.red : C.amber;
 
   return (
     <div
@@ -168,7 +167,15 @@ export function BoardroomSimViz() {
               <div style={{ minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, flexWrap: 'wrap' }}>
                   <span style={{ fontSize: 13, fontWeight: 700, color: C.slate900 }}>{p.role}</span>
-                  <span style={{ fontSize: 10.5, fontWeight: 600, color: C.slate400, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  <span
+                    style={{
+                      fontSize: 10.5,
+                      fontWeight: 600,
+                      color: C.slate400,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.06em',
+                    }}
+                  >
                     · {p.priming}
                   </span>
                 </div>

@@ -80,8 +80,8 @@ export function CaseStudyCta({ slug, company, hasDeepAnalysis }: CaseStudyCtaPro
           Got it &mdash; we&apos;ll be in touch shortly.
         </h3>
         <p style={{ fontSize: 14, color: C.slate400, margin: 0 }}>
-          You&apos;ll hear from the founder within a business day with a sample audit of one of
-          your own strategic memos.
+          You&apos;ll hear from the founder within a business day with a sample audit of one of your
+          own strategic memos.
         </p>
       </div>
     );
@@ -108,7 +108,15 @@ export function CaseStudyCta({ slug, company, hasDeepAnalysis }: CaseStudyCtaPro
             animation: 'pulse 2s infinite',
           }}
         />
-        <span style={{ fontSize: 11, fontWeight: 700, color: C.green, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            color: C.green,
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px',
+          }}
+        >
           Pilot slots available
         </span>
       </div>
@@ -118,8 +126,8 @@ export function CaseStudyCta({ slug, company, hasDeepAnalysis }: CaseStudyCtaPro
       </h3>
       <p style={{ fontSize: 14, color: C.slate400, marginBottom: 20, lineHeight: 1.6 }}>
         Upload a strategic memo or board deck. Get the same{' '}
-        {hasDeepAnalysis ? 'hindsight-stripped analysis' : 'bias audit'} you just saw for{' '}
-        {company}, on your own high-stakes call, in under 60 seconds.
+        {hasDeepAnalysis ? 'hindsight-stripped analysis' : 'bias audit'} you just saw for {company},
+        on your own high-stakes call, in under 60 seconds.
       </p>
 
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 16 }}>
@@ -174,8 +182,8 @@ export function CaseStudyCta({ slug, company, hasDeepAnalysis }: CaseStudyCtaPro
         }}
       >
         <p style={{ fontSize: 12, color: C.slate400, marginBottom: 10 }}>
-          Or leave your email, we&apos;ll run a strategic memo of your choosing and send the
-          readout within a business day.
+          Or leave your email, we&apos;ll run a strategic memo of your choosing and send the readout
+          within a business day.
         </p>
         <form onSubmit={handleSubmit} style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <input

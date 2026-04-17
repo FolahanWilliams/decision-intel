@@ -127,7 +127,16 @@ export function CaseBiasWeb({
         padding: '24px 28px 22px',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, marginBottom: 8 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: 16,
+          marginBottom: 8,
+        }}
+      >
         <div>
           <div
             style={{
@@ -204,8 +213,7 @@ export function CaseBiasWeb({
             const curveFactor = 0.18;
             const qx = mx + curveDx * curveFactor;
             const qy = my + curveDy * curveFactor;
-            const isHighlighted =
-              hover !== null && (hover === e.from || hover === e.to);
+            const isHighlighted = hover !== null && (hover === e.from || hover === e.to);
             return (
               <motion.path
                 key={`${e.from}-${e.to}-${i}`}

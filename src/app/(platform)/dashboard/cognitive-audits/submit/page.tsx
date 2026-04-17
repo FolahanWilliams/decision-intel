@@ -221,8 +221,8 @@ export default function SubmitDecisionPage() {
           </div>
           <p className="text-muted">
             Paste a strategic memo, upload a board deck, or submit a meeting transcript. We score
-            the reasoning, predict the objections your steering committee will raise, and add it
-            to your Knowledge Graph.
+            the reasoning, predict the objections your steering committee will raise, and add it to
+            your Knowledge Graph.
           </p>
         </header>
 

@@ -170,11 +170,7 @@ export function CopilotPageContent() {
         }}
       >
         <div className="p-4 border-b space-y-2" style={{ borderColor: 'var(--border-color)' }}>
-          <button
-            onClick={handleNewDecision}
-            className="btn btn-primary w-full"
-            style={{ gap: 8 }}
-          >
+          <button onClick={handleNewDecision} className="btn btn-primary w-full" style={{ gap: 8 }}>
             <Plus className="h-4 w-4" />
             New Decision
           </button>
@@ -466,11 +462,7 @@ export function CopilotPageContent() {
               </div>
 
               <div className="flex justify-center">
-                <button
-                  onClick={handleNewDecision}
-                  className="btn btn-primary"
-                  style={{ gap: 8 }}
-                >
+                <button onClick={handleNewDecision} className="btn btn-primary" style={{ gap: 8 }}>
                   <Plus className="h-4 w-4" />
                   New Decision Session
                 </button>

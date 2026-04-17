@@ -189,7 +189,8 @@ export const TECHNOLOGY_EXTENDED_CASES: FailureCase[] = [
     preDecisionEvidence: {
       document:
         "Myspace's 2006-2008 strategic documents under News Corp ownership specified annual revenue targets of $500M+ growing to $1B by 2009, with advertising yield-per-user as the primary KPI. CEO Chris DeWolfe's initiatives to improve platform experience (redesign, anti-spam, developer platform) were repeatedly deprioritized when they conflicted with short-term revenue metrics. When Facebook opened registration beyond universities (September 2006), Myspace internal reports dismissed Facebook as a 'college market' competitor through early 2008 despite declining Myspace engagement.",
-      source: "News Corp 10-K filings (2005-2010); Felix Gillette 'The Rise and Inglorious Fall of Myspace' (Bloomberg Businessweek, 2011)",
+      source:
+        "News Corp 10-K filings (2005-2010); Felix Gillette 'The Rise and Inglorious Fall of Myspace' (Bloomberg Businessweek, 2011)",
       date: '2008-06',
       documentType: 'strategy_document',
       detectableRedFlags: [

@@ -282,12 +282,13 @@ export default function TeamPage() {
             {org.name.charAt(0).toUpperCase()}
           </div>
           <div>
-            <h1 style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.03em', margin: 0 }}>
+            <h1
+              style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.03em', margin: 0 }}
+            >
               <span className="text-gradient">{org.name}</span>
             </h1>
             <p className="page-subtitle">
-              {org.members.length} member{org.members.length !== 1 ? 's' : ''} &middot; /
-              {org.slug}
+              {org.members.length} member{org.members.length !== 1 ? 's' : ''} &middot; /{org.slug}
             </p>
           </div>
         </div>
@@ -569,8 +570,7 @@ function MemberRow({
             fontSize: '12px',
             padding: '3px 10px',
             borderRadius: '12px',
-            background:
-              member.role === 'owner' ? 'rgba(234, 179, 8, 0.12)' : 'var(--bg-tertiary)',
+            background: member.role === 'owner' ? 'rgba(234, 179, 8, 0.12)' : 'var(--bg-tertiary)',
             color: ROLE_COLORS[member.role],
             fontWeight: 600,
           }}

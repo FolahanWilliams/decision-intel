@@ -385,9 +385,7 @@ async function runCognitiveAudit(decisionId: string, input: HumanDecisionInput, 
     if (schemaDrift) {
       await prisma.humanDecision
         .update({ where: { id: decisionId }, data: { status: 'error' } })
-        .catch(err =>
-          log.warn('Failed to mark HumanDecision as error (schema drift path):', err)
-        );
+        .catch(err => log.warn('Failed to mark HumanDecision as error (schema drift path):', err));
       return;
     }
 

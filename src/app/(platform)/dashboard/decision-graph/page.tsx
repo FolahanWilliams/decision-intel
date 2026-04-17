@@ -182,10 +182,7 @@ export default function DecisionGraphPage() {
       {/* Hero-style header — brand-green accent chip + clean title/subtitle */}
       <header className="page-header" style={{ alignItems: 'flex-start' }}>
         <div>
-          <div
-            className="flex items-center gap-sm"
-            style={{ flexWrap: 'wrap', marginBottom: 4 }}
-          >
+          <div className="flex items-center gap-sm" style={{ flexWrap: 'wrap', marginBottom: 4 }}>
             <span
               style={{
                 fontSize: 10,
@@ -333,10 +330,7 @@ export default function DecisionGraphPage() {
               className="card-body flex flex-col items-center justify-center gap-sm"
               style={{ minHeight: 240, padding: '0 24px', textAlign: 'center' }}
             >
-              <Network
-                size={28}
-                style={{ color: 'var(--text-muted)', opacity: 0.5 }}
-              />
+              <Network size={28} style={{ color: 'var(--text-muted)', opacity: 0.5 }} />
               <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
                 Network analysis aggregates patterns across a team&rsquo;s decisions. Switch to the
                 Graph tab to see your personal decision history, or upgrade to Strategy to unlock
@@ -433,7 +427,8 @@ export default function DecisionGraphPage() {
                   <Shield
                     size={20}
                     style={{
-                      color: RISK_COLORS[report.report.riskState.overallRisk] || 'var(--text-muted)',
+                      color:
+                        RISK_COLORS[report.report.riskState.overallRisk] || 'var(--text-muted)',
                     }}
                   />
                   <div>
@@ -502,11 +497,7 @@ export default function DecisionGraphPage() {
                 { label: 'Avg Cluster', value: report.report.metrics.avgClusterSize },
                 { label: 'Isolated', value: report.report.metrics.isolatedNodes },
               ].map((m, i) => (
-                <div
-                  key={i}
-                  className="card"
-                  style={{ padding: '14px 10px', textAlign: 'center' }}
-                >
+                <div key={i} className="card" style={{ padding: '14px 10px', textAlign: 'center' }}>
                   <div
                     style={{
                       fontSize: 19,
@@ -564,10 +555,7 @@ export default function DecisionGraphPage() {
                     </thead>
                     <tbody>
                       {report.report.topNodes.map((n, i) => (
-                        <tr
-                          key={i}
-                          style={{ borderBottom: '1px solid var(--border-color)' }}
-                        >
+                        <tr key={i} style={{ borderBottom: '1px solid var(--border-color)' }}>
                           <td
                             style={{
                               padding: '8px 16px',

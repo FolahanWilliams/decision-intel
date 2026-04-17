@@ -39,7 +39,8 @@ export const HEALTHCARE_CASES: FailureCase[] = [
     preDecisionEvidence: {
       document:
         "The VIGOR study published in NEJM (November 2000) compared Vioxx to naproxen and found a 5x higher rate of heart attacks in the Vioxx arm. Merck's published interpretation attributed the difference to naproxen having a cardioprotective effect — a hypothesis not established by prior cardiovascular trials. Internal Merck email correspondence later released in litigation showed scientists had raised concerns about the cardioprotective hypothesis as early as 1996 in response to the rat studies and 1997 planning memos. The APPROVe trial (confirming cardiovascular risk) was not run until 2001-2004.",
-      source: 'FDA NDA 21-042/S-007; Bombardier et al., NEJM 343:1520 (2000); Merck internal emails disclosed in Vioxx MDL 1657',
+      source:
+        'FDA NDA 21-042/S-007; Bombardier et al., NEJM 343:1520 (2000); Merck internal emails disclosed in Vioxx MDL 1657',
       date: '2000-11-23',
       documentType: 'risk_assessment',
       detectableRedFlags: [
@@ -94,17 +95,23 @@ export const HEALTHCARE_CASES: FailureCase[] = [
     preDecisionEvidence: {
       document:
         "Purdue Pharma's 1996 OxyContin launch materials cited a 1980 Porter & Jick letter-to-the-editor in NEJM claiming 'less than 1 percent' of hospitalized patients receiving opioids became addicted. The letter was a single-paragraph retrospective observation not designed or peer-reviewed as an addiction-risk study. Purdue's sales force training materials used this citation as the foundation for the claim that OxyContin had low addiction potential. Internal documents later released in Commonwealth v. Purdue (2019) showed the Sackler family was aware by 2001 of widespread diversion and addiction but expanded marketing intensity rather than reducing it.",
-      source: 'DOJ Settlement with Purdue Pharma (2020); Commonwealth of Massachusetts v. Purdue Pharma, Complaint 18-1808 (2019); Keefe, "Empire of Pain" (2021)',
+      source:
+        'DOJ Settlement with Purdue Pharma (2020); Commonwealth of Massachusetts v. Purdue Pharma, Complaint 18-1808 (2019); Keefe, "Empire of Pain" (2021)',
       date: '1996-01',
       documentType: 'investor_deck',
       detectableRedFlags: [
-        "1980 Porter & Jick letter cited as addiction-risk evidence — not a study, not designed for that question",
+        '1980 Porter & Jick letter cited as addiction-risk evidence — not a study, not designed for that question',
         'Marketing claims outpaced clinical addiction-risk evidence by orders of magnitude',
         'Internal awareness by 2001 of diversion/addiction epidemic documented in sales force communications',
         'Sales incentive structures rewarded volume over appropriate prescribing patterns',
-        "Sackler family took $10B+ in distributions while litigation liability mounted — extracting value ahead of settlement",
+        'Sackler family took $10B+ in distributions while litigation liability mounted — extracting value ahead of settlement',
       ],
-      flaggableBiases: ['confirmation_bias', 'loss_aversion', 'selective_perception', 'authority_bias'],
+      flaggableBiases: [
+        'confirmation_bias',
+        'loss_aversion',
+        'selective_perception',
+        'authority_bias',
+      ],
       hypotheticalAnalysis:
         "DI would flag Purdue's use of Porter & Jick as the canonical selective-perception failure. A bias-adjusted clinical evidence review would have recognized that a 5-sentence retrospective letter cannot carry the weight of a blockbuster-drug safety claim. The organizational decision process failure runs deeper: internal documents showing awareness of real-world harm paired with *expanded* marketing intensity is the pattern that distinguishes negligence from intentional maximization of harm. A working decision-intelligence review would have required annual independent epidemiological updates as a marketing precondition.",
     },
@@ -241,7 +248,12 @@ export const ENERGY_INDUSTRIAL_CASES: FailureCase[] = [
         'Hydrocarbon detection during cement displacement dismissed as "expected" — no contingency escalation',
         'Negative pressure test interpreted via "bladder effect" — a concept with no engineering documentation',
       ],
-      flaggableBiases: ['overconfidence_bias', 'sunk_cost_fallacy', 'cognitive_misering', 'groupthink'],
+      flaggableBiases: [
+        'overconfidence_bias',
+        'sunk_cost_fallacy',
+        'cognitive_misering',
+        'groupthink',
+      ],
       hypotheticalAnalysis:
         "DI would flag the Macondo negative-pressure interpretation as the textbook case of schedule-induced cognitive misering. With $1M/day overruns, decision-makers shortcut analysis to reach the answer that let drilling continue. The invention of the 'bladder effect' explanation is what the DQI framework flags as motivated reasoning — the team searched for any framework that justified proceeding. A bias-adjusted decision process would have required a second independent pressure test as a bright-line gate.",
     },
@@ -291,7 +303,8 @@ export const ENERGY_INDUSTRIAL_CASES: FailureCase[] = [
     preDecisionEvidence: {
       document:
         "Volkswagen Group committed to an 'American Diesel Offensive' to capture the US clean-diesel market with the EA189 and later EA288 engines. Engineering teams informed management that the technical combination of high power, fuel economy, and Tier 2 Bin 5 NOx compliance could not be achieved with the available urea-tank packaging. Senior engineering leadership instructed the team to 'find a solution' rather than revise the performance-or-emissions tradeoff upward in management reporting.",
-      source: "VW internal engineering briefings (cited in Jones Day internal investigation summary); US DOJ Statement of Facts, U.S. v. Volkswagen AG",
+      source:
+        'VW internal engineering briefings (cited in Jones Day internal investigation summary); US DOJ Statement of Facts, U.S. v. Volkswagen AG',
       date: '2006',
       documentType: 'strategy_document',
       detectableRedFlags: [
@@ -461,13 +474,14 @@ export const ENERGY_INDUSTRIAL_CASES: FailureCase[] = [
     preDecisionEvidence: {
       document:
         "On January 27, 1986 (the evening before the Challenger launch), Morton Thiokol engineers held a teleconference with NASA's Marshall Space Flight Center management. Thiokol engineers Roger Boisjoly and Arnie Thompson presented data showing O-ring erosion correlated with low launch-pad temperatures. Their recommendation was NO LAUNCH below 53°F. Forecast for January 28 was 29-36°F at launch time. NASA Marshall management pushed back, asking Thiokol to reconsider. After Thiokol management caucused away from the engineering team, they reversed the no-launch recommendation and cleared the launch. Boisjoly and Thompson were not polled in the reversed recommendation.",
-      source: 'Rogers Commission Report (1986), Chapter V; Diane Vaughan, "The Challenger Launch Decision" (1996)',
+      source:
+        'Rogers Commission Report (1986), Chapter V; Diane Vaughan, "The Challenger Launch Decision" (1996)',
       date: '1986-01-27',
       documentType: 'risk_assessment',
       detectableRedFlags: [
         'Engineering recommendation: NO LAUNCH below 53°F. Forecast: 29-36°F at launch.',
         'Burden of proof inverted — "prove it is unsafe" rather than "prove it is safe"',
-        "Thiokol management caucused WITHOUT the engineers who raised the objection",
+        'Thiokol management caucused WITHOUT the engineers who raised the objection',
         'Prior launches had shown O-ring erosion — treated as successes rather than warning signs',
         'Schedule pressure from State of the Union address and "Teacher in Space" political commitment',
       ],

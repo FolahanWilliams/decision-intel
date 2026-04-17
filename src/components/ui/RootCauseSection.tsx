@@ -64,10 +64,7 @@ export function RootCauseSection({ analysisId, orgId }: RootCauseSectionProps) {
       className={cn('p-6 rounded-xl mt-8', 'liquid-glass')}
       style={{ border: '1px solid var(--border-color)' }}
     >
-      <h2
-        className="text-xl font-semibold mb-4"
-        style={{ color: 'var(--text-primary)' }}
-      >
+      <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
         Root Cause Analysis
       </h2>
       <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>
@@ -88,10 +85,7 @@ export function RootCauseSection({ analysisId, orgId }: RootCauseSectionProps) {
                   ) : (
                     <TrendingUp size={12} className="text-red-400" />
                   )}
-                  <span
-                    className="text-sm font-medium"
-                    style={{ color: 'var(--text-primary)' }}
-                  >
+                  <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                     {formatBiasName(attr.biasType)}
                   </span>
                   <span

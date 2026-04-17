@@ -76,32 +76,38 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     timeline: [
       {
         date: '2006-Q4',
-        event: 'Lehman becomes the #1 underwriter of U.S. MBS, aggressively expanding commercial real estate via Archstone acquisition commitments.',
+        event:
+          'Lehman becomes the #1 underwriter of U.S. MBS, aggressively expanding commercial real estate via Archstone acquisition commitments.',
         source: 'FCIC Report, Chapter 9',
       },
       {
         date: '2007-03',
-        event: 'Risk Committee memo recommends maintaining MBS exposure; cites "peer leverage" as benchmark.',
+        event:
+          'Risk Committee memo recommends maintaining MBS exposure; cites "peer leverage" as benchmark.',
         source: 'Valukas Report, Vol. 1',
       },
       {
         date: '2007-Q2',
-        event: 'CRO Madelyn Antoncic raises concerns about leverage; is sidelined from risk decisions.',
+        event:
+          'CRO Madelyn Antoncic raises concerns about leverage; is sidelined from risk decisions.',
         source: 'Valukas Report, Vol. 3 (Antoncic testimony)',
       },
       {
         date: '2007-12',
-        event: 'Repo 105 transactions escalate — $38.6B in assets temporarily removed from balance sheet at quarter-end.',
+        event:
+          'Repo 105 transactions escalate — $38.6B in assets temporarily removed from balance sheet at quarter-end.',
         source: 'Valukas Report, Vol. 3',
       },
       {
         date: '2008-03-16',
-        event: 'Bear Stearns collapse; Fuld tells staff Lehman is "not Bear Stearns." No material deleveraging follows.',
+        event:
+          'Bear Stearns collapse; Fuld tells staff Lehman is "not Bear Stearns." No material deleveraging follows.',
         source: 'FCIC Report, Chapter 17',
       },
       {
         date: '2008-06',
-        event: 'Lehman reports first quarterly loss ($2.8B); still pays $128M in dividends that quarter.',
+        event:
+          'Lehman reports first quarterly loss ($2.8B); still pays $128M in dividends that quarter.',
         source: 'Lehman Brothers Q2 2008 10-Q',
       },
       {
@@ -111,7 +117,8 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       },
       {
         date: '2008-09-15',
-        event: 'Lehman Brothers Holdings Inc. files Chapter 11 — largest bankruptcy in U.S. history ($691B in assets).',
+        event:
+          'Lehman Brothers Holdings Inc. files Chapter 11 — largest bankruptcy in U.S. history ($691B in assets).',
         source: 'SDNY Case No. 08-13555',
       },
     ],
@@ -120,31 +127,36 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
         name: 'Richard S. Fuld Jr.',
         role: 'Chairman & CEO',
         position: 'advocate',
-        notes: 'Dominated board discussion; publicly rejected multiple buyout approaches (Korea Development Bank, Warren Buffett in 2008).',
+        notes:
+          'Dominated board discussion; publicly rejected multiple buyout approaches (Korea Development Bank, Warren Buffett in 2008).',
       },
       {
         name: 'Joseph Gregory',
         role: 'President & COO',
         position: 'advocate',
-        notes: 'Pushed aggressive expansion into commercial real estate. Fired by Fuld in June 2008 after Q2 loss.',
+        notes:
+          'Pushed aggressive expansion into commercial real estate. Fired by Fuld in June 2008 after Q2 loss.',
       },
       {
         name: 'Madelyn Antoncic',
         role: 'Chief Risk Officer (to 2007)',
         position: 'overruled',
-        notes: 'Raised concerns about leverage and CRE exposure through 2006–2007; moved out of risk role in late 2007.',
+        notes:
+          'Raised concerns about leverage and CRE exposure through 2006–2007; moved out of risk role in late 2007.',
       },
       {
         name: 'Erin Callan',
         role: 'CFO (Dec 2007 – June 2008)',
         position: 'advocate',
-        notes: 'Publicly defended balance sheet through Q1/Q2 2008. Departed shortly before collapse.',
+        notes:
+          'Publicly defended balance sheet through Q1/Q2 2008. Departed shortly before collapse.',
       },
       {
         name: 'Henry "Hank" Kaufman',
         role: 'Board Director (Finance & Risk Committee chair)',
         position: 'silent',
-        notes: 'Economist with deep market expertise; committee met twice in 2006 and twice in 2007 despite the exposure buildup.',
+        notes:
+          'Economist with deep market expertise; committee met twice in 2006 and twice in 2007 despite the exposure buildup.',
       },
     ],
     counterfactual: {
@@ -153,7 +165,7 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       rationale:
         'Lehman had three distinct windows (March 2007 peer concerns, August 2007 Bear hedge-fund collapse, March 2008 Bear bailout) where a less-biased process would have forced deleveraging. The decision to keep expanding through all three is what made failure catastrophic rather than merely painful.',
       estimatedOutcome:
-        'Survival as a significantly smaller firm — likely acquired or recapitalized in 2008 rather than liquidated, preserving ~$600B of counterparty value and avoiding the global credit freeze that Lehman\'s uncontrolled failure triggered.',
+        "Survival as a significantly smaller firm — likely acquired or recapitalized in 2008 rather than liquidated, preserving ~$600B of counterparty value and avoiding the global credit freeze that Lehman's uncontrolled failure triggered.",
     },
     dqiEstimate: {
       score: 22,
@@ -222,7 +234,8 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     preDecisionEvidence: {
       document:
         "Bear Stearns High-Grade Structured Credit Strategies Fund Q1 2007 investor letter reported positive returns and described subprime mortgage default rates as 'consistent with historical norms adjusted for loan-to-value considerations.' The letter defended continued use of 10:1 fund-level leverage on AAA and AA CDO tranches and stated that 'market dislocations create opportunity' as subprime spreads widened. The funds' internal risk models used 2001-2005 default data as the baseline despite 2006 originations being of visibly lower credit quality.",
-      source: 'Bear Stearns Asset Management — High-Grade Structured Credit Fund Q1 2007 investor letter; SEC v. Cioffi & Tannin (2008)',
+      source:
+        'Bear Stearns Asset Management — High-Grade Structured Credit Fund Q1 2007 investor letter; SEC v. Cioffi & Tannin (2008)',
       date: '2007-04',
       documentType: 'investor_deck',
       detectableRedFlags: [
@@ -232,9 +245,14 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
         'Fund managers made private investor communications inconsistent with marks being reported to repo counterparties',
         'Cioffi shifted personal money out of the fund while publicly maintaining bullish stance',
       ],
-      flaggableBiases: ['anchoring_bias', 'overconfidence_bias', 'confirmation_bias', 'recency_bias'],
+      flaggableBiases: [
+        'anchoring_bias',
+        'overconfidence_bias',
+        'confirmation_bias',
+        'recency_bias',
+      ],
       hypotheticalAnalysis:
-        "DI would flag the Bear Stearns CDO funds as an anchoring-to-benign-history failure. Using 2001-2005 subprime default data to model 2006-vintage loans is like using pre-crisis Lehman leverage to justify 2008 positions. The SEC complaint against Cioffi/Tannin later documented private-vs-public inconsistency — a decision process audit would have flagged marks-discrepancy between investor letters and repo pricing as a bright-line red flag requiring escalation outside the portfolio management team.",
+        'DI would flag the Bear Stearns CDO funds as an anchoring-to-benign-history failure. Using 2001-2005 subprime default data to model 2006-vintage loans is like using pre-crisis Lehman leverage to justify 2008 positions. The SEC complaint against Cioffi/Tannin later documented private-vs-public inconsistency — a decision process audit would have flagged marks-discrepancy between investor letters and repo pricing as a bright-line red flag requiring escalation outside the portfolio management team.',
     },
     source:
       'SEC Litigation Release No. 22306 (2012); Bear Stearns Asset Management investor communications',
@@ -272,7 +290,8 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     preDecisionEvidence: {
       document:
         "Internal JPMorgan Chief Investment Office risk reports from Q4 2011 and Q1 2012 documented that the Synthetic Credit Portfolio (SCP) was breaching Value-at-Risk limits on more than 100 days in the first quarter of 2012. The bank switched from a proven VaR model to a new 'VaR model 2' on January 30, 2012 — which halved reported VaR almost overnight. Positions in the CDX.NA.IG.9 index were so large that the portfolio effectively WAS the market, making hedging impossible without moving prices against itself.",
-      source: 'U.S. Senate PSI "JPMorgan Chase Whale Trades" Report (2013), Exhibits 7-12; JPMorgan 10-K FY2012 restatement',
+      source:
+        'U.S. Senate PSI "JPMorgan Chase Whale Trades" Report (2013), Exhibits 7-12; JPMorgan 10-K FY2012 restatement',
       date: '2012-01-30',
       documentType: 'risk_assessment',
       detectableRedFlags: [
@@ -329,7 +348,8 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     preDecisionEvidence: {
       document:
         "Barings' internal audit report on the Singapore futures operation identified that trader Nick Leeson had unsupervised control over both trading and back-office settlement functions — a fundamental violation of segregation-of-duties control. The report flagged the error account (88888) where losses were accumulating but was not escalated with urgency. Leeson's reported profits ($30M in 1994) were inconsistent with the documented arbitrage strategy he was authorized to execute. London management continued to wire margin payments to Singapore on Leeson's request.",
-      source: "Barings internal audit report; Bank of England 'Board of Banking Supervision' Report, Ch. 4",
+      source:
+        "Barings internal audit report; Bank of England 'Board of Banking Supervision' Report, Ch. 4",
       date: '1994-08',
       documentType: 'risk_assessment',
       detectableRedFlags: [
@@ -339,7 +359,12 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
         'Margin payments from London to Singapore grew from £30M to £500M in 12 months',
         'SIMEX inquiries about unusually large Nikkei futures positions were routed through Leeson himself',
       ],
-      flaggableBiases: ['authority_bias', 'gamblers_fallacy', 'overconfidence_bias', 'cognitive_misering'],
+      flaggableBiases: [
+        'authority_bias',
+        'gamblers_fallacy',
+        'overconfidence_bias',
+        'cognitive_misering',
+      ],
       hypotheticalAnalysis:
         "DI would flag Barings as the canonical gambler's-fallacy + authority-bias combination. Leeson's escalating doubling-down after losses is textbook gambler's fallacy ('the next trade will reverse my losses'). London management's authority bias toward Leeson's reported profits caused them to keep funding the error account even as margin calls grew exponentially. Segregation-of-duties is a bright-line control that no bias-adjusted review of Barings' operations would have left unaddressed.",
     },
@@ -428,33 +453,39 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     timeline: [
       {
         date: '1994-02',
-        event: 'LTCM launches with $1.25B from 80 investors at 25× leverage; initial principals include Meriwether, Scholes, Merton, and ex-Fed Vice Chairman David Mullins.',
+        event:
+          'LTCM launches with $1.25B from 80 investors at 25× leverage; initial principals include Meriwether, Scholes, Merton, and ex-Fed Vice Chairman David Mullins.',
         source: 'PWG Report, Appendix A',
       },
       {
         date: '1996',
-        event: 'Returns of 41% net of fees; fund becomes unable to deploy new capital at same convergence spreads, signaling trade crowding.',
+        event:
+          'Returns of 41% net of fees; fund becomes unable to deploy new capital at same convergence spreads, signaling trade crowding.',
         source: 'Lowenstein, "When Genius Failed", ch. 7',
       },
       {
         date: '1997-12',
-        event: 'Fund returns $2.7B to investors — but retains full trading book, actually *increasing* leverage relative to equity base.',
+        event:
+          'Fund returns $2.7B to investors — but retains full trading book, actually *increasing* leverage relative to equity base.',
         source: 'LTCM 1997 investor letter',
       },
       {
         date: '1998-05',
-        event: 'Salomon Smith Barney closes its arbitrage desk, unwinding positions similar to LTCM — the first warning that "convergence" strategies were becoming divergent.',
+        event:
+          'Salomon Smith Barney closes its arbitrage desk, unwinding positions similar to LTCM — the first warning that "convergence" strategies were becoming divergent.',
         source: 'PWG Report, ch. 3',
       },
       {
         date: '1998-08-17',
-        event: 'Russia defaults on ruble-denominated debt; flight-to-quality drives spreads wider rather than narrower. LTCM loses 44% of capital in one month.',
+        event:
+          'Russia defaults on ruble-denominated debt; flight-to-quality drives spreads wider rather than narrower. LTCM loses 44% of capital in one month.',
         source: 'Federal Reserve Board staff study (Kambhu et al., 2007)',
       },
       {
         date: '1998-09-23',
-        event: 'Fed-organized consortium of 14 banks injects $3.625B to prevent forced liquidation; LTCM effectively dissolved.',
-        source: "PWG Report, ch. 4",
+        event:
+          'Fed-organized consortium of 14 banks injects $3.625B to prevent forced liquidation; LTCM effectively dissolved.',
+        source: 'PWG Report, ch. 4',
       },
     ],
     stakeholders: [
@@ -462,13 +493,15 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
         name: 'John Meriwether',
         role: 'Founding Principal & CEO',
         position: 'advocate',
-        notes: 'Pushed to return capital in 1997 to keep per-partner returns high rather than shrink leverage.',
+        notes:
+          'Pushed to return capital in 1997 to keep per-partner returns high rather than shrink leverage.',
       },
       {
         name: 'Myron Scholes',
         role: 'Principal (Nobel Laureate, Options Pricing)',
         position: 'advocate',
-        notes: 'Publicly defended the model framework; later acknowledged leverage as the core error.',
+        notes:
+          'Publicly defended the model framework; later acknowledged leverage as the core error.',
       },
       {
         name: 'Robert Merton',
@@ -479,7 +512,8 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
         name: 'David Mullins',
         role: 'Principal (former Fed Vice Chair)',
         position: 'silent',
-        notes: 'Brought regulatory gravitas but did not publicly flag leverage or crowding concerns.',
+        notes:
+          'Brought regulatory gravitas but did not publicly flag leverage or crowding concerns.',
       },
       {
         name: 'Eric Rosenfeld',
@@ -491,7 +525,7 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       recommendation:
         'Retain 1997 capital base (avoid the forced leverage increase); cap gross leverage at 10:1; diversify across strategies with genuinely uncorrelated drivers; install an independent non-principal risk officer with veto power.',
       rationale:
-        'Every bias LTCM exhibited traces to a closed-loop where the same people who designed the models also signed off on leverage and rejected external challenge. The model wasn\'t the problem — absence of any external risk voice was.',
+        "Every bias LTCM exhibited traces to a closed-loop where the same people who designed the models also signed off on leverage and rejected external challenge. The model wasn't the problem — absence of any external risk voice was.",
       estimatedOutcome:
         'Fund survives Russia default with 15–20% drawdown rather than 44%; likely continues operating through the early 2000s before gradual wind-down.',
     },
@@ -508,11 +542,13 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
         year: 1999,
       },
       {
-        label: 'Roger Lowenstein, "When Genius Failed: The Rise and Fall of Long-Term Capital Management"',
+        label:
+          'Roger Lowenstein, "When Genius Failed: The Rise and Fall of Long-Term Capital Management"',
         year: 2000,
       },
       {
-        label: 'Kambhu, Schuermann & Stiroh, "Hedge Funds, Financial Intermediation, and Systemic Risk" (Federal Reserve Bank of New York Staff Reports, No. 291)',
+        label:
+          'Kambhu, Schuermann & Stiroh, "Hedge Funds, Financial Intermediation, and Systemic Risk" (Federal Reserve Bank of New York Staff Reports, No. 291)',
         year: 2007,
       },
     ],
@@ -554,7 +590,8 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     preDecisionEvidence: {
       document:
         "Enron board meeting minutes from June 1999 document the approval of CFO Andrew Fastow's role as managing partner of LJM Cayman L.P. — a special purpose entity that would transact with Enron. The board waived Enron's Code of Ethics specifically to permit Fastow's dual role. Minutes reflect no challenging questions about the inherent conflict of interest. Similar waivers were granted for LJM2 (October 1999) and Chewco.",
-      source: 'Powers Report (Special Investigative Committee of the Board of Directors of Enron Corp.)',
+      source:
+        'Powers Report (Special Investigative Committee of the Board of Directors of Enron Corp.)',
       date: '1999-06-28',
       documentType: 'board_memo',
       detectableRedFlags: [
@@ -713,7 +750,8 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     timeline: [
       {
         date: '2015-04',
-        event: 'FT Alphaville publishes first "House of Wirecard" posts raising concerns about Asian subsidiaries.',
+        event:
+          'FT Alphaville publishes first "House of Wirecard" posts raising concerns about Asian subsidiaries.',
         source: 'Financial Times, Dan McCrum',
       },
       {
@@ -723,17 +761,20 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       },
       {
         date: '2019-01',
-        event: 'FT publishes leaked internal documents alleging accounting fraud at Wirecard Singapore.',
+        event:
+          'FT publishes leaked internal documents alleging accounting fraud at Wirecard Singapore.',
         source: 'FT investigation, Jan 30 2019',
       },
       {
         date: '2019-02-18',
-        event: 'BaFin imposes a two-month ban on short selling Wirecard stock and files criminal complaint against FT journalists for market manipulation.',
+        event:
+          'BaFin imposes a two-month ban on short selling Wirecard stock and files criminal complaint against FT journalists for market manipulation.',
         source: 'BaFin official announcement',
       },
       {
         date: '2019-04',
-        event: 'EY issues unqualified 2018 audit opinion despite not obtaining direct confirmation from the Philippine trustee banks.',
+        event:
+          'EY issues unqualified 2018 audit opinion despite not obtaining direct confirmation from the Philippine trustee banks.',
         source: 'German Parliamentary Inquiry testimony, 2021',
       },
       {
@@ -743,12 +784,14 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       },
       {
         date: '2020-04-28',
-        event: 'KPMG special audit report: could not verify the existence of the €1.9B or the revenue from three key partner businesses.',
+        event:
+          'KPMG special audit report: could not verify the existence of the €1.9B or the revenue from three key partner businesses.',
         source: 'KPMG Special Investigation Report, April 2020',
       },
       {
         date: '2020-06-18',
-        event: 'BDO confirms from Philippine central bank that the €1.9B never existed in the named accounts.',
+        event:
+          'BDO confirms from Philippine central bank that the €1.9B never existed in the named accounts.',
         source: 'FT, BSP statement',
       },
       {
@@ -785,13 +828,15 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
         name: 'Felix Hufeld',
         role: 'BaFin President (2015–2021)',
         position: 'overruled',
-        notes: 'Forced to resign January 2021 after acknowledging BaFin "was not effective enough."',
+        notes:
+          'Forced to resign January 2021 after acknowledging BaFin "was not effective enough."',
       },
       {
         name: 'Dan McCrum',
         role: 'Financial Times investigative reporter',
         position: 'dissenter',
-        notes: 'Subject of BaFin criminal complaint; reporting vindicated by KPMG and BDO findings.',
+        notes:
+          'Subject of BaFin criminal complaint; reporting vindicated by KPMG and BDO findings.',
       },
     ],
     counterfactual: {
@@ -819,7 +864,8 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
         year: 2020,
       },
       {
-        label: 'Dan McCrum, "Money Men: A Hot Startup, A Billion Dollar Fraud, A Fight for the Truth"',
+        label:
+          'Dan McCrum, "Money Men: A Hot Startup, A Billion Dollar Fraud, A Fight for the Truth"',
         year: 2022,
       },
       {
@@ -871,7 +917,8 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     preDecisionEvidence: {
       document:
         "Credit Suisse prime services risk committee reviewed Archegos Capital exposure in late 2020 and early 2021. The committee documented that Archegos's aggregate gross exposure across prime brokers exceeded $50B against reported family-office equity of ~$10B, implying effective leverage of 5-8x on concentrated single-stock positions. Credit Suisse's initial margin requirements on Archegos total return swaps were set materially below Goldman Sachs and Morgan Stanley — a competitive-intensity decision rather than a risk-based one. Earlier internal recommendations to raise margin were deferred pending relationship-revenue discussions.",
-      source: 'Credit Suisse Special Committee Report on Archegos (Paul, Weiss, July 2021), pp. 26-58',
+      source:
+        'Credit Suisse Special Committee Report on Archegos (Paul, Weiss, July 2021), pp. 26-58',
       date: '2021-01',
       documentType: 'risk_assessment',
       detectableRedFlags: [
@@ -879,7 +926,7 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
         "Knowledge that Bill Hwang's prior Tiger Asia vehicle settled SEC insider-trading charges in 2012",
         'Archegos aggregate gross exposure across prime brokers estimated at 5x+ reported family-office capital',
         'Prime services risk function did not have authority to force margin increases over relationship-banker objection',
-        "CRO pushback on Archegos limits deferred to relationship-revenue discussions",
+        'CRO pushback on Archegos limits deferred to relationship-revenue discussions',
       ],
       flaggableBiases: ['anchoring_bias', 'loss_aversion', 'authority_bias', 'overconfidence_bias'],
       hypotheticalAnalysis:
@@ -921,7 +968,8 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     preDecisionEvidence: {
       document:
         "FTX raised $400M at a $32B valuation from investors including Sequoia, Paradigm, SoftBank, Temasek, and the Ontario Teachers' Pension Plan. The company had no board of directors. CEO Sam Bankman-Fried was the sole signatory on corporate actions. No independent audit of the relationship between FTX and sister trading firm Alameda Research had been performed. Sequoia's published profile described SBF playing League of Legends during the pitch meeting as a positive trait.",
-      source: 'FTX Series C press release; Sequoia Capital published profile of Sam Bankman-Fried (archived, deleted November 2022)',
+      source:
+        'FTX Series C press release; Sequoia Capital published profile of Sam Bankman-Fried (archived, deleted November 2022)',
       date: '2022-01-31',
       documentType: 'press_release',
       detectableRedFlags: [
@@ -933,7 +981,7 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       ],
       flaggableBiases: ['authority_bias', 'halo_effect', 'bandwagon_effect', 'groupthink'],
       hypotheticalAnalysis:
-        'DI would flag the absence of a functioning board of directors at a $32B financial-services company as a binary governance failure. The Sequoia profile\'s framing of founder-as-genius as substitute for institutional due diligence is a textbook halo-effect signal. Customer funds commingling is a bright-line fiduciary red flag — no bias-adjusted valuation could survive basic audit-trail verification of customer-asset segregation.',
+        "DI would flag the absence of a functioning board of directors at a $32B financial-services company as a binary governance failure. The Sequoia profile's framing of founder-as-genius as substitute for institutional due diligence is a textbook halo-effect signal. Customer funds commingling is a bright-line fiduciary red flag — no bias-adjusted valuation could survive basic audit-trail verification of customer-asset segregation.",
     },
     source:
       "FTX Debtors' First Interim Report, Chapter 11 Case No. 22-11068 (2023); SEC v. Samuel Bankman-Fried complaint",
@@ -971,7 +1019,8 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     preDecisionEvidence: {
       document:
         "SVB's Q4 2021 earnings commentary emphasized the bank's strategy of investing incoming deposits into high-quality long-duration agency MBS and Treasuries with the expectation that its tech/VC deposit base would remain stable. Hedging of interest-rate risk on the held-to-maturity portfolio was explicitly described as unnecessary given the rate outlook. The bank operated without a Chief Risk Officer for eight months in 2022.",
-      source: 'SVB Financial Group Q4 2021 earnings call and 10-K; Federal Reserve SVB Review (April 2023)',
+      source:
+        'SVB Financial Group Q4 2021 earnings call and 10-K; Federal Reserve SVB Review (April 2023)',
       date: '2022-01-27',
       documentType: 'earnings_call',
       detectableRedFlags: [
@@ -1027,7 +1076,8 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     preDecisionEvidence: {
       document:
         "MF Global's Q3 FY2011 board materials documented a $6.3B gross exposure to European sovereign debt (Italy, Spain, Portugal, Ireland, Belgium) through repo-to-maturity transactions. The structure was disclosed as 'off-balance-sheet' despite carrying full market risk. CEO Jon Corzine personally directed the trades, overruling Chief Risk Officer Michael Roseman's objections — Roseman was replaced in January 2011 after refusing to approve increased sovereign exposure. CFO Henri Steenkamp's balance sheet reports understated the true liquidity risk of the RTM structure.",
-      source: "SIPA Trustee's Report on MF Global (2013); CFTC v. MF Global Inc. complaint; House Financial Services Committee testimony",
+      source:
+        "SIPA Trustee's Report on MF Global (2013); CFTC v. MF Global Inc. complaint; House Financial Services Committee testimony",
       date: '2011-06',
       documentType: 'board_memo',
       detectableRedFlags: [
@@ -1037,7 +1087,12 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
         'Initial board approvals set limit at $1B — breached multiple times before limit was raised retroactively to $4.75B, then $5B',
         'Financial Industry Regulatory Authority (FINRA) raised concerns about capital treatment of the RTM positions in summer 2011',
       ],
-      flaggableBiases: ['overconfidence_bias', 'authority_bias', 'sunk_cost_fallacy', 'gamblers_fallacy'],
+      flaggableBiases: [
+        'overconfidence_bias',
+        'authority_bias',
+        'sunk_cost_fallacy',
+        'gamblers_fallacy',
+      ],
       hypotheticalAnalysis:
         "DI would flag Corzine's removal of the CRO as the single most diagnostic event. A decision process where the CEO replaces the risk officer who challenges him — and the board allows it — is structurally incapable of circuit-breaking. The retroactive limit raises (rather than forced unwinds) is the signature of gambler's fallacy: each loss cycle produces a 'we're closer to the reversal' rationalization rather than a mandatory trim. The $1.6B customer-fund shortfall that ended the firm was the final-stage expression of a decision process that had already ceased functioning.",
     },
@@ -1141,7 +1196,12 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
         'Head of equities Moscow (Wiswell) had personal relationships with counterparty firms, flagged but not reviewed',
         'No jurisdictional KYC review correlated Moscow-client identities with London-counterparty identities',
       ],
-      flaggableBiases: ['status_quo_bias', 'selective_perception', 'cognitive_misering', 'loss_aversion'],
+      flaggableBiases: [
+        'status_quo_bias',
+        'selective_perception',
+        'cognitive_misering',
+        'loss_aversion',
+      ],
       hypotheticalAnalysis:
         "DI would flag Deutsche Bank's mirror-trading case as the canonical 'revenue-generating activity evades compliance scrutiny' failure. When a compliance team calls transactions 'economically meaningless' and they continue, a decision process with working circuit-breakers would have required either a documented business-purpose explanation or a halt. The organizational status quo — 'this desk makes money, other desks don't, let the experts manage it' — is the bias. A bias-adjusted AML review would have required cross-jurisdiction identity matching as a mandatory bright-line check that would have surfaced the pattern in months, not years.",
     },

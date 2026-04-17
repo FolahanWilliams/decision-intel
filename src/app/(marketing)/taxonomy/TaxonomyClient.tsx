@@ -15,10 +15,7 @@ import {
   ChevronDown,
   X,
 } from 'lucide-react';
-import {
-  BIAS_EDUCATION,
-  type BiasEducationContent,
-} from '@/lib/constants/bias-education';
+import { BIAS_EDUCATION, type BiasEducationContent } from '@/lib/constants/bias-education';
 import type { BiasCategory } from '@/types';
 
 const C = {
@@ -55,7 +52,13 @@ const DIFFICULTY_TOKENS: Record<
   Difficulty,
   { label: string; dot: string; bg: string; border: string; fg: string }
 > = {
-  easy: { label: 'Easy to spot', dot: C.green, bg: C.greenSoft, border: C.greenBorder, fg: C.green },
+  easy: {
+    label: 'Easy to spot',
+    dot: C.green,
+    bg: C.greenSoft,
+    border: C.greenBorder,
+    fg: C.green,
+  },
   moderate: {
     label: 'Moderate',
     dot: C.amber,
@@ -84,9 +87,9 @@ export function TaxonomyClient() {
   const entries = useMemo(
     () =>
       (Object.entries(BIAS_EDUCATION) as BiasEntry[]).sort((a, b) =>
-        a[1].taxonomyId.localeCompare(b[1].taxonomyId),
+        a[1].taxonomyId.localeCompare(b[1].taxonomyId)
       ),
-    [],
+    []
   );
 
   const [query, setQuery] = useState('');
@@ -204,10 +207,9 @@ export function TaxonomyClient() {
                   maxWidth: 620,
                 }}
               >
-                Every bias the Decision Intel pipeline detects has a stable, permanent ID
-                (DI-B-001 through DI-B-020), a named historical failure, and a primary
-                academic citation. Cite these IDs in research, audits, and regulatory
-                filings.
+                Every bias the Decision Intel pipeline detects has a stable, permanent ID (DI-B-001
+                through DI-B-020), a named historical failure, and a primary academic citation. Cite
+                these IDs in research, audits, and regulatory filings.
               </p>
               <p style={{ fontSize: 14, color: C.slate500, margin: 0, maxWidth: 620 }}>
                 Once assigned, an ID never changes. This is the published contract.
@@ -513,10 +515,17 @@ export function TaxonomyClient() {
                 lineHeight: 1.55,
               }}
             >
-              Sixty seconds per document. Every detection cites the taxonomy ID and the
-              primary academic source.
+              Sixty seconds per document. Every detection cites the taxonomy ID and the primary
+              academic source.
             </p>
-            <div style={{ display: 'inline-flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
+            <div
+              style={{
+                display: 'inline-flex',
+                gap: 10,
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+              }}
+            >
               <Link
                 href="/"
                 style={{

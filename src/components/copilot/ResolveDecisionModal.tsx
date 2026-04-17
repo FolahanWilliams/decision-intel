@@ -59,7 +59,10 @@ export function ResolveDecisionModal({ onResolve, onClose }: ResolveDecisionModa
 
   if (success) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0, 0, 0, 0.6)' }}>
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center"
+        style={{ background: 'rgba(0, 0, 0, 0.6)' }}
+      >
         <div className="mx-4 w-full max-w-md rounded-xl border border-zinc-700 bg-zinc-900 p-8 text-center">
           <CheckCircle2 className="mx-auto h-12 w-12 text-green-400 mb-4" />
           <h3 className="text-lg font-semibold text-zinc-100 mb-2">Decision Logged</h3>
@@ -79,7 +82,10 @@ export function ResolveDecisionModal({ onResolve, onClose }: ResolveDecisionModa
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0, 0, 0, 0.6)' }}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{ background: 'rgba(0, 0, 0, 0.6)' }}
+    >
       <div className="mx-4 w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl border border-zinc-700 bg-zinc-900 p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-zinc-100">Resolve Decision</h3>

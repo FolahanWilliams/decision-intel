@@ -27,7 +27,7 @@ export function Reveal({
   const ref = useScrollReveal<HTMLDivElement>();
   const mergedStyle: CSSProperties = delay
     ? { ...style, transitionDelay: `${delay}ms` }
-    : style ?? {};
+    : (style ?? {});
   return (
     <div
       ref={ref}

@@ -259,14 +259,7 @@ export function RiskLandscape({ entries }: RiskLandscapeProps) {
           stroke={C.slate200}
           strokeWidth={1}
         />
-        <line
-          x1={padL}
-          x2={padL}
-          y1={padT}
-          y2={padT + plotH}
-          stroke={C.slate200}
-          strokeWidth={1}
-        />
+        <line x1={padL} x2={padL} y1={padT} y2={padT + plotH} stroke={C.slate200} strokeWidth={1} />
 
         {/* X tick labels */}
         {xTicks.map((t, i) => (
@@ -368,14 +361,7 @@ export function RiskLandscape({ entries }: RiskLandscapeProps) {
                   strokeDasharray="3 3"
                 />
               )}
-              <circle
-                cx={cx}
-                cy={cy}
-                r={r}
-                fill={q.fill}
-                stroke={q.stroke}
-                strokeWidth={1.8}
-              />
+              <circle cx={cx} cy={cy} r={r} fill={q.fill} stroke={q.stroke} strokeWidth={1.8} />
               {/* Label ALWAYS visible for top-right quadrant entries (the key story) */}
               {(q.quadrant === 'common-dangerous' || isHover) && (
                 <g pointerEvents="none">

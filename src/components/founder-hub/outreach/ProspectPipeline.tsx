@@ -170,16 +170,41 @@ export function ProspectPipeline({ founderPass, refreshKey }: ProspectPipelinePr
   const followupCount = prospects.filter(isFollowUpDue).length;
 
   return (
-    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', padding: '20px 24px', marginBottom: 20 }}>
+    <div
+      style={{
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-color)',
+        borderRadius: 'var(--radius-lg)',
+        padding: '20px 24px',
+        marginBottom: 20,
+      }}
+    >
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: 16,
+        }}
+      >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <TrendingUp size={15} style={{ color: 'var(--accent-primary)' }} />
           <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
             Prospect Pipeline
           </span>
           {followupCount > 0 && (
-            <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 'var(--radius-full)', background: '#F59E0B20', color: '#F59E0B', border: '1px solid #F59E0B40' }}>
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                padding: '2px 6px',
+                borderRadius: 'var(--radius-full)',
+                background: '#F59E0B20',
+                color: '#F59E0B',
+                border: '1px solid #F59E0B40',
+              }}
+            >
               {followupCount} follow-up{followupCount > 1 ? 's' : ''} due
             </span>
           )}
@@ -187,13 +212,33 @@ export function ProspectPipeline({ founderPass, refreshKey }: ProspectPipelinePr
         <div style={{ display: 'flex', gap: 8 }}>
           <button
             onClick={fetchProspects}
-            style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', padding: 4 }}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'var(--text-muted)',
+              display: 'flex',
+              alignItems: 'center',
+              padding: 4,
+            }}
           >
             <RefreshCw size={13} />
           </button>
           <button
             onClick={() => setShowAddForm(v => !v)}
-            style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 12px', borderRadius: 'var(--radius-sm)', background: showAddForm ? 'var(--bg-tertiary)' : 'var(--accent-primary)', border: 'none', color: showAddForm ? 'var(--text-primary)' : '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              padding: '6px 12px',
+              borderRadius: 'var(--radius-sm)',
+              background: showAddForm ? 'var(--bg-tertiary)' : 'var(--accent-primary)',
+              border: 'none',
+              color: showAddForm ? 'var(--text-primary)' : '#fff',
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
           >
             <Plus size={12} />
             Add manually
@@ -203,18 +248,49 @@ export function ProspectPipeline({ founderPass, refreshKey }: ProspectPipelinePr
 
       {/* Stats row */}
       {total > 0 && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: 10,
+            marginBottom: 16,
+          }}
+        >
           {[
             { label: 'Reached', value: total },
             { label: 'Reply rate', value: `${replyRate}%` },
             { label: 'Active', value: active },
             { label: 'Converted', value: converted },
           ].map(stat => (
-            <div key={stat.label} style={{ background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)', padding: '10px 12px', textAlign: 'center' }}>
-              <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
+            <div
+              key={stat.label}
+              style={{
+                background: 'var(--bg-secondary)',
+                borderRadius: 'var(--radius-md)',
+                padding: '10px 12px',
+                textAlign: 'center',
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 20,
+                  fontWeight: 800,
+                  color: 'var(--text-primary)',
+                  letterSpacing: '-0.02em',
+                }}
+              >
                 {stat.value}
               </div>
-              <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: 2 }}>
+              <div
+                style={{
+                  fontSize: 10,
+                  color: 'var(--text-muted)',
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                  marginTop: 2,
+                }}
+              >
                 {stat.label}
               </div>
             </div>
@@ -224,9 +300,28 @@ export function ProspectPipeline({ founderPass, refreshKey }: ProspectPipelinePr
 
       {/* Add form */}
       {showAddForm && (
-        <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: 16, marginBottom: 14 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 12 }}>Add prospect</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 8 }}>
+        <div
+          style={{
+            background: 'var(--bg-secondary)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-md)',
+            padding: 16,
+            marginBottom: 14,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 12,
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+              marginBottom: 12,
+            }}
+          >
+            Add prospect
+          </div>
+          <div
+            style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 8 }}
+          >
             <input
               placeholder="Name *"
               value={addName}
@@ -247,9 +342,15 @@ export function ProspectPipeline({ founderPass, refreshKey }: ProspectPipelinePr
             />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 8, marginBottom: 8 }}>
-            <select value={addIntent} onChange={e => setAddIntent(e.target.value as OutreachIntent)} style={inputStyle}>
+            <select
+              value={addIntent}
+              onChange={e => setAddIntent(e.target.value as OutreachIntent)}
+              style={inputStyle}
+            >
               {Object.entries(INTENT_LABELS).map(([k, v]) => (
-                <option key={k} value={k}>{v}</option>
+                <option key={k} value={k}>
+                  {v}
+                </option>
               ))}
             </select>
             <input
@@ -263,11 +364,32 @@ export function ProspectPipeline({ founderPass, refreshKey }: ProspectPipelinePr
             <button
               onClick={handleAddProspect}
               disabled={!addName.trim() || adding}
-              style={{ padding: '7px 14px', borderRadius: 'var(--radius-sm)', border: 'none', background: !addName.trim() || adding ? 'var(--bg-tertiary)' : 'var(--accent-primary)', color: '#fff', fontSize: 12, fontWeight: 600, cursor: !addName.trim() || adding ? 'not-allowed' : 'pointer' }}
+              style={{
+                padding: '7px 14px',
+                borderRadius: 'var(--radius-sm)',
+                border: 'none',
+                background:
+                  !addName.trim() || adding ? 'var(--bg-tertiary)' : 'var(--accent-primary)',
+                color: '#fff',
+                fontSize: 12,
+                fontWeight: 600,
+                cursor: !addName.trim() || adding ? 'not-allowed' : 'pointer',
+              }}
             >
               {adding ? 'Adding...' : 'Add to pipeline'}
             </button>
-            <button onClick={() => setShowAddForm(false)} style={{ padding: '7px 14px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-secondary)', fontSize: 12, cursor: 'pointer' }}>
+            <button
+              onClick={() => setShowAddForm(false)}
+              style={{
+                padding: '7px 14px',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid var(--border-color)',
+                background: 'transparent',
+                color: 'var(--text-secondary)',
+                fontSize: 12,
+                cursor: 'pointer',
+              }}
+            >
               Cancel
             </button>
           </div>
@@ -278,11 +400,12 @@ export function ProspectPipeline({ founderPass, refreshKey }: ProspectPipelinePr
       {total > 0 && (
         <div style={{ display: 'flex', gap: 4, marginBottom: 12, flexWrap: 'wrap' }}>
           {FILTER_TABS.map(tab => {
-            const count = tab.key === 'all'
-              ? total
-              : tab.key === 'followup'
-              ? followupCount
-              : prospects.filter(p => p.status === tab.key).length;
+            const count =
+              tab.key === 'all'
+                ? total
+                : tab.key === 'followup'
+                  ? followupCount
+                  : prospects.filter(p => p.status === tab.key).length;
             const active = filter === tab.key;
             return (
               <button
@@ -291,7 +414,9 @@ export function ProspectPipeline({ founderPass, refreshKey }: ProspectPipelinePr
                 style={{
                   padding: '5px 10px',
                   borderRadius: 'var(--radius-sm)',
-                  border: active ? '1px solid var(--accent-primary)' : '1px solid var(--border-color)',
+                  border: active
+                    ? '1px solid var(--accent-primary)'
+                    : '1px solid var(--border-color)',
                   background: active ? 'var(--accent-primary)15' : 'transparent',
                   color: active ? 'var(--accent-primary)' : 'var(--text-muted)',
                   fontSize: 11,
@@ -309,15 +434,21 @@ export function ProspectPipeline({ founderPass, refreshKey }: ProspectPipelinePr
 
       {/* Prospect list */}
       {loading ? (
-        <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0, textAlign: 'center', padding: '16px 0' }}>
+        <p
+          style={{
+            fontSize: 12,
+            color: 'var(--text-muted)',
+            margin: 0,
+            textAlign: 'center',
+            padding: '16px 0',
+          }}
+        >
           Loading prospects...
         </p>
       ) : filtered.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '20px 0' }}>
           <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '0 0 4px 0' }}>
-            {total === 0
-              ? 'No prospects yet.'
-              : 'No prospects in this filter.'}
+            {total === 0 ? 'No prospects yet.' : 'No prospects in this filter.'}
           </p>
           {total === 0 && (
             <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: 0 }}>
@@ -349,19 +480,50 @@ export function ProspectPipeline({ founderPass, refreshKey }: ProspectPipelinePr
               >
                 {/* Identity */}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2, flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{p.name}</span>
-                    {p.company && <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>— {p.company}</span>}
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      marginBottom: 2,
+                      flexWrap: 'wrap',
+                    }}
+                  >
+                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
+                      {p.name}
+                    </span>
+                    {p.company && (
+                      <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                        — {p.company}
+                      </span>
+                    )}
                     {due && (
-                      <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 10, fontWeight: 700, color: '#F59E0B', background: '#F59E0B15', border: '1px solid #F59E0B30', borderRadius: 4, padding: '1px 6px' }}>
+                      <span
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 3,
+                          fontSize: 10,
+                          fontWeight: 700,
+                          color: '#F59E0B',
+                          background: '#F59E0B15',
+                          border: '1px solid #F59E0B30',
+                          borderRadius: 4,
+                          padding: '1px 6px',
+                        }}
+                      >
                         <AlertCircle size={9} />
                         Follow up
                       </span>
                     )}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    {p.role && <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{p.role}</span>}
-                    {p.role && <span style={{ fontSize: 11, color: 'var(--border-color)' }}>•</span>}
+                    {p.role && (
+                      <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{p.role}</span>
+                    )}
+                    {p.role && (
+                      <span style={{ fontSize: 11, color: 'var(--border-color)' }}>•</span>
+                    )}
                     <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
                       {INTENT_LABELS[p.intent as OutreachIntent] ?? p.intent}
                     </span>
@@ -373,29 +535,59 @@ export function ProspectPipeline({ founderPass, refreshKey }: ProspectPipelinePr
                 </div>
 
                 {/* Status badge */}
-                <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 'var(--radius-full)', background: `${meta.color}15`, color: meta.color, border: `1px solid ${meta.color}30`, whiteSpace: 'nowrap', flexShrink: 0 }}>
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    padding: '3px 8px',
+                    borderRadius: 'var(--radius-full)',
+                    background: `${meta.color}15`,
+                    color: meta.color,
+                    border: `1px solid ${meta.color}30`,
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
+                  }}
+                >
                   {meta.label}
                 </span>
 
                 {/* Quick actions */}
                 <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
                   {p.status === 'cold' && (
-                    <ActionBtn onClick={() => updateStatus(p.id, 'warm')} title="Mark replied" disabled={busy}>
+                    <ActionBtn
+                      onClick={() => updateStatus(p.id, 'warm')}
+                      title="Mark replied"
+                      disabled={busy}
+                    >
                       <CheckCircle size={13} />
                     </ActionBtn>
                   )}
                   {p.status === 'warm' && (
                     <>
-                      <ActionBtn onClick={() => updateStatus(p.id, 'active')} title="Call scheduled" disabled={busy}>
+                      <ActionBtn
+                        onClick={() => updateStatus(p.id, 'active')}
+                        title="Call scheduled"
+                        disabled={busy}
+                      >
                         <Phone size={13} />
                       </ActionBtn>
-                      <ActionBtn onClick={() => updateStatus(p.id, 'converted')} title="Converted" color="var(--accent-primary)" disabled={busy}>
+                      <ActionBtn
+                        onClick={() => updateStatus(p.id, 'converted')}
+                        title="Converted"
+                        color="var(--accent-primary)"
+                        disabled={busy}
+                      >
                         <TrendingUp size={13} />
                       </ActionBtn>
                     </>
                   )}
                   {p.status === 'active' && (
-                    <ActionBtn onClick={() => updateStatus(p.id, 'converted')} title="Converted" color="var(--accent-primary)" disabled={busy}>
+                    <ActionBtn
+                      onClick={() => updateStatus(p.id, 'converted')}
+                      title="Converted"
+                      color="var(--accent-primary)"
+                      disabled={busy}
+                    >
                       <TrendingUp size={13} />
                     </ActionBtn>
                   )}

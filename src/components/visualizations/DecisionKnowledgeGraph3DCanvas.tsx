@@ -165,7 +165,7 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
         } catch {
           // Layout not converged yet — next retry will catch it.
         }
-      }, ms),
+      }, ms)
     );
     return () => timers.forEach(clearTimeout);
   }, [hasGraph]);
@@ -204,9 +204,9 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
         onNodeSelect(null);
         return;
       }
-      const internalNode = graphRef.current
-        ?.getGraph()
-        ?.getNodeAttribute(ids[0], 'data') as InternalGraphNode | undefined;
+      const internalNode = graphRef.current?.getGraph()?.getNodeAttribute(ids[0], 'data') as
+        | InternalGraphNode
+        | undefined;
       if (internalNode) {
         onNodeSelect(internalNode);
       } else {
@@ -223,7 +223,7 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
         graphRef.current?.centerGraph([node.id]);
       }
     },
-    [selections, toggleSelection],
+    [selections, toggleSelection]
   );
 
   // Hover tooltip state — preview complementary to click-to-select.
@@ -240,14 +240,14 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
       const t = (node.data as { type?: string } | undefined)?.type ?? '';
       setHoverType(t);
     },
-    [onNodePointerOver],
+    [onNodePointerOver]
   );
   const handleNodePointerOut = useCallback(
     (node: InternalGraphNode) => {
       onNodePointerOut?.(node);
       setHoverNodeId(null);
     },
-    [onNodePointerOut],
+    [onNodePointerOut]
   );
   const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     const rect = wrapperRef.current?.getBoundingClientRect();
@@ -272,7 +272,16 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
         <group>
           <mesh>
             <dodecahedronGeometry args={[size, 0]} />
-            <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
+            <meshPhongMaterial
+              color={col}
+              emissive={col}
+              emissiveIntensity={emissive}
+              shininess={90}
+              specular="#FFFFFF"
+              side={DoubleSide}
+              transparent
+              opacity={o}
+            />
           </mesh>
           {selected && <SelectedGlow size={size} color={col} shape="dodecahedron" />}
         </group>
@@ -285,7 +294,16 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
         <group>
           <mesh>
             <octahedronGeometry args={[size, 0]} />
-            <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
+            <meshPhongMaterial
+              color={col}
+              emissive={col}
+              emissiveIntensity={emissive}
+              shininess={90}
+              specular="#FFFFFF"
+              side={DoubleSide}
+              transparent
+              opacity={o}
+            />
           </mesh>
           {selected && <SelectedGlow size={size} color={col} shape="octahedron" />}
           {isCriticalBias && !selected && (
@@ -301,7 +319,16 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
         <group>
           <mesh>
             <cylinderGeometry args={[size * 0.82, size * 0.82, size * 2.2, 8]} />
-            <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
+            <meshPhongMaterial
+              color={col}
+              emissive={col}
+              emissiveIntensity={emissive}
+              shininess={90}
+              specular="#FFFFFF"
+              side={DoubleSide}
+              transparent
+              opacity={o}
+            />
           </mesh>
           {selected && (
             <SelectedGlow
@@ -320,7 +347,16 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
       <group>
         <mesh>
           <sphereGeometry args={[size * 0.85, 16, 12]} />
-          <meshPhongMaterial color={col} emissive={col} emissiveIntensity={emissive} shininess={90} specular="#FFFFFF" side={DoubleSide} transparent opacity={o} />
+          <meshPhongMaterial
+            color={col}
+            emissive={col}
+            emissiveIntensity={emissive}
+            shininess={90}
+            specular="#FFFFFF"
+            side={DoubleSide}
+            transparent
+            opacity={o}
+          />
         </mesh>
         {selected && <SelectedGlow size={size * 0.85} color={col} shape="sphere" />}
       </group>

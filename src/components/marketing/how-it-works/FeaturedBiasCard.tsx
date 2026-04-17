@@ -123,7 +123,9 @@ export function FeaturedBiasCard({
       >
         <span style={{ fontSize: 11, fontWeight: 600, color: C.slate900 }}>
           {example.company}
-          <span style={{ color: C.slate400, fontWeight: 500, marginLeft: 6 }}>· {example.year}</span>
+          <span style={{ color: C.slate400, fontWeight: 500, marginLeft: 6 }}>
+            · {example.year}
+          </span>
         </span>
         <span
           style={{

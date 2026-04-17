@@ -33,7 +33,7 @@ const CaseStudyBiasGraph3D = dynamic(
         />
       </div>
     ),
-  },
+  }
 );
 
 const SEVERITY_COLORS: Record<string, string> = {
@@ -96,7 +96,13 @@ export function CaseStudyGraphSection({ biases, primaryBias, toxicCombinations, 
             <span style={{ fontWeight: 600, color: '#0F172A' }}>
               {biases.length} biases
               {toxicCombinations.length > 0 && (
-                <>, <span style={{ color: '#DC2626' }}>{toxicCombinations.length} toxic combination{toxicCombinations.length !== 1 ? 's' : ''}</span></>
+                <>
+                  ,{' '}
+                  <span style={{ color: '#DC2626' }}>
+                    {toxicCombinations.length} toxic combination
+                    {toxicCombinations.length !== 1 ? 's' : ''}
+                  </span>
+                </>
               )}
             </span>
           </div>
@@ -174,7 +180,7 @@ export function CaseStudyGraphSection({ biases, primaryBias, toxicCombinations, 
                       textTransform: 'uppercase',
                       letterSpacing: '0.5px',
                       color: SEVERITY_COLORS[selectedData.severity ?? 'medium'],
-                      background: (SEVERITY_COLORS[selectedData.severity ?? 'medium']) + '18',
+                      background: SEVERITY_COLORS[selectedData.severity ?? 'medium'] + '18',
                       padding: '2px 7px',
                       borderRadius: 4,
                     }}

@@ -32,11 +32,7 @@ import {
   Calculator,
   type LucideIcon,
 } from 'lucide-react';
-import {
-  PIPELINE_NODES,
-  type PipelineNode,
-  type PipelineZone,
-} from '@/lib/data/pipeline-nodes';
+import { PIPELINE_NODES, type PipelineNode, type PipelineZone } from '@/lib/data/pipeline-nodes';
 import { useReducedMotion } from './useReducedMotion';
 
 const C = {
@@ -227,7 +223,10 @@ export function PipelineLandingTeaser() {
               textAlign: 'center',
               minWidth: 76,
               border: `1.5px solid ${C.green}`,
-              boxShadow: activeZone === 'synthesis' && !reducedMotion ? `0 0 0 4px rgba(22,163,74,0.14)` : 'none',
+              boxShadow:
+                activeZone === 'synthesis' && !reducedMotion
+                  ? `0 0 0 4px rgba(22,163,74,0.14)`
+                  : 'none',
               transition: 'box-shadow 0.4s',
             }}
           >
@@ -317,7 +316,8 @@ export function PipelineLandingTeaser() {
         }}
       >
         <span style={{ fontSize: 12, color: C.slate500 }}>
-          Click any node on the full page to see what it does, what it produces, and which paper it cites.
+          Click any node on the full page to see what it does, what it produces, and which paper it
+          cites.
         </span>
         <Link
           href="/how-it-works"
@@ -371,10 +371,7 @@ function ZoneGroup({
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns:
-          layout === 'grid'
-            ? 'repeat(4, auto)'
-            : '1fr',
+        gridTemplateColumns: layout === 'grid' ? 'repeat(4, auto)' : '1fr',
         gap: 6,
         padding: 8,
         borderRadius: 12,
@@ -406,11 +403,7 @@ function ZoneGroup({
               transition: 'background 0.4s, border-color 0.4s',
             }}
           >
-            <Icon
-              size={18}
-              color={active ? C.white : accent}
-              strokeWidth={2}
-            />
+            <Icon size={18} color={active ? C.white : accent} strokeWidth={2} />
             {active && !reducedMotion && (
               <motion.span
                 aria-hidden

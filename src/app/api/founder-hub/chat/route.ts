@@ -140,7 +140,7 @@ export async function POST(req: NextRequest) {
   if (!auth.ok) {
     return NextResponse.json(
       { error: auth.reason === 'not_configured' ? 'Not configured' : 'Unauthorized' },
-      { status: auth.reason === 'not_configured' ? 503 : 401 },
+      { status: auth.reason === 'not_configured' ? 503 : 401 }
     );
   }
 

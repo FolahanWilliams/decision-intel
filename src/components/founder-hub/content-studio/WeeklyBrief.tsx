@@ -43,8 +43,7 @@ export function WeeklyBrief({ founderPass, onDraft }: WeeklyBriefProps) {
       const json = await res.json();
       // Sort by canonical day order
       const sorted = (json.data?.briefs ?? []).sort(
-        (a: PostBrief, b: PostBrief) =>
-          DAYS_ORDER.indexOf(a.day) - DAYS_ORDER.indexOf(b.day)
+        (a: PostBrief, b: PostBrief) => DAYS_ORDER.indexOf(a.day) - DAYS_ORDER.indexOf(b.day)
       );
       setBriefs(sorted);
       setGenerated(true);
@@ -66,7 +65,14 @@ export function WeeklyBrief({ founderPass, onDraft }: WeeklyBriefProps) {
       }}
     >
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: 16,
+        }}
+      >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Calendar size={15} style={{ color: 'var(--accent-primary)' }} />
           <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
@@ -107,9 +113,7 @@ export function WeeklyBrief({ founderPass, onDraft }: WeeklyBriefProps) {
       </div>
 
       {/* Error */}
-      {error && (
-        <p style={{ fontSize: 12, color: 'var(--error)', margin: 0 }}>{error}</p>
-      )}
+      {error && <p style={{ fontSize: 12, color: 'var(--error)', margin: 0 }}>{error}</p>}
 
       {/* Empty state */}
       {!loading && !error && !generated && (
@@ -162,31 +166,50 @@ export function WeeklyBrief({ founderPass, onDraft }: WeeklyBriefProps) {
                 }}
               >
                 {/* Day + badges row */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: 8,
+                  }}
+                >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    <span
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 700,
+                        color: 'var(--text-muted)',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.06em',
+                      }}
+                    >
                       {brief.day}
                     </span>
-                    <span style={{
-                      fontSize: 10,
-                      fontWeight: 700,
-                      color: pillarColor,
-                      background: `${pillarColor}15`,
-                      border: `1px solid ${pillarColor}30`,
-                      borderRadius: 4,
-                      padding: '1px 6px',
-                    }}>
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        color: pillarColor,
+                        background: `${pillarColor}15`,
+                        border: `1px solid ${pillarColor}30`,
+                        borderRadius: 4,
+                        padding: '1px 6px',
+                      }}
+                    >
                       {brief.pillarLabel}
                     </span>
-                    <span style={{
-                      fontSize: 10,
-                      fontWeight: 700,
-                      color: platformColor,
-                      background: `${platformColor}15`,
-                      border: `1px solid ${platformColor}30`,
-                      borderRadius: 4,
-                      padding: '1px 6px',
-                    }}>
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        color: platformColor,
+                        background: `${platformColor}15`,
+                        border: `1px solid ${platformColor}30`,
+                        borderRadius: 4,
+                        padding: '1px 6px',
+                      }}
+                    >
                       {brief.platform}
                     </span>
                   </div>
@@ -212,24 +235,56 @@ export function WeeklyBrief({ founderPass, onDraft }: WeeklyBriefProps) {
                 </div>
 
                 {/* Headline */}
-                <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 4px 0' }}>
+                <p
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: 'var(--text-primary)',
+                    margin: '0 0 4px 0',
+                  }}
+                >
                   {brief.headline}
                 </p>
 
                 {/* Angle */}
-                <p style={{ fontSize: 12, color: 'var(--text-secondary)', margin: '0 0 8px 0', lineHeight: 1.5 }}>
+                <p
+                  style={{
+                    fontSize: 12,
+                    color: 'var(--text-secondary)',
+                    margin: '0 0 8px 0',
+                    lineHeight: 1.5,
+                  }}
+                >
                   {brief.angle}
                 </p>
 
                 {/* Hook */}
-                <p style={{ fontSize: 12, color: 'var(--text-muted)', fontStyle: 'italic', margin: '0 0 8px 0', borderTop: '1px solid var(--border-color)', paddingTop: 8, lineHeight: 1.5 }}>
+                <p
+                  style={{
+                    fontSize: 12,
+                    color: 'var(--text-muted)',
+                    fontStyle: 'italic',
+                    margin: '0 0 8px 0',
+                    borderTop: '1px solid var(--border-color)',
+                    paddingTop: 8,
+                    lineHeight: 1.5,
+                  }}
+                >
                   &ldquo;{brief.hook}&rdquo;
                 </p>
 
                 {/* Key points */}
                 <ul style={{ margin: 0, paddingLeft: 16, listStyle: 'disc' }}>
                   {brief.keyPoints.map((pt, i) => (
-                    <li key={i} style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 3, lineHeight: 1.45 }}>
+                    <li
+                      key={i}
+                      style={{
+                        fontSize: 12,
+                        color: 'var(--text-muted)',
+                        marginBottom: 3,
+                        lineHeight: 1.45,
+                      }}
+                    >
                       {pt}
                     </li>
                   ))}
@@ -237,8 +292,16 @@ export function WeeklyBrief({ founderPass, onDraft }: WeeklyBriefProps) {
 
                 {/* CTA */}
                 {brief.cta && (
-                  <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', margin: '8px 0 0 0' }}>
-                    <span style={{ fontWeight: 700 }}>CTA: </span>{brief.cta}
+                  <p
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: 'var(--text-muted)',
+                      margin: '8px 0 0 0',
+                    }}
+                  >
+                    <span style={{ fontWeight: 700 }}>CTA: </span>
+                    {brief.cta}
                   </p>
                 )}
               </div>

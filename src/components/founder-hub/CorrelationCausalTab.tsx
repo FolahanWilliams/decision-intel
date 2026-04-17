@@ -27,10 +27,9 @@ import {
 } from '@/lib/data/case-study-causal-weights';
 import type { CausalNodeData } from '@/components/visualizations/CausalGraph3DCanvas';
 
-const CausalGraph3D = dynamic(
-  () => import('@/components/visualizations/CausalGraph3DCanvas'),
-  { ssr: false },
-);
+const CausalGraph3D = dynamic(() => import('@/components/visualizations/CausalGraph3DCanvas'), {
+  ssr: false,
+});
 // Types used implicitly via the graph data
 // import type { CausalGraphNode, CausalGraphEdge } from '@/lib/data/case-study-causal-weights';
 import {
@@ -784,10 +783,7 @@ export function CorrelationCausalTab() {
           {causalWeights.length > 0 ? (
             <>
               <div style={{ height: 500 }}>
-                <CausalGraph3D
-                  weights={causalWeights}
-                  onNodeSelect={setSelectedCausalNode}
-                />
+                <CausalGraph3D weights={causalWeights} onNodeSelect={setSelectedCausalNode} />
               </div>
               {/* Legend */}
               <div
@@ -806,30 +802,77 @@ export function CorrelationCausalTab() {
                 <span>Drag to rotate · Scroll to zoom · Click to explore</span>
                 <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <span style={{ width: 8, height: 8, background: '#DC2626', display: 'inline-block', clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)' }} />
+                    <span
+                      style={{
+                        width: 8,
+                        height: 8,
+                        background: '#DC2626',
+                        display: 'inline-block',
+                        clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)',
+                      }}
+                    />
                     High danger
                   </span>
                   <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <span style={{ width: 8, height: 8, background: '#EAB308', borderRadius: 1, display: 'inline-block', transform: 'rotate(45deg)' }} />
+                    <span
+                      style={{
+                        width: 8,
+                        height: 8,
+                        background: '#EAB308',
+                        borderRadius: 1,
+                        display: 'inline-block',
+                        transform: 'rotate(45deg)',
+                      }}
+                    />
                     Moderate
                   </span>
                   <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <span style={{ width: 8, height: 8, background: '#EF4444', borderRadius: '50%', display: 'inline-block' }} />
+                    <span
+                      style={{
+                        width: 8,
+                        height: 8,
+                        background: '#EF4444',
+                        borderRadius: '50%',
+                        display: 'inline-block',
+                      }}
+                    />
                     Failure
                   </span>
                   <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <span style={{ width: 8, height: 8, background: '#22C55E', borderRadius: '50%', display: 'inline-block' }} />
+                    <span
+                      style={{
+                        width: 8,
+                        height: 8,
+                        background: '#22C55E',
+                        borderRadius: '50%',
+                        display: 'inline-block',
+                      }}
+                    />
                     Success
                   </span>
                   <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <span style={{ width: 16, height: 2, background: '#DC2626', borderRadius: 1, display: 'inline-block' }} />
+                    <span
+                      style={{
+                        width: 16,
+                        height: 2,
+                        background: '#DC2626',
+                        borderRadius: 1,
+                        display: 'inline-block',
+                      }}
+                    />
                     Toxic pair
                   </span>
                 </div>
               </div>
               {/* Detail panel */}
               {selectedCausalNode?.nodeType === 'bias' && selectedCausalNode.biasType && (
-                <div style={{ padding: '12px 16px', borderTop: '1px solid #1E293B', background: '#0F172A' }}>
+                <div
+                  style={{
+                    padding: '12px 16px',
+                    borderTop: '1px solid #1E293B',
+                    background: '#0F172A',
+                  }}
+                >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
                     <span style={{ fontSize: 14, fontWeight: 700, color: '#E2E8F0' }}>
                       {formatBias(selectedCausalNode.biasType)}
@@ -840,8 +883,12 @@ export function CorrelationCausalTab() {
                         fontWeight: 700,
                         padding: '2px 8px',
                         borderRadius: 4,
-                        background: (selectedCausalNode.dangerMultiplier ?? 1) >= 1.3 ? '#DC262620' : '#22C55E20',
-                        color: (selectedCausalNode.dangerMultiplier ?? 1) >= 1.3 ? '#EF4444' : '#22C55E',
+                        background:
+                          (selectedCausalNode.dangerMultiplier ?? 1) >= 1.3
+                            ? '#DC262620'
+                            : '#22C55E20',
+                        color:
+                          (selectedCausalNode.dangerMultiplier ?? 1) >= 1.3 ? '#EF4444' : '#22C55E',
                       }}
                     >
                       {(selectedCausalNode.dangerMultiplier ?? 1).toFixed(2)}× danger
@@ -849,16 +896,28 @@ export function CorrelationCausalTab() {
                   </div>
                   <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#94A3B8' }}>
                     <span>
-                      Failures: <strong style={{ color: '#EF4444' }}>{selectedCausalNode.failureCount ?? 0}</strong>
+                      Failures:{' '}
+                      <strong style={{ color: '#EF4444' }}>
+                        {selectedCausalNode.failureCount ?? 0}
+                      </strong>
                     </span>
                     <span>
-                      Successes: <strong style={{ color: '#22C55E' }}>{selectedCausalNode.successCount ?? 0}</strong>
+                      Successes:{' '}
+                      <strong style={{ color: '#22C55E' }}>
+                        {selectedCausalNode.successCount ?? 0}
+                      </strong>
                     </span>
                     <span>
-                      Sample: <strong style={{ color: '#E2E8F0' }}>n={selectedCausalNode.sampleSize ?? 0}</strong>
+                      Sample:{' '}
+                      <strong style={{ color: '#E2E8F0' }}>
+                        n={selectedCausalNode.sampleSize ?? 0}
+                      </strong>
                     </span>
                     <span>
-                      Correlation: <strong style={{ color: '#E2E8F0' }}>{(selectedCausalNode.outcomeCorrelation ?? 0).toFixed(3)}</strong>
+                      Correlation:{' '}
+                      <strong style={{ color: '#E2E8F0' }}>
+                        {(selectedCausalNode.outcomeCorrelation ?? 0).toFixed(3)}
+                      </strong>
                     </span>
                   </div>
                 </div>

@@ -87,7 +87,9 @@ export function OutreachResult({
           <div style={kicker}>Drafted outreach</div>
           <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)' }}>
             {profile.name ?? 'Unnamed contact'}
-            {profile.role && <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}> — {profile.role}</span>}
+            {profile.role && (
+              <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}> — {profile.role}</span>
+            )}
           </div>
           {profile.company && (
             <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{profile.company}</div>
@@ -98,7 +100,14 @@ export function OutreachResult({
 
       {profile.icpFit !== 'unknown' && (
         <div style={icpFitBlock(profile.icpFit)}>
-          <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+            }}
+          >
             ICP fit: {profile.icpFit}
           </div>
           <div style={{ fontSize: 12, marginTop: 4 }}>{profile.icpFitReason}</div>

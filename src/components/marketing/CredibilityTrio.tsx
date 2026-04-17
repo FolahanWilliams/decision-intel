@@ -99,8 +99,8 @@ export function CredibilityTrio() {
           Every claim we make is a page.
         </h2>
         <p style={{ fontSize: 18, color: C.slate600, margin: 0, maxWidth: 620 }}>
-          Click in &mdash; read the receipts. Case evidence, cross-decision intel, and our
-          full security posture all live in public.
+          Click in &mdash; read the receipts. Case evidence, cross-decision intel, and our full
+          security posture all live in public.
         </p>
       </div>
 
@@ -341,13 +341,7 @@ function GenomeThumb() {
             0{i + 1}
           </text>
           {/* Label */}
-          <text
-            x="16"
-            y="10"
-            fontSize="8"
-            fill={C.slate700}
-            fontWeight="600"
-          >
+          <text x="16" y="10" fontSize="8" fill={C.slate700} fontWeight="600">
             {r.label}
           </text>
           {/* Bar background */}

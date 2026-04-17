@@ -103,7 +103,6 @@ function normalizeProfile(raw: unknown): ExtractedProfile {
     inferredPriorities: asStringArray(obj.inferredPriorities, 4),
     potentialObjections: asStringArray(obj.potentialObjections, 3),
     icpFit,
-    icpFitReason:
-      asString(obj.icpFitReason) ?? 'No explanation provided by extraction.',
+    icpFitReason: asString(obj.icpFitReason) ?? 'No explanation provided by extraction.',
   };
 }

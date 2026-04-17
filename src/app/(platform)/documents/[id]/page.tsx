@@ -1140,7 +1140,12 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       {analysis && (
         <div
           className="flex items-center justify-between mb-lg"
-          style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: 12, flexWrap: 'wrap', gap: 8 }}
+          style={{
+            borderBottom: '1px solid var(--border-color)',
+            paddingBottom: 12,
+            flexWrap: 'wrap',
+            gap: 8,
+          }}
         >
           <div
             className="flex items-center"
@@ -1221,10 +1226,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           objections, and a clear "proceed / caution / review" verdict. */}
       {analysis && viewMode === 'cso' && (
         <div className="mb-xl" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <LiveRedFlagsAlert
-            biases={biases}
-            onSelect={bias => setSelectedBias(bias)}
-          />
+          <LiveRedFlagsAlert biases={biases} onSelect={bias => setSelectedBias(bias)} />
 
           <LivePredictedQuestions
             biases={biases}
@@ -1285,10 +1287,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           </div>
 
           {/* Deep Dive CTA — lateral switchers */}
-          <div
-            className="flex items-center justify-center gap-md"
-            style={{ flexWrap: 'wrap' }}
-          >
+          <div className="flex items-center justify-center gap-md" style={{ flexWrap: 'wrap' }}>
             <button
               onClick={() => setViewMode('analyst')}
               className="btn btn-ghost flex items-center gap-sm"
@@ -1580,10 +1579,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               we don't duplicate it here. */}
           {(isScanning || streamLogs.length > 0) && (
             <div className="mb-xl">
-              <div
-                className="card animate-fade-in"
-                style={{ background: 'var(--bg-card)' }}
-              >
+              <div className="card animate-fade-in" style={{ background: 'var(--bg-card)' }}>
                 <div
                   className="card-header"
                   style={{ background: 'var(--bg-secondary)', padding: '18px 20px' }}
@@ -2225,10 +2221,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                   )}
                   {activeTab === 'pdf-view' && (
                     <ErrorBoundary sectionName="PDF Viewer">
-                      <BiasAnnotatedPDFViewer
-                        documentId={document.id}
-                        biases={biases}
-                      />
+                      <BiasAnnotatedPDFViewer documentId={document.id} biases={biases} />
                     </ErrorBoundary>
                   )}
                 </Suspense>

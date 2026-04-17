@@ -14,7 +14,7 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.c
 export const metadata: Metadata = {
   title: 'The Bias Genome — Which Cognitive Biases Predict Strategic Failure | Decision Intel',
   description:
-    "A public map of which cognitive biases predict which kinds of strategic failure, by industry. Seed dataset of real decisions. Updated quarterly as consenting orgs opt in.",
+    'A public map of which cognitive biases predict which kinds of strategic failure, by industry. Seed dataset of real decisions. Updated quarterly as consenting orgs opt in.',
   alternates: { canonical: `${siteUrl}/bias-genome` },
   openGraph: {
     title: 'The Bias Genome — Which Biases Predict Which Failures',
@@ -104,10 +104,10 @@ export default function BiasGenomePage() {
               marginBottom: 10,
             }}
           >
-            A public map drawn from {meta.totalCases} real strategic decisions —{' '}
-            {meta.failureCases} failures and {meta.successCases} successes — across{' '}
-            {meta.industriesCovered.length} industries. Methodology open. Data cite-able.
-            Refreshed as consenting customer orgs opt in.
+            A public map drawn from {meta.totalCases} real strategic decisions — {meta.failureCases}{' '}
+            failures and {meta.successCases} successes — across {meta.industriesCovered.length}{' '}
+            industries. Methodology open. Data cite-able. Refreshed as consenting customer orgs opt
+            in.
           </p>
           <p
             style={{
@@ -116,8 +116,8 @@ export default function BiasGenomePage() {
               margin: 0,
             }}
           >
-            Baseline failure rate in this dataset: {Math.round(meta.baselineFailureRate * 100)}%. Every
-            &ldquo;failure lift&rdquo; below is multiplied against this baseline.
+            Baseline failure rate in this dataset: {Math.round(meta.baselineFailureRate * 100)}%.
+            Every &ldquo;failure lift&rdquo; below is multiplied against this baseline.
           </p>
 
           {/* Meta strip */}
@@ -241,10 +241,7 @@ export default function BiasGenomePage() {
             Every bias plotted on two axes — how often it appears, how much it lifts the failure
             rate. The top-right quadrant is where your audit energy pays off.
           </p>
-          <RiskLandscape
-            entries={genome.entries}
-            baselineFailureRate={meta.baselineFailureRate}
-          />
+          <RiskLandscape entries={genome.entries} baselineFailureRate={meta.baselineFailureRate} />
         </div>
       </section>
 
@@ -272,8 +269,8 @@ export default function BiasGenomePage() {
               maxWidth: 680,
             }}
           >
-            Sorted by failure lift — how much more often a decision fails when this bias is
-            present, relative to the baseline. Filter by industry to narrow the slice.
+            Sorted by failure lift — how much more often a decision fails when this bias is present,
+            relative to the baseline. Filter by industry to narrow the slice.
           </p>
           <BiasGenomeClient genome={genome} />
         </div>
@@ -350,7 +347,15 @@ export default function BiasGenomePage() {
             >
               Method · How this dataset is built
             </div>
-            <ul style={{ margin: 0, paddingLeft: 20, fontSize: 14, color: C.slate600, lineHeight: 1.75 }}>
+            <ul
+              style={{
+                margin: 0,
+                paddingLeft: 20,
+                fontSize: 14,
+                color: C.slate600,
+                lineHeight: 1.75,
+              }}
+            >
               <li>
                 Each case is a real, documented strategic decision drawn from SEC filings, NTSB
                 reports, FDA actions, post-mortems, or academic case studies.
@@ -358,7 +363,10 @@ export default function BiasGenomePage() {
               <li>
                 Biases are assigned per-case by applying the Decision Intel taxonomy (DI-B-001 →
                 DI-B-020). Every named bias links to peer-reviewed academic sources at{' '}
-                <Link href="/taxonomy" style={{ color: C.green, textDecoration: 'none', fontWeight: 600 }}>
+                <Link
+                  href="/taxonomy"
+                  style={{ color: C.green, textDecoration: 'none', fontWeight: 600 }}
+                >
                   /taxonomy
                 </Link>
                 .
@@ -368,8 +376,8 @@ export default function BiasGenomePage() {
                 across the full dataset ({Math.round(meta.baselineFailureRate * 100)}%).
               </li>
               <li>
-                <strong>Sample-size gate:</strong> headline rankings require n ≥ 5. Rows with n &lt; 3
-                are shown dimmed with a ⚠ — they are directional only.
+                <strong>Sample-size gate:</strong> headline rankings require n ≥ 5. Rows with n &lt;
+                3 are shown dimmed with a ⚠ — they are directional only.
               </li>
               <li>
                 <strong>Honest selection bias:</strong> famous strategic failures dominate the
@@ -380,7 +388,14 @@ export default function BiasGenomePage() {
                 As consenting customer orgs opt into anonymized outcome sharing (see{' '}
                 <em>Settings → Privacy</em> when logged in), their data supplements this seed. The
                 live genome endpoint at{' '}
-                <code style={{ fontSize: 12, background: C.slate100, padding: '1px 6px', borderRadius: 4 }}>
+                <code
+                  style={{
+                    fontSize: 12,
+                    background: C.slate100,
+                    padding: '1px 6px',
+                    borderRadius: 4,
+                  }}
+                >
                   /api/intelligence/bias-genome
                 </code>{' '}
                 will take over once n ≥ 3 consenting orgs have reported outcomes.
@@ -514,15 +529,7 @@ export default function BiasGenomePage() {
   );
 }
 
-function Pill({
-  label,
-  value,
-  sublabel,
-}: {
-  label: string;
-  value: string;
-  sublabel?: string;
-}) {
+function Pill({ label, value, sublabel }: { label: string; value: string; sublabel?: string }) {
   return (
     <div style={{ minWidth: 0 }}>
       <div
@@ -549,9 +556,7 @@ function Pill({
       >
         {value}
       </div>
-      {sublabel && (
-        <div style={{ fontSize: 11, color: C.slate500, marginTop: 4 }}>{sublabel}</div>
-      )}
+      {sublabel && <div style={{ fontSize: 11, color: C.slate500, marginTop: 4 }}>{sublabel}</div>}
     </div>
   );
 }
