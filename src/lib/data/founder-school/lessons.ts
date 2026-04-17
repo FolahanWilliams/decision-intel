@@ -21,10 +21,17 @@ export interface Lesson {
     detail?: string;
   }>;
   /** The 60-second pitch to a Chief Strategy Officer. Short, confident,
-   *  pain-focused. Optional — populated on methodology lessons. */
+   *  pain-focused. Optional — populated on methodology + GTM lessons. */
   csoPitch?: string;
+  /** The 60-second pitch to an M&A team (deal partners / senior analysts).
+   *  Framed in IC/committee-prep and due-diligence vocabulary. */
+  mnaPitch?: string;
+  /** The 60-second pitch to a corporate strategy group (PMO / strategy-ops
+   *  lead / head of strategic planning). Framed as a recurring hygiene
+   *  step inside the strategic-review cadence. */
+  corpStrategyPitch?: string;
   /** The 60-second pitch to a VC. Short, confident, moat-focused.
-   *  Optional — populated on methodology lessons. */
+   *  Optional — populated on methodology + GTM lessons. */
   vcPitch?: string;
 }
 
@@ -55,6 +62,10 @@ export const TRACKS: Track[] = [
         whyItMatters: 'Most prospects have never audited their strategic process before. You\'re not competing with another vendor — you\'re competing with "doing nothing." Frame every conversation around the cost of inaction, not your product\'s features.',
         action: 'Reframe your next outreach pitch: replace "here\'s what our product does" with "here\'s what changes for your team when strategic decisions are audited." Write this new framing today.',
         reflection: 'What specific organizational behavior does Decision Intel change at your top target company?',
+        csoPitch: 'You don\'t have a process for auditing your own strategic memos before they reach the board, because three years ago it wasn\'t technically possible. LLMs couldn\'t read a 40-page market-entry recommendation, flag the confirmation-bias paragraph, and surface the five objections your steering committee will raise. Now they can. Decision Intel isn\'t replacing anything in your stack — it\'s adding the 60-second audit layer that happens between your analyst and the committee. One behavioural change: every board-bound memo gets run through DI before it leaves the desk. Everything compounding on top of that — the Decision Knowledge Graph, the DQI trend, the recalibrated case library — happens automatically.',
+        mnaPitch: 'The diligence memos your team writes for IC are where DI earns its keep. Before a deal thesis reaches the partners, it runs through DI: confirmation bias, overconfidence, sunk-cost anchoring, base-rate neglect — each flagged with the exact sentence it lives in, and each carrying a historical exemplar from our 135-case library. Your deal team can say "we hit the same pattern Nortel did on Nokia-Siemens" with evidence, not analogy. You\'re not slowing deals down — you\'re removing the category of post-close partner question that starts with "why didn\'t we see that in Q3?"',
+        corpStrategyPitch: 'Your strategy function ships 40-60 recommendations a year. Each one survives or dies inside the steering committee — and the variance isn\'t in the data; it\'s in which biases the memo author didn\'t catch themselves. DI is the missing hygiene step: every memo gets audited for the specific decision-failure patterns your organisation has produced before. Not a new meeting, not a new dashboard, not a new workflow — a 60-second pass that happens before the committee pack is finalised. Over 12 months it compounds into a Decision Knowledge Graph your CEO can ask questions of.',
+        vcPitch: 'The interesting thing about enterprise strategy software isn\'t that it takes 6-18 months — it\'s that the decision to buy requires the organisation to admit they don\'t currently have this capability. Nobody has a process for auditing their own strategic memos because three years ago it wasn\'t technically feasible. That makes this a category-creation sale, not a displacement sale: no incumbent, no competitive RFP, and the longer we\'re in market defining the category, the more expensive it becomes for anyone else to enter. At pre-seed our moat is time-in-market, not just tech.',
       },
       {
         id: 'es_2',
@@ -66,6 +77,10 @@ export const TRACKS: Track[] = [
         whyItMatters: 'For Decision Intel, your champion is likely a VP of Strategy or a senior M&A analyst — someone who has personally experienced a decision go wrong and sees auditing as their competitive advantage internally.',
         action: 'For each prospect in your pipeline, name your champion specifically. If you can\'t name a person, finding one is your next task before any other sales activity.',
         reflection: 'What does your champion gain internally by championing Decision Intel? How does it make them look to their boss?',
+        csoPitch: 'I\'ll be direct — I\'m not selling to you initially. I\'m selling to your VP of Strategy or Director-level, the person who\'s already watched one memo land badly in front of the board and felt the asymmetry: the analyst gets blamed, you have to rebuild trust. That person wants DI because running the audit makes them the adult in the room on every recommendation. They bring me in; you approve. Economic buyer is you; champion is them. Both roles have to be right for this to close — if you approve without a champion who lives in the workflow, it becomes shelfware inside six months.',
+        mnaPitch: 'Your champion is almost always a senior associate or VP who has personally worked on a deal that blew up, and who can now name the exact bias that drove the miss. They don\'t hold budget, but they hold credibility. When they walk into your office and say "this would have caught the Nortel analogue on that Q3 deal," you listen because they lived it. Without that internal narrator I\'m just another vendor the deal team doesn\'t have time to evaluate — the champion is the oxygen in this sale.',
+        corpStrategyPitch: 'In corporate strategy teams, the champion is usually a strategy-ops lead or PMO director — someone who owns the process around strategic reviews and wants more rigour, not less. They sit through every board pack and wince when a recommendation lands without supporting evidence. They bring DI to the CSO as a "quality gate," not as a tool — that framing is what gets it budgeted. Pitch DI as the piece of infrastructure that makes strategic-review cadence feel defensible, and you\'ll close faster than if you sell it as features.',
+        vcPitch: 'The champion model is why bottom-up enterprise GTM works at all. Every target org has someone who has felt the pain but can\'t name the category — when they see DI, they name it instantly. Our job isn\'t to find 500 buyers; it\'s to find 20 champions in the right ICPs who become our internal narrators. Each champion unlocks an org, each org becomes a published case study, and each case study finds the next 20 champions. That\'s the distribution flywheel — cheaper than outbound, more defensible than paid.',
       },
       {
         id: 'es_3',
@@ -77,6 +92,10 @@ export const TRACKS: Track[] = [
         whyItMatters: 'For Decision Intel, the economic buyer is typically a CSO, COO, or whoever owns the strategic planning budget — not the analyst who runs the audits. Know which conversations you\'re having with which person.',
         action: 'For your top 3 prospects, write: (1) champion name and title, (2) economic buyer role, (3) your plan to get from champion to economic buyer introduction.',
         reflection: 'What\'s the specific conversation that moves a deal from "champion loves us" to "economic buyer approved"?',
+        csoPitch: 'Let me be honest about the buying motion: you don\'t need to love this tool. Your VP of Strategy does. You need to trust her judgement, see the evidence pack she\'s built, and approve the budget — that\'s the relationship this software has to your office. If I try to sell directly to you and skip the person who actually uses it, we end up with shelfware. The champion uses it every week; you fund it once a year; the metric that moves is the DQI trend she shows you at quarterly reviews.',
+        mnaPitch: 'In M&A, the champion is your senior analyst or VP; the economic buyer is the managing director or the partner holding deal-support budget. The champion never says "buy this" — she says "the last three deals we lost, DI would have surfaced the root-cause bias pre-IC, here\'s the pattern match against our case library." That\'s the evidence the MD needs. The check-signing conversation happens once; the champion-loved conversation is what gets you there. Skip the champion layer and the MD will politely ask you to "come back after we\'ve heard from the team" — which is where deals quietly die.',
+        corpStrategyPitch: 'In a corporate strategy group, the economic buyer is typically the CSO or COO, depending on where strategic planning reports. The champion is the strategy lead or PMO owner of the review cadence. The critical thing founders get wrong: they pitch straight to the CSO, get a polite "we\'ll take a look," and nothing happens. The CSO isn\'t saying no — they\'re saying "I can\'t evaluate this without the person who\'ll use it." Champion first. Economic buyer second. In that order, enterprise strategy deals close in 60-90 days; inverted, they take 18 months and usually die.',
+        vcPitch: 'The champion-then-economic-buyer motion is what makes enterprise CAC defensible. We\'re not running outbound to CSOs — we\'re running content and product at the analyst layer who becomes the champion, and letting them sell up. That\'s why content-led GTM (Bias Genome, case studies, LinkedIn founder voice) works for us: the champion finds us through research, not a pitch. By the time the economic-buyer conversation happens, the deal is already championed internally. Our blended CAC at scale is projected to land well under $3K per seat — unusual for enterprise strategy software, and it\'s a direct consequence of this motion.',
       },
       {
         id: 'es_4',

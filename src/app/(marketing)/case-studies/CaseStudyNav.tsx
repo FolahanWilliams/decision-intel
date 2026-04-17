@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Brain } from 'lucide-react';
+import Image from 'next/image';
 
 const C = {
   navy: '#0F172A',
@@ -29,7 +29,7 @@ export function CaseStudyNav() {
     >
       <div
         style={{
-          maxWidth: 1200,
+          maxWidth: 1280,
           margin: '0 auto',
           padding: '0 24px',
           height: 64,
@@ -47,7 +47,13 @@ export function CaseStudyNav() {
             textDecoration: 'none',
           }}
         >
-          <Brain size={24} style={{ color: C.green }} />
+          <Image
+            src="/logo.png"
+            alt="Decision Intel"
+            width={28}
+            height={28}
+            style={{ borderRadius: 6, objectFit: 'cover' }}
+          />
           <span
             style={{
               fontSize: 18,

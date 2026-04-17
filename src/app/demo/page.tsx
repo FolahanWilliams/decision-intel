@@ -25,6 +25,10 @@ import {
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { DEMO_ANALYSES } from './data';
+import { PipelineFlowDiagram } from '@/components/marketing/how-it-works/PipelineFlowDiagram';
+import { PipelineNodeDetail } from '@/components/marketing/how-it-works/PipelineNodeDetail';
+import { DqiComponentBars } from '@/components/marketing/how-it-works/DqiComponentBars';
+import { NoiseDistributionViz } from '@/components/marketing/how-it-works/NoiseDistributionViz';
 import { DQIBadge } from '@/components/ui/DQIBadge';
 import { Reveal } from '@/components/ui/Reveal';
 import { trackEvent } from '@/lib/analytics/track';
@@ -132,6 +136,7 @@ const BiasProfileRadar = dynamic(
 );
 
 const FLOW_SECTIONS = [
+  { id: 'pipeline', label: 'Pipeline' },
   { id: 'score', label: 'Score' },
   { id: 'biases', label: 'Biases' },
   { id: 'noise', label: 'Noise' },
@@ -172,8 +177,9 @@ export default function DemoPage() {
   const [pasteText, setPasteText] = useState('');
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
-  const [activeSection, setActiveSection] = useState('score');
+  const [activeSection, setActiveSection] = useState('pipeline');
   const [showAllBiases, setShowAllBiases] = useState(false);
+  const [activePipelineNodeId, setActivePipelineNodeId] = useState<string | null>(null);
 
   const analysis = selectedIdx !== null ? DEMO_ANALYSES[selectedIdx] : null;
 
@@ -790,6 +796,65 @@ export default function DemoPage() {
                 })}
               </nav>
 
+              {/* Section 0: Pipeline — inside the audit */}
+              <div id="pipeline" style={{ scrollMarginTop: 80 }}>
+                <div
+                  style={{
+                    ...cardStyle,
+                    padding: '28px 32px',
+                    marginBottom: 24,
+                    background: C.white,
+                  }}
+                >
+                  <div style={{ marginBottom: 20 }}>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 700,
+                        color: C.green,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.1em',
+                        marginBottom: 8,
+                      }}
+                    >
+                      Inside the audit
+                    </div>
+                    <h2
+                      style={{
+                        fontSize: 22,
+                        fontWeight: 700,
+                        color: C.slate900,
+                        letterSpacing: '-0.01em',
+                        margin: '0 0 8px',
+                      }}
+                    >
+                      The 12 agents that read your memo.
+                    </h2>
+                    <p
+                      style={{
+                        fontSize: 14,
+                        color: C.slate600,
+                        lineHeight: 1.6,
+                        margin: 0,
+                        maxWidth: 640,
+                      }}
+                    >
+                      A sequential preprocessing chain, seven parallel analysis agents, and a
+                      two-step synthesis that reconciles the signals and computes the DQI. Click
+                      any node to see what it does.
+                    </p>
+                  </div>
+                  <PipelineFlowDiagram
+                    activeNodeId={activePipelineNodeId}
+                    onSelectNode={setActivePipelineNodeId}
+                  />
+                </div>
+              </div>
+              <PipelineNodeDetail
+                nodeId={activePipelineNodeId}
+                onClose={() => setActivePipelineNodeId(null)}
+              />
+
               {/* Section 1: Score Hero */}
               <div id="score" style={{ scrollMarginTop: 80 }}>
                 <div
@@ -900,6 +965,14 @@ export default function DemoPage() {
                   <p style={{ color: C.slate600, lineHeight: 1.65, margin: 0, fontSize: 14 }}>
                     {analysis.summary}
                   </p>
+                </Section>
+                {/* DQI methodology — how the single number is built */}
+                <Section
+                  icon={<BarChart3 size={16} />}
+                  title="How the DQI is built"
+                  subtitle="Six weighted components feed the composite score. A-F grade scale is fixed and published — re-runnable against the methodology, not a proprietary black box."
+                >
+                  <DqiComponentBars />
                 </Section>
               </div>
 
@@ -1229,6 +1302,14 @@ export default function DemoPage() {
                       </div>
                     </div>
                   </div>
+                </Section>
+                {/* Noise methodology — what the distribution looks like */}
+                <Section
+                  icon={<Target size={16} />}
+                  title="Why noise matters"
+                  subtitle="Two memos with the same logic should get the same DQI. Low noise means your reasoning travels — different reviewers converge on the same verdict. High noise means half your committee was reading a different paper."
+                >
+                  <NoiseDistributionViz />
                 </Section>
               </div>
 

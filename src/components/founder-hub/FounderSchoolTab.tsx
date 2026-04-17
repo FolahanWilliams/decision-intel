@@ -312,9 +312,10 @@ function LessonDetail({
           </div>
         )}
 
-        {/* Ready-to-use CSO / VC pitches — Platform Foundations lessons
-            carry these so you can walk into the meeting already fluent. */}
-        {(lesson.csoPitch || lesson.vcPitch) && (
+        {/* Ready-to-use buyer pitches — methodology + GTM lessons carry
+            these so you can walk into the meeting already fluent. Four
+            personas covered: CSO, M&A, Corporate Strategy, VC. */}
+        {(lesson.csoPitch || lesson.mnaPitch || lesson.corpStrategyPitch || lesson.vcPitch) && (
           <div
             style={{
               display: 'grid',
@@ -324,56 +325,40 @@ function LessonDetail({
             }}
           >
             {lesson.csoPitch && (
-              <div
-                style={{
-                  background: 'rgba(22,163,74,0.06)',
-                  border: '1px solid rgba(22,163,74,0.24)',
-                  borderRadius: 'var(--radius-md)',
-                  padding: '12px 14px',
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: 10,
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
-                    color: 'var(--accent-primary)',
-                    marginBottom: 6,
-                  }}
-                >
-                  60-second pitch · CSO
-                </div>
-                <p style={{ fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.6, margin: 0 }}>
-                  &ldquo;{lesson.csoPitch}&rdquo;
-                </p>
-              </div>
+              <PitchCard
+                label="60-second pitch · CSO"
+                body={lesson.csoPitch}
+                background="rgba(22,163,74,0.06)"
+                border="rgba(22,163,74,0.24)"
+                labelColor="var(--accent-primary)"
+              />
+            )}
+            {lesson.mnaPitch && (
+              <PitchCard
+                label="60-second pitch · M&A"
+                body={lesson.mnaPitch}
+                background="rgba(14,116,144,0.06)"
+                border="rgba(14,116,144,0.24)"
+                labelColor="#0E7490"
+              />
+            )}
+            {lesson.corpStrategyPitch && (
+              <PitchCard
+                label="60-second pitch · Corp Strategy"
+                body={lesson.corpStrategyPitch}
+                background="rgba(124,58,237,0.06)"
+                border="rgba(124,58,237,0.24)"
+                labelColor="#7C3AED"
+              />
             )}
             {lesson.vcPitch && (
-              <div
-                style={{
-                  background: 'rgba(15,23,42,0.04)',
-                  border: '1px solid rgba(15,23,42,0.14)',
-                  borderRadius: 'var(--radius-md)',
-                  padding: '12px 14px',
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: 10,
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
-                    color: '#0F172A',
-                    marginBottom: 6,
-                  }}
-                >
-                  60-second pitch · VC
-                </div>
-                <p style={{ fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.6, margin: 0 }}>
-                  &ldquo;{lesson.vcPitch}&rdquo;
-                </p>
-              </div>
+              <PitchCard
+                label="60-second pitch · VC"
+                body={lesson.vcPitch}
+                background="rgba(15,23,42,0.04)"
+                border="rgba(15,23,42,0.14)"
+                labelColor="#0F172A"
+              />
             )}
           </div>
         )}
@@ -556,6 +541,47 @@ export function FounderSchoolTab({ founderPass }: FounderSchoolTabProps) {
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+function PitchCard({
+  label,
+  body,
+  background,
+  border,
+  labelColor,
+}: {
+  label: string;
+  body: string;
+  background: string;
+  border: string;
+  labelColor: string;
+}) {
+  return (
+    <div
+      style={{
+        background,
+        border: `1px solid ${border}`,
+        borderRadius: 'var(--radius-md)',
+        padding: '12px 14px',
+      }}
+    >
+      <div
+        style={{
+          fontSize: 10,
+          fontWeight: 700,
+          textTransform: 'uppercase',
+          letterSpacing: '0.08em',
+          color: labelColor,
+          marginBottom: 6,
+        }}
+      >
+        {label}
+      </div>
+      <p style={{ fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.6, margin: 0 }}>
+        &ldquo;{body}&rdquo;
+      </p>
     </div>
   );
 }

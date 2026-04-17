@@ -216,7 +216,7 @@ export default function LandingPage() {
       >
         <div
           style={{
-            maxWidth: 1200,
+            maxWidth: 1400,
             margin: '0 auto',
             padding: '0 24px',
             height: 64,
@@ -251,7 +251,9 @@ export default function LandingPage() {
                   ? '/case-studies'
                   : item === 'Pricing'
                     ? '/pricing'
-                    : `#${item.toLowerCase().replace(/\s+/g, '-')}`;
+                    : item === 'How It Works'
+                      ? '/how-it-works'
+                      : `#${item.toLowerCase().replace(/\s+/g, '-')}`;
               return (
                 <a
                   key={item}
@@ -325,7 +327,9 @@ export default function LandingPage() {
                   ? '/case-studies'
                   : item === 'Pricing'
                     ? '/pricing'
-                    : `#${item.toLowerCase().replace(/\s+/g, '-')}`;
+                    : item === 'How It Works'
+                      ? '/how-it-works'
+                      : `#${item.toLowerCase().replace(/\s+/g, '-')}`;
               return (
                 <a
                   key={item}
