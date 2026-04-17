@@ -50,9 +50,10 @@ const C = {
 } as const;
 
 const fadeIn = {
-  initial: { opacity: 0, y: 20 },
+  initial: { opacity: 0, y: 16 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true },
+  viewport: { once: false, amount: 0.15, margin: '0px 0px -8% 0px' },
+  transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] },
 };
 
 // ── Newsletter Form (shared by newsletter section + footer) ─────────────
@@ -605,12 +606,12 @@ export default function LandingPage() {
       <CaseStudyCarousel />
 
       {/* ── Credibility trio (Proof / Bias Genome / Privacy) ────────── */}
-      <Reveal>
+      <Reveal repeat>
         <CredibilityTrio />
       </Reveal>
 
       {/* ── Four Moments (core value proposition) ───────────────────── */}
-      <Reveal>
+      <Reveal repeat>
         <section
           id="four-moments"
           style={{ maxWidth: 1200, margin: '0 auto', padding: '96px 24px' }}
@@ -789,7 +790,7 @@ export default function LandingPage() {
       </Reveal>
 
       {/* ── How It Works ────────────────────────────────────────────── */}
-      <Reveal>
+      <Reveal repeat>
         <section
           id="how-it-works"
           style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}
@@ -840,7 +841,7 @@ export default function LandingPage() {
       </Reveal>
 
       {/* ── Features ────────────────────────────────────────────────── */}
-      <Reveal>
+      <Reveal repeat>
         <section id="features" style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}>
           <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
             <p
@@ -1334,7 +1335,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── FAQ + Competitor Comparison ───────────────────────────────── */}
-      <Reveal>
+      <Reveal repeat>
         <section id="faq" style={{ maxWidth: 1320, margin: '0 auto', padding: '96px 24px' }}>
           <motion.div
             {...fadeIn}

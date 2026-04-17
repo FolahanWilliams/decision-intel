@@ -17,21 +17,25 @@ export function Reveal({
   className,
   style,
   delay,
+  repeat,
 }: {
   children: ReactNode;
   className?: string;
   style?: CSSProperties;
   /** Optional additional CSS transition delay (ms) for staggered reveals. */
   delay?: number;
+  /** If true, subtly re-reveals on every entry (not just first). */
+  repeat?: boolean;
 }) {
-  const ref = useScrollReveal<HTMLDivElement>();
+  const ref = useScrollReveal<HTMLDivElement>({ repeat });
   const mergedStyle: CSSProperties = delay
     ? { ...style, transitionDelay: `${delay}ms` }
     : (style ?? {});
+  const baseClass = repeat ? 'scroll-reveal scroll-reveal-subtle' : 'scroll-reveal';
   return (
     <div
       ref={ref}
-      className={className ? `scroll-reveal ${className}` : 'scroll-reveal'}
+      className={className ? `${baseClass} ${className}` : baseClass}
       style={mergedStyle}
     >
       {children}

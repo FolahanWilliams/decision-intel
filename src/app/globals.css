@@ -2415,11 +2415,27 @@ tr:hover td {
 }
 @media (prefers-reduced-motion: reduce) {
   .scroll-reveal,
-  .scroll-reveal.is-visible {
+  .scroll-reveal.is-visible,
+  .scroll-reveal-subtle,
+  .scroll-reveal-subtle.is-visible {
     opacity: 1;
     transform: none;
     transition: none;
   }
+}
+
+/* Subtle variant — pair with Reveal `repeat` prop. Smaller translate + partial
+   opacity so re-entries on scroll-up read as polish, not a full replay. */
+.scroll-reveal.scroll-reveal-subtle {
+  opacity: 0.4;
+  transform: translateY(8px);
+  transition:
+    opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.scroll-reveal.scroll-reveal-subtle.is-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* Hide "This month" caption on narrow viewports — pill stands alone there */
