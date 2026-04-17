@@ -66,7 +66,7 @@ General AI:
 === MARKET STRATEGY ===
 Primary buyer: Chief Strategy Officer or Head of Corporate Strategy. They sign the contract and care about compounding edge plus board-ready evidence. Secondary user: strategy manager or analyst who actually uploads documents and cares about less rework plus faster executive-review prep.
 Primary vertical: Corporate Strategy teams at enterprises (10,000+ eligible orgs, defined budgets, AI-receptive in 2026). Secondary: M&A teams inside the same enterprises. Tertiary expansion: BizOps/FP&A teams, sales forecasting. PE/VC is NOT the target early audience: budgets are small relative to enterprises, buying is relationship-driven, and funds are skeptical of unknown tools. Advisor feedback (the consultant who took Wiz from startup to $32B) was explicit on this pivot.
-Pricing: Free tier (4 analyses/month, core platform access), Strategy ($2,499/mo, unlimited analyses, full platform), Enterprise (Custom, multi-division, SSO, SLA). Free tier enables product-led growth. Sales-led trial mechanism is a free 30-day pilot on the buyer's next high-stakes strategic memo. The Knowledge Graph compounds over time, creating switching costs. Per-deal transactional pricing was removed because the product's value IS the longitudinal learning.
+Pricing: Free tier (4 analyses/month), Individual ($249/mo or $2,490/yr, 15 analyses, solo strategist), Strategy ($2,499/mo, unlimited analyses, team Decision Knowledge Graph + Decision Rooms), Enterprise (Custom, multi-division, SSO, SLA). Free tier enables product-led growth. Sales-led trial mechanism is a free 30-day pilot on the buyer's next high-stakes strategic memo. The Knowledge Graph compounds over time, creating switching costs. Per-deal transactional pricing was removed because the product's value IS the longitudinal learning.
 Market: Decision intelligence $12.2B going to $46.4B by 2030. Enterprise GRC $50B+. Corporate strategy and M&A advisory market $40B+ annually.
 Expansion: Year 1 Corporate Strategy and M&A inside enterprises. Year 2 BizOps, FP&A, sales forecasting, risk. Year 3 Government, Insurance, Healthcare strategy functions. Year 4+ horizontal platform. PE/VC remains a long-term secondary vertical but is not the wedge.
 
@@ -116,6 +116,18 @@ Demo script: Upload a strategic memo, Score reveal (pause for effect), Bias walk
 - Consider a "Decision Score" that's external-facing — like a credit score for organizational decision quality.
 
 === RECENTLY SHIPPED FEATURES (April 2026) ===
+- /how-it-works Credibility Page: 8-section deep-dive into the 12-node pipeline, bias detection, toxic combinations, DQI methodology, noise + boardroom simulation, academic foundations, and security posture. Centerpiece PipelineFlowDiagram with clickable node drawers. All pure SVG + Framer Motion.
+- /proof Pre-Decision Evidence Explorer: Split-panel page surfacing original documents from BEFORE outcomes were known alongside numbered red flags, hypothetical DQI scores, and outcome reveals. DecisionTimeline bubble chart and CaseBiasWeb radial network.
+- /bias-genome Public Bias Genome: Which biases predict failure by industry, computed from 33 seed case studies. RiskLandscape 2D scatter and ToxicNetworkGraph hub-and-spoke. Every metric shows its n=. Migration path to live data when 3+ consenting orgs report outcomes.
+- CredibilityTrio Landing Section: 3-card link block between How It Works and Features on the landing page, each with a self-contained SVG thumbnail linking to /proof, /bias-genome, and /privacy.
+- View-as Toggle (Analyst/CSO/Board): 3-way segmented control on document detail page. CSO view shows exec summary + recommendation + featured counterfactual. Board view shows inline 2-page preview mirroring the exported board report PDF.
+- Featured Counterfactual: Hero ROI card above analysis tabs showing highest-impact scenario (remove bias → success lift). Null when no positive scenario exists.
+- Decision Log Unification: Merged journal + cognitive audits into single /dashboard/decision-log page with chip filters and status segmented control.
+- Compare Selected: Browse multi-select batch action for 2-3 documents, routes to /dashboard/compare.
+- Board-Ready PDF Export: 2-page jsPDF (exec summary, DQI card, top-3 biases, CEO question, top mitigation). Wired into ShareModal and Command Palette.
+- Founder Hub Vertical Rail: Left sidebar replaces horizontal tab strip, 4 groups (Product, Go-to-Market, Intelligence, Tools).
+- Founder School: 58 lessons across 8 tracks including Platform Foundations with academic sources, CSO/VC pitches.
+- Privacy Marketing Page: Full marketing+legal page with animated DataLifecycleViz, trust guarantees, GDPR rights cards.
 - Email Forwarding Integration: Unique email address per user (analyze+{token}@in.decision-intel.com). Forward documents or paste text → auto-analyzed. Supports PDF, DOCX, XLSX, CSV, PPTX attachments. Confirmation email with dashboard link. Resend webhook with HMAC verification.
 - Google Drive Connector: OAuth 2.0 integration. Watch folders for new documents, auto-analyze every 10 minutes. Google Docs/Sheets/Slides auto-exported. Folder picker UI. Encrypted refresh token storage. Full marketplace card in Settings.
 - Slack Deep Thread Analysis: /di analyze in threads now fetches all messages, combines into structured document, runs full analysis pipeline, posts rich results back to thread. Zero-friction decision auditing from any Slack discussion.
@@ -149,7 +161,7 @@ Demo script: Upload a strategic memo, Score reveal (pause for effect), Bias walk
 - Quick Bias Check: Dashboard modal for instant <5s bias scan via paste. Shared Gemini utility across extension + platform.
 - Counterfactual Analysis API: "What-if" decision path computation with narrative explanations.
 - Enterprise Project Types: M&A, Strategic Initiative, Risk Assessment, Vendor Evaluation, Product Launch, Restructuring — alongside existing PE/VC types.
-- Founder Hub Expansion: Now 16 tabs — Product Overview, Analysis Pipeline, Scoring Engine, DQI Methodology, Integrations & Flywheel, Strategy & Positioning, Sales Toolkit, Live Stats, Playbook & Research, Methodologies & Principles, Case Studies, Correlation & Causal Graph, Decision Alpha, Content Studio, Investor Defense, Founder Tips. Global search (⌘K) with Escape to clear, responsive tab strip, floating AI chat widget.
+- Founder Hub: 11 primary tabs (consolidated from 17). Product Overview, Pipeline & Scoring (merged 3), Research & Foundations (merged 2), Competitive Positioning (merged 2), Sales Toolkit, Outreach & Meetings, Content Studio, Data Ecosystem (merged 2), Case Library (merged 3), Founder Tips, Founder School (58 lessons across 8 tracks). Vertical left rail with 4 groups (Product, Go-to-Market, Intelligence, Tools). Global search (⌘K) with Escape to clear, floating AI chat widget.
 - Content Studio: AI-powered content generation for LinkedIn posts, Twitter/X threads, blog drafts, snippets, and YouTube scripts. Four content pillars (Last-Mile Problem, Decision Noise, Toxic Combinations, Decision Alpha). Tone customization (authoritative, conversational, technical, inspirational). Voice notes persistence. Minto Pyramid (BLUF) structure enforced. Content library with draft/ready/posted status management. Powered by Gemini with full founder context injection.
 - Methodologies & Principles Tab: Academic grounding for all platform features — Kahneman, Klein, Tetlock, Duke, Sibony, Strebulaev, Lochhead, Thiel frameworks with implementation mapping.
 - Founder Tips Tab: 23 personalized strategic principles across 7 sections (Narrative & Positioning, Moat Discipline, GTM & Wedge — now including "First paying customer is the only milestone before fundraise" and "GTM co-founder is a 6-month recruiting project" — Execution, Refinement & Consolidation, Phase Awareness, Product Roadmap). Grounded in founder's specific position. Each tip has principle, rationale, and concrete action.
@@ -235,13 +247,13 @@ Beat 7 — MARKET (Opportunity Size): "Decision intelligence $12.2B to $46.4B by
 PHASE 3 — CONVICTION (Why You Will Win):
 Beat 8 — CONVICTION (Why You Will Win): "Three moat layers. Layer 1: Decision Knowledge Graph, a living network of every strategic memo, assumption, bias, and outcome per customer. This is the proprietary asset that compounds and cannot be cloned. Layer 2: Causal learning engine that needs 18+ months of outcome data per org to calibrate. Layer 3: Cross-org Bias Genome dataset, the only one of its kind. Competitors can copy the audit UI. They cannot copy 18 months of accumulated institutional memory."
 Beat 9 — ADVANTAGE (Unique Strength): "Toxic Combination Detection. Individual bias detection is a feature. Calibrated compound risk scoring with org-specific weights, dollar impact estimation, and auto-generated mitigation playbooks is a product category. That is the difference between a thermometer and a cardiologist."
-Beat 10 — TRACTION (Signals That Matter): "199K+ lines of production TypeScript, 586+ automated tests, 160+ API routes, full analysis engine shipped. 4 integration channels (Web, Slack, Chrome Extension, Public API). Strategy-plan pricing generating early revenue signal."
+Beat 10 — TRACTION (Signals That Matter): "199K+ lines of production TypeScript, 586+ automated tests, 70+ API routes, 71 Prisma models, full analysis engine shipped. 6 integration channels (Web, Slack, Google Drive, Email, Chrome Extension, REST API). Strategy-plan pricing generating early revenue signal."
 Beat 11 — TEAM (Why You): "Solo technical founder, 16, Nigeria. Built entire platform solo. Advised by senior consultant who helped take Wiz from startup to $32B. The codebase IS the company, not tribal knowledge. Any senior full-stack engineer can onboard in weeks."
 
 PHASE 4 — VIABILITY (Reduce Risk):
-Beat 12 — BUSINESS MODEL: "Two tiers: Strategy $2,499/mo (unlimited audits, full platform) and Enterprise custom. 97% gross margins at $0.03-0.07 API cost per analysis. Land motion: free 30-day pilot on their next high-stakes strategic memo. They see the Knowledge Graph seed, understand the compounding value, then subscribe. No transactional pricing because the product's entire value is longitudinal learning."
+Beat 12 — BUSINESS MODEL: "Three tiers: Individual $249/mo (15 audits, solo strategist), Strategy $2,499/mo (unlimited audits, team Decision Knowledge Graph, Decision Rooms), Enterprise custom. 97% gross margins at ~$0.40-0.65 per audit (17 LLM calls across 12 nodes). Land motion: free 30-day pilot on their next high-stakes strategic memo. They see the Knowledge Graph seed, understand the compounding value, then subscribe. No transactional pricing because the product's entire value is longitudinal learning."
 Beat 13 — COMPETITION: "McKinsey consults quarterly, we audit every strategic memo in real time. Palantir analyzes data, we analyze the reasoning behind the data. ChatGPT gives one opinion from one model, we give 3 independent judges, a 20x20 compound matrix, and an outcome flywheel with auditable evidence for the board."
-Beat 14 — UNIT ECONOMICS: "~97% gross margins. $0.03-0.07 API cost per analysis. $2,499/mo subscription equals $30K ARR per customer minimum. CAC for corporate strategy teams is accessible via LinkedIn content (bias case studies on famous corporate decisions) and warm intros through the advisor network. Free pilot converts at high rate because the Knowledge Graph seeds during the trial: customers would lose their institutional memory by not subscribing."
+Beat 14 — UNIT ECONOMICS: "~97% gross margins. ~$0.40-0.65 API cost per audit (17 LLM calls across 12 nodes, cost-tier routing moves 3 nodes to Flash Lite for 15-25% savings). Individual at $249/mo with ~6 pounds raw cost on 15 audits. Strategy at $2,499/mo equals $30K ARR per customer minimum. CAC for corporate strategy teams is accessible via LinkedIn content (bias case studies on famous corporate decisions) and warm intros through the advisor network. Free pilot converts at high rate because the Knowledge Graph seeds during the trial: customers would lose their institutional memory by not subscribing."
 
 PHASE 5 — DECISION (Make It Easy to Act):
 Beat 15 — ASK: State clearly how much you are raising, at what terms, and why this amount. Tie to specific milestones (first 10 paying customers, first enterprise contract, first ML hire).
@@ -341,7 +353,7 @@ The product is now transitioning from rapid feature shipping to refinement, stre
 6. Strengthen integrations depth rather than adding new ones
 7. Focus on getting first paid design partner before raising
 When advising the founder, prioritize refinement suggestions over new feature ideas. The product has reached a point where consolidation creates more value than expansion.
-Scale reality: 200+ React components, 70+ API routes, 61 Prisma models, full LangGraph analysis pipeline, 7 regulatory compliance frameworks, ~1,500-line Prisma schema. This is beyond most Series A codebases. The strategic question is no longer "what else can we build" but "what can we polish and bundle into a killer demo that converts a CSO on first click."
+Scale reality: 200+ React components, 70+ API routes, 71 Prisma models, full LangGraph analysis pipeline, 7 regulatory compliance frameworks, ~1,500-line Prisma schema. This is beyond most Series A codebases. The strategic question is no longer "what else can we build" but "what can we polish and bundle into a killer demo that converts a CSO on first click."
 
 === FUNDRAISING STATE ===
 - Currently pre-revenue. No paying design partner yet. Actively outreaching to corporate strategy and M&A teams via advisor network.
@@ -349,7 +361,7 @@ Scale reality: 200+ React components, 70+ API routes, 61 Prisma models, full Lan
 - Needs: GTM / enterprise-sales co-founder or advisor. Technical side is covered solo. The gap is distribution, not product.
 - Advisor: senior consultant who helped take Wiz from startup to $32B. Leverage this for warm intros AND as a credibility signal in decks.
 - Founder: solo technical, 16, based in Nigeria. The age and geography are NOT liabilities if framed correctly — they're proof of conviction, velocity, and cost discipline. Frame as "the codebase IS the company" so any senior full-stack engineer can onboard in weeks.
-- Margin discipline: 97% gross margins ($0.03–0.07 API cost per analysis). Unit economics are not an issue; distribution is.
+- Margin discipline: ~97% gross margins (~$0.40-0.65 per audit, 17 LLM calls across 12 nodes). Unit economics are not an issue; distribution is.
 
 === AI INFRASTRUCTURE (TECHNICAL PROOF POINTS) ===
 - Primary LLM: Google Gemini (cost-efficient, grounded search, long context).
@@ -377,7 +389,7 @@ Share these when the founder asks about code quality or onboarding a future engi
 - The wedge is making the problem visible in 60 seconds. If a prospect uploads a document and the DQI score surprises them, the sale is halfway done.
 - When someone asks "why hasn't anyone done this before" the answer is: "Two years ago, LLMs couldn't detect bias in context. Now they can. The tool didn't exist to build it. It does now."
 
-=== CURRENT PHASE (as of 2026-04-14) ===
+=== CURRENT PHASE (as of 2026-04-17) ===
 - Phase: refinement and polish. NOT new feature build. The codebase has 200+ components and 70+ API routes — more than most Series A startups. Priority is polishing the upload -> analyze -> review -> track-outcomes flow for pilot acquisition.
 - Pilot status: zero paying customers. Active outreach to corporate strategy and M&A teams via advisor network. PE/VC is the secondary fallback vertical (2-week kill switch if no CSO pilot materializes).
 - Fundraise: pre-seed/seed targeting next 6 months. Reference logos matter more than feature count.

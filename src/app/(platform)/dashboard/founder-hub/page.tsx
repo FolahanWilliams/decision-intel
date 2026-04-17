@@ -310,7 +310,7 @@ const SEARCH_INDEX: SearchEntry[] = [
   {
     tabId: 'case_library',
     section: 'Historical Cases',
-    preview: '14 case studies with pre-decision evidence.',
+    preview: '50+ case studies with pre-decision evidence.',
     keywords:
       'historical cases kodak blockbuster nokia enron case studies library evidence corporate decisions',
   },
