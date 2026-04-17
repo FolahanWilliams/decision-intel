@@ -478,7 +478,7 @@ export default function DemoPage() {
                 className="text-xs text-slate-500 hover:text-slate-900 transition-colors cursor-pointer bg-transparent border-none flex items-center gap-1.5 mx-auto"
               >
                 <ClipboardPaste size={14} />
-                {pasteMode ? 'Hide text input' : 'Or paste your own text for a preview'}
+                {pasteMode ? 'Hide text input' : 'Or paste your own strategic memo'}
               </button>
             </div>
             {pasteMode && !scanResult && (
@@ -491,7 +491,7 @@ export default function DemoPage() {
                 />
                 <div className="flex justify-between items-center mt-3">
                   <span className="text-[11px] text-slate-500">
-                    Real-time bias scan — results generated from your text
+                    Pattern scan — results generated from your text
                   </span>
                   <button
                     onClick={handlePasteAnalyze}
@@ -2126,7 +2126,7 @@ function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () =
           <ScoreCard
             label="SCAN TYPE"
             value="Quick"
-            sub={result.isPreDecision ? 'Pre-decision detected' : '14-bias pattern scan'}
+            sub={result.isPreDecision ? 'Pre-decision detected' : 'Pattern scan'}
             color={C.slate900}
             smallValue
           />

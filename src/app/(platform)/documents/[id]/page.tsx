@@ -1097,6 +1097,72 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         )}
       </header>
 
+      {/* Overdue outcome banner — prompts the user to close the flywheel loop
+          by reporting what actually happened. The server's outcome-reminders
+          cron flips outcomeStatus to 'outcome_overdue' past outcomeDueAt; we
+          also flag early if dueAt is in the past but the cron hasn't run yet. */}
+      {analysis &&
+        (() => {
+          const extra = analysis as unknown as {
+            outcomeStatus?: string;
+            outcomeDueAt?: string;
+          };
+          const dueDate = extra.outcomeDueAt ? new Date(extra.outcomeDueAt) : null;
+          const isOverdue =
+            extra.outcomeStatus === 'outcome_overdue' ||
+            (extra.outcomeStatus === 'pending_outcome' &&
+              dueDate !== null &&
+              dueDate.getTime() < Date.now());
+          if (!isOverdue) return null;
+          return (
+            <div
+              className="mb-lg"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '12px 16px',
+                borderRadius: 12,
+                background: 'rgba(245, 158, 11, 0.08)',
+                border: '1px solid rgba(245, 158, 11, 0.3)',
+                color: 'var(--text-primary)',
+              }}
+              role="status"
+            >
+              <AlertTriangle size={16} style={{ color: '#F59E0B', flexShrink: 0 }} />
+              <div style={{ fontSize: 13, lineHeight: 1.5, flex: 1 }}>
+                <strong style={{ fontWeight: 600 }}>Outcome due.</strong>{' '}
+                {dueDate
+                  ? `This decision was flagged for review on ${dueDate.toLocaleDateString()}. `
+                  : 'This decision has passed its review date. '}
+                Reporting the actual outcome recalibrates your DQI and sharpens future audits.
+              </div>
+              <a
+                href="#outcome-reporter"
+                onClick={e => {
+                  e.preventDefault();
+                  window.document
+                    .querySelector('[data-outcome-reporter]')
+                    ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }}
+                style={{
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: '#B45309',
+                  textDecoration: 'none',
+                  padding: '6px 12px',
+                  borderRadius: 999,
+                  border: '1px solid rgba(245, 158, 11, 0.4)',
+                  background: 'rgba(255, 255, 255, 0.6)',
+                  flexShrink: 0,
+                }}
+              >
+                Report outcome →
+              </a>
+            </div>
+          );
+        })()}
+
       {/* Executive Summary */}
       {analysis && (
         <ErrorBoundary sectionName="Executive Summary">
@@ -1440,7 +1506,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
 
           {/* Decision Outcome Tracker */}
           {analysis && (
-            <div className="mb-lg">
+            <div className="mb-lg" data-outcome-reporter>
               <OutcomeReporter
                 analysisId={analysis.id}
                 analysisDate={analysis.createdAt}
