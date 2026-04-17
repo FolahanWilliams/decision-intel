@@ -77,6 +77,12 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
   const [saving, setSaving] = useState(false);
   const [expanded, setExpanded] = useState(false);
 
+  const [recalibrationNote, setRecalibrationNote] = useState<
+    | null
+    | { status: 'ok'; delta: number; grade: string; recalibratedScore: number }
+    | { status: 'failed' }
+  >(null);
+
   // Form state
   const [outcome, setOutcome] = useState<string>('');
   const [timeframe, setTimeframe] = useState<string>('');
@@ -137,11 +143,25 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
 
       if (res.ok) {
         const data = await res.json();
-        setExisting(data);
+        // Server returns { outcome, stats, recalibration } — existing state
+        // expects the outcome object, not the envelope.
+        setExisting(data?.outcome ?? data);
+        if (data?.recalibration) {
+          if (data.recalibration.status === 'ok') {
+            setRecalibrationNote({
+              status: 'ok',
+              delta: data.recalibration.delta,
+              grade: data.recalibration.grade,
+              recalibratedScore: data.recalibration.recalibratedScore,
+            });
+          } else if (data.recalibration.status === 'failed') {
+            setRecalibrationNote({ status: 'failed' });
+          }
+        }
         setExpanded(false);
       }
-    } catch {
-      // Error handling
+    } catch (err) {
+      console.error('[OutcomeReporter] submit failed:', err);
     } finally {
       setSaving(false);
     }
@@ -224,6 +244,45 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
         </div>
         {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
       </button>
+
+      {/* Recalibration result banner — shown after a successful submit */}
+      {recalibrationNote && (
+        <div
+          style={{
+            padding: '10px 18px',
+            fontSize: '12px',
+            borderTop: '1px solid var(--liquid-border)',
+            background:
+              recalibrationNote.status === 'ok'
+                ? 'rgba(22, 163, 74, 0.06)'
+                : 'rgba(220, 38, 38, 0.06)',
+            color:
+              recalibrationNote.status === 'ok'
+                ? 'var(--accent-primary)'
+                : 'var(--severity-high, #DC2626)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+          }}
+        >
+          {recalibrationNote.status === 'ok' ? (
+            <>
+              <TrendingUp size={13} />
+              <span>
+                DQI recalibrated: {recalibrationNote.recalibratedScore}/100 (
+                {recalibrationNote.grade}){' '}
+                {recalibrationNote.delta >= 0 ? '+' : ''}
+                {recalibrationNote.delta} vs. original. See the comparison in the Replay tab.
+              </span>
+            </>
+          ) : (
+            <span>
+              Outcome saved, but DQI recalibration failed. The outcome is still in your history —
+              refresh or try again.
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Expanded Form */}
       {expanded && (

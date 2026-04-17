@@ -68,7 +68,7 @@ import { useDeals } from '@/hooks/useDeals';
 import { DOCUMENT_TYPES } from '@/types/deals';
 import { getBiasPreview } from '@/lib/utils/bias-preview';
 import { QuickScanModal } from '@/components/ui/QuickScanModal';
-import { Zap, Lock as LockIcon } from 'lucide-react';
+import { Zap, Lock as LockIcon, Sparkles } from 'lucide-react';
 import { AnalysisShell } from '@/components/analysis/AnalysisShell';
 import {
   InlineAnalysisResultCard,
@@ -219,6 +219,7 @@ export default function Dashboard() {
   const { data: billingData } = useSWR<{
     usage: { analysesThisMonth: number };
     limits: { analysesPerMonth: number };
+    plan: 'free' | 'pro' | 'team' | 'enterprise';
     planName: string;
   }>('/api/billing', url => fetch(url).then(r => (r.ok ? r.json() : null)), {
     revalidateOnFocus: false,
@@ -1429,7 +1430,7 @@ export default function Dashboard() {
                       )}
                       {billingData &&
                         billingData.limits.analysesPerMonth > 0 &&
-                        billingData.planName?.toLowerCase() === 'starter' &&
+                        billingData.plan === 'free' &&
                         billingData.usage.analysesThisMonth / billingData.limits.analysesPerMonth >=
                           0.8 && (
                           <Link
@@ -1472,6 +1473,14 @@ export default function Dashboard() {
                       { label: 'Under 60 seconds', icon: <Zap size={12} /> },
                       { label: 'SOC 2-ready · AES-256', icon: <Shield size={12} /> },
                       { label: 'Never used for training', icon: <LockIcon size={12} /> },
+                      ...(billingData?.plan === 'free' && billingData?.limits?.analysesPerMonth > 0
+                        ? [
+                            {
+                              label: `${billingData.limits.analysesPerMonth} free this month`,
+                              icon: <Sparkles size={12} />,
+                            },
+                          ]
+                        : []),
                     ].map(chip => (
                       <span
                         key={chip.label}

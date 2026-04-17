@@ -66,9 +66,16 @@ function getErrorMessage(code: string | null): string | null {
 }
 
 function LoginContent() {
+  const searchParams = useSearchParams();
+  const modeParam = searchParams.get('mode');
+  const initialMode: 'signin' | 'signup' | 'forgot' | 'reset' =
+    modeParam === 'signup' || modeParam === 'forgot' || modeParam === 'reset'
+      ? modeParam
+      : 'signin';
+
   const [loading, setLoading] = useState(false);
-  const [mode, setMode] = useState<'signin' | 'signup' | 'forgot' | 'reset'>('signin');
-  const [email, setEmail] = useState('');
+  const [mode, setMode] = useState<'signin' | 'signup' | 'forgot' | 'reset'>(initialMode);
+  const [email, setEmail] = useState(searchParams.get('email') ?? '');
   const [password, setPassword] = useState('');
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -90,7 +97,6 @@ function LoginContent() {
   const [verifyingOtp, setVerifyingOtp] = useState(false);
   const [otpError, setOtpError] = useState<string | null>(null);
 
-  const searchParams = useSearchParams();
   const authError = searchParams.get('error');
   const errorMessage = getErrorMessage(authError);
 

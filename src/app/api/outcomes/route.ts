@@ -129,7 +129,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Recalibrate DQI with outcome data (fire-and-forget)
+    // Recalibrate DQI with outcome data.
+    // This is the user-visible payoff of submitting an outcome — if it
+    // silently fails, the "quarter-over-quarter compounding" story breaks
+    // with no feedback to the user. Track status so the API response can
+    // surface it to the client.
+    let recalibrationStatus: 'ok' | 'failed' | 'skipped' = 'skipped';
+    let recalibrationResult: {
+      originalScore: number;
+      recalibratedScore: number;
+      delta: number;
+      grade: string;
+    } | null = null;
     try {
       const originalScore = analysis.overallScore;
       // Adjust Bias Load: remove false positives, boost confirmed bias weights
@@ -185,11 +196,22 @@ export async function POST(req: NextRequest) {
           },
         },
       });
+      recalibrationStatus = 'ok';
+      recalibrationResult = {
+        originalScore: Math.round(originalScore),
+        recalibratedScore,
+        delta,
+        grade,
+      };
       log.info(
         `Recalibrated DQI for ${analysisId}: ${Math.round(originalScore)} → ${recalibratedScore} (${delta > 0 ? '+' : ''}${delta})`
       );
     } catch (recalErr) {
-      log.warn('DQI recalibration failed (non-critical):', recalErr);
+      recalibrationStatus = 'failed';
+      log.error(
+        `DQI recalibration failed for ${analysisId}:`,
+        recalErr instanceof Error ? recalErr.message : String(recalErr)
+      );
     }
 
     // Adjust graph edge weights from outcome (fire-and-forget flywheel)
@@ -284,7 +306,15 @@ export async function POST(req: NextRequest) {
     }
 
     log.info(`Outcome reported for analysis ${analysisId}: ${outcome}`);
-    return NextResponse.json({ ...result, contradictions, milestone });
+    return NextResponse.json({
+      ...result,
+      contradictions,
+      milestone,
+      recalibration: {
+        status: recalibrationStatus,
+        ...(recalibrationResult ?? {}),
+      },
+    });
   } catch (error: unknown) {
     const code = (error as { code?: string }).code;
     if (code === 'P2021' || code === 'P2022') {

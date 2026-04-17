@@ -2705,7 +2705,11 @@ function DemoConversionCTA({
             {!loadingSample && <ArrowRight size={14} />}
           </button>
           <Link
-            href="/login?redirect=/dashboard"
+            href={
+              submitted && email
+                ? `/login?mode=signup&email=${encodeURIComponent(email)}&redirect=/dashboard`
+                : '/login?mode=signup&redirect=/dashboard'
+            }
             onClick={() => trackEvent('demo_cta_clicked', { target: 'signup', submitted })}
             style={ctaSecondary}
             onMouseEnter={e => {

@@ -154,6 +154,86 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Recalibrate this specific analysis's DQI given what we now know from
+    // the reported outcome. Writes Analysis.recalibratedDqi so the document
+    // detail page (ReplayTab) can render the before/after comparison.
+    // Previously this logic only ran in the parallel /api/outcomes route,
+    // which OutcomeReporter does not call — so the "quarter-over-quarter
+    // compounding" story was invisible from the main UI surface.
+    let recalibrationStatus: 'ok' | 'failed' | 'skipped' = 'skipped';
+    let recalibrationPayload: {
+      originalScore: number;
+      recalibratedScore: number;
+      delta: number;
+      grade: string;
+    } | null = null;
+    try {
+      const analysis = await prisma.analysis.findUnique({
+        where: { id: analysisId },
+        select: { overallScore: true, biases: { select: { id: true } } },
+      });
+      if (analysis) {
+        const originalScore = analysis.overallScore;
+        const confirmedCount = (confirmedBiases || []).length;
+        const falsePositiveCount = (falsPositiveBiases || []).length;
+        const totalBiases = analysis.biases?.length || 0;
+
+        let recalibratedScore = originalScore;
+        if (totalBiases > 0 && falsePositiveCount > 0) {
+          const falsePositiveRatio = falsePositiveCount / totalBiases;
+          recalibratedScore += falsePositiveRatio * 12;
+        }
+        if (confirmedCount > 0) {
+          recalibratedScore -= confirmedCount * 1.5;
+        }
+        recalibratedScore += 3; // outcome tracking boosts process maturity
+        if (outcome === 'failure') recalibratedScore -= 5;
+        else if (outcome === 'success') recalibratedScore += 4;
+
+        recalibratedScore = Math.max(0, Math.min(100, Math.round(recalibratedScore)));
+        const delta = recalibratedScore - Math.round(originalScore);
+        const grade =
+          recalibratedScore >= 85
+            ? 'A'
+            : recalibratedScore >= 70
+              ? 'B'
+              : recalibratedScore >= 55
+                ? 'C'
+                : recalibratedScore >= 40
+                  ? 'D'
+                  : 'F';
+
+        await prisma.analysis.update({
+          where: { id: analysisId },
+          data: {
+            recalibratedDqi: {
+              originalScore: Math.round(originalScore),
+              recalibratedScore,
+              recalibratedGrade: grade,
+              delta,
+              recalibratedAt: new Date().toISOString(),
+            },
+          },
+        });
+        recalibrationStatus = 'ok';
+        recalibrationPayload = {
+          originalScore: Math.round(originalScore),
+          recalibratedScore,
+          delta,
+          grade,
+        };
+        log.info(
+          `Recalibrated DQI for ${analysisId}: ${Math.round(originalScore)} → ${recalibratedScore} (${delta > 0 ? '+' : ''}${delta})`
+        );
+      }
+    } catch (recalErr) {
+      recalibrationStatus = 'failed';
+      log.error(
+        `DQI recalibration failed for ${analysisId}:`,
+        recalErr instanceof Error ? recalErr.message : String(recalErr)
+      );
+    }
+
     // Emit webhook event (non-blocking, fire-and-forget)
     try {
       const { emitWebhookEvent } = await import('@/lib/integrations/webhooks/engine');
@@ -217,6 +297,10 @@ export async function POST(req: NextRequest) {
       message: 'Outcome tracked',
       outcome: decisionOutcome,
       stats,
+      recalibration: {
+        status: recalibrationStatus,
+        ...(recalibrationPayload ?? {}),
+      },
     });
   } catch (error: unknown) {
     const code = (error as { code?: string }).code;
