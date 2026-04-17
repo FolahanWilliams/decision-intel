@@ -89,16 +89,17 @@ export async function GET() {
   const dayOfWeek = now.getUTCDay(); // 0 = Sunday, 1 = Monday
 
   // Jobs that run every day.
-  // NOTE: /api/cron/daily-linkedin is intentionally omitted — the email
-  // delivery step was broken and each run burned Gemini budget before
-  // failing (root cause of April 2026 cost spike). Re-enable once the
-  // email pipeline is verified.
+  // NOTE on /api/cron/daily-linkedin (re-enabled Apr 2026): the route now
+  // short-circuits BEFORE calling Gemini if FOUNDER_EMAIL or RESEND_API_KEY
+  // is missing, so it cannot burn budget when email delivery is unavailable
+  // (the original root cause of the April 2026 cost spike).
   const dailyJobs = [
     '/api/cron/sync-intelligence',
     '/api/cron/detect-outcomes',
     '/api/cron/infer-graph-edges',
     '/api/cron/retry-nudges',
     '/api/cron/google-drive-sync',
+    '/api/cron/daily-linkedin',
     '/api/cache/cleanup',
   ];
 

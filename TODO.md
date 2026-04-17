@@ -6,7 +6,7 @@ Claude reads this file at the start of every session. Update it as tasks are com
 - [ ] Land first paying design partner (outreach via advisor network)
 - [ ] Post 1 case study per day on LinkedIn (use Content Studio → Generate LinkedIn Post, or wait for daily email from `/api/cron/daily-linkedin`)
 - [x] Polish the first 60 seconds of the demo (upload → pipeline animation → score reveal)
-- [ ] Set `FOUNDER_EMAIL` env var on Vercel to activate daily LinkedIn post emails
+- [x] Re-enable `/api/cron/daily-linkedin` in dispatcher with early-bail guard for missing `FOUNDER_EMAIL` / `RESEND_API_KEY` (prevents future Gemini budget burn — the original April 2026 incident). Founder still needs to verify `RESEND_API_KEY` is set on Vercel AND that the `EMAIL_FROM` sender domain is verified inside Resend, otherwise emails will short-circuit with `result='dry_run'` or `result='failed'` instead of landing in the inbox.
 - [ ] Pre-seed/seed fundraise: target first paying design partner + 2-3 reference logos before kickoff
 - [ ] Find GTM / enterprise-sales co-founder or advisor
 

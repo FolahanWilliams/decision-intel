@@ -18,7 +18,7 @@ import { ALL_CASES } from '@/lib/data/case-studies';
 import { getSlugForCase } from '@/lib/data/case-studies/slugs';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { getRequiredEnvVar, getOptionalEnvVar } from '@/lib/env';
-import { sendEmail } from '@/lib/notifications/email';
+import { sendEmail, isEmailConfigured } from '@/lib/notifications/email';
 
 const log = createLogger('DailyLinkedIn');
 
@@ -42,6 +42,25 @@ export async function GET() {
   }
   if (!safeCompare(authHeader, `Bearer ${cronSecret}`)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  // Guard: bail early if email delivery isn't configured. Calling Gemini
+  // without a working email downstream was the root cause of the April 2026
+  // cost spike — each daily run burned tokens then silently failed to deliver.
+  const founderEmail = process.env.FOUNDER_EMAIL?.trim();
+  if (!founderEmail) {
+    log.warn('Skipping daily-linkedin: FOUNDER_EMAIL not set');
+    return NextResponse.json(
+      { skipped: true, reason: 'FOUNDER_EMAIL not configured' },
+      { status: 200 }
+    );
+  }
+  if (!isEmailConfigured()) {
+    log.warn('Skipping daily-linkedin: RESEND_API_KEY not set (email delivery disabled)');
+    return NextResponse.json(
+      { skipped: true, reason: 'RESEND_API_KEY not configured — email delivery disabled' },
+      { status: 200 }
+    );
   }
 
   try {
@@ -141,38 +160,41 @@ Rules:
     }
 
     // Email the post to the founder
-    const founderEmail = process.env.FOUNDER_EMAIL;
-    if (founderEmail) {
-      const hubUrl = `${SITE_URL}/dashboard/founder-hub`;
-      await sendEmail({
-        to: founderEmail,
-        subject: `LinkedIn Post Ready: ${caseStudy.company} (${caseStudy.year})`,
-        html: `
-          <div style="font-family: -apple-system, system-ui, sans-serif; max-width: 600px;">
-            <h2 style="color: #16A34A; font-size: 16px; margin-bottom: 4px;">Your daily LinkedIn post is ready</h2>
-            <p style="color: #64748B; font-size: 13px; margin-top: 0;">Case study #${caseIndex + 1} of ${ALL_CASES.length}: ${caseStudy.company}</p>
+    const hubUrl = `${SITE_URL}/dashboard/founder-hub`;
+    const emailResult = await sendEmail({
+      to: founderEmail,
+      subject: `LinkedIn Post Ready: ${caseStudy.company} (${caseStudy.year})`,
+      html: `
+        <div style="font-family: -apple-system, system-ui, sans-serif; max-width: 600px;">
+          <h2 style="color: #16A34A; font-size: 16px; margin-bottom: 4px;">Your daily LinkedIn post is ready</h2>
+          <p style="color: #64748B; font-size: 13px; margin-top: 0;">Case study #${caseIndex + 1} of ${ALL_CASES.length}: ${caseStudy.company}</p>
 
-            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; margin: 16px 0; white-space: pre-wrap; font-size: 14px; line-height: 1.7; color: #1E293B;">
+          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; margin: 16px 0; white-space: pre-wrap; font-size: 14px; line-height: 1.7; color: #1E293B;">
 ${postText}
-            </div>
-
-            <p style="font-size: 13px; color: #64748B;">
-              <strong>Next steps:</strong><br>
-              1. Copy the post above<br>
-              2. Go to <a href="${hubUrl}" style="color: #16A34A;">Content Studio</a> to download the bias graph image for this case study<br>
-              3. Paste into LinkedIn, attach the image, publish
-            </p>
-
-            <p style="font-size: 12px; color: #94A3B8; margin-top: 24px;">
-              Case study link: <a href="${caseUrl}" style="color: #16A34A;">${caseUrl}</a><br>
-              Tomorrow's post: ${ALL_CASES[(caseIndex + 1) % ALL_CASES.length].company} (${ALL_CASES[(caseIndex + 1) % ALL_CASES.length].year})
-            </p>
           </div>
-        `,
-      });
+
+          <p style="font-size: 13px; color: #64748B;">
+            <strong>Next steps:</strong><br>
+            1. Copy the post above<br>
+            2. Go to <a href="${hubUrl}" style="color: #16A34A;">Content Studio</a> to download the bias graph image for this case study<br>
+            3. Paste into LinkedIn, attach the image, publish
+          </p>
+
+          <p style="font-size: 12px; color: #94A3B8; margin-top: 24px;">
+            Case study link: <a href="${caseUrl}" style="color: #16A34A;">${caseUrl}</a><br>
+            Tomorrow's post: ${ALL_CASES[(caseIndex + 1) % ALL_CASES.length].company} (${ALL_CASES[(caseIndex + 1) % ALL_CASES.length].year})
+          </p>
+        </div>
+      `,
+    });
+
+    if (emailResult === 'sent') {
       log.info(`LinkedIn post emailed to ${founderEmail} for ${caseStudy.company}`);
     } else {
-      log.info(`LinkedIn post generated for ${caseStudy.company} (no FOUNDER_EMAIL configured)`);
+      log.warn(
+        `LinkedIn email for ${caseStudy.company} ended with result='${emailResult}' ` +
+          `(post was generated; check EMAIL_FROM domain verification in Resend)`
+      );
     }
 
     return NextResponse.json({
@@ -185,7 +207,8 @@ ${postText}
         total: ALL_CASES.length,
       },
       postLength: postText.length,
-      emailed: !!founderEmail,
+      emailed: emailResult === 'sent',
+      emailResult,
       nextCase: ALL_CASES[(caseIndex + 1) % ALL_CASES.length].company,
     });
   } catch (error) {
