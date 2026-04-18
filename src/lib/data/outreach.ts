@@ -1013,6 +1013,113 @@ export const OUTREACH_CHANNELS: OutreachChannel[] = [
   },
 ];
 
+// ─── Deal-Closing Docs (Security one-pager + Design Partner LOI) ─────────
+
+export interface DealCloserDoc {
+  id: string;
+  name: string;
+  purpose: string;
+  when: string;
+  accent: string;
+  sections: Array<{
+    heading: string;
+    body: string;
+  }>;
+  footer?: string;
+}
+
+export const DEAL_CLOSER_DOCS: DealCloserDoc[] = [
+  {
+    id: 'security',
+    name: 'Data Security & Trust One-Pager',
+    purpose: 'Send the moment a prospect asks "how do you handle our documents?" — which will happen on call #1.',
+    when: 'Attach to any first outreach where the prospect is a regulated buyer (financial services, healthcare, defense). Send after any security question.',
+    accent: '#0EA5E9',
+    sections: [
+      {
+        heading: 'GDPR Anonymization Gate',
+        body: 'Runs before any LLM touches the document. Names, deal codes, financials, and PII are stripped or tokenized at ingestion. The raw memo never reaches a model provider.',
+      },
+      {
+        heading: 'AES-256-GCM Encryption',
+        body: 'At rest in Supabase/Postgres and in transit via TLS 1.3. Per-tenant keys, rotated on a defined cadence. CSRF protection and audit logging on every request.',
+      },
+      {
+        heading: 'Data Residency',
+        body: 'EU and US Supabase regions available at deployment. Enterprise tier selects residency during onboarding. No cross-region replication without explicit customer consent.',
+      },
+      {
+        heading: 'No Training on Customer Data',
+        body: 'Explicit, contractual commitment. Customer documents, outputs, and metadata are never used to train Decision Intel models or third-party LLMs. Enforced at the API boundary.',
+      },
+      {
+        heading: 'Retention, Customer-Controlled',
+        body: 'Delete any document or analysis on demand. Auto-purge schedules of 30 / 60 / 90 days configurable per workspace. Full export before deletion.',
+      },
+      {
+        heading: 'SOC 2 Roadmap',
+        body: 'Controls mapped to SOC 2 criteria today. Type I targeted Q3 2026; Type II follows the observation window. Current internal security posture score: 8.5 / 10.',
+      },
+      {
+        heading: 'On-Prem / Private Cloud Option',
+        body: 'Enterprise tier supports dedicated VPC or on-prem deployment for regulated buyers (financial services, defense, healthcare). Pipeline runs against customer-hosted LLM endpoints on request.',
+      },
+      {
+        heading: 'Independent Review',
+        body: 'Architecture reviewed by Josh Rainer (ex-Wiz, $32B public exit). Founder research credential: published paper on cognitive drivers of the 2008 UK financial crisis — the problem Decision Intel audits against.',
+      },
+    ],
+    footer:
+      'Decision Intel will not process a document under any control weaker than what is described here. Request our full security review at /security.',
+  },
+  {
+    id: 'design_partner_loi',
+    name: 'Design Partner Letter of Intent',
+    purpose:
+      'One-page agreement that converts a completed pilot into a paying design partner. Not an NDA (that\'s separate). Not a full MSA (that\'s months of legal). This is what your first paying customer signs to lock in the design-partner discount + case-study rights.',
+    when: 'Send at the end of Week 5 of a successful POC, or the moment a pilot contact says "yes, we want to keep using this." Binding on signature.',
+    accent: '#16A34A',
+    sections: [
+      {
+        heading: 'Header',
+        body: 'Design Partner Letter of Intent · BINDING INTENT · NON-EXCLUSIVE\nEffective Date: ______  Term: 6–12 months from Effective Date\n\nThis Letter of Intent ("LOI") is between Folahan Williams, d/b/a Decision Intel ("Decision Intel") and ______ ("Design Partner"). It converts the preceding pilot into a paid Design Partnership and sets the commitments of each party.',
+      },
+      {
+        heading: '1. Commercial Terms',
+        body:
+          'Design Partner subscribes to Decision Intel at a founding-partner rate of US $1,500 / month (vs. list of $2,499), billed monthly in advance, for a 6–12 month term. After the initial term, subscription continues at list pricing unless the parties agree otherwise in writing.\n\nFair-use: This rate applies to up to 10 seats and 100 audits/month during the initial term. Higher volumes trigger a scope conversation — not a breach. Decision Intel will propose a revised rate within 10 business days of exceeding cap, and usage continues uninterrupted while terms are agreed.',
+      },
+      {
+        heading: '2. Decision Intel Commitments',
+        body:
+          '• Weekly founder check-ins (30 min) for the duration of the term.\n• Direct roadmap access — Design Partner sees the prioritized backlog and influences sequencing.\n• Right of first refusal on feature requests — any feature requested is either built, or a written decline with rationale is returned within 10 business days.\n• Named logo on decision-intel.com within 30 days of the Effective Date (subject to Section 4).\n• All controls in the Decision Intel Data Security & Trust one-pager remain in force throughout the term.',
+      },
+      {
+        heading: '3. Design Partner Commitments',
+        body:
+          '• Use Decision Intel on at least one active strategic decision per month and provide structured feedback after each use.\n• Grant Decision Intel the right to publish a case study at end of term — Design Partner elects in writing whether publication is named or anonymized.\n• Permit use of Design Partner\'s logo on decision-intel.com, marketing decks, and investor materials. Revocable on 30 days\' written notice.\n• Designate one executive sponsor and one day-to-day user for the weekly check-ins.',
+      },
+      {
+        heading: '4. Confidentiality, Data & Logo',
+        body:
+          'The NDA from the preceding pilot remains in effect. Uploaded documents are processed under the Decision Intel Data Security & Trust controls: GDPR anonymization gate, AES-256-GCM encryption, no training on customer data, customer-controlled retention. Logo and case-study rights in Section 3 are limited to the form and context approved by the Design Partner at publication.',
+      },
+      {
+        heading: '5. Binding Provisions',
+        body:
+          'Sections 1–4 are binding on execution. The parties intend to execute a full MSA within 60 days; until then, this LOI governs. Upon incorporation of Decision Intel (anticipated 2026), this LOI assigns automatically to the incorporated entity. Either party may terminate for material breach on 15 days\' written notice.',
+      },
+      {
+        heading: 'Signature block',
+        body:
+          'DECISION INTEL\n______ Folahan Williams, Founder\nDate: ______\n\nDESIGN PARTNER\nName: ______\nTitle: ______\nDate: ______',
+      },
+    ],
+    footer:
+      'Founder-friendly, one-page, non-exclusive. · decision-intel.com · folahanwilliams@gmail.com',
+  },
+];
+
 export const FRAMEWORK_AUDIT_TOP_FIXES: string[] = [
   'Get 3–5 design partners running real deal memos through the product.',
   'Add a before/after transformation statement to every document.',

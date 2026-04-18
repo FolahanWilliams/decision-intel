@@ -128,7 +128,7 @@ export const PERSONA_ROWS: PersonaRow[] = [
 export const ROI_NARRATIVE = {
   headline: 'ROI',
   body: 'A single avoided bad decision saves organizations **millions to billions** in value. The platform pays for itself after one corrected thesis. Organizations using systematic decision hygiene report **up to 60% reduction** in decision variance.',
-  pricingAnchor: '$2,499/mo Strategy tier · ~97% gross margin · 1 avoided bad thesis > year of subscription',
+  pricingAnchor: '$2,499/mo Strategy tier · ~90% blended gross margin · 1 avoided bad thesis > year of subscription',
 };
 
 export interface ShippedFeature {

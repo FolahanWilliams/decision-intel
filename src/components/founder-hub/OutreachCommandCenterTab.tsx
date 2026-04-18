@@ -11,6 +11,7 @@ import {
   UserCircle,
   Globe,
   Radio,
+  FileCheck,
 } from 'lucide-react';
 import { ThisWeekPriority } from './outreach-cmd/ThisWeekPriority';
 import { ContactPipelineTracker } from './outreach-cmd/ContactPipelineTracker';
@@ -21,6 +22,7 @@ import { POCKit } from './outreach-cmd/POCKit';
 import { BuyerPersonaMap } from './outreach-cmd/BuyerPersonaMap';
 import { TargetIndustryAtlas } from './outreach-cmd/TargetIndustryAtlas';
 import { ChannelStrategyMatrix } from './outreach-cmd/ChannelStrategyMatrix';
+import { DealCloserDocs } from './outreach-cmd/DealCloserDocs';
 import { FRAMEWORK_AUDIT_TOP_FIXES } from '@/lib/data/outreach';
 
 interface SectionProps {
@@ -194,6 +196,15 @@ export function OutreachCommandCenterTab() {
         accent="#F59E0B"
       >
         <TemplateQuickCopy />
+      </Section>
+
+      <Section
+        icon={<FileCheck size={16} />}
+        title="Deal-Closing Docs"
+        subtitle="Security & Trust one-pager (send when a prospect asks about data handling) + Design Partner LOI (converts a completed pilot into $1,500/mo for 6-12 months). One-click copy."
+        accent="#0EA5E9"
+      >
+        <DealCloserDocs />
       </Section>
 
       <Section

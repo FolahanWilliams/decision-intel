@@ -291,7 +291,7 @@ export const INVESTOR_QA: InvestorQA[] = [
     topic: 'unit-economics',
     question: "How do you actually make money? What's the unit economics?",
     answer:
-      "API cost per analysis: $0.03-0.07 using Gemini Flash. Strategy plan: $2,499/month. That is ~97% gross margin. The motion: free 30-day pilot on the buyer's next high-stakes strategic memo. The Knowledge Graph seeds during the trial. Then convert to Strategy subscription ($2,499/mo) or negotiate enterprise ($50K to $200K/yr ACV). The pilot converts because they would lose their Knowledge Graph data by not subscribing. Outcome tracking creates additional switching costs: calibration profiles and the Decision Knowledge Graph become org-specific assets that cannot transfer to a competitor.",
+      "API cost per analysis: ~$0.40-0.65 on Gemini paid tier 1 (17 LLM calls across the 12-node pipeline). Strategy plan: $2,499/month. Blended gross margin: ~90% across typical usage, compressing to 85% at heavy team usage — still top-decile for enterprise SaaS. The motion: free 30-day pilot on the buyer's next high-stakes strategic memo. The Knowledge Graph seeds during the trial. Then convert to Strategy subscription ($2,499/mo) or negotiate enterprise ($50K to $200K/yr ACV with a volume floor + overage schedule). The pilot converts because they would lose their Knowledge Graph data by not subscribing. Outcome tracking creates additional switching costs: calibration profiles and the Decision Knowledge Graph become org-specific assets that cannot transfer to a competitor.",
   },
   {
     id: 'platform_risk',

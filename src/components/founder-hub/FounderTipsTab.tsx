@@ -110,11 +110,11 @@ const SECTION_NARRATIVE: Tip[] = [
   {
     title: 'Your gross-margin slide is your best slide — stop burying it',
     principle:
-      "At ~97% gross margins with $0.03–0.07 API cost against $249 Individual pricing ($2,499 on Strategy), you are a pre-seed investor's dream. Most AI startups at your stage are underwater on gross margin. You are not.",
+      "At ~90% blended gross margins (~$0.40-0.65 per audit, 17 LLM calls across the 12-node pipeline) against $249 Individual ($2,499 Strategy, Enterprise custom), you are a pre-seed investor's dream. Most AI startups at your stage are underwater on gross margin. You are not.",
     rationale:
-      'Pre-seed investors have been burned by AI wrapper companies whose unit economics are terrible once you back out the API costs. Your unit economics are the opposite of that pattern, and you buried them on slide 8. The most durable thing you can show a skeptical investor in 2026 is that you will not run out of money and you do not need to raise again at any particular price. Gross margin is how you prove it without saying it.',
+      'Pre-seed investors have been burned by AI wrapper companies whose unit economics are terrible once you back out the API costs. Your unit economics are the opposite of that pattern, and you buried them on slide 8. Lead with ~90% blended (the defensible number), not 97% (the ghost-user number). The most durable thing you can show a skeptical investor in 2026 is that you will not run out of money and you do not need to raise again at any particular price. Gross margin is how you prove it without saying it.',
     action:
-      'Move the 97% gross margin unit economics slide to position 2 or 3 of the deck, right after the problem. Add a 12-month burn projection at 100 / 1000 / 10000 paying customers. Include the exact API cost breakdown. Investors will remember this slide for weeks.',
+      'Move the gross margin slide to position 2 or 3 of the deck, right after the problem. Use "~90% blended" — defensible across usage patterns. Add a 12-month burn projection at 100 / 1000 / 10000 paying customers. Include the exact per-audit API cost breakdown. Investors will remember this slide for weeks.',
   },
   {
     title: 'Reframe the product around calibrated intuition, not bias elimination',
@@ -355,9 +355,9 @@ export function FounderTipsTab() {
           }}
         >
           Twenty-three principles grounded in your specific position: solo founder, 16, Nigeria,
-          corporate strategy/M&amp;A wedge, Wiz advisor, 97% gross margins, 199K+ LoC already
-          shipped. Re-read when deciding what to build next, what to kill, what to say in a pitch,
-          and what to ignore.
+          corporate strategy/M&amp;A wedge, Wiz advisor, ~90% blended gross margins, 199K+ LoC
+          already shipped. Re-read when deciding what to build next, what to kill, what to say in a
+          pitch, and what to ignore.
         </p>
       </div>
 

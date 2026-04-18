@@ -477,7 +477,7 @@ export const PITCH_SLIDES: PitchSlide[] = [
     title: 'Business Model',
     purpose: 'How you make money',
     decisionIntelAnswer:
-      'Tiered SaaS. Free (4 audits/mo) → Individual $249/mo (15 audits) → Strategy $2,499/mo (unlimited + team) → Enterprise custom. ~97% margin at Individual tier post-LLM cost.',
+      'Tiered SaaS. Free (4 audits/mo) → Individual $249/mo (15 audits) → Strategy $2,499/mo (fair-use 250 audits/mo + team) → Enterprise custom (volume floor + overage). Blended gross margin: ~90% across tiers (~95% Individual typical, 85-88% heavy Strategy team). Elite for enterprise SaaS without overclaiming.',
     kind: 'business',
   },
   {

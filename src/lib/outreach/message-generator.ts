@@ -14,7 +14,7 @@ Moat: 18 months of causal outcome data per org — once a team logs enough decis
 
 Competitor reality: There is no direct competitor in "decision quality auditing." Cloverpop does decision tracking (not bias detection). The real competition is "do nothing" — teams don't audit their decision processes at all.
 
-Economics: 97% gross margins ($0.03-0.07 per analysis). Pricing: $2,499/mo for corporate strategy teams, $249/mo for Individual (solo strategist).
+Economics: ~90% blended gross margins (~$0.40-0.65 per audit on Gemini paid tier 1, 17 LLM calls across 12 nodes). Pricing: $2,499/mo Strategy (fair-use 250 audits/mo + team), $249/mo Individual (15 audits). Enterprise custom with volume floor + overage.
 
 The "why now" hook: Boards are demanding decision rigor after a decade of bad M&A (Boeing MAX, WeWork, Microsoft-Nokia). Compliance frameworks are citing cognitive hygiene. LLMs finally make real-time bias detection feasible at <$0.10 per document. The 18-month causal flywheel just turned on (production code path that was silently broken for months is now live).
 
@@ -51,7 +51,7 @@ Maximum 200 words including the salutation and sign-off. Goal: a reply, not a me
 Open with a specific observation about their company's recent strategic moves or M&A activity (inferred from profile). Explain in one sentence that you run a bias-auditing tool. Offer a concrete, free 30-day pilot for their team with a specific proof point ("I'll run your last three board memos through it and send you the findings — no login required, no cost"). Close with "Is next week too soon?" or similar low-friction ask.`,
 
   poc: `INTENT: Proof of Concept.
-Technical and scoped. Reference their technical depth or process rigor from the profile. Propose a 2-week POC with clear scope: 10 documents of their choosing, full DQI + bias breakdown + causal deductions if they have historical outcomes. Mention the 97% gross margins and sub-60-second turnaround. Close by asking for a 20-minute technical call to scope which documents fit.`,
+Technical and scoped. Reference their technical depth or process rigor from the profile. Propose a 2-week POC with clear scope: 10 documents of their choosing, full DQI + bias breakdown + causal deductions if they have historical outcomes. Mention the ~90% blended gross margin and sub-60-second turnaround. Close by asking for a 20-minute technical call to scope which documents fit.`,
 
   investor: `INTENT: Investor.
 Positioning-first. Lead with the "why now" hook and the moat. Reference the investor's thesis or portfolio overlap if inferable. Mention the Wiz advisor explicitly. Mention that we just turned on the causal flywheel (the broken-until-now code path is shipping). Close by offering a 10-minute loom of a live audit on one of the investor's portfolio companies' public memos (earnings call, shareholder letter). NEVER ask for money in a first-touch message.`,
@@ -80,7 +80,7 @@ Return this exact JSON shape:
 
 Hard requirements — validation will reject outputs that fail these:
 1. The message MUST reference at least one specific detail from the profile (name, role, company, recent topic, or inferred priority).
-2. The message MUST reference at least one specific detail from the founder context (the 60-second audit, the Wiz advisor, the 18-month causal moat, the 97% gross margins, the "do nothing" competitor, or the "why now" hook).
+2. The message MUST reference at least one specific detail from the founder context (the 60-second audit, the Wiz advisor, the 18-month causal moat, the ~90% blended gross margins, the "do nothing" competitor, or the "why now" hook).
 3. The message MUST stay within the word limit specified by the intent (200 words for connect, 150 words for all other intents).
 4. The message MUST include a formal salutation on the first line (e.g. "Good Afternoon Ms. Smith,") and end with the "Warm regards, Folahan Williams, decision-intel.com" sign-off.
 5. No emojis, no em dashes, no markdown.`;

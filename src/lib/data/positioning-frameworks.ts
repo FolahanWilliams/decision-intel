@@ -384,7 +384,7 @@ export const STORY_STEPS: StoryStep[] = [
     byContext: {
       cold_email: '"CSO average tenure is 3 years. One bad board recommendation ends most careers."',
       demo: 'Show the 20×20 bias interaction matrix — 400 toxic combinations the buyer has never seen mapped.',
-      pitch: '$22.5M ARR at 5% penetration of the 15,000-company target TAM. ~97% gross margin.',
+      pitch: '$22.5M ARR at 5% penetration of the 15,000-company target TAM. ~90% blended gross margin.',
     },
   },
   {
