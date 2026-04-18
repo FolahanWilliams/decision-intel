@@ -15,6 +15,13 @@ const tabLoader = () => (
     />
   </div>
 );
+const StartHereTab = dynamic(
+  () =>
+    import('@/components/founder-hub/StartHereTab').then(m => ({
+      default: m.StartHereTab,
+    })),
+  { loading: tabLoader }
+);
 const ProductOverviewTab = dynamic(
   () =>
     import('@/components/founder-hub/ProductOverviewTab').then(m => ({
@@ -177,6 +184,7 @@ import { AccordionSection } from '@/components/founder-hub/AccordionSection';
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 type TabId =
+  | 'start'
   | 'overview'
   | 'product_deep'
   | 'research'
@@ -194,7 +202,7 @@ type TabId =
   | 'forecast'
   | 'category_position';
 
-type TabGroup = 'Product' | 'Go-to-Market' | 'Intelligence' | 'Tools';
+type TabGroup = 'Start' | 'Product' | 'Go-to-Market' | 'Intelligence' | 'Tools';
 
 // Maps old tab slugs (from 17-tab era) to new 10-tab slugs so bookmarks and
 // deep links don't break after consolidation.
@@ -216,6 +224,8 @@ const LEGACY_TAB_REDIRECTS: Record<string, TabId> = {
 };
 
 const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabGroup }> = [
+  // Start — guided 2-day walkthrough entry point
+  { id: 'start', label: 'Start Here', icon: <Compass size={16} />, group: 'Start' },
   // Product
   { id: 'overview', label: 'Product Overview', icon: <Rocket size={16} />, group: 'Product' },
   { id: 'product_deep', label: 'Pipeline & Scoring', icon: <Brain size={16} />, group: 'Product' },
@@ -288,7 +298,7 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
   },
 ];
 
-const TAB_GROUPS: TabGroup[] = ['Product', 'Go-to-Market', 'Intelligence', 'Tools'];
+const TAB_GROUPS: TabGroup[] = ['Start', 'Product', 'Go-to-Market', 'Intelligence', 'Tools'];
 
 // ─── Search Index ─────────────────────────────────────────────────────────
 // Flat keyword index over tab sections. Previously, typing in search rendered
@@ -303,6 +313,13 @@ type SearchEntry = {
 };
 
 const SEARCH_INDEX: SearchEntry[] = [
+  {
+    tabId: 'start',
+    section: 'Start Here — 2-day study plan',
+    preview: 'Interactive flow + 4 sessions guiding you through all 15 tabs in ~6 hours.',
+    keywords:
+      'start here study plan guided tour walkthrough 2 day two day sessions progress compass onboarding first where begin path flow',
+  },
   {
     tabId: 'overview',
     section: 'Product Overview',
@@ -620,12 +637,12 @@ export default function FounderHubPage() {
   // Resolve initial tab from ?tab=X query param, supporting both current 10-tab
   // slugs and legacy 17-tab slugs (LEGACY_TAB_REDIRECTS) so bookmarks keep working.
   const [activeTab, setActiveTab] = useState<TabId>(() => {
-    if (typeof window === 'undefined') return 'overview';
+    if (typeof window === 'undefined') return 'start';
     const raw = new URLSearchParams(window.location.search).get('tab');
-    if (!raw) return 'overview';
+    if (!raw) return 'start';
     const validIds = TABS.map(t => t.id);
     if (validIds.includes(raw as TabId)) return raw as TabId;
-    return LEGACY_TAB_REDIRECTS[raw] ?? 'overview';
+    return LEGACY_TAB_REDIRECTS[raw] ?? 'start';
   });
   const [unlocked, setUnlocked] = useState(false);
   const [passInput, setPassInput] = useState('');
@@ -743,7 +760,9 @@ export default function FounderHubPage() {
 
   // Only build TAB_CONTENT when NOT searching. Building this record
   // instantiates every dynamic() component, defeating lazy loading.
-  const tabContent: React.ReactNode = searchQuery ? null : renderTab(activeTab, FOUNDER_PASS);
+  const tabContent: React.ReactNode = searchQuery
+    ? null
+    : renderTab(activeTab, FOUNDER_PASS, setActiveTab);
 
   return (
     <ErrorBoundary sectionName="Founder Hub">
@@ -989,8 +1008,17 @@ export default function FounderHubPage() {
   }
 }
 
-function renderTab(activeTab: TabId, FOUNDER_PASS: string): React.ReactNode {
+function renderTab(
+  activeTab: TabId,
+  FOUNDER_PASS: string,
+  setActiveTab: (id: TabId) => void
+): React.ReactNode {
   const TAB_CONTENT: Record<TabId, React.ReactNode> = {
+    start: (
+      <ErrorBoundary sectionName="Start Here">
+        <StartHereTab onNavigateToTab={id => setActiveTab(id as TabId)} />
+      </ErrorBoundary>
+    ),
     overview: <ProductOverviewTab />,
     positioning_copilot: (
       <ErrorBoundary sectionName="Positioning Copilot">
