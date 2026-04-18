@@ -152,7 +152,9 @@ async function deliverWithRetry(
           where: { id: subscriptionId },
           data: { failCount: 0, lastSuccess: new Date(), lastError: null },
         })
-        .catch(() => {});
+        .catch(err =>
+          log.warn(`Failed to reset failCount on subscription ${subscriptionId}:`, err)
+        );
       return;
     }
 

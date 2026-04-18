@@ -170,7 +170,9 @@ export async function POST(request: NextRequest) {
 
     if (uploadError) {
       log.error('Storage upload failed:', uploadError);
-      await prisma.meeting.delete({ where: { id: meeting.id } }).catch(() => {});
+      await prisma.meeting
+        .delete({ where: { id: meeting.id } })
+        .catch(err => log.warn('Failed to clean up orphan meeting after storage error:', err));
       throw new Error(`Storage upload failed: ${uploadError.message}`);
     }
 
@@ -191,7 +193,7 @@ export async function POST(request: NextRequest) {
         fileSize: file.size,
         fileName: file.name,
       },
-    }).catch(() => {});
+    }).catch(err => log.warn('logAudit UPLOAD_MEETING failed:', err));
 
     // Kick off background processing (transcription → analysis)
     processMeeting(meeting.id, user.id).catch(err => {

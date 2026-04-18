@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
         projectedScore: result.decisionQualityScore,
         biasCount: result.biasFindings.length,
       },
-    }).catch(() => {});
+    }).catch(err => log.warn('logAudit SIMULATE_COGNITIVE_AUDIT failed:', err));
 
     log.info(
       `Simulation complete: score=${result.decisionQualityScore}, biases=${result.biasFindings.length}`

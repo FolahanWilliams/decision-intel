@@ -48,7 +48,10 @@ export function RootCauseSection({ analysisId, orgId }: RootCauseSectionProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 py-4 text-gray-500 text-sm">
+      <div
+        className="flex items-center gap-2 py-4 text-sm"
+        style={{ color: 'var(--text-muted)' }}
+      >
         <Loader2 size={14} className="animate-spin" />
         Analyzing root causes...
       </div>
@@ -124,7 +127,9 @@ export function RootCauseSection({ analysisId, orgId }: RootCauseSectionProps) {
                   }}
                 />
               </div>
-              <p className="text-[11px] text-gray-500">{attr.evidence}</p>
+              <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>
+                {attr.evidence}
+              </p>
             </div>
           );
         })}

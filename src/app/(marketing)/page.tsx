@@ -1581,6 +1581,7 @@ export default function LandingPage() {
               'Case Studies',
               'Proof',
               'Bias Genome',
+              'Decision Alpha',
               'Pricing',
               'Resources',
             ].map(l => {
@@ -1593,11 +1594,13 @@ export default function LandingPage() {
                       ? '/proof'
                       : l === 'Bias Genome'
                         ? '/bias-genome'
-                        : l === 'Pricing'
-                          ? '/pricing'
-                          : l === 'Privacy'
-                            ? '/privacy'
-                            : `#${l.toLowerCase().replace(/\s+/g, '-')}`;
+                        : l === 'Decision Alpha'
+                          ? '/decision-alpha'
+                          : l === 'Pricing'
+                            ? '/pricing'
+                            : l === 'Privacy'
+                              ? '/privacy'
+                              : `#${l.toLowerCase().replace(/\s+/g, '-')}`;
               return (
                 <a
                   key={l}
