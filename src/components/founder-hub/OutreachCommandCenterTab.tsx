@@ -12,6 +12,7 @@ import {
   Globe,
   Radio,
   FileCheck,
+  Wand2,
 } from 'lucide-react';
 import { ThisWeekPriority } from './outreach-cmd/ThisWeekPriority';
 import { ContactPipelineTracker } from './outreach-cmd/ContactPipelineTracker';
@@ -23,6 +24,7 @@ import { BuyerPersonaMap } from './outreach-cmd/BuyerPersonaMap';
 import { TargetIndustryAtlas } from './outreach-cmd/TargetIndustryAtlas';
 import { ChannelStrategyMatrix } from './outreach-cmd/ChannelStrategyMatrix';
 import { DealCloserDocs } from './outreach-cmd/DealCloserDocs';
+import { LinkedInOutreachGenerator } from './outreach-cmd/LinkedInOutreachGenerator';
 import { FRAMEWORK_AUDIT_TOP_FIXES } from '@/lib/data/outreach';
 
 interface SectionProps {
@@ -74,7 +76,11 @@ function Section({ icon, title, subtitle, accent, children }: SectionProps) {
   );
 }
 
-export function OutreachCommandCenterTab() {
+interface Props {
+  founderPass: string;
+}
+
+export function OutreachCommandCenterTab({ founderPass }: Props) {
   return (
     <div>
       {/* Hero */}
@@ -169,6 +175,15 @@ export function OutreachCommandCenterTab() {
         accent="#0EA5E9"
       >
         <ContactPipelineTracker />
+      </Section>
+
+      <Section
+        icon={<Wand2 size={16} />}
+        title="LinkedIn Message Generator"
+        subtitle="Paste a LinkedIn URL or the profile text, pick an intent (connect, pilot, POC, investor), get a tailored message with talking points and warm openers. Saved drafts appear in the Outreach & Meetings tab history."
+        accent="#EC4899"
+      >
+        <LinkedInOutreachGenerator founderPass={founderPass} />
       </Section>
 
       <Section

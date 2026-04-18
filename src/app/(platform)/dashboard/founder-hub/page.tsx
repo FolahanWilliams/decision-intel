@@ -1061,7 +1061,7 @@ function renderTab(
     ),
     outreach_cmd: (
       <ErrorBoundary sectionName="Outreach Command Center">
-        <OutreachCommandCenterTab />
+        <OutreachCommandCenterTab founderPass={FOUNDER_PASS} />
       </ErrorBoundary>
     ),
     outreach: <OutreachAndMeetingsTab founderPass={FOUNDER_PASS} />,
