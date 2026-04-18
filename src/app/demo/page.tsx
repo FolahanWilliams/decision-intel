@@ -169,6 +169,7 @@ export default function DemoPage() {
   const router = useRouter();
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [loadingSample, setLoadingSample] = useState(false);
+  const [signInHint, setSignInHint] = useState<string | null>(null);
   const [isSimulating, setIsSimulating] = useState(false);
   const [currentStage, setCurrentStage] = useState(-1);
   const [showResults, setShowResults] = useState(false);
@@ -237,18 +238,43 @@ export default function DemoPage() {
 
   const handleTryNow = useCallback(async () => {
     setLoadingSample(true);
+    setSignInHint(null);
     try {
       const res = await fetch('/api/onboarding/sample', { method: 'POST' });
-      const data = await res.json();
-      if (data.documentId) {
+      const data = (await res.json().catch(() => ({}))) as {
+        documentId?: string;
+        error?: string;
+      };
+      if (res.ok && data.documentId) {
         router.push(`/documents/${data.documentId}`);
         return;
       }
+      if (res.status === 401) {
+        // Anonymous visitor — give them context before the redirect instead
+        // of silently dumping them on /login.
+        setSignInHint(
+          'Creating your own audit needs a free account (30 seconds, no card). Redirecting...'
+        );
+        setTimeout(
+          () => router.push('/login?next=' + encodeURIComponent('/demo?start=sample')),
+          1400
+        );
+        return;
+      }
+      if (res.status === 500) {
+        setSignInHint(
+          'Sample is temporarily unavailable. Try a pre-built demo below, or reach us at hello@decision-intel.com.'
+        );
+        setLoadingSample(false);
+        return;
+      }
+      // Unexpected non-OK — fall through
+      setSignInHint('Something went wrong. Redirecting to sign-in...');
+      setTimeout(() => router.push('/login'), 1400);
     } catch {
-      // Fall through to login
+      setSignInHint('Network error. Redirecting to sign-in...');
+      setTimeout(() => router.push('/login'), 1400);
     }
-    router.push('/login');
-    setLoadingSample(false);
   }, [router]);
 
   // IntersectionObserver for section navigation
@@ -356,6 +382,25 @@ export default function DemoPage() {
             </button>
           </div>
         </div>
+        {signInHint && (
+          <div
+            role="status"
+            aria-live="polite"
+            style={{
+              maxWidth: 1200,
+              margin: '8px auto 0',
+              padding: '10px 16px',
+              borderRadius: 8,
+              background: C.greenSoft,
+              border: `1px solid ${C.greenLight}`,
+              color: C.slate900,
+              fontSize: 13,
+              lineHeight: 1.5,
+            }}
+          >
+            {signInHint}
+          </div>
+        )}
       </header>
 
       {/* ─── Idle: Video hero on white band ──────────────────────────── */}
@@ -1783,7 +1828,7 @@ function DemoVideoSection() {
         >
           Start free — 4 audits on us <ArrowRight size={14} />
         </Link>
-        {DEMO_BOOKING_URL ? (
+        {DEMO_BOOKING_URL && (
           <a
             href={DEMO_BOOKING_URL}
             target="_blank"
@@ -1812,36 +1857,8 @@ function DemoVideoSection() {
               e.currentTarget.style.background = C.white;
             }}
           >
-            Book a Call <ExternalLink size={14} />
+            Book a 15-min walkthrough <ExternalLink size={14} />
           </a>
-        ) : (
-          <Link
-            href="/pricing"
-            style={{
-              padding: '14px 24px',
-              borderRadius: 10,
-              background: C.white,
-              border: `1px solid ${C.slate200}`,
-              color: C.slate900,
-              fontWeight: 600,
-              fontSize: 14,
-              textDecoration: 'none',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              transition: 'border-color 0.15s, background 0.15s',
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.borderColor = C.slate400;
-              e.currentTarget.style.background = C.slate50;
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.borderColor = C.slate200;
-              e.currentTarget.style.background = C.white;
-            }}
-          >
-            View Pricing
-          </Link>
         )}
       </div>
     </div>
@@ -2743,7 +2760,7 @@ function DemoConversionCTA({
                 e.currentTarget.style.background = C.white;
               }}
             >
-              Book a Demo <ExternalLink size={14} />
+              Book a 15-min walkthrough <ExternalLink size={14} />
             </a>
           )}
         </div>

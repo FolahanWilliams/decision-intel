@@ -43,7 +43,7 @@ export function DemoCta({ company }: { company: string }) {
           marginBottom: 10,
         }}
       >
-        Run your own strategic memo in 60 seconds.
+        Audit your own strategic memo in under 60 seconds.
       </h2>
       <p
         style={{
@@ -54,9 +54,9 @@ export function DemoCta({ company }: { company: string }) {
           lineHeight: 1.55,
         }}
       >
-        Same bias framework, same pre-decision evidence discipline. Upload a strategic memo or board
-        deck — get the DQI grade, flagged biases, predicted questions, and counterfactual back
-        before your next meeting.
+        Same bias framework, same pre-decision-evidence discipline. Drop in your strategic memo or
+        board deck, get the DQI grade, flagged biases, predicted CEO questions, and counterfactual
+        back before your next meeting.
       </p>
       <div
         style={{

@@ -42,7 +42,7 @@ export async function generateMetadata({
   }
 
   const title = `Live demo: Decision Intel on ${caseStudy.company} (${caseStudy.year}) | Decision Intel`;
-  const description = `See exactly what Decision Intel would have flagged in ${caseStudy.company}'s ${caseStudy.year} strategic memo — DQI grade ${caseStudy.dqiEstimate.grade}, ${caseStudy.preDecisionEvidence.detectableRedFlags.length} red flags, simulated CEO questions, counterfactual recommendation. No hindsight.`;
+  const description = `See exactly what Decision Intel would have flagged in ${caseStudy.company}'s ${caseStudy.year} pre-decision document — DQI grade ${caseStudy.dqiEstimate.grade}, ${caseStudy.preDecisionEvidence.detectableRedFlags.length} red flags, simulated CEO questions, counterfactual recommendation. No hindsight.`;
 
   return {
     title,
