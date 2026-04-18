@@ -48,13 +48,6 @@ const IntegrationsAndFlywheelTab = dynamic(
     })),
   { loading: tabLoader }
 );
-const StrategyAndPositioningTab = dynamic(
-  () =>
-    import('@/components/founder-hub/StrategyAndPositioningTab').then(m => ({
-      default: m.StrategyAndPositioningTab,
-    })),
-  { loading: tabLoader }
-);
 const SalesToolkitTab = dynamic(
   () =>
     import('@/components/founder-hub/SalesToolkitTab').then(m => ({ default: m.SalesToolkitTab })),
@@ -104,13 +97,6 @@ const ContentStudioTab = dynamic(
     })),
   { loading: tabLoader }
 );
-const InvestorDefenseTab = dynamic(
-  () =>
-    import('@/components/founder-hub/InvestorDefenseTab').then(m => ({
-      default: m.InvestorDefenseTab,
-    })),
-  { loading: tabLoader }
-);
 const FounderTipsTab = dynamic(
   () =>
     import('@/components/founder-hub/FounderTipsTab').then(m => ({ default: m.FounderTipsTab })),
@@ -141,6 +127,13 @@ const PositioningCopilotTab = dynamic(
   () =>
     import('@/components/founder-hub/PositioningCopilotTab').then(m => ({
       default: m.PositioningCopilotTab,
+    })),
+  { loading: tabLoader }
+);
+const CompetitivePositioningTab = dynamic(
+  () =>
+    import('@/components/founder-hub/CompetitivePositioningTab').then(m => ({
+      default: m.CompetitivePositioningTab,
     })),
   { loading: tabLoader }
 );
@@ -946,24 +939,9 @@ function renderTab(activeTab: TabId, FOUNDER_PASS: string): React.ReactNode {
       </>
     ),
     positioning: (
-      <>
-        <AccordionSection
-          title="External Story"
-          subtitle="Moat narrative, market sizing, 'why now' hook"
-        >
-          <ErrorBoundary sectionName="Strategy & Positioning">
-            <StrategyAndPositioningTab />
-          </ErrorBoundary>
-        </AccordionSection>
-        <AccordionSection
-          title="Investor Defense"
-          subtitle="Kill-shot objections, Q&A, competitive responses"
-        >
-          <ErrorBoundary sectionName="Investor Defense">
-            <InvestorDefenseTab />
-          </ErrorBoundary>
-        </AccordionSection>
-      </>
+      <ErrorBoundary sectionName="Competitive Positioning">
+        <CompetitivePositioningTab />
+      </ErrorBoundary>
     ),
     sales: (
       <ErrorBoundary sectionName="Sales Toolkit">
