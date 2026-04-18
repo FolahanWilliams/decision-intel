@@ -137,6 +137,13 @@ const CronControlsTab = dynamic(
     })),
   { loading: tabLoader }
 );
+const PositioningCopilotTab = dynamic(
+  () =>
+    import('@/components/founder-hub/PositioningCopilotTab').then(m => ({
+      default: m.PositioningCopilotTab,
+    })),
+  { loading: tabLoader }
+);
 import {
   Rocket,
   Brain,
@@ -153,6 +160,7 @@ import {
   Lightbulb,
   GraduationCap,
   Terminal,
+  Compass,
 } from 'lucide-react';
 import { card } from '@/components/founder-hub/shared-styles';
 import { AccordionSection } from '@/components/founder-hub/AccordionSection';
@@ -163,6 +171,7 @@ type TabId =
   | 'overview'
   | 'product_deep'
   | 'research'
+  | 'positioning_copilot'
   | 'positioning'
   | 'sales'
   | 'outreach'
@@ -205,6 +214,12 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
     group: 'Product',
   },
   // Go-to-Market
+  {
+    id: 'positioning_copilot',
+    label: 'Positioning Copilot',
+    icon: <Compass size={16} />,
+    group: 'Go-to-Market',
+  },
   {
     id: 'positioning',
     label: 'Competitive Positioning',
@@ -264,6 +279,27 @@ const SEARCH_INDEX: SearchEntry[] = [
     preview: 'High-level narrative: the four moments we catch what others miss.',
     keywords:
       'overview narrative moat four moments elevator pitch positioning compounding decision knowledge graph dqi',
+  },
+  {
+    tabId: 'positioning_copilot',
+    section: 'Positioning Copilot',
+    preview: 'Brand spine, market thesis, compass, pitch deck, coach — rehearse before outreach.',
+    keywords:
+      'positioning copilot brand spine sharp 8 steps market thesis strategic compass pitch deck coach outreach rehearsal cheat sheet pdf export visual knowledge graph',
+  },
+  {
+    tabId: 'positioning_copilot',
+    section: 'Brand Spine (Sharp 8 steps)',
+    preview: 'Category, buyer, problem, position, assets, memory, consistency, availability.',
+    keywords:
+      'sharp brand byron spine category buyer problem position assets memory consistency availability',
+  },
+  {
+    tabId: 'positioning_copilot',
+    section: 'Pitch Deck Roadmap',
+    preview: '16 slides from hook to ask, each pre-filled with the line you actually say.',
+    keywords:
+      'pitch deck slides hook insight problem timing solution proof market conviction advantage traction team business model competition unit economics ask next step',
   },
   {
     tabId: 'product_deep',
@@ -865,6 +901,11 @@ export default function FounderHubPage() {
 function renderTab(activeTab: TabId, FOUNDER_PASS: string): React.ReactNode {
   const TAB_CONTENT: Record<TabId, React.ReactNode> = {
     overview: <ProductOverviewTab />,
+    positioning_copilot: (
+      <ErrorBoundary sectionName="Positioning Copilot">
+        <PositioningCopilotTab founderPass={FOUNDER_PASS} />
+      </ErrorBoundary>
+    ),
     product_deep: (
       <>
         <AccordionSection title="Analysis Pipeline" subtitle="12-node LangGraph sequence">
