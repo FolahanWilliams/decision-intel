@@ -57,17 +57,10 @@ const LiveStatsTab = dynamic(
   () => import('@/components/founder-hub/LiveStatsTab').then(m => ({ default: m.LiveStatsTab })),
   { loading: tabLoader }
 );
-const PlaybookAndResearchTab = dynamic(
+const ResearchFoundationsTab = dynamic(
   () =>
-    import('@/components/founder-hub/PlaybookAndResearchTab').then(m => ({
-      default: m.PlaybookAndResearchTab,
-    })),
-  { loading: tabLoader }
-);
-const MethodologiesAndPrinciplesTab = dynamic(
-  () =>
-    import('@/components/founder-hub/MethodologiesAndPrinciplesTab').then(m => ({
-      default: m.MethodologiesAndPrinciplesTab,
+    import('@/components/founder-hub/ResearchFoundationsTab').then(m => ({
+      default: m.ResearchFoundationsTab,
     })),
   { loading: tabLoader }
 );
@@ -361,16 +354,63 @@ const SEARCH_INDEX: SearchEntry[] = [
   },
   {
     tabId: 'research',
-    section: 'Methodologies & Principles',
-    preview: 'Kahneman, Sibony, Strebulaev — academic foundations.',
+    section: 'Intellectual Constellation',
+    preview: '37 thinkers on a radial map — click any node for origin, summary, and product surface.',
     keywords:
-      'kahneman sibony strebulaev noise thinking fast slow behavioral economics academic research principles',
+      'constellation thinkers map radial kahneman tversky klein sibony tetlock duke bayes strebulaev helmer thiel porter munger bezos boyd snowden surowiecki christensen moore dixon rackham dunkel osterwalder fitzpatrick hormozi lochhead voss minto miller eyal',
   },
   {
     tabId: 'research',
-    section: 'Playbook & Research',
-    preview: 'Cited papers, research library, decision playbook.',
-    keywords: 'playbook research library papers citations decision protocol checklist method',
+    section: 'The Noise moment',
+    preview: '10% expected vs 55% actual variance — the insurance underwriter "holy shit" stat.',
+    keywords:
+      'noise moment kahneman sibony insurance underwriter 10 55 variance bell curve holy shit stat sales conversation opener',
+  },
+  {
+    tabId: 'research',
+    section: 'Kahneman ↔ Klein synthesis',
+    preview: 'Structured debiasing vs expert intuition — Decision Intel as the both/and.',
+    keywords:
+      'kahneman klein dual framework synthesis axis structured debiasing expert intuition rpd failure to disagree 2009',
+  },
+  {
+    tabId: 'research',
+    section: 'Decision Quality Chain',
+    preview: 'Howard & Matheson — six links. Frame → alternatives → info → values → reasoning → commitment.',
+    keywords:
+      'decision quality chain howard matheson six links frame alternatives information values reasoning commitment dq chain',
+  },
+  {
+    tabId: 'research',
+    section: 'Decision Hygiene',
+    preview: 'Sibony — checklists, pre-mortems, structured assessment, noise audits.',
+    keywords:
+      'decision hygiene sibony checklists pre-mortems structured independent assessment noise audits quadrants',
+  },
+  {
+    tabId: 'research',
+    section: 'Strebulaev 9 principles',
+    preview: 'Stanford GSB VC decision science. Consensus underperforms. Home runs, prepared mind, fast/slow lane.',
+    keywords:
+      'strebulaev nine principles stanford vc decision science consensus home runs prepared mind fast slow lane jockey horse',
+  },
+  {
+    tabId: 'research',
+    section: 'Methodology timeline',
+    preview: '260 years of decision science from Bayes (1763) to Decision Intel (2026).',
+    keywords: 'methodology timeline history bayes 1763 260 years decision science milestones dates',
+  },
+  {
+    tabId: 'research',
+    section: 'Research library',
+    preview: 'Podcasts and long-form essays mapped to product + startup actions.',
+    keywords: 'research library podcast stratechery aggregation lenny platform builders 80000 hours',
+  },
+  {
+    tabId: 'research',
+    section: 'Sales positioning',
+    preview: 'Hook / pitch / close by buyer persona — strategy, M&A, risk, board.',
+    keywords: 'sales positioning persona hook pitch close strategy m&a risk board buyer',
   },
   {
     tabId: 'positioning',
@@ -977,24 +1017,9 @@ function renderTab(activeTab: TabId, FOUNDER_PASS: string): React.ReactNode {
       </>
     ),
     research: (
-      <>
-        <AccordionSection
-          title="Methodologies & Principles"
-          subtitle="Kahneman, Sibony, Strebulaev — academic foundations"
-        >
-          <ErrorBoundary sectionName="Methodologies & Principles">
-            <MethodologiesAndPrinciplesTab />
-          </ErrorBoundary>
-        </AccordionSection>
-        <AccordionSection
-          title="Playbook & Research"
-          subtitle="Cited papers, research library, decision playbook"
-        >
-          <ErrorBoundary sectionName="Playbook & Research">
-            <PlaybookAndResearchTab />
-          </ErrorBoundary>
-        </AccordionSection>
-      </>
+      <ErrorBoundary sectionName="Research & Foundations">
+        <ResearchFoundationsTab />
+      </ErrorBoundary>
     ),
     positioning: (
       <ErrorBoundary sectionName="Competitive Positioning">
