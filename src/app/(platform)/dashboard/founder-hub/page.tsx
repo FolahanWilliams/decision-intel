@@ -144,6 +144,13 @@ const OutreachCommandCenterTab = dynamic(
     })),
   { loading: tabLoader }
 );
+const ForecastRoadmapTab = dynamic(
+  () =>
+    import('@/components/founder-hub/ForecastRoadmapTab').then(m => ({
+      default: m.ForecastRoadmapTab,
+    })),
+  { loading: tabLoader }
+);
 import {
   Rocket,
   Brain,
@@ -161,6 +168,7 @@ import {
   GraduationCap,
   Terminal,
   Compass,
+  Map,
 } from 'lucide-react';
 import { card } from '@/components/founder-hub/shared-styles';
 import { AccordionSection } from '@/components/founder-hub/AccordionSection';
@@ -181,7 +189,8 @@ type TabId =
   | 'case_library'
   | 'founder_tips'
   | 'founder_school'
-  | 'cron_controls';
+  | 'cron_controls'
+  | 'forecast';
 
 type TabGroup = 'Product' | 'Go-to-Market' | 'Intelligence' | 'Tools';
 
@@ -250,6 +259,12 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
   },
   { id: 'case_library', label: 'Case Library', icon: <Library size={16} />, group: 'Intelligence' },
   // Tools
+  {
+    id: 'forecast',
+    label: '12-Month Forecast',
+    icon: <Map size={16} />,
+    group: 'Tools',
+  },
   { id: 'founder_tips', label: 'Founder Tips', icon: <Lightbulb size={16} />, group: 'Tools' },
   {
     id: 'founder_school',
@@ -428,6 +443,13 @@ const SEARCH_INDEX: SearchEntry[] = [
     preview: 'Manually fire scheduled jobs: LinkedIn email, Drive sync, outcome reminders.',
     keywords:
       'cron controls trigger manual run linkedin email drive sync outcome reminders dispatcher schedule jobs test admin',
+  },
+  {
+    tabId: 'forecast',
+    section: '12-Month Forecast',
+    preview: 'Bootstrap vs VC lanes, 4 quarters, interactive milestone drill-down.',
+    keywords:
+      'forecast roadmap timeline bootstrap vc raise yc ycombinator accelerator pre-seed seed angel operator advisor dilution valuation runway discovery calls design partners pattern validation 12 month plan strategy',
   },
 ];
 
@@ -1022,6 +1044,11 @@ function renderTab(activeTab: TabId, FOUNDER_PASS: string): React.ReactNode {
     cron_controls: (
       <ErrorBoundary sectionName="Cron Controls">
         <CronControlsTab />
+      </ErrorBoundary>
+    ),
+    forecast: (
+      <ErrorBoundary sectionName="12-Month Forecast">
+        <ForecastRoadmapTab />
       </ErrorBoundary>
     ),
   };
