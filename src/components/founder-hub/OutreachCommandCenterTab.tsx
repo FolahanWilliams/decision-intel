@@ -1,12 +1,26 @@
 'use client';
 
-import { Calendar, Users, Phone, Sparkles, Copy, Briefcase, Lightbulb } from 'lucide-react';
+import {
+  Calendar,
+  Users,
+  Phone,
+  Sparkles,
+  Copy,
+  Briefcase,
+  Lightbulb,
+  UserCircle,
+  Globe,
+  Radio,
+} from 'lucide-react';
 import { ThisWeekPriority } from './outreach-cmd/ThisWeekPriority';
 import { ContactPipelineTracker } from './outreach-cmd/ContactPipelineTracker';
 import { DiscoveryCallCompanion } from './outreach-cmd/DiscoveryCallCompanion';
 import { PatternValidationDashboard } from './outreach-cmd/PatternValidationDashboard';
 import { TemplateQuickCopy } from './outreach-cmd/TemplateQuickCopy';
 import { POCKit } from './outreach-cmd/POCKit';
+import { BuyerPersonaMap } from './outreach-cmd/BuyerPersonaMap';
+import { TargetIndustryAtlas } from './outreach-cmd/TargetIndustryAtlas';
+import { ChannelStrategyMatrix } from './outreach-cmd/ChannelStrategyMatrix';
 import { FRAMEWORK_AUDIT_TOP_FIXES } from '@/lib/data/outreach';
 
 interface SectionProps {
@@ -116,6 +130,34 @@ export function OutreachCommandCenterTab() {
         accent="#16A34A"
       >
         <ThisWeekPriority />
+      </Section>
+
+      {/* Customer Discovery Map — who, where, how */}
+      <Section
+        icon={<UserCircle size={16} />}
+        title="Buyer Persona Map"
+        subtitle="Three primary buyers, three adjacent, three anti-patterns. Click any persona for their pain, their language, their authority, the warmest intro path. Mirror their vocabulary on every call."
+        accent="#16A34A"
+      >
+        <BuyerPersonaMap />
+      </Section>
+
+      <Section
+        icon={<Globe size={16} />}
+        title="Target Industry Atlas"
+        subtitle="Five industries ranked by fit. Sample companies and M&A cadence per vertical. Use this to pattern-match whether a new contact fits the ICP in 5 seconds."
+        accent="#0EA5E9"
+      >
+        <TargetIndustryAtlas />
+      </Section>
+
+      <Section
+        icon={<Radio size={16} />}
+        title="Channel Strategy Matrix"
+        subtitle="Five paths to the first 10 calls, plotted by effort per contact vs. response quality. Top-left quadrant is where to start — Josh intros and academic bridge."
+        accent="#8B5CF6"
+      >
+        <ChannelStrategyMatrix />
       </Section>
 
       <Section

@@ -722,6 +722,297 @@ export interface FrameworkScore {
   priorityFix?: string;
 }
 
+// ─── Buyer Personas (from Customer Discovery Map) ─────────────────────────
+
+export type PersonaTier = 'primary' | 'adjacent' | 'anti_pattern';
+
+export interface BuyerPersona {
+  id: string;
+  tier: PersonaTier;
+  title: string;
+  titleVariants: string[];
+  whereToFind: string;
+  pain: string;
+  language: string;
+  authority: string;
+  warmIntroPath?: string;
+  // For anti-patterns only — why NOT to start here:
+  antiReason?: string;
+}
+
+export const PERSONA_TIER_LABEL: Record<PersonaTier, string> = {
+  primary: 'Primary buyer · talk first',
+  adjacent: 'Adjacent · talk after primary',
+  anti_pattern: 'Do NOT start here',
+};
+
+export const PERSONA_TIER_COLOR: Record<PersonaTier, string> = {
+  primary: '#16A34A',
+  adjacent: '#0EA5E9',
+  anti_pattern: '#EF4444',
+};
+
+export const BUYER_PERSONAS: BuyerPersona[] = [
+  {
+    id: 'vp_corp_dev',
+    tier: 'primary',
+    title: 'VP of Corporate Development',
+    titleVariants: ['VP Corp Dev', 'Head of Corporate Development', 'VP M&A'],
+    whereToFind:
+      'LinkedIn (search "VP Corporate Development" + Fortune 500), M&A East, Strategic Acquirers Summit, ACG events',
+    pain: 'Owns deal tools budget. Board-accountable for deal performance. Feels the career risk of every uncaught bias personally.',
+    language: 'Deal memo · deal thesis · acquisition rationale · synergy capture · integration thesis · board approval',
+    authority: 'Direct decision authority on deal tools. Budget owner for M&A process improvements.',
+    warmIntroPath:
+      'Josh Rainer almost certainly has 5–10 of these from the Wiz $32B deal. Ask him explicitly.',
+  },
+  {
+    id: 'director_ma',
+    tier: 'primary',
+    title: 'Director of M&A',
+    titleVariants: ['Director Corporate Development', 'Senior Director M&A', 'M&A Associate (at large cos)'],
+    whereToFind:
+      'LinkedIn (more candid than VP level), conference panels, ACG chapter events, M&A East',
+    pain:
+      'Lives inside the 40-page deal memos every day. Writes them, reviews them, knows where the reasoning breaks.',
+    language: 'IC memo · red flag · kill the deal · stress-test the thesis · pre-mortem · post-close review',
+    authority:
+      'Execution authority. Influences deal tool selection without owning budget. Often more candid than VP level because less political.',
+    warmIntroPath: 'LinkedIn cold outreach with specific deal reference. ACG chapter events.',
+  },
+  {
+    id: 'cso',
+    tier: 'primary',
+    title: 'Chief Strategy Officer',
+    titleVariants: ['SVP Strategy', 'Head of Strategy & Corporate Development', 'Chief of Staff to CEO (sometimes)'],
+    whereToFind: 'LinkedIn, Strategic Acquirers Summit, CSO Council, CEO-panel conferences',
+    pain:
+      'Owns repeatable decision quality at the portfolio level. Career ends over one bad board recommendation.',
+    language:
+      'Strategic memo · decision quality · repeatable process · quarter after quarter · board credibility',
+    authority:
+      'Sets the process. If they\'re convinced, the VP of Corp Dev follows within one cycle.',
+    warmIntroPath: 'Advisor network. LinkedIn. Warmer path than VP Corp Dev for some companies.',
+  },
+  {
+    id: 'ma_integration',
+    tier: 'adjacent',
+    title: 'Head of M&A Integration',
+    titleVariants: ['VP Integration', 'Head of Post-Merger Integration', 'M&A Integration Director'],
+    whereToFind: 'LinkedIn. Post-merger integration conferences.',
+    pain:
+      'Sees the aftermath of bad decisions. Signed off on synergies that never materialized. Highly motivated to improve upstream quality.',
+    language:
+      'Synergy realization · integration thesis · cultural fit · post-close review · what did we miss?',
+    authority:
+      'Influencer, not decision-maker. But their pain is the cleanest articulation of Pattern B (memo hides it in plain sight).',
+    warmIntroPath:
+      'Key question: "What information would have changed the decision, if you\'d had it before signing?"',
+  },
+  {
+    id: 'general_counsel',
+    tier: 'adjacent',
+    title: 'General Counsel / Deputy GC (M&A)',
+    titleVariants: ['General Counsel', 'Deputy General Counsel', 'Associate GC, M&A'],
+    whereToFind: 'LinkedIn. GC networks (ACC). Legal ops conferences.',
+    pain:
+      'SOX 302 compliance. Increasingly responsible for documenting decision rationale. Regulatory exposure on bad deals.',
+    language:
+      'Documented process · audit trail · fiduciary duty · SOX 302 · SEC disclosure · Delaware standards',
+    authority:
+      'Compliance veto power. Can accelerate OR block procurement based on "does this reduce our exposure?"',
+    warmIntroPath:
+      'Cold email angle: "Given what SOX 302 now requires, I\'d love to understand how [Company] currently documents M&A decision rationale."',
+  },
+  {
+    id: 'cfo_midmarket',
+    tier: 'adjacent',
+    title: 'CFO (mid-market Fortune 500)',
+    titleVariants: ['CFO', 'Co-chair M&A Committee', 'SVP Finance & Strategy'],
+    whereToFind: 'LinkedIn. Mid-market ($5B–$20B revenue) Fortune 500 companies.',
+    pain:
+      'Often co-chairs the M&A committee at smaller F500s. Numbers-first. "85–90% gross margin, $0.05 vs. $500K McKinsey" framing lands fast.',
+    language:
+      'Unit economics · gross margin · ROI · cost to replace · compounding asset · LTV',
+    authority: 'Co-signs on M&A committee. Can accelerate procurement for sub-$50K tools.',
+    warmIntroPath:
+      'Lead with unit economics in the first message. Never lead with "cognitive bias" — lead with "$0.05 vs. $500K."',
+  },
+  {
+    id: 'innovation_lab',
+    tier: 'anti_pattern',
+    title: 'Innovation Lab / Chief Innovation Officer',
+    titleVariants: ['Chief Innovation Officer', 'Head of Innovation', 'Innovation Program Lead'],
+    whereToFind: 'Innovation conferences. Corporate innovation Slack groups.',
+    pain: 'They\'re always looking for "the next thing." They\'ll say yes to meetings. They can\'t close.',
+    language: 'Innovation · exploration · cutting-edge · proof of concept · we\'d love to take a look',
+    authority: 'Can recommend. Cannot buy. Zero budget authority for line-of-business tools.',
+    antiReason:
+      'They soak up pitch energy for zero conversion probability. Will reference Decision Intel for months without procurement moving.',
+  },
+  {
+    id: 'cto_it',
+    tier: 'anti_pattern',
+    title: 'CTO / IT leadership',
+    titleVariants: ['CTO', 'VP Engineering', 'Head of IT', 'Chief Data Officer'],
+    whereToFind: 'Easy to find. Easy to engage. Deceptively warm conversations.',
+    pain:
+      '"This is interesting, but we could build this internally." They will build a half-version in Q3, ship nothing, and block procurement.',
+    language: 'Build vs. buy · data governance · integration complexity · we have a team',
+    authority: 'Can block procurement. Can champion build-it-yourself. Cannot close the line-of-business budget.',
+    antiReason:
+      'They\'ll spend 3 months evaluating "should we build this ourselves?" The deal dies waiting for engineering capacity.',
+  },
+  {
+    id: 'procurement',
+    tier: 'anti_pattern',
+    title: 'Procurement / Strategic Sourcing',
+    titleVariants: ['Procurement', 'Strategic Sourcing Manager', 'Vendor Management'],
+    whereToFind: 'They will find you. Especially if you haven\'t found a champion.',
+    pain: 'They are not a buyer. They are a buying-process enforcer.',
+    language: 'RFP · vendor qualification · security review · MSA · indemnification · 18-month cycle',
+    authority: 'Zero decision-making power on what to buy. Total power over how and when to buy.',
+    antiReason:
+      'Never start here. They\'ll RFP you into an 18-month cycle. Only engage procurement AFTER a business-line champion has said "I want this."',
+  },
+];
+
+// ─── Target Industries (from Customer Discovery Map) ──────────────────────
+
+export interface TargetIndustry {
+  id: string;
+  name: string;
+  note: string;
+  cadence: string;
+  companies: string[];
+  fit: 'core' | 'strong' | 'bridge';
+  accent: string;
+}
+
+export const TARGET_INDUSTRIES: TargetIndustry[] = [
+  {
+    id: 'tech',
+    name: 'Technology',
+    note: 'High M&A frequency. Mature corp dev functions. Most active acquirer class.',
+    cadence: '5–15 deals/yr',
+    companies: ['Cisco Systems', 'Salesforce', 'Alphabet / Google', 'Microsoft', 'Adobe', 'Workday', 'ServiceNow'],
+    fit: 'core',
+    accent: '#0EA5E9',
+  },
+  {
+    id: 'pharma',
+    name: 'Pharma / Life Sciences',
+    note: 'Compliance-heavy. High-value deals. Regulatory documentation pressure is baked in.',
+    cadence: '5–12 deals/yr',
+    companies: ['Abbvie', 'Pfizer', 'Johnson & Johnson', 'Merck', 'Bristol Myers Squibb'],
+    fit: 'core',
+    accent: '#16A34A',
+  },
+  {
+    id: 'financial_services',
+    name: 'Financial Services (corporate, not funds)',
+    note: 'Distinct from PE/VC — these are the companies themselves. SOX compliance is existential.',
+    cadence: '3–8 deals/yr',
+    companies: ['JPMorgan Chase', 'Fidelity Investments', 'BlackRock', 'Charles Schwab'],
+    fit: 'strong',
+    accent: '#8B5CF6',
+  },
+  {
+    id: 'industrials',
+    name: 'Industrials',
+    note: 'Process-driven. SOX-heavy. Bolt-on acquisitions with rigorous board process.',
+    cadence: '4–10 deals/yr',
+    companies: ['Honeywell', 'Emerson Electric', 'Parker Hannifin', 'Illinois Tool Works'],
+    fit: 'strong',
+    accent: '#F59E0B',
+  },
+  {
+    id: 'pe_portcos',
+    name: 'PE-Backed Rollup Platforms',
+    note: 'Bridge between old and new ICP. Operationally focused. Buy like corporations, not funds.',
+    cadence: '8–20 deals/yr',
+    companies: [
+      'Thoma Bravo portfolio (software rollups)',
+      'Vista Equity portfolio',
+      'KKR portcos in industrials',
+      'Clayton Dubilier & Rice portcos',
+    ],
+    fit: 'bridge',
+    accent: '#EC4899',
+  },
+];
+
+// ─── Outreach Channels (5 paths to first 10 calls) ────────────────────────
+
+export interface OutreachChannel {
+  id: string;
+  name: string;
+  description: string;
+  effortScore: number; // 1-10 (10 = highest effort per call)
+  qualityScore: number; // 1-10 (10 = highest-quality response)
+  volume: string;
+  bestFor: string;
+  color: string;
+}
+
+export const OUTREACH_CHANNELS: OutreachChannel[] = [
+  {
+    id: 'josh_intros',
+    name: 'Josh Rainer warm intros',
+    description:
+      'Ask Josh directly for 3–5 VP Corp Dev intros from the Wiz deal network. Fastest path to qualified calls.',
+    effortScore: 2,
+    qualityScore: 10,
+    volume: '5–10 intros available',
+    bestFor: 'Tier 1 targets (Alphabet, Salesforce, Microsoft, Cisco, ServiceNow)',
+    color: '#16A34A',
+  },
+  {
+    id: 'linkedin_cold',
+    name: 'LinkedIn cold outreach',
+    description:
+      '16-year-old founder angle is the hook. "Genuine learning, no pitch" frame. Already connected with 50 CSOs.',
+    effortScore: 4,
+    qualityScore: 6,
+    volume: 'Unlimited, throttled by LinkedIn',
+    bestFor: 'Tier 2 targets, your existing 50 CSO connections',
+    color: '#0EA5E9',
+  },
+  {
+    id: 'acg',
+    name: 'ACG (Association for Corporate Growth)',
+    description:
+      'ACG chapter events in NYC and SF. Attended almost exclusively by corp dev professionals. Join as student member.',
+    effortScore: 7,
+    qualityScore: 9,
+    volume: '10–30 contacts per event',
+    bestFor: 'Face-to-face rapport building. Net-new contacts you can\'t reach cold.',
+    color: '#8B5CF6',
+  },
+  {
+    id: 'legal_cold',
+    name: 'Cold email to legal-adjacent contacts',
+    description:
+      '"Given what SOX 302 now requires, I\'d love to understand how [Company] currently handles that." General Counsel offices respond to compliance angles.',
+    effortScore: 5,
+    qualityScore: 7,
+    volume: 'Narrower target list, higher response rate',
+    bestFor: 'Pattern C validation (compliance/documentation pressure)',
+    color: '#EC4899',
+  },
+  {
+    id: 'academic_bridge',
+    name: 'Academic research bridge',
+    description:
+      'Your 2008 UK Financial Crisis research paper is a legitimate reason to pressure-test findings with practitioners.',
+    effortScore: 3,
+    qualityScore: 8,
+    volume: 'Works on any target who respects rigor',
+    bestFor: 'First conversations. Disarming entry. Especially good for CSOs.',
+    color: '#F59E0B',
+  },
+];
+
 export const FRAMEWORK_AUDIT_TOP_FIXES: string[] = [
   'Get 3–5 design partners running real deal memos through the product.',
   'Add a before/after transformation statement to every document.',
