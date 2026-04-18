@@ -1781,7 +1781,7 @@ function DemoVideoSection() {
           onMouseEnter={e => (e.currentTarget.style.background = C.greenDark)}
           onMouseLeave={e => (e.currentTarget.style.background = C.green)}
         >
-          Start Free Trial <ArrowRight size={14} />
+          Start free — 4 audits on us <ArrowRight size={14} />
         </Link>
         {DEMO_BOOKING_URL ? (
           <a
@@ -2417,7 +2417,7 @@ function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () =
           </Link>
         </div>
         <p style={{ color: C.slate400, fontSize: 11, marginTop: 18 }}>
-          No credit card required · 4 free analyses · 14-day trial on paid plans
+          No credit card required · Free plan covers your first 4 audits · 30-day pilot on Strategy tier
         </p>
       </div>
     </div>
@@ -2748,7 +2748,7 @@ function DemoConversionCTA({
           )}
         </div>
         <p style={{ color: C.slate400, fontSize: 11, marginTop: 18 }}>
-          No credit card required · 4 free analyses · 14-day trial on paid plans
+          No credit card required · Free plan covers your first 4 audits · 30-day pilot on Strategy tier
         </p>
       </div>
     </div>

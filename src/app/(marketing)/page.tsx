@@ -401,7 +401,7 @@ export default function LandingPage() {
                 marginBottom: 12,
               }}
             >
-              Grammarly for strategic decisions
+              Decision auditing for corporate strategy
             </p>
             <h1
               style={{
@@ -1038,7 +1038,7 @@ export default function LandingPage() {
                 anchor: 'or $24,990/year · ~10× cheaper than one consulting week',
                 desc: 'For teams producing multiple board-level memos a quarter. Built around the shared Decision Knowledge Graph.',
                 features: [
-                  { label: 'Unlimited audits, 15 seats', strong: true },
+                  { label: '250 audits per month · 15 seats', strong: true },
                   { label: 'Shared Decision Knowledge Graph', strong: true },
                   { label: 'Decision Rooms + blind priors', strong: false },
                   { label: 'Slack, Drive, Email integrations', strong: false },
