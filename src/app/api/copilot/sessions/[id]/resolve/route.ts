@@ -139,7 +139,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         outcome: outcome || null,
         hasOutcome: !!copilotOutcome,
       },
-    }).catch(() => {});
+    }).catch(err => log.warn('logAudit COPILOT session_resolved failed:', err));
 
     return NextResponse.json({
       session: updatedSession,

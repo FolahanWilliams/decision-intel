@@ -57,7 +57,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       action: 'VIEW_COGNITIVE_AUDIT',
       resource: 'HumanDecision',
       resourceId: id,
-    }).catch(() => {});
+    }).catch(err => log.warn('logAudit VIEW_COGNITIVE_AUDIT failed:', err));
 
     return NextResponse.json(decision);
   } catch (error) {
@@ -102,7 +102,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
       action: 'DELETE_ACCOUNT_DATA',
       resource: 'HumanDecision',
       resourceId: id,
-    }).catch(() => {});
+    }).catch(err => log.warn('logAudit DELETE_ACCOUNT_DATA failed:', err));
 
     return NextResponse.json({ deleted: true });
   } catch (error) {

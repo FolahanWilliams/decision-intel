@@ -115,7 +115,7 @@ export async function processMeeting(meetingId: string, userId: string): Promise
         durationSeconds: Math.round(transcriptionResult.durationMs / 1000),
         language: transcriptionResult.language,
       },
-    }).catch(() => {});
+    }).catch(err => log.warn('logAudit TRANSCRIBE_MEETING failed:', err));
 
     // ── Step 3b: Extract meeting intelligence (Phase 2) ──────────────
     // Runs in parallel with audit preparation — action items, key decisions,
@@ -349,7 +349,9 @@ export async function processMeeting(meetingId: string, userId: string): Promise
           errorMessage: error instanceof Error ? error.message : String(error),
         },
       })
-      .catch(() => {});
+      .catch(err =>
+        log.warn(`Failed to mark Meeting ${meetingId} status=error after processing failure:`, err)
+      );
   }
 }
 
@@ -361,7 +363,9 @@ async function updateStatus(meetingId: string, status: string, progress: number)
       where: { id: meetingId },
       data: { status, transcriptionProgress: progress },
     })
-    .catch(() => {});
+    .catch(err =>
+      log.warn(`Failed to update Meeting ${meetingId} status=${status} progress=${progress}:`, err)
+    );
 }
 
 function formatDuration(ms: number): string {

@@ -137,7 +137,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       resource: 'JournalEntry',
       resourceId: entryId,
       details: { convertedTo: humanDecision.id, source: entry.source },
-    }).catch(() => {});
+    }).catch(err => log.warn('logAudit SUBMIT_HUMAN_DECISION failed:', err));
 
     log.info(`Journal entry ${entryId} converted to HumanDecision ${humanDecision.id}`);
     return NextResponse.json(
@@ -241,7 +241,7 @@ async function runCognitiveAudit(decisionId: string, input: HumanDecisionInput, 
     if (schemaDrift) {
       await prisma.humanDecision
         .update({ where: { id: decisionId }, data: { status: 'error' } })
-        .catch(() => {});
+        .catch(err => log.warn('Failed to mark HumanDecision status=error after schema drift:', err));
       return;
     }
 
@@ -252,6 +252,6 @@ async function runCognitiveAudit(decisionId: string, input: HumanDecisionInput, 
     log.error(`Cognitive audit failed for journal conversion ${decisionId}:`, error);
     await prisma.humanDecision
       .update({ where: { id: decisionId }, data: { status: 'error' } })
-      .catch(() => {});
+      .catch(err => log.warn('Failed to mark HumanDecision status=error after audit failure:', err));
   }
 }

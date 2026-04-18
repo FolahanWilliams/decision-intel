@@ -103,6 +103,18 @@ export function CaseStudyNav() {
             Bias Genome
           </Link>
           <Link
+            href="/decision-alpha"
+            className="nav-link-hide-mobile"
+            style={{
+              fontSize: 14,
+              color: '#CBD5E1',
+              textDecoration: 'none',
+              fontWeight: 500,
+            }}
+          >
+            Decision Alpha
+          </Link>
+          <Link
             href="/case-studies"
             className="nav-link-hide-mobile"
             style={{
