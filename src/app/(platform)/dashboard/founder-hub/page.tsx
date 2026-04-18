@@ -137,6 +137,13 @@ const CompetitivePositioningTab = dynamic(
     })),
   { loading: tabLoader }
 );
+const OutreachCommandCenterTab = dynamic(
+  () =>
+    import('@/components/founder-hub/OutreachCommandCenterTab').then(m => ({
+      default: m.OutreachCommandCenterTab,
+    })),
+  { loading: tabLoader }
+);
 import {
   Rocket,
   Brain,
@@ -167,6 +174,7 @@ type TabId =
   | 'positioning_copilot'
   | 'positioning'
   | 'sales'
+  | 'outreach_cmd'
   | 'outreach'
   | 'content'
   | 'data_ecosystem'
@@ -220,6 +228,12 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
     group: 'Go-to-Market',
   },
   { id: 'sales', label: 'Sales Toolkit', icon: <MessageSquare size={16} />, group: 'Go-to-Market' },
+  {
+    id: 'outreach_cmd',
+    label: 'Outreach Command Center',
+    icon: <Zap size={16} />,
+    group: 'Go-to-Market',
+  },
   {
     id: 'outreach',
     label: 'Outreach & Meetings',
@@ -946,6 +960,11 @@ function renderTab(activeTab: TabId, FOUNDER_PASS: string): React.ReactNode {
     sales: (
       <ErrorBoundary sectionName="Sales Toolkit">
         <SalesToolkitTab />
+      </ErrorBoundary>
+    ),
+    outreach_cmd: (
+      <ErrorBoundary sectionName="Outreach Command Center">
+        <OutreachCommandCenterTab />
       </ErrorBoundary>
     ),
     outreach: <OutreachAndMeetingsTab founderPass={FOUNDER_PASS} />,
