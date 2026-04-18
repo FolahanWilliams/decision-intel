@@ -151,6 +151,13 @@ const ForecastRoadmapTab = dynamic(
     })),
   { loading: tabLoader }
 );
+const CategoryPositionTab = dynamic(
+  () =>
+    import('@/components/founder-hub/CategoryPositionTab').then(m => ({
+      default: m.CategoryPositionTab,
+    })),
+  { loading: tabLoader }
+);
 import {
   Rocket,
   Brain,
@@ -169,6 +176,7 @@ import {
   Terminal,
   Compass,
   Map,
+  Radar,
 } from 'lucide-react';
 import { card } from '@/components/founder-hub/shared-styles';
 import { AccordionSection } from '@/components/founder-hub/AccordionSection';
@@ -190,7 +198,8 @@ type TabId =
   | 'founder_tips'
   | 'founder_school'
   | 'cron_controls'
-  | 'forecast';
+  | 'forecast'
+  | 'category_position';
 
 type TabGroup = 'Product' | 'Go-to-Market' | 'Intelligence' | 'Tools';
 
@@ -241,6 +250,12 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
     id: 'outreach_cmd',
     label: 'Outreach Command Center',
     icon: <Zap size={16} />,
+    group: 'Go-to-Market',
+  },
+  {
+    id: 'category_position',
+    label: 'Category Position',
+    icon: <Radar size={16} />,
     group: 'Go-to-Market',
   },
   {
@@ -450,6 +465,13 @@ const SEARCH_INDEX: SearchEntry[] = [
     preview: 'Bootstrap vs VC lanes, 4 quarters, interactive milestone drill-down.',
     keywords:
       'forecast roadmap timeline bootstrap vc raise yc ycombinator accelerator pre-seed seed angel operator advisor dilution valuation runway discovery calls design partners pattern validation 12 month plan strategy',
+  },
+  {
+    tabId: 'category_position',
+    section: 'Category Position',
+    preview: 'DI landscape map, three market gaps with shipped-file evidence, 18-month category path.',
+    keywords:
+      'category position landscape gap creator quantexa aera pyramid palantir cloverpop competitive positioning map causal governance decision intelligence market incumbent analyst gartner forrester thesis four moments scorecard',
   },
 ];
 
@@ -1049,6 +1071,11 @@ function renderTab(activeTab: TabId, FOUNDER_PASS: string): React.ReactNode {
     forecast: (
       <ErrorBoundary sectionName="12-Month Forecast">
         <ForecastRoadmapTab />
+      </ErrorBoundary>
+    ),
+    category_position: (
+      <ErrorBoundary sectionName="Category Position">
+        <CategoryPositionTab />
       </ErrorBoundary>
     ),
   };
