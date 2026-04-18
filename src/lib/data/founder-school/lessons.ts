@@ -204,7 +204,7 @@ export const TRACKS: Track[] = [
         insight:
           'Pre-seed is signal, not validation. Investors are betting on: (1) exceptional founder insight, (2) execution speed, (3) an unfair advantage that makes you the right person for this. You are 16, building in Nigeria, advised by someone who scaled Wiz to $32B. That combination is genuinely rare and worth leading with.',
         whyItMatters:
-          "Decision Intel's fundability argument: exceptional founder (youngest in any comparable cohort), real problem ($200M acquisitions fail partly due to cognitive bias), proprietary approach (LangGraph pipeline + Claude), and 97% gross margins baked in from day one.",
+          "Decision Intel's fundability argument: exceptional founder (youngest in any comparable cohort), real problem ($200M acquisitions fail partly due to cognitive bias), proprietary approach (12-node LangGraph pipeline on Gemini with Claude fallback), and ~90% blended gross margins that hold up through diligence.",
         action:
           "Write your 3-sentence investor thesis from the investor's perspective: \"We are betting on X because Y and the downside is Z.\" Read it aloud. If you're not excited by it, investors won't be either.",
         reflection:
@@ -252,7 +252,7 @@ export const TRACKS: Track[] = [
         insight:
           "Don't project 100 enterprise deals in Year 1. Project 3 design partners at $2K/month, 1 paid pilot at $8K/month, ending Year 1 at $36K ARR — believable and impressive for pre-seed. What investors want to see: do you understand unit economics, is your burn plan reasonable, does your growth model make sense?",
         whyItMatters:
-          "At 97% gross margin and 10% churn, Decision Intel's LTV:CAC ratio is exceptional even with high acquisition costs. Know your unit economics cold — this is the conversation that separates founders who understand their business from those who don't.",
+          "At ~90% blended gross margin and 10% churn, Decision Intel's LTV:CAC ratio is still exceptional — even with high acquisition costs. Know your unit economics cold — this is the conversation that separates founders who understand their business from those who don't.",
         action:
           "Build a 3-year monthly model in Google Sheets. Bear case, base case, bull case. Share with your Wiz advisor before any investor meeting — they've seen what real enterprise growth looks like.",
         reflection:
@@ -443,9 +443,9 @@ export const TRACKS: Track[] = [
         summary:
           'Before customers exist, focus on gross margin, target ACV, and days to first revenue.',
         insight:
-          "Three numbers define Decision Intel's fundability before a single customer signs: (1) Gross margin: ~97% — exceptional, fundable on its own. (2) Target ACV: $24K/year (design partner $2K/month), scaling to $50–100K enterprise. (3) Days to first revenue: know your clock. Every investor will ask all three in the first 10 minutes.",
+          "Three numbers define Decision Intel's fundability before a single customer signs: (1) Gross margin: ~90% blended — very strong, fundable on its own, and the number survives diligence. (2) Target ACV: ~$30K/year (Strategy tier at $2,499/month), scaling to $50–100K+ enterprise. (3) Days to first revenue: know your clock. Every investor will ask all three in the first 10 minutes.",
         whyItMatters:
-          '97% gross margin means almost every dollar of revenue becomes profit at scale. That number alone justifies aggressive investment in CAC — you pay back fast. Lead with gross margin in every investor conversation.',
+          '~90% blended gross margin means roughly 90¢ of every revenue dollar becomes gross profit at scale — and the number holds up when the investor runs due diligence. That margin still justifies aggressive investment in CAC — you pay back fast. Lead with gross margin in every investor conversation, but lead with the honest blended number, not the 97% ghost-user figure that ignores flywheel API costs.',
         action:
           'Commit your 3 numbers to memory: gross margin, target ACV by tier (design partner / SMB / enterprise), and your target "days to first signed customer." These should be instant answers.',
         reflection:
@@ -459,7 +459,7 @@ export const TRACKS: Track[] = [
         summary:
           'Customer Acquisition Cost is calculable even pre-revenue. Know it before investors ask.',
         insight:
-          'CAC = all acquisition costs / customers acquired. Pre-revenue estimate: 10 hours of outreach per prospect × 10% conversion = 100 hours per customer. At $100/hr opportunity cost, CAC ≈ $10K. With a $232K LTV (97% margin, 10% churn), your LTV:CAC is 23x — world-class. The benchmark is 3–5x.',
+          'CAC = all acquisition costs / customers acquired. Pre-revenue estimate: 10 hours of outreach per prospect × 10% conversion = 100 hours per customer. At $100/hr opportunity cost, CAC ≈ $10K. With a $270K LTV ($30K Strategy ACV × ~90% blended margin × 10 for 10% churn), your LTV:CAC is 27x — world-class. The benchmark is 3–5x.',
         whyItMatters:
           'Your job is to get CAC as low as possible while LTV stays high. For Decision Intel, content-driven inbound has CAC near zero (just your time). Advisor-led warm intros have CAC of roughly one lunch. Cold outreach is 100 hours. Optimize your channel mix accordingly.',
         action:
@@ -475,9 +475,9 @@ export const TRACKS: Track[] = [
         summary:
           "LTV = ACV × gross margin × (1/churn). Decision Intel's LTV is exceptional by design.",
         insight:
-          'Formula: LTV = ACV × gross margin × (1/annual churn). At 97% margin and 10% churn: $24K × 0.97 × 10 = $232K LTV. At 5% churn: $461K LTV. This math is your moat — SaaS businesses with high gross margins can afford high CAC and still build durable businesses. Software gross margins at 80%+ are fundable. 97% is elite.',
+          'Formula: LTV = ACV × gross margin × (1/annual churn). At ~90% blended margin, $30K Strategy ACV, 10% churn: $30K × 0.90 × 10 = $270K LTV. At 5% churn: $540K LTV. This math is your moat — SaaS businesses with ~90% margins can afford high CAC and still build durable businesses. Software gross margins at 80%+ are fundable; ~90% blended is strong and, unlike the 97% ghost-user figure, it survives diligence.',
         whyItMatters:
-          "Every dollar of enterprise revenue at Decision Intel generates $0.97 of gross profit. That's the number that makes investors lean forward. Contrast with a hardware company at 40% margins — they need 6x more revenue to hit the same profit. You don't.",
+          "Every dollar of enterprise revenue at Decision Intel generates ~$0.90 of gross profit (blended). That's the number that makes investors lean forward, and — critically — it's the number that survives diligence. Contrast with a hardware company at 40% margins — they need 2× more revenue to hit the same gross profit. You don't.",
         action:
           'Build the LTV formula in a spreadsheet. Run 3 churn scenarios: 20% (bad), 10% (base), 5% (excellent). Present all three to investors — the range shows you understand the drivers.',
         reflection:
@@ -490,9 +490,9 @@ export const TRACKS: Track[] = [
         readTime: '3 min',
         summary: 'Payback = CAC / (monthly revenue × gross margin). Sub-6-month payback is elite.',
         insight:
-          "Payback period tells you how quickly customer acquisition investment returns. At $10K CAC and $2K/month at 97% margin: payback = $10K / ($2K × 0.97) ≈ 5 months. This means every dollar spent acquiring a customer comes back in 5 months — then it's pure profit. Sub-6-month payback justifies aggressive CAC spend at Series A.",
+          "Payback period tells you how quickly customer acquisition investment returns. At $10K CAC and $2,499/month Strategy tier at ~90% blended margin: payback = $10K / ($2,499 × 0.90) ≈ 4–5 months. This means every dollar spent acquiring a customer comes back in about 4–5 months — then it's mostly profit. Sub-6-month payback justifies aggressive CAC spend at Series A.",
         whyItMatters:
-          'This metric matters most at Seed and Series A when investors are deciding how much growth capital to deploy. If payback is 5 months, every $100K in sales investment returns $240K in LTV. That\'s the math behind "pour fuel on the fire."',
+          'This metric matters most at Seed and Series A when investors are deciding how much growth capital to deploy. If payback is ~5 months, every $100K in sales investment returns $270K+ in LTV (using the Strategy-tier math above). That\'s the math behind "pour fuel on the fire."',
         action:
           'Calculate your payback period using estimated CAC and target ACV. Bring this number to every investor conversation before they ask for it. Showing you know it signals financial maturity.',
         reflection:
