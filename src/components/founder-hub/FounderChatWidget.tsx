@@ -84,6 +84,22 @@ export function FounderChatWidget({ founderPass }: { founderPass: string }) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Listen for `founder-chat-ask` events dispatched from elsewhere in the
+  // Founder Hub (Lesson Detail's "Ask the Hub AI" button, command palette
+  // shortcuts, etc.). Mirrors the command-palette-export-board-report pattern
+  // used on the document-detail page — keeps the chat widget decoupled from
+  // the callers while still letting them open + prefill a question.
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<{ question?: string }>).detail;
+      if (!detail?.question) return;
+      setOpen(true);
+      setInput(detail.question);
+    };
+    window.addEventListener('founder-chat-ask', handler);
+    return () => window.removeEventListener('founder-chat-ask', handler);
+  }, []);
+
   const handleClear = useCallback(() => {
     if (streaming) return;
     const shouldClear =

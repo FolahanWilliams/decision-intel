@@ -10,6 +10,7 @@ import {
   Loader2,
   ExternalLink,
   GraduationCap,
+  Sparkles,
 } from 'lucide-react';
 import {
   TRACKS,
@@ -218,6 +219,30 @@ function LessonDetail({
   const [loadingSources, setLoadingSources] = useState(false);
   const [sourceError, setSourceError] = useState<string | null>(null);
   const isDone = completed.includes(lesson.id);
+
+  /** Compose a rich starter prompt for the Founder-Hub AI chat that preloads
+   *  the current lesson's track, title, core insight, and action prompt so the
+   *  founder can ask follow-ups, get quizzed, or pressure-test their own
+   *  answer without re-pasting the lesson content. Fires a `founder-chat-ask`
+   *  window event that FounderChatWidget listens for. */
+  const handleAskAI = useCallback(() => {
+    const question = [
+      `I'm on the "${lesson.title}" lesson in the ${track.title} track of Founder School.`,
+      '',
+      `Core insight: ${lesson.insight}`,
+      '',
+      `Why it matters for Decision Intel: ${lesson.whyItMatters}`,
+      '',
+      `Today's action: ${lesson.action}`,
+      '',
+      'Teach me this lesson the way a senior operator would. Quiz me on the reasoning, push back when my answers are fuzzy, and make me defend the Decision Intel-specific application. Start with the sharpest question.',
+    ].join('\n');
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('founder-chat-ask', { detail: { question } }),
+      );
+    }
+  }, [lesson.title, lesson.insight, lesson.whyItMatters, lesson.action, track.title]);
 
   const fetchSources = useCallback(async () => {
     setLoadingSources(true);
@@ -517,6 +542,20 @@ function LessonDetail({
           </button>
         )}
         <div style={{ flex: 1 }} />
+        <button
+          onClick={handleAskAI}
+          title="Open the Founder AI chat with this lesson preloaded"
+          style={{
+            ...navBtn,
+            background: `${track.color}15`,
+            border: `1px solid ${track.color}55`,
+            color: track.color,
+            fontWeight: 700,
+          }}
+        >
+          <Sparkles size={13} />
+          Ask the Hub AI
+        </button>
         <button
           onClick={fetchSources}
           disabled={loadingSources}
