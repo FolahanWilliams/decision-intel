@@ -180,6 +180,7 @@ import {
 } from 'lucide-react';
 import { card } from '@/components/founder-hub/shared-styles';
 import { AccordionSection } from '@/components/founder-hub/AccordionSection';
+import { CsoPipelineBoard } from '@/components/founder-hub/CsoPipelineBoard';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -768,6 +769,7 @@ export default function FounderHubPage() {
     <ErrorBoundary sectionName="Founder Hub">
       <div className="founder-hub-root max-w-6xl mx-auto px-4 py-6">
         {renderHeader()}
+        <CsoPipelineBoard founderPass={FOUNDER_PASS} />
         <div className="founder-hub-layout">
           <aside className="founder-hub-rail" aria-label="Founder Hub navigation">
             {renderHubRail()}
