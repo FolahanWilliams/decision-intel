@@ -1073,107 +1073,60 @@ export default function LandingPage() {
         <CategoryGapShowcase />
       </Reveal>
 
-      {/* ── Proof: real failures, audited in hindsight ──────────────── */}
+      {/* ── Open proof (unified): header → carousel peek → three doorways ── */}
       <Reveal repeat>
-        <section id="proof" style={{ maxWidth: 1200, margin: '0 auto', padding: '88px 24px 32px' }}>
-          <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
-            <p
-              style={{
-                fontSize: 14,
-                fontWeight: 700,
-                color: C.green,
-                textTransform: 'uppercase',
-                letterSpacing: '0.14em',
-                marginBottom: 10,
-              }}
-            >
-              Proof, not logos
-            </p>
-            <h2
-              style={{
-                fontSize: 'clamp(28px, 4vw, 40px)',
-                fontWeight: 800,
-                color: C.slate900,
-                letterSpacing: '-0.02em',
-                lineHeight: 1.1,
-                marginBottom: 16,
-                maxWidth: 820,
-              }}
-            >
-              135 real corporate decisions, audited in hindsight &mdash; with the signals we would
-              have caught before the outcome.
-            </h2>
-            <p
-              style={{
-                fontSize: 17,
-                color: C.slate600,
-                lineHeight: 1.6,
-                maxWidth: 720,
-                marginBottom: 24,
-              }}
-            >
-              Pre-seed we have no pilot logos to paste on a page. What we do have is a reproducible
-              library of failures &mdash; every one scored, every bias marked against the
-              pre-decision evidence, every outcome matched to what we would have flagged. The
-              evidence lives on the next two pages, not behind a login.
-            </p>
-            <div
-              style={{
-                display: 'flex',
-                gap: 12,
-                flexWrap: 'wrap',
-                marginBottom: 8,
-              }}
-            >
-              <Link
-                href="/proof"
-                onClick={() => trackEvent('proof_cta_clicked', { target: 'proof' })}
+        <section id="proof" style={{ background: C.white, borderTop: `1px solid ${C.slate200}` }}>
+          <div style={{ maxWidth: 1200, margin: '0 auto', padding: '88px 24px 72px' }}>
+            <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
+              <p
                 style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  fontSize: 14,
+                  fontSize: 13,
                   fontWeight: 700,
-                  color: C.white,
-                  background: C.green,
-                  padding: '11px 20px',
-                  borderRadius: 10,
-                  textDecoration: 'none',
-                  boxShadow: '0 4px 14px rgba(22,163,74,0.22)',
+                  color: C.green,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.16em',
+                  marginBottom: 12,
                 }}
               >
-                Explore the pre-decision evidence <ArrowRight size={14} />
-              </Link>
-              <Link
-                href="/bias-genome"
-                onClick={() => trackEvent('proof_cta_clicked', { target: 'bias-genome' })}
+                Open proof
+              </p>
+              <h2
                 style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  fontSize: 14,
-                  fontWeight: 700,
+                  fontSize: 'clamp(28px, 4vw, 40px)',
+                  fontWeight: 800,
                   color: C.slate900,
-                  background: C.white,
-                  padding: '11px 20px',
-                  borderRadius: 10,
-                  border: `1px solid ${C.slate200}`,
-                  textDecoration: 'none',
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1.1,
+                  marginBottom: 16,
+                  maxWidth: 860,
                 }}
               >
-                See which biases predict failure <ArrowRight size={14} />
-              </Link>
+                Every claim on this site is checkable.
+              </h2>
+              <p
+                style={{
+                  fontSize: 17,
+                  color: C.slate600,
+                  lineHeight: 1.6,
+                  maxWidth: 760,
+                  marginBottom: 36,
+                }}
+              >
+                135 corporate decisions, audited in hindsight. A bias-failure leaderboard across
+                thirteen industries. The enterprise security posture that runs on every memo. All
+                three sit one click away &mdash; no login, no gate, no asterisk.
+              </p>
+            </motion.div>
+
+            {/* Carousel strip — the case library peek, no duplicate header */}
+            <div style={{ marginBottom: 56 }}>
+              <CaseStudyCarousel embedded />
             </div>
-          </motion.div>
+
+            {/* Three exploration doorways — case library / bias genome / security */}
+            <CredibilityTrio embedded />
+          </div>
         </section>
-      </Reveal>
-
-      {/* ── Case study carousel — evidence strip below the proof header ── */}
-      <CaseStudyCarousel />
-
-      {/* ── Credibility trio — three exploration doorways (case library / bias genome / security) ── */}
-      <Reveal repeat>
-        <CredibilityTrio />
       </Reveal>
 
       {/* ── Pricing ─────────────────────────────────────────────────── */}

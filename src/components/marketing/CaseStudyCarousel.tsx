@@ -39,8 +39,11 @@ function outcomeColor(outcome: CaseStudy['outcome']): { bg: string; fg: string }
  * hindsight-stripped pre-decision evidence. Renders on the landing page
  * between the stats bar and pricing, filling the credibility slot that
  * would otherwise hold customer logos.
+ *
+ * When `embedded` is set the component suppresses its own header +
+ * outer section wrapper so a parent section can provide the narrative.
  */
-export function CaseStudyCarousel() {
+export function CaseStudyCarousel({ embedded = false }: { embedded?: boolean } = {}) {
   const featured = useMemo<CaseStudy[]>(() => {
     const deep = getDeepCases();
     if (deep.length >= 4) return deep.slice(0, 4);
@@ -52,90 +55,101 @@ export function CaseStudyCarousel() {
     return [...deep, ...extras];
   }, []);
 
+  const Wrapper = embedded ? 'div' : 'section';
   return (
-    <section
-      style={{
-        background: C.white,
-        borderBottom: `1px solid ${C.slate200}`,
-      }}
-    >
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          style={{
-            marginBottom: 40,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-end',
-            flexWrap: 'wrap',
-            gap: 16,
-          }}
-        >
-          <div>
-            <p
-              style={{
-                fontSize: 14,
-                fontWeight: 600,
-                color: C.green,
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                marginBottom: 8,
-              }}
-            >
-              Proof, not logos
-            </p>
-            <h2
-              style={{
-                fontSize: 'clamp(24px, 4vw, 36px)',
-                fontWeight: 700,
-                color: C.slate900,
-                margin: 0,
-                marginBottom: 12,
-                letterSpacing: '-0.01em',
-                maxWidth: 720,
-              }}
-            >
-              Real decisions, analyzed the same way we analyze yours.
-            </h2>
-            <p
-              style={{
-                fontSize: 'clamp(14px, 2.5vw, 17px)',
-                color: C.slate600,
-                margin: 0,
-                maxWidth: 640,
-                lineHeight: 1.5,
-              }}
-            >
-              We took the pre-decision memos from {featured.length} famous strategic decisions,
-              stripped the hindsight, and ran them through the same bias and noise framework we
-              apply to your memos today. Here&apos;s what we would have flagged.
-            </p>
-          </div>
-
-          <Link
-            href="/case-studies"
-            onClick={() => trackEvent('case_study_carousel_see_all', {})}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              fontSize: 14,
-              fontWeight: 600,
-              color: C.navy,
-              textDecoration: 'none',
-              border: `1px solid ${C.slate200}`,
-              padding: '10px 16px',
-              borderRadius: 8,
+    <Wrapper
+      style={
+        embedded
+          ? undefined
+          : {
               background: C.white,
+              borderBottom: `1px solid ${C.slate200}`,
+            }
+      }
+    >
+      <div
+        style={
+          embedded ? { margin: 0 } : { maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }
+        }
+      >
+        {!embedded && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            style={{
+              marginBottom: 40,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'flex-end',
+              flexWrap: 'wrap',
+              gap: 16,
             }}
           >
-            See all {ALL_CASES.length} cases
-            <ArrowRight size={14} />
-          </Link>
-        </motion.div>
+            <div>
+              <p
+                style={{
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: C.green,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  marginBottom: 8,
+                }}
+              >
+                Proof, not logos
+              </p>
+              <h2
+                style={{
+                  fontSize: 'clamp(24px, 4vw, 36px)',
+                  fontWeight: 700,
+                  color: C.slate900,
+                  margin: 0,
+                  marginBottom: 12,
+                  letterSpacing: '-0.01em',
+                  maxWidth: 720,
+                }}
+              >
+                Real decisions, analyzed the same way we analyze yours.
+              </h2>
+              <p
+                style={{
+                  fontSize: 'clamp(14px, 2.5vw, 17px)',
+                  color: C.slate600,
+                  margin: 0,
+                  maxWidth: 640,
+                  lineHeight: 1.5,
+                }}
+              >
+                We took the pre-decision memos from {featured.length} famous strategic decisions,
+                stripped the hindsight, and ran them through the same bias and noise framework we
+                apply to your memos today. Here&apos;s what we would have flagged.
+              </p>
+            </div>
+
+            <Link
+              href="/case-studies"
+              onClick={() => trackEvent('case_study_carousel_see_all', {})}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                fontSize: 14,
+                fontWeight: 600,
+                color: C.navy,
+                textDecoration: 'none',
+                border: `1px solid ${C.slate200}`,
+                padding: '10px 16px',
+                borderRadius: 8,
+                background: C.white,
+              }}
+            >
+              See all {ALL_CASES.length} cases
+              <ArrowRight size={14} />
+            </Link>
+          </motion.div>
+        )}
 
         <div
           style={{
@@ -288,6 +302,6 @@ export function CaseStudyCarousel() {
           })}
         </div>
       </div>
-    </section>
+    </Wrapper>
   );
 }

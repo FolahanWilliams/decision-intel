@@ -53,7 +53,11 @@ export const CLOVERPOP_COMPARISON: ComparisonRow[] = [
     decisionIntel:
       'Decision Knowledge Graph + LangGraph engine: bias detection, noise simulation, adversarial debate',
   },
-  { dimension: 'Bias Detection', cloverpop: 'None', decisionIntel: '20+ types with compound interaction matrix' },
+  {
+    dimension: 'Bias Detection',
+    cloverpop: 'None',
+    decisionIntel: '20+ types with compound interaction matrix',
+  },
   {
     dimension: 'Noise Measurement',
     cloverpop: 'None',
@@ -79,7 +83,11 @@ export const CLOVERPOP_COMPARISON: ComparisonRow[] = [
     cloverpop: 'Workflow adoption + Decision Bank data',
     decisionIntel: 'Compound scoring IP + org-calibrated outcome flywheel',
   },
-  { dimension: 'Inc. 5000', cloverpop: '#608 (2025), ~300% 3yr growth', decisionIntel: 'N/A (pre-revenue)' },
+  {
+    dimension: 'Inc. 5000',
+    cloverpop: '#608 (2025), ~300% 3yr growth',
+    decisionIntel: 'N/A (pre-revenue)',
+  },
 ];
 
 // ─── 5 moat layers with file proofs ───────────────────────────────────────
@@ -173,17 +181,94 @@ export interface CapabilityRow {
 }
 
 export const CAPABILITY_MATRIX: CapabilityRow[] = [
-  { capability: 'Cognitive Bias Detection', decisionIntel: 'yes', cloverpop: 'no', palantir: 'no', consulting: 'partial', llm: 'partial' },
-  { capability: 'Noise Measurement (Kahneman)', decisionIntel: 'yes', cloverpop: 'no', palantir: 'no', consulting: 'no', llm: 'no' },
-  { capability: 'Compound Bias Scoring', decisionIntel: 'yes', cloverpop: 'no', palantir: 'no', consulting: 'no', llm: 'no' },
-  { capability: 'Toxic Combination Patterns', decisionIntel: 'yes', cloverpop: 'no', palantir: 'no', consulting: 'no', llm: 'no' },
-  { capability: 'Compliance Frameworks', decisionIntel: 'yes', cloverpop: 'no', palantir: 'partial', consulting: 'partial', llm: 'no' },
-  { capability: 'Outcome Learning Flywheel', decisionIntel: 'yes', cloverpop: 'partial', palantir: 'no', consulting: 'no', llm: 'no' },
-  { capability: 'Knowledge Graph', decisionIntel: 'yes', cloverpop: 'no', palantir: 'yes', consulting: 'no', llm: 'no' },
-  { capability: 'Real-time Integration', decisionIntel: 'yes', cloverpop: 'partial', palantir: 'partial', consulting: 'no', llm: 'no' },
-  { capability: 'Case Study Library', decisionIntel: 'yes', cloverpop: 'no', palantir: 'no', consulting: 'yes', llm: 'no' },
-  { capability: 'Time to Insight', decisionIntel: 'yes', cloverpop: 'partial', palantir: 'partial', consulting: 'no', llm: 'yes' },
-  { capability: 'Cost per Analysis', decisionIntel: 'yes', cloverpop: 'partial', palantir: 'no', consulting: 'no', llm: 'yes' },
+  {
+    capability: 'Cognitive Bias Detection',
+    decisionIntel: 'yes',
+    cloverpop: 'no',
+    palantir: 'no',
+    consulting: 'partial',
+    llm: 'partial',
+  },
+  {
+    capability: 'Noise Measurement (Kahneman)',
+    decisionIntel: 'yes',
+    cloverpop: 'no',
+    palantir: 'no',
+    consulting: 'no',
+    llm: 'no',
+  },
+  {
+    capability: 'Compound Bias Scoring',
+    decisionIntel: 'yes',
+    cloverpop: 'no',
+    palantir: 'no',
+    consulting: 'no',
+    llm: 'no',
+  },
+  {
+    capability: 'Toxic Combination Patterns',
+    decisionIntel: 'yes',
+    cloverpop: 'no',
+    palantir: 'no',
+    consulting: 'no',
+    llm: 'no',
+  },
+  {
+    capability: 'Compliance Frameworks',
+    decisionIntel: 'yes',
+    cloverpop: 'no',
+    palantir: 'partial',
+    consulting: 'partial',
+    llm: 'no',
+  },
+  {
+    capability: 'Outcome Learning Flywheel',
+    decisionIntel: 'yes',
+    cloverpop: 'partial',
+    palantir: 'no',
+    consulting: 'no',
+    llm: 'no',
+  },
+  {
+    capability: 'Knowledge Graph',
+    decisionIntel: 'yes',
+    cloverpop: 'no',
+    palantir: 'yes',
+    consulting: 'no',
+    llm: 'no',
+  },
+  {
+    capability: 'Real-time Integration',
+    decisionIntel: 'yes',
+    cloverpop: 'partial',
+    palantir: 'partial',
+    consulting: 'no',
+    llm: 'no',
+  },
+  {
+    capability: 'Case Study Library',
+    decisionIntel: 'yes',
+    cloverpop: 'no',
+    palantir: 'no',
+    consulting: 'yes',
+    llm: 'no',
+  },
+  {
+    capability: 'Time to Insight',
+    decisionIntel: 'yes',
+    cloverpop: 'partial',
+    palantir: 'partial',
+    consulting: 'no',
+    llm: 'yes',
+  },
+  {
+    capability: 'Cost per Analysis',
+    decisionIntel: 'yes',
+    cloverpop: 'partial',
+    palantir: 'no',
+    consulting: 'no',
+    llm: 'yes',
+  },
 ];
 
 export const COMPETITOR_HEADERS = [
@@ -213,7 +298,15 @@ export interface InvestorQA {
   question: string;
   answer: string;
   proof?: string;
-  topic: 'competition' | 'tam' | 'team' | 'adoption' | 'moat' | 'unit-economics' | 'defensibility' | 'traction';
+  topic:
+    | 'competition'
+    | 'tam'
+    | 'team'
+    | 'adoption'
+    | 'moat'
+    | 'unit-economics'
+    | 'defensibility'
+    | 'traction';
 }
 
 export const TOPIC_LABEL: Record<InvestorQA['topic'], string> = {
@@ -252,7 +345,8 @@ export const INVESTOR_QA: InvestorQA[] = [
   {
     id: 'tam_limit',
     topic: 'tam',
-    question: "You're laser-focused on corporate strategy and M&A. Aren't you artificially limiting your TAM?",
+    question:
+      "You're laser-focused on corporate strategy and M&A. Aren't you artificially limiting your TAM?",
     answer:
       "We are applying Peter Thiel's monopoly framework: dominate a high-stakes, high-WTP vertical before expanding horizontally. Cloverpop's generic AI is fine for deciding where to host a corporate retreat. But a generic LLM cannot audit a $500M acquisition memo. Our engine has 11 proprietary, strategy-specific bias overlays — we hunt for Winner's Curse, Valuation Anchoring, and Synergy Overconfidence. When a CFO is approving a $200M acquisition, they don't want a horizontal HR collaboration tool. They want a specialized statistical jury. Because we're verticalized, we tie outputs directly to FCA Consumer Duty and SOX compliance — turning our software from nice-to-have into must-have regulatory CYA.",
     proof:
@@ -271,7 +365,8 @@ export const INVESTOR_QA: InvestorQA[] = [
   {
     id: 'pe_adoption',
     topic: 'adoption',
-    question: "PE partners have massive egos. They won't log into a dashboard to have an AI tell them their judgment is noisy. How do you get adoption?",
+    question:
+      "PE partners have massive egos. They won't log into a dashboard to have an AI tell them their judgment is noisy. How do you get adoption?",
     answer:
       "You are completely right, they will not log into a dashboard. That is why Cloverpop's Decision Playbooks require heavy change management and top-down mandates. I designed Decision Intel to require zero behavior change. Native Slack, Email, and Google Drive integrations wire the audit directly into the existing workflow. The AI lives where the strategy discussion is already happening. When a strategy manager uploads a board deck, pastes a market-entry memo, or drops a strategic recommendation in Slack, background agents run the audit and deliver a localized nudge. We do not ask anyone to learn a new workflow. We augment the workflow they are already using.",
     proof:
@@ -529,7 +624,7 @@ export const DI_GAPS: DiGap[] = [
   },
   {
     id: 'execution',
-    name: 'Closed-Loop',
+    name: 'Close the loop',
     fullName: 'A loop that actually closes: insight, outcome, recalibration',
     categoryProblem:
       'Most decision-intelligence platforms surface recommendations and stop there. The outcome six months later never makes it back into the system that produced the recommendation, so nothing recalibrates and the tool never gets sharper.',
@@ -577,13 +672,13 @@ export const DI_GAPS: DiGap[] = [
     name: 'Governance',
     fullName: 'Regulator-grade governance that survives the audit committee',
     categoryProblem:
-      "Black-box AI inside a high-stakes decision process fails audit committee review. Decision governance lags data governance by a decade. Few platforms produce regulator-grade defence documents for the flags they surface, and almost none cross-link those flags to the specific regulations they trigger.",
+      'Black-box AI inside a high-stakes decision process fails audit committee review. Decision governance lags data governance by a decade. Few platforms produce regulator-grade defence documents for the flags they surface, and almost none cross-link those flags to the specific regulations they trigger.',
     whatFailureLooksLike:
       '"We can\'t use AI in board memos because our GC doesn\'t know how to defend it in an EU AI Act audit." Strategic decisions stall in limbo: the tool surfaces a flag, the GC asks which regulation it touches, and nobody can answer without a week of legal review.',
     evidence:
       'Every Fortune 500 procurement team vetoes a tool that cannot produce regulator-grade defence documents. The EU AI Act, SOX §404, and GDPR Article 22 each gate different customer categories, and all three are rising, not falling, as AI enters decision workflows.',
     diApproach:
-      "Decision Intel delivers governance as product, not documentation. Every flag cross-links to a specific provision across seven frameworks. The Audit Defense Packet exports as a regulator-grade PDF on Pro tier, so a General Counsel can walk into a regulator meeting with the memo, the flags, and the framework citations in a single document.",
+      'Decision Intel delivers governance as product, not documentation. Every flag cross-links to a specific provision across seven frameworks. The Audit Defense Packet exports as a regulator-grade PDF on Pro tier, so a General Counsel can walk into a regulator meeting with the memo, the flags, and the framework citations in a single document.',
     diCapabilities: [
       {
         label: '7 regulatory framework mappers',

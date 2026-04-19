@@ -66,45 +66,52 @@ const CARDS = [
   },
 ];
 
-export function CredibilityTrio() {
+export function CredibilityTrio({ embedded = false }: { embedded?: boolean } = {}) {
+  const Wrapper = embedded ? 'div' : 'section';
   return (
-    <section
-      style={{
-        maxWidth: 1200,
-        margin: '0 auto',
-        padding: '80px 24px',
-      }}
+    <Wrapper
+      style={
+        embedded
+          ? { margin: 0 }
+          : {
+              maxWidth: 1200,
+              margin: '0 auto',
+              padding: '80px 24px',
+            }
+      }
     >
-      <div style={{ marginBottom: 32 }}>
-        <div
-          style={{
-            fontSize: 12,
-            fontWeight: 800,
-            color: C.green,
-            textTransform: 'uppercase',
-            letterSpacing: '0.14em',
-            marginBottom: 10,
-          }}
-        >
-          Go deeper
+      {!embedded && (
+        <div style={{ marginBottom: 32 }}>
+          <div
+            style={{
+              fontSize: 12,
+              fontWeight: 800,
+              color: C.green,
+              textTransform: 'uppercase',
+              letterSpacing: '0.14em',
+              marginBottom: 10,
+            }}
+          >
+            Go deeper
+          </div>
+          <h2
+            style={{
+              fontSize: 'clamp(26px, 3.6vw, 34px)',
+              fontWeight: 800,
+              color: C.slate900,
+              marginBottom: 12,
+              letterSpacing: '-0.02em',
+              lineHeight: 1.15,
+            }}
+          >
+            Three pages. Everything this site claims, checkable.
+          </h2>
+          <p style={{ fontSize: 16, color: C.slate600, margin: 0, maxWidth: 640, lineHeight: 1.6 }}>
+            The full case library, the bias-failure rankings, and the security posture on your
+            documents. Every claim on this site traces back to one of these pages.
+          </p>
         </div>
-        <h2
-          style={{
-            fontSize: 'clamp(26px, 3.6vw, 34px)',
-            fontWeight: 800,
-            color: C.slate900,
-            marginBottom: 12,
-            letterSpacing: '-0.02em',
-            lineHeight: 1.15,
-          }}
-        >
-          Three pages. Everything this site claims, checkable.
-        </h2>
-        <p style={{ fontSize: 16, color: C.slate600, margin: 0, maxWidth: 640, lineHeight: 1.6 }}>
-          The full case library, the bias-failure rankings, and the security posture on your
-          documents. Every claim on this site traces back to one of these pages.
-        </p>
-      </div>
+      )}
 
       <div
         style={{
@@ -214,7 +221,7 @@ export function CredibilityTrio() {
           }
         }
       `}</style>
-    </section>
+    </Wrapper>
   );
 }
 

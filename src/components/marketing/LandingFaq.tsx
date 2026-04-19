@@ -123,10 +123,10 @@ const ITEMS: FaqItem[] = [
     a: (
       <>
         ChatGPT gives one opinion from one model — it will confidently tell you the deck looks fine.
-        Decision Intel runs a 12-node LangGraph pipeline with three independent judges for noise
-        measurement, a 20×20 bias interaction matrix for compound risk, 30+ domain-specific biases
-        mapped to published research, and an outcome flywheel that recalibrates your scores with
-        every confirmed result. The full pipeline is documented at{' '}
+        Decision Intel runs a multi-stage audit: 30+ domain-specific biases mapped to published
+        research, triangulated noise measurement, compound-risk scoring across interacting biases,
+        and an outcome flywheel that recalibrates your scores with every confirmed result. The full
+        methodology is documented at{' '}
         <Link href="/how-it-works" style={{ color: C.green, fontWeight: 600 }}>
           /how-it-works
         </Link>

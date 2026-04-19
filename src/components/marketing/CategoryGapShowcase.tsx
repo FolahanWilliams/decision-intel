@@ -3,7 +3,7 @@
 import { useMemo, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Check, ChevronDown, FileText, Sparkles, Zap } from 'lucide-react';
+import { ArrowRight, Check, ChevronDown, FileText, Zap } from 'lucide-react';
 import {
   DI_GAPS,
   type DiCapability,
@@ -147,8 +147,7 @@ function CapabilityPill({ capability }: { capability: DiCapability }) {
                 style={{
                   fontSize: 11,
                   color: C.slate500,
-                  fontFamily:
-                    'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+                  fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
                   background: C.slate50,
                   border: `1px solid ${C.slate200}`,
                   borderRadius: 6,
@@ -225,59 +224,16 @@ function GapPanel({ gap, reducedMotion }: { gap: DiGap; reducedMotion: boolean }
               fontSize: 10,
               fontWeight: 800,
               textTransform: 'uppercase',
-              letterSpacing: '0.12em',
-              color: C.red,
-              background: C.redLight,
-              border: `1px solid #FCA5A5`,
-              padding: '3px 8px',
-              borderRadius: 999,
-              marginBottom: 10,
-            }}
-          >
-            Category problem
-          </div>
-          <p
-            style={{
-              fontSize: 14,
-              color: C.slate700,
-              lineHeight: 1.6,
-              margin: 0,
-            }}
-          >
-            {gap.categoryProblem}
-          </p>
-          <p
-            style={{
-              fontSize: 13,
-              color: C.slate500,
-              lineHeight: 1.6,
-              margin: '10px 0 0',
-              fontStyle: 'italic',
-            }}
-          >
-            {gap.whatFailureLooksLike}
-          </p>
-        </div>
-
-        <div>
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              fontSize: 10,
-              fontWeight: 800,
-              textTransform: 'uppercase',
-              letterSpacing: '0.12em',
+              letterSpacing: '0.14em',
               color: C.green,
               background: C.greenLight,
               border: `1px solid ${C.greenBorder}`,
-              padding: '3px 8px',
+              padding: '3px 10px',
               borderRadius: 999,
               marginBottom: 10,
             }}
           >
-            How Decision Intel closes it
+            What Decision Intel delivers
           </div>
           <p
             style={{
@@ -302,6 +258,50 @@ function GapPanel({ gap, reducedMotion }: { gap: DiGap; reducedMotion: boolean }
               <CapabilityPill key={cap.label} capability={cap} />
             ))}
           </div>
+        </div>
+
+        <div
+          style={{
+            background: C.white,
+            border: `1px solid ${C.slate200}`,
+            borderLeft: `3px solid ${C.slate300}`,
+            borderRadius: 10,
+            padding: '12px 14px',
+          }}
+        >
+          <div
+            style={{
+              fontSize: 10,
+              fontWeight: 800,
+              textTransform: 'uppercase',
+              letterSpacing: '0.14em',
+              color: C.slate500,
+              marginBottom: 6,
+            }}
+          >
+            Why it matters
+          </div>
+          <p
+            style={{
+              fontSize: 13.5,
+              color: C.slate700,
+              lineHeight: 1.55,
+              margin: 0,
+            }}
+          >
+            {gap.categoryProblem}
+          </p>
+          <p
+            style={{
+              fontSize: 12.5,
+              color: C.slate500,
+              lineHeight: 1.55,
+              margin: '8px 0 0',
+              fontStyle: 'italic',
+            }}
+          >
+            {gap.whatFailureLooksLike}
+          </p>
         </div>
 
         <div
@@ -400,8 +400,7 @@ function subscribeReducedMotion(cb: () => void) {
   return () => mq.removeEventListener('change', cb);
 }
 const getReducedMotion = () =>
-  typeof window !== 'undefined' &&
-  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const getReducedMotionServer = () => false;
 
 export function CategoryGapShowcase() {
@@ -409,13 +408,10 @@ export function CategoryGapShowcase() {
   const reducedMotion = useSyncExternalStore(
     subscribeReducedMotion,
     getReducedMotion,
-    getReducedMotionServer,
+    getReducedMotionServer
   );
 
-  const activeGap = useMemo(
-    () => DI_GAPS.find(g => g.id === activeId) ?? DI_GAPS[0],
-    [activeId],
-  );
+  const activeGap = useMemo(() => DI_GAPS.find(g => g.id === activeId) ?? DI_GAPS[0], [activeId]);
 
   return (
     <section
@@ -461,56 +457,44 @@ export function CategoryGapShowcase() {
       <div style={{ maxWidth: 1180, margin: '0 auto' }}>
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <div
+          <p
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              fontSize: 11,
-              fontWeight: 800,
-              textTransform: 'uppercase',
-              letterSpacing: '0.14em',
+              fontSize: 13,
+              fontWeight: 700,
               color: C.green,
-              background: C.greenLight,
-              border: `1px solid ${C.greenBorder}`,
-              padding: '4px 10px',
-              borderRadius: 999,
-              marginBottom: 16,
+              textTransform: 'uppercase',
+              letterSpacing: '0.16em',
+              margin: '0 0 14px',
             }}
           >
-            <Sparkles size={11} strokeWidth={2.4} />
-            The category we&rsquo;re defining
-          </div>
+            The reasoning layer
+          </p>
           <h2
             style={{
               fontSize: 'clamp(28px, 3.6vw, 42px)',
               fontWeight: 800,
               color: C.slate900,
-              letterSpacing: '-0.015em',
+              letterSpacing: '-0.02em',
               lineHeight: 1.1,
-              margin: '0 auto 14px',
+              margin: '0 auto 16px',
               maxWidth: 880,
             }}
           >
-            Judged on the four pillars every other system in your stack already is.
-            <br />
-            <span style={{ color: C.green }}>
-              Quality. Governance. Scalability. Reliability.
-            </span>
+            Held to the same bar as the rest of your enterprise stack.
           </h2>
           <p
             style={{
               fontSize: 'clamp(14px, 1.4vw, 17px)',
               color: C.slate600,
               lineHeight: 1.6,
-              maxWidth: 740,
+              maxWidth: 760,
               margin: '0 auto',
             }}
           >
-            Your data warehouse, your CRM, your finance stack &mdash; each one passed the audit
-            committee on these four. The reasoning layer on top of them never has. That&rsquo;s
-            the category Decision Intel is building, and the three capabilities below are how
-            we deliver each pillar. Pick one to explore.
+            Your data warehouse, CRM, and finance systems all meet the audit-committee bar on
+            quality, governance, scalability, and reliability. The layer where your strategy team
+            actually writes the memo hasn&rsquo;t. Decision Intel closes that gap across three
+            capabilities &mdash; explore any.
           </p>
         </div>
 
@@ -520,15 +504,14 @@ export function CategoryGapShowcase() {
             background: C.white,
             border: `1px solid ${C.slate200}`,
             borderRadius: 22,
-            boxShadow:
-              '0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 32px rgba(15, 23, 42, 0.06)',
+            boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 32px rgba(15, 23, 42, 0.06)',
             overflow: 'hidden',
           }}
         >
           {/* Tabs */}
           <div
             role="tablist"
-            aria-label="Three unsolved problems in decision intelligence"
+            aria-label="Three capabilities"
             className="category-gap-tabs"
             style={{
               display: 'flex',
@@ -536,7 +519,7 @@ export function CategoryGapShowcase() {
               borderBottom: `1px solid ${C.slate100}`,
             }}
           >
-            {DI_GAPS.map((gap, i) => {
+            {DI_GAPS.map(gap => {
               const isActive = gap.id === activeId;
               return (
                 <button
@@ -561,53 +544,26 @@ export function CategoryGapShowcase() {
                   className="category-gap-tab"
                   style={{
                     flex: 1,
-                    padding: '18px 22px',
+                    padding: '20px 22px',
                     border: 'none',
                     background: isActive ? C.white : 'transparent',
                     cursor: 'pointer',
-                    borderBottom: isActive
-                      ? `2px solid ${C.green}`
-                      : '2px solid transparent',
+                    borderBottom: isActive ? `2px solid ${C.green}` : '2px solid transparent',
                     transition: 'all 0.15s',
                     textAlign: 'left',
                   }}
                 >
                   <div
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 8,
-                      marginBottom: 4,
+                      fontSize: 11,
+                      fontWeight: 800,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.14em',
+                      color: isActive ? C.green : C.slate500,
+                      marginBottom: 6,
                     }}
                   >
-                    <span
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        width: 22,
-                        height: 22,
-                        borderRadius: '50%',
-                        background: isActive ? C.green : C.slate200,
-                        color: isActive ? C.white : C.slate500,
-                        fontSize: 11,
-                        fontWeight: 800,
-                        flexShrink: 0,
-                      }}
-                    >
-                      {i + 1}
-                    </span>
-                    <span
-                      style={{
-                        fontSize: 11,
-                        fontWeight: 700,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.1em',
-                        color: isActive ? C.green : C.slate500,
-                      }}
-                    >
-                      Problem {i + 1} · {gap.name}
-                    </span>
+                    {gap.name}
                   </div>
                   <div
                     style={{
@@ -697,7 +653,7 @@ export function CategoryGapShowcase() {
                 gap: 4,
               }}
             >
-              See the 12-node pipeline <ArrowRight size={13} />
+              See how it works <ArrowRight size={13} />
             </Link>
             <Link
               href="/bias-genome"
@@ -764,33 +720,38 @@ interface CausalEdge {
   label?: string;
 }
 
+// Positions use 0-100 space; layout tuned so node labels (rendered below
+// each node) never collide with edge midpoint labels:
+//  - Left column: ceo (top), legacy (lower-mid), market (bottom)
+//  - Mid column: memo (upper), competitor (bottom)
+//  - Right column: dissent (high-right), synergy (mid-right), outcome (far-right)
 const CAUSAL_NODES: CausalNode[] = [
-  { id: 'ceo',        label: 'CEO vision',           kind: 'bias',        x: 10, y: 20, cx: 14, cy: 18 },
-  { id: 'market',     label: 'Market slowdown',      kind: 'signal',      x: 10, y: 72, cx: 18, cy: 70 },
-  { id: 'legacy',     label: 'Legacy asset',         kind: 'bias',        x: 10, y: 46, cx: 28, cy: 42 },
-  { id: 'memo',       label: 'Acquisition memo',     kind: 'assumption',  x: 42, y: 36, cx: 48, cy: 28 },
-  { id: 'competitor', label: 'Competitor move',      kind: 'signal',      x: 42, y: 72, cx: 52, cy: 78 },
-  { id: 'synergy',    label: 'Claimed £80M synergy', kind: 'claim',       x: 68, y: 44, cx: 70, cy: 50 },
-  { id: 'dissent',    label: 'Dissent absent',       kind: 'bias',        x: 68, y: 20, cx: 78, cy: 18 },
-  { id: 'outcome',    label: 'Revenue miss',         kind: 'outcome',     x: 92, y: 50, cx: 86, cy: 60 },
+  { id: 'ceo', label: 'CEO vision', kind: 'bias', x: 8, y: 14, cx: 12, cy: 14 },
+  { id: 'legacy', label: 'Legacy asset', kind: 'bias', x: 8, y: 55, cx: 26, cy: 46 },
+  { id: 'market', label: 'Market slowdown', kind: 'signal', x: 8, y: 86, cx: 18, cy: 76 },
+  { id: 'memo', label: 'Acquisition memo', kind: 'assumption', x: 40, y: 32, cx: 46, cy: 28 },
+  { id: 'competitor', label: 'Competitor move', kind: 'signal', x: 40, y: 86, cx: 52, cy: 80 },
+  { id: 'dissent', label: 'Dissent absent', kind: 'bias', x: 74, y: 14, cx: 78, cy: 14 },
+  { id: 'synergy', label: 'Claimed £80M synergy', kind: 'claim', x: 70, y: 56, cx: 72, cy: 52 },
+  { id: 'outcome', label: 'Revenue miss', kind: 'outcome', x: 94, y: 56, cx: 88, cy: 62 },
 ];
 
 const CAUSAL_EDGES: CausalEdge[] = [
-  { from: 'ceo',        to: 'memo',    label: 'confirmation' },
-  { from: 'market',     to: 'memo',    label: 'anchoring' },
-  { from: 'competitor', to: 'memo',    label: 'availability' },
-  { from: 'legacy',     to: 'synergy', label: 'sunk cost' },
-  { from: 'dissent',    to: 'synergy', label: 'groupthink' },
-  { from: 'memo',       to: 'synergy' },
-  { from: 'synergy',    to: 'outcome' },
+  { from: 'ceo', to: 'memo', label: 'confirmation' },
+  { from: 'market', to: 'memo', label: 'anchoring' },
+  { from: 'competitor', to: 'memo', label: 'availability' },
+  { from: 'legacy', to: 'synergy', label: 'sunk cost' },
+  { from: 'dissent', to: 'synergy', label: 'groupthink' },
+  { from: 'memo', to: 'synergy' },
+  { from: 'synergy', to: 'outcome' },
 ];
 
 const KIND_STYLE: Record<CausalNodeKind, { fill: string; ring: string; text: string }> = {
-  bias:       { fill: '#FEE2E2', ring: '#DC2626', text: '#7F1D1D' },
+  bias: { fill: '#FEE2E2', ring: '#DC2626', text: '#7F1D1D' },
   assumption: { fill: '#E0F2FE', ring: '#0284C7', text: '#075985' },
-  claim:      { fill: '#F1F5F9', ring: '#64748B', text: '#1E293B' },
-  outcome:    { fill: '#DCFCE7', ring: '#16A34A', text: '#14532D' },
-  signal:     { fill: '#EDE9FE', ring: '#8B5CF6', text: '#4C1D95' },
+  claim: { fill: '#F1F5F9', ring: '#64748B', text: '#1E293B' },
+  outcome: { fill: '#DCFCE7', ring: '#16A34A', text: '#14532D' },
+  signal: { fill: '#EDE9FE', ring: '#8B5CF6', text: '#4C1D95' },
 };
 
 const KIND_LABEL: Record<CausalNodeKind, string> = {
@@ -805,14 +766,24 @@ function CausalGraphVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
   const [view, setView] = useState<'correlation' | 'causation'>('causation');
   const [sel, setSel] = useState<string | null>('memo');
 
-  const w = 460;
-  const h = 260;
+  const w = 480;
+  const h = 310;
   const pos = (n: CausalNode) => {
     const useCorr = view === 'correlation';
     return {
       x: ((useCorr ? n.cx : n.x) / 100) * w,
       y: ((useCorr ? n.cy : n.y) / 100) * h,
     };
+  };
+
+  // White halo around SVG text so labels stay legible even if they sit
+  // near an edge line — avoids overlap visuals without manual per-edge
+  // offsets.
+  const HALO = {
+    paintOrder: 'stroke' as const,
+    stroke: C.slate50,
+    strokeWidth: 3.5,
+    strokeLinejoin: 'round' as const,
   };
 
   const selected = useMemo(() => CAUSAL_NODES.find(n => n.id === sel) ?? null, [sel]);
@@ -824,7 +795,7 @@ function CausalGraphVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
             node: CAUSAL_NODES.find(n => n.id === e.from)!,
           }))
         : [],
-    [selected],
+    [selected]
   );
   const downstream = useMemo(
     () =>
@@ -834,7 +805,7 @@ function CausalGraphVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
             node: CAUSAL_NODES.find(n => n.id === e.to)!,
           }))
         : [],
-    [selected],
+    [selected]
   );
 
   const arrow = view === 'causation' ? 'url(#causal-arrow)' : undefined;
@@ -868,7 +839,7 @@ function CausalGraphVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
             color: C.slate500,
           }}
         >
-          Sample thesis · Decision Knowledge Graph
+          Sample memo · Decision Knowledge Graph
         </div>
         <div
           role="tablist"
@@ -942,14 +913,9 @@ function CausalGraphVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
           const to = CAUSAL_NODES.find(n => n.id === e.to)!;
           const p1 = pos(from);
           const p2 = pos(to);
-          const isSelEdge =
-            selected && (selected.id === e.from || selected.id === e.to);
+          const isSelEdge = selected && (selected.id === e.from || selected.id === e.to);
           const stroke =
-            view === 'causation'
-              ? isSelEdge
-                ? C.green
-                : 'rgba(22, 163, 74, 0.5)'
-              : C.slate300;
+            view === 'causation' ? (isSelEdge ? C.green : 'rgba(22, 163, 74, 0.5)') : C.slate300;
           return (
             <motion.line
               key={`edge-${i}`}
@@ -986,6 +952,7 @@ function CausalGraphVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
                 fill={C.slate500}
                 textAnchor="middle"
                 style={{ pointerEvents: 'none' }}
+                {...HALO}
               >
                 {e.label}
               </text>
@@ -1005,9 +972,7 @@ function CausalGraphVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
               style={{ cursor: 'pointer' }}
               animate={reducedMotion ? undefined : { transform: `translate(${p.x}px, ${p.y}px)` }}
               transition={{ duration: 0.5, ease: 'easeInOut' }}
-              {...(!reducedMotion
-                ? {}
-                : { transform: `translate(${p.x}, ${p.y})` })}
+              {...(!reducedMotion ? {} : { transform: `translate(${p.x}, ${p.y})` })}
             >
               {isSel && (
                 <circle
@@ -1036,6 +1001,7 @@ function CausalGraphVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
                 fill={style.text}
                 textAnchor="middle"
                 style={{ pointerEvents: 'none' }}
+                {...HALO}
               >
                 {n.label}
               </text>
@@ -1055,39 +1021,37 @@ function CausalGraphVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
           borderTop: `1px dashed ${C.slate200}`,
         }}
       >
-        {(['bias', 'signal', 'assumption', 'claim', 'outcome'] as CausalNodeKind[]).map(
-          kind => {
-            const s = KIND_STYLE[kind];
-            return (
+        {(['bias', 'signal', 'assumption', 'claim', 'outcome'] as CausalNodeKind[]).map(kind => {
+          const s = KIND_STYLE[kind];
+          return (
+            <span
+              key={kind}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                fontSize: 10,
+                fontWeight: 600,
+                color: C.slate600,
+                padding: '2px 8px',
+                borderRadius: 999,
+                background: C.white,
+                border: `1px solid ${C.slate200}`,
+              }}
+            >
               <span
-                key={kind}
                 style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 4,
-                  fontSize: 10,
-                  fontWeight: 600,
-                  color: C.slate600,
-                  padding: '2px 8px',
-                  borderRadius: 999,
-                  background: C.white,
-                  border: `1px solid ${C.slate200}`,
+                  width: 8,
+                  height: 8,
+                  borderRadius: '50%',
+                  background: s.fill,
+                  border: `1.5px solid ${s.ring}`,
                 }}
-              >
-                <span
-                  style={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: '50%',
-                    background: s.fill,
-                    border: `1.5px solid ${s.ring}`,
-                  }}
-                />
-                {KIND_LABEL[kind]}
-              </span>
-            );
-          },
-        )}
+              />
+              {KIND_LABEL[kind]}
+            </span>
+          );
+        })}
       </div>
 
       {/* Selection panel */}
@@ -1189,9 +1153,7 @@ function CausalGraphVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
                   upstream.map(({ edge, node }) => (
                     <div key={`u-${node.id}`} style={{ marginBottom: 2 }}>
                       <strong style={{ color: C.slate900 }}>{node.label}</strong>
-                      {edge.label && (
-                        <span style={{ color: C.slate500 }}> · {edge.label}</span>
-                      )}
+                      {edge.label && <span style={{ color: C.slate500 }}> · {edge.label}</span>}
                     </div>
                   ))
                 )}
@@ -1215,9 +1177,7 @@ function CausalGraphVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
                   downstream.map(({ edge, node }) => (
                     <div key={`d-${node.id}`} style={{ marginBottom: 2 }}>
                       <strong style={{ color: C.slate900 }}>{node.label}</strong>
-                      {edge.label && (
-                        <span style={{ color: C.slate500 }}> · {edge.label}</span>
-                      )}
+                      {edge.label && <span style={{ color: C.slate500 }}> · {edge.label}</span>}
                     </div>
                   ))
                 )}
@@ -1251,9 +1211,9 @@ const FLYWHEEL_STAGES: FlywheelStage[] = [
     id: 'audit',
     icon: 'clipboard',
     label: 'Audit',
-    sub: '12-node pipeline',
+    sub: 'Full memo audit',
     detail:
-      '60-second audit: bias detection across 30+ types, 3-judge noise measurement, logical coherence check, pre-mortem, red team, fact-check, compliance mapping, compound-risk scoring, verdict synthesis. Output: a DQI score and an evidence pack.',
+      '60-second audit across 30+ cognitive biases, triangulated noise measurement, logical-coherence check, pre-mortem, red team, fact-check, compliance mapping, and compound-risk scoring. Output: a DQI score and an evidence pack.',
     cap: 'DQI assigned',
   },
   {
@@ -1294,7 +1254,16 @@ function StageIcon({
   size?: number;
   color: string;
 }) {
-  const common = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: color, strokeWidth: 2, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
+  const common = {
+    width: size,
+    height: size,
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: color,
+    strokeWidth: 2,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+  };
   if (kind === 'clipboard')
     return (
       <svg {...common}>
@@ -1489,14 +1458,7 @@ function ClosedLoopFlywheelVizImpl({ reducedMotion }: { reducedMotion: boolean }
           )}
 
           {/* Centre node */}
-          <circle
-            cx={cx}
-            cy={cy}
-            r={48}
-            fill={C.white}
-            stroke={C.green}
-            strokeWidth={1.5}
-          />
+          <circle cx={cx} cy={cy} r={48} fill={C.white} stroke={C.green} strokeWidth={1.5} />
           <circle
             cx={cx}
             cy={cy}
@@ -1517,9 +1479,7 @@ function ClosedLoopFlywheelVizImpl({ reducedMotion }: { reducedMotion: boolean }
                 lineHeight: 1.25,
               }}
             >
-              <div style={{ textTransform: 'uppercase', fontSize: 9 }}>
-                Decision
-              </div>
+              <div style={{ textTransform: 'uppercase', fontSize: 9 }}>Decision</div>
               <div style={{ fontSize: 12, color: C.slate900, fontWeight: 800, marginTop: 2 }}>
                 Knowledge
               </div>
@@ -1534,9 +1494,7 @@ function ClosedLoopFlywheelVizImpl({ reducedMotion }: { reducedMotion: boolean }
             return (
               <g
                 key={s.id}
-                onClick={() =>
-                  setPausedStage(prev => (prev === s.id ? null : s.id))
-                }
+                onClick={() => setPausedStage(prev => (prev === s.id ? null : s.id))}
                 style={{ cursor: 'pointer' }}
               >
                 {isPaused && (
@@ -1568,11 +1526,7 @@ function ClosedLoopFlywheelVizImpl({ reducedMotion }: { reducedMotion: boolean }
                       height: '100%',
                     }}
                   >
-                    <StageIcon
-                      kind={s.icon}
-                      size={16}
-                      color={isPaused ? C.green : C.slate500}
-                    />
+                    <StageIcon kind={s.icon} size={16} color={isPaused ? C.green : C.slate500} />
                   </div>
                 </foreignObject>
                 {/* Label placement — tightened so the east/west stages
@@ -1589,12 +1543,7 @@ function ClosedLoopFlywheelVizImpl({ reducedMotion }: { reducedMotion: boolean }
                     y: cy + Math.sin(ang) * (orbit + 32),
                   };
                   return (
-                    <foreignObject
-                      x={outside.x - 44}
-                      y={outside.y - 18}
-                      width={88}
-                      height={40}
-                    >
+                    <foreignObject x={outside.x - 44} y={outside.y - 18} width={88} height={40}>
                       <div
                         style={{
                           fontSize: 10,
@@ -1776,9 +1725,9 @@ interface MemoFlag {
 }
 
 const SEVERITY_STYLE: Record<MemoFlag['severity'], { bg: string; ring: string; text: string }> = {
-  high:   { bg: '#FEE2E2', ring: '#DC2626', text: '#7F1D1D' },
+  high: { bg: '#FEE2E2', ring: '#DC2626', text: '#7F1D1D' },
   medium: { bg: '#FEF3C7', ring: '#D97706', text: '#92400E' },
-  low:    { bg: '#E0F2FE', ring: '#0284C7', text: '#075985' },
+  low: { bg: '#E0F2FE', ring: '#0284C7', text: '#075985' },
 };
 
 const MEMO_FLAGS: MemoFlag[] = [
@@ -1826,8 +1775,7 @@ const MEMO_FLAGS: MemoFlag[] = [
       {
         code: 'SOX §404',
         framework: 'Sarbanes-Oxley',
-        detail:
-          'Material asset impairment risk not flagged in committee materials.',
+        detail: 'Material asset impairment risk not flagged in committee materials.',
       },
       {
         code: 'Basel III',
@@ -1844,7 +1792,7 @@ const MEMO_FLAGS: MemoFlag[] = [
     biasType: 'Dissent absent',
     severity: 'medium',
     snippet:
-      'The diligence team unanimously supports the thesis; no material concerns surfaced during review.',
+      'The diligence team unanimously supports the recommendation; no material concerns surfaced during review.',
     explanation:
       'Unanimous agreement in committees with time pressure is a Kahneman-flagged groupthink marker. Red-team pass is missing.',
     hits: [
@@ -1871,7 +1819,7 @@ const MEMO_FLAGS: MemoFlag[] = [
     snippet:
       "Customer pricing tiers will be algorithmically assigned post-integration using the acquirer's existing pricing engine.",
     explanation:
-      "Automated pricing decisions that affect EU data subjects trigger Article 22 disclosure + opt-out obligations.",
+      'Automated pricing decisions that affect EU data subjects trigger Article 22 disclosure + opt-out obligations.',
     hits: [
       {
         code: 'GDPR Art. 22',
@@ -1907,11 +1855,8 @@ function GovernanceMemoVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
   const [selId, setSelId] = useState<string | null>('overconfidence');
   const selected = MEMO_FLAGS.find(f => f.id === selId) ?? null;
   const litFrameworks = useMemo(
-    () =>
-      new Set(
-        selected ? selected.hits.map(h => matchFrameworkCode(h.code)) : [],
-      ),
-    [selected],
+    () => new Set(selected ? selected.hits.map(h => matchFrameworkCode(h.code)) : []),
+    [selected]
   );
 
   return (
@@ -1977,8 +1922,7 @@ function GovernanceMemoVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
           border: `1px solid ${C.slate200}`,
           borderRadius: 12,
           padding: '20px 22px',
-          fontFamily:
-            'Georgia, "Times New Roman", ui-serif, serif',
+          fontFamily: 'Georgia, "Times New Roman", ui-serif, serif',
           color: C.slate700,
           lineHeight: 1.6,
           fontSize: 12.5,
@@ -1996,8 +1940,7 @@ function GovernanceMemoVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
             color: C.slate400,
-            fontFamily:
-              'system-ui, -apple-system, "Segoe UI", sans-serif',
+            fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif',
             marginBottom: 6,
           }}
         >
@@ -2017,9 +1960,9 @@ function GovernanceMemoVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
         </div>
 
         <p style={{ margin: '0 0 10px' }}>
-          Management recommends proceeding with the £240M acquisition of Meridian Ltd. The
-          strategic rationale centres on accelerating our entry into the mid-market segment
-          and consolidating fragmented share.{' '}
+          Management recommends proceeding with the £240M acquisition of Meridian Ltd. The strategic
+          rationale centres on accelerating our entry into the mid-market segment and consolidating
+          fragmented share.{' '}
           <FlagSpan
             flag={MEMO_FLAGS[0]}
             selected={selId === MEMO_FLAGS[0].id}
@@ -2032,8 +1975,8 @@ function GovernanceMemoVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
             selected={selId === MEMO_FLAGS[1].id}
             onClick={() => setSelId(prev => (prev === MEMO_FLAGS[1].id ? null : MEMO_FLAGS[1].id))}
           />{' '}
-          Integration costs are therefore estimated at the lower end of the comparable range,
-          with most programme risk already absorbed by the prior build.
+          Integration costs are therefore estimated at the lower end of the comparable range, with
+          most programme risk already absorbed by the prior build.
         </p>
         <p style={{ margin: '0 0 10px' }}>
           <FlagSpan
@@ -2041,8 +1984,8 @@ function GovernanceMemoVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
             selected={selId === MEMO_FLAGS[2].id}
             onClick={() => setSelId(prev => (prev === MEMO_FLAGS[2].id ? null : MEMO_FLAGS[2].id))}
           />{' '}
-          Given the unanimity of the diligence team and the competitive deal timeline, we
-          recommend proceeding to Heads of Terms this quarter.
+          Given the unanimity of the diligence team and the competitive deal timeline, we recommend
+          proceeding to Heads of Terms this quarter.
         </p>
         <p style={{ margin: 0 }}>
           Post-close, operational continuity will be preserved.{' '}
@@ -2093,13 +2036,7 @@ function GovernanceMemoVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
             return (
               <motion.span
                 key={fw}
-                animate={
-                  reducedMotion
-                    ? undefined
-                    : lit
-                      ? { scale: [1, 1.08, 1] }
-                      : { scale: 1 }
-                }
+                animate={reducedMotion ? undefined : lit ? { scale: [1, 1.08, 1] } : { scale: 1 }}
                 transition={{ duration: 0.35, ease: 'easeOut' }}
                 style={{
                   display: 'inline-flex',
@@ -2175,9 +2112,7 @@ function GovernanceMemoVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
                       >
                         {hit.code}
                       </div>
-                      <div style={{ fontSize: 10, color: C.slate500 }}>
-                        {hit.framework}
-                      </div>
+                      <div style={{ fontSize: 10, color: C.slate500 }}>{hit.framework}</div>
                     </div>
                     <div
                       style={{
@@ -2244,8 +2179,7 @@ function FlagSpan({
           fontWeight: 800,
           marginRight: 5,
           verticalAlign: 'text-top',
-          fontFamily:
-            'system-ui, -apple-system, "Segoe UI", sans-serif',
+          fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif',
         }}
       >
         {flag.num}
@@ -2254,4 +2188,3 @@ function FlagSpan({
     </button>
   );
 }
-

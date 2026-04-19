@@ -38,6 +38,34 @@ Decision Intel is a decision intelligence platform for corporate strategy teams.
 
 **Tone:** Calm CSO 1:1 voice with manager-level pain included. Never critique the buyer's judgment. Frame as additive rigor, not a report card. Lead with gain, not deficit. Use em dashes sparingly (one or two for emphasis); prefer commas and sentence breaks.
 
+## Marketing Voice — Enterprise Discipline (locked 2026-04-19)
+
+**The single test:** every word on a marketing surface must be something a Fortune 500 CSO, GC, or CFO could say aloud in a procurement meeting without flinching. If it reads like a startup talking to itself, cut it.
+
+**Marketing surfaces this rule governs:** `/`, `/demo`, `/how-it-works`, `/case-studies`, `/proof`, `/bias-genome`, `/security`, `/privacy`, `/pricing`, any landing-page module, any email or LinkedIn copy.
+
+**Banned on marketing surfaces — no exceptions:**
+
+- Stage-of-company language: "pre-seed", "seed-stage", "pre-revenue", "we just launched", "we're building", "we're a young company", "solo founder", "early days", "our journey", "just shipped"
+- Apologetic proof framing: "we don't have logos yet", "we're still cold-starting", "pilots coming soon", "waiting for our first customer"
+- Technical jargon: "12-node pipeline", "LangGraph", "agent", "agents", "3 independent AI judges", "pgvector", "prompts", "tokens", "inference", model names, any infra term
+- Startup-cute visual patterns: "Sparkles" icons on category pills, "The category we're defining" framed as a self-congratulatory badge, rounded-pill "look at us" banners, marketing-page glitter
+- Loss-first headlines: "X% of strategy fails", "Most decisions are wrong", "Stop getting it wrong" — lead with gain, not deficit
+- Vague jargon: "game-changer", "revolutionary", "next-generation", "AI-powered" (on its own), "leveraging AI"
+
+**Allowed and encouraged:**
+
+- Capability-led leads: "Causal reasoning, not correlation dressed up as insight" — name the capability, not the problem
+- Concrete artefacts: "strategic memo", "board deck", "audit committee", "steering committee", "audit defense packet", "Decision Knowledge Graph", "Decision Quality Index"
+- Compliance vocabulary: SOC 2, GDPR, EU AI Act, Basel III, SEC Reg D — specific, named, defensible
+- Enterprise shapes: the audit committee, the GC review, the procurement bar, the regulator meeting
+- Numbers that survive due diligence: "135 audited corporate decisions", "30+ cognitive biases", "~90% blended margin" — publicly verifiable or internally defensible
+- Quiet confidence: "checkable", "traceable", "defensible", "one click away, no login, no gate"
+
+**Where the jargon CAN live:** `/how-it-works` is the only public page that can name the 12-node pipeline, the node zones, and the interaction matrix — and even there, the manifest in `src/lib/data/pipeline-nodes.ts` is the ceiling. Founder Hub, Founder School, and the pitch deck can be as technical as useful because they're behind Supabase auth or the founder's own outreach.
+
+**If Claude drifts into startup voice:** stop, reread this section, rewrite. A correction from the founder on voice is a tripwire — update this section in the same commit so the next session has the lesson baked in.
+
 ## Founder Context
 
 - Solo technical founder, 16 years old, based in Nigeria
@@ -120,7 +148,9 @@ src/
 ## Critical Conventions — READ THESE
 
 ### Styling
+
 - **Use CSS variables with fallbacks**, not hardcoded hex colors or dark-mode Tailwind classes:
+
   ```tsx
   // ✅ Correct
   style={{ color: 'var(--text-primary)', background: 'var(--bg-card)' }}
@@ -128,6 +158,7 @@ src/
   // ❌ Wrong — breaks in light theme
   className="text-white bg-white/5 border-white/10"
   ```
+
 - Full token system defined in `src/app/globals.css` (297 lines). Key tokens:
   - Backgrounds: `--bg-primary`, `--bg-secondary`, `--bg-tertiary`, `--bg-card`, `--bg-elevated`
   - Text: `--text-primary`, `--text-secondary`, `--text-muted`, `--text-highlight`
@@ -140,6 +171,7 @@ src/
 - Inline `style={{}}` objects are the dominant pattern (not Tailwind utilities). Follow the existing pattern.
 
 ### Database
+
 - **Document model uses `uploadedAt`**, NOT `createdAt`, for the creation timestamp. This has caused build errors multiple times — always double-check.
 - **Analysis model uses `createdAt`** (standard Prisma).
 - Always handle schema drift: wrap Prisma queries in try-catch, check for P2021/P2022 error codes.
@@ -148,6 +180,7 @@ src/
 - **Prisma JSON fields need explicit casting.** When writing objects to nullable JSON columns (e.g., `biasBriefing`, `recalibratedDqi`), arrays with inferred types cause `InputJsonValue` errors. Fix: cast with `as unknown as Record<string, unknown>`.
 
 ### Security
+
 - **Always use `safeCompare` from `@/lib/utils/safe-compare`** for secret comparisons. Never write a local implementation — a buggy duplicate was the cause of a critical auth bypass that was fixed.
 - CSRF protection is in middleware.ts. Slack/Stripe/cron paths are exempt.
 - Document encryption uses AES-256-GCM via `DOCUMENT_ENCRYPTION_KEY`.
@@ -155,6 +188,7 @@ src/
 - **Encryption key rotation** uses a `keyVersion` stamp on every encrypted row (`Document.contentKeyVersion`, `SlackInstallation.botTokenKeyVersion`). New keys are provisioned at `DOCUMENT_ENCRYPTION_KEY_V{N}` / `SLACK_TOKEN_ENCRYPTION_KEY_V{N}`; the active version comes from `*_VERSION` env vars (defaults to highest resolvable). Rotate with `npm run rotate:encryption-key -- --domain document --from 1 --to 2` — batched, idempotent, resumable. Legacy `DOCUMENT_ENCRYPTION_KEY` (un-suffixed) is treated as v1 for back-compat. Full protocol in `src/lib/utils/encryption.ts` header.
 
 ### Components & Patterns
+
 - Lazy-load heavy components with `dynamic()` from `next/dynamic` (see Founder Hub page for pattern).
 - Use `ErrorBoundary` wrapper on all page-level components.
 - Use `EnhancedEmptyState` (not legacy `EmptyState`) for empty states. Always pass `showBrief` and `briefContext` for intelligence brief integration.
@@ -177,38 +211,43 @@ src/
 - **Founder School curriculum:** 8 tracks × variable lessons (currently 58 total) in [src/lib/data/founder-school/lessons.ts](src/lib/data/founder-school/lessons.ts). Standard lesson shape: `insight` / `whyItMatters` / `action` / `reflection`. Optional fields: `sources` (primary-source references), `csoPitch`, `mnaPitch`, `corpStrategyPitch`, `vcPitch`. All four pitch fields render as discrete buyer-persona cards in [FounderSchoolTab](src/components/founder-hub/FounderSchoolTab.tsx) via the `PitchCard` helper — CSO (green), M&A (teal), Corp Strategy (purple), VC (slate). Include a pitch on a lesson only when you have something specific and defensible to say to that buyer; omit it otherwise. The **Platform Foundations** track is the methodology-consolidation curriculum (Kahneman-Tversky, Noise, DQI components, pre-mortems, Tetlock outcome loop, 20×20 matrix, 12-node pipeline, regulatory frameworks, 135-case library) and carries `sources` + CSO/VC pitches. **Enterprise Sales** lessons 1-3 (change-management framing, champion identification, economic-buyer vs. champion) now carry all four pitches so the founder can rehearse the dual-stream positioning (Individual CSO + Team M&A/Corp Strategy, plus VC) directly from the curriculum. Header count is dynamic via `TOTAL_LESSONS`, so adding lessons can't drift the display.
 - **Founder-hub server auth:** [src/lib/utils/founder-auth.ts](src/lib/utils/founder-auth.ts) `verifyFounderPass` accepts EITHER `FOUNDER_HUB_PASS` (server-only, for CI/scripts) OR `NEXT_PUBLIC_FOUNDER_HUB_PASS` (the UI credential). Previously it did `serverPass || publicPass`, which locked the UI out once the two vars diverged. The Founder Hub page sits behind Supabase platform auth, so the public var is a second factor, not a bare-internet credential.
 - **Document-detail View-as toggle:** 3-way segmented control at the top of `/documents/[id]` — **Analyst** (full detail), **CSO** (condensed — exec summary + recommendation + featured counterfactual), **Board** (inline 2-page preview that mirrors the exported board report PDF). State key: `'analyst' | 'cso' | 'board'`. Legacy `'focused'` / `'full'` values from the old toggle are mapped on load (`focused → cso`, `full → analyst`). Persists via `?view=` URL param + `localStorage['di-doc-view-mode']`. Default: CSO.
-- **Board view:** [BoardReportView](src/app/(platform)/documents/[id]/tabs/BoardReportView.tsx) renders the same content the jsPDF generator produces — exec summary 500c, top-3 biases 180c excerpts each, CEO question, mitigation 400c. Keep the truncation constants in sync with [board-report-generator.ts](src/lib/reports/board-report-generator.ts) when either changes.
+- **Board view:** [BoardReportView](<src/app/(platform)/documents/[id]/tabs/BoardReportView.tsx>) renders the same content the jsPDF generator produces — exec summary 500c, top-3 biases 180c excerpts each, CEO question, mitigation 400c. Keep the truncation constants in sync with [board-report-generator.ts](src/lib/reports/board-report-generator.ts) when either changes.
 - **CounterfactualPanel featured variant:** `<CounterfactualPanel analysisId={...} variant="featured" />` renders a hero ROI card with the single highest-impact scenario. Used above the tabs on the document detail page in every view mode. Null when no positive scenario exists, so it never shows an empty or "would make things worse" message.
-- **Marketing page `/proof`:** [src/app/(marketing)/proof/page.tsx](src/app/(marketing)/proof/page.tsx) (server — metadata + Suspense) + [ProofPageClient.tsx](src/app/(marketing)/proof/ProofPageClient.tsx) (client — `?case=<slug>` state). Renders all cases with `preDecisionEvidence` populated. Two-column split: [PreDecisionDocument](src/components/marketing/proof/PreDecisionDocument.tsx) paper-style memo on left, [FlaggedAnalysisPanel](src/components/marketing/proof/FlaggedAnalysisPanel.tsx) hypothetical-DQI + numbered flags on right, [OutcomeReveal](src/components/marketing/proof/OutcomeReveal.tsx) navy strip below. Flags are numbered markers (not substring highlights) so they stay accurate across the descriptive red-flag text.
-- **Marketing page `/bias-genome`:** [src/app/(marketing)/bias-genome/page.tsx](src/app/(marketing)/bias-genome/page.tsx) (server — metadata + table rendered via [BiasGenomeClient.tsx](src/app/(marketing)/bias-genome/BiasGenomeClient.tsx)). Data comes from [src/lib/data/bias-genome-seed.ts](src/lib/data/bias-genome-seed.ts) — pure synchronous `computeGenomeFromSeed()` over `ALL_CASES`. Headline rankings require n≥5; dimmed rows with ⚠ flag n<3. "Failure lift" = bias failure rate / baseline failure rate. Never fabricate numbers — every metric traces to the underlying case-study records. When real customer data flows via `/api/intelligence/bias-genome` (≥3 consenting orgs), the page should be migrated to that source.
-- **Marketing page `/how-it-works`:** [src/app/(marketing)/how-it-works/page.tsx](src/app/(marketing)/how-it-works/page.tsx) (server metadata + Suspense wrapper) + [HowItWorksClient.tsx](src/app/(marketing)/how-it-works/HowItWorksClient.tsx). Content sourced from [src/lib/data/pipeline-nodes.ts](src/lib/data/pipeline-nodes.ts) — the 12-node manifest. **Content discipline**: every factual claim mirrors `FOUNDER_CONTEXT` in `src/app/api/founder-hub/founder-context.ts` — if that changes (DQI weights, node count, grade scale), update this page. **Public-safety rule**: the page never surfaces prompts, the 20×20 interaction-matrix weights, per-org causal edges, model tier routing, or API cost math — only the *what* and *why*.
+- **Marketing page `/proof`:** [src/app/(marketing)/proof/page.tsx](<src/app/(marketing)/proof/page.tsx>) (server — metadata + Suspense) + [ProofPageClient.tsx](<src/app/(marketing)/proof/ProofPageClient.tsx>) (client — `?case=<slug>` state). Renders all cases with `preDecisionEvidence` populated. Two-column split: [PreDecisionDocument](src/components/marketing/proof/PreDecisionDocument.tsx) paper-style memo on left, [FlaggedAnalysisPanel](src/components/marketing/proof/FlaggedAnalysisPanel.tsx) hypothetical-DQI + numbered flags on right, [OutcomeReveal](src/components/marketing/proof/OutcomeReveal.tsx) navy strip below. Flags are numbered markers (not substring highlights) so they stay accurate across the descriptive red-flag text.
+- **Marketing page `/bias-genome`:** [src/app/(marketing)/bias-genome/page.tsx](<src/app/(marketing)/bias-genome/page.tsx>) (server — metadata + table rendered via [BiasGenomeClient.tsx](<src/app/(marketing)/bias-genome/BiasGenomeClient.tsx>)). Data comes from [src/lib/data/bias-genome-seed.ts](src/lib/data/bias-genome-seed.ts) — pure synchronous `computeGenomeFromSeed()` over `ALL_CASES`. Headline rankings require n≥5; dimmed rows with ⚠ flag n<3. "Failure lift" = bias failure rate / baseline failure rate. Never fabricate numbers — every metric traces to the underlying case-study records. When real customer data flows via `/api/intelligence/bias-genome` (≥3 consenting orgs), the page should be migrated to that source.
+- **Marketing page `/how-it-works`:** [src/app/(marketing)/how-it-works/page.tsx](<src/app/(marketing)/how-it-works/page.tsx>) (server metadata + Suspense wrapper) + [HowItWorksClient.tsx](<src/app/(marketing)/how-it-works/HowItWorksClient.tsx>). Content sourced from [src/lib/data/pipeline-nodes.ts](src/lib/data/pipeline-nodes.ts) — the 12-node manifest. **Content discipline**: every factual claim mirrors `FOUNDER_CONTEXT` in `src/app/api/founder-hub/founder-context.ts` — if that changes (DQI weights, node count, grade scale), update this page. **Public-safety rule**: the page never surfaces prompts, the 20×20 interaction-matrix weights, per-org causal edges, model tier routing, or API cost math — only the _what_ and _why_.
 - **How-It-Works viz components** live under [src/components/marketing/how-it-works/](src/components/marketing/how-it-works/). `PipelineFlowDiagram` is the centerpiece (12-node SVG with zone-cycling highlight); `PipelineMiniatureViz` is the hero compact version; `DqiComponentBars` renders the 6 weighted bars + A–F grade scale; `NoiseDistributionViz` shows two bell-curve panels (low vs high noise); `BoardroomSimViz` shows 5 role-primed personas with vote chips; `PipelineNodeDetail` is the drawer that opens when any node is clicked. All pure SVG + Framer Motion. All respect `prefers-reduced-motion`. `PipelineLandingTeaser` (compact horizontal pipeline) + `OutcomeDetectionViz` (outcome-loop schematic, intentionally abstract — no fabricated numbers) are embedded on the landing page's "How It Works" section.
-- **Marketing page `/privacy`:** [src/app/(marketing)/privacy/page.tsx](src/app/(marketing)/privacy/page.tsx) (server — metadata + static JSX) + [DataLifecycleViz](src/components/marketing/privacy/DataLifecycleViz.tsx) (client — animated 4-stage flow in the hero). Refactored April 2026 from a legal-only stub into a full marketing+legal page matching `/how-it-works` polish. Structure: Hero → Trust stack (5 guarantees) → Lifecycle (4 steps, "anonymization" highlighted) → What we collect (4 cards) → What we never do (red prohibition panel) → GDPR rights (5 cards) → Processors → Retention/Cookies/Changes/Contact. Any change to the security posture (encryption, retention window, processor list) must be reflected here.
+- **Marketing page `/privacy`:** [src/app/(marketing)/privacy/page.tsx](<src/app/(marketing)/privacy/page.tsx>) (server — metadata + static JSX) + [DataLifecycleViz](src/components/marketing/privacy/DataLifecycleViz.tsx) (client — animated 4-stage flow in the hero). Refactored April 2026 from a legal-only stub into a full marketing+legal page matching `/how-it-works` polish. Structure: Hero → Trust stack (5 guarantees) → Lifecycle (4 steps, "anonymization" highlighted) → What we collect (4 cards) → What we never do (red prohibition panel) → GDPR rights (5 cards) → Processors → Retention/Cookies/Changes/Contact. Any change to the security posture (encryption, retention window, processor list) must be reflected here.
 - **Landing-page credibility trio:** [src/components/marketing/CredibilityTrio.tsx](src/components/marketing/CredibilityTrio.tsx) — re-integrated on the landing 2026-04-19 evening after the category-creator refactor removed it. Current destinations: **`/case-studies`** (case library, was `/proof`), `/bias-genome`, **`/security`** (was `/privacy`). Section sits after the Proof header + CaseStudyCarousel as a "Go deeper" rail, header trimmed to avoid competing with the Proof H2 above.
 - **Landing-page positioning lock (2026-04-19 refactor):** the landing page `/` has a locked 7-section IA: (1) Hero with [HeroCounterfactualTease](src/components/marketing/HeroCounterfactualTease.tsx) + [HeroDecisionGraph](src/components/marketing/HeroDecisionGraph.tsx), (2) compliance trust strip (no logos until a real pilot lands), (3) Four Moments rewritten gain-leading with moat eyebrows, (4) "What we replace" before/after panel, (5) reframed [CategoryGapShowcase](src/components/marketing/CategoryGapShowcase.tsx) as "the category we're defining" (four pillars: quality + governance + scalability + reliability), (6) Proof section (`/proof` + `/bias-genome` CTAs + [CaseStudyCarousel](src/components/marketing/CaseStudyCarousel.tsx)), (7) Pricing, (8) FAQ + CompetitorComparison, (9) final CTA + newsletter. **Do not re-add Stats bar, CredibilityTrio row, PipelineLandingTeaser, OutcomeDetectionViz, Features cards, or mid-page BookDemoCTA** — they were removed deliberately. Hero H1 ("The human-AI governance system for strategic decisions.") and subhead are the category thesis; treat them as canon, don't drift. All `agent` / `LangGraph` / `12-node` / `3 independent AI judges` language is banned from the landing surface; those details live on `/how-it-works` only.
 - **`/demo` paste-first flow (2026-04-19):** the `/demo` page leads with [PasteAuditResults](src/components/marketing/demo/PasteAuditResults.tsx) flow — visitor pastes a memo, clicks "Run the audit", and the REAL 12-node pipeline runs via [/api/demo/run](src/app/api/demo/run/route.ts). Sample picker (Kodak/Blockbuster/Nokia) and video tour are both demoted below the paste hero. The old `scanForBiases()` regex path + the in-file `QuickScanResults` component were deleted in the refactor — if you need a fallback, use the real endpoint with a disabled flag rather than reintroducing a regex stub.
 
 ### Visualization Components (light-theme audit rule)
+
 - Visualization cards (`ToxicCombinationCard`, `RiskHeatMap`, `GraphDetailPanel`, `DecisionTimeline`, `StakeholderMap`) keep dark-theme Tailwind classes **inside** their colored severity wrappers (`bg-red-950/40`, `bg-amber-950/20`) — that is correct, the interior is dark.
 - The audit rule: check only the **outermost** heading and elements that sit directly on the page surface. Any `text-white` on a standalone heading outside a dark wrapper is a bug. Interiors on red/amber/yellow severity cards can stay dark.
 - Same rule for `ActivityFeed` — rendered inside a platform `.card` (light), so its row content uses `var(--text-primary/secondary/muted)`, not `text-white` or `text-gray-400`.
 
 ### DQI Grade Boundaries (locked)
+
 - Canonical grade scale: A 85+, B 70+, C 55+, D 40+, F 0+ — matches `src/lib/scoring/dqi.ts` → `GRADE_THRESHOLDS`.
 - The JSDoc at the top of `dqi.ts` is the external reference. **Update both** the comment AND `GRADE_THRESHOLDS` when changing boundaries, or the published contract drifts from runtime.
 
 ### Bias Taxonomy
+
 - 20 biases with stable taxonomy IDs: DI-B-001 through DI-B-020 (defined in `src/lib/constants/bias-education.ts`).
 - These IDs are permanent and published at `/taxonomy`. Never renumber or reassign them.
 - Biases are referenced by snake_case string keys (e.g., `confirmation_bias`, `anchoring_bias`).
 
 ### Plan Limits & Billing
+
 - Free tier: 4 analyses/month (defined in `src/lib/stripe.ts` → `PLANS.free.analysesPerMonth`)
 - Limit enforced by `checkAnalysisLimit()` in `src/lib/utils/plan-limits.ts`
 - Stripe price IDs may not be configured yet. Upgrade buttons must fall back gracefully to `/#pricing` when `PLANS.pro.priceId` is empty.
 - **Admin full-access bypass.** Supabase user IDs listed in `ADMIN_USER_IDS` (Vercel env var, comma-separated) resolve to the `enterprise` plan in `getUserPlan()` / `getOrgPlan()` / `/api/billing` — no Stripe subscription needed. Intended for founder dogfooding and end-to-end testing. Bootstrap: set `ADMIN_EMAILS` first, deploy, visit `/api/admin/whoami` to discover your Supabase UUID, then paste into `ADMIN_USER_IDS` and redeploy. Helper: `isAdminUserId(userId)` in `src/lib/utils/admin.ts`.
 
 ### Integrations
+
 - **Slack:** 7 slash commands, thread monitoring, auto-creates CopilotSession + DecisionRoom after audits. Handler in `src/app/api/integrations/slack/events/route.ts`.
 - **Google Drive:** OAuth + Changes API polling via cron. Dedup by `sourceRef` (Google file ID). Detects updated files by content hash comparison. 24h cooldown between re-analyses.
 - **Email:** Unique address per user (`analyze+{token}@in.decision-intel.com`). Token-based auth.
@@ -216,6 +255,7 @@ src/
 ## When to Push Back
 
 Claude should push back on requests that:
+
 1. **Add new top-level routes** — the sidebar already has 10 items and 25+ dashboard routes. Consolidate instead.
 2. **Add features before the core flow is polished** — upload → analyze → review → track outcomes is the only flow that matters for pilot users.
 3. **Skip error handling or schema drift protection** — every Prisma query in an API route needs a try-catch with P2021/P2022 fallback.
@@ -227,6 +267,7 @@ Claude should push back on requests that:
 ## When to Ask Questions
 
 Claude should ask the founder before:
+
 1. **Creating new database models or fields** — schema changes require migrations and affect production.
 2. **Modifying the analysis pipeline** (`src/lib/agents/`) — this is the core product. Even small changes can affect DQI scores across all users.
 3. **Changing pricing, plan limits, or billing logic** — revenue-sensitive.
@@ -263,35 +304,35 @@ For mechanical checks — type-checking, test runs, build verification, counting
 
 ## Key Files Quick Reference
 
-| Purpose | File |
-|---------|------|
-| Plan definitions & limits | `src/lib/stripe.ts` |
-| Plan limit enforcement | `src/lib/utils/plan-limits.ts` |
-| DQI scoring engine | `src/lib/scoring/dqi.ts` (792 lines) |
-| Brier scoring (outcome calibration) | `src/lib/learning/brier-scoring.ts` (+ `.test.ts`, 20 tests) |
-| Encryption + key rotation | `src/lib/utils/encryption.ts` |
-| Analysis pipeline graph | `src/lib/agents/graph.ts` |
-| Pipeline node implementations | `src/lib/agents/nodes.ts` (2,297 lines) |
-| Pipeline prompts | `src/lib/agents/prompts.ts` |
-| Bias taxonomy & education | `src/lib/constants/bias-education.ts` |
-| Founder Hub AI context | `src/app/api/founder-hub/founder-context.ts` |
-| CSS design tokens | `src/app/globals.css` |
-| Sidebar navigation | `src/components/ui/Sidebar.tsx` |
-| Command palette | `src/components/ui/CommandPalette.tsx` |
-| Platform layout | `src/app/(platform)/layout.tsx` |
-| Prisma schema | `prisma/schema.prisma` (1,487 lines, 61 models) |
-| Middleware (CSRF, sessions) | `src/middleware.ts` |
-| Document detail page | `src/app/(platform)/documents/[id]/page.tsx` |
-| Settings page | `src/app/(platform)/dashboard/settings/SettingsForm.tsx` |
-| Analytics page | `src/app/(platform)/dashboard/analytics/page.tsx` |
-| Admin audit-log UI | `src/components/admin/AdminAuditLog.tsx` (+ `/api/admin/audit-log` + `/api/admin/audit-log/facets`) |
-| `/security` marketing page | `src/app/(marketing)/security/page.tsx` (+ `EncryptionFlowViz`) |
-| Landing-page category showcase | `src/components/marketing/CategoryGapShowcase.tsx` |
-| Landing hero what-if chip | `src/components/marketing/HeroCounterfactualTease.tsx` |
-| Demo paste-flow wow-sequence | `src/components/marketing/demo/PasteAuditResults.tsx` |
-| Demo real-pipeline endpoint | `src/app/api/demo/run/route.ts` (requires `DEMO_USER_ID` env) |
-| Founder Hub CSO pipeline board | `src/components/founder-hub/CsoPipelineBoard.tsx` (3-column always-visible widget) |
-| Booking CTA component | `src/components/marketing/BookDemoCTA.tsx` (3 variants) |
+| Purpose                             | File                                                                                                |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Plan definitions & limits           | `src/lib/stripe.ts`                                                                                 |
+| Plan limit enforcement              | `src/lib/utils/plan-limits.ts`                                                                      |
+| DQI scoring engine                  | `src/lib/scoring/dqi.ts` (792 lines)                                                                |
+| Brier scoring (outcome calibration) | `src/lib/learning/brier-scoring.ts` (+ `.test.ts`, 20 tests)                                        |
+| Encryption + key rotation           | `src/lib/utils/encryption.ts`                                                                       |
+| Analysis pipeline graph             | `src/lib/agents/graph.ts`                                                                           |
+| Pipeline node implementations       | `src/lib/agents/nodes.ts` (2,297 lines)                                                             |
+| Pipeline prompts                    | `src/lib/agents/prompts.ts`                                                                         |
+| Bias taxonomy & education           | `src/lib/constants/bias-education.ts`                                                               |
+| Founder Hub AI context              | `src/app/api/founder-hub/founder-context.ts`                                                        |
+| CSS design tokens                   | `src/app/globals.css`                                                                               |
+| Sidebar navigation                  | `src/components/ui/Sidebar.tsx`                                                                     |
+| Command palette                     | `src/components/ui/CommandPalette.tsx`                                                              |
+| Platform layout                     | `src/app/(platform)/layout.tsx`                                                                     |
+| Prisma schema                       | `prisma/schema.prisma` (1,487 lines, 61 models)                                                     |
+| Middleware (CSRF, sessions)         | `src/middleware.ts`                                                                                 |
+| Document detail page                | `src/app/(platform)/documents/[id]/page.tsx`                                                        |
+| Settings page                       | `src/app/(platform)/dashboard/settings/SettingsForm.tsx`                                            |
+| Analytics page                      | `src/app/(platform)/dashboard/analytics/page.tsx`                                                   |
+| Admin audit-log UI                  | `src/components/admin/AdminAuditLog.tsx` (+ `/api/admin/audit-log` + `/api/admin/audit-log/facets`) |
+| `/security` marketing page          | `src/app/(marketing)/security/page.tsx` (+ `EncryptionFlowViz`)                                     |
+| Landing-page category showcase      | `src/components/marketing/CategoryGapShowcase.tsx`                                                  |
+| Landing hero what-if chip           | `src/components/marketing/HeroCounterfactualTease.tsx`                                              |
+| Demo paste-flow wow-sequence        | `src/components/marketing/demo/PasteAuditResults.tsx`                                               |
+| Demo real-pipeline endpoint         | `src/app/api/demo/run/route.ts` (requires `DEMO_USER_ID` env)                                       |
+| Founder Hub CSO pipeline board      | `src/components/founder-hub/CsoPipelineBoard.tsx` (3-column always-visible widget)                  |
+| Booking CTA component               | `src/components/marketing/BookDemoCTA.tsx` (3 variants)                                             |
 
 ## Environment Variables
 
