@@ -522,7 +522,9 @@ export async function calculateBiasCosts(
       if (stats.monetaryVals.length > 0) {
         const avgMonetary =
           stats.monetaryVals.reduce((s, v) => s + v, 0) / stats.monetaryVals.length;
-        estimatedCost = Number(((impactDelta / 100) * avgMonetary).toFixed(2));
+        // impactDelta is on the 1-10 DecisionOutcome.impactScore scale, not 0-100.
+        // Previous /100 undershot monetary estimates by ~10x.
+        estimatedCost = Number(((impactDelta / 10) * avgMonetary).toFixed(2));
       }
 
       return {
@@ -716,13 +718,14 @@ export async function getQuarterlyImpact(
 
       const impactGap = avgChanged - avgUnchanged;
 
-      // Calculate total monetary savings across changed-positive decisions
+      // Calculate total monetary savings across changed-positive decisions.
+      // impactGap is on the 1-10 DecisionOutcome.impactScore scale, not 0-100.
       let totalSavings = 0;
       let hasMonetary = false;
       for (const o of changedPositive) {
         const mv = monetaryValues.get(o.analysisId);
         if (mv) {
-          totalSavings += (impactGap / 100) * mv.value;
+          totalSavings += (impactGap / 10) * mv.value;
           currency = mv.currency;
           hasMonetary = true;
         }
@@ -956,11 +959,18 @@ export async function calculateRiskAdjustedScore(
     let totalRiskWeight = 0;
 
     for (const bias of biases) {
-      // Get failure rate: prefer org-specific, fall back to toxic patterns, default 0.3
+      // Get failure rate: prefer org-specific, fall back to toxic patterns, default 0.3.
+      // avgFailureImpact is on the 1-10 DecisionOutcome.impactScore scale, not 0-100.
+      // Previous formula `1 - (x/100)` both under-scaled AND inverted polarity — high
+      // severity (impactScore 9) produced the lowest failure rate. Correct: x/10 so
+      // severity maps directly to failure rate (impact 9 → 0.9, impact 2 → 0.2).
+      // 0.5 fallback kept for orgs with rated-but-unconfirmed bias history.
       const orgStats = biasHistory?.biasStats.find(s => s.biasType === bias.biasType);
       const failureRate =
         orgStats && orgStats.totalRated >= 3
-          ? 1 - (orgStats.confirmed > 0 ? orgStats.avgFailureImpact / 100 : 0.5)
+          ? orgStats.confirmed > 0
+            ? orgStats.avgFailureImpact / 10
+            : 0.5
           : (patternFailureRates[bias.biasType] ?? 0.3);
 
       const sevWeight = severityWeights[bias.severity] ?? 0.4;
