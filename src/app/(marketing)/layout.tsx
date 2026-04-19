@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Decision Intel — Audit Strategic Memos Before the Board Sees Them',
+  title: 'Decision Intel — The Human-AI Governance System for Strategic Decisions',
   description:
-    'Decision Intel audits strategic memos, board decks, and market-entry recommendations in 60 seconds. 30+ cognitive biases detected, steering-committee questions predicted, outcomes tracked in a living Decision Knowledge Graph. Built for corporate strategy teams.',
+    'Decision Intel audits every board memo, simulates steering-committee objections, runs what-if interventions, and compounds your team’s judgment into a living Decision Knowledge Graph — so decision quality, scalability, and reliability improve quarter after quarter.',
   openGraph: {
-    title: 'Decision Intel — Audit Strategic Memos Before the Board Sees Them',
+    title: 'Decision Intel — The Human-AI Governance System for Strategic Decisions',
     description:
-      'Audit any strategic memo, board deck, or market-entry recommendation in 60 seconds. 30+ cognitive biases, predicted CEO/board questions, and a Decision Knowledge Graph that compounds quarter after quarter.',
+      'Governance on the reasoning layer, not just the data. Audit every strategic memo, simulate the boardroom, run what-if interventions, and compound your team’s judgment quarter after quarter.',
     url: '/',
     siteName: 'Decision Intel',
     type: 'website',
@@ -15,33 +15,37 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Decision Intel — Audit Strategic Memos Before the Board Sees Them',
+    title: 'Decision Intel — The Human-AI Governance System for Strategic Decisions',
     description:
-      'The same lens that exposed Kodak, Blockbuster, and Nokia now audits your strategic memos in 60 seconds.',
+      'Audit the reasoning behind every strategic memo. Simulate the boardroom. Run what-if interventions. Compound your team’s judgment quarter after quarter.',
   },
   keywords: [
-    // Core positioning
-    'strategic memo audit',
-    'decision intelligence platform',
-    'cognitive bias detection AI',
+    // Category-creator positioning
+    'decision intelligence',
+    'human-AI governance',
+    'causal decision intelligence',
+    'strategic decision auditing',
+    'decision quality platform',
+    // Product identity
     'decision knowledge graph',
+    'strategic memo audit',
+    'ai boardroom simulation',
+    'counterfactual decision analysis',
+    'decision quality index',
+    'cognitive bias detection AI',
     // Enterprise audiences
-    'corporate strategy tool',
+    'corporate strategy platform',
     'chief strategy officer software',
     'steering committee preparation',
     'board deck review',
     'market entry analysis',
-    // Product capabilities
-    'AI bias detection',
-    'decision quality index',
-    'strategic risk assessment',
-    'cognitive audit software',
-    'decision playbooks',
+    // Compliance + trust
+    'strategic decision governance',
     'compliance mapping SOX FCA',
-    'outcome tracking',
+    'EU AI Act decision tool',
     // Research-backed
     'Kahneman decision noise',
-    'cognitive bias enterprise',
+    'Tetlock forecasting',
     'decision quality score',
   ],
   alternates: {
@@ -69,18 +73,18 @@ const jsonLd = [
     operatingSystem: 'Web',
     url: siteUrl,
     description:
-      'Decision intelligence platform for corporate strategy teams. Upload strategic memos, board decks, and market-entry recommendations; get a 60-second audit that scores 30+ cognitive biases, predicts steering-committee objections, and adds every decision to a living Decision Knowledge Graph that compounds quarter after quarter.',
+      'The human-AI governance system for strategic decisions. Decision Intel audits every board memo, simulates steering-committee objections, runs what-if interventions, and compounds your team’s judgment into a living Decision Knowledge Graph so decision quality, scalability, and reliability improve quarter after quarter.',
     featureList: [
-      '30+ cognitive biases detected automatically',
-      'Steering-committee question prediction (CEO, board, parent company)',
-      'Decision Knowledge Graph — compounds across every memo',
-      'Decision Quality Index (DQI) — score every memo, benchmark across 135 historical decisions',
-      'Toxic combination detection (compound bias patterns)',
+      'Decision Knowledge Graph — every strategic call, compounded in one living system',
+      'AI boardroom simulation — CEO, CFO, and board objections rehearsed before the meeting',
+      'Human-AI reasoning audit — every recommendation traceable to the evidence that triggered it',
+      'What-if interventions — see how removing a bias changes outcome probability',
+      'Decision Quality Index (DQI) — benchmarked against a 135-case public reference library',
+      '30+ cognitive biases detected automatically, with severity scoring and evidence excerpts',
       'Compliance mapping: SOX, FCA, EU AI Act, Basel III, GDPR, SEC, LPOA',
-      'Audit Defense Packet PDF export with regulatory citations',
-      'Passive outcome inference from documents, Slack, and web intelligence',
-      'Calibrated risk scoring that improves with every confirmed outcome',
-      'Boardroom Simulation — rehearse objections before the real meeting',
+      'Board-ready PDF export with regulatory citations',
+      'Closed-loop outcome tracking — every confirmed outcome recalibrates the signal',
+      'Integrations: Slack, Google Drive, email, Stripe billing',
     ],
     offers: [
       {
@@ -137,7 +141,7 @@ const jsonLd = [
     url: siteUrl,
     logo: `${siteUrl}/logo.png`,
     description:
-      'Decision Intel is a decision intelligence platform for corporate strategy teams. Audit strategic memos and board decks for 30+ cognitive biases, predict steering-committee questions, and compound every decision into a living Decision Knowledge Graph.',
+      'Decision Intel is the human-AI governance system for strategic decisions. Chief Strategy Officers and corporate development teams use Decision Intel to audit every board memo, simulate steering-committee objections, run what-if interventions, and compound their team’s judgment into a living Decision Knowledge Graph.',
     foundingDate: '2024',
     sameAs: ['https://www.linkedin.com/company/decision-intel'],
     contactPoint: {
@@ -178,10 +182,10 @@ const jsonLd = [
       },
       {
         '@type': 'Question',
-        name: 'How is Decision Intel different from ChatGPT?',
+        name: 'How is Decision Intel different from ChatGPT or a general AI assistant?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'ChatGPT gives one opinion from one model. Decision Intel uses 3 independent judges for noise measurement, a bias interaction matrix for compound scoring, 30+ cognitive biases benchmarked across 135 historical decisions, and an outcome flywheel that gets smarter with every confirmed decision.',
+          text: 'ChatGPT gives one opinion from one model — ungoverned, untraceable, unaudited. Decision Intel is a governance system: it measures the noise in your reasoning the same way Kahneman did in the insurance underwriter study, simulates an AI boardroom of CEO, CFO, and board personas, runs what-if interventions against a 135-case public reference library, and compounds every confirmed outcome back into a calibrated Decision Quality Index your audit committee can defend. Not a chatbot — a human-AI governance layer.',
         },
       },
     ],

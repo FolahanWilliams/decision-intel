@@ -1711,7 +1711,7 @@ export default function LandingPage() {
               }}
             >
               {[
-                'Real 12-node audit',
+                'Full 60-second audit',
                 'No signup · no card',
                 '4 design-partner seats open',
               ].map(t => (
