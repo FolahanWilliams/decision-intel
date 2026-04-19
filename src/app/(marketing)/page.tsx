@@ -8,24 +8,16 @@ import { trackEvent } from '@/lib/analytics/track';
 import { CaseStudyCarousel } from '@/components/marketing/CaseStudyCarousel';
 import { HeroDecisionGraph } from '@/components/marketing/HeroDecisionGraph';
 import { HeroCounterfactualTease } from '@/components/marketing/HeroCounterfactualTease';
-import { PipelineLandingTeaser } from '@/components/marketing/how-it-works/PipelineLandingTeaser';
-import { OutcomeDetectionViz } from '@/components/marketing/how-it-works/OutcomeDetectionViz';
 import { CategoryGapShowcase } from '@/components/marketing/CategoryGapShowcase';
 import { BookDemoCTA } from '@/components/marketing/BookDemoCTA';
 import { CompetitorComparisonCard } from '@/components/marketing/CompetitorComparisonCard';
 import { LandingFaq } from '@/components/marketing/LandingFaq';
 import { Reveal } from '@/components/ui/Reveal';
 import {
-  Brain,
-  FileSearch,
   ArrowRight,
   Menu,
   X,
   Check,
-  BarChart3,
-  Users,
-  Shield,
-  Target,
   ShieldCheck,
   FileCheck2,
   Scale,
@@ -1149,165 +1141,6 @@ export default function LandingPage() {
 
       {/* ── Case study carousel — evidence strip below the proof header ── */}
       <CaseStudyCarousel />
-
-      {/* ── How It Works ────────────────────────────────────────────── */}
-      <Reveal repeat>
-        <section
-          id="how-it-works"
-          style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}
-        >
-          <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
-            <p
-              style={{
-                fontSize: 14,
-                fontWeight: 600,
-                color: C.green,
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                marginBottom: 8,
-              }}
-            >
-              How it Works
-            </p>
-            <h2
-              style={{
-                fontSize: 36,
-                fontWeight: 700,
-                color: C.slate900,
-                marginBottom: 16,
-                letterSpacing: '-0.01em',
-              }}
-            >
-              Decision Hygiene in Three Steps
-            </h2>
-            <p style={{ fontSize: 18, color: C.slate600, marginBottom: 32, maxWidth: 560 }}>
-              From strategic document to verified outcome &mdash; for any decision-critical team.
-            </p>
-          </motion.div>
-
-          {/* 12-node pipeline teaser — what happens INSIDE the 60-second audit */}
-          <motion.div
-            {...fadeIn}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            style={{ marginBottom: 24 }}
-          >
-            <PipelineLandingTeaser />
-          </motion.div>
-
-          {/* Outcome loop viz — what happens AFTER the audit (complements the teaser) */}
-          <motion.div {...fadeIn} transition={{ duration: 0.5, delay: 0.15 }}>
-            <OutcomeDetectionViz />
-          </motion.div>
-        </section>
-      </Reveal>
-
-      {/* ── Features ────────────────────────────────────────────────── */}
-      <Reveal repeat>
-        <section id="features" style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}>
-          <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
-            <p
-              style={{
-                fontSize: 14,
-                fontWeight: 600,
-                color: C.green,
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                marginBottom: 8,
-              }}
-            >
-              Features
-            </p>
-            <h2 style={{ fontSize: 36, fontWeight: 700, color: C.slate900, marginBottom: 48 }}>
-              The Decision Performance OS
-            </h2>
-          </motion.div>
-
-          <div
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}
-            className="cards-grid"
-          >
-            {[
-              {
-                icon: Brain,
-                title: 'Cognitive Bias Detection',
-                desc: '30+ biases detected with confidence scores, excerpts, and research-backed explanations. Includes domain-specific biases for corporate strategy, M&A, and market-entry decisions.',
-                color: '#8B5CF6',
-                bg: '#F5F3FF',
-              },
-              {
-                icon: BarChart3,
-                title: 'Noise Measurement',
-                desc: "3 independent AI judges score your document — just like Kahneman's insurance underwriter study. Measures the variance your team doesn't see.",
-                color: '#3B82F6',
-                bg: '#EFF6FF',
-              },
-              {
-                icon: Users,
-                title: 'Decision Rooms',
-                desc: 'Blind prior collection before group discussion. Consensus scoring reveals when agreement is genuine vs. groupthink.',
-                color: C.teal,
-                bg: C.tealBg,
-              },
-              {
-                icon: Target,
-                title: 'Toxic Combinations',
-                desc: '10 named compound risk patterns (Echo Chamber, Sunk Ship, etc.) with auto-generated mitigation playbooks and dollar impact estimates.',
-                color: '#EF4444',
-                bg: '#FEF2F2',
-              },
-              {
-                icon: FileSearch,
-                title: 'Forgotten Questions',
-                desc: 'Surfaces the questions your memo never asks, drawn from the gap between your document and its closest historical analogs. Every question was answered (or fatally ignored) in a comparable real decision.',
-                color: '#F59E0B',
-                bg: '#FFFBEB',
-              },
-              {
-                icon: Shield,
-                title: 'Compliance Mapping',
-                desc: 'SOX, GDPR, MiFID II, and FCA Consumer Duty frameworks. Cross-maps detected biases to regulatory risks with audit trails.',
-                color: C.green,
-                bg: C.greenLight,
-              },
-            ].map((f, i) => {
-              const Icon = f.icon;
-              return (
-                <motion.div
-                  key={f.title}
-                  {...fadeIn}
-                  transition={{ duration: 0.4, delay: i * 0.08 }}
-                  style={{
-                    background: C.white,
-                    border: `1px solid ${C.slate200}`,
-                    borderRadius: 16,
-                    padding: 28,
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: 10,
-                      background: f.bg,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginBottom: 16,
-                    }}
-                  >
-                    <Icon size={20} style={{ color: f.color }} />
-                  </div>
-                  <h3 style={{ fontSize: 18, fontWeight: 700, color: C.slate900, marginBottom: 8 }}>
-                    {f.title}
-                  </h3>
-                  <p style={{ fontSize: 14, color: C.slate600, lineHeight: 1.6 }}>{f.desc}</p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </section>
-      </Reveal>
 
       {/* ── Pricing ─────────────────────────────────────────────────── */}
       <section id="pricing" style={{ background: C.slate50, borderTop: `1px solid ${C.slate200}` }}>
