@@ -351,7 +351,14 @@ function GapPanel({ gap, reducedMotion }: { gap: DiGap; reducedMotion: boolean }
                 flexWrap: 'wrap',
               }}
             >
-              <span style={{ fontSize: 20, fontWeight: 800, color: C.white }}>
+              <span
+                style={{
+                  fontSize: 20,
+                  fontWeight: 800,
+                  color: C.white,
+                  whiteSpace: 'nowrap',
+                }}
+              >
                 {gap.outcomeLift.value}
               </span>
               <span
@@ -442,6 +449,12 @@ export function CategoryGapShowcase() {
             grid-template-columns: 1fr !important;
             gap: 4px !important;
           }
+          /* Reduce memo paper padding on phones so the 320-ish px
+             inner width holds long paragraphs cleanly. */
+          .governance-memo-paper {
+            padding: 16px 14px !important;
+            font-size: 12px !important;
+          }
         }
       `}</style>
 
@@ -529,7 +542,19 @@ export function CategoryGapShowcase() {
                   aria-selected={isActive}
                   aria-controls={`gap-panel-${gap.id}`}
                   id={`gap-tab-${gap.id}`}
-                  onClick={() => setActiveId(gap.id)}
+                  onClick={e => {
+                    setActiveId(gap.id);
+                    // On narrow viewports the tab bar horizontally
+                    // scrolls (3 × 220px min-width > typical phone
+                    // width). Scroll the tapped tab into view so the
+                    // user gets visual confirmation of the selection
+                    // even when it was off-screen at tap time.
+                    e.currentTarget.scrollIntoView({
+                      behavior: 'smooth',
+                      inline: 'center',
+                      block: 'nearest',
+                    });
+                  }}
                   className="category-gap-tab"
                   style={{
                     flex: 1,
@@ -953,7 +978,7 @@ function CausalGraphVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
                 key={`elabel-${i}`}
                 x={mx}
                 y={my}
-                fontSize={8}
+                fontSize={10}
                 fontWeight={700}
                 fill={C.slate500}
                 textAnchor="middle"
@@ -1003,7 +1028,7 @@ function CausalGraphVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
               <text
                 x={0}
                 y={labelY - p.y}
-                fontSize={9}
+                fontSize={11}
                 fontWeight={isSel ? 800 : 600}
                 fill={style.text}
                 textAnchor="middle"
@@ -1250,10 +1275,10 @@ const FLYWHEEL_STAGES: FlywheelStage[] = [
     id: 'calibrate',
     icon: 'refresh',
     label: 'Calibrate',
-    sub: 'Brier + Bayesian update',
+    sub: 'Brier + bias confidence',
     detail:
-      'The gap between predicted DQI and actual outcome scores the original prediction with a Brier score. Per-org DQI weights shift along the gradient. After 12 months your score is tuned to your decisions, not an industry average.',
-    cap: 'Weights shift',
+      'Every confirmed outcome runs through a proper scoring rule: (predicted DQI / 100 − actual)², bucketed into excellent, good, fair, or poor using the Tetlock-superforecaster thresholds. In parallel, confirmed and dismissed flags update a private bias-confidence profile for your organisation. After 12 months your calibration sits in the superforecaster band and the bias library knows which flags your team actually trusts.',
+    cap: 'Brier + profile update',
   },
 ];
 
@@ -1547,18 +1572,24 @@ function ClosedLoopFlywheelVizImpl({ reducedMotion }: { reducedMotion: boolean }
                     />
                   </div>
                 </foreignObject>
-                {/* Label placement — inside orbit when closer to center, outside otherwise */}
+                {/* Label placement — tightened so the east/west stages
+                     don't clip at narrow viewports. Previous geometry
+                     (orbit + 40, foreignObject width 100 centered on
+                     ±50) reached x = cx + 140 + 50 on the east stage,
+                     which hit the viewBox right edge exactly at 360px
+                     container widths. New geometry keeps labels inside
+                     the viewBox with comfortable margin. */}
                 {(() => {
                   const ang = stageAngle(i);
                   const outside = {
-                    x: cx + Math.cos(ang) * (orbit + 40),
-                    y: cy + Math.sin(ang) * (orbit + 40),
+                    x: cx + Math.cos(ang) * (orbit + 32),
+                    y: cy + Math.sin(ang) * (orbit + 32),
                   };
                   return (
                     <foreignObject
-                      x={outside.x - 50}
+                      x={outside.x - 44}
                       y={outside.y - 18}
-                      width={100}
+                      width={88}
                       height={40}
                     >
                       <div
@@ -1937,6 +1968,7 @@ function GovernanceMemoVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
 
       {/* Memo paper */}
       <div
+        className="governance-memo-paper"
         style={{
           background: C.white,
           border: `1px solid ${C.slate200}`,
@@ -1948,6 +1980,10 @@ function GovernanceMemoVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
           lineHeight: 1.6,
           fontSize: 12.5,
           position: 'relative',
+          // Long words (hyphenated phrases, memo titles with em-dashes)
+          // could otherwise overflow at phone widths.
+          wordBreak: 'break-word',
+          overflowWrap: 'anywhere',
         }}
       >
         <div
