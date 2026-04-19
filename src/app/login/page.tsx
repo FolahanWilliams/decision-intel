@@ -6,7 +6,6 @@ import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import {
   ShieldCheck,
-  Brain,
   BarChart3,
   Search,
   Loader2,
@@ -330,165 +329,202 @@ function LoginContent() {
       style={{
         minHeight: '100vh',
         display: 'flex',
-        background: 'var(--bg-primary)',
+        background: '#FFFFFF',
+        color: '#0F172A',
         fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
       }}
     >
-      {/* Ambient glows */}
-      <div
-        className="fixed inset-0 pointer-events-none"
-        style={{
-          background: `
-            radial-gradient(ellipse 60% 50% at 20% 20%, rgba(22, 163, 74, 0.12) 0%, transparent 60%),
-            radial-gradient(ellipse 50% 50% at 80% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 60%),
-            radial-gradient(ellipse 40% 30% at 60% 40%, rgba(245, 158, 11, 0.04) 0%, transparent 50%)
-          `,
-        }}
-      />
-
-      {/* Left panel — branding & features */}
+      {/* Left panel — brand + enterprise pitch (matches landing voice) */}
       <div
         className="login-left-panel"
         style={{
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'center',
-          padding: '3rem',
-          borderRight: '1px solid var(--border-color, #E2E8F0)',
+          justifyContent: 'space-between',
+          padding: '2.5rem 3rem 2rem',
+          background: '#F8FAFC',
+          borderRight: '1px solid #E2E8F0',
           position: 'relative',
           zIndex: 1,
         }}
       >
-        <div style={{ maxWidth: 480 }}>
-          {/* Brand */}
-          <Link href="/" style={{ textDecoration: 'none', display: 'inline-block' }}>
-            <div className="flex items-center gap-3" style={{ marginBottom: '2.5rem' }}>
-              <Image
-                src="/logo.png"
-                alt="Decision Intel"
-                width={36}
-                height={36}
-                style={{
-                  borderRadius: '10px',
-                  objectFit: 'cover',
-                }}
-              />
-              <span
-                style={{
-                  fontWeight: 700,
-                  fontSize: '1.1rem',
-                  color: 'var(--text-primary)',
-                  letterSpacing: '-0.01em',
-                }}
-              >
-                Decision Intel
-              </span>
-            </div>
-          </Link>
-
-          <h2
+        {/* Top: brand + back-to-site link */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Link
+            href="/"
             style={{
-              fontSize: 'clamp(1.4rem, 2.5vw, 1.75rem)',
-              fontWeight: 700,
-              color: 'var(--text-primary)',
-              marginBottom: '0.75rem',
-              lineHeight: 1.3,
-              letterSpacing: '-0.02em',
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '10px',
             }}
           >
-            Audit the reasoning behind every
+            <Image
+              src="/logo.png"
+              alt="Decision Intel"
+              width={32}
+              height={32}
+              style={{ borderRadius: '8px', objectFit: 'cover' }}
+            />
             <span
               style={{
-                background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
+                fontWeight: 700,
+                fontSize: '1.05rem',
+                color: '#0F172A',
+                letterSpacing: '-0.01em',
               }}
             >
-              {' '}
-              strategic memo
+              Decision Intel
             </span>
+          </Link>
+          <Link
+            href="/"
+            className="login-back-link"
+            style={{
+              fontSize: '0.78rem',
+              color: '#64748B',
+              textDecoration: 'none',
+              fontWeight: 500,
+            }}
+          >
+            ← Back to site
+          </Link>
+        </div>
+
+        {/* Middle: enterprise pitch */}
+        <div style={{ maxWidth: 480, margin: '2rem 0' }}>
+          <p
+            style={{
+              fontSize: '0.75rem',
+              fontWeight: 800,
+              color: '#16A34A',
+              textTransform: 'uppercase',
+              letterSpacing: '0.16em',
+              margin: '0 0 14px',
+            }}
+          >
+            Decision Intelligence
+          </p>
+          <h2
+            style={{
+              fontSize: 'clamp(1.6rem, 2.8vw, 2.1rem)',
+              fontWeight: 800,
+              color: '#0F172A',
+              marginBottom: '1rem',
+              lineHeight: 1.15,
+              letterSpacing: '-0.025em',
+            }}
+          >
+            The human-AI governance system for{' '}
+            <span style={{ color: '#16A34A' }}>strategic decisions.</span>
           </h2>
           <p
             style={{
-              fontSize: '0.9rem',
-              color: 'var(--text-muted)',
-              lineHeight: 1.7,
+              fontSize: '0.95rem',
+              color: '#475569',
+              lineHeight: 1.65,
               marginBottom: '2rem',
-              maxWidth: '440px',
+              maxWidth: '460px',
             }}
           >
-            Score cognitive biases, predict steering-committee objections, and turn every major call
-            your team makes into a living Decision Knowledge Graph.
+            Audit every strategic memo, simulate steering-committee objections, and compound your
+            team&rsquo;s judgment into a living Decision Knowledge Graph &mdash; quarter after
+            quarter.
           </p>
 
-          {/* Feature list */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {/* Four Moments — landing-aligned vocabulary */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {[
               {
-                icon: Brain,
-                title: 'Bias Detection',
+                title: 'Decision Knowledge Graph',
                 description:
-                  'Score 30+ cognitive biases with confidence, excerpts, and research-backed explanations',
-                color: '#f59e0b',
+                  'Every memo, assumption, bias, and outcome linked into one navigable graph.',
               },
               {
-                icon: BarChart3,
-                title: 'Decision Quality Index',
-                description:
-                  'Auditable, board-ready evidence that your process was rigorous, compounding quarter over quarter',
-                color: '#16A34A',
+                title: 'AI boardroom simulation',
+                description: 'Walk in with every CEO, CFO, and board objection already answered.',
               },
               {
-                icon: Search,
-                title: 'Knowledge Graph',
+                title: 'Human-AI reasoning audit',
                 description:
-                  'Every memo becomes a searchable, traceable node connected by assumption, bias, and outcome',
-                color: '#3b82f6',
+                  'Your team keeps the judgment. The system keeps the receipts — every flag traceable.',
               },
               {
-                icon: ShieldCheck,
-                title: 'Risk & Compliance',
-                description: 'FCA Consumer Duty, GDPR, and regulatory compliance audits',
-                color: '#22c55e',
+                title: 'What-if + Decision Quality Index',
+                description:
+                  'Counterfactual replay before the call; auditable DQI compounding after.',
               },
-            ].map((feature, i) => (
+            ].map((moment, i) => (
               <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
                 <div
                   style={{
                     flexShrink: 0,
-                    width: '36px',
-                    height: '36px',
+                    width: '22px',
+                    height: '22px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    background: `${feature.color}18`,
-                    border: `1px solid ${feature.color}40`,
-                    borderRadius: '10px',
-                    backdropFilter: 'blur(8px)',
-                    boxShadow: '0 1px 0 rgba(255,255,255,0.08) inset',
+                    background: '#DCFCE7',
+                    border: '1px solid #86EFAC',
+                    borderRadius: '999px',
+                    marginTop: '2px',
                   }}
                 >
-                  <feature.icon size={18} style={{ color: feature.color }} />
+                  <CheckCircle size={12} strokeWidth={2.5} style={{ color: '#16A34A' }} />
                 </div>
                 <div>
                   <div
                     style={{
-                      fontSize: '0.85rem',
-                      fontWeight: 600,
-                      color: 'var(--text-primary)',
+                      fontSize: '0.88rem',
+                      fontWeight: 700,
+                      color: '#0F172A',
                       marginBottom: '2px',
+                      letterSpacing: '-0.005em',
                     }}
                   >
-                    {feature.title}
+                    {moment.title}
                   </div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
-                    {feature.description}
+                  <div style={{ fontSize: '0.8rem', color: '#64748B', lineHeight: 1.55 }}>
+                    {moment.description}
                   </div>
                 </div>
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Bottom: compliance trust strip — same as landing */}
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '18px',
+            paddingTop: '20px',
+            borderTop: '1px solid #E2E8F0',
+          }}
+        >
+          {[
+            { Icon: ShieldCheck, label: 'SOC 2 ready' },
+            { Icon: Search, label: 'GDPR + EU AI Act mapped' },
+            { Icon: BarChart3, label: '135-case reference library' },
+          ].map(({ Icon, label }) => (
+            <div
+              key={label}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '11.5px',
+                fontWeight: 600,
+                color: '#64748B',
+                letterSpacing: '0.01em',
+              }}
+            >
+              <Icon size={13} style={{ color: '#16A34A', flexShrink: 0 }} />
+              {label}
+            </div>
+          ))}
         </div>
       </div>
 
@@ -615,8 +651,7 @@ function LoginContent() {
                       fontSize: '0.9rem',
                       fontWeight: 600,
                       color: '#fff',
-                      background:
-                        'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)',
+                      background: '#16A34A',
                       border: '1px solid rgba(22, 163, 74, 0.4)',
                       borderRadius: 12,
                       cursor: verifyingOtp || otpCode.length < 6 ? 'not-allowed' : 'pointer',
@@ -766,8 +801,7 @@ function LoginContent() {
                       fontSize: '0.9rem',
                       fontWeight: 600,
                       color: '#fff',
-                      background:
-                        'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)',
+                      background: '#16A34A',
                       border: '1px solid rgba(22, 163, 74, 0.4)',
                       borderRadius: 12,
                       cursor: formLoading ? 'not-allowed' : 'pointer',
@@ -953,8 +987,7 @@ function LoginContent() {
                       fontSize: '0.9rem',
                       fontWeight: 600,
                       color: '#fff',
-                      background:
-                        'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)',
+                      background: '#16A34A',
                       border: '1px solid rgba(22, 163, 74, 0.4)',
                       borderRadius: 12,
                       cursor:
@@ -1186,12 +1219,10 @@ function LoginContent() {
                     fontSize: '0.9rem',
                     fontWeight: 600,
                     color: '#fff',
-                    background:
-                      'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)',
-                    border: '1px solid rgba(22, 163, 74, 0.4)',
-                    borderRadius: '14px',
-                    boxShadow:
-                      '0 4px 16px rgba(22, 163, 74, 0.35), 0 1px 0 rgba(255,255,255,0.12) inset',
+                    background: '#16A34A',
+                    border: 'none',
+                    borderRadius: '12px',
+                    boxShadow: '0 6px 20px rgba(22,163,74,0.28)',
                     cursor: loading || formLoading ? 'not-allowed' : 'pointer',
                     opacity: loading || formLoading ? 0.7 : 1,
                     transition: 'all 0.15s',

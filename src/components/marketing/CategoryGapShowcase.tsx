@@ -1299,13 +1299,15 @@ function ClosedLoopFlywheelVizImpl({ reducedMotion }: { reducedMotion: boolean }
   const [pausedStage, setPausedStage] = useState<FlywheelStage['id'] | null>(null);
   const paused = pausedStage !== null || reducedMotion;
 
-  // viewBox deliberately wider than the orbit + label distance so the
-  // outside-orbit stage labels never clip when the SVG scales down to a
-  // sub-400px mobile container.
-  const size = 380;
+  // viewBox sized so the outside-orbit stage labels (at orbit+80) clear the
+  // 25-radius stage circles on all four axes. Previous sizing (380 with
+  // labels at orbit+32) caused east/west labels to run under the stage
+  // circles, producing visible text-through-icon overlap.
+  const size = 460;
   const cx = size / 2;
   const cy = size / 2;
   const orbit = 100;
+  const labelOffset = 80; // distance from stage-circle center to label-box center
   const stageAngle = (i: number) => (i / FLYWHEEL_STAGES.length) * 2 * Math.PI - Math.PI / 2;
   const stagePos = (i: number) => ({
     x: cx + Math.cos(stageAngle(i)) * orbit,
@@ -1384,7 +1386,7 @@ function ClosedLoopFlywheelVizImpl({ reducedMotion }: { reducedMotion: boolean }
         <svg
           viewBox={`0 0 ${size} ${size}`}
           width="100%"
-          style={{ display: 'block', maxWidth: 420, margin: '0 auto', overflow: 'visible' }}
+          style={{ display: 'block', maxWidth: 460, margin: '0 auto', overflow: 'visible' }}
           role="img"
           aria-label="Outcome flywheel: audit, commit, detect outcome, calibrate, rotating."
         >
@@ -1529,18 +1531,15 @@ function ClosedLoopFlywheelVizImpl({ reducedMotion }: { reducedMotion: boolean }
                     <StageIcon kind={s.icon} size={16} color={isPaused ? C.green : C.slate500} />
                   </div>
                 </foreignObject>
-                {/* Label placement — tightened so the east/west stages
-                     don't clip at narrow viewports. Previous geometry
-                     (orbit + 40, foreignObject width 100 centered on
-                     ±50) reached x = cx + 140 + 50 on the east stage,
-                     which hit the viewBox right edge exactly at 360px
-                     container widths. New geometry keeps labels inside
-                     the viewBox with comfortable margin. */}
+                {/* Label placement — pushed out to orbit + labelOffset so
+                     east/west labels clear the 25-radius stage circles.
+                     viewBox = 460 has enough margin for the full label
+                     span (88 wide) on every axis without clipping. */}
                 {(() => {
                   const ang = stageAngle(i);
                   const outside = {
-                    x: cx + Math.cos(ang) * (orbit + 32),
-                    y: cy + Math.sin(ang) * (orbit + 32),
+                    x: cx + Math.cos(ang) * (orbit + labelOffset),
+                    y: cy + Math.sin(ang) * (orbit + labelOffset),
                   };
                   return (
                     <foreignObject x={outside.x - 44} y={outside.y - 18} width={88} height={40}>

@@ -1401,7 +1401,11 @@ export const DEMO_WEWORK: DemoAnalysis = {
 };
 
 // Combined list for the demo selector
-export const DEMO_ANALYSES: DemoAnalysis[] = [DEMO_NOKIA, DEMO_WEWORK, DEMO_PHOENIX, DEMO_SERIES_B];
+// Three samples deliberately — three in a row reads as a cleaner visual
+// lineup on the demo page than four. Nokia + WeWork are the real famous
+// decisions; Phoenix covers the market-entry scenario most CSOs recognise.
+// DEMO_SERIES_B stays exported above so any direct deep-link keeps working.
+export const DEMO_ANALYSES: DemoAnalysis[] = [DEMO_NOKIA, DEMO_WEWORK, DEMO_PHOENIX];
 
 // Backwards compatibility
 export const DEMO_ANALYSIS = DEMO_NOKIA;

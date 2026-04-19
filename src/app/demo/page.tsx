@@ -636,9 +636,10 @@ export default function DemoPage() {
             </div>
 
             <div
+              className="demo-sample-grid"
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
                 gap: 20,
               }}
             >
@@ -649,12 +650,16 @@ export default function DemoPage() {
                   <button
                     key={a.id}
                     onClick={() => startSimulation(idx)}
-                    className="text-left rounded-2xl bg-white border border-slate-200 cursor-pointer transition-all duration-200 hover:border-green-200 hover:shadow-lg group"
+                    className="text-left rounded-2xl bg-white cursor-pointer transition-all duration-200 hover:shadow-lg group demo-sample-card"
                     style={{
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '16px',
                       padding: '24px 22px',
+                      borderTop: '3px solid #16A34A',
+                      borderRight: '1px solid #E2E8F0',
+                      borderBottom: '1px solid #E2E8F0',
+                      borderLeft: '1px solid #E2E8F0',
                       boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
                     }}
                   >
@@ -702,6 +707,17 @@ export default function DemoPage() {
                 );
               })}
             </div>
+            <style>{`
+              .demo-sample-card:hover {
+                border-color: #BBF7D0 !important;
+                border-top-color: #16A34A !important;
+              }
+              @media (max-width: 880px) {
+                .demo-sample-grid {
+                  grid-template-columns: 1fr !important;
+                }
+              }
+            `}</style>
           </Reveal>
         </SectionBand>
       )}
@@ -2010,39 +2026,38 @@ function DemoVideoSection() {
         style={{
           fontSize: 11,
           color: C.green,
-          letterSpacing: '0.12em',
+          letterSpacing: '0.14em',
           fontWeight: 700,
-          marginBottom: 14,
+          marginBottom: 10,
+          textTransform: 'uppercase',
         }}
       >
-        SEE IT IN 60 SECONDS
+        Prefer a walkthrough?
       </div>
-      <h1
+      <h2
         style={{
-          fontSize: 'clamp(34px, 6vw, 52px)',
+          fontSize: 'clamp(22px, 3vw, 28px)',
           fontWeight: 800,
           color: C.slate900,
-          margin: '0 auto 18px',
-          lineHeight: 1.08,
-          letterSpacing: '-0.025em',
-          maxWidth: 820,
+          margin: '0 auto 12px',
+          lineHeight: 1.2,
+          letterSpacing: '-0.015em',
+          maxWidth: 640,
         }}
       >
-        Audit your next strategic memo{' '}
-        <span style={{ color: C.green }}>before the board sees it.</span>
-      </h1>
+        60-second video tour of a real audit.
+      </h2>
       <p
         style={{
-          fontSize: 17,
+          fontSize: 14.5,
           color: C.slate500,
-          maxWidth: 640,
-          margin: '0 auto 36px',
-          lineHeight: 1.6,
+          maxWidth: 560,
+          margin: '0 auto 28px',
+          lineHeight: 1.55,
         }}
       >
-        The audit your CSO never had time to run. 30+ cognitive biases scored, the question your CEO
-        will raise predicted, and every decision dropped into a Knowledge Graph that compounds
-        quarter after quarter.
+        Watch a strategic memo move through the full pipeline &mdash; biases flagged, CEO questions
+        predicted, DQI assigned. No signup.
       </p>
 
       {DEMO_VIDEO_URL ? (
