@@ -1,10 +1,15 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Calendar, CheckCircle, FileText, Scale, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ScoreReveal } from '@/components/ui/ScoreReveal';
+import { CounterfactualPanel } from '@/components/ui/CounterfactualPanel';
 import { trackEvent } from '@/lib/analytics/track';
+import { createLogger } from '@/lib/utils/logger';
+
+const log = createLogger('InlineAnalysisResultCard');
 
 export interface CompletedAnalysisSummary {
   docId: string;
@@ -53,6 +58,32 @@ export function InlineAnalysisResultCard({ analysis, onDismiss }: Props) {
         (SEVERITY_ORDER[a.severity ?? 'unknown'] ?? 0)
     )
     .slice(0, 3);
+
+  // Resolve the Analysis row ID from the Document so we can feed the
+  // Featured Counterfactual card below. Self-contained so the dashboard
+  // caller doesn't need to know about counterfactuals. Silent-fail — if
+  // the lookup hiccups the card just doesn't render, no broken UI.
+  const [analysisId, setAnalysisId] = useState<string | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    async function resolveAnalysisId() {
+      try {
+        const res = await fetch(`/api/documents/${analysis.docId}`);
+        if (!res.ok) return;
+        const data = (await res.json().catch(() => null)) as {
+          analyses?: Array<{ id: string }>;
+        } | null;
+        const id = data?.analyses?.[0]?.id;
+        if (id && !cancelled) setAnalysisId(id);
+      } catch (err) {
+        log.warn('Failed to resolve analysisId for counterfactual:', err);
+      }
+    }
+    resolveAnalysisId();
+    return () => {
+      cancelled = true;
+    };
+  }, [analysis.docId]);
 
   return (
     <motion.div
@@ -271,6 +302,23 @@ export function InlineAnalysisResultCard({ analysis, onDismiss }: Props) {
           )}
         </div>
       </div>
+
+      {/* Featured counterfactual — ROI beat that closes the pitch loop before
+          the "Upload another / Deep Dive" footer. Renders null until the
+          analysisId resolves AND there's a positive scenario to show, so the
+          card never flashes an empty or negative-impact message. */}
+      {analysisId && (
+        <div
+          style={{
+            padding: '0 20px 8px',
+            borderTop: '1px solid var(--border-color)',
+          }}
+        >
+          <div style={{ paddingTop: 14 }}>
+            <CounterfactualPanel analysisId={analysisId} variant="featured" />
+          </div>
+        </div>
+      )}
 
       <div
         style={{
