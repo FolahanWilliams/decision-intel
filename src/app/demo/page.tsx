@@ -19,7 +19,6 @@ import {
   Loader2,
   Upload,
   CheckCircle2,
-  ClipboardPaste,
   Play,
   ExternalLink,
 } from 'lucide-react';
@@ -173,7 +172,6 @@ export default function DemoPage() {
   const [isSimulating, setIsSimulating] = useState(false);
   const [currentStage, setCurrentStage] = useState(-1);
   const [showResults, setShowResults] = useState(false);
-  const [pasteMode, setPasteMode] = useState(false);
   const [pasteText, setPasteText] = useState('');
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
@@ -403,42 +401,181 @@ export default function DemoPage() {
         )}
       </header>
 
-      {/* ─── Idle: Video hero on white band ──────────────────────────── */}
+      {/* ─── Idle: PASTE HERO — primary conversion mechanic ─────────── */}
       {idleState && (
-        <SectionBand bg={C.white} paddingY={56}>
-          <DemoVideoSection />
-        </SectionBand>
-      )}
-
-      {/* ─── Idle: Interactive picker on slate50 band ────────────────── */}
-      {idleState && (
-        <SectionBand bg={C.slate50} borderTop paddingY={72}>
+        <SectionBand bg={C.white} paddingY={72} maxWidth={920}>
           <Reveal>
-            <div style={{ textAlign: 'center', marginBottom: 40 }}>
-              <h2
+            <div style={{ textAlign: 'center', marginBottom: 32 }}>
+              <div
                 style={{
-                  fontSize: 'clamp(28px, 5vw, 38px)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  fontSize: 11,
+                  fontWeight: 800,
+                  color: C.green,
+                  background: C.greenSoft,
+                  border: `1px solid ${C.greenLight}`,
+                  padding: '4px 12px',
+                  borderRadius: 999,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.12em',
+                  marginBottom: 16,
+                }}
+              >
+                <Play size={10} strokeWidth={2.8} />
+                One free audit &middot; no signup
+              </div>
+              <h1
+                style={{
+                  fontSize: 'clamp(30px, 5vw, 44px)',
                   fontWeight: 800,
                   color: C.slate900,
                   margin: '0 0 14px',
-                  lineHeight: 1.15,
-                  letterSpacing: '-0.02em',
+                  lineHeight: 1.08,
+                  letterSpacing: '-0.025em',
                 }}
               >
-                Audit a famous corporate decision in 60 seconds.
-              </h2>
+                Paste your strategic memo.
+                <br />
+                <span style={{ color: C.green }}>Get a full audit in 60 seconds.</span>
+              </h1>
               <p
                 style={{
-                  fontSize: 16,
+                  fontSize: 17,
                   color: C.slate500,
-                  maxWidth: 600,
+                  maxWidth: 640,
                   margin: '0 auto',
                   lineHeight: 1.6,
                 }}
               >
-                Pick one below. Decision Intel will score 30+ cognitive biases, predict the
-                questions your steering committee would raise, and map the decision into a Knowledge
-                Graph that compounds across every audit you run.
+                Decision Quality Index. Top cognitive biases with evidence excerpts. AI boardroom
+                objections. What-if interventions. Your decision mapped into the Knowledge Graph.
+                Everything on your actual text &mdash; no signup, no card.
+              </p>
+            </div>
+
+            <div
+              style={{
+                background: C.white,
+                border: `1px solid ${C.slate200}`,
+                borderRadius: 20,
+                padding: 20,
+                boxShadow: '0 14px 40px rgba(15,23,42,0.06)',
+              }}
+            >
+              <textarea
+                value={pasteText}
+                onChange={e => setPasteText(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-900 resize-none focus:outline-none focus:border-green-300 placeholder:text-slate-400"
+                style={{ minHeight: 200, fontSize: 14, lineHeight: 1.6 }}
+                placeholder={
+                  'Paste a strategic memo, board deck excerpt, or market-entry recommendation.\n\nExamples: "We should acquire [target] because…", a pre-mortem, a growth-plan one-pager, the recommendation section of a board deck…'
+                }
+                aria-label="Paste your strategic memo for auditing"
+              />
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: 14,
+                  gap: 12,
+                  flexWrap: 'wrap',
+                }}
+              >
+                <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+                  {[
+                    '1 audit per day',
+                    '4,000-word cap',
+                    'Never stored',
+                  ].map(chip => (
+                    <span
+                      key={chip}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 5,
+                        fontSize: 11.5,
+                        color: C.slate500,
+                        fontWeight: 500,
+                      }}
+                    >
+                      <CheckCircle2 size={12} style={{ color: C.green }} />
+                      {chip}
+                    </span>
+                  ))}
+                </div>
+                <button
+                  onClick={handlePasteAnalyze}
+                  disabled={pasteText.trim().length < 15}
+                  style={{
+                    padding: '11px 22px',
+                    borderRadius: 10,
+                    background: C.green,
+                    color: C.white,
+                    fontSize: 14,
+                    fontWeight: 700,
+                    cursor: pasteText.trim().length < 15 ? 'not-allowed' : 'pointer',
+                    opacity: pasteText.trim().length < 15 ? 0.45 : 1,
+                    border: 'none',
+                    boxShadow:
+                      pasteText.trim().length < 15
+                        ? 'none'
+                        : '0 6px 20px rgba(22,163,74,0.3)',
+                    transition: 'all 0.15s',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
+                >
+                  Run the audit <ArrowRight size={14} />
+                </button>
+              </div>
+            </div>
+          </Reveal>
+        </SectionBand>
+      )}
+
+      {/* ─── Idle: Secondary — Sample decisions ──────────────────────── */}
+      {idleState && (
+        <SectionBand bg={C.slate50} borderTop paddingY={64}>
+          <Reveal>
+            <div style={{ textAlign: 'center', marginBottom: 28 }}>
+              <p
+                style={{
+                  fontSize: 11,
+                  fontWeight: 800,
+                  color: C.slate500,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.14em',
+                  margin: '0 0 8px',
+                }}
+              >
+                Or try a famous one
+              </p>
+              <h2
+                style={{
+                  fontSize: 'clamp(22px, 3vw, 28px)',
+                  fontWeight: 800,
+                  color: C.slate900,
+                  margin: '0 0 10px',
+                  lineHeight: 1.2,
+                  letterSpacing: '-0.015em',
+                }}
+              >
+                Three corporate decisions that should have been audited.
+              </h2>
+              <p
+                style={{
+                  fontSize: 14,
+                  color: C.slate500,
+                  maxWidth: 560,
+                  margin: '0 auto',
+                  lineHeight: 1.55,
+                }}
+              >
+                Pre-canned samples, same full audit flow, runs instantly &mdash; no LLM calls.
               </p>
             </div>
 
@@ -447,7 +584,6 @@ export default function DemoPage() {
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
                 gap: 20,
-                marginBottom: 32,
               }}
             >
               {DEMO_ANALYSES.map((a, idx) => {
@@ -462,17 +598,16 @@ export default function DemoPage() {
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '16px',
-                      padding: '28px 24px',
+                      padding: '24px 22px',
                       boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
                     }}
                   >
-                    {/* Icon + DQI badge row */}
                     <div className="flex items-start justify-between">
                       <div
                         className="shrink-0"
                         style={{
-                          width: 44,
-                          height: 44,
+                          width: 40,
+                          height: 40,
                           borderRadius: 12,
                           background: '#F0FDF4',
                           display: 'flex',
@@ -480,7 +615,7 @@ export default function DemoPage() {
                           justifyContent: 'center',
                         }}
                       >
-                        <FileText size={20} style={{ color: '#16A34A' }} />
+                        <FileText size={18} style={{ color: '#16A34A' }} />
                       </div>
                       <span
                         className="text-xs px-2.5 py-1 rounded-lg font-bold"
@@ -493,21 +628,17 @@ export default function DemoPage() {
                         DQI {a.overallScore}/100
                       </span>
                     </div>
-
-                    {/* Title + description */}
                     <div>
                       <div className="text-base font-bold text-slate-900 mb-1.5 leading-tight">
                         {a.shortName}
                       </div>
                       <div className="text-sm text-slate-500 leading-relaxed">{a.teaser}</div>
                     </div>
-
-                    {/* CTA footer */}
                     <div className="flex items-center gap-2 text-xs text-green-600 font-semibold group-hover:text-green-700 transition-colors mt-auto pt-2 border-t border-slate-100">
-                      <Upload size={13} />
-                      <span>Click to analyze</span>
+                      <Upload size={12} />
+                      <span>Run this sample</span>
                       <ArrowRight
-                        size={13}
+                        size={12}
                         className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity"
                       />
                     </div>
@@ -515,40 +646,14 @@ export default function DemoPage() {
                 );
               })}
             </div>
-
-            {/* Paste Your Own Text */}
-            <div className="text-center">
-              <button
-                onClick={() => setPasteMode(!pasteMode)}
-                className="text-xs text-slate-500 hover:text-slate-900 transition-colors cursor-pointer bg-transparent border-none flex items-center gap-1.5 mx-auto"
-              >
-                <ClipboardPaste size={14} />
-                {pasteMode ? 'Hide text input' : 'Or paste your own strategic memo'}
-              </button>
-            </div>
-            {pasteMode && !scanResult && (
-              <div className="mt-4">
-                <textarea
-                  value={pasteText}
-                  onChange={e => setPasteText(e.target.value)}
-                  className="w-full h-32 bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-900 resize-none focus:outline-none focus:border-green-300 placeholder:text-slate-400"
-                  placeholder="Paste a strategic memo, board deck excerpt, or market-entry recommendation..."
-                />
-                <div className="flex justify-between items-center mt-3">
-                  <span className="text-[11px] text-slate-500">
-                    Pattern scan — results generated from your text
-                  </span>
-                  <button
-                    onClick={handlePasteAnalyze}
-                    disabled={pasteText.trim().length < 15}
-                    className="px-4 py-2 rounded-lg bg-green-600 text-white text-xs font-semibold cursor-pointer border-none disabled:opacity-40 disabled:cursor-not-allowed hover:bg-green-700 transition-colors"
-                  >
-                    Scan for Biases <ArrowRight size={12} className="inline ml-1" />
-                  </button>
-                </div>
-              </div>
-            )}
           </Reveal>
+        </SectionBand>
+      )}
+
+      {/* ─── Idle: Video tour — tertiary ─────────────────────────────── */}
+      {idleState && (
+        <SectionBand bg={C.white} borderTop paddingY={56}>
+          <DemoVideoSection />
         </SectionBand>
       )}
 
