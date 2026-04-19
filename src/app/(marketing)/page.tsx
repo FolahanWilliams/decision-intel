@@ -3,57 +3,17 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { trackEvent } from '@/lib/analytics/track';
-// Hero components load eagerly — they're above the fold.
 import { HeroDecisionGraph } from '@/components/marketing/HeroDecisionGraph';
 import { HeroCounterfactualTease } from '@/components/marketing/HeroCounterfactualTease';
-// Nav CTA is visible on first paint. Everything else below the fold
-// is dynamic()'d so Next.js splits it into a separate chunk that only
-// loads once the visitor scrolls past the hero. Trims the initial JS
-// payload materially on mobile and old hardware.
 import { BookDemoCTA } from '@/components/marketing/BookDemoCTA';
 import { Reveal } from '@/components/ui/Reveal';
-
-// Skeleton shell for lazy-loaded sections — keeps layout stable while
-// the dynamic chunk streams in.
-const sectionShell = (minHeight: number) => () => (
-  <div aria-hidden style={{ minHeight, width: '100%' }} />
-);
-
-const CaseStudyCarousel = dynamic(
-  () =>
-    import('@/components/marketing/CaseStudyCarousel').then(m => ({
-      default: m.CaseStudyCarousel,
-    })),
-  { ssr: false, loading: sectionShell(320) }
-);
-const CategoryGapShowcase = dynamic(
-  () =>
-    import('@/components/marketing/CategoryGapShowcase').then(m => ({
-      default: m.CategoryGapShowcase,
-    })),
-  { ssr: false, loading: sectionShell(640) }
-);
-const CredibilityTrio = dynamic(
-  () =>
-    import('@/components/marketing/CredibilityTrio').then(m => ({
-      default: m.CredibilityTrio,
-    })),
-  { ssr: false, loading: sectionShell(480) }
-);
-const CompetitorComparisonCard = dynamic(
-  () =>
-    import('@/components/marketing/CompetitorComparisonCard').then(m => ({
-      default: m.CompetitorComparisonCard,
-    })),
-  { ssr: false, loading: sectionShell(400) }
-);
-const LandingFaq = dynamic(
-  () => import('@/components/marketing/LandingFaq').then(m => ({ default: m.LandingFaq })),
-  { ssr: false, loading: sectionShell(480) }
-);
+import { CaseStudyCarousel } from '@/components/marketing/CaseStudyCarousel';
+import { CategoryGapShowcase } from '@/components/marketing/CategoryGapShowcase';
+import { CredibilityTrio } from '@/components/marketing/CredibilityTrio';
+import { CompetitorComparisonCard } from '@/components/marketing/CompetitorComparisonCard';
+import { LandingFaq } from '@/components/marketing/LandingFaq';
 import { ArrowRight, Menu, X, Check, ShieldCheck, FileCheck2, Scale, BookOpen } from 'lucide-react';
 
 /* ─── Color Tokens ──────────────────────────────────────────────────────── */

@@ -268,14 +268,14 @@ function LegendItem({
 
 export function HeroDecisionGraph() {
   const [selectedData, setSelectedData] = useState<NodeData | null>(null);
-  // WebGL capability detection runs client-side after mount. Tri-state:
-  //   null  — not yet checked (render loading shell)
-  //   true  — WebGL supported, proceed with reagraph canvas
-  //   false — no WebGL, render the SVG fallback (never load three.js)
-  const [webglReady, setWebglReady] = useState<boolean | null>(null);
+  // WebGL capability detection — optimistic default so the 3D canvas starts
+  // loading immediately on every capable device (99% of CSO-segment traffic).
+  // We only flip to `false` if detection definitively fails on mount, in
+  // which case the SVG fallback takes over. No transient "preparing…" shell.
+  const [webglSupported, setWebglSupported] = useState<boolean>(true);
 
   useEffect(() => {
-    setWebglReady(detectWebGL());
+    if (!detectWebGL()) setWebglSupported(false);
   }, []);
 
   const handleNodeSelect = useCallback((node: GraphNode | null) => {
@@ -283,7 +283,7 @@ export function HeroDecisionGraph() {
   }, []);
 
   // No WebGL → render the SVG fallback so the hero visual is never empty
-  if (webglReady === false) {
+  if (!webglSupported) {
     return <HeroDecisionGraphFallback />;
   }
 
@@ -363,40 +363,10 @@ export function HeroDecisionGraph() {
             </div>
           </div>
 
-          {/* 3D Canvas — gated on WebGL detection so unsupported devices
-              never trigger the reagraph/three.js bundle download. Shows a
-              loading shell while the check runs (always brief; runs once on
-              mount). */}
+          {/* 3D Canvas — the `dynamic()` wrapper around Graph3DCanvas shows
+              its own loading shell while the reagraph chunk arrives. */}
           <div style={{ height: 460, position: 'relative' }}>
-            {webglReady === true ? (
-              <Graph3DCanvas onNodeSelect={handleNodeSelect} />
-            ) : (
-              <div
-                style={{
-                  height: 460,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 12,
-                  background: '#FFFFFF',
-                }}
-              >
-                <div
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: '50%',
-                    border: '2px solid #E2E8F0',
-                    borderTopColor: '#16A34A',
-                    animation: 'spin 0.8s linear infinite',
-                  }}
-                />
-                <span style={{ fontSize: 12, color: '#64748B', letterSpacing: '0.5px' }}>
-                  Preparing graph&hellip;
-                </span>
-              </div>
-            )}
+            <Graph3DCanvas onNodeSelect={handleNodeSelect} />
             {/* Subtle analytical grid overlay */}
             <div
               aria-hidden
