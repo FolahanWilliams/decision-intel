@@ -313,12 +313,7 @@ export function HeroDecisionGraphFallback() {
                 <rect width="100%" height="100%" fill="url(#hero-grid-mask)" />
               </mask>
             </defs>
-            <rect
-              width="100%"
-              height="100%"
-              fill="url(#hero-grid)"
-              mask="url(#hero-grid-clip)"
-            />
+            <rect width="100%" height="100%" fill="url(#hero-grid)" mask="url(#hero-grid-clip)" />
 
             {/* Edges: center → biases */}
             {BIASES.map((b, i) => {
@@ -379,9 +374,7 @@ export function HeroDecisionGraphFallback() {
                   onClick={() => setSelected(b)}
                   style={{ cursor: 'pointer' }}
                 >
-                  {isActive && (
-                    <circle cx={p.x} cy={p.y} r={18} fill={color} fillOpacity={0.18} />
-                  )}
+                  {isActive && <circle cx={p.x} cy={p.y} r={18} fill={color} fillOpacity={0.18} />}
                   <circle
                     cx={p.x}
                     cy={p.y}
@@ -529,9 +522,7 @@ export function HeroDecisionGraphFallback() {
             gap: 8,
           }}
         >
-          <span style={{ fontSize: 11, color: '#94A3B8' }}>
-            Hover a node · Click to explore
-          </span>
+          <span style={{ fontSize: 11, color: '#94A3B8' }}>Hover a node · Click to explore</span>
           <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
             <LegendDot color="#60A5FA" label="Decision" />
             <LegendDot color="#EF4444" label="Bias" />

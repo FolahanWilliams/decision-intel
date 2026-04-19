@@ -17,15 +17,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import {
-  ExternalLink,
-  Loader2,
-  Mail,
-  Users,
-  Rocket,
-  ArrowRight,
-  AlertCircle,
-} from 'lucide-react';
+import { ExternalLink, Loader2, Mail, Users, Rocket, ArrowRight, AlertCircle } from 'lucide-react';
 import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('CsoPipelineBoard');
@@ -410,8 +402,7 @@ export function CsoPipelineBoard({ founderPass }: { founderPass: string }) {
                     }}
                   >
                     {topThree.map(p => {
-                      const overdue =
-                        col.id === 'reached_out' && isFollowUpOverdue(p.followUpDue);
+                      const overdue = col.id === 'reached_out' && isFollowUpOverdue(p.followUpDue);
                       return (
                         <li
                           key={p.id}

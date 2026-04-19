@@ -65,9 +65,7 @@ export async function POST(req: NextRequest) {
     // Setup error: DEMO_USER_ID isn't in ADMIN_USER_IDS, so the plan check
     // inside analyzeDocument will throw after the 4-free-audit quota is
     // consumed by past demo runs. Fail loud so the founder sees it.
-    log.error(
-      'DEMO_USER_ID is set but not present in ADMIN_USER_IDS — plan bypass inactive.'
-    );
+    log.error('DEMO_USER_ID is set but not present in ADMIN_USER_IDS — plan bypass inactive.');
     return apiError({
       error: 'Demo is misconfigured on the server. Please contact support.',
       status: 503,

@@ -373,7 +373,8 @@ const SEARCH_INDEX: SearchEntry[] = [
   {
     tabId: 'research',
     section: 'Intellectual Constellation',
-    preview: '37 thinkers on a radial map — click any node for origin, summary, and product surface.',
+    preview:
+      '37 thinkers on a radial map — click any node for origin, summary, and product surface.',
     keywords:
       'constellation thinkers map radial kahneman tversky klein sibony tetlock duke bayes strebulaev helmer thiel porter munger bezos boyd snowden surowiecki christensen moore dixon rackham dunkel osterwalder fitzpatrick hormozi lochhead voss minto miller eyal',
   },
@@ -394,7 +395,8 @@ const SEARCH_INDEX: SearchEntry[] = [
   {
     tabId: 'research',
     section: 'Decision Quality Chain',
-    preview: 'Howard & Matheson — six links. Frame → alternatives → info → values → reasoning → commitment.',
+    preview:
+      'Howard & Matheson — six links. Frame → alternatives → info → values → reasoning → commitment.',
     keywords:
       'decision quality chain howard matheson six links frame alternatives information values reasoning commitment dq chain',
   },
@@ -408,7 +410,8 @@ const SEARCH_INDEX: SearchEntry[] = [
   {
     tabId: 'research',
     section: 'Strebulaev 9 principles',
-    preview: 'Stanford GSB VC decision science. Consensus underperforms. Home runs, prepared mind, fast/slow lane.',
+    preview:
+      'Stanford GSB VC decision science. Consensus underperforms. Home runs, prepared mind, fast/slow lane.',
     keywords:
       'strebulaev nine principles stanford vc decision science consensus home runs prepared mind fast slow lane jockey horse',
   },
@@ -422,7 +425,8 @@ const SEARCH_INDEX: SearchEntry[] = [
     tabId: 'research',
     section: 'Research library',
     preview: 'Podcasts and long-form essays mapped to product + startup actions.',
-    keywords: 'research library podcast stratechery aggregation lenny platform builders 80000 hours',
+    keywords:
+      'research library podcast stratechery aggregation lenny platform builders 80000 hours',
   },
   {
     tabId: 'research',
@@ -527,7 +531,8 @@ const SEARCH_INDEX: SearchEntry[] = [
   {
     tabId: 'category_position',
     section: 'Category Position',
-    preview: 'DI landscape map, three market gaps with shipped-file evidence, 18-month category path.',
+    preview:
+      'DI landscape map, three market gaps with shipped-file evidence, 18-month category path.',
     keywords:
       'category position landscape gap creator quantexa aera pyramid palantir cloverpop competitive positioning map causal governance decision intelligence market incumbent analyst gartner forrester thesis four moments scorecard',
   },
@@ -753,7 +758,9 @@ export default function FounderHubPage() {
           </button>
         </div>
         {passError && (
-          <p style={{ fontSize: 12, color: 'var(--error)', marginTop: 8 }}>Incorrect access code.</p>
+          <p style={{ fontSize: 12, color: 'var(--error)', marginTop: 8 }}>
+            Incorrect access code.
+          </p>
         )}
       </div>
     );

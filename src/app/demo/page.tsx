@@ -244,9 +244,7 @@ export default function DemoPage() {
       };
 
       if (!res.ok || !body.success || !body.data) {
-        const msg =
-          body.error ||
-          'The audit ran into an error. Please try again in a moment.';
+        const msg = body.error || 'The audit ran into an error. Please try again in a moment.';
         trackEvent('demo_paste_error', { status: res.status });
         setPasteError(msg);
         setPasteAuditing(false);
@@ -358,8 +356,7 @@ export default function DemoPage() {
     return () => observers.forEach(o => o.disconnect());
   }, [showResults]);
 
-  const idleState =
-    !isSimulating && !showResults && !pasteAuditing && !pasteAudit && !pasteError;
+  const idleState = !isSimulating && !showResults && !pasteAuditing && !pasteAudit && !pasteError;
 
   return (
     <div style={{ minHeight: '100vh', background: C.white, color: C.slate900 }}>
@@ -550,11 +547,7 @@ export default function DemoPage() {
                 }}
               >
                 <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-                  {[
-                    '1 audit per day',
-                    '4,000-word cap',
-                    'Never stored',
-                  ].map(chip => (
+                  {['1 audit per day', '4,000-word cap', 'Never stored'].map(chip => (
                     <span
                       key={chip}
                       style={{
@@ -585,9 +578,7 @@ export default function DemoPage() {
                     opacity: pasteText.trim().length < 15 ? 0.45 : 1,
                     border: 'none',
                     boxShadow:
-                      pasteText.trim().length < 15
-                        ? 'none'
-                        : '0 6px 20px rgba(22,163,74,0.3)',
+                      pasteText.trim().length < 15 ? 'none' : '0 6px 20px rgba(22,163,74,0.3)',
                     transition: 'all 0.15s',
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -792,7 +783,8 @@ export default function DemoPage() {
                           : state === 'running'
                             ? C.greenSoft
                             : C.slate50,
-                      color: state === 'done' ? C.green : state === 'running' ? C.green : C.slate400,
+                      color:
+                        state === 'done' ? C.green : state === 'running' ? C.green : C.slate400,
                       display: 'inline-flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -2663,7 +2655,8 @@ function DemoConversionCTA({
           )}
         </div>
         <p style={{ color: C.slate400, fontSize: 11, marginTop: 18 }}>
-          No credit card required · Free plan covers your first 4 audits · 30-day pilot on Strategy tier
+          No credit card required · Free plan covers your first 4 audits · 30-day pilot on Strategy
+          tier
         </p>
       </div>
     </div>

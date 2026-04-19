@@ -19,10 +19,7 @@ import { Reveal } from '@/components/ui/Reveal';
 // Skeleton shell for lazy-loaded sections — keeps layout stable while
 // the dynamic chunk streams in.
 const sectionShell = (minHeight: number) => () => (
-  <div
-    aria-hidden
-    style={{ minHeight, width: '100%' }}
-  />
+  <div aria-hidden style={{ minHeight, width: '100%' }} />
 );
 
 const CaseStudyCarousel = dynamic(
@@ -57,16 +54,7 @@ const LandingFaq = dynamic(
   () => import('@/components/marketing/LandingFaq').then(m => ({ default: m.LandingFaq })),
   { ssr: false, loading: sectionShell(480) }
 );
-import {
-  ArrowRight,
-  Menu,
-  X,
-  Check,
-  ShieldCheck,
-  FileCheck2,
-  Scale,
-  BookOpen,
-} from 'lucide-react';
+import { ArrowRight, Menu, X, Check, ShieldCheck, FileCheck2, Scale, BookOpen } from 'lucide-react';
 
 /* ─── Color Tokens ──────────────────────────────────────────────────────── */
 
@@ -1087,10 +1075,7 @@ export default function LandingPage() {
 
       {/* ── Proof: real failures, audited in hindsight ──────────────── */}
       <Reveal repeat>
-        <section
-          id="proof"
-          style={{ maxWidth: 1200, margin: '0 auto', padding: '88px 24px 32px' }}
-        >
+        <section id="proof" style={{ maxWidth: 1200, margin: '0 auto', padding: '88px 24px 32px' }}>
           <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
             <p
               style={{
@@ -1115,8 +1100,8 @@ export default function LandingPage() {
                 maxWidth: 820,
               }}
             >
-              135 real corporate decisions, audited in hindsight &mdash; with the signals we
-              would have caught before the outcome.
+              135 real corporate decisions, audited in hindsight &mdash; with the signals we would
+              have caught before the outcome.
             </h2>
             <p
               style={{
@@ -1127,9 +1112,9 @@ export default function LandingPage() {
                 marginBottom: 24,
               }}
             >
-              Pre-seed we have no pilot logos to paste on a page. What we do have is a
-              reproducible library of failures &mdash; every one scored, every bias marked against
-              the pre-decision evidence, every outcome matched to what we would have flagged. The
+              Pre-seed we have no pilot logos to paste on a page. What we do have is a reproducible
+              library of failures &mdash; every one scored, every bias marked against the
+              pre-decision evidence, every outcome matched to what we would have flagged. The
               evidence lives on the next two pages, not behind a login.
             </p>
             <div
@@ -1688,8 +1673,8 @@ export default function LandingPage() {
                 lineHeight: 1.6,
               }}
             >
-              Paste your next strategic memo for one free audit, no signup. Or spend 30 minutes
-              with the founder on a call.
+              Paste your next strategic memo for one free audit, no signup. Or spend 30 minutes with
+              the founder on a call.
             </p>
             <div
               style={{
@@ -1725,9 +1710,7 @@ export default function LandingPage() {
                 return (
                   <Link
                     href={bookingHref}
-                    {...(bookingExternal
-                      ? { target: '_blank', rel: 'noopener noreferrer' }
-                      : {})}
+                    {...(bookingExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                     onClick={() =>
                       trackEvent('final_cta_clicked', { target: 'design_partner_call' })
                     }
@@ -1759,24 +1742,22 @@ export default function LandingPage() {
                 flexWrap: 'wrap',
               }}
             >
-              {[
-                'Full 60-second audit',
-                'No signup · no card',
-                '4 design-partner seats open',
-              ].map(t => (
-                <span
-                  key={t}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    fontSize: 13,
-                    color: C.slate500,
-                  }}
-                >
-                  <Check size={14} style={{ color: C.green }} /> {t}
-                </span>
-              ))}
+              {['Full 60-second audit', 'No signup · no card', '4 design-partner seats open'].map(
+                t => (
+                  <span
+                    key={t}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      fontSize: 13,
+                      color: C.slate500,
+                    }}
+                  >
+                    <Check size={14} style={{ color: C.green }} /> {t}
+                  </span>
+                )
+              )}
             </div>
           </motion.div>
         </div>

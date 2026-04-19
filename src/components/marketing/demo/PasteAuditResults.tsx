@@ -57,9 +57,7 @@ export function PasteAuditResults({ documentId, analysisId, result }: PasteAudit
   const twins: DecisionTwin[] = (result.simulation?.twins ?? []).slice(0, 3);
   const redTeam = (result.preMortem?.redTeam ?? []).slice(0, 2);
 
-  const deepDiveHref = analysisId
-    ? `/documents/${documentId}`
-    : `/documents/${documentId}`;
+  const deepDiveHref = analysisId ? `/documents/${documentId}` : `/documents/${documentId}`;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -598,25 +596,23 @@ export function PasteAuditResults({ documentId, analysisId, result }: PasteAudit
             marginTop: 4,
           }}
         >
-          {[
-            '4 audits/month on the free tier',
-            'No card required',
-            'Delete any audit anytime',
-          ].map(t => (
-            <span
-              key={t}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                fontSize: 12,
-                color: '#94A3B8',
-              }}
-            >
-              <CheckCircle2 size={12} style={{ color: C.green }} />
-              {t}
-            </span>
-          ))}
+          {['4 audits/month on the free tier', 'No card required', 'Delete any audit anytime'].map(
+            t => (
+              <span
+                key={t}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  fontSize: 12,
+                  color: '#94A3B8',
+                }}
+              >
+                <CheckCircle2 size={12} style={{ color: C.green }} />
+                {t}
+              </span>
+            )
+          )}
         </div>
       </motion.section>
     </div>

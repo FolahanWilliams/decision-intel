@@ -391,8 +391,7 @@ function PostRevealBookingRow() {
         alignItems: 'center',
         gap: 14,
         flexWrap: 'wrap',
-        background:
-          'linear-gradient(to right, var(--bg-card) 0%, rgba(22, 163, 74, 0.06) 100%)',
+        background: 'linear-gradient(to right, var(--bg-card) 0%, rgba(22, 163, 74, 0.06) 100%)',
       }}
     >
       <span
