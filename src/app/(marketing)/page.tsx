@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { trackEvent } from '@/lib/analytics/track';
+import { CaseStudyCarousel } from '@/components/marketing/CaseStudyCarousel';
 import { HeroDecisionGraph } from '@/components/marketing/HeroDecisionGraph';
 import { HeroCounterfactualTease } from '@/components/marketing/HeroCounterfactualTease';
 import { PipelineLandingTeaser } from '@/components/marketing/how-it-works/PipelineLandingTeaser';
@@ -1043,23 +1044,111 @@ export default function LandingPage() {
         </section>
       </Reveal>
 
-      {/* ── Category-defining: three DI gaps only we close ──────────── */}
+      {/* ── Category we're defining: three capability tabs ──────────── */}
       <Reveal repeat>
         <CategoryGapShowcase />
       </Reveal>
 
-      {/* ── Book a design partner call — primary conversion beat ────── */}
+      {/* ── Proof: real failures, audited in hindsight ──────────────── */}
       <Reveal repeat>
         <section
-          style={{
-            maxWidth: 1180,
-            margin: '0 auto',
-            padding: '0 24px 80px',
-          }}
+          id="proof"
+          style={{ maxWidth: 1200, margin: '0 auto', padding: '88px 24px 32px' }}
         >
-          <BookDemoCTA variant="hero" source="landing_post_showcase" />
+          <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
+            <p
+              style={{
+                fontSize: 14,
+                fontWeight: 700,
+                color: C.green,
+                textTransform: 'uppercase',
+                letterSpacing: '0.14em',
+                marginBottom: 10,
+              }}
+            >
+              Proof, not logos
+            </p>
+            <h2
+              style={{
+                fontSize: 'clamp(28px, 4vw, 40px)',
+                fontWeight: 800,
+                color: C.slate900,
+                letterSpacing: '-0.02em',
+                lineHeight: 1.1,
+                marginBottom: 16,
+                maxWidth: 820,
+              }}
+            >
+              135 real corporate decisions, audited in hindsight &mdash; with the signals we
+              would have caught before the outcome.
+            </h2>
+            <p
+              style={{
+                fontSize: 17,
+                color: C.slate600,
+                lineHeight: 1.6,
+                maxWidth: 720,
+                marginBottom: 24,
+              }}
+            >
+              Pre-seed we have no pilot logos to paste on a page. What we do have is a
+              reproducible library of failures &mdash; every one scored, every bias marked against
+              the pre-decision evidence, every outcome matched to what we would have flagged. The
+              evidence lives on the next two pages, not behind a login.
+            </p>
+            <div
+              style={{
+                display: 'flex',
+                gap: 12,
+                flexWrap: 'wrap',
+                marginBottom: 8,
+              }}
+            >
+              <Link
+                href="/proof"
+                onClick={() => trackEvent('proof_cta_clicked', { target: 'proof' })}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: C.white,
+                  background: C.green,
+                  padding: '11px 20px',
+                  borderRadius: 10,
+                  textDecoration: 'none',
+                  boxShadow: '0 4px 14px rgba(22,163,74,0.22)',
+                }}
+              >
+                Explore the pre-decision evidence <ArrowRight size={14} />
+              </Link>
+              <Link
+                href="/bias-genome"
+                onClick={() => trackEvent('proof_cta_clicked', { target: 'bias-genome' })}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: C.slate900,
+                  background: C.white,
+                  padding: '11px 20px',
+                  borderRadius: 10,
+                  border: `1px solid ${C.slate200}`,
+                  textDecoration: 'none',
+                }}
+              >
+                See which biases predict failure <ArrowRight size={14} />
+              </Link>
+            </div>
+          </motion.div>
         </section>
       </Reveal>
+
+      {/* ── Case study carousel — evidence strip below the proof header ── */}
+      <CaseStudyCarousel />
 
       {/* ── How It Works ────────────────────────────────────────────── */}
       <Reveal repeat>
