@@ -1,10 +1,31 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { GraphNode } from 'reagraph';
 import type { NodeData } from './HeroDecisionGraph3DCanvas';
+import { HeroDecisionGraphFallback } from './HeroDecisionGraphFallback';
+
+// ─── WebGL capability detection ─────────────────────────────────────────────
+// Checks whether the browser can actually create a WebGL context. Fails on
+// old hardware (Intel HD 3000-era laptops), headless browsers without GPU
+// passthrough, and locked-down enterprise configs. When this returns false we
+// skip the reagraph/three.js bundle entirely and render the SVG fallback so
+// the hero never shows an empty frame.
+function detectWebGL(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    const canvas = document.createElement('canvas');
+    const gl =
+      canvas.getContext('webgl2') ||
+      canvas.getContext('webgl') ||
+      canvas.getContext('experimental-webgl');
+    return !!gl;
+  } catch {
+    return false;
+  }
+}
 
 // ─── Lazy-load the WebGL canvas (no SSR — WebGL is client-only) ──────────────
 
@@ -247,10 +268,24 @@ function LegendItem({
 
 export function HeroDecisionGraph() {
   const [selectedData, setSelectedData] = useState<NodeData | null>(null);
+  // WebGL capability detection runs client-side after mount. Tri-state:
+  //   null  — not yet checked (render loading shell)
+  //   true  — WebGL supported, proceed with reagraph canvas
+  //   false — no WebGL, render the SVG fallback (never load three.js)
+  const [webglReady, setWebglReady] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    setWebglReady(detectWebGL());
+  }, []);
 
   const handleNodeSelect = useCallback((node: GraphNode | null) => {
     setSelectedData(node ? (node.data as NodeData) : null);
   }, []);
+
+  // No WebGL → render the SVG fallback so the hero visual is never empty
+  if (webglReady === false) {
+    return <HeroDecisionGraphFallback />;
+  }
 
   return (
     <>
@@ -328,9 +363,40 @@ export function HeroDecisionGraph() {
             </div>
           </div>
 
-          {/* 3D Canvas */}
+          {/* 3D Canvas — gated on WebGL detection so unsupported devices
+              never trigger the reagraph/three.js bundle download. Shows a
+              loading shell while the check runs (always brief; runs once on
+              mount). */}
           <div style={{ height: 460, position: 'relative' }}>
-            <Graph3DCanvas onNodeSelect={handleNodeSelect} />
+            {webglReady === true ? (
+              <Graph3DCanvas onNodeSelect={handleNodeSelect} />
+            ) : (
+              <div
+                style={{
+                  height: 460,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 12,
+                  background: '#FFFFFF',
+                }}
+              >
+                <div
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: '50%',
+                    border: '2px solid #E2E8F0',
+                    borderTopColor: '#16A34A',
+                    animation: 'spin 0.8s linear infinite',
+                  }}
+                />
+                <span style={{ fontSize: 12, color: '#64748B', letterSpacing: '0.5px' }}>
+                  Preparing graph&hellip;
+                </span>
+              </div>
+            )}
             {/* Subtle analytical grid overlay */}
             <div
               aria-hidden
