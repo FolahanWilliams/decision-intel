@@ -490,11 +490,11 @@ export const DI_GAPS: DiGap[] = [
     categoryProblem:
       'Every decision-intelligence platform runs on correlation. Dashboards show that A moves with B; recommendation engines rank by covariance; LLMs hallucinate explanations that sound causal and usually are not.',
     whatFailureLooksLike:
-      'Your strategy office can name what happened, but not why. Counterfactual questions — "would this deal still have closed if we had removed the overconfidence paragraph?" — get soft answers nobody can defend in front of the audit committee.',
+      'Your strategy office can name what happened, but not why. Counterfactual questions like "would this deal still have closed if we had removed the overconfidence paragraph?" get soft answers nobody can defend in front of the audit committee.',
     evidence:
       'Peer-reviewed studies find ~74% of LLM-generated decision explanations fail causal-faithfulness tests. Correlation-only tooling simply cannot answer "what if" questions about a strategic memo.',
     diApproach:
-      'Decision Intel treats every strategic memo as a causal artefact. Structural causal models with do-calculus run over a per-org Decision Knowledge Graph, so every flag names a cause — and every counterfactual becomes a traceable intervention with a dollar-impact forecast.',
+      'Decision Intel treats every strategic memo as a causal artefact. Structural causal models with do-calculus run over a per-org Decision Knowledge Graph, so every flag names a cause. Every counterfactual becomes a traceable intervention with a dollar-impact forecast.',
     diCapabilities: [
       {
         label: 'Decision Knowledge Graph',
@@ -511,7 +511,7 @@ export const DI_GAPS: DiGap[] = [
       {
         label: '20×20 bias interaction matrix',
         detail:
-          'Compound-risk scorer names the specific toxic pattern — not just the single bias — and maps it to a historical exemplar.',
+          'Compound-risk scorer names the specific toxic pattern, not just the single bias, and maps it to a historical exemplar.',
         proofFile: 'src/lib/scoring/compound-engine.ts',
       },
       {
@@ -530,13 +530,13 @@ export const DI_GAPS: DiGap[] = [
   {
     id: 'execution',
     name: 'Closed-Loop',
-    fullName: 'A loop that actually closes — insight ↔ outcome ↔ recalibration',
+    fullName: 'A loop that actually closes: insight, outcome, recalibration',
     categoryProblem:
       'Most decision-intelligence platforms surface recommendations and stop there. The outcome six months later never makes it back into the system that produced the recommendation, so nothing recalibrates and the tool never gets sharper.',
     whatFailureLooksLike:
-      '"Insight without action." Teams run an audit, the committee nods, the decision is made — and the actual outcome lives in a separate CRM, a Drive folder, a Slack thread, and a partner\'s head. The system that recommended never learns whether it was right.',
+      '"Insight without action." Teams run an audit, the committee nods, the decision is made, and the actual outcome lives in a separate CRM, a Drive folder, a Slack thread, or a partner\'s head. The system that recommended never learns whether it was right.',
     evidence:
-      "Tetlock's 20-year Good Judgment Project showed forecasting skill is trainable only when judgments are scored against actual outcomes with a proper scoring rule. Without a closed loop, decision-support tools can't sharpen — by construction.",
+      "Tetlock's 20-year Good Judgment Project showed forecasting skill is trainable only when judgments are scored against actual outcomes with a proper scoring rule. Without a closed loop, decision-support tools cannot sharpen, by construction.",
     diApproach:
       'Decision Intel closes the loop automatically. Outcomes are detected passively across Slack, Drive, and email; each detection scores the original prediction with a Brier score; Bayesian updating recalibrates the org-specific DQI weights every quarter. After 12 months your score is tuned to your decisions, not an industry average.',
     diCapabilities: [
@@ -576,24 +576,24 @@ export const DI_GAPS: DiGap[] = [
     name: 'Governance',
     fullName: 'Regulator-grade governance that survives the audit committee',
     categoryProblem:
-      "Black-box AI inside a high-stakes decision process fails audit committee review. Decision governance lags data governance by a decade — few platforms produce regulator-grade defence documents for the flags they surface, and almost none cross-link those flags to the specific regulations they trigger.",
+      "Black-box AI inside a high-stakes decision process fails audit committee review. Decision governance lags data governance by a decade. Few platforms produce regulator-grade defence documents for the flags they surface, and almost none cross-link those flags to the specific regulations they trigger.",
     whatFailureLooksLike:
       '"We can\'t use AI in board memos because our GC doesn\'t know how to defend it in an EU AI Act audit." Strategic decisions stall in limbo: the tool surfaces a flag, the GC asks which regulation it touches, and nobody can answer without a week of legal review.',
     evidence:
-      'Every Fortune 500 procurement team vetoes a tool that cannot produce regulator-grade defence documents. The EU AI Act, SOX §404, and GDPR Article 22 each gate different customer categories — and all three are rising, not falling, as AI enters decision workflows.',
+      'Every Fortune 500 procurement team vetoes a tool that cannot produce regulator-grade defence documents. The EU AI Act, SOX §404, and GDPR Article 22 each gate different customer categories, and all three are rising, not falling, as AI enters decision workflows.',
     diApproach:
-      "Decision Intel ships governance as product, not documentation. Every flag cross-links to a specific provision across seven frameworks. The Audit Defense Packet exports as a regulator-grade PDF on Pro tier, so a General Counsel can walk into a regulator meeting with the memo, the flags, and the framework citations in a single document.",
+      "Decision Intel delivers governance as product, not documentation. Every flag cross-links to a specific provision across seven frameworks. The Audit Defense Packet exports as a regulator-grade PDF on Pro tier, so a General Counsel can walk into a regulator meeting with the memo, the flags, and the framework citations in a single document.",
     diCapabilities: [
       {
         label: '7 regulatory framework mappers',
         detail:
-          'SOX §404, GDPR Art. 22, EU AI Act Annex III, Basel III, FCA Consumer Duty, SEC Reg D, LPOA — provision-level mapping.',
+          'SOX §404, GDPR Art. 22, EU AI Act Annex III, Basel III, FCA Consumer Duty, SEC Reg D, LPOA. Provision-level mapping across all seven.',
         proofFile: 'src/lib/compliance/frameworks/',
       },
       {
         label: 'Audit Defense Packet',
         detail:
-          'One-click regulator-grade PDF. Every flag, every framework citation, every provision section — exportable.',
+          'One-click regulator-grade PDF. Every flag, every framework citation, every provision section, exportable in a single document.',
       },
       {
         label: 'Decision Defense timeline',

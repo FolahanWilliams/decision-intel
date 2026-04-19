@@ -3,7 +3,7 @@
 import { useMemo, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Check, FileText, Sparkles, Zap } from 'lucide-react';
+import { ArrowRight, Check, ChevronDown, FileText, Sparkles, Zap } from 'lucide-react';
 import {
   DI_GAPS,
   type DiCapability,
@@ -103,22 +103,25 @@ function CapabilityPill({ capability }: { capability: DiCapability }) {
         >
           {capability.label}
         </span>
-        <span
+        <motion.span
+          animate={{ rotate: open ? 180 : 0 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
           style={{
-            fontSize: 10,
-            fontWeight: 700,
-            color: C.green,
-            background: C.greenLight,
-            border: `1px solid ${C.greenBorder}`,
-            padding: '1px 6px',
-            borderRadius: 999,
-            textTransform: 'uppercase',
-            letterSpacing: '0.08em',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 22,
+            height: 22,
+            borderRadius: '50%',
+            background: open ? C.greenLight : C.slate50,
+            color: open ? C.green : C.slate400,
+            border: `1px solid ${open ? C.greenBorder : C.slate200}`,
             flexShrink: 0,
           }}
+          aria-hidden
         >
-          Shipped
-        </span>
+          <ChevronDown size={12} strokeWidth={2.4} />
+        </motion.span>
       </div>
       <AnimatePresence initial={false}>
         {open && (
@@ -481,8 +484,8 @@ export function CategoryGapShowcase() {
             }}
           >
             Correlation dressed up as insight. Loops that never close. Black-box AI that the
-            audit committee can&rsquo;t defend. Each one blocks real value — and each one has
-            a specific, shipped answer on the other side of this card.
+            audit committee can&rsquo;t defend. Each one blocks real value. Each one has a
+            specific answer on the other side of this card.
           </p>
         </div>
 
@@ -828,7 +831,7 @@ function CausalGraphVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
             color: C.slate500,
           }}
         >
-          Live · Decision Knowledge Graph · sample acquisition thesis
+          Sample thesis · Decision Knowledge Graph
         </div>
         <div
           role="tablist"
@@ -1143,7 +1146,7 @@ function CausalGraphVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
                   Upstream causes
                 </div>
                 {upstream.length === 0 ? (
-                  <span style={{ color: C.slate400 }}>— root node</span>
+                  <span style={{ color: C.slate400 }}>root node</span>
                 ) : (
                   upstream.map(({ edge, node }) => (
                     <div key={`u-${node.id}`} style={{ marginBottom: 2 }}>
@@ -1169,7 +1172,7 @@ function CausalGraphVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
                   Downstream effects
                 </div>
                 {downstream.length === 0 ? (
-                  <span style={{ color: C.slate400 }}>— terminal node</span>
+                  <span style={{ color: C.slate400 }}>terminal node</span>
                 ) : (
                   downstream.map(({ edge, node }) => (
                     <div key={`d-${node.id}`} style={{ marginBottom: 2 }}>
@@ -1230,7 +1233,7 @@ const FLYWHEEL_STAGES: FlywheelStage[] = [
     label: 'Detect',
     sub: 'Outcome surfaces passively',
     detail:
-      'Outcome listeners on Slack, Drive, and email detect what actually happened — revenue hit or miss, milestone cleared, synergy delivered. No one has to update a field. Detection latency is measured in days, not quarters.',
+      'Outcome listeners on Slack, Drive, and email detect what actually happened: revenue hit or miss, milestone cleared, synergy delivered. No one has to update a field. Detection latency is measured in days, not quarters.',
     cap: 'Outcome captured',
   },
   {
@@ -1333,7 +1336,7 @@ function ClosedLoopFlywheelVizImpl({ reducedMotion }: { reducedMotion: boolean }
             color: C.slate500,
           }}
         >
-          Live · Outcome flywheel · click any stage to pause + inspect
+          Outcome flywheel · tap any stage to inspect
         </div>
         <div
           style={{
@@ -1892,7 +1895,7 @@ function GovernanceMemoVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
             color: C.slate500,
           }}
         >
-          Live · Strategic memo · click any numbered flag
+          Strategic memo · tap any numbered flag
         </div>
         <button
           type="button"
