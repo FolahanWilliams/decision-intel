@@ -137,6 +137,14 @@ export const TRACKS: Track[] = [
           'Write 5 discovery questions that would make a CSO visibly uncomfortable — but also have a natural answer that points toward Decision Intel. Test them on your advisor.',
         reflection:
           "What's the most uncomfortable question you could ask a prospect that they'd still want to answer?",
+        csoPitch:
+          "I want to understand your team before I talk about our tool. Walk me through the last strategic memo that landed badly in front of your board — not to relitigate it, just to understand what your process looked like the week before. What did the analyst believe was the weakest assumption? Did it survive into the final memo? Was the dissenting voice represented? Most CSOs I talk to can name the exact paragraph that went wrong in hindsight — and they can also name the moment in their review cadence where it should have been caught. That moment is what we build around.",
+        mnaPitch:
+          'Before you tell me about your deal process, tell me about the last thesis that turned out wrong in Year 2. What bias do you think dominated the diligence? Was there a dissenting associate? Did the committee hear them? These aren\'t gotcha questions — I need to understand how IC memos get pressure-tested at your firm today so I know whether DI slots in upstream of IC or replaces a step entirely. The firms where we land fastest are the ones where the answer is "honestly, the pressure-test is the MD\'s instincts" — and they know it.',
+        corpStrategyPitch:
+          "Walk me through your strategic-review cadence — not the slide template, the actual conversation. When a recommendation goes in, who argues against it? Is there a written dissent? Is there a quality bar the memo has to clear before the committee pack is finalised? Most corporate strategy groups I talk to have a polished output process and a completely tacit quality process — and the gap is where bad calls slip through. I'm trying to locate that gap in your specific cadence so I know whether DI becomes a pre-committee hygiene step or a CSO-office audit.",
+        vcPitch:
+          "Enterprise discovery should feel like a good therapist, not a sales pitch. The best founders in our category run discovery that surfaces cost-of-inaction so clearly the prospect sells themselves — and that only happens when the questions target the moment of pain, not the feature list. Our discovery playbook is five questions, each tested against our advisor network, and each one forces the prospect to name a memo that went wrong. The close rate on calls that answer those five honestly is dramatically higher than the close rate on calls that drift into our feature matrix.",
       },
       {
         id: 'es_5',
@@ -153,6 +161,14 @@ export const TRACKS: Track[] = [
           "Draft a 1-page design partner proposal template this week. Have your Wiz advisor review it — they've seen hundreds of enterprise proposals from the other side.",
         reflection:
           'Who besides your champion will read this proposal, and what does each person need to see to say yes?',
+        csoPitch:
+          "The proposal isn't for you or me — it's for the four people above you who have never met me and will each spend ninety seconds deciding whether this is a yes. CFO wants to see cost justification and a budget line, not our 12-node pipeline. Legal wants the DPA and the MSA, not our bias taxonomy. Procurement wants the security FAQ, not our research citations. Your audit committee wants the board-ready export, not our per-bias severity breakdown. One page, four answers, in the order they read.",
+        mnaPitch:
+          'The thing that kills pilot approvals inside M&A firms is a proposal that reads like a tool spec instead of a business case. Your MD doesn\'t want our product deck — she wants "what\'s the 6-month success criteria, what does it cost against the budget line, and what\'s the reference?" We ship a proposal template that leads with your firm-specific case library: three deals from the last 5 years where DI would have flagged the dominant bias pre-IC. You hand that to the MD and the question becomes "why didn\'t we have this three years ago," not "what is this."',
+        corpStrategyPitch:
+          'Corporate strategy proposals die in CFO review, not in CSO review. The CFO reads three things: what does it cost, what\'s the budget line, and what\'s the comparable spend. We give you a one-pager that benchmarks DI against the alternative — the Q4 where a recommendation landed badly, estimated cost of the cycle lost, and DI\'s annualised cost as a fraction of that. The frame is "this is the insurance premium on strategic-planning cadence," not "this is a new tool."',
+        vcPitch:
+          "The design-partner proposal is a distribution asset. Once we ship it, every champion we've landed can quietly pass it up their approval chain, and the approval chain reads the same document we handed the champion. That consistency is what lets a 16-year-old solo founder run enterprise sales — the document does the explaining in rooms the founder isn't in. It's why our close rates from first call to signed DP agreement outperform most pre-seed enterprise startups: the proposal is pre-approved to read correctly at every level above the champion.",
       },
       {
         id: 'es_6',
@@ -184,6 +200,14 @@ export const TRACKS: Track[] = [
           'Write your 5-sentence design partner pitch. Practice it out loud until it takes under 3 minutes and feels natural. The ask should come naturally at the end, not feel like a sales close.',
         reflection:
           'What outcome would a design partner need to see by month 3 to feel like this was worth their time and money?',
+        csoPitch:
+          "I'm not selling you a subscription; I'm asking you to co-build the category. Five strategy offices will shape Decision Intel over the next six months — unlimited audits, weekly working sessions with me, guaranteed roadmap input, and your office becomes one of the three published reference cases. £2K/month, six-month term, case-study consent. I'm deliberately not calling it a pilot — pilots are about proving a vendor. This is you helping me define the shape of decision-quality auditing before the rest of the market gets to.",
+        mnaPitch:
+          'This is a design partnership, not a pilot. Five M&A firms will shape what DI looks like for deal work through Q4 — unlimited audits on live and historical theses, weekly working sessions to stress-test your diligence, roadmap input on every feature that touches IC flow, and a published case study once you\'re through three confirmed outcomes. £2K/mo, six months, case-study consent. What you get isn\'t software access — it\'s the chance to tell every other M&A buyer what auditing a thesis should look like. The firms that join now set the template.',
+        corpStrategyPitch:
+          "Five corporate strategy groups will define what DI looks like inside the strategic-review cadence. The offer: unlimited audits on every recommendation you put through committee for six months, weekly co-build sessions with me, guaranteed roadmap input, and a published case study at month six once you can point to measurable decision-quality lift. £2K/month, case-study consent, six-month commitment. Why £2K and not free: free pilots get deprioritised the second a quarter-end hits. Paid design partners get the founder on speed-dial.",
+        vcPitch:
+          "Design partners are how we compound GTM without an SDR team. £2K/month is sub-procurement at every target ICP and creates 10× the engagement of a free pilot — paid partners show up to weekly calls, give feedback, tell peers. Each partnership yields a published case study in month 6, and each case study is a distribution asset that finds the next champion. Our target: 5 design partners by end of Q3, 3 published references by Q4, first priced Enterprise contract by Q1 the year after. That's the ladder to Seed.",
       },
     ],
   },
@@ -688,6 +712,14 @@ export const TRACKS: Track[] = [
           'Build a list of 50 companies that exactly match your ICP. Use LinkedIn Sales Navigator, Apollo, or Crunchbase. For each: company, ICP contact name and title, and whether you have a warm path in.',
         reflection:
           'What\'s the one filter that most precisely identifies a company that is "ready to buy" Decision Intel right now?',
+        csoPitch:
+          "Our ICP isn't \"enterprise.\" It's the Chief Strategy Officer at a $500M+ company with an active strategic-review cadence, a historical case in the last 24 months of a recommendation landing badly in front of the board, and a strategy function of 6-20 analysts who already write the memos we audit. 500 companies globally meet that filter; about 50 in US + UK combined. If your office matches, DI was built for you. If it doesn't — if you're $5B or you're pre-revenue or you've never sent a deck to a board — I'll tell you today so we don't waste a quarter.",
+        mnaPitch:
+          "Our sharpest ICP in M&A is a VP or Director at a mid-market PE-backed portco's corporate-development team, or an associate-to-VP at a $1-5B active-acquiror strategic. Deal frequency matters more than deal size: 6+ theses a year beats one $500M mega-deal because the flywheel needs repeated audits to show compounding value. If your firm closes one transformative deal every 18 months, we're not the right fit this year; if you close 8-12 a year, we're the most obvious 60-second hygiene step you haven't added yet.",
+        corpStrategyPitch:
+          "Corporate strategy groups inside $1-5B operating companies are the cleanest fit — you ship 40-60 recommendations a year, every one of them goes to a steering committee, and the variance in outcome isn't in the data, it's in which biases the memo author didn't catch themselves. If you're below that volume you'll get value but the ROI math is softer; above that volume you'll get value but you need the Strategy tier with team seats. The sweet spot is strategy teams of 8-25 with a formal review cadence.",
+        vcPitch:
+          "\"Enterprise strategy software\" sounds broad and that's why founders drown in it. Our true buyable ICP is 500 companies globally — CSOs at $500M+ companies with active strategic cadence. 50 in the US + UK are the beachhead. This is a list, not a TAM calculation; we know every name, have a warm path to roughly a third through the Wiz advisor network, and content is doing the work on the rest. At pre-seed the right question isn't \"how big is the market?\" — it's \"can the founder name the 50 accounts and the path in?\" That's what we have.",
       },
       {
         id: 'gtm_2',
@@ -703,6 +735,14 @@ export const TRACKS: Track[] = [
           'Write a 1-paragraph "beachhead thesis" — why this specific market, why now, why you can own it in 24 months. Share it with your advisor. Is it believable?',
         reflection:
           'What would "owning" your beachhead look like in 18 months — specifically, how many customers, what market recognition, and what inbound rate?',
+        csoPitch:
+          "Our beachhead is corporate-strategy groups and M&A teams inside $500M-$2B operating companies — deliberately mid-market rather than Fortune 100. The reason is simple: mid-market CSOs write their own memos, own their own budget line, and can run a design partner without a Gartner procurement review. We dominate this segment first, publish the reference cases, and expand upward into large-cap strategy in Year 2 with reference logos already in hand. That's how you own a category, not how you chase revenue.",
+        mnaPitch:
+          "Mid-market PE-backed portcos are the M&A beachhead: $500M-$2B revenue, high-frequency deal cadence, real budget for decision-quality tooling, and — critically — PE sponsors talk to each other. When a portco CEO mentions DI at the quarterly board review, every other portco in that fund hears about it within 30 days. That's the word-of-mouth compounding that replaces an SDR team. We don't chase the mega-deals until we've published 3 mid-market PE references.",
+        corpStrategyPitch:
+          "The beachhead isn't where the biggest spend lives — it's where we can own a reference story fastest. Corporate strategy at $500M-$2B operating companies is dense enough that 5 logos is a credible \"category leader\" claim, budget-real enough to close at enterprise ACV, and reference-able because the CSOs know each other through industry forums. Three published case studies inside that band and the Fortune 500 conversation shifts from \"who is this\" to \"why don't we have this yet.\"",
+        vcPitch:
+          "Thiel's law: dominate a small, specific market first. Ours is corporate strategy + M&A at mid-market $500M-$2B. 200-300 accounts globally fit. We target 5 design partners inside it in the first 12 months, publish 3 reference case studies, then expand upward to large-cap in Year 2. The expansion doesn't require new product — it requires a new brand story (\"used by these 3 mid-caps, now landing at Fortune 500\"). That's why beachhead discipline matters more at pre-seed than at any later stage.",
       },
       {
         id: 'gtm_3',
@@ -764,6 +804,14 @@ export const TRACKS: Track[] = [
           "In your next design partner conversation, quote a price 20% higher than your instinct. Watch the reaction. If there's no pushback, raise again. Price is information — let the market tell you where the ceiling is.",
         reflection:
           'What objection are you most afraid of hearing to a higher price, and is that fear based on data or assumption?',
+        csoPitch:
+          "DI is priced to the risk it prevents, not to the hours it saves. A single failed $200M strategic recommendation destroys $20-50M of enterprise value through the value-destruction curve — and the frequency of that in corporate strategy is roughly one per 2-3 years. Our Strategy tier is £30K/year for a 15-seat team with unlimited audits on your entire memo pipeline. The unit economics work at 0.06% of the risk we're priced against. If that feels expensive, I'd rather hear that upfront than discount into a relationship that won't renew.",
+        mnaPitch:
+          "Pricing for M&A buyers is anchored to deal-support spend, not SaaS. Your firm spends 6-8 figures per deal on banker fees, diligence providers, and post-close integration consultants — DI at £30K a year as a deal-quality audit layer across every thesis is measured in basis points, not percentage points. The sharpest M&A firms don't flinch; the ones who do aren't the ones who would renew. If a prospective MD flinches at £30K for unlimited audits on 6-10 theses a year, the deal pipeline isn't dense enough for the tool to compound.",
+        corpStrategyPitch:
+          "Corporate strategy buyers price-anchor to consulting spend, not SaaS. You pay McKinsey or BCG £500K-£2M for a single engagement; a £30K/year subscription to DI that audits every memo across every project, every quarter, quarter after quarter, is a fraction of a percent of your total advisory budget. Frame it that way and the procurement conversation gets 10× shorter. We deliberately don't benchmark against \"decision management\" tooling because that category isn't priced to strategic impact; it's priced to analyst seats.",
+        vcPitch:
+          "Enterprise strategy founders systematically undercharge — the instinct is to discount to close, and the instinct is wrong. High price signals value in this category: £500/month reads as \"cheap analytics\"; £30K/year reads as \"strategic infrastructure.\" Our pricing ladder (Individual £249/mo → Strategy £2,499/mo → Enterprise custom) is deliberately flat for the first 15 seats, steep after, which lets the Strategy tier anchor the Enterprise negotiation. Pricing is information: the ones who flinch were never buyers.",
       },
       {
         id: 'gtm_7',
@@ -780,6 +828,14 @@ export const TRACKS: Track[] = [
           'Memorize this pitch. Practice it out loud until it takes under 3 minutes and the ask comes naturally. Record yourself. The first 3 times will be uncomfortable — do it anyway.',
         reflection:
           'What would need to be true for a CSO to say yes to this in the first 10 minutes of a call?',
+        csoPitch:
+          "I'm building a five-office design partner programme for the next two quarters. The offer is straightforward: unlimited audits across your strategic-memo pipeline, weekly working sessions with me to shape the product specifically against your review cadence, guaranteed roadmap input on anything that touches your committee flow, and a published reference once you're through one full quarterly cycle. £2K per month for six months. You're not licensing software; you're co-authoring the category of strategic-decision auditing. Five seats — four open as of this week.",
+        mnaPitch:
+          'Five M&A firms are shaping DI for deal work this year. The partnership runs six months: unlimited audits on live theses and post-mortem re-analysis on anything from your last two years of closed deals, weekly working sessions with me, roadmap input on the IC flow, and a case study we publish jointly once you\'re through three confirmed outcomes. £2K/month. Why I\'m limiting to five: product depth. I can\'t give every design partner weekly founder time if there are twenty. This is the window where the founder is available.',
+        corpStrategyPitch:
+          "Five corporate strategy groups will shape DI across the back half of this year. What your team gets: unlimited audits across every recommendation you put through committee, weekly co-build sessions with me, roadmap input, and a joint case study at month six. £2K a month, six-month term, case-study consent. Why paid and not a free pilot — free pilots die on a quarter-end. £2K is sub-procurement approval for every ICP group I've spoken to, and it creates the engagement pattern we need to build the product correctly. Four partner slots left.",
+        vcPitch:
+          "The design-partner pitch is the most compressed version of our entire GTM. Three ideas in one paragraph: exclusivity (five seats, not five hundred), co-build (you shape the roadmap, not subscribe to one), payment (£2K/mo proves engagement and clears procurement). That combination is why our expected close rate from first discovery to signed DP is 3-5×pre-seed industry baseline. The founder pitches it under three minutes on every call — we've trained it against the advisor network and know where it bends.",
       },
     ],
   },
@@ -1023,8 +1079,10 @@ export const TRACKS: Track[] = [
         ],
         csoPitch:
           "DQI is a weighted composite of six decision-quality components — each weight grounded in a specific published finding about what predicts good strategic outcomes. Every memo you run comes back with its DQI, its sub-scores, and the exact weightings that produced them. Your audit committee doesn't have to take our word for anything; the methodology is transparent and re-runnable.",
-        vcPitch:
-          "FICO took a decade to become the reference score for consumer credit. DQI is our bid for that position in strategic decisions. Every confirmed outcome customers report recalibrates their DQI — meaning after 12 months, the score is specifically tuned to that customer's actual outcome history. That recalibration is the moat.",
+        mnaPitch:
+          "Every thesis gets a single-number DQI your IC can compare across deals — 28% bias profile, 18% noise, 18% logical coherence, 13% evidence grounding, 13% pre-mortem robustness, 10% stakeholder coverage. Partners who've sat through eight hours of diligence read-outs immediately get the value: one number, defensible weightings, pattern-matched against 135 historical theses. An A means this memo would have cleared IC at a firm that successfully acquired; a D means it shares structure with the ones that didn't. That's the signal gap we fill.",
+        corpStrategyPitch:
+          "DQI is the hygiene score your steering committee will eventually demand. Six components, each weighted from published outcome research, producing a single A-F grade on every recommendation that crosses the committee table. The weights are public (they live in dqi.ts in our repo); the sub-scores are drill-downable; the recalibration curves against your own committee's confirmed outcomes over 12 months. Think of it as a PMO quality gate — except the gate is quantitative and the standard sharpens as your decision history accumulates.",
       },
       {
         id: 'pf_4',
@@ -1096,8 +1154,10 @@ export const TRACKS: Track[] = [
         ],
         csoPitch:
           "Your DQI starts at an industry baseline. Every confirmed outcome your team reports — good or bad — tunes the model to your specific decision patterns. After 12 months, the score is calibrated to the way your organisation actually makes calls, not a generic average. That's not a feature; that's how Tetlock's superforecasters outperformed CIA analysts by 30% on the same information.",
-        vcPitch:
-          'The outcome flywheel is what makes this business defensible. Every confirmed outcome per customer is a data point a competitor cannot replicate without running a full 12-month engagement of their own. The cost of replication compounds, and our per-customer DQI becomes more accurate the longer they use us. This is a data-network moat, not a feature moat.',
+        mnaPitch:
+          "Every closed deal, win or lose, becomes a training signal. You report the outcome (revenue hit, revenue miss, integration flop, thesis held), we compute the Brier score against our pre-IC DQI, and the weights recalibrate against your specific firm. After 18-24 months of closed deals, your DQI isn't pointing at a generic bias baseline — it's pointing at the failure modes your partners specifically under-weight in diligence. The compounding is per-firm; the learning is private; the moat is unreachable without a full cycle of closed deals.",
+        corpStrategyPitch:
+          "The outcome loop is what turns a one-off audit into a compounding quality system. Every recommendation that goes through committee gets its DQI at commit time; six to eighteen months later, your team reports the outcome (revenue delta, milestone hit, strategic thesis held); the gap between DQI and outcome feeds back into your organisation's private DQI model. Over four quarters, your score gets tuned to your CSO office's blind spots, not an industry average. No consulting engagement, no competing tool, can replicate that — it requires actual outcome history, which only your own review cadence produces.",
       },
       {
         id: 'pf_6',
