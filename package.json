@@ -18,6 +18,7 @@
     "gemini": "gemini",
     "test": "vitest run",
     "audit:ai": "bash ./scripts/gemini-audit.sh",
+    "rotate:encryption-key": "tsx ./scripts/rotate-encryption-key.ts",
     "prepare": "husky"
   },
   "dependencies": {

@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { CheckCircle, ArrowRight, X, FileText, Scale } from 'lucide-react';
+import { ArrowRight, Calendar, CheckCircle, FileText, Scale, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ScoreReveal } from '@/components/ui/ScoreReveal';
+import { trackEvent } from '@/lib/analytics/track';
 
 export interface CompletedAnalysisSummary {
   docId: string;
@@ -142,21 +143,61 @@ export function InlineAnalysisResultCard({ analysis, onDismiss }: Props) {
           {analysis.noiseScore != null && (
             <div
               style={{
-                marginTop: 14,
-                display: 'inline-flex',
+                marginTop: 16,
+                display: 'flex',
                 alignItems: 'center',
-                gap: 6,
-                fontSize: 12,
-                color: 'var(--text-secondary)',
+                gap: 12,
+                padding: '10px 14px',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 'var(--radius-md, 8px)',
               }}
             >
-              <Scale size={12} />
-              <span>
-                Noise:{' '}
-                <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
-                  {Math.round(analysis.noiseScore)}%
-                </span>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 32,
+                  height: 32,
+                  borderRadius: '50%',
+                  background: 'var(--bg-tertiary)',
+                  color: 'var(--text-primary)',
+                  flexShrink: 0,
+                }}
+                aria-hidden
+              >
+                <Scale size={14} />
               </span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em',
+                    color: 'var(--text-muted)',
+                    marginBottom: 1,
+                  }}
+                >
+                  Noise score
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    gap: 8,
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <span style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)' }}>
+                    {Math.round(analysis.noiseScore)}%
+                  </span>
+                  <span style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.35 }}>
+                    judge disagreement across 3 independent reads
+                  </span>
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -274,6 +315,100 @@ export function InlineAnalysisResultCard({ analysis, onDismiss }: Props) {
           <ArrowRight size={14} />
         </Link>
       </div>
+
+      <PostRevealBookingRow />
     </motion.div>
+  );
+}
+
+/**
+ * Design-partner booking beat that sits under the DQI reveal. The user
+ * just saw their own score — this is the highest-intent moment in the
+ * whole product surface, and a 30-minute founder call is the natural
+ * next step. Uses CSS variables so it reads correctly under both light
+ * and dark platform themes, unlike the marketing-side BookDemoCTA which
+ * is light-only by design.
+ */
+function PostRevealBookingRow() {
+  const bookingUrl = process.env.NEXT_PUBLIC_DEMO_BOOKING_URL;
+  const href = bookingUrl || '/pricing#design-partner';
+  const external = !!bookingUrl;
+
+  return (
+    <div
+      style={{
+        padding: '14px 20px',
+        borderTop: '1px solid var(--border-color)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 14,
+        flexWrap: 'wrap',
+        background:
+          'linear-gradient(to right, var(--bg-card) 0%, rgba(22, 163, 74, 0.06) 100%)',
+      }}
+    >
+      <span
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: 32,
+          height: 32,
+          borderRadius: 10,
+          background: 'rgba(22, 163, 74, 0.15)',
+          color: 'var(--accent-primary)',
+          border: '1px solid rgba(22, 163, 74, 0.3)',
+          flexShrink: 0,
+        }}
+        aria-hidden
+      >
+        <Calendar size={15} strokeWidth={2.25} />
+      </span>
+      <div style={{ flex: 1, minWidth: 180 }}>
+        <div
+          style={{
+            fontSize: 13,
+            fontWeight: 700,
+            color: 'var(--text-primary)',
+            lineHeight: 1.35,
+            marginBottom: 2,
+          }}
+        >
+          Want the founder to walk through this audit with you?
+        </div>
+        <div
+          style={{
+            fontSize: 12,
+            color: 'var(--text-muted)',
+            lineHeight: 1.4,
+          }}
+        >
+          30 minutes, live. Bring another memo and we&rsquo;ll audit that too.
+        </div>
+      </div>
+      <Link
+        href={href}
+        {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+        onClick={() => trackEvent('book_demo_click', { source: 'post_reveal' })}
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 6,
+          padding: '8px 14px',
+          background: 'transparent',
+          color: 'var(--accent-primary)',
+          border: '1px solid var(--accent-primary)',
+          borderRadius: 'var(--radius-full)',
+          fontSize: 13,
+          fontWeight: 700,
+          textDecoration: 'none',
+          whiteSpace: 'nowrap',
+          flexShrink: 0,
+        }}
+      >
+        Book a 30-min call
+        <ArrowRight size={13} />
+      </Link>
+    </div>
   );
 }

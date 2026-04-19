@@ -11,6 +11,7 @@ import { PipelineLandingTeaser } from '@/components/marketing/how-it-works/Pipel
 import { OutcomeDetectionViz } from '@/components/marketing/how-it-works/OutcomeDetectionViz';
 import { CredibilityTrio } from '@/components/marketing/CredibilityTrio';
 import { CategoryGapShowcase } from '@/components/marketing/CategoryGapShowcase';
+import { BookDemoCTA } from '@/components/marketing/BookDemoCTA';
 import { CompetitorComparisonCard } from '@/components/marketing/CompetitorComparisonCard';
 import { LandingFaq } from '@/components/marketing/LandingFaq';
 import { Reveal } from '@/components/ui/Reveal';
@@ -275,13 +276,14 @@ export default function LandingPage() {
             })}
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }} className="hidden-mobile">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }} className="hidden-mobile">
             <Link
               href="/login"
               style={{ fontSize: 14, color: '#CBD5E1', textDecoration: 'none', fontWeight: 500 }}
             >
               Sign In
             </Link>
+            <BookDemoCTA variant="nav" source="landing_nav" />
             <Link
               href="/demo"
               style={{
@@ -358,8 +360,12 @@ export default function LandingPage() {
             >
               Sign In
             </Link>
+            <div onClick={() => setMobileNavOpen(false)} style={{ marginTop: 4 }}>
+              <BookDemoCTA variant="nav" source="landing_nav_mobile" />
+            </div>
             <Link
               href="/demo"
+              onClick={() => setMobileNavOpen(false)}
               style={{
                 fontSize: 14,
                 fontWeight: 600,
@@ -796,6 +802,19 @@ export default function LandingPage() {
       {/* ── Category-defining: three DI gaps only we close ──────────── */}
       <Reveal repeat>
         <CategoryGapShowcase />
+      </Reveal>
+
+      {/* ── Book a design partner call — primary conversion beat ────── */}
+      <Reveal repeat>
+        <section
+          style={{
+            maxWidth: 1180,
+            margin: '0 auto',
+            padding: '0 24px 80px',
+          }}
+        >
+          <BookDemoCTA variant="hero" source="landing_post_showcase" />
+        </section>
       </Reveal>
 
       {/* ── How It Works ────────────────────────────────────────────── */}
@@ -1439,26 +1458,66 @@ export default function LandingPage() {
               Ready to compound your team&rsquo;s judgment?
             </h2>
             <p style={{ fontSize: 18, color: C.slate600, marginBottom: 32 }}>
-              Audit your next strategic memo in 60 seconds. No credit card required.
+              Run your next strategic memo through Decision Intel in 60 seconds, or bring one
+              to a 30-minute call with the founder.
             </p>
-            <Link
-              href="/login"
-              onClick={() => trackEvent('final_cta_clicked')}
+            <div
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                fontSize: 16,
-                fontWeight: 600,
-                color: C.white,
-                background: C.green,
-                padding: '14px 32px',
-                borderRadius: 10,
-                textDecoration: 'none',
+                display: 'flex',
+                gap: 12,
+                justifyContent: 'center',
+                flexWrap: 'wrap',
               }}
             >
-              Get Started Free <ArrowRight size={18} />
-            </Link>
+              {(() => {
+                const bookingUrl = process.env.NEXT_PUBLIC_DEMO_BOOKING_URL;
+                const bookingHref = bookingUrl || '/pricing#design-partner';
+                const bookingExternal = !!bookingUrl;
+                return (
+                  <Link
+                    href={bookingHref}
+                    {...(bookingExternal
+                      ? { target: '_blank', rel: 'noopener noreferrer' }
+                      : {})}
+                    onClick={() => trackEvent('book_demo_click', { source: 'final_cta' })}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      fontSize: 16,
+                      fontWeight: 700,
+                      color: C.white,
+                      background: C.green,
+                      padding: '14px 32px',
+                      borderRadius: 10,
+                      textDecoration: 'none',
+                      boxShadow: '0 2px 12px rgba(22, 163, 74, 0.25)',
+                    }}
+                  >
+                    Book a design partner call <ArrowRight size={18} />
+                  </Link>
+                );
+              })()}
+              <Link
+                href="/login"
+                onClick={() => trackEvent('final_cta_clicked')}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  fontSize: 16,
+                  fontWeight: 600,
+                  color: C.green,
+                  background: C.white,
+                  border: `1.5px solid #86EFAC`,
+                  padding: '14px 32px',
+                  borderRadius: 10,
+                  textDecoration: 'none',
+                }}
+              >
+                Try Decision Intel free <ArrowRight size={18} />
+              </Link>
+            </div>
             <div
               style={{
                 display: 'flex',
@@ -1468,7 +1527,7 @@ export default function LandingPage() {
                 flexWrap: 'wrap',
               }}
             >
-              {['No credit card required', '14-day free trial', 'SOC 2 infrastructure'].map(t => (
+              {['30 minutes · no slides', 'Live on your own memo', '4 design-partner seats open'].map(t => (
                 <span
                   key={t}
                   style={{
@@ -1583,6 +1642,7 @@ export default function LandingPage() {
             </h4>
             {[
               'Privacy',
+              'Security',
               'How It Works',
               'Case Studies',
               'Proof',
@@ -1606,7 +1666,9 @@ export default function LandingPage() {
                             ? '/pricing'
                             : l === 'Privacy'
                               ? '/privacy'
-                              : `#${l.toLowerCase().replace(/\s+/g, '-')}`;
+                              : l === 'Security'
+                                ? '/security'
+                                : `#${l.toLowerCase().replace(/\s+/g, '-')}`;
               return (
                 <a
                   key={l}

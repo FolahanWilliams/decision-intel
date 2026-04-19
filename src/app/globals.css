@@ -83,11 +83,28 @@
      in light theme (previously fell back to browser default #333). */
   --border-primary: rgba(15, 23, 42, 0.08);
 
-  /* Severity — vivid, saturated */
+  /* Modal overlay — the scrim behind dialogs. Previously every modal
+     site hardcoded rgba(0,0,0,0.6) which reads slightly too hot over
+     a light page surface. Tokenised so the dark-theme counterpart can
+     go heavier without touching call sites. */
+  --overlay: rgba(15, 23, 42, 0.52);
+
+  /* Foreground colour on an accent-filled surface (button in primary
+     state, severity chip, etc.). White reads correctly on every
+     accent/severity hue we use in both themes. */
+  --text-on-accent: #ffffff;
+
+  /* Severity — vivid, saturated.
+     RGB triplet companions let consumers compose
+     `rgba(var(--error-rgb), 0.12)` without redeclaring the hue. */
   --success: #16a34a;
+  --success-rgb: 22, 163, 74;
   --warning: #d97706;
+  --warning-rgb: 217, 119, 6;
   --error: #ef4444;
+  --error-rgb: 239, 68, 68;
   --info: #0284c7;
+  --info-rgb: 2, 132, 199;
 
   --severity-low: #16a34a;
   --severity-medium: #d97706;
@@ -237,11 +254,24 @@
   --border-hover: rgba(22, 163, 74, 0.25);
   --border-primary: rgba(22, 163, 74, 0.12);
 
-  /* Severity — vivid, saturated */
+  /* Modal overlay — darker scrim in dark theme so the dialog still
+     reads as elevated against the near-black page. */
+  --overlay: rgba(0, 0, 0, 0.72);
+
+  /* Text on accent-filled surface. Same in both themes — white reads
+     correctly on every accent hue. Declared explicitly so call sites
+     can drop the fallback chain once the repo-wide sweep is finished. */
+  --text-on-accent: #ffffff;
+
+  /* Severity — vivid, saturated. RGB triplets companion. */
   --success: #34d399;
+  --success-rgb: 52, 211, 153;
   --warning: #fbbf24;
+  --warning-rgb: 251, 191, 36;
   --error: #f87171;
+  --error-rgb: 248, 113, 113;
   --info: #38bdf8;
+  --info-rgb: 56, 189, 248;
 
   --severity-low: #34d399;
   --severity-medium: #fbbf24;
@@ -2004,6 +2034,28 @@ tr:hover td {
   font-size: 0.8125rem;
   color: var(--text-muted);
   margin-top: 2px;
+}
+
+/* ═══════════════════════════════════════════
+   Modal Backdrop — tokenised scrim behind dialogs. Replaces
+   hardcoded rgba(0,0,0,0.6) that previously lived at every call
+   site. Backdrop-filter makes the page beneath read as out-of-focus
+   so the dialog above feels genuinely elevated rather than pasted on.
+   Call sites should use this class on their fixed-positioned outer
+   container — or inline style={{ background: 'var(--overlay)' }}
+   when class composition isn't convenient.
+   ═══════════════════════════════════════════ */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md);
 }
 
 /* ═══════════════════════════════════════════

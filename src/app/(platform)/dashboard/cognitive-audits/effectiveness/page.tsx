@@ -94,28 +94,51 @@ export default function EffectivenessPage() {
         ]}
       />
 
-      <header className="mb-xl animate-fade-in">
-        <div className="flex items-center justify-between mb-sm">
-          <div className="flex items-center gap-md">
-            <TrendingUp size={28} style={{ color: 'var(--success)' }} />
-            <h1>Decision Effectiveness</h1>
+      <header className="page-header animate-fade-in">
+        <div className="flex items-center gap-md">
+          <div
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 'var(--radius-md)',
+              background: 'rgba(var(--success-rgb), 0.12)',
+              border: '1px solid rgba(var(--success-rgb), 0.25)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <TrendingUp size={20} style={{ color: 'var(--accent-primary)' }} />
           </div>
-          <div className="flex items-center gap-sm">
-            {PERIOD_OPTIONS.map(opt => (
-              <button
-                key={opt.value}
-                onClick={() => setPeriod(opt.value)}
-                className={`btn ${period === opt.value ? 'btn-primary' : 'btn-secondary'}`}
-                style={{ padding: '6px 12px', fontSize: '12px' }}
-              >
-                {opt.label}
-              </button>
-            ))}
+          <div>
+            <h1
+              style={{
+                fontSize: '1.75rem',
+                fontWeight: 800,
+                letterSpacing: '-0.03em',
+                margin: 0,
+              }}
+            >
+              <span className="text-gradient">Decision Effectiveness</span>
+            </h1>
+            <p className="page-subtitle">
+              Decision quality trends, bias patterns, and nudge effectiveness over time.
+            </p>
           </div>
         </div>
-        <p className="text-muted">
-          Track decision quality trends, bias patterns, and nudge effectiveness over time
-        </p>
+        <div className="flex items-center gap-sm">
+          {PERIOD_OPTIONS.map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => setPeriod(opt.value)}
+              className={`btn ${period === opt.value ? 'btn-primary' : 'btn-secondary'}`}
+              style={{ padding: '6px 12px', fontSize: '12px' }}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
       </header>
 
       {/* Summary Cards */}
@@ -363,7 +386,7 @@ export default function EffectivenessPage() {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            color: '#fff',
+                            color: 'var(--text-on-accent, #fff)',
                             fontSize: '11px',
                             fontWeight: 600,
                           }}
@@ -375,11 +398,11 @@ export default function EffectivenessPage() {
                         <div
                           style={{
                             flex: ne.notHelpful,
-                            background: '#6B7280',
+                            background: 'var(--text-secondary)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            color: '#fff',
+                            color: 'var(--text-on-accent, #fff)',
                             fontSize: '11px',
                             fontWeight: 600,
                           }}
@@ -395,7 +418,7 @@ export default function EffectivenessPage() {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            color: '#000',
+                            color: 'var(--text-on-accent, #fff)',
                             fontSize: '11px',
                             fontWeight: 600,
                           }}
@@ -463,7 +486,13 @@ export default function EffectivenessPage() {
                                   paddingRight: 8,
                                 }}
                               >
-                                <span style={{ color: '#fff', fontSize: '11px', fontWeight: 600 }}>
+                                <span
+                                  style={{
+                                    color: 'var(--text-on-accent, #fff)',
+                                    fontSize: '11px',
+                                    fontWeight: 600,
+                                  }}
+                                >
                                   {count}
                                 </span>
                               </div>

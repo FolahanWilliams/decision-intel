@@ -214,16 +214,40 @@ export default function SubmitDecisionPage() {
           ]}
         />
 
-        <header className="mb-xl animate-fade-in">
-          <div className="flex items-center gap-md mb-sm">
-            <BrainCircuit size={28} style={{ color: 'var(--text-secondary)' }} />
-            <h1>Submit a strategic memo for audit</h1>
+        <header className="page-header animate-fade-in">
+          <div className="flex items-center gap-md">
+            <div
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 'var(--radius-md)',
+                background: 'rgba(var(--success-rgb), 0.12)',
+                border: '1px solid rgba(var(--success-rgb), 0.25)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              <BrainCircuit size={20} style={{ color: 'var(--accent-primary)' }} />
+            </div>
+            <div>
+              <h1
+                style={{
+                  fontSize: '1.75rem',
+                  fontWeight: 800,
+                  letterSpacing: '-0.03em',
+                  margin: 0,
+                }}
+              >
+                <span className="text-gradient">Submit a strategic memo</span>
+              </h1>
+              <p className="page-subtitle">
+                We score the reasoning, predict steering-committee objections, and add it to your
+                Decision Knowledge Graph.
+              </p>
+            </div>
           </div>
-          <p className="text-muted">
-            Paste a strategic memo, upload a board deck, or submit a meeting transcript. We score
-            the reasoning, predict the objections your steering committee will raise, and add it to
-            your Knowledge Graph.
-          </p>
         </header>
 
         {error && (
@@ -231,7 +255,7 @@ export default function SubmitDecisionPage() {
             className="flex items-center gap-sm mb-lg"
             style={{
               padding: 'var(--spacing-md)',
-              background: 'rgba(239, 68, 68, 0.1)',
+              background: 'rgba(var(--error-rgb), 0.1)',
               border: '1px solid var(--error)',
               fontSize: '14px',
               color: 'var(--error)',
@@ -316,7 +340,7 @@ export default function SubmitDecisionPage() {
                           textAlign: 'center',
                           cursor: 'pointer',
                           background: dragActive
-                            ? 'rgba(255, 255, 255, 0.06)'
+                            ? 'rgba(var(--success-rgb), 0.08)'
                             : 'var(--bg-secondary)',
                           transition: 'all 0.2s ease',
                         }}

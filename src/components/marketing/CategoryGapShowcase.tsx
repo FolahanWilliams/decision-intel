@@ -434,6 +434,15 @@ export function CategoryGapShowcase() {
           .category-gap-tabs::-webkit-scrollbar { display: none; }
           .category-gap-tab { flex: 0 0 auto !important; min-width: 220px; }
         }
+        @media (max-width: 639px) {
+          .causal-selection-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .framework-citation-grid {
+            grid-template-columns: 1fr !important;
+            gap: 4px !important;
+          }
+        }
       `}</style>
 
       <div style={{ maxWidth: 1180, margin: '0 auto' }}>
@@ -1124,6 +1133,7 @@ function CausalGraphVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
               </button>
             </div>
             <div
+              className="causal-selection-grid"
               style={{
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr',
@@ -1292,10 +1302,13 @@ function ClosedLoopFlywheelVizImpl({ reducedMotion }: { reducedMotion: boolean }
   const [pausedStage, setPausedStage] = useState<FlywheelStage['id'] | null>(null);
   const paused = pausedStage !== null || reducedMotion;
 
-  const size = 360;
+  // viewBox deliberately wider than the orbit + label distance so the
+  // outside-orbit stage labels never clip when the SVG scales down to a
+  // sub-400px mobile container.
+  const size = 380;
   const cx = size / 2;
   const cy = size / 2;
-  const orbit = 118;
+  const orbit = 100;
   const stageAngle = (i: number) => (i / FLYWHEEL_STAGES.length) * 2 * Math.PI - Math.PI / 2;
   const stagePos = (i: number) => ({
     x: cx + Math.cos(stageAngle(i)) * orbit,
@@ -1374,9 +1387,9 @@ function ClosedLoopFlywheelVizImpl({ reducedMotion }: { reducedMotion: boolean }
         <svg
           viewBox={`0 0 ${size} ${size}`}
           width="100%"
-          style={{ display: 'block', maxWidth: 420, margin: '0 auto' }}
+          style={{ display: 'block', maxWidth: 420, margin: '0 auto', overflow: 'visible' }}
           role="img"
-          aria-label="Outcome flywheel: audit, commit, detect outcome, calibrate — rotating."
+          aria-label="Outcome flywheel: audit, commit, detect outcome, calibrate, rotating."
         >
           <defs>
             <marker
@@ -1543,9 +1556,9 @@ function ClosedLoopFlywheelVizImpl({ reducedMotion }: { reducedMotion: boolean }
                   };
                   return (
                     <foreignObject
-                      x={outside.x - 60}
+                      x={outside.x - 50}
                       y={outside.y - 18}
-                      width={120}
+                      width={100}
                       height={40}
                     >
                       <div
@@ -2102,6 +2115,7 @@ function GovernanceMemoVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
                 {selected.hits.map(hit => (
                   <div
                     key={hit.code}
+                    className="framework-citation-grid"
                     style={{
                       display: 'grid',
                       gridTemplateColumns: '110px 1fr',

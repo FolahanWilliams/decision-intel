@@ -32,16 +32,36 @@ const PAGE_TABS = [
   { key: 'rooms', label: 'Decision Rooms', icon: <Vote size={15} /> },
 ];
 
+/** Meeting-processing status badges, wired to severity RGB tokens so the
+ *  tint follows the active theme. Previously ran on raw rgba() triplets
+ *  which drifted from the rest of the platform once the severity ramp
+ *  changed in globals.css. */
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  uploading: { label: 'Uploading', color: 'var(--text-muted)', bg: 'rgba(148,163,184,0.1)' },
+  uploading: {
+    label: 'Uploading',
+    color: 'var(--text-muted)',
+    bg: 'var(--bg-tertiary)',
+  },
   transcribing: {
     label: 'Transcribing',
-    color: 'var(--accent-primary)',
-    bg: 'rgba(249,115,22,0.1)',
+    color: 'var(--info)',
+    bg: 'rgba(var(--info-rgb), 0.12)',
   },
-  analyzing: { label: 'Analyzing', color: 'var(--warning)', bg: 'rgba(245,158,11,0.1)' },
-  complete: { label: 'Complete', color: 'var(--success)', bg: 'rgba(34,197,94,0.1)' },
-  error: { label: 'Error', color: 'var(--error)', bg: 'rgba(239,68,68,0.1)' },
+  analyzing: {
+    label: 'Analyzing',
+    color: 'var(--warning)',
+    bg: 'rgba(var(--warning-rgb), 0.12)',
+  },
+  complete: {
+    label: 'Complete',
+    color: 'var(--success)',
+    bg: 'rgba(var(--success-rgb), 0.12)',
+  },
+  error: {
+    label: 'Error',
+    color: 'var(--error)',
+    bg: 'rgba(var(--error-rgb), 0.12)',
+  },
 };
 
 const MEETING_TYPE_LABELS: Record<string, string> = {
