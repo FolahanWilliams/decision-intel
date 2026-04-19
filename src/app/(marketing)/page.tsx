@@ -698,6 +698,351 @@ export default function LandingPage() {
         </section>
       </Reveal>
 
+      {/* ── What we replace — before/after framing ──────────────────── */}
+      <Reveal repeat>
+        <section
+          id="what-we-replace"
+          style={{ background: C.slate50, borderTop: `1px solid ${C.slate200}` }}
+        >
+          <div
+            style={{
+              maxWidth: 1200,
+              margin: '0 auto',
+              padding: '96px 24px',
+            }}
+          >
+            <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
+              <p
+                style={{
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: C.green,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.14em',
+                  marginBottom: 10,
+                }}
+              >
+                What we replace
+              </p>
+              <h2
+                style={{
+                  fontSize: 'clamp(30px, 4.2vw, 42px)',
+                  fontWeight: 800,
+                  color: C.slate900,
+                  marginBottom: 18,
+                  letterSpacing: '-0.02em',
+                  maxWidth: 820,
+                  lineHeight: 1.1,
+                }}
+              >
+                One governed system in place of four broken ones.
+              </h2>
+              <p
+                style={{
+                  fontSize: 17,
+                  color: C.slate600,
+                  lineHeight: 1.6,
+                  maxWidth: 720,
+                  marginBottom: 48,
+                }}
+              >
+                Decision Intel doesn&rsquo;t add a tool to your stack &mdash; it retires the
+                patchwork of workarounds your strategy team uses to compensate for the fact that
+                judgment has never had a governance layer.
+              </p>
+            </motion.div>
+
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 56px 1fr',
+                gap: 16,
+                alignItems: 'stretch',
+              }}
+              className="replace-grid"
+            >
+              {/* Before panel */}
+              <motion.div
+                {...fadeIn}
+                transition={{ duration: 0.5 }}
+                style={{
+                  background: C.white,
+                  border: `1px solid ${C.slate200}`,
+                  borderRadius: 16,
+                  padding: '28px 28px 24px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 14,
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 800,
+                    color: C.slate500,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.12em',
+                    marginBottom: 2,
+                  }}
+                >
+                  Before &middot; today&rsquo;s stack
+                </div>
+                <h3
+                  style={{
+                    fontSize: 20,
+                    fontWeight: 800,
+                    color: C.slate900,
+                    margin: 0,
+                    letterSpacing: '-0.015em',
+                    lineHeight: 1.3,
+                  }}
+                >
+                  Four tools, zero governance.
+                </h3>
+                <ul
+                  style={{
+                    listStyle: 'none',
+                    padding: 0,
+                    margin: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 12,
+                  }}
+                >
+                  {[
+                    {
+                      label: 'Gut calls under deadline pressure',
+                      sub: 'No record of the reasoning, no way to audit it later.',
+                    },
+                    {
+                      label: '40-page consulting decks',
+                      sub: 'Expensive, not repeatable, and gone the next quarter.',
+                    },
+                    {
+                      label: 'Post-mortems that never compound',
+                      sub: 'Lessons live in one analyst&rsquo;s laptop, then churn out.',
+                    },
+                    {
+                      label: 'BI dashboards that ignore the memo',
+                      sub: 'Data has governance; the reasoning on top of it does not.',
+                    },
+                  ].map(item => (
+                    <li
+                      key={item.label}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: 12,
+                      }}
+                    >
+                      <span
+                        aria-hidden
+                        style={{
+                          width: 18,
+                          height: 18,
+                          borderRadius: 9,
+                          background: '#FEE2E2',
+                          color: '#DC2626',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                          fontWeight: 800,
+                          fontSize: 12,
+                          marginTop: 1,
+                        }}
+                      >
+                        ×
+                      </span>
+                      <div style={{ minWidth: 0 }}>
+                        <div
+                          style={{
+                            fontSize: 14.5,
+                            fontWeight: 700,
+                            color: C.slate900,
+                            lineHeight: 1.35,
+                          }}
+                        >
+                          {item.label}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 13,
+                            color: C.slate500,
+                            marginTop: 2,
+                            lineHeight: 1.5,
+                          }}
+                          dangerouslySetInnerHTML={{ __html: item.sub }}
+                        />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+
+              {/* Arrow */}
+              <div
+                className="replace-arrow"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <div
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 22,
+                    background: C.green,
+                    color: C.white,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 8px 22px rgba(22,163,74,0.32)',
+                  }}
+                >
+                  <ArrowRight size={22} />
+                </div>
+              </div>
+
+              {/* After panel */}
+              <motion.div
+                {...fadeIn}
+                transition={{ duration: 0.5, delay: 0.08 }}
+                style={{
+                  background: C.white,
+                  border: `2px solid ${C.green}`,
+                  borderRadius: 16,
+                  padding: '28px 28px 24px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 14,
+                  boxShadow: '0 14px 40px rgba(22,163,74,0.12)',
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 800,
+                    color: C.green,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.12em',
+                    marginBottom: 2,
+                  }}
+                >
+                  After &middot; with Decision Intel
+                </div>
+                <h3
+                  style={{
+                    fontSize: 20,
+                    fontWeight: 800,
+                    color: C.slate900,
+                    margin: 0,
+                    letterSpacing: '-0.015em',
+                    lineHeight: 1.3,
+                  }}
+                >
+                  One governed system that scores, simulates, and compounds.
+                </h3>
+                <ul
+                  style={{
+                    listStyle: 'none',
+                    padding: 0,
+                    margin: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 12,
+                  }}
+                >
+                  {[
+                    {
+                      label: 'Every memo scored and auditable',
+                      sub: 'DQI + evidence trail for your CEO, board, or parent company.',
+                    },
+                    {
+                      label: 'Consulting-grade rigour, in 60 seconds',
+                      sub: 'A fraction of a single engagement, and it gets sharper every quarter.',
+                    },
+                    {
+                      label: 'Lessons compound in the Decision Knowledge Graph',
+                      sub: 'Every call connects to its closest historical analog. Nothing leaks.',
+                    },
+                    {
+                      label: 'Governance on the reasoning, not just the data',
+                      sub: 'Counterfactuals, AI boardroom, outcome loop &mdash; all on the memo itself.',
+                    },
+                  ].map(item => (
+                    <li
+                      key={item.label}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: 12,
+                      }}
+                    >
+                      <span
+                        aria-hidden
+                        style={{
+                          width: 18,
+                          height: 18,
+                          borderRadius: 9,
+                          background: C.greenLight,
+                          color: C.green,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                          marginTop: 1,
+                        }}
+                      >
+                        <Check size={11} strokeWidth={3} />
+                      </span>
+                      <div style={{ minWidth: 0 }}>
+                        <div
+                          style={{
+                            fontSize: 14.5,
+                            fontWeight: 700,
+                            color: C.slate900,
+                            lineHeight: 1.35,
+                          }}
+                        >
+                          {item.label}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 13,
+                            color: C.slate500,
+                            marginTop: 2,
+                            lineHeight: 1.5,
+                          }}
+                          dangerouslySetInnerHTML={{ __html: item.sub }}
+                        />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            </div>
+
+            {/* Mobile: stack vertically and rotate the arrow */}
+            <style>{`
+              @media (max-width: 880px) {
+                .replace-grid {
+                  grid-template-columns: 1fr !important;
+                  gap: 12px !important;
+                }
+                .replace-arrow {
+                  justify-self: center;
+                  transform: rotate(90deg);
+                  padding: 4px 0;
+                }
+              }
+            `}</style>
+          </div>
+        </section>
+      </Reveal>
+
       {/* ── Category-defining: three DI gaps only we close ──────────── */}
       <Reveal repeat>
         <CategoryGapShowcase />
