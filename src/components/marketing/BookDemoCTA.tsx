@@ -178,20 +178,32 @@ export function BookDemoCTA({
 
   // variant === 'hero'
   return (
-    <div
-      style={{
-        background: `linear-gradient(135deg, ${C.white} 0%, ${C.greenLight} 100%)`,
-        border: `1px solid ${C.greenBorder}`,
-        borderRadius: 20,
-        padding: 'clamp(24px, 4vw, 36px)',
-        boxShadow: '0 4px 24px rgba(22, 163, 74, 0.08)',
-        display: 'grid',
-        gridTemplateColumns: 'minmax(0, 1.4fr) minmax(0, 1fr)',
-        gap: 28,
-        alignItems: 'center',
-      }}
-      className="book-demo-hero-grid"
-    >
+    <>
+      <style>{`
+        @media (max-width: 759px) {
+          .book-demo-hero-grid {
+            grid-template-columns: 1fr !important;
+            gap: 20px !important;
+          }
+          .book-demo-hero-chips {
+            order: 2;
+          }
+        }
+      `}</style>
+      <div
+        style={{
+          background: `linear-gradient(135deg, ${C.white} 0%, ${C.greenLight} 100%)`,
+          border: `1px solid ${C.greenBorder}`,
+          borderRadius: 20,
+          padding: 'clamp(24px, 4vw, 36px)',
+          boxShadow: '0 4px 24px rgba(22, 163, 74, 0.08)',
+          display: 'grid',
+          gridTemplateColumns: 'minmax(0, 1.4fr) minmax(0, 1fr)',
+          gap: 28,
+          alignItems: 'center',
+        }}
+        className="book-demo-hero-grid"
+      >
       <div>
         <div
           style={{
@@ -320,7 +332,8 @@ export function BookDemoCTA({
           </li>
         ))}
       </ul>
-    </div>
+      </div>
+    </>
   );
 }
 
