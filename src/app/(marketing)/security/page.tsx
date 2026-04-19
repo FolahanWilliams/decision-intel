@@ -120,33 +120,61 @@ const FRAMEWORKS = [
   { code: 'LPOA', name: 'Limited Partnership Obligations', gates: 'Fund-level fiduciary dissent documentation.' },
 ];
 
-const ACCESS_CONTROLS = [
+type AccessAvailability = 'every_plan' | 'enterprise';
+
+interface AccessControl {
+  label: string;
+  availability: AccessAvailability;
+  body: string;
+}
+
+const ACCESS_CONTROLS: AccessControl[] = [
   {
     label: 'Google Workspace SSO',
-    status: 'shipped',
-    body: 'Available today on every plan via Supabase Auth. No password storage; sessions are server-signed.',
+    availability: 'every_plan',
+    body: 'Single sign-on via Google Workspace, live today on every plan. No password is ever stored; sessions are signed and rotated server-side.',
   },
   {
-    label: 'SAML 2.0 + OIDC SSO',
-    status: 'roadmap',
-    body: 'Okta / Azure AD / OneLogin / generic SAML / generic OIDC. Designed for Enterprise tier. See docs/plans/sso-saml.md for the scoped build.',
+    label: 'SAML 2.0 and OIDC single sign-on',
+    availability: 'enterprise',
+    body: 'Okta, Azure AD, OneLogin, Ping, JumpCloud, and generic SAML / OIDC. Your IT admin configures the connection from the admin console; typical setup is under 20 minutes from metadata paste to first login.',
   },
   {
-    label: 'Team session management',
-    status: 'roadmap',
-    body: 'Admin visibility into every active session across the org, force-logout, per-org idle timeout. See docs/plans/team-session-management.md.',
+    label: 'Org-wide session visibility',
+    availability: 'enterprise',
+    body: 'Admins see every active session across the organisation, can force-log-out a departing member in a single click, and can set a per-org idle timeout between 15 minutes and 8 hours.',
   },
   {
-    label: 'Admin-scoped audit log UI',
-    status: 'shipped',
-    body: 'Admins (ADMIN_USER_IDS) see the full AuditLog firehose with filters and CSV export at /dashboard/admin/audit-log.',
+    label: 'Admin audit log',
+    availability: 'every_plan',
+    body: 'Org admins review every action taken inside their workspace — who viewed which memo, who exported an Audit Defense Packet, who invited a new member — with filters, date range, and CSV export for downstream compliance tooling.',
   },
   {
     label: 'Per-org data isolation',
-    status: 'shipped',
-    body: 'Every Prisma query scopes on orgId. Decision Knowledge Graphs are org-private and never cross-read.',
+    availability: 'every_plan',
+    body: 'Every data access scopes on organisation. Your Decision Knowledge Graph, your audit trail, and your outcome history are strictly org-private and are never cross-read by any other tenant.',
   },
 ];
+
+const AVAILABILITY_STYLE: Record<
+  AccessAvailability,
+  { label: string; border: string; pillBg: string; pillBorder: string; pillText: string }
+> = {
+  every_plan: {
+    label: 'Available',
+    border: '#16A34A',
+    pillBg: 'rgba(22, 163, 74, 0.08)',
+    pillBorder: 'rgba(22, 163, 74, 0.25)',
+    pillText: '#16A34A',
+  },
+  enterprise: {
+    label: 'Enterprise',
+    border: '#0F172A',
+    pillBg: 'rgba(15, 23, 42, 0.06)',
+    pillBorder: 'rgba(15, 23, 42, 0.18)',
+    pillText: '#0F172A',
+  },
+};
 
 const PROCESSORS = [
   { name: 'Vercel', role: 'Application hosting + CDN', cert: 'SOC 2 Type II', region: 'US + EU' },
@@ -621,22 +649,22 @@ export default function SecurityPage() {
           <SectionHeader
             eyebrow="Access controls"
             title="Who gets in, and who sees what"
-            body="The controls shipped today, and the ones scoped for the next enterprise release."
+            body="What is available today across every plan, and what is unlocked on Enterprise."
           />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {ACCESS_CONTROLS.map(ctrl => {
-              const shipped = ctrl.status === 'shipped';
+              const style = AVAILABILITY_STYLE[ctrl.availability];
               return (
                 <div
                   key={ctrl.label}
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: '110px 1fr',
+                    gridTemplateColumns: '130px 1fr',
                     gap: 16,
                     padding: '16px 20px',
                     background: C.white,
                     border: `1px solid ${C.slate200}`,
-                    borderLeft: `3px solid ${shipped ? C.green : C.amber}`,
+                    borderLeft: `3px solid ${style.border}`,
                     borderRadius: 12,
                     alignItems: 'flex-start',
                   }}
@@ -653,15 +681,16 @@ export default function SecurityPage() {
                       textTransform: 'uppercase',
                       padding: '4px 10px',
                       borderRadius: 999,
-                      background: shipped ? C.greenSoft : C.amberSoft,
-                      color: shipped ? C.green : C.amber,
-                      border: `1px solid ${shipped ? C.greenBorder : C.amberBorder}`,
+                      background: style.pillBg,
+                      color: style.pillText,
+                      border: `1px solid ${style.pillBorder}`,
                       height: 22,
                       alignSelf: 'center',
                       justifySelf: 'start',
+                      whiteSpace: 'nowrap',
                     }}
                   >
-                    {shipped ? 'Shipped' : 'Roadmap'}
+                    {style.label}
                   </span>
                   <div>
                     <div
