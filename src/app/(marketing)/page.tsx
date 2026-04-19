@@ -5,11 +5,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { trackEvent } from '@/lib/analytics/track';
-import { CaseStudyCarousel } from '@/components/marketing/CaseStudyCarousel';
-import { HeroTabs } from '@/components/marketing/HeroTabs';
+import { HeroDecisionGraph } from '@/components/marketing/HeroDecisionGraph';
+import { HeroCounterfactualTease } from '@/components/marketing/HeroCounterfactualTease';
 import { PipelineLandingTeaser } from '@/components/marketing/how-it-works/PipelineLandingTeaser';
 import { OutcomeDetectionViz } from '@/components/marketing/how-it-works/OutcomeDetectionViz';
-import { CredibilityTrio } from '@/components/marketing/CredibilityTrio';
 import { CategoryGapShowcase } from '@/components/marketing/CategoryGapShowcase';
 import { BookDemoCTA } from '@/components/marketing/BookDemoCTA';
 import { CompetitorComparisonCard } from '@/components/marketing/CompetitorComparisonCard';
@@ -18,7 +17,6 @@ import { Reveal } from '@/components/ui/Reveal';
 import {
   Brain,
   FileSearch,
-  TrendingUp,
   ArrowRight,
   Menu,
   X,
@@ -26,9 +24,11 @@ import {
   BarChart3,
   Users,
   Shield,
-  Zap,
   Target,
-  AlertTriangle,
+  ShieldCheck,
+  FileCheck2,
+  Scale,
+  BookOpen,
 } from 'lucide-react';
 
 /* ─── Color Tokens ──────────────────────────────────────────────────────── */
@@ -248,32 +248,25 @@ export default function LandingPage() {
 
           {/* Desktop Nav */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 32 }} className="hidden-mobile">
-            {['Features', 'How It Works', 'Case Studies', 'Bias Genome', 'Pricing'].map(item => {
-              const href =
-                item === 'Case Studies'
-                  ? '/case-studies'
-                  : item === 'Bias Genome'
-                    ? '/bias-genome'
-                    : item === 'Pricing'
-                      ? '/pricing'
-                      : item === 'How It Works'
-                        ? '/how-it-works'
-                        : `#${item.toLowerCase().replace(/\s+/g, '-')}`;
-              return (
-                <a
-                  key={item}
-                  href={href}
-                  style={{
-                    fontSize: 14,
-                    color: '#CBD5E1',
-                    textDecoration: 'none',
-                    fontWeight: 500,
-                  }}
-                >
-                  {item}
-                </a>
-              );
-            })}
+            {[
+              { label: 'How It Works', href: '/how-it-works' },
+              { label: 'Proof', href: '/proof' },
+              { label: 'Bias Genome', href: '/bias-genome' },
+              { label: 'Pricing', href: '/pricing' },
+            ].map(item => (
+              <a
+                key={item.label}
+                href={item.href}
+                style={{
+                  fontSize: 14,
+                  color: '#CBD5E1',
+                  textDecoration: 'none',
+                  fontWeight: 500,
+                }}
+              >
+                {item.label}
+              </a>
+            ))}
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }} className="hidden-mobile">
@@ -327,33 +320,26 @@ export default function LandingPage() {
               gap: 12,
             }}
           >
-            {['Features', 'How It Works', 'Case Studies', 'Bias Genome', 'Pricing'].map(item => {
-              const href =
-                item === 'Case Studies'
-                  ? '/case-studies'
-                  : item === 'Bias Genome'
-                    ? '/bias-genome'
-                    : item === 'Pricing'
-                      ? '/pricing'
-                      : item === 'How It Works'
-                        ? '/how-it-works'
-                        : `#${item.toLowerCase().replace(/\s+/g, '-')}`;
-              return (
-                <a
-                  key={item}
-                  href={href}
-                  onClick={() => setMobileNavOpen(false)}
-                  style={{
-                    fontSize: 15,
-                    color: '#CBD5E1',
-                    textDecoration: 'none',
-                    padding: '8px 0',
-                  }}
-                >
-                  {item}
-                </a>
-              );
-            })}
+            {[
+              { label: 'How It Works', href: '/how-it-works' },
+              { label: 'Proof', href: '/proof' },
+              { label: 'Bias Genome', href: '/bias-genome' },
+              { label: 'Pricing', href: '/pricing' },
+            ].map(item => (
+              <a
+                key={item.label}
+                href={item.href}
+                onClick={() => setMobileNavOpen(false)}
+                style={{
+                  fontSize: 15,
+                  color: '#CBD5E1',
+                  textDecoration: 'none',
+                  padding: '8px 0',
+                }}
+              >
+                {item.label}
+              </a>
+            ))}
             <Link
               href="/login"
               style={{ fontSize: 15, color: '#CBD5E1', textDecoration: 'none', padding: '8px 0' }}
@@ -385,7 +371,7 @@ export default function LandingPage() {
       </nav>
 
       {/* ── Hero ────────────────────────────────────────────────────── */}
-      <section style={{ maxWidth: 1400, margin: '0 auto', padding: '80px 24px 60px' }}>
+      <section style={{ maxWidth: 1400, margin: '0 auto', padding: '88px 24px 64px' }}>
         <motion.div
           {...fadeIn}
           transition={{ duration: 0.5 }}
@@ -400,45 +386,47 @@ export default function LandingPage() {
           <div>
             <p
               style={{
-                fontSize: 13,
-                fontWeight: 600,
+                fontSize: 12,
+                fontWeight: 800,
                 color: C.green,
                 textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                marginBottom: 12,
+                letterSpacing: '0.14em',
+                marginBottom: 14,
               }}
             >
-              Decision auditing for corporate strategy
+              Decision Intelligence
             </p>
             <h1
               style={{
-                fontSize: 'clamp(30px, 5.5vw, 48px)',
-                fontWeight: 700,
+                fontSize: 'clamp(30px, 5.2vw, 52px)',
+                fontWeight: 800,
                 color: C.slate900,
-                lineHeight: 1.1,
-                letterSpacing: '-0.02em',
-                marginBottom: 20,
+                lineHeight: 1.08,
+                letterSpacing: '-0.025em',
+                marginBottom: 22,
               }}
             >
-              Catch the questions
-              <br />
-              <span style={{ color: C.green }}>that kill strategic decisions.</span>
+              The human-AI governance system for{' '}
+              <span style={{ color: C.green }}>strategic decisions.</span>
             </h1>
             <p
               style={{
                 fontSize: 18,
                 color: C.slate600,
-                lineHeight: 1.7,
-                marginBottom: 32,
-                maxWidth: 520,
+                lineHeight: 1.6,
+                marginBottom: 28,
+                maxWidth: 560,
               }}
             >
-              Months after the board signs off, your team finds the assumption that killed the
-              market entry, or the bias that drove the wrong acquisition. Decision Intel audits
-              every strategic memo for the cognitive gaps your team has normalized, in 60 seconds,
-              before the meeting that actually matters.
+              Decision Intel audits every board memo, simulates steering-committee objections, runs
+              what-if interventions, and compounds your team&rsquo;s judgment into a living Decision
+              Knowledge Graph&nbsp;&mdash; so decision quality, scalability, and reliability improve
+              quarter after quarter.
             </p>
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            <div style={{ marginBottom: 22 }}>
+              <HeroCounterfactualTease />
+            </div>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
               <Link
                 href="/demo"
                 onClick={() => trackEvent('hero_try_demo_clicked')}
@@ -447,70 +435,41 @@ export default function LandingPage() {
                   alignItems: 'center',
                   gap: 8,
                   fontSize: 15,
-                  fontWeight: 600,
+                  fontWeight: 700,
                   color: C.white,
                   background: C.green,
-                  padding: '12px 24px',
+                  padding: '13px 26px',
                   borderRadius: 10,
                   textDecoration: 'none',
+                  boxShadow: '0 6px 20px rgba(22,163,74,0.28)',
                 }}
               >
-                Audit your next strategic memo <ArrowRight size={16} />
+                One free audit &mdash; paste your memo <ArrowRight size={16} />
               </Link>
               <Link
-                href="/case-studies"
+                href="/how-it-works"
+                onClick={() => trackEvent('hero_how_it_works_clicked')}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: 8,
-                  fontSize: 15,
+                  gap: 6,
+                  fontSize: 14,
                   fontWeight: 600,
-                  color: C.slate900,
-                  background: C.white,
-                  padding: '12px 24px',
-                  borderRadius: 10,
-                  border: `1px solid ${C.slate200}`,
+                  color: C.slate600,
                   textDecoration: 'none',
+                  padding: '13px 8px',
                 }}
               >
-                See a live bias case study
+                How it works <ArrowRight size={14} />
               </Link>
             </div>
-            <div
-              style={{
-                marginTop: 28,
-                padding: '16px 20px',
-                borderLeft: `3px solid ${C.green}`,
-                background: C.greenLight,
-                borderRadius: 6,
-                maxWidth: 520,
-              }}
-            >
-              <div
-                style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: C.green,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px',
-                  marginBottom: 6,
-                }}
-              >
-                The job you&rsquo;re hiring us for
-              </div>
-              <p style={{ fontSize: 14, color: C.slate600, lineHeight: 1.6, margin: 0 }}>
-                The night before the steering committee reviews the strategic memo your team has
-                worked on for months: what question is this paper not asking? What did teams in
-                comparable situations get wrong, and did we just repeat it?
-              </p>
-            </div>
           </div>
-          {/* Hero Tabs — Loss aversion chart + Decision knowledge graph */}
-          <HeroTabs />
+          {/* Single clean visual: 3D Decision Knowledge Graph (WeWork S-1 sample) */}
+          <HeroDecisionGraph />
         </motion.div>
       </section>
 
-      {/* ── Stats Bar ───────────────────────────────────────────────── */}
+      {/* ── Trust strip (compliance-only, no fabricated logos) ──────── */}
       <section
         style={{
           background: C.slate50,
@@ -522,104 +481,40 @@ export default function LandingPage() {
           style={{
             maxWidth: 1200,
             margin: '0 auto',
-            padding: '48px 24px',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: 24,
-            textAlign: 'center',
+            padding: '20px 24px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 28,
+            rowGap: 12,
           }}
-          className="stats-grid"
+          className="trust-strip"
         >
           {[
-            {
-              icon: BarChart3,
-              value: '55%',
-              label: 'Of your decision risk is invisible to your team',
-              sub: 'Kahneman, "Noise" (2021)',
-              href: null as string | null,
-            },
-            {
-              icon: AlertTriangle,
-              value: '$1.3T',
-              label: 'Lost annually to decisions nobody audits',
-              sub: 'McKinsey, Malmendier & Tate',
-              href: null as string | null,
-            },
-            {
-              icon: TrendingUp,
-              value: '135',
-              label: 'Preventable failures we reverse-engineered',
-              sub: '8 industries, SEC filings & NTSB reports',
-              href: '/case-studies' as string | null,
-            },
-            {
-              icon: Zap,
-              value: '<60s',
-              label: 'To find what your team missed',
-              sub: 'From strategic memo to measurable risk signal',
-              href: null as string | null,
-            },
-          ].map(({ icon: Icon, value, label, sub, href }) => {
-            const content = (
-              <>
-                <div
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 10,
-                    background: C.tealBg,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                  }}
-                >
-                  <Icon size={18} style={{ color: C.teal }} />
-                </div>
-                <div style={{ textAlign: 'left', minWidth: 0 }}>
-                  <div style={{ fontSize: 28, fontWeight: 800, color: C.slate900, lineHeight: 1 }}>
-                    {value}
-                  </div>
-                  <div style={{ fontSize: 12, color: C.slate600, marginTop: 2, lineHeight: 1.4 }}>
-                    {label}
-                  </div>
-                  <div style={{ fontSize: 10, color: C.slate400, marginTop: 1 }}>{sub}</div>
-                </div>
-              </>
-            );
-            const baseStyle = {
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-            } as const;
-            if (href) {
-              return (
-                <Link
-                  key={label}
-                  href={href}
-                  onClick={() => trackEvent('stats_chip_click', { href })}
-                  style={{ ...baseStyle, textDecoration: 'none', color: 'inherit' }}
-                >
-                  {content}
-                </Link>
-              );
-            }
-            return (
-              <div key={label} style={baseStyle}>
-                {content}
-              </div>
-            );
-          })}
+            { Icon: ShieldCheck, label: 'SOC 2 ready' },
+            { Icon: FileCheck2, label: 'GDPR + EU AI Act mapped' },
+            { Icon: BookOpen, label: '135-case public reference library' },
+            { Icon: Scale, label: 'Advised by operators who built Wiz to $32B' },
+          ].map(({ Icon, label }) => (
+            <div
+              key={label}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                fontSize: 12.5,
+                fontWeight: 600,
+                color: C.slate600,
+                letterSpacing: '0.01em',
+              }}
+            >
+              <Icon size={14} style={{ color: C.green, flexShrink: 0 }} />
+              {label}
+            </div>
+          ))}
         </div>
       </section>
-
-      {/* ── Case Study Carousel ─────────────────────────────────────── */}
-      <CaseStudyCarousel />
-
-      {/* ── Credibility trio (Proof / Bias Genome / Privacy) ────────── */}
-      <Reveal repeat>
-        <CredibilityTrio />
-      </Reveal>
 
       {/* ── Four Moments (core value proposition) ───────────────────── */}
       <Reveal repeat>
