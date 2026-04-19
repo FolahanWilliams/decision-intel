@@ -278,7 +278,7 @@ export function PricingPageClient() {
   const handleContact = () => {
     trackEvent('pricing_page_cta_clicked', { tier: 'enterprise', cycle: 'n/a' });
     window.location.href =
-      'mailto:folahanwilliams@gmail.com?subject=Decision%20Intel%20Enterprise%20Inquiry';
+      'mailto:team@decision-intel.com?subject=Decision%20Intel%20Enterprise%20Inquiry';
   };
 
   return (
