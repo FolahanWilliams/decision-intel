@@ -50,10 +50,14 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   custom: <Brain size={18} />,
 };
 
+/** Risk-tolerance accent colours driven by severity tokens so the
+ *  palette follows both themes and matches the rest of the platform
+ *  (previously shipped as raw hex, which broke the dark-theme severity
+ *  ramp and made Playbooks read hotter than any other surface). */
 const RISK_COLORS: Record<string, string> = {
-  conservative: '#ef4444',
-  moderate: '#f59e0b',
-  aggressive: '#22c55e',
+  conservative: 'var(--error)',
+  moderate: 'var(--warning)',
+  aggressive: 'var(--success)',
 };
 
 function PlaybooksPageContent() {
@@ -172,9 +176,9 @@ function PlaybooksPageContent() {
             padding: '6px 14px',
             borderRadius: 20,
             border: '1px solid',
-            borderColor: !selectedCategory ? 'var(--accent)' : 'var(--border)',
-            background: !selectedCategory ? 'var(--accent)' : 'transparent',
-            color: !selectedCategory ? '#fff' : 'var(--text-secondary)',
+            borderColor: !selectedCategory ? 'var(--accent-primary)' : 'var(--border-color)',
+            background: !selectedCategory ? 'var(--accent-primary)' : 'transparent',
+            color: !selectedCategory ? 'var(--text-on-accent, #fff)' : 'var(--text-secondary)',
             fontSize: 12,
             fontWeight: 500,
             cursor: 'pointer',
@@ -190,9 +194,9 @@ function PlaybooksPageContent() {
               padding: '6px 14px',
               borderRadius: 20,
               border: '1px solid',
-              borderColor: selectedCategory === cat.value ? 'var(--accent)' : 'var(--border)',
-              background: selectedCategory === cat.value ? 'var(--accent)' : 'transparent',
-              color: selectedCategory === cat.value ? '#fff' : 'var(--text-secondary)',
+              borderColor: selectedCategory === cat.value ? 'var(--accent-primary)' : 'var(--border-color)',
+              background: selectedCategory === cat.value ? 'var(--accent-primary)' : 'transparent',
+              color: selectedCategory === cat.value ? 'var(--text-on-accent, #fff)' : 'var(--text-secondary)',
               fontSize: 12,
               fontWeight: 500,
               cursor: 'pointer',
@@ -222,7 +226,7 @@ function PlaybooksPageContent() {
               key={pb.id}
               style={{
                 background: 'var(--bg-secondary)',
-                border: '1px solid var(--border)',
+                border: '1px solid var(--border-color)',
                 borderRadius: 10,
                 overflow: 'hidden',
                 transition: 'border-color 0.15s',
@@ -252,7 +256,7 @@ function PlaybooksPageContent() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: 'var(--accent)',
+                    color: 'var(--accent-primary)',
                     flexShrink: 0,
                   }}
                 >
@@ -307,7 +311,7 @@ function PlaybooksPageContent() {
                 <div
                   style={{
                     padding: '0 16px 16px',
-                    borderTop: '1px solid var(--border)',
+                    borderTop: '1px solid var(--border-color)',
                   }}
                 >
                   {/* Bias Focus */}
@@ -333,9 +337,9 @@ function PlaybooksPageContent() {
                               fontSize: 11,
                               padding: '3px 8px',
                               borderRadius: 4,
-                              background: 'rgba(239, 68, 68, 0.08)',
-                              color: '#f87171',
-                              border: '1px solid rgba(239, 68, 68, 0.15)',
+                              background: 'rgba(var(--error-rgb), 0.08)',
+                              color: 'var(--error)',
+                              border: '1px solid rgba(var(--error-rgb), 0.2)',
                             }}
                           >
                             {bias.replace(/_/g, ' ')}
@@ -406,7 +410,7 @@ function PlaybooksPageContent() {
                               padding: '6px 10px',
                               borderRadius: 6,
                               background: 'var(--bg-primary)',
-                              border: '1px solid var(--border)',
+                              border: '1px solid var(--border-color)',
                             }}
                           >
                             <div
@@ -472,9 +476,9 @@ function PlaybooksPageContent() {
                           fontSize: 12,
                           padding: '6px 12px',
                           borderRadius: 6,
-                          border: '1px solid rgba(239, 68, 68, 0.3)',
+                          border: '1px solid rgba(var(--error-rgb), 0.35)',
                           background: 'transparent',
-                          color: '#ef4444',
+                          color: 'var(--error)',
                           cursor: 'pointer',
                         }}
                       >
@@ -511,22 +515,15 @@ function PlaybooksPageContent() {
       {/* Create Modal */}
       {showCreate && (
         <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0,0,0,0.6)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000,
-          }}
+          className="modal-backdrop"
+          style={{ zIndex: 1000 }}
           onClick={() => setShowCreate(false)}
         >
           <div
             onClick={e => e.stopPropagation()}
             style={{
               background: 'var(--bg-secondary)',
-              border: '1px solid var(--border)',
+              border: '1px solid var(--border-color)',
               borderRadius: 12,
               padding: 24,
               width: '100%',
@@ -581,7 +578,7 @@ function PlaybooksPageContent() {
                     width: '100%',
                     padding: '8px 12px',
                     borderRadius: 6,
-                    border: '1px solid var(--border)',
+                    border: '1px solid var(--border-color)',
                     background: 'var(--bg-primary)',
                     color: 'var(--text-primary)',
                     fontSize: 13,
@@ -610,7 +607,7 @@ function PlaybooksPageContent() {
                     width: '100%',
                     padding: '8px 12px',
                     borderRadius: 6,
-                    border: '1px solid var(--border)',
+                    border: '1px solid var(--border-color)',
                     background: 'var(--bg-primary)',
                     color: 'var(--text-primary)',
                     fontSize: 13,
@@ -638,7 +635,7 @@ function PlaybooksPageContent() {
                     width: '100%',
                     padding: '8px 12px',
                     borderRadius: 6,
-                    border: '1px solid var(--border)',
+                    border: '1px solid var(--border-color)',
                     background: 'var(--bg-primary)',
                     color: 'var(--text-primary)',
                     fontSize: 13,
@@ -672,7 +669,7 @@ function PlaybooksPageContent() {
                     width: '100%',
                     padding: '8px 12px',
                     borderRadius: 6,
-                    border: '1px solid var(--border)',
+                    border: '1px solid var(--border-color)',
                     background: 'var(--bg-primary)',
                     color: 'var(--text-primary)',
                     fontSize: 13,
@@ -687,7 +684,7 @@ function PlaybooksPageContent() {
                 style={{
                   padding: '8px 16px',
                   borderRadius: 6,
-                  border: '1px solid var(--border)',
+                  border: '1px solid var(--border-color)',
                   background: 'transparent',
                   color: 'var(--text-secondary)',
                   fontSize: 13,
@@ -706,8 +703,8 @@ function PlaybooksPageContent() {
                   padding: '8px 16px',
                   borderRadius: 6,
                   border: 'none',
-                  background: 'var(--accent)',
-                  color: '#fff',
+                  background: 'var(--accent-primary)',
+                  color: 'var(--text-on-accent, #fff)',
                   fontSize: 13,
                   fontWeight: 600,
                   cursor: creating ? 'wait' : 'pointer',
