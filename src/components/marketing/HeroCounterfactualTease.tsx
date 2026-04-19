@@ -46,6 +46,7 @@ export function HeroCounterfactualTease() {
     <div
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
+      className="hero-counterfactual-tease"
       style={{
         display: 'inline-flex',
         alignItems: 'center',
@@ -92,9 +93,26 @@ export function HeroCounterfactualTease() {
           <span style={{ color: '#475569', fontWeight: 500 }}>Remove {current.bias}</span>
           <span style={{ color: '#94A3B8' }}>→</span>
           <span style={{ color: '#16A34A', fontWeight: 700 }}>{current.lift}</span>
-          <span style={{ color: '#475569', fontWeight: 500 }}>{current.label}</span>
+          <span
+            className="hero-counterfactual-tease__label"
+            style={{ color: '#475569', fontWeight: 500 }}
+          >
+            {current.label}
+          </span>
         </motion.span>
       </AnimatePresence>
+      <style jsx>{`
+        @media (max-width: 480px) {
+          :global(.hero-counterfactual-tease) {
+            font-size: 11.5px !important;
+            padding: 7px 11px !important;
+            gap: 6px !important;
+          }
+          :global(.hero-counterfactual-tease__label) {
+            display: none;
+          }
+        }
+      `}</style>
     </div>
   );
 }

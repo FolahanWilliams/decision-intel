@@ -200,7 +200,7 @@ export default function LandingPage() {
   };
 
   return (
-    <div style={{ background: C.white, color: C.slate900 }}>
+    <div style={{ background: C.white, color: C.slate900, overflowX: 'hidden' }}>
       {/* ── Navigation ──────────────────────────────────────────────── */}
       <nav
         style={{
