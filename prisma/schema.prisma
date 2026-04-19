@@ -18,6 +18,10 @@ model Document {
   contentEncrypted String?             @db.Text
   contentIv        String?
   contentTag       String?
+  /// Key-rotation version stamp. Null = legacy (v1). Populated by new
+  /// writes and by the rotate:encryption-key CLI. See
+  /// src/lib/utils/encryption.ts for the protocol.
+  contentKeyVersion Int?
   uploadedAt       DateTime            @default(now())
   status           String              @default("pending")
   updatedAt        DateTime            @updatedAt
@@ -327,6 +331,9 @@ model SlackInstallation {
   botTokenEncrypted String
   botTokenIv        String
   botTokenTag       String
+  /// Key-rotation version stamp. Null = legacy (v1). See
+  /// src/lib/utils/encryption.ts for the protocol.
+  botTokenKeyVersion Int?
   botUserId         String?
   scopes            String[]
   monitoredChannels String[]  @default([])
