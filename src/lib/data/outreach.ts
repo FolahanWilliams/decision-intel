@@ -1116,7 +1116,7 @@ export const DEAL_CLOSER_DOCS: DealCloserDoc[] = [
       },
     ],
     footer:
-      'Founder-friendly, one-page, non-exclusive. · decision-intel.com · folahanwilliams@gmail.com',
+      'Founder-friendly, one-page, non-exclusive. · decision-intel.com · team@decision-intel.com',
   },
 ];
 

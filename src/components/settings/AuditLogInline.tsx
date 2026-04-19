@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import {
   ShieldCheck,
+  ShieldAlert,
   Download,
   Search,
   FileText,
@@ -30,6 +31,11 @@ const ACTION_ICONS: Record<string, React.ReactNode> = {
 export function AuditLogInline() {
   const [logs, setLogs] = useState<AuditEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  // Check admin status once on mount so the org-wide firehose shortcut
+  // only renders for ADMIN_USER_IDS users. 401 / 403 / non-admin responses
+  // all resolve to `false` — the link stays hidden and non-admins never
+  // see an affordance they couldn't use.
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     fetch('/api/audit?limit=15')
@@ -37,6 +43,13 @@ export function AuditLogInline() {
       .then(data => setLogs(data.logs || []))
       .catch(() => setLogs([]))
       .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/admin/is-admin')
+      .then(r => (r.ok ? r.json() : { isAdmin: false }))
+      .then(data => setIsAdmin(!!data.isAdmin))
+      .catch(() => setIsAdmin(false));
   }, []);
 
   if (loading) {
@@ -125,6 +138,30 @@ export function AuditLogInline() {
           >
             View Full Audit Log
           </Link>
+
+          {isAdmin && (
+            <Link
+              href="/dashboard/admin/audit-log"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                marginTop: 8,
+                padding: 10,
+                fontSize: 13,
+                fontWeight: 700,
+                color: 'var(--accent-primary)',
+                textDecoration: 'none',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid rgba(var(--success-rgb), 0.3)',
+                background: 'rgba(var(--success-rgb), 0.06)',
+              }}
+            >
+              <ShieldAlert size={14} />
+              View org-wide audit log (admin)
+            </Link>
+          )}
         </div>
       </div>
     </div>

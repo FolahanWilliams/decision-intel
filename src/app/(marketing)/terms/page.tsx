@@ -247,10 +247,10 @@ export default function TermsOfServicePage() {
             <p>
               For questions about these Terms, contact us at:{' '}
               <a
-                href="mailto:folahanwilliams@gmail.com"
+                href="mailto:team@decision-intel.com"
                 style={{ color: '#FFFFFF', textDecoration: 'underline' }}
               >
-                folahanwilliams@gmail.com
+                team@decision-intel.com
               </a>
             </p>
           </section>

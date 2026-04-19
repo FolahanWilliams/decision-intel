@@ -548,6 +548,16 @@ model DecisionOutcome {
   confirmedBiases    String[]
   falsPositiveBiases String[]
   mostAccurateTwin   String?
+  /// Brier score between predicted DQI and actual outcome. Lower is
+  /// better calibrated (0 = perfect, 1 = worst). Nullable for rows
+  /// created before brier-scoring.ts shipped; populated on every
+  /// outcome submission going forward. See src/lib/learning/brier-scoring.ts.
+  brierScore         Float?
+  /// Categorical calibration label derived from brierScore — 'excellent'
+  /// (<= 0.10), 'good' (<= 0.20), 'fair' (<= 0.35), 'poor' (> 0.35).
+  /// Stored alongside the raw score so filter / analytics queries don't
+  /// have to recompute the bucket every read.
+  brierCategory      String?
   reportedAt         DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
@@ -561,6 +571,10 @@ model DecisionOutcome {
   @@index([reportedAt])
   @@index([userId, reportedAt])
   @@index([orgId, reportedAt])
+  /// Dedicated index for per-org Brier trend queries — the outcome
+  /// flywheel surface groups by reportedAt month and averages
+  /// brierScore, so this composite index is the hot path.
+  @@index([orgId, brierScore])
 }
 
 model BoardroomPersona {

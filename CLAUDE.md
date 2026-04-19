@@ -65,6 +65,8 @@ Decision Intel is a decision intelligence platform for corporate strategy teams.
 - **UI:** Tailwind CSS 4 + shadcn/ui + Lucide icons + Framer Motion
 - **Auth:** Supabase Auth (Google OAuth)
 - **Payments:** Stripe (subscriptions + per-deal audit pricing)
+- **DNS + inbound email:** Cloudflare. Email Routing forwards every `*@decision-intel.com` address to the founder's personal Gmail (e.g. `security@decision-intel.com` → `folahanwilliams@gmail.com`).
+- **Outbound SMTP:** Resend (`smtp.resend.com:465`, username `resend`, password = a Resend API key). Used by Supabase Auth for password-reset / magic-link / confirm emails, and by any Gmail "Send mail as" identity replying from `*@decision-intel.com`. Resend's `decision-intel.com` domain is verified with SPF + DKIM records living in Cloudflare DNS — when adding new DNS, leave those untouched.
 - **Deployment:** Vercel (serverless)
 - **Monitoring:** Sentry + custom AuditLog + structured logging
 

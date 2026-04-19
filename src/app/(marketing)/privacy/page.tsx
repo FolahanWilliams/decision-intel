@@ -293,7 +293,7 @@ export default function PrivacyPage() {
                   Your GDPR rights
                 </a>
                 <a
-                  href="mailto:folahanwilliams@gmail.com"
+                  href="mailto:team@decision-intel.com"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -661,10 +661,10 @@ export default function PrivacyPage() {
             <span>
               To exercise any right, email{' '}
               <a
-                href="mailto:folahanwilliams@gmail.com"
+                href="mailto:team@decision-intel.com"
                 style={{ color: C.slate900, fontWeight: 600 }}
               >
-                folahanwilliams@gmail.com
+                team@decision-intel.com
               </a>
               . We respond within 30 days.
             </span>
@@ -765,10 +765,10 @@ export default function PrivacyPage() {
                 <>
                   Privacy questions, complaints, or rights requests:{' '}
                   <a
-                    href="mailto:folahanwilliams@gmail.com"
+                    href="mailto:team@decision-intel.com"
                     style={{ color: C.slate900, fontWeight: 600 }}
                   >
-                    folahanwilliams@gmail.com
+                    team@decision-intel.com
                   </a>
                 </>
               }

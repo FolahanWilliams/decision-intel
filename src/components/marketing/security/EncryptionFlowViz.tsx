@@ -85,6 +85,12 @@ export function EncryptionFlowViz() {
         boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.03)',
       }}
     >
+      <style>{`
+        @media (max-width: 419px) {
+          .encryption-flow-stage-label { font-size: 10px !important; }
+          .encryption-flow-stage-sub { font-size: 9px !important; }
+        }
+      `}</style>
       {/* Header */}
       <div
         style={{
@@ -203,22 +209,26 @@ export function EncryptionFlowViz() {
                 />
               </motion.div>
               <div
+                className="encryption-flow-stage-label"
                 style={{
                   fontSize: 11,
                   fontWeight: 700,
                   color: isActive ? C.green : C.slate900,
                   textAlign: 'center',
                   lineHeight: 1.25,
+                  wordBreak: 'break-word',
                 }}
               >
                 {stage.label}
               </div>
               <div
+                className="encryption-flow-stage-sub"
                 style={{
                   fontSize: 9.5,
                   color: C.slate500,
                   textAlign: 'center',
                   lineHeight: 1.3,
+                  wordBreak: 'break-word',
                   fontFamily:
                     stage.sub === 'AES-256-GCM' || stage.sub === 'keyVersion stamp'
                       ? 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace'
@@ -240,6 +250,8 @@ export function EncryptionFlowViz() {
           lineHeight: 1.55,
           borderTop: `1px solid ${C.slate100}`,
           paddingTop: 12,
+          wordBreak: 'break-word',
+          overflowWrap: 'anywhere',
         }}
       >
         Every row in the encrypted columns carries a <code

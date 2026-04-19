@@ -538,7 +538,7 @@ export const DI_GAPS: DiGap[] = [
     evidence:
       "Tetlock's 20-year Good Judgment Project showed forecasting skill is trainable only when judgments are scored against actual outcomes with a proper scoring rule. Without a closed loop, decision-support tools cannot sharpen, by construction.",
     diApproach:
-      'Decision Intel closes the loop automatically. Outcomes are detected passively across Slack, Drive, and email; each detection scores the original prediction with a Brier score; Bayesian updating recalibrates the org-specific DQI weights every quarter. After 12 months your score is tuned to your decisions, not an industry average.',
+      'Decision Intel closes the loop automatically. Outcomes are detected passively across Slack, Drive, and email; every confirmed outcome produces a Brier score against the original DQI; the per-org bias-confidence profile updates based on which flags your team confirmed or dismissed. After 12 months your calibration sits in the superforecaster band (~0.13 average Brier), not the motivated-amateur band where ungrounded LLM auditors drift.',
     diCapabilities: [
       {
         label: 'Passive outcome detection',
@@ -547,21 +547,22 @@ export const DI_GAPS: DiGap[] = [
         proofFile: 'src/lib/integrations/',
       },
       {
-        label: 'Brier scoring + Bayesian update',
+        label: 'Brier scoring on every outcome',
         detail:
-          'Every confirmed outcome scores the original prediction and shifts per-org DQI weights along the gradient.',
-        proofFile: 'src/lib/learning/',
+          'Proper scoring rule: (predicted − actual)². Categorised into excellent (≤ 0.10), good (≤ 0.20), fair (≤ 0.35), poor (> 0.35). Tetlock-band thresholds; lower is better.',
+        proofFile: 'src/lib/learning/brier-scoring.ts',
+      },
+      {
+        label: 'Per-org bias-confidence profile',
+        detail:
+          'Confirmed and dismissed flags update a private confidence profile for your organisation; future audits upweight biases your team confirms as real and downweight ones they ship as false positives.',
+        proofFile: 'src/lib/learning/outcome-scoring.ts',
       },
       {
         label: 'Toxic-combination learning',
         detail:
           'The flywheel learns which bias patterns actually failed at your org and flags them harder next time.',
         proofFile: 'src/lib/learning/toxic-combinations.ts',
-      },
-      {
-        label: 'Outcome Flywheel dashboard',
-        detail:
-          'See the DQI → Brier → recalibration loop running quarter by quarter, with drift alerts on weights that are moving fastest.',
       },
     ],
     outcomeLift: {

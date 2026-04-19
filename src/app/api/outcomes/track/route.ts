@@ -13,6 +13,11 @@ import { createLogger } from '@/lib/utils/logger';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { apiError } from '@/lib/utils/api-response';
 import { DecisionOutcome } from '@prisma/client';
+import {
+  canonicalOutcome,
+  scoreOutcome,
+  type BrierCategory,
+} from '@/lib/learning/brier-scoring';
 
 const log = createLogger('OutcomeTracking');
 
@@ -167,6 +172,7 @@ export async function POST(req: NextRequest) {
       delta: number;
       grade: string;
     } | null = null;
+    let brierPayload: { score: number; category: BrierCategory } | null = null;
     try {
       const analysis = await prisma.analysis.findUnique({
         where: { id: analysisId },
@@ -203,6 +209,15 @@ export async function POST(req: NextRequest) {
                   ? 'D'
                   : 'F';
 
+        // Brier scoring — proper-scoring-rule calibration of the
+        // originalScore prediction against the confirmed outcome. Persisted
+        // on the DecisionOutcome row so the outcome-flywheel dashboard can
+        // compute per-org calibration trends over time. See
+        // src/lib/learning/brier-scoring.ts for the math.
+        const outcomeCode = canonicalOutcome(outcome);
+        const brier = scoreOutcome(originalScore, outcomeCode);
+        brierPayload = brier;
+
         await prisma.analysis.update({
           where: { id: analysisId },
           data: {
@@ -212,9 +227,23 @@ export async function POST(req: NextRequest) {
               recalibratedGrade: grade,
               delta,
               recalibratedAt: new Date().toISOString(),
+              brierScore: brier.score,
+              brierCategory: brier.category,
             },
           },
         });
+
+        // Stamp Brier on the DecisionOutcome row so per-org aggregation
+        // queries (getOrgBrierStats) can pull directly from the indexed
+        // column instead of parsing the JSON blob on Analysis.
+        await prisma.decisionOutcome.update({
+          where: { id: decisionOutcome.id },
+          data: {
+            brierScore: brier.score,
+            brierCategory: brier.category,
+          },
+        });
+
         recalibrationStatus = 'ok';
         recalibrationPayload = {
           originalScore: Math.round(originalScore),
@@ -223,7 +252,7 @@ export async function POST(req: NextRequest) {
           grade,
         };
         log.info(
-          `Recalibrated DQI for ${analysisId}: ${Math.round(originalScore)} → ${recalibratedScore} (${delta > 0 ? '+' : ''}${delta})`
+          `Recalibrated DQI for ${analysisId}: ${Math.round(originalScore)} → ${recalibratedScore} (${delta > 0 ? '+' : ''}${delta}) · Brier ${brier.score} (${brier.category})`
         );
       }
     } catch (recalErr) {
@@ -301,6 +330,10 @@ export async function POST(req: NextRequest) {
         status: recalibrationStatus,
         ...(recalibrationPayload ?? {}),
       },
+      // Brier is surfaced so the client can render a calibration chip
+      // in the outcome-submission success banner. Null on the "recalibration
+      // skipped" branch (e.g. analysis was deleted between upsert and now).
+      brier: brierPayload,
     });
   } catch (error: unknown) {
     const code = (error as { code?: string }).code;

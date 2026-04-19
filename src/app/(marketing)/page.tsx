@@ -1094,7 +1094,7 @@ export default function LandingPage() {
                 cta: 'Contact sales',
                 action: () => {
                   window.location.href =
-                    'mailto:folahanwilliams@gmail.com?subject=Enterprise%20Inquiry';
+                    'mailto:team@decision-intel.com?subject=Enterprise%20Inquiry';
                 },
                 outline: true,
                 popular: false,
@@ -1713,7 +1713,7 @@ export default function LandingPage() {
               +44 7539 443572
             </a>
             <a
-              href="mailto:folahanwilliams@gmail.com"
+              href="mailto:team@decision-intel.com"
               style={{
                 display: 'block',
                 fontSize: 14,
@@ -1722,7 +1722,7 @@ export default function LandingPage() {
                 marginBottom: 10,
               }}
             >
-              folahanwilliams@gmail.com
+              team@decision-intel.com
             </a>
             <a
               href="https://www.linkedin.com/in/folahan-williams-13a7b03a2/"
