@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import type {
   ChainViz,
   QuadrantsViz,
@@ -15,6 +17,99 @@ import type {
   MatrixViz,
 } from '@/lib/data/founder-school/visualizations';
 
+// ─── Shared: interactive detail panel ───────────────────────────────────────
+//
+// Every primitive that has clickable cells renders this underneath. The panel
+// animates in/out with AnimatePresence so selection feels responsive, and
+// keyboard users can dismiss with Escape.
+
+function SelectionDetail({
+  label,
+  detail,
+  accent,
+  onClose,
+}: {
+  label: string;
+  detail: string;
+  accent: string;
+  onClose: () => void;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -4 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -4 }}
+      transition={{ duration: 0.18, ease: 'easeOut' }}
+      style={{
+        marginTop: 10,
+        padding: '10px 12px 10px 14px',
+        background: 'var(--bg-card)',
+        border: `1px solid ${accent}55`,
+        borderLeft: `3px solid ${accent}`,
+        borderRadius: 6,
+        display: 'flex',
+        gap: 10,
+        alignItems: 'flex-start',
+      }}
+      role="region"
+      aria-live="polite"
+    >
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            color: accent,
+            marginBottom: 3,
+          }}
+        >
+          {label}
+        </div>
+        <div
+          style={{
+            fontSize: 12,
+            color: 'var(--text-secondary)',
+            lineHeight: 1.55,
+          }}
+        >
+          {detail}
+        </div>
+      </div>
+      <button
+        onClick={onClose}
+        aria-label="Close detail"
+        style={{
+          background: 'none',
+          border: 'none',
+          color: 'var(--text-muted)',
+          cursor: 'pointer',
+          fontSize: 14,
+          padding: '0 2px',
+          lineHeight: 1,
+        }}
+      >
+        ×
+      </button>
+    </motion.div>
+  );
+}
+
+/** Button-like clickable wrapper that keeps visual parity with the non-
+ *  interactive version — resets native button chrome and inherits layout. */
+const clickableStyle: React.CSSProperties = {
+  background: 'transparent',
+  border: 'none',
+  padding: 0,
+  margin: 0,
+  font: 'inherit',
+  color: 'inherit',
+  textAlign: 'left' as const,
+  cursor: 'pointer',
+  width: '100%',
+};
+
 const TONE: Record<string, { bg: string; border: string; accent: string }> = {
   good: { bg: 'rgba(22,163,74,0.10)', border: 'rgba(22,163,74,0.35)', accent: '#16A34A' },
   bad: { bg: 'rgba(239,68,68,0.08)', border: 'rgba(239,68,68,0.32)', accent: '#EF4444' },
@@ -25,57 +120,80 @@ const TONE: Record<string, { bg: string; border: string; accent: string }> = {
 // ─── Chain ───────────────────────────────────────────────────────────────────
 
 export function ChainVizRender({ viz, accent }: { viz: ChainViz; accent: string }) {
+  const [sel, setSel] = useState<number | null>(null);
+  const showInline = viz.steps.length <= 5;
   return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: `repeat(${viz.steps.length}, 1fr)`,
-        gap: 4,
-        alignItems: 'stretch',
-      }}
-    >
-      {viz.steps.map((step, i) => (
-        <div
-          key={i}
-          style={{
-            position: 'relative',
-            padding: '10px 12px 10px 14px',
-            background: step.emphasis ? `${accent}18` : 'var(--bg-card)',
-            border: `1px solid ${step.emphasis ? accent + '55' : 'var(--border-color)'}`,
-            borderLeft: `3px solid ${step.emphasis ? accent : accent + '55'}`,
-            borderRadius: 6,
-            minHeight: 64,
-          }}
-        >
-          <div
-            style={{
-              fontSize: 9,
-              fontWeight: 700,
-              color: accent,
-              letterSpacing: '0.06em',
-              marginBottom: 3,
-            }}
-          >
-            {String(i + 1).padStart(2, '0')}
-          </div>
-          <div
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              color: 'var(--text-primary)',
-              lineHeight: 1.3,
-              marginBottom: step.detail ? 4 : 0,
-            }}
-          >
-            {step.label}
-          </div>
-          {step.detail && (
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4 }}>
-              {step.detail}
-            </div>
-          )}
-        </div>
-      ))}
+    <div>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(${viz.steps.length}, 1fr)`,
+          gap: 4,
+          alignItems: 'stretch',
+        }}
+      >
+        {viz.steps.map((step, i) => {
+          const isSel = sel === i;
+          const emphasised = step.emphasis || isSel;
+          return (
+            <button
+              key={i}
+              onClick={() => setSel(isSel ? null : i)}
+              aria-pressed={isSel}
+              style={{
+                ...clickableStyle,
+                padding: '10px 12px 10px 14px',
+                background: emphasised ? `${accent}18` : 'var(--bg-card)',
+                border: `1px solid ${emphasised ? accent + '66' : 'var(--border-color)'}`,
+                borderLeft: `3px solid ${emphasised ? accent : accent + '55'}`,
+                borderRadius: 6,
+                minHeight: 64,
+                boxShadow: isSel ? `0 0 0 1px ${accent}44` : 'none',
+                transition: 'background 0.15s, box-shadow 0.15s',
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 9,
+                  fontWeight: 700,
+                  color: accent,
+                  letterSpacing: '0.06em',
+                  marginBottom: 3,
+                }}
+              >
+                {String(i + 1).padStart(2, '0')}
+              </div>
+              <div
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  lineHeight: 1.3,
+                  marginBottom: showInline && step.detail ? 4 : 0,
+                }}
+              >
+                {step.label}
+              </div>
+              {showInline && step.detail && (
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                  {step.detail}
+                </div>
+              )}
+            </button>
+          );
+        })}
+      </div>
+      <AnimatePresence>
+        {sel !== null && viz.steps[sel]?.detail && !showInline && (
+          <SelectionDetail
+            key={`chain-${sel}`}
+            label={`Step ${sel + 1} · ${viz.steps[sel].label}`}
+            detail={viz.steps[sel].detail!}
+            accent={accent}
+            onClose={() => setSel(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -83,6 +201,7 @@ export function ChainVizRender({ viz, accent }: { viz: ChainViz; accent: string 
 // ─── Quadrants ───────────────────────────────────────────────────────────────
 
 export function QuadrantsVizRender({ viz, accent }: { viz: QuadrantsViz; accent: string }) {
+  const [sel, setSel] = useState<number | null>(viz.highlight ?? null);
   return (
     <div>
       <div
@@ -109,24 +228,30 @@ export function QuadrantsVizRender({ viz, accent }: { viz: QuadrantsViz; accent:
         {viz.cells.map((cell, i) => {
           const tone = TONE[cell.tone ?? 'neutral'];
           const isHighlight = viz.highlight === i;
+          const isSel = sel === i;
+          const lit = isHighlight || isSel;
           return (
-            <div
+            <button
               key={i}
+              onClick={() => setSel(isSel ? null : i)}
+              aria-pressed={isSel}
               style={{
+                ...clickableStyle,
                 padding: '12px 14px',
-                background: isHighlight ? tone.bg : 'var(--bg-card)',
-                border: `1px solid ${isHighlight ? tone.border : 'var(--border-color)'}`,
+                background: lit ? tone.bg : 'var(--bg-card)',
+                border: `1px solid ${lit ? tone.border : 'var(--border-color)'}`,
                 borderRadius: 8,
-                borderLeft: `3px solid ${isHighlight ? tone.accent : accent + '44'}`,
+                borderLeft: `3px solid ${lit ? tone.accent : accent + '44'}`,
                 minHeight: 78,
-                boxShadow: isHighlight ? `0 0 0 1px ${tone.border}` : 'none',
+                boxShadow: isSel ? `0 0 0 1px ${tone.accent}66` : isHighlight ? `0 0 0 1px ${tone.border}` : 'none',
+                transition: 'background 0.15s, box-shadow 0.15s',
               }}
             >
               <div
                 style={{
                   fontSize: 12,
                   fontWeight: 700,
-                  color: isHighlight ? tone.accent : 'var(--text-primary)',
+                  color: lit ? tone.accent : 'var(--text-primary)',
                   marginBottom: 4,
                 }}
               >
@@ -137,7 +262,7 @@ export function QuadrantsVizRender({ viz, accent }: { viz: QuadrantsViz; accent:
                   {cell.detail}
                 </div>
               )}
-            </div>
+            </button>
           );
         })}
       </div>
@@ -226,6 +351,22 @@ export function FlywheelVizRender({ viz, accent }: { viz: FlywheelViz; accent: s
           );
         })}
       </svg>
+      <FlywheelNodesList nodes={viz.nodes} accent={accent} />
+    </div>
+  );
+}
+
+function FlywheelNodesList({
+  nodes,
+  accent,
+}: {
+  nodes: FlywheelViz['nodes'];
+  accent: string;
+}) {
+  const [sel, setSel] = useState<number | null>(null);
+  const n = nodes.length;
+  return (
+    <>
       <div
         style={{
           display: 'grid',
@@ -235,32 +376,42 @@ export function FlywheelVizRender({ viz, accent }: { viz: FlywheelViz; accent: s
           width: '100%',
         }}
       >
-        {viz.nodes.map((node, i) => (
-          <div
-            key={i}
-            style={{
-              padding: '8px 10px',
-              background: 'var(--bg-card)',
-              border: `1px solid ${accent}33`,
-              borderLeft: `3px solid ${accent}`,
-              borderRadius: 6,
-            }}
-          >
-            <div style={{ fontSize: 9, fontWeight: 700, color: accent, marginBottom: 2 }}>
-              {String(i + 1).padStart(2, '0')}
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-primary)' }}>
-              {node.label}
-            </div>
-            {node.detail && (
-              <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2, lineHeight: 1.35 }}>
-                {node.detail}
+        {nodes.map((node, i) => {
+          const isSel = sel === i;
+          return (
+            <button
+              key={i}
+              onClick={() => node.detail && setSel(isSel ? null : i)}
+              aria-pressed={isSel}
+              disabled={!node.detail}
+              style={{
+                ...clickableStyle,
+                padding: '8px 10px',
+                background: isSel ? `${accent}18` : 'var(--bg-card)',
+                border: `1px solid ${isSel ? accent + '66' : accent + '33'}`,
+                borderLeft: `3px solid ${accent}`,
+                borderRadius: 6,
+                cursor: node.detail ? 'pointer' : 'default',
+                boxShadow: isSel ? `0 0 0 1px ${accent}44` : 'none',
+                transition: 'background 0.15s, box-shadow 0.15s',
+              }}
+            >
+              <div style={{ fontSize: 9, fontWeight: 700, color: accent, marginBottom: 2 }}>
+                {String(i + 1).padStart(2, '0')}
               </div>
-            )}
-          </div>
-        ))}
+              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-primary)' }}>
+                {node.label}
+              </div>
+              {node.detail && (
+                <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2, lineHeight: 1.35 }}>
+                  {node.detail}
+                </div>
+              )}
+            </button>
+          );
+        })}
       </div>
-    </div>
+    </>
   );
 }
 
@@ -268,13 +419,31 @@ export function FlywheelVizRender({ viz, accent }: { viz: FlywheelViz; accent: s
 
 export function WeightBarsVizRender({ viz, accent }: { viz: WeightBarsViz; accent: string }) {
   const max = Math.max(...viz.bars.map(b => Math.abs(b.value)), 1);
+  const [sel, setSel] = useState<number | null>(null);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       {viz.bars.map((bar, i) => {
         const w = Math.max(2, (Math.abs(bar.value) / max) * 100);
         const clr = bar.accent ?? accent;
+        const isSel = sel === i;
+        const clickable = !!bar.detail;
         return (
-          <div key={i}>
+          <button
+            key={i}
+            onClick={() => clickable && setSel(isSel ? null : i)}
+            aria-pressed={isSel}
+            disabled={!clickable}
+            style={{
+              ...clickableStyle,
+              cursor: clickable ? 'pointer' : 'default',
+              padding: '4px 6px',
+              marginLeft: -6,
+              marginRight: -6,
+              borderRadius: 6,
+              background: isSel ? `${clr}12` : 'transparent',
+              transition: 'background 0.15s',
+            }}
+          >
             <div
               style={{
                 display: 'flex',
@@ -321,7 +490,7 @@ export function WeightBarsVizRender({ viz, accent }: { viz: WeightBarsViz; accen
                 {bar.detail}
               </div>
             )}
-          </div>
+          </button>
         );
       })}
     </div>
@@ -332,24 +501,36 @@ export function WeightBarsVizRender({ viz, accent }: { viz: WeightBarsViz; accen
 
 export function FunnelVizRender({ viz, accent }: { viz: FunnelViz; accent: string }) {
   const n = viz.stages.length;
+  const [sel, setSel] = useState<number | null>(null);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 3, alignItems: 'stretch' }}>
       {viz.stages.map((stage, i) => {
         const w = 100 - (i / Math.max(1, n)) * 35;
+        const isSel = sel === i;
+        const clickable = !!stage.detail;
         return (
           <div key={i} style={{ display: 'flex', justifyContent: 'center' }}>
-            <div
+            <button
+              onClick={() => clickable && setSel(isSel ? null : i)}
+              aria-pressed={isSel}
+              disabled={!clickable}
               style={{
+                ...clickableStyle,
                 width: `${w}%`,
                 padding: '9px 14px',
-                background: `${accent}${(18 - i * 2).toString(16).padStart(2, '0')}`,
-                border: `1px solid ${accent}55`,
+                background: isSel
+                  ? `${accent}26`
+                  : `${accent}${(18 - i * 2).toString(16).padStart(2, '0')}`,
+                border: `1px solid ${isSel ? accent + '99' : accent + '55'}`,
                 borderLeft: `3px solid ${accent}`,
                 borderRadius: 5,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 gap: 10,
+                cursor: clickable ? 'pointer' : 'default',
+                boxShadow: isSel ? `0 0 0 1px ${accent}44` : 'none',
+                transition: 'background 0.15s, box-shadow 0.15s',
               }}
             >
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -378,7 +559,7 @@ export function FunnelVizRender({ viz, accent }: { viz: FunnelViz; accent: strin
                   {stage.value}
                 </span>
               )}
-            </div>
+            </button>
           </div>
         );
       })}
@@ -388,15 +569,19 @@ export function FunnelVizRender({ viz, accent }: { viz: FunnelViz; accent: strin
 
 // ─── Swimlanes ───────────────────────────────────────────────────────────────
 
-export function SwimlanesVizRender({ viz, accent: _accent }: { viz: SwimlanesViz; accent: string }) {
-  const col = (lane: SwimlanesViz['left'], key: string) => (
+export function SwimlanesVizRender({ viz, accent }: { viz: SwimlanesViz; accent: string }) {
+  const [sel, setSel] = useState<{ lane: 'L' | 'R'; idx: number } | null>(null);
+  const lane = (
+    spec: SwimlanesViz['left'],
+    key: 'L' | 'R',
+  ) => (
     <div
       key={key}
       style={{
         padding: '12px 14px',
         background: 'var(--bg-card)',
-        border: `1px solid ${(lane.accent ?? '#94A3B8')}33`,
-        borderLeft: `3px solid ${lane.accent ?? '#94A3B8'}`,
+        border: `1px solid ${(spec.accent ?? '#94A3B8')}33`,
+        borderLeft: `3px solid ${spec.accent ?? '#94A3B8'}`,
         borderRadius: 8,
       }}
     >
@@ -406,44 +591,60 @@ export function SwimlanesVizRender({ viz, accent: _accent }: { viz: SwimlanesViz
           fontWeight: 700,
           textTransform: 'uppercase',
           letterSpacing: '0.06em',
-          color: lane.accent ?? 'var(--text-secondary)',
+          color: spec.accent ?? 'var(--text-secondary)',
           marginBottom: 8,
         }}
       >
-        {lane.title}
+        {spec.title}
       </div>
-      <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 5 }}>
-        {lane.points.map((p, i) => (
-          <li
-            key={i}
-            style={{
-              fontSize: 12,
-              color: 'var(--text-secondary)',
-              lineHeight: 1.45,
-              paddingLeft: 14,
-              position: 'relative',
-            }}
-          >
-            <span
-              style={{
-                position: 'absolute',
-                left: 0,
-                top: 7,
-                width: 6,
-                height: 2,
-                background: lane.accent ?? 'var(--text-muted)',
-              }}
-            />
-            {p}
-          </li>
-        ))}
+      <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 3 }}>
+        {spec.points.map((p, i) => {
+          const isSel = sel?.lane === key && sel?.idx === i;
+          return (
+            <li key={i} style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+              <button
+                onClick={() => setSel(isSel ? null : { lane: key, idx: i })}
+                aria-pressed={isSel}
+                style={{
+                  ...clickableStyle,
+                  fontSize: 12,
+                  color: isSel ? (spec.accent ?? accent) : 'var(--text-secondary)',
+                  fontWeight: isSel ? 700 : 400,
+                  lineHeight: 1.45,
+                  paddingLeft: 14,
+                  paddingTop: 3,
+                  paddingBottom: 3,
+                  paddingRight: 6,
+                  position: 'relative',
+                  width: '100%',
+                  borderRadius: 4,
+                  background: isSel ? (spec.accent ?? accent) + '12' : 'transparent',
+                  transition: 'background 0.15s, color 0.15s',
+                }}
+              >
+                <span
+                  style={{
+                    position: 'absolute',
+                    left: 4,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    width: isSel ? 8 : 6,
+                    height: 2,
+                    background: spec.accent ?? 'var(--text-muted)',
+                  }}
+                />
+                {p}
+              </button>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-      {col(viz.left, 'left')}
-      {col(viz.right, 'right')}
+      {lane(viz.left, 'L')}
+      {lane(viz.right, 'R')}
     </div>
   );
 }
@@ -451,6 +652,7 @@ export function SwimlanesVizRender({ viz, accent: _accent }: { viz: SwimlanesViz
 // ─── Timeline ────────────────────────────────────────────────────────────────
 
 export function TimelineVizRender({ viz, accent }: { viz: TimelineViz; accent: string }) {
+  const [sel, setSel] = useState<number | null>(null);
   return (
     <div style={{ position: 'relative', paddingLeft: 20 }}>
       <div
@@ -463,52 +665,64 @@ export function TimelineVizRender({ viz, accent }: { viz: TimelineViz; accent: s
           background: `${accent}44`,
         }}
       />
-      {viz.events.map((e, i) => (
-        <div key={i} style={{ position: 'relative', marginBottom: i === viz.events.length - 1 ? 0 : 12 }}>
-          <div
-            style={{
-              position: 'absolute',
-              left: -18,
-              top: 4,
-              width: 12,
-              height: 12,
-              borderRadius: '50%',
-              background: e.emphasis ? accent : 'var(--bg-card)',
-              border: `2px solid ${accent}`,
-            }}
-          />
-          <div
-            style={{
-              padding: '8px 12px',
-              background: e.emphasis ? `${accent}12` : 'var(--bg-card)',
-              border: `1px solid ${e.emphasis ? accent + '55' : 'var(--border-color)'}`,
-              borderRadius: 6,
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 2 }}>
-              <span
-                style={{
-                  fontSize: 10,
-                  fontWeight: 800,
-                  color: accent,
-                  letterSpacing: '0.04em',
-                  minWidth: 50,
-                }}
-              >
-                {e.when}
-              </span>
-              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)' }}>
-                {e.label}
-              </span>
-            </div>
-            {e.detail && (
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4, paddingLeft: 58 }}>
-                {e.detail}
+      {viz.events.map((e, i) => {
+        const isSel = sel === i;
+        const lit = e.emphasis || isSel;
+        const clickable = !!e.detail;
+        return (
+          <div key={i} style={{ position: 'relative', marginBottom: i === viz.events.length - 1 ? 0 : 12 }}>
+            <div
+              style={{
+                position: 'absolute',
+                left: -18,
+                top: 4,
+                width: 12,
+                height: 12,
+                borderRadius: '50%',
+                background: lit ? accent : 'var(--bg-card)',
+                border: `2px solid ${accent}`,
+              }}
+            />
+            <button
+              onClick={() => clickable && setSel(isSel ? null : i)}
+              aria-pressed={isSel}
+              disabled={!clickable}
+              style={{
+                ...clickableStyle,
+                padding: '8px 12px',
+                background: lit ? `${accent}12` : 'var(--bg-card)',
+                border: `1px solid ${lit ? accent + '66' : 'var(--border-color)'}`,
+                borderRadius: 6,
+                cursor: clickable ? 'pointer' : 'default',
+                boxShadow: isSel ? `0 0 0 1px ${accent}44` : 'none',
+                transition: 'background 0.15s, box-shadow 0.15s',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 2 }}>
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 800,
+                    color: accent,
+                    letterSpacing: '0.04em',
+                    minWidth: 50,
+                  }}
+                >
+                  {e.when}
+                </span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)' }}>
+                  {e.label}
+                </span>
               </div>
-            )}
+              {e.detail && (
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4, paddingLeft: 58 }}>
+                  {e.detail}
+                </div>
+              )}
+            </button>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -517,22 +731,34 @@ export function TimelineVizRender({ viz, accent }: { viz: TimelineViz; accent: s
 
 export function PyramidVizRender({ viz, accent }: { viz: PyramidViz; accent: string }) {
   const n = viz.tiers.length;
+  const [sel, setSel] = useState<number | null>(null);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'stretch' }}>
       {viz.tiers.map((tier, i) => {
         const w = 55 + (i / Math.max(1, n - 1)) * 45;
+        const isSel = sel === i;
+        const clickable = !!tier.detail;
         return (
           <div key={i} style={{ display: 'flex', justifyContent: 'center' }}>
-            <div
+            <button
+              onClick={() => clickable && setSel(isSel ? null : i)}
+              aria-pressed={isSel}
+              disabled={!clickable}
               style={{
+                ...clickableStyle,
                 width: `${w}%`,
                 padding: '9px 14px',
-                background: `${accent}${(10 + i * 3).toString(16).padStart(2, '0')}`,
-                border: `1px solid ${accent}55`,
+                background: isSel
+                  ? `${accent}33`
+                  : `${accent}${(10 + i * 3).toString(16).padStart(2, '0')}`,
+                border: `1px solid ${isSel ? accent + '99' : accent + '55'}`,
                 borderRadius: 6,
                 display: 'flex',
                 alignItems: 'center',
                 gap: 10,
+                cursor: clickable ? 'pointer' : 'default',
+                boxShadow: isSel ? `0 0 0 1px ${accent}55` : 'none',
+                transition: 'background 0.15s, box-shadow 0.15s',
               }}
             >
               <span
@@ -559,7 +785,7 @@ export function PyramidVizRender({ viz, accent }: { viz: PyramidViz; accent: str
                   </div>
                 )}
               </div>
-            </div>
+            </button>
           </div>
         );
       })}
@@ -581,6 +807,7 @@ export function CompoundVizRender({ viz, accent }: { viz: CompoundViz; accent: s
   const maxT = Math.max(...viz.points.map(p => p.t));
   const minT = Math.min(...viz.points.map(p => p.t));
   const maxV = Math.max(...viz.points.map(p => p.v));
+  const [sel, setSel] = useState<number | null>(null);
   const x = (t: number) => pl + ((t - minT) / (maxT - minT || 1)) * iw;
   const y = (v: number) => pt + ih - (v / (maxV || 1)) * ih;
   const path = viz.points
@@ -609,22 +836,46 @@ export function CompoundVizRender({ viz, accent }: { viz: CompoundViz; accent: s
         {/* line */}
         <path d={path} fill="none" stroke={accent} strokeWidth={2} strokeLinecap="round" />
         {/* points + annotations */}
-        {viz.points.map((p, i) => (
-          <g key={i}>
-            <circle cx={x(p.t)} cy={y(p.v)} r={3.5} fill={accent} stroke="#fff" strokeWidth={1.5} />
-            {p.note && (
-              <text
-                x={x(p.t)}
-                y={y(p.v) - 8}
-                fontSize={9}
-                fill="var(--text-muted)"
-                textAnchor="middle"
-              >
-                {p.note}
-              </text>
-            )}
-          </g>
-        ))}
+        {viz.points.map((p, i) => {
+          const isSel = sel === i;
+          return (
+            <g
+              key={i}
+              onClick={() => setSel(isSel ? null : i)}
+              style={{ cursor: 'pointer' }}
+            >
+              {isSel && (
+                <circle cx={x(p.t)} cy={y(p.v)} r={10} fill={accent} opacity={0.15} />
+              )}
+              <circle
+                cx={x(p.t)}
+                cy={y(p.v)}
+                r={isSel ? 5.5 : 3.5}
+                fill={accent}
+                stroke="#fff"
+                strokeWidth={1.5}
+              />
+              <circle
+                cx={x(p.t)}
+                cy={y(p.v)}
+                r={14}
+                fill="transparent"
+              />
+              {p.note && (
+                <text
+                  x={x(p.t)}
+                  y={y(p.v) - 8}
+                  fontSize={9}
+                  fontWeight={isSel ? 700 : 400}
+                  fill={isSel ? accent : 'var(--text-muted)'}
+                  textAnchor="middle"
+                >
+                  {p.note}
+                </text>
+              )}
+            </g>
+          );
+        })}
         {/* axes labels */}
         {viz.xLabel && (
           <text x={pl + iw / 2} y={h - 4} fontSize={10} fill="var(--text-muted)" textAnchor="middle">
@@ -644,6 +895,17 @@ export function CompoundVizRender({ viz, accent }: { viz: CompoundViz; accent: s
           </text>
         )}
       </svg>
+      <AnimatePresence>
+        {sel !== null && viz.points[sel] && (
+          <SelectionDetail
+            key={`cp-${sel}`}
+            label={`${viz.xLabel ?? 't'} = ${viz.points[sel].t} · ${viz.yLabel ?? 'v'} = ${viz.points[sel].v}`}
+            detail={viz.points[sel].note ?? `Point ${sel + 1} of ${viz.points.length}`}
+            accent={accent}
+            onClose={() => setSel(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -662,18 +924,26 @@ export function RadialNetworkVizRender({
   const cy = size / 2;
   const orbitR = 118;
   const n = viz.nodes.length;
+  const [sel, setSel] = useState<number | null>(null);
 
   const pos = (i: number) => {
     const a = (i / n) * 2 * Math.PI - Math.PI / 2;
     return { x: cx + Math.cos(a) * orbitR, y: cy + Math.sin(a) * orbitR };
   };
 
+  const toggle = (i: number) => setSel(prev => (prev === i ? null : i));
+
   return (
     <div>
-      <svg width="100%" viewBox={`0 0 ${size} ${size}`} style={{ maxWidth: 360, display: 'block', margin: '0 auto' }}>
+      <svg
+        width="100%"
+        viewBox={`0 0 ${size} ${size}`}
+        style={{ maxWidth: 360, display: 'block', margin: '0 auto' }}
+      >
         {/* spokes — from center to each node */}
         {viz.nodes.map((node, i) => {
           const { x, y } = pos(i);
+          const isSel = sel === i;
           return (
             <line
               key={`sp${i}`}
@@ -681,8 +951,8 @@ export function RadialNetworkVizRender({
               y1={cy}
               x2={x}
               y2={y}
-              stroke={node.emphasis ? accent : `${accent}44`}
-              strokeWidth={node.emphasis ? 1.5 : 1}
+              stroke={isSel || node.emphasis ? accent : `${accent}44`}
+              strokeWidth={isSel ? 2 : node.emphasis ? 1.5 : 1}
             />
           );
         })}
@@ -719,30 +989,42 @@ export function RadialNetworkVizRender({
             {viz.center}
           </div>
         </foreignObject>
-        {/* nodes */}
+        {/* nodes — clickable SVG groups */}
         {viz.nodes.map((node, i) => {
           const { x, y } = pos(i);
+          const isSel = sel === i;
+          const lit = node.emphasis || isSel;
           return (
-            <g key={`n${i}`}>
+            <g
+              key={`n${i}`}
+              onClick={() => node.detail && toggle(i)}
+              style={{ cursor: node.detail ? 'pointer' : 'default' }}
+            >
+              {isSel && (
+                <circle
+                  cx={x}
+                  cy={y}
+                  r={14}
+                  fill="none"
+                  stroke={accent}
+                  strokeWidth={1}
+                  opacity={0.5}
+                />
+              )}
               <circle
                 cx={x}
                 cy={y}
-                r={node.emphasis ? 9 : 7}
-                fill={node.emphasis ? accent : 'var(--bg-card)'}
+                r={lit ? 9 : 7}
+                fill={lit ? accent : 'var(--bg-card)'}
                 stroke={accent}
                 strokeWidth={1.4}
               />
-              <foreignObject
-                x={x - 55}
-                y={y + 12}
-                width={110}
-                height={46}
-              >
+              <foreignObject x={x - 55} y={y + 12} width={110} height={46}>
                 <div
                   style={{
                     fontSize: 10,
-                    fontWeight: node.emphasis ? 700 : 600,
-                    color: node.emphasis ? accent : 'var(--text-secondary)',
+                    fontWeight: lit ? 700 : 600,
+                    color: lit ? accent : 'var(--text-secondary)',
                     textAlign: 'center',
                     lineHeight: 1.25,
                   }}
@@ -766,24 +1048,32 @@ export function RadialNetworkVizRender({
           {viz.nodes
             .map((node, i) => ({ node, i }))
             .filter(({ node }) => node.detail)
-            .map(({ node, i }) => (
-              <div
-                key={i}
-                style={{
-                  padding: '7px 10px',
-                  background: 'var(--bg-card)',
-                  border: `1px solid ${accent}33`,
-                  borderRadius: 5,
-                }}
-              >
-                <div style={{ fontSize: 10, fontWeight: 700, color: accent, marginBottom: 1 }}>
-                  {node.label}
-                </div>
-                <div style={{ fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.35 }}>
-                  {node.detail}
-                </div>
-              </div>
-            ))}
+            .map(({ node, i }) => {
+              const isSel = sel === i;
+              return (
+                <button
+                  key={i}
+                  onClick={() => toggle(i)}
+                  aria-pressed={isSel}
+                  style={{
+                    ...clickableStyle,
+                    padding: '7px 10px',
+                    background: isSel ? `${accent}12` : 'var(--bg-card)',
+                    border: `1px solid ${isSel ? accent + '66' : accent + '33'}`,
+                    borderRadius: 5,
+                    boxShadow: isSel ? `0 0 0 1px ${accent}33` : 'none',
+                    transition: 'background 0.15s, box-shadow 0.15s',
+                  }}
+                >
+                  <div style={{ fontSize: 10, fontWeight: 700, color: accent, marginBottom: 1 }}>
+                    {node.label}
+                  </div>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.35 }}>
+                    {node.detail}
+                  </div>
+                </button>
+              );
+            })}
         </div>
       )}
     </div>
@@ -794,84 +1084,110 @@ export function RadialNetworkVizRender({
 
 export function StepperVizRender({ viz, accent }: { viz: StepperViz; accent: string }) {
   const vertical = viz.orientation === 'vertical';
+  const [sel, setSel] = useState<number | null>(null);
   return (
-    <div
-      style={{
-        display: vertical ? 'flex' : 'grid',
-        flexDirection: vertical ? 'column' : undefined,
-        gridTemplateColumns: vertical ? undefined : `repeat(${viz.steps.length}, 1fr)`,
-        gap: vertical ? 8 : 6,
-      }}
-    >
-      {viz.steps.map((step, i) => (
-        <div
-          key={i}
-          style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: 10,
-            padding: '10px 12px',
-            background: step.wow ? `${accent}15` : 'var(--bg-card)',
-            border: `1px solid ${step.wow ? accent + '55' : 'var(--border-color)'}`,
-            borderLeft: `3px solid ${accent}`,
-            borderRadius: 6,
-          }}
-        >
-          <div
-            style={{
-              width: 24,
-              height: 24,
-              borderRadius: '50%',
-              background: step.wow ? accent : `${accent}22`,
-              color: step.wow ? '#fff' : accent,
-              fontSize: 11,
-              fontWeight: 800,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            {step.num}
-          </div>
-          <div style={{ minWidth: 0 }}>
-            <div
+    <div>
+      <div
+        style={{
+          display: vertical ? 'flex' : 'grid',
+          flexDirection: vertical ? 'column' : undefined,
+          gridTemplateColumns: vertical ? undefined : `repeat(${viz.steps.length}, 1fr)`,
+          gap: vertical ? 8 : 6,
+        }}
+      >
+        {viz.steps.map((step, i) => {
+          const isSel = sel === i;
+          const lit = step.wow || isSel;
+          const clickable = !!step.detail;
+          return (
+            <button
+              key={i}
+              onClick={() => clickable && setSel(isSel ? null : i)}
+              aria-pressed={isSel}
+              disabled={!clickable}
               style={{
-                fontSize: 12,
-                fontWeight: 700,
-                color: 'var(--text-primary)',
-                marginBottom: 2,
+                ...clickableStyle,
                 display: 'flex',
-                alignItems: 'center',
-                gap: 6,
+                alignItems: 'flex-start',
+                gap: 10,
+                padding: '10px 12px',
+                background: lit ? `${accent}15` : 'var(--bg-card)',
+                border: `1px solid ${lit ? accent + '66' : 'var(--border-color)'}`,
+                borderLeft: `3px solid ${accent}`,
+                borderRadius: 6,
+                cursor: clickable ? 'pointer' : 'default',
+                boxShadow: isSel ? `0 0 0 1px ${accent}44` : 'none',
+                transition: 'background 0.15s, box-shadow 0.15s',
               }}
             >
-              {step.label}
-              {step.wow && (
-                <span
+              <div
+                style={{
+                  width: 24,
+                  height: 24,
+                  borderRadius: '50%',
+                  background: lit ? accent : `${accent}22`,
+                  color: lit ? '#fff' : accent,
+                  fontSize: 11,
+                  fontWeight: 800,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                {step.num}
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <div
                   style={{
-                    fontSize: 9,
+                    fontSize: 12,
                     fontWeight: 700,
-                    color: accent,
-                    background: `${accent}22`,
-                    padding: '1px 6px',
-                    borderRadius: 8,
-                    letterSpacing: '0.04em',
-                    textTransform: 'uppercase',
+                    color: 'var(--text-primary)',
+                    marginBottom: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
                   }}
                 >
-                  wow
-                </span>
-              )}
-            </div>
-            {step.detail && (
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.45 }}>
-                {step.detail}
+                  {step.label}
+                  {step.wow && (
+                    <span
+                      style={{
+                        fontSize: 9,
+                        fontWeight: 700,
+                        color: accent,
+                        background: `${accent}22`,
+                        padding: '1px 6px',
+                        borderRadius: 8,
+                        letterSpacing: '0.04em',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      wow
+                    </span>
+                  )}
+                </div>
+                {vertical && step.detail && (
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.45 }}>
+                    {step.detail}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </div>
-      ))}
+            </button>
+          );
+        })}
+      </div>
+      <AnimatePresence>
+        {!vertical && sel !== null && viz.steps[sel]?.detail && (
+          <SelectionDetail
+            key={`step-${sel}`}
+            label={`Step ${viz.steps[sel].num} · ${viz.steps[sel].label}`}
+            detail={viz.steps[sel].detail!}
+            accent={accent}
+            onClose={() => setSel(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -879,15 +1195,23 @@ export function StepperVizRender({ viz, accent }: { viz: StepperViz; accent: str
 // ─── Matrix (heatmap) ────────────────────────────────────────────────────────
 
 export function MatrixVizRender({ viz, accent }: { viz: MatrixViz; accent: string }) {
-  const heatBg = (h: 0 | 1 | 2 | 3) => {
+  const heatBg = (h: 0 | 1 | 2 | 3, hex: string) => {
     if (h === 0) return 'var(--bg-tertiary)';
-    const op = [0, 0.18, 0.38, 0.62][h];
-    return `rgba(22,163,74,${op})`;
+    const op = [0, 0.16, 0.34, 0.58][h];
+    return hexToRgba(hex, op);
   };
   const heatText = (h: 0 | 1 | 2 | 3) =>
     h === 0 ? 'var(--text-muted)' : h >= 2 ? '#0F172A' : 'var(--text-primary)';
 
   const cellAt = (r: number, c: number) => viz.cells.find(x => x.row === r && x.col === c);
+  const [sel, setSel] = useState<[number, number] | null>(null);
+  const selCell = sel ? cellAt(sel[0], sel[1]) : null;
+  const selLabel = sel ? `${viz.rows[sel[0]]} × ${viz.cols[sel[1]]}` : '';
+  const selDetail = selCell?.label
+    ? (selCell.heat >= 2 ? `High-heat cell · ${selCell.label}` : `${selCell.label}`)
+    : sel
+      ? `Heat: ${selCell?.heat ?? 0}/3`
+      : '';
   return (
     <div style={{ overflowX: 'auto' }}>
       <table
@@ -938,22 +1262,33 @@ export function MatrixVizRender({ viz, accent }: { viz: MatrixViz; accent: strin
               {viz.cols.map((_, c) => {
                 const cell = cellAt(r, c);
                 const h = (cell?.heat ?? 0) as 0 | 1 | 2 | 3;
+                const isSel = sel?.[0] === r && sel?.[1] === c;
+                const clickable = h > 0;
                 return (
-                  <td
-                    key={c}
-                    style={{
-                      background: heatBg(h),
-                      border: `1px solid ${h === 0 ? 'var(--border-color)' : accent + '33'}`,
-                      borderRadius: 4,
-                      padding: '8px 10px',
-                      color: heatText(h),
-                      textAlign: 'center',
-                      minWidth: 70,
-                      fontWeight: 600,
-                      fontSize: 10,
-                    }}
-                  >
-                    {cell?.label ?? (h === 0 ? '—' : '●'.repeat(h))}
+                  <td key={c} style={{ padding: 0 }}>
+                    <button
+                      onClick={() => clickable && setSel(isSel ? null : [r, c])}
+                      aria-pressed={isSel}
+                      disabled={!clickable}
+                      style={{
+                        ...clickableStyle,
+                        width: '100%',
+                        background: heatBg(h, accent),
+                        border: `1px solid ${h === 0 ? 'var(--border-color)' : accent + '33'}`,
+                        borderRadius: 4,
+                        padding: '8px 10px',
+                        color: heatText(h),
+                        textAlign: 'center',
+                        minWidth: 70,
+                        fontWeight: 600,
+                        fontSize: 10,
+                        cursor: clickable ? 'pointer' : 'default',
+                        boxShadow: isSel ? `0 0 0 2px ${accent}` : 'none',
+                        transition: 'box-shadow 0.15s',
+                      }}
+                    >
+                      {cell?.label ?? (h === 0 ? '—' : '●'.repeat(h))}
+                    </button>
                   </td>
                 );
               })}
@@ -961,6 +1296,26 @@ export function MatrixVizRender({ viz, accent }: { viz: MatrixViz; accent: strin
           ))}
         </tbody>
       </table>
+      <AnimatePresence>
+        {sel && (
+          <SelectionDetail
+            key={`mx-${sel[0]}-${sel[1]}`}
+            label={selLabel}
+            detail={selDetail}
+            accent={accent}
+            onClose={() => setSel(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
+}
+
+function hexToRgba(hex: string, alpha: number) {
+  const h = hex.replace('#', '');
+  const bigint = parseInt(h.length === 3 ? h.split('').map(c => c + c).join('') : h, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  return `rgba(${r},${g},${b},${alpha})`;
 }
