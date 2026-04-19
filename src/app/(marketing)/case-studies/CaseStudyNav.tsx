@@ -127,6 +127,18 @@ export function CaseStudyNav() {
             Case Studies
           </Link>
           <Link
+            href="/security"
+            className="nav-link-hide-mobile"
+            style={{
+              fontSize: 14,
+              color: '#CBD5E1',
+              textDecoration: 'none',
+              fontWeight: 500,
+            }}
+          >
+            Security
+          </Link>
+          <Link
             href="/"
             style={{
               fontSize: 13,

@@ -1642,6 +1642,7 @@ export default function LandingPage() {
             </h4>
             {[
               'Privacy',
+              'Security',
               'How It Works',
               'Case Studies',
               'Proof',
@@ -1665,7 +1666,9 @@ export default function LandingPage() {
                             ? '/pricing'
                             : l === 'Privacy'
                               ? '/privacy'
-                              : `#${l.toLowerCase().replace(/\s+/g, '-')}`;
+                              : l === 'Security'
+                                ? '/security'
+                                : `#${l.toLowerCase().replace(/\s+/g, '-')}`;
               return (
                 <a
                   key={l}
