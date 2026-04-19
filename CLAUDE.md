@@ -152,6 +152,7 @@ src/
 - CSRF protection is in middleware.ts. Slack/Stripe/cron paths are exempt.
 - Document encryption uses AES-256-GCM via `DOCUMENT_ENCRYPTION_KEY`.
 - Slack tokens encrypted with `SLACK_TOKEN_ENCRYPTION_KEY`.
+- **Encryption key rotation** uses a `keyVersion` stamp on every encrypted row (`Document.contentKeyVersion`, `SlackInstallation.botTokenKeyVersion`). New keys are provisioned at `DOCUMENT_ENCRYPTION_KEY_V{N}` / `SLACK_TOKEN_ENCRYPTION_KEY_V{N}`; the active version comes from `*_VERSION` env vars (defaults to highest resolvable). Rotate with `npm run rotate:encryption-key -- --domain document --from 1 --to 2` — batched, idempotent, resumable. Legacy `DOCUMENT_ENCRYPTION_KEY` (un-suffixed) is treated as v1 for back-compat. Full protocol in `src/lib/utils/encryption.ts` header.
 
 ### Components & Patterns
 - Lazy-load heavy components with `dynamic()` from `next/dynamic` (see Founder Hub page for pattern).
@@ -265,6 +266,8 @@ For mechanical checks — type-checking, test runs, build verification, counting
 | Plan definitions & limits | `src/lib/stripe.ts` |
 | Plan limit enforcement | `src/lib/utils/plan-limits.ts` |
 | DQI scoring engine | `src/lib/scoring/dqi.ts` (792 lines) |
+| Brier scoring (outcome calibration) | `src/lib/learning/brier-scoring.ts` (+ `.test.ts`, 20 tests) |
+| Encryption + key rotation | `src/lib/utils/encryption.ts` |
 | Analysis pipeline graph | `src/lib/agents/graph.ts` |
 | Pipeline node implementations | `src/lib/agents/nodes.ts` (2,297 lines) |
 | Pipeline prompts | `src/lib/agents/prompts.ts` |
@@ -279,12 +282,20 @@ For mechanical checks — type-checking, test runs, build verification, counting
 | Document detail page | `src/app/(platform)/documents/[id]/page.tsx` |
 | Settings page | `src/app/(platform)/dashboard/settings/SettingsForm.tsx` |
 | Analytics page | `src/app/(platform)/dashboard/analytics/page.tsx` |
+| Admin audit-log UI | `src/components/admin/AdminAuditLog.tsx` (+ `/api/admin/audit-log` + `/api/admin/audit-log/facets`) |
+| `/security` marketing page | `src/app/(marketing)/security/page.tsx` (+ `EncryptionFlowViz`) |
+| Landing-page category showcase | `src/components/marketing/CategoryGapShowcase.tsx` |
+| Booking CTA component | `src/components/marketing/BookDemoCTA.tsx` (3 variants) |
 
 ## Environment Variables
 
 Required for development: `DATABASE_URL`, `DIRECT_URL`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `GOOGLE_API_KEY`.
 
 Optional: `FOUNDER_EMAIL` (for daily LinkedIn post emails via `/api/cron/daily-linkedin`).
+
+Conversion / admin: `NEXT_PUBLIC_DEMO_BOOKING_URL` (Calendly link the `BookDemoCTA` component points at; falls back to `/pricing#design-partner` if unset). `ADMIN_USER_IDS` and `ADMIN_EMAILS` gate the admin surfaces (`/dashboard/admin/audit-log`, `/dashboard/admin/monitoring`) and the enterprise-plan bypass.
+
+Encryption + key rotation: `DOCUMENT_ENCRYPTION_KEY` and `SLACK_TOKEN_ENCRYPTION_KEY` (legacy / v1). When rotating, add `DOCUMENT_ENCRYPTION_KEY_V{N}` / `SLACK_TOKEN_ENCRYPTION_KEY_V{N}` and bump `DOCUMENT_ENCRYPTION_KEY_VERSION` / `SLACK_TOKEN_ENCRYPTION_KEY_VERSION` to the new active version. See `src/lib/utils/encryption.ts` header for the full protocol; rotate with `npm run rotate:encryption-key`.
 
 See `.env.example` for the full list with descriptions.
 
