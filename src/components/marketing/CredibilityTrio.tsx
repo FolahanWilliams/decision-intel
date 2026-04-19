@@ -3,14 +3,15 @@
 /**
  * CredibilityTrio
  *
- * Landing-page section surfacing the three evidence pages (/proof,
- * /bias-genome, /privacy) as a clean horizontal trio, each with a
- * purpose-built SVG thumbnail and a CTA to the full page. Upgrades the
- * Bias Genome from a footer link to a first-class landing slot alongside
- * the case evidence and security posture.
+ * Landing-page "go deeper" rail surfacing the three most integral
+ * exploration destinations as a clean horizontal trio, each with a
+ * purpose-built SVG thumbnail and a CTA to the full sub-page:
+ *   - /case-studies  — the 135-case library
+ *   - /bias-genome   — which biases most often precede failure
+ *   - /security      — enterprise security posture
  *
  * Light theme. Zero external data deps — thumbnails are self-contained
- * SVG sketches that match each destination page's visual identity.
+ * SVG sketches.
  */
 
 import Link from 'next/link';
@@ -40,27 +41,27 @@ const C = {
 
 const CARDS = [
   {
-    href: '/proof',
+    href: '/case-studies',
     eyebrow: 'Case library',
-    title: 'The red flags that preceded real outcomes.',
-    body: 'Each case pairs the pre-decision memo, the biases the pipeline flagged, and what happened next. The source documents are public, so you can check our reading against them.',
-    cta: 'See the cases',
+    title: '135 audited corporate decisions, open for review.',
+    body: 'Thirteen industries of strategic calls \u2014 successful and failed \u2014 each scored against the same bias taxonomy. The source documents are public, so every conclusion is checkable.',
+    cta: 'Browse the library',
     thumb: 'proof' as const,
   },
   {
     href: '/bias-genome',
     eyebrow: 'Across 135 decisions',
     title: 'Which biases most often precede failure.',
-    body: 'Every bias in the taxonomy is ranked by how often it appears in failed strategic decisions, across 135 audited cases and thirteen industries. Methodology and data are open.',
+    body: 'Every bias in the taxonomy is ranked by how often it appears in failed strategic decisions, across the full case library and thirteen industries. Methodology and data are open.',
     cta: 'See the rankings',
     thumb: 'genome' as const,
   },
   {
-    href: '/privacy',
+    href: '/security',
     eyebrow: 'Security posture',
-    title: 'Your memos are evidence. We treat them that way.',
-    body: 'GDPR anonymization runs first, before any analysis model sees your text. AES-256-GCM at rest, TLS 1.2+ in transit, no training on your content, 30-day hard-delete when you are done.',
-    cta: 'Read the policy',
+    title: 'Enterprise-grade protection on every strategic memo.',
+    body: 'SOC 2 ready, AES-256-GCM at rest, TLS 1.3 in transit, GDPR anonymization before any model sees your text, EU AI Act mapped, and no training on your content \u2014 ever, by contract.',
+    cta: 'See the posture',
     thumb: 'privacy' as const,
   },
 ];
@@ -74,34 +75,34 @@ export function CredibilityTrio() {
         padding: '80px 24px',
       }}
     >
-      <div style={{ marginBottom: 40 }}>
+      <div style={{ marginBottom: 32 }}>
         <div
           style={{
-            fontSize: 14,
-            fontWeight: 600,
+            fontSize: 12,
+            fontWeight: 800,
             color: C.green,
             textTransform: 'uppercase',
-            letterSpacing: '0.08em',
-            marginBottom: 8,
+            letterSpacing: '0.14em',
+            marginBottom: 10,
           }}
         >
-          The evidence
+          Go deeper
         </div>
         <h2
           style={{
-            fontSize: 36,
-            fontWeight: 700,
+            fontSize: 'clamp(26px, 3.6vw, 34px)',
+            fontWeight: 800,
             color: C.slate900,
-            marginBottom: 16,
-            letterSpacing: '-0.01em',
+            marginBottom: 12,
+            letterSpacing: '-0.02em',
+            lineHeight: 1.15,
           }}
         >
-          The underlying evidence.
+          Three pages. Everything this site claims, checkable.
         </h2>
-        <p style={{ fontSize: 18, color: C.slate600, margin: 0, maxWidth: 620 }}>
-          The cases behind the methodology, the bias patterns that most often precede failure, and
-          exactly how your documents are handled. Every claim on this site traces back to one of
-          these pages.
+        <p style={{ fontSize: 16, color: C.slate600, margin: 0, maxWidth: 640, lineHeight: 1.6 }}>
+          The full case library, the bias-failure rankings, and the security posture on your
+          documents. Every claim on this site traces back to one of these pages.
         </p>
       </div>
 

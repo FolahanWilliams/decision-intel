@@ -9,6 +9,7 @@ import { CaseStudyCarousel } from '@/components/marketing/CaseStudyCarousel';
 import { HeroDecisionGraph } from '@/components/marketing/HeroDecisionGraph';
 import { HeroCounterfactualTease } from '@/components/marketing/HeroCounterfactualTease';
 import { CategoryGapShowcase } from '@/components/marketing/CategoryGapShowcase';
+import { CredibilityTrio } from '@/components/marketing/CredibilityTrio';
 import { BookDemoCTA } from '@/components/marketing/BookDemoCTA';
 import { CompetitorComparisonCard } from '@/components/marketing/CompetitorComparisonCard';
 import { LandingFaq } from '@/components/marketing/LandingFaq';
@@ -1141,6 +1142,11 @@ export default function LandingPage() {
 
       {/* ── Case study carousel — evidence strip below the proof header ── */}
       <CaseStudyCarousel />
+
+      {/* ── Credibility trio — three exploration doorways (case library / bias genome / security) ── */}
+      <Reveal repeat>
+        <CredibilityTrio />
+      </Reveal>
 
       {/* ── Pricing ─────────────────────────────────────────────────── */}
       <section id="pricing" style={{ background: C.slate50, borderTop: `1px solid ${C.slate200}` }}>
