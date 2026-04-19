@@ -255,7 +255,12 @@ export async function POST(req: NextRequest) {
           },
         },
       })
-      .catch(() => {});
+      .catch(err =>
+        log.warn(
+          `Failed to write red_team.challenge audit log for analysis ${body.analysisId}:`,
+          err instanceof Error ? err.message : String(err)
+        )
+      );
 
     return NextResponse.json({ challenge }, { status: 201 });
   } catch (err: unknown) {

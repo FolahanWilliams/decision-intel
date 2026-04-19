@@ -1116,7 +1116,12 @@ async function handleOutcomeCommand(params: {
         where: { id: recentDecision.linkedAnalysisId },
         data: { outcomeStatus: 'outcome_logged' },
       })
-      .catch(() => {});
+      .catch(err =>
+        log.warn(
+          `Failed to transition analysis ${recentDecision.linkedAnalysisId} to outcome_logged:`,
+          err instanceof Error ? err.message : String(err)
+        )
+      );
 
     log.info(
       `Outcome reported via Slack: ${outcome} for analysis ${recentDecision.linkedAnalysisId}`

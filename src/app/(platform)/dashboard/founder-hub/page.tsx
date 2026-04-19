@@ -567,10 +567,10 @@ function SearchResults({ query, onJump }: { query: string; onJump: (tabId: TabId
           marginBottom: 16,
         }}
       >
-        <Search size={14} style={{ color: '#16A34A', flexShrink: 0 }} />
+        <Search size={14} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
         <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
           {matches.length} section{matches.length === 1 ? '' : 's'} match &quot;
-          <strong style={{ color: '#16A34A' }}>{query}</strong>&quot; — click to jump.
+          <strong style={{ color: 'var(--accent-primary)' }}>{query}</strong>&quot; — click to jump.
         </span>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -594,13 +594,13 @@ function SearchResults({ query, onJump }: { query: string; onJump: (tabId: TabId
                 transition: 'border-color 0.15s, transform 0.15s',
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.borderColor = '#16A34A';
+                e.currentTarget.style.borderColor = 'var(--accent-primary)';
               }}
               onMouseLeave={e => {
                 e.currentTarget.style.borderColor = 'var(--border-primary, #222)';
               }}
             >
-              <div style={{ marginTop: 2, color: '#16A34A' }}>{tab?.icon}</div>
+              <div style={{ marginTop: 2, color: 'var(--accent-primary)' }}>{tab?.icon}</div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div
                   style={{
@@ -752,7 +752,7 @@ export default function FounderHubPage() {
           </button>
         </div>
         {passError && (
-          <p style={{ fontSize: 12, color: '#ef4444', marginTop: 8 }}>Incorrect access code.</p>
+          <p style={{ fontSize: 12, color: 'var(--error)', marginTop: 8 }}>Incorrect access code.</p>
         )}
       </div>
     );
@@ -839,7 +839,7 @@ export default function FounderHubPage() {
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Rocket size={26} style={{ color: '#16A34A' }} />
+            <Rocket size={26} style={{ color: 'var(--accent-primary)' }} />
             <h1
               style={{
                 fontSize: 24,

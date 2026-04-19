@@ -1271,12 +1271,12 @@ export default function Dashboard() {
                 gap: 'var(--spacing-sm)',
               }}
             >
-              <FileText size={16} style={{ color: '#16A34A', flexShrink: 0 }} />
+              <FileText size={16} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div
                   style={{
                     fontSize: '11px',
-                    color: '#16A34A',
+                    color: 'var(--accent-primary)',
                     fontWeight: 600,
                     marginBottom: '2px',
                   }}

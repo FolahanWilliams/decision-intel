@@ -214,8 +214,8 @@ export default function PersonProfilePage({
             }}
           >
             <div className="flex items-center gap-sm">
-              <AlertTriangle size={16} style={{ color: '#ef4444' }} />
-              <span style={{ color: '#fca5a5' }}>{error}</span>
+              <AlertTriangle size={16} style={{ color: 'var(--error)' }} />
+              <span style={{ color: 'var(--text-primary)' }}>{error}</span>
             </div>
           </div>
         )}

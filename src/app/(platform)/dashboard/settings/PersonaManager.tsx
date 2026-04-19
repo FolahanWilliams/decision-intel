@@ -209,8 +209,8 @@ export function PersonaManager() {
                             fontSize: '10px',
                             padding: '1px 8px',
                             borderRadius: '10px',
-                            background: 'rgba(249,115,22,0.1)',
-                            color: '#FBBF24',
+                            background: 'rgba(249,115,22,0.12)',
+                            color: 'var(--warning)',
                           }}
                         >
                           {persona.role}
