@@ -18,6 +18,8 @@ import {
   type Track,
   type Lesson,
 } from '@/lib/data/founder-school/lessons';
+import { getLessonViz } from '@/lib/data/founder-school/visualizations';
+import { LessonVisualization } from './school/LessonVisualization';
 
 const STORAGE_KEY = 'founder-school-progress';
 
@@ -316,6 +318,10 @@ function LessonDetail({
       </div>
 
       <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: 16 }}>
+        {(() => {
+          const viz = getLessonViz(lesson.id);
+          return viz ? <LessonVisualization viz={viz} accent={track.color} /> : null;
+        })()}
         {section('Core Insight', lesson.insight)}
         {section('Why It Matters for Decision Intel', lesson.whyItMatters, track.color)}
 
