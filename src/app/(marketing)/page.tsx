@@ -525,44 +525,41 @@ export default function LandingPage() {
           <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
             <p
               style={{
-                fontSize: 15,
-                color: C.slate600,
-                lineHeight: 1.7,
-                maxWidth: 820,
-                marginBottom: 32,
-                fontStyle: 'italic',
-              }}
-            >
-              The same lens that exposed Kodak&rsquo;s missed digital pivot, Blockbuster&rsquo;s
-              Netflix rejection, and Nokia&rsquo;s smartphone blind spot now audits your strategic
-              memos in 60 seconds, turning every major call your team makes into a living, navigable
-              Decision Knowledge Graph.
-            </p>
-            <p
-              style={{
                 fontSize: 14,
-                fontWeight: 600,
+                fontWeight: 700,
                 color: C.green,
                 textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                marginBottom: 8,
+                letterSpacing: '0.14em',
+                marginBottom: 10,
               }}
             >
               What you get
             </p>
             <h2
               style={{
-                fontSize: 36,
-                fontWeight: 700,
+                fontSize: 'clamp(30px, 4.2vw, 42px)',
+                fontWeight: 800,
                 color: C.slate900,
-                marginBottom: 56,
-                letterSpacing: '-0.01em',
+                marginBottom: 18,
+                letterSpacing: '-0.02em',
                 maxWidth: 820,
-                lineHeight: 1.15,
+                lineHeight: 1.1,
               }}
             >
-              The Four Moments We Catch What Others Miss
+              The four moments that compound your team&rsquo;s judgment.
             </h2>
+            <p
+              style={{
+                fontSize: 17,
+                color: C.slate600,
+                lineHeight: 1.6,
+                maxWidth: 720,
+                marginBottom: 56,
+              }}
+            >
+              Every high-stakes call flows through the same four moments. Decision Intel governs
+              each one, and the compounding happens automatically.
+            </p>
           </motion.div>
 
           <div
@@ -572,61 +569,55 @@ export default function LandingPage() {
             {[
               {
                 num: '01',
-                title: 'Your full Decision Knowledge Graph: every major strategic call, connected.',
+                eyebrow: 'Decision Knowledge Graph',
+                title: 'Every strategic call, compounded into one living graph.',
                 body: (
                   <>
-                    Every strategic memo, board deck, and market-entry recommendation your team
-                    produces becomes a node in one navigable graph, connected by assumption, bias,
-                    and outcome. No more strategy archaeology across SharePoint, email, and the last
-                    analyst&rsquo;s laptop. Your team&rsquo;s collective judgment becomes a
-                    searchable, traceable asset. Today&rsquo;s decision always inherits
+                    Every board memo, market-entry recommendation, and M&amp;A paper your team
+                    writes becomes a node in one navigable graph&nbsp;&mdash; connected by
+                    assumption, bias, and outcome. Today&rsquo;s decision always inherits
                     yesterday&rsquo;s lessons.
                   </>
                 ),
               },
               {
                 num: '02',
-                title: 'See the questions before the CEO asks them.',
+                eyebrow: 'AI boardroom simulation',
+                title: 'Walk in with every objection already answered.',
                 body: (
                   <>
-                    Reworking the same board deck three times because new questions keep surfacing
-                    in the steering committee. That&rsquo;s time your team never gets back. Our
-                    simulation engine runs your memo against 135 historical decisions with known
-                    outcomes, predicting the objections, forgotten angles, and counterarguments
-                    before the meeting. You walk in with the objections already answered.
+                    Every memo runs past a role-primed AI boardroom of CEO, CFO, board, and
+                    division-lead personas. You see the questions your steering committee will raise
+                    before the meeting&nbsp;&mdash; not on your third draft of the deck.
                   </>
                 ),
               },
               {
                 num: '03',
-                title: 'Audit the reasoning behind every strategic memo.',
+                eyebrow: 'Human-AI reasoning audit',
+                title: 'Governance, not a black box.',
                 body: (
                   <>
-                    Strategy papers live or die on the logic behind the numbers. We score the 30+
-                    cognitive biases that quietly derail even the strongest-looking recommendations,
-                    converting narrative judgment into measurable risk signal. You walk into the
-                    board with the same analytical confidence in the{' '}
-                    <em style={{ color: C.slate900, fontStyle: 'italic' }}>strategy</em> that you
-                    already have in the{' '}
-                    <em style={{ color: C.slate900, fontStyle: 'italic' }}>data</em>.
+                    Your team keeps the judgment. The system keeps the receipts. Every
+                    cognitive-bias signal, noise measurement, and evidence excerpt is traceable to
+                    the exact line in your memo that triggered it&nbsp;&mdash; so every
+                    recommendation is defensible, not just delivered.
                   </>
                 ),
               },
               {
                 num: '04',
-                title: 'Close the loop most teams never close.',
+                eyebrow: 'What-if + Decision Quality Index',
+                title: 'Run what-if before the call, prove quality after.',
                 body: (
                   <>
-                    Most strategy teams recommend something and then wonder, months later, whether
-                    it actually worked. Every high-stakes call gets a Decision Quality Index:
-                    auditable evidence for your board, CEO, or parent company that the process was
-                    rigorous, not just that the outcome was lucky. Memo after memo, quarter after
-                    quarter, your DQI becomes proprietary proof that your team&rsquo;s judgment
-                    isn&rsquo;t just strong&mdash;it&rsquo;s{' '}
-                    <em style={{ color: C.green, fontStyle: 'italic', fontWeight: 600 }}>
-                      compounding
-                    </em>
-                    .
+                    Before the decision: run what-if interventions to see how removing a bias or
+                    reframing an assumption changes outcome probability. After: every call earns a
+                    Decision Quality Index that{' '}
+                    <em style={{ color: C.green, fontStyle: 'italic', fontWeight: 700 }}>
+                      compounds
+                    </em>{' '}
+                    into proprietary proof your team&rsquo;s judgment is sharpening.
                   </>
                 ),
               },
@@ -642,37 +633,50 @@ export default function LandingPage() {
                   padding: '36px 32px',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 16,
+                  gap: 14,
+                  boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
                 }}
               >
                 <div
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 12,
+                    gap: 10,
+                    flexWrap: 'wrap',
                   }}
                 >
                   <span
                     style={{
-                      fontSize: 13,
-                      fontWeight: 700,
+                      fontSize: 12,
+                      fontWeight: 800,
                       color: C.green,
                       background: C.greenLight,
                       padding: '4px 10px',
                       borderRadius: 6,
-                      letterSpacing: '0.04em',
+                      letterSpacing: '0.06em',
                     }}
                   >
                     {m.num}
                   </span>
+                  <span
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      color: C.slate500,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.1em',
+                    }}
+                  >
+                    {m.eyebrow}
+                  </span>
                 </div>
                 <h3
                   style={{
-                    fontSize: 20,
-                    fontWeight: 700,
+                    fontSize: 22,
+                    fontWeight: 800,
                     color: C.slate900,
-                    lineHeight: 1.3,
-                    letterSpacing: '-0.01em',
+                    lineHeight: 1.25,
+                    letterSpacing: '-0.015em',
                     margin: 0,
                   }}
                 >
