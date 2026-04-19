@@ -437,3 +437,161 @@ export const EXPANSION_ROADMAP: RoadmapYear[] = [
       'Decision quality as infrastructure. API-first platform for any organization. Industry-specific bias modules as add-ons.',
   },
 ];
+
+// ─── DI-space gap analysis (landing-page CategoryGapShowcase) ─────────────
+//
+// Three gaps the decision-intelligence incumbents have left open. The
+// landing-page showcase renders these as interactive tabs, with a per-gap
+// micro-viz and a rating strip showing how Quantexa, Aera, and Pyramid fare
+// against Decision Intel on each one.
+//
+// Positioning-only — no funding/valuation numbers. The incumbents' stances
+// come from their published positioning (Quantexa = contextual decision
+// intelligence / entity resolution; Aera = real-time decision automation;
+// Pyramid = augmented analytics / governed self-service BI) and Grok's
+// 2026 DI-space synthesis. Ratings are deliberate:
+//   - causal:     none = correlation-only; partial = some root-cause tooling;
+//                 full = structural causal models + do-calculus.
+//   - execution:  none = recommendations only; partial = automation without
+//                 recalibration loop; full = outcome flywheel + per-org DQI.
+//   - governance: none = black-box; partial = some audit / lineage; full =
+//                 regulator-grade compliance packet across 7 frameworks.
+
+export type GapId = 'causal' | 'execution' | 'governance';
+
+export interface DiGap {
+  id: GapId;
+  name: string; // short tab label
+  fullName: string; // full headline
+  summary: string; // what's broken across the DI space
+  diEdge: string; // what DI does differently
+  evidence: string; // research / internal anchor for credibility
+}
+
+export const DI_GAPS: DiGap[] = [
+  {
+    id: 'causal',
+    name: 'Causal',
+    fullName: 'Causal reasoning & faithful explainability',
+    summary:
+      "Incumbents run on correlation, not causation. ~74% of LLM-generated decision explanations don't match the actual drivers, so \"what-if\" and counterfactual questions get soft answers no audit committee can defend.",
+    diEdge:
+      "Structural causal models + do-calculus over a per-org Decision Knowledge Graph. Every flag names the cause, not just the pattern — and every counterfactual is a traceable intervention, not an LLM opinion.",
+    evidence:
+      'Grounded in the Kahneman-Tversky heuristics-and-biases lineage and our 20×20 bias-interaction matrix — both operationalised in src/lib/scoring/compound-engine.ts.',
+  },
+  {
+    id: 'execution',
+    name: 'Closed-Loop',
+    fullName: 'Decision-to-action execution & accountability',
+    summary:
+      'DI platforms stop at the recommendation. Outcome tracking, ownership, and score recalibration live outside the tool — so "insight without action" becomes the default, not the exception.',
+    diEdge:
+      "Outcome flywheel passively detects what actually happened across Slack, Drive, and email. Every confirmed outcome scores the original prediction with a Brier score and recalibrates the org's DQI per quarter. The loop closes automatically.",
+    evidence:
+      'Tetlock-grade calibration applied to corporate strategy. Implemented in src/lib/learning/ and surfaced on the Outcome Flywheel dashboard.',
+  },
+  {
+    id: 'governance',
+    name: 'Governance',
+    fullName: 'Human-AI governance, trust & oversight',
+    summary:
+      "Black-box AI inside a regulated decision process fails audit committee review. Decision governance lags data governance by a decade — few platforms produce regulator-grade defence documents for every flag they surface.",
+    diEdge:
+      'Every flag cross-links to a specific regulatory provision across 7 frameworks (SOX, GDPR, EU AI Act, Basel III, FCA, SEC Reg D, LPOA). The Audit Defense Packet is a one-click export your audit committee can walk into a regulator meeting with.',
+    evidence:
+      'Seven framework implementations shipped in src/lib/compliance/frameworks/ — provision-level mapping, not marketing claims.',
+  },
+];
+
+export type GapRating = 'full' | 'partial' | 'none';
+
+export interface DiIncumbent {
+  key: 'quantexa' | 'aera' | 'pyramid' | 'decisionIntel';
+  name: string;
+  tagline: string;
+  focus: string; // one line — what they're best at
+  accent: string; // hex for the row chip
+  ratings: Record<GapId, GapRating>;
+  blurb: Record<GapId, string>; // why each rating lands where it does
+}
+
+export const DI_INCUMBENTS: DiIncumbent[] = [
+  {
+    key: 'quantexa',
+    name: 'Quantexa',
+    tagline: 'Contextual Decision Intelligence',
+    focus: 'Unifies siloed data across entities for financial crime, fraud, and KYC.',
+    accent: '#0EA5E9',
+    ratings: { causal: 'partial', execution: 'none', governance: 'partial' },
+    blurb: {
+      causal:
+        'Entity resolution surfaces connections — but a connection is not a cause. No do-calculus layer for counterfactual what-ifs on strategic decisions.',
+      execution:
+        'Strong at flagging risk. Outcome tracking and per-org recalibration sit outside the platform.',
+      governance:
+        'Lineage for compliance cases, not for strategic decisions. No provision-level mapping to SOX or the EU AI Act on a board memo.',
+    },
+  },
+  {
+    key: 'aera',
+    name: 'Aera Technology',
+    tagline: 'Real-time decision automation',
+    focus: 'Digitises, augments, and automates supply-chain and operational decisions.',
+    accent: '#8B5CF6',
+    ratings: { causal: 'none', execution: 'partial', governance: 'none' },
+    blurb: {
+      causal:
+        'Recommendation engine on top of operational data. Correlation-based — no SCM layer, no intervention simulation.',
+      execution:
+        'Automation closes the loop for operational calls (replenishment, pricing). Strategic-memo outcomes are not in scope.',
+      governance:
+        'Built for ops, not for the audit committee. No cross-framework regulatory mapping on decision artefacts.',
+    },
+  },
+  {
+    key: 'pyramid',
+    name: 'Pyramid Analytics',
+    tagline: 'Augmented analytics',
+    focus: 'Governed self-service BI and decision dashboards for business users.',
+    accent: '#F59E0B',
+    ratings: { causal: 'none', execution: 'none', governance: 'partial' },
+    blurb: {
+      causal:
+        'Descriptive + predictive analytics over warehoused data. No causal inference on the reasoning that produced the memo.',
+      execution:
+        'Dashboards inform decisions; they do not track or recalibrate outcomes per-org.',
+      governance:
+        'Data governance is strong. Decision governance — flag-to-regulation mapping — is not the product surface.',
+    },
+  },
+  {
+    key: 'decisionIntel',
+    name: 'Decision Intel',
+    tagline: 'Causal Decision Assurance for strategy and M&A',
+    focus:
+      'Audits the reasoning behind every strategic memo — bias, noise, and compound risk — and closes the outcome loop.',
+    accent: '#16A34A',
+    ratings: { causal: 'full', execution: 'full', governance: 'full' },
+    blurb: {
+      causal:
+        'SCMs + do-calculus over a per-org Decision Knowledge Graph. Counterfactual what-ifs become traceable interventions with dollar-impact forecasts.',
+      execution:
+        'Outcome flywheel detects confirmed outcomes across Slack, Drive, and email. Brier scoring + Bayesian updating recalibrate the org-specific DQI quarter over quarter.',
+      governance:
+        'Every flag cites a regulatory provision across 7 frameworks. Audit Defense Packet exports as a regulator-grade PDF on Pro tier.',
+    },
+  },
+];
+
+export const GAP_RATING_COLOR: Record<GapRating, string> = {
+  full: '#16A34A',
+  partial: '#F59E0B',
+  none: '#EF4444',
+};
+
+export const GAP_RATING_LABEL: Record<GapRating, string> = {
+  full: 'Full coverage',
+  partial: 'Partial coverage',
+  none: 'Not covered',
+};

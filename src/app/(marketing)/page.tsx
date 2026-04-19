@@ -10,6 +10,7 @@ import { HeroTabs } from '@/components/marketing/HeroTabs';
 import { PipelineLandingTeaser } from '@/components/marketing/how-it-works/PipelineLandingTeaser';
 import { OutcomeDetectionViz } from '@/components/marketing/how-it-works/OutcomeDetectionViz';
 import { CredibilityTrio } from '@/components/marketing/CredibilityTrio';
+import { CategoryGapShowcase } from '@/components/marketing/CategoryGapShowcase';
 import { CompetitorComparisonCard } from '@/components/marketing/CompetitorComparisonCard';
 import { LandingFaq } from '@/components/marketing/LandingFaq';
 import { Reveal } from '@/components/ui/Reveal';
@@ -790,6 +791,11 @@ export default function LandingPage() {
             ))}
           </div>
         </section>
+      </Reveal>
+
+      {/* ── Category-defining: three DI gaps only we close ──────────── */}
+      <Reveal repeat>
+        <CategoryGapShowcase />
       </Reveal>
 
       {/* ── How It Works ────────────────────────────────────────────── */}
