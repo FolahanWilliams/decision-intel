@@ -1540,14 +1540,14 @@ export default function LandingPage() {
               style={{
                 display: 'inline-block',
                 fontSize: 11,
-                fontWeight: 700,
+                fontWeight: 800,
                 textTransform: 'uppercase',
                 letterSpacing: '0.14em',
                 color: C.green,
                 marginBottom: 12,
               }}
             >
-              Answers & alternatives
+              Before you sign
             </div>
             <h2
               style={{
@@ -1559,7 +1559,7 @@ export default function LandingPage() {
                 marginBottom: 12,
               }}
             >
-              Everything a buyer asks before signing.
+              The questions strategy teams actually bring.
             </h2>
             <p
               style={{
@@ -1570,8 +1570,7 @@ export default function LandingPage() {
                 lineHeight: 1.6,
               }}
             >
-              The questions corporate strategy teams actually bring — plus an honest side-by-side
-              against the alternatives we lose deals to.
+              Plus an honest side-by-side against what we replace.
             </p>
           </motion.div>
 
@@ -1609,23 +1608,39 @@ export default function LandingPage() {
         }
       `}</style>
 
-      {/* ── Final CTA + Newsletter ──────────────────────────────────── */}
+      {/* ── Final CTA + Newsletter (unified closing panel) ──────────── */}
       <section style={{ background: C.slate50, borderTop: `1px solid ${C.slate200}` }}>
         <div
           style={{
-            maxWidth: 640,
+            maxWidth: 680,
             margin: '0 auto',
-            padding: '80px 24px 48px',
+            padding: '88px 24px 40px',
             textAlign: 'center',
           }}
         >
           <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
-            <h2 style={{ fontSize: 36, fontWeight: 700, color: C.slate900, marginBottom: 16 }}>
+            <h2
+              style={{
+                fontSize: 'clamp(30px, 4.2vw, 42px)',
+                fontWeight: 800,
+                color: C.slate900,
+                marginBottom: 14,
+                letterSpacing: '-0.02em',
+                lineHeight: 1.1,
+              }}
+            >
               Ready to compound your team&rsquo;s judgment?
             </h2>
-            <p style={{ fontSize: 18, color: C.slate600, marginBottom: 32 }}>
-              Run your next strategic memo through Decision Intel in 60 seconds, or bring one
-              to a 30-minute call with the founder.
+            <p
+              style={{
+                fontSize: 18,
+                color: C.slate600,
+                marginBottom: 32,
+                lineHeight: 1.6,
+              }}
+            >
+              Paste your next strategic memo for one free audit, no signup. Or spend 30 minutes
+              with the founder on a call.
             </p>
             <div
               style={{
@@ -1635,6 +1650,25 @@ export default function LandingPage() {
                 flexWrap: 'wrap',
               }}
             >
+              <Link
+                href="/demo"
+                onClick={() => trackEvent('final_cta_clicked', { target: 'demo' })}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  fontSize: 16,
+                  fontWeight: 700,
+                  color: C.white,
+                  background: C.green,
+                  padding: '14px 32px',
+                  borderRadius: 10,
+                  textDecoration: 'none',
+                  boxShadow: '0 6px 20px rgba(22,163,74,0.28)',
+                }}
+              >
+                Audit a memo free <ArrowRight size={18} />
+              </Link>
               {(() => {
                 const bookingUrl = process.env.NEXT_PUBLIC_DEMO_BOOKING_URL;
                 const bookingHref = bookingUrl || '/pricing#design-partner';
@@ -1645,63 +1679,50 @@ export default function LandingPage() {
                     {...(bookingExternal
                       ? { target: '_blank', rel: 'noopener noreferrer' }
                       : {})}
-                    onClick={() => trackEvent('book_demo_click', { source: 'final_cta' })}
+                    onClick={() =>
+                      trackEvent('final_cta_clicked', { target: 'design_partner_call' })
+                    }
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: 8,
                       fontSize: 16,
-                      fontWeight: 700,
-                      color: C.white,
-                      background: C.green,
+                      fontWeight: 600,
+                      color: C.slate900,
+                      background: C.white,
+                      border: `1px solid ${C.slate200}`,
                       padding: '14px 32px',
                       borderRadius: 10,
                       textDecoration: 'none',
-                      boxShadow: '0 2px 12px rgba(22, 163, 74, 0.25)',
                     }}
                   >
                     Book a design partner call <ArrowRight size={18} />
                   </Link>
                 );
               })()}
-              <Link
-                href="/login"
-                onClick={() => trackEvent('final_cta_clicked')}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  fontSize: 16,
-                  fontWeight: 600,
-                  color: C.green,
-                  background: C.white,
-                  border: `1.5px solid #86EFAC`,
-                  padding: '14px 32px',
-                  borderRadius: 10,
-                  textDecoration: 'none',
-                }}
-              >
-                Try Decision Intel free <ArrowRight size={18} />
-              </Link>
             </div>
             <div
               style={{
                 display: 'flex',
                 justifyContent: 'center',
-                gap: 24,
-                marginTop: 24,
+                gap: 22,
+                marginTop: 22,
                 flexWrap: 'wrap',
               }}
             >
-              {['30 minutes · no slides', 'Live on your own memo', '4 design-partner seats open'].map(t => (
+              {[
+                'Real 12-node audit',
+                'No signup · no card',
+                '4 design-partner seats open',
+              ].map(t => (
                 <span
                   key={t}
                   style={{
-                    display: 'flex',
+                    display: 'inline-flex',
                     alignItems: 'center',
                     gap: 6,
                     fontSize: 13,
-                    color: C.slate400,
+                    color: C.slate500,
                   }}
                 >
                   <Check size={14} style={{ color: C.green }} /> {t}
@@ -1711,52 +1732,41 @@ export default function LandingPage() {
           </motion.div>
         </div>
 
-        {/* Secondary: newsletter capture for the not-ready-yet segment */}
-        <div style={{ maxWidth: 640, margin: '0 auto', padding: '0 24px' }}>
+        {/* Quiet secondary: newsletter for the not-ready-yet segment */}
+        <div style={{ maxWidth: 680, margin: '0 auto', padding: '0 24px' }}>
           <div style={{ borderTop: `1px solid ${C.slate200}` }} />
         </div>
         <div
           style={{
-            maxWidth: 640,
+            maxWidth: 560,
             margin: '0 auto',
-            padding: '48px 24px 80px',
+            padding: '36px 24px 72px',
             textAlign: 'center',
           }}
         >
           <p
             style={{
-              fontSize: 12,
-              fontWeight: 700,
+              fontSize: 11,
+              fontWeight: 800,
               color: C.slate500,
               textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              margin: '0 0 10px',
+              letterSpacing: '0.12em',
+              margin: '0 0 8px',
             }}
           >
-            Not ready for a pilot?
+            Not ready to audit a memo?
           </p>
-          <h3
-            style={{
-              fontSize: 22,
-              fontWeight: 700,
-              color: C.slate900,
-              margin: '0 0 10px',
-              letterSpacing: '-0.01em',
-            }}
-          >
-            Get one corporate-decision post-mortem a week.
-          </h3>
           <p
             style={{
               fontSize: 14,
               color: C.slate600,
-              lineHeight: 1.65,
-              margin: '0 auto 20px',
-              maxWidth: 480,
+              lineHeight: 1.6,
+              margin: '0 auto 16px',
+              maxWidth: 460,
             }}
           >
-            One real-world case study per week, broken down with the cognitive biases that were
-            detectable before the outcome was known. Free, unsubscribe anytime.
+            One real corporate decision, broken down weekly with the biases detectable before the
+            outcome was known.
           </p>
           <NewsletterForm source="landing_newsletter" />
         </div>
