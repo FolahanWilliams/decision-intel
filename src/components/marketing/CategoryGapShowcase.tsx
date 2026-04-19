@@ -479,7 +479,7 @@ export function CategoryGapShowcase() {
             }}
           >
             <Sparkles size={11} strokeWidth={2.4} />
-            Category-defining
+            The category we&rsquo;re defining
           </div>
           <h2
             style={{
@@ -489,25 +489,28 @@ export function CategoryGapShowcase() {
               letterSpacing: '-0.015em',
               lineHeight: 1.1,
               margin: '0 auto 14px',
-              maxWidth: 860,
+              maxWidth: 880,
             }}
           >
-            The decision-intelligence category has three unsolved problems.
+            Judged on the four pillars every other system in your stack already is.
             <br />
-            <span style={{ color: C.green }}>We built the platform that solves all three.</span>
+            <span style={{ color: C.green }}>
+              Quality. Governance. Scalability. Reliability.
+            </span>
           </h2>
           <p
             style={{
               fontSize: 'clamp(14px, 1.4vw, 17px)',
               color: C.slate600,
               lineHeight: 1.6,
-              maxWidth: 720,
+              maxWidth: 740,
               margin: '0 auto',
             }}
           >
-            Correlation dressed up as insight. Loops that never close. Black-box AI that the
-            audit committee can&rsquo;t defend. Each one blocks real value. Each one has a
-            specific answer on the other side of this card.
+            Your data warehouse, your CRM, your finance stack &mdash; each one passed the audit
+            committee on these four. The reasoning layer on top of them never has. That&rsquo;s
+            the category Decision Intel is building, and the three capabilities below are how
+            we deliver each pillar. Pick one to explore.
           </p>
         </div>
 
