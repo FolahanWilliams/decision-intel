@@ -30,8 +30,9 @@ import { DqiComponentBars } from '@/components/marketing/how-it-works/DqiCompone
 import { NoiseDistributionViz } from '@/components/marketing/how-it-works/NoiseDistributionViz';
 import { DQIBadge } from '@/components/ui/DQIBadge';
 import { Reveal } from '@/components/ui/Reveal';
+import { PasteAuditResults } from '@/components/marketing/demo/PasteAuditResults';
 import { trackEvent } from '@/lib/analytics/track';
-import { scanForBiases, type ScanResult } from '@/lib/analysis/client-bias-scanner';
+import type { AnalysisResult } from '@/types';
 
 /* ─── Color tokens (mirror landing page so the demo feels like the same product) ── */
 const C = {
@@ -173,7 +174,14 @@ export default function DemoPage() {
   const [currentStage, setCurrentStage] = useState(-1);
   const [showResults, setShowResults] = useState(false);
   const [pasteText, setPasteText] = useState('');
-  const [scanResult, setScanResult] = useState<ScanResult | null>(null);
+  const [pasteAuditing, setPasteAuditing] = useState(false);
+  const [pasteAudit, setPasteAudit] = useState<{
+    documentId: string;
+    analysisId: string | null;
+    result: AnalysisResult;
+  } | null>(null);
+  const [pasteError, setPasteError] = useState<string | null>(null);
+  const [pasteStageIdx, setPasteStageIdx] = useState(0);
   const resultsRef = useRef<HTMLDivElement>(null);
   const [activeSection, setActiveSection] = useState('pipeline');
   const [showAllBiases, setShowAllBiases] = useState(false);
@@ -210,14 +218,70 @@ export default function DemoPage() {
     runNextStage();
   }, []);
 
-  // Handle paste mode submission — runs real client-side bias scanning
-  const handlePasteAnalyze = useCallback(() => {
-    if (!pasteText.trim() || pasteText.trim().length < 15) return;
-    trackEvent('demo_paste_analyzed', { textLength: pasteText.length });
-    const result = scanForBiases(pasteText);
-    setScanResult(result);
-    trackEvent('demo_paste_results', { biasCount: result.biasCount, riskLevel: result.riskLevel });
+  // Handle paste mode submission — runs the REAL 12-node pipeline via
+  // /api/demo/run. Displays a staged progress animation while the audit
+  // is running, then hands the result to <PasteAuditResults>.
+  const handlePasteAnalyze = useCallback(async () => {
+    const trimmed = pasteText.trim();
+    if (trimmed.length < 15) return;
+
+    trackEvent('demo_paste_analyzed', { textLength: trimmed.length });
+    setPasteAuditing(true);
+    setPasteError(null);
+    setPasteAudit(null);
+    setPasteStageIdx(0);
+
+    try {
+      const res = await fetch('/api/demo/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: trimmed }),
+      });
+      const body = (await res.json().catch(() => ({}))) as {
+        success?: boolean;
+        data?: { documentId: string; analysisId: string | null; result: AnalysisResult };
+        error?: string;
+      };
+
+      if (!res.ok || !body.success || !body.data) {
+        const msg =
+          body.error ||
+          'The audit ran into an error. Please try again in a moment.';
+        trackEvent('demo_paste_error', { status: res.status });
+        setPasteError(msg);
+        setPasteAuditing(false);
+        return;
+      }
+
+      trackEvent('demo_paste_results', {
+        dqi: body.data.result.overallScore,
+        biasCount: body.data.result.biases?.length ?? 0,
+      });
+      setPasteAudit(body.data);
+      setPasteAuditing(false);
+      // Scroll to results after a short beat so the animation feels intentional
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 220);
+    } catch (err) {
+      const msg =
+        err instanceof Error && err.message
+          ? 'Network error. Please check your connection and try again.'
+          : 'Something went wrong. Please try again.';
+      trackEvent('demo_paste_error', { network: true });
+      setPasteError(msg);
+      setPasteAuditing(false);
+    }
   }, [pasteText]);
+
+  // Cycle through the progress stages while the real pipeline runs
+  useEffect(() => {
+    if (!pasteAuditing) return;
+    const t = setInterval(() => {
+      setPasteStageIdx(i => Math.min(i + 1, PIPELINE_STAGES.length - 1));
+    }, 5500);
+    return () => clearInterval(t);
+  }, [pasteAuditing]);
 
   const scoreColor = analysis
     ? analysis.overallScore >= 70
@@ -294,7 +358,8 @@ export default function DemoPage() {
     return () => observers.forEach(o => o.disconnect());
   }, [showResults]);
 
-  const idleState = !isSimulating && !showResults && !scanResult;
+  const idleState =
+    !isSimulating && !showResults && !pasteAuditing && !pasteAudit && !pasteError;
 
   return (
     <div style={{ minHeight: '100vh', background: C.white, color: C.slate900 }}>
@@ -657,16 +722,161 @@ export default function DemoPage() {
         </SectionBand>
       )}
 
-      {/* Quick Scan Results (paste mode) */}
-      {scanResult && !isSimulating && !showResults && (
-        <SectionBand bg={C.slate50} borderTop paddingY={56}>
-          <QuickScanResults
-            result={scanResult}
-            onBack={() => {
-              setScanResult(null);
-              setPasteText('');
+      {/* Paste audit: in-flight progress (real /api/demo/run running) */}
+      {pasteAuditing && (
+        <SectionBand bg={C.slate50} borderTop paddingY={56} maxWidth={720}>
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+            <div
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: 999,
+                background: C.white,
+                border: `1px solid ${C.slate200}`,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: 14,
+                boxShadow: '0 1px 3px rgba(15,23,42,0.06)',
+              }}
+            >
+              <Loader2 size={26} style={{ color: C.green }} className="animate-spin" />
+            </div>
+            <h2
+              style={{
+                fontSize: 'clamp(22px, 3.5vw, 28px)',
+                fontWeight: 800,
+                color: C.slate900,
+                margin: '0 0 6px',
+                letterSpacing: '-0.015em',
+              }}
+            >
+              Auditing your memo
+            </h2>
+            <p style={{ fontSize: 13.5, color: C.slate500, margin: 0, lineHeight: 1.55 }}>
+              Running the real Decision Intel pipeline. This takes 30&ndash;60&nbsp;seconds on a
+              strategic memo.
+            </p>
+          </div>
+          <div style={{ ...cardStyle, padding: '22px 26px' }}>
+            {PIPELINE_STAGES.map((stage, idx) => {
+              const Icon = stage.icon;
+              const state =
+                idx < pasteStageIdx
+                  ? ('done' as const)
+                  : idx === pasteStageIdx
+                    ? ('running' as const)
+                    : ('pending' as const);
+              return (
+                <div
+                  key={stage.id}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    padding: '10px 0',
+                    borderBottom:
+                      idx === PIPELINE_STAGES.length - 1 ? 'none' : `1px solid ${C.slate100}`,
+                    opacity: state === 'pending' ? 0.42 : 1,
+                    transition: 'opacity 0.3s',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: 8,
+                      background:
+                        state === 'done'
+                          ? C.greenLight
+                          : state === 'running'
+                            ? C.greenSoft
+                            : C.slate50,
+                      color: state === 'done' ? C.green : state === 'running' ? C.green : C.slate400,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {state === 'running' ? (
+                      <Loader2 size={13} className="animate-spin" />
+                    ) : state === 'done' ? (
+                      <CheckCircle2 size={14} strokeWidth={2.4} />
+                    ) : (
+                      <Icon size={13} />
+                    )}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 13.5,
+                      fontWeight: state === 'pending' ? 500 : 600,
+                      color: state === 'pending' ? C.slate500 : C.slate900,
+                    }}
+                  >
+                    {stage.label}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </SectionBand>
+      )}
+
+      {/* Paste audit: error state */}
+      {pasteError && !pasteAuditing && !pasteAudit && (
+        <SectionBand bg={C.slate50} borderTop paddingY={48} maxWidth={640}>
+          <div
+            style={{
+              background: '#FEF2F2',
+              border: '1px solid #FECACA',
+              borderRadius: 14,
+              padding: '18px 22px',
+              color: '#7F1D1D',
             }}
-          />
+          >
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 800,
+                color: '#B91C1C',
+                textTransform: 'uppercase',
+                letterSpacing: '0.14em',
+                marginBottom: 6,
+              }}
+            >
+              Audit didn&rsquo;t run
+            </div>
+            <p style={{ fontSize: 14, lineHeight: 1.55, margin: '0 0 10px' }}>{pasteError}</p>
+            <button
+              onClick={() => setPasteError(null)}
+              style={{
+                fontSize: 12.5,
+                fontWeight: 700,
+                color: C.white,
+                background: '#B91C1C',
+                border: 'none',
+                padding: '8px 14px',
+                borderRadius: 8,
+                cursor: 'pointer',
+              }}
+            >
+              Edit memo and retry
+            </button>
+          </div>
+        </SectionBand>
+      )}
+
+      {/* Paste audit: wow-sequence result */}
+      {pasteAudit && !pasteAuditing && (
+        <SectionBand bg={C.slate50} borderTop paddingY={64} maxWidth={920}>
+          <div ref={resultsRef}>
+            <PasteAuditResults
+              documentId={pasteAudit.documentId}
+              analysisId={pasteAudit.analysisId}
+              result={pasteAudit.result}
+            />
+          </div>
         </SectionBand>
       )}
 
@@ -2125,423 +2335,6 @@ function StatPill({ label, value }: { label: string; value: string }) {
         {label}
       </span>
       <span style={{ fontSize: 13, fontWeight: 700, color: C.slate900 }}>{value}</span>
-    </div>
-  );
-}
-
-// ─── Quick Scan Results (Paste Mode) ──────────────────────────────────
-
-const riskColors: Record<string, string> = {
-  critical: '#ef4444',
-  high: '#f97316',
-  medium: '#eab308',
-  low: '#22c55e',
-  clear: '#22c55e',
-};
-
-function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () => void }) {
-  const router = useRouter();
-  const [loadingSample, setLoadingSample] = useState(false);
-
-  const handleTryNow = async () => {
-    setLoadingSample(true);
-    try {
-      const res = await fetch('/api/onboarding/sample', { method: 'POST' });
-      const data = await res.json();
-      if (data.documentId) {
-        router.push(`/documents/${data.documentId}`);
-        return;
-      }
-    } catch {
-      // Fall through to login
-    }
-    router.push('/login');
-    setLoadingSample(false);
-  };
-
-  const riskColor = riskColors[result.riskLevel];
-
-  return (
-    <div>
-      {/* Back button */}
-      <button
-        onClick={onBack}
-        style={{
-          fontSize: 12,
-          color: C.slate500,
-          background: 'transparent',
-          border: 'none',
-          cursor: 'pointer',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 6,
-          padding: 0,
-          marginBottom: 28,
-          transition: 'color 0.15s',
-        }}
-        onMouseEnter={e => (e.currentTarget.style.color = C.slate900)}
-        onMouseLeave={e => (e.currentTarget.style.color = C.slate500)}
-      >
-        <ArrowRight size={12} style={{ transform: 'rotate(180deg)' }} />
-        Scan different text
-      </button>
-
-      {/* Header */}
-      <div style={{ textAlign: 'center', marginBottom: 36 }}>
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 8,
-            padding: '8px 16px',
-            borderRadius: 999,
-            background: `${riskColor}15`,
-            border: `1px solid ${riskColor}33`,
-            color: riskColor,
-            fontSize: 13,
-            fontWeight: 700,
-            letterSpacing: '0.02em',
-            marginBottom: 16,
-          }}
-        >
-          <Brain size={15} />
-          {result.biasCount === 0
-            ? 'No Biases Detected'
-            : `${result.biasCount} Bias${result.biasCount > 1 ? 'es' : ''} Detected`}
-        </div>
-        <p
-          style={{
-            color: C.slate600,
-            fontSize: 15,
-            maxWidth: 620,
-            margin: '0 auto',
-            lineHeight: 1.6,
-          }}
-        >
-          {result.summary}
-        </p>
-      </div>
-
-      {/* Score Cards */}
-      {result.biasCount > 0 && (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-            gap: 12,
-            marginBottom: 28,
-          }}
-        >
-          <ScoreCard
-            label="BIASES FOUND"
-            value={`${result.biasCount}`}
-            sub="of 14 checked"
-            color={riskColor}
-          />
-          <ScoreCard
-            label="RISK LEVEL"
-            value={result.riskLevel.toUpperCase()}
-            sub={`${result.biases.filter(b => b.severity === 'critical' || b.severity === 'high').length} high/critical`}
-            color={riskColor}
-            smallValue
-          />
-          <ScoreCard
-            label="SCAN TYPE"
-            value="Quick"
-            sub={result.isPreDecision ? 'Pre-decision detected' : 'Pattern scan'}
-            color={C.slate900}
-            smallValue
-          />
-        </div>
-      )}
-
-      {/* Detected Biases */}
-      {result.biases.length > 0 && (
-        <Section icon={<Brain size={16} />} title="Detected Biases">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {result.biases.map((bias, idx) => (
-              <div key={idx} style={innerCardStyle}>
-                <div
-                  style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    alignItems: 'center',
-                    gap: 10,
-                    marginBottom: 12,
-                  }}
-                >
-                  <span
-                    style={{
-                      fontWeight: 700,
-                      fontSize: 14,
-                      color: C.slate900,
-                      letterSpacing: '-0.01em',
-                    }}
-                  >
-                    {bias.label}
-                  </span>
-                  <SeverityBadge severity={bias.severity} />
-                </div>
-                <p
-                  style={{
-                    color: C.slate600,
-                    fontSize: 13,
-                    margin: '0 0 12px',
-                    fontStyle: 'italic',
-                    lineHeight: 1.65,
-                    paddingLeft: 14,
-                    borderLeft: `3px solid ${sevColor(bias.severity)}55`,
-                  }}
-                >
-                  &ldquo;...{bias.signal}...&rdquo;
-                </p>
-                <p
-                  style={{
-                    color: C.slate600,
-                    fontSize: 13,
-                    margin: '0 0 12px',
-                    lineHeight: 1.65,
-                  }}
-                >
-                  {bias.explanation}
-                </p>
-                <div
-                  style={{
-                    padding: '10px 14px',
-                    borderRadius: 8,
-                    background: C.greenSoft,
-                    border: `1px solid ${C.greenLight}`,
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: 10,
-                      fontWeight: 700,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.06em',
-                      color: C.greenDark,
-                      marginRight: 8,
-                    }}
-                  >
-                    Recommend
-                  </span>
-                  <span style={{ color: C.greenDark, fontSize: 13, lineHeight: 1.6 }}>
-                    {bias.suggestion}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Section>
-      )}
-
-      {/* No biases state */}
-      {result.biases.length === 0 && (
-        <div
-          style={{
-            ...cardStyle,
-            padding: '32px 28px',
-            textAlign: 'center',
-            marginBottom: 24,
-            border: `1px solid ${C.greenLight}`,
-          }}
-        >
-          <div
-            style={{
-              width: 56,
-              height: 56,
-              borderRadius: 999,
-              background: C.greenSoft,
-              border: `1px solid ${C.greenLight}`,
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: 14,
-            }}
-          >
-            <CheckCircle2 size={26} style={{ color: C.green }} />
-          </div>
-          <h3
-            style={{
-              fontSize: 20,
-              fontWeight: 700,
-              color: C.slate900,
-              margin: '0 0 10px',
-              letterSpacing: '-0.01em',
-            }}
-          >
-            Looking Good
-          </h3>
-          <p
-            style={{
-              color: C.slate600,
-              fontSize: 14,
-              maxWidth: 520,
-              margin: '0 auto',
-              lineHeight: 1.6,
-            }}
-          >
-            No common cognitive biases detected in this text. The full analysis also checks for
-            logical fallacies, decision noise, regulatory compliance, fact verification, and runs a
-            boardroom simulation with AI decision twins.
-          </p>
-        </div>
-      )}
-
-      {/* Upsell CTA */}
-      <div
-        style={{
-          marginTop: 32,
-          padding: '36px 32px',
-          borderRadius: 20,
-          background: `linear-gradient(160deg, ${C.white} 0%, ${C.greenSoft} 100%)`,
-          border: `1px solid ${C.slate200}`,
-          textAlign: 'center',
-          boxShadow: '0 4px 24px rgba(15,23,42,0.05)',
-        }}
-      >
-        <div
-          style={{
-            fontSize: 11,
-            color: C.green,
-            letterSpacing: '0.1em',
-            fontWeight: 700,
-            marginBottom: 12,
-          }}
-        >
-          UNLOCK THE FULL ANALYSIS
-        </div>
-        <h3
-          style={{
-            fontSize: 'clamp(20px, 2.6vw, 26px)',
-            fontWeight: 700,
-            color: C.slate900,
-            margin: '0 0 10px',
-            letterSpacing: '-0.015em',
-            lineHeight: 1.2,
-          }}
-        >
-          This quick scan only checked 14 biases.
-        </h3>
-        <p
-          style={{
-            color: C.slate600,
-            fontSize: 14,
-            margin: '0 auto 20px',
-            maxWidth: 560,
-            lineHeight: 1.55,
-          }}
-        >
-          The full Decision Intel analysis goes much deeper:
-        </p>
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            gap: 6,
-            marginBottom: 28,
-            maxWidth: 640,
-            marginLeft: 'auto',
-            marginRight: 'auto',
-          }}
-        >
-          {[
-            '30+ cognitive biases',
-            'Decision noise scoring',
-            'Logical fallacy detection',
-            'Regulatory compliance',
-            'Fact verification',
-            'SWOT analysis',
-            'Pre-mortem scenarios',
-            'Boardroom simulation',
-            'Institutional memory',
-          ].map(feature => (
-            <span
-              key={feature}
-              style={{
-                fontSize: 11,
-                padding: '4px 10px',
-                borderRadius: 999,
-                background: C.white,
-                color: C.greenDark,
-                border: `1px solid ${C.greenLight}`,
-                fontWeight: 500,
-              }}
-            >
-              {feature}
-            </span>
-          ))}
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            gap: 10,
-            justifyContent: 'center',
-            flexWrap: 'wrap',
-          }}
-        >
-          <button
-            onClick={handleTryNow}
-            disabled={loadingSample}
-            style={{
-              padding: '14px 24px',
-              borderRadius: 10,
-              background: C.green,
-              color: C.white,
-              fontWeight: 700,
-              fontSize: 14,
-              border: 'none',
-              cursor: loadingSample ? 'wait' : 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              boxShadow: '0 4px 12px rgba(22,163,74,0.25)',
-              transition: 'background 0.15s',
-            }}
-            onMouseEnter={e => {
-              if (!loadingSample) e.currentTarget.style.background = C.greenDark;
-            }}
-            onMouseLeave={e => {
-              if (!loadingSample) e.currentTarget.style.background = C.green;
-            }}
-          >
-            {loadingSample ? 'Loading...' : 'Try Full Analysis'}
-            {!loadingSample && <ArrowRight size={14} />}
-          </button>
-          <Link
-            href="/login"
-            style={{
-              padding: '14px 24px',
-              borderRadius: 10,
-              background: C.white,
-              border: `1px solid ${C.slate200}`,
-              color: C.slate900,
-              fontWeight: 600,
-              fontSize: 14,
-              textDecoration: 'none',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              transition: 'border-color 0.15s, background 0.15s',
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.borderColor = C.slate400;
-              e.currentTarget.style.background = C.slate50;
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.borderColor = C.slate200;
-              e.currentTarget.style.background = C.white;
-            }}
-          >
-            Sign Up Free
-          </Link>
-        </div>
-        <p style={{ color: C.slate400, fontSize: 11, marginTop: 18 }}>
-          No credit card required · Free plan covers your first 4 audits · 30-day pilot on Strategy tier
-        </p>
-      </div>
     </div>
   );
 }
