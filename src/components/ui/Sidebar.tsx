@@ -21,6 +21,8 @@ import {
   PenLine,
   Briefcase,
   BookTemplate,
+  Share2,
+  Repeat,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { ThemeToggle, ThemeToggleCompact } from '@/components/ThemeToggle';
@@ -430,6 +432,28 @@ export default function Sidebar() {
               collapsed={collapsed}
               onNavigate={closeMobile}
             />
+            {!collapsed &&
+              (pathname.startsWith('/dashboard/analytics') ||
+                pathname.startsWith('/dashboard/outcome-flywheel') ||
+                pathname.startsWith('/dashboard/decision-graph') ||
+                pathname.startsWith('/dashboard/decision-quality')) && (
+                <>
+                  <SubNavItem
+                    href="/dashboard/decision-graph"
+                    icon={<Share2 size={14} />}
+                    label="Decision Graph"
+                    active={pathname.startsWith('/dashboard/decision-graph')}
+                    onNavigate={closeMobile}
+                  />
+                  <SubNavItem
+                    href="/dashboard/outcome-flywheel"
+                    icon={<Repeat size={14} />}
+                    label="Outcome Flywheel"
+                    active={pathname.startsWith('/dashboard/outcome-flywheel')}
+                    onNavigate={closeMobile}
+                  />
+                </>
+              )}
             {isTeamPlan && (
               <NavItem
                 href="/dashboard/meetings"
@@ -755,6 +779,63 @@ function NavItem({
         </div>
       )}
     </div>
+  );
+}
+
+function SubNavItem({
+  href,
+  icon,
+  label,
+  active,
+  onNavigate,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  label: string;
+  active?: boolean;
+  onNavigate?: () => void;
+}) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <Link
+      href={href}
+      onClick={onNavigate}
+      aria-current={active ? 'page' : undefined}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
+        padding: '6px 10px 6px 28px',
+        color: active
+          ? 'var(--text-highlight)'
+          : hovered
+            ? 'var(--text-primary)'
+            : 'var(--text-secondary)',
+        background: active ? 'var(--bg-card-hover)' : 'transparent',
+        borderLeft: active ? '2px solid var(--accent-primary)' : '2px solid transparent',
+        marginLeft: '12px',
+        marginBottom: '1px',
+        fontSize: '12.5px',
+        fontWeight: active ? 600 : 400,
+        textDecoration: 'none',
+        borderRadius: 0,
+        transition: 'all 0.15s',
+      }}
+    >
+      <span
+        style={{
+          color: active ? 'var(--accent-primary)' : 'var(--text-muted)',
+          flexShrink: 0,
+          display: 'flex',
+          alignItems: 'center',
+        }}
+      >
+        {icon}
+      </span>
+      <span>{label}</span>
+    </Link>
   );
 }
 
