@@ -379,6 +379,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
     }
   }, []);
   const [isExportingBoardView, setIsExportingBoardView] = useState(false);
+  // Confidential classification toggle for the Board view + its PDF
+  // export. Kept as component state (not persisted) so every document
+  // starts un-classified by default — a CSO has to opt in each time
+  // they intend to forward internally.
+  const [isBoardConfidential, setIsBoardConfidential] = useState(false);
 
   // URL-based tab state (#7)
   const tabFromUrl = searchParams.get('tab') ?? '';
@@ -446,7 +451,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
     try {
       const { BoardReportGenerator } = await import('@/lib/reports/board-report-generator');
       const generator = new BoardReportGenerator();
-      generator.generateReport({ filename: document.filename, analysis });
+      generator.generateReport({
+        filename: document.filename,
+        analysis,
+        confidential: isBoardConfidential,
+      });
       fetch('/api/audit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -454,10 +463,13 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           action: 'EXPORT_BOARD_REPORT',
           resource: 'Document',
           resourceId: document.id,
-          details: { filename: document.filename },
+          details: { filename: document.filename, confidential: isBoardConfidential },
         }),
       }).catch(err => log.warn('audit EXPORT_BOARD_REPORT failed:', err));
-      showToast('Board report generated', 'success');
+      showToast(
+        isBoardConfidential ? 'Confidential board report generated' : 'Board report generated',
+        'success'
+      );
     } catch (error) {
       log.error('Failed to generate board report:', error);
       showToast('Failed to generate board report', 'error');
@@ -1395,6 +1407,8 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 | undefined
             }
             exporting={isExportingBoardView}
+            confidential={isBoardConfidential}
+            onToggleConfidential={() => setIsBoardConfidential(prev => !prev)}
             onExportPdf={async () => {
               setIsExportingBoardView(true);
               try {
