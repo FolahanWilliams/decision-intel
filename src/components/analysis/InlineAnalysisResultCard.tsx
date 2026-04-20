@@ -85,6 +85,32 @@ export function InlineAnalysisResultCard({ analysis, onDismiss }: Props) {
     };
   }, [analysis.docId]);
 
+  // Pull the team's benchmark DQI so the post-upload reveal can show
+  // "+12 above your org's avg." The endpoint returns null profile for
+  // individual-plan users and for team-plan orgs with < 3 analyses —
+  // in both cases the benchmark chip simply doesn't render.
+  const [orgAvg, setOrgAvg] = useState<number | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    async function loadBenchmark() {
+      try {
+        const res = await fetch('/api/team/intelligence');
+        if (!res.ok) return;
+        const data = (await res.json().catch(() => null)) as {
+          profile?: { avgDecisionQuality?: number | null } | null;
+        } | null;
+        const avg = data?.profile?.avgDecisionQuality;
+        if (typeof avg === 'number' && !cancelled) setOrgAvg(avg);
+      } catch (err) {
+        log.warn('Failed to load team benchmark for score reveal:', err);
+      }
+    }
+    loadBenchmark();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -170,6 +196,7 @@ export function InlineAnalysisResultCard({ analysis, onDismiss }: Props) {
             label="Decision Quality Index"
             showGrade
             suspenseMs={1200}
+            benchmark={orgAvg !== null ? { value: orgAvg } : undefined}
           />
           {analysis.noiseScore != null && (
             <div

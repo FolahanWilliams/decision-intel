@@ -30,6 +30,13 @@ interface ScoreRevealProps {
    * in the hero flow should pass 1200 for the SAT-score reveal feel.
    */
   suspenseMs?: number;
+  /**
+   * Optional benchmark — renders a small "vs org avg 62 · +12" line below
+   * the grade once the reveal completes. Omit if no benchmark is available
+   * (individual plans, cold-start orgs with < 3 analyses). Label defaults
+   * to "your org's avg".
+   */
+  benchmark?: { value: number; label?: string };
 }
 
 export function ScoreReveal({
@@ -38,6 +45,7 @@ export function ScoreReveal({
   showGrade = false,
   duration = 1500,
   suspenseMs = 0,
+  benchmark,
 }: ScoreRevealProps) {
   const [stage, setStage] = useState<'suspense' | 'revealing'>(
     suspenseMs > 0 ? 'suspense' : 'revealing'
@@ -49,7 +57,11 @@ export function ScoreReveal({
     return () => clearTimeout(timer);
   }, [suspenseMs]);
 
-  const { grade, color } = getGrade(Math.round(score));
+  const rounded = Math.round(score);
+  const { grade, color } = getGrade(rounded);
+  const benchmarkDelta =
+    benchmark && Number.isFinite(benchmark.value) ? rounded - Math.round(benchmark.value) : null;
+  const benchmarkLabel = benchmark?.label ?? "your org's avg";
 
   return (
     <div>
@@ -132,6 +144,52 @@ export function ScoreReveal({
           )}
         </AnimatePresence>
       </div>
+      {stage === 'revealing' && benchmark && benchmarkDelta !== null && (
+        <motion.div
+          initial={{ opacity: 0, y: -2 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: duration / 1000 + 0.25, duration: 0.3 }}
+          style={{
+            marginTop: 6,
+            fontSize: 11.5,
+            color: 'var(--text-muted)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+          }}
+        >
+          <span>
+            {benchmarkLabel}: {Math.round(benchmark.value)}
+          </span>
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 3,
+              padding: '1px 7px',
+              borderRadius: 'var(--radius-full)',
+              fontSize: 10.5,
+              fontWeight: 600,
+              background:
+                benchmarkDelta > 0
+                  ? 'rgba(22,163,74,0.10)'
+                  : benchmarkDelta < 0
+                    ? 'rgba(239,68,68,0.10)'
+                    : 'var(--bg-card-hover)',
+              color:
+                benchmarkDelta > 0
+                  ? 'var(--success)'
+                  : benchmarkDelta < 0
+                    ? 'var(--error)'
+                    : 'var(--text-muted)',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {benchmarkDelta > 0 ? '↑' : benchmarkDelta < 0 ? '↓' : '='}
+            {benchmarkDelta !== 0 && Math.abs(benchmarkDelta)}
+          </span>
+        </motion.div>
+      )}
     </div>
   );
 }
