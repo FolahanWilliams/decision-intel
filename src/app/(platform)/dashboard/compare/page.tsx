@@ -108,11 +108,17 @@ export default function ComparePage() {
   return (
     <ErrorBoundary sectionName="Compare Analyses">
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">Compare Analyses</h1>
-          <p className="text-[var(--text-muted)]">
-            Compare multiple cognitive audits side by side to identify patterns and trends.
-          </p>
+        <div className="page-header">
+          <div>
+            <h1
+              style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.03em', margin: 0 }}
+            >
+              <span className="text-gradient">Compare Analyses</span>
+            </h1>
+            <p className="page-subtitle" style={{ maxWidth: 640 }}>
+              Compare multiple cognitive audits side by side to identify patterns and trends.
+            </p>
+          </div>
         </div>
 
         <div className="grid gap-6">
