@@ -424,7 +424,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             resourceId: data.id,
             details: { filename: data.filename },
           }),
-        }).catch(() => {});
+        }).catch(err => log.warn('audit VIEW_DOCUMENT failed:', err));
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load document');
       } finally {
@@ -456,7 +456,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           resourceId: document.id,
           details: { filename: document.filename },
         }),
-      }).catch(() => {});
+      }).catch(err => log.warn('audit EXPORT_BOARD_REPORT failed:', err));
       showToast('Board report generated', 'success');
     } catch (error) {
       log.error('Failed to generate board report:', error);
@@ -483,7 +483,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: auditPayload,
-        }).catch(() => {});
+        }).catch(err => log.warn('audit EXPORT_PDF failed:', err));
       } catch (stringifyError) {
         log.error('Failed to stringify audit payload:', stringifyError);
       }
@@ -512,7 +512,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           resourceId: document.id,
           details: { filename: document.filename },
         }),
-      }).catch(() => {});
+      }).catch(err => log.warn('audit EXPORT_CSV failed:', err));
       showToast('CSV export generated successfully', 'success');
     } catch (error) {
       log.error('Failed to generate CSV:', error);
