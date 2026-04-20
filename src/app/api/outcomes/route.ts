@@ -12,6 +12,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { recalibrateFromOutcome } from '@/lib/learning/recalibration';
 
 const log = createLogger('Outcomes');
 
@@ -129,90 +130,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Recalibrate DQI with outcome data.
+    // Recalibrate DQI with outcome data via the shared engine.
     // This is the user-visible payoff of submitting an outcome — if it
     // silently fails, the "quarter-over-quarter compounding" story breaks
-    // with no feedback to the user. Track status so the API response can
-    // surface it to the client.
-    let recalibrationStatus: 'ok' | 'failed' | 'skipped' = 'skipped';
-    let recalibrationResult: {
-      originalScore: number;
-      recalibratedScore: number;
-      delta: number;
-      grade: string;
-    } | null = null;
-    try {
-      const originalScore = analysis.overallScore;
-      // Adjust Bias Load: remove false positives, boost confirmed bias weights
-      const confirmedCount = (confirmedBiases || []).length;
-      const falsePositiveCount = (falsPositiveBiases || []).length;
-      const totalBiases = analysis.biases?.length || 0;
-
-      // Recalibrated score adjusts for outcome knowledge
-      let recalibratedScore = originalScore;
-
-      // False positives were overpenalized → score should be higher
-      if (totalBiases > 0 && falsePositiveCount > 0) {
-        const falsePositiveRatio = falsePositiveCount / totalBiases;
-        recalibratedScore += falsePositiveRatio * 12; // Recover some of the bias penalty
-      }
-
-      // Confirmed biases were real → score should be lower (validated the detection)
-      if (confirmedCount > 0) {
-        recalibratedScore -= confirmedCount * 1.5; // Small additional penalty for confirmed danger
-      }
-
-      // Outcome tracking boosts process maturity (+5 for having outcome data)
-      recalibratedScore += 3;
-
-      // Outcome success/failure adjusts historical alignment
-      if (outcome === 'failure') recalibratedScore -= 5;
-      else if (outcome === 'success') recalibratedScore += 4;
-
-      recalibratedScore = Math.max(0, Math.min(100, Math.round(recalibratedScore)));
-      const delta = recalibratedScore - Math.round(originalScore);
-
-      // Determine grade
-      const grade =
-        recalibratedScore >= 85
-          ? 'A'
-          : recalibratedScore >= 70
-            ? 'B'
-            : recalibratedScore >= 55
-              ? 'C'
-              : recalibratedScore >= 40
-                ? 'D'
-                : 'F';
-
-      await prisma.analysis.update({
-        where: { id: analysisId },
-        data: {
-          recalibratedDqi: {
-            originalScore: Math.round(originalScore),
-            recalibratedScore,
-            recalibratedGrade: grade,
-            delta,
-            recalibratedAt: new Date().toISOString(),
-          },
-        },
-      });
-      recalibrationStatus = 'ok';
-      recalibrationResult = {
-        originalScore: Math.round(originalScore),
-        recalibratedScore,
-        delta,
-        grade,
-      };
-      log.info(
-        `Recalibrated DQI for ${analysisId}: ${Math.round(originalScore)} → ${recalibratedScore} (${delta > 0 ? '+' : ''}${delta})`
-      );
-    } catch (recalErr) {
-      recalibrationStatus = 'failed';
-      log.error(
-        `DQI recalibration failed for ${analysisId}:`,
-        recalErr instanceof Error ? recalErr.message : String(recalErr)
-      );
-    }
+    // with no feedback to the user. Shared with /api/outcomes/track so
+    // the scoring rule cannot drift between entry points.
+    const recalibration = await recalibrateFromOutcome({
+      prisma,
+      analysisId,
+      outcome,
+      confirmedBiases: confirmedBiases || [],
+      falsPositiveBiases: falsPositiveBiases || [],
+      decisionOutcomeId: result.id,
+    });
 
     // Adjust graph edge weights from outcome (fire-and-forget flywheel)
     let contradictions: Array<{
@@ -311,9 +241,10 @@ export async function POST(req: NextRequest) {
       contradictions,
       milestone,
       recalibration: {
-        status: recalibrationStatus,
-        ...(recalibrationResult ?? {}),
+        status: recalibration.status,
+        ...(recalibration.payload ?? {}),
       },
+      brier: recalibration.brier,
     });
   } catch (error: unknown) {
     const code = (error as { code?: string }).code;

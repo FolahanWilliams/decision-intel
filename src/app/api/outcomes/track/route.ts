@@ -13,11 +13,7 @@ import { createLogger } from '@/lib/utils/logger';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { apiError } from '@/lib/utils/api-response';
 import { DecisionOutcome } from '@prisma/client';
-import {
-  canonicalOutcome,
-  scoreOutcome,
-  type BrierCategory,
-} from '@/lib/learning/brier-scoring';
+import { recalibrateFromOutcome } from '@/lib/learning/recalibration';
 
 const log = createLogger('OutcomeTracking');
 
@@ -159,109 +155,20 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Recalibrate this specific analysis's DQI given what we now know from
-    // the reported outcome. Writes Analysis.recalibratedDqi so the document
-    // detail page (ReplayTab) can render the before/after comparison.
-    // Previously this logic only ran in the parallel /api/outcomes route,
-    // which OutcomeReporter does not call — so the "quarter-over-quarter
-    // compounding" story was invisible from the main UI surface.
-    let recalibrationStatus: 'ok' | 'failed' | 'skipped' = 'skipped';
-    let recalibrationPayload: {
-      originalScore: number;
-      recalibratedScore: number;
-      delta: number;
-      grade: string;
-    } | null = null;
-    let brierPayload: { score: number; category: BrierCategory } | null = null;
-    try {
-      const analysis = await prisma.analysis.findUnique({
-        where: { id: analysisId },
-        select: { overallScore: true, biases: { select: { id: true } } },
-      });
-      if (analysis) {
-        const originalScore = analysis.overallScore;
-        const confirmedCount = (confirmedBiases || []).length;
-        const falsePositiveCount = (falsPositiveBiases || []).length;
-        const totalBiases = analysis.biases?.length || 0;
-
-        let recalibratedScore = originalScore;
-        if (totalBiases > 0 && falsePositiveCount > 0) {
-          const falsePositiveRatio = falsePositiveCount / totalBiases;
-          recalibratedScore += falsePositiveRatio * 12;
-        }
-        if (confirmedCount > 0) {
-          recalibratedScore -= confirmedCount * 1.5;
-        }
-        recalibratedScore += 3; // outcome tracking boosts process maturity
-        if (outcome === 'failure') recalibratedScore -= 5;
-        else if (outcome === 'success') recalibratedScore += 4;
-
-        recalibratedScore = Math.max(0, Math.min(100, Math.round(recalibratedScore)));
-        const delta = recalibratedScore - Math.round(originalScore);
-        const grade =
-          recalibratedScore >= 85
-            ? 'A'
-            : recalibratedScore >= 70
-              ? 'B'
-              : recalibratedScore >= 55
-                ? 'C'
-                : recalibratedScore >= 40
-                  ? 'D'
-                  : 'F';
-
-        // Brier scoring — proper-scoring-rule calibration of the
-        // originalScore prediction against the confirmed outcome. Persisted
-        // on the DecisionOutcome row so the outcome-flywheel dashboard can
-        // compute per-org calibration trends over time. See
-        // src/lib/learning/brier-scoring.ts for the math.
-        const outcomeCode = canonicalOutcome(outcome);
-        const brier = scoreOutcome(originalScore, outcomeCode);
-        brierPayload = brier;
-
-        await prisma.analysis.update({
-          where: { id: analysisId },
-          data: {
-            recalibratedDqi: {
-              originalScore: Math.round(originalScore),
-              recalibratedScore,
-              recalibratedGrade: grade,
-              delta,
-              recalibratedAt: new Date().toISOString(),
-              brierScore: brier.score,
-              brierCategory: brier.category,
-            },
-          },
-        });
-
-        // Stamp Brier on the DecisionOutcome row so per-org aggregation
-        // queries (getOrgBrierStats) can pull directly from the indexed
-        // column instead of parsing the JSON blob on Analysis.
-        await prisma.decisionOutcome.update({
-          where: { id: decisionOutcome.id },
-          data: {
-            brierScore: brier.score,
-            brierCategory: brier.category,
-          },
-        });
-
-        recalibrationStatus = 'ok';
-        recalibrationPayload = {
-          originalScore: Math.round(originalScore),
-          recalibratedScore,
-          delta,
-          grade,
-        };
-        log.info(
-          `Recalibrated DQI for ${analysisId}: ${Math.round(originalScore)} → ${recalibratedScore} (${delta > 0 ? '+' : ''}${delta}) · Brier ${brier.score} (${brier.category})`
-        );
-      }
-    } catch (recalErr) {
-      recalibrationStatus = 'failed';
-      log.error(
-        `DQI recalibration failed for ${analysisId}:`,
-        recalErr instanceof Error ? recalErr.message : String(recalErr)
-      );
-    }
+    // Recalibrate this specific analysis's DQI given the confirmed
+    // outcome, via the shared recalibration engine. Writes
+    // Analysis.recalibratedDqi (with Brier embedded) so ReplayTab can
+    // render the before/after comparison, and stamps Brier on the
+    // DecisionOutcome row so per-org aggregation (getOrgBrierStats)
+    // hits the indexed column.
+    const recalibration = await recalibrateFromOutcome({
+      prisma,
+      analysisId,
+      outcome,
+      confirmedBiases: confirmedBiases || [],
+      falsPositiveBiases: falsPositiveBiases || [],
+      decisionOutcomeId: decisionOutcome.id,
+    });
 
     // Emit webhook event (non-blocking, fire-and-forget)
     try {
@@ -327,13 +234,13 @@ export async function POST(req: NextRequest) {
       outcome: decisionOutcome,
       stats,
       recalibration: {
-        status: recalibrationStatus,
-        ...(recalibrationPayload ?? {}),
+        status: recalibration.status,
+        ...(recalibration.payload ?? {}),
       },
       // Brier is surfaced so the client can render a calibration chip
       // in the outcome-submission success banner. Null on the "recalibration
       // skipped" branch (e.g. analysis was deleted between upsert and now).
-      brier: brierPayload,
+      brier: recalibration.brier,
     });
   } catch (error: unknown) {
     const code = (error as { code?: string }).code;

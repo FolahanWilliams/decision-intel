@@ -310,6 +310,7 @@ For mechanical checks — type-checking, test runs, build verification, counting
 | Plan limit enforcement              | `src/lib/utils/plan-limits.ts`                                                                      |
 | DQI scoring engine                  | `src/lib/scoring/dqi.ts` (792 lines)                                                                |
 | Brier scoring (outcome calibration) | `src/lib/learning/brier-scoring.ts` (+ `.test.ts`, 20 tests)                                        |
+| Outcome-driven DQI recalibration    | `src/lib/learning/recalibration.ts` — `recalibrateFromOutcome()` shared by both outcome POST routes |
 | Encryption + key rotation           | `src/lib/utils/encryption.ts`                                                                       |
 | Analysis pipeline graph             | `src/lib/agents/graph.ts`                                                                           |
 | Pipeline node implementations       | `src/lib/agents/nodes.ts` (2,297 lines)                                                             |
