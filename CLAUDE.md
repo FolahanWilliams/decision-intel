@@ -68,7 +68,7 @@ Decision Intel is a decision intelligence platform for corporate strategy teams.
 
 ## Founder Context
 
-- Solo technical founder, 16 years old, based in Nigeria
+- Solo technical founder, 16 years old. Born in the US, raised between Lagos (home) and the UK (current residence). Moving to San Francisco at 18 for university. Lead the story with Lagos/Nigeria — it's the narrative edge.
 - Advised by a senior consultant who helped take Wiz from startup to $32B
 - The codebase IS the company — any senior full-stack engineer can onboard in weeks
 - Pre-revenue; working toward first paid design partner before raising

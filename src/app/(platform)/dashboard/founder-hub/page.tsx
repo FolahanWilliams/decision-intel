@@ -158,6 +158,13 @@ const CategoryPositionTab = dynamic(
     })),
   { loading: tabLoader }
 );
+const UnicornRoadmapTab = dynamic(
+  () =>
+    import('@/components/founder-hub/UnicornRoadmapTab').then(m => ({
+      default: m.UnicornRoadmapTab,
+    })),
+  { loading: tabLoader }
+);
 import {
   Rocket,
   Brain,
@@ -177,6 +184,7 @@ import {
   Compass,
   Map,
   Radar,
+  Target,
 } from 'lucide-react';
 import { card } from '@/components/founder-hub/shared-styles';
 import { AccordionSection } from '@/components/founder-hub/AccordionSection';
@@ -201,7 +209,8 @@ type TabId =
   | 'founder_school'
   | 'cron_controls'
   | 'forecast'
-  | 'category_position';
+  | 'category_position'
+  | 'unicorn_roadmap';
 
 type TabGroup = 'Start' | 'Product' | 'Go-to-Market' | 'Intelligence' | 'Tools';
 
@@ -227,6 +236,7 @@ const LEGACY_TAB_REDIRECTS: Record<string, TabId> = {
 const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabGroup }> = [
   // Start — guided 2-day walkthrough entry point
   { id: 'start', label: 'Start Here', icon: <Compass size={16} />, group: 'Start' },
+  { id: 'unicorn_roadmap', label: 'Unicorn Roadmap', icon: <Target size={16} />, group: 'Start' },
   // Product
   { id: 'overview', label: 'Product Overview', icon: <Rocket size={16} />, group: 'Product' },
   { id: 'product_deep', label: 'Pipeline & Scoring', icon: <Brain size={16} />, group: 'Product' },
@@ -535,6 +545,14 @@ const SEARCH_INDEX: SearchEntry[] = [
       'DI landscape map, three market gaps with shipped-file evidence, 18-month category path.',
     keywords:
       'category position landscape gap creator quantexa aera pyramid palantir cloverpop competitive positioning map causal governance decision intelligence market incumbent analyst gartner forrester thesis four moments scorecard',
+  },
+  {
+    tabId: 'unicorn_roadmap',
+    section: 'Unicorn Roadmap',
+    preview:
+      'North star, executive memo, 5-year timeline, moat radar, 90-day sprint, pipeline funnel, pitfalls, fundraising gauge.',
+    keywords:
+      'unicorn roadmap north star vision executive memo synthesis kahneman klein moat 5 year timeline milestone sprint 90 day design partner funnel pipeline authority founder pitfall risk cadence weekly rhythm fundraising readiness pre-seed seed series a competitive map',
   },
 ];
 
@@ -1138,6 +1156,11 @@ function renderTab(
     category_position: (
       <ErrorBoundary sectionName="Category Position">
         <CategoryPositionTab />
+      </ErrorBoundary>
+    ),
+    unicorn_roadmap: (
+      <ErrorBoundary sectionName="Unicorn Roadmap">
+        <UnicornRoadmapTab />
       </ErrorBoundary>
     ),
   };
