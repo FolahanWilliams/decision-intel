@@ -242,14 +242,17 @@ export async function POST(request: NextRequest) {
             select: { id: true },
           });
 
-          // Update session title if this is the first agent response
+          // Update session title if this is the first agent response.
+          // Affects the sidebar session list — silent failure leaves
+          // the session as "Untitled" forever, which looks broken but
+          // is survivable. Log + continue.
           if (history.length === 0) {
             void prisma.copilotSession
               .update({
                 where: { id: session.id },
                 data: { title: session.decisionPrompt.slice(0, 100) },
               })
-              .catch(() => {});
+              .catch(err => log.warn('Failed to set copilot session title:', err));
           }
 
           // Signal completion

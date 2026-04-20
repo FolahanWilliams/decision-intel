@@ -227,9 +227,14 @@ export async function DELETE(
       }
     }
 
-    // Clean up visualization storage (fire-and-forget)
+    // Clean up visualization storage (fire-and-forget). A silent
+    // failure here leaks a handful of cached SVG blobs but doesn't
+    // block the delete — log the failure so we can notice if the
+    // storage backend drifts without taking the whole delete down.
     for (const analysis of doc.analyses) {
-      deleteVisualizations('analysis', analysis.id).catch(() => {});
+      deleteVisualizations('analysis', analysis.id).catch(err =>
+        log.warn(`Failed to clean up visualizations for analysis ${analysis.id}:`, err)
+      );
     }
 
     // Clean up Supabase storage (fire-and-forget).
