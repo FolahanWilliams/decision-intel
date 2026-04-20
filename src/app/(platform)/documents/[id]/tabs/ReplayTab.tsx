@@ -29,6 +29,8 @@ interface OutcomeData {
   mostAccurateTwin?: string | null;
 }
 
+type BrierCategory = 'excellent' | 'good' | 'fair' | 'poor';
+
 interface ReplayTabProps {
   analysisData: AnalysisResult;
   outcome?: OutcomeData | null;
@@ -37,8 +39,47 @@ interface ReplayTabProps {
     recalibratedScore: number;
     delta: number;
     recalibratedGrade: string;
+    brierScore?: number;
+    brierCategory?: BrierCategory;
   } | null;
 }
+
+const BRIER_CHIP: Record<
+  BrierCategory,
+  { label: string; bg: string; fg: string; border: string; tooltip: string }
+> = {
+  excellent: {
+    label: 'Excellent',
+    bg: 'rgba(22,163,74,0.10)',
+    fg: 'var(--success)',
+    border: 'rgba(22,163,74,0.25)',
+    tooltip:
+      'Brier ≤ 0.10 — superforecaster band. The original DQI closely matched the confirmed outcome.',
+  },
+  good: {
+    label: 'Good',
+    bg: 'rgba(132,204,22,0.10)',
+    fg: '#65a30d',
+    border: 'rgba(132,204,22,0.25)',
+    tooltip: 'Brier ≤ 0.20 — informed-analyst band. The original DQI was well-calibrated.',
+  },
+  fair: {
+    label: 'Fair',
+    bg: 'rgba(245,158,11,0.10)',
+    fg: 'var(--warning)',
+    border: 'rgba(245,158,11,0.25)',
+    tooltip:
+      'Brier ≤ 0.35 — motivated-amateur band. The original DQI was roughly directional but off.',
+  },
+  poor: {
+    label: 'Poor',
+    bg: 'rgba(239,68,68,0.10)',
+    fg: 'var(--error)',
+    border: 'rgba(239,68,68,0.25)',
+    tooltip:
+      'Brier > 0.35 — worse than coin-flip. The original DQI and the confirmed outcome diverged sharply.',
+  },
+};
 
 const STEP_ICONS: Record<string, React.ReactNode> = {
   'document-intel': <Play size={14} />,
@@ -489,6 +530,7 @@ export function ReplayTab({ analysisData, outcome, recalibratedDqi }: ReplayTabP
                         display: 'flex',
                         alignItems: 'center',
                         gap: 16,
+                        flexWrap: 'wrap',
                       }}
                     >
                       <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
@@ -525,6 +567,44 @@ export function ReplayTab({ analysisData, outcome, recalibratedDqi }: ReplayTabP
                           {recalibratedDqi.delta})
                         </span>
                       </div>
+                      {recalibratedDqi.brierCategory &&
+                        typeof recalibratedDqi.brierScore === 'number' && (
+                          <span
+                            title={BRIER_CHIP[recalibratedDqi.brierCategory].tooltip}
+                            style={{
+                              marginLeft: 'auto',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 6,
+                              padding: '3px 10px',
+                              borderRadius: 'var(--radius-full)',
+                              fontSize: 11,
+                              fontWeight: 600,
+                              background: BRIER_CHIP[recalibratedDqi.brierCategory].bg,
+                              color: BRIER_CHIP[recalibratedDqi.brierCategory].fg,
+                              border: `1px solid ${BRIER_CHIP[recalibratedDqi.brierCategory].border}`,
+                              cursor: 'help',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            <span
+                              style={{
+                                fontSize: 9,
+                                fontWeight: 700,
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.06em',
+                                opacity: 0.7,
+                              }}
+                            >
+                              Brier
+                            </span>
+                            <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+                              {recalibratedDqi.brierScore.toFixed(2)}
+                            </span>
+                            <span style={{ opacity: 0.6 }}>·</span>
+                            <span>{BRIER_CHIP[recalibratedDqi.brierCategory].label}</span>
+                          </span>
+                        )}
                     </div>
                   )}
 

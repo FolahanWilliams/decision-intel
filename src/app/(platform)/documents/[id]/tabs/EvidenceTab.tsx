@@ -23,6 +23,8 @@ interface EvidenceTabProps {
     recalibratedScore: number;
     delta: number;
     recalibratedGrade: string;
+    brierScore?: number;
+    brierCategory?: 'excellent' | 'good' | 'fair' | 'poor';
   } | null;
 }
 

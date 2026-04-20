@@ -2229,6 +2229,8 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                 recalibratedScore: number;
                                 delta: number;
                                 recalibratedGrade: string;
+                                brierScore?: number;
+                                brierCategory?: 'excellent' | 'good' | 'fair' | 'poor';
                               };
                             }
                           ).recalibratedDqi
