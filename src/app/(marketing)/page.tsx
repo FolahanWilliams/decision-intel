@@ -1,20 +1,24 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { trackEvent } from '@/lib/analytics/track';
-import { HeroDecisionGraph } from '@/components/marketing/HeroDecisionGraph';
 import { HeroCounterfactualTease } from '@/components/marketing/HeroCounterfactualTease';
 import { BookDemoCTA } from '@/components/marketing/BookDemoCTA';
 import { Reveal } from '@/components/ui/Reveal';
 import { CaseStudyCarousel } from '@/components/marketing/CaseStudyCarousel';
-import { CategoryGapShowcase } from '@/components/marketing/CategoryGapShowcase';
 import { CredibilityTrio } from '@/components/marketing/CredibilityTrio';
 import { CompetitorComparisonCard } from '@/components/marketing/CompetitorComparisonCard';
 import { LandingFaq } from '@/components/marketing/LandingFaq';
-import { ArrowRight, Menu, X, Check, ShieldCheck, FileCheck2, Scale, BookOpen } from 'lucide-react';
+import { ProblemScenes } from '@/components/marketing/ProblemScenes';
+import { CategoryTurn } from '@/components/marketing/CategoryTurn';
+import { KahnemanKleinSynthesis } from '@/components/marketing/KahnemanKleinSynthesis';
+import { MomentsPyramid } from '@/components/marketing/MomentsPyramid';
+import { SecurityLifecycleStrip } from '@/components/marketing/SecurityLifecycleStrip';
+import { ScrollRevealGraph } from '@/components/marketing/ScrollRevealGraph';
+import { ArrowRight, Menu, X, Check } from 'lucide-react';
 
 /* ─── Color Tokens ──────────────────────────────────────────────────────── */
 
@@ -140,58 +144,14 @@ function NewsletterForm({ source = 'footer' }: { source?: string }) {
 
 export default function LandingPage() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
-
-  // After login redirects back to /?scrollTo=pricing, scroll to the
-  // pricing section so the user picks up where they left off.
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const params = new URLSearchParams(window.location.search);
-    const target = params.get('scrollTo');
-    if (target) {
-      // Small delay so the page has time to render the section
-      setTimeout(() => {
-        const el = document.getElementById(target);
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        // Clean up the URL so refreshing doesn't re-scroll
-        const clean = new URL(window.location.href);
-        clean.searchParams.delete('scrollTo');
-        window.history.replaceState({}, '', clean.pathname + clean.hash);
-      }, 300);
-    }
-  }, []);
-
-  const handleCheckout = async (plan: 'pro' | 'team') => {
-    setCheckoutLoading(plan);
-    try {
-      const res = await fetch('/api/stripe/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan }),
-      });
-      if (res.status === 401) {
-        window.location.href = `/login?redirect=${encodeURIComponent('/?scrollTo=pricing')}`;
-        return;
-      }
-      if (res.status === 503) {
-        alert('Stripe is not configured yet. Please check back soon!');
-        return;
-      }
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        alert(data.error || 'Failed to start checkout');
-      }
-    } catch {
-      alert('Something went wrong. Please try again.');
-    } finally {
-      setCheckoutLoading(null);
-    }
-  };
 
   return (
     <div style={{ background: C.white, color: C.slate900, overflowX: 'hidden' }}>
+      {/* Floating Decision Knowledge Graph overlay — desktop only, accumulates
+          nodes beat-by-beat as the reader scrolls. See ScrollRevealGraph for
+          stage thresholds and node topology. */}
+      <ScrollRevealGraph />
+
       {/* ── Navigation ──────────────────────────────────────────────── */}
       <nav
         style={{
@@ -355,333 +315,128 @@ export default function LandingPage() {
         )}
       </nav>
 
-      {/* ── Hero ────────────────────────────────────────────────────── */}
-      <section style={{ maxWidth: 1400, margin: '0 auto', padding: '88px 24px 64px' }}>
-        <motion.div
-          {...fadeIn}
-          transition={{ duration: 0.5 }}
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: 48,
-            alignItems: 'center',
-          }}
-          className="hero-grid"
-        >
-          <div>
-            <p
-              style={{
-                fontSize: 12,
-                fontWeight: 800,
-                color: C.green,
-                textTransform: 'uppercase',
-                letterSpacing: '0.14em',
-                marginBottom: 14,
-              }}
-            >
-              Decision Intelligence
-            </p>
-            <h1
-              style={{
-                fontSize: 'clamp(30px, 5.2vw, 52px)',
-                fontWeight: 800,
-                color: C.slate900,
-                lineHeight: 1.08,
-                letterSpacing: '-0.025em',
-                marginBottom: 22,
-              }}
-            >
-              The human-AI governance system for{' '}
-              <span style={{ color: C.green }}>strategic decisions.</span>
-            </h1>
-            <p
-              style={{
-                fontSize: 18,
-                color: C.slate600,
-                lineHeight: 1.6,
-                marginBottom: 28,
-                maxWidth: 560,
-              }}
-            >
-              Decision Intel audits every board memo, simulates steering-committee objections, runs
-              what-if interventions, and compounds your team&rsquo;s judgment into a living Decision
-              Knowledge Graph&nbsp;&mdash; so decision quality, scalability, and reliability improve
-              quarter after quarter.
-            </p>
-            <div style={{ marginBottom: 22 }}>
-              <HeroCounterfactualTease />
-            </div>
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
-              <Link
-                href="/demo"
-                onClick={() => trackEvent('hero_try_demo_clicked')}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  fontSize: 15,
-                  fontWeight: 700,
-                  color: C.white,
-                  background: C.green,
-                  padding: '13px 26px',
-                  borderRadius: 10,
-                  textDecoration: 'none',
-                  boxShadow: '0 6px 20px rgba(22,163,74,0.28)',
-                }}
-              >
-                One free audit &mdash; paste your memo <ArrowRight size={16} />
-              </Link>
-              <Link
-                href="/how-it-works"
-                onClick={() => trackEvent('hero_how_it_works_clicked')}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  fontSize: 14,
-                  fontWeight: 600,
-                  color: C.slate600,
-                  textDecoration: 'none',
-                  padding: '13px 8px',
-                }}
-              >
-                How it works <ArrowRight size={14} />
-              </Link>
-            </div>
+      {/* ── Hero (beat 01) ──────────────────────────────────────────────
+          Tight typography, no inline graph. The full Decision Knowledge
+          Graph accumulates in <ScrollRevealGraph /> as the reader scrolls,
+          arriving populated precisely when the narrative has earned it. */}
+      <section style={{ maxWidth: 960, margin: '0 auto', padding: '112px 24px 88px' }}>
+        <motion.div {...fadeIn} transition={{ duration: 0.5 }} style={{ textAlign: 'center' }}>
+          <p
+            style={{
+              fontSize: 12,
+              fontWeight: 800,
+              color: C.green,
+              textTransform: 'uppercase',
+              letterSpacing: '0.14em',
+              marginBottom: 18,
+            }}
+          >
+            For strategy teams who answer to the board
+          </p>
+          <h1
+            style={{
+              fontSize: 'clamp(34px, 6vw, 64px)',
+              fontWeight: 800,
+              color: C.slate900,
+              lineHeight: 1.05,
+              letterSpacing: '-0.03em',
+              marginBottom: 26,
+              maxWidth: 880,
+              marginLeft: 'auto',
+              marginRight: 'auto',
+            }}
+          >
+            The human-AI governance system for{' '}
+            <span style={{ color: C.green }}>strategic decisions.</span>
+          </h1>
+          <p
+            style={{
+              fontSize: 19,
+              color: C.slate600,
+              lineHeight: 1.6,
+              marginBottom: 30,
+              maxWidth: 720,
+              marginLeft: 'auto',
+              marginRight: 'auto',
+            }}
+          >
+            Decision Intel audits every board memo, simulates steering-committee objections, runs
+            what-if interventions, and compounds your team&rsquo;s judgment into a living Decision
+            Knowledge Graph&nbsp;&mdash; so decision quality, scalability, and reliability improve
+            quarter after quarter.
+          </p>
+          <div
+            style={{
+              marginBottom: 26,
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            <HeroCounterfactualTease />
           </div>
-          {/* Single clean visual: 3D Decision Knowledge Graph (WeWork S-1 sample) */}
-          <HeroDecisionGraph />
-        </motion.div>
-      </section>
-
-      {/* ── Trust strip (compliance-only, no fabricated logos) ──────── */}
-      <section
-        style={{
-          background: C.slate50,
-          borderTop: `1px solid ${C.slate200}`,
-          borderBottom: `1px solid ${C.slate200}`,
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 1200,
-            margin: '0 auto',
-            padding: '20px 24px',
-            display: 'flex',
-            flexWrap: 'wrap',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 28,
-            rowGap: 12,
-          }}
-          className="trust-strip"
-        >
-          {[
-            { Icon: ShieldCheck, label: 'SOC 2 ready' },
-            { Icon: FileCheck2, label: 'GDPR + EU AI Act mapped' },
-            { Icon: BookOpen, label: '135-case public reference library' },
-            { Icon: Scale, label: 'Advised by operators who built Wiz to $32B' },
-          ].map(({ Icon, label }) => (
-            <div
-              key={label}
+          <div
+            style={{
+              display: 'flex',
+              gap: 14,
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Link
+              href="/demo"
+              onClick={() => trackEvent('hero_try_demo_clicked')}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 8,
-                fontSize: 12.5,
+                fontSize: 15,
+                fontWeight: 700,
+                color: C.white,
+                background: C.green,
+                padding: '14px 28px',
+                borderRadius: 10,
+                textDecoration: 'none',
+                boxShadow: '0 6px 20px rgba(22,163,74,0.28)',
+              }}
+            >
+              One free audit &mdash; paste your memo <ArrowRight size={16} />
+            </Link>
+            <Link
+              href="/how-it-works"
+              onClick={() => trackEvent('hero_how_it_works_clicked')}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                fontSize: 14,
                 fontWeight: 600,
                 color: C.slate600,
-                letterSpacing: '0.01em',
+                textDecoration: 'none',
+                padding: '14px 10px',
               }}
             >
-              <Icon size={14} style={{ color: C.green, flexShrink: 0 }} />
-              {label}
-            </div>
-          ))}
-        </div>
+              How it works <ArrowRight size={14} />
+            </Link>
+          </div>
+        </motion.div>
       </section>
 
-      {/* ── Four Moments (core value proposition) ───────────────────── */}
+      {/* ── Beat 02 — The Problem ─────────────────────────────────────── */}
       <Reveal repeat>
-        <section
-          id="four-moments"
-          style={{ maxWidth: 1200, margin: '0 auto', padding: '96px 24px' }}
-        >
-          <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
-            <p
-              style={{
-                fontSize: 14,
-                fontWeight: 700,
-                color: C.green,
-                textTransform: 'uppercase',
-                letterSpacing: '0.14em',
-                marginBottom: 10,
-              }}
-            >
-              What you get
-            </p>
-            <h2
-              style={{
-                fontSize: 'clamp(30px, 4.2vw, 42px)',
-                fontWeight: 800,
-                color: C.slate900,
-                marginBottom: 18,
-                letterSpacing: '-0.02em',
-                maxWidth: 820,
-                lineHeight: 1.1,
-              }}
-            >
-              The four moments that compound your team&rsquo;s judgment.
-            </h2>
-            <p
-              style={{
-                fontSize: 17,
-                color: C.slate600,
-                lineHeight: 1.6,
-                maxWidth: 720,
-                marginBottom: 56,
-              }}
-            >
-              Every high-stakes call flows through the same four moments. Decision Intel governs
-              each one, and the compounding happens automatically.
-            </p>
-          </motion.div>
-
-          <div
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 32 }}
-            className="cards-grid"
-          >
-            {[
-              {
-                num: '01',
-                eyebrow: 'Decision Knowledge Graph',
-                title: 'Every strategic call, compounded into one living graph.',
-                body: (
-                  <>
-                    Every board memo, market-entry recommendation, and M&amp;A paper your team
-                    writes becomes a node in one navigable graph&nbsp;&mdash; connected by
-                    assumption, bias, and outcome. Today&rsquo;s decision always inherits
-                    yesterday&rsquo;s lessons.
-                  </>
-                ),
-              },
-              {
-                num: '02',
-                eyebrow: 'AI boardroom simulation',
-                title: 'Walk in with every objection already answered.',
-                body: (
-                  <>
-                    Every memo runs past a role-primed AI boardroom of CEO, CFO, board, and
-                    division-lead personas. You see the questions your steering committee will raise
-                    before the meeting&nbsp;&mdash; not on your third draft of the deck.
-                  </>
-                ),
-              },
-              {
-                num: '03',
-                eyebrow: 'Human-AI reasoning audit',
-                title: 'Governance, not a black box.',
-                body: (
-                  <>
-                    Your team keeps the judgment. The system keeps the receipts. Every
-                    cognitive-bias signal, noise measurement, and evidence excerpt is traceable to
-                    the exact line in your memo that triggered it&nbsp;&mdash; so every
-                    recommendation is defensible, not just delivered.
-                  </>
-                ),
-              },
-              {
-                num: '04',
-                eyebrow: 'What-if + Decision Quality Index',
-                title: 'Run what-if before the call, prove quality after.',
-                body: (
-                  <>
-                    Before the decision: run what-if interventions to see how removing a bias or
-                    reframing an assumption changes outcome probability. After: every call earns a
-                    Decision Quality Index that{' '}
-                    <em style={{ color: C.green, fontStyle: 'italic', fontWeight: 700 }}>
-                      compounds
-                    </em>{' '}
-                    into proprietary proof your team&rsquo;s judgment is sharpening.
-                  </>
-                ),
-              },
-            ].map((m, i) => (
-              <motion.div
-                key={m.num}
-                {...fadeIn}
-                transition={{ duration: 0.5, delay: i * 0.05 }}
-                style={{
-                  background: C.white,
-                  border: `1px solid ${C.slate200}`,
-                  borderRadius: 16,
-                  padding: '36px 32px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 14,
-                  boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
-                }}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 10,
-                    flexWrap: 'wrap',
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 800,
-                      color: C.green,
-                      background: C.greenLight,
-                      padding: '4px 10px',
-                      borderRadius: 6,
-                      letterSpacing: '0.06em',
-                    }}
-                  >
-                    {m.num}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 700,
-                      color: C.slate500,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.1em',
-                    }}
-                  >
-                    {m.eyebrow}
-                  </span>
-                </div>
-                <h3
-                  style={{
-                    fontSize: 22,
-                    fontWeight: 800,
-                    color: C.slate900,
-                    lineHeight: 1.25,
-                    letterSpacing: '-0.015em',
-                    margin: 0,
-                  }}
-                >
-                  {m.title}
-                </h3>
-                <p
-                  style={{
-                    fontSize: 15,
-                    color: C.slate600,
-                    lineHeight: 1.7,
-                    margin: 0,
-                  }}
-                >
-                  {m.body}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </section>
+        <ProblemScenes />
       </Reveal>
+
+      {/* ── Beat 03 — The Turn ────────────────────────────────────────── */}
+      <CategoryTurn />
+
+      {/* ── Beat 04 — Kahneman × Klein Synthesis (the IP moat) ──────── */}
+      <Reveal repeat>
+        <KahnemanKleinSynthesis />
+      </Reveal>
+
+      {/* ── Beat 05 — The Moments (Pyramid-style vertical alternation) ─ */}
+      <MomentsPyramid />
 
       {/* ── What we replace — before/after framing ──────────────────── */}
       <Reveal repeat>
@@ -955,7 +710,7 @@ export default function LandingPage() {
                     },
                     {
                       label: 'Governance on the reasoning, not just the data',
-                      sub: 'Counterfactuals, AI boardroom, outcome loop &mdash; all on the memo itself.',
+                      sub: 'What-ifs, AI boardroom, outcome loop &mdash; all on the memo itself.',
                     },
                   ].map(item => (
                     <li
@@ -1028,12 +783,50 @@ export default function LandingPage() {
         </section>
       </Reveal>
 
-      {/* ── Category we're defining: three capability tabs ──────────── */}
+      {/* ── Beat 07 — Security + Governance (the procurement bar) ─────
+          Dark-navy section wrapper gives the Security beat weight and
+          narrates the palette progression (white moments → navy security).
+          CredibilityTrio runs in un-embedded mode so it owns its own
+          heading and sits as a full beat, not a trailing "go deeper" rail. */}
       <Reveal repeat>
-        <CategoryGapShowcase />
+        <section
+          id="security"
+          style={{
+            background: C.navy,
+            borderTop: `1px solid ${C.slate200}`,
+            color: C.white,
+            position: 'relative',
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              backgroundImage:
+                'linear-gradient(135deg, rgba(148,163,184,0.04) 1px, transparent 1px), linear-gradient(45deg, rgba(148,163,184,0.04) 1px, transparent 1px)',
+              backgroundSize: '48px 48px',
+              pointerEvents: 'none',
+            }}
+          />
+          <div style={{ position: 'relative', paddingTop: 16, paddingBottom: 16 }}>
+            {/* Inline overrides so the trio's default light styling lands
+                as a light card surface on a dark page. The component
+                itself stays theme-agnostic. */}
+            <style>{`
+              #security h2 { color: ${C.white} !important; }
+              #security h2 + p { color: #CBD5E1 !important; }
+            `}</style>
+            {/* Dynamic in-flow lifecycle — sits above the three cards so
+                the Security beat opens with motion, not a static grid. */}
+            <SecurityLifecycleStrip />
+            <CredibilityTrio />
+          </div>
+        </section>
       </Reveal>
 
-      {/* ── Open proof (unified): header → carousel peek → three doorways ── */}
+      {/* ── Beat 08 — Proof (case library carousel) ───────────────────── */}
       <Reveal repeat>
         <section id="proof" style={{ background: C.white, borderTop: `1px solid ${C.slate200}` }}>
           <div style={{ maxWidth: 1200, margin: '0 auto', padding: '88px 24px 72px' }}>
@@ -1061,7 +854,7 @@ export default function LandingPage() {
                   maxWidth: 860,
                 }}
               >
-                Every claim on this site is checkable.
+                135 decisions, audited in hindsight. The case library is open.
               </h2>
               <p
                 style={{
@@ -1072,408 +865,16 @@ export default function LandingPage() {
                   marginBottom: 36,
                 }}
               >
-                135 corporate decisions, audited in hindsight. A bias-failure leaderboard across
-                thirteen industries. The enterprise security posture that runs on every memo. All
-                three sit one click away &mdash; no login, no gate, no asterisk.
+                Every famous corporate decision, scored against the same bias taxonomy your memo
+                would be scored against. Every conclusion traces back to a public source. No login,
+                no gate.
               </p>
             </motion.div>
 
-            {/* Carousel strip — the case library peek, no duplicate header */}
-            <div style={{ marginBottom: 56 }}>
-              <CaseStudyCarousel embedded />
-            </div>
-
-            {/* Three exploration doorways — case library / bias genome / security */}
-            <CredibilityTrio embedded />
+            <CaseStudyCarousel embedded />
           </div>
         </section>
       </Reveal>
-
-      {/* ── Pricing ─────────────────────────────────────────────────── */}
-      <section id="pricing" style={{ background: C.slate50, borderTop: `1px solid ${C.slate200}` }}>
-        <div style={{ maxWidth: 1240, margin: '0 auto', padding: '96px 24px' }}>
-          <motion.div
-            {...fadeIn}
-            transition={{ duration: 0.5 }}
-            style={{ textAlign: 'center', marginBottom: 56 }}
-          >
-            <p
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                color: C.green,
-                textTransform: 'uppercase',
-                letterSpacing: '0.14em',
-                marginBottom: 12,
-              }}
-            >
-              Pricing
-            </p>
-            <h2
-              style={{
-                fontSize: 'clamp(28px, 4vw, 40px)',
-                fontWeight: 800,
-                color: C.slate900,
-                letterSpacing: '-0.02em',
-                lineHeight: 1.15,
-                marginBottom: 14,
-              }}
-            >
-              A fraction of what a single misjudged decision costs.
-            </h2>
-            <p
-              style={{
-                fontSize: 17,
-                color: C.slate600,
-                margin: '0 auto',
-                maxWidth: 640,
-                lineHeight: 1.6,
-              }}
-            >
-              Every tier includes the full bias taxonomy, Decision Quality Index, and outcome
-              flywheel. You&apos;re choosing the audit volume and the team surface — not a
-              feature-gated product.
-            </p>
-          </motion.div>
-
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-              gap: 20,
-              maxWidth: 1140,
-              margin: '0 auto',
-            }}
-            className="pricing-grid"
-          >
-            {[
-              {
-                name: 'Individual',
-                role: 'Solo strategy operator',
-                price: 249,
-                priceSuffix: '/mo',
-                anchor: 'or $2,490/year (save ~16%)',
-                desc: 'The career-defining edge for a Head of Strategy, CorpDev lead, or M&A operator who owns the memo.',
-                features: [
-                  { label: '15 audits per month', strong: true },
-                  { label: 'Full DQI + 30+ biases', strong: false },
-                  { label: 'Boardroom simulation', strong: false },
-                  { label: 'Forgotten Questions engine', strong: false },
-                  { label: 'Personal Decision History', strong: false },
-                  { label: 'Calibration dashboard', strong: false },
-                ],
-                cta: 'Start Individual',
-                action: () => handleCheckout('pro'),
-                loading: checkoutLoading === 'pro',
-                outline: true,
-                popular: false,
-              },
-              {
-                name: 'Strategy',
-                role: 'Corporate strategy team',
-                price: 2499,
-                priceSuffix: '/mo',
-                anchor: 'or $24,990/year · ~10× cheaper than one consulting week',
-                desc: 'For teams producing multiple board-level memos a quarter. Built around the shared Decision Knowledge Graph.',
-                features: [
-                  { label: '250 audits per month · 15 seats', strong: true },
-                  { label: 'Shared Decision Knowledge Graph', strong: true },
-                  { label: 'Decision Rooms + blind priors', strong: false },
-                  { label: 'Slack, Drive, Email integrations', strong: false },
-                  { label: 'Compliance mapping + audit logs', strong: false },
-                  { label: 'Everything in Individual', strong: false },
-                ],
-                cta: 'Start 30-day pilot',
-                action: () => handleCheckout('team'),
-                loading: checkoutLoading === 'team',
-                outline: false,
-                popular: true,
-              },
-              {
-                name: 'Enterprise',
-                role: 'Fortune 500 strategy function',
-                price: -1,
-                priceSuffix: '',
-                anchor: 'Annual · negotiated per seat',
-                desc: 'Multi-division workflows, compliance SLAs, and a dedicated deployment partner.',
-                features: [
-                  { label: 'Unlimited team seats', strong: true },
-                  { label: 'SSO + SCIM + custom taxonomy', strong: false },
-                  { label: 'Multi-division management', strong: false },
-                  { label: 'Signed DPA + audit-log retention SLA', strong: false },
-                  { label: 'EU-region hosting option', strong: false },
-                  { label: 'Everything in Strategy', strong: false },
-                ],
-                cta: 'Contact sales',
-                action: () => {
-                  window.location.href =
-                    'mailto:team@decision-intel.com?subject=Enterprise%20Inquiry';
-                },
-                outline: true,
-                popular: false,
-              },
-            ].map((tier, i) => {
-              const displayPrice = tier.price;
-              return (
-                <motion.div
-                  key={tier.name}
-                  {...fadeIn}
-                  transition={{ duration: 0.4, delay: i * 0.08 }}
-                  style={{
-                    background: C.white,
-                    border: tier.popular ? `2px solid ${C.green}` : `1px solid ${C.slate200}`,
-                    borderRadius: 20,
-                    padding: 32,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    position: 'relative',
-                    boxShadow: tier.popular
-                      ? '0 12px 36px rgba(22,163,74,0.14)'
-                      : '0 4px 18px rgba(15,23,42,0.05)',
-                  }}
-                >
-                  {tier.popular && (
-                    <div
-                      style={{
-                        position: 'absolute',
-                        top: -13,
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        background: C.green,
-                        color: C.white,
-                        fontSize: 10,
-                        fontWeight: 800,
-                        padding: '5px 14px',
-                        borderRadius: 999,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.14em',
-                        boxShadow: '0 4px 14px rgba(22,163,74,0.35)',
-                      }}
-                    >
-                      Most popular
-                    </div>
-                  )}
-
-                  {/* Role chip */}
-                  <div
-                    style={{
-                      fontSize: 10,
-                      fontWeight: 700,
-                      color: tier.popular ? C.green : C.slate500,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.12em',
-                      marginBottom: 6,
-                    }}
-                  >
-                    {tier.role}
-                  </div>
-
-                  <h3
-                    style={{
-                      fontSize: 22,
-                      fontWeight: 800,
-                      color: C.slate900,
-                      margin: 0,
-                      marginBottom: 12,
-                      letterSpacing: '-0.01em',
-                    }}
-                  >
-                    {tier.name}
-                  </h3>
-
-                  <div style={{ marginBottom: 6 }}>
-                    {displayPrice === -1 ? (
-                      <span style={{ fontSize: 36, fontWeight: 800, color: C.slate900 }}>
-                        Custom
-                      </span>
-                    ) : (
-                      <span
-                        style={{
-                          fontSize: 40,
-                          fontWeight: 800,
-                          color: C.slate900,
-                          letterSpacing: '-0.02em',
-                        }}
-                      >
-                        ${displayPrice.toLocaleString()}
-                        <span style={{ fontSize: 15, fontWeight: 500, color: C.slate400 }}>
-                          {tier.priceSuffix}
-                        </span>
-                      </span>
-                    )}
-                  </div>
-                  <p style={{ fontSize: 12, color: C.slate400, margin: 0, marginBottom: 16 }}>
-                    {tier.anchor}
-                  </p>
-
-                  <p
-                    style={{ fontSize: 14, color: C.slate600, marginBottom: 22, lineHeight: 1.55 }}
-                  >
-                    {tier.desc}
-                  </p>
-                  <ul
-                    style={{
-                      listStyle: 'none',
-                      padding: 0,
-                      margin: '0 0 26px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 11,
-                      flex: 1,
-                    }}
-                  >
-                    {tier.features.map(f => (
-                      <li
-                        key={f.label}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 10,
-                          fontSize: 13.5,
-                          fontWeight: f.strong ? 600 : 500,
-                          color: f.strong ? C.slate900 : C.slate600,
-                        }}
-                      >
-                        <span
-                          style={{
-                            width: 18,
-                            height: 18,
-                            borderRadius: 9,
-                            background: C.greenLight,
-                            color: C.green,
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            flexShrink: 0,
-                          }}
-                        >
-                          <Check size={11} strokeWidth={3} />
-                        </span>
-                        {f.label}
-                      </li>
-                    ))}
-                  </ul>
-                  <button
-                    onClick={tier.action}
-                    disabled={tier.loading}
-                    style={{
-                      width: '100%',
-                      padding: '14px 18px',
-                      fontSize: 14,
-                      fontWeight: 700,
-                      borderRadius: 12,
-                      border: tier.outline ? `1px solid ${C.slate200}` : 'none',
-                      background: tier.outline ? C.white : C.green,
-                      color: tier.outline ? C.slate900 : C.white,
-                      cursor: tier.loading ? 'wait' : 'pointer',
-                      opacity: tier.loading ? 0.7 : 1,
-                      transition: 'all 0.2s',
-                      boxShadow: tier.outline ? 'none' : '0 6px 20px rgba(22,163,74,0.28)',
-                    }}
-                  >
-                    {tier.loading ? 'Redirecting…' : tier.cta}
-                  </button>
-                </motion.div>
-              );
-            })}
-          </div>
-
-          {/* Trust band below the cards — stops the pricing grid from hanging
-              in space and gives a calm closing beat. */}
-          <div
-            style={{
-              maxWidth: 1140,
-              margin: '40px auto 0',
-              padding: '20px 24px',
-              background: C.white,
-              border: `1px solid ${C.slate200}`,
-              borderRadius: 16,
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-              gap: 20,
-              alignItems: 'center',
-            }}
-          >
-            {[
-              { label: 'SOC 2 ready', sub: 'AES-256-GCM + TLS 1.3' },
-              { label: 'Signed DPA', sub: 'on any paid tier' },
-              { label: 'No training on your data', sub: 'ever, by contract' },
-              { label: '30-day pilot', sub: 'on Strategy tier' },
-            ].map(item => (
-              <div key={item.label} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-                <span
-                  style={{
-                    width: 20,
-                    height: 20,
-                    borderRadius: 10,
-                    background: C.greenLight,
-                    color: C.green,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                    marginTop: 2,
-                  }}
-                >
-                  <Check size={12} strokeWidth={3} />
-                </span>
-                <div style={{ minWidth: 0 }}>
-                  <div
-                    style={{ fontSize: 13, fontWeight: 700, color: C.slate900, lineHeight: 1.3 }}
-                  >
-                    {item.label}
-                  </div>
-                  <div
-                    style={{ fontSize: 11.5, color: C.slate500, lineHeight: 1.35, marginTop: 1 }}
-                  >
-                    {item.sub}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div
-            style={{
-              textAlign: 'center',
-              marginTop: 32,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 10,
-            }}
-          >
-            <p style={{ fontSize: 13, color: C.slate600, margin: 0 }}>
-              Just exploring?{' '}
-              <Link
-                href="/login"
-                style={{ color: C.green, fontWeight: 600, textDecoration: 'none' }}
-              >
-                Start free
-              </Link>{' '}
-              with 4 audits a month, no card required.
-            </p>
-            <Link
-              href="/pricing"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                fontSize: 13,
-                fontWeight: 600,
-                color: C.slate900,
-                textDecoration: 'none',
-                padding: '8px 16px',
-                border: `1px solid ${C.slate200}`,
-                borderRadius: 8,
-                background: C.white,
-              }}
-            >
-              See full feature comparison <ArrowRight size={13} />
-            </Link>
-          </div>
-        </div>
-      </section>
 
       {/* ── FAQ + Competitor Comparison ───────────────────────────────── */}
       <Reveal repeat>
@@ -1919,28 +1320,17 @@ export default function LandingPage() {
         @media (max-width: 768px) {
           .hidden-mobile { display: none !important; }
           .show-mobile-only { display: block !important; }
-          .hero-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
-          .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 16px !important; }
-          .cards-grid { grid-template-columns: 1fr !important; }
-          .pricing-grid { grid-template-columns: 1fr !important; }
           .footer-grid { grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
           .faq-grid { gap: 32px !important; }
           h1 { font-size: 32px !important; }
           h2 { font-size: 26px !important; }
         }
         @media (max-width: 480px) {
-          .stats-grid { grid-template-columns: 1fr 1fr !important; gap: 12px !important; }
           .footer-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
           h1 { font-size: 28px !important; }
         }
 
-        @media (min-width: 769px) and (max-width: 1100px) {
-          .hero-grid { grid-template-columns: 1fr !important; }
-        }
-
         @media (min-width: 769px) and (max-width: 1024px) {
-          .cards-grid { grid-template-columns: 1fr 1fr !important; }
-          .pricing-grid { grid-template-columns: 1fr 1fr !important; }
           .footer-grid { grid-template-columns: 1fr 1fr !important; }
         }
       `}</style>
