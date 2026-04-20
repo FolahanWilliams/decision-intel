@@ -564,13 +564,14 @@ function MeetingsInner() {
         <Breadcrumbs
           items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Meetings & Rooms' }]}
         />
-        <header className="flex items-center justify-between mb-lg animate-fade-in">
+        <div className="page-header animate-fade-in">
           <div>
-            <div className="flex items-center gap-md mb-sm">
-              <Video size={28} style={{ color: 'var(--accent-primary)' }} />
-              <h1>Meetings & Rooms</h1>
-            </div>
-            <p className="text-muted">
+            <h1
+              style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.03em', margin: 0 }}
+            >
+              <span className="text-gradient">Meetings & Rooms</span>
+            </h1>
+            <p className="page-subtitle" style={{ maxWidth: 640 }}>
               Capture the strategic discussions your memos never document. Turn meetings into
               audited decision nodes on your Knowledge Graph.
             </p>
@@ -580,7 +581,7 @@ function MeetingsInner() {
               <Upload size={16} /> Upload Meeting
             </Link>
           )}
-        </header>
+        </div>
         <TabBar
           tabs={PAGE_TABS}
           activeTab={tab}

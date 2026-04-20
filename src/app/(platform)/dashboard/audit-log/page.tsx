@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { ShieldCheck, Download, Search, FileText, LogIn, ClipboardList } from 'lucide-react';
+import { Download, Search, FileText, LogIn, ClipboardList } from 'lucide-react';
 import { format } from 'date-fns';
 import AuditFilters from './AuditFilters';
 import Link from 'next/link';
@@ -71,29 +71,27 @@ export default async function AuditLogPage({
   return (
     <ErrorBoundary sectionName="Audit Log">
       <div className="container py-8">
-        <header className="mb-8">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="flex items-center gap-2 text-muted-foreground mb-2">
-                <ShieldCheck size={20} />
-                <span className="text-sm font-medium">Governance & Compliance</span>
-              </div>
-              <h1 className="text-3xl font-bold tracking-tight">Audit Log</h1>
-              <p className="text-muted-foreground mt-2">
-                Track all access, analysis, and export events for compliance verification.
-              </p>
-            </div>
-            <a
-              href="/api/audit?export=csv"
-              download
-              className="btn btn-secondary flex items-center gap-2 mt-1"
-              style={{ flexShrink: 0 }}
+        <div className="page-header">
+          <div>
+            <h1
+              style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.03em', margin: 0 }}
             >
-              <Download size={14} />
-              Export CSV
-            </a>
+              <span className="text-gradient">Audit Log</span>
+            </h1>
+            <p className="page-subtitle" style={{ maxWidth: 640 }}>
+              Track all access, analysis, and export events for compliance verification.
+            </p>
           </div>
-        </header>
+          <a
+            href="/api/audit?export=csv"
+            download
+            className="btn btn-secondary flex items-center gap-2"
+            style={{ flexShrink: 0 }}
+          >
+            <Download size={14} />
+            Export CSV
+          </a>
+        </div>
 
         <AuditFilters />
 

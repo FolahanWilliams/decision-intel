@@ -33,15 +33,18 @@ function DecisionQualityInner() {
         <Breadcrumbs
           items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Decision Quality' }]}
         />
-        <header className="mb-lg">
-          <div className="flex items-center gap-md mb-sm">
-            <BrainCircuit size={28} style={{ color: 'var(--accent-primary)' }} />
-            <h1>Decision Quality</h1>
+        <div className="page-header">
+          <div>
+            <h1
+              style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.03em', margin: 0 }}
+            >
+              <span className="text-gradient">Decision Quality</span>
+            </h1>
+            <p className="page-subtitle" style={{ maxWidth: 640 }}>
+              Audits, nudges, personal calibration, and A/B prompt experiments.
+            </p>
           </div>
-          <p className="text-muted">
-            Audits, nudges, personal calibration, and A/B prompt experiments
-          </p>
-        </header>
+        </div>
         <TabBar
           tabs={TABS}
           activeTab={tab}
