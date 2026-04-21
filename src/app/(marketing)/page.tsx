@@ -18,13 +18,7 @@ import { KahnemanKleinSynthesis } from '@/components/marketing/KahnemanKleinSynt
 import { MomentsPyramid } from '@/components/marketing/MomentsPyramid';
 import { SecurityLifecycleStrip } from '@/components/marketing/SecurityLifecycleStrip';
 import { ScrollRevealGraph } from '@/components/marketing/ScrollRevealGraph';
-import {
-  ArrowRight,
-  Check,
-  ShieldCheck,
-  Scale,
-  GraduationCap,
-} from 'lucide-react';
+import { ArrowRight, Check, ShieldCheck, Scale, GraduationCap } from 'lucide-react';
 
 /* ─── Color Tokens ──────────────────────────────────────────────────────── */
 
@@ -1303,7 +1297,7 @@ function HeroCredibilityStrip() {
   const reducedMotion = useSyncExternalStore(
     subscribeReducedMotion,
     getReducedMotionSnapshot,
-    getReducedMotionServerSnapshot,
+    getReducedMotionServerSnapshot
   );
 
   useEffect(() => {
@@ -1630,9 +1624,7 @@ function SampleAuditCard() {
               marginBottom: 6,
             }}
           >
-            Remove{' '}
-            <span style={{ fontWeight: 700 }}>overconfidence</span> from the
-            revenue framing
+            Remove <span style={{ fontWeight: 700 }}>overconfidence</span> from the revenue framing
           </div>
           <div
             style={{

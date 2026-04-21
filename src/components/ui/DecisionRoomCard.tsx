@@ -262,14 +262,11 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
                           room.decisionType === 'pre_commitment'
                             ? 'rgba(220, 38, 38, 0.1)'
                             : 'rgba(59, 130, 246, 0.1)',
-                        color:
-                          room.decisionType === 'pre_commitment' ? '#dc2626' : '#60a5fa',
-                        fontWeight:
-                          room.decisionType === 'pre_commitment' ? 700 : 500,
+                        color: room.decisionType === 'pre_commitment' ? '#dc2626' : '#60a5fa',
+                        fontWeight: room.decisionType === 'pre_commitment' ? 700 : 500,
                         textTransform:
                           room.decisionType === 'pre_commitment' ? 'uppercase' : 'none',
-                        letterSpacing:
-                          room.decisionType === 'pre_commitment' ? '0.04em' : 'normal',
+                        letterSpacing: room.decisionType === 'pre_commitment' ? '0.04em' : 'normal',
                       }}
                       title={
                         room.decisionType === 'pre_commitment'

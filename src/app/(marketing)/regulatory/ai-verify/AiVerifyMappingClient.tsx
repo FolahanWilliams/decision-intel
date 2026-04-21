@@ -261,9 +261,9 @@ export function AiVerifyMappingClient() {
           >
             Every Decision Provenance Record maps onto the{' '}
             <strong>11 internationally-recognised AI governance principles</strong> codified by AI
-            Verify, Singapore IMDA&rsquo;s governance framework, cross-aligned with the EU AI
-            Act and the OECD AI Principles. The reference implementation a Fortune 500 procurement
-            team can paste into a vendor risk assessment.
+            Verify, Singapore IMDA&rsquo;s governance framework, cross-aligned with the EU AI Act
+            and the OECD AI Principles. The reference implementation a Fortune 500 procurement team
+            can paste into a vendor risk assessment.
           </p>
           <p
             style={{
@@ -589,9 +589,9 @@ export function AiVerifyMappingClient() {
             }}
           >
             The design-partner cohort gets the Decision Provenance Record bundled on every audit at
-            $1,999/mo (20% off the $2,499 Strategy list) so the mapping above stops
-            being a reference doc and starts being the artifact your General Counsel forwards to the
-            audit committee.
+            $1,999/mo (20% off the $2,499 Strategy list) so the mapping above stops being a
+            reference doc and starts being the artifact your General Counsel forwards to the audit
+            committee.
           </p>
           <div
             style={{

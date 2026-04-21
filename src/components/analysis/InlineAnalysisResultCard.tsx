@@ -459,13 +459,9 @@ function InlineCoEditPanel({ originalScore }: { originalScore: number }) {
           originalOverallScore: originalScore,
         }),
       });
-      const json = (await res.json()) as
-        | PassageReAuditResponse
-        | { error: string };
+      const json = (await res.json()) as PassageReAuditResponse | { error: string };
       if (!res.ok || 'error' in json) {
-        setError(
-          'error' in json ? json.error : 'Passage audit failed. Try again.'
-        );
+        setError('error' in json ? json.error : 'Passage audit failed. Try again.');
         return;
       }
       setResult(json.data);
@@ -510,9 +506,7 @@ function InlineCoEditPanel({ originalScore }: { originalScore: number }) {
         >
           ✎
         </span>
-        <span style={{ flex: 1 }}>
-          Rewrite a flagged passage — see the DQI update in seconds.
-        </span>
+        <span style={{ flex: 1 }}>Rewrite a flagged passage — see the DQI update in seconds.</span>
         <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>passage-level</span>
       </button>
     );
@@ -616,8 +610,7 @@ function InlineCoEditPanel({ originalScore }: { originalScore: number }) {
                 : 'var(--text-on-accent, #fff)',
             fontSize: 13,
             fontWeight: 600,
-            cursor:
-              submitting || passage.trim().length < 24 ? 'default' : 'pointer',
+            cursor: submitting || passage.trim().length < 24 ? 'default' : 'pointer',
           }}
         >
           {submitting ? 'Auditing…' : 'Re-audit passage'}

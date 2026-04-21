@@ -153,7 +153,10 @@ export async function POST(req: NextRequest) {
                 ? 'medium'
                 : 'low';
         return {
-          type: String(b.type || '').trim().toLowerCase().replace(/\s+/g, '_'),
+          type: String(b.type || '')
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, '_'),
           severity: normalised,
           evidence:
             typeof b.evidence === 'string' && b.evidence.trim().length > 0

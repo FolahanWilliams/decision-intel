@@ -16,14 +16,7 @@
  * Node size is supplied by the parent (encodes sizeMetric).
  */
 
-import {
-  useRef,
-  useCallback,
-  forwardRef,
-  useImperativeHandle,
-  useMemo,
-  useState,
-} from 'react';
+import { useRef, useCallback, forwardRef, useImperativeHandle, useMemo, useState } from 'react';
 import { DoubleSide, type Mesh, type MeshBasicMaterial } from 'three';
 import { useFrame } from '@react-three/fiber';
 import {

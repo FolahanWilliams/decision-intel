@@ -655,8 +655,8 @@ export default async function CaseStudyDetailPage({
                   margin: '0 0 20px',
                 }}
               >
-                The analysis below was produced from the pre-decision document only. No
-                hindsight. This is what the platform would have surfaced if it had been running{' '}
+                The analysis below was produced from the pre-decision document only. No hindsight.
+                This is what the platform would have surfaced if it had been running{' '}
                 {caseStudy.year > 2000 ? `in ${deep.date}` : `at the time`}.
               </p>
 

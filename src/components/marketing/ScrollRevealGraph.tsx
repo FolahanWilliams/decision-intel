@@ -190,10 +190,7 @@ const AUDIT_TICKER_SEED: AuditTickerEvent[] = [
   { industry: 'telecommunications', auditType: 'spectrum-bid audit', dqi: 58, biasCount: 5 },
 ];
 
-function useRotatingAuditEvent(
-  intervalMs: number,
-  enabled: boolean
-): AuditTickerEvent {
+function useRotatingAuditEvent(intervalMs: number, enabled: boolean): AuditTickerEvent {
   const [idx, setIdx] = useState(0);
   useEffect(() => {
     if (!enabled) return;

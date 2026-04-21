@@ -96,12 +96,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn(
-        inter.variable,
-        instrumentSerif.variable,
-        jetbrainsMono.variable,
-        'font-sans'
-      )}
+      className={cn(inter.variable, instrumentSerif.variable, jetbrainsMono.variable, 'font-sans')}
     >
       <body className="antialiased min-h-screen">
         <ThemeProvider

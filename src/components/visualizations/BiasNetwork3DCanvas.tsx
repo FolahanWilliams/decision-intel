@@ -135,7 +135,6 @@ export default function BiasNetwork3DCanvas({ biases, onBiasSelect }: BiasNetwor
   const { nodes, edges } = useMemo(() => buildGraphFromBiases(biases), [biases]);
   const hasGraph = nodes.length > 0;
 
-
   const nodeIds = useMemo(() => nodes.map(n => n.id), [nodes]);
   const edgeIds = useMemo(() => edges.map(e => e.id), [edges]);
   const { narrativeActives, isRevealing } = useEdgeNarrativeReveal({

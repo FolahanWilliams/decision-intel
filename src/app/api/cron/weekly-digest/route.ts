@@ -112,8 +112,7 @@ export async function GET(req: NextRequest) {
           .filter((s): s is number => s != null);
         let dqiTrendPts: number | undefined;
         if (scores.length >= 2 && priorScoresClean.length >= 2) {
-          const priorAvg =
-            priorScoresClean.reduce((a, b) => a + b, 0) / priorScoresClean.length;
+          const priorAvg = priorScoresClean.reduce((a, b) => a + b, 0) / priorScoresClean.length;
           dqiTrendPts = avgScore - priorAvg;
         }
 

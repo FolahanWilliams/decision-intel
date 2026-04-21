@@ -130,14 +130,9 @@ export function TimelinePhaseScrub({ phase, onChange }: TimelinePhaseScrubProps)
               width: 28,
               height: 28,
               borderRadius: '50%',
-              background:
-                isActive || isPast
-                  ? 'var(--accent-primary)'
-                  : 'var(--bg-card)',
+              background: isActive || isPast ? 'var(--accent-primary)' : 'var(--bg-card)',
               border: `2px solid ${
-                isActive || isPast
-                  ? 'var(--accent-primary)'
-                  : 'var(--border-color)'
+                isActive || isPast ? 'var(--accent-primary)' : 'var(--border-color)'
               }`,
               color: isActive || isPast ? '#ffffff' : 'var(--text-muted)',
               display: 'inline-flex',
@@ -145,9 +140,7 @@ export function TimelinePhaseScrub({ phase, onChange }: TimelinePhaseScrubProps)
               justifyContent: 'center',
               cursor: 'pointer',
               transition: 'all 0.2s',
-              boxShadow: isActive
-                ? '0 0 0 4px rgba(22,163,74,0.18), var(--shadow-sm)'
-                : 'none',
+              boxShadow: isActive ? '0 0 0 4px rgba(22,163,74,0.18), var(--shadow-sm)' : 'none',
             };
             return (
               <button
@@ -333,8 +326,8 @@ export function PhaseDuringPanel({
           }}
         >
           When you commit to a direction — approve, modify, reject, escalate — log it here. The
-          record becomes the anchor for outcome scoring 60/90 days from now, and the decision
-          joins the Decision Knowledge Graph.
+          record becomes the anchor for outcome scoring 60/90 days from now, and the decision joins
+          the Decision Knowledge Graph.
         </p>
         <div
           style={{
@@ -346,7 +339,11 @@ export function PhaseDuringPanel({
         >
           <Link
             href={`/dashboard/cognitive-audits/submit?source=manual${
-              analysisId ? `&analysisId=${analysisId}` : documentId ? `&documentId=${documentId}` : ''
+              analysisId
+                ? `&analysisId=${analysisId}`
+                : documentId
+                  ? `&documentId=${documentId}`
+                  : ''
             }`}
             style={{
               display: 'inline-flex',
@@ -407,20 +404,14 @@ interface PhaseAfterPanelProps {
   lessonsLearned?: string;
 }
 
-const BRIER_COLOR: Record<
-  NonNullable<RecalibratedDqiSummary['brierCategory']>,
-  string
-> = {
+const BRIER_COLOR: Record<NonNullable<RecalibratedDqiSummary['brierCategory']>, string> = {
   excellent: '#16A34A',
   good: '#38BDF8',
   fair: '#F59E0B',
   poor: '#EF4444',
 };
 
-const BRIER_LABEL: Record<
-  NonNullable<RecalibratedDqiSummary['brierCategory']>,
-  string
-> = {
+const BRIER_LABEL: Record<NonNullable<RecalibratedDqiSummary['brierCategory']>, string> = {
   excellent: 'Superforecaster',
   good: 'Analyst',
   fair: 'Amateur',
@@ -666,9 +657,9 @@ export function PhaseAfterPanel({
           }}
         >
           When the real-world result lands — deal closed, initiative shipped, recommendation
-          accepted or rejected — report it here. Decision Intel recalibrates the DQI, scores
-          a Brier, and feeds the lesson back into the Knowledge Graph so every future call
-          inherits this one&rsquo;s signal.
+          accepted or rejected — report it here. Decision Intel recalibrates the DQI, scores a
+          Brier, and feeds the lesson back into the Knowledge Graph so every future call inherits
+          this one&rsquo;s signal.
         </p>
         <div
           style={{
@@ -680,7 +671,11 @@ export function PhaseAfterPanel({
         >
           <Link
             href={`/dashboard/outcome-flywheel${
-              analysisId ? `?analysisId=${analysisId}` : documentId ? `?documentId=${documentId}` : ''
+              analysisId
+                ? `?analysisId=${analysisId}`
+                : documentId
+                  ? `?documentId=${documentId}`
+                  : ''
             }`}
             style={{
               display: 'inline-flex',

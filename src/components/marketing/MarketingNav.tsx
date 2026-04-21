@@ -319,9 +319,7 @@ export function MarketingNav() {
             height={28}
             style={{ borderRadius: 6, objectFit: 'cover' }}
           />
-          <span
-            style={{ fontSize: 18, fontWeight: 700, color: C.white, letterSpacing: '-0.02em' }}
-          >
+          <span style={{ fontSize: 18, fontWeight: 700, color: C.white, letterSpacing: '-0.02em' }}>
             Decision Intel
           </span>
         </Link>
@@ -493,35 +491,43 @@ export function MarketingNav() {
                       size={16}
                       style={{
                         transition: 'transform 0.2s',
-                        transform:
-                          mobileExpanded === m.id ? 'rotate(180deg)' : 'rotate(0deg)',
+                        transform: mobileExpanded === m.id ? 'rotate(180deg)' : 'rotate(0deg)',
                       }}
                     />
                   </button>
                   {mobileExpanded === m.id && (
-                    <div style={{ paddingBottom: 12, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      {m.sections.flatMap(s => s.links).map(link => {
-                        const Icon = link.icon;
-                        return (
-                          <Link
-                            key={link.href}
-                            href={link.href}
-                            onClick={() => setMobileOpen(false)}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 10,
-                              padding: '10px 4px',
-                              textDecoration: 'none',
-                              color: C.slate300,
-                              fontSize: 14,
-                            }}
-                          >
-                            <Icon size={14} color={C.green} />
-                            {link.label}
-                          </Link>
-                        );
-                      })}
+                    <div
+                      style={{
+                        paddingBottom: 12,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 2,
+                      }}
+                    >
+                      {m.sections
+                        .flatMap(s => s.links)
+                        .map(link => {
+                          const Icon = link.icon;
+                          return (
+                            <Link
+                              key={link.href}
+                              href={link.href}
+                              onClick={() => setMobileOpen(false)}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 10,
+                                padding: '10px 4px',
+                                textDecoration: 'none',
+                                color: C.slate300,
+                                fontSize: 14,
+                              }}
+                            >
+                              <Icon size={14} color={C.green} />
+                              {link.label}
+                            </Link>
+                          );
+                        })}
                     </div>
                   )}
                 </div>
@@ -620,8 +626,7 @@ function MegaPanel({ menu, onNavigate }: { menu: MegaMenu; onNavigate: () => voi
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns:
-            sections.length > 1 ? 'repeat(auto-fit, minmax(260px, 1fr))' : '1fr',
+          gridTemplateColumns: sections.length > 1 ? 'repeat(auto-fit, minmax(260px, 1fr))' : '1fr',
           gap: 32,
         }}
       >

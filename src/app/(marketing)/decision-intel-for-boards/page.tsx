@@ -96,7 +96,7 @@ const OBJECTIONS: Objection[] = [
     number: '03',
     question: 'Who vouches for the methodology?',
     answer:
-      "The analysis pipeline is a synthesis of two Nobel-adjacent traditions: Kahneman's System 2 debiasing (Thinking, Fast and Slow; Noise) and Klein's Recognition-Primed Decision framework (Sources of Power). Both authors converged on the arbitrated integration in their 2009 paper \"Conditions for Intuitive Expertise.\" Decision Intel is the only platform that operationalises the synthesis. We call it the Recognition-Rigor Framework. The 11 AI-governance principles published by AI Verify Foundation (Singapore IMDA) map field-by-field onto our Decision Provenance Record.",
+      'The analysis pipeline is a synthesis of two Nobel-adjacent traditions: Kahneman\'s System 2 debiasing (Thinking, Fast and Slow; Noise) and Klein\'s Recognition-Primed Decision framework (Sources of Power). Both authors converged on the arbitrated integration in their 2009 paper "Conditions for Intuitive Expertise." Decision Intel is the only platform that operationalises the synthesis. We call it the Recognition-Rigor Framework. The 11 AI-governance principles published by AI Verify Foundation (Singapore IMDA) map field-by-field onto our Decision Provenance Record.',
   },
 ];
 
@@ -177,11 +177,34 @@ export default function DecisionIntelForBoardsPage() {
     <div style={pageStyle}>
       <div style={containerStyle}>
         {/* Minimal header — this is a forwarded artifact, not a navigated page */}
-        <div style={{ marginBottom: 48, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Link href="/" style={{ fontSize: 14, fontWeight: 600, color: C.navy, textDecoration: 'none', letterSpacing: '-0.01em' }}>
+        <div
+          style={{
+            marginBottom: 48,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <Link
+            href="/"
+            style={{
+              fontSize: 14,
+              fontWeight: 600,
+              color: C.navy,
+              textDecoration: 'none',
+              letterSpacing: '-0.01em',
+            }}
+          >
             Decision Intel
           </Link>
-          <span style={{ fontSize: 12, color: C.slate500, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+          <span
+            style={{
+              fontSize: 12,
+              color: C.slate500,
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+            }}
+          >
             For the board · 4-minute read
           </span>
         </div>
@@ -205,13 +228,13 @@ export default function DecisionIntelForBoardsPage() {
           sits between the strategy team drafting a memo and the committee that will vote on it. In
           roughly sixty seconds, it scores thirty-plus cognitive biases, predicts the questions the
           CEO or board chair is most likely to ask, simulates five role-primed committee personas
-          against the memo, and attaches every decision to a Decision Knowledge Graph that
-          compounds over time.
+          against the memo, and attaches every decision to a Decision Knowledge Graph that compounds
+          over time.
         </p>
         <p style={bodyStyle}>
-          Every audit produces a Decision Provenance Record: the signed, hashed, mapped-onto-EU-AI-Act
-          artifact that your GC can walk into a regulator meeting with. This is the piece most
-          relevant to the board.
+          Every audit produces a Decision Provenance Record: the signed, hashed,
+          mapped-onto-EU-AI-Act artifact that your GC can walk into a regulator meeting with. This
+          is the piece most relevant to the board.
         </p>
 
         {/* Why it matters to the board */}
@@ -221,7 +244,15 @@ export default function DecisionIntelForBoardsPage() {
           purchase, is already calendared, not speculative. Four items specifically.
         </p>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 8, marginBottom: 8 }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 16,
+            marginTop: 8,
+            marginBottom: 8,
+          }}
+        >
           {BOARD_TAILWINDS.map(({ icon: Icon, label, status, body }) => (
             <div
               key={label}
@@ -250,10 +281,20 @@ export default function DecisionIntelForBoardsPage() {
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={h3Style}>{label}</div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: C.green, letterSpacing: '0.02em', marginBottom: 8 }}>
+                  <div
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: C.green,
+                      letterSpacing: '0.02em',
+                      marginBottom: 8,
+                    }}
+                  >
                     {status}
                   </div>
-                  <div style={{ ...bodyStyle, marginBottom: 0, fontSize: 15, lineHeight: 1.6 }}>{body}</div>
+                  <div style={{ ...bodyStyle, marginBottom: 0, fontSize: 15, lineHeight: 1.6 }}>
+                    {body}
+                  </div>
                 </div>
               </div>
             </div>
@@ -262,20 +303,18 @@ export default function DecisionIntelForBoardsPage() {
 
         {/* The ask */}
         <h2 style={h2Style}>The specific ask</h2>
-        <p style={bodyStyle}>
-          The CSO is almost certainly proposing one of two tiers.
-        </p>
+        <p style={bodyStyle}>The CSO is almost certainly proposing one of two tiers.</p>
         <p style={bodyStyle}>
           <strong>Strategy tier at £2,499/month</strong> supports a team of up to ten users and 250
-          audits per month, the operating rhythm for a single strategy function running memos,
-          board decks, and M&A recommendations through the platform. This is the most common
-          starting point for Fortune 500 corporate strategy teams.
+          audits per month, the operating rhythm for a single strategy function running memos, board
+          decks, and M&A recommendations through the platform. This is the most common starting
+          point for Fortune 500 corporate strategy teams.
         </p>
         <p style={bodyStyle}>
           <strong>Enterprise</strong> is custom-priced, includes a volume floor, and covers
-          cross-functional deployments where multiple strategy and M&A teams share the same
-          Decision Knowledge Graph. Enterprise buyers typically also request dedicated GC
-          onboarding on the seven-framework compliance mapping.
+          cross-functional deployments where multiple strategy and M&A teams share the same Decision
+          Knowledge Graph. Enterprise buyers typically also request dedicated GC onboarding on the
+          seven-framework compliance mapping.
         </p>
         <p style={bodyMutedStyle}>
           Gross margin runs approximately ninety percent blended, so the subscription is
@@ -336,10 +375,10 @@ export default function DecisionIntelForBoardsPage() {
           </div>
           <p style={{ fontSize: 15.5, lineHeight: 1.7, color: C.slate200, marginBottom: 14 }}>
             I am Folahan Williams, the solo technical founder of Decision Intel. I built the
-            platform alongside secondary school over roughly sixteen hours a week. I am advised by
-            a senior operator who helped scale Wiz from startup to $32B. If the board has a
-            question that is best answered by the person holding the pen on the product roadmap
-            rather than the sales team, I am one email away.
+            platform alongside secondary school over roughly sixteen hours a week. I am advised by a
+            senior operator who helped scale Wiz from startup to $32B. If the board has a question
+            that is best answered by the person holding the pen on the product roadmap rather than
+            the sales team, I am one email away.
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, marginTop: 10 }}>
             <Link

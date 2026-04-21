@@ -147,8 +147,8 @@ export function SimulateCeoClient() {
           }}
         >
           Same primed-persona engine as the full Decision Intel pipeline, stripped down to a
-          single-CEO simulation so you can stress-test a memo in the twelve minutes before you
-          walk into the meeting. Free, no login. Three runs per day per IP.
+          single-CEO simulation so you can stress-test a memo in the twelve minutes before you walk
+          into the meeting. Free, no login. Three runs per day per IP.
         </p>
 
         {/* Form */}
@@ -423,8 +423,8 @@ export function SimulateCeoClient() {
         >
           <strong style={{ color: C.navy }}>How it works.</strong> Decision Intel&rsquo;s full
           pipeline runs five primed boardroom personas (CEO, CFO, GC, domain lead, dissenting
-          director) against your memo, arbitrated through the Recognition-Rigor Framework. This
-          page is the single-CEO teaser. It&rsquo;s the same engine, cut down for speed. When
+          director) against your memo, arbitrated through the Recognition-Rigor Framework. This page
+          is the single-CEO teaser. It&rsquo;s the same engine, cut down for speed. When
           you&rsquo;re ready for the full audit with Decision Provenance Record, try{' '}
           <Link href="/demo" style={{ color: C.green, fontWeight: 600 }}>
             the free demo

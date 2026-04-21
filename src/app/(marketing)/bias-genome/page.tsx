@@ -333,7 +333,8 @@ export default function BiasGenomePage() {
             }}
           >
             Named patterns where two biases compound. Detection in live memos is 8x worse than
-            either bias alone. This is the product category our toxic-combination engine was built for.
+            either bias alone. This is the product category our toxic-combination engine was built
+            for.
           </p>
 
           {/* Network viz first — shows which biases are the hubs */}
