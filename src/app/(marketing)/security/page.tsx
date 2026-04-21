@@ -179,8 +179,8 @@ const AVAILABILITY_STYLE: Record<
 const PROCESSORS = [
   { name: 'Vercel', role: 'Application hosting + CDN', cert: 'SOC 2 Type II', region: 'US + EU' },
   { name: 'Supabase', role: 'Postgres + Auth + Storage', cert: 'SOC 2 Type II · HIPAA', region: 'US' },
-  { name: 'Google AI (Gemini)', role: 'Analysis LLM', cert: 'No-training contract terms', region: 'US' },
-  { name: 'Anthropic (Claude)', role: 'Fallback analysis LLM', cert: 'No-training contract terms', region: 'US' },
+  { name: 'Google AI', role: 'Primary analysis LLM', cert: 'No-training contract terms', region: 'US' },
+  { name: 'Anthropic', role: 'Fallback analysis LLM', cert: 'No-training contract terms', region: 'US' },
   { name: 'Stripe', role: 'Billing', cert: 'PCI-DSS Level 1 · SOC 1/2', region: 'US + EU' },
   { name: 'Sentry', role: 'Error monitoring', cert: 'SOC 2 Type II', region: 'US' },
 ];

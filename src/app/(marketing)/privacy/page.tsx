@@ -81,7 +81,7 @@ const TRUST_STACK = [
   {
     icon: EyeOff,
     label: 'No model training on your data',
-    body: 'Your documents are not used to train Gemini, Claude, or any upstream model. Google AI processes under no-training terms.',
+    body: 'Your documents are not used to train any upstream model. Every processor operates under no-training contract terms.',
   },
   {
     icon: Trash2,
