@@ -92,7 +92,7 @@ export function CaseStudyGraphSection({ biases, primaryBias, toxicCombinations, 
             3D Decision Knowledge Graph
           </div>
           <div style={{ fontSize: 14, color: '#64748B', lineHeight: 1.4 }}>
-            {company} &mdash;{' '}
+            {company} ·{' '}
             <span style={{ fontWeight: 600, color: '#0F172A' }}>
               {biases.length} biases
               {toxicCombinations.length > 0 && (

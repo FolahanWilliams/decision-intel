@@ -152,7 +152,7 @@ export function ProofPageClient() {
               margin: 0,
             }}
           >
-            {deepCases.length} real documents — memos, SEC filings, earnings calls — from{' '}
+            {deepCases.length} real documents (memos, SEC filings, earnings calls) from{' '}
             <strong style={{ color: C.white }}>before</strong> the outcome was known. Run through
             the same 30+ bias detection methodology we apply to your next strategic memo.
           </p>
@@ -340,13 +340,13 @@ export function ProofPageClient() {
                 >
                   /taxonomy
                 </Link>
-                , DI-B-001 through DI-B-020) against each — a blind test against your own library.
+                , DI-B-001 through DI-B-020) against each: a blind test against your own library.
                 Our findings are the red flags the original authors, auditors, and committees missed
                 at the time.
               </p>
               <p style={{ fontSize: 13, color: C.slate400, margin: 0 }}>
                 Every flaggable bias links to its peer-reviewed academic source. No LLM storytelling
-                — the methodology is fully cited.
+                . The methodology is fully cited.
               </p>
             </div>
           </div>
@@ -441,7 +441,7 @@ export function ProofPageClient() {
             </h3>
             <p style={{ fontSize: 14.5, color: C.slate300, margin: 0, maxWidth: 640 }}>
               Upload the same document you&apos;re preparing for your next board or steering
-              committee. Get the 60-second audit — same methodology, your memo.
+              committee. Get the 60-second audit: same methodology, your memo.
             </p>
           </div>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>

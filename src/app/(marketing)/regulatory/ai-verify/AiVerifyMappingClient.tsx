@@ -84,7 +84,7 @@ const PRINCIPLES: PrincipleRow[] = [
     name: 'Transparency',
     definition: 'The AI system discloses information about itself to relevant stakeholders.',
     mechanism:
-      'Every audit ships with the SHA-256 fingerprint of the exact prompt version used, plus the model lineage — which Gemini tier ran on which of the 12 pipeline nodes, with temperature and top-p per node. Nothing about the model or the prompt is hidden.',
+      'Every audit ships with the SHA-256 fingerprint of the exact prompt version used, plus the model lineage: which Gemini tier ran on which of the 12 pipeline nodes, with temperature and top-p per node. Nothing about the model or the prompt is hidden.',
     dprFields: ['Prompt fingerprint', 'Model lineage'],
   },
   {

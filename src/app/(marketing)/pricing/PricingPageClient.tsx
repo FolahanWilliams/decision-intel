@@ -48,7 +48,7 @@ function buildTiers(_cycle: BillingCycle): Tier[] {
       id: 'free',
       name: 'Free',
       role: 'Just exploring',
-      tagline: 'See what we flag on your first memo — no card needed.',
+      tagline: 'See what we flag on your first memo. No card needed.',
       priceMonthly: 0,
       priceAnnual: 0,
       anchor: 'Forever free · upgrade any time',
@@ -707,7 +707,7 @@ export function PricingPageClient() {
               Design Partner Program &middot; 5 seats
             </div>
             <div style={{ fontSize: 14, fontWeight: 700, color: C.slate900, lineHeight: 1.4 }}>
-              $1,999/mo locked for 12 months &mdash; 20% off Strategy list.
+              $1,999/mo locked for 12 months. 20% off Strategy list.
             </div>
             <div style={{ fontSize: 12.5, color: C.slate500, marginTop: 3, lineHeight: 1.5 }}>
               Fortune 500 corporate strategy teams shaping the Recognition-Rigor Framework. Decision

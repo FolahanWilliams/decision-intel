@@ -30,7 +30,7 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.c
 export const metadata: Metadata = {
   title: 'Security & Privacy · Decision Intel',
   description:
-    'Your strategic memos are evidence. We treat them that way. GDPR anonymization runs first — before any analysis LLM sees your text. AES-256-GCM at rest, TLS 1.2+ in transit, no model training on your content.',
+    'Your strategic memos are evidence. We treat them that way. GDPR anonymization runs first, before any analysis LLM sees your text. AES-256-GCM at rest, TLS 1.2+ in transit, no model training on your content.',
   alternates: { canonical: `${siteUrl}/privacy` },
   openGraph: {
     title: 'Security & Privacy · Decision Intel',
@@ -325,7 +325,7 @@ export default function PrivacyPage() {
           <SectionHeader
             eyebrow="The stack"
             title="Five guarantees, non-negotiable."
-            body="Every strategic memo is high-leverage data. These are the defaults you get from the moment you create an account — not premium features, not paid add-ons."
+            body="Every strategic memo is high-leverage data. These are the defaults you get from the moment you create an account. Not premium features, not paid add-ons."
           />
           <div
             style={{
@@ -404,7 +404,7 @@ export default function PrivacyPage() {
               n="02"
               icon={ShieldCheck}
               title="GDPR anonymization"
-              body="The first pipeline node — before analysis — scans for PII (names, emails, account numbers, internal IDs) and redacts in place. Anonymized text is what the reasoning models receive."
+              body="The first pipeline node (before analysis) scans for PII (names, emails, account numbers, internal IDs) and redacts in place. Anonymized text is what the reasoning models receive."
               highlight
             />
             <LifecycleStep

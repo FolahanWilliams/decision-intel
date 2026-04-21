@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Decision Intel — The Human-AI Governance System for Strategic Decisions',
+  title: 'Decision Intel · The native reasoning layer for boardroom strategic decisions',
   description:
-    'Decision Intel audits every board memo, simulates steering-committee objections, runs what-if interventions, and compounds your team’s judgment into a living Decision Knowledge Graph — so decision quality, scalability, and reliability improve quarter after quarter.',
+    'Decision Intel audits every board memo, simulates steering-committee objections, runs what-if interventions, and compounds your team’s judgment into a living Decision Knowledge Graph, so decision quality, scalability, and reliability improve quarter after quarter.',
   openGraph: {
-    title: 'Decision Intel — The Human-AI Governance System for Strategic Decisions',
+    title: 'Decision Intel · The native reasoning layer for boardroom strategic decisions',
     description:
       'Governance on the reasoning layer, not just the data. Audit every strategic memo, simulate the boardroom, run what-if interventions, and compound your team’s judgment quarter after quarter.',
     url: '/',
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Decision Intel — The Human-AI Governance System for Strategic Decisions',
+    title: 'Decision Intel · The native reasoning layer for boardroom strategic decisions',
     description:
       'Audit the reasoning behind every strategic memo. Simulate the boardroom. Run what-if interventions. Compound your team’s judgment quarter after quarter.',
   },
@@ -75,15 +75,15 @@ const jsonLd = [
     description:
       'The human-AI governance system for strategic decisions. Decision Intel audits every board memo, simulates steering-committee objections, runs what-if interventions, and compounds your team’s judgment into a living Decision Knowledge Graph so decision quality, scalability, and reliability improve quarter after quarter.',
     featureList: [
-      'Decision Knowledge Graph — every strategic call, compounded in one living system',
-      'AI boardroom simulation — CEO, CFO, and board objections rehearsed before the meeting',
-      'Human-AI reasoning audit — every recommendation traceable to the evidence that triggered it',
-      'What-if interventions — see how removing a bias changes outcome probability',
-      'Decision Quality Index (DQI) — benchmarked against a 135-case public reference library',
+      'Decision Knowledge Graph: every strategic call, compounded in one living system',
+      'AI boardroom simulation: CEO, CFO, and board objections rehearsed before the meeting',
+      'Human-AI reasoning audit: every recommendation traceable to the evidence that triggered it',
+      'What-if interventions: see how removing a bias changes outcome probability',
+      'Decision Quality Index (DQI): benchmarked against a 135-case public reference library',
       '30+ cognitive biases detected automatically, with severity scoring and evidence excerpts',
       'Compliance mapping: SOX, FCA, EU AI Act, Basel III, GDPR, SEC, LPOA',
       'Board-ready PDF export with regulatory citations',
-      'Closed-loop outcome tracking — every confirmed outcome recalibrates the signal',
+      'Closed-loop outcome tracking: every confirmed outcome recalibrates the signal',
       'Integrations: Slack, Google Drive, email, Stripe billing',
     ],
     offers: [
@@ -92,7 +92,7 @@ const jsonLd = [
         name: 'Free',
         price: '0',
         priceCurrency: 'USD',
-        description: 'Free — 4 memo audits per month. See what we flag on any strategic document.',
+        description: 'Free: 4 memo audits per month. See what we flag on any strategic document.',
       },
       {
         '@type': 'Offer',
@@ -185,7 +185,7 @@ const jsonLd = [
         name: 'How is Decision Intel different from ChatGPT or a general AI assistant?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'ChatGPT gives one opinion from one model — ungoverned, untraceable, unaudited. Decision Intel is a governance system: it measures the noise in your reasoning the same way Kahneman did in the insurance underwriter study, simulates an AI boardroom of CEO, CFO, and board personas, runs what-if interventions against a 135-case public reference library, and compounds every confirmed outcome back into a calibrated Decision Quality Index your audit committee can defend. Not a chatbot — a human-AI governance layer.',
+          text: 'ChatGPT gives one opinion from one model: ungoverned, untraceable, unaudited. Decision Intel is a governance system. It measures the noise in your reasoning the same way Kahneman did in the insurance underwriter study, simulates an AI boardroom of CEO, CFO, and board personas, runs what-if interventions against a 135-case public reference library, and compounds every confirmed outcome back into a calibrated Decision Quality Index your audit committee can defend. Not a chatbot; a human-AI governance layer.',
         },
       },
     ],

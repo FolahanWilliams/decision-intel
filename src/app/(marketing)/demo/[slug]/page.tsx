@@ -42,7 +42,7 @@ export async function generateMetadata({
   }
 
   const title = `Live demo: Decision Intel on ${caseStudy.company} (${caseStudy.year}) | Decision Intel`;
-  const description = `See exactly what Decision Intel would have flagged in ${caseStudy.company}'s ${caseStudy.year} pre-decision document — DQI grade ${caseStudy.dqiEstimate.grade}, ${caseStudy.preDecisionEvidence.detectableRedFlags.length} red flags, simulated CEO questions, counterfactual recommendation. No hindsight.`;
+  const description = `See exactly what Decision Intel would have flagged in ${caseStudy.company}'s ${caseStudy.year} pre-decision document: DQI grade ${caseStudy.dqiEstimate.grade}, ${caseStudy.preDecisionEvidence.detectableRedFlags.length} red flags, simulated CEO questions, counterfactual recommendation. No hindsight.`;
 
   return {
     title,
@@ -76,7 +76,7 @@ export default async function DemoPage({ params }: { params: Promise<{ slug: str
   const demoJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: `Decision Intel — Live Demo (${caseStudy.company})`,
+    name: `Decision Intel · Live Demo (${caseStudy.company})`,
     description: `Interactive demo of the Decision Intel platform using ${caseStudy.company}'s ${caseStudy.year} pre-decision document as input.`,
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',

@@ -235,7 +235,7 @@ export function HowItWorksClient() {
               >
                 The engine behind the native reasoning layer for every boardroom strategic decision.
                 Twelve specialized agents, thirty cognitive biases, and a ten-pattern interaction
-                model grounded in Kahneman, Klein, and Tetlock &mdash; every memo audited in under
+                model grounded in Kahneman, Klein, and Tetlock. Every memo audited in under
                 sixty seconds, so the reasoning lives in one surface instead of four.
               </p>
               <p style={{ fontSize: 14, color: C.slate500, margin: 0, maxWidth: 560 }}>
@@ -625,7 +625,7 @@ export function HowItWorksClient() {
                 </li>
                 <li>
                   <strong>Seven-framework compliance mapping</strong> built into the Verification
-                  node — FCA Consumer Duty, SOX, Basel III, EU AI Act, SEC Reg D, GDPR, plus an
+                  node: FCA Consumer Duty, SOX, Basel III, EU AI Act, SEC Reg D, GDPR, plus an
                   internal framework. The same detection runs on your memos and on our own shipping
                   policies.
                 </li>

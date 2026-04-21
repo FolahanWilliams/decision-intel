@@ -3,12 +3,12 @@ import Link from 'next/link';
 import { ArrowRight, TrendingDown, TrendingUp, Quote } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Decision Alpha — Quarterly Index of Strategic Decision Quality | Decision Intel',
+  title: 'Decision Alpha · Quarterly Index of Strategic Decision Quality | Decision Intel',
   description:
     'The Decision Alpha Index is a quarterly benchmark of strategic decision quality across sectors, computed from the same 30+ bias taxonomy Decision Intel uses on every memo. Published quarterly. Free to cite.',
   alternates: { canonical: '/decision-alpha' },
   openGraph: {
-    title: 'Decision Alpha — The VIX for Decision-Making',
+    title: 'Decision Alpha · The VIX for Decision-Making',
     description:
       'Quarterly sector-level index of strategic decision quality. 30+ biases benchmarked across public earnings-call postures. Published by Decision Intel.',
     type: 'article',
@@ -218,7 +218,7 @@ export default function DecisionAlphaPage() {
             marginBottom: 8,
           }}
         >
-          Sector Index — {QUARTER}
+          Sector Index · {QUARTER}
         </h2>
         <p
           style={{
@@ -484,11 +484,11 @@ export default function DecisionAlphaPage() {
           {[
             {
               title: 'Inputs',
-              body: 'Public earnings-call transcripts (last 4 quarters), SEC filings (10-K, 10-Q, 8-K), and investor-day disclosures. Strategic posture signals only — never customer data.',
+              body: 'Public earnings-call transcripts (last 4 quarters), SEC filings (10-K, 10-Q, 8-K), and investor-day disclosures. Strategic posture signals only, never customer data.',
             },
             {
               title: 'Bias detection',
-              body: 'The Decision Intel 30+ bias taxonomy (DI-B-001 through DI-B-020 core + toxic combinations). Same scoring model that audits client memos — applied symmetrically to public disclosures.',
+              body: 'The Decision Intel 30+ bias taxonomy (DI-B-001 through DI-B-020 core + toxic combinations). Same scoring model that audits client memos, applied symmetrically to public disclosures.',
             },
             {
               title: 'DQI formula',

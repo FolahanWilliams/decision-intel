@@ -13,12 +13,12 @@ import { BiasGenomeClient } from './BiasGenomeClient';
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
 
 export const metadata: Metadata = {
-  title: 'The Bias Genome — Which Cognitive Biases Predict Strategic Failure | Decision Intel',
+  title: 'The Bias Genome · Which Cognitive Biases Predict Strategic Failure | Decision Intel',
   description:
     'A public map of which cognitive biases predict which kinds of strategic failure, by industry. Seed dataset of real decisions. Updated quarterly as consenting orgs opt in.',
   alternates: { canonical: `${siteUrl}/bias-genome` },
   openGraph: {
-    title: 'The Bias Genome — Which Biases Predict Which Failures',
+    title: 'The Bias Genome · Which Biases Predict Which Failures',
     description:
       'A quarterly public genome of bias → failure correlations across industries. Computed from real case studies. Cite freely.',
     url: `${siteUrl}/bias-genome`,
@@ -105,8 +105,8 @@ export default function BiasGenomePage() {
               marginBottom: 10,
             }}
           >
-            A public map drawn from {meta.totalCases} real strategic decisions — {meta.failureCases}{' '}
-            failures and {meta.successCases} successes — across {meta.industriesCovered.length}{' '}
+            A public map drawn from {meta.totalCases} real strategic decisions: {meta.failureCases}{' '}
+            failures and {meta.successCases} successes, across {meta.industriesCovered.length}{' '}
             industries. Methodology open. Data cite-able. Refreshed as consenting customer orgs opt
             in.
           </p>
@@ -270,7 +270,7 @@ export default function BiasGenomePage() {
               maxWidth: 680,
             }}
           >
-            Every bias plotted on two axes — how often it appears, how much it lifts the failure
+            Every bias plotted on two axes: how often it appears, how much it lifts the failure
             rate. The top-right quadrant is where your audit energy pays off.
           </p>
           <RiskLandscape entries={genome.entries} baselineFailureRate={meta.baselineFailureRate} />
@@ -301,7 +301,7 @@ export default function BiasGenomePage() {
               maxWidth: 680,
             }}
           >
-            Sorted by failure lift — how much more often a decision fails when this bias is present,
+            Sorted by failure lift: how much more often a decision fails when this bias is present,
             relative to the baseline. Filter by industry to narrow the slice.
           </p>
           <BiasGenomeClient genome={genome} />
@@ -333,7 +333,7 @@ export default function BiasGenomePage() {
             }}
           >
             Named patterns where two biases compound. Detection in live memos is 8x worse than
-            either bias alone — the product category our toxic-combination engine was built for.
+            either bias alone. This is the product category our toxic-combination engine was built for.
           </p>
 
           {/* Network viz first — shows which biases are the hubs */}
@@ -409,7 +409,7 @@ export default function BiasGenomePage() {
               </li>
               <li>
                 <strong>Sample-size gate:</strong> headline rankings require n ≥ 5. Rows with n &lt;
-                3 are shown dimmed with a ⚠ — they are directional only.
+                3 are shown dimmed with a ⚠ (directional only).
               </li>
               <li>
                 <strong>Honest selection bias:</strong> famous strategic failures dominate the
@@ -484,7 +484,7 @@ export default function BiasGenomePage() {
                 Run your next strategic memo through the same taxonomy.
               </h3>
               <p style={{ fontSize: 14.5, color: C.slate300, margin: 0, maxWidth: 640 }}>
-                Upload takes 60 seconds. Your data stays yours — anonymized aggregation is opt-in.
+                Upload takes 60 seconds. Your data stays yours. Anonymized aggregation is opt-in.
               </p>
             </div>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>

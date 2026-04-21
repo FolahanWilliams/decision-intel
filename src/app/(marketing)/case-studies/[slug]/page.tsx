@@ -47,7 +47,7 @@ export async function generateMetadata({
 
   const outcomeLabel = outcomeTitle(caseStudy.outcome);
   const title = `${caseStudy.company} (${caseStudy.year}): ${caseStudy.title} | Decision Intel Case Study`;
-  const description = `${outcomeLabel} — ${caseStudy.summary}`.slice(0, 180);
+  const description = `${outcomeLabel}: ${caseStudy.summary}`.slice(0, 180);
 
   return {
     title,
@@ -63,7 +63,7 @@ export async function generateMetadata({
           url: `${siteUrl}/api/og-case-study/${slug}`,
           width: 1200,
           height: 630,
-          alt: `${caseStudy.company} — ${caseStudy.title}`,
+          alt: `${caseStudy.company}: ${caseStudy.title}`,
         },
       ],
     },
@@ -170,7 +170,7 @@ const TOXIC_DESCRIPTIONS: Record<string, string> = {
   'Blind Sprint':
     'Overconfidence combined with planning fallacy creates unstoppable momentum toward failure.',
   'Yes Committee':
-    'Authority bias meets groupthink — the group converges on whatever leadership signals it wants.',
+    'Authority bias meets groupthink: the group converges on whatever leadership signals it wants.',
   'Optimism Trap':
     'Overconfidence and availability bias create a systematically positive outlook that ignores base rates.',
   'Status Quo Lock':
@@ -447,7 +447,7 @@ export default async function CaseStudyDetailPage({
                     Decision Quality Index (simulated)
                   </div>
                   <div style={{ fontSize: 13, color: '#94A3B8', marginTop: 2 }}>
-                    {dqi.label} &mdash; {caseStudy.biasesPresent.length} biases detected
+                    {dqi.label} · {caseStudy.biasesPresent.length} biases detected
                     {caseStudy.toxicCombinations.length > 0 &&
                       `, ${caseStudy.toxicCombinations.length} toxic combinations`}
                   </div>
@@ -655,7 +655,7 @@ export default async function CaseStudyDetailPage({
                   margin: '0 0 20px',
                 }}
               >
-                The analysis below was produced from the pre-decision document only &mdash; no
+                The analysis below was produced from the pre-decision document only. No
                 hindsight. This is what the platform would have surfaced if it had been running{' '}
                 {caseStudy.year > 2000 ? `in ${deep.date}` : `at the time`}.
               </p>

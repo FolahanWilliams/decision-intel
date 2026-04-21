@@ -77,7 +77,7 @@ export function CaseStudyCta({ slug, company, hasDeepAnalysis }: CaseStudyCtaPro
         }}
       >
         <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>
-          Got it &mdash; we&apos;ll be in touch shortly.
+          Got it. We&apos;ll be in touch shortly.
         </h3>
         <p style={{ fontSize: 14, color: C.slate400, margin: 0 }}>
           You&apos;ll hear from the founder within a business day with a sample audit of one of your
@@ -150,7 +150,7 @@ export function CaseStudyCta({ slug, company, hasDeepAnalysis }: CaseStudyCtaPro
           }}
         >
           <Upload size={15} />
-          Try the Demo &mdash; Free
+          Try the Demo · Free
         </Link>
         <a
           href="#pilot-form"

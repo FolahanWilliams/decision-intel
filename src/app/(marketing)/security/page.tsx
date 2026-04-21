@@ -541,7 +541,7 @@ export default function SecurityPage() {
               }}
             >
               Three regulatory waves are already in force or on the enforcement calendar. Each one
-              asks for exactly the artifact the Decision Provenance Record produces — the reasoning
+              asks for exactly the artifact the Decision Provenance Record produces. The reasoning
               behind a decision, the model lineage that shaped it, and the evidence that it was
               reviewed, not just generated. We built for this on purpose.
             </p>
@@ -743,7 +743,7 @@ export default function SecurityPage() {
           <SectionHeader
             eyebrow="Key rotation"
             title="Rotate encryption keys without downtime"
-            body="Every row in an encrypted column carries an integer keyVersion stamp. Swapping keys is a four-step protocol — no big-bang migration, no data loss, no customer-visible pause."
+            body="Every row in an encrypted column carries an integer keyVersion stamp. Swapping keys is a four-step protocol with no big-bang migration, no data loss, no customer-visible pause."
           />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {KEY_ROTATION.map(({ step, label, body }) => (
@@ -842,7 +842,7 @@ export default function SecurityPage() {
           <SectionHeader
             eyebrow="Regulatory coverage"
             title="Seven frameworks, mapped flag-by-flag"
-            body="Every flag the pipeline surfaces carries a regulatory citation. Your GC doesn't take the tool on faith — they walk into the audit committee meeting with the memo, the flags, and the framework sections attached."
+            body="Every flag the pipeline surfaces carries a regulatory citation. Your GC doesn't take the tool on faith. They walk into the audit committee meeting with the memo, the flags, and the framework sections attached."
             align="center"
           />
           <div
@@ -910,7 +910,7 @@ export default function SecurityPage() {
               </div>
               <div style={{ fontSize: 13, color: C.slate600, lineHeight: 1.5 }}>
                 A signed, hashed 4-page artifact your General Counsel hands to the audit committee
-                or regulator of record — built to the shape EU AI Act Article 14, SEC AI disclosure,
+                or regulator of record, built to the shape EU AI Act Article 14, SEC AI disclosure,
                 and Basel III ICAAP already require. Includes input-document hash, prompt
                 fingerprint, model lineage, academic citations across the 30+ bias taxonomy,
                 regulatory mapping across seven frameworks, and full pipeline lineage.
@@ -1022,7 +1022,7 @@ export default function SecurityPage() {
           <SectionHeader
             eyebrow="Incident response"
             title="What happens if something goes wrong"
-            body="The commitment isn't that incidents never happen — it's what you'll hear from us when one does, and in what timeframe."
+            body="The commitment isn't that incidents never happen. It's what you'll hear from us when one does, and in what timeframe."
           />
           <div
             style={{
@@ -1179,7 +1179,7 @@ export default function SecurityPage() {
             >
               security@decision-intel.com
             </a>{' '}
-            — first response within 48 hours, every time. For DPA requests, SOC 2 reports, or a
+            (first response within 48 hours, every time). For DPA requests, SOC 2 reports, or a
             security questionnaire response, reach the same inbox and reference your organisation
             name.
           </p>

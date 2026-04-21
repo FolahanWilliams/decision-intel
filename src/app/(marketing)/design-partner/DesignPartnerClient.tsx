@@ -59,7 +59,7 @@ const YOU_RECEIVE: Array<{ icon: typeof ShieldCheck; title: string; body: string
   {
     icon: ShieldCheck,
     title: 'Decision Provenance Record free on every audit',
-    body: 'The signed, hashed, 4-page artifact your General Counsel hands to the audit committee — mapped onto EU AI Act Article 14 record-keeping, SEC AI disclosure, and Basel III ICAAP. Bundled on every strategic memo you audit.',
+    body: 'The signed, hashed, 4-page artifact your General Counsel hands to the audit committee, mapped onto EU AI Act Article 14 record-keeping, SEC AI disclosure, and Basel III ICAAP. Bundled on every strategic memo you audit.',
   },
   {
     icon: Sparkles,
@@ -79,12 +79,12 @@ const YOU_RECEIVE: Array<{ icon: typeof ShieldCheck; title: string; body: string
   {
     icon: BookOpen,
     title: 'Early access to new capabilities',
-    body: 'R\u00b2F Playbook, Weekly Digest, Decision Rooms, outcome-learning recalibration — design-partner Slack gets the invite before the public changelog.',
+    body: 'R\u00b2F Playbook, Weekly Digest, Decision Rooms, outcome-learning recalibration. Design-partner Slack gets the invite before the public changelog.',
   },
   {
     icon: Building2,
     title: 'Marquee placement on /proof (optional)',
-    body: 'Logo + short attribution on the public proof page, subject to your approval. Decline freely — no clawback.',
+    body: 'Logo + short attribution on the public proof page, subject to your approval. Decline freely, no clawback.',
   },
   {
     icon: Handshake,
@@ -314,7 +314,7 @@ export function DesignPartnerClient() {
               maxWidth: 880,
             }}
           >
-            Three regulatory waves are already in force or on the enforcement calendar &mdash;{' '}
+            Three regulatory waves are already in force or on the enforcement calendar:{' '}
             <strong style={{ color: C.slate900, fontWeight: 700 }}>
               EU AI Act Article 14 record-keeping
             </strong>{' '}
@@ -537,7 +537,7 @@ export function DesignPartnerClient() {
               maxWidth: 820,
             }}
           >
-            From warm intro to Month 12 case study — the cadence is specific.
+            From warm intro to Month 12 case study. The cadence is specific.
           </h2>
           <div
             className="dp-timeline"
