@@ -195,6 +195,18 @@ export async function sendWeeklyDigest(
     avgScore: number;
     topBiases: string[];
     nudgesReceived: number;
+    /**
+     * Count of analyses currently in the `pending_outcome` or
+     * `outcome_overdue` state for this user. Surfaces the flywheel's
+     * "what do I owe" side every Monday.
+     */
+    pendingOutcomes?: number;
+    /**
+     * DQI trend (current week's avg minus last week's avg). Positive
+     * means decisions are improving week-over-week. Omit when there
+     * isn't enough prior-week data to compute.
+     */
+    dqiTrendPts?: number;
   }
 ) {
   const settings = await (await getPrisma()).userSettings
@@ -226,6 +238,28 @@ export async function sendWeeklyDigest(
             <div style="font-size: 12px; color: #94a3b8;">Avg Score</div>
             <div style="font-size: 24px; font-weight: 700; color: ${stats.avgScore >= 70 ? '#22c55e' : stats.avgScore >= 40 ? '#eab308' : '#ef4444'};">
               ${stats.avgScore > 0 ? Math.round(stats.avgScore) : '—'}
+            </div>
+          </div>
+          <div style="background: #1a1a2e; padding: 14px; border-radius: 8px;">
+            <div style="font-size: 12px; color: #94a3b8;">Pending outcomes</div>
+            <div style="font-size: 24px; font-weight: 700; color: ${(stats.pendingOutcomes ?? 0) > 0 ? '#eab308' : '#64748b'};">${stats.pendingOutcomes ?? 0}</div>
+          </div>
+          <div style="background: #1a1a2e; padding: 14px; border-radius: 8px;">
+            <div style="font-size: 12px; color: #94a3b8;">DQI trend (WoW)</div>
+            <div style="font-size: 24px; font-weight: 700; color: ${
+              stats.dqiTrendPts == null
+                ? '#64748b'
+                : stats.dqiTrendPts > 0
+                  ? '#22c55e'
+                  : stats.dqiTrendPts < 0
+                    ? '#ef4444'
+                    : '#94a3b8'
+            };">
+              ${
+                stats.dqiTrendPts == null
+                  ? '—'
+                  : `${stats.dqiTrendPts > 0 ? '+' : ''}${stats.dqiTrendPts.toFixed(1)}pt`
+              }
             </div>
           </div>
           <div style="background: #1a1a2e; padding: 14px; border-radius: 8px;">

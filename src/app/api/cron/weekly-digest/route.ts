@@ -48,33 +48,74 @@ export async function GET(req: NextRequest) {
 
     for (const settings of subscribers) {
       try {
-        // Gather stats for this user
-        const [documents, nudges, biasInstances] = await Promise.all([
-          prisma.document.findMany({
-            where: { userId: settings.userId, status: 'complete', updatedAt: { gte: oneWeekAgo } },
-            include: {
-              analyses: { take: 1, orderBy: { createdAt: 'desc' }, select: { overallScore: true } },
-            },
-          }),
-          prisma.nudge.count({
-            where: { targetUserId: settings.userId, createdAt: { gte: oneWeekAgo } },
-          }),
-          prisma.biasInstance.findMany({
-            where: {
-              analysis: {
-                document: { userId: settings.userId },
-                createdAt: { gte: oneWeekAgo },
+        const twoWeeksAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+        // Gather stats for this user. Prior-week DQI is computed in parallel
+        // so we can report a true week-over-week delta rather than just a
+        // point-in-time average.
+        const [documents, nudges, biasInstances, priorWeekScores, pendingOutcomes] =
+          await Promise.all([
+            prisma.document.findMany({
+              where: {
+                userId: settings.userId,
+                status: 'complete',
+                updatedAt: { gte: oneWeekAgo },
               },
-            },
-            select: { biasType: true },
-          }),
-        ]);
+              include: {
+                analyses: {
+                  take: 1,
+                  orderBy: { createdAt: 'desc' },
+                  select: { overallScore: true },
+                },
+              },
+            }),
+            prisma.nudge.count({
+              where: { targetUserId: settings.userId, createdAt: { gte: oneWeekAgo } },
+            }),
+            prisma.biasInstance.findMany({
+              where: {
+                analysis: {
+                  document: { userId: settings.userId },
+                  createdAt: { gte: oneWeekAgo },
+                },
+              },
+              select: { biasType: true },
+            }),
+            prisma.analysis
+              .findMany({
+                where: {
+                  document: { userId: settings.userId, status: 'complete' },
+                  createdAt: { gte: twoWeeksAgo, lt: oneWeekAgo },
+                },
+                select: { overallScore: true },
+              })
+              .catch(() => []),
+            prisma.analysis
+              .count({
+                where: {
+                  document: { userId: settings.userId },
+                  outcomeStatus: { in: ['pending_outcome', 'outcome_overdue'] },
+                },
+              })
+              .catch(() => 0),
+          ]);
 
         // Calculate stats
         const scores = documents
           .map(d => d.analyses[0]?.overallScore)
           .filter((s): s is number => s != null);
         const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+
+        // Week-over-week DQI trend. Omit when either side has fewer than 2
+        // data points so we never surface a meaningless delta.
+        const priorScoresClean = priorWeekScores
+          .map(a => a.overallScore)
+          .filter((s): s is number => s != null);
+        let dqiTrendPts: number | undefined;
+        if (scores.length >= 2 && priorScoresClean.length >= 2) {
+          const priorAvg =
+            priorScoresClean.reduce((a, b) => a + b, 0) / priorScoresClean.length;
+          dqiTrendPts = avgScore - priorAvg;
+        }
 
         // Count bias occurrences
         const biasCounts = new Map<string, number>();
@@ -116,6 +157,8 @@ export async function GET(req: NextRequest) {
           avgScore,
           topBiases,
           nudgesReceived: nudges,
+          pendingOutcomes,
+          dqiTrendPts,
         });
 
         sent++;

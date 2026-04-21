@@ -195,6 +195,7 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
                   }}
                 >
                   <option value="general">General</option>
+                  <option value="pre_commitment">Pre-commitment review (attack)</option>
                   <option value="investment_committee">Investment Committee</option>
                   <option value="board_review">Board Review</option>
                   <option value="deal_committee">Transaction Committee</option>
@@ -257,12 +258,28 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
                         fontSize: '10px',
                         padding: '1px 6px',
                         borderRadius: '4px',
-                        background: 'rgba(59, 130, 246, 0.1)',
-                        color: '#60a5fa',
-                        fontWeight: 500,
+                        background:
+                          room.decisionType === 'pre_commitment'
+                            ? 'rgba(220, 38, 38, 0.1)'
+                            : 'rgba(59, 130, 246, 0.1)',
+                        color:
+                          room.decisionType === 'pre_commitment' ? '#dc2626' : '#60a5fa',
+                        fontWeight:
+                          room.decisionType === 'pre_commitment' ? 700 : 500,
+                        textTransform:
+                          room.decisionType === 'pre_commitment' ? 'uppercase' : 'none',
+                        letterSpacing:
+                          room.decisionType === 'pre_commitment' ? '0.04em' : 'normal',
                       }}
+                      title={
+                        room.decisionType === 'pre_commitment'
+                          ? 'Pre-commitment review — invited attackers stress-test the weakest claims before commitment'
+                          : undefined
+                      }
                     >
-                      {room.decisionType.replace(/_/g, ' ')}
+                      {room.decisionType === 'pre_commitment'
+                        ? 'pre-commit · attack'
+                        : room.decisionType.replace(/_/g, ' ')}
                     </span>
                   )}
                 </div>
