@@ -26,7 +26,7 @@
 
 import { useCallback } from 'react';
 import Link from 'next/link';
-import { CaseStudyNav } from '../../case-studies/CaseStudyNav';
+import { MarketingNav } from '@/components/marketing/MarketingNav';
 import {
   ArrowRight,
   Download,
@@ -193,7 +193,7 @@ export function AiVerifyMappingClient() {
       style={{ background: C.white, color: C.slate900, minHeight: '100vh' }}
     >
       <div className="screen-only">
-        <CaseStudyNav />
+        <MarketingNav />
       </div>
 
       {/* Print-only header — shows on the PDF but not the live page */}

@@ -14,7 +14,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 
-import { CaseStudyNav } from '../case-studies/CaseStudyNav';
+import { MarketingNav } from '@/components/marketing/MarketingNav';
 import { EncryptionFlowViz } from '@/components/marketing/security/EncryptionFlowViz';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
@@ -312,7 +312,7 @@ function SectionHeader({
 export default function SecurityPage() {
   return (
     <div style={{ background: C.white, color: C.slate900 }}>
-      <CaseStudyNav />
+      <MarketingNav />
 
       {/* Hero */}
       <section

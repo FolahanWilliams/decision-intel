@@ -12,7 +12,7 @@ import {
   type CaseStudy,
 } from '@/lib/data/case-studies';
 import { computeReferenceClass } from '@/lib/data/reference-class-forecasting';
-import { CaseStudyNav, BRAND_COLORS as C } from '../CaseStudyNav';
+import { MarketingNav, BRAND_COLORS as C } from '@/components/marketing/MarketingNav';
 import { CaseStudyCta } from './CaseStudyCta';
 import { CaseStudyGraphSection } from './CaseStudyGraphSection';
 import { BiasProfileRadarWrapper as BiasProfileRadar } from '@/components/visualizations/BiasProfileRadarWrapper';
@@ -294,7 +294,7 @@ export default async function CaseStudyDetailPage({
 
   return (
     <div style={{ background: '#F8FAFC', color: C.slate900, minHeight: '100vh' }}>
-      <CaseStudyNav />
+      <MarketingNav />
       {caseStudyJsonLd.map((schema, i) => (
         <script
           key={i}

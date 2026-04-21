@@ -15,7 +15,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { CaseStudyNav } from '../case-studies/CaseStudyNav';
+import { MarketingNav } from '@/components/marketing/MarketingNav';
 import {
   ArrowRight,
   CheckCircle2,
@@ -195,7 +195,7 @@ export function DesignPartnerClient() {
 
   return (
     <div style={{ background: C.white, color: C.slate900, minHeight: '100vh' }}>
-      <CaseStudyNav />
+      <MarketingNav />
 
       {/* Hero */}
       <section

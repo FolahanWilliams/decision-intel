@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ALL_CASES, getCaseBySlug, getSlugForCase } from '@/lib/data/case-studies';
-import { CaseStudyNav, BRAND_COLORS as C } from '../../case-studies/CaseStudyNav';
+import { MarketingNav, BRAND_COLORS as C } from '@/components/marketing/MarketingNav';
 import { formatBiasName } from '@/lib/utils/labels';
 
 import { DemoPageHeader } from '@/components/marketing/demo/DemoPageHeader';
@@ -85,7 +85,7 @@ export default async function DemoPage({ params }: { params: Promise<{ slug: str
 
   return (
     <div style={{ background: '#F8FAFC', color: C.slate900, minHeight: '100vh' }}>
-      <CaseStudyNav />
+      <MarketingNav />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(demoJsonLd) }}

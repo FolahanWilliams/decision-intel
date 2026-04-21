@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowRight, FileText, ShieldCheck, Gauge } from 'lucide-react';
 import { ALL_CASES, getDeepCases, getSlugForCase, type CaseStudy } from '@/lib/data/case-studies';
-import { CaseStudyNav } from '../case-studies/CaseStudyNav';
+import { MarketingNav } from '@/components/marketing/MarketingNav';
 import { CaseSelector } from '@/components/marketing/proof/CaseSelector';
 import { PreDecisionDocument } from '@/components/marketing/proof/PreDecisionDocument';
 import { FlaggedAnalysisPanel } from '@/components/marketing/proof/FlaggedAnalysisPanel';
@@ -104,7 +104,7 @@ export function ProofPageClient() {
 
   return (
     <div style={{ background: C.slate50, color: C.slate900, minHeight: '100vh' }}>
-      <CaseStudyNav />
+      <MarketingNav />
 
       {/* HERO ───────────────────────────────────────────────────── */}
       <section

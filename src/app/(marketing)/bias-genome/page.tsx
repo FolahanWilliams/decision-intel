@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { AlertTriangle, Flame, Coins, EyeOff, ArrowRight, BookOpen } from 'lucide-react';
 import { computeGenomeFromSeed } from '@/lib/data/bias-genome-seed';
-import { CaseStudyNav } from '../case-studies/CaseStudyNav';
+import { MarketingNav } from '@/components/marketing/MarketingNav';
 import { HeadlineStatCard } from '@/components/marketing/genome/HeadlineStatCard';
 import { ToxicComboCard } from '@/components/marketing/genome/ToxicComboCard';
 import { RiskLandscape } from '@/components/marketing/genome/RiskLandscape';
@@ -54,7 +54,7 @@ export default function BiasGenomePage() {
 
   return (
     <div style={{ background: C.slate50, color: C.slate900, minHeight: '100vh' }}>
-      <CaseStudyNav />
+      <MarketingNav />
 
       {/* HERO ───────────────────────────────────────────────────── */}
       <section

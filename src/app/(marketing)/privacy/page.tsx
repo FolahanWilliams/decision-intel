@@ -22,7 +22,7 @@ import {
   Workflow,
 } from 'lucide-react';
 
-import { CaseStudyNav } from '../case-studies/CaseStudyNav';
+import { MarketingNav } from '@/components/marketing/MarketingNav';
 import { DataLifecycleViz } from '@/components/marketing/privacy/DataLifecycleViz';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
@@ -184,7 +184,7 @@ const PROCESSORS = [
 export default function PrivacyPage() {
   return (
     <div style={{ background: C.slate50, color: C.slate900, minHeight: '100vh' }}>
-      <CaseStudyNav />
+      <MarketingNav />
 
       {/* HERO */}
       <section

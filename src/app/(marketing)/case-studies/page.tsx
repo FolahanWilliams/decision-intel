@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { ALL_CASES, getSlugForCase, type CaseStudy } from '@/lib/data/case-studies';
-import { CaseStudyNav, BRAND_COLORS as C } from './CaseStudyNav';
+import { MarketingNav, BRAND_COLORS as C } from '@/components/marketing/MarketingNav';
 import { CaseStudyGrid } from './CaseStudyGrid';
 import { IndustryDistributionChart } from './IndustryDistributionChart';
 import { FeaturedDeepCases } from './FeaturedDeepCases';
@@ -68,7 +68,7 @@ export default function CaseStudyIndexPage() {
 
   return (
     <div style={{ background: '#F8FAFC', color: C.slate900, minHeight: '100vh' }}>
-      <CaseStudyNav />
+      <MarketingNav />
 
       {/* Hero */}
       <section

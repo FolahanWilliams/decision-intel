@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { trackEvent } from '@/lib/analytics/track';
 import { HeroCounterfactualTease } from '@/components/marketing/HeroCounterfactualTease';
-import { BookDemoCTA } from '@/components/marketing/BookDemoCTA';
+import { MarketingNav } from '@/components/marketing/MarketingNav';
 import { Reveal } from '@/components/ui/Reveal';
 import { CaseStudyCarousel } from '@/components/marketing/CaseStudyCarousel';
 import { CredibilityTrio } from '@/components/marketing/CredibilityTrio';
@@ -20,8 +20,6 @@ import { SecurityLifecycleStrip } from '@/components/marketing/SecurityLifecycle
 import { ScrollRevealGraph } from '@/components/marketing/ScrollRevealGraph';
 import {
   ArrowRight,
-  Menu,
-  X,
   Check,
   ShieldCheck,
   Scale,
@@ -152,8 +150,6 @@ function NewsletterForm({ source = 'footer' }: { source?: string }) {
 //    maintainability — the landing page file was already 1500+ lines).
 
 export default function LandingPage() {
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
-
   return (
     <div style={{ background: C.white, color: C.slate900, overflowX: 'hidden' }}>
       {/* Floating Decision Knowledge Graph overlay — desktop only, accumulates
@@ -161,168 +157,8 @@ export default function LandingPage() {
           stage thresholds and node topology. */}
       <ScrollRevealGraph />
 
-      {/* ── Navigation ──────────────────────────────────────────────── */}
-      <nav
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 50,
-          background: C.navy,
-          borderBottom: '1px solid rgba(255,255,255,0.08)',
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 1400,
-            margin: '0 auto',
-            padding: '0 24px',
-            height: 64,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Link
-            href="/"
-            style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}
-          >
-            <Image
-              src="/logo.png"
-              alt="Decision Intel"
-              width={28}
-              height={28}
-              style={{ borderRadius: 6, objectFit: 'cover' }}
-            />
-            <span
-              style={{ fontSize: 18, fontWeight: 700, color: C.white, letterSpacing: '-0.02em' }}
-            >
-              Decision Intel
-            </span>
-          </Link>
-
-          {/* Desktop Nav */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 32 }} className="hidden-mobile">
-            {[
-              { label: 'How It Works', href: '/how-it-works' },
-              { label: 'Proof', href: '/proof' },
-              { label: 'Bias Genome', href: '/bias-genome' },
-              { label: 'Pricing', href: '/pricing' },
-            ].map(item => (
-              <a
-                key={item.label}
-                href={item.href}
-                style={{
-                  fontSize: 14,
-                  color: '#CBD5E1',
-                  textDecoration: 'none',
-                  fontWeight: 500,
-                }}
-              >
-                {item.label}
-              </a>
-            ))}
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }} className="hidden-mobile">
-            <Link
-              href="/login"
-              style={{ fontSize: 14, color: '#CBD5E1', textDecoration: 'none', fontWeight: 500 }}
-            >
-              Sign In
-            </Link>
-            <BookDemoCTA variant="nav" source="landing_nav" />
-            <Link
-              href="/demo"
-              style={{
-                fontSize: 14,
-                fontWeight: 600,
-                color: C.white,
-                background: C.green,
-                padding: '8px 20px',
-                borderRadius: 8,
-                textDecoration: 'none',
-              }}
-            >
-              Try the Demo
-            </Link>
-          </div>
-
-          {/* Mobile Toggle */}
-          <button
-            onClick={() => setMobileNavOpen(!mobileNavOpen)}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: C.white,
-              cursor: 'pointer',
-              padding: 4,
-            }}
-            className="show-mobile-only"
-          >
-            {mobileNavOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
-
-        {/* Mobile Menu */}
-        {mobileNavOpen && (
-          <div
-            style={{
-              background: C.navyLight,
-              padding: '16px 24px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 12,
-            }}
-          >
-            {[
-              { label: 'How It Works', href: '/how-it-works' },
-              { label: 'Proof', href: '/proof' },
-              { label: 'Bias Genome', href: '/bias-genome' },
-              { label: 'Pricing', href: '/pricing' },
-            ].map(item => (
-              <a
-                key={item.label}
-                href={item.href}
-                onClick={() => setMobileNavOpen(false)}
-                style={{
-                  fontSize: 15,
-                  color: '#CBD5E1',
-                  textDecoration: 'none',
-                  padding: '8px 0',
-                }}
-              >
-                {item.label}
-              </a>
-            ))}
-            <Link
-              href="/login"
-              style={{ fontSize: 15, color: '#CBD5E1', textDecoration: 'none', padding: '8px 0' }}
-            >
-              Sign In
-            </Link>
-            <div onClick={() => setMobileNavOpen(false)} style={{ marginTop: 4 }}>
-              <BookDemoCTA variant="nav" source="landing_nav_mobile" />
-            </div>
-            <Link
-              href="/demo"
-              onClick={() => setMobileNavOpen(false)}
-              style={{
-                fontSize: 14,
-                fontWeight: 600,
-                color: C.white,
-                background: C.green,
-                padding: '10px 20px',
-                borderRadius: 8,
-                textDecoration: 'none',
-                textAlign: 'center',
-                marginTop: 4,
-              }}
-            >
-              Try the Demo
-            </Link>
-          </div>
-        )}
-      </nav>
+      {/* ── Navigation — shared mega-menu across all marketing surfaces ── */}
+      <MarketingNav />
 
       {/* ── Hero (beat 01) ──────────────────────────────────────────────
           Tight typography, no inline graph. The full Decision Knowledge

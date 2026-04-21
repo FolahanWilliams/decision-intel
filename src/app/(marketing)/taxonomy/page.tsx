@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { CaseStudyNav } from '../case-studies/CaseStudyNav';
+import { MarketingNav } from '@/components/marketing/MarketingNav';
 import { TaxonomyClient } from './TaxonomyClient';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 export default function TaxonomyPage() {
   return (
     <div style={{ minHeight: '100vh', background: '#F8FAFC' }}>
-      <CaseStudyNav />
+      <MarketingNav />
       <TaxonomyClient />
     </div>
   );

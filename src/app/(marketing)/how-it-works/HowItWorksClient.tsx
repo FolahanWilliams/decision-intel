@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, FileText, ShieldCheck, Microscope, BookOpen, ChevronDown } from 'lucide-react';
 
-import { CaseStudyNav } from '../case-studies/CaseStudyNav';
+import { MarketingNav } from '@/components/marketing/MarketingNav';
 import { PipelineMiniatureViz } from '@/components/marketing/how-it-works/PipelineMiniatureViz';
 import { PipelineFlowDiagram } from '@/components/marketing/how-it-works/PipelineFlowDiagram';
 import { PipelineNodeDetail } from '@/components/marketing/how-it-works/PipelineNodeDetail';
@@ -176,7 +176,7 @@ export function HowItWorksClient() {
 
   return (
     <div style={{ background: C.slate50, color: C.slate900, minHeight: '100vh' }}>
-      <CaseStudyNav />
+      <MarketingNav />
 
       {/* HERO ───────────────────────────────────────────────────── */}
       <section
