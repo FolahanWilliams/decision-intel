@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useCallback, useEffect, useMemo, useState } from 'react';
+import { useRef, useCallback, useMemo, useState } from 'react';
 import { DoubleSide, type Mesh, type MeshBasicMaterial } from 'three';
 import { useFrame } from '@react-three/fiber';
 import {
@@ -10,6 +10,7 @@ import {
   withNarrativeTheme,
   NodeHoverTooltip,
   SelectedGlow,
+  useCanvasFitOnVisible,
 } from '@/components/visualizations/reagraph-helpers';
 import {
   GraphCanvas,
@@ -302,26 +303,6 @@ export default function CaseStudyBiasGraph3DCanvas({
   );
   const hasGraph = nodes.length > 0;
 
-  // Force-directed 3D layout needs several ticks before node positions stabilize.
-  // Retry through ~4s so whichever call lands after layout has produced
-  // visible coords successfully frames the camera on all nodes.
-  useEffect(() => {
-    if (!hasGraph) return;
-    const delays = [250, 700, 1300, 2000, 2800, 3800];
-    const timers = delays.map(ms =>
-      setTimeout(() => {
-        const ref = graphRef.current;
-        if (!ref) return;
-        try {
-          ref.fitNodesInView(undefined, { animated: false });
-        } catch {
-          // Layout hasn't placed nodes yet — next retry will catch it.
-        }
-      }, ms)
-    );
-    return () => timers.forEach(clearTimeout);
-  }, [hasGraph]);
-
   const nodeIds = useMemo(() => nodes.map(n => n.id), [nodes]);
   const edgeIds = useMemo(() => edges.map(e => e.id), [edges]);
   const { narrativeActives, isRevealing } = useEdgeNarrativeReveal({
@@ -368,6 +349,7 @@ export default function CaseStudyBiasGraph3DCanvas({
 
   // Hover tooltip
   const wrapperRef = useRef<HTMLDivElement | null>(null);
+  useCanvasFitOnVisible({ graphRef, containerRef: wrapperRef, enabled: hasGraph });
   const [hoverNodeId, setHoverNodeId] = useState<string | null>(null);
   const [pointerPos, setPointerPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const handleNodePointerOver = useCallback(

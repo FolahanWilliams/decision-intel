@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useCallback, useEffect, useMemo, useState } from 'react';
+import { useRef, useCallback, useMemo, useState } from 'react';
 import { DoubleSide } from 'three';
 import {
   GraphCanvas,
@@ -20,6 +20,7 @@ import {
   withNarrativeTheme,
   NodeHoverTooltip,
   SelectedGlow,
+  useCanvasFitOnVisible,
 } from './reagraph-helpers';
 
 export interface CausalNodeData {
@@ -180,23 +181,6 @@ export default function CausalGraph3DCanvas({ weights, onNodeSelect }: CausalGra
   const { nodes, edges } = useMemo(() => buildGraph(weights), [weights]);
   const hasGraph = nodes.length > 0;
 
-  useEffect(() => {
-    if (!hasGraph) return;
-    const delays = [250, 700, 1300, 2000, 2800, 3800];
-    const timers = delays.map(ms =>
-      setTimeout(() => {
-        const ref = graphRef.current;
-        if (!ref) return;
-        try {
-          ref.fitNodesInView(undefined, { animated: false });
-        } catch {
-          // Layout not converged yet — next retry will catch it.
-        }
-      }, ms)
-    );
-    return () => timers.forEach(clearTimeout);
-  }, [hasGraph]);
-
   const nodeIds = useMemo(() => nodes.map(n => n.id), [nodes]);
   const edgeIds = useMemo(() => edges.map(e => e.id), [edges]);
   const { narrativeActives, isRevealing } = useEdgeNarrativeReveal({
@@ -337,6 +321,7 @@ export default function CausalGraph3DCanvas({ weights, onNodeSelect }: CausalGra
 
   // Hover tooltip
   const wrapperRef = useRef<HTMLDivElement | null>(null);
+  useCanvasFitOnVisible({ graphRef, containerRef: wrapperRef, enabled: hasGraph });
   const [hoverNodeId, setHoverNodeId] = useState<string | null>(null);
   const [hoverLabel, setHoverLabel] = useState<string>('');
   const [hoverSubtitle, setHoverSubtitle] = useState<string>('');

@@ -132,6 +132,25 @@
   --spacing-xl: clamp(2.25rem, 2.6vw, 3.25rem); /* hero-row and page blocks */
   --spacing-2xl: clamp(3.25rem, 4vw, 5rem); /* major page breaks */
 
+  /* ─── Type scale (1.25 modular ratio) ──────────────────────────────
+     Single scale shared across platform + marketing so CSOs clicking
+     from /how-it-works into /dashboard feel no jolt. Page-scoped H1
+     tokens (--fs-page-h1-platform / --fs-page-h1-marketing-hero) share
+     the same ratio; the marketing hero just lands at the top of the
+     scale while platform page-headers land at the middle. Body tokens
+     stay rem-based so user zoom and base-size preferences apply. */
+  --fs-3xs: 0.6875rem; /* 11px — micro labels, ribbon ids */
+  --fs-2xs: 0.75rem; /* 12px — eyebrows, footnotes */
+  --fs-xs: 0.8125rem; /* 13px — subtitles, table cells, chips */
+  --fs-sm: 0.875rem; /* 14px — secondary body */
+  --fs-base: 1rem; /* 16px — body */
+  --fs-md: 1.125rem; /* 18px — lead paragraphs */
+  --fs-lg: 1.25rem; /* 20px — card titles */
+  --fs-xl: 1.5rem; /* 24px — section labels */
+  --fs-2xl: clamp(1.5rem, 1.6vw, 2.125rem); /* 24-34px — legacy .page-header h1 */
+  --fs-page-h1-platform: clamp(1.75rem, 2.2vw, 2.5rem); /* 28-40px — bridging token */
+  --fs-page-h1-marketing-hero: clamp(1.875rem, 5.5vw, 3rem); /* 30-48px — landing hero H1 */
+
   /* Radii */
   --radius-sm: 4px;
   --radius-md: 8px;
@@ -2024,7 +2043,11 @@ tr:hover td {
 }
 
 .page-header h1 {
-  font-size: clamp(1.5rem, 1.6vw, 2.125rem);
+  /* Shared type scale — one step above the legacy size so the
+     platform→marketing transition feels continuous rather than a
+     compression. Uses --fs-page-h1-platform (28-40px) which
+     bridges into --fs-page-h1-marketing-hero (30-48px). */
+  font-size: var(--fs-page-h1-platform);
   font-weight: 800;
   letter-spacing: -0.03em;
   margin: 0;

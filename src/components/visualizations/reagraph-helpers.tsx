@@ -15,6 +15,75 @@ import { useFrame } from '@react-three/fiber';
 import type { GraphCanvasRef, Theme } from 'reagraph';
 import { RotateCcw } from 'lucide-react';
 
+// ─── useCanvasFitOnVisible ──────────────────────────────────────────────────
+// Replaces the always-fired 6-timer fitNodesInView retry chain. Waits until
+// the wrapping container enters the viewport, then runs a short retry
+// sequence that stops as soon as fit succeeds. Cheaper, and no flicker when
+// a reviewer scrolls past quickly — the canvas only tries to frame itself
+// once it is actually on-screen.
+
+interface UseCanvasFitOnVisibleOpts {
+  graphRef: MutableRefObject<GraphCanvasRef | null>;
+  containerRef: MutableRefObject<HTMLDivElement | null>;
+  enabled?: boolean;
+  /** Retry offsets (ms) after the container becomes visible. */
+  retryOffsetsMs?: number[];
+}
+
+export function useCanvasFitOnVisible({
+  graphRef,
+  containerRef,
+  enabled = true,
+  retryOffsetsMs = [150, 500, 1200, 2400],
+}: UseCanvasFitOnVisibleOpts) {
+  useEffect(() => {
+    if (!enabled) return;
+    const timers: number[] = [];
+    let fired = false;
+
+    const tryFit = () => {
+      if (fired) return;
+      const r = graphRef.current;
+      if (!r) return;
+      try {
+        r.fitNodesInView(undefined, { animated: false });
+        fired = true;
+      } catch {
+        // Layout not converged yet — next retry will catch it.
+      }
+    };
+
+    const scheduleRetries = () => {
+      retryOffsetsMs.forEach(ms => {
+        timers.push(window.setTimeout(tryFit, ms));
+      });
+    };
+
+    const el = containerRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') {
+      // Old browser or no container yet — fall back to eager schedule.
+      scheduleRetries();
+      return () => timers.forEach(clearTimeout);
+    }
+
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries.some(e => e.isIntersecting)) {
+          scheduleRetries();
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+
+    return () => {
+      observer.disconnect();
+      timers.forEach(clearTimeout);
+    };
+  }, [enabled, graphRef, containerRef, retryOffsetsMs]);
+}
+
 // ─── SlowOrbit ───────────────────────────────────────────────────────────────
 
 interface SlowOrbitProps {

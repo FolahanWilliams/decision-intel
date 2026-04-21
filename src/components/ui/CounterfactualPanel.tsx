@@ -110,7 +110,7 @@ export function CounterfactualPanel({ analysisId, variant = 'full' }: Counterfac
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="card"
+        className="card liquid-glass-premium"
         style={{
           borderLeft: '3px solid var(--accent-primary)',
           marginBottom: 'var(--spacing-lg)',

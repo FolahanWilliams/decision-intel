@@ -21,7 +21,6 @@ import {
   useCallback,
   forwardRef,
   useImperativeHandle,
-  useEffect,
   useMemo,
   useState,
 } from 'react';
@@ -34,6 +33,7 @@ import {
   withNarrativeTheme,
   NodeHoverTooltip,
   SelectedGlow,
+  useCanvasFitOnVisible,
 } from './reagraph-helpers';
 import {
   GraphCanvas,
@@ -151,25 +151,6 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
   const graphRef = useRef<GraphCanvasRef | null>(null);
   const hasGraph = nodes.length > 0;
 
-  // Force-directed 3D layout settles over multiple ticks. Retry fitNodesInView
-  // through ~4s so whichever call lands post-stabilization frames the camera.
-  useEffect(() => {
-    if (!hasGraph) return;
-    const delays = [250, 700, 1300, 2000, 2800, 3800];
-    const timers = delays.map(ms =>
-      setTimeout(() => {
-        const r = graphRef.current;
-        if (!r) return;
-        try {
-          r.fitNodesInView(undefined, { animated: false });
-        } catch {
-          // Layout not converged yet — next retry will catch it.
-        }
-      }, ms)
-    );
-    return () => timers.forEach(clearTimeout);
-  }, [hasGraph]);
-
   // Expose camera helpers to shell
   useImperativeHandle(ref, () => ({
     fitGraph: () => graphRef.current?.fitNodesInView(undefined, { animated: true }),
@@ -228,6 +209,7 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
 
   // Hover tooltip state — preview complementary to click-to-select.
   const wrapperRef = useRef<HTMLDivElement | null>(null);
+  useCanvasFitOnVisible({ graphRef, containerRef: wrapperRef, enabled: hasGraph });
   const [hoverNodeId, setHoverNodeId] = useState<string | null>(null);
   const [hoverLabel, setHoverLabel] = useState<string>('');
   const [hoverType, setHoverType] = useState<string>('');

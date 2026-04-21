@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useCallback, useEffect, useMemo, useState } from 'react';
+import { useRef, useCallback, useMemo, useState } from 'react';
 import { DoubleSide, type Mesh, type MeshBasicMaterial } from 'three';
 import { useFrame } from '@react-three/fiber';
 import {
@@ -20,6 +20,7 @@ import {
   withNarrativeTheme,
   NodeHoverTooltip,
   SelectedGlow,
+  useCanvasFitOnVisible,
 } from '@/components/visualizations/reagraph-helpers';
 
 // ─── Shared types (exported so parent can access .data) ──────────────────────
@@ -829,25 +830,6 @@ export default function HeroDecisionGraph3DCanvas({
 }: HeroDecisionGraph3DCanvasProps) {
   const graphRef = useRef<GraphCanvasRef | null>(null);
 
-  // Force-directed 3D layout needs several ticks before node positions stabilize.
-  // With 20+ nodes, iterations take longer — retry through 4s so whichever call
-  // lands after the layout has produced visible coords frames the camera.
-  useEffect(() => {
-    const delays = [250, 700, 1300, 2000, 2800, 3800];
-    const timers = delays.map(ms =>
-      setTimeout(() => {
-        const r = graphRef.current;
-        if (!r) return;
-        try {
-          r.fitNodesInView(undefined, { animated: false });
-        } catch {
-          // Layout not converged yet — next retry will catch it.
-        }
-      }, ms)
-    );
-    return () => timers.forEach(clearTimeout);
-  }, []);
-
   // Density toggle: "Narrative" trims the graph to the causal spine
   // (decision -> bias -> outcome), hiding toxic combos and outcome cascades
   // for clearer reading. Full shows everything (the default first view).
@@ -883,6 +865,7 @@ export default function HeroDecisionGraph3DCanvas({
 
   // Hover tooltip state — lightweight preview, complementary to click-to-select.
   const wrapperRef = useRef<HTMLDivElement | null>(null);
+  useCanvasFitOnVisible({ graphRef, containerRef: wrapperRef });
   const [hoverNodeId, setHoverNodeId] = useState<string | null>(null);
   const [pointerPos, setPointerPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 

@@ -12,6 +12,7 @@ export function NorthStarHero() {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45 }}
+      className="liquid-glass-premium"
       style={{
         padding: '36px 36px 34px',
         borderRadius: 18,
