@@ -103,6 +103,7 @@ model Analysis {
   toxicCombinations   ToxicCombination[]
   draftOutcomes       DraftOutcome[]
   fingerprintWarnings FingerprintWarning[]
+  defensePacket       AuditDefensePacket?
 
   @@index([documentId])
   @@index([createdAt])
@@ -1573,4 +1574,64 @@ model FounderProspect {
   @@index([status])
   @@index([followUpDue])
   @@index([createdAt])
+}
+
+// ─── Audit Defense Packet ─────────────────────────────────────────────────
+//
+// Per-audit signed, hashed artifact the CSO's General Counsel can hand to
+// the audit committee, SEC, or plaintiff's counsel if a strategic decision
+// is ever challenged. Free add-on for the 5 design partners; scheduled to
+// become a paid Strategy+ upsell after the first 12-month cohort.
+//
+// Each packet stores ONLY metadata + hashes — never prompt content, never
+// the 20×20 toxic-combination weights, never per-org causal edges. The PDF
+// generator reads from this row + the linked Analysis to produce the
+// deliverable.
+//
+// Chain-of-custody timestamp (RFC 3161 TSA) is deferred for v1 — we store
+// the serverside Date and leave tsaSignature nullable for a later upgrade
+// to DigiCert / Sectigo free TSA endpoints.
+model AuditDefensePacket {
+  id                 String   @id @default(cuid())
+  analysisId         String   @unique
+  documentId         String
+  userId             String
+  orgId              String?
+  // SHA-256 of the PromptVersion.content in force at audit time. If prompts
+  // rotate, new audits get a new hash; the old packet's hash is immutable.
+  promptFingerprint  String
+  // Hash of the decrypted document content at audit time. Proves the packet
+  // refers to THIS memo, not a later edit.
+  inputHash          String
+  // Which model tier ran on which node + temperature + top-p per node.
+  // Shape: { [nodeName]: { model, temperature, topP } }
+  modelLineage       Json
+  // Three-judge outputs + metaJudge arbitration.
+  // Shape: { biasDetective, noiseJudge, statisticalJury, metaJudge }
+  judgeVariance      Json
+  // Each detected bias → taxonomyId + academic citation.
+  // Shape: [{ biasType, taxonomyId, citation }]
+  citations          Json
+  // Which regulatory frameworks apply to the detected risks.
+  // Shape: [{ framework, article, applicability }]
+  regulatoryMapping  Json
+  // Pipeline node order + per-node input/output hashes (hashes only — no
+  // content). Shape: [{ node, order, inputHash, outputHash }]
+  pipelineLineage    Json
+  // Optional RFC 3161 timestamp authority signature (deferred — null for v1).
+  tsaSignature       String?
+  // Optional reviewer counter-signature block (CSO / GC names + signedAt).
+  reviewerSignatures Json?
+  // Version of the packet schema itself — bump when fields change.
+  schemaVersion      Int      @default(1)
+  generatedAt        DateTime @default(now())
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  analysis           Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([orgId])
+  @@index([documentId])
+  @@index([generatedAt])
 }

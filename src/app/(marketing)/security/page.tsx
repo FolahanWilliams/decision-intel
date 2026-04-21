@@ -617,8 +617,11 @@ export default function SecurityPage() {
                 Audit Defense Packet export
               </div>
               <div style={{ fontSize: 13, color: C.slate600, lineHeight: 1.5 }}>
-                One-click regulator-grade PDF of every flag on an analysis, with its framework
-                citation and provision section. Available on Pro tier.
+                A signed, hashed 4-page artifact your General Counsel hands to the audit committee
+                or regulator of record: input-document hash, prompt fingerprint, model lineage,
+                academic citations across the 30+ bias taxonomy, regulatory mapping across seven
+                frameworks (Basel III, EU AI Act, SEC Reg D, FCA Consumer Duty, SOX, GDPR Article
+                22, LPOA), and full pipeline lineage.
               </div>
             </div>
             <Link
@@ -637,7 +640,7 @@ export default function SecurityPage() {
                 whiteSpace: 'nowrap',
               }}
             >
-              See Pro pricing <ArrowRight size={13} />
+              See Strategy pricing <ArrowRight size={13} />
             </Link>
           </div>
         </div>

@@ -477,6 +477,56 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
     }
   };
 
+  // Audit Defense Packet — design-partner perk. Fetches the packet JSON
+  // from /api/documents/[id]/defense-packet (POST persists + returns data),
+  // then hands the data to AuditDefensePacketGenerator client-side. The
+  // generator is client-side jsPDF so the PDF download is a browser action.
+  const handleDefensePacketExport = async () => {
+    if (!document) return;
+    try {
+      const res = await fetch(`/api/documents/${document.id}/defense-packet`, {
+        method: 'POST',
+      });
+      if (!res.ok) {
+        const body = (await res.json().catch(() => ({ error: 'Failed to generate packet.' }))) as {
+          error?: string;
+        };
+        throw new Error(body.error || 'Failed to generate packet.');
+      }
+      const { data } = (await res.json()) as {
+        data: import('@/lib/reports/defense-packet-data').DefensePacketData;
+      };
+      const { AuditDefensePacketGenerator } = await import(
+        '@/lib/reports/audit-defense-packet-generator'
+      );
+      const generator = new AuditDefensePacketGenerator();
+      // DefensePacketData serialized through JSON loses the Date type on
+      // generatedAt — rehydrate before handing to jsPDF.
+      generator.generateAndDownload({
+        ...data,
+        generatedAt: new Date(data.generatedAt as unknown as string),
+      });
+      fetch('/api/audit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'EXPORT_DEFENSE_PACKET',
+          resource: 'Document',
+          resourceId: document.id,
+          details: { filename: document.filename },
+        }),
+      }).catch(err => log.warn('audit EXPORT_DEFENSE_PACKET failed:', err));
+      showToast('Audit Defense Packet generated', 'success');
+    } catch (error) {
+      log.error('Failed to generate defense packet:', error);
+      showToast(
+        error instanceof Error ? error.message : 'Failed to generate defense packet',
+        'error'
+      );
+      throw error;
+    }
+  };
+
   const handleExport = async () => {
     if (!document || !analysis) return;
     setIsExportingPdf(true);
@@ -2498,6 +2548,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           }}
           onExportPdf={handleExport}
           onExportBoardReport={handleBoardReportExport}
+          onExportDefensePacket={handleDefensePacketExport}
           onExportCsv={handleCsvExport}
           onExportMarkdown={handleMarkdownExport}
           onExportJson={handleJsonExport}

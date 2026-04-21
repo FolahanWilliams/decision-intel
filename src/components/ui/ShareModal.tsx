@@ -13,6 +13,7 @@ import {
   Loader2,
   BookOpen,
   Presentation,
+  ShieldCheck,
 } from 'lucide-react';
 import { useToast } from '@/components/ui/EnhancedToast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -26,6 +27,10 @@ interface ShareModalProps {
   analysisId?: string;
   onExportPdf: () => Promise<void>;
   onExportBoardReport?: () => Promise<void>;
+  /** Audit Defense Packet — signed + hashed 4-page artifact for the
+   *  General Counsel / audit committee. Free for design partners;
+   *  scheduled as a paid Strategy+ upsell after Month 12. */
+  onExportDefensePacket?: () => Promise<void>;
   onExportCsv: () => void;
   onExportMarkdown: () => void;
   onExportJson: () => void;
@@ -41,6 +46,7 @@ export function ShareModal({
   analysisId,
   onExportPdf,
   onExportBoardReport,
+  onExportDefensePacket,
   onExportCsv,
   onExportMarkdown,
   onExportJson,
@@ -48,6 +54,7 @@ export function ShareModal({
   const [activeTab, setActiveTab] = useState<ActiveTab>('export');
   const [exportingPdf, setExportingPdf] = useState(false);
   const [exportingBoard, setExportingBoard] = useState(false);
+  const [exportingPacket, setExportingPacket] = useState(false);
   const [copied, setCopied] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [creatingLink, setCreatingLink] = useState(false);
@@ -81,6 +88,18 @@ export function ShareModal({
       setExportingBoard(false);
     }
   }, [onExportBoardReport, showToast]);
+
+  const handleDefensePacketExport = useCallback(async () => {
+    if (!onExportDefensePacket) return;
+    setExportingPacket(true);
+    try {
+      await onExportDefensePacket();
+    } catch {
+      // Parent handler already showToast'd with the specific error.
+    } finally {
+      setExportingPacket(false);
+    }
+  }, [onExportDefensePacket]);
 
   const handleCopySummary = useCallback(async () => {
     try {
@@ -236,6 +255,34 @@ export function ShareModal({
                   <span style={{ fontSize: '13px', fontWeight: 600 }}>Board-Ready Report</span>
                   <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
                     2-page executive summary — DQI, top risks, CEO question, mitigation
+                  </span>
+                </Button>
+              )}
+              {onExportDefensePacket && (
+                <Button
+                  variant="outline"
+                  onClick={handleDefensePacketExport}
+                  disabled={exportingPacket}
+                  className="h-auto flex-col gap-2 p-4"
+                  style={{
+                    gridColumn: '1 / -1',
+                    borderColor: 'var(--accent-primary)',
+                    background: 'rgba(22, 163, 74, 0.04)',
+                  }}
+                >
+                  {exportingPacket ? (
+                    <Loader2
+                      size={24}
+                      className="animate-spin"
+                      style={{ color: 'var(--accent-primary)' }}
+                    />
+                  ) : (
+                    <ShieldCheck size={24} style={{ color: 'var(--accent-primary)' }} />
+                  )}
+                  <span style={{ fontSize: '13px', fontWeight: 600 }}>Audit Defense Packet</span>
+                  <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                    Signed + hashed artifact for your GC: fingerprints, model lineage, citations,
+                    regulatory mapping
                   </span>
                 </Button>
               )}
