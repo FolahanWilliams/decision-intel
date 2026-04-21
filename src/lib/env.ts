@@ -60,6 +60,34 @@ export function validateEnv(): EnvValidationResult {
     }
   }
 
+  // Admin + demo alignment — the ADMIN_USER_IDS env var grants enterprise
+  // plan bypass to any listed Supabase UUID. A malformed entry either (a)
+  // silently drops a legitimate admin out of the list or (b) grants
+  // unintended access if a non-UUID string is loosely matched elsewhere.
+  // Validate shape and demo alignment here so misconfigurations surface at
+  // startup, not during a live demo or investor call.
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const adminIdsRaw = process.env.ADMIN_USER_IDS?.trim();
+  const demoUserId = process.env.DEMO_USER_ID?.trim();
+  if (adminIdsRaw) {
+    const entries = adminIdsRaw.split(',').map(s => s.trim()).filter(Boolean);
+    const invalid = entries.filter(id => !UUID_RE.test(id));
+    if (invalid.length > 0) {
+      const msg = `ADMIN_USER_IDS contains ${invalid.length} entry/entries that are not valid UUIDs: ${invalid.join(', ')}. Enterprise-plan bypass will not match these.`;
+      warnings.push(msg);
+      console.error(`[ENV] CRITICAL: ${msg}`);
+    }
+    if (demoUserId && !entries.includes(demoUserId)) {
+      const msg = `DEMO_USER_ID (${demoUserId}) is not present in ADMIN_USER_IDS. The /api/demo/run endpoint will fail for visitors once free-tier quota is exhausted — add the demo UUID to ADMIN_USER_IDS.`;
+      warnings.push(msg);
+      console.error(`[ENV] CRITICAL: ${msg}`);
+    }
+  } else if (demoUserId) {
+    const msg = `DEMO_USER_ID is set but ADMIN_USER_IDS is empty. The demo endpoint's plan-bypass is inactive — the first 4 audits will succeed, then every subsequent visitor hits a quota error.`;
+    warnings.push(msg);
+    console.error(`[ENV] CRITICAL: ${msg}`);
+  }
+
   // Security warnings for production deployments
   if (process.env.NODE_ENV === 'production') {
     if (!process.env.DOCUMENT_ENCRYPTION_KEY) {

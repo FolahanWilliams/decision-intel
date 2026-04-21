@@ -150,6 +150,39 @@ export function OutcomeFlywheelContent() {
     flywheelHealth.totalDecisions - flywheelHealth.outcomesLogged
   );
 
+  // Sampling-confidence disclosure — the reporting loop only closes on
+  // decisions that users bother to follow up on. Until that rate is high,
+  // causal learning reflects an engaged-reporter subsample, not the full
+  // decision population. Surface that honestly so neither the founder nor
+  // a CSO reader over-trusts rankings from a thin sample.
+  const samplingConfidence =
+    flywheelHealth.outcomesLogged < 5
+      ? {
+          label: 'Too thin to trust',
+          color: 'var(--warning)',
+          caveat:
+            'Fewer than 5 outcomes confirmed — rankings here are directional, not statistical.',
+        }
+      : flywheelHealth.loopClosureRate < 30
+        ? {
+            label: 'Low — reporting-rate bias likely',
+            color: 'var(--warning)',
+            caveat:
+              'Most decisions have no outcome yet. Results skew toward users engaged enough to close the loop.',
+          }
+        : flywheelHealth.loopClosureRate < 60
+          ? {
+              label: 'Medium',
+              color: 'var(--text-secondary)',
+              caveat:
+                'Enough outcomes to see patterns, but expect rankings to shift as more decisions close.',
+            }
+          : {
+              label: 'High',
+              color: 'var(--success)',
+              caveat: null,
+            };
+
   return (
     <div>
       {/* Contextual Intelligence Brief — what to do next */}
@@ -300,6 +333,28 @@ export function OutcomeFlywheelContent() {
               <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
                 decisions have closed the outcome loop
               </div>
+              <div
+                style={{
+                  fontSize: '11px',
+                  color: samplingConfidence.color,
+                  marginTop: 6,
+                  fontWeight: 600,
+                }}
+              >
+                Sampling confidence: {samplingConfidence.label}
+              </div>
+              {samplingConfidence.caveat && (
+                <div
+                  style={{
+                    fontSize: '11px',
+                    color: 'var(--text-muted)',
+                    marginTop: 3,
+                    lineHeight: 1.45,
+                  }}
+                >
+                  {samplingConfidence.caveat}
+                </div>
+              )}
             </div>
           </div>
         </div>

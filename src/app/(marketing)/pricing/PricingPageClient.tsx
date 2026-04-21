@@ -38,6 +38,11 @@ interface Tier {
 }
 
 function buildTiers(_cycle: BillingCycle): Tier[] {
+  // Card order matters for mobile (1 col) and tablet (2 col) — the featured
+  // tier must land above the fold. Free stays first as the familiar CVR
+  // entry; Strategy (featured) sits second so it's visible on every device
+  // without scroll; Individual is third as the fallback path; Enterprise
+  // anchors the right end. The comparison table below mirrors this order.
   return [
     {
       id: 'free',
@@ -54,23 +59,6 @@ function buildTiers(_cycle: BillingCycle): Tier[] {
         { label: 'Export to PDF' },
       ],
       cta: { label: 'Sign up free', href: '/login' },
-    },
-    {
-      id: 'pro',
-      name: 'Individual',
-      role: 'Solo strategy operator',
-      tagline: 'The career-defining edge for a Head of Strategy, CorpDev lead, or M&A operator.',
-      priceMonthly: 249,
-      priceAnnual: 2490,
-      anchor: '$2,490/year (save ~16%) on annual',
-      highlights: [
-        { label: '15 audits per month', strong: true },
-        { label: 'Full DQI + 30+ cognitive biases' },
-        { label: 'Boardroom Simulation + Forgotten Questions' },
-        { label: 'Personal Decision History' },
-        { label: 'Calibration dashboard' },
-      ],
-      cta: { label: 'Start Individual', action: 'checkout-pro' },
     },
     {
       id: 'team',
@@ -91,6 +79,23 @@ function buildTiers(_cycle: BillingCycle): Tier[] {
       cta: { label: 'Start 30-day pilot', action: 'checkout-team' },
       badge: 'Most popular',
       featured: true,
+    },
+    {
+      id: 'pro',
+      name: 'Individual',
+      role: 'Solo strategy operator',
+      tagline: 'The career-defining edge for a Head of Strategy, CorpDev lead, or M&A operator.',
+      priceMonthly: 249,
+      priceAnnual: 2490,
+      anchor: '$2,490/year (save ~16%) on annual',
+      highlights: [
+        { label: '15 audits per month', strong: true },
+        { label: 'Full DQI + 30+ cognitive biases' },
+        { label: 'Boardroom Simulation + Forgotten Questions' },
+        { label: 'Personal Decision History' },
+        { label: 'Calibration dashboard' },
+      ],
+      cta: { label: 'Start Individual', action: 'checkout-pro' },
     },
     {
       id: 'enterprise',
@@ -734,8 +739,8 @@ export function PricingPageClient() {
               >
                 <div>Feature</div>
                 <div style={{ textAlign: 'center' }}>Free</div>
-                <div style={{ textAlign: 'center' }}>Individual</div>
                 <div style={{ textAlign: 'center', color: C.green }}>Strategy</div>
+                <div style={{ textAlign: 'center' }}>Individual</div>
                 <div style={{ textAlign: 'center' }}>Enterprise</div>
               </div>
 
@@ -775,8 +780,8 @@ export function PricingPageClient() {
                   >
                     <div style={{ color: C.slate900, fontWeight: 500 }}>{row.label}</div>
                     <CellValue value={row.free} />
-                    <CellValue value={row.pro} />
                     <CellValue value={row.team} />
+                    <CellValue value={row.pro} />
                     <CellValue value={row.enterprise} />
                   </div>
                 );
