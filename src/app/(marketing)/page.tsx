@@ -346,8 +346,8 @@ export default function LandingPage() {
               marginRight: 'auto',
             }}
           >
-            The native system of record for{' '}
-            <span style={{ color: C.green }}>strategic reasoning.</span>
+            The native reasoning layer for every{' '}
+            <span style={{ color: C.green }}>boardroom strategic decision.</span>
           </h1>
           <p
             style={{
@@ -364,7 +364,8 @@ export default function LandingPage() {
             Google Doc / Slack thread / Confluence page / board deck graveyard with a single
             governed surface where every strategic memo is scored, every objection is simulated,
             and every decision joins a living Decision Knowledge Graph that compounds quarter
-            after quarter.
+            after quarter &mdash; ready for the next audit, the next regulator, and the next
+            board cycle.
           </p>
           <div
             style={{

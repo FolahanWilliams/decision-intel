@@ -8,6 +8,25 @@ Decision Intel is a decision intelligence platform for corporate strategy teams.
 
 **Current phase: Refinement & consolidation.** The product has 200+ components and 70+ API routes — more features than most Series A companies. The priority is polishing the core flow (upload → analyze → review → track outcomes) to attract pilot users and raise pre/seed funding. Push back on scope creep. If a change doesn't make the first 60 seconds of a demo better, it probably shouldn't be the priority.
 
+## One-liner (LOCKED 2026-04-22)
+
+**Primary (hero + pitch-deck + LinkedIn headline):**
+
+> **The native reasoning layer for every boardroom strategic decision.**
+
+**Secondary (cold outreach + investor-narrative moments, carries the regulatory tailwind story in one breath):**
+
+> **The reasoning layer the Fortune 500 needs before regulators start asking.**
+
+**Rules:**
+
+- "Reasoning layer" is the ownable anchor — treat it like the category term. Any new surface defaults to this.
+- "Native" does the "built for this, not retrofitted" work.
+- "Boardroom strategic decision" names the buyer without needing "Fortune 500" (layer that into the subhead).
+- Do NOT use "collaborative," "collaborator," "medium," or "protect outcomes" framings. "Collaborative" codes as Slack/Notion/consensus-tool in a CSO's ear; we are an audit + simulation engine, not a collaboration layer. "Protect" is reactive.
+- "System of record for strategic reasoning" is still valid supporting vocabulary in long-form writing, but it is NOT the category claim. "Reasoning layer" is.
+- The secondary variant is for moments where tension beats elegance (cold DMs, VC pitches, LinkedIn replies). Never use it as a hero H1.
+
 ## Positioning & Vocabulary (locked 2026-04-13)
 
 **Core value proposition:** "The Four Moments We Catch What Others Miss" — a Decision Knowledge Graph as the foundation, with (1) the Graph itself, (2) predicting CEO/steering-committee questions, (3) auditing reasoning, and (4) closing the outcome loop via DQI.
