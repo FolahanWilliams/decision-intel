@@ -51,8 +51,27 @@ function loadStoredMessages(): ChatMsg[] {
   }
 }
 
-export function FounderChatWidget({ founderPass }: { founderPass: string }) {
-  const [open, setOpen] = useState(false);
+interface FounderChatWidgetProps {
+  founderPass: string;
+  /**
+   * `floating` (default) — historical positioning: fixed bubble bottom-right
+   * that opens into a floating card. Kept for surfaces outside the Founder Hub.
+   * `pane` — renders in-flow as a permanent right-rail panel. The host
+   * controls width and sticky positioning via CSS; the widget drops its
+   * fixed positioning and sizing and fills whatever container it is
+   * placed in. No bubble / open-state — always expanded.
+   */
+  variant?: 'floating' | 'pane';
+  /** Optional collapse handler exposed by the host; only used in `pane` mode. */
+  onCollapse?: () => void;
+}
+
+export function FounderChatWidget({
+  founderPass,
+  variant = 'floating',
+  onCollapse,
+}: FounderChatWidgetProps) {
+  const [open, setOpen] = useState(variant === 'pane');
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [streaming, setStreaming] = useState(false);
@@ -228,7 +247,7 @@ export function FounderChatWidget({ founderPass }: { founderPass: string }) {
     e.target.value = '';
   };
 
-  if (!open) {
+  if (!open && variant === 'floating') {
     return (
       <button
         onClick={() => setOpen(true)}
@@ -257,25 +276,41 @@ export function FounderChatWidget({ founderPass }: { founderPass: string }) {
     );
   }
 
+  const isPane = variant === 'pane';
+
   return (
     <div
-      style={{
-        position: 'fixed',
-        bottom: 24,
-        right: 24,
-        width: 'min(400px, calc(100vw - 32px))',
-        height: 'min(520px, calc(100vh - 96px))',
-        maxWidth: 400,
-        maxHeight: 520,
-        borderRadius: 16,
-        background: 'var(--bg-secondary, #111)',
-        border: '1px solid var(--border-primary, #333)',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
-        zIndex: 50,
-      }}
+      style={
+        isPane
+          ? {
+              width: '100%',
+              height: '100%',
+              borderRadius: 14,
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              boxShadow: 'var(--shadow-sm)',
+            }
+          : {
+              position: 'fixed',
+              bottom: 24,
+              right: 24,
+              width: 'min(400px, calc(100vw - 32px))',
+              height: 'min(520px, calc(100vh - 96px))',
+              maxWidth: 400,
+              maxHeight: 520,
+              borderRadius: 16,
+              background: 'var(--bg-secondary, #111)',
+              border: '1px solid var(--border-primary, #333)',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
+              zIndex: 50,
+            }
+      }
     >
       {/* Header */}
       <div
@@ -329,7 +364,14 @@ export function FounderChatWidget({ founderPass }: { founderPass: string }) {
             <Trash2 size={13} />
           </button>
           <button
-            onClick={() => setOpen(false)}
+            onClick={() => {
+              if (isPane) {
+                onCollapse?.();
+              } else {
+                setOpen(false);
+              }
+            }}
+            title={isPane ? 'Collapse pane' : 'Close'}
             style={{
               background: 'none',
               border: 'none',

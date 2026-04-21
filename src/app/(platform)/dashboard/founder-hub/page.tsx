@@ -715,6 +715,26 @@ export default function FounderHubPage() {
   const [passInput, setPassInput] = useState('');
   const [passError, setPassError] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  // Founder AI pane lives permanently in the hub layout at ≥1280px. At
+  // smaller widths it collapses back to the floating bubble pattern via
+  // the fallback button. State persists across sessions so the founder's
+  // preference sticks.
+  const [chatPaneOpen, setChatPaneOpen] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return true;
+    try {
+      const saved = localStorage.getItem('di-founder-hub-chat-pane');
+      return saved !== '0';
+    } catch {
+      return true;
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem('di-founder-hub-chat-pane', chatPaneOpen ? '1' : '0');
+    } catch {
+      /* ignore */
+    }
+  }, [chatPaneOpen]);
   const searchRef = useRef<HTMLInputElement>(null);
 
   const handleUnlock = useCallback(() => {
@@ -855,8 +875,41 @@ export default function FounderHubPage() {
               tabContent
             )}
           </main>
+          {chatPaneOpen && (
+            <aside className="founder-hub-chat" aria-label="Founder AI pane">
+              <FounderChatWidget
+                founderPass={FOUNDER_PASS}
+                variant="pane"
+                onCollapse={() => setChatPaneOpen(false)}
+              />
+            </aside>
+          )}
         </div>
-        <FounderChatWidget founderPass={FOUNDER_PASS} />
+        {!chatPaneOpen && (
+          <button
+            onClick={() => setChatPaneOpen(true)}
+            title="Open Founder AI pane"
+            style={{
+              position: 'fixed',
+              bottom: 24,
+              right: 24,
+              width: 52,
+              height: 52,
+              borderRadius: '50%',
+              background: '#16A34A',
+              color: '#fff',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 4px 12px rgba(22, 163, 74, 0.4)',
+              zIndex: 50,
+            }}
+          >
+            <MessageSquare size={22} />
+          </button>
+        )}
       </div>
       <style jsx global>{`
         .founder-hub-layout {
@@ -877,6 +930,9 @@ export default function FounderHubPage() {
           min-width: 0;
           width: 100%;
         }
+        .founder-hub-chat {
+          width: 100%;
+        }
         @media (min-width: 900px) {
           .founder-hub-layout {
             flex-direction: row;
@@ -890,6 +946,15 @@ export default function FounderHubPage() {
             top: 16px;
             max-height: calc(100vh - 32px);
             overflow-y: auto;
+          }
+        }
+        @media (min-width: 1280px) {
+          .founder-hub-chat {
+            width: 340px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 16px;
+            height: calc(100vh - 32px);
           }
         }
       `}</style>

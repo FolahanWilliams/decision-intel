@@ -330,6 +330,21 @@ export function InlineAnalysisResultCard({ analysis, onDismiss }: Props) {
         </div>
       </div>
 
+      {/* Inline live co-edit — paste a rewritten passage, get a 5s bias
+          re-check + DQI delta without leaving the dashboard. The endpoint
+          is a lightweight bias-only check; canonical DQI still requires
+          uploading the full revised memo. */}
+      {analysis.biasCount > 0 && (
+        <div
+          style={{
+            padding: '16px 20px 0',
+            borderTop: '1px solid var(--border-color)',
+          }}
+        >
+          <InlineCoEditPanel originalScore={analysis.overallScore} />
+        </div>
+      )}
+
       {/* Featured counterfactual — ROI beat that closes the pitch loop before
           the "Upload another / Deep Dive" footer. Renders null until the
           analysisId resolves AND there's a positive scenario to show, so the
@@ -393,6 +408,363 @@ export function InlineAnalysisResultCard({ analysis, onDismiss }: Props) {
 
       <PostRevealBookingRow />
     </motion.div>
+  );
+}
+
+/**
+ * InlineCoEditPanel — paste a rewritten passage, watch the DQI update.
+ *
+ * Collapsed by default (keeps the post-upload reveal focused on the wow
+ * moment). Expands to a compact textarea + submit. On submit, POSTs to
+ * /api/passages/re-audit and renders the returned estimated DQI + delta
+ * + bias list in-place. The endpoint is deliberately lightweight — a
+ * single focused Gemini call, not the full pipeline — so the iteration
+ * feels instant (~3-5s) without burning the audit budget.
+ */
+type PassageReAuditResponse = {
+  data: {
+    biases: Array<{
+      type: string;
+      severity: 'low' | 'medium' | 'high' | 'critical';
+      evidence?: string;
+    }>;
+    estimatedDqi: number;
+    originalDqi?: number;
+    delta?: number;
+    disclaimer: string;
+  };
+};
+
+function InlineCoEditPanel({ originalScore }: { originalScore: number }) {
+  const [expanded, setExpanded] = useState(false);
+  const [passage, setPassage] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [result, setResult] = useState<PassageReAuditResponse['data'] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function submit() {
+    if (passage.trim().length < 24) {
+      setError('Add at least 24 characters so we have something to audit.');
+      return;
+    }
+    setSubmitting(true);
+    setError(null);
+    setResult(null);
+    try {
+      const res = await fetch('/api/passages/re-audit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          passage: passage.trim(),
+          originalOverallScore: originalScore,
+        }),
+      });
+      const json = (await res.json()) as
+        | PassageReAuditResponse
+        | { error: string };
+      if (!res.ok || 'error' in json) {
+        setError(
+          'error' in json ? json.error : 'Passage audit failed. Try again.'
+        );
+        return;
+      }
+      setResult(json.data);
+      trackEvent('dashboard_inline_coedit_submit', {
+        biasCountAfter: json.data.biases.length,
+        delta: json.data.delta ?? null,
+      });
+    } catch (err) {
+      log.warn('Inline re-audit failed:', err);
+      setError('Network error. Try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  if (!expanded) {
+    return (
+      <button
+        onClick={() => setExpanded(true)}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          padding: '10px 14px',
+          width: '100%',
+          borderRadius: 'var(--radius-md)',
+          border: '1px dashed var(--border-color)',
+          background: 'transparent',
+          color: 'var(--text-secondary)',
+          cursor: 'pointer',
+          fontSize: 13,
+          textAlign: 'left',
+          marginBottom: 14,
+        }}
+      >
+        <span
+          style={{
+            fontSize: 16,
+            color: 'var(--accent-primary)',
+            fontWeight: 700,
+          }}
+        >
+          ✎
+        </span>
+        <span style={{ flex: 1 }}>
+          Rewrite a flagged passage — see the DQI update in seconds.
+        </span>
+        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>passage-level</span>
+      </button>
+    );
+  }
+
+  const delta = result?.delta ?? null;
+  const deltaColor =
+    delta == null
+      ? 'var(--text-muted)'
+      : delta > 0
+        ? 'var(--success)'
+        : delta < 0
+          ? 'var(--error)'
+          : 'var(--text-muted)';
+
+  return (
+    <div
+      style={{
+        padding: 16,
+        borderRadius: 'var(--radius-md)',
+        border: '1px solid var(--border-color)',
+        background: 'var(--bg-secondary)',
+        marginBottom: 14,
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: 10,
+        }}
+      >
+        <strong style={{ fontSize: 13, color: 'var(--text-primary)' }}>
+          Rewrite a flagged passage
+        </strong>
+        <button
+          onClick={() => {
+            setExpanded(false);
+            setResult(null);
+            setPassage('');
+            setError(null);
+          }}
+          style={{
+            border: 'none',
+            background: 'transparent',
+            color: 'var(--text-muted)',
+            cursor: 'pointer',
+            padding: 2,
+          }}
+        >
+          <X size={14} />
+        </button>
+      </div>
+      <textarea
+        value={passage}
+        onChange={e => setPassage(e.target.value)}
+        placeholder="Paste the 2 lines we flagged, rewritten — we'll re-audit the passage and return a DQI delta in ~5s."
+        rows={4}
+        maxLength={6000}
+        style={{
+          width: '100%',
+          padding: 10,
+          borderRadius: 'var(--radius-md)',
+          border: '1px solid var(--border-color)',
+          background: 'var(--bg-card)',
+          color: 'var(--text-primary)',
+          fontSize: 13,
+          fontFamily: 'inherit',
+          resize: 'vertical',
+          minHeight: 80,
+        }}
+      />
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginTop: 10,
+          gap: 10,
+          flexWrap: 'wrap',
+        }}
+      >
+        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+          {passage.length}/6000 · passage-level estimate, not the canonical DQI
+        </span>
+        <button
+          onClick={submit}
+          disabled={submitting || passage.trim().length < 24}
+          style={{
+            padding: '8px 18px',
+            borderRadius: 'var(--radius-full)',
+            border: 'none',
+            background:
+              submitting || passage.trim().length < 24
+                ? 'var(--bg-tertiary)'
+                : 'var(--accent-primary)',
+            color:
+              submitting || passage.trim().length < 24
+                ? 'var(--text-muted)'
+                : 'var(--text-on-accent, #fff)',
+            fontSize: 13,
+            fontWeight: 600,
+            cursor:
+              submitting || passage.trim().length < 24 ? 'default' : 'pointer',
+          }}
+        >
+          {submitting ? 'Auditing…' : 'Re-audit passage'}
+        </button>
+      </div>
+      {error && (
+        <div
+          style={{
+            marginTop: 10,
+            fontSize: 12,
+            color: 'var(--error)',
+          }}
+        >
+          {error}
+        </div>
+      )}
+      {result && (
+        <div
+          style={{
+            marginTop: 14,
+            paddingTop: 14,
+            borderTop: '1px solid var(--border-color)',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: 16,
+              flexWrap: 'wrap',
+              marginBottom: 10,
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  fontSize: 10.5,
+                  fontWeight: 700,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  color: 'var(--text-muted)',
+                }}
+              >
+                Passage DQI estimate
+              </div>
+              <div
+                style={{
+                  fontSize: 26,
+                  fontWeight: 800,
+                  color: 'var(--text-primary)',
+                  marginTop: 2,
+                }}
+              >
+                {result.estimatedDqi}
+                {delta != null && (
+                  <span
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 700,
+                      color: deltaColor,
+                      marginLeft: 10,
+                    }}
+                  >
+                    {delta > 0 ? '+' : ''}
+                    {delta} vs original
+                  </span>
+                )}
+              </div>
+            </div>
+            <div
+              style={{
+                fontSize: 11.5,
+                color: 'var(--text-muted)',
+                maxWidth: 300,
+                lineHeight: 1.55,
+              }}
+            >
+              {result.disclaimer}
+            </div>
+          </div>
+          {result.biases.length > 0 ? (
+            <ul
+              style={{
+                listStyle: 'none',
+                padding: 0,
+                margin: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 6,
+              }}
+            >
+              {result.biases.slice(0, 5).map((b, i) => (
+                <li
+                  key={i}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 8,
+                    fontSize: 12.5,
+                    color: 'var(--text-secondary)',
+                  }}
+                >
+                  <span
+                    style={{
+                      display: 'inline-block',
+                      width: 7,
+                      height: 7,
+                      borderRadius: '50%',
+                      background: severityColor(b.severity),
+                      flexShrink: 0,
+                      marginTop: 6,
+                    }}
+                  />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
+                      {humanizeBias(b.type)}
+                    </span>
+                    {b.evidence && (
+                      <div
+                        style={{
+                          fontSize: 11.5,
+                          color: 'var(--text-muted)',
+                          marginTop: 2,
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        &ldquo;{b.evidence}&rdquo;
+                      </div>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div
+              style={{
+                fontSize: 12.5,
+                color: 'var(--success)',
+                fontWeight: 600,
+              }}
+            >
+              No biases detected in the rewrite.
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
 
