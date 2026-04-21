@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
   BrainCircuit,
@@ -54,12 +54,28 @@ function formatFileSize(bytes: number): string {
 
 export default function SubmitDecisionPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Common fields
-  const [source, setSource] = useState('manual');
+  // Common fields — initial source honours ?source=X deep-link from the
+  // dashboard "four doors" row, which routes users here with
+  // source=manual / meeting_recording / email / jira / meeting_transcript.
+  const initialSource = (() => {
+    const s = searchParams.get('source');
+    if (
+      s === 'manual' ||
+      s === 'meeting_transcript' ||
+      s === 'meeting_recording' ||
+      s === 'email' ||
+      s === 'jira'
+    ) {
+      return s;
+    }
+    return 'manual';
+  })();
+  const [source, setSource] = useState(initialSource);
   const [channel, setChannel] = useState('');
   const [decisionType, setDecisionType] = useState('');
   const [participants, setParticipants] = useState('');

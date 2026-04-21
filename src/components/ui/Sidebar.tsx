@@ -37,9 +37,13 @@ export default function Sidebar() {
   const [collapsed, setCollapsedState] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [plan, setPlan] = useState<string>('free');
+  // Sidebar clusters (2026-04-23 rework): Act / Reflect / Together matches
+  // how a CSO's week actually runs — do the thing, learn from last quarter,
+  // operate with the team. "Act" is non-collapsible top-level; "Reflect"
+  // and "Together" fold away to keep the rail short.
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
-    Intelligence: true,
-    'Team & Settings': true,
+    Reflect: true,
+    Together: true,
   });
 
   // Persist the full-sidebar collapse state so the hamburger's effect is
@@ -370,7 +374,10 @@ export default function Sidebar() {
             {!collapsed && <span>New Decision</span>}
           </button>
 
-          <SectionLabel collapsed={collapsed}>Core</SectionLabel>
+          {/* Act — what the CSO does this week. Drafting, uploading,
+              logging, chasing the live portfolio of decisions. Not
+              collapsible: these are the daily verbs. */}
+          <SectionLabel collapsed={collapsed}>Act</SectionLabel>
           <NavItem
             href="/dashboard"
             icon={<LayoutDashboard size={18} />}
@@ -398,25 +405,40 @@ export default function Sidebar() {
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
-
-          <CollapsibleSection
-            label="Intelligence"
+          <NavItem
+            href="/dashboard/ask"
+            icon={<Sparkles size={18} />}
+            label="AI Copilot"
+            description="Decision copilot & document chat"
+            active={
+              pathname.startsWith('/dashboard/ask') ||
+              pathname.startsWith('/dashboard/ai-assistant')
+            }
             collapsed={collapsed}
-            isOpen={!collapsedSections.Intelligence}
-            onToggle={() => toggleSection('Intelligence')}
+            onNavigate={closeMobile}
+          />
+          <NavItem
+            href="/dashboard/decision-log"
+            icon={<PenLine size={18} />}
+            label="Decision Log"
+            description="Journal entries + cognitive audits in one feed"
+            active={
+              pathname === '/dashboard/decision-log' ||
+              pathname.startsWith('/dashboard/cognitive-audits')
+            }
+            collapsed={collapsed}
+            onNavigate={closeMobile}
+          />
+
+          {/* Reflect — what the CSO learns from last quarter. Analytics,
+              graph, outcome loop, playbooks. Collapsible — these are the
+              deeper surfaces you dive into, not the daily rituals. */}
+          <CollapsibleSection
+            label="Reflect"
+            collapsed={collapsed}
+            isOpen={!collapsedSections.Reflect}
+            onToggle={() => toggleSection('Reflect')}
           >
-            <NavItem
-              href="/dashboard/ask"
-              icon={<Sparkles size={18} />}
-              label="AI Copilot"
-              description="Decision copilot & document chat"
-              active={
-                pathname.startsWith('/dashboard/ask') ||
-                pathname.startsWith('/dashboard/ai-assistant')
-              }
-              collapsed={collapsed}
-              onNavigate={closeMobile}
-            />
             <NavItem
               id="onborda-nav-analytics"
               href="/dashboard/analytics"
@@ -454,29 +476,6 @@ export default function Sidebar() {
                   />
                 </>
               )}
-            {isTeamPlan && (
-              <NavItem
-                href="/dashboard/meetings"
-                icon={<Video size={18} />}
-                label="Meetings & Rooms"
-                description="Recordings, transcripts & decision rooms"
-                active={pathname.startsWith('/dashboard/meetings')}
-                collapsed={collapsed}
-                onNavigate={closeMobile}
-              />
-            )}
-            <NavItem
-              href="/dashboard/decision-log"
-              icon={<PenLine size={18} />}
-              label="Decision Log"
-              description="Journal entries + cognitive audits in one feed"
-              active={
-                pathname === '/dashboard/decision-log' ||
-                pathname.startsWith('/dashboard/cognitive-audits')
-              }
-              collapsed={collapsed}
-              onNavigate={closeMobile}
-            />
             <NavItem
               href="/dashboard/playbooks"
               icon={<BookTemplate size={18} />}
@@ -488,12 +487,25 @@ export default function Sidebar() {
             />
           </CollapsibleSection>
 
+          {/* Together — how the team operates. Meetings, decision rooms,
+              teammates, integrations, settings. Collapsible. */}
           <CollapsibleSection
-            label="Team & Settings"
+            label="Together"
             collapsed={collapsed}
-            isOpen={!collapsedSections['Team & Settings']}
-            onToggle={() => toggleSection('Team & Settings')}
+            isOpen={!collapsedSections.Together}
+            onToggle={() => toggleSection('Together')}
           >
+            {isTeamPlan && (
+              <NavItem
+                href="/dashboard/meetings"
+                icon={<Video size={18} />}
+                label="Meetings & Rooms"
+                description="Recordings, transcripts & decision rooms"
+                active={pathname.startsWith('/dashboard/meetings')}
+                collapsed={collapsed}
+                onNavigate={closeMobile}
+              />
+            )}
             <NavItem
               href="/dashboard/team"
               icon={<Users size={18} />}

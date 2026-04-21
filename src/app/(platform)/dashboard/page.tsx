@@ -22,6 +22,9 @@ import {
   Clock,
   CloudUpload,
   GitCompareArrows,
+  BrainCircuit,
+  Video,
+  Mail,
 } from 'lucide-react';
 import { DecisionIQCard } from '@/components/ui/DecisionIQCard';
 import Link from 'next/link';
@@ -1503,6 +1506,72 @@ export default function Dashboard() {
                         {chip.label}
                       </span>
                     ))}
+                  </div>
+                )}
+                {/* Four doors row — every ingestion mode on one surface.
+                    File upload is the default (the dropzone above); the
+                    three alternative modes route to their dedicated pages
+                    without forcing a trip through the sidebar. Consolidates
+                    the "same pipeline, different door" UX so cognitive-
+                    audits/submit, meetings/new, and the email inbound
+                    setup are all one click from /dashboard. */}
+                {!uploading && !pendingFile && (
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      gap: 10,
+                      flexWrap: 'wrap',
+                      marginTop: 18,
+                      fontSize: 12,
+                    }}
+                  >
+                    <span style={{ color: 'var(--text-muted)' }}>Not uploading a file?</span>
+                    <Link
+                      href="/dashboard/cognitive-audits/submit?source=manual"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 5,
+                        fontWeight: 600,
+                        color: 'var(--accent-primary)',
+                        textDecoration: 'none',
+                      }}
+                    >
+                      <BrainCircuit size={13} />
+                      Paste text
+                    </Link>
+                    <span style={{ color: 'var(--border-color)' }}>·</span>
+                    <Link
+                      href="/dashboard/cognitive-audits/submit?source=meeting_recording"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 5,
+                        fontWeight: 600,
+                        color: 'var(--accent-primary)',
+                        textDecoration: 'none',
+                      }}
+                    >
+                      <Video size={13} />
+                      Submit a meeting
+                    </Link>
+                    <span style={{ color: 'var(--border-color)' }}>·</span>
+                    <Link
+                      href="/dashboard/settings/integrations"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 5,
+                        fontWeight: 600,
+                        color: 'var(--accent-primary)',
+                        textDecoration: 'none',
+                      }}
+                    >
+                      <Mail size={13} />
+                      Email inbox
+                    </Link>
                   </div>
                 )}
               </>
