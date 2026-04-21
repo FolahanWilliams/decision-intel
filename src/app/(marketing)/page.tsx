@@ -362,10 +362,9 @@ export default function LandingPage() {
           >
             Write, audit, compound &mdash; in one place, not four. Decision Intel replaces the
             Google Doc / Slack thread / Confluence page / board deck graveyard with a single
-            governed surface where every strategic memo is scored, every objection is simulated,
-            and every decision joins a living Decision Knowledge Graph that compounds quarter
-            after quarter &mdash; ready for the next audit, the next regulator, and the next
-            board cycle.
+            governed surface where every strategic memo is scored, every objection is simulated, and
+            every decision joins a living Decision Knowledge Graph that compounds quarter after
+            quarter &mdash; ready for the next audit, the next regulator, and the next board cycle.
           </p>
           <div
             style={{
@@ -825,6 +824,64 @@ export default function LandingPage() {
                 the Security beat opens with motion, not a static grid. */}
             <SecurityLifecycleStrip />
             <CredibilityTrio />
+
+            {/* AI Verify alignment — one-line chip below the CredibilityTrio.
+                Deliberately low-key so it doesn't dilute the three-card
+                narrative; the procurement conversation that needs this lands
+                on /regulatory/ai-verify for the full mapping. */}
+            <div
+              style={{
+                maxWidth: 1080,
+                margin: '-8px auto 0',
+                padding: '14px 20px',
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.12)',
+                borderRadius: 12,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 14,
+                flexWrap: 'wrap',
+              }}
+            >
+              <div style={{ flex: 1, minWidth: 260 }}>
+                <div
+                  style={{
+                    fontSize: 10.5,
+                    fontWeight: 800,
+                    letterSpacing: '0.14em',
+                    textTransform: 'uppercase',
+                    color: '#86EFAC',
+                    marginBottom: 3,
+                  }}
+                >
+                  AI Verify Foundation &middot; Singapore IMDA
+                </div>
+                <div style={{ fontSize: 13.5, color: '#CBD5E1', lineHeight: 1.5 }}>
+                  Aligned with the 11 internationally-recognised AI governance principles &mdash;
+                  cross-aligned with the EU AI Act and OECD AI Principles.
+                </div>
+              </div>
+              <Link
+                href="/regulatory/ai-verify"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '8px 16px',
+                  background: 'transparent',
+                  color: C.white,
+                  border: '1px solid rgba(255,255,255,0.24)',
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                  borderRadius: 8,
+                  textDecoration: 'none',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                View the principle mapping <ArrowRight size={12} />
+              </Link>
+            </div>
           </div>
         </section>
       </Reveal>

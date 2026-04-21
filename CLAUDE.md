@@ -77,10 +77,12 @@ Decision Intel is a decision intelligence platform for corporate strategy teams.
 - **SEC Reg D** — live for private placements. Forward-looking-statement disclosure rigor.
 - **GDPR Art. 22** — live since 2018. Automated-decision rights require meaningful information about the logic involved; DPR citations provide that without exposing platform IP.
 - **Colorado SB24-205** (AI anti-discrimination, Feb 2026 enforceable) and **California SB942** (AI transparency disclosures) — secondary US tailwinds; reference when selling into CO/CA-based public companies.
+- **AI Verify Foundation** (Singapore IMDA, Apache 2.0, aligned with EU + OECD) — 11 internationally-recognised AI governance principles: transparency, explainability, repeatability, safety, security, robustness, fairness, data governance, accountability, human agency & oversight, inclusive growth. Every DPR field maps onto these principles. Canonical mapping page at `/regulatory/ai-verify`. **Language discipline is critical here: AI Verify is self-assessment, not third-party certification. The accurate and defensible claim is "aligned with the 11 internationally-recognised AI governance principles codified by AI Verify" — NEVER "fully compliant" or "certified by." The AI Verify Foundation's own FAQ states the framework "does not guarantee that any AI system tested will be free from risks or biases or is completely safe"; we mirror that disclaimer on the mapping page.** Ship-what-we-have moves: the mapping page. Deferred to the Regulatory Tailwind moat-stack work: contributing a plugin to AI Verify 2.0's stock-plugins directory (would land DI in an IMDA-adjacent open framework's official codebase — highest-leverage free regulatory credential once engineering bandwidth exists).
 
 **The framing rule:** when writing about regulation, lead with what's already in force or calendared, not with what might pass someday. Enterprise procurement believes calendars and skeptical of "the FTC is thinking about…" framing. Every tailwind we reference has either a statute, a regulator guidance, or an enforcement date. If it doesn't, don't cite it.
 
 **Where this lives on marketing surfaces:**
+
 - `/security` — dedicated "Regulatory tailwinds · already in motion" section with 6 tailwinds cards, each with status + date + how the DPR covers it.
 - `/design-partner` — compact "Why now" strip above the fold.
 - `/pricing` — trust band includes "Decision Provenance Record: signed + hashed on every audit."
@@ -88,6 +90,7 @@ Decision Intel is a decision intelligence platform for corporate strategy teams.
 - Pitch deck — slide 3 (Why Now) pairs the three anchor tailwinds (EU AI Act Aug 2026, SEC 2024-2026, Basel III live) with the DPR as the answer.
 
 **Where this DOES NOT live:**
+
 - The landing page — deliberately kept clean. Regulation is a secondary beat for CSOs; they arrive via the R²F story first, then discover tailwinds on `/security` once procurement surfaces.
 - Demo / free-tier surfaces — tailwinds conversation belongs in the procurement-stage conversation, not the discovery-stage one.
 

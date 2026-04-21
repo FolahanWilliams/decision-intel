@@ -26,8 +26,7 @@ export const metadata: Metadata = {
   alternates: { canonical: `${siteUrl}/security` },
   openGraph: {
     title: 'Security · Decision Intel',
-    description:
-      'How Decision Intel is built to clear a Fortune-500 security questionnaire.',
+    description: 'How Decision Intel is built to clear a Fortune-500 security questionnaire.',
     url: `${siteUrl}/security`,
   },
 };
@@ -111,13 +110,41 @@ const KEY_ROTATION: Array<{ step: number; label: string; body: string }> = [
 ];
 
 const FRAMEWORKS = [
-  { code: 'SOX §404', name: 'Sarbanes-Oxley', gates: 'Public-company material-statement controls.' },
-  { code: 'GDPR Art. 22', name: 'General Data Protection Regulation', gates: 'Automated-decision rights for EU data subjects.' },
-  { code: 'EU AI Act · Annex III', name: 'EU AI Act', gates: 'High-risk AI decision-support obligations.' },
-  { code: 'Basel III', name: 'Basel III', gates: 'Capital-allocation decisions in regulated banks.' },
-  { code: 'FCA Consumer Duty', name: 'Financial Conduct Authority', gates: 'UK financial-services decisioning.' },
-  { code: 'SEC Reg D', name: 'SEC Regulation D', gates: 'Forward-looking statements + safe-harbour disclosure.' },
-  { code: 'LPOA', name: 'Limited Partnership Obligations', gates: 'Fund-level fiduciary dissent documentation.' },
+  {
+    code: 'SOX §404',
+    name: 'Sarbanes-Oxley',
+    gates: 'Public-company material-statement controls.',
+  },
+  {
+    code: 'GDPR Art. 22',
+    name: 'General Data Protection Regulation',
+    gates: 'Automated-decision rights for EU data subjects.',
+  },
+  {
+    code: 'EU AI Act · Annex III',
+    name: 'EU AI Act',
+    gates: 'High-risk AI decision-support obligations.',
+  },
+  {
+    code: 'Basel III',
+    name: 'Basel III',
+    gates: 'Capital-allocation decisions in regulated banks.',
+  },
+  {
+    code: 'FCA Consumer Duty',
+    name: 'Financial Conduct Authority',
+    gates: 'UK financial-services decisioning.',
+  },
+  {
+    code: 'SEC Reg D',
+    name: 'SEC Regulation D',
+    gates: 'Forward-looking statements + safe-harbour disclosure.',
+  },
+  {
+    code: 'LPOA',
+    name: 'Limited Partnership Obligations',
+    gates: 'Fund-level fiduciary dissent documentation.',
+  },
 ];
 
 type AccessAvailability = 'every_plan' | 'enterprise';
@@ -178,18 +205,45 @@ const AVAILABILITY_STYLE: Record<
 
 const PROCESSORS = [
   { name: 'Vercel', role: 'Application hosting + CDN', cert: 'SOC 2 Type II', region: 'US + EU' },
-  { name: 'Supabase', role: 'Postgres + Auth + Storage', cert: 'SOC 2 Type II · HIPAA', region: 'US' },
-  { name: 'Google AI', role: 'Primary analysis LLM', cert: 'No-training contract terms', region: 'US' },
-  { name: 'Anthropic', role: 'Fallback analysis LLM', cert: 'No-training contract terms', region: 'US' },
+  {
+    name: 'Supabase',
+    role: 'Postgres + Auth + Storage',
+    cert: 'SOC 2 Type II · HIPAA',
+    region: 'US',
+  },
+  {
+    name: 'Google AI',
+    role: 'Primary analysis LLM',
+    cert: 'No-training contract terms',
+    region: 'US',
+  },
+  {
+    name: 'Anthropic',
+    role: 'Fallback analysis LLM',
+    cert: 'No-training contract terms',
+    region: 'US',
+  },
   { name: 'Stripe', role: 'Billing', cert: 'PCI-DSS Level 1 · SOC 1/2', region: 'US + EU' },
   { name: 'Sentry', role: 'Error monitoring', cert: 'SOC 2 Type II', region: 'US' },
 ];
 
 const INCIDENT_COMMITMENTS = [
-  { threshold: '1h', body: 'Internal detection + containment triggered. Customer-visible status posted within the hour when customer data is in scope.' },
-  { threshold: '24h', body: 'First disclosure to affected customers with the scope, the data classes involved, and the remediation plan.' },
-  { threshold: '72h', body: 'Regulator notification where applicable (GDPR Art. 33, SEC 8-K item 1.05) with the materiality assessment attached.' },
-  { threshold: '30d', body: 'Full post-mortem delivered to affected customers. Root cause, timeline, controls added, exposure window. Signed by the founder.' },
+  {
+    threshold: '1h',
+    body: 'Internal detection + containment triggered. Customer-visible status posted within the hour when customer data is in scope.',
+  },
+  {
+    threshold: '24h',
+    body: 'First disclosure to affected customers with the scope, the data classes involved, and the remediation plan.',
+  },
+  {
+    threshold: '72h',
+    body: 'Regulator notification where applicable (GDPR Art. 33, SEC 8-K item 1.05) with the materiality assessment attached.',
+  },
+  {
+    threshold: '30d',
+    body: 'Full post-mortem delivered to affected customers. Root cause, timeline, controls added, exposure window. Signed by the founder.',
+  },
 ];
 
 // ── Helpers ────────────────────────────────────────────────────────────
@@ -323,10 +377,9 @@ export default function SecurityPage() {
                 maxWidth: 540,
               }}
             >
-              AES-256-GCM at rest with keyVersion rotation, TLS 1.2+ in transit, an immutable
-              audit log, and every flag cross-linked to a specific regulatory provision across
-              seven frameworks. A Fortune-500 security questionnaire finishes in minutes, not
-              weeks.
+              AES-256-GCM at rest with keyVersion rotation, TLS 1.2+ in transit, an immutable audit
+              log, and every flag cross-linked to a specific regulatory provision across seven
+              frameworks. A Fortune-500 security questionnaire finishes in minutes, not weeks.
             </p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <Link
@@ -596,11 +649,96 @@ export default function SecurityPage() {
             We ship it on every audit so your procurement conversation starts at &ldquo;here is the
             control&rdquo; instead of &ldquo;we&rsquo;re working on it.&rdquo;
           </p>
+
+          {/* AI Verify alignment strip — sits at the base of the Regulatory
+              Tailwinds section as the proof point that the DPR maps onto an
+              existing, internationally-recognised governance framework. Link
+              to the dedicated /regulatory/ai-verify mapping page. */}
+          <div
+            style={{
+              marginTop: 32,
+              padding: '22px 24px',
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.14)',
+              borderRadius: 16,
+              display: 'grid',
+              gridTemplateColumns: 'minmax(0, 1fr) auto',
+              gap: 18,
+              alignItems: 'center',
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  fontSize: 10.5,
+                  fontWeight: 800,
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  color: '#86EFAC',
+                  marginBottom: 8,
+                }}
+              >
+                AI Verify Foundation &middot; Singapore IMDA
+              </div>
+              <div
+                style={{
+                  fontSize: 15,
+                  fontWeight: 700,
+                  color: C.white,
+                  lineHeight: 1.4,
+                  marginBottom: 6,
+                }}
+              >
+                Aligned with the 11 internationally-recognised AI governance principles.
+              </div>
+              <div
+                style={{
+                  fontSize: 13,
+                  color: C.slate300,
+                  lineHeight: 1.6,
+                }}
+              >
+                Every Decision Provenance Record field maps onto AI Verify&rsquo;s 11 principles
+                (transparency, explainability, repeatability, safety, security, robustness,
+                fairness, data governance, accountability, human agency &amp; oversight, inclusive
+                growth). Cross-aligned with the EU AI Act and OECD AI Principles. Self-assessment
+                framework; no certification claim, no overclaim.
+              </div>
+            </div>
+            <Link
+              href="/regulatory/ai-verify"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '12px 20px',
+                background: C.white,
+                color: C.slate900,
+                fontSize: 13,
+                fontWeight: 700,
+                borderRadius: 10,
+                textDecoration: 'none',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              View the principle mapping <ArrowRight size={14} />
+            </Link>
+          </div>
         </div>
       </section>
 
       {/* Key rotation */}
-      <section style={{ padding: '72px 24px', background: C.slate50, borderTop: `1px solid ${C.slate200}`, borderBottom: `1px solid ${C.slate200}` }}>
+      <section
+        style={{
+          padding: '72px 24px',
+          background: C.slate50,
+          borderTop: `1px solid ${C.slate200}`,
+          borderBottom: `1px solid ${C.slate200}`,
+        }}
+      >
         <div style={{ maxWidth: 1000, margin: '0 auto' }}>
           <SectionHeader
             eyebrow="Key rotation"
@@ -656,9 +794,7 @@ export default function SecurityPage() {
                       color: C.slate600,
                       lineHeight: 1.6,
                       fontFamily:
-                        body.includes('KEY') || body.includes('rotate:')
-                          ? undefined
-                          : undefined,
+                        body.includes('KEY') || body.includes('rotate:') ? undefined : undefined,
                     }}
                   >
                     {body}
@@ -684,8 +820,7 @@ export default function SecurityPage() {
               The rotate CLI lives at{' '}
               <code
                 style={{
-                  fontFamily:
-                    'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+                  fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
                   background: C.slate50,
                   border: `1px solid ${C.slate200}`,
                   padding: '1px 6px',
@@ -751,9 +886,7 @@ export default function SecurityPage() {
                 >
                   {fw.name}
                 </div>
-                <div style={{ fontSize: 12, color: C.slate600, lineHeight: 1.5 }}>
-                  {fw.gates}
-                </div>
+                <div style={{ fontSize: 12, color: C.slate600, lineHeight: 1.5 }}>{fw.gates}</div>
               </div>
             ))}
           </div>
@@ -777,10 +910,10 @@ export default function SecurityPage() {
               </div>
               <div style={{ fontSize: 13, color: C.slate600, lineHeight: 1.5 }}>
                 A signed, hashed 4-page artifact your General Counsel hands to the audit committee
-                or regulator of record — built to the shape EU AI Act Article 14, SEC AI
-                disclosure, and Basel III ICAAP already require. Includes input-document hash,
-                prompt fingerprint, model lineage, academic citations across the 30+ bias
-                taxonomy, regulatory mapping across seven frameworks, and full pipeline lineage.
+                or regulator of record — built to the shape EU AI Act Article 14, SEC AI disclosure,
+                and Basel III ICAAP already require. Includes input-document hash, prompt
+                fingerprint, model lineage, academic citations across the 30+ bias taxonomy,
+                regulatory mapping across seven frameworks, and full pipeline lineage.
               </div>
             </div>
             <Link
@@ -806,7 +939,14 @@ export default function SecurityPage() {
       </section>
 
       {/* Access controls */}
-      <section style={{ padding: '72px 24px', background: C.slate50, borderTop: `1px solid ${C.slate200}`, borderBottom: `1px solid ${C.slate200}` }}>
+      <section
+        style={{
+          padding: '72px 24px',
+          background: C.slate50,
+          borderTop: `1px solid ${C.slate200}`,
+          borderBottom: `1px solid ${C.slate200}`,
+        }}
+      >
         <div style={{ maxWidth: 1000, margin: '0 auto' }}>
           <SectionHeader
             eyebrow="Access controls"
@@ -884,7 +1024,13 @@ export default function SecurityPage() {
             title="What happens if something goes wrong"
             body="The commitment isn't that incidents never happen — it's what you'll hear from us when one does, and in what timeframe."
           />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: 12,
+            }}
+          >
             {INCIDENT_COMMITMENTS.map(c => (
               <div
                 key={c.threshold}
@@ -921,9 +1067,7 @@ export default function SecurityPage() {
                 >
                   {c.threshold}
                 </div>
-                <div style={{ fontSize: 12.5, color: C.slate600, lineHeight: 1.55 }}>
-                  {c.body}
-                </div>
+                <div style={{ fontSize: 12.5, color: C.slate600, lineHeight: 1.55 }}>{c.body}</div>
               </div>
             ))}
           </div>
@@ -931,7 +1075,14 @@ export default function SecurityPage() {
       </section>
 
       {/* Processors */}
-      <section style={{ padding: '72px 24px', background: C.slate50, borderTop: `1px solid ${C.slate200}`, borderBottom: `1px solid ${C.slate200}` }}>
+      <section
+        style={{
+          padding: '72px 24px',
+          background: C.slate50,
+          borderTop: `1px solid ${C.slate200}`,
+          borderBottom: `1px solid ${C.slate200}`,
+        }}
+      >
         <div style={{ maxWidth: 1180, margin: '0 auto' }}>
           <SectionHeader
             eyebrow="Sub-processors"
@@ -972,8 +1123,7 @@ export default function SecurityPage() {
                   display: 'grid',
                   gridTemplateColumns: '1fr 1.4fr 1.3fr 0.8fr',
                   padding: '14px 18px',
-                  borderBottom:
-                    i === PROCESSORS.length - 1 ? undefined : `1px solid ${C.slate100}`,
+                  borderBottom: i === PROCESSORS.length - 1 ? undefined : `1px solid ${C.slate100}`,
                   fontSize: 13,
                 }}
               >
@@ -1000,12 +1150,7 @@ export default function SecurityPage() {
             textAlign: 'center',
           }}
         >
-          <ShieldAlert
-            size={32}
-            color={C.green}
-            strokeWidth={2}
-            style={{ marginBottom: 14 }}
-          />
+          <ShieldAlert size={32} color={C.green} strokeWidth={2} style={{ marginBottom: 14 }} />
           <h2
             style={{
               fontSize: 'clamp(24px, 2.6vw, 30px)',
@@ -1017,8 +1162,17 @@ export default function SecurityPage() {
           >
             Found something? We want to hear about it.
           </h2>
-          <p style={{ fontSize: 14, color: C.slate600, lineHeight: 1.65, margin: '0 auto 22px', maxWidth: 560 }}>
-            Responsible disclosure is a first-class contract with our users. Report vulnerabilities to{' '}
+          <p
+            style={{
+              fontSize: 14,
+              color: C.slate600,
+              lineHeight: 1.65,
+              margin: '0 auto 22px',
+              maxWidth: 560,
+            }}
+          >
+            Responsible disclosure is a first-class contract with our users. Report vulnerabilities
+            to{' '}
             <a
               href="mailto:security@decision-intel.com"
               style={{ color: C.green, fontWeight: 700, textDecoration: 'none' }}
@@ -1081,7 +1235,6 @@ export default function SecurityPage() {
           </div>
         </div>
       </section>
-
     </div>
   );
 }
