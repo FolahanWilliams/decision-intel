@@ -16,8 +16,6 @@ import { motion } from 'framer-motion';
 import { DecisionGraphViz } from './moments/DecisionGraphViz';
 import { BoardroomViz } from './moments/BoardroomViz';
 import { AuditTraceViz } from './moments/AuditTraceViz';
-import { DqiGaugeViz } from './moments/DqiGaugeViz';
-import { OutcomeLoopViz } from './moments/OutcomeLoopViz';
 
 const C = {
   white: '#FFFFFF',
@@ -35,7 +33,13 @@ type MomentDef = {
   eyebrow: string;
   title: string;
   body: React.ReactNode;
-  Viz: React.ComponentType;
+  /**
+   * Illustration for moments that need one. Moments 04 + 05 run text-only
+   * (2026-04-23 cut) — three bespoke SVGs pace the section better than five,
+   * and the remaining visuals widen to carry the load. Keep null for any
+   * moment that earns its weight from the copy alone.
+   */
+  Viz: React.ComponentType | null;
   bg: string;
 };
 
@@ -93,7 +97,7 @@ const MOMENTS: MomentDef[] = [
         one that sounds best in the room.
       </>
     ),
-    Viz: DqiGaugeViz,
+    Viz: null,
     bg: C.slate50,
   },
   {
@@ -109,7 +113,7 @@ const MOMENTS: MomentDef[] = [
         one you make today.
       </>
     ),
-    Viz: OutcomeLoopViz,
+    Viz: null,
     bg: C.white,
   },
 ];
@@ -176,6 +180,8 @@ export function MomentsPyramid() {
 
       {MOMENTS.map((moment, idx) => {
         const flipped = idx % 2 === 1;
+        const hasViz = moment.Viz != null;
+        const Viz = moment.Viz;
         return (
           <div
             key={moment.num}
@@ -194,48 +200,62 @@ export function MomentsPyramid() {
               <div
                 className="moment-panel"
                 style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: 64,
+                  display: hasViz ? 'grid' : 'block',
+                  gridTemplateColumns: hasViz ? '1fr 1fr' : undefined,
+                  gap: hasViz ? 64 : 0,
                   alignItems: 'center',
+                  maxWidth: hasViz ? undefined : 780,
+                  margin: hasViz ? undefined : '0 auto',
+                  textAlign: hasViz ? 'left' : 'center',
                 }}
               >
-                {/* Illustration column */}
-                <motion.div
-                  initial={{ opacity: 0, x: flipped ? 24 : -24 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: false, amount: 0.25, margin: '0px 0px -10% 0px' }}
-                  transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                  style={{
-                    order: flipped ? 2 : 1,
-                    minWidth: 0,
-                  }}
-                  className={`moment-illustration moment-illustration-${flipped ? 'right' : 'left'}`}
-                >
-                  <div
+                {/* Illustration column (only for moments 01-03; 04 + 05 run
+                    text-only and wider so the 3 remaining illustrations carry
+                    the visual weight without section fatigue). */}
+                {hasViz && Viz && (
+                  <motion.div
+                    initial={{ opacity: 0, x: flipped ? 24 : -24 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: false, amount: 0.25, margin: '0px 0px -10% 0px' }}
+                    transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                     style={{
-                      width: '100%',
-                      maxWidth: 520,
-                      aspectRatio: '480 / 340',
-                      margin: flipped ? '0 0 0 auto' : '0 auto 0 0',
+                      order: flipped ? 2 : 1,
+                      minWidth: 0,
                     }}
+                    className={`moment-illustration moment-illustration-${flipped ? 'right' : 'left'}`}
                   >
-                    <moment.Viz />
-                  </div>
-                </motion.div>
+                    <div
+                      style={{
+                        width: '100%',
+                        maxWidth: 560,
+                        aspectRatio: '480 / 340',
+                        margin: flipped ? '0 0 0 auto' : '0 auto 0 0',
+                      }}
+                    >
+                      <Viz />
+                    </div>
+                  </motion.div>
+                )}
 
                 {/* Copy column */}
                 <motion.div
-                  initial={{ opacity: 0, x: flipped ? -24 : 24 }}
-                  whileInView={{ opacity: 1, x: 0 }}
+                  initial={{ opacity: 0, x: hasViz ? (flipped ? -24 : 24) : 0, y: hasViz ? 0 : 16 }}
+                  whileInView={{ opacity: 1, x: 0, y: 0 }}
                   viewport={{ once: false, amount: 0.25, margin: '0px 0px -10% 0px' }}
                   transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-                  style={{ order: flipped ? 1 : 2, minWidth: 0 }}
+                  style={{
+                    order: hasViz ? (flipped ? 1 : 2) : undefined,
+                    minWidth: 0,
+                    display: hasViz ? 'block' : 'flex',
+                    flexDirection: hasViz ? undefined : 'column',
+                    alignItems: hasViz ? undefined : 'center',
+                  }}
                 >
                   <div
                     style={{
                       display: 'flex',
                       alignItems: 'center',
+                      justifyContent: hasViz ? 'flex-start' : 'center',
                       gap: 12,
                       marginBottom: 16,
                       flexWrap: 'wrap',

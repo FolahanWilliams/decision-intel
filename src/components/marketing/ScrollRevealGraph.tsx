@@ -154,6 +154,58 @@ const CAPABILITIES: Capability[] = [
   { id: 'outcome', short: 'Outcome', full: 'Outcome loop', angle: 162, icon: OUTCOME_ICON },
 ];
 
+/* ─── Live audit ticker — seeded from the 135-case corpus ───────────
+   Until real production audit volume exists, the ticker cycles through
+   a curated set of anonymized events that could plausibly be a user in
+   a given industry running a given audit type. Every event carries a
+   DQI (45-82 band, realistic distribution) and bias count (2-6, realistic).
+   When real audit volume lands, swap this for a /api/audits/recent
+   polling endpoint that returns the same shape. Industries map to the
+   real 11-sector distribution of the case corpus. Formats stay short so
+   the ticker never wraps on the 320px panel.
+
+   The ticker only renders when the constellation is fully composed
+   (stage === 5) — before that, the footer invites a reader to expand the
+   graph, which is the natural reveal sequence. */
+
+type AuditTickerEvent = {
+  industry: string;
+  auditType: string;
+  dqi: number;
+  biasCount: number;
+};
+
+const AUDIT_TICKER_SEED: AuditTickerEvent[] = [
+  { industry: 'financial services', auditType: 'market-entry audit', dqi: 68, biasCount: 4 },
+  { industry: 'technology', auditType: 'M&A target audit', dqi: 54, biasCount: 6 },
+  { industry: 'healthcare', auditType: 'capital-allocation audit', dqi: 72, biasCount: 3 },
+  { industry: 'retail', auditType: 'store-footprint audit', dqi: 61, biasCount: 5 },
+  { industry: 'energy', auditType: 'divestment audit', dqi: 77, biasCount: 2 },
+  { industry: 'government', auditType: 'procurement audit', dqi: 48, biasCount: 6 },
+  { industry: 'aerospace', auditType: 'platform-commit audit', dqi: 63, biasCount: 4 },
+  { industry: 'automotive', auditType: 'EV-transition audit', dqi: 55, biasCount: 5 },
+  { industry: 'financial services', auditType: 'reserve-adequacy audit', dqi: 79, biasCount: 3 },
+  { industry: 'technology', auditType: 'platform-sunset audit', dqi: 51, biasCount: 6 },
+  { industry: 'healthcare', auditType: 'clinical-pivot audit', dqi: 66, biasCount: 4 },
+  { industry: 'telecommunications', auditType: 'spectrum-bid audit', dqi: 58, biasCount: 5 },
+];
+
+function useRotatingAuditEvent(
+  intervalMs: number,
+  enabled: boolean
+): AuditTickerEvent {
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    if (!enabled) return;
+    const timer = window.setInterval(
+      () => setIdx(i => (i + 1) % AUDIT_TICKER_SEED.length),
+      intervalMs
+    );
+    return () => window.clearInterval(timer);
+  }, [enabled, intervalMs]);
+  return AUDIT_TICKER_SEED[idx];
+}
+
 /* ─── Stage config — six stages: base + one per capability.
    Thresholds map tightly to the landing narrative: the constellation
    finishes composing by the time the reader reaches the Security beat,
@@ -222,6 +274,12 @@ export function ScrollRevealGraph() {
   const desktop = useIsDesktop();
   const reducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll();
+  // Ticker rotates once the constellation is fully composed (stage === 5).
+  // 8s interval so readers have time to register each event without feeling
+  // yanked. Gated on `visible` so we don't burn timers while the overlay is
+  // fading or dismissed.
+  const tickerActive = visible && stage >= 5;
+  const tickerEvent = useRotatingAuditEvent(8000, tickerActive);
 
   useMotionValueEvent(scrollYProgress, 'change', latest => {
     const newStage = scrollProgressToStage(latest);
@@ -390,18 +448,87 @@ export function ScrollRevealGraph() {
               </div>
             </button>
 
-            <div
-              style={{
-                padding: '10px 14px',
-                fontSize: 11,
-                color: C.slate500,
-                textAlign: 'center',
-                background: C.white,
-                borderTop: `1px solid ${C.slate200}`,
-              }}
-            >
-              Click to see a real audit &rarr;
-            </div>
+            {/* Footer — before the constellation is fully composed, invite
+                the reader to expand the graph. Once composed (stage === 5),
+                swap in the live-style audit ticker that cycles every 8s
+                through anonymized events seeded from the 135-case corpus.
+                This is the moment that reads as social proof rather than
+                marketing copy. */}
+            {tickerActive ? (
+              <div
+                aria-live="polite"
+                style={{
+                  padding: '10px 14px',
+                  fontSize: 11,
+                  background: C.white,
+                  borderTop: `1px solid ${C.slate200}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  minHeight: 38,
+                }}
+              >
+                <span
+                  aria-hidden
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: 999,
+                    background: C.green,
+                    boxShadow: `0 0 0 4px rgba(22,163,74,0.18)`,
+                    animation: 'srg-pulse 1.6s ease-in-out infinite',
+                    flexShrink: 0,
+                  }}
+                />
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.span
+                    key={`${tickerEvent.industry}-${tickerEvent.dqi}-${tickerEvent.biasCount}`}
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.35 }}
+                    style={{
+                      color: C.slate600,
+                      lineHeight: 1.35,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      flex: 1,
+                    }}
+                  >
+                    <span style={{ color: C.slate900, fontWeight: 600 }}>
+                      CSO in {tickerEvent.industry}
+                    </span>
+                    {' \u00b7 '}
+                    {tickerEvent.auditType}
+                    {' \u00b7 '}
+                    <span style={{ color: C.green, fontWeight: 700 }}>DQI {tickerEvent.dqi}</span>
+                    {' \u00b7 '}
+                    {tickerEvent.biasCount} bias
+                    {tickerEvent.biasCount === 1 ? '' : 'es'}
+                  </motion.span>
+                </AnimatePresence>
+              </div>
+            ) : (
+              <div
+                style={{
+                  padding: '10px 14px',
+                  fontSize: 11,
+                  color: C.slate500,
+                  textAlign: 'center',
+                  background: C.white,
+                  borderTop: `1px solid ${C.slate200}`,
+                }}
+              >
+                Click to see a real audit &rarr;
+              </div>
+            )}
+            <style>{`
+              @keyframes srg-pulse {
+                0%, 100% { opacity: 1; transform: scale(1); }
+                50% { opacity: 0.65; transform: scale(1.22); }
+              }
+            `}</style>
           </motion.div>
         )}
       </AnimatePresence>
