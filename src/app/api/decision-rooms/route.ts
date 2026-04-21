@@ -120,7 +120,9 @@ export async function POST(request: NextRequest) {
         documentId: documentId || null,
         analysisId: analysisId || null,
         decisionType: validType,
-        biasBriefing: biasBriefing ?? undefined,
+        biasBriefing: biasBriefing
+          ? (biasBriefing as unknown as Record<string, unknown>)
+          : undefined,
         participants: {
           create: participantCreates,
         },

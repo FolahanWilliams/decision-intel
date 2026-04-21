@@ -621,7 +621,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               .then(data => {
                 if (data) setDocument(data);
               })
-              .catch(() => {});
+              .catch(err => {
+                if (err?.name !== 'AbortError') {
+                  console.warn('Failed to refresh document after stream:', err);
+                }
+              });
           } else if (update.type === 'error') {
             streamError = update.message || 'Analysis failed during stream';
           }
