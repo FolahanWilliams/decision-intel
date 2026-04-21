@@ -52,6 +52,12 @@ import { DecisionScorecard } from '@/components/analysis/DecisionScorecard';
 import { DrRedTeamCard } from '@/components/analysis/DrRedTeamCard';
 import { RecommendationsPanel } from '@/components/ui/RecommendationsPanel';
 import { ExecutiveSummary } from '@/components/visualizations/ExecutiveSummary';
+import {
+  TimelinePhaseScrub,
+  PhaseDuringPanel,
+  PhaseAfterPanel,
+  type DocumentPhase,
+} from '@/components/documents/TimelinePhaseScrub';
 import { LiveRedFlagsAlert } from '@/components/analysis/LiveRedFlagsAlert';
 import { LivePredictedQuestions } from '@/components/analysis/LivePredictedQuestions';
 import { NoiseTaxCard } from '@/components/analysis/NoiseTaxCard';
@@ -378,6 +384,39 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       window.history.replaceState({}, '', url.toString());
     }
   }, []);
+  // Temporal phase scrub — independent axis from viewMode. 'before' is the
+  // default (full analyst/cso/board content). 'during' surfaces the human-
+  // decision record. 'after' surfaces recalibrated DQI + Brier + lessons.
+  // Persisted via ?phase= URL param + localStorage so the user stays on the
+  // same phase across documents.
+  const resolveInitialPhase = (): DocumentPhase => {
+    if (typeof window === 'undefined') return 'before';
+    const param = new URLSearchParams(window.location.search).get('phase');
+    if (param === 'before' || param === 'during' || param === 'after') return param;
+    try {
+      const saved = localStorage.getItem('di-doc-phase');
+      if (saved === 'before' || saved === 'during' || saved === 'after') return saved;
+    } catch {
+      /* ignore */
+    }
+    return 'before';
+  };
+  const [phase, setPhaseState] = useState<DocumentPhase>(resolveInitialPhase);
+  const setPhase = useCallback((next: DocumentPhase) => {
+    setPhaseState(next);
+    try {
+      localStorage.setItem('di-doc-phase', next);
+    } catch {
+      /* ignore */
+    }
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      if (next === 'before') url.searchParams.delete('phase');
+      else url.searchParams.set('phase', next);
+      window.history.replaceState({}, '', url.toString());
+    }
+  }, []);
+
   const [isExportingBoardView, setIsExportingBoardView] = useState(false);
   // Confidential classification toggle for the Board view + its PDF
   // export. Kept as component state (not persisted) so every document
@@ -1232,6 +1271,16 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           );
         })()}
 
+      {/* Temporal phase scrub — sits above the Executive Summary since
+          it frames the entire document view. Swapping phases swaps the
+          body below (before = full analyst/cso/board; during = human
+          decision panel; after = outcome + recalibrated DQI). */}
+      {analysis && (
+        <ErrorBoundary sectionName="Decision timeline phase scrub">
+          <TimelinePhaseScrub phase={phase} onChange={setPhase} />
+        </ErrorBoundary>
+      )}
+
       {/* Executive Summary */}
       {analysis && (
         <ErrorBoundary sectionName="Executive Summary">
@@ -1265,14 +1314,68 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       {/* Featured Counterfactual — ROI hero card for the top-impact bias.
           Renders in every view (Analyst / CSO / Board). Null if backend has
           no scenarios or no positive-impact bias. */}
-      {analysis && (
+      {analysis && phase === 'before' && (
         <ErrorBoundary sectionName="Counterfactual Hero">
           <CounterfactualPanel analysisId={analysis.id} variant="featured" />
         </ErrorBoundary>
       )}
 
+      {/* Phase: During — the human-decision record. Swap the analyst/cso/
+          board surface for a dedicated panel that either shows the logged
+          decision or prompts the user to log it. */}
+      {analysis && phase === 'during' && (
+        <ErrorBoundary sectionName="Phase: During panel">
+          <PhaseDuringPanel
+            documentId={resolvedParams.id}
+            analysisId={analysis.id}
+            hasHumanDecision={false}
+          />
+        </ErrorBoundary>
+      )}
+
+      {/* Phase: After — outcome + recalibrated DQI + Brier + lessons.
+          Pulls hasOutcome + recalibratedDqi off the analysis payload; the
+          panel self-handles the "no outcome yet" stub. */}
+      {analysis && phase === 'after' && (
+        <ErrorBoundary sectionName="Phase: After panel">
+          <PhaseAfterPanel
+            documentId={resolvedParams.id}
+            analysisId={analysis.id}
+            hasOutcome={analysis.outcomeStatus === 'outcome_logged'}
+            recalibratedDqi={
+              (
+                analysis as unknown as {
+                  recalibratedDqi?: {
+                    originalScore: number;
+                    recalibratedScore: number;
+                    delta: number;
+                    recalibratedGrade: string;
+                    brierScore?: number;
+                    brierCategory?: 'excellent' | 'good' | 'fair' | 'poor';
+                  };
+                }
+              ).recalibratedDqi
+            }
+            outcomeLabel={
+              (
+                analysis as unknown as {
+                  outcome?: { outcome: string };
+                }
+              ).outcome?.outcome
+            }
+            lessonsLearned={
+              (
+                analysis as unknown as {
+                  outcome?: { lessonsLearned?: string };
+                }
+              ).outcome?.lessonsLearned
+            }
+          />
+        </ErrorBoundary>
+      )}
+
       {/* View-as Toggle: Analyst / CSO / Board */}
-      {analysis && (
+      {analysis && phase === 'before' && (
         <div
           className="flex items-center justify-between mb-lg"
           style={{
@@ -1359,7 +1462,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           already handles the DQI top-line, so CSO focuses on what an exec
           actually walks into the meeting with: the risks, the expected
           objections, and a clear "proceed / caution / review" verdict. */}
-      {analysis && viewMode === 'cso' && (
+      {analysis && viewMode === 'cso' && phase === 'before' && (
         <div className="mb-xl" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <LiveRedFlagsAlert biases={biases} onSelect={bias => setSelectedBias(bias)} />
 
@@ -1443,7 +1546,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       )}
 
       {/* === Board View: inline 2-page preview of the board-ready PDF === */}
-      {analysis && viewMode === 'board' && (
+      {analysis && viewMode === 'board' && phase === 'before' && (
         <ErrorBoundary sectionName="Board Report View">
           <BoardReportView
             title={document.filename.replace(/\.[^.]+$/, '')}
@@ -1481,7 +1584,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       )}
 
       {/* === Analyst (full) Analysis View === */}
-      {viewMode === 'analyst' && (
+      {viewMode === 'analyst' && phase === 'before' && (
         <>
           {/* Bias Network Map */}
           {analysis && biases.length > 0 && (
