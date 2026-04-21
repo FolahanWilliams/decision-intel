@@ -346,8 +346,8 @@ export default function LandingPage() {
               marginRight: 'auto',
             }}
           >
-            The human-AI governance system for{' '}
-            <span style={{ color: C.green }}>strategic decisions.</span>
+            The native system of record for{' '}
+            <span style={{ color: C.green }}>strategic reasoning.</span>
           </h1>
           <p
             style={{
@@ -360,10 +360,11 @@ export default function LandingPage() {
               marginRight: 'auto',
             }}
           >
-            Decision Intel audits every board memo, simulates steering-committee objections, runs
-            what-if interventions, and compounds your team&rsquo;s judgment into a living Decision
-            Knowledge Graph&nbsp;&mdash; so decision quality, scalability, and reliability improve
-            quarter after quarter.
+            Write, audit, compound &mdash; in one place, not four. Decision Intel replaces the
+            Google Doc / Slack thread / Confluence page / board deck graveyard with a single
+            governed surface where every strategic memo is scored, every objection is simulated,
+            and every decision joins a living Decision Knowledge Graph that compounds quarter
+            after quarter.
           </p>
           <div
             style={{
@@ -475,7 +476,7 @@ export default function LandingPage() {
                   lineHeight: 1.1,
                 }}
               >
-                One governed system in place of four broken ones.
+                One system of record in place of the four-tool graveyard.
               </h2>
               <p
                 style={{
@@ -486,9 +487,10 @@ export default function LandingPage() {
                   marginBottom: 48,
                 }}
               >
-                Decision Intel doesn&rsquo;t add a tool to your stack &mdash; it retires the
-                patchwork of workarounds your strategy team uses to compensate for the fact that
-                judgment has never had a governance layer.
+                Decision Intel doesn&rsquo;t add a fifth tool to your stack &mdash; it retires the
+                four-tool graveyard your strategy team uses to compensate for the fact that
+                reasoning has never had a system of record. Every quarter this lives across Docs,
+                Slack, Confluence, and the deck is another quarter of decision archaeology.
               </p>
             </motion.div>
 
@@ -525,7 +527,7 @@ export default function LandingPage() {
                     marginBottom: 2,
                   }}
                 >
-                  Before &middot; today&rsquo;s stack
+                  Before &middot; decision archaeology
                 </div>
                 <h3
                   style={{
@@ -551,20 +553,20 @@ export default function LandingPage() {
                 >
                   {[
                     {
-                      label: 'Gut calls under deadline pressure',
-                      sub: 'No record of the reasoning, no way to audit it later.',
+                      label: 'Google Docs drafts',
+                      sub: 'The reasoning exists, but only in a draft nobody revisits.',
                     },
                     {
-                      label: '40-page consulting decks',
-                      sub: 'Expensive, not repeatable, and gone the next quarter.',
+                      label: 'Slack threads of feedback',
+                      sub: 'Six months later, the context is buried in 400 messages.',
                     },
                     {
-                      label: 'Post-mortems that never compound',
-                      sub: 'Lessons live in one analyst&rsquo;s laptop, then churn out.',
+                      label: 'Confluence writeups',
+                      sub: 'The what, but never the why it was the right call.',
                     },
                     {
-                      label: 'BI dashboards that ignore the memo',
-                      sub: 'Data has governance; the reasoning on top of it does not.',
+                      label: 'The board deck',
+                      sub: 'The presentation, not the thinking that produced it.',
                     },
                   ].map(item => (
                     <li
@@ -683,7 +685,7 @@ export default function LandingPage() {
                     lineHeight: 1.3,
                   }}
                 >
-                  One governed system that scores, simulates, and compounds.
+                  The system of record that scores, simulates, and compounds.
                 </h3>
                 <ul
                   style={{
@@ -709,8 +711,8 @@ export default function LandingPage() {
                       sub: 'Every call connects to its closest historical analog. Nothing leaks.',
                     },
                     {
-                      label: 'Governance on the reasoning, not just the data',
-                      sub: 'What-ifs, AI boardroom, outcome loop &mdash; all on the memo itself.',
+                      label: 'One system of record for the reasoning itself',
+                      sub: 'DQI, what-ifs, AI boardroom, outcome loop &mdash; all on the memo itself.',
                     },
                   ].map(item => (
                     <li

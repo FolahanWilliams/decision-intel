@@ -79,7 +79,7 @@ export function CategoryTurn() {
             transition={{ duration: 0.6, delay: 0.32 }}
             style={{ margin: 0 }}
           >
-            Your reasoning{' '}
+            Your reasoning lives in{' '}
             <span
               style={{
                 color: C.green,
@@ -87,7 +87,7 @@ export function CategoryTurn() {
                 display: 'inline-block',
               }}
             >
-              doesn&rsquo;t.
+              400 Slack threads.
               {/* Underline flourish — draws in after the word animates */}
               <motion.span
                 aria-hidden
@@ -125,8 +125,8 @@ export function CategoryTurn() {
             marginRight: 'auto',
           }}
         >
-          Every critical system in your company has an audit layer. Except the one that makes the
-          decisions. That&rsquo;s what we build.
+          Strategic reasoning deserves its own system of record &mdash; not an excavation site
+          across Google Docs, Slack, Confluence, and the board deck.
         </motion.p>
       </div>
     </section>

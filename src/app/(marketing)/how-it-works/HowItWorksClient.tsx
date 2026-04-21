@@ -233,8 +233,10 @@ export function HowItWorksClient() {
                   maxWidth: 560,
                 }}
               >
-                Twelve specialized agents. Thirty cognitive biases. A ten-pattern interaction model
-                grounded in Kahneman, Klein, and Tetlock. Under sixty seconds.
+                The engine behind the native system of record for strategic reasoning. Twelve
+                specialized agents, thirty cognitive biases, and a ten-pattern interaction model
+                grounded in Kahneman, Klein, and Tetlock &mdash; every memo audited in under sixty
+                seconds, so the reasoning lives in one surface instead of four.
               </p>
               <p style={{ fontSize: 14, color: C.slate500, margin: 0, maxWidth: 560 }}>
                 This is a general-but-detailed walk-through of our methodology. It omits proprietary

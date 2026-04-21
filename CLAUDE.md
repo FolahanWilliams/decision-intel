@@ -26,6 +26,10 @@ Decision Intel is a decision intelligence platform for corporate strategy teams.
 - "quarter after quarter" (cadence)
 - "135 historical decisions" (benchmark number — defensible; deduped 2026-04-16 from 146)
 - "30+ cognitive biases" (taxonomy scope)
+- **"native system of record for strategic reasoning"** — the category-defining phrase (2026-04-22 lock). Lives in the landing H1, /how-it-works subtitle, pitch deck slide 2. Softer alternative "native medium for strategic reasoning" is interchangeable for surfaces where "system of record" feels over-procurement-coded.
+- **"Recognition-Rigor Framework" / "R²F"** — the category-defining framework name (2026-04-22 lock). Kahneman's rigor (System 2 debiasing) + Klein's recognition (System 1 amplification) arbitrated in one pipeline. Trademark filing DEFERRED until pre-seed close; use consistently now so vocabulary is owned by usage alone. Anchor citation: 2009 Kahneman-Klein paper "Conditions for Intuitive Expertise: a failure to disagree."
+- **"decision archaeology"** — the canonical verb for the pain we replace (reconstructing past reasoning from the 4-tool graveyard).
+- **"four-tool graveyard"** — Google Docs drafts / Slack threads / Confluence writeups / the board deck. Canonical pain name, used in the What-we-replace beat.
 
 **Vocabulary to AVOID:**
 
@@ -35,6 +39,8 @@ Decision Intel is a decision intelligence platform for corporate strategy teams.
 - "deal" as a headline term (too M&A-narrow; use "call" or "memo")
 - "M&A documents" as primary artifact (use "strategic memo" first; M&A is secondary)
 - "12-node pipeline" in headline positions (too technical for CSO buyer; fine as technical detail only)
+- **"decision intelligence platform"** in marketing leads — Gartner-crowded (Peak.ai, Cloverpop, Quantellia, Aera). Use "native system of record for strategic reasoning" instead. "Decision intelligence" is fine as a descriptor inside a sentence; never as the headline claim.
+- "human-AI governance system" as an H1 (retired 2026-04-22 in favor of system-of-record framing).
 
 **Tone:** Calm CSO 1:1 voice with manager-level pain included. Never critique the buyer's judgment. Frame as additive rigor, not a report card. Lead with gain, not deficit. Use em dashes sparingly (one or two for emphasis); prefer commas and sentence breaks.
 

@@ -86,7 +86,7 @@ export function KahnemanKleinSynthesis() {
                 marginBottom: 14,
               }}
             >
-              Where Kahneman meets Klein
+              The Recognition-Rigor Framework &middot; R&sup2;F
             </p>
             <h2
               style={{
@@ -99,9 +99,10 @@ export function KahnemanKleinSynthesis() {
                 marginBottom: 22,
               }}
             >
-              The only platform that combines{' '}
-              <span style={{ color: C.green }}>debiasing</span> with{' '}
-              <span style={{ color: C.green }}>Recognition-Primed Decision</span>.
+              The only platform that runs both halves of the decision stack &mdash;{' '}
+              <span style={{ color: C.green }}>debiasing</span> and{' '}
+              <span style={{ color: C.green }}>Recognition-Primed Decision</span> &mdash; in one
+              pipeline.
             </h2>
             <p
               style={{
@@ -119,6 +120,24 @@ export function KahnemanKleinSynthesis() {
               <em style={{ fontStyle: 'italic', color: C.slate700 }}>
                 &ldquo;Conditions for Intuitive Expertise: a failure to disagree.&rdquo;
               </em>
+            </p>
+            <p
+              style={{
+                fontSize: 16.5,
+                color: C.slate600,
+                lineHeight: 1.7,
+                margin: 0,
+                marginBottom: 18,
+                maxWidth: 520,
+              }}
+            >
+              We call the synthesis the{' '}
+              <strong style={{ color: C.slate900, fontWeight: 700 }}>
+                Recognition-Rigor Framework
+              </strong>
+              &nbsp;&mdash;&nbsp;Klein&rsquo;s recognition plus Kahneman&rsquo;s rigor, arbitrated
+              in a single pipeline. No other vendor in the decision-quality space combines both
+              traditions.
             </p>
             <p
               style={{
