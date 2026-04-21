@@ -165,6 +165,17 @@ const UnicornRoadmapTab = dynamic(
     })),
   { loading: tabLoader }
 );
+const TodoTab = dynamic(
+  () => import('@/components/founder-hub/TodoTab').then(m => ({ default: m.TodoTab })),
+  { loading: tabLoader }
+);
+const DesignPartnersTab = dynamic(
+  () =>
+    import('@/components/founder-hub/DesignPartnersTab').then(m => ({
+      default: m.DesignPartnersTab,
+    })),
+  { loading: tabLoader }
+);
 import {
   Rocket,
   Brain,
@@ -185,6 +196,8 @@ import {
   Map,
   Radar,
   Target,
+  CheckSquare,
+  Handshake,
 } from 'lucide-react';
 import { card } from '@/components/founder-hub/shared-styles';
 import { AccordionSection } from '@/components/founder-hub/AccordionSection';
@@ -202,6 +215,7 @@ type TabId =
   | 'sales'
   | 'outreach_cmd'
   | 'outreach'
+  | 'design_partners'
   | 'content'
   | 'data_ecosystem'
   | 'case_library'
@@ -210,7 +224,8 @@ type TabId =
   | 'cron_controls'
   | 'forecast'
   | 'category_position'
-  | 'unicorn_roadmap';
+  | 'unicorn_roadmap'
+  | 'todo';
 
 type TabGroup = 'Start' | 'Product' | 'Go-to-Market' | 'Intelligence' | 'Tools';
 
@@ -278,6 +293,12 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
     icon: <Crosshair size={16} />,
     group: 'Go-to-Market',
   },
+  {
+    id: 'design_partners',
+    label: 'Design Partners',
+    icon: <Handshake size={16} />,
+    group: 'Go-to-Market',
+  },
   { id: 'content', label: 'Content Studio', icon: <Zap size={16} />, group: 'Go-to-Market' },
   // Intelligence
   {
@@ -288,6 +309,12 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
   },
   { id: 'case_library', label: 'Case Library', icon: <Library size={16} />, group: 'Intelligence' },
   // Tools
+  {
+    id: 'todo',
+    label: 'To-Do',
+    icon: <CheckSquare size={16} />,
+    group: 'Tools',
+  },
   {
     id: 'forecast',
     label: '12-Month Forecast',
@@ -553,6 +580,22 @@ const SEARCH_INDEX: SearchEntry[] = [
       'North star, executive memo, 5-year timeline, moat radar, 90-day sprint, pipeline funnel, pitfalls, fundraising gauge.',
     keywords:
       'unicorn roadmap north star vision executive memo synthesis kahneman klein moat 5 year timeline milestone sprint 90 day design partner funnel pipeline authority founder pitfall risk cadence weekly rhythm fundraising readiness pre-seed seed series a competitive map',
+  },
+  {
+    tabId: 'design_partners',
+    section: 'Design Partners',
+    preview:
+      'Triage inbound design-partner applications. Capacity strip (5 seats). Status transitions + founder notes.',
+    keywords:
+      'design partners applications cohort 5 seats strategy pilot status reviewing accepted declined withdrawn scheduled_call triage founder notes capacity cso head of corporate strategy banking insurance pharma aerospace energy m&a mna',
+  },
+  {
+    tabId: 'todo',
+    section: 'To-Do',
+    preview:
+      'Plain task list for day-to-day priorities. Pinned tasks stay up top. Deliberately short \u2014 Unicorn Roadmap and Forecast hold the structured stuff.',
+    keywords:
+      'todo to-do task list tasks short plain checklist prep meeting prep daily weekly priorities pinned done open reminder note',
   },
 ];
 
@@ -1092,6 +1135,11 @@ function renderTab(
       </ErrorBoundary>
     ),
     outreach: <OutreachAndMeetingsTab founderPass={FOUNDER_PASS} />,
+    design_partners: (
+      <ErrorBoundary sectionName="Design Partners">
+        <DesignPartnersTab founderPass={FOUNDER_PASS} />
+      </ErrorBoundary>
+    ),
     content: (
       <ErrorBoundary sectionName="Content Studio">
         <ContentStudioTab founderPass={FOUNDER_PASS} />
@@ -1161,6 +1209,11 @@ function renderTab(
     unicorn_roadmap: (
       <ErrorBoundary sectionName="Unicorn Roadmap">
         <UnicornRoadmapTab />
+      </ErrorBoundary>
+    ),
+    todo: (
+      <ErrorBoundary sectionName="To-Do">
+        <TodoTab founderPass={FOUNDER_PASS} />
       </ErrorBoundary>
     ),
   };

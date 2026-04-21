@@ -1675,3 +1675,25 @@ model DesignPartnerApplication {
   @@index([submittedAt])
   @@index([email])
 }
+
+// ─── Founder Hub: plain to-do list ─────────────────────────────────────────
+//
+// Deliberately minimal: title, done, optional dueDate. No priority, no
+// labels, no drag-drop. The Founder Hub already has heavier roadmap +
+// sprint surfaces (UnicornRoadmapTab, ForecastRoadmapTab); this is the
+// tab for the day-to-day "what needs to happen this week" list that
+// every other roadmap tool is too structured to hold cleanly.
+//
+// Pinned tasks stick to the top — used for meeting-prep items the
+// founder wants to protect from ambient churn (e.g. Thursday CEO call).
+model FounderTodo {
+  id        String    @id @default(cuid())
+  title     String
+  done      Boolean   @default(false)
+  pinned    Boolean   @default(false)
+  dueDate   DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([done, pinned, createdAt])
+}
