@@ -15,7 +15,7 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.c
 export const metadata: Metadata = {
   title: 'For the board · Decision Intel',
   description:
-    'A 4-minute read for the board director whose CSO is about to propose a Decision Intel subscription. Written in director-facing language — fiduciary duty, EU AI Act board oversight, SEC AI disclosure, Basel III ICAAP, SOX §404.',
+    'A 4-minute read for the board director whose CSO is about to propose a Decision Intel subscription. Written in director-facing language: fiduciary duty, EU AI Act board oversight, SEC AI disclosure, Basel III ICAAP, SOX §404.',
   alternates: { canonical: `${siteUrl}/decision-intel-for-boards` },
   // Intentionally off the public discovery index: this surface is a CSO-
   // forwards-to-board artifact, not a top-of-funnel landing page.
@@ -49,25 +49,25 @@ type Tailwind = {
 const BOARD_TAILWINDS: Tailwind[] = [
   {
     icon: Gavel,
-    label: 'EU AI Act — high-risk decision-support obligations',
+    label: 'EU AI Act · high-risk decision-support obligations',
     status: 'Enforceable 2 August 2026',
-    body: 'Article 14 (human oversight) and Article 15 (record-keeping + accuracy) apply to AI-augmented strategic decision systems. The board is the accountable body. Decision Intel produces a per-decision Decision Provenance Record — model lineage, prompt fingerprint, judge variance, signed input hash — mapped onto Article 14 record-keeping by design.',
+    body: 'Article 14 (human oversight) and Article 15 (record-keeping + accuracy) apply to AI-augmented strategic decision systems. The board is the accountable body. Decision Intel produces a per-decision Decision Provenance Record (model lineage, prompt fingerprint, judge variance, signed input hash) mapped onto Article 14 record-keeping by design.',
   },
   {
     icon: Landmark,
-    label: 'SEC AI Disclosure — investor-adviser decisions',
-    status: 'Rulemaking evolving 2024 — 2026',
+    label: 'SEC AI Disclosure · investor-adviser decisions',
+    status: 'Rulemaking evolving 2024 to 2026',
     body: 'The SEC proposal requires documentation of AI use in decisions that affect investors. "We use AI" is no longer a sufficient disclosure. Decision Intel\'s per-decision audit trail is the documentation your GC can attach to a 10-K or investor letter without hand-assembly.',
   },
   {
     icon: FileCheck2,
     label: 'Basel III · Pillar 2 ICAAP',
     status: 'Live for regulated banks',
-    body: 'The Internal Capital Adequacy Assessment Process requires documented qualitative decisions, including the reasoning behind them. Decision Intel attaches a Basel III provision to every flagged bias — so the audit committee can defend each capital-allocation call against its source.',
+    body: 'The Internal Capital Adequacy Assessment Process requires documented qualitative decisions, including the reasoning behind them. Decision Intel attaches a Basel III provision to every flagged bias, so the audit committee can defend each capital-allocation call against its source.',
   },
   {
     icon: ShieldCheck,
-    label: 'SOX §404 — internal controls over financial reporting',
+    label: 'SOX §404 · internal controls over financial reporting',
     status: 'Live for public companies',
     body: 'When strategic decisions affect material financial statements (M&A reserves, impairment, forward guidance), the reasoning behind those decisions is part of the internal-controls perimeter. Decision Intel is the first tool that instruments it.',
   },
@@ -84,19 +84,19 @@ const OBJECTIONS: Objection[] = [
     number: '01',
     question: 'Is this just AI wrapped around existing board-reporting tools?',
     answer:
-      'No. Board-reporting tools (Diligent, Nasdaq Boardvantage) package what the strategy team produces. Decision Intel instruments how the strategy team reasons — it sits one layer earlier in the workflow, before the board deck is written. The two are complementary: Decision Intel\'s Decision Provenance Record attaches to your board-pack as evidentiary backup for the decision it describes.',
+      "No. Board-reporting tools (Diligent, Nasdaq Boardvantage) package what the strategy team produces. Decision Intel instruments how the strategy team reasons. It sits one layer earlier in the workflow, before the board deck is written. The two are complementary: Decision Intel's Decision Provenance Record attaches to your board-pack as evidentiary backup for the decision it describes.",
   },
   {
     number: '02',
     question: 'What happens to our data?',
     answer:
-      'Documents are encrypted at rest with authenticated AES-256-GCM (keyVersion-rotated). A GDPR anonymizer runs as the literal first node of the pipeline — no analysis model ever sees raw PII. No customer data is used to train upstream models. Hosted on SOC 2 Type II infrastructure (Vercel + Supabase). Full posture at /security.',
+      'Documents are encrypted at rest with authenticated AES-256-GCM (keyVersion-rotated). A GDPR anonymizer runs as the literal first node of the pipeline, so no analysis model ever sees raw PII. No customer data is used to train upstream models. Hosted on SOC 2 Type II infrastructure (Vercel + Supabase). Full posture at /security.',
   },
   {
     number: '03',
     question: 'Who vouches for the methodology?',
     answer:
-      'The analysis pipeline is a synthesis of two Nobel-adjacent traditions: Kahneman\'s System 2 debiasing (Thinking, Fast and Slow; Noise) and Klein\'s Recognition-Primed Decision framework (Sources of Power). Both authors converged on the arbitrated integration in their 2009 paper "Conditions for Intuitive Expertise." Decision Intel is the only platform that operationalises the synthesis — we call it the Recognition-Rigor Framework. The 11 AI-governance principles published by AI Verify Foundation (Singapore IMDA) map field-by-field onto our Decision Provenance Record.',
+      "The analysis pipeline is a synthesis of two Nobel-adjacent traditions: Kahneman's System 2 debiasing (Thinking, Fast and Slow; Noise) and Klein's Recognition-Primed Decision framework (Sources of Power). Both authors converged on the arbitrated integration in their 2009 paper \"Conditions for Intuitive Expertise.\" Decision Intel is the only platform that operationalises the synthesis. We call it the Recognition-Rigor Framework. The 11 AI-governance principles published by AI Verify Foundation (Singapore IMDA) map field-by-field onto our Decision Provenance Record.",
   },
 ];
 
@@ -217,8 +217,8 @@ export default function DecisionIntelForBoardsPage() {
         {/* Why it matters to the board */}
         <h2 style={h2Style}>Why this is relevant to the board agenda this year</h2>
         <p style={bodyStyle}>
-          The regulatory wave that makes this a board-level topic — not a pure strategy-team
-          purchase — is already calendared, not speculative. Four items specifically.
+          The regulatory wave that makes this a board-level topic, not a pure strategy-team
+          purchase, is already calendared, not speculative. Four items specifically.
         </p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 8, marginBottom: 8 }}>
@@ -267,7 +267,7 @@ export default function DecisionIntelForBoardsPage() {
         </p>
         <p style={bodyStyle}>
           <strong>Strategy tier at £2,499/month</strong> supports a team of up to ten users and 250
-          audits per month — the operating rhythm for a single strategy function running memos,
+          audits per month, the operating rhythm for a single strategy function running memos,
           board decks, and M&A recommendations through the platform. This is the most common
           starting point for Fortune 500 corporate strategy teams.
         </p>
@@ -279,7 +279,7 @@ export default function DecisionIntelForBoardsPage() {
         </p>
         <p style={bodyMutedStyle}>
           Gross margin runs approximately ninety percent blended, so the subscription is
-          structurally self-sustaining rather than promotional — relevant context for boards that
+          structurally self-sustaining rather than promotional. Relevant context for boards that
           have been burned by AI vendors whose unit economics collapse at scale.
         </p>
 

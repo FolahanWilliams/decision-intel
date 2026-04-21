@@ -2053,6 +2053,17 @@ tr:hover td {
   margin: 0;
 }
 
+/* Marketing display utility. Instrument Serif at low weight + tight tracking
+   produces the editorial-enterprise feel that separates landing pages from
+   default-Inter SaaS templates. Use on landing + marketing H1s, never on
+   platform / dashboard surfaces. Kerning is tightened because the serif
+   default reads too wide at hero scale. */
+.marketing-display {
+  font-family: var(--font-display-marketing);
+  font-weight: 400;
+  letter-spacing: -0.015em;
+}
+
 .page-header .page-subtitle {
   font-size: 0.8125rem;
   color: var(--text-muted);
@@ -2702,6 +2713,10 @@ tr:hover td {
 @theme inline {
   --font-heading: var(--font-inter), 'Inter', sans-serif;
   --font-sans: var(--font-inter), 'Inter', sans-serif;
+  /* Marketing display face — Instrument Serif. Applied to landing + marketing
+     H1s and occasional H2s via .marketing-display. Registered 2026-04-23 to
+     kill the "default-Inter SaaS template" perception on the landing page. */
+  --font-display-marketing: var(--font-display), 'Instrument Serif', 'Georgia', serif;
   --font-mono: var(--font-mono), 'JetBrains Mono', monospace;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);

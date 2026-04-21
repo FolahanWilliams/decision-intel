@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Simulate my CEO · Decision Intel',
     description:
-      'Paste a memo + a one-line CEO profile — get the three questions the CEO is most likely to ask. Free, no login.',
+      'Paste a memo + a one-line CEO profile. Get the three questions the CEO is most likely to ask. Free, no login.',
     url: `${siteUrl}/simulate-ceo`,
   },
 };

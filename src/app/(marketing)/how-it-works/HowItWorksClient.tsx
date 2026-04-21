@@ -52,7 +52,7 @@ const FEATURED_BIASES = [
     taxonomyId: 'DI-B-004',
     label: 'Groupthink',
     description:
-      'Suppressing dissent to maintain group harmony — the memo reads like unanimous consensus where there should be friction.',
+      'Suppressing dissent to maintain group harmony. The memo reads like unanimous consensus where there should be friction.',
     example: { title: 'Bay of Pigs', company: 'U.S. Government', year: '1961' },
   },
   {
@@ -129,7 +129,7 @@ const RESEARCH_CITATIONS = [
     title: 'Sources of Power: How People Make Decisions',
     year: '1998',
     connection:
-      'Recognition-Primed Decision theory grounds the RPD Recognition node — pattern matching against a labeled historical library.',
+      'Recognition-Primed Decision theory grounds the RPD Recognition node: pattern matching against a labeled historical library.',
     featureName: 'RPD Recognition',
   },
   {
@@ -147,7 +147,7 @@ const RESEARCH_CITATIONS = [
     title: 'Superforecasting & Expert Political Judgment',
     year: '2005 / 2015',
     connection:
-      'Calibration methodology for the outcome flywheel and the Forgotten Questions node — what are you not asking?',
+      'Calibration methodology for the outcome flywheel and the Forgotten Questions node: what are you not asking?',
     featureName: 'Forgotten Questions',
   },
   {
@@ -162,7 +162,7 @@ const RESEARCH_CITATIONS = [
   {
     authorMonogram: 'IS',
     authors: 'Ilya Strebulaev',
-    title: 'Stanford VC Initiative — Corporate Decision Research',
+    title: 'Stanford VC Initiative · Corporate Decision Research',
     year: 'ongoing',
     connection:
       'Source for the 11 strategy-specific biases (entry-price anchor, thesis confirmation, winner\u2019s curse, management halo).',
@@ -240,7 +240,7 @@ export function HowItWorksClient() {
               </p>
               <p style={{ fontSize: 14, color: C.slate500, margin: 0, maxWidth: 560 }}>
                 This is a general-but-detailed walk-through of our methodology. It omits proprietary
-                weights and prompts by design — everything you see here is public-safe, citable, and
+                weights and prompts by design. Everything you see here is public-safe, citable, and
                 reproducible against the academic record.
               </p>
 
@@ -405,7 +405,7 @@ export function HowItWorksClient() {
                 Context amplifiers multiply the score when monetary stakes are high, dissent is
                 absent, or time pressure is active. False-positive damping kicks in when a pattern
                 gets flagged but the outcome succeeded. Over time, each organization calibrates its
-                own weights from its own outcomes — which is why this section of the engine is the
+                own weights from its own outcomes, which is why this section of the engine is the
                 hardest to replicate.
               </>
             }
@@ -522,7 +522,7 @@ export function HowItWorksClient() {
           <SectionHeader
             eyebrow="Closing the loop"
             title="Every decision becomes signal for the next one."
-            body="An audit is only half the work. After a decision gets made, Decision Intel listens for the outcome through the tools your team already uses — Slack threads, Drive folders, inbox replies, public announcements — and writes what actually happened back into your Decision Knowledge Graph. Your team's calibration improves quarter after quarter, on your own data."
+            body="An audit is only half the work. After a decision gets made, Decision Intel listens for the outcome through the tools your team already uses (Slack threads, Drive folders, inbox replies, public announcements) and writes what actually happened back into your Decision Knowledge Graph. Your team's calibration improves quarter after quarter, on your own data."
           />
           <OutcomeDetectionViz />
         </div>
@@ -534,7 +534,7 @@ export function HowItWorksClient() {
           <SectionHeader
             eyebrow="Academic foundation"
             title="Standing on shoulders."
-            body="None of this methodology is invented in a vacuum. Every node in the pipeline cites a specific academic lineage — and every detected bias on your memo links back to the peer-reviewed paper that first named it."
+            body="None of this methodology is invented in a vacuum. Every node in the pipeline cites a specific academic lineage, and every detected bias on your memo links back to the peer-reviewed paper that first named it."
           />
           <div
             style={{

@@ -82,7 +82,7 @@ const TRUST_SPINE: Array<{ icon: LucideIcon; label: string; body: string }> = [
   {
     icon: Server,
     label: 'SOC 2 infrastructure',
-    body: 'Hosted on Vercel (SOC 2 Type II) + Supabase (SOC 2 Type II, HIPAA). Our own SOC 2 audit is scoped for 2026 — in-flight controls already mirror Type II.',
+    body: 'Hosted on Vercel (SOC 2 Type II) + Supabase (SOC 2 Type II, HIPAA). Our own SOC 2 audit is scoped for 2026; in-flight controls already mirror Type II.',
   },
 ];
 
@@ -90,7 +90,7 @@ const KEY_ROTATION: Array<{ step: number; label: string; body: string }> = [
   {
     step: 1,
     label: 'Provision the new key',
-    body: 'Set DOCUMENT_ENCRYPTION_KEY_V2 (64-character hex) in production. The legacy v1 key stays in place — no downtime, no lockout.',
+    body: 'Set DOCUMENT_ENCRYPTION_KEY_V2 (64-character hex) in production. The legacy v1 key stays in place, so no downtime, no lockout.',
   },
   {
     step: 2,
@@ -100,7 +100,7 @@ const KEY_ROTATION: Array<{ step: number; label: string; body: string }> = [
   {
     step: 3,
     label: 'Backfill historical rows',
-    body: 'Run npm run rotate:encryption-key — the CLI walks every row where keyVersion != 2, decrypts with v1, re-encrypts with v2, updates the stamp. Batched, resumable, idempotent.',
+    body: 'Run npm run rotate:encryption-key. The CLI walks every row where keyVersion != 2, decrypts with v1, re-encrypts with v2, updates the stamp. Batched, resumable, idempotent.',
   },
   {
     step: 4,
@@ -174,7 +174,7 @@ const ACCESS_CONTROLS: AccessControl[] = [
   {
     label: 'Admin audit log',
     availability: 'every_plan',
-    body: 'Org admins review every action taken inside their workspace — who viewed which memo, who exported a Decision Provenance Record, who invited a new member — with filters, date range, and CSV export for downstream compliance tooling.',
+    body: 'Org admins review every action taken inside their workspace (who viewed which memo, who exported a Decision Provenance Record, who invited a new member) with filters, date range, and CSV export for downstream compliance tooling.',
   },
   {
     label: 'Per-org data isolation',
@@ -558,7 +558,7 @@ export default function SecurityPage() {
               {
                 code: 'EU AI Act',
                 status: 'In force · high-risk obligations Aug 2026',
-                body: 'Article 13 (transparency), Article 14 (human oversight), Article 15 (accuracy + record-keeping), Annex III (high-risk decision-support). Every DPR section maps onto one of these — by design.',
+                body: 'Article 13 (transparency), Article 14 (human oversight), Article 15 (accuracy + record-keeping), Annex III (high-risk decision-support). Every DPR section maps onto one of these by design.',
               },
               {
                 code: 'SEC AI Disclosure',

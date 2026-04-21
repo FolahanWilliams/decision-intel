@@ -1,11 +1,24 @@
 import type { Metadata } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import { Inter, Instrument_Serif, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 
 const inter = Inter({
   subsets: ['latin'],
   weight: ['300', '400', '500', '600', '700', '800'],
   variable: '--font-inter',
+  display: 'swap',
+});
+
+// Editorial serif used on marketing H1/H2 only. One font, Regular + Italic.
+// Registers as `--font-display` — applied via the .marketing-display utility
+// (see globals.css) or inline `fontFamily: 'var(--font-display)'`. Inter
+// stays the workhorse for body + every platform surface so the app does not
+// shift under users' feet.
+const instrumentSerif = Instrument_Serif({
+  subsets: ['latin'],
+  weight: ['400'],
+  style: ['normal', 'italic'],
+  variable: '--font-display',
   display: 'swap',
 });
 
@@ -81,7 +94,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn(inter.variable, jetbrainsMono.variable, 'font-sans')}>
+    <html
+      lang="en"
+      className={cn(
+        inter.variable,
+        instrumentSerif.variable,
+        jetbrainsMono.variable,
+        'font-sans'
+      )}
+    >
       <body className="antialiased min-h-screen">
         <ThemeProvider
           attribute="class"
