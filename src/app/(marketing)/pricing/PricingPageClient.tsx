@@ -636,7 +636,7 @@ export function PricingPageClient() {
             { label: 'SOC 2 ready', sub: 'AES-256-GCM + TLS 1.3' },
             { label: 'Signed DPA', sub: 'on any paid tier' },
             { label: 'No training on your data', sub: 'ever, by contract' },
-            { label: '30-day pilot', sub: 'on Strategy tier' },
+            { label: 'Audit Defense Packet', sub: 'signed + hashed on every audit' },
           ].map(item => (
             <div key={item.label} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
               <span
@@ -672,6 +672,68 @@ export function PricingPageClient() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Design-partner program — quiet, procurement-coded strip.
+            Not a pricing tier: a separate cohort referenced under the
+            main cards so CSOs arriving via warm intro know the path
+            exists without crowding the primary tiers. */}
+        <div
+          style={{
+            maxWidth: 1160,
+            margin: '20px auto 0',
+            padding: '18px 22px',
+            background: C.slate50,
+            border: `1px solid ${C.slate200}`,
+            borderRadius: 14,
+            display: 'flex',
+            gap: 18,
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+          }}
+        >
+          <div style={{ flex: 1, minWidth: 260 }}>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 800,
+                color: C.green,
+                textTransform: 'uppercase',
+                letterSpacing: '0.12em',
+                marginBottom: 4,
+              }}
+            >
+              Design Partner Program &middot; 5 seats
+            </div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: C.slate900, lineHeight: 1.4 }}>
+              $1,999/mo locked for 12 months &mdash; 20% off Strategy list.
+            </div>
+            <div style={{ fontSize: 12.5, color: C.slate500, marginTop: 3, lineHeight: 1.5 }}>
+              Fortune 500 corporate strategy teams shaping the Recognition-Rigor Framework.
+              Audit Defense Packets bundled on every audit. Direct Slack line to the founder.
+            </div>
+          </div>
+          <Link
+            href="/design-partner"
+            onClick={() => trackEvent('pricing_page_design_partner_clicked', {})}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '10px 18px',
+              background: C.white,
+              border: `1px solid ${C.slate200}`,
+              color: C.slate900,
+              fontSize: 13,
+              fontWeight: 700,
+              borderRadius: 10,
+              textDecoration: 'none',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            See the program <ArrowRight size={13} />
+          </Link>
         </div>
       </section>
 

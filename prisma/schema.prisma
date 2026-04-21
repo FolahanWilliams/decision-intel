@@ -1635,3 +1635,43 @@ model AuditDefensePacket {
   @@index([documentId])
   @@index([generatedAt])
 }
+
+// ─── Design Partner Applications ──────────────────────────────────────────
+//
+// Inbound applications to the 5-seat design-partner cohort. Warm-intro'd
+// CSOs / Heads of Corporate Strategy / M&A leads complete a short form
+// at /design-partner; the API persists the application, fires a Slack
+// + email notification to the founder, and returns a booking link for
+// the intro call. Status transitions (applied → reviewing → accepted /
+// declined) are managed via the Founder Hub in a follow-up PR.
+//
+// The form captures just enough for the founder to triage fast: who +
+// where they work + what industry + what's the triggering need + which
+// tools they currently use (validates the four-tool graveyard story on
+// real data) + how they heard about DI (source attribution).
+model DesignPartnerApplication {
+  id             String    @id @default(cuid())
+  name           String
+  email          String
+  company        String
+  role           String
+  linkedInUrl    String?
+  industry       String    // banking | insurance | pharma | aerospace | energy | mna | other
+  teamSize       String    // '1-5' | '6-15' | '16-50' | '51-200' | '200+'
+  memoCadence    String?   // e.g. "3-5 strategic memos per quarter"
+  currentStack   String?   // free-text list of tools they use today
+  whyNow         String    @db.Text
+  source         String?   // warm-intro | linkedin | press | direct | other
+  // Internal triage
+  status         String    @default("applied")
+  // 'applied' | 'reviewing' | 'scheduled_call' | 'accepted' | 'declined' | 'withdrawn'
+  founderNotes   String?   @db.Text
+  reviewedAt     DateTime?
+  callScheduledAt DateTime?
+  submittedAt    DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([status])
+  @@index([submittedAt])
+  @@index([email])
+}
