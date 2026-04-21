@@ -47,6 +47,7 @@ vi.mock('@/lib/stripe', () => ({
 
 const mockSubscriptionUpsert = vi.fn();
 const mockSubscriptionUpdate = vi.fn();
+const mockSubscriptionUpdateMany = vi.fn();
 
 const mockAuditLogFindFirst = vi.fn().mockResolvedValue(null);
 const mockAuditLogCreate = vi.fn().mockResolvedValue({ id: 'audit-1' });
@@ -57,6 +58,7 @@ vi.mock('@/lib/prisma', () => ({
     subscription: {
       upsert: (...args: unknown[]) => mockSubscriptionUpsert(...args),
       update: (...args: unknown[]) => mockSubscriptionUpdate(...args),
+      updateMany: (...args: unknown[]) => mockSubscriptionUpdateMany(...args),
     },
     auditLog: {
       findFirst: (...args: unknown[]) => mockAuditLogFindFirst(...args),
@@ -119,9 +121,10 @@ beforeEach(() => {
     data: { object: {} },
   });
 
-  // Default: subscription update resolves
+  // Default: subscription update/upsert/updateMany resolves
   mockSubscriptionUpdate.mockResolvedValue({});
   mockSubscriptionUpsert.mockResolvedValue({});
+  mockSubscriptionUpdateMany.mockResolvedValue({ count: 1 });
 });
 
 // ---------------------------------------------------------------------------
@@ -287,14 +290,16 @@ describe('POST /api/stripe/webhook', () => {
       const res = await POST(createWebhookRequest());
 
       expect(res.status).toBe(200);
-      expect(mockSubscriptionUpdate).toHaveBeenCalledWith({
-        where: { stripeSubscriptionId: 'sub_200' },
-        data: {
-          status: 'active',
-          currentPeriodEnd: new Date(1700000000 * 1000),
-          cancelAtPeriodEnd: false,
-        },
-      });
+      expect(mockSubscriptionUpsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { stripeSubscriptionId: 'sub_200' },
+          update: {
+            status: 'active',
+            currentPeriodEnd: new Date(1700000000 * 1000),
+            cancelAtPeriodEnd: false,
+          },
+        })
+      );
     });
 
     it('updates to canceled when cancel_at_period_end is true', async () => {
@@ -310,14 +315,16 @@ describe('POST /api/stripe/webhook', () => {
       const res = await POST(createWebhookRequest());
 
       expect(res.status).toBe(200);
-      expect(mockSubscriptionUpdate).toHaveBeenCalledWith({
-        where: { stripeSubscriptionId: 'sub_300' },
-        data: {
-          status: 'canceled',
-          currentPeriodEnd: new Date(1700000000 * 1000),
-          cancelAtPeriodEnd: true,
-        },
-      });
+      expect(mockSubscriptionUpsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { stripeSubscriptionId: 'sub_300' },
+          update: {
+            status: 'canceled',
+            currentPeriodEnd: new Date(1700000000 * 1000),
+            cancelAtPeriodEnd: true,
+          },
+        })
+      );
     });
 
     it('updates to trialing status when subscription is trialing', async () => {
@@ -333,9 +340,9 @@ describe('POST /api/stripe/webhook', () => {
       const res = await POST(createWebhookRequest());
 
       expect(res.status).toBe(200);
-      expect(mockSubscriptionUpdate).toHaveBeenCalledWith(
+      expect(mockSubscriptionUpsert).toHaveBeenCalledWith(
         expect.objectContaining({
-          data: expect.objectContaining({ status: 'trialing' }),
+          update: expect.objectContaining({ status: 'trialing' }),
         })
       );
     });
@@ -356,7 +363,7 @@ describe('POST /api/stripe/webhook', () => {
       const res = await POST(createWebhookRequest());
 
       expect(res.status).toBe(200);
-      expect(mockSubscriptionUpdate).toHaveBeenCalledWith({
+      expect(mockSubscriptionUpdateMany).toHaveBeenCalledWith({
         where: { stripeSubscriptionId: 'sub_400' },
         data: { status: 'canceled' },
       });
@@ -378,7 +385,7 @@ describe('POST /api/stripe/webhook', () => {
       const res = await POST(createWebhookRequest());
 
       expect(res.status).toBe(200);
-      expect(mockSubscriptionUpdate).toHaveBeenCalledWith({
+      expect(mockSubscriptionUpdateMany).toHaveBeenCalledWith({
         where: { stripeSubscriptionId: 'sub_500' },
         data: { status: 'past_due' },
       });
@@ -394,7 +401,7 @@ describe('POST /api/stripe/webhook', () => {
       const res = await POST(createWebhookRequest());
 
       expect(res.status).toBe(200);
-      expect(mockSubscriptionUpdate).toHaveBeenCalledWith({
+      expect(mockSubscriptionUpdateMany).toHaveBeenCalledWith({
         where: { stripeSubscriptionId: 'sub_600' },
         data: { status: 'past_due' },
       });
@@ -410,7 +417,7 @@ describe('POST /api/stripe/webhook', () => {
       const res = await POST(createWebhookRequest());
 
       expect(res.status).toBe(200);
-      expect(mockSubscriptionUpdate).not.toHaveBeenCalled();
+      expect(mockSubscriptionUpdateMany).not.toHaveBeenCalled();
     });
   });
 

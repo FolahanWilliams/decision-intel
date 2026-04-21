@@ -181,10 +181,30 @@ export function getPriceId(plan: PlanType, cycle: BillingCycle = 'monthly'): str
 
 /**
  * Check whether a plan has a specific feature enabled.
+ * Returns true for both `true` and `'limited'` values — use
+ * `getFeatureAccess()` when you need to distinguish between full
+ * and limited access (e.g. to cap simulation runs on the free tier).
  */
 export function hasFeature(plan: PlanType, feature: keyof PlanFeatures): boolean {
   const value = PLANS[plan].features[feature];
-  return value === true;
+  return value === true || value === 'limited';
+}
+
+/**
+ * Return the raw feature-access value for a plan.
+ *   - `true`      → fully enabled
+ *   - `'limited'` → enabled with caps (e.g. free-tier boardroom simulation)
+ *   - `false`     → disabled
+ *
+ * Use this when the caller needs to apply different limits for
+ * limited vs full access. For simple "is it on?" checks, prefer
+ * `hasFeature()`.
+ */
+export function getFeatureAccess(
+  plan: PlanType,
+  feature: keyof PlanFeatures
+): boolean | 'limited' {
+  return PLANS[plan].features[feature];
 }
 
 export const DEAL_AUDIT_TIERS = [

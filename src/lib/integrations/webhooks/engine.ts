@@ -9,6 +9,7 @@ import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 import { createLogger } from '@/lib/utils/logger';
 import { createHmac } from 'crypto';
+import { decryptWebhookSecret } from '@/lib/utils/encryption';
 import type { WebhookEvent } from './events';
 
 const log = createLogger('WebhookEngine');
@@ -93,7 +94,8 @@ async function deliverWithRetry(
     // Non-critical — deliver anyway if count check fails
   }
 
-  const signature = createHmac('sha256', secret).update(payload).digest('hex');
+  const plaintextSecret = decryptWebhookSecret(secret);
+  const signature = createHmac('sha256', plaintextSecret).update(payload).digest('hex');
 
   for (let attempt = 1; attempt <= RETRY_DELAYS.length + 1; attempt++) {
     const start = performance.now();

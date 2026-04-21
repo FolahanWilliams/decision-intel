@@ -277,3 +277,56 @@ export function getResolvableKeyVersions(domain: KeyDomain): number[] {
   }
   return out;
 }
+
+// ── Webhook secrets ─────────────────────────────────────────────
+
+/** True iff an encryption key is configured for the Slack domain
+ *  (reused for webhook secrets). */
+export function isWebhookEncryptionEnabled(): boolean {
+  return resolveKeyHex('slack', LEGACY_VERSION) !== null;
+}
+
+/** Encrypt a webhook signing secret for storage. Returns a JSON
+ *  string containing the encrypted components (ciphertext, IV, tag,
+ *  keyVersion). The JSON format is stored in the existing `secret`
+ *  column to avoid a schema migration.
+ *
+ *  If no encryption key is configured, returns the plaintext secret
+ *  unchanged so the platform is still functional. */
+export function encryptWebhookSecret(secret: string): string {
+  if (!isWebhookEncryptionEnabled()) return secret;
+  const encrypted = encryptFor('slack', secret);
+  return JSON.stringify({
+    _encrypted: true,
+    ciphertext: encrypted.ciphertext,
+    iv: encrypted.iv,
+    tag: encrypted.tag,
+    keyVersion: encrypted.keyVersion,
+  });
+}
+
+/** Decrypt a webhook signing secret from storage. Transparently
+ *  handles both encrypted (JSON-encoded) and legacy plaintext
+ *  secrets (start with `whsec_`). */
+export function decryptWebhookSecret(stored: string): string {
+  // Legacy plaintext secrets start with 'whsec_'
+  if (stored.startsWith('whsec_')) return stored;
+
+  // Attempt to parse as encrypted JSON
+  try {
+    const parsed = JSON.parse(stored);
+    if (parsed?._encrypted === true) {
+      return decryptFor('slack', {
+        ciphertext: parsed.ciphertext,
+        iv: parsed.iv,
+        tag: parsed.tag,
+        keyVersion: parsed.keyVersion,
+      });
+    }
+  } catch {
+    // Not valid JSON — treat as plaintext
+  }
+
+  // Fallback: return as-is (unrecognised format)
+  return stored;
+}

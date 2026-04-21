@@ -11,6 +11,7 @@ import { prisma } from '@/lib/prisma';
 import { randomBytes } from 'crypto';
 import { WEBHOOK_EVENTS } from '@/lib/integrations/webhooks/events';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
+import { encryptWebhookSecret } from '@/lib/utils/encryption';
 
 /**
  * Block webhook URLs pointing to private/internal networks (SSRF prevention).
@@ -123,8 +124,9 @@ export async function POST(request: Request) {
     );
   }
 
-  // Generate signing secret
+  // Generate signing secret and encrypt for storage
   const secret = `whsec_${randomBytes(32).toString('hex')}`;
+  const encryptedSecret = encryptWebhookSecret(secret);
 
   const subscription = await prisma.webhookSubscription.create({
     data: {
@@ -132,7 +134,7 @@ export async function POST(request: Request) {
       userId: auth.userId!,
       url,
       events,
-      secret,
+      secret: encryptedSecret,
     },
   });
 

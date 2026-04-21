@@ -152,36 +152,65 @@ export async function POST(request: NextRequest) {
             ? new Date(sub.current_period_end * 1000)
             : null;
 
-        await prisma.subscription
-          .update({
-            where: { stripeSubscriptionId: subscriptionId },
-            data: {
-              status:
-                sub.status === 'trialing'
-                  ? 'trialing'
-                  : sub.cancel_at_period_end
-                    ? 'canceled'
-                    : 'active',
-              currentPeriodEnd: updatedPeriodEnd,
-              cancelAtPeriodEnd: sub.cancel_at_period_end,
-            },
-          })
-          .catch(err => {
-            log.warn(`Subscription update failed for ${subscriptionId}:`, err);
-          });
+        const updatedStatus =
+          sub.status === 'trialing'
+            ? 'trialing'
+            : sub.cancel_at_period_end
+              ? 'canceled'
+              : 'active';
+
+        // Use upsert to handle out-of-order delivery: if
+        // checkout.session.completed hasn't arrived yet, the subscription
+        // row won't exist.  Rather than crash, we create it so the state
+        // isn't lost.
+        const customerId =
+          typeof sub.customer === 'string'
+            ? sub.customer
+            : isRecord(sub.customer) && typeof sub.customer.id === 'string'
+              ? sub.customer.id
+              : '';
+        const subMetadata = isRecord(sub.metadata) ? sub.metadata : {};
+        const userId = typeof subMetadata.userId === 'string' ? subMetadata.userId : 'unknown';
+        const plan = typeof subMetadata.plan === 'string' ? subMetadata.plan : 'pro';
+
+        await prisma.subscription.upsert({
+          where: { stripeSubscriptionId: subscriptionId },
+          update: {
+            status: updatedStatus,
+            currentPeriodEnd: updatedPeriodEnd,
+            cancelAtPeriodEnd: sub.cancel_at_period_end,
+          },
+          create: {
+            userId,
+            stripeCustomerId: customerId,
+            stripeSubscriptionId: subscriptionId,
+            plan,
+            status: updatedStatus,
+            currentPeriodEnd: updatedPeriodEnd,
+            cancelAtPeriodEnd: sub.cancel_at_period_end,
+          },
+        });
+
+        log.info(`Subscription updated: ${subscriptionId} → ${updatedStatus}`);
         break;
       }
 
       case 'customer.subscription.deleted': {
         const sub = event.data.object as Stripe.Subscription;
-        await prisma.subscription
-          .update({
-            where: { stripeSubscriptionId: sub.id },
-            data: { status: 'canceled' },
-          })
-          .catch(err => {
-            log.warn(`Subscription deletion update failed:`, err);
-          });
+
+        // Use updateMany instead of update: if the row doesn't exist
+        // (e.g. orphaned subscription), this is a safe no-op rather
+        // than a P2025 crash.  The count tells us whether it matched.
+        const deleteResult = await prisma.subscription.updateMany({
+          where: { stripeSubscriptionId: sub.id },
+          data: { status: 'canceled' },
+        });
+
+        if (deleteResult.count === 0) {
+          log.warn(`Subscription deletion: no matching row for ${sub.id}`);
+        } else {
+          log.info(`Subscription canceled: ${sub.id}`);
+        }
         break;
       }
 
@@ -195,15 +224,16 @@ export async function POST(request: NextRequest) {
               ? rawSub.id
               : undefined;
         if (subId) {
-          await prisma.subscription
-            .update({
-              where: { stripeSubscriptionId: subId },
-              data: { status: 'past_due' },
-            })
-            .catch(err => {
-              log.warn(`Failed to mark subscription as past_due:`, err);
-            });
-          log.info(`Marked subscription ${subId} as past_due after payment failure`);
+          const paymentResult = await prisma.subscription.updateMany({
+            where: { stripeSubscriptionId: subId },
+            data: { status: 'past_due' },
+          });
+
+          if (paymentResult.count === 0) {
+            log.warn(`Payment failure: no matching subscription for ${subId}`);
+          } else {
+            log.info(`Marked subscription ${subId} as past_due after payment failure`);
+          }
         }
         break;
       }

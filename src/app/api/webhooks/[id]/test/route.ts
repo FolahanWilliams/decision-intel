@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authenticateApiRequest } from '@/lib/utils/api-auth';
 import { prisma } from '@/lib/prisma';
 import { createHmac } from 'crypto';
+import { decryptWebhookSecret } from '@/lib/utils/encryption';
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await authenticateApiRequest(request);
@@ -31,7 +32,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     },
   });
 
-  const signature = createHmac('sha256', subscription.secret).update(testPayload).digest('hex');
+  const plaintextSecret = decryptWebhookSecret(subscription.secret);
+  const signature = createHmac('sha256', plaintextSecret).update(testPayload).digest('hex');
 
   const start = performance.now();
   let statusCode: number | null = null;
