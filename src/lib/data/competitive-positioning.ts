@@ -76,7 +76,7 @@ export const CLOVERPOP_COMPARISON: ComparisonRow[] = [
   {
     dimension: 'Output',
     cloverpop: 'Logged "Decision Flow" + AI recommendations',
-    decisionIntel: 'DQI score + Noise Tax + Audit Defense Packet',
+    decisionIntel: 'DQI score + Noise Tax + Decision Provenance Record',
   },
   {
     dimension: 'Moat Type',
@@ -151,7 +151,7 @@ export const MOAT_LAYERS: MoatLayer[] = [
     strength: 'very_high',
     timeline: 'Day 1',
     description:
-      '7 regulatory frameworks (SOX, FCA, EU AI Act, Basel III, GDPR, SEC Reg D, LPOA) with provision-level mapping and audit defense packet generation.',
+      '7 regulatory frameworks (SOX, FCA, EU AI Act, Basel III, GDPR, SEC Reg D, LPOA) with provision-level mapping and Decision Provenance Record generation.',
     files: 'src/lib/compliance/frameworks/',
     why: "Competitors need 7 frameworks' worth of legal review before shipping a single page. Cloverpop, Palantir, and IBM can't catch up here.",
   },
@@ -678,7 +678,7 @@ export const DI_GAPS: DiGap[] = [
     evidence:
       'Every Fortune 500 procurement team vetoes a tool that cannot produce regulator-grade defence documents. The EU AI Act, SOX §404, and GDPR Article 22 each gate different customer categories, and all three are rising, not falling, as AI enters decision workflows.',
     diApproach:
-      'Decision Intel delivers governance as product, not documentation. Every flag cross-links to a specific provision across seven frameworks. The Audit Defense Packet exports as a regulator-grade PDF on Pro tier, so a General Counsel can walk into a regulator meeting with the memo, the flags, and the framework citations in a single document.',
+      'Decision Intel delivers governance as product, not documentation. Every flag cross-links to a specific provision across seven frameworks. The Decision Provenance Record exports as a regulator-grade PDF on Pro tier, so a General Counsel can walk into a regulator meeting with the memo, the flags, and the framework citations in a single document.',
     diCapabilities: [
       {
         label: '7 regulatory framework mappers',
@@ -687,7 +687,7 @@ export const DI_GAPS: DiGap[] = [
         proofFile: 'src/lib/compliance/frameworks/',
       },
       {
-        label: 'Audit Defense Packet',
+        label: 'Decision Provenance Record',
         detail:
           'One-click regulator-grade PDF. Every flag, every framework citation, every provision section, exportable in a single document.',
       },
@@ -706,7 +706,7 @@ export const DI_GAPS: DiGap[] = [
       label: 'Time to produce audit-ready defence',
       value: '5 days → 60 seconds',
       caption:
-        'Audit Defense Packet exports in real time, replacing the weeks of legal review most teams run today.',
+        'Decision Provenance Record exports in real time, replacing the weeks of legal review most teams run today.',
     },
   },
 ];

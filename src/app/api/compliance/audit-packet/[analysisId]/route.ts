@@ -1,13 +1,23 @@
 /**
- * GET /api/compliance/audit-packet/[analysisId] — M8.3
+ * GET /api/compliance/audit-packet/[analysisId]
  *
- * Generates a branded, tamper-evident Audit Defense Packet PDF for a
- * single analysis. Streams the PDF back as a download.
+ * Generates a branded, tamper-evident Decision Provenance Record PDF for
+ * a single analysis (server-side, plan-gated). Streams the PDF back as
+ * a download.
+ *
+ * URL path kept as /audit-packet/ for backwards compatibility — external
+ * integrations and existing deep links shouldn't break on the 2026-04-22
+ * rename from "Audit Defense Packet" → "Decision Provenance Record."
+ *
+ * There is a parallel client-side generator at
+ * /api/documents/[id]/provenance-record which produces the same artifact
+ * class for design partners (richer data, not plan-gated). Follow-up
+ * work will converge the two paths behind one implementation.
  *
  * Auth: user must own the analysis or belong to the same org.
  * Gating: requires Pro tier or higher (matches existing plan-limit pattern).
- * Audit: every export is logged to AuditLog with the packet's SHA-256 hash
- *        so a compliance officer can later prove the packet was generated
+ * Audit: every export is logged to AuditLog with the record's SHA-256 hash
+ *        so a compliance officer can later prove the record was generated
  *        from this specific source data at this specific time.
  */
 
@@ -18,7 +28,7 @@ import { createLogger } from '@/lib/utils/logger';
 import { assessCompliance } from '@/lib/compliance/regulatory-graph';
 import {
   AggregatePdfGenerator,
-  type AuditDefensePacketInput,
+  type ProvenanceRecordInput,
 } from '@/lib/reports/aggregate-pdf-generator';
 import { getUserPlan, getOrgPlan } from '@/lib/utils/plan-limits';
 
@@ -105,7 +115,7 @@ export async function GET(
         {
           error: 'UPGRADE_REQUIRED',
           message:
-            'Audit Defense Packet export requires the Pro plan or higher. Upgrade to unlock regulator-grade compliance reports.',
+            'Decision Provenance Record export requires the Pro plan or higher. Upgrade to unlock regulator-grade compliance reports.',
           requiredPlan: 'pro',
         },
         { status: 402 } // Payment Required
@@ -122,7 +132,7 @@ export async function GET(
 
     // Build the packet
     const generator = new AggregatePdfGenerator();
-    const input: AuditDefensePacketInput = {
+    const input: ProvenanceRecordInput = {
       analysisId,
       documentFilename: analysis.document.filename,
       orgName,
@@ -137,7 +147,7 @@ export async function GET(
       assessments,
     };
 
-    const { doc, filename, hash } = generator.generateAuditDefensePacket(input);
+    const { doc, filename, hash } = generator.generateProvenanceRecord(input);
 
     // Get the raw PDF bytes (arraybuffer) for the HTTP response
     const pdfArrayBuffer = doc.output('arraybuffer') as ArrayBuffer;
@@ -168,7 +178,7 @@ export async function GET(
     }
 
     log.info(
-      `Audit Defense Packet exported: analysis=${analysisId} hash=${hash.slice(0, 12)}… plan=${effectivePlan}`
+      `Decision Provenance Record exported: analysis=${analysisId} hash=${hash.slice(0, 12)}… plan=${effectivePlan}`
     );
 
     // Return the PDF as a streaming download
@@ -184,9 +194,9 @@ export async function GET(
   } catch (err: unknown) {
     const code = (err as { code?: string })?.code;
     if (code === 'P2021' || code === 'P2022') {
-      log.warn('Schema drift during audit packet export:', code);
+      log.warn('Schema drift during provenance record export:', code);
       return NextResponse.json(
-        { error: 'Audit Defense Packet not yet available. Database migration pending.' },
+        { error: 'Decision Provenance Record not yet available. Database migration pending.' },
         { status: 503, headers: { 'Retry-After': '300' } }
       );
     }

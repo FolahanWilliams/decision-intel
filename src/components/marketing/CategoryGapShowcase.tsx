@@ -1704,7 +1704,7 @@ function ClosedLoopFlywheelVizImpl({ reducedMotion }: { reducedMotion: boolean }
 // highlight is numbered and coloured by bias severity. Clicking a flag opens
 // a slide-out card that shows which of the seven regulatory frameworks the
 // flag triggers, with provision-level citations. A CTA pill at the bottom
-// mimes the "Export Audit Defense Packet" action from the product.
+// mimes the "Export Decision Provenance Record" action from the product.
 
 interface FrameworkHit {
   code: string; // e.g. "SOX §404"
@@ -1909,7 +1909,7 @@ function GovernanceMemoVizImpl({ reducedMotion }: { reducedMotion: boolean }) {
           }}
         >
           <FileText size={12} />
-          Export Audit Defense Packet
+          Export Decision Provenance Record
         </button>
       </div>
 

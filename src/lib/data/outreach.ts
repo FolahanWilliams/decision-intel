@@ -450,7 +450,7 @@ export const PATTERNS: Pattern[] = [
     description:
       '3+ people mention lawyers, boards, or regulators asking for "better documentation of decision rationale." SOX / SEC / Delaware fiduciary duty.',
     wedge:
-      'Compliance gap mapping + audit defense packet. Opens procurement doors via regulatory mandate.',
+      'Compliance gap mapping + Decision Provenance Record. Opens procurement doors via regulatory mandate (EU AI Act, SEC, Basel III).',
     threshold: 3,
     color: '#8B5CF6',
   },

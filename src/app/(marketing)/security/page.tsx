@@ -22,7 +22,7 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.c
 export const metadata: Metadata = {
   title: 'Security · Decision Intel',
   description:
-    'Enterprise-grade security posture on a founder budget. AES-256-GCM at rest with keyVersion rotation, TLS 1.2+ in transit, immutable audit log, seven regulatory frameworks mapped flag-by-flag, and an Audit Defense Packet your GC can walk into a regulator meeting with.',
+    'Enterprise-grade security posture on a founder budget. AES-256-GCM at rest with keyVersion rotation, TLS 1.2+ in transit, immutable audit log, seven regulatory frameworks mapped flag-by-flag, and a Decision Provenance Record (EU AI Act Article 14 aligned) your GC can walk into a regulator meeting with.',
   alternates: { canonical: `${siteUrl}/security` },
   openGraph: {
     title: 'Security · Decision Intel',
@@ -147,7 +147,7 @@ const ACCESS_CONTROLS: AccessControl[] = [
   {
     label: 'Admin audit log',
     availability: 'every_plan',
-    body: 'Org admins review every action taken inside their workspace — who viewed which memo, who exported an Audit Defense Packet, who invited a new member — with filters, date range, and CSV export for downstream compliance tooling.',
+    body: 'Org admins review every action taken inside their workspace — who viewed which memo, who exported a Decision Provenance Record, who invited a new member — with filters, date range, and CSV export for downstream compliance tooling.',
   },
   {
     label: 'Per-org data isolation',
@@ -440,6 +440,165 @@ export default function SecurityPage() {
         </div>
       </section>
 
+      {/* Regulatory tailwinds — the wave already in motion */}
+      <section
+        id="tailwinds"
+        style={{
+          padding: '72px 24px',
+          background: C.navy,
+          color: C.white,
+          borderTop: `1px solid ${C.slate200}`,
+          borderBottom: `1px solid ${C.slate200}`,
+        }}
+      >
+        <div style={{ maxWidth: 1180, margin: '0 auto' }}>
+          <div style={{ textAlign: 'left', marginBottom: 28 }}>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: '#86EFAC',
+                marginBottom: 10,
+              }}
+            >
+              Regulatory tailwinds · already in motion
+            </div>
+            <h2
+              style={{
+                fontSize: 'clamp(26px, 3vw, 34px)',
+                fontWeight: 800,
+                color: C.white,
+                letterSpacing: '-0.015em',
+                lineHeight: 1.2,
+                margin: 0,
+                maxWidth: 820,
+              }}
+            >
+              The record your AI-augmented decision-making is already supposed to produce.
+            </h2>
+            <p
+              style={{
+                marginTop: 14,
+                fontSize: 15,
+                color: C.slate300,
+                lineHeight: 1.65,
+                maxWidth: 760,
+              }}
+            >
+              Three regulatory waves are already in force or on the enforcement calendar. Each one
+              asks for exactly the artifact the Decision Provenance Record produces — the reasoning
+              behind a decision, the model lineage that shaped it, and the evidence that it was
+              reviewed, not just generated. We built for this on purpose.
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              gap: 16,
+            }}
+          >
+            {[
+              {
+                code: 'EU AI Act',
+                status: 'In force · high-risk obligations Aug 2026',
+                body: 'Article 13 (transparency), Article 14 (human oversight), Article 15 (accuracy + record-keeping), Annex III (high-risk decision-support). Every DPR section maps onto one of these — by design.',
+              },
+              {
+                code: 'SEC AI Disclosure',
+                status: 'Rulemaking 2024–2026',
+                body: 'Proposed rules on AI use in investment-adviser decisions require documented oversight of the model\u2019s role. The DPR\u2019s model lineage + prompt fingerprint + judge variance are the documentation.',
+              },
+              {
+                code: 'Basel III · Pillar 2 ICAAP',
+                status: 'Live for regulated banks',
+                body: 'Banks must document the internal capital-adequacy process including qualitative decisions. Every flagged bias in the DPR carries a Basel III provision reference on the same page.',
+              },
+              {
+                code: 'UK AI White Paper',
+                status: 'Principles-based, pre-statutory',
+                body: 'Regulator guidance across FCA, ICO, and CMA converges on safety, transparency, fairness, accountability, and contestability. The DPR is the contestable artifact by default.',
+              },
+              {
+                code: 'SOX §404 + SEC Reg D',
+                status: 'Live for public companies + private placements',
+                body: 'Internal-control documentation and forward-looking-statement disclosure both require evidence of process. The DPR is process evidence your auditor can point at instead of a narrative describing it.',
+              },
+              {
+                code: 'GDPR Art. 22',
+                status: 'Live since 2018',
+                body: 'Automated-decision rights require the data subject be told meaningful information about the logic involved. DPR citations provide that in one document without exposing platform IP.',
+              },
+            ].map(t => (
+              <div
+                key={t.code}
+                style={{
+                  background: C.navyLight,
+                  border: `1px solid rgba(255,255,255,0.08)`,
+                  borderRadius: 14,
+                  padding: '18px 20px 20px',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'inline-block',
+                    fontSize: 10,
+                    fontWeight: 800,
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                    color: '#86EFAC',
+                    padding: '3px 8px',
+                    borderRadius: 6,
+                    background: 'rgba(22,163,74,0.12)',
+                    marginBottom: 10,
+                  }}
+                >
+                  {t.status}
+                </div>
+                <div
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 800,
+                    color: C.white,
+                    marginBottom: 8,
+                  }}
+                >
+                  {t.code}
+                </div>
+                <div
+                  style={{
+                    fontSize: 13,
+                    color: C.slate300,
+                    lineHeight: 1.6,
+                  }}
+                >
+                  {t.body}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <p
+            style={{
+              marginTop: 24,
+              fontSize: 12,
+              color: C.slate400,
+              lineHeight: 1.6,
+              fontStyle: 'italic',
+              maxWidth: 880,
+            }}
+          >
+            Positioning note for CSOs evaluating us: the Decision Provenance Record is the record
+            your AI-augmented decision-making is supposed to produce anyway under these frameworks.
+            We ship it on every audit so your procurement conversation starts at &ldquo;here is the
+            control&rdquo; instead of &ldquo;we&rsquo;re working on it.&rdquo;
+          </p>
+        </div>
+      </section>
+
       {/* Key rotation */}
       <section style={{ padding: '72px 24px', background: C.slate50, borderTop: `1px solid ${C.slate200}`, borderBottom: `1px solid ${C.slate200}` }}>
         <div style={{ maxWidth: 1000, margin: '0 auto' }}>
@@ -614,14 +773,14 @@ export default function SecurityPage() {
             <FileCheck2 size={22} color={C.green} strokeWidth={2.25} />
             <div style={{ flex: 1, minWidth: 240 }}>
               <div style={{ fontSize: 14, fontWeight: 800, color: C.slate900, marginBottom: 2 }}>
-                Audit Defense Packet export
+                Decision Provenance Record export
               </div>
               <div style={{ fontSize: 13, color: C.slate600, lineHeight: 1.5 }}>
                 A signed, hashed 4-page artifact your General Counsel hands to the audit committee
-                or regulator of record: input-document hash, prompt fingerprint, model lineage,
-                academic citations across the 30+ bias taxonomy, regulatory mapping across seven
-                frameworks (Basel III, EU AI Act, SEC Reg D, FCA Consumer Duty, SOX, GDPR Article
-                22, LPOA), and full pipeline lineage.
+                or regulator of record — built to the shape EU AI Act Article 14, SEC AI
+                disclosure, and Basel III ICAAP already require. Includes input-document hash,
+                prompt fingerprint, model lineage, academic citations across the 30+ bias
+                taxonomy, regulatory mapping across seven frameworks, and full pipeline lineage.
               </div>
             </div>
             <Link

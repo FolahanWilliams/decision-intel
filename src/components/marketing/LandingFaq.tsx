@@ -154,7 +154,7 @@ const ITEMS: FaqItem[] = [
       <>
         Seven currently: GDPR, SOC 2 Type II, HIPAA, CCPA, SOX (financial materiality), EU AI Act
         (transparency + risk tiers), and the NIST AI Risk Management Framework. Every flagged bias
-        cross-links to the relevant control section, and the Audit Defense Packet exports a
+        cross-links to the relevant control section, and the Decision Provenance Record exports a
         regulator-grade PDF citing every framework the decision touches. We add frameworks on
         paying-customer request — if you need a specific one, tell us.
       </>

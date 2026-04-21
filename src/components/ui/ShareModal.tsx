@@ -27,10 +27,11 @@ interface ShareModalProps {
   analysisId?: string;
   onExportPdf: () => Promise<void>;
   onExportBoardReport?: () => Promise<void>;
-  /** Audit Defense Packet — signed + hashed 4-page artifact for the
-   *  General Counsel / audit committee. Free for design partners;
-   *  scheduled as a paid Strategy+ upsell after Month 12. */
-  onExportDefensePacket?: () => Promise<void>;
+  /** Decision Provenance Record — signed + hashed 4-page artifact for
+   *  the General Counsel / audit committee, mapped onto EU AI Act Art 14
+   *  record-keeping, SEC AI disclosure, and Basel III ICAAP. Bundled on
+   *  every audit for the design-partner cohort. */
+  onExportProvenanceRecord?: () => Promise<void>;
   onExportCsv: () => void;
   onExportMarkdown: () => void;
   onExportJson: () => void;
@@ -46,7 +47,7 @@ export function ShareModal({
   analysisId,
   onExportPdf,
   onExportBoardReport,
-  onExportDefensePacket,
+  onExportProvenanceRecord,
   onExportCsv,
   onExportMarkdown,
   onExportJson,
@@ -54,7 +55,7 @@ export function ShareModal({
   const [activeTab, setActiveTab] = useState<ActiveTab>('export');
   const [exportingPdf, setExportingPdf] = useState(false);
   const [exportingBoard, setExportingBoard] = useState(false);
-  const [exportingPacket, setExportingPacket] = useState(false);
+  const [exportingRecord, setExportingRecord] = useState(false);
   const [copied, setCopied] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [creatingLink, setCreatingLink] = useState(false);
@@ -89,17 +90,17 @@ export function ShareModal({
     }
   }, [onExportBoardReport, showToast]);
 
-  const handleDefensePacketExport = useCallback(async () => {
-    if (!onExportDefensePacket) return;
-    setExportingPacket(true);
+  const handleProvenanceRecordExport = useCallback(async () => {
+    if (!onExportProvenanceRecord) return;
+    setExportingRecord(true);
     try {
-      await onExportDefensePacket();
+      await onExportProvenanceRecord();
     } catch {
       // Parent handler already showToast'd with the specific error.
     } finally {
-      setExportingPacket(false);
+      setExportingRecord(false);
     }
-  }, [onExportDefensePacket]);
+  }, [onExportProvenanceRecord]);
 
   const handleCopySummary = useCallback(async () => {
     try {
@@ -258,11 +259,11 @@ export function ShareModal({
                   </span>
                 </Button>
               )}
-              {onExportDefensePacket && (
+              {onExportProvenanceRecord && (
                 <Button
                   variant="outline"
-                  onClick={handleDefensePacketExport}
-                  disabled={exportingPacket}
+                  onClick={handleProvenanceRecordExport}
+                  disabled={exportingRecord}
                   className="h-auto flex-col gap-2 p-4"
                   style={{
                     gridColumn: '1 / -1',
@@ -270,7 +271,7 @@ export function ShareModal({
                     background: 'rgba(22, 163, 74, 0.04)',
                   }}
                 >
-                  {exportingPacket ? (
+                  {exportingRecord ? (
                     <Loader2
                       size={24}
                       className="animate-spin"
@@ -279,10 +280,12 @@ export function ShareModal({
                   ) : (
                     <ShieldCheck size={24} style={{ color: 'var(--accent-primary)' }} />
                   )}
-                  <span style={{ fontSize: '13px', fontWeight: 600 }}>Audit Defense Packet</span>
+                  <span style={{ fontSize: '13px', fontWeight: 600 }}>
+                    Decision Provenance Record
+                  </span>
                   <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
-                    Signed + hashed artifact for your GC: fingerprints, model lineage, citations,
-                    regulatory mapping
+                    Signed + hashed record for your GC — fingerprints, model lineage, citations,
+                    regulatory mapping (EU AI Act Art 14, SEC, Basel III)
                   </span>
                 </Button>
               )}

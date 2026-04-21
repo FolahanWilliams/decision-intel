@@ -477,30 +477,33 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
     }
   };
 
-  // Audit Defense Packet — design-partner perk. Fetches the packet JSON
-  // from /api/documents/[id]/defense-packet (POST persists + returns data),
-  // then hands the data to AuditDefensePacketGenerator client-side. The
-  // generator is client-side jsPDF so the PDF download is a browser action.
-  const handleDefensePacketExport = async () => {
+  // Decision Provenance Record — design-partner perk. Fetches the record
+  // JSON from /api/documents/[id]/provenance-record (POST persists + returns
+  // data), then hands the data to DecisionProvenanceRecordGenerator
+  // client-side. The generator is client-side jsPDF so the PDF download is
+  // a browser action.
+  //
+  // Renamed from handleDefensePacketExport on 2026-04-22.
+  const handleProvenanceRecordExport = async () => {
     if (!document) return;
     try {
-      const res = await fetch(`/api/documents/${document.id}/defense-packet`, {
+      const res = await fetch(`/api/documents/${document.id}/provenance-record`, {
         method: 'POST',
       });
       if (!res.ok) {
-        const body = (await res.json().catch(() => ({ error: 'Failed to generate packet.' }))) as {
+        const body = (await res.json().catch(() => ({ error: 'Failed to generate record.' }))) as {
           error?: string;
         };
-        throw new Error(body.error || 'Failed to generate packet.');
+        throw new Error(body.error || 'Failed to generate record.');
       }
       const { data } = (await res.json()) as {
-        data: import('@/lib/reports/defense-packet-data').DefensePacketData;
+        data: import('@/lib/reports/provenance-record-data').ProvenanceRecordData;
       };
-      const { AuditDefensePacketGenerator } = await import(
-        '@/lib/reports/audit-defense-packet-generator'
+      const { DecisionProvenanceRecordGenerator } = await import(
+        '@/lib/reports/decision-provenance-record-generator'
       );
-      const generator = new AuditDefensePacketGenerator();
-      // DefensePacketData serialized through JSON loses the Date type on
+      const generator = new DecisionProvenanceRecordGenerator();
+      // ProvenanceRecordData serialized through JSON loses the Date type on
       // generatedAt — rehydrate before handing to jsPDF.
       generator.generateAndDownload({
         ...data,
@@ -510,17 +513,17 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'EXPORT_DEFENSE_PACKET',
+          action: 'EXPORT_PROVENANCE_RECORD',
           resource: 'Document',
           resourceId: document.id,
           details: { filename: document.filename },
         }),
-      }).catch(err => log.warn('audit EXPORT_DEFENSE_PACKET failed:', err));
-      showToast('Audit Defense Packet generated', 'success');
+      }).catch(err => log.warn('audit EXPORT_PROVENANCE_RECORD failed:', err));
+      showToast('Decision Provenance Record generated', 'success');
     } catch (error) {
-      log.error('Failed to generate defense packet:', error);
+      log.error('Failed to generate provenance record:', error);
       showToast(
-        error instanceof Error ? error.message : 'Failed to generate defense packet',
+        error instanceof Error ? error.message : 'Failed to generate provenance record',
         'error'
       );
       throw error;
@@ -1058,10 +1061,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                   Share & Export
                 </button>
               )}
-              {/* M8 — Audit Defense Packet: Pro-gated regulator-grade PDF
-                  export. Opens the export endpoint directly; the server
-                  returns a 402 if the user is on the free tier, which we
-                  surface as a friendly upgrade prompt. */}
+              {/* Decision Provenance Record — Pro-gated, server-side branded
+                  PDF export. URL path is kept as /api/compliance/audit-packet
+                  for backwards compatibility with the 2026-04-22 rename;
+                  the user-visible label and filename both say "Decision
+                  Provenance Record." */}
               {analysis && (
                 <button
                   onClick={async () => {
@@ -1069,12 +1073,12 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                       const res = await fetch(`/api/compliance/audit-packet/${analysis.id}`);
                       if (res.status === 402) {
                         alert(
-                          'Audit Defense Packet export requires the Pro plan or higher. Upgrade to unlock regulator-grade compliance reports.'
+                          'Decision Provenance Record export requires the Pro plan or higher. Upgrade to unlock regulator-grade compliance reports.'
                         );
                         return;
                       }
                       if (!res.ok) {
-                        alert('Failed to generate Audit Defense Packet. Please try again.');
+                        alert('Failed to generate Decision Provenance Record. Please try again.');
                         return;
                       }
                       const blob = await res.blob();
@@ -1083,21 +1087,21 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                       a.href = url;
                       const contentDisposition = res.headers.get('content-disposition') || '';
                       const match = contentDisposition.match(/filename="([^"]+)"/);
-                      a.download = match?.[1] || `audit-defense-${analysis.id}.pdf`;
+                      a.download = match?.[1] || `decision-provenance-record-${analysis.id}.pdf`;
                       window.document.body.appendChild(a);
                       a.click();
                       window.document.body.removeChild(a);
                       URL.revokeObjectURL(url);
                     } catch {
-                      alert('Failed to download Audit Defense Packet.');
+                      alert('Failed to download Decision Provenance Record.');
                     }
                   }}
                   className="btn btn-secondary btn-sm flex items-center gap-sm"
-                  aria-label="Export Audit Defense Packet"
-                  title="Export a regulator-grade PDF citing every framework section triggered by this decision"
+                  aria-label="Export Decision Provenance Record"
+                  title="Export a regulator-grade PDF citing every framework section triggered by this decision (EU AI Act Art 14, SEC, Basel III)"
                 >
                   <ShieldCheck size={14} />
-                  Audit Defense Packet
+                  Decision Provenance Record
                 </button>
               )}
             </div>
@@ -2548,7 +2552,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           }}
           onExportPdf={handleExport}
           onExportBoardReport={handleBoardReportExport}
-          onExportDefensePacket={handleDefensePacketExport}
+          onExportProvenanceRecord={handleProvenanceRecordExport}
           onExportCsv={handleCsvExport}
           onExportMarkdown={handleMarkdownExport}
           onExportJson={handleJsonExport}

@@ -386,14 +386,14 @@ export class AggregatePdfGenerator {
   // not the PDF bytes themselves — this lets a verifier reconstruct the
   // hash from the same inputs without the original PDF.
 
-  public generateAuditDefensePacket(input: AuditDefensePacketInput): {
+  public generateProvenanceRecord(input: ProvenanceRecordInput): {
     doc: jsPDF;
     filename: string;
     hash: string;
   } {
-    const hash = this.computeDefensePacketHash(input);
+    const hash = this.computeProvenanceRecordHash(input);
 
-    this.addAuditDefenseCover(input, hash);
+    this.addProvenanceRecordCover(input, hash);
 
     // Per-framework pages — only render frameworks that actually have
     // triggered provisions. Empty assessments would just be noise.
@@ -404,7 +404,7 @@ export class AggregatePdfGenerator {
 
     // Executive summary of bias findings that drove the assessment
     if (input.biasFindings.length > 0) {
-      this.addAuditDefenseBiasSection(input);
+      this.addProvenanceRecordBiasSection(input);
     }
 
     // Research foundations — reuses M2.3 for every bias type cited
@@ -416,7 +416,7 @@ export class AggregatePdfGenerator {
     this.addFooter();
 
     const safeId = input.analysisId.replace(/[^a-zA-Z0-9_-]/g, '');
-    const filename = `audit-defense-${safeId}-${new Date().toISOString().split('T')[0]}.pdf`;
+    const filename = `decision-provenance-record-${safeId}-${new Date().toISOString().split('T')[0]}.pdf`;
     return { doc: this.doc, filename, hash };
   }
 
@@ -433,7 +433,7 @@ export class AggregatePdfGenerator {
    * hash represents — any verifier can detect the mismatch by re-running
    * the generator.
    */
-  private computeDefensePacketHash(input: AuditDefensePacketInput): string {
+  private computeProvenanceRecordHash(input: ProvenanceRecordInput): string {
     const canonical = JSON.stringify(
       {
         analysisId: input.analysisId,
@@ -458,7 +458,7 @@ export class AggregatePdfGenerator {
     return createHash('sha256').update(canonical).digest('hex');
   }
 
-  private addAuditDefenseCover(input: AuditDefensePacketInput, hash: string) {
+  private addProvenanceRecordCover(input: ProvenanceRecordInput, hash: string) {
     // Full-page black hero — matches the brand's existing header treatment
     this.doc.setFillColor(5, 5, 5);
     this.doc.rect(0, 0, 210, 110, 'F');
@@ -593,7 +593,7 @@ export class AggregatePdfGenerator {
 
   private addComplianceFrameworkSection(
     assessment: RegulatoryAssessment,
-    input: AuditDefensePacketInput
+    input: ProvenanceRecordInput
   ) {
     this.doc.addPage();
 
@@ -750,7 +750,7 @@ export class AggregatePdfGenerator {
    * reader can see the full picture: "which biases triggered these
    * provisions, and which section of the document showed them."
    */
-  private addAuditDefenseBiasSection(input: AuditDefensePacketInput) {
+  private addProvenanceRecordBiasSection(input: ProvenanceRecordInput) {
     this.doc.addPage();
     this.addPageHeader('Bias Findings Summary');
 
@@ -809,9 +809,9 @@ export class AggregatePdfGenerator {
   }
 }
 
-// ─── Audit Defense Packet Input Type (M8) ────────────────────────────────
+// ─── Decision Provenance Record Input Type (was "Audit Defense Packet" pre-2026-04-22) ────
 
-export interface AuditDefensePacketInput {
+export interface ProvenanceRecordInput {
   analysisId: string;
   documentFilename: string;
   orgName: string | null;

@@ -636,7 +636,7 @@ export function PricingPageClient() {
             { label: 'SOC 2 ready', sub: 'AES-256-GCM + TLS 1.3' },
             { label: 'Signed DPA', sub: 'on any paid tier' },
             { label: 'No training on your data', sub: 'ever, by contract' },
-            { label: 'Audit Defense Packet', sub: 'signed + hashed on every audit' },
+            { label: 'Decision Provenance Record', sub: 'signed + hashed on every audit' },
           ].map(item => (
             <div key={item.label} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
               <span
@@ -711,7 +711,7 @@ export function PricingPageClient() {
             </div>
             <div style={{ fontSize: 12.5, color: C.slate500, marginTop: 3, lineHeight: 1.5 }}>
               Fortune 500 corporate strategy teams shaping the Recognition-Rigor Framework.
-              Audit Defense Packets bundled on every audit. Direct Slack line to the founder.
+              Decision Provenance Record bundled on every audit. Direct Slack line to the founder.
             </div>
           </div>
           <Link

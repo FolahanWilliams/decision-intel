@@ -19,7 +19,7 @@ Decision Intel and Customer are each a "**Party**" and together the "**Parties**
 
 ### 2.1 The Platform
 
-"**Platform**" means the Decision Intel SaaS product as described at https://www.decision-intel.com, including the strategic-memo audit pipeline, Decision Knowledge Graph, Recognition-Rigor Framework (R²F) outputs, Audit Defense Packet generator, and all associated integrations the Customer elects to use.
+"**Platform**" means the Decision Intel SaaS product as described at https://www.decision-intel.com, including the strategic-memo audit pipeline, Decision Knowledge Graph, Recognition-Rigor Framework (R²F) outputs, Decision Provenance Record generator, and all associated integrations the Customer elects to use.
 
 ### 2.2 The Program
 
@@ -30,7 +30,7 @@ Customer is accepted as a Design Partner in a cohort of no more than five (5) Fo
 During the Design Partner Term, Decision Intel will:
 
 1. Provide Customer with seats on the **Strategy tier** of the Platform at a locked rate of $1,999 per month (see §5).
-2. Bundle the **Audit Defense Packet** on every Customer audit at no additional cost during the Design Partner Term.
+2. Bundle the **Decision Provenance Record** on every Customer audit at no additional cost during the Design Partner Term.
 3. Tune the 20×20 toxic-combination weight matrix to Customer's industry using Customer-supplied historical memo data (see §6).
 4. Provision a direct Slack channel between Customer's designated point-of-contact and the Decision Intel founder.
 5. Host a 30-minute weekly product-feedback call, rescheduled (not cancelled) as Customer's calendar requires.
@@ -72,7 +72,7 @@ The Parties will execute a Data Processing Addendum ("**DPA**") in the form atta
 
 ### 4.4 Output Data
 
-Analysis outputs (DQI scores, bias detections, Audit Defense Packets, Decision Knowledge Graph derivatives) are Customer's property; Decision Intel retains an aggregated, de-identified statistical derivative (the "**Bias Genome Data**") for the sole purpose of improving Platform calibration. Bias Genome Data never contains raw Customer content, raw memos, or identifiable decision records.
+Analysis outputs (DQI scores, bias detections, Decision Provenance Records, Decision Knowledge Graph derivatives) are Customer's property; Decision Intel retains an aggregated, de-identified statistical derivative (the "**Bias Genome Data**") for the sole purpose of improving Platform calibration. Bias Genome Data never contains raw Customer content, raw memos, or identifiable decision records.
 
 ## 5. Fees and Payment
 
@@ -122,7 +122,7 @@ Either Party may terminate this Agreement on 30 days' written notice if the othe
 
 ### 8.3 Data Export on Exit
 
-On termination for any reason, Decision Intel will export all Customer Data and audit outputs (including all Audit Defense Packets and the Customer's Decision Knowledge Graph) to Customer within thirty (30) days and delete the source copies within sixty (60) days (subject to legal-hold obligations). Export format: structured JSON + PDF artefacts for packets.
+On termination for any reason, Decision Intel will export all Customer Data and audit outputs (including all Decision Provenance Records and the Customer's Decision Knowledge Graph) to Customer within thirty (30) days and delete the source copies within sixty (60) days (subject to legal-hold obligations). Export format: structured JSON + PDF artefacts for packets.
 
 ### 8.4 Commitment Fee Refund
 

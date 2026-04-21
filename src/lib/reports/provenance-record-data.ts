@@ -1,16 +1,22 @@
 /**
- * Audit Defense Packet — data assembler.
+ * Decision Provenance Record — data assembler.
  *
- * Builds the signed, hashed metadata bundle that the Audit Defense Packet
- * PDF generator consumes. Also the shape persisted to the
- * AuditDefensePacket table (see prisma/schema.prisma).
+ * Builds the signed, hashed metadata bundle that the Decision Provenance
+ * Record PDF generator consumes. Also the shape persisted to the
+ * DecisionProvenanceRecord table (see prisma/schema.prisma).
+ *
+ * The name was chosen to map cleanly onto regulatory tailwinds already in
+ * motion — EU AI Act Article 14 (record-keeping for high-risk AI systems),
+ * SEC AI disclosure language, Basel III ICAAP documentation. "Provenance"
+ * is a GC-native word. "Defense" was reactive; provenance is the record
+ * AI-augmented decision-making is supposed to produce anyway.
  *
  * IP-PROTECTION RULES — do not break:
  *   1. Never serialize prompt content — only the SHA-256 fingerprint.
  *   2. Never serialize the 20×20 toxic-combination weight matrix.
  *   3. Never serialize per-org causal edges or learned bias genome values.
  *   4. Pipeline lineage stores node IDs + order only; per-node I/O
- *      hashing is deferred to packet schema v2 (requires instrumentation
+ *      hashing is deferred to record schema v2 (requires instrumentation
  *      changes in src/lib/agents/nodes.ts that land in a later PR).
  *
  * Honesty discipline: if a field can't be populated accurately for a
@@ -28,9 +34,9 @@ import { getCrossFrameworkRisk } from '@/lib/compliance/bias-regulation-map';
 import { PIPELINE_NODES } from '@/lib/data/pipeline-nodes';
 import { createLogger } from '@/lib/utils/logger';
 
-const log = createLogger('DefensePacketData');
+const log = createLogger('ProvenanceRecordData');
 
-export interface DefensePacketData {
+export interface ProvenanceRecordData {
   analysisId: string;
   documentId: string;
   userId: string;
@@ -100,7 +106,7 @@ export interface PipelineLineageEntry {
 
 // ─── Model-lineage constant ──────────────────────────────────────────
 // Reflects the cost-tier routing documented in CLAUDE.md (Apr 2026).
-// Bump the note when routing changes so the packet declares the
+// Bump the note when routing changes so the record declares the
 // change set the audit ran under.
 const CURRENT_MODEL_LINEAGE: ModelLineage = {
   nodes: {
@@ -126,7 +132,7 @@ const CURRENT_MODEL_LINEAGE: ModelLineage = {
 // If an Analysis has no linked PromptVersion (pre-versioning rows, or
 // a failure during versioning), we compute the SHA-256 of the current
 // prompts.ts file as a best-effort fingerprint. Honest disclosure: the
-// packet notes when this fallback was used.
+// record notes when this fallback was used.
 let cachedPromptFileHash: { hash: string; computedAt: number } | null = null;
 const PROMPT_FILE_PATH = join(process.cwd(), 'src', 'lib', 'agents', 'prompts.ts');
 
@@ -148,9 +154,9 @@ function getPromptFileFingerprint(): string {
 
 // ─── Main assembler ──────────────────────────────────────────────────
 
-export async function assembleDefensePacketData(
+export async function assembleProvenanceRecordData(
   analysisId: string
-): Promise<DefensePacketData> {
+): Promise<ProvenanceRecordData> {
   const analysis = await prisma.analysis.findUnique({
     where: { id: analysisId },
     include: {
@@ -173,7 +179,7 @@ export async function assembleDefensePacketData(
   });
 
   if (!analysis) {
-    throw new Error(`Analysis ${analysisId} not found — cannot assemble defense packet.`);
+    throw new Error(`Analysis ${analysisId} not found — cannot assemble provenance record.`);
   }
 
   const biasTypes = Array.from(new Set((analysis.biases ?? []).map(b => b.biasType)));
@@ -212,7 +218,7 @@ export async function assembleDefensePacketData(
     };
   });
 
-  // Pipeline lineage: node IDs + order (hashes-per-node are packet v2).
+  // Pipeline lineage: node IDs + order (hashes-per-node are record v2).
   const pipelineLineage: PipelineLineageEntry[] = PIPELINE_NODES.map((node, i) => ({
     order: i + 1,
     nodeId: node.id,
@@ -234,7 +240,7 @@ export async function assembleDefensePacketData(
     distribution: noiseBenchmarks ? { benchmarks: noiseBenchmarks } : undefined,
     metaVerdict: analysis.metaVerdict ?? null,
     note:
-      'Summary view of judge variance. Per-judge granular outputs are stored in the internal audit log and available on request; they are deliberately excluded from the client-facing packet to protect prompt internals.',
+      'Summary view of judge variance. Per-judge granular outputs are stored in the internal audit log and available on request under the DPA; they are deliberately excluded from the client-facing record to protect prompt internals.',
   };
 
   return {

@@ -44,6 +44,34 @@ Decision Intel is a decision intelligence platform for corporate strategy teams.
 
 **Tone:** Calm CSO 1:1 voice with manager-level pain included. Never critique the buyer's judgment. Frame as additive rigor, not a report card. Lead with gain, not deficit. Use em dashes sparingly (one or two for emphasis); prefer commas and sentence breaks.
 
+## Regulatory Tailwinds (locked 2026-04-22)
+
+**The positioning claim:** Decision Intel is built for the regulatory wave already in motion. The Decision Provenance Record is "the record your AI-augmented decision-making is already supposed to produce" — proactive, not reactive.
+
+**Named tailwinds to reference (by date + status, in every investor conversation):**
+
+- **EU AI Act** — in force since Aug 2024. Prohibited practices enforceable Feb 2, 2025. General-purpose AI obligations Aug 2, 2025. High-risk decision-support systems Aug 2, 2026. Articles 13 (transparency), 14 (human oversight), 15 (accuracy + record-keeping), Annex III (high-risk use cases). **This is the anchor tailwind — the DPR maps onto Art 14 record-keeping by design.**
+- **SEC AI Disclosure** — proposed rulemaking 2024, evolving through 2026 for AI use in investment-adviser decisions. DPR's model lineage + prompt fingerprint + judge variance are the documentation.
+- **Basel III · Pillar 2 ICAAP** — live for regulated banks. Requires documented internal-capital-adequacy process including qualitative decisions. DPR attaches a Basel III provision to every flagged bias.
+- **UK AI White Paper** — pro-innovation, principles-based (Mar 2023). Regulator guidance across FCA, ICO, and CMA converges on transparency, fairness, accountability, contestability. The DPR is the contestable artifact by default.
+- **SOX §404** — live for public companies. Internal-controls documentation.
+- **SEC Reg D** — live for private placements. Forward-looking-statement disclosure rigor.
+- **GDPR Art. 22** — live since 2018. Automated-decision rights require meaningful information about the logic involved; DPR citations provide that without exposing platform IP.
+- **Colorado SB24-205** (AI anti-discrimination, Feb 2026 enforceable) and **California SB942** (AI transparency disclosures) — secondary US tailwinds; reference when selling into CO/CA-based public companies.
+
+**The framing rule:** when writing about regulation, lead with what's already in force or calendared, not with what might pass someday. Enterprise procurement believes calendars and skeptical of "the FTC is thinking about…" framing. Every tailwind we reference has either a statute, a regulator guidance, or an enforcement date. If it doesn't, don't cite it.
+
+**Where this lives on marketing surfaces:**
+- `/security` — dedicated "Regulatory tailwinds · already in motion" section with 6 tailwinds cards, each with status + date + how the DPR covers it.
+- `/design-partner` — compact "Why now" strip above the fold.
+- `/pricing` — trust band includes "Decision Provenance Record: signed + hashed on every audit."
+- `/how-it-works` — pipeline-node academic-anchor column already cites regulatory provisions; keep it aligned.
+- Pitch deck — slide 3 (Why Now) pairs the three anchor tailwinds (EU AI Act Aug 2026, SEC 2024-2026, Basel III live) with the DPR as the answer.
+
+**Where this DOES NOT live:**
+- The landing page — deliberately kept clean. Regulation is a secondary beat for CSOs; they arrive via the R²F story first, then discover tailwinds on `/security` once procurement surfaces.
+- Demo / free-tier surfaces — tailwinds conversation belongs in the procurement-stage conversation, not the discovery-stage one.
+
 ## Marketing Voice — Enterprise Discipline (locked 2026-04-19)
 
 **The single test:** every word on a marketing surface must be something a Fortune 500 CSO, GC, or CFO could say aloud in a procurement meeting without flinching. If it reads like a startup talking to itself, cut it.
@@ -62,7 +90,7 @@ Decision Intel is a decision intelligence platform for corporate strategy teams.
 **Allowed and encouraged:**
 
 - Capability-led leads: "Causal reasoning, not correlation dressed up as insight" — name the capability, not the problem
-- Concrete artefacts: "strategic memo", "board deck", "audit committee", "steering committee", "audit defense packet", "Decision Knowledge Graph", "Decision Quality Index"
+- Concrete artefacts: "strategic memo", "board deck", "audit committee", "steering committee", "Decision Provenance Record" (2026-04-22 rename from "Audit Defense Packet"), "Decision Knowledge Graph", "Decision Quality Index"
 - Compliance vocabulary: SOC 2, GDPR, EU AI Act, Basel III, SEC Reg D — specific, named, defensible
 - Enterprise shapes: the audit committee, the GC review, the procurement bar, the regulator meeting
 - Numbers that survive due diligence: "135 audited corporate decisions", "30+ cognitive biases", "~90% blended margin" — publicly verifiable or internally defensible

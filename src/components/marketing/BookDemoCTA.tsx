@@ -287,7 +287,7 @@ export function BookDemoCTA({
         {[
           '30 minutes · no slides',
           'Live on your own strategic memo',
-          'You leave with the audit + the Audit Defense Packet',
+          'You leave with the audit + the Decision Provenance Record',
           'Five design-partner seats · four still open',
         ].map(chip => (
           <li

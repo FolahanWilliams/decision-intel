@@ -15,7 +15,7 @@ We charge because each audit runs seventeen LLM calls across twelve specialized 
 ## What a design partner receives
 
 1. **$1,999/month locked for 12 months.** 20% off the $2,499 Strategy list. First right of refusal at $2,499 for Year 2 before list moves again.
-2. **Audit Defense Packet on every audit — free.** The signed, hashed 4-page PDF your General Counsel hands to the audit committee: input-document hash, prompt fingerprint, model lineage, academic citations across the 30+ bias taxonomy, regulatory mapping across seven frameworks, pipeline lineage. Normally bundled into Strategy+ in Year 2; free for the design-partner cohort.
+2. **Decision Provenance Record on every audit — free.** The signed, hashed 4-page PDF your General Counsel hands to the audit committee: input-document hash, prompt fingerprint, model lineage, academic citations across the 30+ bias taxonomy, regulatory mapping across seven frameworks, pipeline lineage. Normally bundled into Strategy+ in Year 2; free for the design-partner cohort.
 3. **Custom toxic-combination weights tuned to your industry.** The founder personally calibrates the 20×20 interaction matrix using your historical memo library.
 4. **Direct Slack channel with the founder.** Bug reports and feature requests route to the same Slack the founder writes code in. No ticket queues.
 5. **Quarterly 1-hour strategy session.** Memo rehearsal, board-deck review, or a direct run through the R²F framework.
@@ -52,7 +52,7 @@ We charge because each audit runs seventeen LLM calls across twelve specialized 
 | **Week 1** | Application received. Intro call booked within 2 business days. Technical + procurement Q&A covered. |
 | **Week 2** | MSA + DPA signed. Commitment fee invoiced. Slack channel provisioned. First audit runs. |
 | **Weeks 3–8** | Core flow stabilizes on your memos. Founder tunes the 20×20 matrix. Weekly cadence established. |
-| **Months 3–6** | Audit Defense Packets circulate to your GC / audit committee. First outcome feedback loop closes. |
+| **Months 3–6** | Decision Provenance Records circulate to your GC / audit committee. First outcome feedback loop closes. |
 | **Month 12** | Public case study drafted. Year 2 pricing confirmed at $2,499. Option to renew, step up, or step back. |
 
 ---
@@ -67,4 +67,4 @@ Warm-intro'd CSOs / Heads of Corporate Strategy / M&A leads apply at [decision-i
 
 ## The narrative you can share internally
 
-> *"Decision Intel is the first platform to run both halves of the decision stack — Kahneman's debiasing tradition and Klein's Recognition-Primed Decision tradition — in one pipeline. They call the synthesis the Recognition-Rigor Framework (R²F). They audit strategic memos in under 60 seconds, detect 30+ cognitive biases, and produce a signed, hashed Audit Defense Packet the GC can hand to the audit committee. The founder is a solo technical operator shipping at Series A velocity. The company is raising pre-seed; design-partner seats are priced at $1,999/month, a 20% concession off list. Five seats total; this would be ours."*
+> *"Decision Intel is the first platform to run both halves of the decision stack — Kahneman's debiasing tradition and Klein's Recognition-Primed Decision tradition — in one pipeline. They call the synthesis the Recognition-Rigor Framework (R²F). They audit strategic memos in under 60 seconds, detect 30+ cognitive biases, and produce a signed, hashed Decision Provenance Record the GC can hand to the audit committee. The founder is a solo technical operator shipping at Series A velocity. The company is raising pre-seed; design-partner seats are priced at $1,999/month, a 20% concession off list. Five seats total; this would be ours."*

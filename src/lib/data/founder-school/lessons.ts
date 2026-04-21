@@ -1285,7 +1285,7 @@ export const TRACKS: Track[] = [
           {
             label: 'Internal',
             detail:
-              'src/lib/compliance/* — our seven framework mappers and the Audit Defense Packet exporter.',
+              'src/lib/compliance/* — our seven framework mappers and the Decision Provenance Record exporter.',
           },
         ],
         csoPitch:
@@ -1293,9 +1293,9 @@ export const TRACKS: Track[] = [
         mnaPitch:
           "Deal-side compliance is where most strategy tools fail procurement. Every flag on a DI-audited thesis is cross-mapped to the specific regulatory framework that touches it: SOX §404 materiality on any earnings-impact claim, GDPR Article 22 on automated-decision influence over EU data subjects, EU AI Act risk tiers on AI-assisted due diligence, HIPAA for healthcare-sector deals. Your GC's team doesn't have to take the tool on faith — they can review each flag against its citation. This is the standard that lets DI sit inside IC workflows at regulated acquirors.",
         corpStrategyPitch:
-          "Your audit committee will eventually ask how AI-assisted strategic-decision tooling is defensible under their compliance posture. DI ships that answer as product, not documentation. Every flag cross-links to one of seven regulatory frameworks — GDPR, SOC 2 Type II, HIPAA, CCPA, SOX, EU AI Act, NIST AI RMF — with the specific section the flag touches. On Pro tier you get the Audit Defense Packet as a regulator-grade PDF for every memo. The practical consequence: your strategy function can adopt AI-assisted decision auditing six months before the rest of your peers do, because compliance isn't a gating conversation — it's a pre-answered one.",
+          "Your audit committee will eventually ask how AI-assisted strategic-decision tooling is defensible under their compliance posture. DI ships that answer as product, not documentation. Every flag cross-links to one of seven regulatory frameworks — GDPR, SOC 2 Type II, HIPAA, CCPA, SOX, EU AI Act, NIST AI RMF — with the specific section the flag touches. On Pro tier you get the Decision Provenance Record as a regulator-grade PDF for every memo. The practical consequence: your strategy function can adopt AI-assisted decision auditing six months before the rest of your peers do, because compliance isn't a gating conversation — it's a pre-answered one.",
         vcPitch:
-          "Every Fortune 500 procurement team vetoes a tool that can't produce regulator-grade defence documents. We ship the Audit Defense Packet on Pro tier — a regulator-grade PDF citing every framework section our flags touch. This isn't a \"compliance feature\"; it's the thing that unblocks the procurement gate. Our enterprise sales motion is built around it.",
+          "Every Fortune 500 procurement team vetoes a tool that can't produce regulator-grade defence documents. We ship the Decision Provenance Record on Pro tier — a regulator-grade PDF citing every framework section our flags touch. This isn't a \"compliance feature\"; it's the thing that unblocks the procurement gate. Our enterprise sales motion is built around it.",
       },
       {
         id: 'pf_9',

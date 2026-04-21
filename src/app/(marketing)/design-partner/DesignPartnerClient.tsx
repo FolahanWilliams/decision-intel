@@ -58,8 +58,8 @@ const YOU_RECEIVE: Array<{ icon: typeof ShieldCheck; title: string; body: string
   },
   {
     icon: ShieldCheck,
-    title: 'Audit Defense Packet free on every audit',
-    body: 'The signed, hashed, 4-page artifact your General Counsel hands to the audit committee — bundled on every strategic memo you audit, no add-on SKU to negotiate.',
+    title: 'Decision Provenance Record free on every audit',
+    body: 'The signed, hashed, 4-page artifact your General Counsel hands to the audit committee — mapped onto EU AI Act Article 14 record-keeping, SEC AI disclosure, and Basel III ICAAP. Bundled on every strategic memo you audit.',
   },
   {
     icon: Sparkles,
@@ -136,7 +136,7 @@ const TIMELINE: Array<{ label: string; body: string }> = [
   },
   {
     label: 'Months 3\u20136',
-    body: 'Audit Defense Packets start circulating to your GC / audit committee. First feedback loop closes on an outcome you\u2019ve confirmed.',
+    body: 'Decision Provenance Records start circulating to your GC / audit committee. First feedback loop closes on an outcome you\u2019ve confirmed.',
   },
   {
     label: 'Month 12',
@@ -239,9 +239,9 @@ export function DesignPartnerClient() {
               margin: '0 auto 22px',
             }}
           >
-            Twelve months. $1,999/mo, 20% off the $2,499 Strategy list price. Audit Defense Packets
-            free on every memo. Custom toxic-combination weights tuned to your industry by the
-            founder personally. Your feedback becomes the product.
+            Twelve months. $1,999/mo, 20% off the $2,499 Strategy list price. Decision Provenance
+            Records free on every memo. Custom toxic-combination weights tuned to your industry by
+            the founder personally. Your feedback becomes the product.
           </p>
           <p
             style={{
@@ -276,6 +276,55 @@ export function DesignPartnerClient() {
             >
               Apply for a seat <ArrowRight size={16} />
             </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Regulatory tailwinds \u2014 a compact strip positioning the program
+          as infrastructure for the wave already in motion. Enterprise
+          procurement cares about this first; the program details follow. */}
+      <section
+        style={{
+          padding: '32px 24px',
+          background: C.slate50,
+          borderTop: `1px solid ${C.slate200}`,
+          borderBottom: `1px solid ${C.slate200}`,
+        }}
+      >
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <p
+            style={{
+              fontSize: 11,
+              fontWeight: 800,
+              color: C.green,
+              textTransform: 'uppercase',
+              letterSpacing: '0.14em',
+              marginBottom: 8,
+            }}
+          >
+            Why now
+          </p>
+          <div
+            style={{
+              fontSize: 15,
+              color: C.slate700,
+              lineHeight: 1.65,
+              maxWidth: 880,
+            }}
+          >
+            Three regulatory waves are already in force or on the enforcement calendar &mdash;{' '}
+            <strong style={{ color: C.slate900, fontWeight: 700 }}>
+              EU AI Act Article 14 record-keeping
+            </strong>{' '}
+            (high-risk obligations enforceable Aug&nbsp;2026),{' '}
+            <strong style={{ color: C.slate900, fontWeight: 700 }}>SEC AI disclosure rulemaking</strong>{' '}
+            (2024&ndash;2026), and{' '}
+            <strong style={{ color: C.slate900, fontWeight: 700 }}>
+              Basel III Pillar 2 ICAAP documentation
+            </strong>{' '}
+            (live for regulated banks). Each asks for exactly the artifact our Decision Provenance
+            Record produces. Design partners get this built-in from day one, not bolted on after
+            procurement flags the gap.
           </div>
         </div>
       </section>

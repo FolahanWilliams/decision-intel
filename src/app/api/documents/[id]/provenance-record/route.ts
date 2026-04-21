@@ -1,18 +1,22 @@
 /**
- * Audit Defense Packet — document-scoped API.
+ * Decision Provenance Record — document-scoped API.
  *
- * POST  /api/documents/[id]/defense-packet
- *   Assembles the defense packet for the most recent analysis on this
- *   document, persists it (upsert), and returns the packet data JSON.
- *   The client then uses the JSON with AuditDefensePacketGenerator to
- *   produce the PDF client-side (jsPDF lives in the browser).
+ * POST  /api/documents/[id]/provenance-record
+ *   Assembles the provenance record for the most recent analysis on this
+ *   document, persists it (upsert), and returns the record data JSON.
+ *   The client then uses the JSON with DecisionProvenanceRecordGenerator
+ *   to produce the PDF client-side (jsPDF lives in the browser).
  *
- * GET   /api/documents/[id]/defense-packet
- *   Returns the stored packet for this document\u2019s most recent analysis,
- *   or 404 if no packet has been generated yet.
+ * GET   /api/documents/[id]/provenance-record
+ *   Returns the stored record for this document's most recent analysis,
+ *   or 404 if no record has been generated yet.
  *
  * Auth: Supabase session required. Must own the document OR be a member
- * of the document\u2019s org (matches the doc detail route\u2019s access rule).
+ * of the document's org (matches the doc detail route's access rule).
+ *
+ * Renamed from /defense-packet on 2026-04-22 — "provenance" maps directly
+ * onto EU AI Act Article 14 record-keeping, SEC AI disclosure language,
+ * and Basel III ICAAP documentation.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -20,9 +24,9 @@ import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 import { createLogger } from '@/lib/utils/logger';
-import { assembleDefensePacketData } from '@/lib/reports/defense-packet-data';
+import { assembleProvenanceRecordData } from '@/lib/reports/provenance-record-data';
 
-const log = createLogger('DefensePacketRoute');
+const log = createLogger('ProvenanceRecordRoute');
 
 async function getAuthorizedAnalysisId(
   documentId: string
@@ -73,16 +77,19 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     const auth = await getAuthorizedAnalysisId(id);
     if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
-    const packet = await prisma.auditDefensePacket.findUnique({
+    const record = await prisma.decisionProvenanceRecord.findUnique({
       where: { analysisId: auth.analysisId },
     });
-    if (!packet)
-      return NextResponse.json({ error: 'No defense packet has been generated yet.' }, { status: 404 });
+    if (!record)
+      return NextResponse.json(
+        { error: 'No provenance record has been generated yet.' },
+        { status: 404 }
+      );
 
-    return NextResponse.json({ packet });
+    return NextResponse.json({ record });
   } catch (err) {
-    log.error('GET defense-packet failed:', err);
-    return NextResponse.json({ error: 'Failed to load defense packet.' }, { status: 500 });
+    log.error('GET provenance-record failed:', err);
+    return NextResponse.json({ error: 'Failed to load provenance record.' }, { status: 500 });
   }
 }
 
@@ -92,10 +99,10 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
     const auth = await getAuthorizedAnalysisId(id);
     if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
-    const data = await assembleDefensePacketData(auth.analysisId);
+    const data = await assembleProvenanceRecordData(auth.analysisId);
 
-    // Persist (upsert) — one packet per analysis.
-    const persisted = await prisma.auditDefensePacket.upsert({
+    // Persist (upsert) — one record per analysis.
+    const persisted = await prisma.decisionProvenanceRecord.upsert({
       where: { analysisId: auth.analysisId },
       create: {
         analysisId: data.analysisId,
@@ -125,13 +132,16 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
       },
     });
 
-    log.info(`Defense packet generated for analysis ${auth.analysisId} (doc ${id})`);
+    log.info(`Provenance record generated for analysis ${auth.analysisId} (doc ${id})`);
 
     // Return both the persisted row and the full assembled data (with
     // meta) so the client can hand `data` straight to the PDF generator.
-    return NextResponse.json({ packet: persisted, data });
+    return NextResponse.json({ record: persisted, data });
   } catch (err) {
-    log.error('POST defense-packet failed:', err);
-    return NextResponse.json({ error: 'Failed to generate defense packet.' }, { status: 500 });
+    log.error('POST provenance-record failed:', err);
+    return NextResponse.json(
+      { error: 'Failed to generate provenance record.' },
+      { status: 500 }
+    );
   }
 }

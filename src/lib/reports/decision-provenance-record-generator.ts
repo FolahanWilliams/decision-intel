@@ -1,9 +1,10 @@
 /**
- * Audit Defense Packet — PDF generator.
+ * Decision Provenance Record — PDF generator.
  *
  * Client-side jsPDF generator that emits a 4-page artifact the CSO's
  * General Counsel can hand to the audit committee, SEC, or plaintiff's
- * counsel. Pages:
+ * counsel — or more usefully, the record their AI-augmented
+ * decision-making was always supposed to produce. Pages:
  *
  *   1. Cover + hashes — title, filename, input hash, prompt fingerprint,
  *      timestamp, reviewer signature block.
@@ -12,8 +13,8 @@
  *      judge outputs.
  *   3. Academic citations + regulatory mapping — every detected bias
  *      with its APA citation and the frameworks (Basel III, EU AI Act,
- *      SEC Reg D, etc.) it touches.
- *   4. Pipeline lineage + "What this packet proves" GC-ready appendix.
+ *      SEC Reg D, FCA Consumer Duty, SOX, GDPR Art 22, LPOA) it touches.
+ *   4. Pipeline lineage + "What this record proves" GC-ready appendix.
  *
  * Honesty discipline: every page declares what's stored vs. what's
  * available on request. A GC reading this should never discover that a
@@ -21,7 +22,7 @@
  */
 
 import jsPDF from 'jspdf';
-import type { DefensePacketData } from './defense-packet-data';
+import type { ProvenanceRecordData } from './provenance-record-data';
 
 const MAX_TITLE_CHARS = 70;
 const PAGE_W = 210; // A4 mm
@@ -51,15 +52,15 @@ function formatHashShort(hash: string): string {
   return `${hash.slice(0, 12)}…${hash.slice(-8)}`;
 }
 
-export class AuditDefensePacketGenerator {
+export class DecisionProvenanceRecordGenerator {
   private doc: jsPDF;
 
   constructor() {
     this.doc = new jsPDF();
   }
 
-  /** Generate and trigger a client-side download of the packet PDF. */
-  public generateAndDownload(data: DefensePacketData) {
+  /** Generate and trigger a client-side download of the record PDF. */
+  public generateAndDownload(data: ProvenanceRecordData) {
     this.drawPageOne(data);
     this.doc.addPage();
     this.drawPageTwo(data);
@@ -70,12 +71,12 @@ export class AuditDefensePacketGenerator {
     this.drawFooterAllPages();
 
     const stamp = data.generatedAt.toISOString().slice(0, 10);
-    this.doc.save(`audit-defense-packet-${slugify(data.meta.filename)}-${stamp}.pdf`);
+    this.doc.save(`decision-provenance-record-${slugify(data.meta.filename)}-${stamp}.pdf`);
   }
 
   /** Return the PDF as a Blob (useful for server-side generation or
    *  attaching to emails). */
-  public generateAsBlob(data: DefensePacketData): Blob {
+  public generateAsBlob(data: ProvenanceRecordData): Blob {
     this.drawPageOne(data);
     this.doc.addPage();
     this.drawPageTwo(data);
@@ -88,7 +89,7 @@ export class AuditDefensePacketGenerator {
   }
 
   // ─── Page 1: Cover + hashes ────────────────────────────────────────
-  private drawPageOne(data: DefensePacketData) {
+  private drawPageOne(data: ProvenanceRecordData) {
     this.drawAccentBand();
     this.drawHeader('AUDIT DEFENSE PACKET');
 
@@ -121,7 +122,7 @@ export class AuditDefensePacketGenerator {
     this.drawKvBox([
       { k: 'Input document hash (SHA-256)', v: formatHashShort(data.inputHash) },
       { k: 'Prompt version fingerprint (SHA-256)', v: formatHashShort(data.promptFingerprint) },
-      { k: 'Packet schema version', v: `v${data.schemaVersion}` },
+      { k: 'Record schema version', v: `v${data.schemaVersion}` },
       {
         k: 'Server-side timestamp',
         v: data.generatedAt.toISOString() + ' (RFC 3161 TSA: deferred to v2)',
@@ -173,7 +174,7 @@ export class AuditDefensePacketGenerator {
   }
 
   // ─── Page 2: Model lineage + judge variance ───────────────────────
-  private drawPageTwo(data: DefensePacketData) {
+  private drawPageTwo(data: ProvenanceRecordData) {
     this.drawAccentBand();
     this.drawHeader('MODEL LINEAGE & JUDGE VARIANCE');
 
@@ -242,7 +243,7 @@ export class AuditDefensePacketGenerator {
   }
 
   // ─── Page 3: Citations + regulatory mapping ────────────────────────
-  private drawPageThree(data: DefensePacketData) {
+  private drawPageThree(data: ProvenanceRecordData) {
     this.drawAccentBand();
     this.drawHeader('ACADEMIC CITATIONS & REGULATORY MAPPING');
 
@@ -345,7 +346,7 @@ export class AuditDefensePacketGenerator {
   }
 
   // ─── Page 4: Pipeline lineage + appendix ───────────────────────────
-  private drawPageFour(data: DefensePacketData) {
+  private drawPageFour(data: ProvenanceRecordData) {
     this.drawAccentBand();
     this.drawHeader('PIPELINE LINEAGE & APPENDIX');
 
@@ -356,7 +357,7 @@ export class AuditDefensePacketGenerator {
     this.doc.setFontSize(9);
     this.doc.setTextColor(100, 100, 100);
     const intro = this.doc.splitTextToSize(
-      'Nodes executed in this order for every audit. Per-node input/output hashing is deferred to packet schema v2; this v1 packet declares the order + each node\u2019s academic anchor.',
+      'Nodes executed in this order for every audit. Per-node input/output hashing is deferred to record schema v2; this v1 record declares the order + each node\u2019s academic anchor.',
       TEXT_W
     );
     this.doc.text(intro, MARGIN_L, y);
@@ -380,20 +381,22 @@ export class AuditDefensePacketGenerator {
 
     // Bottom appendix
     y = Math.max(y, 238);
-    this.drawSectionHeading('WHAT THIS PACKET PROVES', y);
+    this.drawSectionHeading('WHAT THIS RECORD PROVES', y);
     y += 8;
     this.doc.setFont('helvetica', 'normal');
     this.doc.setFontSize(9.5);
     this.doc.setTextColor(40, 40, 40);
     const apx = this.doc.splitTextToSize(
-      'This packet is the verifiable audit trail for a Decision Intel analysis. The input ' +
-        'document hash proves the audit targeted this exact memo, not a later edit. The prompt ' +
-        'fingerprint proves which prompt version produced the analysis. The model-routing table ' +
-        'discloses which model tier ran on which pipeline node at audit time. Every detected ' +
-        'bias carries its taxonomy ID, primary academic reference, and the regulatory provisions ' +
-        'it intersects. The packet deliberately omits prompt content, toxic-combination weights, ' +
-        'and per-org causal edges to protect platform IP; full internal audit logs with ' +
-        'per-judge granular outputs are available on request under a data-processing addendum.',
+      'This record is the verifiable provenance trail for a Decision Intel analysis. The ' +
+        'input-document hash proves the audit targeted this exact memo, not a later edit. The ' +
+        'prompt fingerprint proves which prompt version produced the analysis. The model-routing ' +
+        'table discloses which model tier ran on which pipeline node at audit time. Every ' +
+        'detected bias carries its taxonomy ID, primary academic reference, and the regulatory ' +
+        'provisions it intersects (Basel III, EU AI Act Art 14, SEC Reg D, FCA Consumer Duty, ' +
+        'SOX §404, GDPR Article 22, LPOA). The record deliberately omits prompt content, ' +
+        'toxic-combination weights, and per-org causal edges to protect platform IP; full ' +
+        'internal audit logs with per-judge granular outputs are available on request under a ' +
+        'data-processing addendum.',
       TEXT_W
     );
     this.doc.text(apx, MARGIN_L, y);
@@ -461,7 +464,7 @@ export class AuditDefensePacketGenerator {
       this.doc.setFontSize(8);
       this.doc.setTextColor(150, 150, 150);
       this.doc.text(
-        `Audit Defense Packet · Decision Intel · Page ${i} of ${pages}`,
+        `Decision Provenance Record · Decision Intel · Page ${i} of ${pages}`,
         PAGE_W / 2,
         290,
         { align: 'center' }
