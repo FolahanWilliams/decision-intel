@@ -7,18 +7,18 @@
 
 ## Executive Summary
 
-| Metric              | Value         |
-| ------------------- | ------------- |
-| TypeScript Files    | 636           |
-| Lines of Code       | ~159,000      |
-| API Route Handlers  | 147           |
-| React Components    | ~160          |
-| Library Modules     | 173           |
-| Prisma Models       | 40+           |
-| Database Migrations | 38            |
-| Test Files          | 32            |
-| CI/CD Workflows     | 5             |
-| Dependencies        | 65+           |
+| Metric              | Value    |
+| ------------------- | -------- |
+| TypeScript Files    | 636      |
+| Lines of Code       | ~159,000 |
+| API Route Handlers  | 147      |
+| React Components    | ~160     |
+| Library Modules     | 173      |
+| Prisma Models       | 40+      |
+| Database Migrations | 38       |
+| Test Files          | 32       |
+| CI/CD Workflows     | 5        |
+| Dependencies        | 65+      |
 
 **Overall Assessment:** A well-architected, production-grade AI-powered decision intelligence platform with excellent security posture (8.5/10). Strong TypeScript strictness (`strict: true`), multi-layer auth, CSRF protection, AES-256-GCM encryption, timing-safe secret comparison, and structured logging. Key areas for improvement: test coverage (5% threshold, 12 failing test files), inconsistent error response formats, and missing composite database indexes.
 
@@ -36,11 +36,11 @@
 
 **Issues Found:**
 
-| Severity | Issue                               | Location                               |
-| -------- | ----------------------------------- | -------------------------------------- |
-| LOW      | `/api/notifications/status` — no auth, returns only `{ emailConfigured: bool }` | `src/app/api/notifications/status/route.ts` |
-| LOW      | `/api/public/*` routes are intentionally public but have no rate limiting | `src/app/api/public/case-studies/route.ts`, `src/app/api/public/outcome-stats/route.ts` |
-| LOW      | `/api/health` — no auth (expected, but should be documented) | `src/app/api/health/route.ts` |
+| Severity | Issue                                                                           | Location                                                                                |
+| -------- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| LOW      | `/api/notifications/status` — no auth, returns only `{ emailConfigured: bool }` | `src/app/api/notifications/status/route.ts`                                             |
+| LOW      | `/api/public/*` routes are intentionally public but have no rate limiting       | `src/app/api/public/case-studies/route.ts`, `src/app/api/public/outcome-stats/route.ts` |
+| LOW      | `/api/health` — no auth (expected, but should be documented)                    | `src/app/api/health/route.ts`                                                           |
 
 ### 1.2 CSRF Protection — STRONG
 
@@ -101,6 +101,7 @@
 ### 2.2 Error Handling — GOOD with gaps
 
 **Strengths:**
+
 - Consistent try-catch in all API routes.
 - Proper HTTP status codes (401, 403, 404, 429, 500).
 - Structured logging via `createLogger()`.
@@ -108,19 +109,19 @@
 
 **Issues:**
 
-| Severity | Issue                          | Files Affected                   |
-| -------- | ------------------------------ | -------------------------------- |
-| MEDIUM   | Generic error messages without correlation IDs | Most API routes return `"Internal Server Error"` without a request ID |
-| MEDIUM   | Inconsistent error response format | Some routes: `{ error: "msg" }`, others: `{ success: false, data, error }` |
-| LOW      | 31 instances of `console.warn`/`console.error` in production code instead of logger | Components: NotificationCenter, BiasBriefing, InteractiveChartWrapper |
+| Severity | Issue                                                                               | Files Affected                                                             |
+| -------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| MEDIUM   | Generic error messages without correlation IDs                                      | Most API routes return `"Internal Server Error"` without a request ID      |
+| MEDIUM   | Inconsistent error response format                                                  | Some routes: `{ error: "msg" }`, others: `{ success: false, data, error }` |
+| LOW      | 31 instances of `console.warn`/`console.error` in production code instead of logger | Components: NotificationCenter, BiasBriefing, InteractiveChartWrapper      |
 
 ### 2.3 Code Duplication — MODERATE
 
-| Pattern                          | Recommendation                           |
-| -------------------------------- | ---------------------------------------- |
-| Auth + validation boilerplate in every API route | Extract shared middleware/wrapper |
+| Pattern                                                | Recommendation                          |
+| ------------------------------------------------------ | --------------------------------------- |
+| Auth + validation boilerplate in every API route       | Extract shared middleware/wrapper       |
 | Pagination logic (`skip`, `take`, `Math.min`) repeated | Create `buildPaginationQuery()` utility |
-| Zod schemas with overlapping field definitions | Use `.partial().extend()` patterns |
+| Zod schemas with overlapping field definitions         | Use `.partial().extend()` patterns      |
 
 ### 2.4 Dead Code — CLEAN
 
@@ -131,6 +132,7 @@
 ### 2.5 React Patterns — MODERATE issues
 
 **Good:**
+
 - 214+ usages of `useMemo`/`useCallback`/`React.memo`.
 - All `.map()` iterations have `key` props.
 - `ErrorBoundary` component for UI resilience.
@@ -138,11 +140,11 @@
 
 **Issues:**
 
-| Severity | Issue                                    | Location |
-| -------- | ---------------------------------------- | -------- |
+| Severity | Issue                                                                         | Location                                                                     |
+| -------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
 | MEDIUM   | D3 visualizations bypass React reconciliation (`svg.selectAll('*').remove()`) | `CausalGraph.tsx:153`, `DecisionKnowledgeGraph.tsx:435`, `CausalDAG.tsx:219` |
-| MEDIUM   | `import * as d3` imports full D3 bundle (~50-100KB per component) | `CausalGraph.tsx:4` |
-| LOW      | Fetch chains in `RelatedDecisions.tsx` silently swallow errors | `src/components/ui/RelatedDecisions.tsx:51-66` |
+| MEDIUM   | `import * as d3` imports full D3 bundle (~50-100KB per component)             | `CausalGraph.tsx:4`                                                          |
+| LOW      | Fetch chains in `RelatedDecisions.tsx` silently swallow errors                | `src/components/ui/RelatedDecisions.tsx:51-66`                               |
 
 ---
 
@@ -179,6 +181,7 @@ metaJudgeNode (debate orchestration) → riskScorer → END
 ```
 
 **Strengths:**
+
 - Multi-model safety configuration (relaxed for bias detection, standard for simulation).
 - Lazy singleton model instances for efficient reuse.
 - Prompt injection mitigation — untrusted data wrapped in XML delimiters with entity escaping.
@@ -189,12 +192,12 @@ metaJudgeNode (debate orchestration) → riskScorer → END
 
 **Issues:**
 
-| Severity | Issue                                    | Recommendation                      |
-| -------- | ---------------------------------------- | ----------------------------------- |
+| Severity | Issue                                                                          | Recommendation                                                               |
+| -------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
 | HIGH     | No circuit breaker for LLM failures — consistent node failure crashes pipeline | Add `withCircuitBreaker()` wrapper (code exists in resilience.ts but unused) |
-| MEDIUM   | No per-node timeout — all nodes share 90s timeout | Add configurable per-node timeouts |
-| MEDIUM   | No partial result propagation — any node failure fails entire analysis | Implement graceful degradation for non-critical nodes |
-| LOW      | AI fallback to Claude mentioned but not integrated into agent nodes | Wire up `AI_FALLBACK_ENABLED` → Claude provider |
+| MEDIUM   | No per-node timeout — all nodes share 90s timeout                              | Add configurable per-node timeouts                                           |
+| MEDIUM   | No partial result propagation — any node failure fails entire analysis         | Implement graceful degradation for non-critical nodes                        |
+| LOW      | AI fallback to Claude mentioned but not integrated into agent nodes            | Wire up `AI_FALLBACK_ENABLED` → Claude provider                              |
 
 ### 3.3 SSE Streaming — ROBUST
 
@@ -206,10 +209,10 @@ metaJudgeNode (debate orchestration) → riskScorer → END
 
 **Issues:**
 
-| Severity | Issue                                | Recommendation                    |
-| -------- | ------------------------------------ | --------------------------------- |
+| Severity | Issue                                                           | Recommendation                                      |
+| -------- | --------------------------------------------------------------- | --------------------------------------------------- |
 | MEDIUM   | No backpressure handling — large documents may overwhelm stream | Implement stream.pause/resume based on buffer level |
-| LOW      | Checkpoint expiration can break resumption silently | Add logging when resume falls back to restart |
+| LOW      | Checkpoint expiration can break resumption silently             | Add logging when resume falls back to restart       |
 
 ### 3.4 RAG Implementation — WELL-IMPLEMENTED
 
@@ -219,11 +222,11 @@ metaJudgeNode (debate orchestration) → riskScorer → END
 
 **Issues:**
 
-| Severity | Issue                                | Recommendation                    |
-| -------- | ------------------------------------ | --------------------------------- |
-| MEDIUM   | No embedding versioning — dimension changes break old vectors | Track model version per embedding |
-| MEDIUM   | Silent storage failures — RAG misses results with no error | Add retry + alerting for embedding storage |
-| LOW      | Similarity threshold hardcoded | Make configurable for precision vs. recall tuning |
+| Severity | Issue                                                         | Recommendation                                    |
+| -------- | ------------------------------------------------------------- | ------------------------------------------------- |
+| MEDIUM   | No embedding versioning — dimension changes break old vectors | Track model version per embedding                 |
+| MEDIUM   | Silent storage failures — RAG misses results with no error    | Add retry + alerting for embedding storage        |
+| LOW      | Similarity threshold hardcoded                                | Make configurable for precision vs. recall tuning |
 
 ### 3.5 Database Schema — COMPREHENSIVE
 
@@ -234,24 +237,24 @@ metaJudgeNode (debate orchestration) → riskScorer → END
 
 **Issues:**
 
-| Severity | Issue                             | Recommendation                    |
-| -------- | --------------------------------- | --------------------------------- |
-| MEDIUM   | Missing composite indexes on common query patterns | Add `@@index([userId, createdAt])`, `@@index([orgId, createdAt])` |
-| MEDIUM   | JSON denormalization in Analysis model (`noiseStats`, `factCheck`, `compliance`, etc.) | Extract into typed relational tables for query flexibility |
-| MEDIUM   | No soft delete — cascading deletes can lose DecisionRoom data | Add `deletedAt` timestamp with soft-delete queries |
-| MEDIUM   | Minimal transaction usage for multi-step writes | Use `$transaction` for deal + document creation flows |
-| LOW      | CacheEntry has no automatic cleanup job | Add cron job to prune expired entries |
+| Severity | Issue                                                                                  | Recommendation                                                    |
+| -------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| MEDIUM   | Missing composite indexes on common query patterns                                     | Add `@@index([userId, createdAt])`, `@@index([orgId, createdAt])` |
+| MEDIUM   | JSON denormalization in Analysis model (`noiseStats`, `factCheck`, `compliance`, etc.) | Extract into typed relational tables for query flexibility        |
+| MEDIUM   | No soft delete — cascading deletes can lose DecisionRoom data                          | Add `deletedAt` timestamp with soft-delete queries                |
+| MEDIUM   | Minimal transaction usage for multi-step writes                                        | Use `$transaction` for deal + document creation flows             |
+| LOW      | CacheEntry has no automatic cleanup job                                                | Add cron job to prune expired entries                             |
 
 ### 3.6 Scalability — CRITICAL gaps
 
-| Severity | Issue                                    | Location                      | Recommendation                    |
-| -------- | ---------------------------------------- | ----------------------------- | --------------------------------- |
-| CRITICAL | `buildDecisionGraph()` loads up to 200 analyses without pagination | `graph-builder.ts` | Cursor-based pagination |
-| HIGH     | RAG search returns all results, client-side filtering | `embeddings.ts` | Enforce `LIMIT` at DB level |
-| HIGH     | 2-hop graph traversal can fetch up to 2,550 edges | `graph-builder.ts` | Cache graph snapshots with TTL |
-| MEDIUM   | NotificationCenter fetches all notifications on mount, no pagination | `NotificationCenter.tsx` | Add offset/limit pagination |
-| MEDIUM   | No cost tracking for embedding generation | `embeddings.ts` | Add per-org quota + alerts |
-| MEDIUM   | Document decrypted per-node (11x per analysis) | `encryption.ts` | Cache decrypted content for pipeline duration |
+| Severity | Issue                                                                | Location                 | Recommendation                                |
+| -------- | -------------------------------------------------------------------- | ------------------------ | --------------------------------------------- |
+| CRITICAL | `buildDecisionGraph()` loads up to 200 analyses without pagination   | `graph-builder.ts`       | Cursor-based pagination                       |
+| HIGH     | RAG search returns all results, client-side filtering                | `embeddings.ts`          | Enforce `LIMIT` at DB level                   |
+| HIGH     | 2-hop graph traversal can fetch up to 2,550 edges                    | `graph-builder.ts`       | Cache graph snapshots with TTL                |
+| MEDIUM   | NotificationCenter fetches all notifications on mount, no pagination | `NotificationCenter.tsx` | Add offset/limit pagination                   |
+| MEDIUM   | No cost tracking for embedding generation                            | `embeddings.ts`          | Add per-org quota + alerts                    |
+| MEDIUM   | Document decrypted per-node (11x per analysis)                       | `encryption.ts`          | Cache decrypted content for pipeline duration |
 
 ### 3.7 State Management — AD-HOC (acceptable at current scale)
 
@@ -274,14 +277,14 @@ metaJudgeNode (debate orchestration) → riskScorer → END
 
 ### 4.1 Current State — WEAK
 
-| Metric                | Value     |
-| --------------------- | --------- |
-| Test files            | 32        |
-| Tests passing         | 237       |
-| Tests failing         | 2         |
-| Test files failing    | 12        |
-| Coverage threshold    | 5%        |
-| Component tests       | 0         |
+| Metric             | Value |
+| ------------------ | ----- |
+| Test files         | 32    |
+| Tests passing      | 237   |
+| Tests failing      | 2     |
+| Test files failing | 12    |
+| Coverage threshold | 5%    |
+| Component tests    | 0     |
 
 ### 4.2 Test Failures
 

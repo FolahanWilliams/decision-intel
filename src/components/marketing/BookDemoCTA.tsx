@@ -67,13 +67,7 @@ const C = {
   greenBorder: '#86EFAC',
 } as const;
 
-export function BookDemoCTA({
-  variant,
-  source,
-  heading,
-  sub,
-  label,
-}: Props) {
+export function BookDemoCTA({ variant, source, heading, sub, label }: Props) {
   const { href, external } = getBookingHref();
   const onClick = () => trackEvent('book_demo_click', { source });
 
@@ -204,134 +198,133 @@ export function BookDemoCTA({
         }}
         className="book-demo-hero-grid"
       >
-      <div>
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            fontSize: 11,
-            fontWeight: 800,
-            textTransform: 'uppercase',
-            letterSpacing: '0.14em',
-            color: C.green,
-            background: C.white,
-            border: `1px solid ${C.greenBorder}`,
-            padding: '4px 10px',
-            borderRadius: 999,
-            marginBottom: 14,
-          }}
-        >
-          <Calendar size={11} strokeWidth={2.4} />
-          Design partner programme
-        </div>
-        <h3
-          style={{
-            fontSize: 'clamp(22px, 2.6vw, 30px)',
-            fontWeight: 800,
-            color: C.slate900,
-            letterSpacing: '-0.01em',
-            lineHeight: 1.2,
-            margin: '0 0 10px',
-          }}
-        >
-          {heading ??
-            'Run your next strategic memo through the platform. Leave with the audit.'}
-        </h3>
-        <p
-          style={{
-            fontSize: 'clamp(13px, 1.25vw, 15px)',
-            color: C.slate600,
-            lineHeight: 1.6,
-            margin: '0 0 18px',
-            maxWidth: 560,
-          }}
-        >
-          {sub ??
-            'Thirty minutes with the founder. No slides. We run one of your recent memos through the causal graph, the outcome flywheel, and the framework mapper, live on the call.'}
-        </p>
-        <Link
-          {...LinkProps}
-          onClick={onClick}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 8,
-            fontSize: 15,
-            fontWeight: 700,
-            color: C.white,
-            background: C.green,
-            padding: '13px 24px',
-            borderRadius: 10,
-            textDecoration: 'none',
-            boxShadow: '0 2px 10px rgba(22, 163, 74, 0.28)',
-          }}
-        >
-          <Calendar size={15} strokeWidth={2.4} />
-          {label ?? 'Book a 30-min design partner call'}
-          <ArrowRight size={15} />
-        </Link>
-      </div>
-
-      <ul
-        style={{
-          margin: 0,
-          padding: 0,
-          listStyle: 'none',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 10,
-        }}
-        className="book-demo-hero-chips"
-      >
-        {[
-          '30 minutes · no slides',
-          'Live on your own strategic memo',
-          'You leave with the audit + the Decision Provenance Record',
-          'Five design-partner seats · four still open',
-        ].map(chip => (
-          <li
-            key={chip}
+        <div>
+          <div
             style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: 10,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              fontSize: 11,
+              fontWeight: 800,
+              textTransform: 'uppercase',
+              letterSpacing: '0.14em',
+              color: C.green,
               background: C.white,
               border: `1px solid ${C.greenBorder}`,
-              borderRadius: 10,
-              padding: '10px 14px',
+              padding: '4px 10px',
+              borderRadius: 999,
+              marginBottom: 14,
             }}
           >
-            <span
+            <Calendar size={11} strokeWidth={2.4} />
+            Design partner programme
+          </div>
+          <h3
+            style={{
+              fontSize: 'clamp(22px, 2.6vw, 30px)',
+              fontWeight: 800,
+              color: C.slate900,
+              letterSpacing: '-0.01em',
+              lineHeight: 1.2,
+              margin: '0 0 10px',
+            }}
+          >
+            {heading ?? 'Run your next strategic memo through the platform. Leave with the audit.'}
+          </h3>
+          <p
+            style={{
+              fontSize: 'clamp(13px, 1.25vw, 15px)',
+              color: C.slate600,
+              lineHeight: 1.6,
+              margin: '0 0 18px',
+              maxWidth: 560,
+            }}
+          >
+            {sub ??
+              'Thirty minutes with the founder. No slides. We run one of your recent memos through the causal graph, the outcome flywheel, and the framework mapper, live on the call.'}
+          </p>
+          <Link
+            {...LinkProps}
+            onClick={onClick}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              fontSize: 15,
+              fontWeight: 700,
+              color: C.white,
+              background: C.green,
+              padding: '13px 24px',
+              borderRadius: 10,
+              textDecoration: 'none',
+              boxShadow: '0 2px 10px rgba(22, 163, 74, 0.28)',
+            }}
+          >
+            <Calendar size={15} strokeWidth={2.4} />
+            {label ?? 'Book a 30-min design partner call'}
+            <ArrowRight size={15} />
+          </Link>
+        </div>
+
+        <ul
+          style={{
+            margin: 0,
+            padding: 0,
+            listStyle: 'none',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 10,
+          }}
+          className="book-demo-hero-chips"
+        >
+          {[
+            '30 minutes · no slides',
+            'Live on your own strategic memo',
+            'You leave with the audit + the Decision Provenance Record',
+            'Five design-partner seats · four still open',
+          ].map(chip => (
+            <li
+              key={chip}
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: 20,
-                height: 20,
-                borderRadius: '50%',
-                background: C.green,
-                color: C.white,
-                flexShrink: 0,
-                marginTop: 1,
-              }}
-              aria-hidden
-            >
-              <Check size={12} strokeWidth={3} />
-            </span>
-            <span
-              style={{
-                fontSize: 13,
-                fontWeight: 600,
-                color: C.slate900,
-                lineHeight: 1.45,
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 10,
+                background: C.white,
+                border: `1px solid ${C.greenBorder}`,
+                borderRadius: 10,
+                padding: '10px 14px',
               }}
             >
-              {chip}
-            </span>
-          </li>
-        ))}
-      </ul>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 20,
+                  height: 20,
+                  borderRadius: '50%',
+                  background: C.green,
+                  color: C.white,
+                  flexShrink: 0,
+                  marginTop: 1,
+                }}
+                aria-hidden
+              >
+                <Check size={12} strokeWidth={3} />
+              </span>
+              <span
+                style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: C.slate900,
+                  lineHeight: 1.45,
+                }}
+              >
+                {chip}
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
     </>
   );

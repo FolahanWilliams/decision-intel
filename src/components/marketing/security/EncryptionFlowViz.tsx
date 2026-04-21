@@ -16,15 +16,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import {
-  Globe,
-  KeyRound,
-  Lock,
-  ShieldCheck,
-  Cpu,
-  Database,
-  type LucideIcon,
-} from 'lucide-react';
+import { Globe, KeyRound, Lock, ShieldCheck, Cpu, Database, type LucideIcon } from 'lucide-react';
 import { useReducedMotion } from '@/components/marketing/how-it-works/useReducedMotion';
 
 const C = {
@@ -254,10 +246,10 @@ export function EncryptionFlowViz() {
           overflowWrap: 'anywhere',
         }}
       >
-        Every row in the encrypted columns carries a <code
+        Every row in the encrypted columns carries a{' '}
+        <code
           style={{
-            fontFamily:
-              'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+            fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
             background: C.slate50,
             border: `1px solid ${C.slate200}`,
             padding: '1px 5px',
@@ -265,7 +257,10 @@ export function EncryptionFlowViz() {
             fontSize: 10.5,
             color: C.slate700,
           }}
-        >keyVersion</code> stamp so keys can be rotated without bricking historical data.
+        >
+          keyVersion
+        </code>{' '}
+        stamp so keys can be rotated without bricking historical data.
       </div>
     </div>
   );

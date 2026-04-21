@@ -75,10 +75,7 @@ export function IntellectualConstellation() {
     );
   }, [activeCategory, shippedFilter, searchQuery]);
 
-  const selected = useMemo(
-    () => THINKERS.find(t => t.id === selectedId) ?? null,
-    [selectedId]
-  );
+  const selected = useMemo(() => THINKERS.find(t => t.id === selectedId) ?? null, [selectedId]);
 
   const shippedCount = THINKERS.filter(t => t.shipped).length;
   const totalCount = THINKERS.length;
@@ -354,7 +351,15 @@ export function IntellectualConstellation() {
                 )}
                 {/* Selected halo */}
                 {isSelected && (
-                  <circle cx={pos.x} cy={pos.y} r={NODE_R + 8} fill="none" stroke={meta.color} strokeWidth={2} strokeOpacity={0.5}>
+                  <circle
+                    cx={pos.x}
+                    cy={pos.y}
+                    r={NODE_R + 8}
+                    fill="none"
+                    stroke={meta.color}
+                    strokeWidth={2}
+                    strokeOpacity={0.5}
+                  >
                     <animate
                       attributeName="r"
                       values={`${NODE_R + 8};${NODE_R + 14};${NODE_R + 8}`}
@@ -513,9 +518,7 @@ export function IntellectualConstellation() {
               >
                 {selected.shipped ? 'Shipped' : 'Roadmap'}
               </span>
-              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                {selected.year}
-              </span>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{selected.year}</span>
             </div>
             <div
               style={{

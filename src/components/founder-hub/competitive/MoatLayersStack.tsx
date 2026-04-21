@@ -39,9 +39,7 @@ export function MoatLayersStack() {
                 padding: 12,
                 background: isActive ? color : 'var(--bg-card)',
                 color: isActive ? '#fff' : 'var(--text-primary)',
-                border: isActive
-                  ? `1.5px solid ${color}`
-                  : '1px solid var(--border-color)',
+                border: isActive ? `1.5px solid ${color}` : '1px solid var(--border-color)',
                 borderLeft: `3px solid ${color}`,
                 borderRadius: 'var(--radius-md)',
                 cursor: 'pointer',

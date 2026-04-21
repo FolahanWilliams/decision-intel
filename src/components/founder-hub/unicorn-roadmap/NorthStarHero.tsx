@@ -32,7 +32,12 @@ export function NorthStarHero() {
       >
         <defs>
           <pattern id="north-star-grid" width="28" height="28" patternUnits="userSpaceOnUse">
-            <path d="M 28 0 L 0 0 0 28" fill="none" stroke="var(--border-primary)" strokeWidth="0.5" />
+            <path
+              d="M 28 0 L 0 0 0 28"
+              fill="none"
+              stroke="var(--border-primary)"
+              strokeWidth="0.5"
+            />
           </pattern>
         </defs>
         <rect width="100%" height="100%" fill="url(#north-star-grid)" />
@@ -64,8 +69,7 @@ export function NorthStarHero() {
             maxWidth: 920,
           }}
         >
-          Decision Intel becomes the reasoning infrastructure every board
-          buys by 2030.
+          Decision Intel becomes the reasoning infrastructure every board buys by 2030.
         </h1>
         <p
           style={{
@@ -76,11 +80,10 @@ export function NorthStarHero() {
             maxWidth: 760,
           }}
         >
-          Category infrastructure, not a tool. Kahneman × Klein synthesis
-          is the moat. Design Partner #1 by week 16. Pre-seed by Q4 2026.
-          Series A at $2–5M ARR. Unicorn mark 2029–2030 on the honest
-          path — $5–10B ceiling if regulation triggers mandatory decision
-          audit and you extend into clinical, litigation, and policy.
+          Category infrastructure, not a tool. Kahneman × Klein synthesis is the moat. Design
+          Partner #1 by week 16. Pre-seed by Q4 2026. Series A at $2–5M ARR. Unicorn mark 2029–2030
+          on the honest path — $5–10B ceiling if regulation triggers mandatory decision audit and
+          you extend into clinical, litigation, and policy.
         </p>
 
         <div

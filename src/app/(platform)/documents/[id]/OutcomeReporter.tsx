@@ -270,8 +270,7 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
               <TrendingUp size={13} />
               <span>
                 DQI recalibrated: {recalibrationNote.recalibratedScore}/100 (
-                {recalibrationNote.grade}){' '}
-                {recalibrationNote.delta >= 0 ? '+' : ''}
+                {recalibrationNote.grade}) {recalibrationNote.delta >= 0 ? '+' : ''}
                 {recalibrationNote.delta} vs. original. See the comparison in the Replay tab.
               </span>
             </>

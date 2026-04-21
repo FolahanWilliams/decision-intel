@@ -264,8 +264,19 @@ export function ChannelStrategyMatrix() {
             marginBottom: 12,
           }}
         >
-          <ScoreBlock label="Effort per call" value={active.effortScore} max={10} color={active.color} invert />
-          <ScoreBlock label="Response quality" value={active.qualityScore} max={10} color={active.color} />
+          <ScoreBlock
+            label="Effort per call"
+            value={active.effortScore}
+            max={10}
+            color={active.color}
+            invert
+          />
+          <ScoreBlock
+            label="Response quality"
+            value={active.qualityScore}
+            max={10}
+            color={active.color}
+          />
         </div>
 
         <MetaRow label="Volume" body={active.volume} color={active.color} />
@@ -342,7 +353,13 @@ function ScoreBlock({
           style={{
             width: `${pct}%`,
             height: '100%',
-            background: invert ? (value <= 3 ? '#16A34A' : value <= 6 ? '#F59E0B' : '#EF4444') : color,
+            background: invert
+              ? value <= 3
+                ? '#16A34A'
+                : value <= 6
+                  ? '#F59E0B'
+                  : '#EF4444'
+              : color,
           }}
         />
       </div>

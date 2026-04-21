@@ -22,23 +22,23 @@
 
 Stripe dashboard → Products → Add product.
 
-| Field | Value |
-|-------|-------|
-| **Name** | `Decision Intel Strategy — Design Partner` |
-| **Description** | `12-month design partner seat. $1,999/mo locked for Year 1; transitions to $2,499/mo for Year 2 under MSA §5.4.` |
-| **Metadata** | `tier=strategy`, `cohort=design_partner_2026`, `year1_rate=1999`, `year2_rate=2499` |
-| **Statement descriptor** | `DECISION-INTEL DP` (must be ≤22 chars) |
+| Field                    | Value                                                                                                            |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| **Name**                 | `Decision Intel Strategy — Design Partner`                                                                       |
+| **Description**          | `12-month design partner seat. $1,999/mo locked for Year 1; transitions to $2,499/mo for Year 2 under MSA §5.4.` |
+| **Metadata**             | `tier=strategy`, `cohort=design_partner_2026`, `year1_rate=1999`, `year2_rate=2499`                              |
+| **Statement descriptor** | `DECISION-INTEL DP` (must be ≤22 chars)                                                                          |
 
 ### 2. Create the Price
 
 On the product you just created → Add price.
 
-| Field | Value |
-|-------|-------|
-| **Amount** | `$1,999.00 USD` |
-| **Billing** | Recurring · Monthly |
+| Field            | Value                                           |
+| ---------------- | ----------------------------------------------- |
+| **Amount**       | `$1,999.00 USD`                                 |
+| **Billing**      | Recurring · Monthly                             |
 | **Tax behavior** | Exclusive (invoice states sales tax separately) |
-| **Metadata** | `cohort=design_partner_2026` |
+| **Metadata**     | `cohort=design_partner_2026`                    |
 
 Save the Price ID (starts with `price_`). You'll reference it in the Subscription Schedule or the Checkout session.
 
@@ -47,6 +47,7 @@ Save the Price ID (starts with `price_`). You'll reference it in the Subscriptio
 Stripe dashboard → Subscriptions → Schedules → New schedule.
 
 Phases:
+
 - **Phase 1 (12 months):** Price = $1,999/mo (the Price you just created). Iterations = 12.
 - **Phase 2 (indefinite):** Price = the existing public **Strategy** price ID ($2,499/mo). This is the phase Month 13 transitions to automatically.
 
@@ -81,10 +82,10 @@ Set a calendar reminder for **Month 11** on each partner to handle the manual tr
 
 These env vars need values on Vercel before the first design-partner Checkout session fires:
 
-| Env var | Purpose |
-|---------|---------|
-| `STRIPE_SECRET_KEY` | already set — nothing to change |
-| `STRIPE_WEBHOOK_SECRET` | already set — nothing to change |
+| Env var                                      | Purpose                                                                                                                                                      |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `STRIPE_SECRET_KEY`                          | already set — nothing to change                                                                                                                              |
+| `STRIPE_WEBHOOK_SECRET`                      | already set — nothing to change                                                                                                                              |
 | `NEXT_PUBLIC_STRIPE_DESIGN_PARTNER_PRICE_ID` | `price_...` from step 2. Use in the design-partner checkout flow if/when we automate it. Until then, the MSA workflow stays manual (invoice + Payment Link). |
 
 `src/lib/stripe.ts` already exposes `PLANS.team` (Strategy tier). When the automated design-partner checkout is built, add a new `PLANS.designPartner` entry with the new Price ID and `metadata.cohort = 'design_partner_2026'` so webhooks can route accordingly.

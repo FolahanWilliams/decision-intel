@@ -28,7 +28,7 @@ export const TRACTION_PLAN: WeekPlan[] = [
     keyActions: [
       'Send 40 LinkedIn connection requests using the discovery opener',
       'Book first 3–5 discovery calls',
-      'Run Goldner\'s 4-question script on every call',
+      "Run Goldner's 4-question script on every call",
       'Tell Josh Rainer the wedge is sharp — request Tier 1 intros',
       'Draft one-page Validation Summary with anonymized quotes',
     ],
@@ -126,144 +126,168 @@ export const SEED_TARGETS: SeedTarget[] = [
     company: 'Alphabet (Google Cloud)',
     tier: 'tier_1',
     industry: 'tech',
-    reason: 'Alphabet acquires 10–15 companies per year. Wiz ($32B) was Josh\'s direct deal. Corp Dev team is one of the most sophisticated in tech.',
+    reason:
+      "Alphabet acquires 10–15 companies per year. Wiz ($32B) was Josh's direct deal. Corp Dev team is one of the most sophisticated in tech.",
     roleToTarget: 'VP, Corporate Development, Strategy / Director, M&A, Google Cloud',
     dealFrequency: '10–15 per year',
     dealSizeRange: '$500M–$15B',
     approach: 'Josh Rainer warm intro (direct Wiz connection)',
-    personalisationHook: 'Reference Wiz acquisition and post-close integration complexity of a $32B cloud security deal.',
+    personalisationHook:
+      'Reference Wiz acquisition and post-close integration complexity of a $32B cloud security deal.',
   },
   {
     id: 'salesforce',
     company: 'Salesforce',
     tier: 'tier_1',
     industry: 'tech',
-    reason: '$30B+ in acquisitions (Tableau, Slack, MuleSoft). Organizational pain around deal ROI and board scrutiny.',
+    reason:
+      '$30B+ in acquisitions (Tableau, Slack, MuleSoft). Organizational pain around deal ROI and board scrutiny.',
     roleToTarget: 'VP / SVP, Corporate Development',
     dealFrequency: '8–12 per year',
     dealSizeRange: '$1B–$15B',
     approach: 'Josh intro (SaaS/cloud network)',
-    personalisationHook: 'Slack acquisition challenges and the gap between pre-deal hype and post-integration reality.',
+    personalisationHook:
+      'Slack acquisition challenges and the gap between pre-deal hype and post-integration reality.',
   },
   {
     id: 'microsoft',
     company: 'Microsoft',
     tier: 'tier_1',
     industry: 'tech',
-    reason: 'Activision ($69B) was controversial — regulatory scrutiny, integration complexity, board-level scrutiny. Actively re-evaluating M&A strategy.',
+    reason:
+      'Activision ($69B) was controversial — regulatory scrutiny, integration complexity, board-level scrutiny. Actively re-evaluating M&A strategy.',
     roleToTarget: 'Corporate Vice President, Corporate Development / VP, M&A Strategy',
     dealFrequency: '8–12 per year',
     dealSizeRange: '$500M–$75B',
     approach: 'Josh intro (enterprise software network)',
-    personalisationHook: 'Activision Blizzard post-close cultural/regulatory integration. Pre-deal bias audit could have highlighted risks earlier.',
+    personalisationHook:
+      'Activision Blizzard post-close cultural/regulatory integration. Pre-deal bias audit could have highlighted risks earlier.',
   },
   {
     id: 'cisco',
     company: 'Cisco',
     tier: 'tier_1',
     industry: 'tech',
-    reason: 'Aggressive repositioning into security/software (Splunk). Known for disciplined M&A but recent integration challenges.',
+    reason:
+      'Aggressive repositioning into security/software (Splunk). Known for disciplined M&A but recent integration challenges.',
     roleToTarget: 'VP, Corporate Development / Director, M&A',
     dealFrequency: '6–10 per year',
     dealSizeRange: '$500M–$28B',
     approach: 'Josh intro (enterprise/security network)',
-    personalisationHook: 'Shift into security-driven M&A and complexity of integrating software into a hardware-centric company.',
+    personalisationHook:
+      'Shift into security-driven M&A and complexity of integrating software into a hardware-centric company.',
   },
   {
     id: 'servicenow',
     company: 'ServiceNow',
     tier: 'tier_1',
     industry: 'tech',
-    reason: '15+ acquisitions in last 5 years. Building a platform via consolidation. Recent CEO transition brought new M&A discipline.',
+    reason:
+      '15+ acquisitions in last 5 years. Building a platform via consolidation. Recent CEO transition brought new M&A discipline.',
     roleToTarget: 'SVP, Corporate Development / VP, M&A, Strategy',
     dealFrequency: '8–15 per year',
     dealSizeRange: '$100M–$5B',
     approach: 'Josh intro (cloud/SaaS network)',
-    personalisationHook: 'Platform consolidation strategy. Pattern of smaller acquisitions rolled into a larger platform.',
+    personalisationHook:
+      'Platform consolidation strategy. Pattern of smaller acquisitions rolled into a larger platform.',
   },
   {
     id: 'jnj',
     company: 'Johnson & Johnson',
     tier: 'tier_2',
     industry: 'healthcare',
-    reason: '6–10 per year across pharma, devices, consumer health. Post-acquisition integration challenges. Healthcare M&A is high-stakes.',
+    reason:
+      '6–10 per year across pharma, devices, consumer health. Post-acquisition integration challenges. Healthcare M&A is high-stakes.',
     roleToTarget: 'VP, Corporate Development / Head of M&A, Pharmaceuticals',
     dealFrequency: '6–10 per year',
     dealSizeRange: '$500M–$30B',
     approach: 'Cold LinkedIn outreach + warm follow-up',
-    personalisationHook: 'Predicting post-acquisition R&D productivity and regulatory outcomes. Pre-deal bias audit on clinical/regulatory assumptions.',
+    personalisationHook:
+      'Predicting post-acquisition R&D productivity and regulatory outcomes. Pre-deal bias audit on clinical/regulatory assumptions.',
   },
   {
     id: 'unitedhealth',
     company: 'UnitedHealth Group / Optum',
     tier: 'tier_2',
     industry: 'healthcare',
-    reason: '10–15 per year. Consolidating healthcare value chain. Board-level scrutiny extremely high.',
+    reason:
+      '10–15 per year. Consolidating healthcare value chain. Board-level scrutiny extremely high.',
     roleToTarget: 'SVP, Corporate Development, Optum / VP, M&A Strategy',
     dealFrequency: '10–15 per year',
     dealSizeRange: '$500M–$15B',
     approach: 'Cold LinkedIn, reference consolidation thesis',
-    personalisationHook: 'Integrating services across payer/provider/technology businesses. Groupthink in complex deals.',
+    personalisationHook:
+      'Integrating services across payer/provider/technology businesses. Groupthink in complex deals.',
   },
   {
     id: 'honeywell',
     company: 'Honeywell International',
     tier: 'tier_2',
     industry: 'industrial',
-    reason: '8–12 per year across aerospace, building tech, materials, software. CEO driving portfolio optimization.',
+    reason:
+      '8–12 per year across aerospace, building tech, materials, software. CEO driving portfolio optimization.',
     roleToTarget: 'VP, Corporate Development / Head of M&A',
     dealFrequency: '8–12 per year',
     dealSizeRange: '$500M–$10B',
     approach: 'Cold LinkedIn, reference portfolio strategy',
-    personalisationHook: 'Portfolio restructuring and synergy identification across diverse business units. 60% of synergies don\'t materialize.',
+    personalisationHook:
+      "Portfolio restructuring and synergy identification across diverse business units. 60% of synergies don't materialize.",
   },
   {
     id: 'pfizer',
     company: 'Pfizer',
     tier: 'tier_2',
     industry: 'healthcare',
-    reason: '4–8 per year. Post-COVID intense shareholder scrutiny on R&D ROI. Board-level accountability for deal success.',
+    reason:
+      '4–8 per year. Post-COVID intense shareholder scrutiny on R&D ROI. Board-level accountability for deal success.',
     roleToTarget: 'VP, Corporate Development / SVP, Strategy & M&A',
     dealFrequency: '4–8 per year',
     dealSizeRange: '$1B–$43B',
     approach: 'Cold LinkedIn, reference recent acquisitions',
-    personalisationHook: 'Integrating companies into a diversified pharma portfolio. Cognitive bias in biotech M&A (hype vs. reality).',
+    personalisationHook:
+      'Integrating companies into a diversified pharma portfolio. Cognitive bias in biotech M&A (hype vs. reality).',
   },
   {
     id: 'adobe',
     company: 'Adobe',
     tier: 'tier_2',
     industry: 'tech',
-    reason: '5–8 per year. Consolidating creative and marketing workflows. Public-facing M&A strategy.',
+    reason:
+      '5–8 per year. Consolidating creative and marketing workflows. Public-facing M&A strategy.',
     roleToTarget: 'VP, Corporate Development / SVP, Strategy & Corp Dev',
     dealFrequency: '5–8 per year',
     dealSizeRange: '$500M–$20B',
     approach: 'Cold LinkedIn, reference strategy',
-    personalisationHook: 'Consolidation strategy. Pre-close bias audit to inform deal selection and integration.',
+    personalisationHook:
+      'Consolidation strategy. Pre-close bias audit to inform deal selection and integration.',
   },
   {
     id: 'emerson',
     company: 'Emerson Electric',
     tier: 'tier_2',
     industry: 'industrial',
-    reason: '8–15 per year. Building automation/software empire via M&A. Shift toward digital transformation.',
+    reason:
+      '8–15 per year. Building automation/software empire via M&A. Shift toward digital transformation.',
     roleToTarget: 'VP, Corporate Development / Director, M&A Strategy',
     dealFrequency: '8–15 per year',
     dealSizeRange: '$100M–$5B',
     approach: 'Cold LinkedIn, reference digital transformation thesis',
-    personalisationHook: 'Shift toward software/digital via M&A. Synergy realization in tech-into-industrial deals.',
+    personalisationHook:
+      'Shift toward software/digital via M&A. Synergy realization in tech-into-industrial deals.',
   },
   {
     id: 'deloitte',
     company: 'Deloitte M&A Advisory',
     tier: 'tier_3',
     industry: 'financial',
-    reason: 'Advises 100+ Fortune 500 clients per year. Channel partner — Decision Intel embedded in their deal playbook = massive distribution.',
+    reason:
+      'Advises 100+ Fortune 500 clients per year. Channel partner — Decision Intel embedded in their deal playbook = massive distribution.',
     roleToTarget: 'M&A Advisory Partner / Head of deal methodology practice',
     dealFrequency: '100s per year (client-side)',
     dealSizeRange: 'Varies',
     approach: 'Cold email to M&A Advisory partner',
-    personalisationHook: 'Complementary to their integration playbook. Add AI-powered bias auditing to their rigor.',
+    personalisationHook:
+      'Complementary to their integration playbook. Add AI-powered bias auditing to their rigor.',
   },
   {
     id: 'goldman',
@@ -275,31 +299,36 @@ export const SEED_TARGETS: SeedTarget[] = [
     dealFrequency: '100s per year (client-side)',
     dealSizeRange: 'Mega-deals',
     approach: 'Warm intro via Goldman contact',
-    personalisationHook: 'De-risk their advisory relationships. Catch bias before the deal fails post-close.',
+    personalisationHook:
+      'De-risk their advisory relationships. Catch bias before the deal fails post-close.',
   },
   {
     id: 'berkshire',
     company: 'Berkshire Hathaway',
     tier: 'tier_3',
     industry: 'financial',
-    reason: '5–10 per year. A validation POC with Berkshire would be the most credible case study in the world.',
+    reason:
+      '5–10 per year. A validation POC with Berkshire would be the most credible case study in the world.',
     roleToTarget: 'IR team / Treasury / Corporate Development office',
     dealFrequency: '5–10 per year',
     dealSizeRange: '$1B–$40B',
     approach: 'IR team first, then corporate development',
-    personalisationHook: 'Pride-based, not shame-based. Position as validation tool for disciplined decision-making.',
+    personalisationHook:
+      'Pride-based, not shame-based. Position as validation tool for disciplined decision-making.',
   },
   {
     id: 'defense',
     company: 'General Dynamics / Lockheed Martin',
     tier: 'tier_3',
     industry: 'defense',
-    reason: 'Compliance requirements (CFIUS, export controls, clearances) add complexity. Prove compliance + bias audits = own a niche.',
+    reason:
+      'Compliance requirements (CFIUS, export controls, clearances) add complexity. Prove compliance + bias audits = own a niche.',
     roleToTarget: 'VP, Corporate Development (Defense / Aerospace)',
     dealFrequency: '4–8 per year per company',
     dealSizeRange: '$500M–$10B',
     approach: 'Cold outreach emphasizing compliance + bias',
-    personalisationHook: 'Board asks two questions: Is this strategic? Are we compliant? We answer both.',
+    personalisationHook:
+      'Board asks two questions: Is this strategic? Are we compliant? We answer both.',
   },
 ];
 
@@ -380,7 +409,7 @@ export const GOLDNER_QUESTIONS: DiscoveryQuestion[] = [
     question: 'What did you miss? When did you realise it?',
     probes: [
       'What would you have needed to know earlier?',
-      'Was there a moment where someone raised it and it didn\'t stick?',
+      "Was there a moment where someone raised it and it didn't stick?",
       'Who was responsible for stress-testing that assumption?',
     ],
     listenFor:
@@ -399,7 +428,7 @@ export const GOLDNER_QUESTIONS: DiscoveryQuestion[] = [
   },
   {
     number: 4,
-    question: 'What do you wish you\'d known earlier in diligence?',
+    question: "What do you wish you'd known earlier in diligence?",
     probes: [
       'What would it have to offer for you to consider an external bias audit?',
       'Have you ever used McKinsey / outside counsel for a second opinion?',
@@ -517,12 +546,12 @@ Think this is worth 20 minutes? I'll let him take it from here.
 
 Josh`,
     when: 'Week 2 — after Week 1 pitch sharpening. Paste + hand to Josh.',
-    tone: 'Understated — Josh\'s credibility does the heavy lifting',
+    tone: "Understated — Josh's credibility does the heavy lifting",
     variables: ['FIRST_NAME'],
   },
   {
     id: 'folahan_followup_after_josh',
-    name: '4. Folahan Follow-Up After Josh\'s Intro',
+    name: "4. Folahan Follow-Up After Josh's Intro",
     channel: 'email',
     subject: "Let's run one deal memo",
     body: `Hi {{FIRST_NAME}},
@@ -588,7 +617,7 @@ Folahan`,
 Takes about one memo and 20 minutes of your team's time spread over 6 weeks. We handle all the analysis; you just give us the memo and 20 minutes to review the report with your team.
 
 If it's useful, we can talk about next steps. If not, you've only spent a memo and lost nothing. Fair deal?`,
-    when: 'End of discovery call, after they\'ve named the pain',
+    when: "End of discovery call, after they've named the pain",
     tone: 'Confident. Offering, not asking.',
     variables: [],
   },
@@ -689,14 +718,17 @@ export const POC_SUCCESS_CRITERIA: POCSuccessCriterion[] = [
   {
     id: 'novel_bias',
     name: 'Novel Bias Detection',
-    description: 'At least 2 cognitive biases surfaced that the team hadn\'t explicitly identified before.',
-    measurement: 'Week 5: "Did any of the biases we flagged surprise you or change how you think about this deal?"',
+    description:
+      "At least 2 cognitive biases surfaced that the team hadn't explicitly identified before.",
+    measurement:
+      'Week 5: "Did any of the biases we flagged surprise you or change how you think about this deal?"',
   },
   {
     id: 'actionable_insight',
     name: 'Specific Actionable Insight',
-    description: 'Participant articulates 1 specific insight they\'ll use going forward.',
-    measurement: '"Because of Decision Intel, we\'re now going to..." — must be concrete, not generic.',
+    description: "Participant articulates 1 specific insight they'll use going forward.",
+    measurement:
+      '"Because of Decision Intel, we\'re now going to..." — must be concrete, not generic.',
   },
   {
     id: 'nps',
@@ -761,8 +793,10 @@ export const BUYER_PERSONAS: BuyerPersona[] = [
     whereToFind:
       'LinkedIn (search "VP Corporate Development" + Fortune 500), M&A East, Strategic Acquirers Summit, ACG events',
     pain: 'Owns deal tools budget. Board-accountable for deal performance. Feels the career risk of every uncaught bias personally.',
-    language: 'Deal memo · deal thesis · acquisition rationale · synergy capture · integration thesis · board approval',
-    authority: 'Direct decision authority on deal tools. Budget owner for M&A process improvements.',
+    language:
+      'Deal memo · deal thesis · acquisition rationale · synergy capture · integration thesis · board approval',
+    authority:
+      'Direct decision authority on deal tools. Budget owner for M&A process improvements.',
     warmIntroPath:
       'Josh Rainer almost certainly has 5–10 of these from the Wiz $32B deal. Ask him explicitly.',
   },
@@ -770,12 +804,16 @@ export const BUYER_PERSONAS: BuyerPersona[] = [
     id: 'director_ma',
     tier: 'primary',
     title: 'Director of M&A',
-    titleVariants: ['Director Corporate Development', 'Senior Director M&A', 'M&A Associate (at large cos)'],
+    titleVariants: [
+      'Director Corporate Development',
+      'Senior Director M&A',
+      'M&A Associate (at large cos)',
+    ],
     whereToFind:
       'LinkedIn (more candid than VP level), conference panels, ACG chapter events, M&A East',
-    pain:
-      'Lives inside the 40-page deal memos every day. Writes them, reviews them, knows where the reasoning breaks.',
-    language: 'IC memo · red flag · kill the deal · stress-test the thesis · pre-mortem · post-close review',
+    pain: 'Lives inside the 40-page deal memos every day. Writes them, reviews them, knows where the reasoning breaks.',
+    language:
+      'IC memo · red flag · kill the deal · stress-test the thesis · pre-mortem · post-close review',
     authority:
       'Execution authority. Influences deal tool selection without owning budget. Often more candid than VP level because less political.',
     warmIntroPath: 'LinkedIn cold outreach with specific deal reference. ACG chapter events.',
@@ -784,24 +822,30 @@ export const BUYER_PERSONAS: BuyerPersona[] = [
     id: 'cso',
     tier: 'primary',
     title: 'Chief Strategy Officer',
-    titleVariants: ['SVP Strategy', 'Head of Strategy & Corporate Development', 'Chief of Staff to CEO (sometimes)'],
+    titleVariants: [
+      'SVP Strategy',
+      'Head of Strategy & Corporate Development',
+      'Chief of Staff to CEO (sometimes)',
+    ],
     whereToFind: 'LinkedIn, Strategic Acquirers Summit, CSO Council, CEO-panel conferences',
-    pain:
-      'Owns repeatable decision quality at the portfolio level. Career ends over one bad board recommendation.',
+    pain: 'Owns repeatable decision quality at the portfolio level. Career ends over one bad board recommendation.',
     language:
       'Strategic memo · decision quality · repeatable process · quarter after quarter · board credibility',
     authority:
-      'Sets the process. If they\'re convinced, the VP of Corp Dev follows within one cycle.',
+      "Sets the process. If they're convinced, the VP of Corp Dev follows within one cycle.",
     warmIntroPath: 'Advisor network. LinkedIn. Warmer path than VP Corp Dev for some companies.',
   },
   {
     id: 'ma_integration',
     tier: 'adjacent',
     title: 'Head of M&A Integration',
-    titleVariants: ['VP Integration', 'Head of Post-Merger Integration', 'M&A Integration Director'],
+    titleVariants: [
+      'VP Integration',
+      'Head of Post-Merger Integration',
+      'M&A Integration Director',
+    ],
     whereToFind: 'LinkedIn. Post-merger integration conferences.',
-    pain:
-      'Sees the aftermath of bad decisions. Signed off on synergies that never materialized. Highly motivated to improve upstream quality.',
+    pain: 'Sees the aftermath of bad decisions. Signed off on synergies that never materialized. Highly motivated to improve upstream quality.',
     language:
       'Synergy realization · integration thesis · cultural fit · post-close review · what did we miss?',
     authority:
@@ -815,8 +859,7 @@ export const BUYER_PERSONAS: BuyerPersona[] = [
     title: 'General Counsel / Deputy GC (M&A)',
     titleVariants: ['General Counsel', 'Deputy General Counsel', 'Associate GC, M&A'],
     whereToFind: 'LinkedIn. GC networks (ACC). Legal ops conferences.',
-    pain:
-      'SOX 302 compliance. Increasingly responsible for documenting decision rationale. Regulatory exposure on bad deals.',
+    pain: 'SOX 302 compliance. Increasingly responsible for documenting decision rationale. Regulatory exposure on bad deals.',
     language:
       'Documented process · audit trail · fiduciary duty · SOX 302 · SEC disclosure · Delaware standards',
     authority:
@@ -830,10 +873,8 @@ export const BUYER_PERSONAS: BuyerPersona[] = [
     title: 'CFO (mid-market Fortune 500)',
     titleVariants: ['CFO', 'Co-chair M&A Committee', 'SVP Finance & Strategy'],
     whereToFind: 'LinkedIn. Mid-market ($5B–$20B revenue) Fortune 500 companies.',
-    pain:
-      'Often co-chairs the M&A committee at smaller F500s. Numbers-first. "85–90% gross margin, $0.05 vs. $500K McKinsey" framing lands fast.',
-    language:
-      'Unit economics · gross margin · ROI · cost to replace · compounding asset · LTV',
+    pain: 'Often co-chairs the M&A committee at smaller F500s. Numbers-first. "85–90% gross margin, $0.05 vs. $500K McKinsey" framing lands fast.',
+    language: 'Unit economics · gross margin · ROI · cost to replace · compounding asset · LTV',
     authority: 'Co-signs on M&A committee. Can accelerate procurement for sub-$50K tools.',
     warmIntroPath:
       'Lead with unit economics in the first message. Never lead with "cognitive bias" — lead with "$0.05 vs. $500K."',
@@ -844,8 +885,9 @@ export const BUYER_PERSONAS: BuyerPersona[] = [
     title: 'Innovation Lab / Chief Innovation Officer',
     titleVariants: ['Chief Innovation Officer', 'Head of Innovation', 'Innovation Program Lead'],
     whereToFind: 'Innovation conferences. Corporate innovation Slack groups.',
-    pain: 'They\'re always looking for "the next thing." They\'ll say yes to meetings. They can\'t close.',
-    language: 'Innovation · exploration · cutting-edge · proof of concept · we\'d love to take a look',
+    pain: "They're always looking for \"the next thing.\" They'll say yes to meetings. They can't close.",
+    language:
+      "Innovation · exploration · cutting-edge · proof of concept · we'd love to take a look",
     authority: 'Can recommend. Cannot buy. Zero budget authority for line-of-business tools.',
     antiReason:
       'They soak up pitch energy for zero conversion probability. Will reference Decision Intel for months without procurement moving.',
@@ -856,10 +898,10 @@ export const BUYER_PERSONAS: BuyerPersona[] = [
     title: 'CTO / IT leadership',
     titleVariants: ['CTO', 'VP Engineering', 'Head of IT', 'Chief Data Officer'],
     whereToFind: 'Easy to find. Easy to engage. Deceptively warm conversations.',
-    pain:
-      '"This is interesting, but we could build this internally." They will build a half-version in Q3, ship nothing, and block procurement.',
+    pain: '"This is interesting, but we could build this internally." They will build a half-version in Q3, ship nothing, and block procurement.',
     language: 'Build vs. buy · data governance · integration complexity · we have a team',
-    authority: 'Can block procurement. Can champion build-it-yourself. Cannot close the line-of-business budget.',
+    authority:
+      'Can block procurement. Can champion build-it-yourself. Cannot close the line-of-business budget.',
     antiReason:
       'They\'ll spend 3 months evaluating "should we build this ourselves?" The deal dies waiting for engineering capacity.',
   },
@@ -868,9 +910,10 @@ export const BUYER_PERSONAS: BuyerPersona[] = [
     tier: 'anti_pattern',
     title: 'Procurement / Strategic Sourcing',
     titleVariants: ['Procurement', 'Strategic Sourcing Manager', 'Vendor Management'],
-    whereToFind: 'They will find you. Especially if you haven\'t found a champion.',
+    whereToFind: "They will find you. Especially if you haven't found a champion.",
     pain: 'They are not a buyer. They are a buying-process enforcer.',
-    language: 'RFP · vendor qualification · security review · MSA · indemnification · 18-month cycle',
+    language:
+      'RFP · vendor qualification · security review · MSA · indemnification · 18-month cycle',
     authority: 'Zero decision-making power on what to buy. Total power over how and when to buy.',
     antiReason:
       'Never start here. They\'ll RFP you into an 18-month cycle. Only engage procurement AFTER a business-line champion has said "I want this."',
@@ -895,7 +938,15 @@ export const TARGET_INDUSTRIES: TargetIndustry[] = [
     name: 'Technology',
     note: 'High M&A frequency. Mature corp dev functions. Most active acquirer class.',
     cadence: '5–15 deals/yr',
-    companies: ['Cisco Systems', 'Salesforce', 'Alphabet / Google', 'Microsoft', 'Adobe', 'Workday', 'ServiceNow'],
+    companies: [
+      'Cisco Systems',
+      'Salesforce',
+      'Alphabet / Google',
+      'Microsoft',
+      'Adobe',
+      'Workday',
+      'ServiceNow',
+    ],
     fit: 'core',
     accent: '#0EA5E9',
   },
@@ -986,7 +1037,7 @@ export const OUTREACH_CHANNELS: OutreachChannel[] = [
     effortScore: 7,
     qualityScore: 9,
     volume: '10–30 contacts per event',
-    bestFor: 'Face-to-face rapport building. Net-new contacts you can\'t reach cold.',
+    bestFor: "Face-to-face rapport building. Net-new contacts you can't reach cold.",
     color: '#8B5CF6',
   },
   {
@@ -1032,7 +1083,8 @@ export const DEAL_CLOSER_DOCS: DealCloserDoc[] = [
   {
     id: 'security',
     name: 'Data Security & Trust One-Pager',
-    purpose: 'Send the moment a prospect asks "how do you handle our documents?" — which will happen on call #1.',
+    purpose:
+      'Send the moment a prospect asks "how do you handle our documents?" — which will happen on call #1.',
     when: 'Attach to any first outreach where the prospect is a regulated buyer (financial services, healthcare, defense). Send after any security question.',
     accent: '#0EA5E9',
     sections: [
@@ -1076,7 +1128,7 @@ export const DEAL_CLOSER_DOCS: DealCloserDoc[] = [
     id: 'design_partner_loi',
     name: 'Design Partner Letter of Intent',
     purpose:
-      'One-page agreement that converts a completed pilot into a paying design partner. Not an NDA (that\'s separate). Not a full MSA (that\'s months of legal). This is what your first paying customer signs to lock in the design-partner discount + case-study rights.',
+      "One-page agreement that converts a completed pilot into a paying design partner. Not an NDA (that's separate). Not a full MSA (that's months of legal). This is what your first paying customer signs to lock in the design-partner discount + case-study rights.",
     when: 'Send at the end of Week 5 of a successful POC, or the moment a pilot contact says "yes, we want to keep using this." Binding on signature.',
     accent: '#16A34A',
     sections: [
@@ -1086,33 +1138,27 @@ export const DEAL_CLOSER_DOCS: DealCloserDoc[] = [
       },
       {
         heading: '1. Commercial Terms',
-        body:
-          'Design Partner subscribes to Decision Intel at a founding-partner rate of US $1,500 / month (vs. list of $2,499), billed monthly in advance, for a 6–12 month term. After the initial term, subscription continues at list pricing unless the parties agree otherwise in writing.\n\nFair-use: This rate applies to up to 10 seats and 100 audits/month during the initial term. Higher volumes trigger a scope conversation — not a breach. Decision Intel will propose a revised rate within 10 business days of exceeding cap, and usage continues uninterrupted while terms are agreed.',
+        body: 'Design Partner subscribes to Decision Intel at a founding-partner rate of US $1,500 / month (vs. list of $2,499), billed monthly in advance, for a 6–12 month term. After the initial term, subscription continues at list pricing unless the parties agree otherwise in writing.\n\nFair-use: This rate applies to up to 10 seats and 100 audits/month during the initial term. Higher volumes trigger a scope conversation — not a breach. Decision Intel will propose a revised rate within 10 business days of exceeding cap, and usage continues uninterrupted while terms are agreed.',
       },
       {
         heading: '2. Decision Intel Commitments',
-        body:
-          '• Weekly founder check-ins (30 min) for the duration of the term.\n• Direct roadmap access — Design Partner sees the prioritized backlog and influences sequencing.\n• Right of first refusal on feature requests — any feature requested is either built, or a written decline with rationale is returned within 10 business days.\n• Named logo on decision-intel.com within 30 days of the Effective Date (subject to Section 4).\n• All controls in the Decision Intel Data Security & Trust one-pager remain in force throughout the term.',
+        body: '• Weekly founder check-ins (30 min) for the duration of the term.\n• Direct roadmap access — Design Partner sees the prioritized backlog and influences sequencing.\n• Right of first refusal on feature requests — any feature requested is either built, or a written decline with rationale is returned within 10 business days.\n• Named logo on decision-intel.com within 30 days of the Effective Date (subject to Section 4).\n• All controls in the Decision Intel Data Security & Trust one-pager remain in force throughout the term.',
       },
       {
         heading: '3. Design Partner Commitments',
-        body:
-          '• Use Decision Intel on at least one active strategic decision per month and provide structured feedback after each use.\n• Grant Decision Intel the right to publish a case study at end of term — Design Partner elects in writing whether publication is named or anonymized.\n• Permit use of Design Partner\'s logo on decision-intel.com, marketing decks, and investor materials. Revocable on 30 days\' written notice.\n• Designate one executive sponsor and one day-to-day user for the weekly check-ins.',
+        body: "• Use Decision Intel on at least one active strategic decision per month and provide structured feedback after each use.\n• Grant Decision Intel the right to publish a case study at end of term — Design Partner elects in writing whether publication is named or anonymized.\n• Permit use of Design Partner's logo on decision-intel.com, marketing decks, and investor materials. Revocable on 30 days' written notice.\n• Designate one executive sponsor and one day-to-day user for the weekly check-ins.",
       },
       {
         heading: '4. Confidentiality, Data & Logo',
-        body:
-          'The NDA from the preceding pilot remains in effect. Uploaded documents are processed under the Decision Intel Data Security & Trust controls: GDPR anonymization gate, AES-256-GCM encryption, no training on customer data, customer-controlled retention. Logo and case-study rights in Section 3 are limited to the form and context approved by the Design Partner at publication.',
+        body: 'The NDA from the preceding pilot remains in effect. Uploaded documents are processed under the Decision Intel Data Security & Trust controls: GDPR anonymization gate, AES-256-GCM encryption, no training on customer data, customer-controlled retention. Logo and case-study rights in Section 3 are limited to the form and context approved by the Design Partner at publication.',
       },
       {
         heading: '5. Binding Provisions',
-        body:
-          'Sections 1–4 are binding on execution. The parties intend to execute a full MSA within 60 days; until then, this LOI governs. Upon incorporation of Decision Intel (anticipated 2026), this LOI assigns automatically to the incorporated entity. Either party may terminate for material breach on 15 days\' written notice.',
+        body: "Sections 1–4 are binding on execution. The parties intend to execute a full MSA within 60 days; until then, this LOI governs. Upon incorporation of Decision Intel (anticipated 2026), this LOI assigns automatically to the incorporated entity. Either party may terminate for material breach on 15 days' written notice.",
       },
       {
         heading: 'Signature block',
-        body:
-          'DECISION INTEL\n______ Folahan Williams, Founder\nDate: ______\n\nDESIGN PARTNER\nName: ______\nTitle: ______\nDate: ______',
+        body: 'DECISION INTEL\n______ Folahan Williams, Founder\nDate: ______\n\nDESIGN PARTNER\nName: ______\nTitle: ______\nDate: ______',
       },
     ],
     footer:

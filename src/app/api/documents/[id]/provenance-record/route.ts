@@ -139,9 +139,6 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ record: persisted, data });
   } catch (err) {
     log.error('POST provenance-record failed:', err);
-    return NextResponse.json(
-      { error: 'Failed to generate provenance record.' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to generate provenance record.' }, { status: 500 });
   }
 }

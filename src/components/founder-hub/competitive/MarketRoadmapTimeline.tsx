@@ -232,9 +232,7 @@ export function MarketRoadmapTimeline() {
                 marginBottom: 6,
               }}
             >
-              <span style={{ fontSize: 13, fontWeight: 800, color: item.color }}>
-                {item.year}
-              </span>
+              <span style={{ fontSize: 13, fontWeight: 800, color: item.color }}>{item.year}</span>
               <span
                 style={{
                   fontSize: 8,

@@ -15,20 +15,68 @@ export const HERO = {
   headline: 'The Decision Performance OS for Corporate Strategy & M&A Teams',
   body: 'Audit every strategic decision for cognitive bias and decision noise. Protect business outcomes. AI-powered cognitive auditing purpose-built for corporate strategy and M&A teams.',
   pillars: [
-    { label: 'Decision Knowledge Graph', detail: 'Every audit persists. Compounds quarter over quarter.' },
-    { label: 'Predict CEO Questions', detail: '5 role-primed personas simulate the steering-committee grilling.' },
-    { label: 'Audit the Reasoning', detail: '12-node pipeline. 30+ biases. Noise decomposition. Structured in 60 seconds.' },
-    { label: 'Close the Outcome Loop', detail: 'DQI grade + Tetlock-calibrated tracking. Quarter after quarter.' },
+    {
+      label: 'Decision Knowledge Graph',
+      detail: 'Every audit persists. Compounds quarter over quarter.',
+    },
+    {
+      label: 'Predict CEO Questions',
+      detail: '5 role-primed personas simulate the steering-committee grilling.',
+    },
+    {
+      label: 'Audit the Reasoning',
+      detail: '12-node pipeline. 30+ biases. Noise decomposition. Structured in 60 seconds.',
+    },
+    {
+      label: 'Close the Outcome Loop',
+      detail: 'DQI grade + Tetlock-calibrated tracking. Quarter after quarter.',
+    },
   ],
 };
 
 export const PRODUCT_METRICS: ProductMetric[] = [
-  { value: '20', label: 'Standard Biases', sub: '+ 11 investment-specific', accent: '#16A34A', icon: 'biases' },
-  { value: '12', label: 'Pipeline Nodes', sub: '7-way parallel fan-out', accent: '#0EA5E9', icon: 'pipeline' },
-  { value: '135', label: 'Case Studies', sub: 'failures + successes', accent: '#F59E0B', icon: 'cases' },
-  { value: '3', label: 'Outcome Channels', sub: 'Autonomous detection', accent: '#8B5CF6', icon: 'outcomes' },
-  { value: '2', label: 'AI Providers', sub: 'Gemini + Claude fallback', accent: '#EC4899', icon: 'providers' },
-  { value: '6', label: 'Touchpoints', sub: 'Web, Slack, Drive, Email, Extension, API', accent: '#14B8A6', icon: 'touchpoints' },
+  {
+    value: '20',
+    label: 'Standard Biases',
+    sub: '+ 11 investment-specific',
+    accent: '#16A34A',
+    icon: 'biases',
+  },
+  {
+    value: '12',
+    label: 'Pipeline Nodes',
+    sub: '7-way parallel fan-out',
+    accent: '#0EA5E9',
+    icon: 'pipeline',
+  },
+  {
+    value: '135',
+    label: 'Case Studies',
+    sub: 'failures + successes',
+    accent: '#F59E0B',
+    icon: 'cases',
+  },
+  {
+    value: '3',
+    label: 'Outcome Channels',
+    sub: 'Autonomous detection',
+    accent: '#8B5CF6',
+    icon: 'outcomes',
+  },
+  {
+    value: '2',
+    label: 'AI Providers',
+    sub: 'Gemini + Claude fallback',
+    accent: '#EC4899',
+    icon: 'providers',
+  },
+  {
+    value: '6',
+    label: 'Touchpoints',
+    sub: 'Web, Slack, Drive, Email, Extension, API',
+    accent: '#14B8A6',
+    icon: 'touchpoints',
+  },
 ];
 
 export interface ProblemStatement {
@@ -42,20 +90,25 @@ export interface ProblemStatement {
 export const PROBLEM_STATEMENTS: ProblemStatement[] = [
   {
     id: 'undetected_bias',
-    headline: 'High-stakes decisions are made on documents riddled with cognitive bias nobody detects.',
-    detail: 'Executive teams ship strategic memos without any structured bias audit. Every blind spot becomes a board-meeting risk.',
+    headline:
+      'High-stakes decisions are made on documents riddled with cognitive bias nobody detects.',
+    detail:
+      'Executive teams ship strategic memos without any structured bias audit. Every blind spot becomes a board-meeting risk.',
     severity: 'critical',
   },
   {
     id: 'single_decision_cost',
     headline: 'A single bad strategic decision costs organizations millions in value destruction.',
-    detail: 'One uncaught bias in a capital-allocation memo can compound into nine-figure write-downs.',
+    detail:
+      'One uncaught bias in a capital-allocation memo can compound into nine-figure write-downs.',
     severity: 'critical',
   },
   {
     id: 'anchoring',
-    headline: 'Decision-makers anchored to initial assumptions hold failing initiatives 40% longer than optimal.',
-    detail: 'Anchoring bias keeps teams glued to doomed strategies past the point where exit would preserve value.',
+    headline:
+      'Decision-makers anchored to initial assumptions hold failing initiatives 40% longer than optimal.',
+    detail:
+      'Anchoring bias keeps teams glued to doomed strategies past the point where exit would preserve value.',
     severity: 'high',
   },
   {
@@ -74,7 +127,7 @@ export const PROBLEM_STATEMENTS: ProblemStatement[] = [
   {
     id: 'no_causal_track',
     headline: 'No organization can track which biases actually correlated with poor outcomes.',
-    detail: 'Without the feedback loop, the same biases keep firing on the next quarter\'s memo.',
+    detail: "Without the feedback loop, the same biases keep firing on the next quarter's memo.",
     severity: 'medium',
   },
 ];
@@ -92,7 +145,8 @@ export const PERSONA_ROWS: PersonaRow[] = [
     id: 'strategy',
     persona: 'Strategy Leaders',
     pain: 'No systematic decision quality measurement.',
-    deliverable: 'Document-level DQI scoring (0-100). Bias tracking across every strategic project.',
+    deliverable:
+      'Document-level DQI scoring (0-100). Bias tracking across every strategic project.',
     icon: 'strategy',
   },
   {
@@ -128,7 +182,8 @@ export const PERSONA_ROWS: PersonaRow[] = [
 export const ROI_NARRATIVE = {
   headline: 'ROI',
   body: 'A single avoided bad decision saves organizations **millions to billions** in value. The platform pays for itself after one corrected thesis. Organizations using systematic decision hygiene report **up to 60% reduction** in decision variance.',
-  pricingAnchor: '$2,499/mo Strategy tier · ~90% blended gross margin · 1 avoided bad thesis > year of subscription',
+  pricingAnchor:
+    '$2,499/mo Strategy tier · ~90% blended gross margin · 1 avoided bad thesis > year of subscription',
 };
 
 export interface ShippedFeature {
@@ -141,37 +196,44 @@ export interface ShippedFeature {
 export const SHIPPED_FEATURES: ShippedFeature[] = [
   {
     title: 'Email Forwarding Integration',
-    detail: 'Unique email address per user (analyze+{token}@in.decision-intel.com). Forward documents or paste text, auto-analyzed with results emailed back.',
+    detail:
+      'Unique email address per user (analyze+{token}@in.decision-intel.com). Forward documents or paste text, auto-analyzed with results emailed back.',
     category: 'integration',
   },
   {
     title: 'Google Drive Connector',
-    detail: 'OAuth 2.0 integration. Watch folders for new documents, auto-analyze every 10 minutes. Folder picker UI in Settings.',
+    detail:
+      'OAuth 2.0 integration. Watch folders for new documents, auto-analyze every 10 minutes. Folder picker UI in Settings.',
     category: 'integration',
   },
   {
     title: 'Slack Deep Thread Analysis',
-    detail: '/di analyze in threads fetches all messages, runs full analysis, posts rich results back. Zero-friction.',
+    detail:
+      '/di analyze in threads fetches all messages, runs full analysis, posts rich results back. Zero-friction.',
     category: 'integration',
   },
   {
     title: 'Forgotten Questions Node',
-    detail: '12th pipeline node surfaces unknown-unknowns: questions the document should address but does not.',
+    detail:
+      '12th pipeline node surfaces unknown-unknowns: questions the document should address but does not.',
     category: 'pipeline',
   },
   {
     title: 'Free 30-Day Pilot',
-    detail: 'Full platform access on a live deal to seed the Knowledge Graph. Converts to Corp Dev subscription ($2,499/mo) at trial end.',
+    detail:
+      'Full platform access on a live deal to seed the Knowledge Graph. Converts to Corp Dev subscription ($2,499/mo) at trial end.',
     category: 'distribution',
   },
   {
     title: 'Toxic Mitigation Playbooks',
-    detail: 'Auto-generated research-backed debiasing steps for all 10 named patterns with owner, timing, and citations.',
+    detail:
+      'Auto-generated research-backed debiasing steps for all 10 named patterns with owner, timing, and citations.',
     category: 'intelligence',
   },
   {
     title: 'Dollar Impact Estimation',
-    detail: 'Connects toxic combos to deal ticketSize for financial risk estimates (ticketSize × historicalFailRate).',
+    detail:
+      'Connects toxic combos to deal ticketSize for financial risk estimates (ticketSize × historicalFailRate).',
     category: 'intelligence',
   },
   {
@@ -181,37 +243,44 @@ export const SHIPPED_FEATURES: ShippedFeature[] = [
   },
   {
     title: 'Investor Defense Tab',
-    detail: 'Competitive positioning vs. Cloverpop, moat layers, objection handling with technical proof points.',
+    detail:
+      'Competitive positioning vs. Cloverpop, moat layers, objection handling with technical proof points.',
     category: 'intelligence',
   },
   {
     title: 'Slack → Copilot Auto-Trigger',
-    detail: 'Auto-creates CopilotSession seeded with decision context after every Slack audit. "Continue in Copilot" button for seamless handoff.',
+    detail:
+      'Auto-creates CopilotSession seeded with decision context after every Slack audit. "Continue in Copilot" button for seamless handoff.',
     category: 'integration',
   },
   {
     title: 'Intelligence Brief on Empty States',
-    detail: 'Contextual org intelligence (top dangerous biases, maturity grade, decision stats) replaces generic empty states across 4 dashboard pages.',
+    detail:
+      'Contextual org intelligence (top dangerous biases, maturity grade, decision stats) replaces generic empty states across 4 dashboard pages.',
     category: 'ux',
   },
   {
     title: 'Enhanced Slack Commands',
-    detail: '7 slash commands with rich Block Kit: /di help, /di score, /di brief, /di status, /di analyze (with Copilot link).',
+    detail:
+      '7 slash commands with rich Block Kit: /di help, /di score, /di brief, /di status, /di analyze (with Copilot link).',
     category: 'integration',
   },
   {
     title: 'Bias Heat Map Enhancement',
-    detail: 'Density gutter minimap, confidence-based opacity, hover tooltips with excerpts, keyboard navigation (←→ cycle, H toggle).',
+    detail:
+      'Density gutter minimap, confidence-based opacity, hover tooltips with excerpts, keyboard navigation (←→ cycle, H toggle).',
     category: 'ux',
   },
   {
     title: 'Enterprise Language Pivot',
-    detail: 'Decision types renamed from PE/VC-specific to enterprise-neutral (resource allocation, strategic proposal, initiative closure).',
+    detail:
+      'Decision types renamed from PE/VC-specific to enterprise-neutral (resource allocation, strategic proposal, initiative closure).',
     category: 'distribution',
   },
   {
     title: 'Klein RPD Framework',
-    detail: 'Expert intuition amplification: pattern recognition cues, narrative pre-mortems, RPD mental simulator, personal calibration dashboard.',
+    detail:
+      'Expert intuition amplification: pattern recognition cues, narrative pre-mortems, RPD mental simulator, personal calibration dashboard.',
     category: 'intelligence',
   },
   {
@@ -221,7 +290,8 @@ export const SHIPPED_FEATURES: ShippedFeature[] = [
   },
   {
     title: 'Case Study Export',
-    detail: 'One-click anonymized, branded shareable analyses with permanent links for stakeholder reporting.',
+    detail:
+      'One-click anonymized, branded shareable analyses with permanent links for stakeholder reporting.',
     category: 'distribution',
   },
   {
@@ -241,7 +311,8 @@ export const SHIPPED_FEATURES: ShippedFeature[] = [
   },
   {
     title: 'Quick Bias Check',
-    detail: 'Dashboard modal for instant <5s bias scan via paste. Shared Gemini utility across extension + platform.',
+    detail:
+      'Dashboard modal for instant <5s bias scan via paste. Shared Gemini utility across extension + platform.',
     category: 'ux',
   },
   {

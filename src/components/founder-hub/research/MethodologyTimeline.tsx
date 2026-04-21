@@ -3,11 +3,7 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock } from 'lucide-react';
-import {
-  TIMELINE,
-  CATEGORY_META,
-  type ThinkerCategory,
-} from '@/lib/data/research-foundations';
+import { TIMELINE, CATEGORY_META, type ThinkerCategory } from '@/lib/data/research-foundations';
 
 // 260+ years of decision science plotted on a horizontal timeline.
 // Each milestone is a clickable marker colored by category.
@@ -78,8 +74,8 @@ export function MethodologyTimeline() {
             260 years of decision science
           </div>
           <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
-            From Bayes&rsquo; 1763 essay to the Decision Knowledge Graph shipping in 2026. Click
-            any marker.
+            From Bayes&rsquo; 1763 essay to the Decision Knowledge Graph shipping in 2026. Click any
+            marker.
           </div>
         </div>
       </div>

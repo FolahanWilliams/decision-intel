@@ -238,9 +238,7 @@ function LessonDetail({
       'Teach me this lesson the way a senior operator would. Quiz me on the reasoning, push back when my answers are fuzzy, and make me defend the Decision Intel-specific application. Start with the sharpest question.',
     ].join('\n');
     if (typeof window !== 'undefined') {
-      window.dispatchEvent(
-        new CustomEvent('founder-chat-ask', { detail: { question } }),
-      );
+      window.dispatchEvent(new CustomEvent('founder-chat-ask', { detail: { question } }));
     }
   }, [lesson.title, lesson.insight, lesson.whyItMatters, lesson.action, track.title]);
 

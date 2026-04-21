@@ -50,7 +50,13 @@ export function AuditTraceViz() {
   const memoH = 200;
 
   return (
-    <svg viewBox="0 0 480 340" width="100%" height="100%" role="img" aria-label="Reasoning audit — three cognitive-bias flags traced to specific lines in a strategic memo">
+    <svg
+      viewBox="0 0 480 340"
+      width="100%"
+      height="100%"
+      role="img"
+      aria-label="Reasoning audit — three cognitive-bias flags traced to specific lines in a strategic memo"
+    >
       {/* Memo card */}
       <rect
         x={memoX}
@@ -87,7 +93,7 @@ export function AuditTraceViz() {
       })}
 
       {/* Highlight bars over flagged lines */}
-      {LINES.filter(l => l.flag).map((line) => (
+      {LINES.filter(l => l.flag).map(line => (
         <motion.rect
           key={`hi-${line.flag}`}
           x={memoX + 10}
@@ -140,14 +146,7 @@ export function AuditTraceViz() {
               strokeWidth="1.4"
             />
             {/* Flag badge */}
-            <rect
-              x={annX + 6}
-              y={annY + 6}
-              width="22"
-              height="12"
-              rx="6"
-              fill={ann.color}
-            />
+            <rect x={annX + 6} y={annY + 6} width="22" height="12" rx="6" fill={ann.color} />
             <text
               x={annX + 17}
               y={annY + 15}

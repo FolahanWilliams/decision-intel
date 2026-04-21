@@ -18,9 +18,7 @@ export function ShippedFeatureRibbon() {
 
   const filtered = useMemo(
     () =>
-      filter === 'all'
-        ? SHIPPED_FEATURES
-        : SHIPPED_FEATURES.filter(f => f.category === filter),
+      filter === 'all' ? SHIPPED_FEATURES : SHIPPED_FEATURES.filter(f => f.category === filter),
     [filter]
   );
 

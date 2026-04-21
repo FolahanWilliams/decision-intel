@@ -80,7 +80,11 @@ export function generatePositioningCheatsheet(): void {
   SPINE_STEPS.forEach(step => {
     if (y > pageHeight - 20) return;
     const color: [number, number, number] =
-      step.status === 'strong' ? [22, 163, 74] : step.status === 'partial' ? [245, 158, 11] : [239, 68, 68];
+      step.status === 'strong'
+        ? [22, 163, 74]
+        : step.status === 'partial'
+          ? [245, 158, 11]
+          : [239, 68, 68];
     doc.setFillColor(...color);
     doc.circle(PAGE_MARGIN + 1.5, y - 1.2, 1.3, 'F');
     doc.setFont('helvetica', 'bold');
@@ -91,7 +95,11 @@ export function generatePositioningCheatsheet(): void {
     doc.setFontSize(7);
     doc.setTextColor(90, 90, 90);
     const statusLabel = STATUS_LABEL[step.status];
-    doc.text(`(${statusLabel})`, PAGE_MARGIN + 5 + doc.getTextWidth(`${step.step}. ${step.title} `), y);
+    doc.text(
+      `(${statusLabel})`,
+      PAGE_MARGIN + 5 + doc.getTextWidth(`${step.step}. ${step.title} `),
+      y
+    );
     y += 3.5;
     doc.setTextColor(40, 40, 40);
     doc.setFontSize(8);

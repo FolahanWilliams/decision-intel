@@ -15,7 +15,13 @@ const PAD_Y = 30;
 const CURVE_W = (VIEW_W - PAD_X * 3) / 2;
 const CURVE_H = VIEW_H - PAD_Y * 2;
 
-function bellPath(cx: number, baseY: number, width: number, height: number, spread: number): string {
+function bellPath(
+  cx: number,
+  baseY: number,
+  width: number,
+  height: number,
+  spread: number
+): string {
   // spread is a dimensionless "sigma" — wider = noisier
   // We sample points and use a Gaussian-shaped bell.
   const samples = 80;
@@ -91,8 +97,8 @@ export function NoiseMomentViz() {
             lineHeight: 1.55,
           }}
         >
-          {NOISE_MOMENT.example.framing} — pricing variance on identical files between
-          professional underwriters. This is the stat that turns &ldquo;we trust our process&rdquo; into
+          {NOISE_MOMENT.example.framing} — pricing variance on identical files between professional
+          underwriters. This is the stat that turns &ldquo;we trust our process&rdquo; into
           &ldquo;how would we even measure it?&rdquo; in sixty seconds.
         </p>
       </div>

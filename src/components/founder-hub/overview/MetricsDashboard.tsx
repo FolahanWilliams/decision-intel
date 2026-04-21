@@ -3,10 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Brain, GitBranch, Library, Radio, Cpu, Share2 } from 'lucide-react';
-import {
-  PRODUCT_METRICS,
-  type ProductMetric,
-} from '@/lib/data/product-overview';
+import { PRODUCT_METRICS, type ProductMetric } from '@/lib/data/product-overview';
 
 const ICON: Record<ProductMetric['icon'], React.ReactNode> = {
   biases: <Brain size={14} />,

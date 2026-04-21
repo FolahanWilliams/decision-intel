@@ -204,17 +204,17 @@ Signature: `_______________________________`
 
 ### Schedule A — Data Processing Addendum
 
-> The DPA is a separate document. A GDPR-aligned, EU-AI-Act-ready DPA template lives at `docs/positioning/design-partner-dpa-template.md` *(to be drafted — flag in the first legal review)*. The short version: Decision Intel is Processor, Customer is Controller, sub-processors are listed and updated in the DPA, no model training on Customer Data, EU-region hosting available on request, standard Article 28 processor terms.
+> The DPA is a separate document. A GDPR-aligned, EU-AI-Act-ready DPA template lives at `docs/positioning/design-partner-dpa-template.md` _(to be drafted — flag in the first legal review)_. The short version: Decision Intel is Processor, Customer is Controller, sub-processors are listed and updated in the DPA, no model training on Customer Data, EU-region hosting available on request, standard Article 28 processor terms.
 
 ---
 
 // FOUNDER NOTE — TO DO BEFORE FIRST SIGNATURE:
 // 1. Form the UK Ltd (or Delaware C-Corp if structuring for US VC from Day 1).
 // 2. Have a UK or DE corporate solicitor tighten this skeleton — Notion, Linear,
-//    and Vercel's early MSAs are all public; pattern-match before engaging.
+// and Vercel's early MSAs are all public; pattern-match before engaging.
 // 3. Draft the DPA Schedule A before any partner signs.
 // 4. Choose governing law based on the first partner's preference (most F500s
-//    will accept either UK or DE Delaware — don't fight this one).
+// will accept either UK or DE Delaware — don't fight this one).
 // 5. Set up a simple redline workflow via Docusign / PandaDoc for speed.
 // 6. Keep a version history of each partner's signed MSA; Year-2 pricing
-//    conversations will reference §5.4 verbatim.
+// conversations will reference §5.4 verbatim.

@@ -237,9 +237,7 @@ function SectionHeading({
         >
           {title}
         </div>
-        <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
-          {subtitle}
-        </div>
+        <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>{subtitle}</div>
       </div>
     </div>
   );

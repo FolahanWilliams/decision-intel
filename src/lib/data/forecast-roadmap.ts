@@ -299,7 +299,7 @@ export const DECISION_OBJECTIVES: DecisionObjective[] = [
     description: 'Qualified buyer intros that compound in your favor.',
     winner: 'vc',
     rationale:
-      "YC portfolio alone produces ~50 warm intros to CSOs at portfolio companies. Solo bootstrapping has zero equivalent — this is the single biggest VC unlock.",
+      'YC portfolio alone produces ~50 warm intros to CSOs at portfolio companies. Solo bootstrapping has zero equivalent — this is the single biggest VC unlock.',
   },
   {
     id: 'learning',
@@ -332,7 +332,7 @@ export const SEQUENCING: SequencingPhase[] = [
     phase: 'Now → 60 days',
     window: 'Apr–May 2026',
     recommendation:
-      'Outreach only. 2–3 design partners via LOI. Same work for both lanes — you can\'t skip this.',
+      "Outreach only. 2–3 design partners via LOI. Same work for both lanes — you can't skip this.",
     gate: '3 discovery calls logged with at least 1 pattern confirmed 3× independently.',
   },
   {
@@ -346,9 +346,8 @@ export const SEQUENCING: SequencingPhase[] = [
     phase: '120–180 days',
     window: 'Aug–Oct 2026',
     recommendation:
-      'Decision point. 1 paying + 3 design partners → YC. 3 design partners, no paid → operator angels. Nothing → diagnose, don\'t raise.',
-    gate:
-      'Enough traction to defend a real valuation OR a clear reason to stay bootstrapped for 6 more months.',
+      "Decision point. 1 paying + 3 design partners → YC. 3 design partners, no paid → operator angels. Nothing → diagnose, don't raise.",
+    gate: 'Enough traction to defend a real valuation OR a clear reason to stay bootstrapped for 6 more months.',
   },
 ];
 

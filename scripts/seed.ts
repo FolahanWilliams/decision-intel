@@ -20,7 +20,6 @@ async function main() {
     // Simple query to verify schema
     const docCount = await prisma.document.count();
     console.log(`📊 Current document count: ${docCount}`);
-
   } catch (e) {
     console.error('❌ Database connection failed:');
     console.error(e);

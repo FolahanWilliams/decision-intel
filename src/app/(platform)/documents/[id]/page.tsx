@@ -499,9 +499,8 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       const { data } = (await res.json()) as {
         data: import('@/lib/reports/provenance-record-data').ProvenanceRecordData;
       };
-      const { DecisionProvenanceRecordGenerator } = await import(
-        '@/lib/reports/decision-provenance-record-generator'
-      );
+      const { DecisionProvenanceRecordGenerator } =
+        await import('@/lib/reports/decision-provenance-record-generator');
       const generator = new DecisionProvenanceRecordGenerator();
       // ProvenanceRecordData serialized through JSON loses the Date type on
       // generatedAt — rehydrate before handing to jsPDF.

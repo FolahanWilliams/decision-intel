@@ -55,8 +55,7 @@ const SESSIONS: StudySession[] = [
     slot: 'Day 1 · Morning',
     color: '#16A34A',
     bg: 'rgba(22, 163, 74, 0.14)',
-    goal:
-      'You can explain the 12-node pipeline, why DQI exists, and the 260-year intellectual genealogy in under 2 minutes, without notes.',
+    goal: 'You can explain the 12-node pipeline, why DQI exists, and the 260-year intellectual genealogy in under 2 minutes, without notes.',
     tabs: [
       {
         tabId: 'overview',
@@ -87,8 +86,7 @@ const SESSIONS: StudySession[] = [
     slot: 'Day 1 · Afternoon',
     color: '#0EA5E9',
     bg: 'rgba(14, 165, 233, 0.14)',
-    goal:
-      'You know where each of the 5 DI incumbents sits, the 3 gaps you close with shipped evidence, and the moat narrative cold.',
+    goal: 'You know where each of the 5 DI incumbents sits, the 3 gaps you close with shipped evidence, and the moat narrative cold.',
     tabs: [
       {
         tabId: 'category_position',
@@ -126,8 +124,7 @@ const SESSIONS: StudySession[] = [
     slot: 'Day 2 · Morning',
     color: '#F59E0B',
     bg: 'rgba(245, 158, 11, 0.14)',
-    goal:
-      'You have 5\u201310 Monday-morning outreach drafts queued and you know exactly which pattern to listen for on the first discovery call.',
+    goal: 'You have 5\u201310 Monday-morning outreach drafts queued and you know exactly which pattern to listen for on the first discovery call.',
     tabs: [
       {
         tabId: 'outreach_cmd',
@@ -158,8 +155,7 @@ const SESSIONS: StudySession[] = [
     slot: 'Day 2 · Afternoon',
     color: '#8B5CF6',
     bg: 'rgba(139, 92, 246, 0.14)',
-    goal:
-      'You understand the outcome flywheel, know which of the 135 cases to cite in pitches, and you\u2019ve committed to bootstrap vs. VC with explicit gates.',
+    goal: 'You understand the outcome flywheel, know which of the 135 cases to cite in pitches, and you\u2019ve committed to bootstrap vs. VC with explicit gates.',
     tabs: [
       {
         tabId: 'case_library',
@@ -280,10 +276,7 @@ export function StartHereTab({ onNavigateToTab }: Props) {
     );
     const doneMinutes = SESSIONS.reduce(
       (a, s) =>
-        a +
-        s.tabs
-          .filter(t => completedTabs.has(t.tabId))
-          .reduce((b, t) => b + t.minutes, 0),
+        a + s.tabs.filter(t => completedTabs.has(t.tabId)).reduce((b, t) => b + t.minutes, 0),
       0
     );
     return { totalTabs, totalDone, totalMinutes, doneMinutes };
@@ -371,7 +364,7 @@ function renderHero(
           maxWidth: 760,
         }}
       >
-        Four focused sessions, 15 tabs, ~{Math.round(totals.totalMinutes / 60 * 10) / 10} hours.
+        Four focused sessions, 15 tabs, ~{Math.round((totals.totalMinutes / 60) * 10) / 10} hours.
         Designed so you finish Day 2 with everything in your head and nothing on the to-do list
         except outreach. Tick tabs as you read them — progress saves automatically.
       </p>
@@ -483,9 +476,7 @@ function renderFlow(
       }}
     >
       <div style={{ marginBottom: 10 }}>
-        <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>
-          The path
-        </div>
+        <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>The path</div>
         <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
           Four sessions flow into each other. Click any stop to jump to its session card below.
         </div>
@@ -1004,9 +995,9 @@ function renderNextAction(overallPct: number) {
               marginTop: 6,
             }}
           >
-            Your next action is Monday-morning outreach — 5 to 10 messages from the Outreach
-            Command Center templates, sent before noon. Nothing else. Everything in the hub only
-            matters if a CSO replies.
+            Your next action is Monday-morning outreach — 5 to 10 messages from the Outreach Command
+            Center templates, sent before noon. Nothing else. Everything in the hub only matters if
+            a CSO replies.
           </div>
           {isComplete && (
             <div

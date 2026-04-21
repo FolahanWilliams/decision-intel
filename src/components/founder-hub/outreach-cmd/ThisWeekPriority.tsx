@@ -116,7 +116,15 @@ export function ThisWeekPriority() {
         >
           {week.theme}
         </h3>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-secondary)' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            fontSize: 12,
+            color: 'var(--text-secondary)',
+          }}
+        >
           <Target size={12} style={{ color: '#16A34A' }} />
           <span>
             <strong style={{ color: 'var(--text-primary)' }}>Goal:</strong> {week.primaryGoal}
@@ -147,7 +155,8 @@ export function ThisWeekPriority() {
               transition={{ duration: 0.5 }}
               style={{
                 height: '100%',
-                background: progressPct >= 80 ? '#16A34A' : progressPct >= 40 ? '#F59E0B' : '#0EA5E9',
+                background:
+                  progressPct >= 80 ? '#16A34A' : progressPct >= 40 ? '#F59E0B' : '#0EA5E9',
               }}
             />
           </div>
@@ -200,7 +209,13 @@ export function ThisWeekPriority() {
                   transition: 'all 0.12s ease',
                 }}
               >
-                <div style={{ color: done ? '#16A34A' : 'var(--text-muted)', flexShrink: 0, marginTop: 1 }}>
+                <div
+                  style={{
+                    color: done ? '#16A34A' : 'var(--text-muted)',
+                    flexShrink: 0,
+                    marginTop: 1,
+                  }}
+                >
                   {done ? <CheckCircle2 size={14} /> : <Circle size={14} />}
                 </div>
                 <span

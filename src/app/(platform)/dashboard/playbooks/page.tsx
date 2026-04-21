@@ -194,9 +194,13 @@ function PlaybooksPageContent() {
               padding: '6px 14px',
               borderRadius: 20,
               border: '1px solid',
-              borderColor: selectedCategory === cat.value ? 'var(--accent-primary)' : 'var(--border-color)',
+              borderColor:
+                selectedCategory === cat.value ? 'var(--accent-primary)' : 'var(--border-color)',
               background: selectedCategory === cat.value ? 'var(--accent-primary)' : 'transparent',
-              color: selectedCategory === cat.value ? 'var(--text-on-accent, #fff)' : 'var(--text-secondary)',
+              color:
+                selectedCategory === cat.value
+                  ? 'var(--text-on-accent, #fff)'
+                  : 'var(--text-secondary)',
               fontSize: 12,
               fontWeight: 500,
               cursor: 'pointer',

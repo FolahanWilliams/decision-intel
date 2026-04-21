@@ -48,10 +48,7 @@ const SHORT_LABELS: Record<string, [string, string]> = {
   'vc-q4': ['Post-raise', 'scale'],
 };
 
-const CONFIDENCE_META: Record<
-  Confidence,
-  { label: string; color: string; bg: string }
-> = {
+const CONFIDENCE_META: Record<Confidence, { label: string; color: string; bg: string }> = {
   high: { label: 'High confidence', color: '#16A34A', bg: 'rgba(22, 163, 74, 0.14)' },
   medium: { label: 'Medium confidence', color: '#F59E0B', bg: 'rgba(245, 158, 11, 0.14)' },
   low: { label: 'Lower confidence', color: '#EF4444', bg: 'rgba(239, 68, 68, 0.14)' },
@@ -138,8 +135,7 @@ function renderHero() {
       >
         Both lanes start with the same Q1 gate: three logged discovery calls. What diverges is what
         you optimize for in Q2 onward. Click any milestone to see its requirements, risks, and
-        decision criteria. Toggle an objective above to see which lane wins for that goal — and
-        why.
+        decision criteria. Toggle an objective above to see which lane wins for that goal — and why.
       </p>
     </div>
   );
@@ -174,7 +170,14 @@ function renderObjectiveChips(
       >
         What am I optimizing for?
       </div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: activeObjective ? 12 : 0 }}>
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 6,
+          marginBottom: activeObjective ? 12 : 0,
+        }}
+      >
         {DECISION_OBJECTIVES.map(obj => {
           const isActive = obj.id === activeId;
           const winnerColor =
@@ -196,9 +199,7 @@ function renderObjectiveChips(
                 fontWeight: 600,
                 color: isActive ? '#fff' : 'var(--text-primary)',
                 background: isActive ? winnerColor : 'var(--bg-card)',
-                border: isActive
-                  ? `1.5px solid ${winnerColor}`
-                  : '1px solid var(--border-color)',
+                border: isActive ? `1.5px solid ${winnerColor}` : '1px solid var(--border-color)',
                 borderLeft: `3px solid ${winnerColor}`,
                 borderRadius: 'var(--radius-md)',
                 cursor: 'pointer',
@@ -261,9 +262,7 @@ function renderObjectiveChips(
                 {activeObjective.label}
               </span>
             </div>
-            <div
-              style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.55 }}
-            >
+            <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
               {activeObjective.rationale}
             </div>
           </motion.div>
@@ -1192,10 +1191,7 @@ function renderHonestTake() {
                   lineHeight: 1.5,
                 }}
               >
-                <CheckCircle2
-                  size={12}
-                  style={{ color: '#F59E0B', flexShrink: 0, marginTop: 3 }}
-                />
+                <CheckCircle2 size={12} style={{ color: '#F59E0B', flexShrink: 0, marginTop: 3 }} />
                 <span>{item}</span>
               </li>
             ))}

@@ -33,9 +33,7 @@ export function DesignPartnerFunnel() {
             const fillPct = stage.target === 0 ? 0 : (stage.current / stage.target) * 100;
             const prev = i > 0 ? FUNNEL[i - 1] : null;
             const conversion =
-              prev && prev.target > 0
-                ? Math.round((stage.target / prev.target) * 100)
-                : null;
+              prev && prev.target > 0 ? Math.round((stage.target / prev.target) * 100) : null;
 
             return (
               <div key={stage.id}>
@@ -108,7 +106,16 @@ function StageRow({
             zIndex: 0,
           }}
         />
-        <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 1,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: 12,
+          }}
+        >
           <div style={{ minWidth: 0 }}>
             <div
               style={{
@@ -144,7 +151,8 @@ function StageRow({
             >
               {stage.current}
               <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 700 }}>
-                {' '}/ {stage.target}
+                {' '}
+                / {stage.target}
               </span>
             </div>
             <div

@@ -231,8 +231,8 @@ export function DesignPartnersTab({ founderPass }: DesignPartnersTabProps) {
           Design Partner Applications
         </div>
         <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: '0 0 16px' }}>
-          Inbound from /design-partner. Status transitions are enforced by the 5-seat capacity
-          guard server-side. Founder notes persist on save.
+          Inbound from /design-partner. Status transitions are enforced by the 5-seat capacity guard
+          server-side. Founder notes persist on save.
         </p>
 
         {/* Filter chips */}
@@ -243,18 +243,25 @@ export function DesignPartnersTab({ founderPass }: DesignPartnersTabProps) {
             active={filter === 'all'}
             onClick={() => setFilter('all')}
           />
-          {(['applied', 'reviewing', 'scheduled_call', 'accepted', 'declined', 'withdrawn'] as ApplicationStatus[]).map(
-            s => (
-              <FilterChip
-                key={s}
-                label={STATUS_LABELS[s]}
-                count={byStatus[s] ?? 0}
-                active={filter === s}
-                color={STATUS_COLORS[s]}
-                onClick={() => setFilter(s)}
-              />
-            )
-          )}
+          {(
+            [
+              'applied',
+              'reviewing',
+              'scheduled_call',
+              'accepted',
+              'declined',
+              'withdrawn',
+            ] as ApplicationStatus[]
+          ).map(s => (
+            <FilterChip
+              key={s}
+              label={STATUS_LABELS[s]}
+              count={byStatus[s] ?? 0}
+              active={filter === s}
+              color={STATUS_COLORS[s]}
+              onClick={() => setFilter(s)}
+            />
+          ))}
         </div>
 
         {error && (
@@ -345,9 +352,7 @@ function FilterChip({
         fontWeight: 600,
         borderRadius: 999,
         border: `1px solid ${active ? color || 'var(--accent-primary)' : 'var(--border-color)'}`,
-        background: active
-          ? `${color || 'var(--accent-primary)'}1A`
-          : 'transparent',
+        background: active ? `${color || 'var(--accent-primary)'}1A` : 'transparent',
         color: active ? color || 'var(--accent-primary)' : 'var(--text-secondary)',
         cursor: 'pointer',
         display: 'inline-flex',
@@ -382,11 +387,16 @@ function ApplicationCard({
 }) {
   const [notesValue, setNotesValue] = useState(app.founderNotes ?? '');
   const [notesExpanded, setNotesExpanded] = useState(false);
-
-  // Keep notes value in sync if the server returns the canonical version
-  useEffect(() => {
+  // React 19 pattern for syncing state with changing props: track the
+  // previous prop value and update during render when it changes. This
+  // avoids the setState-in-effect cascading-render anti-pattern. When
+  // the parent refetches the canonical row after a save, this picks up
+  // the server-returned notes value without a redundant render cycle.
+  const [lastSyncedNotes, setLastSyncedNotes] = useState(app.founderNotes ?? '');
+  if ((app.founderNotes ?? '') !== lastSyncedNotes) {
+    setLastSyncedNotes(app.founderNotes ?? '');
     setNotesValue(app.founderNotes ?? '');
-  }, [app.founderNotes]);
+  }
 
   const submitted = new Date(app.submittedAt);
 

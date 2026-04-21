@@ -138,7 +138,8 @@ export const MOATS: Moat[] = [
   {
     id: 'synthesis',
     name: 'Kahneman × Klein synthesis',
-    oneLiner: 'The only pipeline combining debiasing with Recognition-Primed Decision — no competitor has this.',
+    oneLiner:
+      'The only pipeline combining debiasing with Recognition-Primed Decision — no competitor has this.',
     proofRequired:
       'Published whitepaper (framework name + taxonomy), 3 side-by-side historical audits where Kahneman-alone misses what the synthesis catches.',
     currentStrength: 40,
@@ -235,8 +236,7 @@ export const SPRINTS: SprintTask[] = [
     week: 3,
     lane: 'product',
     title: 'Time the 60-second demo end-to-end',
-    detail:
-      'Record 10 runs on 10 different memos. Median time must be <8s. Fix anything over.',
+    detail: 'Record 10 runs on 10 different memos. Median time must be <8s. Fix anything over.',
     effort: 'M',
   },
   {
@@ -253,8 +253,7 @@ export const SPRINTS: SprintTask[] = [
     week: 4,
     lane: 'pipeline',
     title: 'Send design-partner 1-pager to warm leads',
-    detail:
-      '$10K flat / 90 days / 20 audits / case-study commitment. One page. No legal prose.',
+    detail: '$10K flat / 90 days / 20 audits / case-study commitment. One page. No legal prose.',
     effort: 'S',
   },
   {
@@ -327,8 +326,7 @@ export const SPRINTS: SprintTask[] = [
     week: 8,
     lane: 'pipeline',
     title: 'Close Design Partner #2',
-    detail:
-      'Via referral from DP #1 or second-tier advisor intro. Lock by end of week 8.',
+    detail: 'Via referral from DP #1 or second-tier advisor intro. Lock by end of week 8.',
     effort: 'L',
   },
   {
@@ -355,8 +353,7 @@ export const SPRINTS: SprintTask[] = [
     week: 11,
     lane: 'founder',
     title: 'First GTM co-founder conversations',
-    detail:
-      '3–5 candidates from advisor + Series A operator networks. Coffee only — no pitch yet.',
+    detail: '3–5 candidates from advisor + Series A operator networks. Coffee only — no pitch yet.',
     effort: 'L',
   },
   {
@@ -364,8 +361,7 @@ export const SPRINTS: SprintTask[] = [
     week: 11,
     lane: 'product',
     title: 'Ship Knowledge Graph export',
-    detail:
-      'CSV + JSON of decisions/biases/outcomes per org. First enterprise buyer ask, usually.',
+    detail: 'CSV + JSON of decisions/biases/outcomes per org. First enterprise buyer ask, usually.',
     effort: 'M',
   },
   {
@@ -390,11 +386,41 @@ export type FunnelStage = {
 };
 
 export const FUNNEL: FunnelStage[] = [
-  { id: 'intros', label: 'Warm intros sourced', target: 10, current: 2, subtitle: 'From advisor + referrals' },
-  { id: 'calls', label: 'Discovery calls booked', target: 7, current: 2, subtitle: '15–30 min, script-led' },
-  { id: 'demos', label: '60-sec demos delivered', target: 5, current: 0, subtitle: 'With on-screen recording' },
-  { id: 'pilots', label: 'Paid pilots signed', target: 3, current: 0, subtitle: '$5–25K / 90 days' },
-  { id: 'refs', label: 'Public references', target: 2, current: 0, subtitle: 'Named logo + case study' },
+  {
+    id: 'intros',
+    label: 'Warm intros sourced',
+    target: 10,
+    current: 2,
+    subtitle: 'From advisor + referrals',
+  },
+  {
+    id: 'calls',
+    label: 'Discovery calls booked',
+    target: 7,
+    current: 2,
+    subtitle: '15–30 min, script-led',
+  },
+  {
+    id: 'demos',
+    label: '60-sec demos delivered',
+    target: 5,
+    current: 0,
+    subtitle: 'With on-screen recording',
+  },
+  {
+    id: 'pilots',
+    label: 'Paid pilots signed',
+    target: 3,
+    current: 0,
+    subtitle: '$5–25K / 90 days',
+  },
+  {
+    id: 'refs',
+    label: 'Public references',
+    target: 2,
+    current: 0,
+    subtitle: 'Named logo + case study',
+  },
 ];
 
 /* ─── Authority tracker ─────────────────────────────────────────────── */
@@ -410,12 +436,60 @@ export type AuthoritySignal = {
 };
 
 export const AUTHORITY_SIGNALS: AuthoritySignal[] = [
-  { id: 'posts', label: 'Primary-source reconstructions published', current: 0, target: 12, unit: 'posts', direction: 'up', compounding: true },
-  { id: 'cso-calls', label: 'CSO / CFO / GC calls (this quarter)', current: 0, target: 15, unit: 'calls', direction: 'up', compounding: false },
-  { id: 'advisor-intros', label: 'Warm intros from advisor network', current: 2, target: 10, unit: 'intros', direction: 'up', compounding: true },
-  { id: 'inbound', label: 'Inbound inquiries from content', current: 0, target: 8, unit: 'inquiries', direction: 'up', compounding: true },
-  { id: 'citations', label: 'Citations / mentions in industry media', current: 0, target: 3, unit: 'mentions', direction: 'up', compounding: true },
-  { id: 'podcast', label: 'Podcast / conference appearances', current: 0, target: 4, unit: 'features', direction: 'up', compounding: true },
+  {
+    id: 'posts',
+    label: 'Primary-source reconstructions published',
+    current: 0,
+    target: 12,
+    unit: 'posts',
+    direction: 'up',
+    compounding: true,
+  },
+  {
+    id: 'cso-calls',
+    label: 'CSO / CFO / GC calls (this quarter)',
+    current: 0,
+    target: 15,
+    unit: 'calls',
+    direction: 'up',
+    compounding: false,
+  },
+  {
+    id: 'advisor-intros',
+    label: 'Warm intros from advisor network',
+    current: 2,
+    target: 10,
+    unit: 'intros',
+    direction: 'up',
+    compounding: true,
+  },
+  {
+    id: 'inbound',
+    label: 'Inbound inquiries from content',
+    current: 0,
+    target: 8,
+    unit: 'inquiries',
+    direction: 'up',
+    compounding: true,
+  },
+  {
+    id: 'citations',
+    label: 'Citations / mentions in industry media',
+    current: 0,
+    target: 3,
+    unit: 'mentions',
+    direction: 'up',
+    compounding: true,
+  },
+  {
+    id: 'podcast',
+    label: 'Podcast / conference appearances',
+    current: 0,
+    target: 4,
+    unit: 'features',
+    direction: 'up',
+    compounding: true,
+  },
 ];
 
 /* ─── Pitfall radar ────────────────────────────────────────────────── */
@@ -435,15 +509,18 @@ export const PITFALLS: Pitfall[] = [
     name: 'Staying solo past month 6',
     severity: 'critical',
     likelihood: 'likely',
-    mitigation: 'Start GTM co-founder sourcing week 7. Equity partner, 15–25%. Non-negotiable before seed.',
-    tripwire: 'If no co-founder conversations booked by week 10, escalate to advisor weekly until solved.',
+    mitigation:
+      'Start GTM co-founder sourcing week 7. Equity partner, 15–25%. Non-negotiable before seed.',
+    tripwire:
+      'If no co-founder conversations booked by week 10, escalate to advisor weekly until solved.',
   },
   {
     id: 'feature-bloat',
     name: 'Building before closing',
     severity: 'critical',
     likelihood: 'likely',
-    mitigation: 'Every new line of code must close a pilot in flight. Written rule: no new route / model / feature until DP #1 signs.',
+    mitigation:
+      'Every new line of code must close a pilot in flight. Written rule: no new route / model / feature until DP #1 signs.',
     tripwire: 'If weekly PR count > 10 and DP #0 not signed, freeze repo for 2 weeks. Sell only.',
   },
   {
@@ -451,23 +528,28 @@ export const PITFALLS: Pitfall[] = [
     name: 'Age anxiety bleeding into copy',
     severity: 'high',
     likelihood: 'possible',
-    mitigation: 'Study actual Fortune 500 earnings-call transcripts, not marketing pages. Short, blunt, dollar-specific.',
-    tripwire: 'If founder uses the word "procurement" or "defensible" in a customer call, that\'s the tell.',
+    mitigation:
+      'Study actual Fortune 500 earnings-call transcripts, not marketing pages. Short, blunt, dollar-specific.',
+    tripwire:
+      'If founder uses the word "procurement" or "defensible" in a customer call, that\'s the tell.',
   },
   {
     id: 'incumbents',
     name: 'Salesforce/Microsoft bolt-on',
     severity: 'high',
     likelihood: 'possible',
-    mitigation: 'Outrun on depth: 5+ years of per-org Knowledge Graph data no incumbent can replicate from cold start.',
-    tripwire: 'If Einstein or Copilot ships a "decision audit" feature, accelerate API partnership plays.',
+    mitigation:
+      'Outrun on depth: 5+ years of per-org Knowledge Graph data no incumbent can replicate from cold start.',
+    tripwire:
+      'If Einstein or Copilot ships a "decision audit" feature, accelerate API partnership plays.',
   },
   {
     id: 'pricing',
     name: 'Pricing collapses in negotiation',
     severity: 'high',
     likelihood: 'possible',
-    mitigation: 'Hold the line on $10K minimum pilot. Discount only via narrowed scope (1 division), never via price floor.',
+    mitigation:
+      'Hold the line on $10K minimum pilot. Discount only via narrowed scope (1 division), never via price floor.',
     tripwire: 'Two pilots closed below $5K = pricing reset needed. Re-anchor before DP #3.',
   },
   {
@@ -475,15 +557,18 @@ export const PITFALLS: Pitfall[] = [
     name: 'Regulatory window closes without capture',
     severity: 'medium',
     likelihood: 'watch',
-    mitigation: 'File comments on EU AI Act Art. 14 implementing acts. Build policy-brief relationships in Q3 2026.',
-    tripwire: 'If a competitor is quoted in an analyst report on decision-audit before you, that\'s the signal.',
+    mitigation:
+      'File comments on EU AI Act Art. 14 implementing acts. Build policy-brief relationships in Q3 2026.',
+    tripwire:
+      "If a competitor is quoted in an analyst report on decision-audit before you, that's the signal.",
   },
   {
     id: 'margin',
     name: 'Margin overclaim in VC DD',
     severity: 'medium',
     likelihood: 'likely',
-    mitigation: 'Lead with honest 80–88% blended. Model unit economics per tier. Show margin improving with volume concentration.',
+    mitigation:
+      'Lead with honest 80–88% blended. Model unit economics per tier. Show margin improving with volume concentration.',
     tripwire: 'If a partner pushes on the math and founder stumbles, revise deck within 48h.',
   },
   {
@@ -491,7 +576,8 @@ export const PITFALLS: Pitfall[] = [
     name: 'CSO security review blocks pilot',
     severity: 'medium',
     likelihood: 'possible',
-    mitigation: 'SOC 2 Type II audit on the calendar by Q3 2026. 1-page security summary ready for any inbound ask.',
+    mitigation:
+      'SOC 2 Type II audit on the calendar by Q3 2026. 1-page security summary ready for any inbound ask.',
     tripwire: 'Two pilots stalled at security review = SOC 2 accelerate.',
   },
   {
@@ -499,7 +585,8 @@ export const PITFALLS: Pitfall[] = [
     name: 'Personal burnout / sleep debt',
     severity: 'high',
     likelihood: 'likely',
-    mitigation: 'Hard stop at 11pm local. Sleep is a decision-quality input — the product is literally about this.',
+    mitigation:
+      'Hard stop at 11pm local. Sleep is a decision-quality input — the product is literally about this.',
     tripwire: 'Three nights under 6h in one week = mandatory rest day, no code, no calls.',
   },
   {
@@ -507,8 +594,10 @@ export const PITFALLS: Pitfall[] = [
     name: 'Isolation from peer network',
     severity: 'medium',
     likelihood: 'possible',
-    mitigation: 'Join 1–2 young-founder cohorts (Z Fellows, Contrary, HF0). Two peer calls per week minimum.',
-    tripwire: 'If a month passes without speaking to another 16–22-year-old technical founder, fix that week.',
+    mitigation:
+      'Join 1–2 young-founder cohorts (Z Fellows, Contrary, HF0). Two peer calls per week minimum.',
+    tripwire:
+      'If a month passes without speaking to another 16–22-year-old technical founder, fix that week.',
   },
 ];
 
@@ -524,22 +613,134 @@ export type CadenceBlock = {
 };
 
 export const CADENCE: CadenceBlock[] = [
-  { day: 'Mon', slot: 'morning', duration: '30m', label: 'Advisor call', detail: 'Week ahead + positioning review', category: 'sell' },
-  { day: 'Mon', slot: 'midday', duration: '2h', label: 'Sales outreach', detail: 'Warm intros, follow-ups, DP comms', category: 'sell' },
-  { day: 'Mon', slot: 'evening', duration: '30m', label: 'Read HBR / FT', detail: 'One CSO-relevant article, note one insight', category: 'learn' },
-  { day: 'Tue', slot: 'morning', duration: '2h', label: 'Content creation', detail: 'Primary-source reconstruction, LinkedIn + X', category: 'sell' },
-  { day: 'Tue', slot: 'midday', duration: '1h', label: 'Demo rehearsal', detail: 'Record 60s demo, review with advisor', category: 'sell' },
-  { day: 'Tue', slot: 'evening', duration: '1h', label: 'Founder School', detail: 'Self-taught enterprise sales or cognitive-science lesson', category: 'learn' },
-  { day: 'Wed', slot: 'morning', duration: '3h', label: 'Customer calls', detail: '2–3 intro or pilot calls, back-to-back', category: 'sell' },
-  { day: 'Wed', slot: 'midday', duration: '1h', label: 'Debrief', detail: 'Insights to Positioning Memo, file product tickets', category: 'sell' },
-  { day: 'Thu', slot: 'morning', duration: '3h', label: 'Product polish', detail: 'Only items gating pilots in flight', category: 'build' },
-  { day: 'Thu', slot: 'evening', duration: '30m', label: 'Peer call', detail: 'Young-founder network check-in', category: 'learn' },
-  { day: 'Fri', slot: 'morning', duration: '2h', label: 'Pipeline review', detail: 'Funnel math, intros, pitch-deck iteration', category: 'sell' },
-  { day: 'Fri', slot: 'midday', duration: '2h', label: 'Deep work', detail: 'Kahneman × Klein paper draft OR deal desk', category: 'build' },
-  { day: 'Sat', slot: 'morning', duration: '1h', label: 'Customer call', detail: 'DP onboarding or prospect discovery', category: 'sell' },
-  { day: 'Sat', slot: 'evening', duration: '—', label: 'Hard stop', detail: 'No code, no Slack. Reset for week.', category: 'rest' },
-  { day: 'Sun', slot: 'morning', duration: '1h', label: 'Week planning', detail: 'Sprint-board review, next-week sequencing', category: 'learn' },
-  { day: 'Sun', slot: 'midday', duration: '—', label: 'Rest', detail: 'Sleep debt is decision-quality debt.', category: 'rest' },
+  {
+    day: 'Mon',
+    slot: 'morning',
+    duration: '30m',
+    label: 'Advisor call',
+    detail: 'Week ahead + positioning review',
+    category: 'sell',
+  },
+  {
+    day: 'Mon',
+    slot: 'midday',
+    duration: '2h',
+    label: 'Sales outreach',
+    detail: 'Warm intros, follow-ups, DP comms',
+    category: 'sell',
+  },
+  {
+    day: 'Mon',
+    slot: 'evening',
+    duration: '30m',
+    label: 'Read HBR / FT',
+    detail: 'One CSO-relevant article, note one insight',
+    category: 'learn',
+  },
+  {
+    day: 'Tue',
+    slot: 'morning',
+    duration: '2h',
+    label: 'Content creation',
+    detail: 'Primary-source reconstruction, LinkedIn + X',
+    category: 'sell',
+  },
+  {
+    day: 'Tue',
+    slot: 'midday',
+    duration: '1h',
+    label: 'Demo rehearsal',
+    detail: 'Record 60s demo, review with advisor',
+    category: 'sell',
+  },
+  {
+    day: 'Tue',
+    slot: 'evening',
+    duration: '1h',
+    label: 'Founder School',
+    detail: 'Self-taught enterprise sales or cognitive-science lesson',
+    category: 'learn',
+  },
+  {
+    day: 'Wed',
+    slot: 'morning',
+    duration: '3h',
+    label: 'Customer calls',
+    detail: '2–3 intro or pilot calls, back-to-back',
+    category: 'sell',
+  },
+  {
+    day: 'Wed',
+    slot: 'midday',
+    duration: '1h',
+    label: 'Debrief',
+    detail: 'Insights to Positioning Memo, file product tickets',
+    category: 'sell',
+  },
+  {
+    day: 'Thu',
+    slot: 'morning',
+    duration: '3h',
+    label: 'Product polish',
+    detail: 'Only items gating pilots in flight',
+    category: 'build',
+  },
+  {
+    day: 'Thu',
+    slot: 'evening',
+    duration: '30m',
+    label: 'Peer call',
+    detail: 'Young-founder network check-in',
+    category: 'learn',
+  },
+  {
+    day: 'Fri',
+    slot: 'morning',
+    duration: '2h',
+    label: 'Pipeline review',
+    detail: 'Funnel math, intros, pitch-deck iteration',
+    category: 'sell',
+  },
+  {
+    day: 'Fri',
+    slot: 'midday',
+    duration: '2h',
+    label: 'Deep work',
+    detail: 'Kahneman × Klein paper draft OR deal desk',
+    category: 'build',
+  },
+  {
+    day: 'Sat',
+    slot: 'morning',
+    duration: '1h',
+    label: 'Customer call',
+    detail: 'DP onboarding or prospect discovery',
+    category: 'sell',
+  },
+  {
+    day: 'Sat',
+    slot: 'evening',
+    duration: '—',
+    label: 'Hard stop',
+    detail: 'No code, no Slack. Reset for week.',
+    category: 'rest',
+  },
+  {
+    day: 'Sun',
+    slot: 'morning',
+    duration: '1h',
+    label: 'Week planning',
+    detail: 'Sprint-board review, next-week sequencing',
+    category: 'learn',
+  },
+  {
+    day: 'Sun',
+    slot: 'midday',
+    duration: '—',
+    label: 'Rest',
+    detail: 'Sleep debt is decision-quality debt.',
+    category: 'rest',
+  },
 ];
 
 /* ─── Fundraising readiness checklist ──────────────────────────────── */
@@ -553,18 +754,90 @@ export type ReadinessCheck = {
 };
 
 export const READINESS: ReadinessCheck[] = [
-  { id: 'r1', area: 'traction', label: '2–5 design partners auditing real decisions', required: '10+ audits per partner', done: false },
-  { id: 'r2', area: 'traction', label: 'First outcome data captured', required: '"We implemented X, board approved in one round"', done: false },
-  { id: 'r3', area: 'traction', label: 'One published case study', required: 'Anonymised or with logo permission', done: false },
-  { id: 'r4', area: 'traction', label: '$5–20K MRR', required: 'Pilots converted to subscription', done: false },
-  { id: 'r5', area: 'financials', label: 'Margin math validated', required: '80–88% blended, documented per tier', done: false },
-  { id: 'r6', area: 'product', label: '60-second demo flawless', required: '<8s end-to-end on 10 different memos', done: false },
-  { id: 'r7', area: 'product', label: 'Knowledge Graph API beta', required: 'REST endpoints + one partner integration', done: false },
-  { id: 'r8', area: 'story', label: '9-slide pitch deck locked', required: 'Vision/Moat/Proof/Market/Model/Traction/Team/Roadmap/Use', done: false },
-  { id: 'r9', area: 'story', label: 'Kahneman × Klein whitepaper published', required: 'Framework named, taxonomy documented', done: false },
-  { id: 'r10', area: 'team', label: 'GTM co-founder closed', required: '15–25% equity, enterprise-sales background', done: false },
-  { id: 'r11', area: 'team', label: 'Advisor endorsement on record', required: 'Signed quote on deck + site', done: false },
-  { id: 'r12', area: 'story', label: 'CSO-reaction video captured', required: '90-second clip of real buyer on real output', done: false },
+  {
+    id: 'r1',
+    area: 'traction',
+    label: '2–5 design partners auditing real decisions',
+    required: '10+ audits per partner',
+    done: false,
+  },
+  {
+    id: 'r2',
+    area: 'traction',
+    label: 'First outcome data captured',
+    required: '"We implemented X, board approved in one round"',
+    done: false,
+  },
+  {
+    id: 'r3',
+    area: 'traction',
+    label: 'One published case study',
+    required: 'Anonymised or with logo permission',
+    done: false,
+  },
+  {
+    id: 'r4',
+    area: 'traction',
+    label: '$5–20K MRR',
+    required: 'Pilots converted to subscription',
+    done: false,
+  },
+  {
+    id: 'r5',
+    area: 'financials',
+    label: 'Margin math validated',
+    required: '80–88% blended, documented per tier',
+    done: false,
+  },
+  {
+    id: 'r6',
+    area: 'product',
+    label: '60-second demo flawless',
+    required: '<8s end-to-end on 10 different memos',
+    done: false,
+  },
+  {
+    id: 'r7',
+    area: 'product',
+    label: 'Knowledge Graph API beta',
+    required: 'REST endpoints + one partner integration',
+    done: false,
+  },
+  {
+    id: 'r8',
+    area: 'story',
+    label: '9-slide pitch deck locked',
+    required: 'Vision/Moat/Proof/Market/Model/Traction/Team/Roadmap/Use',
+    done: false,
+  },
+  {
+    id: 'r9',
+    area: 'story',
+    label: 'Kahneman × Klein whitepaper published',
+    required: 'Framework named, taxonomy documented',
+    done: false,
+  },
+  {
+    id: 'r10',
+    area: 'team',
+    label: 'GTM co-founder closed',
+    required: '15–25% equity, enterprise-sales background',
+    done: false,
+  },
+  {
+    id: 'r11',
+    area: 'team',
+    label: 'Advisor endorsement on record',
+    required: 'Signed quote on deck + site',
+    done: false,
+  },
+  {
+    id: 'r12',
+    area: 'story',
+    label: 'CSO-reaction video captured',
+    required: '90-second clip of real buyer on real output',
+    done: false,
+  },
 ];
 
 /* ─── Competitive map ──────────────────────────────────────────────── */
@@ -579,12 +852,43 @@ export type Competitor = {
 };
 
 export const COMPETITORS: Competitor[] = [
-  { id: 'us', name: 'Decision Intel', x: 72, y: 88, note: 'Reasoning infrastructure + causal synthesis', isUs: true },
-  { id: 'cloverpop', name: 'Cloverpop', x: 25, y: 18, note: 'Decision management, not reasoning audit' },
-  { id: 'palantir', name: 'Palantir Foundry', x: 92, y: 55, note: 'Data provenance, not reasoning provenance' },
+  {
+    id: 'us',
+    name: 'Decision Intel',
+    x: 72,
+    y: 88,
+    note: 'Reasoning infrastructure + causal synthesis',
+    isUs: true,
+  },
+  {
+    id: 'cloverpop',
+    name: 'Cloverpop',
+    x: 25,
+    y: 18,
+    note: 'Decision management, not reasoning audit',
+  },
+  {
+    id: 'palantir',
+    name: 'Palantir Foundry',
+    x: 92,
+    y: 55,
+    note: 'Data provenance, not reasoning provenance',
+  },
   { id: 'ibm', name: 'IBM Watson', x: 65, y: 25, note: 'Correlation surfaces, no causal lens' },
-  { id: 'anthropic', name: 'Anthropic / OpenAI', x: 45, y: 45, note: 'Generic reasoning — could enter in 12–18m' },
-  { id: 'consultancies', name: 'McKinsey / BCG', x: 35, y: 70, note: 'Manual, non-repeatable, not infra' },
+  {
+    id: 'anthropic',
+    name: 'Anthropic / OpenAI',
+    x: 45,
+    y: 45,
+    note: 'Generic reasoning — could enter in 12–18m',
+  },
+  {
+    id: 'consultancies',
+    name: 'McKinsey / BCG',
+    x: 35,
+    y: 70,
+    note: 'Manual, non-repeatable, not infra',
+  },
 ];
 
 /* ─── Executive memo (the one-pager) ───────────────────────────────── */
@@ -601,7 +905,7 @@ export const EXECUTIVE_MEMO: MemoSection[] = [
     id: 'ceiling',
     eyebrow: 'Realistic ceiling',
     heading: '$1B by 2029–2030, if you execute.',
-    body: 'Not because the product can\'t do it — because B2B enterprise GTM can\'t compress below that without a miracle logo. A bigger ceiling ($5–10B by 2032) exists if (1) regulation triggers mandatory decision audit, and (2) you extend beyond corporate strategy into clinical, litigation, and policy verticals.',
+    body: "Not because the product can't do it — because B2B enterprise GTM can't compress below that without a miracle logo. A bigger ceiling ($5–10B by 2032) exists if (1) regulation triggers mandatory decision audit, and (2) you extend beyond corporate strategy into clinical, litigation, and policy verticals.",
   },
   {
     id: 'moat',
@@ -630,7 +934,8 @@ export const EXECUTIVE_MEMO: MemoSection[] = [
   {
     id: 'where-council-wrong',
     eyebrow: 'Where the playbook is wrong',
-    heading: 'Title yourself less. Drop "Palantir for Reasoning" from customer copy. Realistic DP #1 is week 16, not week 10.',
+    heading:
+      'Title yourself less. Drop "Palantir for Reasoning" from customer copy. Realistic DP #1 is week 16, not week 10.',
     body: '"Chief Decision Scientist" compounds the age problem. Remove yourself from the front and let the outputs speak. "Palantir for Reasoning" is politically radioactive to half your buyers — keep for VCs, cut from customer-facing. Margin claim at 90% dies in DD; lead with honest 80–88%. Advisor is filter + endorsement, not closer.',
   },
 ];

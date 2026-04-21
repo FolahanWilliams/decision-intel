@@ -122,7 +122,14 @@ export function OutcomeLoopViz() {
       })}
 
       <defs>
-        <marker id="outcome-arrow-05" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+        <marker
+          id="outcome-arrow-05"
+          markerWidth="8"
+          markerHeight="8"
+          refX="6"
+          refY="4"
+          orient="auto"
+        >
           <path d="M 0 0 L 6 4 L 0 8 z" fill={C.green} opacity="0.7" />
         </marker>
       </defs>

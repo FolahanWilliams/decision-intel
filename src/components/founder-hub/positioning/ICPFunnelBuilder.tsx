@@ -73,9 +73,7 @@ export function ICPFunnelBuilder() {
                   padding: '8px 10px',
                   background: isActive ? '#16A34A' : 'var(--bg-secondary)',
                   color: isActive ? '#fff' : 'var(--text-primary)',
-                  border: isActive
-                    ? '1.5px solid #16A34A'
-                    : '1px solid var(--border-color)',
+                  border: isActive ? '1.5px solid #16A34A' : '1px solid var(--border-color)',
                   borderRadius: 'var(--radius-sm)',
                   cursor: 'pointer',
                   textAlign: 'left',

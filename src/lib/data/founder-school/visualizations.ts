@@ -129,7 +129,11 @@ const VIZ_ENTERPRISE_SALES: Record<string, LessonViz> = {
       { label: 'Awareness', detail: 'CSO hears "decision auditing" for the first time.' },
       { label: 'Interest', detail: 'A memo goes badly — pain becomes nameable.' },
       { label: 'Champion forms', detail: 'VP Strategy owns the "we need rigour here" narrative.' },
-      { label: 'Economic buyer approves', detail: 'CSO signs because DI de-risks the board cycle.', emphasis: true },
+      {
+        label: 'Economic buyer approves',
+        detail: 'CSO signs because DI de-risks the board cycle.',
+        emphasis: true,
+      },
       { label: 'New behaviour', detail: 'Every board-bound memo runs through DI pre-committee.' },
     ],
   },
@@ -138,14 +142,23 @@ const VIZ_ENTERPRISE_SALES: Record<string, LessonViz> = {
     caption: 'Your champion is the internal narrator — not the user, not the buyer.',
     center: 'Champion\n(VP Strategy / Sr. M&A Analyst)',
     nodes: [
-      { label: 'Economic buyer (CSO)', emphasis: true, detail: 'Signs — needs champion\'s evidence.' },
+      {
+        label: 'Economic buyer (CSO)',
+        emphasis: true,
+        detail: "Signs — needs champion's evidence.",
+      },
       { label: 'End user (analyst)', detail: 'Runs the audits weekly.' },
       { label: 'Procurement', detail: 'Gates on SOC2 + MSA.' },
       { label: 'Legal', detail: 'Reviews data-handling.' },
       { label: 'IT / Security', detail: 'Gates on encryption + SSO.' },
       { label: 'Board audit committee', detail: 'Sees the DQI output downstream.' },
     ],
-    edges: [[0, 1], [0, 2], [0, 3], [0, 4]],
+    edges: [
+      [0, 1],
+      [0, 2],
+      [0, 3],
+      [0, 4],
+    ],
   },
   es_3: {
     type: 'swimlanes',
@@ -158,7 +171,7 @@ const VIZ_ENTERPRISE_SALES: Record<string, LessonViz> = {
         'Wants rigour as their internal advantage',
         'Runs the weekly audits',
         'Builds the evidence pack',
-        'Sells you internally in rooms you\'re not in',
+        "Sells you internally in rooms you're not in",
       ],
     },
     right: {
@@ -167,7 +180,7 @@ const VIZ_ENTERPRISE_SALES: Record<string, LessonViz> = {
       points: [
         'Owns strategic-planning budget',
         'Has never used the tool',
-        'Signs on champion\'s evidence',
+        "Signs on champion's evidence",
         'Wants a defensible DQI trend for quarterly review',
         'Decides once per year; champion decides every week',
       ],
@@ -177,11 +190,27 @@ const VIZ_ENTERPRISE_SALES: Record<string, LessonViz> = {
     type: 'funnel',
     caption: 'A discovery call that closes is 80% questions about their pain.',
     stages: [
-      { label: 'Opening', value: '2 min', detail: '"Tell me about the last memo that landed badly."' },
+      {
+        label: 'Opening',
+        value: '2 min',
+        detail: '"Tell me about the last memo that landed badly."',
+      },
       { label: 'Pain discovery', value: '15 min', detail: 'Draw out specific failure stories.' },
-      { label: 'Cost of inaction', value: '10 min', detail: 'What does the next one cost if it repeats?' },
-      { label: 'Positioning mirror', value: '8 min', detail: 'Reflect DI language back to their pain.' },
-      { label: 'The ask', value: '5 min', detail: 'Design partner — 6 months, $2K/mo, roadmap input.' },
+      {
+        label: 'Cost of inaction',
+        value: '10 min',
+        detail: 'What does the next one cost if it repeats?',
+      },
+      {
+        label: 'Positioning mirror',
+        value: '8 min',
+        detail: 'Reflect DI language back to their pain.',
+      },
+      {
+        label: 'The ask',
+        value: '5 min',
+        detail: 'Design partner — 6 months, $2K/mo, roadmap input.',
+      },
     ],
   },
   es_5: {
@@ -192,7 +221,7 @@ const VIZ_ENTERPRISE_SALES: Record<string, LessonViz> = {
       { label: 'CFO', detail: 'Cost justification + budget line.' },
       { label: 'Legal + Procurement', detail: 'MSA, DPA, security questionnaire.' },
       { label: 'IT / Security', detail: 'SOC2 posture, encryption, data handling.' },
-      { label: 'Your champion', detail: 'The only reader you\'ve actually met.' },
+      { label: 'Your champion', detail: "The only reader you've actually met." },
     ],
   },
   es_6: {
@@ -202,7 +231,7 @@ const VIZ_ENTERPRISE_SALES: Record<string, LessonViz> = {
       { label: 'Pre-call', detail: 'Draft MSA, DPA, security FAQ all ready.' },
       { label: 'Pilot agreement', detail: '6 months, $2K/mo, roadmap input.' },
       { label: 'Security review', detail: 'SOC2 posture + encryption docs.' },
-      { label: 'Legal red-lines', detail: 'Accept standard changes; flag the 3 you won\'t.' },
+      { label: 'Legal red-lines', detail: "Accept standard changes; flag the 3 you won't." },
       { label: 'Countersign', detail: 'Days, not months.', emphasis: true },
     ],
   },
@@ -214,7 +243,11 @@ const VIZ_ENTERPRISE_SALES: Record<string, LessonViz> = {
       { label: 'Free trial', detail: '0% conversion — attention cost is real.', tone: 'bad' },
       { label: 'Paid pilot', detail: 'Good, but no co-build framing.', tone: 'neutral' },
       { label: 'Case study only', detail: 'No commitment — no signal.', tone: 'bad' },
-      { label: 'Design partner', detail: '$2K/mo · 6 sessions · roadmap input · case study.', tone: 'good' },
+      {
+        label: 'Design partner',
+        detail: '$2K/mo · 6 sessions · roadmap input · case study.',
+        tone: 'good',
+      },
     ],
     highlight: 3,
   },
@@ -227,10 +260,22 @@ const VIZ_FUNDRAISING: Record<string, LessonViz> = {
     type: 'pyramid',
     caption: 'At pre-seed, investors are buying the founder, not the product.',
     tiers: [
-      { label: 'Founder insight', detail: '16 yrs old · built DI solo · understands cognitive bias at CSO depth.' },
-      { label: 'Unfair advantage', detail: 'Wiz advisor (0 → $32B) — enterprise-GTM signal no peer can replicate.' },
-      { label: 'Execution speed', detail: '12-node pipeline shipped · 200+ components · 70+ routes.' },
-      { label: 'Real problem', detail: '$200M+ deals fail from bias · no competitor owns "decision quality".' },
+      {
+        label: 'Founder insight',
+        detail: '16 yrs old · built DI solo · understands cognitive bias at CSO depth.',
+      },
+      {
+        label: 'Unfair advantage',
+        detail: 'Wiz advisor (0 → $32B) — enterprise-GTM signal no peer can replicate.',
+      },
+      {
+        label: 'Execution speed',
+        detail: '12-node pipeline shipped · 200+ components · 70+ routes.',
+      },
+      {
+        label: 'Real problem',
+        detail: '$200M+ deals fail from bias · no competitor owns "decision quality".',
+      },
       { label: 'Traction hook', detail: 'First design partner in flight; content flywheel live.' },
     ],
   },
@@ -251,10 +296,31 @@ const VIZ_FUNDRAISING: Record<string, LessonViz> = {
     caption: 'The four-sentence fundraising narrative.',
     orientation: 'vertical',
     steps: [
-      { num: 1, label: 'Problem', detail: '$Bn strategic decisions made with cognitive processes riddled with bias — no software audits for this.' },
-      { num: 2, label: 'Why now', detail: 'LLMs can read a 40-page memo, flag bias, predict board objections at £0.30–0.50 per audit. New in 2024.' },
-      { num: 3, label: 'Us', detail: '12-node LangGraph pipeline · 135-case library · per-org outcome-calibrated DQI. Category-creator position.' },
-      { num: 4, label: 'Moat', detail: 'Outcome loop compounds per customer. 12 months in = DQI specifically tuned to their decisions.', wow: true },
+      {
+        num: 1,
+        label: 'Problem',
+        detail:
+          '$Bn strategic decisions made with cognitive processes riddled with bias — no software audits for this.',
+      },
+      {
+        num: 2,
+        label: 'Why now',
+        detail:
+          'LLMs can read a 40-page memo, flag bias, predict board objections at £0.30–0.50 per audit. New in 2024.',
+      },
+      {
+        num: 3,
+        label: 'Us',
+        detail:
+          '12-node LangGraph pipeline · 135-case library · per-org outcome-calibrated DQI. Category-creator position.',
+      },
+      {
+        num: 4,
+        label: 'Moat',
+        detail:
+          'Outcome loop compounds per customer. 12 months in = DQI specifically tuned to their decisions.',
+        wow: true,
+      },
     ],
   },
   fr_4: {
@@ -263,7 +329,13 @@ const VIZ_FUNDRAISING: Record<string, LessonViz> = {
     bars: [
       { label: '3 design partners × $2K', value: 72, unit: 'K ARR' },
       { label: '1 paid pilot × $8K', value: 96, unit: 'K ARR' },
-      { label: 'Year-1 ending ARR', value: 36, unit: 'K', accent: '#16A34A', detail: 'Net of churn — the number you bring to investors.' },
+      {
+        label: 'Year-1 ending ARR',
+        value: 36,
+        unit: 'K',
+        accent: '#16A34A',
+        detail: 'Net of churn — the number you bring to investors.',
+      },
       { label: 'COGS (API)', value: 3.6, unit: 'K', accent: '#EF4444' },
       { label: 'Gross margin (blended)', value: 90, unit: '%', accent: '#16A34A' },
     ],
@@ -272,9 +344,17 @@ const VIZ_FUNDRAISING: Record<string, LessonViz> = {
     type: 'funnel',
     caption: 'Run a tight process. 10 meetings in 2 weeks create perceived momentum.',
     stages: [
-      { label: 'Target list', value: '15-20', detail: 'Africa/emerging · B2B SaaS pre-seed · AI infra.' },
+      {
+        label: 'Target list',
+        value: '15-20',
+        detail: 'Africa/emerging · B2B SaaS pre-seed · AI infra.',
+      },
       { label: 'Warm intros', value: '10-12', detail: 'Through Wiz advisor — 10× cold email.' },
-      { label: 'First meetings', value: '8-10', detail: 'Cluster in 2 weeks — creates momentum narrative.' },
+      {
+        label: 'First meetings',
+        value: '8-10',
+        detail: 'Cluster in 2 weeks — creates momentum narrative.',
+      },
       { label: 'Second meetings', value: '4-6', detail: 'DD-lite — product demo + model.' },
       { label: 'Term sheets', value: '1-2', detail: 'Best one leads. Others fill.' },
     ],
@@ -283,7 +363,13 @@ const VIZ_FUNDRAISING: Record<string, LessonViz> = {
     type: 'weightBars',
     caption: 'Five terms that actually matter at pre-seed SAFE.',
     bars: [
-      { label: 'Valuation cap', value: 5, unit: 'M post', accent: '#16A34A', detail: '$3-6M normal for Africa-based AI; higher with US signals.' },
+      {
+        label: 'Valuation cap',
+        value: 5,
+        unit: 'M post',
+        accent: '#16A34A',
+        detail: '$3-6M normal for Africa-based AI; higher with US signals.',
+      },
       { label: 'Board seats', value: 0, unit: '', detail: 'Observer at most at pre-seed.' },
       { label: 'Pro-rata', value: 1, unit: 'only to exercisers' },
       { label: 'Info rights', value: 1, unit: 'quarterly ok' },
@@ -298,7 +384,11 @@ const VIZ_FUNDRAISING: Record<string, LessonViz> = {
       { label: 'Demo video', detail: '5 minutes — upload → score reveal → counterfactual.' },
       { label: 'Reference list', detail: 'Wiz advisor + any design-partner contacts.' },
       { label: 'Cap table', detail: 'Just you today — keep it clean.' },
-      { label: 'Incorporation', detail: 'Delaware C-Corp holding above Nigeria OpCo.', emphasis: true },
+      {
+        label: 'Incorporation',
+        detail: 'Delaware C-Corp holding above Nigeria OpCo.',
+        emphasis: true,
+      },
     ],
   },
 };
@@ -322,10 +412,26 @@ const VIZ_BRAND_DISTRIBUTION: Record<string, LessonViz> = {
     type: 'weightBars',
     caption: 'Trust = (Credibility + Reliability + Intimacy) / Self-Orientation.',
     bars: [
-      { label: 'Credibility — you know the Kahneman lineage cold', value: 85, unit: '%', accent: '#16A34A' },
+      {
+        label: 'Credibility — you know the Kahneman lineage cold',
+        value: 85,
+        unit: '%',
+        accent: '#16A34A',
+      },
       { label: 'Reliability — you show up daily', value: 70, unit: '%', accent: '#16A34A' },
-      { label: 'Intimacy — the 16-yr-old in Nigeria building DI', value: 90, unit: '%', accent: '#16A34A' },
-      { label: 'Self-orientation — keep under this line', value: 20, unit: '% max', accent: '#EF4444', detail: 'Every "look what we built" post raises this. Kill on sight.' },
+      {
+        label: 'Intimacy — the 16-yr-old in Nigeria building DI',
+        value: 90,
+        unit: '%',
+        accent: '#16A34A',
+      },
+      {
+        label: 'Self-orientation — keep under this line',
+        value: 20,
+        unit: '% max',
+        accent: '#EF4444',
+        detail: 'Every "look what we built" post raises this. Kill on sight.',
+      },
     ],
   },
   bd_3: {
@@ -410,9 +516,22 @@ const VIZ_BRAND_DISTRIBUTION: Record<string, LessonViz> = {
     caption: 'The three phases of the distribution flywheel.',
     orientation: 'horizontal',
     steps: [
-      { num: 1, label: 'Now → first customer', detail: 'Daily post · 1,000 ICP-filtered LinkedIn followers.' },
-      { num: 2, label: 'First customer → seed', detail: 'Case-study content · warm intros from your own audience.', wow: true },
-      { num: 3, label: 'Seed → Series A', detail: 'Speaking slots (ACG, Intralinks) · industry recognition.' },
+      {
+        num: 1,
+        label: 'Now → first customer',
+        detail: 'Daily post · 1,000 ICP-filtered LinkedIn followers.',
+      },
+      {
+        num: 2,
+        label: 'First customer → seed',
+        detail: 'Case-study content · warm intros from your own audience.',
+        wow: true,
+      },
+      {
+        num: 3,
+        label: 'Seed → Series A',
+        detail: 'Speaking slots (ACG, Intralinks) · industry recognition.',
+      },
     ],
   },
 };
@@ -424,8 +543,20 @@ const VIZ_UNIT_ECONOMICS: Record<string, LessonViz> = {
     type: 'weightBars',
     caption: 'Three numbers every investor checks in the first 10 minutes.',
     bars: [
-      { label: 'Gross margin (blended)', value: 90, unit: '%', accent: '#16A34A', detail: 'Survives diligence. The 97% ghost-user figure does not.' },
-      { label: 'Target ACV — Strategy tier', value: 30, unit: 'K/yr', accent: '#0EA5E9', detail: '$2,499/mo · fair-use 250 audits · team seats.' },
+      {
+        label: 'Gross margin (blended)',
+        value: 90,
+        unit: '%',
+        accent: '#16A34A',
+        detail: 'Survives diligence. The 97% ghost-user figure does not.',
+      },
+      {
+        label: 'Target ACV — Strategy tier',
+        value: 30,
+        unit: 'K/yr',
+        accent: '#0EA5E9',
+        detail: '$2,499/mo · fair-use 250 audits · team seats.',
+      },
       { label: 'Days to first revenue', value: 90, unit: 'day target', accent: '#F59E0B' },
     ],
   },
@@ -437,7 +568,11 @@ const VIZ_UNIT_ECONOMICS: Record<string, LessonViz> = {
       { label: 'Prospect → discovery', value: '20%' },
       { label: 'Discovery → pilot', value: '50%' },
       { label: 'Pilot → paid', value: '30%' },
-      { label: 'Implied CAC', value: '~$10K', detail: 'Content-led channels cut this to near-zero.' },
+      {
+        label: 'Implied CAC',
+        value: '~$10K',
+        detail: 'Content-led channels cut this to near-zero.',
+      },
     ],
   },
   ue_3: {
@@ -459,8 +594,19 @@ const VIZ_UNIT_ECONOMICS: Record<string, LessonViz> = {
     caption: 'Payback period — the VC metric that governs growth capital.',
     bars: [
       { label: 'CAC', value: 10, unit: 'K', accent: '#EF4444' },
-      { label: 'Monthly contribution ($2,499 × 90%)', value: 2.25, unit: 'K / mo', accent: '#16A34A' },
-      { label: 'Payback period', value: 4.5, unit: 'months', accent: '#0EA5E9', detail: 'Sub-6 is elite. Justifies aggressive CAC spend at Series A.' },
+      {
+        label: 'Monthly contribution ($2,499 × 90%)',
+        value: 2.25,
+        unit: 'K / mo',
+        accent: '#16A34A',
+      },
+      {
+        label: 'Payback period',
+        value: 4.5,
+        unit: 'months',
+        accent: '#0EA5E9',
+        detail: 'Sub-6 is elite. Justifies aggressive CAC spend at Series A.',
+      },
     ],
   },
   ue_5: {
@@ -471,7 +617,11 @@ const VIZ_UNIT_ECONOMICS: Record<string, LessonViz> = {
       { label: 'SaaS in trouble', detail: '<40 = kill or restructure.', tone: 'bad' },
       { label: 'Mature SaaS', detail: '30% growth · 40% margin = 70.', tone: 'neutral' },
       { label: 'Burn-rich growth', detail: '100% growth · -30% margin = 70.', tone: 'warn' },
-      { label: 'Decision Intel @ $1M', detail: '100% growth · 40% margin = 140. Elite.', tone: 'good' },
+      {
+        label: 'Decision Intel @ $1M',
+        detail: '100% growth · 40% margin = 140. Elite.',
+        tone: 'good',
+      },
     ],
     highlight: 3,
   },
@@ -493,11 +643,32 @@ const VIZ_UNIT_ECONOMICS: Record<string, LessonViz> = {
     caption: 'A believable 3-year model: drivers, not outputs.',
     orientation: 'vertical',
     steps: [
-      { num: 1, label: 'New customers by channel', detail: 'Warm intro / content / cold — each with its own CAC.' },
-      { num: 2, label: 'Churn by tier', detail: 'Annual %. Design partners > Individual > Strategy > Enterprise.' },
-      { num: 3, label: 'ACV by tier', detail: 'Individual $3K · Strategy $30K · Enterprise $150K.' },
-      { num: 4, label: 'COGS (Gemini API + infra)', detail: '£0.30-0.50/audit · 17 LLM calls each · factor flywheel costs.' },
-      { num: 5, label: 'Gross profit → op margin', detail: 'Show all three scenarios — bull, base, bear.', wow: true },
+      {
+        num: 1,
+        label: 'New customers by channel',
+        detail: 'Warm intro / content / cold — each with its own CAC.',
+      },
+      {
+        num: 2,
+        label: 'Churn by tier',
+        detail: 'Annual %. Design partners > Individual > Strategy > Enterprise.',
+      },
+      {
+        num: 3,
+        label: 'ACV by tier',
+        detail: 'Individual $3K · Strategy $30K · Enterprise $150K.',
+      },
+      {
+        num: 4,
+        label: 'COGS (Gemini API + infra)',
+        detail: '£0.30-0.50/audit · 17 LLM calls each · factor flywheel costs.',
+      },
+      {
+        num: 5,
+        label: 'Gross profit → op margin',
+        detail: 'Show all three scenarios — bull, base, bear.',
+        wow: true,
+      },
     ],
   },
 };
@@ -510,9 +681,21 @@ const VIZ_DECISION_QUALITY: Record<string, LessonViz> = {
     caption: 'The biases that hit founders hardest — the ones your product catches in others.',
     center: 'Founder\n(solo, conviction-heavy)',
     nodes: [
-      { label: 'Confirmation bias', emphasis: true, detail: 'You seek validation, not disconfirmation.' },
-      { label: 'Overconfidence', emphasis: true, detail: 'Conviction is rewarded — until it isn\'t.' },
-      { label: 'Sunk cost', emphasis: true, detail: '"We\'ve already built this" drives bad calls.' },
+      {
+        label: 'Confirmation bias',
+        emphasis: true,
+        detail: 'You seek validation, not disconfirmation.',
+      },
+      {
+        label: 'Overconfidence',
+        emphasis: true,
+        detail: "Conviction is rewarded — until it isn't.",
+      },
+      {
+        label: 'Sunk cost',
+        emphasis: true,
+        detail: '"We\'ve already built this" drives bad calls.',
+      },
       { label: 'Availability', detail: 'Recent investor feedback skews your roadmap.' },
       { label: 'Anchoring', detail: 'First quote from a prospect becomes your ceiling.' },
       { label: 'Optimism bias', detail: 'Timelines always feel 2× shorter than they are.' },
@@ -523,9 +706,18 @@ const VIZ_DECISION_QUALITY: Record<string, LessonViz> = {
     caption: 'The pre-mortem: write the failure story before the decision.',
     events: [
       { when: 'T-0', label: 'Pre-decision', detail: 'Optimism is loud. Risks are invisible.' },
-      { when: 'T+0', label: 'Imagine failure', detail: '"It\'s 12 months later and this decision failed. Why?"', emphasis: true },
+      {
+        when: 'T+0',
+        label: 'Imagine failure',
+        detail: '"It\'s 12 months later and this decision failed. Why?"',
+        emphasis: true,
+      },
       { when: 'T+1', label: 'List causes', detail: 'Force the brain from defence → diagnosis.' },
-      { when: 'T+2', label: 'Rank by plausibility', detail: 'Top 3 become your must-monitor list.' },
+      {
+        when: 'T+2',
+        label: 'Rank by plausibility',
+        detail: 'Top 3 become your must-monitor list.',
+      },
       { when: 'T+3', label: 'Decide', detail: 'Often: same decision, better guardrails.' },
     ],
   },
@@ -533,11 +725,21 @@ const VIZ_DECISION_QUALITY: Record<string, LessonViz> = {
     type: 'weightBars',
     caption: 'Reference-class base rates you should actually know.',
     bars: [
-      { label: 'Pre-seed close — time to term sheet', value: 4.5, unit: 'months median', accent: '#0EA5E9' },
+      {
+        label: 'Pre-seed close — time to term sheet',
+        value: 4.5,
+        unit: 'months median',
+        accent: '#0EA5E9',
+      },
       { label: 'Enterprise deal cycle', value: 12, unit: 'months median', accent: '#F59E0B' },
       { label: 'Pilot → paid conversion', value: 30, unit: '%' },
       { label: 'Year-1 SaaS GRR', value: 85, unit: '% baseline' },
-      { label: 'Your instinct vs. reality', value: 150, unit: '% too optimistic', accent: '#EF4444' },
+      {
+        label: 'Your instinct vs. reality',
+        value: 150,
+        unit: '% too optimistic',
+        accent: '#EF4444',
+      },
     ],
   },
   dq_4: {
@@ -549,7 +751,12 @@ const VIZ_DECISION_QUALITY: Record<string, LessonViz> = {
       { num: 2, label: 'Context', detail: 'What you knew at the time.' },
       { num: 3, label: 'Options considered', detail: 'Including the ones you rejected.' },
       { num: 4, label: 'Why this one', detail: 'Your reasoning chain.' },
-      { num: 5, label: 'What would prove me wrong', detail: 'The disconfirmer you\'d accept.', wow: true },
+      {
+        num: 5,
+        label: 'What would prove me wrong',
+        detail: "The disconfirmer you'd accept.",
+        wow: true,
+      },
     ],
   },
   dq_5: {
@@ -557,10 +764,26 @@ const VIZ_DECISION_QUALITY: Record<string, LessonViz> = {
     caption: 'Outcome quality = decision quality + luck. Never conflate them.',
     axes: { x: ['Bad decision', 'Good decision'], y: ['Bad outcome', 'Good outcome'] },
     cells: [
-      { label: 'Deserved outcome', detail: 'Good process · lucky result. Don\'t over-learn.', tone: 'neutral' },
-      { label: 'Earned outcome', detail: 'Good process · good result. Repeat the process.', tone: 'good' },
-      { label: 'Deserved failure', detail: 'Bad process · bad result. Fix the process.', tone: 'bad' },
-      { label: 'Lucky escape', detail: 'Bad process · good result. Most dangerous cell.', tone: 'warn' },
+      {
+        label: 'Deserved outcome',
+        detail: "Good process · lucky result. Don't over-learn.",
+        tone: 'neutral',
+      },
+      {
+        label: 'Earned outcome',
+        detail: 'Good process · good result. Repeat the process.',
+        tone: 'good',
+      },
+      {
+        label: 'Deserved failure',
+        detail: 'Bad process · bad result. Fix the process.',
+        tone: 'bad',
+      },
+      {
+        label: 'Lucky escape',
+        detail: 'Bad process · good result. Most dangerous cell.',
+        tone: 'warn',
+      },
     ],
   },
   dq_6: {
@@ -582,7 +805,7 @@ const VIZ_DECISION_QUALITY: Record<string, LessonViz> = {
     nodes: [
       { label: 'List 5 biggest decisions' },
       { label: 'Identify dominant bias each' },
-      { label: 'Note what you\'d do differently' },
+      { label: "Note what you'd do differently" },
       { label: 'Pattern across all 5' },
       { label: 'One change for next quarter' },
     ],
@@ -608,23 +831,46 @@ const VIZ_GTM_STRATEGY: Record<string, LessonViz> = {
     caption: 'Beachhead: corporate strategy + M&A at $500M-$2B mid-market. Expand outward.',
     center: 'Beachhead\nCorp strategy + M&A\n$500M-$2B revenue',
     nodes: [
-      { label: 'Large-cap strategy', emphasis: true, detail: 'Year 2 — once you have 5 mid-market references.' },
+      {
+        label: 'Large-cap strategy',
+        emphasis: true,
+        detail: 'Year 2 — once you have 5 mid-market references.',
+      },
       { label: 'Strategy consultancies', detail: 'White-label DI as their audit tool.' },
       { label: 'BizOps / FP&A', detail: 'Tertiary — decision-support desks.' },
       { label: 'Sales forecasting', detail: 'Tertiary — forecast-quality audits.' },
       { label: 'PE-backed portcos', detail: 'Good bridge — high-frequency, real budget.' },
-      { label: 'PE / VC funds', detail: 'Explicitly NOT target — small budgets, relationship-driven.' },
+      {
+        label: 'PE / VC funds',
+        detail: 'Explicitly NOT target — small budgets, relationship-driven.',
+      },
     ],
   },
   gtm_3: {
     type: 'funnel',
     caption: 'First 10 customers — almost never from cold outreach.',
     stages: [
-      { label: 'Warm intros via Wiz advisor', value: '~4', detail: 'Highest-trust channel. Ask directly for 3 names.' },
-      { label: 'LinkedIn inbound (ICP followers)', value: '~3', detail: 'Content flywheel. Starts after post #60.' },
-      { label: 'Speaking in ICP communities', value: '~2', detail: 'ACG, Corporate Strategy Director forums.' },
+      {
+        label: 'Warm intros via Wiz advisor',
+        value: '~4',
+        detail: 'Highest-trust channel. Ask directly for 3 names.',
+      },
+      {
+        label: 'LinkedIn inbound (ICP followers)',
+        value: '~3',
+        detail: 'Content flywheel. Starts after post #60.',
+      },
+      {
+        label: 'Speaking in ICP communities',
+        value: '~2',
+        detail: 'ACG, Corporate Strategy Director forums.',
+      },
       { label: '2nd-degree intros', value: '~1', detail: 'Former contacts in adjacent roles.' },
-      { label: 'Cold outreach', value: '0-1', detail: 'Last resort — 10× conversion worse than warm.' },
+      {
+        label: 'Cold outreach',
+        value: '0-1',
+        detail: 'Last resort — 10× conversion worse than warm.',
+      },
     ],
   },
   gtm_4: {
@@ -669,11 +915,21 @@ const VIZ_GTM_STRATEGY: Record<string, LessonViz> = {
     type: 'weightBars',
     caption: 'Price to value, not to cost. Founders systematically undercharge.',
     bars: [
-      { label: 'Cost of one failed $200M acquisition', value: 40, unit: 'M destroyed', accent: '#EF4444' },
+      {
+        label: 'Cost of one failed $200M acquisition',
+        value: 40,
+        unit: 'M destroyed',
+        accent: '#EF4444',
+      },
       { label: 'DI — Strategy tier (fair-use)', value: 30, unit: 'K / year', accent: '#16A34A' },
       { label: 'DI — Enterprise', value: 150, unit: 'K / year', accent: '#0EA5E9' },
       { label: 'Per-audit marginal cost (DI)', value: 0.5, unit: '£ / audit' },
-      { label: 'Your price-to-value ratio', value: 0.075, unit: '% of risk', detail: 'At 0.075%, the price conversation is easy.' },
+      {
+        label: 'Your price-to-value ratio',
+        value: 0.075,
+        unit: '% of risk',
+        detail: 'At 0.075%, the price conversation is easy.',
+      },
     ],
   },
   gtm_7: {
@@ -681,11 +937,33 @@ const VIZ_GTM_STRATEGY: Record<string, LessonViz> = {
     caption: 'The design-partner pitch — co-build, not sell.',
     orientation: 'vertical',
     steps: [
-      { num: 1, label: 'Exclusivity frame', detail: '"5 companies shaping the future of strategic decision quality."' },
-      { num: 2, label: 'What they get', detail: 'Unlimited audits · weekly sessions with founder · guaranteed roadmap input.' },
-      { num: 3, label: 'What they give', detail: '$2K/mo · 6-month commitment · case-study consent.' },
-      { num: 4, label: 'Why it works', detail: 'Exclusivity signals value · co-build makes them builders · $2K is sub-procurement.' },
-      { num: 5, label: 'Close', detail: '"You in?" — the ask comes naturally, not as a close.', wow: true },
+      {
+        num: 1,
+        label: 'Exclusivity frame',
+        detail: '"5 companies shaping the future of strategic decision quality."',
+      },
+      {
+        num: 2,
+        label: 'What they get',
+        detail: 'Unlimited audits · weekly sessions with founder · guaranteed roadmap input.',
+      },
+      {
+        num: 3,
+        label: 'What they give',
+        detail: '$2K/mo · 6-month commitment · case-study consent.',
+      },
+      {
+        num: 4,
+        label: 'Why it works',
+        detail:
+          'Exclusivity signals value · co-build makes them builders · $2K is sub-procurement.',
+      },
+      {
+        num: 5,
+        label: 'Close',
+        detail: '"You in?" — the ask comes naturally, not as a close.',
+        wow: true,
+      },
     ],
   },
 };
@@ -695,13 +973,22 @@ const VIZ_GTM_STRATEGY: Record<string, LessonViz> = {
 const VIZ_LEADERSHIP: Record<string, LessonViz> = {
   ldr_1: {
     type: 'stepper',
-    caption: 'Monthly advisor update — drip value, don\'t batch asks.',
+    caption: "Monthly advisor update — drip value, don't batch asks.",
     orientation: 'vertical',
     steps: [
       { num: 1, label: 'Progress (2 sentences)', detail: 'What shipped since last call.' },
       { num: 2, label: 'Biggest blocker (1 sentence)', detail: 'Specific enough to act on.' },
-      { num: 3, label: '2-3 decisions you want their take on', detail: 'Draw on their Wiz pattern-matching.' },
-      { num: 4, label: 'One ask', detail: 'Intro · intro · intro. Their network is the lever.', wow: true },
+      {
+        num: 3,
+        label: '2-3 decisions you want their take on',
+        detail: 'Draw on their Wiz pattern-matching.',
+      },
+      {
+        num: 4,
+        label: 'One ask',
+        detail: 'Intro · intro · intro. Their network is the lever.',
+        wow: true,
+      },
       { num: 5, label: 'Report back next month', detail: 'Show their input mattered.' },
     ],
   },
@@ -721,10 +1008,16 @@ const VIZ_LEADERSHIP: Record<string, LessonViz> = {
     type: 'funnel',
     caption: 'First hire — whoever makes you 10× more effective, not 10% better.',
     stages: [
-      { label: 'Only you can do it', detail: 'Investor relationships · strategic vision · design-partner calls.' },
+      {
+        label: 'Only you can do it',
+        detail: 'Investor relationships · strategic vision · design-partner calls.',
+      },
       { label: 'You + Claude', detail: 'Architecture · content · outreach drafts.' },
       { label: 'Automatable today', detail: 'Builds · deploys · reminders.' },
-      { label: 'First-hire gap', detail: 'Enterprise-sales motion specialist — owns DP pipeline while you build.' },
+      {
+        label: 'First-hire gap',
+        detail: 'Enterprise-sales motion specialist — owns DP pipeline while you build.',
+      },
     ],
   },
   ldr_4: {
@@ -743,16 +1036,26 @@ const VIZ_LEADERSHIP: Record<string, LessonViz> = {
     type: 'weightBars',
     caption: 'Founder psychology — tools that work in bad weeks.',
     bars: [
-      { label: 'Separate decision quality from outcome quality', value: 90, unit: '% leverage', accent: '#16A34A' },
+      {
+        label: 'Separate decision quality from outcome quality',
+        value: 90,
+        unit: '% leverage',
+        accent: '#16A34A',
+      },
       { label: 'Weekly review — 3 wins · 1 loss · 1 different', value: 75, unit: '%' },
       { label: '10-year test — will this matter in a decade?', value: 80, unit: '%' },
       { label: 'Physical reset — the loop is rarely fixed by more thinking', value: 70, unit: '%' },
-      { label: 'Emotional regulation at 16 compounds for 40 years', value: 100, unit: '% moat', accent: '#0EA5E9' },
+      {
+        label: 'Emotional regulation at 16 compounds for 40 years',
+        value: 100,
+        unit: '% moat',
+        accent: '#0EA5E9',
+      },
     ],
   },
   ldr_6: {
     type: 'matrix',
-    caption: 'Stakeholders have different currencies. Don\'t cross-pay.',
+    caption: "Stakeholders have different currencies. Don't cross-pay.",
     rows: ['Investors', 'Advisors', 'Design partners'],
     cols: ['Momentum', 'Specifics', 'Exclusivity', 'Roadmap visibility'],
     cells: [
@@ -793,12 +1096,35 @@ const VIZ_PLATFORM_FOUNDATIONS: Record<string, LessonViz> = {
     type: 'timeline',
     caption: 'The Heuristics & Biases research lineage — 1974 → DI taxonomy.',
     events: [
-      { when: '1974', label: 'Tversky & Kahneman', detail: '"Judgment under Uncertainty" — Science. Founding paper.', emphasis: true },
-      { when: '1982', label: 'Kahneman, Slovic, Tversky', detail: 'Academic canon collection — Cambridge UP.' },
+      {
+        when: '1974',
+        label: 'Tversky & Kahneman',
+        detail: '"Judgment under Uncertainty" — Science. Founding paper.',
+        emphasis: true,
+      },
+      {
+        when: '1982',
+        label: 'Kahneman, Slovic, Tversky',
+        detail: 'Academic canon collection — Cambridge UP.',
+      },
       { when: '2002', label: 'Kahneman wins Nobel', detail: 'Prospect Theory enters economics.' },
-      { when: '2005', label: 'Malmendier & Tate', detail: '"CEO Overconfidence and Corporate Investment" — applies bias research to public-company CEOs.' },
-      { when: '2011', label: 'Thinking, Fast and Slow', detail: 'Layperson synthesis. System 1 / System 2.' },
-      { when: '2026', label: 'Decision Intel taxonomy', detail: 'DI-B-001 → DI-B-020 + 30+ scope. Published at /taxonomy.', emphasis: true },
+      {
+        when: '2005',
+        label: 'Malmendier & Tate',
+        detail:
+          '"CEO Overconfidence and Corporate Investment" — applies bias research to public-company CEOs.',
+      },
+      {
+        when: '2011',
+        label: 'Thinking, Fast and Slow',
+        detail: 'Layperson synthesis. System 1 / System 2.',
+      },
+      {
+        when: '2026',
+        label: 'Decision Intel taxonomy',
+        detail: 'DI-B-001 → DI-B-020 + 30+ scope. Published at /taxonomy.',
+        emphasis: true,
+      },
     ],
   },
   pf_2: {
@@ -831,12 +1157,42 @@ const VIZ_PLATFORM_FOUNDATIONS: Record<string, LessonViz> = {
     type: 'weightBars',
     caption: 'DQI — the six components and their locked weights (GRADE_THRESHOLDS in dqi.ts).',
     bars: [
-      { label: 'Bias profile', value: 28, unit: '%', accent: '#EF4444', detail: 'Kahneman-Sibony: largest error source.' },
-      { label: 'Noise', value: 18, unit: '%', accent: '#F59E0B', detail: 'Kahneman 2021 — same weight class as bias.' },
-      { label: 'Logical coherence', value: 18, unit: '%', accent: '#0EA5E9', detail: 'Howard-Matheson argument-validity.' },
+      {
+        label: 'Bias profile',
+        value: 28,
+        unit: '%',
+        accent: '#EF4444',
+        detail: 'Kahneman-Sibony: largest error source.',
+      },
+      {
+        label: 'Noise',
+        value: 18,
+        unit: '%',
+        accent: '#F59E0B',
+        detail: 'Kahneman 2021 — same weight class as bias.',
+      },
+      {
+        label: 'Logical coherence',
+        value: 18,
+        unit: '%',
+        accent: '#0EA5E9',
+        detail: 'Howard-Matheson argument-validity.',
+      },
       { label: 'Evidence grounding', value: 13, unit: '%', accent: '#0EA5E9' },
-      { label: 'Pre-mortem robustness', value: 13, unit: '%', accent: '#16A34A', detail: 'Klein 2007 — failure-mode coverage.' },
-      { label: 'Stakeholder coverage', value: 10, unit: '%', accent: '#16A34A', detail: 'Mercier-Sperber argumentative theory.' },
+      {
+        label: 'Pre-mortem robustness',
+        value: 13,
+        unit: '%',
+        accent: '#16A34A',
+        detail: 'Klein 2007 — failure-mode coverage.',
+      },
+      {
+        label: 'Stakeholder coverage',
+        value: 10,
+        unit: '%',
+        accent: '#16A34A',
+        detail: 'Mercier-Sperber argumentative theory.',
+      },
     ],
   },
   pf_4: {
@@ -844,16 +1200,34 @@ const VIZ_PLATFORM_FOUNDATIONS: Record<string, LessonViz> = {
     caption: 'Pre-mortem + Red Team — operationalised adversarial cognition.',
     orientation: 'vertical',
     steps: [
-      { num: 1, label: 'Klein (2007) — pre-mortem', detail: '"Imagine it failed. Write why." Prospective-hindsight shift.' },
-      { num: 2, label: 'Mitchell et al (1989)', detail: 'Research behind why prospective hindsight works.' },
-      { num: 3, label: 'Mercier & Sperber (2017)', detail: 'Reasoning evolved for argumentation — red teams beat solo thinking.' },
+      {
+        num: 1,
+        label: 'Klein (2007) — pre-mortem',
+        detail: '"Imagine it failed. Write why." Prospective-hindsight shift.',
+      },
+      {
+        num: 2,
+        label: 'Mitchell et al (1989)',
+        detail: 'Research behind why prospective hindsight works.',
+      },
+      {
+        num: 3,
+        label: 'Mercier & Sperber (2017)',
+        detail: 'Reasoning evolved for argumentation — red teams beat solo thinking.',
+      },
       { num: 4, label: 'DI pre-mortem node', detail: 'Generates failure scenarios on every memo.' },
-      { num: 5, label: 'DI Red Team node', detail: 'Synthesises single most-damaging objection against weakest load-bearing assumption.', wow: true },
+      {
+        num: 5,
+        label: 'DI Red Team node',
+        detail:
+          'Synthesises single most-damaging objection against weakest load-bearing assumption.',
+        wow: true,
+      },
     ],
   },
   pf_5: {
     type: 'flywheel',
-    caption: 'The outcome loop — Tetlock\'s calibration research applied to corporate strategy.',
+    caption: "The outcome loop — Tetlock's calibration research applied to corporate strategy.",
     centerLabel: 'Per-org\ncalibrated DQI',
     nodes: [
       { label: 'Memo audited — DQI assigned' },
@@ -890,7 +1264,7 @@ const VIZ_PLATFORM_FOUNDATIONS: Record<string, LessonViz> = {
   },
   pf_7: {
     type: 'chain',
-    caption: 'The 12-node LangGraph pipeline — why this isn\'t a ChatGPT wrapper.',
+    caption: "The 12-node LangGraph pipeline — why this isn't a ChatGPT wrapper.",
     steps: [
       { label: 'GDPR anonymiser', detail: 'Strips PII before any external call.' },
       { label: 'Structurer', detail: 'Parses memo into sections.' },
@@ -911,8 +1285,16 @@ const VIZ_PLATFORM_FOUNDATIONS: Record<string, LessonViz> = {
     caption: 'Seven regulatory frameworks — each gates a category of customer.',
     center: 'DI flags\n(every one carries a citation)',
     nodes: [
-      { label: 'GDPR · Art. 22', emphasis: true, detail: 'Gates EU deals. Automated-decision provisions.' },
-      { label: 'SOC 2 Type II', emphasis: true, detail: 'Gates any regulated industry. Five trust principles.' },
+      {
+        label: 'GDPR · Art. 22',
+        emphasis: true,
+        detail: 'Gates EU deals. Automated-decision provisions.',
+      },
+      {
+        label: 'SOC 2 Type II',
+        emphasis: true,
+        detail: 'Gates any regulated industry. Five trust principles.',
+      },
       { label: 'HIPAA', detail: 'Gates healthcare strategic decisions.' },
       { label: 'CCPA', detail: 'California residents.' },
       { label: 'SOX §404', detail: 'Gates public-company CFO approval. Materiality.' },
@@ -924,16 +1306,35 @@ const VIZ_PLATFORM_FOUNDATIONS: Record<string, LessonViz> = {
     type: 'pyramid',
     caption: 'The 135-case library — why this is a training prior, not marketing.',
     tiers: [
-      { label: 'Cross-decision intelligence', detail: '"Your memo matches 12 historical cases; 9 of 12 produced negative outcomes."' },
+      {
+        label: 'Cross-decision intelligence',
+        detail: '"Your memo matches 12 historical cases; 9 of 12 produced negative outcomes."',
+      },
       { label: 'Bias Genome', detail: 'Failure-lift leaderboard computed from the library.' },
-      { label: '135 Tier-2 cases', detail: 'Each with pre-decision memo, biases, red flags, counter-exemplars.' },
-      { label: 'Pattern families (Finkelstein)', detail: 'Kodak-pattern, Blockbuster-pattern, Nortel-pattern.' },
+      {
+        label: '135 Tier-2 cases',
+        detail: 'Each with pre-decision memo, biases, red flags, counter-exemplars.',
+      },
+      {
+        label: 'Pattern families (Finkelstein)',
+        detail: 'Kodak-pattern, Blockbuster-pattern, Nortel-pattern.',
+      },
       { label: 'Primary-source citations', detail: 'Every case hand-verified. Not LLM-generated.' },
     ],
   },
 };
 
-Object.assign(LESSON_VIZ, VIZ_ENTERPRISE_SALES, VIZ_FUNDRAISING, VIZ_BRAND_DISTRIBUTION, VIZ_UNIT_ECONOMICS, VIZ_DECISION_QUALITY, VIZ_GTM_STRATEGY, VIZ_LEADERSHIP, VIZ_PLATFORM_FOUNDATIONS);
+Object.assign(
+  LESSON_VIZ,
+  VIZ_ENTERPRISE_SALES,
+  VIZ_FUNDRAISING,
+  VIZ_BRAND_DISTRIBUTION,
+  VIZ_UNIT_ECONOMICS,
+  VIZ_DECISION_QUALITY,
+  VIZ_GTM_STRATEGY,
+  VIZ_LEADERSHIP,
+  VIZ_PLATFORM_FOUNDATIONS
+);
 
 export function getLessonViz(lessonId: string): LessonViz | null {
   return LESSON_VIZ[lessonId] ?? null;

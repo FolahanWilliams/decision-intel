@@ -2,15 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  User,
-  MapPin,
-  Flame,
-  MessageSquare,
-  Key,
-  Star,
-  ShieldOff,
-} from 'lucide-react';
+import { User, MapPin, Flame, MessageSquare, Key, Star, ShieldOff } from 'lucide-react';
 import {
   BUYER_PERSONAS,
   PERSONA_TIER_LABEL,
@@ -59,9 +51,7 @@ export function BuyerPersonaMap() {
               >
                 {PERSONA_TIER_LABEL[tier]}
               </div>
-              {tier === 'anti_pattern' && (
-                <ShieldOff size={12} style={{ color, marginLeft: -4 }} />
-              )}
+              {tier === 'anti_pattern' && <ShieldOff size={12} style={{ color, marginLeft: -4 }} />}
               {tier === 'primary' && <Star size={12} style={{ color, marginLeft: -4 }} />}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -137,7 +127,14 @@ function PersonaCard({
           {isAnti ? <ShieldOff size={14} /> : <User size={14} />}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.25 }}>
+          <div
+            style={{
+              fontSize: 13,
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+              lineHeight: 1.25,
+            }}
+          >
             {persona.title}
           </div>
           <div

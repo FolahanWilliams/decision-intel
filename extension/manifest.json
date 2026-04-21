@@ -3,12 +3,7 @@
   "name": "Decision Intel | Cognitive Bias Auditor",
   "version": "2.0",
   "description": "Analyze web pages for cognitive biases and decision noise using the Decision Intel platform.",
-  "permissions": [
-    "activeTab",
-    "scripting",
-    "storage",
-    "sidePanel"
-  ],
+  "permissions": ["activeTab", "scripting", "storage", "sidePanel"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {

@@ -38,8 +38,7 @@ export const INCUMBENTS: Incumbent[] = [
     oneLiner: 'Unifies siloed data into entity graphs for investigation and risk.',
     strength:
       'Largest pure-play DI startup by valuation. Deep context unification across entities, transactions, and relationships.',
-    gap:
-      'Correlational graph inference — strong at "who is connected to whom" but does not model causal effect of bias/noise on strategic decisions. No closed outcome loop.',
+    gap: 'Correlational graph inference — strong at "who is connected to whom" but does not model causal effect of bias/noise on strategic decisions. No closed outcome loop.',
     x: 42,
     y: 28,
     isDI: false,
@@ -55,8 +54,7 @@ export const INCUMBENTS: Incumbent[] = [
     oneLiner: 'Recommendation + automation layer for repeatable operational decisions.',
     strength:
       'Proven enterprise scale. Real-time automation with strong ROI in supply chain and ops.',
-    gap:
-      'Recommendation engine, not a causal or governance layer. No bias detection, no outcome-loop accountability beyond the immediate recommendation.',
+    gap: 'Recommendation engine, not a causal or governance layer. No bias detection, no outcome-loop accountability beyond the immediate recommendation.',
     x: 35,
     y: 32,
     isDI: false,
@@ -71,8 +69,7 @@ export const INCUMBENTS: Incumbent[] = [
     focus: 'Augmented analytics · Self-service BI',
     oneLiner: 'AI-driven analytics platform for governed self-service BI.',
     strength: 'Broad BI coverage. Strong self-service tooling for business users.',
-    gap:
-      'Positioned as BI-first, not decision-first. No causal modelling, no bias taxonomy, no decision-quality scoring.',
+    gap: 'Positioned as BI-first, not decision-first. No causal modelling, no bias taxonomy, no decision-quality scoring.',
     x: 14,
     y: 12,
     isDI: false,
@@ -88,8 +85,7 @@ export const INCUMBENTS: Incumbent[] = [
     oneLiner: 'Data and ontology platform for operational decision workflows.',
     strength:
       'Unmatched scale at data unification. Ontology and workflow primitives for operational decisions.',
-    gap:
-      'Operational, not strategic. No bias model, no decision-quality standard, no board-facing audit trail for strategic memos.',
+    gap: 'Operational, not strategic. No bias model, no decision-quality standard, no board-facing audit trail for strategic memos.',
     x: 48,
     y: 22,
     isDI: false,
@@ -105,8 +101,7 @@ export const INCUMBENTS: Incumbent[] = [
     oneLiner: 'Lightweight decision-logging and behavioral-nudging platform.',
     strength:
       'First mover in explicit "decision management." Useful for process logging and nudges.',
-    gap:
-      'No causal layer, no bias taxonomy, no DQI, no 135-case benchmark. Surface-level decision logging, not audit.',
+    gap: 'No causal layer, no bias taxonomy, no DQI, no 135-case benchmark. Surface-level decision logging, not audit.',
     x: 62,
     y: 18,
     isDI: false,
@@ -122,8 +117,7 @@ export const INCUMBENTS: Incumbent[] = [
     oneLiner: 'Decision Knowledge Graph for strategic memos — the four moments others miss.',
     strength:
       'Only DI platform with per-org causal weights (PC algorithm), published DQI standard, 30+ bias taxonomy, 135-case benchmark, and closed outcome loop.',
-    gap:
-      'Zero paying customers yet. Distribution, brand, and enterprise sales machinery are the build-out.',
+    gap: 'Zero paying customers yet. Distribution, brand, and enterprise sales machinery are the build-out.',
     x: 86,
     y: 88,
     isDI: true,
@@ -165,8 +159,14 @@ export const MARKET_GAPS: MarketGap[] = [
       summary:
         'PC-algorithm causal discovery over outcome data, producing per-organization bias→outcome causal weights. Every audit explanation ties a bias to a weighted causal path, not a correlated pattern.',
       evidence: [
-        { label: 'Causal Learning Service (PC algorithm)', path: 'src/lib/learning/causal-learning.ts' },
-        { label: 'Bias interaction matrix (20×20 toxic combinations)', path: 'src/lib/learning/toxic-combinations.ts' },
+        {
+          label: 'Causal Learning Service (PC algorithm)',
+          path: 'src/lib/learning/causal-learning.ts',
+        },
+        {
+          label: 'Bias interaction matrix (20×20 toxic combinations)',
+          path: 'src/lib/learning/toxic-combinations.ts',
+        },
         { label: 'Counterfactual score engine', path: 'src/lib/replay/score-calculator.ts' },
       ],
     },
@@ -210,7 +210,10 @@ export const MARKET_GAPS: MarketGap[] = [
       summary:
         'Seven regulatory frameworks mapped to 30+ biases with citations. Decision fingerprints for audit trail. Board-ready PDF export of the full decision audit in two pages.',
       evidence: [
-        { label: 'Bias ↔ regulation mapping (7 frameworks)', path: 'src/lib/compliance/bias-regulation-map.ts' },
+        {
+          label: 'Bias ↔ regulation mapping (7 frameworks)',
+          path: 'src/lib/compliance/bias-regulation-map.ts',
+        },
         { label: 'Regulatory graph', path: 'src/lib/compliance/regulatory-graph.ts' },
         { label: 'Decision fingerprint engine', path: 'src/lib/learning/fingerprint-engine.ts' },
         { label: 'Board-report PDF generator', path: 'src/lib/reports/board-report-generator.ts' },
@@ -251,7 +254,8 @@ export const CATEGORY_PATH: CategoryMilestone[] = [
     title: 'First paying customer + public causal case study',
     subtitle: '$2,499/mo MRR opens. First case study with real DQI uplift.',
     type: 'product',
-    targetOutput: '1 paying Strategy-tier customer, case study published, outcome loop demonstrated on real data.',
+    targetOutput:
+      '1 paying Strategy-tier customer, case study published, outcome loop demonstrated on real data.',
     dependsOn: 'Q1 design partner converts. If none convert, re-diagnose ICP before Q3.',
   },
   {
@@ -261,8 +265,10 @@ export const CATEGORY_PATH: CategoryMilestone[] = [
     title: 'Analyst outreach: Gartner + Forrester submissions',
     subtitle: 'Enter the DI Magic Quadrant conversation as "Causal / Governance" entrant.',
     type: 'analyst',
-    targetOutput: 'Gartner inquiry call booked. Forrester Wave submission filed. Brand mention in ≥1 analyst blog.',
-    dependsOn: '≥1 referenceable customer + published case study. Without a customer, analysts decline the call.',
+    targetOutput:
+      'Gartner inquiry call booked. Forrester Wave submission filed. Brand mention in ≥1 analyst blog.',
+    dependsOn:
+      '≥1 referenceable customer + published case study. Without a customer, analysts decline the call.',
   },
   {
     id: 'cp-q4',
@@ -271,8 +277,10 @@ export const CATEGORY_PATH: CategoryMilestone[] = [
     title: 'Category content push + conference placement',
     subtitle: 'Own "Causal Decision Audit" as a searchable term.',
     type: 'content',
-    targetOutput: '12-post Substack series. 1 conference talk accepted (Gartner Data & Analytics, Forrester Decisions, or Decision Intelligence Summit).',
-    dependsOn: 'Analyst signal from Q3. Conference acceptance is gated by speaker track review — not guaranteed.',
+    targetOutput:
+      '12-post Substack series. 1 conference talk accepted (Gartner Data & Analytics, Forrester Decisions, or Decision Intelligence Summit).',
+    dependsOn:
+      'Analyst signal from Q3. Conference acceptance is gated by speaker track review — not guaranteed.',
   },
   {
     id: 'cp-q5',
@@ -281,7 +289,8 @@ export const CATEGORY_PATH: CategoryMilestone[] = [
     title: 'Seed or seed+ round on category narrative',
     subtitle: '£1–3M at 2–3× pre-revenue valuation, anchored on MRR + analyst signal.',
     type: 'funding',
-    targetOutput: '£1M+ closed, lead investor committed, GTM co-founder or head-of-sales onboarding.',
+    targetOutput:
+      '£1M+ closed, lead investor committed, GTM co-founder or head-of-sales onboarding.',
     dependsOn: '£25–50k MRR + named analyst mention. Without both, valuation compresses.',
   },
   {
@@ -289,9 +298,11 @@ export const CATEGORY_PATH: CategoryMilestone[] = [
     quarter: 6,
     quarterLabel: 'Q3 2027 · Jul–Sep',
     title: '$1M ARR + named in analyst report',
-    subtitle: 'The category crossing point. "Causal / Governance DI" exists as a sub-category on paper.',
+    subtitle:
+      'The category crossing point. "Causal / Governance DI" exists as a sub-category on paper.',
     type: 'analyst',
-    targetOutput: '$1M ARR, 10+ paying customers, inclusion in a Gartner or Forrester published report.',
+    targetOutput:
+      '$1M ARR, 10+ paying customers, inclusion in a Gartner or Forrester published report.',
     dependsOn: 'All of the above compounding. This is a goal, not a guarantee.',
   },
 ];
@@ -378,23 +389,19 @@ export const CATEGORY_THESIS = {
   theFourMoments: [
     {
       label: 'The Graph',
-      body:
-        'A Decision Knowledge Graph that compounds: every audit becomes a node, every outcome becomes an edge weight.',
+      body: 'A Decision Knowledge Graph that compounds: every audit becomes a node, every outcome becomes an edge weight.',
     },
     {
       label: 'Predicted CEO questions',
-      body:
-        'Steering-committee objections surfaced in 60 seconds — before the board meeting, not in it.',
+      body: 'Steering-committee objections surfaced in 60 seconds — before the board meeting, not in it.',
     },
     {
       label: 'Reasoning audit',
-      body:
-        '30+ biases scored across 6 DQI components, mapped to 7 regulatory frameworks. Every score traceable.',
+      body: '30+ biases scored across 6 DQI components, mapped to 7 regulatory frameworks. Every score traceable.',
     },
     {
       label: 'Outcome loop',
-      body:
-        'Autonomous outcome detection closes the loop. Causal weights learn your organisation. Quarter after quarter.',
+      body: 'Autonomous outcome detection closes the loop. Causal weights learn your organisation. Quarter after quarter.',
     },
   ],
   whyNow:

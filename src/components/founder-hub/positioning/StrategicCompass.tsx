@@ -2,10 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  COMPASS_DIRECTIONS,
-  type CompassDirection,
-} from '@/lib/data/positioning-copilot';
+import { COMPASS_DIRECTIONS, type CompassDirection } from '@/lib/data/positioning-copilot';
 
 const SIZE = 420;
 const CENTER = SIZE / 2;
@@ -111,11 +108,7 @@ export function StrategicCompass() {
             const pos = polar(dir.angle, LABEL_RADIUS);
             const isActive = dir.id === activeId;
             return (
-              <g
-                key={dir.id}
-                onClick={() => setActiveId(dir.id)}
-                style={{ cursor: 'pointer' }}
-              >
+              <g key={dir.id} onClick={() => setActiveId(dir.id)} style={{ cursor: 'pointer' }}>
                 <circle
                   cx={pos.x}
                   cy={pos.y}

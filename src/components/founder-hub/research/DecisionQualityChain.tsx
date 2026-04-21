@@ -136,14 +136,7 @@ export function DecisionQualityChain() {
               </button>
               {!isLast && (
                 <svg width="24" height="12" viewBox="0 0 24 12" style={{ flexShrink: 0 }}>
-                  <line
-                    x1="2"
-                    y1="6"
-                    x2="22"
-                    y2="6"
-                    stroke="var(--border-color)"
-                    strokeWidth={2}
-                  />
+                  <line x1="2" y1="6" x2="22" y2="6" stroke="var(--border-color)" strokeWidth={2} />
                   <polygon points="22,2 22,10 26,6" fill="var(--border-color)" />
                 </svg>
               )}

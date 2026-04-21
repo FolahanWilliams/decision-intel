@@ -259,7 +259,12 @@ export function ContactPipelineTracker() {
         >
           Tier
         </span>
-        <TierChip label="All" active={tierFilter === 'all'} onClick={() => setTierFilter('all')} color="var(--text-muted)" />
+        <TierChip
+          label="All"
+          active={tierFilter === 'all'}
+          onClick={() => setTierFilter('all')}
+          color="var(--text-muted)"
+        />
         {(['tier_1', 'tier_2', 'tier_3'] as Tier[]).map(t => (
           <TierChip
             key={t}
@@ -293,7 +298,12 @@ export function ContactPipelineTracker() {
         </div>
       </div>
 
-      {showAdd && <AddCustomContactForm onAdd={c => saveCustom([...custom, c])} onClose={() => setShowAdd(false)} />}
+      {showAdd && (
+        <AddCustomContactForm
+          onAdd={c => saveCustom([...custom, c])}
+          onClose={() => setShowAdd(false)}
+        />
+      )}
 
       {/* Entries list */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -428,9 +438,7 @@ export function ContactPipelineTracker() {
                         gap: 8,
                       }}
                     >
-                      {entry.reason && (
-                        <MetaRow label="Why this target">{entry.reason}</MetaRow>
-                      )}
+                      {entry.reason && <MetaRow label="Why this target">{entry.reason}</MetaRow>}
                       {entry.roleToTarget && (
                         <MetaRow label="Role to target">{entry.roleToTarget}</MetaRow>
                       )}
@@ -605,16 +613,21 @@ function AddCustomContactForm({
         label="Tier"
         value={tier}
         onChange={v => setTier(v as Tier)}
-        options={(['tier_1', 'tier_2', 'tier_3'] as Tier[]).map(t => ({ value: t, label: TIER_LABEL[t] }))}
+        options={(['tier_1', 'tier_2', 'tier_3'] as Tier[]).map(t => ({
+          value: t,
+          label: TIER_LABEL[t],
+        }))}
       />
       <SelectField
         label="Industry"
         value={industry}
         onChange={v => setIndustry(v as Industry)}
-        options={(['tech', 'healthcare', 'industrial', 'financial', 'defense'] as Industry[]).map(i => ({
-          value: i,
-          label: INDUSTRY_LABEL[i],
-        }))}
+        options={(['tech', 'healthcare', 'industrial', 'financial', 'defense'] as Industry[]).map(
+          i => ({
+            value: i,
+            label: INDUSTRY_LABEL[i],
+          })
+        )}
       />
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6 }}>
         <button
@@ -726,4 +739,3 @@ function SelectField({
     </div>
   );
 }
-

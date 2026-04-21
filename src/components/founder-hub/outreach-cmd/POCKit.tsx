@@ -54,7 +54,10 @@ export function POCKit() {
     }
   };
 
-  const active = useMemo<POCRecord | null>(() => pocs.find(p => p.id === activeId) ?? null, [pocs, activeId]);
+  const active = useMemo<POCRecord | null>(
+    () => pocs.find(p => p.id === activeId) ?? null,
+    [pocs, activeId]
+  );
   const currentWeek = active ? weeksSince(active.startDate) : 1;
 
   const createPOC = () => {
@@ -281,11 +284,19 @@ export function POCKit() {
             }}
           >
             <Briefcase size={28} style={{ color: 'var(--text-muted)', marginBottom: 10 }} />
-            <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4, color: 'var(--text-primary)' }}>
+            <div
+              style={{
+                fontSize: 14,
+                fontWeight: 600,
+                marginBottom: 4,
+                color: 'var(--text-primary)',
+              }}
+            >
               Kick off your first POC.
             </div>
             <div style={{ fontSize: 12, lineHeight: 1.5 }}>
-              Each POC unlocks a 6-week milestone tracker, success criteria scoring, and the Week 5 evaluation capture.
+              Each POC unlocks a 6-week milestone tracker, success criteria scoring, and the Week 5
+              evaluation capture.
             </div>
           </div>
         ) : (
@@ -313,9 +324,12 @@ export function POCKit() {
               >
                 <Briefcase size={16} style={{ color: '#F59E0B' }} />
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{active.company}</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>
+                    {active.company}
+                  </div>
                   <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                    Started {new Date(active.startDate).toLocaleDateString()} · currently in Week {currentWeek}
+                    Started {new Date(active.startDate).toLocaleDateString()} · currently in Week{' '}
+                    {currentWeek}
                   </div>
                 </div>
                 <button
@@ -365,8 +379,12 @@ export function POCKit() {
                         key={m.week}
                         style={{
                           padding: 10,
-                          background: isCurrent ? 'rgba(245, 158, 11, 0.08)' : 'var(--bg-secondary)',
-                          border: isCurrent ? '1px solid rgba(245, 158, 11, 0.35)' : '1px solid var(--border-color)',
+                          background: isCurrent
+                            ? 'rgba(245, 158, 11, 0.08)'
+                            : 'var(--bg-secondary)',
+                          border: isCurrent
+                            ? '1px solid rgba(245, 158, 11, 0.35)'
+                            : '1px solid var(--border-color)',
                           borderRadius: 4,
                         }}
                       >
@@ -413,7 +431,9 @@ export function POCKit() {
                                   gap: 6,
                                   padding: '5px 8px',
                                   background: done ? 'rgba(22,163,74,0.06)' : 'transparent',
-                                  border: done ? '1px solid rgba(22,163,74,0.25)' : '1px solid transparent',
+                                  border: done
+                                    ? '1px solid rgba(22,163,74,0.25)'
+                                    : '1px solid transparent',
                                   borderRadius: 3,
                                   cursor: 'pointer',
                                   textAlign: 'left',
@@ -422,7 +442,13 @@ export function POCKit() {
                                   lineHeight: 1.5,
                                 }}
                               >
-                                <span style={{ color: done ? '#16A34A' : 'var(--text-muted)', marginTop: 1, flexShrink: 0 }}>
+                                <span
+                                  style={{
+                                    color: done ? '#16A34A' : 'var(--text-muted)',
+                                    marginTop: 1,
+                                    flexShrink: 0,
+                                  }}
+                                >
                                   {done ? <CheckCircle2 size={12} /> : <Circle size={12} />}
                                 </span>
                                 <span
@@ -474,7 +500,9 @@ export function POCKit() {
                         style={{
                           padding: 10,
                           background: state.met ? 'rgba(22, 163, 74, 0.06)' : 'var(--bg-secondary)',
-                          border: state.met ? '1px solid rgba(22, 163, 74, 0.3)' : '1px solid var(--border-color)',
+                          border: state.met
+                            ? '1px solid rgba(22, 163, 74, 0.3)'
+                            : '1px solid var(--border-color)',
                           borderRadius: 4,
                         }}
                       >
@@ -515,10 +543,24 @@ export function POCKit() {
                             MET
                           </label>
                         </div>
-                        <div style={{ fontSize: 11, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 4 }}>
+                        <div
+                          style={{
+                            fontSize: 11,
+                            color: 'var(--text-secondary)',
+                            lineHeight: 1.5,
+                            marginBottom: 4,
+                          }}
+                        >
                           {c.description}
                         </div>
-                        <div style={{ fontSize: 10, color: 'var(--text-muted)', fontStyle: 'italic', marginBottom: 6 }}>
+                        <div
+                          style={{
+                            fontSize: 10,
+                            color: 'var(--text-muted)',
+                            fontStyle: 'italic',
+                            marginBottom: 6,
+                          }}
+                        >
                           {c.measurement}
                         </div>
                         <textarea
@@ -576,7 +618,11 @@ export function POCKit() {
                 >
                   {(['yes', 'maybe', 'no'] as const).map(v => {
                     const colorMap = { yes: '#16A34A', maybe: '#F59E0B', no: '#EF4444' };
-                    const labelMap = { yes: 'Would pay', maybe: 'Maybe / needs', no: 'Would not pay' };
+                    const labelMap = {
+                      yes: 'Would pay',
+                      maybe: 'Maybe / needs',
+                      no: 'Would not pay',
+                    };
                     const isSelected = active.wouldPay === v;
                     return (
                       <button
@@ -586,7 +632,9 @@ export function POCKit() {
                           padding: '8px 10px',
                           background: isSelected ? colorMap[v] : 'var(--bg-secondary)',
                           color: isSelected ? '#fff' : 'var(--text-primary)',
-                          border: isSelected ? `1.5px solid ${colorMap[v]}` : '1px solid var(--border-color)',
+                          border: isSelected
+                            ? `1.5px solid ${colorMap[v]}`
+                            : '1px solid var(--border-color)',
                           borderRadius: 4,
                           cursor: 'pointer',
                           fontSize: 12,
@@ -624,7 +672,9 @@ export function POCKit() {
                       min={0}
                       max={10}
                       value={active.nps ?? ''}
-                      onChange={e => updateActive({ nps: e.target.value ? Number(e.target.value) : undefined })}
+                      onChange={e =>
+                        updateActive({ nps: e.target.value ? Number(e.target.value) : undefined })
+                      }
                       placeholder="—"
                       style={{
                         width: '100%',

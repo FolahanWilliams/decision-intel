@@ -175,9 +175,11 @@ export function DesignPartnerClient() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      const data = (await res.json().catch(() => null)) as
-        | { success?: boolean; data?: { bookingUrl?: string | null }; error?: string }
-        | null;
+      const data = (await res.json().catch(() => null)) as {
+        success?: boolean;
+        data?: { bookingUrl?: string | null };
+        error?: string;
+      } | null;
       if (!res.ok) {
         setStatus('error');
         setErrorMsg(data?.error || 'We could not submit your application. Please try again.');
@@ -317,7 +319,9 @@ export function DesignPartnerClient() {
               EU AI Act Article 14 record-keeping
             </strong>{' '}
             (high-risk obligations enforceable Aug&nbsp;2026),{' '}
-            <strong style={{ color: C.slate900, fontWeight: 700 }}>SEC AI disclosure rulemaking</strong>{' '}
+            <strong style={{ color: C.slate900, fontWeight: 700 }}>
+              SEC AI disclosure rulemaking
+            </strong>{' '}
             (2024&ndash;2026), and{' '}
             <strong style={{ color: C.slate900, fontWeight: 700 }}>
               Basel III Pillar 2 ICAAP documentation
@@ -445,7 +449,12 @@ export function DesignPartnerClient() {
                       gap: 12,
                     }}
                   >
-                    <item.icon size={16} color={C.green} strokeWidth={2.25} style={{ marginTop: 2 }} />
+                    <item.icon
+                      size={16}
+                      color={C.green}
+                      strokeWidth={2.25}
+                      style={{ marginTop: 2 }}
+                    />
                     <div>
                       <div style={{ fontSize: 13.5, fontWeight: 700, color: C.slate900 }}>
                         {item.title}
@@ -481,7 +490,9 @@ export function DesignPartnerClient() {
                   <div style={{ fontSize: 13, fontWeight: 700, color: C.slate900 }}>
                     Twelve-month term, clean exit
                   </div>
-                  <div style={{ fontSize: 12.5, color: C.slate600, marginTop: 2, lineHeight: 1.55 }}>
+                  <div
+                    style={{ fontSize: 12.5, color: C.slate600, marginTop: 2, lineHeight: 1.55 }}
+                  >
                     At Month 12, you renew at the locked $2,499 rate, step up to full Strategy
                     terms, or step back. Your Decision Knowledge Graph + all packets remain
                     exportable either way.
@@ -599,9 +610,7 @@ export function DesignPartnerClient() {
           >
             Tell us what your quarter actually looks like.
           </h2>
-          <p
-            style={{ fontSize: 15, color: C.slate600, marginBottom: 26, lineHeight: 1.6 }}
-          >
+          <p style={{ fontSize: 15, color: C.slate600, marginBottom: 26, lineHeight: 1.6 }}>
             Brief. Specific. You&rsquo;ll hear back within 2 business days with an intro-call slot.
           </p>
 

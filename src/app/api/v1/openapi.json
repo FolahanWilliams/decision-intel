@@ -394,7 +394,10 @@
               "overallScore": { "type": "number", "minimum": 0, "maximum": 100 },
               "biases": { "type": "array", "items": { "type": "object" } },
               "recommendations": { "type": "array", "items": { "type": "object" } },
-              "cached": { "type": "boolean", "description": "True if result was returned from cache" }
+              "cached": {
+                "type": "boolean",
+                "description": "True if result was returned from cache"
+              }
             }
           },
           "metadata": {
@@ -517,7 +520,10 @@
                   "properties": {
                     "biasType": { "type": "string" },
                     "count": { "type": "integer" },
-                    "avgSeverity": { "type": "string", "enum": ["low", "medium", "high", "critical"] }
+                    "avgSeverity": {
+                      "type": "string",
+                      "enum": ["low", "medium", "high", "critical"]
+                    }
                   }
                 }
               },
@@ -563,7 +569,10 @@
           "id": { "type": "string" },
           "name": { "type": "string" },
           "keyPrefix": { "type": "string", "example": "di_live_a1b2c3d4" },
-          "rawKey": { "type": "string", "description": "Full API key. Shown only once — save it immediately." },
+          "rawKey": {
+            "type": "string",
+            "description": "Full API key. Shown only once — save it immediately."
+          },
           "scopes": { "type": "array", "items": { "type": "string" } },
           "rateLimit": { "type": "integer", "example": 100 },
           "createdAt": { "type": "string", "format": "date-time" }

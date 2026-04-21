@@ -55,9 +55,7 @@ export async function GET() {
     // Admins (ADMIN_USER_IDS) always resolve to enterprise so the dashboard
     // UI reflects the same bypass that plan-limits applies server-side.
     const isAdmin = isAdminUserId(user.id);
-    const plan: PlanType = isAdmin
-      ? 'enterprise'
-      : ((subscription?.plan as PlanType) || 'free');
+    const plan: PlanType = isAdmin ? 'enterprise' : (subscription?.plan as PlanType) || 'free';
     const limits = PLANS[plan];
     const status = isAdmin ? 'admin' : subscription?.status || 'none';
 

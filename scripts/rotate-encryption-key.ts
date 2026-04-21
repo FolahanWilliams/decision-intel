@@ -163,9 +163,7 @@ async function rotateDocuments(prisma: PrismaClient, args: Args) {
       processed++;
     }
     batchCount++;
-    console.log(
-      `  batch ${batchCount}: processed ${rows.length} (running total: ${processed})`
-    );
+    console.log(`  batch ${batchCount}: processed ${rows.length} (running total: ${processed})`);
   }
   return processed;
 }
@@ -222,9 +220,7 @@ async function rotateSlackInstallations(prisma: PrismaClient, args: Args) {
       processed++;
     }
     batchCount++;
-    console.log(
-      `  batch ${batchCount}: processed ${rows.length} (running total: ${processed})`
-    );
+    console.log(`  batch ${batchCount}: processed ${rows.length} (running total: ${processed})`);
   }
   return processed;
 }

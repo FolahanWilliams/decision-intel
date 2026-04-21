@@ -57,7 +57,10 @@ export function TemplateQuickCopy() {
 
   const copyToClipboard = async () => {
     try {
-      const text = active.channel === 'email' && filled.subject ? `Subject: ${filled.subject}\n\n${filled.body}` : filled.body;
+      const text =
+        active.channel === 'email' && filled.subject
+          ? `Subject: ${filled.subject}\n\n${filled.body}`
+          : filled.body;
       await navigator.clipboard.writeText(text);
       setCopyState('copied');
       setTimeout(() => setCopyState('idle'), 1800);
@@ -108,7 +111,9 @@ export function TemplateQuickCopy() {
                 textAlign: 'left',
               }}
             >
-              <span style={{ color: isActive ? '#fff' : color, display: 'flex', alignItems: 'center' }}>
+              <span
+                style={{ color: isActive ? '#fff' : color, display: 'flex', alignItems: 'center' }}
+              >
                 {CHANNEL_ICON[t.channel]}
               </span>
               <span
@@ -158,7 +163,9 @@ export function TemplateQuickCopy() {
                   marginBottom: 6,
                 }}
               >
-                <span style={{ color: TEMPLATE_CHANNEL_COLOR[active.channel] }}>{CHANNEL_ICON[active.channel]}</span>
+                <span style={{ color: TEMPLATE_CHANNEL_COLOR[active.channel] }}>
+                  {CHANNEL_ICON[active.channel]}
+                </span>
                 <span
                   style={{
                     fontSize: 9,
@@ -182,7 +189,14 @@ export function TemplateQuickCopy() {
               >
                 {active.name}
               </div>
-              <div style={{ fontSize: 11, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 8 }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.5,
+                  marginBottom: 8,
+                }}
+              >
                 <strong style={{ color: 'var(--text-primary)' }}>When:</strong> {active.when}
               </div>
               <div style={{ fontSize: 11, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
@@ -213,7 +227,9 @@ export function TemplateQuickCopy() {
                 </div>
 
                 {/* Autofill from target */}
-                {active.variables.some(v => ['COMPANY', 'PERSONALISATION_HOOK', 'DEAL_FREQUENCY'].includes(v)) && (
+                {active.variables.some(v =>
+                  ['COMPANY', 'PERSONALISATION_HOOK', 'DEAL_FREQUENCY'].includes(v)
+                ) && (
                   <div style={{ marginBottom: 10 }}>
                     <div
                       style={{
@@ -328,7 +344,12 @@ export function TemplateQuickCopy() {
                   alignItems: 'center',
                   gap: 5,
                   padding: '6px 12px',
-                  background: copyState === 'copied' ? '#16A34A' : hasUnfilled ? 'var(--bg-secondary)' : '#0EA5E9',
+                  background:
+                    copyState === 'copied'
+                      ? '#16A34A'
+                      : hasUnfilled
+                        ? 'var(--bg-secondary)'
+                        : '#0EA5E9',
                   color: hasUnfilled && copyState !== 'copied' ? 'var(--text-muted)' : '#fff',
                   border: 'none',
                   borderRadius: 4,
@@ -364,7 +385,9 @@ export function TemplateQuickCopy() {
                 >
                   Subject
                 </div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>{filled.subject}</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
+                  {filled.subject}
+                </div>
               </div>
             )}
 

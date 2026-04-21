@@ -220,7 +220,10 @@ export function StrebulaevPrinciples() {
                   lineHeight: 1.5,
                 }}
               >
-                <ChevronRight size={12} style={{ color: active.color, flexShrink: 0, marginTop: 3 }} />
+                <ChevronRight
+                  size={12}
+                  style={{ color: active.color, flexShrink: 0, marginTop: 3 }}
+                />
                 <span>{a}</span>
               </li>
             ))}

@@ -115,7 +115,7 @@ export function brierCategory(score: number): BrierCategory {
  *  a single Prisma update. */
 export function scoreOutcome(
   predictedDqi: number,
-  outcomeCode: OutcomeCode,
+  outcomeCode: OutcomeCode
 ): { score: number; category: BrierCategory } {
   const score = computeBrier(predictedDqi, outcomeCode);
   return { score, category: brierCategory(score) };
@@ -147,7 +147,7 @@ export interface OrgBrierStats {
 export async function getOrgBrierStats(
   prisma: PrismaClient,
   orgId: string,
-  lookbackDays = 365,
+  lookbackDays = 365
 ): Promise<OrgBrierStats> {
   const from = new Date(Date.now() - lookbackDays * 24 * 60 * 60 * 1000);
   const rows = await prisma.decisionOutcome.findMany({
@@ -170,9 +170,7 @@ export async function getOrgBrierStats(
     };
   }
 
-  const scores = rows
-    .map(r => r.brierScore)
-    .filter((s): s is number => typeof s === 'number');
+  const scores = rows.map(r => r.brierScore).filter((s): s is number => typeof s === 'number');
   const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
   const sorted = [...scores].sort((a, b) => a - b);
   const median =
@@ -200,7 +198,8 @@ export async function getOrgBrierStats(
     const firstAvg = scores.slice(0, half).reduce((a, b) => a + b, 0) / half;
     const secondAvg = scores.slice(-half).reduce((a, b) => a + b, 0) / half;
     const delta = secondAvg - firstAvg;
-    if (delta <= -0.03) trend = 'improving'; // lower Brier = better
+    if (delta <= -0.03)
+      trend = 'improving'; // lower Brier = better
     else if (delta >= 0.03) trend = 'degrading';
     else trend = 'flat';
   }

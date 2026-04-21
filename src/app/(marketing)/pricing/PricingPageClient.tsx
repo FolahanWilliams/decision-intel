@@ -710,8 +710,8 @@ export function PricingPageClient() {
               $1,999/mo locked for 12 months &mdash; 20% off Strategy list.
             </div>
             <div style={{ fontSize: 12.5, color: C.slate500, marginTop: 3, lineHeight: 1.5 }}>
-              Fortune 500 corporate strategy teams shaping the Recognition-Rigor Framework.
-              Decision Provenance Record bundled on every audit. Direct Slack line to the founder.
+              Fortune 500 corporate strategy teams shaping the Recognition-Rigor Framework. Decision
+              Provenance Record bundled on every audit. Direct Slack line to the founder.
             </div>
           </div>
           <Link

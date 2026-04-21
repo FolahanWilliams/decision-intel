@@ -1,206 +1,326 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <title>Decision Intel — Side Panel</title>
-  <link rel="stylesheet" href="popup.css">
-  <style>
-    body {
-      width: 100%;
-      min-height: 100vh;
-    }
+  <head>
+    <title>Decision Intel — Side Panel</title>
+    <link rel="stylesheet" href="popup.css" />
+    <style>
+      body {
+        width: 100%;
+        min-height: 100vh;
+      }
 
-    .container {
-      padding: 20px;
-      max-width: 480px;
-    }
+      .container {
+        padding: 20px;
+        max-width: 480px;
+      }
 
-    .hero-card {
-      padding: 32px 20px;
-    }
+      .hero-card {
+        padding: 32px 20px;
+      }
 
-    /* Extended results for side panel */
-    .bias-item {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 6px;
-    }
+      /* Extended results for side panel */
+      .bias-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
 
-    .bias-item-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      width: 100%;
-    }
+      .bias-item-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+      }
 
-    .bias-excerpt {
-      font-size: 12px;
-      color: var(--text-muted);
-      font-style: italic;
-      padding-left: 18px;
-      border-left: 2px solid var(--liquid-border);
-      margin-top: 4px;
-      line-height: 1.5;
-    }
+      .bias-excerpt {
+        font-size: 12px;
+        color: var(--text-muted);
+        font-style: italic;
+        padding-left: 18px;
+        border-left: 2px solid var(--liquid-border);
+        margin-top: 4px;
+        line-height: 1.5;
+      }
 
-    .bias-explanation {
-      font-size: 12px;
-      color: var(--text-secondary);
-      padding-left: 18px;
-      line-height: 1.5;
-    }
+      .bias-explanation {
+        font-size: 12px;
+        color: var(--text-secondary);
+        padding-left: 18px;
+        line-height: 1.5;
+      }
 
-    .bias-suggestion {
-      font-size: 12px;
-      padding: 6px 10px;
-      background: rgba(34, 197, 94, 0.08);
-      border-left: 3px solid var(--success);
-      border-radius: 4px;
-      color: var(--text-secondary);
-      margin-left: 18px;
-      line-height: 1.5;
-    }
+      .bias-suggestion {
+        font-size: 12px;
+        padding: 6px 10px;
+        background: rgba(34, 197, 94, 0.08);
+        border-left: 3px solid var(--success);
+        border-radius: 4px;
+        color: var(--text-secondary);
+        margin-left: 18px;
+        line-height: 1.5;
+      }
 
-    /* Summary section */
-    .summary-section {
-      padding: 14px 16px;
-      background: var(--liquid-bg);
-      border: 1px solid var(--liquid-border);
-      border-radius: var(--liquid-radius-sm);
-      margin-bottom: 14px;
-      font-size: 13px;
-      line-height: 1.6;
-      color: var(--text-secondary);
-    }
+      /* Summary section */
+      .summary-section {
+        padding: 14px 16px;
+        background: var(--liquid-bg);
+        border: 1px solid var(--liquid-border);
+        border-radius: var(--liquid-radius-sm);
+        margin-bottom: 14px;
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--text-secondary);
+      }
 
-    .summary-section strong {
-      color: var(--text-primary);
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <!-- Header -->
-    <header>
-      <div class="header-row">
-        <div class="logo">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-primary)">
-            <path d="M12 2a8 8 0 0 0-8 8c0 3.4 2.1 6.3 5 7.5V20h6v-2.5c2.9-1.2 5-4.1 5-7.5a8 8 0 0 0-8-8z"/>
-            <path d="M12 18v4"/><path d="M9 22h6"/>
-          </svg>
-          <div>
-            <h1>Decision Intel</h1>
-            <p class="subtitle">Side Panel Audit</p>
+      .summary-section strong {
+        color: var(--text-primary);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <header>
+        <div class="header-row">
+          <div class="logo">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="color: var(--accent-primary)"
+            >
+              <path
+                d="M12 2a8 8 0 0 0-8 8c0 3.4 2.1 6.3 5 7.5V20h6v-2.5c2.9-1.2 5-4.1 5-7.5a8 8 0 0 0-8-8z"
+              />
+              <path d="M12 18v4" />
+              <path d="M9 22h6" />
+            </svg>
+            <div>
+              <h1>Decision Intel</h1>
+              <p class="subtitle">Side Panel Audit</p>
+            </div>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
 
-    <!-- Initial View -->
-    <div id="initial-view">
-      <div class="hero-card">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-primary); margin-bottom: 12px">
-          <circle cx="11" cy="11" r="8"/>
-          <path d="M21 21l-4.35-4.35"/>
-          <path d="M11 8v6"/>
-          <path d="M8 11h6"/>
-        </svg>
-        <p class="instruction">Analyze the current page for cognitive biases and decision noise with detailed results.</p>
-        <button id="analyze-btn" class="btn-primary">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-          Analyze Page
-        </button>
-      </div>
-    </div>
-
-    <!-- Streaming Progress View -->
-    <div id="loading-view" class="hidden">
-      <div class="progress-header">
-        <div class="progress-spinner"></div>
-        <span>Auditing...</span>
-      </div>
-      <div class="pipeline-steps" id="pipeline-steps"></div>
-      <div class="progress-bar-track">
-        <div class="progress-bar-fill" id="progress-bar" style="width: 0%"></div>
-      </div>
-    </div>
-
-    <!-- Results View -->
-    <div id="results-view" class="hidden">
-      <div class="score-row">
-        <div class="score-ring" id="score-ring">
-          <svg viewBox="0 0 80 80">
-            <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="6"/>
-            <circle cx="40" cy="40" r="34" fill="none" stroke-width="6" stroke-linecap="round"
-              id="score-circle"
-              stroke-dasharray="213.6"
-              stroke-dashoffset="213.6"
-              transform="rotate(-90 40 40)"
-              style="transition: stroke-dashoffset 1s ease-out, stroke 0.3s"/>
+      <!-- Initial View -->
+      <div id="initial-view">
+        <div class="hero-card">
+          <svg
+            width="32"
+            height="32"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            style="color: var(--accent-primary); margin-bottom: 12px"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <path d="M21 21l-4.35-4.35" />
+            <path d="M11 8v6" />
+            <path d="M8 11h6" />
           </svg>
-          <div class="score-number" id="score-value">--</div>
+          <p class="instruction">
+            Analyze the current page for cognitive biases and decision noise with detailed results.
+          </p>
+          <button id="analyze-btn" class="btn-primary">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+            </svg>
+            Analyze Page
+          </button>
         </div>
-        <div class="score-meta">
-          <div class="score-label">Decision Score</div>
-          <div class="score-verdict" id="score-verdict">Analyzing...</div>
-          <div class="noise-badge" id="noise-badge">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-            <span id="noise-value">--</span> noise
+      </div>
+
+      <!-- Streaming Progress View -->
+      <div id="loading-view" class="hidden">
+        <div class="progress-header">
+          <div class="progress-spinner"></div>
+          <span>Auditing...</span>
+        </div>
+        <div class="pipeline-steps" id="pipeline-steps"></div>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="progress-bar" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- Results View -->
+      <div id="results-view" class="hidden">
+        <div class="score-row">
+          <div class="score-ring" id="score-ring">
+            <svg viewBox="0 0 80 80">
+              <circle
+                cx="40"
+                cy="40"
+                r="34"
+                fill="none"
+                stroke="rgba(255,255,255,0.06)"
+                stroke-width="6"
+              />
+              <circle
+                cx="40"
+                cy="40"
+                r="34"
+                fill="none"
+                stroke-width="6"
+                stroke-linecap="round"
+                id="score-circle"
+                stroke-dasharray="213.6"
+                stroke-dashoffset="213.6"
+                transform="rotate(-90 40 40)"
+                style="
+                  transition:
+                    stroke-dashoffset 1s ease-out,
+                    stroke 0.3s;
+                "
+              />
+            </svg>
+            <div class="score-number" id="score-value">--</div>
+          </div>
+          <div class="score-meta">
+            <div class="score-label">Decision Score</div>
+            <div class="score-verdict" id="score-verdict">Analyzing...</div>
+            <div class="noise-badge" id="noise-badge">
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+              </svg>
+              <span id="noise-value">--</span> noise
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Summary -->
-      <div class="summary-section" id="summary-section"></div>
+        <!-- Summary -->
+        <div class="summary-section" id="summary-section"></div>
 
-      <div class="section-title">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        Biases Detected
-      </div>
-      <ul class="bias-list" id="bias-list-items"></ul>
-
-      <div class="fact-check-section hidden" id="fact-check-section">
         <div class="section-title">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-          Fact Check
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+          Biases Detected
         </div>
-        <div class="fact-row">
-          <div class="fact-badge verified">
-            <span class="count" id="fc-verified">0</span> Verified
+        <ul class="bias-list" id="bias-list-items"></ul>
+
+        <div class="fact-check-section hidden" id="fact-check-section">
+          <div class="section-title">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+            Fact Check
           </div>
-          <div class="fact-badge contradicted">
-            <span class="count" id="fc-contradicted">0</span> Flags
+          <div class="fact-row">
+            <div class="fact-badge verified">
+              <span class="count" id="fc-verified">0</span> Verified
+            </div>
+            <div class="fact-badge contradicted">
+              <span class="count" id="fc-contradicted">0</span> Flags
+            </div>
           </div>
+          <p class="fact-note" id="fc-note">Analyzed against real-time market data.</p>
         </div>
-        <p class="fact-note" id="fc-note">Analyzed against real-time market data.</p>
+
+        <div class="actions-row">
+          <button id="annotate-btn" class="btn-secondary">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+            </svg>
+            Annotate Page
+          </button>
+          <a href="#" id="view-report-btn" class="btn-primary btn-sm" target="_blank">
+            Full Report
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+              <polyline points="15 3 21 3 21 9" />
+              <line x1="10" y1="14" x2="21" y2="3" />
+            </svg>
+          </a>
+        </div>
       </div>
 
-      <div class="actions-row">
-        <button id="annotate-btn" class="btn-secondary">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          Annotate Page
-        </button>
-        <a href="#" id="view-report-btn" class="btn-primary btn-sm" target="_blank">
-          Full Report
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        </a>
+      <!-- Error View -->
+      <div id="error-view" class="hidden">
+        <div class="error-card">
+          <svg
+            width="28"
+            height="28"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#ef4444"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="15" y1="9" x2="9" y2="15" />
+            <line x1="9" y1="9" x2="15" y2="15" />
+          </svg>
+          <p class="error-msg" id="error-msg">Something went wrong.</p>
+          <button id="retry-btn" class="btn-secondary">Try Again</button>
+        </div>
       </div>
     </div>
 
-    <!-- Error View -->
-    <div id="error-view" class="hidden">
-      <div class="error-card">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/>
-          <line x1="15" y1="9" x2="9" y2="15"/>
-          <line x1="9" y1="9" x2="15" y2="15"/>
-        </svg>
-        <p class="error-msg" id="error-msg">Something went wrong.</p>
-        <button id="retry-btn" class="btn-secondary">Try Again</button>
-      </div>
-    </div>
-  </div>
-
-  <script src="pdf.min.js"></script>
-  <script src="sidepanel.js"></script>
-</body>
+    <script src="pdf.min.js"></script>
+    <script src="sidepanel.js"></script>
+  </body>
 </html>

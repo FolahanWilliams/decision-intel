@@ -3,10 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle } from 'lucide-react';
-import {
-  PROBLEM_STATEMENTS,
-  type ProblemStatement,
-} from '@/lib/data/product-overview';
+import { PROBLEM_STATEMENTS, type ProblemStatement } from '@/lib/data/product-overview';
 
 const SEVERITY_COLOR: Record<ProblemStatement['severity'], string> = {
   critical: '#EF4444',

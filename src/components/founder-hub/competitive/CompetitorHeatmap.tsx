@@ -93,9 +93,7 @@ export function CompetitorHeatmap() {
                   justifyContent: 'center',
                 }}
               >
-                <span style={{ color: CELL_COLOR.yes, fontWeight: 700 }}>
-                  {scores[h.key].yes}
-                </span>
+                <span style={{ color: CELL_COLOR.yes, fontWeight: 700 }}>{scores[h.key].yes}</span>
                 <span>·</span>
                 <span style={{ color: CELL_COLOR.partial, fontWeight: 700 }}>
                   {scores[h.key].partial}

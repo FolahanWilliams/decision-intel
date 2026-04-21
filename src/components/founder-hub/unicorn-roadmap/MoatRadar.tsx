@@ -51,27 +51,75 @@ function MoatCard({ moat, index }: { moat: (typeof MOATS)[number]; index: number
         borderLeft: `3px solid ${moat.color}`,
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, alignItems: 'baseline', flexWrap: 'wrap' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          gap: 16,
+          alignItems: 'baseline',
+          flexWrap: 'wrap',
+        }}
+      >
         <div style={{ flex: '1 1 260px', minWidth: 0 }}>
-          <h4 style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.01em' }}>
+          <h4
+            style={{
+              fontSize: 15,
+              fontWeight: 800,
+              color: 'var(--text-primary)',
+              margin: 0,
+              letterSpacing: '-0.01em',
+            }}
+          >
             {moat.name}
           </h4>
-          <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '6px 0 0', lineHeight: 1.55 }}>
+          <p
+            style={{
+              fontSize: 13,
+              color: 'var(--text-secondary)',
+              margin: '6px 0 0',
+              lineHeight: 1.55,
+            }}
+          >
             {moat.oneLiner}
           </p>
         </div>
         <div style={{ textAlign: 'right', minWidth: 120 }}>
-          <div style={{ fontSize: 10, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.12em', fontFamily: 'var(--font-mono, monospace)' }}>
+          <div
+            style={{
+              fontSize: 10,
+              fontWeight: 800,
+              color: 'var(--text-muted)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.12em',
+              fontFamily: 'var(--font-mono, monospace)',
+            }}
+          >
             strength
           </div>
-          <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em', lineHeight: 1 }}>
+          <div
+            style={{
+              fontSize: 22,
+              fontWeight: 800,
+              color: 'var(--text-primary)',
+              letterSpacing: '-0.02em',
+              lineHeight: 1,
+            }}
+          >
             {moat.currentStrength}
             <span style={{ fontSize: 14, color: 'var(--text-muted)', fontWeight: 700 }}>
-              {' '}/ {moat.targetStrength}
+              {' '}
+              / {moat.targetStrength}
             </span>
           </div>
           {gap > 0 && (
-            <div style={{ fontSize: 10.5, color: moat.color, fontWeight: 700, fontFamily: 'var(--font-mono, monospace)' }}>
+            <div
+              style={{
+                fontSize: 10.5,
+                color: moat.color,
+                fontWeight: 700,
+                fontFamily: 'var(--font-mono, monospace)',
+              }}
+            >
               +{gap} to lock
             </div>
           )}
@@ -79,7 +127,17 @@ function MoatCard({ moat, index }: { moat: (typeof MOATS)[number]; index: number
       </div>
       <MoatBar current={moat.currentStrength} target={moat.targetStrength} color={moat.color} />
       <div style={{ marginTop: 12, fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.55 }}>
-        <span style={{ fontSize: 9.5, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.14em', fontFamily: 'var(--font-mono, monospace)', marginRight: 8 }}>
+        <span
+          style={{
+            fontSize: 9.5,
+            fontWeight: 800,
+            color: 'var(--text-muted)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.14em',
+            fontFamily: 'var(--font-mono, monospace)',
+            marginRight: 8,
+          }}
+        >
           proof required
         </span>
         {moat.proofRequired}
@@ -90,7 +148,17 @@ function MoatCard({ moat, index }: { moat: (typeof MOATS)[number]; index: number
 
 function MoatBar({ current, target, color }: { current: number; target: number; color: string }) {
   return (
-    <div style={{ marginTop: 14, position: 'relative', height: 10, borderRadius: 5, background: 'var(--bg-card)', overflow: 'hidden', border: '1px solid var(--border-primary)' }}>
+    <div
+      style={{
+        marginTop: 14,
+        position: 'relative',
+        height: 10,
+        borderRadius: 5,
+        background: 'var(--bg-card)',
+        overflow: 'hidden',
+        border: '1px solid var(--border-primary)',
+      }}
+    >
       {/* Target ghost */}
       <motion.div
         initial={{ width: 0 }}

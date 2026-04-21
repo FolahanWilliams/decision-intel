@@ -3,11 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, AlertTriangle } from 'lucide-react';
-import {
-  SALES_STEPS,
-  SALES_PRINCIPLES,
-  type SalesStep,
-} from '@/lib/data/positioning-frameworks';
+import { SALES_STEPS, SALES_PRINCIPLES, type SalesStep } from '@/lib/data/positioning-frameworks';
 
 export function SalesCallScript() {
   const [openId, setOpenId] = useState<string | null>('customer');
@@ -223,7 +219,10 @@ function StepCard({
                   gap: 6,
                 }}
               >
-                <AlertTriangle size={12} style={{ color: '#EF4444', marginTop: 1, flexShrink: 0 }} />
+                <AlertTriangle
+                  size={12}
+                  style={{ color: '#EF4444', marginTop: 1, flexShrink: 0 }}
+                />
                 <div>
                   <strong style={{ color: '#EF4444' }}>Trap to avoid:</strong> {step.trapToAvoid}
                 </div>
@@ -236,15 +235,7 @@ function StepCard({
   );
 }
 
-function ScriptBlock({
-  label,
-  body,
-  accent,
-}: {
-  label: string;
-  body: string;
-  accent: string;
-}) {
+function ScriptBlock({ label, body, accent }: { label: string; body: string; accent: string }) {
   return (
     <div
       style={{

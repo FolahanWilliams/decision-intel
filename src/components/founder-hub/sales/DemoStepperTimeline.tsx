@@ -53,11 +53,7 @@ export function DemoStepperTimeline() {
                 flex: '0 0 auto',
                 width: 150,
                 padding: 10,
-                background: isActive
-                  ? isWow
-                    ? '#F59E0B'
-                    : '#16A34A'
-                  : 'var(--bg-card)',
+                background: isActive ? (isWow ? '#F59E0B' : '#16A34A') : 'var(--bg-card)',
                 color: isActive ? '#fff' : 'var(--text-primary)',
                 border: isActive
                   ? `1.5px solid ${isWow ? '#F59E0B' : '#16A34A'}`

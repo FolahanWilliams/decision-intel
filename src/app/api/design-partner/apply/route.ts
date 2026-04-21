@@ -34,22 +34,12 @@ const ApplicationSchema = z.object({
   company: z.string().trim().min(2).max(200),
   role: z.string().trim().min(2).max(120),
   linkedInUrl: z.string().trim().url().max(400).optional().or(z.literal('')),
-  industry: z.enum([
-    'banking',
-    'insurance',
-    'pharma',
-    'aerospace',
-    'energy',
-    'mna',
-    'other',
-  ]),
+  industry: z.enum(['banking', 'insurance', 'pharma', 'aerospace', 'energy', 'mna', 'other']),
   teamSize: z.enum(['1-5', '6-15', '16-50', '51-200', '200+']),
   memoCadence: z.string().trim().max(200).optional().or(z.literal('')),
   currentStack: z.string().trim().max(400).optional().or(z.literal('')),
   whyNow: z.string().trim().min(40).max(2000),
-  source: z
-    .enum(['warm-intro', 'linkedin', 'press', 'direct', 'other'])
-    .optional(),
+  source: z.enum(['warm-intro', 'linkedin', 'press', 'direct', 'other']).optional(),
 });
 
 function extractIp(req: NextRequest): string {
@@ -129,7 +119,8 @@ export async function POST(req: NextRequest) {
   });
   if (!limit.success) {
     return apiError({
-      error: "You've submitted a few applications recently. Email team@decision-intel.com if you need another route in.",
+      error:
+        "You've submitted a few applications recently. Email team@decision-intel.com if you need another route in.",
       status: 429,
     });
   }
@@ -170,7 +161,8 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     log.error('DesignPartnerApplication persist failed:', err);
     return apiError({
-      error: 'Could not save your application right now. Email team@decision-intel.com as a fallback.',
+      error:
+        'Could not save your application right now. Email team@decision-intel.com as a fallback.',
       status: 500,
     });
   }

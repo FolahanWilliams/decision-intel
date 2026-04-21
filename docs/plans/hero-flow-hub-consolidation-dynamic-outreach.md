@@ -21,53 +21,63 @@ All three can ship independently. Recommended order: **C → B → A** (C is the
 ## Track A — 60-Second Hero Flow Polish
 
 ### Goal
+
 The upload → pipeline → score reveal sequence should feel like a SAT score reveal: inevitable, paced, dopamine-tuned. Today it reads real-time from the pipeline stream, which means slow Gemini responses make the animation stutter.
 
 ### Core principle
+
 **Animation runs on a fixed timeline. Backend fills in the gaps.** Never wait for the backend to advance the animation. If the pipeline finishes early, the animation still plays out on schedule. If the pipeline is late, the animation waits at the last rendered node, never jumps backward.
 
 ### Files touched
+
 - [src/components/analysis/PipelineVisualization.tsx](src/components/analysis/PipelineVisualization.tsx) — the 12-node pipeline graph. Currently ticks forward as SSE events arrive.
 - [src/components/analysis/ScoreReveal.tsx](src/components/analysis/ScoreReveal.tsx) (create if missing) — wraps the existing DQI badge + grade rendering with a suspense pause and staged reveal.
-- [src/app/(platform)/documents/[id]/page.tsx](src/app/(platform)/documents/[id]/page.tsx) — swaps in `<ScoreReveal>` as the post-analysis landing component.
+- [src/app/(platform)/documents/[id]/page.tsx](<src/app/(platform)/documents/[id]/page.tsx>) — swaps in `<ScoreReveal>` as the post-analysis landing component.
 - [src/hooks/useAnalysisStream.ts](src/hooks/useAnalysisStream.ts) — adds a `minNodeDwellMs` floor so each node gets at least 400ms of airtime even if the backend is fast.
 - [src/app/globals.css](src/app/globals.css) — adds 3 keyframe animations: `nodeGlow`, `scoreReveal`, `gradeBadgePop`.
 
 ### Detailed changes
 
 **A1. Pipeline node pre-scheduling.**
+
 - Keep the existing SSE stream from `/api/analyze/stream`.
 - In `useAnalysisStream`, buffer incoming node events into a queue. A separate `setTimeout` loop pulls from the queue on a fixed 400ms cadence. Minimum dwell time = 400ms, maximum = until the next event arrives.
 - Result: if Gemini takes 800ms on node 3 and 50ms on node 4, the user sees both nodes for at least 400ms each. No "blink and miss it" on fast nodes.
 - Add a "catch-up" mode: if the backend is >2 nodes ahead of the animation, drop the per-node dwell to 200ms until caught up. Prevents the animation from falling embarrassingly far behind.
 
 **A2. Bias count ticker.**
+
 - Replace the current `{biases.length}` render with `<AnimatedNumber value={biases.length} duration={600} />`. Already in `src/components/ui/AnimatedNumber.tsx`.
 - When a new bias is detected, trigger a subtle `bg-[var(--severity-high)]/20` flash on the count badge (200ms, ease-out).
 
 **A3. Score reveal suspense pause.**
+
 - After the final pipeline node completes, insert a **1.2s pause** before the score badge appears. This is the "wow" gap.
 - During the pause, show a single line: "Scoring decision quality..." with a pulsing cursor.
 - Then: grade badge pops in (scale 0.85 → 1.0, 300ms spring), DQI number animates 0 → final (900ms), top 3 biases slide in staggered (each 150ms delay).
 - Implementation: `<ScoreReveal>` is a state machine with 4 stages — `pending`, `suspense`, `revealing`, `settled`. Use `framer-motion`'s `AnimatePresence` with `mode="wait"`.
 
 **A4. End state — always an action.**
+
 - The final screen currently shows "Analysis complete." Replace with: `"Your document scored {dqi}. Here's what to do next:"` + 3 buttons: "Review top bias", "Run counterfactual", "Share decision twin".
 - The buttons scroll-link to the relevant tabs on the document detail page (no new routes).
 
 **A5. Persistent "analysis in progress" banner.**
+
 - New component: `src/components/analysis/AnalysisProgressBanner.tsx`.
 - Mount point: `src/app/(platform)/layout.tsx` — slim banner at top of every dashboard page when an analysis is mid-stream.
 - Uses existing `useAnalysisStream` hook, shown only when `status === 'running'`.
 - Click → routes to `/documents/{id}`. Prevents "lost thread" when users navigate away mid-analysis.
 
 ### Scope discipline for Track A
+
 - **Does not touch** pipeline backend (`src/lib/agents/*`). Pure frontend animation work.
 - **Does not touch** DQI scoring. Pure presentation.
 - **Does not add new API routes.**
 - **Does not change** the existing SSE event format.
 
 ### Test plan
+
 - Playwright: upload a sample memo, assert the pipeline visualization renders all 12 nodes in order with >=400ms between renders.
 - Playwright: assert the suspense pause (1.2s) fires before the grade badge appears.
 - Manual: run an analysis with Gemini in "fast" mode (cache hit) and "slow" mode (cold start) — verify both feel the same from the user's perspective.
@@ -83,7 +93,7 @@ Same content. Fewer top-level choices. Match the refinement-phase mandate in CLA
 
 ### Current state (17 tabs)
 
-As declared in [src/app/(platform)/dashboard/founder-hub/page.tsx](src/app/(platform)/dashboard/founder-hub/page.tsx):
+As declared in [src/app/(platform)/dashboard/founder-hub/page.tsx](<src/app/(platform)/dashboard/founder-hub/page.tsx>):
 
 1. Product Overview (`overview`)
 2. Pipeline Deep Dive (`pipeline`)
@@ -115,22 +125,15 @@ Visual grouping via small left-aligned labels above groups of tab buttons. No ne
 2. **Scoring & Methodology** — merges `scoring` (toxic patterns, 5x risk multipliers) + `methodology` (DQI formula, percentiles). One tab; two accordion sections.
 3. **Research & Foundations** — merges `principles` (Kahneman, Sibony, Strebulaev) + `playbook` (research library + cited papers). One tab; the underlying components are kept, rendered in sequence under subheadings.
 
-**Go-to-Market**
-4. **Competitive Positioning** — merges `strategy` (moat narrative, market sizing) + `defense` (investor Q&A, kill-shot objections). One tab; two accordion sections labeled "External story" and "Investor defense."
-5. **Sales Toolkit** — no change. Existing tab; keep as-is.
-6. **Outreach & Meetings** — **replaces** `meeting_prep`. This is where Track C lives (dynamic LinkedIn outreach generator). See Track C below.
-7. **Content Studio** — no change.
+**Go-to-Market** 4. **Competitive Positioning** — merges `strategy` (moat narrative, market sizing) + `defense` (investor Q&A, kill-shot objections). One tab; two accordion sections labeled "External story" and "Investor defense." 5. **Sales Toolkit** — no change. Existing tab; keep as-is. 6. **Outreach & Meetings** — **replaces** `meeting_prep`. This is where Track C lives (dynamic LinkedIn outreach generator). See Track C below. 7. **Content Studio** — no change.
 
-**Intelligence**
-8. **Data Ecosystem** — merges `flywheel` (integrations, data sources) + `stats` (live metrics, usage counters). "What goes in + what comes out" framing.
-9. **Case Library** — merges `cases` (14 case studies) + `correlation` (bias correlation matrix) + `alpha` (Decision Alpha index). Three accordion sections: "Historical cases," "Bias correlations," "Decision Alpha leaderboard."
+**Intelligence** 8. **Data Ecosystem** — merges `flywheel` (integrations, data sources) + `stats` (live metrics, usage counters). "What goes in + what comes out" framing. 9. **Case Library** — merges `cases` (14 case studies) + `correlation` (bias correlation matrix) + `alpha` (Decision Alpha index). Three accordion sections: "Historical cases," "Bias correlations," "Decision Alpha leaderboard."
 
-**Tools**
-10. **Founder Tools** — merges `experiments` (A/B test dashboard) + Founder Tips (promoted from standalone component). Two accordion sections.
+**Tools** 10. **Founder Tools** — merges `experiments` (A/B test dashboard) + Founder Tips (promoted from standalone component). Two accordion sections.
 
 ### Files touched
 
-- [src/app/(platform)/dashboard/founder-hub/page.tsx](src/app/(platform)/dashboard/founder-hub/page.tsx) — update `TABS` array, add `GROUPS` const, render grouped label + tab buttons.
+- [src/app/(platform)/dashboard/founder-hub/page.tsx](<src/app/(platform)/dashboard/founder-hub/page.tsx>) — update `TABS` array, add `GROUPS` const, render grouped label + tab buttons.
 - [src/components/founder-hub/](src/components/founder-hub/) — **no component deletions.** Each old tab component stays. Merged tabs render multiple existing components sequentially inside a single tab panel, wrapped in `<AccordionSection>` where needed.
 - New small component: `src/components/founder-hub/AccordionSection.tsx` — tiny wrapper (header + collapse chevron + Framer `AnimatePresence`), reused across 5 merged tabs.
 - Optional: `src/components/founder-hub/TabGroupLabel.tsx` — one-line styled `<span>` for the group labels.
@@ -196,6 +199,7 @@ Replace the hardcoded Yumiko Oka / Antler meeting prep with a paste-in-a-LinkedI
 **Database**
 
 - **NEW Prisma model** `OutreachArtifact`:
+
   ```prisma
   model OutreachArtifact {
     id              String   @id @default(cuid())
@@ -223,6 +227,7 @@ Replace the hardcoded Yumiko Oka / Antler meeting prep with a paste-in-a-LinkedI
     @@index([userId, status])
   }
   ```
+
 - **Requires founder approval** (per CLAUDE.md rule: "ask before creating new database models"). Flagged in the Decision Points section below.
 
 **Frontend**
@@ -334,7 +339,3 @@ Naming these so there's no scope creep:
 - **Track C:** Founder can paste a LinkedIn profile and get a usable outreach message in under 15 seconds. The generated message references at least one specific profile detail and at least one founder-context detail. Over 5 real prospects, the message is close enough to ship with <5 min of editing per message.
 
 ---
-
-
-
-

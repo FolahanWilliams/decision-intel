@@ -30,41 +30,39 @@ export interface Thinker {
   year: number; // publication year of the seminal work
 }
 
-export const CATEGORY_META: Record<
-  ThinkerCategory,
-  { label: string; color: string; bg: string }
-> = {
-  cognitive: {
-    label: 'Cognitive & decision science',
-    color: '#16A34A',
-    bg: 'rgba(22, 163, 74, 0.14)',
-  },
-  structuring: {
-    label: 'Decision structuring',
-    color: '#0EA5E9',
-    bg: 'rgba(14, 165, 233, 0.14)',
-  },
-  communication: {
-    label: 'Communication & persuasion',
-    color: '#F59E0B',
-    bg: 'rgba(245, 158, 11, 0.14)',
-  },
-  gtm: {
-    label: 'Go-to-market & sales',
-    color: '#8B5CF6',
-    bg: 'rgba(139, 92, 246, 0.14)',
-  },
-  strategy: {
-    label: 'Strategy',
-    color: '#EC4899',
-    bg: 'rgba(236, 72, 153, 0.14)',
-  },
-  moat: {
-    label: 'Moat theory',
-    color: '#06B6D4',
-    bg: 'rgba(6, 182, 212, 0.14)',
-  },
-};
+export const CATEGORY_META: Record<ThinkerCategory, { label: string; color: string; bg: string }> =
+  {
+    cognitive: {
+      label: 'Cognitive & decision science',
+      color: '#16A34A',
+      bg: 'rgba(22, 163, 74, 0.14)',
+    },
+    structuring: {
+      label: 'Decision structuring',
+      color: '#0EA5E9',
+      bg: 'rgba(14, 165, 233, 0.14)',
+    },
+    communication: {
+      label: 'Communication & persuasion',
+      color: '#F59E0B',
+      bg: 'rgba(245, 158, 11, 0.14)',
+    },
+    gtm: {
+      label: 'Go-to-market & sales',
+      color: '#8B5CF6',
+      bg: 'rgba(139, 92, 246, 0.14)',
+    },
+    strategy: {
+      label: 'Strategy',
+      color: '#EC4899',
+      bg: 'rgba(236, 72, 153, 0.14)',
+    },
+    moat: {
+      label: 'Moat theory',
+      color: '#06B6D4',
+      bg: 'rgba(6, 182, 212, 0.14)',
+    },
+  };
 
 export const THINKERS: Thinker[] = [
   // ─── Ring 1: Cognitive & decision science foundations ──────────────
@@ -72,7 +70,8 @@ export const THINKERS: Thinker[] = [
     id: 'kahneman-sibony-noise',
     name: 'Daniel Kahneman & Olivier Sibony — Noise',
     shortName: 'Kahneman · Sibony',
-    origin: 'Noise: A Flaw in Human Judgment (2021). Insurance underwriter study: 55% variance where execs expected 10%.',
+    origin:
+      'Noise: A Flaw in Human Judgment (2021). Insurance underwriter study: 55% variance where execs expected 10%.',
     summary:
       'Noise is unwanted variability in judgments that should be identical. Decision hygiene (structured, independent, aggregated judgment) cuts noise without requiring domain expertise.',
     why: 'Theoretical backbone of the triple-judge scoring engine and the NoiseTax component of DQI. Reframes the sales pitch from "avoid bias" to "measure and reduce decision variance."',
@@ -86,11 +85,13 @@ export const THINKERS: Thinker[] = [
     id: 'klein-rpd',
     name: 'Gary Klein — Recognition-Primed Decision (RPD)',
     shortName: 'Klein · RPD',
-    origin: 'Sources of Power (1998). Research on firefighters, nurses, and NICU clinicians: experts pattern-match, they do not enumerate options.',
+    origin:
+      'Sources of Power (1998). Research on firefighters, nurses, and NICU clinicians: experts pattern-match, they do not enumerate options.',
     summary:
       'Experts recognize situations from prior experience and mentally simulate how the chosen course will play out. Pre-mortem and narrative simulation are standard RPD tools.',
     why: 'DI sits at the intersection of structured debiasing (Kahneman) and expert intuition amplification (Klein). The RPD tab surfaces recognition cues from historical cases.',
-    surface: 'src/app/(platform)/documents/[id]/tabs/RpdTab.tsx, PreMortemScenarioCards.tsx, /api/rpd-simulator',
+    surface:
+      'src/app/(platform)/documents/[id]/tabs/RpdTab.tsx, PreMortemScenarioCards.tsx, /api/rpd-simulator',
     shipped: true,
     category: 'cognitive',
     ring: 1,
@@ -100,11 +101,13 @@ export const THINKERS: Thinker[] = [
     id: 'tversky-kahneman-s1s2',
     name: 'Tversky & Kahneman — System 1/System 2',
     shortName: 'Tversky · Kahneman',
-    origin: 'Judgment under Uncertainty (1974), Thinking Fast and Slow (2011). Catalogued the heuristics and biases that drive systematic error.',
+    origin:
+      'Judgment under Uncertainty (1974), Thinking Fast and Slow (2011). Catalogued the heuristics and biases that drive systematic error.',
     summary:
       'Fast, automatic System 1 judgment is easily hijacked by anchoring, availability, representativeness, loss aversion, and confirmation. System 2 is capable of correction but lazy.',
     why: 'The 30+ bias taxonomy the platform detects is a direct inheritance from this research program. Every bias card traces back to a specific paper here.',
-    surface: 'Bias taxonomy across the detection pipeline, compound scoring engine, src/lib/constants/bias-education.ts',
+    surface:
+      'Bias taxonomy across the detection pipeline, compound scoring engine, src/lib/constants/bias-education.ts',
     shipped: true,
     category: 'cognitive',
     ring: 1,
@@ -114,7 +117,8 @@ export const THINKERS: Thinker[] = [
     id: 'tetlock-superforecasting',
     name: 'Philip Tetlock — Superforecasting',
     shortName: 'Tetlock',
-    origin: 'Expert Political Judgment (2005) and Superforecasting (2015). IARPA forecasting tournaments.',
+    origin:
+      'Expert Political Judgment (2005) and Superforecasting (2015). IARPA forecasting tournaments.',
     summary:
       'Hybrid human-machine forecasters beat both pure AI and pure humans. Calibration is trainable. Brier scores measure how well stated probabilities match outcomes.',
     why: 'Validates the whole product architecture (AI augmenting expert judgment rather than replacing it) and grounds the calibration dashboard and its Bronze-to-Platinum tiers.',
@@ -142,11 +146,13 @@ export const THINKERS: Thinker[] = [
     id: 'bayes',
     name: 'Thomas Bayes — Bayesian epistemology',
     shortName: 'Bayes',
-    origin: 'An Essay towards solving a Problem in the Doctrine of Chances (1763). Applied to decision theory by Savage, Jeffreys, and Jaynes.',
+    origin:
+      'An Essay towards solving a Problem in the Doctrine of Chances (1763). Applied to decision theory by Savage, Jeffreys, and Jaynes.',
     summary:
       'Rational belief update combines a prior with likelihood of new evidence. Blind priors captured before new evidence arrives create a clean audit trail for belief change.',
     why: 'Grounds the DecisionPriorCapture feature and the blind-prior collection inside Decision Rooms. The whole calibration story depends on capturing priors cleanly.',
-    surface: 'src/lib/scoring/bayesian-priors.ts, DecisionPriorCapture.tsx, Decision Rooms blind priors',
+    surface:
+      'src/lib/scoring/bayesian-priors.ts, DecisionPriorCapture.tsx, Decision Rooms blind priors',
     shipped: true,
     category: 'cognitive',
     ring: 1,
@@ -176,7 +182,8 @@ export const THINKERS: Thinker[] = [
     summary:
       'Instead of forecasting from project-specific details (inside view), look at the base rate of comparable projects (outside view). Humans wildly over-rely on the inside view.',
     why: 'For a CSO reviewing a strategic memo, the single most persuasive number is the historical base rate of comparable decisions.',
-    surface: 'src/lib/data/reference-class-forecasting.ts, OutsideViewCard.tsx, document Overview tab',
+    surface:
+      'src/lib/data/reference-class-forecasting.ts, OutsideViewCard.tsx, document Overview tab',
     shipped: true,
     category: 'structuring',
     ring: 2,
@@ -186,7 +193,8 @@ export const THINKERS: Thinker[] = [
     id: 'inversion',
     name: 'Inversion',
     shortName: 'Inversion',
-    origin: 'Charlie Munger, Poor Charlie\u2019s Almanack. Adapted from Carl Jacobi: invert, always invert.',
+    origin:
+      'Charlie Munger, Poor Charlie\u2019s Almanack. Adapted from Carl Jacobi: invert, always invert.',
     summary:
       'Solve the problem backward. Instead of asking how to succeed, ask what guarantees failure, then avoid those paths.',
     why: 'Pairs naturally with pre-mortem as a standalone prompt. Cheap to ship and immediately differentiating in demos.',
@@ -200,7 +208,8 @@ export const THINKERS: Thinker[] = [
     id: 'red-team',
     name: 'Red Team / 10th Man Rule',
     shortName: 'Red Team',
-    origin: 'RAND Corporation and Israeli military intelligence after the 1973 Yom Kippur surprise.',
+    origin:
+      'RAND Corporation and Israeli military intelligence after the 1973 Yom Kippur surprise.',
     summary:
       'If nine people agree, the tenth must argue the contrarian position no matter how implausible. Institutionalised dissent.',
     why: 'Complements blind priors. Makes structured dissent a first-class product primitive.',
@@ -314,7 +323,8 @@ export const THINKERS: Thinker[] = [
     id: 'voss-tactical-empathy',
     name: 'Chris Voss — Tactical Empathy',
     shortName: 'Voss',
-    origin: 'Never Split the Difference (2016). Former FBI lead international kidnapping negotiator.',
+    origin:
+      'Never Split the Difference (2016). Former FBI lead international kidnapping negotiator.',
     summary:
       'Labelling, mirroring, calibrated questions, and accusation audits lower the other side\u2019s defences so they can hear you. Emotion first, logic second.',
     why: 'Content Studio already cites this. Critical for selling a product that implies the buyer\u2019s current process is biased, without putting them on the defensive.',
@@ -610,7 +620,7 @@ export interface StrebulaevPrinciple {
 export const STREBULAEV_PRINCIPLES: StrebulaevPrinciple[] = [
   {
     num: 1,
-    principle: "Home runs matter, strikeouts don\u2019t",
+    principle: 'Home runs matter, strikeouts don\u2019t',
     summary:
       'Only 1 in 20 VC investments hits a home run, but a single winner returns 100x. Failure tolerance is structural, not emotional.',
     product:
@@ -884,7 +894,7 @@ export const RESEARCH_LIBRARY: LibraryEntry[] = [
   {
     id: 'lochhead-lenny',
     title: 'Christopher Lochhead: "How to become a category pirate"',
-    source: "Lenny\u2019s Podcast",
+    source: 'Lenny\u2019s Podcast',
     type: 'Podcast / Newsletter',
     link: 'https://www.lennysnewsletter.com/p/how-to-become-a-category-pirate-christopher',
     insight:
@@ -969,7 +979,8 @@ export const RESEARCH_LIBRARY: LibraryEntry[] = [
 // ─── The Noise moment (for NoiseMomentViz) ────────────────────────
 
 export const NOISE_MOMENT = {
-  source: 'Kahneman, Sibony, Sunstein — Noise (2021). Based on Kahneman\u2019s insurance underwriter study.',
+  source:
+    'Kahneman, Sibony, Sunstein — Noise (2021). Based on Kahneman\u2019s insurance underwriter study.',
   expectedVariance: 10, // % — what execs expected before the study
   actualVariance: 55, // % — what the study found
   example: {
@@ -988,7 +999,8 @@ export const DUAL_FRAMEWORK = {
   kahneman: {
     pole: 'Structured debiasing',
     book: 'Thinking, Fast and Slow (2011); Noise (2021)',
-    thesis: 'Human judgment is systematically flawed. Structured processes beat intuition at scale.',
+    thesis:
+      'Human judgment is systematically flawed. Structured processes beat intuition at scale.',
     diProduct: [
       '30+ bias taxonomy detection',
       'Triple-judge noise decomposition',
@@ -999,7 +1011,8 @@ export const DUAL_FRAMEWORK = {
   klein: {
     pole: 'Expert intuition amplification',
     book: 'Sources of Power (1998); Performing a Project Premortem (HBR 2007)',
-    thesis: 'Experts pattern-match from prior experience. Good tools surface cues and simulate outcomes.',
+    thesis:
+      'Experts pattern-match from prior experience. Good tools surface cues and simulate outcomes.',
     diProduct: [
       'RPD tab surfacing recognition cues',
       'Pre-mortem scenario cards',
@@ -1009,8 +1022,7 @@ export const DUAL_FRAMEWORK = {
   },
   synthesis: {
     title: 'The DI synthesis',
-    body:
-      'Decision Intel does not pick a side. The 12-node pipeline suppresses bias and noise (Kahneman) while the RPD tab surfaces the pattern-recognition cues an expert with 10+ comparable decisions would notice (Klein). Their 2009 joint paper "Conditions for Intuitive Expertise: A Failure to Disagree" is the product thesis.',
+    body: 'Decision Intel does not pick a side. The 12-node pipeline suppresses bias and noise (Kahneman) while the RPD tab surfaces the pattern-recognition cues an expert with 10+ comparable decisions would notice (Klein). Their 2009 joint paper "Conditions for Intuitive Expertise: A Failure to Disagree" is the product thesis.',
   },
 };
 
@@ -1089,7 +1101,8 @@ export const HYGIENE_QUADRANTS: HygieneQuadrant[] = [
     title: 'Checklists',
     description:
       'Structured rubrics that force complete coverage. Reduce omission errors and free up working memory.',
-    diFeature: '12-node pipeline executes a fixed rubric on every document. No memo ships without coverage.',
+    diFeature:
+      '12-node pipeline executes a fixed rubric on every document. No memo ships without coverage.',
     shipped: true,
   },
   {
@@ -1103,7 +1116,8 @@ export const HYGIENE_QUADRANTS: HygieneQuadrant[] = [
     title: 'Structured independent assessment',
     description:
       'Multiple judges score in isolation, then aggregate. Wisdom of Crowds conditions enforced.',
-    diFeature: 'Triple-judge pipeline. Blind priors in Decision Rooms. Consensus quality scored, not just agreement.',
+    diFeature:
+      'Triple-judge pipeline. Blind priors in Decision Rooms. Consensus quality scored, not just agreement.',
     shipped: true,
   },
   {
@@ -1126,33 +1140,196 @@ export interface TimelineMilestone {
 }
 
 export const TIMELINE: TimelineMilestone[] = [
-  { year: 1763, label: 'Bayes\u2019 theorem', thinker: 'Thomas Bayes', significance: 'Rational belief update: prior × likelihood.', category: 'cognitive' },
-  { year: 1973, label: '10th Man Rule', thinker: 'IDF / RAND', significance: 'Institutionalised dissent after Yom Kippur surprise.', category: 'structuring' },
-  { year: 1974, label: 'Heuristics & Biases', thinker: 'Tversky & Kahneman', significance: 'The research program that named 30+ systematic errors.', category: 'cognitive' },
-  { year: 1976, label: 'OODA Loop', thinker: 'John Boyd', significance: 'Decision tempo under uncertainty. Whoever cycles faster wins.', category: 'structuring' },
-  { year: 1978, label: 'Pyramid Principle', thinker: 'Barbara Minto', significance: 'Lead with the conclusion. BLUF becomes the global consulting standard.', category: 'communication' },
-  { year: 1980, label: 'Five Forces', thinker: 'Michael Porter', significance: 'Industry structure as the determinant of profitability.', category: 'moat' },
-  { year: 1988, label: 'SPIN Selling', thinker: 'Neil Rackham', significance: 'Large-ticket sales won by discovery question sequence.', category: 'gtm' },
-  { year: 1988, label: 'DQ Chain', thinker: 'Howard & Matheson', significance: 'Six-link chain: frame → alternatives → info → values → reasoning → commitment.', category: 'structuring' },
-  { year: 1991, label: 'Crossing the Chasm', thinker: 'Geoffrey Moore', significance: 'Early markets vs. mainstream — most startups die between them.', category: 'gtm' },
-  { year: 1996, label: 'MEDDIC', thinker: 'PTC (later Dunkel)', significance: 'Enterprise deal qualification checklist.', category: 'gtm' },
-  { year: 1998, label: 'Sources of Power', thinker: 'Gary Klein', significance: 'Recognition-Primed Decision: experts pattern-match, they don\u2019t enumerate.', category: 'cognitive' },
-  { year: 2004, label: 'Wisdom of Crowds', thinker: 'James Surowiecki', significance: 'Four conditions for group judgment to outperform experts.', category: 'structuring' },
-  { year: 2005, label: 'Expert Political Judgment', thinker: 'Philip Tetlock', significance: 'Most "expert" forecasts are no better than chance. Calibration is trainable.', category: 'cognitive' },
-  { year: 2005, label: 'Blue Ocean Strategy', thinker: 'Kim & Mauborgne', significance: 'Compete in uncontested markets via Value Curve differentiation.', category: 'strategy' },
-  { year: 2007, label: 'Pre-mortem (HBR)', thinker: 'Gary Klein', significance: 'Imagine the decision has failed. Write why. Highest-ROI debiasing.', category: 'structuring' },
-  { year: 2011, label: 'Thinking, Fast and Slow', thinker: 'Daniel Kahneman', significance: 'System 1/System 2. The popular synthesis of 40 years of bias research.', category: 'cognitive' },
-  { year: 2011, label: 'The Challenger Sale', thinker: 'Dixon & Adamson', significance: 'Top performers teach, tailor, take control. Relationship builders are worst.', category: 'gtm' },
-  { year: 2014, label: 'Zero to One', thinker: 'Peter Thiel', significance: 'Monopoly + contrarian truth. Last-mover advantage in a new category.', category: 'strategy' },
-  { year: 2015, label: 'Superforecasting', thinker: 'Philip Tetlock', significance: 'Hybrid human + AI forecasting beats pure either.', category: 'cognitive' },
-  { year: 2015, label: 'Aggregation Theory', thinker: 'Ben Thompson', significance: 'Value accrues to demand aggregators, not supply controllers.', category: 'moat' },
-  { year: 2016, label: '7 Powers', thinker: 'Hamilton Helmer', significance: 'Seven (and only seven) sources of durable competitive advantage.', category: 'moat' },
-  { year: 2016, label: 'Never Split the Difference', thinker: 'Chris Voss', significance: 'Tactical empathy: emotion first, logic second.', category: 'communication' },
-  { year: 2016, label: 'Jobs-to-be-Done', thinker: 'Christensen & Moesta', significance: 'Customers hire products for a job. The job is stable; demographics are not.', category: 'gtm' },
-  { year: 2018, label: 'Thinking in Bets', thinker: 'Annie Duke', significance: 'Decision quality ≠ outcome quality. The resulting bias named.', category: 'cognitive' },
-  { year: 2021, label: 'Noise', thinker: 'Kahneman, Sibony, Sunstein', significance: 'Variance in identical judgments. 55% where 10% was expected.', category: 'cognitive' },
-  { year: 2024, label: 'VC Decision Science', thinker: 'Ilya Strebulaev', significance: 'Nine principles. Consensus-seeking committees underperform.', category: 'strategy' },
-  { year: 2026, label: 'Decision Intel', thinker: '—', significance: 'The Decision Knowledge Graph: the synthesis of 260 years of decision science, shipped.', category: 'cognitive' },
+  {
+    year: 1763,
+    label: 'Bayes\u2019 theorem',
+    thinker: 'Thomas Bayes',
+    significance: 'Rational belief update: prior × likelihood.',
+    category: 'cognitive',
+  },
+  {
+    year: 1973,
+    label: '10th Man Rule',
+    thinker: 'IDF / RAND',
+    significance: 'Institutionalised dissent after Yom Kippur surprise.',
+    category: 'structuring',
+  },
+  {
+    year: 1974,
+    label: 'Heuristics & Biases',
+    thinker: 'Tversky & Kahneman',
+    significance: 'The research program that named 30+ systematic errors.',
+    category: 'cognitive',
+  },
+  {
+    year: 1976,
+    label: 'OODA Loop',
+    thinker: 'John Boyd',
+    significance: 'Decision tempo under uncertainty. Whoever cycles faster wins.',
+    category: 'structuring',
+  },
+  {
+    year: 1978,
+    label: 'Pyramid Principle',
+    thinker: 'Barbara Minto',
+    significance: 'Lead with the conclusion. BLUF becomes the global consulting standard.',
+    category: 'communication',
+  },
+  {
+    year: 1980,
+    label: 'Five Forces',
+    thinker: 'Michael Porter',
+    significance: 'Industry structure as the determinant of profitability.',
+    category: 'moat',
+  },
+  {
+    year: 1988,
+    label: 'SPIN Selling',
+    thinker: 'Neil Rackham',
+    significance: 'Large-ticket sales won by discovery question sequence.',
+    category: 'gtm',
+  },
+  {
+    year: 1988,
+    label: 'DQ Chain',
+    thinker: 'Howard & Matheson',
+    significance: 'Six-link chain: frame → alternatives → info → values → reasoning → commitment.',
+    category: 'structuring',
+  },
+  {
+    year: 1991,
+    label: 'Crossing the Chasm',
+    thinker: 'Geoffrey Moore',
+    significance: 'Early markets vs. mainstream — most startups die between them.',
+    category: 'gtm',
+  },
+  {
+    year: 1996,
+    label: 'MEDDIC',
+    thinker: 'PTC (later Dunkel)',
+    significance: 'Enterprise deal qualification checklist.',
+    category: 'gtm',
+  },
+  {
+    year: 1998,
+    label: 'Sources of Power',
+    thinker: 'Gary Klein',
+    significance: 'Recognition-Primed Decision: experts pattern-match, they don\u2019t enumerate.',
+    category: 'cognitive',
+  },
+  {
+    year: 2004,
+    label: 'Wisdom of Crowds',
+    thinker: 'James Surowiecki',
+    significance: 'Four conditions for group judgment to outperform experts.',
+    category: 'structuring',
+  },
+  {
+    year: 2005,
+    label: 'Expert Political Judgment',
+    thinker: 'Philip Tetlock',
+    significance: 'Most "expert" forecasts are no better than chance. Calibration is trainable.',
+    category: 'cognitive',
+  },
+  {
+    year: 2005,
+    label: 'Blue Ocean Strategy',
+    thinker: 'Kim & Mauborgne',
+    significance: 'Compete in uncontested markets via Value Curve differentiation.',
+    category: 'strategy',
+  },
+  {
+    year: 2007,
+    label: 'Pre-mortem (HBR)',
+    thinker: 'Gary Klein',
+    significance: 'Imagine the decision has failed. Write why. Highest-ROI debiasing.',
+    category: 'structuring',
+  },
+  {
+    year: 2011,
+    label: 'Thinking, Fast and Slow',
+    thinker: 'Daniel Kahneman',
+    significance: 'System 1/System 2. The popular synthesis of 40 years of bias research.',
+    category: 'cognitive',
+  },
+  {
+    year: 2011,
+    label: 'The Challenger Sale',
+    thinker: 'Dixon & Adamson',
+    significance: 'Top performers teach, tailor, take control. Relationship builders are worst.',
+    category: 'gtm',
+  },
+  {
+    year: 2014,
+    label: 'Zero to One',
+    thinker: 'Peter Thiel',
+    significance: 'Monopoly + contrarian truth. Last-mover advantage in a new category.',
+    category: 'strategy',
+  },
+  {
+    year: 2015,
+    label: 'Superforecasting',
+    thinker: 'Philip Tetlock',
+    significance: 'Hybrid human + AI forecasting beats pure either.',
+    category: 'cognitive',
+  },
+  {
+    year: 2015,
+    label: 'Aggregation Theory',
+    thinker: 'Ben Thompson',
+    significance: 'Value accrues to demand aggregators, not supply controllers.',
+    category: 'moat',
+  },
+  {
+    year: 2016,
+    label: '7 Powers',
+    thinker: 'Hamilton Helmer',
+    significance: 'Seven (and only seven) sources of durable competitive advantage.',
+    category: 'moat',
+  },
+  {
+    year: 2016,
+    label: 'Never Split the Difference',
+    thinker: 'Chris Voss',
+    significance: 'Tactical empathy: emotion first, logic second.',
+    category: 'communication',
+  },
+  {
+    year: 2016,
+    label: 'Jobs-to-be-Done',
+    thinker: 'Christensen & Moesta',
+    significance: 'Customers hire products for a job. The job is stable; demographics are not.',
+    category: 'gtm',
+  },
+  {
+    year: 2018,
+    label: 'Thinking in Bets',
+    thinker: 'Annie Duke',
+    significance: 'Decision quality ≠ outcome quality. The resulting bias named.',
+    category: 'cognitive',
+  },
+  {
+    year: 2021,
+    label: 'Noise',
+    thinker: 'Kahneman, Sibony, Sunstein',
+    significance: 'Variance in identical judgments. 55% where 10% was expected.',
+    category: 'cognitive',
+  },
+  {
+    year: 2024,
+    label: 'VC Decision Science',
+    thinker: 'Ilya Strebulaev',
+    significance: 'Nine principles. Consensus-seeking committees underperform.',
+    category: 'strategy',
+  },
+  {
+    year: 2026,
+    label: 'Decision Intel',
+    thinker: '—',
+    significance:
+      'The Decision Knowledge Graph: the synthesis of 260 years of decision science, shipped.',
+    category: 'cognitive',
+  },
 ];
 
 // ─── Connecting thread + takeaways + founder notes ────────────────
@@ -1198,11 +1375,13 @@ export const FOUNDER_NOTES = [
   },
   {
     headline: 'Sell the Bias Genome to investors.',
-    detail: 'World\u2019s first dataset of which cognitive biases predict failure, by industry and decision type.',
+    detail:
+      'World\u2019s first dataset of which cognitive biases predict failure, by industry and decision type.',
   },
   {
     headline: 'The counterfactual engine is underexposed.',
-    detail: 'Get it into the UI and the sales deck — it\u2019s the ROI story that closes enterprise deals.',
+    detail:
+      'Get it into the UI and the sales deck — it\u2019s the ROI story that closes enterprise deals.',
   },
 ];
 
@@ -1210,7 +1389,8 @@ export const SALES_PERSONAS = [
   {
     persona: 'Strategy Leaders',
     hook: '"How do you measure decision quality today?"',
-    pitch: 'Show DQI scoring across their last 10 major decisions. Highlight the ones with low scores that later underperformed.',
+    pitch:
+      'Show DQI scoring across their last 10 major decisions. Highlight the ones with low scores that later underperformed.',
     close: 'Free pilot: upload 3 recent strategic documents and see the scores.',
   },
   {
@@ -1240,26 +1420,32 @@ export const SALES_PERSONAS = [
 export const KEY_TALKING_POINTS = [
   {
     point: 'ROI is immediate',
-    detail: 'A single avoided bad decision saves £50M–£500M. The platform pays for itself after one corrected thesis.',
+    detail:
+      'A single avoided bad decision saves £50M–£500M. The platform pays for itself after one corrected thesis.',
   },
   {
     point: 'Not a replacement — an augmentation',
-    detail: 'We don\u2019t tell you what to decide. We show you what you might be missing. Like a spell-checker for cognitive biases.',
+    detail:
+      'We don\u2019t tell you what to decide. We show you what you might be missing. Like a spell-checker for cognitive biases.',
   },
   {
     point: 'Gets smarter with you',
-    detail: 'After 50 decisions, we know which biases actually cost YOUR org money. No competitor replicates 18 months of your calibration data.',
+    detail:
+      'After 50 decisions, we know which biases actually cost YOUR org money. No competitor replicates 18 months of your calibration data.',
   },
   {
     point: 'Sell to the committee, not the individual',
-    detail: 'Slack integration + cognitive audit of team decisions is the B2B killer feature. Individual bias detection is nice-to-have; team auditing is must-have.',
+    detail:
+      'Slack integration + cognitive audit of team decisions is the B2B killer feature. Individual bias detection is nice-to-have; team auditing is must-have.',
   },
   {
     point: 'The toxic combinations are viral',
-    detail: '"The Echo Chamber", "The Sunk Ship" — memorable, tweetable. Consider publishing a "Taxonomy of Bad Decisions" for thought leadership.',
+    detail:
+      '"The Echo Chamber", "The Sunk Ship" — memorable, tweetable. Consider publishing a "Taxonomy of Bad Decisions" for thought leadership.',
   },
   {
     point: 'Counterfactual is the ROI story',
-    detail: '"If you\u2019d removed anchoring from your last 20 decisions, success rate would have been 14% higher — that\u2019s £2.3M in avoided losses."',
+    detail:
+      '"If you\u2019d removed anchoring from your last 20 decisions, success rate would have been 14% higher — that\u2019s £2.3M in avoided losses."',
   },
 ];

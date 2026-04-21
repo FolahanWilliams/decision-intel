@@ -155,10 +155,10 @@ function renderHero() {
           maxWidth: 760,
         }}
       >
-        Quantexa owns contextual graphs. Aera owns supply-chain automation. Pyramid owns BI.
-        Nobody owns causal audit + closed outcome loop + board-ready governance for strategic
-        decisions. That&rsquo;s the category we&rsquo;re creating — grounded in what&rsquo;s
-        already shipped, honest about what still has to be built.
+        Quantexa owns contextual graphs. Aera owns supply-chain automation. Pyramid owns BI. Nobody
+        owns causal audit + closed outcome loop + board-ready governance for strategic decisions.
+        That&rsquo;s the category we&rsquo;re creating — grounded in what&rsquo;s already shipped,
+        honest about what still has to be built.
       </p>
     </div>
   );
@@ -379,8 +379,7 @@ function renderLandscape(selected: Incumbent, setSelectedId: (id: string) => voi
             DI landscape
           </div>
           <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
-            Six players positioned by strategic specificity (x) and causal depth (y). Click any
-            dot.
+            Six players positioned by strategic specificity (x) and causal depth (y). Click any dot.
           </div>
         </div>
       </div>
@@ -488,7 +487,15 @@ function renderLandscape(selected: Incumbent, setSelectedId: (id: string) => voi
                 aria-label={inc.name}
               >
                 {isSelected && (
-                  <circle cx={cx} cy={cy} r={20} fill="none" stroke={color} strokeWidth={2} strokeOpacity={0.4}>
+                  <circle
+                    cx={cx}
+                    cy={cy}
+                    r={20}
+                    fill="none"
+                    stroke={color}
+                    strokeWidth={2}
+                    strokeOpacity={0.4}
+                  >
                     <animate
                       attributeName="r"
                       values="20;26;20"
@@ -1039,10 +1046,7 @@ function GapColumn({
 
 // ─── Category path (18 months) ──────────────────────────────────────────
 
-function renderCategoryPath(
-  hoveredId: string | null,
-  setHoveredId: (id: string | null) => void
-) {
+function renderCategoryPath(hoveredId: string | null, setHoveredId: (id: string | null) => void) {
   return (
     <section
       style={{
@@ -1500,17 +1504,17 @@ function renderSources() {
         }}
       >
         <SourceItem>
-          <strong>Funding / valuation figures:</strong> Crunchbase, Reuters, Quantexa press
-          releases (March 2025 Series F), Aera GetLatka revenue report (2024).
+          <strong>Funding / valuation figures:</strong> Crunchbase, Reuters, Quantexa press releases
+          (March 2025 Series F), Aera GetLatka revenue report (2024).
         </SourceItem>
         <SourceItem>
-          <strong>Market size:</strong> Gartner DI Magic Quadrant 2026 commentary ($16–20B market
-          in 2025–2026); CAGR projections 15–24% to 2030–2035.
+          <strong>Market size:</strong> Gartner DI Magic Quadrant 2026 commentary ($16–20B market in
+          2025–2026); CAGR projections 15–24% to 2030–2035.
         </SourceItem>
         <SourceItem>
           <strong>74% faithfulness gap:</strong> theCUBE Research 2026 DI market trends, citing
-          academic work on LLM explanation faithfulness. Treat as analyst-reported, not
-          first-party measurement.
+          academic work on LLM explanation faithfulness. Treat as analyst-reported, not first-party
+          measurement.
         </SourceItem>
         <SourceItem>
           <strong>85% decision regret:</strong> Deloitte 2025 Decision Making Survey.
@@ -1520,8 +1524,8 @@ function renderSources() {
           enforcement 2026–2027.
         </SourceItem>
         <SourceItem>
-          <strong>Landscape x/y coordinates:</strong> Founder&rsquo;s positional judgment on
-          public product positioning. Transparently opinionated, not analyst-derived.
+          <strong>Landscape x/y coordinates:</strong> Founder&rsquo;s positional judgment on public
+          product positioning. Transparently opinionated, not analyst-derived.
         </SourceItem>
       </ul>
     </section>

@@ -12,7 +12,7 @@ interface ChatMsg {
 const PRESET_QUESTIONS = [
   'Roleplay a skeptical CSO. Ask me the 3 hardest questions about category, moat, and proof.',
   'Audit my positioning vocabulary against what I wrote in CLAUDE.md. Flag anything I drift on.',
-  "Write me a cold-email opener for a CSO who lost sleep over a board meeting this quarter.",
+  'Write me a cold-email opener for a CSO who lost sleep over a board meeting this quarter.',
   "Drill me on the Kodak hook — how do I open if the prospect hasn't heard of Decision Intel?",
   'What is my weakest Sharp step right now, and the single action to fix it this week?',
   'Turn the Four Moments into a 30-second spoken elevator pitch. No jargon, no hedge words.',
@@ -298,8 +298,7 @@ export function PositioningCoachChat({ founderPass }: { founderPass: string }) {
                 alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
                 maxWidth: '86%',
                 padding: '8px 12px',
-                background:
-                  msg.role === 'user' ? '#16A34A' : 'var(--bg-secondary)',
+                background: msg.role === 'user' ? '#16A34A' : 'var(--bg-secondary)',
                 color: msg.role === 'user' ? '#fff' : 'var(--text-primary)',
                 borderRadius: 8,
                 borderBottomRightRadius: msg.role === 'user' ? 2 : 8,

@@ -121,8 +121,7 @@ export async function GET(req: NextRequest) {
           details: true,
         },
       });
-      const header =
-        'id,createdAt,userId,orgId,action,resource,resourceId,ipAddress,details\n';
+      const header = 'id,createdAt,userId,orgId,action,resource,resourceId,ipAddress,details\n';
       const body = rows
         .map(r =>
           [

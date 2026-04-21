@@ -24,8 +24,7 @@ export function ExecutiveMemo() {
         style={{
           padding: '28px 32px 20px',
           borderBottom: '1px solid var(--border-primary)',
-          background:
-            'linear-gradient(180deg, rgba(22,163,74,0.04) 0%, transparent 100%)',
+          background: 'linear-gradient(180deg, rgba(22,163,74,0.04) 0%, transparent 100%)',
         }}
       >
         <div
@@ -63,9 +62,8 @@ export function ExecutiveMemo() {
             maxWidth: 720,
           }}
         >
-          Refined synthesis of the LLM Council roadmap, reconciled with the
-          codebase, founder context, and honest counter-takes. Read once.
-          Act on it. Update quarterly.
+          Refined synthesis of the LLM Council roadmap, reconciled with the codebase, founder
+          context, and honest counter-takes. Read once. Act on it. Update quarterly.
         </p>
       </div>
 

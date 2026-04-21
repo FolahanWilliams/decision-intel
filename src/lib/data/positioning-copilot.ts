@@ -66,7 +66,7 @@ export const SPINE_STEPS: SpineStep[] = [
     title: 'Problem',
     question: 'What job is your brand helping with?',
     answer:
-      'Catch cognitive bias + missing evidence in strategic memos and board decks BEFORE they reach the steering committee. The CSO\'s existential job is credibility with the CEO and board — we preserve it, quarter after quarter.',
+      "Catch cognitive bias + missing evidence in strategic memos and board decks BEFORE they reach the steering committee. The CSO's existential job is credibility with the CEO and board — we preserve it, quarter after quarter.",
     failureMode: 'Unclear value = weak demand. Solve something real.',
     status: 'strong',
   },
@@ -178,11 +178,26 @@ export const MARKET_DIMENSIONS: MarketDimension[] = [
     answer:
       'CSO average tenure has compressed to ~3 years. Careers end over one bad steering-committee recommendation. Boards are holding CSOs accountable for process, not just outcome.',
     subQuestions: [
-      { q: 'What frustrates people today?', a: 'Spending 20+ hours on a memo and getting killed in 8 minutes of Q&A over a bias they never saw.' },
-      { q: 'What takes too long?', a: 'Red-teaming a memo internally — asking peers to find flaws. Peers are conflict-averse and under-cite.' },
-      { q: 'What costs too much?', a: 'Consulting firms charge £200K-£1M per engagement. Most CSOs can only afford 1-2 per year.' },
-      { q: 'What feels broken or inefficient?', a: 'No artifact survives between strategic decisions. Every memo starts from zero. The Decision Knowledge Graph is the fix.' },
-      { q: 'Is this pain frequent or rare?', a: 'Frequent — every board cycle (quarterly) produces 3-5 strategic memos per CSO.' },
+      {
+        q: 'What frustrates people today?',
+        a: 'Spending 20+ hours on a memo and getting killed in 8 minutes of Q&A over a bias they never saw.',
+      },
+      {
+        q: 'What takes too long?',
+        a: 'Red-teaming a memo internally — asking peers to find flaws. Peers are conflict-averse and under-cite.',
+      },
+      {
+        q: 'What costs too much?',
+        a: 'Consulting firms charge £200K-£1M per engagement. Most CSOs can only afford 1-2 per year.',
+      },
+      {
+        q: 'What feels broken or inefficient?',
+        a: 'No artifact survives between strategic decisions. Every memo starts from zero. The Decision Knowledge Graph is the fix.',
+      },
+      {
+        q: 'Is this pain frequent or rare?',
+        a: 'Frequent — every board cycle (quarterly) produces 3-5 strategic memos per CSO.',
+      },
     ],
     confidence: 85,
   },
@@ -193,11 +208,26 @@ export const MARKET_DIMENSIONS: MarketDimension[] = [
     answer:
       'CSO at a public or late-stage private company with a formal strategy function. Reports directly to CEO. Owns the board-meeting strategic-memo workflow. ~15,000 globally.',
     subQuestions: [
-      { q: 'Who feels this pain most often?', a: 'CSOs with boards that hold formal steering-committee reviews every quarter.' },
-      { q: 'What role / industry / lifestyle?', a: 'CSO, VP Strategy, Head of Corporate Development. Industries: tech, healthcare, financial services, energy, consumer.' },
-      { q: 'Who is actively looking for help?', a: 'CSOs who survived a board grilling recently. Emotional freshness drives purchase intent.' },
-      { q: 'Who has urgency?', a: 'CSOs with a major strategic bet in the next 90 days — M&A thesis, market entry, pricing shift, CAPEX >$100M.' },
-      { q: 'Who has budget or influence?', a: 'CSOs with $50K-$500K discretionary line item. They can pilot without procurement gauntlets.' },
+      {
+        q: 'Who feels this pain most often?',
+        a: 'CSOs with boards that hold formal steering-committee reviews every quarter.',
+      },
+      {
+        q: 'What role / industry / lifestyle?',
+        a: 'CSO, VP Strategy, Head of Corporate Development. Industries: tech, healthcare, financial services, energy, consumer.',
+      },
+      {
+        q: 'Who is actively looking for help?',
+        a: 'CSOs who survived a board grilling recently. Emotional freshness drives purchase intent.',
+      },
+      {
+        q: 'Who has urgency?',
+        a: 'CSOs with a major strategic bet in the next 90 days — M&A thesis, market entry, pricing shift, CAPEX >$100M.',
+      },
+      {
+        q: 'Who has budget or influence?',
+        a: 'CSOs with $50K-$500K discretionary line item. They can pilot without procurement gauntlets.',
+      },
     ],
     confidence: 80,
   },
@@ -208,11 +238,26 @@ export const MARKET_DIMENSIONS: MarketDimension[] = [
     answer:
       'Manual peer review (conflict-averse, under-cites), ad-hoc consulting (expensive, slow), or nothing. Cloverpop is workflow-adjacent but does not audit bias or predict board objections.',
     subQuestions: [
-      { q: 'What are they using today?', a: 'Word docs, Google Slides, email peer review, occasional Bain/McKinsey engagements, and ChatGPT/Claude informally.' },
-      { q: 'Are they using competitors, agencies, spreadsheets, or manual work?', a: 'Agencies + manual + spreadsheets. No true competitor in bias-auditing.' },
-      { q: 'What do they dislike about those options?', a: 'Consulting = slow + expensive + exits with the consultant. Peer review = too polite. ChatGPT = no citations, no memory.' },
-      { q: 'Where are current solutions weak?', a: 'Every existing option lacks: (1) persistence across decisions, (2) a DQI score, (3) predicted CEO questions.' },
-      { q: 'What gap still exists?', a: 'No tool delivers a structured, auditable, cited bias review in 60 seconds with an artifact that compounds.' },
+      {
+        q: 'What are they using today?',
+        a: 'Word docs, Google Slides, email peer review, occasional Bain/McKinsey engagements, and ChatGPT/Claude informally.',
+      },
+      {
+        q: 'Are they using competitors, agencies, spreadsheets, or manual work?',
+        a: 'Agencies + manual + spreadsheets. No true competitor in bias-auditing.',
+      },
+      {
+        q: 'What do they dislike about those options?',
+        a: 'Consulting = slow + expensive + exits with the consultant. Peer review = too polite. ChatGPT = no citations, no memory.',
+      },
+      {
+        q: 'Where are current solutions weak?',
+        a: 'Every existing option lacks: (1) persistence across decisions, (2) a DQI score, (3) predicted CEO questions.',
+      },
+      {
+        q: 'What gap still exists?',
+        a: 'No tool delivers a structured, auditable, cited bias review in 60 seconds with an artifact that compounds.',
+      },
     ],
     confidence: 85,
   },
@@ -223,11 +268,26 @@ export const MARKET_DIMENSIONS: MarketDimension[] = [
     answer:
       '~15,000 target companies globally with a formal CSO function. At $30K average ACV (blending Individual + Strategy + Enterprise), 5% penetration = $22.5M ARR. Adjacent verticals (M&A, BizOps) expand TAM 3-5x.',
     subQuestions: [
-      { q: 'How many people or businesses have this problem?', a: 'Global: ~15,000 formal CSO functions. US: ~6,000. Addressable in year 1: ~300 warm targets via advisor network.' },
-      { q: 'Is the market growing?', a: 'Yes — CSO roles up ~14% YoY since 2022 per LinkedIn Economic Graph. AI-native strategy tooling is nascent.' },
-      { q: 'Can you reach them?', a: 'Yes — LinkedIn + advisor intros + inbound from /proof + /bias-genome pages. No paid ads needed pre-seed.' },
-      { q: 'Is solving this valuable enough?', a: 'Yes — a single prevented bad strategic decision > 10x annual subscription cost. ROI is obvious to the buyer.' },
-      { q: 'Can this become repeat revenue?', a: 'Yes — quarterly board cycles create natural renewal cadence. Decision Knowledge Graph compounds switching cost.' },
+      {
+        q: 'How many people or businesses have this problem?',
+        a: 'Global: ~15,000 formal CSO functions. US: ~6,000. Addressable in year 1: ~300 warm targets via advisor network.',
+      },
+      {
+        q: 'Is the market growing?',
+        a: 'Yes — CSO roles up ~14% YoY since 2022 per LinkedIn Economic Graph. AI-native strategy tooling is nascent.',
+      },
+      {
+        q: 'Can you reach them?',
+        a: 'Yes — LinkedIn + advisor intros + inbound from /proof + /bias-genome pages. No paid ads needed pre-seed.',
+      },
+      {
+        q: 'Is solving this valuable enough?',
+        a: 'Yes — a single prevented bad strategic decision > 10x annual subscription cost. ROI is obvious to the buyer.',
+      },
+      {
+        q: 'Can this become repeat revenue?',
+        a: 'Yes — quarterly board cycles create natural renewal cadence. Decision Knowledge Graph compounds switching cost.',
+      },
     ],
     confidence: 70,
   },
@@ -238,10 +298,16 @@ export const MARKET_DIMENSIONS: MarketDimension[] = [
     answer:
       'Thesis = YES. Clear shift (AI + capital discipline). Strong pain (tenure compression). Specific customer (CSO). Weak current solutions. Large enough market. All five criteria met. Proceed with pilot outreach now.',
     subQuestions: [
-      { q: 'There is a clear shift', a: 'Yes — AI-native strategy ops is the next Gong/Clari cycle.' },
+      {
+        q: 'There is a clear shift',
+        a: 'Yes — AI-native strategy ops is the next Gong/Clari cycle.',
+      },
       { q: 'The pain is strong', a: 'Yes — CSO tenure compression + post-ZIRP scrutiny.' },
       { q: 'A specific customer feels it deeply', a: 'Yes — CSO at pre-board-meeting moment.' },
-      { q: 'Current solutions are weak', a: 'Yes — none deliver 60-sec structured audit with memory.' },
+      {
+        q: 'Current solutions are weak',
+        a: 'Yes — none deliver 60-sec structured audit with memory.',
+      },
       { q: 'The market is large enough', a: 'Yes — $22.5M+ ARR at 5% penetration of primary TAM.' },
     ],
     confidence: 80,
@@ -308,7 +374,7 @@ export const COMPASS_DIRECTIONS: CompassDirection[] = [
     title: 'Decisiveness',
     tagline: 'Decide without 100% info',
     principles: [
-      'Act, don\'t wait',
+      "Act, don't wait",
       'Reversible? → Experiment',
       'Irreversible? → Analyze + deadline',
       'Mistakes → lessons, not disasters',
@@ -341,7 +407,7 @@ export const COMPASS_DIRECTIONS: CompassDirection[] = [
       'Focus on benefits: "What\'s in it?"',
     ],
     appliedToDecisionIntel:
-      'The Kodak/Blockbuster/Nokia case-study pattern IS the story. Famous failure → bias we would have caught → would you rather be the next case, or the first customer who wasn\'t?',
+      "The Kodak/Blockbuster/Nokia case-study pattern IS the story. Famous failure → bias we would have caught → would you rather be the next case, or the first customer who wasn't?",
   },
   {
     id: 'focus',
@@ -349,7 +415,7 @@ export const COMPASS_DIRECTIONS: CompassDirection[] = [
     title: 'Focus',
     tagline: '5% effort → 95% result',
     principles: [
-      'Multiply, don\'t add',
+      "Multiply, don't add",
       "Where's your leverage?",
       'Automate routines',
       'Ruthless "no" to distractions',
@@ -397,7 +463,7 @@ export const PITCH_SLIDES: PitchSlide[] = [
     title: 'Insight',
     purpose: 'Share a fresh perspective',
     decisionIntelAnswer:
-      'Strategic failure is not a data problem. It\'s a bias problem. 30+ cognitive biases, well-studied since Kahneman, have never been operationalized at the C-suite. We did it in 60 seconds per memo.',
+      "Strategic failure is not a data problem. It's a bias problem. 30+ cognitive biases, well-studied since Kahneman, have never been operationalized at the C-suite. We did it in 60 seconds per memo.",
     kind: 'hook',
   },
   {
@@ -509,7 +575,7 @@ export const PITCH_SLIDES: PitchSlide[] = [
     title: 'Next Step',
     purpose: 'Close strong — define the next action',
     decisionIntelAnswer:
-      'Two paths: (1) audit one of your portfolio CSOs\' real board memos live on a 30-minute call, or (2) introduce me to one CSO who lost sleep over a board presentation this quarter.',
+      "Two paths: (1) audit one of your portfolio CSOs' real board memos live on a 30-minute call, or (2) introduce me to one CSO who lost sleep over a board presentation this quarter.",
     kind: 'close',
   },
 ];
@@ -540,24 +606,120 @@ export interface PositioningEdge {
 }
 
 export const POSITIONING_NODES: PositioningNode[] = [
-  { id: 'core', label: 'Decision Intel', kind: 'core', detail: 'The decision intelligence platform for corporate strategy teams.' },
-  { id: 'category', label: 'Category', kind: 'category', detail: 'Decision intelligence — a new category we are seeding. Adjacent to decision management, orthogonal to BI and consulting.' },
-  { id: 'cso', label: 'CSO', kind: 'buyer', detail: 'Primary buyer. Signs the contract. Cares about board credibility quarter after quarter.' },
-  { id: 'mna', label: 'M&A Head', kind: 'buyer', detail: 'Secondary buyer. Uses the product for deal-thesis red-teaming.' },
-  { id: 'bias', label: 'Memo Bias', kind: 'problem', detail: 'Cognitive bias in strategic memos — confirmation, anchoring, sunk cost, etc. 30+ biases taxonomy. Uncaught in most peer review.' },
-  { id: 'tenure', label: 'Short Tenure', kind: 'problem', detail: 'CSO tenure compressed to ~3 years. One bad memo ends careers.' },
-  { id: 'audit', label: '60s Audit', kind: 'capability', detail: 'Upload → 12-node pipeline → DQI grade + biases + predicted questions. The core demo flow.' },
-  { id: 'dkg', label: 'Knowledge Graph', kind: 'capability', detail: 'The Decision Knowledge Graph. Every audit persists. Compounds quarter over quarter. The real moat.' },
-  { id: 'predict', label: 'CEO Qs', kind: 'capability', detail: 'CEO question prediction. Pre-empts the board grilling. 5 role-primed personas.' },
-  { id: 'dqi', label: 'DQI Grade', kind: 'capability', detail: 'DQI A-F grade scale. 85+ A, 70+ B, 55+ C, 40+ D. Buyer-legible in one glance.' },
-  { id: 'cases', label: '135 Cases', kind: 'proof', detail: 'Historical case library. Kodak, Blockbuster, Nokia, Theranos, Enron. Every failure traceable to a bias.' },
-  { id: 'taxonomy', label: 'Bias Taxonomy', kind: 'proof', detail: '30+ biases with stable IDs DI-B-001–020 live. Published at /taxonomy.' },
-  { id: 'pipeline', label: 'Pipeline', kind: 'proof', detail: '12-node LangGraph sequential+parallel pipeline. Technical defensibility.' },
-  { id: 'four_moments', label: 'Four Moments', kind: 'pitch', detail: 'Graph + Predict + Audit + Outcome loop. The locked positioning narrative.' },
-  { id: 'kodak_hook', label: 'Kodak Hook', kind: 'pitch', detail: 'Opening line: "$31B mistake. We would have caught it."' },
-  { id: 'linkedin', label: 'LinkedIn', kind: 'channel', detail: 'LinkedIn content engine. Daily bias case studies. Brand memory engine.' },
-  { id: 'advisor', label: 'Advisors', kind: 'channel', detail: 'Advisor network. Warm intros via Wiz advisor. Highest-conversion channel.' },
-  { id: 'proof_page', label: '/proof', kind: 'channel', detail: '/proof marketing page. Live proof of bias detection on real historical memos.' },
+  {
+    id: 'core',
+    label: 'Decision Intel',
+    kind: 'core',
+    detail: 'The decision intelligence platform for corporate strategy teams.',
+  },
+  {
+    id: 'category',
+    label: 'Category',
+    kind: 'category',
+    detail:
+      'Decision intelligence — a new category we are seeding. Adjacent to decision management, orthogonal to BI and consulting.',
+  },
+  {
+    id: 'cso',
+    label: 'CSO',
+    kind: 'buyer',
+    detail:
+      'Primary buyer. Signs the contract. Cares about board credibility quarter after quarter.',
+  },
+  {
+    id: 'mna',
+    label: 'M&A Head',
+    kind: 'buyer',
+    detail: 'Secondary buyer. Uses the product for deal-thesis red-teaming.',
+  },
+  {
+    id: 'bias',
+    label: 'Memo Bias',
+    kind: 'problem',
+    detail:
+      'Cognitive bias in strategic memos — confirmation, anchoring, sunk cost, etc. 30+ biases taxonomy. Uncaught in most peer review.',
+  },
+  {
+    id: 'tenure',
+    label: 'Short Tenure',
+    kind: 'problem',
+    detail: 'CSO tenure compressed to ~3 years. One bad memo ends careers.',
+  },
+  {
+    id: 'audit',
+    label: '60s Audit',
+    kind: 'capability',
+    detail:
+      'Upload → 12-node pipeline → DQI grade + biases + predicted questions. The core demo flow.',
+  },
+  {
+    id: 'dkg',
+    label: 'Knowledge Graph',
+    kind: 'capability',
+    detail:
+      'The Decision Knowledge Graph. Every audit persists. Compounds quarter over quarter. The real moat.',
+  },
+  {
+    id: 'predict',
+    label: 'CEO Qs',
+    kind: 'capability',
+    detail: 'CEO question prediction. Pre-empts the board grilling. 5 role-primed personas.',
+  },
+  {
+    id: 'dqi',
+    label: 'DQI Grade',
+    kind: 'capability',
+    detail: 'DQI A-F grade scale. 85+ A, 70+ B, 55+ C, 40+ D. Buyer-legible in one glance.',
+  },
+  {
+    id: 'cases',
+    label: '135 Cases',
+    kind: 'proof',
+    detail:
+      'Historical case library. Kodak, Blockbuster, Nokia, Theranos, Enron. Every failure traceable to a bias.',
+  },
+  {
+    id: 'taxonomy',
+    label: 'Bias Taxonomy',
+    kind: 'proof',
+    detail: '30+ biases with stable IDs DI-B-001–020 live. Published at /taxonomy.',
+  },
+  {
+    id: 'pipeline',
+    label: 'Pipeline',
+    kind: 'proof',
+    detail: '12-node LangGraph sequential+parallel pipeline. Technical defensibility.',
+  },
+  {
+    id: 'four_moments',
+    label: 'Four Moments',
+    kind: 'pitch',
+    detail: 'Graph + Predict + Audit + Outcome loop. The locked positioning narrative.',
+  },
+  {
+    id: 'kodak_hook',
+    label: 'Kodak Hook',
+    kind: 'pitch',
+    detail: 'Opening line: "$31B mistake. We would have caught it."',
+  },
+  {
+    id: 'linkedin',
+    label: 'LinkedIn',
+    kind: 'channel',
+    detail: 'LinkedIn content engine. Daily bias case studies. Brand memory engine.',
+  },
+  {
+    id: 'advisor',
+    label: 'Advisors',
+    kind: 'channel',
+    detail: 'Advisor network. Warm intros via Wiz advisor. Highest-conversion channel.',
+  },
+  {
+    id: 'proof_page',
+    label: '/proof',
+    kind: 'channel',
+    detail: '/proof marketing page. Live proof of bias detection on real historical memos.',
+  },
 ];
 
 export const POSITIONING_EDGES: PositioningEdge[] = [
@@ -590,7 +752,8 @@ export const POSITIONING_EDGES: PositioningEdge[] = [
 // ─── Boil-the-ocean standard (applied to outreach) ──────────────────────────
 
 export const BOIL_THE_OCEAN_STANDARD = {
-  principle: 'The marginal cost of completeness is near zero with AI. Do the whole thing. Do it right.',
+  principle:
+    'The marginal cost of completeness is near zero with AI. Do the whole thing. Do it right.',
   appliedToOutreach: [
     'Never send a cold email without a specific company failure pattern referenced — "I watched your Q3 earnings call segment on the XYZ pivot. The pre-decision memo for that bet probably had 3 biases we would have flagged. Want to see?"',
     'Never offer to "circle back" when the permanent follow-up is within reach.',

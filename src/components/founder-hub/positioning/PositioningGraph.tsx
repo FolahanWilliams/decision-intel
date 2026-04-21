@@ -71,7 +71,9 @@ function computeLayout(): PositionedNode[] {
     const spread = Math.min(36, 12 * nodes.length);
     nodes.forEach((n, i) => {
       const offset =
-        nodes.length === 1 ? 0 : (i - (nodes.length - 1) / 2) * (spread / Math.max(1, nodes.length - 1));
+        nodes.length === 1
+          ? 0
+          : (i - (nodes.length - 1) / 2) * (spread / Math.max(1, nodes.length - 1));
       const angle = ((start + offset - 90) * Math.PI) / 180;
       positioned.push({
         ...n,
@@ -292,4 +294,3 @@ export function PositioningGraph() {
     </div>
   );
 }
-

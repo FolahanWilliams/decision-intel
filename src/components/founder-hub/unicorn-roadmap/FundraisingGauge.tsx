@@ -8,10 +8,7 @@ import { usePersistedChecks } from './use-persisted-checks';
 
 const STORAGE_KEY = 'di-unicorn-roadmap-readiness';
 
-const AREA_META: Record<
-  ReadinessCheck['area'],
-  { color: string; label: string }
-> = {
+const AREA_META: Record<ReadinessCheck['area'], { color: string; label: string }> = {
   traction: { color: '#16A34A', label: 'Traction' },
   product: { color: '#7C3AED', label: 'Product' },
   team: { color: '#DB2777', label: 'Team' },
@@ -100,10 +97,26 @@ export function FundraisingGauge() {
                 >
                   {area.label}
                 </span>
-                <span style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.35, textDecoration: isDone ? 'line-through' : 'none', opacity: isDone ? 0.7 : 1 }}>
+                <span
+                  style={{
+                    fontSize: 13.5,
+                    fontWeight: 600,
+                    color: 'var(--text-primary)',
+                    lineHeight: 1.35,
+                    textDecoration: isDone ? 'line-through' : 'none',
+                    opacity: isDone ? 0.7 : 1,
+                  }}
+                >
                   {r.label}
                 </span>
-                <span style={{ fontSize: 11.5, color: 'var(--text-muted)', lineHeight: 1.45, fontStyle: 'italic' }}>
+                <span
+                  style={{
+                    fontSize: 11.5,
+                    color: 'var(--text-muted)',
+                    lineHeight: 1.45,
+                    fontStyle: 'italic',
+                  }}
+                >
                   {r.required}
                 </span>
               </motion.button>

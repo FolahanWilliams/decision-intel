@@ -75,9 +75,9 @@ Per-org settings:
 
 - `prisma/schema.prisma` — new `UserSession` model + two Organization cols.
 - `src/lib/auth/sessions.ts` — `listActiveSessions(orgId)`, `revokeSession(id,
-  reason)`, `revokeAllForUser(userId, reason)`, `revokeAllForOrg(orgId,
-  reason)`. Uses Supabase admin client for the underlying `auth.admin.
-  signOut()` call, writes AuditLog on every mutation.
+reason)`, `revokeAllForUser(userId, reason)`, `revokeAllForOrg(orgId,
+reason)`. Uses Supabase admin client for the underlying `auth.admin.
+signOut()` call, writes AuditLog on every mutation.
 - `src/middleware.ts` — on each request, touch `UserSession.lastActiveAt`
   and check idle-timeout against the org's `sessionIdleTimeoutMinutes`.
   Expired sessions get auto-revoked with reason `policy_timeout`.
@@ -90,7 +90,7 @@ Per-org settings:
 - `src/app/(platform)/dashboard/team/sessions/page.tsx` — admin view of the
   full org session list with revoke actions.
 - `src/app/(marketing)/security/page.tsx` — surface the idle-timeout range
-  + force-revoke capability.
+  - force-revoke capability.
 
 ## Flow
 

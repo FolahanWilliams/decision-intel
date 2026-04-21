@@ -35,10 +35,7 @@ export async function POST() {
     const existing = await prisma.document.findFirst({
       where: {
         userId: user.id,
-        OR: [
-          { filename: PREFERRED_SAMPLE_FILENAME },
-          { filename: { endsWith: '(SAMPLE).txt' } },
-        ],
+        OR: [{ filename: PREFERRED_SAMPLE_FILENAME }, { filename: { endsWith: '(SAMPLE).txt' } }],
       },
       select: { id: true },
     });
@@ -55,8 +52,7 @@ export async function POST() {
     // fall back to the first available seed rather than 500-ing a CSO who
     // clicks "Audit Your Own Memo" off a LinkedIn link.
     const corpus = getSeedCorpus();
-    const phoenix =
-      corpus.find(e => e.demoId === 'demo-phoenix-expansion') ?? corpus[0];
+    const phoenix = corpus.find(e => e.demoId === 'demo-phoenix-expansion') ?? corpus[0];
     if (!phoenix) {
       log.error('Demo seed corpus is empty — no fallback available');
       return NextResponse.json({ error: 'Sample document not available' }, { status: 500 });

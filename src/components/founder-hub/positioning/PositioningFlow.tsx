@@ -3,11 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, X, AlertTriangle, ArrowRight } from 'lucide-react';
-import {
-  POSITIONING_FLOW,
-  FLOW_CLOSING,
-  type FlowStep,
-} from '@/lib/data/positioning-frameworks';
+import { POSITIONING_FLOW, FLOW_CLOSING, type FlowStep } from '@/lib/data/positioning-frameworks';
 
 const FLAG_COLOR: Record<FlowStep['diFlag'], string> = {
   yes: '#16A34A',

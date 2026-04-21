@@ -68,15 +68,41 @@ export function DualFrameworkAxis() {
           </defs>
 
           {/* Horizontal gradient bar */}
-          <rect x={60} y={VIEW_H / 2 - 3} width={VIEW_W - 120} height={6} rx={3} fill="url(#axis-grad)" />
+          <rect
+            x={60}
+            y={VIEW_H / 2 - 3}
+            width={VIEW_W - 120}
+            height={6}
+            rx={3}
+            fill="url(#axis-grad)"
+          />
 
           {/* Left pole (Kahneman) */}
-          <motion.g initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }}>
+          <motion.g
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4 }}
+          >
             <circle cx={80} cy={VIEW_H / 2} r={34} fill="#0EA5E9" stroke="#fff" strokeWidth={2} />
-            <text x={80} y={VIEW_H / 2 - 6} textAnchor="middle" fontSize={11} fontWeight={800} fill="#fff">
+            <text
+              x={80}
+              y={VIEW_H / 2 - 6}
+              textAnchor="middle"
+              fontSize={11}
+              fontWeight={800}
+              fill="#fff"
+            >
               KAHNEMAN
             </text>
-            <text x={80} y={VIEW_H / 2 + 8} textAnchor="middle" fontSize={9} fontWeight={600} fill="#fff" opacity={0.9}>
+            <text
+              x={80}
+              y={VIEW_H / 2 + 8}
+              textAnchor="middle"
+              fontSize={9}
+              fontWeight={600}
+              fill="#fff"
+              opacity={0.9}
+            >
               1934–2024
             </text>
             <text
@@ -101,9 +127,27 @@ export function DualFrameworkAxis() {
           </motion.g>
 
           {/* Right pole (Klein) */}
-          <motion.g initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4, delay: 0.1 }}>
-            <circle cx={VIEW_W - 80} cy={VIEW_H / 2} r={34} fill="#F59E0B" stroke="#fff" strokeWidth={2} />
-            <text x={VIEW_W - 80} y={VIEW_H / 2 - 6} textAnchor="middle" fontSize={11} fontWeight={800} fill="#fff">
+          <motion.g
+            initial={{ opacity: 0, x: 10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+          >
+            <circle
+              cx={VIEW_W - 80}
+              cy={VIEW_H / 2}
+              r={34}
+              fill="#F59E0B"
+              stroke="#fff"
+              strokeWidth={2}
+            />
+            <text
+              x={VIEW_W - 80}
+              y={VIEW_H / 2 - 6}
+              textAnchor="middle"
+              fontSize={11}
+              fontWeight={800}
+              fill="#fff"
+            >
               KLEIN
             </text>
             <text
@@ -144,7 +188,14 @@ export function DualFrameworkAxis() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4, delay: 0.3 }}
           >
-            <circle cx={VIEW_W / 2} cy={VIEW_H / 2} r={48} fill="#16A34A" stroke="#fff" strokeWidth={3} />
+            <circle
+              cx={VIEW_W / 2}
+              cy={VIEW_H / 2}
+              r={48}
+              fill="#16A34A"
+              stroke="#fff"
+              strokeWidth={3}
+            />
             <text
               x={VIEW_W / 2}
               y={VIEW_H / 2 - 4}
@@ -249,7 +300,9 @@ export function DualFrameworkAxis() {
         >
           {syn.title}
         </div>
-        <div style={{ fontSize: 12, color: 'var(--text-primary)', lineHeight: 1.55 }}>{syn.body}</div>
+        <div style={{ fontSize: 12, color: 'var(--text-primary)', lineHeight: 1.55 }}>
+          {syn.body}
+        </div>
       </div>
     </section>
   );
@@ -292,7 +345,9 @@ function PoleCard({
       >
         {label} · {pole}
       </div>
-      <div style={{ fontSize: 11, color: 'var(--text-muted)', fontStyle: 'italic', marginBottom: 6 }}>
+      <div
+        style={{ fontSize: 11, color: 'var(--text-muted)', fontStyle: 'italic', marginBottom: 6 }}
+      >
         {book}
       </div>
       <div
@@ -317,7 +372,16 @@ function PoleCard({
       >
         In Decision Intel
       </div>
-      <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <ul
+        style={{
+          margin: 0,
+          padding: 0,
+          listStyle: 'none',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 4,
+        }}
+      >
         {items.map(item => (
           <li
             key={item}

@@ -89,8 +89,8 @@ const MOMENTS: MomentDef[] = [
     body: (
       <>
         See how removing a bias or reframing an assumption lifts the Decision Quality Index &mdash;
-        before you make the call. We surface the one change that actually moves the number, not
-        the one that sounds best in the room.
+        before you make the call. We surface the one change that actually moves the number, not the
+        one that sounds best in the room.
       </>
     ),
     Viz: DqiGaugeViz,
@@ -105,8 +105,8 @@ const MOMENTS: MomentDef[] = [
         When the real-world outcome lands, Decision Intel closes the loop &mdash; measuring how
         close your call came to reality, recalibrating the Decision Quality Index, and feeding the
         lesson back into the Knowledge Graph. The judgment that made yesterday&rsquo;s call{' '}
-        <em style={{ color: C.green, fontStyle: 'italic', fontWeight: 700 }}>compounds</em> into
-        the one you make today.
+        <em style={{ color: C.green, fontStyle: 'italic', fontWeight: 700 }}>compounds</em> into the
+        one you make today.
       </>
     ),
     Viz: OutcomeLoopViz,

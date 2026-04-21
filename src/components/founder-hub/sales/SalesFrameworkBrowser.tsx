@@ -7,7 +7,10 @@ import { CHALLENGER, MEDDPICC, SPIN } from '@/lib/data/sales-toolkit';
 
 type FrameworkKey = 'challenger' | 'meddpicc' | 'spin';
 
-const FRAMEWORK_META: Record<FrameworkKey, { label: string; color: string; icon: React.ReactNode; subtitle: string }> = {
+const FRAMEWORK_META: Record<
+  FrameworkKey,
+  { label: string; color: string; icon: React.ReactNode; subtitle: string }
+> = {
   challenger: {
     label: 'Challenger Sale',
     color: '#0EA5E9',

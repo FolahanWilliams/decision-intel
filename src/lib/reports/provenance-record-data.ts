@@ -124,8 +124,7 @@ const CURRENT_MODEL_LINEAGE: ModelLineage = {
     metaJudge: { model: 'gemini-3-flash-preview', temperature: 0.15, topP: 0.95 },
     riskScorer: { model: 'deterministic', temperature: 0.0, topP: 1.0 },
   },
-  note:
-    'Cost-tier routing: preprocessing nodes on Gemini 3.1 Flash Lite, analysis/synthesis nodes on Gemini 3 Flash Preview. Final risk score is deterministic (not LLM-generated).',
+  note: 'Cost-tier routing: preprocessing nodes on Gemini 3.1 Flash Lite, analysis/synthesis nodes on Gemini 3 Flash Preview. Final risk score is deterministic (not LLM-generated).',
 };
 
 // ─── Fallback prompt fingerprint ─────────────────────────────────────
@@ -239,8 +238,7 @@ export async function assembleProvenanceRecordData(
     noiseScore: analysis.noiseScore,
     distribution: noiseBenchmarks ? { benchmarks: noiseBenchmarks } : undefined,
     metaVerdict: analysis.metaVerdict ?? null,
-    note:
-      'Summary view of judge variance. Per-judge granular outputs are stored in the internal audit log and available on request under the DPA; they are deliberately excluded from the client-facing record to protect prompt internals.',
+    note: 'Summary view of judge variance. Per-judge granular outputs are stored in the internal audit log and available on request under the DPA; they are deliberately excluded from the client-facing record to protect prompt internals.',
   };
 
   return {
@@ -269,7 +267,5 @@ export async function assembleProvenanceRecordData(
 }
 
 function formatBiasLabel(biasType: string): string {
-  return biasType
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase());
+  return biasType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }

@@ -68,7 +68,9 @@ function Section({ icon, title, subtitle, accent, children }: SectionProps) {
           >
             {title}
           </div>
-          <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>{subtitle}</div>
+          <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
+            {subtitle}
+          </div>
         </div>
       </div>
       {children}
@@ -126,8 +128,9 @@ export function OutreachCommandCenterTab({ founderPass }: Props) {
             maxWidth: 720,
           }}
         >
-          Six operational surfaces pulled from your discovery map, outreach templates, POC playbook, and traction plan.
-          Everything persists in your browser — use this during live calls, not as reading material.
+          Six operational surfaces pulled from your discovery map, outreach templates, POC playbook,
+          and traction plan. Everything persists in your browser — use this during live calls, not
+          as reading material.
         </p>
       </div>
 
@@ -259,12 +262,18 @@ export function OutreachCommandCenterTab({ founderPass }: Props) {
           </div>
           <div style={{ minWidth: 0 }}>
             <div
-              style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.2 }}
+              style={{
+                fontSize: 15,
+                fontWeight: 700,
+                color: 'var(--text-primary)',
+                lineHeight: 1.2,
+              }}
             >
               Top 10 fixes — Framework Audit
             </div>
             <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
-              The prioritized punch list from your 7-framework audit. Apply these before every document revision.
+              The prioritized punch list from your 7-framework audit. Apply these before every
+              document revision.
             </div>
           </div>
         </div>

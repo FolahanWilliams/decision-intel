@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (!contentData || !contentData.text) {
-        throw new Error("Could not extract text.");
+        throw new Error('Could not extract text.');
       }
 
       completeStep(0);
@@ -88,7 +88,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
       let result;
       try {
-        result = await analyzeWithExtensionApi(apiBaseUrl, apiKey, extensionUserId, contentData, tab);
+        result = await analyzeWithExtensionApi(
+          apiBaseUrl,
+          apiKey,
+          extensionUserId,
+          contentData,
+          tab
+        );
         completeStep(1);
       } catch {
         // Fall back to streaming endpoint
@@ -108,12 +114,13 @@ document.addEventListener('DOMContentLoaded', () => {
       renderResults(result, apiBaseUrl);
       setView('results');
 
-      chrome.tabs.sendMessage(tab.id, {
-        action: 'annotate',
-        biases: result.biases || [],
-        overallScore: result.overallScore,
-      }).catch(() => {});
-
+      chrome.tabs
+        .sendMessage(tab.id, {
+          action: 'annotate',
+          biases: result.biases || [],
+          overallScore: result.overallScore,
+        })
+        .catch(() => {});
     } catch (err) {
       console.error(err);
       errorMsg.textContent = err.message || 'Failed to analyze page.';
@@ -150,7 +157,11 @@ document.addEventListener('DOMContentLoaded', () => {
   async function analyzeWithStreaming(apiBaseUrl, apiKey, extensionUserId, contentData) {
     const response = await fetch(apiBaseUrl + '/api/analyze/stream', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-extension-key': apiKey, 'x-extension-user-id': extensionUserId },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-extension-key': apiKey,
+        'x-extension-user-id': extensionUserId,
+      },
       body: JSON.stringify({
         text: contentData.text,
         filename: contentData.title || 'Web Page',
@@ -178,9 +189,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!line) continue;
         let data;
         if (line.startsWith('data: ')) {
-          try { data = JSON.parse(line.slice(6)); } catch { continue; }
+          try {
+            data = JSON.parse(line.slice(6));
+          } catch {
+            continue;
+          }
         } else if (line.startsWith('{')) {
-          try { data = JSON.parse(line); } catch { continue; }
+          try {
+            data = JSON.parse(line);
+          } catch {
+            continue;
+          }
         }
         if (!data) continue;
         if (data.type === 'step') handleStreamStep(data);
@@ -195,14 +214,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function handleStreamStep(data) {
-    pipelineSteps.querySelectorAll('.pipeline-step.running').forEach((el) => {
+    pipelineSteps.querySelectorAll('.pipeline-step.running').forEach(el => {
       el.classList.remove('running');
       el.classList.add('complete');
       const icon = el.querySelector('.step-icon');
       if (icon) {
         icon.classList.remove('running');
         icon.classList.add('complete');
-        icon.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+        icon.innerHTML =
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
       }
     });
     if (data.status === 'running') addStep(data.step, data.description || '', 'running');
@@ -212,7 +232,11 @@ document.addEventListener('DOMContentLoaded', () => {
   async function analyzeStandard(apiBaseUrl, apiKey, extensionUserId, contentData) {
     const response = await fetch(apiBaseUrl + '/api/analyze', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-extension-key': apiKey, 'x-extension-user-id': extensionUserId },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-extension-key': apiKey,
+        'x-extension-user-id': extensionUserId,
+      },
       body: JSON.stringify({
         text: contentData.text,
         filename: contentData.title || 'Web Page',
@@ -228,13 +252,19 @@ document.addEventListener('DOMContentLoaded', () => {
   function addStep(label, description, status) {
     const step = document.createElement('div');
     step.className = 'pipeline-step ' + status;
-    const iconSvg = status === 'running'
-      ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>'
-      : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+    const iconSvg =
+      status === 'running'
+        ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>'
+        : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
     step.innerHTML =
-      '<div class="step-icon ' + status + '">' + iconSvg + '</div>' +
-      '<div class="step-label">' + label +
-        (description ? '<span class="step-desc">' + description + '</span>' : '') +
+      '<div class="step-icon ' +
+      status +
+      '">' +
+      iconSvg +
+      '</div>' +
+      '<div class="step-label">' +
+      label +
+      (description ? '<span class="step-desc">' + description + '</span>' : '') +
       '</div>';
     pipelineSteps.appendChild(step);
     const allSteps = pipelineSteps.querySelectorAll('.pipeline-step');
@@ -250,7 +280,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (icon) {
         icon.classList.remove('running');
         icon.classList.add('complete');
-        icon.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+        icon.innerHTML =
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
       }
     }
   }
@@ -291,16 +322,24 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!data.biases || data.biases.length === 0) {
       list.innerHTML = '<li class="bias-empty">No significant biases detected.</li>';
     } else {
-      data.biases.forEach((bias) => {
+      data.biases.forEach(bias => {
         const sev = (bias.severity || 'medium').toLowerCase();
         const li = document.createElement('li');
         li.className = 'bias-item';
 
         let html =
           '<div class="bias-item-header">' +
-            '<div class="bias-severity-dot ' + sev + '"></div>' +
-            '<div class="bias-info"><span class="bias-name">' + escapeHtml(bias.biasType) + '</span></div>' +
-            '<span class="bias-severity-label ' + sev + '">' + sev + '</span>' +
+          '<div class="bias-severity-dot ' +
+          sev +
+          '"></div>' +
+          '<div class="bias-info"><span class="bias-name">' +
+          escapeHtml(bias.biasType) +
+          '</span></div>' +
+          '<span class="bias-severity-label ' +
+          sev +
+          '">' +
+          sev +
+          '</span>' +
           '</div>';
 
         if (bias.excerpt) {
@@ -323,7 +362,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (data.factCheckResult) {
       fcSection.classList.remove('hidden');
       document.getElementById('fc-verified').textContent = data.factCheckResult.verifiedCount || 0;
-      document.getElementById('fc-contradicted').textContent = data.factCheckResult.contradictedCount || 0;
+      document.getElementById('fc-contradicted').textContent =
+        data.factCheckResult.contradictedCount || 0;
     } else {
       fcSection.classList.add('hidden');
     }
@@ -337,7 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ─── Utils ───────────────────────────────────────────────────────────────
 
   function setView(viewName) {
-    [initialView, loadingView, resultsView, errorView].forEach((el) => el.classList.add('hidden'));
+    [initialView, loadingView, resultsView, errorView].forEach(el => el.classList.add('hidden'));
     if (viewName === 'initial') initialView.classList.remove('hidden');
     if (viewName === 'loading') loadingView.classList.remove('hidden');
     if (viewName === 'results') resultsView.classList.remove('hidden');
@@ -349,18 +389,22 @@ document.addEventListener('DOMContentLoaded', () => {
       pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdf.worker.min.js';
       const response = await fetch(url);
       const arrayBuffer = await response.arrayBuffer();
-      const pdfDocument = await (pdfjsLib.getDocument({ data: arrayBuffer })).promise;
+      const pdfDocument = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
       let fullText = '';
       for (let pageNum = 1; pageNum <= pdfDocument.numPages; pageNum++) {
         const page = await pdfDocument.getPage(pageNum);
         const textContent = await page.getTextContent();
-        fullText += textContent.items.map((item) => item.str).join(' ') + '\n\n';
+        fullText += textContent.items.map(item => item.str).join(' ') + '\n\n';
       }
       let filename = url.split('/').pop() || 'Document.pdf';
-      try { filename = decodeURIComponent(filename); } catch (e) { void e; }
+      try {
+        filename = decodeURIComponent(filename);
+      } catch (e) {
+        void e;
+      }
       return { title: filename, text: fullText.trim(), fileType: 'pdf' };
     } catch (e) {
-      throw new Error("PDF Parsing failed.");
+      throw new Error('PDF Parsing failed.');
     }
   }
 

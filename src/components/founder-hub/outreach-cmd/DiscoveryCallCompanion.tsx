@@ -47,7 +47,10 @@ export function DiscoveryCallCompanion() {
     }
   };
 
-  const active = useMemo<DiscoveryCall | null>(() => calls.find(c => c.id === activeId) ?? null, [calls, activeId]);
+  const active = useMemo<DiscoveryCall | null>(
+    () => calls.find(c => c.id === activeId) ?? null,
+    [calls, activeId]
+  );
 
   const createCall = () => {
     if (!company.trim() || !contactName.trim()) return;
@@ -83,7 +86,9 @@ export function DiscoveryCallCompanion() {
 
   const togglePattern = (pId: PatternId) => {
     if (!active) return;
-    const next = active.patterns.includes(pId) ? active.patterns.filter(p => p !== pId) : [...active.patterns, pId];
+    const next = active.patterns.includes(pId)
+      ? active.patterns.filter(p => p !== pId)
+      : [...active.patterns, pId];
     updateActive({ patterns: next });
   };
 
@@ -174,7 +179,15 @@ export function DiscoveryCallCompanion() {
         >
           Calls logged ({calls.length})
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, maxHeight: 440, overflowY: 'auto' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 4,
+            maxHeight: 440,
+            overflowY: 'auto',
+          }}
+        >
           {calls.length === 0 && (
             <div
               style={{
@@ -249,12 +262,19 @@ export function DiscoveryCallCompanion() {
             }}
           >
             <Phone size={28} style={{ color: 'var(--text-muted)', marginBottom: 10 }} />
-            <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4, color: 'var(--text-primary)' }}>
+            <div
+              style={{
+                fontSize: 14,
+                fontWeight: 600,
+                marginBottom: 4,
+                color: 'var(--text-primary)',
+              }}
+            >
               Pick a call to drive with Goldner&apos;s script.
             </div>
             <div style={{ fontSize: 12, lineHeight: 1.5 }}>
-              Type notes as they talk. Tag patterns the moment they describe one. After 10 calls, the Pattern Validation
-              dashboard surfaces your validated wedge.
+              Type notes as they talk. Tag patterns the moment they describe one. After 10 calls,
+              the Pattern Validation dashboard surfaces your validated wedge.
             </div>
           </div>
         ) : (
@@ -360,7 +380,9 @@ export function DiscoveryCallCompanion() {
                           padding: 10,
                           background: isTagged ? p.color : 'var(--bg-secondary)',
                           color: isTagged ? '#fff' : 'var(--text-primary)',
-                          border: isTagged ? `1.5px solid ${p.color}` : '1px solid var(--border-color)',
+                          border: isTagged
+                            ? `1.5px solid ${p.color}`
+                            : '1px solid var(--border-color)',
                           borderLeft: `3px solid ${p.color}`,
                           borderRadius: 4,
                           cursor: 'pointer',
@@ -380,7 +402,9 @@ export function DiscoveryCallCompanion() {
                         >
                           Pattern {p.id}
                         </div>
-                        <div style={{ fontSize: 12, fontWeight: 700, lineHeight: 1.25 }}>{p.name}</div>
+                        <div style={{ fontSize: 12, fontWeight: 700, lineHeight: 1.25 }}>
+                          {p.name}
+                        </div>
                       </button>
                     );
                   })}

@@ -281,10 +281,7 @@ export function AdminAuditLog() {
       </header>
 
       {/* Filter bar */}
-      <div
-        className="card"
-        style={{ marginBottom: 'var(--spacing-lg)' }}
-      >
+      <div className="card" style={{ marginBottom: 'var(--spacing-lg)' }}>
         <div className="card-body" style={{ padding: '14px 18px' }}>
           <div
             style={{
@@ -376,10 +373,7 @@ export function AdminAuditLog() {
                 background: 'transparent',
                 border: '1px solid var(--border-color)',
                 borderRadius: 'var(--radius-md, 8px)',
-                color:
-                  activeFilterCount === 0
-                    ? 'var(--text-muted)'
-                    : 'var(--text-primary)',
+                color: activeFilterCount === 0 ? 'var(--text-muted)' : 'var(--text-primary)',
                 cursor: activeFilterCount === 0 ? 'default' : 'pointer',
                 whiteSpace: 'nowrap',
                 display: 'inline-flex',
@@ -545,9 +539,7 @@ export function AdminAuditLog() {
                   }}
                 >
                   <td style={cellStyle()}>
-                    <div style={{ color: 'var(--text-primary)' }}>
-                      {formatTime(row.createdAt)}
-                    </div>
+                    <div style={{ color: 'var(--text-primary)' }}>{formatTime(row.createdAt)}</div>
                   </td>
                   <td style={cellStyle()}>
                     <span
@@ -777,7 +769,13 @@ export function AdminAuditLog() {
                 </button>
               </div>
 
-              <DetailRow label="Event ID" value={selected.id} copyable onCopy={copyId} copied={copiedId === selected.id} />
+              <DetailRow
+                label="Event ID"
+                value={selected.id}
+                copyable
+                onCopy={copyId}
+                copied={copiedId === selected.id}
+              />
               <DetailRow label="Resource" value={selected.resource} />
               <DetailRow
                 label="Resource ID"
@@ -795,11 +793,7 @@ export function AdminAuditLog() {
               />
               <DetailRow label="Organisation" value={selected.orgId ?? '—'} />
               <DetailRow label="IP address" value={selected.ipAddress ?? '—'} />
-              <DetailRow
-                label="User agent"
-                value={selected.userAgent ?? '—'}
-                wrap
-              />
+              <DetailRow label="User agent" value={selected.userAgent ?? '—'} wrap />
 
               <div style={{ marginTop: 'var(--spacing-lg)' }}>
                 <div className="section-heading" style={{ marginBottom: 6 }}>
@@ -849,8 +843,7 @@ function FilterChip({ label, onClear }: { label: string; onClear: () => void }) 
         fontSize: 11,
         fontWeight: 600,
         color: 'var(--text-secondary)',
-        fontFamily:
-          'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+        fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
       }}
     >
       {label}
@@ -914,8 +907,7 @@ function DetailRow({
         style={{
           fontSize: 12,
           color: 'var(--text-primary)',
-          fontFamily:
-            'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+          fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
           wordBreak: wrap ? 'break-word' : 'normal',
           display: 'flex',
           alignItems: 'center',
@@ -939,8 +931,7 @@ function DetailRow({
               display: 'inline-flex',
               alignItems: 'center',
               gap: 4,
-              fontFamily:
-                'system-ui, -apple-system, "Segoe UI", sans-serif',
+              fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif',
             }}
           >
             {copied ? 'Copied' : 'Copy'}
@@ -982,8 +973,7 @@ function actorChipStyle(): React.CSSProperties {
     border: '1px solid var(--border-color)',
     borderRadius: 6,
     fontSize: 11,
-    fontFamily:
-      'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+    fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
     color: 'var(--text-secondary)',
     cursor: 'pointer',
     maxWidth: 160,

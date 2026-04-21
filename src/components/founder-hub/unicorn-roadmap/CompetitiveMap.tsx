@@ -34,7 +34,11 @@ export function CompetitiveMap() {
         subtitle="Breadth (narrow tool → infrastructure) × depth (correlation → causal reasoning). Decision Intel alone in the top-right."
       />
       <div style={{ padding: '24px 28px 32px', overflowX: 'auto' }}>
-        <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ maxWidth: 720, minWidth: 540, display: 'block' }}>
+        <svg
+          viewBox={`0 0 ${W} ${H}`}
+          width="100%"
+          style={{ maxWidth: 720, minWidth: 540, display: 'block' }}
+        >
           {/* Grid lines */}
           {[25, 50, 75].map(v => (
             <g key={`grid-${v}`}>
@@ -60,17 +64,56 @@ export function CompetitiveMap() {
           ))}
 
           {/* Axes */}
-          <line x1={pad} y1={H - pad} x2={W - pad} y2={H - pad} stroke="var(--text-muted)" strokeWidth="1" />
-          <line x1={pad} y1={pad} x2={pad} y2={H - pad} stroke="var(--text-muted)" strokeWidth="1" />
+          <line
+            x1={pad}
+            y1={H - pad}
+            x2={W - pad}
+            y2={H - pad}
+            stroke="var(--text-muted)"
+            strokeWidth="1"
+          />
+          <line
+            x1={pad}
+            y1={pad}
+            x2={pad}
+            y2={H - pad}
+            stroke="var(--text-muted)"
+            strokeWidth="1"
+          />
 
           {/* Axis labels */}
-          <text x={W - pad} y={H - pad + 24} fontSize="10.5" fontWeight="800" fill="var(--text-muted)" textAnchor="end" fontFamily="var(--font-mono, monospace)" letterSpacing="0.12em">
+          <text
+            x={W - pad}
+            y={H - pad + 24}
+            fontSize="10.5"
+            fontWeight="800"
+            fill="var(--text-muted)"
+            textAnchor="end"
+            fontFamily="var(--font-mono, monospace)"
+            letterSpacing="0.12em"
+          >
             BREADTH →
           </text>
-          <text x={pad} y={H - pad + 24} fontSize="10.5" fontWeight="600" fill="var(--text-muted)" textAnchor="start" fontFamily="var(--font-mono, monospace)">
+          <text
+            x={pad}
+            y={H - pad + 24}
+            fontSize="10.5"
+            fontWeight="600"
+            fill="var(--text-muted)"
+            textAnchor="start"
+            fontFamily="var(--font-mono, monospace)"
+          >
             narrow tool
           </text>
-          <text x={W - pad} y={H - pad + 40} fontSize="10.5" fontWeight="600" fill="var(--text-muted)" textAnchor="end" fontFamily="var(--font-mono, monospace)">
+          <text
+            x={W - pad}
+            y={H - pad + 40}
+            fontSize="10.5"
+            fontWeight="600"
+            fill="var(--text-muted)"
+            textAnchor="end"
+            fontFamily="var(--font-mono, monospace)"
+          >
             infrastructure
           </text>
 
@@ -85,7 +128,14 @@ export function CompetitiveMap() {
           >
             ↑ DEPTH
           </text>
-          <text x={pad - 42} y={pad + 8} fontSize="10.5" fontWeight="600" fill="var(--text-muted)" fontFamily="var(--font-mono, monospace)">
+          <text
+            x={pad - 42}
+            y={pad + 8}
+            fontSize="10.5"
+            fontWeight="600"
+            fill="var(--text-muted)"
+            fontFamily="var(--font-mono, monospace)"
+          >
             causal
           </text>
           <text

@@ -64,12 +64,12 @@ The extension can analyze PDF files opened in Chrome. For local PDFs (`file://` 
 
 ## API Endpoints
 
-| Endpoint | Method | Rate Limit | Description |
-|---|---|---|---|
-| `/api/extension/quick-score` | POST | 30/hour | Fast bias-only scan |
-| `/api/extension/analyze` | POST | 10/hour | Full analysis pipeline |
-| `/api/analyze/stream` | POST | 5/hour | SSE streaming analysis (fallback) |
-| `/api/analyze` | POST | 5/hour | Standard analysis (fallback) |
+| Endpoint                     | Method | Rate Limit | Description                       |
+| ---------------------------- | ------ | ---------- | --------------------------------- |
+| `/api/extension/quick-score` | POST   | 30/hour    | Fast bias-only scan               |
+| `/api/extension/analyze`     | POST   | 10/hour    | Full analysis pipeline            |
+| `/api/analyze/stream`        | POST   | 5/hour     | SSE streaming analysis (fallback) |
+| `/api/analyze`               | POST   | 5/hour     | Standard analysis (fallback)      |
 
 All endpoints require `x-extension-key` and `x-extension-user-id` headers.
 

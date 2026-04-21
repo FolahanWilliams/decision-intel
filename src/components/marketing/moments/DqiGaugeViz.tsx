@@ -46,7 +46,7 @@ const BANDS = [
 ];
 
 const BASELINE = 62; // C grade
-const WHATIF = 81;   // B grade
+const WHATIF = 81; // B grade
 
 function scoreToAngle(score: number): number {
   return 180 - (score / 100) * 180;
@@ -85,7 +85,7 @@ export function DqiGaugeViz() {
       aria-label="Decision Quality Index gauge — the memo lands at C grade (62); removing one bias lifts it to B grade (81)"
     >
       {/* Gauge backdrop bands */}
-      {BANDS.map((band) => (
+      {BANDS.map(band => (
         <path
           key={band.grade}
           d={arcPath(cx, cy, r, band.from, band.to)}
@@ -99,7 +99,7 @@ export function DqiGaugeViz() {
 
       {/* Grade labels — pushed to r+40 for breathing room from any
           score marker that lands near a band boundary. */}
-      {BANDS.map((band) => {
+      {BANDS.map(band => {
         const midAngle = scoreToAngle((band.from + band.to) / 2);
         const labelPt = polar(cx, cy, r + 40, midAngle);
         return (
@@ -135,7 +135,14 @@ export function DqiGaugeViz() {
           strokeLinecap="round"
           strokeDasharray="4 4"
         />
-        <circle cx={baselinePt.x} cy={baselinePt.y} r="7" fill={C.white} stroke={C.slate500} strokeWidth="2" />
+        <circle
+          cx={baselinePt.x}
+          cy={baselinePt.y}
+          r="7"
+          fill={C.white}
+          stroke={C.slate500}
+          strokeWidth="2"
+        />
       </motion.g>
 
       {/* What-if arc segment (baseline → what-if) — the animated "lift" */}
@@ -168,7 +175,14 @@ export function DqiGaugeViz() {
           strokeWidth="3"
           strokeLinecap="round"
         />
-        <circle cx={whatifPt.x} cy={whatifPt.y} r="9" fill={C.green} stroke={C.white} strokeWidth="2" />
+        <circle
+          cx={whatifPt.x}
+          cy={whatifPt.y}
+          r="9"
+          fill={C.green}
+          stroke={C.white}
+          strokeWidth="2"
+        />
       </motion.g>
 
       {/* Center hub */}

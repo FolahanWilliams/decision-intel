@@ -1,4 +1,5 @@
 # FOUNDER_STATE.md
+
 > Living context document. Claude reads this at session start and updates it at session end.
 > Last updated: 2026-04-11 | Branch: feature/hero-hub-outreach
 
@@ -37,6 +38,7 @@ AI-powered cognitive bias auditing for high-stakes decision teams. Users upload 
 ## What's Deployed / What's In-Progress
 
 ### Merged to main (deployed on Vercel)
+
 - Core analysis pipeline (12-node LangGraph, Google Gemini primary + Claude fallback)
 - DQI scoring engine
 - 25+ dashboard routes, 200+ components
@@ -44,6 +46,7 @@ AI-powered cognitive bias auditing for high-stakes decision teams. Users upload 
 - Case studies, taxonomy, compliance frameworks
 
 ### On feature/hero-hub-outreach (not yet PR'd to main)
+
 - **Hero flow** — dwell floor, suspense pause, end-state actions
 - **Hub consolidation** — 17 tabs → 10 tabs with groups
 - **Dynamic LinkedIn outreach** — voice-matched connect/follow-up/meeting messages

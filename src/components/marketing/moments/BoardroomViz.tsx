@@ -38,7 +38,13 @@ const PERSONAS = [
 
 export function BoardroomViz() {
   return (
-    <svg viewBox="0 0 480 340" width="100%" height="100%" role="img" aria-label="AI boardroom — CEO, CFO, board, legal, and division-lead personas each surface objections before the meeting">
+    <svg
+      viewBox="0 0 480 340"
+      width="100%"
+      height="100%"
+      role="img"
+      aria-label="AI boardroom — CEO, CFO, board, legal, and division-lead personas each surface objections before the meeting"
+    >
       {/* Table ellipse */}
       <ellipse
         cx="240"

@@ -70,7 +70,10 @@ export function validateEnv(): EnvValidationResult {
   const adminIdsRaw = process.env.ADMIN_USER_IDS?.trim();
   const demoUserId = process.env.DEMO_USER_ID?.trim();
   if (adminIdsRaw) {
-    const entries = adminIdsRaw.split(',').map(s => s.trim()).filter(Boolean);
+    const entries = adminIdsRaw
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean);
     const invalid = entries.filter(id => !UUID_RE.test(id));
     if (invalid.length > 0) {
       const msg = `ADMIN_USER_IDS contains ${invalid.length} entry/entries that are not valid UUIDs: ${invalid.join(', ')}. Enterprise-plan bypass will not match these.`;

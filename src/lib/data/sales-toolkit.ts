@@ -14,7 +14,7 @@ export const PITCH_REFRAME = {
   offensive: {
     label: 'Offensive (new)',
     pitch:
-      'Swing with confidence. Make bolder strategic bets because you\'ve stress-tested the decision. Decision Intel gives your team permission to be ambitious.',
+      "Swing with confidence. Make bolder strategic bets because you've stress-tested the decision. Decision Intel gives your team permission to be ambitious.",
     attracts: 'Strategy leaders',
     color: '#16A34A',
   },
@@ -217,7 +217,11 @@ export const AUDIENCE_PITCHES: AudiencePitch[] = [
     pitch:
       'LangGraph-based 12-node pipeline with deterministic compound scoring on top of LLM output. 20x20 bias interaction matrix, Bayesian prior integration, Granger-causal temporal inference for our decision knowledge graph. Not a wrapper — we built the scoring math.',
     color: '#0EA5E9',
-    emphasis: ['20x20 bias interaction matrix', 'Granger-causal temporal inference', 'Not a wrapper'],
+    emphasis: [
+      '20x20 bias interaction matrix',
+      'Granger-causal temporal inference',
+      'Not a wrapper',
+    ],
   },
 ];
 
@@ -237,7 +241,7 @@ export const CHALLENGER = {
       number: 1,
       title: 'TEACH',
       description:
-        "Lead with the counterintuitive insight, not the product. Example: \"Kahneman's insurance underwriter study found 55% variance where people expected 10%. Your IC has the same problem and nobody measures it.\" The reframe is the hook.",
+        'Lead with the counterintuitive insight, not the product. Example: "Kahneman\'s insurance underwriter study found 55% variance where people expected 10%. Your IC has the same problem and nobody measures it." The reframe is the hook.',
     },
     {
       number: 2,

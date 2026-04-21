@@ -92,10 +92,10 @@ function renderHero() {
           maxWidth: 760,
         }}
       >
-        Every thinker, framework, and paper that shaped Decision Intel — visualised, searchable,
-        and tied to the specific file or feature in the product. Scroll for the Noise moment (the
-        &ldquo;holy shit&rdquo; stat every sales call opens with), the intellectual constellation, the
-        Kahneman↔Klein synthesis, the 6-link Decision Quality Chain, Strebulaev&rsquo;s 9 VC
+        Every thinker, framework, and paper that shaped Decision Intel — visualised, searchable, and
+        tied to the specific file or feature in the product. Scroll for the Noise moment (the
+        &ldquo;holy shit&rdquo; stat every sales call opens with), the intellectual constellation,
+        the Kahneman↔Klein synthesis, the 6-link Decision Quality Chain, Strebulaev&rsquo;s 9 VC
         principles, and the research library. End with the founder playbook and takeaways.
       </p>
     </div>
@@ -258,10 +258,7 @@ function renderKeyTalkingPoints() {
               gap: 10,
             }}
           >
-            <ChevronRight
-              size={14}
-              style={{ color: '#3B82F6', flexShrink: 0, marginTop: 2 }}
-            />
+            <ChevronRight size={14} style={{ color: '#3B82F6', flexShrink: 0, marginTop: 2 }} />
             <div>
               <span
                 style={{
@@ -375,8 +372,7 @@ function renderConnectingThread() {
     <section
       style={{
         padding: 18,
-        background:
-          'linear-gradient(135deg, rgba(139, 92, 246, 0.10), rgba(22, 163, 74, 0.06))',
+        background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.10), rgba(22, 163, 74, 0.06))',
         border: '1px solid var(--border-color)',
         borderTop: '3px solid #8B5CF6',
         borderRadius: 'var(--radius-lg)',

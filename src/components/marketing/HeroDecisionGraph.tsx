@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { GraphNode } from 'reagraph';
@@ -270,13 +270,14 @@ export function HeroDecisionGraph() {
   const [selectedData, setSelectedData] = useState<NodeData | null>(null);
   // WebGL capability detection — optimistic default so the 3D canvas starts
   // loading immediately on every capable device (99% of CSO-segment traffic).
-  // We only flip to `false` if detection definitively fails on mount, in
-  // which case the SVG fallback takes over. No transient "preparing…" shell.
-  const [webglSupported, setWebglSupported] = useState<boolean>(true);
-
-  useEffect(() => {
-    if (!detectWebGL()) setWebglSupported(false);
-  }, []);
+  // We only flip to `false` if detection definitively fails, in which case
+  // the SVG fallback takes over. The lazy state initializer runs detection
+  // once during first render; during SSR we optimistically return true and
+  // the client-side first render computes the real value. This avoids the
+  // setState-in-effect cascading-render anti-pattern (React 19 rule).
+  const [webglSupported] = useState<boolean>(() =>
+    typeof window !== 'undefined' ? detectWebGL() : true
+  );
 
   const handleNodeSelect = useCallback((node: GraphNode | null) => {
     setSelectedData(node ? (node.data as NodeData) : null);

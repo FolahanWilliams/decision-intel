@@ -28,7 +28,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     chrome.sidePanel
       .open({ windowId: sender.tab?.windowId ?? undefined })
       .then(() => sendResponse({ success: true }))
-      .catch((err) => sendResponse({ success: false, error: err.message }));
+      .catch(err => sendResponse({ success: false, error: err.message }));
     return true; // async response
   }
 });

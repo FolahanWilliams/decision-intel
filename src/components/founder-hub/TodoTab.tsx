@@ -14,7 +14,16 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Pin, PinOff, Trash2, CheckCircle2, Circle, Plus, Loader2, CalendarDays } from 'lucide-react';
+import {
+  Pin,
+  PinOff,
+  Trash2,
+  CheckCircle2,
+  Circle,
+  Plus,
+  Loader2,
+  CalendarDays,
+} from 'lucide-react';
 import { card, sectionTitle } from './shared-styles';
 
 interface FounderTodo {
@@ -149,8 +158,8 @@ export function TodoTab({ founderPass }: TodoTabProps) {
           To-do
         </div>
         <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: '0 0 16px' }}>
-          Plain task list. Pinned tasks stay at the top. Deliberately short — the Unicorn
-          Roadmap and Forecast tabs hold the structured stuff.
+          Plain task list. Pinned tasks stay at the top. Deliberately short — the Unicorn Roadmap
+          and Forecast tabs hold the structured stuff.
         </p>
 
         {/* Add form */}
@@ -316,9 +325,12 @@ function TodoRow({
   onTogglePin: () => void;
   onDelete: () => void;
 }) {
+  // Pin "now" to a stable value captured at mount. Using Date.now() during
+  // render would be impure (React 19 rules-of-hooks flag); for a to-do row
+  // the 1-day past-due threshold is robust to a mount-time reference.
+  const [now] = useState(() => Date.now());
   const dueDate = todo.dueDate ? new Date(todo.dueDate) : null;
-  const isPastDue =
-    !todo.done && dueDate && dueDate.getTime() < Date.now() - 24 * 60 * 60 * 1000;
+  const isPastDue = !todo.done && dueDate && dueDate.getTime() < now - 24 * 60 * 60 * 1000;
 
   return (
     <div

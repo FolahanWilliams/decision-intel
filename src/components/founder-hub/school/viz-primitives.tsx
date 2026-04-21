@@ -243,7 +243,11 @@ export function QuadrantsVizRender({ viz, accent }: { viz: QuadrantsViz; accent:
                 borderRadius: 8,
                 borderLeft: `3px solid ${lit ? tone.accent : accent + '44'}`,
                 minHeight: 78,
-                boxShadow: isSel ? `0 0 0 1px ${tone.accent}66` : isHighlight ? `0 0 0 1px ${tone.border}` : 'none',
+                boxShadow: isSel
+                  ? `0 0 0 1px ${tone.accent}66`
+                  : isHighlight
+                    ? `0 0 0 1px ${tone.border}`
+                    : 'none',
                 transition: 'background 0.15s, box-shadow 0.15s',
               }}
             >
@@ -356,13 +360,7 @@ export function FlywheelVizRender({ viz, accent }: { viz: FlywheelViz; accent: s
   );
 }
 
-function FlywheelNodesList({
-  nodes,
-  accent,
-}: {
-  nodes: FlywheelViz['nodes'];
-  accent: string;
-}) {
+function FlywheelNodesList({ nodes, accent }: { nodes: FlywheelViz['nodes']; accent: string }) {
   const [sel, setSel] = useState<number | null>(null);
   const n = nodes.length;
   return (
@@ -403,7 +401,14 @@ function FlywheelNodesList({
                 {node.label}
               </div>
               {node.detail && (
-                <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2, lineHeight: 1.35 }}>
+                <div
+                  style={{
+                    fontSize: 10,
+                    color: 'var(--text-muted)',
+                    marginTop: 2,
+                    lineHeight: 1.35,
+                  }}
+                >
                   {node.detail}
                 </div>
               )}
@@ -452,13 +457,12 @@ export function WeightBarsVizRender({ viz, accent }: { viz: WeightBarsViz; accen
                 marginBottom: 3,
               }}
             >
-              <span
-                style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)' }}
-              >
+              <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)' }}>
                 {bar.label}
               </span>
               <span style={{ fontSize: 11, fontWeight: 700, color: clr }}>
-                {bar.value}{bar.unit ? ` ${bar.unit}` : ''}
+                {bar.value}
+                {bar.unit ? ` ${bar.unit}` : ''}
               </span>
             </div>
             <div
@@ -571,16 +575,13 @@ export function FunnelVizRender({ viz, accent }: { viz: FunnelViz; accent: strin
 
 export function SwimlanesVizRender({ viz, accent }: { viz: SwimlanesViz; accent: string }) {
   const [sel, setSel] = useState<{ lane: 'L' | 'R'; idx: number } | null>(null);
-  const lane = (
-    spec: SwimlanesViz['left'],
-    key: 'L' | 'R',
-  ) => (
+  const lane = (spec: SwimlanesViz['left'], key: 'L' | 'R') => (
     <div
       key={key}
       style={{
         padding: '12px 14px',
         background: 'var(--bg-card)',
-        border: `1px solid ${(spec.accent ?? '#94A3B8')}33`,
+        border: `1px solid ${spec.accent ?? '#94A3B8'}33`,
         borderLeft: `3px solid ${spec.accent ?? '#94A3B8'}`,
         borderRadius: 8,
       }}
@@ -597,7 +598,16 @@ export function SwimlanesVizRender({ viz, accent }: { viz: SwimlanesViz; accent:
       >
         {spec.title}
       </div>
-      <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <ul
+        style={{
+          margin: 0,
+          padding: 0,
+          listStyle: 'none',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 3,
+        }}
+      >
         {spec.points.map((p, i) => {
           const isSel = sel?.lane === key && sel?.idx === i;
           return (
@@ -670,7 +680,10 @@ export function TimelineVizRender({ viz, accent }: { viz: TimelineViz; accent: s
         const lit = e.emphasis || isSel;
         const clickable = !!e.detail;
         return (
-          <div key={i} style={{ position: 'relative', marginBottom: i === viz.events.length - 1 ? 0 : 12 }}>
+          <div
+            key={i}
+            style={{ position: 'relative', marginBottom: i === viz.events.length - 1 ? 0 : 12 }}
+          >
             <div
               style={{
                 position: 'absolute',
@@ -715,7 +728,14 @@ export function TimelineVizRender({ viz, accent }: { viz: TimelineViz; accent: s
                 </span>
               </div>
               {e.detail && (
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4, paddingLeft: 58 }}>
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: 'var(--text-muted)',
+                    lineHeight: 1.4,
+                    paddingLeft: 58,
+                  }}
+                >
                   {e.detail}
                 </div>
               )}
@@ -780,7 +800,14 @@ export function PyramidVizRender({ viz, accent }: { viz: PyramidViz; accent: str
                   {tier.label}
                 </div>
                 {tier.detail && (
-                  <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 1, lineHeight: 1.4 }}>
+                  <div
+                    style={{
+                      fontSize: 10,
+                      color: 'var(--text-muted)',
+                      marginTop: 1,
+                      lineHeight: 1.4,
+                    }}
+                  >
                     {tier.detail}
                   </div>
                 )}
@@ -810,9 +837,7 @@ export function CompoundVizRender({ viz, accent }: { viz: CompoundViz; accent: s
   const [sel, setSel] = useState<number | null>(null);
   const x = (t: number) => pl + ((t - minT) / (maxT - minT || 1)) * iw;
   const y = (v: number) => pt + ih - (v / (maxV || 1)) * ih;
-  const path = viz.points
-    .map((p, i) => `${i === 0 ? 'M' : 'L'}${x(p.t)},${y(p.v)}`)
-    .join(' ');
+  const path = viz.points.map((p, i) => `${i === 0 ? 'M' : 'L'}${x(p.t)},${y(p.v)}`).join(' ');
   const areaPath = `${path} L${x(maxT)},${pt + ih} L${x(minT)},${pt + ih} Z`;
 
   return (
@@ -839,14 +864,8 @@ export function CompoundVizRender({ viz, accent }: { viz: CompoundViz; accent: s
         {viz.points.map((p, i) => {
           const isSel = sel === i;
           return (
-            <g
-              key={i}
-              onClick={() => setSel(isSel ? null : i)}
-              style={{ cursor: 'pointer' }}
-            >
-              {isSel && (
-                <circle cx={x(p.t)} cy={y(p.v)} r={10} fill={accent} opacity={0.15} />
-              )}
+            <g key={i} onClick={() => setSel(isSel ? null : i)} style={{ cursor: 'pointer' }}>
+              {isSel && <circle cx={x(p.t)} cy={y(p.v)} r={10} fill={accent} opacity={0.15} />}
               <circle
                 cx={x(p.t)}
                 cy={y(p.v)}
@@ -855,12 +874,7 @@ export function CompoundVizRender({ viz, accent }: { viz: CompoundViz; accent: s
                 stroke="#fff"
                 strokeWidth={1.5}
               />
-              <circle
-                cx={x(p.t)}
-                cy={y(p.v)}
-                r={14}
-                fill="transparent"
-              />
+              <circle cx={x(p.t)} cy={y(p.v)} r={14} fill="transparent" />
               {p.note && (
                 <text
                   x={x(p.t)}
@@ -878,7 +892,13 @@ export function CompoundVizRender({ viz, accent }: { viz: CompoundViz; accent: s
         })}
         {/* axes labels */}
         {viz.xLabel && (
-          <text x={pl + iw / 2} y={h - 4} fontSize={10} fill="var(--text-muted)" textAnchor="middle">
+          <text
+            x={pl + iw / 2}
+            y={h - 4}
+            fontSize={10}
+            fill="var(--text-muted)"
+            textAnchor="middle"
+          >
             {viz.xLabel}
           </text>
         )}
@@ -912,13 +932,7 @@ export function CompoundVizRender({ viz, accent }: { viz: CompoundViz; accent: s
 
 // ─── Radial Network ──────────────────────────────────────────────────────────
 
-export function RadialNetworkVizRender({
-  viz,
-  accent,
-}: {
-  viz: RadialNetworkViz;
-  accent: string;
-}) {
+export function RadialNetworkVizRender({ viz, accent }: { viz: RadialNetworkViz; accent: string }) {
   const size = 320;
   const cx = size / 2;
   const cy = size / 2;
@@ -1208,7 +1222,9 @@ export function MatrixVizRender({ viz, accent }: { viz: MatrixViz; accent: strin
   const selCell = sel ? cellAt(sel[0], sel[1]) : null;
   const selLabel = sel ? `${viz.rows[sel[0]]} × ${viz.cols[sel[1]]}` : '';
   const selDetail = selCell?.label
-    ? (selCell.heat >= 2 ? `High-heat cell · ${selCell.label}` : `${selCell.label}`)
+    ? selCell.heat >= 2
+      ? `High-heat cell · ${selCell.label}`
+      : `${selCell.label}`
     : sel
       ? `Heat: ${selCell?.heat ?? 0}/3`
       : '';
@@ -1313,7 +1329,15 @@ export function MatrixVizRender({ viz, accent }: { viz: MatrixViz; accent: strin
 
 function hexToRgba(hex: string, alpha: number) {
   const h = hex.replace('#', '');
-  const bigint = parseInt(h.length === 3 ? h.split('').map(c => c + c).join('') : h, 16);
+  const bigint = parseInt(
+    h.length === 3
+      ? h
+          .split('')
+          .map(c => c + c)
+          .join('')
+      : h,
+    16
+  );
   const r = (bigint >> 16) & 255;
   const g = (bigint >> 8) & 255;
   const b = bigint & 255;

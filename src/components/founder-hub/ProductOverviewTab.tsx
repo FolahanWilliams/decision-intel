@@ -37,7 +37,9 @@ function SectionHeading({
         {icon}
       </div>
       <div style={{ minWidth: 0 }}>
-        <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.2 }}>
+        <div
+          style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.2 }}
+        >
           {title}
         </div>
         <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>{subtitle}</div>
@@ -129,8 +131,7 @@ export function ProductOverviewTab() {
       <section
         style={{
           padding: 18,
-          background:
-            'linear-gradient(135deg, rgba(22,163,74,0.08), rgba(16,185,129,0.04))',
+          background: 'linear-gradient(135deg, rgba(22,163,74,0.08), rgba(16,185,129,0.04))',
           border: '1px solid var(--border-color)',
           borderLeft: '3px solid #16A34A',
           borderRadius: 'var(--radius-lg)',

@@ -121,9 +121,7 @@ export async function POST(request: NextRequest) {
         documentId: documentId || null,
         analysisId: analysisId || null,
         decisionType: validType,
-        biasBriefing: biasBriefing
-          ? (biasBriefing as Prisma.InputJsonValue)
-          : undefined,
+        biasBriefing: biasBriefing ? (biasBriefing as Prisma.InputJsonValue) : undefined,
         participants: {
           create: participantCreates,
         },

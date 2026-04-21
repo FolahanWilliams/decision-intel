@@ -119,15 +119,18 @@ export class DecisionProvenanceRecordGenerator {
     this.drawSectionHeading('INTEGRITY FINGERPRINTS', y);
     y += 10;
 
-    this.drawKvBox([
-      { k: 'Input document hash (SHA-256)', v: formatHashShort(data.inputHash) },
-      { k: 'Prompt version fingerprint (SHA-256)', v: formatHashShort(data.promptFingerprint) },
-      { k: 'Record schema version', v: `v${data.schemaVersion}` },
-      {
-        k: 'Server-side timestamp',
-        v: data.generatedAt.toISOString() + ' (RFC 3161 TSA: deferred to v2)',
-      },
-    ], y);
+    this.drawKvBox(
+      [
+        { k: 'Input document hash (SHA-256)', v: formatHashShort(data.inputHash) },
+        { k: 'Prompt version fingerprint (SHA-256)', v: formatHashShort(data.promptFingerprint) },
+        { k: 'Record schema version', v: `v${data.schemaVersion}` },
+        {
+          k: 'Server-side timestamp',
+          v: data.generatedAt.toISOString() + ' (RFC 3161 TSA: deferred to v2)',
+        },
+      ],
+      y
+    );
     y += 42;
 
     // Audit summary

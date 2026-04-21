@@ -2,10 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  MARKET_DIMENSIONS,
-  type MarketDimension,
-} from '@/lib/data/positioning-copilot';
+import { MARKET_DIMENSIONS, type MarketDimension } from '@/lib/data/positioning-copilot';
 
 export function MarketThesisGrid() {
   const [openId, setOpenId] = useState<string | null>(null);
@@ -61,8 +58,7 @@ function DimensionCard({
   onToggle: () => void;
   isLast: boolean;
 }) {
-  const confColor =
-    dim.confidence >= 80 ? '#16A34A' : dim.confidence >= 60 ? '#F59E0B' : '#EF4444';
+  const confColor = dim.confidence >= 80 ? '#16A34A' : dim.confidence >= 60 ? '#F59E0B' : '#EF4444';
 
   return (
     <button
@@ -70,9 +66,7 @@ function DimensionCard({
       style={{
         textAlign: 'left',
         padding: 12,
-        border: isOpen
-          ? `1px solid ${confColor}`
-          : `1px solid var(--border-color)`,
+        border: isOpen ? `1px solid ${confColor}` : `1px solid var(--border-color)`,
         borderRadius: 'var(--radius-md)',
         background: isLast ? 'var(--text-primary)' : 'var(--bg-card)',
         color: isLast ? 'var(--bg-primary)' : 'var(--text-primary)',

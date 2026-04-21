@@ -102,7 +102,15 @@ const AUDIT_ICON = (color: string) => (
       strokeWidth="1"
     />
     <line x1="-3" y1="-3" x2="3" y2="-3" stroke={color} strokeWidth="0.9" strokeLinecap="round" />
-    <line x1="-3" y1="-0.5" x2="2" y2="-0.5" stroke={color} strokeWidth="0.9" strokeLinecap="round" />
+    <line
+      x1="-3"
+      y1="-0.5"
+      x2="2"
+      y2="-0.5"
+      stroke={color}
+      strokeWidth="0.9"
+      strokeLinecap="round"
+    />
     <path
       d="M -2.5 3 l 1.6 1.6 l 3.4 -3.2"
       stroke={color}
@@ -480,7 +488,8 @@ export function ScrollRevealGraph() {
                     letterSpacing: '-0.015em',
                   }}
                 >
-                  WeWork&rsquo;s S-1 &mdash; 11 pre-decision biases Decision Intel would have flagged.
+                  WeWork&rsquo;s S-1 &mdash; 11 pre-decision biases Decision Intel would have
+                  flagged.
                 </h3>
                 <HeroDecisionGraph />
               </div>

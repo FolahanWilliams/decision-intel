@@ -222,7 +222,14 @@ export function PatternValidationDashboard() {
               >
                 {pattern.name}
               </div>
-              <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 10 }}>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.5,
+                  marginBottom: 10,
+                }}
+              >
                 {pattern.description}
               </div>
 
@@ -251,7 +258,15 @@ export function PatternValidationDashboard() {
                     style={{ height: '100%', background: pattern.color }}
                   />
                 </div>
-                <span style={{ fontSize: 10, fontWeight: 700, color: pattern.color, minWidth: 26, textAlign: 'right' }}>
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    color: pattern.color,
+                    minWidth: 26,
+                    textAlign: 'right',
+                  }}
+                >
                   {count}
                 </span>
               </div>
@@ -311,7 +326,8 @@ export function PatternValidationDashboard() {
                           borderRadius: 3,
                         }}
                       >
-                        <strong style={{ color: 'var(--text-primary)' }}>{call.contactName}</strong> · {call.company}
+                        <strong style={{ color: 'var(--text-primary)' }}>{call.contactName}</strong>{' '}
+                        · {call.company}
                       </div>
                     ))}
                   </div>

@@ -6,10 +6,7 @@ import { AlertTriangle } from 'lucide-react';
 import { PITFALLS, type Pitfall } from './data';
 import { SectionHeader } from './UnicornTimeline';
 
-const SEVERITY_META: Record<
-  Pitfall['severity'],
-  { color: string; label: string }
-> = {
+const SEVERITY_META: Record<Pitfall['severity'], { color: string; label: string }> = {
   critical: { color: '#EF4444', label: 'Critical' },
   high: { color: '#F59E0B', label: 'High' },
   medium: { color: '#3B82F6', label: 'Medium' },

@@ -12,10 +12,10 @@ Branded HTML templates for the Supabase auth emails. These must be **pasted into
 
 ## Template mapping
 
-| File | Supabase template slot | Subject line |
-| --- | --- | --- |
-| [confirm-signup.html](confirm-signup.html) | Confirm signup | Confirm your email address |
-| [reset-password.html](reset-password.html) | Reset Password | Reset your password |
+| File                                       | Supabase template slot | Subject line               |
+| ------------------------------------------ | ---------------------- | -------------------------- |
+| [confirm-signup.html](confirm-signup.html) | Confirm signup         | Confirm your email address |
+| [reset-password.html](reset-password.html) | Reset Password         | Reset your password        |
 
 ## Template variables
 

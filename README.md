@@ -49,13 +49,13 @@ The platform runs documents through an **11-agent analysis pipeline** with deal-
 
 ## Value Proposition
 
-| For                         | Pain Point                                                        | What We Deliver                                                                           |
-| :-------------------------- | :---------------------------------------------------------------- | :---------------------------------------------------------------------------------------- |
-| **Corporate Strategy Teams**| Strategic proposals anchored to initial assumptions, not fundamentals | 20+ cognitive biases detected with exact excerpts and coaching suggestions                |
-| **M&A / Corp Dev Teams**   | Due diligence rubber-stamps thesis instead of stress-testing it    | 11 domain-specific bias overlays, deal-stage analysis from screening to post-close        |
-| **Executive Committees**    | Authority bias and groupthink silence genuine debate               | Blind committee voting, noise measurement across members, decision calibration            |
-| **Post-Merger Integration** | Integration plans tainted by sunk cost and overconfidence         | Executive simulation with custom personas, blind voting, and dissent tracking             |
-| **Portfolio / BizOps Teams**| Disposition effect and sunk cost drive hold/divest decisions      | Outcome tracking, org-specific causal learning, portfolio-wide bias analytics             |
+| For                          | Pain Point                                                            | What We Deliver                                                                    |
+| :--------------------------- | :-------------------------------------------------------------------- | :--------------------------------------------------------------------------------- |
+| **Corporate Strategy Teams** | Strategic proposals anchored to initial assumptions, not fundamentals | 20+ cognitive biases detected with exact excerpts and coaching suggestions         |
+| **M&A / Corp Dev Teams**     | Due diligence rubber-stamps thesis instead of stress-testing it       | 11 domain-specific bias overlays, deal-stage analysis from screening to post-close |
+| **Executive Committees**     | Authority bias and groupthink silence genuine debate                  | Blind committee voting, noise measurement across members, decision calibration     |
+| **Post-Merger Integration**  | Integration plans tainted by sunk cost and overconfidence             | Executive simulation with custom personas, blind voting, and dissent tracking      |
+| **Portfolio / BizOps Teams** | Disposition effect and sunk cost drive hold/divest decisions          | Outcome tracking, org-specific causal learning, portfolio-wide bias analytics      |
 
 **ROI**: A single avoided bad strategic decision saves **millions in value**. The platform pays for itself after one corrected recommendation. Research shows systematic decision hygiene reduces decision variance significantly (Kahneman, _Noise_, 2021).
 
@@ -63,12 +63,12 @@ The platform runs documents through an **11-agent analysis pipeline** with deal-
 
 ## Pricing
 
-| Plan | Price | Best For |
-|:-----|:------|:---------|
-| **Free** | $0 | 4 audits/month — see what the engine flags on any strategic memo |
-| **Professional** | $149/mo ($1,499/yr) | The high-stakes strategist: 15 audits/mo, 30+ biases, Personal Decision History |
-| **Strategy** | $2,499/mo | Corporate strategy teams — unlimited audits, shared Decision Knowledge Graph, Decision Rooms, integrations |
-| **Enterprise** | Custom | Fortune 500 strategy functions with SSO, custom taxonomy, SLA, dedicated support |
+| Plan             | Price               | Best For                                                                                                   |
+| :--------------- | :------------------ | :--------------------------------------------------------------------------------------------------------- |
+| **Free**         | $0                  | 4 audits/month — see what the engine flags on any strategic memo                                           |
+| **Professional** | $149/mo ($1,499/yr) | The high-stakes strategist: 15 audits/mo, 30+ biases, Personal Decision History                            |
+| **Strategy**     | $2,499/mo           | Corporate strategy teams — unlimited audits, shared Decision Knowledge Graph, Decision Rooms, integrations |
+| **Enterprise**   | Custom              | Fortune 500 strategy functions with SSO, custom taxonomy, SLA, dedicated support                           |
 
 All paid plans include a 14-day free trial. No credit card required to start.
 
@@ -76,12 +76,12 @@ All paid plans include a 14-day free trial. No credit card required to start.
 
 One-time deal audit purchases scale with investment size — no subscription required:
 
-| Tier | Deal Size | Price | Includes |
-|:-----|:----------|:------|:---------|
-| **Emerging** | < $10M | $499 | Unlimited analyses for all documents linked to the deal |
-| **Growth** | $10M–$50M | $1,499 | Unlimited analyses for all documents linked to the deal |
-| **Core** | $50M–$200M | $2,999 | Unlimited analyses for all documents linked to the deal |
-| **Flagship** | $200M+ | $4,999 | Unlimited analyses for all documents linked to the deal |
+| Tier         | Deal Size  | Price  | Includes                                                |
+| :----------- | :--------- | :----- | :------------------------------------------------------ |
+| **Emerging** | < $10M     | $499   | Unlimited analyses for all documents linked to the deal |
+| **Growth**   | $10M–$50M  | $1,499 | Unlimited analyses for all documents linked to the deal |
+| **Core**     | $50M–$200M | $2,999 | Unlimited analyses for all documents linked to the deal |
+| **Flagship** | $200M+     | $4,999 | Unlimited analyses for all documents linked to the deal |
 
 **[View full pricing details](https://www.decision-intel.com/#pricing)**
 
@@ -183,14 +183,14 @@ The platform's core differentiator: a deterministic, mathematically rigorous sco
 
 A branded **0-100 composite score** (like FICO for decisions) with letter grades (A-F) computed from 6 weighted dimensions (v2.0.0):
 
-| Component                | Weight | Measures                                                              |
-| :----------------------- | :----- | :-------------------------------------------------------------------- |
-| **Bias Load**            | 28%    | Severity-weighted bias count vs. document complexity                  |
-| **Noise Level**          | 18%    | Inter-judge variance from triple-judge noise measurement              |
-| **Evidence Quality**     | 18%    | Fact-check verification rate and source reliability                   |
-| **Process Maturity**     | 13%    | Prior submitted, outcomes tracked, dissent present, System 1 ratio    |
-| **Compliance Risk**      | 13%    | Regulatory framework violation score                                  |
-| **Historical Alignment** | 10%    | Correlation with 146-case database failure/success patterns           |
+| Component                | Weight | Measures                                                           |
+| :----------------------- | :----- | :----------------------------------------------------------------- |
+| **Bias Load**            | 28%    | Severity-weighted bias count vs. document complexity               |
+| **Noise Level**          | 18%    | Inter-judge variance from triple-judge noise measurement           |
+| **Evidence Quality**     | 18%    | Fact-check verification rate and source reliability                |
+| **Process Maturity**     | 13%    | Prior submitted, outcomes tracked, dissent present, System 1 ratio |
+| **Compliance Risk**      | 13%    | Regulatory framework violation score                               |
+| **Historical Alignment** | 10%    | Correlation with 146-case database failure/success patterns        |
 
 Grades: **A** (80-100), **B** (65-79), **C** (50-64), **D** (35-49), **F** (0-34). Surfaced as an SVG badge on every analysis with component breakdown and top improvement recommendation.
 
@@ -1318,12 +1318,12 @@ Or connect your GitHub repository to Vercel for automatic deployments on push.
 
 Live metrics from the Decision Intel platform:
 
-| Metric | Value |
-|:-------|:------|
-| **Analyses Run** | Updated live — see [/api/public/outcome-stats](https://www.decision-intel.com/api/public/outcome-stats) |
-| **Biases Detected** | Across all strategic documents processed |
-| **Outcomes Tracked** | Deal outcomes linked back to original bias detections |
-| **Detection Accuracy** | Percentage of flagged biases later confirmed by deal outcomes |
+| Metric                 | Value                                                                                                   |
+| :--------------------- | :------------------------------------------------------------------------------------------------------ |
+| **Analyses Run**       | Updated live — see [/api/public/outcome-stats](https://www.decision-intel.com/api/public/outcome-stats) |
+| **Biases Detected**    | Across all strategic documents processed                                                                |
+| **Outcomes Tracked**   | Deal outcomes linked back to original bias detections                                                   |
+| **Detection Accuracy** | Percentage of flagged biases later confirmed by deal outcomes                                           |
 
 These counters are displayed on the [landing page](https://www.decision-intel.com) and powered by the public outcome stats API.
 

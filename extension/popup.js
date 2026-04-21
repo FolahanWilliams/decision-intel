@@ -129,12 +129,13 @@ document.addEventListener('DOMContentLoaded', () => {
       setView('results');
 
       // 6. Auto-annotate the page
-      chrome.tabs.sendMessage(tab.id, {
-        action: 'annotate',
-        biases: result.biases || [],
-        overallScore: result.overallScore,
-      }).catch(() => {});
-
+      chrome.tabs
+        .sendMessage(tab.id, {
+          action: 'annotate',
+          biases: result.biases || [],
+          overallScore: result.overallScore,
+        })
+        .catch(() => {});
     } catch (err) {
       console.error(err);
       errorMsg.textContent = err.message || 'Failed to analyze page.';
@@ -171,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return {
       overallScore: data.score,
       noiseScore: null,
-      biases: (data.biases || []).map((b) => ({
+      biases: (data.biases || []).map(b => ({
         biasType: b.type,
         severity: b.severity,
         excerpt: b.excerpt,
@@ -226,9 +227,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let data;
         if (line.startsWith('data: ')) {
-          try { data = JSON.parse(line.slice(6)); } catch { continue; }
+          try {
+            data = JSON.parse(line.slice(6));
+          } catch {
+            continue;
+          }
         } else if (line.startsWith('{')) {
-          try { data = JSON.parse(line); } catch { continue; }
+          try {
+            data = JSON.parse(line);
+          } catch {
+            continue;
+          }
         }
 
         if (!data) continue;
@@ -252,7 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const existingSteps = pipelineSteps.querySelectorAll('.pipeline-step');
 
     // Mark all previous running steps as complete
-    existingSteps.forEach((el) => {
+    existingSteps.forEach(el => {
       if (el.classList.contains('running')) {
         el.classList.remove('running');
         el.classList.add('complete');
@@ -260,7 +269,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (icon) {
           icon.classList.remove('running');
           icon.classList.add('complete');
-          icon.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+          icon.innerHTML =
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
         }
       }
     });
@@ -313,9 +323,14 @@ document.addEventListener('DOMContentLoaded', () => {
         : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
 
     step.innerHTML =
-      '<div class="step-icon ' + iconClass + '">' + iconSvg + '</div>' +
-      '<div class="step-label">' + label +
-        (description ? '<span class="step-desc">' + description + '</span>' : '') +
+      '<div class="step-icon ' +
+      iconClass +
+      '">' +
+      iconSvg +
+      '</div>' +
+      '<div class="step-label">' +
+      label +
+      (description ? '<span class="step-desc">' + description + '</span>' : '') +
       '</div>';
 
     pipelineSteps.appendChild(step);
@@ -336,7 +351,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (icon) {
         icon.classList.remove('running');
         icon.classList.add('complete');
-        icon.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+        icon.innerHTML =
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
       }
     }
   }
@@ -373,14 +389,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!data.biases || data.biases.length === 0) {
       list.innerHTML = '<li class="bias-empty">No significant biases detected.</li>';
     } else {
-      data.biases.slice(0, 5).forEach((bias) => {
+      data.biases.slice(0, 5).forEach(bias => {
         const sev = (bias.severity || 'medium').toLowerCase();
         const li = document.createElement('li');
         li.className = 'bias-item';
         li.innerHTML =
-          '<div class="bias-severity-dot ' + sev + '"></div>' +
-          '<div class="bias-info"><span class="bias-name">' + escapeHtml(bias.biasType) + '</span></div>' +
-          '<span class="bias-severity-label ' + sev + '">' + sev + '</span>';
+          '<div class="bias-severity-dot ' +
+          sev +
+          '"></div>' +
+          '<div class="bias-info"><span class="bias-name">' +
+          escapeHtml(bias.biasType) +
+          '</span></div>' +
+          '<span class="bias-severity-label ' +
+          sev +
+          '">' +
+          sev +
+          '</span>';
         list.appendChild(li);
       });
     }
@@ -390,7 +414,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (data.factCheckResult) {
       fcSection.classList.remove('hidden');
       document.getElementById('fc-verified').textContent = data.factCheckResult.verifiedCount || 0;
-      document.getElementById('fc-contradicted').textContent = data.factCheckResult.contradictedCount || 0;
+      document.getElementById('fc-contradicted').textContent =
+        data.factCheckResult.contradictedCount || 0;
 
       const noteEl = document.getElementById('fc-note');
       if (data.factCheckResult.score >= 80) {
@@ -420,9 +445,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ─── View Management ─────────────────────────────────────────────────────
 
   function setView(viewName) {
-    [initialView, loadingView, resultsView, errorView].forEach((el) =>
-      el.classList.add('hidden')
-    );
+    [initialView, loadingView, resultsView, errorView].forEach(el => el.classList.add('hidden'));
     if (viewName === 'initial') initialView.classList.remove('hidden');
     if (viewName === 'loading') loadingView.classList.remove('hidden');
     if (viewName === 'results') resultsView.classList.remove('hidden');
@@ -443,11 +466,15 @@ document.addEventListener('DOMContentLoaded', () => {
       for (let pageNum = 1; pageNum <= pdfDocument.numPages; pageNum++) {
         const page = await pdfDocument.getPage(pageNum);
         const textContent = await page.getTextContent();
-        fullText += textContent.items.map((item) => item.str).join(' ') + '\n\n';
+        fullText += textContent.items.map(item => item.str).join(' ') + '\n\n';
       }
 
       let filename = url.split('/').pop() || 'Document.pdf';
-      try { filename = decodeURIComponent(filename); } catch (e) { void e; }
+      try {
+        filename = decodeURIComponent(filename);
+      } catch (e) {
+        void e;
+      }
 
       return { title: filename, text: fullText.trim(), fileType: 'pdf' };
     } catch (e) {

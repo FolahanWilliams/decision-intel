@@ -1,123 +1,169 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <title>Decision Intel — Settings</title>
-  <style>
-    :root {
-      --bg-primary: #080B12;
-      --liquid-bg: rgba(15, 19, 32, 0.55);
-      --liquid-border: rgba(255, 255, 255, 0.10);
-      --liquid-border-hover: rgba(255, 255, 255, 0.20);
-      --accent-primary: #6366F1;
-      --accent-secondary: #818cf8;
-      --text-primary: #F1F5F9;
-      --text-secondary: #94A3B8;
-      --text-muted: #64748b;
-      --success: #22c55e;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      padding: 20px;
-      max-width: 420px;
-      background: var(--bg-primary);
-      background-image: radial-gradient(ellipse 75% 55% at 12% 8%, rgba(99, 102, 241, 0.12) 0%, transparent 65%);
-      color: var(--text-primary);
-      font-size: 13px;
-    }
-    h2 {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    h2 svg { color: var(--accent-primary); }
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: 600;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--text-muted);
-    }
-    input[type="text"] {
-      width: 100%;
-      padding: 10px 14px;
-      margin-bottom: 16px;
-      background: var(--liquid-bg);
-      border: 1px solid var(--liquid-border);
-      border-radius: 9999px;
-      color: var(--text-primary);
-      font-family: inherit;
-      font-size: 13px;
-      transition: all 0.15s;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-    input[type="text"]:focus {
-      outline: none;
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
-    }
-    input[type="text"]::placeholder { color: var(--text-muted); }
-    button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-      padding: 10px 16px;
-      background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
-      color: #fff;
-      border: 1px solid rgba(99, 102, 241, 0.4);
-      border-radius: 9999px;
-      font-family: inherit;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s;
-      box-shadow: 0 2px 12px rgba(99, 102, 241, 0.35);
-    }
-    button:hover {
-      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
-      transform: translateY(-1px);
-    }
-    #status {
-      margin-top: 12px;
-      text-align: center;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--success);
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    #status.visible { opacity: 1; }
-  </style>
-</head>
-<body>
-  <h2>
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-    Settings
-  </h2>
+  <head>
+    <title>Decision Intel — Settings</title>
+    <style>
+      :root {
+        --bg-primary: #080b12;
+        --liquid-bg: rgba(15, 19, 32, 0.55);
+        --liquid-border: rgba(255, 255, 255, 0.1);
+        --liquid-border-hover: rgba(255, 255, 255, 0.2);
+        --accent-primary: #6366f1;
+        --accent-secondary: #818cf8;
+        --text-primary: #f1f5f9;
+        --text-secondary: #94a3b8;
+        --text-muted: #64748b;
+        --success: #22c55e;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family:
+          'Inter',
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
+        padding: 20px;
+        max-width: 420px;
+        background: var(--bg-primary);
+        background-image: radial-gradient(
+          ellipse 75% 55% at 12% 8%,
+          rgba(99, 102, 241, 0.12) 0%,
+          transparent 65%
+        );
+        color: var(--text-primary);
+        font-size: 13px;
+      }
+      h2 {
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      h2 svg {
+        color: var(--accent-primary);
+      }
+      label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-muted);
+      }
+      input[type='text'] {
+        width: 100%;
+        padding: 10px 14px;
+        margin-bottom: 16px;
+        background: var(--liquid-bg);
+        border: 1px solid var(--liquid-border);
+        border-radius: 9999px;
+        color: var(--text-primary);
+        font-family: inherit;
+        font-size: 13px;
+        transition: all 0.15s;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+      input[type='text']:focus {
+        outline: none;
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+      }
+      input[type='text']::placeholder {
+        color: var(--text-muted);
+      }
+      button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 10px 16px;
+        background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+        color: #fff;
+        border: 1px solid rgba(99, 102, 241, 0.4);
+        border-radius: 9999px;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+        box-shadow: 0 2px 12px rgba(99, 102, 241, 0.35);
+      }
+      button:hover {
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+        transform: translateY(-1px);
+      }
+      #status {
+        margin-top: 12px;
+        text-align: center;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--success);
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      #status.visible {
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="12" cy="12" r="3" />
+        <path
+          d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+        />
+      </svg>
+      Settings
+    </h2>
 
-  <label for="apiKey">Extension API Key</label>
-  <input type="text" id="apiKey" placeholder="Enter your key from the dashboard settings">
+    <label for="apiKey">Extension API Key</label>
+    <input type="text" id="apiKey" placeholder="Enter your key from the dashboard settings" />
 
-  <label for="userId">Extension User ID</label>
-  <input type="text" id="userId" placeholder="your-user-id (alphanumeric, hyphens, underscores)">
+    <label for="userId">Extension User ID</label>
+    <input
+      type="text"
+      id="userId"
+      placeholder="your-user-id (alphanumeric, hyphens, underscores)"
+    />
 
-  <label for="apiUrl">API Base URL</label>
-  <input type="text" id="apiUrl" placeholder="http://localhost:3000">
+    <label for="apiUrl">API Base URL</label>
+    <input type="text" id="apiUrl" placeholder="http://localhost:3000" />
 
-  <button id="save">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-    Save Settings
-  </button>
-  <div id="status">Settings saved successfully.</div>
+    <button id="save">
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+      >
+        <polyline points="20 6 9 17 4 12" />
+      </svg>
+      Save Settings
+    </button>
+    <div id="status">Settings saved successfully.</div>
 
-  <script src="options.js"></script>
-</body>
+    <script src="options.js"></script>
+  </body>
 </html>

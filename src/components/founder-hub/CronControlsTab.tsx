@@ -162,10 +162,9 @@ export function CronControlsTab() {
           Cron controls
         </h2>
         <p style={{ fontSize: 14, color: 'var(--text-secondary, #b4b4bc)', lineHeight: 1.6 }}>
-          Manually fire any scheduled job. Responses show the real status +{' '}
-          JSON body returned by the cron handler, so you can smoke-test
-          delivery paths (LinkedIn email, Drive sync, outcome reminders)
-          without waiting for the scheduled run. Requires{' '}
+          Manually fire any scheduled job. Responses show the real status + JSON body returned by
+          the cron handler, so you can smoke-test delivery paths (LinkedIn email, Drive sync,
+          outcome reminders) without waiting for the scheduled run. Requires{' '}
           <code>ADMIN_EMAILS</code> + <code>CRON_SECRET</code> on Vercel.
         </p>
       </div>
@@ -255,9 +254,7 @@ export function CronControlsTab() {
                       padding: '8px 14px',
                       borderRadius: 8,
                       border: '1px solid rgba(22, 163, 74, 0.3)',
-                      background: running
-                        ? 'rgba(22, 163, 74, 0.08)'
-                        : 'rgba(22, 163, 74, 0.15)',
+                      background: running ? 'rgba(22, 163, 74, 0.08)' : 'rgba(22, 163, 74, 0.15)',
                       color: '#16A34A',
                       fontSize: 12,
                       fontWeight: 700,
@@ -302,9 +299,7 @@ export function CronControlsTab() {
                         fontSize: 12,
                         fontWeight: 600,
                         color:
-                          result.status === 'success'
-                            ? '#16A34A'
-                            : 'var(--severity-high, #DC2626)',
+                          result.status === 'success' ? '#16A34A' : 'var(--severity-high, #DC2626)',
                         marginBottom: 6,
                       }}
                     >
@@ -364,10 +359,8 @@ export function CronControlsTab() {
 
       <div style={{ ...card, background: 'transparent', border: 'none', padding: 0 }}>
         <p style={{ fontSize: 12, color: 'var(--text-muted, #71717a)', lineHeight: 1.6 }}>
-          Job specs mirror the dispatcher at{' '}
-          <code>src/app/api/cron/dispatch/route.ts</code>. Adding or removing
-          a cron there requires updating the <code>JOBS</code> array in this
-          component.
+          Job specs mirror the dispatcher at <code>src/app/api/cron/dispatch/route.ts</code>. Adding
+          or removing a cron there requires updating the <code>JOBS</code> array in this component.
         </p>
       </div>
     </div>

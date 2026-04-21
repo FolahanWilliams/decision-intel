@@ -9,10 +9,7 @@ import { usePersistedChecks } from './use-persisted-checks';
 
 const STORAGE_KEY = 'di-unicorn-roadmap-sprint-checks';
 
-const LANE_META: Record<
-  SprintTask['lane'],
-  { label: string; color: string }
-> = {
+const LANE_META: Record<SprintTask['lane'], { label: string; color: string }> = {
   positioning: { label: 'Positioning', color: '#16A34A' },
   product: { label: 'Product', color: '#7C3AED' },
   pipeline: { label: 'Pipeline', color: '#0EA5E9' },
@@ -61,13 +58,7 @@ export function SprintBoard() {
         <ProgressBar pct={totalPct} />
         <div style={{ marginTop: 18, display: 'grid', gap: 14 }}>
           {weeks.map(([week, tasks]) => (
-            <WeekRow
-              key={week}
-              week={week}
-              tasks={tasks}
-              checks={checks}
-              onToggle={toggle}
-            />
+            <WeekRow key={week} week={week} tasks={tasks} checks={checks} onToggle={toggle} />
           ))}
         </div>
       </div>
@@ -94,8 +85,7 @@ function ProgressBar({ pct }: { pct: number }) {
         style={{
           position: 'absolute',
           inset: 0,
-          background:
-            'linear-gradient(90deg, #16A34A 0%, #22C55E 100%)',
+          background: 'linear-gradient(90deg, #16A34A 0%, #22C55E 100%)',
         }}
       />
     </div>
@@ -152,12 +142,7 @@ function WeekRow({
       </div>
       <div style={{ display: 'grid', gap: 8 }}>
         {tasks.map(t => (
-          <TaskRow
-            key={t.id}
-            task={t}
-            done={!!checks[t.id]}
-            onToggle={() => onToggle(t.id)}
-          />
+          <TaskRow key={t.id} task={t} done={!!checks[t.id]} onToggle={() => onToggle(t.id)} />
         ))}
       </div>
     </div>
@@ -234,7 +219,15 @@ function TaskRow({
           {task.detail}
         </div>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'flex-end', flexShrink: 0 }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 4,
+          alignItems: 'flex-end',
+          flexShrink: 0,
+        }}
+      >
         <span
           style={{
             fontSize: 9.5,

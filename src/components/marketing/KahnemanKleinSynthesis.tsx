@@ -551,14 +551,7 @@ function DualCardComposition() {
         transition={{ duration: 0.55, delay: 0.85, ease: [0.22, 1, 0.36, 1] }}
       >
         <circle cx={pivotX} cy={pivotY} r="34" fill="url(#pivot-glow)" />
-        <circle
-          cx={pivotX}
-          cy={pivotY}
-          r="22"
-          fill={C.white}
-          stroke={C.green}
-          strokeWidth="1.5"
-        />
+        <circle cx={pivotX} cy={pivotY} r="22" fill={C.white} stroke={C.green} strokeWidth="1.5" />
         <circle cx={pivotX} cy={pivotY} r="6" fill={C.green} />
         <motion.circle
           cx={pivotX}

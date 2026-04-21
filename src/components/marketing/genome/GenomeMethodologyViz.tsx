@@ -297,7 +297,12 @@ function MatrixViz({ reduced }: { reduced: boolean }) {
   const size = gridSize * cell + (gridSize - 1) * gap;
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-label="Interaction matrix">
+      <svg
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+        aria-label="Interaction matrix"
+      >
         {cells}
       </svg>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -424,13 +429,7 @@ export function GenomeMethodologyViz() {
     <div style={{ position: 'relative' }}>
       <div className="genome-methodology-grid">
         {steps.map((s, i) => (
-          <Step
-            key={s.title}
-            index={i}
-            title={s.title}
-            descriptor={s.descriptor}
-            reduced={reduced}
-          >
+          <Step key={s.title} index={i} title={s.title} descriptor={s.descriptor} reduced={reduced}>
             {s.viz}
           </Step>
         ))}
@@ -468,8 +467,8 @@ export function GenomeMethodologyViz() {
         </svg>
         <span>
           <strong style={{ color: C.slate700, fontWeight: 600 }}>Outcome loop.</strong> When a
-          decision lands, its result flows back into step 3 — the interaction weights recalibrate
-          on real data, not just the seed set.
+          decision lands, its result flows back into step 3 — the interaction weights recalibrate on
+          real data, not just the seed set.
         </span>
       </div>
 

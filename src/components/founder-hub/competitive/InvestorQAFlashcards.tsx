@@ -18,8 +18,7 @@ export function InvestorQAFlashcards() {
 
   const filtered = filter === 'all' ? INVESTOR_QA : INVESTOR_QA.filter(q => q.topic === filter);
 
-  const active =
-    filtered.find(q => q.id === activeId) ?? filtered[0] ?? INVESTOR_QA[0];
+  const active = filtered.find(q => q.id === activeId) ?? filtered[0] ?? INVESTOR_QA[0];
 
   return (
     <div>

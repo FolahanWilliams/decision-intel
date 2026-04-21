@@ -260,9 +260,7 @@ export function getDocumentContent(doc: {
       });
     } catch (err) {
       log.error('Document decryption failed for a row with encrypted fields', err);
-      throw new Error(
-        'Document decryption failed — possible key rotation or data corruption'
-      );
+      throw new Error('Document decryption failed — possible key rotation or data corruption');
     }
   }
   return doc.content;

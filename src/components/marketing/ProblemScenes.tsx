@@ -40,7 +40,7 @@ const SCENES = [
   {
     num: '02',
     tag: 'Departed judgment',
-    body: "Your head of strategy takes a new role. The reasoning behind the last four bets walks out with her, and the next CSO starts from a blank page.",
+    body: 'Your head of strategy takes a new role. The reasoning behind the last four bets walks out with her, and the next CSO starts from a blank page.',
     Icon: UserMinus,
     accent: C.red,
   },

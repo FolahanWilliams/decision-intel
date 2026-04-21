@@ -78,7 +78,7 @@ model OrgSso {
 2. UI shows the WorkOS-embedded admin portal (iframe or redirect with return
    URL) so the IT admin pastes their IdP metadata.
 3. On WorkOS's `connection.activated` webhook, we upsert `OrgSso.status =
-   'active'` and surface a confirmation in the settings UI.
+'active'` and surface a confirmation in the settings UI.
 4. User logs in at `/login?email=...@acme.com`. Middleware checks if the
    domain has an active SSO connection; if yes, redirect to
    `/api/auth/sso/start?org=<id>` which creates a WorkOS SSO redirect.

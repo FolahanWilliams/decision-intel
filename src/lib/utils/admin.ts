@@ -38,9 +38,7 @@ export async function verifyAdmin(): Promise<{ id: string; email: string } | nul
  */
 export function isAdminUserId(userId: string | null | undefined): boolean {
   if (!userId) return false;
-  const ids = (process.env.ADMIN_USER_IDS?.split(',') || [])
-    .map(id => id.trim())
-    .filter(Boolean);
+  const ids = (process.env.ADMIN_USER_IDS?.split(',') || []).map(id => id.trim()).filter(Boolean);
   if (ids.length === 0) return false;
   return ids.includes(userId);
 }

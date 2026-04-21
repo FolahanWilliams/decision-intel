@@ -241,7 +241,9 @@ async function runCognitiveAudit(decisionId: string, input: HumanDecisionInput, 
     if (schemaDrift) {
       await prisma.humanDecision
         .update({ where: { id: decisionId }, data: { status: 'error' } })
-        .catch(err => log.warn('Failed to mark HumanDecision status=error after schema drift:', err));
+        .catch(err =>
+          log.warn('Failed to mark HumanDecision status=error after schema drift:', err)
+        );
       return;
     }
 
@@ -252,6 +254,8 @@ async function runCognitiveAudit(decisionId: string, input: HumanDecisionInput, 
     log.error(`Cognitive audit failed for journal conversion ${decisionId}:`, error);
     await prisma.humanDecision
       .update({ where: { id: decisionId }, data: { status: 'error' } })
-      .catch(err => log.warn('Failed to mark HumanDecision status=error after audit failure:', err));
+      .catch(err =>
+        log.warn('Failed to mark HumanDecision status=error after audit failure:', err)
+      );
   }
 }

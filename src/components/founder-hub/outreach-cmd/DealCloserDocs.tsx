@@ -63,7 +63,13 @@ export function DealCloserDocs() {
                 transition: 'all 0.12s ease',
               }}
             >
-              <span style={{ color: isActive ? '#fff' : doc.accent, display: 'flex', alignItems: 'center' }}>
+              <span
+                style={{
+                  color: isActive ? '#fff' : doc.accent,
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
                 {DOC_ICON[doc.id] ?? <FileText size={14} />}
               </span>
               {doc.name}
