@@ -177,7 +177,7 @@ src/
 - Always handle schema drift: wrap Prisma queries in try-catch, check for P2021/P2022 error codes.
 - Use `onDelete: Cascade` or `onDelete: SetNull` on all new relations — never leave onDelete unspecified.
 - The `recalibratedDqi` field on Analysis is a nullable JSON field (added April 2026).
-- **Prisma JSON fields need explicit casting.** When writing objects to nullable JSON columns (e.g., `biasBriefing`, `recalibratedDqi`), arrays with inferred types cause `InputJsonValue` errors. Fix: cast with `as unknown as Record<string, unknown>`.
+- **Prisma JSON fields need explicit casting.** When writing objects to nullable JSON columns (e.g., `biasBriefing`, `recalibratedDqi`), inferred types cause `InputJsonValue` errors. Fix: import `{ Prisma } from '@prisma/client'` and cast with `as Prisma.InputJsonValue` (use `Prisma.JsonNull` for explicit null writes). Do NOT use `as unknown as Record<string, unknown>` — `InputJsonValue` is recursive and requires JSON-serializable values, which `Record<string, unknown>` doesn't guarantee.
 
 ### Security
 

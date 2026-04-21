@@ -6,6 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
@@ -121,7 +122,7 @@ export async function POST(request: NextRequest) {
         analysisId: analysisId || null,
         decisionType: validType,
         biasBriefing: biasBriefing
-          ? (biasBriefing as unknown as Record<string, unknown>)
+          ? (biasBriefing as Prisma.InputJsonValue)
           : undefined,
         participants: {
           create: participantCreates,
