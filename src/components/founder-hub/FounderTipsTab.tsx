@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { Compass, Target, Shield, Rocket, Hammer, Wrench, Map } from 'lucide-react';
+import { Compass, Target, Shield, Rocket, Hammer, Wrench, Map, Flag } from 'lucide-react';
 
 /**
  * Founder Tips — personalized strategic principles for the Decision Intel
@@ -338,6 +338,65 @@ const SECTION_ROADMAP: Tip[] = [
   },
 ];
 
+// ─── Section 8 — Fundraise Posture & Founder Discipline (locked 2026-04-23) ──
+
+const SECTION_FUNDRAISE: Tip[] = [
+  {
+    title: 'The "16 hours" principle — turn the age into the thesis',
+    principle:
+      'Do not bury the fact that you shipped 200+ components and 70+ API routes in 16 hours a week while finishing school. Name it. "When I am full-time in San Francisco in 18 months, what do you expect the velocity to be?" That question, asked first, flips the age objection into the diligence item that sells the round.',
+    rationale:
+      'Every pre-seed investor who sees a 16-year-old solo founder is already running the age objection in their head — ignoring it does not make it go away, it just leaves them to resolve it privately with a discount to conviction. Naming it first, with a concrete velocity claim the investor can mentally extrapolate, converts the objection from a silent risk into a public thesis they have to reason against. The math is: 16-hours-a-week velocity × 5x full-time multiplier × 18-month horizon = the fastest-compounding technical founder they have met this year. That is the sentence. Once they are on that side of the argument, the rest of the pitch is downhill.',
+    action:
+      'Rewrite slide 2 of the deck. Replace any soft age framing with a three-line founder card: "16, solo technical founder. Built 200+ components and 70+ API routes in ~16 hours/week alongside secondary school. Moving full-time to San Francisco in 18 months." Then in the voiceover: "The velocity you see was part-time. Project forward." Practice saying it 10 times out loud before the next pitch.',
+  },
+  {
+    title: 'Pick ONE CSO and commit to them for 90 days',
+    principle:
+      'The hit rate on one committed CSO relationship beats the hit rate on 100 cold DMs by more than the inverse ratio. Stop thinking in outreach volume. Start thinking in depth on a single targeted relationship.',
+    rationale:
+      'Solo founders underweight long-horizon 1:1 relationships because they do not produce daily dashboard metrics — no new responses, no new logos, no new numbers move for weeks. But pre-seed design partners are never won from the cold-DM layer; they are won from the "I have been watching you for three months and you showed up every single week" layer. The Wiz advisor network gives you direct access to exactly this kind of long-horizon relationship. Pick one specific CSO — the single most likely to become your first paying design partner — and commit: weekly email with one specific insight from their industry, monthly 30-minute call, quarterly in-person if the geography works. No pitching in weeks 1-6. Just value. The ask comes in week 8 and lands because they already know what you do.',
+    action:
+      'This week: rank every CSO the advisor has introduced or could introduce, score each on (a) likelihood of becoming design partner in 90 days, (b) fit of their industry to your 135-case corpus, (c) role authority to greenlight a $2,499/mo contract unilaterally. Pick the top one. Send email 1 on Friday ("one insight from your industry I think you will find useful"). Calendar the next 12 weekly Fridays. Do not skip.',
+  },
+  {
+    title: 'The advisor is a door, not a verdict',
+    principle:
+      'Use the Wiz advisor for: warm intros, objection rehearsal on the one toughest investor question, final pitch-deck read before send. Do not wait on advisor sign-off to ship product decisions. Advisor round-trips cost 3-5 days of velocity each — too expensive at your cadence.',
+    rationale:
+      'The trap a first-time founder with a senior advisor falls into is treating every advisor call as a gate. "I will wait to ship this until the advisor weighs in on positioning." That sounds like diligence. It is actually displacement — you are outsourcing your own conviction to a proxy. The advisor has seen this pattern before and it is why the second-best thing they can do for you (after warm intros) is push back when you ask them to rule on things that are yours to decide. Use the advisor for the asks only they can fulfill: (1) warm intros to specific named CSOs in their network, (2) objection-handling rehearsal for the single toughest investor question you are dreading, (3) final read on the pitch deck before you send it to the first partner call. Everything else — product, pricing, positioning tweaks, route consolidation, feature kill decisions — you decide yourself, at your own velocity, and the advisor hears about it at the monthly sync.',
+    action:
+      'Write three lists today: (1) the five warm intros you will ask for this month (specific names, with a 2-sentence pitch the advisor can forward verbatim), (2) the one investor question you are most afraid of ("Why will a CSO trust a 16-year-old with their decision process?") and the answer you want to rehearse with the advisor, (3) the one version of the pitch deck you will ask them to read. Send all three as a single batched message. No other advisor asks this quarter.',
+  },
+  {
+    title: 'Stop updating CLAUDE.md and TODO.md so often',
+    principle:
+      "You are averaging a positioning lock per 2 days. That is refactoring-as-anxiety-management — productive-feeling but displaced from the one metric that matters: CSO conversations. Force yourself to go 7 days without touching CLAUDE.md or TODO.md.",
+    rationale:
+      'The most dangerous form of founder productivity is the kind that looks identical to real work while producing zero movement on the pre-revenue milestone. Updating CLAUDE.md with today\'s positioning lock feels productive — it is productive — but the marginal return on the 14th positioning lock in a month is near zero. The marginal return on one CSO conversation is the whole game. The 7-day CLAUDE.md freeze is a forcing function: every time the reflex to update it kicks in, redirect that same 15 minutes to either a cold outbound email, a LinkedIn post, or a follow-up with the committed CSO from Tip 22. If at the end of Day 7 there genuinely is a CLAUDE.md update worth making, you will know it is real, not self-soothing. Most weeks, Day 7 comes and the list is empty — which is itself the lesson.',
+    action:
+      'Today: commit a calendar block called "CLAUDE.md freeze — do not touch until [date + 7]." In that 7-day window, every 15 minutes that would have gone to CLAUDE.md goes to one of three things: CSO cold outbound, one weekly LinkedIn post, or a follow-up to the committed CSO. Log those three numbers at the end of Day 7. If the numbers are zero, the freeze was the easiest part of the problem.',
+  },
+  {
+    title: 'The fundraise is an interview, not a pitch',
+    principle:
+      'The real question a pre-seed investor asks is not "is the product good?" It is "will this founder still be alive in 18 months — emotionally, strategically, geographically?" At 16, solo, moving countries in 18 months, the answer to that question is your actual diligence item. Own it on slide 2, not in the Q&A.',
+    rationale:
+      'Investors do not decide on products; they decide on founders who happen to be working on products. When they look at you, the underwriting worry is not "can this product work" — your code, case studies, and pitch deck already answer that. The worry is: "can this specific founder sustain a 24-month pre-revenue slog, then move continents, then ramp a GTM team, all without the wheels coming off?" Owning that concern on slide 2 — three lines, calmly framed — preempts it from living in their head as a silent discount. "Solo, 16, Lagos → London → SF" is not a list of liabilities. Told correctly, it is a list of assets: (1) discipline no peer has, (2) transcontinental perspective that makes enterprise conversations sharper, (3) 18-month migration that is a built-in forcing function, not a risk. The investor will ask anyway. If you speak first, you own the frame.',
+    action:
+      'Add a "Founder" slide at position 2 of the deck. Three lines, no pictures, no theatrics. Line 1: "Folahan Williams, 16, solo technical founder. Lagos-raised, UK-resident, moving to San Francisco at 18." Line 2: "Shipped Decision Intel part-time while finishing secondary school. Advised by a senior Wiz operator." Line 3: "This arc — one continent per phase — is the thesis, not the risk." Rehearse the voiceover until it lands in 30 seconds flat.',
+  },
+  {
+    title: 'One LinkedIn story per week, deeply edited — not one per day',
+    principle:
+      'The daily-linkedin cron optimizes for volume. Switch the mental model: one weekly post, 800+ words, one case study, personally signed. Less noise, more authority. Pre-seed investors stalk your LinkedIn. Five great posts beat thirty good ones.',
+    rationale:
+      'The daily cron is a compounding engine at low quality; the weekly deeply-edited post is a compounding engine at high authority. Both compound, but they compound different audiences. Daily-linkedin gets you coverage among strangers who scroll past. Weekly long-form gets you depth with the 30 people who will decide whether to fund you, intro you, or hire into you — specifically, corporate strategy leaders and pre-seed investors who value signal over frequency. The cron does not disappear; it becomes input. You let it draft Monday, then spend 2 hours Thursday editing the draft into a post with one case study, one sharp opinion, and one signed footer that says "Folahan Williams, founder, Decision Intel." The one-story-per-week discipline is also cheaper to sustain than daily posting — it survives the week you get sick, the week you have exams, the week you are moving flats. Habits that survive are the only habits that compound.',
+    action:
+      'This week: turn Thursday 19:00-21:00 into the weekly LinkedIn edit block on your calendar, recurring. Each Thursday: pull the cron draft from the daily-linkedin email, pick the single strongest case study, rewrite to 800+ words, add one signed opinion paragraph ("Here is what this means for you if you sit on a corporate board"), publish Friday morning. Do not break the streak. After 8 Fridays you will have a portfolio of depth posts to attach to any cold outbound; that is the moment the advisor intros start converting at 2-3x their current rate.',
+  },
+];
+
 export function FounderTipsTab() {
   return (
     <div>
@@ -354,7 +413,7 @@ export function FounderTipsTab() {
             marginBottom: 0,
           }}
         >
-          Twenty-three principles grounded in your specific position: solo founder, 16, Nigeria,
+          Twenty-nine principles grounded in your specific position: solo founder, 16, Nigeria,
           corporate strategy/M&amp;A wedge, Wiz advisor, ~90% blended gross margins, 199K+ LoC
           already shipped. Re-read when deciding what to build next, what to kill, what to say in a
           pitch, and what to ignore.
@@ -422,6 +481,16 @@ export function FounderTipsTab() {
         </div>
         {SECTION_ROADMAP.map((t, i) => (
           <TipBlock key={t.title} t={t} idx={i + 23} />
+        ))}
+      </div>
+
+      <div style={{ ...card, borderLeft: '3px solid #10b981' }}>
+        <div style={sectionTitle}>
+          <Flag size={18} style={{ color: '#10b981' }} /> Section 8 — Fundraise Posture &amp;
+          Founder Discipline
+        </div>
+        {SECTION_FUNDRAISE.map((t, i) => (
+          <TipBlock key={t.title} t={t} idx={i + 24} />
         ))}
       </div>
     </div>
