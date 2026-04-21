@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { trackEvent } from '@/lib/analytics/track';
 import { HeroCounterfactualTease } from '@/components/marketing/HeroCounterfactualTease';
 import { BookDemoCTA } from '@/components/marketing/BookDemoCTA';
@@ -25,7 +25,6 @@ import {
   Check,
   ShieldCheck,
   Scale,
-  BookOpen,
   GraduationCap,
 } from 'lucide-react';
 
@@ -366,13 +365,15 @@ export default function LandingPage() {
               color: C.slate600,
               lineHeight: 1.6,
               marginBottom: 32,
-              maxWidth: 640,
+              maxWidth: 720,
               marginLeft: 'auto',
               marginRight: 'auto',
             }}
           >
-            Write, audit, and compound every strategic memo in one governed surface. Ready for the
-            next audit, the next regulator, the next board cycle.
+            Every strategic memo runs through a cognitive-bias audit grounded in 30+ biases from
+            Kahneman and Klein, calibrated against 135 historical corporate decisions. Decision
+            Intel scores the reasoning, names the biases the board will catch first, and shows
+            exactly what shifts when you remove them.
           </p>
           <div
             style={{
@@ -1419,12 +1420,14 @@ export default function LandingPage() {
 }
 
 /* ─── HeroCredibilityStrip ──────────────────────────────────────────────
-   Quiet trust signals below the hero CTAs. Everything here is defensible
-   at the procurement bar: R²F is the framework name we coined and own by
-   usage, AI Verify alignment is a real principle-mapping exercise not a
-   certification claim, SOC 2 refers to the infrastructure (Vercel +
-   Supabase) we run on, and the Wiz advisor line is the only founder-
-   origin detail we surface above the fold. No fabricated customer logos. */
+   Single-line rotating ticker of trust signals below the hero CTAs.
+   Each signal is defensible at the procurement bar: R²F is the framework
+   name we coined and own by usage, AI Verify alignment is a real
+   principle-mapping exercise (not a certification claim), and SOC 2
+   refers to the infrastructure stack (Vercel + Supabase). The Wiz
+   advisor line lives on the Founder slide of the pitch deck instead.
+   One visible item at a time, rotates every 4s; reduced-motion readers
+   see the first item without auto-advance. No fabricated customer logos. */
 
 function HeroCredibilityStrip() {
   const items = [
@@ -1436,85 +1439,130 @@ function HeroCredibilityStrip() {
     {
       icon: Scale,
       label: 'Aligned with AI Verify',
-      note: "11 internationally recognised AI governance principles",
+      note: '11 internationally recognised AI governance principles',
     },
     {
       icon: ShieldCheck,
       label: 'SOC 2 Type II infrastructure',
       note: 'Vercel and Supabase. Encryption posture at /security.',
     },
-    {
-      icon: BookOpen,
-      label: 'Advised by senior Wiz operator',
-      note: 'Scaled Wiz from startup to $32B',
-    },
   ];
+  const [idx, setIdx] = useState(0);
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReducedMotion(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  useEffect(() => {
+    if (reducedMotion) return;
+    const t = window.setInterval(() => setIdx(i => (i + 1) % items.length), 4200);
+    return () => window.clearInterval(t);
+  }, [reducedMotion, items.length]);
+
+  const active = items[idx];
+  const ActiveIcon = active.icon;
+
   return (
     <div
       style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-        gap: 18,
         maxWidth: 980,
         marginLeft: 'auto',
         marginRight: 'auto',
-        paddingTop: 28,
+        paddingTop: 24,
         borderTop: `1px solid ${C.slate200}`,
       }}
     >
-      {items.map(item => {
-        const Icon = item.icon;
-        return (
-          <div
-            key={item.label}
+      <div
+        aria-live="polite"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 12,
+          minHeight: 42,
+        }}
+      >
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={active.label}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
             style={{
-              display: 'flex',
-              alignItems: 'flex-start',
+              display: 'inline-flex',
+              alignItems: 'center',
               gap: 10,
-              textAlign: 'left',
+              whiteSpace: 'nowrap',
             }}
           >
-            <div
+            <span
               style={{
-                width: 30,
-                height: 30,
+                width: 26,
+                height: 26,
                 borderRadius: 7,
                 background: 'rgba(22,163,74,0.08)',
-                border: '1px solid rgba(22,163,74,0.2)',
+                border: '1px solid rgba(22,163,74,0.22)',
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
-                marginTop: 2,
               }}
             >
-              <Icon size={14} color={C.green} strokeWidth={2.4} />
-            </div>
-            <div style={{ minWidth: 0 }}>
-              <div
-                style={{
-                  fontSize: 12.5,
-                  fontWeight: 700,
-                  color: C.slate900,
-                  lineHeight: 1.35,
-                }}
-              >
-                {item.label}
-              </div>
-              <div
-                style={{
-                  fontSize: 11.5,
-                  color: C.slate500,
-                  lineHeight: 1.45,
-                  marginTop: 2,
-                }}
-              >
-                {item.note}
-              </div>
-            </div>
-          </div>
-        );
-      })}
+              <ActiveIcon size={13} color={C.green} strokeWidth={2.5} />
+            </span>
+            <span
+              style={{
+                fontSize: 13,
+                fontWeight: 700,
+                color: C.slate900,
+                letterSpacing: '-0.005em',
+              }}
+            >
+              {active.label}
+            </span>
+            <span
+              style={{
+                fontSize: 13,
+                color: C.slate500,
+                fontWeight: 500,
+              }}
+            >
+              &middot; {active.note}
+            </span>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+      {/* Progress dots — reads as a confident ticker, not a static strip. */}
+      <div
+        aria-hidden
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: 6,
+          marginTop: 10,
+        }}
+      >
+        {items.map((it, i) => (
+          <span
+            key={it.label}
+            style={{
+              width: i === idx ? 18 : 5,
+              height: 5,
+              borderRadius: 5,
+              background: i === idx ? C.green : C.slate200,
+              transition: 'width 0.35s, background 0.35s',
+              display: 'inline-block',
+            }}
+          />
+        ))}
+      </div>
     </div>
   );
 }
@@ -1754,6 +1802,77 @@ function SampleAuditCard() {
           >
             +18pp outcome probability
           </div>
+        </div>
+      </div>
+
+      {/* Compound analysis — the causal layer. Reads what the Decision
+          Knowledge Graph has learned about this org's own prior decisions,
+          ties the flagged bias stack to a measured historical failure rate,
+          and quantifies what the counterfactual removes. This is the beat
+          that separates Decision Intel from "LLM wrapper scoring a memo" —
+          the numbers compound over time, they are the org's own data, and
+          they arrive signed as part of the DPR. */}
+      <div
+        style={{
+          margin: '0 22px 20px',
+          padding: '14px 16px',
+          borderRadius: 10,
+          background: 'linear-gradient(135deg, rgba(22,163,74,0.04), rgba(22,163,74,0.08))',
+          border: '1px solid rgba(22,163,74,0.18)',
+          textAlign: 'left',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 6,
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            fontSize: 10.5,
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: C.green,
+          }}
+        >
+          <span
+            style={{
+              width: 5,
+              height: 5,
+              borderRadius: 999,
+              background: C.green,
+              display: 'inline-block',
+            }}
+          />
+          Compound analysis
+          <span
+            style={{
+              fontSize: 10.5,
+              fontWeight: 600,
+              color: C.slate500,
+              letterSpacing: '0.04em',
+              textTransform: 'none',
+            }}
+          >
+            · calibrated against 127 prior decisions in your Knowledge Graph
+          </span>
+        </div>
+        <div
+          style={{
+            fontSize: 13.5,
+            color: C.slate900,
+            lineHeight: 1.55,
+          }}
+        >
+          Memos with this bias stack (
+          <span style={{ fontWeight: 700 }}>overconfidence + anchoring</span>) failed{' '}
+          <span style={{ fontWeight: 800, color: C.green }}>34% more often</span> than your
+          portfolio baseline in M&amp;A and market-entry contexts. Removing overconfidence from the
+          revenue framing narrows the gap to{' '}
+          <span style={{ fontWeight: 800, color: C.green }}>12%</span>, a{' '}
+          <span style={{ fontWeight: 700 }}>$4.1M expected-value swing</span> at this ticket size.
         </div>
       </div>
 
