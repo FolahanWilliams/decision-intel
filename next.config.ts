@@ -124,6 +124,12 @@ export default withSentryConfig(nextConfig, {
 
   widenClientFileUpload: false,
 
+  // Disable source-map upload — the upload step has no wall-clock timeout and
+  // can hang Vercel builds indefinitely when the auth token is slow or bundle
+  // is large. Re-enable once build times are stable and SENTRY_AUTH_TOKEN is
+  // confirmed working on Vercel.
+  sourcemaps: { disable: true },
+
   // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
   // This can increase your server load as well as your hosting bill.
   // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
