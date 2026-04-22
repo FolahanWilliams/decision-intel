@@ -200,10 +200,7 @@ export function hasFeature(plan: PlanType, feature: keyof PlanFeatures): boolean
  * limited vs full access. For simple "is it on?" checks, prefer
  * `hasFeature()`.
  */
-export function getFeatureAccess(
-  plan: PlanType,
-  feature: keyof PlanFeatures
-): boolean | 'limited' {
+export function getFeatureAccess(plan: PlanType, feature: keyof PlanFeatures): boolean | 'limited' {
   return PLANS[plan].features[feature];
 }
 

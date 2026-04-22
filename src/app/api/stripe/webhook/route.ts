@@ -153,11 +153,7 @@ export async function POST(request: NextRequest) {
             : null;
 
         const updatedStatus =
-          sub.status === 'trialing'
-            ? 'trialing'
-            : sub.cancel_at_period_end
-              ? 'canceled'
-              : 'active';
+          sub.status === 'trialing' ? 'trialing' : sub.cancel_at_period_end ? 'canceled' : 'active';
 
         // Use upsert to handle out-of-order delivery: if
         // checkout.session.completed hasn't arrived yet, the subscription
