@@ -198,7 +198,7 @@ src/
 │   └── utils/           # Logger, cache, encryption, rate-limit, etc.
 ├── hooks/               # 20+ custom React hooks
 ├── types/               # TypeScript interfaces
-└── middleware.ts        # CSRF, session management
+└── proxy.ts             # CSRF, session management (Next.js 16 — middleware.ts is deprecated)
 ```
 
 ## Critical Conventions — READ THESE
@@ -243,7 +243,7 @@ src/
 ### Security
 
 - **Always use `safeCompare` from `@/lib/utils/safe-compare`** for secret comparisons. Never write a local implementation — a buggy duplicate was the cause of a critical auth bypass that was fixed.
-- CSRF protection is in middleware.ts. Slack/Stripe/cron paths are exempt.
+- CSRF protection is in `src/proxy.ts` — Next.js 16 renamed `middleware.ts` → `proxy.ts` and the export name is `proxy` (not `middleware`). The file at `middleware.ts` still works but emits a deprecation warning on every build. Slack/Stripe/cron paths are exempt.
 - Document encryption uses AES-256-GCM via `DOCUMENT_ENCRYPTION_KEY`.
 - Slack tokens encrypted with `SLACK_TOKEN_ENCRYPTION_KEY`.
 - **Encryption key rotation** uses a `keyVersion` stamp on every encrypted row (`Document.contentKeyVersion`, `SlackInstallation.botTokenKeyVersion`). New keys are provisioned at `DOCUMENT_ENCRYPTION_KEY_V{N}` / `SLACK_TOKEN_ENCRYPTION_KEY_V{N}`; the active version comes from `*_VERSION` env vars (defaults to highest resolvable). Rotate with `npm run rotate:encryption-key -- --domain document --from 1 --to 2` — batched, idempotent, resumable. Legacy `DOCUMENT_ENCRYPTION_KEY` (un-suffixed) is treated as v1 for back-compat. Full protocol in `src/lib/utils/encryption.ts` header.
@@ -391,7 +391,7 @@ For mechanical checks — type-checking, test runs, build verification, counting
 | Command palette                     | `src/components/ui/CommandPalette.tsx`                                                              |
 | Platform layout                     | `src/app/(platform)/layout.tsx`                                                                     |
 | Prisma schema                       | `prisma/schema.prisma` (1,487 lines, 61 models)                                                     |
-| Middleware (CSRF, sessions)         | `src/middleware.ts`                                                                                 |
+| Middleware (CSRF, sessions)         | `src/proxy.ts` — Next.js 16 renamed `middleware.ts` → `proxy.ts`; export name is `proxy`           |
 | Document detail page                | `src/app/(platform)/documents/[id]/page.tsx`                                                        |
 | Settings page                       | `src/app/(platform)/dashboard/settings/SettingsForm.tsx`                                            |
 | Analytics page                      | `src/app/(platform)/dashboard/analytics/page.tsx`                                                   |
