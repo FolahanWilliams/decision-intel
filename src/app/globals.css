@@ -2711,13 +2711,17 @@ tr:hover td {
 }
 
 @theme inline {
-  --font-heading: var(--font-inter), 'Inter', sans-serif;
-  --font-sans: var(--font-inter), 'Inter', sans-serif;
+  /* Font variables source from @fontsource packages (imported in layout.tsx).
+     No build-time network call — fonts ship as npm deps cached by Vercel. */
+  --font-inter: 'Inter Variable', 'Inter', system-ui, sans-serif;
+  --font-display: 'Instrument Serif', 'Georgia', serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', 'Menlo', monospace;
+  --font-heading: var(--font-inter);
+  --font-sans: var(--font-inter);
   /* Marketing display face — Instrument Serif. Applied to landing + marketing
      H1s and occasional H2s via .marketing-display. Registered 2026-04-23 to
      kill the "default-Inter SaaS template" perception on the landing page. */
-  --font-display-marketing: var(--font-display), 'Instrument Serif', 'Georgia', serif;
-  --font-mono: var(--font-mono), 'JetBrains Mono', monospace;
+  --font-display-marketing: var(--font-display);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);

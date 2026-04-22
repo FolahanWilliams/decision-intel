@@ -1,33 +1,19 @@
 import type { Metadata } from 'next';
-import { Inter, Instrument_Serif, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700', '800'],
-  variable: '--font-inter',
-  display: 'swap',
-});
+// Local font packages — no build-time network dependency on Google Fonts.
+// See the top of globals.css for the @font-face sources. The CSS variables
+// below are kept as-is so every existing class, style, and cn() call that
+// references --font-inter / --font-display / --font-mono continues to work.
+import '@fontsource-variable/inter';
+import '@fontsource/instrument-serif/400.css';
+import '@fontsource/instrument-serif/400-italic.css';
+import '@fontsource-variable/jetbrains-mono';
 
-// Editorial serif used on marketing H1/H2 only. One font, Regular + Italic.
-// Registers as `--font-display` — applied via the .marketing-display utility
-// (see globals.css) or inline `fontFamily: 'var(--font-display)'`. Inter
-// stays the workhorse for body + every platform surface so the app does not
-// shift under users' feet.
-const instrumentSerif = Instrument_Serif({
-  subsets: ['latin'],
-  weight: ['400'],
-  style: ['normal', 'italic'],
-  variable: '--font-display',
-  display: 'swap',
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  weight: ['400', '500', '700'],
-  variable: '--font-mono',
-  display: 'swap',
-});
+// Inter variable covers 100-900. Instrument Serif is 400 regular + italic.
+// JetBrains Mono variable covers 100-800. font-display: swap is set per-
+// @font-face by @fontsource, so no CLS regression vs. next/font/google.
+const fontClass = 'font-sans';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
 
@@ -96,7 +82,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn(inter.variable, instrumentSerif.variable, jetbrainsMono.variable, 'font-sans')}
+      className={cn(fontClass)}
     >
       <body className="antialiased min-h-screen">
         <ThemeProvider
