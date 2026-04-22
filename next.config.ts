@@ -1,5 +1,4 @@
-// DIAGNOSTIC: withSentryConfig import temporarily removed — see bottom of file
-// for the Sentry bypass and the options block to restore when Sentry is re-enabled.
+import { withSentryConfig } from '@sentry/nextjs';
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
@@ -107,29 +106,32 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '10mb',
     },
   },
+  // 2026-04-22: Next.js 16.2.x SWC hits an infinite-loop bug when
+  // processing inline `<style>{`@media ...`}</style>` blocks via the
+  // styled-jsx transform. Our app uses plain <style> tags with static
+  // CSS (no scoped selectors, no dynamic interpolation) — disabling
+  // the styled-jsx compile path bypasses the hang without affecting
+  // runtime behavior. If we ever need scoped styled-jsx, re-enable
+  // and fix the source files instead.
+  compiler: {
+    styledJsx: false,
+  },
 };
 
-// DIAGNOSTIC: Sentry bypass to isolate whether Sentry's webpack plugin
-// is hanging Vercel builds. Local fonts migrated, telemetry disabled,
-// http patch installed — build still hangs at "Creating an optimized
-// production build..." right after the 3 Sentry plugin hooks log. Let's
-// pull Sentry out of the webpack chain entirely and see if the build
-// completes. If yes → pin Sentry plugin version / file upstream issue.
-// Restore original `export default withSentryConfig(nextConfig, {...});`
-// once the diagnosis is complete.
-export default nextConfig;
-
-/* Sentry options preserved verbatim for one-line restore:
-  withSentryConfig(nextConfig, {
-    org: 'decision-intel-bu',
-    project: 'decisionintelsentry',
-    silent: !process.env.CI,
-    telemetry: false,
-    widenClientFileUpload: false,
-    tunnelRoute: '/monitoring',
-    webpack: {
-      automaticVercelMonitors: true,
-      treeshake: { removeDebugLogging: true },
-    },
-  });
-*/
+export default withSentryConfig(nextConfig, {
+  org: 'decision-intel-bu',
+  project: 'decisionintelsentry',
+  // Only print logs for uploading source maps in CI
+  silent: !process.env.CI,
+  // Plugin-level telemetry off — Sentry v10+ uses undici which our Node
+  // http monkey-patch can't intercept; if Sentry's telemetry endpoint is
+  // slow, the build can hang after "Creating an optimized production build".
+  telemetry: false,
+  // Reduce source-map upload scope to speed the build.
+  widenClientFileUpload: false,
+  tunnelRoute: '/monitoring',
+  webpack: {
+    automaticVercelMonitors: true,
+    treeshake: { removeDebugLogging: true },
+  },
+});

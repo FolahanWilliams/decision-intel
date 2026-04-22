@@ -973,19 +973,9 @@ export function PricingPageClient() {
         </div>
       </section>
 
-      {/* Mobile responsive */}
-      <style>{`
-        @media (max-width: 1024px) {
-          .pricing-cards-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
-          }
-        }
-        @media (max-width: 640px) {
-          .pricing-cards-grid {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
+      {/* Mobile responsive — rules moved to globals.css (.pricing-cards-grid).
+          Inline <style> blocks with @media queries trigger a Next.js 16.2 SWC
+          compiler hang — see fix in commit for details. */}
     </div>
   );
 }

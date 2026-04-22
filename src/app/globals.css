@@ -3118,3 +3118,19 @@ tr:hover td {
     animation: none !important;
   }
 }
+
+/* Pricing page responsive grid — moved out of inline <style> in
+   PricingPageClient.tsx after SWC (Next.js 16.2.1–16.2.4) hit an
+   infinite-loop compile bug on inline JSX <style>{`@media…`}</style>
+   blocks. Keep media rules here, never inline. */
+@media (max-width: 1024px) {
+  .pricing-cards-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .pricing-cards-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
