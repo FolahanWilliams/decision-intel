@@ -1,4 +1,5 @@
-import { withSentryConfig } from '@sentry/nextjs';
+// DIAGNOSTIC: withSentryConfig import temporarily removed — see bottom of file
+// for the Sentry bypass and the options block to restore when Sentry is re-enabled.
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
@@ -108,47 +109,27 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSentryConfig(nextConfig, {
-  // For all available options, see:
-  // https://www.npmjs.com/package/@sentry/webpack-plugin#options
+// DIAGNOSTIC: Sentry bypass to isolate whether Sentry's webpack plugin
+// is hanging Vercel builds. Local fonts migrated, telemetry disabled,
+// http patch installed — build still hangs at "Creating an optimized
+// production build..." right after the 3 Sentry plugin hooks log. Let's
+// pull Sentry out of the webpack chain entirely and see if the build
+// completes. If yes → pin Sentry plugin version / file upstream issue.
+// Restore original `export default withSentryConfig(nextConfig, {...});`
+// once the diagnosis is complete.
+export default nextConfig;
 
-  org: 'decision-intel-bu',
-
-  project: 'decisionintelsentry',
-
-  // Only print logs for uploading source maps in CI
-  silent: !process.env.CI,
-
-  // Disable Sentry's plugin telemetry phone-home. Sentry v10+ sends this
-  // via undici, which our `patch-http-timeout.mjs` cannot intercept (it
-  // only wraps Node's built-in http/https). When Sentry's telemetry
-  // endpoint is slow from Vercel's build network, the undici request
-  // hangs indefinitely and Vercel kills the build at 45 min. Turning
-  // this off removes the hang without affecting error reporting.
-  telemetry: false,
-
-  // For all available options, see:
-  // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
-
-  widenClientFileUpload: false,
-
-  // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
-  // This can increase your server load as well as your hosting bill.
-  // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
-  // side errors will fail.
-  tunnelRoute: '/monitoring',
-
-  webpack: {
-    // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
-    // See the following for more information:
-    // https://docs.sentry.io/product/crons/
-    // https://vercel.com/docs/cron-jobs
-    automaticVercelMonitors: true,
-
-    // Tree-shaking options for reducing bundle size
-    treeshake: {
-      // Automatically tree-shake Sentry logger statements to reduce bundle size
-      removeDebugLogging: true,
+/* Sentry options preserved verbatim for one-line restore:
+  withSentryConfig(nextConfig, {
+    org: 'decision-intel-bu',
+    project: 'decisionintelsentry',
+    silent: !process.env.CI,
+    telemetry: false,
+    widenClientFileUpload: false,
+    tunnelRoute: '/monitoring',
+    webpack: {
+      automaticVercelMonitors: true,
+      treeshake: { removeDebugLogging: true },
     },
-  },
-});
+  });
+*/
