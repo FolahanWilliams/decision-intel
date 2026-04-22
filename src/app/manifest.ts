@@ -2,10 +2,10 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Decision Intel — AI Cognitive Bias Detection',
+    name: 'Decision Intel — Reasoning Layer for Boardroom Decisions',
     short_name: 'Decision Intel',
     description:
-      'Detect cognitive bias and decision noise in strategic documents. AI-powered audits for M&A, PE/VC, and investment committees.',
+      'The native reasoning layer for every boardroom strategic decision. Audit every strategic memo, simulate steering-committee objections, and compound your team’s judgment quarter after quarter.',
     start_url: '/',
     display: 'standalone',
     background_color: '#0a0a0a',

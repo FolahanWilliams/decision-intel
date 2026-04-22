@@ -21,9 +21,9 @@ export const metadata: Metadata = {
   },
   keywords: [
     // Category-creator positioning
-    'decision intelligence',
-    'human-AI governance',
-    'causal decision intelligence',
+    'reasoning layer',
+    'decision provenance record',
+    'recognition-rigor framework',
     'strategic decision auditing',
     'decision quality platform',
     // Product identity
@@ -73,7 +73,7 @@ const jsonLd = [
     operatingSystem: 'Web',
     url: siteUrl,
     description:
-      'The human-AI governance system for strategic decisions. Decision Intel audits every board memo, simulates steering-committee objections, runs what-if interventions, and compounds your team’s judgment into a living Decision Knowledge Graph so decision quality, scalability, and reliability improve quarter after quarter.',
+      'The native reasoning layer for every boardroom strategic decision. Decision Intel audits every board memo, simulates steering-committee objections, runs what-if interventions, and compounds your team’s judgment into a living Decision Knowledge Graph so decision quality, scalability, and reliability improve quarter after quarter.',
     featureList: [
       'Decision Knowledge Graph: every strategic call, compounded in one living system',
       'AI boardroom simulation: CEO, CFO, and board objections rehearsed before the meeting',
@@ -141,7 +141,7 @@ const jsonLd = [
     url: siteUrl,
     logo: `${siteUrl}/logo.png`,
     description:
-      'Decision Intel is the human-AI governance system for strategic decisions. Chief Strategy Officers and corporate development teams use Decision Intel to audit every board memo, simulate steering-committee objections, run what-if interventions, and compound their team’s judgment into a living Decision Knowledge Graph.',
+      'Decision Intel is the native reasoning layer for every boardroom strategic decision. Chief Strategy Officers and corporate development teams use Decision Intel to audit every board memo, simulate steering-committee objections, run what-if interventions, and compound their team’s judgment into a living Decision Knowledge Graph.',
     foundingDate: '2024',
     sameAs: ['https://www.linkedin.com/company/decision-intel'],
     contactPoint: {
@@ -185,7 +185,7 @@ const jsonLd = [
         name: 'How is Decision Intel different from ChatGPT or a general AI assistant?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'ChatGPT gives one opinion from one model: ungoverned, untraceable, unaudited. Decision Intel is a governance system. It measures the noise in your reasoning the same way Kahneman did in the insurance underwriter study, simulates an AI boardroom of CEO, CFO, and board personas, runs what-if interventions against a 135-case public reference library, and compounds every confirmed outcome back into a calibrated Decision Quality Index your audit committee can defend. Not a chatbot; a human-AI governance layer.',
+          text: 'ChatGPT gives one opinion from one model: ungoverned, untraceable, unaudited. Decision Intel is the native reasoning layer underneath every boardroom strategic decision. It measures the noise in your reasoning the same way Kahneman did in the insurance underwriter study, simulates an AI boardroom of CEO, CFO, and board personas, runs what-if interventions against a 135-case public reference library, and compounds every confirmed outcome back into a calibrated Decision Quality Index your audit committee can defend. Not a chatbot; a reasoning layer, checkable from memo to outcome.',
         },
       },
     ],

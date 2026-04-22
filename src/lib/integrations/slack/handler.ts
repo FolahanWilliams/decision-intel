@@ -15,6 +15,7 @@
 
 import crypto from 'crypto';
 import { createLogger } from '@/lib/utils/logger';
+import { safeCompare } from '@/lib/utils/safe-compare';
 import { decryptToken } from '@/lib/utils/encryption';
 import { prisma } from '@/lib/prisma';
 import type {
@@ -50,11 +51,7 @@ export function verifySlackSignature(
   hmac.update(sigBaseString);
   const expectedSignature = `v0=${hmac.digest('hex')}`;
 
-  try {
-    return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature));
-  } catch {
-    return false;
-  }
+  return safeCompare(signature, expectedSignature);
 }
 
 // ─── Message Processing ──────────────────────────────────────────────────────
