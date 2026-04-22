@@ -8,11 +8,11 @@
  * "forward all emails matching 'decision' to journal@decision-intel.com"
  */
 
-import crypto from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { toPrismaStringArray } from '@/lib/utils/prisma-json';
 import { createLogger } from '@/lib/utils/logger';
+import { validateBearerToken } from '@/lib/utils/safe-compare';
 import { isSchemaDrift } from '@/lib/utils/error';
 import { isDecisionMessage, extractDecisionFrame } from '@/lib/integrations/slack/handler';
 
@@ -54,22 +54,7 @@ function verifyIngestSecret(request: NextRequest): boolean {
     return false;
   }
 
-  const authHeader = request.headers.get('authorization');
-  if (!authHeader) return false;
-
-  const parts = authHeader.split(' ');
-  if (parts.length !== 2 || parts[0] !== 'Bearer') return false;
-
-  // Constant-time comparison to prevent timing attacks
-  const provided = Buffer.from(parts[1]);
-  const expected = Buffer.from(secret);
-  if (provided.length !== expected.length) return false;
-
-  try {
-    return crypto.timingSafeEqual(provided, expected);
-  } catch {
-    return false;
-  }
+  return validateBearerToken(request.headers.get('authorization'), secret);
 }
 
 /**

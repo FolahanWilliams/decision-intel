@@ -160,11 +160,11 @@ const PROCESSORS = [
     role: 'Authentication and encrypted Postgres hosting (EU region available).',
   },
   {
-    name: 'Google AI (Gemini)',
-    role: 'Analysis model. Processed under no-training terms; input is anonymized first.',
+    name: 'Google AI',
+    role: 'Primary analysis model. Processed under no-training terms; input is anonymized first.',
   },
   {
-    name: 'Anthropic (fallback)',
+    name: 'Anthropic',
     role: 'Fallback analysis when explicitly enabled. Same no-training terms.',
   },
   {

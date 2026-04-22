@@ -405,7 +405,7 @@ export function SimulateCeoClient() {
                 textDecoration: 'none',
               }}
             >
-              Run the full 12-node audit <ArrowRight size={14} />
+              Run the full reasoning audit <ArrowRight size={14} />
             </Link>
           </div>
         )}

@@ -84,7 +84,7 @@ const PRINCIPLES: PrincipleRow[] = [
     name: 'Transparency',
     definition: 'The AI system discloses information about itself to relevant stakeholders.',
     mechanism:
-      'Every audit ships with the SHA-256 fingerprint of the exact prompt version used, plus the model lineage: which Gemini tier ran on which of the 12 pipeline nodes, with temperature and top-p per node. Nothing about the model or the prompt is hidden.',
+      'Every audit ships with the SHA-256 fingerprint of the exact prompt version used, plus full model lineage: which model tier ran on which pipeline stage, with decoding parameters recorded per stage. Nothing about the model or the prompt is hidden.',
     dprFields: ['Prompt fingerprint', 'Model lineage'],
   },
   {
@@ -129,7 +129,7 @@ const PRINCIPLES: PrincipleRow[] = [
     name: 'Robustness',
     definition: 'The AI system remains reliable under perturbation or partial failure.',
     mechanism:
-      'Three-judge noise jury arbitrated by a meta-judge \u2014 individual LLM failures do not cascade. Model routing classifies errors as transient vs permanent and fails over to a second provider (Anthropic Claude) when thresholds are exceeded. Exponential-backoff retries + atomic rate limiting on every call.',
+      'Three-judge noise jury arbitrated by a meta-judge \u2014 individual model failures do not cascade. Model routing classifies errors as transient vs permanent and fails over to a second provider when thresholds are exceeded. Exponential-backoff retries + atomic rate limiting on every call.',
     dprFields: ['Model lineage', 'Judge variance'],
   },
   {

@@ -416,8 +416,8 @@ function LoginContent() {
               letterSpacing: '-0.025em',
             }}
           >
-            The human-AI governance system for{' '}
-            <span style={{ color: '#16A34A' }}>strategic decisions.</span>
+            The native reasoning layer for{' '}
+            <span style={{ color: '#16A34A' }}>boardroom strategic decisions.</span>
           </h2>
           <p
             style={{

@@ -298,7 +298,7 @@ export const BRAND_STEPS: BrandStep[] = [
     title: 'Positioning & Launch',
     question: 'Will they instantly get the meaning?',
     diAnswer:
-      'Tagline: "The decision intelligence platform for corporate strategy." First-line outreach: "Kodak lost $31B. We would have caught it." Both are instantly legible.',
+      'Tagline: "The native reasoning layer for every boardroom strategic decision." First-line outreach: "Kodak lost $31B. We would have caught it." Both are instantly legible.',
     status: 'partial',
     ifWeak: 'Visualize it — charts, images, before/after. Launch moment needs a signature visual.',
   },
