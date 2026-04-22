@@ -17,8 +17,10 @@ import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('DemoStatusRoute');
 
-/** Real-analysis count at which "ready to remove samples" CTA appears. */
-export const CLEAR_THRESHOLD = 5;
+/** Real-analysis count at which "ready to remove samples" CTA appears.
+    Kept module-private — Next.js route.ts files reject any export that
+    isn't an HTTP method or recognized metadata ("dynamic", "revalidate"...). */
+const CLEAR_THRESHOLD = 5;
 
 async function resolveOrgId(userId: string): Promise<string | null> {
   try {

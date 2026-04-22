@@ -332,7 +332,7 @@ export async function DELETE(req: NextRequest) {
 /**
  * GET /api/share?linkId=xxx&access=true — View access logs for a share link (owner only)
  */
-export async function getShareLinkAccessHistory(req: NextRequest) {
+async function getShareLinkAccessHistory(req: NextRequest) {
   const supabase = await createClient();
   const {
     data: { user },

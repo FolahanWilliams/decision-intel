@@ -18,9 +18,9 @@ const DETAIL_SECTIONS = [
 ];
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 async function getAnalysis(id: string, userId: string) {
@@ -54,6 +54,7 @@ async function getAnalysis(id: string, userId: string) {
 }
 
 export default async function CognitiveAuditDetailPage({ params }: PageProps) {
+  const { id } = await params;
   const supabase = await createClient();
   const {
     data: { user },
@@ -63,7 +64,7 @@ export default async function CognitiveAuditDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  const analysis = await getAnalysis(params.id, user.id);
+  const analysis = await getAnalysis(id, user.id);
 
   if (!analysis) {
     notFound();
@@ -317,7 +318,7 @@ export default async function CognitiveAuditDetailPage({ params }: PageProps) {
             }}
           >
             <Link
-              href={`/dashboard/decision-graph?highlight=${params.id}`}
+              href={`/dashboard/decision-graph?highlight=${id}`}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -341,13 +342,13 @@ export default async function CognitiveAuditDetailPage({ params }: PageProps) {
         {/* Root Cause Attribution */}
         <section id="section-root-cause">
           {analysis.document.orgId && (
-            <RootCauseSection analysisId={params.id} orgId={analysis.document.orgId} />
+            <RootCauseSection analysisId={id} orgId={analysis.document.orgId} />
           )}
         </section>
 
         {/* Related Decisions from Knowledge Graph */}
         <section id="section-related">
-          <RelatedDecisions analysisId={params.id} />
+          <RelatedDecisions analysisId={id} />
         </section>
       </div>
     </ErrorBoundary>
