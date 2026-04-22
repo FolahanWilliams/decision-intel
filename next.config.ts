@@ -119,6 +119,14 @@ export default withSentryConfig(nextConfig, {
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,
 
+  // Disable Sentry's plugin telemetry phone-home. Sentry v10+ sends this
+  // via undici, which our `patch-http-timeout.mjs` cannot intercept (it
+  // only wraps Node's built-in http/https). When Sentry's telemetry
+  // endpoint is slow from Vercel's build network, the undici request
+  // hangs indefinitely and Vercel kills the build at 45 min. Turning
+  // this off removes the hang without affecting error reporting.
+  telemetry: false,
+
   // For all available options, see:
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
