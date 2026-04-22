@@ -1,6 +1,8 @@
 import { ImageResponse } from 'next/og';
 
-export const runtime = 'edge';
+// No `runtime = 'edge'` — the image is static and prerenders at build time.
+// Edge runtime forced this to a 1.12 MB Edge Function, over Vercel's 1 MB
+// Hobby-plan limit. Static generation writes the PNG to the build output.
 export const alt = 'Decision Intel — The Decision Performance OS for M&A & Investment Teams';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
