@@ -343,6 +343,40 @@ Claude should ask the founder before:
 4. **Deleting any route or component** — may have external links, bookmarks, or Slack deep links pointing to it.
 5. **Making changes visible to end users** (copy, labels, flow changes) — the founder has specific positioning and language preferences.
 
+## Build Hang Triage (READ THIS BEFORE TOUCHING THE BUILD)
+
+Vercel build hangs cost ~$0 in money but ~45 minutes per attempt. The 2026-04-22 incident burned 11 hours and 30+ deploys because the right fix was found at hour 0, reverted at hour 1, then re-discovered at hour 11. Don't repeat that loop. The diagnostic chain below is the load-bearing artifact from that incident.
+
+**Step 1 — locate the hang.** Pull the Vercel build logs and find the LAST log line before silence. Three known patterns:
+
+| Last visible log line | Cause | Fix |
+| --- | --- | --- |
+| `Successfully uploaded source maps to Sentry` | [getsentry/sentry-javascript#17511](https://github.com/getsentry/sentry-javascript/issues/17511) — webpack plugin leaks undici sockets after upload, `runAfterProductionCompile` never resolves | `sourcemaps: { disable: true }` in `withSentryConfig` options. Already applied — do NOT revert it. |
+| `Creating an optimized production build ...` (Turbopack) | Some Turbopack-only stall in this codebase. Not yet isolated. | Stay on `next build --webpack`. The `--webpack` flag in `package.json:7` is load-bearing. |
+| `Creating an optimized production build ...` (webpack) | Likely SWC infinite-loop on inline `<style>{`@media...`}</style>` blocks if `compiler.styledJsx: false` is missing | Confirm `compiler: { styledJsx: false }` is in `next.config.ts`. |
+
+**Step 2 — reproduce locally before pushing any fix.** `npm run build` reproduces most build issues in 3-4 minutes. A failing local build is 10× cheaper to debug than a failing Vercel deploy. If it passes locally but fails on Vercel, the bug is environment-specific (network, container resource limits, Linux SWC binary differences) — and that itself narrows the search.
+
+**Step 3 — bisect, don't theorize.** When N commits land between the last-green and the first-red, run `git bisect` against `npm run build`. The 2026-04-22 incident had 15 commits + ~5,000 LOC between green and red — bisection would have isolated the trigger in 4 build runs (~15 min) instead of 11 hours of theory-chasing.
+
+**Things that have been ruled out as primary causes** (don't re-investigate without new evidence):
+
+- Google Fonts fetch hang — fonts are now `@fontsource` local packages.
+- `next/font/google` — removed.
+- Turbopack font fetcher Rust HTTP path — fonts are local, the path doesn't fire.
+- Sentry plugin telemetry — `telemetry: false` in `withSentryConfig`.
+- Sentry source-map upload — DISABLED in `withSentryConfig`. **This is the load-bearing fix; do not revert.** Source maps will be uploaded post-deploy via the separate `npm run sentry:upload-sourcemaps` step (see Environment Variables → `SENTRY_AUTH_TOKEN`).
+- Edge runtime on `app/opengraph-image.tsx` — file deleted; static OG image lives in `public/` instead.
+- Heap exhaustion — `--max-old-space-size=6144` in NODE_OPTIONS gives webpack 6GB on Vercel's 8GB build container.
+- TypeScript errors — `npx tsc --noEmit` now runs clean; type-check phase no longer hangs silently on errors.
+
+**The load-bearing config — do not change without a passing build to prove the alternative works:**
+
+- `package.json:7` build script: `next build --webpack` (Turbopack hangs at compile-start)
+- `next.config.ts` Sentry options: `sourcemaps: { disable: true }`
+- `next.config.ts` compiler: `compiler: { styledJsx: false }`
+- `NODE_OPTIONS='--max-old-space-size=6144'` in the build script
+
 ## Session Workflow
 
 Claude Code sessions should follow this pattern for best results:
@@ -354,6 +388,20 @@ Claude Code sessions should follow this pattern for best results:
 4. **Don't rediscover — read CLAUDE.md.** The conventions here (CSS variables, `uploadedAt` not `createdAt`, `safeCompare` import) have all been learned the hard way.
 5. **Pre-commit hook note:** There is a Gemini AI audit hook in `.husky/pre-commit` that runs `npm run audit:ai`. It can be slow. If it blocks and the changes are reviewed, use `--no-verify`.
 6. **Keep CLAUDE.md current — proactively, not at session end.** Whenever a change introduces a new convention, renames a field, adds a critical file, changes a workflow pattern, or discovers a gotcha that cost time — update CLAUDE.md **in the same commit** as that change. Don't wait until the session ends. Don't ask permission. Just include the CLAUDE.md edit alongside the code change. Examples: adding a new Prisma field → update the Database section. Creating a new shared utility → add it to Key Files. Discovering a build error caused by a naming convention → add it to Critical Conventions. The goal is that the next session (which has zero memory of this one) starts with every lesson already learned.
+
+## Debugging Discipline (locked 2026-04-22 after the 11-hour build-hang incident)
+
+These five rules exist because the 2026-04-22 build-hang debug burned 11 hours and 30+ deploys re-discovering a fix that had already been found and wrongly reverted at hour 1. They are not optional.
+
+1. **A working fix is not reverted without a NEW failing test that proves it wasn't the cause.** "It used to work without this" / "the old log shows this never fired" / "this can't be the cause because X" are guesses, not evidence. If a commit makes the build go green, the burden of proof is on the revert, not the keep. The 2026-04-22 incident's killer mistake was `c6af4ab` reverting `c1540a1`'s `sourcemaps: { disable: true }` on exactly this kind of "it used to work" reasoning.
+
+2. **Bisect before theorize.** When N commits land between the last-green and the first-red, `git bisect run npm run build` is faster than any theory. Three builds (~12 min) beats three hours of reading code.
+
+3. **Reproduce locally before pushing.** Each Vercel deploy attempt is 8-45 minutes. `npm run build` reproduces most issues in 3-4 minutes. Local first; push only after the local repro confirms the fix.
+
+4. **Memory and commit messages record evidence + uncertainty, not conclusions.** Banned phrasings: "THE ACTUAL BUG", "definitively the culprit", "real root cause", "this is the fix". Every one of these in the 2026-04-22 commit history was followed by another red build. Use instead: "tried X, build now hangs at Y instead of Z" / "X eliminates the hang in deploy ABC123 — keeping unless disproved by a new failing case." The next session reads commit messages as ground truth — don't lie to it.
+
+5. **Don't accumulate scaffolding without removing on disproof.** Each rejected hypothesis leaves debt: env vars, scripts, NODE_OPTIONS flags, config keys. When a hypothesis is disproved, delete its scaffolding in the same commit as the disproof, or document it as deliberately-kept-for-X with a date. The current build script still carries `patch-http-timeout.mjs` from a Google Fonts theory that's been irrelevant since fonts went local — don't let that pile grow.
 
 ## Sub-Agent Strategy
 
@@ -415,6 +463,8 @@ Conversion / admin: `NEXT_PUBLIC_DEMO_BOOKING_URL` (Calendly link the `BookDemoC
 Encryption + key rotation: `DOCUMENT_ENCRYPTION_KEY` and `SLACK_TOKEN_ENCRYPTION_KEY` (legacy / v1). When rotating, add `DOCUMENT_ENCRYPTION_KEY_V{N}` / `SLACK_TOKEN_ENCRYPTION_KEY_V{N}` and bump `DOCUMENT_ENCRYPTION_KEY_VERSION` / `SLACK_TOKEN_ENCRYPTION_KEY_VERSION` to the new active version. See `src/lib/utils/encryption.ts` header for the full protocol; rotate with `npm run rotate:encryption-key`.
 
 Public demo: `DEMO_USER_ID` — deterministic UUID used as the Document owner for anonymous audits via `/api/demo/run`. MUST also be added to `ADMIN_USER_IDS` so the plan check resolves to enterprise. Rate limits: 1 audit / IP / 24h + 50 audits / day global (~$20/day ceiling). Leave unset to disable the demo endpoint; the UI surfaces a "temporarily unavailable" message.
+
+Sentry source-maps (post-deploy): `SENTRY_AUTH_TOKEN` — required by `npm run sentry:upload-sourcemaps`. Build-time source-map upload was disabled to fix the 11-hour build hang (see "Build Hang Triage"). The post-deploy script uploads sourcemaps via `@sentry/cli` directly, bypassing the webpack-plugin's undici socket leak. Generate a token at `https://decision-intel-bu.sentry.io/settings/auth-tokens/` with `project:releases` + `project:write` scopes. Until this is wired into a Vercel deploy hook or GitHub Action, source-maps need a manual `npm run sentry:upload-sourcemaps` after each deploy — Sentry events will point at minified code in the meantime.
 
 See `.env.example` for the full list with descriptions.
 

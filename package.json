@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/validate-deploy-env.mjs && node scripts/prisma-migrate-safe.mjs && NODE_OPTIONS='--import ./scripts/patch-http-timeout.mjs --max-old-space-size=6144' next build --webpack",
+    "build": "node scripts/validate-deploy-env.mjs && node scripts/prisma-migrate-safe.mjs && NODE_OPTIONS='--max-old-space-size=6144' next build --webpack",
     "start": "next start",
     "lint": "eslint .",
     "prisma:generate": "prisma generate",
@@ -19,6 +19,7 @@
     "test": "vitest run",
     "audit:ai": "bash ./scripts/gemini-audit.sh",
     "rotate:encryption-key": "tsx ./scripts/rotate-encryption-key.ts",
+    "sentry:upload-sourcemaps": "npx -y @sentry/cli@latest sourcemaps upload --org=decision-intel-bu --project=decisionintelsentry --release=${VERCEL_GIT_COMMIT_SHA:-$(git rev-parse HEAD)} .next",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky"
