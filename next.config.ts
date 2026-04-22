@@ -129,6 +129,15 @@ export default withSentryConfig(nextConfig, {
   telemetry: false,
   // Reduce source-map upload scope to speed the build.
   widenClientFileUpload: false,
+  // 2026-04-22: Disable source-map upload during Vercel build to work
+  // around getsentry/sentry-javascript#17511 — on the `--webpack` path
+  // the plugin leaks undici sockets after "Successfully uploaded source
+  // maps to Sentry" is logged, so `runAfterProductionCompile` never
+  // resolves and Vercel kills the build at 45 min. Matches our symptom
+  // exactly. Follow-up: upload source maps via a post-deploy
+  // `sentry-cli sourcemaps upload` step so prod error traces stay
+  // resolvable. Until then, Sentry events will point at minified code.
+  sourcemaps: { disable: true },
   tunnelRoute: '/monitoring',
   webpack: {
     automaticVercelMonitors: true,
