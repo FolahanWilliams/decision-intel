@@ -225,12 +225,15 @@ const KLEIN_ITEMS: RowItem[] = [
 ];
 
 function DualCardComposition() {
-  // Card geometry — two panels with a 96px central gap for the pivot
-  const cardW = 176;
+  // Card geometry — two panels with a 60px central gap for the pivot.
+  // Cards widened from 176→200 (and padding shifted) so the longest item
+  // names ("Overconfidence", "Pattern match") no longer kiss the status
+  // pill at the right edge. Pivot stays centered at x=240.
+  const cardW = 200;
   const cardH = 224;
-  const leftCardX = 16;
+  const leftCardX = 10;
   const leftCardY = 48;
-  const rightCardX = 288;
+  const rightCardX = 270;
   const rightCardY = 48;
   const cardPadding = 14;
   const pivotX = 240;
@@ -624,7 +627,9 @@ function RowEntry({
 }) {
   const indicatorX = cardX + cardPadding + 6;
   const nameX = cardX + cardPadding + 20;
-  const pillW = 52;
+  // Tightened pill width and added an 8px buffer between name column and
+  // pill so "Overconfidence" / "Pattern match" have breathing room.
+  const pillW = 48;
   const pillH = 16;
   const pillX = cardX + cardW - cardPadding - pillW;
   const pillY = rowY - pillH / 2;
