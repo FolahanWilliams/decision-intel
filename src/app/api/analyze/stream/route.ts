@@ -843,8 +843,15 @@ export async function POST(request: NextRequest) {
               });
           }
 
-          // Send final complete
-          sendUpdate({ type: 'complete', progress: 100, result: result.finalReport });
+          // Send final complete. Inject analysisId into the payload so
+          // the client (InlineAnalysisResultCard, CounterfactualPanel)
+          // can skip a follow-up round-trip to /api/documents/[id] and
+          // render the counterfactual + DPR buttons immediately.
+          const completePayload =
+            createdAnalysisId && result.finalReport && typeof result.finalReport === 'object'
+              ? { ...(result.finalReport as Record<string, unknown>), analysisId: createdAnalysisId }
+              : result.finalReport;
+          sendUpdate({ type: 'complete', progress: 100, result: completePayload });
 
           // Emit webhook event (non-blocking, fire-and-forget)
           try {

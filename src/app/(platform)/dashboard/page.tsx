@@ -641,6 +641,10 @@ export default function Dashboard() {
 
       if (finalResult) {
         const score = finalResult?.overallScore as number;
+        const resolvedAnalysisId =
+          typeof (finalResult as Record<string, unknown>).analysisId === 'string'
+            ? ((finalResult as Record<string, unknown>).analysisId as string)
+            : null;
         completeTracking(uploadData.id);
         setLastCompletedAnalysis({
           docId: uploadData.id,
@@ -649,6 +653,7 @@ export default function Dashboard() {
           biasCount: biasCountRef.current,
           noiseScore: noiseScoreRef.current,
           detectedBiases: [...detectedBiasesRef.current],
+          analysisId: resolvedAnalysisId,
         });
         addNotification({
           type: score < 40 ? 'low_score' : 'analysis_complete',
@@ -727,6 +732,10 @@ export default function Dashboard() {
 
       if (finalResult) {
         const retryScore = finalResult?.overallScore as number;
+        const resolvedAnalysisId =
+          typeof (finalResult as Record<string, unknown>).analysisId === 'string'
+            ? ((finalResult as Record<string, unknown>).analysisId as string)
+            : null;
         completeTracking(docId);
         setLastCompletedAnalysis({
           docId,
@@ -735,6 +744,7 @@ export default function Dashboard() {
           biasCount: biasCountRef.current,
           noiseScore: noiseScoreRef.current,
           detectedBiases: [...detectedBiasesRef.current],
+          analysisId: resolvedAnalysisId,
         });
         addNotification({
           type: retryScore < 40 ? 'low_score' : 'analysis_complete',
@@ -1371,6 +1381,7 @@ export default function Dashboard() {
               <InlineAnalysisResultCard
                 analysis={lastCompletedAnalysis}
                 onDismiss={() => setLastCompletedAnalysis(null)}
+                preResolvedAnalysisId={lastCompletedAnalysis.analysisId ?? null}
               />
             ) : !uploading && !pendingFile && inlineMode === 'paste' ? (
               <InlinePasteMemoCard onClose={() => setInlineMode('none')} />

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 const GRADE_THRESHOLDS: Array<{ min: number; grade: string; color: string }> = [
   { min: 85, grade: 'A', color: '#34d399' },
@@ -27,9 +27,20 @@ interface ScoreRevealProps {
   /**
    * Milliseconds of suspense pause to hold the placeholder before the score
    * animates in. Defaults to 0 (no pause) for backwards-compatibility; callers
-   * in the hero flow should pass 1200 for the SAT-score reveal feel.
+   * in the hero flow should pass 400 for a brief entrance-only pause. Callers
+   * that want "hold until upstream signals readiness" should pass `revealReady`
+   * instead and set it to true when the real analysis is done — the suspense
+   * then ends on real work, not a timer.
    */
   suspenseMs?: number;
+  /**
+   * When provided, the suspense phase is gated by this flag instead of
+   * (or in addition to) `suspenseMs`. `false` keeps the placeholder on
+   * screen regardless of the timer; `true` (or undefined, for back-compat)
+   * allows the reveal to proceed. Use this to sync the reveal with real
+   * SSE completion rather than a hard-coded timer.
+   */
+  revealReady?: boolean;
   /**
    * Optional benchmark — renders a small "vs org avg 62 · +12" line below
    * the grade once the reveal completes. Omit if no benchmark is available
@@ -45,17 +56,36 @@ export function ScoreReveal({
   showGrade = false,
   duration = 1500,
   suspenseMs = 0,
+  revealReady,
   benchmark,
 }: ScoreRevealProps) {
-  const [stage, setStage] = useState<'suspense' | 'revealing'>(
-    suspenseMs > 0 ? 'suspense' : 'revealing'
-  );
+  const prefersReducedMotion = useReducedMotion();
+  const initialStage: 'suspense' | 'revealing' =
+    suspenseMs > 0 || revealReady === false ? 'suspense' : 'revealing';
+  const [stage, setStage] = useState<'suspense' | 'revealing'>(initialStage);
+
+  // If the caller passes revealReady, honor it first (real-work signal
+  // beats timer). Otherwise fall back to the suspenseMs timer.
+  useEffect(() => {
+    if (revealReady === true && stage === 'suspense') {
+      setStage('revealing');
+    }
+    if (revealReady === false && stage === 'revealing') {
+      setStage('suspense');
+    }
+  }, [revealReady, stage]);
 
   useEffect(() => {
     if (suspenseMs <= 0) return;
+    if (revealReady === false) return;
     const timer = setTimeout(() => setStage('revealing'), suspenseMs);
     return () => clearTimeout(timer);
-  }, [suspenseMs]);
+  }, [suspenseMs, revealReady]);
+
+  // Motion-preference respect: collapse AnimatedNumber duration and
+  // framer transitions so reduced-motion users see the final number
+  // immediately rather than a slow count-up.
+  const effectiveDuration = prefersReducedMotion ? 0 : duration;
 
   const rounded = Math.round(score);
   const { grade, color } = getGrade(rounded);
@@ -109,7 +139,7 @@ export function ScoreReveal({
             >
               <AnimatedNumber
                 value={Math.round(score)}
-                duration={duration}
+                duration={effectiveDuration}
                 suffix="/100"
                 style={{ fontSize: 30, fontWeight: 700, color: 'var(--text-primary)' }}
               />
@@ -118,7 +148,7 @@ export function ScoreReveal({
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{
-                    delay: duration / 1000 + 0.1,
+                    delay: prefersReducedMotion ? 0 : duration / 1000 + 0.1,
                     type: 'spring',
                     stiffness: 200,
                     damping: 12,
@@ -148,7 +178,10 @@ export function ScoreReveal({
         <motion.div
           initial={{ opacity: 0, y: -2 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: duration / 1000 + 0.25, duration: 0.3 }}
+          transition={{
+            delay: prefersReducedMotion ? 0 : duration / 1000 + 0.25,
+            duration: prefersReducedMotion ? 0 : 0.3,
+          }}
           style={{
             marginTop: 6,
             fontSize: 11.5,

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Calendar, CheckCircle, FileText, Scale, X } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 import { ScoreReveal } from '@/components/ui/ScoreReveal';
 import { CounterfactualPanel } from '@/components/ui/CounterfactualPanel';
 import { trackEvent } from '@/lib/analytics/track';
@@ -18,11 +19,26 @@ export interface CompletedAnalysisSummary {
   biasCount: number;
   noiseScore?: number;
   detectedBiases: Array<{ type: string; severity?: string }>;
+  /**
+   * Analysis row ID resolved from the SSE `complete` event. When
+   * present, the reveal card skips the mount-time /api/documents/[id]
+   * round-trip and feeds CounterfactualPanel immediately. Falls back
+   * to the resolver when absent (back-compat for callers that don't
+   * carry the ID).
+   */
+  analysisId?: string | null;
 }
 
 interface Props {
   analysis: CompletedAnalysisSummary;
   onDismiss: () => void;
+  /**
+   * When the caller already knows the Analysis row ID (from the SSE
+   * completion payload), pass it here to skip the mount-time round-trip
+   * to /api/documents/[id]. This makes the Featured Counterfactual card
+   * render immediately rather than flashing in 200–300ms late.
+   */
+  preResolvedAnalysisId?: string | null;
 }
 
 function humanizeBias(type: string): string {
@@ -50,7 +66,11 @@ function severityColor(severity: string | undefined): string {
   }
 }
 
-export function InlineAnalysisResultCard({ analysis, onDismiss }: Props) {
+export function InlineAnalysisResultCard({
+  analysis,
+  onDismiss,
+  preResolvedAnalysisId = null,
+}: Props) {
   const top3 = [...analysis.detectedBiases]
     .sort(
       (a, b) =>
@@ -60,11 +80,16 @@ export function InlineAnalysisResultCard({ analysis, onDismiss }: Props) {
     .slice(0, 3);
 
   // Resolve the Analysis row ID from the Document so we can feed the
-  // Featured Counterfactual card below. Self-contained so the dashboard
-  // caller doesn't need to know about counterfactuals. Silent-fail — if
-  // the lookup hiccups the card just doesn't render, no broken UI.
-  const [analysisId, setAnalysisId] = useState<string | null>(null);
+  // Featured Counterfactual card below. When the caller supplies
+  // preResolvedAnalysisId (dashboard can, from the SSE completion
+  // payload), skip the round-trip entirely. Silent-fail — if the lookup
+  // hiccups the card just doesn't render, no broken UI.
+  const [analysisId, setAnalysisId] = useState<string | null>(preResolvedAnalysisId);
   useEffect(() => {
+    if (preResolvedAnalysisId) {
+      setAnalysisId(preResolvedAnalysisId);
+      return;
+    }
     let cancelled = false;
     async function resolveAnalysisId() {
       try {
@@ -83,7 +108,7 @@ export function InlineAnalysisResultCard({ analysis, onDismiss }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [analysis.docId]);
+  }, [analysis.docId, preResolvedAnalysisId]);
 
   // Pull the team's benchmark DQI so the post-upload reveal can show
   // "+12 above your org's avg." The endpoint returns null profile for
@@ -195,7 +220,13 @@ export function InlineAnalysisResultCard({ analysis, onDismiss }: Props) {
             score={analysis.overallScore}
             label="Decision Quality Index"
             showGrade
-            suspenseMs={1200}
+            /* Reduced 1200 → 400 2026-04-24. The card only mounts AFTER the
+             * SSE stream resolves — the user has already watched 30-60s of
+             * progress. Another 1.2s "scoring…" placeholder reads as
+             * artificial loading, not anticipation. 400ms is just enough
+             * for the AnimatedNumber count-up + grade spring to feel
+             * deliberate without faking work. */
+            suspenseMs={400}
             benchmark={orgAvg !== null ? { value: orgAvg } : undefined}
           />
           {analysis.noiseScore != null && (
@@ -267,11 +298,25 @@ export function InlineAnalysisResultCard({ analysis, onDismiss }: Props) {
               fontWeight: 500,
               color: 'var(--text-muted)',
               marginBottom: 10,
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: 6,
             }}
           >
-            {analysis.biasCount === 0
-              ? 'No cognitive biases flagged'
-              : `${analysis.biasCount} cognitive bias${analysis.biasCount === 1 ? '' : 'es'} flagged`}
+            {analysis.biasCount === 0 ? (
+              <span>No cognitive biases flagged</span>
+            ) : (
+              <>
+                <AnimatedNumber
+                  value={analysis.biasCount}
+                  duration={900}
+                  style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}
+                />
+                <span>
+                  cognitive bias{analysis.biasCount === 1 ? '' : 'es'} flagged
+                </span>
+              </>
+            )}
           </div>
           {top3.length > 0 ? (
             <ul
