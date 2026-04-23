@@ -84,12 +84,14 @@ export function InlineAnalysisResultCard({
   // preResolvedAnalysisId (dashboard can, from the SSE completion
   // payload), skip the round-trip entirely. Silent-fail — if the lookup
   // hiccups the card just doesn't render, no broken UI.
-  const [analysisId, setAnalysisId] = useState<string | null>(preResolvedAnalysisId);
+  //
+  // Two-source state pattern to avoid react-hooks/set-state-in-effect:
+  // the prop is used directly via ?? at the top of the resolved value,
+  // and the hook-local state only holds the fetched fallback.
+  const [fetchedAnalysisId, setFetchedAnalysisId] = useState<string | null>(null);
+  const analysisId = preResolvedAnalysisId ?? fetchedAnalysisId;
   useEffect(() => {
-    if (preResolvedAnalysisId) {
-      setAnalysisId(preResolvedAnalysisId);
-      return;
-    }
+    if (preResolvedAnalysisId) return; // no fetch needed
     let cancelled = false;
     async function resolveAnalysisId() {
       try {
@@ -99,7 +101,7 @@ export function InlineAnalysisResultCard({
           analyses?: Array<{ id: string }>;
         } | null;
         const id = data?.analyses?.[0]?.id;
-        if (id && !cancelled) setAnalysisId(id);
+        if (id && !cancelled) setFetchedAnalysisId(id);
       } catch (err) {
         log.warn('Failed to resolve analysisId for counterfactual:', err);
       }

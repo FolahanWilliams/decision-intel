@@ -60,25 +60,22 @@ export function ScoreReveal({
   benchmark,
 }: ScoreRevealProps) {
   const prefersReducedMotion = useReducedMotion();
-  const initialStage: 'suspense' | 'revealing' =
-    suspenseMs > 0 || revealReady === false ? 'suspense' : 'revealing';
-  const [stage, setStage] = useState<'suspense' | 'revealing'>(initialStage);
 
-  // If the caller passes revealReady, honor it first (real-work signal
-  // beats timer). Otherwise fall back to the suspenseMs timer.
-  useEffect(() => {
-    if (revealReady === true && stage === 'suspense') {
-      setStage('revealing');
-    }
-    if (revealReady === false && stage === 'revealing') {
-      setStage('suspense');
-    }
-  }, [revealReady, stage]);
+  // Timer-driven stage — only moved by the suspenseMs setTimeout below.
+  // When the caller supplies `revealReady`, we OVERRIDE this at render
+  // time (derived value) rather than pushing changes into state via an
+  // effect — avoids react-hooks/set-state-in-effect and makes the
+  // revealReady signal authoritative without a re-render cascade.
+  const [timerStage, setTimerStage] = useState<'suspense' | 'revealing'>(() =>
+    suspenseMs > 0 ? 'suspense' : 'revealing'
+  );
+  const stage: 'suspense' | 'revealing' =
+    revealReady === false ? 'suspense' : revealReady === true ? 'revealing' : timerStage;
 
   useEffect(() => {
     if (suspenseMs <= 0) return;
     if (revealReady === false) return;
-    const timer = setTimeout(() => setStage('revealing'), suspenseMs);
+    const timer = setTimeout(() => setTimerStage('revealing'), suspenseMs);
     return () => clearTimeout(timer);
   }, [suspenseMs, revealReady]);
 
