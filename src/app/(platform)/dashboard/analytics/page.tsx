@@ -11,6 +11,7 @@ import {
   Lightbulb,
   Gauge,
   BookOpen,
+  FlaskConical,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { PageSkeleton } from '@/components/ui/LoadingSkeleton';
@@ -18,6 +19,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { TabBar } from '@/components/ui/TabBar';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { useInsights } from '@/hooks/useInsights';
+import { CalibrationTrackerChip } from '@/components/analytics/CalibrationTrackerChip';
 
 // Lazy-load heavy visualization components — only the active tab's bundle is loaded
 const InsightsPageContent = lazy(() =>
@@ -49,9 +51,9 @@ const CalibrationContent = lazy(() =>
     default: m.CalibrationContent,
   }))
 );
-const OutcomeFlywheelContent = lazy(() =>
-  import('@/components/outcome-flywheel/OutcomeFlywheelContent').then(m => ({
-    default: m.OutcomeFlywheelContent,
+const ExperimentsContent = lazy(() =>
+  import('@/components/experiments/ExperimentsContent').then(m => ({
+    default: m.ExperimentsContent,
   }))
 );
 
@@ -79,6 +81,13 @@ const LEGACY_VIEW_MAP: Record<string, string> = {
   library: 'intelligence',
   dna: 'intelligence',
   fingerprint: 'intelligence',
+  // 2026-04-23 consolidation — /dashboard/decision-quality redirects here
+  // with ?view=<tab>. Audits and Nudges already live in DecisionSignals
+  // on Performance; Calibration and Experiments sit alongside.
+  audits: 'performance',
+  nudges: 'performance',
+  calibration: 'performance',
+  experiments: 'performance',
 };
 
 // Heavy visualizations navigate to separate pages instead of rendering inline
@@ -120,6 +129,61 @@ function SectionHeading({ icon, children }: { icon?: React.ReactNode; children: 
       )}
       <span>{children}</span>
     </h2>
+  );
+}
+
+// Thin link card that replaces the old embedded OutcomeFlywheelContent.
+// Dedupe with /dashboard/outcome-flywheel (cron writes there; sidebar
+// FlywheelChips already surface pending + Brier globally).
+function OutcomeFlywheelLinkCard() {
+  return (
+    <div
+      className="card"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 16,
+        padding: '18px 22px',
+        borderLeft: '3px solid var(--accent-primary)',
+        flexWrap: 'wrap',
+      }}
+    >
+      <div style={{ flex: 1, minWidth: 220 }}>
+        <div
+          style={{
+            fontSize: 10.5,
+            fontWeight: 800,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: 'var(--text-muted)',
+            marginBottom: 2,
+          }}
+        >
+          Flywheel · Standalone surface
+        </div>
+        <div
+          style={{
+            fontSize: 15,
+            fontWeight: 600,
+            color: 'var(--text-primary)',
+            marginBottom: 2,
+          }}
+        >
+          Outcome Flywheel — recalibrated DQI, Brier trend, lessons learned.
+        </div>
+        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+          Pending + Brier signals are always visible in the sidebar. The full timeline + per-audit recalibration lives on its own page.
+        </div>
+      </div>
+      <a
+        href="/dashboard/outcome-flywheel"
+        className="btn btn-primary btn-sm flex items-center gap-2"
+        style={{ whiteSpace: 'nowrap' }}
+      >
+        Open Outcome Flywheel
+        <span aria-hidden>→</span>
+      </a>
+    </div>
   );
 }
 
@@ -195,6 +259,7 @@ function AnalyticsInner() {
               strategic memo your team produces.
             </p>
           </div>
+          <CalibrationTrackerChip />
         </header>
         {!hasNoData && (
           <TabBar
@@ -229,9 +294,15 @@ function AnalyticsInner() {
                   <InsightsPageContent />
                 </section>
 
+                {/* Outcome Flywheel lives on its own page — the cron
+                    writes there, the sidebar chip (FlywheelChips) surfaces
+                    pending + Brier globally, and the standalone surface
+                    has room for the full timeline / recalibration view.
+                    We show a thin summary-card link here instead of
+                    embedding the full content (2026-04-23 dedupe). */}
                 <section>
                   <SectionHeading icon={<TrendingUp size={13} />}>Outcome Flywheel</SectionHeading>
-                  <OutcomeFlywheelContent />
+                  <OutcomeFlywheelLinkCard />
                 </section>
 
                 <section>
@@ -242,6 +313,11 @@ function AnalyticsInner() {
                 <section>
                   <SectionHeading icon={<Gauge size={13} />}>Calibration</SectionHeading>
                   <CalibrationContent />
+                </section>
+
+                <section>
+                  <SectionHeading icon={<FlaskConical size={13} />}>Experiments</SectionHeading>
+                  <ExperimentsContent />
                 </section>
               </>
             )}

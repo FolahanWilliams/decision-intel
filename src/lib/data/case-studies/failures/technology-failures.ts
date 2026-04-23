@@ -274,7 +274,7 @@ export const TECHNOLOGY_FAILURE_CASES: CaseStudy[] = [
         name: 'Andrew Bosworth',
         role: 'CTO / Head of Reality Labs',
         position: 'advocate',
-        notes: 'Internal champion of the metaverse investment thesis.',
+        notes: 'Internal champion of the metaverse strategic bet.',
       },
       {
         name: 'Sheryl Sandberg',

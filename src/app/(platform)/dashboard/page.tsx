@@ -25,8 +25,10 @@ import {
   BrainCircuit,
   Video,
   Mail,
+  ShieldCheck,
 } from 'lucide-react';
 import { DecisionIQCard } from '@/components/ui/DecisionIQCard';
+import { InlinePasteMemoCard } from '@/components/dashboard/InlinePasteMemoCard';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -146,7 +148,7 @@ export default function Dashboard() {
           setKgConsent({ status: data.status, memoCount: data.memoCount ?? 0 });
         }
       })
-      .catch(() => {});
+      .catch(err => log.warn('knowledge-graph/consent fetch failed:', err));
     return () => {
       cancelled = true;
     };
@@ -208,6 +210,12 @@ export default function Dashboard() {
     'newest'
   );
   const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
+  /** Inline "paste a memo" mode — replaces the upload zone when a user
+   *  clicks the "Paste text" four-door, so there's no bounce to
+   *  /dashboard/cognitive-audits/submit?source=manual. The deep link
+   *  stays valid for external callers; this state is for the in-dashboard
+   *  keep-me-on-this-surface path. */
+  const [inlineMode, setInlineMode] = useState<'none' | 'paste'>('none');
   const [batchDeleting, setBatchDeleting] = useState(false);
 
   // Welcome modal self-gates via /api/onboarding; rendering is unconditional.
@@ -247,7 +255,7 @@ export default function Dashboard() {
         .then(data => {
           if (data?.decisionStatement) setActiveFrameStatement(data.decisionStatement);
         })
-        .catch(() => {});
+        .catch(err => log.warn('decision-frames fetch failed:', err));
       window.history.replaceState({}, '', '/dashboard');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -799,12 +807,10 @@ export default function Dashboard() {
       {/* Header with view tabs */}
       <div className="page-header" style={{ marginBottom: 0 }}>
         <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.03em' }}>
+          <h1>
             <span className="text-gradient">Dashboard</span>
           </h1>
-          <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-            Decision intelligence overview
-          </p>
+          <p className="page-subtitle">Decision intelligence overview</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <button
@@ -1227,11 +1233,48 @@ export default function Dashboard() {
                         }}
                       >
                         <option value="">Select deal...</option>
-                        {dealsList.map(d => (
-                          <option key={d.id} value={d.id}>
-                            {d.name}
-                          </option>
-                        ))}
+                        {(() => {
+                          // Sort by updatedAt desc (proxy for "recently used");
+                          // pin top 3 at the top under a "Recent" optgroup, render
+                          // the rest alphabetically below so a CSO with 40+ deals
+                          // still finds the one they touched yesterday in one click.
+                          const byRecency = [...dealsList].sort((a, b) => {
+                            const aT = a.updatedAt
+                              ? new Date(a.updatedAt).getTime()
+                              : 0;
+                            const bT = b.updatedAt
+                              ? new Date(b.updatedAt).getTime()
+                              : 0;
+                            return bT - aT;
+                          });
+                          const recent = byRecency.slice(0, 3);
+                          const recentIds = new Set(recent.map(d => d.id));
+                          const rest = [...dealsList]
+                            .filter(d => !recentIds.has(d.id))
+                            .sort((a, b) => a.name.localeCompare(b.name));
+                          return (
+                            <>
+                              {recent.length > 0 && (
+                                <optgroup label="Recent">
+                                  {recent.map(d => (
+                                    <option key={d.id} value={d.id}>
+                                      {d.name}
+                                    </option>
+                                  ))}
+                                </optgroup>
+                              )}
+                              {rest.length > 0 && (
+                                <optgroup label={recent.length > 0 ? 'All deals' : undefined}>
+                                  {rest.map(d => (
+                                    <option key={d.id} value={d.id}>
+                                      {d.name}
+                                    </option>
+                                  ))}
+                                </optgroup>
+                              )}
+                            </>
+                          );
+                        })()}
                       </select>
                     </div>
                   </div>
@@ -1323,6 +1366,8 @@ export default function Dashboard() {
                 analysis={lastCompletedAnalysis}
                 onDismiss={() => setLastCompletedAnalysis(null)}
               />
+            ) : !uploading && !pendingFile && inlineMode === 'paste' ? (
+              <InlinePasteMemoCard onClose={() => setInlineMode('none')} />
             ) : !uploading && !pendingFile ? (
               <>
                 <div
@@ -1528,20 +1573,25 @@ export default function Dashboard() {
                     }}
                   >
                     <span style={{ color: 'var(--text-muted)' }}>Not uploading a file?</span>
-                    <Link
-                      href="/dashboard/cognitive-audits/submit?source=manual"
+                    <button
+                      type="button"
+                      onClick={() => setInlineMode('paste')}
                       style={{
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: 5,
                         fontWeight: 600,
                         color: 'var(--accent-primary)',
-                        textDecoration: 'none',
+                        background: 'transparent',
+                        border: 'none',
+                        padding: 0,
+                        cursor: 'pointer',
+                        fontSize: 'inherit',
                       }}
                     >
                       <BrainCircuit size={13} />
                       Paste text
-                    </Link>
+                    </button>
                     <span style={{ color: 'var(--border-color)' }}>·</span>
                     <Link
                       href="/dashboard/cognitive-audits/submit?source=meeting_recording"
@@ -1813,8 +1863,8 @@ export default function Dashboard() {
                   title={`Start your ${knowledgeGraphLabel}`}
                   description={
                     isTeamPlan
-                      ? 'Drop a strategic memo, board deck, or market-entry recommendation in the upload zone. Get the bias audit, steering-committee objection simulation, and your first Knowledge Graph node in 60 seconds.'
-                      : 'Drop a strategic memo, board deck, or market-entry recommendation in the upload zone. Get the bias audit, the questions your CEO will ask, and your first entry in your Personal Decision History in 60 seconds.'
+                      ? 'Drop a strategic memo, board deck, or market-entry recommendation in the upload zone. Every memo you upload joins your org’s reasoning layer — bias audit, steering-committee objection simulation, and your first Knowledge Graph node in 60 seconds.'
+                      : 'Drop a strategic memo, board deck, or market-entry recommendation in the upload zone. Every memo you upload joins your reasoning layer — bias audit, the questions your CEO will ask, and your first entry in your Personal Decision History in 60 seconds.'
                   }
                   showBrief
                   briefContext="documents"
@@ -2009,34 +2059,59 @@ export default function Dashboard() {
                 </div>
               ) : (
                 <div className="divide-y divide-border">
-                  {/* Select all header */}
+                  {/* Select all header + compare entry point */}
                   <div
                     className="flex items-center gap-md p-md"
-                    style={{ background: 'var(--bg-secondary)' }}
+                    style={{
+                      background: 'var(--bg-secondary)',
+                      justifyContent: 'space-between',
+                    }}
                   >
-                    <input
-                      type="checkbox"
-                      aria-label="Select all documents"
-                      checked={selectedDocs.size === sortedDocs.length && sortedDocs.length > 0}
-                      onChange={e => {
-                        if (e.target.checked) {
-                          setSelectedDocs(new Set(sortedDocs.map(d => d.id)));
-                        } else {
-                          setSelectedDocs(new Set());
-                        }
-                      }}
-                      style={{
-                        width: 14,
-                        height: 14,
-                        accentColor: 'var(--accent-primary)',
-                        cursor: 'pointer',
-                      }}
-                    />
-                    <span className="text-xs text-muted">
-                      {selectedDocs.size > 0
-                        ? `${selectedDocs.size} selected`
-                        : `${sortedDocs.length} documents`}
-                    </span>
+                    <div className="flex items-center gap-md">
+                      <input
+                        type="checkbox"
+                        aria-label="Select all documents"
+                        checked={selectedDocs.size === sortedDocs.length && sortedDocs.length > 0}
+                        onChange={e => {
+                          if (e.target.checked) {
+                            setSelectedDocs(new Set(sortedDocs.map(d => d.id)));
+                          } else {
+                            setSelectedDocs(new Set());
+                          }
+                        }}
+                        style={{
+                          width: 14,
+                          height: 14,
+                          accentColor: 'var(--accent-primary)',
+                          cursor: 'pointer',
+                        }}
+                      />
+                      <span className="text-xs text-muted">
+                        {selectedDocs.size > 0
+                          ? `${selectedDocs.size} selected`
+                          : `${sortedDocs.length} documents`}
+                      </span>
+                    </div>
+                    {selectedDocs.size === 0 && sortedDocs.length >= 2 && (
+                      <Link
+                        href="/dashboard/compare"
+                        className="flex items-center gap-xs text-xs"
+                        title="Compare 2–3 memos side-by-side"
+                        style={{
+                          color: 'var(--accent-primary)',
+                          padding: '4px 10px',
+                          borderRadius: 'var(--radius-full)',
+                          background: 'rgba(22, 163, 74, 0.08)',
+                          border: '1px solid rgba(22, 163, 74, 0.22)',
+                          textDecoration: 'none',
+                          fontWeight: 600,
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        <GitCompareArrows size={12} />
+                        Compare memos
+                      </Link>
+                    )}
                   </div>
                   {sortedDocs.map((doc, idx) => (
                     <div
@@ -2175,6 +2250,18 @@ export default function Dashboard() {
                               <BarChart3 size={14} />
                               View Analysis
                             </Link>
+                            <a
+                              href={`/api/documents/${doc.id}/provenance-record?format=pdf`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="btn btn-ghost btn-sm flex items-center gap-1"
+                              title="Download Decision Provenance Record · signed + hashed PDF"
+                              aria-label="Download Decision Provenance Record"
+                              style={{ whiteSpace: 'nowrap' }}
+                            >
+                              <ShieldCheck size={14} />
+                              DPR
+                            </a>
                           </>
                         )}
 

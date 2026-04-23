@@ -65,7 +65,7 @@ function TourCard({ step, currentStep, totalSteps, nextStep, prevStep }: CardCom
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ onboardingTourSeen: true }),
-    }).catch(() => {});
+    }).catch(err => console.warn('[OnboardingTour] mark tour-seen failed:', err));
     closeOnborda();
   };
 

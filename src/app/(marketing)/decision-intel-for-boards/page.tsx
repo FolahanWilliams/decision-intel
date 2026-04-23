@@ -396,7 +396,7 @@ export default function DecisionIntelForBoardsPage() {
                 textDecoration: 'none',
               }}
             >
-              See the 12-node pipeline
+              See the pipeline breakdown
               <ArrowRight size={15} strokeWidth={2.25} />
             </Link>
             <Link

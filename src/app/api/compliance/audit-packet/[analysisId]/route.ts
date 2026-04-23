@@ -1,40 +1,50 @@
 /**
  * GET /api/compliance/audit-packet/[analysisId]
  *
- * Generates a branded, tamper-evident Decision Provenance Record PDF for
- * a single analysis (server-side, plan-gated). Streams the PDF back as
- * a download.
+ * Thin server-side wrapper around the canonical Decision Provenance Record
+ * pipeline. Streams a signed, hashed PDF for a single analysis.
  *
- * URL path kept as /audit-packet/ for backwards compatibility — external
- * integrations and existing deep links shouldn't break on the 2026-04-22
- * rename from "Audit Defense Packet" → "Decision Provenance Record."
+ * URL path kept stable for backwards compatibility — any external deep
+ * link or bookmarked "Audit Defense Packet" URL still resolves. The
+ * PDF itself is titled "Decision Provenance Record" per the 2026-04-22
+ * rename.
  *
- * There is a parallel client-side generator at
- * /api/documents/[id]/provenance-record which produces the same artifact
- * class for design partners (richer data, not plan-gated). Follow-up
- * work will converge the two paths behind one implementation.
+ * Convergence (2026-04-23): previously this route used its own
+ * AggregatePdfGenerator.generateProvenanceRecord() path, which produced
+ * a thinner artifact than the newer /api/documents/[id]/provenance-record
+ * route. Both now flow through assembleProvenanceRecordData() +
+ * DecisionProvenanceRecordGenerator so a GC never sees two different
+ * artifact shapes depending on which button they clicked.
  *
- * Auth: user must own the analysis or belong to the same org.
- * Gating: requires Pro tier or higher (matches existing plan-limit pattern).
- * Audit: every export is logged to AuditLog with the record's SHA-256 hash
- *        so a compliance officer can later prove the record was generated
- *        from this specific source data at this specific time.
+ * Auth:   Supabase session required; caller must own the analysis or
+ *         share its org.
+ * Gating: Pro plan or higher (free tier is blocked with a 402 upgrade
+ *         hint; matches the prior contract).
+ * Audit:  every export writes an AuditLog row stamped with the record's
+ *         input-hash + prompt fingerprint so a compliance officer can
+ *         later prove the record was generated from this source data at
+ *         this specific time.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import { createLogger } from '@/lib/utils/logger';
-import { assessCompliance } from '@/lib/compliance/regulatory-graph';
-import {
-  AggregatePdfGenerator,
-  type ProvenanceRecordInput,
-} from '@/lib/reports/aggregate-pdf-generator';
+import { assembleProvenanceRecordData } from '@/lib/reports/provenance-record-data';
+import { DecisionProvenanceRecordGenerator } from '@/lib/reports/decision-provenance-record-generator';
 import { getUserPlan, getOrgPlan } from '@/lib/utils/plan-limits';
 
-const log = createLogger('AuditPacketExport');
+const log = createLogger('DprExport');
 
 export const dynamic = 'force-dynamic';
+
+function safeFilename(raw: string): string {
+  return raw
+    .replace(/\.[^.]+$/, '')
+    .replace(/[^a-z0-9-_]+/gi, '-')
+    .slice(0, 64);
+}
 
 export async function GET(
   _request: NextRequest,
@@ -54,34 +64,18 @@ export async function GET(
       return NextResponse.json({ error: 'analysisId is required' }, { status: 400 });
     }
 
-    // Fetch analysis + biases + document
+    // Ownership check — resolve analysis → document → (userId | orgId).
     const analysis = await prisma.analysis.findUnique({
       where: { id: analysisId },
-      include: {
-        biases: {
-          select: {
-            biasType: true,
-            severity: true,
-            confidence: true,
-            excerpt: true,
-          },
-        },
-        document: {
-          select: {
-            filename: true,
-            userId: true,
-            orgId: true,
-          },
-        },
+      select: {
+        id: true,
+        document: { select: { id: true, userId: true, orgId: true } },
       },
     });
-
     if (!analysis) {
       return NextResponse.json({ error: 'Analysis not found' }, { status: 404 });
     }
 
-    // Ownership check: user owns the source document OR shares the org
-    let orgName: string | null = null;
     if (analysis.document.userId !== user.id) {
       if (!analysis.document.orgId) {
         return NextResponse.json({ error: 'Access denied' }, { status: 403 });
@@ -94,19 +88,9 @@ export async function GET(
         return NextResponse.json({ error: 'Access denied' }, { status: 403 });
       }
     }
-    if (analysis.document.orgId) {
-      try {
-        const org = await prisma.organization.findUnique({
-          where: { id: analysis.document.orgId },
-          select: { name: true },
-        });
-        orgName = org?.name ?? null;
-      } catch {
-        // Organization table may not exist — leave orgName null
-      }
-    }
 
-    // Plan gating — Pro or higher. Prefer org plan if the analysis lives in an org.
+    // Plan gate — Pro+ for the server-streamed download. Org plan wins
+    // when the analysis lives in an org, so team seats inherit access.
     const effectivePlan = analysis.document.orgId
       ? await getOrgPlan(analysis.document.orgId)
       : await getUserPlan(user.id);
@@ -118,58 +102,74 @@ export async function GET(
             'Decision Provenance Record export requires the Pro plan or higher. Upgrade to unlock regulator-grade compliance reports.',
           requiredPlan: 'pro',
         },
-        { status: 402 } // Payment Required
+        { status: 402 }
       );
     }
 
-    // Run compliance assessment against all registered frameworks
-    const assessmentInput = analysis.biases.map(b => ({
-      type: b.biasType,
-      severity: b.severity,
-      confidence: b.confidence ?? 0.5,
-    }));
-    const assessments = assessCompliance(assessmentInput);
+    // Canonical path: assemble → generate → persist record for archive.
+    const data = await assembleProvenanceRecordData(analysisId);
 
-    // Build the packet
-    const generator = new AggregatePdfGenerator();
-    const input: ProvenanceRecordInput = {
-      analysisId,
-      documentFilename: analysis.document.filename,
-      orgName,
-      generatedAt: new Date(),
-      overallScore: Math.round(analysis.overallScore),
-      biasFindings: analysis.biases.map(b => ({
-        biasType: b.biasType,
-        severity: b.severity,
-        confidence: b.confidence,
-        excerpt: b.excerpt,
-      })),
-      assessments,
-    };
+    try {
+      await prisma.decisionProvenanceRecord.upsert({
+        where: { analysisId: data.analysisId },
+        create: {
+          analysisId: data.analysisId,
+          documentId: data.documentId,
+          userId: data.userId,
+          orgId: data.orgId,
+          promptFingerprint: data.promptFingerprint,
+          inputHash: data.inputHash,
+          modelLineage: data.modelLineage as unknown as Prisma.InputJsonValue,
+          judgeVariance: data.judgeVariance as unknown as Prisma.InputJsonValue,
+          citations: data.citations as unknown as Prisma.InputJsonValue,
+          regulatoryMapping: data.regulatoryMapping as unknown as Prisma.InputJsonValue,
+          pipelineLineage: data.pipelineLineage as unknown as Prisma.InputJsonValue,
+          schemaVersion: data.schemaVersion,
+          generatedAt: data.generatedAt,
+        },
+        update: {
+          promptFingerprint: data.promptFingerprint,
+          inputHash: data.inputHash,
+          modelLineage: data.modelLineage as unknown as Prisma.InputJsonValue,
+          judgeVariance: data.judgeVariance as unknown as Prisma.InputJsonValue,
+          citations: data.citations as unknown as Prisma.InputJsonValue,
+          regulatoryMapping: data.regulatoryMapping as unknown as Prisma.InputJsonValue,
+          pipelineLineage: data.pipelineLineage as unknown as Prisma.InputJsonValue,
+          schemaVersion: data.schemaVersion,
+          generatedAt: data.generatedAt,
+        },
+      });
+    } catch (persistErr) {
+      // Persistence is best-effort for this route — the canonical "generate
+      // and persist" path is the client-side button. If the upsert fails
+      // (schema drift during migration window), still serve the PDF.
+      log.warn('DPR upsert failed on server export (non-fatal):', persistErr);
+    }
 
-    const { doc, filename, hash } = generator.generateProvenanceRecord(input);
-
-    // Get the raw PDF bytes (arraybuffer) for the HTTP response
+    const generator = new DecisionProvenanceRecordGenerator();
+    const doc = generator.generate(data);
     const pdfArrayBuffer = doc.output('arraybuffer') as ArrayBuffer;
     const pdfBytes = new Uint8Array(pdfArrayBuffer);
 
-    // Audit trail — provable record of export for downstream compliance attestation
+    const filename = `DPR-${safeFilename(data.meta.filename)}-${data.analysisId.slice(0, 8)}.pdf`;
+
+    // AuditLog — the "proof the record was generated from this source".
     try {
       await prisma.auditLog.create({
         data: {
           userId: user.id,
           orgId: analysis.document.orgId ?? 'personal',
-          action: 'audit_packet.export',
+          action: 'dpr.export',
           resource: 'analysis',
           resourceId: analysisId,
           details: {
-            hash,
+            inputHash: data.inputHash,
+            promptFingerprint: data.promptFingerprint,
             filename,
-            frameworksTriggered: assessments
-              .filter(a => a.triggeredProvisions.length > 0)
-              .map(a => a.framework.id),
-            biasCount: analysis.biases.length,
-            overallScore: Math.round(analysis.overallScore),
+            schemaVersion: data.schemaVersion,
+            biasCount: data.meta.biasCount,
+            overallScore: data.meta.overallScore,
+            channel: 'compliance.audit-packet',
           },
         },
       });
@@ -178,23 +178,25 @@ export async function GET(
     }
 
     log.info(
-      `Decision Provenance Record exported: analysis=${analysisId} hash=${hash.slice(0, 12)}… plan=${effectivePlan}`
+      `DPR exported (compliance channel): analysis=${analysisId} inputHash=${data.inputHash.slice(0, 12)}… plan=${effectivePlan}`
     );
 
-    // Return the PDF as a streaming download
     return new NextResponse(pdfBytes as unknown as BodyInit, {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="${filename}"`,
-        'X-Audit-Packet-Hash': hash,
+        'X-Dpr-Input-Hash': data.inputHash,
+        'X-Dpr-Prompt-Fingerprint': data.promptFingerprint,
+        // Legacy header retained for any external caller that parsed it.
+        'X-Audit-Packet-Hash': data.inputHash,
         'Cache-Control': 'private, no-store',
       },
     });
   } catch (err: unknown) {
     const code = (err as { code?: string })?.code;
     if (code === 'P2021' || code === 'P2022') {
-      log.warn('Schema drift during provenance record export:', code);
+      log.warn('Schema drift during DPR export:', code);
       return NextResponse.json(
         { error: 'Decision Provenance Record not yet available. Database migration pending.' },
         { status: 503, headers: { 'Retry-After': '300' } }

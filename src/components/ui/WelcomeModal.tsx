@@ -125,7 +125,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
-      }).catch(() => {});
+      }).catch(err => console.warn('[WelcomeModal] persist onboarding failed:', err));
     },
     []
   );

@@ -1075,6 +1075,7 @@ export default function LandingPage() {
               'Privacy',
               'Security',
               'How It Works',
+              'R²F Standard',
               'Case Studies',
               'Proof',
               'Bias Genome',
@@ -1085,21 +1086,23 @@ export default function LandingPage() {
               const href =
                 l === 'How It Works'
                   ? '/how-it-works'
-                  : l === 'Case Studies'
-                    ? '/case-studies'
-                    : l === 'Proof'
-                      ? '/proof'
-                      : l === 'Bias Genome'
-                        ? '/bias-genome'
-                        : l === 'Decision Alpha'
-                          ? '/decision-alpha'
-                          : l === 'Pricing'
-                            ? '/pricing'
-                            : l === 'Privacy'
-                              ? '/privacy'
-                              : l === 'Security'
-                                ? '/security'
-                                : `#${l.toLowerCase().replace(/\s+/g, '-')}`;
+                  : l === 'R²F Standard'
+                    ? '/r2f-standard'
+                    : l === 'Case Studies'
+                      ? '/case-studies'
+                      : l === 'Proof'
+                        ? '/proof'
+                        : l === 'Bias Genome'
+                          ? '/bias-genome'
+                          : l === 'Decision Alpha'
+                            ? '/decision-alpha'
+                            : l === 'Pricing'
+                              ? '/pricing'
+                              : l === 'Privacy'
+                                ? '/privacy'
+                                : l === 'Security'
+                                  ? '/security'
+                                  : `#${l.toLowerCase().replace(/\s+/g, '-')}`;
               return (
                 <a
                   key={l}

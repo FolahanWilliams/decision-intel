@@ -755,7 +755,7 @@ async function processSlackDecision(
             orgId: roomOrgMember?.orgId,
             status: 'open',
             decisionType: input.decisionType || 'general',
-            biasBriefing: JSON.parse(JSON.stringify(briefing)),
+            biasBriefing: toPrismaJson(briefing),
           },
         });
         await prisma.roomParticipant.create({

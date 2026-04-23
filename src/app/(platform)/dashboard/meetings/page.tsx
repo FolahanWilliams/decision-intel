@@ -566,9 +566,7 @@ function MeetingsInner() {
         />
         <div className="page-header animate-fade-in">
           <div>
-            <h1
-              style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.03em', margin: 0 }}
-            >
+            <h1>
               <span className="text-gradient">Meetings & Rooms</span>
             </h1>
             <p className="page-subtitle" style={{ maxWidth: 640 }}>

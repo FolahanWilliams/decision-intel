@@ -89,7 +89,7 @@ const YOU_RECEIVE: Array<{ icon: typeof ShieldCheck; title: string; body: string
   {
     icon: Handshake,
     title: 'Named design partner in investor deck (optional)',
-    body: 'Attribution in the pre-seed / seed deck, subject to your approval. Often the cleanest way to reciprocate a warm intro.',
+    body: 'Attribution in the investor deck, subject to your approval. Often the cleanest way to reciprocate a warm intro.',
   },
 ];
 

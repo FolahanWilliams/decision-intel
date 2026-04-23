@@ -1,10 +1,31 @@
 #!/bin/sh
 # ==============================================================================
-# Pre-Commit Hook: AI-Powered Architectural Safety Check
+# Pre-Commit Hook: Positioning-lint + AI-Powered Architectural Safety Check
 # ==============================================================================
-# Runs the Gemini CLI audit before every commit.
-# Blocks commit if critical issues are found.
+# 1. positioning-lint — fast, deterministic, blocks any retired vocabulary
+#    from leaking back onto a marketing surface. Near-zero runtime.
+# 2. Gemini CLI audit — slower, architectural.
 # ==============================================================================
+
+echo ""
+echo "🔤 Running positioning-lint (banned-vocabulary scanner)..."
+echo ""
+
+npm run lint:positioning
+POSITIONING_EXIT_CODE=$?
+
+if [ $POSITIONING_EXIT_CODE -ne 0 ]; then
+    echo ""
+    echo "╔══════════════════════════════════════════════════════════════╗"
+    echo "║  ❌ COMMIT BLOCKED: positioning-lint failed                  ║"
+    echo "╠══════════════════════════════════════════════════════════════╣"
+    echo "║  Banned vocabulary leaked into a marketing surface.          ║"
+    echo "║  Fix in the same commit or add a scoped allowIn rule in     ║"
+    echo "║  scripts/lint-positioning.mjs.                              ║"
+    echo "╚══════════════════════════════════════════════════════════════╝"
+    echo ""
+    exit 1
+fi
 
 echo ""
 echo "🔍 Running AI Architectural Audit..."

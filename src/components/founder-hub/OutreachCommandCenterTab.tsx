@@ -105,7 +105,7 @@ export function OutreachCommandCenterTab({ founderPass }: Props) {
             marginBottom: 6,
           }}
         >
-          Outreach Command Center
+          Outreach Strategy
         </div>
         <h2
           style={{

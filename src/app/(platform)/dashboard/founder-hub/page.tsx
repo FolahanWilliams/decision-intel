@@ -277,7 +277,7 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
   { id: 'sales', label: 'Sales Toolkit', icon: <MessageSquare size={16} />, group: 'Go-to-Market' },
   {
     id: 'outreach_cmd',
-    label: 'Outreach Command Center',
+    label: 'Outreach Strategy',
     icon: <Zap size={16} />,
     group: 'Go-to-Market',
   },
@@ -289,7 +289,7 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
   },
   {
     id: 'outreach',
-    label: 'Outreach & Meetings',
+    label: 'Message Generator',
     icon: <Crosshair size={16} />,
     group: 'Go-to-Market',
   },

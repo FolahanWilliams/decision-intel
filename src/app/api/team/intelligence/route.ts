@@ -9,9 +9,84 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { computeMaturityScore } from '@/lib/learning/maturity-score';
+import { brierCategory, type BrierCategory } from '@/lib/learning/brier-scoring';
 import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('TeamIntelligenceAPI');
+
+const BRIER_WINDOW_DAYS = 90;
+const BRIER_MIN_SAMPLE = 3;
+
+interface BrierChip {
+  avgBrier: number;
+  category: BrierCategory;
+  sampleSize: number;
+  windowDays: number;
+}
+
+interface OutcomesPending {
+  pending: number;
+  overdue: number;
+}
+
+/** Roll the last BRIER_WINDOW_DAYS of outcome rows into a single
+ *  org-level calibration signal. Returns null when the sample is too
+ *  small to be defensible — we would rather show nothing than a chip
+ *  built from one data point. */
+async function computeOrgBrierChip(
+  orgId: string | null,
+  userId: string
+): Promise<BrierChip | null> {
+  try {
+    const since = new Date(Date.now() - BRIER_WINDOW_DAYS * 24 * 60 * 60 * 1000);
+    const rows = await prisma.decisionOutcome.findMany({
+      where: {
+        reportedAt: { gte: since },
+        brierScore: { not: null },
+        ...(orgId ? { orgId } : { userId }),
+      },
+      select: { brierScore: true },
+    });
+    if (rows.length < BRIER_MIN_SAMPLE) return null;
+    const sum = rows.reduce((acc, r) => acc + (r.brierScore ?? 0), 0);
+    const avg = sum / rows.length;
+    return {
+      avgBrier: Number(avg.toFixed(3)),
+      category: brierCategory(avg),
+      sampleSize: rows.length,
+      windowDays: BRIER_WINDOW_DAYS,
+    };
+  } catch (err) {
+    log.warn('Brier chip computation failed (non-fatal):', err);
+    return null;
+  }
+}
+
+/** Count analyses awaiting outcome — the "flywheel hasn't closed" backlog
+ *  the sidebar chip surfaces. Splits `pending_outcome` from
+ *  `outcome_overdue` so the UI can colour the overdue subset. */
+async function computeOutcomesPending(
+  orgId: string | null,
+  userId: string
+): Promise<OutcomesPending> {
+  try {
+    const scopeClause = orgId
+      ? { document: { orgId } }
+      : { document: { userId } };
+    const [pending, overdue] = await Promise.all([
+      prisma.analysis.count({
+        where: { ...scopeClause, outcomeStatus: 'pending_outcome' },
+      }),
+      prisma.analysis.count({
+        where: { ...scopeClause, outcomeStatus: 'outcome_overdue' },
+      }),
+    ]);
+    return { pending, overdue };
+  } catch (err) {
+    log.warn('Outcomes-pending count failed (non-fatal):', err);
+    return { pending: 0, overdue: 0 };
+  }
+}
 
 export async function GET() {
   try {
@@ -37,16 +112,24 @@ export async function GET() {
     }
 
     if (!orgId) {
+      // Personal scope — org-gated signals are empty but flywheel signals
+      // (Brier, outcomes-pending) still render off the user's own analyses.
+      const [brierChip, outcomesPending] = await Promise.all([
+        computeOrgBrierChip(null, user.id),
+        computeOutcomesPending(null, user.id),
+      ]);
       return NextResponse.json({
         profile: null,
         causalWeights: [],
         maturityScore: null,
-        _message: 'Organization membership required for team intelligence.',
+        brierChip,
+        outcomesPending,
+        _message: 'Personal scope — team-level signals require org membership.',
       });
     }
 
-    // Parallel fetch: profile, causal weights, maturity score
-    const [profile, causalEdges, maturity] = await Promise.all([
+    // Parallel fetch: profile, causal weights, maturity score, flywheel
+    const [profile, causalEdges, maturity, brierChip, outcomesPending] = await Promise.all([
       prisma.teamCognitiveProfile
         .findFirst({
           where: { orgId },
@@ -64,6 +147,9 @@ export async function GET() {
         .catch(() => []),
 
       computeMaturityScore(orgId).catch(() => null),
+
+      computeOrgBrierChip(orgId, user.id),
+      computeOutcomesPending(orgId, user.id),
     ]);
 
     // Transform causal edges into weights the frontend can display
@@ -125,6 +211,8 @@ export async function GET() {
               peerBenchmark: maturity.peerBenchmark,
             }
           : null,
+        brierChip,
+        outcomesPending,
       },
       {
         headers: { 'Cache-Control': 'private, max-age=300, stale-while-revalidate=60' },

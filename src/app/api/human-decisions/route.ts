@@ -219,9 +219,34 @@ export async function GET(req: NextRequest) {
     const page = Math.max(1, Math.min(parseInt(searchParams.get('page') || '1', 10), 1000));
     const offset = (page - 1) * limit;
     const source = searchParams.get('source');
+    const analysisId = searchParams.get('analysisId');
+    const documentId = searchParams.get('documentId');
 
     const where: Record<string, unknown> = { userId: user.id };
     if (source) where.source = source;
+    // Filter to decisions linked to a specific analysis or document —
+    // powers the TimelinePhaseScrub "during" panel on /documents/[id].
+    // documentId resolves to the latest analysis on that document so a
+    // caller with only doc.id can still find the linked decision.
+    if (analysisId) {
+      where.linkedAnalysisId = analysisId;
+    } else if (documentId) {
+      try {
+        const latest = await prisma.analysis.findFirst({
+          where: { documentId },
+          orderBy: { createdAt: 'desc' },
+          select: { id: true },
+        });
+        if (latest) {
+          where.linkedAnalysisId = latest.id;
+        } else {
+          return NextResponse.json({ decisions: [], total: 0, page, totalPages: 0 });
+        }
+      } catch (lookupErr) {
+        log.warn('documentId → analysis lookup failed on human-decisions list:', lookupErr);
+        return NextResponse.json({ decisions: [], total: 0, page, totalPages: 0 });
+      }
+    }
 
     let decisions: unknown[] = [];
     let total = 0;

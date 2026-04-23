@@ -25,6 +25,9 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useToast } from '@/components/ui/EnhancedToast';
 import { TeammateWallModal } from '@/components/pricing/TeammateWallModal';
 import dynamic from 'next/dynamic';
+import { createClientLogger } from '@/lib/utils/logger';
+
+const log = createClientLogger('TeamPage');
 
 const TeamIntelligenceTab = dynamic(() => import('@/components/ui/TeamIntelligenceTab'), {
   loading: () => (
@@ -99,7 +102,7 @@ export default function TeamPage() {
       .then(data => {
         if (data?.plan) setPlan(data.plan);
       })
-      .catch(() => {});
+      .catch(err => log.warn('billing fetch failed:', err));
   }, []);
 
   const isTeamPlan = plan === 'team' || plan === 'enterprise';
@@ -282,9 +285,7 @@ export default function TeamPage() {
             {org.name.charAt(0).toUpperCase()}
           </div>
           <div>
-            <h1
-              style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.03em', margin: 0 }}
-            >
+            <h1>
               <span className="text-gradient">{org.name}</span>
             </h1>
             <p className="page-subtitle">

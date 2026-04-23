@@ -5,6 +5,7 @@ import { User, Users } from 'lucide-react';
 import { DecisionDNAPageContent } from '@/components/dna/DecisionDNAPageContent';
 import { FingerprintContent } from '@/components/fingerprint/FingerprintContent';
 import { BiasGenomeBenchmark } from './BiasGenomeBenchmark';
+import { TopCounterfactualsCard } from './TopCounterfactualsCard';
 
 type View = 'personal' | 'team';
 
@@ -36,6 +37,11 @@ export function DecisionIntelligenceContent() {
           />
         </div>
       </div>
+
+      {/* Top counterfactuals — the board-ready digest beat. Renders null
+          when the recent window has no positive scenarios, so it never
+          leads with a "0" surface. */}
+      <TopCounterfactualsCard />
 
       {/* Content */}
       {activeView === 'personal' ? <DecisionDNAPageContent /> : <FingerprintContent />}

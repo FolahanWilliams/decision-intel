@@ -157,7 +157,7 @@ export interface CaseStudy {
 
   /** Pre-decision evidence: the actual document/memo from BEFORE outcome was known.
    *  This eliminates hindsight bias — shows what the decision looked like at decision time,
-   *  and what a Decision Intelligence platform would have flagged. */
+   *  and what a reasoning-layer audit would have flagged. */
   preDecisionEvidence?: {
     /** The memo, statement, or document excerpt from before the decision outcome */
     document: string;

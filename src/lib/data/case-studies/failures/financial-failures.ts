@@ -54,7 +54,7 @@ export const FINANCIAL_FAILURE_CASES: CaseStudy[] = [
       ],
       flaggableBiases: ['authority_bias', 'groupthink', 'sunk_cost_fallacy'],
       hypotheticalAnalysis:
-        "A decision intelligence platform would have detected the anomalous divergence between declining telecom revenue industry-wide and WorldCom's stable reported earnings, flagging the sudden spike in capitalized line costs as inconsistent with historical patterns. The directive to exclude external auditors from reviewing entries would have triggered a critical transparency alert, and authority bias scoring would have identified the CFO's unilateral control over accounting classifications as a single point of failure.",
+        "A reasoning-layer audit would have detected the anomalous divergence between declining telecom revenue industry-wide and WorldCom's stable reported earnings, flagging the sudden spike in capitalized line costs as inconsistent with historical patterns. The directive to exclude external auditors from reviewing entries would have triggered a critical transparency alert, and authority bias scoring would have identified the CFO's unilateral control over accounting classifications as a single point of failure.",
     },
     source:
       'WorldCom Inc. Chapter 11 filing, S.D.N.Y. Case No. 02-13533; SEC v. WorldCom Inc. (2002); Cynthia Cooper, "Extraordinary Circumstances" (2008)',
@@ -122,7 +122,7 @@ export const FINANCIAL_FAILURE_CASES: CaseStudy[] = [
         'narrative_fallacy',
       ],
       hypotheticalAnalysis:
-        'A decision intelligence platform would have flagged the concentration risk of a single business unit contributing over half of earnings, particularly one operating in financial services without bank-level regulatory oversight or capital requirements. The narrative fallacy of "GE management discipline" being transferable to financial risk management would have been identified as unsupported by evidence. The platform would have modeled tail-risk scenarios showing that a financial crisis would simultaneously impair GE Capital\'s assets and eliminate the company\'s ability to raise capital.',
+        'A reasoning-layer audit would have flagged the concentration risk of a single business unit contributing over half of earnings, particularly one operating in financial services without bank-level regulatory oversight or capital requirements. The narrative fallacy of "GE management discipline" being transferable to financial risk management would have been identified as unsupported by evidence. Tail-risk scenarios would have shown that a financial crisis would simultaneously impair GE Capital\'s assets and eliminate the company\'s ability to raise capital.',
     },
     source:
       'GE 10-K filings (2007-2018); Thomas Gryta and Ted Mann, "Lights Out: Pride, Delusion, and the Fall of General Electric" (2020); SEC investigation of GE accounting (2020)',

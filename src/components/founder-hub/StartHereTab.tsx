@@ -128,17 +128,17 @@ const SESSIONS: StudySession[] = [
     tabs: [
       {
         tabId: 'outreach_cmd',
-        label: 'Outreach Command Center',
+        label: 'Outreach Strategy',
         icon: <Zap size={14} />,
         minutes: 40,
-        why: 'This-week priority, buyer personas, industry atlas, channel matrix, contact pipeline, discovery call companion, pattern dashboard, templates, POC kit, deal-closer docs.',
+        why: 'This-week priority, buyer personas, industry atlas, channel matrix, contact pipeline, discovery call companion, pattern dashboard, templates, POC kit, deal-closer docs. The strategic layer — who, why, through which channels.',
       },
       {
         tabId: 'outreach',
-        label: 'Outreach & Meetings',
+        label: 'Message Generator',
         icon: <Crosshair size={14} />,
         minutes: 20,
-        why: 'Prospect pipeline, weekly brief, meeting prep, stakeholder notes.',
+        why: 'Paste a LinkedIn URL, generate a tailored message, save the prospect to the pipeline. The tactical layer — paired with Outreach Strategy, not a duplicate of it.',
       },
       {
         tabId: 'content',
@@ -995,9 +995,9 @@ function renderNextAction(overallPct: number) {
               marginTop: 6,
             }}
           >
-            Your next action is Monday-morning outreach — 5 to 10 messages from the Outreach Command
-            Center templates, sent before noon. Nothing else. Everything in the hub only matters if
-            a CSO replies.
+            Your next action is Monday-morning outreach — 5 to 10 messages from the Outreach
+            Strategy templates, sent before noon. Nothing else. Everything in the hub only matters
+            if a CSO replies.
           </div>
           {isComplete && (
             <div

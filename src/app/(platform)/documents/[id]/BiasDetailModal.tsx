@@ -591,9 +591,9 @@ export function BiasDetailModal({
           >
             <div className="flex items-center gap-lg">
               <div>
-                <span className="text-xs text-muted">Detection Model: </span>
+                <span className="text-xs text-muted">Detection Framework: </span>
                 <span className="text-xs" style={{ color: 'var(--text-highlight)' }}>
-                  Gemini 3 Pro
+                  Recognition-Rigor Framework
                 </span>
               </div>
               <div>

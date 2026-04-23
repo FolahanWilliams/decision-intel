@@ -21,7 +21,7 @@
  * claim was overstated when they ask for backup.
  */
 
-import jsPDF from 'jspdf';
+import jsPDF, { GState } from 'jspdf';
 import type { ProvenanceRecordData } from './provenance-record-data';
 
 const MAX_TITLE_CHARS = 70;
@@ -61,15 +61,7 @@ export class DecisionProvenanceRecordGenerator {
 
   /** Generate and trigger a client-side download of the record PDF. */
   public generateAndDownload(data: ProvenanceRecordData) {
-    this.drawPageOne(data);
-    this.doc.addPage();
-    this.drawPageTwo(data);
-    this.doc.addPage();
-    this.drawPageThree(data);
-    this.doc.addPage();
-    this.drawPageFour(data);
-    this.drawFooterAllPages();
-
+    this.generate(data);
     const stamp = data.generatedAt.toISOString().slice(0, 10);
     this.doc.save(`decision-provenance-record-${slugify(data.meta.filename)}-${stamp}.pdf`);
   }
@@ -77,6 +69,18 @@ export class DecisionProvenanceRecordGenerator {
   /** Return the PDF as a Blob (useful for server-side generation or
    *  attaching to emails). */
   public generateAsBlob(data: ProvenanceRecordData): Blob {
+    this.generate(data);
+    return this.doc.output('blob');
+  }
+
+  /** Assemble every page and return the raw jsPDF instance. Callers that
+   *  need bytes (server-side streaming, buffer hashing) should use this
+   *  and call `.output('arraybuffer')` themselves.
+   *
+   *  `watermark` draws a diagonal banner on every page — used for the
+   *  public sample DPR so a GC can't mistake the specimen for a real
+   *  audit record. Leave undefined for authenticated exports. */
+  public generate(data: ProvenanceRecordData, opts?: { watermark?: string }): jsPDF {
     this.drawPageOne(data);
     this.doc.addPage();
     this.drawPageTwo(data);
@@ -85,13 +89,30 @@ export class DecisionProvenanceRecordGenerator {
     this.doc.addPage();
     this.drawPageFour(data);
     this.drawFooterAllPages();
-    return this.doc.output('blob');
+    if (opts?.watermark) this.drawWatermarkAllPages(opts.watermark);
+    return this.doc;
+  }
+
+  /** Diagonal watermark across every page. Intentionally large and
+   *  tinted so it survives being printed or screenshotted. */
+  private drawWatermarkAllPages(label: string) {
+    const pages = this.doc.getNumberOfPages();
+    for (let i = 1; i <= pages; i++) {
+      this.doc.setPage(i);
+      this.doc.saveGraphicsState();
+      this.doc.setGState(new GState({ opacity: 0.08 }));
+      this.doc.setFont('helvetica', 'bold');
+      this.doc.setFontSize(88);
+      this.doc.setTextColor(22, 163, 74);
+      this.doc.text(label, 105, 160, { align: 'center', angle: -28 });
+      this.doc.restoreGraphicsState();
+    }
   }
 
   // ─── Page 1: Cover + hashes ────────────────────────────────────────
   private drawPageOne(data: ProvenanceRecordData) {
     this.drawAccentBand();
-    this.drawHeader('AUDIT DEFENSE PACKET');
+    this.drawHeader('DECISION PROVENANCE RECORD');
 
     const title = truncate(data.meta.filename.replace(/\.[^.]+$/, ''), MAX_TITLE_CHARS);
 
@@ -102,6 +123,14 @@ export class DecisionProvenanceRecordGenerator {
     const titleLines = this.doc.splitTextToSize(title, TEXT_W);
     this.doc.text(titleLines, MARGIN_L, 34);
     let y = 34 + titleLines.length * 8 + 4;
+
+    // R²F framework mark — names the category claim on the cover so the
+    // reviewer sees it before anything else (CLAUDE.md 2026-04-22 lock).
+    this.doc.setFont('helvetica', 'bold');
+    this.doc.setFontSize(9);
+    this.doc.setTextColor(22, 163, 74);
+    this.doc.text('R²F · RECOGNITION-RIGOR FRAMEWORK', MARGIN_L, y);
+    y += 6;
 
     // Purpose strap
     this.doc.setFont('helvetica', 'italic');
@@ -467,7 +496,7 @@ export class DecisionProvenanceRecordGenerator {
       this.doc.setFontSize(8);
       this.doc.setTextColor(150, 150, 150);
       this.doc.text(
-        `Decision Provenance Record · Decision Intel · Page ${i} of ${pages}`,
+        `Decision Provenance Record · R²F · Decision Intel · Page ${i} of ${pages}`,
         PAGE_W / 2,
         290,
         { align: 'center' }

@@ -29,7 +29,7 @@ function persistOnboardingState(data: Partial<OnboardingState>) {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
-  }).catch(() => {});
+  }).catch(err => console.warn('[OnboardingGuide] persist onboarding state failed:', err));
 }
 
 interface ChecklistItem {

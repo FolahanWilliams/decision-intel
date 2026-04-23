@@ -32,6 +32,10 @@ interface ShareModalProps {
    *  record-keeping, SEC AI disclosure, and Basel III ICAAP. Bundled on
    *  every audit for the design-partner cohort. */
   onExportProvenanceRecord?: () => Promise<void>;
+  /** Hallway Brief — single-page PDF handed to the CEO before the board
+   *  meeting. Top recommendation, top 3 risks, one counterfactual,
+   *  reviewer counter-signature. */
+  onExportHallwayBrief?: () => Promise<void>;
   onExportCsv: () => void;
   onExportMarkdown: () => void;
   onExportJson: () => void;
@@ -48,6 +52,7 @@ export function ShareModal({
   onExportPdf,
   onExportBoardReport,
   onExportProvenanceRecord,
+  onExportHallwayBrief,
   onExportCsv,
   onExportMarkdown,
   onExportJson,
@@ -56,6 +61,7 @@ export function ShareModal({
   const [exportingPdf, setExportingPdf] = useState(false);
   const [exportingBoard, setExportingBoard] = useState(false);
   const [exportingRecord, setExportingRecord] = useState(false);
+  const [exportingBrief, setExportingBrief] = useState(false);
   const [copied, setCopied] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [creatingLink, setCreatingLink] = useState(false);
@@ -101,6 +107,18 @@ export function ShareModal({
       setExportingRecord(false);
     }
   }, [onExportProvenanceRecord]);
+
+  const handleHallwayBriefExport = useCallback(async () => {
+    if (!onExportHallwayBrief) return;
+    setExportingBrief(true);
+    try {
+      await onExportHallwayBrief();
+    } catch {
+      // Parent handler already showToast'd with the specific error.
+    } finally {
+      setExportingBrief(false);
+    }
+  }, [onExportHallwayBrief]);
 
   const handleCopySummary = useCallback(async () => {
     try {
@@ -256,6 +274,34 @@ export function ShareModal({
                   <span style={{ fontSize: '13px', fontWeight: 600 }}>Board-Ready Report</span>
                   <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
                     2-page executive summary — DQI, top risks, CEO question, mitigation
+                  </span>
+                </Button>
+              )}
+              {onExportHallwayBrief && (
+                <Button
+                  variant="outline"
+                  onClick={handleHallwayBriefExport}
+                  disabled={exportingBrief}
+                  className="h-auto flex-col gap-2 p-4"
+                  style={{
+                    gridColumn: '1 / -1',
+                    borderColor: 'var(--accent-primary)',
+                    background: 'rgba(22, 163, 74, 0.05)',
+                  }}
+                >
+                  {exportingBrief ? (
+                    <Loader2
+                      size={24}
+                      className="animate-spin"
+                      style={{ color: 'var(--accent-primary)' }}
+                    />
+                  ) : (
+                    <FileText size={24} style={{ color: 'var(--accent-primary)' }} />
+                  )}
+                  <span style={{ fontSize: '13px', fontWeight: 600 }}>Hallway Brief</span>
+                  <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                    One page, signed — top recommendation, top 3 risks, one counterfactual.
+                    For the 90-second CEO hand-off.
                   </span>
                 </Button>
               )}

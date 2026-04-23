@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, FileText, ShieldCheck, Microscope, BookOpen, ChevronDown } from 'lucide-react';
+import { ArrowRight, FileText, ShieldCheck, Microscope, BookOpen, ChevronDown, GraduationCap } from 'lucide-react';
 
 import { MarketingNav } from '@/components/marketing/MarketingNav';
 import { PipelineMiniatureViz } from '@/components/marketing/how-it-works/PipelineMiniatureViz';
@@ -734,6 +734,25 @@ export function HowItWorksClient() {
                 }}
               >
                 <Microscope size={14} /> See the proof
+              </Link>
+              <Link
+                href="/r2f-standard"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '12px 22px',
+                  borderRadius: 10,
+                  background: 'rgba(255,255,255,0.08)',
+                  color: C.white,
+                  border: `1px solid rgba(255,255,255,0.15)`,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  textDecoration: 'none',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <GraduationCap size={14} /> Read the R²F standard
               </Link>
             </div>
           </div>

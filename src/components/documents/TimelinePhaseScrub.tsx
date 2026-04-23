@@ -21,6 +21,7 @@
  * conditionally by the document-detail page.
  */
 
+import { useEffect, useState } from 'react';
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Circle, PenLine, Target, TrendingUp, Activity } from 'lucide-react';
@@ -195,9 +196,19 @@ export function TimelinePhaseScrub({ phase, onChange }: TimelinePhaseScrubProps)
 
 // ─── PhaseDuringPanel ────────────────────────────────────────────────
 
+interface LinkedHumanDecision {
+  id: string;
+  content: string;
+  decisionType?: string | null;
+  createdAt: string;
+}
+
 interface PhaseDuringPanelProps {
   documentId: string;
   analysisId?: string;
+  /** Caller-supplied override; when omitted the panel self-fetches from
+   *  /api/human-decisions?analysisId= (or ?documentId= when no analysis
+   *  id is available yet). */
   hasHumanDecision?: boolean;
   humanDecisionSummary?: string;
   humanDecisionDate?: string;
@@ -206,11 +217,74 @@ interface PhaseDuringPanelProps {
 export function PhaseDuringPanel({
   documentId,
   analysisId,
-  hasHumanDecision = false,
+  hasHumanDecision,
   humanDecisionSummary,
   humanDecisionDate,
 }: PhaseDuringPanelProps) {
-  if (hasHumanDecision && humanDecisionSummary) {
+  const [fetched, setFetched] = useState<LinkedHumanDecision | null>(null);
+  const [loading, setLoading] = useState(hasHumanDecision === undefined);
+
+  // Self-fetch the linked HumanDecision unless the caller has already
+  // supplied both the has-flag and the summary (full override path).
+  useEffect(() => {
+    if (hasHumanDecision !== undefined && humanDecisionSummary !== undefined) {
+      setLoading(false);
+      return;
+    }
+    if (!analysisId && !documentId) {
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    const params = new URLSearchParams({ limit: '1' });
+    if (analysisId) params.set('analysisId', analysisId);
+    else if (documentId) params.set('documentId', documentId);
+
+    fetch(`/api/human-decisions?${params.toString()}`)
+      .then(r => (r.ok ? r.json() : null))
+      .then(json => {
+        if (cancelled || !json) return;
+        const decisions = json.decisions as LinkedHumanDecision[] | undefined;
+        if (decisions && decisions.length > 0) setFetched(decisions[0]);
+      })
+      .catch(err => console.warn('[PhaseDuringPanel] human-decisions fetch failed:', err))
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [analysisId, documentId, hasHumanDecision, humanDecisionSummary]);
+
+  const effectiveHas =
+    hasHumanDecision ?? (fetched !== null);
+  const effectiveSummary =
+    humanDecisionSummary ?? fetched?.content;
+  const effectiveDate =
+    humanDecisionDate ??
+    (fetched ? new Date(fetched.createdAt).toLocaleDateString() : undefined);
+
+  if (loading) {
+    return (
+      <div
+        className="card"
+        style={{
+          border: '1px dashed var(--border-color)',
+          background: 'var(--bg-tertiary)',
+          marginBottom: 'var(--spacing-md)',
+        }}
+      >
+        <div
+          className="card-body"
+          style={{ textAlign: 'center', padding: '28px 24px', color: 'var(--text-muted)' }}
+        >
+          Loading decision record…
+        </div>
+      </div>
+    );
+  }
+
+  if (effectiveHas && effectiveSummary) {
     return (
       <div
         className="card"
@@ -239,7 +313,7 @@ export function PhaseDuringPanel({
             >
               What you decided
             </h3>
-            {humanDecisionDate && (
+            {effectiveDate && (
               <span
                 style={{
                   fontSize: 11,
@@ -248,7 +322,7 @@ export function PhaseDuringPanel({
                   marginLeft: 'auto',
                 }}
               >
-                Logged {humanDecisionDate}
+                Logged {effectiveDate}
               </span>
             )}
           </div>
@@ -261,7 +335,7 @@ export function PhaseDuringPanel({
               whiteSpace: 'pre-wrap',
             }}
           >
-            {humanDecisionSummary}
+            {effectiveSummary}
           </p>
           <Link
             href="/dashboard/decision-log"

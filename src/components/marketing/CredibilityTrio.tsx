@@ -6,7 +6,7 @@
  * Destinations (2026-04-21 refactor):
  *   - /security      — encryption, DPA, procurement posture
  *   - /bias-genome   — open taxonomy with failure-lift rankings
- *   - /how-it-works  — the 12-node pipeline, DQI components, counterfactuals
+ *   - /how-it-works  — the pipeline, DQI components, counterfactuals
  *
  * Light theme. Zero external data deps — thumbnails are self-contained
  * SVG sketches. Case-library coverage stays on CaseStudyCarousel in beat 07;
@@ -390,7 +390,7 @@ function GenomeThumb() {
 }
 
 /** How-It-Works thumbnail: a compact 6-node pipeline with one node highlighted
- *  green (active), the rest in slate. Small "12-NODE PIPELINE" badge anchors
+ *  green (active), the rest in slate. Small "INSIDE THE SYSTEM" badge anchors
  *  the bottom. Abstracts the full /how-it-works PipelineFlowDiagram without
  *  copying its density. */
 function HowItWorksThumb() {

@@ -49,6 +49,10 @@ import { ToxicCombinationCard } from '@/components/visualizations/ToxicCombinati
 import { ScoringBreakdown } from '@/components/visualizations/ScoringBreakdown';
 import { RelatedDecisions } from '@/components/ui/RelatedDecisions';
 import { DecisionScorecard } from '@/components/analysis/DecisionScorecard';
+import { R2FDecompositionCard } from '@/components/documents/R2FDecompositionCard';
+import { R2FBadge } from '@/components/ui/R2FBadge';
+import { ReferenceClassChip } from '@/components/documents/ReferenceClassChip';
+import { ReportOutcomeFab } from '@/components/documents/ReportOutcomeFab';
 import { DrRedTeamCard } from '@/components/analysis/DrRedTeamCard';
 import { RecommendationsPanel } from '@/components/ui/RecommendationsPanel';
 import { ExecutiveSummary } from '@/components/visualizations/ExecutiveSummary';
@@ -568,6 +572,50 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
     }
   };
 
+  // Hallway Brief — single-page PDF a CSO hands the CEO in the hallway
+  // before a board meeting. Sits between the board report (committee
+  // artifact) and the DPR (regulator artifact). Purely client-side jsPDF.
+  const handleHallwayBriefExport = async () => {
+    if (!document || !analysis) return;
+    try {
+      const { HallwayBriefGenerator } = await import('@/lib/reports/hallway-brief-generator');
+      const generator = new HallwayBriefGenerator();
+      generator.generateAndDownload({
+        filename: document.filename,
+        overallScore: analysis.overallScore,
+        noiseScore: analysis.noiseScore,
+        summary: analysis.summary,
+        metaVerdict: analysis.metaVerdict ?? null,
+        biases: biases.map(b => ({
+          biasType: b.biasType,
+          severity: b.severity,
+          confidence: b.confidence,
+          excerpt: b.excerpt,
+          explanation: b.explanation,
+          suggestion: b.suggestion,
+        })),
+        generatedAt: new Date(),
+      });
+      fetch('/api/audit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'EXPORT_HALLWAY_BRIEF',
+          resource: 'Document',
+          resourceId: document.id,
+          details: { filename: document.filename },
+        }),
+      }).catch(err => log.warn('audit EXPORT_HALLWAY_BRIEF failed:', err));
+      showToast('Hallway Brief generated', 'success');
+    } catch (error) {
+      log.error('Failed to generate hallway brief:', error);
+      showToast(
+        error instanceof Error ? error.message : 'Failed to generate hallway brief',
+        'error'
+      );
+    }
+  };
+
   const handleExport = async () => {
     if (!document || !analysis) return;
     setIsExportingPdf(true);
@@ -800,7 +848,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       .then(data => {
         if (data?.prior) setPrior(data.prior);
       })
-      .catch(() => {})
+      .catch(err => log.warn('decision-priors fetch failed:', err))
       .finally(() => setPriorLoading(false));
   }, [analysis?.id]);
 
@@ -812,7 +860,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       .then(data => {
         if (data?.combinations) setToxicCombinations(data.combinations);
       })
-      .catch(() => {});
+      .catch(err => log.warn('toxic-combinations fetch failed:', err));
   }, [analysis?.id]);
 
   const handleMarkdownExport = useCallback(async () => {
@@ -1070,6 +1118,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                     <CheckCircle size={11} /> Analyzed
                   </span>
                 )}
+                {analysis && <R2FBadge size="xs" compact />}
               </div>
             </div>
           </div>
@@ -1281,6 +1330,15 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         </ErrorBoundary>
       )}
 
+      {/* Reference-class forecast — one-line "this memo resembles X of N
+          historical cases, Y failed" above the Executive Summary. Null
+          when the bias signature has no overlap with the seed corpus. */}
+      {analysis && phase === 'before' && biases.length > 0 && (
+        <ErrorBoundary sectionName="Reference-class forecast">
+          <ReferenceClassChip biasTypes={biases.map(b => b.biasType)} />
+        </ErrorBoundary>
+      )}
+
       {/* Executive Summary */}
       {analysis && (
         <ErrorBoundary sectionName="Executive Summary">
@@ -1311,6 +1369,18 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         </ErrorBoundary>
       )}
 
+      {/* R²F decomposition — names the framework in-product so the moat
+          is visible to the CSO and screenshottable for their board. */}
+      {analysis && phase === 'before' && (
+        <ErrorBoundary sectionName="R²F decomposition">
+          <R2FDecompositionCard
+            overallScore={analysis.overallScore}
+            noiseScore={analysis.noiseScore}
+            biasCount={biases.length}
+          />
+        </ErrorBoundary>
+      )}
+
       {/* Featured Counterfactual — ROI hero card for the top-impact bias.
           Renders in every view (Analyst / CSO / Board). Null if backend has
           no scenarios or no positive-impact bias. */}
@@ -1325,10 +1395,12 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           decision or prompts the user to log it. */}
       {analysis && phase === 'during' && (
         <ErrorBoundary sectionName="Phase: During panel">
+          {/* Omit hasHumanDecision so the panel self-fetches the linked
+              HumanDecision via /api/human-decisions?analysisId=… — wired
+              2026-04-23 once the filter shipped. */}
           <PhaseDuringPanel
             documentId={resolvedParams.id}
             analysisId={analysis.id}
-            hasHumanDecision={false}
           />
         </ErrorBoundary>
       )}
@@ -2654,11 +2726,16 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           }}
           onExportPdf={handleExport}
           onExportBoardReport={handleBoardReportExport}
+          onExportHallwayBrief={handleHallwayBriefExport}
           onExportProvenanceRecord={handleProvenanceRecordExport}
           onExportCsv={handleCsvExport}
           onExportMarkdown={handleMarkdownExport}
           onExportJson={handleJsonExport}
         />
+      )}
+
+      {analysis && (
+        <ReportOutcomeFab outcomeStatus={analysis.outcomeStatus} phase={phase} />
       )}
     </div>
   );

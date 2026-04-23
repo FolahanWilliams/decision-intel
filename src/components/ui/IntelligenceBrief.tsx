@@ -160,7 +160,7 @@ export function IntelligenceBrief({ context, metrics }: IntelligenceBriefProps) 
       .then(json => {
         if (!cancelled && json) setData(json);
       })
-      .catch(() => {})
+      .catch(err => console.warn('[IntelligenceBrief] team/intelligence fetch failed:', err))
       .finally(() => {
         if (!cancelled) setLoading(false);
       });

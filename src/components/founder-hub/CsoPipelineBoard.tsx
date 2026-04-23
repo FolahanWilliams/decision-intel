@@ -222,7 +222,7 @@ export function CsoPipelineBoard({ founderPass }: { founderPass: string }) {
             whiteSpace: 'nowrap',
           }}
         >
-          Open Outreach Command Center <ArrowRight size={12} />
+          Open Outreach Strategy <ArrowRight size={12} />
         </Link>
       </div>
 

@@ -106,8 +106,14 @@ const MENUS: MegaMenu[] = [
           {
             icon: Workflow,
             label: 'How it works',
-            description: 'The 12-node pipeline, explained end-to-end.',
+            description: 'The reasoning pipeline, explained end-to-end.',
             href: '/how-it-works',
+          },
+          {
+            icon: GraduationCap,
+            label: 'R²F Standard',
+            description: 'The voluntary standard. Six tenets, self-assessment rubric.',
+            href: '/r2f-standard',
           },
           {
             icon: ListTree,
@@ -128,8 +134,8 @@ const MENUS: MegaMenu[] = [
       eyebrow: 'IP moat',
       title: 'The Recognition-Rigor Framework',
       body: "Kahneman's System 2 debiasing and Klein's Recognition-Primed Decision, arbitrated in one pipeline. The only vendor running both halves of the decision stack.",
-      href: '/how-it-works',
-      cta: 'See the synthesis',
+      href: '/r2f-standard',
+      cta: 'Read the standard',
       icon: GraduationCap,
     },
   },

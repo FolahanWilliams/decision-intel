@@ -251,7 +251,7 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
       {/* Header — shared .page-header rhythm */}
       <header className="page-header">
         <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.03em', margin: 0 }}>
+          <h1>
             <span className="text-gradient">Settings</span>
           </h1>
           <p className="page-subtitle">Manage your account preferences and notifications</p>
@@ -821,7 +821,7 @@ function EmailForwardingSection() {
       .then(data => {
         if (data?.token) setToken(data.token);
       })
-      .catch(() => {})
+      .catch(err => log.warn('email/token fetch failed:', err))
       .finally(() => setLoading(false));
   }, []);
 

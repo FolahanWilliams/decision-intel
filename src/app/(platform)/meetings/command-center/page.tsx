@@ -21,6 +21,9 @@ import {
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useMeetings, type MeetingSummary } from '@/hooks/useMeetings';
+import { createClientLogger } from '@/lib/utils/logger';
+
+const log = createClientLogger('MeetingsCommandCenter');
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -355,7 +358,7 @@ export default function MeetingCommandCenterPage() {
           setOrgId(data?.orgId || data?.organization?.id || null);
         }
       })
-      .catch(() => {});
+      .catch(err => log.warn('team fetch failed:', err));
     return () => {
       cancelled = true;
     };

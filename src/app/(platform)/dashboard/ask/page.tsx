@@ -26,8 +26,14 @@ function AskSurfaceInner() {
         height: 'calc(100vh - 44px)',
       }}
     >
-      {/* Header — compact (sits above a scrolling chat surface) but now on
-          the brand green palette instead of the previous blue/purple mix. */}
+      {/* Header — compact (sits above a scrolling chat surface) on the
+          brand green palette. INTENTIONALLY DEVIATES from the platform
+          .page-header / .text-gradient / .page-subtitle pattern because
+          the chat area below needs every vertical pixel — a 28-40px H1
+          plus page-subtitle would compress the conversation surface. If
+          a future sweep flags this as drift, it's not: the surface is an
+          always-open chat, not a canvas. Treat /ask like an IDE chat
+          panel, not like /dashboard/analytics. */}
       <div
         style={{
           padding: '16px 24px 14px',

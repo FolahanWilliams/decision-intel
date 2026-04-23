@@ -228,7 +228,7 @@ export function DecisionKnowledgeGraph({
       .then(data => {
         if (data) setGraphData(data);
       })
-      .catch(() => {})
+      .catch(err => console.warn('[DecisionKnowledgeGraph] decision-graph fetch failed:', err))
       .finally(() => setLoading(false));
   }, [orgId, timeRange, highlightNodeId]);
 

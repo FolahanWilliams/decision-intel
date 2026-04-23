@@ -34,7 +34,7 @@ export function usePlanLabels(): PlanLabels {
       .then(data => {
         if (!cancelled && data?.plan) setPlan(data.plan);
       })
-      .catch(() => {})
+      .catch(err => console.warn('[usePlanLabels] billing fetch failed:', err))
       .finally(() => {
         if (!cancelled) setIsLoading(false);
       });

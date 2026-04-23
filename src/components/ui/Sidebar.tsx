@@ -23,11 +23,13 @@ import {
   BookTemplate,
   Share2,
   Repeat,
+  ShieldCheck,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { ThemeToggle, ThemeToggleCompact } from '@/components/ThemeToggle';
 import { DensityToggle } from '@/components/DensityProvider';
 import { UsageMeter } from '@/components/billing/UsageMeter';
+import { FlywheelChips } from '@/components/ui/FlywheelChips';
 
 const SIDEBAR_COLLAPSED_KEY = 'di-sidebar-main-collapsed';
 const SIDEBAR_SECTIONS_KEY = 'di-sidebar-collapsed';
@@ -79,7 +81,7 @@ export default function Sidebar() {
       .then(data => {
         if (data?.plan) setPlan(data.plan);
       })
-      .catch(() => {});
+      .catch(err => console.warn('[Sidebar] billing fetch failed:', err));
   }, []);
 
   const isTeamPlan = plan === 'team' || plan === 'enterprise';
@@ -232,7 +234,7 @@ export default function Sidebar() {
                     fontWeight: 500,
                   }}
                 >
-                  Intelligence Platform
+                  Reasoning layer
                 </div>
               </div>
             </div>
@@ -485,6 +487,15 @@ export default function Sidebar() {
               collapsed={collapsed}
               onNavigate={closeMobile}
             />
+            <NavItem
+              href="/dashboard/provenance"
+              icon={<ShieldCheck size={18} />}
+              label="Provenance"
+              description="Archive of signed Decision Provenance Records"
+              active={pathname.startsWith('/dashboard/provenance')}
+              collapsed={collapsed}
+              onNavigate={closeMobile}
+            />
           </CollapsibleSection>
 
           {/* Together — how the team operates. Meetings, decision rooms,
@@ -534,9 +545,13 @@ export default function Sidebar() {
           <div
             style={{
               padding: '10px 14px 0',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 8,
             }}
           >
             <UsageMeter variant="compact" />
+            <FlywheelChips variant="compact" />
           </div>
         )}
 

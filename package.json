@@ -18,6 +18,7 @@
     "gemini": "gemini",
     "test": "vitest run",
     "audit:ai": "bash ./scripts/gemini-audit.sh",
+    "lint:positioning": "node scripts/lint-positioning.mjs",
     "rotate:encryption-key": "tsx ./scripts/rotate-encryption-key.ts",
     "sentry:upload-sourcemaps": "npx -y @sentry/cli@latest sourcemaps upload --org=decision-intel-bu --project=decisionintelsentry --release=${VERCEL_GIT_COMMIT_SHA:-$(git rev-parse HEAD)} .next",
     "format": "prettier --write .",

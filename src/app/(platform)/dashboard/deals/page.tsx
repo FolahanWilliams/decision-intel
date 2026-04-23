@@ -116,9 +116,7 @@ export default function DealsPage() {
         {/* Header — aligned to the shared .page-header rhythm */}
         <div className="page-header">
           <div>
-            <h1
-              style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.03em', margin: 0 }}
-            >
+            <h1>
               <span className="text-gradient">Project Pipeline</span>
             </h1>
             <p className="page-subtitle">
