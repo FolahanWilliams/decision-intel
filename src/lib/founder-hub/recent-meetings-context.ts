@@ -27,8 +27,11 @@ type FounderMeetingLite = {
   prospectName: string | null;
   prospectRole: string | null;
   prospectCompany: string | null;
-  meetingContext: string;
-  founderAsk: string;
+  // Nullable 2026-04-24 — manual-log meetings (source='log') have no
+  // meetingContext / founderAsk since they weren't generated via the
+  // prep-plan flow.
+  meetingContext: string | null;
+  founderAsk: string | null;
   scheduledAt: Date | null;
   happenedAt: Date | null;
   notes: string | null;
@@ -60,9 +63,11 @@ function formatMeeting(m: FounderMeetingLite): string {
   const header = headerFor(m);
   const lines: string[] = [
     `${when} · ${header} · type: ${m.meetingType} · status: ${m.status}${m.outcome ? ` · outcome: ${m.outcome}` : ''}`,
-    `  context: ${truncate(m.meetingContext, 220)}`,
-    `  ask: ${truncate(m.founderAsk, 180)}`,
   ];
+  // Prep-flow fields — skipped entirely for manual-log rows where they
+  // are null by design.
+  if (m.meetingContext) lines.push(`  context: ${truncate(m.meetingContext, 220)}`);
+  if (m.founderAsk) lines.push(`  ask: ${truncate(m.founderAsk, 180)}`);
   // User-facing labels: "What happened / Outcomes / The future" map
   // onto the underlying notes/learnings/nextSteps columns. Keep the
   // chat context aligned with the MeetingsLogTab vocabulary so the

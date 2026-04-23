@@ -31,9 +31,6 @@ import {
   CalendarClock,
   User,
   Briefcase,
-  Pencil,
-  Save,
-  AlertCircle,
   XCircle,
   TrendingUp,
   Presentation,
@@ -518,9 +515,12 @@ function MeetingListItem({
     [meeting.prospectRole, meeting.prospectCompany].filter(Boolean).join(' · ') ||
     MEETING_TYPE_LABELS[meeting.meetingType] ||
     'Meeting';
+  // meetingContext is null for manual-log rows; fall back to the first
+  // chunk of the 'what happened' notes if available, otherwise a dash.
+  const ctx = meeting.meetingContext ?? meeting.notes ?? '';
   const sub =
     [meeting.prospectRole, meeting.prospectCompany].filter(Boolean).join(' · ') ||
-    meeting.meetingContext.slice(0, 60).trim() + (meeting.meetingContext.length > 60 ? '…' : '');
+    (ctx.length > 0 ? ctx.slice(0, 60).trim() + (ctx.length > 60 ? '…' : '') : '—');
 
   return (
     <li>

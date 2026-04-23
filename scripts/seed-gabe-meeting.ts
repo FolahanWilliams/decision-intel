@@ -93,56 +93,80 @@ Brier-calibrated predictions:
 Log all three in the Decision Log with today's date so the calibration compounds.`,
 };
 
+// Error codes we treat as "settle-on-next-deploy" rather than hard
+// failures. P1001 = connection error (DB waking). P2021 = table missing
+// (migration pending). P2022 = column missing (schema drift between
+// generated client and deployed DB). In all three cases we log and exit
+// 0 — the seed is not build-critical and will apply on a subsequent
+// deploy once the DB side is caught up.
+const TOLERABLE_PRISMA_CODES = new Set(['P1001', 'P2021', 'P2022']);
+
 async function main() {
   console.log('\n🤝 Seeding Gabriel Osamor CFO strategy call...\n');
 
-  const existing = await prisma.founderMeeting.findFirst({
-    where: {
-      prospectName: GABE_MEETING.prospectName,
-      meetingType: GABE_MEETING.meetingType,
-      happenedAt: {
-        gte: new Date(HAPPENED_AT.getTime() - 24 * 60 * 60 * 1000),
-        lte: new Date(HAPPENED_AT.getTime() + 24 * 60 * 60 * 1000),
+  try {
+    const existing = await prisma.founderMeeting.findFirst({
+      where: {
+        prospectName: GABE_MEETING.prospectName,
+        meetingType: GABE_MEETING.meetingType,
+        happenedAt: {
+          gte: new Date(HAPPENED_AT.getTime() - 24 * 60 * 60 * 1000),
+          lte: new Date(HAPPENED_AT.getTime() + 24 * 60 * 60 * 1000),
+        },
       },
-    },
-    select: { id: true },
-  });
+      select: { id: true },
+    });
 
-  if (existing) {
-    console.log(`  ⏭️  Gabe meeting already exists (id: ${existing.id}). Skipping.`);
-    return;
+    if (existing) {
+      console.log(`  ⏭️  Gabe meeting already exists (id: ${existing.id}). Skipping.`);
+      return;
+    }
+
+    const created = await prisma.founderMeeting.create({
+      data: {
+        meetingType: GABE_MEETING.meetingType,
+        prospectName: GABE_MEETING.prospectName,
+        prospectRole: GABE_MEETING.prospectRole,
+        prospectCompany: GABE_MEETING.prospectCompany,
+        // Prep fields intentionally null — this is a manually-logged past meeting
+        linkedInInfo: null,
+        meetingContext: null,
+        founderAsk: null,
+        prepPlan: null,
+        // Three-tab content maps onto notes / learnings / nextSteps columns
+        notes: GABE_MEETING.whatHappened,
+        learnings: GABE_MEETING.outcomes,
+        nextSteps: GABE_MEETING.theFuture,
+        outcome: GABE_MEETING.outcome,
+        scheduledAt: null,
+        happenedAt: GABE_MEETING.happenedAt,
+        status: GABE_MEETING.status,
+        source: GABE_MEETING.source,
+      },
+    });
+
+    console.log(`  ✅ Created Gabe meeting (id: ${created.id})`);
+    console.log(`     The Founder AI chat will now reference this call automatically.`);
+  } catch (err) {
+    const code = (err as { code?: string })?.code;
+    if (code && TOLERABLE_PRISMA_CODES.has(code)) {
+      console.warn(
+        `  ⚠️  Seed hit Prisma ${code} (schema still settling or DB asleep). ` +
+          `Will retry on next deploy once migrations are caught up.`
+      );
+      return;
+    }
+    // Surface the full error object so the Vercel build log shows the
+    // actual cause (the wrapper will flag this as a seed failure but
+    // won't block the build).
+    console.error('❌ Gabe seed failed with unexpected error:', err);
+    throw err;
   }
-
-  const created = await prisma.founderMeeting.create({
-    data: {
-      meetingType: GABE_MEETING.meetingType,
-      prospectName: GABE_MEETING.prospectName,
-      prospectRole: GABE_MEETING.prospectRole,
-      prospectCompany: GABE_MEETING.prospectCompany,
-      // Prep fields intentionally null — this is a manually-logged past meeting
-      linkedInInfo: null,
-      meetingContext: null,
-      founderAsk: null,
-      prepPlan: null,
-      // Three-tab content maps onto notes / learnings / nextSteps columns
-      notes: GABE_MEETING.whatHappened,
-      learnings: GABE_MEETING.outcomes,
-      nextSteps: GABE_MEETING.theFuture,
-      outcome: GABE_MEETING.outcome,
-      scheduledAt: null,
-      happenedAt: GABE_MEETING.happenedAt,
-      status: GABE_MEETING.status,
-      source: GABE_MEETING.source,
-    },
-  });
-
-  console.log(`  ✅ Created Gabe meeting (id: ${created.id})`);
-  console.log(`     The Founder AI chat will now reference this call automatically.`);
 }
 
 main()
   .catch(err => {
-    console.error('❌ Seed failed:', err);
+    console.error('❌ Seed failed (outer):', err);
     process.exit(1);
   })
   .finally(async () => {
