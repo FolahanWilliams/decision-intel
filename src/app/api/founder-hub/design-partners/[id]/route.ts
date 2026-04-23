@@ -17,10 +17,12 @@
  */
 
 import { NextRequest } from 'next/server';
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { apiError, apiSuccess } from '@/lib/utils/api-response';
 import { createLogger } from '@/lib/utils/logger';
 import { verifyFounderPass } from '@/lib/utils/founder-auth';
+import type { PartnerRichProfile } from '@/types/partner-profile';
 
 const log = createLogger('FounderDesignPartnerItem');
 
@@ -45,6 +47,8 @@ interface PatchBody {
   status?: ValidStatus;
   founderNotes?: string;
   callScheduledAt?: string | null;
+  slotOrder?: number | null;
+  richProfile?: PartnerRichProfile | null;
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -77,6 +81,24 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     data.callScheduledAt = null;
   } else if (typeof body.callScheduledAt === 'string') {
     data.callScheduledAt = body.callScheduledAt ? new Date(body.callScheduledAt) : null;
+  }
+
+  if (body.slotOrder === null) {
+    data.slotOrder = null;
+  } else if (typeof body.slotOrder === 'number') {
+    if (body.slotOrder < 1 || body.slotOrder > MAX_SEATS || !Number.isInteger(body.slotOrder)) {
+      return apiError({
+        error: `slotOrder must be an integer between 1 and ${MAX_SEATS}.`,
+        status: 400,
+      });
+    }
+    data.slotOrder = body.slotOrder;
+  }
+
+  if (body.richProfile === null) {
+    data.richProfile = Prisma.JsonNull;
+  } else if (body.richProfile && typeof body.richProfile === 'object') {
+    data.richProfile = body.richProfile as unknown as Prisma.InputJsonValue;
   }
 
   // Capacity guard: don't accept the 6th seat.

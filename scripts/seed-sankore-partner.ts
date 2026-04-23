@@ -17,9 +17,10 @@
  * Runs automatically on every Vercel deploy via scripts/seed-business-data.mjs.
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
+import type { PartnerRichProfile } from '../src/types/partner-profile';
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -35,6 +36,233 @@ const prisma = new PrismaClient({ adapter });
 // ─────────────────────────────────────────────────────────────────────────
 
 const SANKORE_EMAIL = 'sankore-pilot@decision-intel.com'; // placeholder key until the real contact confirms; the upsert matches on this string
+
+// ─────────────────────────────────────────────────────────────────────────
+// Structured rich profile — rendered by the Design Partners detail view
+// as the per-partner briefing. Sourced from blending Grok's external
+// analysis of Sankore (sankore.com) with the founder's earlier
+// positioning work. Every claim is defensible — if a fact is invented
+// it is tagged as such, because this data will drive the pitch in the
+// room.
+// ─────────────────────────────────────────────────────────────────────────
+
+const SANKORE_RICH_PROFILE: PartnerRichProfile = {
+  whatTheyDo: {
+    summary:
+      'Licensed Nigerian investment and wealth management firm, SEC-Nigeria registered across Investment Adviser, Portfolio Manager, Fund Manager, and Broker/Dealer. Founded circa 2010, Lagos-based. Tailor-made advisory, fund management, wealth and legacy planning, real estate / real assets, fintech innovation, and capacity building — aimed at individuals, corporations, and public/private sectors in Nigeria. Growing from near-zero AUM by acquiring and building entities (e.g., Diamond Capital) plus launching fintech brands under the group.',
+    services: [
+      {
+        title: 'Tailor-made advisory & fund management',
+        description:
+          'Bespoke investment advice and actively-managed fund strategies for HNW individuals and institutional clients.',
+      },
+      {
+        title: 'Wealth creation and preservation, including legacy planning',
+        description:
+          'Long-horizon wealth-management decisions tied to family dynamics, intergenerational transfer, and estate rigor.',
+      },
+      {
+        title: 'Real estate and real assets',
+        description:
+          'Capital allocation into property, infrastructure, and alternative real-asset exposures.',
+      },
+      {
+        title: 'Fintech innovation arm',
+        description:
+          'Building fintech brands and products for alternative investments and financial inclusion across Nigeria.',
+      },
+      {
+        title: 'Capacity building and consulting',
+        description:
+          'Financial consulting and capacity-building mandates for corporates and public-sector clients.',
+      },
+    ],
+    philosophy: 'Credit | Capital | Cities | Communities | Culture',
+    heritage:
+      'Named after the 13th-century University of Sankore in Timbuktu — one of the oldest centres of scholarly rigor on the African continent. The name is a heritage marker for intellectual seriousness; they market themselves as closing the "people-information-wealth" gap, which maps directly onto a reasoning-layer positioning.',
+    scale: {
+      aum: '~₦120B AUM (roughly $70–80M USD depending on FX)',
+      teamSize:
+        '30–66 on LinkedIn; founder frames ~10 seats for the pilot quote — reconcile with actual usage pattern after onboarding.',
+      founded: '2010',
+      licenses: ['Investment Adviser', 'Portfolio Manager', 'Fund Manager', 'Broker / Dealer'],
+      regulator: 'SEC Nigeria',
+      headquarters: 'Lagos, Nigeria',
+    },
+    keyPeople: [
+      {
+        name: 'Titi Odunfa Adeoye',
+        role: 'CEO',
+        note: 'Harvard Business School alum. Intellectual-rigor framing will land with her directly.',
+      },
+    ],
+  },
+
+  wedges: [
+    {
+      title: 'Investment committee & deal evaluation',
+      description:
+        'Every portfolio allocation, new fund launch, and acquisition decision runs through a committee with known bias exposure — anchoring on entry price, thesis confirmation, sunk cost on prior positions, overconfidence, and groupthink in a small deal team.',
+      diIntersect:
+        '12-node pipeline audits the memo behind every committee vote. Decision Provenance Record gives them a regulator-grade, signed-and-hashed artifact on each audit — exactly the document a regulator, auditor, or LP will eventually demand.',
+    },
+    {
+      title: 'Wealth & legacy planning',
+      description:
+        'High-stakes, long-horizon decisions for HNW clients. Family dynamics, recency bias, narrative fallacy, and anchoring on a single scenario dominate this workflow.',
+      diIntersect:
+        'Recognition-Rigor Framework (Kahneman rigor + Klein recognition arbitrated in one pipeline) is the only architecture in market that combines both traditions. No competitor in the legacy-planning tooling space touches both sides of the Kahneman-Klein synthesis.',
+    },
+    {
+      title: 'Fintech-arm product decisions',
+      description:
+        'They build fintech products for financial inclusion. Every product bet, feature prioritisation, and go-to-market call is a strategic decision with the same bias exposure as an allocation memo.',
+      diIntersect:
+        'Decision Quality Index applies to product-strategy memos identically. Same audit, same artifact, same compounding Decision Knowledge Graph — their fintech arm and their investment arm both feed one org-level learning loop.',
+    },
+    {
+      title: 'Regulatory posture & AI governance',
+      description:
+        'As a SEC-Nigeria licensed entity, they care about governance, auditability, and record-keeping. AI governance is the next regulatory wave and they are already thinking about it.',
+      diIntersect:
+        'DPR maps onto EU AI Act Article 14 (human oversight), SEC AI Disclosure language, Basel III · Pillar 2 ICAAP qualitative-decision documentation, and GDPR Art. 22 by design. The phrase to use: "the record your AI-augmented decision-making is already supposed to produce."',
+    },
+    {
+      title: 'African / emerging-markets frontier positioning',
+      description:
+        'Sankore frames itself as a knowledge-forward, tech-forward Lagos-based firm. No local competitor is selling a reasoning-layer category. First-mover advantage is real on both sides — us for credibility, them for narrative.',
+      diIntersect:
+        'First design partner on the continent running a reasoning-layer audit gives them a differentiated narrative in their own market. Gives Decision Intel a defensible "already shaping R²F with a SEC-regulated African investment firm" line for the next VC round and the next CSO conversation.',
+    },
+  ],
+
+  offerSpec: {
+    pricing: {
+      rate: '£1,999 / month',
+      label: 'Founding Design Partner rate',
+      delta: '20% off the £2,499 list price',
+      floor: '£1,499 / month absolute floor — below this the product stops being premium.',
+      fallbackOffer:
+        '3-month pilot at £1,499 stepping to £1,999 from month 4. Only if they push back hard on the opening number.',
+      hardNo:
+        'Never free. A paying pilot is stickier, produces better case-study material, and will not anchor Year-2 expectations below market.',
+    },
+    inclusions: [
+      'Unlimited audits during the pilot window',
+      'Bespoke remote onboarding session (~2 hours) with the founder',
+      'Monthly co-design call for 6 months',
+      'First right of refusal on Year-2 pricing',
+      'Priority roadmap input on the investment-committee and portfolio workflow',
+      'Sankore-specific Decision Provenance Record template + African / EM case inclusions in the corpus',
+      'Security one-pager + DPA ready for their GC on day one',
+    ],
+    ask: {
+      short:
+        'One historical investment-committee memo (redacted). 48-hour turnaround, DPR delivered personally.',
+      long: 'Two things after the meeting. First: send one historical investment-committee memo, redacted however you like — I will run the full audit and deliver a Decision Provenance Record within 48 hours. Second: if the DPR is useful, we move to a 30-day pilot starting the first of next month. At 30 days we either sign a 12-month agreement at founding rate, or we part as friends with a case study. No lock-in during the pilot. Zero downside, full proof of value.',
+    },
+  },
+
+  positioning: {
+    categoryAnchor: 'The native reasoning layer for every boardroom strategic decision',
+    avoidFraming: [
+      "'AI bias detection tool' — positions Decision Intel in the ChatGPT bucket in their mental model.",
+      "'Decision intelligence platform' — Gartner-crowded, competes with Cloverpop / Peak.ai / Quantellia.",
+      "'AI-powered' as a solo modifier — meaningless; cut it wherever it appears.",
+      "'Human-AI governance system' — retired positioning; do not use.",
+    ],
+    openingLine:
+      'Sankore takes its name from a 13th-century university in Mali — the oldest centre of scholarly rigor on the continent. Decision Intel is the native reasoning layer for the exact thing that university was built to test: can the argument on the page survive scrutiny. I have built it so every one of your investment-committee memos gets the scrutiny a regulator, a board, and a future LP will eventually demand — before they ask.',
+    ethosAnchors: [
+      'Wiz advisor (senior operator who took Wiz from startup to $32B)',
+      '135-case annotated corpus across 11 industries',
+      'Peer-reviewed anchor: Kahneman & Klein (2009), "Conditions for Intuitive Expertise"',
+      'Shipped codebase: 200+ components, 70+ API routes, SOC 2 Type II infrastructure posture',
+    ],
+    pathosCurrents: [
+      {
+        label: 'Pride of rigor',
+        moveIn:
+          'Decision Intel does not replace your judgment. It audits the reasoning behind it — the way a good Harvard case discussion does, except every time, on every memo, with a traceable record.',
+      },
+      {
+        label: 'Quiet anxiety about AI governance',
+        moveIn:
+          'You will be asked for this artifact. Better to be three years ahead of the ask than three weeks behind.',
+      },
+      {
+        label: 'Frontier ambition',
+        moveIn:
+          'You would be the first investment firm on the continent running this — not as a vendor, as a design partner. Your workflow shapes the category.',
+      },
+    ],
+    logosMoves: [
+      {
+        claim:
+          'Each audit runs your memo through 12 specialised reasoning nodes, scoring 30+ cognitive biases against 135 annotated real-world decisions with known outcomes. The output is a Decision Quality Index, a Decision Provenance Record, and a boardroom simulation of how a CEO, CFO, and audit chair would push back on the memo.',
+        followUp:
+          'When was the last time your investment-committee memo was tested against 135 prior decisions with known outcomes before the call was made?',
+      },
+      {
+        claim:
+          "Recognition-Rigor Framework, or R²F, is Kahneman's rigor and Klein's recognition arbitrated in one pipeline. The only version of this architecture in market. Anchor citation: the 2009 Kahneman-Klein paper 'Conditions for Intuitive Expertise: a failure to disagree.'",
+        followUp:
+          'Which of your current tools combines both behavioural-science traditions in one pass?',
+      },
+      {
+        claim:
+          'We are running a five-seat design-partner cohort. Four seats remain. The design-partner rate is £1,999 per month — about 20 percent off the £2,499 list — with first right of refusal on Year-2 pricing. You would be the founding African member of the cohort, which is both a commercial and a narrative win for both sides.',
+        followUp:
+          'If I sent a Decision Provenance Record specimen and three financial-services case studies from the 135-case corpus, would you be in a position to commit to the first audit by end of next week?',
+      },
+    ],
+  },
+
+  introContext: {
+    source: "Warm family intro — distant friend of the founder's father.",
+    venue: 'Casual get-together in Lagos; founder and Sankore contact both present.',
+    depth:
+      'Warm but not deep. Relationship has not carried into professional territory yet — the meeting must do that work on its own.',
+    rule: 'Respect the casual origin. Do not lean on the family connection. Lead with competence and the product; the relationship is air cover, not the pitch.',
+  },
+
+  risks: [
+    {
+      title: 'Currency / FX',
+      detail:
+        'They will likely want to settle in naira-equivalent. Confirm GBP or USD billing on the LOI. Naira volatility would otherwise distort pilot economics — do not let them pay local.',
+    },
+    {
+      title: 'Internal decision cycle',
+      detail:
+        'Even at 10–50 people, they have internal governance. The budget holder may not be in the meeting. Ask early: "Who else needs to sign off on a tool at this price point?"',
+    },
+    {
+      title: 'Scope creep',
+      detail:
+        'They may want bespoke Nigerian / African case studies in the corpus. That is a legitimate roadmap item — it is not a pilot deliverable. Hold the line; promise it for Q2 of the pilot year, not week one.',
+    },
+    {
+      title: 'Intro over-reliance',
+      detail:
+        'The intro is warm, not influential. The meeting stands or falls on the product and the DPR specimen. If the product does not land, the family connection will not rescue it.',
+    },
+    {
+      title: 'Regulatory sensitivity on data handling',
+      detail:
+        'As a licensed entity, they will push on data privacy and AI explainability. Lead with the DPA, the SHA-256 input hashing, the AES-256-GCM document encryption, and the fact that we never serialise prompts or per-org weights. Security one-pager ready to send same-day.',
+    },
+  ],
+
+  strategic: {
+    arr: '~£24k ARR on a £1,999/mo retainer',
+    cohortConversion: 'Converts the five-seat design-partner cohort from 0-of-5 to 1-of-5.',
+    socialProof:
+      'Unlocks "already shaping R²F with a SEC-regulated investment firm" as a defensible social-proof line in VC conversations + subsequent CSO outreach.',
+    narrativeShift:
+      'Pre-seed / seed narrative changes from "pre-revenue" to "paid pilot, expanding." That is the difference between a term sheet and a maybe.',
+  },
+};
 
 const FOUNDER_NOTES = `
 STATUS SNAPSHOT
@@ -159,6 +387,8 @@ async function main() {
     status: 'scheduled_call' as const,
     founderNotes: FOUNDER_NOTES,
     callScheduledAt: null, // set to the exact meeting datetime once confirmed
+    slotOrder: 1, // first of the five cohort seats
+    richProfile: SANKORE_RICH_PROFILE as unknown as Prisma.InputJsonValue,
   };
 
   const force = process.env.FORCE_SEED_SANKORE === '1';

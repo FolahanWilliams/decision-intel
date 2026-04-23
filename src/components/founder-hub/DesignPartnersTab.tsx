@@ -29,34 +29,9 @@ import {
   Handshake,
 } from 'lucide-react';
 import { card, sectionTitle } from './shared-styles';
-
-type ApplicationStatus =
-  | 'applied'
-  | 'reviewing'
-  | 'scheduled_call'
-  | 'accepted'
-  | 'declined'
-  | 'withdrawn';
-
-interface Application {
-  id: string;
-  name: string;
-  email: string;
-  company: string;
-  role: string;
-  linkedInUrl: string | null;
-  industry: string;
-  teamSize: string;
-  memoCadence: string | null;
-  currentStack: string | null;
-  whyNow: string;
-  source: string | null;
-  status: ApplicationStatus;
-  founderNotes: string | null;
-  reviewedAt: string | null;
-  callScheduledAt: string | null;
-  submittedAt: string;
-}
+import { CohortGrid } from './design-partners/CohortGrid';
+import { PartnerDetailView } from './design-partners/PartnerDetailView';
+import type { Application, ApplicationStatus } from './design-partners/types';
 
 interface Capacity {
   filled: number;
@@ -103,6 +78,9 @@ export function DesignPartnersTab({ founderPass }: DesignPartnersTabProps) {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<ApplicationStatus | 'all'>('all');
   const [saveState, setSaveState] = useState<Record<string, 'saving' | 'saved' | 'error'>>({});
+  // Which partner (if any) is open in the detail view. Null = cohort
+  // grid + inbox list. String = per-partner rich profile view.
+  const [openPartnerId, setOpenPartnerId] = useState<string | null>(null);
 
   const authHeaders = useCallback(
     () => ({
@@ -174,8 +152,29 @@ export function DesignPartnersTab({ founderPass }: DesignPartnersTabProps) {
     {} as Record<ApplicationStatus, number>
   );
 
+  // When a detail view is open, swap the whole tab body to the per-
+  // partner page. Back action returns to the cohort + inbox view.
+  const openPartner = applications.find(a => a.id === openPartnerId) ?? null;
+
+  if (openPartner) {
+    return (
+      <div>
+        <PartnerDetailView
+          app={openPartner}
+          founderPass={founderPass}
+          onBack={() => setOpenPartnerId(null)}
+        />
+      </div>
+    );
+  }
+
   return (
     <div>
+      {/* 5-slot cohort grid — the primary entry point. Click a filled
+          slot to open the rich per-partner detail view. Click an empty
+          slot to focus the inbox filter (partners needing assignment). */}
+      <CohortGrid applications={applications} onOpenPartner={id => setOpenPartnerId(id)} />
+
       {/* Pitch-deck capacity slide — deliberately formatted for screenshot
           + paste into deck slide 10. 16:9 frame, minimal chrome, ARR math
           spelled out, first-right-of-refusal note baked in. See
@@ -331,6 +330,7 @@ export function DesignPartnersTab({ founderPass }: DesignPartnersTabProps) {
                 app={app}
                 saveState={saveState[app.id]}
                 onUpdate={patch => handleUpdate(app.id, patch)}
+                onOpenDetail={() => setOpenPartnerId(app.id)}
               />
             ))}
           </div>
@@ -390,10 +390,12 @@ function ApplicationCard({
   app,
   saveState,
   onUpdate,
+  onOpenDetail,
 }: {
   app: Application;
   saveState: 'saving' | 'saved' | 'error' | undefined;
   onUpdate: (patch: Partial<Application>) => void;
+  onOpenDetail: () => void;
 }) {
   const [notesValue, setNotesValue] = useState(app.founderNotes ?? '');
   const [notesExpanded, setNotesExpanded] = useState(false);
@@ -562,8 +564,26 @@ function ApplicationCard({
         )}
       </div>
 
-      {/* Status transition buttons */}
+      {/* Status transition buttons + Open profile */}
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
+        <button
+          onClick={onOpenDetail}
+          style={{
+            padding: '6px 12px',
+            fontSize: 11.5,
+            fontWeight: 700,
+            borderRadius: 999,
+            border: '1px solid var(--accent-primary)',
+            background: 'var(--accent-primary)',
+            color: 'var(--text-on-accent, #fff)',
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+          }}
+        >
+          Open profile →
+        </button>
         {nextStatuses(app.status).map(next => (
           <button
             key={next}

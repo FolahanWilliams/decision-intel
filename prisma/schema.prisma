@@ -1678,9 +1678,77 @@ model DesignPartnerApplication {
   submittedAt    DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
+  // ─── 5-seat cohort slot (2026-04-24) ──────────────────────────────────
+  // Which of the 5 cohort slots this partner occupies. Null means the
+  // partner is in the inbound triage queue but hasn't been assigned a
+  // cohort seat. 1..5 when assigned. Unique per non-null value so two
+  // partners can't share slot 1.
+  slotOrder Int?
+
+  // ─── Rich profile (2026-04-24) ────────────────────────────────────────
+  // Structured per-partner briefing consumed by the Design Partners tab
+  // detail view. Shape lives in src/types/partner-profile.ts as
+  // PartnerRichProfile; stored as JSON so the shape can evolve without
+  // migrations during the pilot-scoping phase. Sections:
+  //   whatTheyDo    — company snapshot + scale + heritage
+  //   wedges[]      — 5-ish fit wedges, each with DI intersection
+  //   offerSpec     — pricing, inclusions, the ask
+  //   positioning   — category anchor, opening line, ethos/pathos/logos
+  //   introContext  — how the intro happened + framing rule
+  //   risks[]       — named risks + mitigation framing
+  //   strategic     — why this partner matters for the company
+  // Everything is optional so the UI can render progressively as fields
+  // are filled in over the pilot-preparation arc.
+  richProfile Json?
+
+  contacts PartnerContact[]
+
   @@index([status])
   @@index([submittedAt])
   @@index([email])
+  @@index([slotOrder])
+}
+
+// ─── PartnerContact (2026-04-24) ─────────────────────────────────────────
+// A specific person at a design partner that the founder is or will be in
+// touch with (e.g. the investment partner at Sankore who holds the
+// budget, the GC who signs off on the DPA). Each contact carries the
+// raw LinkedIn paste the founder dumped plus the Gemini-generated
+// meeting-prep plan (populated on demand, persisted for re-reads).
+//
+// Scoped per-partner so the cohort-detail UI can show "people at Sankore"
+// list. Cascades on partner delete.
+model PartnerContact {
+  id           String @id @default(cuid())
+  partnerAppId String
+
+  name        String
+  role        String
+  linkedInUrl String?
+  // Raw profile summary pasted by the founder (About section, bio,
+  // recent roles). The meeting-prep route reads this to ground its
+  // plan. Required because the prep generator refuses to run with
+  // fewer than 40 chars of info.
+  linkedInInfo String  @db.Text
+  // How the meeting came to be — shared between contacts at the same
+  // partner or personalised per contact. Defaults to a stub the UI
+  // pre-fills.
+  meetingContext String? @db.Text
+  // Founder's desired outcome for this specific meeting (different
+  // asks for the investment partner vs the GC, for example).
+  founderAsk String? @db.Text
+  // Generated meeting prep (the full streamed-then-accumulated
+  // plan). Null until the founder clicks "Generate meeting prep."
+  generatedPrep String?   @db.Text
+  generatedAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  partnerApp DesignPartnerApplication @relation(fields: [partnerAppId], references: [id], onDelete: Cascade)
+
+  @@index([partnerAppId])
+  @@index([createdAt])
 }
 
 // ─── Founder Hub: plain to-do list ─────────────────────────────────────────
