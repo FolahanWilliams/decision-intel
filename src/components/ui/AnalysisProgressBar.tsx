@@ -233,12 +233,25 @@ const STEP_TO_LABEL: Record<string, string> = {
   'Pattern Recognition': 'Pattern Recognition',
   'Meta Judge': 'Meta Judge',
   'Risk Scoring': 'Risk Scoring',
+  // Fallback aliases for the short-form ANALYSIS_STEPS labels the
+  // dashboard still passes through useAnalysisStream. Keeps the pipeline
+  // graph useful on AnalysisShell even when the stream emits the short
+  // names instead of the canonical pipeline node labels.
+  'Preparing document': 'Document Intelligence',
+  'Detecting cognitive biases': 'Bias Detection',
+  'Analyzing decision noise': 'Noise Analysis',
+  'Fact checking claims': 'Fact & Compliance Check',
+  'Evaluating compliance': 'Fact & Compliance Check',
+  'Generating risk assessment': 'Risk Scoring',
+  'Finalizing report': 'Meta Judge',
 };
 
-function findPipelineLabel(stepName: string): string | null {
-  // Direct match
+/** Map an incoming SSE step name to the canonical pipeline node label.
+ *  Exported so any component that shows the LivePipelineGraph can derive
+ *  nodeStates from its own step list without re-implementing the fuzzy
+ *  matching. */
+export function findPipelineLabel(stepName: string): string | null {
   if (STEP_TO_LABEL[stepName]) return STEP_TO_LABEL[stepName];
-  // Fuzzy: check if any label is contained in the step name
   for (const label of PIPELINE_NODE_LABELS) {
     if (stepName.toLowerCase().includes(label.toLowerCase())) return label;
   }

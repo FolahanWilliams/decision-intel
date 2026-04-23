@@ -22,10 +22,11 @@
  * on the WeWork S-1 sample).
  */
 
-import { useEffect, useState, useSyncExternalStore, type ReactElement } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { AnimatePresence, motion, useScroll, useMotionValueEvent } from 'framer-motion';
 import { Maximize2, X } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import { AnatomyOfACallGraph, ANATOMY_CAPABILITIES } from './AnatomyOfACallGraph';
 
 const HeroDecisionGraph = dynamic(
   () => import('./HeroDecisionGraph').then(m => m.HeroDecisionGraph),
@@ -50,109 +51,10 @@ const C = {
 };
 
 /* ─── Capability definitions ─────────────────────────────────────────
-   Each capability maps to one of the five moments on the page, so the
-   overlay and the pyramid tell the same story at different zoom levels. */
-
-type Capability = {
-  id: string;
-  short: string; // label under the node
-  full: string; // label that shows in the panel subtitle
-  angle: number; // pentagon position (degrees from +x, CCW; 90 = top)
-  icon: (color: string) => ReactElement;
-};
-
-const GRAPH_ICON = (color: string) => (
-  <g>
-    <circle cx="0" cy="-5" r="1.6" fill={color} />
-    <circle cx="-5" cy="0" r="1.6" fill={color} />
-    <circle cx="5" cy="0" r="1.6" fill={color} />
-    <circle cx="-3" cy="5" r="1.4" fill={color} />
-    <circle cx="3" cy="5" r="1.4" fill={color} />
-    <g stroke={color} strokeWidth="0.9" strokeLinecap="round">
-      <line x1="0" y1="-5" x2="-5" y2="0" />
-      <line x1="0" y1="-5" x2="5" y2="0" />
-      <line x1="-5" y1="0" x2="-3" y2="5" />
-      <line x1="5" y1="0" x2="3" y2="5" />
-      <line x1="-3" y1="5" x2="3" y2="5" />
-    </g>
-  </g>
-);
-
-const BOARDROOM_ICON = (color: string) => (
-  <g fill={color}>
-    <circle cx="-6" cy="-1" r="1.9" />
-    <circle cx="0" cy="-4" r="2.1" />
-    <circle cx="6" cy="-1" r="1.9" />
-    <path d="M -8.8 5.5 Q -6 1.8 -3.2 5.5 Z" />
-    <path d="M -2.6 3 Q 0 -0.8 2.6 3 Z" />
-    <path d="M 3.2 5.5 Q 6 1.8 8.8 5.5 Z" />
-  </g>
-);
-
-const AUDIT_ICON = (color: string) => (
-  <g>
-    <rect
-      x="-5"
-      y="-6"
-      width="10"
-      height="12"
-      rx="1.2"
-      fill="none"
-      stroke={color}
-      strokeWidth="1"
-    />
-    <line x1="-3" y1="-3" x2="3" y2="-3" stroke={color} strokeWidth="0.9" strokeLinecap="round" />
-    <line
-      x1="-3"
-      y1="-0.5"
-      x2="2"
-      y2="-0.5"
-      stroke={color}
-      strokeWidth="0.9"
-      strokeLinecap="round"
-    />
-    <path
-      d="M -2.5 3 l 1.6 1.6 l 3.4 -3.2"
-      stroke={color}
-      strokeWidth="1.4"
-      fill="none"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </g>
-);
-
-const WHATIF_ICON = (color: string) => (
-  <g>
-    <rect x="-6" y="1.5" width="2.4" height="5" rx="0.5" fill={color} opacity="0.55" />
-    <rect x="-1.2" y="-2" width="2.4" height="8.5" rx="0.5" fill={color} opacity="0.75" />
-    <rect x="3.6" y="-5.5" width="2.4" height="12" rx="0.5" fill={color} />
-    <path
-      d="M -7 -3 L 6 -6"
-      stroke={color}
-      strokeWidth="1.1"
-      strokeLinecap="round"
-      fill="none"
-      opacity="0.9"
-    />
-  </g>
-);
-
-const OUTCOME_ICON = (color: string) => (
-  <g fill="none" stroke={color} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M -5.5 -2 A 6 6 0 1 1 4.5 4.5" />
-    <path d="M 4.5 4.5 l 2.3 -2.6" />
-    <path d="M 4.5 4.5 l -2.4 -1.3" />
-  </g>
-);
-
-const CAPABILITIES: Capability[] = [
-  { id: 'graph', short: 'Graph', full: 'Decision Knowledge Graph', angle: 90, icon: GRAPH_ICON },
-  { id: 'boardroom', short: 'Boardroom', full: 'AI boardroom', angle: 18, icon: BOARDROOM_ICON },
-  { id: 'audit', short: 'Audit', full: 'Reasoning audit', angle: -54, icon: AUDIT_ICON },
-  { id: 'whatif', short: 'What-if', full: 'What-if', angle: -126, icon: WHATIF_ICON },
-  { id: 'outcome', short: 'Outcome', full: 'Outcome loop', angle: 162, icon: OUTCOME_ICON },
-];
+   Icon definitions + CAPABILITIES array extracted to
+   ./AnatomyOfACallGraph.tsx on 2026-04-23 so /how-it-works can render
+   the same pentagon. Local STAGE_SUBTITLES below reads
+   ANATOMY_CAPABILITIES — single source of truth. */
 
 /* ─── Live audit ticker — seeded from the 135-case corpus ───────────
    Until real production audit volume exists, the ticker cycles through
@@ -212,11 +114,11 @@ const STAGE_THRESHOLDS = [0, 0.08, 0.18, 0.28, 0.4, 0.55];
 
 const STAGE_SUBTITLES = [
   'The building blocks of a call',
-  CAPABILITIES[0].full,
-  CAPABILITIES[1].full,
-  CAPABILITIES[2].full,
-  CAPABILITIES[3].full,
-  CAPABILITIES[4].full,
+  ANATOMY_CAPABILITIES[0].full,
+  ANATOMY_CAPABILITIES[1].full,
+  ANATOMY_CAPABILITIES[2].full,
+  ANATOMY_CAPABILITIES[3].full,
+  ANATOMY_CAPABILITIES[4].full,
 ];
 
 function scrollProgressToStage(p: number): number {
@@ -295,15 +197,90 @@ export function ScrollRevealGraph() {
     };
   }, [expanded]);
 
-  if (!desktop || dismissed || reducedMotion) return null;
+  if (dismissed || reducedMotion) return null;
 
   const panelSize = 320;
   const fullyComposed = stage >= 5;
+  const miniSize = 80;
 
   return (
     <>
+      {/* Mobile / narrow-viewport surface — below 1024px we replace the
+          full 320px panel with a compact 80x80 tappable bubble so the
+          constellation stays visible without stealing vertical pixels
+          from phone traffic. Tapping expands into the shared modal that
+          desktop uses for the full 3D graph view. (2026-04-23: mobile
+          discoverability fix — previously the overlay was desktop-only
+          and half the landing visitors never saw the pentagon.) */}
       <AnimatePresence>
-        {visible && (
+        {!desktop && visible && (
+          <motion.div
+            initial={{ opacity: 0, y: 16, scale: 0.88 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 16, scale: 0.88 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            style={{
+              position: 'fixed',
+              right: 16,
+              bottom: 16,
+              zIndex: 50,
+              pointerEvents: 'auto',
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setExpanded(true)}
+              aria-label="Open Decision Intel capability constellation"
+              style={{
+                width: miniSize,
+                height: miniSize,
+                borderRadius: '50%',
+                border: '1px solid rgba(22,163,74,0.25)',
+                background: C.white,
+                boxShadow: '0 10px 28px rgba(15,23,42,0.18)',
+                padding: 6,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <AnatomyOfACallGraph
+                stage={5}
+                size={miniSize - 12}
+                reducedMotion
+                captionOverride={null}
+              />
+            </button>
+            <button
+              type="button"
+              onClick={() => setDismissed(true)}
+              aria-label="Dismiss capability constellation"
+              style={{
+                position: 'absolute',
+                top: -6,
+                right: -6,
+                width: 22,
+                height: 22,
+                borderRadius: '50%',
+                background: C.slate900,
+                color: C.white,
+                border: 'none',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: 0,
+              }}
+            >
+              <X size={12} />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {desktop && visible && (
           <motion.div
             initial={{ opacity: 0, y: 24, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -415,7 +392,7 @@ export function ScrollRevealGraph() {
                 position: 'relative',
               }}
             >
-              <ConstellationCanvas stage={stage} panelSize={panelSize} />
+              <AnatomyOfACallGraph stage={stage} size={panelSize} />
 
               {/* Stage progress chips */}
               <div
@@ -625,217 +602,3 @@ export function ScrollRevealGraph() {
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════════
-   ConstellationCanvas — the quiet anatomy-of-a-decision viz.
-
-   Geometry:
-     - Central "your call" disc at panel centre
-     - 5 capability tiles arranged in a pentagon, r=88 from centre
-     - Thin dashed orbit ring behind the tiles
-     - Edges thread from each tile to centre as its stage activates
-     - Ambient pulse particles flow inward along active edges
-
-   Palette is deliberately restrained — green only where activation is
-   meaningful (edges, active icons, core). Everything else is slate.
-   ═══════════════════════════════════════════════════════════════════ */
-
-function ConstellationCanvas({ stage, panelSize }: { stage: number; panelSize: number }) {
-  const cx = panelSize / 2;
-  const cy = panelSize / 2 - 6; // nudge upward to leave footer breathing room
-  const orbitR = 92;
-
-  const nodes = CAPABILITIES.map((cap, i) => {
-    const rad = (cap.angle * Math.PI) / 180;
-    return {
-      ...cap,
-      x: cx + orbitR * Math.cos(rad),
-      y: cy - orbitR * Math.sin(rad),
-      activeAt: i + 1,
-    };
-  });
-
-  const fullyComposed = stage >= 5;
-
-  return (
-    <svg viewBox={`0 0 ${panelSize} ${panelSize}`} width="100%" height="100%" aria-hidden>
-      <defs>
-        <radialGradient id="core-halo" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor={C.green} stopOpacity="0.22" />
-          <stop offset="70%" stopColor={C.green} stopOpacity="0.04" />
-          <stop offset="100%" stopColor={C.green} stopOpacity="0" />
-        </radialGradient>
-        <radialGradient id="core-disc" cx="35%" cy="30%" r="72%">
-          <stop offset="0%" stopColor="#BBF7D0" />
-          <stop offset="55%" stopColor="#34D399" />
-          <stop offset="100%" stopColor={C.greenDark} />
-        </radialGradient>
-        <filter id="tile-shadow" x="-40%" y="-40%" width="180%" height="180%">
-          <feDropShadow dx="0" dy="1" stdDeviation="1" floodColor="#0F172A" floodOpacity="0.06" />
-          <feDropShadow dx="0" dy="5" stdDeviation="10" floodColor="#0F172A" floodOpacity="0.05" />
-        </filter>
-      </defs>
-
-      {/* Orbit ring — very quiet */}
-      <circle
-        cx={cx}
-        cy={cy}
-        r={orbitR}
-        fill="none"
-        stroke={C.slate200}
-        strokeWidth="0.6"
-        strokeDasharray="1 5"
-        opacity="0.6"
-      />
-
-      {/* Soft halo behind core */}
-      <circle cx={cx} cy={cy} r="66" fill="url(#core-halo)" />
-
-      {/* Edges — animate pathLength from centre outward when active */}
-      {nodes.map(n => {
-        const active = stage >= n.activeAt;
-        return (
-          <motion.line
-            key={`edge-${n.id}`}
-            x1={cx}
-            y1={cy}
-            x2={n.x}
-            y2={n.y}
-            stroke={active ? C.green : C.slate200}
-            strokeWidth={active ? 1.2 : 0.8}
-            strokeOpacity={active ? 0.55 : 0.35}
-            strokeLinecap="round"
-            initial={false}
-            animate={{ pathLength: active ? 1 : 0 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          />
-        );
-      })}
-
-      {/* Ambient pulse particles — flow from each active node toward core */}
-      {nodes.map(n => {
-        const active = stage >= n.activeAt;
-        if (!active) return null;
-        return (
-          <motion.circle
-            key={`pulse-${n.id}`}
-            r="1.8"
-            fill={C.green}
-            initial={{ cx: n.x, cy: n.y, opacity: 0 }}
-            animate={{
-              cx: [n.x, cx],
-              cy: [n.y, cy],
-              opacity: [0, 0.85, 0],
-            }}
-            transition={{
-              duration: 2.4,
-              repeat: Infinity,
-              ease: 'easeInOut',
-              delay: n.activeAt * 0.35,
-            }}
-          />
-        );
-      })}
-
-      {/* Capability tiles */}
-      {nodes.map(n => {
-        const active = stage >= n.activeAt;
-        return (
-          <motion.g
-            key={n.id}
-            initial={{ opacity: 0, scale: 0.6 }}
-            animate={{
-              opacity: active ? 1 : 0.28,
-              scale: active ? 1 : 0.88,
-            }}
-            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <g transform={`translate(${n.x}, ${n.y})`}>
-              <rect
-                x="-16"
-                y="-16"
-                width="32"
-                height="32"
-                rx="9"
-                fill={C.white}
-                stroke={active ? 'rgba(22,163,74,0.38)' : C.slate200}
-                strokeWidth="1"
-                filter="url(#tile-shadow)"
-              />
-              {n.icon(active ? C.greenDark : C.slate400)}
-              <text
-                y="28"
-                fontSize="9"
-                fontWeight="700"
-                fill={active ? C.slate900 : C.slate400}
-                textAnchor="middle"
-                fontFamily="system-ui, -apple-system, sans-serif"
-                style={{ transition: 'fill 0.4s' }}
-              >
-                {n.short}
-              </text>
-            </g>
-          </motion.g>
-        );
-      })}
-
-      {/* Central "your call" core */}
-      <g>
-        {/* Pulsing outer ring — only when fully composed */}
-        {fullyComposed && (
-          <motion.circle
-            cx={cx}
-            cy={cy}
-            r="24"
-            fill="none"
-            stroke="rgba(22,163,74,0.35)"
-            strokeWidth="1"
-            animate={{ r: [24, 30, 24], opacity: [0.8, 0.25, 0.8] }}
-            transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        )}
-        {/* Static outer ring when composing */}
-        {!fullyComposed && (
-          <circle
-            cx={cx}
-            cy={cy}
-            r="22"
-            fill="none"
-            stroke="rgba(148,163,184,0.35)"
-            strokeWidth="1"
-          />
-        )}
-        {/* Inner disc */}
-        <circle cx={cx} cy={cy} r="16" fill="url(#core-disc)" />
-        {/* Glass highlight */}
-        <ellipse cx={cx - 4} cy={cy - 5} rx="7" ry="3" fill="rgba(255,255,255,0.55)" />
-        {/* Minimal monogram */}
-        <text
-          x={cx}
-          y={cy + 3.5}
-          fontSize="11"
-          fontWeight="800"
-          fill={C.white}
-          textAnchor="middle"
-          fontFamily="system-ui, -apple-system, sans-serif"
-          letterSpacing="-0.02em"
-        >
-          DI
-        </text>
-      </g>
-
-      {/* Caption */}
-      <text
-        x={panelSize / 2}
-        y={panelSize - 22}
-        fontSize="9"
-        fontWeight="800"
-        fill={C.slate500}
-        textAnchor="middle"
-        fontFamily="var(--font-mono, monospace)"
-        letterSpacing="0.14em"
-      >
-        {fullyComposed ? 'EVERY ANGLE \u00B7 ONE CALL' : `${stage} / 5 LAYERS ACTIVE`}
-      </text>
-    </svg>
-  );
-}

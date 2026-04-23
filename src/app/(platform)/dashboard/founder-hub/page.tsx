@@ -767,6 +767,27 @@ export default function FounderHubPage() {
     return () => document.removeEventListener('keydown', handler);
   }, [unlocked, searchQuery]);
 
+  // Listen for navigation events from the FounderChatWidget. When the
+  // chat response mentions another tab (e.g. "go to the Research tab")
+  // the widget renders clickable chips; clicking one dispatches this
+  // event and we flip the active tab so the founder doesn't have to
+  // hunt for it in the left rail. Contract is defined in
+  // src/lib/founder-hub/chat-nav.ts.
+  useEffect(() => {
+    if (!unlocked) return;
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<{ tabId?: string }>).detail;
+      const next = detail?.tabId;
+      if (!next) return;
+      if (TABS.some(t => t.id === next)) {
+        setActiveTab(next as TabId);
+        setSearchQuery('');
+      }
+    };
+    window.addEventListener('founder-hub-navigate', handler);
+    return () => window.removeEventListener('founder-hub-navigate', handler);
+  }, [unlocked]);
+
   if (!unlocked) {
     return (
       <div

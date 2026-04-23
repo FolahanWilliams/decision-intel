@@ -1,7 +1,12 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { Brain, MessageSquare, Paperclip, X, FileText, Trash2 } from 'lucide-react';
+import { Brain, MessageSquare, Paperclip, X, FileText, Trash2, ArrowUpRight } from 'lucide-react';
+import {
+  detectNavTargets,
+  FOUNDER_HUB_NAVIGATE_EVENT,
+  type TabNavTarget,
+} from '@/lib/founder-hub/chat-nav';
 
 interface ChatMsg {
   role: 'user' | 'assistant';
@@ -439,24 +444,90 @@ export function FounderChatWidget({
             </div>
           </div>
         )}
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            style={{
-              alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
-              maxWidth: '85%',
-              padding: '8px 12px',
-              borderRadius: msg.role === 'user' ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
-              background: msg.role === 'user' ? '#16A34A' : 'var(--bg-tertiary, #1a1a1a)',
-              color: msg.role === 'user' ? '#fff' : 'var(--text-secondary)',
-              fontSize: 12,
-              lineHeight: 1.6,
-              whiteSpace: 'pre-wrap',
-            }}
-          >
-            {msg.content || (streaming && i === messages.length - 1 ? '...' : '')}
-          </div>
-        ))}
+        {messages.map((msg, i) => {
+          // Suggest tab navigation for completed assistant messages that
+          // reference another Founder Hub tab by name. Skipped while the
+          // message is still streaming so chips don't flicker in/out as
+          // tokens arrive; only shown once the message has settled.
+          const isSettledAssistant =
+            msg.role === 'assistant' &&
+            msg.content.length > 0 &&
+            !(streaming && i === messages.length - 1);
+          const navTargets: TabNavTarget[] = isSettledAssistant
+            ? detectNavTargets(msg.content, 3)
+            : [];
+
+          return (
+            <div
+              key={i}
+              style={{
+                alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                maxWidth: '85%',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 6,
+              }}
+            >
+              <div
+                style={{
+                  padding: '8px 12px',
+                  borderRadius:
+                    msg.role === 'user' ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
+                  background: msg.role === 'user' ? '#16A34A' : 'var(--bg-tertiary, #1a1a1a)',
+                  color: msg.role === 'user' ? '#fff' : 'var(--text-secondary)',
+                  fontSize: 12,
+                  lineHeight: 1.6,
+                  whiteSpace: 'pre-wrap',
+                }}
+              >
+                {msg.content || (streaming && i === messages.length - 1 ? '...' : '')}
+              </div>
+              {navTargets.length > 0 && (
+                <div
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: 6,
+                    paddingLeft: 2,
+                  }}
+                >
+                  {navTargets.map(t => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => {
+                        if (typeof window === 'undefined') return;
+                        window.dispatchEvent(
+                          new CustomEvent(FOUNDER_HUB_NAVIGATE_EVENT, {
+                            detail: { tabId: t.id },
+                          })
+                        );
+                      }}
+                      title={`Open ${t.label} tab`}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 4,
+                        padding: '3px 8px',
+                        fontSize: 11,
+                        fontWeight: 600,
+                        borderRadius: 9999,
+                        border: '1px solid rgba(22,163,74,0.35)',
+                        background: 'rgba(22,163,74,0.10)',
+                        color: '#16A34A',
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      <ArrowUpRight size={10} />
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
         <div ref={messagesEndRef} />
       </div>
 

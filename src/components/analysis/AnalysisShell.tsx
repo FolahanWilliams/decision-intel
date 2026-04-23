@@ -24,6 +24,8 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { LivePipelineGraph, PIPELINE_NODE_LABELS } from '@/components/ui/LivePipelineGraph';
+import { findPipelineLabel } from '@/components/ui/AnalysisProgressBar';
 
 export interface StepStatus {
   name: string;
@@ -72,6 +74,29 @@ export function AnalysisShell({
 }: AnalysisShellProps) {
   const currentStep = steps.find(s => s.status === 'running');
   const completedCount = steps.filter(s => s.status === 'complete').length;
+
+  // Derive node-label states from the current steps so the LivePipelineGraph
+  // below renders the moat visual instead of a generic pip row. Any step
+  // label that doesn't map onto a canonical pipeline node is skipped; the
+  // fallback aliases live in AnalysisProgressBar.STEP_TO_LABEL so the
+  // short ANALYSIS_STEPS names still resolve.
+  const nodeStates: Record<string, 'pending' | 'running' | 'complete'> = Object.fromEntries(
+    PIPELINE_NODE_LABELS.map(l => [l, 'pending' as const])
+  );
+  for (const step of steps) {
+    if (step.status === 'pending') continue;
+    const label = findPipelineLabel(step.name);
+    if (!label) continue;
+    // "complete" wins over "running" wins over "pending" for the same label
+    // (useful when multiple ANALYSIS_STEPS share a pipeline node).
+    const current = nodeStates[label];
+    const incoming: 'pending' | 'running' | 'complete' =
+      step.status === 'error' ? 'pending' : step.status;
+    if (incoming === 'complete' || current !== 'complete') {
+      if (incoming === 'running' && current === 'complete') continue;
+      nodeStates[label] = incoming;
+    }
+  }
 
   return (
     <div
@@ -245,69 +270,24 @@ export function AnalysisShell({
           </div>
         </motion.div>
 
-        {/* Pipeline step pips */}
+        {/* Pipeline viz — same 10-node graph the AnalysisProgressFloat
+            shows in its expanded state, embedded inline so the moat is
+            visible on every upload, not just in the floating notification. */}
         <div
           style={{
             display: 'flex',
             justifyContent: 'center',
-            gap: 12,
             marginBottom: 28,
-            flexWrap: 'wrap',
+            maxWidth: 640,
+            marginLeft: 'auto',
+            marginRight: 'auto',
           }}
         >
-          {steps.map((step, i) => (
-            <motion.div
-              key={i}
-              animate={{
-                scale: step.status === 'running' ? 1.15 : 1,
-              }}
-              transition={{ duration: 0.4 }}
-              title={step.name}
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background:
-                  step.status === 'complete'
-                    ? 'rgba(34, 197, 94, 0.15)'
-                    : step.status === 'running'
-                      ? 'rgba(22, 163, 74, 0.18)'
-                      : 'var(--bg-tertiary)',
-                border: `1.5px solid ${
-                  step.status === 'complete'
-                    ? 'var(--success, #22c55e)'
-                    : step.status === 'running'
-                      ? 'var(--accent-primary, #16A34A)'
-                      : 'var(--border-color)'
-                }`,
-                boxShadow: step.status === 'running' ? '0 0 0 4px rgba(22, 163, 74, 0.12)' : 'none',
-                transition: 'all 0.3s ease',
-              }}
-            >
-              {step.status === 'complete' ? (
-                <CheckCircle size={16} style={{ color: 'var(--success, #22c55e)' }} />
-              ) : step.status === 'running' ? (
-                <Loader2
-                  size={14}
-                  className="animate-spin"
-                  style={{ color: 'var(--accent-primary, #16A34A)' }}
-                />
-              ) : (
-                <span
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: 'var(--text-muted)',
-                  }}
-                >
-                  {i + 1}
-                </span>
-              )}
-            </motion.div>
-          ))}
+          <LivePipelineGraph
+            nodeStates={nodeStates}
+            progress={currentProgress}
+            biasCount={biasCount}
+          />
         </div>
 
         {/* Progress bar */}

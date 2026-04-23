@@ -128,23 +128,83 @@ function LessonsList({
   completed: string[];
   onSelect: (lesson: Lesson) => void;
 }) {
+  /** Track-level "Quiz me on the whole track" CTA — dispatches the same
+   *  founder-chat-ask event the per-lesson button uses, but with a
+   *  prompt that spans the entire curriculum in one go. Platform
+   *  Foundations is the most rehearse-worthy track (Kahneman, Noise,
+   *  DQI, pre-mortems, 20×20 matrix, 12-node pipeline, 135-case lib) so
+   *  the button is surfaced on every track header uniformly and the
+   *  prompt is shaped to match the track's actual content. */
+  const handleQuizTrack = () => {
+    if (typeof window === 'undefined') return;
+    const lessonTitles = track.lessons
+      .map(l => `${l.order}. ${l.title}`)
+      .join('\n');
+    const question = [
+      `Quiz me on the "${track.title}" track in Founder School.`,
+      '',
+      track.description,
+      '',
+      'Lessons in scope:',
+      lessonTitles,
+      '',
+      'Drill me like a senior operator prepping a founder for a board meeting — start with the hardest question across the whole track, not lesson-by-lesson. Push back when my answers miss the Decision Intel-specific application. End with the one thing I still cannot defend.',
+    ].join('\n');
+    window.dispatchEvent(new CustomEvent('founder-chat-ask', { detail: { question } }));
+  };
+  const isPlatformFoundations = /platform\s*foundations?/i.test(track.title);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-      <div style={{ marginBottom: 8 }}>
-        <span
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          gap: 12,
+          marginBottom: 8,
+          flexWrap: 'wrap',
+        }}
+      >
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              color: track.color,
+            }}
+          >
+            {track.emoji} {track.title}
+          </span>
+          <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '4px 0 0' }}>
+            {track.description}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={handleQuizTrack}
+          title={`Open the Founder AI chat and drill the entire ${track.title} track`}
           style={{
-            fontSize: 11,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '6px 12px',
+            fontSize: 12,
             fontWeight: 700,
-            textTransform: 'uppercase',
-            letterSpacing: '0.08em',
+            borderRadius: 'var(--radius-full, 9999px)',
+            border: `1px solid ${track.color}55`,
+            background: `${track.color}${isPlatformFoundations ? '20' : '10'}`,
             color: track.color,
+            cursor: 'pointer',
+            flexShrink: 0,
+            whiteSpace: 'nowrap',
           }}
         >
-          {track.emoji} {track.title}
-        </span>
-        <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '4px 0 0' }}>
-          {track.description}
-        </p>
+          <Sparkles size={12} />
+          {isPlatformFoundations ? 'Quiz me on this methodology' : 'Quiz me on this track'}
+        </button>
       </div>
       {track.lessons.map(lesson => {
         const done = completed.includes(lesson.id);

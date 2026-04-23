@@ -25,6 +25,8 @@ import {
   FileText,
   Inbox,
   AlertCircle,
+  Camera,
+  Handshake,
 } from 'lucide-react';
 import { card, sectionTitle } from './shared-styles';
 
@@ -174,6 +176,14 @@ export function DesignPartnersTab({ founderPass }: DesignPartnersTabProps) {
 
   return (
     <div>
+      {/* Pitch-deck capacity slide — deliberately formatted for screenshot
+          + paste into deck slide 10. 16:9 frame, minimal chrome, ARR math
+          spelled out, first-right-of-refusal note baked in. See
+          CLAUDE.md positioning lock: "5 seats × $1,999/mo × 12 = $119,940
+          ARR · first-right-of-refusal at list Year 2." Only renders
+          inside the Hub; never ships to public marketing. */}
+      <PitchDeckCapacitySlide capacity={capacity} />
+
       {/* Capacity strip */}
       <div
         style={{
@@ -723,4 +733,243 @@ function nextStatuses(current: ApplicationStatus): ApplicationStatus[] {
     default:
       return [];
   }
+}
+
+/** Pitch-deck-ready capacity slide (brainstorm item 10.1).
+ *
+ *  Sits at the top of DesignPartnersTab, above the ops capacity strip.
+ *  The founder screenshots this and drops it into pitch deck slide 10
+ *  ("Design Partner cohort") in place of the feature-chart slide.
+ *
+ *  Layout is deliberate:
+ *   - 16:9-ish frame so the screenshot crops cleanly into 1920x1080
+ *   - Headline sets the slide claim ("5 Fortune 500 seats, 12-month term")
+ *   - Five seat pills (filled = green, open = outlined) sized big enough
+ *     to count at speaker-view zoom
+ *   - ARR math below ("$1,999 × 12 × 5 = $119,940 ARR")
+ *   - First-right-of-refusal Year 2 footnote — the repeatable unit
+ *     economic that makes this a slide 10, not a feature chart.
+ *   - Small "Screenshot this" chip bottom-right marks the purpose without
+ *     leaking into the screenshot if cropped.
+ */
+function PitchDeckCapacitySlide({ capacity }: { capacity: Capacity }) {
+  const seats = Array.from({ length: capacity.total }, (_, i) => i < capacity.filled);
+  const priceMonthly = 1999;
+  const term = 12;
+  const totalArr = priceMonthly * term * capacity.total;
+  const bookedArr = priceMonthly * term * capacity.filled;
+  const money = (n: number) =>
+    n >= 1000 ? `$${(n / 1000).toFixed(0)}k` : `$${n}`;
+
+  return (
+    <div
+      style={{
+        ...card,
+        position: 'relative',
+        overflow: 'hidden',
+        borderLeft: '3px solid #16A34A',
+        background:
+          'linear-gradient(160deg, var(--bg-card) 0%, rgba(22,163,74,0.06) 100%)',
+      }}
+    >
+      {/* Eyebrow */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 12,
+          marginBottom: 10,
+          flexWrap: 'wrap',
+        }}
+      >
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '3px 10px',
+            fontSize: 10,
+            fontWeight: 800,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: '#16A34A',
+            background: 'rgba(22,163,74,0.10)',
+            border: '1px solid rgba(22,163,74,0.28)',
+            borderRadius: 9999,
+          }}
+        >
+          <Handshake size={11} />
+          Pitch deck · slide 10
+        </div>
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 5,
+            fontSize: 10.5,
+            fontWeight: 600,
+            color: 'var(--text-muted)',
+          }}
+        >
+          <Camera size={11} />
+          Screenshot this frame
+        </div>
+      </div>
+
+      {/* Headline */}
+      <div
+        style={{
+          fontSize: 22,
+          fontWeight: 800,
+          letterSpacing: '-0.02em',
+          color: 'var(--text-primary)',
+          marginBottom: 4,
+        }}
+      >
+        5 Fortune 500 seats · 12-month term
+      </div>
+      <div
+        style={{
+          fontSize: 13,
+          color: 'var(--text-muted)',
+          marginBottom: 18,
+        }}
+      >
+        Not a feature chart. Repeatable unit economics with a first-right-of-refusal at list
+        price in Year 2.
+      </div>
+
+      {/* Seat pills — 5 big chips so the count is readable at 1920x1080 */}
+      <div
+        style={{
+          display: 'flex',
+          gap: 10,
+          marginBottom: 18,
+          flexWrap: 'wrap',
+        }}
+      >
+        {seats.map((filled, i) => (
+          <div
+            key={i}
+            style={{
+              flex: '1 1 120px',
+              minWidth: 120,
+              height: 72,
+              borderRadius: 12,
+              border: filled ? '2px solid #16A34A' : '2px dashed rgba(100,116,139,0.4)',
+              background: filled ? 'rgba(22,163,74,0.12)' : 'transparent',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 4,
+              color: filled ? '#16A34A' : 'var(--text-muted)',
+            }}
+          >
+            <div
+              style={{
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+              }}
+            >
+              Seat {i + 1}
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 700 }}>
+              {filled ? 'Filled' : 'Open'}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ARR math */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 20,
+          padding: '14px 16px',
+          background: 'var(--bg-secondary)',
+          border: '1px solid var(--border-color)',
+          borderRadius: 10,
+          flexWrap: 'wrap',
+        }}
+      >
+        <div>
+          <div
+            style={{
+              fontSize: 10.5,
+              fontWeight: 800,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: 'var(--text-muted)',
+              marginBottom: 2,
+            }}
+          >
+            Cohort ARR at list
+          </div>
+          <div
+            style={{
+              fontSize: 22,
+              fontWeight: 800,
+              color: 'var(--text-primary)',
+              letterSpacing: '-0.02em',
+              fontFamily: 'var(--font-mono, monospace)',
+            }}
+          >
+            {money(totalArr)}
+          </div>
+        </div>
+        <div
+          style={{
+            fontSize: 13,
+            color: 'var(--text-secondary)',
+            fontFamily: 'var(--font-mono, monospace)',
+          }}
+        >
+          $1,999/mo × 12 × {capacity.total} seats
+        </div>
+        <div style={{ flex: 1 }} />
+        <div>
+          <div
+            style={{
+              fontSize: 10.5,
+              fontWeight: 800,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: 'var(--text-muted)',
+              marginBottom: 2,
+            }}
+          >
+            Booked
+          </div>
+          <div
+            style={{
+              fontSize: 18,
+              fontWeight: 700,
+              color: '#16A34A',
+              fontFamily: 'var(--font-mono, monospace)',
+            }}
+          >
+            {money(bookedArr)} · {capacity.filled}/{capacity.total}
+          </div>
+        </div>
+      </div>
+
+      {/* FRR footnote */}
+      <div
+        style={{
+          marginTop: 10,
+          fontSize: 12,
+          color: 'var(--text-muted)',
+          lineHeight: 1.5,
+        }}
+      >
+        Year 2: first-right-of-refusal at list price. Design partners get the 20% discount
+        locked for Year 1 only — the cohort is self-upgrading if the product compounds.
+      </div>
+    </div>
+  );
 }

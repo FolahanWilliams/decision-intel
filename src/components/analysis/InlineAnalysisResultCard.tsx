@@ -435,16 +435,59 @@ type PassageReAuditResponse = {
   };
 };
 
+/** Word-level longest-common-subsequence diff. Returns a sequence of
+ *  { type, token } where type ∈ { 'equal' | 'add' | 'remove' }. Tiny LCS
+ *  (O(m*n) table) — fine for the ≤6,000-char passages this component
+ *  accepts; no dependency needed. */
+type DiffSegment = { type: 'equal' | 'add' | 'remove'; token: string };
+
+function wordDiff(before: string, after: string): DiffSegment[] {
+  const a = before.split(/(\s+)/);
+  const b = after.split(/(\s+)/);
+  const m = a.length;
+  const n = b.length;
+  // Build LCS table.
+  const dp: number[][] = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+  for (let i = m - 1; i >= 0; i--) {
+    for (let j = n - 1; j >= 0; j--) {
+      if (a[i] === b[j]) dp[i][j] = dp[i + 1][j + 1] + 1;
+      else dp[i][j] = Math.max(dp[i + 1][j], dp[i][j + 1]);
+    }
+  }
+  const out: DiffSegment[] = [];
+  let i = 0;
+  let j = 0;
+  while (i < m && j < n) {
+    if (a[i] === b[j]) {
+      out.push({ type: 'equal', token: a[i] });
+      i++;
+      j++;
+    } else if (dp[i + 1][j] >= dp[i][j + 1]) {
+      out.push({ type: 'remove', token: a[i] });
+      i++;
+    } else {
+      out.push({ type: 'add', token: b[j] });
+      j++;
+    }
+  }
+  while (i < m) out.push({ type: 'remove', token: a[i++] });
+  while (j < n) out.push({ type: 'add', token: b[j++] });
+  return out;
+}
+
 function InlineCoEditPanel({ originalScore }: { originalScore: number }) {
   const [expanded, setExpanded] = useState(false);
-  const [passage, setPassage] = useState('');
+  const [originalPassage, setOriginalPassage] = useState('');
+  const [revisedPassage, setRevisedPassage] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<PassageReAuditResponse['data'] | null>(null);
+  const [submittedOriginal, setSubmittedOriginal] = useState<string | null>(null);
+  const [submittedRevised, setSubmittedRevised] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function submit() {
-    if (passage.trim().length < 24) {
-      setError('Add at least 24 characters so we have something to audit.');
+    if (revisedPassage.trim().length < 24) {
+      setError('Add at least 24 characters in the revised passage so we have something to audit.');
       return;
     }
     setSubmitting(true);
@@ -455,7 +498,7 @@ function InlineCoEditPanel({ originalScore }: { originalScore: number }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          passage: passage.trim(),
+          passage: revisedPassage.trim(),
           originalOverallScore: originalScore,
         }),
       });
@@ -465,6 +508,8 @@ function InlineCoEditPanel({ originalScore }: { originalScore: number }) {
         return;
       }
       setResult(json.data);
+      setSubmittedOriginal(originalPassage.trim());
+      setSubmittedRevised(revisedPassage.trim());
       trackEvent('dashboard_inline_coedit_submit', {
         biasCountAfter: json.data.biases.length,
         delta: json.data.delta ?? null,
@@ -547,7 +592,10 @@ function InlineCoEditPanel({ originalScore }: { originalScore: number }) {
           onClick={() => {
             setExpanded(false);
             setResult(null);
-            setPassage('');
+            setOriginalPassage('');
+            setRevisedPassage('');
+            setSubmittedOriginal(null);
+            setSubmittedRevised(null);
             setError(null);
           }}
           style={{
@@ -561,25 +609,35 @@ function InlineCoEditPanel({ originalScore }: { originalScore: number }) {
           <X size={14} />
         </button>
       </div>
-      <textarea
-        value={passage}
-        onChange={e => setPassage(e.target.value)}
-        placeholder="Paste the 2 lines we flagged, rewritten — we'll re-audit the passage and return a DQI delta in ~5s."
-        rows={4}
-        maxLength={6000}
+
+      {/* Split pane: original on left, revised on right. Stacks on
+          narrow viewports via flexWrap. */}
+      <div
         style={{
-          width: '100%',
-          padding: 10,
-          borderRadius: 'var(--radius-md)',
-          border: '1px solid var(--border-color)',
-          background: 'var(--bg-card)',
-          color: 'var(--text-primary)',
-          fontSize: 13,
-          fontFamily: 'inherit',
-          resize: 'vertical',
-          minHeight: 80,
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+          gap: 10,
         }}
-      />
+      >
+        <PassageField
+          label="Original passage (optional)"
+          sublabel="Paste the 2 lines we flagged — shown as context for the diff."
+          value={originalPassage}
+          onChange={setOriginalPassage}
+          placeholder="Paste the original passage we flagged…"
+          rows={4}
+        />
+        <PassageField
+          label="Revised passage"
+          sublabel="We re-audit this on submit and return a DQI delta in ~5s."
+          value={revisedPassage}
+          onChange={setRevisedPassage}
+          placeholder="Paste your rewrite…"
+          rows={4}
+          accent
+        />
+      </div>
+
       <div
         style={{
           display: 'flex',
@@ -591,26 +649,26 @@ function InlineCoEditPanel({ originalScore }: { originalScore: number }) {
         }}
       >
         <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-          {passage.length}/6000 · passage-level estimate, not the canonical DQI
+          {revisedPassage.length}/6000 · passage-level estimate, not the canonical DQI
         </span>
         <button
           onClick={submit}
-          disabled={submitting || passage.trim().length < 24}
+          disabled={submitting || revisedPassage.trim().length < 24}
           style={{
             padding: '8px 18px',
             borderRadius: 'var(--radius-full)',
             border: 'none',
             background:
-              submitting || passage.trim().length < 24
+              submitting || revisedPassage.trim().length < 24
                 ? 'var(--bg-tertiary)'
                 : 'var(--accent-primary)',
             color:
-              submitting || passage.trim().length < 24
+              submitting || revisedPassage.trim().length < 24
                 ? 'var(--text-muted)'
                 : 'var(--text-on-accent, #fff)',
             fontSize: 13,
             fontWeight: 600,
-            cursor: submitting || passage.trim().length < 24 ? 'default' : 'pointer',
+            cursor: submitting || revisedPassage.trim().length < 24 ? 'default' : 'pointer',
           }}
         >
           {submitting ? 'Auditing…' : 'Re-audit passage'}
@@ -691,6 +749,37 @@ function InlineCoEditPanel({ originalScore }: { originalScore: number }) {
               {result.disclaimer}
             </div>
           </div>
+
+          {/* Word-level diff — renders only when the user supplied an
+              original passage. Turns "here's a new score" into "here's
+              what moved." */}
+          {submittedOriginal && submittedRevised && (
+            <div
+              style={{
+                marginTop: 12,
+                marginBottom: 14,
+                padding: 12,
+                border: '1px solid var(--border-color)',
+                borderRadius: 'var(--radius-md)',
+                background: 'var(--bg-card)',
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 10.5,
+                  fontWeight: 800,
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                  color: 'var(--text-muted)',
+                  marginBottom: 8,
+                }}
+              >
+                What moved
+              </div>
+              <DiffView before={submittedOriginal} after={submittedRevised} />
+            </div>
+          )}
+
           {result.biases.length > 0 ? (
             <ul
               style={{
@@ -848,6 +937,166 @@ function PostRevealBookingRow() {
         Book a 30-min call
         <ArrowRight size={13} />
       </Link>
+    </div>
+  );
+}
+
+
+/** Small textarea helper used by the passage co-edit split pane. */
+function PassageField({
+  label,
+  sublabel,
+  value,
+  onChange,
+  placeholder,
+  rows,
+  accent = false,
+}: {
+  label: string;
+  sublabel?: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  rows?: number;
+  accent?: boolean;
+}) {
+  return (
+    <div>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          marginBottom: 6,
+          gap: 8,
+        }}
+      >
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            color: accent ? 'var(--accent-primary)' : 'var(--text-secondary)',
+            letterSpacing: '0.04em',
+          }}
+        >
+          {label}
+        </span>
+        {sublabel && (
+          <span style={{ fontSize: 10.5, color: 'var(--text-muted)' }}>{sublabel}</span>
+        )}
+      </div>
+      <textarea
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        placeholder={placeholder}
+        rows={rows ?? 4}
+        maxLength={6000}
+        style={{
+          width: '100%',
+          padding: 10,
+          borderRadius: 'var(--radius-md)',
+          border: `1px solid ${accent ? 'rgba(22,163,74,0.25)' : 'var(--border-color)'}`,
+          background: accent ? 'rgba(22,163,74,0.04)' : 'var(--bg-card)',
+          color: 'var(--text-primary)',
+          fontSize: 13,
+          fontFamily: 'inherit',
+          resize: 'vertical',
+          minHeight: 80,
+        }}
+      />
+    </div>
+  );
+}
+
+/** Side-by-side word-diff renderer. Left column shows the original with
+ *  removed tokens highlighted red; right column shows the revised with
+ *  added tokens highlighted green. Equal tokens appear in muted text on
+ *  both sides so the reader can see continuity. */
+function DiffView({ before, after }: { before: string; after: string }) {
+  const segments = wordDiff(before, after);
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+        gap: 10,
+      }}
+    >
+      <DiffColumn
+        label="Original"
+        segments={segments.filter(s => s.type !== 'add')}
+        highlight="remove"
+      />
+      <DiffColumn
+        label="Revised"
+        segments={segments.filter(s => s.type !== 'remove')}
+        highlight="add"
+      />
+    </div>
+  );
+}
+
+function DiffColumn({
+  label,
+  segments,
+  highlight,
+}: {
+  label: string;
+  segments: DiffSegment[];
+  highlight: 'add' | 'remove';
+}) {
+  const highlightColor = highlight === 'add' ? 'var(--accent-primary)' : 'var(--error)';
+  const highlightBg =
+    highlight === 'add' ? 'rgba(22,163,74,0.12)' : 'rgba(220,38,38,0.10)';
+  return (
+    <div
+      style={{
+        padding: '10px 12px',
+        background: 'var(--bg-secondary)',
+        border: '1px solid var(--border-color)',
+        borderRadius: 'var(--radius-md)',
+      }}
+    >
+      <div
+        style={{
+          fontSize: 10.5,
+          fontWeight: 800,
+          letterSpacing: '0.1em',
+          textTransform: 'uppercase',
+          color: 'var(--text-muted)',
+          marginBottom: 6,
+        }}
+      >
+        {label}
+      </div>
+      <div
+        style={{
+          fontSize: 12.5,
+          lineHeight: 1.65,
+          color: 'var(--text-secondary)',
+          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-word',
+        }}
+      >
+        {segments.map((seg, i) =>
+          seg.type === highlight ? (
+            <mark
+              key={i}
+              style={{
+                background: highlightBg,
+                color: highlightColor,
+                borderRadius: 2,
+                padding: '0 2px',
+                textDecoration: highlight === 'remove' ? 'line-through' : 'none',
+              }}
+            >
+              {seg.token}
+            </mark>
+          ) : (
+            <span key={i}>{seg.token}</span>
+          )
+        )}
+      </div>
     </div>
   );
 }

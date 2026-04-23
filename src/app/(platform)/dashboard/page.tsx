@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { DecisionIQCard } from '@/components/ui/DecisionIQCard';
 import { InlinePasteMemoCard } from '@/components/dashboard/InlinePasteMemoCard';
+import { CsoDashboardRail } from '@/components/dashboard/CsoDashboardRail';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -879,6 +880,11 @@ export default function Dashboard() {
           </button>
         </div>
       </div>
+
+      {/* CSO pipeline rail — Strategy+ tier only, collapsible. Shows
+          in-flight audits / outcomes awaiting report / active decision
+          rooms. Self-hides on Free + Pro via /api/cso-rail plan gate. */}
+      <CsoDashboardRail />
 
       {/* Hero KPI Cards — always rendered so first paint matches the
           post-load layout (prevents the content-shift flash when SWR

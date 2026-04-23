@@ -6,6 +6,7 @@ import { ArrowRight, FileText, ShieldCheck, Microscope, BookOpen, ChevronDown, G
 
 import { MarketingNav } from '@/components/marketing/MarketingNav';
 import { PipelineMiniatureViz } from '@/components/marketing/how-it-works/PipelineMiniatureViz';
+import { AnatomyOfACallGraph } from '@/components/marketing/AnatomyOfACallGraph';
 import { PipelineFlowDiagram } from '@/components/marketing/how-it-works/PipelineFlowDiagram';
 import { PipelineNodeDetail } from '@/components/marketing/how-it-works/PipelineNodeDetail';
 import { FeaturedBiasCard } from '@/components/marketing/how-it-works/FeaturedBiasCard';
@@ -303,6 +304,43 @@ export function HowItWorksClient() {
             </div>
             <div>
               <PipelineMiniatureViz />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 1b — ANATOMY OF A CALL (the constellation beat) ─────
+          Mirrors the landing-page ScrollRevealGraph pentagon so readers
+          who arrived from /proof or /pricing see the same moat visual
+          they almost-saw on the landing overlay. Shared component:
+          AnatomyOfACallGraph (single source of truth). */}
+      <section style={{ padding: '72px 24px 0' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'minmax(0, 1.15fr) minmax(0, 1fr)',
+              gap: 48,
+              alignItems: 'center',
+            }}
+            className="hiw-anatomy"
+          >
+            <div>
+              <SectionHeader
+                eyebrow="Anatomy of a call"
+                title="Every Decision Intel call composes five rigor layers around one decision."
+                body="Knowledge Graph (what you've decided before), AI Boardroom (how each stakeholder will receive the memo), Reasoning Audit (what the bias + noise stack flags), What-if (the counterfactual impact), Outcome Loop (how the decision actually played out). Individually, any one of these is a feature. Composed, they are the call. The pipeline below is how we assemble them."
+              />
+            </div>
+            <div
+              style={{
+                maxWidth: 420,
+                margin: '0 auto',
+                aspectRatio: '1 / 1',
+                width: '100%',
+              }}
+            >
+              <AnatomyOfACallGraph stage={5} size={420} />
             </div>
           </div>
         </div>
@@ -762,6 +800,7 @@ export function HowItWorksClient() {
       <style>{`
         @media (max-width: 900px) {
           .hiw-hero { grid-template-columns: 1fr !important; gap: 32px !important; }
+          .hiw-anatomy { grid-template-columns: 1fr !important; gap: 32px !important; }
           .hiw-parallel-checks { grid-template-columns: 1fr !important; }
         }
         @media (max-width: 720px) {
