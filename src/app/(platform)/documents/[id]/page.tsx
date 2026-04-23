@@ -1152,20 +1152,25 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                   PDF export. URL path is kept as /api/compliance/audit-packet
                   for backwards compatibility with the 2026-04-22 rename;
                   the user-visible label and filename both say "Decision
-                  Provenance Record." */}
+                  Provenance Record." Both routes flow through the same
+                  assembler + generator so the artifact shape is identical. */}
               {analysis && (
                 <button
                   onClick={async () => {
                     try {
                       const res = await fetch(`/api/compliance/audit-packet/${analysis.id}`);
                       if (res.status === 402) {
-                        alert(
-                          'Decision Provenance Record export requires the Pro plan or higher. Upgrade to unlock regulator-grade compliance reports.'
+                        showToast(
+                          'Decision Provenance Record export requires the Pro plan or higher.',
+                          'warning'
                         );
                         return;
                       }
                       if (!res.ok) {
-                        alert('Failed to generate Decision Provenance Record. Please try again.');
+                        showToast(
+                          'Failed to generate Decision Provenance Record. Please try again.',
+                          'error'
+                        );
                         return;
                       }
                       const blob = await res.blob();
@@ -1179,11 +1184,19 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                       a.click();
                       window.document.body.removeChild(a);
                       URL.revokeObjectURL(url);
-                    } catch {
-                      alert('Failed to download Decision Provenance Record.');
+                      showToast('Decision Provenance Record downloaded', 'success');
+                    } catch (err) {
+                      log.error('DPR header-button export failed:', err);
+                      showToast('Failed to download Decision Provenance Record.', 'error');
                     }
                   }}
-                  className="btn btn-secondary btn-sm flex items-center gap-sm"
+                  className="btn btn-sm flex items-center gap-sm"
+                  style={{
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--accent-primary)',
+                    color: 'var(--accent-primary)',
+                    fontWeight: 600,
+                  }}
                   aria-label="Export Decision Provenance Record"
                   title="Export a regulator-grade PDF citing every framework section triggered by this decision (EU AI Act Art 14, SEC, Basel III)"
                 >

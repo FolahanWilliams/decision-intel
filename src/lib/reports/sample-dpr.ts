@@ -175,6 +175,9 @@ export function buildSampleDprData(): ProvenanceRecordData {
       metaVerdict:
         'Proceed only after independent reference-class forecast + reviewer sign-off on the break-even assumption. Not board-ready as drafted.',
       biasCount: SAMPLE_CITATIONS.length,
+      topMitigation:
+        'Commission an independent reference-class forecast against eight to twelve comparable European DACH expansions before the committee vote. Require the forecaster to submit base-rate break-even distributions alongside point estimates so the committee sees the range, not a single number.',
+      topMitigationFor: 'Overconfidence Bias',
     },
   };
 }

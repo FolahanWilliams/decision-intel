@@ -58,6 +58,20 @@ export interface ProvenanceRecordData {
     summary: string;
     metaVerdict: string | null;
     biasCount: number;
+    /**
+     * Top recommended mitigation pulled from the highest-severity bias's
+     * `suggestion` field. Null when no biases were flagged or none carried
+     * a suggestion. The PDF renders this as a forward-looking "RECOMMENDED
+     * NEXT ACTION" section on page 1 so a GC reading the record sees not
+     * just risks but the remediation the record implies.
+     */
+    topMitigation: string | null;
+    /**
+     * Label of the bias the top mitigation came from, for attribution
+     * inside the mitigation section ("Recommended mitigation for
+     * {biasLabel}: ..."). Null when topMitigation is null.
+     */
+    topMitigationFor: string | null;
   };
 }
 
@@ -160,7 +174,7 @@ export async function assembleProvenanceRecordData(
     where: { id: analysisId },
     include: {
       biases: {
-        select: { biasType: true },
+        select: { biasType: true, severity: true, suggestion: true },
       },
       promptVersion: {
         select: { hash: true, name: true, version: true },
@@ -182,6 +196,28 @@ export async function assembleProvenanceRecordData(
   }
 
   const biasTypes = Array.from(new Set((analysis.biases ?? []).map(b => b.biasType)));
+
+  // Top recommended mitigation: pick the highest-severity bias with a
+  // non-empty suggestion. Severity is a string ('critical' | 'high' |
+  // 'medium' | 'low') — rank it explicitly so 'critical' beats 'high'.
+  const SEVERITY_RANK: Record<string, number> = {
+    critical: 4,
+    high: 3,
+    medium: 2,
+    low: 1,
+  };
+  const rankedBiases = (analysis.biases ?? [])
+    .filter(b => b.suggestion && b.suggestion.trim().length > 0)
+    .sort(
+      (a, b) =>
+        (SEVERITY_RANK[b.severity?.toLowerCase() ?? ''] ?? 0) -
+        (SEVERITY_RANK[a.severity?.toLowerCase() ?? ''] ?? 0)
+    );
+  const topMitigationBias = rankedBiases[0] ?? null;
+  const topMitigation = topMitigationBias?.suggestion?.trim() ?? null;
+  const topMitigationFor = topMitigationBias
+    ? formatBiasLabel(topMitigationBias.biasType)
+    : null;
 
   // Prompt fingerprint: prefer the linked PromptVersion.hash (authoritative
   // per-audit hash). Fall back to hashing prompts.ts (honest best-effort).
@@ -262,6 +298,8 @@ export async function assembleProvenanceRecordData(
       summary: analysis.summary,
       metaVerdict: analysis.metaVerdict ?? null,
       biasCount: biasTypes.length,
+      topMitigation,
+      topMitigationFor,
     },
   };
 }
