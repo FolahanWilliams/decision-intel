@@ -38,6 +38,53 @@ const prisma = new PrismaClient({ adapter });
 const SANKORE_EMAIL = 'sankore-pilot@decision-intel.com'; // placeholder key until the real contact confirms; the upsert matches on this string
 
 // ─────────────────────────────────────────────────────────────────────────
+// Titi Odunfa Adeoye — the specific contact the founder is meeting with.
+// Populates the Contacts & Meeting Prep tab on the Sankore detail page
+// ready for the founder to click "Generate meeting prep" and get a
+// tailored plan grounded in Sankore's rich profile + Titi's LinkedIn.
+// ─────────────────────────────────────────────────────────────────────────
+
+const TITI_CONTACT = {
+  name: 'Titi Odunfa Adeoye',
+  role: 'Founder & Chief Investment Officer · Sankore Investments',
+  linkedInUrl: 'https://www.linkedin.com/in/titioadeoye/',
+  linkedInInfo: `LinkedIn headline: "Investment Strategist | Entrepreneur | Alternative Investments."
+
+About: Titi Odunfa Adeoye is the Founder and Chief Investment Officer of Sankore Investments.
+
+Experience:
+• Founder / Chief Investment Officer at Sankore Investments (Sep 2009 – Present, 16+ years). Lagos, Nigeria. Built Sankore from inception through acquisitions (e.g. Diamond Capital) into a SEC-Nigeria licensed investment and wealth management firm spanning Investment Adviser, Portfolio Manager, Fund Manager, and Broker / Dealer licences. AUM ~₦120B (≈ $70–80M USD).
+• Board Chair at ToNote (Jan 2021 – Present, 5+ years). Lagos, Nigeria. ToNote is a fintech / product leadership company (CEO Fikayo Durosinmi-Etti, per the profile). Board Chair role signals Titi's active role in fintech product-strategy decisions, not only investment-committee decisions.
+• Board Member at FCMB Pensions Limited (May 2020 – Present, 6 years). Part-time. Signals regulated-entity board experience and pensions / long-horizon capital allocation expertise.
+
+Education: Harvard Business School alum.
+
+Profile signals:
+• Location: Lagos State, Nigeria.
+• 500+ connections, 1,931 followers — established reputation in the Nigerian investment / alternative-investments community.
+• Recent LinkedIn activity: positive, mentorship-oriented (congratulations posts on peers' milestones: "Beautiful work. So proud of you!", "I'm super proud of you and look forward to seeing all you will do!", "Huge congratulations Kemi Ojenike"). Signals a senior operator who invests in others' success — the internship offer to the founder fits the pattern.
+
+Shared connection with founder: Titi knows the founder's mother personally (same Lagos social circle). Not a cold lead. Titi has already offered the founder an internship at Sankore.
+
+What to emphasise with her in-meeting:
+• The HBS + "Investment Strategist" self-framing tells us she responds to intellectual rigor and alternative-investment vocabulary. Lead with the Kahneman-Klein anchor and the regulatory-tailwind framing.
+• The Board Chair of ToNote signals fintech product-decision interest — the "DQI on product-strategy memos" wedge is legitimate here, not just investment memos.
+• The Board Member of FCMB Pensions signals regulated-entity thinking. The Decision Provenance Record maps onto Basel III Pillar 2 and SEC AI Disclosure language by design; this will land.`,
+  meetingContext: `Next-week meeting with Titi Odunfa Adeoye at Sankore Investments. Warm intro through the founder's mother (same Lagos social circle). Titi has already offered the founder an internship at Sankore. The meeting is the conversion conversation: turn the internship offer into an integrated Decision Intel product engagement rather than a generic internship.
+
+The meeting is not a cold pitch. The relationship is already established; the product demonstration is what carries the conversation from "intern who happens to have built something" to "Decision Intel integrated into Sankore's investment-committee workflow."`,
+  founderAsk: `Three-step conversion, structured so Titi never takes a risky step without seeing value first:
+
+Step 1 (confirm in the room): accept the internship with Decision Intel explicitly scoped as a project deliverable — run Decision Provenance Record audits on a set of Sankore's historical or in-progress investment-committee memos during the internship.
+
+Step 2 (weeks 1 to 8 of the internship): deliver DPRs on real memos, integrate with the investment-committee workflow, capture before-and-after data for a Sankore-specific case study.
+
+Step 3 (month 3 of the internship, roughly): convert to a 12-month design-partner pilot at £1,999/mo founding rate with Year-2 first-right-of-refusal at list.
+
+The paid commercial conversation happens only after she has seen DPRs land on her own desk. Zero cold-procurement friction. Full proof of value before a single invoice.`,
+};
+
+// ─────────────────────────────────────────────────────────────────────────
 // Structured rich profile — rendered by the Design Partners detail view
 // as the per-partner briefing. Sourced from blending Grok's external
 // analysis of Sankore (sankore.com) with the founder's earlier
@@ -92,8 +139,8 @@ const SANKORE_RICH_PROFILE: PartnerRichProfile = {
     keyPeople: [
       {
         name: 'Titi Odunfa Adeoye',
-        role: 'CEO',
-        note: 'Harvard Business School alum. Intellectual-rigor framing will land with her directly.',
+        role: 'Founder & Chief Investment Officer',
+        note: "LinkedIn headline 'Investment Strategist | Entrepreneur | Alternative Investments.' Harvard Business School alum. Founder/CIO of Sankore since September 2009 (16+ years). Board Chair of ToNote (a fintech product / digital note-taking platform) since January 2021. Board Member of FCMB Pensions Limited (part-time, since May 2020). 1,931 LinkedIn followers, 500+ connections. Lagos State, Nigeria. She is the primary contact for this pilot — she knows the founder's mother personally and has already offered an internship at Sankore. Intellectual-rigor framing will land with her directly; she picks her public vocabulary carefully (Sankore, Alternative Investments, Investment Strategist). LinkedIn: linkedin.com/in/titioadeoye/",
       },
     ],
   },
@@ -158,8 +205,8 @@ const SANKORE_RICH_PROFILE: PartnerRichProfile = {
     ],
     ask: {
       short:
-        'One historical investment-committee memo (redacted). 48-hour turnaround, DPR delivered personally.',
-      long: 'Two things after the meeting. First: send one historical investment-committee memo, redacted however you like — I will run the full audit and deliver a Decision Provenance Record within 48 hours. Second: if the DPR is useful, we move to a 30-day pilot starting the first of next month. At 30 days we either sign a 12-month agreement at founding rate, or we part as friends with a case study. No lock-in during the pilot. Zero downside, full proof of value.',
+        'Accept the internship. Integrate Decision Intel as an internship deliverable on real Sankore memos. Convert to paid pilot at month 3 if the value is obvious.',
+      long: "Three-step ask, structured so she never has to take a risky step without seeing value first. Step 1 (confirm today): accept the internship she has already offered, with Decision Intel as an explicit project deliverable — I run audits on a set of Sankore's historical or in-progress investment-committee memos during the internship. Step 2 (weeks 1 to 8 of the internship): deliver Decision Provenance Records on real memos, integrate with the investment-committee workflow, capture a bank of before-and-after data for a Sankore case study. Step 3 (month 3 of the internship, roughly): convert to a 12-month design-partner pilot at the £1,999/mo founding rate with Year-2 first-right-of-refusal at list. The entire arc is designed so the paid conversation happens only after she has seen DPRs land on her own desk. Zero cold-procurement friction. Full proof of value before a single invoice.",
     },
   },
 
@@ -219,11 +266,13 @@ const SANKORE_RICH_PROFILE: PartnerRichProfile = {
   },
 
   introContext: {
-    source: "Warm family intro — distant friend of the founder's father.",
-    venue: 'Casual get-together in Lagos; founder and Sankore contact both present.',
+    source:
+      "Family intro — Titi knows the founder's mother personally; same Lagos social circle. Not a cold lead, not a forced intro.",
+    venue:
+      'Casual get-together in Lagos; Titi and the founder briefly connected. She has since offered an internship at Sankore, which is the immediate foothold for this conversation.',
     depth:
-      'Warm but not deep. Relationship has not carried into professional territory yet — the meeting must do that work on its own.',
-    rule: 'Respect the casual origin. Do not lean on the family connection. Lead with competence and the product; the relationship is air cover, not the pitch.',
+      'Warmer than a typical first-call. She already believes enough in the founder to open the door to an internship. The meeting is about converting that open door into an integrated product engagement — internship first, pilot second.',
+    rule: 'Respect the relationship without leaning on it. Lead with competence and the product; the family connection is air cover, not the pitch. The internship offer is the reciprocity loop she has already opened; match it by proposing Decision Intel as an internship deliverable rather than asking for a cold paid pilot on day one.',
   },
 
   risks: [
@@ -245,7 +294,17 @@ const SANKORE_RICH_PROFILE: PartnerRichProfile = {
     {
       title: 'Intro over-reliance',
       detail:
-        'The intro is warm, not influential. The meeting stands or falls on the product and the DPR specimen. If the product does not land, the family connection will not rescue it.',
+        "The intro through Titi knowing the founder's mother is warm, and she has already opened the internship door — but the commercial conversation still stands or falls on the product and the DPR specimen. Mother-connection gets a fair first hearing; it does not buy a second chance if the demo falls flat.",
+    },
+    {
+      title: 'Internship structure',
+      detail:
+        'Clarify the internship shape before the meeting ends: remote vs Lagos on-site, paid vs stipend vs equity, duration, reporting line (to Titi directly, or to a deputy). A remote internship with direct access to Titi is ideal; anything that puts the founder two reports away from her kills the product-feedback loop.',
+    },
+    {
+      title: 'Dual-role conflict',
+      detail:
+        'The founder will simultaneously be an intern at Sankore AND the CEO of the vendor Sankore is piloting. Flag this in-meeting with a simple separation-of-concerns frame: internship = operational contribution; Decision Intel = product engagement with an arms-length LOI. Offer to sign a conflicts-of-interest acknowledgement the GC can keep on file.',
     },
     {
       title: 'Regulatory sensitivity on data handling',
@@ -255,12 +314,12 @@ const SANKORE_RICH_PROFILE: PartnerRichProfile = {
   ],
 
   strategic: {
-    arr: '~£24k ARR on a £1,999/mo retainer',
+    arr: '~£24k ARR on a £1,999/mo retainer (pilot kicks in at internship month 3, so ARR effectively starts Q3 of the internship calendar)',
     cohortConversion: 'Converts the five-seat design-partner cohort from 0-of-5 to 1-of-5.',
     socialProof:
-      'Unlocks "already shaping R²F with a SEC-regulated investment firm" as a defensible social-proof line in VC conversations + subsequent CSO outreach.',
+      'Unlocks "already shaping R²F with a SEC-regulated investment firm" as a defensible social-proof line in VC conversations + subsequent CSO outreach. The internship-first pathway also becomes a replicable playbook for converting warm intros into design partnerships at other regulated firms.',
     narrativeShift:
-      'Pre-seed / seed narrative changes from "pre-revenue" to "paid pilot, expanding." That is the difference between a term sheet and a maybe.',
+      "Pre-seed / seed narrative changes from 'pre-revenue' to 'embedded in Sankore's investment-committee workflow, paid pilot converting in month 3.' That is the difference between a term sheet and a maybe. The internship also gives the founder 8 weeks of unambiguous domain experience inside a live investment committee — invaluable for product depth and for future CSO conversations.",
   },
 };
 
@@ -276,7 +335,7 @@ What they do: tailor-made advisory and fund management, wealth and legacy planni
 Naming cue: Sankore references the ancient University of Sankore at Timbuktu, a medieval centre of learning. Their heritage nod is intellectual rigor and knowledge. Use that framing in the opening 60 seconds — the product extends their own founding metaphor.
 
 HOW THE INTRO HAPPENED
-Distant friend of founder's father. Met at a casual get-together. Brief connection established. Meeting scheduled next week. Implication: warm but not deep — the meeting has to carry the relationship into pilot territory, not rely on pre-existing trust. Framing rule: respect the casual origin, do not lean on it. Lead with competence, not connection.
+Titi Odunfa Adeoye (Founder & CIO of Sankore) knows the founder's mother personally — same Lagos social circle, not a cold lead. Met at a casual get-together; brief connection established. Since then Titi has already offered the founder an internship at Sankore, which changes the shape of the meeting entirely. This is no longer a cold commercial pitch converting a distant acquaintance into a paid pilot. It is converting an already-opened internship door into an integrated product engagement. Framing rule: respect the relationship without leaning on it. The internship offer is her reciprocity move; match it by proposing Decision Intel as an internship deliverable, not by asking for a paid pilot on day one.
 
 WHY DECISION INTEL FITS SANKORE (THE WEDGE)
 Their workflows are decision-heavy in exactly the shapes Decision Intel is built for:
@@ -331,8 +390,16 @@ Open: £1,999/month, framed as "Founding Design Partner rate — 20 percent off 
 Fallback if they push back: 3-month pilot at £1,499, steps to £1,999 from month 4. Never go below £1,499 — that is the floor where the product stops being premium.
 Hard no: free. They do not need free. A paying pilot is stickier and better for the case study.
 
-THE ASK
-Specific small reciprocal. "Two things: one, send me one of your historical investment committee memos — redacted however you want — and I will run the full audit personally and deliver a Decision Provenance Record within 48 hours. Two, if the DPR is useful, we move to a 30-day pilot starting on the first of next month. You see the weekly audit cadence, I see which parts of the workflow need bespoke work. At 30 days we either sign a 12-month agreement at founding rate, or we part as friends with a case study. No lock-in during the pilot."
+THE ASK (INTERNSHIP-FIRST, REVISED 2026-04-24)
+The internship offer she has already opened is the reciprocity loop; match it, do not replace it with a paid-pilot pitch on day one. Structure the ask in three steps so she never takes a risky step without seeing value first.
+
+Step 1 (confirm today, in the room): accept the internship with Decision Intel explicitly scoped as a project deliverable — "I will run Decision Provenance Record audits on a set of Sankore's historical or in-progress investment-committee memos during the internship." Tangible, measurable, low-risk, already aligned with what she has offered.
+
+Step 2 (weeks 1 to 8 of the internship): deliver DPRs on real memos. Integrate with the investment-committee workflow. Capture before-and-after data for a Sankore-specific case study (with consent). No invoice, no procurement friction, no GC review required during the internship phase.
+
+Step 3 (month 3 of the internship, roughly): convert to a 12-month design-partner pilot at the £1,999/mo founding rate. Year-2 first-right-of-refusal at list price. The LOI is drafted on the back of real Sankore DPRs and a real Sankore-specific case study, so the commercial decision is made with evidence, not imagination.
+
+The in-room scripted version: "Thank you for the internship offer. I'd like to accept it on one condition — that I get to use it as the chance to integrate Decision Intel into your investment-committee workflow. In the first eight weeks I'll deliver Decision Provenance Records on a set of your memos. If the output is useful, we convert to a 12-month design-partner pilot at the founding rate at month three. If it isn't useful, I finish the internship on whatever other project you want me on and we part as friends with a case study. Zero cold-procurement friction. Full proof of value before a single invoice."
 
 PRE-MEETING PREP (20 MINUTES, THE MORNING OF)
 1. Open the Design Partners tab in the Founder Hub — this card is where the notes live.
@@ -353,10 +420,12 @@ AFTER THE MEETING (within 90 minutes)
 3. Update this founderNotes field with what was learned — specifically any objections that were NOT anticipated above. Re-run the seed script to persist.
 
 RISKS / WATCH-OUTS
-- Currency: they will likely pay in naira-equivalent. Confirm GBP or USD billing on the LOI. Naira volatility could distort the pilot economics if we let them pay local.
-- Decision cycle: even as a small firm, they have internal governance. Budget holder may not be in the meeting. Ask early: "Who else needs to sign off on a 2k/month tool?"
-- Scope creep: they may want bespoke Nigerian-market case studies in the corpus. That is fine as a roadmap item but not a pilot deliverable — hold the line.
-- Over-reliance on family intro: the intro is warm, not influential. The meeting stands or falls on the product.
+- Internship structure: clarify shape before the meeting ends. Remote vs Lagos on-site, paid vs stipend vs equity, duration, reporting line (direct to Titi is ideal; anything that puts you two reports away from her kills the feedback loop). Push for remote + direct access + 10-12 week duration minimum.
+- Dual-role conflict: you are simultaneously the intern at Sankore AND the CEO of the vendor Sankore is piloting. Pre-empt this: separate the concerns in-room, offer a written conflicts-of-interest acknowledgement for the GC. Frame internship = operational contribution, Decision Intel = arms-length product engagement.
+- Currency: when the pilot LOI comes in month 3, they will likely want to settle in naira-equivalent. Confirm GBP or USD billing up-front so naira volatility does not distort pilot economics.
+- Decision cycle: even at Sankore's scale, budget-holder approvals matter. Titi is Founder/CIO so the budget sign-off probably IS her, but confirm in the room before moving to Step 3.
+- Scope creep: they may want bespoke Nigerian-market case studies in the corpus. Legitimate roadmap item — NOT an internship-phase deliverable. Hold the line; promise Q2 of the pilot year, not week one.
+- Over-reliance on the mother connection: Titi already offered the internship, which is warm, but the pilot conversion at month 3 stands or falls on the product and the DPRs delivered during the internship. Do the work; the connection does not pay the invoice.
 
 WHY THIS MATTERS FOR DECISION INTEL
 First paid customer. ~£24k ARR. Converts the five-seat cohort from theoretical to 1-of-5. Unlocks the "already shaping R²F with a SEC-regulated investment firm" social-proof line for VC conversations. Unlocks the African / emerging-markets credibility angle for when we go to US corp-strategy buyers. Most importantly: the pre-seed narrative changes from "pre-revenue" to "paid pilot, expanding." That is the difference between a term sheet and a maybe.
@@ -412,6 +481,57 @@ async function main() {
       data: baseData,
     });
     console.log(`  ✅ Created Sankore record (id: ${created.id})`);
+  }
+
+  // ─── Seed Titi Odunfa Adeoye as a PartnerContact ──────────────────
+  // Create-only by default so UI edits / re-generated prep plans never
+  // get clobbered. FORCE_SEED_SANKORE=1 refreshes the row from this
+  // file (handy when the founder wants to push updated LinkedIn info
+  // or meeting-context copy from Git).
+  const partnerId = (
+    await prisma.designPartnerApplication.findFirst({
+      where: { email: SANKORE_EMAIL },
+      select: { id: true },
+    })
+  )?.id;
+
+  if (partnerId) {
+    const existingContact = await prisma.partnerContact.findFirst({
+      where: { partnerAppId: partnerId, name: TITI_CONTACT.name },
+      select: { id: true },
+    });
+
+    if (existingContact && !force) {
+      console.log(
+        `  ⏭️  Titi contact already exists (id: ${existingContact.id}). Skipping. ` +
+          `Set FORCE_SEED_SANKORE=1 to refresh.`
+      );
+    } else if (existingContact && force) {
+      await prisma.partnerContact.update({
+        where: { id: existingContact.id },
+        data: {
+          name: TITI_CONTACT.name,
+          role: TITI_CONTACT.role,
+          linkedInUrl: TITI_CONTACT.linkedInUrl,
+          linkedInInfo: TITI_CONTACT.linkedInInfo,
+          meetingContext: TITI_CONTACT.meetingContext,
+          founderAsk: TITI_CONTACT.founderAsk,
+          // Intentionally do NOT touch generatedPrep — if the founder
+          // has already generated and refined a plan in the UI, we keep
+          // it. Re-generation on refreshed inputs is explicit via the
+          // UI button, not implicit via re-seed.
+        },
+      });
+      console.log(`  ✏️  Force-refreshed Titi contact (id: ${existingContact.id})`);
+    } else {
+      const created = await prisma.partnerContact.create({
+        data: {
+          partnerAppId: partnerId,
+          ...TITI_CONTACT,
+        },
+      });
+      console.log(`  ✅ Created Titi contact (id: ${created.id})`);
+    }
   }
 
   const capacity = await prisma.designPartnerApplication.count({
