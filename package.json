@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/validate-deploy-env.mjs && node scripts/prisma-migrate-safe.mjs && NODE_OPTIONS='--max-old-space-size=4096' npx tsc --noEmit && NODE_OPTIONS='--max-old-space-size=6144' next build --webpack && node scripts/upload-sourcemaps.mjs",
+    "build": "node scripts/validate-deploy-env.mjs && node scripts/prisma-migrate-safe.mjs && node scripts/seed-business-data.mjs && NODE_OPTIONS='--max-old-space-size=4096' npx tsc --noEmit && NODE_OPTIONS='--max-old-space-size=6144' next build --webpack && node scripts/upload-sourcemaps.mjs",
     "start": "next start",
     "lint": "eslint .",
     "prisma:generate": "prisma generate",

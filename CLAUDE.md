@@ -373,7 +373,7 @@ Vercel build hangs cost ~$0 in money but ~45 minutes per attempt. The 2026-04-22
 
 **The load-bearing config — do not change without a passing build to prove the alternative works:**
 
-- `package.json:7` build script: chain is `validate-deploy-env && prisma-migrate-safe && tsc --noEmit && next build --webpack && upload-sourcemaps`. The external `tsc --noEmit` step is load-bearing per the 2026-04-23 stacked-heap fix.
+- `package.json:7` build script: chain is `validate-deploy-env && prisma-migrate-safe && seed-business-data && tsc --noEmit && next build --webpack && upload-sourcemaps`. The external `tsc --noEmit` step is load-bearing per the 2026-04-23 stacked-heap fix. `seed-business-data.mjs` (added 2026-04-24) runs version-controlled pilot-data seeds (currently just Sankore) after migrations; it is create-only by default so UI edits to `founderNotes` are never clobbered, and it NEVER fails the build — DB-unreachable or seed-script errors log a warning and exit 0. Business data is not build-artifact-critical; the 11-hr build-hang postmortem's lesson is "don't let optional steps block the deploy."
 - `next.config.ts` Sentry options: `sourcemaps: { disable: true }`
 - `next.config.ts` compiler: `compiler: { styledJsx: false }`
 - `next.config.ts` typescript: `{ ignoreBuildErrors: true }` — paired with the external tsc step above. Flip one, flip both.
