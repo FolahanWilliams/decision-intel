@@ -157,14 +157,14 @@ export function InlineAnalysisResultCard({
           gap: 12,
         }}
       >
-        <CheckCircle size={16} style={{ color: 'var(--success)' }} />
+        <CheckCircle size={18} style={{ color: 'var(--success)' }} />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
-              fontSize: 11,
-              fontWeight: 700,
+              fontSize: 10.5,
+              fontWeight: 800,
               textTransform: 'uppercase',
-              letterSpacing: '0.12em',
+              letterSpacing: '0.15em',
               color: 'var(--success)',
             }}
           >
@@ -172,19 +172,20 @@ export function InlineAnalysisResultCard({
           </div>
           <div
             style={{
-              fontSize: 13,
+              fontSize: 14.5,
               color: 'var(--text-primary)',
-              fontWeight: 500,
-              marginTop: 2,
+              fontWeight: 600,
+              marginTop: 3,
+              letterSpacing: '-0.005em',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               display: 'flex',
               alignItems: 'center',
-              gap: 6,
+              gap: 7,
             }}
           >
-            <FileText size={12} style={{ opacity: 0.6, flexShrink: 0 }} />
+            <FileText size={13} style={{ opacity: 0.55, flexShrink: 0 }} />
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {analysis.filename}
             </span>

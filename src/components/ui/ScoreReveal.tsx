@@ -97,15 +97,23 @@ export function ScoreReveal({
     <div>
       <h3
         style={{
-          fontSize: 13,
-          fontWeight: 500,
+          /* Eyebrow-style label — uppercase, tracked, muted. Pulls the
+             "Decision Quality Index" line into the same visual grammar
+             as other platform category labels ("DETECTED IN MEMO",
+             "RECOMMENDED NEXT ACTION"). Replaces the previous 13px/500
+             treatment that read as generic sub-header. */
+          fontSize: 10.5,
+          fontWeight: 800,
+          letterSpacing: '0.1em',
+          textTransform: 'uppercase',
           color: 'var(--text-muted)',
-          marginBottom: 8,
+          margin: 0,
+          marginBottom: 10,
         }}
       >
         {label}
       </h3>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, minHeight: 36 }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, minHeight: 42 }}>
         <AnimatePresence mode="wait">
           {stage === 'suspense' ? (
             <motion.span
@@ -141,7 +149,13 @@ export function ScoreReveal({
                 value={Math.round(score)}
                 duration={effectiveDuration}
                 suffix="/100"
-                style={{ fontSize: 30, fontWeight: 700, color: 'var(--text-primary)' }}
+                style={{
+                  fontSize: 34,
+                  fontWeight: 800,
+                  color: 'var(--text-primary)',
+                  letterSpacing: '-0.02em',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
               />
               {showGrade && (
                 <motion.span
@@ -157,14 +171,16 @@ export function ScoreReveal({
                     display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    width: 32,
-                    height: 32,
+                    width: 38,
+                    height: 38,
                     borderRadius: 'var(--radius-md)',
-                    fontSize: 16,
-                    fontWeight: 800,
+                    fontSize: 18,
+                    fontWeight: 900,
                     color,
-                    background: `${color}18`,
-                    border: `1px solid ${color}30`,
+                    background: `linear-gradient(180deg, ${color}22, ${color}10)`,
+                    border: `1px solid ${color}40`,
+                    boxShadow: `0 1px 0 ${color}18 inset`,
+                    letterSpacing: '0.02em',
                   }}
                 >
                   {grade}

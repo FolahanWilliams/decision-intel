@@ -1140,10 +1140,15 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             <div style={{ minWidth: 0 }}>
               <h1
                 style={{
-                  fontSize: 'clamp(22px, 3vw, 30px)',
-                  fontWeight: 700,
-                  letterSpacing: '-0.01em',
-                  lineHeight: 1.2,
+                  /* Shared platform page-H1 token so this page feels
+                     continuous with /dashboard, /projects, etc. rather
+                     than reading as smaller/lighter. Token definition
+                     lives in globals.css → --fs-page-h1-platform
+                     (28-40px clamp). */
+                  fontSize: 'var(--fs-page-h1-platform)',
+                  fontWeight: 800,
+                  letterSpacing: '-0.03em',
+                  lineHeight: 1.15,
                   color: 'var(--text-primary)',
                   margin: 0,
                   display: 'inline-flex',
