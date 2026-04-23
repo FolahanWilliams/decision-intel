@@ -375,19 +375,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
     return 'cso';
   };
   const [viewMode, setViewModeState] = useState<ViewMode>(resolveInitialViewMode);
-  const setViewMode = useCallback((next: ViewMode) => {
-    setViewModeState(next);
-    try {
-      localStorage.setItem('di-doc-view-mode', next);
-    } catch {
-      /* ignore */
-    }
-    if (typeof window !== 'undefined') {
-      const url = new URL(window.location.href);
-      url.searchParams.set('view', next);
-      window.history.replaceState({}, '', url.toString());
-    }
-  }, []);
+  // setViewMode is defined below — it also snaps phase to 'before' when the
+  // user switches to CSO or Board, both of which currently only render
+  // content at phase='before'. The snap prevents the blank-state
+  // combinations (CSO + during, Board + after) that previously surfaced
+  // no content at all. Defined after setPhase so we can call it here.
   // Temporal phase scrub — independent axis from viewMode. 'before' is the
   // default (full analyst/cso/board content). 'during' surfaces the human-
   // decision record. 'after' surfaces recalibrated DQI + Brier + lessons.
@@ -419,6 +411,44 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       else url.searchParams.set('phase', next);
       window.history.replaceState({}, '', url.toString());
     }
+  }, []);
+
+  // setViewMode — defined here (after setPhase) so it can snap phase to
+  // 'before' when the user switches to CSO or Board. Both of those views
+  // currently only render content at phase='before' (the during + after
+  // phase panels are analyst-only), so allowing the combinations would
+  // surface an empty page. Snapping is the simpler guard per the
+  // 2026-04-24 polish decision; the user can re-select during/after
+  // after switching back to Analyst.
+  const setViewMode = useCallback(
+    (next: ViewMode) => {
+      setViewModeState(next);
+      try {
+        localStorage.setItem('di-doc-view-mode', next);
+      } catch {
+        /* ignore */
+      }
+      if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href);
+        url.searchParams.set('view', next);
+        window.history.replaceState({}, '', url.toString());
+      }
+      if ((next === 'cso' || next === 'board') && phase !== 'before') {
+        setPhase('before');
+      }
+    },
+    [phase, setPhase]
+  );
+
+  // Direct-URL guard: if the user lands on /documents/[id]?view=cso&phase=after
+  // (or via localStorage persistence) we resolve the mismatch on mount by
+  // snapping phase to 'before'. Without this, the user sees an empty page
+  // and no way to recover short of clicking Analyst then a phase chip.
+  useEffect(() => {
+    if ((viewMode === 'cso' || viewMode === 'board') && phase !== 'before') {
+      setPhase('before');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [isExportingBoardView, setIsExportingBoardView] = useState(false);
