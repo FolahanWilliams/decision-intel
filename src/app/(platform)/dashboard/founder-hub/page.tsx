@@ -715,26 +715,10 @@ export default function FounderHubPage() {
   const [passInput, setPassInput] = useState('');
   const [passError, setPassError] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  // Founder AI pane lives permanently in the hub layout at ≥1280px. At
-  // smaller widths it collapses back to the floating bubble pattern via
-  // the fallback button. State persists across sessions so the founder's
-  // preference sticks.
-  const [chatPaneOpen, setChatPaneOpen] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return true;
-    try {
-      const saved = localStorage.getItem('di-founder-hub-chat-pane');
-      return saved !== '0';
-    } catch {
-      return true;
-    }
-  });
-  useEffect(() => {
-    try {
-      localStorage.setItem('di-founder-hub-chat-pane', chatPaneOpen ? '1' : '0');
-    } catch {
-      /* ignore */
-    }
-  }, [chatPaneOpen]);
+  // chatPaneOpen state + localStorage sync were retired 2026-04-23 when
+  // the AI chat switched from permanent-pane to floating widget. The
+  // `di-founder-hub-chat-pane` localStorage key orphans on first load
+  // for returning users — acceptable, no migration needed.
   const searchRef = useRef<HTMLInputElement>(null);
 
   const handleUnlock = useCallback(() => {
@@ -876,7 +860,13 @@ export default function FounderHubPage() {
 
   return (
     <ErrorBoundary sectionName="Founder Hub">
-      <div className="founder-hub-root max-w-6xl mx-auto px-4 py-6">
+      {/* Page cap widened from max-w-6xl (1152px) → max-w-screen-2xl
+          (1536px) on 2026-04-23: with the chat now floating instead of
+          anchored as a 340px right pane, the main column has a LOT of
+          horizontal air, and 1152px was leaving visible empty space on
+          wide monitors. 1536px uses the extra width without letting
+          narrow-text line-lengths become unreadable. */}
+      <div className="founder-hub-root max-w-screen-2xl mx-auto px-4 py-6">
         {renderHeader()}
         <CsoPipelineBoard founderPass={FOUNDER_PASS} />
         <div className="founder-hub-layout">
@@ -896,41 +886,17 @@ export default function FounderHubPage() {
               tabContent
             )}
           </main>
-          {chatPaneOpen && (
-            <aside className="founder-hub-chat" aria-label="Founder AI pane">
-              <FounderChatWidget
-                founderPass={FOUNDER_PASS}
-                variant="pane"
-                onCollapse={() => setChatPaneOpen(false)}
-              />
-            </aside>
-          )}
         </div>
-        {!chatPaneOpen && (
-          <button
-            onClick={() => setChatPaneOpen(true)}
-            title="Open Founder AI pane"
-            style={{
-              position: 'fixed',
-              bottom: 24,
-              right: 24,
-              width: 52,
-              height: 52,
-              borderRadius: '50%',
-              background: '#16A34A',
-              color: '#fff',
-              border: 'none',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(22, 163, 74, 0.4)',
-              zIndex: 50,
-            }}
-          >
-            <MessageSquare size={22} />
-          </button>
-        )}
+        {/* Chat now renders as a floating bubble (variant="floating").
+            The ≥1280px permanent-pane column was retired 2026-04-23 —
+            it was compressing the main content to ~568px at the 1152px
+            page cap once the 240px rail + 340px pane + gaps were
+            subtracted. The widget handles its own open/close state via
+            a bubble in the bottom-right. The hub's founder-hub-navigate
+            listener (above) still drives tab switching from chat chips
+            and from explicit [[nav:tabId]] markers the widget parses
+            out of the assistant stream. */}
+        <FounderChatWidget founderPass={FOUNDER_PASS} variant="floating" />
       </div>
       <style jsx global>{`
         .founder-hub-layout {
@@ -951,9 +917,6 @@ export default function FounderHubPage() {
           min-width: 0;
           width: 100%;
         }
-        .founder-hub-chat {
-          width: 100%;
-        }
         @media (min-width: 900px) {
           .founder-hub-layout {
             flex-direction: row;
@@ -969,15 +932,8 @@ export default function FounderHubPage() {
             overflow-y: auto;
           }
         }
-        @media (min-width: 1280px) {
-          .founder-hub-chat {
-            width: 340px;
-            flex-shrink: 0;
-            position: sticky;
-            top: 16px;
-            height: calc(100vh - 32px);
-          }
-        }
+        /* .founder-hub-chat 340px pane column retired 2026-04-23; the
+           chat is now a floating bubble and owns its own positioning. */
       `}</style>
     </ErrorBoundary>
   );

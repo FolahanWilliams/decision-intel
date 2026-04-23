@@ -94,3 +94,44 @@ export function detectNavTargets(text: string, limit = 3): TabNavTarget[] {
     .slice(0, limit)
     .map(h => h.target);
 }
+
+/** Explicit navigation marker the chat system prompt teaches the model
+ *  to emit when the user asks the AI to take them to a specific tab.
+ *  Form: [[nav:tabId]]  — e.g. "[[nav:outreach_cmd]]". The widget
+ *  auto-fires the founder-hub-navigate event for the first valid marker
+ *  in a response and strips every marker from the displayed text.
+ *
+ *  Why a marker rather than LLM tool calling: keeps the Gemini chat
+ *  route as a simple stream and lets the widget operate on final
+ *  assembled text. A malformed or unknown tabId is silently ignored.
+ */
+const NAV_MARKER_RE = /\[\[nav:([a-z0-9_-]+)\]\]/gi;
+
+export interface NavMarkerExtraction {
+  /** Message text with every marker stripped — what the widget displays. */
+  cleaned: string;
+  /** Unique tabIds in order of first appearance. Unknown ids filtered out. */
+  tabIds: string[];
+}
+
+/** Pull [[nav:tabId]] markers out of a (potentially streaming) message.
+ *  Safe to call on partial text — a marker split across chunks will not
+ *  match until both halves are concatenated, which is always the case
+ *  when the widget's running buffer is passed in. */
+export function extractNavMarkers(text: string): NavMarkerExtraction {
+  if (!text) return { cleaned: text, tabIds: [] };
+  const validIds = new Set(TAB_NAV_TARGETS.map(t => t.id));
+  const seen = new Set<string>();
+  const tabIds: string[] = [];
+  let match: RegExpExecArray | null;
+  NAV_MARKER_RE.lastIndex = 0;
+  while ((match = NAV_MARKER_RE.exec(text)) !== null) {
+    const id = match[1];
+    if (validIds.has(id) && !seen.has(id)) {
+      seen.add(id);
+      tabIds.push(id);
+    }
+  }
+  const cleaned = text.replace(NAV_MARKER_RE, '').replace(/[ \t]{2,}/g, ' ').trim();
+  return { cleaned, tabIds };
+}

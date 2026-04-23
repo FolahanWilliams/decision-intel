@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { Brain, MessageSquare, Paperclip, X, FileText, Trash2, ArrowUpRight } from 'lucide-react';
 import {
   detectNavTargets,
+  extractNavMarkers,
   FOUNDER_HUB_NAVIGATE_EVENT,
   type TabNavTarget,
 } from '@/lib/founder-hub/chat-nav';
@@ -196,6 +197,11 @@ export function FounderChatWidget({
 
       const decoder = new TextDecoder();
       let assistantContent = '';
+      // Track which [[nav:tabId]] markers have already auto-fired for
+      // this message so we don't double-dispatch when the marker re-
+      // appears in the running buffer across chunks. Per-message set,
+      // reset at the start of each new assistant reply.
+      const firedNavMarkers = new Set<string>();
       setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
 
       try {
@@ -212,11 +218,35 @@ export function FounderChatWidget({
               const data = JSON.parse(line.slice(6));
               if (data.type === 'chunk' && data.text) {
                 assistantContent += data.text;
+                // Strip any [[nav:tabId]] markers before rendering AND
+                // auto-dispatch the first unseen valid marker so the
+                // hub switches tabs in-flight. Navigation is single-
+                // shot per message: the founder-hub-navigate handler
+                // already guards against bad ids, and firedNavMarkers
+                // guards against re-firing if the marker appears more
+                // than once mid-stream.
+                const { cleaned, tabIds } = extractNavMarkers(assistantContent);
                 setMessages(prev => {
                   const updated = [...prev];
-                  updated[updated.length - 1] = { role: 'assistant', content: assistantContent };
+                  updated[updated.length - 1] = { role: 'assistant', content: cleaned };
                   return updated;
                 });
+                for (const tabId of tabIds) {
+                  if (firedNavMarkers.has(tabId)) continue;
+                  firedNavMarkers.add(tabId);
+                  if (typeof window !== 'undefined') {
+                    window.dispatchEvent(
+                      new CustomEvent(FOUNDER_HUB_NAVIGATE_EVENT, {
+                        detail: { tabId },
+                      })
+                    );
+                  }
+                  // Only fire the first marker automatically — multiple
+                  // nav markers per response mean the AI wanted to
+                  // preview several tabs. The founder reads the reply,
+                  // then clicks the suggestion chips for the rest.
+                  break;
+                }
               }
             } catch {
               // malformed SSE line
