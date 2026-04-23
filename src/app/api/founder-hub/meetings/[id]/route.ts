@@ -79,7 +79,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (body.nextSteps !== undefined) data.nextSteps = body.nextSteps?.trim() || null;
   if (body.prospectName !== undefined) data.prospectName = body.prospectName?.trim() || null;
   if (body.prospectRole !== undefined) data.prospectRole = body.prospectRole?.trim() || null;
-  if (body.prospectCompany !== undefined) data.prospectCompany = body.prospectCompany?.trim() || null;
+  if (body.prospectCompany !== undefined)
+    data.prospectCompany = body.prospectCompany?.trim() || null;
 
   const scheduled = toDate(body.scheduledAt);
   if (scheduled !== undefined) data.scheduledAt = scheduled;

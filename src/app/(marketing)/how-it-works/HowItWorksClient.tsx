@@ -2,7 +2,15 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, FileText, ShieldCheck, Microscope, BookOpen, ChevronDown, GraduationCap } from 'lucide-react';
+import {
+  ArrowRight,
+  FileText,
+  ShieldCheck,
+  Microscope,
+  BookOpen,
+  ChevronDown,
+  GraduationCap,
+} from 'lucide-react';
 
 import { MarketingNav } from '@/components/marketing/MarketingNav';
 import { PipelineMiniatureViz } from '@/components/marketing/how-it-works/PipelineMiniatureViz';

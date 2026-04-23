@@ -849,7 +849,10 @@ export async function POST(request: NextRequest) {
           // render the counterfactual + DPR buttons immediately.
           const completePayload =
             createdAnalysisId && result.finalReport && typeof result.finalReport === 'object'
-              ? { ...(result.finalReport as Record<string, unknown>), analysisId: createdAnalysisId }
+              ? {
+                  ...(result.finalReport as Record<string, unknown>),
+                  analysisId: createdAnalysisId,
+                }
               : result.finalReport;
           sendUpdate({ type: 'complete', progress: 100, result: completePayload });
 

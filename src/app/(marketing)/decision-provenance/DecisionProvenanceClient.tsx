@@ -232,9 +232,9 @@ export function DecisionProvenanceClient() {
             maxWidth: 780,
           }}
         >
-          The specimen is a SPECIMEN — the PDF carries a diagonal watermark on every page. The
-          memo, hashes, and findings are fictional but representative; the structure is the
-          production shape. A live DPR is generated on every authenticated audit.
+          The specimen is a SPECIMEN — the PDF carries a diagonal watermark on every page. The memo,
+          hashes, and findings are fictional but representative; the structure is the production
+          shape. A live DPR is generated on every authenticated audit.
         </p>
       </section>
 
@@ -350,9 +350,8 @@ export function DecisionProvenanceClient() {
             maxWidth: 720,
           }}
         >
-          The DPR maps onto regulation already in force or calendared. Every tailwind below
-          carries a statute, a regulator guidance, or an enforcement date. Speculation is not
-          cited.
+          The DPR maps onto regulation already in force or calendared. Every tailwind below carries
+          a statute, a regulator guidance, or an enforcement date. Speculation is not cited.
         </p>
         <div
           style={{
@@ -393,9 +392,7 @@ export function DecisionProvenanceClient() {
               >
                 {t.status}
               </div>
-              <div style={{ fontSize: 13, lineHeight: 1.55, color: C.slate600 }}>
-                {t.anchor}
-              </div>
+              <div style={{ fontSize: 13, lineHeight: 1.55, color: C.slate600 }}>{t.anchor}</div>
             </div>
           ))}
         </div>
@@ -434,8 +431,8 @@ export function DecisionProvenanceClient() {
             </div>
             <p style={{ margin: 0, fontSize: 15, lineHeight: 1.6, color: '#CBD5E1' }}>
               The DPR never serialises prompt content, the toxic-combination weight matrix, or
-              per-org causal edges. The record declares what it contains, what it explicitly
-              does not contain, and why. A GC can forward it without a secondary redaction pass.
+              per-org causal edges. The record declares what it contains, what it explicitly does
+              not contain, and why. A GC can forward it without a secondary redaction pass.
             </p>
           </div>
           <Link

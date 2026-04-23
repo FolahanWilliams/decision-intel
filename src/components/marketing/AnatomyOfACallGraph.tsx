@@ -301,9 +301,7 @@ export function AnatomyOfACallGraph({
                 strokeWidth="1"
                 filter={`url(#aoc-tile-shadow-${size})`}
               />
-              <g transform={`scale(${iconScale})`}>
-                {n.icon(active ? C.greenDark : C.slate400)}
-              </g>
+              <g transform={`scale(${iconScale})`}>{n.icon(active ? C.greenDark : C.slate400)}</g>
               {tileFontSize >= 8 && (
                 <text
                   y={tileHalf + 12}

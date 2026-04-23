@@ -1,7 +1,17 @@
 'use client';
 
 import type React from 'react';
-import { Compass, Target, Shield, Rocket, Hammer, Wrench, Map, Flag, Presentation } from 'lucide-react';
+import {
+  Compass,
+  Target,
+  Shield,
+  Rocket,
+  Hammer,
+  Wrench,
+  Map,
+  Flag,
+  Presentation,
+} from 'lucide-react';
 
 /**
  * Founder Tips — personalized strategic principles for the Decision Intel
@@ -419,7 +429,7 @@ const SECTION_PITCH_PREP: Tip[] = [
     principle:
       'VCs look at 200+ components and 70+ API routes from a pre-seed founder and see either execution proof or scope creep. Which one they see depends entirely on how you frame it. Frame it as "the full reasoning stack is shipped — the next 12 months are customer acquisition." Turns the perceived weakness into the strongest execution signal in the round.',
     rationale:
-      "The natural VC reaction to seeing 200 components + 70 API routes on a pre-seed deck is: \"this is a solo founder who cannot prioritize.\" Left unframed, this is a silent discount. Framed correctly, it flips: \"most pre-seeds are toys; we have shipped a Series-B-equivalent codebase, so every dollar you invest goes to distribution, not to infrastructure build-out.\" Rehearse this in the chat widget this week: open the Founder AI chat, say \"play a skeptical VC and grill me on scope creep,\" drill the response until the execution-strength frame lands in under 20 seconds. The key sentence is \"the next 12 months are customer acquisition, not feature build\" — because it reframes the investor question from \"will he keep shipping random features\" to \"will the money go where it is supposed to go.\" That reframe is the work.",
+      'The natural VC reaction to seeing 200 components + 70 API routes on a pre-seed deck is: "this is a solo founder who cannot prioritize." Left unframed, this is a silent discount. Framed correctly, it flips: "most pre-seeds are toys; we have shipped a Series-B-equivalent codebase, so every dollar you invest goes to distribution, not to infrastructure build-out." Rehearse this in the chat widget this week: open the Founder AI chat, say "play a skeptical VC and grill me on scope creep," drill the response until the execution-strength frame lands in under 20 seconds. The key sentence is "the next 12 months are customer acquisition, not feature build" — because it reframes the investor question from "will he keep shipping random features" to "will the money go where it is supposed to go." That reframe is the work.',
     action:
       'This week: rehearse the execution-strength frame with the AI mentor chat. Prompt: "Play a skeptical VC who thinks a 16-year-old solo founder with 200+ components is demonstrating scope creep. Drill me until my frame lands in 20 seconds." Rehearse 5 times. Final landing sentence to memorize: "Most pre-seeds are toys. We have shipped the full reasoning stack. The next 12 months are customer acquisition, not feature build — your round deploys into distribution, not infra." Add this to slide 7 as the voice-over anchor.',
   },
@@ -428,7 +438,7 @@ const SECTION_PITCH_PREP: Tip[] = [
     principle:
       'The gap between your current founder profile (Wiz advisor, age-as-thesis, SF-bound) and your first logo is a distribution problem, not a product problem. A 90-day engagement with a senior BD contractor — someone who has sold into Fortune 500 corporate strategy before — closes that gap faster than any feature you could build in Q2. Small retainer + referral fee on landed logos. Ask costs zero.',
     rationale:
-      "Every pre-seed founder who worries about GTM thinks the answer is \"I need a GTM co-founder.\" At your stage, the weaker-but-faster move is \"I need a senior BD contractor for 90 days.\" The co-founder search is a 6-month recruiting project. The contractor engagement is a 1-week ask to the Wiz advisor + a 2-week intro process. The contractor is someone who has closed corporate strategy deals before, knows which CSO titles actually decide, can open 10 warm conversations in the first week that would take you 6 months to source cold. The economics: small monthly retainer (say £2k/mo × 3 months = £6k) plus a 10% referral fee on the first paying logo. If the first logo is a $2,499/mo Strategy tier × 12 months = ~$30k ARR, the referral fee is $3k. Total cost of one logo: ~$9k. Compare with burning 6 months of your own time on cold outbound that produces zero logos. The contractor path is not cheaper in dollars; it is dramatically cheaper in time-to-first-logo, which is the metric the fundraise depends on.",
+      'Every pre-seed founder who worries about GTM thinks the answer is "I need a GTM co-founder." At your stage, the weaker-but-faster move is "I need a senior BD contractor for 90 days." The co-founder search is a 6-month recruiting project. The contractor engagement is a 1-week ask to the Wiz advisor + a 2-week intro process. The contractor is someone who has closed corporate strategy deals before, knows which CSO titles actually decide, can open 10 warm conversations in the first week that would take you 6 months to source cold. The economics: small monthly retainer (say £2k/mo × 3 months = £6k) plus a 10% referral fee on the first paying logo. If the first logo is a $2,499/mo Strategy tier × 12 months = ~$30k ARR, the referral fee is $3k. Total cost of one logo: ~$9k. Compare with burning 6 months of your own time on cold outbound that produces zero logos. The contractor path is not cheaper in dollars; it is dramatically cheaper in time-to-first-logo, which is the metric the fundraise depends on.',
     action:
       'This week, draft a single batched message to the Wiz advisor: "Three specific asks. (1) Intro to a senior BD contractor who has sold into Fortune 500 corporate strategy — 90-day engagement, small retainer + 10% referral fee, close our first paying design partner. (2) Warm intros to the five named CSOs you identified as highest-fit. (3) One read of the current deck before I send it to partner meeting A." Send as one message, not three. Do not follow up for 7 days. The ask is legitimate and the advisor is there for exactly this; nervous follow-ups signal lack of conviction.',
   },
@@ -545,10 +555,9 @@ export function FounderTipsTab() {
             lineHeight: 1.55,
           }}
         >
-          Three rehearsal-grade moves for the upcoming pre-seed round: slide 10 capacity strip
-          (open Design Partners tab for the screenshot), slide 7 execution-strength frame
-          (rehearse in the AI chat), BD contractor ask to the Wiz advisor (single batched
-          message).
+          Three rehearsal-grade moves for the upcoming pre-seed round: slide 10 capacity strip (open
+          Design Partners tab for the screenshot), slide 7 execution-strength frame (rehearse in the
+          AI chat), BD contractor ask to the Wiz advisor (single batched message).
         </p>
         {SECTION_PITCH_PREP.map((t, i) => (
           <TipBlock key={t.title} t={t} idx={i + 30} />

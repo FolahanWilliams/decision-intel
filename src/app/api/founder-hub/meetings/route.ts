@@ -53,8 +53,7 @@ export async function GET(req: NextRequest) {
       500
     );
 
-    const where =
-      statusFilter && ALLOWED_STATUS.has(statusFilter) ? { status: statusFilter } : {};
+    const where = statusFilter && ALLOWED_STATUS.has(statusFilter) ? { status: statusFilter } : {};
 
     // Order by effective date: happenedAt for completed rows,
     // scheduledAt for ready/prep rows, createdAt as final fallback. We
@@ -130,8 +129,7 @@ export async function POST(req: NextRequest) {
     return apiError({ error: 'prepPlan is required (full generated plan)', status: 400 });
   }
 
-  const status =
-    body.status && ALLOWED_STATUS.has(body.status) ? body.status : 'prep';
+  const status = body.status && ALLOWED_STATUS.has(body.status) ? body.status : 'prep';
   const scheduledAt =
     body.scheduledAt && !Number.isNaN(new Date(body.scheduledAt).getTime())
       ? new Date(body.scheduledAt)

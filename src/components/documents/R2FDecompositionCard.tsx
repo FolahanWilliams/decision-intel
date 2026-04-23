@@ -93,9 +93,9 @@ export function R2FDecompositionCard({
               maxWidth: 620,
             }}
           >
-            Kahneman’s debiasing tradition and Klein’s Recognition-Primed Decision
-            framework run side-by-side, arbitrated into one score. The 2009
-            Kahneman–Klein paper is the canonical citation.
+            Kahneman’s debiasing tradition and Klein’s Recognition-Primed Decision framework run
+            side-by-side, arbitrated into one score. The 2009 Kahneman–Klein paper is the canonical
+            citation.
           </p>
         </div>
         <div
@@ -108,9 +108,7 @@ export function R2FDecompositionCard({
         >
           <ScoreStat label="DQI" value={String(overallScore)} accent />
           <ScoreStat label="Biases" value={String(biasCount)} />
-          {typeof noiseScore === 'number' && (
-            <ScoreStat label="Noise" value={`${noiseScore}%`} />
-          )}
+          {typeof noiseScore === 'number' && <ScoreStat label="Noise" value={`${noiseScore}%`} />}
         </div>
       </header>
 
@@ -201,8 +199,7 @@ export function R2FDecompositionCard({
       >
         <ArrowRight size={12} strokeWidth={2.25} aria-hidden />
         <span>
-          Every bias and every counterfactual in this memo traces to one of
-          these six stages.
+          Every bias and every counterfactual in this memo traces to one of these six stages.
         </span>
       </footer>
     </section>
@@ -268,10 +265,8 @@ function SideColumn({
   items: Array<{ label: string; note: string }>;
   tone: 'amber' | 'blue';
 }) {
-  const accent =
-    tone === 'amber' ? 'rgba(217, 119, 6, 0.85)' : 'rgba(37, 99, 235, 0.85)';
-  const accentSoft =
-    tone === 'amber' ? 'rgba(217, 119, 6, 0.08)' : 'rgba(37, 99, 235, 0.08)';
+  const accent = tone === 'amber' ? 'rgba(217, 119, 6, 0.85)' : 'rgba(37, 99, 235, 0.85)';
+  const accentSoft = tone === 'amber' ? 'rgba(217, 119, 6, 0.08)' : 'rgba(37, 99, 235, 0.08)';
   return (
     <div
       style={{

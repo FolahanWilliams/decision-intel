@@ -527,7 +527,9 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       // Null when /api/counterfactual has no positive scenarios for this
       // analysis or the fetch fails — the PDF gracefully omits the
       // section rather than rendering fabricated numbers.
-      let counterfactualTop: import('@/lib/reports/board-report-generator').BoardCounterfactualTop | null = null;
+      let counterfactualTop:
+        | import('@/lib/reports/board-report-generator').BoardCounterfactualTop
+        | null = null;
       try {
         const cfRes = await fetch(`/api/counterfactual?analysisId=${analysis.id}`);
         if (cfRes.ok) {
@@ -1483,10 +1485,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           {/* Omit hasHumanDecision so the panel self-fetches the linked
               HumanDecision via /api/human-decisions?analysisId=… — wired
               2026-04-23 once the filter shipped. */}
-          <PhaseDuringPanel
-            documentId={resolvedParams.id}
-            analysisId={analysis.id}
-          />
+          <PhaseDuringPanel documentId={resolvedParams.id} analysisId={analysis.id} />
         </ErrorBoundary>
       )}
 
@@ -2819,9 +2818,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         />
       )}
 
-      {analysis && (
-        <ReportOutcomeFab outcomeStatus={analysis.outcomeStatus} phase={phase} />
-      )}
+      {analysis && <ReportOutcomeFab outcomeStatus={analysis.outcomeStatus} phase={phase} />}
     </div>
   );
 }

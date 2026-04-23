@@ -92,8 +92,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         return NextResponse.json(
           {
             error: 'UPGRADE_REQUIRED',
-            message:
-              'Decision Provenance Record export requires the Pro plan or higher.',
+            message: 'Decision Provenance Record export requires the Pro plan or higher.',
             requiredPlan: 'pro',
           },
           { status: 402 }

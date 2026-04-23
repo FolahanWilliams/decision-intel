@@ -116,7 +116,10 @@ export class HallwayBriefGenerator {
 
   public generateAndDownload(data: HallwayBriefData): jsPDF {
     this.render(data);
-    const slug = data.filename.replace(/\.[^.]+$/, '').replace(/[^a-z0-9-_]+/gi, '-').slice(0, 40);
+    const slug = data.filename
+      .replace(/\.[^.]+$/, '')
+      .replace(/[^a-z0-9-_]+/gi, '-')
+      .slice(0, 40);
     const stamp = (data.generatedAt ?? new Date()).toISOString().slice(0, 10);
     this.doc.save(`hallway-brief-${slug}-${stamp}.pdf`);
     return this.doc;
@@ -147,12 +150,9 @@ export class HallwayBriefGenerator {
     this.doc.setFont('helvetica', 'normal');
     this.doc.setFontSize(9);
     this.doc.setTextColor(90, 90, 90);
-    this.doc.text(
-      `Generated ${generatedAt.toISOString().slice(0, 10)}`,
-      PAGE_W - MARGIN_R,
-      16,
-      { align: 'right' }
-    );
+    this.doc.text(`Generated ${generatedAt.toISOString().slice(0, 10)}`, PAGE_W - MARGIN_R, 16, {
+      align: 'right',
+    });
 
     this.doc.setTextColor(22, 163, 74);
     this.doc.setFont('helvetica', 'bold');
@@ -199,7 +199,10 @@ export class HallwayBriefGenerator {
     if (top) {
       this.sectionLabel('TOP RECOMMENDATION', y);
       y += 6;
-      const rec = top.suggestion ?? top.explanation ?? `Address ${formatBiasName(top.biasType)} before circulating.`;
+      const rec =
+        top.suggestion ??
+        top.explanation ??
+        `Address ${formatBiasName(top.biasType)} before circulating.`;
       this.doc.setTextColor(20, 20, 20);
       this.doc.setFont('helvetica', 'normal');
       this.doc.setFontSize(11);
@@ -304,12 +307,7 @@ export class HallwayBriefGenerator {
     this.doc.setTextColor(150, 150, 150);
     this.doc.setFont('helvetica', 'normal');
     this.doc.setFontSize(8);
-    this.doc.text(
-      'Hallway Brief · R²F · Decision Intel',
-      PAGE_W / 2,
-      287,
-      { align: 'center' }
-    );
+    this.doc.text('Hallway Brief · R²F · Decision Intel', PAGE_W / 2, 287, { align: 'center' });
     this.doc.text(
       `DQI ${score} · Grade ${grade} · Biases ${data.biases.length}${typeof data.noiseScore === 'number' ? ` · Noise ${Math.round(data.noiseScore)}` : ''}`,
       PAGE_W / 2,

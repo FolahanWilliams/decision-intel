@@ -154,7 +154,11 @@ export default async function ProvenanceArchivePage() {
             <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 14 }}>
               Generate a DPR on any completed audit to seed the archive.
             </div>
-            <Link href="/dashboard" className="btn btn-secondary flex items-center gap-2" style={{ display: 'inline-flex' }}>
+            <Link
+              href="/dashboard"
+              className="btn btn-secondary flex items-center gap-2"
+              style={{ display: 'inline-flex' }}
+            >
               <FileText size={14} />
               Go to dashboard
             </Link>
@@ -182,10 +186,7 @@ export default async function ProvenanceArchivePage() {
                 {records.map(r => {
                   const frameworks = collectFrameworkIds(r.regulatoryMapping);
                   return (
-                    <tr
-                      key={r.id}
-                      style={{ borderBottom: '1px solid var(--border-color)' }}
-                    >
+                    <tr key={r.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
                       <td style={tdStyle}>
                         <Link
                           href={`/documents/${r.documentId}`}

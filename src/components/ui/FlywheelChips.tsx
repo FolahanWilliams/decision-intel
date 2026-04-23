@@ -40,7 +40,10 @@ interface TeamIntelligenceResponse {
   outcomesPending?: OutcomesPendingData | null;
 }
 
-const BRIER_PALETTE: Record<BrierCategory, { fg: string; bg: string; border: string; label: string }> = {
+const BRIER_PALETTE: Record<
+  BrierCategory,
+  { fg: string; bg: string; border: string; label: string }
+> = {
   excellent: {
     fg: 'var(--accent-primary)',
     bg: 'rgba(22,163,74,0.08)',
@@ -97,8 +100,7 @@ export function FlywheelChips({ variant = 'compact' }: FlywheelChipsProps) {
 
   const brier = data.brierChip ?? null;
   const pending = data.outcomesPending ?? null;
-  const nothingToShow =
-    !brier && (!pending || (pending.pending === 0 && pending.overdue === 0));
+  const nothingToShow = !brier && (!pending || (pending.pending === 0 && pending.overdue === 0));
   if (nothingToShow) return null;
 
   return (
@@ -161,8 +163,7 @@ export function FlywheelChips({ variant = 'compact' }: FlywheelChipsProps) {
             fontSize: 11,
             fontWeight: 600,
             color: pending.overdue > 0 ? 'var(--warning, #D97706)' : 'var(--text-primary)',
-            background:
-              pending.overdue > 0 ? 'rgba(217,119,6,0.08)' : 'var(--bg-elevated, #fff)',
+            background: pending.overdue > 0 ? 'rgba(217,119,6,0.08)' : 'var(--bg-elevated, #fff)',
             border:
               pending.overdue > 0
                 ? '1px solid rgba(217,119,6,0.3)'

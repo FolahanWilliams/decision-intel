@@ -137,6 +137,9 @@ export function extractNavMarkers(text: string): NavMarkerExtraction {
       tabIds.push(id);
     }
   }
-  const cleaned = text.replace(NAV_MARKER_RE, '').replace(/[ \t]{2,}/g, ' ').trim();
+  const cleaned = text
+    .replace(NAV_MARKER_RE, '')
+    .replace(/[ \t]{2,}/g, ' ')
+    .trim();
   return { cleaned, tabIds };
 }

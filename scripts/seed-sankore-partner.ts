@@ -149,8 +149,10 @@ async function main() {
     linkedInUrl: 'https://sankore.com',
     industry: 'mna', // closest match in the DP enum; their workflow IS investment committee / deal evaluation
     teamSize: '6-15', // pricing quote is for ~10 seats; public sources show 30-66, reconcile post-onboarding
-    memoCadence: 'Estimated 3-8 investment committee memos per month across portfolio + new-fund decisions (confirm in meeting)',
-    currentStack: 'Unknown. Likely Excel + internal memos + Bloomberg/S&P for market data. Part of discovery.',
+    memoCadence:
+      'Estimated 3-8 investment committee memos per month across portfolio + new-fund decisions (confirm in meeting)',
+    currentStack:
+      'Unknown. Likely Excel + internal memos + Bloomberg/S&P for market data. Part of discovery.',
     whyNow:
       'First high-probability paid pilot. Warm family intro. SEC-Nigeria licensed investment and wealth management firm with 120B naira AUM. Regulatory posture + investment committee cadence + heritage-of-rigor framing make them an ideal design-partner fit. Targeting £1,999/mo founding-partner rate.',
     source: 'warm-intro',
@@ -187,7 +189,9 @@ async function main() {
   });
 
   console.log(`\n📊 Cohort status: ${capacity} of 5 seats accepted.`);
-  console.log(`   Sankore is in "scheduled_call" — move to "accepted" in the Founder Hub UI after signed LOI.\n`);
+  console.log(
+    `   Sankore is in "scheduled_call" — move to "accepted" in the Founder Hub UI after signed LOI.\n`
+  );
 }
 
 main()

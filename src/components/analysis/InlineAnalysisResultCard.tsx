@@ -313,9 +313,7 @@ export function InlineAnalysisResultCard({
                   duration={900}
                   style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}
                 />
-                <span>
-                  cognitive bias{analysis.biasCount === 1 ? '' : 'es'} flagged
-                </span>
+                <span>cognitive bias{analysis.biasCount === 1 ? '' : 'es'} flagged</span>
               </>
             )}
           </div>
@@ -987,7 +985,6 @@ function PostRevealBookingRow() {
   );
 }
 
-
 /** Small textarea helper used by the passage co-edit split pane. */
 function PassageField({
   label,
@@ -1027,9 +1024,7 @@ function PassageField({
         >
           {label}
         </span>
-        {sublabel && (
-          <span style={{ fontSize: 10.5, color: 'var(--text-muted)' }}>{sublabel}</span>
-        )}
+        {sublabel && <span style={{ fontSize: 10.5, color: 'var(--text-muted)' }}>{sublabel}</span>}
       </div>
       <textarea
         value={value}
@@ -1092,8 +1087,7 @@ function DiffColumn({
   highlight: 'add' | 'remove';
 }) {
   const highlightColor = highlight === 'add' ? 'var(--accent-primary)' : 'var(--error)';
-  const highlightBg =
-    highlight === 'add' ? 'rgba(22,163,74,0.12)' : 'rgba(220,38,38,0.10)';
+  const highlightBg = highlight === 'add' ? 'rgba(22,163,74,0.12)' : 'rgba(220,38,38,0.10)';
   return (
     <div
       style={{

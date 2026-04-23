@@ -172,7 +172,8 @@ function OutcomeFlywheelLinkCard() {
           Outcome Flywheel — recalibrated DQI, Brier trend, lessons learned.
         </div>
         <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-          Pending + Brier signals are always visible in the sidebar. The full timeline + per-audit recalibration lives on its own page.
+          Pending + Brier signals are always visible in the sidebar. The full timeline + per-audit
+          recalibration lives on its own page.
         </div>
       </div>
       <a

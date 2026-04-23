@@ -91,9 +91,7 @@ export async function GET(req: NextRequest) {
       log.warn('teamMember lookup failed on provenance list:', err);
     }
 
-    const where = orgId
-      ? { OR: [{ orgId }, { userId: user.id }] }
-      : { userId: user.id };
+    const where = orgId ? { OR: [{ orgId }, { userId: user.id }] } : { userId: user.id };
     const whereWithSince =
       since && !Number.isNaN(since.getTime())
         ? { AND: [where, { generatedAt: { gte: since } }] }

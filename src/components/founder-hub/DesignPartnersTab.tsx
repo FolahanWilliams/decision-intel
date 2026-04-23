@@ -758,8 +758,7 @@ function PitchDeckCapacitySlide({ capacity }: { capacity: Capacity }) {
   const term = 12;
   const totalArr = priceMonthly * term * capacity.total;
   const bookedArr = priceMonthly * term * capacity.filled;
-  const money = (n: number) =>
-    n >= 1000 ? `$${(n / 1000).toFixed(0)}k` : `$${n}`;
+  const money = (n: number) => (n >= 1000 ? `$${(n / 1000).toFixed(0)}k` : `$${n}`);
 
   return (
     <div
@@ -768,8 +767,7 @@ function PitchDeckCapacitySlide({ capacity }: { capacity: Capacity }) {
         position: 'relative',
         overflow: 'hidden',
         borderLeft: '3px solid #16A34A',
-        background:
-          'linear-gradient(160deg, var(--bg-card) 0%, rgba(22,163,74,0.06) 100%)',
+        background: 'linear-gradient(160deg, var(--bg-card) 0%, rgba(22,163,74,0.06) 100%)',
       }}
     >
       {/* Eyebrow */}
@@ -836,8 +834,8 @@ function PitchDeckCapacitySlide({ capacity }: { capacity: Capacity }) {
           marginBottom: 18,
         }}
       >
-        Not a feature chart. Repeatable unit economics with a first-right-of-refusal at list
-        price in Year 2.
+        Not a feature chart. Repeatable unit economics with a first-right-of-refusal at list price
+        in Year 2.
       </div>
 
       {/* Seat pills — 5 big chips so the count is readable at 1920x1080 */}
@@ -877,9 +875,7 @@ function PitchDeckCapacitySlide({ capacity }: { capacity: Capacity }) {
             >
               Seat {i + 1}
             </div>
-            <div style={{ fontSize: 13, fontWeight: 700 }}>
-              {filled ? 'Filled' : 'Open'}
-            </div>
+            <div style={{ fontSize: 13, fontWeight: 700 }}>{filled ? 'Filled' : 'Open'}</div>
           </div>
         ))}
       </div>
@@ -967,8 +963,8 @@ function PitchDeckCapacitySlide({ capacity }: { capacity: Capacity }) {
           lineHeight: 1.5,
         }}
       >
-        Year 2: first-right-of-refusal at list price. Design partners get the 20% discount
-        locked for Year 1 only — the cohort is self-upgrading if the product compounds.
+        Year 2: first-right-of-refusal at list price. Design partners get the 20% discount locked
+        for Year 1 only — the cohort is self-upgrading if the product compounds.
       </div>
     </div>
   );

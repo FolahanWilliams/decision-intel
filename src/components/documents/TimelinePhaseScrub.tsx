@@ -263,13 +263,10 @@ export function PhaseDuringPanel({
     };
   }, [analysisId, documentId, hasHumanDecision, humanDecisionSummary]);
 
-  const effectiveHas =
-    hasHumanDecision ?? (fetched !== null);
-  const effectiveSummary =
-    humanDecisionSummary ?? fetched?.content;
+  const effectiveHas = hasHumanDecision ?? fetched !== null;
+  const effectiveSummary = humanDecisionSummary ?? fetched?.content;
   const effectiveDate =
-    humanDecisionDate ??
-    (fetched ? new Date(fetched.createdAt).toLocaleDateString() : undefined);
+    humanDecisionDate ?? (fetched ? new Date(fetched.createdAt).toLocaleDateString() : undefined);
 
   if (loading) {
     return (

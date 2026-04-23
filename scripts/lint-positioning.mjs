@@ -20,11 +20,7 @@ const ROOT = process.cwd();
 // (positioning-copilot, positioning-frameworks, category-position,
 // competitive-positioning, founder-school/**) sit behind Supabase +
 // FOUNDER_HUB_PASS — stage-of-company vocabulary is legitimate there.
-const SCAN_ROOTS = [
-  'src/app/(marketing)',
-  'src/components/marketing',
-  'src/lib/data/case-studies',
-];
+const SCAN_ROOTS = ['src/app/(marketing)', 'src/components/marketing', 'src/lib/data/case-studies'];
 
 // Paths that must never be flagged even if they fall inside SCAN_ROOTS.
 const SKIP_SUFFIXES = [
@@ -117,26 +113,17 @@ const BANNED = [
   {
     pattern: /\b12-node pipeline\b/i,
     label: '"12-node pipeline" (jargon — allowed only in /how-it-works)',
-    allowIn: [
-      'src/app/(marketing)/how-it-works',
-      'src/components/marketing/how-it-works',
-    ],
+    allowIn: ['src/app/(marketing)/how-it-works', 'src/components/marketing/how-it-works'],
   },
   {
     pattern: /\bLangGraph\b/,
     label: 'LangGraph (jargon — allowed only in /how-it-works)',
-    allowIn: [
-      'src/app/(marketing)/how-it-works',
-      'src/components/marketing/how-it-works',
-    ],
+    allowIn: ['src/app/(marketing)/how-it-works', 'src/components/marketing/how-it-works'],
   },
   {
     pattern: /\b3 independent AI judges\b/i,
     label: '"3 independent AI judges" (jargon — allowed only in /how-it-works)',
-    allowIn: [
-      'src/app/(marketing)/how-it-works',
-      'src/components/marketing/how-it-works',
-    ],
+    allowIn: ['src/app/(marketing)/how-it-works', 'src/components/marketing/how-it-works'],
   },
 ];
 

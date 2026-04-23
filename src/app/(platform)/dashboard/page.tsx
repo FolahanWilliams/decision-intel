@@ -1255,12 +1255,8 @@ export default function Dashboard() {
                           // the rest alphabetically below so a CSO with 40+ deals
                           // still finds the one they touched yesterday in one click.
                           const byRecency = [...dealsList].sort((a, b) => {
-                            const aT = a.updatedAt
-                              ? new Date(a.updatedAt).getTime()
-                              : 0;
-                            const bT = b.updatedAt
-                              ? new Date(b.updatedAt).getTime()
-                              : 0;
+                            const aT = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+                            const bT = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
                             return bT - aT;
                           });
                           const recent = byRecency.slice(0, 3);

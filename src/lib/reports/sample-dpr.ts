@@ -96,12 +96,13 @@ const SAMPLE_REGULATORY: RegulatoryEntry[] = [
       {
         id: 'eu_ai_act',
         name: 'EU AI Act',
-        provisions: [
-          'Article 14 — Human oversight',
-          'Article 15 — Accuracy and record-keeping',
-        ],
+        provisions: ['Article 14 — Human oversight', 'Article 15 — Accuracy and record-keeping'],
       },
-      { id: 'basel_iii', name: 'Basel III · Pillar 2 ICAAP', provisions: ['Qualitative-decision documentation'] },
+      {
+        id: 'basel_iii',
+        name: 'Basel III · Pillar 2 ICAAP',
+        provisions: ['Qualitative-decision documentation'],
+      },
     ],
   },
   {
@@ -113,7 +114,11 @@ const SAMPLE_REGULATORY: RegulatoryEntry[] = [
         name: 'SEC AI Disclosure',
         provisions: ['Rule 206(4)-8 — Investment-adviser decision documentation'],
       },
-      { id: 'eu_ai_act', name: 'EU AI Act', provisions: ['Annex III — High-risk decision support'] },
+      {
+        id: 'eu_ai_act',
+        name: 'EU AI Act',
+        provisions: ['Annex III — High-risk decision support'],
+      },
     ],
   },
   {
@@ -133,15 +138,13 @@ const SAMPLE_REGULATORY: RegulatoryEntry[] = [
   },
 ];
 
-const SAMPLE_PIPELINE_LINEAGE: PipelineLineageEntry[] = PIPELINE_NODES.map(
-  (node, i) => ({
-    order: i + 1,
-    nodeId: node.id,
-    zone: node.zone,
-    label: node.label,
-    academicAnchor: node.academicAnchor,
-  })
-);
+const SAMPLE_PIPELINE_LINEAGE: PipelineLineageEntry[] = PIPELINE_NODES.map((node, i) => ({
+  order: i + 1,
+  nodeId: node.id,
+  zone: node.zone,
+  label: node.label,
+  academicAnchor: node.academicAnchor,
+}));
 
 const SAMPLE_SUMMARY =
   'Proposal to launch a direct sales motion into DACH markets with a projected 18-month break-even, anchored to a single customer-discovery cohort of 14 prospects. Analysis flags confirmation bias in source selection, overconfidence in the break-even claim, and sunk-cost framing around the incumbent go-to-market build. Recommended action: commission an independent reference-class forecast against comparable European expansions before the committee vote.';

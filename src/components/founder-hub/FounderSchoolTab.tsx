@@ -137,9 +137,7 @@ function LessonsList({
    *  prompt is shaped to match the track's actual content. */
   const handleQuizTrack = () => {
     if (typeof window === 'undefined') return;
-    const lessonTitles = track.lessons
-      .map(l => `${l.order}. ${l.title}`)
-      .join('\n');
+    const lessonTitles = track.lessons.map(l => `${l.order}. ${l.title}`).join('\n');
     const question = [
       `Quiz me on the "${track.title}" track in Founder School.`,
       '',

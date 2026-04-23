@@ -59,9 +59,7 @@ export function R2FBadge({
         whiteSpace: 'nowrap',
         background: isChip ? 'rgba(22, 163, 74, 0.12)' : 'transparent',
         color: 'var(--accent-primary)',
-        border: isChip
-          ? '1px solid rgba(22, 163, 74, 0.35)'
-          : '1px solid var(--accent-primary)',
+        border: isChip ? '1px solid rgba(22, 163, 74, 0.35)' : '1px solid var(--accent-primary)',
         ...style,
       }}
     >

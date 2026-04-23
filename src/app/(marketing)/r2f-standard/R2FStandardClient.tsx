@@ -123,30 +123,39 @@ const SELF_ASSESSMENT: Array<{ question: string; weight: number }> = [
   { question: 'Does the system surface pattern analogues from a published corpus?', weight: 1 },
   { question: 'Are "forgotten questions" flagged as a first-class output?', weight: 1 },
   { question: 'Is a pre-mortem produced for every memo, not just on request?', weight: 1 },
-  { question: 'Is the pipeline’s reasoning arbitrated by an explicit meta-judge stage?', weight: 1 },
+  {
+    question: 'Is the pipeline’s reasoning arbitrated by an explicit meta-judge stage?',
+    weight: 1,
+  },
   { question: 'Does every output trace back to a signed, hashed record?', weight: 1 },
-  { question: 'Does the system treat expert intuition as amplified input, not noise to suppress?', weight: 1 },
+  {
+    question: 'Does the system treat expert intuition as amplified input, not noise to suppress?',
+    weight: 1,
+  },
 ];
 
 const TIERS = [
   {
     label: 'Bronze · R²F-aligned',
     minScore: 4,
-    blurb: '4 of 10 tenets in place. Minimum bar to claim R²F alignment — bias + noise + one recognition signal.',
+    blurb:
+      '4 of 10 tenets in place. Minimum bar to claim R²F alignment — bias + noise + one recognition signal.',
     tone: C.amber,
     bg: C.amberSoft,
   },
   {
     label: 'Silver · R²F-integrated',
     minScore: 7,
-    blurb: '7 of 10 tenets in place. Both rigor and recognition pipelines are running, including a named meta-judge.',
+    blurb:
+      '7 of 10 tenets in place. Both rigor and recognition pipelines are running, including a named meta-judge.',
     tone: C.blue,
     bg: C.blueSoft,
   },
   {
     label: 'Gold · R²F-arbitrated',
     minScore: 10,
-    blurb: 'All 10 tenets in place. Full Kahneman × Klein synthesis with a signed, reproducible audit record.',
+    blurb:
+      'All 10 tenets in place. Full Kahneman × Klein synthesis with a signed, reproducible audit record.',
     tone: C.green,
     bg: C.greenSoft,
   },
@@ -207,10 +216,9 @@ export function R2FStandardClient() {
             margin: '18px 0 0',
           }}
         >
-          A first-party, voluntary standard for human-AI strategic reasoning. Kahneman’s
-          debiasing tradition and Klein’s Recognition-Primed Decision tradition, run in one
-          pipeline and arbitrated into a single artifact. Any product can self-assess against
-          the rubric below.
+          A first-party, voluntary standard for human-AI strategic reasoning. Kahneman’s debiasing
+          tradition and Klein’s Recognition-Primed Decision tradition, run in one pipeline and
+          arbitrated into a single artifact. Any product can self-assess against the rubric below.
         </p>
         <div style={{ display: 'flex', gap: 10, marginTop: 28, flexWrap: 'wrap' }}>
           <Link
@@ -359,9 +367,9 @@ export function R2FStandardClient() {
                 maxWidth: 620,
               }}
             >
-              Three rigor tenets on Kahneman’s side, three recognition tenets on Klein’s.
-              Arbitrated by an explicit meta-judge stage — the glue that makes R²F different
-              from running two pipelines in parallel.
+              Three rigor tenets on Kahneman’s side, three recognition tenets on Klein’s. Arbitrated
+              by an explicit meta-judge stage — the glue that makes R²F different from running two
+              pipelines in parallel.
             </p>
           </div>
           <Link
@@ -483,7 +491,8 @@ export function R2FStandardClient() {
                     letterSpacing: '0.04em',
                   }}
                 >
-                  Decision Intel pipeline stage: <span style={{ color: C.slate900 }}>{t.pipelineStage}</span>
+                  Decision Intel pipeline stage:{' '}
+                  <span style={{ color: C.slate900 }}>{t.pipelineStage}</span>
                 </div>
               </article>
             );
@@ -511,9 +520,9 @@ export function R2FStandardClient() {
             maxWidth: 720,
           }}
         >
-          Ten yes/no questions. Score your own product, not ours. A score of 4+ earns Bronze;
-          7+ earns Silver; 10 earns Gold. This is a self-assessment — no external audit body
-          certifies the result, and the standard is published so it can be disputed in public.
+          Ten yes/no questions. Score your own product, not ours. A score of 4+ earns Bronze; 7+
+          earns Silver; 10 earns Gold. This is a self-assessment — no external audit body certifies
+          the result, and the standard is published so it can be disputed in public.
         </p>
         <ol
           style={{
@@ -653,9 +662,10 @@ export function R2FStandardClient() {
               Canonical citation
             </div>
             <p style={{ margin: 0, fontSize: 15, lineHeight: 1.6, color: '#CBD5E1' }}>
-              Kahneman, D. &amp; Klein, G. (2009). <em>Conditions for Intuitive Expertise:
-              A failure to disagree.</em> American Psychologist, 64(6), 515–526. The framing
-              paper where the two traditions converged. R²F is the operationalisation.
+              Kahneman, D. &amp; Klein, G. (2009).{' '}
+              <em>Conditions for Intuitive Expertise: A failure to disagree.</em> American
+              Psychologist, 64(6), 515–526. The framing paper where the two traditions converged.
+              R²F is the operationalisation.
             </p>
           </div>
           <Link
@@ -712,7 +722,10 @@ export function R2FStandardClient() {
             <Link href="/how-it-works" style={{ color: C.slate600, textDecoration: 'none' }}>
               How it works
             </Link>
-            <Link href="/regulatory/ai-verify" style={{ color: C.slate600, textDecoration: 'none' }}>
+            <Link
+              href="/regulatory/ai-verify"
+              style={{ color: C.slate600, textDecoration: 'none' }}
+            >
               AI Verify alignment
             </Link>
             <Link href="/bias-genome" style={{ color: C.slate600, textDecoration: 'none' }}>

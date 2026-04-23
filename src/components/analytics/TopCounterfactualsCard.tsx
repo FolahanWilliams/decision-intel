@@ -67,9 +67,7 @@ export function TopCounterfactualsCard() {
       .then((json: TopResponse | null) => {
         if (!cancelled) setData(json);
       })
-      .catch(err =>
-        console.warn('[TopCounterfactualsCard] top-counterfactuals fetch failed:', err)
-      )
+      .catch(err => console.warn('[TopCounterfactualsCard] top-counterfactuals fetch failed:', err))
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
@@ -209,7 +207,10 @@ export function TopCounterfactualsCard() {
                     <span style={{ color: 'var(--accent-primary)' }}>
                       {formatBiasName(s.biasRemoved)}
                     </span>{' '}
-                    in <span style={{ fontStyle: 'italic' }}>{s.filename.replace(/\.[^.]+$/, '')}</span>
+                    in{' '}
+                    <span style={{ fontStyle: 'italic' }}>
+                      {s.filename.replace(/\.[^.]+$/, '')}
+                    </span>
                   </div>
                   <div
                     style={{
@@ -220,9 +221,7 @@ export function TopCounterfactualsCard() {
                       flexWrap: 'wrap',
                     }}
                   >
-                    <span>
-                      +{improvement} pp success lift
-                    </span>
+                    <span>+{improvement} pp success lift</span>
                     <span>·</span>
                     <span>n={s.historicalSampleSize}</span>
                     <span>·</span>

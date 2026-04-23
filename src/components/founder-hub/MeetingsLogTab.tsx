@@ -192,9 +192,7 @@ export function MeetingsLogTab({ founderPass }: Props) {
           return { ok: false, error: json.error || 'Update failed' };
         }
         if (json.data?.meeting) {
-          setMeetings(cur =>
-            cur.map(m => (m.id === id ? (json.data.meeting as Meeting) : m))
-          );
+          setMeetings(cur => cur.map(m => (m.id === id ? (json.data.meeting as Meeting) : m)));
         }
         return { ok: true as const };
       } catch {
@@ -339,10 +337,7 @@ export function MeetingsLogTab({ founderPass }: Props) {
             >
               {meetings.length === 0 ? (
                 <>
-                  <Plus
-                    size={18}
-                    style={{ color: 'var(--accent-primary)', marginBottom: 6 }}
-                  />
+                  <Plus size={18} style={{ color: 'var(--accent-primary)', marginBottom: 6 }} />
                   <div>No meetings yet. Generate a prep plan on the Outreach Strategy tab.</div>
                 </>
               ) : (
@@ -706,10 +701,7 @@ function MeetingDetail({
       </div>
 
       {/* Context (read-only) */}
-      <CollapsibleReadOnly
-        label="The inputs you prep'd with"
-        icon={<User size={11} />}
-      >
+      <CollapsibleReadOnly label="The inputs you prep'd with" icon={<User size={11} />}>
         <ReadOnlyField label="LinkedIn info" value={meeting.linkedInInfo} />
         <ReadOnlyField label="Meeting context" value={meeting.meetingContext} />
         <ReadOnlyField label="What a win looks like" value={meeting.founderAsk} />
@@ -972,8 +964,7 @@ function SaveIndicator({
   error: string | null;
 }) {
   if (state === 'idle') return null;
-  const Icon =
-    state === 'saving' ? Loader2 : state === 'saved' ? CheckCircle2 : XCircle;
+  const Icon = state === 'saving' ? Loader2 : state === 'saved' ? CheckCircle2 : XCircle;
   const color =
     state === 'saved'
       ? 'var(--accent-primary)'
@@ -989,7 +980,7 @@ function SaveIndicator({
         fontSize: 11,
         color,
       }}
-      title={state === 'error' ? error ?? 'Save failed' : undefined}
+      title={state === 'error' ? (error ?? 'Save failed') : undefined}
     >
       <Icon size={12} className={state === 'saving' ? 'animate-spin' : undefined} />
       {state === 'saving' ? 'Saving…' : state === 'saved' ? 'Saved' : 'Save failed'}

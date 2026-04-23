@@ -62,8 +62,7 @@ export async function GET(req: NextRequest) {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition':
-          'inline; filename="decision-provenance-record-specimen.pdf"',
+        'Content-Disposition': 'inline; filename="decision-provenance-record-specimen.pdf"',
         // Public specimen — safe to cache aggressively on the CDN since
         // the content is frozen at build time.
         'Cache-Control': 'public, max-age=3600, s-maxage=86400',

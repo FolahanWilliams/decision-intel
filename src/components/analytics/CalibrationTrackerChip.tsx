@@ -75,9 +75,7 @@ export function CalibrationTrackerChip() {
       .then(json => {
         if (!cancelled && json?.brierChip) setData(json.brierChip as BrierChipData);
       })
-      .catch(err =>
-        console.warn('[CalibrationTrackerChip] intelligence fetch failed:', err)
-      )
+      .catch(err => console.warn('[CalibrationTrackerChip] intelligence fetch failed:', err))
       .finally(() => {
         if (!cancelled) setLoading(false);
       });

@@ -215,9 +215,7 @@ export async function assembleProvenanceRecordData(
     );
   const topMitigationBias = rankedBiases[0] ?? null;
   const topMitigation = topMitigationBias?.suggestion?.trim() ?? null;
-  const topMitigationFor = topMitigationBias
-    ? formatBiasLabel(topMitigationBias.biasType)
-    : null;
+  const topMitigationFor = topMitigationBias ? formatBiasLabel(topMitigationBias.biasType) : null;
 
   // Prompt fingerprint: prefer the linked PromptVersion.hash (authoritative
   // per-audit hash). Fall back to hashing prompts.ts (honest best-effort).

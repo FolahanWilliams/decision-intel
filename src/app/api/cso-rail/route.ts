@@ -56,9 +56,7 @@ export async function GET() {
       });
     }
 
-    const analysisScope = orgId
-      ? { document: { orgId } }
-      : { document: { userId: user.id } };
+    const analysisScope = orgId ? { document: { orgId } } : { document: { userId: user.id } };
     const documentScope = orgId ? { orgId } : { userId: user.id };
 
     const [backlog, outcomesPending, outcomesOverdue, roomsActive] = await Promise.all([
@@ -89,9 +87,7 @@ export async function GET() {
         .count({
           where: {
             status: 'open',
-            ...(orgId
-              ? { orgId }
-              : { participants: { some: { userId: user.id } } }),
+            ...(orgId ? { orgId } : { participants: { some: { userId: user.id } } }),
           },
         })
         .catch(() => 0),

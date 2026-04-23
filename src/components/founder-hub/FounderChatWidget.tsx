@@ -501,8 +501,7 @@ export function FounderChatWidget({
               <div
                 style={{
                   padding: '8px 12px',
-                  borderRadius:
-                    msg.role === 'user' ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
+                  borderRadius: msg.role === 'user' ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
                   background: msg.role === 'user' ? '#16A34A' : 'var(--bg-tertiary, #1a1a1a)',
                   color: msg.role === 'user' ? '#fff' : 'var(--text-secondary)',
                   fontSize: 12,

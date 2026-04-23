@@ -300,8 +300,8 @@ export function ShareModal({
                   )}
                   <span style={{ fontSize: '13px', fontWeight: 600 }}>Hallway Brief</span>
                   <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
-                    One page, signed — top recommendation, top 3 risks, one counterfactual.
-                    For the 90-second CEO hand-off.
+                    One page, signed — top recommendation, top 3 risks, one counterfactual. For the
+                    90-second CEO hand-off.
                   </span>
                 </Button>
               )}

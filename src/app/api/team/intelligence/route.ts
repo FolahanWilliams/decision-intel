@@ -70,9 +70,7 @@ async function computeOutcomesPending(
   userId: string
 ): Promise<OutcomesPending> {
   try {
-    const scopeClause = orgId
-      ? { document: { orgId } }
-      : { document: { userId } };
+    const scopeClause = orgId ? { document: { orgId } } : { document: { userId } };
     const [pending, overdue] = await Promise.all([
       prisma.analysis.count({
         where: { ...scopeClause, outcomeStatus: 'pending_outcome' },

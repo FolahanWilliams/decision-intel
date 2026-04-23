@@ -41,10 +41,22 @@ function getModel() {
   const model = genAI.getGenerativeModel({
     model: modelName,
     safetySettings: [
-      { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-      { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-      { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-      { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+      {
+        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
     ],
     generationConfig: { maxOutputTokens: 6144, temperature: 0.35 },
   });
@@ -137,9 +149,7 @@ interface PrepBody {
 
 function normaliseMeetingType(value: string | undefined): MeetingType {
   if (!value) return 'other';
-  return (MEETING_TYPES as readonly string[]).includes(value)
-    ? (value as MeetingType)
-    : 'other';
+  return (MEETING_TYPES as readonly string[]).includes(value) ? (value as MeetingType) : 'other';
 }
 
 export async function POST(req: NextRequest) {
@@ -216,7 +226,7 @@ export async function POST(req: NextRequest) {
           role: 'model',
           parts: [
             {
-              text: 'Understood. I have the founder context loaded and will ground every meeting-prep plan in Decision Intel\'s real assets, the founder\'s specific position, and the three-mode ethos/pathos/logos frame with Cialdini principles named where used.',
+              text: "Understood. I have the founder context loaded and will ground every meeting-prep plan in Decision Intel's real assets, the founder's specific position, and the three-mode ethos/pathos/logos frame with Cialdini principles named where used.",
             },
           ],
         },
@@ -247,10 +257,7 @@ export async function POST(req: NextRequest) {
             carry = '_';
             s = s.slice(0, -1);
           }
-          return s
-            .replace(/\*\*/g, '')
-            .replace(/__/g, '')
-            .replace(/[—–]/g, ', ');
+          return s.replace(/\*\*/g, '').replace(/__/g, '').replace(/[—–]/g, ', ');
         };
         try {
           for await (const chunk of result.stream) {

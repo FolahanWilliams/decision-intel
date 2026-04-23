@@ -79,8 +79,7 @@ export function computeReferenceClass(
         ? 'loose'
         : 'none';
 
-  const matchPool =
-    band === 'strong' ? strongMatches : band === 'loose' ? scored : [];
+  const matchPool = band === 'strong' ? strongMatches : band === 'loose' ? scored : [];
 
   const failures = matchPool.filter(s => isFailureOutcome(s.case.outcome)).length;
   const successes = matchPool.length - failures;

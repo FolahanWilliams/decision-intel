@@ -25,13 +25,9 @@ export function ReferenceClassChip({ biasTypes }: ReferenceClassChipProps) {
 
   const { corpusSize, matches, failures, band, failureRate, topMatches } = result;
   const top = topMatches[0];
-  const rateLabel =
-    failureRate === null
-      ? null
-      : `${Math.round(failureRate * 100)}% failure rate`;
+  const rateLabel = failureRate === null ? null : `${Math.round(failureRate * 100)}% failure rate`;
 
-  const bandLabel =
-    band === 'strong' ? 'reference-class match' : 'loose match';
+  const bandLabel = band === 'strong' ? 'reference-class match' : 'loose match';
 
   return (
     <section

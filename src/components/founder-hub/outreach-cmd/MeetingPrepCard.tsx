@@ -186,9 +186,10 @@ export function MeetingPrepCard({ founderPass }: Props) {
             status: 'prep',
           }),
         });
-        const json = (await saveRes.json().catch(() => null)) as
-          | { data?: { meeting?: { id?: string } }; error?: string }
-          | null;
+        const json = (await saveRes.json().catch(() => null)) as {
+          data?: { meeting?: { id?: string } };
+          error?: string;
+        } | null;
         if (!saveRes.ok) {
           setSaveError(json?.error ?? 'Plan generated, but the save to Meetings Log failed.');
         } else if (json?.data?.meeting?.id) {
@@ -237,7 +238,13 @@ export function MeetingPrepCard({ founderPass }: Props) {
     <div className="meeting-prep-card">
       <div style={{ display: 'grid', gap: 12 }}>
         {/* Row 1 — meeting type + prospect header */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10 }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gap: 10,
+          }}
+        >
           <FieldLabel icon={<Target size={12} />} label="Meeting type">
             <select
               value={meetingType}
@@ -307,7 +314,13 @@ export function MeetingPrepCard({ founderPass }: Props) {
         </FieldLabel>
 
         {/* Row 3 — context + ask, side by side */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 10 }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gap: 10,
+          }}
+        >
           <FieldLabel
             label="Meeting context"
             hint="What is this meeting about, who initiated it, how did it come to be."
@@ -351,8 +364,8 @@ export function MeetingPrepCard({ founderPass }: Props) {
           }}
         >
           <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-            Grounded in Decision Intel assets + Kahneman / Klein framing + Aristotle ethos /
-            pathos / logos + Cialdini influence principles.
+            Grounded in Decision Intel assets + Kahneman / Klein framing + Aristotle ethos / pathos
+            / logos + Cialdini influence principles.
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             {plan && !streaming && (
@@ -475,9 +488,7 @@ export function MeetingPrepCard({ founderPass }: Props) {
                   gap: 10,
                   padding: '10px 14px',
                   borderTop: '1px solid var(--border-color)',
-                  background: saveError
-                    ? 'rgba(220,38,38,0.04)'
-                    : 'rgba(22,163,74,0.04)',
+                  background: saveError ? 'rgba(220,38,38,0.04)' : 'rgba(22,163,74,0.04)',
                   flexWrap: 'wrap',
                 }}
               >
