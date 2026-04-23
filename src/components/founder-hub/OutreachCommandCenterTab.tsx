@@ -13,6 +13,7 @@ import {
   Radio,
   FileCheck,
   Wand2,
+  Presentation,
 } from 'lucide-react';
 import { ThisWeekPriority } from './outreach-cmd/ThisWeekPriority';
 import { ContactPipelineTracker } from './outreach-cmd/ContactPipelineTracker';
@@ -25,6 +26,7 @@ import { TargetIndustryAtlas } from './outreach-cmd/TargetIndustryAtlas';
 import { ChannelStrategyMatrix } from './outreach-cmd/ChannelStrategyMatrix';
 import { DealCloserDocs } from './outreach-cmd/DealCloserDocs';
 import { LinkedInOutreachGenerator } from './outreach-cmd/LinkedInOutreachGenerator';
+import { MeetingPrepCard } from './outreach-cmd/MeetingPrepCard';
 import { FRAMEWORK_AUDIT_TOP_FIXES } from '@/lib/data/outreach';
 
 interface SectionProps {
@@ -141,6 +143,22 @@ export function OutreachCommandCenterTab({ founderPass }: Props) {
         accent="#16A34A"
       >
         <ThisWeekPriority />
+      </Section>
+
+      {/* Dynamic meeting preparation — grounded in ethos / pathos / logos
+          + Cialdini influence principles + Decision Intel's real assets
+          (Wiz advisor, R²F, DPR, 135-case corpus, design-partner cohort)
+          + the founder's specific profile. Ephemeral by design: generate,
+          use, re-run if the meeting reschedules. Top-of-tab slot because
+          this is the single highest-stakes daily-use surface — every
+          real meeting should flow through this before the call. */}
+      <Section
+        icon={<Presentation size={16} />}
+        title="Meeting Preparation"
+        subtitle="Paste the LinkedIn info + meeting context + what a win looks like. Get a custom ethos / pathos / logos plan — opening line, pathos moves, logos claims ranked by pushback, the three questions they'll ask, the reciprocal ask, 20-min prep checklist, the close, and the same-day follow-up. Grounded in your real assets and your specific position."
+        accent="#F59E0B"
+      >
+        <MeetingPrepCard founderPass={founderPass} />
       </Section>
 
       {/* Customer Discovery Map — who, where, how */}
