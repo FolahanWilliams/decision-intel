@@ -2,6 +2,17 @@ import { withSentryConfig } from '@sentry/nextjs';
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  // TypeScript is validated in the build script via an explicit
+  // `npx tsc --noEmit` invocation that runs BEFORE `next build`. Running
+  // both the external tsc + Next.js's in-process type check stacks
+  // heap usage and OOM'd the 8 GB Vercel Hobby container on 2026-04-23
+  // (deploy 4Sz9sqTpr, exit 137 after 6 min in "Running TypeScript..."
+  // with ~93 files typechecked). Gating to the external check keeps the
+  // memory envelope phased — ~3 GB tsc, then ~5 GB webpack, never
+  // overlapping. Do NOT flip this off without also removing the
+  // `npx tsc --noEmit` step from package.json :: scripts.build, or the
+  // type check gets silently skipped in CI.
+  typescript: { ignoreBuildErrors: true },
   async redirects() {
     // Legacy dashboard URLs that used to be thin redirect shim pages.
     // Preserved at the Next layer so external bookmarks, shared links, and

@@ -369,13 +369,15 @@ Vercel build hangs cost ~$0 in money but ~45 minutes per attempt. The 2026-04-22
 - Edge runtime on `app/opengraph-image.tsx` — file deleted; static OG image lives in `public/` instead.
 - Heap exhaustion — `--max-old-space-size=6144` in NODE_OPTIONS gives webpack 6GB on Vercel's 8GB build container.
 - TypeScript errors — `npx tsc --noEmit` now runs clean; type-check phase no longer hangs silently on errors.
+- **Stacked heap from two concurrent TS checks** (new 2026-04-23, deploy 4Sz9sqTpr, exit 137 after 6 min in "Running TypeScript..."). Next.js runs its own in-process TS check AFTER webpack compile finishes; combined with webpack's own heap it blew past 8 GB. Fix shipped: `typescript: { ignoreBuildErrors: true }` in next.config.ts, plus an explicit `NODE_OPTIONS='--max-old-space-size=4096' npx tsc --noEmit` step in the build script that runs **before** `next build`. The external tsc runs in its own process (~3 GB peak, then exits), then webpack runs at ~5 GB peak — never overlapping. Do NOT flip `ignoreBuildErrors` off without also removing the explicit tsc step, or type-checking gets silently skipped.
 
 **The load-bearing config — do not change without a passing build to prove the alternative works:**
 
-- `package.json:7` build script: `next build --webpack` (Turbopack hangs at compile-start)
+- `package.json:7` build script: chain is `validate-deploy-env && prisma-migrate-safe && tsc --noEmit && next build --webpack && upload-sourcemaps`. The external `tsc --noEmit` step is load-bearing per the 2026-04-23 stacked-heap fix.
 - `next.config.ts` Sentry options: `sourcemaps: { disable: true }`
 - `next.config.ts` compiler: `compiler: { styledJsx: false }`
-- `NODE_OPTIONS='--max-old-space-size=6144'` in the build script
+- `next.config.ts` typescript: `{ ignoreBuildErrors: true }` — paired with the external tsc step above. Flip one, flip both.
+- `NODE_OPTIONS='--max-old-space-size=6144'` on `next build`; `--max-old-space-size=4096` on the pre-build `tsc --noEmit`.
 
 ## Session Workflow
 
