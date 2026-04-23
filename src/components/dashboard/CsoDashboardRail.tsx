@@ -38,16 +38,19 @@ interface RailData {
 export function CsoDashboardRail() {
   const [data, setData] = useState<RailData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [collapsed, setCollapsed] = useState<boolean>(false);
-
-  useEffect(() => {
+  // Lazy initialiser reads persisted state directly so we never flash
+  // "expanded" on first paint and never setState inside an effect (the
+  // Next.js 16 / React 19 react-hooks/set-state-in-effect rule bans the
+  // read-then-setState-in-useEffect pattern). Guards SSR by checking
+  // `typeof window` before touching localStorage.
+  const [collapsed, setCollapsed] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
     try {
-      const saved = localStorage.getItem(COLLAPSE_KEY);
-      if (saved === '1') setCollapsed(true);
+      return localStorage.getItem(COLLAPSE_KEY) === '1';
     } catch {
-      /* quota / privacy mode — default expanded */
+      return false;
     }
-  }, []);
+  });
 
   useEffect(() => {
     let cancelled = false;

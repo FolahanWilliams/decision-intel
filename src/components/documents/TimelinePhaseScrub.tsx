@@ -222,19 +222,26 @@ export function PhaseDuringPanel({
   humanDecisionDate,
 }: PhaseDuringPanelProps) {
   const [fetched, setFetched] = useState<LinkedHumanDecision | null>(null);
-  const [loading, setLoading] = useState(hasHumanDecision === undefined);
+  // Lazy initialiser decides the starting loading state based on whether
+  // we will actually fetch. React 19's react-hooks/set-state-in-effect
+  // rule disallows setState calls inside a useEffect body, so the
+  // "parent supplied override" and "no IDs" branches can't fall through
+  // to a synchronous setLoading(false) like they used to — they have to
+  // start as `false` from the get-go.
+  const [loading, setLoading] = useState<boolean>(() => {
+    if (hasHumanDecision !== undefined && humanDecisionSummary !== undefined) return false;
+    if (!analysisId && !documentId) return false;
+    return true;
+  });
 
   // Self-fetch the linked HumanDecision unless the caller has already
-  // supplied both the has-flag and the summary (full override path).
+  // supplied both the has-flag and the summary (full override path), or
+  // there are no IDs to look up. Both no-fetch branches are handled by
+  // the lazy-initial-state above, so this effect only runs when a fetch
+  // is actually warranted.
   useEffect(() => {
-    if (hasHumanDecision !== undefined && humanDecisionSummary !== undefined) {
-      setLoading(false);
-      return;
-    }
-    if (!analysisId && !documentId) {
-      setLoading(false);
-      return;
-    }
+    if (hasHumanDecision !== undefined && humanDecisionSummary !== undefined) return;
+    if (!analysisId && !documentId) return;
     let cancelled = false;
     const params = new URLSearchParams({ limit: '1' });
     if (analysisId) params.set('analysisId', analysisId);
