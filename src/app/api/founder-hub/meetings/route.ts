@@ -85,6 +85,14 @@ export async function GET(req: NextRequest) {
 }
 
 interface CreateBody {
+  /**
+   * 'prep' (default) — MeetingPrepCard path, requires the four prep
+   *   fields (linkedInInfo / meetingContext / founderAsk / prepPlan).
+   * 'log' — MeetingsLogTab "Log a past meeting" path. Prep fields are
+   *   optional; what-happened / outcomes / future content is supplied
+   *   via notes / learnings / nextSteps instead.
+   */
+  mode?: 'prep' | 'log';
   meetingType?: string;
   prospectName?: string;
   prospectRole?: string;
@@ -93,7 +101,17 @@ interface CreateBody {
   meetingContext?: string;
   founderAsk?: string;
   prepPlan?: string;
+  /** What happened in the meeting — raw recap. Only used in 'log' mode. */
+  notes?: string;
+  /** Outcomes — decisions, commitments, takeaways. Only used in 'log' mode. */
+  learnings?: string;
+  /** The future — follow-ups and next steps. Only used in 'log' mode. */
+  nextSteps?: string;
+  /** Free-text outcome picker value (progressed / stalled / etc.). */
+  outcome?: string;
   scheduledAt?: string | null;
+  /** When the meeting actually happened. Populated for logged past meetings. */
+  happenedAt?: string | null;
   status?: string;
 }
 
@@ -107,33 +125,61 @@ export async function POST(req: NextRequest) {
     return apiError({ error: 'Invalid JSON', status: 400 });
   }
 
+  const mode = body.mode === 'log' ? 'log' : 'prep';
   const meetingType = (body.meetingType ?? 'other').trim();
   const linkedInInfo = (body.linkedInInfo ?? '').trim();
   const meetingContext = (body.meetingContext ?? '').trim();
   const founderAsk = (body.founderAsk ?? '').trim();
   const prepPlan = (body.prepPlan ?? '').trim();
+  const notes = (body.notes ?? '').trim();
+  const learnings = (body.learnings ?? '').trim();
+  const nextSteps = (body.nextSteps ?? '').trim();
 
   if (!ALLOWED_TYPES.has(meetingType)) {
     return apiError({ error: 'Invalid meetingType', status: 400 });
   }
-  if (linkedInInfo.length < 40) {
-    return apiError({ error: 'linkedInInfo is required (40 chars minimum)', status: 400 });
-  }
-  if (meetingContext.length < 20) {
-    return apiError({ error: 'meetingContext is required (20 chars minimum)', status: 400 });
-  }
-  if (founderAsk.length < 15) {
-    return apiError({ error: 'founderAsk is required (15 chars minimum)', status: 400 });
-  }
-  if (prepPlan.length < 100) {
-    return apiError({ error: 'prepPlan is required (full generated plan)', status: 400 });
+
+  if (mode === 'prep') {
+    // MeetingPrepCard flow — all four prep fields required.
+    if (linkedInInfo.length < 40) {
+      return apiError({ error: 'linkedInInfo is required (40 chars minimum)', status: 400 });
+    }
+    if (meetingContext.length < 20) {
+      return apiError({ error: 'meetingContext is required (20 chars minimum)', status: 400 });
+    }
+    if (founderAsk.length < 15) {
+      return apiError({ error: 'founderAsk is required (15 chars minimum)', status: 400 });
+    }
+    if (prepPlan.length < 100) {
+      return apiError({ error: 'prepPlan is required (full generated plan)', status: 400 });
+    }
+  } else {
+    // Log-a-past-meeting flow — at least one of the three post-meeting
+    // text fields must carry something, otherwise there's no content.
+    // Prospect name OR a non-empty body is enough to create the row.
+    const hasProspect = Boolean(body.prospectName?.trim());
+    const hasBody = notes.length > 0 || learnings.length > 0 || nextSteps.length > 0;
+    if (!hasProspect && !hasBody) {
+      return apiError({
+        error: 'Add a prospect name OR at least one of: what happened, outcomes, next steps.',
+        status: 400,
+      });
+    }
   }
 
-  const status = body.status && ALLOWED_STATUS.has(body.status) ? body.status : 'prep';
+  const defaultStatus = mode === 'log' ? 'completed' : 'prep';
+  const status = body.status && ALLOWED_STATUS.has(body.status) ? body.status : defaultStatus;
   const scheduledAt =
     body.scheduledAt && !Number.isNaN(new Date(body.scheduledAt).getTime())
       ? new Date(body.scheduledAt)
       : null;
+  const happenedAt =
+    body.happenedAt && !Number.isNaN(new Date(body.happenedAt).getTime())
+      ? new Date(body.happenedAt)
+      : mode === 'log'
+        ? new Date() // default to "now" for logged past meetings
+        : null;
+  const outcome = body.outcome && ALLOWED_OUTCOMES.has(body.outcome) ? body.outcome : null;
 
   try {
     const meeting = await prisma.founderMeeting.create({
@@ -142,12 +188,18 @@ export async function POST(req: NextRequest) {
         prospectName: body.prospectName?.trim() || null,
         prospectRole: body.prospectRole?.trim() || null,
         prospectCompany: body.prospectCompany?.trim() || null,
-        linkedInInfo,
-        meetingContext,
-        founderAsk,
-        prepPlan,
+        linkedInInfo: mode === 'prep' ? linkedInInfo : linkedInInfo || null,
+        meetingContext: mode === 'prep' ? meetingContext : meetingContext || null,
+        founderAsk: mode === 'prep' ? founderAsk : founderAsk || null,
+        prepPlan: mode === 'prep' ? prepPlan : prepPlan || null,
+        notes: notes || null,
+        learnings: learnings || null,
+        nextSteps: nextSteps || null,
+        outcome,
         scheduledAt,
+        happenedAt,
         status,
+        source: mode,
       },
     });
     return apiSuccess({ data: { meeting } });

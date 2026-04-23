@@ -51,17 +51,24 @@ interface Meeting {
   prospectName: string | null;
   prospectRole: string | null;
   prospectCompany: string | null;
-  linkedInInfo: string;
-  meetingContext: string;
-  founderAsk: string;
-  prepPlan: string;
+  /** Null for manual-log meetings (no prep plan generated). */
+  linkedInInfo: string | null;
+  meetingContext: string | null;
+  founderAsk: string | null;
+  prepPlan: string | null;
   scheduledAt: string | null;
   happenedAt: string | null;
+  /** "What happened" — raw recap of the meeting. */
   notes: string | null;
+  /** "Outcomes" — decisions, commitments, takeaways. Repurposed from the
+   *  previous 'learnings' label. Same column, new semantics. */
   learnings: string | null;
+  /** "The future" — follow-ups + next steps. */
   nextSteps: string | null;
   outcome: string | null;
   status: 'prep' | 'ready' | 'completed' | 'cancelled';
+  /** 'prep' = generated via MeetingPrepCard. 'log' = manually logged. */
+  source: 'prep' | 'log';
   createdAt: string;
   updatedAt: string;
 }
@@ -104,6 +111,30 @@ const OUTCOME_OPTIONS: Array<{ value: string; label: string }> = [
 
 type FilterKey = 'all' | 'prep' | 'ready' | 'completed' | 'cancelled';
 
+/** Payload for POST /api/founder-hub/meetings with mode='log'. */
+interface LogFormInput {
+  meetingType: string;
+  prospectName: string;
+  prospectRole: string;
+  prospectCompany: string;
+  happenedAt: string | null;
+  notes: string;
+  learnings: string;
+  nextSteps: string;
+  outcome: string;
+}
+
+/** Three-tab content inside MeetingDetail — user-facing labels. The
+ *  underlying DB columns stay as notes/learnings/nextSteps for backward
+ *  compatibility; this just remaps the semantics of each column in the
+ *  UI + the Founder AI chat. */
+type DetailTabKey = 'what_happened' | 'outcomes' | 'future';
+const DETAIL_TABS: Array<{ key: DetailTabKey; label: string }> = [
+  { key: 'what_happened', label: 'What happened' },
+  { key: 'outcomes', label: 'Outcomes' },
+  { key: 'future', label: 'The future' },
+];
+
 interface Props {
   founderPass: string;
 }
@@ -115,6 +146,8 @@ export function MeetingsLogTab({ founderPass }: Props) {
   const [filter, setFilter] = useState<FilterKey>('all');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
+  /** Whether the "Log a past meeting" inline form is open. */
+  const [logFormOpen, setLogFormOpen] = useState(false);
 
   const authHeaders = useCallback(
     () => ({ 'Content-Type': 'application/json', 'x-founder-pass': founderPass }),
@@ -203,6 +236,31 @@ export function MeetingsLogTab({ founderPass }: Props) {
     [meetings, authHeaders]
   );
 
+  /** Create a new manual-log meeting via POST /api/founder-hub/meetings
+   *  with mode='log'. Returns the created row on success so the parent
+   *  can select it. */
+  const handleCreateLog = useCallback(
+    async (
+      input: LogFormInput
+    ): Promise<{ ok: true; meeting: Meeting } | { ok: false; error: string }> => {
+      try {
+        const res = await fetch('/api/founder-hub/meetings', {
+          method: 'POST',
+          headers: authHeaders(),
+          body: JSON.stringify({ mode: 'log', ...input }),
+        });
+        const json = await res.json();
+        if (!res.ok) return { ok: false, error: json.error || 'Failed to log meeting' };
+        const meeting = json.data?.meeting as Meeting;
+        setMeetings(cur => [meeting, ...cur]);
+        return { ok: true, meeting };
+      } catch {
+        return { ok: false, error: 'Network error' };
+      }
+    },
+    [authHeaders]
+  );
+
   const handleDelete = useCallback(
     async (id: string) => {
       if (!confirm('Delete this meeting record? This cannot be undone.')) return;
@@ -228,20 +286,63 @@ export function MeetingsLogTab({ founderPass }: Props) {
   return (
     <div>
       <div style={{ ...card }}>
-        <div style={sectionTitle}>
-          <Presentation size={18} style={{ color: 'var(--accent-primary)', marginRight: 8 }} />
-          Meetings Log
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 10,
+            flexWrap: 'wrap',
+            marginBottom: 4,
+          }}
+        >
+          <div style={sectionTitle}>
+            <Presentation size={18} style={{ color: 'var(--accent-primary)', marginRight: 8 }} />
+            Meetings Log
+          </div>
+          <button
+            type="button"
+            onClick={() => setLogFormOpen(v => !v)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '7px 14px',
+              fontSize: 12,
+              fontWeight: 700,
+              borderRadius: 999,
+              border: '1px solid var(--accent-primary)',
+              background: logFormOpen ? 'transparent' : 'var(--accent-primary)',
+              color: logFormOpen ? 'var(--accent-primary)' : 'var(--text-on-accent, #fff)',
+              cursor: 'pointer',
+            }}
+          >
+            <Plus size={13} />
+            {logFormOpen ? 'Close form' : 'Log a past meeting'}
+          </button>
         </div>
         <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: '0 0 4px' }}>
-          Every meeting you have prepped, logged, and learned from, in one place instead of
-          scattered across Docs, Slack, and Drive. The Founder AI chat pulls from this log as
-          context so the mentor knows where you are right now.
+          Every meeting you have prepped or logged, in one place instead of scattered across Docs,
+          Slack, and Drive. The Founder AI chat pulls from this log so the mentor knows where you
+          are right now.
         </p>
         <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '0 0 0' }}>
-          New meetings are created automatically when you generate a prep plan on the Outreach
-          Strategy tab. Notes, learnings, and outcomes live here.
+          Generate a prep plan on Outreach Strategy for an upcoming meeting, or use &ldquo;Log a
+          past meeting&rdquo; above to capture one that already happened.
         </p>
       </div>
+
+      {logFormOpen && (
+        <LogMeetingForm
+          onCreate={handleCreateLog}
+          onCancel={() => setLogFormOpen(false)}
+          onCreated={m => {
+            setSelectedId(m.id);
+            setMobileDetailOpen(true);
+            setLogFormOpen(false);
+          }}
+        />
+      )}
 
       {/* Filter chips */}
       <div
@@ -525,6 +626,7 @@ function MeetingDetail({
   const [notes, setNotes] = useState<string>(() => meeting.notes ?? '');
   const [learnings, setLearnings] = useState<string>(() => meeting.learnings ?? '');
   const [nextSteps, setNextSteps] = useState<string>(() => meeting.nextSteps ?? '');
+  const [detailTab, setDetailTab] = useState<DetailTabKey>('what_happened');
   const [scheduledAt, setScheduledAt] = useState<string>(() => toLocalInput(meeting.scheduledAt));
   const [happenedAt, setHappenedAt] = useState<string>(() => toLocalInput(meeting.happenedAt));
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
@@ -700,98 +802,117 @@ function MeetingDetail({
         </FieldLabel>
       </div>
 
-      {/* Context (read-only) */}
-      <CollapsibleReadOnly label="The inputs you prep'd with" icon={<User size={11} />}>
-        <ReadOnlyField label="LinkedIn info" value={meeting.linkedInInfo} />
-        <ReadOnlyField label="Meeting context" value={meeting.meetingContext} />
-        <ReadOnlyField label="What a win looks like" value={meeting.founderAsk} />
-      </CollapsibleReadOnly>
+      {/* Prep-specific blocks — hidden on manual-log rows since those
+          have no linkedInInfo / meetingContext / founderAsk / prepPlan
+          by design. */}
+      {meeting.source === 'prep' && (
+        <>
+          {/* Context (read-only) */}
+          {(meeting.linkedInInfo || meeting.meetingContext || meeting.founderAsk) && (
+            <CollapsibleReadOnly label="The inputs you prep'd with" icon={<User size={11} />}>
+              {meeting.linkedInInfo && (
+                <ReadOnlyField label="LinkedIn info" value={meeting.linkedInInfo} />
+              )}
+              {meeting.meetingContext && (
+                <ReadOnlyField label="Meeting context" value={meeting.meetingContext} />
+              )}
+              {meeting.founderAsk && (
+                <ReadOnlyField label="What a win looks like" value={meeting.founderAsk} />
+              )}
+            </CollapsibleReadOnly>
+          )}
 
-      {/* Prep plan (collapsible) */}
-      <div style={{ marginBottom: 14 }}>
-        <button
-          type="button"
-          onClick={() => setPlanOpen(v => !v)}
+          {/* Prep plan (collapsible) */}
+          {meeting.prepPlan && (
+            <div style={{ marginBottom: 14 }}>
+              <button
+                type="button"
+                onClick={() => setPlanOpen(v => !v)}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '6px 10px',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  borderRadius: 8,
+                  border: '1px solid var(--border-color)',
+                  background: 'var(--bg-card)',
+                  color: 'var(--text-secondary)',
+                  cursor: 'pointer',
+                }}
+              >
+                <Briefcase size={11} />
+                {planOpen ? 'Hide prep plan' : 'Show prep plan'}
+              </button>
+              {planOpen && (
+                <div
+                  style={{
+                    marginTop: 8,
+                    padding: '14px 16px',
+                    fontSize: 13,
+                    lineHeight: 1.65,
+                    color: 'var(--text-primary)',
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: 10,
+                    whiteSpace: 'pre-wrap',
+                    maxHeight: 420,
+                    overflowY: 'auto',
+                  }}
+                >
+                  {meeting.prepPlan}
+                </div>
+              )}
+            </div>
+          )}
+        </>
+      )}
+
+      {meeting.source === 'log' && (
+        <div
           style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            padding: '6px 10px',
-            fontSize: 11,
-            fontWeight: 700,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            borderRadius: 8,
+            padding: '10px 12px',
+            marginBottom: 14,
+            fontSize: 11.5,
+            color: 'var(--text-muted)',
+            background: 'var(--bg-secondary)',
             border: '1px solid var(--border-color)',
-            background: 'var(--bg-card)',
-            color: 'var(--text-secondary)',
-            cursor: 'pointer',
+            borderRadius: 8,
+            fontStyle: 'italic',
           }}
         >
-          <Briefcase size={11} />
-          {planOpen ? 'Hide prep plan' : 'Show prep plan'}
-        </button>
-        {planOpen && (
-          <div
-            style={{
-              marginTop: 8,
-              padding: '14px 16px',
-              fontSize: 13,
-              lineHeight: 1.65,
-              color: 'var(--text-primary)',
-              background: 'var(--bg-secondary)',
-              border: '1px solid var(--border-color)',
-              borderRadius: 10,
-              whiteSpace: 'pre-wrap',
-              maxHeight: 420,
-              overflowY: 'auto',
-            }}
-          >
-            {meeting.prepPlan}
-          </div>
-        )}
-      </div>
+          Logged manually (no prep plan generated). The three tabs below capture what happened, the
+          outcomes, and the future — the Founder AI chat reads from all three as context.
+        </div>
+      )}
 
-      {/* Notes + learnings + next steps */}
-      <FieldLabel icon={<Pencil size={11} />} label="Notes from the call">
-        <textarea
-          value={notes}
-          onChange={e => {
-            setNotes(e.target.value);
-            scheduleSave({ notes: e.target.value });
-          }}
-          rows={5}
-          maxLength={10000}
-          placeholder="Raw notes while it's fresh — what they said, what surprised you, what you noticed."
-          style={{ ...inputStyle, minHeight: 110, fontFamily: 'inherit' }}
-        />
-      </FieldLabel>
-      <FieldLabel icon={<AlertCircle size={11} />} label="Learnings">
-        <textarea
-          value={learnings}
-          onChange={e => {
-            setLearnings(e.target.value);
-            scheduleSave({ learnings: e.target.value });
-          }}
-          rows={4}
-          maxLength={10000}
-          placeholder="What you'd do differently. Patterns worth revisiting. Biases you caught in your own framing."
-          style={{ ...inputStyle, minHeight: 90, fontFamily: 'inherit' }}
-        />
-      </FieldLabel>
-      <FieldLabel icon={<Save size={11} />} label="Next steps">
-        <textarea
-          value={nextSteps}
-          onChange={e => {
-            setNextSteps(e.target.value);
-            scheduleSave({ nextSteps: e.target.value });
-          }}
-          rows={3}
-          maxLength={5000}
-          placeholder="Specific follow-up actions + deadlines. The calendar moves, the artifacts, the introductions."
-          style={{ ...inputStyle, minHeight: 70, fontFamily: 'inherit' }}
-        />
-      </FieldLabel>
+      {/* Three-tab post-meeting content. Column names stay as
+          notes/learnings/nextSteps in the DB for backward compatibility;
+          the user-facing labels are "What happened / Outcomes / The
+          future." The Founder AI chat reads from the same columns via
+          recent-meetings-context.ts. */}
+      <DetailTabs
+        active={detailTab}
+        onChange={setDetailTab}
+        whatHappened={notes}
+        outcomes={learnings}
+        future={nextSteps}
+        onWhatHappenedChange={v => {
+          setNotes(v);
+          scheduleSave({ notes: v });
+        }}
+        onOutcomesChange={v => {
+          setLearnings(v);
+          scheduleSave({ learnings: v });
+        }}
+        onFutureChange={v => {
+          setNextSteps(v);
+          scheduleSave({ nextSteps: v });
+        }}
+      />
 
       {/* Delete */}
       <div
@@ -1003,4 +1124,438 @@ function fromLocalInput(value: string): string | null {
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return null;
   return d.toISOString();
+}
+
+// ─── DetailTabs — three-tab post-meeting content ───────────────────────
+
+function DetailTabs({
+  active,
+  onChange,
+  whatHappened,
+  outcomes,
+  future,
+  onWhatHappenedChange,
+  onOutcomesChange,
+  onFutureChange,
+}: {
+  active: DetailTabKey;
+  onChange: (k: DetailTabKey) => void;
+  whatHappened: string;
+  outcomes: string;
+  future: string;
+  onWhatHappenedChange: (v: string) => void;
+  onOutcomesChange: (v: string) => void;
+  onFutureChange: (v: string) => void;
+}) {
+  const counts: Record<DetailTabKey, number> = {
+    what_happened: whatHappened.length,
+    outcomes: outcomes.length,
+    future: future.length,
+  };
+
+  const placeholders: Record<DetailTabKey, string> = {
+    what_happened:
+      'Raw recap while it is fresh — who attended, what they said, what you pushed back on, what surprised you, what you noticed about their tone or body language. Factual narrative.',
+    outcomes:
+      'What came out of the meeting — decisions made, commitments given, positions updated, pricing signals, objections surfaced. The durable substance the Founder AI chat and future you can reference.',
+    future:
+      'Specific follow-up actions + deadlines. The artifacts to send, the introductions to make, the calendar moves, the next-meeting ask, the Brier-calibrated probability that this progresses.',
+  };
+
+  const values: Record<DetailTabKey, string> = {
+    what_happened: whatHappened,
+    outcomes,
+    future,
+  };
+
+  const setters: Record<DetailTabKey, (v: string) => void> = {
+    what_happened: onWhatHappenedChange,
+    outcomes: onOutcomesChange,
+    future: onFutureChange,
+  };
+
+  return (
+    <div style={{ marginBottom: 14 }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: 2,
+          borderBottom: '1px solid var(--border-color)',
+          marginBottom: 10,
+        }}
+      >
+        {DETAIL_TABS.map(tab => {
+          const isActive = tab.key === active;
+          const hasContent = counts[tab.key] > 0;
+          return (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => onChange(tab.key)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '9px 14px',
+                background: 'transparent',
+                border: 'none',
+                borderBottom: isActive
+                  ? '2px solid var(--accent-primary)'
+                  : '2px solid transparent',
+                marginBottom: -1,
+                fontSize: 12.5,
+                fontWeight: isActive ? 700 : 500,
+                letterSpacing: '0.01em',
+                color: isActive ? 'var(--accent-primary)' : 'var(--text-muted)',
+                cursor: 'pointer',
+              }}
+            >
+              {tab.label}
+              {hasContent && (
+                <span
+                  aria-hidden
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: 3,
+                    background: isActive ? 'var(--accent-primary)' : 'var(--text-muted)',
+                    opacity: isActive ? 1 : 0.6,
+                  }}
+                />
+              )}
+            </button>
+          );
+        })}
+      </div>
+      <textarea
+        value={values[active]}
+        onChange={e => setters[active](e.target.value)}
+        rows={8}
+        maxLength={10000}
+        placeholder={placeholders[active]}
+        style={{ ...inputStyle, minHeight: 180, fontFamily: 'inherit' }}
+      />
+      <div
+        style={{
+          fontSize: 10.5,
+          color: 'var(--text-muted)',
+          marginTop: 6,
+          fontStyle: 'italic',
+        }}
+      >
+        Saves automatically. The Founder AI chat reads &ldquo;
+        {DETAIL_TABS.find(t => t.key === active)?.label}
+        &rdquo; as context on every new chat so it knows where you are right now.
+      </div>
+    </div>
+  );
+}
+
+// ─── LogMeetingForm — manual-log entry point ───────────────────────────
+
+function LogMeetingForm({
+  onCreate,
+  onCancel,
+  onCreated,
+}: {
+  onCreate: (
+    input: LogFormInput
+  ) => Promise<{ ok: true; meeting: Meeting } | { ok: false; error: string }>;
+  onCancel: () => void;
+  onCreated: (m: Meeting) => void;
+}) {
+  const [meetingType, setMeetingType] = useState<string>('other');
+  const [prospectName, setProspectName] = useState('');
+  const [prospectRole, setProspectRole] = useState('');
+  const [prospectCompany, setProspectCompany] = useState('');
+  const [happenedAt, setHappenedAt] = useState<string>(() =>
+    toLocalInput(new Date().toISOString())
+  );
+  const [whatHappened, setWhatHappened] = useState('');
+  const [outcomes, setOutcomes] = useState('');
+  const [future, setFuture] = useState('');
+  const [outcome, setOutcome] = useState<string>('');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [formTab, setFormTab] = useState<DetailTabKey>('what_happened');
+  const formValues: Record<DetailTabKey, string> = {
+    what_happened: whatHappened,
+    outcomes,
+    future,
+  };
+  const formSetters: Record<DetailTabKey, (v: string) => void> = {
+    what_happened: setWhatHappened,
+    outcomes: setOutcomes,
+    future: setFuture,
+  };
+  const formCounts: Record<DetailTabKey, number> = {
+    what_happened: whatHappened.length,
+    outcomes: outcomes.length,
+    future: future.length,
+  };
+  const formPlaceholders: Record<DetailTabKey, string> = {
+    what_happened:
+      'Raw recap — who attended, what they said, what surprised you. Factual narrative while it is fresh.',
+    outcomes:
+      'What came out — decisions, commitments, pricing signals, objections surfaced. The durable substance.',
+    future:
+      'Specific follow-ups + deadlines. Artifacts to send, intros to make, next-meeting ask, calibrated probability.',
+  };
+
+  const submit = async () => {
+    setError(null);
+    if (!prospectName.trim() && !whatHappened.trim() && !outcomes.trim() && !future.trim()) {
+      setError('Add a prospect name or fill at least one tab before saving.');
+      return;
+    }
+    setSubmitting(true);
+    const res = await onCreate({
+      meetingType,
+      prospectName: prospectName.trim(),
+      prospectRole: prospectRole.trim(),
+      prospectCompany: prospectCompany.trim(),
+      happenedAt: fromLocalInput(happenedAt),
+      notes: whatHappened.trim(),
+      learnings: outcomes.trim(),
+      nextSteps: future.trim(),
+      outcome,
+    });
+    setSubmitting(false);
+    if (!res.ok) {
+      setError(res.error);
+      return;
+    }
+    onCreated(res.meeting);
+  };
+
+  return (
+    <div
+      style={{
+        padding: 16,
+        marginBottom: 14,
+        border: '1px solid var(--accent-primary)',
+        borderRadius: 10,
+        background: 'var(--bg-card)',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 10,
+          marginBottom: 12,
+        }}
+      >
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 800,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: 'var(--accent-primary)',
+          }}
+        >
+          Log a past meeting
+        </div>
+        <button
+          type="button"
+          onClick={onCancel}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: 'var(--text-muted)',
+            cursor: 'pointer',
+            fontSize: 11,
+            padding: 4,
+          }}
+        >
+          Cancel
+        </button>
+      </div>
+
+      <div
+        style={{
+          display: 'grid',
+          gap: 10,
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          marginBottom: 10,
+        }}
+      >
+        <FieldLabel label="Meeting type">
+          <select
+            value={meetingType}
+            onChange={e => setMeetingType(e.target.value)}
+            style={inputStyle}
+          >
+            {Object.entries(MEETING_TYPE_LABELS).map(([k, v]) => (
+              <option key={k} value={k}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </FieldLabel>
+        <FieldLabel label="Happened at">
+          <input
+            type="datetime-local"
+            value={happenedAt}
+            onChange={e => setHappenedAt(e.target.value)}
+            style={inputStyle}
+          />
+        </FieldLabel>
+        <FieldLabel label="Outcome">
+          <select value={outcome} onChange={e => setOutcome(e.target.value)} style={inputStyle}>
+            {OUTCOME_OPTIONS.map(opt => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </FieldLabel>
+      </div>
+
+      <div
+        style={{
+          display: 'grid',
+          gap: 10,
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          marginBottom: 14,
+        }}
+      >
+        <FieldLabel label="Prospect name">
+          <input
+            type="text"
+            value={prospectName}
+            onChange={e => setProspectName(e.target.value)}
+            placeholder="e.g. Gabriel Osamor"
+            style={inputStyle}
+          />
+        </FieldLabel>
+        <FieldLabel label="Role">
+          <input
+            type="text"
+            value={prospectRole}
+            onChange={e => setProspectRole(e.target.value)}
+            placeholder="e.g. CFO advisor"
+            style={inputStyle}
+          />
+        </FieldLabel>
+        <FieldLabel label="Company">
+          <input
+            type="text"
+            value={prospectCompany}
+            onChange={e => setProspectCompany(e.target.value)}
+            placeholder="Optional"
+            style={inputStyle}
+          />
+        </FieldLabel>
+      </div>
+
+      {/* Three-tab content, same structure as the detail panel so the
+          founder uses identical muscle memory. */}
+      <div
+        style={{
+          display: 'flex',
+          gap: 2,
+          borderBottom: '1px solid var(--border-color)',
+          marginBottom: 10,
+        }}
+      >
+        {DETAIL_TABS.map(tab => {
+          const isActive = tab.key === formTab;
+          const hasContent = formCounts[tab.key] > 0;
+          return (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => setFormTab(tab.key)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '9px 14px',
+                background: 'transparent',
+                border: 'none',
+                borderBottom: isActive
+                  ? '2px solid var(--accent-primary)'
+                  : '2px solid transparent',
+                marginBottom: -1,
+                fontSize: 12.5,
+                fontWeight: isActive ? 700 : 500,
+                color: isActive ? 'var(--accent-primary)' : 'var(--text-muted)',
+                cursor: 'pointer',
+              }}
+            >
+              {tab.label}
+              {hasContent && (
+                <span
+                  aria-hidden
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: 3,
+                    background: isActive ? 'var(--accent-primary)' : 'var(--text-muted)',
+                    opacity: isActive ? 1 : 0.6,
+                  }}
+                />
+              )}
+            </button>
+          );
+        })}
+      </div>
+      <textarea
+        value={formValues[formTab]}
+        onChange={e => formSetters[formTab](e.target.value)}
+        rows={6}
+        maxLength={10000}
+        placeholder={formPlaceholders[formTab]}
+        style={{ ...inputStyle, minHeight: 140, fontFamily: 'inherit' }}
+      />
+
+      {error && (
+        <div
+          role="alert"
+          style={{
+            marginTop: 10,
+            padding: '8px 10px',
+            fontSize: 12,
+            color: 'var(--error)',
+            background: 'rgba(220,38,38,0.08)',
+            border: '1px solid rgba(220,38,38,0.22)',
+            borderRadius: 8,
+          }}
+        >
+          {error}
+        </div>
+      )}
+
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          marginTop: 12,
+          gap: 8,
+        }}
+      >
+        <button
+          type="button"
+          onClick={submit}
+          disabled={submitting}
+          style={{
+            padding: '9px 18px',
+            borderRadius: 999,
+            border: 'none',
+            background: submitting ? 'var(--bg-tertiary)' : 'var(--accent-primary)',
+            color: submitting ? 'var(--text-muted)' : 'var(--text-on-accent, #fff)',
+            fontSize: 12.5,
+            fontWeight: 700,
+            cursor: submitting ? 'default' : 'pointer',
+          }}
+        >
+          {submitting ? 'Saving…' : 'Save meeting log'}
+        </button>
+      </div>
+    </div>
+  );
 }

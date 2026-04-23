@@ -1800,15 +1800,29 @@ model FounderMeeting {
   prospectRole    String?
   prospectCompany String?
   /// Raw LinkedIn info / background the founder pasted into the form.
-  /// Kept verbatim so the prep plan stays auditable against its input.
-  linkedInInfo    String    @db.Text
+  /// Nullable 2026-04-24 so past meetings can be logged without having
+  /// to generate a prep plan (e.g. the founder wants to capture a
+  /// meeting that already happened). Populated when the row was created
+  /// via MeetingPrepCard; null when created via the Log-a-past-meeting
+  /// path on MeetingsLogTab.
+  linkedInInfo    String?   @db.Text
   /// How the meeting came to be (who initiated, what was promised).
-  meetingContext  String    @db.Text
-  /// Founder's desired outcome in his own words.
-  founderAsk      String    @db.Text
+  /// Nullable for the same reason as linkedInInfo — manual-log rows
+  /// don't require it.
+  meetingContext  String?   @db.Text
+  /// Founder's desired outcome in his own words. Nullable for manual-log.
+  founderAsk      String?   @db.Text
   /// Full streamed-then-saved prep plan from the Gemini meeting-prep
   /// route. Plain prose with UPPERCASE section headers per the prompt.
-  prepPlan        String    @db.Text
+  /// Nullable 2026-04-24 so manual-log meetings (no prep generation)
+  /// can be created. Populated when row came from MeetingPrepCard;
+  /// null when created via the Log-a-past-meeting path.
+  prepPlan        String?   @db.Text
+  /// How this record was created. 'prep' = generated via MeetingPrepCard
+  /// (full prep plan streamed). 'log' = manually logged past meeting
+  /// (three-tab post-meeting content only). Default 'prep' for backward
+  /// compatibility with rows created before this column landed.
+  source          String    @default("prep")
   /// When the meeting is / was scheduled for. Null until the founder
   /// logs a date (the form doesn't require it — some meetings are
   /// spontaneous).

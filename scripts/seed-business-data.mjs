@@ -26,6 +26,10 @@ const SEEDS = [
     name: 'sankore-partner',
     path: 'scripts/seed-sankore-partner.ts',
   },
+  {
+    name: 'gabe-meeting',
+    path: 'scripts/seed-gabe-meeting.ts',
+  },
 ];
 
 if (!process.env.DATABASE_URL) {

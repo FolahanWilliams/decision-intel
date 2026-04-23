@@ -63,9 +63,13 @@ function formatMeeting(m: FounderMeetingLite): string {
     `  context: ${truncate(m.meetingContext, 220)}`,
     `  ask: ${truncate(m.founderAsk, 180)}`,
   ];
-  if (m.notes) lines.push(`  notes: ${truncate(m.notes, 400)}`);
-  if (m.learnings) lines.push(`  learnings: ${truncate(m.learnings, 300)}`);
-  if (m.nextSteps) lines.push(`  next: ${truncate(m.nextSteps, 220)}`);
+  // User-facing labels: "What happened / Outcomes / The future" map
+  // onto the underlying notes/learnings/nextSteps columns. Keep the
+  // chat context aligned with the MeetingsLogTab vocabulary so the
+  // mentor's response lexicon matches what the founder sees on screen.
+  if (m.notes) lines.push(`  what happened: ${truncate(m.notes, 420)}`);
+  if (m.learnings) lines.push(`  outcomes: ${truncate(m.learnings, 320)}`);
+  if (m.nextSteps) lines.push(`  the future: ${truncate(m.nextSteps, 240)}`);
   return lines.join('\n');
 }
 
