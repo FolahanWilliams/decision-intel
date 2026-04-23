@@ -627,6 +627,7 @@ Valid tabIds — match these exactly, case-sensitive, no prefix:
 - data_ecosystem         Data Ecosystem
 - case_library           Case Library
 - todo                   To-Do (the founder's working checklist)
+- meetings_log           Meetings Log (every prep'd meeting + notes + learnings + outcome)
 - forecast               12-Month Forecast
 - founder_tips           Founder Tips (32 principles incl. pitch prep Section 9)
 - founder_school         Founder School (curriculum + quizzes)

@@ -20,6 +20,7 @@ import { createLogger } from '@/lib/utils/logger';
 import { verifyFounderPass } from '@/lib/utils/founder-auth';
 import { parseFile } from '@/lib/utils/file-parser';
 import { FOUNDER_CONTEXT } from '../founder-context';
+import { buildRecentMeetingsBlock } from '@/lib/founder-hub/recent-meetings-context';
 
 const log = createLogger('FounderHubChat');
 const ENCODER = new TextEncoder();
@@ -165,20 +166,36 @@ export async function POST(req: NextRequest) {
       parts: [{ text: m.content }],
     }));
 
-    const chat = model.startChat({
-      history: [
-        { role: 'user', parts: [{ text: FOUNDER_CONTEXT }] },
-        {
-          role: 'model',
-          parts: [
-            {
-              text: "Understood. I'm your decision-quality advisor, not a generic assistant. I'll lead with the answer, name biases in your framing when they appear, run pre-mortems on high-stakes decisions, and push back when the reasoning is thin. When you're rehearsing a CSO or VC pitch, I'll take the skeptical side hard. Clear prose, no markdown bold, no em dashes, no section headers.",
-            },
-          ],
-        },
-        ...geminiHistory,
-      ],
-    });
+    // Pull the live recent-meetings block so the mentor knows "where
+    // he is right now" without being re-told each session. Silent-fail:
+    // an empty string is fine, chat continues without the block.
+    const recentMeetingsBlock = await buildRecentMeetingsBlock();
+
+    const chatHistory: Array<{ role: 'user' | 'model'; parts: Array<{ text: string }> }> = [
+      { role: 'user', parts: [{ text: FOUNDER_CONTEXT }] },
+      {
+        role: 'model',
+        parts: [
+          {
+            text: "Understood. I'm your decision-quality advisor, not a generic assistant. I'll lead with the answer, name biases in your framing when they appear, run pre-mortems on high-stakes decisions, and push back when the reasoning is thin. When you're rehearsing a CSO or VC pitch, I'll take the skeptical side hard. Clear prose, no markdown bold, no em dashes, no section headers.",
+          },
+        ],
+      },
+    ];
+    if (recentMeetingsBlock) {
+      chatHistory.push({ role: 'user', parts: [{ text: recentMeetingsBlock }] });
+      chatHistory.push({
+        role: 'model',
+        parts: [
+          {
+            text: 'Got the meetings snapshot. I will reference specific meetings by name and date when you ask about follow-ups, continuity across calls, or what to prioritise next — without making you re-explain what you already logged.',
+          },
+        ],
+      });
+    }
+    chatHistory.push(...geminiHistory);
+
+    const chat = model.startChat({ history: chatHistory });
 
     const result = await chat.sendMessageStream(userMessage);
 

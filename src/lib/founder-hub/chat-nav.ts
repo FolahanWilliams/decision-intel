@@ -52,6 +52,11 @@ export const TAB_NAV_TARGETS: TabNavTarget[] = [
   { id: 'data_ecosystem', label: 'Data Ecosystem' },
   { id: 'case_library', label: 'Case Library' },
   { id: 'todo', label: 'To-Do', aliases: ['to do tab', 'todo tab'] },
+  {
+    id: 'meetings_log',
+    label: 'Meetings Log',
+    aliases: ['meeting log', 'meetings tab', 'past meetings', 'meeting history'],
+  },
   { id: 'forecast', label: '12-Month Forecast', aliases: ['forecast tab'] },
   { id: 'founder_tips', label: 'Founder Tips' },
   { id: 'founder_school', label: 'Founder School' },

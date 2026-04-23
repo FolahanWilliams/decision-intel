@@ -169,6 +169,13 @@ const TodoTab = dynamic(
   () => import('@/components/founder-hub/TodoTab').then(m => ({ default: m.TodoTab })),
   { loading: tabLoader }
 );
+const MeetingsLogTab = dynamic(
+  () =>
+    import('@/components/founder-hub/MeetingsLogTab').then(m => ({
+      default: m.MeetingsLogTab,
+    })),
+  { loading: tabLoader }
+);
 const DesignPartnersTab = dynamic(
   () =>
     import('@/components/founder-hub/DesignPartnersTab').then(m => ({
@@ -197,6 +204,7 @@ import {
   Radar,
   Target,
   CheckSquare,
+  Presentation,
   Handshake,
 } from 'lucide-react';
 import { card } from '@/components/founder-hub/shared-styles';
@@ -225,6 +233,7 @@ type TabId =
   | 'forecast'
   | 'category_position'
   | 'unicorn_roadmap'
+  | 'meetings_log'
   | 'todo';
 
 type TabGroup = 'Start' | 'Product' | 'Go-to-Market' | 'Intelligence' | 'Tools';
@@ -313,6 +322,12 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
     id: 'todo',
     label: 'To-Do',
     icon: <CheckSquare size={16} />,
+    group: 'Tools',
+  },
+  {
+    id: 'meetings_log',
+    label: 'Meetings Log',
+    icon: <Presentation size={16} />,
     group: 'Tools',
   },
   {
@@ -596,6 +611,14 @@ const SEARCH_INDEX: SearchEntry[] = [
       'Plain task list for day-to-day priorities. Pinned tasks stay up top. Deliberately short \u2014 Unicorn Roadmap and Forecast hold the structured stuff.',
     keywords:
       'todo to-do task list tasks short plain checklist prep meeting prep daily weekly priorities pinned done open reminder note',
+  },
+  {
+    tabId: 'meetings_log',
+    section: 'Meetings Log',
+    preview:
+      'Persistent record of every prep’d meeting with the AI-generated plan, post-call notes, learnings, next steps, and outcome. One place instead of scattered across Docs, Slack, and Drive. Auto-populated from the Meeting Preparation card on the Outreach Strategy tab.',
+    keywords:
+      'meetings meeting log history record notes learnings followup follow-up outcome cso vc advisor design partner reference call pitch prep plan ethos pathos logos cialdini past upcoming scheduled completed reschedule no-show journal',
   },
 ];
 
@@ -1256,6 +1279,11 @@ function renderTab(
     todo: (
       <ErrorBoundary sectionName="To-Do">
         <TodoTab founderPass={FOUNDER_PASS} />
+      </ErrorBoundary>
+    ),
+    meetings_log: (
+      <ErrorBoundary sectionName="Meetings Log">
+        <MeetingsLogTab founderPass={FOUNDER_PASS} />
       </ErrorBoundary>
     ),
   };

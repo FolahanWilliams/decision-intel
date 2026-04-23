@@ -1704,3 +1704,69 @@ model FounderTodo {
 
   @@index([done, pinned, createdAt])
 }
+
+// ─── FOUNDER MEETING LOG ────────────────────────────────────────────
+//
+// Persistent record of every prep'd meeting from the Outreach Strategy
+// tab's MeetingPrepCard. Replaces the pre-existing "notes scattered
+// across Google Docs, Slack, Drive" workflow — one row is one meeting,
+// from prep through outcome.
+//
+// The AI-generated prep plan is stored alongside the founder's
+// post-meeting notes so a CSO follow-up call can load the plan, the
+// notes from last time, and the learnings in one click. The Founder AI
+// chat also pulls the most recent records into its system context so
+// the mentor knows "where he is right now" without being told each
+// session.
+//
+// No org scope — this is founder-only, gated by FOUNDER_HUB_PASS at
+// the route layer.
+model FounderMeeting {
+  id              String    @id @default(cuid())
+  /// Meeting type tag — cso_discovery | vc_pitch | vc_fundraise_first |
+  /// advisor_intro | design_partner_review | reference_call |
+  /// content_collab | other. String (not enum) so adding new types is
+  /// a prompt-only change, no migration.
+  meetingType     String
+  prospectName    String?
+  prospectRole    String?
+  prospectCompany String?
+  /// Raw LinkedIn info / background the founder pasted into the form.
+  /// Kept verbatim so the prep plan stays auditable against its input.
+  linkedInInfo    String    @db.Text
+  /// How the meeting came to be (who initiated, what was promised).
+  meetingContext  String    @db.Text
+  /// Founder's desired outcome in his own words.
+  founderAsk      String    @db.Text
+  /// Full streamed-then-saved prep plan from the Gemini meeting-prep
+  /// route. Plain prose with UPPERCASE section headers per the prompt.
+  prepPlan        String    @db.Text
+  /// When the meeting is / was scheduled for. Null until the founder
+  /// logs a date (the form doesn't require it — some meetings are
+  /// spontaneous).
+  scheduledAt     DateTime?
+  /// When the meeting actually happened. Stays null until the founder
+  /// marks it completed.
+  happenedAt      DateTime?
+  /// Post-meeting notes — raw capture while it's fresh. Kept separate
+  /// from learnings so the two don't blur.
+  notes           String?   @db.Text
+  /// What was learned — stable takeaways worth revisiting.
+  learnings       String?   @db.Text
+  /// Immediate follow-up actions from the meeting.
+  nextSteps       String?   @db.Text
+  /// Qualitative outcome — progressed | stalled | closed_won |
+  /// closed_lost | rescheduled | no_show | other. Feeds founder Brier
+  /// calibration on his own prep-to-conversion rate.
+  outcome         String?
+  /// Workflow state — prep (plan generated, not yet had) | ready
+  /// (meeting scheduled, imminent) | completed (met + notes logged) |
+  /// cancelled.
+  status          String    @default("prep")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([status, scheduledAt])
+  @@index([happenedAt])
+  @@index([createdAt])
+}

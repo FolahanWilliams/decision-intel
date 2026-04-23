@@ -11,9 +11,11 @@
  * influence levers, grounded in Decision Intel's real assets and the
  * founder's specific position.
  *
- * No persistence: plans are ephemeral. The founder copies, prints, or
- * re-runs if the prospect reschedules. Keeping it stateless avoids
- * seeding the hub with stale prep for meetings that got cancelled.
+ * Persistence (2026-04-23 extension): when the stream completes the
+ * plan is POST'd to /api/founder-hub/meetings so it shows up in the
+ * Meetings Log tab. The founder can log notes / learnings / outcome
+ * there post-call, and the Founder AI chat context pulls from the same
+ * table — so "where he is right now" stays visible to the mentor.
  */
 
 import { useState, useRef, useCallback } from 'react';
@@ -27,7 +29,10 @@ import {
   User,
   FileText,
   Target,
+  BookmarkCheck,
+  ArrowUpRight,
 } from 'lucide-react';
+import { FOUNDER_HUB_NAVIGATE_EVENT } from '@/lib/founder-hub/chat-nav';
 
 const MEETING_TYPE_OPTIONS: Array<{ value: string; label: string }> = [
   { value: 'cso_discovery', label: 'CSO / corp strategy discovery call' },
@@ -57,6 +62,12 @@ export function MeetingPrepCard({ founderPass }: Props) {
   const [streaming, setStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  // Persistence state — set once the plan finishes streaming and we've
+  // POST'd it to /api/founder-hub/meetings. `saveError` stays mounted
+  // alongside the plan so the founder still has the prose if the save
+  // blips.
+  const [savedMeetingId, setSavedMeetingId] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const outputRef = useRef<HTMLDivElement>(null);
 
@@ -73,7 +84,12 @@ export function MeetingPrepCard({ founderPass }: Props) {
     abortRef.current = ac;
     setStreaming(true);
     setError(null);
+    setSavedMeetingId(null);
+    setSaveError(null);
     setPlan('');
+    // Declared outside the try block so the post-finally persistence
+    // block can see the final plan text.
+    let accumulated = '';
     try {
       const res = await fetch('/api/founder-hub/meeting-prep', {
         method: 'POST',
@@ -105,7 +121,6 @@ export function MeetingPrepCard({ founderPass }: Props) {
         return;
       }
       const decoder = new TextDecoder();
-      let accumulated = '';
       try {
         while (true) {
           const { done, value } = await reader.read();
@@ -143,6 +158,45 @@ export function MeetingPrepCard({ founderPass }: Props) {
       if (!isAbort) setError('Network error. Retry.');
     } finally {
       setStreaming(false);
+    }
+
+    // Persist once we have a full plan. Runs outside the SSE try/catch
+    // so a persistence blip doesn't wipe the prose the founder can still
+    // copy from the screen. 100-char floor matches the POST route's
+    // minimum — if the stream got cut short, we skip saving rather than
+    // seed the log with half-plans.
+    const finalPlan = accumulated.trim();
+    if (!ac.signal.aborted && finalPlan.length >= 100) {
+      try {
+        const saveRes = await fetch('/api/founder-hub/meetings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-founder-pass': founderPass,
+          },
+          body: JSON.stringify({
+            meetingType,
+            prospectName,
+            prospectRole,
+            prospectCompany,
+            linkedInInfo: linkedInInfo.trim(),
+            meetingContext: meetingContext.trim(),
+            founderAsk: founderAsk.trim(),
+            prepPlan: finalPlan,
+            status: 'prep',
+          }),
+        });
+        const json = (await saveRes.json().catch(() => null)) as
+          | { data?: { meeting?: { id?: string } }; error?: string }
+          | null;
+        if (!saveRes.ok) {
+          setSaveError(json?.error ?? 'Plan generated, but the save to Meetings Log failed.');
+        } else if (json?.data?.meeting?.id) {
+          setSavedMeetingId(json.data.meeting.id);
+        }
+      } catch {
+        setSaveError('Plan generated, but the save to Meetings Log failed (network).');
+      }
     }
   }, [
     canSubmit,
@@ -406,6 +460,80 @@ export function MeetingPrepCard({ founderPass }: Props) {
             >
               {plan || (streaming ? 'Generating…' : '')}
             </div>
+
+            {/* Save-to-log chip — appears once the plan has been
+                persisted to /api/founder-hub/meetings. Clicking jumps
+                to the Meetings Log tab via the founder-hub-navigate
+                event; the tab loads the detail view keyed on id. */}
+            {!streaming && (savedMeetingId || saveError) && (
+              <div
+                className="no-print"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 10,
+                  padding: '10px 14px',
+                  borderTop: '1px solid var(--border-color)',
+                  background: saveError
+                    ? 'rgba(220,38,38,0.04)'
+                    : 'rgba(22,163,74,0.04)',
+                  flexWrap: 'wrap',
+                }}
+              >
+                {savedMeetingId ? (
+                  <>
+                    <div
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        fontSize: 12,
+                        fontWeight: 600,
+                        color: 'var(--accent-primary)',
+                      }}
+                    >
+                      <BookmarkCheck size={13} />
+                      Saved to Meetings Log · add notes after the call
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (typeof window === 'undefined') return;
+                        window.dispatchEvent(
+                          new CustomEvent(FOUNDER_HUB_NAVIGATE_EVENT, {
+                            detail: {
+                              tabId: 'meetings_log',
+                              anchor: savedMeetingId,
+                            },
+                          })
+                        );
+                      }}
+                      style={{
+                        ...chipBtn,
+                        background: 'var(--accent-primary)',
+                        color: '#fff',
+                        border: 'none',
+                      }}
+                    >
+                      Open in Meetings Log <ArrowUpRight size={11} />
+                    </button>
+                  </>
+                ) : (
+                  <div
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      fontSize: 12,
+                      color: 'var(--error)',
+                    }}
+                  >
+                    {saveError}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
