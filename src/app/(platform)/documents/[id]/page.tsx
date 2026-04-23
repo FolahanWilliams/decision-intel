@@ -492,12 +492,49 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
   const handleBoardReportExport = async () => {
     if (!document || !analysis) return;
     try {
+      // Fetch the top counterfactual scenario (silent-tolerant) so the
+      // board PDF renders a PROJECTED IMPACT section with real ROI math.
+      // Null when /api/counterfactual has no positive scenarios for this
+      // analysis or the fetch fails — the PDF gracefully omits the
+      // section rather than rendering fabricated numbers.
+      let counterfactualTop: import('@/lib/reports/board-report-generator').BoardCounterfactualTop | null = null;
+      try {
+        const cfRes = await fetch(`/api/counterfactual?analysisId=${analysis.id}`);
+        if (cfRes.ok) {
+          const cfData = (await cfRes.json()) as {
+            scenarios?: Array<{
+              biasType: string;
+              expectedImprovement: number;
+              impactUsd?: number;
+              confidence?: number;
+              similarDecisionsCount?: number;
+            }>;
+          };
+          const positives = (cfData.scenarios || [])
+            .filter(s => s.expectedImprovement > 0)
+            .sort((a, b) => b.expectedImprovement - a.expectedImprovement);
+          if (positives.length > 0) {
+            const top = positives[0];
+            counterfactualTop = {
+              biasType: top.biasType,
+              expectedImprovement: top.expectedImprovement,
+              impactUsd: top.impactUsd,
+              confidence: top.confidence,
+              similarDecisionsCount: top.similarDecisionsCount,
+            };
+          }
+        }
+      } catch (cfErr) {
+        log.warn('Board report counterfactual fetch failed (non-fatal):', cfErr);
+      }
+
       const { BoardReportGenerator } = await import('@/lib/reports/board-report-generator');
       const generator = new BoardReportGenerator();
       generator.generateReport({
         filename: document.filename,
         analysis,
         confidential: isBoardConfidential,
+        counterfactualTop,
       });
       fetch('/api/audit', {
         method: 'POST',

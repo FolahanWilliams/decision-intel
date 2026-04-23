@@ -2,17 +2,42 @@ import jsPDF from 'jspdf';
 import { formatBiasName } from '@/lib/utils/labels';
 import type { ReportAnalysisData, ReportBiasInstance, SimulationData } from './pdf-generator';
 
+/** Projected-impact data for page 2's counterfactual section. Supplied by
+ *  the caller — the board generator itself is side-effect-free and does
+ *  not fetch. When null/undefined, the PROJECTED IMPACT section is
+ *  omitted rather than shown with fabricated numbers. */
+export interface BoardCounterfactualTop {
+  biasType: string;
+  expectedImprovement: number; // percentage points (e.g. 18.5 → "+18.5pp")
+  impactUsd?: number; // optional dollar estimate
+  confidence?: number; // 0–1
+  similarDecisionsCount?: number;
+}
+
 interface BoardReportData {
   filename: string;
   analysis: ReportAnalysisData & {
     mitigations?: Array<{ biasType?: string; recommendation?: string; suggestion?: string }>;
   };
+  /** Top counterfactual scenario (highest expected improvement). When
+   *  supplied, renders a PROJECTED IMPACT section on page 2. Optional —
+   *  the caller fetches this from /api/counterfactual and passes it
+   *  through; null when the endpoint returned no positive scenarios. */
+  counterfactualTop?: BoardCounterfactualTop | null;
   /** When true, stamps a diagonal "CONFIDENTIAL" watermark on every
    *  page and prefixes the footer with "CONFIDENTIAL — ". Intended for
    *  CSOs forwarding the report internally to audit / steering /
    *  board committees who need a visible classification marker. */
   confidential?: boolean;
 }
+
+// A4 layout constants. Margins widened from 20mm to 22mm 2026-04-24 for
+// breathing room — the board report was reading as "dense" per the
+// enterprise-polish audit. TEXT_W drops from 170 to 166 in consequence.
+const PAGE_W = 210;
+const MARGIN_L = 22;
+const MARGIN_R = 22;
+const TEXT_W = PAGE_W - MARGIN_L - MARGIN_R;
 
 const SEVERITY_ORDER: Record<string, number> = {
   critical: 0,
@@ -79,19 +104,27 @@ export class BoardReportGenerator {
   }
 
   public generateReport(data: BoardReportData) {
-    const { filename, analysis, confidential = false } = data;
+    const { filename, analysis, confidential = false, counterfactualTop } = data;
     const title = truncate(filename.replace(/\.[^.]+$/, ''), MAX_TITLE_CHARS);
-    const topBiases = [...(analysis.biases || [])]
-      .sort(
-        (a, b) =>
-          (SEVERITY_ORDER[a.severity?.toLowerCase()] ?? 4) -
-          (SEVERITY_ORDER[b.severity?.toLowerCase()] ?? 4)
-      )
-      .slice(0, 3);
+    const allBiases = [...(analysis.biases || [])].sort(
+      (a, b) =>
+        (SEVERITY_ORDER[a.severity?.toLowerCase()] ?? 4) -
+        (SEVERITY_ORDER[b.severity?.toLowerCase()] ?? 4)
+    );
+    const topBiases = allBiases.slice(0, 3);
+    const remainingBiases = allBiases.slice(3);
 
     this.drawPageOne({ title, analysis, topBiases });
     this.doc.addPage();
-    this.drawPageTwo({ analysis, topBiases });
+    this.drawPageTwo({ analysis, topBiases, counterfactualTop });
+    // Additional-risks page(s) — biases 4+ paginate here instead of being
+    // silently dropped. Dropping risks from a board-committee artifact is
+    // not acceptable for Sankore-sized investment committee memos, which
+    // can easily flag 6–8 biases.
+    if (remainingBiases.length > 0) {
+      this.doc.addPage();
+      this.drawAdditionalRisks(remainingBiases);
+    }
     if (confidential) this.drawConfidentialWatermark();
     this.drawFooter(confidential);
 
@@ -112,24 +145,26 @@ export class BoardReportGenerator {
   }) {
     // Accent band
     this.doc.setFillColor(22, 163, 74);
-    this.doc.rect(0, 0, 210, 6, 'F');
+    this.doc.rect(0, 0, PAGE_W, 6, 'F');
 
     // Header
     this.doc.setTextColor(5, 5, 5);
     this.doc.setFont('helvetica', 'bold');
     this.doc.setFontSize(10);
-    this.doc.text('BOARD-READY DECISION AUDIT', 20, 18);
+    this.doc.text('BOARD-READY DECISION AUDIT', MARGIN_L, 18);
     this.doc.setFont('helvetica', 'normal');
     this.doc.setFontSize(9);
     this.doc.setTextColor(120, 120, 120);
-    this.doc.text(new Date().toLocaleDateString(), 190, 18, { align: 'right' });
+    this.doc.text(new Date().toLocaleDateString(), PAGE_W - MARGIN_R, 18, {
+      align: 'right',
+    });
 
     // Title
     this.doc.setTextColor(5, 5, 5);
     this.doc.setFont('helvetica', 'bold');
     this.doc.setFontSize(18);
-    const titleLines = this.doc.splitTextToSize(title, 170);
-    this.doc.text(titleLines, 20, 32);
+    const titleLines = this.doc.splitTextToSize(title, TEXT_W);
+    this.doc.text(titleLines, MARGIN_L, 32);
     const titleHeight = titleLines.length * 8;
 
     // DQI card
@@ -138,26 +173,33 @@ export class BoardReportGenerator {
     const grade = gradeFromScore(score);
     this.drawDqiCard(cardY, score, grade);
 
-    // Executive summary
-    let yPos = cardY + 42;
+    // Executive summary — line-height loosened 5 → 5.8 for breathing room.
+    let yPos = cardY + 44;
     this.drawSectionHeading('EXECUTIVE SUMMARY', yPos);
     yPos += 8;
     this.doc.setFont('helvetica', 'normal');
     this.doc.setFontSize(10.5);
     this.doc.setTextColor(40, 40, 40);
     const summaryText = truncate(analysis.summary || 'No summary generated.', MAX_SUMMARY_CHARS);
-    const summaryLines = this.doc.splitTextToSize(summaryText, 170);
-    this.doc.text(summaryLines, 20, yPos);
-    yPos += summaryLines.length * 5 + 8;
+    const summaryLines = this.doc.splitTextToSize(summaryText, TEXT_W);
+    this.doc.text(summaryLines, MARGIN_L, yPos);
+    yPos += summaryLines.length * 5.8 + 9;
 
-    // Top 3 biases
-    this.drawSectionHeading('TOP 3 COGNITIVE RISKS', yPos);
+    // Top 3 biases — label is now dynamic ("TOP COGNITIVE RISKS") so it
+    // stays accurate whether there are 0, 1, 2, 3, or 3+ biases overall.
+    const heading =
+      topBiases.length === 3
+        ? 'TOP 3 COGNITIVE RISKS'
+        : topBiases.length === 0
+          ? 'COGNITIVE RISKS'
+          : `TOP ${topBiases.length} COGNITIVE RISK${topBiases.length === 1 ? '' : 'S'}`;
+    this.drawSectionHeading(heading, yPos);
     yPos += 8;
     if (topBiases.length === 0) {
       this.doc.setFont('helvetica', 'italic');
       this.doc.setFontSize(10);
       this.doc.setTextColor(90, 130, 90);
-      this.doc.text('No significant biases detected.', 20, yPos);
+      this.doc.text('No significant biases detected.', MARGIN_L, yPos);
     } else {
       for (const bias of topBiases) {
         yPos = this.drawBiasRow(bias, yPos);
@@ -167,86 +209,117 @@ export class BoardReportGenerator {
   }
 
   private drawDqiCard(y: number, score: number, grade: string) {
-    // Card background
+    // Card background — width adjusted from 170 to TEXT_W (166) for the
+    // new margin system.
     this.doc.setDrawColor(220, 220, 220);
     this.doc.setFillColor(250, 250, 250);
-    this.doc.roundedRect(20, y, 170, 34, 3, 3, 'FD');
+    this.doc.roundedRect(MARGIN_L, y, TEXT_W, 36, 3, 3, 'FD');
 
     // Score
     this.doc.setFont('helvetica', 'bold');
     this.doc.setFontSize(28);
     this.doc.setTextColor(22, 163, 74);
-    this.doc.text(`${score}`, 30, y + 22);
+    this.doc.text(`${score}`, MARGIN_L + 10, y + 23);
 
     this.doc.setFontSize(10);
     this.doc.setTextColor(100, 100, 100);
-    this.doc.text('/100', 56, y + 22);
+    this.doc.text('/100', MARGIN_L + 36, y + 23);
 
     // Grade pill
     this.doc.setFillColor(22, 163, 74);
-    this.doc.roundedRect(75, y + 10, 18, 14, 2, 2, 'F');
+    this.doc.roundedRect(MARGIN_L + 55, y + 11, 18, 14, 2, 2, 'F');
     this.doc.setTextColor(255, 255, 255);
     this.doc.setFont('helvetica', 'bold');
     this.doc.setFontSize(12);
-    this.doc.text(grade, 84, y + 20, { align: 'center' });
+    this.doc.text(grade, MARGIN_L + 64, y + 21, { align: 'center' });
 
     // Interpretation
     this.doc.setFont('helvetica', 'normal');
     this.doc.setFontSize(9.5);
     this.doc.setTextColor(60, 60, 60);
-    this.doc.text('DECISION QUALITY INDEX', 100, y + 13);
+    this.doc.text('DECISION QUALITY INDEX', MARGIN_L + 80, y + 13);
     this.doc.setFontSize(9);
     this.doc.setTextColor(80, 80, 80);
-    const interp = this.doc.splitTextToSize(interpretGrade(grade), 85);
-    this.doc.text(interp, 100, y + 20);
+    const interp = this.doc.splitTextToSize(interpretGrade(grade), TEXT_W - 80);
+    this.doc.text(interp, MARGIN_L + 80, y + 21);
   }
 
   private drawBiasRow(bias: ReportBiasInstance, startY: number): number {
     const severity = (bias.severity || 'medium').toLowerCase();
     const color = SEVERITY_RGB[severity] || [100, 100, 100];
     const name = formatBiasName(bias.biasType);
-    const excerpt = truncate(bias.excerpt || bias.explanation || '', MAX_EXCERPT_CHARS);
+    const rawExcerpt = bias.excerpt || bias.explanation || '';
+    const wasTruncated = rawExcerpt.trim().length > MAX_EXCERPT_CHARS;
+    const excerpt = truncate(rawExcerpt, MAX_EXCERPT_CHARS);
 
-    // Severity stripe
+    // Severity stripe — widened 2mm → 3mm so it survives anti-aliasing
+    // in common PDF readers (Preview, Acrobat, Sumatra) and reads as a
+    // clear severity indicator rather than a hair-thin line.
     this.doc.setFillColor(color[0], color[1], color[2]);
-    this.doc.rect(20, startY - 4, 2, 22, 'F');
+    this.doc.rect(MARGIN_L, startY - 4, 3, 24, 'F');
 
     // Name + severity
     this.doc.setFont('helvetica', 'bold');
     this.doc.setFontSize(11);
     this.doc.setTextColor(10, 10, 10);
-    this.doc.text(name, 26, startY + 2);
+    this.doc.text(name, MARGIN_L + 7, startY + 2);
 
     this.doc.setFont('helvetica', 'bold');
     this.doc.setFontSize(8);
     this.doc.setTextColor(color[0], color[1], color[2]);
-    this.doc.text(severity.toUpperCase(), 190, startY + 2, { align: 'right' });
+    this.doc.text(severity.toUpperCase(), PAGE_W - MARGIN_R, startY + 2, {
+      align: 'right',
+    });
 
-    // Excerpt
+    // "Detected in memo" micro-caption — tells the reader this is a
+    // quote from THEIR memo, not a generated summary. Matters when the
+    // excerpt gets forwarded to audit committee members who weren't in
+    // the upload session.
+    this.doc.setFont('helvetica', 'normal');
+    this.doc.setFontSize(7.5);
+    this.doc.setTextColor(140, 140, 140);
+    this.doc.text('DETECTED IN MEMO', MARGIN_L + 7, startY + 6);
+
+    // Excerpt — line-height loosened 4.5 → 5 for breathing room.
+    // Trailing ellipsis already added by truncate(); suffix marker
+    // signals to the reader that there's more context on page 3+.
     this.doc.setFont('helvetica', 'italic');
     this.doc.setFontSize(9.5);
     this.doc.setTextColor(70, 70, 70);
-    const excerptLines = this.doc.splitTextToSize(`"${excerpt}"`, 162);
-    this.doc.text(excerptLines, 26, startY + 9);
+    const excerptLines = this.doc.splitTextToSize(`"${excerpt}"`, TEXT_W - 10);
+    this.doc.text(excerptLines, MARGIN_L + 7, startY + 11);
 
-    return startY + 9 + excerptLines.length * 4.5 + 6;
+    let nextY = startY + 11 + excerptLines.length * 5 + 5;
+
+    // If we truncated, add a subtle context hint under the quote.
+    if (wasTruncated) {
+      this.doc.setFont('helvetica', 'italic');
+      this.doc.setFontSize(7.5);
+      this.doc.setTextColor(150, 150, 150);
+      this.doc.text('Full passage available in the analysis detail.', MARGIN_L + 7, nextY);
+      nextY += 4;
+    }
+
+    return nextY + 2;
   }
 
   private drawPageTwo({
     analysis,
     topBiases,
+    counterfactualTop,
   }: {
     analysis: BoardReportData['analysis'];
     topBiases: ReportBiasInstance[];
+    counterfactualTop?: BoardCounterfactualTop | null;
   }) {
     // Accent band
     this.doc.setFillColor(22, 163, 74);
-    this.doc.rect(0, 0, 210, 6, 'F');
+    this.doc.rect(0, 0, PAGE_W, 6, 'F');
 
     this.doc.setTextColor(5, 5, 5);
     this.doc.setFont('helvetica', 'bold');
     this.doc.setFontSize(10);
-    this.doc.text('BOARD-READY DECISION AUDIT', 20, 18);
+    this.doc.text('BOARD-READY DECISION AUDIT', MARGIN_L, 18);
 
     // Simulated CEO question
     let yPos = 32;
@@ -256,9 +329,9 @@ export class BoardReportGenerator {
     this.doc.setFont('helvetica', 'normal');
     this.doc.setFontSize(11);
     this.doc.setTextColor(30, 30, 30);
-    const ceoLines = this.doc.splitTextToSize(ceoQuestion, 170);
-    this.doc.text(ceoLines, 20, yPos);
-    yPos += ceoLines.length * 5.5 + 12;
+    const ceoLines = this.doc.splitTextToSize(ceoQuestion, TEXT_W);
+    this.doc.text(ceoLines, MARGIN_L, yPos);
+    yPos += ceoLines.length * 5.8 + 12;
 
     // Recommended mitigation
     this.drawSectionHeading('RECOMMENDED MITIGATION', yPos);
@@ -269,18 +342,115 @@ export class BoardReportGenerator {
     this.doc.setTextColor(40, 40, 40);
     const mitigationLines = this.doc.splitTextToSize(
       truncate(mitigationText, MAX_MITIGATION_CHARS),
-      170
+      TEXT_W
     );
-    this.doc.text(mitigationLines, 20, yPos);
+    this.doc.text(mitigationLines, MARGIN_L, yPos);
+    yPos += mitigationLines.length * 5.5 + 12;
+
+    // Projected impact — counterfactual ROI. Rendered only when the
+    // caller supplied a scenario (silent skip when null, never
+    // fabricated). Gives the committee a forward-looking "what if we
+    // accepted the mitigation" anchor rather than pure risk framing.
+    if (counterfactualTop) {
+      this.drawSectionHeading('PROJECTED IMPACT IF MITIGATION IS APPLIED', yPos);
+      yPos += 8;
+      this.doc.setFont('helvetica', 'bold');
+      this.doc.setFontSize(16);
+      this.doc.setTextColor(22, 163, 74);
+      const improvement = counterfactualTop.expectedImprovement;
+      const headline = `+${improvement.toFixed(1)}pp DQI uplift`;
+      this.doc.text(headline, MARGIN_L, yPos);
+      yPos += 8;
+
+      this.doc.setFont('helvetica', 'normal');
+      this.doc.setFontSize(10);
+      this.doc.setTextColor(60, 60, 60);
+      const addressedBy = `Addresses: ${formatBiasName(counterfactualTop.biasType)}`;
+      this.doc.text(addressedBy, MARGIN_L, yPos);
+      yPos += 5;
+
+      const extras: string[] = [];
+      if (typeof counterfactualTop.impactUsd === 'number' && counterfactualTop.impactUsd > 0) {
+        const usdText =
+          counterfactualTop.impactUsd >= 1_000_000
+            ? `$${(counterfactualTop.impactUsd / 1_000_000).toFixed(1)}M`
+            : `$${Math.round(counterfactualTop.impactUsd / 1000)}k`;
+        extras.push(`Estimated impact: ${usdText}`);
+      }
+      if (typeof counterfactualTop.confidence === 'number') {
+        extras.push(`Confidence: ${Math.round(counterfactualTop.confidence * 100)}%`);
+      }
+      if (
+        typeof counterfactualTop.similarDecisionsCount === 'number' &&
+        counterfactualTop.similarDecisionsCount > 0
+      ) {
+        extras.push(
+          `Calibrated against ${counterfactualTop.similarDecisionsCount} similar decisions`
+        );
+      }
+      if (extras.length > 0) {
+        this.doc.setFont('helvetica', 'italic');
+        this.doc.setFontSize(9);
+        this.doc.setTextColor(100, 100, 100);
+        this.doc.text(extras.join('     ·     '), MARGIN_L, yPos);
+      }
+    }
+  }
+
+  /** Additional-risks page. Renders biases beyond the top-3. Uses the
+   *  same drawBiasRow helper so the layout matches page 1 exactly.
+   *  Paginates automatically if the list is long enough to overflow. */
+  private drawAdditionalRisks(biases: ReportBiasInstance[]) {
+    let yPos = this.drawAdditionalRisksHeader(/* isContinuation */ false);
+    const totalCount = biases.length;
+    this.doc.setFont('helvetica', 'normal');
+    this.doc.setFontSize(9.5);
+    this.doc.setTextColor(80, 80, 80);
+    this.doc.text(
+      `${totalCount} additional cognitive risk${totalCount === 1 ? '' : 's'} flagged beyond the top 3. Listed in severity order.`,
+      MARGIN_L,
+      yPos
+    );
+    yPos += 10;
+
+    for (const bias of biases) {
+      // Estimate the row height so we can paginate cleanly instead of
+      // letting a row overflow the bottom margin.
+      const rawExcerpt = bias.excerpt || bias.explanation || '';
+      const excerpt = truncate(rawExcerpt, MAX_EXCERPT_CHARS);
+      const estimatedLines = this.doc.splitTextToSize(`"${excerpt}"`, TEXT_W - 10).length;
+      const rowEstHeight = 11 + estimatedLines * 5 + 10;
+      if (yPos + rowEstHeight > 275) {
+        this.doc.addPage();
+        yPos = this.drawAdditionalRisksHeader(/* isContinuation */ true);
+      }
+      yPos = this.drawBiasRow(bias, yPos);
+    }
+  }
+
+  private drawAdditionalRisksHeader(isContinuation: boolean): number {
+    this.doc.setFillColor(22, 163, 74);
+    this.doc.rect(0, 0, PAGE_W, 6, 'F');
+    this.doc.setTextColor(5, 5, 5);
+    this.doc.setFont('helvetica', 'bold');
+    this.doc.setFontSize(10);
+    this.doc.text('BOARD-READY DECISION AUDIT', MARGIN_L, 18);
+    let yPos = 32;
+    this.drawSectionHeading(
+      isContinuation ? 'ADDITIONAL COGNITIVE RISKS (cont.)' : 'ADDITIONAL COGNITIVE RISKS',
+      yPos
+    );
+    yPos += 10;
+    return yPos;
   }
 
   private drawSectionHeading(label: string, y: number) {
     this.doc.setFont('helvetica', 'bold');
     this.doc.setFontSize(9);
     this.doc.setTextColor(120, 120, 120);
-    this.doc.text(label, 20, y);
+    this.doc.text(label, MARGIN_L, y);
     this.doc.setDrawColor(220, 220, 220);
-    this.doc.line(20, y + 2, 190, y + 2);
+    this.doc.line(MARGIN_L, y + 2, PAGE_W - MARGIN_R, y + 2);
   }
 
   private drawFooter(confidential: boolean = false) {
@@ -294,7 +464,7 @@ export class BoardReportGenerator {
       const prefix = confidential ? 'CONFIDENTIAL · ' : '';
       this.doc.text(
         `${prefix}Generated by Decision Intel · R²F · ${new Date().toLocaleDateString()} · Page ${i}/${pages}`,
-        105,
+        PAGE_W / 2,
         290,
         { align: 'center' }
       );
@@ -316,7 +486,7 @@ export class BoardReportGenerator {
       this.doc.setTextColor(220, 38, 38);
       // 210×297 is A4; rotate -38° around the centre to match the
       // classic diagonal stamp convention.
-      this.doc.text('CONFIDENTIAL', 105, 160, {
+      this.doc.text('CONFIDENTIAL', PAGE_W / 2, 160, {
         align: 'center',
         angle: 38,
       });
