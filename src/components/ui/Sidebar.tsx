@@ -379,7 +379,9 @@ export default function Sidebar() {
           {/* Act — what the CSO does this week. Drafting, uploading,
               logging, chasing the live portfolio of decisions. Not
               collapsible: these are the daily verbs. */}
-          <SectionLabel collapsed={collapsed}>Act</SectionLabel>
+          <SectionLabel collapsed={collapsed} icon={<ActGlyph />}>
+            Act
+          </SectionLabel>
           <NavItem
             href="/dashboard"
             icon={<LayoutDashboard size={18} />}
@@ -437,6 +439,7 @@ export default function Sidebar() {
               deeper surfaces you dive into, not the daily rituals. */}
           <CollapsibleSection
             label="Reflect"
+            icon={<ReflectGlyph />}
             collapsed={collapsed}
             isOpen={!collapsedSections.Reflect}
             onToggle={() => toggleSection('Reflect')}
@@ -502,6 +505,7 @@ export default function Sidebar() {
               teammates, integrations, settings. Collapsible. */}
           <CollapsibleSection
             label="Together"
+            icon={<TogetherGlyph />}
             collapsed={collapsed}
             isOpen={!collapsedSections.Together}
             onToggle={() => toggleSection('Together')}
@@ -656,11 +660,22 @@ export default function Sidebar() {
   );
 }
 
-function SectionLabel({ collapsed, children }: { collapsed: boolean; children: React.ReactNode }) {
+function SectionLabel({
+  collapsed,
+  icon,
+  children,
+}: {
+  collapsed: boolean;
+  icon?: React.ReactNode;
+  children: React.ReactNode;
+}) {
   if (collapsed) return <div style={{ height: '20px' }} />;
   return (
     <div
       style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
         fontSize: '10px',
         fontWeight: 600,
         color: 'var(--text-muted)',
@@ -669,8 +684,74 @@ function SectionLabel({ collapsed, children }: { collapsed: boolean; children: R
         textTransform: 'uppercase',
       }}
     >
+      {icon}
       {children}
     </div>
+  );
+}
+
+// Sidebar cluster glyphs — bespoke 12×12 SVGs so Act / Reflect / Together
+// read at a glance as a thought-out information architecture, not a generic
+// Lucide sidebar. Stroke-only, currentColor, matches Lucide weight.
+function ActGlyph() {
+  return (
+    <svg
+      width={12}
+      height={12}
+      viewBox="0 0 12 12"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M2.25 6h6" />
+      <path d="M5.5 3.25 8.25 6 5.5 8.75" />
+    </svg>
+  );
+}
+
+function ReflectGlyph() {
+  return (
+    <svg
+      width={12}
+      height={12}
+      viewBox="0 0 12 12"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M9.5 6a3.5 3.5 0 1 1-3.5-3.5" />
+      <path d="M6 4a2 2 0 1 0 2 2" />
+      <path d="M6 6h.01" />
+    </svg>
+  );
+}
+
+function TogetherGlyph() {
+  return (
+    <svg
+      width={12}
+      height={12}
+      viewBox="0 0 12 12"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="3" cy="3.75" r="1.25" />
+      <circle cx="9" cy="3.75" r="1.25" />
+      <circle cx="6" cy="9" r="1.25" />
+      <path d="M4.25 3.75h3.5" />
+      <path d="M3.7 4.9 5.35 7.85" />
+      <path d="M8.3 4.9 6.65 7.85" />
+    </svg>
   );
 }
 
@@ -868,12 +949,14 @@ function SubNavItem({
 
 function CollapsibleSection({
   label,
+  icon,
   collapsed: sidebarCollapsed,
   isOpen,
   onToggle,
   children,
 }: {
   label: string;
+  icon?: React.ReactNode;
   collapsed: boolean;
   isOpen: boolean;
   onToggle: () => void;
@@ -916,6 +999,7 @@ function CollapsibleSection({
             transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
           }}
         />
+        {icon}
         {label}
       </button>
       <div

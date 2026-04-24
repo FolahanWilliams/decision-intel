@@ -21,6 +21,7 @@ import {
   BookOpen,
   Link2,
   HelpCircle,
+  X,
 } from 'lucide-react';
 import { useToast } from '@/components/ui/EnhancedToast';
 import { SSEReader } from '@/lib/sse';
@@ -403,6 +404,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
     return 'before';
   };
   const [phase, setPhaseState] = useState<DocumentPhase>(resolveInitialPhase);
+  const [phaseResetNotice, setPhaseResetNotice] = useState(false);
   const setPhase = useCallback((next: DocumentPhase) => {
     setPhaseState(next);
     try {
@@ -440,6 +442,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       }
       if ((next === 'cso' || next === 'board') && phase !== 'before') {
         setPhase('before');
+        setPhaseResetNotice(true);
       }
     },
     [phase, setPhase]
@@ -1422,6 +1425,52 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         </ErrorBoundary>
       )}
 
+      {phaseResetNotice && (
+        <div
+          role="status"
+          aria-live="polite"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
+            padding: '10px 14px',
+            marginTop: 8,
+            marginBottom: 16,
+            borderRadius: 8,
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            fontSize: 13,
+            color: 'var(--text-secondary)',
+            lineHeight: 1.5,
+          }}
+        >
+          <span>
+            Phase snapped to <strong style={{ color: 'var(--text-primary)' }}>Before</strong>.
+            Switch to <strong style={{ color: 'var(--text-primary)' }}>Analyst</strong> view to
+            explore During and After.
+          </span>
+          <button
+            type="button"
+            onClick={() => setPhaseResetNotice(false)}
+            aria-label="Dismiss phase-reset notice"
+            style={{
+              flexShrink: 0,
+              background: 'transparent',
+              border: 'none',
+              padding: 4,
+              borderRadius: 4,
+              cursor: 'pointer',
+              color: 'var(--text-muted)',
+              display: 'inline-flex',
+              alignItems: 'center',
+            }}
+          >
+            <X size={14} />
+          </button>
+        </div>
+      )}
+
       {/* Reference-class forecast — one-line "this memo resembles X of N
           historical cases, Y failed" above the Executive Summary. Null
           when the bias signature has no overlap with the seed corpus. */}
@@ -1855,13 +1904,6 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           {analysis && (
             <div className="mb-lg">
               <LearningImpactCard analysisId={analysis.id} />
-            </div>
-          )}
-
-          {/* Counterfactual Analysis */}
-          {analysis && (
-            <div className="mb-lg">
-              <CounterfactualPanel analysisId={analysis.id} />
             </div>
           )}
 

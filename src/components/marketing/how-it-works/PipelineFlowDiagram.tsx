@@ -16,22 +16,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useReducedMotion } from './useReducedMotion';
-import {
-  Shield,
-  Layers,
-  Radar,
-  Brain,
-  Scale,
-  CheckCircle2,
-  Microscope,
-  Users,
-  Eye,
-  HelpCircle,
-  Gavel,
-  Calculator,
-  type LucideIcon,
-} from 'lucide-react';
 import { PIPELINE_NODES, type PipelineNode, type PipelineZone } from '@/lib/data/pipeline-nodes';
+import { PipelineNodeGlyph } from './PipelineNodeGlyph';
 
 const C = {
   white: '#FFFFFF',
@@ -47,21 +33,6 @@ const C = {
   green: '#16A34A',
   greenLight: '#DCFCE7',
   violet: '#7C3AED',
-};
-
-const ICONS: Record<PipelineNode['iconName'], LucideIcon> = {
-  Shield,
-  Layers,
-  Radar,
-  Brain,
-  Scale,
-  CheckCircle2,
-  Microscope,
-  Users,
-  Eye,
-  HelpCircle,
-  Gavel,
-  Calculator,
 };
 
 const ZONE_COLOR: Record<PipelineZone, { accent: string; soft: string; label: string }> = {
@@ -325,7 +296,6 @@ export function PipelineFlowDiagram({ activeNodeId, onSelectNode }: PipelineFlow
         {POSITIONS.map((pos, i) => {
           const node = nodeById.get(pos.id);
           if (!node) return null;
-          const Icon = ICONS[node.iconName];
           const zone = node.zone;
           const zoneActive = activeZone === zone;
           const isSelected = activeNodeId === node.id;
@@ -366,7 +336,8 @@ export function PipelineFlowDiagram({ activeNodeId, onSelectNode }: PipelineFlow
                 fill={zoneActive ? accent : ZONE_COLOR[zone].soft}
                 style={{ transition: 'fill 0.35s' }}
               />
-              {/* Icon — rendered via foreignObject for Lucide React support */}
+              {/* Glyph — bespoke SVG set (see PipelineNodeGlyph). foreignObject
+                  lets us keep the React SVG component inside an outer SVG. */}
               <foreignObject x={pos.x + 12} y={pos.y + 14} width={46} height={46}>
                 <div
                   style={{
@@ -378,7 +349,11 @@ export function PipelineFlowDiagram({ activeNodeId, onSelectNode }: PipelineFlow
                   }}
                   aria-hidden
                 >
-                  <Icon size={22} color={zoneActive ? C.white : accent} strokeWidth={2} />
+                  <PipelineNodeGlyph
+                    nodeId={node.id}
+                    size={22}
+                    color={zoneActive ? C.white : accent}
+                  />
                 </div>
               </foreignObject>
               {/* Label */}

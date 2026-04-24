@@ -17,23 +17,9 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
-import {
-  Shield,
-  Layers,
-  Radar,
-  Brain,
-  Scale,
-  CheckCircle2,
-  Microscope,
-  Users,
-  Eye,
-  HelpCircle,
-  Gavel,
-  Calculator,
-  type LucideIcon,
-} from 'lucide-react';
 import { PIPELINE_NODES, type PipelineNode, type PipelineZone } from '@/lib/data/pipeline-nodes';
 import { useReducedMotion } from './useReducedMotion';
+import { PipelineNodeGlyph } from './PipelineNodeGlyph';
 
 const C = {
   white: '#FFFFFF',
@@ -48,21 +34,6 @@ const C = {
   slate900: '#0F172A',
   green: '#16A34A',
   violet: '#7C3AED',
-};
-
-const ICONS: Record<PipelineNode['iconName'], LucideIcon> = {
-  Shield,
-  Layers,
-  Radar,
-  Brain,
-  Scale,
-  CheckCircle2,
-  Microscope,
-  Users,
-  Eye,
-  HelpCircle,
-  Gavel,
-  Calculator,
 };
 
 const ZONE_ACCENT: Record<PipelineZone, string> = {
@@ -381,7 +352,6 @@ function ZoneGroup({
       }}
     >
       {nodes.map((n, i) => {
-        const Icon = ICONS[n.iconName];
         return (
           <motion.div
             key={n.id}
@@ -403,7 +373,7 @@ function ZoneGroup({
               transition: 'background 0.4s, border-color 0.4s',
             }}
           >
-            <Icon size={18} color={active ? C.white : accent} strokeWidth={2} />
+            <PipelineNodeGlyph nodeId={n.id} size={18} color={active ? C.white : accent} />
             {active && !reducedMotion && (
               <motion.span
                 aria-hidden

@@ -845,6 +845,8 @@ export function CommandPalette() {
         <div
           ref={listRef}
           role="listbox"
+          aria-live="polite"
+          aria-label={`${flatItems.length} ${flatItems.length === 1 ? 'result' : 'results'}`}
           style={{ maxHeight: 380, overflowY: 'auto', padding: '4px 0' }}
         >
           {flatItems.length === 0 ? (
