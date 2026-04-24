@@ -295,6 +295,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to start generation.' }, { status: 500 });
   }
 }
-
-export const MEETING_TYPE_OPTIONS = MEETING_TYPES;
-export { MEETING_TYPE_LABELS };
