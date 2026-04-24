@@ -589,6 +589,29 @@ export default function DemoPage() {
                 </button>
               </div>
             </div>
+
+            {/* Cross-link: lighter-surface alternative */}
+            <div
+              style={{
+                marginTop: 22,
+                textAlign: 'center',
+                fontSize: 13,
+                color: C.slate500,
+              }}
+            >
+              Just want to see what questions your CEO will ask?{' '}
+              <Link
+                href="/simulate-ceo"
+                style={{
+                  color: C.green,
+                  fontWeight: 600,
+                  textDecoration: 'none',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Simulate the CEO <ArrowRight size={12} style={{ display: 'inline' }} />
+              </Link>
+            </div>
           </Reveal>
         </SectionBand>
       )}

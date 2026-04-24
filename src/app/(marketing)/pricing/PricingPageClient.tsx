@@ -372,6 +372,49 @@ export function PricingPageClient() {
         </div>
       </section>
 
+      {/* Regulatory trust band */}
+      <section style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+            gap: 10,
+            padding: '14px 20px',
+            background: C.slate50,
+            border: `1px solid ${C.slate200}`,
+            borderRadius: 10,
+            fontSize: 13.5,
+            lineHeight: 1.55,
+            color: C.slate600,
+            textAlign: 'center',
+          }}
+        >
+          <span>
+            <span style={{ fontWeight: 600, color: C.slate900 }}>
+              Decision Provenance Record
+            </span>{' '}
+            on every audit · mapped to EU AI Act Art. 14, Basel III ICAAP, and SEC AI disclosure.
+          </span>
+          <Link
+            href="/security"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              color: C.green,
+              fontWeight: 600,
+              textDecoration: 'none',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            See the mapping
+            <ArrowRight size={13} />
+          </Link>
+        </div>
+      </section>
+
       {/* Tier cards */}
       <section style={{ maxWidth: 1200, margin: '0 auto', padding: '24px 24px 80px' }}>
         <div

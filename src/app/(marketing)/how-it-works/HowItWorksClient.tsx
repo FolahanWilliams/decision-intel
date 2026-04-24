@@ -696,6 +696,54 @@ export function HowItWorksClient() {
         </div>
       </section>
 
+      {/* SECTION 9b — WHY REGULATORS CARE ─────────────────────── */}
+      <section style={{ padding: '36px 24px 0' }}>
+        <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+          <div
+            style={{
+              background: C.slate50,
+              border: `1px solid ${C.slate200}`,
+              borderRadius: 12,
+              padding: '18px 22px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 14,
+              flexWrap: 'wrap',
+            }}
+          >
+            <ShieldCheck size={18} style={{ color: C.green, flexShrink: 0 }} />
+            <span
+              style={{
+                fontSize: 14,
+                color: C.slate600,
+                lineHeight: 1.6,
+                flex: 1,
+                minWidth: 280,
+              }}
+            >
+              Each node&rsquo;s audit trail maps onto EU AI Act Art. 14, Basel III ICAAP, and SEC AI
+              disclosure.
+            </span>
+            <Link
+              href="/security"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                color: C.green,
+                fontWeight: 600,
+                textDecoration: 'none',
+                fontSize: 13.5,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              See the mapping
+              <ArrowRight size={13} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* CTA ─────────────────────────────────────────────────────── */}
       <section style={{ padding: '72px 24px 88px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>

@@ -1,6 +1,14 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { AlertTriangle, Flame, Coins, EyeOff, ArrowRight, BookOpen } from 'lucide-react';
+import {
+  AlertTriangle,
+  Flame,
+  Coins,
+  EyeOff,
+  ArrowRight,
+  BookOpen,
+  ShieldCheck,
+} from 'lucide-react';
 import { computeGenomeFromSeed } from '@/lib/data/bias-genome-seed';
 import { MarketingNav } from '@/components/marketing/MarketingNav';
 import { HeadlineStatCard } from '@/components/marketing/genome/HeadlineStatCard';
@@ -434,6 +442,54 @@ export default function BiasGenomePage() {
                 will take over once n ≥ 3 consenting orgs have reported outcomes.
               </li>
             </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* REGULATORY CLOSER ─────────────────────────────────────── */}
+      <section style={{ padding: '48px 24px 0' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+          <div
+            style={{
+              background: C.white,
+              border: `1px solid ${C.slate200}`,
+              borderRadius: 12,
+              padding: '18px 22px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 14,
+              flexWrap: 'wrap',
+            }}
+          >
+            <ShieldCheck size={18} style={{ color: C.green, flexShrink: 0 }} />
+            <span
+              style={{
+                fontSize: 14,
+                color: C.slate600,
+                lineHeight: 1.6,
+                flex: 1,
+                minWidth: 280,
+              }}
+            >
+              This same taxonomy is what regulators have written into the EU AI Act high-risk
+              decision-support obligations effective Aug 2026.
+            </span>
+            <Link
+              href="/security"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                color: C.green,
+                fontWeight: 600,
+                textDecoration: 'none',
+                fontSize: 13.5,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              See the mapping
+              <ArrowRight size={13} />
+            </Link>
           </div>
         </div>
       </section>

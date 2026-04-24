@@ -389,13 +389,27 @@ export function SimulateCeoClient() {
             >
               {result.disclaimer}
             </div>
+            <div
+              style={{
+                marginTop: 22,
+                fontSize: 13.5,
+                color: C.slate400,
+                lineHeight: 1.6,
+              }}
+            >
+              Want all five rigor layers, not just the boardroom?{' '}
+              <span style={{ color: C.slate500 }}>
+                Knowledge Graph, boardroom simulation, reasoning audit, what-if counterfactual, and
+                outcome loop.
+              </span>
+            </div>
             <Link
               href="/demo"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 6,
-                marginTop: 18,
+                marginTop: 12,
                 padding: '10px 18px',
                 borderRadius: 10,
                 background: C.white,
