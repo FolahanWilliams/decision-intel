@@ -7,7 +7,7 @@
  * Decision Intel publishes the rubric, any product can self-assess
  * against it, and the registry is opt-in. If other products carry the
  * R²F mark, the framework becomes a category definition by usage alone
- * (trademark filing deferred until fundraise closes).
+ * (trademark filing deferred until funding round closes).
  *
  * Voice rules:
  *   - "Voluntary standard" — do NOT say "certification" or "compliance,"

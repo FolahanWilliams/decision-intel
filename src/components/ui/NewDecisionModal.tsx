@@ -9,7 +9,7 @@ const OPTIONS = [
     key: 'analyze',
     icon: Upload,
     title: 'Analyze a Document',
-    description: 'Upload a document for AI-powered analysis',
+    description: 'Upload a strategic memo for a full reasoning audit.',
     href: '/dashboard',
   },
   {

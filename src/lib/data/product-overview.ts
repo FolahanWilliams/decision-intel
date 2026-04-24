@@ -12,8 +12,8 @@ export interface ProductMetric {
 
 export const HERO = {
   eyebrow: 'Positioning',
-  headline: 'The Decision Performance OS for Corporate Strategy & M&A Teams',
-  body: 'Audit every strategic decision for cognitive bias and decision noise. Protect business outcomes. AI-powered cognitive auditing purpose-built for corporate strategy and M&A teams.',
+  headline: 'The native reasoning layer for every boardroom strategic decision',
+  body: 'Audit the reasoning in every strategic memo, predict steering-committee objections before the meeting, and compound a living Decision Knowledge Graph quarter after quarter. Purpose-built for corporate strategy and M&A teams.',
   pillars: [
     {
       label: 'Decision Knowledge Graph',

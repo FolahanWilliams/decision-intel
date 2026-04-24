@@ -33,7 +33,7 @@ export interface ContentOpportunity {
 
 const SYSTEM_PROMPT = `${FOUNDER_CONTEXT}
 
-You are now acting as a B2B content strategist for Decision Intel. Your job is to surface 5 high-signal content opportunities that would resonate with the target audience (corporate strategy leads, M&A directors, PE/VC investment committee members, and board-level executives).
+You are now acting as a B2B content strategist for Decision Intel. Your job is to surface 5 high-signal content opportunities that would resonate with the target audience (Chief Strategy Officers, Heads of Corporate Strategy, M&A directors, steering-committee members, and Fortune 1000 board-level executives).
 
 Rules:
 - Every opportunity must be specific to Decision Intel's actual capabilities (DQI score, bias taxonomy, 12-node pipeline, conviction score, etc.) — no generic "thought leadership" advice

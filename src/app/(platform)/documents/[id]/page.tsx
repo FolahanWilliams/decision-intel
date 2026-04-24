@@ -287,7 +287,12 @@ function ConvictionBadge({ analysis }: { analysis: Analysis }) {
     });
   }, [analysis]);
 
-  const color = conviction.score >= 70 ? '#3b82f6' : conviction.score >= 40 ? '#16A34A' : '#71717a';
+  const color =
+    conviction.score >= 70
+      ? 'var(--info)'
+      : conviction.score >= 40
+        ? 'var(--accent-primary)'
+        : 'var(--text-muted)';
 
   return (
     <div style={{ textAlign: 'center', marginRight: '8px' }} title={conviction.interpretation}>
@@ -1634,10 +1639,10 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             style={{
               borderLeft: `4px solid ${
                 analysis.overallScore > 80
-                  ? '#16A34A'
+                  ? 'var(--accent-primary)'
                   : analysis.overallScore > 60
-                    ? '#eab308'
-                    : '#ef4444'
+                    ? 'var(--warning)'
+                    : 'var(--error)'
               }`,
               marginBottom: 32,
             }}
@@ -1652,10 +1657,10 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                     letterSpacing: '0.12em',
                     color:
                       analysis.overallScore > 80
-                        ? '#16A34A'
+                        ? 'var(--accent-primary)'
                         : analysis.overallScore > 60
-                          ? '#eab308'
-                          : '#ef4444',
+                          ? 'var(--warning)'
+                          : 'var(--error)',
                   }}
                 >
                   Recommendation ·{' '}

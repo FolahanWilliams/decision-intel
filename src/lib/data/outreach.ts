@@ -287,7 +287,7 @@ export const SEED_TARGETS: SeedTarget[] = [
     dealSizeRange: 'Varies',
     approach: 'Cold email to M&A Advisory partner',
     personalisationHook:
-      'Complementary to their integration playbook. Add AI-powered bias auditing to their rigor.',
+      'Complementary to their integration playbook. Adds a reasoning-layer bias audit to their rigor.',
   },
   {
     id: 'goldman',

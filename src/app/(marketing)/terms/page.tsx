@@ -21,7 +21,7 @@ export default function TermsOfServicePage() {
       <div className="max-w-3xl mx-auto">
         <Link
           href="/"
-          className="inline-flex items-center gap-1 text-sm mb-8 hover:text-white transition-colors"
+          className="inline-flex items-center gap-1 text-sm mb-8 hover:[color:var(--text-primary)] transition-colors"
           style={{ color: 'var(--text-muted)' }}
         >
           &larr; Back to Home

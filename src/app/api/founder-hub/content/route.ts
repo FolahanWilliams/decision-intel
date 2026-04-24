@@ -89,7 +89,7 @@ const CONTENT_INSTRUCTIONS: Record<string, string> = {
 - Introduction paragraph (hook the reader)
 - 3-4 H2 sections with substantive content
 - Conclusion with CTA
-- Target audience: CTOs, PE/VC partners, decision-makers
+- Target audience: Chief Strategy Officers, Heads of Corporate Strategy, M&A directors, steering-committee members
 - Authoritative but accessible tone`,
 
   snippet: `Write a short-form snippet (2-4 sentences, ≤300 characters total). Requirements:
@@ -100,7 +100,7 @@ const CONTENT_INSTRUCTIONS: Record<string, string> = {
 
   video_script: `Write a YouTube video script (5-8 minutes when read aloud, ~800-1200 words). Structure:
 - HOOK (first 15 seconds): A provocative question or startling statistic that stops the scroll
-- CONTEXT (30 seconds): Why this matters to M&A teams / PE/VC investment committees RIGHT NOW
+- CONTEXT (30 seconds): Why this matters to corporate strategy teams and M&A directors answering to their steering committee RIGHT NOW
 - KEY ARGUMENT 1: Core insight with specific evidence (case study, data point, or research)
 - KEY ARGUMENT 2: Second supporting insight, ideally from a different angle
 - KEY ARGUMENT 3 (optional): Third insight or counterargument acknowledgment
@@ -144,10 +144,10 @@ STRUCTURE (Minto Pyramid — BLUF):
 1. LEAD with the provocative conclusion or key insight first (the "so what")
 2. SUPPORT with 2-3 key arguments
 3. DETAIL with specific data, case studies, or research citations
-PE/VC professionals want the conclusion first, evidence on demand.`;
+Corporate strategy and M&A leaders want the conclusion first, evidence on demand.`;
 
 const TACTICAL_EMPATHY_INSTRUCTION = `
-TACTICAL EMPATHY: Acknowledge the audience's expertise before challenging their process. Use labeling ("It might seem like..."). Frame as augmenting expert judgment, not replacing it. Lead with curiosity ("What if..."), not criticism. Mirror deal-making language (deal flow, thesis, conviction, IC memo).`;
+TACTICAL EMPATHY: Acknowledge the audience's expertise before challenging their process. Use labeling ("It might seem like..."). Frame as augmenting expert judgment, not replacing it. Lead with curiosity ("What if..."), not criticism. Mirror corporate-strategy language (strategic memo, steering committee, board deck, recommendation, conviction).`;
 
 // ─── POST: Generate (SSE) or Save ───────────────────────────────────────────
 
@@ -218,7 +218,7 @@ export async function POST(request: NextRequest) {
 
     const systemPrompt = `${FOUNDER_CONTEXT}
 
-You are the founder's personal content writer. Generate social media content that builds thought leadership in decision intelligence and cognitive bias auditing for M&A teams, PE/VC investment committees, and corporate development groups.
+You are the founder's personal content writer. Generate social media content that builds thought leadership in strategic-reasoning auditing and cognitive-bias detection for Chief Strategy Officers, Heads of Corporate Strategy, M&A directors, and the steering committees they answer to.
 
 CONTENT TYPE INSTRUCTIONS:
 ${typeInstructions}

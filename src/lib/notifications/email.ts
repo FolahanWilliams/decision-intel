@@ -608,7 +608,7 @@ export async function sendNewsletterWelcome(email: string): Promise<SendResult> 
           You're receiving this because you subscribed to the Decision Intelligence Brief.
           If you didn't subscribe, you can safely ignore this email.
           <br /><br />
-          Decision Intel &middot; The Decision Performance OS for M&amp;A and investment teams
+          Decision Intel &middot; The native reasoning layer for every boardroom strategic decision
         </p>
       </div>
     </div>
