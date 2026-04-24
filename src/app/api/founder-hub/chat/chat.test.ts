@@ -42,6 +42,17 @@ vi.mock('@/lib/utils/logger', () => ({
   createLogger: () => ({ info: vi.fn(), error: vi.fn(), warn: vi.fn() }),
 }));
 
+// The route calls buildRecentMeetingsBlock() on every request. When a
+// DB is reachable in CI with seed rows, the helper returns a non-empty
+// string and the chat injects TWO extra history entries (the meetings
+// snapshot + model ack), breaking the deterministic history-length
+// assertions below. Mock to empty by default; individual tests can
+// override via mockBuildRecentMeetingsBlock.mockResolvedValueOnce(...).
+const mockBuildRecentMeetingsBlock = vi.fn(async () => '');
+vi.mock('@/lib/founder-hub/recent-meetings-context', () => ({
+  buildRecentMeetingsBlock: (...args: unknown[]) => mockBuildRecentMeetingsBlock(...args),
+}));
+
 import { POST } from './route';
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
