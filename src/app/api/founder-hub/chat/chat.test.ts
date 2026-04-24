@@ -48,9 +48,9 @@ vi.mock('@/lib/utils/logger', () => ({
 // snapshot + model ack), breaking the deterministic history-length
 // assertions below. Mock to empty by default; individual tests can
 // override via mockBuildRecentMeetingsBlock.mockResolvedValueOnce(...).
-const mockBuildRecentMeetingsBlock = vi.fn(async () => '');
+const mockBuildRecentMeetingsBlock = vi.fn(() => Promise.resolve(''));
 vi.mock('@/lib/founder-hub/recent-meetings-context', () => ({
-  buildRecentMeetingsBlock: (...args: unknown[]) => mockBuildRecentMeetingsBlock(...args),
+  buildRecentMeetingsBlock: () => mockBuildRecentMeetingsBlock(),
 }));
 
 import { POST } from './route';
