@@ -654,6 +654,29 @@ export function PricingPageClient() {
                       {checkoutLoading !== tier.id && <ArrowRight size={14} />}
                     </button>
                   )}
+                  {(tier.cta.action === 'checkout-pro' ||
+                    tier.cta.action === 'checkout-team') && (
+                    <Link
+                      href="/design-partner"
+                      onClick={() =>
+                        trackEvent('pricing_procurement_link_clicked', { tier: tier.id })
+                      }
+                      style={{
+                        display: 'block',
+                        marginTop: 10,
+                        textAlign: 'center',
+                        fontSize: 12.5,
+                        color: C.slate500,
+                        textDecoration: 'none',
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      Need to bring this to procurement?{' '}
+                      <span style={{ color: C.green, fontWeight: 600 }}>
+                        Talk to the founder →
+                      </span>
+                    </Link>
+                  )}
                 </div>
               </div>
             );

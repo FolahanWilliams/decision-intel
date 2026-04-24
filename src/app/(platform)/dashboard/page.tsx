@@ -31,7 +31,7 @@ import { DecisionIQCard } from '@/components/ui/DecisionIQCard';
 import { InlinePasteMemoCard } from '@/components/dashboard/InlinePasteMemoCard';
 import { CsoDashboardRail } from '@/components/dashboard/CsoDashboardRail';
 import Link from 'next/link';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Dialog,
@@ -168,7 +168,6 @@ export default function Dashboard() {
     return () => clearTimeout(handle);
   }, [error]);
   const searchParams = useSearchParams();
-  const router = useRouter();
   const viewParam = searchParams.get('view');
   const initialView: DashboardView = viewParam === 'browse' ? 'browse' : 'upload';
   const [activeView, setActiveView] = useState<DashboardView>(initialView);
@@ -2105,26 +2104,60 @@ export default function Dashboard() {
                           : `${sortedDocs.length} documents`}
                       </span>
                     </div>
-                    {selectedDocs.size === 0 && sortedDocs.length >= 2 && (
-                      <Link
-                        href="/dashboard/compare"
-                        className="flex items-center gap-xs text-xs"
-                        title="Compare 2–3 memos side-by-side"
-                        style={{
-                          color: 'var(--accent-primary)',
+                    {sortedDocs.length >= 2 &&
+                      (() => {
+                        // One verb, one chip, four progressive states.
+                        // Collapses the prior split between the header
+                        // "Compare memos" discovery chip and the batch-bar
+                        // "Compare Selected" action button.
+                        const count = selectedDocs.size;
+                        const canCompare = count >= 2 && count <= 3;
+                        const href = canCompare
+                          ? `/dashboard/compare?doc=${Array.from(selectedDocs).slice(0, 3).join(',')}`
+                          : '/dashboard/compare';
+                        const label =
+                          count === 0
+                            ? 'Compare memos'
+                            : count === 1
+                              ? 'Select 1 more to compare'
+                              : count > 3
+                                ? 'Select 2–3 to compare'
+                                : `Compare ${count}`;
+                        const active = count === 0 || canCompare;
+                        const title = canCompare
+                          ? `Compare ${count} selected memos`
+                          : count > 3
+                            ? 'Compare accepts up to 3 memos at a time'
+                            : 'Compare 2–3 memos side-by-side';
+                        const style: React.CSSProperties = {
+                          color: active ? 'var(--accent-primary)' : 'var(--text-muted)',
                           padding: '4px 10px',
                           borderRadius: 'var(--radius-full)',
-                          background: 'rgba(22, 163, 74, 0.08)',
-                          border: '1px solid rgba(22, 163, 74, 0.22)',
+                          background: active
+                            ? 'rgba(22, 163, 74, 0.08)'
+                            : 'var(--bg-tertiary)',
+                          border: `1px solid ${
+                            active ? 'rgba(22, 163, 74, 0.22)' : 'var(--border-color)'
+                          }`,
                           textDecoration: 'none',
                           fontWeight: 600,
                           whiteSpace: 'nowrap',
-                        }}
-                      >
-                        <GitCompareArrows size={12} />
-                        Compare memos
-                      </Link>
-                    )}
+                          cursor: active ? 'pointer' : 'default',
+                          pointerEvents: active ? 'auto' : 'none',
+                        };
+                        return (
+                          <Link
+                            href={href}
+                            className="flex items-center gap-xs text-xs"
+                            title={title}
+                            aria-disabled={!active}
+                            style={style}
+                          >
+                            <GitCompareArrows size={12} />
+                            {label}
+                          </Link>
+                        );
+                      })()}
                   </div>
                   {sortedDocs.map((doc, idx) => (
                     <div
@@ -2344,36 +2377,6 @@ export default function Dashboard() {
                 >
                   Clear
                 </button>
-                {selectedDocs.size >= 2 && selectedDocs.size <= 3 && (
-                  <button
-                    onClick={() => {
-                      const ids = Array.from(selectedDocs).slice(0, 3).join(',');
-                      router.push(`/dashboard/compare?doc=${ids}`);
-                    }}
-                    className="btn btn-sm flex items-center gap-xs text-sm"
-                    style={{
-                      background: 'rgba(22, 163, 74, 0.1)',
-                      border: '1px solid rgba(22, 163, 74, 0.3)',
-                      color: 'var(--accent-primary)',
-                    }}
-                    title={
-                      selectedDocs.size > 3
-                        ? 'Compare accepts up to 3 documents — only the first 3 will be used'
-                        : undefined
-                    }
-                  >
-                    <GitCompareArrows size={12} />
-                    Compare Selected
-                  </button>
-                )}
-                {selectedDocs.size > 3 && (
-                  <span
-                    className="text-xs"
-                    style={{ color: 'var(--text-muted)', whiteSpace: 'nowrap' }}
-                  >
-                    Select 2–3 to compare
-                  </span>
-                )}
                 <button
                   onClick={handleBatchDelete}
                   disabled={batchDeleting}
