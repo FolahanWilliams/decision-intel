@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { Plus, LayoutList, LayoutGrid, FileText, Filter, X, AlertTriangle } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
+import { useOnboardingRole } from '@/hooks/useOnboardingRole';
+import { emptyStateCopy } from '@/lib/onboarding/role-empty-states';
 import { useDeals } from '@/hooks/useDeals';
 import { useUrlFilters } from '@/hooks/useUrlFilters';
 import { DealFormModal } from '@/components/deals/DealFormModal';
@@ -39,6 +41,9 @@ const selectStyle: React.CSSProperties = {
 };
 
 export default function DealsPage() {
+  const role = useOnboardingRole();
+  const dealsCopy = emptyStateCopy('deals', role);
+
   const {
     filters: urlFilters,
     setFilter,
@@ -352,12 +357,12 @@ export default function DealsPage() {
         ) : deals.length === 0 ? (
           <EnhancedEmptyState
             type="generic"
-            title="No projects yet"
-            description="Create your first project to start tracking your pipeline."
+            title={dealsCopy.title}
+            description={dealsCopy.description}
             showBrief
             briefContext="deals"
             actions={[
-              { label: 'Create Project', onClick: () => setShowForm(true), variant: 'primary' },
+              { label: 'Create deal', onClick: () => setShowForm(true), variant: 'primary' },
             ]}
           />
         ) : view === 'board' ? (

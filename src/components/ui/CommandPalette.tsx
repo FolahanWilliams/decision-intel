@@ -31,6 +31,7 @@ import {
   Shield,
   Target,
   Presentation,
+  Compass,
 } from 'lucide-react';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useTheme } from 'next-themes';
@@ -333,6 +334,22 @@ export function CommandPalette() {
         icon: <Target size={16} />,
         action: () => navigate('/dashboard/outcome-flywheel'),
         keywords: ['outcome', 'result', 'follow up', 'flywheel'],
+      },
+      {
+        id: 'restart-onboarding',
+        label: 'Restart onboarding tour',
+        description: 'Re-run the role-routed dashboard walkthrough',
+        icon: <Compass size={16} />,
+        action: () => {
+          // 4.2 deep — clear the auto-launch dedupe + dispatch the launch
+          // event the OnboardingTour TourLauncher already listens for.
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('decision-intel-tour-autolaunched');
+            navigate('/dashboard');
+            setTimeout(() => window.dispatchEvent(new Event('di:launch-tour')), 250);
+          }
+        },
+        keywords: ['onboarding', 'tour', 'walkthrough', 'help', 'guide', 'restart'],
       },
       {
         id: 'open-last-analysis',

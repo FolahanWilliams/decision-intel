@@ -25,6 +25,8 @@ import {
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
+import { useOnboardingRole } from '@/hooks/useOnboardingRole';
+import { emptyStateCopy } from '@/lib/onboarding/role-empty-states';
 import { useHumanDecisions, type HumanDecisionSummary } from '@/hooks/useHumanDecisions';
 import {
   SOURCE_ICONS as AUDIT_SOURCE_ICONS,
@@ -529,6 +531,9 @@ function AuditRow({
 // ─── Page ─────────────────────────────────────────────────────────────────
 
 export default function DecisionLogPage() {
+  const role = useOnboardingRole();
+  const logCopy = emptyStateCopy('decision-log', role);
+
   // Journal state
   const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
   const [journalLoading, setJournalLoading] = useState(true);
@@ -950,13 +955,19 @@ export default function DecisionLogPage() {
         ) : visibleRows.length === 0 ? (
           <EnhancedEmptyState
             type="generic"
-            title="No decisions match this view"
+            title={
+              sourceFilter === 'all'
+                ? logCopy.title
+                : sourceFilter === 'audits'
+                  ? 'No cognitive audits yet'
+                  : 'No journal entries yet'
+            }
             description={
               sourceFilter === 'audits'
                 ? 'Audit a human decision — submit a memo, meeting transcript, or Slack excerpt to start building your log.'
                 : sourceFilter === 'journal'
                   ? 'Log a journal entry, connect email/calendar/Slack, or submit a decision for audit.'
-                  : 'Nothing logged yet — every audit and journal entry you create will show up here.'
+                  : logCopy.description
             }
             showBrief
             briefContext="journal"

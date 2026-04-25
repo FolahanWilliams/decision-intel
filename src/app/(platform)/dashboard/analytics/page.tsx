@@ -19,6 +19,8 @@ import { PageSkeleton } from '@/components/ui/LoadingSkeleton';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { TabBar } from '@/components/ui/TabBar';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
+import { useOnboardingRole } from '@/hooks/useOnboardingRole';
+import { emptyStateCopy } from '@/lib/onboarding/role-empty-states';
 import { useInsights } from '@/hooks/useInsights';
 import { CalibrationTrackerChip } from '@/components/analytics/CalibrationTrackerChip';
 
@@ -237,6 +239,8 @@ function DecisionSignals() {
 }
 
 function AnalyticsInner() {
+  const role = useOnboardingRole();
+  const analyticsCopy = emptyStateCopy('analytics', role);
   const searchParams = useSearchParams();
   const router = useRouter();
   const rawView = searchParams.get('view') ?? 'performance';
@@ -284,7 +288,13 @@ function AnalyticsInner() {
       </div>
       {hasNoData ? (
         <div className="container" style={{ paddingTop: 'var(--spacing-xl)' }}>
-          <EnhancedEmptyState type="insights" showBrief briefContext="analytics" />
+          <EnhancedEmptyState
+            type="insights"
+            title={analyticsCopy.title}
+            description={analyticsCopy.description}
+            showBrief
+            briefContext="analytics"
+          />
         </div>
       ) : (
         <Suspense fallback={<PageSkeleton />}>

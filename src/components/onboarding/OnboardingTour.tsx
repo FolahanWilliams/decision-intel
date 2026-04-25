@@ -4,58 +4,226 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { OnbordaProvider, Onborda, useOnborda } from 'onborda';
 import type { Step, CardComponentProps } from 'onborda';
-import { Upload, BarChart3, Gauge, X, ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import {
+  Upload,
+  BarChart3,
+  Gauge,
+  X,
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  ShieldCheck,
+  GitCompare,
+  Briefcase,
+  PenLine,
+  Package,
+} from 'lucide-react';
 
 const TOUR_TRIGGER_KEY = 'decision-intel-launch-tour';
 
-const TOUR_STEPS: Step[] = [
-  {
-    icon: <Upload size={18} />,
-    title: 'Drop in your strategic memo',
-    content: (
-      <>
-        Start here. Upload a strategic memo, board deck, or market-entry recommendation — PDF, DOCX,
-        or PPTX (speaker notes included). The 60-second audit starts the moment it lands.
-      </>
-    ),
-    selector: '#onborda-upload',
-    side: 'bottom',
-    showControls: true,
-    pointerPadding: 12,
-    pointerRadius: 12,
-  },
-  {
-    icon: <Gauge size={18} />,
-    title: 'Your audit usage, at a glance',
-    content: (
-      <>
-        Every audit counts against your monthly plan. Free tier gets 4 audits/month — this pill
-        shows how many are left and warns you before you hit the cap.
-      </>
-    ),
-    selector: '#onborda-usage-meter',
-    side: 'bottom-right',
-    showControls: true,
-    pointerPadding: 8,
-    pointerRadius: 999,
-  },
-  {
-    icon: <BarChart3 size={18} />,
-    title: 'Analytics + your Decision Graph',
-    content: (
-      <>
-        Analytics surfaces Decision Quality Index across quarters, repeat biases by theme, and the
-        Decision Knowledge Graph — every audited memo joins it, so today&apos;s decision inherits
-        yesterday&apos;s lessons. This is where compounding shows up.
-      </>
-    ),
-    selector: '#onborda-nav-analytics',
-    side: 'right',
-    showControls: true,
-    pointerPadding: 6,
-    pointerRadius: 10,
-  },
-];
+type TourRole = 'cso' | 'ma' | 'bizops' | 'other';
+
+/**
+ * Role-routed tour stops (4.2 deep). All four tours run on the dashboard
+ * page so the selectors are guaranteed to exist — multi-page Onborda
+ * tours are flaky when the target page changes during navigation, and a
+ * single-page tour with role-tailored COPY converts better than a
+ * route-bouncing tour that breaks on the first navigation. Each role's
+ * final stop links to a deeper page (Reflect cluster, Deals, Decisions)
+ * via the in-card Next button so the user lands on the right surface
+ * the moment they finish.
+ *
+ * Selectors that exist on /dashboard today:
+ *   #onborda-upload         — file-upload zone
+ *   #onborda-usage-meter    — sidebar usage pill (UsageMeter)
+ *   #onborda-nav-analytics  — sidebar Analytics nav item
+ *
+ * If we want to add new selectors for role-specific stops, we add IDs
+ * via the Sidebar component (already done for nav-analytics). For now,
+ * every tour uses the same three anchors with role-tailored copy.
+ */
+const SHARED_STOP_UPLOAD: Omit<Step, 'content' | 'icon' | 'title'> = {
+  selector: '#onborda-upload',
+  side: 'bottom',
+  showControls: true,
+  pointerPadding: 12,
+  pointerRadius: 12,
+};
+
+const SHARED_STOP_USAGE: Omit<Step, 'content' | 'icon' | 'title'> = {
+  selector: '#onborda-usage-meter',
+  side: 'bottom-right',
+  showControls: true,
+  pointerPadding: 8,
+  pointerRadius: 999,
+};
+
+const SHARED_STOP_ANALYTICS: Omit<Step, 'content' | 'icon' | 'title'> = {
+  selector: '#onborda-nav-analytics',
+  side: 'right',
+  showControls: true,
+  pointerPadding: 6,
+  pointerRadius: 10,
+};
+
+const TOUR_STEPS_BY_ROLE: Record<TourRole, Step[]> = {
+  cso: [
+    {
+      ...SHARED_STOP_UPLOAD,
+      icon: <Upload size={18} />,
+      title: 'Drop your strategic memo or board deck',
+      content: (
+        <>
+          Upload a strategic memo, market-entry recommendation, or quarterly board deck. The audit
+          surfaces 30+ cognitive biases with traceable excerpts and the questions a CEO or audit
+          committee will surface — in 60 seconds.
+        </>
+      ),
+    },
+    {
+      ...SHARED_STOP_USAGE,
+      icon: <Gauge size={18} />,
+      title: 'Your audit budget',
+      content: (
+        <>
+          Every audit costs against your monthly plan. Strategy tier gets 250 audits/month
+          (fair-use). The pill warns you before the cap so a quarter-end push doesn&apos;t get blocked.
+        </>
+      ),
+    },
+    {
+      ...SHARED_STOP_ANALYTICS,
+      icon: <ShieldCheck size={18} />,
+      title: 'Decision Provenance + Outcome Flywheel',
+      content: (
+        <>
+          Under Analytics: signed Decision Provenance Records (DPR) for every audit — the artefact
+          your GC and audit committee receive — plus the Outcome Flywheel where you close the loop
+          and watch Brier-calibrated DQI compound quarter over quarter.
+        </>
+      ),
+    },
+  ],
+  ma: [
+    {
+      ...SHARED_STOP_UPLOAD,
+      icon: <Upload size={18} />,
+      title: 'Drop the IC memo, CIM, or model',
+      content: (
+        <>
+          Upload the IC memo, CIM, or counsel review for a deal in flight. The audit catches the
+          biases that sink committee votes — anchoring on synergies, sunk-cost on a year-long
+          process, overconfidence on integration timelines.
+        </>
+      ),
+    },
+    {
+      ...SHARED_STOP_USAGE,
+      icon: <Briefcase size={18} />,
+      title: 'Your audit budget per deal',
+      content: (
+        <>
+          Strategy tier supports unlimited audits per active deal under fair-use; Enterprise adds
+          per-deal billing for high-volume programs. The usage pill shows monthly draw against your
+          plan.
+        </>
+      ),
+    },
+    {
+      ...SHARED_STOP_ANALYTICS,
+      icon: <GitCompare size={18} />,
+      title: 'Cross-document review + Decisions',
+      content: (
+        <>
+          When you upload more than one doc per deal, the cross-reference agent flags conflicts
+          (&ldquo;CIM says 40% growth, model assumes 15%&rdquo;) and a composite Deal DQI lives on
+          the Deals page. Decision Packages do the same for non-deal decisions.
+        </>
+      ),
+    },
+  ],
+  bizops: [
+    {
+      ...SHARED_STOP_UPLOAD,
+      icon: <Upload size={18} />,
+      title: 'Drop your forecast or planning memo',
+      content: (
+        <>
+          Upload a quarterly forecast, planning memo, or buy-vs-build recommendation. The audit
+          flags the anchoring + overconfidence patterns that ship bad forecasts before they reach
+          the steering committee.
+        </>
+      ),
+    },
+    {
+      ...SHARED_STOP_USAGE,
+      icon: <PenLine size={18} />,
+      title: 'Decision Log feeds the audit',
+      content: (
+        <>
+          Beyond uploads, your Decision Log captures every committed decision — manual entries,
+          meeting transcripts, Slack threads. Each one feeds the same audit pipeline, so patterns
+          across forecasts become visible instead of anecdotal.
+        </>
+      ),
+    },
+    {
+      ...SHARED_STOP_ANALYTICS,
+      icon: <Package size={18} />,
+      title: 'Outcome Flywheel + Decision Packages',
+      content: (
+        <>
+          Under Analytics: the Outcome Flywheel where you log realised outcomes and watch DQI
+          recalibrate. Decision Packages in the Reflect cluster bundle related docs into a single
+          decision-quality view — composite DQI, recurring biases, cross-doc conflicts.
+        </>
+      ),
+    },
+  ],
+  other: [
+    {
+      ...SHARED_STOP_UPLOAD,
+      icon: <Upload size={18} />,
+      title: 'Drop in your strategic memo',
+      content: (
+        <>
+          Start here. Upload a strategic memo, board deck, or market-entry recommendation. The
+          60-second audit starts the moment it lands.
+        </>
+      ),
+    },
+    {
+      ...SHARED_STOP_USAGE,
+      icon: <Gauge size={18} />,
+      title: 'Your audit usage, at a glance',
+      content: (
+        <>
+          Every audit counts against your monthly plan. Free tier gets 4 audits/month — this pill
+          shows how many are left and warns you before you hit the cap.
+        </>
+      ),
+    },
+    {
+      ...SHARED_STOP_ANALYTICS,
+      icon: <BarChart3 size={18} />,
+      title: 'Analytics + your Decision Graph',
+      content: (
+        <>
+          Analytics surfaces Decision Quality Index across quarters, repeat biases by theme, and the
+          Decision Knowledge Graph — every audited memo joins it, so today&apos;s decision inherits
+          yesterday&apos;s lessons. This is where compounding shows up.
+        </>
+      ),
+    },
+  ],
+};
+
+const TOUR_NAME_BY_ROLE: Record<TourRole, string> = {
+  cso: 'dashboard-tour-cso',
+  ma: 'dashboard-tour-ma',
+  bizops: 'dashboard-tour-bizops',
+  other: 'dashboard-tour',
+};
 
 function TourCard({ step, currentStep, totalSteps, nextStep, prevStep }: CardComponentProps) {
   const { closeOnborda } = useOnborda();
@@ -271,33 +439,48 @@ function TourCard({ step, currentStep, totalSteps, nextStep, prevStep }: CardCom
  *      This catches users who skipped the Welcome modal entirely — previously
  *      they would never see the tour.
  */
+function isTourRole(value: unknown): value is TourRole {
+  return value === 'cso' || value === 'ma' || value === 'bizops' || value === 'other';
+}
+
 function TourLauncher() {
   const { startOnborda } = useOnborda();
   const router = useRouter();
 
   useEffect(() => {
-    const trigger = (delay = 300) => {
-      // Ensure we're on the dashboard so the tour targets exist
+    // Re-fetch the role at trigger time (not at mount) so a fresh
+    // PATCH from the WelcomeModal isn't lost to the role state. The
+    // network call adds <50ms to launch which is well below the
+    // already-existing setTimeout delay.
+    const resolveRoleAndLaunch = async (delay = 300) => {
+      let role: TourRole = 'other';
+      try {
+        const res = await fetch('/api/onboarding');
+        if (res.ok) {
+          const data = (await res.json()) as { onboardingRole?: string | null };
+          if (isTourRole(data.onboardingRole)) role = data.onboardingRole;
+        }
+      } catch {
+        /* fall back to 'other' tour */
+      }
       if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/dashboard')) {
         router.push('/dashboard');
       }
       setTimeout(() => {
-        startOnborda('dashboard-tour');
+        startOnborda(TOUR_NAME_BY_ROLE[role]);
         localStorage.removeItem(TOUR_TRIGGER_KEY);
       }, delay);
     };
 
     if (localStorage.getItem(TOUR_TRIGGER_KEY) === 'pending') {
-      trigger(600);
+      void resolveRoleAndLaunch(600);
     }
 
-    const handleLaunch = () => trigger(300);
+    const handleLaunch = () => {
+      void resolveRoleAndLaunch(300);
+    };
     window.addEventListener('di:launch-tour', handleLaunch);
 
-    // Auto-launch for first-login users who bypassed the WelcomeModal.
-    // Fire only when we can see the upload zone selector — protects against
-    // running on sub-routes like /dashboard/settings where the target is
-    // missing and Onborda would render against nothing.
     const maybeAutoLaunch = () => {
       if (typeof window === 'undefined') return;
       if (!window.location.pathname.startsWith('/dashboard')) return;
@@ -310,14 +493,12 @@ function TourLauncher() {
         .then((data: { onboardingTourSeen?: boolean }) => {
           if (data.onboardingTourSeen) return;
           localStorage.setItem('decision-intel-tour-autolaunched', 'true');
-          trigger(900);
+          void resolveRoleAndLaunch(900);
         })
         .catch(() => {
-          // no-op: without auth or onboarding data we skip auto-launch.
+          /* without auth we skip auto-launch */
         });
     };
-    // Delay one frame so the dashboard has time to render the upload zone
-    // before we query for it.
     const autoLaunchTimer = setTimeout(maybeAutoLaunch, 400);
 
     return () => {
@@ -333,7 +514,12 @@ export function OnboardingTourProvider({ children }: { children: React.ReactNode
   return (
     <OnbordaProvider>
       <Onborda
-        steps={[{ tour: 'dashboard-tour', steps: TOUR_STEPS }]}
+        steps={[
+          { tour: 'dashboard-tour', steps: TOUR_STEPS_BY_ROLE.other },
+          { tour: 'dashboard-tour-cso', steps: TOUR_STEPS_BY_ROLE.cso },
+          { tour: 'dashboard-tour-ma', steps: TOUR_STEPS_BY_ROLE.ma },
+          { tour: 'dashboard-tour-bizops', steps: TOUR_STEPS_BY_ROLE.bizops },
+        ]}
         shadowRgb="15, 23, 42"
         shadowOpacity="0.55"
         cardComponent={TourCard}

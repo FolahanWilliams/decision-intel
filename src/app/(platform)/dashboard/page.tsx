@@ -28,6 +28,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { DecisionIQCard } from '@/components/ui/DecisionIQCard';
+import { FirstRunInlineWalkthrough } from '@/components/onboarding/FirstRunInlineWalkthrough';
 import { InlinePasteMemoCard } from '@/components/dashboard/InlinePasteMemoCard';
 import { CsoDashboardRail } from '@/components/dashboard/CsoDashboardRail';
 import Link from 'next/link';
@@ -216,6 +217,10 @@ export default function Dashboard() {
    *  stays valid for external callers; this state is for the in-dashboard
    *  keep-me-on-this-surface path. */
   const [inlineMode, setInlineMode] = useState<'none' | 'paste'>('none');
+  // 4.2 deep — first-run walkthrough plumbing. When the user clicks
+  // "Run audit" on a sample card we load the memo into the paste flow
+  // and auto-submit on mount.
+  const [pasteSeed, setPasteSeed] = useState<{ content: string; autoSubmit: boolean } | null>(null);
   const [batchDeleting, setBatchDeleting] = useState(false);
 
   // Welcome modal self-gates via /api/onboarding; rendering is unconditional.
@@ -1370,6 +1375,27 @@ export default function Dashboard() {
             </div>
           )}
 
+          {/* 4.2 deep — first-run walkthrough renders only when the org
+              has zero analyses, no upload in flight, and no paste session
+              already open. Dismissible per-org via localStorage. */}
+          {uploadedDocs.length === 0 &&
+            !uploading &&
+            !pendingFile &&
+            !lastCompletedAnalysis &&
+            inlineMode === 'none' && (
+              <FirstRunInlineWalkthrough
+                visible
+                onLoadAndRun={bundle => {
+                  setPasteSeed({ content: bundle.content, autoSubmit: true });
+                  setInlineMode('paste');
+                }}
+                onLoadOnly={bundle => {
+                  setPasteSeed({ content: bundle.content, autoSubmit: false });
+                  setInlineMode('paste');
+                }}
+              />
+            )}
+
           {/* Upload Zone - Enhanced with drag feedback */}
           <ErrorBoundary sectionName="Upload">
             {!uploading && !pendingFile && lastCompletedAnalysis ? (
@@ -1379,7 +1405,14 @@ export default function Dashboard() {
                 preResolvedAnalysisId={lastCompletedAnalysis.analysisId ?? null}
               />
             ) : !uploading && !pendingFile && inlineMode === 'paste' ? (
-              <InlinePasteMemoCard onClose={() => setInlineMode('none')} />
+              <InlinePasteMemoCard
+                onClose={() => {
+                  setInlineMode('none');
+                  setPasteSeed(null);
+                }}
+                initialContent={pasteSeed?.content}
+                autoSubmit={pasteSeed?.autoSubmit ?? false}
+              />
             ) : !uploading && !pendingFile ? (
               <>
                 <div

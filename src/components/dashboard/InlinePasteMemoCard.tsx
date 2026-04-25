@@ -14,7 +14,7 @@
  * page. On success, navigates to the newly-created cognitive-audit.
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BrainCircuit, Loader2, X } from 'lucide-react';
 import { RoleSamplePicker } from '@/components/samples/RoleSamplePicker';
@@ -34,14 +34,25 @@ interface InlinePasteMemoCardProps {
    *  Passed as a callback so the parent can intercept (e.g. auto-scroll
    *  the new audit into view without a page change). */
   onSubmitted?: (auditId: string) => void;
+  /** Pre-populate the memo body — used by the first-run walkthrough to
+   *  drop a role-matched sample into the editor without an extra paste step. */
+  initialContent?: string;
+  /** When true (and `initialContent` meets the minimum), auto-fire the
+   *  audit on mount so the user sees the pipeline run immediately. */
+  autoSubmit?: boolean;
 }
 
 const MIN_CONTENT_CHARS = 40;
 const MAX_CONTENT_CHARS = 100_000;
 
-export function InlinePasteMemoCard({ onClose, onSubmitted }: InlinePasteMemoCardProps) {
+export function InlinePasteMemoCard({
+  onClose,
+  onSubmitted,
+  initialContent,
+  autoSubmit,
+}: InlinePasteMemoCardProps) {
   const router = useRouter();
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState(initialContent ?? '');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // Redaction gate (3.2) — when content has PII hits, the user sees the
@@ -108,6 +119,18 @@ export function InlinePasteMemoCard({ onClose, onSubmitted }: InlinePasteMemoCar
     }
     await runSubmit(trimmed);
   }
+
+  // 4.2 deep — auto-submit path used by FirstRunInlineWalkthrough.
+  // Fires once on mount when both initialContent and autoSubmit are set
+  // and the content meets the minimum. Sample memos are pre-redacted
+  // (synthetic data, no real PII) so we skip the redaction modal.
+  useEffect(() => {
+    if (!autoSubmit) return;
+    if (!initialContent) return;
+    if (initialContent.trim().length < MIN_CONTENT_CHARS) return;
+    void runSubmit(initialContent.trim());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div
