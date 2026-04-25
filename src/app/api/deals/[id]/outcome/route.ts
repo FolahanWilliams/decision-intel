@@ -141,7 +141,25 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       where: { id: dealId, orgId: orgId || user.id },
       include: {
         documents: {
-          select: { id: true, filename: true, documentType: true, status: true },
+          select: {
+            id: true,
+            filename: true,
+            documentType: true,
+            status: true,
+            // 3.1 deal-centric: include the latest analysis per doc so the
+            // deal page can compute composite DQI + bias signature in one
+            // payload (avoids N+1 fetches from the client).
+            analyses: {
+              orderBy: { createdAt: 'desc' },
+              take: 1,
+              select: {
+                id: true,
+                overallScore: true,
+                biases: true,
+                createdAt: true,
+              },
+            },
+          },
         },
       },
     });
@@ -150,7 +168,30 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: 'Deal not found' }, { status: 404 });
     }
 
-    return NextResponse.json(deal);
+    // Compute composite DQI + bias signature server-side so every consumer
+    // (deal page, deal-list cards, analytics) reads the same numbers.
+    const { aggregateDeal } = await import('@/lib/scoring/deal-aggregation');
+    const latestAnalyses = (deal.documents || [])
+      .map(d => {
+        const latest = d.analyses?.[0];
+        if (!latest) return null;
+        const biasArr = Array.isArray(latest.biases)
+          ? (latest.biases as Array<{ biasType?: string | null; severity?: string | null }>)
+          : [];
+        return {
+          documentId: d.id,
+          analysisId: latest.id,
+          overallScore: latest.overallScore,
+          biases: biasArr.map(b => ({
+            biasType: b?.biasType || 'unknown_bias',
+            severity: b?.severity ?? null,
+          })),
+        };
+      })
+      .filter((x): x is NonNullable<typeof x> => x !== null);
+    const aggregation = aggregateDeal(latestAnalyses);
+
+    return NextResponse.json({ ...deal, aggregation });
   } catch (error) {
     log.error('Failed to fetch deal outcome:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

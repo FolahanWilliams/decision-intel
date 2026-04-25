@@ -209,6 +209,41 @@ export interface DealDocument {
   filename: string;
   documentType: string | null;
   status: string;
+  /**
+   * Latest analysis (most recent createdAt) for this document, included
+   * by the deal-detail API so the deal page can render per-doc DQI
+   * scores without an N+1 fetch. Absent when the doc hasn't been
+   * analyzed yet.
+   */
+  analyses?: Array<{
+    id: string;
+    overallScore: number;
+    biases: unknown;
+    createdAt: string;
+  }>;
+}
+
+/**
+ * Composite DQI + bias signature for a deal — computed server-side by
+ * `aggregateDeal()` in src/lib/scoring/deal-aggregation.ts and returned
+ * on the deal-detail API alongside the deal itself.
+ */
+export interface DealAggregationDto {
+  compositeDqi: number | null;
+  compositeGrade: 'A' | 'B' | 'C' | 'D' | 'F' | null;
+  analyzedDocCount: number;
+  recurringBiases: Array<{
+    biasType: string;
+    documentCount: number;
+    totalOccurrences: number;
+    topSeverity: 'critical' | 'high' | 'medium' | 'low';
+  }>;
+  allBiases: Array<{
+    biasType: string;
+    documentCount: number;
+    totalOccurrences: number;
+    topSeverity: 'critical' | 'high' | 'medium' | 'low';
+  }>;
 }
 
 export interface DealSummary {
@@ -233,6 +268,7 @@ export interface DealSummary {
 
 export interface DealDetail extends DealSummary {
   documents: DealDocument[];
+  aggregation?: DealAggregationDto;
 }
 
 export interface DealFilters {

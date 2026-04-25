@@ -21,6 +21,8 @@ import { DealOutcomeForm } from '@/components/deals/DealOutcomeForm';
 import { DealOutcomeDisplay } from '@/components/deals/DealOutcomeDisplay';
 import { DecisionBriefTab } from '@/components/deals/DecisionBriefTab';
 import { UpgradeFromAudit } from '@/components/deals/UpgradeFromAudit';
+import { DealCompositeHero } from '@/components/deals/DealCompositeHero';
+import { UploadToDealButton } from '@/components/deals/UploadToDealButton';
 import {
   STAGE_COLORS,
   DEAL_TYPE_COLORS,
@@ -279,6 +281,31 @@ export default function DealDetailPage() {
           )}
         </div>
 
+        {/* Composite DQI + bias signature (3.1 deal-as-decision-unit hero) */}
+        {deal.aggregation && (
+          <DealCompositeHero
+            aggregation={deal.aggregation}
+            totalDocs={deal.documents?.length || 0}
+          />
+        )}
+
+        {/* Upload-to-deal CTA — sits above the tabs so it's the primary verb
+            on the page. Pre-binds dealId so the new doc lands in this deal
+            automatically. */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            marginBottom: 14,
+          }}
+        >
+          <UploadToDealButton
+            dealId={deal.id}
+            dealName={deal.name}
+            onUploaded={() => mutate()}
+          />
+        </div>
+
         {/* Tabs */}
         <div
           style={{
@@ -310,7 +337,12 @@ export default function DealDetailPage() {
         {activeTab === 'documents' && (
           <DocumentsTab documents={deal.documents || []} dealId={deal.id} />
         )}
-        {activeTab === 'bias' && <BiasSummaryTab documents={deal.documents || []} />}
+        {activeTab === 'bias' && (
+          <BiasSummaryTab
+            documents={deal.documents || []}
+            aggregation={deal.aggregation ?? null}
+          />
+        )}
         {activeTab === 'outcome' && <OutcomeTab deal={deal} onUpdate={() => mutate()} />}
         {activeTab === 'brief' && <DecisionBriefTab dealId={dealId} />}
 
@@ -332,7 +364,13 @@ function DocumentsTab({
   documents,
   dealId: _dealId,
 }: {
-  documents: Array<{ id: string; filename: string; documentType: string | null; status: string }>;
+  documents: Array<{
+    id: string;
+    filename: string;
+    documentType: string | null;
+    status: string;
+    analyses?: Array<{ id: string; overallScore: number; createdAt: string }>;
+  }>;
   dealId: string;
 }) {
   const router = useRouter();
@@ -378,75 +416,105 @@ function DocumentsTab({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-      {documents.map(doc => (
-        <Link
-          key={doc.id}
-          href={`/documents/${doc.id}`}
-          style={{ textDecoration: 'none', color: 'inherit' }}
-        >
-          <div
-            className="card"
-            style={{
-              padding: '12px 16px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-            }}
+      {documents.map(doc => {
+        const latestScore = doc.analyses?.[0]?.overallScore;
+        const scoreColour =
+          latestScore === undefined
+            ? null
+            : latestScore >= 85
+              ? '#16A34A'
+              : latestScore >= 70
+                ? '#2563EB'
+                : latestScore >= 55
+                  ? '#D97706'
+                  : '#DC2626';
+        return (
+          <Link
+            key={doc.id}
+            href={`/documents/${doc.id}`}
+            style={{ textDecoration: 'none', color: 'inherit' }}
           >
-            <FileText size={16} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div
-                style={{
-                  fontSize: 13,
-                  fontWeight: 500,
-                  color: 'var(--text-primary)',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {doc.filename}
+            <div
+              className="card"
+              style={{
+                padding: '12px 16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+              }}
+            >
+              <FileText size={16} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 500,
+                    color: 'var(--text-primary)',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {doc.filename}
+                </div>
               </div>
-            </div>
-            {doc.documentType && (
+              {scoreColour && latestScore !== undefined && (
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: scoreColour,
+                    background: `${scoreColour}18`,
+                    border: `1px solid ${scoreColour}33`,
+                    padding: '2px 8px',
+                    borderRadius: 999,
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                  title="Decision Quality Index"
+                >
+                  DQI {Math.round(latestScore)}
+                </span>
+              )}
+              {doc.documentType && (
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 500,
+                    color: '#16A34A',
+                    background: 'rgba(22, 163, 74, 0.1)',
+                    padding: '2px 6px',
+                    borderRadius: 4,
+                  }}
+                >
+                  {getDocTypeLabel(doc.documentType)}
+                </span>
+              )}
               <span
                 style={{
                   fontSize: 10,
                   fontWeight: 500,
-                  color: '#16A34A',
-                  background: 'rgba(22, 163, 74, 0.1)',
+                  color:
+                    doc.status === 'analyzed'
+                      ? '#10b981'
+                      : doc.status === 'error'
+                        ? '#ef4444'
+                        : '#f59e0b',
+                  background:
+                    doc.status === 'analyzed'
+                      ? 'rgba(16, 185, 129, 0.1)'
+                      : doc.status === 'error'
+                        ? 'rgba(239, 68, 68, 0.1)'
+                        : 'rgba(245, 158, 11, 0.1)',
                   padding: '2px 6px',
                   borderRadius: 4,
                 }}
               >
-                {getDocTypeLabel(doc.documentType)}
+                {doc.status}
               </span>
-            )}
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: 500,
-                color:
-                  doc.status === 'analyzed'
-                    ? '#10b981'
-                    : doc.status === 'error'
-                      ? '#ef4444'
-                      : '#f59e0b',
-                background:
-                  doc.status === 'analyzed'
-                    ? 'rgba(16, 185, 129, 0.1)'
-                    : doc.status === 'error'
-                      ? 'rgba(239, 68, 68, 0.1)'
-                      : 'rgba(245, 158, 11, 0.1)',
-                padding: '2px 6px',
-                borderRadius: 4,
-              }}
-            >
-              {doc.status}
-            </span>
-          </div>
-        </Link>
-      ))}
+            </div>
+          </Link>
+        );
+      })}
     </div>
   );
 }
@@ -455,8 +523,10 @@ function DocumentsTab({
 
 function BiasSummaryTab({
   documents,
+  aggregation,
 }: {
   documents: Array<{ id: string; filename: string; status: string }>;
+  aggregation: import('@/types/deals').DealAggregationDto | null;
 }) {
   const analyzedCount = documents.filter(d => d.status === 'analyzed').length;
 
@@ -475,26 +545,161 @@ function BiasSummaryTab({
     );
   }
 
+  const allBiases = aggregation?.allBiases ?? [];
+
   return (
-    <div
-      style={{
-        background: 'var(--bg-card)',
-        border: '1px solid var(--bg-elevated)',
-        borderRadius: 10,
-        padding: '20px 24px',
-      }}
-    >
-      <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 8 }}>
-        Bias Analysis Overview
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div
+        style={{
+          background: 'var(--bg-card)',
+          border: '1px solid var(--bg-elevated)',
+          borderRadius: 10,
+          padding: '18px 22px',
+        }}
+      >
+        <div
+          style={{
+            fontSize: 14,
+            fontWeight: 600,
+            color: 'var(--text-primary)',
+            marginBottom: 6,
+          }}
+        >
+          Bias signature across this deal
+        </div>
+        <div
+          style={{
+            fontSize: 12.5,
+            color: 'var(--text-secondary)',
+            lineHeight: 1.6,
+          }}
+        >
+          {analyzedCount} of {documents.length} document
+          {documents.length !== 1 ? 's' : ''} analyzed. The composite Deal DQI
+          and recurring biases are shown above the tabs. Below: every bias flagged
+          on any document linked to this deal, ranked by how many documents share it.
+        </div>
       </div>
-      <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-        {analyzedCount} of {documents.length} document{documents.length !== 1 ? 's' : ''} analyzed.
-        {analyzedCount > 0
-          ? ' View individual document analyses for detailed bias findings.'
-          : ' Analyze linked documents to see aggregated bias patterns across this deal.'}
-      </div>
+
+      {allBiases.length > 0 ? (
+        <div
+          style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--bg-elevated)',
+            borderRadius: 10,
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 80px 80px 80px',
+              gap: 12,
+              padding: '10px 16px',
+              background: 'var(--bg-elevated)',
+              fontSize: 11,
+              fontWeight: 800,
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              color: 'var(--text-muted)',
+            }}
+          >
+            <div>Bias</div>
+            <div style={{ textAlign: 'right' }}>Docs</div>
+            <div style={{ textAlign: 'right' }}>Flags</div>
+            <div style={{ textAlign: 'right' }}>Top sev.</div>
+          </div>
+          {allBiases.map(b => (
+            <div
+              key={b.biasType}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 80px 80px 80px',
+                gap: 12,
+                padding: '10px 16px',
+                borderTop: '1px solid var(--bg-elevated)',
+                fontSize: 12.5,
+                color: 'var(--text-primary)',
+                alignItems: 'center',
+              }}
+            >
+              <div style={{ fontWeight: 600 }}>
+                {b.biasType
+                  .split('_')
+                  .map(w => w[0]?.toUpperCase() + w.slice(1))
+                  .join(' ')}
+              </div>
+              <div
+                style={{
+                  textAlign: 'right',
+                  fontVariantNumeric: 'tabular-nums',
+                  color: b.documentCount >= 2 ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                  fontWeight: b.documentCount >= 2 ? 700 : 500,
+                }}
+              >
+                {b.documentCount}
+              </div>
+              <div
+                style={{
+                  textAlign: 'right',
+                  fontVariantNumeric: 'tabular-nums',
+                  color: 'var(--text-secondary)',
+                }}
+              >
+                {b.totalOccurrences}
+              </div>
+              <div
+                style={{
+                  textAlign: 'right',
+                  fontSize: 11,
+                  fontWeight: 600,
+                  textTransform: 'capitalize',
+                  color:
+                    b.topSeverity === 'critical'
+                      ? '#7F1D1D'
+                      : b.topSeverity === 'high'
+                        ? '#DC2626'
+                        : b.topSeverity === 'medium'
+                          ? '#D97706'
+                          : '#2563EB',
+                }}
+              >
+                {b.topSeverity}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div
+          style={{
+            fontSize: 12.5,
+            color: 'var(--text-muted)',
+            padding: '14px 18px',
+            background: 'var(--bg-card)',
+            borderRadius: 10,
+            border: '1px dashed var(--border-color)',
+          }}
+        >
+          {analyzedCount === 0
+            ? 'Analyze the linked documents to see the deal-level bias signature.'
+            : 'No biases flagged on the analyzed documents — clean reasoning so far.'}
+        </div>
+      )}
+
       {analyzedCount > 0 && (
-        <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 800,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: 'var(--text-muted)',
+              marginBottom: 4,
+            }}
+          >
+            Drill into individual analyses
+          </div>
           {documents
             .filter(d => d.status === 'analyzed')
             .map(doc => (
@@ -511,7 +716,7 @@ function BiasSummaryTab({
                 }}
               >
                 <FileText size={12} />
-                {doc.filename} — View Analysis
+                {doc.filename} — view audit
               </Link>
             ))}
         </div>
