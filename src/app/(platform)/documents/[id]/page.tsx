@@ -59,6 +59,7 @@ import {
   DocumentVisibilityPill,
   type DocumentVisibility,
 } from '@/components/documents/DocumentVisibilityModal';
+import { LegalHoldStatusChip } from '@/components/documents/LegalHoldStatusChip';
 import { DrRedTeamCard } from '@/components/analysis/DrRedTeamCard';
 import { RecommendationsPanel } from '@/components/ui/RecommendationsPanel';
 import { ExecutiveSummary } from '@/components/visualizations/ExecutiveSummary';
@@ -250,6 +251,15 @@ interface Document {
   isOwner?: boolean;
   documentType?: string | null;
   visibility?: 'private' | 'team' | 'specific';
+  legalHoldId?: string | null;
+  legalHold?: {
+    id: string;
+    reason: string | null;
+    holdUntil: string | null;
+    releasedAt: string | null;
+    grantedById: string;
+    createdAt: string;
+  } | null;
   analyses: Analysis[];
   deal?: {
     id: string;
@@ -1279,6 +1289,13 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                     }
                   />
                 )}
+                <LegalHoldStatusChip
+                  documentId={document.id}
+                  legalHoldId={document.legalHoldId ?? null}
+                  legalHold={document.legalHold ?? null}
+                  isOwner={!!document.isOwner}
+                  onChanged={() => void refetchDocument()}
+                />
               </div>
             </div>
           </div>

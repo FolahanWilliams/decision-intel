@@ -52,6 +52,17 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
           uploadedAt: true,
           status: true,
           visibility: true,
+          legalHoldId: true,
+          legalHold: {
+            select: {
+              id: true,
+              reason: true,
+              holdUntil: true,
+              releasedAt: true,
+              grantedById: true,
+              createdAt: true,
+            },
+          },
           deal: {
             select: {
               id: true,
