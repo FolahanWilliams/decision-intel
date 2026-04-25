@@ -17,6 +17,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BrainCircuit, Loader2, X } from 'lucide-react';
+import { scanForPii, type ScanResult } from '@/lib/utils/redaction-scanner';
+import { RedactionPreModal } from '@/components/ui/RedactionPreModal';
 
 interface InlinePasteMemoCardProps {
   onClose: () => void;
@@ -34,19 +36,23 @@ export function InlinePasteMemoCard({ onClose, onSubmitted }: InlinePasteMemoCar
   const [content, setContent] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Redaction gate (3.2) — when content has PII hits, the user sees the
+  // modal first. The scan + open happen on click, not on every keystroke,
+  // so paste-fast users don't watch a flicker.
+  const [redactScan, setRedactScan] = useState<ScanResult | null>(null);
+  const [pendingText, setPendingText] = useState<string | null>(null);
 
   const chars = content.trim().length;
   const canSubmit = chars >= MIN_CONTENT_CHARS && chars <= MAX_CONTENT_CHARS;
 
-  async function handleSubmit() {
-    if (!canSubmit || submitting) return;
+  async function runSubmit(textToSubmit: string) {
     setSubmitting(true);
     setError(null);
     try {
       const res = await fetch('/api/human-decisions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ source: 'manual', content: content.trim() }),
+        body: JSON.stringify({ source: 'manual', content: textToSubmit }),
       });
       const data = await res.json().catch(() => null);
       if (!res.ok || !data?.id) {
@@ -63,6 +69,18 @@ export function InlinePasteMemoCard({ onClose, onSubmitted }: InlinePasteMemoCar
       setError('Network error. Please try again.');
       setSubmitting(false);
     }
+  }
+
+  async function handleSubmit() {
+    if (!canSubmit || submitting) return;
+    const trimmed = content.trim();
+    const scan = scanForPii(trimmed);
+    if (scan.hits.length > 0) {
+      setPendingText(trimmed);
+      setRedactScan(scan);
+      return;
+    }
+    await runSubmit(trimmed);
   }
 
   return (
@@ -190,6 +208,30 @@ export function InlinePasteMemoCard({ onClose, onSubmitted }: InlinePasteMemoCar
         >
           {error}
         </div>
+      )}
+
+      {redactScan && pendingText && (
+        <RedactionPreModal
+          isOpen
+          text={pendingText}
+          scan={redactScan}
+          onRedact={async redacted => {
+            setContent(redacted);
+            setRedactScan(null);
+            setPendingText(null);
+            await runSubmit(redacted);
+          }}
+          onSkip={async () => {
+            const t = pendingText;
+            setRedactScan(null);
+            setPendingText(null);
+            if (t) await runSubmit(t);
+          }}
+          onCancel={() => {
+            setRedactScan(null);
+            setPendingText(null);
+          }}
+        />
       )}
     </div>
   );

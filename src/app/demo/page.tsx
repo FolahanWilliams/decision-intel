@@ -31,6 +31,8 @@ import { NoiseDistributionViz } from '@/components/marketing/how-it-works/NoiseD
 import { DQIBadge } from '@/components/ui/DQIBadge';
 import { Reveal } from '@/components/ui/Reveal';
 import { PasteAuditResults } from '@/components/marketing/demo/PasteAuditResults';
+import { RedactionPreModal } from '@/components/ui/RedactionPreModal';
+import { scanForPii, type ScanResult } from '@/lib/utils/redaction-scanner';
 import { trackEvent } from '@/lib/analytics/track';
 import type { AnalysisResult } from '@/types';
 
@@ -182,6 +184,9 @@ export default function DemoPage() {
   } | null>(null);
   const [pasteError, setPasteError] = useState<string | null>(null);
   const [pasteStageIdx, setPasteStageIdx] = useState(0);
+  // Redaction gate (3.2) — opens the modal when a paste contains PII.
+  const [redactScan, setRedactScan] = useState<ScanResult | null>(null);
+  const [redactPending, setRedactPending] = useState<string | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
   const [activeSection, setActiveSection] = useState('pipeline');
   const [showAllBiases, setShowAllBiases] = useState(false);
@@ -221,11 +226,8 @@ export default function DemoPage() {
   // Handle paste mode submission — runs the REAL 12-node pipeline via
   // /api/demo/run. Displays a staged progress animation while the audit
   // is running, then hands the result to <PasteAuditResults>.
-  const handlePasteAnalyze = useCallback(async () => {
-    const trimmed = pasteText.trim();
-    if (trimmed.length < 15) return;
-
-    trackEvent('demo_paste_analyzed', { textLength: trimmed.length });
+  const runPasteAudit = useCallback(async (textToAudit: string) => {
+    trackEvent('demo_paste_analyzed', { textLength: textToAudit.length });
     setPasteAuditing(true);
     setPasteError(null);
     setPasteAudit(null);
@@ -235,7 +237,7 @@ export default function DemoPage() {
       const res = await fetch('/api/demo/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: trimmed }),
+        body: JSON.stringify({ text: textToAudit }),
       });
       const body = (await res.json().catch(() => ({}))) as {
         success?: boolean;
@@ -270,7 +272,20 @@ export default function DemoPage() {
       setPasteError(msg);
       setPasteAuditing(false);
     }
-  }, [pasteText]);
+  }, []);
+
+  // Click handler — gates the run on the redaction modal when PII is detected.
+  const handlePasteAnalyze = useCallback(() => {
+    const trimmed = pasteText.trim();
+    if (trimmed.length < 15) return;
+    const scan = scanForPii(trimmed);
+    if (scan.hits.length > 0) {
+      setRedactPending(trimmed);
+      setRedactScan(scan);
+      return;
+    }
+    void runPasteAudit(trimmed);
+  }, [pasteText, runPasteAudit]);
 
   // Cycle through the progress stages while the real pipeline runs
   useEffect(() => {
@@ -2032,6 +2047,34 @@ export default function DemoPage() {
             </p>
           </div>
         </SectionBand>
+      )}
+
+      {redactScan && redactPending && (
+        <RedactionPreModal
+          isOpen
+          text={redactPending}
+          scan={redactScan}
+          onRedact={async redacted => {
+            setPasteText(redacted);
+            const t = redacted;
+            setRedactScan(null);
+            setRedactPending(null);
+            trackEvent('demo_paste_redacted', { hits: redactScan.hits.length });
+            await runPasteAudit(t);
+          }}
+          onSkip={async () => {
+            const t = redactPending;
+            setRedactScan(null);
+            setRedactPending(null);
+            trackEvent('demo_paste_redact_skipped', { hits: redactScan.hits.length });
+            if (t) await runPasteAudit(t);
+          }}
+          onCancel={() => {
+            setRedactScan(null);
+            setRedactPending(null);
+            trackEvent('demo_paste_redact_cancelled', { hits: redactScan.hits.length });
+          }}
+        />
       )}
     </div>
   );
