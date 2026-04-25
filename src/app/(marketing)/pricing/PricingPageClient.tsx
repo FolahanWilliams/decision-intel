@@ -105,13 +105,13 @@ function buildTiers(_cycle: BillingCycle): Tier[] {
       priceMonthly: null,
       priceAnnual: null,
       customPrice: 'Custom',
-      anchor: 'Annual · negotiated per seat',
+      anchor: '20-30 seats from $4,000/mo · custom above that',
       highlights: [
-        { label: 'Unlimited team seats', strong: true },
+        { label: '20-30 seats from $4,000/month', strong: true },
+        { label: 'Unlimited audits and Decision Packages' },
         { label: 'SSO + SCIM + custom taxonomy' },
         { label: 'Multi-division management' },
         { label: 'Signed DPA + audit-log retention SLA' },
-        { label: 'EU-region hosting option' },
         { label: 'Everything in Strategy' },
       ],
       cta: { label: 'Contact sales', action: 'contact' },
@@ -677,6 +677,26 @@ export function PricingPageClient() {
                       <span style={{ color: C.green, fontWeight: 600 }}>
                         Talk to the founder →
                       </span>
+                    </Link>
+                  )}
+                  {tier.cta.action === 'contact' && (
+                    <Link
+                      href="/pricing/quote"
+                      onClick={() =>
+                        trackEvent('pricing_quote_builder_clicked', { tier: tier.id })
+                      }
+                      style={{
+                        display: 'block',
+                        marginTop: 10,
+                        textAlign: 'center',
+                        fontSize: 12.5,
+                        color: C.slate500,
+                        textDecoration: 'none',
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      Or build a procurement-grade quote PDF —{' '}
+                      <span style={{ color: C.green, fontWeight: 600 }}>no login →</span>
                     </Link>
                   )}
                 </div>

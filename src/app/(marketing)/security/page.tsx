@@ -82,7 +82,7 @@ const TRUST_SPINE: Array<{ icon: LucideIcon; label: string; body: string }> = [
   {
     icon: Server,
     label: 'SOC 2 infrastructure',
-    body: 'Hosted on Vercel (SOC 2 Type II) + Supabase (SOC 2 Type II, HIPAA). Our own SOC 2 audit is scoped for 2026; in-flight controls already mirror Type II.',
+    body: 'Hosted on Vercel (SOC 2 Type II) + Supabase (SOC 2 Type II, HIPAA). Our own product audit is targeted for Type I completion in Q4 2026, with the Type II observation window opening immediately after. In-flight controls already mirror Type II.',
   },
 ];
 

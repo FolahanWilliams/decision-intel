@@ -90,7 +90,7 @@ const OBJECTIONS: Objection[] = [
     number: '02',
     question: 'What happens to our data?',
     answer:
-      'Documents are encrypted at rest with authenticated AES-256-GCM (keyVersion-rotated). A GDPR anonymizer runs as the literal first node of the pipeline, so no analysis model ever sees raw PII. No customer data is used to train upstream models. Hosted on SOC 2 Type II infrastructure (Vercel + Supabase); our own product-level SOC 2 audit is scoped for 2026 with controls already mirroring Type II. Full posture at /security.',
+      'Documents are encrypted at rest with authenticated AES-256-GCM (keyVersion-rotated). A GDPR anonymizer runs as the literal first node of the pipeline, so no analysis model ever sees raw PII. No customer data is used to train upstream models. Hosted on SOC 2 Type II infrastructure (Vercel + Supabase); our own product-level SOC 2 Type I completion is targeted for Q4 2026 with the Type II observation window opening immediately after, and in-flight controls already mirror Type II. Full posture at /security.',
   },
   {
     number: '03',

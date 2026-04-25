@@ -88,10 +88,13 @@ export async function POST(
     }
 
     // Cap the run rate. Cross-ref is a Gemini call per attempt — we don't
-    // want a button-mash to burn budget. 5/hr/user is generous.
+    // want a button-mash to burn budget. 20/hr/user (raised 2026-04-25 from
+    // 5/hr per Marcus's audit catch — IC-night iteration + auto-run on each
+    // doc completion both push real users above 5/hr without the agent
+    // becoming pathological).
     const rate = await checkRateLimit(user.id, 'deal-cross-reference', {
       windowMs: 60 * 60 * 1000,
-      maxRequests: 5,
+      maxRequests: 20,
       failMode: 'closed',
     });
     if (!rate.success) {

@@ -239,10 +239,15 @@ function buildDpaTemplate() {
   );
 
   y = pageIfNeeded(doc, y);
-  y = H2(doc, '7. International transfers', y);
+  y = H2(doc, '7. Data residency and international transfers', y);
   y = P(
     doc,
-    'Where Processing involves transfer of Personal Data outside the European Economic Area or the United Kingdom, the parties rely on the Standard Contractual Clauses (Commission Implementing Decision (EU) 2021/914) or the UK International Data Transfer Addendum, as applicable. These clauses are incorporated by reference.',
+    'Processor\'s primary processing region is the United States. Application hosting (Vercel) and database / file storage (Supabase) operate from US-region infrastructure. There is no EU-region or African-region processing option in production today; Controllers requiring a specific regional processing commitment should contact privacy@decision-intel.com before contract execution to discuss feasibility.',
+    y
+  );
+  y = P(
+    doc,
+    'Where Processing involves transfer of Personal Data from the European Economic Area, the United Kingdom, or another jurisdiction whose data-protection law restricts cross-border transfer, the parties rely on the Standard Contractual Clauses (Commission Implementing Decision (EU) 2021/914), the UK International Data Transfer Addendum, or the equivalent standard mechanism for the originating jurisdiction (including, where applicable, NDPR cross-border transfer requirements for Nigerian data subjects). These clauses are incorporated by reference. Processor will not transfer Personal Data to any third country whose data-protection law would prevent the application of an appropriate transfer mechanism.',
     y
   );
 

@@ -15,9 +15,28 @@ interface Defaults {
 
 interface Props {
   defaults: Defaults;
+  /**
+   * Override the API endpoint the builder POSTs to. Defaults to the
+   * admin-only `/api/billing/enterprise-quote`; the public `/pricing/quote`
+   * surface passes `/api/billing/enterprise-quote-public` (IP-rate-limited,
+   * no auth) instead.
+   */
+  apiEndpoint?: string;
+  /**
+   * Override the back-link target. Defaults to /dashboard/settings; the
+   * public surface passes /pricing.
+   */
+  backHref?: string;
+  /** Override the back-link label. Defaults to "Back to settings". */
+  backLabel?: string;
 }
 
-export function EnterpriseQuoteBuilderClient({ defaults }: Props) {
+export function EnterpriseQuoteBuilderClient({
+  defaults,
+  apiEndpoint = '/api/billing/enterprise-quote',
+  backHref = '/dashboard/settings',
+  backLabel = 'Back to settings',
+}: Props) {
   const [customerName, setCustomerName] = useState('');
   const [contactName, setContactName] = useState('');
   const [contactEmail, setContactEmail] = useState('');
@@ -52,7 +71,7 @@ export function EnterpriseQuoteBuilderClient({ defaults }: Props) {
     }
     setBusy(true);
     try {
-      const res = await fetch('/api/billing/enterprise-quote', {
+      const res = await fetch(apiEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -96,7 +115,7 @@ export function EnterpriseQuoteBuilderClient({ defaults }: Props) {
     <div style={{ padding: 'var(--spacing-xl)', maxWidth: 1080, margin: '0 auto' }}>
       <div style={{ marginBottom: 'var(--spacing-md)' }}>
         <Link
-          href="/dashboard/settings"
+          href={backHref}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -109,7 +128,7 @@ export function EnterpriseQuoteBuilderClient({ defaults }: Props) {
             fontWeight: 600,
           }}
         >
-          <ChevronLeft size={14} /> Back to settings
+          <ChevronLeft size={14} /> {backLabel}
         </Link>
       </div>
 

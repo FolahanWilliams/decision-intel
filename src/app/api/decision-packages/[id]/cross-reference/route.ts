@@ -78,11 +78,12 @@ export async function POST(
     }
     const { id: packageId } = await params;
 
-    // Same rate cap as deal cross-ref: 5/hr/user. The LLM call is the
-    // same shape and cost; sharing a single bucket would also be fine.
+    // Same rate cap as deal cross-ref: 20/hr/user (raised 2026-04-25
+    // from 5/hr per Marcus's audit catch). The LLM call is the same
+    // shape and cost; sharing a single bucket would also be fine.
     const rate = await checkRateLimit(user.id, 'decision-package-cross-reference', {
       windowMs: 60 * 60 * 1000,
-      maxRequests: 5,
+      maxRequests: 20,
       failMode: 'closed',
     });
     if (!rate.success) {
