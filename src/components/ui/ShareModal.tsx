@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   Download,
   FileText,
@@ -15,6 +15,10 @@ import {
   Presentation,
   ShieldCheck,
   Clock,
+  Eye,
+  Trash2,
+  AlertCircle,
+  RefreshCw,
 } from 'lucide-react';
 
 // Board-member share expiries (3.3). 24h is the default — the most common
@@ -70,7 +74,21 @@ interface ShareModalProps {
   onExportJson: () => void;
 }
 
-type ActiveTab = 'export' | 'share';
+type ActiveTab = 'export' | 'share' | 'manage';
+
+interface ShareLinkRow {
+  id: string;
+  token: string;
+  url: string;
+  expiresAt: string | null;
+  revokedAt: string | null;
+  viewCount: number;
+  lastViewedAt: string | null;
+  isCaseStudy: boolean;
+  hasPassword: boolean;
+  createdAt: string;
+  status: 'active' | 'expired' | 'revoked';
+}
 
 export function ShareModal({
   isOpen,
@@ -99,6 +117,10 @@ export function ShareModal({
   const [creatingCaseStudy, setCreatingCaseStudy] = useState(false);
   const [caseStudyCopied, setCaseStudyCopied] = useState(false);
   const [expiry, setExpiry] = useState<ExpiryChoice>('24h');
+  const [requireRecipientEmail, setRequireRecipientEmail] = useState(false);
+  const [manageLinks, setManageLinks] = useState<ShareLinkRow[] | null>(null);
+  const [loadingLinks, setLoadingLinks] = useState(false);
+  const [revokingId, setRevokingId] = useState<string | null>(null);
   const { showToast } = useToast();
 
   const handlePdfExport = useCallback(async () => {
@@ -170,7 +192,11 @@ export function ShareModal({
       const res = await fetch('/api/share', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ analysisId, expiresInHours: expiryToHours(expiry) }),
+        body: JSON.stringify({
+          analysisId,
+          expiresInHours: expiryToHours(expiry),
+          requireEmail: requireRecipientEmail,
+        }),
       });
       if (res.ok) {
         const data = await res.json();
@@ -189,7 +215,7 @@ export function ShareModal({
     } finally {
       setCreatingLink(false);
     }
-  }, [analysisId, expiry, showToast]);
+  }, [analysisId, expiry, requireRecipientEmail, showToast]);
 
   const handleCreateCaseStudyLink = useCallback(async () => {
     if (!analysisId) return;
@@ -218,6 +244,63 @@ export function ShareModal({
       setCreatingCaseStudy(false);
     }
   }, [analysisId, showToast]);
+
+  const fetchManageLinks = useCallback(async () => {
+    if (!analysisId) return;
+    setLoadingLinks(true);
+    try {
+      const res = await fetch(`/api/share?analysisId=${analysisId}`);
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setManageLinks(data.links ?? []);
+      } else {
+        setManageLinks([]);
+      }
+    } catch {
+      setManageLinks([]);
+    } finally {
+      setLoadingLinks(false);
+    }
+  }, [analysisId]);
+
+  useEffect(() => {
+    if (activeTab === 'manage' && analysisId && manageLinks === null) {
+      void fetchManageLinks();
+    }
+  }, [activeTab, analysisId, manageLinks, fetchManageLinks]);
+
+  const handleRevokeLink = useCallback(
+    async (id: string) => {
+      setRevokingId(id);
+      try {
+        const res = await fetch(`/api/share?id=${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          showToast('Share link revoked.', 'success');
+          await fetchManageLinks();
+        } else {
+          const data = await res.json().catch(() => ({}));
+          showToast(data.error || 'Revoke failed.', 'error');
+        }
+      } catch {
+        showToast('Revoke failed.', 'error');
+      } finally {
+        setRevokingId(null);
+      }
+    },
+    [fetchManageLinks, showToast]
+  );
+
+  const handleCopyManageUrl = useCallback(
+    async (url: string) => {
+      try {
+        await navigator.clipboard.writeText(url);
+        showToast('Link copied!', 'success');
+      } catch {
+        showToast('Failed to copy.', 'error');
+      }
+    },
+    [showToast]
+  );
 
   const handleEmailShare = useCallback(() => {
     const subject = encodeURIComponent(`Decision Audit: ${documentName}`);
@@ -253,7 +336,7 @@ export function ShareModal({
             borderBottom: '1px solid var(--border-color)',
           }}
         >
-          {(['export', 'share'] as const).map(tab => (
+          {(['export', 'share', 'manage'] as const).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -271,7 +354,11 @@ export function ShareModal({
                 cursor: 'pointer',
               }}
             >
-              {tab === 'export' ? 'Export' : 'Quick Share'}
+              {tab === 'export'
+                ? 'Export'
+                : tab === 'share'
+                  ? 'Quick Share'
+                  : 'Manage Links'}
             </button>
           ))}
         </div>
@@ -501,6 +588,33 @@ export function ShareModal({
                     {expiry === 'never' &&
                       ' — link stays live until you revoke it. Use sparingly.'}
                   </div>
+
+                  <label
+                    style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: 8,
+                      marginTop: 12,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={requireRecipientEmail}
+                      onChange={e => setRequireRecipientEmail(e.target.checked)}
+                      style={{
+                        marginTop: 2,
+                        accentColor: 'var(--accent-primary)',
+                        cursor: 'pointer',
+                      }}
+                    />
+                    <span style={{ fontSize: 11.5, color: 'var(--text-secondary)' }}>
+                      Require recipient email
+                      <span style={{ display: 'block', fontSize: 10.5, color: 'var(--text-muted)', marginTop: 1 }}>
+                        Viewer must enter an email before the analysis loads. Captured on the access log.
+                      </span>
+                    </span>
+                  </label>
                 </div>
               )}
 
@@ -688,6 +802,221 @@ export function ShareModal({
                   </div>
                 </div>
               </Button>
+            </div>
+          )}
+
+          {/* Manage Links Tab (3.3 deep) */}
+          {activeTab === 'manage' && analysisId && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '8px 4px',
+                }}
+              >
+                <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                  {loadingLinks
+                    ? 'Loading…'
+                    : `${manageLinks?.length ?? 0} link${(manageLinks?.length ?? 0) === 1 ? '' : 's'} for this analysis`}
+                </span>
+                <button
+                  onClick={() => void fetchManageLinks()}
+                  className="btn btn-ghost btn-sm"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    fontSize: 11,
+                  }}
+                  aria-label="Refresh"
+                >
+                  <RefreshCw size={11} />
+                  Refresh
+                </button>
+              </div>
+
+              {!loadingLinks && (manageLinks?.length ?? 0) === 0 && (
+                <div
+                  style={{
+                    padding: '16px',
+                    textAlign: 'center',
+                    fontSize: 12.5,
+                    color: 'var(--text-muted)',
+                    background: 'var(--bg-card)',
+                    border: '1px dashed var(--border-color)',
+                    borderRadius: 'var(--radius-md)',
+                  }}
+                >
+                  No share links yet. Use the Quick Share tab to create one.
+                </div>
+              )}
+
+              {(manageLinks ?? []).map(link => {
+                const statusColour =
+                  link.status === 'active'
+                    ? '#16A34A'
+                    : link.status === 'expired'
+                      ? '#D97706'
+                      : '#7F1D1D';
+                const statusLabel =
+                  link.status === 'active'
+                    ? link.expiresAt
+                      ? `expires ${new Date(link.expiresAt).toLocaleString()}`
+                      : 'no expiry'
+                    : link.status === 'expired'
+                      ? `expired ${link.expiresAt ? new Date(link.expiresAt).toLocaleString() : ''}`
+                      : `revoked ${link.revokedAt ? new Date(link.revokedAt).toLocaleString() : ''}`;
+                return (
+                  <div
+                    key={link.id}
+                    style={{
+                      border: '1px solid var(--border-color)',
+                      borderLeft: `3px solid ${statusColour}`,
+                      borderRadius: 'var(--radius-md)',
+                      padding: '10px 12px',
+                      background: 'var(--bg-card)',
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: 8,
+                        flexWrap: 'wrap',
+                        marginBottom: 6,
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 6,
+                          fontSize: 11,
+                          fontWeight: 700,
+                          letterSpacing: '0.06em',
+                          textTransform: 'uppercase',
+                          color: statusColour,
+                        }}
+                      >
+                        {link.status === 'active' ? (
+                          <Clock size={11} />
+                        ) : (
+                          <AlertCircle size={11} />
+                        )}
+                        {link.status} · {statusLabel}
+                      </div>
+                      <div
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 8,
+                          fontSize: 11,
+                          color: 'var(--text-muted)',
+                        }}
+                      >
+                        <span title={`${link.viewCount} view${link.viewCount === 1 ? '' : 's'}`}>
+                          <Eye
+                            size={11}
+                            style={{ verticalAlign: -2, marginRight: 2 }}
+                          />
+                          {link.viewCount}
+                        </span>
+                        {link.isCaseStudy && (
+                          <span
+                            style={{
+                              padding: '1px 6px',
+                              fontSize: 10,
+                              fontWeight: 700,
+                              borderRadius: 999,
+                              background: 'rgba(22,163,74,0.10)',
+                              color: '#16A34A',
+                            }}
+                          >
+                            CASE
+                          </span>
+                        )}
+                        {link.hasPassword && (
+                          <span
+                            style={{
+                              padding: '1px 6px',
+                              fontSize: 10,
+                              fontWeight: 700,
+                              borderRadius: 999,
+                              background: 'rgba(124,58,237,0.10)',
+                              color: '#7C3AED',
+                            }}
+                          >
+                            PWD
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        fontFamily: 'var(--font-mono, monospace)',
+                        fontSize: 11,
+                        color: 'var(--text-secondary)',
+                        wordBreak: 'break-all',
+                        marginBottom: 8,
+                      }}
+                    >
+                      {link.url}
+                    </div>
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      <button
+                        onClick={() => void handleCopyManageUrl(link.url)}
+                        className="btn btn-outline btn-sm"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 4,
+                          fontSize: 11,
+                        }}
+                      >
+                        <Copy size={11} /> Copy
+                      </button>
+                      {link.status === 'active' && (
+                        <button
+                          onClick={() => void handleRevokeLink(link.id)}
+                          disabled={revokingId === link.id}
+                          className="btn btn-outline btn-sm"
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 4,
+                            fontSize: 11,
+                            color: '#DC2626',
+                            borderColor: 'rgba(220,38,38,0.3)',
+                          }}
+                        >
+                          {revokingId === link.id ? (
+                            <Loader2 size={11} className="animate-spin" />
+                          ) : (
+                            <Trash2 size={11} />
+                          )}
+                          Revoke
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {activeTab === 'manage' && !analysisId && (
+            <div
+              style={{
+                padding: 16,
+                fontSize: 12.5,
+                color: 'var(--text-muted)',
+                textAlign: 'center',
+              }}
+            >
+              No analysis bound to this modal. Manage links is available once an audit completes.
             </div>
           )}
         </div>

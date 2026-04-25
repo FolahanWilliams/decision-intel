@@ -343,9 +343,13 @@ export default function SharedAnalysisPage() {
   const [requiresPassword, setRequiresPassword] = useState(false);
   const [password, setPassword] = useState('');
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
+  const [sharedByEmail, setSharedByEmail] = useState<string | null>(null);
   const [isCaseStudy, setIsCaseStudy] = useState(searchParams.get('case') === 'true');
+  const [requiresEmail, setRequiresEmail] = useState(false);
+  const [recipientEmail, setRecipientEmail] = useState('');
+  const [emailError, setEmailError] = useState<string | null>(null);
 
-  const fetchAnalysis = async (pwd?: string) => {
+  const fetchAnalysis = async (pwd?: string, email?: string) => {
     setLoading(true);
     setError(null);
     try {
@@ -354,9 +358,16 @@ export default function SharedAnalysisPage() {
 
       const headers: Record<string, string> = {};
       if (pwd) headers['x-share-password'] = pwd;
+      if (email) headers['x-recipient-email'] = email;
 
       const res = await fetch(url.toString(), { headers });
       const data = await res.json();
+
+      if (res.status === 401 && data.requiresEmail) {
+        setRequiresEmail(true);
+        setLoading(false);
+        return;
+      }
 
       if (res.status === 401 && data.requiresPassword) {
         setRequiresPassword(true);
@@ -372,6 +383,7 @@ export default function SharedAnalysisPage() {
 
       setAnalysis(data.analysis);
       setExpiresAt(data.expiresAt);
+      setSharedByEmail(data.sharedByEmail ?? null);
       if (data.isCaseStudy) setIsCaseStudy(true);
       if (data.isCaseStudy || isCaseStudy) {
         trackEvent('case_study_viewed');
@@ -382,6 +394,7 @@ export default function SharedAnalysisPage() {
         analysisId: data.analysis?.id,
       });
       setRequiresPassword(false);
+      setRequiresEmail(false);
     } catch {
       setError('Network error. Please try again.');
     } finally {
@@ -402,6 +415,112 @@ export default function SharedAnalysisPage() {
     () => (analysis ? new Date(analysis.createdAt).toLocaleDateString() : ''),
     [analysis]
   );
+
+  /* ─── Email gate (3.3 deep) ──────────────────────────────────── */
+
+  if (requiresEmail && !analysis) {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          background: C.slate50,
+          color: C.slate900,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <div
+          style={{
+            maxWidth: 420,
+            width: '90%',
+            background: C.white,
+            border: `1px solid ${C.slate200}`,
+            borderRadius: 20,
+            padding: 32,
+            textAlign: 'center',
+            boxShadow: '0 10px 30px rgba(15,23,42,0.08)',
+          }}
+        >
+          <div
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: 14,
+              background: C.greenLight,
+              color: C.green,
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: 14,
+            }}
+          >
+            <Lock size={22} />
+          </div>
+          <h2 style={{ fontSize: 22, fontWeight: 700, margin: 0, marginBottom: 6 }}>
+            Identify yourself to continue
+          </h2>
+          <p style={{ color: C.slate500, margin: 0, marginBottom: 20, fontSize: 14 }}>
+            The owner of this link asked to record who reads it. Your email
+            is logged on the access trail and not shared further.
+          </p>
+          <form
+            onSubmit={e => {
+              e.preventDefault();
+              const trimmed = recipientEmail.trim().toLowerCase();
+              if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+                setEmailError('Please enter a valid email address.');
+                return;
+              }
+              setEmailError(null);
+              fetchAnalysis(undefined, trimmed);
+            }}
+          >
+            <input
+              type="email"
+              value={recipientEmail}
+              onChange={e => setRecipientEmail(e.target.value)}
+              placeholder="you@yourcompany.com"
+              autoFocus
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                background: C.white,
+                border: `1px solid ${C.slate200}`,
+                borderRadius: 10,
+                color: C.slate900,
+                fontSize: 14,
+                marginBottom: 12,
+                outline: 'none',
+              }}
+            />
+            <button
+              type="submit"
+              disabled={!recipientEmail || loading}
+              style={{
+                width: '100%',
+                padding: '12px',
+                background: C.green,
+                color: C.white,
+                border: 'none',
+                borderRadius: 10,
+                fontWeight: 700,
+                cursor: 'pointer',
+                opacity: !recipientEmail || loading ? 0.5 : 1,
+                boxShadow: '0 6px 20px rgba(22,163,74,0.24)',
+              }}
+            >
+              {loading ? 'Loading…' : 'View audit'}
+            </button>
+          </form>
+          {emailError && (
+            <p style={{ color: C.red, marginTop: 12, fontSize: 13 }}>{emailError}</p>
+          )}
+          {error && <p style={{ color: C.red, marginTop: 12, fontSize: 13 }}>{error}</p>}
+        </div>
+      </div>
+    );
+  }
 
   /* ─── Password gate ──────────────────────────────────────────── */
 
@@ -641,6 +760,51 @@ export default function SharedAnalysisPage() {
           </div>
         </div>
       </div>
+
+      {/* 3.3 deep — provenance watermark. Sits below the header on every
+          page of the shared view so a screen-shotted page still carries
+          who shared it + when the link expires. Procurement-grade. */}
+      {!isCaseStudy && (sharedByEmail || expiresAt) && (
+        <div
+          style={{
+            background: 'rgba(15,23,42,0.04)',
+            borderBottom: `1px solid ${C.slate200}`,
+            padding: '8px 24px',
+          }}
+        >
+          <div
+            style={{
+              maxWidth: 960,
+              margin: '0 auto',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 12,
+              flexWrap: 'wrap',
+              fontSize: 11,
+              color: C.slate500,
+            }}
+          >
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                fontWeight: 600,
+              }}
+            >
+              {sharedByEmail
+                ? `Shared by ${sharedByEmail}`
+                : 'Shared from a Decision Intel account'}
+            </span>
+            <span style={{ fontFamily: 'var(--font-mono, monospace)' }}>
+              {expiresAt
+                ? `Link expires ${new Date(expiresAt).toLocaleString()}`
+                : 'No expiry · revocable by the owner'}
+            </span>
+          </div>
+        </div>
+      )}
 
       <main
         style={{

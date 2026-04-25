@@ -815,6 +815,10 @@ model ShareLink {
   expiresAt    DateTime?
   revokedAt    DateTime?
   password     String?
+  /// 3.3 deep — optional recipient-email gate. When true, the public
+  /// viewer must enter an email before the analysis loads. The captured
+  /// email is stored on the ShareLinkAccess row that records each view.
+  requireEmail Boolean   @default(false)
   viewCount    Int       @default(0)
   lastViewedAt DateTime?
   isCaseStudy  Boolean   @default(false)
@@ -916,6 +920,9 @@ model ShareLinkAccess {
   shareLink   ShareLink @relation(fields: [shareLinkId], references: [id], onDelete: Cascade)
   ipAddress   String?
   userAgent   String?
+  /// 3.3 deep — captured when the parent ShareLink has requireEmail=true.
+  /// Stored verbatim; lowercased on write.
+  viewerEmail String?
   createdAt   DateTime  @default(now())
 
   @@index([shareLinkId])

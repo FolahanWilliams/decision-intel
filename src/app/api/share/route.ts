@@ -14,6 +14,7 @@ import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import { safeCompare } from '@/lib/utils/safe-compare';
+import { logAudit } from '@/lib/audit';
 
 const log = createLogger('ShareLink');
 
@@ -28,6 +29,8 @@ const CreateShareSchema = z.object({
   expiresInDays: z.number().min(1).max(90).optional(),
   password: z.string().min(4).max(100).optional(),
   isCaseStudy: z.boolean().optional().default(false),
+  /** Optional viewer-email gate (3.3 deep). */
+  requireEmail: z.boolean().optional().default(false),
 });
 
 export async function POST(req: NextRequest) {
@@ -42,8 +45,14 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { analysisId, expiresInHours, expiresInDays, password, isCaseStudy } =
-      CreateShareSchema.parse(body);
+    const {
+      analysisId,
+      expiresInHours,
+      expiresInDays,
+      password,
+      isCaseStudy,
+      requireEmail,
+    } = CreateShareSchema.parse(body);
 
     // Resolve effective expiry: hours wins over days; null = never (forced to
     // null on case-study links). If neither was provided, fall back to 7 days
@@ -93,6 +102,7 @@ export async function POST(req: NextRequest) {
         expiresAt: expiryMs === null ? null : new Date(Date.now() + expiryMs),
         password: passwordHash,
         isCaseStudy,
+        requireEmail: !!requireEmail,
       },
     });
 
@@ -101,6 +111,20 @@ export async function POST(req: NextRequest) {
     log.info(
       `Share link created for analysis ${analysisId} by ${user.id}${isCaseStudy ? ' (case study)' : ''}`
     );
+
+    // 3.3 deep — audit trail. Fire-and-forget so it never blocks share creation.
+    logAudit({
+      action: 'SHARE_LINK_CREATED',
+      resource: 'ShareLink',
+      resourceId: link.id,
+      details: {
+        analysisId,
+        token: link.token,
+        expiresAt: link.expiresAt?.toISOString() ?? null,
+        isCaseStudy: link.isCaseStudy,
+        hasPassword: !!passwordHash,
+      },
+    }).catch(() => null);
 
     // Referrer/funnel attribution lives in AnalyticsEvent so we can answer
     // "shares created → viewed → signup_from_share" without a schema
@@ -148,6 +172,14 @@ export async function GET(req: NextRequest) {
     return getShareLinkAccessHistory(req);
   }
 
+  // 3.3 deep — owner list view: ?analysisId=X (no token) returns every
+  // ShareLink for the analysis the caller owns. Used by the Manage
+  // links tab on the ShareModal.
+  const listAnalysisId = searchParams.get('analysisId');
+  if (listAnalysisId && !searchParams.get('token')) {
+    return getShareLinkListForAnalysis(req, listAnalysisId);
+  }
+
   const token = searchParams.get('token');
   // Accept password from header to avoid exposing it in query params,
   // server logs, browser history, and referrer headers.
@@ -182,6 +214,22 @@ export async function GET(req: NextRequest) {
 
     if (link.expiresAt && link.expiresAt < new Date()) {
       return NextResponse.json({ error: 'This share link has expired' }, { status: 410 });
+    }
+
+    // 3.3 deep — recipient-email gate.
+    const recipientEmailRaw =
+      req.headers.get('x-recipient-email') || searchParams.get('recipient_email');
+    const recipientEmail = recipientEmailRaw?.trim().toLowerCase() ?? null;
+    if (link.requireEmail) {
+      if (!recipientEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipientEmail)) {
+        return NextResponse.json(
+          {
+            error: 'Email required to view this link',
+            requiresEmail: true,
+          },
+          { status: 401 }
+        );
+      }
     }
 
     // Check password if set
@@ -239,7 +287,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Analysis no longer exists' }, { status: 404 });
     }
 
-    // Update view count and create access log atomically (fire and forget)
+    // Update view count and create access log atomically (fire and forget).
+    // viewerEmail is captured when requireEmail=true was satisfied.
     prisma
       .$transaction([
         prisma.shareLink.update({
@@ -249,8 +298,9 @@ export async function GET(req: NextRequest) {
         prisma.shareLinkAccess.create({
           data: {
             shareLinkId: link.id,
-            ipAddress: clientIp.slice(0, 45), // Limit IP length for IPv6 compatibility
+            ipAddress: clientIp.slice(0, 45),
             userAgent: req.headers.get('user-agent')?.slice(0, 256) || null,
+            viewerEmail: recipientEmail,
           },
         }),
       ])
@@ -272,6 +322,33 @@ export async function GET(req: NextRequest) {
         },
       });
     }
+
+    // 3.3 deep — resolve the sharer's email so the public viewer can
+    // render a "Shared by …" watermark. Fall back to a generic label if
+    // we can't find a TeamMember row (case studies often won't have one).
+    let sharedByEmail: string | null = null;
+    try {
+      const tm = await prisma.teamMember.findFirst({
+        where: { userId: link.userId },
+        select: { email: true, displayName: true },
+      });
+      sharedByEmail = tm?.displayName || tm?.email || null;
+    } catch {
+      // Schema drift — leave null
+    }
+
+    // Audit-trail the view as well — useful for procurement-grade
+    // "who-saw-what-when" follow-ups. Fire-and-forget.
+    logAudit({
+      action: 'SHARE_LINK_VIEWED',
+      resource: 'ShareLink',
+      resourceId: link.id,
+      details: {
+        token: link.token,
+        analysisId: link.analysisId,
+        ipAddress: clientIp.slice(0, 45),
+      },
+    }).catch(() => null);
 
     const responseData = {
       analysis: {
@@ -298,6 +375,7 @@ export async function GET(req: NextRequest) {
         createdAt: analysis.createdAt,
       },
       sharedBy: link.userId,
+      sharedByEmail,
       expiresAt: link.expiresAt,
       isCaseStudy: link.isCaseStudy,
     };
@@ -342,6 +420,13 @@ export async function DELETE(req: NextRequest) {
       where: { id },
       data: { revokedAt: new Date() },
     });
+
+    logAudit({
+      action: 'SHARE_LINK_REVOKED',
+      resource: 'ShareLink',
+      resourceId: id,
+      details: { token: link.token, analysisId: link.analysisId },
+    }).catch(() => null);
 
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -400,3 +485,76 @@ async function getShareLinkAccessHistory(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to fetch access history' }, { status: 500 });
   }
 }
+
+/**
+ * GET /api/share?analysisId=X — owner-only list of every ShareLink the
+ * caller has created against the given analysis. Powers the "Manage
+ * links" tab on the ShareModal (3.3 deep).
+ *
+ * Returns active + expired + revoked rows so the owner sees the full
+ * history; the UI is responsible for grouping. Each row includes the
+ * derived URL so the user can copy it without recomputing.
+ */
+async function getShareLinkListForAnalysis(req: NextRequest, analysisId: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  try {
+    // Verify the caller is the document owner — same authority as
+    // share-link creation. A teammate with read access cannot enumerate
+    // share links for the analysis.
+    const analysis = await prisma.analysis.findUnique({
+      where: { id: analysisId },
+      select: { document: { select: { userId: true } } },
+    });
+    if (!analysis || analysis.document.userId !== user.id) {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    }
+
+    const rows = await prisma.shareLink.findMany({
+      where: { analysisId, userId: user.id },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        token: true,
+        expiresAt: true,
+        revokedAt: true,
+        viewCount: true,
+        lastViewedAt: true,
+        isCaseStudy: true,
+        createdAt: true,
+        password: true, // Just to flag whether one is set; not returned raw.
+      },
+      take: 50,
+    });
+
+    const base = process.env.NEXT_PUBLIC_APP_URL || '';
+    const now = Date.now();
+    const enriched = rows.map(r => {
+      const expired = !!(r.expiresAt && r.expiresAt.getTime() < now);
+      const revoked = !!r.revokedAt;
+      return {
+        id: r.id,
+        token: r.token,
+        url: `${base}/shared/${r.token}${r.isCaseStudy ? '?case=true' : ''}`,
+        expiresAt: r.expiresAt,
+        revokedAt: r.revokedAt,
+        viewCount: r.viewCount,
+        lastViewedAt: r.lastViewedAt,
+        isCaseStudy: r.isCaseStudy,
+        hasPassword: !!r.password,
+        createdAt: r.createdAt,
+        status: revoked ? 'revoked' : expired ? 'expired' : 'active',
+      };
+    });
+
+    return NextResponse.json({ links: enriched });
+  } catch (error) {
+    log.error('Failed to list share links:', error);
+    return NextResponse.json({ error: 'Failed to list share links' }, { status: 500 });
+  }
+}
+
