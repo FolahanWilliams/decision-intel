@@ -9,17 +9,19 @@ import { parseJSON } from '@/lib/utils/json';
 const log = createLogger('PassageReAudit');
 
 // Tight passage-level re-audit for the dashboard's inline "rewrite what we
-// flagged" affordance. Deliberately NOT the full 12-node pipeline — that is
+// flagged" affordance. Deliberately NOT the full audit pipeline — that is
 // reserved for documents and costs ~£0.40 per run. This endpoint runs a
 // single focused Gemini call (~£0.02-0.05) against a short passage and
-// returns a bias list + rough estimated DQI so the user sees their change
-// reflected in < 5 seconds.
+// returns a bias list so the user sees their change reflected in < 5
+// seconds.
 //
-// The "estimated DQI" is NOT a canonical DQI — it is a visual proxy anchored
-// in bias count and severity. We label it clearly in the response and UI so
-// no one mistakes the inline number for the full-pipeline score. When a user
-// wants the canonical number, they upload the revised memo via the main
-// flow.
+// The response also computes an `estimatedDqi` heuristic field (kept for
+// API back-compat) — but as of the 2026-04-25 audit the UI deliberately
+// surfaces the BIAS-COUNT delta instead of any numeric DQI proxy. A
+// passage-level estimate can drift from the full-pipeline score, and a
+// strategist who sees "B+ on the passage, C on the full memo" is the
+// trust-collapse moment we'd rather not ship. Bias-count delta is a
+// directionally honest signal and that's what the UI shows.
 
 const MAX_PASSAGE_LENGTH = 6000; // ~1,500 tokens; keeps the Gemini call fast + cheap
 const RATE_LIMIT_KEY_PREFIX = 'passage-reaudit';
@@ -171,7 +173,7 @@ export async function POST(req: NextRequest) {
       biases,
       estimatedDqi,
       disclaimer:
-        'Passage-level estimate — not the canonical DQI. Upload the full revised memo for the 12-node score.',
+        'Passage-level bias check, not a DQI score. Upload the revised memo for the canonical audit — the full pipeline weighs evidence, simulation, and structural assumptions in addition to bias load.',
       passageLength: passage.length,
     };
     if (typeof body.originalOverallScore === 'number') {

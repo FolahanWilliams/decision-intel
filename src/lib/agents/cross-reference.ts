@@ -59,6 +59,19 @@ export interface CrossRefFinding {
   resolutionQuestion: string;
 }
 
+export interface CrossRefTruncationReport {
+  /** Per-doc cap (chars). */
+  perDocCapChars: number;
+  /** Total-input cap across all docs (chars). */
+  totalCapChars: number;
+  /** Total chars actually sent to the model (after truncation). */
+  totalCharsSent: number;
+  /** Docs whose content was truncated to fit within the per-doc or total cap. */
+  truncatedDocs: Array<{ documentId: string; documentName: string; originalChars: number; sentChars: number }>;
+  /** Docs that were excluded entirely because the total cap had been hit. */
+  excludedDocs: Array<{ documentId: string; documentName: string; originalChars: number }>;
+}
+
 export interface CrossRefRunOutput {
   findings: CrossRefFinding[];
   /**
@@ -72,6 +85,16 @@ export interface CrossRefRunOutput {
     analysisId: string;
     overallScore: number;
   }>;
+  /**
+   * Truncation accounting (2026-04-25 audit fix). The agent caps total
+   * input to keep the Gemini call inside its budget envelope; before this
+   * field existed, the cap was silent and an 80-200-page CIM would
+   * silently lose its synergy table to truncation, producing a
+   * "no conflicts" reading the deal team would trust. The card surfaces
+   * any truncation as a visible banner so the reader knows the scan is
+   * partial.
+   */
+  truncationReport: CrossRefTruncationReport;
 }
 
 export interface CrossRefInputDoc {
@@ -85,8 +108,14 @@ export interface CrossRefInputDoc {
   topBiases?: Array<{ biasType: string; severity?: string | null }>;
 }
 
-const MAX_TOTAL_INPUT_CHARS = 60_000;
-const MAX_PER_DOC_CHARS = 12_000;
+// Caps lifted 2026-04-25 from 60K/12K to 150K/25K (gemini-3-flash-preview
+// has a 1M+ token window — ~50K tokens at 150K chars is well inside it).
+// A 25K-char per-doc cap fits ~50 pages of dense CIM content, which is
+// enough for the synergy / unit-economics / risk sections most deals turn
+// on. Beyond 150K total, the next step is chunked multi-pass which is
+// flagged for the cross-ref capability follow-up.
+const MAX_TOTAL_INPUT_CHARS = 150_000;
+const MAX_PER_DOC_CHARS = 25_000;
 
 function truncate(text: string, max: number): string {
   if (!text) return '';
@@ -192,23 +221,60 @@ export async function runCrossReferenceAgent(
         analysisId: d.analysisId,
         overallScore: d.overallScore,
       })),
+      truncationReport: {
+        perDocCapChars: MAX_PER_DOC_CHARS,
+        totalCapChars: MAX_TOTAL_INPUT_CHARS,
+        totalCharsSent: 0,
+        truncatedDocs: [],
+        excludedDocs: [],
+      },
     };
   }
 
   // Cap total input — for a 12-doc deal with dense CIMs this can balloon.
+  // We track per-doc truncation + total exclusion so the UI can show a
+  // visible banner; the silent truncation that shipped before 2026-04-25
+  // produced "no conflicts found" readings that ignored entire CIM
+  // sections (Marcus's persona-audit catch).
   let totalChars = 0;
   const capped: CrossRefInputDoc[] = [];
+  const truncatedDocs: CrossRefTruncationReport['truncatedDocs'] = [];
+  const excludedDocs: CrossRefTruncationReport['excludedDocs'] = [];
   for (const d of docs) {
-    const len = (d.content || '').length;
-    if (totalChars + len > MAX_TOTAL_INPUT_CHARS) {
-      // Truncate this doc's content to fit, then stop adding more.
-      const remaining = Math.max(2000, MAX_TOTAL_INPUT_CHARS - totalChars);
-      capped.push({ ...d, content: truncate(d.content, remaining) });
-      break;
+    const originalLen = (d.content || '').length;
+    if (totalChars >= MAX_TOTAL_INPUT_CHARS) {
+      excludedDocs.push({
+        documentId: d.documentId,
+        documentName: d.documentName,
+        originalChars: originalLen,
+      });
+      continue;
     }
-    capped.push(d);
-    totalChars += len;
+    const remainingTotal = MAX_TOTAL_INPUT_CHARS - totalChars;
+    const perDocBudget = Math.min(MAX_PER_DOC_CHARS, remainingTotal);
+    if (originalLen > perDocBudget) {
+      const sentLen = Math.max(2_000, perDocBudget);
+      const sentContent = truncate(d.content || '', sentLen);
+      capped.push({ ...d, content: sentContent });
+      totalChars += sentContent.length;
+      truncatedDocs.push({
+        documentId: d.documentId,
+        documentName: d.documentName,
+        originalChars: originalLen,
+        sentChars: sentContent.length,
+      });
+    } else {
+      capped.push(d);
+      totalChars += originalLen;
+    }
   }
+  const truncationReport: CrossRefTruncationReport = {
+    perDocCapChars: MAX_PER_DOC_CHARS,
+    totalCapChars: MAX_TOTAL_INPUT_CHARS,
+    totalCharsSent: totalChars,
+    truncatedDocs,
+    excludedDocs,
+  };
 
   const prompt = buildCrossRefPrompt(capped);
 
@@ -269,6 +335,7 @@ export async function runCrossReferenceAgent(
       analysisId: d.analysisId,
       overallScore: d.overallScore,
     })),
+    truncationReport,
   };
 }
 

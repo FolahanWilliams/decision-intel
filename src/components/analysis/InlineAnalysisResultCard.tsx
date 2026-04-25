@@ -427,9 +427,13 @@ export function InlineAnalysisResultCard({
       </div>
 
       {/* Inline live co-edit — paste a rewritten passage, get a 5s bias
-          re-check + DQI delta without leaving the dashboard. The endpoint
-          is a lightweight bias-only check; canonical DQI still requires
-          uploading the full revised memo. */}
+          re-check without leaving the dashboard. The endpoint is a
+          lightweight bias-only check; canonical DQI requires uploading
+          the full revised memo. The panel deliberately surfaces the
+          BIAS-COUNT delta (not a numeric DQI estimate) — a passage-level
+          DQI proxy can drift from the full-pipeline number, and showing
+          the proxy as a score risks the trust-collapse moment Elena
+          flagged in the 2026-04-25 audit. */}
       {analysis.biasCount > 0 && (
         <div
           style={{
@@ -437,7 +441,7 @@ export function InlineAnalysisResultCard({
             borderTop: '1px solid var(--border-color)',
           }}
         >
-          <InlineCoEditPanel originalScore={analysis.overallScore} />
+          <InlineCoEditPanel originalBiasCount={analysis.biasCount} />
         </div>
       )}
 
@@ -571,7 +575,7 @@ function wordDiff(before: string, after: string): DiffSegment[] {
   return out;
 }
 
-function InlineCoEditPanel({ originalScore }: { originalScore: number }) {
+function InlineCoEditPanel({ originalBiasCount }: { originalBiasCount: number }) {
   const [expanded, setExpanded] = useState(false);
   const [originalPassage, setOriginalPassage] = useState('');
   const [revisedPassage, setRevisedPassage] = useState('');
@@ -595,7 +599,6 @@ function InlineCoEditPanel({ originalScore }: { originalScore: number }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           passage: revisedPassage.trim(),
-          originalOverallScore: originalScore,
         }),
       });
       const json = (await res.json()) as PassageReAuditResponse | { error: string };
@@ -647,19 +650,22 @@ function InlineCoEditPanel({ originalScore }: { originalScore: number }) {
         >
           ✎
         </span>
-        <span style={{ flex: 1 }}>Rewrite a flagged passage — see the DQI update in seconds.</span>
+        <span style={{ flex: 1 }}>
+          Rewrite a flagged passage — see what biases the revision still trips, in seconds.
+        </span>
         <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>passage-level</span>
       </button>
     );
   }
 
-  const delta = result?.delta ?? null;
-  const deltaColor =
-    delta == null
+  const revisedBiasCount = result?.biases.length ?? 0;
+  const biasDelta = result == null ? null : revisedBiasCount - originalBiasCount;
+  const biasDeltaColor =
+    biasDelta == null
       ? 'var(--text-muted)'
-      : delta > 0
+      : biasDelta < 0
         ? 'var(--success)'
-        : delta < 0
+        : biasDelta > 0
           ? 'var(--error)'
           : 'var(--text-muted)';
 
@@ -808,7 +814,7 @@ function InlineCoEditPanel({ originalScore }: { originalScore: number }) {
                   color: 'var(--text-muted)',
                 }}
               >
-                Passage DQI estimate
+                Biases in the revised passage
               </div>
               <div
                 style={{
@@ -818,18 +824,30 @@ function InlineCoEditPanel({ originalScore }: { originalScore: number }) {
                   marginTop: 2,
                 }}
               >
-                {result.estimatedDqi}
-                {delta != null && (
+                {revisedBiasCount}
+                {biasDelta != null && biasDelta !== 0 && (
                   <span
                     style={{
                       fontSize: 14,
                       fontWeight: 700,
-                      color: deltaColor,
+                      color: biasDeltaColor,
                       marginLeft: 10,
                     }}
                   >
-                    {delta > 0 ? '+' : ''}
-                    {delta} vs original
+                    {biasDelta > 0 ? '+' : ''}
+                    {biasDelta} vs the original ({originalBiasCount})
+                  </span>
+                )}
+                {biasDelta === 0 && (
+                  <span
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 700,
+                      color: 'var(--text-muted)',
+                      marginLeft: 10,
+                    }}
+                  >
+                    no change vs the original ({originalBiasCount})
                   </span>
                 )}
               </div>
@@ -838,11 +856,13 @@ function InlineCoEditPanel({ originalScore }: { originalScore: number }) {
               style={{
                 fontSize: 11.5,
                 color: 'var(--text-muted)',
-                maxWidth: 300,
+                maxWidth: 320,
                 lineHeight: 1.55,
               }}
             >
-              {result.disclaimer}
+              Passage-level bias check, not a DQI score. Upload the revised memo for the canonical
+              audit — the full pipeline weighs evidence, simulation, and structural assumptions in
+              addition to bias load.
             </div>
           </div>
 

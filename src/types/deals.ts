@@ -301,6 +301,18 @@ export interface DealCrossReferenceRun {
           analysisId: string;
           overallScore: number;
         }>;
+        /**
+         * 2026-04-25 audit fix: surface per-doc + total truncation so the
+         * card can render a "Partial scan" banner. Null/undefined when no
+         * truncation happened or when the run predates this field.
+         */
+        truncationReport?: {
+          perDocCapChars: number;
+          totalCapChars: number;
+          totalCharsSent: number;
+          truncatedDocs: Array<{ documentId: string; documentName: string; originalChars: number; sentChars: number }>;
+          excludedDocs: Array<{ documentId: string; documentName: string; originalChars: number }>;
+        };
       }
     | DealCrossReferenceFinding[];
   documentSnapshot: Array<{

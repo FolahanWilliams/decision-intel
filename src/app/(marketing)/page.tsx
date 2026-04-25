@@ -1465,7 +1465,7 @@ function SampleAuditCard() {
               color: C.green,
             }}
           >
-            Sample output
+            Sample output · illustrative
           </div>
           <div
             style={{
@@ -1719,7 +1719,7 @@ function SampleAuditCard() {
           portfolio baseline in M&amp;A and market-entry contexts. Removing overconfidence from the
           revenue framing narrows the gap to{' '}
           <span style={{ fontWeight: 800, color: C.green }}>12%</span>, a{' '}
-          <span style={{ fontWeight: 700 }}>$4.1M expected-value swing</span> at this ticket size.
+          <span style={{ fontWeight: 700 }}>22-point reduction</span> in failure-rate exposure.
         </div>
       </div>
 
@@ -1734,6 +1734,8 @@ function SampleAuditCard() {
           fontSize: 11.5,
           color: C.slate500,
           background: C.white,
+          gap: 12,
+          flexWrap: 'wrap',
         }}
       >
         <span>
@@ -1741,12 +1743,12 @@ function SampleAuditCard() {
         </span>
         <span
           style={{
-            fontWeight: 700,
-            color: C.slate700,
-            letterSpacing: '0.04em',
+            fontStyle: 'italic',
+            color: C.slate500,
+            fontSize: 11,
           }}
         >
-          DPR-2026-04-Q4-0173
+          Synthetic sample · not a real audit
         </span>
       </div>
     </div>

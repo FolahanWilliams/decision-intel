@@ -73,6 +73,14 @@ const TYPE_LABEL: Record<CrossRefFinding['type'], string> = {
   scope: 'Scope',
 };
 
+interface TruncationReport {
+  perDocCapChars: number;
+  totalCapChars: number;
+  totalCharsSent: number;
+  truncatedDocs: Array<{ documentId: string; documentName: string; originalChars: number; sentChars: number }>;
+  excludedDocs: Array<{ documentId: string; documentName: string; originalChars: number }>;
+}
+
 function findingsArray(run: CrossRefRunDto | null): CrossRefFinding[] {
   if (!run) return [];
   if (Array.isArray(run.findings)) return run.findings as CrossRefFinding[];
@@ -85,6 +93,15 @@ function topSummary(run: CrossRefRunDto | null): string {
   if (Array.isArray(run.findings)) return '';
   const wrap = run.findings as { summary?: string } | null;
   return wrap?.summary ?? '';
+}
+
+function truncationOf(run: CrossRefRunDto | null): TruncationReport | null {
+  if (!run || Array.isArray(run.findings)) return null;
+  const wrap = run.findings as { truncationReport?: TruncationReport } | null;
+  const r = wrap?.truncationReport;
+  if (!r) return null;
+  if (r.truncatedDocs.length === 0 && r.excludedDocs.length === 0) return null;
+  return r;
 }
 
 function formatRunAt(ts: string): string {
@@ -142,6 +159,7 @@ export function CrossReferenceCard({
 
   const findings = findingsArray(run);
   const headlineSummary = topSummary(run);
+  const truncation = truncationOf(run);
 
   return (
     <div
@@ -229,6 +247,53 @@ export function CrossReferenceCard({
               }}
             >
               {headlineSummary}
+            </div>
+          )}
+          {truncation && (
+            <div
+              style={{
+                marginTop: 10,
+                padding: '8px 12px',
+                background: 'rgba(217,119,6,0.08)',
+                border: '1px solid rgba(217,119,6,0.30)',
+                borderRadius: 'var(--radius-sm)',
+                display: 'flex',
+                gap: 8,
+                fontSize: 12,
+                color: 'var(--text-secondary)',
+                lineHeight: 1.55,
+              }}
+            >
+              <AlertTriangle size={13} style={{ color: '#D97706', flexShrink: 0, marginTop: 2 }} />
+              <div>
+                <strong style={{ color: 'var(--text-primary)' }}>Partial scan.</strong>{' '}
+                {truncation.truncatedDocs.length > 0 && (
+                  <>
+                    {truncation.truncatedDocs.length} doc{truncation.truncatedDocs.length === 1 ? '' : 's'} truncated to fit the cross-reference budget
+                    {truncation.truncatedDocs.length <= 3 && (
+                      <>
+                        {' '}({truncation.truncatedDocs.map(d => d.documentName).join(', ')})
+                      </>
+                    )}
+                    .
+                  </>
+                )}
+                {truncation.excludedDocs.length > 0 && (
+                  <>
+                    {' '}
+                    {truncation.excludedDocs.length} doc{truncation.excludedDocs.length === 1 ? '' : 's'} excluded entirely once the {Math.round(truncation.totalCapChars / 1000)}K-char total cap was reached
+                    {truncation.excludedDocs.length <= 3 && (
+                      <>
+                        {' '}({truncation.excludedDocs.map(d => d.documentName).join(', ')})
+                      </>
+                    )}
+                    .
+                  </>
+                )}{' '}
+                Findings may miss conflicts in the truncated content. Trim long memos to the
+                load-bearing sections (synergies / unit economics / risk treatment) and re-run for
+                full coverage.
+              </div>
             </div>
           )}
         </div>
