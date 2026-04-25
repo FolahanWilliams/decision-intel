@@ -12,6 +12,7 @@ import {
   Gauge,
   BookOpen,
   FlaskConical,
+  Layers,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { PageSkeleton } from '@/components/ui/LoadingSkeleton';
@@ -39,6 +40,11 @@ const DecisionIntelligenceContent = lazy(() =>
 );
 const BiasLibraryContent = lazy(() =>
   import('@/components/insights/BiasLibraryContent').then(m => ({ default: m.BiasLibraryContent }))
+);
+const StructuralExposureCard = lazy(() =>
+  import('@/components/analysis/StructuralExposureCard').then(m => ({
+    default: m.StructuralExposureCard,
+  }))
 );
 const AuditsPageContent = lazy(() =>
   import('@/components/audits/AuditsPageContent').then(m => ({ default: m.AuditsPageContent }))
@@ -334,6 +340,13 @@ function AnalyticsInner() {
                 <section>
                   <SectionHeading icon={<Lightbulb size={13} />}>Explainability</SectionHeading>
                   <ExplainabilityContent />
+                </section>
+
+                <section>
+                  <SectionHeading icon={<Layers size={13} />}>
+                    Structural Exposure (Dalio 18-determinants)
+                  </SectionHeading>
+                  <StructuralExposureCard />
                 </section>
 
                 <section>

@@ -9,6 +9,7 @@ import { createLogger } from '@/lib/utils/logger';
 import { buildStructuralAssumptionsPrompt } from '@/lib/agents/prompts';
 import { DALIO_DETERMINANTS } from '@/lib/constants/dalio-determinants';
 import { resolveAnalysisAccess } from '@/lib/utils/document-access';
+import { Prisma } from '@prisma/client';
 
 const log = createLogger('StructuralAssumptionsAPI');
 
@@ -208,11 +209,116 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       generatedAt: new Date().toISOString(),
     };
 
+    // 1.3a deep — persist the run so subsequent reads (StructuralAssumptionsPanel,
+    // org-level exposure aggregator) don't re-pay the LLM cost. Replace any
+    // prior persisted set for this analysis to keep cardinality clean. Schema-
+    // drift tolerant: if the table is missing the run still returns inline.
+    const effectiveContextLabel =
+      effectiveContext?.context && effectiveContext.context !== 'unknown'
+        ? effectiveContext.context
+        : null;
+    try {
+      await prisma.$transaction(async tx => {
+        await tx.structuralAssumption.deleteMany({ where: { analysisId } });
+        if (structuralAssumptions.length > 0) {
+          await tx.structuralAssumption.createMany({
+            data: structuralAssumptions.map(a => ({
+              analysisId,
+              determinantId: a.determinantId,
+              determinantLabel: a.determinantLabel ?? null,
+              category: a.category ?? null,
+              assumption: a.assumption,
+              defensibility: a.defensibility,
+              severity: a.severity,
+              evidenceFromMemo: a.evidenceFromMemo ?? null,
+              hardeningQuestion: a.hardeningQuestion ?? null,
+              framework: 'dalio-18-determinants',
+              marketContext: effectiveContextLabel,
+            })) satisfies Prisma.StructuralAssumptionCreateManyInput[],
+          });
+        }
+      });
+    } catch (persistErr) {
+      log.warn(
+        'structural-assumptions persistence failed (non-critical):',
+        persistErr instanceof Error ? persistErr.message : String(persistErr)
+      );
+    }
+
     return NextResponse.json(payload);
   } catch (err) {
     log.error('structural-assumptions audit failed', err as Error);
     return NextResponse.json(
       { error: 'Structural assumptions audit failed' },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * GET /api/analysis/:id/structural-assumptions
+ *
+ * Returns the persisted structural-assumptions run for the analysis, or
+ * `{ structuralAssumptions: [], cached: false }` when nothing has run yet.
+ * Used by the StructuralAssumptionsPanel to render previous results
+ * without paying the Gemini cost again on every page load.
+ */
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { id: analysisId } = await params;
+    const access = await resolveAnalysisAccess(analysisId, user.id);
+    if (!access) {
+      return NextResponse.json({ error: 'Analysis not found' }, { status: 404 });
+    }
+
+    const rows = await prisma.structuralAssumption
+      .findMany({
+        where: { analysisId },
+        orderBy: { generatedAt: 'desc' },
+      })
+      .catch(() => []);
+
+    if (rows.length === 0) {
+      return NextResponse.json({
+        structuralAssumptions: [],
+        summary: 'No structural-assumptions run on file. Run the audit to populate this layer.',
+        framework: 'dalio-18-determinants',
+        cached: false,
+      });
+    }
+
+    const generatedAt = rows[0].generatedAt.toISOString();
+
+    const payload: StructuralAudit & { cached: boolean } = {
+      structuralAssumptions: rows.map(r => ({
+        determinantId: r.determinantId,
+        determinantLabel: r.determinantLabel ?? undefined,
+        category: r.category ?? undefined,
+        assumption: r.assumption,
+        defensibility: normaliseDefensibility(r.defensibility),
+        severity: normaliseSeverity(r.severity),
+        evidenceFromMemo: r.evidenceFromMemo ?? undefined,
+        hardeningQuestion: r.hardeningQuestion ?? undefined,
+      })),
+      summary: `${rows.length} structural assumption${rows.length === 1 ? '' : 's'} persisted from the most recent run.`,
+      framework: 'dalio-18-determinants',
+      generatedAt,
+      cached: true,
+    };
+
+    return NextResponse.json(payload);
+  } catch (err) {
+    log.error('structural-assumptions GET failed', err as Error);
+    return NextResponse.json(
+      { error: 'Failed to load structural assumptions' },
       { status: 500 }
     );
   }

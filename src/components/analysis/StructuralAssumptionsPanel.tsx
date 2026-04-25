@@ -100,9 +100,9 @@ export function StructuralAssumptionsPanel({ analysisId, autoRun = true, marketC
   const [state, setState] = useState<
     | { status: 'idle' }
     | { status: 'loading' }
-    | { status: 'ready'; data: StructuralAudit }
+    | { status: 'ready'; data: StructuralAudit; cached?: boolean }
     | { status: 'error'; message: string }
-  >(autoRun ? { status: 'loading' } : { status: 'idle' });
+  >({ status: 'loading' });
   const [expanded, setExpanded] = useState(true);
 
   const runAudit = useCallback(async () => {
@@ -116,7 +116,7 @@ export function StructuralAssumptionsPanel({ analysisId, autoRun = true, marketC
         throw new Error(body.error || `Audit failed (${res.status})`);
       }
       const data = (await res.json()) as StructuralAudit;
-      setState({ status: 'ready', data });
+      setState({ status: 'ready', data, cached: false });
     } catch (err) {
       setState({
         status: 'error',
@@ -125,11 +125,39 @@ export function StructuralAssumptionsPanel({ analysisId, autoRun = true, marketC
     }
   }, [analysisId]);
 
+  // 1.3a deep — load persisted findings on mount BEFORE deciding whether
+  // to auto-run. This lets users open the panel without paying the LLM
+  // cost again and lets the org-level aggregator share the same data.
   useEffect(() => {
-    if (autoRun) {
-      void runAudit();
-    }
-  }, [autoRun, runAudit]);
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/analysis/${analysisId}/structural-assumptions`);
+        if (!res.ok) {
+          if (autoRun) void runAudit();
+          else if (!cancelled) setState({ status: 'idle' });
+          return;
+        }
+        const data = (await res.json()) as StructuralAudit & { cached?: boolean };
+        if (cancelled) return;
+        if (data.cached && data.structuralAssumptions.length > 0) {
+          setState({ status: 'ready', data, cached: true });
+        } else if (autoRun) {
+          void runAudit();
+        } else {
+          setState({ status: 'idle' });
+        }
+      } catch {
+        if (!cancelled) {
+          if (autoRun) void runAudit();
+          else setState({ status: 'idle' });
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [analysisId, autoRun, runAudit]);
 
   const assumptions =
     state.status === 'ready' ? state.data.structuralAssumptions : [];

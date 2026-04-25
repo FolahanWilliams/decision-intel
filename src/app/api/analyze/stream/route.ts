@@ -671,6 +671,42 @@ export async function POST(request: NextRequest) {
               });
           }
 
+          // 1.3a deep — auto-fire the Dalio structural-assumptions audit
+          // as a background step right after the main analysis lands. Runs
+          // outside the 12-node pipeline (avoids DQI drift) but persists
+          // findings so the analysis detail page renders the macro layer
+          // without the user clicking "Run audit." Fire-and-forget; never
+          // blocks the SSE pipeline.
+          if (createdAnalysisId) {
+            const analysisIdForStructural = createdAnalysisId;
+            // Best-effort POST through the existing route so RBAC, prompt
+            // assembly, and persistence all live in one place.
+            (async () => {
+              try {
+                const baseUrl =
+                  process.env.NEXT_PUBLIC_APP_URL ||
+                  request.headers.get('origin') ||
+                  '';
+                if (!baseUrl) return;
+                // Pass the auth cookie so the in-band POST resolves the
+                // same Supabase user context as the original SSE call.
+                const cookie = request.headers.get('cookie') ?? '';
+                await fetch(
+                  `${baseUrl}/api/analysis/${analysisIdForStructural}/structural-assumptions`,
+                  {
+                    method: 'POST',
+                    headers: cookie ? { cookie } : undefined,
+                  }
+                );
+              } catch (err) {
+                log.warn(
+                  'Auto structural-assumptions run failed (non-critical): ' +
+                    (err instanceof Error ? err.message : String(err))
+                );
+              }
+            })().catch(() => null);
+          }
+
           // 3.1 deep — auto-trigger cross-document review when this doc is
           // attached to a deal that now has ≥2 analyzed documents. Runs in
           // the background; never blocks the SSE pipeline. Uses the same

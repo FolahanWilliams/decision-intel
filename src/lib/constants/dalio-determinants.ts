@@ -28,6 +28,34 @@ export type DalioCategory =
   | 'internal' // Governance, civility, wealth gaps, rule of law
   | 'external'; // Geology, acts of nature, resource endowment
 
+/**
+ * Human-readable label per category, used by the structural-exposure
+ * heatmap on /dashboard/analytics + the Dalio constellation viz on
+ * the Sankore brief.
+ */
+export const DETERMINANT_CATEGORIES: Record<DalioCategory, { label: string; description: string }> = {
+  cycles: {
+    label: 'Cycles',
+    description: 'Debt, currency, and inflation cycles — the short-run drivers.',
+  },
+  power: {
+    label: 'Power',
+    description: 'Economic, military, trade, and reserve-currency power.',
+  },
+  fundamentals: {
+    label: 'Fundamentals',
+    description: 'Education, innovation, productivity, infrastructure.',
+  },
+  internal: {
+    label: 'Internal order',
+    description: 'Governance, civility, wealth gaps, rule of law.',
+  },
+  external: {
+    label: 'External shocks',
+    description: 'Geology, acts of nature, resource endowment.',
+  },
+};
+
 export interface DalioDeterminant {
   /** Stable ID. Once assigned, never changes. */
   id: string;

@@ -49,6 +49,10 @@ model Document {
   /// anchoring_bias emerged" delta loop.
   parentDocumentId String?
   versionNumber    Int                 @default(1)
+  /// Optional human-readable label for the version surface (e.g.
+  /// "Pre-IC draft", "Post-counsel rev"). Free text, ≤80 chars enforced
+  /// in the route. Falls back to "v{N}" in UI when null. (2.3 deep)
+  versionLabel     String?
   /// Document-level access control (3.5). Values:
   ///   'private' — only `userId` can read/write (default for new uploads).
   ///   'team'    — anyone in the same org (matches the pre-3.5 default).
@@ -56,6 +60,16 @@ model Document {
   /// The owner (matching `userId`) always retains full access regardless of
   /// this setting; visibility only controls what additional users can see.
   visibility       String              @default("team")
+  /// Stamp set by the retention cron when a pre-deletion warning email
+  /// has been dispatched. Used to avoid duplicate warnings when the
+  /// cron runs daily inside the warning window. Null = not yet warned.
+  /// (2.1 deep)
+  deletionWarningSentAt DateTime?
+  /// Foreign key to a LegalHold row when this document is currently
+  /// preserved from retention enforcement. The retention cron skips
+  /// any document with a non-null legalHoldId. (2.1 deep)
+  legalHoldId      String?
+  legalHold        LegalHold?          @relation(fields: [legalHoldId], references: [id], onDelete: SetNull)
   parentDocument   Document?           @relation("DocumentVersions", fields: [parentDocumentId], references: [id], onDelete: SetNull)
   childVersions    Document[]          @relation("DocumentVersions")
   deal             Deal?               @relation(fields: [dealId], references: [id], onDelete: SetNull)
@@ -76,6 +90,65 @@ model Document {
   @@index([orgId, isSample])
   @@index([deletedAt])
   @@index([parentDocumentId, versionNumber])
+  @@index([deletionWarningSentAt])
+  @@index([legalHoldId])
+}
+
+/// Legal-hold register (2.1 deep). When a document is on hold the
+/// retention cron skips it entirely — soft-deletion stays manual, hard-
+/// purge is blocked. Used for litigation, regulator inquiry, or
+/// internal investigation. Owner-only setter today; admin-elevation
+/// can be added as a follow-up without a schema change.
+///
+/// One LegalHold can attach to many documents (e.g. a single matter
+/// covering a deal's full document set). The owner records `reason`
+/// + `holdUntil` on creation; both are required for audit defensibility.
+model LegalHold {
+  id          String     @id @default(cuid())
+  orgId       String?
+  /// Human-readable reason — auditor needs to see why each hold exists.
+  reason      String     @db.Text
+  /// Optional sunset; null = until manually released.
+  holdUntil   DateTime?
+  grantedById String
+  releasedAt  DateTime?
+  releasedById String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  documents   Document[]
+
+  @@index([orgId])
+  @@index([releasedAt])
+}
+
+/// Persisted Dalio structural-assumptions findings (1.3a deep).
+/// Was previously a runtime-only on-demand audit; now persists per
+/// analysis so the cross-analysis exposure aggregator can read them
+/// without re-running the agent. One row per flagged determinant.
+model StructuralAssumption {
+  id              String   @id @default(cuid())
+  analysisId      String
+  /// Stable determinant id from src/lib/constants/dalio-determinants.ts
+  /// (e.g. 'debt_cycle', 'currency_cycle', 'reserve_currency_status').
+  determinantId   String
+  determinantLabel String?
+  category        String? // 'cycles' | 'power' | 'fundamentals' | 'internal' | 'external'
+  assumption      String   @db.Text
+  defensibility   String   // well_supported | partially_supported | unsupported | contradicted
+  severity        String   // low | medium | high | critical
+  evidenceFromMemo String? @db.Text
+  hardeningQuestion String? @db.Text
+  framework       String   @default("dalio-18-determinants")
+  generatedAt     DateTime @default(now())
+  /// Effective market context at the time of the run (so cross-analysis
+  /// aggregation can filter by EM/DM exposure when surfacing patterns).
+  marketContext   String? // emerging_market | developed_market | cross_border | unknown
+  analysis        Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+
+  @@index([analysisId])
+  @@index([determinantId])
+  @@index([severity])
+  @@index([defensibility])
 }
 
 /// Cross-document conflict findings for a Deal (3.1 deep).
@@ -192,6 +265,13 @@ model Analysis {
   outcomeStatus   String    @default("pending_outcome") // pending_outcome | outcome_logged | outcome_overdue
   outcomeDueAt    DateTime? // When outcome should be reported
   recalibratedDqi Json? // { originalScore, recalibratedScore, recalibratedGrade, delta, recalibratedAt }
+  /// Granular per-judge outputs captured during the pipeline run so the
+  /// Decision Provenance Record can show actual judge variance (1.1
+  /// deep). Shape: { biasDetective: { ... }, noiseJudge: { ... },
+  /// statisticalJury: { ... }, metaJudge: { ... } }. Null on legacy
+  /// analyses. Surfacing this on the DPR closes a procurement gap —
+  /// previously we cited variance at a coarse level only.
+  judgeOutputs    Json?
 
   // Synthetic seed analysis — flagged SAMPLE, clearable via /api/demo/clear-samples
   isSample Boolean @default(false)
@@ -202,6 +282,8 @@ model Analysis {
   shareLinks ShareLink[]
   outcome    DecisionOutcome?
   prior      DecisionPrior?
+  /// Persisted Dalio structural-assumptions findings (1.3a deep).
+  structuralAssumptions StructuralAssumption[]
 
   toxicCombinations   ToxicCombination[]
   draftOutcomes       DraftOutcome[]
@@ -447,6 +529,11 @@ model Organization {
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
   isAnonymized       Boolean            @default(false) // Consent to anonymous aggregation
+  /// Per-org retention override (2.1 deep). When set, the retention
+  /// cron uses this value instead of the plan-tier default for documents
+  /// owned by this org. Min 30 days enforced in the API. Null = use the
+  /// plan-tier default from src/lib/utils/plan-limits.ts.
+  retentionDaysOverride Int?
   invites            TeamInvite[]
   members            TeamMember[]
   ssoConfigurations  SsoConfiguration[]
