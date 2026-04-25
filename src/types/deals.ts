@@ -266,9 +266,59 @@ export interface DealSummary {
   updatedAt: string;
 }
 
+/**
+ * Cross-document conflict surface (3.1 deep). Persisted on
+ * `DealCrossReference` rows; the deal-detail API returns the most-recent
+ * row alongside the aggregation. Findings come from the cross-reference
+ * agent (src/lib/agents/cross-reference.ts).
+ */
+export interface DealCrossReferenceFinding {
+  summary: string;
+  type: 'numeric' | 'assumption' | 'timeline' | 'risk_treatment' | 'scope';
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  claims: Array<{
+    documentId: string;
+    documentName: string;
+    excerpt: string;
+  }>;
+  whyItMatters: string;
+  resolutionQuestion: string;
+}
+
+export interface DealCrossReferenceRun {
+  id: string;
+  dealId: string;
+  runAt: string;
+  modelVersion: string;
+  /** Wrapper shape persisted as JSON. */
+  findings:
+    | {
+        findings?: DealCrossReferenceFinding[];
+        summary?: string;
+        documentSnapshot?: Array<{
+          documentId: string;
+          documentName: string;
+          analysisId: string;
+          overallScore: number;
+        }>;
+      }
+    | DealCrossReferenceFinding[];
+  documentSnapshot: Array<{
+    documentId: string;
+    documentName: string;
+    analysisId: string;
+    overallScore: number;
+  }>;
+  conflictCount: number;
+  highSeverityCount: number;
+  status: 'running' | 'complete' | 'error';
+  errorMessage?: string | null;
+}
+
 export interface DealDetail extends DealSummary {
   documents: DealDocument[];
   aggregation?: DealAggregationDto;
+  crossReference?: DealCrossReferenceRun | null;
 }
 
 export interface DealFilters {

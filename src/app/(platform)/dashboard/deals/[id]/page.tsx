@@ -23,6 +23,7 @@ import { DecisionBriefTab } from '@/components/deals/DecisionBriefTab';
 import { UpgradeFromAudit } from '@/components/deals/UpgradeFromAudit';
 import { DealCompositeHero } from '@/components/deals/DealCompositeHero';
 import { UploadToDealButton } from '@/components/deals/UploadToDealButton';
+import { CrossReferenceCard } from '@/components/deals/CrossReferenceCard';
 import {
   STAGE_COLORS,
   DEAL_TYPE_COLORS,
@@ -288,6 +289,16 @@ export default function DealDetailPage() {
             totalDocs={deal.documents?.length || 0}
           />
         )}
+
+        {/* Cross-document conflict surface (3.1 deep) — the deal-level
+            agent that catches "CIM says 40% growth, model assumes 15%"
+            class contradictions across the docs. */}
+        <CrossReferenceCard
+          dealId={deal.id}
+          initialRun={deal.crossReference ?? null}
+          aggregation={deal.aggregation ?? null}
+          onRunCompleted={() => mutate()}
+        />
 
         {/* Upload-to-deal CTA — sits above the tabs so it's the primary verb
             on the page. Pre-binds dealId so the new doc lands in this deal

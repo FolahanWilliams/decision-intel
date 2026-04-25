@@ -78,6 +78,45 @@ model Document {
   @@index([parentDocumentId, versionNumber])
 }
 
+/// Cross-document conflict findings for a Deal (3.1 deep).
+///
+/// When a Deal has ≥2 analyzed documents, the cross-reference agent runs
+/// over the latest analysis of each doc and surfaces contradictions:
+/// numeric ("CIM says 40% CAGR, model assumes 15%"), assumption-level
+/// ("memo says regulatory clear, counsel flags CBN ambiguity"), timeline,
+/// risk-treatment, etc. The findings ARE the moat for the "deal as the
+/// atomic decision unit" claim — looking at any single doc's DQI tells
+/// you about the artifact, not the decision.
+///
+/// One row per run. We keep history (runAt timestamps) so the UI can
+/// say "as of {date}" rather than "live", which procurement appreciates.
+model DealCrossReference {
+  id            String   @id @default(cuid())
+  dealId        String
+  runAt         DateTime @default(now())
+  /// Gemini model used for the run — pinned for reproducibility.
+  modelVersion  String   @default("gemini-3-flash-preview")
+  /// Snapshot of which (documentId → analysisId) pairs the run consumed,
+  /// so we can show "this finding came from analyses X, Y, Z" even after
+  /// the parent docs are versioned.
+  documentSnapshot Json
+  /// Array of conflict findings — full shape lives in the cross-reference
+  /// agent file. Persisting as JSON so we can iterate the schema without
+  /// migrations. UI maps from this directly.
+  findings      Json
+  /// Top-level numbers for the deal hero card.
+  conflictCount Int      @default(0)
+  highSeverityCount Int  @default(0)
+  /// Status: 'running' | 'complete' | 'error'. Mostly informational —
+  /// the API call is sync today, but a long-running deal with 10 docs
+  /// might warrant a queue later.
+  status        String   @default("complete")
+  errorMessage  String?
+  deal          Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+
+  @@index([dealId, runAt])
+}
+
 /// Document-level access grants for the `visibility = 'specific'` mode (3.5).
 /// One row per (document, user) grant. The Document.userId owner is implicit
 /// — they always have full access; this table only holds *additional* grants.
@@ -1285,6 +1324,7 @@ model Deal {
   documents          Document[]
   outcome            DealOutcome?
   auditPurchases     DealAuditPurchase[]
+  crossReferences    DealCrossReference[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -671,6 +671,108 @@ export async function POST(request: NextRequest) {
               });
           }
 
+          // 3.1 deep — auto-trigger cross-document review when this doc is
+          // attached to a deal that now has ≥2 analyzed documents. Runs in
+          // the background; never blocks the SSE pipeline. Uses the same
+          // RBAC + agent path as the manual button on the deal page.
+          if (doc.dealId) {
+            const dealIdForCrossRef = doc.dealId;
+            (async () => {
+              try {
+                const analyzedCount = await prisma.document.count({
+                  where: {
+                    dealId: dealIdForCrossRef,
+                    deletedAt: null,
+                    analyses: { some: {} },
+                  },
+                });
+                if (analyzedCount < 2) return;
+
+                // Pull all analyzed docs on the deal — owner-context run, not
+                // teammate-context, so we use the document owner's userId.
+                // The auto-trigger represents the OWNER's action (their doc
+                // just landed). Visibility filtering is handled implicitly
+                // because we read all docs on the deal regardless and the
+                // agent doesn't expose results until the user opens the
+                // deal page (which is itself RBAC-gated).
+                const docs = await prisma.document.findMany({
+                  where: { dealId: dealIdForCrossRef, deletedAt: null },
+                  select: {
+                    id: true,
+                    filename: true,
+                    content: true,
+                    contentEncrypted: true,
+                    contentIv: true,
+                    contentTag: true,
+                    contentKeyVersion: true,
+                    analyses: {
+                      orderBy: { createdAt: 'desc' },
+                      take: 1,
+                      select: {
+                        id: true,
+                        overallScore: true,
+                        biases: {
+                          select: { biasType: true, severity: true },
+                          take: 5,
+                        },
+                      },
+                    },
+                  },
+                });
+
+                const { runCrossReferenceAgent } = await import(
+                  '@/lib/agents/cross-reference'
+                );
+                const { getDocumentContent: decrypt } = await import('@/lib/utils/encryption');
+                const inputs = docs
+                  .map(d => {
+                    const a = d.analyses?.[0];
+                    if (!a) return null;
+                    const content = decrypt(d as Parameters<typeof decrypt>[0]);
+                    if (!content || content.trim().length < 200) return null;
+                    return {
+                      documentId: d.id,
+                      documentName: d.filename,
+                      analysisId: a.id,
+                      overallScore: a.overallScore,
+                      content,
+                      topBiases: a.biases.map(b => ({
+                        biasType: b.biasType,
+                        severity: b.severity ?? null,
+                      })),
+                    };
+                  })
+                  .filter((x): x is NonNullable<typeof x> => x !== null);
+                if (inputs.length < 2) return;
+
+                const output = await runCrossReferenceAgent(inputs);
+                const conflictCount = output.findings.length;
+                const highSeverityCount = output.findings.filter(
+                  f => f.severity === 'critical' || f.severity === 'high'
+                ).length;
+
+                await prisma.dealCrossReference.create({
+                  data: {
+                    dealId: dealIdForCrossRef,
+                    documentSnapshot: output.documentSnapshot as unknown as Prisma.InputJsonValue,
+                    findings: output as unknown as Prisma.InputJsonValue,
+                    conflictCount,
+                    highSeverityCount,
+                    status: 'complete',
+                  },
+                });
+                log.info(
+                  `Auto cross-reference run complete for deal ${dealIdForCrossRef}: ${conflictCount} conflicts, ${highSeverityCount} high-severity`
+                );
+              } catch (err) {
+                log.warn(
+                  'Auto cross-reference run failed (non-critical): ' +
+                    (err instanceof Error ? err.message : String(err))
+                );
+              }
+            })().catch(() => null);
+          }
+
           // Store embedding (fire and forget)
           try {
             const { storeAnalysisEmbedding } = await import('@/lib/rag/embeddings');
