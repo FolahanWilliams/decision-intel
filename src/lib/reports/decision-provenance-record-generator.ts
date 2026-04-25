@@ -88,6 +88,10 @@ export class DecisionProvenanceRecordGenerator {
     this.drawPageThree(data);
     this.doc.addPage();
     this.drawPageFour(data);
+    if (data.blindPriorAggregates && data.blindPriorAggregates.length > 0) {
+      this.doc.addPage();
+      this.drawPageFiveBlindPriors(data);
+    }
     this.drawFooterAllPages();
     if (opts?.watermark) this.drawWatermarkAllPages(opts.watermark);
     return this.doc;
@@ -574,6 +578,120 @@ export class DecisionProvenanceRecordGenerator {
       TEXT_W
     );
     this.doc.text(apx, MARGIN_L, y);
+  }
+
+  // ─── Page 5: Pre-IC blind-prior aggregations (4.1 deep) ────────────
+  private drawPageFiveBlindPriors(data: ProvenanceRecordData) {
+    this.drawAccentBand();
+    this.drawHeader('PRE-IC BLIND-PRIOR AGGREGATIONS');
+
+    let y = 34;
+    this.drawSectionHeading('GOVERNANCE EVIDENCE', y);
+    y += 8;
+    this.doc.setFont('helvetica', 'italic');
+    this.doc.setFontSize(9);
+    this.doc.setTextColor(100, 100, 100);
+    const intro = this.doc.splitTextToSize(
+      'Before the committee met, every voter submitted their probability + top-3 risks blind. ' +
+        'The aggregate below shows the anonymised distribution alongside the calibration ' +
+        '(Brier score per participant) once the actual outcome was reported. Maps onto Basel III ' +
+        'Pillar 2 ICAAP qualitative-decision documentation, EU AI Act Art. 14 human-oversight ' +
+        'records, and African board-effectiveness regimes (FRC Nigeria 1.1, CMA Kenya §2).',
+      TEXT_W
+    );
+    this.doc.text(intro, MARGIN_L, y);
+    y += intro.length * 4.5 + 6;
+
+    this.doc.setFont('helvetica', 'normal');
+    this.doc.setFontSize(9);
+    this.doc.setTextColor(40, 40, 40);
+
+    for (const room of data.blindPriorAggregates) {
+      if (y > 260) break;
+      this.doc.setFont('helvetica', 'bold');
+      this.doc.setFontSize(10);
+      this.doc.setTextColor(15, 15, 15);
+      const titleLines = this.doc.splitTextToSize(`Room: ${room.roomTitle}`, TEXT_W);
+      this.doc.text(titleLines, MARGIN_L, y);
+      y += titleLines.length * 5;
+
+      if (room.outcomeFrame) {
+        this.doc.setFont('helvetica', 'italic');
+        this.doc.setFontSize(9);
+        this.doc.setTextColor(80, 80, 80);
+        const frameLines = this.doc.splitTextToSize(
+          `Frame: ${room.outcomeFrame}`,
+          TEXT_W
+        );
+        this.doc.text(frameLines, MARGIN_L, y);
+        y += frameLines.length * 4.5 + 1;
+      }
+
+      this.doc.setFont('helvetica', 'normal');
+      this.doc.setFontSize(9);
+      this.doc.setTextColor(60, 60, 60);
+      const meta: string[] = [
+        `Voters: ${room.participantCount}`,
+        `Mean confidence: ${room.meanConfidence}%`,
+        `Median: ${room.medianConfidence}%`,
+        `σ: ${room.stdDevConfidence}pt`,
+        `Risk overlap: ${(room.topRisksAgreement * 100).toFixed(0)}%`,
+      ];
+      if (room.meanBrier !== null) {
+        meta.push(`Mean Brier: ${room.meanBrier.toFixed(3)}`);
+      }
+      this.doc.text(meta.join('   ·   '), MARGIN_L, y);
+      y += 5;
+
+      if (room.bestCalibrated) {
+        this.doc.setFont('helvetica', 'normal');
+        this.doc.setFontSize(8.5);
+        this.doc.setTextColor(22, 163, 74);
+        const bc = room.bestCalibrated;
+        const bcLine = `Best-calibrated voter: ${
+          bc.name ?? 'anonymous'
+        } · prior ${bc.confidencePercent}% · Brier ${bc.brierScore.toFixed(3)} (${
+          bc.brierCategory ?? 'unscored'
+        })`;
+        this.doc.text(this.doc.splitTextToSize(bcLine, TEXT_W), MARGIN_L, y);
+        y += 5;
+      }
+
+      if (room.topRisks.length > 0) {
+        this.doc.setFont('helvetica', 'bold');
+        this.doc.setFontSize(8.5);
+        this.doc.setTextColor(120, 120, 120);
+        this.doc.text('TOP RISKS', MARGIN_L, y);
+        y += 4;
+        this.doc.setFont('helvetica', 'normal');
+        this.doc.setFontSize(8.5);
+        this.doc.setTextColor(60, 60, 60);
+        for (const risk of room.topRisks.slice(0, 5)) {
+          if (y > 275) break;
+          const line = `· ${risk.risk} (×${risk.count}${
+            risk.attributedTo.length > 0 ? ` — ${risk.attributedTo.join(', ')}` : ''
+          })`;
+          const wrapped = this.doc.splitTextToSize(line, TEXT_W - 4);
+          this.doc.text(wrapped, MARGIN_L + 2, y);
+          y += wrapped.length * 4;
+        }
+      }
+
+      this.doc.setDrawColor(220, 220, 220);
+      this.doc.line(MARGIN_L, y + 1, PAGE_W - MARGIN_R, y + 1);
+      y += 5;
+    }
+
+    if (data.blindPriorAggregates.length === 0) {
+      this.doc.setFont('helvetica', 'italic');
+      this.doc.setFontSize(9);
+      this.doc.setTextColor(120, 120, 120);
+      this.doc.text(
+        'No pre-IC blind-prior survey was attached to this analysis.',
+        MARGIN_L,
+        y
+      );
+    }
   }
 
   // ─── Helpers ───────────────────────────────────────────────────────

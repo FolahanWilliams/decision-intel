@@ -144,6 +144,34 @@ export async function POST(req: NextRequest) {
       decisionOutcomeId: result.id,
     });
 
+    // Per-participant Brier (4.1 deep) — same engine as /api/outcomes/track.
+    try {
+      const { recordParticipantBrier } = await import('@/lib/learning/blind-prior-brier');
+      const participantBrier = await recordParticipantBrier({
+        prisma,
+        analysisId,
+        outcome,
+      });
+      if (participantBrier.roomIds.length > 0) {
+        await prisma.decisionRoom
+          .updateMany({
+            where: { id: { in: participantBrier.roomIds }, outcomeId: null },
+            data: { outcomeId: result.id },
+          })
+          .catch(err =>
+            log.warn(
+              'Failed to link rooms to outcome (legacy path):',
+              err instanceof Error ? err.message : String(err)
+            )
+          );
+      }
+    } catch (err) {
+      log.warn(
+        'Per-participant Brier (legacy path) failed:',
+        err instanceof Error ? err.message : String(err)
+      );
+    }
+
     // Adjust graph edge weights from outcome (fire-and-forget flywheel)
     let contradictions: Array<{
       contradictedBias: string;

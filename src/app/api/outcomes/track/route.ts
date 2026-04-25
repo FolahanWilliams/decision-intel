@@ -170,6 +170,45 @@ export async function POST(req: NextRequest) {
       decisionOutcomeId: decisionOutcome.id,
     });
 
+    // Per-participant Brier (4.1 deep). Stamps Brier + category on every
+    // unstamped DecisionRoomBlindPrior tied to this analysis. Fire-and-
+    // forget — failure shouldn't block outcome submission, but we surface
+    // the count in the response so the UI can show "5 participants
+    // calibrated" alongside the recalibration block.
+    let participantBrier = null;
+    try {
+      const { recordParticipantBrier } = await import('@/lib/learning/blind-prior-brier');
+      participantBrier = await recordParticipantBrier({
+        prisma,
+        analysisId,
+        outcome,
+      });
+      // Link the room to the outcome so the per-room detail page can
+      // render the outcome_logged phase. Idempotent: if the room is
+      // already linked we skip.
+      if (participantBrier.roomIds.length > 0) {
+        await prisma.decisionRoom
+          .updateMany({
+            where: {
+              id: { in: participantBrier.roomIds },
+              outcomeId: null,
+            },
+            data: { outcomeId: decisionOutcome.id },
+          })
+          .catch(err =>
+            log.warn(
+              'Failed to link rooms to outcome:',
+              err instanceof Error ? err.message : String(err)
+            )
+          );
+      }
+    } catch (err) {
+      log.warn(
+        'Per-participant Brier failed (non-critical):',
+        err instanceof Error ? err.message : String(err)
+      );
+    }
+
     // Emit webhook event (non-blocking, fire-and-forget)
     try {
       const { emitWebhookEvent } = await import('@/lib/integrations/webhooks/engine');
@@ -241,6 +280,15 @@ export async function POST(req: NextRequest) {
       // in the outcome-submission success banner. Null on the "recalibration
       // skipped" branch (e.g. analysis was deleted between upsert and now).
       brier: recalibration.brier,
+      // Per-participant calibration count (4.1 deep) — null when no
+      // Decision Room with priors was tied to this analysis.
+      participantBrier: participantBrier
+        ? {
+            scoredCount: participantBrier.scoredCount,
+            roomCount: participantBrier.roomIds.length,
+            outcomeCode: participantBrier.outcomeCode,
+          }
+        : null,
     });
   } catch (error: unknown) {
     const code = (error as { code?: string }).code;

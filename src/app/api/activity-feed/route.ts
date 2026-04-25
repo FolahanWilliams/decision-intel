@@ -8,7 +8,15 @@ const log = createLogger('ActivityFeed');
 
 export interface ActivityItem {
   id: string;
-  type: 'upload' | 'analysis_complete' | 'analysis_error' | 'nudge' | 'outcome';
+  type:
+    | 'upload'
+    | 'analysis_complete'
+    | 'analysis_error'
+    | 'nudge'
+    | 'outcome'
+    | 'blind_prior_distributed'
+    | 'blind_prior_revealed'
+    | 'blind_prior_outcome_logged';
   title: string;
   description: string;
   timestamp: string;
@@ -18,6 +26,10 @@ export interface ActivityItem {
     score?: number;
     severity?: string;
     nudgeType?: string;
+    roomId?: string;
+    roomTitle?: string;
+    submittedCount?: number;
+    totalVoters?: number;
   };
 }
 
@@ -49,7 +61,16 @@ export async function GET(request: NextRequest) {
     const allowedTypes = new Set(
       typesParam
         ? typesParam.split(',').map(t => t.trim())
-        : ['upload', 'analysis_complete', 'analysis_error', 'nudge', 'outcome']
+        : [
+            'upload',
+            'analysis_complete',
+            'analysis_error',
+            'nudge',
+            'outcome',
+            'blind_prior_distributed',
+            'blind_prior_revealed',
+            'blind_prior_outcome_logged',
+          ]
     );
 
     const cursorDate = cursor ? new Date(cursor) : undefined;
@@ -59,8 +80,16 @@ export async function GET(request: NextRequest) {
     // analysis-complete events; private docs must not leak to teammates.
     const { where: docWhere } = await buildDocumentAccessFilter(user.id);
 
+    // 4.1 deep — Decision Room blind-prior events. Surfaces three event
+    // types (distributed / revealed / outcome_logged). Schema-drift
+    // tolerant: a missing column or table returns an empty array.
+    const wantsBlindPrior =
+      allowedTypes.has('blind_prior_distributed') ||
+      allowedTypes.has('blind_prior_revealed') ||
+      allowedTypes.has('blind_prior_outcome_logged');
+
     // Fetch from multiple sources in parallel
-    const [documents, nudges, outcomes] = await Promise.allSettled([
+    const [documents, nudges, outcomes, blindPriorRooms] = await Promise.allSettled([
       // Documents (uploads + analysis completions/errors)
       allowedTypes.has('upload') ||
       allowedTypes.has('analysis_complete') ||
@@ -129,6 +158,56 @@ export async function GET(request: NextRequest) {
                 notes: true,
                 reportedAt: true,
                 analysisId: true,
+              },
+            })
+            .catch(() => [])
+        : Promise.resolve([]),
+
+      // Blind-prior events — fetch rooms the user is involved with that
+      // have crossed any of the three milestones (distributed via deadline
+      // set, revealed, outcome logged). Schema-drift tolerant.
+      wantsBlindPrior
+        ? prisma.decisionRoom
+            .findMany({
+              where: {
+                OR: [
+                  { createdBy: user.id },
+                  { participants: { some: { userId: user.id } } },
+                  { decisionRoomInvites: { some: { userId: user.id } } },
+                ],
+                AND: [
+                  {
+                    OR: [
+                      { blindPriorDeadline: { not: null } },
+                      { blindPriorRevealedAt: { not: null } },
+                    ],
+                  },
+                  cursorDate
+                    ? {
+                        OR: [
+                          { blindPriorDeadline: { lt: cursorDate } },
+                          { blindPriorRevealedAt: { lt: cursorDate } },
+                          { updatedAt: { lt: cursorDate } },
+                        ],
+                      }
+                    : {},
+                ],
+              },
+              orderBy: { updatedAt: 'desc' },
+              take: limit,
+              select: {
+                id: true,
+                title: true,
+                blindPriorDeadline: true,
+                blindPriorRevealedAt: true,
+                outcomeId: true,
+                updatedAt: true,
+                _count: {
+                  select: {
+                    decisionRoomBlindPriors: true,
+                    decisionRoomInvites: true,
+                  },
+                },
               },
             })
             .catch(() => [])
@@ -207,6 +286,64 @@ export async function GET(request: NextRequest) {
           timestamp: nudge.createdAt.toISOString(),
           metadata: { severity: nudge.severity, nudgeType: nudge.nudgeType },
         });
+      }
+    }
+
+    // Process blind-prior events (4.1 deep)
+    if (blindPriorRooms.status === 'fulfilled') {
+      for (const room of blindPriorRooms.value as Array<{
+        id: string;
+        title: string;
+        blindPriorDeadline: Date | null;
+        blindPriorRevealedAt: Date | null;
+        outcomeId: string | null;
+        updatedAt: Date;
+        _count: { decisionRoomBlindPriors: number; decisionRoomInvites: number };
+      }>) {
+        if (room.blindPriorDeadline && allowedTypes.has('blind_prior_distributed')) {
+          activities.push({
+            id: `blind-prior-distributed-${room.id}`,
+            type: 'blind_prior_distributed',
+            title: `Blind-prior survey distributed: ${room.title}`,
+            description: `Pre-IC survey live. ${room._count.decisionRoomInvites} invitee${room._count.decisionRoomInvites === 1 ? '' : 's'}.`,
+            timestamp: room.blindPriorDeadline.toISOString(),
+            metadata: {
+              roomId: room.id,
+              roomTitle: room.title,
+              totalVoters: room._count.decisionRoomInvites,
+              submittedCount: room._count.decisionRoomBlindPriors,
+            },
+          });
+        }
+        if (room.blindPriorRevealedAt && allowedTypes.has('blind_prior_revealed')) {
+          activities.push({
+            id: `blind-prior-revealed-${room.id}`,
+            type: 'blind_prior_revealed',
+            title: `Aggregate revealed: ${room.title}`,
+            description: `${room._count.decisionRoomBlindPriors} of ${room._count.decisionRoomInvites} priors visible.`,
+            timestamp: room.blindPriorRevealedAt.toISOString(),
+            metadata: {
+              roomId: room.id,
+              roomTitle: room.title,
+              submittedCount: room._count.decisionRoomBlindPriors,
+              totalVoters: room._count.decisionRoomInvites,
+            },
+          });
+        }
+        if (
+          room.outcomeId &&
+          room.blindPriorRevealedAt &&
+          allowedTypes.has('blind_prior_outcome_logged')
+        ) {
+          activities.push({
+            id: `blind-prior-outcome-${room.id}`,
+            type: 'blind_prior_outcome_logged',
+            title: `Brier scored: ${room.title}`,
+            description: `Per-participant calibration computed against the actual outcome.`,
+            timestamp: room.updatedAt.toISOString(),
+            metadata: { roomId: room.id, roomTitle: room.title },
+          });
+        }
       }
     }
 

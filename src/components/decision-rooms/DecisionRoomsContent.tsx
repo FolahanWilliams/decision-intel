@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import useSWR from 'swr';
 import {
   Users,
@@ -207,15 +208,19 @@ export function DecisionRoomsContent() {
               const biasCount = room.biasBriefing ? Object.keys(room.biasBriefing).length : 0;
 
               return (
-                <div
+                <Link
                   key={room.id}
+                  href={`/dashboard/decision-rooms/${room.id}`}
                   style={{
+                    display: 'block',
+                    textDecoration: 'none',
                     background: 'var(--bg-secondary)',
                     border: '1px solid var(--glass-border)',
                     borderRadius: 'var(--radius-md)',
                     padding: 'var(--spacing-md)',
                     transition: 'border-color 0.15s ease',
-                    cursor: 'default',
+                    cursor: 'pointer',
+                    color: 'inherit',
                   }}
                   onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--accent-primary)')}
                   onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--glass-border)')}
@@ -338,7 +343,7 @@ export function DecisionRoomsContent() {
                       {formatDate(room.createdAt)}
                     </span>
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>

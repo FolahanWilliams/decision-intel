@@ -53,7 +53,12 @@ export type AuditAction =
   // Share-link revocation (3.3 deep)
   | 'SHARE_LINK_CREATED'
   | 'SHARE_LINK_REVOKED'
-  | 'SHARE_LINK_VIEWED';
+  | 'SHARE_LINK_VIEWED'
+  // Decision Rooms · pre-IC blind-prior platform (4.1 deep)
+  | 'BLIND_PRIOR_INVITES_DISTRIBUTED'
+  | 'BLIND_PRIOR_SUBMITTED'
+  | 'BLIND_PRIOR_REVEAL_FIRED'
+  | 'BLIND_PRIOR_REMINDER_SENT';
 
 export interface AuditLogParams {
   action: AuditAction;

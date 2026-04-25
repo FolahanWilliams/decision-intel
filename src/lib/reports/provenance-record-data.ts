@@ -33,6 +33,10 @@ import { getBiasEducation } from '@/lib/constants/bias-education';
 import { getCrossFrameworkRisk } from '@/lib/compliance/bias-regulation-map';
 import { PIPELINE_NODES } from '@/lib/data/pipeline-nodes';
 import { createLogger } from '@/lib/utils/logger';
+import {
+  aggregateBlindPriors,
+  type BlindPriorRow,
+} from '@/lib/learning/blind-prior-aggregate';
 
 const log = createLogger('ProvenanceRecordData');
 
@@ -48,6 +52,13 @@ export interface ProvenanceRecordData {
   citations: CitationEntry[];
   regulatoryMapping: RegulatoryEntry[];
   pipelineLineage: PipelineLineageEntry[];
+  /**
+   * Pre-IC blind-prior aggregations attached to this analysis (4.1
+   * deep). One entry per Decision Room that ran a blind-prior survey
+   * before the decision was made. Empty array when no rooms had a
+   * pre-IC survey — the DPR section then renders a one-line note.
+   */
+  blindPriorAggregates: BlindPriorRoomAggregate[];
   schemaVersion: number;
   generatedAt: Date;
   // Meta for the PDF renderer — not persisted.
@@ -146,6 +157,35 @@ export interface PipelineLineageEntry {
   zone: string;
   label: string;
   academicAnchor: string;
+}
+
+/**
+ * Per-room blind-prior summary as it lives in the DPR (4.1 deep).
+ * The shape mirrors `BlindPriorAggregate` but is reduced to the fields
+ * a procurement-grade record needs: counts, central tendency, spread,
+ * agreement, calibration. Names are only included when the participant
+ * opted in to share identity — same privacy contract as the in-app view.
+ */
+export interface BlindPriorRoomAggregate {
+  roomId: string;
+  roomTitle: string;
+  outcomeFrame: string | null;
+  deadline: string | null;
+  revealedAt: string | null;
+  participantCount: number;
+  meanConfidence: number;
+  medianConfidence: number;
+  stdDevConfidence: number;
+  topRisksAgreement: number;
+  topRisks: Array<{ risk: string; count: number; attributedTo: string[] }>;
+  meanBrier: number | null;
+  bestCalibrated: {
+    name: string | null;
+    confidencePercent: number;
+    brierScore: number;
+    brierCategory: string | null;
+  } | null;
+  outcomeReported: boolean;
 }
 
 // ─── Model-lineage constant ──────────────────────────────────────────
@@ -310,6 +350,69 @@ export async function assembleProvenanceRecordData(
       : 'Legacy analysis — granular per-judge outputs were not captured at run time. Available on request under the DPA from the internal audit log.',
   };
 
+  // Decision Room blind-prior aggregates (4.1 deep). Pulls every room
+  // whose `analysisId` matches, computes the anonymised aggregate per
+  // room, and reduces it down to the procurement-friendly shape stored
+  // on the DPR. Schema-drift tolerant — falls back to an empty array
+  // when the table or columns aren't migrated yet.
+  let blindPriorAggregates: BlindPriorRoomAggregate[] = [];
+  try {
+    const rooms = await prisma.decisionRoom.findMany({
+      where: { analysisId: analysis.id },
+      select: {
+        id: true,
+        title: true,
+        blindPriorOutcomeFrame: true,
+        blindPriorDeadline: true,
+        blindPriorRevealedAt: true,
+        outcomeId: true,
+        decisionRoomBlindPriors: {
+          select: {
+            id: true,
+            respondentUserId: true,
+            respondentEmail: true,
+            respondentName: true,
+            confidencePercent: true,
+            topRisks: true,
+            privateRationale: true,
+            shareRationale: true,
+            shareIdentity: true,
+            brierScore: true,
+            brierCategory: true,
+            brierCalculatedAt: true,
+            submittedAt: true,
+          },
+        },
+      },
+    });
+    blindPriorAggregates = rooms
+      .filter(r => r.decisionRoomBlindPriors.length > 0)
+      .map(room => {
+        const agg = aggregateBlindPriors(room.decisionRoomBlindPriors as BlindPriorRow[]);
+        return {
+          roomId: room.id,
+          roomTitle: room.title,
+          outcomeFrame: room.blindPriorOutcomeFrame,
+          deadline: room.blindPriorDeadline?.toISOString() ?? null,
+          revealedAt: room.blindPriorRevealedAt?.toISOString() ?? null,
+          participantCount: agg.count,
+          meanConfidence: agg.meanConfidence,
+          medianConfidence: agg.medianConfidence,
+          stdDevConfidence: agg.stdDevConfidence,
+          topRisksAgreement: agg.topRisksAgreement,
+          topRisks: agg.topRisks.slice(0, 6),
+          meanBrier: agg.meanBrier,
+          bestCalibrated: agg.bestCalibrated,
+          outcomeReported: room.outcomeId !== null,
+        };
+      });
+  } catch (err) {
+    log.warn(
+      'Blind-prior aggregate lookup for DPR failed (likely schema drift):',
+      err instanceof Error ? err.message : String(err)
+    );
+  }
+
   return {
     analysisId: analysis.id,
     documentId: analysis.document.id,
@@ -322,6 +425,7 @@ export async function assembleProvenanceRecordData(
     citations,
     regulatoryMapping,
     pipelineLineage,
+    blindPriorAggregates,
     schemaVersion: 1,
     generatedAt: new Date(),
     meta: {

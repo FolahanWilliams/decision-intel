@@ -1192,8 +1192,20 @@ model DecisionRoom {
   closedAt        DateTime?
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
+  /// Pre-IC blind-prior platform (4.1 deep). Survey closes at this timestamp.
+  blindPriorDeadline    DateTime?
+  /// Stamped when the owner-fired reveal flips the room from `collecting`
+  /// to `revealed`. Once set, the per-participant aggregate is visible
+  /// to every invitee. Nullable until the reveal fires.
+  blindPriorRevealedAt  DateTime?
+  /// Human-readable decision frame surfaced to invitees on the survey:
+  /// e.g. "Should we approve Project Atlas at $40M?". Optional — when
+  /// absent the room title is used.
+  blindPriorOutcomeFrame String?       @db.Text
   participants    RoomParticipant[]
   blindPriors     BlindPrior[]
+  decisionRoomBlindPriors DecisionRoomBlindPrior[]
+  decisionRoomInvites     DecisionRoomInvite[]
 
   @@index([createdBy])
   @@index([orgId])
@@ -1202,6 +1214,85 @@ model DecisionRoom {
   @@index([outcomeId])
   @@index([documentId])
   @@index([analysisId])
+  @@index([blindPriorDeadline])
+}
+
+/// Pre-IC blind-prior submission. Decoupled from the legacy `BlindPrior`
+/// model so the new procurement-grade fields (top risks, share-toggles,
+/// per-participant Brier) don't have to backfill onto historical rows.
+/// Either `respondentUserId` (existing platform user) or `respondentEmail`
+/// (external invitee submitting via magic-link) is set — never both.
+model DecisionRoomBlindPrior {
+  id                  String        @id @default(cuid())
+  roomId              String
+  /// Set when an existing platform user submits.
+  respondentUserId    String?
+  /// Set when an external invitee submits via the magic-link token flow.
+  respondentEmail     String?
+  /// Display name carried forward from the invite, used when
+  /// `shareIdentity = true` so the reveal can attribute by name.
+  respondentName      String?
+  /// 0–100. Subjective probability the decision succeeds.
+  confidencePercent   Int
+  /// Free-text top-3 risks. Each entry capped at 200 chars in the
+  /// API; up to 3 entries.
+  topRisks            String[]
+  /// Optional one-sentence private rationale. Surfaced in the aggregate
+  /// only when `shareRationale = true`.
+  privateRationale    String?       @db.Text
+  /// Whether the participant agreed to share their rationale in the reveal.
+  shareRationale      Boolean       @default(false)
+  /// Whether the participant agreed to share their identity (name) in
+  /// the reveal. Defaults false — reveal is anonymised by default.
+  shareIdentity       Boolean       @default(false)
+  submittedAt         DateTime      @default(now())
+  /// Brier score per participant computed once the linked outcome is
+  /// logged. Lower is better calibrated. See src/lib/learning/brier-scoring.ts.
+  brierScore          Float?
+  brierCategory       String?
+  brierCalculatedAt   DateTime?
+  room                DecisionRoom  @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@unique([roomId, respondentUserId])
+  @@unique([roomId, respondentEmail])
+  @@index([roomId])
+  @@index([respondentUserId])
+  @@index([respondentEmail])
+}
+
+/// Per-invitee magic-link record for the blind-prior survey. Each row
+/// owns a single-use signed token (consumed on submission). Existing
+/// platform users get an invite AND a RoomParticipant row; external
+/// invitees get only an invite. Both kinds resolve to a
+/// DecisionRoomBlindPrior on submission.
+model DecisionRoomInvite {
+  id              String       @id @default(cuid())
+  roomId          String
+  /// Filled when invitee already has a platform account.
+  userId          String?
+  /// Filled when invitee is external (no platform account).
+  email           String?
+  /// Display name surfaced on the survey page + on the reveal aggregate
+  /// when shareIdentity is true.
+  displayName     String?
+  role            String       @default("voter") // voter, observer
+  /// Cryptographically random token. Single-use — `usedAt` is stamped
+  /// on submission and the token is rotated to prevent replay.
+  submissionToken String       @unique
+  tokenExpiresAt  DateTime
+  sentAt          DateTime     @default(now())
+  /// Stamped when the invitee POSTs a valid blind-prior. Submission
+  /// idempotent — if the same token is replayed, return the existing
+  /// prior + 200, never duplicate.
+  usedAt          DateTime?
+  remindedAt      DateTime?
+  room            DecisionRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@unique([roomId, userId])
+  @@unique([roomId, email])
+  @@index([roomId])
+  @@index([submissionToken])
+  @@index([tokenExpiresAt])
 }
 
 model RoomParticipant {

@@ -168,6 +168,39 @@ export function buildSampleDprData(): ProvenanceRecordData {
     citations: SAMPLE_CITATIONS,
     regulatoryMapping: SAMPLE_REGULATORY,
     pipelineLineage: SAMPLE_PIPELINE_LINEAGE,
+    blindPriorAggregates: [
+      {
+        roomId: 'specimen-room-0001',
+        roomTitle: 'Project Heliograph · IC pre-vote',
+        outcomeFrame:
+          'Should we approve the DACH market entry at the proposed $14M budget and 18-month break-even target?',
+        deadline: '2026-04-22T17:00:00Z',
+        revealedAt: '2026-04-22T17:30:00Z',
+        participantCount: 6,
+        meanConfidence: 47.5,
+        medianConfidence: 50,
+        stdDevConfidence: 18.4,
+        topRisksAgreement: 0.42,
+        topRisks: [
+          {
+            risk: 'break-even underestimates customer-acquisition cost',
+            count: 4,
+            attributedTo: ['Sarah Adekunle'],
+          },
+          { risk: 'reference-class missing — no comparable EU expansions cited', count: 3, attributedTo: [] },
+          { risk: 'sunk-cost framing on incumbent GTM build', count: 2, attributedTo: [] },
+          { risk: 'currency hedge unfunded for the 18-month horizon', count: 2, attributedTo: [] },
+        ],
+        meanBrier: 0.142,
+        bestCalibrated: {
+          name: 'Sarah Adekunle',
+          confidencePercent: 35,
+          brierScore: 0.062,
+          brierCategory: 'excellent',
+        },
+        outcomeReported: true,
+      },
+    ],
     schemaVersion: 1,
     generatedAt: specimenDate,
     meta: {

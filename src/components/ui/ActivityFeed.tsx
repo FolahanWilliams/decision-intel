@@ -17,7 +17,10 @@ export interface Activity {
     | 'analysis_complete'
     | 'analysis_error'
     | 'nudge'
-    | 'outcome';
+    | 'outcome'
+    | 'blind_prior_distributed'
+    | 'blind_prior_revealed'
+    | 'blind_prior_outcome_logged';
   title: string;
   description?: string;
   timestamp: Date | string;
