@@ -8,6 +8,7 @@ import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
 import { buildStructuralAssumptionsPrompt } from '@/lib/agents/prompts';
 import { DALIO_DETERMINANTS } from '@/lib/constants/dalio-determinants';
+import { resolveAnalysisAccess } from '@/lib/utils/document-access';
 
 const log = createLogger('StructuralAssumptionsAPI');
 
@@ -81,6 +82,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     const { id: analysisId } = await params;
 
+    // RBAC (3.5): visibility-aware access via the parent document.
+    const access = await resolveAnalysisAccess(analysisId, user.id);
+    if (!access) {
+      return NextResponse.json({ error: 'Analysis not found' }, { status: 404 });
+    }
+
     const analysis = await prisma.analysis.findUnique({
       where: { id: analysisId },
       select: {
@@ -88,8 +95,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         document: {
           select: {
             id: true,
-            userId: true,
-            orgId: true,
             content: true,
             contentEncrypted: true,
             contentIv: true,
@@ -103,23 +108,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     if (!analysis) {
       return NextResponse.json({ error: 'Analysis not found' }, { status: 404 });
-    }
-
-    // Access check mirrors /api/analysis/[id]/risk-score
-    const docUserId = analysis.document.userId;
-    const docOrgId = analysis.document.orgId;
-    let hasAccess = docUserId === user.id;
-    if (!hasAccess && docOrgId) {
-      const membership = await prisma.teamMember
-        .findFirst({
-          where: { userId: user.id, orgId: docOrgId },
-          select: { id: true },
-        })
-        .catch(() => null);
-      hasAccess = !!membership;
-    }
-    if (!hasAccess) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const memoText = getDocumentContent(

@@ -5,6 +5,7 @@ import { authenticateApiRequest } from '@/lib/utils/api-auth';
 import { prisma } from '@/lib/prisma';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
+import { buildDocumentAccessWhere } from '@/lib/utils/document-access';
 
 const log = createLogger('AnalyzeRoute');
 
@@ -82,10 +83,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing documentId or text' }, { status: 400 });
     }
 
-    // Verify ownership
-    const doc = await prisma.document.findFirst({
-      where: { id: documentId, userId: effectiveUserId },
-    });
+    // RBAC (3.5): use the visibility-aware resolver. Owner always wins;
+    // teammates see 'team'; explicit grantees see 'specific'. A teammate
+    // who can read a doc *can* also re-trigger analysis on it — that's
+    // intentional, the doc is in their access scope.
+    const access = await buildDocumentAccessWhere(documentId, effectiveUserId);
+    const doc = await prisma.document.findFirst({ where: access.where });
 
     if (!doc) {
       return NextResponse.json({ error: 'Document not found' }, { status: 404 });

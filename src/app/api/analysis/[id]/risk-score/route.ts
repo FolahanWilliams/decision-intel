@@ -3,6 +3,7 @@ import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { calculateRiskAdjustedScore } from '@/lib/learning/outcome-scoring';
 import { createLogger } from '@/lib/utils/logger';
+import { resolveAnalysisAccess } from '@/lib/utils/document-access';
 
 const log = createLogger('RiskScoreAPI');
 
@@ -19,42 +20,18 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
     const { id: analysisId } = await params;
 
-    // Verify analysis exists and user has access
-    const analysis = await prisma.analysis.findUnique({
-      where: { id: analysisId },
-      select: {
-        id: true,
-        document: {
-          select: { userId: true, orgId: true },
-        },
-      },
-    });
-
-    if (!analysis) {
+    // RBAC (3.5): visibility-aware access via the parent document.
+    const access = await resolveAnalysisAccess(analysisId, user.id);
+    if (!access) {
       return NextResponse.json({ error: 'Analysis not found' }, { status: 404 });
     }
 
-    // Check access: user owns the document or is in the same org
-    const docUserId = analysis.document.userId;
-    const docOrgId = analysis.document.orgId;
-    let hasAccess = docUserId === user.id;
-
-    if (!hasAccess && docOrgId) {
-      const membership = await prisma.teamMember
-        .findFirst({
-          where: { userId: user.id, orgId: docOrgId },
-          select: { id: true },
-        })
-        .catch(() => null);
-      hasAccess = !!membership;
-    }
-
-    if (!hasAccess) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
-
-    // Resolve org context
-    let orgId: string | null = docOrgId;
+    // Resolve org context for downstream calibration.
+    const docMeta = await prisma.document.findUnique({
+      where: { id: access.documentId },
+      select: { orgId: true },
+    });
+    let orgId: string | null = docMeta?.orgId ?? null;
     if (!orgId) {
       const membership = await prisma.teamMember
         .findFirst({

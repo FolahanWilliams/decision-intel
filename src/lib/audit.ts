@@ -42,7 +42,18 @@ export type AuditAction =
   | 'BIAS_TASK_UPDATED'
   | 'BIAS_TASK_REASSIGNED'
   | 'BIAS_TASK_RESOLVED'
-  | 'BIAS_TASK_DELETED';
+  | 'BIAS_TASK_DELETED'
+  // Document RBAC (3.5 deep)
+  | 'DOCUMENT_VISIBILITY_CHANGED'
+  | 'DOCUMENT_ACCESS_GRANTED'
+  | 'DOCUMENT_ACCESS_REVOKED'
+  // Redaction trail (3.2 deep)
+  | 'REDACTION_APPLIED'
+  | 'REDACTION_SKIPPED'
+  // Share-link revocation (3.3 deep)
+  | 'SHARE_LINK_CREATED'
+  | 'SHARE_LINK_REVOKED'
+  | 'SHARE_LINK_VIEWED';
 
 export interface AuditLogParams {
   action: AuditAction;

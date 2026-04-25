@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
 import { apiError } from '@/lib/utils/api-response';
+import { buildDocumentAccessFilter } from '@/lib/utils/document-access';
 
 const log = createLogger('DocumentsRoute');
 
@@ -57,30 +58,11 @@ export async function GET(request: Request) {
     const limit = Math.min(100, Math.max(1, Number(searchParams.get('limit')) || 10));
     const skip = (page - 1) * limit;
 
-    // Build org-aware where clause: user's own docs + org-shared docs.
-    // Soft-deleted rows (deletedAt != null) are excluded by default — they
-    // remain in the DB during the grace window but are invisible to all
-    // user-facing surfaces. The enforce-retention cron handles permanent
-    // purge after SOFT_DELETE_GRACE_DAYS.
-    let where: {
-      userId?: string;
-      OR?: Array<Record<string, unknown>>;
-      deletedAt?: null;
-    } = { userId, deletedAt: null };
-    try {
-      const membership = await prisma.teamMember.findFirst({
-        where: { userId },
-        select: { orgId: true },
-      });
-      if (membership?.orgId) {
-        where = {
-          OR: [{ userId }, { orgId: membership.orgId }],
-          deletedAt: null,
-        };
-      }
-    } catch {
-      // Schema drift — TeamMember may not exist, fall back to userId-only
-    }
+    // Document-level RBAC (3.5): private docs stay invisible to teammates,
+    // team docs surface to org members, specific docs surface to grantees.
+    // Owner sees all of their own regardless of visibility. Soft-deleted
+    // rows excluded by the resolver — see buildDocumentAccessFilter.
+    const { where } = await buildDocumentAccessFilter(userId);
     let schemaDrift = false;
 
     // Build the select — detailed mode requests extended analysis fields.

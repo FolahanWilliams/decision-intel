@@ -12,6 +12,10 @@ import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { isSchemaDrift } from '@/lib/utils/error';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
+import {
+  buildDocumentAccessWhere,
+  resolveAnalysisAccess,
+} from '@/lib/utils/document-access';
 
 const log = createLogger('DecisionRoomsRoute');
 
@@ -45,6 +49,33 @@ export async function POST(request: NextRequest) {
 
     if (!title || typeof title !== 'string' || title.trim().length === 0) {
       return NextResponse.json({ error: 'Missing required field: title' }, { status: 400 });
+    }
+
+    // RBAC (3.5): if a documentId/analysisId is supplied, the creator must
+    // be allowed to read the document the room is being built around.
+    // Otherwise a teammate could create a "Decision Room" exposing a
+    // private doc to extra participants.
+    if (typeof documentId === 'string' && documentId.length > 0) {
+      const access = await buildDocumentAccessWhere(documentId, user.id);
+      const canRead = await prisma.document.findFirst({
+        where: access.where,
+        select: { id: true },
+      });
+      if (!canRead) {
+        return NextResponse.json(
+          { error: 'Document not found or you do not have access.' },
+          { status: 404 }
+        );
+      }
+    }
+    if (typeof analysisId === 'string' && analysisId.length > 0) {
+      const analysisAccess = await resolveAnalysisAccess(analysisId, user.id);
+      if (!analysisAccess) {
+        return NextResponse.json(
+          { error: 'Analysis not found or you do not have access.' },
+          { status: 404 }
+        );
+      }
     }
 
     // Build participant creates — always include the creator

@@ -3,6 +3,10 @@ import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { apiError } from '@/lib/utils/api-response';
 import { createLogger } from '@/lib/utils/logger';
+import {
+  buildDocumentAccessFilter,
+  buildDocumentAccessWhere,
+} from '@/lib/utils/document-access';
 
 const log = createLogger('DocumentVersionsRoute');
 
@@ -27,44 +31,31 @@ export async function GET(
     } = await supabase.auth.getUser();
     if (!user?.id) return apiError({ error: 'Unauthorized', status: 401 });
 
-    // Fetch the requested doc to discover the chain root.
-    const focal = await prisma.document.findUnique({
-      where: { id },
+    // RBAC (3.5): visibility-aware fetch of the focal doc.
+    const focalAccess = await buildDocumentAccessWhere(id, user.id);
+    const focal = await prisma.document.findFirst({
+      where: focalAccess.where,
       select: {
         id: true,
-        userId: true,
-        orgId: true,
         parentDocumentId: true,
         versionNumber: true,
-        deletedAt: true,
       },
     });
-    if (!focal || focal.deletedAt) {
+    if (!focal) {
       return apiError({ error: 'Not found', status: 404 });
     }
 
-    // Access check: ownership or org-membership.
-    let hasAccess = focal.userId === user.id;
-    if (!hasAccess && focal.orgId) {
-      const membership = await prisma.teamMember
-        .findFirst({
-          where: { userId: user.id, orgId: focal.orgId },
-          select: { id: true },
-        })
-        .catch(() => null);
-      hasAccess = !!membership;
-    }
-    if (!hasAccess) return apiError({ error: 'Forbidden', status: 403 });
-
     // Resolve the chain root. v1 has parentDocumentId=null; vN has it set
     // to v1's id (we always anchor on root, see Document.parentDocumentId
-    // doc on the schema).
+    // doc on the schema). Filter the chain itself by the visibility resolver
+    // so a private vN inside a chain is hidden from teammates of v1.
     const rootId = focal.parentDocumentId ?? focal.id;
+    const { where: chainWhere } = await buildDocumentAccessFilter(user.id);
 
     const chain = await prisma.document.findMany({
       where: {
         OR: [{ id: rootId }, { parentDocumentId: rootId }],
-        deletedAt: null,
+        AND: chainWhere,
       },
       orderBy: { versionNumber: 'asc' },
       select: {

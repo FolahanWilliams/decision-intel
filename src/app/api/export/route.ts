@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { resolveAnalysisAccess } from '@/lib/utils/document-access';
 import { Analysis, BiasInstance, AnalysisVersion, Document } from '@prisma/client';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
@@ -63,7 +64,13 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Missing analysisId' }, { status: 400 });
     }
 
-    // Fetch analysis with document and biases
+    // RBAC (3.5): visibility-aware. Export bundles the document content, so
+    // a teammate of a 'private' doc must NOT be able to export it.
+    const access = await resolveAnalysisAccess(analysisId, user.id);
+    if (!access) {
+      return NextResponse.json({ error: 'Analysis not found' }, { status: 404 });
+    }
+
     const analysis = await prisma.analysis.findUnique({
       where: { id: analysisId },
       include: {
@@ -71,24 +78,13 @@ export async function GET(req: NextRequest) {
         biases: true,
         versions: {
           orderBy: { version: 'desc' },
-          take: 5, // Include last 5 versions for comparison
+          take: 5,
         },
       },
     });
 
     if (!analysis) {
       return NextResponse.json({ error: 'Analysis not found' }, { status: 404 });
-    }
-
-    // Verify ownership
-    if (analysis.document.userId !== user.id) {
-      const membership = await prisma.teamMember.findFirst({
-        where: { userId: user.id },
-      });
-
-      if (!membership || membership.orgId !== analysis.document.orgId) {
-        return NextResponse.json({ error: 'Access denied' }, { status: 403 });
-      }
     }
 
     // Generate export based on format

@@ -9,9 +9,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-import { prisma } from '@/lib/prisma';
 import { findSimilarDecisions } from '@/lib/graph/graph-builder';
 import { createLogger } from '@/lib/utils/logger';
+import { resolveAnalysisAccess } from '@/lib/utils/document-access';
 
 const log = createLogger('SimilarDecisionsAPI');
 
@@ -41,25 +41,10 @@ export async function GET(
     const rawLimit = parseInt(searchParams.get('limit') || '3', 10);
     const limit = Math.min(Number.isFinite(rawLimit) && rawLimit > 0 ? rawLimit : 3, 10);
 
-    // Ownership check — user must own the analysis or belong to its org
-    const analysis = await prisma.analysis.findUnique({
-      where: { id: analysisId },
-      include: { document: { select: { userId: true, orgId: true } } },
-    });
-    if (!analysis) {
+    // RBAC (3.5): visibility-aware via the parent document.
+    const access = await resolveAnalysisAccess(analysisId, user.id);
+    if (!access) {
       return NextResponse.json({ error: 'Analysis not found' }, { status: 404 });
-    }
-    if (analysis.document.userId !== user.id) {
-      if (!analysis.document.orgId) {
-        return NextResponse.json({ error: 'Access denied' }, { status: 403 });
-      }
-      const membership = await prisma.teamMember.findFirst({
-        where: { userId: user.id, orgId: analysis.document.orgId },
-        select: { orgId: true },
-      });
-      if (!membership) {
-        return NextResponse.json({ error: 'Access denied' }, { status: 403 });
-      }
     }
 
     const similar = await findSimilarDecisions(analysisId, limit);

@@ -3,6 +3,7 @@ import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { apiError } from '@/lib/utils/api-response';
 import { createLogger } from '@/lib/utils/logger';
+import { resolveAnalysisAccess } from '@/lib/utils/document-access';
 
 const log = createLogger('AnalysisFingerprintRoute');
 
@@ -12,7 +13,8 @@ const log = createLogger('AnalysisFingerprintRoute');
 //   Avoids pulling the full Analysis object (which is ~50KB+ once you
 //   include compliance, sentiment, simulation, etc.).
 //
-// Auth mirrors /api/analysis/[id]/risk-score: ownership OR same-org.
+// Auth (3.5): visibility-aware via resolveAnalysisAccess — checks the
+// parent document's visibility. Private docs only readable by owner.
 
 export async function GET(
   _req: NextRequest,
@@ -26,6 +28,9 @@ export async function GET(
     if (!user?.id) return apiError({ error: 'Unauthorized', status: 401 });
 
     const { id } = await params;
+    const access = await resolveAnalysisAccess(id, user.id);
+    if (!access) return apiError({ error: 'Not found', status: 404 });
+
     const analysis = await prisma.analysis.findUnique({
       where: { id },
       select: {
@@ -33,26 +38,9 @@ export async function GET(
         overallScore: true,
         noiseScore: true,
         biases: { select: { biasType: true, severity: true } },
-        document: {
-          select: { userId: true, orgId: true, deletedAt: true },
-        },
       },
     });
-    if (!analysis || analysis.document.deletedAt) {
-      return apiError({ error: 'Not found', status: 404 });
-    }
-
-    let hasAccess = analysis.document.userId === user.id;
-    if (!hasAccess && analysis.document.orgId) {
-      const m = await prisma.teamMember
-        .findFirst({
-          where: { userId: user.id, orgId: analysis.document.orgId },
-          select: { id: true },
-        })
-        .catch(() => null);
-      hasAccess = !!m;
-    }
-    if (!hasAccess) return apiError({ error: 'Forbidden', status: 403 });
+    if (!analysis) return apiError({ error: 'Not found', status: 404 });
 
     return NextResponse.json({
       id: analysis.id,

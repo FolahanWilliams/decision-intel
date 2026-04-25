@@ -6,6 +6,7 @@ import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 import { getSafeErrorMessage } from '@/lib/utils/error';
 import { safeJsonClone } from '@/lib/utils/json';
+import { buildDocumentAccessWhere } from '@/lib/utils/document-access';
 import { toPrismaJson } from '@/lib/utils/prisma-json';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { checkAnalysisLimit } from '@/lib/utils/plan-limits';
@@ -126,10 +127,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Document ID is required' }, { status: 400 });
     }
 
-    // Verify ownership
-    const doc = await prisma.document.findFirst({
-      where: { id: documentId, userId },
-    });
+    // RBAC (3.5): visibility-aware. The streaming pipeline is the most
+    // sensitive read path — it decrypts and ships raw content into Gemini,
+    // so any leak here is a procurement-grade incident.
+    const access = await buildDocumentAccessWhere(documentId, userId);
+    const doc = await prisma.document.findFirst({ where: access.where });
 
     if (!doc) {
       return NextResponse.json({ error: 'Document not found' }, { status: 404 });

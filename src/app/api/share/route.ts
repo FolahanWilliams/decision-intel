@@ -56,7 +56,10 @@ export async function POST(req: NextRequest) {
       return days * 24 * 60 * 60 * 1000;
     })();
 
-    // Verify user owns the document associated with this analysis
+    // Share-link creation is owner-only (3.5): a teammate who can READ a
+    // doc must not be able to externally publish it. Sharing is an
+    // explicit grant authority that lives with the document owner — same
+    // shape as the visibility editor.
     const analysis = await prisma.analysis.findUnique({
       where: { id: analysisId },
       include: { document: { select: { userId: true, orgId: true } } },
@@ -67,13 +70,13 @@ export async function POST(req: NextRequest) {
     }
 
     if (analysis.document.userId !== user.id) {
-      // Check if user is in the same org
-      const membership = await prisma.teamMember.findFirst({
-        where: { userId: user.id },
-      });
-      if (!membership || membership.orgId !== analysis.document.orgId) {
-        return NextResponse.json({ error: 'Access denied' }, { status: 403 });
-      }
+      log.warn(
+        `Share-link creation denied: ${user.id} is not the owner of doc ${analysis.document.userId} (analysis ${analysisId})`
+      );
+      return NextResponse.json(
+        { error: 'Only the document owner can create share links.' },
+        { status: 403 }
+      );
     }
 
     // Hash password if provided using bcrypt

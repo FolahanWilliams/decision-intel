@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { searchSimilarDocuments } from '@/lib/rag/embeddings';
+import {
+  buildDocumentAccessWhere,
+  filterDocumentIdsByAccess,
+} from '@/lib/utils/document-access';
 import { formatSSE } from '@/lib/sse';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
@@ -157,43 +161,59 @@ export async function POST(request: NextRequest) {
 
     try {
       if (documentId && typeof documentId === 'string') {
-        // Pinned mode: search all docs then scope to the pinned document
-        try {
-          const pinned = await searchSimilarDocuments(message, userId, RAG_RESULT_LIMIT * 3);
-          ragResults = pinned.filter(r => r.documentId === documentId).slice(0, RAG_RESULT_LIMIT);
-        } catch {
-          // Embedding search failed — ignore, will fall back below
-        }
-
-        // If vector search didn't find the pinned doc, load its embeddings directly
-        if (ragResults.length === 0) {
+        // Pinned mode: must verify the user can read the pinned doc before
+        // touching its embeddings (RBAC 3.5 — same gate as the doc detail
+        // route). Without this a chat request with a pinned-private id
+        // would leak content via the LLM context.
+        const pinnedAccess = await buildDocumentAccessWhere(documentId, userId);
+        const pinnedDoc = await prisma.document.findFirst({
+          where: pinnedAccess.where,
+          select: { id: true, filename: true },
+        });
+        if (!pinnedDoc) {
+          ragResults = [];
+        } else {
           try {
-            const embeddings = await prisma.decisionEmbedding.findMany({
-              where: { documentId },
-              select: { content: true, metadata: true },
-              take: RAG_RESULT_LIMIT,
-            });
-            const doc = await prisma.document.findUnique({
-              where: { id: documentId },
-              select: { filename: true },
-            });
-            ragResults = embeddings.map(e => {
-              const meta = e.metadata as Record<string, unknown> | null;
-              return {
-                documentId,
-                filename: doc?.filename || 'Unknown',
-                score: (meta?.overallScore as number) || 0,
-                similarity: 1.0,
-                biases: (meta?.primaryBiases as string[]) || [],
-                content: e.content,
-              };
-            });
-          } catch (dbErr) {
-            log.warn('Direct embedding fetch for pinned doc failed:', dbErr);
+            const pinned = await searchSimilarDocuments(message, userId, RAG_RESULT_LIMIT * 3);
+            ragResults = pinned.filter(r => r.documentId === documentId).slice(0, RAG_RESULT_LIMIT);
+          } catch {
+            // Embedding search failed — fall back to direct fetch below
+          }
+
+          if (ragResults.length === 0) {
+            try {
+              const embeddings = await prisma.decisionEmbedding.findMany({
+                where: { documentId },
+                select: { content: true, metadata: true },
+                take: RAG_RESULT_LIMIT,
+              });
+              ragResults = embeddings.map(e => {
+                const meta = e.metadata as Record<string, unknown> | null;
+                return {
+                  documentId,
+                  filename: pinnedDoc.filename,
+                  score: (meta?.overallScore as number) || 0,
+                  similarity: 1.0,
+                  biases: (meta?.primaryBiases as string[]) || [],
+                  content: e.content,
+                };
+              });
+            } catch (dbErr) {
+              log.warn('Direct embedding fetch for pinned doc failed:', dbErr);
+            }
           }
         }
       } else {
-        ragResults = await searchSimilarDocuments(message, userId, RAG_RESULT_LIMIT);
+        const raw = await searchSimilarDocuments(message, userId, RAG_RESULT_LIMIT);
+        // Cross-doc RAG must respect visibility — strip private docs from
+        // teammates' context windows even if their embeddings live in the
+        // shared org pool.
+        const allowedIds = await filterDocumentIdsByAccess(
+          raw.map(r => r.documentId),
+          userId
+        );
+        const allowedSet = new Set(allowedIds);
+        ragResults = raw.filter(r => allowedSet.has(r.documentId));
       }
     } catch (err) {
       log.warn('RAG retrieval failed, proceeding without context:', err);

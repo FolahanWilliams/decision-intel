@@ -12,6 +12,7 @@ import {
   generateCounterfactualNarrative,
 } from '@/lib/graph/counterfactual';
 import { createLogger } from '@/lib/utils/logger';
+import { resolveAnalysisAccess } from '@/lib/utils/document-access';
 
 const log = createLogger('DecisionGraphCounterfactualAPI');
 
@@ -68,12 +69,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Decision not found' }, { status: 404 });
     }
 
-    // Verify ownership
-    let document: { userId: string; orgId: string | null } | null = null;
+    // RBAC (3.5): visibility-aware via the parent document.
+    const access = await resolveAnalysisAccess(decisionId, user.id);
+    if (!access) {
+      return NextResponse.json({ error: 'Decision not found' }, { status: 404 });
+    }
+
+    let document: { orgId: string | null } | null = null;
     try {
       document = await prisma.document.findUnique({
         where: { id: analysis.documentId },
-        select: { userId: true, orgId: true },
+        select: { orgId: true },
       });
     } catch (error) {
       const code = (error as { code?: string }).code;
@@ -86,11 +92,7 @@ export async function POST(req: NextRequest) {
       throw error;
     }
 
-    if (!document || document.userId !== user.id) {
-      return NextResponse.json({ error: 'Decision not found' }, { status: 404 });
-    }
-
-    const orgId = document.orgId;
+    const orgId = document?.orgId ?? null;
 
     // Fetch the decision outcome for this analysis
     let outcome: { outcome: string } | null = null;

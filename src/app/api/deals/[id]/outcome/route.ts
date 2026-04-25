@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
 import { createLogger } from '@/lib/utils/logger';
 import { z } from 'zod';
+import { buildDocumentAccessFilter } from '@/lib/utils/document-access';
 
 const log = createLogger('DealOutcomeRoute');
 
@@ -137,10 +138,16 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       // Schema drift
     }
 
+    // RBAC (3.5): the deal-detail view exposes its child documents'
+    // metadata + DQI scores. Filter the included docs by the visibility
+    // resolver so a private doc attached to a team-visible deal stays
+    // hidden from teammates.
+    const { where: docVisibilityWhere } = await buildDocumentAccessFilter(user.id);
     const deal = await prisma.deal.findFirst({
       where: { id: dealId, orgId: orgId || user.id },
       include: {
         documents: {
+          where: docVisibilityWhere,
           select: {
             id: true,
             filename: true,

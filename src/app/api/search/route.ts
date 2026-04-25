@@ -3,6 +3,10 @@ import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { searchSimilarDocuments, getContextualInsights } from '@/lib/rag/embeddings';
 import { createLogger } from '@/lib/utils/logger';
+import {
+  buildDocumentAccessWhere,
+  filterDocumentIdsByAccess,
+} from '@/lib/utils/document-access';
 
 const log = createLogger('SearchRoute');
 
@@ -45,12 +49,23 @@ export async function POST(request: NextRequest) {
 
     const safeLimit = Math.max(1, Math.min(20, Number(limit) || 5));
 
-    const results = await searchSimilarDocuments(
+    const rawResults = await searchSimilarDocuments(
       query,
       userId,
       safeLimit,
       typeof documentId === 'string' ? documentId : undefined
     );
+
+    // RBAC (3.5): post-filter against the visibility model so private docs
+    // never surface in cross-org RAG hits. The pgvector raw SQL path can't
+    // use the Prisma where clause natively; one extra round-trip is
+    // acceptable for the security guarantee.
+    const allowedIds = await filterDocumentIdsByAccess(
+      rawResults.map(r => r.documentId),
+      userId
+    );
+    const allowedSet = new Set(allowedIds);
+    const results = rawResults.filter(r => allowedSet.has(r.documentId));
 
     // Enrich results with graph edge counts (non-blocking best-effort)
     let enrichedResults: Array<{
@@ -146,9 +161,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'documentId and content are required' }, { status: 400 });
     }
 
-    // Verify the user owns the requested document
+    // RBAC (3.5): visibility-aware. Insights endpoint reads cross-doc
+    // context against the focal doc, so the same access bar applies.
+    const access = await buildDocumentAccessWhere(documentId, userId);
     const doc = await prisma.document.findFirst({
-      where: { id: documentId, userId },
+      where: access.where,
       select: { id: true },
     });
     if (!doc) {

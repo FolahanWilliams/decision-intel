@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
 import { createLogger } from '@/lib/utils/logger';
 import { apiSuccess, apiError } from '@/lib/utils/api-response';
+import { buildDocumentAccessWhere } from '@/lib/utils/document-access';
 
 const log = createLogger('DocumentPdfRoute');
 
@@ -18,9 +19,14 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       return apiError({ error: 'Unauthorized', status: 401 });
     }
 
+    // RBAC (3.5): visibility-aware. Storage path uses the doc OWNER's
+    // userId so teammates with read access can resolve the underlying
+    // signed URL (the path was previously hardcoded to user.id which only
+    // worked for owners — quietly broke team-shared PDFs).
+    const access = await buildDocumentAccessWhere(id, user.id);
     const doc = await prisma.document.findFirst({
-      where: { id, userId: user.id },
-      select: { id: true, filename: true, fileType: true },
+      where: access.where,
+      select: { id: true, filename: true, fileType: true, userId: true },
     });
 
     if (!doc) {
@@ -35,7 +41,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     }
 
     const ext = doc.filename ? '.' + doc.filename.split('.').pop() : '.pdf';
-    const storagePath = `${user.id}/${doc.id}${ext}`;
+    const storagePath = `${doc.userId}/${doc.id}${ext}`;
     const bucket = process.env.SUPABASE_DOCUMENT_BUCKET || 'pdf';
 
     const { getServiceSupabase } = await import('@/lib/supabase');

@@ -34,6 +34,7 @@ import { createLogger } from '@/lib/utils/logger';
 import { assembleProvenanceRecordData } from '@/lib/reports/provenance-record-data';
 import { DecisionProvenanceRecordGenerator } from '@/lib/reports/decision-provenance-record-generator';
 import { getUserPlan, getOrgPlan } from '@/lib/utils/plan-limits';
+import { resolveAnalysisAccess } from '@/lib/utils/document-access';
 
 const log = createLogger('DprExport');
 
@@ -64,29 +65,22 @@ export async function GET(
       return NextResponse.json({ error: 'analysisId is required' }, { status: 400 });
     }
 
-    // Ownership check — resolve analysis → document → (userId | orgId).
+    // RBAC (3.5): visibility-aware. The DPR bundles a regulator-grade
+    // disclosure pack — same content gate as export.
+    const access = await resolveAnalysisAccess(analysisId, user.id);
+    if (!access) {
+      return NextResponse.json({ error: 'Analysis not found' }, { status: 404 });
+    }
+
     const analysis = await prisma.analysis.findUnique({
       where: { id: analysisId },
       select: {
         id: true,
-        document: { select: { id: true, userId: true, orgId: true } },
+        document: { select: { id: true, orgId: true } },
       },
     });
     if (!analysis) {
       return NextResponse.json({ error: 'Analysis not found' }, { status: 404 });
-    }
-
-    if (analysis.document.userId !== user.id) {
-      if (!analysis.document.orgId) {
-        return NextResponse.json({ error: 'Access denied' }, { status: 403 });
-      }
-      const membership = await prisma.teamMember.findFirst({
-        where: { userId: user.id, orgId: analysis.document.orgId },
-        select: { orgId: true },
-      });
-      if (!membership) {
-        return NextResponse.json({ error: 'Access denied' }, { status: 403 });
-      }
     }
 
     // Plan gate — Pro+ for the server-streamed download. Org plan wins

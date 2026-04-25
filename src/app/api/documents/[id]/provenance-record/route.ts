@@ -27,6 +27,7 @@ import { createLogger } from '@/lib/utils/logger';
 import { assembleProvenanceRecordData } from '@/lib/reports/provenance-record-data';
 import { DecisionProvenanceRecordGenerator } from '@/lib/reports/decision-provenance-record-generator';
 import { getUserPlan, getOrgPlan } from '@/lib/utils/plan-limits';
+import { buildDocumentAccessWhere } from '@/lib/utils/document-access';
 
 const log = createLogger('ProvenanceRecordRoute');
 
@@ -42,22 +43,11 @@ async function getAuthorizedAnalysisId(
   } = await supabase.auth.getUser();
   if (!user?.id) return { ok: false, status: 401, error: 'Unauthorized' };
 
-  // Scope: owner OR same org (mirrors doc detail route).
-  let orgId: string | null = null;
-  try {
-    const membership = await prisma.teamMember.findFirst({
-      where: { userId: user.id },
-      select: { orgId: true },
-    });
-    orgId = membership?.orgId ?? null;
-  } catch {
-    // Schema drift — continue with userId-only scope.
-  }
-
+  // RBAC (3.5): visibility-aware. The DPR includes the full audit packet,
+  // so the same access bar as analysis-export applies.
+  const access = await buildDocumentAccessWhere(documentId, user.id);
   const doc = await prisma.document.findFirst({
-    where: orgId
-      ? { id: documentId, OR: [{ userId: user.id }, { orgId }] }
-      : { id: documentId, userId: user.id },
+    where: access.where,
     select: { id: true, userId: true, orgId: true },
   });
   if (!doc) return { ok: false, status: 404, error: 'Document not found' };

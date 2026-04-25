@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { buildDocumentAccessFilter } from '@/lib/utils/document-access';
 
 const log = createLogger('ActivityFeed');
 
@@ -54,19 +55,9 @@ export async function GET(request: NextRequest) {
     const cursorDate = cursor ? new Date(cursor) : undefined;
     const activities: ActivityItem[] = [];
 
-    // Resolve org membership for org-scoped queries
-    let docWhere: Record<string, unknown> = { userId: user.id };
-    try {
-      const membership = await prisma.teamMember.findFirst({
-        where: { userId: user.id },
-        select: { orgId: true },
-      });
-      if (membership?.orgId) {
-        docWhere = { OR: [{ userId: user.id }, { orgId: membership.orgId }] };
-      }
-    } catch {
-      // Schema drift
-    }
+    // RBAC (3.5): visibility-aware. The activity feed surfaces upload +
+    // analysis-complete events; private docs must not leak to teammates.
+    const { where: docWhere } = await buildDocumentAccessFilter(user.id);
 
     // Fetch from multiple sources in parallel
     const [documents, nudges, outcomes] = await Promise.allSettled([

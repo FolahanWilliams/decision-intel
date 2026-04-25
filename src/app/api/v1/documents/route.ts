@@ -11,6 +11,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { validateApiKey, requireScope, type ValidateError } from '@/lib/api/auth';
 import { createLogger } from '@/lib/utils/logger';
+import {
+  buildDocumentAccessFilter,
+  buildDocumentAccessWhere,
+} from '@/lib/utils/document-access';
 
 const log = createLogger('PublicDocumentsRoute');
 
@@ -34,8 +38,9 @@ export async function GET(request: NextRequest) {
 
     if (documentId) {
       // ── Get specific document with latest analysis ──────────────
+      const access = await buildDocumentAccessWhere(documentId, context.userId);
       const document = await prisma.document.findFirst({
-        where: { id: documentId, userId: context.userId, deletedAt: null },
+        where: access.where,
         include: {
           analyses: {
             orderBy: { createdAt: 'desc' },
@@ -67,9 +72,10 @@ export async function GET(request: NextRequest) {
     const limit = Math.max(1, Math.min(100, parseInt(searchParams.get('limit') || '20', 10)));
     const skip = (page - 1) * limit;
 
+    const { where: listWhere } = await buildDocumentAccessFilter(context.userId);
     const [documents, total] = await Promise.all([
       prisma.document.findMany({
-        where: { userId: context.userId, deletedAt: null },
+        where: listWhere,
         orderBy: { uploadedAt: 'desc' },
         skip,
         take: limit,
@@ -92,7 +98,7 @@ export async function GET(request: NextRequest) {
           },
         },
       }),
-      prisma.document.count({ where: { userId: context.userId, deletedAt: null } }),
+      prisma.document.count({ where: listWhere }),
     ]);
 
     return NextResponse.json({

@@ -16,6 +16,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
 import { createLogger } from '@/lib/utils/logger';
+import { logAudit } from '@/lib/audit';
 import { z } from 'zod';
 
 const log = createLogger('DocumentVisibility');
@@ -82,7 +83,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     // Owner-only check.
     const doc = await prisma.document.findFirst({
       where: { id, userId: user.id, deletedAt: null },
-      select: { id: true },
+      select: { id: true, visibility: true, filename: true, orgId: true },
     });
     if (!doc) {
       return NextResponse.json({ error: 'Not found or not owner' }, { status: 404 });
@@ -95,6 +96,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       );
     }
 
+    const previousVisibility = doc.visibility ?? 'team';
+
+    let added: string[] = [];
+    let removed: string[] = [];
+
     await prisma.$transaction(async tx => {
       await tx.document.update({
         where: { id },
@@ -104,6 +110,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       // For non-specific modes, drop any leftover grants so a future flip
       // back to 'specific' starts from a clean state.
       if (visibility !== 'specific') {
+        const existing = await tx.documentAccess.findMany({
+          where: { documentId: id },
+          select: { userId: true },
+        });
+        removed = existing.map(g => g.userId);
         await tx.documentAccess.deleteMany({ where: { documentId: id } });
         return;
       }
@@ -134,7 +145,64 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
           })),
         });
       }
+      added = toAdd;
+      removed = toDelete;
     });
+
+    // Audit log + Nudge fire-and-forget — never block the visibility update.
+    if (previousVisibility !== visibility) {
+      logAudit({
+        action: 'DOCUMENT_VISIBILITY_CHANGED',
+        resource: 'Document',
+        resourceId: id,
+        details: {
+          from: previousVisibility,
+          to: visibility,
+          filename: doc.filename,
+        },
+      }).catch(err =>
+        log.warn('audit log for visibility change failed:', err)
+      );
+    }
+
+    if (added.length > 0) {
+      logAudit({
+        action: 'DOCUMENT_ACCESS_GRANTED',
+        resource: 'Document',
+        resourceId: id,
+        details: { addedUserIds: added, filename: doc.filename },
+      }).catch(err => log.warn('audit log for grant failed:', err));
+
+      // Nudge each grantee so they know the doc just appeared in their
+      // accessible set. Fire-and-forget; never block the PATCH.
+      Promise.allSettled(
+        added.map(grantee =>
+          prisma.nudge
+            .create({
+              data: {
+                targetUserId: grantee,
+                orgId: doc.orgId ?? undefined,
+                nudgeType: 'document_access_granted',
+                message: `${doc.filename} was just shared with you.`,
+                triggerReason: `granted by ${user.id} on doc ${id}`,
+                channel: 'dashboard',
+                severity: 'info',
+                phase: 'post_decision',
+              },
+            })
+            .catch(() => null)
+        )
+      ).catch(() => null);
+    }
+
+    if (removed.length > 0) {
+      logAudit({
+        action: 'DOCUMENT_ACCESS_REVOKED',
+        resource: 'Document',
+        resourceId: id,
+        details: { removedUserIds: removed, filename: doc.filename },
+      }).catch(err => log.warn('audit log for revoke failed:', err));
+    }
 
     log.info(`Document ${id} visibility set to ${visibility} by ${user.id}`);
     return NextResponse.json({ ok: true, visibility });
