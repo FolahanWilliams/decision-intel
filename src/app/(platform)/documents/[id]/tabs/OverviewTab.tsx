@@ -29,6 +29,7 @@ import { ResearchInsight } from '@/types';
 import { StructuralAssumptionsPanel } from '@/components/analysis/StructuralAssumptionsPanel';
 import { BiasCollabPanel } from '@/components/analysis/BiasCollabPanel';
 import { MarketContextChip } from '@/components/analysis/MarketContextChip';
+import { RedactionTrailCard } from '@/components/analysis/RedactionTrailCard';
 
 interface ExtendedBiasInstance extends BiasInstance {
   researchInsight: ResearchInsight;
@@ -78,6 +79,8 @@ interface OverviewTabProps {
     cagrCeiling: number;
     rationale: string;
   };
+  /** Document-owner flag — gates the redaction map reveal feature. */
+  isOwner?: boolean;
 }
 
 const SEVERITY_BADGE_STYLES: Record<string, string> = {
@@ -106,6 +109,7 @@ export function OverviewTab({
   dealSector,
   dealTicketSize,
   marketContextApplied,
+  isOwner,
 }: OverviewTabProps) {
   const [showRpd, setShowRpd] = useState(false);
   const hasRpd = !!(recognitionCues || narrativePreMortem);
@@ -379,6 +383,12 @@ export function OverviewTab({
           )}
         </div>
       </div>
+
+      {/* Redaction trail (3.2 deep) — proof that PII was scrubbed before
+          submit. Owner can replay the local-only placeholder map. */}
+      {analysisId && (
+        <RedactionTrailCard analysisId={analysisId} isOwner={!!isOwner} />
+      )}
 
       {/* Market-context priors chip — shows which growth-rate ceiling the bias
           detector applied based on detected jurisdictions (3.6). Renders nothing

@@ -18,7 +18,14 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BrainCircuit, Loader2, X } from 'lucide-react';
 import { scanForPii, type ScanResult } from '@/lib/utils/redaction-scanner';
-import { RedactionPreModal } from '@/components/ui/RedactionPreModal';
+import {
+  RedactionPreModal,
+  type RedactionTrailContext,
+} from '@/components/ui/RedactionPreModal';
+import {
+  postRedactionTrail,
+  savePlaceholderMap,
+} from '@/lib/utils/redaction-trail';
 
 interface InlinePasteMemoCardProps {
   onClose: () => void;
@@ -45,7 +52,10 @@ export function InlinePasteMemoCard({ onClose, onSubmitted }: InlinePasteMemoCar
   const chars = content.trim().length;
   const canSubmit = chars >= MIN_CONTENT_CHARS && chars <= MAX_CONTENT_CHARS;
 
-  async function runSubmit(textToSubmit: string) {
+  async function runSubmit(
+    textToSubmit: string,
+    trail?: RedactionTrailContext
+  ) {
     setSubmitting(true);
     setError(null);
     try {
@@ -59,6 +69,21 @@ export function InlinePasteMemoCard({ onClose, onSubmitted }: InlinePasteMemoCar
         setError(data?.error ?? 'Submission failed. Please try again.');
         setSubmitting(false);
         return;
+      }
+      // 3.2 deep — fire-and-forget redaction trail. We attach the
+      // human-decision id as the resourceId so the audit row can be
+      // followed back to the submission. Originals never leave the
+      // browser.
+      if (trail) {
+        const { placeholderEntries, ...payload } = trail;
+        postRedactionTrail({
+          ...payload,
+          analysisId: data.id,
+          source: 'dashboard_paste_human_decision',
+        });
+        if (placeholderEntries.length > 0) {
+          savePlaceholderMap(data.id, placeholderEntries);
+        }
       }
       if (onSubmitted) {
         onSubmitted(data.id);
@@ -215,17 +240,17 @@ export function InlinePasteMemoCard({ onClose, onSubmitted }: InlinePasteMemoCar
           isOpen
           text={pendingText}
           scan={redactScan}
-          onRedact={async redacted => {
+          onRedact={async (redacted, trail) => {
             setContent(redacted);
             setRedactScan(null);
             setPendingText(null);
-            await runSubmit(redacted);
+            await runSubmit(redacted, trail);
           }}
-          onSkip={async () => {
+          onSkip={async trail => {
             const t = pendingText;
             setRedactScan(null);
             setPendingText(null);
-            if (t) await runSubmit(t);
+            if (t) await runSubmit(t, trail);
           }}
           onCancel={() => {
             setRedactScan(null);

@@ -25,6 +25,23 @@ import {
   type RedactionHit,
   type ScanResult,
 } from '@/lib/utils/redaction-scanner';
+import {
+  sha256Hex,
+  type PlaceholderMapEntry,
+  type RedactionTrailPayload,
+} from '@/lib/utils/redaction-trail';
+
+/**
+ * Trail context emitted to parent on Redact/Skip — the parent attaches
+ * the analysisId post-submission and POSTs to /api/redaction/log.
+ * Originals NEVER appear here (only on the placeholder map, which the
+ * parent stores in sessionStorage).
+ */
+export interface RedactionTrailContext
+  extends Omit<RedactionTrailPayload, 'analysisId' | 'source'> {
+  /** Client-only — passed to savePlaceholderMap once analysisId is known. */
+  placeholderEntries: PlaceholderMapEntry[];
+}
 
 interface Props {
   isOpen: boolean;
@@ -32,10 +49,10 @@ interface Props {
   text: string;
   /** Result from scanForPii(text). */
   scan: ScanResult;
-  /** User clicked "Redact selected" — receives the redacted text. */
-  onRedact: (redactedText: string) => void;
+  /** User clicked "Redact selected" — receives the redacted text + trail. */
+  onRedact: (redactedText: string, trail: RedactionTrailContext) => void;
   /** User clicked "Continue without redacting" — original text passes through. */
-  onSkip: () => void;
+  onSkip: (trail: RedactionTrailContext) => void;
   /** User dismissed the modal; no submission action should run. */
   onCancel: () => void;
 }
@@ -103,9 +120,78 @@ export function RedactionPreModal({ isOpen, text, scan, onRedact, onSkip, onCanc
     [scan.hits, excluded]
   );
 
-  const handleRedact = () => {
-    const { redactedText } = applyRedactions(text, selected);
-    onRedact(redactedText);
+  const buildCounts = (
+    hits: ReturnType<typeof Array.from> & RedactionHit[]
+  ): Record<RedactionCategory, number> => {
+    const c: Record<RedactionCategory, number> = {
+      email: 0,
+      phone: 0,
+      ssn: 0,
+      amount: 0,
+      entity: 0,
+      name: 0,
+    };
+    for (const h of hits) c[h.category] += 1;
+    return c;
+  };
+
+  const handleRedact = async () => {
+    const { redactedText, placeholderMap } = applyRedactions(text, selected);
+    const placeholderEntries: PlaceholderMapEntry[] = Object.entries(placeholderMap).map(
+      ([placeholder, original]) => {
+        // Recover category from the placeholder prefix ([NAME_..] → 'name').
+        const m = placeholder.match(/^\[([A-Z]+)_/);
+        const prefix = (m?.[1] || '').toLowerCase();
+        const category =
+          prefix === 'name'
+            ? ('name' as RedactionCategory)
+            : prefix === 'amount'
+              ? ('amount' as RedactionCategory)
+              : prefix === 'entity'
+                ? ('entity' as RedactionCategory)
+                : prefix === 'email'
+                  ? ('email' as RedactionCategory)
+                  : prefix === 'phone'
+                    ? ('phone' as RedactionCategory)
+                    : ('ssn' as RedactionCategory);
+        return { placeholder, original, category };
+      }
+    );
+    const [originalHash, submittedHash] = await Promise.all([
+      sha256Hex(text),
+      sha256Hex(redactedText),
+    ]);
+    const trail: RedactionTrailContext = {
+      originalHash,
+      submittedHash,
+      detectedCounts: buildCounts(scan.hits as unknown as RedactionHit[]),
+      redactedCounts: buildCounts(selected as unknown as RedactionHit[]),
+      action: 'applied',
+      placeholderCount: placeholderEntries.length,
+      placeholderEntries,
+    };
+    onRedact(redactedText, trail);
+  };
+
+  const handleSkip = async () => {
+    const hash = await sha256Hex(text);
+    const trail: RedactionTrailContext = {
+      originalHash: hash,
+      submittedHash: hash,
+      detectedCounts: buildCounts(scan.hits as unknown as RedactionHit[]),
+      redactedCounts: {
+        email: 0,
+        phone: 0,
+        ssn: 0,
+        amount: 0,
+        entity: 0,
+        name: 0,
+      },
+      action: 'skipped',
+      placeholderCount: 0,
+      placeholderEntries: [],
+    };
+    onSkip(trail);
   };
 
   const totalHits = scan.hits.length;
@@ -338,7 +424,7 @@ export function RedactionPreModal({ isOpen, text, scan, onRedact, onSkip, onCanc
             </Button>
             <Button
               variant="outline"
-              onClick={onSkip}
+              onClick={handleSkip}
               style={{ fontSize: 12 }}
             >
               Continue without redacting

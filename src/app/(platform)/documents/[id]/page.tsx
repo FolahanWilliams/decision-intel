@@ -2670,6 +2670,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                         dealSector={document.deal?.sector ?? null}
                         dealTicketSize={document.deal?.ticketSize ?? null}
                         marketContextApplied={analysis?.marketContextApplied}
+                        isOwner={!!document.isOwner}
                       />
                     </ErrorBoundary>
                   )}

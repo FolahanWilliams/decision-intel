@@ -31,8 +31,15 @@ import { NoiseDistributionViz } from '@/components/marketing/how-it-works/NoiseD
 import { DQIBadge } from '@/components/ui/DQIBadge';
 import { Reveal } from '@/components/ui/Reveal';
 import { PasteAuditResults } from '@/components/marketing/demo/PasteAuditResults';
-import { RedactionPreModal } from '@/components/ui/RedactionPreModal';
+import {
+  RedactionPreModal,
+  type RedactionTrailContext,
+} from '@/components/ui/RedactionPreModal';
 import { scanForPii, type ScanResult } from '@/lib/utils/redaction-scanner';
+import {
+  postRedactionTrail,
+  savePlaceholderMap,
+} from '@/lib/utils/redaction-trail';
 import { trackEvent } from '@/lib/analytics/track';
 import type { AnalysisResult } from '@/types';
 
@@ -226,7 +233,8 @@ export default function DemoPage() {
   // Handle paste mode submission — runs the REAL 12-node pipeline via
   // /api/demo/run. Displays a staged progress animation while the audit
   // is running, then hands the result to <PasteAuditResults>.
-  const runPasteAudit = useCallback(async (textToAudit: string) => {
+  const runPasteAudit = useCallback(
+    async (textToAudit: string, trail?: RedactionTrailContext) => {
     trackEvent('demo_paste_analyzed', { textLength: textToAudit.length });
     setPasteAuditing(true);
     setPasteError(null);
@@ -257,6 +265,20 @@ export default function DemoPage() {
         dqi: body.data.result.overallScore,
         biasCount: body.data.result.biases?.length ?? 0,
       });
+      // 3.2 deep — fire the redaction trail with the resolved analysisId
+      // (or the documentId fallback when there is no analysis).
+      if (trail) {
+        const { placeholderEntries, ...payload } = trail;
+        const idForTrail = body.data.analysisId ?? body.data.documentId;
+        postRedactionTrail({
+          ...payload,
+          analysisId: idForTrail,
+          source: 'demo_paste',
+        });
+        if (idForTrail && placeholderEntries.length > 0) {
+          savePlaceholderMap(idForTrail, placeholderEntries);
+        }
+      }
       setPasteAudit(body.data);
       setPasteAuditing(false);
       // Scroll to results after a short beat so the animation feels intentional
@@ -272,7 +294,9 @@ export default function DemoPage() {
       setPasteError(msg);
       setPasteAuditing(false);
     }
-  }, []);
+  },
+    []
+  );
 
   // Click handler — gates the run on the redaction modal when PII is detected.
   const handlePasteAnalyze = useCallback(() => {
@@ -2054,20 +2078,20 @@ export default function DemoPage() {
           isOpen
           text={redactPending}
           scan={redactScan}
-          onRedact={async redacted => {
+          onRedact={async (redacted, trail) => {
             setPasteText(redacted);
             const t = redacted;
             setRedactScan(null);
             setRedactPending(null);
             trackEvent('demo_paste_redacted', { hits: redactScan.hits.length });
-            await runPasteAudit(t);
+            await runPasteAudit(t, trail);
           }}
-          onSkip={async () => {
+          onSkip={async trail => {
             const t = redactPending;
             setRedactScan(null);
             setRedactPending(null);
             trackEvent('demo_paste_redact_skipped', { hits: redactScan.hits.length });
-            if (t) await runPasteAudit(t);
+            if (t) await runPasteAudit(t, trail);
           }}
           onCancel={() => {
             setRedactScan(null);
