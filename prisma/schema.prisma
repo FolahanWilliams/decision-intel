@@ -100,6 +100,10 @@ model Analysis {
   recognitionCues     Json?
   narrativePreMortem  Json?
   forgottenQuestions  Json?
+  // Market-context priors applied by the bias detector (3.6). Shape:
+  // { context, emergingMarketCountries[], developedMarketCountries[],
+  //   cagrCeiling, rationale }. Null when the memo is jurisdiction-agnostic.
+  marketContextApplied Json?
 
   // Version tracking and prompt reference
   version         Int            @default(1)

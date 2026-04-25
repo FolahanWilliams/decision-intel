@@ -212,6 +212,13 @@ interface Analysis {
   narrativePreMortem?: NarrativePreMortem;
   dqChain?: import('@/types').DQChainSummary;
   forgottenQuestions?: import('@/types').ForgottenQuestionsResult;
+  marketContextApplied?: {
+    context: 'emerging_market' | 'developed_market' | 'cross_border' | 'unknown';
+    emergingMarketCountries: string[];
+    developedMarketCountries: string[];
+    cagrCeiling: number;
+    rationale: string;
+  };
 }
 
 interface Document {
@@ -2641,6 +2648,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                         narrativePreMortem={analysis?.narrativePreMortem}
                         dealSector={document.deal?.sector ?? null}
                         dealTicketSize={document.deal?.ticketSize ?? null}
+                        marketContextApplied={analysis?.marketContextApplied}
                       />
                     </ErrorBoundary>
                   )}

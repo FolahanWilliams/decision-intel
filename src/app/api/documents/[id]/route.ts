@@ -103,6 +103,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
               recognitionCues: true,
               narrativePreMortem: true,
               forgottenQuestions: true,
+              marketContextApplied: true,
               outcomeStatus: true,
               recalibratedDqi: true,
               outcome: true,

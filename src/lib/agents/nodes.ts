@@ -27,7 +27,9 @@ import {
   buildMetaJudgePrompt,
   buildRpdRecognitionPrompt,
   buildForgottenQuestionsPrompt,
+  buildMarketContextBlock,
 } from './prompts';
+import { detectMarketContext, GROWTH_RATE_PRIORS } from '../constants/market-context';
 import { searchSimilarDocuments, searchSimilarWithOutcomes } from '../rag/embeddings';
 import { prisma } from '../prisma';
 import { executeDataRequests, DataRequest } from '../tools/financial';
@@ -490,6 +492,20 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
       );
     }
 
+    // Market-context priors — adjusts the overconfidence trigger so an EM
+    // memo's 35%+ CAGR claim is not auto-flagged the same way a DM memo's
+    // 35%+ CAGR claim is. Detection is mention-based + deterministic, no
+    // LLM call. When `unknown`, buildMarketContextBlock returns '' so the
+    // detector falls through to its default behaviour.
+    const marketContextDetection = detectMarketContext(content);
+    const marketContextBlock = buildMarketContextBlock(marketContextDetection);
+    if (marketContextBlock) {
+      biasPrompt += marketContextBlock;
+      log.info(
+        `Market context applied: ${marketContextDetection.context} (EM=[${marketContextDetection.emergingMarketCountries.join(',')}], DM=[${marketContextDetection.developedMarketCountries.join(',')}], confidence=${marketContextDetection.confidence.toFixed(2)})`
+      );
+    }
+
     // Use Grounded Model for primary detection with circuit breaker + retry
     const result = await withGeminiResilience(
       () =>
@@ -574,7 +590,7 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
       );
     }
 
-    return { biasAnalysis: biases };
+    return { biasAnalysis: biases, marketContext: marketContextDetection };
   } catch (e) {
     log.error('Bias Detective failed:', e instanceof Error ? e.message : String(e));
     return { biasAnalysis: [] };
@@ -2209,6 +2225,15 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
       recognitionCues: state.recognitionCues ?? undefined,
       narrativePreMortem: state.narrativePreMortem ?? undefined,
       forgottenQuestions: state.forgottenQuestions ?? undefined,
+      marketContextApplied: state.marketContext
+        ? {
+            context: state.marketContext.context,
+            emergingMarketCountries: state.marketContext.emergingMarketCountries,
+            developedMarketCountries: state.marketContext.developedMarketCountries,
+            cagrCeiling: GROWTH_RATE_PRIORS[state.marketContext.context].cagrCeiling,
+            rationale: state.marketContext.rationale,
+          }
+        : undefined,
       dqChain: computeDQChain({
         logicalAnalysis: state.logicalAnalysis,
         swotAnalysis: state.swotAnalysis,

@@ -557,6 +557,7 @@ export async function POST(request: NextRequest) {
                       : undefined
                   ),
                   forgottenQuestions: toPrismaJson(report.forgottenQuestions || undefined),
+                  marketContextApplied: toPrismaJson(report.marketContextApplied || undefined),
                 } satisfies Prisma.AnalysisUncheckedCreateInput,
               });
 

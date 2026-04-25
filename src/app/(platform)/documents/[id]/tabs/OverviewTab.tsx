@@ -28,6 +28,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ResearchInsight } from '@/types';
 import { StructuralAssumptionsPanel } from '@/components/analysis/StructuralAssumptionsPanel';
 import { BiasCollabPanel } from '@/components/analysis/BiasCollabPanel';
+import { MarketContextChip } from '@/components/analysis/MarketContextChip';
 
 interface ExtendedBiasInstance extends BiasInstance {
   researchInsight: ResearchInsight;
@@ -70,6 +71,13 @@ interface OverviewTabProps {
   narrativePreMortem?: NarrativePreMortem;
   dealSector?: string | null;
   dealTicketSize?: number | null;
+  marketContextApplied?: {
+    context: 'emerging_market' | 'developed_market' | 'cross_border' | 'unknown';
+    emergingMarketCountries: string[];
+    developedMarketCountries: string[];
+    cagrCeiling: number;
+    rationale: string;
+  };
 }
 
 const SEVERITY_BADGE_STYLES: Record<string, string> = {
@@ -97,6 +105,7 @@ export function OverviewTab({
   narrativePreMortem,
   dealSector,
   dealTicketSize,
+  marketContextApplied,
 }: OverviewTabProps) {
   const [showRpd, setShowRpd] = useState(false);
   const hasRpd = !!(recognitionCues || narrativePreMortem);
@@ -370,6 +379,13 @@ export function OverviewTab({
           )}
         </div>
       </div>
+
+      {/* Market-context priors chip — shows which growth-rate ceiling the bias
+          detector applied based on detected jurisdictions (3.6). Renders nothing
+          when context is unknown. */}
+      {marketContextApplied && (
+        <MarketContextChip marketContextApplied={marketContextApplied} />
+      )}
 
       {/* Structural Assumptions (Dalio 18-determinants macro lens) */}
       {analysisId && (

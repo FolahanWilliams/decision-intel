@@ -88,6 +88,19 @@ export interface AnalysisResult {
   dqChain?: DQChainSummary;
   /** Questions the memo never asks but historical analogs had to answer. */
   forgottenQuestions?: ForgottenQuestionsResult;
+  /**
+   * Market-context priors applied to overconfidence detection. Surfaces in
+   * the analysis detail page as a small chip so the user can see exactly
+   * which jurisdictions drove the auto-detection (and which growth-rate
+   * ceiling the bias detector used). Auto-populated by `biasDetectiveNode`.
+   */
+  marketContextApplied?: {
+    context: 'emerging_market' | 'developed_market' | 'cross_border' | 'unknown';
+    emergingMarketCountries: string[];
+    developedMarketCountries: string[];
+    cagrCeiling: number;
+    rationale: string;
+  };
 }
 
 /**

@@ -14,6 +14,7 @@ import {
 } from '@/types';
 import { type IntelligenceContext } from '@/lib/intelligence/contextBuilder';
 import { type CrossDocContext } from '@/lib/rag/cross-document-context';
+import { type MarketContextDetection } from '@/lib/constants/market-context';
 
 export interface AuditState {
   // Input
@@ -41,6 +42,12 @@ export interface AuditState {
 
   // Agent Outputs
   biasAnalysis?: BiasDetectionResult[];
+  /**
+   * Market-context detection set by `biasDetectiveNode` — used both to
+   * shape the bias-detection prompt's overconfidence trigger and to surface
+   * the applied priors on the analysis detail page.
+   */
+  marketContext?: MarketContextDetection;
   noiseScores?: number[];
   noiseStats?: {
     mean: number;

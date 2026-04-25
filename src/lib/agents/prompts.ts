@@ -1174,6 +1174,60 @@ ${options.hasDealContext ? 'The memo has deal context attached — use sector an
 // `buildDalioPromptBlock()` in `src/lib/constants/dalio-determinants.ts`.
 
 import { buildDalioPromptBlock } from '@/lib/constants/dalio-determinants';
+import {
+  GROWTH_RATE_PRIORS,
+  type MarketContext,
+  type MarketContextDetection,
+} from '@/lib/constants/market-context';
+
+/**
+ * Build a "market-context priors" block to inject into the bias-detection
+ * prompt. The block tells the detector which growth-rate ceiling to use for
+ * the overconfidence trigger and lists the specific jurisdictions that drove
+ * the classification, so a Lagos memo isn't penalised for normal Nigerian
+ * sector growth and a Tokyo memo isn't given a free pass on aggressive growth.
+ *
+ * Returns an empty string when the context is `unknown` so we do NOT inject
+ * any spurious prior — the detector falls through to its default behaviour.
+ */
+export function buildMarketContextBlock(detection: MarketContextDetection): string {
+  if (detection.context === 'unknown') return '';
+
+  const priors = GROWTH_RATE_PRIORS[detection.context];
+  const jurisdictions = [
+    detection.emergingMarketCountries.length
+      ? `EM: ${detection.emergingMarketCountries.join(', ')}`
+      : null,
+    detection.developedMarketCountries.length
+      ? `DM: ${detection.developedMarketCountries.join(', ')}`
+      : null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+
+  const label: Record<MarketContext, string> = {
+    emerging_market: 'EMERGING-MARKET MEMO',
+    developed_market: 'DEVELOPED-MARKET MEMO',
+    cross_border: 'CROSS-BORDER MEMO',
+    unknown: '',
+  };
+
+  return `\n--- MARKET-CONTEXT PRIORS (${label[detection.context]}) ---
+Jurisdictions detected: ${jurisdictions}
+
+Apply this growth-rate prior when evaluating overconfidence on revenue / market-share / CAGR claims:
+- CAGR ceiling for default overconfidence trigger: ~${priors.cagrCeiling}%
+- ${priors.rationale}
+
+This does NOT mean "ignore aggressive growth." It means: a ${priors.cagrCeiling}%+ CAGR claim in this jurisdiction needs evidence (sector benchmark, comparable company, market-share path), not auto-flagging. If the memo provides defensible evidence, do not flag overconfidence on the growth claim alone.
+
+Continue to flag overconfidence when:
+- Growth claims are unhedged on FX, political, regulatory, or liquidity risk that the jurisdiction structurally faces
+- The author asserts a number without sector benchmark or comparable
+- Multiple growth claims compound to an unrealistic cumulative outcome
+- Cross-border claims paper over jurisdiction-specific risk
+--- END MARKET-CONTEXT PRIORS ---\n`;
+}
 
 export function buildStructuralAssumptionsPrompt(memoText: string, context?: {
   industry?: string;
