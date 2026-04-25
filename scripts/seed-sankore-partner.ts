@@ -21,7 +21,7 @@ import { Prisma } from '@prisma/client';
 import type { PartnerRichProfile } from '../src/types/partner-profile';
 import { createSeedPrismaClient } from './seed-prisma-client';
 
-const { prisma } = createSeedPrismaClient();
+const { prisma, pool } = createSeedPrismaClient();
 
 // ─────────────────────────────────────────────────────────────────────────
 // Sankore record — edit these fields as the pilot evolves, then re-seed.

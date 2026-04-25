@@ -18,7 +18,7 @@
 
 import { createSeedPrismaClient } from './seed-prisma-client';
 
-const { prisma } = createSeedPrismaClient();
+const { prisma, pool } = createSeedPrismaClient();
 
 const HAPPENED_AT = new Date('2026-04-23T15:37:00Z'); // 16:37 BST = 15:37 UTC
 
