@@ -194,12 +194,11 @@ export const HOLE_MATRIX: HoleEntry[] = [
     flaggedBy: 'Convergent — Opus recommended-first-move; Sankore + Marcus + Chinedu',
     status: 'shipped',
     shipped:
-      'BiasComment threaded comments + BiasTask assignment per BiasInstance. @mentions parse against TeamMember roster, fire one Nudge per mentioned user. Task assignment also fires Slack DM via the org\'s monitoredChannels[0] (best-effort). Granular auth: author edits, anyone-with-access resolves, creator/assignee/admin task matrix.',
+      'BiasComment threaded comments + BiasTask assignment per BiasInstance. @mentions parse against TeamMember roster, fire one Nudge per mentioned user. Task assignment also fires Slack DM via the org\'s monitoredChannels[0] (best-effort) (2.2 lean). DEEP: tiny safe markdown renderer (mentions + bold/italic/code/link/url, no dangerouslySetInnerHTML) on comment bodies + task descriptions. Email fallback on @mentions resolves to TeamMember.email + sends templated message via sendEmail. Task overdue chip — red OVERDUE label when dueAt is past + status not resolved/dismissed; amber when due within 48h (2.2 deep).',
     surfaces: [
       { label: 'BiasCollabPanel', codePath: 'src/components/analysis/BiasCollabPanel.tsx' },
+      { label: 'Comment renderer', codePath: 'src/lib/utils/comment-render.ts' },
       { label: '/api/bias-comments', codePath: 'src/app/api/bias-comments/route.ts' },
-      { label: '/api/bias-tasks', codePath: 'src/app/api/bias-tasks/route.ts' },
-      { label: 'Wired into OverviewTab on every bias card' },
     ],
   },
   {
@@ -207,11 +206,37 @@ export const HOLE_MATRIX: HoleEntry[] = [
     flaggedBy: 'Opus — "THE behavior-change loop"',
     status: 'shipped',
     shipped:
-      'Document.parentDocumentId + versionNumber + Analysis.previousAnalysisId. Upload route accepts versionOfDocumentId. Analyze stream auto-links the previous Analysis. VersionDeltaCard renders "DQI 42 → 71 (+29)" hero card; VersionHistoryStrip shows v1 → v2 → v3 chain. "Upload new version" button on every doc.',
+      'Document.parentDocumentId + versionNumber + Analysis.previousAnalysisId. VersionDeltaCard renders "DQI 42 → 71 (+29)" hero card; VersionHistoryStrip shows v1 → v2 → v3 chain (2.3 lean). DEEP: pure-JS Myers/LCS line-level memo diff (src/lib/utils/text-diff.ts) with collapseUnchanged caps at 2000 lines/side. /api/documents/[id]/diff?against=Y same-chain enforcement + visibility-aware on both sides. MemoDiffViewer with green/red gutters + +N/-M stats + 60vh scroll. VersionHistoryStrip extended: per-version "Compare" button toggles inline diff; owner-only inline version-label editor on current version (Pencil icon → textbox); non-current versions show italic label inline. New PATCH /api/documents/[id] for versionLabel updates (2.3 deep).',
     surfaces: [
       { label: 'VersionDeltaCard', codePath: 'src/components/analysis/VersionDeltaCard.tsx' },
-      { label: 'VersionHistoryStrip', codePath: 'src/components/analysis/VersionHistoryStrip.tsx' },
-      { label: 'computeVersionDelta', codePath: 'src/lib/utils/version-delta.ts' },
+      { label: 'VersionHistoryStrip + diff', codePath: 'src/components/analysis/VersionHistoryStrip.tsx' },
+      { label: 'MemoDiffViewer', codePath: 'src/components/analysis/MemoDiffViewer.tsx' },
+      { label: 'Diff helper', codePath: 'src/lib/utils/text-diff.ts' },
+    ],
+  },
+  {
+    title: 'Decision Provenance Record was a static 4-page PDF',
+    flaggedBy: 'Procurement — "show the judge variance, prove convergence"',
+    status: 'shipped',
+    shipped:
+      'DPR generator already shipped per-analysis 4-page PDF with hash chain + model lineage + regulatory mapping per bias (1.1 lean). DEEP: granular per-judge outputs captured during the pipeline run and persisted on Analysis.judgeOutputs (biasDetective.flagCount/severeFlagCount/biasTypes, noiseJudge.mean/stdDev/variance/sampleCount, factChecker stats, metaJudge.verdict, preMortem counts). PDF page 2 renders a PER-JUDGE CONVERGENCE block. New /api/analysis/[id]/provenance JSON endpoint + DprPreviewCard on document detail with eight-field collapsed chip; "Inspect" expands to show input hash / prompt fingerprint / pipeline node count / noise score / bias detective stats / fact checker stats / pre-mortem stats / meta verdict — without opening the PDF (1.1 deep).',
+    surfaces: [
+      { label: 'DprPreviewCard', codePath: 'src/components/analysis/DprPreviewCard.tsx' },
+      { label: 'DPR PDF generator', codePath: 'src/lib/reports/decision-provenance-record-generator.ts' },
+      { label: 'Provenance JSON API', codePath: 'src/app/api/analysis/[id]/provenance/route.ts' },
+    ],
+  },
+  {
+    title: 'Retention enforcement had no legal-hold register',
+    flaggedBy: 'Procurement — "litigation-grade retention requires a hold register"',
+    status: 'shipped',
+    shipped:
+      'Two-phase retention (soft-delete + hard-purge) with per-tier windows already in cron (2.1 lean). DEEP: cron honors Organization.retentionDaysOverride (per-org bulk-loaded). Both phases skip docs with active legalHoldId. NEW Phase 1.5 — pre-deletion warning email fired ~7 days before hard-purge; stamps deletionWarningSentAt to prevent double-send. POST /api/documents/[id]/restore — owner-only restore within grace window (410 past it). GET/POST/PATCH /api/legal-holds — list/create/release with reason (4-2000 chars) + optional holdUntil. LegalHoldStatusChip on document detail header — "No hold" or red "Legal hold" pill + place/release modal (2.1 deep).',
+    surfaces: [
+      { label: 'LegalHoldStatusChip', codePath: 'src/components/documents/LegalHoldStatusChip.tsx' },
+      { label: '/api/legal-holds', codePath: 'src/app/api/legal-holds/route.ts' },
+      { label: '/api/documents/[id]/restore', codePath: 'src/app/api/documents/[id]/restore/route.ts' },
+      { label: 'Retention cron', codePath: 'src/app/api/cron/enforce-retention/route.ts' },
     ],
   },
   {
@@ -219,10 +244,11 @@ export const HOLE_MATRIX: HoleEntry[] = [
     flaggedBy: 'Titi sub-agent + Opus — bias detection applies a Western prior to EM growth',
     status: 'shipped',
     shipped:
-      'Structural-Assumptions audit operates as a SECOND lens alongside cognitive bias. Dalio determinants (currency_cycle, debt_cycle, geology, governance, etc.) explicitly model emerging-market exposures. The Dangote case study explicitly references the FX-repatriation assumption that Western priors miss. Auto-detection flag is wired but the "tag this memo as emerging_market" UX is Week 5–8.',
+      'Two layers shipped: (a) market-context auto-detection during the bias pass — emerging_market | developed_market | cross_border | unknown — with EM growth-rate priors so a Lagos memo\'s 35%+ CAGR claim is no longer auto-flagged as overconfidence (3.6 lean). (b) Owner override + structural-assumptions integration (3.6 deep) — Titi can flip the auto-detection from the chip and the Dalio audit re-runs against the overridden context. THREE Dalio determinants are persisted per audit (cycle / power / fundamentals / internal / external categories) and surfaced as an org-level structural-exposure heatmap on /dashboard/analytics with EM share per determinant. Persisted so cross-analysis reads pay zero LLM cost (1.3a deep).',
     surfaces: [
       { label: 'StructuralAssumptionsPanel', codePath: 'src/components/analysis/StructuralAssumptionsPanel.tsx' },
-      { label: 'Dangote DEMO showing EM priors', href: '/demo' },
+      { label: 'StructuralExposureCard (analytics)', codePath: 'src/components/analysis/StructuralExposureCard.tsx' },
+      { label: 'MarketContextChip + override', codePath: 'src/components/analysis/MarketContextChip.tsx' },
     ],
   },
   {
@@ -242,45 +268,56 @@ export const HOLE_MATRIX: HoleEntry[] = [
     title: 'Decision Rooms is a 142-byte stub',
     flaggedBy: 'Opus — "visible-stub-level problem a serious buyer would find in minutes"',
     status: 'scheduled',
-    plannedWeek: 'Weeks 9–10',
+    plannedWeek: 'Weeks 9–10 (deep refactor)',
     shipped:
       'Per-room detail page + blind-prior survey + reveal flow planned. Marcus called this his "feature I\'d pay for immediately." Pre-IC blind-prior collection → unanimity score → DQI overlay.',
-    surfaces: [{ label: 'Plan §4.1' }],
+    surfaces: [{ label: 'Plan §4.1 (deep refactor in flight)' }],
   },
   {
     title: 'Deal-centric workflow (deal IS the organising unit)',
     flaggedBy: 'Opus M&A panel + Marcus — "Your Deals page and Audit page are two products"',
-    status: 'scheduled',
-    plannedWeek: 'Weeks 5–8',
+    status: 'shipped',
     shipped:
-      'Per-deal detail page with all docs + composite Deal DQI + bias-signature aggregation. Deal-scoped copilot RAG. Compare-deals side-by-side.',
-    surfaces: [{ label: 'Plan §3.1' }],
+      'Per-deal page reworked to the atomic decision unit. Composite Deal DQI (equal-weighted mean across docs) + bias signature (per-bias doc count + top severity) (3.1 lean). DEEP: cross-document cross-reference agent — gemini-3-flash-preview run across every analyzed doc on the deal, surfaces 5 conflict types (numeric / assumption / timeline / risk_treatment / scope) with verbatim 2-side excerpts + whyItMatters + resolutionQuestion. Persisted on DealCrossReference table with auto-trigger when a 2nd doc analysis lands. THIS IS THE KILLER DEMO MOMENT for Sankore — pasting CIM + counsel memo + IC memo and watching the agent flag "CIM says 40% growth, model assumes 15%" is the most differentiated capability in the entire product (3.1 deep).',
+    surfaces: [
+      { label: 'DealCompositeHero', codePath: 'src/components/deals/DealCompositeHero.tsx' },
+      { label: 'CrossReferenceCard', codePath: 'src/components/deals/CrossReferenceCard.tsx' },
+      { label: 'Cross-ref agent', codePath: 'src/lib/agents/cross-reference.ts' },
+    ],
   },
   {
     title: 'Document-level RBAC',
     flaggedBy: 'Opus CSO + Sankore — "analyst sees CEO board papers"',
-    status: 'scheduled',
-    plannedWeek: 'Weeks 5–8',
+    status: 'shipped',
     shipped:
-      'DocumentAccess Prisma model with private / team / specific-members visibility. Org admin can override per document.',
-    surfaces: [{ label: 'Plan §3.5' }],
+      'Three-state visibility (private / team / specific) on Document, with DocumentAccess allowlist for "specific" mode (3.5 lean). DEEP: visibility resolver swept across 23 doc-touching endpoints (documents-list, v1-API, analyze, analyze/stream SSE pipeline, fingerprint/risk-score/structural-assumptions, share POST, decision-rooms POST, export, audit-packet, activity-feed, versions, pdf, provenance-record, decision-graph similar/counterfactual, search insights, chat pinned + cross-doc RAG, deals child docs). Owner-only PATCH /visibility fires Nudges to grantees + AuditLog rows for every visibility change + grant add/remove. Closes the security hole the lean ship left in the listing endpoints (3.5 deep).',
+    surfaces: [
+      { label: 'DocumentVisibilityModal', codePath: 'src/components/documents/DocumentVisibilityModal.tsx' },
+      { label: 'document-access resolver', codePath: 'src/lib/utils/document-access.ts' },
+    ],
   },
   {
     title: 'Redaction assistant on paste flow',
     flaggedBy: 'Marcus + Chinedu (confidentiality)',
-    status: 'scheduled',
-    plannedWeek: 'Weeks 5–8',
+    status: 'shipped',
     shipped:
-      'Pre-submit scan flags emails / phones / financial totals / common entity-suffixes; one-click auto-redact. Avoids the memo touching cloud vendors with unredacted PII.',
-    surfaces: [{ label: 'Plan §3.2' }],
+      'Pre-submit scanner: emails, phones (US/UK/EU/Nigerian), SSN/UK NI, financial totals ≥1M ($/£/€/₦/¥), company entity suffixes, capitalised person-name pairs with deny-list filter. RedactionPreModal with per-hit checkboxes; stable [NAME_1] / [AMOUNT_2] placeholders so pipeline still parses structure (3.2 lean). DEEP: server-side AuditLog row on every redaction event with sha256 hashes of original + submitted (NEVER originals — those stay client-only) + category-counts + outcome action. Owner-only sessionStorage placeholder map for in-browser replay. RedactionTrailCard on document detail with category pill row + truncated hash evidence + owner-only "Reveal local map" button. Closes the procurement question "prove redaction happened before content left the browser" (3.2 deep).',
+    surfaces: [
+      { label: 'RedactionPreModal', codePath: 'src/components/ui/RedactionPreModal.tsx' },
+      { label: 'RedactionTrailCard', codePath: 'src/components/analysis/RedactionTrailCard.tsx' },
+      { label: 'Trail helper', codePath: 'src/lib/utils/redaction-trail.ts' },
+    ],
   },
   {
     title: 'Board-member 24h view-only share links',
     flaggedBy: 'Marcus + Elena — "the board doesn\'t log into SaaS tools"',
-    status: 'scheduled',
-    plannedWeek: 'Weeks 5–8',
-    shipped: 'ShareLink.expiresAt + 410-Gone gate + 1h/24h/7d/30d selector on the existing modal.',
-    surfaces: [{ label: 'Plan §3.3' }],
+    status: 'shipped',
+    shipped:
+      'ShareLink.expiresAt + 410-Gone gate + 1h/24h/7d/30d/never selector on the modal (3.3 lean). DEEP: third "Manage Links" tab on ShareModal (status-coded per-link cards + view counts + revoke). Public viewer carries a provenance watermark on every page ("Shared by {ownerEmail} · expires {timestamp}") that survives screenshots. Optional recipient-email gate (ShareLink.requireEmail) — captured email lands on ShareLinkAccess.viewerEmail for follow-up. New AuditLog actions SHARE_LINK_CREATED / _REVOKED / _VIEWED (3.3 deep).',
+    surfaces: [
+      { label: 'ShareModal Manage tab', codePath: 'src/components/ui/ShareModal.tsx' },
+      { label: '/api/share', codePath: 'src/app/api/share/route.ts' },
+    ],
   },
   {
     title: 'Plain-English portfolio insights (DKG opacity)',
@@ -373,10 +410,17 @@ export const FRAMEWORKS_BRIEF: FrameworkBrief[] = [
   { code: 'FCA Consumer Duty', name: 'UK Financial Conduct Authority', region: 'g7', status: 'live', dprCoverage: 'UK financial-services decisioning evidence.' },
   { code: 'SEC Reg D', name: 'SEC Regulation D', region: 'g7', status: 'live', dprCoverage: 'Forward-looking statement / safe-harbour rigor.' },
   { code: 'LPOA', name: 'Limited Partnership Obligations', region: 'g7', status: 'live', dprCoverage: 'Fund-level fiduciary dissent + IC-meeting record.' },
-  // African — added in this sprint
-  { code: 'NDPR Art. 12', name: 'Nigeria Data Protection Regulation', region: 'africa', status: 'live', dprCoverage: 'Automated-decision rights for Nigerian data subjects (GDPR-aligned).' },
-  { code: 'CBN AI Guidelines', name: 'Central Bank of Nigeria', region: 'africa', status: 'draft', enforcementDate: 'Draft 2024', dprCoverage: 'FS-sector model governance, explainability, consumer-protection duties.' },
-  { code: 'WAEMU', name: 'West African Economic & Monetary Union', region: 'africa', status: 'live', dprCoverage: 'Cross-border data localisation across 8 member states.' },
+  // African — 10 frameworks now registered (lean ship: 3; deep ship: +7).
+  { code: 'NDPR Art. 12', name: 'Nigeria Data Protection Regulation', region: 'africa', status: 'live', dprCoverage: 'Automated-decision rights for Nigerian data subjects (GDPR-aligned). Art. 12 + Art. 13 mapped per bias.' },
+  { code: 'CBN AI Guidelines', name: 'Central Bank of Nigeria', region: 'africa', status: 'draft', enforcementDate: 'Draft 2024', dprCoverage: 'FS-sector model governance, explainability, consumer-protection duties. Para. 4.2 + 5.1 mapped per bias.' },
+  { code: 'WAEMU', name: 'West African Economic & Monetary Union', region: 'africa', status: 'live', dprCoverage: 'Cross-border data localisation across 8 member states. Reg. R09 + BCEAO Circular 04-2017 mapped.' },
+  { code: 'CMA Kenya', name: 'Capital Markets Authority (Kenya)', region: 'africa', status: 'live', dprCoverage: 'Listed-company material disclosure + Code of Corporate Governance s.2 — board decision-making evidence per bias.' },
+  { code: 'BoG Cyber & ICT', name: 'Bank of Ghana', region: 'africa', status: 'live', dprCoverage: 'Directive 2018/05 (rev. 2023) §5 model & algorithmic governance for Ghanaian regulated FIs.' },
+  { code: 'FRC Nigeria', name: 'Financial Reporting Council of Nigeria', region: 'africa', status: 'live', dprCoverage: 'Code of Corporate Governance Principles 1.1 + 11 — board-effectiveness + risk-management for public-interest entities.' },
+  { code: 'CBE AI Guidelines', name: 'Central Bank of Egypt', region: 'africa', status: 'live', dprCoverage: 'CBE 2023 ICT Governance Framework §III — AI/ML model governance + explainability for Egyptian banks.' },
+  { code: 'PoPIA §71', name: 'Protection of Personal Information Act (South Africa)', region: 'africa', status: 'live', dprCoverage: 'PoPIA s.71 automated-decision rights + s.24 quality-of-information duties.' },
+  { code: 'SARB Model Risk', name: 'South African Reserve Bank', region: 'africa', status: 'live', dprCoverage: 'Directive D2/2022 + Joint Standard 2 of 2024 — model risk + AI governance for SA banks.' },
+  { code: 'BoT FinTech', name: 'Bank of Tanzania — FinTech Sandbox', region: 'africa', status: 'live', dprCoverage: 'BoT FinTech Sandbox Guidelines 2023 §V — AI/ML decisioning governance for sandbox-stage entities.' },
 ];
 
 // ─── 5. Case-library geography (before / after) ───────────────────────────
@@ -410,8 +454,17 @@ export const CASE_GEOGRAPHY: CaseGeographyBucket[] = [
   {
     region: 'Sub-Saharan Africa',
     before: 0,
-    after: 3,
-    examples: ['Dangote Cement pan-African expansion', 'MTN Nigeria · NCC USSD dispute', 'Access Bank · Diamond merger'],
+    after: 8,
+    examples: [
+      'Dangote Cement pan-African expansion',
+      'MTN Nigeria · NCC USSD dispute',
+      'Access Bank · Diamond merger',
+      'Jumia Group IPO · Amazon-of-Africa narrative collapse',
+      'Equity Group · DRC + Rwanda banking expansion',
+      'Twiga Foods · Series E + Pan-African FMCG pivot',
+      'MTN MoMo · 17-market single-rail thesis',
+      'Naspers / Tencent · cross-border concentration cycle',
+    ],
   },
 ];
 
@@ -648,17 +701,7 @@ export const HONEST_GAPS = [
   {
     title: 'Decision Rooms is still a redirect',
     detail:
-      'The list page exists; per-room collaboration page is on the Week 9–10 plan. Marcus (M&A persona) called the blind-prior survey "the feature I\'d pay for immediately" — it\'s the highest-leverage thing left.',
-  },
-  {
-    title: 'Deal-centric workflow is scheduled, not shipped',
-    detail:
-      'Today, deals show document counts; uploading still starts from /dashboard. The per-deal page with composite Deal DQI + bias-signature aggregation is Weeks 5–8.',
-  },
-  {
-    title: 'Document-level RBAC',
-    detail:
-      'Org admin / member roles exist. Per-document private / team / specific-members permissions ship Weeks 5–8. Confidential watermark on board reports today is cosmetic, not an access gate.',
+      'The list page exists; per-room collaboration page is on the Week 9–10 deep-refactor plan. Marcus (M&A persona) called the blind-prior survey "the feature I\'d pay for immediately" — it\'s the highest-leverage thing left in the 12-week arc. Plan §4.1 deep covers full per-room state + survey distribution + anonymized reveal + Brier-per-participant.',
   },
   {
     title: 'SAML SSO requires Supabase Pro',
@@ -671,8 +714,18 @@ export const HONEST_GAPS = [
       'Audit progress UI is SSE-driven from real backend events (verified — claim was wrong in the original audit). What\'s NOT real: the per-stage progress is event-completion-driven, not percent-within-stage. For a 90-second audit it feels honest; for a 4-minute one we\'d want finer granularity.',
   },
   {
-    title: 'WhatsApp / multi-language / PPP pricing',
+    title: 'Slack /di slash-command + WhatsApp surface',
     detail:
-      'Sankore-specific asks from the original Titi sub-agent. Not in the 12-week plan. Slack /di audit (Weeks 9–12) covers the workflow-embedding use-case for now.',
+      'Slack install + thread-monitoring exists; the in-channel /di audit slash-command is on the Week 9-12 deep plan. WhatsApp is deliberately deferred — Slack covers the corporate-strategy buyer; WhatsApp belongs to a different distribution playbook (consumer / SMB) we\'re not pursuing.',
+  },
+  {
+    title: 'PPP / regional pricing remains a deal-by-deal handle',
+    detail:
+      'Not in list pricing. For Sankore specifically: founder-handled outside the standard tiers — pilot pricing reflected pan-African operating context. List pricing is otherwise developed-market-anchored by design.',
+  },
+  {
+    title: 'Cross-org bias-genome insights gated on 3+ pilots',
+    detail:
+      'Plain-English portfolio insights above the DKG graph still need real cross-org consenting data before we can ship them honestly. The Bias Genome page already runs on real data when n is large enough; the cross-tenant aggregation activates at the third paid pilot.',
   },
 ];
