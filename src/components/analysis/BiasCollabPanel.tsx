@@ -13,6 +13,7 @@ import {
   Calendar,
 } from 'lucide-react';
 import { TeammatePicker } from './TeammatePicker';
+import { renderCommentBody } from '@/lib/utils/comment-render';
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
@@ -143,7 +144,7 @@ function CommentRow({
           wordBreak: 'break-word',
         }}
       >
-        {c.body}
+        {renderCommentBody(c.body)}
       </p>
       <div className="flex items-center gap-3 mt-2">
         <button
@@ -227,7 +228,7 @@ function TaskRow({
                 wordBreak: 'break-word',
               }}
             >
-              {task.description}
+              {renderCommentBody(task.description)}
             </div>
           )}
         </div>
@@ -248,11 +249,28 @@ function TaskRow({
         className="flex items-center gap-3 mt-2 flex-wrap"
         style={{ fontSize: 11, color: 'var(--text-muted)' }}
       >
-        {task.dueAt && (
-          <span className="inline-flex items-center gap-1">
-            <Calendar size={10} /> due {formatDate(task.dueAt)}
-          </span>
-        )}
+        {task.dueAt && (() => {
+          const due = new Date(task.dueAt);
+          const isOverdue =
+            due.getTime() < Date.now() &&
+            task.status !== 'resolved' &&
+            task.status !== 'dismissed';
+          const soonMs = 48 * 3600 * 1000;
+          const isSoon = !isOverdue && due.getTime() - Date.now() < soonMs;
+          return (
+            <span
+              className="inline-flex items-center gap-1"
+              style={{
+                color: isOverdue ? '#DC2626' : isSoon ? '#D97706' : 'var(--text-muted)',
+                fontWeight: isOverdue ? 700 : 500,
+              }}
+            >
+              <Calendar size={10} />
+              {isOverdue ? 'OVERDUE · ' : 'due '}
+              {formatDate(task.dueAt)}
+            </span>
+          );
+        })()}
         <select
           value={task.status}
           onChange={e => onStatusChange(task, e.target.value as BiasTask['status'])}

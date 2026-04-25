@@ -167,28 +167,65 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Fire @mention Nudges fire-and-forget — never block the comment write
-    // on a notification side-effect.
+    // Fire @mention Nudges + email fallback fire-and-forget — never block the
+    // comment write on a notification side-effect.
     if (mentionedUserIds.length > 0) {
       const previewBody = trimmed.length > 200 ? `${trimmed.slice(0, 197)}…` : trimmed;
+      const targets = mentionedUserIds.filter(id => id !== user.id);
+
+      // Dashboard Nudge (immediate in-product surface).
       Promise.all(
-        mentionedUserIds
-          .filter(id => id !== user.id) // don't nudge the author for self-mentions
-          .map(targetUserId =>
-            prisma.nudge.create({
-              data: {
-                targetUserId,
-                orgId: access.orgId,
-                analysisId: access.analysisId,
-                nudgeType: 'bias_comment_mention',
-                triggerReason: 'mentioned_in_bias_comment',
-                message: `You were mentioned on a flagged bias: "${previewBody}"`,
-                channel: 'dashboard',
-                severity: 'info',
-              },
-            })
-          )
+        targets.map(targetUserId =>
+          prisma.nudge.create({
+            data: {
+              targetUserId,
+              orgId: access.orgId,
+              analysisId: access.analysisId,
+              nudgeType: 'bias_comment_mention',
+              triggerReason: 'mentioned_in_bias_comment',
+              message: `You were mentioned on a flagged bias: "${previewBody}"`,
+              channel: 'dashboard',
+              severity: 'info',
+            },
+          })
+        )
       ).catch(err => log.warn('bias-comment mention nudges failed:', err));
+
+      // 2.2 deep — email fallback. Slack DM dispatch happens via the
+      // existing bias-task path; for comments we use email so the mention
+      // catches teammates who have notifications off in-app.
+      (async () => {
+        try {
+          const memberships = await prisma.teamMember
+            .findMany({
+              where: { userId: { in: targets } },
+              select: { userId: true, email: true, displayName: true },
+            })
+            .catch(() => []);
+          if (memberships.length === 0) return;
+          const { sendEmail } = await import('@/lib/notifications/email');
+          for (const m of memberships) {
+            const subject = `Decision Intel — you were mentioned on a flagged bias`;
+            const link = `${process.env.NEXT_PUBLIC_APP_URL || ''}/documents/${access.documentId ?? ''}`;
+            await sendEmail({
+              to: m.email,
+              subject,
+              text: `${m.displayName ?? m.email},\n\nYou were mentioned on a flagged bias:\n\n"${previewBody}"\n\nOpen the document: ${link}`,
+              html: `<p>You were mentioned on a flagged bias:</p><blockquote style="margin:0 0 12px;padding:8px 12px;background:#f8fafc;border-left:3px solid #16A34A;font-style:italic;">${previewBody}</blockquote><p><a href="${link}" style="color:#16A34A;font-weight:600;">Open the document</a></p>`,
+            }).catch(err =>
+              log.warn(
+                `bias-comment mention email to ${m.email} failed:`,
+                err instanceof Error ? err.message : String(err)
+              )
+            );
+          }
+        } catch (err) {
+          log.warn(
+            'bias-comment mention email pass failed:',
+            err instanceof Error ? err.message : String(err)
+          );
+        }
+      })().catch(() => null);
     }
 
     logAudit({
