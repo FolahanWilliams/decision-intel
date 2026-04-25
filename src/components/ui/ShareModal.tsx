@@ -14,7 +14,36 @@ import {
   BookOpen,
   Presentation,
   ShieldCheck,
+  Clock,
 } from 'lucide-react';
+
+// Board-member share expiries (3.3). 24h is the default — the most common
+// procurement-grade ask is a one-day window so the General Counsel / audit
+// committee member can review the audit during the meeting prep block, then
+// the link goes dead automatically.
+type ExpiryChoice = '1h' | '24h' | '7d' | '30d' | 'never';
+const EXPIRY_OPTIONS: Array<{ id: ExpiryChoice; label: string; hint: string }> = [
+  { id: '1h', label: '1 hour', hint: 'Live read-along' },
+  { id: '24h', label: '24 hours', hint: 'Board-member review' },
+  { id: '7d', label: '7 days', hint: 'Default' },
+  { id: '30d', label: '30 days', hint: 'Long-running deal' },
+  { id: 'never', label: 'Never', hint: 'Public reference' },
+];
+
+function expiryToHours(choice: ExpiryChoice): number | null {
+  switch (choice) {
+    case '1h':
+      return 1;
+    case '24h':
+      return 24;
+    case '7d':
+      return 168;
+    case '30d':
+      return 720;
+    case 'never':
+      return null;
+  }
+}
 import { useToast } from '@/components/ui/EnhancedToast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -69,6 +98,7 @@ export function ShareModal({
   const [caseStudyUrl, setCaseStudyUrl] = useState<string | null>(null);
   const [creatingCaseStudy, setCreatingCaseStudy] = useState(false);
   const [caseStudyCopied, setCaseStudyCopied] = useState(false);
+  const [expiry, setExpiry] = useState<ExpiryChoice>('24h');
   const { showToast } = useToast();
 
   const handlePdfExport = useCallback(async () => {
@@ -140,7 +170,7 @@ export function ShareModal({
       const res = await fetch('/api/share', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ analysisId, expiresInDays: 7 }),
+        body: JSON.stringify({ analysisId, expiresInHours: expiryToHours(expiry) }),
       });
       if (res.ok) {
         const data = await res.json();
@@ -159,7 +189,7 @@ export function ShareModal({
     } finally {
       setCreatingLink(false);
     }
-  }, [analysisId, showToast]);
+  }, [analysisId, expiry, showToast]);
 
   const handleCreateCaseStudyLink = useCallback(async () => {
     if (!analysisId) return;
@@ -402,6 +432,78 @@ export function ShareModal({
           {/* Share Tab */}
           {activeTab === 'share' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {/* Expiry selector — applies to the shareable link below. The
+                  case-study link below ignores this and stays no-expiry. */}
+              {analysisId && !shareUrl && (
+                <div
+                  style={{
+                    padding: '10px 12px',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: 'var(--radius-sm)',
+                    background: 'var(--bg-elevated)',
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      letterSpacing: '0.06em',
+                      textTransform: 'uppercase',
+                      color: 'var(--text-muted)',
+                      marginBottom: 8,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                    }}
+                  >
+                    <Clock size={11} />
+                    Expires in
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: 6,
+                    }}
+                  >
+                    {EXPIRY_OPTIONS.map(opt => {
+                      const active = opt.id === expiry;
+                      return (
+                        <button
+                          key={opt.id}
+                          onClick={() => setExpiry(opt.id)}
+                          aria-pressed={active}
+                          style={{
+                            padding: '5px 10px',
+                            fontSize: 11,
+                            fontWeight: active ? 700 : 500,
+                            color: active ? 'white' : 'var(--text-secondary)',
+                            background: active ? 'var(--accent-primary)' : 'transparent',
+                            border: `1px solid ${active ? 'var(--accent-primary)' : 'var(--border-color)'}`,
+                            borderRadius: 999,
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease',
+                          }}
+                        >
+                          {opt.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: 'var(--text-muted)',
+                      marginTop: 8,
+                    }}
+                  >
+                    {EXPIRY_OPTIONS.find(o => o.id === expiry)?.hint}
+                    {expiry === 'never' &&
+                      ' — link stays live until you revoke it. Use sparingly.'}
+                  </div>
+                </div>
+              )}
+
               {/* Shareable Link */}
               {analysisId && (
                 <div>
@@ -450,7 +552,11 @@ export function ShareModal({
                       <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                         {shareUrl
                           ? 'Anyone with this link can view the analysis'
-                          : 'Generates a public read-only link (7 day expiry)'}
+                          : `Generates a public read-only link${
+                              expiry === 'never'
+                                ? ' (no expiry — revoke manually)'
+                                : ` (${EXPIRY_OPTIONS.find(o => o.id === expiry)?.label} expiry)`
+                            }`}
                       </div>
                     </div>
                   </Button>

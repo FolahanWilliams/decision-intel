@@ -15,7 +15,7 @@
  */
 
 import { useState } from 'react';
-import { ArrowLeft, Building2, Target, HandCoins, Users } from 'lucide-react';
+import { ArrowLeft, Building2, Target, HandCoins, Users, BookOpen } from 'lucide-react';
 import type { Application, ApplicationStatus } from './types';
 import { PartnerOverviewTab } from './tabs/PartnerOverviewTab';
 import { PartnerFitTab } from './tabs/PartnerFitTab';
@@ -59,6 +59,7 @@ interface Props {
 export function PartnerDetailView({ app, founderPass, onBack }: Props) {
   const [tab, setTab] = useState<DetailTab>('overview');
   const statusColor = STATUS_COLORS[app.status];
+  const isSankore = app.company.toLowerCase().includes('sankore');
 
   return (
     <div>
@@ -115,6 +116,29 @@ export function PartnerDetailView({ app, founderPass, onBack }: Props) {
             {app.company}
           </div>
         </div>
+        {isSankore && (
+          <a
+            href="/dashboard/founder-hub/design-partners/sankore"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '5px 11px',
+              borderRadius: 999,
+              background: 'rgba(22,163,74,0.10)',
+              border: '1px solid rgba(22,163,74,0.30)',
+              color: 'var(--accent-primary)',
+              fontSize: 11,
+              fontWeight: 700,
+              textDecoration: 'none',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <BookOpen size={11} />
+            Capability brief
+            <span style={{ opacity: 0.7 }}>→</span>
+          </a>
+        )}
         <span
           style={{
             fontSize: 10.5,

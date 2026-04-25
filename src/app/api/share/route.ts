@@ -17,9 +17,15 @@ import { safeCompare } from '@/lib/utils/safe-compare';
 
 const log = createLogger('ShareLink');
 
+// Expiry: callers send EITHER expiresInHours (granular — 1h, 24h boardroom
+// share, etc.) OR expiresInDays (legacy — pre-3.3 callers). When neither is
+// provided we default to 7 days. expiresInHours wins when both are present.
+// `null` on either field means "never expires" (still gated server-side to
+// case-study links only — open-public default expiry guards against link rot).
 const CreateShareSchema = z.object({
   analysisId: z.string().min(1),
-  expiresInDays: z.number().min(1).max(90).default(7),
+  expiresInHours: z.number().min(1).max(2160).nullable().optional(),
+  expiresInDays: z.number().min(1).max(90).optional(),
   password: z.string().min(4).max(100).optional(),
   isCaseStudy: z.boolean().optional().default(false),
 });
@@ -36,7 +42,19 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { analysisId, expiresInDays, password, isCaseStudy } = CreateShareSchema.parse(body);
+    const { analysisId, expiresInHours, expiresInDays, password, isCaseStudy } =
+      CreateShareSchema.parse(body);
+
+    // Resolve effective expiry: hours wins over days; null = never (forced to
+    // null on case-study links). If neither was provided, fall back to 7 days
+    // so legacy callers stay on the existing default.
+    const expiryMs: number | null = (() => {
+      if (isCaseStudy) return null;
+      if (expiresInHours === null) return null;
+      if (typeof expiresInHours === 'number') return expiresInHours * 60 * 60 * 1000;
+      const days = expiresInDays ?? 7;
+      return days * 24 * 60 * 60 * 1000;
+    })();
 
     // Verify user owns the document associated with this analysis
     const analysis = await prisma.analysis.findUnique({
@@ -69,7 +87,7 @@ export async function POST(req: NextRequest) {
         analysisId,
         userId: user.id,
         orgId: analysis.document.orgId,
-        expiresAt: isCaseStudy ? null : new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000),
+        expiresAt: expiryMs === null ? null : new Date(Date.now() + expiryMs),
         password: passwordHash,
         isCaseStudy,
       },
