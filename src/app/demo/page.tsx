@@ -42,6 +42,7 @@ import {
 } from '@/lib/utils/redaction-trail';
 import { trackEvent } from '@/lib/analytics/track';
 import type { AnalysisResult } from '@/types';
+import { RoleSamplePicker } from '@/components/samples/RoleSamplePicker';
 
 /* ─── Color tokens (mirror landing page so the demo feels like the same product) ── */
 const C = {
@@ -320,6 +321,28 @@ export default function DemoPage() {
     return () => clearInterval(t);
   }, [pasteAuditing]);
 
+  // 4.3 deep — `?sample=<slug>` deep-link from /case-studies/sample/[slug]
+  // pre-loads the memo body into the paste flow. Reads on mount only;
+  // user can edit afterwards.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const slug = params.get('sample');
+    if (!slug) return;
+    void (async () => {
+      try {
+        const { SAMPLE_BUNDLES_BY_SLUG } = await import('@/lib/data/sample-bundles');
+        const bundle = SAMPLE_BUNDLES_BY_SLUG[slug];
+        if (bundle) {
+          setPasteText(bundle.content);
+          trackEvent('demo_sample_deep_link', { slug });
+        }
+      } catch {
+        /* ignore */
+      }
+    })();
+  }, []);
+
   const scoreColor = analysis
     ? analysis.overallScore >= 70
       ? '#22c55e'
@@ -565,6 +588,20 @@ export default function DemoPage() {
                 boxShadow: '0 14px 40px rgba(15,23,42,0.06)',
               }}
             >
+              <div style={{ marginBottom: 18 }}>
+                <RoleSamplePicker
+                  fetchRole={false}
+                  title="Paste a sample memo"
+                  subtitle="Pick the one closest to a decision your team makes — the picker is role-routed so the first paste maps to your stack."
+                  onSelect={bundle => {
+                    setPasteText(bundle.content);
+                    trackEvent('demo_sample_bundle_loaded', {
+                      slug: bundle.slug,
+                      role: bundle.role,
+                    });
+                  }}
+                />
+              </div>
               <textarea
                 value={pasteText}
                 onChange={e => setPasteText(e.target.value)}

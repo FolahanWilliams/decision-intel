@@ -17,6 +17,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BrainCircuit, Loader2, X } from 'lucide-react';
+import { RoleSamplePicker } from '@/components/samples/RoleSamplePicker';
 import { scanForPii, type ScanResult } from '@/lib/utils/redaction-scanner';
 import {
   RedactionPreModal,
@@ -158,6 +159,17 @@ export function InlinePasteMemoCard({ onClose, onSubmitted }: InlinePasteMemoCar
           <X size={14} />
           Back to upload
         </button>
+      </div>
+
+      <div style={{ marginBottom: 14 }}>
+        <RoleSamplePicker
+          fetchRole={true}
+          title="Don't have a memo handy?"
+          subtitle="Pick a role-routed sample. Picker reads your onboarding role; you can switch tracks too."
+          onSelect={bundle => {
+            setContent(bundle.content);
+          }}
+        />
       </div>
 
       <textarea
