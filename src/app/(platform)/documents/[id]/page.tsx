@@ -1574,7 +1574,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       {/* Document version chain — only renders when ≥2 versions exist. */}
       {document?.id && (
         <ErrorBoundary sectionName="Version history strip">
-          <VersionHistoryStrip documentId={document.id} />
+          <VersionHistoryStrip documentId={document.id} isOwner={!!document.isOwner} />
         </ErrorBoundary>
       )}
 

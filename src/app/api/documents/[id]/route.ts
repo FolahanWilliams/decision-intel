@@ -173,6 +173,74 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   }
 }
 
+/**
+ * PATCH /api/documents/:id  (2.3 deep)
+ *
+ * Owner-only update of light metadata that doesn't have its own
+ * dedicated route. Currently supports:
+ *   versionLabel — free-text human label per version (≤80 chars).
+ *
+ * The visibility editor lives at /api/documents/:id/visibility and the
+ * legal-hold attach lives at /api/legal-holds; this PATCH is for things
+ * the document owner can change in-place without a workflow.
+ */
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body = await request.json().catch(() => null);
+    if (!body || typeof body !== 'object') {
+      return NextResponse.json({ error: 'Invalid body' }, { status: 400 });
+    }
+
+    const update: { versionLabel?: string | null } = {};
+    if ('versionLabel' in body) {
+      const raw = (body as { versionLabel?: unknown }).versionLabel;
+      if (raw === null || raw === '') {
+        update.versionLabel = null;
+      } else if (typeof raw === 'string') {
+        const trimmed = raw.trim().slice(0, 80);
+        update.versionLabel = trimmed.length === 0 ? null : trimmed;
+      } else {
+        return NextResponse.json({ error: 'versionLabel must be string or null' }, { status: 400 });
+      }
+    }
+
+    if (Object.keys(update).length === 0) {
+      return NextResponse.json({ error: 'No updatable fields supplied' }, { status: 400 });
+    }
+
+    // Owner-only.
+    const doc = await prisma.document.findFirst({
+      where: { id, userId: user.id, deletedAt: null },
+      select: { id: true },
+    });
+    if (!doc) {
+      return NextResponse.json({ error: 'Not found or not owner' }, { status: 404 });
+    }
+
+    const updated = await prisma.document.update({
+      where: { id },
+      data: update,
+      select: { id: true, versionLabel: true },
+    });
+    return NextResponse.json({ ok: true, ...updated });
+  } catch (e) {
+    log.error('PATCH document failed:', e instanceof Error ? e.message : String(e));
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
+
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
