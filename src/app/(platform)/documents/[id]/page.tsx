@@ -224,6 +224,17 @@ interface Analysis {
     cagrCeiling: number;
     rationale: string;
   };
+  marketContextOverride?:
+    | ({
+        context: 'emerging_market' | 'developed_market' | 'cross_border' | 'unknown';
+        emergingMarketCountries: string[];
+        developedMarketCountries: string[];
+        cagrCeiling: number;
+        rationale: string;
+        overriddenAt?: string;
+        overriddenBy?: string;
+      })
+    | null;
 }
 
 interface Document {
@@ -514,38 +525,38 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
     [router, resolvedParams.id, searchParams]
   );
 
-  useEffect(() => {
-    const fetchDocument = async () => {
-      try {
-        const res = await fetch(`/api/documents/${resolvedParams.id}`);
-        if (!res.ok) throw new Error('Document not found');
-        const data = await res.json();
-        setDocument(data);
-        // Seed the visibility pill from the API payload so the UI reflects
-        // the persisted value before the user opens the modal.
-        if (data.visibility) setVisibilityState(data.visibility as DocumentVisibility);
-        if (data.analyses?.[0]?.biases?.[0]) {
-          setSelectedBias(null); // Don't auto-select
-        }
-        // Log document view for audit trail (fire and forget)
-        fetch('/api/audit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'VIEW_DOCUMENT',
-            resource: 'Document',
-            resourceId: data.id,
-            details: { filename: data.filename },
-          }),
-        }).catch(err => log.warn('audit VIEW_DOCUMENT failed:', err));
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load document');
-      } finally {
-        setLoading(false);
+  const refetchDocument = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/documents/${resolvedParams.id}`);
+      if (!res.ok) throw new Error('Document not found');
+      const data = await res.json();
+      setDocument(data);
+      if (data.visibility) setVisibilityState(data.visibility as DocumentVisibility);
+      if (data.analyses?.[0]?.biases?.[0]) {
+        setSelectedBias(null);
       }
-    };
-    fetchDocument();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load document');
+    } finally {
+      setLoading(false);
+    }
   }, [resolvedParams.id]);
+
+  useEffect(() => {
+    refetchDocument().then(() => {
+      // Audit-log the view (fire-and-forget) on first load only.
+      const id = resolvedParams.id;
+      fetch('/api/audit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'VIEW_DOCUMENT',
+          resource: 'Document',
+          resourceId: id,
+        }),
+      }).catch(err => log.warn('audit VIEW_DOCUMENT failed:', err));
+    });
+  }, [resolvedParams.id, refetchDocument]);
 
   // Abort any in-flight scan stream on unmount
   useEffect(() => {
@@ -2670,6 +2681,8 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                         dealSector={document.deal?.sector ?? null}
                         dealTicketSize={document.deal?.ticketSize ?? null}
                         marketContextApplied={analysis?.marketContextApplied}
+                        marketContextOverride={analysis?.marketContextOverride ?? null}
+                        onMarketContextChanged={() => void refetchDocument()}
                         isOwner={!!document.isOwner}
                       />
                     </ErrorBoundary>

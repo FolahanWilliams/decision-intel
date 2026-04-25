@@ -79,6 +79,19 @@ interface OverviewTabProps {
     cagrCeiling: number;
     rationale: string;
   };
+  marketContextOverride?:
+    | ({
+        context: 'emerging_market' | 'developed_market' | 'cross_border' | 'unknown';
+        emergingMarketCountries: string[];
+        developedMarketCountries: string[];
+        cagrCeiling: number;
+        rationale: string;
+        overriddenAt?: string;
+        overriddenBy?: string;
+      })
+    | null;
+  /** Triggered after a successful override save so the parent can refresh. */
+  onMarketContextChanged?: () => void;
   /** Document-owner flag — gates the redaction map reveal feature. */
   isOwner?: boolean;
 }
@@ -109,6 +122,8 @@ export function OverviewTab({
   dealSector,
   dealTicketSize,
   marketContextApplied,
+  marketContextOverride,
+  onMarketContextChanged,
   isOwner,
 }: OverviewTabProps) {
   const [showRpd, setShowRpd] = useState(false);
@@ -391,16 +406,39 @@ export function OverviewTab({
       )}
 
       {/* Market-context priors chip — shows which growth-rate ceiling the bias
-          detector applied based on detected jurisdictions (3.6). Renders nothing
-          when context is unknown. */}
+          detector applied based on detected jurisdictions (3.6). Owner can
+          flip the auto-detection via the chip's override editor. */}
       {marketContextApplied && (
-        <MarketContextChip marketContextApplied={marketContextApplied} />
+        <MarketContextChip
+          marketContextApplied={marketContextApplied}
+          marketContextOverride={marketContextOverride ?? null}
+          analysisId={analysisId}
+          isOwner={!!isOwner}
+          onChanged={onMarketContextChanged}
+        />
       )}
 
       {/* Structural Assumptions (Dalio 18-determinants macro lens) */}
       {analysisId && (
         <ErrorBoundary>
-          <StructuralAssumptionsPanel analysisId={analysisId} autoRun={false} />
+          <StructuralAssumptionsPanel
+            analysisId={analysisId}
+            autoRun={false}
+            marketContext={
+              marketContextOverride
+                ? {
+                    context: marketContextOverride.context,
+                    cagrCeiling: marketContextOverride.cagrCeiling,
+                    overridden: true,
+                  }
+                : marketContextApplied
+                  ? {
+                      context: marketContextApplied.context,
+                      cagrCeiling: marketContextApplied.cagrCeiling,
+                    }
+                  : undefined
+            }
+          />
         </ErrorBoundary>
       )}
 

@@ -89,6 +89,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
               narrativePreMortem: true,
               forgottenQuestions: true,
               marketContextApplied: true,
+              marketContextOverride: true,
               outcomeStatus: true,
               recalibratedDqi: true,
               outcome: true,

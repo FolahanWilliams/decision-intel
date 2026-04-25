@@ -92,6 +92,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       where: { id: analysisId },
       select: {
         id: true,
+        marketContextApplied: true,
+        marketContextOverride: true,
         document: {
           select: {
             id: true,
@@ -125,8 +127,33 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     // enough context for the 18-determinant scan.
     const capped = memoText.slice(0, MAX_MEMO_CHARS);
 
+    // 3.6 deep — feed the effective market context (override > applied)
+    // into the structural-assumptions prompt so an overridden EM memo
+    // gets EM-shaped Dalio prompts and a Lagos memo isn't audited
+    // against developed-market baselines.
+    const effectiveContext = (analysis.marketContextOverride ??
+      analysis.marketContextApplied) as
+      | {
+          context?: 'emerging_market' | 'developed_market' | 'cross_border' | 'unknown';
+          emergingMarketCountries?: string[];
+          developedMarketCountries?: string[];
+        }
+      | null;
+    const region = effectiveContext
+      ? [
+          ...(effectiveContext.emergingMarketCountries ?? []),
+          ...(effectiveContext.developedMarketCountries ?? []),
+        ]
+          .slice(0, 3)
+          .join(', ') || undefined
+      : undefined;
     const prompt = buildStructuralAssumptionsPrompt(capped, {
       industry: analysis.document.deal?.sector ?? undefined,
+      region,
+      marketContext:
+        effectiveContext?.context && effectiveContext.context !== 'unknown'
+          ? effectiveContext.context
+          : undefined,
     });
 
     const result = await generateText(prompt, {

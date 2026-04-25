@@ -28,6 +28,17 @@ interface Props {
    * "Run structural audit" button and only fetch on click. Defaults true.
    */
   autoRun?: boolean;
+  /**
+   * Effective market context for the audit (3.6 deep). When provided,
+   * surfaces a small "EM priors applied" chip in the panel header so the
+   * reader knows the structural pass uses the same context as the chip.
+   */
+  marketContext?: {
+    context: 'emerging_market' | 'developed_market' | 'cross_border' | 'unknown';
+    cagrCeiling: number;
+    /** Override flag — green badge "Owner override" when true. */
+    overridden?: boolean;
+  };
 }
 
 const SEVERITY_STYLES: Record<
@@ -71,7 +82,21 @@ const CATEGORY_LABELS: Record<string, string> = {
   external: 'External (geology, nature)',
 };
 
-export function StructuralAssumptionsPanel({ analysisId, autoRun = true }: Props) {
+const CONTEXT_LABEL: Record<NonNullable<Props['marketContext']>['context'], string> = {
+  emerging_market: 'Emerging-market priors',
+  developed_market: 'Developed-market priors',
+  cross_border: 'Cross-border priors',
+  unknown: 'Default priors',
+};
+
+const CONTEXT_HEX: Record<NonNullable<Props['marketContext']>['context'], string> = {
+  emerging_market: '#16A34A',
+  developed_market: '#2563EB',
+  cross_border: '#7C3AED',
+  unknown: '#64748B',
+};
+
+export function StructuralAssumptionsPanel({ analysisId, autoRun = true, marketContext }: Props) {
   const [state, setState] = useState<
     | { status: 'idle' }
     | { status: 'loading' }
@@ -120,11 +145,27 @@ export function StructuralAssumptionsPanel({ analysisId, autoRun = true }: Props
         <div className="flex items-center gap-3">
           <Layers size={18} style={{ color: 'var(--accent-primary)' }} />
           <div className="text-left">
-            <h3 className="text-base flex items-center gap-2">
+            <h3 className="text-base flex items-center gap-2 flex-wrap">
               Structural Assumptions
               {state.status === 'ready' && hasFindings && (
                 <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300">
                   {assumptions.length} flagged
+                </span>
+              )}
+              {marketContext && marketContext.context !== 'unknown' && (
+                <span
+                  className="text-xs font-medium"
+                  style={{
+                    color: CONTEXT_HEX[marketContext.context],
+                    background: `${CONTEXT_HEX[marketContext.context]}14`,
+                    border: `1px solid ${CONTEXT_HEX[marketContext.context]}33`,
+                    padding: '2px 8px',
+                    borderRadius: 999,
+                  }}
+                  title={`Overconfidence trigger: ~${marketContext.cagrCeiling}% CAGR ceiling`}
+                >
+                  {CONTEXT_LABEL[marketContext.context]} · {marketContext.cagrCeiling}%
+                  {marketContext.overridden && ' · override'}
                 </span>
               )}
             </h3>
