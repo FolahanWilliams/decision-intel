@@ -16,18 +16,9 @@
  * if they want to regenerate.
  */
 
-import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
-import { Pool } from 'pg';
+import { createSeedPrismaClient } from './seed-prisma-client';
 
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) {
-  throw new Error('DATABASE_URL environment variable is not set');
-}
-
-const pool = new Pool({ connectionString });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
+const { prisma } = createSeedPrismaClient();
 
 const HAPPENED_AT = new Date('2026-04-23T15:37:00Z'); // 16:37 BST = 15:37 UTC
 

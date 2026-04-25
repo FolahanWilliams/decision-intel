@@ -17,19 +17,11 @@
  * Runs automatically on every Vercel deploy via scripts/seed-business-data.mjs.
  */
 
-import { PrismaClient, Prisma } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
-import { Pool } from 'pg';
+import { Prisma } from '@prisma/client';
 import type { PartnerRichProfile } from '../src/types/partner-profile';
+import { createSeedPrismaClient } from './seed-prisma-client';
 
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) {
-  throw new Error('DATABASE_URL environment variable is not set');
-}
-
-const pool = new Pool({ connectionString });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
+const { prisma } = createSeedPrismaClient();
 
 // ─────────────────────────────────────────────────────────────────────────
 // Sankore record — edit these fields as the pilot evolves, then re-seed.
