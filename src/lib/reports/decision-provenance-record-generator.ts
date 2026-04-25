@@ -313,6 +313,50 @@ export class DecisionProvenanceRecordGenerator {
       y += verdictLines.length * 5 + 6;
     }
 
+    // 1.1 deep — granular per-judge convergence summary. Each judge
+    // runs independently; the metrics below show the convergence call.
+    const g = data.judgeVariance.granular;
+    if (g) {
+      this.doc.setFont('helvetica', 'bold');
+      this.doc.setFontSize(10);
+      this.doc.setTextColor(40, 40, 40);
+      this.doc.text('PER-JUDGE CONVERGENCE', MARGIN_L, y);
+      y += 6;
+      this.doc.setFont('helvetica', 'normal');
+      this.doc.setFontSize(9);
+      this.doc.setTextColor(60, 60, 60);
+      const lines: string[] = [];
+      if (g.biasDetective) {
+        lines.push(
+          `Bias Detective: ${g.biasDetective.flagCount} flag${g.biasDetective.flagCount === 1 ? '' : 's'} (${g.biasDetective.severeFlagCount} high/critical) across ${g.biasDetective.biasTypes.length} distinct bias type${g.biasDetective.biasTypes.length === 1 ? '' : 's'}.`
+        );
+      }
+      if (g.noiseJudge) {
+        const stdDev = g.noiseJudge.stdDev != null ? g.noiseJudge.stdDev.toFixed(2) : '—';
+        const mean = g.noiseJudge.mean != null ? g.noiseJudge.mean.toFixed(1) : '—';
+        const sample = g.noiseJudge.sampleCount ?? '—';
+        lines.push(
+          `Noise Judge: mean ${mean}, stdDev ${stdDev}, samples ${sample}. Lower stdDev = stronger inter-rater agreement on noise.`
+        );
+      }
+      if (g.factChecker) {
+        lines.push(
+          `Fact Checker: ${g.factChecker.verified ?? 0}/${g.factChecker.totalClaims ?? 0} claims verified · ${g.factChecker.contradicted ?? 0} contradicted.`
+        );
+      }
+      if (g.preMortem) {
+        lines.push(
+          `Pre-mortem: ${g.preMortem.failureScenarioCount} failure scenarios · ${g.preMortem.redTeamCount} red-team objections · ${g.preMortem.inversionCount} Munger inversions.`
+        );
+      }
+      for (const ln of lines) {
+        const wrapped = this.doc.splitTextToSize(`• ${ln}`, TEXT_W - 4);
+        this.doc.text(wrapped, MARGIN_L + 2, y);
+        y += wrapped.length * 4.6 + 1.5;
+      }
+      y += 3;
+    }
+
     this.doc.setFont('helvetica', 'normal');
     this.doc.setFontSize(9);
     this.doc.setTextColor(90, 90, 90);

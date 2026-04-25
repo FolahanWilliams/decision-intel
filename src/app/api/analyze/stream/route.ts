@@ -560,6 +560,91 @@ export async function POST(request: NextRequest) {
                   ),
                   forgottenQuestions: toPrismaJson(report.forgottenQuestions || undefined),
                   marketContextApplied: toPrismaJson(report.marketContextApplied || undefined),
+                  // 1.1 deep — granular per-judge variance summary for the
+                  // Decision Provenance Record. Keeps prompts/raw outputs
+                  // out (procurement won't accept those server-side) but
+                  // captures the metadata needed to demonstrate convergence
+                  // between the bias detective, noise judge, statistical
+                  // jury, fact-checker, and meta-judge.
+                  judgeOutputs: toPrismaJson({
+                    biasDetective: {
+                      flagCount: Array.isArray(report.biases)
+                        ? report.biases.length
+                        : 0,
+                      severeFlagCount: Array.isArray(report.biases)
+                        ? (report.biases as Array<{ severity?: string }>).filter(
+                            b => b.severity === 'high' || b.severity === 'critical'
+                          ).length
+                        : 0,
+                      biasTypes: Array.isArray(report.biases)
+                        ? Array.from(
+                            new Set(
+                              (report.biases as Array<{ biasType?: string }>).map(
+                                b => b.biasType ?? ''
+                              )
+                            )
+                          )
+                            .filter(Boolean)
+                            .slice(0, 12)
+                        : [],
+                    },
+                    noiseJudge: (() => {
+                      const ns = report.noiseStats as
+                        | { mean?: number; stdDev?: number; variance?: number }
+                        | undefined;
+                      return {
+                        mean: ns?.mean ?? null,
+                        stdDev: ns?.stdDev ?? null,
+                        variance: ns?.variance ?? null,
+                        sampleCount: Array.isArray(report.noiseBenchmarks)
+                          ? report.noiseBenchmarks.length
+                          : null,
+                      };
+                    })(),
+                    factChecker: (() => {
+                      const fc = report.factCheck as
+                        | {
+                            score?: number;
+                            verifications?: Array<{ verdict?: string }>;
+                          }
+                        | undefined;
+                      if (!fc) return null;
+                      const verifications = Array.isArray(fc.verifications)
+                        ? fc.verifications
+                        : [];
+                      return {
+                        score: fc.score ?? null,
+                        totalClaims: verifications.length,
+                        verified: verifications.filter(v => v.verdict === 'VERIFIED').length,
+                        contradicted: verifications.filter(v => v.verdict === 'CONTRADICTED')
+                          .length,
+                      };
+                    })(),
+                    metaJudge: {
+                      verdict:
+                        typeof report.metaVerdict === 'string'
+                          ? report.metaVerdict.slice(0, 800)
+                          : null,
+                    },
+                    preMortem: (() => {
+                      const pm = report.preMortem as
+                        | {
+                            failureScenarios?: unknown[];
+                            redTeam?: unknown[];
+                            inversion?: unknown[];
+                          }
+                        | undefined;
+                      if (!pm) return null;
+                      return {
+                        failureScenarioCount: Array.isArray(pm.failureScenarios)
+                          ? pm.failureScenarios.length
+                          : 0,
+                        redTeamCount: Array.isArray(pm.redTeam) ? pm.redTeam.length : 0,
+                        inversionCount: Array.isArray(pm.inversion) ? pm.inversion.length : 0,
+                      };
+                    })(),
+                    capturedAt: new Date().toISOString(),
+                  }),
                 } satisfies Prisma.AnalysisUncheckedCreateInput,
               });
 

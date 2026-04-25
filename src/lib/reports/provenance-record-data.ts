@@ -93,6 +93,36 @@ export interface JudgeVariance {
     benchmarks?: Record<string, unknown>;
   };
   metaVerdict: string | null;
+  /**
+   * Per-judge metadata captured during the pipeline run (1.1 deep). Null
+   * for legacy analyses (judgeOutputs column hadn't shipped yet).
+   * Procurement uses this to demonstrate convergence — the bias detective,
+   * noise judge, fact checker, pre-mortem, and meta-judge are independent
+   * passes and the variance shows up as flag counts + statistical jury
+   * mean/stdDev.
+   */
+  granular?: {
+    biasDetective?: { flagCount: number; severeFlagCount: number; biasTypes: string[] };
+    noiseJudge?: {
+      mean: number | null;
+      stdDev: number | null;
+      variance: number | null;
+      sampleCount: number | null;
+    };
+    factChecker?: {
+      score: number | null;
+      totalClaims: number | null;
+      verified: number | null;
+      contradicted: number | null;
+    };
+    metaJudge?: { verdict: string | null };
+    preMortem?: {
+      failureScenarioCount: number;
+      redTeamCount: number;
+      inversionCount: number;
+    };
+    capturedAt?: string;
+  };
   note: string;
 }
 
@@ -260,19 +290,24 @@ export async function assembleProvenanceRecordData(
     academicAnchor: node.academicAnchor,
   }));
 
-  // Judge variance: summary from what the Analysis row actually stores.
-  // The three individual judge outputs (biasDetective, noiseJudge,
-  // statisticalJury) are currently accessible via the internal audit log
-  // but not persisted granularly on Analysis. v1 is honest about that.
+  // Judge variance: granular per-judge summary persisted on Analysis
+  // (1.1 deep). Falls back to the v1 shape when judgeOutputs is null
+  // (legacy analyses captured before the column shipped).
   const noiseBenchmarks =
     analysis.noiseBenchmarks && typeof analysis.noiseBenchmarks === 'object'
       ? (analysis.noiseBenchmarks as Record<string, unknown>)
       : undefined;
+  const judgeOutputs =
+    (analysis as unknown as { judgeOutputs?: JudgeVariance['granular'] | null }).judgeOutputs ??
+    null;
   const judgeVariance: JudgeVariance = {
     noiseScore: analysis.noiseScore,
     distribution: noiseBenchmarks ? { benchmarks: noiseBenchmarks } : undefined,
     metaVerdict: analysis.metaVerdict ?? null,
-    note: 'Summary view of judge variance. Per-judge granular outputs are stored in the internal audit log and available on request under the DPA; they are deliberately excluded from the client-facing record to protect prompt internals.',
+    granular: judgeOutputs ?? undefined,
+    note: judgeOutputs
+      ? 'Per-judge convergence summary. Each judge runs independently; flag counts + noise stdDev show pipeline convergence. Raw prompt outputs are excluded by design (prompt-IP protection); the meta-judge verdict reproduces the convergence call.'
+      : 'Legacy analysis — granular per-judge outputs were not captured at run time. Available on request under the DPA from the internal audit log.',
   };
 
   return {

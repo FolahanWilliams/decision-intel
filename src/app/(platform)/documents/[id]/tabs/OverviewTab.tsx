@@ -30,6 +30,7 @@ import { StructuralAssumptionsPanel } from '@/components/analysis/StructuralAssu
 import { BiasCollabPanel } from '@/components/analysis/BiasCollabPanel';
 import { MarketContextChip } from '@/components/analysis/MarketContextChip';
 import { RedactionTrailCard } from '@/components/analysis/RedactionTrailCard';
+import { DprPreviewCard } from '@/components/analysis/DprPreviewCard';
 
 interface ExtendedBiasInstance extends BiasInstance {
   researchInsight: ResearchInsight;
@@ -398,6 +399,11 @@ export function OverviewTab({
           )}
         </div>
       </div>
+
+      {/* Decision Provenance Record preview (1.1 deep) — eight key
+          fields rendered in-page so the analyst sees the audit-defensible
+          shape without downloading the full PDF first. */}
+      {analysisId && <DprPreviewCard analysisId={analysisId} />}
 
       {/* Redaction trail (3.2 deep) — proof that PII was scrubbed before
           submit. Owner can replay the local-only placeholder map. */}
