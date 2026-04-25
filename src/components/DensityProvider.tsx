@@ -92,10 +92,15 @@ export function DensityToggle({ className }: { className?: string }) {
   };
 
   const labels = {
-    comfortable: 'Comfortable View',
-    compact: 'Compact View',
-    dense: 'Dense View',
+    comfortable: 'Comfortable',
+    compact: 'Compact',
+    dense: 'Dense',
   };
+  const next = {
+    comfortable: 'compact',
+    compact: 'dense',
+    dense: 'comfortable',
+  } as const;
 
   return (
     <Button
@@ -103,8 +108,8 @@ export function DensityToggle({ className }: { className?: string }) {
       size="icon"
       onClick={toggleDensity}
       className={cn('w-9 h-9', className)}
-      title={`Switch to ${labels[density]}`}
-      aria-label={`Current: ${labels[density]}. Click to toggle density.`}
+      title={`UI density: ${labels[density]}. Click to switch to ${labels[next[density]]}.`}
+      aria-label={`UI density: ${labels[density]}. Click to switch to ${labels[next[density]]}.`}
     >
       {icons[density]}
     </Button>

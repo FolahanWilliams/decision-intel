@@ -347,10 +347,16 @@ const [collapsedSections, setCollapsedSections] = useState<Record<string, boolea
             )}
           </button>
 
-          {/* New Decision button */}
+          {/* Start-an-audit button. The label was previously "New Decision"
+              which Adaeze's audit flagged as unfamiliar — the modal it
+              opens routes to one of four concrete entry points (Analyze a
+              Document, Think Through a Decision, Audit a Decision, Upload
+              a Meeting), none of which is a "decision frame" in the
+              audit's misread sense. The label now matches what actually
+              happens. */}
           <button
             onClick={() => window.dispatchEvent(new Event('open-new-decision-modal'))}
-            title={collapsed ? 'New Decision' : undefined}
+            title={collapsed ? 'Start an audit' : undefined}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -370,7 +376,7 @@ const [collapsedSections, setCollapsedSections] = useState<Record<string, boolea
             }}
           >
             <Plus size={16} />
-            {!collapsed && <span>New Decision</span>}
+            {!collapsed && <span>Start an audit</span>}
           </button>
 
           {/* Act — what the CSO does this week. Drafting, uploading,

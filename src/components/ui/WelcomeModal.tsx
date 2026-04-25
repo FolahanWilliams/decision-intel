@@ -10,8 +10,6 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import {
-  Sparkles,
-  ArrowRight,
   FileText,
   Upload,
   Compass,
@@ -32,6 +30,14 @@ import {
  * fund/investor option as a procurement-stage tell. Per CLAUDE.md
  * positioning we don't market to PE/VC, but once they sign up we honor
  * the workflow.
+ *
+ * Compressed 2026-04-25 from a 3-step modal (role / value props /
+ * CTAs) to a single screen. Adaeze's audit catch: "Three steps for an
+ * unseen tool is too much friction" — the value-props middle step
+ * was redundant with the marketing site the user just came from. The
+ * one-screen layout shows role pills first, then reveals three primary
+ * actions inline once a role is picked. Whole modal closes in two
+ * clicks (role + CTA) instead of four (role + Continue + Next + CTA).
  */
 const STORAGE_KEY = 'decision-intel-onboarding-completed';
 const TOUR_TRIGGER_KEY = 'decision-intel-launch-tour';
@@ -80,38 +86,9 @@ const ROLES: Array<{
   },
 ];
 
-const VALUE_PROPS_BY_ROLE: Record<Role, string[]> = {
-  cso: [
-    'Audit strategic memos and board decks in 60 seconds — surface 30+ cognitive biases with excerpts.',
-    'Predict the CEO, board, or parent-company questions before the room does.',
-    'Track Decision Quality Index quarter after quarter, against 135 historical decisions.',
-  ],
-  ma: [
-    'Pressure-test the deal memo — flag anchoring, sunk-cost, and overconfidence before IC.',
-    'Predict the questions the steering committee will ask before they sink the deal.',
-    'Close the outcome loop — every decision joins your Decision Knowledge Graph.',
-  ],
-  bizops: [
-    'Audit strategic recommendations and planning memos for the biases that ship bad forecasts.',
-    'Surface the assumptions your team treats as facts — with excerpts and recommendations.',
-    'Track decision quality across quarters, so patterns become visible instead of anecdotal.',
-  ],
-  pe_vc: [
-    'Audit IC memos and pre-commit reviews — flag anchoring on synergies, sunk-cost on a year-long process, planning fallacy on integration timelines.',
-    'Run blind-prior IC voting before the meeting — see the disagreement before the room collapses to consensus.',
-    'Brier-calibrated DQI compounds across funds and outcomes — the calibration record your LPs increasingly want to see.',
-  ],
-  other: [
-    'Upload any strategic memo, board deck, or market-entry recommendation.',
-    'Surface 30+ cognitive biases, anchoring assumptions, and predicted objections in 60 seconds.',
-    'Every audited decision joins your Decision Knowledge Graph — context compounds over time.',
-  ],
-};
-
 export function WelcomeModal({ onClose }: WelcomeModalProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [step, setStep] = useState<0 | 1 | 2>(0);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [loadingSample, setLoadingSample] = useState(false);
   const [sampleError, setSampleError] = useState<string | null>(null);
@@ -204,7 +181,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
         marginBottom: 10,
       }}
     >
-      <Sparkles size={22} style={{ color: 'var(--accent-primary)' }} />
+      <Compass size={22} style={{ color: 'var(--accent-primary)' }} />
     </div>
   );
 
@@ -216,187 +193,84 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
       }}
     >
       <DialogContent className="sm:max-w-md" showCloseButton>
-        {/* Step 0: role picker */}
-        {step === 0 && (
-          <>
-            <DialogHeader>
-              {headerIcon}
-              <DialogTitle style={{ fontSize: 18, letterSpacing: '-0.01em' }}>
-                Welcome to Decision Intel
-              </DialogTitle>
-              <DialogDescription>
-                One quick question so we tailor the next 60 seconds — what best describes your work?
-              </DialogDescription>
-            </DialogHeader>
+        <DialogHeader>
+          {headerIcon}
+          <DialogTitle style={{ fontSize: 18, letterSpacing: '-0.01em' }}>
+            Welcome to Decision Intel
+          </DialogTitle>
+          <DialogDescription>
+            Quick: what describes your work? We&apos;ll tailor the first audit to it.
+          </DialogDescription>
+        </DialogHeader>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, margin: '8px 0 4px' }}>
-              {ROLES.map(role => {
-                const RoleIcon = role.icon;
-                const isSelected = selectedRole === role.id;
-                return (
-                  <button
-                    key={role.id}
-                    type="button"
-                    onClick={() => setSelectedRole(role.id)}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 12,
-                      padding: '12px 14px',
-                      background: isSelected ? 'rgba(22, 163, 74, 0.06)' : 'var(--bg-card)',
-                      border: `1px solid ${
-                        isSelected ? 'var(--accent-primary)' : 'var(--border-color)'
-                      }`,
-                      borderRadius: 10,
-                      cursor: 'pointer',
-                      textAlign: 'left',
-                      transition: 'all 0.15s',
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: 34,
-                        height: 34,
-                        borderRadius: 9,
-                        background: isSelected ? 'var(--accent-primary)' : 'var(--bg-tertiary)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0,
-                      }}
-                    >
-                      <RoleIcon
-                        size={16}
-                        color={isSelected ? '#FFFFFF' : 'var(--text-secondary)'}
-                      />
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div
-                        style={{
-                          fontSize: 13,
-                          fontWeight: 600,
-                          color: 'var(--text-primary)',
-                        }}
-                      >
-                        {role.label}
-                      </div>
-                      <div
-                        style={{
-                          fontSize: 11,
-                          color: 'var(--text-muted)',
-                          marginTop: 1,
-                        }}
-                      >
-                        {role.description}
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-
-            <button
-              onClick={() => selectedRole && setStep(1)}
-              disabled={!selectedRole}
-              className="btn btn-primary flex items-center justify-center gap-sm"
-              style={{
-                width: '100%',
-                marginTop: 10,
-                padding: '10px 16px',
-                opacity: selectedRole ? 1 : 0.45,
-                cursor: selectedRole ? 'pointer' : 'not-allowed',
-              }}
-            >
-              Continue <ArrowRight size={14} />
-            </button>
-          </>
-        )}
-
-        {/* Step 1: value props tailored to role */}
-        {step === 1 && selectedRole && (
-          <>
-            <DialogHeader>
-              <DialogTitle style={{ fontSize: 18, letterSpacing: '-0.01em' }}>
-                Here&apos;s what you can do
-              </DialogTitle>
-              <DialogDescription>
-                Decision Intel audits the strategic memo before the board sees it.
-              </DialogDescription>
-            </DialogHeader>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, margin: '8px 0 4px' }}>
-              {VALUE_PROPS_BY_ROLE[selectedRole].map((item, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, margin: '8px 0 4px' }}>
+          {ROLES.map(role => {
+            const RoleIcon = role.icon;
+            const isSelected = selectedRole === role.id;
+            return (
+              <button
+                key={role.id}
+                type="button"
+                onClick={() => setSelectedRole(role.id)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: '10px 12px',
+                  background: isSelected ? 'rgba(22, 163, 74, 0.06)' : 'var(--bg-card)',
+                  border: `1px solid ${
+                    isSelected ? 'var(--accent-primary)' : 'var(--border-color)'
+                  }`,
+                  borderRadius: 10,
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'all 0.15s',
+                }}
+              >
+                <div
+                  style={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: 8,
+                    background: isSelected ? 'var(--accent-primary)' : 'var(--bg-tertiary)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <RoleIcon size={14} color={isSelected ? '#FFFFFF' : 'var(--text-secondary)'} />
+                </div>
+                <div style={{ flex: 1 }}>
                   <div
                     style={{
-                      width: 22,
-                      height: 22,
-                      borderRadius: '50%',
-                      background: 'rgba(22, 163, 74, 0.12)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: 'var(--text-primary)',
+                    }}
+                  >
+                    {role.label}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: 'var(--text-muted)',
                       marginTop: 1,
                     }}
                   >
-                    <span
-                      style={{
-                        fontSize: 11,
-                        fontWeight: 700,
-                        color: 'var(--accent-primary)',
-                      }}
-                    >
-                      {i + 1}
-                    </span>
+                    {role.description}
                   </div>
-                  <span
-                    style={{
-                      fontSize: 13,
-                      color: 'var(--text-secondary)',
-                      lineHeight: 1.55,
-                    }}
-                  >
-                    {item}
-                  </span>
                 </div>
-              ))}
-            </div>
+              </button>
+            );
+          })}
+        </div>
 
-            <button
-              onClick={() => setStep(2)}
-              className="btn btn-primary flex items-center justify-center gap-sm"
-              style={{ width: '100%', marginTop: 12, padding: '10px 16px' }}
-            >
-              Next <ArrowRight size={14} />
-            </button>
-            <button
-              onClick={() => setStep(0)}
-              style={{
-                width: '100%',
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--text-muted)',
-                fontSize: 12,
-                cursor: 'pointer',
-                padding: '6px 0',
-              }}
-            >
-              Back
-            </button>
-          </>
-        )}
-
-        {/* Step 2: get started */}
-        {step === 2 && (
-          <>
-            <DialogHeader>
-              <DialogTitle style={{ fontSize: 18, letterSpacing: '-0.01em' }}>
-                Ready to go
-              </DialogTitle>
-              <DialogDescription>Take the 60-second tour, or jump straight in.</DialogDescription>
-            </DialogHeader>
-
+        {/* CTAs reveal once a role is picked. Three primary actions on the
+            same screen — no second step. Adaeze's audit catch on the
+            three-step flow. */}
+        {selectedRole && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 10 }}>
             {sampleError && (
               <div
                 style={{
@@ -405,163 +279,142 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                   borderRadius: 8,
                   fontSize: 12,
                   color: '#f87171',
-                  margin: '0 0 4px',
                 }}
               >
                 {sampleError}
               </div>
             )}
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, margin: '8px 0 4px' }}>
-              <button
-                onClick={() => completeOnboarding({ launchTour: true })}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 14,
-                  padding: '14px 16px',
-                  background: 'var(--accent-primary)',
-                  border: '1px solid var(--accent-primary)',
-                  borderRadius: 10,
-                  cursor: 'pointer',
-                  color: '#FFFFFF',
-                  textAlign: 'left',
-                  transition: 'filter 0.15s',
-                }}
-              >
-                <div
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 10,
-                    background: 'rgba(255, 255, 255, 0.18)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                  }}
-                >
-                  <Compass size={20} color="#fff" />
-                </div>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 600 }}>Take the 60-second tour</div>
-                  <div style={{ fontSize: 12, opacity: 0.85, marginTop: 2 }}>
-                    We&apos;ll spotlight the upload zone, audit tabs, and Knowledge Graph.
-                  </div>
-                </div>
-              </button>
-
-              <button
-                onClick={() => completeOnboarding()}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 14,
-                  padding: '14px 16px',
-                  background: 'var(--bg-card)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: 10,
-                  cursor: 'pointer',
-                  color: 'inherit',
-                  textAlign: 'left',
-                }}
-              >
-                <div
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 10,
-                    background: 'var(--bg-tertiary)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                  }}
-                >
-                  <Upload size={20} style={{ color: 'var(--text-secondary)' }} />
-                </div>
-                <div>
-                  <div
-                    style={{
-                      fontSize: 14,
-                      fontWeight: 600,
-                      color: 'var(--text-primary)',
-                    }}
-                  >
-                    Upload a strategic memo now
-                  </div>
-                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
-                    PDF, DOCX, PPTX, XLSX — up to 5MB
-                  </div>
-                </div>
-              </button>
-
-              <button
-                onClick={handleTrySample}
-                disabled={loadingSample}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 14,
-                  padding: '14px 16px',
-                  background: 'var(--bg-card)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: 10,
-                  cursor: loadingSample ? 'wait' : 'pointer',
-                  color: 'inherit',
-                  textAlign: 'left',
-                  opacity: loadingSample ? 0.7 : 1,
-                }}
-              >
-                <div
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 10,
-                    background: 'var(--bg-tertiary)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                  }}
-                >
-                  <FileText size={20} style={{ color: 'var(--text-secondary)' }} />
-                </div>
-                <div>
-                  <div
-                    style={{
-                      fontSize: 14,
-                      fontWeight: 600,
-                      color: 'var(--text-primary)',
-                    }}
-                  >
-                    {loadingSample ? 'Loading sample...' : 'Try with a sample memo'}
-                  </div>
-                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
-                    See the platform in action with a pre-loaded example.
-                  </div>
-                </div>
-              </button>
-            </div>
-
             <button
-              onClick={() => setStep(1)}
+              onClick={() => completeOnboarding({ launchTour: true })}
               style={{
-                width: '100%',
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--text-muted)',
-                fontSize: 12,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '12px 14px',
+                background: 'var(--accent-primary)',
+                border: '1px solid var(--accent-primary)',
+                borderRadius: 10,
                 cursor: 'pointer',
-                padding: '6px 0',
-                marginTop: 4,
+                color: '#FFFFFF',
+                textAlign: 'left',
               }}
             >
-              Back
+              <div
+                style={{
+                  width: 34,
+                  height: 34,
+                  borderRadius: 9,
+                  background: 'rgba(255, 255, 255, 0.18)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <Compass size={16} color="#fff" />
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600 }}>Take the 60-second tour</div>
+                <div style={{ fontSize: 11, opacity: 0.85, marginTop: 1 }}>
+                  Spotlight the upload zone, audit tabs, Knowledge Graph.
+                </div>
+              </div>
             </button>
-          </>
+            <button
+              onClick={() => completeOnboarding()}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '12px 14px',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 10,
+                cursor: 'pointer',
+                color: 'inherit',
+                textAlign: 'left',
+              }}
+            >
+              <div
+                style={{
+                  width: 34,
+                  height: 34,
+                  borderRadius: 9,
+                  background: 'var(--bg-tertiary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <Upload size={16} style={{ color: 'var(--text-secondary)' }} />
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
+                  Upload a strategic memo now
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>
+                  PDF, DOCX, PPTX, XLSX — up to 5MB.
+                </div>
+              </div>
+            </button>
+            <button
+              onClick={handleTrySample}
+              disabled={loadingSample}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '12px 14px',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 10,
+                cursor: loadingSample ? 'wait' : 'pointer',
+                color: 'inherit',
+                textAlign: 'left',
+                opacity: loadingSample ? 0.7 : 1,
+              }}
+            >
+              <div
+                style={{
+                  width: 34,
+                  height: 34,
+                  borderRadius: 9,
+                  background: 'var(--bg-tertiary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <FileText size={16} style={{ color: 'var(--text-secondary)' }} />
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
+                  {loadingSample ? 'Loading sample...' : 'Try with a sample memo'}
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>
+                  See the platform in action with a pre-loaded example.
+                </div>
+              </div>
+            </button>
+          </div>
+        )}
+
+        {!selectedRole && (
+          <div
+            style={{
+              fontSize: 11,
+              color: 'var(--text-muted)',
+              marginTop: 6,
+              textAlign: 'center',
+            }}
+          >
+            Pick a role above to see the next step.
+          </div>
         )}
       </DialogContent>
     </Dialog>
   );
 }
+

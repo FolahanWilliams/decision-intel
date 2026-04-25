@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { X, Upload, Sparkles, BrainCircuit, Video } from 'lucide-react';
+import { X, Upload, Bot, BrainCircuit, Video } from 'lucide-react';
 
 const OPTIONS = [
   {
@@ -14,7 +14,7 @@ const OPTIONS = [
   },
   {
     key: 'copilot',
-    icon: Sparkles,
+    icon: Bot,
     title: 'Think Through a Decision',
     description: 'Get help from your AI advisory team',
     href: '/dashboard/ask',

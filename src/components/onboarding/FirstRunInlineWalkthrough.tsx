@@ -20,7 +20,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import {
-  Sparkles,
   Compass,
   Briefcase,
   TrendingUp,
@@ -170,7 +169,7 @@ export function FirstRunInlineWalkthrough({ visible, onLoadAndRun, onLoadOnly }:
           marginBottom: 6,
         }}
       >
-        <Sparkles size={16} color="#16A34A" />
+        <Icon size={16} color="#16A34A" />
         <span
           style={{
             fontSize: 11,
@@ -182,7 +181,6 @@ export function FirstRunInlineWalkthrough({ visible, onLoadAndRun, onLoadOnly }:
         >
           First run · {role ? ROLE_LABEL[role] : ROLE_LABEL.other}
         </span>
-        <Icon size={13} style={{ color: 'var(--accent-primary)' }} />
       </div>
       <h2
         style={{

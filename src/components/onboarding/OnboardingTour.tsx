@@ -286,10 +286,7 @@ function TourCard({ step, currentStep, totalSteps, nextStep, prevStep }: CardCom
   return (
     <div
       style={{
-        // NB: intentionally NOT using var(--bg-card) — that token is
-        // rgba(0,0,0,0.01) in light theme, which makes the tour card
-        // unreadable over Onborda's dimmed shadow. Solid white instead.
-        background: '#FFFFFF',
+        background: 'var(--bg-card, #FFFFFF)',
         border: '1px solid var(--border-color, #E2E8F0)',
         borderTop: '3px solid var(--accent-primary, #16A34A)',
         borderRadius: 12,
@@ -539,8 +536,17 @@ function TourLauncher() {
       if (localStorage.getItem('decision-intel-tour-autolaunched') === 'true') return;
       fetch('/api/onboarding')
         .then(r => (r.ok ? r.json() : Promise.reject()))
-        .then((data: { onboardingTourSeen?: boolean }) => {
+        .then((data: { onboardingTourSeen?: boolean; hasContent?: boolean }) => {
           if (data.onboardingTourSeen) return;
+          // Adaeze's audit catch (2026-04-25): skip the spotlight tour when
+          // the user already has any document or human-decision row. The
+          // tour assumes an empty dashboard; firing it over the user's own
+          // data is the failure mode where they "see things that don't
+          // exist" and silently dismiss.
+          if (data.hasContent) {
+            localStorage.setItem('decision-intel-tour-autolaunched', 'true');
+            return;
+          }
           localStorage.setItem('decision-intel-tour-autolaunched', 'true');
           void resolveRoleAndLaunch(900);
         })

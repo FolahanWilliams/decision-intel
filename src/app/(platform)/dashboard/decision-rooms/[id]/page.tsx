@@ -1,8 +1,106 @@
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { ArrowLeft, Lock, Vote } from 'lucide-react';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { DecisionRoomDetailClient } from '@/components/decision-rooms/DecisionRoomDetailClient';
+
+function NotFoundShell({
+  title,
+  body,
+  Icon,
+  borderColor,
+}: {
+  title: string;
+  body: string;
+  Icon: typeof Vote;
+  borderColor: string;
+}) {
+  return (
+    <div
+      style={{
+        maxWidth: 560,
+        margin: '0 auto',
+        padding: 'var(--spacing-xl)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 16,
+      }}
+    >
+      <div>
+        <Link
+          href="/dashboard/meetings?tab=rooms"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            fontSize: 12,
+            fontWeight: 600,
+            color: 'var(--text-muted)',
+            textDecoration: 'none',
+            letterSpacing: '0.04em',
+            textTransform: 'uppercase',
+          }}
+        >
+          <ArrowLeft size={13} /> All Decision Rooms
+        </Link>
+      </div>
+      <div
+        style={{
+          padding: 'var(--spacing-lg)',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-color)',
+          borderLeft: `3px solid ${borderColor}`,
+          borderRadius: 'var(--radius-md)',
+          display: 'flex',
+          gap: 14,
+        }}
+      >
+        <Icon size={20} style={{ color: 'var(--text-muted)', flexShrink: 0, marginTop: 2 }} />
+        <div style={{ flex: 1 }}>
+          <h1
+            style={{
+              margin: 0,
+              fontSize: 18,
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+              marginBottom: 6,
+            }}
+          >
+            {title}
+          </h1>
+          <p
+            style={{
+              margin: 0,
+              fontSize: 13,
+              color: 'var(--text-secondary)',
+              lineHeight: 1.55,
+            }}
+          >
+            {body}
+          </p>
+          <div style={{ display: 'flex', gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
+            <Link
+              href="/dashboard/meetings?tab=rooms"
+              className="btn btn-primary flex items-center gap-sm"
+              style={{ fontSize: 13, padding: '8px 14px' }}
+            >
+              Browse Decision Rooms
+            </Link>
+            <Link
+              href="/dashboard"
+              className="btn btn-ghost flex items-center gap-sm"
+              style={{ fontSize: 13, padding: '8px 14px' }}
+            >
+              Back to dashboard
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -56,12 +154,12 @@ export default async function DecisionRoomDetailPage({ params }: Props) {
 
   if (!room) {
     return (
-      <div style={{ padding: 'var(--spacing-xl)' }}>
-        <h1 style={{ color: 'var(--text-primary)' }}>Room not found</h1>
-        <p style={{ color: 'var(--text-muted)' }}>
-          This decision room either doesn&rsquo;t exist or has been archived.
-        </p>
-      </div>
+      <NotFoundShell
+        title="Decision Room not found"
+        body="This Decision Room either doesn't exist, was archived, or you followed a stale link. The blind-prior submission window for old rooms eventually expires; once an outcome lands, the room moves into the Outcome Flywheel and only the creator + participants can re-open it."
+        Icon={Vote}
+        borderColor="var(--warning)"
+      />
     );
   }
 
@@ -70,12 +168,12 @@ export default async function DecisionRoomDetailPage({ params }: Props) {
   const isInvited = room.decisionRoomInvites.some(i => i.userId === user.id);
   if (!isCreator && !isParticipant && !isInvited) {
     return (
-      <div style={{ padding: 'var(--spacing-xl)' }}>
-        <h1 style={{ color: 'var(--text-primary)' }}>Access denied</h1>
-        <p style={{ color: 'var(--text-muted)' }}>
-          You aren&rsquo;t a participant in this room.
-        </p>
-      </div>
+      <NotFoundShell
+        title="You don't have access to this Decision Room"
+        body="Only the room creator, invited participants, and people the creator added directly can view a Decision Room. If you should have access, ask the creator to invite you or share a fresh submission link."
+        Icon={Lock}
+        borderColor="var(--severity-high)"
+      />
     );
   }
 

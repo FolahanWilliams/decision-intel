@@ -7,7 +7,7 @@ import {
   TrendingUp,
   Landmark,
   Users,
-  Sparkles,
+  BookOpen,
   ArrowRight,
   Loader2,
 } from 'lucide-react';
@@ -132,7 +132,7 @@ export function RoleSamplePicker({
               marginBottom: 4,
             }}
           >
-            <Sparkles size={12} /> {effectiveLabel}
+            <BookOpen size={12} /> {effectiveLabel}
           </div>
           <h3
             style={{
