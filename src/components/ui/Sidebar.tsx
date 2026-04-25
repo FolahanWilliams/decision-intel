@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import {
   LayoutDashboard,
   FileText,
@@ -15,7 +15,7 @@ import {
   LogOut as LogOutIcon,
   Video,
   Users,
-  Sparkles,
+  Bot,
   Plus,
   ChevronRight as ChevronR,
   PenLine,
@@ -37,6 +37,8 @@ const SIDEBAR_SECTIONS_KEY = 'di-sidebar-collapsed';
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const viewParam = searchParams?.get('view') ?? null;
   const [collapsed, setCollapsedState] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [plan, setPlan] = useState<string>('free');
@@ -44,8 +46,14 @@ export default function Sidebar() {
   // how a CSO's week actually runs — do the thing, learn from last quarter,
   // operate with the team. "Act" is non-collapsible top-level; "Reflect"
   // and "Together" fold away to keep the rail short.
-  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
-    Reflect: true,
+  // Reflect default flipped 2026-04-25 from collapsed to expanded — first-time
+// users were missing Analytics / Decision Graph / Outcome Flywheel because
+// those features hide behind the cluster header. Together stays collapsed
+// (post-team activation a user usually only opens it when actively
+// collaborating). Existing users who explicitly collapsed Reflect will keep
+// their preference via the localStorage hydration below.
+const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
+    Reflect: false,
     Together: true,
   });
 
@@ -225,18 +233,6 @@ export default function Sidebar() {
                     Intel
                   </span>
                 </div>
-                <div
-                  style={{
-                    fontSize: '10px',
-                    color: 'var(--text-muted)',
-                    marginTop: '1px',
-                    letterSpacing: '0.08em',
-                    textTransform: 'uppercase',
-                    fontWeight: 500,
-                  }}
-                >
-                  Reasoning layer
-                </div>
               </div>
             </div>
           )}
@@ -406,13 +402,16 @@ export default function Sidebar() {
             icon={<FileText size={18} />}
             label="Documents"
             description="Browse uploaded documents"
-            active={pathname.startsWith('/documents')}
+            active={
+              pathname.startsWith('/documents') ||
+              (pathname === '/dashboard' && viewParam === 'browse')
+            }
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
           <NavItem
             href="/dashboard/ask"
-            icon={<Sparkles size={18} />}
+            icon={<Bot size={18} />}
             label="AI Copilot"
             description="Decision copilot & document chat"
             active={

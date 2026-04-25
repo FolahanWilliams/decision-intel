@@ -91,7 +91,7 @@ export const THINKERS: Thinker[] = [
       'Experts recognize situations from prior experience and mentally simulate how the chosen course will play out. Pre-mortem and narrative simulation are standard RPD tools.',
     why: 'DI sits at the intersection of structured debiasing (Kahneman) and expert intuition amplification (Klein). The RPD tab surfaces recognition cues from historical cases.',
     surface:
-      'src/app/(platform)/documents/[id]/tabs/RpdTab.tsx, PreMortemScenarioCards.tsx, /api/rpd-simulator',
+      'src/app/(platform)/documents/[id]/tabs/OverviewTab.tsx (Pattern Recognition collapsible), PreMortemScenarioCards.tsx, /api/rpd-simulator',
     shipped: true,
     category: 'cognitive',
     ring: 1,
