@@ -72,6 +72,7 @@ import {
 import { LiveRedFlagsAlert } from '@/components/analysis/LiveRedFlagsAlert';
 import { LivePredictedQuestions } from '@/components/analysis/LivePredictedQuestions';
 import { NoiseTaxCard } from '@/components/analysis/NoiseTaxCard';
+import { StructuralAssumptionsPanel } from '@/components/analysis/StructuralAssumptionsPanel';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { trackEvent } from '@/lib/analytics/track';
 import { PageSkeleton, CardSkeleton } from '@/components/ui/LoadingSkeleton';
@@ -405,21 +406,29 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [toxicCombinations, setToxicCombinations] = useState<any[]>([]);
 
-  // View-as toggle: Analyst (full detail) / CSO (condensed) / Board (inline report).
-  // Persisted via ?view= URL param (primary source) + localStorage fallback so the
-  // same user keeps their preferred density across documents. Default: CSO — the
-  // most demo-ready view and the closest match to the previous "focused" default.
-  type ViewMode = 'analyst' | 'cso' | 'board';
+  // View-as toggle: Analyst (full detail) / CSO (condensed) / IC (pre-IC
+  // memo cover) / Board (inline report). Persisted via ?view= URL param
+  // (primary source) + localStorage fallback so the same user keeps their
+  // preferred density across documents. Default: CSO — the most demo-ready
+  // view and the closest match to the previous "focused" default.
+  // The `ic` mode (added 2026-04-25) reorders existing surfaces for an
+  // investment-committee reader: predicted IC questions → structural
+  // assumptions (Dalio overlay) → top biases as IC risks → DPR prominence.
+  type ViewMode = 'analyst' | 'cso' | 'ic' | 'board';
   const resolveInitialViewMode = (): ViewMode => {
     if (typeof window === 'undefined') return 'cso';
     const param = new URLSearchParams(window.location.search).get('view');
-    if (param === 'analyst' || param === 'cso' || param === 'board') return param;
+    if (param === 'analyst' || param === 'cso' || param === 'ic' || param === 'board') {
+      return param;
+    }
     // Legacy values from the previous Focused/Full toggle
     if (param === 'focused') return 'cso';
     if (param === 'full') return 'analyst';
     try {
       const saved = localStorage.getItem('di-doc-view-mode');
-      if (saved === 'analyst' || saved === 'cso' || saved === 'board') return saved;
+      if (saved === 'analyst' || saved === 'cso' || saved === 'ic' || saved === 'board') {
+        return saved;
+      }
     } catch {
       /* ignore */
     }
@@ -485,7 +494,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         url.searchParams.set('view', next);
         window.history.replaceState({}, '', url.toString());
       }
-      if ((next === 'cso' || next === 'board') && phase !== 'before') {
+      if ((next === 'cso' || next === 'ic' || next === 'board') && phase !== 'before') {
         setPhase('before');
         setPhaseResetNotice(true);
       }
@@ -497,8 +506,10 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
   // (or via localStorage persistence) we resolve the mismatch on mount by
   // snapping phase to 'before'. Without this, the user sees an empty page
   // and no way to recover short of clicking Analyst then a phase chip.
+  // Same guard applies to the ic + board view modes — neither renders
+  // content at phase ≠ 'before'.
   useEffect(() => {
-    if ((viewMode === 'cso' || viewMode === 'board') && phase !== 'before') {
+    if ((viewMode === 'cso' || viewMode === 'ic' || viewMode === 'board') && phase !== 'before') {
       setPhase('before');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1814,6 +1825,12 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               [
                 { key: 'analyst', label: 'Analyst', hint: 'Everything — every tab, every metric' },
                 { key: 'cso', label: 'CSO', hint: 'Summary + DQI + top risk + recommended action' },
+                {
+                  key: 'ic',
+                  label: 'IC',
+                  hint:
+                    'Pre-IC memo cover — predicted IC questions, structural assumptions, top risks, DPR',
+                },
                 { key: 'board', label: 'Board', hint: '2-page board-ready preview, inline' },
               ] as Array<{ key: ViewMode; label: string; hint: string }>
             ).map((opt, idx) => {
@@ -1850,7 +1867,9 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               ? 'Full analyst view — every surface'
               : viewMode === 'cso'
                 ? 'Condensed for the Chief Strategy Officer'
-                : 'Board-ready report — export as PDF above'}
+                : viewMode === 'ic'
+                  ? 'Pre-IC memo cover — what your committee reads first'
+                  : 'Board-ready report — export as PDF above'}
           </span>
         </div>
       )}
@@ -1939,6 +1958,125 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             >
               View Board-Ready Report →
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* IC View: Pre-IC memo cover. Order: predicted IC questions →
+          structural assumptions (Dalio overlay) → top risks for IC review →
+          DPR-prominence verdict card. The ExecutiveSummary + DQI hero +
+          featured CounterfactualPanel above this block already cover the
+          "thesis + DQI + counterfactual" beats; this block adds the IC-
+          specific surfaces a fund analyst expects to see when prepping a
+          memo cover. */}
+      {analysis && viewMode === 'ic' && phase === 'before' && (
+        <div className="mb-xl" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <LivePredictedQuestions
+            biases={biases}
+            summary={analysis.summary}
+            topRecommendation={biases[0]?.suggestion}
+          />
+
+          {/* Structural assumptions — the Dalio overlay every IC reader cares about */}
+          <ErrorBoundary sectionName="IC structural assumptions">
+            <StructuralAssumptionsPanel
+              analysisId={analysis.id}
+              autoRun={true}
+              marketContext={
+                analysis.marketContextOverride
+                  ? {
+                      context: analysis.marketContextOverride.context,
+                      cagrCeiling: analysis.marketContextOverride.cagrCeiling,
+                      overridden: true,
+                    }
+                  : analysis.marketContextApplied
+                    ? {
+                        context: analysis.marketContextApplied.context,
+                        cagrCeiling: analysis.marketContextApplied.cagrCeiling,
+                      }
+                    : undefined
+              }
+            />
+          </ErrorBoundary>
+
+          <LiveRedFlagsAlert biases={biases} onSelect={bias => setSelectedBias(bias)} />
+
+          {/* DPR-prominence card: an IC reader cares whether they can carry the
+              Decision Provenance Record into the meeting (and forward it to LPs
+              after the outcome lands). Make the export action the primary
+              right-side CTA so it does not get lost in the export-modal labyrinth. */}
+          <div
+            className="card animate-fade-in"
+            style={{
+              borderLeft: '4px solid var(--accent-primary)',
+              marginBottom: 8,
+            }}
+          >
+            <div
+              className="card-body"
+              style={{
+                padding: '20px 24px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 16,
+                flexWrap: 'wrap',
+              }}
+            >
+              <div style={{ flex: 1, minWidth: 280 }}>
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.12em',
+                    color: 'var(--accent-primary)',
+                    marginBottom: 6,
+                  }}
+                >
+                  Pre-IC packet · Decision Provenance Record
+                </div>
+                <h3
+                  style={{
+                    margin: 0,
+                    fontSize: 16,
+                    fontWeight: 700,
+                    color: 'var(--text-primary)',
+                    marginBottom: 6,
+                  }}
+                >
+                  Carry this audit into the IC, then forward to your LPs after the outcome lands.
+                </h3>
+                <p
+                  style={{
+                    fontSize: 13,
+                    color: 'var(--text-secondary)',
+                    margin: 0,
+                    lineHeight: 1.55,
+                  }}
+                >
+                  The DPR is hashed, signed, and aligned with EU AI Act Art. 14, GDPR Art. 22, NDPR
+                  Art. 12, and 14 other regulatory frameworks. The same artefact your GC walks into
+                  the audit committee with.
+                </p>
+              </div>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <button
+                  onClick={handleProvenanceRecordExport}
+                  className="btn btn-primary flex items-center gap-sm"
+                  style={{ fontSize: 13 }}
+                >
+                  Export DPR (PDF)
+                </button>
+                <button
+                  onClick={() => setViewMode('analyst')}
+                  className="btn btn-ghost flex items-center gap-sm"
+                  style={{ fontSize: 13 }}
+                >
+                  View Full Analysis →
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

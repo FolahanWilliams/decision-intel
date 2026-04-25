@@ -115,7 +115,7 @@ export const PIPELINE_NODES: PipelineNode[] = [
     tagline: 'Fact-checks claims and maps compliance exposure.',
     iconName: 'CheckCircle2',
     purpose:
-      'Extracts quantitative and factual claims and verifies them against grounded search. In parallel, maps the memo against seven regulatory frameworks (FCA Consumer Duty, SOX, Basel III, EU AI Act, SEC Reg D, GDPR, and an internal framework) for exposure that the author may not have flagged.',
+      'Extracts quantitative and factual claims and verifies them against grounded search. In parallel, maps the memo against 17 regulatory frameworks — international anchors (FCA Consumer Duty, SOX, Basel III, EU AI Act, SEC Reg D, GDPR Art. 22, LPOA) plus African-market regimes (NDPR, CBN, WAEMU, CMA Kenya, BoG, FRC Nigeria, CBE, PoPIA, SARB, BoT) — for exposure the author may not have flagged.',
     output:
       'Verification verdicts (VERIFIED / CONTRADICTED / UNVERIFIABLE) and a compliance exposure report.',
     academicAnchor: 'Grounded LLM reasoning with search + structured regulatory ontology.',

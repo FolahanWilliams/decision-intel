@@ -1,14 +1,20 @@
 /**
- * Role-anchored sample memos (4.3 deep).
+ * Role-anchored sample memos (4.3 deep, extended 2026-04-25 with pe_vc).
  *
- * Three samples per primary buyer role (CSO / M&A / BizOps), each at
- * decision-grade quality matching the EM case-study standard. The
- * WelcomeModal-captured role routes the demo paste flow + dashboard
+ * Samples per primary buyer role (CSO / M&A / BizOps / PE-Venture-Fund),
+ * each at decision-grade quality matching the EM case-study standard.
+ * The WelcomeModal-captured role routes the demo paste flow + dashboard
  * sample picker to the matching bundle so the first paste a buyer
  * makes maps to a decision they actually face.
  *
- * No `pe_vc` track — per CLAUDE.md positioning, PE/VC is NOT a target
- * buyer.
+ * The `pe_vc` track was added in the 2026-04-25 Sankore-readiness pass.
+ * Per CLAUDE.md positioning, PE/VC is NOT a primary marketed audience —
+ * the landing/pricing/case-study pages stay focused on Fortune 500
+ * strategy. But the platform must HONOR PE/VC users when they sign up
+ * (Sankore is the design partner; Marcus + Adaeze + Titi all flagged
+ * the role-enum gap as a procurement-stage tell). The pe_vc samples
+ * carry African / EM markers because the design partner is a Pan-African
+ * fund and that is the EM context the persona panels asked for.
  *
  * Each memo is plausible enough to survive a procurement-grade smell
  * test: real cycle-aware structural assumptions, real cited
@@ -19,7 +25,7 @@
  * compliance overlay where appropriate).
  */
 
-export type SampleRole = 'cso' | 'ma' | 'bizops' | 'other';
+export type SampleRole = 'cso' | 'ma' | 'bizops' | 'pe_vc' | 'other';
 
 export interface SampleBundle {
   /** URL-safe identifier, used by /case-studies/sample/[slug]. */
@@ -753,6 +759,193 @@ Cumulative: $14.2M
 `,
 };
 
+// ─── PE / Venture / Fund bundle (2) ─────────────────────────────────
+
+const PE_LAGOS_CONSUMER_ROLLUP: SampleBundle = {
+  slug: 'pe-lagos-consumer-rollup',
+  role: 'pe_vc',
+  title: 'Lagos consumer-staples roll-up — preliminary IC memo',
+  summary:
+    'Pan-African consumer-staples roll-up across Lagos, Accra and Nairobi with a 5-year exit thesis anchored on FY24 EBITDA multiples and a $42M ticket.',
+  hookCopy:
+    'Fund analysts paste this when their IC is one week away and the deal team is anchoring on a single comparable transaction.',
+  marketContext: 'emerging_market',
+  expectedBiases: [
+    'anchoring_bias',
+    'overconfidence_bias',
+    'confirmation_bias',
+    'narrative_fallacy',
+    'optimism_bias',
+  ],
+  expectedDqi: 49,
+  content: `# Preliminary IC Memo — Project Baobab (Pan-African Consumer Staples Roll-Up)
+
+**Prepared by:** Pan-African Investments — Lagos Office
+**Date:** 28 March 2026
+**IC Date:** 4 April 2026
+**Recommendation:** Approve $42M Series-A roll-up vehicle, 60% equity / 40% mezzanine
+
+## Executive Summary
+
+We recommend the IC approve a $42M ticket into a roll-up vehicle (NewCo) acquiring three regional consumer-staples businesses across Nigeria, Ghana and Kenya. The vehicle targets a 4.2x MOIC over five years via operational integration, regional brand consolidation and an exit to a strategic FMCG acquirer in 2030-31. The thesis is anchored on the 2024 Tiger Brands acquisition of Empresas Polar's Nigerian subsidiary (5.8x EV/EBITDA multiple).
+
+## The Three Targets
+
+**Target 1 — Lagos beverages (Nigeria):** $18M acquisition. NGN-denominated revenue of ₦12.4Bn (~$8.2M at current naira rates), FY24 EBITDA margin of 14%. Founder-led; no formal IFRS audit before 2023.
+
+**Target 2 — Accra snacks (Ghana):** $14M acquisition. GHS-denominated revenue of ₵38M (~$3.1M at GHS 12.3:USD), FY24 EBITDA margin of 18%. Strong distribution network across 4 regions; minority Bank of Ghana stake.
+
+**Target 3 — Nairobi sauces & condiments (Kenya):** $10M acquisition. KES-denominated revenue of KSh 420M (~$3.2M at KES 130:USD), FY24 EBITDA margin of 11%. Two-product concentration (75% of revenue from one SKU).
+
+Combined FY24 revenue ~$14.5M; combined EBITDA ~$2.0M; entry multiple 21x EBITDA — justified by integration synergies.
+
+## Why Now
+
+Tiger Brands' 2024 acquisition demonstrates strategic-acquirer appetite for Pan-African consumer brands at premium multiples. Their entry establishes the comp set for our exit thesis. The 2025-26 window is uniquely favourable because:
+
+1. The naira-cedi-shilling tri-currency basket has stabilised since the H1 2024 Nigeria FX-liberalisation.
+2. AfCFTA single-market provisions came into force Q4 2025, lowering intra-regional tariffs by an average of 12%.
+3. Nestlé and Diageo have both signalled Africa-strategy refreshes for 2027-28; we expect strategic-buyer pipeline to be deep when we exit.
+
+## Synergies
+
+We model $1.8M of run-rate synergies achieved by Year 3:
+- Procurement consolidation (palm oil, sugar, packaging): $0.7M annually
+- Shared distribution into Cotonou + Abidjan via WAEMU corridor: $0.5M
+- Centralised finance + accounting service in Lagos: $0.3M
+- Regional brand investment lifting realised pricing: $0.3M
+
+## Exit Thesis
+
+Exit in 2030 at $186M (4.2x MOIC) assumes:
+- Combined Year-5 revenue of $32M (CAGR ~17% from current $14.5M)
+- Year-5 EBITDA margin expansion to 22% (+5pp from current blended ~14%)
+- Exit multiple of 8x EBITDA (+30% premium to entry, justified by regional scale + strategic-buyer competition)
+- Strategic acquirer outcome (either Tiger Brands, Diageo, Nestlé, or a Pan-African strategic; we have informal indications from two of four)
+
+## Risks
+
+**FX risk:** All three targets generate revenue in local currency; we underwrite in USD. FY24 brought a 38% naira devaluation — the risk is not symmetric. We propose hedging the first 18 months of cash flow forward via NGX-listed FX forwards.
+
+**Regulatory risk:** Nigeria's Federal Competition and Consumer Protection Commission (FCCPC) requires merger notification above ₦1Bn; we will file before close. CMA Kenya approval expected within 90 days based on comparable transactions.
+
+**Concentration risk:** The Nairobi target derives 75% of revenue from a single SKU. We have a Year-1 plan to launch two adjacent SKUs leveraging the existing distribution network.
+
+**Operational integration:** Three founder-led businesses across three countries with different management cultures. We will install a CFO and a VP Operations in Year 1.
+
+## Comparable Transactions
+
+The 2024 Tiger Brands / Empresas Polar Nigeria acquisition is our anchor comp at 5.8x EV/EBITDA. Other relevant Pan-African consumer-staples comparables:
+- Kasapreko (Ghana) — 2023 minority stake at 6.1x EV/EBITDA
+- Bidco Africa (Kenya) — 2022 secondary at 7.4x EV/EBITDA
+
+We are confident the 8x exit multiple is achievable.
+
+## Track Record
+
+Our last three Pan-African consumer roll-ups returned 3.1x, 4.7x and 2.8x — average 3.5x. We are comfortable underwriting Project Baobab at 4.2x given the AfCFTA tailwind and the more favourable FX environment.
+
+## Investment Committee Ask
+
+We recommend the IC approve:
+- $42M ticket ($25M equity, $17M mezzanine)
+- 5-year hold, 7-year hard cap
+- LP capital calls in Q2 2026 (60%) and Q4 2026 (40%)
+- 2% management fee on committed capital, 20% carry above 8% IRR hurdle
+
+Recommendation: APPROVE.`,
+};
+
+const PE_KENYA_FINTECH_GROWTH: SampleBundle = {
+  slug: 'pe-kenya-fintech-growth',
+  role: 'pe_vc',
+  title: 'Series-B growth round — Nairobi neo-bank, $30M ticket',
+  summary:
+    'Pre-IC memo for a $30M Series-B into a Nairobi-headquartered SME-lending neo-bank, anchored on user-growth extrapolation and one peer transaction.',
+  hookCopy:
+    'PE / VC investors paste this when the growth-round CIM is making confident claims about regulatory tailwinds the analyst has not stress-tested.',
+  marketContext: 'emerging_market',
+  regulatoryTag: 'CMA Kenya · CBK · CBN',
+  expectedBiases: [
+    'overconfidence_bias',
+    'narrative_fallacy',
+    'survivorship_bias',
+    'availability_heuristic',
+    'planning_fallacy',
+  ],
+  expectedDqi: 54,
+  content: `# Pre-IC Memo — Project Tilapia (Series-B Investment in Nairobi-HQ Neo-Bank)
+
+**Fund:** Sahel Growth Capital II
+**Prepared by:** Investment Team, Lagos
+**Date:** 18 March 2026
+**IC Date:** 25 March 2026
+**Ticket:** $30M Series-B participation (lead)
+**Recommendation:** APPROVE with conditions
+
+## Executive Summary
+
+Project Tilapia is a Nairobi-headquartered SME-lending neo-bank operating in Kenya, Uganda, Nigeria and (planned 2026) Ghana. The company has grown active SME loans from 4,200 in Q1 2024 to 31,800 in Q4 2025 (CAGR 198%). Loan book stands at $48M with 6.2% non-performing loans (NPL); deposit book at $112M with a 1.4x loan-to-deposit ratio inverse. We recommend a $30M Series-B at $180M post-money valuation (16x trailing revenue), leading the round alongside three co-investors.
+
+## Investment Thesis
+
+The thesis rests on four pillars:
+
+**1. SME under-banking gap.** ~63% of African SMEs lack access to formal credit. Tilapia's average loan size ($8,400) sits in the sweet-spot — too small for traditional banks, too large for microfinance. We estimate the Pan-African TAM at $36Bn over 5 years.
+
+**2. Regulatory tailwinds.** The Central Bank of Kenya (CBK) has signalled support for digital-first SME lending under the 2024 Banking (Amendment) Act. The Central Bank of Nigeria's Open Banking framework went live Q4 2025. We expect more African regulators to follow within 18-24 months.
+
+**3. Best-in-class unit economics.** Tilapia's CAC is $42 against an LTV of $640 (LTV:CAC of 15.2x), driven by referral-led growth and zero-marketing-spend Q3-Q4 2025. Net interest margin of 11.4% is the highest in the African neo-banking peer set.
+
+**4. Exit liquidity.** The Q3 2025 IPO of EgyptBank (3.8x revenue at IPO, now at 4.6x) and the rumoured 2027 IPO of an Egyptian SME lender create a credible public-market exit path. Strategic acquirer interest from Standard Bank and Equity Group has been informally signalled.
+
+## Growth Modeling
+
+We model:
+- 2026 active SMEs: 78,000 (+145% YoY)
+- 2027 active SMEs: 195,000 (+150% YoY)
+- 2028 active SMEs: 425,000 (+118% YoY)
+- 2029 active SMEs: 870,000 (+105% YoY)
+
+The growth-rate decay curve is conservative — most peers in our internal database held >150% YoY growth through Year 4 of operations. Tilapia is in Year 3.
+
+Loan book modelling: $48M (now) → $180M (2026) → $410M (2027) → $720M (2028) → $1.2Bn (2029). Implied LTM revenue: $7M (now) → $18M (2026) → $42M (2027) → $78M (2028) → $135M (2029).
+
+At Year-4 exit (2030), we model $1.6Bn loan book / $185M revenue / $58M EBITDA. Exit multiple of 14x EBITDA = $812M enterprise value. Our $30M today returns $135M at exit (4.5x MOIC, 35% gross IRR).
+
+## Comparable Transactions
+
+The most relevant comp is the Q3 2025 EgyptBank IPO (3.8x revenue at IPO, ~$1.4Bn market cap). EgyptBank is a deposit-led full-stack neo-bank, not a pure SME lender, but the operational comparison is the closest available in the African neo-banking peer set.
+
+## Risks
+
+**Regulatory risk.** SME lending across four jurisdictions creates four-way regulatory exposure. The CBN requires Nigerian deposit-taking institutions to maintain a 30% liquidity ratio that Tilapia does not yet meet. Management has flagged this as a 2026 priority.
+
+**Asset quality.** NPL of 6.2% sits above the 4.5% Pan-African neo-bank average. Management argues this is driven by the seasoning of late-2024 vintages and will compress to 4.0% by Q4 2026 as the loan-book mix shifts.
+
+**Currency mismatch.** Loan book is locally denominated; equity raise is USD. We model a 12% annual basket-currency depreciation against USD; the actual realised depreciation in 2024-25 was 18% and 9% respectively.
+
+**Concentration.** 41% of the loan book is to Kenyan SMEs in agriculture / agro-processing. A drought-year (last seen 2022) would test asset quality.
+
+## Why $180M Post-Money
+
+Anchored to:
+- 16x LTM revenue ($7M LTM × 16 = $112M, then a 60% premium for the demonstrated growth trajectory)
+- The Q3 2025 EgyptBank IPO at 3.8x revenue (we apply a 4x premium to private SaaS-comparable multiples)
+
+The 16x revenue multiple is justifiable given the growth rate and unit economics.
+
+## Recommendation
+
+We recommend the IC approve a $30M Series-B participation with the following conditions:
+1. Tilapia must close the CBN liquidity ratio gap by Q3 2026.
+2. NPL must be benchmarked at 5.0% within 18 months; breach triggers a board observer seat.
+3. We require pre-emptive rights on a Series-C up to $20M.
+4. ESG diligence on the SME borrower profile must complete pre-close.
+
+Recommendation: APPROVE WITH CONDITIONS.`,
+};
+
 // ─── Public exports ─────────────────────────────────────────────────
 
 export const SAMPLE_BUNDLES: readonly SampleBundle[] = [
@@ -765,6 +958,8 @@ export const SAMPLE_BUNDLES: readonly SampleBundle[] = [
   BIZOPS_REPLATFORM_BILLING,
   BIZOPS_RD_BUDGET,
   BIZOPS_EMEA_SHUTTER,
+  PE_LAGOS_CONSUMER_ROLLUP,
+  PE_KENYA_FINTECH_GROWTH,
 ] as const;
 
 export const SAMPLE_BUNDLES_BY_SLUG: Readonly<Record<string, SampleBundle>> =
@@ -774,10 +969,10 @@ export function bundlesForRole(role: SampleRole | null | undefined): SampleBundl
   if (!role) {
     // Show one of each so a fresh visitor without role still sees the
     // breadth.
-    return [SAMPLE_BUNDLES[0], SAMPLE_BUNDLES[3], SAMPLE_BUNDLES[6]];
+    return [SAMPLE_BUNDLES[0], SAMPLE_BUNDLES[3], SAMPLE_BUNDLES[6], SAMPLE_BUNDLES[9]];
   }
   if (role === 'other') {
-    return [SAMPLE_BUNDLES[0], SAMPLE_BUNDLES[3], SAMPLE_BUNDLES[6]];
+    return [SAMPLE_BUNDLES[0], SAMPLE_BUNDLES[3], SAMPLE_BUNDLES[6], SAMPLE_BUNDLES[9]];
   }
   return SAMPLE_BUNDLES.filter(b => b.role === role);
 }
@@ -786,5 +981,6 @@ export const ROLE_LABEL: Record<SampleRole, string> = {
   cso: 'Corporate Strategy',
   ma: 'M&A / Corp Dev',
   bizops: 'BizOps / FP&A',
+  pe_vc: 'PE / Venture / Fund',
   other: 'Mixed selection',
 };

@@ -17,18 +17,26 @@ import {
   Compass,
   Briefcase,
   TrendingUp,
+  Landmark,
   Users,
 } from 'lucide-react';
 
 /**
- * First-login gate. Captures role (CSO / M&A / BizOps / Other) and kicks off the
- * Onborda spotlight tour. Role + dismissal persisted via PATCH /api/onboarding
- * so the modal never re-shows and downstream UI can personalize copy by role.
+ * First-login gate. Captures role (CSO / M&A / BizOps / PE-Venture-Fund /
+ * Other) and kicks off the Onborda spotlight tour. Role + dismissal
+ * persisted via PATCH /api/onboarding so the modal never re-shows and
+ * downstream UI can personalize copy by role.
+ *
+ * The pe_vc track was added 2026-04-25 — Sankore is the design partner
+ * and the persona panels (Titi, Adaeze, Marcus) all flagged the missing
+ * fund/investor option as a procurement-stage tell. Per CLAUDE.md
+ * positioning we don't market to PE/VC, but once they sign up we honor
+ * the workflow.
  */
 const STORAGE_KEY = 'decision-intel-onboarding-completed';
 const TOUR_TRIGGER_KEY = 'decision-intel-launch-tour';
 
-type Role = 'cso' | 'ma' | 'bizops' | 'other';
+type Role = 'cso' | 'ma' | 'bizops' | 'pe_vc' | 'other';
 
 interface WelcomeModalProps {
   onClose: () => void;
@@ -59,6 +67,12 @@ const ROLES: Array<{
     icon: TrendingUp,
   },
   {
+    id: 'pe_vc',
+    label: 'PE / Venture / Fund',
+    description: 'GP, partner, principal, or investment analyst at a fund',
+    icon: Landmark,
+  },
+  {
     id: 'other',
     label: 'Something else',
     description: 'Founder, consultant, or exploring the product',
@@ -81,6 +95,11 @@ const VALUE_PROPS_BY_ROLE: Record<Role, string[]> = {
     'Audit strategic recommendations and planning memos for the biases that ship bad forecasts.',
     'Surface the assumptions your team treats as facts — with excerpts and recommendations.',
     'Track decision quality across quarters, so patterns become visible instead of anecdotal.',
+  ],
+  pe_vc: [
+    'Audit IC memos and pre-commit reviews — flag anchoring on synergies, sunk-cost on a year-long process, planning fallacy on integration timelines.',
+    'Run blind-prior IC voting before the meeting — see the disagreement before the room collapses to consensus.',
+    'Brier-calibrated DQI compounds across funds and outcomes — the calibration record your LPs increasingly want to see.',
   ],
   other: [
     'Upload any strategic memo, board deck, or market-entry recommendation.',

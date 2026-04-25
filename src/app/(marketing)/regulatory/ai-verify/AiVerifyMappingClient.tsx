@@ -175,7 +175,7 @@ const PRINCIPLES: PrincipleRow[] = [
     definition:
       'The AI system contributes to outcomes that are socially and environmentally positive.',
     mechanism:
-      'Cross-framework regulatory mapping across seven frameworks (Basel III, EU AI Act, SEC Reg D, FCA Consumer Duty, SOX, GDPR Art 22, LPOA) aligns Decision Intel with societal governance objectives. Decision-quality audits reduce the strategic-decision failures that cascade into stakeholder harm. Cost-tier model routing reduces inference energy per audit where decision quality allows.',
+      'Cross-framework regulatory mapping across 17 frameworks — international anchors (Basel III, EU AI Act, SEC Reg D, FCA Consumer Duty, SOX, GDPR Art 22, LPOA) plus African-market regimes (NDPR, CBN, WAEMU, CMA Kenya, BoG, FRC Nigeria, CBE, PoPIA, SARB, BoT) — aligns Decision Intel with societal governance objectives. Decision-quality audits reduce the strategic-decision failures that cascade into stakeholder harm. Cost-tier model routing reduces inference energy per audit where decision quality allows.',
     dprFields: ['Regulatory mapping', 'Model lineage (cost-tier routing)'],
   },
 ];
@@ -342,7 +342,7 @@ export function AiVerifyMappingClient() {
       {/* The mapping table */}
       <section id="mapping" style={{ padding: '56px 24px', background: C.white }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div className="screen-only" style={{ marginBottom: 32 }}>
+          <div style={{ marginBottom: 32 }}>
             <h2
               style={{
                 fontSize: 'clamp(24px, 3vw, 30px)',
@@ -560,9 +560,10 @@ export function AiVerifyMappingClient() {
         </div>
       </section>
 
-      {/* African-regulatory bridge — the 11 AI Verify principles translate */}
+      {/* African-regulatory bridge — the 11 AI Verify principles translate.
+          Renders on screen AND in print: this is procurement-grade evidence
+          a Pan-African GC carries home in the PDF, not navigation chrome. */}
       <section
-        className="screen-only"
         style={{
           padding: '48px 24px',
           background: C.white,

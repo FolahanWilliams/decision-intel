@@ -678,12 +678,12 @@ export const DI_GAPS: DiGap[] = [
     evidence:
       'Every Fortune 500 procurement team vetoes a tool that cannot produce regulator-grade defence documents. The EU AI Act, SOX §404, and GDPR Article 22 each gate different customer categories, and all three are rising, not falling, as AI enters decision workflows.',
     diApproach:
-      'Decision Intel delivers governance as product, not documentation. Every flag cross-links to a specific provision across seven frameworks. The Decision Provenance Record exports as a regulator-grade PDF on Pro tier, so a General Counsel can walk into a regulator meeting with the memo, the flags, and the framework citations in a single document.',
+      'Decision Intel delivers governance as product, not documentation. Every flag cross-links to a specific provision across 17 frameworks spanning G7, EU, GCC, and African markets. The Decision Provenance Record exports as a regulator-grade PDF on Pro tier, so a General Counsel can walk into a regulator meeting with the memo, the flags, and the framework citations in a single document.',
     diCapabilities: [
       {
-        label: '7 regulatory framework mappers',
+        label: '17 regulatory framework mappers',
         detail:
-          'SOX §404, GDPR Art. 22, EU AI Act Annex III, Basel III, FCA Consumer Duty, SEC Reg D, LPOA. Provision-level mapping across all seven.',
+          'International anchors (SOX §404, GDPR Art. 22, EU AI Act Annex III, Basel III, FCA Consumer Duty, SEC Reg D, LPOA) plus African-market regimes (NDPR, CBN, WAEMU, CMA Kenya, BoG, FRC Nigeria, CBE, PoPIA, SARB, BoT). Provision-level mapping across all 17.',
         proofFile: 'src/lib/compliance/frameworks/',
       },
       {

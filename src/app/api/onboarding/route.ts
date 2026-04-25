@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 const log = createLogger('OnboardingRoute');
 
-const ROLE_VALUES = ['cso', 'ma', 'bizops', 'other'] as const;
+const ROLE_VALUES = ['cso', 'ma', 'bizops', 'pe_vc', 'other'] as const;
 
 const DEFAULTS = {
   onboardingCompleted: false,

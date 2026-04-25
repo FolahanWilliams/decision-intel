@@ -25,7 +25,13 @@ async function fetchRole(): Promise<EmptyStateRole | null> {
     .then(r => (r.ok ? r.json() : null))
     .then((data: { onboardingRole?: string | null } | null) => {
       const role = data?.onboardingRole;
-      if (role === 'cso' || role === 'ma' || role === 'bizops' || role === 'other') {
+      if (
+        role === 'cso' ||
+        role === 'ma' ||
+        role === 'bizops' ||
+        role === 'pe_vc' ||
+        role === 'other'
+      ) {
         cached = role;
         return role;
       }

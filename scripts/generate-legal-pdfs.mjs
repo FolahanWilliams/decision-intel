@@ -1,9 +1,14 @@
 #!/usr/bin/env node
 /**
- * Generate the two legal-grade PDFs published under /public:
+ * Generate the legal-grade PDFs published under /public:
  *
  *   public/dpa-template.pdf          — GDPR Art. 28 DPA template for procurement
- *   public/dpr-sample-wework.pdf     — anonymised Decision Provenance Record sample
+ *   public/dpr-sample-wework.pdf     — anonymised DPR sample (US public-market)
+ *   public/dpr-sample-dangote.pdf    — anonymised DPR sample (Pan-African
+ *                                       industrial expansion; surfaces the
+ *                                       Dalio structural-assumptions lens +
+ *                                       NDPR / CBN / WAEMU regulatory mapping
+ *                                       for the African design-partner cohort)
  *
  * Idempotent. Safe to re-run. Uses the jspdf already in the dependency tree —
  * no new packages.
@@ -519,9 +524,253 @@ function buildDprSample() {
 }
 
 // ------------------------------------------------------------
+// PDF 3 — DPR sample (anonymised Pan-African industrial expansion audit)
+//
+// Built specifically for procurement-grade evaluation by funds operating
+// in African markets. The structural-assumption block surfaces three
+// Dalio determinants (currency cycle, trade share, governance), and the
+// regulatory-mapping section names NDPR Art. 12, CBN AI Guidelines, and
+// WAEMU alongside EU AI Act Art. 14 — so a Pan-African GC carries a
+// single artefact home that satisfies both their regional regulators and
+// any cross-border counterparty.
+// ------------------------------------------------------------
+
+function buildDprDangote() {
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  let y = 25;
+
+  // Header band
+  doc.setFillColor(15, 23, 42);
+  doc.rect(0, 0, doc.internal.pageSize.getWidth(), 16, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.setTextColor(255, 255, 255);
+  doc.text('DECISION INTEL · Decision Provenance Record', 20, 10);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text('SAMPLE · for procurement evaluation', doc.internal.pageSize.getWidth() - 20, 10, {
+    align: 'right',
+  });
+
+  y = 26;
+  y = H1(doc, 'Audit of a Pan-African industrial expansion thesis', y);
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(10);
+  doc.setTextColor(100, 116, 139);
+  doc.text(
+    'Anonymised from a 2014 cement-sector pan-African expansion plan whose unit-economics thesis inverted between 2018-2021.',
+    20,
+    y,
+    { maxWidth: 170 }
+  );
+  y += 12;
+
+  y = H2(doc, 'Record identity', y);
+  y = Mono(
+    doc,
+    [
+      'record-id           dpr_sample_0002_em_anonymised',
+      'audit-timestamp     2026-04-25T11:42:18Z',
+      'pipeline-version    di-pipeline@v12.3.1',
+      'input-hash          sha256:9c2e7b41a8d0…3f1a8e72 (sample)',
+      'signature-algorithm Ed25519',
+      'signer-fingerprint  4F:7A:CB:29:8E:11:D0:A2:…:7C:55',
+      'market-context      emerging_market (auto-detected, owner-confirmed)',
+    ],
+    y
+  );
+
+  y = pageIfNeeded(doc, y);
+  y = H2(doc, 'Model lineage & prompt fingerprint', y);
+  y = Mono(
+    doc,
+    [
+      'primary-model       gemini-3-flash-preview',
+      'fallback-model      claude-3.5-sonnet (not invoked on this run)',
+      'judges              jury of 3 independent statistical judges',
+      'prompt-hash         sha256:dc41f8a905e2…74b2e019',
+      'grounded-retrieval  135-case corpus · knowledge-graph edges 56,795',
+      'temperature         bias=0.1  noise=0.0  structural=0.2',
+      'em-prior-overlay    applied — growth-rate thresholds adjusted for EM',
+    ],
+    y
+  );
+
+  y = pageIfNeeded(doc, y);
+  y = H2(doc, 'Judge variance (noise stats)', y);
+  y = Mono(
+    doc,
+    [
+      'mean-score           34 / 100 (grade F)',
+      'std-dev              4.2',
+      'inter-judge variance 17.8 (medium — judges diverge on the trade-share',
+      '                     determinant; convergence on currency-cycle)',
+      'calibration-band     34 ± 6 at p=0.95',
+    ],
+    y
+  );
+
+  doc.addPage();
+  y = 25;
+
+  y = H2(doc, 'Cognitive biases flagged', y);
+  y = P(
+    doc,
+    'Biases detected in the memo, each mapped to the audit-committee-ready hardening question a reviewer should be able to answer before capital commitment.',
+    y,
+    { size: 10 }
+  );
+  const biases = [
+    {
+      label: 'Survivorship bias (critical)',
+      quote:
+        'EBITDA margins "converging toward Nigerian reference levels" used as the cross-market unit-economics anchor for ten target markets.',
+      harden:
+        'What share of the Nigerian margin advantage is attributable to dollar-linked cement pricing, protective trade measures, and concentrated market structure that do not exist uniformly across the ten target markets?',
+    },
+    {
+      label: 'Overconfidence on capacity utilisation (critical)',
+      quote:
+        '70-80% capacity utilisation forecast within 24 months of plant commissioning, applied uniformly across ten distinct markets.',
+      harden:
+        'Which target markets have a verified prior of ≥70% utilisation for cement plants commissioned by external operators in the previous decade, and which assume convergence to that level on operational excellence alone?',
+    },
+    {
+      label: 'Anchoring bias (high)',
+      quote:
+        'Uniform 5% country-risk premium applied across markets whose sovereign-credit spreads vary 3-5x.',
+      harden:
+        'What does a per-market discount-rate model produce when each market\'s sovereign-spread, FX-volatility, and repatriation-risk components are measured independently?',
+    },
+    {
+      label: 'Availability heuristic (high)',
+      quote:
+        'African infrastructure-spend trajectory 2010-2014 used as the demand-projection baseline through the capex-amortisation window.',
+      harden:
+        'Which targeted markets\' infrastructure spend is cycle-dependent on Chinese commodity demand, and what is the plan if that cycle peaks before the Year-7 amortisation midpoint?',
+    },
+    {
+      label: 'Planning fallacy (medium)',
+      quote:
+        '~$4B cumulative capex programme committed across ten markets without a per-market unit-economics gate before sequential commitments.',
+      harden:
+        'What is the explicit per-market gate that, if missed at the 18-month commissioning review, pauses subsequent-market capex rather than amortising the prior commitment?',
+    },
+  ];
+  for (const b of biases) {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(30, 41, 59);
+    doc.text(b.label, 20, y);
+    y += 5;
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(9);
+    doc.setTextColor(71, 85, 105);
+    const qLines = doc.splitTextToSize('Evidence: "' + b.quote + '"', 170);
+    doc.text(qLines, 22, y);
+    y += qLines.length * 4 + 1;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(30, 41, 59);
+    const hLines = doc.splitTextToSize('Harden with: ' + b.harden, 170);
+    doc.text(hLines, 22, y);
+    y += hLines.length * 4 + 4;
+    y = pageIfNeeded(doc, y);
+  }
+
+  y = pageIfNeeded(doc, y);
+  y = H2(doc, 'Structural assumptions (Dalio lens)', y);
+  y = P(
+    doc,
+    'Three macro-structural determinants the memo implicitly depends on, surfaced by the structural-assumptions audit alongside the cognitive biases above. These do not appear in a Kahneman-only or Klein-only audit.',
+    y,
+    { size: 10 }
+  );
+  y = Bullet(
+    doc,
+    [
+      'Currency cycle (high · unsupported): the dividend-repatriation logic of the cross-border return model assumes continued FX access in each target market. Harden with: what is the IRR floor if any of the top-3 destination markets imposes FX repatriation controls during the capex-amortisation window?',
+      'Trade share (high · partially-supported): the export-distribution logic assumes regional cement trade flows that are themselves cycle-dependent on infrastructure spend (which is cycle-dependent on Chinese commodity demand). Harden with: what is the demand floor under a 30% commodity-cycle compression scenario?',
+      'Governance (medium · partially-supported): the regulatory-stability logic assumes consistent treatment across ten jurisdictions. Harden with: what is the operational and capital plan in the worst-case bilateral-trade dispute or local-content-rule shift in any one of the top-5 markets?',
+    ],
+    y
+  );
+
+  doc.addPage();
+  y = 25;
+
+  y = H2(doc, 'EU AI Act Art. 14 mapping', y);
+  y = Mono(
+    doc,
+    [
+      'human-oversight       ≥ 1 designated reviewer (captured on record)',
+      'explainability        per-bias evidence + hardening question (above)',
+      'record-keeping        this DPR, hashed and signed, retained per DPA §5',
+      'contestability        reviewer dissent logged before decision is ratified',
+    ],
+    y
+  );
+
+  y = pageIfNeeded(doc, y);
+  y = H2(doc, 'African regulatory mapping', y);
+  y = P(
+    doc,
+    'For Pan-African counterparties: the same DPR fields satisfy the emerging African regulatory framework stack. The cross-walk below is identical to the production /security mapping.',
+    y,
+    { size: 10 }
+  );
+  y = Mono(
+    doc,
+    [
+      'NDPR Art. 12 (Nigeria)        automated-decision rights → DPR explainability',
+      'CBN AI Guidelines (2024 draft)  model governance + explainability for FS',
+      'WAEMU                          data-localisation + cross-border governance',
+      'PoPIA s.71 (South Africa)      automated-decision data-subject rights',
+      'CMA Kenya (2024 Conduct Reg.)  listed-company decision disclosure',
+      'CBE ICT Risk (Egypt)           AI/ML model governance for banks',
+      'Basel III · Pillar 2 ICAAP     internal capital-adequacy decision audit',
+    ],
+    y
+  );
+
+  y = pageIfNeeded(doc, y);
+  y = H2(doc, 'Signature block', y);
+  y = Mono(
+    doc,
+    [
+      'Signed by  di-signer-prod@decision-intel.com',
+      'Public key 4F:7A:CB:29:8E:11:D0:A2:…:7C:55',
+      'Signature  MEUCIQDoVqf4u…zX5c1wIhAPmLk…Bv8oK1z (truncated)',
+      '',
+      'Verification: https://www.decision-intel.com/regulatory/ai-verify',
+    ],
+    y
+  );
+
+  y = pageIfNeeded(doc, y);
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(8);
+  doc.setTextColor(100, 116, 139);
+  doc.text(
+    'This sample DPR is anonymised from a real 2014 Pan-African expansion-plan audit run. Identifying text has been redacted; hashes, signatures and record-ids are sample values. The schema, field set, Art. 14 mapping, African regulatory cross-walk and structural-assumptions lens are identical to the production artefact.',
+    20,
+    y,
+    { maxWidth: 170 }
+  );
+
+  drawWatermark(doc, 'SAMPLE');
+  drawPageNumbers(doc, 'Decision Intel · Decision Provenance Record (sample · EM)');
+
+  const out = join(PUBLIC_DIR, 'dpr-sample-dangote.pdf');
+  writeFileSync(out, Buffer.from(doc.output('arraybuffer')));
+  console.log(`wrote ${out}`);
+}
+
+// ------------------------------------------------------------
 // Run
 // ------------------------------------------------------------
 
 buildDpaTemplate();
 buildDprSample();
+buildDprDangote();
 console.log('done.');

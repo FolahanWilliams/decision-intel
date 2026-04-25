@@ -18,7 +18,7 @@ import { KahnemanKleinSynthesis } from '@/components/marketing/KahnemanKleinSynt
 import { MomentsPyramid } from '@/components/marketing/MomentsPyramid';
 import { SecurityLifecycleStrip } from '@/components/marketing/SecurityLifecycleStrip';
 import { ScrollRevealGraph } from '@/components/marketing/ScrollRevealGraph';
-import { ArrowRight, Check, ShieldCheck, Scale, GraduationCap } from 'lucide-react';
+import { ArrowRight, Check, ShieldCheck, Scale, GraduationCap, Globe2 } from 'lucide-react';
 
 /* ─── Color Tokens ──────────────────────────────────────────────────────── */
 
@@ -1294,6 +1294,11 @@ function HeroCredibilityStrip() {
       icon: ShieldCheck,
       label: 'SOC 2 Type II infrastructure (Vercel + Supabase)',
       note: 'Our own product audit is scoped for 2026; in-flight controls already mirror Type II. Full posture at /security.',
+    },
+    {
+      icon: Globe2,
+      label: '17 frameworks · G7, EU, GCC, African markets',
+      note: 'Every flag cross-linked to a regulatory provision — SOX, EU AI Act, Basel III, GDPR, NDPR, CBN, WAEMU, PoPIA, and ten more, mapped flag-by-flag for a Fortune-500 procurement bar.',
     },
   ];
   const [idx, setIdx] = useState(0);

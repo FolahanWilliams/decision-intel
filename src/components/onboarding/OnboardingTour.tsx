@@ -15,13 +15,15 @@ import {
   ShieldCheck,
   GitCompare,
   Briefcase,
+  Landmark,
   PenLine,
   Package,
+  Vote,
 } from 'lucide-react';
 
 const TOUR_TRIGGER_KEY = 'decision-intel-launch-tour';
 
-type TourRole = 'cso' | 'ma' | 'bizops' | 'other';
+type TourRole = 'cso' | 'ma' | 'bizops' | 'pe_vc' | 'other';
 
 /**
  * Role-routed tour stops (4.2 deep). All four tours run on the dashboard
@@ -180,6 +182,46 @@ const TOUR_STEPS_BY_ROLE: Record<TourRole, Step[]> = {
       ),
     },
   ],
+  pe_vc: [
+    {
+      ...SHARED_STOP_UPLOAD,
+      icon: <Upload size={18} />,
+      title: 'Drop the IC memo, source memo, or growth-round CIM',
+      content: (
+        <>
+          Upload a pre-IC memo, source memo, growth-round CIM, or pre-commit review. The audit
+          surfaces the patterns that kill fund returns — anchoring on a single comparable
+          transaction, narrative-fallacy on regulatory tailwinds, planning-fallacy on integration
+          timelines, survivorship bias on the peer set.
+        </>
+      ),
+    },
+    {
+      ...SHARED_STOP_USAGE,
+      icon: <Vote size={18} />,
+      title: 'Pre-IC blind-prior voting',
+      content: (
+        <>
+          Decision Rooms collect anonymous IC priors before the meeting and reveal aggregate
+          confidence + top-3 risks at deadline. See the disagreement before the room collapses to
+          consensus. Brier-calibrated participant scoring closes the loop after the outcome lands.
+        </>
+      ),
+    },
+    {
+      ...SHARED_STOP_ANALYTICS,
+      icon: <Landmark size={18} />,
+      title: 'LP-grade Decision Provenance + cross-fund DQI',
+      content: (
+        <>
+          Under Analytics: signed Decision Provenance Records on every audited deal, the Outcome
+          Flywheel where realised exits recalibrate prior IC convictions, and Brier-calibrated DQI
+          across the portfolio. The calibration data your LPs increasingly want to see in the
+          annual report.
+        </>
+      ),
+    },
+  ],
   other: [
     {
       ...SHARED_STOP_UPLOAD,
@@ -222,6 +264,7 @@ const TOUR_NAME_BY_ROLE: Record<TourRole, string> = {
   cso: 'dashboard-tour-cso',
   ma: 'dashboard-tour-ma',
   bizops: 'dashboard-tour-bizops',
+  pe_vc: 'dashboard-tour-pe-vc',
   other: 'dashboard-tour',
 };
 
@@ -440,7 +483,13 @@ function TourCard({ step, currentStep, totalSteps, nextStep, prevStep }: CardCom
  *      they would never see the tour.
  */
 function isTourRole(value: unknown): value is TourRole {
-  return value === 'cso' || value === 'ma' || value === 'bizops' || value === 'other';
+  return (
+    value === 'cso' ||
+    value === 'ma' ||
+    value === 'bizops' ||
+    value === 'pe_vc' ||
+    value === 'other'
+  );
 }
 
 function TourLauncher() {

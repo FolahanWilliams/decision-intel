@@ -6,6 +6,7 @@ import { MarketingNav, BRAND_COLORS as C } from '@/components/marketing/Marketin
 import {
   SAMPLE_BUNDLES_BY_SLUG,
   SAMPLE_BUNDLES,
+  ROLE_LABEL,
 } from '@/lib/data/sample-bundles';
 
 interface Props {
@@ -32,13 +33,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
   };
 }
-
-const ROLE_LABEL = {
-  cso: 'Corporate Strategy',
-  ma: 'M&A / Corp Dev',
-  bizops: 'BizOps / FP&A',
-  other: 'Other',
-} as const;
 
 export default async function SamplePage({ params }: Props) {
   const { slug } = await params;

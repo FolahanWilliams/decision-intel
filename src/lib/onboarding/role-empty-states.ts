@@ -9,7 +9,7 @@
  * onboarding role via /api/onboarding and indexes into the same map.
  */
 
-export type EmptyStateRole = 'cso' | 'ma' | 'bizops' | 'other';
+export type EmptyStateRole = 'cso' | 'ma' | 'bizops' | 'pe_vc' | 'other';
 export type EmptyStateSurface = 'dashboard' | 'deals' | 'decision-log' | 'analytics';
 
 interface SurfaceCopy {
@@ -34,6 +34,11 @@ const COPY: Record<EmptyStateSurface, Record<EmptyStateRole, SurfaceCopy>> = {
       description:
         'Upload a quarterly forecast, planning memo, or buy-vs-build recommendation. The audit flags the anchoring + overconfidence patterns that ship miss-the-quarter forecasts before they reach the steering committee.',
     },
+    pe_vc: {
+      title: 'Audit your first IC memo',
+      description:
+        'Upload a pre-IC memo, source memo, growth-round CIM, or pre-commitment review. The audit catches the patterns that kill fund returns — anchoring on a single comparable transaction, overconfidence on growth-curve extrapolation, narrative-fallacy on regulatory tailwinds — and produces a signed Decision Provenance Record your LPs can read.',
+    },
     other: {
       title: 'Run your first audit',
       description:
@@ -55,6 +60,11 @@ const COPY: Record<EmptyStateSurface, Record<EmptyStateRole, SurfaceCopy>> = {
       title: 'No deals yet',
       description:
         'Deals are the M&A-shape decision unit. For BizOps decisions (forecasts, buy-vs-build, regional rationalisation), use Decision Packages instead — same composite DQI + cross-doc audit, scoped to non-deal decisions.',
+    },
+    pe_vc: {
+      title: 'No deals yet',
+      description:
+        'Each deal is the IC-shape decision unit — source memo + financial model + management presentation + counsel review. Cross-doc cross-reference flags inconsistencies (CIM says 40% growth, model assumes 15%) and a composite Deal DQI lives on the deal page. Pre-IC blind-prior voting in Decision Rooms surfaces disagreement before the meeting.',
     },
     other: {
       title: 'No deals yet',
@@ -78,6 +88,11 @@ const COPY: Record<EmptyStateSurface, Record<EmptyStateRole, SurfaceCopy>> = {
       description:
         'Capture the forecasts, planning calls, and operational decisions you commit to. The log + outcome flywheel turns anecdotes into patterns — the same memo + outcome pair, repeated quarterly, becomes calibration.',
     },
+    pe_vc: {
+      title: 'Your decision log is empty',
+      description:
+        'Capture every IC vote, pass decision, follow-on call, and pre-commit review. The log surfaces fund-level patterns — which biases recur at IC, which calls were over-confident, which structural assumptions held — and feeds your Brier calibration quarter over quarter.',
+    },
     other: {
       title: 'Your decision log is empty',
       description:
@@ -99,6 +114,11 @@ const COPY: Record<EmptyStateSurface, Record<EmptyStateRole, SurfaceCopy>> = {
       title: 'No analytics yet',
       description:
         'Analytics surface DQI trends across forecasts, recurring biases by theme, and the Outcome Flywheel where realised outcomes recalibrate prior DQIs. Patterns become visible once you have 3+ outcomes logged.',
+    },
+    pe_vc: {
+      title: 'No analytics yet',
+      description:
+        'Analytics aggregate DQI across deals, recurring biases at IC, counterfactual ROI scenarios, and the Outcome Flywheel where realised exits recalibrate prior IC convictions. Brier-calibrated DQI compounds quarter over quarter — the calibration data your LPs increasingly want to see in the annual report.',
     },
     other: {
       title: 'No analytics yet',

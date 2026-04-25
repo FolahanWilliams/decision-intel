@@ -24,6 +24,7 @@ import {
   Compass,
   Briefcase,
   TrendingUp,
+  Landmark,
   Users,
   ArrowRight,
   Loader2,
@@ -43,6 +44,7 @@ const ROLE_LABEL: Record<SampleRole, string> = {
   cso: 'Corporate Strategy',
   ma: 'M&A / Corp Dev',
   bizops: 'BizOps / FP&A',
+  pe_vc: 'PE / Venture / Fund',
   other: 'Mixed library',
 };
 
@@ -50,7 +52,16 @@ const ROLE_ICON: Record<SampleRole, typeof Compass> = {
   cso: Compass,
   ma: Briefcase,
   bizops: TrendingUp,
+  pe_vc: Landmark,
   other: Users,
+};
+
+const ROLE_TAG_LABEL: Record<SampleRole, string> = {
+  cso: 'CSO',
+  ma: 'M&A',
+  bizops: 'BizOps',
+  pe_vc: 'PE / VC',
+  other: 'Mixed',
 };
 
 const ROLE_PITCH: Record<SampleRole, string> = {
@@ -60,6 +71,8 @@ const ROLE_PITCH: Record<SampleRole, string> = {
     'Three IC-grade memos: a synergy-and-integration deal, a bank-regulatory diligence note, and a cross-border reverse merger. Pasting any of them and clicking Run produces a procurement-grade audit.',
   bizops:
     'Three planning-grade memos: a buy-vs-build re-platform, an FY26 R&D budget recommendation, and a regional-hub shutdown call. The biases the audit catches map onto the patterns that produce miss-the-quarter forecasts.',
+  pe_vc:
+    'Two IC-grade memos: a Pan-African consumer-staples roll-up with FX-cycle exposure, and a Series-B growth round into a Nairobi neo-bank with multi-jurisdiction regulatory risk. Decision-grade memos of the shape your IC actually reads.',
   other:
     'A handful of decision-grade memos picked from across the buyer-personas — pick the closest to a decision your team makes.',
 };
@@ -95,6 +108,7 @@ export function FirstRunInlineWalkthrough({ visible, onLoadAndRun, onLoadOnly }:
           data.onboardingRole === 'cso' ||
           data.onboardingRole === 'ma' ||
           data.onboardingRole === 'bizops' ||
+          data.onboardingRole === 'pe_vc' ||
           data.onboardingRole === 'other'
         ) {
           setRole(data.onboardingRole);
@@ -228,7 +242,7 @@ export function FirstRunInlineWalkthrough({ visible, onLoadAndRun, onLoadOnly }:
                   gap: 6,
                 }}
               >
-                {b.role === 'cso' ? 'CSO' : b.role === 'ma' ? 'M&A' : 'BizOps'}
+                {ROLE_TAG_LABEL[b.role]}
                 {b.regulatoryTag && (
                   <span
                     style={{

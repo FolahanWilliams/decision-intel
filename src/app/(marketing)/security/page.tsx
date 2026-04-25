@@ -22,7 +22,7 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.c
 export const metadata: Metadata = {
   title: 'Security · Decision Intel',
   description:
-    'Enterprise-grade security posture on a founder budget. AES-256-GCM at rest with keyVersion rotation, TLS 1.2+ in transit, immutable audit log, seven regulatory frameworks mapped flag-by-flag, and a Decision Provenance Record (EU AI Act Article 14 aligned) your GC can walk into a regulator meeting with.',
+    'Enterprise-grade security posture on a founder budget. AES-256-GCM at rest with keyVersion rotation, TLS 1.2+ in transit, immutable audit log, 17 regulatory frameworks mapped flag-by-flag across G7, EU, GCC and African markets, and a Decision Provenance Record (EU AI Act Article 14 aligned) your GC can walk into a regulator meeting with.',
   alternates: { canonical: `${siteUrl}/security` },
   openGraph: {
     title: 'Security · Decision Intel',
@@ -460,9 +460,9 @@ export default function SecurityPage() {
               }}
             >
               AES-256-GCM at rest with keyVersion rotation, TLS 1.2+ in transit, an immutable audit
-              log, and every flag cross-linked to a specific regulatory provision across 17
-              frameworks (G7, EU, GCC, plus seven Africa-anchored regimes for Sankore-class buyers).
-              A Fortune-500 security questionnaire finishes in minutes, not weeks.
+              log, and every flag cross-linked to a specific regulatory provision across {FRAMEWORKS.length}{' '}
+              international frameworks spanning G7, EU, GCC, and African markets. A Fortune-500
+              security questionnaire finishes in minutes, not weeks.
             </p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <Link
@@ -924,8 +924,8 @@ export default function SecurityPage() {
         <div style={{ maxWidth: 1180, margin: '0 auto' }}>
           <SectionHeader
             eyebrow="Regulatory coverage"
-            title="Seven frameworks, mapped flag-by-flag"
-            body="Every flag the pipeline surfaces carries a regulatory citation. Your GC doesn't take the tool on faith. They walk into the audit committee meeting with the memo, the flags, and the framework sections attached."
+            title={`${FRAMEWORKS.length} frameworks, mapped flag-by-flag`}
+            body="Every flag the pipeline surfaces carries a regulatory citation across G7, EU, GCC, and African markets. Your GC doesn't take the tool on faith. They walk into the audit committee meeting with the memo, the flags, and the framework sections attached."
             align="center"
           />
           <div
@@ -996,7 +996,7 @@ export default function SecurityPage() {
                 or regulator of record, built to the shape EU AI Act Article 14, SEC AI disclosure,
                 and Basel III ICAAP already require. Includes input-document hash, prompt
                 fingerprint, model lineage, academic citations across the 30+ bias taxonomy,
-                regulatory mapping across seven frameworks, and full pipeline lineage.
+                regulatory mapping across all {FRAMEWORKS.length} frameworks, and full pipeline lineage.
               </div>
             </div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -1018,7 +1018,27 @@ export default function SecurityPage() {
                   whiteSpace: 'nowrap',
                 }}
               >
-                <FileText size={13} /> Sample DPR (PDF)
+                <FileText size={13} /> Sample DPR · US public-market
+              </a>
+              <a
+                href="/dpr-sample-dangote.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '9px 16px',
+                  background: C.green,
+                  color: C.white,
+                  borderRadius: 8,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <FileText size={13} /> Sample DPR · Pan-African industrial
               </a>
               <a
                 href="/dpa-template.pdf"

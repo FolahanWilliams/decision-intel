@@ -5,6 +5,7 @@ import {
   Compass,
   Briefcase,
   TrendingUp,
+  Landmark,
   Users,
   Sparkles,
   ArrowRight,
@@ -46,7 +47,15 @@ const ROLE_ICONS: Record<SampleRole, typeof Compass> = {
   cso: Compass,
   ma: Briefcase,
   bizops: TrendingUp,
+  pe_vc: Landmark,
   other: Users,
+};
+
+const ROLE_TOGGLE_LABEL: Record<Exclude<SampleRole, 'other'>, string> = {
+  cso: 'CSO',
+  ma: 'M&A',
+  bizops: 'BizOps',
+  pe_vc: 'PE / VC',
 };
 
 export function RoleSamplePicker({
@@ -73,6 +82,7 @@ export function RoleSamplePicker({
           data.onboardingRole === 'cso' ||
           data.onboardingRole === 'ma' ||
           data.onboardingRole === 'bizops' ||
+          data.onboardingRole === 'pe_vc' ||
           data.onboardingRole === 'other'
         ) {
           setRole(data.onboardingRole);
@@ -142,7 +152,7 @@ export function RoleSamplePicker({
         </div>
         {!hideRoleToggle && (
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            {(['cso', 'ma', 'bizops'] as const).map(r => {
+            {(['cso', 'ma', 'bizops', 'pe_vc'] as const).map(r => {
               const Icon = ROLE_ICONS[r];
               const active = role === r;
               return (
@@ -164,7 +174,7 @@ export function RoleSamplePicker({
                   }}
                 >
                   <Icon size={11} />
-                  {r === 'cso' ? 'CSO' : r === 'ma' ? 'M&A' : 'BizOps'}
+                  {ROLE_TOGGLE_LABEL[r]}
                 </button>
               );
             })}
@@ -222,7 +232,7 @@ export function RoleSamplePicker({
                   color: 'var(--text-muted)',
                 }}
               >
-                {b.role === 'cso' ? 'CSO' : b.role === 'ma' ? 'M&A' : 'BizOps'}
+                {b.role === 'other' ? 'Mixed' : ROLE_TOGGLE_LABEL[b.role]}
                 {b.regulatoryTag && (
                   <span
                     style={{
