@@ -88,7 +88,34 @@ export function CohortGrid({ applications, onOpenPartner, onAssignSlot }: Props)
               />
             );
           }
-          return <FilledSlotCard key={slot} app={app} onClick={() => onOpenPartner(app.id)} />;
+          const isSankore = app.company.toLowerCase().includes('sankore');
+          return (
+            <div key={slot} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <FilledSlotCard app={app} onClick={() => onOpenPartner(app.id)} />
+              {isSankore && (
+                <a
+                  href="/dashboard/founder-hub/design-partners/sankore"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 6,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: 'var(--accent-primary)',
+                    background: 'rgba(22,163,74,0.08)',
+                    border: '1px solid rgba(22,163,74,0.25)',
+                    borderRadius: 'var(--radius-sm)',
+                    padding: '6px 10px',
+                    textDecoration: 'none',
+                  }}
+                >
+                  <span>Capability brief — founder reference</span>
+                  <span style={{ opacity: 0.7 }}>→</span>
+                </a>
+              )}
+            </div>
+          );
         })}
       </div>
     </div>
