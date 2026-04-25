@@ -13,6 +13,7 @@ import { EU_AI_ACT_FRAMEWORK } from './eu-ai-act';
 import { GDPR_ART22_FRAMEWORK } from './gdpr-automated-decisions';
 import { SEC_REG_D_FRAMEWORK } from './sec-reg-d';
 import { LPOA_FRAMEWORK } from './lpoa';
+import { AFRICA_FRAMEWORKS } from './africa-frameworks';
 
 export { FCA_CONSUMER_DUTY } from './fca-consumer-duty';
 export { SOX_FRAMEWORK } from './sox';
@@ -21,6 +22,19 @@ export { EU_AI_ACT_FRAMEWORK } from './eu-ai-act';
 export { GDPR_ART22_FRAMEWORK } from './gdpr-automated-decisions';
 export { SEC_REG_D_FRAMEWORK } from './sec-reg-d';
 export { LPOA_FRAMEWORK } from './lpoa';
+export {
+  AFRICA_FRAMEWORKS,
+  NDPR_FRAMEWORK,
+  CBN_AI_FRAMEWORK,
+  WAEMU_FRAMEWORK,
+  CMA_KENYA_FRAMEWORK,
+  BOG_FRAMEWORK,
+  FRC_NIGERIA_FRAMEWORK,
+  CBE_FRAMEWORK,
+  POPIA_FRAMEWORK,
+  SARB_FRAMEWORK,
+  BOT_FRAMEWORK,
+} from './africa-frameworks';
 
 /**
  * Returns all registered regulatory frameworks.
@@ -35,5 +49,6 @@ export function getAllRegisteredFrameworks(): RegulatoryFramework[] {
     GDPR_ART22_FRAMEWORK,
     SEC_REG_D_FRAMEWORK,
     LPOA_FRAMEWORK,
+    ...AFRICA_FRAMEWORKS,
   ];
 }
