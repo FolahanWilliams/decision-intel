@@ -24,6 +24,7 @@ import {
   Share2,
   Repeat,
   ShieldCheck,
+  Package,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { ThemeToggle, ThemeToggleCompact } from '@/components/ThemeToggle';
@@ -481,6 +482,15 @@ export default function Sidebar() {
                   />
                 </>
               )}
+            <NavItem
+              href="/dashboard/decisions"
+              icon={<Package size={18} />}
+              label="Decisions"
+              description="Decision Packages — composite DQI + cross-doc audit"
+              active={pathname.startsWith('/dashboard/decisions')}
+              collapsed={collapsed}
+              onNavigate={closeMobile}
+            />
             <NavItem
               href="/dashboard/playbooks"
               icon={<BookTemplate size={18} />}

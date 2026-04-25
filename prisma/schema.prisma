@@ -78,6 +78,7 @@ model Document {
   failedAnalyses   FailedAnalysis[]
   decisionFrame    DecisionFrame?
   documentAccess   DocumentAccess[]
+  decisionPackages DecisionPackageDocument[]
 
   @@index([userId])
   @@index([orgId])
@@ -205,6 +206,127 @@ model DocumentAccess {
   @@unique([documentId, userId])
   @@index([userId])
   @@index([documentId])
+}
+
+/// Decision Package (4.4 deep) — a named bundle of documents that
+/// together constitute a single strategic decision. Generalises the
+/// "deal as the atomic decision unit" claim to non-deal contexts:
+/// board recommendations, market-entry recs, RFP responses, IC
+/// preparation packets where the M&A Deal model is too narrow.
+///
+/// Cross-reference + composite DQI + outcome calibration run on a
+/// package the same way they do on a deal. A document can sit in 0..n
+/// packages (a memo can belong to "Q4 board pack" AND "DACH market
+/// entry"); the join row carries the role label for that context.
+///
+/// Visibility uses the same three-state model as Document — each member
+/// doc's own visibility still applies, so adding a private doc to a
+/// team-visible package doesn't widen its read radius (the resolver
+/// hides the doc; the package shows N member docs accessible to you).
+model DecisionPackage {
+  id                        String                          @id @default(cuid())
+  orgId                     String?
+  ownerUserId               String
+  name                      String
+  /// Optional decision frame the package is built around — e.g.
+  /// "Should we enter the Brazilian market in 2026 at the proposed budget?"
+  decisionFrame             String?                         @db.Text
+  /// Lifecycle: 'drafting' (assembling docs) | 'under_review' (committee
+  /// reviewing) | 'decided' (a verdict was recorded; outcome may follow) |
+  /// 'superseded' (replaced by a newer package — keeps history without
+  /// deletion).
+  status                    String                          @default("drafting")
+  decidedAt                 DateTime?
+  /// Composite DQI computed across the latest analysis of every doc
+  /// in the package. Cached on write (we recompute when docs are
+  /// added/removed or new analyses land) so the package list page
+  /// doesn't have to recompute on every render. Mirror of Deal aggregation.
+  compositeDqi              Float?
+  compositeGrade            String? // A | B | C | D | F | null
+  documentCount             Int                             @default(0)
+  analyzedDocCount          Int                             @default(0)
+  recurringBiasCount        Int                             @default(0)
+  conflictCount             Int                             @default(0)
+  highSeverityConflictCount Int                             @default(0)
+  /// Visibility — same three-state model as Document. Member docs keep
+  /// their own visibility; this only controls whether the package shell
+  /// (name + decisionFrame + composite metrics) shows up in another
+  /// teammate's list view.
+  visibility                String                          @default("team")
+  createdAt                 DateTime                        @default(now())
+  updatedAt                 DateTime                        @updatedAt
+  documents                 DecisionPackageDocument[]
+  outcome                   DecisionPackageOutcome?
+  crossReferences           DecisionPackageCrossReference[]
+
+  @@index([orgId])
+  @@index([ownerUserId])
+  @@index([status])
+  @@index([orgId, status])
+  @@index([orgId, updatedAt])
+}
+
+/// Join table — Document ↔ DecisionPackage. Carries the per-context
+/// role label ("memo" | "model" | "counsel review" | "deck" — free-form,
+/// not enum'd because committee vocabulary varies) and the position so
+/// the package detail page can render the docs in a meaningful order.
+model DecisionPackageDocument {
+  id          String          @id @default(cuid())
+  packageId   String
+  documentId  String
+  /// Free-text role label per doc.
+  role        String?
+  /// Sort order in the package (0-indexed).
+  position    Int             @default(0)
+  addedAt     DateTime        @default(now())
+  package     DecisionPackage @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  document    Document        @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@unique([packageId, documentId])
+  @@index([packageId, position])
+  @@index([documentId])
+}
+
+/// Cross-reference run scoped to a package — mirrors DealCrossReference
+/// but for non-deal decision sets. One row per run; we keep history so
+/// the UI can say "as of {date}".
+model DecisionPackageCrossReference {
+  id                String          @id @default(cuid())
+  packageId         String
+  runAt             DateTime        @default(now())
+  modelVersion      String          @default("gemini-3-flash-preview")
+  /// Snapshot of which (documentId → analysisId) pairs the run consumed,
+  /// preserved across versioning so older findings can still be cited.
+  documentSnapshot  Json
+  /// CrossRefRunOutput from src/lib/agents/cross-reference.ts
+  /// ({ summary, findings[], documentSnapshot[] }).
+  findings          Json
+  conflictCount     Int             @default(0)
+  highSeverityCount Int             @default(0)
+  status            String          @default("complete") // running | complete | error
+  errorMessage      String?
+  package           DecisionPackage @relation(fields: [packageId], references: [id], onDelete: Cascade)
+
+  @@index([packageId, runAt])
+}
+
+/// Outcome reported on a Decision Package. Mirrors DecisionOutcome's
+/// purpose at the analysis level but for the composite decision: a
+/// CSO's "we decided X, here's how it played out" reflection. Plain-
+/// English summary required; realisedDqi + brierScore optional and
+/// computed on the back-end when the package's member analyses
+/// recalibrate post-outcome.
+model DecisionPackageOutcome {
+  id               String          @id @default(cuid())
+  packageId        String          @unique
+  summary          String          @db.Text
+  realisedDqi      Float?
+  brierScore       Float?
+  reportedAt       DateTime        @default(now())
+  reportedByUserId String
+  package          DecisionPackage @relation(fields: [packageId], references: [id], onDelete: Cascade)
+
+  @@index([packageId])
 }
 
 model Analysis {

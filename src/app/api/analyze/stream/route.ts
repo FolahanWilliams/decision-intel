@@ -894,6 +894,133 @@ export async function POST(request: NextRequest) {
             })().catch(() => null);
           }
 
+          // 4.4 deep — DecisionPackage auto-recompute + cross-reference. Same
+          // shape as the deal hook above, but for non-deal contexts. A doc
+          // can sit in 0..n packages; we recompute every package the doc is
+          // in, then auto-fire the cross-ref agent for each that has ≥2
+          // analyzed members and no run in the last 30 minutes (avoids a
+          // burst-fire when a CSO uploads several docs sequentially).
+          (async () => {
+            try {
+              const memberships = await prisma.decisionPackageDocument
+                .findMany({
+                  where: { documentId },
+                  select: { packageId: true },
+                })
+                .catch(() => [] as Array<{ packageId: string }>);
+              if (memberships.length === 0) return;
+
+              const { recomputePackageMetrics } = await import(
+                '@/lib/scoring/package-aggregation'
+              );
+              const { runCrossReferenceAgent } = await import('@/lib/agents/cross-reference');
+              const { getDocumentContent: decrypt } = await import('@/lib/utils/encryption');
+
+              const RECENT_RUN_MS = 30 * 60 * 1000;
+              for (const m of memberships) {
+                await recomputePackageMetrics(m.packageId);
+
+                // Cross-ref auto-trigger: ≥2 analyzed docs AND no run in
+                // the last 30min. Mirrors the deal hook's "fresh material
+                // arrived" semantics.
+                const analyzedCount = await prisma.decisionPackageDocument.count({
+                  where: {
+                    packageId: m.packageId,
+                    document: { deletedAt: null, analyses: { some: {} } },
+                  },
+                });
+                if (analyzedCount < 2) continue;
+                const recent = await prisma.decisionPackageCrossReference
+                  .findFirst({
+                    where: { packageId: m.packageId },
+                    orderBy: { runAt: 'desc' },
+                    select: { runAt: true },
+                  })
+                  .catch(() => null);
+                if (recent && Date.now() - recent.runAt.getTime() < RECENT_RUN_MS) continue;
+
+                const docs = await prisma.decisionPackageDocument.findMany({
+                  where: {
+                    packageId: m.packageId,
+                    document: { deletedAt: null },
+                  },
+                  select: {
+                    document: {
+                      select: {
+                        id: true,
+                        filename: true,
+                        content: true,
+                        contentEncrypted: true,
+                        contentIv: true,
+                        contentTag: true,
+                        contentKeyVersion: true,
+                        analyses: {
+                          orderBy: { createdAt: 'desc' },
+                          take: 1,
+                          select: {
+                            id: true,
+                            overallScore: true,
+                            biases: {
+                              select: { biasType: true, severity: true },
+                              take: 5,
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                });
+
+                const inputs = docs
+                  .map(row => {
+                    const a = row.document.analyses[0];
+                    if (!a) return null;
+                    const content = decrypt(row.document as Parameters<typeof decrypt>[0]);
+                    if (!content || content.trim().length < 200) return null;
+                    return {
+                      documentId: row.document.id,
+                      documentName: row.document.filename,
+                      analysisId: a.id,
+                      overallScore: a.overallScore,
+                      content,
+                      topBiases: a.biases.map(b => ({
+                        biasType: b.biasType,
+                        severity: b.severity ?? null,
+                      })),
+                    };
+                  })
+                  .filter((x): x is NonNullable<typeof x> => x !== null);
+                if (inputs.length < 2) continue;
+
+                const output = await runCrossReferenceAgent(inputs);
+                const conflictCount = output.findings.length;
+                const highSeverityCount = output.findings.filter(
+                  f => f.severity === 'critical' || f.severity === 'high'
+                ).length;
+
+                await prisma.decisionPackageCrossReference.create({
+                  data: {
+                    packageId: m.packageId,
+                    documentSnapshot: output.documentSnapshot as unknown as Prisma.InputJsonValue,
+                    findings: output as unknown as Prisma.InputJsonValue,
+                    conflictCount,
+                    highSeverityCount,
+                    status: 'complete',
+                  },
+                });
+                await recomputePackageMetrics(m.packageId);
+                log.info(
+                  `Auto package cross-reference for ${m.packageId}: ${conflictCount} conflicts, ${highSeverityCount} high-severity`
+                );
+              }
+            } catch (err) {
+              log.warn(
+                'Auto package recompute failed (non-critical): ' +
+                  (err instanceof Error ? err.message : String(err))
+              );
+            }
+          })().catch(() => null);
+
           // Store embedding (fire and forget)
           try {
             const { storeAnalysisEmbedding } = await import('@/lib/rag/embeddings');

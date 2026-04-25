@@ -16,7 +16,11 @@ export interface ActivityItem {
     | 'outcome'
     | 'blind_prior_distributed'
     | 'blind_prior_revealed'
-    | 'blind_prior_outcome_logged';
+    | 'blind_prior_outcome_logged'
+    | 'decision_package_created'
+    | 'decision_package_decided'
+    | 'decision_package_outcome_logged'
+    | 'decision_package_conflict_flagged';
   title: string;
   description: string;
   timestamp: string;
@@ -30,6 +34,10 @@ export interface ActivityItem {
     roomTitle?: string;
     submittedCount?: number;
     totalVoters?: number;
+    packageId?: string;
+    packageName?: string;
+    conflictCount?: number;
+    highSeverityCount?: number;
   };
 }
 
@@ -70,6 +78,10 @@ export async function GET(request: NextRequest) {
             'blind_prior_distributed',
             'blind_prior_revealed',
             'blind_prior_outcome_logged',
+            'decision_package_created',
+            'decision_package_decided',
+            'decision_package_outcome_logged',
+            'decision_package_conflict_flagged',
           ]
     );
 
@@ -88,8 +100,15 @@ export async function GET(request: NextRequest) {
       allowedTypes.has('blind_prior_revealed') ||
       allowedTypes.has('blind_prior_outcome_logged');
 
+    // 4.4 deep — Decision Package events. Same schema-drift posture.
+    const wantsPackage =
+      allowedTypes.has('decision_package_created') ||
+      allowedTypes.has('decision_package_decided') ||
+      allowedTypes.has('decision_package_outcome_logged') ||
+      allowedTypes.has('decision_package_conflict_flagged');
+
     // Fetch from multiple sources in parallel
-    const [documents, nudges, outcomes, blindPriorRooms] = await Promise.allSettled([
+    const [documents, nudges, outcomes, packages, blindPriorRooms] = await Promise.allSettled([
       // Documents (uploads + analysis completions/errors)
       allowedTypes.has('upload') ||
       allowedTypes.has('analysis_complete') ||
@@ -158,6 +177,43 @@ export async function GET(request: NextRequest) {
                 notes: true,
                 reportedAt: true,
                 analysisId: true,
+              },
+            })
+            .catch(() => [])
+        : Promise.resolve([]),
+
+      // Decision Package events — packages the user owns or has access
+      // to (via team membership). Cross-references with high-severity
+      // counts surface as their own event so a CSO sees "3 conflicts
+      // flagged on DACH market entry" in the activity feed. Schema-drift
+      // tolerant.
+      wantsPackage
+        ? prisma.decisionPackage
+            .findMany({
+              where: {
+                OR: [
+                  { ownerUserId: user.id },
+                  { documents: { some: { document: docWhere } } },
+                ],
+                ...(cursorDate ? { updatedAt: { lt: cursorDate } } : {}),
+              },
+              orderBy: { updatedAt: 'desc' },
+              take: limit,
+              select: {
+                id: true,
+                name: true,
+                status: true,
+                decidedAt: true,
+                createdAt: true,
+                updatedAt: true,
+                conflictCount: true,
+                highSeverityConflictCount: true,
+                outcome: { select: { id: true, reportedAt: true } },
+                crossReferences: {
+                  orderBy: { runAt: 'desc' },
+                  take: 1,
+                  select: { runAt: true, conflictCount: true, highSeverityCount: true },
+                },
               },
             })
             .catch(() => [])
@@ -286,6 +342,73 @@ export async function GET(request: NextRequest) {
           timestamp: nudge.createdAt.toISOString(),
           metadata: { severity: nudge.severity, nudgeType: nudge.nudgeType },
         });
+      }
+    }
+
+    // Process Decision Package events (4.4 deep)
+    if (packages.status === 'fulfilled') {
+      for (const pkg of packages.value as Array<{
+        id: string;
+        name: string;
+        status: string;
+        decidedAt: Date | null;
+        createdAt: Date;
+        updatedAt: Date;
+        conflictCount: number;
+        highSeverityConflictCount: number;
+        outcome: { id: string; reportedAt: Date } | null;
+        crossReferences: Array<{ runAt: Date; conflictCount: number; highSeverityCount: number }>;
+      }>) {
+        if (allowedTypes.has('decision_package_created')) {
+          activities.push({
+            id: `package-created-${pkg.id}`,
+            type: 'decision_package_created',
+            title: `Package created: ${pkg.name}`,
+            description: 'New decision package — assemble the docs that compose this decision.',
+            timestamp: pkg.createdAt.toISOString(),
+            metadata: { packageId: pkg.id, packageName: pkg.name },
+          });
+        }
+        if (pkg.decidedAt && allowedTypes.has('decision_package_decided')) {
+          activities.push({
+            id: `package-decided-${pkg.id}`,
+            type: 'decision_package_decided',
+            title: `Package decided: ${pkg.name}`,
+            description: 'Status flipped to decided — outcome reporting unlocked.',
+            timestamp: pkg.decidedAt.toISOString(),
+            metadata: { packageId: pkg.id, packageName: pkg.name },
+          });
+        }
+        if (pkg.outcome && allowedTypes.has('decision_package_outcome_logged')) {
+          activities.push({
+            id: `package-outcome-${pkg.id}`,
+            type: 'decision_package_outcome_logged',
+            title: `Outcome logged: ${pkg.name}`,
+            description: 'Realised result reported on the package.',
+            timestamp: pkg.outcome.reportedAt.toISOString(),
+            metadata: { packageId: pkg.id, packageName: pkg.name },
+          });
+        }
+        const latestRun = pkg.crossReferences[0];
+        if (
+          latestRun &&
+          (latestRun.conflictCount > 0 || latestRun.highSeverityCount > 0) &&
+          allowedTypes.has('decision_package_conflict_flagged')
+        ) {
+          activities.push({
+            id: `package-conflicts-${pkg.id}-${latestRun.runAt.toISOString()}`,
+            type: 'decision_package_conflict_flagged',
+            title: `Cross-doc conflicts flagged: ${pkg.name}`,
+            description: `${latestRun.conflictCount} conflict${latestRun.conflictCount === 1 ? '' : 's'} flagged · ${latestRun.highSeverityCount} high-severity.`,
+            timestamp: latestRun.runAt.toISOString(),
+            metadata: {
+              packageId: pkg.id,
+              packageName: pkg.name,
+              conflictCount: latestRun.conflictCount,
+              highSeverityCount: latestRun.highSeverityCount,
+            },
+          });
+        }
       }
     }
 

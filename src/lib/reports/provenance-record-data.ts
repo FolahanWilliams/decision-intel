@@ -59,6 +59,45 @@ export interface ProvenanceRecordData {
    * pre-IC survey — the DPR section then renders a one-line note.
    */
   blindPriorAggregates: BlindPriorRoomAggregate[];
+  /**
+   * Decision Package member roster (4.4 deep) — populated only when the
+   * DPR was generated from a Decision Package root rather than a single
+   * Analysis. Adds a per-doc lineage page to the PDF showing which
+   * documents composed the decision, their per-doc DQI, and their
+   * individual input hashes. Null when the DPR is per-analysis (the
+   * legacy / default mode).
+   */
+  packageContext?: {
+    packageId: string;
+    packageName: string;
+    decisionFrame: string | null;
+    status: string;
+    decidedAt: string | null;
+    compositeDqi: number | null;
+    compositeGrade: string | null;
+    members: Array<{
+      documentId: string;
+      filename: string;
+      role: string | null;
+      analysisId: string | null;
+      overallScore: number | null;
+      biasCount: number;
+      inputHash: string;
+    }>;
+    packageInputHash: string;
+    crossReference: {
+      runAt: string;
+      conflictCount: number;
+      highSeverityCount: number;
+      summary: string | null;
+    } | null;
+    outcome: {
+      summary: string;
+      realisedDqi: number | null;
+      brierScore: number | null;
+      reportedAt: string;
+    } | null;
+  };
   schemaVersion: number;
   generatedAt: Date;
   // Meta for the PDF renderer — not persisted.
@@ -443,4 +482,238 @@ export async function assembleProvenanceRecordData(
 
 function formatBiasLabel(biasType: string): string {
   return biasType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+/**
+ * Assemble a Decision Package-rooted Provenance Record (4.4 deep).
+ *
+ * Strategy: pull every member doc + its latest analysis. The DPR is
+ * built from the LATEST analysis on the most-recently-decided member
+ * doc (so the meta strip carries a real DQI + summary). Then the
+ * `packageContext` field is populated with the full member roster +
+ * cross-reference + outcome so the PDF can render a per-package page.
+ *
+ * Citations and regulatoryMapping are aggregated across all member
+ * analyses (deduped by biasType) so a procurement reader sees every
+ * regulator-touching bias surfaced anywhere in the package, not just
+ * the lead doc's.
+ */
+export async function assembleProvenanceRecordDataForPackage(
+  packageId: string
+): Promise<ProvenanceRecordData> {
+  const pkg = await prisma.decisionPackage.findUnique({
+    where: { id: packageId },
+    include: {
+      documents: {
+        orderBy: { position: 'asc' },
+        select: {
+          documentId: true,
+          role: true,
+          position: true,
+          document: {
+            select: {
+              id: true,
+              filename: true,
+              contentHash: true,
+              analyses: {
+                orderBy: { createdAt: 'desc' },
+                take: 1,
+                select: {
+                  id: true,
+                  overallScore: true,
+                  noiseScore: true,
+                  summary: true,
+                  biases: {
+                    select: { biasType: true, severity: true, suggestion: true },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      crossReferences: {
+        orderBy: { runAt: 'desc' },
+        take: 1,
+      },
+      outcome: true,
+    },
+  });
+
+  if (!pkg) {
+    throw new Error(`DecisionPackage ${packageId} not found.`);
+  }
+
+  // Pick the lead analysis: highest-scoring among members. Falls back
+  // to the first member with any analysis. We use the lead's analysis
+  // for the standard DPR strip (DQI, summary, judgeVariance) so the
+  // surface is identical to a per-analysis DPR; the package-specific
+  // additions are layered on top.
+  const memberAnalyses = pkg.documents
+    .map(m => ({
+      member: m,
+      analysis: m.document.analyses[0] ?? null,
+    }))
+    .filter((x): x is { member: typeof x.member; analysis: NonNullable<typeof x.analysis> } =>
+      x.analysis !== null
+    );
+
+  let baseData: ProvenanceRecordData;
+  if (memberAnalyses.length > 0) {
+    const lead = memberAnalyses.reduce((best, curr) =>
+      curr.analysis.overallScore > best.analysis.overallScore ? curr : best
+    );
+    baseData = await assembleProvenanceRecordData(lead.analysis.id);
+  } else {
+    // No analyses yet — synthesize a minimal data shape.
+    baseData = {
+      analysisId: 'no-analysis',
+      documentId: 'no-document',
+      userId: pkg.ownerUserId,
+      orgId: pkg.orgId ?? null,
+      promptFingerprint: 'NO_ANALYSES',
+      inputHash: 'NO_ANALYSES',
+      modelLineage: CURRENT_MODEL_LINEAGE,
+      judgeVariance: {
+        noiseScore: 0,
+        metaVerdict: null,
+        note: 'This package has no analyzed member documents yet.',
+      },
+      citations: [],
+      regulatoryMapping: [],
+      pipelineLineage: PIPELINE_NODES.map((node, i) => ({
+        order: i + 1,
+        nodeId: node.id,
+        zone: node.zone,
+        label: node.label,
+        academicAnchor: node.academicAnchor,
+      })),
+      blindPriorAggregates: [],
+      schemaVersion: 1,
+      generatedAt: new Date(),
+      meta: {
+        filename: pkg.name,
+        overallScore: 0,
+        noiseScore: 0,
+        summary: pkg.decisionFrame ?? 'No analyses on member documents yet.',
+        metaVerdict: null,
+        biasCount: 0,
+        topMitigation: null,
+        topMitigationFor: null,
+      },
+    };
+  }
+
+  // Aggregate citations + regulatoryMapping across every member doc's
+  // latest analysis (dedup by biasType).
+  const seenCitations = new Set<string>();
+  const aggregatedCitations: ProvenanceRecordData['citations'] = [];
+  const seenReg = new Set<string>();
+  const aggregatedRegulatory: ProvenanceRecordData['regulatoryMapping'] = [];
+  const allBiasTypes = new Set<string>();
+  for (const ma of memberAnalyses) {
+    const biasTypes = Array.from(new Set(ma.analysis.biases.map(b => b.biasType)));
+    for (const biasType of biasTypes) {
+      allBiasTypes.add(biasType);
+      if (!seenCitations.has(biasType)) {
+        seenCitations.add(biasType);
+        const edu = getBiasEducation(biasType);
+        aggregatedCitations.push({
+          biasType,
+          biasLabel: formatBiasLabel(biasType),
+          taxonomyId: edu?.taxonomyId ?? null,
+          citation: edu?.academicReference?.citation ?? null,
+          doi: edu?.academicReference?.doi ?? null,
+        });
+      }
+      if (!seenReg.has(biasType)) {
+        seenReg.add(biasType);
+        const risk = getCrossFrameworkRisk(biasType);
+        aggregatedRegulatory.push({
+          biasType,
+          aggregateRiskScore: risk.aggregateRiskScore,
+          frameworks: risk.frameworks.map(fw => ({
+            id: fw.frameworkId,
+            name: fw.frameworkName,
+            provisions: fw.provisions.map(p => `${p.provisionId} — ${p.title}`),
+          })),
+        });
+      }
+    }
+  }
+
+  // Composite input hash — sha256 of concatenated member input hashes.
+  const inputHashes = memberAnalyses
+    .map(ma => ma.member.document.contentHash || ma.member.documentId)
+    .sort();
+  const packageInputHash = createHash('sha256')
+    .update(`${pkg.id}::${inputHashes.join('::')}`)
+    .digest('hex');
+
+  // Cross-reference summary
+  const latestRun = pkg.crossReferences[0];
+  let crossRefSummary: string | null = null;
+  if (latestRun) {
+    const findingsAny = latestRun.findings as
+      | { summary?: string; findings?: unknown[] }
+      | null
+      | undefined;
+    crossRefSummary =
+      typeof findingsAny?.summary === 'string'
+        ? findingsAny.summary
+        : `${latestRun.conflictCount} conflict${latestRun.conflictCount === 1 ? '' : 's'} flagged.`;
+  }
+
+  return {
+    ...baseData,
+    citations: aggregatedCitations.length > 0 ? aggregatedCitations : baseData.citations,
+    regulatoryMapping:
+      aggregatedRegulatory.length > 0 ? aggregatedRegulatory : baseData.regulatoryMapping,
+    inputHash: packageInputHash,
+    meta: {
+      ...baseData.meta,
+      filename: pkg.name,
+      summary: pkg.decisionFrame ?? baseData.meta.summary,
+      overallScore: pkg.compositeDqi ?? baseData.meta.overallScore,
+      biasCount: allBiasTypes.size,
+    },
+    packageContext: {
+      packageId: pkg.id,
+      packageName: pkg.name,
+      decisionFrame: pkg.decisionFrame,
+      status: pkg.status,
+      decidedAt: pkg.decidedAt?.toISOString() ?? null,
+      compositeDqi: pkg.compositeDqi,
+      compositeGrade: pkg.compositeGrade,
+      packageInputHash,
+      members: pkg.documents.map(m => {
+        const a = m.document.analyses[0];
+        return {
+          documentId: m.documentId,
+          filename: m.document.filename,
+          role: m.role ?? null,
+          analysisId: a?.id ?? null,
+          overallScore: a?.overallScore ?? null,
+          biasCount: a?.biases.length ?? 0,
+          inputHash: m.document.contentHash || 'UNAVAILABLE',
+        };
+      }),
+      crossReference: latestRun
+        ? {
+            runAt: latestRun.runAt.toISOString(),
+            conflictCount: latestRun.conflictCount,
+            highSeverityCount: latestRun.highSeverityCount,
+            summary: crossRefSummary,
+          }
+        : null,
+      outcome: pkg.outcome
+        ? {
+            summary: pkg.outcome.summary,
+            realisedDqi: pkg.outcome.realisedDqi,
+            brierScore: pkg.outcome.brierScore,
+            reportedAt: pkg.outcome.reportedAt.toISOString(),
+          }
+        : null,
+    },
+  };
 }

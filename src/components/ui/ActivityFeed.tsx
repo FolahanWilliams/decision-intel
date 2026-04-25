@@ -20,7 +20,11 @@ export interface Activity {
     | 'outcome'
     | 'blind_prior_distributed'
     | 'blind_prior_revealed'
-    | 'blind_prior_outcome_logged';
+    | 'blind_prior_outcome_logged'
+    | 'decision_package_created'
+    | 'decision_package_decided'
+    | 'decision_package_outcome_logged'
+    | 'decision_package_conflict_flagged';
   title: string;
   description?: string;
   timestamp: Date | string;

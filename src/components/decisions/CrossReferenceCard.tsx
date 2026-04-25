@@ -1,0 +1,446 @@
+'use client';
+
+/**
+ * Cross-document conflict surface for the Decision Package detail page
+ * (4.4 deep). Mirror of the deals/CrossReferenceCard but parameterised
+ * on the endpoint so it can run against any package-style cross-ref API.
+ *
+ * Findings shape is identical to the deal flow — the cross-reference
+ * agent is shared. We keep this as a sibling component (rather than
+ * extracting a single generic file) because the deals card has its own
+ * micro-callouts ("comparing the deal CIM, model, counsel memo") that
+ * read poorly outside the deal context.
+ */
+
+import { useCallback, useState } from 'react';
+import {
+  GitCompare,
+  AlertTriangle,
+  Loader2,
+  Clock,
+  ChevronDown,
+  ArrowRight,
+} from 'lucide-react';
+
+interface CrossRefClaim {
+  documentId: string;
+  documentName: string;
+  excerpt: string;
+}
+
+interface CrossRefFinding {
+  summary: string;
+  type: 'numeric' | 'assumption' | 'timeline' | 'risk_treatment' | 'scope';
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  claims: CrossRefClaim[];
+  whyItMatters: string;
+  resolutionQuestion: string;
+}
+
+interface CrossRefRunDto {
+  id: string;
+  runAt: string;
+  modelVersion: string;
+  documentSnapshot: unknown;
+  findings: unknown;
+  conflictCount: number;
+  highSeverityCount: number;
+  status: string;
+  errorMessage?: string | null;
+}
+
+interface Props {
+  /** Full POST/GET endpoint (e.g. /api/decision-packages/abc/cross-reference). */
+  endpoint: string;
+  initialRun: CrossRefRunDto | null;
+  analyzedDocCount: number;
+  /** Called after a successful new run so the parent can refresh other data. */
+  onRunCompleted?: () => void | Promise<void>;
+}
+
+const SEVERITY_HEX: Record<CrossRefFinding['severity'], string> = {
+  critical: '#7F1D1D',
+  high: '#DC2626',
+  medium: '#D97706',
+  low: '#2563EB',
+};
+
+const TYPE_LABEL: Record<CrossRefFinding['type'], string> = {
+  numeric: 'Numeric',
+  assumption: 'Assumption',
+  timeline: 'Timeline',
+  risk_treatment: 'Risk treatment',
+  scope: 'Scope',
+};
+
+function findingsArray(run: CrossRefRunDto | null): CrossRefFinding[] {
+  if (!run) return [];
+  if (Array.isArray(run.findings)) return run.findings as CrossRefFinding[];
+  const wrap = run.findings as { findings?: CrossRefFinding[] } | null;
+  return wrap?.findings ?? [];
+}
+
+function topSummary(run: CrossRefRunDto | null): string {
+  if (!run) return '';
+  if (Array.isArray(run.findings)) return '';
+  const wrap = run.findings as { summary?: string } | null;
+  return wrap?.summary ?? '';
+}
+
+function formatRunAt(ts: string): string {
+  try {
+    const d = new Date(ts);
+    const now = Date.now();
+    const diffMs = now - d.getTime();
+    const mins = Math.floor(diffMs / 60_000);
+    if (mins < 1) return 'just now';
+    if (mins < 60) return `${mins} min${mins === 1 ? '' : 's'} ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs} hr${hrs === 1 ? '' : 's'} ago`;
+    const days = Math.floor(hrs / 24);
+    return `${days} day${days === 1 ? '' : 's'} ago`;
+  } catch {
+    return ts;
+  }
+}
+
+export function CrossReferenceCard({
+  endpoint,
+  initialRun,
+  analyzedDocCount,
+  onRunCompleted,
+}: Props) {
+  const [run, setRun] = useState<CrossRefRunDto | null>(initialRun);
+  const [running, setRunning] = useState(false);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [error, setError] = useState<string | null>(null);
+
+  const canRun = analyzedDocCount >= 2;
+
+  const handleRun = useCallback(async () => {
+    if (running) return;
+    setRunning(true);
+    setError(null);
+    try {
+      const res = await fetch(endpoint, { method: 'POST' });
+      const body = (await res.json().catch(() => ({}))) as {
+        run?: CrossRefRunDto;
+        error?: string;
+      };
+      if (!res.ok) {
+        setError(body.error ?? `Cross-reference failed (${res.status})`);
+        return;
+      }
+      setRun(body.run ?? null);
+      await onRunCompleted?.();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Cross-reference failed.');
+    } finally {
+      setRunning(false);
+    }
+  }, [endpoint, running, onRunCompleted]);
+
+  const findings = findingsArray(run);
+  const headlineSummary = topSummary(run);
+
+  return (
+    <div
+      style={{
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-color)',
+        borderLeft:
+          findings.length > 0
+            ? `3px solid ${
+                findings.some(f => f.severity === 'critical' || f.severity === 'high')
+                  ? '#DC2626'
+                  : '#D97706'
+              }`
+            : '3px solid var(--accent-primary)',
+        borderRadius: 10,
+        padding: '16px 20px',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          gap: 16,
+          flexWrap: 'wrap',
+          marginBottom: findings.length > 0 || run ? 10 : 0,
+        }}
+      >
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              fontSize: 11,
+              fontWeight: 800,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: 'var(--text-muted)',
+              marginBottom: 4,
+            }}
+          >
+            <GitCompare size={12} />
+            Cross-document review
+            {run && (
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  fontSize: 10,
+                  fontWeight: 600,
+                  letterSpacing: '0.04em',
+                  color: 'var(--text-muted)',
+                  textTransform: 'none',
+                }}
+              >
+                · <Clock size={10} /> {formatRunAt(run.runAt)}
+              </span>
+            )}
+          </div>
+          <div
+            style={{
+              fontSize: 14,
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+              lineHeight: 1.45,
+            }}
+          >
+            {!run
+              ? canRun
+                ? `Run cross-document review across the ${analyzedDocCount} analyzed doc${analyzedDocCount === 1 ? '' : 's'}`
+                : 'Cross-document review needs at least two analyzed documents in this package.'
+              : findings.length === 0
+                ? 'No cross-document conflicts detected on the available material.'
+                : `${findings.length} conflict${findings.length === 1 ? '' : 's'} flagged · ${run.highSeverityCount} high-severity`}
+          </div>
+          {headlineSummary && findings.length > 0 && (
+            <div
+              style={{
+                fontSize: 12.5,
+                color: 'var(--text-secondary)',
+                marginTop: 6,
+                lineHeight: 1.55,
+              }}
+            >
+              {headlineSummary}
+            </div>
+          )}
+        </div>
+        <button
+          onClick={handleRun}
+          disabled={!canRun || running}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '8px 14px',
+            borderRadius: 'var(--radius-sm)',
+            background: canRun ? 'var(--accent-primary)' : 'var(--bg-elevated)',
+            color: canRun ? '#fff' : 'var(--text-muted)',
+            border: canRun ? 'none' : '1px solid var(--border-color)',
+            fontSize: 12,
+            fontWeight: 700,
+            cursor: canRun && !running ? 'pointer' : 'not-allowed',
+            opacity: canRun ? 1 : 0.55,
+          }}
+        >
+          {running ? <Loader2 size={13} className="animate-spin" /> : <GitCompare size={13} />}
+          {running ? 'Running…' : run ? 'Re-run' : 'Run review'}
+        </button>
+      </div>
+
+      {error && (
+        <div
+          style={{
+            color: 'var(--severity-high)',
+            fontSize: 12,
+            padding: '6px 10px',
+            background: 'rgba(239,68,68,0.08)',
+            borderRadius: 'var(--radius-sm)',
+            marginTop: 8,
+          }}
+        >
+          {error}
+        </div>
+      )}
+
+      {findings.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12 }}>
+          {findings.map((f, idx) => {
+            const colour = SEVERITY_HEX[f.severity];
+            const id = `${idx}-${f.summary.slice(0, 20)}`;
+            const isOpen = expanded[id];
+            return (
+              <div
+                key={id}
+                style={{
+                  border: '1px solid var(--border-color)',
+                  borderLeft: `3px solid ${colour}`,
+                  borderRadius: 8,
+                  background: 'var(--bg-elevated)',
+                }}
+              >
+                <button
+                  onClick={() => setExpanded(prev => ({ ...prev, [id]: !prev[id] }))}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 10,
+                    width: '100%',
+                    padding: '10px 12px',
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                  }}
+                  aria-expanded={isOpen}
+                >
+                  <AlertTriangle
+                    size={14}
+                    style={{ color: colour, flexShrink: 0, marginTop: 2 }}
+                  />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        flexWrap: 'wrap',
+                        marginBottom: 2,
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: 10,
+                          fontWeight: 800,
+                          letterSpacing: '0.06em',
+                          textTransform: 'uppercase',
+                          color: colour,
+                          background: `${colour}18`,
+                          border: `1px solid ${colour}33`,
+                          padding: '2px 6px',
+                          borderRadius: 4,
+                        }}
+                      >
+                        {f.severity}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: 10,
+                          fontWeight: 700,
+                          letterSpacing: '0.04em',
+                          textTransform: 'uppercase',
+                          color: 'var(--text-muted)',
+                        }}
+                      >
+                        {TYPE_LABEL[f.type]}
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: 'var(--text-primary)',
+                        lineHeight: 1.45,
+                      }}
+                    >
+                      {f.summary}
+                    </div>
+                  </div>
+                  <ChevronDown
+                    size={14}
+                    style={{
+                      color: 'var(--text-muted)',
+                      flexShrink: 0,
+                      marginTop: 4,
+                      transform: isOpen ? 'rotate(180deg)' : undefined,
+                      transition: 'transform 0.15s ease',
+                    }}
+                  />
+                </button>
+                {isOpen && (
+                  <div
+                    style={{
+                      padding: '0 12px 12px 36px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 8,
+                      borderTop: '1px solid var(--border-color)',
+                      paddingTop: 10,
+                    }}
+                  >
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {f.claims.map((c, i) => (
+                        <div
+                          key={`${c.documentId}-${i}`}
+                          style={{
+                            background: 'var(--bg-card)',
+                            border: '1px solid var(--border-color)',
+                            borderRadius: 6,
+                            padding: '8px 10px',
+                          }}
+                        >
+                          <div
+                            style={{
+                              fontSize: 10.5,
+                              fontWeight: 800,
+                              letterSpacing: '0.06em',
+                              textTransform: 'uppercase',
+                              color: 'var(--text-muted)',
+                              marginBottom: 3,
+                            }}
+                          >
+                            {c.documentName}
+                          </div>
+                          <div
+                            style={{
+                              fontSize: 12,
+                              color: 'var(--text-primary)',
+                              lineHeight: 1.5,
+                              fontStyle: 'italic',
+                            }}
+                          >
+                            &ldquo;{c.excerpt}&rdquo;
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {f.whyItMatters && (
+                      <div
+                        style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.55 }}
+                      >
+                        <strong style={{ color: 'var(--text-primary)' }}>Why it matters:</strong>{' '}
+                        {f.whyItMatters}
+                      </div>
+                    )}
+                    {f.resolutionQuestion && (
+                      <div
+                        style={{
+                          fontSize: 12,
+                          color: 'var(--accent-primary)',
+                          fontWeight: 600,
+                          display: 'inline-flex',
+                          alignItems: 'flex-start',
+                          gap: 6,
+                        }}
+                      >
+                        <ArrowRight size={12} style={{ marginTop: 3, flexShrink: 0 }} />
+                        <span>{f.resolutionQuestion}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}

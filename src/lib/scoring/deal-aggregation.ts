@@ -1,13 +1,16 @@
 /**
- * Deal-level aggregation — composite DQI + bias signature across the
- * documents linked to a single Deal.
+ * Multi-document aggregation — composite DQI + bias signature across a
+ * set of documents that share a common decision context.
  *
- * Why: a deal isn't one memo. It's a CIM, a model, a board deck, a
- * counsel memo, a KPI report. Looking at any single doc's DQI tells you
- * about that artifact, not the decision. The "atomic decision unit" view
- * (3.1) needs an aggregate. This utility is the single source of truth
- * for that aggregation so deal hero, deal kanban cards, and the bias
- * signature card all agree on the math.
+ * Originally written for the Deal model (3.1 deep) where the atomic
+ * decision unit is a CIM + model + counsel memo + IC deck. The same
+ * math now also drives DecisionPackage (4.4 deep) for non-deal
+ * decisions: board recommendations, market-entry recs, RFP responses.
+ *
+ * The function signature is identical for both — pass the latest analysis
+ * per document, get composite DQI + bias signature back. The Deal-flavoured
+ * type alias and `aggregateDeal` export are preserved for backwards
+ * compatibility; new call sites should use `aggregateAnalyses`.
  *
  * Aggregation rules:
  * - Composite DQI: equal-weighted mean of the latest analysis per
@@ -22,7 +25,7 @@
  *   beats sophistication here — every CSO can explain "the average."
  */
 
-export interface DealDocAnalysis {
+export interface AnalyzedDocument {
   documentId: string;
   analysisId: string;
   overallScore: number;
@@ -32,6 +35,9 @@ export interface DealDocAnalysis {
   }>;
 }
 
+/** @deprecated Use AnalyzedDocument. Kept for backwards-compat. */
+export type DealDocAnalysis = AnalyzedDocument;
+
 export interface BiasSignatureEntry {
   biasType: string;
   documentCount: number; // # of distinct docs in this deal where this bias was flagged
@@ -39,7 +45,7 @@ export interface BiasSignatureEntry {
   topSeverity: 'critical' | 'high' | 'medium' | 'low';
 }
 
-export interface DealAggregation {
+export interface AnalysesAggregation {
   /** Composite DQI score 0-100. null when no docs are analyzed. */
   compositeDqi: number | null;
   /** Composite DQI grade (A/B/C/D/F) — null when compositeDqi is null. */
@@ -55,6 +61,9 @@ export interface DealAggregation {
   /** All biases across all docs, including non-recurring (count===1). */
   allBiases: BiasSignatureEntry[];
 }
+
+/** @deprecated Use AnalysesAggregation. Kept for backwards-compat. */
+export type DealAggregation = AnalysesAggregation;
 
 const SEVERITY_ORDER: Record<string, number> = {
   critical: 4,
@@ -83,7 +92,7 @@ function gradeFromScore(score: number): 'A' | 'B' | 'C' | 'D' | 'F' {
   return 'F';
 }
 
-export function aggregateDeal(latestAnalyses: DealDocAnalysis[]): DealAggregation {
+export function aggregateAnalyses(latestAnalyses: AnalyzedDocument[]): AnalysesAggregation {
   if (latestAnalyses.length === 0) {
     return {
       compositeDqi: null,
@@ -145,3 +154,10 @@ export function aggregateDeal(latestAnalyses: DealDocAnalysis[]): DealAggregatio
     allBiases,
   };
 }
+
+/**
+ * Backwards-compat alias for `aggregateAnalyses`. Existing deal call
+ * sites import `aggregateDeal`; new package call sites should import
+ * `aggregateAnalyses` directly. Identical behaviour.
+ */
+export const aggregateDeal = aggregateAnalyses;
