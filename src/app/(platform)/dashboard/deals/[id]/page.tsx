@@ -22,6 +22,7 @@ import { DealOutcomeDisplay } from '@/components/deals/DealOutcomeDisplay';
 import { DecisionBriefTab } from '@/components/deals/DecisionBriefTab';
 import { UpgradeFromAudit } from '@/components/deals/UpgradeFromAudit';
 import { DealCompositeHero } from '@/components/deals/DealCompositeHero';
+import { DealCounterfactualHero } from '@/components/deals/DealCounterfactualHero';
 import { UploadToDealButton } from '@/components/deals/UploadToDealButton';
 import { CrossReferenceCard } from '@/components/deals/CrossReferenceCard';
 import {
@@ -289,6 +290,12 @@ export default function DealDetailPage() {
             totalDocs={deal.documents?.length || 0}
           />
         )}
+
+        {/* Deal-level counterfactual ROI (Marcus's audit ask). Renders
+            null until the deal has ≥2 analyzed docs AND the aggregate
+            improvement is positive — single-doc deals already have the
+            CounterfactualPanel on the document page. */}
+        <DealCounterfactualHero dealId={deal.id} />
 
         {/* Cross-document conflict surface (3.1 deep) — the deal-level
             agent that catches "CIM says 40% growth, model assumes 15%"
