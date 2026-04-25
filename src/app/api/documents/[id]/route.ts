@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
 import { getDocumentContent } from '@/lib/utils/encryption';
+import { buildDocumentAccessWhere } from '@/lib/utils/document-access';
 
 const log = createLogger('DocumentRoute');
 
@@ -20,35 +21,17 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Include org-scoped documents so team members can view shared docs
-    // (matches the pattern used in the document listing route). Soft-deleted
-    // rows (deletedAt != null) are excluded — recoverable for the grace
-    // window via support, invisible everywhere else.
-    let where: {
+    // Document-level RBAC (3.5): the visibility model now governs read
+    // access. The owner always wins; teammates see 'team' docs; explicit
+    // grantees see 'specific' docs; nobody else sees 'private' docs.
+    // buildDocumentAccessWhere also excludes soft-deleted rows.
+    const access = await buildDocumentAccessWhere(id, userId);
+    const where = access.where as {
       id: string;
       userId?: string;
       OR?: Array<Record<string, unknown>>;
       deletedAt?: null;
-    } = {
-      id,
-      userId,
-      deletedAt: null,
     };
-    try {
-      const membership = await prisma.teamMember.findFirst({
-        where: { userId },
-        select: { orgId: true },
-      });
-      if (membership?.orgId) {
-        where = {
-          id,
-          OR: [{ userId }, { orgId: membership.orgId }],
-          deletedAt: null,
-        };
-      }
-    } catch {
-      // Schema drift — fall back to userId-only
-    }
 
     // Try with all analysis fields first; fall back to core-only if
     // extended columns don't exist yet (schema drift / P2022).
@@ -58,6 +41,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         where,
         select: {
           id: true,
+          userId: true,
           filename: true,
           fileType: true,
           fileSize: true,
@@ -67,6 +51,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
           contentTag: true,
           uploadedAt: true,
           status: true,
+          visibility: true,
           deal: {
             select: {
               id: true,
@@ -163,7 +148,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
             dealRaw.ticketSize != null ? Number(dealRaw.ticketSize as unknown as string) : null,
         }
       : null;
-    return NextResponse.json({ ...docFields, deal, content: decryptedContent });
+    const isOwner = (docFields as { userId?: string }).userId === userId;
+    return NextResponse.json({
+      ...docFields,
+      deal,
+      content: decryptedContent,
+      isOwner,
+    });
   } catch (error) {
     log.error('Error fetching document:', error);
     return NextResponse.json({ error: 'Failed to fetch document' }, { status: 500 });

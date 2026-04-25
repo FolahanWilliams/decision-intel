@@ -49,6 +49,13 @@ model Document {
   /// anchoring_bias emerged" delta loop.
   parentDocumentId String?
   versionNumber    Int                 @default(1)
+  /// Document-level access control (3.5). Values:
+  ///   'private' — only `userId` can read/write (default for new uploads).
+  ///   'team'    — anyone in the same org (matches the pre-3.5 default).
+  ///   'specific' — explicit allowlist via DocumentAccess rows.
+  /// The owner (matching `userId`) always retains full access regardless of
+  /// this setting; visibility only controls what additional users can see.
+  visibility       String              @default("team")
   parentDocument   Document?           @relation("DocumentVersions", fields: [parentDocumentId], references: [id], onDelete: SetNull)
   childVersions    Document[]          @relation("DocumentVersions")
   deal             Deal?               @relation(fields: [dealId], references: [id], onDelete: SetNull)
@@ -56,6 +63,7 @@ model Document {
   embeddings       DecisionEmbedding[]
   failedAnalyses   FailedAnalysis[]
   decisionFrame    DecisionFrame?
+  documentAccess   DocumentAccess[]
 
   @@index([userId])
   @@index([orgId])
@@ -68,6 +76,23 @@ model Document {
   @@index([orgId, isSample])
   @@index([deletedAt])
   @@index([parentDocumentId, versionNumber])
+}
+
+/// Document-level access grants for the `visibility = 'specific'` mode (3.5).
+/// One row per (document, user) grant. The Document.userId owner is implicit
+/// — they always have full access; this table only holds *additional* grants.
+model DocumentAccess {
+  id          String   @id @default(cuid())
+  documentId  String
+  userId      String // grantee — references Supabase auth.users.id; not a relation since user IDs live across systems
+  permission  String   @default("read") // 'read' | 'write' (write reserved for 2.x collab; v1 only enforces read)
+  grantedById String // who issued the grant (typically the document owner)
+  grantedAt   DateTime @default(now())
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, userId])
+  @@index([userId])
+  @@index([documentId])
 }
 
 model Analysis {

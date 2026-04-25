@@ -54,6 +54,11 @@ import { R2FDecompositionCard } from '@/components/documents/R2FDecompositionCar
 import { R2FBadge } from '@/components/ui/R2FBadge';
 import { ReferenceClassChip } from '@/components/documents/ReferenceClassChip';
 import { ReportOutcomeFab } from '@/components/documents/ReportOutcomeFab';
+import {
+  DocumentVisibilityModal,
+  DocumentVisibilityPill,
+  type DocumentVisibility,
+} from '@/components/documents/DocumentVisibilityModal';
 import { DrRedTeamCard } from '@/components/analysis/DrRedTeamCard';
 import { RecommendationsPanel } from '@/components/ui/RecommendationsPanel';
 import { ExecutiveSummary } from '@/components/visualizations/ExecutiveSummary';
@@ -223,6 +228,7 @@ interface Analysis {
 
 interface Document {
   id: string;
+  userId?: string;
   filename: string;
   fileType: string;
   fileSize: number;
@@ -230,7 +236,9 @@ interface Document {
   uploadedAt: string;
   status: string;
   isSample?: boolean;
+  isOwner?: boolean;
   documentType?: string | null;
+  visibility?: 'private' | 'team' | 'specific';
   analyses: Analysis[];
   deal?: {
     id: string;
@@ -351,6 +359,8 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
   const [, setIsExportingPdf] = useState(false);
   const [, setIsExportingCsv] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showVisibilityModal, setShowVisibilityModal] = useState(false);
+  const [visibilityState, setVisibilityState] = useState<DocumentVisibility | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUploadingVersion, setIsUploadingVersion] = useState(false);
@@ -511,6 +521,9 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         if (!res.ok) throw new Error('Document not found');
         const data = await res.json();
         setDocument(data);
+        // Seed the visibility pill from the API payload so the UI reflects
+        // the persisted value before the user opens the modal.
+        if (data.visibility) setVisibilityState(data.visibility as DocumentVisibility);
         if (data.analyses?.[0]?.biases?.[0]) {
           setSelectedBias(null); // Don't auto-select
         }
@@ -1247,6 +1260,14 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                   </span>
                 )}
                 {analysis && <R2FBadge size="xs" compact />}
+                {visibilityState && (
+                  <DocumentVisibilityPill
+                    visibility={visibilityState}
+                    onClick={
+                      document.isOwner ? () => setShowVisibilityModal(true) : undefined
+                    }
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -3002,6 +3023,16 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           onExportCsv={handleCsvExport}
           onExportMarkdown={handleMarkdownExport}
           onExportJson={handleJsonExport}
+        />
+      )}
+
+      {/* Document visibility (3.5) — owner-only modal. */}
+      {document.isOwner && (
+        <DocumentVisibilityModal
+          documentId={document.id}
+          isOpen={showVisibilityModal}
+          onClose={() => setShowVisibilityModal(false)}
+          onSaved={vis => setVisibilityState(vis)}
         />
       )}
 
