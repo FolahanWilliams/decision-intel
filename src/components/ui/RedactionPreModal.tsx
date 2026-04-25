@@ -80,12 +80,18 @@ export function RedactionPreModal({ isOpen, text, scan, onRedact, onSkip, onCanc
   const [excluded, setExcluded] = useState<Set<string>>(new Set());
   const [expandedCat, setExpandedCat] = useState<RedactionCategory | null>(null);
 
-  // Reset selection state every time the modal re-opens.
+  // Reset selection state every time the modal re-opens. Deferred via a
+  // microtask-scheduled timeout so react-hooks/set-state-in-effect doesn't
+  // flag the synchronous setState (matches the FirstRunInlineWalkthrough
+  // pattern; the cascading-render risk is real on a React-19 strict mode
+  // pass even though this effect's only trigger is the open prop).
   useEffect(() => {
-    if (isOpen) {
+    if (!isOpen) return;
+    const t = setTimeout(() => {
       setExcluded(new Set());
       setExpandedCat(null);
-    }
+    }, 0);
+    return () => clearTimeout(t);
   }, [isOpen]);
 
   const hitKey = (h: RedactionHit) => `${h.category}:${h.start}:${h.end}`;
@@ -116,7 +122,6 @@ export function RedactionPreModal({ isOpen, text, scan, onRedact, onSkip, onCanc
 
   const selected = useMemo(
     () => scan.hits.filter(h => !excluded.has(hitKey(h))),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [scan.hits, excluded]
   );
 

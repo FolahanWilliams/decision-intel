@@ -32,7 +32,7 @@ export interface DocumentAccessFilter {
   grantedDocumentIds: string[];
 }
 
-export interface DocumentAccessResolution extends DocumentAccessFilter {}
+export type DocumentAccessResolution = DocumentAccessFilter;
 
 /**
  * Builds the OR clauses + deletedAt filter for ANY document the given user

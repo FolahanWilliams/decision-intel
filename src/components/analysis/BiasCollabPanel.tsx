@@ -196,6 +196,13 @@ function TaskRow({
   onDelete: (task: BiasTask) => void;
   isCreator: boolean;
 }) {
+  // Capture "now" once at mount via useState's lazy initializer so the
+  // render body stays pure (react-hooks/purity rejects Date.now() inside
+  // JSX or useMemo bodies; useState lazy init is the sanctioned escape
+  // hatch). The overdue / soon chip reads relative to this value; the
+  // value refreshes on the next remount, which is fine for a chip that
+  // doesn't need live ticking.
+  const [nowMs] = useState(() => Date.now());
   return (
     <div
       style={{
@@ -252,11 +259,11 @@ function TaskRow({
         {task.dueAt && (() => {
           const due = new Date(task.dueAt);
           const isOverdue =
-            due.getTime() < Date.now() &&
+            due.getTime() < nowMs &&
             task.status !== 'resolved' &&
             task.status !== 'dismissed';
           const soonMs = 48 * 3600 * 1000;
-          const isSoon = !isOverdue && due.getTime() - Date.now() < soonMs;
+          const isSoon = !isOverdue && due.getTime() - nowMs < soonMs;
           return (
             <span
               className="inline-flex items-center gap-1"
