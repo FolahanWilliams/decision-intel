@@ -375,9 +375,10 @@ Vercel build hangs cost ~$0 in money but ~45 minutes per attempt. The 2026-04-22
 - Sentry plugin telemetry — `telemetry: false` in `withSentryConfig`.
 - Sentry source-map upload — DISABLED in `withSentryConfig`. **This is the load-bearing fix; do not revert.** Source maps will be uploaded post-deploy via the separate `npm run sentry:upload-sourcemaps` step (see Environment Variables → `SENTRY_AUTH_TOKEN`).
 - Edge runtime on `app/opengraph-image.tsx` — file deleted; static OG image lives in `public/` instead.
-- Heap exhaustion — `--max-old-space-size=6144` in NODE_OPTIONS gives webpack 6GB on Vercel's 8GB build container.
+- Heap exhaustion — `--max-old-space-size=7168` in NODE_OPTIONS gives webpack ~7 GB on Vercel's 8 GB build container; the pre-build tsc runs at `--max-old-space-size=3584` (~3.5 GB) in its own process, exits, then webpack starts.
 - TypeScript errors — `npx tsc --noEmit` now runs clean; type-check phase no longer hangs silently on errors.
-- **Stacked heap from two concurrent TS checks** (new 2026-04-23, deploy 4Sz9sqTpr, exit 137 after 6 min in "Running TypeScript..."). Next.js runs its own in-process TS check AFTER webpack compile finishes; combined with webpack's own heap it blew past 8 GB. Fix shipped: `typescript: { ignoreBuildErrors: true }` in next.config.ts, plus an explicit `NODE_OPTIONS='--max-old-space-size=4096' npx tsc --noEmit` step in the build script that runs **before** `next build`. The external tsc runs in its own process (~3 GB peak, then exits), then webpack runs at ~5 GB peak — never overlapping. Do NOT flip `ignoreBuildErrors` off without also removing the explicit tsc step, or type-checking gets silently skipped.
+- **Stacked heap from two concurrent TS checks** (2026-04-23, deploy 4Sz9sqTpr, exit 137 after 6 min in "Running TypeScript..."). Next.js runs its own in-process TS check AFTER webpack compile finishes; combined with webpack's own heap it blew past 8 GB. Fix shipped: `typescript: { ignoreBuildErrors: true }` in next.config.ts, plus an explicit `NODE_OPTIONS='--max-old-space-size=3584' npx tsc --noEmit` step in the build script that runs **before** `next build`. The external tsc runs in its own process (~3 GB peak, then exits), then webpack runs at ~5 GB peak — never overlapping. Do NOT flip `ignoreBuildErrors` off without also removing the explicit tsc step, or type-checking gets silently skipped.
+- **Webpack OOM at 6 GB heap** (2026-04-25, exit 137 during "Creating an optimized production build"). Codebase grew large enough that webpack's compile pass exceeded 6 GB even after the tsc step had freed its memory. Two-line fix shipped: (a) bumped webpack heap to 7168 (giving webpack ~7 GB on the 8 GB container, leaving ~1 GB for parent Node + container overhead) and dropped tsc heap to 3584 to phase the pressure cleanly, (b) enabled `experimental.webpackMemoryOptimizations: true` in next.config.ts — Next 16's built-in webpack memory optimization that drops a few non-essential webpack passes (unused-variable analysis tuning, some source-map auxiliary work) to keep peak memory under the 8 GB ceiling. No runtime impact; only changes how webpack does its bookkeeping during compile. If webpack OOMs again, the next move is `experimental.webpackBuildWorker: false` (Next 16+ runs webpack in a worker by default; disabling it can paradoxically reduce peak memory by avoiding the worker's own heap), or splitting heavy routes via dynamic imports. Do NOT raise the heap above 7168 — that pushes the process into the parent-Node + container-overhead window and the SIGKILL fires.
 
 **The load-bearing config — do not change without a passing build to prove the alternative works:**
 
@@ -385,7 +386,8 @@ Vercel build hangs cost ~$0 in money but ~45 minutes per attempt. The 2026-04-22
 - `next.config.ts` Sentry options: `sourcemaps: { disable: true }`
 - `next.config.ts` compiler: `compiler: { styledJsx: false }`
 - `next.config.ts` typescript: `{ ignoreBuildErrors: true }` — paired with the external tsc step above. Flip one, flip both.
-- `NODE_OPTIONS='--max-old-space-size=6144'` on `next build`; `--max-old-space-size=4096` on the pre-build `tsc --noEmit`.
+- `NODE_OPTIONS='--max-old-space-size=7168'` on `next build`; `--max-old-space-size=3584` on the pre-build `tsc --noEmit` (raised webpack / lowered tsc 2026-04-25 to fix webpack OOM at the previous 6144 ceiling).
+- `next.config.ts` `experimental.webpackMemoryOptimizations: true` (added 2026-04-25 alongside the heap rebalance — Next 16's built-in webpack memory optimization).
 
 ## Session Workflow
 

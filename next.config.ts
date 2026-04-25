@@ -116,6 +116,13 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: '10mb',
     },
+    // 2026-04-25: Vercel build OOM (exit 137) during `next build --webpack`
+    // at 6 GB heap. Next.js 16's webpackMemoryOptimizations flag drops a
+    // few non-essential webpack passes (unused-variable analysis tuning,
+    // some source-map auxiliary work) to keep peak memory under the 8 GB
+    // container ceiling. No runtime impact; it only changes how webpack
+    // does its bookkeeping during compile.
+    webpackMemoryOptimizations: true,
   },
   // 2026-04-22: Next.js 16.2.x SWC hits an infinite-loop bug when
   // processing inline `<style>{`@media ...`}</style>` blocks via the
