@@ -213,7 +213,7 @@ function createModelByName(name: string, options?: { temperature?: number }): Ge
 
 /**
  * Parse NOISE_JURY_MODELS env var for multi-model noise jury configuration.
- * Format: comma-separated model names, e.g. "gemini-2.5-flash,gemini-2.5-pro,gemini-2.0-flash"
+ * Format: comma-separated model names, e.g. "gemini-3-flash-preview,gemini-2.5-pro,gemini-3.1-flash-lite"
  * Returns empty array if not set (falls back to default single-model jury).
  */
 function getNoiseJuryModels(): string[] {

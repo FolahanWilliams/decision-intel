@@ -131,6 +131,33 @@ function LoginContent() {
     });
   };
 
+  /**
+   * Before attempting password auth, probe whether the email's domain has
+   * an active SAML SSO configuration. If it does, the API returns a redirect
+   * URL to the IdP and we short-circuit — password auth is bypassed because
+   * enterprise SSO overrides local credentials. If the domain has no SSO,
+   * the probe returns { ssoEnabled: false } and we fall through to the
+   * existing email+password / Google OAuth paths unchanged.
+   *
+   * The probe endpoint is rate-limited per-IP to avoid becoming a
+   * "which-companies-use-DI" enumeration oracle.
+   */
+  const probeSsoForEmail = async (candidate: string): Promise<string | null> => {
+    try {
+      const res = await fetch('/api/sso/initiate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: candidate }),
+      });
+      if (!res.ok) return null;
+      const data = (await res.json()) as { ssoEnabled?: boolean; redirectUrl?: string };
+      if (data.ssoEnabled && data.redirectUrl) return data.redirectUrl;
+      return null;
+    } catch {
+      return null;
+    }
+  };
+
   const handleEmailAuth = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFormError(null);
@@ -152,6 +179,14 @@ function LoginContent() {
 
     try {
       if (mode === 'signin') {
+        // SSO probe first — enterprise SSO overrides local password auth.
+        const ssoUrl = await probeSsoForEmail(email);
+        if (ssoUrl) {
+          trackEvent('signin_sso_initiated', {});
+          window.location.href = ssoUrl;
+          return;
+        }
+
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         const safeRedirect = redirectTo && /^\/[^/]/.test(redirectTo) ? redirectTo : '/dashboard';

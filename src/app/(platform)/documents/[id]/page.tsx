@@ -89,7 +89,9 @@ const BiasNetwork = dynamic(
   { ssr: false }
 );
 import { ShareModal } from '@/components/ui/ShareModal';
-import { Share2, ShieldCheck } from 'lucide-react';
+import { Share2, ShieldCheck, Trash2, GitBranch, Upload } from 'lucide-react';
+import { VersionHistoryStrip } from '@/components/analysis/VersionHistoryStrip';
+import { VersionDeltaCard } from '@/components/analysis/VersionDeltaCard';
 
 // Lazy-loaded tab components
 const OverviewTab = lazy(() =>
@@ -342,6 +344,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
   const [, setIsExportingPdf] = useState(false);
   const [, setIsExportingCsv] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isUploadingVersion, setIsUploadingVersion] = useState(false);
+  const [versionUploadError, setVersionUploadError] = useState<string | null>(null);
+  const versionFileInputRef = useRef<HTMLInputElement | null>(null);
   const scanAbortRef = useRef<AbortController | null>(null);
 
   // Decision prior state
@@ -526,6 +533,38 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       scanAbortRef.current?.abort();
     };
   }, []);
+
+  // "Upload new version" — sends the file to /api/upload with
+  // versionOfDocumentId set to the current document. The API resolves the
+  // chain root, computes nextVersionNumber, and the analyze pipeline auto-
+  // links previousAnalysisId on the new analysis. We navigate to the new
+  // doc on success so the user sees the VersionDeltaCard render in place.
+  const handleVersionFilePicked = async (file: File) => {
+    if (!document?.id) return;
+    setVersionUploadError(null);
+    setIsUploadingVersion(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('versionOfDocumentId', document.id);
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || `Upload failed (${res.status})`);
+      }
+      const data = (await res.json()) as { id?: string };
+      if (!data.id) throw new Error('Upload returned no document id');
+      showToast('New version uploaded — running audit now…', 'success');
+      // Navigate to the new doc; the analyze stream picks up automatically
+      // and the VersionDeltaCard renders once the new Analysis is persisted.
+      router.push(`/documents/${data.id}`);
+    } catch (err) {
+      log.error('version upload failed:', err);
+      setVersionUploadError(err instanceof Error ? err.message : 'Upload failed');
+    } finally {
+      setIsUploadingVersion(false);
+    }
+  };
 
   const handleBoardReportExport = async () => {
     if (!document || !analysis) return;
@@ -1286,6 +1325,50 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                   Decision Provenance Record
                 </button>
               )}
+              <button
+                onClick={() => versionFileInputRef.current?.click()}
+                disabled={isUploadingVersion}
+                className="btn btn-sm flex items-center gap-sm"
+                style={{
+                  background: 'transparent',
+                  border: '1px solid var(--accent-primary)',
+                  color: 'var(--accent-primary)',
+                  fontWeight: 600,
+                  opacity: isUploadingVersion ? 0.6 : 1,
+                }}
+                aria-label="Upload new version"
+                title="Upload a revised version of this memo. The new audit shows DQI delta + biases resolved/emerged."
+              >
+                {isUploadingVersion ? <Upload size={14} className="animate-pulse" /> : <GitBranch size={14} />}
+                {isUploadingVersion ? 'Uploading…' : 'Upload new version'}
+              </button>
+              <input
+                ref={versionFileInputRef}
+                type="file"
+                accept=".pdf,.docx,.doc,.txt,.md,.rtf"
+                style={{ display: 'none' }}
+                onChange={e => {
+                  const file = e.target.files?.[0];
+                  if (file) void handleVersionFilePicked(file);
+                  // Reset so picking the same filename twice still fires onChange.
+                  e.target.value = '';
+                }}
+              />
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                className="btn btn-sm flex items-center gap-sm"
+                style={{
+                  background: 'transparent',
+                  border: '1px solid var(--border-color)',
+                  color: 'var(--severity-high)',
+                  fontWeight: 600,
+                }}
+                aria-label="Delete document"
+                title="Soft-delete this document. Recoverable during the grace window; hard-purged after that."
+              >
+                <Trash2 size={14} />
+                Delete
+              </button>
             </div>
           </div>
         </div>
@@ -1414,6 +1497,55 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             </div>
           );
         })()}
+
+      {versionUploadError && (
+        <div
+          role="alert"
+          style={{
+            padding: '8px 12px',
+            background: 'var(--severity-high)10',
+            border: '1px solid var(--severity-high)',
+            borderRadius: 'var(--radius-sm)',
+            color: 'var(--severity-high)',
+            fontSize: 13,
+            marginBottom: 12,
+          }}
+        >
+          {versionUploadError}
+        </div>
+      )}
+
+      {/* Document version chain — only renders when ≥2 versions exist. */}
+      {document?.id && (
+        <ErrorBoundary sectionName="Version history strip">
+          <VersionHistoryStrip documentId={document.id} />
+        </ErrorBoundary>
+      )}
+
+      {/* Cross-version delta — only renders when this analysis is linked
+          to a predecessor via Analysis.previousAnalysisId. Quietly null when
+          this is v1. The cast through `unknown` keeps TS happy while the
+          new previousAnalysisId field propagates through the wider typed
+          surfaces. */}
+      {(() => {
+        const prevId = (
+          analysis as unknown as { previousAnalysisId?: string | null } | undefined
+        )?.previousAnalysisId;
+        if (!analysis || !prevId) return null;
+        return (
+          <ErrorBoundary sectionName="Version delta card">
+            <VersionDeltaCard
+              current={{
+                id: analysis.id,
+                overallScore: analysis.overallScore,
+                noiseScore: analysis.noiseScore,
+                biases: biases.map(b => ({ biasType: b.biasType, severity: b.severity })),
+              }}
+              previousAnalysisId={prevId}
+            />
+          </ErrorBoundary>
+        );
+      })()}
 
       {/* Temporal phase scrub — sits above the Executive Summary since
           it frames the entire document view. Swapping phases swaps the
@@ -2866,6 +2998,110 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       )}
 
       {analysis && <ReportOutcomeFab outcomeStatus={analysis.outcomeStatus} phase={phase} />}
+
+      {/* Delete confirmation — soft-delete with grace-window framing.
+          Hard-purge happens later via the enforce-retention cron, never
+          synchronously, so the user-perceived action is reversible during
+          the grace window. */}
+      {showDeleteConfirm && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-confirm-title"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.55)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: 'var(--spacing-lg)',
+          }}
+          onClick={() => !isDeleting && setShowDeleteConfirm(false)}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-lg)',
+              padding: 'var(--spacing-lg)',
+              maxWidth: 480,
+              width: '100%',
+              boxShadow: 'var(--shadow-lg)',
+            }}
+          >
+            <div className="flex items-start gap-3 mb-4">
+              <Trash2 size={20} style={{ color: 'var(--severity-high)', marginTop: 2 }} />
+              <div>
+                <h2 id="delete-confirm-title" style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)' }}>
+                  Delete this document?
+                </h2>
+                <p
+                  className="text-sm mt-2"
+                  style={{ color: 'var(--text-secondary)', lineHeight: 1.55 }}
+                >
+                  <strong>{document.filename}</strong> will be soft-deleted immediately and
+                  invisible across the platform. The document and its analyses are recoverable via
+                  support during the 30-day grace window, then permanently purged (DB rows + storage
+                  blob) by the retention cron.
+                </p>
+                <p className="text-xs mt-3" style={{ color: 'var(--text-muted)' }}>
+                  This action is logged to the audit trail.
+                </p>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 mt-2">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={isDeleting}
+                className="btn btn-secondary btn-sm"
+              >
+                Cancel
+              </button>
+              <button
+                disabled={isDeleting}
+                onClick={async () => {
+                  setIsDeleting(true);
+                  try {
+                    const res = await fetch(`/api/documents/${document.id}`, { method: 'DELETE' });
+                    if (!res.ok) {
+                      const body = await res.json().catch(() => ({}));
+                      showToast(
+                        body.error ||
+                          `Delete failed (${res.status}). Please retry or contact support.`,
+                        'error'
+                      );
+                      setIsDeleting(false);
+                      return;
+                    }
+                    showToast(
+                      'Document deleted. Recoverable during the 30-day grace window.',
+                      'success'
+                    );
+                    setShowDeleteConfirm(false);
+                    router.push('/dashboard/documents');
+                  } catch (err) {
+                    log.error('document delete failed:', err);
+                    showToast('Delete failed. Please retry.', 'error');
+                    setIsDeleting(false);
+                  }
+                }}
+                className="btn btn-sm"
+                style={{
+                  background: 'var(--severity-high)',
+                  color: 'white',
+                  fontWeight: 600,
+                  opacity: isDeleting ? 0.6 : 1,
+                }}
+              >
+                {isDeleting ? 'Deleting…' : 'Delete document'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

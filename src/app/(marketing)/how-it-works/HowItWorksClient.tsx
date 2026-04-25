@@ -177,6 +177,15 @@ const RESEARCH_CITATIONS = [
       'Source for the 11 strategy-specific biases (entry-price anchor, thesis confirmation, winner\u2019s curse, management halo).',
     featureName: '11 strategy biases',
   },
+  {
+    authorMonogram: 'RD',
+    authors: 'Ray Dalio',
+    title: 'Principles for Dealing with the Changing World Order',
+    year: '2021',
+    connection:
+      '18 rise-and-fall determinants (debt cycle, currency cycle, reserve-currency status, governance, infrastructure) feed the Structural Assumptions audit — the macro-layer pass that sits beside cognitive-bias detection, asking what the plan is betting on about the world.',
+    featureName: 'Structural Assumptions',
+  },
 ];
 
 export function HowItWorksClient() {

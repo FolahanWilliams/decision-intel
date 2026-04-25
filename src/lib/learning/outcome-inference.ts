@@ -55,7 +55,7 @@ function getModel() {
   const apiKey = process.env.GOOGLE_API_KEY;
   if (!apiKey) throw new Error('GOOGLE_API_KEY not set');
   const genAI = new GoogleGenerativeAI(apiKey);
-  const modelName = process.env.GEMINI_MODEL_NAME || 'gemini-2.0-flash';
+  const modelName = process.env.GEMINI_MODEL_NAME || 'gemini-3.1-flash-lite';
   return genAI.getGenerativeModel({
     model: modelName,
     generationConfig: {
@@ -504,7 +504,7 @@ export async function detectOutcomesFromWeb(
 
         const genAI = new GoogleGenerativeAI(apiKey);
         const groundedModel = genAI.getGenerativeModel({
-          model: process.env.GEMINI_MODEL_NAME || 'gemini-2.0-flash',
+          model: process.env.GEMINI_MODEL_NAME || 'gemini-3-flash-preview',
           tools: [{ googleSearch: {} } as import('@google/generative-ai').Tool],
           generationConfig: {
             responseMimeType: 'application/json',

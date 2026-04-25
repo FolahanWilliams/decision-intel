@@ -47,7 +47,7 @@ export async function generateText(
   options?: GenerateTextOptions
 ): Promise<GenerateTextResult> {
   const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
-  const modelName = options?.model ?? getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-2.0-flash');
+  const modelName = options?.model ?? getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview');
 
   const genAI = getGenAI(apiKey);
 

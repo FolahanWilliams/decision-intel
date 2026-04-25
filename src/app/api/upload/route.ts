@@ -53,6 +53,12 @@ export async function POST(request: NextRequest) {
     const frameId = formData.get('frameId') as string | null;
     const documentType = formData.get('documentType') as string | null;
     const dealId = formData.get('dealId') as string | null;
+    /** When set, this upload becomes a NEW VERSION of the referenced document.
+     *  parentDocumentId is normalised to point at the chain root (v1.id), and
+     *  versionNumber is computed as max(existing siblings) + 1. The analyze
+     *  pipeline picks up `previousAnalysisId` automatically off the schema
+     *  link. Plan reference: 2.3 — versioning + delta DQI. */
+    const versionOfRaw = formData.get('versionOfDocumentId') as string | null;
 
     // Validate documentType against known investment document types
     const VALID_DOC_TYPES = [
@@ -178,6 +184,62 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Resolve version-chain ancestor when versionOfDocumentId is provided.
+    // We anchor parentDocumentId on the CHAIN ROOT (always v1.id), so v3
+    // points to v1 just like v2 does. versionNumber is computed as
+    // max(existing chain siblings) + 1. The new analysis's
+    // previousAnalysisId is wired in /api/analyze/stream (it queries the
+    // immediate predecessor by versionNumber - 1 in the same chain).
+    let resolvedParentDocumentId: string | null = null;
+    let resolvedVersionNumber = 1;
+    if (versionOfRaw && versionOfRaw.trim().length > 0) {
+      try {
+        const target = await prisma.document.findUnique({
+          where: { id: versionOfRaw.trim() },
+          select: {
+            id: true,
+            userId: true,
+            orgId: true,
+            parentDocumentId: true,
+            versionNumber: true,
+            deletedAt: true,
+          },
+        });
+        if (!target || target.deletedAt) {
+          return NextResponse.json(
+            { error: 'Cannot version: source document not found' },
+            { status: 400 }
+          );
+        }
+        // Access check on the source — same policy as the GET on documents/[id].
+        const ownsTarget = target.userId === userId;
+        const sharedOrg =
+          !ownsTarget && target.orgId && userOrgId && target.orgId === userOrgId;
+        if (!ownsTarget && !sharedOrg) {
+          return NextResponse.json(
+            { error: 'Cannot version: access denied to source document' },
+            { status: 403 }
+          );
+        }
+        const rootId = target.parentDocumentId ?? target.id;
+        const maxSibling = await prisma.document.aggregate({
+          where: {
+            OR: [{ id: rootId }, { parentDocumentId: rootId }],
+            deletedAt: null,
+          },
+          _max: { versionNumber: true },
+        });
+        const nextVersion = (maxSibling._max.versionNumber ?? 1) + 1;
+        resolvedParentDocumentId = rootId;
+        resolvedVersionNumber = nextVersion;
+        log.info(
+          `Versioned upload: rootId=${rootId} nextVersion=${nextVersion} (source=${target.id})`
+        );
+      } catch (lookupErr) {
+        log.warn('versionOfDocumentId lookup failed (proceeding as v1):', lookupErr);
+      }
+    }
+
     // Extract text content
     let content = '';
 
@@ -218,6 +280,9 @@ export async function POST(request: NextRequest) {
           status: 'pending',
           ...(documentType ? { documentType } : {}),
           ...(dealId ? { dealId } : {}),
+          ...(resolvedParentDocumentId
+            ? { parentDocumentId: resolvedParentDocumentId, versionNumber: resolvedVersionNumber }
+            : {}),
         },
       });
     } catch (dbError: unknown) {
@@ -268,6 +333,9 @@ export async function POST(request: NextRequest) {
             status: 'pending',
             ...(documentType ? { documentType } : {}),
             ...(dealId ? { dealId } : {}),
+            ...(resolvedParentDocumentId
+              ? { parentDocumentId: resolvedParentDocumentId, versionNumber: resolvedVersionNumber }
+              : {}),
           },
         });
       } else {

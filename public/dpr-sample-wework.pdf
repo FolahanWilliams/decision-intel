@@ -1,0 +1,730 @@
+%PDF-1.3
+%ºß¬à
+3 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/MediaBox [0 0 595.2799999999999727 841.8899999999999864]
+/Contents 4 0 R
+>>
+endobj
+4 0 obj
+<<
+/Length 3963
+>>
+stream
+0.5670000000000001 w
+0 G
+0.06 0.09 0.16 rg
+0. 841.8899999999999864 595.2799999999999727 -45.354330708661422 re
+f
+BT
+/F2 11 Tf
+12.6499999999999986 TL
+1. g
+56.6929133858267775 813.5435433070865656 Td
+(DECISION INTEL · Decision Provenance Record) Tj
+ET
+BT
+/F1 9 Tf
+10.3499999999999996 TL
+1. g
+388.5570866141731017 813.5435433070865656 Td
+(SAMPLE · for procurement evaluation) Tj
+ET
+BT
+/F2 22 Tf
+25.2999999999999972 TL
+0.059 0.09 0.165 rg
+56.6929133858267775 768.1892125984252289 Td
+(Audit of a private-market growth-company prospectus) Tj
+ET
+BT
+/F3 10 Tf
+11.5 TL
+0.392 0.455 0.545 rg
+56.6929133858267775 739.8427559055118081 Td
+(Anonymised from a 2019 Form S-1 that was withdrawn 33 days after filing.) Tj
+ET
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.059 0.09 0.165 rg
+56.6929133858267775 717.1655905511811397 Td
+(Record identity) Tj
+ET
+BT
+/F5 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 700.15771653543311 Td
+(record-id           dpr_sample_0001_anonymised) Tj
+ET
+BT
+/F5 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 688.0254330708661428 Td
+(audit-timestamp     2026-04-24T09:14:07Z) Tj
+ET
+BT
+/F5 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 675.8931496062991755 Td
+(pipeline-version    di-pipeline@v12.3.1) Tj
+ET
+BT
+/F5 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 663.7608661417322082 Td
+(input-hash          sha256:4a7f3d21c8e0…6f8e2d91 \(sample\)) Tj
+ET
+BT
+/F5 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 651.628582677165241 Td
+(signature-algorithm Ed25519) Tj
+ET
+BT
+/F5 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 639.4962992125983874 Td
+(signer-fingerprint  4F:7A:CB:29:8E:11:D0:A2:…:7C:55) Tj
+ET
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.059 0.09 0.165 rg
+56.6929133858267775 621.6947244094487814 Td
+(Model lineage & prompt fingerprint) Tj
+ET
+BT
+/F5 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 604.6868503937007517 Td
+(primary-model       gemini-3-flash-preview) Tj
+ET
+BT
+/F5 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 592.5545669291337845 Td
+(fallback-model      claude-3.5-sonnet \(not invoked on this run\)) Tj
+ET
+BT
+/F5 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 580.4222834645668172 Td
+(judges              jury of 3 independent statistical judges) Tj
+ET
+BT
+/F5 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 568.2899999999999636 Td
+(prompt-hash         sha256:c90e2a14b7d3…2f0c77a1) Tj
+ET
+BT
+/F5 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 556.1577165354329964 Td
+(grounded-retrieval  135-case corpus · knowledge-graph edges 56,795) Tj
+ET
+BT
+/F5 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 544.0254330708660291 Td
+(temperature         bias=0.1  noise=0.0  structural=0.2) Tj
+ET
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.059 0.09 0.165 rg
+56.6929133858267775 526.2238582677164231 Td
+(Judge variance \(noise stats\)) Tj
+ET
+BT
+/F5 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 509.2159842519683934 Td
+(mean-score           24 / 100 \(grade F\)) Tj
+ET
+BT
+/F5 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 497.083700787401483 Td
+(std-dev              3.1) Tj
+ET
+BT
+/F5 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 484.9514173228345726 Td
+(inter-judge variance 9.6 \(low — judges converge\)) Tj
+ET
+BT
+/F5 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 472.8191338582676053 Td
+(calibration-band     24 ± 4 at p=0.95) Tj
+ET
+q
+BT
+/F2 64 Tf
+73.5999999999999943 TL
+0.863 g
+0.8191520442889918 0.573576436351046 -0.573576436351046 0.8191520442889918 165.1599999999999966 420.9449999999999932 Tm
+(SAMPLE) Tj
+ET
+Q
+BT
+/F1 9 Tf
+10.3499999999999996 TL
+0.392 0.455 0.545 rg
+161.3349999999998658 28.3464566929134207 Td
+(Decision Intel · Decision Provenance Record \(sample\)  ·  Page 1 of 3) Tj
+ET
+endstream
+endobj
+5 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/MediaBox [0 0 595.2799999999999727 841.8899999999999864]
+/Contents 6 0 R
+>>
+endobj
+6 0 obj
+<<
+/Length 6959
+>>
+stream
+0.5670000000000001 w
+0 G
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.059 0.09 0.165 rg
+56.6929133858267775 771.0238582677164914 Td
+(Cognitive biases flagged) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 754.0159842519684616 Td
+(Biases detected in the memo, each mapped to the audit-committee-ready hardening question a reviewer) Tj
+T* (should be able to answer.) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 721.7010236220471597 Td
+(Narrative fallacy \(critical\)) Tj
+ET
+BT
+/F3 9 Tf
+10.3499999999999996 TL
+0.278 0.333 0.412 rg
+62.3622047244094517 707.5277952755905062 Td
+(Evidence: ""A revolution in the way people work" used as the economic-value driver; unit economics treated as a) Tj
+T* (secondary exposition.") Tj
+ET
+BT
+/F1 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+62.3622047244094517 682.0159842519684616 Td
+(Harden with: What specific unit of output does a single workspace produce, and at what gross margin net of) Tj
+T* (community-contribution credits?) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 648.0002362204724022 Td
+(Founder halo \(critical\)) Tj
+ET
+BT
+/F3 9 Tf
+10.3499999999999996 TL
+0.278 0.333 0.412 rg
+62.3622047244094517 633.827007874015635 Td
+(Evidence: "The Founder-CEO controls 20:1 supervoting shares with no independent-chair provision in the charter.") Tj
+ET
+BT
+/F1 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+62.3622047244094517 619.6537795275589815 Td
+(Harden with: Under what conditions would the board have both the authority and the independence to remove the) Tj
+T* (Founder-CEO without shareholder dispute?) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 585.6380314960629221 Td
+(Planning fallacy \(high\)) Tj
+ET
+BT
+/F3 9 Tf
+10.3499999999999996 TL
+0.278 0.333 0.412 rg
+62.3622047244094517 571.4648031496062686 Td
+(Evidence: "Twenty-three named target markets for geographic expansion within the five-year plan window.") Tj
+ET
+BT
+/F1 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+62.3622047244094517 557.291574803149615 Td
+(Harden with: Which markets are in the first wave, what is the per-market unit-economics gate, and what is the explicit) Tj
+T* (decision to not launch the remaining markets if the first wave misses its gates?) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 523.2758267716535556 Td
+(Overconfidence on TAM \(high\)) Tj
+ET
+BT
+/F3 9 Tf
+10.3499999999999996 TL
+0.278 0.333 0.412 rg
+62.3622047244094517 509.1025984251967884 Td
+(Evidence: "$3 trillion total addressable market derived from aggregated knowledge-worker population.") Tj
+ET
+BT
+/F1 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+62.3622047244094517 494.929370078740078 Td
+(Harden with: What share of the target knowledge-worker population pays for a comparable service today, and what) Tj
+T* (switching-cost evidence underwrites the assumed share-capture curve?) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 460.9136220472440186 Td
+(Escalation of commitment \(medium\)) Tj
+ET
+BT
+/F3 9 Tf
+10.3499999999999996 TL
+0.278 0.333 0.412 rg
+62.3622047244094517 446.7403937007873083 Td
+(Evidence: "Ongoing expansion capex in markets where the prior-year cohort has not yet reached breakeven on the) Tj
+T* (disclosed membership metrics.") Tj
+ET
+BT
+/F1 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+62.3622047244094517 421.2285826771652637 Td
+(Harden with: What is the explicit gate that would cause the committee to pause expansion capex in markets whose prior) Tj
+T* (cohort is under-performing?) Tj
+ET
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.059 0.09 0.165 rg
+56.6929133858267775 387.2128346456692043 Td
+(Structural assumptions \(Dalio lens\)) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 370.2049606299211746 Td
+(Three macro-structural determinants the memo implicitly depends on, flagged beside the cognitive biases) Tj
+T* (above.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+62.3622047244094517 337.8899999999999295 Td
+(•  Debt cycle \(high · unsupported\): valuation model assumes continuation of the 2014-2019 private-market) Tj
+T* (discount-rate regime. Harden with: what is the valuation floor under a public-market multiple-compression) Tj
+T* (scenario of 50%?) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+62.3622047244094517 297.0711023622045559 Td
+(•  Governance \(medium · partially-supported\): the dual-class supervoting structure assumes regulatory) Tj
+T* (tolerance of founder-controlled governance in regulated workspaces. Harden with: in which target markets) Tj
+T* (does the governance structure itself create regulatory friction?) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+62.3622047244094517 256.2522047244093528 Td
+(•  Productivity \(low · unsupported\): plan depends on a productivity-gain thesis in knowledge-worker output) Tj
+T* (that has not been substantiated with controlled comparison data.) Tj
+ET
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.059 0.09 0.165 rg
+56.6929133858267775 221.9529921259841103 Td
+(EU AI Act Art. 14 mapping) Tj
+ET
+BT
+/F5 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 204.9451181102360806 Td
+( h u m a n - o v e r s i g h t              "e   1   d e s i g n a t e d   r e v i e w e r   \( c a p t u r e d   o n   r e c o r d \)) Tj
+ET
+BT
+/F5 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 192.8128346456691133 Td
+(explainability        per-bias evidence + hardening question \(above\)) Tj
+ET
+BT
+/F5 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 180.6805511811022598 Td
+(record-keeping        this DPR, hashed and signed, retained per DPA §5) Tj
+ET
+BT
+/F5 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 168.5482677165352925 Td
+(contestability        reviewer dissent logged before decision is ratified) Tj
+ET
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.059 0.09 0.165 rg
+56.6929133858267775 150.7466929133856866 Td
+(Signature block) Tj
+ET
+BT
+/F5 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 133.7388188976376568 Td
+(Signed by  di-signer-prod@decision-intel.com) Tj
+ET
+BT
+/F5 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 121.6065354330706896 Td
+(Public key 4F:7A:CB:29:8E:11:D0:A2:…:7C:55) Tj
+ET
+BT
+/F5 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 109.474251968503836 Td
+(Signature  MEUCIQDoVqf4u…zX5c1wIhAPmLk…Bv8oK1z \(truncated\)) Tj
+ET
+BT
+/F5 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 85.2096850393701288 Td
+(Verification: https://www.decision-intel.com/regulatory/ai-verify) Tj
+ET
+q
+BT
+/F2 64 Tf
+73.5999999999999943 TL
+0.863 g
+0.8191520442889918 0.573576436351046 -0.573576436351046 0.8191520442889918 165.1599999999999966 420.9449999999999932 Tm
+(SAMPLE) Tj
+ET
+Q
+BT
+/F1 9 Tf
+10.3499999999999996 TL
+0.392 0.455 0.545 rg
+161.3349999999998658 28.3464566929134207 Td
+(Decision Intel · Decision Provenance Record \(sample\)  ·  Page 2 of 3) Tj
+ET
+endstream
+endobj
+7 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/MediaBox [0 0 595.2799999999999727 841.8899999999999864]
+/Contents 8 0 R
+>>
+endobj
+8 0 obj
+<<
+/Length 778
+>>
+stream
+0.5670000000000001 w
+0 G
+BT
+/F3 8 Tf
+9.1999999999999993 TL
+0.392 0.455 0.545 rg
+56.6929133858267775 771.0238582677164914 Td
+(This sample DPR is anonymised from a real 2019 Form S-1 audit run. Identifying text has been redacted; hashes, signatures and) Tj
+T* (record-ids are sample values. The schema, field set, Art. 14 mapping and structural-assumptions lens are identical to the production) Tj
+T* (artefact.) Tj
+ET
+q
+BT
+/F2 64 Tf
+73.5999999999999943 TL
+0.863 g
+0.8191520442889918 0.573576436351046 -0.573576436351046 0.8191520442889918 165.1599999999999966 420.9449999999999932 Tm
+(SAMPLE) Tj
+ET
+Q
+BT
+/F1 9 Tf
+10.3499999999999996 TL
+0.392 0.455 0.545 rg
+161.3349999999998658 28.3464566929134207 Td
+(Decision Intel · Decision Provenance Record \(sample\)  ·  Page 3 of 3) Tj
+ET
+endstream
+endobj
+1 0 obj
+<</Type /Pages
+/Kids [3 0 R 5 0 R 7 0 R ]
+/Count 3
+>>
+endobj
+9 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+10 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+11 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+12 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+13 0 obj
+<<
+/Type /Font
+/BaseFont /Courier
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+14 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+15 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+16 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+17 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Roman
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+18 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+19 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Italic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+20 0 obj
+<<
+/Type /Font
+/BaseFont /Times-BoldItalic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+21 0 obj
+<<
+/Type /Font
+/BaseFont /ZapfDingbats
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+22 0 obj
+<<
+/Type /Font
+/BaseFont /Symbol
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+2 0 obj
+<<
+/ProcSet [/PDF /Text /ImageB /ImageC /ImageI]
+/Font <<
+/F1 9 0 R
+/F2 10 0 R
+/F3 11 0 R
+/F4 12 0 R
+/F5 13 0 R
+/F6 14 0 R
+/F7 15 0 R
+/F8 16 0 R
+/F9 17 0 R
+/F10 18 0 R
+/F11 19 0 R
+/F12 20 0 R
+/F13 21 0 R
+/F14 22 0 R
+>>
+/XObject <<
+>>
+>>
+endobj
+23 0 obj
+<<
+/Producer (jsPDF 4.2.1)
+/CreationDate (D:20260424142323+01'00')
+>>
+endobj
+24 0 obj
+<<
+/Type /Catalog
+/Pages 1 0 R
+/OpenAction [3 0 R /FitH null]
+/PageLayout /OneColumn
+>>
+endobj
+xref
+0 25
+0000000000 65535 f 
+0000012281 00000 n 
+0000014114 00000 n 
+0000000015 00000 n 
+0000000152 00000 n 
+0000004167 00000 n 
+0000004304 00000 n 
+0000011315 00000 n 
+0000011452 00000 n 
+0000012350 00000 n 
+0000012475 00000 n 
+0000012606 00000 n 
+0000012740 00000 n 
+0000012878 00000 n 
+0000013002 00000 n 
+0000013131 00000 n 
+0000013263 00000 n 
+0000013399 00000 n 
+0000013527 00000 n 
+0000013654 00000 n 
+0000013783 00000 n 
+0000013916 00000 n 
+0000014018 00000 n 
+0000014366 00000 n 
+0000014452 00000 n 
+trailer
+<<
+/Size 25
+/Root 24 0 R
+/Info 23 0 R
+/ID [ <A2C9F69F2D1252E991B8FB2D83A84CF0> <A2C9F69F2D1252E991B8FB2D83A84CF0> ]
+>>
+startxref
+14556
+%%EOF

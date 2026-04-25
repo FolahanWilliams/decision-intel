@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     if (documentId) {
       // ── Get specific document with latest analysis ──────────────
       const document = await prisma.document.findFirst({
-        where: { id: documentId, userId: context.userId },
+        where: { id: documentId, userId: context.userId, deletedAt: null },
         include: {
           analyses: {
             orderBy: { createdAt: 'desc' },
@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
 
     const [documents, total] = await Promise.all([
       prisma.document.findMany({
-        where: { userId: context.userId },
+        where: { userId: context.userId, deletedAt: null },
         orderBy: { uploadedAt: 'desc' },
         skip,
         take: limit,
@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
           },
         },
       }),
-      prisma.document.count({ where: { userId: context.userId } }),
+      prisma.document.count({ where: { userId: context.userId, deletedAt: null } }),
     ]);
 
     return NextResponse.json({

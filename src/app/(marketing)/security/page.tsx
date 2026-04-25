@@ -145,6 +145,21 @@ const FRAMEWORKS = [
     name: 'Limited Partnership Obligations',
     gates: 'Fund-level fiduciary dissent documentation.',
   },
+  {
+    code: 'NDPR Art. 12',
+    name: 'Nigeria Data Protection Regulation',
+    gates: 'Automated-decision rights for Nigerian data subjects (aligned with GDPR Art. 22 via the NDPR 2019 Implementation Framework).',
+  },
+  {
+    code: 'CBN AI Guidelines',
+    name: 'Central Bank of Nigeria',
+    gates: 'Financial-services AI governance obligations (draft 2024) — model governance, explainability and consumer-protection duties for regulated Nigerian financial institutions.',
+  },
+  {
+    code: 'WAEMU',
+    name: 'West African Economic and Monetary Union',
+    gates: 'Cross-border data localisation and financial-sector governance across the eight WAEMU member states.',
+  },
 ];
 
 type AccessAvailability = 'every_plan' | 'enterprise';
@@ -162,9 +177,9 @@ const ACCESS_CONTROLS: AccessControl[] = [
     body: 'Single sign-on via Google Workspace, live today on every plan. No password is ever stored; sessions are signed and rotated server-side.',
   },
   {
-    label: 'SAML 2.0 and OIDC single sign-on',
+    label: 'SAML 2.0 and OIDC single sign-on (coming soon)',
     availability: 'enterprise',
-    body: 'Okta, Azure AD, OneLogin, Ping, JumpCloud, and generic SAML / OIDC. Your IT admin configures the connection from the admin console; typical setup is under 20 minutes from metadata paste to first login.',
+    body: 'Okta, Azure AD, OneLogin, Ping, JumpCloud, and generic SAML / OIDC. Activated as part of every Enterprise design-partner onboarding; the integration code, admin UI, and audit-log wiring are in place today and provisioning takes under 20 minutes from your IdP metadata to first login. Until then, Workspace orgs use Google SSO above.',
   },
   {
     label: 'Org-wide session visibility',
@@ -202,6 +217,38 @@ const AVAILABILITY_STYLE: Record<
     pillText: '#0F172A',
   },
 };
+
+const RETENTION_TIERS: Array<{
+  tier: string;
+  retention: string;
+  grace: string;
+  body: string;
+}> = [
+  {
+    tier: 'Free',
+    retention: '30 days',
+    grace: '+ 30-day soft-delete grace',
+    body: 'Documents auto-soft-delete 30 days after upload. Recoverable via support during the grace window, then permanently purged.',
+  },
+  {
+    tier: 'Individual',
+    retention: '90 days',
+    grace: '+ 30-day soft-delete grace',
+    body: 'Documents auto-soft-delete 90 days after upload. Same grace window, same support-recoverable path.',
+  },
+  {
+    tier: 'Strategy',
+    retention: '12 months',
+    grace: '+ 30-day soft-delete grace',
+    body: 'Quarter-after-quarter retention for team-level Decision Knowledge Graph. Auto-soft-delete at 365 days; same recoverable grace.',
+  },
+  {
+    tier: 'Enterprise',
+    retention: '360 days default · configurable',
+    grace: '+ 30-day soft-delete grace',
+    body: 'Default matches Strategy; per-Order-Form overrides for legal-hold, SEC, or Basel III obligations. Configurable in either direction.',
+  },
+];
 
 const PROCESSORS = [
   { name: 'Vercel', role: 'Application hosting + CDN', cert: 'SOC 2 Type II', region: 'US + EU' },
@@ -916,24 +963,67 @@ export default function SecurityPage() {
                 regulatory mapping across seven frameworks, and full pipeline lineage.
               </div>
             </div>
-            <Link
-              href="/pricing"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                padding: '9px 16px',
-                background: C.green,
-                color: C.white,
-                borderRadius: 8,
-                fontSize: 13,
-                fontWeight: 700,
-                textDecoration: 'none',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              See Strategy pricing <ArrowRight size={13} />
-            </Link>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <a
+                href="/dpr-sample-wework.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '9px 16px',
+                  background: C.green,
+                  color: C.white,
+                  borderRadius: 8,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <FileText size={13} /> Sample DPR (PDF)
+              </a>
+              <a
+                href="/dpa-template.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '9px 16px',
+                  background: C.white,
+                  color: C.slate900,
+                  border: `1px solid ${C.slate300}`,
+                  borderRadius: 8,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <FileText size={13} /> DPA template
+              </a>
+              <Link
+                href="/pricing"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '9px 16px',
+                  background: 'transparent',
+                  color: C.slate600,
+                  borderRadius: 8,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Strategy pricing <ArrowRight size={13} />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -1071,6 +1161,108 @@ export default function SecurityPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Per-tier retention SLA */}
+      <section
+        id="retention"
+        style={{
+          padding: '72px 24px',
+          background: C.white,
+        }}
+      >
+        <div style={{ maxWidth: 1080, margin: '0 auto' }}>
+          <SectionHeader
+            eyebrow="Retention SLA"
+            title="How long your documents live, and how to delete them"
+            body="Documents auto-soft-delete at the end of your tier's window. A 30-day grace window applies before permanent purge — recoverable via support during the grace, irrecoverable after. Self-serve Delete is on every document detail page and on the post-upload reveal card."
+          />
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: 12,
+              marginTop: 24,
+            }}
+          >
+            {RETENTION_TIERS.map(t => (
+              <div
+                key={t.tier}
+                style={{
+                  background: C.white,
+                  border: `1px solid ${C.slate200}`,
+                  borderRadius: 14,
+                  padding: '20px 22px',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    gap: 10,
+                    marginBottom: 6,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 800,
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                      color: C.slate500,
+                    }}
+                  >
+                    {t.tier}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    fontSize: 22,
+                    fontWeight: 800,
+                    color: C.green,
+                    letterSpacing: '-0.01em',
+                    lineHeight: 1.15,
+                  }}
+                >
+                  {t.retention}
+                </div>
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: C.slate500,
+                    marginTop: 2,
+                  }}
+                >
+                  {t.grace}
+                </div>
+                <p
+                  style={{
+                    fontSize: 13,
+                    color: C.slate600,
+                    lineHeight: 1.55,
+                    marginTop: 12,
+                  }}
+                >
+                  {t.body}
+                </p>
+              </div>
+            ))}
+          </div>
+          <p
+            style={{
+              fontSize: 12,
+              color: C.slate500,
+              marginTop: 18,
+              textAlign: 'center',
+            }}
+          >
+            Right-to-delete (GDPR Art. 17) requests are processed within 30 days. Send to{' '}
+            <a href="mailto:privacy@decision-intel.com" style={{ color: C.green }}>
+              privacy@decision-intel.com
+            </a>{' '}
+            or use the in-app Delete button on any document.
+          </p>
         </div>
       </section>
 

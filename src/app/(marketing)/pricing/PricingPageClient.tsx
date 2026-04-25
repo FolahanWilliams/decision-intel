@@ -248,6 +248,10 @@ const FAQ: Array<{ q: string; a: string }> = [
     q: 'Are you SOC 2 compliant?',
     a: 'We run on SOC 2 certified infrastructure (Supabase, Vercel). Documents are encrypted with AES-256-GCM at rest and TLS 1.3 in transit. A GDPR anonymization layer strips PII before any AI processing.',
   },
+  {
+    q: 'How long are my documents retained, and can I delete them?',
+    a: 'Free 30 days · Individual 90 days · Strategy 12 months · Enterprise 360-day default (configurable per Order Form). Every tier has a 30-day soft-delete grace window before permanent purge — recoverable via support during the grace, irrecoverable after. Self-serve Delete button on every document detail page and on the post-upload reveal card. Full retention SLA at /security#retention.',
+  },
 ];
 
 export function PricingPageClient() {
@@ -700,9 +704,19 @@ export function PricingPageClient() {
         >
           {[
             { label: 'SOC 2 ready', sub: 'AES-256-GCM + TLS 1.3' },
-            { label: 'Signed DPA', sub: 'on any paid tier' },
+            {
+              label: 'Signed DPA',
+              sub: 'on any paid tier',
+              href: '/dpa-template.pdf',
+              cta: 'Template (PDF) →',
+            },
             { label: 'No training on your data', sub: 'ever, by contract' },
-            { label: 'Decision Provenance Record', sub: 'signed + hashed on every audit' },
+            {
+              label: 'Decision Provenance Record',
+              sub: 'signed + hashed on every audit',
+              href: '/dpr-sample-wework.pdf',
+              cta: 'Sample (PDF) →',
+            },
           ].map(item => (
             <div key={item.label} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
               <span
@@ -735,6 +749,23 @@ export function PricingPageClient() {
                 >
                   {item.sub}
                 </div>
+                {'href' in item && item.href && (
+                  <a
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      color: C.green,
+                      textDecoration: 'none',
+                      display: 'inline-block',
+                      marginTop: 2,
+                    }}
+                  >
+                    {item.cta}
+                  </a>
+                )}
               </div>
             </div>
           ))}

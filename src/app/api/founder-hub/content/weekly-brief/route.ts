@@ -97,7 +97,7 @@ export async function GET(req: NextRequest) {
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-      model: process.env.GEMINI_MODEL_NAME || 'gemini-2.0-flash',
+      model: process.env.GEMINI_MODEL_NAME || 'gemini-3.1-flash-lite',
     });
 
     const result = await model.generateContent(SYSTEM_PROMPT);

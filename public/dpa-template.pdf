@@ -1,0 +1,618 @@
+%PDF-1.3
+%ºß¬à
+3 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/MediaBox [0 0 595.2799999999999727 841.8899999999999864]
+/Contents 4 0 R
+>>
+endobj
+4 0 obj
+<<
+/Length 6889
+>>
+stream
+0.5670000000000001 w
+0 G
+BT
+/F2 22 Tf
+25.2999999999999972 TL
+0.059 0.09 0.165 rg
+56.6929133858267775 771.0238582677164914 Td
+(Data Processing Addendum) Tj
+ET
+BT
+/F3 11 Tf
+12.6499999999999986 TL
+0.392 0.455 0.545 rg
+56.6929133858267775 742.6774015748030706 Td
+(Template for customers of Decision Intel \(the "Processor"\)) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 717.1655905511811397 Td
+(This Data Processing Addendum \("DPA"\) supplements the Decision Intel Subscription Agreement between) Tj
+T* ([CUSTOMER LEGAL NAME] \("Controller"\) and Decision Intel Ltd. \("Processor"\). It governs the processing of) Tj
+T* (Personal Data \(as defined below\) that Controller provides to Processor in connection with the Services. This) Tj
+T* (DPA is aligned with Article 28 of Regulation \(EU\) 2016/679 \(GDPR\) and the UK GDPR.) Tj
+ET
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.059 0.09 0.165 rg
+56.6929133858267775 661.0396062992125508 Td
+(1. Definitions) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 644.0317322834645211 Td
+("Personal Data" has the meaning given in GDPR Art. 4\(1\). "Processing" has the meaning given in GDPR Art.) Tj
+T* (4\(2\). "Sub-processor" means any third party engaged by Processor to process Personal Data on Controller's) Tj
+T* (behalf. "Services" means the Decision Intel subscription services the Controller has contracted. All terms not) Tj
+T* (defined in this DPA have the meaning given in the Subscription Agreement or GDPR.) Tj
+ET
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.059 0.09 0.165 rg
+56.6929133858267775 587.9057480314960458 Td
+(2. Subject-matter, duration, nature and purpose) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 570.8978740157480161 Td
+(Processor processes Personal Data solely to provide the Services — analysing strategic memos, board) Tj
+T* (decks and related decision artefacts for cognitive biases, structural assumptions and decision-quality signals) Tj
+T* (— and to produce the Decision Provenance Record \(DPR\) that documents that processing. Processing) Tj
+T* (continues for the term of the Subscription Agreement unless terminated earlier in accordance with it.) Tj
+ET
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.059 0.09 0.165 rg
+56.6929133858267775 514.7718897637794271 Td
+(3. Sub-processors) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 497.7640157480314542 Td
+(Controller authorises Processor to engage the following Sub-processors:) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+62.3622047244094517 477.3545669291337958 Td
+(•  Google LLC \(Gemini API\) — LLM inference for bias and structural-assumption detection. Google) Tj
+T* (commits not to use customer inputs or outputs to train its models under its Vertex AI terms.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+62.3622047244094517 448.7246456692913057 Td
+(•  Anthropic PBC \(Claude API\) — fallback LLM inference when AI_FALLBACK_ENABLED is set.) Tj
+T* (Anthropic commits not to use customer inputs or outputs to train its models under its commercial terms.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+62.3622047244094517 420.0947244094488155 Td
+(•  Supabase Inc. — PostgreSQL database, authentication and file storage. SOC 2 Type II certified.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+62.3622047244094517 403.6537795275590383 Td
+(•  Vercel Inc. — application hosting and edge compute. SOC 2 Type II certified.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+62.3622047244094517 387.2128346456692043 Td
+(•  Resend \(for transactional email\) — notifications and session-management flows only.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 365.1025984251967316 Td
+(Processor will notify Controller at least 30 days before adding or replacing a Sub-processor. Controller may) Tj
+T* (object in writing; the parties will in good faith work to resolve the objection or, failing agreement, Controller) Tj
+T* (may terminate the affected Services.) Tj
+ET
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.059 0.09 0.165 rg
+56.6929133858267775 320.882125984251843 Td
+(4. Security measures) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 303.8742519685038133 Td
+(Processor maintains the following technical and organisational measures, commensurate with the state of the) Tj
+T* (art:) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+62.3622047244094517 271.5592913385825113 Td
+(•  Encryption at rest of document content using AES-256-GCM with key-version rotation) Tj
+T* (\(DOCUMENT_ENCRYPTION_KEY protocol\).) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+62.3622047244094517 242.9293700787400212 Td
+(•  Encryption in transit via TLS 1.2 or higher on all public endpoints.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+62.3622047244094517 226.488425196850244 Td
+(•  A GDPR anonymizer node runs as the first stage of the analysis pipeline; no analysis model ever) Tj
+T* (receives raw PII.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+62.3622047244094517 197.8585039370077538 Td
+(•  Per-user and per-organisation access scoping with audit-log retention.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+62.3622047244094517 181.4175590551179766 Td
+(•  Role-based access to production systems with SSO and least-privilege grants.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+62.3622047244094517 164.9766141732281994 Td
+(•  Incident response plan with 72-hour notification commitment for confirmed Personal Data breaches.) Tj
+ET
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.059 0.09 0.165 rg
+56.6929133858267775 142.8663779527556699 Td
+(5. Retention and deletion) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 125.8585039370076402 Td
+(Default retention windows by tier \(subject to the Order Form\):) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+62.3622047244094517 105.4490551181099818 Td
+(•  Free tier: 30 days from upload.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+62.3622047244094517 89.0081102362202046 Td
+(•  Individual tier: 90 days from upload.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+62.3622047244094517 72.5671653543303137 Td
+(•  Strategy tier: 12 months from upload.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+62.3622047244094517 56.1262204724405365 Td
+(•  Enterprise tier: configurable, 360-day default.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 34.0159842519681206 Td
+(Controller may request deletion of any document at any time via the in-app Delete action or by written notice) Tj
+T* (to privacy@decision-intel.com. Processor will soft-delete within 24 hours and permanently purge within 30) Tj
+T* (days, except where retention is required to comply with applicable law.) Tj
+ET
+BT
+/F1 9 Tf
+10.3499999999999996 TL
+0.392 0.455 0.545 rg
+160.8399999999998897 28.3464566929134207 Td
+(Decision Intel · Data Processing Addendum \(template\)  ·  Page 1 of 2) Tj
+ET
+endstream
+endobj
+5 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/MediaBox [0 0 595.2799999999999727 841.8899999999999864]
+/Contents 6 0 R
+>>
+endobj
+6 0 obj
+<<
+/Length 4006
+>>
+stream
+0.5670000000000001 w
+0 G
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.059 0.09 0.165 rg
+56.6929133858267775 771.0238582677164914 Td
+(6. Data subject rights) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 754.0159842519684616 Td
+(Processor will, at Controller's reasonable request and cost, assist Controller in responding to data-subject) Tj
+T* (rights requests under GDPR Articles 15-22 \(access, rectification, erasure, restriction, portability, objection,) Tj
+T* (and automated-decision rights\). The Decision Provenance Record serves as the) Tj
+T* (meaningful-information-about-the-logic artefact required by Article 22.) Tj
+ET
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.059 0.09 0.165 rg
+56.6929133858267775 697.8899999999999864 Td
+(7. International transfers) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 680.8821259842519567 Td
+(Where Processing involves transfer of Personal Data outside the European Economic Area or the United) Tj
+T* (Kingdom, the parties rely on the Standard Contractual Clauses \(Commission Implementing Decision \(EU\)) Tj
+T* (2021/914\) or the UK International Data Transfer Addendum, as applicable. These clauses are incorporated by) Tj
+T* (reference.) Tj
+ET
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.059 0.09 0.165 rg
+56.6929133858267775 624.7561417322834814 Td
+(8. Audit rights) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 607.7482677165354517 Td
+(Processor will, on reasonable written request \(not more than once per year, unless a breach is suspected\),) Tj
+T* (make available to Controller or its independent auditor \(subject to reasonable confidentiality obligations\) the) Tj
+T* (information necessary to demonstrate compliance with this DPA. Processor shares current SOC 2 and) Tj
+T* (third-party security reports on written request.) Tj
+ET
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.059 0.09 0.165 rg
+56.6929133858267775 551.6222834645668627 Td
+(9. Return or destruction of Personal Data) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 534.614409448818833 Td
+(On termination of the Services, Controller may export its data for 30 days. After that window, Processor will) Tj
+T* (delete Personal Data per Section 5, except where retention is required to comply with applicable law.) Tj
+ET
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.059 0.09 0.165 rg
+56.6929133858267775 502.2994488188975879 Td
+(10. Governing law and notices) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 485.2915748031495582 Td
+(This DPA is governed by the law specified in the Subscription Agreement. Notices under this DPA are sent to) Tj
+T* (the respective contacts listed in the Order Form. For Processor: privacy@decision-intel.com.) Tj
+ET
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.059 0.09 0.165 rg
+56.6929133858267775 452.9766141732283131 Td
+(Signatures) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 435.9687401574802834 Td
+(Controller: _______________________________________   Date: _____________________) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 415.5592913385826819 Td
+(Name / Title: ____________________________________________________________________) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 386.6459055118110655 Td
+(Processor \(Decision Intel Ltd.\): _________________________   Date: __________________) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 366.2364566929134639 Td
+(Name / Title: ____________________________________________________________________) Tj
+ET
+BT
+/F3 8 Tf
+9.1999999999999993 TL
+0.392 0.455 0.545 rg
+56.6929133858267775 328.8191338582678327 Td
+(This template is provided for evaluation by Controller procurement. Executed version is governed by the Order Form and any negotiated) Tj
+T* (addenda.) Tj
+ET
+BT
+/F1 9 Tf
+10.3499999999999996 TL
+0.392 0.455 0.545 rg
+160.8399999999998897 28.3464566929134207 Td
+(Decision Intel · Data Processing Addendum \(template\)  ·  Page 2 of 2) Tj
+ET
+endstream
+endobj
+1 0 obj
+<</Type /Pages
+/Kids [3 0 R 5 0 R ]
+/Count 2
+>>
+endobj
+7 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+8 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+9 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+10 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+11 0 obj
+<<
+/Type /Font
+/BaseFont /Courier
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+12 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+13 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+14 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+15 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Roman
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+16 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+17 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Italic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+18 0 obj
+<<
+/Type /Font
+/BaseFont /Times-BoldItalic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+19 0 obj
+<<
+/Type /Font
+/BaseFont /ZapfDingbats
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+20 0 obj
+<<
+/Type /Font
+/BaseFont /Symbol
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+2 0 obj
+<<
+/ProcSet [/PDF /Text /ImageB /ImageC /ImageI]
+/Font <<
+/F1 7 0 R
+/F2 8 0 R
+/F3 9 0 R
+/F4 10 0 R
+/F5 11 0 R
+/F6 12 0 R
+/F7 13 0 R
+/F8 14 0 R
+/F9 15 0 R
+/F10 16 0 R
+/F11 17 0 R
+/F12 18 0 R
+/F13 19 0 R
+/F14 20 0 R
+>>
+/XObject <<
+>>
+>>
+endobj
+21 0 obj
+<<
+/Producer (jsPDF 4.2.1)
+/CreationDate (D:20260424142323+01'00')
+>>
+endobj
+22 0 obj
+<<
+/Type /Catalog
+/Pages 1 0 R
+/OpenAction [3 0 R /FitH null]
+/PageLayout /OneColumn
+>>
+endobj
+xref
+0 23
+0000000000 65535 f 
+0000011288 00000 n 
+0000013113 00000 n 
+0000000015 00000 n 
+0000000152 00000 n 
+0000007093 00000 n 
+0000007230 00000 n 
+0000011351 00000 n 
+0000011476 00000 n 
+0000011606 00000 n 
+0000011739 00000 n 
+0000011877 00000 n 
+0000012001 00000 n 
+0000012130 00000 n 
+0000012262 00000 n 
+0000012398 00000 n 
+0000012526 00000 n 
+0000012653 00000 n 
+0000012782 00000 n 
+0000012915 00000 n 
+0000013017 00000 n 
+0000013363 00000 n 
+0000013449 00000 n 
+trailer
+<<
+/Size 23
+/Root 22 0 R
+/Info 21 0 R
+/ID [ <496BC0470E6AFF5351A45CD1966DF255> <496BC0470E6AFF5351A45CD1966DF255> ]
+>>
+startxref
+13553
+%%EOF

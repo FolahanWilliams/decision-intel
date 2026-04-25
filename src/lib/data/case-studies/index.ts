@@ -12,6 +12,7 @@ import { TECHNOLOGY_FAILURE_CASES } from './failures/technology-failures';
 import { FINANCIAL_FAILURE_CASES } from './failures/financial-failures';
 import { INDUSTRY_FAILURE_CASES } from './failures/industry-failures';
 import { GOVERNMENT_FAILURE_CASES } from './failures/government-failures';
+import { EMERGING_MARKETS_FAILURE_CASES } from './failures/emerging-markets-failures';
 import { TECHNOLOGY_SUCCESS_CASES } from './successes/technology-successes';
 import { INDUSTRY_SUCCESS_CASES } from './successes/industry-successes';
 import { GOVERNMENT_SUCCESS_CASES } from './successes/government-successes';
@@ -62,6 +63,7 @@ const NEW_FAILURE_CASES: CaseStudy[] = [
   ...FINANCIAL_FAILURE_CASES,
   ...INDUSTRY_FAILURE_CASES,
   ...GOVERNMENT_FAILURE_CASES,
+  ...EMERGING_MARKETS_FAILURE_CASES,
 ];
 
 const NEW_SUCCESS_CASES: CaseStudy[] = [

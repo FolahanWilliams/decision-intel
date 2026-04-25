@@ -53,6 +53,10 @@ export const PLANS = {
     maxPages: 10,
     biasTypes: 5,
     maxTeamMembers: 1,
+    /** Days from upload before a document is soft-deleted by the
+     *  enforce-retention cron. After soft-delete, a 30-day grace window
+     *  applies before hard-purge (DB cascade + storage cleanup). */
+    retentionDays: 30,
     features: {
       boardroomSimulation: 'limited',
       forgottenQuestions: false,
@@ -85,6 +89,7 @@ export const PLANS = {
     maxPages: 100,
     biasTypes: 30,
     maxTeamMembers: 1,
+    retentionDays: 90,
     features: {
       boardroomSimulation: true,
       forgottenQuestions: true,
@@ -116,6 +121,7 @@ export const PLANS = {
     maxPages: 200,
     biasTypes: 30,
     maxTeamMembers: 15,
+    retentionDays: 365,
     features: {
       boardroomSimulation: true,
       forgottenQuestions: true,
@@ -147,6 +153,10 @@ export const PLANS = {
     maxPages: Infinity,
     biasTypes: 30,
     maxTeamMembers: Infinity,
+    /** Default for Enterprise; configurable per Order Form. The
+     *  enforce-retention cron uses this value unless an explicit
+     *  contract-level override is set on the Org. */
+    retentionDays: 360,
     features: {
       boardroomSimulation: true,
       forgottenQuestions: true,

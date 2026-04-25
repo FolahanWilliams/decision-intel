@@ -1155,3 +1155,81 @@ OUTPUT FORMAT (JSON, no markdown, no prose):
 
 ${options.hasDealContext ? 'The memo has deal context attached — use sector and ticket size to prioritise the most comparable analogs.' : 'No deal context available — rely on document-level similarity only.'}`;
 }
+
+// ---------------------------------------------------------------------------
+// Dalio Structural-Assumptions prompt
+// ---------------------------------------------------------------------------
+//
+// Dalio's 18 rise-and-fall determinants operate on the STRUCTURAL layer —
+// debt cycles, currency cycles, reserve-currency status, governance, infra.
+// A memo can be cognitively clean (Kahneman + Klein pass) yet still rest on
+// a structural assumption that breaks the plan — e.g., assuming FX stability
+// in an emerging-market exposure, or assuming reserve-currency dominance on
+// a >5 year horizon.
+//
+// This prompt runs as an on-demand secondary call from the analysis detail
+// page. It is NOT in the main 12-node pipeline (yet) — keeping it on-demand
+// lets us add the structural layer without risking DQI-score drift across
+// existing users. The determinants block is injected from
+// `buildDalioPromptBlock()` in `src/lib/constants/dalio-determinants.ts`.
+
+import { buildDalioPromptBlock } from '@/lib/constants/dalio-determinants';
+
+export function buildStructuralAssumptionsPrompt(memoText: string, context?: {
+  industry?: string;
+  region?: string;
+  marketContext?: 'emerging_market' | 'developed_market' | 'cross_border';
+}): string {
+  const determinantsBlock = buildDalioPromptBlock();
+  const contextLine = [
+    context?.industry ? `industry: ${context.industry}` : null,
+    context?.region ? `region: ${context.region}` : null,
+    context?.marketContext ? `market context: ${context.marketContext}` : null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+
+  return `You are Decision Intel, auditing a strategic memo for the STRUCTURAL assumptions it depends on.
+
+This is a separate layer from cognitive-bias detection (Kahneman + Klein).
+You are applying Ray Dalio's 18-determinant framework (Principles for
+Dealing with the Changing World Order, 2021) to surface macro-structural
+bets the memo is implicitly making.
+
+${contextLine ? `CONTEXT — ${contextLine}\n` : ''}
+DETERMINANTS (audit prompts in parens):
+${determinantsBlock}
+
+TASK: for this memo, flag every determinant the plan implicitly depends
+on. For each flagged determinant:
+- name the specific assumption the memo is making about it
+- rate how defensible the assumption is on the evidence present in the memo
+- suggest the one-sentence question the author should answer to harden the assumption
+
+Return ONLY valid JSON matching this shape (no markdown, no prose):
+{
+  "structuralAssumptions": [
+    {
+      "determinantId": "string (stable id from the list above, e.g. 'debt_cycle', 'currency_cycle', 'reserve_currency_status')",
+      "assumption": "string (one sentence naming the specific assumption the memo is making)",
+      "defensibility": "well_supported | partially_supported | unsupported | contradicted",
+      "severity": "low | medium | high | critical",
+      "evidenceFromMemo": "string (one short quote or paraphrase from the memo showing the assumption, max 200 chars)",
+      "hardeningQuestion": "string (one sentence the author should answer to de-risk this)"
+    }
+  ],
+  "summary": "string (one sentence — the single most load-bearing structural assumption in this memo)"
+}
+
+Rules:
+- Only flag determinants the memo actually depends on. Do not list every one.
+- Three well-evidenced structural flags beat ten weak ones.
+- Defensibility grades: "well_supported" = memo explicitly addresses and hedges; "partially_supported" = addressed but with gaps; "unsupported" = implicit, not addressed; "contradicted" = memo's own evidence points the other way.
+- Do NOT duplicate cognitive biases already flagged in the main audit. Structural assumptions are about the WORLD the plan assumes, not the reasoner's cognition.
+- If the memo has no meaningful structural exposures (e.g. a local, short-horizon, single-jurisdiction decision), return { "structuralAssumptions": [], "summary": "No meaningful structural exposures detected." }.
+
+MEMO:
+<memo>
+${memoText}
+</memo>`;
+}

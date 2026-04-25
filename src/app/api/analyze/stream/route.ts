@@ -413,12 +413,58 @@ export async function POST(request: NextRequest) {
           const previousAnalysis = existingAnalysesForVersion[0];
           const nextVersion = previousAnalysis ? previousAnalysis.version + 1 : 1;
 
+          // Cross-document version-delta link (Plan 2.3): when this document
+          // is part of a multi-version chain, find the immediate predecessor
+          // document's latest Analysis and persist it as
+          // `previousAnalysisId`. The VersionDeltaCard on the detail page
+          // renders DQI delta + bias diff when this is set.
+          let previousAnalysisIdAcrossVersions: string | null = null;
+          try {
+            const docForVersionLookup = await prisma.document.findUnique({
+              where: { id: documentId },
+              select: { id: true, parentDocumentId: true, versionNumber: true },
+            });
+            if (
+              docForVersionLookup?.parentDocumentId &&
+              (docForVersionLookup.versionNumber ?? 1) > 1
+            ) {
+              // Predecessor = a doc in the same chain (id = root OR
+              // parentDocumentId = root) with versionNumber one less than
+              // the current doc.
+              const prevDoc = await prisma.document.findFirst({
+                where: {
+                  OR: [
+                    { id: docForVersionLookup.parentDocumentId },
+                    { parentDocumentId: docForVersionLookup.parentDocumentId },
+                  ],
+                  versionNumber: docForVersionLookup.versionNumber - 1,
+                  deletedAt: null,
+                },
+                select: {
+                  analyses: {
+                    orderBy: { createdAt: 'desc' },
+                    take: 1,
+                    select: { id: true },
+                  },
+                },
+              });
+              previousAnalysisIdAcrossVersions = prevDoc?.analyses[0]?.id ?? null;
+            }
+          } catch (lookupErr) {
+            // Schema drift on parentDocumentId — fall through with a null
+            // link rather than failing the whole analysis.
+            log.warn('previousAnalysisId lookup failed (non-fatal):', lookupErr);
+          }
+
           try {
             await prisma.$transaction(async tx => {
               const newAnalysis = await tx.analysis.create({
                 data: {
                   documentId,
                   version: nextVersion,
+                  ...(previousAnalysisIdAcrossVersions
+                    ? { previousAnalysisId: previousAnalysisIdAcrossVersions }
+                    : {}),
                   overallScore: (report.overallScore as number) || 0,
                   noiseScore: (report.noiseScore as number) || 0,
                   summary: (report.summary as string) || '',
@@ -571,6 +617,9 @@ export async function POST(request: NextRequest) {
                   summary: (report.summary as string) || '',
                   modelVersion: process.env.GEMINI_MODEL_NAME ?? 'gemini-3-flash-preview',
                   version: nextVersion,
+                  ...(previousAnalysisIdAcrossVersions
+                    ? { previousAnalysisId: previousAnalysisIdAcrossVersions }
+                    : {}),
                   biases: {
                     create: detectedBiases.map(bias => ({
                       biasType: bias.biasType as string,

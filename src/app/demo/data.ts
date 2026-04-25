@@ -1400,12 +1400,257 @@ export const DEMO_WEWORK: DemoAnalysis = {
   },
 };
 
+// ─── Example 5: Dangote Cement Pan-African Expansion ─────────────────
+
+export const DEMO_DANGOTE: DemoAnalysis = {
+  id: 'demo-dangote-panafrican',
+  documentName:
+    'Dangote Cement PLC — Pan-African Capacity Expansion Thesis (2014 Board Memo)',
+  shortName: 'Dangote · Pan-African Expansion',
+  teaser:
+    'Extrapolating Nigerian cement margins across 10 African markets — without pricing FX-repatriation and governance risk.',
+  overallScore: 52,
+  noiseScore: 41,
+  summary:
+    'Board memo recommending ~$4B of capital commitment across ten non-Nigerian African cement markets, assuming margin convergence toward Nigerian reference levels and 70-80% utilisation within 24 months per plant. The plan treats FX repatriation as a residual disclosure item and uses a uniform 5% country-risk premium across markets whose sovereign spreads vary 3-5x.',
+  metaVerdict:
+    'HIGH-RISK: the thesis is cognitively defensible on operational-excellence grounds but rests on structural assumptions (FX liquidity across 10 markets, uniform country-risk premium, continued Chinese commodity-cycle infrastructure demand) that are not pressure-tested. The Dalio structural audit flags the currency-cycle and governance determinants as load-bearing — if either shifts, the return model inverts. Recommended: phase the commitment across 3-4 verified markets before the full ten-market programme.',
+  createdAt: new Date().toISOString(),
+  noiseStats: { mean: 52, stdDev: 14, variance: 196 },
+  noiseBenchmarks: [
+    { label: 'Pan-African industrial expansion (median)', value: 48 },
+    { label: 'Single-market greenfield (median)', value: 64 },
+    { label: 'Your memo', value: 52 },
+  ],
+  biases: [
+    {
+      biasType: 'survivorship_bias',
+      severity: 'critical',
+      excerpt:
+        'Margins will converge toward Nigerian reference levels as local distribution networks mature.',
+      explanation:
+        'Extrapolates a margin story from one market (Nigeria) with protective trade measures, concentrated structure, and dollar-linked pricing to ten markets without those features. The reference case is the surviving, structurally-advantaged exemplar, not a representative draw.',
+      suggestion:
+        'Build a per-market unit-economics model with explicit competitive-structure inputs. Do not use Nigerian margin bands as the default prior for any other market.',
+      confidence: 0.92,
+    },
+    {
+      biasType: 'overconfidence_bias',
+      severity: 'high',
+      excerpt:
+        '70-80% capacity utilisation within 24 months of plant commissioning in each new market.',
+      explanation:
+        'A single confidence band applied to ten different markets with different demand cycles, competitive dynamics, and regulatory structures. Management has no cross-border operational track record to calibrate the forecast against.',
+      suggestion:
+        'Replace the single point estimate with a per-market utilisation distribution, anchored on observed ramps in comparable emerging-market capacity builds.',
+      confidence: 0.88,
+    },
+    {
+      biasType: 'anchoring_bias',
+      severity: 'high',
+      excerpt:
+        'Country-risk premium of 5% applied uniformly across ten markets.',
+      explanation:
+        'The 5% premium is an internal-convention anchor, not a market-derived input. Sovereign-credit spreads across the ten target markets vary 3-5x; a uniform premium systematically under-prices the high-risk markets.',
+      suggestion:
+        'Use market-implied sovereign spreads + a consistent risk-premium methodology per market. Re-price the NPV under this framework before committing capital.',
+      confidence: 0.9,
+    },
+    {
+      biasType: 'availability_heuristic',
+      severity: 'medium',
+      excerpt:
+        'Demand projection assumes continuation of the 2010-2014 African infrastructure-spend trajectory.',
+      explanation:
+        'The recent 4-year infrastructure boom is the most available reference. That boom was cycle-dependent on Chinese commodity demand; extrapolating linearly ignores the cycle-timing risk of capex whose amortisation window spans a full cycle.',
+      suggestion:
+        'Model demand under a Chinese-commodity-cycle-peak scenario and a debt-cycle-tightening scenario. Size the expansion so NPV is positive in both.',
+      confidence: 0.8,
+    },
+  ],
+  simulation: {
+    overallVerdict:
+      'Boardroom simulation: 4/5 roles voted STAGE (phase the programme) rather than APPROVE (commit all ten markets now). The dissenting voice was the CEO persona, anchored on the Nigerian-margin thesis.',
+    twins: [
+      {
+        name: 'CFO (structural)',
+        role: 'Chief Financial Officer',
+        vote: 'stage',
+        confidence: 0.82,
+        rationale:
+          'The return model is cycle-sensitive and the FX-repatriation assumption is not sized. Commit to three markets first; withhold the balance of capex pending 18-month unit economics on the first wave.',
+      },
+      {
+        name: 'Chief Risk Officer',
+        role: 'CRO',
+        vote: 'stage',
+        confidence: 0.88,
+        rationale:
+          'Uniform country-risk premium across ten markets is a governance-risk failure. The structural-assumption layer makes this a NO in its current form.',
+      },
+      {
+        name: 'Head of Africa Strategy',
+        role: 'Regional SVP',
+        vote: 'stage',
+        confidence: 0.71,
+        rationale:
+          'The opportunity is real but the scheduling is wrong. Building all ten plants concurrently compresses execution risk. Wave the capex in tranches.',
+      },
+      {
+        name: 'Independent Non-Executive',
+        role: 'Board',
+        vote: 'stage',
+        confidence: 0.66,
+        rationale:
+          'The thesis works on paper but the cycle timing is unacknowledged. I want to see a downside scenario at 40% plant utilisation before approving.',
+      },
+      {
+        name: 'Group CEO',
+        role: 'CEO',
+        vote: 'approve',
+        confidence: 0.74,
+        rationale:
+          'Nigeria proves the playbook. Execution capability is our moat. The first-mover window closes if we phase.',
+      },
+    ],
+  },
+  logicalFallacies: [
+    {
+      name: 'Extrapolation Fallacy',
+      severity: 'high',
+      excerpt:
+        'Nigerian unit economics projected across ten markets without per-market structure analysis.',
+      explanation:
+        'Drawing a general rule from a single, structurally-advantaged case. The Nigerian market has features that do not generalise (trade measures, market concentration, dollar-linked pricing).',
+      score: 68,
+    },
+    {
+      name: 'False Equivalence',
+      severity: 'high',
+      excerpt: 'Uniform 5% country-risk premium across ten heterogenous markets.',
+      explanation:
+        'Equates markets whose sovereign-risk profiles are demonstrably different. The single-premium treatment is an artefact of internal convention, not external evidence.',
+      score: 63,
+    },
+  ],
+  swot: {
+    strengths: [
+      'Nigerian operational excellence is a genuine capability.',
+      'Integrated limestone-quarry-to-cement economics is a real cost advantage in markets with limestone access.',
+      'Management track record on Nigerian capacity expansion is strong.',
+    ],
+    weaknesses: [
+      'Zero cross-border operational track record at scale.',
+      'Over-reliance on a single-market reference case for ten-market forecasting.',
+      'FX-repatriation risk not explicitly sized in return model.',
+    ],
+    opportunities: [
+      'African infrastructure demand is real and multi-decade.',
+      'First-mover advantage in some target markets with limited local-producer capacity.',
+    ],
+    threats: [
+      'Chinese-commodity-cycle peak during capex amortisation window.',
+      'FX-control tightening in multiple target markets (Nigeria, Ethiopia, Tanzania, Zambia historically).',
+      'Regulatory shifts across ten jurisdictions simultaneously is a governance-risk compound.',
+    ],
+    strategicAdvice:
+      'Stage the programme. Commit to 3-4 markets where unit economics can be verified within 24 months. Withhold the balance of capex pending the first-wave operating data.',
+  },
+  compliance: {
+    frameworks: [
+      {
+        name: 'Nigerian Exchange listing rules',
+        status: 'compliant',
+        score: 92,
+        findings: ['Investor-disclosure posture consistent with NGX requirements.'],
+      },
+      {
+        name: 'IFRS 9 expected-credit-loss (applied to receivables from African subsidiaries)',
+        status: 'partial',
+        score: 68,
+        findings: [
+          'Cross-border receivables ECL model does not stress-test for FX-control scenarios.',
+        ],
+      },
+    ],
+    overallRisk: 'Medium — accounting posture is sound but the underlying FX assumption is unhedged in the return model.',
+  },
+  preMortem: {
+    scenarios: [
+      {
+        title: 'FX controls tighten in 3+ target markets',
+        probability: 0.55,
+        impact: 'Dividend repatriation from those subsidiaries is restricted. Group cash-flow thesis inverts even with operationally strong plants.',
+        description:
+          'Nigeria, Ethiopia, Tanzania and Zambia have historically imposed FX controls during stress periods. The plan assumes none of them do, for ten straight years.',
+      },
+      {
+        title: 'Chinese commodity cycle peaks during capex amortisation window',
+        probability: 0.45,
+        impact: 'Infrastructure demand across target markets contracts 20-40%. Plant utilisation runs at 40-55% instead of 70-80%.',
+        description:
+          'The demand thesis is implicitly levered to Chinese commodity-cycle-driven African infrastructure spending. A cycle peak would hit during the post-commissioning ramp.',
+      },
+      {
+        title: 'One or two markets succeed, eight underperform',
+        probability: 0.6,
+        impact: 'Group ROE compression; stranded capex on underperforming plants; opportunity cost of capital relative to additional Nigerian capacity.',
+        description:
+          'The most likely outcome path — partial pan-African success, not uniform replication. The return model does not currently accommodate this outcome.',
+      },
+    ],
+  },
+  intelligence: {
+    recallScore: 0.78,
+    similarCases: [
+      {
+        title: 'Heineken Africa expansion (2000s-2010s)',
+        outcome: 'Partial success — strong in Nigeria, mixed elsewhere',
+        similarity: 0.72,
+        lesson:
+          'A single-market success does not predict a regional replication even with strong operational DNA. The macro structure matters.',
+      },
+      {
+        title: 'MTN Nigeria international expansion (2006-2015)',
+        outcome: 'Similar pattern — anchor market carried the group',
+        similarity: 0.7,
+        lesson:
+          'The anchor market subsidises the cross-border portfolio for longer than the plan anticipates.',
+      },
+    ],
+    recognitionCues: [
+      {
+        title: 'Margin-convergence assumption across heterogenous markets',
+        description:
+          'Historical failure pattern in pan-African industrial expansion — margin convergence rarely materialises uniformly.',
+        similarity: 0.82,
+      },
+    ],
+    patternMatch: 'Anchor-market extrapolation',
+  },
+  toxicCombinations: [
+    {
+      name: 'Anchor + Sprint',
+      biases: ['anchoring_bias', 'planning_fallacy', 'overconfidence_bias'],
+      riskLevel: 'high',
+      description:
+        'Anchor on the Nigerian margin story + plan to execute across ten markets concurrently. This is the specific failure mode: the anchor is wrong in ways the sprint does not allow the team to learn before capital is committed.',
+      historicalExample: 'Heineken Africa, MTN international expansion, French utility African water contracts.',
+    },
+  ],
+  outcome: {
+    what: 'Several African subsidiaries ran below capacity for multiple years. FX repatriation from Ethiopia and Tanzania was restricted through 2019-2022. The Nigerian business remained the load-bearing profit centre.',
+    when: '2015-2022 (outcomes visible by 2019-2021)',
+    impact:
+      'c.$1-2B in stranded expansion capex; restricted dividend repatriation from multiple subsidiaries; pan-African strategic thesis materially moderated in subsequent strategy cycles.',
+  },
+};
+
 // Combined list for the demo selector
-// Three samples deliberately — three in a row reads as a cleaner visual
-// lineup on the demo page than four. Nokia + WeWork are the real famous
-// decisions; Phoenix covers the market-entry scenario most CSOs recognise.
-// DEMO_SERIES_B stays exported above so any direct deep-link keeps working.
-export const DEMO_ANALYSES: DemoAnalysis[] = [DEMO_NOKIA, DEMO_WEWORK, DEMO_PHOENIX];
+// Four samples now — Nokia, WeWork, Phoenix stay (Western + market-entry),
+// and Dangote adds emerging-market coverage without which the product reads
+// as US/UK-only to African and EM buyers. Any direct deep-link keeps working.
+export const DEMO_ANALYSES: DemoAnalysis[] = [DEMO_NOKIA, DEMO_WEWORK, DEMO_PHOENIX, DEMO_DANGOTE];
 
 // Backwards compatibility
 export const DEMO_ANALYSIS = DEMO_NOKIA;

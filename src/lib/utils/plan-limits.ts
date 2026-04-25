@@ -148,3 +148,35 @@ export async function getBiasTypeLimit(
   const plan = await getUserPlan(userId);
   return { plan, maxBiasTypes: PLANS[plan].biasTypes };
 }
+
+/**
+ * Days from upload before the enforce-retention cron soft-deletes a
+ * document for the given user. Org-scoped documents resolve via the
+ * Org's plan, falling back to the user's plan only when the document
+ * has no orgId.
+ */
+export async function getRetentionDaysForUser(userId: string): Promise<number> {
+  const plan = await getUserPlan(userId);
+  return PLANS[plan].retentionDays;
+}
+
+export async function getRetentionDaysForOrg(orgId: string): Promise<number> {
+  const plan = await getOrgPlan(orgId);
+  return PLANS[plan].retentionDays;
+}
+
+/**
+ * Resolve the retention window for a single document based on its
+ * org / user ownership. Used by the enforce-retention cron.
+ */
+export async function getRetentionDaysForDocument(doc: {
+  userId: string;
+  orgId?: string | null;
+}): Promise<number> {
+  return doc.orgId
+    ? getRetentionDaysForOrg(doc.orgId)
+    : getRetentionDaysForUser(doc.userId);
+}
+
+/** Days a soft-deleted document stays recoverable before hard-purge. */
+export const SOFT_DELETE_GRACE_DAYS = 30;

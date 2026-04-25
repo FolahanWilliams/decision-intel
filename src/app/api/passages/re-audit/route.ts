@@ -128,11 +128,11 @@ export async function POST(req: NextRequest) {
 
     const prompt = `${SYSTEM_PROMPT}\n\nPASSAGE:\n<passage>\n${passage}\n</passage>`;
     const result = await generateText(prompt, {
-      // gemini-2.0-flash is already the content-route default and is cheap
-      // enough for short passage-level work. The full pipeline uses grounded
-      // gemini-3 preview for the primary bias pass; this endpoint does not
-      // need grounding.
-      model: 'gemini-2.0-flash',
+      // gemini-3.1-flash-lite is the right cost-tier for short passage-level
+      // bias classification — fast, cheap, and strong enough on structured
+      // output. The full pipeline uses grounded gemini-3-flash-preview for
+      // the primary bias pass; this endpoint does not need grounding.
+      model: 'gemini-3.1-flash-lite',
       temperature: 0.2,
       maxTokens: 800,
     });

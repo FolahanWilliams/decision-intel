@@ -560,6 +560,42 @@ export function AiVerifyMappingClient() {
         </div>
       </section>
 
+      {/* African-regulatory bridge — the 11 AI Verify principles translate */}
+      <section
+        className="screen-only"
+        style={{
+          padding: '48px 24px',
+          background: C.white,
+          borderTop: `1px solid ${C.slate200}`,
+        }}
+      >
+        <div style={{ maxWidth: 960, margin: '0 auto' }}>
+          <h2
+            style={{
+              fontSize: 20,
+              fontWeight: 800,
+              letterSpacing: '-0.01em',
+              color: C.navy,
+              marginBottom: 10,
+            }}
+          >
+            The same principles travel across African regulatory regimes
+          </h2>
+          <p style={{ fontSize: 14, color: C.slate500, lineHeight: 1.7 }}>
+            The 11 internationally-recognised AI governance principles the Decision Provenance
+            Record already maps to (transparency, explainability, repeatability, safety, security,
+            robustness, fairness, data governance, accountability, human agency &amp; oversight,
+            inclusive growth) align beat-for-beat with the emerging African framework stack —
+            <strong> NDPR Art. 12</strong> (Nigeria, automated-decision rights),
+            <strong> CBN AI Guidelines</strong> (Central Bank of Nigeria, draft 2024 — model
+            governance, explainability and consumer-protection duties for regulated financial
+            institutions) and <strong>WAEMU</strong> (data-localisation and financial-sector
+            governance across the eight West African member states). Every DPR field already
+            satisfies these obligations; the cross-walk is covered in the /security posture.
+          </p>
+        </div>
+      </section>
+
       {/* CTA */}
       <section
         className="screen-only"

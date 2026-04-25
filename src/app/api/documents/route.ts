@@ -57,8 +57,16 @@ export async function GET(request: Request) {
     const limit = Math.min(100, Math.max(1, Number(searchParams.get('limit')) || 10));
     const skip = (page - 1) * limit;
 
-    // Build org-aware where clause: user's own docs + org-shared docs
-    let where: { userId?: string; OR?: Array<Record<string, unknown>> } = { userId };
+    // Build org-aware where clause: user's own docs + org-shared docs.
+    // Soft-deleted rows (deletedAt != null) are excluded by default — they
+    // remain in the DB during the grace window but are invisible to all
+    // user-facing surfaces. The enforce-retention cron handles permanent
+    // purge after SOFT_DELETE_GRACE_DAYS.
+    let where: {
+      userId?: string;
+      OR?: Array<Record<string, unknown>>;
+      deletedAt?: null;
+    } = { userId, deletedAt: null };
     try {
       const membership = await prisma.teamMember.findFirst({
         where: { userId },
@@ -67,6 +75,7 @@ export async function GET(request: Request) {
       if (membership?.orgId) {
         where = {
           OR: [{ userId }, { orgId: membership.orgId }],
+          deletedAt: null,
         };
       }
     } catch {
@@ -82,6 +91,8 @@ export async function GET(request: Request) {
       fileSize: true,
       uploadedAt: true,
       isSample: true,
+      versionNumber: true,
+      parentDocumentId: true,
       analyses: {
         orderBy: { createdAt: 'desc' } as const,
         take: 1,
@@ -134,6 +145,8 @@ export async function GET(request: Request) {
       fileSize: number | null;
       uploadedAt: Date;
       isSample?: boolean;
+      versionNumber?: number;
+      parentDocumentId?: string | null;
       analyses: Array<{
         overallScore: number | null;
         noiseScore?: number | null;
@@ -151,6 +164,8 @@ export async function GET(request: Request) {
         fileSize: doc.fileSize,
         uploadedAt: doc.uploadedAt,
         isSample: doc.isSample ?? false,
+        versionNumber: doc.versionNumber ?? 1,
+        parentDocumentId: doc.parentDocumentId ?? null,
         score: latestAnalysis?.overallScore ?? undefined,
         // Include details if requested and available
         ...(detailed &&

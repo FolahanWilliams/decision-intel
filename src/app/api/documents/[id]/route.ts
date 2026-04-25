@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import path from 'path';
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
-import { deleteVisualizations } from '@/lib/utils/visualization-storage';
 import { getDocumentContent } from '@/lib/utils/encryption';
 
 const log = createLogger('DocumentRoute');
@@ -23,10 +21,18 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     // Include org-scoped documents so team members can view shared docs
-    // (matches the pattern used in the document listing route).
-    let where: { id: string; userId?: string; OR?: Array<Record<string, unknown>> } = {
+    // (matches the pattern used in the document listing route). Soft-deleted
+    // rows (deletedAt != null) are excluded — recoverable for the grace
+    // window via support, invisible everywhere else.
+    let where: {
+      id: string;
+      userId?: string;
+      OR?: Array<Record<string, unknown>>;
+      deletedAt?: null;
+    } = {
       id,
       userId,
+      deletedAt: null,
     };
     try {
       const membership = await prisma.teamMember.findFirst({
@@ -37,6 +43,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         where = {
           id,
           OR: [{ userId }, { orgId: membership.orgId }],
+          deletedAt: null,
         };
       }
     } catch {
@@ -194,69 +201,75 @@ export async function DELETE(
       );
     }
 
-    // Fetch the document first so we know the filename (for the
-    // storage path) and can verify it exists before deleting.
+    // Soft-delete only: stamp `deletedAt` + `deletionReason='user_request'`
+    // and return immediately. The hard-purge (DB cascade + Supabase storage
+    // cleanup) is performed by the daily /api/cron/enforce-retention pass
+    // after a SOFT_DELETE_GRACE_DAYS grace window. Recovery during the
+    // grace window is a support ticket today; a self-serve restore button
+    // is a future plan item.
+    //
+    // Org-scoped access: an Org admin can soft-delete any doc in their Org.
+    // Personal docs require ownership (userId match). The `deletedAt: null`
+    // gate ensures double-deletes are no-ops rather than errors.
+    let where: { id: string; userId?: string; OR?: Array<Record<string, unknown>>; deletedAt: null } = {
+      id,
+      userId,
+      deletedAt: null,
+    };
+    try {
+      const orgAdmin = await prisma.teamMember.findFirst({
+        where: { userId, role: 'admin' },
+        select: { orgId: true },
+      });
+      if (orgAdmin?.orgId) {
+        where = {
+          id,
+          OR: [{ userId }, { orgId: orgAdmin.orgId }],
+          deletedAt: null,
+        };
+      }
+    } catch {
+      // Schema drift — fall back to ownership-only
+    }
+
     const doc = await prisma.document.findFirst({
-      where: { id, userId },
-      select: { id: true, filename: true, analyses: { select: { id: true } } },
+      where,
+      select: { id: true },
     });
 
     if (!doc) {
+      // Either doesn't exist, isn't owned by the caller, or already soft-deleted.
       return NextResponse.json({ error: 'Document not found' }, { status: 404 });
     }
 
-    // Delete from DB (cascades to analyses, biases, embeddings).
-    // Wrap in a retry: if a leftover RESTRICT FK blocks the cascade,
-    // attempt a raw cleanup first, then retry the delete.
+    await prisma.document.update({
+      where: { id: doc.id },
+      data: {
+        deletedAt: new Date(),
+        deletionReason: 'user_request',
+      },
+    });
+
+    // Audit-log the destructive action. Fire-and-forget so a logger outage
+    // can't fail the user's delete; log a warning if it does.
     try {
-      await prisma.document.delete({ where: { id } });
-    } catch (deleteErr: unknown) {
-      const code = (deleteErr as { code?: string }).code;
-      // P2003 = foreign key constraint violation
-      if (code === 'P2003') {
-        log.warn('FK constraint blocked delete — attempting raw cleanup for document', id);
-        // Clean up any orphaned rows in legacy tables that still reference
-        // this document with ON DELETE RESTRICT.
-        await prisma.$executeRaw`DELETE FROM "HumanDecisionAudit" WHERE "documentId" = ${id}`.catch(
-          () => {}
-        );
-        // Retry the delete
-        await prisma.document.delete({ where: { id } });
-      } else {
-        throw deleteErr;
-      }
+      const { logAudit } = await import('@/lib/audit');
+      logAudit({
+        action: 'DELETE_ACCOUNT_DATA',
+        resource: 'document',
+        resourceId: doc.id,
+        details: { reason: 'user_request', via: 'documents/[id] route' },
+      }).catch(err => log.warn('audit log write failed:', err));
+    } catch (err) {
+      log.warn('audit module load failed:', err);
     }
 
-    // Clean up visualization storage (fire-and-forget). A silent
-    // failure here leaks a handful of cached SVG blobs but doesn't
-    // block the delete — log the failure so we can notice if the
-    // storage backend drifts without taking the whole delete down.
-    for (const analysis of doc.analyses) {
-      deleteVisualizations('analysis', analysis.id).catch(err =>
-        log.warn(`Failed to clean up visualizations for analysis ${analysis.id}:`, err)
-      );
-    }
-
-    // Clean up Supabase storage (fire-and-forget).
-    // Storage path matches the upload convention: ${userId}/${documentId}${ext}
-    try {
-      const { getServiceSupabase } = await import('@/lib/supabase');
-      const supabase = getServiceSupabase();
-      const ext = path.extname(doc.filename);
-      const storagePath = `${userId}/${doc.id}${ext}`;
-      const bucket = process.env.SUPABASE_DOCUMENT_BUCKET || 'pdf';
-
-      const { error: removeError } = await supabase.storage.from(bucket).remove([storagePath]);
-
-      if (removeError) {
-        log.warn(`Storage cleanup failed for ${storagePath}: ${removeError.message}`);
-      }
-    } catch (storageErr) {
-      // Don't fail the request — the DB record is already gone.
-      log.warn('Storage cleanup error:', storageErr);
-    }
-
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      softDeleted: true,
+      recoverable: true,
+      message: 'Document soft-deleted. It will be permanently purged after the grace window.',
+    });
   } catch (error) {
     log.error('Error deleting document:', error);
     return NextResponse.json({ error: 'Failed to delete document' }, { status: 500 });

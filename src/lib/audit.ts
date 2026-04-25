@@ -28,7 +28,21 @@ export type AuditAction =
   | 'COPILOT_MESSAGE'
   // Document Uploads
   | 'UPLOAD_DOCUMENT'
-  | 'BULK_UPLOAD';
+  | 'BULK_UPLOAD'
+  // SSO / SAML configuration
+  | 'SSO_CONFIGURATION_CREATED'
+  | 'SSO_CONFIGURATION_UPDATED'
+  | 'SSO_CONFIGURATION_DELETED'
+  // Bias-level collaboration
+  | 'BIAS_COMMENT_CREATED'
+  | 'BIAS_COMMENT_UPDATED'
+  | 'BIAS_COMMENT_RESOLVED'
+  | 'BIAS_COMMENT_DELETED'
+  | 'BIAS_TASK_CREATED'
+  | 'BIAS_TASK_UPDATED'
+  | 'BIAS_TASK_REASSIGNED'
+  | 'BIAS_TASK_RESOLVED'
+  | 'BIAS_TASK_DELETED';
 
 export interface AuditLogParams {
   action: AuditAction;

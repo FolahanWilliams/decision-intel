@@ -100,6 +100,7 @@ export async function GET() {
     '/api/cron/retry-nudges',
     '/api/cron/google-drive-sync',
     '/api/cron/daily-linkedin',
+    '/api/cron/enforce-retention',
     '/api/cache/cleanup',
   ];
 

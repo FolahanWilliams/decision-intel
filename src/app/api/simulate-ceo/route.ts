@@ -124,7 +124,7 @@ ${memo}
 Three questions, JSON only.`;
 
     const result = await generateText(prompt, {
-      model: 'gemini-2.0-flash',
+      model: 'gemini-3.1-flash-lite',
       temperature: 0.35,
       maxTokens: 900,
     });

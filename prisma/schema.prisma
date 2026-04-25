@@ -32,6 +32,25 @@ model Document {
   source           String?
   sourceRef        String?
   isSample         Boolean             @default(false) // Synthetic seed doc — clearable via /api/demo/clear-samples
+  /// Soft-delete timestamp. Set when the user clicks Delete or when the
+  /// retention cron passes the tier's window. Soft-deleted rows are
+  /// invisible in normal queries; the enforce-retention cron hard-deletes
+  /// them (DB cascade + storage cleanup) after a 30-day grace window.
+  deletedAt        DateTime?
+  /// Free-text reason populated when `deletedAt` is set. Values used today:
+  /// 'user_request' | 'retention_expired' | 'org_offboard'.
+  deletionReason   String?
+  /// Document-level versioning. v1 of a memo has parentDocumentId=null. When
+  /// the user uploads a revision via "Upload new version", we create a new
+  /// Document row with parentDocumentId pointing to the ROOT of the chain
+  /// (always v1's id, even for v3+). versionNumber counts from 1. To find
+  /// all versions of a memo: WHERE id = X OR parentDocumentId = X.
+  /// Plan reference: 2.3 — "DQI 42 → 71 (+29), sunk_cost_bias resolved,
+  /// anchoring_bias emerged" delta loop.
+  parentDocumentId String?
+  versionNumber    Int                 @default(1)
+  parentDocument   Document?           @relation("DocumentVersions", fields: [parentDocumentId], references: [id], onDelete: SetNull)
+  childVersions    Document[]          @relation("DocumentVersions")
   deal             Deal?               @relation(fields: [dealId], references: [id], onDelete: SetNull)
   analyses         Analysis[]
   embeddings       DecisionEmbedding[]
@@ -47,6 +66,8 @@ model Document {
   @@index([orgId, uploadedAt])
   @@index([source, sourceRef])
   @@index([orgId, isSample])
+  @@index([deletedAt])
+  @@index([parentDocumentId, versionNumber])
 }
 
 model Analysis {
@@ -85,6 +106,15 @@ model Analysis {
   promptVersionId String?
   promptVersion   PromptVersion? @relation(fields: [promptVersionId], references: [id], onDelete: SetNull)
 
+  // Cross-document version delta link. Set automatically when an analysis
+  // is created on a Document with a parentDocumentId — points to the most
+  // recent Analysis on the immediate predecessor in the version chain. The
+  // VersionDeltaCard on the document detail page renders DQI delta + bias
+  // resolved/emerged when this is populated. Plan reference: 2.3.
+  previousAnalysisId String?
+  previousAnalysis   Analysis?  @relation("AnalysisVersionDelta", fields: [previousAnalysisId], references: [id], onDelete: SetNull)
+  derivedAnalyses    Analysis[] @relation("AnalysisVersionDelta")
+
   // Outcome tracking — mandatory flywheel
   outcomeStatus   String    @default("pending_outcome") // pending_outcome | outcome_logged | outcome_overdue
   outcomeDueAt    DateTime? // When outcome should be reported
@@ -113,21 +143,89 @@ model Analysis {
 }
 
 model BiasInstance {
-  id          String   @id @default(cuid())
+  id          String        @id @default(cuid())
   analysisId  String
   biasType    String
   severity    String
-  excerpt     String   @db.Text
-  explanation String   @db.Text
-  suggestion  String   @db.Text
-  confidence  Float?   @default(0.0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  excerpt     String        @db.Text
+  explanation String        @db.Text
+  suggestion  String        @db.Text
+  confidence  Float?        @default(0.0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
   userRating  Int?
-  analysis    Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  analysis    Analysis      @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  comments    BiasComment[]
+  tasks       BiasTask[]
 
   @@index([analysisId])
   @@index([analysisId, severity])
+}
+
+// Bias-level comment thread. Every BiasInstance can carry an arbitrary tree
+// of comments — top-level entries have parentCommentId=null; replies set it
+// to the parent's id. Threading is one-level-deep in the UI today (replies
+// flatten under the parent) but the schema supports deeper nesting if a
+// future surface wants it.
+//
+// `orgId` is denormalised from BiasInstance → Analysis → Document → orgId
+// to keep "all comments my org has on any bias" queries cheap (no four-join
+// path on the hot listing route).
+//
+// `mentions[]` captures Supabase userIds @-mentioned in the body. Populated
+// at create time when the API parses the body against the org's TeamMember
+// roster, and used to fire one Nudge per mentioned user.
+model BiasComment {
+  id               String        @id @default(cuid())
+  biasInstanceId   String
+  authorUserId     String
+  orgId            String?
+  body             String        @db.Text
+  parentCommentId  String?
+  parent           BiasComment?  @relation("CommentThread", fields: [parentCommentId], references: [id], onDelete: Cascade)
+  replies          BiasComment[] @relation("CommentThread")
+  mentions         String[]      @default([])
+  resolvedAt       DateTime?
+  resolvedByUserId String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  biasInstance    BiasInstance   @relation(fields: [biasInstanceId], references: [id], onDelete: Cascade)
+
+  @@index([biasInstanceId])
+  @@index([orgId])
+  @@index([authorUserId])
+  @@index([parentCommentId])
+}
+
+// Bias-level task assignment. Lets a reviewer assign "investigate this
+// anchoring bias on the revenue projection" to a specific teammate with a
+// status + optional due date. The assignee gets an in-app Nudge and (when
+// the org has a Slack installation) a best-effort Slack notification via
+// the org's monitoredChannels[0].
+//
+// status values are 'open' | 'in_progress' | 'resolved' | 'dismissed' —
+// kept as a String column instead of a Prisma enum so future status values
+// don't require a migration.
+model BiasTask {
+  id              String       @id @default(cuid())
+  biasInstanceId  String
+  orgId           String?
+  assigneeUserId  String
+  createdByUserId String
+  status          String       @default("open")
+  title           String
+  description     String?      @db.Text
+  dueAt           DateTime?
+  resolvedAt      DateTime?
+  resolutionNote  String?      @db.Text
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  biasInstance    BiasInstance @relation(fields: [biasInstanceId], references: [id], onDelete: Cascade)
+
+  @@index([biasInstanceId])
+  @@index([orgId])
+  @@index([assigneeUserId, status])
+  @@index([createdByUserId])
 }
 
 model DecisionEmbedding {
@@ -269,17 +367,59 @@ model IntelligenceSync {
 }
 
 model Organization {
-  id           String       @id @default(cuid())
-  name         String
-  slug         String       @unique
-  avatarUrl    String?
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  isAnonymized Boolean      @default(false) // Consent to anonymous aggregation
-  invites      TeamInvite[]
-  members      TeamMember[]
+  id                 String             @id @default(cuid())
+  name               String
+  slug               String             @unique
+  avatarUrl          String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  isAnonymized       Boolean            @default(false) // Consent to anonymous aggregation
+  invites            TeamInvite[]
+  members            TeamMember[]
+  ssoConfigurations  SsoConfiguration[]
 
   @@index([slug])
+}
+
+// SAML / OIDC SSO configuration per Org.
+//
+// Supabase's SAML model is project-level, not tenant-level. Each customer's
+// IdP is registered once with Supabase (via `supabase sso add` or the Admin
+// API) and returns a stable provider UUID that we persist in `providerId`.
+// `domain` is the email domain we match at login — when `alice@acme.com`
+// signs in, we look up `domain='acme.com'`, find the active provider, and
+// call supabase.auth.signInWithSSO({ domain }).
+//
+// One Org can register multiple domains (e.g. acme.com + acme.co.uk) by
+// creating multiple rows; each row maps a single domain to a single provider.
+model SsoConfiguration {
+  id                 String       @id @default(cuid())
+  orgId              String
+  /** Email domain matched at login. Lowercased, no leading @, no trailing dot. */
+  domain             String
+  /** Stable Supabase `sso_provider_id` UUID returned by `supabase sso add`. */
+  providerId         String
+  /** 'saml' | 'oidc' — matches Supabase's provider type. Saml is the only
+   *  form supported at launch. */
+  protocol           String       @default("saml")
+  /** Human-facing label used in admin UI (e.g. "Okta · Acme Inc"). */
+  displayName        String?
+  /** 'pending' (created, not yet registered with Supabase) |
+   *  'active' (registered + verified) |
+   *  'disabled' (manually suspended, login falls back to password). */
+  status             String       @default("pending")
+  /** Timestamp the first successful SAML login landed. */
+  activatedAt        DateTime?
+  /** Free-text notes — the admin's contact at the IdP, ticket reference, etc. */
+  notes              String?      @db.Text
+  createdAt          DateTime     @default(now())
+  createdByUserId    String?
+  updatedAt          DateTime     @updatedAt
+  organization       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([domain])
+  @@index([orgId])
+  @@index([providerId])
 }
 
 model TeamMember {

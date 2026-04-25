@@ -1292,8 +1292,8 @@ function HeroCredibilityStrip() {
     },
     {
       icon: ShieldCheck,
-      label: 'SOC 2 Type II infrastructure',
-      note: 'Vercel and Supabase. Encryption posture at /security.',
+      label: 'SOC 2 Type II infrastructure (Vercel + Supabase)',
+      note: 'Our own product audit is scoped for 2026; in-flight controls already mirror Type II. Full posture at /security.',
     },
   ];
   const [idx, setIdx] = useState(0);

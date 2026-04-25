@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Calendar, CheckCircle, FileText, Scale, X } from 'lucide-react';
+import { ArrowRight, Calendar, CheckCircle, FileText, Scale, Trash2, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 import { ScoreReveal } from '@/components/ui/ScoreReveal';
@@ -90,6 +90,37 @@ export function InlineAnalysisResultCard({
   // and the hook-local state only holds the fetched fallback.
   const [fetchedAnalysisId, setFetchedAnalysisId] = useState<string | null>(null);
   const analysisId = preResolvedAnalysisId ?? fetchedAnalysisId;
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Soft-delete the underlying Document (recoverable via support during the
+  // 30-day grace window). On success, dismiss the card so the dashboard
+  // returns to the upload zone. We don't surface a confirmation modal here —
+  // window.confirm matches the lighter weight of this dashboard surface vs
+  // the dedicated /documents/[id] page which has a styled modal.
+  const handleDelete = async () => {
+    if (isDeleting) return;
+    if (
+      !window.confirm(
+        `Delete ${analysis.filename}? It will be soft-deleted immediately and recoverable via support during the 30-day grace window.`
+      )
+    ) {
+      return;
+    }
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`/api/documents/${analysis.docId}`, { method: 'DELETE' });
+      if (!res.ok) {
+        log.warn('inline delete failed:', res.status);
+      }
+    } catch (err) {
+      log.warn('inline delete failed:', err);
+    } finally {
+      // Always dismiss — even on failure the user wanted the card gone.
+      // A failed soft-delete still leaves the doc visible elsewhere; the
+      // user can retry from /documents/[id].
+      onDismiss();
+    }
+  };
   useEffect(() => {
     if (preResolvedAnalysisId) return; // no fetch needed
     let cancelled = false;
@@ -193,20 +224,39 @@ export function InlineAnalysisResultCard({
             </span>
           </div>
         </div>
-        <button
-          onClick={onDismiss}
-          aria-label="Dismiss analysis result"
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            color: 'var(--text-muted)',
-            padding: 4,
-            display: 'flex',
-          }}
-        >
-          <X size={16} />
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <button
+            onClick={handleDelete}
+            disabled={isDeleting}
+            aria-label="Delete document"
+            title="Soft-delete this document. Recoverable for 30 days."
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: isDeleting ? 'not-allowed' : 'pointer',
+              color: 'var(--text-muted)',
+              padding: 4,
+              display: 'flex',
+              opacity: isDeleting ? 0.5 : 1,
+            }}
+          >
+            <Trash2 size={15} />
+          </button>
+          <button
+            onClick={onDismiss}
+            aria-label="Dismiss analysis result"
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'var(--text-muted)',
+              padding: 4,
+              display: 'flex',
+            }}
+          >
+            <X size={16} />
+          </button>
+        </div>
       </div>
 
       <div

@@ -26,6 +26,8 @@ import { BiologicalRiskBadge } from '@/components/ui/BiologicalRiskBadge';
 import { OutsideViewCard } from '@/components/ui/OutsideViewCard';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ResearchInsight } from '@/types';
+import { StructuralAssumptionsPanel } from '@/components/analysis/StructuralAssumptionsPanel';
+import { BiasCollabPanel } from '@/components/analysis/BiasCollabPanel';
 
 interface ExtendedBiasInstance extends BiasInstance {
   researchInsight: ResearchInsight;
@@ -356,6 +358,11 @@ export function OverviewTab({
                         </p>
                       </div>
                     )}
+                    {bias.id && (
+                      <ErrorBoundary>
+                        <BiasCollabPanel biasInstanceId={bias.id} />
+                      </ErrorBoundary>
+                    )}
                   </div>
                 );
               })}
@@ -363,6 +370,13 @@ export function OverviewTab({
           )}
         </div>
       </div>
+
+      {/* Structural Assumptions (Dalio 18-determinants macro lens) */}
+      {analysisId && (
+        <ErrorBoundary>
+          <StructuralAssumptionsPanel analysisId={analysisId} autoRun={false} />
+        </ErrorBoundary>
+      )}
 
       {/* Pattern Recognition (RPD) — collapsible, conditional */}
       {hasRpd && (
