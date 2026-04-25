@@ -96,7 +96,7 @@ const BiasNetwork = dynamic(
   { ssr: false }
 );
 import { ShareModal } from '@/components/ui/ShareModal';
-import { Share2, ShieldCheck, Trash2, GitBranch, Upload } from 'lucide-react';
+import { Share2, Trash2, GitBranch, Upload } from 'lucide-react';
 import { VersionHistoryStrip } from '@/components/analysis/VersionHistoryStrip';
 import { VersionDeltaCard } from '@/components/analysis/VersionDeltaCard';
 
@@ -1226,7 +1226,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       <Breadcrumbs
         items={[
           { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Documents', href: '/dashboard' },
+          { label: 'Documents', href: '/dashboard?view=browse' },
           { label: document.filename },
         ]}
       />
@@ -1315,7 +1315,23 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             {/* Conviction Score — complementary to DQI (shown in ExecutiveSummary hero) */}
             {analysis && <ConvictionBadge analysis={analysis} />}
 
+            {/* Header actions grouped 2026-04-26 (Opus 4.6 audit) into:
+                  PRIMARY (Share & Export — accent fill)
+                  SECONDARY (Explain Score, Upload new version)
+                  DANGER (Delete — separated by a visual divider).
+                The 8-item flat row was cognitively overloading; the grouping
+                gives the eye a hierarchy without rearranging the JSX wholesale. */}
             <div className="flex items-center gap-sm">
+              {analysis && (
+                <button
+                  onClick={() => setShowShareModal(true)}
+                  className="btn btn-primary btn-sm flex items-center gap-sm"
+                  aria-label="Share and export"
+                >
+                  <Share2 size={14} />
+                  Share & Export
+                </button>
+              )}
               {analysis && (
                 <Link
                   href={`/dashboard/analytics?view=explainability&analysisId=${analysis.id}`}
@@ -1326,72 +1342,12 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                   Explain Score
                 </Link>
               )}
-              {analysis && (
-                <button
-                  onClick={() => setShowShareModal(true)}
-                  className="btn btn-secondary btn-sm flex items-center gap-sm"
-                  aria-label="Share and export"
-                >
-                  <Share2 size={14} />
-                  Share & Export
-                </button>
-              )}
-              {/* Decision Provenance Record — Pro-gated, server-side branded
-                  PDF export. URL path is kept as /api/compliance/audit-packet
-                  for backwards compatibility with the 2026-04-22 rename;
-                  the user-visible label and filename both say "Decision
-                  Provenance Record." Both routes flow through the same
-                  assembler + generator so the artifact shape is identical. */}
-              {analysis && (
-                <button
-                  onClick={async () => {
-                    try {
-                      const res = await fetch(`/api/compliance/audit-packet/${analysis.id}`);
-                      if (res.status === 402) {
-                        showToast(
-                          'Decision Provenance Record export requires the Pro plan or higher.',
-                          'warning'
-                        );
-                        return;
-                      }
-                      if (!res.ok) {
-                        showToast(
-                          'Failed to generate Decision Provenance Record. Please try again.',
-                          'error'
-                        );
-                        return;
-                      }
-                      const blob = await res.blob();
-                      const url = URL.createObjectURL(blob);
-                      const a = window.document.createElement('a');
-                      a.href = url;
-                      const contentDisposition = res.headers.get('content-disposition') || '';
-                      const match = contentDisposition.match(/filename="([^"]+)"/);
-                      a.download = match?.[1] || `decision-provenance-record-${analysis.id}.pdf`;
-                      window.document.body.appendChild(a);
-                      a.click();
-                      window.document.body.removeChild(a);
-                      URL.revokeObjectURL(url);
-                      showToast('Decision Provenance Record downloaded', 'success');
-                    } catch (err) {
-                      log.error('DPR header-button export failed:', err);
-                      showToast('Failed to download Decision Provenance Record.', 'error');
-                    }
-                  }}
-                  className="btn btn-sm flex items-center gap-sm"
-                  style={{
-                    background: 'var(--bg-card)',
-                    border: '1px solid var(--accent-primary)',
-                    color: 'var(--accent-primary)',
-                    fontWeight: 600,
-                  }}
-                  aria-label="Export Decision Provenance Record"
-                  title="Export a regulator-grade PDF citing every framework section triggered by this decision (EU AI Act Art 14, SEC, Basel III)"
-                >
-                  <ShieldCheck size={14} />
-                  Decision Provenance Record
-                </button>
-              )}
+              {/* DPR export — consolidated 2026-04-26 into the Share &
+                  Export modal only. The standalone header button used a
+                  different code path (/api/compliance/audit-packet vs the
+                  modal's /api/documents/[id]/provenance-record + client-
+                  side jsPDF) so two clicks produced two different PDFs.
+                  Single source of truth now. */}
               <button
                 onClick={() => versionFileInputRef.current?.click()}
                 disabled={isUploadingVersion}
@@ -1419,6 +1375,18 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                   if (file) void handleVersionFilePicked(file);
                   // Reset so picking the same filename twice still fires onChange.
                   e.target.value = '';
+                }}
+              />
+              {/* Danger action — separated by a vertical divider so it
+                  reads as a different action class than the primary /
+                  secondary cluster. */}
+              <span
+                aria-hidden
+                style={{
+                  width: 1,
+                  height: 22,
+                  background: 'var(--border-color)',
+                  margin: '0 4px',
                 }}
               />
               <button
@@ -1618,7 +1586,14 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           it frames the entire document view. Swapping phases swaps the
           body below (before = full analyst/cso/board; during = human
           decision panel; after = outcome + recalibrated DQI). */}
-      {analysis && (
+      {/* Phase scrubber renders only when viewMode === 'analyst' (the
+          only mode that has during/after panels). Hiding it on cso/ic/
+          board views — instead of the prior silent-snap-back-to-before
+          behaviour — eliminates the blank-state combinations Opus 4.6
+          flagged ("3 phases × 4 view modes = 12 cells, only 4 work").
+          The auto-snap effect still fires on direct-URL ?phase=after
+          loads so a stale link doesn't strand the user. */}
+      {analysis && viewMode === 'analyst' && (
         <ErrorBoundary sectionName="Decision timeline phase scrub">
           <TimelinePhaseScrub phase={phase} onChange={setPhase} />
         </ErrorBoundary>

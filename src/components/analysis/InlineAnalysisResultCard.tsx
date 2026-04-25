@@ -1018,7 +1018,7 @@ function PostRevealBookingRow() {
             marginBottom: 2,
           }}
         >
-          Want the founder to walk through this audit with you?
+          Want a live walkthrough of this audit?
         </div>
         <div
           style={{
@@ -1027,7 +1027,7 @@ function PostRevealBookingRow() {
             lineHeight: 1.4,
           }}
         >
-          30 minutes, live. Bring another memo and we&rsquo;ll audit that too.
+          30-minute design-partner session. Bring another memo and we&rsquo;ll audit that too.
         </div>
       </div>
       <Link

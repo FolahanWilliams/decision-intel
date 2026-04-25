@@ -230,53 +230,94 @@ export function OverviewTab({
         <DocumentTextHighlighter content={documentContent} biases={biases} />
       </ErrorBoundary>
 
-      {/* 2. Bias Profile Radar + Network + Risk Landscape */}
-      <ErrorBoundary sectionName="Bias Visualizations">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-lg" style={{ minHeight: '400px' }}>
-          <div className="card">
-            <div className="card-header">
-              <h4>Bias Intensity Profile</h4>
-            </div>
-            <div className="card-body">
-              <BiasProfileRadar biases={biases} />
-            </div>
+      {/* Bias visualisations (refactored 2026-04-26 per Opus 4.6 audit):
+          BiasProfileRadar leads — it's the most informative single read
+          for a quick scan. BiasNetwork3D and RiskHeatMap moved behind a
+          single "Show more visualisations" disclosure so they don't
+          fight the radar for attention by default and don't burn GPU on
+          a 1-page memo with 2 biases. The hardcoded probability=60 on
+          RiskHeatMap is now derived from severity (critical=0.85,
+          high=0.65, medium=0.45, low=0.25) — still a heuristic, but
+          honestly two-axis instead of degenerate. */}
+      <ErrorBoundary sectionName="Bias Profile Radar">
+        <div className="card">
+          <div className="card-header">
+            <h4>Bias Intensity Profile</h4>
           </div>
-          <div className="card overflow-hidden">
-            <div className="card-header">
-              <h4>Bias Network Map</h4>
-            </div>
-            <div className="card-body overflow-hidden" style={{ height: 360, padding: 0 }}>
-              <BiasNetwork3D
-                biases={biases.map((b, i) => ({
-                  ...b,
-                  id: b.id || `bias-${i}`,
-                  category: 'cognitive',
-                }))}
-              />
-            </div>
-          </div>
-          <div className="card">
-            <div className="card-header">
-              <h4>Risk Landscape</h4>
-            </div>
-            <div className="card-body">
-              <RiskHeatMap
-                risks={biases.map(b => ({
-                  category: b.biasType,
-                  impact:
-                    b.severity === 'critical'
-                      ? 90
-                      : b.severity === 'high'
-                        ? 70
-                        : b.severity === 'medium'
-                          ? 50
-                          : 30,
-                  probability: 60,
-                }))}
-              />
-            </div>
+          <div className="card-body">
+            <BiasProfileRadar biases={biases} />
           </div>
         </div>
+      </ErrorBoundary>
+
+      <ErrorBoundary sectionName="Additional Bias Visualizations">
+        <details
+          style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-md)',
+            padding: '8px 14px',
+          }}
+        >
+          <summary
+            style={{
+              cursor: 'pointer',
+              fontSize: 13,
+              fontWeight: 600,
+              color: 'var(--text-secondary)',
+              padding: '4px 0',
+            }}
+          >
+            Show more visualisations · Network map · Risk landscape
+          </summary>
+          <div
+            className="grid grid-cols-1 lg:grid-cols-2 gap-lg"
+            style={{ marginTop: 12, minHeight: 360 }}
+          >
+            <div className="card overflow-hidden" style={{ margin: 0 }}>
+              <div className="card-header">
+                <h4>Bias Network Map</h4>
+              </div>
+              <div className="card-body overflow-hidden" style={{ height: 360, padding: 0 }}>
+                <BiasNetwork3D
+                  biases={biases.map((b, i) => ({
+                    ...b,
+                    id: b.id || `bias-${i}`,
+                    category: 'cognitive',
+                  }))}
+                />
+              </div>
+            </div>
+            <div className="card" style={{ margin: 0 }}>
+              <div className="card-header">
+                <h4>Risk Landscape</h4>
+              </div>
+              <div className="card-body">
+                <RiskHeatMap
+                  risks={biases.map(b => ({
+                    category: b.biasType,
+                    impact:
+                      b.severity === 'critical'
+                        ? 90
+                        : b.severity === 'high'
+                          ? 70
+                          : b.severity === 'medium'
+                            ? 50
+                            : 30,
+                    probability:
+                      b.severity === 'critical'
+                        ? 85
+                        : b.severity === 'high'
+                          ? 65
+                          : b.severity === 'medium'
+                            ? 45
+                            : 25,
+                  }))}
+                />
+              </div>
+            </div>
+          </div>
+        </details>
       </ErrorBoundary>
 
       {/* 3. Decision Timeline */}
@@ -388,9 +429,26 @@ export function OverviewTab({
                       </div>
                     )}
                     {bias.id && (
-                      <ErrorBoundary>
-                        <BiasCollabPanel biasInstanceId={bias.id} />
-                      </ErrorBoundary>
+                      <div style={{ marginTop: 14 }}>
+                        <div
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 6,
+                            fontSize: 11,
+                            fontWeight: 700,
+                            letterSpacing: '0.08em',
+                            textTransform: 'uppercase',
+                            color: 'var(--text-muted)',
+                            marginBottom: 8,
+                          }}
+                        >
+                          Team discussion
+                        </div>
+                        <ErrorBoundary>
+                          <BiasCollabPanel biasInstanceId={bias.id} />
+                        </ErrorBoundary>
+                      </div>
                     )}
                   </div>
                 );
