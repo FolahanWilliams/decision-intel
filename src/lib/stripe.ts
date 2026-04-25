@@ -113,9 +113,11 @@ export const PLANS = {
     description:
       'Everything Individual has, plus a living Decision Knowledge Graph that connects every strategic memo your team produces.',
     priceMonthly: 2499,
-    priceAnnual: null,
+    /** Annual prepay (4.5 deep) — 2 months free vs. monthly (~17% off).
+     *  $2,499 × 12 = $29,988; annual = $24,990. */
+    priceAnnual: 24990,
     priceIdMonthly: process.env.STRIPE_TEAM_PRICE_ID || '',
-    priceIdAnnual: '',
+    priceIdAnnual: process.env.STRIPE_TEAM_PRICE_ANNUAL_ID || '',
     priceId: process.env.STRIPE_TEAM_PRICE_ID || '',
     analysesPerMonth: Infinity,
     maxPages: 200,
@@ -157,6 +159,20 @@ export const PLANS = {
      *  enforce-retention cron uses this value unless an explicit
      *  contract-level override is set on the Org. */
     retentionDays: 360,
+    /** Volume floor (4.5 deep). New Enterprise contracts ship with a
+     *  configurable per-quarter audit floor so renewal pricing isn't
+     *  open-ended. Default 100/quarter; the Order Form / quote builder
+     *  captures the actual contract value. Existing customers grandfather
+     *  in — no runtime gate enforces this; it's a contract-discipline
+     *  artefact surfaced on the Enterprise Quote Builder PDF. */
+    volumeFloorAuditsPerQuarter: 100,
+    /** M&A per-deal handle (4.5 deep). Strategy + Enterprise customers
+     *  can purchase additional active-deal slots beyond the fair-use cap
+     *  as a custom overage — NOT a separate plan tier. The handle is
+     *  priced per-deal-per-month and captured on the quote builder; the
+     *  default unit price below is what the founder lists in pitch decks
+     *  but the actual contract figure can flex. */
+    dealOverageUnitPriceMonthly: 750,
     features: {
       boardroomSimulation: true,
       forgottenQuestions: true,
@@ -174,6 +190,27 @@ export const PLANS = {
       customTaxonomy: true,
     } satisfies PlanFeatures,
   },
+} as const;
+
+/**
+ * Public Enterprise quote-builder defaults (4.5 deep). Used by the admin
+ * /dashboard/settings/billing/enterprise-quote builder to seed the
+ * starting numbers. Override per-deal at quote time; never used at
+ * runtime to enforce billing.
+ */
+export const ENTERPRISE_QUOTE_DEFAULTS = {
+  /** Per-seat / per-month list price ($/seat/mo); contract typically negotiates a band around this. */
+  perSeatMonthly: 119,
+  /** Minimum committed seats for a new Enterprise contract. */
+  minSeats: 25,
+  /** Floor on retention window (days). Order Form can extend; cannot reduce below. */
+  minRetentionDays: 360,
+  /** Default SLA tier — Standard | Premium | Custom. */
+  slaTier: 'Standard' as 'Standard' | 'Premium' | 'Custom',
+  /** Per-deal handle list price ($/active-deal/mo) — overage on top of seat fee. */
+  perDealMonthly: 750,
+  /** Default per-quarter audit floor (volume commitment). */
+  volumeFloorAuditsPerQuarter: 100,
 } as const;
 
 export type PlanType = keyof typeof PLANS;

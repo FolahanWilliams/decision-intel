@@ -66,8 +66,8 @@ function buildTiers(_cycle: BillingCycle): Tier[] {
       role: 'Corporate strategy team',
       tagline: 'For teams producing multiple board-level memos a quarter.',
       priceMonthly: 2499,
-      priceAnnual: null,
-      anchor: '$24,990/year · ~10× cheaper than one consulting week',
+      priceAnnual: 24990,
+      anchor: '$24,990/year — 2 months free · ~10× cheaper than one consulting week',
       highlights: [
         { label: 'Unlimited audits, 15 seats', strong: true },
         { label: 'Shared Decision Knowledge Graph', strong: true },
@@ -242,7 +242,7 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: 'Do you offer annual discounts?',
-    a: 'Individual is $249/mo or $2,490/yr (save ~16%). Strategy is billed monthly at $2,499. Enterprise is negotiated annually.',
+    a: 'Individual is $249/mo or $2,490/yr (2 months free). Strategy is $2,499/mo or $24,990/yr (2 months free). Annual prepay swap during a monthly subscription comes with prorated credit. Enterprise is annual by default; talk to us for the order form.',
   },
   {
     q: 'Are you SOC 2 compliant?',
@@ -268,7 +268,7 @@ export function PricingPageClient() {
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan: tierId, cycle: tierId === 'pro' ? cycle : 'monthly' }),
+        body: JSON.stringify({ plan: tierId, cycle }),
       });
       const data = await res.json();
       if (data.url) {
@@ -430,12 +430,15 @@ export function PricingPageClient() {
           className="pricing-cards-grid"
         >
           {tiers.map(tier => {
-            const showPrice =
-              tier.id === 'pro'
-                ? cycle === 'annual'
-                  ? tier.priceAnnual
-                  : tier.priceMonthly
-                : tier.priceMonthly;
+            // 4.5 deep — Strategy + Individual both honor the annual
+            // toggle. Free + Enterprise are unaffected (Free is always
+            // $0, Enterprise is custom-quoted).
+            const supportsCycle = tier.id === 'pro' || tier.id === 'team';
+            const showPrice = supportsCycle
+              ? cycle === 'annual'
+                ? tier.priceAnnual
+                : tier.priceMonthly
+              : tier.priceMonthly;
             const priceLabel =
               tier.customPrice ??
               (showPrice === 0
@@ -443,16 +446,11 @@ export function PricingPageClient() {
                 : showPrice !== null && showPrice !== undefined
                   ? `$${showPrice.toLocaleString()}`
                   : '');
-            const priceSuffix =
-              tier.id === 'pro'
-                ? cycle === 'annual'
-                  ? '/yr'
-                  : '/mo'
-                : tier.id === 'team'
-                  ? '/mo'
-                  : tier.id === 'free'
-                    ? ''
-                    : '';
+            const priceSuffix = supportsCycle
+              ? cycle === 'annual'
+                ? '/yr'
+                : '/mo'
+              : '';
 
             const isFeatured = !!tier.featured;
             return (
