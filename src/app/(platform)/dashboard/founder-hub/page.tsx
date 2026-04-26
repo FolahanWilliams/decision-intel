@@ -183,6 +183,13 @@ const DesignPartnersTab = dynamic(
     })),
   { loading: tabLoader }
 );
+const LrqaTab = dynamic(
+  () =>
+    import('@/components/founder-hub/LrqaTab').then(m => ({
+      default: m.LrqaTab,
+    })),
+  { loading: tabLoader }
+);
 import {
   Rocket,
   Brain,
@@ -234,6 +241,7 @@ type TabId =
   | 'category_position'
   | 'unicorn_roadmap'
   | 'meetings_log'
+  | 'lrqa'
   | 'todo';
 
 type TabGroup = 'Start' | 'Product' | 'Go-to-Market' | 'Intelligence' | 'Tools';
@@ -305,6 +313,12 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
   {
     id: 'design_partners',
     label: 'Design Partners',
+    icon: <Handshake size={16} />,
+    group: 'Go-to-Market',
+  },
+  {
+    id: 'lrqa',
+    label: 'LRQA / Ian Spaulding',
     icon: <Handshake size={16} />,
     group: 'Go-to-Market',
   },
@@ -1203,6 +1217,11 @@ function renderTab(
     design_partners: (
       <ErrorBoundary sectionName="Design Partners">
         <DesignPartnersTab founderPass={FOUNDER_PASS} />
+      </ErrorBoundary>
+    ),
+    lrqa: (
+      <ErrorBoundary sectionName="LRQA / Ian Spaulding">
+        <LrqaTab />
       </ErrorBoundary>
     ),
     content: (
