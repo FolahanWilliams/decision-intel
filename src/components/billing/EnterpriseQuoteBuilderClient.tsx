@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { FileDown, Loader2, ShieldCheck, ChevronLeft } from 'lucide-react';
+import { FileDown, Loader2, ShieldCheck, ChevronLeft, HelpCircle } from 'lucide-react';
 import Link from 'next/link';
 
 interface Defaults {
@@ -242,7 +242,10 @@ export function EnterpriseQuoteBuilderClient({
             </FieldRow>
           </Section>
 
-          <Section title="Active Deal handle">
+          <Section
+            title="Active Deal handle"
+            tooltip="The Active Deal handle is an overage line on top of seats. Each handle gives the M&A or corp-dev team one additional concurrent deal slot beyond the fair-use cap (typically 5 concurrent deals on Strategy tier). Most enterprise teams need 0–3 additional handles; ticket sizes >$100M usually warrant 1 handle per analyst."
+          >
             <FieldRow>
               <Field label="Additional active-deal slots">
                 <NumberInput value={dealOverageCount} onChange={setDealOverageCount} min={0} />
@@ -392,7 +395,16 @@ export function EnterpriseQuoteBuilderClient({
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  children,
+  tooltip,
+}: {
+  title: string;
+  children: React.ReactNode;
+  /** Optional procurement-grade explainer rendered as a HelpCircle icon next to the title with native tooltip on hover/focus. */
+  tooltip?: string;
+}) {
   return (
     <section
       style={{
@@ -411,9 +423,29 @@ function Section({ title, children }: { title: string; children: React.ReactNode
           letterSpacing: '0.06em',
           textTransform: 'uppercase',
           color: 'var(--text-muted)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
         }}
       >
         {title}
+        {tooltip && (
+          <span
+            tabIndex={0}
+            role="button"
+            aria-label={`Help: ${title}`}
+            title={tooltip}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              cursor: 'help',
+              color: 'var(--text-muted)',
+              outline: 'none',
+            }}
+          >
+            <HelpCircle size={12} />
+          </span>
+        )}
       </div>
       {children}
     </section>

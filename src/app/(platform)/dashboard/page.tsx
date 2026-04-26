@@ -29,6 +29,8 @@ import {
 } from 'lucide-react';
 import { DecisionIQCard } from '@/components/ui/DecisionIQCard';
 import { FirstRunInlineWalkthrough } from '@/components/onboarding/FirstRunInlineWalkthrough';
+import { useOnboardingRole } from '@/hooks/useOnboardingRole';
+import type { EmptyStateRole } from '@/lib/onboarding/role-empty-states';
 import { InlinePasteMemoCard } from '@/components/dashboard/InlinePasteMemoCard';
 import { CsoDashboardRail } from '@/components/dashboard/CsoDashboardRail';
 import Link from 'next/link';
@@ -131,8 +133,20 @@ function getDetailedErrorMessage(err: unknown, uploadRes?: Response | null): str
   return 'An unexpected error occurred during document analysis.';
 }
 
+const ROLE_DASHBOARD_SUBTITLE: Record<EmptyStateRole, string> = {
+  cso: 'Strategic memos, audited before the board sees them',
+  ma: 'Pre-IC bias detection across every active thesis',
+  bizops: 'Quality gates on every recurring strategic recommendation',
+  pe_vc: 'IC memos and portfolio reviews, audited live',
+  other: 'Decision intelligence overview',
+};
+
 export default function Dashboard() {
   const { knowledgeGraphLabel, isTeamPlan } = usePlanLabels();
+  const onboardingRole = useOnboardingRole();
+  const dashboardSubtitle = onboardingRole
+    ? ROLE_DASHBOARD_SUBTITLE[onboardingRole]
+    : ROLE_DASHBOARD_SUBTITLE.other;
   const [isDragOver, setIsDragOver] = useState(false);
   const [kgConsent, setKgConsent] = useState<{
     status: 'pending' | 'merged' | 'private' | 'not_applicable';
@@ -825,7 +839,7 @@ export default function Dashboard() {
           <h1>
             <span className="text-gradient">Dashboard</span>
           </h1>
-          <p className="page-subtitle">Decision intelligence overview</p>
+          <p className="page-subtitle">{dashboardSubtitle}</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <button

@@ -282,6 +282,7 @@ export function InlineAnalysisResultCard({
       </div>
 
       <div
+        className="inline-result-body"
         style={{
           padding: '24px 20px',
           display: 'grid',
@@ -596,6 +597,15 @@ export function InlineAnalysisResultCard({
           </div>
         </DialogContent>
       </Dialog>
+      <style>{`
+        @media (max-width: 700px) {
+          .inline-result-body {
+            grid-template-columns: 1fr !important;
+            gap: 18px !important;
+            padding: 18px 14px !important;
+          }
+        }
+      `}</style>
     </motion.div>
   );
 }

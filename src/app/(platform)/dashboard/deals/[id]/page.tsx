@@ -25,6 +25,8 @@ import { DealCompositeHero } from '@/components/deals/DealCompositeHero';
 import { DealCounterfactualHero } from '@/components/deals/DealCounterfactualHero';
 import { UploadToDealButton } from '@/components/deals/UploadToDealButton';
 import { CrossReferenceCard } from '@/components/deals/CrossReferenceCard';
+import { CrossRefBadge } from '@/components/deals/CrossRefBadge';
+import type { DealCrossReferenceFinding } from '@/types/deals';
 import {
   STAGE_COLORS,
   DEAL_TYPE_COLORS,
@@ -353,7 +355,11 @@ export default function DealDetailPage() {
 
         {/* Tab Content */}
         {activeTab === 'documents' && (
-          <DocumentsTab documents={deal.documents || []} dealId={deal.id} />
+          <DocumentsTab
+            documents={deal.documents || []}
+            dealId={deal.id}
+            crossRefFindings={extractFindings(deal.crossReference)}
+          />
         )}
         {activeTab === 'bias' && (
           <BiasSummaryTab
@@ -378,9 +384,24 @@ export default function DealDetailPage() {
 
 // ─── Documents Tab ────────────────────────────────────────────────────────────
 
+/**
+ * Pull the findings array out of a DealCrossReference run regardless of
+ * which JSON shape is persisted (legacy bare-array vs the wrapped
+ * { findings, summary } object). Returns [] when no run / no findings.
+ */
+function extractFindings(
+  run: { findings?: unknown } | null | undefined
+): DealCrossReferenceFinding[] {
+  if (!run || !run.findings) return [];
+  if (Array.isArray(run.findings)) return run.findings as DealCrossReferenceFinding[];
+  const wrapped = run.findings as { findings?: DealCrossReferenceFinding[] };
+  return wrapped.findings ?? [];
+}
+
 function DocumentsTab({
   documents,
   dealId: _dealId,
+  crossRefFindings = [],
 }: {
   documents: Array<{
     id: string;
@@ -390,6 +411,7 @@ function DocumentsTab({
     analyses?: Array<{ id: string; overallScore: number; createdAt: string }>;
   }>;
   dealId: string;
+  crossRefFindings?: DealCrossReferenceFinding[];
 }) {
   const router = useRouter();
 
@@ -493,6 +515,7 @@ function DocumentsTab({
                   DQI {Math.round(latestScore)}
                 </span>
               )}
+              <CrossRefBadge documentId={doc.id} findings={crossRefFindings} />
               {doc.documentType && (
                 <span
                   style={{
