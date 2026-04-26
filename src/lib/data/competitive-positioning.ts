@@ -469,6 +469,126 @@ export const COMMON_OBJECTIONS: Objection[] = [
 
 // ─── Market sizing & expansion roadmap ────────────────────────────────────
 
+// ─── Top 3 DI-space gaps that Decision Intel uniquely fixes ──────────────
+// Source: external research synthesis (CubeResearch, Deloitte, LinkedIn,
+// G2, OpenPR) integrated 2026-04-26. The decision intelligence market is
+// $16-20B (2025-26) → projected $50B+ by 2030, 15-24% CAGR. Despite that
+// growth, most enterprises see low ROI because incumbents (Cloverpop,
+// Aera, Quantexa, Pyramid Analytics, Quantellia, Peak.ai, IBM watsonx)
+// solve correlation + automation but NOT the deeper reasoning, execution,
+// and governance layers. The 3 gaps below are the "white space" a category-
+// creator startup occupies — and they map exactly onto Decision Intel's
+// shipped product surfaces.
+//
+// Use this surface in:
+//   - Cold outbound (cite the gap, the stat, then the product surface)
+//   - Investor decks (proves we're not "another DI tool" — we're the layer
+//     that makes DI tools defensible)
+//   - Active prospect conversations (LRQA brief, future warm intros)
+//   - Procurement responses (when buyers ask "why you over Cloverpop / Aera")
+
+export interface DiSpaceGap {
+  id: string;
+  rank: 1 | 2 | 3;
+  title: string;
+  industryStat: string;
+  whatItIs: string;
+  whyCompetitorsFail: string;
+  whyItBlocksValue: string;
+  howDiSolves: string;
+  diProductSurfaces: string[];
+  citationSources: string[];
+}
+
+export const DI_MARKET_CONTEXT = {
+  size2026: '$16-20B',
+  projection: '$50B+ by 2030-2035',
+  cagr: '15-24%',
+  framing:
+    'The category is exploding but immature. Adoption by leaders (Quantexa, Aera, Pyramid Analytics) focuses on contextual data unification + real-time automation + augmented analytics — but most organisations see LOW ROI because current platforms deliver insights or partial automation WITHOUT addressing deeper systemic failures. A new category-creator startup wins by solving one of the three gaps below — redefining a sub-category (like "Causal Decision Intelligence" or "Governed Agentic DI") rather than competing head-on.',
+};
+
+export const TOP_3_DI_GAPS: DiSpaceGap[] = [
+  {
+    id: 'causal_reasoning_explainability',
+    rank: 1,
+    title: 'Causal Reasoning & Faithful Explainability',
+    industryStat:
+      '~74% of LLM-pipeline explanations don\'t match actual drivers (faithfulness gap). Only ~46% of AI leaders trust agentic decisions for explainable / justified outcomes. 62% of organisations are experimenting with agents but stuck on auditability.',
+    whatItIs:
+      'Most DI tools (and the underlying LLMs/agents) rely on correlation, not causation. They surface insights and recommendations but cannot answer "what-if" interventions, counterfactual scenarios, or root-cause traceability in dynamic environments. When a CSO or auditor asks "why did the system recommend this?" the answer is opaque.',
+    whyCompetitorsFail:
+      'Cloverpop logs decisions but doesn\'t reason about them. Aera, Quantexa, and Pyramid Analytics surface contextual data but not the cognitive mechanics behind a human decision on that data. Generic LLM wrappers produce plausible-sounding explanations that don\'t actually map to the model\'s reasoning chain. PhD-level expertise required for current causal-DI implementations means democratisation is broken.',
+    whyItBlocksValue:
+      'Without causal reasoning, organisations can\'t confidently audit, simulate, or defend high-stakes decisions. Boards can\'t use the output as evidence. Auditors can\'t cite it. Regulators can\'t accept it. The platform becomes "smart suggestions you ignore."',
+    howDiSolves:
+      'Recognition-Rigor Framework (R²F) operationalises Kahneman\'s debiasing (System 2 rigor) arbitrated with Klein\'s Recognition-Primed Decisions (System 1 pattern matching) — every audit attributes the reasoning to either tradition with named causal links. The 12-node LangGraph pipeline produces schema-validated outputs at each step (bias detection cites the exact paragraph; counterfactual scoring quantifies the lift; pre-mortem generates failure scenarios with prospective hindsight). The 20×20 bias interaction matrix maps named toxic combinations (e.g. confirmation × overconfidence × sunk cost = the Kodak pattern) so the explanation is mechanistically traceable, not LLM-generated post-hoc.',
+    diProductSurfaces: [
+      'src/lib/agents/graph.ts — 12-node pipeline with deterministic glue between LLM calls',
+      'src/lib/scoring/dqi.ts — composite scoring with weights traceable to research (Kahneman-Sibony, Howard-Matheson)',
+      'src/lib/scoring/toxic-combinations.ts — 18 named bias patterns with historical exemplars',
+      '/how-it-works — public surface explaining every node + the academic anchor (Kahneman-Klein 2009 paper, DOI 10.1037/a0016755)',
+    ],
+    citationSources: [
+      'CubeResearch 2026 — "AI faithfulness gap"',
+      'YouTube — 2026 DI mainstream post-generative-AI analysis',
+    ],
+  },
+  {
+    id: 'decision_to_action_closed_loop',
+    rank: 2,
+    title: 'Decision-to-Action Execution & Closed-Loop Accountability',
+    industryStat:
+      '>50% of organisations have LOW decision-making maturity. 85% regret rate on AI-influenced decisions in some studies. AI often AMPLIFIES existing decision deficiencies rather than fixing them.',
+    whatItIs:
+      'DI platforms excel at recommendations and partial automation but stop short of execution. Persistent "insight-without-action" issues: unclear ownership of decisions made, missing feedback loops between decision and outcome, no accountability for outcome quality, and no workflow redesigned for AI-human collaboration.',
+    whyCompetitorsFail:
+      'Aera-style "recommendation" platforms hand off the decision to a human and then disappear from the loop. Cloverpop logs the decision but doesn\'t enforce outcome reporting. Generic AI agents execute tactical actions but don\'t close the strategic learning loop. There\'s no platform-level mechanism that guarantees "you made this decision, now log the outcome, now we recalibrate."',
+    whyItBlocksValue:
+      'Without a closed loop, the platform produces no compounding value over time. Users see early audits as "interesting" but flat at month 6 because the system never learned from THEIR specific outcomes. The data flywheel — the only durable moat in DI — never rotates. The platform becomes shelfware.',
+    howDiSolves:
+      'Outcome Gate Enforcement (Phase 1 shipped 2026-04-26): for design-partner orgs with Organization.enforceOutcomeGate=true, the API blocks new audits via HTTP 409 OUTCOME_GATE_BLOCKED when the user has 5+ pending outcome reports past 30 days old. The platform forces the loop closure structurally, not via email reminders. Per-org Brier-scored recalibration (Tetlock superforecasting research operationalised) tunes the DQI weights to YOUR firm\'s specific decisions over 12-24 months. The full lifecycle (frame → decide → act → learn) is treated as first-class — every audit has a decision_state field tracking it through the loop.',
+    diProductSurfaces: [
+      'src/lib/learning/outcome-gate.ts — checkOutcomeGate(userId, enforce) returns allowed: false at HARD threshold',
+      'src/app/api/analyze/stream/route.ts — 409 OUTCOME_GATE_BLOCKED enforcement',
+      'src/lib/learning/brier-scoring.ts — per-outcome Brier scoring + per-org calibration trend',
+      'src/lib/learning/recalibration.ts — recalibrateFromOutcome() shared by both outcome POST routes',
+      'Founder School lesson es_11 — codifies the discovery-call language for the contractual outcome gate',
+    ],
+    citationSources: [
+      'Deloitte — decision-making maturity survey',
+      'LinkedIn enterprise survey — insight-without-action gap',
+    ],
+  },
+  {
+    id: 'human_ai_governance_oversight',
+    rank: 3,
+    title: 'Human-AI Governance, Trust & Oversight',
+    industryStat:
+      'Decision governance lags far behind data governance. Few tools provide decision tracing, ethical guardrails, or hybrid human-AI rights. Explainability is repeatedly cited as the #1 trust barrier in enterprise AI adoption. EU AI Act Article 14 enforcement August 2026 demands documented human oversight on high-risk decision-support systems.',
+    whatItIs:
+      'Black-box AI erodes accountability ("people feel less accountable when delegating to AI") and amplifies biases. As autonomous agents operate at superhuman speed and scale, oversight becomes a nightmare. Decision governance — who decided what, with what rationale, against what regulatory framework — has no canonical artefact in most DI platforms.',
+    whyCompetitorsFail:
+      'IBM watsonx.governance audits the MODEL but not the human decision made on the model\'s output. Cloverpop logs the decision text but not the regulatory provisions it touches. Quantexa surfaces relationship-graph context but doesn\'t produce a regulator-grade audit artefact. Most platforms treat governance as a post-hoc reporting layer, not as a structurally embedded property of every decision.',
+    whyItBlocksValue:
+      'Without traceable oversight, regulators can\'t accept the platform\'s output as evidence. Boards can\'t use it for accountability. Procurement teams veto adoption when the EU AI Act compliance question surfaces. The platform fails the "would you cite this in a board minute?" test that determines enterprise scale.',
+    howDiSolves:
+      'The Decision Provenance Record (DPR) is hashed + tamper-evident + cited against 17 regulatory frameworks across G7, EU, GCC, and African markets (NDPR, CBN, FRC Nigeria, WAEMU, CMA Kenya, CBK, BoG, CBE, PoPIA §71, SARB Model Risk, BoT FinTech, plus EU AI Act Articles 13/14/15, GDPR Art 22, Basel III Pillar 2, SOX §404, NIST AI RMF, AI Verify Foundation alignment). Every flag carries a regulatory provision citation. Per CLAUDE.md AI Verify alignment, the DPR maps to the 11 internationally-recognised AI governance principles (transparency, explainability, repeatability, safety, security, robustness, fairness, data governance, accountability, human agency & oversight, inclusive growth) — never claiming "certified" but always demonstrating principle-by-principle alignment.',
+    diProductSurfaces: [
+      'src/lib/reports/decision-provenance-record-generator.ts — DPR generator producing the hashed PDF',
+      'src/lib/compliance/frameworks/ — 17-framework registry (FRAMEWORKS.length-derived; African coverage in africa-frameworks.ts)',
+      'src/lib/constants/trust-copy.ts — single source of truth for SOC 2 / DPR vocabulary across all surfaces',
+      '/regulatory/ai-verify — public mapping page for the 11 AI governance principles',
+      '/security — Pan-African regulatory bridge + DR/BCP disclosure (RPO ≤ 15min, RTO < 4h)',
+    ],
+    citationSources: [
+      'Deloitte — AI accountability erosion research',
+      'G2 / learn.g2.com — explainability as #1 trust barrier',
+      'EU AI Act Article 14 — human oversight enforcement Aug 2026',
+    ],
+  },
+];
+
 export const MARKET_SIZE = {
   headline: 'Regulatory-tailwind market — $995B by 2035 if categorised broadly',
   stats: [

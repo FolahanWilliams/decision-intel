@@ -18,13 +18,14 @@
  * coverage. Update via lrqa-brief-data.ts as the relationship develops.
  */
 
-import { UserCircle, Building2, Network, Trophy, ClipboardCheck, Send } from 'lucide-react';
+import { UserCircle, Building2, Network, Trophy, ClipboardCheck, Send, Sparkles } from 'lucide-react';
 import { IanProfilePanel } from './lrqa/IanProfilePanel';
 import { LrqaCompanyMap } from './lrqa/LrqaCompanyMap';
 import { IntegrationPathsMap } from './lrqa/IntegrationPathsMap';
 import { AskHierarchyLadder } from './lrqa/AskHierarchyLadder';
 import { MeetingPrepBoard } from './lrqa/MeetingPrepBoard';
 import { FollowUpPlaybook } from './lrqa/FollowUpPlaybook';
+import { ThreeGapsDifferentiator } from './competitive/ThreeGapsDifferentiator';
 
 interface SectionProps {
   icon: React.ReactNode;
@@ -153,6 +154,15 @@ export function LrqaTab() {
         accent="#0EA5E9"
       >
         <LrqaCompanyMap />
+      </Section>
+
+      <Section
+        icon={<Sparkles size={16} />}
+        title="Why DI is structurally different · top 3 DI-space gaps"
+        subtitle="The 3 systemic gaps in current decision intelligence (Cloverpop, Aera, Quantexa, IBM watsonx) that DI uniquely fixes — Causal Reasoning, Closed-Loop Accountability, Human-AI Governance. Reference these with Ian during the meeting if he asks 'how is this different from what's already out there?'. Same surface lives in the Competitive Positioning tab."
+        accent="#DC2626"
+      >
+        <ThreeGapsDifferentiator />
       </Section>
 
       <Section

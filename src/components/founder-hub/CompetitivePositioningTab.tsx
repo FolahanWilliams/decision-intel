@@ -1,6 +1,6 @@
 'use client';
 
-import { Crosshair, Target, Lock, BarChart3, MessageSquare, Shield, Map } from 'lucide-react';
+import { Crosshair, Target, Lock, BarChart3, MessageSquare, Shield, Map, Sparkles } from 'lucide-react';
 import { CategoryContrastPanels } from './competitive/CategoryContrastPanels';
 import { CloverpopComparisonGrid } from './competitive/CloverpopComparisonGrid';
 import { MoatLayersStack } from './competitive/MoatLayersStack';
@@ -8,6 +8,7 @@ import { CompetitorHeatmap } from './competitive/CompetitorHeatmap';
 import { InvestorQAFlashcards } from './competitive/InvestorQAFlashcards';
 import { ObjectionQuickReference } from './competitive/ObjectionQuickReference';
 import { MarketRoadmapTimeline } from './competitive/MarketRoadmapTimeline';
+import { ThreeGapsDifferentiator } from './competitive/ThreeGapsDifferentiator';
 
 interface SectionProps {
   icon: React.ReactNode;
@@ -63,6 +64,15 @@ function Section({ icon, title, subtitle, accent, children }: SectionProps) {
 export function CompetitivePositioningTab() {
   return (
     <div>
+      <Section
+        icon={<Sparkles size={16} />}
+        title="Top 3 DI-space gaps · why DI is structurally different"
+        subtitle="The 3 systemic gaps in current decision intelligence (Cloverpop, Aera, Quantexa, Pyramid Analytics, IBM watsonx) that Decision Intel uniquely fixes — Causal Reasoning & Faithful Explainability, Decision-to-Action Closed-Loop Accountability, Human-AI Governance & Oversight. External research grounded; cite in cold outbound + investor decks + procurement responses + LRQA-style warm intros."
+        accent="#DC2626"
+      >
+        <ThreeGapsDifferentiator />
+      </Section>
+
       <Section
         icon={<Crosshair size={16} />}
         title="Elevator Pitch + Category Contrast"
