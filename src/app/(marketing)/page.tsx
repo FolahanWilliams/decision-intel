@@ -309,7 +309,105 @@ export default function LandingPage() {
                 alignItems: 'flex-start',
               }}
             >
-              <WeWorkProofPanel />
+              <div
+                className="hero-proof-stack"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 16,
+                  width: '100%',
+                  maxWidth: 520,
+                }}
+              >
+                <WeWorkProofPanel />
+                {/* Two mini-cards below the WeWork panel: PAIN ($250M
+                    McKinsey Global Decision-Making Survey, 2017 — verified
+                    primary source) + VALUE (what the user walks away
+                    with — closes the "what's the output?" gap that 8
+                    readers across 3 rounds plus 2 final blind readers
+                    flagged). Both single-sentence. PAIN is sourced;
+                    VALUE describes the actual deliverable. The two cards
+                    sit side-by-side at desktop, stack on mobile. */}
+                <div
+                  className="hero-mini-cards"
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: 12,
+                  }}
+                >
+                  <div
+                    style={{
+                      background: C.white,
+                      border: `1px solid ${C.slate200}`,
+                      borderRadius: 12,
+                      padding: '14px 16px',
+                      boxShadow:
+                        '0 4px 16px -8px rgba(15,23,42,0.08), 0 2px 4px rgba(15,23,42,0.04)',
+                    }}
+                  >
+                    <p
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 800,
+                        letterSpacing: '0.12em',
+                        textTransform: 'uppercase',
+                        color: C.green,
+                        marginBottom: 8,
+                        marginTop: 0,
+                      }}
+                    >
+                      The cost of slow decisions
+                    </p>
+                    <p
+                      style={{
+                        fontSize: 12.5,
+                        color: C.slate700,
+                        lineHeight: 1.5,
+                        margin: 0,
+                      }}
+                    >
+                      McKinsey: inefficient decision-making costs the typical Fortune 500 company
+                      $250M a year.
+                    </p>
+                  </div>
+                  <div
+                    style={{
+                      background: C.white,
+                      border: `1px solid ${C.slate200}`,
+                      borderRadius: 12,
+                      padding: '14px 16px',
+                      boxShadow:
+                        '0 4px 16px -8px rgba(15,23,42,0.08), 0 2px 4px rgba(15,23,42,0.04)',
+                    }}
+                  >
+                    <p
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 800,
+                        letterSpacing: '0.12em',
+                        textTransform: 'uppercase',
+                        color: C.green,
+                        marginBottom: 8,
+                        marginTop: 0,
+                      }}
+                    >
+                      What you get
+                    </p>
+                    <p
+                      style={{
+                        fontSize: 12.5,
+                        color: C.slate700,
+                        lineHeight: 1.5,
+                        margin: 0,
+                      }}
+                    >
+                      A signed Decision Provenance Record: three biases named, the counterfactual
+                      quantified, defensible in any room.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -335,6 +433,9 @@ export default function LandingPage() {
             }
             .hero-proof {
               justify-content: center !important;
+            }
+            .hero-mini-cards {
+              grid-template-columns: 1fr !important;
             }
           }
         `}</style>
