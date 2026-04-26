@@ -31,6 +31,10 @@ import { NoiseDistributionViz } from '@/components/marketing/how-it-works/NoiseD
 import { DQIBadge } from '@/components/ui/DQIBadge';
 import { Reveal } from '@/components/ui/Reveal';
 import { PasteAuditResults } from '@/components/marketing/demo/PasteAuditResults';
+import {
+  DiscoveryGradeImpactCard,
+  STATIC_DEMO_ANCHOR,
+} from '@/components/discovery/DiscoveryGradeImpactCard';
 import { RedactionPreModal, type RedactionTrailContext } from '@/components/ui/RedactionPreModal';
 import { scanForPii, type ScanResult } from '@/lib/utils/redaction-scanner';
 import { postRedactionTrail, savePlaceholderMap } from '@/lib/utils/redaction-trail';
@@ -516,9 +520,29 @@ export default function DemoPage() {
         )}
       </header>
 
+      {/* ─── Idle: Discovery-grade Impact Card (empathic-mode-first) ──
+          Lands BEFORE the paste hero so a cold reader (Pan-African fund
+          partner, F500 CSO at first meeting) sees the dollar anchor +
+          the one fix BEFORE any platform vocabulary. Per CLAUDE.md
+          "Marketing Voice" + memory `feedback-empathic-mode-first`.
+          The static anchor uses the canonical $50M / 45% sample so the
+          number is defensible against a quick fact-check. */}
+      {idleState && (
+        <SectionBand bg={C.slate50} paddingY={56} maxWidth={780}>
+          <Reveal>
+            <DiscoveryGradeImpactCard
+              variant="static"
+              anchor={STATIC_DEMO_ANCHOR}
+              ctaHref="#paste-hero"
+              ctaLabel="Run this on your own memo →"
+            />
+          </Reveal>
+        </SectionBand>
+      )}
       {/* ─── Idle: PASTE HERO — primary conversion mechanic ─────────── */}
       {idleState && (
         <SectionBand bg={C.white} paddingY={72} maxWidth={920}>
+          <div id="paste-hero" />
           <Reveal>
             <div style={{ textAlign: 'center', marginBottom: 32 }}>
               <div

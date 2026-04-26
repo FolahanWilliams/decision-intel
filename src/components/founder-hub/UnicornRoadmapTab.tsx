@@ -21,6 +21,7 @@
 
 import { NorthStarHero } from './unicorn-roadmap/NorthStarHero';
 import { ExecutiveMemo } from './unicorn-roadmap/ExecutiveMemo';
+import { HonestProbabilityPath } from './unicorn-roadmap/HonestProbabilityPath';
 import { UnicornTimeline } from './unicorn-roadmap/UnicornTimeline';
 import { MoatRadar } from './unicorn-roadmap/MoatRadar';
 import { SprintBoard } from './unicorn-roadmap/SprintBoard';
@@ -36,6 +37,10 @@ export function UnicornRoadmapTab() {
     <div style={{ paddingBottom: 64 }}>
       <NorthStarHero />
       <ExecutiveMemo />
+      {/* HonestProbabilityPath is the load-bearing surface — sits high
+          so every visit starts with the multiplied conditionals + five
+          hard-truth weaknesses, not the optimistic timeline. */}
+      <HonestProbabilityPath />
       <UnicornTimeline />
       <MoatRadar />
       <CompetitiveMap />

@@ -599,6 +599,40 @@ export const PITFALLS: Pitfall[] = [
     tripwire:
       'If a month passes without speaking to another 16–22-year-old technical founder, fix that week.',
   },
+  // Three new pitfalls (locked 2026-04-27) — derived from NotebookLM
+  // master-KB synthesis on prior decision-intelligence companies that
+  // tried to scale to unicorn and stalled. Each carries a concrete
+  // tripwire mapped onto Decision Intel's current state.
+  {
+    id: 'quantellia-trap',
+    name: 'The Quantellia "Unscalable Consulting" trap',
+    severity: 'critical',
+    likelihood: 'likely',
+    mitigation:
+      'Adhere to the productised pipeline. Custom feature work for design partners becomes cohort items or cash-priced enterprise add-ons — never silent unpaid dev work. Document the rule before the next Sankore / Ian conversation, not after.',
+    tripwire:
+      'If three of the last five engineering sessions were design-partner-specific feature requests, the rule was breached — reset the week.',
+  },
+  {
+    id: 'cloverpop-trap',
+    name: 'The Cloverpop "Manual Logging" adoption trap',
+    severity: 'critical',
+    likelihood: 'possible',
+    mitigation:
+      'The audit must happen automatically via existing workflows (Slack listener, deal-room email forwarder, Drive polling). Zero behaviour change for the analyst. Force integration-first onboarding in the discovery call, not after the contract.',
+    tripwire:
+      'If a design partner has not had at least one auto-ingested audit fire within 14 days of contract, the integration-first onboarding failed — escalate to founder-led setup.',
+  },
+  {
+    id: 'dormant-flywheel-trap',
+    name: 'The Dormant Data Flywheel trap',
+    severity: 'critical',
+    likelihood: 'likely',
+    mitigation:
+      'Outcome Gate Phase 1 + Phase 2 enforced contractually on every paid org (enforceOutcomeGate=true). Without closed outcomes, the Bias Genome moat stays a story, not a substrate — Cloverpop or IBM can replicate the audit surface in three months.',
+    tripwire:
+      'If a paid design partner has fewer than 5 closed outcomes after 60 days, the data flywheel is not turning — escalate to a founder-led outcome-capture session.',
+  },
 ];
 
 /* ─── Operating cadence ────────────────────────────────────────────── */

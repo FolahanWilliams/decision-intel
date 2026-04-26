@@ -223,7 +223,7 @@ export function InlineAnalysisResultCard({
               color: 'var(--success)',
             }}
           >
-            60-second audit complete
+            Decision audited · what to fix before the room sees it
           </div>
           <div
             style={{

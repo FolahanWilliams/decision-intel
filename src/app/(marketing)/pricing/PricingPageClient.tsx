@@ -34,6 +34,16 @@ interface Tier {
   name: string;
   role: string;
   tagline: string;
+  /**
+   * Protected-value strap (locked 2026-04-27 — positioning shift from
+   * "selling features" to "selling protected revenue / business
+   * outcomes"). Renders as a green-bordered callout above the feature
+   * highlights so a CSO / fund partner reads "what this protects" BEFORE
+   * "what this includes." Per NotebookLM "highest-ROI positioning"
+   * synthesis: per-decision dollar anchor tied to ticket size beats
+   * organisation-wide percentage claims.
+   */
+  protectedValue?: string;
   priceMonthly: number | null;
   priceAnnual: number | null;
   customPrice?: string;
@@ -57,6 +67,8 @@ function buildTiers(_cycle: BillingCycle): Tier[] {
       name: 'Free',
       role: 'Just exploring',
       tagline: 'See what we flag on your first memo. No card needed.',
+      protectedValue:
+        'Run one audit. See the dollar impact you would have missed. Decide if it is worth the upgrade.',
       priceMonthly: 0,
       priceAnnual: 0,
       anchor: 'Forever free · upgrade any time',
@@ -73,6 +85,8 @@ function buildTiers(_cycle: BillingCycle): Tier[] {
       name: 'Strategy',
       role: 'Corporate strategy team',
       tagline: 'For teams producing multiple board-level memos a quarter.',
+      protectedValue:
+        'One avoided £5-15M strategic mistake per quarter pays for the entire team subscription five years over. The price is a rounding error against a single bad call.',
       priceMonthly: 2499,
       priceAnnual: 24990,
       anchor: '$24,990/year — 2 months free · ~10× cheaper than one consulting week',
@@ -93,6 +107,8 @@ function buildTiers(_cycle: BillingCycle): Tier[] {
       name: 'Individual',
       role: 'Solo strategy operator',
       tagline: 'The career-defining edge for a Head of Strategy, CorpDev lead, or M&A operator.',
+      protectedValue:
+        'One audit catches one mistake on one memo and the annual subscription returns 50× over. The audit you can show your manager when the deal goes sideways.',
       priceMonthly: 249,
       priceAnnual: 2490,
       anchor: '$2,490/year (save ~16%) on annual',
@@ -110,6 +126,8 @@ function buildTiers(_cycle: BillingCycle): Tier[] {
       name: 'Enterprise',
       role: 'Fortune 500 strategy function',
       tagline: 'Multi-division workflows, compliance SLAs, and a deployment partner.',
+      protectedValue:
+        'Audit-defensible decisions across the entire strategy function. The provenance record your audit committee asks for and your General Counsel signs off on, before regulators start asking.',
       priceMonthly: null,
       priceAnnual: null,
       customPrice: 'Custom',
@@ -609,6 +627,43 @@ export function PricingPageClient() {
                 >
                   {tier.tagline}
                 </p>
+
+                {tier.protectedValue && (
+                  <div
+                    style={{
+                      padding: '12px 14px',
+                      borderRadius: 10,
+                      background: 'rgba(22,163,74,0.06)',
+                      border: '1px solid rgba(22,163,74,0.22)',
+                      borderLeft: `3px solid ${C.green}`,
+                      marginTop: 4,
+                      marginBottom: 4,
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 9.5,
+                        fontWeight: 800,
+                        color: C.green,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.14em',
+                        marginBottom: 5,
+                      }}
+                    >
+                      What this protects
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 12.5,
+                        color: C.slate900,
+                        lineHeight: 1.5,
+                        letterSpacing: '-0.005em',
+                      }}
+                    >
+                      {tier.protectedValue}
+                    </div>
+                  </div>
+                )}
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {tier.highlights.map(h => (
