@@ -1,17 +1,31 @@
 /**
- * Outcome Reminder Gate
+ * Outcome Reminder Gate (HARDENED 2026-04-26 with optional enforcement).
  *
- * Surfaces progressive, non-blocking nudges asking users to report outcomes
- * on past analyses. The behavioral data flywheel produces more value as users
- * close the loop, but outcome reporting is encouraged — never mandatory — so
- * enterprise adoption is not gated behind workflow commitments.
+ * Surfaces progressive nudges asking users to report outcomes on past
+ * analyses. The behavioral data flywheel produces more value as users close
+ * the loop. Two modes:
  *
- * Gate levels (informational only — `allowed` is always true):
- *   - SOFT (3+ pending): gentle reminder in SSE stream and dashboard banner
- *   - HARD (5+ pending): stronger visual banner with escalated copy
+ *   - DEFAULT (enforce=false): non-blocking. `allowed` is always true.
+ *     SOFT (3+ pending): gentle reminder in SSE stream and dashboard banner.
+ *     HARD (5+ pending): stronger visual banner with escalated copy.
+ *     Outcome reporting is encouraged but never mandatory.
  *
- * Each reported outcome still improves calibration accuracy and personalizes
- * bias detection, so the incentive structure remains intact without friction.
+ *   - ENFORCED (enforce=true, set per-org via Organization.enforceOutcomeGate):
+ *     SOFT and HARD reminders both still fire. Additionally, at HARD
+ *     threshold, `allowed` returns FALSE — caller (the analyze stream
+ *     route) returns HTTP 409 with code 'OUTCOME_GATE_BLOCKED' and the
+ *     pending analysis IDs. The user must log outcomes on the past
+ *     analyses before they can run a new audit.
+ *
+ * The enforced mode is the structural fix for the "outcome-gate avoidance"
+ * failure mode identified by NotebookLM strategic synthesis Q6 pre-mortem
+ * (locked 2026-04-26). Pre-existing soft mode preserved for free /
+ * individual / non-design-partner accounts. Enforced mode is opt-in per org
+ * — typically turned ON for design-partner orgs as a contractual term of
+ * the partnership so the data flywheel actually rotates.
+ *
+ * See `es_11` Founder School lesson: "Outcome Gate Enforcement as a
+ * Design-Partner Contractual Term."
  */
 
 import { prisma } from '@/lib/prisma';
@@ -47,8 +61,18 @@ export interface OutcomeGateResult {
  *
  * Returns gate level, pending count, and analysis IDs that need outcomes.
  * Non-throwing — returns a permissive result on any error (schema drift, etc).
+ *
+ * @param userId  Authenticated Supabase user ID.
+ * @param enforce When true (typically passed because the user's org has
+ *                Organization.enforceOutcomeGate = true), the HARD threshold
+ *                returns `allowed: false` so the caller can hard-block.
+ *                When false (default), preserves the legacy soft-nudge
+ *                behaviour where `allowed` is always true.
  */
-export async function checkOutcomeGate(userId: string): Promise<OutcomeGateResult> {
+export async function checkOutcomeGate(
+  userId: string,
+  enforce: boolean = false
+): Promise<OutcomeGateResult> {
   const permissive: OutcomeGateResult = {
     allowed: true,
     pendingCount: 0,
@@ -78,11 +102,15 @@ export async function checkOutcomeGate(userId: string): Promise<OutcomeGateResul
     const pendingAnalysisIds = pendingAnalyses.map((a: { id: string; createdAt: Date }) => a.id);
 
     if (pendingCount >= OUTCOME_GATE.HARD_THRESHOLD) {
+      // Enforced HARD: block. Legacy soft HARD: still allow with reminder.
+      const blocked = enforce;
       return {
-        allowed: true,
+        allowed: !blocked,
         pendingCount,
         level: 'hard',
-        message: `You have ${pendingCount} analyses awaiting outcome reports. Reporting outcomes improves your calibration accuracy and unlocks personalized bias detection. We recommend catching up soon.`,
+        message: blocked
+          ? `Outcome Gate blocked: log outcomes on ${pendingCount} pending analyses (older than ${OUTCOME_GATE.MIN_AGE_DAYS} days) before running a new audit. The flywheel only compounds when the loop closes.`
+          : `You have ${pendingCount} analyses awaiting outcome reports. Reporting outcomes improves your calibration accuracy and unlocks personalized bias detection. We recommend catching up soon.`,
         pendingAnalysisIds,
       };
     }

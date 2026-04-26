@@ -656,6 +656,19 @@ model Organization {
   /// owned by this org. Min 30 days enforced in the API. Null = use the
   /// plan-tier default from src/lib/utils/plan-limits.ts.
   retentionDaysOverride Int?
+  /// Outcome Gate enforcement (locked 2026-04-26 — closes the
+  /// "outcome-gate avoidance" structural failure mode identified by
+  /// NotebookLM strategic synthesis Q6 pre-mortem). When TRUE, the
+  /// /api/analyze/stream POST returns HTTP 409 with code
+  /// 'OUTCOME_GATE_BLOCKED' if the user has 5+ pending outcome reports
+  /// past 30 days old. The flag is OFF by default (preserves existing
+  /// behaviour for free / individual / non-design-partner accounts) and
+  /// SHOULD be turned ON for design-partner orgs as a contractual term
+  /// of the partnership — the cathedral-of-code trap dies in production
+  /// when outcome capture becomes a hard gate, not a soft nudge. Per
+  /// `es_11` Founder School lesson + CLAUDE.md "Outcome Gate
+  /// Enforcement" lock.
+  enforceOutcomeGate Boolean            @default(false)
   invites            TeamInvite[]
   members            TeamMember[]
   ssoConfigurations  SsoConfiguration[]

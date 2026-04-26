@@ -140,11 +140,54 @@ export async function POST(request: NextRequest) {
     // Decrypt document content transparently (supports both encrypted and legacy plaintext)
     const docContent = getDocumentContent(doc);
 
-    // ── Outcome reminders (non-blocking) ──────────────────────────────
-    // Progressive nudges encouraging users to close the loop. Never blocks
-    // analysis — if pendingCount >= SOFT_THRESHOLD, an `outcome_reminder`
-    // SSE event is emitted downstream so the client can surface a banner.
-    const outcomeGate = await checkOutcomeGate(userId);
+    // ── Outcome Gate ──────────────────────────────────────────────────
+    // Two modes (locked 2026-04-26 — closes the cathedral-of-code trap
+    // identified by NotebookLM strategic synthesis Q6 pre-mortem):
+    //
+    //   1. Default (org.enforceOutcomeGate = false): non-blocking. SSE
+    //      reminder fires at SOFT/HARD thresholds; user can always run
+    //      a new audit. Preserves the legacy free / individual experience.
+    //
+    //   2. Enforced (org.enforceOutcomeGate = true, set per-org as a
+    //      design-partner contractual term): hard-blocks at HARD threshold
+    //      (5+ pending past 30 days). Returns HTTP 409 with code
+    //      'OUTCOME_GATE_BLOCKED' and the pending analysis IDs so the
+    //      client can route the user to the outcome reporter.
+    //
+    // The org's enforcement flag is the org of any Document the user owns
+    // (or null for personal accounts). Non-throwing: any DB error falls
+    // back to enforce=false (permissive).
+    let enforceGate = false;
+    try {
+      // Find any org the user is a member of via TeamMember; if multiple,
+      // any one with enforceOutcomeGate=true triggers enforcement.
+      const orgs = await prisma.organization.findMany({
+        where: {
+          members: { some: { userId } },
+          enforceOutcomeGate: true,
+        },
+        select: { id: true },
+        take: 1,
+      });
+      enforceGate = orgs.length > 0;
+    } catch (err) {
+      log.warn('Outcome gate enforcement lookup failed (defaulting to non-enforced):', err);
+    }
+
+    const outcomeGate = await checkOutcomeGate(userId, enforceGate);
+
+    if (!outcomeGate.allowed) {
+      return NextResponse.json(
+        {
+          error: outcomeGate.message ?? 'Outcome Gate blocked.',
+          code: 'OUTCOME_GATE_BLOCKED',
+          pendingCount: outcomeGate.pendingCount,
+          pendingAnalysisIds: outcomeGate.pendingAnalysisIds,
+          level: outcomeGate.level,
+        },
+        { status: 409 }
+      );
+    }
 
     // Guard against concurrent analysis with atomic check-and-set.
     // Uses updateMany with a predicate to avoid TOCTOU race conditions:
