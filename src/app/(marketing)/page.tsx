@@ -221,7 +221,7 @@ export default function LandingPage() {
               >
                 The native reasoning layer for every{' '}
                 <span style={{ color: C.green, fontStyle: 'italic' }}>
-                  boardroom strategic decision.
+                  high-stakes call.
                 </span>
               </h1>
               <p
@@ -235,7 +235,7 @@ export default function LandingPage() {
               >
                 Every strategic memo runs through a cognitive-bias audit grounded in 30+ biases
                 from Kahneman and Klein, calibrated against 135 historical corporate decisions.
-                Decision Intel scores the reasoning, names the biases the board will catch first,
+                Decision Intel scores the reasoning, names the biases the room will catch first,
                 and shows exactly what shifts when you remove them.
               </p>
               <div
@@ -283,11 +283,31 @@ export default function LandingPage() {
                   How it works <ArrowRight size={14} />
                 </Link>
               </div>
-              {/* The standalone "Or see a real audit on a public S-1 (PDF)"
-                  link that previously sat here was removed: the entire
-                  WeWork proof panel on the right is now the clickable
-                  artifact pointing at the same PDF, so the small text
-                  link became redundant and added noise to the left column. */}
+              {/* Tertiary off-ramp for the cold reader who's curious
+                  but not ready to paste a real memo. Empathic framing:
+                  names the actual desired path (see-it-on-a-known-doc-
+                  first) without diagnosing the reader. Points at the
+                  same PDF the WeWork panel opens, so a reader who
+                  doesn't notice the panel is clickable still gets there. */}
+              <a
+                href="/dpr-sample-wework.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackEvent('hero_dpr_sample_clicked')}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: C.slate500,
+                  textDecoration: 'none',
+                  padding: '4px 0',
+                }}
+              >
+                Or see one we ran on the WeWork S-1
+                <ArrowRight size={12} />
+              </a>
             </div>
 
             {/* RIGHT — proof column. Was a synthetic SampleAuditCard with
@@ -394,8 +414,8 @@ export default function LandingPage() {
                         margin: 0,
                       }}
                     >
-                      The cost of unchecked decisions for a typical Fortune 500 company (McKinsey).
-                      Capital moves on memos nobody pressure-tested for bias.
+                      What unchecked decisions cost the typical Fortune 500 company (McKinsey).
+                      The pattern shows up at every scale of capital allocation.
                     </p>
                   </div>
                   {/* SOLUTION — green */}
