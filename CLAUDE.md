@@ -310,6 +310,22 @@ src/
 - Canonical grade scale: A 85+, B 70+, C 55+, D 40+, F 0+ — matches `src/lib/scoring/dqi.ts` → `GRADE_THRESHOLDS`.
 - The JSDoc at the top of `dqi.ts` is the external reference. **Update both** the comment AND `GRADE_THRESHOLDS` when changing boundaries, or the published contract drifts from runtime.
 
+### Sparkles Icon Discipline (locked 2026-04-26)
+
+`Sparkles` from `lucide-react` is the universal "built with AI" tell — banned on every category pill, badge, and eyebrow chip on every marketing surface and on every public share view. Audit this rule whenever adding a new badge or pill on `(marketing)/**` or `src/app/shared/**`. The 2026-04-26 sweep stripped Sparkles from `FeaturedDeepCases.tsx`, `CaseStudyGrid.tsx`, `case-studies/sample/[slug]/page.tsx`, and two sites in `shared/[token]/page.tsx`. Two exceptions stay legal: (1) the AI Copilot surface chrome at `/dashboard/ask` (Sparkles next to the chat composer reads as "this is an AI surface" and is on-brand for the assistant pattern), (2) the Free-tier "N free this month" reassurance chip on `/dashboard` (platform chrome, not marketing). Every other Sparkles needs a justification or it gets cut.
+
+### NUDGE_TYPE_LABELS Discipline (locked 2026-04-26)
+
+Every new `Nudge.nudgeType` enum value MUST land with a label in [src/lib/constants/human-audit.ts](src/lib/constants/human-audit.ts) `NUDGE_TYPE_LABELS` IN THE SAME COMMIT. The 2026-04-26 audit caught `bias_comment_mention` (shipped commit bf6b038, ~Apr 22) had no label entry — every @mention nudge in the dashboard `NudgeWidget` and `NudgesPageContent` rendered the raw enum string instead of "Comment Mention" for ~4 days. The render fallback (`|| nudge.nudgeType`) hides this from compile-time checks; the test you want is "manually create a Nudge with the new type and verify the label renders." Before adding a new nudgeType: search `NUDGE_TYPE_LABELS` and add the label.
+
+### Onborda Tour Registration Discipline (locked 2026-04-26)
+
+Every role added to `Role = 'cso' | 'ma' | 'bizops' | 'pe_vc' | 'other'` MUST also be registered in the Onborda steps array at [OnboardingTour.tsx](src/components/onboarding/OnboardingTour.tsx) `OnboardingTourProvider`. Defining `TOUR_STEPS_BY_ROLE.<role>` and `TOUR_NAME_BY_ROLE.<role>` is NOT enough — Onborda needs the explicit `{ tour: 'dashboard-tour-<role>', steps: TOUR_STEPS_BY_ROLE.<role> }` entry or the tour silently never fires (users fall through to the default 'dashboard-tour'). The 2026-04-26 audit caught pe_vc was missing the registration even though everything else cascaded correctly — runtime bug, no compile error.
+
+### Stripe / Commerce Dedup Discipline (locked 2026-04-26)
+
+Any `findFirst` query that gates a Stripe checkout (active-purchase dedup, subscription state, idempotency check) MUST fail-closed on query failure, not silently fall through to a "looks like nothing exists" branch. The 2026-04-26 audit caught `src/app/api/stripe/deal-audit/route.ts:61` was wrapped in `.catch(() => null)`, which would have let the route create a NEW Stripe checkout session for an already-purchased deal on a transient DB error → double-charge the customer. The fix pattern: explicit `try/catch` around the dedup, log the error, return a 503 "Could not verify purchase state. Please retry." Cron-side dedups (e.g. `usage-nudges/route.ts` NotificationLog idempotency check) follow the same rule for the same reason — silent fallthrough → duplicate-send. The fail-closed rule applies wherever the next action is irreversible (charge, send email, post Slack, write blockchain). For pure UI fetches the silent-warn pattern is still acceptable.
+
 ### Bias Taxonomy
 
 - 20 biases with stable taxonomy IDs: DI-B-001 through DI-B-020 (defined in `src/lib/constants/bias-education.ts`).

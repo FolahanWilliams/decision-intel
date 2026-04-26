@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Sparkles, ArrowRight, AlertTriangle, CheckCircle } from 'lucide-react';
+import { ArrowRight, AlertTriangle, CheckCircle } from 'lucide-react';
 import {
   getSlugForCase,
   isFailureOutcome,
@@ -64,7 +64,7 @@ export function FeaturedDeepCases({ cases }: { cases: CaseStudy[] }) {
               marginBottom: 6,
             }}
           >
-            <Sparkles size={12} /> Canonical Depth
+            Canonical Depth
           </div>
           <h2
             style={{

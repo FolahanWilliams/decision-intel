@@ -574,6 +574,7 @@ export function OnboardingTourProvider({ children }: { children: React.ReactNode
           { tour: 'dashboard-tour-cso', steps: TOUR_STEPS_BY_ROLE.cso },
           { tour: 'dashboard-tour-ma', steps: TOUR_STEPS_BY_ROLE.ma },
           { tour: 'dashboard-tour-bizops', steps: TOUR_STEPS_BY_ROLE.bizops },
+          { tour: 'dashboard-tour-pe-vc', steps: TOUR_STEPS_BY_ROLE.pe_vc },
         ]}
         shadowRgb="15, 23, 42"
         shadowOpacity="0.55"

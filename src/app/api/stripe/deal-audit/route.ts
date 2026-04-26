@@ -32,13 +32,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'dealId is required' }, { status: 400 });
     }
 
-    // Look up the deal and verify access
+    // Look up the deal and verify access. If the membership lookup itself
+    // fails, log so we know — falling back to user.id keeps the personal-deal
+    // case working but a silent failure on a team account would mis-route.
     const membership = await prisma.teamMember
       .findFirst({
         where: { userId: user.id },
         select: { orgId: true },
       })
-      .catch(() => null);
+      .catch(err => {
+        log.warn('teamMember lookup failed for deal audit:', err);
+        return null;
+      });
 
     const deal = await prisma.deal.findFirst({
       where: { id: dealId, orgId: membership?.orgId || user.id },
@@ -53,12 +58,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Deal has no ticket size set' }, { status: 400 });
     }
 
-    // Check for existing active purchase
-    const existing = await prisma.dealAuditPurchase
-      .findFirst({
+    // Check for existing active purchase. If this query fails, fail closed:
+    // a silent null here would let us double-charge the customer.
+    let existing: { id: string } | null = null;
+    try {
+      existing = await prisma.dealAuditPurchase.findFirst({
         where: { dealId, status: 'active' },
-      })
-      .catch(() => null);
+        select: { id: true },
+      });
+    } catch (err) {
+      log.error('deal-audit purchase dedup lookup failed; failing closed:', err);
+      return NextResponse.json(
+        { error: 'Could not verify purchase state. Please retry.' },
+        { status: 503 }
+      );
+    }
 
     if (existing) {
       return NextResponse.json(
@@ -77,13 +91,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check for existing Stripe customer
+    // Check for existing Stripe customer (graceful: if the lookup fails, we
+    // proceed without a pre-existing customer — Stripe will create a new one).
     const existingSub = await prisma.subscription
       .findFirst({
         where: { userId: user.id },
         select: { stripeCustomerId: true },
       })
-      .catch(() => null);
+      .catch(err => {
+        log.warn('subscription lookup failed for deal audit checkout:', err);
+        return null;
+      });
 
     const origin =
       request.headers.get('origin') || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';

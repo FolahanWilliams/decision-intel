@@ -496,13 +496,17 @@ async function handleAnalyzeCommand(params: {
 
         const participants = [...new Set(messages.map(m => m.user))];
 
-        // Find user ID + orgId for document ownership
+        // Find user ID + orgId for document ownership. Falls back to env-var
+        // system user if the installation lookup itself fails — log so we know.
         const installation = await prisma.slackInstallation
           .findUnique({
             where: { teamId: params.teamId, status: 'active' },
             select: { installedByUserId: true, orgId: true },
           })
-          .catch(() => null);
+          .catch(err => {
+            log.warn('slack installation lookup failed:', err);
+            return null;
+          });
         const docUserId =
           installation?.installedByUserId || process.env.SLACK_SYSTEM_USER_ID || params.userId;
 
@@ -510,12 +514,18 @@ async function handleAnalyzeCommand(params: {
         const contentHash = createHash('sha256').update(threadContent).digest('hex');
         const sourceRef = `${params.channelId}:${params.threadTs}`;
 
-        // Check for existing analysis of this thread (deduplication)
-        const existing = await prisma.document
-          .findFirst({
+        // Check for existing analysis of this thread (deduplication). If this
+        // query fails, log loudly — silently treating as "not yet analyzed" creates
+        // duplicate documents in production.
+        let existing: { id: string } | null = null;
+        try {
+          existing = await prisma.document.findFirst({
             where: { source: 'slack', sourceRef },
-          })
-          .catch(() => null);
+            select: { id: true },
+          });
+        } catch (err) {
+          log.warn('slack thread dedup lookup failed:', err);
+        }
         if (existing) {
           return NextResponse.json({
             response_type: 'ephemeral',

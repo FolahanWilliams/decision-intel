@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Sparkles, ArrowRight, FileText } from 'lucide-react';
+import { ArrowRight, FileText } from 'lucide-react';
 import { MarketingNav, BRAND_COLORS as C } from '@/components/marketing/MarketingNav';
 import {
   SAMPLE_BUNDLES_BY_SLUG,
@@ -66,7 +66,7 @@ export default async function SamplePage({ params }: Props) {
             marginBottom: 12,
           }}
         >
-          <Sparkles size={12} /> Sample memo · {ROLE_LABEL[bundle.role]}
+          Sample memo · {ROLE_LABEL[bundle.role]}
         </div>
         <h1
           style={{

@@ -67,6 +67,7 @@ export const NUDGE_TYPE_LABELS: Record<string, string> = {
   noise_check: 'Noise Check',
   shallow_verification: 'Shallow Verification',
   graph_pattern_warning: 'Graph Pattern Warning',
+  bias_comment_mention: 'Comment Mention',
 };
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
