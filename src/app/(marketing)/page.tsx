@@ -1,11 +1,10 @@
 'use client';
 
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { trackEvent } from '@/lib/analytics/track';
-import { HeroCounterfactualTease } from '@/components/marketing/HeroCounterfactualTease';
 import { MarketingNav } from '@/components/marketing/MarketingNav';
 import { Reveal } from '@/components/ui/Reveal';
 import { CaseStudyCarousel } from '@/components/marketing/CaseStudyCarousel';
@@ -18,7 +17,7 @@ import { KahnemanKleinSynthesis } from '@/components/marketing/KahnemanKleinSynt
 import { MomentsPyramid } from '@/components/marketing/MomentsPyramid';
 import { SecurityLifecycleStrip } from '@/components/marketing/SecurityLifecycleStrip';
 import { ScrollRevealGraph } from '@/components/marketing/ScrollRevealGraph';
-import { ArrowRight, Check, ShieldCheck, Scale, GraduationCap, Globe2 } from 'lucide-react';
+import { ArrowRight, Check, ShieldCheck, Scale, GraduationCap, Globe2, FileText } from 'lucide-react';
 import { DESIGN_PARTNER_SEATS_AVAILABLE } from '@/lib/constants/company-info';
 
 /* ─── Color Tokens ──────────────────────────────────────────────────────── */
@@ -156,123 +155,179 @@ export default function LandingPage() {
       <MarketingNav />
 
       {/* ── Hero (beat 01) ──────────────────────────────────────────────
-          Tight typography, no inline graph. The full Decision Knowledge
-          Graph accumulates in <ScrollRevealGraph /> as the reader scrolls,
-          arriving populated precisely when the narrative has earned it. */}
-      <section style={{ maxWidth: 960, margin: '0 auto', padding: '112px 24px 88px' }}>
-        <motion.div {...fadeIn} transition={{ duration: 0.5 }} style={{ textAlign: 'center' }}>
-          <p
-            style={{
-              fontSize: 12,
-              fontWeight: 800,
-              color: C.green,
-              textTransform: 'uppercase',
-              letterSpacing: '0.14em',
-              marginBottom: 18,
-            }}
-          >
-            For strategy teams who answer to the board
-          </p>
-          <h1
-            className="marketing-display"
-            style={{
-              fontSize: 'clamp(40px, 6.6vw, 72px)',
-              color: C.slate900,
-              lineHeight: 1.02,
-              marginBottom: 26,
-              maxWidth: 920,
-              marginLeft: 'auto',
-              marginRight: 'auto',
-            }}
-          >
-            The native reasoning layer for every{' '}
-            <span style={{ color: C.green, fontStyle: 'italic' }}>
-              boardroom strategic decision.
-            </span>
-          </h1>
-          <p
-            style={{
-              fontSize: 19,
-              color: C.slate600,
-              lineHeight: 1.6,
-              marginBottom: 32,
-              maxWidth: 720,
-              marginLeft: 'auto',
-              marginRight: 'auto',
-            }}
-          >
-            Every strategic memo runs through a cognitive-bias audit grounded in 30+ biases from
-            Kahneman and Klein, calibrated against 135 historical corporate decisions. Decision
-            Intel scores the reasoning, names the biases the board will catch first, and shows
-            exactly what shifts when you remove them.
-          </p>
+          Asymmetric 55/45 grid: claim column left, sample audit card right,
+          static credibility strip full-width below. Replaces the prior
+          centered single-column stack — the persona audit (CSO + GC + M&A
+          partner + design lead + board director) flagged the centered
+          stack as the visual signature of a Series-A SaaS template, and
+          the buried sample card as a confidence tell. The card now sits
+          beside the claim so claim + proof land in one eye-pass. */}
+      <section
+        className="hero-grid-section"
+        style={{ maxWidth: 1200, margin: '0 auto', padding: '96px 24px 64px' }}
+      >
+        <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
           <div
+            className="hero-grid"
             style={{
-              marginBottom: 28,
-              display: 'flex',
-              justifyContent: 'center',
+              display: 'grid',
+              gridTemplateColumns: 'minmax(0, 1.1fr) minmax(0, 0.9fr)',
+              gap: 64,
+              alignItems: 'start',
             }}
           >
-            <HeroCounterfactualTease />
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              gap: 14,
-              flexWrap: 'wrap',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: 32,
-            }}
-          >
-            <Link
-              href="/demo"
-              onClick={() => trackEvent('hero_try_demo_clicked')}
+            {/* LEFT — claim column */}
+            <div className="hero-claim" style={{ textAlign: 'left' }}>
+              <p
+                style={{
+                  fontSize: 11,
+                  fontWeight: 800,
+                  color: C.green,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.14em',
+                  marginBottom: 18,
+                }}
+              >
+                For strategy teams who answer to the board
+              </p>
+              <h1
+                className="marketing-display"
+                style={{
+                  fontSize: 'clamp(36px, 5.2vw, 60px)',
+                  color: C.slate900,
+                  lineHeight: 1.04,
+                  marginBottom: 22,
+                }}
+              >
+                The native reasoning layer for every{' '}
+                <span style={{ color: C.green, fontStyle: 'italic' }}>
+                  boardroom strategic decision.
+                </span>
+              </h1>
+              <p
+                style={{
+                  fontSize: 18,
+                  color: C.slate600,
+                  lineHeight: 1.6,
+                  marginBottom: 28,
+                  maxWidth: 540,
+                }}
+              >
+                Every strategic memo runs through a cognitive-bias audit grounded in 30+ biases
+                from Kahneman and Klein, calibrated against 135 historical corporate decisions.
+                Decision Intel scores the reasoning, names the biases the board will catch first,
+                and shows exactly what shifts when you remove them.
+              </p>
+              <div
+                style={{
+                  display: 'flex',
+                  gap: 14,
+                  flexWrap: 'wrap',
+                  alignItems: 'center',
+                  marginBottom: 14,
+                }}
+              >
+                <Link
+                  href="/demo"
+                  onClick={() => trackEvent('hero_try_demo_clicked')}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    fontSize: 15,
+                    fontWeight: 700,
+                    color: C.white,
+                    background: C.green,
+                    padding: '14px 28px',
+                    borderRadius: 10,
+                    textDecoration: 'none',
+                    boxShadow: '0 6px 20px rgba(22,163,74,0.28)',
+                  }}
+                >
+                  One free audit. Paste your memo. <ArrowRight size={16} />
+                </Link>
+                <Link
+                  href="/how-it-works"
+                  onClick={() => trackEvent('hero_how_it_works_clicked')}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    fontSize: 14,
+                    fontWeight: 600,
+                    color: C.slate600,
+                    textDecoration: 'none',
+                    padding: '14px 10px',
+                  }}
+                >
+                  How it works <ArrowRight size={14} />
+                </Link>
+              </div>
+              {/* A13 — validation path for the procurement-stage reader who
+                  will not paste a real memo into an unvetted tool. Points
+                  to the public WeWork S-1 DPR sample (anonymized 2019
+                  audit) — they get to see a real audit shape before
+                  trusting us with their own document. */}
+              <a
+                href="/dpr-sample-wework.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackEvent('hero_dpr_sample_clicked')}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: C.slate500,
+                  textDecoration: 'none',
+                  padding: '4px 0',
+                }}
+              >
+                <FileText size={13} />
+                Or see a real audit on a public S-1 (PDF)
+                <ArrowRight size={12} />
+              </a>
+            </div>
+
+            {/* RIGHT — proof column */}
+            <div
+              className="hero-proof"
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                fontSize: 15,
-                fontWeight: 700,
-                color: C.white,
-                background: C.green,
-                padding: '14px 28px',
-                borderRadius: 10,
-                textDecoration: 'none',
-                boxShadow: '0 6px 20px rgba(22,163,74,0.28)',
+                display: 'flex',
+                justifyContent: 'flex-end',
+                alignItems: 'flex-start',
               }}
             >
-              One free audit. Paste your memo. <ArrowRight size={16} />
-            </Link>
-            <Link
-              href="/how-it-works"
-              onClick={() => trackEvent('hero_how_it_works_clicked')}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                fontSize: 14,
-                fontWeight: 600,
-                color: C.slate600,
-                textDecoration: 'none',
-                padding: '14px 10px',
-              }}
-            >
-              How it works <ArrowRight size={14} />
-            </Link>
+              <SampleAuditCard />
+            </div>
           </div>
-          {/* Credibility strip — the legitimate signals we have today.
-              Real credentials in enterprise procurement language, no
-              fabricated logos. Sits below the CTAs so the hero closes
-              with trust signal, not with a dangling what-if chip. */}
-          <HeroCredibilityStrip />
-          {/* Sample audit output — a static representation of what the
-              reader will see after pasting a memo. Gives the hero visual
-              weight so it stops reading as pure-text centered SaaS. */}
-          <div style={{ marginTop: 44, display: 'flex', justifyContent: 'center' }}>
-            <SampleAuditCard />
+
+          {/* Credibility strip — full-width below both columns, static
+              (no rotation). All four signals visible at once so the
+              reader sees the full posture in one pass instead of waiting
+              for a 4.2s carousel cycle. */}
+          <div style={{ marginTop: 56 }}>
+            <HeroCredibilityStrip />
           </div>
         </motion.div>
+
+        {/* Mobile: collapse to single column, restore stacking, scale the
+            sample card down to fit the narrower viewport. The hero is the
+            highest-traffic surface on mobile (LinkedIn outbound), and the
+            inline-style asymmetric grid otherwise crushes at <900px. */}
+        <style>{`
+          @media (max-width: 900px) {
+            .hero-grid-section { padding: 64px 20px 48px !important; }
+            .hero-grid {
+              grid-template-columns: 1fr !important;
+              gap: 40px !important;
+            }
+            .hero-proof {
+              justify-content: center !important;
+            }
+          }
+        `}</style>
       </section>
 
       {/* ── Beat 02 — The Problem ─────────────────────────────────────── */}
@@ -1261,164 +1316,104 @@ export default function LandingPage() {
 }
 
 /* ─── HeroCredibilityStrip ──────────────────────────────────────────────
-   Single-line rotating ticker of trust signals below the hero CTAs.
-   Each signal is defensible at the procurement bar: R²F is the framework
-   name we coined and own by usage, AI Verify alignment is a real
-   principle-mapping exercise (not a certification claim), and SOC 2
-   refers to the infrastructure stack (Vercel + Supabase). The Wiz
-   advisor line lives on the Founder slide of the pitch deck instead.
-   One visible item at a time, rotates every 4s; reduced-motion readers
-   see the first item without auto-advance. No fabricated customer logos. */
-
-const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
-
-function subscribeReducedMotion(onChange: () => void) {
-  const mq = window.matchMedia(REDUCED_MOTION_QUERY);
-  mq.addEventListener('change', onChange);
-  return () => mq.removeEventListener('change', onChange);
-}
-
-function getReducedMotionSnapshot() {
-  return window.matchMedia(REDUCED_MOTION_QUERY).matches;
-}
-
-function getReducedMotionServerSnapshot() {
-  return false;
-}
+   Static row of trust signals below the hero grid. All four signals
+   visible at once. Persona audit (Marcus, Elena, Richard) flagged the
+   prior 4.2s rotating ticker as reading "indecision" / "desperation" /
+   "rationing your good credentials" — Bloomberg, S&P Capital IQ,
+   McKinsey marketing pages list credentials static. R²F is the
+   framework name we coined and own by usage; AI Verify alignment is
+   a real principle-mapping exercise (not a certification claim);
+   SOC 2 refers to the infrastructure stack (Vercel + Supabase);
+   17 frameworks is the registry-derived count. No fabricated logos. */
 
 function HeroCredibilityStrip() {
   const items = [
     {
       icon: GraduationCap,
       label: 'Recognition-Rigor Framework',
-      note: 'Kahneman and Klein, arbitrated in one pipeline',
+      note: 'Kahneman and Klein, one pipeline',
     },
     {
       icon: Scale,
       label: 'Aligned with AI Verify',
-      note: '11 internationally recognised AI governance principles',
+      note: '11 governance principles',
     },
     {
       icon: ShieldCheck,
-      label: 'SOC 2 Type II infrastructure (Vercel + Supabase)',
-      note: 'Type I completion targeted for Q4 2026; Type II observation opens immediately after. In-flight controls already mirror Type II. Full posture at /security.',
+      label: 'SOC 2 Type II infrastructure',
+      note: 'Vercel + Supabase, Type I Q4 2026',
     },
     {
       icon: Globe2,
-      label: '17 frameworks · G7, EU, GCC, African markets',
-      note: 'Every flag cross-linked to a regulatory provision — SOX, EU AI Act, Basel III, GDPR, NDPR, CBN, WAEMU, PoPIA, and ten more, mapped flag-by-flag for a Fortune-500 procurement bar.',
+      label: '17 regulatory frameworks',
+      note: 'G7, EU, GCC, African markets',
     },
   ];
-  const [idx, setIdx] = useState(0);
-  const reducedMotion = useSyncExternalStore(
-    subscribeReducedMotion,
-    getReducedMotionSnapshot,
-    getReducedMotionServerSnapshot
-  );
-
-  useEffect(() => {
-    if (reducedMotion) return;
-    const t = window.setInterval(() => setIdx(i => (i + 1) % items.length), 4200);
-    return () => window.clearInterval(t);
-  }, [reducedMotion, items.length]);
-
-  const active = items[idx];
-  const ActiveIcon = active.icon;
 
   return (
     <div
       style={{
-        maxWidth: 980,
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        paddingTop: 24,
+        paddingTop: 28,
         borderTop: `1px solid ${C.slate200}`,
       }}
     >
       <div
-        aria-live="polite"
         style={{
           display: 'flex',
+          flexWrap: 'wrap',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: 12,
-          minHeight: 42,
+          gap: '14px 32px',
         }}
       >
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={active.label}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 10,
-              whiteSpace: 'nowrap',
-            }}
-          >
-            <span
+        {items.map(item => {
+          const Icon = item.icon;
+          return (
+            <div
+              key={item.label}
               style={{
-                width: 26,
-                height: 26,
-                borderRadius: 7,
-                background: 'rgba(22,163,74,0.08)',
-                border: '1px solid rgba(22,163,74,0.22)',
                 display: 'inline-flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
+                gap: 9,
               }}
             >
-              <ActiveIcon size={13} color={C.green} strokeWidth={2.5} />
-            </span>
-            <span
-              style={{
-                fontSize: 13,
-                fontWeight: 700,
-                color: C.slate900,
-                letterSpacing: '-0.005em',
-              }}
-            >
-              {active.label}
-            </span>
-            <span
-              style={{
-                fontSize: 13,
-                color: C.slate500,
-                fontWeight: 500,
-              }}
-            >
-              &middot; {active.note}
-            </span>
-          </motion.div>
-        </AnimatePresence>
-      </div>
-      {/* Progress dots — reads as a confident ticker, not a static strip. */}
-      <div
-        aria-hidden
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: 6,
-          marginTop: 10,
-        }}
-      >
-        {items.map((it, i) => (
-          <span
-            key={it.label}
-            style={{
-              width: i === idx ? 18 : 5,
-              height: 5,
-              borderRadius: 5,
-              background: i === idx ? C.green : C.slate200,
-              transition: 'width 0.35s, background 0.35s',
-              display: 'inline-block',
-            }}
-          />
-        ))}
+              <span
+                style={{
+                  width: 22,
+                  height: 22,
+                  borderRadius: 6,
+                  background: 'rgba(22,163,74,0.08)',
+                  border: '1px solid rgba(22,163,74,0.22)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <Icon size={11} color={C.green} strokeWidth={2.5} />
+              </span>
+              <span
+                style={{
+                  fontSize: 12.5,
+                  fontWeight: 700,
+                  color: C.slate900,
+                  letterSpacing: '-0.005em',
+                }}
+              >
+                {item.label}
+              </span>
+              <span
+                style={{
+                  fontSize: 12.5,
+                  color: C.slate500,
+                  fontWeight: 500,
+                }}
+              >
+                · {item.note}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -1436,16 +1431,36 @@ function HeroCredibilityStrip() {
 function SampleAuditCard() {
   return (
     <div
+      className="sample-audit-card"
       style={{
         width: '100%',
-        maxWidth: 720,
+        maxWidth: 520,
         borderRadius: 18,
         background: C.white,
         border: `1px solid ${C.slate200}`,
-        boxShadow: '0 24px 60px rgba(15,23,42,0.08), 0 2px 4px rgba(15,23,42,0.04)',
+        boxShadow:
+          '0 32px 64px -20px rgba(15,23,42,0.22), 0 16px 36px -16px rgba(15,23,42,0.12), 0 2px 4px rgba(15,23,42,0.04)',
         overflow: 'hidden',
+        transform: 'perspective(1600px) rotateY(-1.4deg)',
+        transformOrigin: 'left center',
       }}
     >
+      {/* Reduced-motion: drop the perspective rotation. Mobile: drop both
+          perspective and the rightward shadow bias so the card sits flat
+          in the stacked column. */}
+      <style>{`
+        @media (prefers-reduced-motion: reduce) {
+          .sample-audit-card { transform: none !important; }
+        }
+        @media (max-width: 900px) {
+          .sample-audit-card {
+            transform: none !important;
+            max-width: 560px !important;
+            margin-left: auto;
+            margin-right: auto;
+          }
+        }
+      `}</style>
       {/* Title bar */}
       <div
         style={{

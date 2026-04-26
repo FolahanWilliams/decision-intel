@@ -7,8 +7,8 @@
  * the contact for due-diligence questions. This page is that surface.
  *
  * Voice rules (CLAUDE.md "Marketing Voice — Enterprise Discipline"):
- *   - No "pre-seed" / "we just launched" / "we're building". Use
- *     "design-partner phase" — accurate, enterprise-voiced.
+ *   - No stage-of-company language; use "design-partner phase" instead
+ *     (the canonical enterprise-voiced replacement).
  *   - No customer logos we don't have.
  *   - Lead the founder narrative with Lagos/Nigeria per the founder
  *     positioning lock.
