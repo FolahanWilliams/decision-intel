@@ -32,6 +32,8 @@ import {
   Target,
   Presentation,
   Compass,
+  Package,
+  Plus,
 } from 'lucide-react';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useTheme } from 'next-themes';
@@ -269,6 +271,44 @@ export function CommandPalette() {
         icon: <GitCompareArrows size={16} />,
         action: () => navigate('/dashboard/decision-graph'),
         keywords: ['graph', 'network', 'knowledge', 'edges', 'nodes'],
+      },
+      // Decision Packages — the composite-DQI feature is the most
+      // differentiated 4.4 ship and was previously reachable only by
+      // expanding the Reflect cluster + clicking Decisions. Surfacing
+      // it here means a CSO who has collapsed Reflect can still find
+      // it instantly via ⌘K. (B-#1, 2026-04-26.)
+      {
+        id: 'decision-packages',
+        label: 'Decision Packages',
+        description: 'Composite DQI + cross-doc audit across non-deal decisions',
+        icon: <Package size={16} />,
+        action: () => navigate('/dashboard/decisions'),
+        keywords: [
+          'package',
+          'packages',
+          'composite',
+          'cross-doc',
+          'cross document',
+          'bundle',
+          'recommendation',
+          'board pack',
+          'rfp',
+          'multi-document',
+        ],
+      },
+      {
+        id: 'decision-packages-new',
+        label: 'New Decision Package',
+        description: 'Bundle related documents into a single decision-quality view',
+        icon: <Plus size={16} />,
+        action: () => navigate('/dashboard/decisions/new'),
+        keywords: [
+          'new decision package',
+          'create package',
+          'bundle documents',
+          'compose',
+          'composite dqi',
+        ],
       },
       {
         id: 'compliance',

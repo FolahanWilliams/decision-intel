@@ -1368,6 +1368,68 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                   isOwner={!!document.isOwner}
                   onChanged={() => void refetchDocument()}
                 />
+                {/* "Log the outcome" pill — visible in the header for any
+                    analysis older than 30 days that hasn't yet had its
+                    outcome logged (B-#3 audit finding). The flywheel
+                    is the load-bearing claim for "compounds quarter
+                    over quarter"; if the user has to scroll past the
+                    entire Analyst view to reach the reporter, the
+                    flywheel never closes. The existing in-flow overdue
+                    banner stays — this is the lower-stakes nudge that
+                    fires earlier and is reachable from the header
+                    without scrolling. */}
+                {analysis &&
+                  (() => {
+                    const extra = analysis as unknown as {
+                      outcomeStatus?: string;
+                    };
+                    if (extra.outcomeStatus === 'outcome_logged') return null;
+                    const createdMs = new Date(analysis.createdAt).getTime();
+                    const ageDays = (Date.now() - createdMs) / (1000 * 60 * 60 * 24);
+                    if (Number.isNaN(ageDays) || ageDays < 30) return null;
+                    const ageLabel =
+                      ageDays >= 365
+                        ? `${Math.floor(ageDays / 30)}mo`
+                        : `${Math.floor(ageDays)}d`;
+                    return (
+                      <a
+                        href="#outcome-reporter"
+                        onClick={e => {
+                          e.preventDefault();
+                          window.document
+                            .querySelector('[data-outcome-reporter]')
+                            ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }}
+                        title={`Log what actually happened — recalibrates DQI and closes the flywheel loop. Analysis is ${ageLabel} old.`}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 4,
+                          fontSize: 11,
+                          fontWeight: 700,
+                          color: '#B45309',
+                          textDecoration: 'none',
+                          padding: '3px 10px',
+                          borderRadius: 999,
+                          background: 'rgba(245, 158, 11, 0.1)',
+                          border: '1px solid rgba(245, 158, 11, 0.32)',
+                          letterSpacing: '0.02em',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        Log the outcome →
+                        <span
+                          style={{
+                            fontSize: 10,
+                            opacity: 0.7,
+                            fontWeight: 500,
+                          }}
+                        >
+                          {ageLabel}
+                        </span>
+                      </a>
+                    );
+                  })()}
               </div>
             </div>
           </div>
