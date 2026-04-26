@@ -246,7 +246,7 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: 'Are you SOC 2 compliant?',
-    a: 'We run on SOC 2 certified infrastructure (Supabase, Vercel). Documents are encrypted with AES-256-GCM at rest and TLS 1.3 in transit. A GDPR anonymization layer strips PII before any AI processing.',
+    a: 'We run on SOC 2 audited infrastructure (Supabase, Vercel). Documents are encrypted with AES-256-GCM at rest and TLS 1.3 in transit. A GDPR anonymization layer strips PII before any AI processing.',
   },
   {
     q: 'How long are my documents retained, and can I delete them?',

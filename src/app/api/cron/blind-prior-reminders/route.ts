@@ -167,7 +167,7 @@ export async function GET(req: NextRequest) {
           inviteCount: room.decisionRoomInvites.length,
           deadline: room.blindPriorDeadline?.toISOString() ?? null,
         },
-      }).catch(() => {});
+      }).catch(err => log.warn('blind-prior reminder audit log failed:', err));
     }
 
     log.info(

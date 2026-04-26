@@ -16,7 +16,6 @@ import {
   Activity,
   Heart,
   ArrowRight,
-  Sparkles,
   MessageSquare,
 } from 'lucide-react';
 import { trackEvent } from '@/lib/analytics/track';
@@ -828,7 +827,7 @@ export default function SharedAnalysisPage() {
               marginBottom: 10,
             }}
           >
-            <Sparkles size={12} /> Decision Quality Index
+            Decision Quality Index
           </div>
           <h1
             style={{
@@ -1231,7 +1230,6 @@ export default function SharedAnalysisPage() {
               marginBottom: 12,
             }}
           >
-            <Sparkles size={12} />
             Your memo, audited in 60 seconds
           </div>
           <h2

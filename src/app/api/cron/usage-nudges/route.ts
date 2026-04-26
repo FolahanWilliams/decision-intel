@@ -94,14 +94,22 @@ export async function GET(request: NextRequest) {
 
     for (const { userId, count } of usageRows) {
       try {
-        // Resolve plan
+        // Resolve plan. If the lookup itself fails, skip this user this run
+        // rather than defaulting to 'free' (which can mis-nudge a paying user).
         const sub = await prisma.subscription
           .findFirst({
             where: { userId, status: { in: ['active', 'trialing'] } },
             orderBy: { createdAt: 'desc' },
             select: { plan: true },
           })
-          .catch(() => null);
+          .catch(err => {
+            log.warn('subscription lookup failed for usage nudge:', err);
+            return undefined;
+          });
+        if (sub === undefined) {
+          skipped++;
+          continue;
+        }
         const plan: PlanType = (sub?.plan as PlanType) || 'free';
         if (!METERED_PLANS.includes(plan)) {
           skipped++;
@@ -119,16 +127,23 @@ export async function GET(request: NextRequest) {
         }
 
         // Idempotency: has a usage_limit_80 notification already fired this month?
-        const already = await prisma.notificationLog
-          .findFirst({
+        // If the dedup query itself fails, skip rather than risk a duplicate send —
+        // a missed nudge is recoverable; a duplicate erodes trust.
+        let already: { id: string } | null = null;
+        try {
+          already = await prisma.notificationLog.findFirst({
             where: {
               userId,
               type: 'usage_limit_80',
               createdAt: { gte: startOfMonth },
             },
             select: { id: true },
-          })
-          .catch(() => null);
+          });
+        } catch (err) {
+          log.warn('idempotency check failed; skipping to avoid duplicate nudge:', err);
+          skipped++;
+          continue;
+        }
         if (already) {
           skipped++;
           continue;

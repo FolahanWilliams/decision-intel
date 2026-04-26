@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { AlertTriangle, CheckCircle, BookOpen, Sparkles } from 'lucide-react';
+import { AlertTriangle, CheckCircle, BookOpen } from 'lucide-react';
 import { isFailureOutcome, isSuccessOutcome, type CaseStudy } from '@/lib/data/case-studies';
 import { trackEvent } from '@/lib/analytics/track';
 import { formatIndustry, formatOutcome, formatBiasName } from '@/lib/utils/labels';
@@ -258,7 +258,7 @@ export function CaseStudyGrid({ cases, industries }: CaseStudyGridProps) {
                       textTransform: 'uppercase',
                     }}
                   >
-                    <Sparkles size={9} /> Deep
+                    Deep
                   </span>
                 )}
               </div>
