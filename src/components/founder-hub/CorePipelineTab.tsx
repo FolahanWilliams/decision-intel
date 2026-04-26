@@ -4,12 +4,15 @@ import { Fragment } from 'react';
 import { Zap, Brain, Target, CheckCircle, FileText, Users, Cpu } from 'lucide-react';
 import { card, sectionTitle, label, badge } from '@/components/founder-hub/shared-styles';
 
-type ModelTier = 'cheap' | 'main' | 'pro' | 'none';
+type ModelTier = 'cheap' | 'main' | 'none';
 
+// Locked 2026-04-24 (CLAUDE.md "Gemini model policy"): only two models in
+// production. The previous "pro" tier (gemini-2.5-pro for metaJudge) was
+// retired in the model-policy sweep; the meta-judge now runs on the same
+// gemini-3-flash-preview as the main bias pass.
 const TIER_META: Record<ModelTier, { color: string; label: string; model: string }> = {
   cheap: { color: '#22c55e', label: 'Cheap', model: 'gemini-3.1-flash-lite' },
   main: { color: '#3b82f6', label: 'Main', model: 'gemini-3-flash-preview' },
-  pro: { color: '#8b5cf6', label: 'Pro', model: 'gemini-2.5-pro' },
   none: { color: '#71717a', label: 'No LLM', model: 'deterministic math' },
 };
 
@@ -30,8 +33,8 @@ const NODE_ROUTING: Array<{ node: string; tier: ModelTier; why: string }> = [
   { node: 'forgottenQuestionsNode', tier: 'main', why: 'Unknown-unknowns surfacing; creative' },
   {
     node: 'metaJudgeNode',
-    tier: 'pro',
-    why: 'Final verdict over 7 parallel signals — highest leverage',
+    tier: 'main',
+    why: 'Final verdict over 7 parallel signals — highest leverage; runs on the same gemini-3-flash-preview as biasDetective post the 2026-04-24 model-policy sweep',
   },
   {
     node: 'riskScorer',
@@ -300,13 +303,15 @@ SYNTHESIS (Sequential)
             Kahneman-style judgment disagreement. Upgrade to cross-model jury by setting{' '}
             <code style={{ fontSize: 10 }}>NOISE_JURY_MODELS</code> env var.
             <br />
-            <strong style={{ color: '#16A34A' }}>Cheapest (lower cost than today):</strong>{' '}
+            <strong style={{ color: '#16A34A' }}>Locked 2026-04-24 policy (2 models only):</strong>{' '}
             <code style={{ fontSize: 10 }}>gemini-3-flash-preview,gemini-3.1-flash-lite</code>
             <br />
-            <strong style={{ color: '#8b5cf6' }}>Full cross-model (adds Pro juror):</strong>{' '}
-            <code style={{ fontSize: 10 }}>
-              gemini-3-flash-preview,gemini-2.5-pro,gemini-3.1-flash-lite
-            </code>
+            <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>
+              The prior third-juror pattern (adding gemini-2.5-pro) was retired with the
+              two-model lock; cross-model variance now relies on architectural diversity
+              between the flash-preview and flash-lite models, not three different model
+              families.
+            </span>
           </div>
         </div>
         <div style={card}>

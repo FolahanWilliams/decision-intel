@@ -6,9 +6,9 @@
 
 export const ELEVATOR_PITCH = {
   quote:
-    'You might be familiar with Cloverpop — they did a great job digitizing the decision-making process. We are doing something entirely different: we are auditing the psychological integrity of the decision itself.',
+    'You might be familiar with Cloverpop — they did a great job digitizing the decision-making workflow. We do something different: we are the native reasoning layer for every high-stakes call. Decision Quality Index in 60 seconds, Decision Provenance Record on every audit, Recognition-Rigor Framework (R²F) — Kahneman\'s debiasing plus Klein\'s Recognition-Primed Decisions, arbitrated in one pipeline.',
   closing:
-    'We are building the Wiz of decision intelligence — compound risk scoring for cognitive biases, not cloud vulnerabilities. Detection is a feature. Calibrated compound risk scoring with mitigation playbooks and dollar quantification is a product category.',
+    'Cloverpop logs decisions. We audit the reasoning behind them. The Decision Provenance Record is hashed, tamper-evident, and mapped to 17 regulatory frameworks across G7, EU, GCC, and African markets — the artefact your audit committee will eventually require evidence of, before regulators start asking.',
 };
 
 export const CATEGORY_CONTRAST = {
@@ -20,8 +20,8 @@ export const CATEGORY_CONTRAST = {
   },
   decisionIntel: {
     label: 'Decision Intel',
-    role: 'System of Cognitive Auditing',
-    tagline: 'Grammarly for judgment — detects invisible cognitive flaws',
+    role: 'Native reasoning layer',
+    tagline: 'R²F audit on every memo — DQI in 60 seconds, DPR on every artefact',
     accent: '#16A34A',
   },
 };
@@ -66,7 +66,8 @@ export const CLOVERPOP_COMPARISON: ComparisonRow[] = [
   {
     dimension: 'Compliance Mapping',
     cloverpop: 'None',
-    decisionIntel: '7 frameworks (SOX, FCA, EU AI Act, Basel III, GDPR, SEC Reg D, LPOA)',
+    decisionIntel:
+      '17 frameworks across G7 / EU / GCC / African markets (EU AI Act, SOC 2, GDPR, Basel III, SOX, NDPR, CBN, WAEMU, PoPIA, CMA Kenya, more — derived dynamically from FRAMEWORKS.length)',
   },
   {
     dimension: 'Target Market',
@@ -76,7 +77,8 @@ export const CLOVERPOP_COMPARISON: ComparisonRow[] = [
   {
     dimension: 'Output',
     cloverpop: 'Logged "Decision Flow" + AI recommendations',
-    decisionIntel: 'DQI score + Noise Tax + Decision Provenance Record',
+    decisionIntel:
+      'Decision Quality Index (A-F + 0-100) + Noise score + Decision Provenance Record (hashed, tamper-evident, 17-framework regulatory mapping)',
   },
   {
     dimension: 'Moat Type',
@@ -147,13 +149,13 @@ export const MOAT_LAYERS: MoatLayer[] = [
   },
   {
     id: 'compliance',
-    name: 'Compliance Framework Lock-in',
+    name: 'Compliance + Pan-African Regulatory Lock-in',
     strength: 'very_high',
     timeline: 'Day 1',
     description:
-      '7 regulatory frameworks (SOX, FCA, EU AI Act, Basel III, GDPR, SEC Reg D, LPOA) with provision-level mapping and Decision Provenance Record generation.',
-    files: 'src/lib/compliance/frameworks/',
-    why: "Competitors need 7 frameworks' worth of legal review before shipping a single page. Cloverpop, Palantir, and IBM can't catch up here.",
+      '17 regulatory frameworks across G7, EU, GCC, and African markets — EU AI Act Art 14, SOC 2 Type II, GDPR Art 22, Basel III Pillar 2 ICAAP, SOX §404, NDPR, CBN, WAEMU, PoPIA §71, CMA Kenya, SARB Model Risk, and more. Provision-level mapping per flag, hashed + tamper-evident Decision Provenance Record on every audit. The 17-framework count is structurally derived from FRAMEWORKS.length so additions extend the moat automatically.',
+    files: 'src/lib/compliance/frameworks/, src/lib/constants/trust-copy.ts',
+    why: "Competitors need 17 frameworks' worth of legal + cultural review before shipping a single page. The Pan-African coverage specifically (NDPR, CBN, WAEMU, PoPIA, etc.) is what removes the 'this is a US-only product' procurement objection from African and EM-focused buyers — Cloverpop, Palantir, IBM Watson, and Aera have no defensible answer here.",
   },
 ];
 
@@ -348,9 +350,9 @@ export const INVESTOR_QA: InvestorQA[] = [
     question:
       "You're laser-focused on corporate strategy and M&A. Aren't you artificially limiting your TAM?",
     answer:
-      "We are applying Peter Thiel's monopoly framework: dominate a high-stakes, high-WTP vertical before expanding horizontally. Cloverpop's generic AI is fine for deciding where to host a corporate retreat. But a generic LLM cannot audit a $500M acquisition memo. Our engine has 11 proprietary, strategy-specific bias overlays — we hunt for Winner's Curse, Valuation Anchoring, and Synergy Overconfidence. When a CFO is approving a $200M acquisition, they don't want a horizontal HR collaboration tool. They want a specialized statistical jury. Because we're verticalized, we tie outputs directly to FCA Consumer Duty and SOX compliance — turning our software from nice-to-have into must-have regulatory CYA.",
+      "We are applying Peter Thiel's monopoly framework: dominate a high-stakes, high-WTP vertical before expanding horizontally. The vertical is broader than it looks — corporate strategy + corporate development + funds (PE, EM-focused VC, family offices) + audit committees + GCs at regulated entities. Cloverpop's generic AI is fine for deciding where to host a corporate retreat; a generic LLM cannot audit a $500M acquisition memo. Our R²F engine has 20-bias taxonomy (DI-B-001 through DI-B-020) with strategy-specific overlays — Winner's Curse, Valuation Anchoring, Synergy Overconfidence — and the 17-framework regulatory map across G7, EU, GCC, and African markets means a Pan-African GC reading our security posture sees NDPR, CBN, WAEMU mapped alongside Basel III and EU AI Act. That's not nice-to-have; that's must-have regulatory CYA. The Pan-African angle alone (which no US incumbent has) opens a beachhead worth $50-150B+ in corporate strategy spend that's structurally underserved.",
     proof:
-      'src/lib/compliance/frameworks/ — 7 regulatory framework implementations (SOX, FCA, EU AI Act, Basel III, GDPR, SEC Reg D, LPOA)',
+      'src/lib/compliance/frameworks/ — 17 regulatory framework implementations (FRAMEWORKS.length-derived) including EU AI Act Art 14, SOC 2 Type II, GDPR Art 22, Basel III Pillar 2, SOX §404, NDPR, CBN, WAEMU, PoPIA §71, CMA Kenya, SARB Model Risk, and more',
   },
   {
     id: 'solo_founder',
@@ -393,14 +395,14 @@ export const INVESTOR_QA: InvestorQA[] = [
     topic: 'defensibility',
     question: 'What if OpenAI or Anthropic just builds this into their platform?',
     answer:
-      "LLM providers are infrastructure, not vertical SaaS. They don't have 7 compliance frameworks implemented, 135 case studies with outcome correlations, or an org-specific calibration flywheel. It's like asking 'What if AWS builds Datadog?' The platform layer and the domain layer are different businesses. Our value is the compound scoring engine + regulatory mapping + outcome learning, not the LLM inference. We swap LLM models freely — that's by design.",
+      "LLM providers are infrastructure, not vertical SaaS. They don't have 17 compliance frameworks implemented (G7, EU, GCC, African markets — including NDPR, CBN, WAEMU, PoPIA), 135 case studies with outcome correlations, two production specimen DPRs (WeWork S-1 + Dangote Pan-African expansion), the per-org Brier-scored recalibration flywheel (Tetlock superforecasting research), or the 20×20 bias interaction matrix with 18 named toxic combinations. It's like asking 'What if AWS builds Datadog?' The platform layer and the domain layer are different businesses. Our value is the R²F engine + 17-framework regulatory mapping + per-org outcome learning + Pan-African geographic moat — not the LLM inference. We swap LLM models freely (locked 2-model policy: gemini-3-flash-preview + gemini-3.1-flash-lite) — that's by design.",
   },
   {
     id: 'traction',
     topic: 'traction',
     question: 'Show me traction.',
     answer:
-      "Working product at production URL. Full analysis engine processing real strategic memos end-to-end, with the Decision Knowledge Graph seeding from document one. Full auth (Google OAuth), multi-tenant orgs, team collaboration. Compliance frameworks (FCA, SOX, Basel III) fully implemented. Reviewed by the senior consultant who helped take Wiz public at $32B, quote: 'genuinely fascinated by the role of unconscious cognitive biases in decision-making.' LRQA executive (global risk management firm) review in progress. 135 reverse-engineered case studies across 11 industries. Cloverpop's Inc. 5000 #608 ranking with 300% growth validates that the decision intelligence category has enterprise demand.",
+      "Working product at production URL — full LangGraph 12-node analysis engine processing real strategic memos end-to-end, with the Decision Knowledge Graph seeding from document one. Full auth (Google OAuth via Supabase), multi-tenant orgs, team collaboration, blind-prior decision rooms, deal-level cross-document conflict detection, hashed + tamper-evident Decision Provenance Records. 17 regulatory frameworks fully mapped across G7, EU, GCC, and African markets (EU AI Act, SOC 2 Type II infrastructure, GDPR, Basel III, SOX, NDPR, CBN, WAEMU, PoPIA, CMA Kenya, more). Two production specimen DPRs (WeWork S-1 + Dangote 2014 Pan-African expansion) ship in public/ as cold-call evidence. Reviewed by the senior consultant who helped take Wiz from startup to $32B, quote: 'genuinely fascinated by the role of unconscious cognitive biases in decision-making.' 135 hand-curated case studies across 11 industries (deduplicated, primary-source cited). Cloverpop's Inc. 5000 #608 ranking with 300% growth validates enterprise demand exists for the workflow-tooling adjacent category — we audit the reasoning Cloverpop logs.",
   },
 ];
 
@@ -423,9 +425,9 @@ export const COMMON_OBJECTIONS: Objection[] = [
   },
   {
     id: 'category',
-    objection: 'Market timing — is decision intelligence a real category?',
+    objection: 'Market timing — is this a real category?',
     response:
-      "Cloverpop's Inc. 5000 #608 ranking with ~300% three-year growth proves enterprise demand exists. Decision intelligence market sized at $12.2B growing to $46.4B by 2030. EU AI Act and FCA Consumer Duty create regulatory tailwinds that make bias detection compliance-mandatory.",
+      "We frame it as the regulatory tailwind moment, not the market-size pitch. EU AI Act in force since Aug 2024 (Article 14 record-keeping for high-risk decision-support systems enforceable Aug 2026, Article 13 transparency, Article 15 accuracy + record-keeping). SEC AI disclosure proposed 2024, evolving through 2026. Basel III Pillar 2 ICAAP live for regulated banks. GDPR Article 22 live since 2018 (automated-decision rights). Colorado SB24-205 (Feb 2026 enforceable). NDPR / CBN / WAEMU / PoPIA on the African side. Every tailwind has a statute, a regulator guidance, or an enforcement date — these are calendars, not predictions. The DPR is the artefact each one will eventually require evidence of. Cloverpop's #608 Inc. 5000 ranking validates workflow tooling adjacent to ours; AI Verify Foundation (IMDA, Singapore, Apache 2.0) gives us 11 internationally-recognised AI governance principles to align with. The category has named enforceable regulations across 17 frameworks — that's the why-now, not a market-size slide.",
     tag: 'Category',
   },
   {
@@ -468,14 +470,17 @@ export const COMMON_OBJECTIONS: Objection[] = [
 // ─── Market sizing & expansion roadmap ────────────────────────────────────
 
 export const MARKET_SIZE = {
-  headline: '$995B by 2035',
+  headline: 'Regulatory-tailwind market — $995B by 2035 if categorised broadly',
   stats: [
-    'Decision intelligence market: $12.2B → $46.4B by 2030',
-    'Enterprise GRC software: $50B+ and growing at 14% CAGR',
-    'Corporate M&A advisory market: $40B+ annually',
-    'Fortune 500 + mid-market = 10,000+ addressable organizations',
+    'Enterprise GRC software: $50B+ and growing at 14% CAGR (commerce-adjacent)',
+    'Corporate M&A advisory market: $40B+ annually (deal-side beachhead)',
+    'Fortune 500 + mid-market + Pan-African enterprise = 12,000+ addressable orgs',
+    'EU AI Act Article 14 enforcement Aug 2026 — compliance is a market trigger, not a feature',
+    'African enterprise / EM funds — structurally underserved $50-150B+ corp strategy spend (the moat geography)',
     'Cross-industry applicability expands TAM beyond any single vertical',
   ],
+  positioning_note:
+    'Lead investor pitches with the REGULATORY TAILWIND moment, not the market-size slide. Every tailwind has a statute, regulator guidance, or enforcement date — calendars, not predictions. The DPR is the artefact each one will eventually require evidence of.',
 };
 
 export const PRICING_RATIONALE = {

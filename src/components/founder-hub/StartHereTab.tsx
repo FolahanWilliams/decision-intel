@@ -369,6 +369,68 @@ function renderHero(
         except outreach. Tick tabs as you read them — progress saves automatically.
       </p>
 
+      {/* Current positioning anchor — at-a-glance reference for the
+          locked vocabulary so the founder doesn't have to re-derive it
+          from CLAUDE.md every session. Updated 2026-04-26 to reflect
+          the high-stakes-call + Pan-African + 17-framework lock. */}
+      <div
+        style={{
+          marginBottom: 12,
+          padding: 12,
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-color)',
+          borderLeft: '3px solid #16A34A',
+          borderRadius: 'var(--radius-md)',
+          fontSize: 12,
+          lineHeight: 1.55,
+          color: 'var(--text-primary)',
+        }}
+      >
+        <div
+          style={{
+            fontSize: 9,
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+            color: '#16A34A',
+            marginBottom: 6,
+          }}
+        >
+          Current positioning anchor — locked 2026-04-26
+        </div>
+        <div style={{ marginBottom: 4 }}>
+          <strong>Primary hero:</strong> &ldquo;The native reasoning layer for every high-stakes
+          call.&rdquo;
+        </div>
+        <div style={{ marginBottom: 4 }}>
+          <strong>Secondary (regulatory):</strong> &ldquo;The reasoning layer the Fortune 500 needs
+          before regulators start asking.&rdquo;
+        </div>
+        <div style={{ marginBottom: 4 }}>
+          <strong>IP moat:</strong> Recognition-Rigor Framework (R²F) — Kahneman&apos;s debiasing +
+          Klein&apos;s Recognition-Primed Decisions, arbitrated in one pipeline.
+        </div>
+        <div style={{ marginBottom: 4 }}>
+          <strong>Specimen library:</strong> WeWork S-1 (US/global) + Dangote 2014 Pan-African
+          expansion (Africa / EM). Two production DPRs in <code>public/</code>.
+        </div>
+        <div style={{ marginBottom: 4 }}>
+          <strong>Compliance moat:</strong> 17 frameworks across G7 / EU / GCC / African markets.
+        </div>
+        <div style={{ marginBottom: 4 }}>
+          <strong>Audience:</strong> Corporate strategy + corp dev + funds (PE, EM-focused VC,
+          family offices) + audit committees + GCs. NOT F500-board-narrow.
+        </div>
+        <div style={{ color: 'var(--text-muted)', fontSize: 11, marginTop: 8 }}>
+          <strong>Banned:</strong> &ldquo;decision intelligence platform&rdquo; (Gartner-crowded),
+          &ldquo;decision hygiene&rdquo; (Kahneman&apos;s 2021 term — cedes vocabulary),
+          &ldquo;boardroom strategic decision&rdquo; (audience-narrowing — replaced by
+          &ldquo;high-stakes call&rdquo; 2026-04-26). Cold-context on-ramps:
+          &ldquo;60-second audit on a strategic memo&rdquo;, &ldquo;pre-IC audit layer&rdquo;,
+          &ldquo;strategic memo audits&rdquo; — descriptive, no academic borrowing.
+        </div>
+      </div>
+
       {/* Progress bar */}
       <div
         style={{

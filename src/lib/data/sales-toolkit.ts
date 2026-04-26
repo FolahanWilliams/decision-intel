@@ -186,41 +186,67 @@ export const AUDIENCE_PITCHES: AudiencePitch[] = [
   {
     id: 'cso',
     audience: 'Chief Strategy Officer',
-    seconds: 30,
+    seconds: 35,
     pitch:
-      "We're building a cognitive bias auditing engine for strategic decisions. Upload a board memo, get a Decision Quality Score in 60 seconds — think FICO for organizational decisions. Our outcome flywheel means we learn which biases actually cost your organization money, so the platform gets sharper with every decision.",
+      "Decision Intel is the native reasoning layer for every high-stakes call your strategy office makes. Upload a board memo, get an R²F audit (Recognition-Rigor Framework — Kahneman's debiasing plus Klein's Recognition-Primed Decisions, arbitrated in one pipeline) and a Decision Quality Index in 60 seconds. Before you say yes, let me run a live audit on a document you already know — the WeWork S-1 from 2019 — so you see the work, not the pitch.",
     color: '#16A34A',
-    emphasis: ['FICO for organizational decisions', '60 seconds', 'outcome flywheel'],
+    emphasis: [
+      'native reasoning layer',
+      'high-stakes call',
+      'WeWork S-1',
+      'see the work, not the pitch',
+    ],
   },
   {
     id: 'ma',
     audience: 'M&A / Corp Dev Lead',
-    seconds: 30,
+    seconds: 35,
     pitch:
-      'We detect 20 cognitive biases in strategic documents — including anchoring to initial estimates, sunk cost in failing deals, and groupthink in committee decisions. Our Boardroom Simulation creates virtual decision-makers who vote on your thesis. Plus a Chrome extension for real-time bias checking and Slack integration for meeting-time coaching. It usually surfaces the objection nobody in the room raised.',
+      "Every IC memo, CIM, and management presentation gets an R²F audit before it reaches the partners — bias flags with the exact paragraphs they appear in, cross-document conflict detection (CIM says 40% growth, model assumes 15%), and a deal-level composite Decision Quality Index. Sample DPR (Decision Provenance Record) on the WeWork S-1 — if you bring one redacted IC memo from a deal that went sideways, I'll run the audit live on our next call. About a third of partners say yes; that call closes at materially higher rates.",
     color: '#8B5CF6',
-    emphasis: ['Boardroom Simulation', 'Chrome extension', 'the objection nobody raised'],
+    emphasis: [
+      'cross-document conflict detection',
+      'composite Decision Quality Index',
+      'redacted IC memo',
+    ],
+  },
+  {
+    id: 'fund',
+    audience: 'Fund Partner / EM Investor',
+    seconds: 35,
+    pitch:
+      "For capital-allocating teams (PE, EM-focused VC, family office IC), the audit anchor is geography-specific. Africa-focused funds see the Dangote 2014 pan-African expansion DPR — three Dalio determinants (currency cycle, trade share, governance) plus regulatory mapping across NDPR, CBN, WAEMU, PoPIA, CMA Kenya, Basel III. US/global funds see the WeWork S-1. The pitch is the evidence moment: 90 seconds to frame, then I run the audit live on a document you already know. Then the ask: bring a redacted IC memo from a deal that didn't go to plan, and we run THAT live next time.",
+    color: '#D97706',
+    emphasis: [
+      'Dangote 2014 pan-African expansion',
+      'evidence moment',
+      'NDPR, CBN, WAEMU',
+    ],
   },
   {
     id: 'board',
-    audience: 'Board / Executive Sponsor',
+    audience: 'Board / Audit Committee',
     seconds: 60,
     pitch:
-      "Decision Intel is the cognitive bias auditing engine for high-stakes executive teams. We sit between analysis and commitment — the one place in the decision workflow where nobody provides quality tools. 12-node AI pipeline, proprietary Decision Quality Index, and an outcome tracking flywheel. Decision intelligence market is $12.2B going to $46.4B by 2030 — we're creating a new category.",
+      "Decision Intel is the reasoning layer the Fortune 500 needs before regulators start asking. Every audit produces a Decision Provenance Record — hashed, tamper-evident, mapped to the regulatory provision it touches across 17 frameworks (EU AI Act Article 14 record-keeping, SEC AI disclosure, Basel III Pillar 2 ICAAP, GDPR Article 22, NDPR, CBN, WAEMU, SOX §404, plus more). The DPR is the artefact your audit committee will eventually require evidence of. We ship it on every audit, today, before the regulator asks.",
     color: '#F59E0B',
-    emphasis: ['between analysis and commitment', '$12.2B → $46.4B by 2030', 'new category'],
+    emphasis: [
+      'reasoning layer the Fortune 500 needs before regulators start asking',
+      'Decision Provenance Record',
+      '17 frameworks',
+    ],
   },
   {
     id: 'technical',
     audience: 'Technical Audience',
-    seconds: 30,
+    seconds: 35,
     pitch:
-      'LangGraph-based 12-node pipeline with deterministic compound scoring on top of LLM output. 20x20 bias interaction matrix, Bayesian prior integration, Granger-causal temporal inference for our decision knowledge graph. Not a wrapper — we built the scoring math.',
+      "LangGraph 12-node pipeline (8 sequential + 4 parallel), schema-validated outputs between every step, Bayesian prior integration for per-org recalibration, Brier-scored outcome loop (Tetlock superforecasting research), 20×20 bias interaction matrix with 18 named toxic combinations. Two-model policy: gemini-3-flash-preview (analytical) + gemini-3.1-flash-lite (lightweight). ~17 LLM calls per audit, ~$0.40-0.65 cost, ~90% blended margin against $2,499/month Strategy tier. Not an LLM wrapper — twelve specialised products bound by deterministic glue.",
     color: '#0EA5E9',
     emphasis: [
-      '20x20 bias interaction matrix',
-      'Granger-causal temporal inference',
-      'Not a wrapper',
+      '20×20 bias interaction matrix',
+      'Brier-scored outcome loop',
+      'twelve specialised products',
     ],
   },
 ];
