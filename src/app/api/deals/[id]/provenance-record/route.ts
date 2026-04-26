@@ -23,6 +23,13 @@ import { createLogger } from '@/lib/utils/logger';
 import { assembleProvenanceRecordDataForDeal } from '@/lib/reports/provenance-record-data';
 import { DecisionProvenanceRecordGenerator } from '@/lib/reports/decision-provenance-record-generator';
 import { logAudit } from '@/lib/audit';
+// TODO(notify): wire notifyExternalDprDownload from
+// @/lib/notifications/dpr-share-alert here when Deal gains a creatorUserId
+// field. Today Deal only carries orgId; "external share" can't be detected
+// without knowing who originated the deal versus who's downloading the DPR.
+// The document-scoped DPR route (src/app/api/documents/[id]/provenance-record)
+// already covers ~80% of the signal because individual analyses ARE owned
+// by the user who ran them.
 
 const log = createLogger('DealProvenance');
 

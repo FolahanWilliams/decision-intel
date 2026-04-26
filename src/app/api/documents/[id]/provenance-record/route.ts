@@ -28,13 +28,20 @@ import { assembleProvenanceRecordData } from '@/lib/reports/provenance-record-da
 import { DecisionProvenanceRecordGenerator } from '@/lib/reports/decision-provenance-record-generator';
 import { getUserPlan, getOrgPlan } from '@/lib/utils/plan-limits';
 import { buildDocumentAccessWhere } from '@/lib/utils/document-access';
+import { notifyExternalDprDownload } from '@/lib/notifications/dpr-share-alert';
 
 const log = createLogger('ProvenanceRecordRoute');
 
 async function getAuthorizedAnalysisId(
   documentId: string
 ): Promise<
-  | { ok: true; analysisId: string; userId: string; orgId: string | null }
+  | {
+      ok: true;
+      analysisId: string;
+      userId: string;
+      orgId: string | null;
+      documentOwnerUserId: string;
+    }
   | { ok: false; status: number; error: string }
 > {
   const supabase = await createClient();
@@ -60,7 +67,13 @@ async function getAuthorizedAnalysisId(
   if (!analysis)
     return { ok: false, status: 409, error: 'Document has no completed analysis yet.' };
 
-  return { ok: true, analysisId: analysis.id, userId: user.id, orgId: doc.orgId };
+  return {
+    ok: true,
+    analysisId: analysis.id,
+    userId: user.id,
+    orgId: doc.orgId,
+    documentOwnerUserId: doc.userId,
+  };
 }
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -123,6 +136,22 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       } catch (auditErr) {
         log.warn('AuditLog write failed on DPR pdf export (non-fatal):', auditErr);
       }
+
+      // External-share alert: fire-and-forget email to FOUNDER_EMAIL when the
+      // downloader is NOT the original document owner. This is the highest-
+      // value conversion signal in the product (es_8 metric #3, es_10).
+      // Helper handles the self-download skip + missing-FOUNDER_EMAIL skip
+      // internally and never throws.
+      void notifyExternalDprDownload({
+        resourceType: 'document',
+        resourceId: id,
+        rootId: auth.analysisId,
+        downloaderUserId: auth.userId,
+        originalAuditorUserId: auth.documentOwnerUserId,
+        filename,
+        context: auth.orgId ? `Org-scoped (orgId: ${auth.orgId})` : 'Personal account',
+        inputHash: data.inputHash,
+      });
 
       return new NextResponse(pdfBytes as unknown as BodyInit, {
         status: 200,
