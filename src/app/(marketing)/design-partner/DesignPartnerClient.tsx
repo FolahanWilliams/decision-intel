@@ -59,7 +59,7 @@ const YOU_RECEIVE: Array<{ icon: typeof ShieldCheck; title: string; body: string
   {
     icon: ShieldCheck,
     title: 'Decision Provenance Record free on every audit',
-    body: 'The signed, hashed, 4-page artifact your General Counsel hands to the audit committee, mapped onto EU AI Act Article 14 record-keeping, SEC AI disclosure, and Basel III ICAAP. Bundled on every strategic memo you audit.',
+    body: 'The hashed, tamper-evident, 4-page artifact your General Counsel hands to the audit committee, mapped onto EU AI Act Article 14 record-keeping, SEC AI disclosure, and Basel III ICAAP. Bundled on every strategic memo you audit.',
   },
   {
     icon: Sparkles,

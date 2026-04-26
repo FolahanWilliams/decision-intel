@@ -99,9 +99,9 @@ const TOUR_STEPS_BY_ROLE: Record<TourRole, Step[]> = {
       title: 'Decision Provenance + Outcome Flywheel',
       content: (
         <>
-          Under Analytics: signed Decision Provenance Records (DPR) for every audit — the artefact
-          your GC and audit committee receive — plus the Outcome Flywheel where you close the loop
-          and watch Brier-calibrated DQI compound quarter over quarter.
+          Under Analytics: hashed, tamper-evident Decision Provenance Records (DPR) for every
+          audit — the artefact your GC and audit committee receive — plus the Outcome Flywheel
+          where you close the loop and watch Brier-calibrated DQI compound quarter over quarter.
         </>
       ),
     },
@@ -214,10 +214,10 @@ const TOUR_STEPS_BY_ROLE: Record<TourRole, Step[]> = {
       title: 'LP-grade Decision Provenance + cross-fund DQI',
       content: (
         <>
-          Under Analytics: signed Decision Provenance Records on every audited deal, the Outcome
-          Flywheel where realised exits recalibrate prior IC convictions, and Brier-calibrated DQI
-          across the portfolio. The calibration data your LPs increasingly want to see in the
-          annual report.
+          Under Analytics: hashed, tamper-evident Decision Provenance Records on every audited
+          deal, the Outcome Flywheel where realised exits recalibrate prior IC convictions, and
+          Brier-calibrated DQI across the portfolio. The calibration data your LPs (including
+          NDPR / WAEMU / CMA Kenya-regulated LPs) increasingly want to see in the annual report.
         </>
       ),
     },

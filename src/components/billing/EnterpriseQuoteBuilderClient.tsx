@@ -204,6 +204,30 @@ export function EnterpriseQuoteBuilderClient({
                 onChange={v => setRegion(v as typeof region)}
                 options={['US', 'EU', 'Multi-region']}
               />
+              {(region === 'EU' || region === 'Multi-region') && (
+                <div
+                  style={{
+                    marginTop: 10,
+                    padding: '10px 12px',
+                    borderRadius: 8,
+                    background: 'rgba(245, 158, 11, 0.08)',
+                    border: '1px solid rgba(245, 158, 11, 0.28)',
+                    fontSize: 12,
+                    color: 'var(--text-secondary)',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  <strong style={{ color: 'var(--text-primary)' }}>
+                    {region === 'EU' ? 'EU' : 'Multi-region'} hosting requires an Enterprise
+                    conversation.
+                  </strong>{' '}
+                  Production today runs on Vercel + Supabase US. {region === 'EU' ? 'EU' : 'Multi-region'}{' '}
+                  residency is available on Enterprise design-partner configurations and is
+                  confirmed during the Order Form discussion. The PDF below records your stated
+                  preference; it is not a representation that {region === 'EU' ? 'EU' : 'Multi-region'}{' '}
+                  is provisioned today.
+                </div>
+              )}
             </Field>
           </Section>
 

@@ -88,6 +88,16 @@ const SAMPLE_CITATIONS: CitationEntry[] = [
   },
 ];
 
+/**
+ * Specimen regulatory mapping. Updated 2026-04-26 (P1 #25, Titi persona
+ * finding) so the public sample DPR no longer reads as US/EU-only.
+ * African frameworks are surfaced alongside the existing EU/US/UK
+ * regimes — every public-tier DPR sample now carries NDPR + WAEMU +
+ * CMA Kenya + PoPIA + FRC Nigeria entries on the same biases an
+ * African-market deal would touch. The full map across the 18-framework
+ * registry is in src/lib/compliance/frameworks/; this file exposes the
+ * subset the SPECIMEN renders.
+ */
 const SAMPLE_REGULATORY: RegulatoryEntry[] = [
   {
     biasType: 'confirmation_bias',
@@ -102,6 +112,16 @@ const SAMPLE_REGULATORY: RegulatoryEntry[] = [
         id: 'basel_iii',
         name: 'Basel III · Pillar 2 ICAAP',
         provisions: ['Qualitative-decision documentation'],
+      },
+      {
+        id: 'ndpr_nigeria',
+        name: 'NDPR Art. 12 (Nigeria)',
+        provisions: ['Automated-decision rights — meaningful information about the logic'],
+      },
+      {
+        id: 'popia_south_africa',
+        name: 'PoPIA s.24 (South Africa)',
+        provisions: ['Quality of information — accuracy and completeness'],
       },
     ],
   },
@@ -119,6 +139,16 @@ const SAMPLE_REGULATORY: RegulatoryEntry[] = [
         name: 'EU AI Act',
         provisions: ['Annex III — High-risk decision support'],
       },
+      {
+        id: 'cbn_ai_guidelines',
+        name: 'CBN AI Guidelines (Nigeria)',
+        provisions: ['Para. 4.2 — Model governance & validation'],
+      },
+      {
+        id: 'sarb_model_risk',
+        name: 'SARB Model Risk (South Africa)',
+        provisions: ['Directive D2/2022 — Model risk & AI governance'],
+      },
     ],
   },
   {
@@ -127,6 +157,11 @@ const SAMPLE_REGULATORY: RegulatoryEntry[] = [
     frameworks: [
       { id: 'eu_ai_act', name: 'EU AI Act', provisions: ['Article 13 — Transparency to users'] },
       { id: 'gdpr', name: 'GDPR', provisions: ['Article 22 — Automated decision-making'] },
+      {
+        id: 'frc_nigeria',
+        name: 'FRC Nigeria',
+        provisions: ['Principle 1.1 — Board effectiveness & decision-making'],
+      },
     ],
   },
   {
@@ -134,6 +169,21 @@ const SAMPLE_REGULATORY: RegulatoryEntry[] = [
     aggregateRiskScore: 6.2,
     frameworks: [
       { id: 'sox_404', name: 'SOX §404', provisions: ['Internal-controls documentation'] },
+      {
+        id: 'frc_nigeria',
+        name: 'FRC Nigeria',
+        provisions: ['Principle 11 — Risk management & material-risk re-identification'],
+      },
+      {
+        id: 'waemu',
+        name: 'WAEMU',
+        provisions: ['BCEAO Circular 04-2017 — Internal governance & material-decision evidence'],
+      },
+      {
+        id: 'cma_kenya',
+        name: 'CMA Kenya',
+        provisions: ['Conduct Regs 2024 Pt. III — Material disclosure & risk factors'],
+      },
     ],
   },
 ];

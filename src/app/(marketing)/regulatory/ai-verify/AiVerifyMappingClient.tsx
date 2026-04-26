@@ -586,14 +586,99 @@ export function AiVerifyMappingClient() {
             The 11 internationally-recognised AI governance principles the Decision Provenance
             Record already maps to (transparency, explainability, repeatability, safety, security,
             robustness, fairness, data governance, accountability, human agency &amp; oversight,
-            inclusive growth) align beat-for-beat with the emerging African framework stack —
-            <strong> NDPR Art. 12</strong> (Nigeria, automated-decision rights),
-            <strong> CBN AI Guidelines</strong> (Central Bank of Nigeria, draft 2024 — model
-            governance, explainability and consumer-protection duties for regulated financial
-            institutions) and <strong>WAEMU</strong> (data-localisation and financial-sector
-            governance across the eight West African member states). Every DPR field already
-            satisfies these obligations; the cross-walk is covered in the /security posture.
+            inclusive growth) align beat-for-beat with the emerging African framework stack. Every
+            DPR field already satisfies these obligations; the full provision-level cross-walk is
+            covered in the /security posture.
           </p>
+          <ul
+            style={{
+              marginTop: 18,
+              padding: 0,
+              listStyle: 'none',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: 12,
+              fontSize: 13,
+              color: C.slate600,
+              lineHeight: 1.55,
+            }}
+          >
+            {[
+              {
+                code: 'NDPR Art. 12',
+                jurisdiction: 'Nigeria',
+                gates: 'Automated-decision rights for Nigerian data subjects',
+              },
+              {
+                code: 'CBN AI Guidelines',
+                jurisdiction: 'Nigeria',
+                gates: 'Model governance + explainability for regulated financial institutions (draft 2024)',
+              },
+              {
+                code: 'FRC Nigeria',
+                jurisdiction: 'Nigeria',
+                gates: 'Code of Corporate Governance — board-level decisioning + dissent capture',
+              },
+              {
+                code: 'WAEMU',
+                jurisdiction: '8 West African Member States',
+                gates: 'Cross-border data localisation + BCEAO financial-sector governance',
+              },
+              {
+                code: 'CMA Kenya',
+                jurisdiction: 'Kenya',
+                gates: 'Listed-company decisioning + prospectus disclosure (Conduct Regs 2024)',
+              },
+              {
+                code: 'CBK',
+                jurisdiction: 'Kenya',
+                gates: 'Banking (Amendment) Act 2024 §33B — digital-lending + AI/ML model risk',
+              },
+              {
+                code: 'BoG Cyber & ICT Risk',
+                jurisdiction: 'Ghana',
+                gates: 'Cyber, data and AI/ML model-governance for regulated financial institutions',
+              },
+              {
+                code: 'CBE AI Guidelines',
+                jurisdiction: 'Egypt',
+                gates: 'AI/ML governance + explainability for Egyptian banks (CBE 2023 framework)',
+              },
+              {
+                code: 'PoPIA §71',
+                jurisdiction: 'South Africa',
+                gates: 'Automated-decision rights + data-subject access (in force July 2021)',
+              },
+              {
+                code: 'SARB Model Risk',
+                jurisdiction: 'South Africa',
+                gates: 'Model risk + AI governance for SA-regulated banks (Directive D2/2022 + JS 2/2024)',
+              },
+              {
+                code: 'BoT FinTech',
+                jurisdiction: 'Tanzania',
+                gates: 'AI/ML decisioning under the BoT Regulatory Sandbox Guidelines 2023',
+              },
+            ].map(row => (
+              <li
+                key={row.code}
+                style={{
+                  padding: '12px 14px',
+                  background: C.slate50,
+                  border: `1px solid ${C.slate200}`,
+                  borderRadius: 10,
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
+                  <strong style={{ color: C.navy, fontSize: 13 }}>{row.code}</strong>
+                  <span style={{ fontSize: 11, color: C.slate500, fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                    {row.jurisdiction}
+                  </span>
+                </div>
+                <div>{row.gates}</div>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 

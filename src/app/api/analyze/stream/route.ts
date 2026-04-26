@@ -796,6 +796,13 @@ export async function POST(request: NextRequest) {
           // attached to a deal that now has ≥2 analyzed documents. Runs in
           // the background; never blocks the SSE pipeline. Uses the same
           // RBAC + agent path as the manual button on the deal page.
+          //
+          // 30-minute cooldown (added 2026-04-26 for parity with the
+          // package-side auto-trigger below): prevents a burst-fire when a
+          // deal team uploads several docs back-to-back, which would
+          // otherwise burn ~£0.40 per Gemini call × N. The manual button
+          // on the deal page bypasses this cooldown via its own rate
+          // limiter.
           if (doc.dealId) {
             const dealIdForCrossRef = doc.dealId;
             (async () => {
@@ -808,6 +815,23 @@ export async function POST(request: NextRequest) {
                   },
                 });
                 if (analyzedCount < 2) return;
+
+                const RECENT_DEAL_RUN_MS = 30 * 60 * 1000;
+                const recent = await prisma.dealCrossReference
+                  .findFirst({
+                    where: {
+                      dealId: dealIdForCrossRef,
+                      runAt: { gt: new Date(Date.now() - RECENT_DEAL_RUN_MS) },
+                    },
+                    select: { id: true },
+                  })
+                  .catch(() => null);
+                if (recent) {
+                  log.info(
+                    `Auto cross-reference for deal ${dealIdForCrossRef} skipped: recent run within ${RECENT_DEAL_RUN_MS / 60_000} minutes`
+                  );
+                  return;
+                }
 
                 // Pull all analyzed docs on the deal — owner-context run, not
                 // teammate-context, so we use the document owner's userId.

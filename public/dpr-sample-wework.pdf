@@ -10,7 +10,7 @@
 endobj
 4 0 obj
 <<
-/Length 3963
+/Length 3981
 >>
 stream
 0.5670000000000001 w
@@ -86,14 +86,14 @@ BT
 10.3499999999999996 TL
 0.118 0.161 0.231 rg
 56.6929133858267775 651.628582677165241 Td
-(signature-algorithm Ed25519) Tj
+(tamper-evidence     SHA-256 input hash + record fingerprint) Tj
 ET
 BT
 /F5 9 Tf
 10.3499999999999996 TL
 0.118 0.161 0.231 rg
 56.6929133858267775 639.4962992125983874 Td
-(signer-fingerprint  4F:7A:CB:29:8E:11:D0:A2:…:7C:55) Tj
+(private-key signing planned · roadmap) Tj
 ET
 BT
 /F2 13 Tf
@@ -207,7 +207,7 @@ endobj
 endobj
 6 0 obj
 <<
-/Length 6959
+/Length 7485
 >>
 stream
 0.5670000000000001 w
@@ -406,7 +406,7 @@ BT
 10.3499999999999996 TL
 0.118 0.161 0.231 rg
 56.6929133858267775 180.6805511811022598 Td
-(record-keeping        this DPR, hashed and signed, retained per DPA §5) Tj
+(record-keeping        this DPR, hashed and tamper-evident, retained per DPA §5) Tj
 ET
 BT
 /F5 9 Tf
@@ -420,34 +420,55 @@ BT
 14.9499999999999993 TL
 0.059 0.09 0.165 rg
 56.6929133858267775 150.7466929133856866 Td
-(Signature block) Tj
+(Verification block) Tj
 ET
 BT
 /F5 9 Tf
 10.3499999999999996 TL
 0.118 0.161 0.231 rg
 56.6929133858267775 133.7388188976376568 Td
-(Signed by  di-signer-prod@decision-intel.com) Tj
+(Issued by   di-issuer-prod@decision-intel.com) Tj
 ET
 BT
 /F5 9 Tf
 10.3499999999999996 TL
 0.118 0.161 0.231 rg
 56.6929133858267775 121.6065354330706896 Td
-(Public key 4F:7A:CB:29:8E:11:D0:A2:…:7C:55) Tj
+(Input hash  sha256:4a7f3d21c8e0…6f8e2d91 \(sample\)) Tj
 ET
 BT
 /F5 9 Tf
 10.3499999999999996 TL
 0.118 0.161 0.231 rg
 56.6929133858267775 109.474251968503836 Td
-(Signature  MEUCIQDoVqf4u…zX5c1wIhAPmLk…Bv8oK1z \(truncated\)) Tj
+(Tamper evidence: any byte change in the source memo invalidates the) Tj
+ET
+BT
+/F5 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 97.3419685039369824 Td
+(input hash above. Cryptographic signing with a Decision Intel) Tj
 ET
 BT
 /F5 9 Tf
 10.3499999999999996 TL
 0.118 0.161 0.231 rg
 56.6929133858267775 85.2096850393701288 Td
+(private key is on the roadmap; until then, verification is by) Tj
+ET
+BT
+/F5 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 73.0774015748032753 Td
+(matching the input hash against the source document.) Tj
+ET
+BT
+/F5 9 Tf
+10.3499999999999996 TL
+0.118 0.161 0.231 rg
+56.6929133858267775 48.8128346456695681 Td
 (Verification: https://www.decision-intel.com/regulatory/ai-verify) Tj
 ET
 q
@@ -478,7 +499,7 @@ endobj
 endobj
 8 0 obj
 <<
-/Length 778
+/Length 892
 >>
 stream
 0.5670000000000001 w
@@ -488,9 +509,9 @@ BT
 9.1999999999999993 TL
 0.392 0.455 0.545 rg
 56.6929133858267775 771.0238582677164914 Td
-(This sample DPR is anonymised from a real 2019 Form S-1 audit run. Identifying text has been redacted; hashes, signatures and) Tj
-T* (record-ids are sample values. The schema, field set, Art. 14 mapping and structural-assumptions lens are identical to the production) Tj
-T* (artefact.) Tj
+(This sample DPR is anonymised from a real 2019 Form S-1 audit run. Identifying text has been redacted; hashes and record-ids are) Tj
+T* (sample values. The schema, field set, Art. 14 mapping and structural-assumptions lens are identical to the production artefact.) Tj
+T* (Cryptographic signing is on the roadmap; production today emits SHA-256 input hashes and a tamper-evident record fingerprint.) Tj
 ET
 q
 BT
@@ -680,7 +701,7 @@ endobj
 23 0 obj
 <<
 /Producer (jsPDF 4.2.1)
-/CreationDate (D:20260425202020+01'00')
+/CreationDate (D:20260426100227+01'00')
 >>
 endobj
 24 0 obj
@@ -694,37 +715,37 @@ endobj
 xref
 0 25
 0000000000 65535 f 
-0000012281 00000 n 
-0000014114 00000 n 
+0000012939 00000 n 
+0000014772 00000 n 
 0000000015 00000 n 
 0000000152 00000 n 
-0000004167 00000 n 
-0000004304 00000 n 
-0000011315 00000 n 
-0000011452 00000 n 
-0000012350 00000 n 
-0000012475 00000 n 
-0000012606 00000 n 
-0000012740 00000 n 
-0000012878 00000 n 
-0000013002 00000 n 
-0000013131 00000 n 
-0000013263 00000 n 
-0000013399 00000 n 
-0000013527 00000 n 
-0000013654 00000 n 
-0000013783 00000 n 
-0000013916 00000 n 
-0000014018 00000 n 
-0000014366 00000 n 
-0000014452 00000 n 
+0000004185 00000 n 
+0000004322 00000 n 
+0000011859 00000 n 
+0000011996 00000 n 
+0000013008 00000 n 
+0000013133 00000 n 
+0000013264 00000 n 
+0000013398 00000 n 
+0000013536 00000 n 
+0000013660 00000 n 
+0000013789 00000 n 
+0000013921 00000 n 
+0000014057 00000 n 
+0000014185 00000 n 
+0000014312 00000 n 
+0000014441 00000 n 
+0000014574 00000 n 
+0000014676 00000 n 
+0000015024 00000 n 
+0000015110 00000 n 
 trailer
 <<
 /Size 25
 /Root 24 0 R
 /Info 23 0 R
-/ID [ <94DDBC220A07753F0EEA0E8D8C9FE468> <94DDBC220A07753F0EEA0E8D8C9FE468> ]
+/ID [ <7109760548FF51D7051858C1F71564A3> <7109760548FF51D7051858C1F71564A3> ]
 >>
 startxref
-14556
+15214
 %%EOF

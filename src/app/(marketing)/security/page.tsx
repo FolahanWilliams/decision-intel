@@ -166,6 +166,11 @@ const FRAMEWORKS = [
     gates: 'Listed-company decisioning + prospectus disclosure obligations under the CMA (Conduct of Business) Regulations 2024.',
   },
   {
+    code: 'CBK',
+    name: 'Central Bank of Kenya — Banking & Digital Lending',
+    gates: 'Digital-lending licensing, AI/ML model-risk management, and consumer-disclosure obligations under the Banking (Amendment) Act 2024 §33B and CBK Risk Management Guidelines (rev. 2023).',
+  },
+  {
     code: 'BoG Cyber & ICT Risk',
     name: 'Bank of Ghana — Cyber & Information Security Directive',
     gates: 'Cyber, data, and AI/ML model-governance obligations for Ghanaian regulated financial institutions (2018 directive + 2023 update).',
@@ -992,11 +997,12 @@ export default function SecurityPage() {
                 Decision Provenance Record export
               </div>
               <div style={{ fontSize: 13, color: C.slate600, lineHeight: 1.5 }}>
-                A signed, hashed 4-page artifact your General Counsel hands to the audit committee
-                or regulator of record, built to the shape EU AI Act Article 14, SEC AI disclosure,
-                and Basel III ICAAP already require. Includes input-document hash, prompt
-                fingerprint, model lineage, academic citations across the 30+ bias taxonomy,
-                regulatory mapping across all {FRAMEWORKS.length} frameworks, and full pipeline lineage.
+                A hashed, tamper-evident 4-page artifact your General Counsel hands to the audit
+                committee or regulator of record, built to the shape EU AI Act Article 14, SEC AI
+                disclosure, and Basel III ICAAP already require. Includes input-document SHA-256
+                hash, prompt fingerprint, model lineage, academic citations across the 30+ bias
+                taxonomy, regulatory mapping across all {FRAMEWORKS.length} frameworks, and full
+                pipeline lineage.
               </div>
             </div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>

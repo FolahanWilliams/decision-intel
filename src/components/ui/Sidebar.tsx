@@ -509,7 +509,7 @@ const [collapsedSections, setCollapsedSections] = useState<Record<string, boolea
               href="/dashboard/provenance"
               icon={<ShieldCheck size={18} />}
               label="Provenance"
-              description="Archive of signed Decision Provenance Records"
+              description="Archive of hashed, tamper-evident Decision Provenance Records"
               active={pathname.startsWith('/dashboard/provenance')}
               collapsed={collapsed}
               onNavigate={closeMobile}

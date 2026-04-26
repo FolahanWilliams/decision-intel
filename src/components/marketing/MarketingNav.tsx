@@ -224,6 +224,12 @@ const MENUS: MegaMenu[] = [
             description: 'Four-minute read for the director whose CSO is about to ask.',
             href: '/decision-intel-for-boards',
           },
+          {
+            icon: Building2,
+            label: 'About / vendor diligence',
+            description: 'Legal entity, founder, stage, procurement contact in one place.',
+            href: '/about',
+          },
         ],
       },
     ],

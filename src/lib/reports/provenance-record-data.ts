@@ -1,9 +1,16 @@
 /**
  * Decision Provenance Record — data assembler.
  *
- * Builds the signed, hashed metadata bundle that the Decision Provenance
- * Record PDF generator consumes. Also the shape persisted to the
- * DecisionProvenanceRecord table (see prisma/schema.prisma).
+ * Builds the hashed, tamper-evident metadata bundle that the Decision
+ * Provenance Record PDF generator consumes. Also the shape persisted to
+ * the DecisionProvenanceRecord table (see prisma/schema.prisma).
+ *
+ * Vocabulary discipline (locked 2026-04-26 after the persona audit
+ * caught "signed, hashed" overclaim): the assembler emits SHA-256 input
+ * hashes but does NOT produce a cryptographic signature against a
+ * Decision Intel private key. Until that ships, every consumer of this
+ * data should describe the artifact as "hashed + tamper-evident" — see
+ * src/lib/constants/trust-copy.ts for the canonical strings.
  *
  * The name was chosen to map cleanly onto regulatory tailwinds already in
  * motion — EU AI Act Article 14 (record-keeping for high-risk AI systems),
@@ -95,6 +102,58 @@ export interface ProvenanceRecordData {
       summary: string;
       realisedDqi: number | null;
       brierScore: number | null;
+      reportedAt: string;
+    } | null;
+  };
+  /**
+   * Deal-native member roster (3.1 deep, added 2026-04-26 P1 #19 after
+   * Marcus's audit caught the post-close-inquiry artefact gap). Populated
+   * only when the DPR was generated from a Deal root rather than a single
+   * Analysis. Same shape contract as `packageContext` plus deal-specific
+   * fields (`dealType`, `stage`, `ticketSize`, `currency`, `fundName`,
+   * `vintage`, `sector`, `targetCompany`) so an M&A audit committee
+   * receives one artefact covering CIM + financial model + counsel memo
+   * + IC deck instead of the four-document shuffle the per-analysis DPR
+   * forced. Null when the DPR is per-analysis or per-package.
+   */
+  dealContext?: {
+    dealId: string;
+    dealName: string;
+    dealType: string;
+    stage: string;
+    sector: string | null;
+    fundName: string | null;
+    vintage: number | null;
+    targetCompany: string | null;
+    ticketSize: number | null;
+    currency: string;
+    status: string;
+    exitDate: string | null;
+    compositeDqi: number | null;
+    compositeGrade: string | null;
+    members: Array<{
+      documentId: string;
+      filename: string;
+      role: string | null;
+      analysisId: string | null;
+      overallScore: number | null;
+      biasCount: number;
+      inputHash: string;
+    }>;
+    dealInputHash: string;
+    crossReference: {
+      runAt: string;
+      conflictCount: number;
+      highSeverityCount: number;
+      summary: string | null;
+    } | null;
+    outcome: {
+      irr: number | null;
+      moic: number | null;
+      exitType: string | null;
+      exitValue: number | null;
+      holdPeriodMonths: number | null;
+      notes: string | null;
       reportedAt: string;
     } | null;
   };
@@ -712,6 +771,277 @@ export async function assembleProvenanceRecordDataForPackage(
             realisedDqi: pkg.outcome.realisedDqi,
             brierScore: pkg.outcome.brierScore,
             reportedAt: pkg.outcome.reportedAt.toISOString(),
+          }
+        : null,
+    },
+  };
+}
+
+/**
+ * Assemble a Deal-rooted Provenance Record (3.1 deep, added 2026-04-26
+ * P1 #19 after Marcus's audit caught the post-close-inquiry gap).
+ *
+ * Strategy mirrors `assembleProvenanceRecordDataForPackage`: pull every
+ * Deal document + its latest analysis, build the standard DPR strip from
+ * the highest-scoring lead analysis, then layer the deal-specific
+ * `dealContext` on top. Citations and regulatoryMapping are aggregated
+ * across the entire deal so a procurement reader sees every
+ * regulator-touching bias surfaced anywhere on the deal — not just the
+ * lead doc's. Composite input hash is sha256 of the sorted member
+ * input hashes, scoped under the dealId so two deals with the same
+ * member docs (rare but possible) produce different deal hashes.
+ *
+ * The atomic decision unit for an M&A engagement is the deal — CIM +
+ * financial model + counsel memo + IC deck. A per-document DPR forces
+ * a GC at post-close inquiry to reconcile four artefacts into one
+ * narrative. The deal-rooted DPR collapses that into one PDF.
+ */
+export async function assembleProvenanceRecordDataForDeal(
+  dealId: string
+): Promise<ProvenanceRecordData> {
+  const deal = await prisma.deal.findUnique({
+    where: { id: dealId },
+    include: {
+      documents: {
+        where: { deletedAt: null },
+        orderBy: { uploadedAt: 'asc' },
+        select: {
+          id: true,
+          filename: true,
+          contentHash: true,
+          documentType: true,
+          analyses: {
+            orderBy: { createdAt: 'desc' },
+            take: 1,
+            select: {
+              id: true,
+              overallScore: true,
+              biases: {
+                select: { biasType: true, severity: true, suggestion: true },
+              },
+            },
+          },
+        },
+      },
+      crossReferences: {
+        orderBy: { runAt: 'desc' },
+        take: 1,
+      },
+      outcome: true,
+    },
+  });
+
+  if (!deal) {
+    throw new Error(`Deal ${dealId} not found.`);
+  }
+
+  // Filter members down to those with a latest analysis — the rest can't
+  // contribute to the composite DQI or the citation aggregation. We
+  // still surface non-analyzed docs in the member roster so the DPR
+  // honestly reports "Not analyzed" rather than silently dropping them.
+  const memberAnalyses = deal.documents
+    .map(d => ({
+      member: d,
+      analysis: d.analyses[0] ?? null,
+    }))
+    .filter(
+      (x): x is { member: typeof x.member; analysis: NonNullable<typeof x.analysis> } =>
+        x.analysis !== null
+    );
+
+  let baseData: ProvenanceRecordData;
+  if (memberAnalyses.length > 0) {
+    const lead = memberAnalyses.reduce((best, curr) =>
+      curr.analysis.overallScore > best.analysis.overallScore ? curr : best
+    );
+    baseData = await assembleProvenanceRecordData(lead.analysis.id);
+  } else {
+    // No analyses yet — synthesize a minimal data shape so the deal-level
+    // DPR still renders a defensible artefact ("deal exists but no
+    // members analysed yet") rather than throwing.
+    baseData = {
+      analysisId: 'no-analysis',
+      documentId: 'no-document',
+      userId: '',
+      orgId: deal.orgId ?? null,
+      promptFingerprint: 'NO_ANALYSES',
+      inputHash: 'NO_ANALYSES',
+      modelLineage: CURRENT_MODEL_LINEAGE,
+      judgeVariance: {
+        noiseScore: 0,
+        metaVerdict: null,
+        note: 'This deal has no analyzed member documents yet.',
+      },
+      citations: [],
+      regulatoryMapping: [],
+      pipelineLineage: PIPELINE_NODES.map((node, i) => ({
+        order: i + 1,
+        nodeId: node.id,
+        zone: node.zone,
+        label: node.label,
+        academicAnchor: node.academicAnchor,
+      })),
+      blindPriorAggregates: [],
+      schemaVersion: 1,
+      generatedAt: new Date(),
+      meta: {
+        filename: deal.name,
+        overallScore: 0,
+        noiseScore: 0,
+        summary: deal.targetCompany
+          ? `${deal.dealType} deal — target ${deal.targetCompany}`
+          : `${deal.dealType} deal — no analyses on member documents yet.`,
+        metaVerdict: null,
+        biasCount: 0,
+        topMitigation: null,
+        topMitigationFor: null,
+      },
+    };
+  }
+
+  // Aggregate citations + regulatoryMapping across every member doc's
+  // latest analysis (dedup by biasType). Same shape as the package
+  // assembler so a reader who's seen one DPR understands both.
+  const seenCitations = new Set<string>();
+  const aggregatedCitations: ProvenanceRecordData['citations'] = [];
+  const seenReg = new Set<string>();
+  const aggregatedRegulatory: ProvenanceRecordData['regulatoryMapping'] = [];
+  const allBiasTypes = new Set<string>();
+  for (const ma of memberAnalyses) {
+    const biasTypes = Array.from(new Set(ma.analysis.biases.map(b => b.biasType)));
+    for (const biasType of biasTypes) {
+      allBiasTypes.add(biasType);
+      if (!seenCitations.has(biasType)) {
+        seenCitations.add(biasType);
+        const edu = getBiasEducation(biasType);
+        aggregatedCitations.push({
+          biasType,
+          biasLabel: formatBiasLabel(biasType),
+          taxonomyId: edu?.taxonomyId ?? null,
+          citation: edu?.academicReference?.citation ?? null,
+          doi: edu?.academicReference?.doi ?? null,
+        });
+      }
+      if (!seenReg.has(biasType)) {
+        seenReg.add(biasType);
+        const risk = getCrossFrameworkRisk(biasType);
+        aggregatedRegulatory.push({
+          biasType,
+          aggregateRiskScore: risk.aggregateRiskScore,
+          frameworks: risk.frameworks.map(fw => ({
+            id: fw.frameworkId,
+            name: fw.frameworkName,
+            provisions: fw.provisions.map(p => `${p.provisionId} — ${p.title}`),
+          })),
+        });
+      }
+    }
+  }
+
+  // Composite DQI from member analyses (mirrors the in-app deal hero).
+  const compositeDqi =
+    memberAnalyses.length > 0
+      ? Math.round(
+          (memberAnalyses.reduce((sum, ma) => sum + ma.analysis.overallScore, 0) /
+            memberAnalyses.length) *
+            10
+        ) / 10
+      : null;
+  const compositeGrade =
+    compositeDqi == null
+      ? null
+      : compositeDqi >= 85
+        ? 'A'
+        : compositeDqi >= 70
+          ? 'B'
+          : compositeDqi >= 55
+            ? 'C'
+            : compositeDqi >= 40
+              ? 'D'
+              : 'F';
+
+  // Composite input hash — sha256 of dealId + sorted member input hashes.
+  const inputHashes = deal.documents
+    .map(d => d.contentHash || d.id)
+    .sort();
+  const dealInputHash = createHash('sha256')
+    .update(`deal::${deal.id}::${inputHashes.join('::')}`)
+    .digest('hex');
+
+  // Cross-reference summary (mirrors package shape).
+  const latestRun = deal.crossReferences[0];
+  let crossRefSummary: string | null = null;
+  if (latestRun) {
+    const findingsAny = latestRun.findings as
+      | { summary?: string; findings?: unknown[] }
+      | null
+      | undefined;
+    crossRefSummary =
+      typeof findingsAny?.summary === 'string'
+        ? findingsAny.summary
+        : `${latestRun.conflictCount} conflict${latestRun.conflictCount === 1 ? '' : 's'} flagged.`;
+  }
+
+  return {
+    ...baseData,
+    citations: aggregatedCitations.length > 0 ? aggregatedCitations : baseData.citations,
+    regulatoryMapping:
+      aggregatedRegulatory.length > 0 ? aggregatedRegulatory : baseData.regulatoryMapping,
+    inputHash: dealInputHash,
+    meta: {
+      ...baseData.meta,
+      filename: deal.name,
+      summary: deal.targetCompany
+        ? `${deal.dealType} deal — target ${deal.targetCompany}`
+        : baseData.meta.summary,
+      overallScore: compositeDqi ?? baseData.meta.overallScore,
+      biasCount: allBiasTypes.size,
+    },
+    dealContext: {
+      dealId: deal.id,
+      dealName: deal.name,
+      dealType: deal.dealType,
+      stage: deal.stage,
+      sector: deal.sector ?? null,
+      fundName: deal.fundName ?? null,
+      vintage: deal.vintage ?? null,
+      targetCompany: deal.targetCompany ?? null,
+      ticketSize: deal.ticketSize ? Number(deal.ticketSize) : null,
+      currency: deal.currency,
+      status: deal.status,
+      exitDate: deal.exitDate?.toISOString() ?? null,
+      compositeDqi,
+      compositeGrade,
+      dealInputHash,
+      members: deal.documents.map(d => {
+        const a = d.analyses[0];
+        return {
+          documentId: d.id,
+          filename: d.filename,
+          role: d.documentType ?? null,
+          analysisId: a?.id ?? null,
+          overallScore: a?.overallScore ?? null,
+          biasCount: a?.biases.length ?? 0,
+          inputHash: d.contentHash || 'UNAVAILABLE',
+        };
+      }),
+      crossReference: latestRun
+        ? {
+            runAt: latestRun.runAt.toISOString(),
+            conflictCount: latestRun.conflictCount,
+            highSeverityCount: latestRun.highSeverityCount,
+            summary: crossRefSummary,
+          }
+        : null,
+      outcome: deal.outcome
+        ? {
+            irr: deal.outcome.irr,
+            moic: deal.outcome.moic,
+            exitType: deal.outcome.exitType,
+            exitValue: deal.outcome.exitValue ? Number(deal.outcome.exitValue) : null,
+            holdPeriodMonths: deal.outcome.holdPeriod,
+            notes: deal.outcome.notes,
+            reportedAt: deal.outcome.updatedAt.toISOString(),
           }
         : null,
     },

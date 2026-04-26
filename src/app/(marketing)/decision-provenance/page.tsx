@@ -7,12 +7,12 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.c
 export const metadata: Metadata = {
   title: 'Decision Provenance Record · Decision Intel',
   description:
-    'The signed, hashed evidence record AI-augmented decision-making is already supposed to produce. Download a 4-page specimen — no login, no gate.',
+    'The hashed, tamper-evident evidence record AI-augmented decision-making is already supposed to produce. Download a 4-page specimen — no login, no gate.',
   alternates: { canonical: `${siteUrl}/decision-provenance` },
   openGraph: {
     title: 'Decision Provenance Record',
     description:
-      'The signed, hashed evidence record AI-augmented decision-making is already supposed to produce. Download a 4-page specimen.',
+      'The hashed, tamper-evident evidence record AI-augmented decision-making is already supposed to produce. Download a 4-page specimen.',
     url: `${siteUrl}/decision-provenance`,
   },
 };

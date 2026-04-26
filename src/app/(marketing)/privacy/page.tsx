@@ -24,6 +24,12 @@ import {
 
 import { MarketingNav } from '@/components/marketing/MarketingNav';
 import { DataLifecycleViz } from '@/components/marketing/privacy/DataLifecycleViz';
+import {
+  LEGAL_ENTITY_NAME,
+  JURISDICTION,
+  REGISTERED_OFFICE_LINES,
+  PRIVACY_CONTACT_EMAIL,
+} from '@/lib/constants/company-info';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
 
@@ -71,7 +77,7 @@ const TRUST_STACK = [
   {
     icon: Lock,
     label: 'AES-256-GCM at rest',
-    body: 'Document content is encrypted with authenticated AES-256-GCM using keys held in a separate vault from the database.',
+    body: 'Document content is encrypted with authenticated AES-256-GCM. Keys are held in environment-variable secrets, separate from the ciphertext database; migration to a dedicated key-management service is on the roadmap.',
   },
   {
     icon: FileLock2,
@@ -130,46 +136,94 @@ const RIGHTS = [
   {
     icon: Download,
     label: 'Access',
-    body: 'Request a full machine-readable export of the data we hold about you.',
+    body: 'Request a full machine-readable export of the data we hold about you (Art 15).',
   },
   {
     icon: Pencil,
     label: 'Rectification',
-    body: 'Correct any inaccurate or outdated personal data.',
+    body: 'Correct any inaccurate or outdated personal data (Art 16).',
   },
   {
     icon: Trash2,
     label: 'Erasure',
-    body: 'Delete your account and trigger a 30-day hard-purge of every associated record.',
+    body: 'Delete your account and trigger a 30-day hard-purge of every associated record (Art 17).',
   },
   {
     icon: Workflow,
     label: 'Portability',
-    body: 'Export your analyses and documents in structured, portable formats.',
+    body: 'Export your analyses and documents in structured, portable formats (Art 20).',
   },
   {
     icon: Ban,
     label: 'Object',
-    body: 'Opt out of any specific processing activity, including anonymized causal-edge contribution.',
+    body: 'Opt out of any specific processing activity, including anonymized causal-edge contribution (Art 21).',
+  },
+  {
+    icon: Cpu,
+    label: 'Automated-decision contestation',
+    body: 'Where Decision Intel’s pipeline produces outputs that significantly affect you, request human review of the logic applied (Art 22). The Decision Provenance Record provides the meaningful information about the logic involved.',
   },
 ] as const;
+
+/**
+ * GDPR Art 6 lawful basis per processing activity. Mandatory disclosure
+ * under Art 13(1)(c). Added 2026-04-26 P0 — the 2026-04-26 persona
+ * audit (James, GC persona) caught the absence of this section as a
+ * facial GDPR non-compliance issue that would block any EEA-scoped
+ * enterprise procurement review.
+ */
+const LAWFUL_BASIS: Array<{ activity: string; basis: string; rationale: string }> = [
+  {
+    activity: 'Account creation, authentication, document analysis',
+    basis: 'Performance of a contract (Art 6(1)(b))',
+    rationale:
+      'These activities are necessary to provide the service you have signed up for. Without them, the platform cannot function.',
+  },
+  {
+    activity: 'Transactional emails (auth flows, billing receipts, security notifications)',
+    basis: 'Performance of a contract (Art 6(1)(b))',
+    rationale:
+      'Required to deliver the service and meet our security-incident notification commitments.',
+  },
+  {
+    activity: 'Aggregate product analytics (no identifiers, no document content)',
+    basis: 'Legitimate interest (Art 6(1)(f))',
+    rationale:
+      'Needed to debug errors and improve the product. The interest is balanced against your privacy by collecting only aggregate event data and giving you the right to object below.',
+  },
+  {
+    activity: 'Compliance and audit-log retention',
+    basis: 'Legal obligation (Art 6(1)(c))',
+    rationale:
+      'EU AI Act Article 14 record-keeping, GDPR accountability, and SOX-equivalent audit obligations require retained logs of sensitive actions.',
+  },
+  {
+    activity: 'Marketing emails or newsletters (only when you opt in)',
+    basis: 'Consent (Art 6(1)(a))',
+    rationale: 'Sent only with explicit opt-in; you may withdraw consent at any time.',
+  },
+];
 
 const PROCESSORS = [
   {
     name: 'Supabase',
-    role: 'Authentication and encrypted Postgres hosting (EU region available).',
+    role: 'Authentication and encrypted Postgres hosting (US production region; EU residency available on Enterprise design-partner configurations — confirm with the Decision Intel team before signature).',
   },
   {
     name: 'Google AI',
-    role: 'Primary analysis model. Processed under no-training terms; input is anonymized first.',
+    role: 'Primary analysis model (US region). Processed under no-training terms; input is anonymized first.',
   },
   {
     name: 'Anthropic',
-    role: 'Fallback analysis when explicitly enabled. Same no-training terms.',
+    role: 'Fallback analysis when explicitly enabled (US region). Same no-training terms.',
   },
   {
     name: 'Stripe',
     role: 'Payment processing. We never see or store card numbers.',
+  },
+  {
+    name: 'Resend',
+    role: 'Transactional email (auth flows, magic links, password resets, account notifications). SOC 2 Type II.',
   },
   {
     name: 'Sentry',
@@ -177,7 +231,11 @@ const PROCESSORS = [
   },
   {
     name: 'Vercel',
-    role: 'Application hosting and serverless compute.',
+    role: 'Application hosting and serverless compute (multi-region edge; primary US).',
+  },
+  {
+    name: 'Cloudflare',
+    role: 'DNS and inbound email routing for *@decision-intel.com addresses.',
   },
 ] as const;
 
@@ -319,6 +377,72 @@ export default function PrivacyPage() {
         </div>
       </section>
 
+      {/* CONTROLLER IDENTITY — GDPR Art 13(1)(a) mandatory disclosure */}
+      <section style={{ padding: '56px 24px 0' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+          <SectionHeader
+            eyebrow="Controller identity"
+            title="Who is responsible for your data."
+            body="The legal entity that determines the purposes and means of processing under GDPR. The contact below is the route for any data-protection question, request, or complaint."
+          />
+          <div
+            style={{
+              marginTop: 28,
+              background: C.white,
+              border: `1px solid ${C.slate200}`,
+              borderRadius: 16,
+              padding: '28px 32px',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: 28,
+            }}
+          >
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: C.slate500, marginBottom: 8 }}>
+                Data controller
+              </div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: C.slate900 }}>{LEGAL_ENTITY_NAME}</div>
+              <div style={{ fontSize: 13, color: C.slate600, marginTop: 4 }}>{JURISDICTION}</div>
+            </div>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: C.slate500, marginBottom: 8 }}>
+                Registered office
+              </div>
+              {REGISTERED_OFFICE_LINES.map((line, i) => (
+                <div key={i} style={{ fontSize: 13, color: C.slate600, lineHeight: 1.55 }}>{line}</div>
+              ))}
+            </div>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: C.slate500, marginBottom: 8 }}>
+                Data-protection contact
+              </div>
+              <a
+                href={`mailto:${PRIVACY_CONTACT_EMAIL}`}
+                style={{ fontSize: 14, fontWeight: 600, color: C.slate900, textDecoration: 'underline' }}
+              >
+                {PRIVACY_CONTACT_EMAIL}
+              </a>
+              <div style={{ fontSize: 12, color: C.slate500, marginTop: 4 }}>
+                We respond within 30 days.
+              </div>
+            </div>
+          </div>
+          <div
+            style={{
+              marginTop: 14,
+              fontSize: 12,
+              color: C.slate500,
+              lineHeight: 1.55,
+            }}
+          >
+            For organisations established outside the European Economic Area or the United Kingdom,
+            we do not currently maintain an in-region representative under GDPR Art 27 / UK GDPR
+            because we do not yet meet the activity thresholds that would require one. This page
+            will name a representative if and when those thresholds are met.
+          </div>
+        </div>
+      </section>
+
       {/* TRUST STACK */}
       <section style={{ padding: '72px 24px 0' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
@@ -411,13 +535,13 @@ export default function PrivacyPage() {
               n="03"
               icon={Cpu}
               title="Analysis inside your tenant"
-              body="The twelve-node pipeline runs entirely within your organization's data scope. No cross-tenant aggregation, no shared model memory, no contribution to any global training run."
+              body="Analysis runs entirely within your organization's data scope. No cross-tenant aggregation, no shared model memory, no contribution to any global training run."
             />
             <LifecycleStep
               n="04"
               icon={Lock}
-              title="Vault at rest (AES-256-GCM)"
-              body="Results and the original document are stored encrypted with authenticated AES-256-GCM. Keys are held in a separate vault from the database that holds the ciphertext."
+              title="Encrypted at rest (AES-256-GCM)"
+              body="Results and the original document are stored encrypted with authenticated AES-256-GCM. Keys are held in environment-variable secrets, separate from the ciphertext database; migration to a dedicated key-management service is on the roadmap."
             />
           </div>
         </div>
@@ -668,6 +792,178 @@ export default function PrivacyPage() {
               </a>
               . We respond within 30 days.
             </span>
+          </div>
+
+          {/* Supervisory authority complaint right — GDPR Art 13(2)(d) + Art 77 */}
+          <div
+            style={{
+              marginTop: 16,
+              padding: '16px 18px',
+              borderRadius: 12,
+              background: C.white,
+              border: `1px solid ${C.slate200}`,
+              fontSize: 13,
+              color: C.slate600,
+              lineHeight: 1.6,
+            }}
+          >
+            <div style={{ fontSize: 12, fontWeight: 700, color: C.slate900, marginBottom: 6, letterSpacing: '0.04em' }}>
+              Right to lodge a complaint with a supervisory authority (Art 77)
+            </div>
+            <span>
+              If you believe your rights under GDPR or UK GDPR have not been respected, you may
+              lodge a complaint with the supervisory authority of your habitual residence, place
+              of work, or place of the alleged infringement &mdash; for example the{' '}
+              <a
+                href="https://ico.org.uk"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: C.slate900, fontWeight: 600 }}
+              >
+                UK ICO
+              </a>
+              , the{' '}
+              <a
+                href="https://www.cnil.fr"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: C.slate900, fontWeight: 600 }}
+              >
+                CNIL
+              </a>{' '}
+              (France), the{' '}
+              <a
+                href="https://www.dataprotection.ie"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: C.slate900, fontWeight: 600 }}
+              >
+                Irish DPC
+              </a>
+              , the{' '}
+              <a
+                href="https://nitda.gov.ng"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: C.slate900, fontWeight: 600 }}
+              >
+                Nigerian NITDA / NDPB
+              </a>
+              , or the{' '}
+              <a
+                href="https://popia.co.za"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: C.slate900, fontWeight: 600 }}
+              >
+                South African Information Regulator
+              </a>
+              . Where possible, we ask you to contact us first so we can resolve the issue
+              directly.
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* LAWFUL BASIS — GDPR Art 13(1)(c) mandatory disclosure */}
+      <section style={{ padding: '72px 24px 0' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+          <SectionHeader
+            eyebrow="Lawful basis"
+            title="Why each processing activity is permitted under GDPR Art 6."
+            body="A separate lawful basis applies to each category of processing. Where the basis is legitimate interest, you have an unconditional right to object below."
+          />
+          <div
+            style={{
+              marginTop: 28,
+              background: C.white,
+              border: `1px solid ${C.slate200}`,
+              borderRadius: 16,
+              overflow: 'hidden',
+            }}
+          >
+            {LAWFUL_BASIS.map((row, i) => (
+              <div
+                key={row.activity}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'minmax(220px, 1fr) minmax(220px, 1fr) minmax(260px, 1.4fr)',
+                  gap: 20,
+                  padding: '18px 22px',
+                  borderTop: i === 0 ? 'none' : `1px solid ${C.slate100}`,
+                  alignItems: 'flex-start',
+                }}
+                className="privacy-lawful-row"
+              >
+                <div style={{ fontSize: 13, fontWeight: 700, color: C.slate900, lineHeight: 1.5 }}>
+                  {row.activity}
+                </div>
+                <div style={{ fontSize: 13, color: C.green, fontWeight: 600, lineHeight: 1.5 }}>
+                  {row.basis}
+                </div>
+                <div style={{ fontSize: 13, color: C.slate600, lineHeight: 1.55 }}>
+                  {row.rationale}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* INTERNATIONAL TRANSFERS — GDPR Chapter V mandatory disclosure */}
+      <section style={{ padding: '72px 24px 0' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+          <SectionHeader
+            eyebrow="International data transfers"
+            title="Where your data goes, and the legal mechanism that covers the journey."
+            body="Several of our sub-processors are US-headquartered. Where personal data of EEA, UK, Swiss, Nigerian, or South African residents is transferred outside their home jurisdiction, the transfer is covered by a recognised mechanism."
+          />
+          <div
+            style={{
+              marginTop: 28,
+              background: C.white,
+              border: `1px solid ${C.slate200}`,
+              borderRadius: 16,
+              padding: '24px 28px',
+              fontSize: 14,
+              color: C.slate600,
+              lineHeight: 1.7,
+            }}
+          >
+            <p style={{ margin: 0 }}>
+              <strong style={{ color: C.slate900 }}>EEA &rarr; US transfers</strong> rely on the
+              EU&ndash;US Data Privacy Framework (DPF) where the recipient is DPF-self-certified, or
+              on the European Commission Standard Contractual Clauses (Module 2 / Module 3) backed
+              by a documented Transfer Impact Assessment where it is not.
+            </p>
+            <p style={{ marginTop: 14, marginBottom: 0 }}>
+              <strong style={{ color: C.slate900 }}>UK &rarr; US transfers</strong> rely on the UK
+              International Data Transfer Addendum (IDTA) to the EU SCCs, and on the UK Extension
+              to the DPF where applicable.
+            </p>
+            <p style={{ marginTop: 14, marginBottom: 0 }}>
+              <strong style={{ color: C.slate900 }}>Nigeria &rarr; US transfers</strong> rely on
+              NDPR-compliant data-transfer agreements with onward-transfer prohibitions, mirroring
+              the GDPR-equivalent safeguards required by the NDPR 2019 Implementation Framework.
+            </p>
+            <p style={{ marginTop: 14, marginBottom: 0 }}>
+              <strong style={{ color: C.slate900 }}>South Africa &rarr; US transfers</strong> rely
+              on PoPIA s.72 with the recipient bound to a level of protection substantially similar
+              to PoPIA via contractual safeguards.
+            </p>
+            <p style={{ marginTop: 14, marginBottom: 0 }}>
+              <strong style={{ color: C.slate900 }}>Onward transfers</strong> are restricted by
+              contract: each sub-processor is bound to the same protections we apply, and any
+              addition triggers the 30-day prior-notice mechanism described in our Terms of
+              Service. To request a copy of the active SCCs, IDTA, or sub-processor list, contact{' '}
+              <a
+                href={`mailto:${PRIVACY_CONTACT_EMAIL}`}
+                style={{ color: C.slate900, fontWeight: 600 }}
+              >
+                {PRIVACY_CONTACT_EMAIL}
+              </a>
+              .
+            </p>
           </div>
         </div>
       </section>

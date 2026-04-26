@@ -1216,6 +1216,9 @@ export default function LandingPage() {
         >
           <span>© {new Date().getFullYear()} Decision Intel. All rights reserved.</span>
           <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+            <Link href="/about" style={{ color: '#94A3B8', textDecoration: 'none' }}>
+              About
+            </Link>
             <Link href="/terms" style={{ color: '#94A3B8', textDecoration: 'none' }}>
               Terms of Service
             </Link>

@@ -232,7 +232,7 @@ export default function DecisionIntelForBoardsPage() {
           over time.
         </p>
         <p style={bodyStyle}>
-          Every audit produces a Decision Provenance Record: the signed, hashed,
+          Every audit produces a Decision Provenance Record: the hashed, tamper-evident,
           mapped-onto-EU-AI-Act artifact that your GC can walk into a regulator meeting with. This
           is the piece most relevant to the board.
         </p>

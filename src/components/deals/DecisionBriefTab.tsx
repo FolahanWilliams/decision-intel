@@ -10,6 +10,7 @@ import {
   CheckCircle,
   XCircle,
   Clock,
+  ShieldCheck,
 } from 'lucide-react';
 
 const SEVERITY_COLORS: Record<string, string> = {
@@ -148,26 +149,47 @@ export function DecisionBriefTab({ dealId }: { dealId: string }) {
 
   return (
     <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 20 }}>
-      {/* Header with regenerate */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      {/* Header with regenerate + deal-level DPR export */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
         <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>
           Decision Brief
         </h3>
-        <button
-          onClick={generateBrief}
-          disabled={isStreaming}
-          className="btn btn-ghost"
-          style={{
-            padding: '5px 10px',
-            fontSize: 11,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4,
-            opacity: isStreaming ? 0.5 : 1,
-          }}
-        >
-          <RefreshCw size={11} /> Regenerate
-        </button>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+          <a
+            href={`/api/deals/${dealId}/provenance-record?format=pdf`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-ghost"
+            title="Download deal-level Decision Provenance Record · hashed + tamper-evident PDF covering every analyzed document, the cross-reference findings, and the realised outcome"
+            style={{
+              padding: '5px 10px',
+              fontSize: 11,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              textDecoration: 'none',
+              color: 'var(--accent-primary)',
+              fontWeight: 600,
+            }}
+          >
+            <ShieldCheck size={11} /> Export Deal DPR
+          </a>
+          <button
+            onClick={generateBrief}
+            disabled={isStreaming}
+            className="btn btn-ghost"
+            style={{
+              padding: '5px 10px',
+              fontSize: 11,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              opacity: isStreaming ? 0.5 : 1,
+            }}
+          >
+            <RefreshCw size={11} /> Regenerate
+          </button>
+        </div>
       </div>
 
       {/* Recommendation Card */}

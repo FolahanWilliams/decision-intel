@@ -60,10 +60,11 @@ interface ShareModalProps {
   analysisId?: string;
   onExportPdf: () => Promise<void>;
   onExportBoardReport?: () => Promise<void>;
-  /** Decision Provenance Record — signed + hashed 4-page artifact for
-   *  the General Counsel / audit committee, mapped onto EU AI Act Art 14
-   *  record-keeping, SEC AI disclosure, and Basel III ICAAP. Bundled on
-   *  every audit for the design-partner cohort. */
+  /** Decision Provenance Record — hashed + tamper-evident 4-page
+   *  artifact for the General Counsel / audit committee, mapped onto EU
+   *  AI Act Art 14 record-keeping, SEC AI disclosure, and Basel III
+   *  ICAAP. Bundled on every audit for the design-partner cohort.
+   *  Vocabulary lock 2026-04-26 — see src/lib/constants/trust-copy.ts */
   onExportProvenanceRecord?: () => Promise<void>;
   /** Hallway Brief — single-page PDF handed to the CEO before the board
    *  meeting. Top recommendation, top 3 risks, one counterfactual,

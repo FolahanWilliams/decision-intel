@@ -38,7 +38,7 @@ const STAGES: Stage[] = [
   {
     key: 'upload',
     label: 'Upload',
-    badge: 'TLS 1.3',
+    badge: 'TLS 1.2+',
     sub: 'Encrypted in transit',
     Icon: FileText,
   },

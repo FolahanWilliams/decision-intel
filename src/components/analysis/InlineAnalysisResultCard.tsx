@@ -7,6 +7,14 @@ import { motion } from 'framer-motion';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 import { ScoreReveal } from '@/components/ui/ScoreReveal';
 import { CounterfactualPanel } from '@/components/ui/CounterfactualPanel';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { useToast } from '@/components/ui/EnhancedToast';
 import { trackEvent } from '@/lib/analytics/track';
 import { createLogger } from '@/lib/utils/logger';
 
@@ -91,30 +99,44 @@ export function InlineAnalysisResultCard({
   const [fetchedAnalysisId, setFetchedAnalysisId] = useState<string | null>(null);
   const analysisId = preResolvedAnalysisId ?? fetchedAnalysisId;
   const [isDeleting, setIsDeleting] = useState(false);
+  // Replaced window.confirm() with a styled Dialog 2026-04-26 (Adaeze
+  // persona finding) — native browser confirms break the modal stack on
+  // mobile Safari, disrupt screen-readers, and read as 2008-vintage at
+  // the highest-stakes moment of the product (the post-upload reveal).
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const { showToast } = useToast();
 
-  // Soft-delete the underlying Document (recoverable via support during the
-  // 30-day grace window). On success, dismiss the card so the dashboard
-  // returns to the upload zone. We don't surface a confirmation modal here —
-  // window.confirm matches the lighter weight of this dashboard surface vs
-  // the dedicated /documents/[id] page which has a styled modal.
-  const handleDelete = async () => {
+  // Soft-delete the underlying Document (recoverable via support during
+  // the 30-day grace window). On success, dismiss the card so the
+  // dashboard returns to the upload zone. The trash button opens the
+  // Dialog rather than firing the request directly; the Dialog's
+  // primary action calls confirmDelete().
+  const requestDelete = () => {
     if (isDeleting) return;
-    if (
-      !window.confirm(
-        `Delete ${analysis.filename}? It will be soft-deleted immediately and recoverable via support during the 30-day grace window.`
-      )
-    ) {
-      return;
-    }
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    if (isDeleting) return;
     setIsDeleting(true);
+    setShowDeleteConfirm(false);
+    let succeeded = false;
     try {
       const res = await fetch(`/api/documents/${analysis.docId}`, { method: 'DELETE' });
-      if (!res.ok) {
+      if (res.ok) {
+        succeeded = true;
+      } else {
         log.warn('inline delete failed:', res.status);
       }
     } catch (err) {
       log.warn('inline delete failed:', err);
     } finally {
+      if (!succeeded) {
+        showToast(
+          `Couldn't delete ${analysis.filename}. Try again from the document page.`,
+          'error'
+        );
+      }
       // Always dismiss — even on failure the user wanted the card gone.
       // A failed soft-delete still leaves the doc visible elsewhere; the
       // user can retry from /documents/[id].
@@ -226,7 +248,7 @@ export function InlineAnalysisResultCard({
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <button
-            onClick={handleDelete}
+            onClick={requestDelete}
             disabled={isDeleting}
             aria-label="Delete document"
             title="Soft-delete this document. Recoverable for 30 days."
@@ -507,6 +529,73 @@ export function InlineAnalysisResultCard({
       </div>
 
       <PostRevealBookingRow />
+
+      {/* Delete confirmation Dialog — replaces the prior window.confirm()
+          per the 2026-04-26 persona audit. Mirrors the upload-confirmation
+          pattern in /dashboard/page.tsx so the surface feels consistent. */}
+      <Dialog
+        open={showDeleteConfirm}
+        onOpenChange={isOpen => {
+          if (!isOpen) setShowDeleteConfirm(false);
+        }}
+      >
+        <DialogContent className="sm:max-w-md" showCloseButton>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base">
+              <Trash2 size={18} style={{ color: 'var(--severity-high, #ef4444)' }} />
+              Delete document?
+            </DialogTitle>
+            <DialogDescription>
+              {analysis.filename} will be soft-deleted immediately and is recoverable via support
+              during the 30-day grace window. After 30 days the document, its analysis, and the
+              Decision Provenance Record are permanently purged.
+            </DialogDescription>
+          </DialogHeader>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: 8,
+              marginTop: 16,
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setShowDeleteConfirm(false)}
+              className="btn"
+              style={{
+                padding: '8px 16px',
+                background: 'transparent',
+                color: 'var(--text-secondary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 'var(--radius-md)',
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              Keep document
+            </button>
+            <button
+              type="button"
+              onClick={confirmDelete}
+              className="btn"
+              style={{
+                padding: '8px 16px',
+                background: 'var(--severity-high, #ef4444)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 'var(--radius-md)',
+                fontSize: 13,
+                fontWeight: 700,
+                cursor: 'pointer',
+              }}
+            >
+              Soft-delete
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }

@@ -1,14 +1,16 @@
 /**
  * Africa-anchored regulatory frameworks (1.3c deep).
  *
- * Provides bias-to-provision mappings for ten African regulatory regimes
- * so the Decision Provenance Record can render specific provision-level
- * citations when an analysis is run on an African memo. Coverage:
+ * Provides bias-to-provision mappings for eleven African regulatory
+ * regimes so the Decision Provenance Record can render specific
+ * provision-level citations when an analysis is run on an African
+ * memo. Coverage:
  *
  *   - NDPR (Nigeria Data Protection Regulation)
  *   - CBN AI Guidelines (Central Bank of Nigeria)
  *   - WAEMU (West African Economic and Monetary Union)
  *   - CMA Kenya (Capital Markets Authority)
+ *   - CBK (Central Bank of Kenya — added 2026-04-26)
  *   - BoG Cyber & ICT Risk (Bank of Ghana)
  *   - FRC Nigeria (Financial Reporting Council Code of Corporate Governance)
  *   - CBE AI Guidelines (Central Bank of Egypt)
@@ -20,6 +22,16 @@
  * mappings are conservative (riskWeight ≤ 0.85) and reference the
  * specific mechanism by which a bias creates regulatory risk under
  * the cited provision.
+ *
+ * Bias-coverage discipline (locked 2026-04-26 after the persona audit
+ * caught zero African mappings for the dominant pe_vc biases):
+ * anchoring_bias, survivorship_bias, and planning_fallacy each carry
+ * at least one African-framework mapping. When adding a new pe_vc
+ * sample bundle, audit `expectedBiases` against this file before
+ * shipping — if a lead bias has no African mapping, the DPR will fall
+ * back to Basel III / EU AI Act citations on what is meant to be a
+ * Pan-African deal, which is exactly the "doesn't know my market"
+ * tell Sankore-class buyers screen for.
  */
 
 import type { RegulatoryFramework } from '../regulatory-graph';
@@ -152,6 +164,13 @@ export const WAEMU_FRAMEWORK: RegulatoryFramework = {
       mechanism: 'Unanimous board-level decisions without dissent capture violate documented governance evidence',
       example: 'WAEMU bank loan-committee minutes record no dissent on a concentrated exposure',
     },
+    {
+      biasType: 'planning_fallacy',
+      provisionId: 'waemu_governance',
+      riskWeight: 0.6,
+      mechanism: 'Planning-fallacy timelines on cross-border integration evade material-decision risk-management evidence',
+      example: 'WAEMU acquirer underwrites 12-month operational integration across CIV / SEN / BFA without contingency capture in the loan-committee minutes',
+    },
   ],
 };
 
@@ -197,6 +216,66 @@ export const CMA_KENYA_FRAMEWORK: RegulatoryFramework = {
       riskWeight: 0.6,
       mechanism: 'Unanimous board approval without dissent capture violates structured decision-making',
       example: 'Board minutes record unanimous M&A approval with no recorded structured challenge',
+    },
+    {
+      biasType: 'survivorship_bias',
+      provisionId: 'cma_kenya_disclosure',
+      riskWeight: 0.65,
+      mechanism: 'Selectively citing surviving comparables understates the risk factors disclosure regime requires for material investor decision-making',
+      example: 'Issuer cites three surviving Pan-African consumer-staples comps to justify an 8x exit multiple while omitting the failed Sub-Saharan African rollouts in the same vintage',
+    },
+  ],
+};
+
+export const CBK_FRAMEWORK: RegulatoryFramework = {
+  id: 'cbk_kenya',
+  name: 'Central Bank of Kenya — Banking & Digital Lending Governance',
+  jurisdiction: 'Kenya',
+  category: 'financial',
+  lastUpdated: '2024-12-01',
+  provisions: [
+    {
+      id: 'cbk_digital_lending',
+      framework: 'cbk_kenya',
+      section: 'Banking (Amendment) Act 2024 §33B',
+      title: 'Digital Credit Provider Licensing & Conduct',
+      description:
+        'Digital credit providers operating in Kenya must hold a CBK licence, maintain documented credit-decisioning governance (including any AI/ML model governance), and meet customer-disclosure and complaint-handling obligations. Material credit decisions made through automated processing require documented human-oversight evidence.',
+      riskLevel: 'high',
+      keywords: ['digital lending', 'AI credit decision', 'consumer protection', 'CBK licence'],
+    },
+    {
+      id: 'cbk_model_governance',
+      framework: 'cbk_kenya',
+      section: 'Risk Management Guidelines (rev. 2023) §VIII',
+      title: 'Model Risk Management for Regulated Banks',
+      description:
+        'CBK-licensed banks deploying models for credit, market, or operational risk must maintain independent model validation, periodic re-validation, and documented model-risk management — including for any AI/ML models in production use.',
+      riskLevel: 'high',
+      keywords: ['model risk', 'model validation', 'CBK guidelines'],
+    },
+  ],
+  biasMappings: [
+    {
+      biasType: 'overconfidence_bias',
+      provisionId: 'cbk_model_governance',
+      riskWeight: 0.65,
+      mechanism: 'Overconfidence in model performance produces inadequate validation cycles, violating CBK Risk Management Guidelines on documented model-risk management',
+      example: 'Kenyan bank treats SME-lending model accuracy as stable through KES devaluation cycles without re-validation',
+    },
+    {
+      biasType: 'algorithmic_bias',
+      provisionId: 'cbk_digital_lending',
+      riskWeight: 0.75,
+      mechanism: 'Algorithmic bias in automated credit decisions violates the §33B human-oversight evidence + customer-disclosure obligations',
+      example: 'Digital lender deploys credit-scoring model that produces systematically different decisions by region without documented oversight evidence',
+    },
+    {
+      biasType: 'narrative_fallacy',
+      provisionId: 'cbk_digital_lending',
+      riskWeight: 0.55,
+      mechanism: 'Narrative-style disclosure of credit decision logic substitutes for the structured reasoning artefact §33B requires',
+      example: 'Adverse-action notice to a Nairobi SME tells a story rather than discloses the model logic in plain language',
     },
   ],
 };
@@ -272,6 +351,13 @@ export const FRC_NIGERIA_FRAMEWORK: RegulatoryFramework = {
       riskWeight: 0.55,
       mechanism: 'Sunk-cost-driven escalation decisions evade material-risk re-identification',
       example: 'Board continues a failing project to recover prior capex without re-evaluating material risk',
+    },
+    {
+      biasType: 'anchoring_bias',
+      provisionId: 'frc_nigeria_board_decision',
+      riskWeight: 0.6,
+      mechanism: 'Anchoring on the seller, sponsor, or first comparable suppresses the documented dissent capture and structured decision processes Principle 1.1 requires',
+      example: 'Public-interest entity board approves an acquisition at the seller-tabled price multiple without a documented independent challenge or alternative-comparable analysis',
     },
   ],
 };
@@ -424,6 +510,7 @@ export const AFRICA_FRAMEWORKS: RegulatoryFramework[] = [
   CBN_AI_FRAMEWORK,
   WAEMU_FRAMEWORK,
   CMA_KENYA_FRAMEWORK,
+  CBK_FRAMEWORK,
   BOG_FRAMEWORK,
   FRC_NIGERIA_FRAMEWORK,
   CBE_FRAMEWORK,

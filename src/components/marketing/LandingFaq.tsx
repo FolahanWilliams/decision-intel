@@ -77,7 +77,7 @@ const ITEMS: FaqItem[] = [
     q: 'How is sensitive data protected?',
     a: (
       <>
-        Every document is encrypted with AES-256-GCM at rest and TLS 1.3 in transit. A GDPR
+        Every document is encrypted with AES-256-GCM at rest and TLS 1.2+ in transit. A GDPR
         anonymization layer strips PII before any LLM call. We sign DPAs on request and our
         processor list is published at{' '}
         <Link href="/privacy" style={{ color: C.green, fontWeight: 600 }}>

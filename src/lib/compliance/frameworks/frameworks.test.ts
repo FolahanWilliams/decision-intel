@@ -193,9 +193,9 @@ describe('SEC_REG_D_FRAMEWORK', () => {
 // ─── Registry ──────────────────────────────────────────────────────────────
 
 describe('getAllRegisteredFrameworks', () => {
-  it('should return all 17 frameworks (7 international anchors + 10 African-market regimes)', () => {
+  it('should return all 18 frameworks (7 international anchors + 11 African-market regimes)', () => {
     const frameworks = getAllRegisteredFrameworks();
-    expect(frameworks).toHaveLength(17);
+    expect(frameworks).toHaveLength(18);
   });
 
   it('should return frameworks with unique IDs', () => {
@@ -214,5 +214,36 @@ describe('getAllRegisteredFrameworks', () => {
     const frameworks = getAllRegisteredFrameworks();
     const ids = frameworks.map(f => f.id);
     expect(ids).toContain('sec_reg_d');
+  });
+
+  it('should include the CBK framework (Central Bank of Kenya, added 2026-04-26)', () => {
+    const frameworks = getAllRegisteredFrameworks();
+    const ids = frameworks.map(f => f.id);
+    expect(ids).toContain('cbk_kenya');
+  });
+
+  it('should map anchoring_bias, survivorship_bias, and planning_fallacy to ≥1 African framework each (locked 2026-04-26)', () => {
+    const frameworks = getAllRegisteredFrameworks();
+    const africaIds = new Set([
+      'ndpr_nigeria',
+      'cbn_ai_guidelines',
+      'waemu',
+      'cma_kenya',
+      'cbk_kenya',
+      'bog_ghana',
+      'frc_nigeria',
+      'cbe_egypt',
+      'popia_south_africa',
+      'sarb_model_risk',
+      'bot_tanzania',
+    ]);
+    const africaFrameworks = frameworks.filter(f => africaIds.has(f.id));
+    const dominantPeVcBiases = ['anchoring_bias', 'survivorship_bias', 'planning_fallacy'];
+    for (const bias of dominantPeVcBiases) {
+      const matches = africaFrameworks.flatMap(f =>
+        f.biasMappings.filter(m => m.biasType === bias)
+      );
+      expect(matches.length).toBeGreaterThanOrEqual(1);
+    }
   });
 });

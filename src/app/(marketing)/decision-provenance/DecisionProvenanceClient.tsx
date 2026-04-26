@@ -11,7 +11,13 @@
  * public surface, not buried behind Pro gating on a document page.
  *
  * Language discipline:
- *   - "signed, hashed evidence record" — procurement-bar voice.
+ *   - "hashed, tamper-evident evidence record" — procurement-bar voice.
+ *     ("Signed" was retired 2026-04-26: the implementation in
+ *     decision-provenance-record-generator.ts produces SHA-256 input
+ *     hashes but does NOT cryptographically sign with a Decision Intel
+ *     private key. When private-key signing ships, restore "signed"
+ *     across the marketing surface and the consumer of trust-copy.ts
+ *     constants.)
  *   - Regulatory tailwinds cited by statute + date, not speculation.
  *   - No pricing, no stage-of-company language, no startup voice.
  */
@@ -158,10 +164,10 @@ export function DecisionProvenanceClient() {
             margin: '18px 0 0',
           }}
         >
-          Every Decision Intel audit ships with a signed, hashed evidence record: source-document
-          hash, prompt-version fingerprint, model lineage, judge variance, academic citations,
-          regulatory mapping, and the full pipeline lineage. Four pages. Your General Counsel can
-          open the specimen in one click — no login, no gate.
+          Every Decision Intel audit ships with a hashed, tamper-evident evidence record:
+          source-document SHA-256, prompt-version fingerprint, model lineage, judge variance,
+          academic citations, regulatory mapping, and the full pipeline lineage. Four pages. Your
+          General Counsel can open the specimen in one click — no login, no gate.
         </p>
         <div style={{ display: 'flex', gap: 10, marginTop: 28, flexWrap: 'wrap' }}>
           <a

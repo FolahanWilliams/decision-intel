@@ -378,7 +378,7 @@ export function FirstRunInlineWalkthrough({ visible, onLoadAndRun, onLoadOnly }:
           }}
         >
           <ShieldCheck size={11} />
-          Where signed Decision Provenance Records land
+          Where Decision Provenance Records (hashed + tamper-evident) land
         </Link>
       </div>
     </div>

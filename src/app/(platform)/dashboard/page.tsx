@@ -2334,7 +2334,7 @@ export default function Dashboard() {
                               target="_blank"
                               rel="noopener noreferrer"
                               className="btn btn-ghost btn-sm flex items-center gap-1"
-                              title="Download Decision Provenance Record · signed + hashed PDF"
+                              title="Download Decision Provenance Record · hashed + tamper-evident PDF"
                               aria-label="Download Decision Provenance Record"
                               style={{ whiteSpace: 'nowrap' }}
                             >

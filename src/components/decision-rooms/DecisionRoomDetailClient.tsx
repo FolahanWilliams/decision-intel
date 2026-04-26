@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { BlindPriorAggregateView } from './BlindPriorAggregateView';
 import type { BlindPriorAggregate } from '@/lib/learning/blind-prior-aggregate';
+import { useToast } from '@/components/ui/EnhancedToast';
 
 interface InitialOutcome {
   outcome: string;
@@ -150,6 +151,11 @@ export function DecisionRoomDetailClient({ roomId, initialRoom }: Props) {
   const [loading, setLoading] = useState(true);
   const [revealing, setRevealing] = useState(false);
   const [showInviteForm, setShowInviteForm] = useState(false);
+  // Replaces native alert() on reveal failure 2026-04-26 (Marcus persona
+  // finding) — alert() at the highest-stakes moment of the room
+  // (blind-prior reveal) reads "broken" to a procurement-stage demo
+  // viewer and disrupts the modal stack on Safari.
+  const { showToast } = useToast();
 
   const phase: 'collecting' | 'revealed' | 'outcome_logged' = useMemo(() => {
     if (room.outcomeId) return 'outcome_logged';
@@ -196,7 +202,7 @@ export function DecisionRoomDetailClient({ roomId, initialRoom }: Props) {
         });
         const data = (await res.json().catch(() => ({}))) as { error?: string; revealedAt?: string };
         if (!res.ok) {
-          alert(data.error ?? 'Could not reveal the aggregate.');
+          showToast(data.error ?? 'Could not reveal the aggregate.', 'error');
           return;
         }
         if (data.revealedAt) {
@@ -207,7 +213,7 @@ export function DecisionRoomDetailClient({ roomId, initialRoom }: Props) {
         setRevealing(false);
       }
     },
-    [fetchAggregate, roomId]
+    [fetchAggregate, roomId, showToast]
   );
 
   const phaseMeta = PHASE_COPY[phase];

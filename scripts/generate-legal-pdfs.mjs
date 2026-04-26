@@ -362,8 +362,8 @@ function buildDprSample() {
       'audit-timestamp     2026-04-24T09:14:07Z',
       'pipeline-version    di-pipeline@v12.3.1',
       'input-hash          sha256:4a7f3d21c8e0…6f8e2d91 (sample)',
-      'signature-algorithm Ed25519',
-      'signer-fingerprint  4F:7A:CB:29:8E:11:D0:A2:…:7C:55',
+      'tamper-evidence     SHA-256 input hash + record fingerprint',
+      'private-key signing planned · roadmap',
     ],
     y
   );
@@ -489,20 +489,23 @@ function buildDprSample() {
     [
       'human-oversight       ≥ 1 designated reviewer (captured on record)',
       'explainability        per-bias evidence + hardening question (above)',
-      'record-keeping        this DPR, hashed and signed, retained per DPA §5',
+      'record-keeping        this DPR, hashed and tamper-evident, retained per DPA §5',
       'contestability        reviewer dissent logged before decision is ratified',
     ],
     y
   );
 
   y = pageIfNeeded(doc, y);
-  y = H2(doc, 'Signature block', y);
+  y = H2(doc, 'Verification block', y);
   y = Mono(
     doc,
     [
-      'Signed by  di-signer-prod@decision-intel.com',
-      'Public key 4F:7A:CB:29:8E:11:D0:A2:…:7C:55',
-      'Signature  MEUCIQDoVqf4u…zX5c1wIhAPmLk…Bv8oK1z (truncated)',
+      'Issued by   di-issuer-prod@decision-intel.com',
+      'Input hash  sha256:4a7f3d21c8e0…6f8e2d91 (sample)',
+      'Tamper evidence: any byte change in the source memo invalidates the',
+      'input hash above. Cryptographic signing with a Decision Intel',
+      'private key is on the roadmap; until then, verification is by',
+      'matching the input hash against the source document.',
       '',
       'Verification: https://www.decision-intel.com/regulatory/ai-verify',
     ],
@@ -514,7 +517,7 @@ function buildDprSample() {
   doc.setFontSize(8);
   doc.setTextColor(100, 116, 139);
   doc.text(
-    'This sample DPR is anonymised from a real 2019 Form S-1 audit run. Identifying text has been redacted; hashes, signatures and record-ids are sample values. The schema, field set, Art. 14 mapping and structural-assumptions lens are identical to the production artefact.',
+    'This sample DPR is anonymised from a real 2019 Form S-1 audit run. Identifying text has been redacted; hashes and record-ids are sample values. The schema, field set, Art. 14 mapping and structural-assumptions lens are identical to the production artefact. Cryptographic signing is on the roadmap; production today emits SHA-256 input hashes and a tamper-evident record fingerprint.',
     20,
     y,
     { maxWidth: 170 }
@@ -578,8 +581,8 @@ function buildDprDangote() {
       'audit-timestamp     2026-04-25T11:42:18Z',
       'pipeline-version    di-pipeline@v12.3.1',
       'input-hash          sha256:9c2e7b41a8d0…3f1a8e72 (sample)',
-      'signature-algorithm Ed25519',
-      'signer-fingerprint  4F:7A:CB:29:8E:11:D0:A2:…:7C:55',
+      'tamper-evidence     SHA-256 input hash + record fingerprint',
+      'private-key signing planned · roadmap',
       'market-context      emerging_market (auto-detected, owner-confirmed)',
     ],
     y
@@ -710,7 +713,7 @@ function buildDprDangote() {
     [
       'human-oversight       ≥ 1 designated reviewer (captured on record)',
       'explainability        per-bias evidence + hardening question (above)',
-      'record-keeping        this DPR, hashed and signed, retained per DPA §5',
+      'record-keeping        this DPR, hashed and tamper-evident, retained per DPA §5',
       'contestability        reviewer dissent logged before decision is ratified',
     ],
     y
@@ -739,13 +742,16 @@ function buildDprDangote() {
   );
 
   y = pageIfNeeded(doc, y);
-  y = H2(doc, 'Signature block', y);
+  y = H2(doc, 'Verification block', y);
   y = Mono(
     doc,
     [
-      'Signed by  di-signer-prod@decision-intel.com',
-      'Public key 4F:7A:CB:29:8E:11:D0:A2:…:7C:55',
-      'Signature  MEUCIQDoVqf4u…zX5c1wIhAPmLk…Bv8oK1z (truncated)',
+      'Issued by   di-issuer-prod@decision-intel.com',
+      'Input hash  sha256:9c2e7b41a8d0…3f1a8e72 (sample)',
+      'Tamper evidence: any byte change in the source memo invalidates the',
+      'input hash above. Cryptographic signing with a Decision Intel',
+      'private key is on the roadmap; until then, verification is by',
+      'matching the input hash against the source document.',
       '',
       'Verification: https://www.decision-intel.com/regulatory/ai-verify',
     ],
@@ -757,7 +763,7 @@ function buildDprDangote() {
   doc.setFontSize(8);
   doc.setTextColor(100, 116, 139);
   doc.text(
-    'This sample DPR is anonymised from a real 2014 Pan-African expansion-plan audit run. Identifying text has been redacted; hashes, signatures and record-ids are sample values. The schema, field set, Art. 14 mapping, African regulatory cross-walk and structural-assumptions lens are identical to the production artefact.',
+    'This sample DPR is anonymised from a real 2014 Pan-African expansion-plan audit run. Identifying text has been redacted; hashes and record-ids are sample values. The schema, field set, Art. 14 mapping, African regulatory cross-walk and structural-assumptions lens are identical to the production artefact. Cryptographic signing is on the roadmap; production today emits SHA-256 input hashes and a tamper-evident record fingerprint.',
     20,
     y,
     { maxWidth: 170 }

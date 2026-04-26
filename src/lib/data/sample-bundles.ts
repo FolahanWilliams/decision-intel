@@ -825,7 +825,7 @@ Exit in 2030 at $186M (4.2x MOIC) assumes:
 
 ## Risks
 
-**FX risk:** All three targets generate revenue in local currency; we underwrite in USD. FY24 brought a 38% naira devaluation — the risk is not symmetric. We propose hedging the first 18 months of cash flow forward via NGX-listed FX forwards.
+**FX risk:** All three targets generate revenue in local currency; we underwrite in USD. FY24 brought a 38% naira devaluation — the risk is not symmetric. We propose hedging the first 18 months of cash flow forward via FMDQ-listed naira FX forwards (CBN I&E window) and CFA-zone forwards through a regional bank counterparty.
 
 **Regulatory risk:** Nigeria's Federal Competition and Consumer Protection Commission (FCCPC) requires merger notification above ₦1Bn; we will file before close. CMA Kenya approval expected within 90 days based on comparable transactions.
 

@@ -22,7 +22,7 @@ const COPY: Record<EmptyStateSurface, Record<EmptyStateRole, SurfaceCopy>> = {
     cso: {
       title: 'Audit your first strategic memo',
       description:
-        'Upload a board recommendation, market-entry memo, or quarterly review. The 60-second audit surfaces 30+ cognitive biases with traceable excerpts plus the questions a CEO or audit committee will surface — and produces a signed Decision Provenance Record on the way out.',
+        'Upload a board recommendation, market-entry memo, or quarterly review. The 60-second audit surfaces 30+ cognitive biases with traceable excerpts plus the questions a CEO or audit committee will surface — and produces a hashed, tamper-evident Decision Provenance Record on the way out.',
     },
     ma: {
       title: 'Audit your first IC memo',
@@ -37,12 +37,12 @@ const COPY: Record<EmptyStateSurface, Record<EmptyStateRole, SurfaceCopy>> = {
     pe_vc: {
       title: 'Audit your first IC memo',
       description:
-        'Upload a pre-IC memo, source memo, growth-round CIM, or pre-commitment review. The audit catches the patterns that kill fund returns — anchoring on a single comparable transaction, overconfidence on growth-curve extrapolation, narrative-fallacy on regulatory tailwinds — and produces a signed Decision Provenance Record your LPs can read.',
+        'Upload a pre-IC memo, source memo, growth-round CIM, or pre-commitment review. The audit catches the patterns that kill fund returns — anchoring on a single comparable transaction, overconfidence on growth-curve extrapolation, narrative-fallacy on regulatory tailwinds — and produces a hashed, tamper-evident Decision Provenance Record your LPs (including NDPR / WAEMU / CMA Kenya-regulated LPs) can read.',
     },
     other: {
       title: 'Run your first audit',
       description:
-        'Upload a strategic memo, board deck, or market-entry recommendation. We surface 30+ cognitive biases, predicted committee questions, and a signed Decision Provenance Record.',
+        'Upload a strategic memo, board deck, or market-entry recommendation. We surface 30+ cognitive biases, predicted committee questions, and a hashed, tamper-evident Decision Provenance Record.',
     },
   },
   deals: {

@@ -4,6 +4,13 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Check, ArrowRight, ChevronDown, Minus } from 'lucide-react';
 import { trackEvent } from '@/lib/analytics/track';
+import {
+  SOC2_FAQ_ANSWER,
+  SOC2_TRUST_BAND_LABEL,
+  SOC2_TRUST_BAND_SUB,
+  DPR_PROVENANCE_CARD_LABEL,
+  DPR_PROVENANCE_CARD_SUB,
+} from '@/lib/constants/trust-copy';
 
 type BillingCycle = 'monthly' | 'annual';
 
@@ -109,7 +116,7 @@ function buildTiers(_cycle: BillingCycle): Tier[] {
       highlights: [
         { label: '20-30 seats from $4,000/month', strong: true },
         { label: 'Unlimited audits and Decision Packages' },
-        { label: 'SSO + SCIM + custom taxonomy' },
+        { label: 'SAML 2.0 / OIDC SSO (coming soon) + custom taxonomy' },
         { label: 'Multi-division management' },
         { label: 'Signed DPA + audit-log retention SLA' },
         { label: 'Everything in Strategy' },
@@ -204,8 +211,50 @@ const COMPARISON_ROWS: Array<{
     team: true,
     enterprise: true,
   },
+  { section: 'Deal & M&A workflows', label: '', free: '', pro: '', team: '', enterprise: '' },
+  {
+    label: 'Cross-document conflict detection',
+    free: false,
+    pro: false,
+    team: true,
+    enterprise: true,
+  },
+  {
+    label: 'Deal-level composite DQI',
+    free: false,
+    pro: false,
+    team: true,
+    enterprise: true,
+  },
+  {
+    label: 'Deal-level Decision Provenance Record',
+    free: false,
+    pro: false,
+    team: true,
+    enterprise: true,
+  },
+  {
+    label: 'Pre-IC blind-prior voting (Decision Rooms)',
+    free: false,
+    pro: false,
+    team: true,
+    enterprise: true,
+  },
+  {
+    label: 'Active Deal handle (concurrent deal slots)',
+    free: false,
+    pro: false,
+    team: 'Fair use',
+    enterprise: 'Configurable',
+  },
   { section: 'Enterprise', label: '', free: '', pro: '', team: '', enterprise: '' },
-  { label: 'SSO', free: false, pro: false, team: false, enterprise: true },
+  {
+    label: 'SAML 2.0 / OIDC SSO (coming soon)',
+    free: false,
+    pro: false,
+    team: false,
+    enterprise: true,
+  },
   {
     label: 'Multi-division + custom taxonomy',
     free: false,
@@ -245,8 +294,8 @@ const FAQ: Array<{ q: string; a: string }> = [
     a: 'Individual is $249/mo or $2,490/yr (2 months free). Strategy is $2,499/mo or $24,990/yr (2 months free). Annual prepay swap during a monthly subscription comes with prorated credit. Enterprise is annual by default; talk to us for the order form.',
   },
   {
-    q: 'Are you SOC 2 compliant?',
-    a: 'We run on SOC 2 audited infrastructure (Supabase, Vercel). Documents are encrypted with AES-256-GCM at rest and TLS 1.3 in transit. A GDPR anonymization layer strips PII before any AI processing.',
+    q: 'What is your SOC 2 posture?',
+    a: SOC2_FAQ_ANSWER,
   },
   {
     q: 'How long are my documents retained, and can I delete them?',
@@ -721,7 +770,7 @@ export function PricingPageClient() {
           }}
         >
           {[
-            { label: 'SOC 2 ready', sub: 'AES-256-GCM + TLS 1.3' },
+            { label: SOC2_TRUST_BAND_LABEL, sub: SOC2_TRUST_BAND_SUB },
             {
               label: 'Signed DPA',
               sub: 'on any paid tier',
@@ -730,8 +779,8 @@ export function PricingPageClient() {
             },
             { label: 'No training on your data', sub: 'ever, by contract' },
             {
-              label: 'Decision Provenance Record',
-              sub: 'signed + hashed on every audit',
+              label: DPR_PROVENANCE_CARD_LABEL,
+              sub: DPR_PROVENANCE_CARD_SUB,
               href: '/dpr-sample-wework.pdf',
               cta: 'Sample (PDF) →',
             },

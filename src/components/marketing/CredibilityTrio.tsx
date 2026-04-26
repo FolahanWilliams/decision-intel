@@ -43,7 +43,7 @@ const CARDS = [
     href: '/security',
     eyebrow: 'Security posture',
     title: 'Built for the procurement bar.',
-    body: 'AES-256-GCM at rest, TLS 1.3 in transit, key rotation with version stamps, a signed DPA on every paid tier — and no training on your content, by contract, not by promise.',
+    body: 'AES-256-GCM at rest, TLS 1.2+ in transit, key rotation with version stamps, a signed DPA on every paid tier — and no training on your content, by contract, not by promise.',
     cta: 'See security posture',
     thumb: 'security' as const,
   },

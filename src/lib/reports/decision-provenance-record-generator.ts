@@ -96,6 +96,10 @@ export class DecisionProvenanceRecordGenerator {
       this.doc.addPage();
       this.drawPagePackageMembers(data);
     }
+    if (data.dealContext) {
+      this.doc.addPage();
+      this.drawPageDealMembers(data);
+    }
     this.drawFooterAllPages();
     if (opts?.watermark) this.drawWatermarkAllPages(opts.watermark);
     return this.doc;
@@ -828,6 +832,166 @@ export class DecisionProvenanceRecordGenerator {
           MARGIN_L,
           y + 4
         );
+      }
+    }
+  }
+
+  // ─── Deal members page (3.1 deep, 2026-04-26 P1 #19) ──────────────
+  // Mirrors drawPagePackageMembers but with deal-native fields. The
+  // shape contract is "what an M&A audit committee or post-close-inquiry
+  // GC reads to reconstruct the decision": deal identity (target / fund /
+  // vintage), composite DQI across CIM + model + counsel + IC deck,
+  // per-doc lineage with input hashes, cross-reference findings, and the
+  // realised IRR/MOIC outcome where the deal has closed.
+  private drawPageDealMembers(data: ProvenanceRecordData) {
+    const ctx = data.dealContext;
+    if (!ctx) return;
+    this.drawAccentBand();
+    this.drawHeader('DEAL · MEMBERS');
+
+    let y = 34;
+    this.drawSectionHeading('DEAL CONTEXT', y);
+    y += 8;
+
+    this.doc.setFont('helvetica', 'bold');
+    this.doc.setFontSize(13);
+    this.doc.setTextColor(15, 15, 15);
+    const titleLines = this.doc.splitTextToSize(ctx.dealName, TEXT_W);
+    this.doc.text(titleLines, MARGIN_L, y);
+    y += titleLines.length * 6;
+
+    if (ctx.targetCompany) {
+      this.doc.setFont('helvetica', 'italic');
+      this.doc.setFontSize(10);
+      this.doc.setTextColor(80, 80, 80);
+      this.doc.text(`Target: ${ctx.targetCompany}`, MARGIN_L, y);
+      y += 5;
+    }
+
+    this.doc.setFont('helvetica', 'normal');
+    this.doc.setFontSize(9);
+    this.doc.setTextColor(60, 60, 60);
+    const meta: string[] = [
+      `Type: ${ctx.dealType}`,
+      `Stage: ${ctx.stage}`,
+      `Members: ${ctx.members.length}`,
+    ];
+    if (ctx.fundName) meta.push(`Fund: ${ctx.fundName}${ctx.vintage ? ` (${ctx.vintage} vintage)` : ''}`);
+    if (ctx.sector) meta.push(`Sector: ${ctx.sector}`);
+    if (ctx.ticketSize != null) {
+      meta.push(`Ticket: ${ctx.currency} ${ctx.ticketSize.toLocaleString('en-US')}`);
+    }
+    if (ctx.compositeDqi != null) {
+      meta.push(
+        `Composite DQI: ${Math.round(ctx.compositeDqi)}${ctx.compositeGrade ? ` (${ctx.compositeGrade})` : ''}`
+      );
+    }
+    if (ctx.exitDate) {
+      meta.push(`Exited: ${new Date(ctx.exitDate).toLocaleDateString()}`);
+    }
+    const metaLines = this.doc.splitTextToSize(meta.join('   ·   '), TEXT_W);
+    this.doc.text(metaLines, MARGIN_L, y);
+    y += metaLines.length * 4.6 + 2;
+
+    this.doc.setFont('courier', 'normal');
+    this.doc.setFontSize(8.5);
+    this.doc.setTextColor(22, 163, 74);
+    this.doc.text(`Deal input hash: ${ctx.dealInputHash.slice(0, 32)}…`, MARGIN_L, y);
+    y += 8;
+
+    // Members table — same visual shape as package members so a reader
+    // who's seen one DPR understands both. Role column carries the
+    // documentType (cim / financial_model / counsel_memo / ic_deck) when
+    // present.
+    this.drawSectionHeading('MEMBER DOCUMENTS', y);
+    y += 8;
+
+    this.doc.setFont('helvetica', 'normal');
+    this.doc.setFontSize(9);
+    this.doc.setTextColor(40, 40, 40);
+    for (const m of ctx.members) {
+      if (y > 245) break;
+      this.doc.setFont('helvetica', 'bold');
+      this.doc.setFontSize(10);
+      this.doc.setTextColor(15, 15, 15);
+      const filenameLines = this.doc.splitTextToSize(
+        `${m.role ? `[${m.role}] ` : ''}${m.filename}`,
+        TEXT_W
+      );
+      this.doc.text(filenameLines, MARGIN_L, y);
+      y += filenameLines.length * 4.5;
+
+      this.doc.setFont('helvetica', 'normal');
+      this.doc.setFontSize(8.5);
+      this.doc.setTextColor(80, 80, 80);
+      const stats: string[] = [];
+      if (m.overallScore != null) stats.push(`DQI ${Math.round(m.overallScore)}/100`);
+      else stats.push('Not analyzed');
+      stats.push(`${m.biasCount} bias${m.biasCount === 1 ? '' : 'es'}`);
+      this.doc.text(stats.join('  ·  '), MARGIN_L + 4, y);
+      y += 4;
+
+      this.doc.setFont('courier', 'normal');
+      this.doc.setFontSize(7.5);
+      this.doc.setTextColor(120, 120, 120);
+      this.doc.text(`Input hash: ${m.inputHash.slice(0, 24)}…`, MARGIN_L + 4, y);
+      y += 6;
+    }
+
+    if (ctx.crossReference) {
+      this.doc.setDrawColor(220, 220, 220);
+      this.doc.line(MARGIN_L, y, PAGE_W - MARGIN_R, y);
+      y += 6;
+      this.drawSectionHeading('CROSS-REFERENCE FINDINGS', y);
+      y += 8;
+      this.doc.setFont('helvetica', 'normal');
+      this.doc.setFontSize(9);
+      this.doc.setTextColor(40, 40, 40);
+      const xrefLines = this.doc.splitTextToSize(
+        `${ctx.crossReference.conflictCount} conflict${ctx.crossReference.conflictCount === 1 ? '' : 's'} flagged on ${new Date(ctx.crossReference.runAt).toLocaleDateString()} (${ctx.crossReference.highSeverityCount} high-severity).`,
+        TEXT_W
+      );
+      this.doc.text(xrefLines, MARGIN_L, y);
+      y += xrefLines.length * 4.5 + 2;
+      if (ctx.crossReference.summary) {
+        this.doc.setFont('helvetica', 'italic');
+        this.doc.setFontSize(9);
+        this.doc.setTextColor(80, 80, 80);
+        const summaryLines = this.doc.splitTextToSize(ctx.crossReference.summary, TEXT_W);
+        this.doc.text(summaryLines, MARGIN_L, y);
+        y += summaryLines.length * 4.5 + 2;
+      }
+    }
+
+    if (ctx.outcome && y < 255) {
+      this.doc.setDrawColor(220, 220, 220);
+      this.doc.line(MARGIN_L, y, PAGE_W - MARGIN_R, y);
+      y += 6;
+      this.drawSectionHeading('REALISED OUTCOME', y);
+      y += 8;
+      this.doc.setFont('helvetica', 'normal');
+      this.doc.setFontSize(9.5);
+      this.doc.setTextColor(40, 40, 40);
+      const outcomeBits: string[] = [];
+      if (ctx.outcome.exitType) outcomeBits.push(`Exit: ${ctx.outcome.exitType}`);
+      if (ctx.outcome.irr != null)
+        outcomeBits.push(`IRR ${(ctx.outcome.irr * 100).toFixed(1)}%`);
+      if (ctx.outcome.moic != null) outcomeBits.push(`MOIC ${ctx.outcome.moic.toFixed(2)}×`);
+      if (ctx.outcome.exitValue != null)
+        outcomeBits.push(`Value ${ctx.currency} ${ctx.outcome.exitValue.toLocaleString('en-US')}`);
+      if (ctx.outcome.holdPeriodMonths != null)
+        outcomeBits.push(`Hold ${ctx.outcome.holdPeriodMonths} mo`);
+      if (outcomeBits.length > 0) {
+        const outcomeLines = this.doc.splitTextToSize(outcomeBits.join('   ·   '), TEXT_W);
+        this.doc.text(outcomeLines, MARGIN_L, y);
+        y += outcomeLines.length * 4.8;
+      }
+      if (ctx.outcome.notes) {
+        this.doc.setFont('helvetica', 'italic');
+        this.doc.setTextColor(80, 80, 80);
+        const noteLines = this.doc.splitTextToSize(ctx.outcome.notes, TEXT_W);
+        this.doc.text(noteLines, MARGIN_L, y);
+        y += noteLines.length * 4.5;
       }
     }
   }

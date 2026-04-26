@@ -41,6 +41,55 @@ export interface BoardReportBranding {
   logoBase64?: string;
 }
 
+/**
+ * Provenance chain attached to a board report (2026-04-26 P1 #22 — Margaret
+ * + Titi persona finding). Procurement-grade artefacts headed to a
+ * regulator or plaintiff need a verifiable source trail. The board
+ * report previously carried a DQI score with no document hash, no model
+ * lineage, no prompt fingerprint — making it impossible to verify
+ * which document the score was computed against, which model produced
+ * it, or whether it was superseded. Caller populates these fields from
+ * the analysis row (analysisId, document.contentHash, modelLineage,
+ * promptVersion.hash, generatedAt). When omitted, the section is
+ * silently skipped.
+ */
+export interface BoardReportProvenance {
+  /** Analysis row UUID — pairs the report with the in-platform record. */
+  analysisId: string;
+  /** SHA-256 of the source document content at the time of analysis.
+   *  "UNAVAILABLE" when the document was uploaded before content-hash
+   *  capture shipped. */
+  documentHash: string;
+  /** Lead analytical model the audit ran on (e.g. "gemini-3-flash-preview").
+   *  The full per-node model lineage lives in the DPR; the board report
+   *  carries only the lead model so a regulator sees the headline
+   *  attribution without leaking pipeline IP. */
+  modelTag: string;
+  /** SHA-256 of the prompt set in force at audit time. Tracks the
+   *  PromptVersion row when present; falls back to the prompts.ts file
+   *  hash when not. */
+  promptFingerprint: string;
+  /** ISO 8601 timestamp the record was generated. Pin the report to a
+   *  point in time so a reviewer who loads it months later can see
+   *  whether a newer audit superseded it. */
+  generatedAt: string;
+}
+
+/**
+ * Compact regulatory-exposure summary row (2026-04-26 P1 #22). Each row
+ * names a flagged bias and the regulatory frameworks it touches.
+ * Caller computes via getCrossFrameworkRisk(biasType) for the top biases
+ * and passes through. When omitted, the REGULATORY EXPOSURE section is
+ * silently skipped. The full per-provision detail lives in the DPR; the
+ * board report carries only the framework names so the audit committee
+ * can see the regulatory surface area at a glance without reading 4
+ * pages of provision citations.
+ */
+export interface BoardReportRegulatoryExposure {
+  biasLabel: string;
+  frameworks: string[];
+}
+
 interface BoardReportData {
   filename: string;
   analysis: ReportAnalysisData & {
@@ -59,6 +108,15 @@ interface BoardReportData {
   /** Per-org branding overrides. When omitted, the report renders with
    *  the default Decision Intel attribution only. */
   branding?: BoardReportBranding;
+  /** Provenance chain (2026-04-26 P1 #22). When supplied, renders a
+   *  PROVENANCE strip on page 2 below the projected-impact section.
+   *  Skipped silently when omitted (back-compat for legacy callers). */
+  provenance?: BoardReportProvenance;
+  /** Regulatory exposure summary (2026-04-26 P1 #22). When supplied,
+   *  renders a REGULATORY EXPOSURE table on page 2 between the
+   *  projected-impact and provenance sections. Skipped silently when
+   *  omitted or empty. */
+  regulatoryExposure?: BoardReportRegulatoryExposure[];
 }
 
 // A4 layout constants. Margins widened from 20mm to 22mm 2026-04-24 for
@@ -134,7 +192,15 @@ export class BoardReportGenerator {
   }
 
   public generateReport(data: BoardReportData) {
-    const { filename, analysis, confidential = false, counterfactualTop, branding } = data;
+    const {
+      filename,
+      analysis,
+      confidential = false,
+      counterfactualTop,
+      branding,
+      provenance,
+      regulatoryExposure,
+    } = data;
     const title = truncate(filename.replace(/\.[^.]+$/, ''), MAX_TITLE_CHARS);
     const allBiases = [...(analysis.biases || [])].sort(
       (a, b) =>
@@ -146,7 +212,7 @@ export class BoardReportGenerator {
 
     this.drawPageOne({ title, analysis, topBiases, branding });
     this.doc.addPage();
-    this.drawPageTwo({ analysis, topBiases, counterfactualTop });
+    this.drawPageTwo({ analysis, topBiases, counterfactualTop, regulatoryExposure, provenance });
     // Additional-risks page(s) — biases 4+ paginate here instead of being
     // silently dropped. Dropping risks from a board-committee artifact is
     // not acceptable for Sankore-sized investment committee memos, which
@@ -363,10 +429,14 @@ export class BoardReportGenerator {
     analysis,
     topBiases,
     counterfactualTop,
+    regulatoryExposure,
+    provenance,
   }: {
     analysis: BoardReportData['analysis'];
     topBiases: ReportBiasInstance[];
     counterfactualTop?: BoardCounterfactualTop | null;
+    regulatoryExposure?: BoardReportRegulatoryExposure[];
+    provenance?: BoardReportProvenance;
   }) {
     // Accent band
     this.doc.setFillColor(22, 163, 74);
@@ -449,7 +519,109 @@ export class BoardReportGenerator {
         this.doc.setFontSize(9);
         this.doc.setTextColor(100, 100, 100);
         this.doc.text(extras.join('     ·     '), MARGIN_L, yPos);
+        yPos += 12;
+      } else {
+        yPos += 6;
       }
+    }
+
+    // Regulatory exposure — compact table mapping flagged biases to the
+    // frameworks they touch. Renders only when caller supplied data.
+    // Margaret + Titi persona finding: a board-committee artefact has to
+    // surface the regulatory surface area on its own pages, not behind a
+    // separate DPR download.
+    if (regulatoryExposure && regulatoryExposure.length > 0 && yPos < 240) {
+      yPos = this.drawRegulatoryExposure(regulatoryExposure, yPos);
+    }
+
+    // Provenance chain — pairs the report with a verifiable source
+    // record. Procurement / regulator / plaintiff's counsel can match
+    // the analysisId + document hash + prompt fingerprint to the
+    // in-platform record. Renders only when caller supplied data.
+    if (provenance && yPos < 260) {
+      this.drawProvenanceStrip(provenance, yPos);
+    }
+  }
+
+  /** Compact regulatory exposure table on page 2. One row per flagged
+   *  bias, each row lists the frameworks it touches. Designed to fit in
+   *  ≤ 50mm so it leaves room for the provenance strip below. */
+  private drawRegulatoryExposure(
+    rows: BoardReportRegulatoryExposure[],
+    startY: number
+  ): number {
+    let y = startY;
+    this.drawSectionHeading('REGULATORY EXPOSURE', y);
+    y += 8;
+    this.doc.setFont('helvetica', 'italic');
+    this.doc.setFontSize(8.5);
+    this.doc.setTextColor(120, 120, 120);
+    this.doc.text(
+      'Frameworks each flagged bias touches. Full provision-level mapping in the Decision Provenance Record.',
+      MARGIN_L,
+      y,
+      { maxWidth: TEXT_W }
+    );
+    y += 6;
+    this.doc.setFont('helvetica', 'normal');
+    this.doc.setFontSize(9);
+    this.doc.setTextColor(40, 40, 40);
+    const limited = rows.slice(0, 5); // page-fit guard
+    for (const row of limited) {
+      if (y > 250) break;
+      this.doc.setFont('helvetica', 'bold');
+      this.doc.setFontSize(9.5);
+      this.doc.setTextColor(15, 15, 15);
+      this.doc.text(`• ${row.biasLabel}`, MARGIN_L, y);
+      y += 4.5;
+      this.doc.setFont('helvetica', 'normal');
+      this.doc.setFontSize(8.5);
+      this.doc.setTextColor(80, 80, 80);
+      const fwText = row.frameworks.length > 0 ? row.frameworks.join(' · ') : 'No regulator-touching frameworks for this bias.';
+      const fwLines = this.doc.splitTextToSize(fwText, TEXT_W - 8);
+      this.doc.text(fwLines, MARGIN_L + 5, y);
+      y += fwLines.length * 4 + 2;
+    }
+    return y + 4;
+  }
+
+  /** Provenance strip — five lines that pair the report with a
+   *  verifiable source record. Renders compact (≤ 25mm) so it fits below
+   *  the regulatory exposure section. Hashes are truncated to 32 chars
+   *  so the line wraps cleanly without splitting the hex string. */
+  private drawProvenanceStrip(provenance: BoardReportProvenance, startY: number) {
+    let y = startY;
+    this.drawSectionHeading('PROVENANCE', y);
+    y += 8;
+    this.doc.setFont('helvetica', 'italic');
+    this.doc.setFontSize(8);
+    this.doc.setTextColor(120, 120, 120);
+    this.doc.text(
+      'Pairs this report with the in-platform audit record. A regulator or plaintiff can verify the trail by matching these against /api/documents/{id}/provenance-record.',
+      MARGIN_L,
+      y,
+      { maxWidth: TEXT_W }
+    );
+    y += 8;
+
+    const truncHash = (h: string) => (h.length > 32 ? `${h.slice(0, 32)}…` : h);
+    const lines: Array<{ k: string; v: string }> = [
+      { k: 'Analysis ID', v: provenance.analysisId },
+      { k: 'Document SHA-256', v: truncHash(provenance.documentHash) },
+      { k: 'Model', v: provenance.modelTag },
+      { k: 'Prompt fingerprint', v: truncHash(provenance.promptFingerprint) },
+      { k: 'Generated', v: provenance.generatedAt },
+    ];
+    for (const line of lines) {
+      this.doc.setFont('helvetica', 'normal');
+      this.doc.setFontSize(8);
+      this.doc.setTextColor(110, 110, 110);
+      this.doc.text(line.k, MARGIN_L, y);
+      this.doc.setFont('courier', 'normal');
+      this.doc.setFontSize(8);
+      this.doc.setTextColor(22, 163, 74);
+      this.doc.text(line.v, MARGIN_L + 40, y, { maxWidth: TEXT_W - 40 });
+      y += 4.5;
     }
   }
 

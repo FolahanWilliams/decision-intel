@@ -1094,7 +1094,7 @@ export const DEAL_CLOSER_DOCS: DealCloserDoc[] = [
       },
       {
         heading: 'AES-256-GCM Encryption',
-        body: 'At rest in Supabase/Postgres and in transit via TLS 1.3. Per-tenant keys, rotated on a defined cadence. CSRF protection and audit logging on every request.',
+        body: 'At rest in Supabase/Postgres and in transit via TLS 1.2+. Per-tenant keys, rotated on a defined cadence. CSRF protection and audit logging on every request.',
       },
       {
         heading: 'Data Residency',

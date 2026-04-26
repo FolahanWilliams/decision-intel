@@ -222,6 +222,99 @@ export default function TermsOfServicePage() {
 
           <section>
             <h2 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '12px' }}>
+              10A. Data Portability on Termination
+            </h2>
+            <p>
+              On any termination, you may request a machine-readable export of all Analyses,
+              Decision Provenance Records, and associated metadata in JSON + PDF format. We will
+              fulfil the request within fourteen (14) calendar days. Production data is preserved
+              against deletion during any active export window (up to thirty days post-termination)
+              before the standard 30-day permanent purge runs.
+            </p>
+          </section>
+
+          <section>
+            <h2 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '12px' }}>
+              10B. Exit Assistance (Enterprise)
+            </h2>
+            <p>
+              For thirty (30) calendar days following termination of an Enterprise subscription, the
+              account retains read-only access to the dashboard archive (no new audits) for the
+              express purpose of completing the export under §10A. No additional fee applies. After
+              that window the account is permanently disabled and content purged on the standard
+              schedule.
+            </p>
+          </section>
+
+          <section>
+            <h2 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '12px' }}>
+              10C. Service Level (Enterprise)
+            </h2>
+            <p>
+              Enterprise subscriptions carry tiered service levels: Standard (99.0% monthly
+              availability for the document analysis pipeline), Premium (99.5% monthly availability
+              and sub-12-hour RTO), or Custom (as separately agreed in the executed Order Form).
+              Service credits accrue against the next monthly invoice when measured uptime falls
+              below the tier target, calculated on a per-percentage-point basis up to a cap of 30%
+              of the monthly fee. Scheduled maintenance and force-majeure events are excluded from
+              availability calculations and are notified in advance where practicable.
+            </p>
+          </section>
+
+          <section>
+            <h2 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '12px' }}>
+              10D. Security-Incident Notification
+            </h2>
+            <p>
+              We will notify you of any confirmed security incident affecting your data within
+              twenty-four (24) hours of confirmation, with a follow-up written report within
+              seventy-two (72) hours describing the scope, root cause, and remediation. Where a
+              regulator (EU AI Act, GDPR, NDPR, PoPIA, Basel III, SEC) requires a separate
+              notification, we will support your response.
+            </p>
+          </section>
+
+          <section>
+            <h2 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '12px' }}>
+              10E. Sub-Processor Change Notification
+            </h2>
+            <p>
+              The current sub-processor list is maintained at /security and /privacy. Any addition
+              of a new sub-processor that processes customer data is preceded by thirty (30)
+              calendar days&apos; written notice, during which you may object on reasonable grounds.
+            </p>
+          </section>
+
+          <section>
+            <h2 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '12px' }}>
+              10F. Audit Rights (Enterprise)
+            </h2>
+            <p>
+              Once per calendar year, on reasonable notice, you may request the most recent SOC 2
+              Type II report (or equivalent attestation) covering our production environment. While
+              our own product-level SOC 2 Type I report is in progress (targeted Q4 2026), customers
+              receive on request the underlying SOC 2 Type II reports of Vercel and Supabase, the
+              production-tier infrastructure providers, plus an executive summary of in-flight
+              controls. Customer-led on-site audits are by mutual agreement and at customer cost.
+            </p>
+          </section>
+
+          <section>
+            <h2 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '12px' }}>
+              10G. Indemnification
+            </h2>
+            <p>
+              We will defend you against third-party claims that the Platform infringes a US patent,
+              copyright, or trade secret. You will defend us against third-party claims arising from
+              your use of the Platform in violation of law or these Terms. Each party&apos;s
+              aggregate liability under this clause is capped at the fees you paid us in the twelve
+              (12) months preceding the claim, except for breaches of confidentiality, the
+              indemnification obligations themselves, or wilful misconduct.
+            </p>
+          </section>
+
+          <section>
+            <h2 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '12px' }}>
               11. Changes to Terms
             </h2>
             <p>
@@ -237,7 +330,11 @@ export default function TermsOfServicePage() {
             </h2>
             <p>
               These Terms shall be governed by and construed in accordance with the laws of the
-              State of Delaware, United States, without regard to conflict of law principles.
+              State of Delaware, United States, without regard to conflict of law principles. For
+              customers in the European Economic Area or the United Kingdom, the foregoing does not
+              affect any mandatory rights under applicable EU or UK data-protection law (including
+              GDPR and UK GDPR), which prevail over any conflicting term and may be exercised before
+              a Member State or UK supervisory authority.
             </p>
           </section>
 

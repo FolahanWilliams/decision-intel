@@ -2,7 +2,7 @@
  * GET /api/compliance/audit-packet/[analysisId]
  *
  * Thin server-side wrapper around the canonical Decision Provenance Record
- * pipeline. Streams a signed, hashed PDF for a single analysis.
+ * pipeline. Streams a hashed, tamper-evident PDF for a single analysis.
  *
  * URL path kept stable for backwards compatibility — any external deep
  * link or bookmarked "Audit Defense Packet" URL still resolves. The

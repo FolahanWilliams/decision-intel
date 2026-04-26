@@ -494,7 +494,17 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         url.searchParams.set('view', next);
         window.history.replaceState({}, '', url.toString());
       }
-      if ((next === 'cso' || next === 'ic' || next === 'board') && phase !== 'before') {
+      // CSO + Board are explicitly pre-IC framings (condensed exec
+      // summary / 2-page board export preview); they have no
+      // during/after meaning and snap to 'before' on entry. IC was
+      // unlocked 2026-04-26 (P1 #21, Marcus persona finding) so an M&A
+      // user running a post-close audit can stay in IC view-mode while
+      // navigating phase=during/after. The during/after PhaseDuringPanel
+      // + PhaseAfterPanel are view-mode-agnostic, so IC + during shows
+      // the human-decision record, IC + after shows the
+      // recalibrated-DQI + Brier + lessons panel — which is exactly the
+      // post-close trail Marcus wanted in IC mode.
+      if ((next === 'cso' || next === 'board') && phase !== 'before') {
         setPhase('before');
         setPhaseResetNotice(true);
       }
@@ -506,10 +516,10 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
   // (or via localStorage persistence) we resolve the mismatch on mount by
   // snapping phase to 'before'. Without this, the user sees an empty page
   // and no way to recover short of clicking Analyst then a phase chip.
-  // Same guard applies to the ic + board view modes — neither renders
-  // content at phase ≠ 'before'.
+  // The guard applies only to CSO + Board now (per the IC unlock above);
+  // IC + phase=during/after is a valid combination as of 2026-04-26.
   useEffect(() => {
-    if ((viewMode === 'cso' || viewMode === 'ic' || viewMode === 'board') && phase !== 'before') {
+    if ((viewMode === 'cso' || viewMode === 'board') && phase !== 'before') {
       setPhase('before');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -659,6 +669,55 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         log.warn('Board report counterfactual fetch failed (non-fatal):', cfErr);
       }
 
+      // Build the provenance chain + regulatory exposure summary so the
+      // board report carries a verifiable trail (P1 #22, 2026-04-26
+      // Margaret + Titi finding). Both fields are optional in the
+      // generator — if any piece is missing we omit the section rather
+      // than fabricate.
+      let provenance: import('@/lib/reports/board-report-generator').BoardReportProvenance | undefined;
+      try {
+        const docHashRes = await fetch(`/api/documents/${document.id}?fields=contentHash,promptVersion`);
+        const docHashJson = (await docHashRes.json().catch(() => null)) as
+          | { contentHash?: string | null; analyses?: Array<{ id: string; promptVersion?: { hash?: string | null } | null }> }
+          | null;
+        const documentHash = docHashJson?.contentHash || 'UNAVAILABLE';
+        const promptFingerprint =
+          docHashJson?.analyses?.[0]?.promptVersion?.hash || 'UNAVAILABLE';
+        provenance = {
+          analysisId: analysis.id,
+          documentHash,
+          modelTag: 'gemini-3-flash-preview',
+          promptFingerprint,
+          generatedAt: new Date().toISOString(),
+        };
+      } catch (provErr) {
+        log.warn('Board report provenance fetch failed (non-fatal):', provErr);
+      }
+
+      let regulatoryExposure: import('@/lib/reports/board-report-generator').BoardReportRegulatoryExposure[] | undefined;
+      try {
+        const { getCrossFrameworkRisk } = await import('@/lib/compliance/bias-regulation-map');
+        const { formatBiasName } = await import('@/lib/utils/labels');
+        const sortedBiases = [...(analysis.biases || [])].sort((a, b) => {
+          const order: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 };
+          return (order[a.severity?.toLowerCase() ?? ''] ?? 4) -
+            (order[b.severity?.toLowerCase() ?? ''] ?? 4);
+        });
+        const seenBias = new Set<string>();
+        regulatoryExposure = [];
+        for (const bias of sortedBiases) {
+          if (seenBias.has(bias.biasType) || regulatoryExposure.length >= 5) continue;
+          seenBias.add(bias.biasType);
+          const risk = getCrossFrameworkRisk(bias.biasType);
+          regulatoryExposure.push({
+            biasLabel: formatBiasName(bias.biasType),
+            frameworks: risk.frameworks.map(f => f.frameworkName),
+          });
+        }
+      } catch (regErr) {
+        log.warn('Board report regulatory mapping failed (non-fatal):', regErr);
+      }
+
       const { BoardReportGenerator } = await import('@/lib/reports/board-report-generator');
       const generator = new BoardReportGenerator();
       generator.generateReport({
@@ -666,6 +725,8 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         analysis,
         confidential: isBoardConfidential,
         counterfactualTop,
+        provenance,
+        regulatoryExposure,
       });
       fetch('/api/audit', {
         method: 'POST',
@@ -2030,9 +2091,9 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                     lineHeight: 1.55,
                   }}
                 >
-                  The DPR is hashed, signed, and aligned with EU AI Act Art. 14, GDPR Art. 22, NDPR
-                  Art. 12, and 14 other regulatory frameworks. The same artefact your GC walks into
-                  the audit committee with.
+                  The DPR is hashed and tamper-evident, aligned with EU AI Act Art. 14, GDPR Art.
+                  22, NDPR Art. 12, and 14 other regulatory frameworks. The same artefact your GC
+                  walks into the audit committee with.
                 </p>
               </div>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -2713,13 +2774,13 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
 
           {/* Tabs + Content */}
           <div
-            className="grid"
+            className="grid doc-detail-main-grid"
             style={{ gridTemplateColumns: '1fr 380px', gap: 'var(--spacing-xl)' }}
           >
             <div className="flex flex-col gap-lg">
               {/* Tab Bar with group labels */}
               <div
-                className="flex flex-wrap items-end gap-0 mb-lg"
+                className="flex flex-wrap items-end gap-0 mb-lg doc-detail-tab-bar"
                 role="tablist"
                 aria-label="Analysis tabs"
                 style={{
@@ -3285,6 +3346,46 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           </div>
         </div>
       )}
+
+      {/*
+        Responsive overrides for the document-detail page.
+        Added 2026-04-26 (P1 #17, Adaeze persona finding) — the main grid
+        and the tab bar were both broken on phones: the 380px sidebar
+        column either crushed the main content or caused horizontal
+        scroll, and the `flex-wrap + overflow:hidden` tab bar silently
+        clipped the second row of tabs (Intelligence / Forgotten
+        Questions / PDF View) so they were unreachable without knowing
+        the URL param. Mobile is the highest-traffic post-upload state
+        — Adaeze opens this on a 4G commute the moment her DQI score
+        completes — so the breakage was at the worst possible moment.
+
+        Fix shape:
+          (1) <900px: stack the main grid into a single column so the
+              sidebar panels render below the analysis content.
+          (2) <900px: tab bar switches from `flex-wrap + overflow:hidden`
+              to `flex-nowrap + overflow-x:auto + scroll-snap` so tabs
+              scroll horizontally with native momentum, no clipping.
+        Both rules use !important to override the inline styles on the
+        elements (those styles were the source of truth on desktop and
+        the responsive override needs to win on the narrow viewport).
+      */}
+      <style>{`
+        @media (max-width: 900px) {
+          .doc-detail-main-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .doc-detail-tab-bar {
+            flex-wrap: nowrap !important;
+            overflow-x: auto !important;
+            overflow-y: hidden !important;
+            -webkit-overflow-scrolling: touch;
+            scroll-snap-type: x proximity;
+          }
+          .doc-detail-tab-bar > * {
+            flex-shrink: 0;
+          }
+        }
+      `}</style>
     </div>
   );
 }

@@ -25,19 +25,19 @@ import {
  * persisted via PATCH /api/onboarding so the modal never re-shows and
  * downstream UI can personalize copy by role.
  *
- * The pe_vc track was added 2026-04-25 — Sankore is the design partner
- * and the persona panels (Titi, Adaeze, Marcus) all flagged the missing
- * fund/investor option as a procurement-stage tell. Per CLAUDE.md
- * positioning we don't market to PE/VC, but once they sign up we honor
+ * The pe_vc track was added 2026-04-25 for the fund/investor persona
+ * identified in design-partner research — junior/senior analysts and
+ * partners at PE / venture / fund shops with IC workflows that look
+ * different from a Fortune 500 CSO's. Per CLAUDE.md positioning we
+ * don't market to PE/VC publicly, but once a fund signs up we honor
  * the workflow.
  *
  * Compressed 2026-04-25 from a 3-step modal (role / value props /
- * CTAs) to a single screen. Adaeze's audit catch: "Three steps for an
- * unseen tool is too much friction" — the value-props middle step
- * was redundant with the marketing site the user just came from. The
- * one-screen layout shows role pills first, then reveals three primary
- * actions inline once a role is picked. Whole modal closes in two
- * clicks (role + CTA) instead of four (role + Continue + Next + CTA).
+ * CTAs) to a single screen — the value-props middle step was redundant
+ * with the marketing site the user just came from. The one-screen
+ * layout shows role pills first, then reveals three primary actions
+ * inline once a role is picked. Whole modal closes in two clicks (role
+ * + CTA) instead of four (role + Continue + Next + CTA).
  */
 const STORAGE_KEY = 'decision-intel-onboarding-completed';
 const TOUR_TRIGGER_KEY = 'decision-intel-launch-tour';

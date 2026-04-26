@@ -127,7 +127,7 @@ const SELF_ASSESSMENT: Array<{ question: string; weight: number }> = [
     question: 'Is the pipeline’s reasoning arbitrated by an explicit meta-judge stage?',
     weight: 1,
   },
-  { question: 'Does every output trace back to a signed, hashed record?', weight: 1 },
+  { question: 'Does every output trace back to a hashed, tamper-evident record?', weight: 1 },
   {
     question: 'Does the system treat expert intuition as amplified input, not noise to suppress?',
     weight: 1,

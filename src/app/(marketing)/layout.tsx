@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { SOC2_JSON_LD_DATA_PROTECTION } from '@/lib/constants/trust-copy';
 
 export const metadata: Metadata = {
   title: 'Decision Intel · The native reasoning layer for boardroom strategic decisions',
@@ -69,7 +70,7 @@ const jsonLd = [
     '@type': 'SoftwareApplication',
     name: 'Decision Intel',
     applicationCategory: 'BusinessApplication',
-    applicationSubCategory: 'Decision Intelligence',
+    applicationSubCategory: 'Strategic Decision Governance',
     operatingSystem: 'Web',
     url: siteUrl,
     description:
@@ -161,7 +162,7 @@ const jsonLd = [
         name: 'How is sensitive data protected?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'All documents are encrypted with AES-256-GCM at rest and TLS 1.3 in transit. A GDPR anonymization layer removes PII before any AI processing. Your data never leaves our SOC 2 certified infrastructure.',
+          text: SOC2_JSON_LD_DATA_PROTECTION,
         },
       },
       {
