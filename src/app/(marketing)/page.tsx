@@ -178,6 +178,26 @@ export default function LandingPage() {
           >
             {/* LEFT — claim column */}
             <div className="hero-claim" style={{ textAlign: 'left' }}>
+              {/* Pain-stat tag — McKinsey "Strategy Beyond the Hockey Stick"
+                  (Bradley/Hirt/Smit, 2018). The 8% finding is the most
+                  defensible broad-pain framing we can ship: covers strategy
+                  + corp dev + funds in one breath, not narrow to M&A or
+                  to board-presented decisions. Source verified before ship;
+                  the prior "$1.3T McKinsey" claim could not be sourced and
+                  was rejected. */}
+              <p
+                style={{
+                  fontSize: 13,
+                  color: C.slate500,
+                  fontStyle: 'italic',
+                  lineHeight: 1.5,
+                  marginBottom: 16,
+                  maxWidth: 520,
+                }}
+              >
+                Only 8% of strategic moves break out of the middle &mdash; the other 92% carry
+                biases nobody named in the memo (McKinsey).
+              </p>
               <p
                 style={{
                   fontSize: 11,
@@ -188,7 +208,7 @@ export default function LandingPage() {
                   marginBottom: 18,
                 }}
               >
-                For strategy teams who answer to the board
+                Decisions worth defending
               </p>
               <h1
                 className="marketing-display"
@@ -263,34 +283,24 @@ export default function LandingPage() {
                   How it works <ArrowRight size={14} />
                 </Link>
               </div>
-              {/* A13 — validation path for the procurement-stage reader who
-                  will not paste a real memo into an unvetted tool. Points
-                  to the public WeWork S-1 DPR sample (anonymized 2019
-                  audit) — they get to see a real audit shape before
-                  trusting us with their own document. */}
-              <a
-                href="/dpr-sample-wework.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => trackEvent('hero_dpr_sample_clicked')}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  fontSize: 13,
-                  fontWeight: 500,
-                  color: C.slate500,
-                  textDecoration: 'none',
-                  padding: '4px 0',
-                }}
-              >
-                <FileText size={13} />
-                Or see a real audit on a public S-1 (PDF)
-                <ArrowRight size={12} />
-              </a>
+              {/* The standalone "Or see a real audit on a public S-1 (PDF)"
+                  link that previously sat here was removed: the entire
+                  WeWork proof panel on the right is now the clickable
+                  artifact pointing at the same PDF, so the small text
+                  link became redundant and added noise to the left column. */}
             </div>
 
-            {/* RIGHT — proof column */}
+            {/* RIGHT — proof column. Was a synthetic SampleAuditCard with
+                DQI / biases / what-if / compound analysis stacked. Replaced
+                2026-04-26 with WeWorkProofPanel — a clickable panel anchored
+                to the public WeWork S-1 audit. Three rounds of persona +
+                blind reads (8 readers total) all converged: the synthetic
+                card asked the cold reader to parse domain vocabulary (DQI
+                / Knowledge Graph / EU AI Act Art 14) before the trust to
+                do that work had been earned. The WeWork case is a real
+                public document with a famous outcome, eliminates the
+                "synthetic sample" disclaimer, and naturally elevates the
+                already-published DPR sample PDF as the validation path. */}
             <div
               className="hero-proof"
               style={{
@@ -299,7 +309,7 @@ export default function LandingPage() {
                 alignItems: 'flex-start',
               }}
             >
-              <SampleAuditCard />
+              <WeWorkProofPanel />
             </div>
           </div>
 
@@ -1419,19 +1429,51 @@ function HeroCredibilityStrip() {
   );
 }
 
-/* ─── SampleAuditCard ────────────────────────────────────────────────
-   Static representation of what a reader sees after pasting a memo. Not
-   live data, not a real analysis. Designed to give the hero visual
-   weight without a customer-logo rail we do not have yet, and without
-   embedding a 3D graph that would redirect attention away from the
-   headline. Every number here maps onto the 135-case corpus at a
-   plausible mid-range; the card reads as "product showroom piece"
-   rather than "dashboard screenshot". */
+/* ─── WeWorkProofPanel ─────────────────────────────────────────────────
+   Replaces the prior SampleAuditCard (synthetic DQI + biases + what-if
+   stack). The synthetic card asked cold readers to parse domain
+   vocabulary (DQI score / Knowledge Graph / EU AI Act Art 14) before
+   the trust to do that work had been earned — three rounds of persona +
+   blind reads (8 readers total) all flagged it as proof-of-concept
+   theater rather than evidence. This panel anchors the proof to the
+   public WeWork S-1 (2019), a famous outcome every buyer recognises
+   without being primed. The whole panel is a clickable card that
+   opens the existing DPR sample PDF in a new tab — the validation
+   path Elena, Sarah, David, and the blind readers explicitly asked
+   for. No "ILLUSTRATIVE" or "synthetic sample" disclaimer needed.
+   Em-dash discipline: the page's one allowed em-dash lives in the
+   pain-stat tag in the left column, so this panel uses colons +
+   middle-dots throughout. */
 
-function SampleAuditCard() {
+function WeWorkProofPanel() {
+  const biases = [
+    {
+      name: 'Overconfidence',
+      finding:
+        'adjusted EBITDA excluded standard operating costs (marketing, design, member acquisition) and was presented as the headline metric.',
+      sev: '#DC2626',
+    },
+    {
+      name: 'Anchoring',
+      finding:
+        'every projection tethered to the $47B private valuation set by SoftBank, not to market comparables.',
+      sev: '#D97706',
+    },
+    {
+      name: 'Sunk cost',
+      finding:
+        '$4B+ of prior funding shaped the IPO as the only path forward, narrowing the alternatives the document considered.',
+      sev: '#D97706',
+    },
+  ];
+
   return (
-    <div
-      className="sample-audit-card"
+    <a
+      className="wework-proof-panel"
+      href="/dpr-sample-wework.pdf"
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={() => trackEvent('hero_dpr_sample_clicked')}
       style={{
         width: '100%',
         maxWidth: 520,
@@ -1441,339 +1483,164 @@ function SampleAuditCard() {
         boxShadow:
           '0 32px 64px -20px rgba(15,23,42,0.22), 0 16px 36px -16px rgba(15,23,42,0.12), 0 2px 4px rgba(15,23,42,0.04)',
         overflow: 'hidden',
+        textDecoration: 'none',
+        color: 'inherit',
+        cursor: 'pointer',
         transform: 'perspective(1600px) rotateY(-1.4deg)',
         transformOrigin: 'left center',
+        transition: 'transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s',
+        display: 'block',
       }}
     >
-      {/* Reduced-motion: drop the perspective rotation. Mobile: drop both
-          perspective and the rightward shadow bias so the card sits flat
-          in the stacked column. */}
+      {/* Reduced-motion: drop the perspective rotation + hover transform.
+          Mobile: drop both perspective and the rightward shadow bias so
+          the card sits flat in the stacked column. */}
       <style>{`
+        .wework-proof-panel:hover {
+          transform: perspective(1600px) rotateY(-1.4deg) translateY(-3px) !important;
+          box-shadow: 0 38px 72px -20px rgba(15,23,42,0.26), 0 18px 40px -16px rgba(15,23,42,0.14), 0 2px 4px rgba(15,23,42,0.04) !important;
+        }
         @media (prefers-reduced-motion: reduce) {
-          .sample-audit-card { transform: none !important; }
+          .wework-proof-panel,
+          .wework-proof-panel:hover {
+            transform: none !important;
+            transition: none !important;
+          }
         }
         @media (max-width: 900px) {
-          .sample-audit-card {
+          .wework-proof-panel,
+          .wework-proof-panel:hover {
             transform: none !important;
+          }
+          .wework-proof-panel {
             max-width: 560px !important;
             margin-left: auto;
             margin-right: auto;
           }
         }
       `}</style>
+
       {/* Title bar */}
       <div
         style={{
-          padding: '14px 22px',
+          padding: '16px 22px',
           borderBottom: `1px solid ${C.slate200}`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
           background: C.slate50,
         }}
       >
         <div
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
+            fontSize: 10.5,
+            fontWeight: 800,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: C.green,
+            marginBottom: 6,
           }}
         >
-          <div
-            style={{
-              fontSize: 10.5,
-              fontWeight: 800,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              color: C.green,
-            }}
-          >
-            Sample output · illustrative
-          </div>
-          <div
-            style={{
-              fontSize: 13,
-              fontWeight: 600,
-              color: C.slate900,
-            }}
-          >
-            Q4 market-entry recommendation
-          </div>
+          What we&apos;d have flagged in the WeWork S-1
         </div>
         <div
           style={{
-            fontSize: 11,
-            fontWeight: 600,
+            fontSize: 12,
             color: C.slate500,
+            fontWeight: 500,
           }}
         >
-          62 seconds
+          Public document &middot; 2019 IPO prospectus &middot; 60-second audit
         </div>
       </div>
 
-      {/* Body */}
-      <div
-        style={{
-          padding: '22px 24px 20px',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: 22,
-          alignItems: 'center',
-          textAlign: 'left',
-        }}
-      >
-        {/* DQI score */}
-        <div>
-          <div
-            style={{
-              fontSize: 10.5,
-              fontWeight: 700,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              color: C.slate500,
-              marginBottom: 4,
-            }}
-          >
-            Decision Quality Index
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'baseline',
-              gap: 10,
-            }}
-          >
-            <div
-              style={{
-                fontSize: 44,
-                fontWeight: 800,
-                color: C.slate900,
-                lineHeight: 1,
-                letterSpacing: '-0.02em',
-                fontFamily: 'var(--font-mono), monospace',
-              }}
-            >
-              68
-            </div>
-            <div
-              style={{
-                fontSize: 14,
-                fontWeight: 800,
-                color: C.white,
-                background: '#38BDF8',
-                padding: '3px 10px',
-                borderRadius: 6,
-                letterSpacing: '0.03em',
-              }}
-            >
-              B
-            </div>
-          </div>
-          <div
-            style={{
-              fontSize: 11.5,
-              color: C.slate500,
-              marginTop: 4,
-            }}
-          >
-            above sector median of 62
-          </div>
-        </div>
-
-        {/* Biases flagged */}
-        <div>
-          <div
-            style={{
-              fontSize: 10.5,
-              fontWeight: 700,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              color: C.slate500,
-              marginBottom: 6,
-            }}
-          >
-            Biases flagged
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-            {[
-              { label: 'Overconfidence', sev: '#DC2626' },
-              { label: 'Anchoring', sev: '#D97706' },
-              { label: 'Availability heuristic', sev: '#D97706' },
-              { label: 'Status quo', sev: '#64748B' },
-            ].map(b => (
-              <div
-                key={b.label}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  fontSize: 12.5,
-                  color: C.slate700,
-                }}
-              >
-                <span
-                  style={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: 999,
-                    background: b.sev,
-                    flexShrink: 0,
-                  }}
-                />
-                {b.label}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* What-if */}
+      {/* Body — three biases */}
+      <div style={{ padding: '20px 22px 18px' }}>
         <div
           style={{
-            background: C.slate50,
-            borderRadius: 10,
-            border: `1px solid ${C.slate200}`,
-            padding: 14,
-          }}
-        >
-          <div
-            style={{
-              fontSize: 10.5,
-              fontWeight: 700,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              color: C.slate500,
-              marginBottom: 6,
-            }}
-          >
-            What-if
-          </div>
-          <div
-            style={{
-              fontSize: 13,
-              color: C.slate900,
-              lineHeight: 1.45,
-              marginBottom: 6,
-            }}
-          >
-            Remove <span style={{ fontWeight: 700 }}>overconfidence</span> from the revenue framing
-          </div>
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              fontSize: 13,
-              fontWeight: 800,
-              color: C.green,
-              background: C.greenLight,
-              padding: '4px 10px',
-              borderRadius: 6,
-            }}
-          >
-            +18pp outcome probability
-          </div>
-        </div>
-      </div>
-
-      {/* Compound analysis — the causal layer. Reads what the Decision
-          Knowledge Graph has learned about this org's own prior decisions,
-          ties the flagged bias stack to a measured historical failure rate,
-          and quantifies what the counterfactual removes. This is the beat
-          that separates Decision Intel from "LLM wrapper scoring a memo" —
-          the numbers compound over time, they are the org's own data, and
-          they arrive signed as part of the DPR. */}
-      <div
-        style={{
-          margin: '0 22px 20px',
-          padding: '14px 16px',
-          borderRadius: 10,
-          background: 'linear-gradient(135deg, rgba(22,163,74,0.04), rgba(22,163,74,0.08))',
-          border: '1px solid rgba(22,163,74,0.18)',
-          textAlign: 'left',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 6,
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
             fontSize: 10.5,
             fontWeight: 700,
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
-            color: C.green,
+            color: C.slate500,
+            marginBottom: 14,
           }}
         >
-          <span
-            style={{
-              width: 5,
-              height: 5,
-              borderRadius: 999,
-              background: C.green,
-              display: 'inline-block',
-            }}
-          />
-          Compound analysis
-          <span
-            style={{
-              fontSize: 10.5,
-              fontWeight: 600,
-              color: C.slate500,
-              letterSpacing: '0.04em',
-              textTransform: 'none',
-            }}
-          >
-            · calibrated against 127 prior decisions in your Knowledge Graph
-          </span>
+          Three biases the prospectus carried
         </div>
-        <div
+        <ul
           style={{
-            fontSize: 13.5,
-            color: C.slate900,
-            lineHeight: 1.55,
+            listStyle: 'none',
+            padding: 0,
+            margin: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 13,
           }}
         >
-          Memos with this bias stack (
-          <span style={{ fontWeight: 700 }}>overconfidence + anchoring</span>) failed{' '}
-          <span style={{ fontWeight: 800, color: C.green }}>34% more often</span> than your
-          portfolio baseline in M&amp;A and market-entry contexts. Removing overconfidence from the
-          revenue framing narrows the gap to{' '}
-          <span style={{ fontWeight: 800, color: C.green }}>12%</span>, a{' '}
-          <span style={{ fontWeight: 700 }}>22-point reduction</span> in failure-rate exposure.
-        </div>
+          {biases.map(b => (
+            <li
+              key={b.name}
+              style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 10,
+              }}
+            >
+              <span
+                aria-hidden
+                style={{
+                  width: 7,
+                  height: 7,
+                  borderRadius: 999,
+                  background: b.sev,
+                  flexShrink: 0,
+                  marginTop: 7,
+                }}
+              />
+              <div style={{ fontSize: 13.5, color: C.slate900, lineHeight: 1.5 }}>
+                <span style={{ fontWeight: 700 }}>{b.name}:</span>
+                <span style={{ color: C.slate700 }}> {b.finding}</span>
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
 
-      {/* Footer */}
+      {/* CTA footer — visible affordance for the clickable panel */}
       <div
         style={{
-          padding: '12px 22px',
+          padding: '14px 22px',
           borderTop: `1px solid ${C.slate200}`,
+          background: C.slate50,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          fontSize: 11.5,
-          color: C.slate500,
-          background: C.white,
           gap: 12,
           flexWrap: 'wrap',
         }}
       >
-        <span>
-          Every call signs a Decision Provenance Record, mapped onto EU AI Act Article 14.
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            fontSize: 13,
+            fontWeight: 700,
+            color: C.green,
+          }}
+        >
+          <FileText size={14} />
+          Read the full Decision Provenance Record
+          <ArrowRight size={14} />
         </span>
         <span
           style={{
-            fontStyle: 'italic',
-            color: C.slate500,
             fontSize: 11,
+            color: C.slate500,
+            fontWeight: 600,
           }}
         >
-          Synthetic sample · not a real audit
+          PDF &middot; opens in new tab
         </span>
       </div>
-    </div>
+    </a>
   );
 }
