@@ -22,6 +22,7 @@ import { DqiComponentBars } from '@/components/marketing/how-it-works/DqiCompone
 import { NoiseDistributionViz } from '@/components/marketing/how-it-works/NoiseDistributionViz';
 import { BoardroomSimViz } from '@/components/marketing/how-it-works/BoardroomSimViz';
 import { OutcomeDetectionViz } from '@/components/marketing/how-it-works/OutcomeDetectionViz';
+import { DprAnatomyViz } from '@/components/marketing/how-it-works/DprAnatomyViz';
 import { ResearchCitationCard } from '@/components/marketing/how-it-works/ResearchCitationCard';
 import { ToxicNetworkGraph } from '@/components/marketing/genome/ToxicNetworkGraph';
 import { computeGenomeFromSeed } from '@/lib/data/bias-genome-seed';
@@ -567,6 +568,70 @@ export function HowItWorksClient() {
           >
             <NoiseDistributionViz />
             <BoardroomSimViz />
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 6.5 — THE DECISION PROVENANCE RECORD ───────────── */}
+      <section id="provenance-record" style={{ padding: '72px 24px 0' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+          <SectionHeader
+            eyebrow="The Decision Provenance Record"
+            title="What comes out the end. Hashed, cited, and built to be defended."
+            body="Every audit produces a Decision Provenance Record — the artifact your team carries into the room when the decision is challenged. Each section below is a real part of the record we generate today; click any row to see what it contains, what regulatory provision it satisfies, and what an external reviewer can verify without leaving the document. Specimen records are publicly available so a procurement reviewer can read one before the conversation starts."
+          />
+          <DprAnatomyViz />
+          <div
+            style={{
+              marginTop: 32,
+              display: 'flex',
+              gap: 12,
+              flexWrap: 'wrap',
+              alignItems: 'center',
+            }}
+          >
+            <a
+              href="/dpr-sample-wework.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                fontSize: 14,
+                fontWeight: 700,
+                color: C.white,
+                background: C.green,
+                padding: '12px 22px',
+                borderRadius: 10,
+                textDecoration: 'none',
+              }}
+            >
+              <FileText size={15} />
+              Read a real DPR (WeWork S-1, PDF)
+              <ArrowRight size={14} />
+            </a>
+            <a
+              href="/dpr-sample-dangote.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                fontSize: 14,
+                fontWeight: 600,
+                color: C.slate700,
+                padding: '12px 16px',
+                textDecoration: 'none',
+                border: `1px solid ${C.slate200}`,
+                borderRadius: 10,
+                background: C.white,
+              }}
+            >
+              Pan-African shape (Dangote, PDF)
+              <ArrowRight size={13} />
+            </a>
           </div>
         </div>
       </section>

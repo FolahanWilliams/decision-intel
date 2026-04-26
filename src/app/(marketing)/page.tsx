@@ -388,22 +388,47 @@ export default function LandingPage() {
                         letterSpacing: '0.12em',
                         textTransform: 'uppercase',
                         color: C.green,
-                        marginBottom: 8,
+                        marginBottom: 10,
                         marginTop: 0,
                       }}
                     >
                       What you get
                     </p>
-                    <p
+                    {/* Reader α's trust move: instead of describing the
+                        artifact in prose, show 3 lines of what the actual
+                        DPR header looks like. Monospace, tinted background,
+                        reads as machine-output rather than marketing copy.
+                        Numbers match the WeWork panel above for coherence. */}
+                    <pre
                       style={{
-                        fontSize: 12.5,
+                        fontSize: 11,
+                        lineHeight: 1.55,
                         color: C.slate700,
-                        lineHeight: 1.5,
+                        background: C.slate50,
+                        border: `1px solid ${C.slate200}`,
+                        borderRadius: 8,
+                        padding: '10px 12px',
                         margin: 0,
+                        marginBottom: 8,
+                        fontFamily: 'var(--font-mono, ui-monospace, monospace)',
+                        whiteSpace: 'pre-wrap',
+                        wordBreak: 'break-word',
+                        overflow: 'hidden',
                       }}
                     >
-                      A signed Decision Provenance Record: three biases named, the counterfactual
-                      quantified, defensible in any room.
+                      {`DPR · WeWork S-1 · 2019 IPO prospectus
+DQI 41 → 70 if mitigated · 3 biases · 7 frameworks
+SHA-256 a4f7e2…d83 · hashed + tamper-evident`}
+                    </pre>
+                    <p
+                      style={{
+                        fontSize: 11,
+                        color: C.slate500,
+                        margin: 0,
+                        lineHeight: 1.45,
+                      }}
+                    >
+                      A real DPR header. Click the WeWork panel above to read the full record.
                     </p>
                   </div>
                 </div>
