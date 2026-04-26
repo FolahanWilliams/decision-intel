@@ -173,9 +173,7 @@ export async function getRetentionDaysForDocument(doc: {
   userId: string;
   orgId?: string | null;
 }): Promise<number> {
-  return doc.orgId
-    ? getRetentionDaysForOrg(doc.orgId)
-    : getRetentionDaysForUser(doc.userId);
+  return doc.orgId ? getRetentionDaysForOrg(doc.orgId) : getRetentionDaysForUser(doc.userId);
 }
 
 /** Days a soft-deleted document stays recoverable before hard-purge. */

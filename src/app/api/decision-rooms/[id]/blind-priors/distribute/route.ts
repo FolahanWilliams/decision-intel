@@ -115,10 +115,7 @@ function buildInviteEmail({
   return { subject, html };
 }
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -258,17 +255,17 @@ export async function POST(
     // Token expiry — capped to deadline + 24h so a token never lives
     // beyond the natural close window. The 24h grace covers late
     // submissions if the owner extends the deadline by a day.
-    const tokenExpiresAt = new Date(
-      Math.min(deadlineDate.getTime() + 24 * 60 * 60 * 1000, cap)
-    );
+    const tokenExpiresAt = new Date(Math.min(deadlineDate.getTime() + 24 * 60 * 60 * 1000, cap));
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
-    const deliveryChannel =
-      channel === 'slack' || channel === 'both' ? channel : 'email';
+    const deliveryChannel = channel === 'slack' || channel === 'both' ? channel : 'email';
 
     const inviterName = user.email?.split('@')[0] || 'A teammate';
-    const created: Array<{ id: string; channel: 'email' | 'dry_run' | 'failed'; recipient: string }> =
-      [];
+    const created: Array<{
+      id: string;
+      channel: 'email' | 'dry_run' | 'failed';
+      recipient: string;
+    }> = [];
 
     for (const invitee of cleaned) {
       const submissionToken = generateToken();

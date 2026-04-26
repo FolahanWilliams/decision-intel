@@ -425,9 +425,9 @@ function renderHero(
           <strong>Banned:</strong> &ldquo;decision intelligence platform&rdquo; (Gartner-crowded),
           &ldquo;decision hygiene&rdquo; (Kahneman&apos;s 2021 term — cedes vocabulary),
           &ldquo;boardroom strategic decision&rdquo; (audience-narrowing — replaced by
-          &ldquo;high-stakes call&rdquo; 2026-04-26). Cold-context on-ramps:
-          &ldquo;60-second audit on a strategic memo&rdquo;, &ldquo;pre-IC audit layer&rdquo;,
-          &ldquo;strategic memo audits&rdquo; — descriptive, no academic borrowing.
+          &ldquo;high-stakes call&rdquo; 2026-04-26). Cold-context on-ramps: &ldquo;60-second audit
+          on a strategic memo&rdquo;, &ldquo;pre-IC audit layer&rdquo;, &ldquo;strategic memo
+          audits&rdquo; — descriptive, no academic borrowing.
         </div>
       </div>
 

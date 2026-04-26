@@ -154,11 +154,7 @@ export function MemoDiffViewer({ documentId, againstId, onClose }: Props) {
           <span style={{ color: '#DC2626', fontWeight: 700 }}>−{data.stats.removed}</span>
           <span>{data.stats.unchanged} unchanged</span>
           {onClose && (
-            <button
-              onClick={onClose}
-              className="btn btn-ghost btn-sm"
-              style={{ fontSize: 11 }}
-            >
+            <button onClick={onClose} className="btn btn-ghost btn-sm" style={{ fontSize: 11 }}>
               Close
             </button>
           )}
@@ -176,11 +172,7 @@ export function MemoDiffViewer({ documentId, againstId, onClose }: Props) {
       >
         {data.segments.map((s, i) => {
           const colour =
-            s.type === 'add'
-              ? '#16A34A'
-              : s.type === 'remove'
-                ? '#DC2626'
-                : 'var(--text-muted)';
+            s.type === 'add' ? '#16A34A' : s.type === 'remove' ? '#DC2626' : 'var(--text-muted)';
           const bg =
             s.type === 'add'
               ? 'rgba(22,163,74,0.06)'

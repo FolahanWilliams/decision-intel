@@ -16,10 +16,7 @@ const log = createLogger('AnalysisFingerprintRoute');
 // Auth (3.5): visibility-aware via resolveAnalysisAccess — checks the
 // parent document's visibility. Private docs only readable by owner.
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {

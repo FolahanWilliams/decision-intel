@@ -5,9 +5,17 @@ import { CheckCircle2, Clock, FileText, MapPin } from 'lucide-react';
 import { FRAMEWORKS_BRIEF, type FrameworkBrief } from './sankore-brief-data';
 import { SectionHeader } from './HoleClosureMatrix';
 
-const STATUS_STYLE: Record<FrameworkBrief['status'], { label: string; color: string; bg: string; Icon: typeof CheckCircle2 }> = {
+const STATUS_STYLE: Record<
+  FrameworkBrief['status'],
+  { label: string; color: string; bg: string; Icon: typeof CheckCircle2 }
+> = {
   live: { label: 'Live', color: '#16A34A', bg: 'rgba(22,163,74,0.10)', Icon: CheckCircle2 },
-  enforceable_2026: { label: 'Aug 2 2026', color: '#D97706', bg: 'rgba(217,119,6,0.10)', Icon: Clock },
+  enforceable_2026: {
+    label: 'Aug 2 2026',
+    color: '#D97706',
+    bg: 'rgba(217,119,6,0.10)',
+    Icon: Clock,
+  },
   draft: { label: 'Draft 2024', color: '#2563EB', bg: 'rgba(37,99,235,0.10)', Icon: FileText },
 };
 
@@ -60,7 +68,9 @@ export function RegulatoryBridge() {
           padding: '14px 18px',
           background: 'var(--bg-card)',
           border: '1px solid var(--border-color)',
-          borderLeft: focused ? `3px solid ${STATUS_STYLE[focused.status].color}` : '3px solid var(--border-color)',
+          borderLeft: focused
+            ? `3px solid ${STATUS_STYLE[focused.status].color}`
+            : '3px solid var(--border-color)',
           borderRadius: 'var(--radius-md)',
           minHeight: 84,
         }}

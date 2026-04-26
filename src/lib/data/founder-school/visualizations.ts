@@ -1275,7 +1275,10 @@ const VIZ_PLATFORM_FOUNDATIONS: Record<string, LessonViz> = {
       { label: 'Pre-mortem', detail: 'Generates failure scenarios.' },
       { label: 'Red Team', detail: 'Strongest adversarial objection.', emphasis: true },
       { label: 'Fact-check', detail: 'Quantitative-claim verification.' },
-      { label: 'Compliance mapper', detail: 'Cross-links 17 frameworks (G7 + EU + GCC + African).' },
+      {
+        label: 'Compliance mapper',
+        detail: 'Cross-links 17 frameworks (G7 + EU + GCC + African).',
+      },
       { label: 'Compound-risk scorer', detail: 'Applies 20×20 matrix.' },
       { label: 'Verdict synthesiser', detail: 'DQI + exec summary.', emphasis: true },
     ],

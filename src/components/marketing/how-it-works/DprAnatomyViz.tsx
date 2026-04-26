@@ -2,15 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  FileText,
-  Layers,
-  AlertTriangle,
-  GitCompare,
-  Scale,
-  Cpu,
-  Hash,
-} from 'lucide-react';
+import { FileText, Layers, AlertTriangle, GitCompare, Scale, Cpu, Hash } from 'lucide-react';
 
 /**
  * DprAnatomyViz — Interactive layered visualization of a Decision
@@ -69,7 +61,8 @@ const SECTIONS: DprSection[] = [
       'Noise score (judge-variance metric)',
       'Meta-verdict: proceed, hold, or reject',
     ],
-    regulatoryProvision: 'GDPR Art. 22 — meaningful information about the logic of automated decisions',
+    regulatoryProvision:
+      'GDPR Art. 22 — meaningful information about the logic of automated decisions',
     reviewerCheck:
       'The DQI is deterministic from the pipeline outputs — the same memo always scores the same number. Reviewers can re-run and confirm.',
     pageHint: 'Page 1',
@@ -306,10 +299,7 @@ export function DprAnatomyViz() {
       <div className="dpr-anatomy-detail">
         <AnimatePresence mode="wait">
           {activeId ? (
-            <DprSectionDetail
-              key={activeId}
-              section={SECTIONS.find(s => s.id === activeId)!}
-            />
+            <DprSectionDetail key={activeId} section={SECTIONS.find(s => s.id === activeId)!} />
           ) : (
             <motion.div
               key="empty"
@@ -327,8 +317,8 @@ export function DprAnatomyViz() {
                 lineHeight: 1.55,
               }}
             >
-              Click any section on the left to see what it contains, what
-              regulatory provision it satisfies, and what a reviewer can verify.
+              Click any section on the left to see what it contains, what regulatory provision it
+              satisfies, and what a reviewer can verify.
             </motion.div>
           )}
         </AnimatePresence>

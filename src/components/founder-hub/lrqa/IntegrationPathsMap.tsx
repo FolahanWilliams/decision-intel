@@ -125,11 +125,7 @@ export function IntegrationPathsMap() {
             {active.title}
           </div>
 
-          <DetailRow
-            label="Where in LRQA's stack"
-            color="#94A3B8"
-            text={active.whereInLrqaStack}
-          />
+          <DetailRow label="Where in LRQA's stack" color="#94A3B8" text={active.whereInLrqaStack} />
           <DetailRow
             label="What DI adds"
             color={FIT_COLORS[active.fitStrength]}

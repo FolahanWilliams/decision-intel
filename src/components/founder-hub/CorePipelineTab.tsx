@@ -303,14 +303,15 @@ SYNTHESIS (Sequential)
             Kahneman-style judgment disagreement. Upgrade to cross-model jury by setting{' '}
             <code style={{ fontSize: 10 }}>NOISE_JURY_MODELS</code> env var.
             <br />
-            <strong style={{ color: '#16A34A' }}>Locked 2026-04-24 policy (2 models only):</strong>{' '}
+            <strong style={{ color: '#16A34A' }}>
+              Locked 2026-04-24 policy (2 models only):
+            </strong>{' '}
             <code style={{ fontSize: 10 }}>gemini-3-flash-preview,gemini-3.1-flash-lite</code>
             <br />
             <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>
-              The prior third-juror pattern (adding gemini-2.5-pro) was retired with the
-              two-model lock; cross-model variance now relies on architectural diversity
-              between the flash-preview and flash-lite models, not three different model
-              families.
+              The prior third-juror pattern (adding gemini-2.5-pro) was retired with the two-model
+              lock; cross-model variance now relies on architectural diversity between the
+              flash-preview and flash-lite models, not three different model families.
             </span>
           </div>
         </div>

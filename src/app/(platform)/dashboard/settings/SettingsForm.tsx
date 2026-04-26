@@ -399,10 +399,7 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
           {/* Bulk data export — backs Terms §10A + DPA §5 (P1 #27, 2026-04-26).
               GDPR Art. 20 portability is technically per-record, but a single
               account-scoped JSON bundle is the procurement-grade answer. */}
-          <div
-            className="card mb-lg animate-fade-in"
-            style={{ animationDelay: '0.18s' }}
-          >
+          <div className="card mb-lg animate-fade-in" style={{ animationDelay: '0.18s' }}>
             <div className="card-header">
               <h3 className="flex items-center gap-sm">
                 <Download size={18} />
@@ -410,7 +407,10 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
               </h3>
             </div>
             <div className="card-body">
-              <div className="flex items-center justify-between" style={{ gap: 16, flexWrap: 'wrap' }}>
+              <div
+                className="flex items-center justify-between"
+                style={{ gap: 16, flexWrap: 'wrap' }}
+              >
                 <div style={{ flex: 1, minWidth: 240 }}>
                   <div style={{ fontWeight: 500, marginBottom: '4px' }}>
                     Account-scoped JSON bundle
@@ -418,8 +418,8 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                   <div className="text-xs text-muted" style={{ lineHeight: 1.55 }}>
                     Every analysis, outcome, Decision Provenance Record header, and decision-room
                     blind prior you&rsquo;ve authored, in one machine-readable bundle. Backs the
-                    contractual data-portability commitment in Terms §10A + DPA §5. Document
-                    bytes are excluded — fetch each per-document export from{' '}
+                    contractual data-portability commitment in Terms §10A + DPA §5. Document bytes
+                    are excluded — fetch each per-document export from{' '}
                     <code
                       style={{
                         background: 'var(--bg-tertiary)',

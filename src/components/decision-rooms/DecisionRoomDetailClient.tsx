@@ -134,8 +134,7 @@ const PHASE_COPY: Record<
   outcome_logged: {
     label: 'Outcome logged',
     tint: '#3b82f6',
-    description:
-      'Brier score per participant is calibrated against the actual outcome.',
+    description: 'Brier score per participant is calibrated against the actual outcome.',
   },
 };
 
@@ -200,7 +199,10 @@ export function DecisionRoomDetailClient({ roomId, initialRoom }: Props) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ force }),
         });
-        const data = (await res.json().catch(() => ({}))) as { error?: string; revealedAt?: string };
+        const data = (await res.json().catch(() => ({}))) as {
+          error?: string;
+          revealedAt?: string;
+        };
         if (!res.ok) {
           showToast(data.error ?? 'Could not reveal the aggregate.', 'error');
           return;
@@ -493,9 +495,7 @@ function StatTile({
       >
         {value}
       </div>
-      {hint && (
-        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{hint}</div>
-      )}
+      {hint && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{hint}</div>}
     </div>
   );
 }
@@ -681,7 +681,8 @@ function CollectingPanel({
                   gap: 6,
                   padding: '7px 12px',
                   borderRadius: 'var(--radius-sm)',
-                  background: allSubmitted || deadlinePassed ? 'var(--accent-primary)' : 'var(--bg-elevated)',
+                  background:
+                    allSubmitted || deadlinePassed ? 'var(--accent-primary)' : 'var(--bg-elevated)',
                   border: `1px solid ${allSubmitted || deadlinePassed ? 'var(--accent-primary)' : 'var(--border-color)'}`,
                   color: allSubmitted || deadlinePassed ? '#fff' : 'var(--text-muted)',
                   fontSize: 12,
@@ -728,7 +729,14 @@ function CollectingPanel({
             <div style={{ marginTop: showInviteForm ? 16 : 0 }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
-                  <tr style={{ color: 'var(--text-muted)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  <tr
+                    style={{
+                      color: 'var(--text-muted)',
+                      fontSize: 11,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.06em',
+                    }}
+                  >
                     <th style={{ textAlign: 'left', padding: '8px 10px' }}>Participant</th>
                     <th style={{ textAlign: 'left', padding: '8px 10px' }}>Channel</th>
                     <th style={{ textAlign: 'left', padding: '8px 10px' }}>Role</th>
@@ -742,8 +750,13 @@ function CollectingPanel({
                       key={r.id}
                       style={{ borderTop: '1px solid var(--border-color)', fontSize: 13 }}
                     >
-                      <td style={{ padding: '10px', color: 'var(--text-primary)', fontWeight: 600 }}>
-                        {r.displayName || (r.recipientType === 'platform_user' ? 'Platform user' : 'External invitee')}
+                      <td
+                        style={{ padding: '10px', color: 'var(--text-primary)', fontWeight: 600 }}
+                      >
+                        {r.displayName ||
+                          (r.recipientType === 'platform_user'
+                            ? 'Platform user'
+                            : 'External invitee')}
                       </td>
                       <td style={{ padding: '10px', color: 'var(--text-muted)' }}>
                         {r.recipientType === 'platform_user' ? 'In-app + email' : 'Email'}
@@ -1074,7 +1087,14 @@ function RevealedPanel({
               )}
             </div>
             {outcome.notes && (
-              <p style={{ margin: '8px 0 0', color: 'var(--text-muted)', fontSize: 13, lineHeight: 1.5 }}>
+              <p
+                style={{
+                  margin: '8px 0 0',
+                  color: 'var(--text-muted)',
+                  fontSize: 13,
+                  lineHeight: 1.5,
+                }}
+              >
                 {outcome.notes}
               </p>
             )}
@@ -1097,10 +1117,7 @@ function RevealedPanel({
       )}
 
       {isCreator && (
-        <div
-          className="card"
-          style={{ background: 'var(--bg-card)' }}
-        >
+        <div className="card" style={{ background: 'var(--bg-card)' }}>
           <div className="card-header">
             <h3 style={{ margin: 0, color: 'var(--text-primary)', fontSize: 14 }}>
               Roster · post-reveal

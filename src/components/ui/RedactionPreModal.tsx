@@ -37,8 +37,10 @@ import {
  * Originals NEVER appear here (only on the placeholder map, which the
  * parent stores in sessionStorage).
  */
-export interface RedactionTrailContext
-  extends Omit<RedactionTrailPayload, 'analysisId' | 'source'> {
+export interface RedactionTrailContext extends Omit<
+  RedactionTrailPayload,
+  'analysisId' | 'source'
+> {
   /** Client-only — passed to savePlaceholderMap once analysisId is known. */
   placeholderEntries: PlaceholderMapEntry[];
 }
@@ -57,14 +59,7 @@ interface Props {
   onCancel: () => void;
 }
 
-const CATEGORY_ORDER: RedactionCategory[] = [
-  'ssn',
-  'email',
-  'phone',
-  'amount',
-  'entity',
-  'name',
-];
+const CATEGORY_ORDER: RedactionCategory[] = ['ssn', 'email', 'phone', 'amount', 'entity', 'name'];
 
 const CATEGORY_HEX: Record<RedactionCategory, string> = {
   ssn: '#7F1D1D',
@@ -229,9 +224,9 @@ export function RedactionPreModal({ isOpen, text, scan, onRedact, onSkip, onCanc
               lineHeight: 1.55,
             }}
           >
-            We scanned your paste for likely identifying details. Pick which to
-            replace with stable placeholders (e.g. <code>[NAME_1]</code>,
-            <code> [AMOUNT_2]</code>). Heuristic only — uncheck any false hit.
+            We scanned your paste for likely identifying details. Pick which to replace with stable
+            placeholders (e.g. <code>[NAME_1]</code>,<code> [AMOUNT_2]</code>). Heuristic only —
+            uncheck any false hit.
           </p>
         </DialogHeader>
 
@@ -427,11 +422,7 @@ export function RedactionPreModal({ isOpen, text, scan, onRedact, onSkip, onCanc
             >
               <X size={13} /> Cancel
             </Button>
-            <Button
-              variant="outline"
-              onClick={handleSkip}
-              style={{ fontSize: 12 }}
-            >
+            <Button variant="outline" onClick={handleSkip} style={{ fontSize: 12 }}>
               Continue without redacting
             </Button>
             <Button

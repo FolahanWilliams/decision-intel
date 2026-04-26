@@ -44,9 +44,7 @@ export type DocumentAccessResolution = DocumentAccessFilter;
  *   2. team     — same org AND visibility in {'team', null}  (null = pre-3.5)
  *   3. specific — id is in the user's DocumentAccess grant list
  */
-export async function buildDocumentAccessFilter(
-  userId: string
-): Promise<DocumentAccessFilter> {
+export async function buildDocumentAccessFilter(userId: string): Promise<DocumentAccessFilter> {
   let membershipOrgId: string | null = null;
   let grantedDocumentIds: string[] = [];
 

@@ -48,11 +48,15 @@ export async function POST(request: NextRequest) {
     const ip = extractIp(request);
     const ipHash = createHash('sha256').update(ip).digest('hex').slice(0, 24);
 
-    const rate = await checkRateLimit(`quote-public-ip:${ipHash}`, '/api/billing/enterprise-quote-public', {
-      windowMs: WINDOW_MS,
-      maxRequests: PER_IP_MAX,
-      failMode: 'closed',
-    });
+    const rate = await checkRateLimit(
+      `quote-public-ip:${ipHash}`,
+      '/api/billing/enterprise-quote-public',
+      {
+        windowMs: WINDOW_MS,
+        maxRequests: PER_IP_MAX,
+        failMode: 'closed',
+      }
+    );
     if (!rate.success) {
       return NextResponse.json(
         {
@@ -75,12 +79,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
     }
 
-    const customerName = String(body.customerName ?? '').trim().slice(0, 120);
+    const customerName = String(body.customerName ?? '')
+      .trim()
+      .slice(0, 120);
     if (customerName.length === 0) {
       return NextResponse.json({ error: 'customerName is required' }, { status: 400 });
     }
-    const contactName = String(body.contactName ?? '').trim().slice(0, 120);
-    const contactEmail = String(body.contactEmail ?? '').trim().slice(0, 200);
+    const contactName = String(body.contactName ?? '')
+      .trim()
+      .slice(0, 120);
+    const contactEmail = String(body.contactEmail ?? '')
+      .trim()
+      .slice(0, 200);
     if (!isPlausibleEmail(contactEmail)) {
       return NextResponse.json(
         { error: 'A working contact email is required so the team can follow up.' },
@@ -113,7 +123,11 @@ export async function POST(request: NextRequest) {
         : ENTERPRISE_QUOTE_DEFAULTS.slaTier;
     const volumeFloorAuditsPerQuarter = Math.max(
       0,
-      Math.floor(Number(body.volumeFloorAuditsPerQuarter ?? ENTERPRISE_QUOTE_DEFAULTS.volumeFloorAuditsPerQuarter))
+      Math.floor(
+        Number(
+          body.volumeFloorAuditsPerQuarter ?? ENTERPRISE_QUOTE_DEFAULTS.volumeFloorAuditsPerQuarter
+        )
+      )
     );
     // Public surface: only the US region option is honest in production
     // today (Vercel + Supabase US). EU / Multi-region remains an

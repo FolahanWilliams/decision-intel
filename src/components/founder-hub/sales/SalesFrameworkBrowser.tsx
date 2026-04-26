@@ -145,7 +145,14 @@ function JoltView() {
                 {el.letter}
               </span>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 13, fontWeight: 800, color: meta.color, letterSpacing: '0.02em' }}>
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 800,
+                    color: meta.color,
+                    letterSpacing: '0.02em',
+                  }}
+                >
                   {el.name}
                 </div>
                 <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
@@ -153,7 +160,14 @@ function JoltView() {
                 </div>
               </div>
             </div>
-            <div style={{ fontSize: 12, color: 'var(--text-primary)', lineHeight: 1.55, marginBottom: 8 }}>
+            <div
+              style={{
+                fontSize: 12,
+                color: 'var(--text-primary)',
+                lineHeight: 1.55,
+                marginBottom: 8,
+              }}
+            >
               {el.description}
             </div>
             <div
@@ -169,7 +183,15 @@ function JoltView() {
                 marginBottom: 6,
               }}
             >
-              <strong style={{ fontStyle: 'normal', color: meta.color, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              <strong
+                style={{
+                  fontStyle: 'normal',
+                  color: meta.color,
+                  fontSize: 10,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                }}
+              >
                 Folahan says
               </strong>
               <br />
@@ -285,7 +307,14 @@ function SlipView() {
                 lineHeight: 1.55,
               }}
             >
-              <strong style={{ color: meta.color, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              <strong
+                style={{
+                  color: meta.color,
+                  fontSize: 10,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                }}
+              >
                 DI today
               </strong>
               <br />

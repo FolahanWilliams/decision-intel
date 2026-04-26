@@ -67,10 +67,7 @@ interface DealCounterfactualResponse {
   dataAsOf: string;
 }
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -105,11 +102,7 @@ export async function GET(
 
     const docs = await prisma.document.findMany({
       where: {
-        AND: [
-          { dealId },
-          { deletedAt: null },
-          accessFilter.where,
-        ],
+        AND: [{ dealId }, { deletedAt: null }, accessFilter.where],
       },
       select: {
         id: true,
@@ -227,10 +220,8 @@ export async function GET(
 
     const topScenarios: DealCounterfactualScenario[] = Array.from(scenarioBuckets.values())
       .map(b => {
-        const avgImprovement =
-          b.improvements.reduce((a, x) => a + x, 0) / b.improvements.length;
-        const avgConfidence =
-          b.confidences.reduce((a, x) => a + x, 0) / b.confidences.length;
+        const avgImprovement = b.improvements.reduce((a, x) => a + x, 0) / b.improvements.length;
+        const avgConfidence = b.confidences.reduce((a, x) => a + x, 0) / b.confidences.length;
         const totalImpact = b.monetaryImpacts
           .filter((x): x is number => typeof x === 'number')
           .reduce((a, x) => a + x, 0);

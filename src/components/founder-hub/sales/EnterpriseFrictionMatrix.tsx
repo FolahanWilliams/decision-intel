@@ -50,7 +50,7 @@ const SEGMENT_ICONS: Record<EnterpriseFriction['buyerSegment'], typeof Building2
   'M&A / Corp Dev': Briefcase,
   'Fund Partner': TrendingUp,
   'GC / Compliance': Shield,
-  'All': AlertTriangle,
+  All: AlertTriangle,
 };
 
 const SEVERITY_COLORS: Record<EnterpriseFriction['severity'], string> = {
@@ -88,7 +88,9 @@ export function EnterpriseFrictionMatrix() {
           fontSize: 11,
         }}
       >
-        <span style={{ color: 'var(--text-muted)', fontWeight: 700 }}>Product status across 5 frictions:</span>
+        <span style={{ color: 'var(--text-muted)', fontWeight: 700 }}>
+          Product status across 5 frictions:
+        </span>
         {(Object.keys(STATUS_META) as FrictionStatus[]).map(s => {
           const m = STATUS_META[s];
           const count = statusCounts[s];

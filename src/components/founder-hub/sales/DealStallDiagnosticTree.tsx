@@ -19,10 +19,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle, ArrowRight, Mail } from 'lucide-react';
-import {
-  DEAL_STALL_DIAGNOSTICS,
-  type DealStallDiagnostic,
-} from '@/lib/data/sales-toolkit';
+import { DEAL_STALL_DIAGNOSTICS, type DealStallDiagnostic } from '@/lib/data/sales-toolkit';
 
 const PROBABILITY_COLORS: Record<DealStallDiagnostic['probability'], string> = {
   High: '#DC2626',
@@ -69,11 +66,10 @@ export function DealStallDiagnosticTree() {
       >
         <AlertCircle size={16} style={{ color: '#94A3B8', flexShrink: 0 }} />
         <span style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-          <strong style={{ color: 'var(--text-primary)' }}>Symptom:</strong> a
-          design-partner candidate had a strong meeting (the WeWork or Dangote
-          live audit landed; they leaned forward) — but they&apos;ve gone silent
-          for 2-3 weeks. Below: 5 root causes ranked by probability + the
-          recovery move for each.
+          <strong style={{ color: 'var(--text-primary)' }}>Symptom:</strong> a design-partner
+          candidate had a strong meeting (the WeWork or Dangote live audit landed; they leaned
+          forward) — but they&apos;ve gone silent for 2-3 weeks. Below: 5 root causes ranked by
+          probability + the recovery move for each.
         </span>
       </div>
 

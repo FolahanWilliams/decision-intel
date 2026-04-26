@@ -80,17 +80,15 @@ interface OverviewTabProps {
     cagrCeiling: number;
     rationale: string;
   };
-  marketContextOverride?:
-    | ({
-        context: 'emerging_market' | 'developed_market' | 'cross_border' | 'unknown';
-        emergingMarketCountries: string[];
-        developedMarketCountries: string[];
-        cagrCeiling: number;
-        rationale: string;
-        overriddenAt?: string;
-        overriddenBy?: string;
-      })
-    | null;
+  marketContextOverride?: {
+    context: 'emerging_market' | 'developed_market' | 'cross_border' | 'unknown';
+    emergingMarketCountries: string[];
+    developedMarketCountries: string[];
+    cagrCeiling: number;
+    rationale: string;
+    overriddenAt?: string;
+    overriddenBy?: string;
+  } | null;
   /** Triggered after a successful override save so the parent can refresh. */
   onMarketContextChanged?: () => void;
   /** Document-owner flag — gates the redaction map reveal feature. */
@@ -465,9 +463,7 @@ export function OverviewTab({
 
       {/* Redaction trail (3.2 deep) — proof that PII was scrubbed before
           submit. Owner can replay the local-only placeholder map. */}
-      {analysisId && (
-        <RedactionTrailCard analysisId={analysisId} isOwner={!!isOwner} />
-      )}
+      {analysisId && <RedactionTrailCard analysisId={analysisId} isOwner={!!isOwner} />}
 
       {/* Market-context priors chip — shows which growth-rate ceiling the bias
           detector applied based on detected jurisdictions (3.6). Owner can

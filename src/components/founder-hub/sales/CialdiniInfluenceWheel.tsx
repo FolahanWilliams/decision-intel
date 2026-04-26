@@ -42,7 +42,12 @@ const PRINCIPLE_ICONS: Record<string, typeof Heart> = {
 };
 
 // Position 6 principles around a hexagon (angles 0, 60, 120, 180, 240, 300 degrees from top)
-function hexPosition(index: number, radius: number, cx: number, cy: number): { x: number; y: number } {
+function hexPosition(
+  index: number,
+  radius: number,
+  cx: number,
+  cy: number
+): { x: number; y: number } {
   const angle = (Math.PI * 2 * index) / 6 - Math.PI / 2;
   return {
     x: cx + Math.cos(angle) * radius,
@@ -63,7 +68,12 @@ export function CialdiniInfluenceWheel() {
     <div>
       {/* Wheel */}
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
-        <svg width="400" height="400" viewBox="0 0 400 400" aria-label="Cialdini's 6 influence principles wheel">
+        <svg
+          width="400"
+          height="400"
+          viewBox="0 0 400 400"
+          aria-label="Cialdini's 6 influence principles wheel"
+        >
           {/* Connecting lines from center to each node */}
           {CIALDINI_FOR_DI.map((p, i) => {
             const pos = hexPosition(i, radius, cx, cy);

@@ -11,10 +11,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { validateApiKey, requireScope, type ValidateError } from '@/lib/api/auth';
 import { createLogger } from '@/lib/utils/logger';
-import {
-  buildDocumentAccessFilter,
-  buildDocumentAccessWhere,
-} from '@/lib/utils/document-access';
+import { buildDocumentAccessFilter, buildDocumentAccessWhere } from '@/lib/utils/document-access';
 
 const log = createLogger('PublicDocumentsRoute');
 

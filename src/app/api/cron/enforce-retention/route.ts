@@ -175,10 +175,7 @@ export async function GET() {
         isSample: false,
         // 2.1 deep — never soft-delete legally-held docs. The hold's
         // releasedAt being non-null means the hold has been lifted.
-        OR: [
-          { legalHoldId: null },
-          { legalHold: { releasedAt: { not: null } } },
-        ],
+        OR: [{ legalHoldId: null }, { legalHold: { releasedAt: { not: null } } }],
       },
       orderBy: { uploadedAt: 'asc' },
       take: RUN_CAP * 4, // pull more than we'll soft-delete to filter
@@ -246,8 +243,7 @@ export async function GET() {
           const to = emailByUser.get(d.userId);
           if (!to) continue;
           const purgeAt = new Date(
-            (d.deletedAt!.getTime() ?? now.getTime()) +
-              SOFT_DELETE_GRACE_DAYS * 24 * 3600 * 1000
+            (d.deletedAt!.getTime() ?? now.getTime()) + SOFT_DELETE_GRACE_DAYS * 24 * 3600 * 1000
           );
           const purgeStr = purgeAt.toLocaleDateString();
           const deletedStr = d.deletedAt!.toLocaleDateString();
@@ -257,7 +253,10 @@ export async function GET() {
             text: `The document "${d.filename}" was soft-deleted on ${deletedStr} and is scheduled for permanent purge on ${purgeStr} (~${RETENTION_WARNING_DAYS} days from now). If you need to keep it, restore from the document detail page or place it on legal hold. This warning is sent once per document.`,
             html: `<p>The document <strong>${d.filename}</strong> was soft-deleted on ${deletedStr} and is scheduled for permanent purge on <strong>${purgeStr}</strong> (~${RETENTION_WARNING_DAYS} days from now).</p><p>If you need to keep it, <a href="${process.env.NEXT_PUBLIC_APP_URL || ''}/documents/${d.id}">restore</a> it from the document detail page or place it on legal hold.</p><p style="font-size:12px;color:#666">This warning is sent once per document.</p>`,
           }).catch((err: unknown) =>
-            log.warn('retention warning email failed:', err instanceof Error ? err.message : String(err))
+            log.warn(
+              'retention warning email failed:',
+              err instanceof Error ? err.message : String(err)
+            )
           );
         }
         const warned = await prisma.document.updateMany({
@@ -274,9 +273,7 @@ export async function GET() {
     }
 
     // ── Phase 2: hard-purge documents soft-deleted past the grace window ──
-    const purgeBefore = new Date(
-      now.getTime() - SOFT_DELETE_GRACE_DAYS * 24 * 3600 * 1000
-    );
+    const purgeBefore = new Date(now.getTime() - SOFT_DELETE_GRACE_DAYS * 24 * 3600 * 1000);
     const toPurge = await prisma.document.findMany({
       where: {
         deletedAt: { lte: purgeBefore },

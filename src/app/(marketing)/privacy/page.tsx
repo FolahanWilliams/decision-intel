@@ -398,27 +398,63 @@ export default function PrivacyPage() {
             }}
           >
             <div>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: C.slate500, marginBottom: 8 }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  color: C.slate500,
+                  marginBottom: 8,
+                }}
+              >
                 Data controller
               </div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: C.slate900 }}>{LEGAL_ENTITY_NAME}</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: C.slate900 }}>
+                {LEGAL_ENTITY_NAME}
+              </div>
               <div style={{ fontSize: 13, color: C.slate600, marginTop: 4 }}>{JURISDICTION}</div>
             </div>
             <div>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: C.slate500, marginBottom: 8 }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  color: C.slate500,
+                  marginBottom: 8,
+                }}
+              >
                 Registered office
               </div>
               {REGISTERED_OFFICE_LINES.map((line, i) => (
-                <div key={i} style={{ fontSize: 13, color: C.slate600, lineHeight: 1.55 }}>{line}</div>
+                <div key={i} style={{ fontSize: 13, color: C.slate600, lineHeight: 1.55 }}>
+                  {line}
+                </div>
               ))}
             </div>
             <div>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: C.slate500, marginBottom: 8 }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  color: C.slate500,
+                  marginBottom: 8,
+                }}
+              >
                 Data-protection contact
               </div>
               <a
                 href={`mailto:${PRIVACY_CONTACT_EMAIL}`}
-                style={{ fontSize: 14, fontWeight: 600, color: C.slate900, textDecoration: 'underline' }}
+                style={{
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: C.slate900,
+                  textDecoration: 'underline',
+                }}
               >
                 {PRIVACY_CONTACT_EMAIL}
               </a>
@@ -807,13 +843,21 @@ export default function PrivacyPage() {
               lineHeight: 1.6,
             }}
           >
-            <div style={{ fontSize: 12, fontWeight: 700, color: C.slate900, marginBottom: 6, letterSpacing: '0.04em' }}>
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                color: C.slate900,
+                marginBottom: 6,
+                letterSpacing: '0.04em',
+              }}
+            >
               Right to lodge a complaint with a supervisory authority (Art 77)
             </div>
             <span>
               If you believe your rights under GDPR or UK GDPR have not been respected, you may
-              lodge a complaint with the supervisory authority of your habitual residence, place
-              of work, or place of the alleged infringement &mdash; for example the{' '}
+              lodge a complaint with the supervisory authority of your habitual residence, place of
+              work, or place of the alleged infringement &mdash; for example the{' '}
               <a
                 href="https://ico.org.uk"
                 target="_blank"
@@ -858,8 +902,7 @@ export default function PrivacyPage() {
               >
                 South African Information Regulator
               </a>
-              . Where possible, we ask you to contact us first so we can resolve the issue
-              directly.
+              . Where possible, we ask you to contact us first so we can resolve the issue directly.
             </span>
           </div>
         </div>
@@ -908,27 +951,29 @@ export default function PrivacyPage() {
                     team@decision-intel.com
                   </a>
                 </strong>{' '}
-                with the subject line <em>&ldquo;Art 22 request — third-party data subject&rdquo;</em>.
-                Tell us your name and (where you can) the customer organisation whose document
-                identifies you.
+                with the subject line{' '}
+                <em>&ldquo;Art 22 request — third-party data subject&rdquo;</em>. Tell us your name
+                and (where you can) the customer organisation whose document identifies you.
               </li>
               <li>
                 <strong style={{ color: C.slate900 }}>We acknowledge within 5 working days</strong>{' '}
                 and route the request to the controller (the Decision Intel customer who uploaded
-                the document). The customer is the data controller; Decision Intel is the
-                processor and assists their response.
+                the document). The customer is the data controller; Decision Intel is the processor
+                and assists their response.
               </li>
               <li>
-                <strong style={{ color: C.slate900 }}>The controller responds within 30 days</strong>{' '}
+                <strong style={{ color: C.slate900 }}>
+                  The controller responds within 30 days
+                </strong>{' '}
                 under GDPR Art 12(3). The response includes the meaningful information about the
-                logic — the Decision Provenance Record is engineered to provide exactly this.
-                You may then express your point of view and contest the decision under Art 22(3).
+                logic — the Decision Provenance Record is engineered to provide exactly this. You
+                may then express your point of view and contest the decision under Art 22(3).
               </li>
               <li>
                 <strong style={{ color: C.slate900 }}>If unresolved</strong>, you retain the right
-                to lodge a complaint with the supervisory authority listed above (ICO / CNIL /
-                Irish DPC / NITDA / SA Information Regulator), and the right to an effective
-                judicial remedy under GDPR Art 79.
+                to lodge a complaint with the supervisory authority listed above (ICO / CNIL / Irish
+                DPC / NITDA / SA Information Regulator), and the right to an effective judicial
+                remedy under GDPR Art 79.
               </li>
             </ol>
             <div
@@ -944,11 +989,10 @@ export default function PrivacyPage() {
             >
               <strong style={{ color: C.slate900 }}>Note:</strong> Decision Intel never produces
               automated decisions about a third-party subject in isolation — every output is a
-              decision-quality audit on a strategic memo authored by a Decision Intel customer.
-              The Art 22 contestation right applies when that customer&rsquo;s decision (informed
-              by the audit) significantly affects you. The DPR provides the &ldquo;meaningful
-              information about the logic&rdquo; the regulator requires; we surface it on
-              request.
+              decision-quality audit on a strategic memo authored by a Decision Intel customer. The
+              Art 22 contestation right applies when that customer&rsquo;s decision (informed by the
+              audit) significantly affects you. The DPR provides the &ldquo;meaningful information
+              about the logic&rdquo; the regulator requires; we surface it on request.
             </div>
           </div>
         </div>
@@ -1027,8 +1071,8 @@ export default function PrivacyPage() {
             </p>
             <p style={{ marginTop: 14, marginBottom: 0 }}>
               <strong style={{ color: C.slate900 }}>UK &rarr; US transfers</strong> rely on the UK
-              International Data Transfer Addendum (IDTA) to the EU SCCs, and on the UK Extension
-              to the DPF where applicable.
+              International Data Transfer Addendum (IDTA) to the EU SCCs, and on the UK Extension to
+              the DPF where applicable.
             </p>
             <p style={{ marginTop: 14, marginBottom: 0 }}>
               <strong style={{ color: C.slate900 }}>Nigeria &rarr; US transfers</strong> rely on
@@ -1043,8 +1087,8 @@ export default function PrivacyPage() {
             <p style={{ marginTop: 14, marginBottom: 0 }}>
               <strong style={{ color: C.slate900 }}>Onward transfers</strong> are restricted by
               contract: each sub-processor is bound to the same protections we apply, and any
-              addition triggers the 30-day prior-notice mechanism described in our Terms of
-              Service. To request a copy of the active SCCs, IDTA, or sub-processor list, contact{' '}
+              addition triggers the 30-day prior-notice mechanism described in our Terms of Service.
+              To request a copy of the active SCCs, IDTA, or sub-processor list, contact{' '}
               <a
                 href={`mailto:${PRIVACY_CONTACT_EMAIL}`}
                 style={{ color: C.slate900, fontWeight: 600 }}

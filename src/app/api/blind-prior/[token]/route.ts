@@ -118,7 +118,9 @@ export async function GET(
     let existingPrior = null;
     if (invite.userId) {
       existingPrior = await prisma.decisionRoomBlindPrior.findUnique({
-        where: { roomId_respondentUserId: { roomId: invite.roomId, respondentUserId: invite.userId } },
+        where: {
+          roomId_respondentUserId: { roomId: invite.roomId, respondentUserId: invite.userId },
+        },
         select: {
           id: true,
           confidencePercent: true,
@@ -195,19 +197,14 @@ export async function POST(
       return NextResponse.json({ error: 'Invalid body' }, { status: 400 });
     }
 
-    const {
-      confidencePercent,
-      topRisks,
-      privateRationale,
-      shareRationale,
-      shareIdentity,
-    } = body as {
-      confidencePercent?: unknown;
-      topRisks?: unknown;
-      privateRationale?: unknown;
-      shareRationale?: unknown;
-      shareIdentity?: unknown;
-    };
+    const { confidencePercent, topRisks, privateRationale, shareRationale, shareIdentity } =
+      body as {
+        confidencePercent?: unknown;
+        topRisks?: unknown;
+        privateRationale?: unknown;
+        shareRationale?: unknown;
+        shareIdentity?: unknown;
+      };
 
     if (
       typeof confidencePercent !== 'number' ||
@@ -256,10 +253,7 @@ export async function POST(
         { status: 410 }
       );
     }
-    if (
-      invite.room.blindPriorDeadline &&
-      invite.room.blindPriorDeadline.getTime() < Date.now()
-    ) {
+    if (invite.room.blindPriorDeadline && invite.room.blindPriorDeadline.getTime() < Date.now()) {
       return NextResponse.json(
         { error: 'The deadline for blind-prior submissions has passed.' },
         { status: 410 }

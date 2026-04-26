@@ -17,10 +17,7 @@ import { createLogger } from '@/lib/utils/logger';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { getDocumentContent } from '@/lib/utils/encryption';
 import { buildDocumentAccessFilter } from '@/lib/utils/document-access';
-import {
-  runCrossReferenceAgent,
-  type CrossRefInputDoc,
-} from '@/lib/agents/cross-reference';
+import { runCrossReferenceAgent, type CrossRefInputDoc } from '@/lib/agents/cross-reference';
 
 const log = createLogger('DealCrossReference');
 
@@ -36,10 +33,7 @@ async function getOrgId(userId: string): Promise<string | null> {
   }
 }
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id: dealId } = await params;
     const supabase = await createClient();
@@ -73,10 +67,7 @@ export async function GET(
   }
 }
 
-export async function POST(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id: dealId } = await params;
     const supabase = await createClient();
@@ -208,7 +199,10 @@ export async function POST(
               analysisId: d.analysisId,
               overallScore: d.overallScore,
             })) as unknown as Prisma.InputJsonValue,
-            findings: { findings: [], summary: 'Cross-reference run failed.' } as unknown as Prisma.InputJsonValue,
+            findings: {
+              findings: [],
+              summary: 'Cross-reference run failed.',
+            } as unknown as Prisma.InputJsonValue,
             conflictCount: 0,
             highSeverityCount: 0,
             status: 'error',

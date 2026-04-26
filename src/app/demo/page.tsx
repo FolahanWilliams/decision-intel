@@ -31,15 +31,9 @@ import { NoiseDistributionViz } from '@/components/marketing/how-it-works/NoiseD
 import { DQIBadge } from '@/components/ui/DQIBadge';
 import { Reveal } from '@/components/ui/Reveal';
 import { PasteAuditResults } from '@/components/marketing/demo/PasteAuditResults';
-import {
-  RedactionPreModal,
-  type RedactionTrailContext,
-} from '@/components/ui/RedactionPreModal';
+import { RedactionPreModal, type RedactionTrailContext } from '@/components/ui/RedactionPreModal';
 import { scanForPii, type ScanResult } from '@/lib/utils/redaction-scanner';
-import {
-  postRedactionTrail,
-  savePlaceholderMap,
-} from '@/lib/utils/redaction-trail';
+import { postRedactionTrail, savePlaceholderMap } from '@/lib/utils/redaction-trail';
 import { trackEvent } from '@/lib/analytics/track';
 import type { AnalysisResult } from '@/types';
 import { RoleSamplePicker } from '@/components/samples/RoleSamplePicker';
@@ -234,8 +228,7 @@ export default function DemoPage() {
   // Handle paste mode submission — runs the REAL 12-node pipeline via
   // /api/demo/run. Displays a staged progress animation while the audit
   // is running, then hands the result to <PasteAuditResults>.
-  const runPasteAudit = useCallback(
-    async (textToAudit: string, trail?: RedactionTrailContext) => {
+  const runPasteAudit = useCallback(async (textToAudit: string, trail?: RedactionTrailContext) => {
     trackEvent('demo_paste_analyzed', { textLength: textToAudit.length });
     setPasteAuditing(true);
     setPasteError(null);
@@ -295,9 +288,7 @@ export default function DemoPage() {
       setPasteError(msg);
       setPasteAuditing(false);
     }
-  },
-    []
-  );
+  }, []);
 
   // Click handler — gates the run on the redaction modal when PII is detected.
   const handlePasteAnalyze = useCallback(() => {

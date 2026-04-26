@@ -154,10 +154,10 @@ export function BlindPriorAggregateView({ aggregate, phase }: Props) {
                           bucket.from >= 60
                             ? 'var(--accent-primary)'
                             : bucket.from >= 40
-                            ? '#3b82f6'
-                            : bucket.from >= 20
-                            ? '#eab308'
-                            : '#ef4444',
+                              ? '#3b82f6'
+                              : bucket.from >= 20
+                                ? '#eab308'
+                                : '#ef4444',
                         transition: 'width 0.4s ease',
                       }}
                     />
@@ -172,12 +172,10 @@ export function BlindPriorAggregateView({ aggregate, phase }: Props) {
       {/* Top risk frequency */}
       <div className="card" style={{ background: 'var(--bg-card)' }}>
         <div className="card-header">
-          <h3 style={{ margin: 0, color: 'var(--text-primary)', fontSize: 14 }}>
-            Risks raised
-          </h3>
+          <h3 style={{ margin: 0, color: 'var(--text-primary)', fontSize: 14 }}>Risks raised</h3>
           <p style={{ margin: '2px 0 0', color: 'var(--text-muted)', fontSize: 12 }}>
-            {totalRiskCount} risk statement{totalRiskCount === 1 ? '' : 's'} across {aggregate.count}{' '}
-            participant{aggregate.count === 1 ? '' : 's'}.
+            {totalRiskCount} risk statement{totalRiskCount === 1 ? '' : 's'} across{' '}
+            {aggregate.count} participant{aggregate.count === 1 ? '' : 's'}.
           </p>
         </div>
         <div className="card-body" style={{ paddingTop: 0 }}>

@@ -2,7 +2,15 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ShieldCheck, Plus, RefreshCw, Trash2, CheckCircle, CircleAlert, XCircle } from 'lucide-react';
+import {
+  ShieldCheck,
+  Plus,
+  RefreshCw,
+  Trash2,
+  CheckCircle,
+  CircleAlert,
+  XCircle,
+} from 'lucide-react';
 
 type OrgRef = { id: string; name: string; slug?: string | null };
 
@@ -22,7 +30,10 @@ interface Props {
   orgs: OrgRef[];
 }
 
-const STATUS_STYLES: Record<SsoConfig['status'], { label: string; badge: string; icon: typeof CheckCircle }> = {
+const STATUS_STYLES: Record<
+  SsoConfig['status'],
+  { label: string; badge: string; icon: typeof CheckCircle }
+> = {
   active: {
     label: 'Active',
     badge: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
@@ -131,7 +142,11 @@ export function SsoAdminClient({ orgs }: Props) {
 
   const handleDelete = async (id: string, domain: string) => {
     if (!activeOrgId) return;
-    if (!confirm(`Remove SSO configuration for ${domain}? Users signing in from this domain will fall back to password / Google OAuth.`)) {
+    if (
+      !confirm(
+        `Remove SSO configuration for ${domain}? Users signing in from this domain will fall back to password / Google OAuth.`
+      )
+    ) {
       return;
     }
     try {
@@ -154,8 +169,8 @@ export function SsoAdminClient({ orgs }: Props) {
           <div>
             <h1>SAML Single Sign-On</h1>
             <p className="text-sm text-muted mt-1">
-              Manage SAML providers for your organisation. Once active, employees signing in from the
-              registered domain are redirected to your Identity Provider.
+              Manage SAML providers for your organisation. Once active, employees signing in from
+              the registered domain are redirected to your Identity Provider.
             </p>
           </div>
         </div>
@@ -266,16 +281,17 @@ export function SsoAdminClient({ orgs }: Props) {
         </div>
         <div className="card-body">
           {error && (
-            <div
-              className="text-sm mb-4"
-              style={{ color: 'var(--severity-high)' }}
-            >
+            <div className="text-sm mb-4" style={{ color: 'var(--severity-high)' }}>
               {error}
             </div>
           )}
 
           {showCreate && activeOrgId && (
-            <form onSubmit={handleCreate} className="mb-6 space-y-3 p-4" style={{ background: 'var(--bg-elevated)', borderRadius: 'var(--radius-md)' }}>
+            <form
+              onSubmit={handleCreate}
+              className="mb-6 space-y-3 p-4"
+              style={{ background: 'var(--bg-elevated)', borderRadius: 'var(--radius-md)' }}
+            >
               <div>
                 <label className="text-xs text-muted" htmlFor="sso-domain">
                   Email domain (e.g. acme.com)
@@ -371,7 +387,12 @@ export function SsoAdminClient({ orgs }: Props) {
                 </div>
               )}
               <div className="flex gap-2">
-                <button type="submit" className="button button-primary" disabled={creating} style={{ fontSize: 13 }}>
+                <button
+                  type="submit"
+                  className="button button-primary"
+                  disabled={creating}
+                  style={{ fontSize: 13 }}
+                >
                   {creating ? 'Saving…' : 'Register (pending)'}
                 </button>
                 <button
@@ -418,9 +439,7 @@ export function SsoAdminClient({ orgs }: Props) {
                           >
                             <StatusIcon size={10} /> {statusStyle.label}
                           </span>
-                          <span
-                            className="text-[10px] uppercase tracking-wider text-muted"
-                          >
+                          <span className="text-[10px] uppercase tracking-wider text-muted">
                             {c.protocol}
                           </span>
                         </div>
@@ -430,9 +449,7 @@ export function SsoAdminClient({ orgs }: Props) {
                         <div className="text-xs text-muted mt-1">
                           Provider ID: <code className="text-xs">{c.providerId}</code>
                         </div>
-                        {c.notes && (
-                          <div className="text-xs text-muted mt-2 italic">{c.notes}</div>
-                        )}
+                        {c.notes && <div className="text-xs text-muted mt-2 italic">{c.notes}</div>}
                       </div>
                       <div className="flex flex-col gap-2">
                         {c.status !== 'active' && (

@@ -16,7 +16,10 @@ const log = createLogger('SsoInitiate');
 // per client IP to prevent probing of which domains are SSO-enabled.
 
 function extractDomain(email: string): string | null {
-  const match = email.trim().toLowerCase().match(/^[^@\s]+@([a-z0-9.-]+\.[a-z]{2,})$/);
+  const match = email
+    .trim()
+    .toLowerCase()
+    .match(/^[^@\s]+@([a-z0-9.-]+\.[a-z]{2,})$/);
   return match?.[1] ?? null;
 }
 

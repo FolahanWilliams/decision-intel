@@ -20,10 +20,7 @@ import { computeTextDiff, collapseUnchanged } from '@/lib/utils/text-diff';
 
 const log = createLogger('DocumentDiff');
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const url = new URL(request.url);
@@ -94,8 +91,7 @@ export async function GET(
     }
 
     // Decide direction: lower versionNumber = before, higher = after.
-    const before =
-      (docA.versionNumber ?? 1) <= (docB.versionNumber ?? 1) ? docA : docB;
+    const before = (docA.versionNumber ?? 1) <= (docB.versionNumber ?? 1) ? docA : docB;
     const after = before === docA ? docB : docA;
 
     const beforeText = getDocumentContent(before as Parameters<typeof getDocumentContent>[0]);

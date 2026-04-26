@@ -40,10 +40,15 @@ import { getBiasEducation } from '@/lib/constants/bias-education';
 import { getCrossFrameworkRisk } from '@/lib/compliance/bias-regulation-map';
 import { PIPELINE_NODES } from '@/lib/data/pipeline-nodes';
 import { createLogger } from '@/lib/utils/logger';
+import { aggregateBlindPriors, type BlindPriorRow } from '@/lib/learning/blind-prior-aggregate';
+import { computeCounterfactuals } from '@/lib/analysis/counterfactual';
+import { getOrgBrierStats, brierCategory } from '@/lib/learning/brier-scoring';
 import {
-  aggregateBlindPriors,
-  type BlindPriorRow,
-} from '@/lib/learning/blind-prior-aggregate';
+  getUserPlan,
+  getOrgPlan,
+  getRetentionDaysForUser,
+  getRetentionDaysForOrg,
+} from '@/lib/utils/plan-limits';
 
 const log = createLogger('ProvenanceRecordData');
 
@@ -66,6 +71,50 @@ export interface ProvenanceRecordData {
    * pre-IC survey — the DPR section then renders a one-line note.
    */
   blindPriorAggregates: BlindPriorRoomAggregate[];
+  /**
+   * Counterfactual ROI block (DPR v2, locked 2026-04-26 P2 #1 from
+   * NotebookLM "highest-ROI DPR additions" synthesis). Top-3 bias
+   * scenarios ranked by expected improvement, with sample-size + Wilson
+   * confidence + monetary anchor disclosure. The PDF renders this on
+   * page 1 below RECOMMENDED NEXT ACTION so the GC sees value-protected
+   * before they read flagged risks. Null when no historical-outcome
+   * data exists for the org (free-tier or first-audit cold start).
+   */
+  counterfactualImpact?: CounterfactualImpactSummary;
+  /**
+   * Human-in-the-loop / reviewer-decisions log (DPR v2, P2 #2). Captures
+   * what the reviewer DID with the audit — which mitigations they
+   * accepted, which flags they dismissed (with reason), any logged
+   * dissent, and the final sign-off verdict. The exact human-oversight
+   * record EU AI Act Art 14 + Basel III Pillar 2 ICAAP qualitative
+   * documentation requires. Null until a reviewer has acted on the
+   * audit; the cover renders an empty signature block in that case.
+   */
+  reviewerDecisions?: ReviewerDecisionLog;
+  /**
+   * Org calibration / Decision Debt strip (DPR v2, P2 #3). The
+   * Cloverpop-defense field: shows the DQI in this audit was
+   * recalibrated against THIS org's outcome history, not a generic
+   * benchmark. Null on cold-start orgs with no closed outcomes.
+   */
+  orgCalibration?: OrgCalibrationSummary;
+  /**
+   * Data lifecycle / retention policy footer (DPR v2, P2 #4). Always
+   * populated — this is the procurement-grade contractual statement of
+   * what happens to the source document, the audit, and the DPR after
+   * it leaves the platform. Pulled from plan-tier defaults +
+   * trust-copy + company-info constants.
+   */
+  dataLifecycle: DataLifecyclePolicy;
+  /**
+   * Client-safe export marker (DPR v2, P2 #5). Populated only when the
+   * generator was invoked with `{ clientSafe: true }` — entity names,
+   * amounts, and person names in the meta strip have been replaced
+   * with stable placeholders so the artefact can be shared with an LP,
+   * regulator, or third-party assurance firm without leaking the
+   * underlying competitive intelligence. Null on standard exports.
+   */
+  clientSafe?: ClientSafeExportMeta;
   /**
    * Decision Package member roster (4.4 deep) — populated only when the
    * DPR was generated from a Decision Package root rather than a single
@@ -286,6 +335,117 @@ export interface BlindPriorRoomAggregate {
   outcomeReported: boolean;
 }
 
+/**
+ * Counterfactual scenario row inside the DPR v2 Counterfactual Impact
+ * block. Mirrors `CounterfactualScenario` from
+ * src/lib/analysis/counterfactual.ts but reduced to the shape a
+ * GC-grade record needs: bias label, expected improvement, sample size,
+ * Wilson confidence, monetary anchor (where the analysis carries a
+ * DecisionFrame.monetaryValue, otherwise null).
+ */
+export interface CounterfactualScenarioRow {
+  biasType: string;
+  biasLabel: string;
+  expectedImprovementPct: number;
+  historicalSampleSize: number;
+  confidence: number;
+  estimatedMonetaryImpact: number | null;
+  currency: string;
+}
+
+/**
+ * Counterfactual ROI summary surfaced on page 1 of the DPR. The
+ * monetaryAnchorAvailable flag drives the "Estimates capped to
+ * percentage points only — no monetary anchor on this audit" disclaimer
+ * we render when the analysis lacks a DecisionFrame value.
+ */
+export interface CounterfactualImpactSummary {
+  scenarios: CounterfactualScenarioRow[];
+  aggregateImprovementPct: number;
+  weightedImprovementPct: number;
+  monetaryAnchorAvailable: boolean;
+  dataAsOf: string;
+  /** Honest disclosure shown next to the aggregate number. */
+  methodologyNote: string;
+}
+
+/**
+ * Reviewer decisions / HITL log. Captures the human-oversight artefact
+ * EU AI Act Art 14 + Basel III Pillar 2 ICAAP require. Empty arrays
+ * are valid (a reviewer might have accepted nothing or dismissed
+ * nothing); the discriminator that says "a human reviewed this" is the
+ * non-null `reviewedAt` timestamp.
+ */
+export interface ReviewerDecisionLog {
+  reviewerName: string | null;
+  reviewerRole: string | null;
+  reviewedAt: string | null;
+  acceptedMitigations: Array<{ biasLabel: string; mitigation: string }>;
+  dismissedFlags: Array<{ biasLabel: string; reason: string }>;
+  dissentLog: Array<{ source: string; objection: string; resolution: string | null }>;
+  finalSignOff: 'approved' | 'approved_with_conditions' | 'deferred' | 'rejected' | null;
+  signOffNote: string | null;
+}
+
+/**
+ * Org calibration / Decision Debt summary. Cloverpop-defense block —
+ * proves the DQI shown is calibrated against THIS org's outcome
+ * history, not a generic global benchmark. Null fields are honest
+ * disclosure: a cold-start org with zero closed outcomes renders the
+ * "calibration pending" note rather than an invented number.
+ */
+export interface OrgCalibrationSummary {
+  decisionsTracked: number;
+  outcomesClosed: number;
+  meanBrierScore: number | null;
+  brierCategory: string | null;
+  recalibratedFromOriginal: {
+    originalScore: number;
+    recalibratedScore: number;
+    delta: number;
+  } | null;
+  calibrationNote: string;
+}
+
+/**
+ * Data lifecycle / retention policy footer. Single source of truth for
+ * what happens to source documents + audits + the DPR itself once the
+ * artefact leaves the platform. Pulled from plan-tier defaults
+ * (src/lib/stripe.ts) + trust-copy.ts + company-info.ts.
+ */
+export interface DataLifecyclePolicy {
+  retentionDays: number;
+  retentionTier: string;
+  encryptionAtRest: string;
+  encryptionInTransit: string;
+  legalHoldAvailable: boolean;
+  rightToErasure: string;
+  subProcessors: string[];
+  productionRegion: string;
+  retentionContact: string;
+  /**
+   * Deferred-but-credible roadmap items the procurement reader may
+   * ask about — surfaced honestly on the footer with a "roadmap"
+   * tag so a GC doesn't infer they're live today.
+   */
+  roadmap: string[];
+}
+
+/**
+ * Client-safe export marker. Populated only when `generate()` was
+ * invoked with `{ clientSafe: true }` — counts how many entities,
+ * amounts, and person names were replaced with stable placeholders in
+ * the rendered meta strip + summary + reviewer notes. Null on
+ * standard exports.
+ */
+export interface ClientSafeExportMeta {
+  enabled: boolean;
+  entitiesMasked: number;
+  amountsMasked: number;
+  namesMasked: number;
+  scrubAppliedAt: string;
+}
+
 // ─── Model-lineage constant ──────────────────────────────────────────
 // Reflects the cost-tier routing documented in CLAUDE.md (Apr 2026).
 // Bump the note when routing changes so the record declares the
@@ -331,6 +491,151 @@ function getPromptFileFingerprint(): string {
     log.warn('Could not hash prompts.ts as fallback fingerprint:', err);
     return 'FILE_NOT_AVAILABLE';
   }
+}
+
+// ─── DPR v2 helper builders (locked 2026-04-26 P2) ────────────────────
+// One builder per new field family. Each is defensive: it returns
+// `undefined` (or a safe default for `dataLifecycle`, which is always
+// populated) when the data isn't available rather than throwing — the
+// PDF renderer skips the section honestly when given `undefined`.
+
+/** Build the Counterfactual Impact summary from the existing
+ *  computeCounterfactuals helper. Returns `undefined` for the cold-start
+ *  case (no orgId, no historical outcomes) so the PDF skips the section
+ *  with an honest "no historical baseline yet" disclosure. */
+async function buildCounterfactualImpact(
+  analysisId: string,
+  orgId: string | null
+): Promise<CounterfactualImpactSummary | undefined> {
+  if (!orgId) return undefined;
+  try {
+    const cf = await computeCounterfactuals(analysisId, orgId);
+    if (cf.scenarios.length === 0) return undefined;
+    const scenarios: CounterfactualScenarioRow[] = cf.scenarios.slice(0, 3).map(s => ({
+      biasType: s.biasRemoved,
+      biasLabel: formatBiasLabel(s.biasRemoved),
+      expectedImprovementPct: s.expectedImprovement,
+      historicalSampleSize: s.historicalSampleSize,
+      confidence: s.confidence,
+      estimatedMonetaryImpact: s.estimatedMonetaryImpact,
+      currency: s.currency,
+    }));
+    const monetaryAnchorAvailable = scenarios.some(s => s.estimatedMonetaryImpact != null);
+    const methodologyNote = monetaryAnchorAvailable
+      ? 'Monetary anchors derived from the linked DecisionFrame.monetaryValue. Confidence reflects historical sample size (Wilson score) weighted by the per-org CausalEdge strength.'
+      : 'Percentage-point estimates only — no monetary anchor on this audit. Confidence reflects historical sample size (Wilson score) weighted by per-org causal-edge strength.';
+    return {
+      scenarios,
+      aggregateImprovementPct: cf.aggregateImprovement,
+      weightedImprovementPct: cf.weightedImprovement,
+      monetaryAnchorAvailable,
+      dataAsOf: cf.dataAsOf,
+      methodologyNote,
+    };
+  } catch (err) {
+    log.warn(
+      'Counterfactual impact lookup for DPR failed (treating as cold-start):',
+      err instanceof Error ? err.message : String(err)
+    );
+    return undefined;
+  }
+}
+
+/** Build the Org Calibration / Decision Debt summary. Pulls Brier
+ *  stats + the analysis's own `recalibratedDqi` JSON field. Null is the
+ *  honest answer for cold-start orgs with no closed outcomes. */
+async function buildOrgCalibration(
+  orgId: string | null,
+  recalibratedDqi: unknown
+): Promise<OrgCalibrationSummary | undefined> {
+  if (!orgId) return undefined;
+  let stats: Awaited<ReturnType<typeof getOrgBrierStats>> | null = null;
+  try {
+    stats = await getOrgBrierStats(prisma, orgId, 365);
+  } catch (err) {
+    log.warn(
+      'Brier stats lookup for DPR failed (likely schema drift or empty org):',
+      err instanceof Error ? err.message : String(err)
+    );
+    return undefined;
+  }
+  if (!stats || stats.count === 0) return undefined;
+  const brierCat = stats.avg > 0 ? brierCategory(stats.avg) : null;
+  let recalibratedFromOriginal: OrgCalibrationSummary['recalibratedFromOriginal'] = null;
+  if (
+    recalibratedDqi &&
+    typeof recalibratedDqi === 'object' &&
+    'originalScore' in recalibratedDqi &&
+    'recalibratedScore' in recalibratedDqi
+  ) {
+    const r = recalibratedDqi as { originalScore: number; recalibratedScore: number };
+    recalibratedFromOriginal = {
+      originalScore: r.originalScore,
+      recalibratedScore: r.recalibratedScore,
+      delta: Math.round((r.recalibratedScore - r.originalScore) * 10) / 10,
+    };
+  }
+  const calibrationNote = recalibratedFromOriginal
+    ? `DQI shown is calibrated against this organisation's outcome history (${stats.count} closed decisions, mean Brier ${stats.avg.toFixed(3)} · ${brierCat ?? 'unscored'}). Original-vs-recalibrated delta: ${recalibratedFromOriginal.delta >= 0 ? '+' : ''}${recalibratedFromOriginal.delta}.`
+    : `Org calibration baseline: ${stats.count} closed decisions tracked, mean Brier ${stats.avg.toFixed(3)} (${brierCat ?? 'unscored'}). Recalibration applied only after the outcome flywheel reaches a per-org statistical floor; this audit shows the absolute DQI.`;
+  return {
+    decisionsTracked: stats.count,
+    outcomesClosed: stats.count,
+    meanBrierScore: stats.avg,
+    brierCategory: brierCat,
+    recalibratedFromOriginal,
+    calibrationNote,
+  };
+}
+
+/** Build the Data Lifecycle / Retention Policy footer. Always populated
+ *  — every DPR carries this footer because every reader is procurement-
+ *  facing. Pulls plan-tier defaults + trust-copy + company-info. */
+async function buildDataLifecycle(
+  userId: string,
+  orgId: string | null
+): Promise<DataLifecyclePolicy> {
+  let retentionDays = 90;
+  let retentionTier = 'individual';
+  try {
+    if (orgId) {
+      const plan = await getOrgPlan(orgId);
+      retentionTier = plan;
+      retentionDays = await getRetentionDaysForOrg(orgId);
+    } else if (userId) {
+      const plan = await getUserPlan(userId);
+      retentionTier = plan;
+      retentionDays = await getRetentionDaysForUser(userId);
+    }
+  } catch (err) {
+    log.warn(
+      'Plan/retention lookup for DPR footer failed (using safe defaults):',
+      err instanceof Error ? err.message : String(err)
+    );
+  }
+  return {
+    retentionDays,
+    retentionTier,
+    encryptionAtRest: 'AES-256-GCM',
+    encryptionInTransit: 'TLS 1.2+',
+    legalHoldAvailable: true,
+    rightToErasure:
+      'GDPR Art. 17 (Right to Erasure) · NDPR Art. 23 (Data Subject Rights) · PoPIA s.24',
+    subProcessors: [
+      'Vercel (US-region production)',
+      'Supabase',
+      'Resend (transactional email)',
+      'Cloudflare (DNS + email routing)',
+    ],
+    productionRegion:
+      'US (Vercel + Supabase). EU + Multi-region available on Enterprise — Enterprise-conversation residency, not production today.',
+    retentionContact: 'team@decision-intel.com',
+    roadmap: [
+      'Private-key signing of the DPR (planned Q3 2026)',
+      'RFC 3161 Time-Stamping Authority (planned Q3 2026)',
+      'EU-region production residency (Enterprise SLA on request)',
+    ],
+  };
 }
 
 // ─── Main assembler ──────────────────────────────────────────────────
@@ -511,11 +816,26 @@ export async function assembleProvenanceRecordData(
     );
   }
 
+  // DPR v2 enrichment (locked 2026-04-26 P2 from NotebookLM
+  // highest-ROI synthesis). Each block is independently fault-tolerant
+  // — failure to populate one returns undefined and the PDF skips the
+  // section honestly rather than fabricating data.
+  const orgId = analysis.document.orgId ?? null;
+  const userId = analysis.document.userId;
+  const [counterfactualImpact, orgCalibration, dataLifecycle] = await Promise.all([
+    buildCounterfactualImpact(analysis.id, orgId),
+    buildOrgCalibration(
+      orgId,
+      (analysis as unknown as { recalibratedDqi?: unknown }).recalibratedDqi ?? null
+    ),
+    buildDataLifecycle(userId, orgId),
+  ]);
+
   return {
     analysisId: analysis.id,
     documentId: analysis.document.id,
-    userId: analysis.document.userId,
-    orgId: analysis.document.orgId ?? null,
+    userId,
+    orgId,
     promptFingerprint,
     inputHash,
     modelLineage: CURRENT_MODEL_LINEAGE,
@@ -524,7 +844,17 @@ export async function assembleProvenanceRecordData(
     regulatoryMapping,
     pipelineLineage,
     blindPriorAggregates,
-    schemaVersion: 1,
+    counterfactualImpact,
+    // reviewerDecisions intentionally undefined in the live assembler —
+    // the capture UI hasn't shipped, so the only honest answer for the
+    // live path is "no reviewer-decision record on this audit". The
+    // SPECIMEN seeds a plausible value so a procurement reader can see
+    // what the section will look like once the UI ships.
+    reviewerDecisions: undefined,
+    orgCalibration,
+    dataLifecycle,
+    clientSafe: undefined,
+    schemaVersion: 2,
     generatedAt: new Date(),
     meta: {
       filename: analysis.document.filename,
@@ -613,8 +943,9 @@ export async function assembleProvenanceRecordDataForPackage(
       member: m,
       analysis: m.document.analyses[0] ?? null,
     }))
-    .filter((x): x is { member: typeof x.member; analysis: NonNullable<typeof x.analysis> } =>
-      x.analysis !== null
+    .filter(
+      (x): x is { member: typeof x.member; analysis: NonNullable<typeof x.analysis> } =>
+        x.analysis !== null
     );
 
   let baseData: ProvenanceRecordData;
@@ -648,7 +979,12 @@ export async function assembleProvenanceRecordDataForPackage(
         academicAnchor: node.academicAnchor,
       })),
       blindPriorAggregates: [],
-      schemaVersion: 1,
+      counterfactualImpact: undefined,
+      reviewerDecisions: undefined,
+      orgCalibration: undefined,
+      dataLifecycle: await buildDataLifecycle('', null),
+      clientSafe: undefined,
+      schemaVersion: 2,
       generatedAt: new Date(),
       meta: {
         filename: pkg.name,
@@ -882,7 +1218,12 @@ export async function assembleProvenanceRecordDataForDeal(
         academicAnchor: node.academicAnchor,
       })),
       blindPriorAggregates: [],
-      schemaVersion: 1,
+      counterfactualImpact: undefined,
+      reviewerDecisions: undefined,
+      orgCalibration: undefined,
+      dataLifecycle: await buildDataLifecycle('', null),
+      clientSafe: undefined,
+      schemaVersion: 2,
       generatedAt: new Date(),
       meta: {
         filename: deal.name,
@@ -961,9 +1302,7 @@ export async function assembleProvenanceRecordDataForDeal(
               : 'F';
 
   // Composite input hash — sha256 of dealId + sorted member input hashes.
-  const inputHashes = deal.documents
-    .map(d => d.contentHash || d.id)
-    .sort();
+  const inputHashes = deal.documents.map(d => d.contentHash || d.id).sort();
   const dealInputHash = createHash('sha256')
     .update(`deal::${deal.id}::${inputHashes.join('::')}`)
     .digest('hex');

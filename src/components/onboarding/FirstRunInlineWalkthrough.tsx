@@ -31,11 +31,7 @@ import {
   Play,
   ShieldCheck,
 } from 'lucide-react';
-import {
-  bundlesForRole,
-  type SampleBundle,
-  type SampleRole,
-} from '@/lib/data/sample-bundles';
+import { bundlesForRole, type SampleBundle, type SampleRole } from '@/lib/data/sample-bundles';
 
 const STORAGE_DISMISSED = 'di-first-run-walkthrough-dismissed';
 
@@ -64,10 +60,8 @@ const ROLE_TAG_LABEL: Record<SampleRole, string> = {
 };
 
 const ROLE_PITCH: Record<SampleRole, string> = {
-  cso:
-    'Three role-matched memos: a market-entry recommendation, a board-level product-defer call, and a strategic acquisition with a load-bearing conflict. Pick whichever sits closest to a decision you actually face.',
-  ma:
-    'Three IC-grade memos: a synergy-and-integration deal, a bank-regulatory diligence note, and a cross-border reverse merger. Pasting any of them and clicking Run produces a procurement-grade audit.',
+  cso: 'Three role-matched memos: a market-entry recommendation, a board-level product-defer call, and a strategic acquisition with a load-bearing conflict. Pick whichever sits closest to a decision you actually face.',
+  ma: 'Three IC-grade memos: a synergy-and-integration deal, a bank-regulatory diligence note, and a cross-border reverse merger. Pasting any of them and clicking Run produces a procurement-grade audit.',
   bizops:
     'Three planning-grade memos: a buy-vs-build re-platform, an FY26 R&D budget recommendation, and a regional-hub shutdown call. The biases the audit catches map onto the patterns that produce miss-the-quarter forecasts.',
   pe_vc:
@@ -133,8 +127,7 @@ export function FirstRunInlineWalkthrough({ visible, onLoadAndRun, onLoadOnly }:
   return (
     <div
       style={{
-        background:
-          'linear-gradient(135deg, rgba(22,163,74,0.06), rgba(59,130,246,0.04))',
+        background: 'linear-gradient(135deg, rgba(22,163,74,0.06), rgba(59,130,246,0.04))',
         border: '1px solid rgba(22,163,74,0.25)',
         borderRadius: 'var(--radius-lg)',
         padding: 'var(--spacing-lg)',

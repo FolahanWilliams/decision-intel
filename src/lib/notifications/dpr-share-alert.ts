@@ -56,10 +56,7 @@ export async function notifyExternalDprDownload(
 ): Promise<'fired' | 'skipped_self_download' | 'skipped_no_founder_email' | 'failed'> {
   // Skip if the downloader IS the original auditor — this is just the user
   // re-downloading their own artefact, not an external share.
-  if (
-    params.originalAuditorUserId &&
-    params.downloaderUserId === params.originalAuditorUserId
-  ) {
+  if (params.originalAuditorUserId && params.downloaderUserId === params.originalAuditorUserId) {
     return 'skipped_self_download';
   }
 
@@ -104,16 +101,15 @@ export async function notifyExternalDprDownload(
   try {
     const result = await sendEmail({ to: founderEmail, subject, html });
     if (result === 'sent' || result === 'dry_run') {
-      log.info(`DPR external-share alert ${result} for ${params.resourceType}/${params.resourceId}`);
+      log.info(
+        `DPR external-share alert ${result} for ${params.resourceType}/${params.resourceId}`
+      );
       return 'fired';
     }
     log.warn(`DPR external-share alert send failed (sendEmail returned ${result})`);
     return 'failed';
   } catch (err) {
-    log.warn(
-      'DPR external-share alert failed:',
-      err instanceof Error ? err.message : String(err)
-    );
+    log.warn('DPR external-share alert failed:', err instanceof Error ? err.message : String(err));
     return 'failed';
   }
 }

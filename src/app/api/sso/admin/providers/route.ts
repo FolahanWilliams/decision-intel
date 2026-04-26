@@ -15,10 +15,7 @@ const log = createLogger('SsoAdmin');
 // Access: super-admin (ADMIN_USER_IDS) OR a TeamMember with role='admin'
 // in the targeted org.
 
-async function authoriseOrgAdmin(
-  userId: string,
-  orgId: string
-): Promise<boolean> {
+async function authoriseOrgAdmin(userId: string, orgId: string): Promise<boolean> {
   if (isAdminUserId(userId)) return true;
   const membership = await prisma.teamMember
     .findFirst({

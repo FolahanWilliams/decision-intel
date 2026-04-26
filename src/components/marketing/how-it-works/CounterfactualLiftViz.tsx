@@ -63,8 +63,7 @@ export function CounterfactualLiftViz() {
   const [mitigated, setMitigated] = useState<Record<string, boolean>>({});
 
   const totalLift = useMemo(
-    () =>
-      BIASES.reduce((sum, b) => (mitigated[b.id] ? sum + b.liftIfMitigated : sum), 0),
+    () => BIASES.reduce((sum, b) => (mitigated[b.id] ? sum + b.liftIfMitigated : sum), 0),
     [mitigated]
   );
   const currentDqi = Math.min(100, BASE_DQI + totalLift);
@@ -126,7 +125,11 @@ export function CounterfactualLiftViz() {
             {BIASES.map(bias => {
               const isMitigated = !!mitigated[bias.id];
               const sevColor =
-                bias.severity === 'high' ? C.red : bias.severity === 'medium' ? C.amber : C.slate400;
+                bias.severity === 'high'
+                  ? C.red
+                  : bias.severity === 'medium'
+                    ? C.amber
+                    : C.slate400;
               return (
                 <li key={bias.id}>
                   <button
@@ -256,9 +259,9 @@ export function CounterfactualLiftViz() {
               lineHeight: 1.5,
             }}
           >
-            Lift weights are calibrated against the same rubric as the live DQI calculation, so
-            the same memo always returns the same number. The mitigated ceiling stays in the
-            D-range because the underlying decision had structural failures beyond bias.
+            Lift weights are calibrated against the same rubric as the live DQI calculation, so the
+            same memo always returns the same number. The mitigated ceiling stays in the D-range
+            because the underlying decision had structural failures beyond bias.
           </div>
         </div>
       </div>
@@ -272,8 +275,7 @@ export function CounterfactualLiftViz() {
             borderRadius: 16,
             padding: '28px 24px 24px',
             textAlign: 'center',
-            boxShadow:
-              '0 8px 24px -8px rgba(15,23,42,0.10), 0 2px 4px rgba(15,23,42,0.04)',
+            boxShadow: '0 8px 24px -8px rgba(15,23,42,0.10), 0 2px 4px rgba(15,23,42,0.04)',
           }}
         >
           <div
@@ -465,9 +467,7 @@ function DqiGauge({
         >
           {grade.letter}
         </motion.span>
-        <span style={{ fontSize: 12.5, fontWeight: 600, color: C.slate500 }}>
-          {grade.label}
-        </span>
+        <span style={{ fontSize: 12.5, fontWeight: 600, color: C.slate500 }}>{grade.label}</span>
       </div>
     </div>
   );

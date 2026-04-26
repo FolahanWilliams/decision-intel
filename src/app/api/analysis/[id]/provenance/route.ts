@@ -16,10 +16,7 @@ import { assembleProvenanceRecordData } from '@/lib/reports/provenance-record-da
 
 const log = createLogger('ProvenancePreview');
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const supabase = await createClient();

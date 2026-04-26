@@ -62,7 +62,7 @@ const FRAMEWORKS: FrameworkPosture[] = [
     category: 'Trust Services',
     certificationStatus: 'targeted',
     certificationNote:
-      'Hosted on Vercel + Supabase (both SOC 2 Type II attested). Decision Intel\'s own product-level Type I audit targeted Q4 2026 with the Type II observation window opening immediately after.',
+      "Hosted on Vercel + Supabase (both SOC 2 Type II attested). Decision Intel's own product-level Type I audit targeted Q4 2026 with the Type II observation window opening immediately after.",
     controls: [
       {
         controlId: 'CC6.1',
@@ -215,7 +215,7 @@ const FRAMEWORKS: FrameworkPosture[] = [
     category: 'AI Governance',
     certificationStatus: 'self_assessed',
     certificationNote:
-      'Aligned with EU AI Act Articles 10, 13, 14, and 15. High-risk decision-support obligations enforceable Aug 2026; the Decision Provenance Record is engineered to satisfy Art 14 record-keeping by design. No external AI Act conformity assessment exists yet — the framework\'s assessment regime is still being defined by the AI Office.',
+      "Aligned with EU AI Act Articles 10, 13, 14, and 15. High-risk decision-support obligations enforceable Aug 2026; the Decision Provenance Record is engineered to satisfy Art 14 record-keeping by design. No external AI Act conformity assessment exists yet — the framework's assessment regime is still being defined by the AI Office.",
     controls: [
       {
         controlId: 'Art. 10',
@@ -268,10 +268,7 @@ const STATUS_CONFIG = {
  * "Attested" — a CISO scanning the page must not be able to
  * misinterpret a feature mapping as a third-party certification.
  */
-const CERT_CONFIG: Record<
-  CertificationStatus,
-  { label: string; color: string; bg: string }
-> = {
+const CERT_CONFIG: Record<CertificationStatus, { label: string; color: string; bg: string }> = {
   self_assessed: {
     label: 'Self-assessed',
     color: '#d97706', // amber

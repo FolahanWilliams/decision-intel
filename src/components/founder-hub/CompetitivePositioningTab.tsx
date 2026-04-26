@@ -1,6 +1,15 @@
 'use client';
 
-import { Crosshair, Target, Lock, BarChart3, MessageSquare, Shield, Map, Sparkles } from 'lucide-react';
+import {
+  Crosshair,
+  Target,
+  Lock,
+  BarChart3,
+  MessageSquare,
+  Shield,
+  Map,
+  Sparkles,
+} from 'lucide-react';
 import { CategoryContrastPanels } from './competitive/CategoryContrastPanels';
 import { CloverpopComparisonGrid } from './competitive/CloverpopComparisonGrid';
 import { MoatLayersStack } from './competitive/MoatLayersStack';

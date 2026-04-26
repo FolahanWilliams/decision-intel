@@ -145,7 +145,7 @@ export function LegalHoldStatusChip({
               </DialogTitle>
               <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0 }}>
                 {isHeld
-                  ? 'Releasing the hold removes retention protection. The document re-enters the cron\'s normal soft-delete + hard-purge schedule.'
+                  ? "Releasing the hold removes retention protection. The document re-enters the cron's normal soft-delete + hard-purge schedule."
                   : 'Held documents are preserved from retention enforcement. Both soft-delete and hard-purge skip them until the hold is released.'}
               </p>
             </DialogHeader>

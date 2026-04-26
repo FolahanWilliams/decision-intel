@@ -1404,8 +1404,7 @@ export const DEMO_WEWORK: DemoAnalysis = {
 
 export const DEMO_DANGOTE: DemoAnalysis = {
   id: 'demo-dangote-panafrican',
-  documentName:
-    'Dangote Cement PLC — Pan-African Capacity Expansion Thesis (2014 Board Memo)',
+  documentName: 'Dangote Cement PLC — Pan-African Capacity Expansion Thesis (2014 Board Memo)',
   shortName: 'Dangote · Pan-African Expansion',
   teaser:
     'Extrapolating Nigerian cement margins across 10 African markets — without pricing FX-repatriation and governance risk.',
@@ -1448,8 +1447,7 @@ export const DEMO_DANGOTE: DemoAnalysis = {
     {
       biasType: 'anchoring_bias',
       severity: 'high',
-      excerpt:
-        'Country-risk premium of 5% applied uniformly across ten markets.',
+      excerpt: 'Country-risk premium of 5% applied uniformly across ten markets.',
       explanation:
         'The 5% premium is an internal-convention anchor, not a market-derived input. Sovereign-credit spreads across the ten target markets vary 3-5x; a uniform premium systematically under-prices the high-risk markets.',
       suggestion:
@@ -1573,28 +1571,32 @@ export const DEMO_DANGOTE: DemoAnalysis = {
         ],
       },
     ],
-    overallRisk: 'Medium — accounting posture is sound but the underlying FX assumption is unhedged in the return model.',
+    overallRisk:
+      'Medium — accounting posture is sound but the underlying FX assumption is unhedged in the return model.',
   },
   preMortem: {
     scenarios: [
       {
         title: 'FX controls tighten in 3+ target markets',
         probability: 0.55,
-        impact: 'Dividend repatriation from those subsidiaries is restricted. Group cash-flow thesis inverts even with operationally strong plants.',
+        impact:
+          'Dividend repatriation from those subsidiaries is restricted. Group cash-flow thesis inverts even with operationally strong plants.',
         description:
           'Nigeria, Ethiopia, Tanzania and Zambia have historically imposed FX controls during stress periods. The plan assumes none of them do, for ten straight years.',
       },
       {
         title: 'Chinese commodity cycle peaks during capex amortisation window',
         probability: 0.45,
-        impact: 'Infrastructure demand across target markets contracts 20-40%. Plant utilisation runs at 40-55% instead of 70-80%.',
+        impact:
+          'Infrastructure demand across target markets contracts 20-40%. Plant utilisation runs at 40-55% instead of 70-80%.',
         description:
           'The demand thesis is implicitly levered to Chinese commodity-cycle-driven African infrastructure spending. A cycle peak would hit during the post-commissioning ramp.',
       },
       {
         title: 'One or two markets succeed, eight underperform',
         probability: 0.6,
-        impact: 'Group ROE compression; stranded capex on underperforming plants; opportunity cost of capital relative to additional Nigerian capacity.',
+        impact:
+          'Group ROE compression; stranded capex on underperforming plants; opportunity cost of capital relative to additional Nigerian capacity.',
         description:
           'The most likely outcome path — partial pan-African success, not uniform replication. The return model does not currently accommodate this outcome.',
       },
@@ -1635,7 +1637,8 @@ export const DEMO_DANGOTE: DemoAnalysis = {
       riskLevel: 'high',
       description:
         'Anchor on the Nigerian margin story + plan to execute across ten markets concurrently. This is the specific failure mode: the anchor is wrong in ways the sprint does not allow the team to learn before capital is committed.',
-      historicalExample: 'Heineken Africa, MTN international expansion, French utility African water contracts.',
+      historicalExample:
+        'Heineken Africa, MTN international expansion, French utility African water contracts.',
     },
   ],
   outcome: {

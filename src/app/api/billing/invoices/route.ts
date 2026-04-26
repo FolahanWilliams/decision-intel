@@ -43,10 +43,7 @@ export async function GET() {
       stripeCustomerId = sub?.stripeCustomerId ?? null;
     } catch (err) {
       if (!isSchemaDrift(err)) {
-        log.warn(
-          'subscription lookup failed:',
-          err instanceof Error ? err.message : String(err)
-        );
+        log.warn('subscription lookup failed:', err instanceof Error ? err.message : String(err));
       }
     }
 

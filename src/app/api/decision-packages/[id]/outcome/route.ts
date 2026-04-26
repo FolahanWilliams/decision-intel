@@ -22,10 +22,7 @@ import { resolvePackageAccess } from '@/lib/utils/decision-package-access';
 
 const log = createLogger('DecisionPackageOutcome');
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -50,8 +47,7 @@ export async function POST(
     } catch {
       return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
     }
-    const summary =
-      typeof body.summary === 'string' ? body.summary.trim().slice(0, 2000) : '';
+    const summary = typeof body.summary === 'string' ? body.summary.trim().slice(0, 2000) : '';
     if (summary.length === 0) {
       return NextResponse.json({ error: 'summary is required' }, { status: 400 });
     }

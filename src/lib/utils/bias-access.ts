@@ -111,8 +111,8 @@ export async function resolveMentions(
 ): Promise<{ userIds: string[]; emails: string[] }> {
   if (!orgId) return { userIds: [], emails: [] };
 
-  const emailMatches = Array.from(body.matchAll(/@([\w.+-]+@[\w.-]+\.[a-zA-Z]{2,})/g)).map(
-    m => m[1].toLowerCase()
+  const emailMatches = Array.from(body.matchAll(/@([\w.+-]+@[\w.-]+\.[a-zA-Z]{2,})/g)).map(m =>
+    m[1].toLowerCase()
   );
   const quotedNameMatches = Array.from(body.matchAll(/@"([^"]+)"/g)).map(m => m[1]);
 

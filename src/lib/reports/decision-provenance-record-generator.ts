@@ -1,24 +1,41 @@
 /**
  * Decision Provenance Record — PDF generator.
  *
- * Client-side jsPDF generator that emits a 4-page artifact the CSO's
- * General Counsel can hand to the audit committee, SEC, or plaintiff's
- * counsel — or more usefully, the record their AI-augmented
- * decision-making was always supposed to produce. Pages:
+ * Client-side jsPDF generator that emits a procurement-grade artifact
+ * the CSO's General Counsel can hand to the audit committee, regulator,
+ * LP, assurance partner (LRQA / Bureau Veritas / SGS / DNV), or
+ * plaintiff's counsel — or more usefully, the record their AI-augmented
+ * decision-making was always supposed to produce.
  *
- *   1. Cover + hashes — title, filename, input hash, prompt fingerprint,
- *      timestamp, reviewer signature block.
+ * Page sequence (DPR schema v2, locked 2026-04-26 from NotebookLM
+ * "highest-ROI DPR additions" synthesis):
+ *
+ *   1. Cover + hashes + verification block + audit summary + score
+ *      strip + org-calibration strip (Cloverpop defense) + counterfactual
+ *      impact block (top-3 scenarios) + recommended next action.
  *   2. Model lineage + judge variance — which model tier ran on which
- *      node; the noise score + meta-verdict; honest note about granular
- *      judge outputs.
+ *      node; the noise score + meta-verdict; per-judge convergence.
  *   3. Academic citations + regulatory mapping — every detected bias
- *      with its APA citation and the frameworks (Basel III, EU AI Act,
- *      SEC Reg D, FCA Consumer Duty, SOX, GDPR Art 22, LPOA) it touches.
+ *      with APA citation and the 17-framework regulatory map it touches.
  *   4. Pipeline lineage + "What this record proves" GC-ready appendix.
+ *   5. Reviewer Decisions (when populated) — HITL / EU AI Act Art 14
+ *      record: accepted mitigations, dismissed flags, dissent log,
+ *      reviewer counter-signature.
+ *   6. Pre-IC blind-prior aggregations (when present).
+ *   7. Decision Package or Deal members (when applicable).
+ *   8. Data Lifecycle / Retention / Sub-Processors — ALWAYS the last
+ *      page; the procurement-grade contractual statement of how the
+ *      source document, audit, and DPR are stored, retained, destroyed.
  *
  * Honesty discipline: every page declares what's stored vs. what's
  * available on request. A GC reading this should never discover that a
  * claim was overstated when they ask for backup.
+ *
+ * IP-PROTECTION RULES — do not break: never serialise prompt content
+ * (only the SHA-256 fingerprint), never serialise the 20×20 toxic-
+ * combination weight matrix, never serialise per-org causal edges or
+ * learned bias-genome values. Per-node input/output hashing is deferred
+ * to record schema v3 (requires instrumentation in nodes.ts).
  */
 
 import jsPDF, { GState } from 'jspdf';
@@ -80,26 +97,44 @@ export class DecisionProvenanceRecordGenerator {
    *  `watermark` draws a diagonal banner on every page — used for the
    *  public sample DPR so a GC can't mistake the specimen for a real
    *  audit record. Leave undefined for authenticated exports. */
-  public generate(data: ProvenanceRecordData, opts?: { watermark?: string }): jsPDF {
-    this.drawPageOne(data);
+  public generate(
+    data: ProvenanceRecordData,
+    opts?: { watermark?: string; clientSafe?: boolean }
+  ): jsPDF {
+    // Client-Safe Export Mode (DPR v2 #5) — when enabled, the meta strip
+    // + summary + reviewer notes are run through the entity / amount /
+    // person-name placeholder masker before any text hits the page.
+    // We mutate a shallow-copied data object so the caller's input is
+    // untouched.
+    const renderData = opts?.clientSafe ? applyClientSafeScrub(data) : data;
+    this.drawPageOne(renderData);
     this.doc.addPage();
-    this.drawPageTwo(data);
+    this.drawPageTwo(renderData);
     this.doc.addPage();
-    this.drawPageThree(data);
+    this.drawPageThree(renderData);
     this.doc.addPage();
-    this.drawPageFour(data);
-    if (data.blindPriorAggregates && data.blindPriorAggregates.length > 0) {
+    this.drawPageFour(renderData);
+    if (renderData.reviewerDecisions && renderData.reviewerDecisions.reviewedAt) {
       this.doc.addPage();
-      this.drawPageFiveBlindPriors(data);
+      this.drawPageReviewerDecisions(renderData);
     }
-    if (data.packageContext) {
+    if (renderData.blindPriorAggregates && renderData.blindPriorAggregates.length > 0) {
       this.doc.addPage();
-      this.drawPagePackageMembers(data);
+      this.drawPageFiveBlindPriors(renderData);
     }
-    if (data.dealContext) {
+    if (renderData.packageContext) {
       this.doc.addPage();
-      this.drawPageDealMembers(data);
+      this.drawPagePackageMembers(renderData);
     }
+    if (renderData.dealContext) {
+      this.doc.addPage();
+      this.drawPageDealMembers(renderData);
+    }
+    // Data lifecycle footer page is ALWAYS the last page — it's the
+    // procurement-grade contractual statement every reader (GC, audit
+    // committee, regulator, LP) needs to trust before signing.
+    this.doc.addPage();
+    this.drawPageDataLifecycle(renderData);
     this.drawFooterAllPages();
     if (opts?.watermark) this.drawWatermarkAllPages(opts.watermark);
     return this.doc;
@@ -121,7 +156,13 @@ export class DecisionProvenanceRecordGenerator {
     }
   }
 
-  // ─── Page 1: Cover + hashes ────────────────────────────────────────
+  // ─── Page 1: Cover + hashes + verification + impact + calibration ─
+  // Restructured 2026-04-26 (DPR v2) to fit the new Verification Block,
+  // Counterfactual Impact Block, and Org Calibration strip alongside
+  // the existing integrity fingerprints + audit summary + recommended
+  // action. Reviewer signature moved off the cover onto its dedicated
+  // Reviewer Decisions page when populated; otherwise inline appendix
+  // on page 4.
   private drawPageOne(data: ProvenanceRecordData) {
     this.drawAccentBand();
     this.drawHeader('DECISION PROVENANCE RECORD');
@@ -131,10 +172,10 @@ export class DecisionProvenanceRecordGenerator {
     // Title
     this.doc.setTextColor(5, 5, 5);
     this.doc.setFont('helvetica', 'bold');
-    this.doc.setFontSize(18);
+    this.doc.setFontSize(17);
     const titleLines = this.doc.splitTextToSize(title, TEXT_W);
     this.doc.text(titleLines, MARGIN_L, 34);
-    let y = 34 + titleLines.length * 8 + 4;
+    let y = 34 + titleLines.length * 7.5 + 3;
 
     // R²F framework mark — names the category claim on the cover so the
     // reviewer sees it before anything else (CLAUDE.md 2026-04-22 lock).
@@ -142,110 +183,176 @@ export class DecisionProvenanceRecordGenerator {
     this.doc.setFontSize(9);
     this.doc.setTextColor(22, 163, 74);
     this.doc.text('R²F · RECOGNITION-RIGOR FRAMEWORK', MARGIN_L, y);
+    if (data.clientSafe?.enabled) {
+      this.doc.setFillColor(217, 119, 6);
+      this.doc.roundedRect(PAGE_W - MARGIN_R - 56, y - 4, 56, 6, 1, 1, 'F');
+      this.doc.setTextColor(255, 255, 255);
+      this.doc.setFontSize(7.5);
+      this.doc.text('CLIENT-SAFE EXPORT', PAGE_W - MARGIN_R - 28, y, { align: 'center' });
+    }
     y += 6;
 
-    // Purpose strap
+    // Purpose strap (vocabulary lock — "hashed + tamper-evident", per
+    // trust-copy.ts; restored from the prior overclaim "signed, hashed").
     this.doc.setFont('helvetica', 'italic');
-    this.doc.setFontSize(10);
+    this.doc.setFontSize(9.5);
     this.doc.setTextColor(80, 80, 80);
     const purposeLines = this.doc.splitTextToSize(
-      'Signed, hashed evidence record for this strategic memo\u2019s Decision Intel audit. ' +
-        'Shareable with your audit committee, General Counsel, or regulator of record.',
+      'Hashed and tamper-evident evidence record for this strategic memo\u2019s Decision Intel audit. ' +
+        'Shareable with your audit committee, General Counsel, regulator of record, or assurance partner.',
       TEXT_W
     );
     this.doc.text(purposeLines, MARGIN_L, y);
-    y += purposeLines.length * 5 + 8;
+    y += purposeLines.length * 4.6 + 5;
 
     // Integrity card
     this.drawSectionHeading('INTEGRITY FINGERPRINTS', y);
-    y += 10;
+    y += 9;
 
     this.drawKvBox(
       [
         { k: 'Input document hash (SHA-256)', v: formatHashShort(data.inputHash) },
         { k: 'Prompt version fingerprint (SHA-256)', v: formatHashShort(data.promptFingerprint) },
         { k: 'Record schema version', v: `v${data.schemaVersion}` },
-        {
-          k: 'Server-side timestamp',
-          v: data.generatedAt.toISOString() + ' (RFC 3161 TSA: deferred to v2)',
-        },
+        { k: 'Generated (ISO-8601, server time)', v: data.generatedAt.toISOString() },
       ],
       y
     );
     y += 42;
 
+    // Verification block — DPR v2 #1. Tells the reader exactly how to
+    // independently verify each hash. Replaces the prior implicit
+    // "trust the hash" framing with an explicit re-verification path.
+    this.drawSectionHeading('HOW TO VERIFY THIS RECORD', y);
+    y += 7;
+    this.doc.setFont('helvetica', 'normal');
+    this.doc.setFontSize(8.5);
+    this.doc.setTextColor(60, 60, 60);
+    const verificationLines = this.doc.splitTextToSize(
+      'Re-hash the source memo with SHA-256 and compare to the input-document hash above. The prompt fingerprint is the SHA-256 of the prompt version active at audit time \u2014 a divergent hash on a re-run proves the prompts evolved between audits. Tamper-evidence today: SHA-256 over canonicalised inputs. Private-key signing of the record itself is on the published roadmap (Q3 2026); the schema is forward-compatible.',
+      TEXT_W
+    );
+    this.doc.text(verificationLines, MARGIN_L, y);
+    y += verificationLines.length * 4 + 4;
+
     // Audit summary
     this.drawSectionHeading('AUDIT SUMMARY', y);
-    y += 8;
+    y += 7;
     this.doc.setFont('helvetica', 'normal');
-    this.doc.setFontSize(10.5);
+    this.doc.setFontSize(9.5);
     this.doc.setTextColor(30, 30, 30);
-    const summaryText = truncate(data.meta.summary || 'No summary generated.', 460);
+    const summaryText = truncate(data.meta.summary || 'No summary generated.', 320);
     const summaryLines = this.doc.splitTextToSize(summaryText, TEXT_W);
     this.doc.text(summaryLines, MARGIN_L, y);
-    y += summaryLines.length * 5 + 10;
+    y += summaryLines.length * 4.5 + 4;
 
     // Score + bias count strip
     this.doc.setFont('helvetica', 'bold');
     this.doc.setFontSize(10);
     this.doc.setTextColor(22, 163, 74);
     this.doc.text(
-      `DQI ${Math.round(data.meta.overallScore)} / 100     \u00b7     Noise Score ${Math.round(
+      `DQI ${Math.round(data.meta.overallScore)} / 100     \u00b7     Noise ${Math.round(
         data.meta.noiseScore
       )} / 100     \u00b7     ${data.meta.biasCount} biases detected`,
       MARGIN_L,
       y
     );
-    y += 12;
+    y += 7;
+
+    // Org calibration strip — DPR v2 #6. Cloverpop-defense move: proves
+    // the DQI shown is calibrated against THIS org's outcome history.
+    if (data.orgCalibration) {
+      this.doc.setFont('helvetica', 'italic');
+      this.doc.setFontSize(8.5);
+      this.doc.setTextColor(80, 80, 80);
+      const cal = data.orgCalibration;
+      const calStrip = cal.recalibratedFromOriginal
+        ? `Calibrated against ${cal.decisionsTracked} closed decisions for this organisation \u00b7 mean Brier ${cal.meanBrierScore?.toFixed(3) ?? '\u2014'} (${cal.brierCategory ?? 'unscored'}) \u00b7 recalibrated ${cal.recalibratedFromOriginal.delta >= 0 ? '+' : ''}${cal.recalibratedFromOriginal.delta} from absolute`
+        : `Calibration baseline: ${cal.decisionsTracked} closed decisions, mean Brier ${cal.meanBrierScore?.toFixed(3) ?? '\u2014'} (${cal.brierCategory ?? 'unscored'}) \u00b7 absolute DQI shown until per-org statistical floor`;
+      const calLines = this.doc.splitTextToSize(calStrip, TEXT_W);
+      this.doc.text(calLines, MARGIN_L, y);
+      y += calLines.length * 4 + 4;
+    }
+
+    // Counterfactual Impact Block — DPR v2 #2. Top-3 bias scenarios with
+    // expected improvement %, sample size + Wilson confidence, monetary
+    // anchor where the analysis carries a DecisionFrame value.
+    if (data.counterfactualImpact && data.counterfactualImpact.scenarios.length > 0) {
+      this.drawSectionHeading('COUNTERFACTUAL IMPACT \u00b7 IF FLAGGED BIASES WERE ADDRESSED', y);
+      y += 7;
+      const ci = data.counterfactualImpact;
+      this.doc.setFont('helvetica', 'normal');
+      this.doc.setFontSize(8.5);
+      this.doc.setTextColor(60, 60, 60);
+      for (const s of ci.scenarios.slice(0, 3)) {
+        if (y > 248) break;
+        const monetary =
+          s.estimatedMonetaryImpact != null
+            ? `~ ${s.currency} ${formatMoney(s.estimatedMonetaryImpact)}`
+            : 'monetary anchor unavailable';
+        const conf = `${(s.confidence * 100).toFixed(0)}% confidence \u00b7 n=${s.historicalSampleSize}`;
+        this.doc.setFont('helvetica', 'bold');
+        this.doc.setTextColor(15, 15, 15);
+        this.doc.text(s.biasLabel, MARGIN_L, y);
+        this.doc.setFont('helvetica', 'normal');
+        this.doc.setTextColor(22, 163, 74);
+        this.doc.text(`+${s.expectedImprovementPct.toFixed(1)} pts success rate`, MARGIN_L + 60, y);
+        this.doc.setTextColor(80, 80, 80);
+        this.doc.text(monetary, MARGIN_L + 110, y);
+        y += 4;
+        this.doc.setFont('helvetica', 'italic');
+        this.doc.setFontSize(7.5);
+        this.doc.setTextColor(120, 120, 120);
+        this.doc.text(conf, MARGIN_L + 4, y);
+        y += 5;
+        this.doc.setFontSize(8.5);
+      }
+      this.doc.setFont('helvetica', 'bold');
+      this.doc.setFontSize(8.5);
+      this.doc.setTextColor(22, 163, 74);
+      this.doc.text(
+        `Aggregate (independence-assumed): +${ci.aggregateImprovementPct.toFixed(1)} pts \u00b7 confidence-weighted: +${ci.weightedImprovementPct.toFixed(1)} pts`,
+        MARGIN_L,
+        y
+      );
+      y += 4.5;
+      this.doc.setFont('helvetica', 'italic');
+      this.doc.setFontSize(7.5);
+      this.doc.setTextColor(120, 120, 120);
+      const methLines = this.doc.splitTextToSize(ci.methodologyNote, TEXT_W);
+      this.doc.text(methLines, MARGIN_L, y);
+      y += methLines.length * 3.5 + 3;
+    }
 
     // Recommended next action — forward-looking remediation the GC or
-    // audit committee can act on before signing. Pulled from the highest-
-    // severity bias's mitigation suggestion. Falls back to an honest
-    // pointer to page 3 when no mitigation text is available.
+    // audit committee can act on before signing.
+    if (y > 268) return;
     this.drawSectionHeading('RECOMMENDED NEXT ACTION', y);
-    y += 8;
+    y += 7;
     if (data.meta.topMitigation && data.meta.topMitigationFor) {
       this.doc.setFont('helvetica', 'italic');
-      this.doc.setFontSize(9);
+      this.doc.setFontSize(8);
       this.doc.setTextColor(22, 163, 74);
       this.doc.text(`Addresses: ${data.meta.topMitigationFor}`, MARGIN_L, y);
-      y += 5;
+      y += 4;
       this.doc.setFont('helvetica', 'normal');
-      this.doc.setFontSize(10);
+      this.doc.setFontSize(9);
       this.doc.setTextColor(30, 30, 30);
-      const mitigationText = truncate(data.meta.topMitigation, 380);
+      const mitigationText = truncate(data.meta.topMitigation, 280);
       const mitigationLines = this.doc.splitTextToSize(mitigationText, TEXT_W);
       this.doc.text(mitigationLines, MARGIN_L, y);
-      y += mitigationLines.length * 5 + 8;
+      y += mitigationLines.length * 4.5 + 3;
     } else {
       this.doc.setFont('helvetica', 'italic');
-      this.doc.setFontSize(9.5);
+      this.doc.setFontSize(9);
       this.doc.setTextColor(90, 90, 90);
       const noMitigationLines = this.doc.splitTextToSize(
         'No individual-bias mitigation exceeded the surfacing threshold for this audit. See Academic Citations and Regulatory Mapping (page 3) for framework-level remediation guidance.',
         TEXT_W
       );
       this.doc.text(noMitigationLines, MARGIN_L, y);
-      y += noMitigationLines.length * 4.5 + 8;
+      y += noMitigationLines.length * 4 + 3;
     }
-
-    // Reviewer signature block
-    this.drawSectionHeading('REVIEWER COUNTER-SIGNATURE', y);
-    y += 8;
-    this.doc.setFont('helvetica', 'italic');
-    this.doc.setFontSize(9);
-    this.doc.setTextColor(90, 90, 90);
-    this.doc.text(
-      'For the CSO, General Counsel, or delegated reviewer to sign on receipt.',
-      MARGIN_L,
-      y
-    );
-    y += 10;
-    this.drawSignatureLine('Reviewer name', y);
-    y += 14;
-    this.drawSignatureLine('Role / title', y);
-    y += 14;
-    this.drawSignatureLine('Signature, date', y);
   }
 
   // ─── Page 2: Model lineage + judge variance ───────────────────────
@@ -627,10 +734,7 @@ export class DecisionProvenanceRecordGenerator {
         this.doc.setFont('helvetica', 'italic');
         this.doc.setFontSize(9);
         this.doc.setTextColor(80, 80, 80);
-        const frameLines = this.doc.splitTextToSize(
-          `Frame: ${room.outcomeFrame}`,
-          TEXT_W
-        );
+        const frameLines = this.doc.splitTextToSize(`Frame: ${room.outcomeFrame}`, TEXT_W);
         this.doc.text(frameLines, MARGIN_L, y);
         y += frameLines.length * 4.5 + 1;
       }
@@ -694,11 +798,7 @@ export class DecisionProvenanceRecordGenerator {
       this.doc.setFont('helvetica', 'italic');
       this.doc.setFontSize(9);
       this.doc.setTextColor(120, 120, 120);
-      this.doc.text(
-        'No pre-IC blind-prior survey was attached to this analysis.',
-        MARGIN_L,
-        y
-      );
+      this.doc.text('No pre-IC blind-prior survey was attached to this analysis.', MARGIN_L, y);
     }
   }
 
@@ -732,12 +832,11 @@ export class DecisionProvenanceRecordGenerator {
     this.doc.setFont('helvetica', 'normal');
     this.doc.setFontSize(9);
     this.doc.setTextColor(60, 60, 60);
-    const meta: string[] = [
-      `Status: ${ctx.status}`,
-      `Members: ${ctx.members.length}`,
-    ];
+    const meta: string[] = [`Status: ${ctx.status}`, `Members: ${ctx.members.length}`];
     if (ctx.compositeDqi != null) {
-      meta.push(`Composite DQI: ${Math.round(ctx.compositeDqi)}${ctx.compositeGrade ? ` (${ctx.compositeGrade})` : ''}`);
+      meta.push(
+        `Composite DQI: ${Math.round(ctx.compositeDqi)}${ctx.compositeGrade ? ` (${ctx.compositeGrade})` : ''}`
+      );
     }
     if (ctx.decidedAt) {
       meta.push(`Decided: ${new Date(ctx.decidedAt).toLocaleDateString()}`);
@@ -827,11 +926,7 @@ export class DecisionProvenanceRecordGenerator {
       if (ctx.outcome.realisedDqi != null) {
         this.doc.setFont('helvetica', 'bold');
         this.doc.setTextColor(22, 163, 74);
-        this.doc.text(
-          `Realised DQI: ${Math.round(ctx.outcome.realisedDqi)}/100`,
-          MARGIN_L,
-          y + 4
-        );
+        this.doc.text(`Realised DQI: ${Math.round(ctx.outcome.realisedDqi)}/100`, MARGIN_L, y + 4);
       }
     }
   }
@@ -876,7 +971,8 @@ export class DecisionProvenanceRecordGenerator {
       `Stage: ${ctx.stage}`,
       `Members: ${ctx.members.length}`,
     ];
-    if (ctx.fundName) meta.push(`Fund: ${ctx.fundName}${ctx.vintage ? ` (${ctx.vintage} vintage)` : ''}`);
+    if (ctx.fundName)
+      meta.push(`Fund: ${ctx.fundName}${ctx.vintage ? ` (${ctx.vintage} vintage)` : ''}`);
     if (ctx.sector) meta.push(`Sector: ${ctx.sector}`);
     if (ctx.ticketSize != null) {
       meta.push(`Ticket: ${ctx.currency} ${ctx.ticketSize.toLocaleString('en-US')}`);
@@ -974,8 +1070,7 @@ export class DecisionProvenanceRecordGenerator {
       this.doc.setTextColor(40, 40, 40);
       const outcomeBits: string[] = [];
       if (ctx.outcome.exitType) outcomeBits.push(`Exit: ${ctx.outcome.exitType}`);
-      if (ctx.outcome.irr != null)
-        outcomeBits.push(`IRR ${(ctx.outcome.irr * 100).toFixed(1)}%`);
+      if (ctx.outcome.irr != null) outcomeBits.push(`IRR ${(ctx.outcome.irr * 100).toFixed(1)}%`);
       if (ctx.outcome.moic != null) outcomeBits.push(`MOIC ${ctx.outcome.moic.toFixed(2)}×`);
       if (ctx.outcome.exitValue != null)
         outcomeBits.push(`Value ${ctx.currency} ${ctx.outcome.exitValue.toLocaleString('en-US')}`);
@@ -1065,8 +1160,396 @@ export class DecisionProvenanceRecordGenerator {
       );
     }
   }
+
+  // ─── Reviewer Decisions page (DPR v2 #3) ──────────────────────────
+  // Renders the human-in-the-loop / EU AI Act Art. 14 oversight record:
+  // accepted mitigations, dismissed flags (with reasons), dissent log,
+  // and the final reviewer sign-off + counter-signature lines. Only
+  // rendered when reviewerDecisions.reviewedAt is non-null — the
+  // "a human acted on this audit" discriminator.
+  private drawPageReviewerDecisions(data: ProvenanceRecordData) {
+    const r = data.reviewerDecisions;
+    if (!r || !r.reviewedAt) return;
+    this.drawAccentBand();
+    this.drawHeader('REVIEWER DECISIONS · HUMAN OVERSIGHT RECORD');
+
+    let y = 34;
+    this.drawSectionHeading('REVIEWER IDENTITY', y);
+    y += 8;
+    this.doc.setFont('helvetica', 'normal');
+    this.doc.setFontSize(9.5);
+    this.doc.setTextColor(40, 40, 40);
+    const idLines: string[] = [];
+    if (r.reviewerName) idLines.push(`Name: ${r.reviewerName}`);
+    if (r.reviewerRole) idLines.push(`Role: ${r.reviewerRole}`);
+    idLines.push(`Reviewed at: ${r.reviewedAt}`);
+    if (r.finalSignOff) idLines.push(`Final sign-off: ${r.finalSignOff.replace(/_/g, ' ')}`);
+    for (const ln of idLines) {
+      this.doc.text(ln, MARGIN_L, y);
+      y += 5;
+    }
+    y += 4;
+
+    if (r.acceptedMitigations.length > 0) {
+      this.drawSectionHeading('ACCEPTED MITIGATIONS', y);
+      y += 7;
+      this.doc.setFont('helvetica', 'normal');
+      this.doc.setFontSize(9);
+      this.doc.setTextColor(40, 40, 40);
+      for (const m of r.acceptedMitigations) {
+        if (y > 245) break;
+        this.doc.setFont('helvetica', 'bold');
+        this.doc.setTextColor(15, 15, 15);
+        this.doc.text(`• ${m.biasLabel}`, MARGIN_L, y);
+        y += 4.5;
+        this.doc.setFont('helvetica', 'normal');
+        this.doc.setTextColor(60, 60, 60);
+        const wrapped = this.doc.splitTextToSize(m.mitigation, TEXT_W - 6);
+        this.doc.text(wrapped, MARGIN_L + 6, y);
+        y += wrapped.length * 4.5 + 2;
+      }
+      y += 3;
+    }
+
+    if (r.dismissedFlags.length > 0) {
+      if (y > 245) {
+        this.doc.addPage();
+        this.drawAccentBand();
+        this.drawHeader('REVIEWER DECISIONS (cont.)');
+        y = 34;
+      }
+      this.drawSectionHeading('DISMISSED FLAGS · REASONED REJECTIONS', y);
+      y += 7;
+      this.doc.setFont('helvetica', 'normal');
+      this.doc.setFontSize(9);
+      this.doc.setTextColor(40, 40, 40);
+      for (const d of r.dismissedFlags) {
+        if (y > 250) break;
+        this.doc.setFont('helvetica', 'bold');
+        this.doc.setTextColor(180, 80, 30);
+        this.doc.text(`• ${d.biasLabel}`, MARGIN_L, y);
+        y += 4.5;
+        this.doc.setFont('helvetica', 'italic');
+        this.doc.setTextColor(60, 60, 60);
+        const wrapped = this.doc.splitTextToSize(`Reason: ${d.reason}`, TEXT_W - 6);
+        this.doc.text(wrapped, MARGIN_L + 6, y);
+        y += wrapped.length * 4.5 + 2;
+      }
+      y += 3;
+    }
+
+    if (r.dissentLog.length > 0) {
+      if (y > 245) {
+        this.doc.addPage();
+        this.drawAccentBand();
+        this.drawHeader('REVIEWER DECISIONS (cont.)');
+        y = 34;
+      }
+      this.drawSectionHeading('DISSENT LOG · OBJECTIONS RAISED + RESOLUTIONS', y);
+      y += 7;
+      this.doc.setFont('helvetica', 'normal');
+      this.doc.setFontSize(9);
+      this.doc.setTextColor(40, 40, 40);
+      for (const d of r.dissentLog) {
+        if (y > 250) break;
+        this.doc.setFont('helvetica', 'bold');
+        this.doc.setTextColor(15, 15, 15);
+        this.doc.text(`• ${d.source}`, MARGIN_L, y);
+        y += 4.5;
+        this.doc.setFont('helvetica', 'normal');
+        this.doc.setTextColor(60, 60, 60);
+        const obj = this.doc.splitTextToSize(`Objection: ${d.objection}`, TEXT_W - 6);
+        this.doc.text(obj, MARGIN_L + 6, y);
+        y += obj.length * 4.5;
+        if (d.resolution) {
+          this.doc.setTextColor(22, 163, 74);
+          const res = this.doc.splitTextToSize(`Resolution: ${d.resolution}`, TEXT_W - 6);
+          this.doc.text(res, MARGIN_L + 6, y);
+          y += res.length * 4.5;
+        }
+        y += 2;
+      }
+      y += 3;
+    }
+
+    if (r.signOffNote) {
+      if (y > 250) {
+        this.doc.addPage();
+        this.drawAccentBand();
+        this.drawHeader('REVIEWER DECISIONS (cont.)');
+        y = 34;
+      }
+      this.drawSectionHeading('SIGN-OFF NOTE', y);
+      y += 7;
+      this.doc.setFont('helvetica', 'normal');
+      this.doc.setFontSize(9.5);
+      this.doc.setTextColor(40, 40, 40);
+      const noteLines = this.doc.splitTextToSize(r.signOffNote, TEXT_W);
+      this.doc.text(noteLines, MARGIN_L, y);
+      y += noteLines.length * 4.6 + 4;
+    }
+
+    // Counter-signature lines (always rendered — give the reader a
+    // physical signing surface even when the digital record is complete).
+    if (y > 245) {
+      this.doc.addPage();
+      this.drawAccentBand();
+      this.drawHeader('REVIEWER DECISIONS (cont.)');
+      y = 34;
+    }
+    this.drawSectionHeading('REVIEWER COUNTER-SIGNATURE', y);
+    y += 8;
+    this.doc.setFont('helvetica', 'italic');
+    this.doc.setFontSize(8.5);
+    this.doc.setTextColor(90, 90, 90);
+    this.doc.text(
+      'For the CSO, General Counsel, or delegated reviewer to counter-sign on print.',
+      MARGIN_L,
+      y
+    );
+    y += 8;
+    this.drawSignatureLine('Reviewer name', y);
+    y += 12;
+    this.drawSignatureLine('Role / title', y);
+    y += 12;
+    this.drawSignatureLine('Signature, date', y);
+  }
+
+  // ─── Data Lifecycle / Retention Policy footer (DPR v2 #4) ─────────
+  // Always the LAST page of every DPR. The procurement-grade contractual
+  // statement of what happens to the source document, the audit, and the
+  // DPR itself once the artefact leaves the platform. Pulled from
+  // plan-tier defaults + trust-copy + company-info.
+  private drawPageDataLifecycle(data: ProvenanceRecordData) {
+    const dl = data.dataLifecycle;
+    this.drawAccentBand();
+    this.drawHeader('DATA LIFECYCLE · RETENTION · SUB-PROCESSORS');
+
+    let y = 34;
+    this.drawSectionHeading('DOCUMENT · AUDIT · DPR LIFECYCLE', y);
+    y += 8;
+    this.doc.setFont('helvetica', 'normal');
+    this.doc.setFontSize(9.5);
+    this.doc.setTextColor(40, 40, 40);
+    const intro = this.doc.splitTextToSize(
+      'Procurement-grade statement of how the source document, the audit record, and this Decision Provenance Record are stored, encrypted, retained, and destroyed. Every Fortune 500 vendor-risk register asks these questions; the answers are below in writing.',
+      TEXT_W
+    );
+    this.doc.text(intro, MARGIN_L, y);
+    y += intro.length * 4.5 + 5;
+
+    this.drawKvBox(
+      [
+        {
+          k: 'Retention window (this account tier)',
+          v: `${dl.retentionDays} days · ${dl.retentionTier}`,
+        },
+        { k: 'Encryption at rest', v: dl.encryptionAtRest },
+        { k: 'Encryption in transit', v: dl.encryptionInTransit },
+        {
+          k: 'Legal hold available',
+          v: dl.legalHoldAvailable ? 'Yes (Enterprise + on-request)' : 'No',
+        },
+        { k: 'Right to erasure', v: dl.rightToErasure },
+        { k: 'Production region', v: dl.productionRegion },
+      ],
+      y
+    );
+    y += 60;
+
+    this.drawSectionHeading('SUB-PROCESSORS', y);
+    y += 7;
+    this.doc.setFont('helvetica', 'normal');
+    this.doc.setFontSize(9);
+    this.doc.setTextColor(40, 40, 40);
+    for (const sp of dl.subProcessors) {
+      this.doc.text(`• ${sp}`, MARGIN_L, y);
+      y += 4.5;
+    }
+    y += 4;
+
+    this.drawSectionHeading('ON THE PUBLISHED ROADMAP', y);
+    y += 7;
+    this.doc.setFont('helvetica', 'italic');
+    this.doc.setFontSize(8.5);
+    this.doc.setTextColor(60, 60, 60);
+    for (const r of dl.roadmap) {
+      const wrapped = this.doc.splitTextToSize(`• ${r}`, TEXT_W - 4);
+      this.doc.text(wrapped, MARGIN_L, y);
+      y += wrapped.length * 4 + 1;
+    }
+    y += 4;
+
+    this.drawSectionHeading('CONTRACTUAL CONTACT', y);
+    y += 7;
+    this.doc.setFont('helvetica', 'normal');
+    this.doc.setFontSize(9);
+    this.doc.setTextColor(40, 40, 40);
+    this.doc.text(
+      `Retention, erasure, legal hold, and sub-processor change notifications: ${dl.retentionContact}`,
+      MARGIN_L,
+      y
+    );
+    y += 8;
+
+    if (data.clientSafe?.enabled) {
+      this.drawSectionHeading('CLIENT-SAFE EXPORT · SCRUB SUMMARY', y);
+      y += 7;
+      this.doc.setFont('helvetica', 'normal');
+      this.doc.setFontSize(9);
+      this.doc.setTextColor(40, 40, 40);
+      const cs = data.clientSafe;
+      this.doc.text(
+        `Entities masked: ${cs.entitiesMasked}  ·  Amounts masked: ${cs.amountsMasked}  ·  Person names masked: ${cs.namesMasked}`,
+        MARGIN_L,
+        y
+      );
+      y += 5;
+      this.doc.setFont('helvetica', 'italic');
+      this.doc.setFontSize(8);
+      this.doc.setTextColor(120, 120, 120);
+      const csNote = this.doc.splitTextToSize(
+        'Original entities and amounts available to authorised reviewers in the source platform under access controls. Placeholder map is held server-side; this exported PDF carries no reverse-lookup table.',
+        TEXT_W
+      );
+      this.doc.text(csNote, MARGIN_L, y);
+      y += csNote.length * 4 + 4;
+    }
+  }
 }
 
 function formatBiasKey(biasType: string): string {
   return biasType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+// ─── Money formatter (Counterfactual Impact, Page 1) ───────────────
+// Compact representation: 1.2M, 850K, 1.4B. No currency symbol — that
+// goes alongside in the rendering call so different currencies pair
+// cleanly with their numerical magnitude.
+function formatMoney(value: number): string {
+  const abs = Math.abs(value);
+  if (abs >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(1)}B`;
+  if (abs >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
+  if (abs >= 1_000) return `${(value / 1_000).toFixed(0)}K`;
+  return value.toFixed(0);
+}
+
+// ─── Client-Safe scrub (DPR v2 #5) ─────────────────────────────────
+// Replaces entity names, amounts, and person names in the meta strip
+// + summary + reviewer notes with stable placeholders. Uses the SAME
+// regex patterns as src/lib/utils/redaction-scanner.ts for parity, but
+// inlined here to keep the generator client-side and zero-dep.
+const CS_ENTITY_RE =
+  /\b((?:[A-Z][A-Za-z0-9&'.-]+(?:\s+(?:&\s+|of\s+|the\s+)?)?){1,5}),?\s+(?:Inc|LLC|L\.L\.C\.|Ltd|Limited|GmbH|Pty|Plc|PLC|AG|SA|N\.V\.|NV|Corp|Corporation|Co\.|Company|S\.A\.|S\.A\.R\.L|S\.r\.l|S\.p\.A|BV|B\.V\.|AB|AS|ApS|Oy|S\.L\.|S\.L|Pvt|Pvt\.|Holdings|Group|Trust|Fund|Capital|Partners|Ventures|Bank|Limited\.)(?=[\s.,;:!?\]\)\}'"]|$)/g;
+const CS_AMOUNT_RE =
+  /(?:[$£€₦¥]|USD|GBP|EUR|NGN|JPY)\s?\d+(?:[.,]\d+)?\s?(?:million|billion|trillion|m|bn?|tn?|k)\b|(?:[$£€₦¥]|USD|GBP|EUR|NGN|JPY)\s?\d{1,3}(?:,\d{3}){2,}(?:\.\d+)?|\b\d+(?:[.,]\d+)?\s?(?:million|billion|trillion)\b/gi;
+const CS_NAME_RE = /\b([A-Z][a-z]{1,15})\s+([A-Z][a-z]{1,20})\b/g;
+
+const CS_NAME_DENYLIST = new Set(
+  [
+    'Decision Intel',
+    'Decision Quality',
+    'Bias Genome',
+    'Recognition Rigor',
+    'European Union',
+    'United Kingdom',
+    'United States',
+    'South Africa',
+    'New York',
+    'San Francisco',
+    'Cape Town',
+    'Annual Report',
+    'Board Members',
+    'Audit Committee',
+    'Steering Committee',
+    'Investment Committee',
+    'EU AI',
+    'UK White',
+    'SEC Reg',
+    'Basel III',
+    'Reserve Bank',
+    'Central Bank',
+    'National Bank',
+    'General Partner',
+    'Limited Partner',
+  ].map(s => s.toLowerCase())
+);
+
+function applyClientSafeScrub(data: ProvenanceRecordData): ProvenanceRecordData {
+  let entities = 0;
+  let amounts = 0;
+  let names = 0;
+
+  const scrub = (text: string | null | undefined): string => {
+    if (!text) return text ?? '';
+    let out = text;
+    // Entities first (longer matches) so person-name regex doesn't cannibalise them.
+    let eIdx = 0;
+    out = out.replace(CS_ENTITY_RE, () => {
+      eIdx += 1;
+      entities += 1;
+      return `[ENTITY_${eIdx}]`;
+    });
+    let aIdx = 0;
+    out = out.replace(CS_AMOUNT_RE, () => {
+      aIdx += 1;
+      amounts += 1;
+      return `[AMOUNT_${aIdx}]`;
+    });
+    let nIdx = 0;
+    out = out.replace(CS_NAME_RE, (m, first: string, last: string) => {
+      const key = `${first} ${last}`.toLowerCase();
+      if (CS_NAME_DENYLIST.has(key)) return m;
+      nIdx += 1;
+      names += 1;
+      return `[NAME_${nIdx}]`;
+    });
+    return out;
+  };
+
+  const scrubbedFilename = scrub(data.meta.filename);
+  const scrubbedSummary = scrub(data.meta.summary);
+  const scrubbedMetaVerdict = data.meta.metaVerdict ? scrub(data.meta.metaVerdict) : null;
+  const scrubbedTopMitigation = data.meta.topMitigation ? scrub(data.meta.topMitigation) : null;
+
+  const scrubbedReviewer = data.reviewerDecisions
+    ? {
+        ...data.reviewerDecisions,
+        signOffNote: data.reviewerDecisions.signOffNote
+          ? scrub(data.reviewerDecisions.signOffNote)
+          : null,
+        acceptedMitigations: data.reviewerDecisions.acceptedMitigations.map(m => ({
+          ...m,
+          mitigation: scrub(m.mitigation),
+        })),
+        dismissedFlags: data.reviewerDecisions.dismissedFlags.map(d => ({
+          ...d,
+          reason: scrub(d.reason),
+        })),
+        dissentLog: data.reviewerDecisions.dissentLog.map(d => ({
+          ...d,
+          objection: scrub(d.objection),
+          resolution: d.resolution ? scrub(d.resolution) : null,
+        })),
+      }
+    : undefined;
+
+  return {
+    ...data,
+    meta: {
+      ...data.meta,
+      filename: scrubbedFilename,
+      summary: scrubbedSummary,
+      metaVerdict: scrubbedMetaVerdict,
+      topMitigation: scrubbedTopMitigation,
+    },
+    reviewerDecisions: scrubbedReviewer,
+    clientSafe: {
+      enabled: true,
+      entitiesMasked: entities,
+      amountsMasked: amounts,
+      namesMasked: names,
+      scrubAppliedAt: new Date().toISOString(),
+    },
+  };
 }

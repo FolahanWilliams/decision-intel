@@ -19,14 +19,8 @@ import { useRouter } from 'next/navigation';
 import { BrainCircuit, Loader2, X } from 'lucide-react';
 import { RoleSamplePicker } from '@/components/samples/RoleSamplePicker';
 import { scanForPii, type ScanResult } from '@/lib/utils/redaction-scanner';
-import {
-  RedactionPreModal,
-  type RedactionTrailContext,
-} from '@/components/ui/RedactionPreModal';
-import {
-  postRedactionTrail,
-  savePlaceholderMap,
-} from '@/lib/utils/redaction-trail';
+import { RedactionPreModal, type RedactionTrailContext } from '@/components/ui/RedactionPreModal';
+import { postRedactionTrail, savePlaceholderMap } from '@/lib/utils/redaction-trail';
 
 interface InlinePasteMemoCardProps {
   onClose: () => void;
@@ -64,10 +58,7 @@ export function InlinePasteMemoCard({
   const chars = content.trim().length;
   const canSubmit = chars >= MIN_CONTENT_CHARS && chars <= MAX_CONTENT_CHARS;
 
-  async function runSubmit(
-    textToSubmit: string,
-    trail?: RedactionTrailContext
-  ) {
+  async function runSubmit(textToSubmit: string, trail?: RedactionTrailContext) {
     setSubmitting(true);
     setError(null);
     try {

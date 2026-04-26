@@ -51,10 +51,7 @@ export function TeammatePicker({
   // Memo the resolution so the useMemo on `filtered` doesn't re-derive on
   // every render — `provided ?? fetched ?? []` would create a new [] each
   // render and invalidate the downstream memo.
-  const teammates = useMemo(
-    () => provided ?? fetched ?? [],
-    [provided, fetched]
-  );
+  const teammates = useMemo(() => provided ?? fetched ?? [], [provided, fetched]);
 
   useEffect(() => {
     if (provided) return;
@@ -100,10 +97,7 @@ export function TeammatePicker({
       .filter(t => (excludeUserId ? t.userId !== excludeUserId : true))
       .filter(t => {
         if (!q) return true;
-        return (
-          t.email.toLowerCase().includes(q) ||
-          (t.displayName ?? '').toLowerCase().includes(q)
-        );
+        return t.email.toLowerCase().includes(q) || (t.displayName ?? '').toLowerCase().includes(q);
       });
   }, [teammates, query, excludeUserId]);
 
@@ -133,9 +127,11 @@ export function TeammatePicker({
       >
         <User size={13} style={{ opacity: 0.6 }} />
         <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          {selected
-            ? selected.displayName || selected.email
-            : <span style={{ color: 'var(--text-muted)' }}>{placeholder}</span>}
+          {selected ? (
+            selected.displayName || selected.email
+          ) : (
+            <span style={{ color: 'var(--text-muted)' }}>{placeholder}</span>
+          )}
         </span>
         <ChevronDown size={13} style={{ opacity: 0.6 }} />
       </button>
@@ -212,8 +208,7 @@ export function TeammatePicker({
                   gap: 10,
                   width: '100%',
                   padding: '8px 10px',
-                  background:
-                    value === t.userId ? 'var(--bg-elevated)' : 'transparent',
+                  background: value === t.userId ? 'var(--bg-elevated)' : 'transparent',
                   border: 'none',
                   textAlign: 'left',
                   cursor: 'pointer',

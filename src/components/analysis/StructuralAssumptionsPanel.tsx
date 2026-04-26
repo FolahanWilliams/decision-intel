@@ -159,8 +159,7 @@ export function StructuralAssumptionsPanel({ analysisId, autoRun = true, marketC
     };
   }, [analysisId, autoRun, runAudit]);
 
-  const assumptions =
-    state.status === 'ready' ? state.data.structuralAssumptions : [];
+  const assumptions = state.status === 'ready' ? state.data.structuralAssumptions : [];
   const hasFindings = assumptions.length > 0;
 
   return (
@@ -198,7 +197,8 @@ export function StructuralAssumptionsPanel({ analysisId, autoRun = true, marketC
               )}
             </h3>
             <p className="text-xs text-muted mt-0.5">
-              Dalio 18-determinant macro lens — the structural bets this memo is making, beyond cognitive bias
+              Dalio 18-determinant macro lens — the structural bets this memo is making, beyond
+              cognitive bias
             </p>
           </div>
         </div>
@@ -213,13 +213,10 @@ export function StructuralAssumptionsPanel({ analysisId, autoRun = true, marketC
           {state.status === 'idle' && (
             <div className="flex items-center justify-between gap-4">
               <p className="text-sm text-muted">
-                Run a macro-layer audit across 18 rise-and-fall determinants (debt cycle, currency cycle, reserve-currency status, governance, infrastructure, trade).
+                Run a macro-layer audit across 18 rise-and-fall determinants (debt cycle, currency
+                cycle, reserve-currency status, governance, infrastructure, trade).
               </p>
-              <button
-                onClick={runAudit}
-                className="button button-primary"
-                style={{ fontSize: 13 }}
-              >
+              <button onClick={runAudit} className="button button-primary" style={{ fontSize: 13 }}>
                 Run structural audit
               </button>
             </div>
@@ -227,7 +224,11 @@ export function StructuralAssumptionsPanel({ analysisId, autoRun = true, marketC
 
           {state.status === 'loading' && (
             <div className="flex items-center gap-3 py-4">
-              <Globe size={16} className="animate-pulse" style={{ color: 'var(--accent-primary)' }} />
+              <Globe
+                size={16}
+                className="animate-pulse"
+                style={{ color: 'var(--accent-primary)' }}
+              />
               <span className="text-sm text-muted">
                 Running Dalio structural audit across 18 determinants…
               </span>
@@ -239,7 +240,11 @@ export function StructuralAssumptionsPanel({ analysisId, autoRun = true, marketC
               <p className="text-sm" style={{ color: 'var(--severity-high)' }}>
                 {state.message}
               </p>
-              <button onClick={runAudit} className="button button-secondary" style={{ fontSize: 13 }}>
+              <button
+                onClick={runAudit}
+                className="button button-secondary"
+                style={{ fontSize: 13 }}
+              >
                 Retry
               </button>
             </div>
@@ -277,7 +282,9 @@ export function StructuralAssumptionsPanel({ analysisId, autoRun = true, marketC
                       >
                         <div className="flex justify-between items-start mb-2 flex-wrap gap-2">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className={`text-xs font-bold uppercase px-2 py-0.5 ${styles.badge}`}>
+                            <span
+                              className={`text-xs font-bold uppercase px-2 py-0.5 ${styles.badge}`}
+                            >
                               {a.determinantLabel ?? a.determinantId}
                             </span>
                             <span className={`text-xs capitalize ${styles.badge} px-1.5 py-0.5`}>
@@ -318,7 +325,10 @@ export function StructuralAssumptionsPanel({ analysisId, autoRun = true, marketC
                             className="mt-3 flex items-start gap-2 text-xs"
                             style={{ color: 'var(--text-secondary)' }}
                           >
-                            <AlertTriangle size={12} className={`mt-0.5 ${styles.dot.replace('bg-', 'text-')}`} />
+                            <AlertTriangle
+                              size={12}
+                              className={`mt-0.5 ${styles.dot.replace('bg-', 'text-')}`}
+                            />
                             <div>
                               <span className="font-medium">Harden with: </span>
                               {a.hardeningQuestion}
@@ -332,7 +342,9 @@ export function StructuralAssumptionsPanel({ analysisId, autoRun = true, marketC
               )}
 
               <p className="text-[11px] text-muted mt-2">
-                Framework: Dalio 18 rise-and-fall determinants. This is a structural-layer audit, separate from the Kahneman + Klein cognitive-bias pass — it asks what the plan is implicitly betting on about the world, not about the reasoner.
+                Framework: Dalio 18 rise-and-fall determinants. This is a structural-layer audit,
+                separate from the Kahneman + Klein cognitive-bias pass — it asks what the plan is
+                implicitly betting on about the world, not about the reasoner.
               </p>
             </div>
           )}

@@ -141,21 +141,9 @@ export function AskHierarchyLadder() {
             quoteStyle
           />
           <Block label="Rationale" color="#94A3B8" text={active.rationale} />
-          <Block
-            label="Why Ian might say YES"
-            color="#16A34A"
-            text={active.whyIanMightSayYes}
-          />
-          <Block
-            label="Why Ian might say NO"
-            color="#DC2626"
-            text={active.whyIanMightSayNo}
-          />
-          <Block
-            label="Fallback position"
-            color="#D97706"
-            text={active.fallbackPosition}
-          />
+          <Block label="Why Ian might say YES" color="#16A34A" text={active.whyIanMightSayYes} />
+          <Block label="Why Ian might say NO" color="#DC2626" text={active.whyIanMightSayNo} />
+          <Block label="Fallback position" color="#D97706" text={active.fallbackPosition} />
         </motion.div>
       </AnimatePresence>
     </div>

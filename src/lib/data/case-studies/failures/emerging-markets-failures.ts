@@ -23,12 +23,13 @@ export const EMERGING_MARKETS_FAILURE_CASES: CaseStudy[] = [
     year: 2014,
     yearRealized: 2021,
     summary:
-      'Between 2011 and 2016, Dangote Cement announced and built cement capacity across ten African markets outside Nigeria — Ethiopia, Tanzania, Cameroon, Senegal, South Africa, Zambia, Congo, Sierra Leone, Ghana and Kenya — extrapolating the extraordinary margin performance of the Nigerian home market. By 2021, multiple African plants ran below capacity, FX repatriation of dividends from several markets was restricted or impossible, and the group\'s Nigerian operations remained the load-bearing source of profit. The strategic thesis that pan-African expansion would replicate Nigerian unit economics proved to depend on structural assumptions about FX liquidity and regional demand cycles that did not hold evenly across markets.',
+      "Between 2011 and 2016, Dangote Cement announced and built cement capacity across ten African markets outside Nigeria — Ethiopia, Tanzania, Cameroon, Senegal, South Africa, Zambia, Congo, Sierra Leone, Ghana and Kenya — extrapolating the extraordinary margin performance of the Nigerian home market. By 2021, multiple African plants ran below capacity, FX repatriation of dividends from several markets was restricted or impossible, and the group's Nigerian operations remained the load-bearing source of profit. The strategic thesis that pan-African expansion would replicate Nigerian unit economics proved to depend on structural assumptions about FX liquidity and regional demand cycles that did not hold evenly across markets.",
     decisionContext:
       'Whether to extrapolate Nigerian cement-market unit economics (~60% EBITDA margins, limited effective competition) across sub-Saharan Africa on the thesis that infrastructure demand would absorb capacity and that margin performance was a function of operational excellence rather than market structure.',
     outcome: 'partial_failure',
     impactScore: 72,
-    estimatedImpact: 'Multi-year capacity underutilisation in 5+ African markets; c.$1-2B in stranded expansion capex; restricted dividend repatriation from several subsidiaries',
+    estimatedImpact:
+      'Multi-year capacity underutilisation in 5+ African markets; c.$1-2B in stranded expansion capex; restricted dividend repatriation from several subsidiaries',
     impactDirection: 'negative',
     biasesPresent: [
       'survivorship_bias',
@@ -98,17 +99,13 @@ export const EMERGING_MARKETS_FAILURE_CASES: CaseStudy[] = [
     summary:
       'In October 2019, MTN Nigeria implemented a flat fee on USSD sessions used by Nigerian banks for mobile-banking transactions, anchoring the price against the cost of telecoms infrastructure while Nigerian banks argued USSD was a regulated financial-services rail that should be priced under CBN / NCC guidance rather than telecoms commercial rates. The billing model was suspended under public backlash within days. The dispute escalated into a multi-year fight between MTN, the Nigerian Communications Commission (NCC), the Central Bank of Nigeria (CBN), and the Nigerian banks — culminating in a March 2021 CBN-NCC joint directive setting USSD pricing at ₦6.98 per session, well below the level MTN had set. The underlying dispute over accumulated arrears continued through 2022.',
     decisionContext:
-      'Whether to unilaterally price a service sitting at the intersection of two regulators (NCC for telecoms, CBN for banking) on a commercial-cost-recovery basis, anchoring against MTN\'s own infrastructure cost model rather than negotiating a regulator-brokered rate.',
+      "Whether to unilaterally price a service sitting at the intersection of two regulators (NCC for telecoms, CBN for banking) on a commercial-cost-recovery basis, anchoring against MTN's own infrastructure cost model rather than negotiating a regulator-brokered rate.",
     outcome: 'partial_failure',
     impactScore: 58,
-    estimatedImpact: 'Multi-year regulatory dispute; flat-fee model reversed within days; ₦42B+ (c.$100M) in USSD arrears disputed with banks; reputational damage with retail consumers',
+    estimatedImpact:
+      'Multi-year regulatory dispute; flat-fee model reversed within days; ₦42B+ (c.$100M) in USSD arrears disputed with banks; reputational damage with retail consumers',
     impactDirection: 'negative',
-    biasesPresent: [
-      'overconfidence_bias',
-      'anchoring_bias',
-      'framing_effect',
-      'planning_fallacy',
-    ],
+    biasesPresent: ['overconfidence_bias', 'anchoring_bias', 'framing_effect', 'planning_fallacy'],
     primaryBias: 'overconfidence_bias',
     toxicCombinations: ['Anchor + Sprint'],
     beneficialPatterns: [],
@@ -127,7 +124,7 @@ export const EMERGING_MARKETS_FAILURE_CASES: CaseStudy[] = [
     },
     lessonsLearned: [
       'Pricing a dual-regulated service (telecoms + banking) unilaterally on a cost-recovery anchor ignored the governance-determinant exposure: two regulators with overlapping mandates and a demonstrated willingness to coordinate against a single counterparty.',
-      'Anchoring the pricing decision on MTN\'s own infrastructure cost model without pressure-testing against CBN consumer-protection priorities is a textbook framing error — the relevant frame was financial inclusion, not telecoms unit economics.',
+      "Anchoring the pricing decision on MTN's own infrastructure cost model without pressure-testing against CBN consumer-protection priorities is a textbook framing error — the relevant frame was financial inclusion, not telecoms unit economics.",
       'The speed of reversal (days) versus the duration of the dispute (years) is characteristic of Blind Sprint failures: a pricing move made without regulator pre-alignment costs little to reverse but creates multi-year arrears disputes.',
       'A structural audit would have flagged the governance determinant (two regulators, explicit consumer-protection mandate) as the load-bearing exposure before implementation.',
     ],
@@ -142,7 +139,7 @@ export const EMERGING_MARKETS_FAILURE_CASES: CaseStudy[] = [
       date: '2019-09-01',
       documentType: 'internal_memo',
       detectableRedFlags: [
-        'Pricing autonomy asserted over a service sitting under two regulators\' mandates, without pre-alignment with either',
+        "Pricing autonomy asserted over a service sitting under two regulators' mandates, without pre-alignment with either",
         'Cost-recovery anchor calculated against MTN-internal cost model rather than against a regulator-acceptable benchmark',
         'No scenario modelled for joint-regulator intervention despite historical CBN-NCC precedent for coordinated directives',
         'Financial-inclusion framing (how banks will price USSD to retail customers) absent from the pricing-review document',
@@ -168,12 +165,13 @@ export const EMERGING_MARKETS_FAILURE_CASES: CaseStudy[] = [
     year: 2018,
     yearRealized: 2020,
     summary:
-      'In December 2018, Access Bank announced the acquisition of Diamond Bank for a reported ₦72B (c.$200M at the transaction-date rate) in cash and shares, making it Nigeria\'s largest bank by assets. Access\'s thesis rested on retail-deposit synergies from Diamond\'s mobile-banking franchise, cost synergies from branch rationalisation, and the recovery of a substantial non-performing-loan book — including large exposures to the telecoms sector (notably 9mobile / Etisalat) that Diamond had absorbed before the merger. Through 2020-2021, Access booked significant additional NPL write-downs, integration costs ran above forecast, and the retail-deposit synergy materialised partially but with higher customer-acquisition cost than the transaction thesis modelled. Access did become the largest Nigerian bank by assets, and CEO Herbert Wigwe publicly framed the deal as strategically successful; the price paid to achieve that position — in write-downs, integration cost, and cycle timing — was materially higher than the announced deal economics suggested.',
+      "In December 2018, Access Bank announced the acquisition of Diamond Bank for a reported ₦72B (c.$200M at the transaction-date rate) in cash and shares, making it Nigeria's largest bank by assets. Access's thesis rested on retail-deposit synergies from Diamond's mobile-banking franchise, cost synergies from branch rationalisation, and the recovery of a substantial non-performing-loan book — including large exposures to the telecoms sector (notably 9mobile / Etisalat) that Diamond had absorbed before the merger. Through 2020-2021, Access booked significant additional NPL write-downs, integration costs ran above forecast, and the retail-deposit synergy materialised partially but with higher customer-acquisition cost than the transaction thesis modelled. Access did become the largest Nigerian bank by assets, and CEO Herbert Wigwe publicly framed the deal as strategically successful; the price paid to achieve that position — in write-downs, integration cost, and cycle timing — was materially higher than the announced deal economics suggested.",
     decisionContext:
       'Whether to acquire a distressed competitor with a large legacy NPL book (including concentrated telecoms exposure) at a discount-to-book price, on the thesis that the resulting combined entity would capture retail-deposit synergies and NPL-recovery upside exceeding the absorbed loan losses — during a Nigerian banking cycle already showing FX stress and rising sovereign-risk spreads.',
     outcome: 'partial_success',
     impactScore: 68,
-    estimatedImpact: 'Access became largest Nigerian bank by assets; NPL write-downs exceeded pre-deal forecast by c.2-3x; integration costs ran above budget; eventual strategic position strong but acquired at a higher all-in cost than headline deal economics implied',
+    estimatedImpact:
+      'Access became largest Nigerian bank by assets; NPL write-downs exceeded pre-deal forecast by c.2-3x; integration costs ran above budget; eventual strategic position strong but acquired at a higher all-in cost than headline deal economics implied',
     impactDirection: 'negative',
     biasesPresent: [
       'sunk_cost_fallacy',
@@ -201,7 +199,7 @@ export const EMERGING_MARKETS_FAILURE_CASES: CaseStudy[] = [
     },
     lessonsLearned: [
       'Acquiring a distressed bank with concentrated sectoral NPL exposure during a stressed macro cycle requires explicit pricing of the recovery tail — the headline discount-to-book masks the cycle-timing risk.',
-      'The Intercontinental Bank precedent (2012) provided a genuine integration-capability signal — a beneficial pattern — but the macro cycle in 2012 was more favourable than in 2018-2020, and anchoring on the prior integration\'s success risked underpricing the cycle-sensitive element.',
+      "The Intercontinental Bank precedent (2012) provided a genuine integration-capability signal — a beneficial pattern — but the macro cycle in 2012 was more favourable than in 2018-2020, and anchoring on the prior integration's success risked underpricing the cycle-sensitive element.",
       'The structural-assumption layer (Dalio) would have flagged the debt-cycle and currency-cycle determinants as load-bearing: the NPL recovery model and the retail-deposit synergy both assumed continued naira stability and a banking-cycle recovery that did not materialise on the original timeline.',
       'Access eventually achieved the strategic position it sought, but the deal is a canonical example of a partial success that looks like a full success if one anchors on the post-deal size metric and ignores the cycle-adjusted cost of getting there.',
     ],
@@ -210,13 +208,13 @@ export const EMERGING_MARKETS_FAILURE_CASES: CaseStudy[] = [
     sourceType: 'annual_report',
     preDecisionEvidence: {
       document:
-        'Access Bank\'s December 2018 investor presentation on the proposed Diamond acquisition (as filed with the Nigerian Exchange): the transaction thesis was framed as three synergy streams — (1) retail-deposit scale from Diamond\'s c.19 million customer base, (2) branch-network cost synergies from rationalising overlap, (3) NPL recovery on the acquired book at a discount to book value. The NPL recovery assumption was sized against Diamond\'s disclosed NPL ratio at deal announcement and did not include an additional reserve for incremental write-downs post-close. The telecoms-sector exposure (notably 9mobile) was acknowledged as a risk item but not stress-tested against a scenario in which the restructuring of the underlying borrowers extended beyond 24 months. The transaction\'s cost-of-capital input used Access\'s pre-deal weighted-average cost of capital rather than a cycle-adjusted rate. No scenario modelled an additional 50-100% NPL write-down beyond the book as disclosed at announcement.',
+        "Access Bank's December 2018 investor presentation on the proposed Diamond acquisition (as filed with the Nigerian Exchange): the transaction thesis was framed as three synergy streams — (1) retail-deposit scale from Diamond's c.19 million customer base, (2) branch-network cost synergies from rationalising overlap, (3) NPL recovery on the acquired book at a discount to book value. The NPL recovery assumption was sized against Diamond's disclosed NPL ratio at deal announcement and did not include an additional reserve for incremental write-downs post-close. The telecoms-sector exposure (notably 9mobile) was acknowledged as a risk item but not stress-tested against a scenario in which the restructuring of the underlying borrowers extended beyond 24 months. The transaction's cost-of-capital input used Access's pre-deal weighted-average cost of capital rather than a cycle-adjusted rate. No scenario modelled an additional 50-100% NPL write-down beyond the book as disclosed at announcement.",
       source:
         'Access Bank / Diamond Bank joint scheme document (Dec 2018); Access Bank Q4 2018 investor presentation; CardinalStone Research "Access / Diamond: the integration thesis" (Jan 2019)',
       date: '2018-12-17',
       documentType: 'investor_deck',
       detectableRedFlags: [
-        'NPL reserve assumption anchored on Diamond\'s disclosed ratio at announcement, with no scenario for incremental write-downs post-close — anchoring bias',
+        "NPL reserve assumption anchored on Diamond's disclosed ratio at announcement, with no scenario for incremental write-downs post-close — anchoring bias",
         'Telecoms-sector concentration (9mobile / Etisalat) acknowledged as "risk item" rather than sized into a specific scenario — framing effect',
         'Cost-of-capital input used pre-deal WACC rather than a cycle-adjusted rate during a period of rising Nigerian sovereign-risk spreads',
         'Intercontinental Bank integration precedent cited as positive signal without adjusting for the macro-cycle difference between 2012 and 2018-2020',
@@ -229,7 +227,7 @@ export const EMERGING_MARKETS_FAILURE_CASES: CaseStudy[] = [
         'sunk_cost_fallacy',
       ],
       hypotheticalAnalysis:
-        'DI Platform would flag: MEDIUM-HIGH "Anchor + Sprint" pattern. Cognitive audit would surface anchoring on Diamond\'s disclosed NPL ratio and planning fallacy on integration timeline. Structural audit (Dalio lens) would flag TWO load-bearing determinants: debt-cycle (Nigerian banking cycle-timing on NPL recovery) and currency-cycle (naira stability assumption implicit in retail-deposit synergy modelling). The institutional-memory signal — prior successful Intercontinental integration — is a genuine beneficial pattern and should be weighted in the decision, but at a discount reflecting the cycle-regime difference. Hardening questions: (1) What\'s the NPL write-down path if 9mobile restructuring extends beyond 24 months? (2) What\'s the retail-deposit synergy in a naira-devaluation scenario? (3) What\'s the integration-cost budget with a 1.5x planning-fallacy buffer applied to the announced timeline? Recommendation: proceed with the acquisition but with a higher NPL reserve and a phased-integration cost budget that explicitly reflects the cycle-timing risk.',
+        "DI Platform would flag: MEDIUM-HIGH \"Anchor + Sprint\" pattern. Cognitive audit would surface anchoring on Diamond's disclosed NPL ratio and planning fallacy on integration timeline. Structural audit (Dalio lens) would flag TWO load-bearing determinants: debt-cycle (Nigerian banking cycle-timing on NPL recovery) and currency-cycle (naira stability assumption implicit in retail-deposit synergy modelling). The institutional-memory signal — prior successful Intercontinental integration — is a genuine beneficial pattern and should be weighted in the decision, but at a discount reflecting the cycle-regime difference. Hardening questions: (1) What's the NPL write-down path if 9mobile restructuring extends beyond 24 months? (2) What's the retail-deposit synergy in a naira-devaluation scenario? (3) What's the integration-cost budget with a 1.5x planning-fallacy buffer applied to the announced timeline? Recommendation: proceed with the acquisition but with a higher NPL reserve and a phased-integration cost budget that explicitly reflects the cycle-timing risk.",
     },
     relatedCases: ['cs-fail-em-001'],
     patternFamily: 'Cycle-Timed M&A on a Distressed Target',
@@ -248,7 +246,8 @@ export const EMERGING_MARKETS_FAILURE_CASES: CaseStudy[] = [
       'Whether to underwrite Jumia at the proposed IPO valuation on the thesis that GMV growth across 14 African markets translated linearly to defensible unit economics, treating the cross-border footprint as a moat rather than a cost-allocation problem.',
     outcome: 'partial_failure',
     impactScore: 78,
-    estimatedImpact: 'IPO valuation collapse from $1.4B day-one peak to ~$200M by 2023; multiple market exits; metrics restatement and SEC scrutiny',
+    estimatedImpact:
+      'IPO valuation collapse from $1.4B day-one peak to ~$200M by 2023; multiple market exits; metrics restatement and SEC scrutiny',
     impactDirection: 'negative',
     biasesPresent: [
       'survivorship_bias',
@@ -318,12 +317,13 @@ export const EMERGING_MARKETS_FAILURE_CASES: CaseStudy[] = [
     year: 2020,
     yearRealized: 2024,
     summary:
-      'Equity Group, Kenya\'s largest bank by customers, completed its acquisition of Banque Commerciale du Congo (BCDC) in August 2020 — combining BCDC with its existing ProCredit Bank Congo subsidiary to form Equity BCDC, the second-largest bank in DRC. The thesis: Equity\'s mobile-first model and SME-focused origination would translate across the regional CEMAC + EAC bloc, replicating its Kenyan unit economics. Outcome: Equity BCDC became Equity\'s second-largest market by 2023, but DRC operations carry materially higher cost-of-risk than the home market and the regional integration thesis has run into governance + currency-cycle frictions that were minor in Kenya. Decision rated partial-failure on the original thesis, not on the acquisition itself.',
+      "Equity Group, Kenya's largest bank by customers, completed its acquisition of Banque Commerciale du Congo (BCDC) in August 2020 — combining BCDC with its existing ProCredit Bank Congo subsidiary to form Equity BCDC, the second-largest bank in DRC. The thesis: Equity's mobile-first model and SME-focused origination would translate across the regional CEMAC + EAC bloc, replicating its Kenyan unit economics. Outcome: Equity BCDC became Equity's second-largest market by 2023, but DRC operations carry materially higher cost-of-risk than the home market and the regional integration thesis has run into governance + currency-cycle frictions that were minor in Kenya. Decision rated partial-failure on the original thesis, not on the acquisition itself.",
     decisionContext:
-      'Whether to extend Equity\'s mobile-first banking model across the CEMAC + EAC bloc through an anchor acquisition (BCDC), assuming the regulatory and currency environment in DRC + Rwanda would tolerate the same operational template that worked in Kenya.',
+      "Whether to extend Equity's mobile-first banking model across the CEMAC + EAC bloc through an anchor acquisition (BCDC), assuming the regulatory and currency environment in DRC + Rwanda would tolerate the same operational template that worked in Kenya.",
     outcome: 'partial_failure',
     impactScore: 58,
-    estimatedImpact: 'Higher-than-projected cost-of-risk in DRC operations; regional thesis materially modified by 2023; integration costs ran ~30% over plan',
+    estimatedImpact:
+      'Higher-than-projected cost-of-risk in DRC operations; regional thesis materially modified by 2023; integration costs ran ~30% over plan',
     impactDirection: 'negative',
     biasesPresent: [
       'overconfidence_bias',
@@ -361,12 +361,13 @@ export const EMERGING_MARKETS_FAILURE_CASES: CaseStudy[] = [
     preDecisionEvidence: {
       document:
         'Equity Group 2019 strategy review: management presented BCDC acquisition as the anchor of a "Pan-African 2024" target — top-3 bank position in 6 EAC + CEMAC markets, with the assumption that the Kenyan cost-to-income ratio (52% in 2019) would converge in newly-acquired markets within 36 months. The plan modelled DRC cost-of-risk at 250bps, 60% above the Kenyan reference (155bps) but well below the BCDC standalone history (340bps under prior management). Pre-mortem identified integration-timeline + cost-of-risk variance as the two top risks; mitigations were budgeted but with a 12-month, not 24-month, buffer.',
-      source: 'Equity Group strategy review 2019; BCDC due-diligence summary disclosed in shareholder circular',
+      source:
+        'Equity Group strategy review 2019; BCDC due-diligence summary disclosed in shareholder circular',
       date: '2019-12-15',
       documentType: 'strategy_document',
       detectableRedFlags: [
         'Kenyan cost-to-income ratio used as a 36-month convergence target across 5 different jurisdictions',
-        'DRC cost-of-risk plan (250bps) is 26% below BCDC standalone history (340bps) — implicit assumption that Equity\'s origination shifts the risk profile inside 36 months',
+        "DRC cost-of-risk plan (250bps) is 26% below BCDC standalone history (340bps) — implicit assumption that Equity's origination shifts the risk profile inside 36 months",
         'Integration-cost buffer at 12 months despite 24-month historical median for cross-border bank integrations',
         'Currency-cycle risk on Congolese franc treated as a translation-only item, not a thesis-level structural assumption',
       ],
@@ -391,12 +392,13 @@ export const EMERGING_MARKETS_FAILURE_CASES: CaseStudy[] = [
     year: 2021,
     yearRealized: 2024,
     summary:
-      'Twiga Foods raised a $50M Series C in 2021 led by Creadev with participation from Goldman Sachs, IFC, and TLcom — pitched as the leading B2B food-distribution platform in Kenya with a thesis to expand pan-African (Nigeria, Côte d\'Ivoire, Uganda) and to vertically integrate into manufacturing (Twiga Fresh). By late 2023, Twiga had retrenched: management changes, layoffs of >280 staff across 2022-2023, exit from Nigeria, suspension of Twiga Fresh manufacturing, and a recapitalisation that revalued the company well below its 2021 mark. Decision: the structural thesis that B2B distribution platform economics translate at the same density across SSA proved incorrect under post-COVID FX + capital cycle conditions.',
+      "Twiga Foods raised a $50M Series C in 2021 led by Creadev with participation from Goldman Sachs, IFC, and TLcom — pitched as the leading B2B food-distribution platform in Kenya with a thesis to expand pan-African (Nigeria, Côte d'Ivoire, Uganda) and to vertically integrate into manufacturing (Twiga Fresh). By late 2023, Twiga had retrenched: management changes, layoffs of >280 staff across 2022-2023, exit from Nigeria, suspension of Twiga Fresh manufacturing, and a recapitalisation that revalued the company well below its 2021 mark. Decision: the structural thesis that B2B distribution platform economics translate at the same density across SSA proved incorrect under post-COVID FX + capital cycle conditions.",
     decisionContext:
       'Whether to underwrite Twiga at a $300-400M Series C valuation on a thesis that B2B agri-food distribution unit economics replicate across SSA, with vertical integration into manufacturing as a margin-protection lever.',
     outcome: 'failure',
     impactScore: 81,
-    estimatedImpact: 'Multi-investor markdown of 2021 Series C valuation by 60-80%; >280 layoffs; Nigeria exit; manufacturing line suspension',
+    estimatedImpact:
+      'Multi-investor markdown of 2021 Series C valuation by 60-80%; >280 layoffs; Nigeria exit; manufacturing line suspension',
     impactDirection: 'negative',
     biasesPresent: [
       'survivorship_bias',
@@ -424,7 +426,7 @@ export const EMERGING_MARKETS_FAILURE_CASES: CaseStudy[] = [
     lessonsLearned: [
       'Capital-cycle timing matters: a 2021-vintage thesis priced for 2021 capital availability does not survive a 2022-2023 SSA capital-cycle reset.',
       'Authority bias in syndicate participation (Goldman + IFC) substituted for unit-economics scrutiny among co-investors. Authority is correlated with conviction, not with first-principles reasoning.',
-      'Vertical integration into manufacturing on top of cross-border expansion compounds two structural bets — capital intensity AND geographic-scaling — into one round\'s thesis. Each is hard alone.',
+      "Vertical integration into manufacturing on top of cross-border expansion compounds two structural bets — capital intensity AND geographic-scaling — into one round's thesis. Each is hard alone.",
       'A structural audit would have flagged debt-cycle (capital availability dependency for follow-ons), currency-cycle (NGN exposure on Nigeria entry), and trade-share (intra-SSA agri-input flows) as load-bearing.',
     ],
     source:
@@ -432,12 +434,12 @@ export const EMERGING_MARKETS_FAILURE_CASES: CaseStudy[] = [
     sourceType: 'news_investigation',
     preDecisionEvidence: {
       document:
-        'Twiga Series C investor memo (Q3 2021): pitched the company as the Pan-African B2B food-distribution platform with 100k+ active retailer customers in Kenya, growing to a target of 1M+ across SSA by 2025. The thesis assumed (a) Kenyan unit economics translate to Nigeria + Côte d\'Ivoire within 18-24 months of market entry, (b) vertical integration into manufacturing (Twiga Fresh) compounds margin by 800-1200bps, and (c) follow-on capital at 2021 rates would be available through 2023. The round was priced at ~$300M post.',
+        "Twiga Series C investor memo (Q3 2021): pitched the company as the Pan-African B2B food-distribution platform with 100k+ active retailer customers in Kenya, growing to a target of 1M+ across SSA by 2025. The thesis assumed (a) Kenyan unit economics translate to Nigeria + Côte d'Ivoire within 18-24 months of market entry, (b) vertical integration into manufacturing (Twiga Fresh) compounds margin by 800-1200bps, and (c) follow-on capital at 2021 rates would be available through 2023. The round was priced at ~$300M post.",
       source: 'Twiga Series C investor memo Q3 2021; co-investor circulars',
       date: '2021-11-01',
       documentType: 'investor_deck',
       detectableRedFlags: [
-        'Kenyan unit economics translated to Nigeria + Côte d\'Ivoire on an 18-24 month convergence assumption with no per-market route-density modelling',
+        "Kenyan unit economics translated to Nigeria + Côte d'Ivoire on an 18-24 month convergence assumption with no per-market route-density modelling",
         'Vertical integration into manufacturing AND geographic expansion underwritten in a single round — two distinct structural bets',
         'Follow-on capital availability assumed at 2021 SSA-VC rates through 2023 — a capital-cycle assumption load-bearing on the burn-rate plan',
         'Syndicate stack (Goldman + IFC + Creadev + TLcom) provides authority signal that may have substituted for unit-economics scrutiny among co-investors',
@@ -470,7 +472,8 @@ export const EMERGING_MARKETS_FAILURE_CASES: CaseStudy[] = [
       'Whether to underwrite MoMo as a standalone pan-African fintech at a unified valuation — assuming regulatory + interoperability convergence across 17 markets — or as a portfolio of country-level mobile-money businesses with country-specific cycle exposures.',
     outcome: 'partial_failure',
     impactScore: 65,
-    estimatedImpact: 'IPO deferral; standalone-fintech valuation rerating ~$2B downward; multi-market regulatory frictions in Nigeria, Uganda, Cameroon',
+    estimatedImpact:
+      'IPO deferral; standalone-fintech valuation rerating ~$2B downward; multi-market regulatory frictions in Nigeria, Uganda, Cameroon',
     impactDirection: 'negative',
     biasesPresent: [
       'narrative_fallacy',
@@ -496,8 +499,8 @@ export const EMERGING_MARKETS_FAILURE_CASES: CaseStudy[] = [
     },
     lessonsLearned: [
       'Regulatory convergence across 17 sub-Saharan markets is not a base case; it is a structural bet that should be priced into the multiple, not assumed.',
-      'M-Pesa\'s Kenyan trajectory is one data point, not the modal regional trajectory. Survivorship-biasing the M-Pesa story produces a confidence interval that is too narrow on cross-border returns.',
-      'Standalone-fintech valuation requires unit-economics homogeneity that the underlying portfolio doesn\'t have. Treat as a portfolio of 17 country businesses with idiosyncratic cycle exposure and discount accordingly.',
+      "M-Pesa's Kenyan trajectory is one data point, not the modal regional trajectory. Survivorship-biasing the M-Pesa story produces a confidence interval that is too narrow on cross-border returns.",
+      "Standalone-fintech valuation requires unit-economics homogeneity that the underlying portfolio doesn't have. Treat as a portfolio of 17 country businesses with idiosyncratic cycle exposure and discount accordingly.",
     ],
     source:
       'MTN Group annual reports 2019-2023 (JSE + NSE filings); MTN MoMo IPO deferral statements (2022, 2023); CBN action on MTN Nigeria MoMo agency activity (2022); Bank of Uganda mobile-money agent-commission cap announcement (2023)',
@@ -512,7 +515,7 @@ export const EMERGING_MARKETS_FAILURE_CASES: CaseStudy[] = [
         '"Single mobile-money rail" framing across 17 SSA markets — narrative-fallacy cue treating regulatory + interoperability convergence as inevitable rather than as a 17-jurisdiction structural bet',
         'M-Pesa Kenyan ARPU used as the convergence reference — survivorship bias on a single-jurisdiction trajectory',
         'Nigeria + Cameroon regulatory friction priced as residual disclosure rather than thesis-level (CBN audit subsequently materialised)',
-        'Standalone-fintech valuation premised on portfolio homogeneity that the 17-market portfolio doesn\'t empirically have',
+        "Standalone-fintech valuation premised on portfolio homogeneity that the 17-market portfolio doesn't empirically have",
         'IPO timing assumption (12-18 months) does not account for cross-jurisdictional regulatory-clearance variance',
       ],
       flaggableBiases: [
@@ -536,12 +539,13 @@ export const EMERGING_MARKETS_FAILURE_CASES: CaseStudy[] = [
     year: 2018,
     yearRealized: 2023,
     summary:
-      'Naspers held a ~31% stake in Tencent acquired in 2001 for $32M, which by 2018 represented >100% of Naspers\' market cap (the rest of the conglomerate trading at a negative implied value). Successive structural moves — the 2019 Prosus listing in Amsterdam, the 2021 share-stapling, and the 2022 open-ended Tencent share buyback to fund Naspers/Prosus repurchases — were framed as discount-narrowing measures. The structural assumption: a Tencent + Chinese-tech-cycle position held inside an SA-listed corporate vehicle could trade at parity to direct Tencent exposure if the discount was managed structurally. Outcome: 2021-2022 Chinese-tech-platform regulatory regime change (anti-monopoly, gaming-time restrictions, ride-hail crackdown) collapsed Tencent\'s multiple, structurally re-priced the discount, and exposed the cross-border cycle assumption as the load-bearing structural bet all along.',
+      "Naspers held a ~31% stake in Tencent acquired in 2001 for $32M, which by 2018 represented >100% of Naspers' market cap (the rest of the conglomerate trading at a negative implied value). Successive structural moves — the 2019 Prosus listing in Amsterdam, the 2021 share-stapling, and the 2022 open-ended Tencent share buyback to fund Naspers/Prosus repurchases — were framed as discount-narrowing measures. The structural assumption: a Tencent + Chinese-tech-cycle position held inside an SA-listed corporate vehicle could trade at parity to direct Tencent exposure if the discount was managed structurally. Outcome: 2021-2022 Chinese-tech-platform regulatory regime change (anti-monopoly, gaming-time restrictions, ride-hail crackdown) collapsed Tencent's multiple, structurally re-priced the discount, and exposed the cross-border cycle assumption as the load-bearing structural bet all along.",
     decisionContext:
       'Whether to treat the Naspers/Tencent stake as a structural-investment with a managed discount, or as a single-name, single-jurisdiction cycle exposure that needed cycle-aware divestment timing.',
     outcome: 'partial_failure',
     impactScore: 76,
-    estimatedImpact: 'Tencent multiple compression of >40% peak-to-trough 2021-2022; Naspers/Prosus discount widened to >40% at multiple points; structural restructurings did not durably narrow the discount through the cycle',
+    estimatedImpact:
+      'Tencent multiple compression of >40% peak-to-trough 2021-2022; Naspers/Prosus discount widened to >40% at multiple points; structural restructurings did not durably narrow the discount through the cycle',
     impactDirection: 'negative',
     biasesPresent: [
       'anchoring_bias',
@@ -597,7 +601,7 @@ export const EMERGING_MARKETS_FAILURE_CASES: CaseStudy[] = [
         'survivorship_bias',
       ],
       hypotheticalAnalysis:
-        'DI Platform would flag: HIGH anchoring on the 2001-2018 Tencent trajectory + sunk-cost on the position size. Beneficial-pattern signal: structural restructurings indicate active engagement (process is good); the issue is cycle-aware sizing, not engagement effort. Structural audit (Dalio lens) flags THREE load-bearing determinants: governance variance (CN regulatory regime), reserve-currency status (USD/CNY-cycle), and debt-cycle (CN domestic credit cycle) — all on the home-jurisdiction of the underlying asset, not on the holder\'s own jurisdiction. Hardening questions: (1) What does the position-size policy say about a single asset exceeding 100% of corporate market cap, and was that policy applied here? (2) What is the cycle-aware divestment schedule that would have reduced concentration into the 2014-2018 favourable regime? (3) What is the discount-narrowing thesis under a CN regulatory regime change scenario, and was that scenario priced into the 2018-2019 structural moves? Recommendation: accelerate divestment with a cycle-aware schedule rather than relying on structural-restructuring discount-narrowing alone; explicitly price a regulatory regime-change scenario into the discount-management plan.',
+        "DI Platform would flag: HIGH anchoring on the 2001-2018 Tencent trajectory + sunk-cost on the position size. Beneficial-pattern signal: structural restructurings indicate active engagement (process is good); the issue is cycle-aware sizing, not engagement effort. Structural audit (Dalio lens) flags THREE load-bearing determinants: governance variance (CN regulatory regime), reserve-currency status (USD/CNY-cycle), and debt-cycle (CN domestic credit cycle) — all on the home-jurisdiction of the underlying asset, not on the holder's own jurisdiction. Hardening questions: (1) What does the position-size policy say about a single asset exceeding 100% of corporate market cap, and was that policy applied here? (2) What is the cycle-aware divestment schedule that would have reduced concentration into the 2014-2018 favourable regime? (3) What is the discount-narrowing thesis under a CN regulatory regime change scenario, and was that scenario priced into the 2018-2019 structural moves? Recommendation: accelerate divestment with a cycle-aware schedule rather than relying on structural-restructuring discount-narrowing alone; explicitly price a regulatory regime-change scenario into the discount-management plan.",
     },
     relatedCases: [],
     patternFamily: 'Cross-Border Concentration · Cycle-Regime Risk',

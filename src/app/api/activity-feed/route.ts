@@ -191,10 +191,7 @@ export async function GET(request: NextRequest) {
         ? prisma.decisionPackage
             .findMany({
               where: {
-                OR: [
-                  { ownerUserId: user.id },
-                  { documents: { some: { document: docWhere } } },
-                ],
+                OR: [{ ownerUserId: user.id }, { documents: { some: { document: docWhere } } }],
                 ...(cursorDate ? { updatedAt: { lt: cursorDate } } : {}),
               },
               orderBy: { updatedAt: 'desc' },

@@ -19,10 +19,7 @@ import { SOFT_DELETE_GRACE_DAYS } from '@/lib/utils/plan-limits';
 
 const log = createLogger('DocumentRestore');
 
-export async function POST(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const supabase = await createClient();

@@ -26,9 +26,7 @@ import {
   Download,
   ChevronDown,
 } from 'lucide-react';
-import type {
-  ProvenanceRecordData,
-} from '@/lib/reports/provenance-record-data';
+import type { ProvenanceRecordData } from '@/lib/reports/provenance-record-data';
 
 interface Props {
   analysisId: string;
@@ -139,8 +137,8 @@ export function DprPreviewCard({ analysisId, onDownload }: Props) {
             }}
           >
             Schema v{data.schemaVersion} · {data.regulatoryMapping.length} regulator
-            {data.regulatoryMapping.length === 1 ? '' : 's'} mapped ·{' '}
-            {data.citations.length} citation{data.citations.length === 1 ? '' : 's'}
+            {data.regulatoryMapping.length === 1 ? '' : 's'} mapped · {data.citations.length}{' '}
+            citation{data.citations.length === 1 ? '' : 's'}
           </div>
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
@@ -190,11 +188,7 @@ export function DprPreviewCard({ analysisId, onDownload }: Props) {
             color: 'var(--text-secondary)',
           }}
         >
-          <Field
-            icon={<Hash size={11} />}
-            label="Input hash"
-            value={shortHash(data.inputHash)}
-          />
+          <Field icon={<Hash size={11} />} label="Input hash" value={shortHash(data.inputHash)} />
           <Field
             icon={<Hash size={11} />}
             label="Prompt fingerprint"
@@ -256,15 +250,7 @@ export function DprPreviewCard({ analysisId, onDownload }: Props) {
   );
 }
 
-function Field({
-  icon,
-  label,
-  value,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-}) {
+function Field({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <div>
       <div

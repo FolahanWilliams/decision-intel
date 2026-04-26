@@ -66,8 +66,8 @@ export function DalioConstellation() {
     });
   }, []);
 
-  const active = activeId ? DALIO_BRIEF.find(d => d.id === activeId) ?? null : null;
-  const hover = hoverId ? DALIO_BRIEF.find(d => d.id === hoverId) ?? null : null;
+  const active = activeId ? (DALIO_BRIEF.find(d => d.id === activeId) ?? null) : null;
+  const hover = hoverId ? (DALIO_BRIEF.find(d => d.id === hoverId) ?? null) : null;
   const focused = active ?? hover;
 
   return (
@@ -276,9 +276,7 @@ export function DalioConstellation() {
                 }}
               >
                 {(
-                  Object.entries(CATEGORY_LABELS) as Array<
-                    [DeterminantBrief['category'], string]
-                  >
+                  Object.entries(CATEGORY_LABELS) as Array<[DeterminantBrief['category'], string]>
                 ).map(([key, label]) => (
                   <div
                     key={key}
@@ -301,9 +299,7 @@ export function DalioConstellation() {
                     <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
                       {label.split(' · ')[0]}
                     </span>
-                    <span style={{ color: 'var(--text-muted)' }}>
-                      {label.split(' · ')[1]}
-                    </span>
+                    <span style={{ color: 'var(--text-muted)' }}>{label.split(' · ')[1]}</span>
                   </div>
                 ))}
               </div>

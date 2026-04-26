@@ -319,11 +319,7 @@ export default function DealDetailPage() {
             marginBottom: 14,
           }}
         >
-          <UploadToDealButton
-            dealId={deal.id}
-            dealName={deal.name}
-            onUploaded={() => mutate()}
-          />
+          <UploadToDealButton dealId={deal.id} dealName={deal.name} onUploaded={() => mutate()} />
         </div>
 
         {/* Tabs */}
@@ -362,10 +358,7 @@ export default function DealDetailPage() {
           />
         )}
         {activeTab === 'bias' && (
-          <BiasSummaryTab
-            documents={deal.documents || []}
-            aggregation={deal.aggregation ?? null}
-          />
+          <BiasSummaryTab documents={deal.documents || []} aggregation={deal.aggregation ?? null} />
         )}
         {activeTab === 'outcome' && <OutcomeTab deal={deal} onUpdate={() => mutate()} />}
         {activeTab === 'brief' && <DecisionBriefTab dealId={dealId} />}
@@ -616,9 +609,9 @@ function BiasSummaryTab({
           }}
         >
           {analyzedCount} of {documents.length} document
-          {documents.length !== 1 ? 's' : ''} analyzed. The composite Deal DQI
-          and recurring biases are shown above the tabs. Below: every bias flagged
-          on any document linked to this deal, ranked by how many documents share it.
+          {documents.length !== 1 ? 's' : ''} analyzed. The composite Deal DQI and recurring biases
+          are shown above the tabs. Below: every bias flagged on any document linked to this deal,
+          ranked by how many documents share it.
         </div>
       </div>
 

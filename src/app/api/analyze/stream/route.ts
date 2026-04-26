@@ -611,9 +611,7 @@ export async function POST(request: NextRequest) {
                   // jury, fact-checker, and meta-judge.
                   judgeOutputs: toPrismaJson({
                     biasDetective: {
-                      flagCount: Array.isArray(report.biases)
-                        ? report.biases.length
-                        : 0,
+                      flagCount: Array.isArray(report.biases) ? report.biases.length : 0,
                       severeFlagCount: Array.isArray(report.biases)
                         ? (report.biases as Array<{ severity?: string }>).filter(
                             b => b.severity === 'high' || b.severity === 'critical'
@@ -652,9 +650,7 @@ export async function POST(request: NextRequest) {
                           }
                         | undefined;
                       if (!fc) return null;
-                      const verifications = Array.isArray(fc.verifications)
-                        ? fc.verifications
-                        : [];
+                      const verifications = Array.isArray(fc.verifications) ? fc.verifications : [];
                       return {
                         score: fc.score ?? null,
                         totalClaims: verifications.length,
@@ -812,9 +808,7 @@ export async function POST(request: NextRequest) {
             (async () => {
               try {
                 const baseUrl =
-                  process.env.NEXT_PUBLIC_APP_URL ||
-                  request.headers.get('origin') ||
-                  '';
+                  process.env.NEXT_PUBLIC_APP_URL || request.headers.get('origin') || '';
                 if (!baseUrl) return;
                 // Pass the auth cookie so the in-band POST resolves the
                 // same Supabase user context as the original SSE call.
@@ -908,9 +902,7 @@ export async function POST(request: NextRequest) {
                   },
                 });
 
-                const { runCrossReferenceAgent } = await import(
-                  '@/lib/agents/cross-reference'
-                );
+                const { runCrossReferenceAgent } = await import('@/lib/agents/cross-reference');
                 const { getDocumentContent: decrypt } = await import('@/lib/utils/encryption');
                 const inputs = docs
                   .map(d => {
@@ -977,9 +969,7 @@ export async function POST(request: NextRequest) {
                 .catch(() => [] as Array<{ packageId: string }>);
               if (memberships.length === 0) return;
 
-              const { recomputePackageMetrics } = await import(
-                '@/lib/scoring/package-aggregation'
-              );
+              const { recomputePackageMetrics } = await import('@/lib/scoring/package-aggregation');
               const { runCrossReferenceAgent } = await import('@/lib/agents/cross-reference');
               const { getDocumentContent: decrypt } = await import('@/lib/utils/encryption');
 

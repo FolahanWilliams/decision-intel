@@ -95,8 +95,7 @@ export async function PATCH(
 
     const update: Record<string, unknown> = {};
     if ('role' in body) {
-      update.role =
-        typeof body.role === 'string' ? body.role.trim().slice(0, 60) || null : null;
+      update.role = typeof body.role === 'string' ? body.role.trim().slice(0, 60) || null : null;
     }
     if (typeof body.position === 'number') {
       update.position = Math.max(0, Math.floor(body.position));

@@ -460,8 +460,8 @@ export default function SharedAnalysisPage() {
             Identify yourself to continue
           </h2>
           <p style={{ color: C.slate500, margin: 0, marginBottom: 20, fontSize: 14 }}>
-            The owner of this link asked to record who reads it. Your email
-            is logged on the access trail and not shared further.
+            The owner of this link asked to record who reads it. Your email is logged on the access
+            trail and not shared further.
           </p>
           <form
             onSubmit={e => {
@@ -512,9 +512,7 @@ export default function SharedAnalysisPage() {
               {loading ? 'Loading…' : 'View audit'}
             </button>
           </form>
-          {emailError && (
-            <p style={{ color: C.red, marginTop: 12, fontSize: 13 }}>{emailError}</p>
-          )}
+          {emailError && <p style={{ color: C.red, marginTop: 12, fontSize: 13 }}>{emailError}</p>}
           {error && <p style={{ color: C.red, marginTop: 12, fontSize: 13 }}>{error}</p>}
         </div>
       </div>

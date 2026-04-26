@@ -116,14 +116,15 @@ export async function GET(req: NextRequest) {
         }
 
         const surveyUrl = `${appUrl}/shared/blind-prior/${encodeURIComponent(invite.submissionToken)}`;
-        const deadlineDisplay = room.blindPriorDeadline?.toLocaleString('en-US', {
-          weekday: 'short',
-          month: 'short',
-          day: 'numeric',
-          hour: 'numeric',
-          minute: '2-digit',
-          timeZoneName: 'short',
-        }) || 'soon';
+        const deadlineDisplay =
+          room.blindPriorDeadline?.toLocaleString('en-US', {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+            timeZoneName: 'short',
+          }) || 'soon';
         const subject = `Reminder: blind prior due ${deadlineDisplay}`;
         const html = `
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width:560px; margin:0 auto;">
@@ -170,9 +171,7 @@ export async function GET(req: NextRequest) {
       }).catch(err => log.warn('blind-prior reminder audit log failed:', err));
     }
 
-    log.info(
-      `Blind-prior reminder cron: rooms=${rooms.length} sent=${sent} skipped=${skipped}`
-    );
+    log.info(`Blind-prior reminder cron: rooms=${rooms.length} sent=${sent} skipped=${skipped}`);
     return NextResponse.json({
       ok: true,
       processed,

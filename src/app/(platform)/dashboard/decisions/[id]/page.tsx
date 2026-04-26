@@ -80,10 +80,7 @@ export default async function DecisionPackageDetailPage({ params }: Props) {
             gap: 14,
           }}
         >
-          <Package
-            size={20}
-            style={{ color: 'var(--text-muted)', flexShrink: 0, marginTop: 2 }}
-          />
+          <Package size={20} style={{ color: 'var(--text-muted)', flexShrink: 0, marginTop: 2 }} />
           <div style={{ flex: 1 }}>
             <h1
               style={{
@@ -104,9 +101,9 @@ export default async function DecisionPackageDetailPage({ params }: Props) {
                 lineHeight: 1.55,
               }}
             >
-              This Decision Package either doesn&rsquo;t exist, was deleted, or you don&rsquo;t
-              have access. If you followed a shared link, ask the package owner to invite you;
-              if you bookmarked this page from your own org, the package may have been removed.
+              This Decision Package either doesn&rsquo;t exist, was deleted, or you don&rsquo;t have
+              access. If you followed a shared link, ask the package owner to invite you; if you
+              bookmarked this page from your own org, the package may have been removed.
             </p>
             <div style={{ display: 'flex', gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
               <Link

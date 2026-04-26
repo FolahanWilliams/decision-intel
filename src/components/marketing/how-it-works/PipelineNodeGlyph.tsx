@@ -28,13 +28,7 @@ const BASE = {
 
 function Svg({ size = 22, color, children }: GlyphProps & { children: React.ReactNode }) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      style={{ color }}
-    >
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" style={{ color }}>
       <g stroke="currentColor" {...BASE}>
         {children}
       </g>

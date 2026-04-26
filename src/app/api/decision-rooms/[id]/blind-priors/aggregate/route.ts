@@ -17,17 +17,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
 import { createLogger } from '@/lib/utils/logger';
-import {
-  aggregateBlindPriors,
-  type BlindPriorRow,
-} from '@/lib/learning/blind-prior-aggregate';
+import { aggregateBlindPriors, type BlindPriorRow } from '@/lib/learning/blind-prior-aggregate';
 
 const log = createLogger('BlindPriorAggregate');
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -106,9 +100,7 @@ export async function GET(
           phase: 'collecting',
           revealed: false,
           deadline: room.blindPriorDeadline?.toISOString() ?? null,
-          mySubmission: room.decisionRoomBlindPriors.find(
-            p => p.respondentUserId === user.id
-          )
+          mySubmission: room.decisionRoomBlindPriors.find(p => p.respondentUserId === user.id)
             ? {
                 submittedAt: room.decisionRoomBlindPriors
                   .find(p => p.respondentUserId === user.id)!

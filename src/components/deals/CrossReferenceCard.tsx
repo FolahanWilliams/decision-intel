@@ -220,7 +220,9 @@ export function CrossReferenceCard({ dealId, initialRun, aggregation, onRunCompl
                 <strong style={{ color: 'var(--text-primary)' }}>Partial scan.</strong>{' '}
                 {truncation.truncatedDocs.length > 0 && (
                   <>
-                    {truncation.truncatedDocs.length} doc{truncation.truncatedDocs.length === 1 ? '' : 's'} truncated to fit the cross-reference budget
+                    {truncation.truncatedDocs.length} doc
+                    {truncation.truncatedDocs.length === 1 ? '' : 's'} truncated to fit the
+                    cross-reference budget
                     {truncation.truncatedDocs.length <= 3 && (
                       <> ({truncation.truncatedDocs.map(d => d.documentName).join(', ')})</>
                     )}
@@ -230,7 +232,9 @@ export function CrossReferenceCard({ dealId, initialRun, aggregation, onRunCompl
                 {truncation.excludedDocs.length > 0 && (
                   <>
                     {' '}
-                    {truncation.excludedDocs.length} doc{truncation.excludedDocs.length === 1 ? '' : 's'} excluded entirely once the {Math.round(truncation.totalCapChars / 1000)}K-char total cap was reached
+                    {truncation.excludedDocs.length} doc
+                    {truncation.excludedDocs.length === 1 ? '' : 's'} excluded entirely once the{' '}
+                    {Math.round(truncation.totalCapChars / 1000)}K-char total cap was reached
                     {truncation.excludedDocs.length <= 3 && (
                       <> ({truncation.excludedDocs.map(d => d.documentName).join(', ')})</>
                     )}
@@ -259,11 +263,7 @@ export function CrossReferenceCard({ dealId, initialRun, aggregation, onRunCompl
             opacity: canRun ? 1 : 0.55,
           }}
         >
-          {running ? (
-            <Loader2 size={13} className="animate-spin" />
-          ) : (
-            <GitCompare size={13} />
-          )}
+          {running ? <Loader2 size={13} className="animate-spin" /> : <GitCompare size={13} />}
           {running ? 'Running…' : run ? 'Re-run' : 'Run review'}
         </button>
       </div>
@@ -292,9 +292,7 @@ export function CrossReferenceCard({ dealId, initialRun, aggregation, onRunCompl
                 }}
               >
                 <button
-                  onClick={() =>
-                    setExpanded(prev => ({ ...prev, [id]: !prev[id] }))
-                  }
+                  onClick={() => setExpanded(prev => ({ ...prev, [id]: !prev[id] }))}
                   style={{
                     display: 'flex',
                     alignItems: 'flex-start',
@@ -308,10 +306,7 @@ export function CrossReferenceCard({ dealId, initialRun, aggregation, onRunCompl
                   }}
                   aria-expanded={isOpen}
                 >
-                  <AlertTriangle
-                    size={14}
-                    style={{ color: colour, flexShrink: 0, marginTop: 2 }}
-                  />
+                  <AlertTriangle size={14} style={{ color: colour, flexShrink: 0, marginTop: 2 }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div
                       style={{
@@ -468,7 +463,8 @@ export function CrossReferenceCard({ dealId, initialRun, aggregation, onRunCompl
             marginTop: 8,
           }}
         >
-          Upload at least one more document and run its audit before kicking off a cross-document review.
+          Upload at least one more document and run its audit before kicking off a cross-document
+          review.
         </div>
       )}
     </div>

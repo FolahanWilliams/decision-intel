@@ -4,7 +4,10 @@ import { useMemo, useState } from 'react';
 import { CheckCircle2, ChevronDown, Code2, ExternalLink, Filter } from 'lucide-react';
 import { HOLE_MATRIX, STATUS_DISPLAY, type CapabilityStatus } from './sankore-brief-data';
 
-const TONE: Record<'success' | 'amber' | 'info' | 'muted', { bg: string; text: string; border: string }> = {
+const TONE: Record<
+  'success' | 'amber' | 'info' | 'muted',
+  { bg: string; text: string; border: string }
+> = {
   success: { bg: 'rgba(22,163,74,0.10)', text: '#16A34A', border: 'rgba(22,163,74,0.30)' },
   amber: { bg: 'rgba(217,119,6,0.10)', text: '#D97706', border: 'rgba(217,119,6,0.30)' },
   info: { bg: 'rgba(37,99,235,0.10)', text: '#2563EB', border: 'rgba(37,99,235,0.30)' },
@@ -195,10 +198,7 @@ export function HoleClosureMatrix() {
                     {h.shipped}
                   </p>
                   {h.surfaces.length > 0 && (
-                    <div
-                      className="flex flex-wrap gap-2"
-                      style={{ marginTop: 4 }}
-                    >
+                    <div className="flex flex-wrap gap-2" style={{ marginTop: 4 }}>
                       {h.surfaces.map((s, i) => {
                         const isLink = !!s.href;
                         const inner = (

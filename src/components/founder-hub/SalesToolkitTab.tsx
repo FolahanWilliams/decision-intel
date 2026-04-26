@@ -1,6 +1,16 @@
 'use client';
 
-import { Rocket, Shield, Play, MessageSquare, Layers, AlertTriangle, Heart, Users, Activity } from 'lucide-react';
+import {
+  Rocket,
+  Shield,
+  Play,
+  MessageSquare,
+  Layers,
+  AlertTriangle,
+  Heart,
+  Users,
+  Activity,
+} from 'lucide-react';
 import { PitchReframeToggle } from './sales/PitchReframeToggle';
 import { ObjectionFlashcards } from './sales/ObjectionFlashcards';
 import { DemoStepperTimeline } from './sales/DemoStepperTimeline';

@@ -57,12 +57,25 @@ export function CapabilitySurfaces() {
                   {s.title}
                 </span>
                 {s.internal ? (
-                  <ArrowUpRight size={13} style={{ color: 'var(--accent-primary)', flexShrink: 0, marginTop: 2 }} />
+                  <ArrowUpRight
+                    size={13}
+                    style={{ color: 'var(--accent-primary)', flexShrink: 0, marginTop: 2 }}
+                  />
                 ) : (
-                  <ExternalLink size={11} style={{ color: 'var(--accent-primary)', flexShrink: 0, marginTop: 2 }} />
+                  <ExternalLink
+                    size={11}
+                    style={{ color: 'var(--accent-primary)', flexShrink: 0, marginTop: 2 }}
+                  />
                 )}
               </div>
-              <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>
+              <p
+                style={{
+                  fontSize: 12.5,
+                  color: 'var(--text-secondary)',
+                  margin: 0,
+                  lineHeight: 1.5,
+                }}
+              >
                 {s.oneLiner}
               </p>
               <div
@@ -76,7 +89,9 @@ export function CapabilitySurfaces() {
                   lineHeight: 1.5,
                 }}
               >
-                <strong style={{ color: 'var(--text-secondary)', fontStyle: 'normal' }}>Demo: </strong>
+                <strong style={{ color: 'var(--text-secondary)', fontStyle: 'normal' }}>
+                  Demo:{' '}
+                </strong>
                 {s.demoNote}
               </div>
             </div>

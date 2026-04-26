@@ -42,23 +42,17 @@ function formatDeadline(iso: string | null): string {
 }
 
 export function BlindPriorSubmitClient({ token, room, invite, existingPrior }: Props) {
-  const [confidence, setConfidence] = useState<number>(
-    existingPrior?.confidencePercent ?? 50
-  );
+  const [confidence, setConfidence] = useState<number>(existingPrior?.confidencePercent ?? 50);
   const initialRisks = existingPrior?.topRisks ?? [];
   const [risk1, setRisk1] = useState(initialRisks[0] ?? '');
   const [risk2, setRisk2] = useState(initialRisks[1] ?? '');
   const [risk3, setRisk3] = useState(initialRisks[2] ?? '');
   const [rationale, setRationale] = useState('');
-  const [shareRationale, setShareRationale] = useState(
-    existingPrior?.shareRationale ?? false
-  );
+  const [shareRationale, setShareRationale] = useState(existingPrior?.shareRationale ?? false);
   const [shareIdentity, setShareIdentity] = useState(existingPrior?.shareIdentity ?? false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [submittedAt, setSubmittedAt] = useState<string | null>(
-    existingPrior?.submittedAt ?? null
-  );
+  const [submittedAt, setSubmittedAt] = useState<string | null>(existingPrior?.submittedAt ?? null);
 
   const isObserver = invite.role === 'observer';
 
@@ -127,8 +121,9 @@ export function BlindPriorSubmitClient({ token, room, invite, existingPrior }: P
             Observer access
           </h1>
           <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>
-            You were invited as an observer for &ldquo;{room.title}&rdquo;. Observers don&rsquo;t submit a
-            blind prior. You&rsquo;ll receive a notification when the aggregate is revealed.
+            You were invited as an observer for &ldquo;{room.title}&rdquo;. Observers don&rsquo;t
+            submit a blind prior. You&rsquo;ll receive a notification when the aggregate is
+            revealed.
           </p>
         </div>
       </main>
@@ -196,7 +191,12 @@ export function BlindPriorSubmitClient({ token, room, invite, existingPrior }: P
             fontSize: 13,
           }}
         >
-          <span>Deadline: <strong style={{ color: 'var(--text-primary)' }}>{formatDeadline(room.deadline)}</strong></span>
+          <span>
+            Deadline:{' '}
+            <strong style={{ color: 'var(--text-primary)' }}>
+              {formatDeadline(room.deadline)}
+            </strong>
+          </span>
           <span>·</span>
           <span>
             Submitting as{' '}
@@ -276,9 +276,21 @@ export function BlindPriorSubmitClient({ token, room, invite, existingPrior }: P
             description="What's most likely to cause this decision to fail? Up to three; one per box."
           >
             <div style={{ display: 'grid', gap: 8 }}>
-              <RiskInput value={risk1} onChange={setRisk1} placeholder="e.g. FX volatility outpaces hedge" />
-              <RiskInput value={risk2} onChange={setRisk2} placeholder="e.g. Integration timeline slips past Q2" />
-              <RiskInput value={risk3} onChange={setRisk3} placeholder="e.g. Counsel review surfaces material disclosure gap" />
+              <RiskInput
+                value={risk1}
+                onChange={setRisk1}
+                placeholder="e.g. FX volatility outpaces hedge"
+              />
+              <RiskInput
+                value={risk2}
+                onChange={setRisk2}
+                placeholder="e.g. Integration timeline slips past Q2"
+              />
+              <RiskInput
+                value={risk3}
+                onChange={setRisk3}
+                placeholder="e.g. Counsel review surfaces material disclosure gap"
+              />
             </div>
           </Field>
 

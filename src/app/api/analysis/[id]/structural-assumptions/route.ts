@@ -44,7 +44,8 @@ type StructuralAudit = {
 
 function normaliseDefensibility(v: unknown): StructuralAssumption['defensibility'] {
   const s = String(v ?? '').toLowerCase();
-  if (s === 'well_supported' || s === 'well-supported' || s === 'supported') return 'well_supported';
+  if (s === 'well_supported' || s === 'well-supported' || s === 'supported')
+    return 'well_supported';
   if (s === 'partially_supported' || s === 'partial' || s === 'partially-supported')
     return 'partially_supported';
   if (s === 'contradicted' || s === 'contradictory') return 'contradicted';
@@ -132,14 +133,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     // into the structural-assumptions prompt so an overridden EM memo
     // gets EM-shaped Dalio prompts and a Lagos memo isn't audited
     // against developed-market baselines.
-    const effectiveContext = (analysis.marketContextOverride ??
-      analysis.marketContextApplied) as
-      | {
-          context?: 'emerging_market' | 'developed_market' | 'cross_border' | 'unknown';
-          emergingMarketCountries?: string[];
-          developedMarketCountries?: string[];
-        }
-      | null;
+    const effectiveContext = (analysis.marketContextOverride ?? analysis.marketContextApplied) as {
+      context?: 'emerging_market' | 'developed_market' | 'cross_border' | 'unknown';
+      emergingMarketCountries?: string[];
+      developedMarketCountries?: string[];
+    } | null;
     const region = effectiveContext
       ? [
           ...(effectiveContext.emergingMarketCountries ?? []),
@@ -185,7 +183,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           determinantId: id,
           determinantLabel: determinant?.label,
           category: determinant?.category,
-          assumption: String(a.assumption ?? '').trim().slice(0, 400),
+          assumption: String(a.assumption ?? '')
+            .trim()
+            .slice(0, 400),
           defensibility: normaliseDefensibility(a.defensibility),
           severity: normaliseSeverity(a.severity),
           evidenceFromMemo:
@@ -253,10 +253,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json(payload);
   } catch (err) {
     log.error('structural-assumptions audit failed', err as Error);
-    return NextResponse.json(
-      { error: 'Structural assumptions audit failed' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Structural assumptions audit failed' }, { status: 500 });
   }
 }
 
@@ -322,9 +319,6 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json(payload);
   } catch (err) {
     log.error('structural-assumptions GET failed', err as Error);
-    return NextResponse.json(
-      { error: 'Failed to load structural assumptions' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to load structural assumptions' }, { status: 500 });
   }
 }

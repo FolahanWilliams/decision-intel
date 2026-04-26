@@ -9,15 +9,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import {
-  FileText,
-  Upload,
-  Compass,
-  Briefcase,
-  TrendingUp,
-  Landmark,
-  Users,
-} from 'lucide-react';
+import { FileText, Upload, Compass, Briefcase, TrendingUp, Landmark, Users } from 'lucide-react';
 
 /**
  * First-login gate. Captures role (CSO / M&A / BizOps / PE-Venture-Fund /
@@ -420,14 +412,11 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
             lineHeight: 1.5,
           }}
         >
-          <strong style={{ color: 'var(--text-primary)' }}>Before you upload:</strong>{' '}
-          documents are encrypted with AES-256-GCM at rest, transit-encrypted with TLS 1.2+,
-          and a GDPR / NDPR anonymizer strips PII as the literal first step of the analysis
-          pipeline — no LLM ever sees raw personal data.{' '}
-          <a
-            href="/privacy"
-            style={{ color: 'var(--accent-primary)', fontWeight: 600 }}
-          >
+          <strong style={{ color: 'var(--text-primary)' }}>Before you upload:</strong> documents are
+          encrypted with AES-256-GCM at rest, transit-encrypted with TLS 1.2+, and a GDPR / NDPR
+          anonymizer strips PII as the literal first step of the analysis pipeline — no LLM ever
+          sees raw personal data.{' '}
+          <a href="/privacy" style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>
             See /privacy
           </a>{' '}
           for the full Art 13 disclosure (lawful basis, retention, your rights).
@@ -436,4 +425,3 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
     </Dialog>
   );
 }
-

@@ -36,10 +36,7 @@ function escapeHtml(str: string): string {
     .replace(/'/g, '&#39;');
 }
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -193,9 +190,7 @@ export async function POST(
           </div>
         </div>
       `;
-      emailQueue.push(
-        sendEmail({ to: recipientEmail, subject, html, includeUnsubscribe: false })
-      );
+      emailQueue.push(sendEmail({ to: recipientEmail, subject, html, includeUnsubscribe: false }));
     }
     Promise.allSettled(emailQueue).catch(() => {
       /* swallow — individual sendEmail handles its own logging. */

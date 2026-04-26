@@ -45,10 +45,7 @@ async function getOrgId(userId: string): Promise<string | null> {
   }
 }
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -59,6 +56,7 @@ export async function GET(
     }
     const { id: dealId } = await params;
     const format = request.nextUrl.searchParams.get('format') ?? 'json';
+    const clientSafe = request.nextUrl.searchParams.get('clientSafe') === '1';
 
     const orgId = await getOrgId(user.id);
     const deal = await prisma.deal.findFirst({
@@ -73,7 +71,7 @@ export async function GET(
 
     if (format === 'pdf') {
       const generator = new DecisionProvenanceRecordGenerator();
-      const pdf = generator.generate(data);
+      const pdf = generator.generate(data, { clientSafe });
       const bytes = pdf.output('arraybuffer');
 
       await logAudit({

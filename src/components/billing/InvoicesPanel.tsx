@@ -270,7 +270,10 @@ export function InvoicesPanel() {
                         whiteSpace: 'nowrap',
                       }}
                     >
-                      {formatMoney(inv.status === 'paid' ? inv.amountPaid : inv.amountDue, inv.currency)}
+                      {formatMoney(
+                        inv.status === 'paid' ? inv.amountPaid : inv.amountDue,
+                        inv.currency
+                      )}
                     </div>
                     <div style={{ display: 'flex', gap: 6 }}>
                       {inv.pdfUrl && (

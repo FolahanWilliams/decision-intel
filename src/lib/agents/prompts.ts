@@ -1266,7 +1266,21 @@ function buildSovereignContextBlock(emergingMarketCountries: string[]): string {
       '• Ghana — cedi managed float; 2022 sovereign-default + IMF programme is the live cycle. Bank-of-Ghana FX restrictions can shift mid-year. Eurobond restructuring is in active conclusion as of 2024-25; capital-controls risk during dollar-debt-service windows.'
     );
   }
-  if (lc.some(c => ['côte d’ivoire', 'cote d’ivoire', 'senegal', 'mali', 'burkina faso', 'benin', 'togo', 'niger', 'guinea-bissau'].includes(c))) {
+  if (
+    lc.some(c =>
+      [
+        'côte d’ivoire',
+        'cote d’ivoire',
+        'senegal',
+        'mali',
+        'burkina faso',
+        'benin',
+        'togo',
+        'niger',
+        'guinea-bissau',
+      ].includes(c)
+    )
+  ) {
     hits.push(
       '• WAEMU (CFA-franc zone) — XOF pegged to EUR by the BCEAO; convertibility guaranteed by the French Treasury under the convertibility agreement. FX risk is materially LOWER than other African markets, but the CFA-zone is itself a political construct under periodic review (the 2019 ECO redenomination is partial). Cross-border governance via BCEAO Circular 04-2017.'
     );
@@ -1315,19 +1329,22 @@ When the memo's structural assumptions touch any of the above, prefer flagging t
 --- END SOVEREIGN-CONTEXT GUIDANCE ---\n`;
 }
 
-export function buildStructuralAssumptionsPrompt(memoText: string, context?: {
-  industry?: string;
-  region?: string;
-  marketContext?: 'emerging_market' | 'developed_market' | 'cross_border';
-  /**
-   * Country list from `detectMarketContext().emergingMarketCountries`.
-   * When provided, the prompt injects per-jurisdiction sovereign-context
-   * guidance via `buildSovereignContextBlock()` so the agent
-   * distinguishes Lagos / Nairobi / Cairo / WAEMU / Johannesburg as
-   * structurally different regimes — not one EM bucket.
-   */
-  emergingMarketCountries?: string[];
-}): string {
+export function buildStructuralAssumptionsPrompt(
+  memoText: string,
+  context?: {
+    industry?: string;
+    region?: string;
+    marketContext?: 'emerging_market' | 'developed_market' | 'cross_border';
+    /**
+     * Country list from `detectMarketContext().emergingMarketCountries`.
+     * When provided, the prompt injects per-jurisdiction sovereign-context
+     * guidance via `buildSovereignContextBlock()` so the agent
+     * distinguishes Lagos / Nairobi / Cairo / WAEMU / Johannesburg as
+     * structurally different regimes — not one EM bucket.
+     */
+    emergingMarketCountries?: string[];
+  }
+): string {
   const determinantsBlock = buildDalioPromptBlock();
   const sovereignBlock = context?.emergingMarketCountries
     ? buildSovereignContextBlock(context.emergingMarketCountries)

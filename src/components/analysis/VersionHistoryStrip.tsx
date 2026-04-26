@@ -2,15 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import {
-  ChevronRight,
-  GitBranch,
-  GitCompareArrows,
-  Loader2,
-  Pencil,
-  Check,
-  X,
-} from 'lucide-react';
+import { ChevronRight, GitBranch, GitCompareArrows, Loader2, Pencil, Check, X } from 'lucide-react';
 import { MemoDiffViewer } from './MemoDiffViewer';
 
 interface Version {
@@ -82,9 +74,7 @@ export function VersionHistoryStrip({ documentId, hideWhenSingle = true, isOwner
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(
-          `/api/documents/${encodeURIComponent(documentId)}/versions`
-        );
+        const res = await fetch(`/api/documents/${encodeURIComponent(documentId)}/versions`);
         if (!res.ok) throw new Error(`Failed (${res.status})`);
         const data = (await res.json()) as { versions: Version[] };
         if (!cancelled) setVersions(data.versions);
@@ -191,18 +181,14 @@ export function VersionHistoryStrip({ documentId, hideWhenSingle = true, isOwner
                   }}
                 >
                   v{v.versionNumber}
-                  {isCurrent && (
-                    <span style={{ marginLeft: 6, fontWeight: 600 }}>· current</span>
-                  )}
+                  {isCurrent && <span style={{ marginLeft: 6, fontWeight: 600 }}>· current</span>}
                 </div>
                 {/* 2.3 deep — version label inline editor (owner-only on the
                     current version). Shows the label inline when set; click
                     pencil to edit. */}
                 {isCurrent && isOwner ? (
                   editingLabelFor === v.id ? (
-                    <div
-                      style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 1 }}
-                    >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 1 }}>
                       <input
                         value={labelDraft}
                         onChange={e => setLabelDraft(e.target.value.slice(0, 80))}
@@ -356,10 +342,7 @@ export function VersionHistoryStrip({ documentId, hideWhenSingle = true, isOwner
                 {isCurrent ? (
                   inner
                 ) : (
-                  <Link
-                    href={`/documents/${v.id}`}
-                    style={{ textDecoration: 'none' }}
-                  >
+                  <Link href={`/documents/${v.id}`} style={{ textDecoration: 'none' }}>
                     {inner}
                   </Link>
                 )}

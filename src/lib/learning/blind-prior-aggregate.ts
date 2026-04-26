@@ -75,14 +75,12 @@ export interface BlindPriorAggregate {
   /** Mean Brier across stamped priors (null when none stamped yet). */
   meanBrier: number | null;
   /** Best-calibrated participant — the prior with the lowest Brier. */
-  bestCalibrated:
-    | {
-        name: string | null;
-        confidencePercent: number;
-        brierScore: number;
-        brierCategory: string | null;
-      }
-    | null;
+  bestCalibrated: {
+    name: string | null;
+    confidencePercent: number;
+    brierScore: number;
+    brierCategory: string | null;
+  } | null;
 }
 
 const HISTOGRAM_BUCKETS: ConfidenceHistogramBucket[] = [
@@ -127,8 +125,7 @@ export function aggregateBlindPriors(priors: BlindPriorRow[]): BlindPriorAggrega
   }
 
   const confidences = priors.map(p => p.confidencePercent);
-  const meanConfidence =
-    confidences.reduce((sum, v) => sum + v, 0) / confidences.length;
+  const meanConfidence = confidences.reduce((sum, v) => sum + v, 0) / confidences.length;
   const variance =
     confidences.reduce((sum, v) => sum + (v - meanConfidence) ** 2, 0) / confidences.length;
   const stdDevConfidence = Math.sqrt(variance);
@@ -199,9 +196,7 @@ export function aggregateBlindPriors(priors: BlindPriorRow[]): BlindPriorAggrega
 
   let bestCalibrated: BlindPriorAggregate['bestCalibrated'] = null;
   if (stamped.length > 0) {
-    const sortedByBrier = [...stamped].sort(
-      (a, b) => (a.brierScore ?? 1) - (b.brierScore ?? 1)
-    );
+    const sortedByBrier = [...stamped].sort((a, b) => (a.brierScore ?? 1) - (b.brierScore ?? 1));
     const top = sortedByBrier[0];
     bestCalibrated = {
       name: top.shareIdentity ? (top.respondentName ?? null) : null,

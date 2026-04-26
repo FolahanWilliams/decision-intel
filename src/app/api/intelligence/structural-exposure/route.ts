@@ -20,10 +20,7 @@ import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
 import { createLogger } from '@/lib/utils/logger';
 import { buildDocumentAccessFilter } from '@/lib/utils/document-access';
-import {
-  DALIO_DETERMINANTS,
-  DETERMINANT_CATEGORIES,
-} from '@/lib/constants/dalio-determinants';
+import { DALIO_DETERMINANTS, DETERMINANT_CATEGORIES } from '@/lib/constants/dalio-determinants';
 
 const log = createLogger('StructuralExposure');
 
@@ -128,8 +125,7 @@ export async function GET(_req: NextRequest) {
       const existing = rollupMap.get(id);
       const determinantLabel =
         DALIO_DETERMINANTS[id]?.label ?? r.determinantLabel ?? id.replace(/_/g, ' ');
-      const determinantCategory =
-        DALIO_DETERMINANTS[id]?.category ?? r.category ?? null;
+      const determinantCategory = DALIO_DETERMINANTS[id]?.category ?? r.category ?? null;
       if (existing) {
         existing.flagCount += 1;
         existing.analysisIds.add(r.analysisId);
@@ -186,9 +182,6 @@ export async function GET(_req: NextRequest) {
     });
   } catch (err) {
     log.error('structural-exposure GET failed:', err as Error);
-    return NextResponse.json(
-      { error: 'Failed to load structural exposure' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to load structural exposure' }, { status: 500 });
   }
 }

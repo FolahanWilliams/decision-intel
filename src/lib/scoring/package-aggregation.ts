@@ -19,10 +19,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
-import {
-  aggregateAnalyses,
-  type AnalyzedDocument,
-} from '@/lib/scoring/deal-aggregation';
+import { aggregateAnalyses, type AnalyzedDocument } from '@/lib/scoring/deal-aggregation';
 import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('PackageAggregation');
@@ -38,9 +35,7 @@ export interface RecomputePackageResult {
   highSeverityConflictCount: number;
 }
 
-export async function recomputePackageMetrics(
-  packageId: string
-): Promise<RecomputePackageResult> {
+export async function recomputePackageMetrics(packageId: string): Promise<RecomputePackageResult> {
   try {
     const docs = await prisma.decisionPackageDocument.findMany({
       where: { packageId },

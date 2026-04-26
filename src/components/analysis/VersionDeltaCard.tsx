@@ -1,19 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import {
-  ArrowRight,
-  CheckCircle2,
-  Loader2,
-  Minus,
-  TrendingDown,
-  TrendingUp,
-} from 'lucide-react';
-import {
-  computeVersionDelta,
-  formatBiasName,
-  type VersionDelta,
-} from '@/lib/utils/version-delta';
+import { ArrowRight, CheckCircle2, Loader2, Minus, TrendingDown, TrendingUp } from 'lucide-react';
+import { computeVersionDelta, formatBiasName, type VersionDelta } from '@/lib/utils/version-delta';
 
 interface AnalysisFingerprint {
   id: string;
@@ -48,9 +37,7 @@ function deltaColor(direction: 'improved' | 'regressed' | 'flat') {
 // ─── component ────────────────────────────────────────────────────────────
 
 export function VersionDeltaCard({ current, previousAnalysisId, previousPreloaded }: Props) {
-  const [previous, setPrevious] = useState<AnalysisFingerprint | null>(
-    previousPreloaded ?? null
-  );
+  const [previous, setPrevious] = useState<AnalysisFingerprint | null>(previousPreloaded ?? null);
   const [loading, setLoading] = useState(!previousPreloaded);
   const [error, setError] = useState<string | null>(null);
 
@@ -117,9 +104,7 @@ export function VersionDeltaCard({ current, previousAnalysisId, previousPreloade
   const dqiColor = deltaColor(delta.dqi.direction);
   const noiseColor = deltaColor(delta.noise.direction);
   const totalChanges =
-    delta.biases.resolved.length +
-    delta.biases.emerged.length +
-    delta.biases.severityShifts.length;
+    delta.biases.resolved.length + delta.biases.emerged.length + delta.biases.severityShifts.length;
 
   return (
     <div
@@ -265,10 +250,7 @@ export function VersionDeltaCard({ current, previousAnalysisId, previousPreloade
 
         {/* Bias diff */}
         {totalChanges === 0 ? (
-          <div
-            className="text-sm flex items-center gap-2"
-            style={{ color: 'var(--text-muted)' }}
-          >
+          <div className="text-sm flex items-center gap-2" style={{ color: 'var(--text-muted)' }}>
             <CheckCircle2 size={14} style={{ color: 'var(--text-muted)' }} />
             Same bias signature as the previous version.
           </div>

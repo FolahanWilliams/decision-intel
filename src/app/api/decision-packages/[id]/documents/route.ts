@@ -20,10 +20,7 @@ import { recomputePackageMetrics } from '@/lib/scoring/package-aggregation';
 
 const log = createLogger('DecisionPackageDocuments');
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -52,8 +49,7 @@ export async function POST(
     if (!documentId) {
       return NextResponse.json({ error: 'documentId is required' }, { status: 400 });
     }
-    const role =
-      typeof body.role === 'string' ? body.role.trim().slice(0, 60) || null : null;
+    const role = typeof body.role === 'string' ? body.role.trim().slice(0, 60) || null : null;
     const positionInput =
       typeof body.position === 'number' ? Math.max(0, Math.floor(body.position)) : null;
 
@@ -75,10 +71,7 @@ export async function POST(
       select: { id: true },
     });
     if (existing) {
-      return NextResponse.json(
-        { error: 'Document is already in this package.' },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: 'Document is already in this package.' }, { status: 409 });
     }
 
     let position = positionInput;

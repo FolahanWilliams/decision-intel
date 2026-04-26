@@ -55,7 +55,9 @@ const ROLE_ICONS: Record<string, typeof Crown> = {
 
 export function BuyingCommitteeMap() {
   const [icp, setIcp] = useState<BuyingCommitteeIcp>('pan_african_fund');
-  const [activeRoleId, setActiveRoleId] = useState<string>(BUYING_COMMITTEE.pan_african_fund.roles[0].id);
+  const [activeRoleId, setActiveRoleId] = useState<string>(
+    BUYING_COMMITTEE.pan_african_fund.roles[0].id
+  );
 
   const committee = BUYING_COMMITTEE[icp];
   const activeRole = committee.roles.find(r => r.id === activeRoleId) ?? committee.roles[0];
@@ -237,16 +239,8 @@ export function BuyingCommitteeMap() {
               color={AUTHORITY_COLORS[activeRole.authority]}
               text={activeRole.cares}
             />
-            <DetailBlock
-              label="What they veto"
-              color="#DC2626"
-              text={activeRole.vetoes}
-            />
-            <DetailBlock
-              label="How to navigate"
-              color="#16A34A"
-              text={activeRole.navigate}
-            />
+            <DetailBlock label="What they veto" color="#DC2626" text={activeRole.vetoes} />
+            <DetailBlock label="How to navigate" color="#16A34A" text={activeRole.navigate} />
           </motion.div>
         </AnimatePresence>
       </div>

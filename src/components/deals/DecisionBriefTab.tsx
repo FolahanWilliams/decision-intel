@@ -150,7 +150,15 @@ export function DecisionBriefTab({ dealId }: { dealId: string }) {
   return (
     <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 20 }}>
       {/* Header with regenerate + deal-level DPR export */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: 8,
+          flexWrap: 'wrap',
+        }}
+      >
         <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>
           Decision Brief
         </h3>

@@ -155,8 +155,8 @@ export function DocumentVisibilityModal({ documentId, isOpen, onClose, onSaved }
             Who can read this document?
           </DialogTitle>
           <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0 }}>
-            Visibility controls internal access. Public share links (created via the share
-            modal) are governed separately by their own expiry rules.
+            Visibility controls internal access. Public share links (created via the share modal)
+            are governed separately by their own expiry rules.
           </p>
         </DialogHeader>
 

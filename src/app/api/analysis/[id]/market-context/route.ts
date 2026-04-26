@@ -17,10 +17,7 @@ import { Prisma } from '@prisma/client';
 import { createClient } from '@/utils/supabase/server';
 import { createLogger } from '@/lib/utils/logger';
 import { z } from 'zod';
-import {
-  GROWTH_RATE_PRIORS,
-  type MarketContext,
-} from '@/lib/constants/market-context';
+import { GROWTH_RATE_PRIORS, type MarketContext } from '@/lib/constants/market-context';
 
 const log = createLogger('MarketContextOverride');
 
@@ -91,8 +88,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     if (!parsed.success) {
       return NextResponse.json({ error: parsed.error.message }, { status: 400 });
     }
-    const { context, emergingMarketCountries, developedMarketCountries, rationale } =
-      parsed.data;
+    const { context, emergingMarketCountries, developedMarketCountries, rationale } = parsed.data;
 
     const analysis = await prisma.analysis.findUnique({
       where: { id },
@@ -107,19 +103,16 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     }
 
     const prior = GROWTH_RATE_PRIORS[context];
-    const applied = (analysis.marketContextApplied as
-      | {
-          emergingMarketCountries?: string[];
-          developedMarketCountries?: string[];
-        }
-      | null) ?? null;
+    const applied =
+      (analysis.marketContextApplied as {
+        emergingMarketCountries?: string[];
+        developedMarketCountries?: string[];
+      } | null) ?? null;
 
     const snapshot: MarketContextSnapshot = {
       context,
-      emergingMarketCountries:
-        emergingMarketCountries ?? applied?.emergingMarketCountries ?? [],
-      developedMarketCountries:
-        developedMarketCountries ?? applied?.developedMarketCountries ?? [],
+      emergingMarketCountries: emergingMarketCountries ?? applied?.emergingMarketCountries ?? [],
+      developedMarketCountries: developedMarketCountries ?? applied?.developedMarketCountries ?? [],
       cagrCeiling: prior.cagrCeiling,
       rationale: rationale && rationale.trim().length > 0 ? rationale.trim() : prior.rationale,
       overriddenAt: new Date().toISOString(),
@@ -133,9 +126,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       },
     });
 
-    log.info(
-      `Market-context override saved on analysis ${id}: ${context} (by ${user.id})`
-    );
+    log.info(`Market-context override saved on analysis ${id}: ${context} (by ${user.id})`);
 
     return NextResponse.json({ override: snapshot });
   } catch (e) {

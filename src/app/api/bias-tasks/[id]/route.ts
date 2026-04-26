@@ -37,10 +37,7 @@ async function userIsOrgAdmin(userId: string, orgId: string | null): Promise<boo
   return !!m;
 }
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -101,7 +98,10 @@ export async function PATCH(
       }
     }
 
-    if (typeof body.assigneeUserId === 'string' && body.assigneeUserId !== existing.assigneeUserId) {
+    if (
+      typeof body.assigneeUserId === 'string' &&
+      body.assigneeUserId !== existing.assigneeUserId
+    ) {
       // Reassignment: only creator or org admin can move a task to a new
       // person. The new assignee must also be in the org.
       if (!isCreator && !isOrgAdmin) {
@@ -190,10 +190,7 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {

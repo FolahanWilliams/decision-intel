@@ -177,7 +177,8 @@ export function DealCounterfactualHero({ dealId }: Props) {
               </span>
               {data.dealAggregateMonetaryImpact != null && data.dealAggregateMonetaryImpact > 0 && (
                 <>
-                  {' '}— roughly{' '}
+                  {' '}
+                  — roughly{' '}
                   <span style={{ color: 'var(--accent-primary)' }}>
                     {sym}
                     {Math.round(data.dealAggregateMonetaryImpact / 1000).toLocaleString()}K
@@ -197,8 +198,8 @@ export function DealCounterfactualHero({ dealId }: Props) {
             >
               Aggregated across {data.analyzedDocCount} analyzed{' '}
               {data.analyzedDocCount === 1 ? 'document' : 'documents'} on this deal. Each scenario
-              rolls up the per-analysis counterfactual using the same historical-outcome priors
-              that drive the document-level panels.
+              rolls up the per-analysis counterfactual using the same historical-outcome priors that
+              drive the document-level panels.
             </p>
           </div>
         </div>

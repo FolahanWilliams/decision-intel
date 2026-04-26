@@ -136,7 +136,9 @@ export default async function DecisionPackagesListPage() {
             >
               No decision packages yet
             </h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: 13, maxWidth: 480, margin: '0 auto' }}>
+            <p
+              style={{ color: 'var(--text-muted)', fontSize: 13, maxWidth: 480, margin: '0 auto' }}
+            >
               Bundle 2+ analyzed documents that constitute a single strategic decision. The package
               page renders composite DQI + recurring biases + cross-document conflicts in one view.
             </p>
@@ -270,8 +272,8 @@ export default async function DecisionPackagesListPage() {
                           p.highSeverityConflictCount > 0
                             ? '#DC2626'
                             : p.conflictCount > 0
-                            ? '#D97706'
-                            : 'var(--text-muted)',
+                              ? '#D97706'
+                              : 'var(--text-muted)',
                       }}
                     >
                       {p.conflictCount > 0 ? (

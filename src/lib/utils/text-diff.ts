@@ -126,10 +126,7 @@ export function computeTextDiff(before: string, after: string): TextDiffResult {
  * cluster; collapses the rest into a single sentinel segment with the
  * count of lines hidden.
  */
-export function collapseUnchanged(
-  segments: DiffSegment[],
-  context = 2
-): DiffSegment[] {
+export function collapseUnchanged(segments: DiffSegment[], context = 2): DiffSegment[] {
   const out: DiffSegment[] = [];
   let runStart = -1;
   let i = 0;

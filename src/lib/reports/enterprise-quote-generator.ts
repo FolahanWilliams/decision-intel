@@ -150,7 +150,10 @@ export function generateEnterpriseQuote(input: EnterpriseQuoteInput): Enterprise
       { k: 'Customer', v: input.customerName },
       { k: 'Contact', v: `${input.contactName} <${input.contactEmail}>` },
       { k: 'Region', v: regionLabel },
-      { k: 'Seats committed', v: `${input.seats.toLocaleString()} (per-seat: ${fmtMoney(input.perSeatMonthly)}/mo)` },
+      {
+        k: 'Seats committed',
+        v: `${input.seats.toLocaleString()} (per-seat: ${fmtMoney(input.perSeatMonthly)}/mo)`,
+      },
       {
         k: 'Active Deal handle',
         v:

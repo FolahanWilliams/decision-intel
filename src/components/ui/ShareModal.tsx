@@ -355,11 +355,7 @@ export function ShareModal({
                 cursor: 'pointer',
               }}
             >
-              {tab === 'export'
-                ? 'Export'
-                : tab === 'share'
-                  ? 'Quick Share'
-                  : 'Manage Links'}
+              {tab === 'export' ? 'Export' : tab === 'share' ? 'Quick Share' : 'Manage Links'}
             </button>
           ))}
         </div>
@@ -586,8 +582,7 @@ export function ShareModal({
                     }}
                   >
                     {EXPIRY_OPTIONS.find(o => o.id === expiry)?.hint}
-                    {expiry === 'never' &&
-                      ' — link stays live until you revoke it. Use sparingly.'}
+                    {expiry === 'never' && ' — link stays live until you revoke it. Use sparingly.'}
                   </div>
 
                   <label
@@ -611,8 +606,16 @@ export function ShareModal({
                     />
                     <span style={{ fontSize: 11.5, color: 'var(--text-secondary)' }}>
                       Require recipient email
-                      <span style={{ display: 'block', fontSize: 10.5, color: 'var(--text-muted)', marginTop: 1 }}>
-                        Viewer must enter an email before the analysis loads. Captured on the access log.
+                      <span
+                        style={{
+                          display: 'block',
+                          fontSize: 10.5,
+                          color: 'var(--text-muted)',
+                          marginTop: 1,
+                        }}
+                      >
+                        Viewer must enter an email before the analysis loads. Captured on the access
+                        log.
                       </span>
                     </span>
                   </label>
@@ -902,11 +905,7 @@ export function ShareModal({
                           color: statusColour,
                         }}
                       >
-                        {link.status === 'active' ? (
-                          <Clock size={11} />
-                        ) : (
-                          <AlertCircle size={11} />
-                        )}
+                        {link.status === 'active' ? <Clock size={11} /> : <AlertCircle size={11} />}
                         {link.status} · {statusLabel}
                       </div>
                       <div
@@ -919,10 +918,7 @@ export function ShareModal({
                         }}
                       >
                         <span title={`${link.viewCount} view${link.viewCount === 1 ? '' : 's'}`}>
-                          <Eye
-                            size={11}
-                            style={{ verticalAlign: -2, marginRight: 2 }}
-                          />
+                          <Eye size={11} style={{ verticalAlign: -2, marginRight: 2 }} />
                           {link.viewCount}
                         </span>
                         {link.isCaseStudy && (

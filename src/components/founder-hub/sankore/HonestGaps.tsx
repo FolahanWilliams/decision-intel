@@ -34,10 +34,7 @@ export function HonestGaps() {
               alignItems: 'flex-start',
             }}
           >
-            <AlertTriangle
-              size={16}
-              style={{ color: '#D97706', flexShrink: 0, marginTop: 2 }}
-            />
+            <AlertTriangle size={16} style={{ color: '#D97706', flexShrink: 0, marginTop: 2 }} />
             <div>
               <div
                 style={{

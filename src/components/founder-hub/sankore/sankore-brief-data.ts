@@ -94,7 +94,7 @@ export interface HoleEntry {
 export const HOLE_MATRIX: HoleEntry[] = [
   {
     title: 'Zero Dalio framing in the product',
-    flaggedBy: 'Titi (real audit) — Sankore\'s entire intellectual anchor is Ray Dalio',
+    flaggedBy: "Titi (real audit) — Sankore's entire intellectual anchor is Ray Dalio",
     status: 'shipped',
     shipped:
       'src/lib/constants/dalio-determinants.ts ships all 18 country rise/fall determinants with audit prompts. Structural-Assumptions Panel renders on every document Overview tab.',
@@ -185,8 +185,14 @@ export const HOLE_MATRIX: HoleEntry[] = [
       'Free 30d / Individual 90d / Strategy 365d / Enterprise 360d (configurable). Document.deletedAt soft-delete with 30-day grace before hard-purge via /api/cron/enforce-retention. Delete button on /documents/[id] AND on the InlineAnalysisResultCard. Audit-logged. /security#retention 4-tile grid + /pricing FAQ.',
     surfaces: [
       { label: '/security#retention', href: '/security#retention' },
-      { label: '/api/cron/enforce-retention', codePath: 'src/app/api/cron/enforce-retention/route.ts' },
-      { label: 'Delete UI on document detail', codePath: 'src/app/(platform)/documents/[id]/page.tsx' },
+      {
+        label: '/api/cron/enforce-retention',
+        codePath: 'src/app/api/cron/enforce-retention/route.ts',
+      },
+      {
+        label: 'Delete UI on document detail',
+        codePath: 'src/app/(platform)/documents/[id]/page.tsx',
+      },
     ],
   },
   {
@@ -194,7 +200,7 @@ export const HOLE_MATRIX: HoleEntry[] = [
     flaggedBy: 'Convergent — Opus recommended-first-move; Sankore + Marcus + Chinedu',
     status: 'shipped',
     shipped:
-      'BiasComment threaded comments + BiasTask assignment per BiasInstance. @mentions parse against TeamMember roster, fire one Nudge per mentioned user. Task assignment also fires Slack DM via the org\'s monitoredChannels[0] (best-effort) (2.2 lean). DEEP: tiny safe markdown renderer (mentions + bold/italic/code/link/url, no dangerouslySetInnerHTML) on comment bodies + task descriptions. Email fallback on @mentions resolves to TeamMember.email + sends templated message via sendEmail. Task overdue chip — red OVERDUE label when dueAt is past + status not resolved/dismissed; amber when due within 48h (2.2 deep).',
+      "BiasComment threaded comments + BiasTask assignment per BiasInstance. @mentions parse against TeamMember roster, fire one Nudge per mentioned user. Task assignment also fires Slack DM via the org's monitoredChannels[0] (best-effort) (2.2 lean). DEEP: tiny safe markdown renderer (mentions + bold/italic/code/link/url, no dangerouslySetInnerHTML) on comment bodies + task descriptions. Email fallback on @mentions resolves to TeamMember.email + sends templated message via sendEmail. Task overdue chip — red OVERDUE label when dueAt is past + status not resolved/dismissed; amber when due within 48h (2.2 deep).",
     surfaces: [
       { label: 'BiasCollabPanel', codePath: 'src/components/analysis/BiasCollabPanel.tsx' },
       { label: 'Comment renderer', codePath: 'src/lib/utils/comment-render.ts' },
@@ -209,7 +215,10 @@ export const HOLE_MATRIX: HoleEntry[] = [
       'Document.parentDocumentId + versionNumber + Analysis.previousAnalysisId. VersionDeltaCard renders "DQI 42 → 71 (+29)" hero card; VersionHistoryStrip shows v1 → v2 → v3 chain (2.3 lean). DEEP: pure-JS Myers/LCS line-level memo diff (src/lib/utils/text-diff.ts) with collapseUnchanged caps at 2000 lines/side. /api/documents/[id]/diff?against=Y same-chain enforcement + visibility-aware on both sides. MemoDiffViewer with green/red gutters + +N/-M stats + 60vh scroll. VersionHistoryStrip extended: per-version "Compare" button toggles inline diff; owner-only inline version-label editor on current version (Pencil icon → textbox); non-current versions show italic label inline. New PATCH /api/documents/[id] for versionLabel updates (2.3 deep).',
     surfaces: [
       { label: 'VersionDeltaCard', codePath: 'src/components/analysis/VersionDeltaCard.tsx' },
-      { label: 'VersionHistoryStrip + diff', codePath: 'src/components/analysis/VersionHistoryStrip.tsx' },
+      {
+        label: 'VersionHistoryStrip + diff',
+        codePath: 'src/components/analysis/VersionHistoryStrip.tsx',
+      },
       { label: 'MemoDiffViewer', codePath: 'src/components/analysis/MemoDiffViewer.tsx' },
       { label: 'Diff helper', codePath: 'src/lib/utils/text-diff.ts' },
     ],
@@ -222,7 +231,10 @@ export const HOLE_MATRIX: HoleEntry[] = [
       'DPR generator already shipped per-analysis 4-page PDF with hash chain + model lineage + regulatory mapping per bias (1.1 lean). DEEP: granular per-judge outputs captured during the pipeline run and persisted on Analysis.judgeOutputs (biasDetective.flagCount/severeFlagCount/biasTypes, noiseJudge.mean/stdDev/variance/sampleCount, factChecker stats, metaJudge.verdict, preMortem counts). PDF page 2 renders a PER-JUDGE CONVERGENCE block. New /api/analysis/[id]/provenance JSON endpoint + DprPreviewCard on document detail with eight-field collapsed chip; "Inspect" expands to show input hash / prompt fingerprint / pipeline node count / noise score / bias detective stats / fact checker stats / pre-mortem stats / meta verdict — without opening the PDF (1.1 deep).',
     surfaces: [
       { label: 'DprPreviewCard', codePath: 'src/components/analysis/DprPreviewCard.tsx' },
-      { label: 'DPR PDF generator', codePath: 'src/lib/reports/decision-provenance-record-generator.ts' },
+      {
+        label: 'DPR PDF generator',
+        codePath: 'src/lib/reports/decision-provenance-record-generator.ts',
+      },
       { label: 'Provenance JSON API', codePath: 'src/app/api/analysis/[id]/provenance/route.ts' },
     ],
   },
@@ -233,9 +245,15 @@ export const HOLE_MATRIX: HoleEntry[] = [
     shipped:
       'Two-phase retention (soft-delete + hard-purge) with per-tier windows already in cron (2.1 lean). DEEP: cron honors Organization.retentionDaysOverride (per-org bulk-loaded). Both phases skip docs with active legalHoldId. NEW Phase 1.5 — pre-deletion warning email fired ~7 days before hard-purge; stamps deletionWarningSentAt to prevent double-send. POST /api/documents/[id]/restore — owner-only restore within grace window (410 past it). GET/POST/PATCH /api/legal-holds — list/create/release with reason (4-2000 chars) + optional holdUntil. LegalHoldStatusChip on document detail header — "No hold" or red "Legal hold" pill + place/release modal (2.1 deep).',
     surfaces: [
-      { label: 'LegalHoldStatusChip', codePath: 'src/components/documents/LegalHoldStatusChip.tsx' },
+      {
+        label: 'LegalHoldStatusChip',
+        codePath: 'src/components/documents/LegalHoldStatusChip.tsx',
+      },
       { label: '/api/legal-holds', codePath: 'src/app/api/legal-holds/route.ts' },
-      { label: '/api/documents/[id]/restore', codePath: 'src/app/api/documents/[id]/restore/route.ts' },
+      {
+        label: '/api/documents/[id]/restore',
+        codePath: 'src/app/api/documents/[id]/restore/route.ts',
+      },
       { label: 'Retention cron', codePath: 'src/app/api/cron/enforce-retention/route.ts' },
     ],
   },
@@ -244,11 +262,20 @@ export const HOLE_MATRIX: HoleEntry[] = [
     flaggedBy: 'Titi sub-agent + Opus — bias detection applies a Western prior to EM growth',
     status: 'shipped',
     shipped:
-      'Two layers shipped: (a) market-context auto-detection during the bias pass — emerging_market | developed_market | cross_border | unknown — with EM growth-rate priors so a Lagos memo\'s 35%+ CAGR claim is no longer auto-flagged as overconfidence (3.6 lean). (b) Owner override + structural-assumptions integration (3.6 deep) — Titi can flip the auto-detection from the chip and the Dalio audit re-runs against the overridden context. THREE Dalio determinants are persisted per audit (cycle / power / fundamentals / internal / external categories) and surfaced as an org-level structural-exposure heatmap on /dashboard/analytics with EM share per determinant. Persisted so cross-analysis reads pay zero LLM cost (1.3a deep).',
+      "Two layers shipped: (a) market-context auto-detection during the bias pass — emerging_market | developed_market | cross_border | unknown — with EM growth-rate priors so a Lagos memo's 35%+ CAGR claim is no longer auto-flagged as overconfidence (3.6 lean). (b) Owner override + structural-assumptions integration (3.6 deep) — Titi can flip the auto-detection from the chip and the Dalio audit re-runs against the overridden context. THREE Dalio determinants are persisted per audit (cycle / power / fundamentals / internal / external categories) and surfaced as an org-level structural-exposure heatmap on /dashboard/analytics with EM share per determinant. Persisted so cross-analysis reads pay zero LLM cost (1.3a deep).",
     surfaces: [
-      { label: 'StructuralAssumptionsPanel', codePath: 'src/components/analysis/StructuralAssumptionsPanel.tsx' },
-      { label: 'StructuralExposureCard (analytics)', codePath: 'src/components/analysis/StructuralExposureCard.tsx' },
-      { label: 'MarketContextChip + override', codePath: 'src/components/analysis/MarketContextChip.tsx' },
+      {
+        label: 'StructuralAssumptionsPanel',
+        codePath: 'src/components/analysis/StructuralAssumptionsPanel.tsx',
+      },
+      {
+        label: 'StructuralExposureCard (analytics)',
+        codePath: 'src/components/analysis/StructuralExposureCard.tsx',
+      },
+      {
+        label: 'MarketContextChip + override',
+        codePath: 'src/components/analysis/MarketContextChip.tsx',
+      },
     ],
   },
   {
@@ -292,7 +319,10 @@ export const HOLE_MATRIX: HoleEntry[] = [
     shipped:
       'Three-state visibility (private / team / specific) on Document, with DocumentAccess allowlist for "specific" mode (3.5 lean). DEEP: visibility resolver swept across 23 doc-touching endpoints (documents-list, v1-API, analyze, analyze/stream SSE pipeline, fingerprint/risk-score/structural-assumptions, share POST, decision-rooms POST, export, audit-packet, activity-feed, versions, pdf, provenance-record, decision-graph similar/counterfactual, search insights, chat pinned + cross-doc RAG, deals child docs). Owner-only PATCH /visibility fires Nudges to grantees + AuditLog rows for every visibility change + grant add/remove. Closes the security hole the lean ship left in the listing endpoints (3.5 deep).',
     surfaces: [
-      { label: 'DocumentVisibilityModal', codePath: 'src/components/documents/DocumentVisibilityModal.tsx' },
+      {
+        label: 'DocumentVisibilityModal',
+        codePath: 'src/components/documents/DocumentVisibilityModal.tsx',
+      },
       { label: 'document-access resolver', codePath: 'src/lib/utils/document-access.ts' },
     ],
   },
@@ -331,14 +361,16 @@ export const HOLE_MATRIX: HoleEntry[] = [
     title: 'Regional / PPP-adjusted pricing',
     flaggedBy: 'Titi sub-agent — "Your pricing assumes US/UK purchasing power"',
     status: 'deferred',
-    shipped: 'Considered for Sankore design-partner offer specifically — handled outside list pricing.',
+    shipped:
+      'Considered for Sankore design-partner offer specifically — handled outside list pricing.',
     surfaces: [{ label: 'Founder Hub → Sankore offer tab' }],
   },
   {
     title: 'WhatsApp / multi-language',
     flaggedBy: 'Titi sub-agent — Africa-specific',
     status: 'deferred',
-    shipped: 'Not in current 12-week plan. Slack /di audit (Week 9+) addresses workflow-embedding for the same use-case.',
+    shipped:
+      'Not in current 12-week plan. Slack /di audit (Week 9+) addresses workflow-embedding for the same use-case.',
     surfaces: [],
   },
 ];
@@ -353,24 +385,114 @@ export interface DeterminantBrief {
 }
 
 export const DALIO_BRIEF: DeterminantBrief[] = [
-  { id: 'debt_cycle', label: 'Debt Cycle', category: 'cycles', oneLiner: 'Where the economy sits on the short + long debt cycles.' },
-  { id: 'currency_cycle', label: 'Currency / Inflation', category: 'cycles', oneLiner: 'FX strength, inflation, devaluation. EM exposures live here.' },
-  { id: 'reserve_currency_status', label: 'Reserve Currency', category: 'power', oneLiner: 'Continued USD/EUR/CNY dominance for settlement + reserves.' },
-  { id: 'economic_output', label: 'Economic Output', category: 'power', oneLiner: 'Absolute + relative GDP — drives addressable-market size.' },
-  { id: 'trade', label: 'Trade Share', category: 'power', oneLiner: 'Global-trade share, terms of trade, route dependencies.' },
-  { id: 'military', label: 'Military / Geopolitical', category: 'power', oneLiner: 'Asset security, sanction risk, contract enforceability.' },
-  { id: 'markets_financial_center', label: 'Financial Centres', category: 'power', oneLiner: 'Liquidity, exit-market depth, regulatory credibility.' },
-  { id: 'education', label: 'Education', category: 'fundamentals', oneLiner: 'Human-capital quality + quantity for execution.' },
-  { id: 'innovation', label: 'Innovation', category: 'fundamentals', oneLiner: 'Tech absorption rate, half-life of any technical moat.' },
-  { id: 'productivity', label: 'Productivity', category: 'fundamentals', oneLiner: 'Total-factor productivity — the long-run output driver.' },
-  { id: 'cost_competitiveness', label: 'Cost Competitiveness', category: 'fundamentals', oneLiner: 'Relative labour / capital / energy cost positions.' },
-  { id: 'infrastructure', label: 'Infrastructure', category: 'fundamentals', oneLiner: 'Power, ports, logistics, broadband, payment rails.' },
-  { id: 'geology', label: 'Geology / Resources', category: 'external', oneLiner: 'Raw materials, water, arable land endowment.' },
-  { id: 'acts_of_nature', label: 'Acts of Nature', category: 'external', oneLiner: 'Climate, pandemics, natural disasters as a 1st-order axis.' },
-  { id: 'governance', label: 'Governance / Rule of Law', category: 'internal', oneLiner: 'Regulatory predictability, contract enforceability.' },
-  { id: 'wealth_gaps', label: 'Wealth Gaps', category: 'internal', oneLiner: 'Internal inequality + values-conflict trajectory.' },
-  { id: 'civility', label: 'Civility / Work Ethic', category: 'internal', oneLiner: 'Cultural determinants of collective output.' },
-  { id: 'resource_allocation', label: 'Resource Allocation', category: 'internal', oneLiner: 'How efficiently capital + talent get to best opportunities.' },
+  {
+    id: 'debt_cycle',
+    label: 'Debt Cycle',
+    category: 'cycles',
+    oneLiner: 'Where the economy sits on the short + long debt cycles.',
+  },
+  {
+    id: 'currency_cycle',
+    label: 'Currency / Inflation',
+    category: 'cycles',
+    oneLiner: 'FX strength, inflation, devaluation. EM exposures live here.',
+  },
+  {
+    id: 'reserve_currency_status',
+    label: 'Reserve Currency',
+    category: 'power',
+    oneLiner: 'Continued USD/EUR/CNY dominance for settlement + reserves.',
+  },
+  {
+    id: 'economic_output',
+    label: 'Economic Output',
+    category: 'power',
+    oneLiner: 'Absolute + relative GDP — drives addressable-market size.',
+  },
+  {
+    id: 'trade',
+    label: 'Trade Share',
+    category: 'power',
+    oneLiner: 'Global-trade share, terms of trade, route dependencies.',
+  },
+  {
+    id: 'military',
+    label: 'Military / Geopolitical',
+    category: 'power',
+    oneLiner: 'Asset security, sanction risk, contract enforceability.',
+  },
+  {
+    id: 'markets_financial_center',
+    label: 'Financial Centres',
+    category: 'power',
+    oneLiner: 'Liquidity, exit-market depth, regulatory credibility.',
+  },
+  {
+    id: 'education',
+    label: 'Education',
+    category: 'fundamentals',
+    oneLiner: 'Human-capital quality + quantity for execution.',
+  },
+  {
+    id: 'innovation',
+    label: 'Innovation',
+    category: 'fundamentals',
+    oneLiner: 'Tech absorption rate, half-life of any technical moat.',
+  },
+  {
+    id: 'productivity',
+    label: 'Productivity',
+    category: 'fundamentals',
+    oneLiner: 'Total-factor productivity — the long-run output driver.',
+  },
+  {
+    id: 'cost_competitiveness',
+    label: 'Cost Competitiveness',
+    category: 'fundamentals',
+    oneLiner: 'Relative labour / capital / energy cost positions.',
+  },
+  {
+    id: 'infrastructure',
+    label: 'Infrastructure',
+    category: 'fundamentals',
+    oneLiner: 'Power, ports, logistics, broadband, payment rails.',
+  },
+  {
+    id: 'geology',
+    label: 'Geology / Resources',
+    category: 'external',
+    oneLiner: 'Raw materials, water, arable land endowment.',
+  },
+  {
+    id: 'acts_of_nature',
+    label: 'Acts of Nature',
+    category: 'external',
+    oneLiner: 'Climate, pandemics, natural disasters as a 1st-order axis.',
+  },
+  {
+    id: 'governance',
+    label: 'Governance / Rule of Law',
+    category: 'internal',
+    oneLiner: 'Regulatory predictability, contract enforceability.',
+  },
+  {
+    id: 'wealth_gaps',
+    label: 'Wealth Gaps',
+    category: 'internal',
+    oneLiner: 'Internal inequality + values-conflict trajectory.',
+  },
+  {
+    id: 'civility',
+    label: 'Civility / Work Ethic',
+    category: 'internal',
+    oneLiner: 'Cultural determinants of collective output.',
+  },
+  {
+    id: 'resource_allocation',
+    label: 'Resource Allocation',
+    category: 'internal',
+    oneLiner: 'How efficiently capital + talent get to best opportunities.',
+  },
 ];
 
 export const CATEGORY_COLOURS: Record<DeterminantBrief['category'], string> = {
@@ -403,24 +525,137 @@ export interface FrameworkBrief {
 
 export const FRAMEWORKS_BRIEF: FrameworkBrief[] = [
   // G7 — were already mapped
-  { code: 'SOX §404', name: 'Sarbanes-Oxley', region: 'g7', status: 'live', dprCoverage: 'Material-statement controls log + signed reviewer trail.' },
-  { code: 'GDPR Art. 22', name: 'EU GDPR', region: 'g7', status: 'live', dprCoverage: 'Meaningful information about the logic; per-bias evidence.' },
-  { code: 'EU AI Act · Annex III', name: 'EU AI Act', region: 'g7', status: 'enforceable_2026', enforcementDate: '2026-08-02', dprCoverage: 'Art. 14 record-keeping, Art. 13 transparency, Art. 15 accuracy.' },
-  { code: 'Basel III', name: 'Basel III · Pillar 2 ICAAP', region: 'g7', status: 'live', dprCoverage: 'Capital-decision documentation; provision attached on flagged biases.' },
-  { code: 'FCA Consumer Duty', name: 'UK Financial Conduct Authority', region: 'g7', status: 'live', dprCoverage: 'UK financial-services decisioning evidence.' },
-  { code: 'SEC Reg D', name: 'SEC Regulation D', region: 'g7', status: 'live', dprCoverage: 'Forward-looking statement / safe-harbour rigor.' },
-  { code: 'LPOA', name: 'Limited Partnership Obligations', region: 'g7', status: 'live', dprCoverage: 'Fund-level fiduciary dissent + IC-meeting record.' },
+  {
+    code: 'SOX §404',
+    name: 'Sarbanes-Oxley',
+    region: 'g7',
+    status: 'live',
+    dprCoverage: 'Material-statement controls log + signed reviewer trail.',
+  },
+  {
+    code: 'GDPR Art. 22',
+    name: 'EU GDPR',
+    region: 'g7',
+    status: 'live',
+    dprCoverage: 'Meaningful information about the logic; per-bias evidence.',
+  },
+  {
+    code: 'EU AI Act · Annex III',
+    name: 'EU AI Act',
+    region: 'g7',
+    status: 'enforceable_2026',
+    enforcementDate: '2026-08-02',
+    dprCoverage: 'Art. 14 record-keeping, Art. 13 transparency, Art. 15 accuracy.',
+  },
+  {
+    code: 'Basel III',
+    name: 'Basel III · Pillar 2 ICAAP',
+    region: 'g7',
+    status: 'live',
+    dprCoverage: 'Capital-decision documentation; provision attached on flagged biases.',
+  },
+  {
+    code: 'FCA Consumer Duty',
+    name: 'UK Financial Conduct Authority',
+    region: 'g7',
+    status: 'live',
+    dprCoverage: 'UK financial-services decisioning evidence.',
+  },
+  {
+    code: 'SEC Reg D',
+    name: 'SEC Regulation D',
+    region: 'g7',
+    status: 'live',
+    dprCoverage: 'Forward-looking statement / safe-harbour rigor.',
+  },
+  {
+    code: 'LPOA',
+    name: 'Limited Partnership Obligations',
+    region: 'g7',
+    status: 'live',
+    dprCoverage: 'Fund-level fiduciary dissent + IC-meeting record.',
+  },
   // African — 10 frameworks now registered (lean ship: 3; deep ship: +7).
-  { code: 'NDPR Art. 12', name: 'Nigeria Data Protection Regulation', region: 'africa', status: 'live', dprCoverage: 'Automated-decision rights for Nigerian data subjects (GDPR-aligned). Art. 12 + Art. 13 mapped per bias.' },
-  { code: 'CBN AI Guidelines', name: 'Central Bank of Nigeria', region: 'africa', status: 'draft', enforcementDate: 'Draft 2024', dprCoverage: 'FS-sector model governance, explainability, consumer-protection duties. Para. 4.2 + 5.1 mapped per bias.' },
-  { code: 'WAEMU', name: 'West African Economic & Monetary Union', region: 'africa', status: 'live', dprCoverage: 'Cross-border data localisation across 8 member states. Reg. R09 + BCEAO Circular 04-2017 mapped.' },
-  { code: 'CMA Kenya', name: 'Capital Markets Authority (Kenya)', region: 'africa', status: 'live', dprCoverage: 'Listed-company material disclosure + Code of Corporate Governance s.2 — board decision-making evidence per bias.' },
-  { code: 'BoG Cyber & ICT', name: 'Bank of Ghana', region: 'africa', status: 'live', dprCoverage: 'Directive 2018/05 (rev. 2023) §5 model & algorithmic governance for Ghanaian regulated FIs.' },
-  { code: 'FRC Nigeria', name: 'Financial Reporting Council of Nigeria', region: 'africa', status: 'live', dprCoverage: 'Code of Corporate Governance Principles 1.1 + 11 — board-effectiveness + risk-management for public-interest entities.' },
-  { code: 'CBE AI Guidelines', name: 'Central Bank of Egypt', region: 'africa', status: 'live', dprCoverage: 'CBE 2023 ICT Governance Framework §III — AI/ML model governance + explainability for Egyptian banks.' },
-  { code: 'PoPIA §71', name: 'Protection of Personal Information Act (South Africa)', region: 'africa', status: 'live', dprCoverage: 'PoPIA s.71 automated-decision rights + s.24 quality-of-information duties.' },
-  { code: 'SARB Model Risk', name: 'South African Reserve Bank', region: 'africa', status: 'live', dprCoverage: 'Directive D2/2022 + Joint Standard 2 of 2024 — model risk + AI governance for SA banks.' },
-  { code: 'BoT FinTech', name: 'Bank of Tanzania — FinTech Sandbox', region: 'africa', status: 'live', dprCoverage: 'BoT FinTech Sandbox Guidelines 2023 §V — AI/ML decisioning governance for sandbox-stage entities.' },
+  {
+    code: 'NDPR Art. 12',
+    name: 'Nigeria Data Protection Regulation',
+    region: 'africa',
+    status: 'live',
+    dprCoverage:
+      'Automated-decision rights for Nigerian data subjects (GDPR-aligned). Art. 12 + Art. 13 mapped per bias.',
+  },
+  {
+    code: 'CBN AI Guidelines',
+    name: 'Central Bank of Nigeria',
+    region: 'africa',
+    status: 'draft',
+    enforcementDate: 'Draft 2024',
+    dprCoverage:
+      'FS-sector model governance, explainability, consumer-protection duties. Para. 4.2 + 5.1 mapped per bias.',
+  },
+  {
+    code: 'WAEMU',
+    name: 'West African Economic & Monetary Union',
+    region: 'africa',
+    status: 'live',
+    dprCoverage:
+      'Cross-border data localisation across 8 member states. Reg. R09 + BCEAO Circular 04-2017 mapped.',
+  },
+  {
+    code: 'CMA Kenya',
+    name: 'Capital Markets Authority (Kenya)',
+    region: 'africa',
+    status: 'live',
+    dprCoverage:
+      'Listed-company material disclosure + Code of Corporate Governance s.2 — board decision-making evidence per bias.',
+  },
+  {
+    code: 'BoG Cyber & ICT',
+    name: 'Bank of Ghana',
+    region: 'africa',
+    status: 'live',
+    dprCoverage:
+      'Directive 2018/05 (rev. 2023) §5 model & algorithmic governance for Ghanaian regulated FIs.',
+  },
+  {
+    code: 'FRC Nigeria',
+    name: 'Financial Reporting Council of Nigeria',
+    region: 'africa',
+    status: 'live',
+    dprCoverage:
+      'Code of Corporate Governance Principles 1.1 + 11 — board-effectiveness + risk-management for public-interest entities.',
+  },
+  {
+    code: 'CBE AI Guidelines',
+    name: 'Central Bank of Egypt',
+    region: 'africa',
+    status: 'live',
+    dprCoverage:
+      'CBE 2023 ICT Governance Framework §III — AI/ML model governance + explainability for Egyptian banks.',
+  },
+  {
+    code: 'PoPIA §71',
+    name: 'Protection of Personal Information Act (South Africa)',
+    region: 'africa',
+    status: 'live',
+    dprCoverage: 'PoPIA s.71 automated-decision rights + s.24 quality-of-information duties.',
+  },
+  {
+    code: 'SARB Model Risk',
+    name: 'South African Reserve Bank',
+    region: 'africa',
+    status: 'live',
+    dprCoverage:
+      'Directive D2/2022 + Joint Standard 2 of 2024 — model risk + AI governance for SA banks.',
+  },
+  {
+    code: 'BoT FinTech',
+    name: 'Bank of Tanzania — FinTech Sandbox',
+    region: 'africa',
+    status: 'live',
+    dprCoverage:
+      'BoT FinTech Sandbox Guidelines 2023 §V — AI/ML decisioning governance for sandbox-stage entities.',
+  },
 ];
 
 // ─── 5. Case-library geography (before / after) ───────────────────────────
@@ -493,8 +728,7 @@ export const FIVE_PILLARS_FIT: PillarFit[] = [
       'NDPR + CBN regulatory coverage on /security',
     ],
     fitGrade: 'A',
-    fitNote:
-      'Closest fit. Every Capital-side workflow has a shipped Decision Intel surface today.',
+    fitNote: 'Closest fit. Every Capital-side workflow has a shipped Decision Intel surface today.',
   },
   {
     pillar: 'Credit',
@@ -523,7 +757,7 @@ export const FIVE_PILLARS_FIT: PillarFit[] = [
   },
   {
     pillar: 'Culture',
-    oneLiner: 'Creative-industry investments — Sankore\'s soft-power thesis.',
+    oneLiner: "Creative-industry investments — Sankore's soft-power thesis.",
     capabilities: [
       'Bias-comment threads turn cultural-frame disagreements into a structured surface',
       'Recognition-Primed Decision (RPD) node already detects creative-industry analogs',
@@ -564,7 +798,7 @@ export const CAPABILITY_SURFACES: CapabilitySurface[] = [
     oneLiner: 'Procurement-grade artifact. Hash, signature, Art. 14 mapping.',
     href: '/dpr-sample-wework.pdf',
     internal: false,
-    demoNote: 'Open in a new tab during the call — Titi\'s GC can review live.',
+    demoNote: "Open in a new tab during the call — Titi's GC can review live.",
   },
   {
     title: 'DPA template',
@@ -613,7 +847,7 @@ export const CAPABILITY_SURFACES: CapabilitySurface[] = [
     oneLiner: 'Full SAML registration UI. Activates on Pro upgrade.',
     href: '/dashboard/settings/sso',
     internal: true,
-    demoNote: 'Show the 5-step prerequisite strip — it\'s honest about Pro requirement.',
+    demoNote: "Show the 5-step prerequisite strip — it's honest about Pro requirement.",
   },
   {
     title: 'Document detail · BiasCollabPanel',
@@ -651,47 +885,40 @@ export const WALKTHROUGH: WalkthroughBeat[] = [
   {
     minute: '0–2',
     title: 'Frame the meta-shift',
-    what:
-      '"Last time we spoke, the platform was a strong intellectual product. Since then, it has been wrapped to actually be useful inside a Sankore deal team. Three shifts: document → decision, solo → collaborative, report → embedded. Show the Three Shifts panel from this brief.',
+    what: '"Last time we spoke, the platform was a strong intellectual product. Since then, it has been wrapped to actually be useful inside a Sankore deal team. Three shifts: document → decision, solo → collaborative, report → embedded. Show the Three Shifts panel from this brief.',
   },
   {
     minute: '2–5',
     title: 'Dalio is now first-class',
-    what:
-      'Open /how-it-works and search for "Ray Dalio". Then open any document audit + click "Run structural audit" — show the 18-determinant output. This is the gap she flagged on day one.',
+    what: 'Open /how-it-works and search for "Ray Dalio". Then open any document audit + click "Run structural audit" — show the 18-determinant output. This is the gap she flagged on day one.',
     link: '/how-it-works',
   },
   {
     minute: '5–7',
     title: 'African memo runs through the audit',
-    what:
-      'Open /demo, click the Dangote chip, run the audit live. Show the output recognising FX-repatriation + currency-cycle as load-bearing structural assumptions. This is the "it understands my market" proof.',
+    what: 'Open /demo, click the Dangote chip, run the audit live. Show the output recognising FX-repatriation + currency-cycle as load-bearing structural assumptions. This is the "it understands my market" proof.',
     link: '/demo',
   },
   {
     minute: '7–9',
     title: 'NDPR + CBN + WAEMU on /security',
-    what:
-      'Scroll the Frameworks block. 7 → 10. Then download the DPR sample and the DPA template — both are live on the same page.',
+    what: 'Scroll the Frameworks block. 7 → 10. Then download the DPR sample and the DPA template — both are live on the same page.',
     link: '/security',
   },
   {
     minute: '9–11',
     title: 'Team workflow inside an audit',
-    what:
-      'Open any document detail page. Expand a bias card. Show the BiasCollabPanel: comment thread, @mention syntax, "Assign as task". Mention how a Sankore associate gets nudged in-app + Slack DM (when org\'s Slack is wired).',
+    what: 'Open any document detail page. Expand a bias card. Show the BiasCollabPanel: comment thread, @mention syntax, "Assign as task". Mention how a Sankore associate gets nudged in-app + Slack DM (when org\'s Slack is wired).',
   },
   {
     minute: '11–13',
     title: 'Versioned memos, delta DQI',
-    what:
-      'On a doc that has a v2: show the VersionHistoryStrip + the VersionDeltaCard rendering "DQI 42 → 71, sunk_cost resolved, anchoring emerged". This is the iteration loop she\'ll demo to her associates.',
+    what: 'On a doc that has a v2: show the VersionHistoryStrip + the VersionDeltaCard rendering "DQI 42 → 71, sunk_cost resolved, anchoring emerged". This is the iteration loop she\'ll demo to her associates.',
   },
   {
     minute: '13–15',
     title: 'Honest gaps + ask',
-    what:
-      'Walk the Honest Gaps panel from this brief. Decision Rooms is scheduled (Weeks 9–10). Deal-centric workflow is scheduled (Weeks 5–8). RBAC + redaction-assistant + share-link expiry are all in the same window. Then ask: "Is there anything between Capital, Credit, City, Culture, Community where you want a custom case study seeded next?"',
+    what: 'Walk the Honest Gaps panel from this brief. Decision Rooms is scheduled (Weeks 9–10). Deal-centric workflow is scheduled (Weeks 5–8). RBAC + redaction-assistant + share-link expiry are all in the same window. Then ask: "Is there anything between Capital, Credit, City, Culture, Community where you want a custom case study seeded next?"',
   },
 ];
 
@@ -706,17 +933,17 @@ export const HONEST_GAPS = [
   {
     title: 'SAML SSO requires Supabase Pro',
     detail:
-      'Code path is shipped. Supabase Pro upgrade ($25/mo) flips the toggle. We\'re holding off until the first design partner asks — which is the right way to discover this with Sankore directly.',
+      "Code path is shipped. Supabase Pro upgrade ($25/mo) flips the toggle. We're holding off until the first design partner asks — which is the right way to discover this with Sankore directly.",
   },
   {
     title: 'Real-time backend progress events',
     detail:
-      'Audit progress UI is SSE-driven from real backend events (verified — claim was wrong in the original audit). What\'s NOT real: the per-stage progress is event-completion-driven, not percent-within-stage. For a 90-second audit it feels honest; for a 4-minute one we\'d want finer granularity.',
+      "Audit progress UI is SSE-driven from real backend events (verified — claim was wrong in the original audit). What's NOT real: the per-stage progress is event-completion-driven, not percent-within-stage. For a 90-second audit it feels honest; for a 4-minute one we'd want finer granularity.",
   },
   {
     title: 'Slack /di slash-command + WhatsApp surface',
     detail:
-      'Slack install + thread-monitoring exists; the in-channel /di audit slash-command is on the Week 9-12 deep plan. WhatsApp is deliberately deferred — Slack covers the corporate-strategy buyer; WhatsApp belongs to a different distribution playbook (consumer / SMB) we\'re not pursuing.',
+      "Slack install + thread-monitoring exists; the in-channel /di audit slash-command is on the Week 9-12 deep plan. WhatsApp is deliberately deferred — Slack covers the corporate-strategy buyer; WhatsApp belongs to a different distribution playbook (consumer / SMB) we're not pursuing.",
   },
   {
     title: 'PPP / regional pricing remains a deal-by-deal handle',

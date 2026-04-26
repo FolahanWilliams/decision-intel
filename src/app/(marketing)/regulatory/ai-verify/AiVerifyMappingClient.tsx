@@ -612,7 +612,8 @@ export function AiVerifyMappingClient() {
               {
                 code: 'CBN AI Guidelines',
                 jurisdiction: 'Nigeria',
-                gates: 'Model governance + explainability for regulated financial institutions (draft 2024)',
+                gates:
+                  'Model governance + explainability for regulated financial institutions (draft 2024)',
               },
               {
                 code: 'FRC Nigeria',
@@ -637,7 +638,8 @@ export function AiVerifyMappingClient() {
               {
                 code: 'BoG Cyber & ICT Risk',
                 jurisdiction: 'Ghana',
-                gates: 'Cyber, data and AI/ML model-governance for regulated financial institutions',
+                gates:
+                  'Cyber, data and AI/ML model-governance for regulated financial institutions',
               },
               {
                 code: 'CBE AI Guidelines',
@@ -652,7 +654,8 @@ export function AiVerifyMappingClient() {
               {
                 code: 'SARB Model Risk',
                 jurisdiction: 'South Africa',
-                gates: 'Model risk + AI governance for SA-regulated banks (Directive D2/2022 + JS 2/2024)',
+                gates:
+                  'Model risk + AI governance for SA-regulated banks (Directive D2/2022 + JS 2/2024)',
               },
               {
                 code: 'BoT FinTech',
@@ -669,9 +672,24 @@ export function AiVerifyMappingClient() {
                   borderRadius: 10,
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    gap: 8,
+                    marginBottom: 4,
+                  }}
+                >
                   <strong style={{ color: C.navy, fontSize: 13 }}>{row.code}</strong>
-                  <span style={{ fontSize: 11, color: C.slate500, fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                  <span
+                    style={{
+                      fontSize: 11,
+                      color: C.slate500,
+                      fontWeight: 600,
+                      letterSpacing: '0.04em',
+                      textTransform: 'uppercase',
+                    }}
+                  >
                     {row.jurisdiction}
                   </span>
                 </div>

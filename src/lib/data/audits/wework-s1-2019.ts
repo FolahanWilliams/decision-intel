@@ -72,9 +72,6 @@ export const WEWORK_AUDIT = {
   ] satisfies WeWorkBias[],
 } as const;
 
-export const WEWORK_TOTAL_LIFT = WEWORK_AUDIT.biases.reduce(
-  (sum, b) => sum + b.liftIfMitigated,
-  0
-);
+export const WEWORK_TOTAL_LIFT = WEWORK_AUDIT.biases.reduce((sum, b) => sum + b.liftIfMitigated, 0);
 
 export const WEWORK_MITIGATED_DQI = WEWORK_AUDIT.baseDqi + WEWORK_TOTAL_LIFT;

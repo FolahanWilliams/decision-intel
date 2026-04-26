@@ -108,10 +108,7 @@ export function aggregateAnalyses(latestAnalyses: AnalyzedDocument[]): AnalysesA
 
   // Bias aggregation: per-bias, count distinct docs that flag it + total
   // occurrences + max severity seen.
-  const biasMap = new Map<
-    string,
-    { docs: Set<string>; total: number; maxSev: number }
-  >();
+  const biasMap = new Map<string, { docs: Set<string>; total: number; maxSev: number }>();
 
   for (const analysis of latestAnalyses) {
     for (const bias of analysis.biases) {

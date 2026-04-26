@@ -48,7 +48,14 @@ export default async function BillingPage() {
         <h1 className="page-header" style={{ margin: '0 0 6px', color: 'var(--text-primary)' }}>
           Billing
         </h1>
-        <p style={{ margin: '0 0 24px', color: 'var(--text-secondary)', fontSize: 14, maxWidth: 720 }}>
+        <p
+          style={{
+            margin: '0 0 24px',
+            color: 'var(--text-secondary)',
+            fontSize: 14,
+            maxWidth: 720,
+          }}
+        >
           Plan + usage + invoices in one place. Annual prepay (2 months free) is available on the
           public pricing page; this view is the post-subscription source of truth.
         </p>
@@ -77,7 +84,8 @@ export default async function BillingPage() {
                     Admin · Enterprise Quote Builder
                   </div>
                   <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                    Build a procurement-grade quote PDF (seats, deals, retention, SLA, volume floor).
+                    Build a procurement-grade quote PDF (seats, deals, retention, SLA, volume
+                    floor).
                   </div>
                 </div>
               </div>

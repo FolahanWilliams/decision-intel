@@ -17,10 +17,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
-import {
-  aggregateBlindPriors,
-  type BlindPriorRow,
-} from '@/lib/learning/blind-prior-aggregate';
+import { aggregateBlindPriors, type BlindPriorRow } from '@/lib/learning/blind-prior-aggregate';
 
 const log = createLogger('BlindPriorPublicAggregate');
 
@@ -96,9 +93,7 @@ export async function GET(
       );
     }
 
-    const aggregate = aggregateBlindPriors(
-      invite.room.decisionRoomBlindPriors as BlindPriorRow[]
-    );
+    const aggregate = aggregateBlindPriors(invite.room.decisionRoomBlindPriors as BlindPriorRow[]);
 
     return NextResponse.json({
       ok: true,

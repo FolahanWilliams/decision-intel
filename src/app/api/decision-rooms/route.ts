@@ -12,10 +12,7 @@ import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { isSchemaDrift } from '@/lib/utils/error';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
-import {
-  buildDocumentAccessWhere,
-  resolveAnalysisAccess,
-} from '@/lib/utils/document-access';
+import { buildDocumentAccessWhere, resolveAnalysisAccess } from '@/lib/utils/document-access';
 
 const log = createLogger('DecisionRoomsRoute');
 

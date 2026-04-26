@@ -181,8 +181,8 @@ export function StructuralExposureCard() {
               color: 'var(--text-primary)',
             }}
           >
-            {totals.flags} flag{totals.flags === 1 ? '' : 's'} across {totals.uniqueAnalyses}{' '}
-            analys{totals.uniqueAnalyses === 1 ? 'is' : 'es'}
+            {totals.flags} flag{totals.flags === 1 ? '' : 's'} across {totals.uniqueAnalyses} analys
+            {totals.uniqueAnalyses === 1 ? 'is' : 'es'}
           </div>
         </div>
         <div
@@ -229,14 +229,15 @@ export function StructuralExposureCard() {
         </div>
         {top.map(r => {
           const sevColour = SEV_HEX[r.topSeverity];
-          const catColour = r.category ? CATEGORY_HEX[r.category] ?? '#64748B' : '#64748B';
+          const catColour = r.category ? (CATEGORY_HEX[r.category] ?? '#64748B') : '#64748B';
           const total =
             r.defensibilityMix.well_supported +
             r.defensibilityMix.partially_supported +
             r.defensibilityMix.unsupported +
             r.defensibilityMix.contradicted;
           const wellPct = total === 0 ? 0 : (r.defensibilityMix.well_supported / total) * 100;
-          const partialPct = total === 0 ? 0 : (r.defensibilityMix.partially_supported / total) * 100;
+          const partialPct =
+            total === 0 ? 0 : (r.defensibilityMix.partially_supported / total) * 100;
           const unsuppPct = total === 0 ? 0 : (r.defensibilityMix.unsupported / total) * 100;
           const contraPct = total === 0 ? 0 : (r.defensibilityMix.contradicted / total) * 100;
           return (

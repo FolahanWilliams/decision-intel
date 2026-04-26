@@ -184,10 +184,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
  * legal-hold attach lives at /api/legal-holds; this PATCH is for things
  * the document owner can change in-place without a workflow.
  */
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const supabase = await createClient();
@@ -283,7 +280,12 @@ export async function DELETE(
     // Org-scoped access: an Org admin can soft-delete any doc in their Org.
     // Personal docs require ownership (userId match). The `deletedAt: null`
     // gate ensures double-deletes are no-ops rather than errors.
-    let where: { id: string; userId?: string; OR?: Array<Record<string, unknown>>; deletedAt: null } = {
+    let where: {
+      id: string;
+      userId?: string;
+      OR?: Array<Record<string, unknown>>;
+      deletedAt: null;
+    } = {
       id,
       userId,
       deletedAt: null,

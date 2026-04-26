@@ -15,9 +15,7 @@ import { createClient } from '@/utils/supabase/server';
 import { createLogger } from '@/lib/utils/logger';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { logAudit } from '@/lib/audit';
-import {
-  buildPackageAccessFilter,
-} from '@/lib/utils/decision-package-access';
+import { buildPackageAccessFilter } from '@/lib/utils/decision-package-access';
 import { buildDocumentAccessFilter } from '@/lib/utils/document-access';
 import { recomputePackageMetrics } from '@/lib/scoring/package-aggregation';
 
@@ -148,9 +146,7 @@ export async function POST(request: NextRequest) {
         ? body.decisionFrame.trim().slice(0, MAX_FRAME) || null
         : null;
     const visibility =
-      body.visibility === 'private' || body.visibility === 'team'
-        ? body.visibility
-        : 'team';
+      body.visibility === 'private' || body.visibility === 'team' ? body.visibility : 'team';
     const documentIds = Array.isArray(body.documentIds)
       ? body.documentIds
           .filter((d): d is string => typeof d === 'string' && d.length > 0)

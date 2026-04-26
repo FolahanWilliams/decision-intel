@@ -310,7 +310,12 @@ export interface DealCrossReferenceRun {
           perDocCapChars: number;
           totalCapChars: number;
           totalCharsSent: number;
-          truncatedDocs: Array<{ documentId: string; documentName: string; originalChars: number; sentChars: number }>;
+          truncatedDocs: Array<{
+            documentId: string;
+            documentName: string;
+            originalChars: number;
+            sentChars: number;
+          }>;
           excludedDocs: Array<{ documentId: string; documentName: string; originalChars: number }>;
         };
       }

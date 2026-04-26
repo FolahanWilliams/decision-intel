@@ -446,9 +446,7 @@ export function PricingPageClient() {
           }}
         >
           <span>
-            <span style={{ fontWeight: 600, color: C.slate900 }}>
-              Decision Provenance Record
-            </span>{' '}
+            <span style={{ fontWeight: 600, color: C.slate900 }}>Decision Provenance Record</span>{' '}
             on every audit · mapped to EU AI Act Art. 14, Basel III ICAAP, and SEC AI disclosure.
           </span>
           <Link
@@ -496,11 +494,7 @@ export function PricingPageClient() {
                 : showPrice !== null && showPrice !== undefined
                   ? `$${showPrice.toLocaleString()}`
                   : '');
-            const priceSuffix = supportsCycle
-              ? cycle === 'annual'
-                ? '/yr'
-                : '/mo'
-              : '';
+            const priceSuffix = supportsCycle ? (cycle === 'annual' ? '/yr' : '/mo') : '';
 
             const isFeatured = !!tier.featured;
             return (
@@ -706,8 +700,7 @@ export function PricingPageClient() {
                       {checkoutLoading !== tier.id && <ArrowRight size={14} />}
                     </button>
                   )}
-                  {(tier.cta.action === 'checkout-pro' ||
-                    tier.cta.action === 'checkout-team') && (
+                  {(tier.cta.action === 'checkout-pro' || tier.cta.action === 'checkout-team') && (
                     <Link
                       href="/design-partner"
                       onClick={() =>
@@ -724,17 +717,13 @@ export function PricingPageClient() {
                       }}
                     >
                       Need to bring this to procurement?{' '}
-                      <span style={{ color: C.green, fontWeight: 600 }}>
-                        Talk to the founder →
-                      </span>
+                      <span style={{ color: C.green, fontWeight: 600 }}>Talk to the founder →</span>
                     </Link>
                   )}
                   {tier.cta.action === 'contact' && (
                     <Link
                       href="/pricing/quote"
-                      onClick={() =>
-                        trackEvent('pricing_quote_builder_clicked', { tier: tier.id })
-                      }
+                      onClick={() => trackEvent('pricing_quote_builder_clicked', { tier: tier.id })}
                       style={{
                         display: 'block',
                         marginTop: 10,

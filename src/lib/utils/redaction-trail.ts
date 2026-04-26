@@ -67,16 +67,10 @@ export async function sha256Hex(input: string): Promise<string> {
  * (not localStorage) so the map clears at tab close — the goal is to
  * support an in-session replay, not a permanent client-side ledger.
  */
-export function savePlaceholderMap(
-  analysisId: string,
-  entries: PlaceholderMapEntry[]
-): void {
+export function savePlaceholderMap(analysisId: string, entries: PlaceholderMapEntry[]): void {
   if (typeof window === 'undefined' || !analysisId) return;
   try {
-    sessionStorage.setItem(
-      `${PLACEHOLDER_MAP_KEY_PREFIX}${analysisId}`,
-      JSON.stringify(entries)
-    );
+    sessionStorage.setItem(`${PLACEHOLDER_MAP_KEY_PREFIX}${analysisId}`, JSON.stringify(entries));
   } catch {
     // QuotaExceeded / disabled storage — not fatal; the placeholders
     // simply cannot be revealed locally.

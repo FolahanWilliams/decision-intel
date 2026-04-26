@@ -22,19 +22,13 @@ import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { getDocumentContent } from '@/lib/utils/encryption';
 import { resolvePackageAccess } from '@/lib/utils/decision-package-access';
 import { buildDocumentAccessFilter } from '@/lib/utils/document-access';
-import {
-  runCrossReferenceAgent,
-  type CrossRefInputDoc,
-} from '@/lib/agents/cross-reference';
+import { runCrossReferenceAgent, type CrossRefInputDoc } from '@/lib/agents/cross-reference';
 import { recomputePackageMetrics } from '@/lib/scoring/package-aggregation';
 import { logAudit } from '@/lib/audit';
 
 const log = createLogger('DecisionPackageCrossRef');
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -64,10 +58,7 @@ export async function GET(
   }
 }
 
-export async function POST(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -134,9 +125,7 @@ export async function POST(
       .map(m => {
         const latest = m.document.analyses[0];
         if (!latest) return null;
-        const content = getDocumentContent(
-          m.document as Parameters<typeof getDocumentContent>[0]
-        );
+        const content = getDocumentContent(m.document as Parameters<typeof getDocumentContent>[0]);
         if (!content || content.trim().length < 200) return null;
         return {
           documentId: m.document.id,

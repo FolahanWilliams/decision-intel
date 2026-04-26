@@ -102,7 +102,9 @@ export function CreatePackageButton() {
                 marginBottom: 16,
               }}
             >
-              <h2 style={{ margin: 0, color: 'var(--text-primary)', fontSize: 18, fontWeight: 700 }}>
+              <h2
+                style={{ margin: 0, color: 'var(--text-primary)', fontSize: 18, fontWeight: 700 }}
+              >
                 New decision package
               </h2>
               <button
@@ -163,7 +165,8 @@ export function CreatePackageButton() {
                   }}
                 >
                   Visibility controls who sees the package shell. Each member doc still uses its own
-                  visibility — adding a private memo to a team package does NOT widen its read radius.
+                  visibility — adding a private memo to a team package does NOT widen its read
+                  radius.
                 </p>
               </Field>
               {error && (

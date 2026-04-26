@@ -102,7 +102,10 @@ export function IanProfilePanel() {
             <GraduationCap size={10} /> Education
           </div>
           {IAN_PROFILE.intellectualProfile.education.map(e => (
-            <div key={e.institution} style={{ fontSize: 11, color: 'var(--text-primary)', marginBottom: 4 }}>
+            <div
+              key={e.institution}
+              style={{ fontSize: 11, color: 'var(--text-primary)', marginBottom: 4 }}
+            >
               <strong>{e.institution}</strong> — {e.degree} ({e.years})
             </div>
           ))}
@@ -177,7 +180,14 @@ export function IanProfilePanel() {
                   {step.years}
                 </span>
               </div>
-              <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4, lineHeight: 1.5 }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: 'var(--text-secondary)',
+                  marginTop: 4,
+                  lineHeight: 1.5,
+                }}
+              >
                 {step.thrust}
               </div>
             </div>

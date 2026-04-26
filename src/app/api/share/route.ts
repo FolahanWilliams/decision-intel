@@ -45,14 +45,8 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const {
-      analysisId,
-      expiresInHours,
-      expiresInDays,
-      password,
-      isCaseStudy,
-      requireEmail,
-    } = CreateShareSchema.parse(body);
+    const { analysisId, expiresInHours, expiresInDays, password, isCaseStudy, requireEmail } =
+      CreateShareSchema.parse(body);
 
     // Resolve effective expiry: hours wins over days; null = never (forced to
     // null on case-study links). If neither was provided, fall back to 7 days
@@ -557,4 +551,3 @@ async function getShareLinkListForAnalysis(req: NextRequest, analysisId: string)
     return NextResponse.json({ error: 'Failed to list share links' }, { status: 500 });
   }
 }
-

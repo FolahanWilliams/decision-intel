@@ -312,10 +312,10 @@ export function DecisionPackageDetailClient({ packageId, initial }: Props) {
                           b.topSeverity === 'critical'
                             ? '#b91c1c'
                             : b.topSeverity === 'high'
-                            ? '#ef4444'
-                            : b.topSeverity === 'medium'
-                            ? '#d97706'
-                            : '#3b82f6',
+                              ? '#ef4444'
+                              : b.topSeverity === 'medium'
+                                ? '#d97706'
+                                : '#3b82f6',
                       }}
                     >
                       {b.topSeverity}
@@ -355,7 +355,8 @@ export function DecisionPackageDetailClient({ packageId, initial }: Props) {
               Documents in this package
             </h3>
             <p style={{ margin: '2px 0 0', color: 'var(--text-muted)', fontSize: 12 }}>
-              {documents.length} doc{documents.length === 1 ? '' : 's'} · {aggregation.analyzedDocCount} analyzed
+              {documents.length} doc{documents.length === 1 ? '' : 's'} ·{' '}
+              {aggregation.analyzedDocCount} analyzed
             </p>
           </div>
           {pkg.isOwner && (
@@ -497,16 +498,10 @@ export function DecisionPackageDetailClient({ packageId, initial }: Props) {
                         DQI {Math.round(d.latestAnalysis.overallScore)}
                       </span>
                     ) : (
-                      <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                        Not analyzed
-                      </span>
+                      <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Not analyzed</span>
                     )}
                     {pkg.isOwner && (
-                      <RemoveDocButton
-                        joinId={d.id}
-                        packageId={packageId}
-                        onRemoved={refetch}
-                      />
+                      <RemoveDocButton joinId={d.id} packageId={packageId} onRemoved={refetch} />
                     )}
                   </div>
                 </li>
@@ -850,8 +845,8 @@ function PackageHero({
               pkg.highSeverityConflictCount > 0
                 ? '#DC2626'
                 : pkg.conflictCount > 0
-                ? '#D97706'
-                : undefined
+                  ? '#D97706'
+                  : undefined
             }
           />
           <Stat
@@ -1345,7 +1340,11 @@ function OutcomeBlock({
                   opacity: submitting ? 0.6 : 1,
                 }}
               >
-                {submitting ? <Loader2 size={13} className="animate-spin" /> : <CheckCircle2 size={13} />}
+                {submitting ? (
+                  <Loader2 size={13} className="animate-spin" />
+                ) : (
+                  <CheckCircle2 size={13} />
+                )}
                 {outcome ? 'Update outcome' : 'Record outcome'}
               </button>
             </div>

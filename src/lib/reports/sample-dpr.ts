@@ -19,6 +19,10 @@ import type {
   CitationEntry,
   RegulatoryEntry,
   PipelineLineageEntry,
+  CounterfactualImpactSummary,
+  ReviewerDecisionLog,
+  OrgCalibrationSummary,
+  DataLifecyclePolicy,
 } from './provenance-record-data';
 import { PIPELINE_NODES } from '@/lib/data/pipeline-nodes';
 
@@ -196,6 +200,131 @@ const SAMPLE_PIPELINE_LINEAGE: PipelineLineageEntry[] = PIPELINE_NODES.map((node
   academicAnchor: node.academicAnchor,
 }));
 
+// ─── DPR v2 specimen blocks ──────────────────────────────────────────
+// Plausible seed values so the SPECIMEN PDF demonstrates every v2
+// section. Hand-crafted to read like a real CSO+GC review of the
+// fictional Project Heliograph DACH market-entry memo.
+
+const SAMPLE_COUNTERFACTUAL_IMPACT: CounterfactualImpactSummary = {
+  scenarios: [
+    {
+      biasType: 'overconfidence_bias',
+      biasLabel: 'Overconfidence Bias',
+      expectedImprovementPct: 18.4,
+      historicalSampleSize: 31,
+      confidence: 0.78,
+      estimatedMonetaryImpact: 2_580_000,
+      currency: 'USD',
+    },
+    {
+      biasType: 'confirmation_bias',
+      biasLabel: 'Confirmation Bias',
+      expectedImprovementPct: 11.2,
+      historicalSampleSize: 26,
+      confidence: 0.69,
+      estimatedMonetaryImpact: 1_570_000,
+      currency: 'USD',
+    },
+    {
+      biasType: 'sunk_cost_fallacy',
+      biasLabel: 'Sunk Cost Fallacy',
+      expectedImprovementPct: 7.6,
+      historicalSampleSize: 19,
+      confidence: 0.58,
+      estimatedMonetaryImpact: 1_065_000,
+      currency: 'USD',
+    },
+  ],
+  aggregateImprovementPct: 32.4,
+  weightedImprovementPct: 13.1,
+  monetaryAnchorAvailable: true,
+  dataAsOf: '2026-04-23T09:00:00Z',
+  methodologyNote:
+    'Monetary anchors derived from the linked DecisionFrame.monetaryValue (DACH expansion budget USD 14M). Confidence reflects historical sample size (Wilson score) weighted by per-org CausalEdge strength. Aggregate assumes bias independence — the 32.4-pt headline overstates the realistic combined effect; reviewers should trust the confidence-weighted 13.1-pt number for board-presentation purposes.',
+};
+
+const SAMPLE_REVIEWER_DECISIONS: ReviewerDecisionLog = {
+  reviewerName: 'Sarah Adekunle',
+  reviewerRole: 'General Counsel · Project Heliograph review',
+  reviewedAt: '2026-04-22T19:15:00Z',
+  acceptedMitigations: [
+    {
+      biasLabel: 'Overconfidence Bias',
+      mitigation:
+        'Commission an independent reference-class forecast against eight to twelve comparable European DACH expansions before the committee vote. Require base-rate break-even distributions alongside point estimates so the committee sees the range, not a single number.',
+    },
+    {
+      biasLabel: 'Confirmation Bias',
+      mitigation:
+        'Expand the customer-discovery cohort from 14 to 30 prospects with explicit selection criteria documented; reviewer to validate the selection criteria do not over-weight the existing GTM thesis.',
+    },
+  ],
+  dismissedFlags: [
+    {
+      biasLabel: 'Anchoring Bias',
+      reason:
+        'The 18-month break-even number was set by the IC at the prior gate, not by this memo. The anchoring critique applies to that earlier decision, not to the current vote on incremental headcount.',
+    },
+  ],
+  dissentLog: [
+    {
+      source: 'Statistical Jury (judge)',
+      objection:
+        'Concurred only after base-rate pull on the 18-month break-even claim; pre-pull the model rated the claim as "supported".',
+      resolution:
+        'Documented in the audit log; reviewer accepts the post-pull verdict as the binding one.',
+    },
+    {
+      source: 'Pre-mortem (judge)',
+      objection:
+        'Flagged currency hedge as unfunded for the 18-month horizon; CFO disagreed (hedge budget is in OPEX, not CAPEX).',
+      resolution:
+        'CFO clarification accepted; mitigation #2 modified to require the OPEX hedge line to be called out explicitly in the IC pack.',
+    },
+  ],
+  finalSignOff: 'approved_with_conditions',
+  signOffNote:
+    'Approving the audit record subject to (a) the independent reference-class forecast landing before the IC vote, and (b) the OPEX currency-hedge line being made explicit in the deck. Both conditions must be satisfied or this audit record should not be relied upon as supporting the committee decision.',
+};
+
+const SAMPLE_ORG_CALIBRATION: OrgCalibrationSummary = {
+  decisionsTracked: 42,
+  outcomesClosed: 28,
+  meanBrierScore: 0.183,
+  brierCategory: 'good',
+  recalibratedFromOriginal: {
+    originalScore: 68,
+    recalibratedScore: 64,
+    delta: -4,
+  },
+  calibrationNote:
+    "DQI shown is calibrated against this organisation's outcome history (28 closed decisions, mean Brier 0.183 · good). Original-vs-recalibrated delta: -4 (the organisation has historically been over-confident on DACH-style market entries; the recalibrator pulls the headline score down accordingly).",
+};
+
+const SAMPLE_DATA_LIFECYCLE: DataLifecyclePolicy = {
+  retentionDays: 365,
+  retentionTier: 'team',
+  encryptionAtRest: 'AES-256-GCM',
+  encryptionInTransit: 'TLS 1.2+',
+  legalHoldAvailable: true,
+  rightToErasure:
+    'GDPR Art. 17 (Right to Erasure) · NDPR Art. 23 (Data Subject Rights) · PoPIA s.24',
+  subProcessors: [
+    'Vercel (US-region production)',
+    'Supabase',
+    'Resend (transactional email)',
+    'Cloudflare (DNS + email routing)',
+  ],
+  productionRegion:
+    'US (Vercel + Supabase). EU + Multi-region available on Enterprise — Enterprise-conversation residency, not production today.',
+  retentionContact: 'team@decision-intel.com',
+  roadmap: [
+    'Private-key signing of the DPR (planned Q3 2026)',
+    'RFC 3161 Time-Stamping Authority (planned Q3 2026)',
+    'EU-region production residency (Enterprise SLA on request)',
+  ],
+};
+
 const SAMPLE_SUMMARY =
   'Proposal to launch a direct sales motion into DACH markets with a projected 18-month break-even, anchored to a single customer-discovery cohort of 14 prospects. Analysis flags confirmation bias in source selection, overconfidence in the break-even claim, and sunk-cost framing around the incumbent go-to-market build. Recommended action: commission an independent reference-class forecast against comparable European expansions before the committee vote.';
 
@@ -237,7 +366,11 @@ export function buildSampleDprData(): ProvenanceRecordData {
             count: 4,
             attributedTo: ['Sarah Adekunle'],
           },
-          { risk: 'reference-class missing — no comparable EU expansions cited', count: 3, attributedTo: [] },
+          {
+            risk: 'reference-class missing — no comparable EU expansions cited',
+            count: 3,
+            attributedTo: [],
+          },
           { risk: 'sunk-cost framing on incumbent GTM build', count: 2, attributedTo: [] },
           { risk: 'currency hedge unfunded for the 18-month horizon', count: 2, attributedTo: [] },
         ],
@@ -251,7 +384,12 @@ export function buildSampleDprData(): ProvenanceRecordData {
         outcomeReported: true,
       },
     ],
-    schemaVersion: 1,
+    counterfactualImpact: SAMPLE_COUNTERFACTUAL_IMPACT,
+    reviewerDecisions: SAMPLE_REVIEWER_DECISIONS,
+    orgCalibration: SAMPLE_ORG_CALIBRATION,
+    dataLifecycle: SAMPLE_DATA_LIFECYCLE,
+    clientSafe: undefined,
+    schemaVersion: 2,
     generatedAt: specimenDate,
     meta: {
       filename: SAMPLE_FILENAME,

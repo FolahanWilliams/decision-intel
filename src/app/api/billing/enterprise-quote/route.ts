@@ -46,12 +46,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate + apply defaults from ENTERPRISE_QUOTE_DEFAULTS.
-    const customerName = String(body.customerName ?? '').trim().slice(0, 120);
+    const customerName = String(body.customerName ?? '')
+      .trim()
+      .slice(0, 120);
     if (customerName.length === 0) {
       return NextResponse.json({ error: 'customerName is required' }, { status: 400 });
     }
-    const contactName = String(body.contactName ?? '').trim().slice(0, 120);
-    const contactEmail = String(body.contactEmail ?? '').trim().slice(0, 200);
+    const contactName = String(body.contactName ?? '')
+      .trim()
+      .slice(0, 120);
+    const contactEmail = String(body.contactEmail ?? '')
+      .trim()
+      .slice(0, 200);
     const seats = Math.max(
       ENTERPRISE_QUOTE_DEFAULTS.minSeats,
       Math.floor(Number(body.seats ?? ENTERPRISE_QUOTE_DEFAULTS.minSeats))
@@ -78,7 +84,11 @@ export async function POST(request: NextRequest) {
         : ENTERPRISE_QUOTE_DEFAULTS.slaTier;
     const volumeFloorAuditsPerQuarter = Math.max(
       0,
-      Math.floor(Number(body.volumeFloorAuditsPerQuarter ?? ENTERPRISE_QUOTE_DEFAULTS.volumeFloorAuditsPerQuarter))
+      Math.floor(
+        Number(
+          body.volumeFloorAuditsPerQuarter ?? ENTERPRISE_QUOTE_DEFAULTS.volumeFloorAuditsPerQuarter
+        )
+      )
     );
     const region: 'EU' | 'US' | 'Multi-region' =
       body.region === 'EU' || body.region === 'Multi-region' ? body.region : 'US';

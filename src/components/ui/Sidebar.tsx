@@ -47,12 +47,12 @@ export default function Sidebar() {
   // operate with the team. "Act" is non-collapsible top-level; "Reflect"
   // and "Together" fold away to keep the rail short.
   // Reflect default flipped 2026-04-25 from collapsed to expanded — first-time
-// users were missing Analytics / Decision Graph / Outcome Flywheel because
-// those features hide behind the cluster header. Together stays collapsed
-// (post-team activation a user usually only opens it when actively
-// collaborating). Existing users who explicitly collapsed Reflect will keep
-// their preference via the localStorage hydration below.
-const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
+  // users were missing Analytics / Decision Graph / Outcome Flywheel because
+  // those features hide behind the cluster header. Together stays collapsed
+  // (post-team activation a user usually only opens it when actively
+  // collaborating). Existing users who explicitly collapsed Reflect will keep
+  // their preference via the localStorage hydration below.
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
     Reflect: false,
     Together: true,
   });

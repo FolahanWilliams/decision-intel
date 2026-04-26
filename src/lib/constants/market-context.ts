@@ -26,11 +26,7 @@
  * default behaviour, which is correct.
  */
 
-export type MarketContext =
-  | 'emerging_market'
-  | 'developed_market'
-  | 'cross_border'
-  | 'unknown';
+export type MarketContext = 'emerging_market' | 'developed_market' | 'cross_border' | 'unknown';
 
 interface CountryEntry {
   /** Canonical name used in user-facing output. */
@@ -43,60 +39,196 @@ interface CountryEntry {
 // Order matters only for display/logging; matching is unordered.
 const COUNTRIES: CountryEntry[] = [
   // Africa — the markets Sankore + the African design-partner pipeline lean on.
-  { name: 'Nigeria', aliases: ['nigeria', 'nigerian', 'lagos', 'abuja'], context: 'emerging_market' },
+  {
+    name: 'Nigeria',
+    aliases: ['nigeria', 'nigerian', 'lagos', 'abuja'],
+    context: 'emerging_market',
+  },
   { name: 'Kenya', aliases: ['kenya', 'kenyan', 'nairobi'], context: 'emerging_market' },
   { name: 'Ghana', aliases: ['ghana', 'ghanaian', 'accra'], context: 'emerging_market' },
-  { name: 'South Africa', aliases: ['south africa', 'south african', 'johannesburg', 'cape town'], context: 'emerging_market' },
+  {
+    name: 'South Africa',
+    aliases: ['south africa', 'south african', 'johannesburg', 'cape town'],
+    context: 'emerging_market',
+  },
   { name: 'Egypt', aliases: ['egypt', 'egyptian', 'cairo'], context: 'emerging_market' },
-  { name: 'Ethiopia', aliases: ['ethiopia', 'ethiopian', 'addis ababa'], context: 'emerging_market' },
+  {
+    name: 'Ethiopia',
+    aliases: ['ethiopia', 'ethiopian', 'addis ababa'],
+    context: 'emerging_market',
+  },
   { name: 'Morocco', aliases: ['morocco', 'moroccan', 'casablanca'], context: 'emerging_market' },
-  { name: 'Côte d’Ivoire', aliases: ['cote d’ivoire', 'cote d\'ivoire', 'ivory coast', 'abidjan'], context: 'emerging_market' },
+  {
+    name: 'Côte d’Ivoire',
+    aliases: ['cote d’ivoire', "cote d'ivoire", 'ivory coast', 'abidjan'],
+    context: 'emerging_market',
+  },
   { name: 'Senegal', aliases: ['senegal', 'senegalese', 'dakar'], context: 'emerging_market' },
   { name: 'Rwanda', aliases: ['rwanda', 'rwandan', 'kigali'], context: 'emerging_market' },
-  { name: 'Tanzania', aliases: ['tanzania', 'tanzanian', 'dar es salaam'], context: 'emerging_market' },
+  {
+    name: 'Tanzania',
+    aliases: ['tanzania', 'tanzanian', 'dar es salaam'],
+    context: 'emerging_market',
+  },
   { name: 'Uganda', aliases: ['uganda', 'ugandan', 'kampala'], context: 'emerging_market' },
 
   // Asia EM
-  { name: 'India', aliases: ['india', 'indian', 'mumbai', 'bangalore', 'bengaluru', 'delhi', 'new delhi'], context: 'emerging_market' },
-  { name: 'Indonesia', aliases: ['indonesia', 'indonesian', 'jakarta'], context: 'emerging_market' },
-  { name: 'Vietnam', aliases: ['vietnam', 'vietnamese', 'ho chi minh', 'hanoi'], context: 'emerging_market' },
-  { name: 'Philippines', aliases: ['philippines', 'philippine', 'filipino', 'manila'], context: 'emerging_market' },
+  {
+    name: 'India',
+    aliases: ['india', 'indian', 'mumbai', 'bangalore', 'bengaluru', 'delhi', 'new delhi'],
+    context: 'emerging_market',
+  },
+  {
+    name: 'Indonesia',
+    aliases: ['indonesia', 'indonesian', 'jakarta'],
+    context: 'emerging_market',
+  },
+  {
+    name: 'Vietnam',
+    aliases: ['vietnam', 'vietnamese', 'ho chi minh', 'hanoi'],
+    context: 'emerging_market',
+  },
+  {
+    name: 'Philippines',
+    aliases: ['philippines', 'philippine', 'filipino', 'manila'],
+    context: 'emerging_market',
+  },
   { name: 'Thailand', aliases: ['thailand', 'thai', 'bangkok'], context: 'emerging_market' },
-  { name: 'Malaysia', aliases: ['malaysia', 'malaysian', 'kuala lumpur'], context: 'emerging_market' },
-  { name: 'Pakistan', aliases: ['pakistan', 'pakistani', 'karachi', 'islamabad'], context: 'emerging_market' },
-  { name: 'Bangladesh', aliases: ['bangladesh', 'bangladeshi', 'dhaka'], context: 'emerging_market' },
+  {
+    name: 'Malaysia',
+    aliases: ['malaysia', 'malaysian', 'kuala lumpur'],
+    context: 'emerging_market',
+  },
+  {
+    name: 'Pakistan',
+    aliases: ['pakistan', 'pakistani', 'karachi', 'islamabad'],
+    context: 'emerging_market',
+  },
+  {
+    name: 'Bangladesh',
+    aliases: ['bangladesh', 'bangladeshi', 'dhaka'],
+    context: 'emerging_market',
+  },
 
   // LatAm EM
-  { name: 'Brazil', aliases: ['brazil', 'brazilian', 'são paulo', 'sao paulo', 'rio de janeiro'], context: 'emerging_market' },
+  {
+    name: 'Brazil',
+    aliases: ['brazil', 'brazilian', 'são paulo', 'sao paulo', 'rio de janeiro'],
+    context: 'emerging_market',
+  },
   { name: 'Mexico', aliases: ['mexico', 'mexican', 'mexico city'], context: 'emerging_market' },
-  { name: 'Argentina', aliases: ['argentina', 'argentine', 'buenos aires'], context: 'emerging_market' },
-  { name: 'Colombia', aliases: ['colombia', 'colombian', 'bogota', 'bogotá'], context: 'emerging_market' },
+  {
+    name: 'Argentina',
+    aliases: ['argentina', 'argentine', 'buenos aires'],
+    context: 'emerging_market',
+  },
+  {
+    name: 'Colombia',
+    aliases: ['colombia', 'colombian', 'bogota', 'bogotá'],
+    context: 'emerging_market',
+  },
   { name: 'Chile', aliases: ['chile', 'chilean', 'santiago'], context: 'emerging_market' },
   { name: 'Peru', aliases: ['peru', 'peruvian', 'lima'], context: 'emerging_market' },
 
   // Other EM
-  { name: 'Turkey', aliases: ['turkey', 'turkish', 'istanbul', 'ankara'], context: 'emerging_market' },
-  { name: 'United Arab Emirates', aliases: ['uae', 'united arab emirates', 'dubai', 'abu dhabi'], context: 'emerging_market' },
-  { name: 'Saudi Arabia', aliases: ['saudi arabia', 'saudi', 'riyadh'], context: 'emerging_market' },
-  { name: 'China', aliases: ['china', 'chinese', 'beijing', 'shanghai', 'shenzhen'], context: 'emerging_market' },
-  { name: 'Russia', aliases: ['russia', 'russian', 'moscow', 'st petersburg'], context: 'emerging_market' },
+  {
+    name: 'Turkey',
+    aliases: ['turkey', 'turkish', 'istanbul', 'ankara'],
+    context: 'emerging_market',
+  },
+  {
+    name: 'United Arab Emirates',
+    aliases: ['uae', 'united arab emirates', 'dubai', 'abu dhabi'],
+    context: 'emerging_market',
+  },
+  {
+    name: 'Saudi Arabia',
+    aliases: ['saudi arabia', 'saudi', 'riyadh'],
+    context: 'emerging_market',
+  },
+  {
+    name: 'China',
+    aliases: ['china', 'chinese', 'beijing', 'shanghai', 'shenzhen'],
+    context: 'emerging_market',
+  },
+  {
+    name: 'Russia',
+    aliases: ['russia', 'russian', 'moscow', 'st petersburg'],
+    context: 'emerging_market',
+  },
   { name: 'Poland', aliases: ['poland', 'polish', 'warsaw'], context: 'emerging_market' },
 
   // Developed markets (G7 + DM peers)
-  { name: 'United States', aliases: ['united states', 'usa', 'u.s.a.', 'us market', 'america', 'american', 'new york', 'silicon valley', 'san francisco', 'seattle'], context: 'developed_market' },
-  { name: 'United Kingdom', aliases: ['united kingdom', 'uk', 'u.k.', 'britain', 'british', 'england', 'london', 'manchester'], context: 'developed_market' },
-  { name: 'Germany', aliases: ['germany', 'german', 'berlin', 'munich', 'frankfurt'], context: 'developed_market' },
+  {
+    name: 'United States',
+    aliases: [
+      'united states',
+      'usa',
+      'u.s.a.',
+      'us market',
+      'america',
+      'american',
+      'new york',
+      'silicon valley',
+      'san francisco',
+      'seattle',
+    ],
+    context: 'developed_market',
+  },
+  {
+    name: 'United Kingdom',
+    aliases: [
+      'united kingdom',
+      'uk',
+      'u.k.',
+      'britain',
+      'british',
+      'england',
+      'london',
+      'manchester',
+    ],
+    context: 'developed_market',
+  },
+  {
+    name: 'Germany',
+    aliases: ['germany', 'german', 'berlin', 'munich', 'frankfurt'],
+    context: 'developed_market',
+  },
   { name: 'France', aliases: ['france', 'french', 'paris'], context: 'developed_market' },
   { name: 'Italy', aliases: ['italy', 'italian', 'milan', 'rome'], context: 'developed_market' },
-  { name: 'Spain', aliases: ['spain', 'spanish', 'madrid', 'barcelona'], context: 'developed_market' },
-  { name: 'Netherlands', aliases: ['netherlands', 'dutch', 'amsterdam'], context: 'developed_market' },
+  {
+    name: 'Spain',
+    aliases: ['spain', 'spanish', 'madrid', 'barcelona'],
+    context: 'developed_market',
+  },
+  {
+    name: 'Netherlands',
+    aliases: ['netherlands', 'dutch', 'amsterdam'],
+    context: 'developed_market',
+  },
   { name: 'Sweden', aliases: ['sweden', 'swedish', 'stockholm'], context: 'developed_market' },
-  { name: 'Switzerland', aliases: ['switzerland', 'swiss', 'zurich', 'geneva'], context: 'developed_market' },
+  {
+    name: 'Switzerland',
+    aliases: ['switzerland', 'swiss', 'zurich', 'geneva'],
+    context: 'developed_market',
+  },
   { name: 'Japan', aliases: ['japan', 'japanese', 'tokyo', 'osaka'], context: 'developed_market' },
   { name: 'South Korea', aliases: ['south korea', 'korean', 'seoul'], context: 'developed_market' },
-  { name: 'Canada', aliases: ['canada', 'canadian', 'toronto', 'vancouver', 'montreal'], context: 'developed_market' },
-  { name: 'Australia', aliases: ['australia', 'australian', 'sydney', 'melbourne'], context: 'developed_market' },
-  { name: 'New Zealand', aliases: ['new zealand', 'auckland', 'wellington'], context: 'developed_market' },
+  {
+    name: 'Canada',
+    aliases: ['canada', 'canadian', 'toronto', 'vancouver', 'montreal'],
+    context: 'developed_market',
+  },
+  {
+    name: 'Australia',
+    aliases: ['australia', 'australian', 'sydney', 'melbourne'],
+    context: 'developed_market',
+  },
+  {
+    name: 'New Zealand',
+    aliases: ['new zealand', 'auckland', 'wellington'],
+    context: 'developed_market',
+  },
   { name: 'Singapore', aliases: ['singapore', 'singaporean'], context: 'developed_market' },
   { name: 'Hong Kong', aliases: ['hong kong'], context: 'developed_market' },
   { name: 'Israel', aliases: ['israel', 'israeli', 'tel aviv'], context: 'developed_market' },
@@ -210,21 +342,26 @@ export function detectMarketContext(memoText: string): MarketContextDetection {
  * trigger when overall growth claims appear in the memo. These are not "the
  * truth" — they're priors. The author can defend a higher number with evidence.
  */
-export const GROWTH_RATE_PRIORS: Record<MarketContext, { cagrCeiling: number; rationale: string }> = {
-  emerging_market: {
-    cagrCeiling: 35,
-    rationale: 'Emerging-market sectors (African telecoms, Indian fintech, Brazilian commerce) routinely sustain 30–45% CAGR for 3–5 years before maturing. Flag overconfidence only above ~35% sustained CAGR, or when growth claims are unhedged on FX / political / liquidity risk.',
-  },
-  developed_market: {
-    cagrCeiling: 25,
-    rationale: 'Developed-market sectors mature: 25%+ sustained CAGR is rare and warrants scrutiny. Flag overconfidence on growth-rate claims above this unless the memo provides specific market-share or new-segment evidence.',
-  },
-  cross_border: {
-    cagrCeiling: 30,
-    rationale: 'Cross-border memo — apply segment-specific priors: emerging-market segments use the 35% ceiling; developed-market segments use 25%. Single blended growth claims that paper over this distinction are themselves an overconfidence signal.',
-  },
-  unknown: {
-    cagrCeiling: 25,
-    rationale: 'No jurisdiction detected — default to developed-market priors (more conservative, fewer false negatives on overconfidence).',
-  },
-};
+export const GROWTH_RATE_PRIORS: Record<MarketContext, { cagrCeiling: number; rationale: string }> =
+  {
+    emerging_market: {
+      cagrCeiling: 35,
+      rationale:
+        'Emerging-market sectors (African telecoms, Indian fintech, Brazilian commerce) routinely sustain 30–45% CAGR for 3–5 years before maturing. Flag overconfidence only above ~35% sustained CAGR, or when growth claims are unhedged on FX / political / liquidity risk.',
+    },
+    developed_market: {
+      cagrCeiling: 25,
+      rationale:
+        'Developed-market sectors mature: 25%+ sustained CAGR is rare and warrants scrutiny. Flag overconfidence on growth-rate claims above this unless the memo provides specific market-share or new-segment evidence.',
+    },
+    cross_border: {
+      cagrCeiling: 30,
+      rationale:
+        'Cross-border memo — apply segment-specific priors: emerging-market segments use the 35% ceiling; developed-market segments use 25%. Single blended growth claims that paper over this distinction are themselves an overconfidence signal.',
+    },
+    unknown: {
+      cagrCeiling: 25,
+      rationale:
+        'No jurisdiction detected — default to developed-market priors (more conservative, fewer false negatives on overconfidence).',
+    },
+  };

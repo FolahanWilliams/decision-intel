@@ -20,10 +20,7 @@ import { logAudit } from '@/lib/audit';
 
 const log = createLogger('DecisionPackageProvenance');
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -34,6 +31,7 @@ export async function GET(
     }
     const { id } = await params;
     const format = request.nextUrl.searchParams.get('format') ?? 'json';
+    const clientSafe = request.nextUrl.searchParams.get('clientSafe') === '1';
 
     const pkg = await resolvePackageAccess(id, user.id);
     if (!pkg) {
@@ -44,7 +42,7 @@ export async function GET(
 
     if (format === 'pdf') {
       const generator = new DecisionProvenanceRecordGenerator();
-      const pdf = generator.generate(data);
+      const pdf = generator.generate(data, { clientSafe });
       const bytes = pdf.output('arraybuffer');
 
       await logAudit({

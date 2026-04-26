@@ -2197,9 +2197,7 @@ export default function Dashboard() {
                           color: active ? 'var(--accent-primary)' : 'var(--text-muted)',
                           padding: '4px 10px',
                           borderRadius: 'var(--radius-full)',
-                          background: active
-                            ? 'rgba(22, 163, 74, 0.08)'
-                            : 'var(--bg-tertiary)',
+                          background: active ? 'rgba(22, 163, 74, 0.08)' : 'var(--bg-tertiary)',
                           border: `1px solid ${
                             active ? 'rgba(22, 163, 74, 0.22)' : 'var(--border-color)'
                           }`,

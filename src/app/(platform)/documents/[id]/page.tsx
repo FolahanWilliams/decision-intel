@@ -226,17 +226,15 @@ interface Analysis {
     cagrCeiling: number;
     rationale: string;
   };
-  marketContextOverride?:
-    | ({
-        context: 'emerging_market' | 'developed_market' | 'cross_border' | 'unknown';
-        emergingMarketCountries: string[];
-        developedMarketCountries: string[];
-        cagrCeiling: number;
-        rationale: string;
-        overriddenAt?: string;
-        overriddenBy?: string;
-      })
-    | null;
+  marketContextOverride?: {
+    context: 'emerging_market' | 'developed_market' | 'cross_border' | 'unknown';
+    emergingMarketCountries: string[];
+    developedMarketCountries: string[];
+    cagrCeiling: number;
+    rationale: string;
+    overriddenAt?: string;
+    overriddenBy?: string;
+  } | null;
 }
 
 interface Document {
@@ -674,15 +672,19 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       // Margaret + Titi finding). Both fields are optional in the
       // generator — if any piece is missing we omit the section rather
       // than fabricate.
-      let provenance: import('@/lib/reports/board-report-generator').BoardReportProvenance | undefined;
+      let provenance:
+        | import('@/lib/reports/board-report-generator').BoardReportProvenance
+        | undefined;
       try {
-        const docHashRes = await fetch(`/api/documents/${document.id}?fields=contentHash,promptVersion`);
-        const docHashJson = (await docHashRes.json().catch(() => null)) as
-          | { contentHash?: string | null; analyses?: Array<{ id: string; promptVersion?: { hash?: string | null } | null }> }
-          | null;
+        const docHashRes = await fetch(
+          `/api/documents/${document.id}?fields=contentHash,promptVersion`
+        );
+        const docHashJson = (await docHashRes.json().catch(() => null)) as {
+          contentHash?: string | null;
+          analyses?: Array<{ id: string; promptVersion?: { hash?: string | null } | null }>;
+        } | null;
         const documentHash = docHashJson?.contentHash || 'UNAVAILABLE';
-        const promptFingerprint =
-          docHashJson?.analyses?.[0]?.promptVersion?.hash || 'UNAVAILABLE';
+        const promptFingerprint = docHashJson?.analyses?.[0]?.promptVersion?.hash || 'UNAVAILABLE';
         provenance = {
           analysisId: analysis.id,
           documentHash,
@@ -694,14 +696,18 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         log.warn('Board report provenance fetch failed (non-fatal):', provErr);
       }
 
-      let regulatoryExposure: import('@/lib/reports/board-report-generator').BoardReportRegulatoryExposure[] | undefined;
+      let regulatoryExposure:
+        | import('@/lib/reports/board-report-generator').BoardReportRegulatoryExposure[]
+        | undefined;
       try {
         const { getCrossFrameworkRisk } = await import('@/lib/compliance/bias-regulation-map');
         const { formatBiasName } = await import('@/lib/utils/labels');
         const sortedBiases = [...(analysis.biases || [])].sort((a, b) => {
           const order: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 };
-          return (order[a.severity?.toLowerCase() ?? ''] ?? 4) -
-            (order[b.severity?.toLowerCase() ?? ''] ?? 4);
+          return (
+            (order[a.severity?.toLowerCase() ?? ''] ?? 4) -
+            (order[b.severity?.toLowerCase() ?? ''] ?? 4)
+          );
         });
         const seenBias = new Set<string>();
         regulatoryExposure = [];
@@ -1356,9 +1362,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 {visibilityState && (
                   <DocumentVisibilityPill
                     visibility={visibilityState}
-                    onClick={
-                      document.isOwner ? () => setShowVisibilityModal(true) : undefined
-                    }
+                    onClick={document.isOwner ? () => setShowVisibilityModal(true) : undefined}
                   />
                 )}
                 <LegalHoldStatusChip
@@ -1388,9 +1392,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                     const ageDays = (Date.now() - createdMs) / (1000 * 60 * 60 * 24);
                     if (Number.isNaN(ageDays) || ageDays < 30) return null;
                     const ageLabel =
-                      ageDays >= 365
-                        ? `${Math.floor(ageDays / 30)}mo`
-                        : `${Math.floor(ageDays)}d`;
+                      ageDays >= 365 ? `${Math.floor(ageDays / 30)}mo` : `${Math.floor(ageDays)}d`;
                     return (
                       <a
                         href="#outcome-reporter"
@@ -1485,7 +1487,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 aria-label="Upload new version"
                 title="Upload a revised version of this memo. The new audit shows DQI delta + biases resolved/emerged."
               >
-                {isUploadingVersion ? <Upload size={14} className="animate-pulse" /> : <GitBranch size={14} />}
+                {isUploadingVersion ? (
+                  <Upload size={14} className="animate-pulse" />
+                ) : (
+                  <GitBranch size={14} />
+                )}
                 {isUploadingVersion ? 'Uploading…' : 'Upload new version'}
               </button>
               <input
@@ -1686,9 +1692,8 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           new previousAnalysisId field propagates through the wider typed
           surfaces. */}
       {(() => {
-        const prevId = (
-          analysis as unknown as { previousAnalysisId?: string | null } | undefined
-        )?.previousAnalysisId;
+        const prevId = (analysis as unknown as { previousAnalysisId?: string | null } | undefined)
+          ?.previousAnalysisId;
         if (!analysis || !prevId) return null;
         return (
           <ErrorBoundary sectionName="Version delta card">
@@ -1926,8 +1931,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 {
                   key: 'ic',
                   label: 'IC',
-                  hint:
-                    'Pre-IC memo cover — predicted IC questions, structural assumptions, top risks, DPR',
+                  hint: 'Pre-IC memo cover — predicted IC questions, structural assumptions, top risks, DPR',
                 },
                 { key: 'board', label: 'Board', hint: '2-page board-ready preview, inline' },
               ] as Array<{ key: ViewMode; label: string; hint: string }>
@@ -3341,7 +3345,10 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             <div className="flex items-start gap-3 mb-4">
               <Trash2 size={20} style={{ color: 'var(--severity-high)', marginTop: 2 }} />
               <div>
-                <h2 id="delete-confirm-title" style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)' }}>
+                <h2
+                  id="delete-confirm-title"
+                  style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)' }}
+                >
                   Delete this document?
                 </h2>
                 <p

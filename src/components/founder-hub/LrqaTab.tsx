@@ -18,7 +18,15 @@
  * coverage. Update via lrqa-brief-data.ts as the relationship develops.
  */
 
-import { UserCircle, Building2, Network, Trophy, ClipboardCheck, Send, Sparkles } from 'lucide-react';
+import {
+  UserCircle,
+  Building2,
+  Network,
+  Trophy,
+  ClipboardCheck,
+  Send,
+  Sparkles,
+} from 'lucide-react';
 import { IanProfilePanel } from './lrqa/IanProfilePanel';
 import { LrqaCompanyMap } from './lrqa/LrqaCompanyMap';
 import { IntegrationPathsMap } from './lrqa/IntegrationPathsMap';

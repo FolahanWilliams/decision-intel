@@ -69,7 +69,14 @@ export function SankoreBriefClient() {
           <h2 style={{ fontSize: 18, fontWeight: 700, margin: '0 0 6px' }}>
             Sankore capability brief
           </h2>
-          <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: '0 0 20px', lineHeight: 1.5 }}>
+          <p
+            style={{
+              fontSize: 13,
+              color: 'var(--text-muted)',
+              margin: '0 0 20px',
+              lineHeight: 1.5,
+            }}
+          >
             Founder-only reference page. Same passcode as the Founder Hub.
           </p>
           <input

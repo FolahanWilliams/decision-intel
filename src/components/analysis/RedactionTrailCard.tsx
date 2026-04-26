@@ -15,10 +15,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { ShieldCheck, Eye, EyeOff, Clock, FileLock2 } from 'lucide-react';
-import {
-  loadPlaceholderMap,
-  type PlaceholderMapEntry,
-} from '@/lib/utils/redaction-trail';
+import { loadPlaceholderMap, type PlaceholderMapEntry } from '@/lib/utils/redaction-trail';
 import { REDACTION_CATEGORY_LABEL, type RedactionCategory } from '@/lib/utils/redaction-scanner';
 
 interface AuditRow {
@@ -119,14 +116,8 @@ export function RedactionTrailCard({ analysisId, isOwner = false }: Props) {
   const detected = details.detectedTotal ?? 0;
   const redacted = details.redactedTotal ?? 0;
   const placeholders = details.placeholderCount ?? 0;
-  const detectedBreakdown = (details.detectedCounts ?? {}) as Record<
-    RedactionCategory,
-    number
-  >;
-  const redactedBreakdown = (details.redactedCounts ?? {}) as Record<
-    RedactionCategory,
-    number
-  >;
+  const detectedBreakdown = (details.detectedCounts ?? {}) as Record<RedactionCategory, number>;
+  const redactedBreakdown = (details.redactedCounts ?? {}) as Record<RedactionCategory, number>;
 
   return (
     <div
@@ -194,7 +185,8 @@ export function RedactionTrailCard({ analysisId, isOwner = false }: Props) {
                   marginTop: 3,
                 }}
               >
-                {placeholders} unique placeholder{placeholders === 1 ? '' : 's'} emitted into the memo.
+                {placeholders} unique placeholder{placeholders === 1 ? '' : 's'} emitted into the
+                memo.
               </div>
             )}
           </div>
@@ -325,10 +317,7 @@ export function RedactionTrailCard({ analysisId, isOwner = false }: Props) {
             }}
           >
             {placeholderMap.map(e => (
-              <div
-                key={e.placeholder}
-                style={{ display: 'flex', alignItems: 'center', gap: 8 }}
-              >
+              <div key={e.placeholder} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span
                   style={{
                     color: CATEGORY_HEX[e.category],

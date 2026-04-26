@@ -17,10 +17,12 @@ interface Props {
   /** Analysis id — required for the owner editor to PATCH the override. */
   analysisId?: string;
   /** Override snapshot, when present takes priority over `marketContextApplied`. */
-  marketContextOverride?: Props['marketContextApplied'] & {
-    overriddenAt?: string;
-    overriddenBy?: string;
-  } | null;
+  marketContextOverride?:
+    | (Props['marketContextApplied'] & {
+        overriddenAt?: string;
+        overriddenBy?: string;
+      })
+    | null;
   /** Called after a successful save so the parent can refresh. */
   onChanged?: () => void;
 }
@@ -195,10 +197,7 @@ export function MarketContextChip({
               flexWrap: 'wrap',
             }}
           >
-            {label}{' '}
-            <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>
-              · {summary}
-            </span>
+            {label} <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>· {summary}</span>
             {isOverridden && (
               <span
                 style={{
@@ -326,7 +325,11 @@ export function MarketContextChip({
                     fontSize: 11,
                   }}
                 >
-                  {clearing ? <Loader2 size={11} className="animate-spin" /> : <RotateCcw size={11} />}
+                  {clearing ? (
+                    <Loader2 size={11} className="animate-spin" />
+                  ) : (
+                    <RotateCcw size={11} />
+                  )}
                   Reset to auto
                 </button>
               )}
@@ -402,9 +405,7 @@ export function MarketContextChip({
                         >
                           {o.label}
                         </div>
-                        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                          {o.ceiling}
-                        </div>
+                        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{o.ceiling}</div>
                       </span>
                     </button>
                   );

@@ -13,14 +13,7 @@
  */
 
 import { useCallback, useState } from 'react';
-import {
-  GitCompare,
-  AlertTriangle,
-  Loader2,
-  Clock,
-  ChevronDown,
-  ArrowRight,
-} from 'lucide-react';
+import { GitCompare, AlertTriangle, Loader2, Clock, ChevronDown, ArrowRight } from 'lucide-react';
 
 interface CrossRefClaim {
   documentId: string;
@@ -77,7 +70,12 @@ interface TruncationReport {
   perDocCapChars: number;
   totalCapChars: number;
   totalCharsSent: number;
-  truncatedDocs: Array<{ documentId: string; documentName: string; originalChars: number; sentChars: number }>;
+  truncatedDocs: Array<{
+    documentId: string;
+    documentName: string;
+    originalChars: number;
+    sentChars: number;
+  }>;
   excludedDocs: Array<{ documentId: string; documentName: string; originalChars: number }>;
 }
 
@@ -269,11 +267,11 @@ export function CrossReferenceCard({
                 <strong style={{ color: 'var(--text-primary)' }}>Partial scan.</strong>{' '}
                 {truncation.truncatedDocs.length > 0 && (
                   <>
-                    {truncation.truncatedDocs.length} doc{truncation.truncatedDocs.length === 1 ? '' : 's'} truncated to fit the cross-reference budget
+                    {truncation.truncatedDocs.length} doc
+                    {truncation.truncatedDocs.length === 1 ? '' : 's'} truncated to fit the
+                    cross-reference budget
                     {truncation.truncatedDocs.length <= 3 && (
-                      <>
-                        {' '}({truncation.truncatedDocs.map(d => d.documentName).join(', ')})
-                      </>
+                      <> ({truncation.truncatedDocs.map(d => d.documentName).join(', ')})</>
                     )}
                     .
                   </>
@@ -281,11 +279,11 @@ export function CrossReferenceCard({
                 {truncation.excludedDocs.length > 0 && (
                   <>
                     {' '}
-                    {truncation.excludedDocs.length} doc{truncation.excludedDocs.length === 1 ? '' : 's'} excluded entirely once the {Math.round(truncation.totalCapChars / 1000)}K-char total cap was reached
+                    {truncation.excludedDocs.length} doc
+                    {truncation.excludedDocs.length === 1 ? '' : 's'} excluded entirely once the{' '}
+                    {Math.round(truncation.totalCapChars / 1000)}K-char total cap was reached
                     {truncation.excludedDocs.length <= 3 && (
-                      <>
-                        {' '}({truncation.excludedDocs.map(d => d.documentName).join(', ')})
-                      </>
+                      <> ({truncation.excludedDocs.map(d => d.documentName).join(', ')})</>
                     )}
                     .
                   </>
@@ -366,10 +364,7 @@ export function CrossReferenceCard({
                   }}
                   aria-expanded={isOpen}
                 >
-                  <AlertTriangle
-                    size={14}
-                    style={{ color: colour, flexShrink: 0, marginTop: 2 }}
-                  />
+                  <AlertTriangle size={14} style={{ color: colour, flexShrink: 0, marginTop: 2 }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div
                       style={{

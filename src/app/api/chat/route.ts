@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { searchSimilarDocuments } from '@/lib/rag/embeddings';
-import {
-  buildDocumentAccessWhere,
-  filterDocumentIdsByAccess,
-} from '@/lib/utils/document-access';
+import { buildDocumentAccessWhere, filterDocumentIdsByAccess } from '@/lib/utils/document-access';
 import { formatSSE } from '@/lib/sse';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';

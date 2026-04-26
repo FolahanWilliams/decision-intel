@@ -67,7 +67,12 @@ export interface CrossRefTruncationReport {
   /** Total chars actually sent to the model (after truncation). */
   totalCharsSent: number;
   /** Docs whose content was truncated to fit within the per-doc or total cap. */
-  truncatedDocs: Array<{ documentId: string; documentName: string; originalChars: number; sentChars: number }>;
+  truncatedDocs: Array<{
+    documentId: string;
+    documentName: string;
+    originalChars: number;
+    sentChars: number;
+  }>;
   /** Docs that were excluded entirely because the total cap had been hit. */
   excludedDocs: Array<{ documentId: string; documentName: string; originalChars: number }>;
 }
@@ -208,9 +213,7 @@ ${blocks}`;
  *   - RBAC (visibility) — the API endpoint that wraps this MUST verify the
  *     caller can read every doc in the input set.
  */
-export async function runCrossReferenceAgent(
-  docs: CrossRefInputDoc[]
-): Promise<CrossRefRunOutput> {
+export async function runCrossReferenceAgent(docs: CrossRefInputDoc[]): Promise<CrossRefRunOutput> {
   if (docs.length < 2) {
     return {
       findings: [],
@@ -293,17 +296,25 @@ export async function runCrossReferenceAgent(
   const findings: CrossRefFinding[] = Array.isArray(parsed?.findings)
     ? parsed!.findings
         .map(f => ({
-          summary: String(f.summary ?? '').trim().slice(0, 240),
+          summary: String(f.summary ?? '')
+            .trim()
+            .slice(0, 240),
           type: normaliseType(f.type),
           severity: normaliseSeverity(f.severity),
-          whyItMatters: String(f.whyItMatters ?? '').trim().slice(0, 280),
-          resolutionQuestion: String(f.resolutionQuestion ?? '').trim().slice(0, 280),
+          whyItMatters: String(f.whyItMatters ?? '')
+            .trim()
+            .slice(0, 280),
+          resolutionQuestion: String(f.resolutionQuestion ?? '')
+            .trim()
+            .slice(0, 280),
           claims: Array.isArray(f.claims)
             ? f.claims
                 .map(c => ({
                   documentId: String(c.documentId ?? '').trim(),
                   documentName: String(c.documentName ?? '').trim(),
-                  excerpt: String(c.excerpt ?? '').trim().slice(0, 280),
+                  excerpt: String(c.excerpt ?? '')
+                    .trim()
+                    .slice(0, 280),
                 }))
                 .filter(c => validIds.has(c.documentId) && c.excerpt.length > 0)
             : [],

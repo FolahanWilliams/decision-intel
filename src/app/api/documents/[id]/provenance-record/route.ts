@@ -32,9 +32,7 @@ import { notifyExternalDprDownload } from '@/lib/notifications/dpr-share-alert';
 
 const log = createLogger('ProvenanceRecordRoute');
 
-async function getAuthorizedAnalysisId(
-  documentId: string
-): Promise<
+async function getAuthorizedAnalysisId(documentId: string): Promise<
   | {
       ok: true;
       analysisId: string;
@@ -82,7 +80,15 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const auth = await getAuthorizedAnalysisId(id);
     if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
-    const format = new URL(req.url).searchParams.get('format');
+    const url = new URL(req.url);
+    const format = url.searchParams.get('format');
+    // Client-Safe Export Mode (DPR v2 #5) — opt-in via ?clientSafe=1 on
+    // the export URL. When enabled, entity names, amounts, and person
+    // names in the rendered meta strip + summary + reviewer notes are
+    // replaced with stable placeholders so the artefact can be shared
+    // with an LP, regulator, or third-party assurance firm without
+    // leaking the underlying competitive intelligence.
+    const clientSafe = url.searchParams.get('clientSafe') === '1';
 
     // format=pdf: assemble → stream a signed PDF. Same plan gate + audit
     // log as /api/compliance/audit-packet/[analysisId]; doc-scoped surface
@@ -104,7 +110,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
       const data = await assembleProvenanceRecordData(auth.analysisId);
       const generator = new DecisionProvenanceRecordGenerator();
-      const doc = generator.generate(data);
+      const doc = generator.generate(data, { clientSafe });
       const pdfArrayBuffer = doc.output('arraybuffer') as ArrayBuffer;
       const pdfBytes = new Uint8Array(pdfArrayBuffer);
 

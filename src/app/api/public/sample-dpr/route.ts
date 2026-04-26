@@ -50,9 +50,13 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    // ?clientSafe=1 lets a curious LP / journalist / regulator preview
+    // the LP-export shape on the same SPECIMEN bytes — same tracking
+    // limit, no auth, watermark stays.
+    const clientSafe = req.nextUrl.searchParams.get('clientSafe') === '1';
     const data = buildSampleDprData();
     const generator = new DecisionProvenanceRecordGenerator();
-    const doc = generator.generate(data, { watermark: 'SPECIMEN' });
+    const doc = generator.generate(data, { watermark: 'SPECIMEN', clientSafe });
     const pdfArrayBuffer = doc.output('arraybuffer') as ArrayBuffer;
     const pdfBytes = new Uint8Array(pdfArrayBuffer);
 

@@ -21,7 +21,11 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingUp, Sparkles, Target, ShieldCheck } from 'lucide-react';
-import { TOP_3_DI_GAPS, DI_MARKET_CONTEXT, type DiSpaceGap } from '@/lib/data/competitive-positioning';
+import {
+  TOP_3_DI_GAPS,
+  DI_MARKET_CONTEXT,
+  type DiSpaceGap,
+} from '@/lib/data/competitive-positioning';
 
 const GAP_ACCENTS: Record<DiSpaceGap['rank'], string> = {
   1: '#DC2626', // red — highest impact, biggest white space
@@ -30,8 +34,8 @@ const GAP_ACCENTS: Record<DiSpaceGap['rank'], string> = {
 };
 
 const GAP_ICONS: Record<DiSpaceGap['rank'], typeof Target> = {
-  1: Sparkles,  // causal reasoning
-  2: Target,    // execution
+  1: Sparkles, // causal reasoning
+  2: Target, // execution
   3: ShieldCheck, // governance
 };
 
@@ -194,16 +198,8 @@ export function ThreeGapsDifferentiator() {
           </div>
 
           <Block label="What it is" color="#94A3B8" text={active.whatItIs} />
-          <Block
-            label="Why competitors fail"
-            color="#DC2626"
-            text={active.whyCompetitorsFail}
-          />
-          <Block
-            label="Why it blocks value"
-            color="#D97706"
-            text={active.whyItBlocksValue}
-          />
+          <Block label="Why competitors fail" color="#DC2626" text={active.whyCompetitorsFail} />
+          <Block label="Why it blocks value" color="#D97706" text={active.whyItBlocksValue} />
           <Block
             label="How Decision Intel solves it"
             color={GAP_ACCENTS[active.rank]}

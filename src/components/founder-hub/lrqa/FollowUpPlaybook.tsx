@@ -131,7 +131,15 @@ export function FollowUpPlaybook() {
         >
           Things to remember about Ian
         </div>
-        <ul style={{ paddingLeft: 18, margin: 0, fontSize: 11, color: 'var(--text-primary)', lineHeight: 1.7 }}>
+        <ul
+          style={{
+            paddingLeft: 18,
+            margin: 0,
+            fontSize: 11,
+            color: 'var(--text-primary)',
+            lineHeight: 1.7,
+          }}
+        >
           {IAN_REMEMBER.map((r, i) => (
             <li key={i}>{r}</li>
           ))}

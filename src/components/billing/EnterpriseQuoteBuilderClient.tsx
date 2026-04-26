@@ -99,9 +99,7 @@ export function EnterpriseQuoteBuilderClient({
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `enterprise-quote-${customerName
-        .replace(/[^a-z0-9-]/gi, '_')
-        .slice(0, 60)}.pdf`;
+      a.download = `enterprise-quote-${customerName.replace(/[^a-z0-9-]/gi, '_').slice(0, 60)}.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -221,11 +219,11 @@ export function EnterpriseQuoteBuilderClient({
                     {region === 'EU' ? 'EU' : 'Multi-region'} hosting requires an Enterprise
                     conversation.
                   </strong>{' '}
-                  Production today runs on Vercel + Supabase US. {region === 'EU' ? 'EU' : 'Multi-region'}{' '}
-                  residency is available on Enterprise design-partner configurations and is
-                  confirmed during the Order Form discussion. The PDF below records your stated
-                  preference; it is not a representation that {region === 'EU' ? 'EU' : 'Multi-region'}{' '}
-                  is provisioned today.
+                  Production today runs on Vercel + Supabase US.{' '}
+                  {region === 'EU' ? 'EU' : 'Multi-region'} residency is available on Enterprise
+                  design-partner configurations and is confirmed during the Order Form discussion.
+                  The PDF below records your stated preference; it is not a representation that{' '}
+                  {region === 'EU' ? 'EU' : 'Multi-region'} is provisioned today.
                 </div>
               )}
             </Field>
@@ -378,7 +376,10 @@ export function EnterpriseQuoteBuilderClient({
               margin: '0',
             }}
           />
-          <SummaryRow label={`Seats — ${seats} × $${perSeatMonthly}/mo × 12`} value={`$${acv.seatACV.toLocaleString()}`} />
+          <SummaryRow
+            label={`Seats — ${seats} × $${perSeatMonthly}/mo × 12`}
+            value={`$${acv.seatACV.toLocaleString()}`}
+          />
           {dealOverageCount > 0 && (
             <SummaryRow
               label={`Deals — ${dealOverageCount} × $${perDealMonthly}/mo × 12`}
@@ -453,9 +454,7 @@ function Section({
 }
 
 function FieldRow({ children }: { children: React.ReactNode }) {
-  return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>{children}</div>
-  );
+  return <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>{children}</div>;
 }
 
 function Field({
@@ -568,7 +567,9 @@ function Select({
 
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
+    <div
+      style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}
+    >
       <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{label}</span>
       <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{value}</span>
     </div>

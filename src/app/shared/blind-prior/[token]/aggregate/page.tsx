@@ -74,9 +74,7 @@ export default async function PublicAggregatePage({ params }: Props) {
           <h1 style={{ margin: 0, color: 'var(--text-primary)', fontSize: 22 }}>
             Aggregate unavailable
           </h1>
-          <p style={{ marginTop: 12, color: 'var(--text-muted)', fontSize: 13 }}>
-            {data.error}
-          </p>
+          <p style={{ marginTop: 12, color: 'var(--text-muted)', fontSize: 13 }}>{data.error}</p>
         </div>
       </main>
     );

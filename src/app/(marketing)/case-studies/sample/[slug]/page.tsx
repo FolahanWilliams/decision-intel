@@ -3,11 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowRight, FileText } from 'lucide-react';
 import { MarketingNav, BRAND_COLORS as C } from '@/components/marketing/MarketingNav';
-import {
-  SAMPLE_BUNDLES_BY_SLUG,
-  SAMPLE_BUNDLES,
-  ROLE_LABEL,
-} from '@/lib/data/sample-bundles';
+import { SAMPLE_BUNDLES_BY_SLUG, SAMPLE_BUNDLES, ROLE_LABEL } from '@/lib/data/sample-bundles';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -199,9 +195,7 @@ export default async function SamplePage({ params }: Props) {
               <div style={{ fontSize: 28, fontWeight: 800, color: C.slate900 }}>
                 {bundle.expectedDqi}
               </div>
-              <div style={{ fontSize: 12, color: C.slate500, fontWeight: 600 }}>
-                Plausible DQI
-              </div>
+              <div style={{ fontSize: 12, color: C.slate500, fontWeight: 600 }}>Plausible DQI</div>
             </div>
             <div style={{ flex: 1, minWidth: 240 }}>
               <div
@@ -382,9 +376,7 @@ export default async function SamplePage({ params }: Props) {
                   >
                     {ROLE_LABEL[o.role]}
                   </div>
-                  <div style={{ fontSize: 14, fontWeight: 700, lineHeight: 1.3 }}>
-                    {o.title}
-                  </div>
+                  <div style={{ fontSize: 14, fontWeight: 700, lineHeight: 1.3 }}>{o.title}</div>
                   <div style={{ fontSize: 12, color: C.slate500, marginTop: 6, lineHeight: 1.4 }}>
                     {o.summary}
                   </div>

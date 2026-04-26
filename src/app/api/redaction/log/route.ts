@@ -100,7 +100,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (e) {
-    log.warn('redaction log POST failed (non-critical):', e instanceof Error ? e.message : String(e));
+    log.warn(
+      'redaction log POST failed (non-critical):',
+      e instanceof Error ? e.message : String(e)
+    );
     // Always return 200 so an audit-trail failure never blocks a real
     // submission; we still log the failure for observability.
     return NextResponse.json({ ok: false });

@@ -421,8 +421,7 @@ const MA_REVERSE_MERGER: SampleBundle = {
   title: 'Reverse-merger IC memo with cross-border exposure',
   summary:
     'Reverse-merger structure with US listing + EU operating entity. Multi-jurisdictional governance variance.',
-  hookCopy:
-    'Cross-border reverse mergers are where most diligence holes hide — paste it and see.',
+  hookCopy: 'Cross-border reverse mergers are where most diligence holes hide — paste it and see.',
   marketContext: 'cross_border',
   regulatoryTag: 'SEC Reg D · GDPR · UK FCA',
   expectedBiases: [
@@ -962,8 +961,9 @@ export const SAMPLE_BUNDLES: readonly SampleBundle[] = [
   PE_KENYA_FINTECH_GROWTH,
 ] as const;
 
-export const SAMPLE_BUNDLES_BY_SLUG: Readonly<Record<string, SampleBundle>> =
-  Object.fromEntries(SAMPLE_BUNDLES.map(b => [b.slug, b]));
+export const SAMPLE_BUNDLES_BY_SLUG: Readonly<Record<string, SampleBundle>> = Object.fromEntries(
+  SAMPLE_BUNDLES.map(b => [b.slug, b])
+);
 
 export function bundlesForRole(role: SampleRole | null | undefined): SampleBundle[] {
   if (!role) {

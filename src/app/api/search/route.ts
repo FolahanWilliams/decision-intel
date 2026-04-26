@@ -3,10 +3,7 @@ import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { searchSimilarDocuments, getContextualInsights } from '@/lib/rag/embeddings';
 import { createLogger } from '@/lib/utils/logger';
-import {
-  buildDocumentAccessWhere,
-  filterDocumentIdsByAccess,
-} from '@/lib/utils/document-access';
+import { buildDocumentAccessWhere, filterDocumentIdsByAccess } from '@/lib/utils/document-access';
 
 const log = createLogger('SearchRoute');
 

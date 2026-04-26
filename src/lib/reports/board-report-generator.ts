@@ -546,10 +546,7 @@ export class BoardReportGenerator {
   /** Compact regulatory exposure table on page 2. One row per flagged
    *  bias, each row lists the frameworks it touches. Designed to fit in
    *  ≤ 50mm so it leaves room for the provenance strip below. */
-  private drawRegulatoryExposure(
-    rows: BoardReportRegulatoryExposure[],
-    startY: number
-  ): number {
+  private drawRegulatoryExposure(rows: BoardReportRegulatoryExposure[], startY: number): number {
     let y = startY;
     this.drawSectionHeading('REGULATORY EXPOSURE', y);
     y += 8;
@@ -577,7 +574,10 @@ export class BoardReportGenerator {
       this.doc.setFont('helvetica', 'normal');
       this.doc.setFontSize(8.5);
       this.doc.setTextColor(80, 80, 80);
-      const fwText = row.frameworks.length > 0 ? row.frameworks.join(' · ') : 'No regulator-touching frameworks for this bias.';
+      const fwText =
+        row.frameworks.length > 0
+          ? row.frameworks.join(' · ')
+          : 'No regulator-touching frameworks for this bias.';
       const fwLines = this.doc.splitTextToSize(fwText, TEXT_W - 8);
       this.doc.text(fwLines, MARGIN_L + 5, y);
       y += fwLines.length * 4 + 2;
@@ -700,12 +700,9 @@ export class BoardReportGenerator {
         this.doc.setFont('helvetica', 'normal');
         this.doc.setFontSize(7);
         this.doc.setTextColor(160, 160, 160);
-        this.doc.text(
-          truncate(branding.retentionPolicy, 140),
-          PAGE_W / 2,
-          294,
-          { align: 'center' }
-        );
+        this.doc.text(truncate(branding.retentionPolicy, 140), PAGE_W / 2, 294, {
+          align: 'center',
+        });
       }
     }
   }

@@ -148,57 +148,68 @@ const FRAMEWORKS = [
   {
     code: 'NDPR Art. 12',
     name: 'Nigeria Data Protection Regulation',
-    gates: 'Automated-decision rights for Nigerian data subjects (aligned with GDPR Art. 22 via the NDPR 2019 Implementation Framework).',
+    gates:
+      'Automated-decision rights for Nigerian data subjects (aligned with GDPR Art. 22 via the NDPR 2019 Implementation Framework).',
   },
   {
     code: 'CBN AI Guidelines',
     name: 'Central Bank of Nigeria',
-    gates: 'Financial-services AI governance obligations (draft 2024) — model governance, explainability and consumer-protection duties for regulated Nigerian financial institutions.',
+    gates:
+      'Financial-services AI governance obligations (draft 2024) — model governance, explainability and consumer-protection duties for regulated Nigerian financial institutions.',
   },
   {
     code: 'WAEMU',
     name: 'West African Economic and Monetary Union',
-    gates: 'Cross-border data localisation and financial-sector governance across the eight WAEMU member states.',
+    gates:
+      'Cross-border data localisation and financial-sector governance across the eight WAEMU member states.',
   },
   {
     code: 'CMA Kenya',
     name: 'Capital Markets Authority (Kenya)',
-    gates: 'Listed-company decisioning + prospectus disclosure obligations under the CMA (Conduct of Business) Regulations 2024.',
+    gates:
+      'Listed-company decisioning + prospectus disclosure obligations under the CMA (Conduct of Business) Regulations 2024.',
   },
   {
     code: 'CBK',
     name: 'Central Bank of Kenya — Banking & Digital Lending',
-    gates: 'Digital-lending licensing, AI/ML model-risk management, and consumer-disclosure obligations under the Banking (Amendment) Act 2024 §33B and CBK Risk Management Guidelines (rev. 2023).',
+    gates:
+      'Digital-lending licensing, AI/ML model-risk management, and consumer-disclosure obligations under the Banking (Amendment) Act 2024 §33B and CBK Risk Management Guidelines (rev. 2023).',
   },
   {
     code: 'BoG Cyber & ICT Risk',
     name: 'Bank of Ghana — Cyber & Information Security Directive',
-    gates: 'Cyber, data, and AI/ML model-governance obligations for Ghanaian regulated financial institutions (2018 directive + 2023 update).',
+    gates:
+      'Cyber, data, and AI/ML model-governance obligations for Ghanaian regulated financial institutions (2018 directive + 2023 update).',
   },
   {
     code: 'FRC Nigeria',
     name: 'Financial Reporting Council of Nigeria',
-    gates: 'Nigerian Code of Corporate Governance — board-level decisioning, dissent capture, and risk-management documentation duties for public-interest entities.',
+    gates:
+      'Nigerian Code of Corporate Governance — board-level decisioning, dissent capture, and risk-management documentation duties for public-interest entities.',
   },
   {
     code: 'CBE AI Guidelines',
     name: 'Central Bank of Egypt',
-    gates: 'AI/ML model-governance + explainability obligations for Egyptian banks under the CBE 2023 ICT Governance and Risk Management Framework.',
+    gates:
+      'AI/ML model-governance + explainability obligations for Egyptian banks under the CBE 2023 ICT Governance and Risk Management Framework.',
   },
   {
     code: 'PoPIA §71',
     name: 'Protection of Personal Information Act (South Africa)',
-    gates: 'Automated-decision rights + data-subject access for South African data subjects (PoPIA s.71, in force July 2021).',
+    gates:
+      'Automated-decision rights + data-subject access for South African data subjects (PoPIA s.71, in force July 2021).',
   },
   {
     code: 'SARB Model Risk',
     name: 'South African Reserve Bank — Model Risk Governance',
-    gates: 'Model risk + AI governance obligations for SA-regulated banks (Directive D2/2022 + Joint Standard 2 of 2024 on cybersecurity).',
+    gates:
+      'Model risk + AI governance obligations for SA-regulated banks (Directive D2/2022 + Joint Standard 2 of 2024 on cybersecurity).',
   },
   {
     code: 'BoT FinTech',
     name: 'Bank of Tanzania — FinTech Regulatory Sandbox',
-    gates: 'Tanzanian financial-services AI/ML decisioning obligations under the BoT FinTech Regulatory Sandbox Guidelines (2023).',
+    gates:
+      'Tanzanian financial-services AI/ML decisioning obligations under the BoT FinTech Regulatory Sandbox Guidelines (2023).',
   },
 ];
 
@@ -506,9 +517,9 @@ export default function SecurityPage() {
               }}
             >
               AES-256-GCM at rest with keyVersion rotation, TLS 1.2+ in transit, an immutable audit
-              log, and every flag cross-linked to a specific regulatory provision across {FRAMEWORKS.length}{' '}
-              international frameworks spanning G7, EU, GCC, and African markets. A Fortune-500
-              security questionnaire finishes in minutes, not weeks.
+              log, and every flag cross-linked to a specific regulatory provision across{' '}
+              {FRAMEWORKS.length} international frameworks spanning G7, EU, GCC, and African
+              markets. A Fortune-500 security questionnaire finishes in minutes, not weeks.
             </p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <Link

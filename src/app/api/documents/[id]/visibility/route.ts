@@ -160,9 +160,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
           to: visibility,
           filename: doc.filename,
         },
-      }).catch(err =>
-        log.warn('audit log for visibility change failed:', err)
-      );
+      }).catch(err => log.warn('audit log for visibility change failed:', err));
     }
 
     if (added.length > 0) {

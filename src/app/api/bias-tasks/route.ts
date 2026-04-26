@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
       });
       if (!assigneeMember) {
         return apiError({
-          error: 'Assignee must be a member of the document\'s organisation',
+          error: "Assignee must be a member of the document's organisation",
           status: 400,
         });
       }

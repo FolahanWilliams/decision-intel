@@ -139,7 +139,16 @@ export function CaseLibraryGeography() {
               </span>
             )}
           </div>
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <ul
+            style={{
+              listStyle: 'none',
+              padding: 0,
+              margin: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 4,
+            }}
+          >
             {focused.examples.map((ex, i) => (
               <li
                 key={i}

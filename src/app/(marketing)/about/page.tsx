@@ -19,7 +19,18 @@
 
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, Building2, Mail, Globe, MapPin, ShieldCheck, FileText, Briefcase, Users, Target } from 'lucide-react';
+import {
+  ArrowRight,
+  Building2,
+  Mail,
+  Globe,
+  MapPin,
+  ShieldCheck,
+  FileText,
+  Briefcase,
+  Users,
+  Target,
+} from 'lucide-react';
 import { MarketingNav } from '@/components/marketing/MarketingNav';
 import {
   LEGAL_ENTITY_NAME,
@@ -184,7 +195,10 @@ export default function AboutPage() {
             </FactRow>
             <FactRow label="Registered office" icon={<MapPin size={14} strokeWidth={2.2} />}>
               {REGISTERED_OFFICE_LINES.map((line, i) => (
-                <div key={i} style={{ marginBottom: i === REGISTERED_OFFICE_LINES.length - 1 ? 0 : 4 }}>
+                <div
+                  key={i}
+                  style={{ marginBottom: i === REGISTERED_OFFICE_LINES.length - 1 ? 0 : 4 }}
+                >
                   {line}
                 </div>
               ))}
@@ -291,7 +305,9 @@ export default function AboutPage() {
               }}
             >
               <ShieldCheck size={22} color={C.green} strokeWidth={2.25} />
-              <div style={{ fontSize: 15, fontWeight: 700, color: C.slate900 }}>Security posture</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: C.slate900 }}>
+                Security posture
+              </div>
               <div style={{ fontSize: 13, color: C.slate600, lineHeight: 1.5 }}>
                 Encryption, key rotation, sub-processors, regulatory mapping across 18 frameworks.
               </div>
@@ -360,7 +376,9 @@ export default function AboutPage() {
               }}
             >
               <FileText size={22} color={C.green} strokeWidth={2.25} />
-              <div style={{ fontSize: 15, fontWeight: 700, color: C.slate900 }}>Terms of service</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: C.slate900 }}>
+                Terms of service
+              </div>
               <div style={{ fontSize: 13, color: C.slate600, lineHeight: 1.5 }}>
                 Indemnification, SLA tiers, data portability on termination, exit assistance,
                 sub-processor change notice, audit rights, governing law (with EEA/UK carve-out).

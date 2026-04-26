@@ -81,11 +81,7 @@ export function UploadToDealButton({ dealId, dealName, onUploaded, variant = 'pr
           cursor: uploading ? 'wait' : 'pointer',
         }}
       >
-        {uploading ? (
-          <Loader2 size={14} className="animate-spin" />
-        ) : (
-          <Upload size={14} />
-        )}
+        {uploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
         {uploading ? 'Uploading…' : `Upload to ${dealName}`}
       </button>
       <input

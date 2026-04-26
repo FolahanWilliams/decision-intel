@@ -115,9 +115,7 @@ function CommentRow({
         <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)' }}>
           {authorLabel(c.author)}
         </span>
-        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-          {formatDate(c.createdAt)}
-        </span>
+        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{formatDate(c.createdAt)}</span>
         {isResolved && (
           <span
             style={{
@@ -256,28 +254,27 @@ function TaskRow({
         className="flex items-center gap-3 mt-2 flex-wrap"
         style={{ fontSize: 11, color: 'var(--text-muted)' }}
       >
-        {task.dueAt && (() => {
-          const due = new Date(task.dueAt);
-          const isOverdue =
-            due.getTime() < nowMs &&
-            task.status !== 'resolved' &&
-            task.status !== 'dismissed';
-          const soonMs = 48 * 3600 * 1000;
-          const isSoon = !isOverdue && due.getTime() - nowMs < soonMs;
-          return (
-            <span
-              className="inline-flex items-center gap-1"
-              style={{
-                color: isOverdue ? '#DC2626' : isSoon ? '#D97706' : 'var(--text-muted)',
-                fontWeight: isOverdue ? 700 : 500,
-              }}
-            >
-              <Calendar size={10} />
-              {isOverdue ? 'OVERDUE · ' : 'due '}
-              {formatDate(task.dueAt)}
-            </span>
-          );
-        })()}
+        {task.dueAt &&
+          (() => {
+            const due = new Date(task.dueAt);
+            const isOverdue =
+              due.getTime() < nowMs && task.status !== 'resolved' && task.status !== 'dismissed';
+            const soonMs = 48 * 3600 * 1000;
+            const isSoon = !isOverdue && due.getTime() - nowMs < soonMs;
+            return (
+              <span
+                className="inline-flex items-center gap-1"
+                style={{
+                  color: isOverdue ? '#DC2626' : isSoon ? '#D97706' : 'var(--text-muted)',
+                  fontWeight: isOverdue ? 700 : 500,
+                }}
+              >
+                <Calendar size={10} />
+                {isOverdue ? 'OVERDUE · ' : 'due '}
+                {formatDate(task.dueAt)}
+              </span>
+            );
+          })()}
         <select
           value={task.status}
           onChange={e => onStatusChange(task, e.target.value as BiasTask['status'])}
@@ -515,12 +512,13 @@ export function BiasCollabPanel({ biasInstanceId, initiallyOpen = false }: Props
       >
         <ChevronDown
           size={12}
-          style={{ transition: 'transform .15s', transform: expanded ? 'rotate(0deg)' : 'rotate(-90deg)' }}
+          style={{
+            transition: 'transform .15s',
+            transform: expanded ? 'rotate(0deg)' : 'rotate(-90deg)',
+          }}
         />
         <MessageSquare size={12} />
-        <span>
-          Discussion ({commentCount})
-        </span>
+        <span>Discussion ({commentCount})</span>
         <span style={{ opacity: 0.7 }}>·</span>
         <UserPlus size={12} />
         <span>
@@ -560,8 +558,8 @@ export function BiasCollabPanel({ biasInstanceId, initiallyOpen = false }: Props
               </div>
             ) : comments.length === 0 ? (
               <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                Start the conversation. Use <code>@user@example.com</code> to mention a teammate
-                — they&apos;ll get an in-app nudge.
+                Start the conversation. Use <code>@user@example.com</code> to mention a teammate —
+                they&apos;ll get an in-app nudge.
               </div>
             ) : (
               comments.map(c => (
@@ -732,9 +730,7 @@ export function BiasCollabPanel({ biasInstanceId, initiallyOpen = false }: Props
                   />
                 </div>
                 {taskFormError && (
-                  <div style={{ fontSize: 12, color: 'var(--severity-high)' }}>
-                    {taskFormError}
-                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--severity-high)' }}>{taskFormError}</div>
                 )}
                 <div className="flex justify-end gap-2">
                   <button

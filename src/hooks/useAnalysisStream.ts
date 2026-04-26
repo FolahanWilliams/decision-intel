@@ -206,7 +206,9 @@ export function useAnalysisStream(options: StreamOptions) {
             setOutcomeGate({
               pendingCount: errorData.pendingCount || 0,
               pendingAnalysisIds: errorData.pendingAnalysisIds || [],
-              message: errorData.error || 'Outcome Gate blocked — log outcomes on past analyses before running a new audit.',
+              message:
+                errorData.error ||
+                'Outcome Gate blocked — log outcomes on past analyses before running a new audit.',
               level: 'hard',
             });
             errorMessage = errorData.error || 'Outcome Gate blocked';

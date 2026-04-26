@@ -3,10 +3,7 @@ import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { apiError } from '@/lib/utils/api-response';
 import { createLogger } from '@/lib/utils/logger';
-import {
-  buildDocumentAccessFilter,
-  buildDocumentAccessWhere,
-} from '@/lib/utils/document-access';
+import { buildDocumentAccessFilter, buildDocumentAccessWhere } from '@/lib/utils/document-access';
 
 const log = createLogger('DocumentVersionsRoute');
 
@@ -19,10 +16,7 @@ const log = createLogger('DocumentVersionsRoute');
 // Auth: ownership OR same-org membership, mirroring /api/documents/[id].
 // Soft-deleted versions are excluded.
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const supabase = await createClient();

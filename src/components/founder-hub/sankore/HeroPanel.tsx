@@ -3,7 +3,10 @@
 import { Building2, Calendar, ChevronRight, Sparkle } from 'lucide-react';
 import { THREE_SHIFTS, STATUS_DISPLAY } from './sankore-brief-data';
 
-const TONE_COLOURS: Record<'success' | 'amber' | 'info' | 'muted', { bg: string; text: string; border: string }> = {
+const TONE_COLOURS: Record<
+  'success' | 'amber' | 'info' | 'muted',
+  { bg: string; text: string; border: string }
+> = {
   success: { bg: 'rgba(22,163,74,0.10)', text: '#16A34A', border: 'rgba(22,163,74,0.30)' },
   amber: { bg: 'rgba(217,119,6,0.10)', text: '#D97706', border: 'rgba(217,119,6,0.30)' },
   info: { bg: 'rgba(37,99,235,0.10)', text: '#2563EB', border: 'rgba(37,99,235,0.30)' },

@@ -17,7 +17,16 @@ import { KahnemanKleinSynthesis } from '@/components/marketing/KahnemanKleinSynt
 import { MomentsPyramid } from '@/components/marketing/MomentsPyramid';
 import { SecurityLifecycleStrip } from '@/components/marketing/SecurityLifecycleStrip';
 import { ScrollRevealGraph } from '@/components/marketing/ScrollRevealGraph';
-import { ArrowRight, Check, ShieldCheck, Scale, GraduationCap, Globe2, FileText, AlertCircle } from 'lucide-react';
+import {
+  ArrowRight,
+  Check,
+  ShieldCheck,
+  Scale,
+  GraduationCap,
+  Globe2,
+  FileText,
+  AlertCircle,
+} from 'lucide-react';
 import { DESIGN_PARTNER_SEATS_AVAILABLE } from '@/lib/constants/company-info';
 
 /* ─── Color Tokens ──────────────────────────────────────────────────────── */
@@ -220,9 +229,7 @@ export default function LandingPage() {
                 }}
               >
                 The native reasoning layer for every{' '}
-                <span style={{ color: C.green, fontStyle: 'italic' }}>
-                  high-stakes call.
-                </span>
+                <span style={{ color: C.green, fontStyle: 'italic' }}>high-stakes call.</span>
               </h1>
               <p
                 style={{
@@ -233,10 +240,10 @@ export default function LandingPage() {
                   maxWidth: 540,
                 }}
               >
-                Every strategic memo runs through a cognitive-bias audit grounded in 30+ biases
-                from Kahneman and Klein, calibrated against 135 historical corporate decisions.
-                Decision Intel scores the reasoning, names the biases the room will catch first,
-                and shows exactly what shifts when you remove them.
+                Every strategic memo runs through a cognitive-bias audit grounded in 30+ biases from
+                Kahneman and Klein, calibrated against 135 historical corporate decisions. Decision
+                Intel scores the reasoning, names the biases the room will catch first, and shows
+                exactly what shifts when you remove them.
               </p>
               <div
                 style={{
@@ -414,8 +421,8 @@ export default function LandingPage() {
                         margin: 0,
                       }}
                     >
-                      What unchecked decisions cost the typical Fortune 500 company (McKinsey).
-                      The pattern shows up at every scale of capital allocation.
+                      What unchecked decisions cost the typical Fortune 500 company (McKinsey). The
+                      pattern shows up at every scale of capital allocation.
                     </p>
                   </div>
                   {/* SOLUTION — green */}
@@ -1213,22 +1220,20 @@ export default function LandingPage() {
                 'Full 60-second audit',
                 'No signup · no card',
                 `${DESIGN_PARTNER_SEATS_AVAILABLE} design-partner seats open`,
-              ].map(
-                t => (
-                  <span
-                    key={t}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 6,
-                      fontSize: 13,
-                      color: C.slate500,
-                    }}
-                  >
-                    <Check size={14} style={{ color: C.green }} /> {t}
-                  </span>
-                )
-              )}
+              ].map(t => (
+                <span
+                  key={t}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    fontSize: 13,
+                    color: C.slate500,
+                  }}
+                >
+                  <Check size={14} style={{ color: C.green }} /> {t}
+                </span>
+              ))}
             </div>
           </motion.div>
         </div>

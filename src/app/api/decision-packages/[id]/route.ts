@@ -21,10 +21,7 @@ const log = createLogger('DecisionPackageDetail');
 const ALLOWED_STATUS = new Set(['drafting', 'under_review', 'decided', 'superseded']);
 const ALLOWED_VISIBILITY = new Set(['private', 'team']);
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -107,9 +104,7 @@ export async function GET(
           orderBy: { runAt: 'desc' },
         })
         .catch(() => null),
-      prisma.decisionPackageOutcome
-        .findUnique({ where: { packageId: id } })
-        .catch(() => null),
+      prisma.decisionPackageOutcome.findUnique({ where: { packageId: id } }).catch(() => null),
     ]);
 
     return NextResponse.json({
@@ -186,10 +181,7 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -225,8 +217,7 @@ export async function PATCH(
     }
     if ('decisionFrame' in body) {
       const raw = body.decisionFrame;
-      update.decisionFrame =
-        typeof raw === 'string' ? (raw.trim().slice(0, 600) || null) : null;
+      update.decisionFrame = typeof raw === 'string' ? raw.trim().slice(0, 600) || null : null;
     }
     if (typeof body.status === 'string' && ALLOWED_STATUS.has(body.status)) {
       update.status = body.status;
@@ -264,10 +255,7 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {

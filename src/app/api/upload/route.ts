@@ -213,8 +213,7 @@ export async function POST(request: NextRequest) {
         }
         // Access check on the source — same policy as the GET on documents/[id].
         const ownsTarget = target.userId === userId;
-        const sharedOrg =
-          !ownsTarget && target.orgId && userOrgId && target.orgId === userOrgId;
+        const sharedOrg = !ownsTarget && target.orgId && userOrgId && target.orgId === userOrgId;
         if (!ownsTarget && !sharedOrg) {
           return NextResponse.json(
             { error: 'Cannot version: access denied to source document' },

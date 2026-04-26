@@ -221,7 +221,9 @@ export function FivePillarsMap() {
                     alignItems: 'flex-start',
                   }}
                 >
-                  <span style={{ color: GRADE_COLOURS[focused.fitGrade].fg, fontWeight: 700 }}>·</span>
+                  <span style={{ color: GRADE_COLOURS[focused.fitGrade].fg, fontWeight: 700 }}>
+                    ·
+                  </span>
                   <span>{c}</span>
                 </li>
               ))}

@@ -32,7 +32,7 @@ export const IAN_PROFILE = {
   connections: '500+',
 
   warmIntroContext:
-    'Ian is the father of one of Folahan\'s best friends. The connection surfaced through casual conversation about what each parent does. This is the highest-value warm intro Folahan has had outside the Wiz advisor relationship — and it lands at the EXACT intersection of Decision Intel\'s positioning (risk management + AI + Pan-African expansion + supply chain reasoning audit). Treat as advisor-grade conversation first, partnership conversation second. Trust capital from the personal connection is real but burns fast if Folahan over-pitches in the first meeting.',
+    "Ian is the father of one of Folahan's best friends. The connection surfaced through casual conversation about what each parent does. This is the highest-value warm intro Folahan has had outside the Wiz advisor relationship — and it lands at the EXACT intersection of Decision Intel's positioning (risk management + AI + Pan-African expansion + supply chain reasoning audit). Treat as advisor-grade conversation first, partnership conversation second. Trust capital from the personal connection is real but burns fast if Folahan over-pitches in the first meeting.",
 
   intellectualProfile: {
     education: [
@@ -56,20 +56,22 @@ export const IAN_PROFILE = {
       role: 'Group CEO',
       company: 'LRQA',
       years: 'Sep 2023 – Present',
-      thrust: 'Driving transformation, streamlining operations, expanding into cybersecurity / ESG / inspection / AI; 61K+ clients across 160 countries.',
+      thrust:
+        'Driving transformation, streamlining operations, expanding into cybersecurity / ESG / inspection / AI; 61K+ clients across 160 countries.',
     },
     {
       role: 'Managing Director — Assessment, then Chief Growth Officer',
       company: 'LRQA',
       years: 'May 2022 – Aug 2023',
-      thrust: 'Drove internal alignment + growth initiatives + digital market awareness during the LRQA platform consolidation post-ELEVATE acquisition.',
+      thrust:
+        'Drove internal alignment + growth initiatives + digital market awareness during the LRQA platform consolidation post-ELEVATE acquisition.',
     },
     {
       role: 'CEO, then Senior Partner',
       company: 'ELEVATE',
       years: 'Apr 2013 – Apr 2022',
       thrust:
-        'Founded and scaled ELEVATE — a leading risk + sustainability solutions firm — into a category leader. Acquired by LRQA in 2022. KEY INSIGHT: Ian knows the founder journey from the inside. He knows what it\'s like to scale a risk-tech firm from zero. He\'ll respect technical depth + intellectual honesty + scrappy execution, and he\'ll see through founder-theatre instantly.',
+        "Founded and scaled ELEVATE — a leading risk + sustainability solutions firm — into a category leader. Acquired by LRQA in 2022. KEY INSIGHT: Ian knows the founder journey from the inside. He knows what it's like to scale a risk-tech firm from zero. He'll respect technical depth + intellectual honesty + scrappy execution, and he'll see through founder-theatre instantly.",
     },
     {
       role: 'Managing Director',
@@ -81,7 +83,8 @@ export const IAN_PROFILE = {
       role: 'Director, Global Compliance',
       company: 'Sears Holdings Corporation',
       years: 'Apr 2001 – Sep 2007',
-      thrust: 'Enterprise-scale compliance + supply chain assurance for one of the largest US retailers. Knows the Fortune 500 procurement lens from the inside.',
+      thrust:
+        'Enterprise-scale compliance + supply chain assurance for one of the largest US retailers. Knows the Fortune 500 procurement lens from the inside.',
     },
   ],
 
@@ -105,7 +108,7 @@ export const IAN_PROFILE = {
       thrust:
         '"Trade weaponized, regulation weakened and strengthened at the same time, cyber and AI risks converging into supply chain risk." Drew on EiQ supply-chain intelligence software data + WEF risk report. The piece IS the strategic lens Ian sees the world through.',
       diRelevance:
-        'Decision Intel\'s R²F + 17-framework regulatory map + Pan-African anchor + the convergence of decision-quality with regulatory tailwinds map DIRECTLY onto Ian\'s framing. Folahan should reference this Reuters piece in the first 5 minutes — proves Folahan has read Ian\'s actual thinking, not just the CV.',
+        "Decision Intel's R²F + 17-framework regulatory map + Pan-African anchor + the convergence of decision-quality with regulatory tailwinds map DIRECTLY onto Ian's framing. Folahan should reference this Reuters piece in the first 5 minutes — proves Folahan has read Ian's actual thinking, not just the CV.",
     },
     {
       date: '2026-04 (4d ago, Earth Day)',
@@ -113,7 +116,7 @@ export const IAN_PROFILE = {
       thrust:
         '"The risk today isn\'t ambition, it\'s proof. Targets are everywhere, but real demonstrable progress is much harder to find. In a more regulated, more scrutinised world, evidence is what separates leaders from the rest."',
       diRelevance:
-        'This quote is the Decision Provenance Record thesis in Ian\'s own words. The DPR — hashed, tamper-evident, mapped against 17 regulatory frameworks — IS evidence that separates leaders from the rest. Folahan should literally repeat this back to Ian in the meeting: "Your Earth Day quote — \'evidence is what separates leaders from the rest\' — that\'s exactly the DPR thesis."',
+        "This quote is the Decision Provenance Record thesis in Ian's own words. The DPR — hashed, tamper-evident, mapped against 17 regulatory frameworks — IS evidence that separates leaders from the rest. Folahan should literally repeat this back to Ian in the meeting: \"Your Earth Day quote — 'evidence is what separates leaders from the rest' — that's exactly the DPR thesis.\"",
     },
   ],
 } as const;
@@ -121,13 +124,14 @@ export const IAN_PROFILE = {
 // ─── LRQA — company snapshot ──────────────────────────────────────────────
 
 export const LRQA_COMPANY = {
-  oneLiner: 'The leading global risk management partner — compliance, certification, supply chain assurance, sustainability, cybersecurity, and emerging technologies for 61,000+ organisations in 150+ countries.',
+  oneLiner:
+    'The leading global risk management partner — compliance, certification, supply chain assurance, sustainability, cybersecurity, and emerging technologies for 61,000+ organisations in 150+ countries.',
 
   tagline: 'Your Risk Management Advantage',
 
   scale: {
     clients: '61,000+ organisations',
-    geography: '150+ countries (160 per Ian\'s most recent post)',
+    geography: "150+ countries (160 per Ian's most recent post)",
     employeeCount: 'Several thousand globally',
     revenue: 'Estimated $500M+ (debut €500M Term Loan B in Q1 2026)',
   },
@@ -146,7 +150,7 @@ export const LRQA_COMPANY = {
       date: '2026-04 (1w ago)',
       move: 'Acquired Partner Africa — first EMEA acquisition, ethical sourcing + food safety + human rights advisory',
       diRelevance:
-        'CRITICAL — this is the warmest possible signal for the Pan-African angle. LRQA is actively investing in Africa. Folahan\'s Lagos rooting + Dangote DPR + Pan-African regulatory map (NDPR / CBN / WAEMU / PoPIA / CMA Kenya) make Decision Intel uniquely valuable to LRQA\'s Africa strategy. Lead with this in the meeting.',
+        "CRITICAL — this is the warmest possible signal for the Pan-African angle. LRQA is actively investing in Africa. Folahan's Lagos rooting + Dangote DPR + Pan-African regulatory map (NDPR / CBN / WAEMU / PoPIA / CMA Kenya) make Decision Intel uniquely valuable to LRQA's Africa strategy. Lead with this in the meeting.",
       strategicWeight: 'critical',
     },
     {
@@ -167,21 +171,21 @@ export const LRQA_COMPANY = {
       date: '2026-02 (2mo ago)',
       move: 'Acquired Lindinger Inspection Engineers — 50-year-old family-owned industrial inspection firm',
       diRelevance:
-        'Pattern: LRQA actively acquires specialised expertise. They bought Ian\'s ELEVATE in 2022 the same way. Decision Intel could be a future acquisition candidate — but Folahan should NOT lead with this. Lead with integration, let acquisition surface naturally if Ian raises it.',
+        "Pattern: LRQA actively acquires specialised expertise. They bought Ian's ELEVATE in 2022 the same way. Decision Intel could be a future acquisition candidate — but Folahan should NOT lead with this. Lead with integration, let acquisition surface naturally if Ian raises it.",
       strategicWeight: 'medium',
     },
     {
       date: '2026-01 (3mo ago)',
       move: 'Welcomed Didier Michaud-Daniel as Chair (former CEO of Bureau Veritas + Otis)',
       diRelevance:
-        'Bureau Veritas is LRQA\'s most direct global competitor. This Chair appointment signals LRQA is serious about competing at scale. Folahan should know the Bureau Veritas / SGS / Intertek / DNV competitive set and not over-claim DI fits in a category they\'ve already covered.',
+        "Bureau Veritas is LRQA's most direct global competitor. This Chair appointment signals LRQA is serious about competing at scale. Folahan should know the Bureau Veritas / SGS / Intertek / DNV competitive set and not over-claim DI fits in a category they've already covered.",
       strategicWeight: 'medium',
     },
     {
       date: '2026 ongoing',
       move: 'EiQ by LRQA — supply chain intelligence software; ERSA 4.0 (Enhanced Responsible Sourcing Assessment) in public consultation March-June 2026, launches at NY Global Summit September 2026',
       diRelevance:
-        'EiQ + ERSA 4.0 IS the integration target. Decision Intel as the reasoning audit layer ON TOP of EiQ\'s supply chain intelligence is a clean integration story. Specifically: ERSA 4.0 produces sourcing risk scores; DI audits the REASONING behind sourcing decisions made on those scores. This is the surgical integration pitch.',
+        "EiQ + ERSA 4.0 IS the integration target. Decision Intel as the reasoning audit layer ON TOP of EiQ's supply chain intelligence is a clean integration story. Specifically: ERSA 4.0 produces sourcing risk scores; DI audits the REASONING behind sourcing decisions made on those scores. This is the surgical integration pitch.",
       strategicWeight: 'critical',
     },
   ],
@@ -194,8 +198,7 @@ export const LRQA_COMPANY = {
       'DNV',
       'TÜV SÜD',
     ],
-    note:
-      'These are the certification + assurance giants. LRQA competes head-on with them. Decision Intel is NOT in their category — DI is the reasoning-audit layer that sits ABOVE certification work. Position carefully: do NOT claim DI competes with Bureau Veritas, position DI as the layer that makes LRQA\'s offering more defensible than BV\'s.',
+    note: "These are the certification + assurance giants. LRQA competes head-on with them. Decision Intel is NOT in their category — DI is the reasoning-audit layer that sits ABOVE certification work. Position carefully: do NOT claim DI competes with Bureau Veritas, position DI as the layer that makes LRQA's offering more defensible than BV's.",
   },
 } as const;
 
@@ -220,7 +223,7 @@ export const INTEGRATION_PATHS: IntegrationPath[] = [
     whereInLrqaStack:
       'EiQ by LRQA — supply chain intelligence software, ERSA 4.0 framework, Global Grievance Mechanism Dashboard.',
     diValueAdd:
-      'EiQ produces sourcing risk scores + responsible-sourcing assessments. Decision Intel audits the REASONING behind sourcing decisions made on those scores: did the procurement team apply the right weighting? Did they catch the toxic combination of overconfidence + sunk cost on a supplier they\'ve been with for 8 years? The R²F catches what EiQ\'s scoring can\'t — the bias in the human decision over the score.',
+      "EiQ produces sourcing risk scores + responsible-sourcing assessments. Decision Intel audits the REASONING behind sourcing decisions made on those scores: did the procurement team apply the right weighting? Did they catch the toxic combination of overconfidence + sunk cost on a supplier they've been with for 8 years? The R²F catches what EiQ's scoring can't — the bias in the human decision over the score.",
     pitchPositioning:
       '"EiQ tells your client THAT a supplier is high-risk. Decision Intel audits HOW the procurement team reasoned about that risk. The two are complementary, not competitive — and together they produce an artefact (the DPR) that survives an auditor\'s review in a way neither does alone."',
     proofArtefact:
@@ -235,7 +238,7 @@ export const INTEGRATION_PATHS: IntegrationPath[] = [
     whereInLrqaStack:
       'Partner Africa (acquired April 2026) — ethical sourcing + food safety + human rights advisory across Africa.',
     diValueAdd:
-      'Partner Africa\'s clients face Pan-African regulatory complexity (NDPR, CBN, FRC Nigeria, WAEMU, PoPIA, CMA Kenya, BoG, CBE, SARB, BoT). Decision Intel\'s 17-framework regulatory map covers this exact set + the structural-assumptions audit branches on jurisdiction-specific FX cycles (NGN, KES, GHS, EGP). NO US-incumbent competitor (Bureau Veritas, SGS, Intertek) has this depth at the reasoning-audit layer for African markets.',
+      "Partner Africa's clients face Pan-African regulatory complexity (NDPR, CBN, FRC Nigeria, WAEMU, PoPIA, CMA Kenya, BoG, CBE, SARB, BoT). Decision Intel's 17-framework regulatory map covers this exact set + the structural-assumptions audit branches on jurisdiction-specific FX cycles (NGN, KES, GHS, EGP). NO US-incumbent competitor (Bureau Veritas, SGS, Intertek) has this depth at the reasoning-audit layer for African markets.",
     pitchPositioning:
       '"You just acquired Partner Africa — first EMEA acquisition, signal that Africa is strategic. I\'m a Lagos-rooted founder with two production specimen DPRs (WeWork US-pattern, Dangote 2014 Pan-African expansion) + a 17-framework map covering NDPR, CBN, WAEMU, PoPIA. Your Partner Africa clients need exactly this reasoning-audit layer to prove their decisions are defensible to LP / regulator scrutiny. We could build the joint Pan-African reasoning audit offering together."',
     proofArtefact:
@@ -252,7 +255,7 @@ export const INTEGRATION_PATHS: IntegrationPath[] = [
     diValueAdd:
       'Ian\'s Earth Day quote: "evidence is what separates leaders from the rest." The DPR IS that evidence — hashed, tamper-evident, regulatory-mapped artefact for every strategic ESG decision. LRQA can issue ESG certifications; Decision Intel produces the decision-quality artefact that makes those certifications defensible if challenged.',
     pitchPositioning:
-      '"Your Earth Day quote landed for me — \'evidence is what separates leaders from the rest.\' That\'s the Decision Provenance Record thesis. Every strategic ESG decision your clients make — supplier change, factory siting, decarbonisation timeline — could carry a DPR proving the reasoning was rigorous. LRQA\'s certifications + DI\'s DPRs is a defensibility stack no competitor offers."',
+      "\"Your Earth Day quote landed for me — 'evidence is what separates leaders from the rest.' That's the Decision Provenance Record thesis. Every strategic ESG decision your clients make — supplier change, factory siting, decarbonisation timeline — could carry a DPR proving the reasoning was rigorous. LRQA's certifications + DI's DPRs is a defensibility stack no competitor offers.\"",
     proofArtefact:
       'Reference the LRQA Climate Performance Risk Outlook report. Show how DI would audit the reasoning behind a climate-target-setting decision.',
     realisticTimeline:
@@ -260,14 +263,14 @@ export const INTEGRATION_PATHS: IntegrationPath[] = [
   },
   {
     id: 'mission_ai_external_ip',
-    title: 'External category-grade IP that LRQA\'s internal AI hackathon can\'t produce',
+    title: "External category-grade IP that LRQA's internal AI hackathon can't produce",
     fitStrength: 'high',
     whereInLrqaStack:
       'Mission AI Possible hackathon (87 ideas, 5 deployed projects). LRQA AI capability stack.',
     diValueAdd:
-      'LRQA\'s internal AI initiative produces tactical AI tools (scheduling, report writing, insights, technical reviews). It does NOT produce category-defining IP like the R²F (Kahneman-Klein synthesis) + 20-bias taxonomy + 17-framework regulatory map + 135-case library + Brier-scored outcome flywheel. These take 5+ years of academic + product work. LRQA could license or partner with DI to bring this IP into the LRQA platform without rebuilding.',
+      "LRQA's internal AI initiative produces tactical AI tools (scheduling, report writing, insights, technical reviews). It does NOT produce category-defining IP like the R²F (Kahneman-Klein synthesis) + 20-bias taxonomy + 17-framework regulatory map + 135-case library + Brier-scored outcome flywheel. These take 5+ years of academic + product work. LRQA could license or partner with DI to bring this IP into the LRQA platform without rebuilding.",
     pitchPositioning:
-      '"Your Mission AI Possible hackathon shows internal AI capability. The question for any enterprise AI strategy is what to build vs partner. R²F + the 17-framework map + the 135-case library would take a team 3-5 years to recreate from scratch — and the academic IP (Kahneman-Klein 2009 \'Conditions for Intuitive Expertise\', the 50-year heuristics-and-biases program) anchors the credibility in a way internal builds rarely match. Worth exploring whether DI is a partner-don\'t-build candidate for LRQA."',
+      "\"Your Mission AI Possible hackathon shows internal AI capability. The question for any enterprise AI strategy is what to build vs partner. R²F + the 17-framework map + the 135-case library would take a team 3-5 years to recreate from scratch — and the academic IP (Kahneman-Klein 2009 'Conditions for Intuitive Expertise', the 50-year heuristics-and-biases program) anchors the credibility in a way internal builds rarely match. Worth exploring whether DI is a partner-don't-build candidate for LRQA.\"",
     proofArtefact:
       'Send the Kahneman-Klein 2009 paper PDF (the R²F intellectual anchor) + a one-page IP moat brief.',
     realisticTimeline:
@@ -275,16 +278,16 @@ export const INTEGRATION_PATHS: IntegrationPath[] = [
   },
   {
     id: 'reuters_2026_risk_lens',
-    title: 'The reasoning audit for Ian\'s 2026 risk-trend convergence thesis',
+    title: "The reasoning audit for Ian's 2026 risk-trend convergence thesis",
     fitStrength: 'high',
     whereInLrqaStack:
-      'Ian\'s strategic narrative + LRQA\'s public-voice positioning. The Reuters piece + WEF risk report.',
+      "Ian's strategic narrative + LRQA's public-voice positioning. The Reuters piece + WEF risk report.",
     diValueAdd:
-      'Ian\'s thesis: trade weaponization + regulatory fragmentation + cyber / AI / supply chain risk convergence = harder, more important risk decisions. Decision Intel is BUILT for exactly this convergence — the R²F + 17-framework regulatory map + structural-assumptions audit (FX cycles, sovereign context) handles cross-border decisions where the bias patterns are amplified by complexity.',
+      "Ian's thesis: trade weaponization + regulatory fragmentation + cyber / AI / supply chain risk convergence = harder, more important risk decisions. Decision Intel is BUILT for exactly this convergence — the R²F + 17-framework regulatory map + structural-assumptions audit (FX cycles, sovereign context) handles cross-border decisions where the bias patterns are amplified by complexity.",
     pitchPositioning:
       '"Your Reuters piece on 2026 risk trends — trade weaponized, regulation fragmenting, cyber + AI converging into supply chain risk — that\'s exactly the decision environment Decision Intel was built for. The harder cross-border decisions get, the more bias patterns compound. The R²F + 17-framework map + structural-assumptions audit ARE the operational answer to your strategic narrative."',
     proofArtefact:
-      'Quote Ian\'s Reuters piece directly. Show how the 12-node pipeline addresses each of his named convergence risks.',
+      "Quote Ian's Reuters piece directly. Show how the 12-node pipeline addresses each of his named convergence risks.",
     realisticTimeline:
       'Phase 1: Joint thought-leadership piece (30 days). Phase 2: LRQA referral channel for high-stakes cross-border audit conversations (90 days).',
   },
@@ -306,8 +309,7 @@ export const ASK_HIERARCHY: AskTier[] = [
   {
     tier: 1,
     label: 'IDEAL — Integration partnership / design partner',
-    ask:
-      'A 90-day joint pilot exploring DI as the reasoning audit layer ON TOP of EiQ for one specific Partner Africa client decision. Folahan handles the audit + DPR generation; LRQA provides the client context + integration access. £0 to LRQA in the pilot phase; commercial discussion at month 3 based on demonstrated lift.',
+    ask: 'A 90-day joint pilot exploring DI as the reasoning audit layer ON TOP of EiQ for one specific Partner Africa client decision. Folahan handles the audit + DPR generation; LRQA provides the client context + integration access. £0 to LRQA in the pilot phase; commercial discussion at month 3 based on demonstrated lift.',
     rationale:
       'This is the optimal ask because it commits LRQA to a low-risk experiment that proves DI value WITHIN their existing client relationships, gives DI a flagship reference, and creates the natural path to a deeper commercial relationship (integration / partnership / referral channel) without requiring Ian to commit to a multi-year deal in the first meeting.',
     whyIanMightSayYes:
@@ -319,13 +321,12 @@ export const ASK_HIERARCHY: AskTier[] = [
   },
   {
     tier: 2,
-    label: 'HIGH-VALUE — Introductions to Ian\'s network',
-    ask:
-      '3-5 specific introductions: (a) one VP of Strategy or CSO at a Fortune 500 LRQA client where reasoning audit would land, (b) one M&A executive who could use DI for diligence reasoning, (c) one Partner Africa contact for the Pan-African pilot, (d) one EiQ team lead for the integration conversation, (e) optionally Didier Michaud-Daniel (LRQA Chair, ex Bureau Veritas) if Ian is willing.',
+    label: "HIGH-VALUE — Introductions to Ian's network",
+    ask: '3-5 specific introductions: (a) one VP of Strategy or CSO at a Fortune 500 LRQA client where reasoning audit would land, (b) one M&A executive who could use DI for diligence reasoning, (c) one Partner Africa contact for the Pan-African pilot, (d) one EiQ team lead for the integration conversation, (e) optionally Didier Michaud-Daniel (LRQA Chair, ex Bureau Veritas) if Ian is willing.',
     rationale:
-      'Even if integration is too aggressive for the first meeting, network introductions cost Ian almost nothing and accelerate Folahan\'s pipeline by 3-6 months per intro. Frame as "I\'d benefit enormously from 3-5 specific intros — here\'s exactly who and why." Specificity respects Ian\'s time and proves Folahan has done the homework.',
+      "Even if integration is too aggressive for the first meeting, network introductions cost Ian almost nothing and accelerate Folahan's pipeline by 3-6 months per intro. Frame as \"I'd benefit enormously from 3-5 specific intros — here's exactly who and why.\" Specificity respects Ian's time and proves Folahan has done the homework.",
     whyIanMightSayYes:
-      'Cheap for Ian (an email each). Helps the friend\'s son. Gives Ian optionality to see how Folahan executes before committing to anything bigger.',
+      "Cheap for Ian (an email each). Helps the friend's son. Gives Ian optionality to see how Folahan executes before committing to anything bigger.",
     whyIanMightSayNo:
       'Ian protects his network capital — he might say "let me see how the first conversations go before I make introductions." That\'s a reasonable position; respect it.',
     fallbackPosition:
@@ -334,8 +335,7 @@ export const ASK_HIERARCHY: AskTier[] = [
   {
     tier: 3,
     label: 'TABLE STAKES — Strategic advisor relationship',
-    ask:
-      'A 30-minute follow-up call once per quarter for the first year, where Folahan presents progress + asks for specific advice. Ian\'s 30 years of risk + sustainability + Africa scaling experience is uniquely valuable for Decision Intel\'s GTM motion. Frame as "I\'d benefit from your perspective at quarterly check-ins."',
+    ask: "A 30-minute follow-up call once per quarter for the first year, where Folahan presents progress + asks for specific advice. Ian's 30 years of risk + sustainability + Africa scaling experience is uniquely valuable for Decision Intel's GTM motion. Frame as \"I'd benefit from your perspective at quarterly check-ins.\"",
     rationale:
       'Even if Ian declines integration AND introductions, an advisor relationship with quarterly cadence builds trust capital + gives Folahan repeated context-setting moments. After 4 quarters of Folahan executing well, the integration / introduction asks become much easier to land.',
     whyIanMightSayYes:
@@ -358,15 +358,15 @@ export interface PrepItem {
 export const MEETING_PREP: PrepItem[] = [
   {
     category: 'research',
-    item: 'Re-read Ian\'s Reuters piece on 2026 risk trends',
+    item: "Re-read Ian's Reuters piece on 2026 risk trends",
     detail:
       'Ian linked it on LinkedIn ~1 month ago. Quote it back to him in the first 5 minutes — proves Folahan has read his actual thinking. Specifically reference "trade weaponized, regulation weakened and strengthened at the same time, cyber and AI risks converging into supply chain risk."',
   },
   {
     category: 'research',
-    item: 'Re-read Ian\'s Earth Day post (4d ago)',
+    item: "Re-read Ian's Earth Day post (4d ago)",
     detail:
-      '"The risk today isn\'t ambition, it\'s proof. Targets are everywhere, but real demonstrable progress is much harder to find. In a more regulated, more scrutinised world, evidence is what separates leaders from the rest." This IS the DPR thesis in Ian\'s words. Quote it.',
+      "\"The risk today isn't ambition, it's proof. Targets are everywhere, but real demonstrable progress is much harder to find. In a more regulated, more scrutinised world, evidence is what separates leaders from the rest.\" This IS the DPR thesis in Ian's words. Quote it.",
   },
   {
     category: 'research',
@@ -388,9 +388,9 @@ export const MEETING_PREP: PrepItem[] = [
   },
   {
     category: 'research',
-    item: 'Review LRQA\'s competitive set (Bureau Veritas, SGS, Intertek, DNV)',
+    item: "Review LRQA's competitive set (Bureau Veritas, SGS, Intertek, DNV)",
     detail:
-      'Don\'t over-claim DI competes with these. Position DI as the reasoning-audit layer that makes LRQA\'s offering more defensible than BV\'s. New Chair Didier Michaud-Daniel is ex Bureau Veritas — he knows BV inside out.',
+      "Don't over-claim DI competes with these. Position DI as the reasoning-audit layer that makes LRQA's offering more defensible than BV's. New Chair Didier Michaud-Daniel is ex Bureau Veritas — he knows BV inside out.",
   },
   {
     category: 'artefact',
@@ -450,7 +450,7 @@ export const MEETING_PREP: PrepItem[] = [
     category: 'avoid',
     item: 'Do NOT pitch acquisition or competitor displacement',
     detail:
-      'LRQA acquired ELEVATE (Ian\'s firm) in 2022. They know how to acquire. If acquisition is on the table, Ian will surface it himself. Folahan should NEVER raise it first.',
+      "LRQA acquired ELEVATE (Ian's firm) in 2022. They know how to acquire. If acquisition is on the table, Ian will surface it himself. Folahan should NEVER raise it first.",
   },
   {
     category: 'avoid',
@@ -490,7 +490,7 @@ export const QUESTION_BANK: QuestionEntry[] = [
     question:
       '"On the Partner Africa acquisition — what was the strategic gap you saw? Was it geographic coverage, sector expertise, regulatory depth, or something else?"',
     whyAsk:
-      'Tells Folahan exactly where DI\'s Pan-African anchor + 17-framework regulatory map + Dangote DPR fits in LRQA\'s stated rationale for the acquisition. Lets Folahan position DI as filling adjacent gaps Partner Africa doesn\'t.',
+      "Tells Folahan exactly where DI's Pan-African anchor + 17-framework regulatory map + Dangote DPR fits in LRQA's stated rationale for the acquisition. Lets Folahan position DI as filling adjacent gaps Partner Africa doesn't.",
     signalIfYes:
       'If the answer is "regulatory depth + reasoning audit for African contexts," Decision Intel\'s positioning is uniquely strong. Lead the Tier 1 ask with this.',
   },
@@ -506,7 +506,7 @@ export const QUESTION_BANK: QuestionEntry[] = [
   {
     category: 'fit',
     question:
-      '"Your Mission AI Possible hackathon produced 5 deployed projects. What\'s LRQA\'s build-vs-buy posture for AI capabilities you don\'t yet have internally — particularly category-defining IP like reasoning frameworks or research-grounded scoring?"',
+      "\"Your Mission AI Possible hackathon produced 5 deployed projects. What's LRQA's build-vs-buy posture for AI capabilities you don't yet have internally — particularly category-defining IP like reasoning frameworks or research-grounded scoring?\"",
     whyAsk:
       'Surfaces whether LRQA is open to external partnerships for category-grade AI IP, or if they want to build everything internally. Determines whether DI as licensing / integration / acquisition is even on the table.',
     signalIfYes:
@@ -515,7 +515,7 @@ export const QUESTION_BANK: QuestionEntry[] = [
   {
     category: 'process',
     question:
-      '"If we ran a 90-day joint pilot on one Partner Africa client, what would success look like for LRQA — what\'s the threshold where you\'d say \'this is worth a deeper conversation\'?"',
+      "\"If we ran a 90-day joint pilot on one Partner Africa client, what would success look like for LRQA — what's the threshold where you'd say 'this is worth a deeper conversation'?\"",
     whyAsk:
       'Forces Ian to articulate his own success criteria for the Tier 1 ask. Whatever he says becomes the explicit goalpost for the pilot. Removes ambiguity about what "wins."',
     signalIfYes:
@@ -528,14 +528,14 @@ export const QUESTION_BANK: QuestionEntry[] = [
     whyAsk:
       'This is the gold question. Ian has done the founder journey in adjacent space. His answer is worth more than any pitch. Triggers advisor-mode rather than buyer-mode.',
     signalIfYes:
-      'A substantive answer = Tier 3 advisor relationship is real. Vague answer = Ian doesn\'t want to be a mentor; respect that and stick with Tier 1 / 2.',
+      "A substantive answer = Tier 3 advisor relationship is real. Vague answer = Ian doesn't want to be a mentor; respect that and stick with Tier 1 / 2.",
   },
   {
     category: 'advice',
     question:
       '"The honest version: where would Decision Intel fall apart in front of LRQA\'s procurement team? What\'s the gap that would kill the deal six months in?"',
     whyAsk:
-      'Invites Ian to be a critical friend. Surfaces objections Folahan can address proactively. Ian\'s 30 years of enterprise procurement experience makes his answer unusually valuable.',
+      "Invites Ian to be a critical friend. Surfaces objections Folahan can address proactively. Ian's 30 years of enterprise procurement experience makes his answer unusually valuable.",
     signalIfYes:
       'A specific procurement objection (e.g., "your DQI doesn\'t have empirical validation; my procurement team will require that") = actionable feedback Folahan can address. Vague encouragement = polite pass.',
   },
@@ -557,7 +557,7 @@ export const FOLLOWUP_PLAYBOOK: FollowUpStep[] = [
     artefact:
       '"Ian — really valued the time today. The conversation about [specific topic Ian raised] gave me a sharper frame. The Dangote DPR is attached as promised; I\'ll send the LRQA-specific one-pager + Kahneman-Klein paper within 24h. — F"',
     rationale:
-      'Velocity signals seriousness. A 4-line email from the train shows Folahan respects Ian\'s time and is already in execution mode.',
+      "Velocity signals seriousness. A 4-line email from the train shows Folahan respects Ian's time and is already in execution mode.",
   },
   {
     hoursAfter: 4,
@@ -565,7 +565,7 @@ export const FOLLOWUP_PLAYBOOK: FollowUpStep[] = [
     artefact:
       '1-page PDF: integration paths, ask hierarchy, suggested next step. No marketing fluff. The Kahneman-Klein paper as a separate attachment with a 1-line note: "The R²F intellectual anchor — Yale background, you\'ll appreciate the depth."',
     rationale:
-      'Within-the-day follow-up is the founder velocity signal. The one-pager makes Ian\'s internal forwarding easy (he can ship it to EiQ team / Partner Africa team / advisor without reformatting).',
+      "Within-the-day follow-up is the founder velocity signal. The one-pager makes Ian's internal forwarding easy (he can ship it to EiQ team / Partner Africa team / advisor without reformatting).",
   },
   {
     hoursAfter: 24,
@@ -581,15 +581,15 @@ export const FOLLOWUP_PLAYBOOK: FollowUpStep[] = [
     artefact:
       'Pick the LRQA Climate Performance Risk Outlook OR the Reuters piece OR a recent ERSA-related document. Run it through DI. Send Ian the resulting DPR with a 2-line note: "Ran your most recent public risk outlook through the audit — interesting flags around [specific bias]. The full DPR is attached."',
     rationale:
-      'This is the artefact-led follow-up that converts. It demonstrates DI value on Ian\'s OWN material, proves the product works, and gives Ian something to forward internally that\'s tangibly different from a sales follow-up.',
+      "This is the artefact-led follow-up that converts. It demonstrates DI value on Ian's OWN material, proves the product works, and gives Ian something to forward internally that's tangibly different from a sales follow-up.",
   },
   {
     hoursAfter: 168, // 7 days
     action: 'Calendar follow-up email proposing the Tier 1 / Tier 2 / Tier 3 next step',
     artefact:
-      'Based on the meeting, propose ONE concrete next step (don\'t list all 3 tiers). If Tier 1 felt in play, propose the 90-day pilot scope. If Tier 2, propose specific introductions. If Tier 3, propose the quarterly cadence.',
+      "Based on the meeting, propose ONE concrete next step (don't list all 3 tiers). If Tier 1 felt in play, propose the 90-day pilot scope. If Tier 2, propose specific introductions. If Tier 3, propose the quarterly cadence.",
     rationale:
-      'A week is enough time for Ian to have processed the meeting + the artefacts. The single-concrete-next-step ask is the JOLT Offer move — don\'t give him 3 options, recommend the one that fits.',
+      "A week is enough time for Ian to have processed the meeting + the artefacts. The single-concrete-next-step ask is the JOLT Offer move — don't give him 3 options, recommend the one that fits.",
   },
 ];
 

@@ -54,8 +54,7 @@ const EVENTS: Event[] = [
     date: 'June 8–12, 2026 (week starting 2nd Monday in June, per recurring pattern)',
     venue: 'Multiple venues — Olympia, Shoreditch, City',
     icpRelevance: 'high',
-    icpWho:
-      'CXOs, enterprise software buyers, UK government / DSIT officials, AI policy leads',
+    icpWho: 'CXOs, enterprise software buyers, UK government / DSIT officials, AI policy leads',
     tactic:
       'Skip the main conference (crowded, low ICP density). Focus on (a) the side events — breakfasts, dinners, afterparties — where ICP-dense introductions happen, (b) the DSIT AI policy sessions which directly map to the UK AI white paper regulatory tailwind. Your Wiz advisor should know the London Tech Week side-event circuit.',
     url: 'https://londontechweek.com',
@@ -75,7 +74,8 @@ const EVENTS: Event[] = [
     date: 'June 2026 (Berlin main; London-based fund partners often host pre/post events in London)',
     venue: 'Berlin (main) + London (PE/VC house events)',
     icpRelevance: 'medium',
-    icpWho: 'PE / VC fund partners, LP relations, fund strategy leads — the fund-buyer ICP from gtm_8',
+    icpWho:
+      'PE / VC fund partners, LP relations, fund strategy leads — the fund-buyer ICP from gtm_8',
     tactic:
       'Berlin trip is high cost / high ICP density; London afterparties are medium cost / similar density. If budget-constrained, target the London events instead — PE houses (Permira, Cinven, BC Partners) often host portfolio receptions in the week. Practice the gtm_8 evidence-moment pitch on at least 3 fund partners that week.',
     url: 'https://informaconnect.com/superreturn-international',
@@ -98,7 +98,7 @@ const EVENTS: Event[] = [
     icpRelevance: 'very_high',
     icpWho: 'Board members, NEDs, GCs, CFOs, strategy executives — Fortune 500 level',
     tactic:
-      'FT events are extremely ICP-dense and hard to get into cold. Angles: (a) FT often comp startup founders when there\'s a relevant story (youngest founder in decision-quality AI works), (b) your Wiz advisor likely knows the FT events team. Sifted is more accessible (founder-friendly) and reaches a slightly different audience (UK/EU growth-stage founders + investors).',
+      "FT events are extremely ICP-dense and hard to get into cold. Angles: (a) FT often comp startup founders when there's a relevant story (youngest founder in decision-quality AI works), (b) your Wiz advisor likely knows the FT events team. Sifted is more accessible (founder-friendly) and reaches a slightly different audience (UK/EU growth-stage founders + investors).",
   },
 ];
 
@@ -145,9 +145,7 @@ export function IcpEventsCalendar() {
                 padding: '12px 14px',
               }}
             >
-              <div
-                style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 8 }}
-              >
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 8 }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div
                     style={{
@@ -173,7 +171,11 @@ export function IcpEventsCalendar() {
                         href={event.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}
+                        style={{
+                          color: 'var(--text-muted)',
+                          display: 'flex',
+                          alignItems: 'center',
+                        }}
                         aria-label="Event website"
                       >
                         <ExternalLink size={11} />
@@ -230,7 +232,11 @@ export function IcpEventsCalendar() {
                   marginBottom: 6,
                 }}
               >
-                <Users size={12} color="var(--text-muted)" style={{ flexShrink: 0, marginTop: 2 }} />
+                <Users
+                  size={12}
+                  color="var(--text-muted)"
+                  style={{ flexShrink: 0, marginTop: 2 }}
+                />
                 <span style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.45 }}>
                   {event.icpWho}
                 </span>

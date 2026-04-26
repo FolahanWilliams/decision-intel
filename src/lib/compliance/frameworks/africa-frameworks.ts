@@ -69,15 +69,19 @@ export const NDPR_FRAMEWORK: RegulatoryFramework = {
       biasType: 'algorithmic_bias',
       provisionId: 'ndpr_art_12',
       riskWeight: 0.85,
-      mechanism: 'Automated bias compounding produces legal-effect decisions without meaningful human oversight',
-      example: 'Credit-scoring model trained on biased historical data denies a Lagos-based applicant',
+      mechanism:
+        'Automated bias compounding produces legal-effect decisions without meaningful human oversight',
+      example:
+        'Credit-scoring model trained on biased historical data denies a Lagos-based applicant',
     },
     {
       biasType: 'confirmation_bias',
       provisionId: 'ndpr_art_12',
       riskWeight: 0.55,
-      mechanism: 'Confirmation bias in human reviewer override of the model produces inconsistent legal-effect decisions',
-      example: 'Human reviewer over-rules model only when model decision aligns with prior expectation',
+      mechanism:
+        'Confirmation bias in human reviewer override of the model produces inconsistent legal-effect decisions',
+      example:
+        'Human reviewer over-rules model only when model decision aligns with prior expectation',
     },
   ],
 };
@@ -122,7 +126,8 @@ export const CBN_AI_FRAMEWORK: RegulatoryFramework = {
       biasType: 'narrative_fallacy',
       provisionId: 'cbn_ai_explainability',
       riskWeight: 0.55,
-      mechanism: 'Narrative-style customer disclosure substitutes for structured reasoning artifact',
+      mechanism:
+        'Narrative-style customer disclosure substitutes for structured reasoning artifact',
       example: 'Customer adverse-action notice tells a story rather than discloses the model logic',
     },
   ],
@@ -161,15 +166,18 @@ export const WAEMU_FRAMEWORK: RegulatoryFramework = {
       biasType: 'groupthink',
       provisionId: 'waemu_governance',
       riskWeight: 0.65,
-      mechanism: 'Unanimous board-level decisions without dissent capture violate documented governance evidence',
+      mechanism:
+        'Unanimous board-level decisions without dissent capture violate documented governance evidence',
       example: 'WAEMU bank loan-committee minutes record no dissent on a concentrated exposure',
     },
     {
       biasType: 'planning_fallacy',
       provisionId: 'waemu_governance',
       riskWeight: 0.6,
-      mechanism: 'Planning-fallacy timelines on cross-border integration evade material-decision risk-management evidence',
-      example: 'WAEMU acquirer underwrites 12-month operational integration across CIV / SEN / BFA without contingency capture in the loan-committee minutes',
+      mechanism:
+        'Planning-fallacy timelines on cross-border integration evade material-decision risk-management evidence',
+      example:
+        'WAEMU acquirer underwrites 12-month operational integration across CIV / SEN / BFA without contingency capture in the loan-committee minutes',
     },
   ],
 };
@@ -207,22 +215,26 @@ export const CMA_KENYA_FRAMEWORK: RegulatoryFramework = {
       biasType: 'optimism_bias',
       provisionId: 'cma_kenya_disclosure',
       riskWeight: 0.7,
-      mechanism: 'Optimism in forward-looking statements understates risk factors that bear on investor decision-making',
+      mechanism:
+        'Optimism in forward-looking statements understates risk factors that bear on investor decision-making',
       example: 'Listed cement company forecasts 25% growth without disclosing FX-cycle dependency',
     },
     {
       biasType: 'groupthink',
       provisionId: 'cma_kenya_board_decision',
       riskWeight: 0.6,
-      mechanism: 'Unanimous board approval without dissent capture violates structured decision-making',
+      mechanism:
+        'Unanimous board approval without dissent capture violates structured decision-making',
       example: 'Board minutes record unanimous M&A approval with no recorded structured challenge',
     },
     {
       biasType: 'survivorship_bias',
       provisionId: 'cma_kenya_disclosure',
       riskWeight: 0.65,
-      mechanism: 'Selectively citing surviving comparables understates the risk factors disclosure regime requires for material investor decision-making',
-      example: 'Issuer cites three surviving Pan-African consumer-staples comps to justify an 8x exit multiple while omitting the failed Sub-Saharan African rollouts in the same vintage',
+      mechanism:
+        'Selectively citing surviving comparables understates the risk factors disclosure regime requires for material investor decision-making',
+      example:
+        'Issuer cites three surviving Pan-African consumer-staples comps to justify an 8x exit multiple while omitting the failed Sub-Saharan African rollouts in the same vintage',
     },
   ],
 };
@@ -260,22 +272,28 @@ export const CBK_FRAMEWORK: RegulatoryFramework = {
       biasType: 'overconfidence_bias',
       provisionId: 'cbk_model_governance',
       riskWeight: 0.65,
-      mechanism: 'Overconfidence in model performance produces inadequate validation cycles, violating CBK Risk Management Guidelines on documented model-risk management',
-      example: 'Kenyan bank treats SME-lending model accuracy as stable through KES devaluation cycles without re-validation',
+      mechanism:
+        'Overconfidence in model performance produces inadequate validation cycles, violating CBK Risk Management Guidelines on documented model-risk management',
+      example:
+        'Kenyan bank treats SME-lending model accuracy as stable through KES devaluation cycles without re-validation',
     },
     {
       biasType: 'algorithmic_bias',
       provisionId: 'cbk_digital_lending',
       riskWeight: 0.75,
-      mechanism: 'Algorithmic bias in automated credit decisions violates the §33B human-oversight evidence + customer-disclosure obligations',
-      example: 'Digital lender deploys credit-scoring model that produces systematically different decisions by region without documented oversight evidence',
+      mechanism:
+        'Algorithmic bias in automated credit decisions violates the §33B human-oversight evidence + customer-disclosure obligations',
+      example:
+        'Digital lender deploys credit-scoring model that produces systematically different decisions by region without documented oversight evidence',
     },
     {
       biasType: 'narrative_fallacy',
       provisionId: 'cbk_digital_lending',
       riskWeight: 0.55,
-      mechanism: 'Narrative-style disclosure of credit decision logic substitutes for the structured reasoning artefact §33B requires',
-      example: 'Adverse-action notice to a Nairobi SME tells a story rather than discloses the model logic in plain language',
+      mechanism:
+        'Narrative-style disclosure of credit decision logic substitutes for the structured reasoning artefact §33B requires',
+      example:
+        'Adverse-action notice to a Nairobi SME tells a story rather than discloses the model logic in plain language',
     },
   ],
 };
@@ -304,7 +322,8 @@ export const BOG_FRAMEWORK: RegulatoryFramework = {
       provisionId: 'bog_model_governance',
       riskWeight: 0.6,
       mechanism: 'Overconfidence in model stability produces inadequate validation cycles',
-      example: 'Ghanaian bank treats credit-scoring model as stable through cedi devaluation cycles',
+      example:
+        'Ghanaian bank treats credit-scoring model as stable through cedi devaluation cycles',
     },
   ],
 };
@@ -342,22 +361,27 @@ export const FRC_NIGERIA_FRAMEWORK: RegulatoryFramework = {
       biasType: 'groupthink',
       provisionId: 'frc_nigeria_board_decision',
       riskWeight: 0.7,
-      mechanism: 'Unanimous board decisions on material matters without dissent capture violate Principle 1.1',
-      example: 'Public-interest entity board approves a related-party transaction without any recorded challenge',
+      mechanism:
+        'Unanimous board decisions on material matters without dissent capture violate Principle 1.1',
+      example:
+        'Public-interest entity board approves a related-party transaction without any recorded challenge',
     },
     {
       biasType: 'sunk_cost_fallacy',
       provisionId: 'frc_nigeria_risk_management',
       riskWeight: 0.55,
       mechanism: 'Sunk-cost-driven escalation decisions evade material-risk re-identification',
-      example: 'Board continues a failing project to recover prior capex without re-evaluating material risk',
+      example:
+        'Board continues a failing project to recover prior capex without re-evaluating material risk',
     },
     {
       biasType: 'anchoring_bias',
       provisionId: 'frc_nigeria_board_decision',
       riskWeight: 0.6,
-      mechanism: 'Anchoring on the seller, sponsor, or first comparable suppresses the documented dissent capture and structured decision processes Principle 1.1 requires',
-      example: 'Public-interest entity board approves an acquisition at the seller-tabled price multiple without a documented independent challenge or alternative-comparable analysis',
+      mechanism:
+        'Anchoring on the seller, sponsor, or first comparable suppresses the documented dissent capture and structured decision processes Principle 1.1 requires',
+      example:
+        'Public-interest entity board approves an acquisition at the seller-tabled price multiple without a documented independent challenge or alternative-comparable analysis',
     },
   ],
 };
@@ -385,8 +409,10 @@ export const CBE_FRAMEWORK: RegulatoryFramework = {
       biasType: 'algorithmic_bias',
       provisionId: 'cbe_ai_governance',
       riskWeight: 0.8,
-      mechanism: 'Algorithmic bias in customer-facing models violates explainability and disclosure obligations',
-      example: 'Egyptian bank credit-scoring model produces systematically different outcomes by region',
+      mechanism:
+        'Algorithmic bias in customer-facing models violates explainability and disclosure obligations',
+      example:
+        'Egyptian bank credit-scoring model produces systematically different outcomes by region',
     },
   ],
 };
@@ -424,8 +450,10 @@ export const POPIA_FRAMEWORK: RegulatoryFramework = {
       biasType: 'algorithmic_bias',
       provisionId: 'popia_s71',
       riskWeight: 0.85,
-      mechanism: 'Algorithmic bias in legal-effect decisions violates s.71 reasoning + objection rights',
-      example: 'Insurer pricing model produces systematically higher premiums on a protected characteristic',
+      mechanism:
+        'Algorithmic bias in legal-effect decisions violates s.71 reasoning + objection rights',
+      example:
+        'Insurer pricing model produces systematically higher premiums on a protected characteristic',
     },
     {
       biasType: 'confirmation_bias',
@@ -499,8 +527,10 @@ export const BOT_FRAMEWORK: RegulatoryFramework = {
       biasType: 'overconfidence_bias',
       provisionId: 'bot_sandbox_governance',
       riskWeight: 0.55,
-      mechanism: 'Overconfidence in sandbox-stage models produces inadequate exit-criteria evidence',
-      example: 'Tanzanian fintech treats sandbox-stage validation as sufficient for full-license operation',
+      mechanism:
+        'Overconfidence in sandbox-stage models produces inadequate exit-criteria evidence',
+      example:
+        'Tanzanian fintech treats sandbox-stage validation as sufficient for full-license operation',
     },
   ],
 };
