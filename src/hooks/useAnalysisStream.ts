@@ -42,6 +42,20 @@ export interface OutcomeGateInfo {
   pendingCount: number;
   pendingAnalysisIds: string[];
   message: string;
+  /**
+   * `'hard'` when the gate actually BLOCKED the upload (HTTP 409
+   * OUTCOME_GATE_BLOCKED — the org has Organization.enforceOutcomeGate=true).
+   * Dashboard should render the blocking OutcomeGateModal in this case.
+   *
+   * `'soft'` when this is a reminder only (legacy 423 path, kept for
+   * backward compat). Dashboard should render the dismissible
+   * OutcomeGateBanner in this case.
+   *
+   * Undefined for legacy callers that don't set it; dashboard treats
+   * undefined as `'hard'` to be safe (preserves blocking behaviour
+   * when the source is ambiguous).
+   */
+  level?: 'soft' | 'hard';
 }
 
 interface StreamOptions {
@@ -182,16 +196,30 @@ export function useAnalysisStream(options: StreamOptions) {
         let errorMessage = `Analysis failed (${res.status})`;
         try {
           const errorData = await res.json();
-          // Legacy: server no longer returns 423 for outcome gate (the gate
-          // is now a non-blocking reminder delivered via SSE `outcome_reminder`
-          // events). Kept for backward compatibility with older deployments.
-          if (res.status === 423 && errorData.code === 'OUTCOME_GATE') {
+          // Outcome Gate enforcement (Phase 1 shipped 2026-04-26): 409 with
+          // code 'OUTCOME_GATE_BLOCKED' fires when the user's org has
+          // Organization.enforceOutcomeGate=true AND they have 5+ pending
+          // outcome reports past 30 days old. Surface as blocking gate so
+          // the upload UI can show the modal directing the user to log
+          // outcomes before proceeding.
+          if (res.status === 409 && errorData.code === 'OUTCOME_GATE_BLOCKED') {
+            setOutcomeGate({
+              pendingCount: errorData.pendingCount || 0,
+              pendingAnalysisIds: errorData.pendingAnalysisIds || [],
+              message: errorData.error || 'Outcome Gate blocked — log outcomes on past analyses before running a new audit.',
+              level: 'hard',
+            });
+            errorMessage = errorData.error || 'Outcome Gate blocked';
+          }
+          // Legacy: server returned 423 for outcome gate in earlier deployments.
+          // Kept for backward compatibility.
+          else if (res.status === 423 && errorData.code === 'OUTCOME_GATE') {
             setOutcomeGate({
               pendingCount: errorData.pendingOutcomes,
               pendingAnalysisIds: errorData.pendingAnalysisIds || [],
               message: errorData.message || errorMessage,
+              level: 'hard',
             });
-            // Don't throw inside the try — set message and fall through
             errorMessage = errorData.message || 'Outcome reporting required';
           } else {
             errorMessage = errorData.error || errorMessage;

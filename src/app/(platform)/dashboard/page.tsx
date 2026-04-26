@@ -53,7 +53,7 @@ import { useAnalysisProgress } from '@/components/ui/AnalysisProgressBar';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { usePlanLabels } from '@/hooks/usePlanLabels';
 import { KGMergeConsentModal } from '@/components/pricing/KGMergeConsentModal';
-import { OutcomeGateBanner } from '@/components/ui/OutcomeGate';
+import { OutcomeGateBanner, OutcomeGateModal } from '@/components/ui/OutcomeGate';
 import { DraftOutcomeBanner } from '@/components/ui/DraftOutcomeBanner';
 import { SampleDataBanner } from '@/components/ui/SampleDataBanner';
 import { SampleBadge } from '@/components/ui/SampleBadge';
@@ -1098,14 +1098,31 @@ export default function Dashboard() {
       <SampleDataBanner />
       <DraftOutcomeBanner />
 
-      {hardGateInfo && (
+      {hardGateInfo && hardGateInfo.level === 'hard' ? (
+        // Hard-blocking modal: the upload was actually rejected by the API
+        // (Organization.enforceOutcomeGate=true + 5+ pending outcomes past
+        // 30 days). User must log an outcome before they can proceed —
+        // not dismissible. Phase 2 of Outcome Gate Enforcement (locked
+        // 2026-04-26).
+        <OutcomeGateModal
+          gateInfo={hardGateInfo}
+          onClose={() => setHardGateInfo(null)}
+          onOutcomeSubmitted={() => {
+            // Outcome logged — clear gate state so user can re-attempt
+            // the upload. The next /api/analyze/stream call will pass
+            // the gate (assuming pending count dropped below threshold).
+            setHardGateInfo(null);
+          }}
+        />
+      ) : hardGateInfo ? (
+        // Soft / legacy reminder: dismissible banner.
         <OutcomeGateBanner
           pendingCount={hardGateInfo.pendingCount}
           pendingAnalysisIds={hardGateInfo.pendingAnalysisIds}
           level="hard"
           onDismiss={() => setHardGateInfo(null)}
         />
-      )}
+      ) : null}
 
       <OnboardingGuide documentCount={totalDocs ?? 0} />
       <DecisionTriageWidget />

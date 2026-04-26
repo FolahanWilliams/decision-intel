@@ -109,10 +109,21 @@ interface OutcomeGateModalProps {
 }
 
 /**
- * @deprecated The outcome gate no longer blocks analyses. Use
- * `OutcomeGateBanner` with `level="hard"` for the stronger reminder
- * treatment instead. Kept only for backward compatibility; do not render
- * in new code.
+ * Outcome Gate hard-block modal. Surfaces when the user has hit the hard
+ * threshold (5+ pending outcomes past 30 days old) AND their org has
+ * `Organization.enforceOutcomeGate=true` (typically design-partner orgs).
+ *
+ * Re-activated 2026-04-26 alongside the API-level enforcement (Phase 1
+ * shipped same day) — `/api/analyze/stream` returns HTTP 409 with code
+ * `OUTCOME_GATE_BLOCKED`, useAnalysisStream catches it and surfaces the
+ * gate state, dashboard renders this modal as a blocking surface until
+ * the user logs an outcome.
+ *
+ * The quick-submit flow lets the user resolve in <30 seconds — pick an
+ * analysis from the pending list, pick an outcome (success / partial /
+ * failure / too-early), submit. Phase 3 (deferred) will wire this to
+ * the auto-draft outcome system (DraftOutcomeBanner) for one-click
+ * pre-filled resolution.
  */
 export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: OutcomeGateModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);

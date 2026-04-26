@@ -1,11 +1,15 @@
 'use client';
 
-import { Rocket, Shield, Play, MessageSquare, Layers } from 'lucide-react';
+import { Rocket, Shield, Play, MessageSquare, Layers, AlertTriangle, Heart, Users, Activity } from 'lucide-react';
 import { PitchReframeToggle } from './sales/PitchReframeToggle';
 import { ObjectionFlashcards } from './sales/ObjectionFlashcards';
 import { DemoStepperTimeline } from './sales/DemoStepperTimeline';
 import { AudiencePitchTabs } from './sales/AudiencePitchTabs';
 import { SalesFrameworkBrowser } from './sales/SalesFrameworkBrowser';
+import { EnterpriseFrictionMatrix } from './sales/EnterpriseFrictionMatrix';
+import { CialdiniInfluenceWheel } from './sales/CialdiniInfluenceWheel';
+import { BuyingCommitteeMap } from './sales/BuyingCommitteeMap';
+import { DealStallDiagnosticTree } from './sales/DealStallDiagnosticTree';
 
 interface SectionProps {
   icon: React.ReactNode;
@@ -71,6 +75,60 @@ export function SalesToolkitTab() {
       </Section>
 
       <Section
+        icon={<MessageSquare size={16} />}
+        title="Elevator Pitches · 5 buyer audiences"
+        subtitle="CSO, M&A Lead, Fund Partner / EM Investor (the GTM wedge), Board / Audit Committee, Technical. Each leads with the WeWork or Dangote DPR as the live-evidence anchor. Locked vocabulary throughout."
+        accent="#0EA5E9"
+      >
+        <AudiencePitchTabs />
+      </Section>
+
+      <Section
+        icon={<Users size={16} />}
+        title="Buying Committee Map · Pan-African fund vs F500 CSO"
+        subtitle="The full committee for each ICP — who has budget, who's the champion path, who vetoes. Toggle between the GTM wedge (Pan-African fund, 6 roles) and the revenue ceiling (F500 CSO, 5 roles). Click any role for the navigation script."
+        accent="#16A34A"
+      >
+        <BuyingCommitteeMap />
+      </Section>
+
+      <Section
+        icon={<Heart size={16} />}
+        title="Cialdini's 6 Influence Principles · applied to DI"
+        subtitle="Reciprocation, commitment & consistency, social proof, liking, authority, scarcity — each operationalised with the literal phrase Folahan says + the anti-pattern. Source: Cialdini PDF in the master KB. Click any principle on the wheel."
+        accent="#EC4899"
+      >
+        <CialdiniInfluenceWheel />
+      </Section>
+
+      <Section
+        icon={<Layers size={16} />}
+        title="Enterprise Sales Frameworks · 5 battle-tested"
+        subtitle="Challenger (teach → tailor → take control), JOLT (overcome 40-60% no-decision), MEDDPICC (8-point qual), SPIN (situation → need-payoff), SLIP (paid pilot design). Not invented — operationalised from primary research in the master KB."
+        accent="#8B5CF6"
+      >
+        <SalesFrameworkBrowser />
+      </Section>
+
+      <Section
+        icon={<AlertTriangle size={16} />}
+        title="Enterprise Friction Matrix · 5 deal-killers + responses"
+        subtitle="The frictions enterprise buyers will surface during procurement (Nigerian SEC ISA 2007 gap, Client-Safe DPR Export, VDR integration, DQI explainability, shelfware risk). Each card carries the pre-baked response + the underlying product status — so frictions also surface real product gaps to fix."
+        accent="#DC2626"
+      >
+        <EnterpriseFrictionMatrix />
+      </Section>
+
+      <Section
+        icon={<Activity size={16} />}
+        title="Deal Stall Diagnostic Tree · when a strong meeting goes silent"
+        subtitle="5 root causes ranked by probability + the recovery move + the literal recovery script. Use this when a Pan-African fund partner or F500 CSO has gone quiet for 2-3 weeks after a strong audit walk-through."
+        accent="#D97706"
+      >
+        <DealStallDiagnosticTree />
+      </Section>
+
+      <Section
         icon={<Shield size={16} />}
         title="Objection Handler · 8 enterprise objections"
         subtitle="Every objection a buyer will raise, the pre-baked response, and the tone that lands it. Click any card to drill the answer."
@@ -86,24 +144,6 @@ export function SalesToolkitTab() {
         accent="#16A34A"
       >
         <DemoStepperTimeline />
-      </Section>
-
-      <Section
-        icon={<MessageSquare size={16} />}
-        title="Elevator Pitches · by audience"
-        subtitle="Four audiences, four pitches. Key hooks highlighted so you can drop them without thinking. CSO, M&A Lead, Board, Technical."
-        accent="#0EA5E9"
-      >
-        <AudiencePitchTabs />
-      </Section>
-
-      <Section
-        icon={<Layers size={16} />}
-        title="Enterprise Sales Frameworks"
-        subtitle="Challenger (teach → tailor → take control), MEDDPICC (8-point qualification), SPIN (situation → need-payoff). Battle-tested, not invented."
-        accent="#8B5CF6"
-      >
-        <SalesFrameworkBrowser />
       </Section>
     </div>
   );

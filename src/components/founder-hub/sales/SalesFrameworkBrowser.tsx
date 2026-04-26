@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Target, CheckCircle, MessageSquare } from 'lucide-react';
-import { CHALLENGER, MEDDPICC, SPIN } from '@/lib/data/sales-toolkit';
+import { Target, CheckCircle, MessageSquare, Zap, Rocket } from 'lucide-react';
+import { CHALLENGER, MEDDPICC, SPIN, JOLT, SLIP } from '@/lib/data/sales-toolkit';
 
-type FrameworkKey = 'challenger' | 'meddpicc' | 'spin';
+type FrameworkKey = 'challenger' | 'meddpicc' | 'spin' | 'jolt' | 'slip';
 
 const FRAMEWORK_META: Record<
   FrameworkKey,
@@ -16,6 +16,12 @@ const FRAMEWORK_META: Record<
     color: '#0EA5E9',
     icon: <Target size={14} />,
     subtitle: 'Teach. Tailor. Take control.',
+  },
+  jolt: {
+    label: 'JOLT Effect',
+    color: '#DC2626',
+    icon: <Zap size={14} />,
+    subtitle: 'Beat "no decision" — 40-60% of qualified deals lost to indecision.',
   },
   meddpicc: {
     label: 'MEDDPICC',
@@ -28,6 +34,12 @@ const FRAMEWORK_META: Record<
     color: '#F59E0B',
     icon: <MessageSquare size={14} />,
     subtitle: 'Situation → Problem → Implication → Need-payoff.',
+  },
+  slip: {
+    label: 'SLIP',
+    color: '#16A34A',
+    icon: <Rocket size={14} />,
+    subtitle: 'Simple · Low cost · Instant value · Plays well — paid pilot design.',
   },
 };
 
@@ -75,10 +87,213 @@ export function SalesFrameworkBrowser() {
           transition={{ duration: 0.18 }}
         >
           {framework === 'challenger' && <ChallengerView />}
+          {framework === 'jolt' && <JoltView />}
           {framework === 'meddpicc' && <MeddpiccView />}
           {framework === 'spin' && <SpinView />}
+          {framework === 'slip' && <SlipView />}
         </motion.div>
       </AnimatePresence>
+    </div>
+  );
+}
+
+function JoltView() {
+  const meta = FRAMEWORK_META.jolt;
+  return (
+    <div>
+      <div
+        style={{
+          padding: 12,
+          background: `${meta.color}0d`,
+          border: `1px solid ${meta.color}30`,
+          borderRadius: 'var(--radius-md)',
+          marginBottom: 12,
+          fontSize: 12,
+          color: 'var(--text-secondary)',
+          lineHeight: 1.55,
+        }}
+      >
+        {JOLT.intro}
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 12 }}>
+        {JOLT.elements.map(el => (
+          <div
+            key={el.letter}
+            style={{
+              padding: 14,
+              background: 'var(--bg-card)',
+              border: `1px solid ${meta.color}30`,
+              borderLeft: `3px solid ${meta.color}`,
+              borderRadius: 'var(--radius-md)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+              <span
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: 8,
+                  background: meta.color,
+                  color: '#fff',
+                  fontSize: 16,
+                  fontWeight: 900,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {el.letter}
+              </span>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: meta.color, letterSpacing: '0.02em' }}>
+                  {el.name}
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
+                  {el.oneLine}
+                </div>
+              </div>
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-primary)', lineHeight: 1.55, marginBottom: 8 }}>
+              {el.description}
+            </div>
+            <div
+              style={{
+                padding: 10,
+                background: 'var(--bg-secondary)',
+                borderLeft: `2px solid ${meta.color}`,
+                borderRadius: 4,
+                fontSize: 12,
+                color: 'var(--text-primary)',
+                fontStyle: 'italic',
+                lineHeight: 1.55,
+                marginBottom: 6,
+              }}
+            >
+              <strong style={{ fontStyle: 'normal', color: meta.color, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                Folahan says
+              </strong>
+              <br />
+              {el.diExample}
+            </div>
+            <div
+              style={{
+                fontSize: 11,
+                color: 'var(--text-muted)',
+                lineHeight: 1.5,
+                paddingLeft: 8,
+                borderLeft: '2px solid var(--border-color)',
+              }}
+            >
+              <strong style={{ color: '#EF4444' }}>Anti-pattern:</strong> {el.antiPattern}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div
+        style={{
+          padding: 10,
+          background: `${meta.color}0d`,
+          border: `1px dashed ${meta.color}40`,
+          borderRadius: 'var(--radius-md)',
+          fontSize: 11,
+          color: 'var(--text-secondary)',
+          lineHeight: 1.55,
+        }}
+      >
+        <strong style={{ color: meta.color }}>When to use:</strong> {JOLT.whenToUse}
+      </div>
+    </div>
+  );
+}
+
+function SlipView() {
+  const meta = FRAMEWORK_META.slip;
+  return (
+    <div>
+      <div
+        style={{
+          padding: 12,
+          background: `${meta.color}0d`,
+          border: `1px solid ${meta.color}30`,
+          borderRadius: 'var(--radius-md)',
+          marginBottom: 12,
+          fontSize: 12,
+          color: 'var(--text-secondary)',
+          lineHeight: 1.55,
+        }}
+      >
+        {SLIP.intro}
+      </div>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+          gap: 10,
+        }}
+      >
+        {SLIP.elements.map(el => (
+          <div
+            key={el.letter}
+            style={{
+              padding: 14,
+              background: 'var(--bg-card)',
+              border: `1px solid ${meta.color}30`,
+              borderTop: `3px solid ${meta.color}`,
+              borderRadius: 'var(--radius-md)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 8,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: '50%',
+                  background: meta.color,
+                  color: '#fff',
+                  fontSize: 14,
+                  fontWeight: 900,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {el.letter}
+              </span>
+              <div style={{ fontSize: 13, fontWeight: 800, color: meta.color }}>{el.name}</div>
+            </div>
+            <div
+              style={{
+                fontSize: 12,
+                color: 'var(--text-secondary)',
+                lineHeight: 1.55,
+                fontStyle: 'italic',
+              }}
+            >
+              {el.question}
+            </div>
+            <div
+              style={{
+                padding: 10,
+                background: 'var(--bg-secondary)',
+                borderLeft: `2px solid ${meta.color}`,
+                borderRadius: 4,
+                fontSize: 12,
+                color: 'var(--text-primary)',
+                lineHeight: 1.55,
+              }}
+            >
+              <strong style={{ color: meta.color, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                DI today
+              </strong>
+              <br />
+              {el.diAnswer}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
