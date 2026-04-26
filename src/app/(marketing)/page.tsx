@@ -17,7 +17,7 @@ import { KahnemanKleinSynthesis } from '@/components/marketing/KahnemanKleinSynt
 import { MomentsPyramid } from '@/components/marketing/MomentsPyramid';
 import { SecurityLifecycleStrip } from '@/components/marketing/SecurityLifecycleStrip';
 import { ScrollRevealGraph } from '@/components/marketing/ScrollRevealGraph';
-import { ArrowRight, Check, ShieldCheck, Scale, GraduationCap, Globe2, FileText } from 'lucide-react';
+import { ArrowRight, Check, ShieldCheck, Scale, GraduationCap, Globe2, FileText, AlertCircle } from 'lucide-react';
 import { DESIGN_PARTNER_SEATS_AVAILABLE } from '@/lib/constants/company-info';
 
 /* ─── Color Tokens ──────────────────────────────────────────────────────── */
@@ -320,14 +320,21 @@ export default function LandingPage() {
                 }}
               >
                 <WeWorkProofPanel />
-                {/* Two mini-cards below the WeWork panel: PAIN ($250M
-                    McKinsey Global Decision-Making Survey, 2017 — verified
-                    primary source) + VALUE (what the user walks away
-                    with — closes the "what's the output?" gap that 8
-                    readers across 3 rounds plus 2 final blind readers
-                    flagged). Both single-sentence. PAIN is sourced;
-                    VALUE describes the actual deliverable. The two cards
-                    sit side-by-side at desktop, stack on mobile. */}
+                {/* Two mini-cards: PROBLEM (red) + SOLUTION (green).
+                    Reframed 2026-04-26 from "COST OF SLOW DECISIONS" /
+                    "WHAT YOU GET" because the prior framing (a) leaked
+                    product jargon (DPR / DQI) above the fold before any
+                    awareness-building had earned it, and (b) reduced the
+                    product to a single artifact when the actual deliverable
+                    is a full audit + biases + counterfactuals + outcome
+                    flywheel + the DPR. PROBLEM card anchors on the McKinsey
+                    $250M / Fortune 500 stat (verified primary source);
+                    SOLUTION card anchors on the 60-second product spec and
+                    describes the WHOLE deliverable in plain language —
+                    "biases named, counterfactuals quantified, the record
+                    signed and shareable, the outcome tracked from there."
+                    Coloured top-borders + icons make them stand out from
+                    the all-white panel above. */}
                 <div
                   className="hero-mini-cards"
                   style={{
@@ -336,14 +343,18 @@ export default function LandingPage() {
                     gap: 12,
                   }}
                 >
+                  {/* PROBLEM — red */}
                   <div
+                    className="hero-mini-card"
                     style={{
                       background: C.white,
                       border: `1px solid ${C.slate200}`,
+                      borderTop: '3px solid #DC2626',
                       borderRadius: 12,
-                      padding: '14px 16px',
+                      padding: '16px 18px',
                       boxShadow:
                         '0 4px 16px -8px rgba(15,23,42,0.08), 0 2px 4px rgba(15,23,42,0.04)',
+                      transition: 'transform 0.18s, box-shadow 0.18s',
                     }}
                   >
                     <p
@@ -352,33 +363,53 @@ export default function LandingPage() {
                         fontWeight: 800,
                         letterSpacing: '0.12em',
                         textTransform: 'uppercase',
-                        color: C.green,
-                        marginBottom: 8,
-                        marginTop: 0,
+                        color: '#DC2626',
+                        margin: '0 0 10px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
                       }}
                     >
-                      The cost of slow decisions
+                      <AlertCircle size={11} strokeWidth={2.6} />
+                      The problem
                     </p>
                     <p
                       style={{
-                        fontSize: 12.5,
+                        fontSize: 22,
+                        fontWeight: 800,
+                        color: C.slate900,
+                        margin: '0 0 8px',
+                        lineHeight: 1.05,
+                        fontFamily: 'var(--font-mono, ui-monospace, monospace)',
+                        letterSpacing: '-0.02em',
+                      }}
+                    >
+                      $250M / yr
+                    </p>
+                    <p
+                      style={{
+                        fontSize: 12,
                         color: C.slate700,
                         lineHeight: 1.5,
                         margin: 0,
                       }}
                     >
-                      McKinsey: inefficient decision-making costs the typical Fortune 500 company
-                      $250M a year.
+                      The cost of unchecked decisions for a typical Fortune 500 company (McKinsey).
+                      Capital moves on memos nobody pressure-tested for bias.
                     </p>
                   </div>
+                  {/* SOLUTION — green */}
                   <div
+                    className="hero-mini-card"
                     style={{
                       background: C.white,
                       border: `1px solid ${C.slate200}`,
+                      borderTop: `3px solid ${C.green}`,
                       borderRadius: 12,
-                      padding: '14px 16px',
+                      padding: '16px 18px',
                       boxShadow:
                         '0 4px 16px -8px rgba(15,23,42,0.08), 0 2px 4px rgba(15,23,42,0.04)',
+                      transition: 'transform 0.18s, box-shadow 0.18s',
                     }}
                   >
                     <p
@@ -388,47 +419,38 @@ export default function LandingPage() {
                         letterSpacing: '0.12em',
                         textTransform: 'uppercase',
                         color: C.green,
-                        marginBottom: 10,
-                        marginTop: 0,
+                        margin: '0 0 10px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
                       }}
                     >
-                      What you get
+                      <ShieldCheck size={11} strokeWidth={2.6} />
+                      The solution
                     </p>
-                    {/* Reader α's trust move: instead of describing the
-                        artifact in prose, show 3 lines of what the actual
-                        DPR header looks like. Monospace, tinted background,
-                        reads as machine-output rather than marketing copy.
-                        Numbers match the WeWork panel above for coherence. */}
-                    <pre
-                      style={{
-                        fontSize: 11,
-                        lineHeight: 1.55,
-                        color: C.slate700,
-                        background: C.slate50,
-                        border: `1px solid ${C.slate200}`,
-                        borderRadius: 8,
-                        padding: '10px 12px',
-                        margin: 0,
-                        marginBottom: 8,
-                        fontFamily: 'var(--font-mono, ui-monospace, monospace)',
-                        whiteSpace: 'pre-wrap',
-                        wordBreak: 'break-word',
-                        overflow: 'hidden',
-                      }}
-                    >
-                      {`DPR · WeWork S-1 · 2019 IPO prospectus
-DQI 41 → 70 if mitigated · 3 biases · 7 frameworks
-SHA-256 a4f7e2…d83 · hashed + tamper-evident`}
-                    </pre>
                     <p
                       style={{
-                        fontSize: 11,
-                        color: C.slate500,
-                        margin: 0,
-                        lineHeight: 1.45,
+                        fontSize: 22,
+                        fontWeight: 800,
+                        color: C.slate900,
+                        margin: '0 0 8px',
+                        lineHeight: 1.05,
+                        fontFamily: 'var(--font-mono, ui-monospace, monospace)',
+                        letterSpacing: '-0.02em',
                       }}
                     >
-                      A real DPR header. Click the WeWork panel above to read the full record.
+                      60 seconds
+                    </p>
+                    <p
+                      style={{
+                        fontSize: 12,
+                        color: C.slate700,
+                        lineHeight: 1.5,
+                        margin: 0,
+                      }}
+                    >
+                      Every memo gets a structured audit. Biases named, counterfactuals quantified,
+                      the record signed and shareable, the outcome tracked from there.
                     </p>
                   </div>
                 </div>
@@ -450,6 +472,14 @@ SHA-256 a4f7e2…d83 · hashed + tamper-evident`}
             highest-traffic surface on mobile (LinkedIn outbound), and the
             inline-style asymmetric grid otherwise crushes at <900px. */}
         <style>{`
+          .hero-mini-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px -8px rgba(15,23,42,0.12), 0 4px 8px rgba(15,23,42,0.05);
+          }
+          @media (prefers-reduced-motion: reduce) {
+            .hero-mini-card,
+            .hero-mini-card:hover { transform: none; transition: none; }
+          }
           @media (max-width: 900px) {
             .hero-grid-section { padding: 64px 20px 48px !important; }
             .hero-grid {
@@ -1754,7 +1784,7 @@ function WeWorkProofPanel() {
           }}
         >
           <FileText size={14} />
-          Read the full Decision Provenance Record
+          Read the full audit report
           <ArrowRight size={14} />
         </span>
         <span

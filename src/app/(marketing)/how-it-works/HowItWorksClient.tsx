@@ -23,6 +23,7 @@ import { NoiseDistributionViz } from '@/components/marketing/how-it-works/NoiseD
 import { BoardroomSimViz } from '@/components/marketing/how-it-works/BoardroomSimViz';
 import { OutcomeDetectionViz } from '@/components/marketing/how-it-works/OutcomeDetectionViz';
 import { DprAnatomyViz } from '@/components/marketing/how-it-works/DprAnatomyViz';
+import { CounterfactualLiftViz } from '@/components/marketing/how-it-works/CounterfactualLiftViz';
 import { ResearchCitationCard } from '@/components/marketing/how-it-works/ResearchCitationCard';
 import { ToxicNetworkGraph } from '@/components/marketing/genome/ToxicNetworkGraph';
 import { computeGenomeFromSeed } from '@/lib/data/bias-genome-seed';
@@ -547,6 +548,18 @@ export function HowItWorksClient() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* SECTION 5.5 — COUNTERFACTUAL LIFT ──────────────────────── */}
+      <section id="counterfactual-lift" style={{ padding: '72px 24px 0' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+          <SectionHeader
+            eyebrow="Counterfactual lift"
+            title="What shifts when you remove the bias. Made visible."
+            body="Every flagged bias on a memo carries a reproducible lift weight: the exact number of DQI points that returns to the score if the bias is mitigated. Toggle the chips below on the actual WeWork S-1 audit and watch the gauge respond. Same memo, same lift, every time — the calculation is deterministic, not generative."
+          />
+          <CounterfactualLiftViz />
         </div>
       </section>
 
