@@ -155,6 +155,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         effectiveContext?.context && effectiveContext.context !== 'unknown'
           ? effectiveContext.context
           : undefined,
+      // P1 #35 (2026-04-26 Titi finding): pass the detected EM jurisdictions
+      // to the prompt so the structural agent injects per-region
+      // sovereign-cycle / FX-regime guidance — Lagos / Nairobi / Cairo /
+      // WAEMU / Johannesburg as DIFFERENT regimes, not one EM bucket.
+      emergingMarketCountries: effectiveContext?.emergingMarketCountries ?? undefined,
     });
 
     const result = await generateText(prompt, {

@@ -21,11 +21,36 @@ interface ControlMapping {
   status: 'pass' | 'configured' | 'partial';
 }
 
+/**
+ * Certification posture — distinguishes "we have the controls" (a feature
+ * mapping) from "we have an external attestation that we have the controls"
+ * (a third-party audit). Margaret persona finding 2026-04-26: a CISO
+ * reading an "ISO 27001 · 80% controls satisfied" card without a
+ * certification-status differentiator infers a formal certification that
+ * doesn't exist. The differentiator below is mandatory; every framework
+ * row must declare its real attestation state.
+ *
+ *   - self_assessed: feature mapping only. No external auditor has reviewed.
+ *                    Honest baseline for any framework on this page.
+ *   - targeted:     a formal audit is in progress or calendared. Includes
+ *                    an ETA blurb so the customer's procurement team can
+ *                    plan around it.
+ *   - attested:     a third-party auditor has issued a report. We can
+ *                    share the report on request under the DPA. Reserved
+ *                    for actual attestations — never inflate.
+ */
+type CertificationStatus = 'self_assessed' | 'targeted' | 'attested';
+
 interface FrameworkPosture {
   id: string;
   name: string;
   jurisdiction: string;
   category: string;
+  certificationStatus: CertificationStatus;
+  /** One-line note about the certification state — surfaced on the
+   *  card. e.g. "Self-assessed against the framework controls below" or
+   *  "Type I audit calendared for Q4 2026". */
+  certificationNote: string;
   controls: ControlMapping[];
 }
 
@@ -35,6 +60,9 @@ const FRAMEWORKS: FrameworkPosture[] = [
     name: 'SOC 2 Type II',
     jurisdiction: 'US',
     category: 'Trust Services',
+    certificationStatus: 'targeted',
+    certificationNote:
+      'Hosted on Vercel + Supabase (both SOC 2 Type II attested). Decision Intel\'s own product-level Type I audit targeted Q4 2026 with the Type II observation window opening immediately after.',
     controls: [
       {
         controlId: 'CC6.1',
@@ -91,6 +119,9 @@ const FRAMEWORKS: FrameworkPosture[] = [
     name: 'ISO 27001:2022',
     jurisdiction: 'International',
     category: 'Information Security',
+    certificationStatus: 'self_assessed',
+    certificationNote:
+      'Self-assessed against the controls below — no external ISO 27001 certification audit has been performed. Formal certification is not currently on the roadmap; if your procurement bar requires it, raise this with the design-partner team.',
     controls: [
       {
         controlId: 'A.8.2',
@@ -139,6 +170,9 @@ const FRAMEWORKS: FrameworkPosture[] = [
     name: 'GDPR',
     jurisdiction: 'EU',
     category: 'Data Privacy',
+    certificationStatus: 'self_assessed',
+    certificationNote:
+      'Aligned with GDPR Articles 25, 30, 32, and 17 via the platform features below. GDPR is not certifiable in the traditional sense; the alignment is documented and the DPA + privacy policy are the contractual artefacts.',
     controls: [
       {
         controlId: 'Art. 25',
@@ -179,6 +213,9 @@ const FRAMEWORKS: FrameworkPosture[] = [
     name: 'EU AI Act',
     jurisdiction: 'EU',
     category: 'AI Governance',
+    certificationStatus: 'self_assessed',
+    certificationNote:
+      'Aligned with EU AI Act Articles 10, 13, 14, and 15. High-risk decision-support obligations enforceable Aug 2026; the Decision Provenance Record is engineered to satisfy Art 14 record-keeping by design. No external AI Act conformity assessment exists yet — the framework\'s assessment regime is still being defined by the AI Office.',
     controls: [
       {
         controlId: 'Art. 10',
@@ -223,6 +260,57 @@ const STATUS_CONFIG = {
   configured: { label: 'Configured', color: '#0284c7', bg: 'rgba(2,132,199,0.1)' },
   partial: { label: 'Partial', color: '#d97706', bg: 'rgba(217,119,6,0.1)' },
 };
+
+/**
+ * Certification-status badge config (P1 #28). Distinct from per-control
+ * status: this declares whether an EXTERNAL auditor has signed off on
+ * the framework. "Self-assessed" must be visually distinct from
+ * "Attested" — a CISO scanning the page must not be able to
+ * misinterpret a feature mapping as a third-party certification.
+ */
+const CERT_CONFIG: Record<
+  CertificationStatus,
+  { label: string; color: string; bg: string }
+> = {
+  self_assessed: {
+    label: 'Self-assessed',
+    color: '#d97706', // amber
+    bg: 'rgba(217,119,6,0.1)',
+  },
+  targeted: {
+    label: 'Audit calendared',
+    color: '#0284c7', // blue
+    bg: 'rgba(2,132,199,0.1)',
+  },
+  attested: {
+    label: 'Externally attested',
+    color: '#16a34a', // green
+    bg: 'rgba(22,163,74,0.1)',
+  },
+};
+
+function CertBadge({ status }: { status: CertificationStatus }) {
+  const cfg = CERT_CONFIG[status];
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        fontSize: 10.5,
+        fontWeight: 700,
+        letterSpacing: '0.06em',
+        textTransform: 'uppercase',
+        padding: '3px 9px',
+        borderRadius: 999,
+        background: cfg.bg,
+        color: cfg.color,
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {cfg.label}
+    </span>
+  );
+}
 
 function StatusBadge({ status }: { status: 'pass' | 'configured' | 'partial' }) {
   const config = STATUS_CONFIG[status];
@@ -279,7 +367,10 @@ function FrameworkCard({ framework }: { framework: FrameworkPosture }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <Shield size={20} style={{ color: 'var(--accent-primary, #16a34a)', flexShrink: 0 }} />
           <div>
-            <div style={{ fontSize: 16, fontWeight: 700 }}>{framework.name}</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <div style={{ fontSize: 16, fontWeight: 700 }}>{framework.name}</div>
+              <CertBadge status={framework.certificationStatus} />
+            </div>
             <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
               {framework.jurisdiction} &middot; {framework.category}
             </div>
@@ -311,6 +402,35 @@ function FrameworkCard({ framework }: { framework: FrameworkPosture }) {
       {/* Controls list */}
       {expanded && (
         <div style={{ padding: '0 20px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {/* Certification note — declares the real attestation state
+              before the per-control mapping. P1 #28: a CISO must read
+              this BEFORE the % coverage so they don't infer an
+              attestation that doesn't exist. */}
+          <div
+            style={{
+              padding: '12px 14px',
+              borderRadius: 'var(--radius-md, 8px)',
+              background: CERT_CONFIG[framework.certificationStatus].bg,
+              border: `1px solid ${CERT_CONFIG[framework.certificationStatus].color}40`,
+              fontSize: 12,
+              color: 'var(--text-secondary)',
+              lineHeight: 1.6,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 10.5,
+                fontWeight: 700,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                color: CERT_CONFIG[framework.certificationStatus].color,
+                marginBottom: 4,
+              }}
+            >
+              Attestation status
+            </div>
+            {framework.certificationNote}
+          </div>
           {framework.controls.map(control => (
             <div
               key={control.controlId}
@@ -464,9 +584,14 @@ export default function CompliancePosturePage() {
           }}
         >
           <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.6, margin: 0 }}>
-            This compliance posture is indicative and based on platform feature analysis. Consult
-            your compliance team for formal certification requirements. For enterprise audit packet
-            generation, see{' '}
+            <strong style={{ color: 'var(--text-primary)' }}>
+              Self-assessed feature mapping, not a third-party certification.
+            </strong>{' '}
+            Each framework above declares its real attestation state via the badge next to the
+            framework name. &ldquo;Self-assessed&rdquo; means the platform features satisfy the
+            framework controls per our reading; it does not mean an external auditor has issued a
+            report. Consult your compliance team before relying on this page in a vendor
+            risk-assessment response. For enterprise audit packet generation, see{' '}
             <a
               href="/dashboard/settings?tab=audit-log"
               style={{ color: 'var(--accent-primary)', textDecoration: 'none' }}

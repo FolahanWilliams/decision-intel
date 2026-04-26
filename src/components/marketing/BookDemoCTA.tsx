@@ -3,6 +3,26 @@
 import Link from 'next/link';
 import { ArrowRight, Calendar, Check } from 'lucide-react';
 import { trackEvent } from '@/lib/analytics/track';
+import {
+  DESIGN_PARTNER_SEATS_TOTAL,
+  DESIGN_PARTNER_SEATS_AVAILABLE,
+} from '@/lib/constants/company-info';
+
+/** Word-spelt seat counts for the BookDemoCTA chip — uses the
+ *  derived constants above rather than hard-coding the numbers in copy. */
+const SEAT_WORDS: Record<number, string> = {
+  1: 'one',
+  2: 'two',
+  3: 'three',
+  4: 'four',
+  5: 'five',
+  6: 'six',
+  7: 'seven',
+  8: 'eight',
+};
+function spellSeats(n: number): string {
+  return SEAT_WORDS[n] ?? String(n);
+}
 
 /**
  * Book-a-design-partner-call CTA.
@@ -281,7 +301,7 @@ export function BookDemoCTA({ variant, source, heading, sub, label }: Props) {
             '30 minutes · no slides',
             'Live on your own strategic memo',
             'You leave with the audit + the Decision Provenance Record',
-            'Five design-partner seats · four still open',
+            `${spellSeats(DESIGN_PARTNER_SEATS_TOTAL).replace(/^./, c => c.toUpperCase())} design-partner seats · ${spellSeats(DESIGN_PARTNER_SEATS_AVAILABLE)} still open`,
           ].map(chip => (
             <li
               key={chip}

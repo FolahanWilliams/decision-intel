@@ -30,6 +30,7 @@ import {
   GraduationCap,
   Building2,
 } from 'lucide-react';
+import { DESIGN_PARTNER_SEATS_TOTAL } from '@/lib/constants/company-info';
 
 const C = {
   white: '#FFFFFF',
@@ -217,7 +218,7 @@ export function DesignPartnerClient() {
               marginBottom: 18,
             }}
           >
-            Design Partner Program &middot; 5 seats
+            Design Partner Program &middot; {DESIGN_PARTNER_SEATS_TOTAL} seats
           </p>
           <h1
             style={{

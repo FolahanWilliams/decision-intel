@@ -1229,16 +1229,116 @@ Continue to flag overconfidence when:
 --- END MARKET-CONTEXT PRIORS ---\n`;
 }
 
+/**
+ * Sovereign-context guidance block for the structural-assumptions prompt
+ * (P1 #35, added 2026-04-26 — Titi persona finding). The Dalio
+ * structural lens collapses without it: a single 35% CAGR ceiling treats
+ * Lagos, Nairobi, and Cairo as one EM bucket when they are
+ * fundamentally different sovereign-cycle / FX-regime contexts. This
+ * block injects per-region guidance so the structural-assumptions agent
+ * actually distinguishes a naira-float exposure from a CFA-zone peg or a
+ * rand-zone managed float.
+ *
+ * The taxonomy below is the production substrate; expand as new
+ * jurisdictions are surfaced by detectMarketContext(). Keep entries
+ * conservative and tied to a verifiable regime fact (currency
+ * convertibility, repatriation rules, central-bank intervention
+ * pattern) — not to a forecast.
+ */
+function buildSovereignContextBlock(emergingMarketCountries: string[]): string {
+  if (emergingMarketCountries.length === 0) return '';
+
+  const lc = emergingMarketCountries.map(s => s.toLowerCase());
+  const hits: string[] = [];
+
+  if (lc.includes('nigeria')) {
+    hits.push(
+      '• Nigeria — naira free-float regime since 2023 unification. FX access via the CBN I&E window; FMDQ-listed naira forwards are the institutional hedging instrument (NGX does NOT list FX forwards). FY24 brought a 38% naira devaluation. The dollar-repatriation assumption is the load-bearing structural bet on most Nigerian deals — flag explicitly.'
+    );
+  }
+  if (lc.includes('kenya')) {
+    hits.push(
+      '• Kenya — KES managed float overseen by CBK. Capital-account convertibility is open in practice, but the central bank intervenes to defend bands during stress (2024 Eurobond cycle is the live precedent). Shilling cycle correlates with East-Africa commodity terms-of-trade.'
+    );
+  }
+  if (lc.includes('ghana')) {
+    hits.push(
+      '• Ghana — cedi managed float; 2022 sovereign-default + IMF programme is the live cycle. Bank-of-Ghana FX restrictions can shift mid-year. Eurobond restructuring is in active conclusion as of 2024-25; capital-controls risk during dollar-debt-service windows.'
+    );
+  }
+  if (lc.some(c => ['côte d’ivoire', 'cote d’ivoire', 'senegal', 'mali', 'burkina faso', 'benin', 'togo', 'niger', 'guinea-bissau'].includes(c))) {
+    hits.push(
+      '• WAEMU (CFA-franc zone) — XOF pegged to EUR by the BCEAO; convertibility guaranteed by the French Treasury under the convertibility agreement. FX risk is materially LOWER than other African markets, but the CFA-zone is itself a political construct under periodic review (the 2019 ECO redenomination is partial). Cross-border governance via BCEAO Circular 04-2017.'
+    );
+  }
+  if (lc.includes('south africa')) {
+    hits.push(
+      '• South Africa — ZAR free-float managed by SARB; among the most liquid African currencies. Rand-cycle correlates strongly with global commodity demand and EM risk-off. Exchange-control framework limits non-resident asset holdings; SARB Model Risk Directive D2/2022 + Joint Standard 2/2024 govern AI/ML risk for SA-regulated banks.'
+    );
+  }
+  if (lc.includes('egypt')) {
+    hits.push(
+      '• Egypt — EGP devalued ~50% across 2023-24 against the dollar; CBE moved to a more flexible regime under the 2024 IMF programme. CBE 2023 ICT Governance and Risk Management Framework governs AI/ML for Egyptian banks. Dollar-shortage windows and capital-controls risk should be flagged on every Egyptian deal.'
+    );
+  }
+  if (lc.includes('tanzania')) {
+    hits.push(
+      '• Tanzania — TZS managed float; BoT FinTech Sandbox Guidelines 2023 govern AI/ML decisioning. Dollar-shortage episodes are recurrent; assume FX repatriation friction unless the memo addresses it.'
+    );
+  }
+  if (lc.includes('rwanda') || lc.includes('uganda') || lc.includes('ethiopia')) {
+    hits.push(
+      '• East-Africa peers (RWF / UGX / ETB) — managed-float regimes with periodic stress; Ethiopia in particular operated dual-rate FX through 2023 with active reform pending. Dollar-shortage and parallel-rate divergence are the recurring structural risks.'
+    );
+  }
+  if (lc.includes('argentina')) {
+    hits.push(
+      '• Argentina — multi-rate FX regime through 2023; 2024 reforms dismantling capital controls but cycle is unstable. Hyperinflation-scale price-level regime change ongoing. Treat as the highest-FX-risk LATAM context.'
+    );
+  }
+  if (lc.includes('turkey')) {
+    hits.push(
+      '• Turkey — TRY policy regime in active flux; 2024 return to orthodox monetary policy after years of unconventional stimulus. Lira cycle is the load-bearing structural bet on every Turkish exposure.'
+    );
+  }
+
+  if (hits.length === 0) {
+    return `\n--- SOVEREIGN-CONTEXT GUIDANCE (EM jurisdictions) ---
+The detected EM jurisdictions (${emergingMarketCountries.join(', ')}) are not in the production sovereign-context taxonomy. Apply general EM principles: (a) flag FX-cycle assumptions on dollar-repatriation, (b) flag sovereign-debt cycle phase, (c) flag governance / regulatory transition risk if the memo crosses a >12-month horizon.
+--- END SOVEREIGN-CONTEXT GUIDANCE ---\n`;
+  }
+
+  return `\n--- SOVEREIGN-CONTEXT GUIDANCE (per-jurisdiction structural cues) ---
+${hits.join('\n')}
+
+When the memo's structural assumptions touch any of the above, prefer flagging the SPECIFIC cycle / regime fact above the generic "EM risk." A Lagos-Nairobi-Cairo deal that papers over three different sovereign regimes is materially less defensible than one that names them.
+--- END SOVEREIGN-CONTEXT GUIDANCE ---\n`;
+}
+
 export function buildStructuralAssumptionsPrompt(memoText: string, context?: {
   industry?: string;
   region?: string;
   marketContext?: 'emerging_market' | 'developed_market' | 'cross_border';
+  /**
+   * Country list from `detectMarketContext().emergingMarketCountries`.
+   * When provided, the prompt injects per-jurisdiction sovereign-context
+   * guidance via `buildSovereignContextBlock()` so the agent
+   * distinguishes Lagos / Nairobi / Cairo / WAEMU / Johannesburg as
+   * structurally different regimes — not one EM bucket.
+   */
+  emergingMarketCountries?: string[];
 }): string {
   const determinantsBlock = buildDalioPromptBlock();
+  const sovereignBlock = context?.emergingMarketCountries
+    ? buildSovereignContextBlock(context.emergingMarketCountries)
+    : '';
   const contextLine = [
     context?.industry ? `industry: ${context.industry}` : null,
     context?.region ? `region: ${context.region}` : null,
     context?.marketContext ? `market context: ${context.marketContext}` : null,
+    context?.emergingMarketCountries && context.emergingMarketCountries.length > 0
+      ? `jurisdictions: ${context.emergingMarketCountries.join(', ')}`
+      : null,
   ]
     .filter(Boolean)
     .join(' · ');
@@ -1250,7 +1350,7 @@ You are applying Ray Dalio's 18-determinant framework (Principles for
 Dealing with the Changing World Order, 2021) to surface macro-structural
 bets the memo is implicitly making.
 
-${contextLine ? `CONTEXT — ${contextLine}\n` : ''}
+${contextLine ? `CONTEXT — ${contextLine}\n` : ''}${sovereignBlock}
 DETERMINANTS (audit prompts in parens):
 ${determinantsBlock}
 

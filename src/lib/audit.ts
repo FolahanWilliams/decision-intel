@@ -66,7 +66,9 @@ export type AuditAction =
   | 'DECISION_PACKAGE_DOCUMENT_ADDED'
   | 'DECISION_PACKAGE_DOCUMENT_REMOVED'
   | 'DECISION_PACKAGE_CROSS_REFERENCE_RUN'
-  | 'DECISION_PACKAGE_OUTCOME_LOGGED';
+  | 'DECISION_PACKAGE_OUTCOME_LOGGED'
+  // Account-scoped bulk export (P1 #27, 2026-04-26)
+  | 'EXPORT_ACCOUNT_BUNDLE';
 
 export interface AuditLogParams {
   action: AuditAction;

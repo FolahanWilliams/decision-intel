@@ -865,6 +865,95 @@ export default function PrivacyPage() {
         </div>
       </section>
 
+      {/* THIRD-PARTY DATA SUBJECTS — GDPR Art 22 path (P1 #29, 2026-04-26).
+          James persona finding: subjects named INSIDE an analyzed document
+          (not the uploader) had no UI mechanism for any right. The /settings
+          surface only serves the authenticated account holder; this section
+          documents the email-based path that covers them. */}
+      <section style={{ padding: '72px 24px 0' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+          <SectionHeader
+            eyebrow="If you're named in someone else's document"
+            title="A path for third-party data subjects"
+            body="If you're identified or referenced inside a strategic memo a Decision Intel customer uploaded — and that document's analysis bears on a decision that significantly affects you — GDPR Article 22 (and equivalent NDPR / PoPIA / UK GDPR provisions) gives you the right to obtain meaningful information about the logic involved, to express your point of view, and to contest the decision."
+          />
+          <div
+            style={{
+              marginTop: 28,
+              background: C.white,
+              border: `1px solid ${C.slate200}`,
+              borderRadius: 16,
+              padding: '24px 28px',
+              fontSize: 14,
+              color: C.slate600,
+              lineHeight: 1.7,
+            }}
+          >
+            <ol
+              style={{
+                margin: 0,
+                paddingLeft: 20,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 14,
+              }}
+            >
+              <li>
+                <strong style={{ color: C.slate900 }}>
+                  Email{' '}
+                  <a
+                    href="mailto:team@decision-intel.com?subject=Art%2022%20request%20%E2%80%94%20third-party%20data%20subject"
+                    style={{ color: C.slate900, fontWeight: 700 }}
+                  >
+                    team@decision-intel.com
+                  </a>
+                </strong>{' '}
+                with the subject line <em>&ldquo;Art 22 request — third-party data subject&rdquo;</em>.
+                Tell us your name and (where you can) the customer organisation whose document
+                identifies you.
+              </li>
+              <li>
+                <strong style={{ color: C.slate900 }}>We acknowledge within 5 working days</strong>{' '}
+                and route the request to the controller (the Decision Intel customer who uploaded
+                the document). The customer is the data controller; Decision Intel is the
+                processor and assists their response.
+              </li>
+              <li>
+                <strong style={{ color: C.slate900 }}>The controller responds within 30 days</strong>{' '}
+                under GDPR Art 12(3). The response includes the meaningful information about the
+                logic — the Decision Provenance Record is engineered to provide exactly this.
+                You may then express your point of view and contest the decision under Art 22(3).
+              </li>
+              <li>
+                <strong style={{ color: C.slate900 }}>If unresolved</strong>, you retain the right
+                to lodge a complaint with the supervisory authority listed above (ICO / CNIL /
+                Irish DPC / NITDA / SA Information Regulator), and the right to an effective
+                judicial remedy under GDPR Art 79.
+              </li>
+            </ol>
+            <div
+              style={{
+                marginTop: 18,
+                padding: '12px 14px',
+                borderRadius: 10,
+                background: C.greenSoft,
+                border: `1px solid ${C.greenBorder}`,
+                fontSize: 12.5,
+                color: C.slate700,
+              }}
+            >
+              <strong style={{ color: C.slate900 }}>Note:</strong> Decision Intel never produces
+              automated decisions about a third-party subject in isolation — every output is a
+              decision-quality audit on a strategic memo authored by a Decision Intel customer.
+              The Art 22 contestation right applies when that customer&rsquo;s decision (informed
+              by the audit) significantly affects you. The DPR provides the &ldquo;meaningful
+              information about the logic&rdquo; the regulator requires; we surface it on
+              request.
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* LAWFUL BASIS — GDPR Art 13(1)(c) mandatory disclosure */}
       <section style={{ padding: '72px 24px 0' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>

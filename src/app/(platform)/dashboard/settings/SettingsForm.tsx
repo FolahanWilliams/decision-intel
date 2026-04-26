@@ -18,6 +18,7 @@ import {
   Unplug,
   Plug,
   PlayCircle,
+  Download,
 } from 'lucide-react';
 import { updateUserSettings, UserSettingsData } from '@/app/actions/settings';
 import { useTheme } from 'next-themes';
@@ -391,6 +392,56 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                   )}
                   {replayingTour ? 'Starting…' : 'Replay tour'}
                 </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Bulk data export — backs Terms §10A + DPA §5 (P1 #27, 2026-04-26).
+              GDPR Art. 20 portability is technically per-record, but a single
+              account-scoped JSON bundle is the procurement-grade answer. */}
+          <div
+            className="card mb-lg animate-fade-in"
+            style={{ animationDelay: '0.18s' }}
+          >
+            <div className="card-header">
+              <h3 className="flex items-center gap-sm">
+                <Download size={18} />
+                Export your data
+              </h3>
+            </div>
+            <div className="card-body">
+              <div className="flex items-center justify-between" style={{ gap: 16, flexWrap: 'wrap' }}>
+                <div style={{ flex: 1, minWidth: 240 }}>
+                  <div style={{ fontWeight: 500, marginBottom: '4px' }}>
+                    Account-scoped JSON bundle
+                  </div>
+                  <div className="text-xs text-muted" style={{ lineHeight: 1.55 }}>
+                    Every analysis, outcome, Decision Provenance Record header, and decision-room
+                    blind prior you&rsquo;ve authored, in one machine-readable bundle. Backs the
+                    contractual data-portability commitment in Terms §10A + DPA §5. Document
+                    bytes are excluded — fetch each per-document export from{' '}
+                    <code
+                      style={{
+                        background: 'var(--bg-tertiary)',
+                        padding: '1px 6px',
+                        borderRadius: 4,
+                        fontSize: 11,
+                      }}
+                    >
+                      /documents/[id]
+                    </code>
+                    . Rate-limited to 1 export / hour.
+                  </div>
+                </div>
+                <a
+                  href="/api/export/account?format=json"
+                  download
+                  className="btn btn-primary flex items-center gap-sm"
+                  style={{ flexShrink: 0, textDecoration: 'none' }}
+                >
+                  <Download size={14} />
+                  Download JSON bundle
+                </a>
               </div>
             </div>
           </div>

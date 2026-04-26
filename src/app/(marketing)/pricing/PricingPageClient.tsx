@@ -11,6 +11,7 @@ import {
   DPR_PROVENANCE_CARD_LABEL,
   DPR_PROVENANCE_CARD_SUB,
 } from '@/lib/constants/trust-copy';
+import { DESIGN_PARTNER_SEATS_TOTAL } from '@/lib/constants/company-info';
 
 type BillingCycle = 'monthly' | 'annual';
 
@@ -868,7 +869,7 @@ export function PricingPageClient() {
                 marginBottom: 4,
               }}
             >
-              Design Partner Program &middot; 5 seats
+              Design Partner Program &middot; {DESIGN_PARTNER_SEATS_TOTAL} seats
             </div>
             <div style={{ fontSize: 14, fontWeight: 700, color: C.slate900, lineHeight: 1.4 }}>
               $1,999/mo locked for 12 months. 20% off Strategy list.

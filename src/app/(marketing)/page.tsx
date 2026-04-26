@@ -19,6 +19,7 @@ import { MomentsPyramid } from '@/components/marketing/MomentsPyramid';
 import { SecurityLifecycleStrip } from '@/components/marketing/SecurityLifecycleStrip';
 import { ScrollRevealGraph } from '@/components/marketing/ScrollRevealGraph';
 import { ArrowRight, Check, ShieldCheck, Scale, GraduationCap, Globe2 } from 'lucide-react';
+import { DESIGN_PARTNER_SEATS_AVAILABLE } from '@/lib/constants/company-info';
 
 /* ─── Color Tokens ──────────────────────────────────────────────────────── */
 
@@ -967,7 +968,11 @@ export default function LandingPage() {
                 flexWrap: 'wrap',
               }}
             >
-              {['Full 60-second audit', 'No signup · no card', '4 design-partner seats open'].map(
+              {[
+                'Full 60-second audit',
+                'No signup · no card',
+                `${DESIGN_PARTNER_SEATS_AVAILABLE} design-partner seats open`,
+              ].map(
                 t => (
                   <span
                     key={t}

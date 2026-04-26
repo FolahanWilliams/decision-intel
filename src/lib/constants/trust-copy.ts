@@ -32,7 +32,7 @@
  * the Type I report is issued.
  */
 export const SOC2_FAQ_ANSWER =
-  'Decision Intel runs on SOC 2 Type II infrastructure (Vercel + Supabase). Our own product-level SOC 2 Type I audit is targeted for Q4 2026, with the Type II observation window opening immediately after. Documents are encrypted with AES-256-GCM at rest and TLS 1.2+ in transit. A GDPR anonymization layer strips PII before any AI processing. Full posture at /security.';
+  'Decision Intel runs on SOC 2 Type II infrastructure (Vercel + Supabase). Our own product-level SOC 2 Type I audit is targeted for Q4 2026, with the Type II observation window opening immediately after. Documents are encrypted with AES-256-GCM at rest and TLS 1.2+ in transit. A GDPR + NDPR anonymization layer strips PII before any AI processing. Pan-African customers: NDPR Art. 12 (Nigeria), PoPIA §71 (South Africa), CMA Kenya, WAEMU, CBK and 6 other African frameworks are mapped flag-by-flag at /security alongside GDPR + EU AI Act + Basel III. Full posture at /security.';
 
 /**
  * Compact JSON-LD FAQ answer for "How is sensitive data protected?".

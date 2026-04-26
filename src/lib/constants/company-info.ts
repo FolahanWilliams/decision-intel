@@ -80,3 +80,19 @@ export const PRIVACY_CONTACT_EMAIL = 'team@decision-intel.com';
  */
 export const FOUNDER_NARRATIVE_SHORT =
   'Born in the United States, raised between Lagos and the United Kingdom, currently UK-resident. Building Decision Intel from the European market with Pan-African market literacy as a substrate, not a footnote.';
+
+/**
+ * Design-Partner Program seat counts (locked 2026-04-26 P1 #31 —
+ * Elena persona caught the 4-vs-5 drift). The program offers
+ * `DESIGN_PARTNER_SEATS_TOTAL` total seats (year-1 capped); when one
+ * fills, decrement `DESIGN_PARTNER_SEATS_AVAILABLE` here and every
+ * surface picks up the change. Surfaces consuming these constants:
+ *   - src/app/(marketing)/page.tsx (final CTA strip)
+ *   - src/app/(marketing)/pricing/PricingPageClient.tsx (design-partner block)
+ *   - src/app/(marketing)/design-partner/DesignPartnerClient.tsx (header chip)
+ *   - src/app/(marketing)/design-partner/page.tsx (metadata)
+ *   - src/components/marketing/MarketingNav.tsx (mega-menu featured)
+ *   - src/components/marketing/BookDemoCTA.tsx (rotating chip)
+ */
+export const DESIGN_PARTNER_SEATS_TOTAL = 5;
+export const DESIGN_PARTNER_SEATS_AVAILABLE = 4;

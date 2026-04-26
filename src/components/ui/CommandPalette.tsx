@@ -933,9 +933,11 @@ export function CommandPalette() {
                       <span
                         style={{
                           fontSize: '11px',
-                          color: 'var(--success)',
+                          color: 'var(--text-muted)',
                           fontWeight: 600,
                           flexShrink: 0,
+                          fontFamily:
+                            'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
                         }}
                       >
                         {cmd.rightHint}

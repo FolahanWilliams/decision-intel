@@ -401,18 +401,37 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
           </div>
         )}
 
-        {!selectedRole && (
-          <div
-            style={{
-              fontSize: 11,
-              color: 'var(--text-muted)',
-              marginTop: 6,
-              textAlign: 'center',
-            }}
+        {/* Art 13 privacy notice — always visible before any upload-triggering
+            CTA. Mandatory disclosure under GDPR Art 13 (and equivalent NDPR /
+            PoPIA / UK GDPR provisions): the data subject must be informed at
+            the time personal data is collected, which for this product is the
+            moment they upload a document. The notice replaces the prior
+            "Pick a role above" hint (Adaeze persona caught it as
+            condescending). */}
+        <div
+          style={{
+            marginTop: 10,
+            padding: '10px 12px',
+            borderRadius: 8,
+            background: 'var(--bg-secondary, rgba(0,0,0,0.02))',
+            border: '1px solid var(--border-color)',
+            fontSize: 11.5,
+            color: 'var(--text-secondary)',
+            lineHeight: 1.5,
+          }}
+        >
+          <strong style={{ color: 'var(--text-primary)' }}>Before you upload:</strong>{' '}
+          documents are encrypted with AES-256-GCM at rest, transit-encrypted with TLS 1.2+,
+          and a GDPR / NDPR anonymizer strips PII as the literal first step of the analysis
+          pipeline — no LLM ever sees raw personal data.{' '}
+          <a
+            href="/privacy"
+            style={{ color: 'var(--accent-primary)', fontWeight: 600 }}
           >
-            Pick a role above to see the next step.
-          </div>
-        )}
+            See /privacy
+          </a>{' '}
+          for the full Art 13 disclosure (lawful basis, retention, your rights).
+        </div>
       </DialogContent>
     </Dialog>
   );
