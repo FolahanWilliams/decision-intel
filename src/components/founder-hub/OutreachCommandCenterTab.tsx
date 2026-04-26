@@ -28,6 +28,7 @@ import { DealCloserDocs } from './outreach-cmd/DealCloserDocs';
 import { LinkedInOutreachGenerator } from './outreach-cmd/LinkedInOutreachGenerator';
 import { MeetingPrepCard } from './outreach-cmd/MeetingPrepCard';
 import { FRAMEWORK_AUDIT_TOP_FIXES } from '@/lib/data/outreach';
+import { IcpEventsCalendar } from './outreach-cmd/IcpEventsCalendar';
 
 interface SectionProps {
   icon: React.ReactNode;
@@ -135,6 +136,15 @@ export function OutreachCommandCenterTab({ founderPass }: Props) {
           as reading material.
         </p>
       </div>
+
+      <Section
+        icon={<Calendar size={16} />}
+        title="ICP Events · London Q2–Q3 2026"
+        subtitle="8 events ranked by buyer density, not size. Core ICP events in green — these are the rooms where your buyers congregate. Date-verify before registering."
+        accent="#D97706"
+      >
+        <IcpEventsCalendar />
+      </Section>
 
       <Section
         icon={<Calendar size={16} />}

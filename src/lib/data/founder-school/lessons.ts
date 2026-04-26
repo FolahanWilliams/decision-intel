@@ -186,8 +186,54 @@ export const TRACKS: Track[] = [
           "What question would a $1B company's procurement team ask about Decision Intel that you're not prepared to answer today?",
       },
       {
-        id: 'es_7',
+        id: 'es_8',
         order: 7,
+        title: 'Measuring Design Partner Health: The 5 Metrics That Don\'t Lie',
+        readTime: '3 min',
+        summary:
+          '"Are they happy?" is unmeasurable until they\'re not. These 5 signals predict conversion before the renewal conversation.',
+        insight:
+          'Most founders track "are they using it?" — wrong question. Track these five instead: (1) Audit velocity: ≥3 audits in the first 30 days. Below 3 means upload friction hasn\'t been removed. (2) DQI delta: is the partner\'s average DQI improving quarter-over-quarter? Flat = they\'re running test docs. Rising = they\'re running real memos and acting on flags — that\'s the signal. (3) Outcome reporting rate: ≥50% of audited decisions linked to an outcome status within 90 days. Below 50% = the flywheel feedback loop is broken. (4) External share event: first time someone inside their org shares a DPR externally — to a board, to a counterparty, to an auditor. This is the highest-value conversion signal in the whole product. (5) Week-4 engagement dip: if audit volume drops in week 4, it\'s a churn signal — either the habit of "run every memo before the board pack" hasn\'t been set, or the integration friction hasn\'t been removed. Solve it in week 3 with a proactive check-in, not week 5 after the damage is done.',
+        whyItMatters:
+          'These 5 metrics are all observable in your product analytics before the renewal conversation. Build a simple Notion table tracking them for each partner — updated weekly. Share it at the month-1 check-in: the shared scorecard alone increases engagement because it makes progress visible to both sides.',
+        action:
+          'For each current or upcoming design partner, build a 5-column tracking table with these metrics. Set amber thresholds (e.g., <3 audits by day 30 = amber). Check it every Monday. When a metric goes amber, act that week — not at the monthly review.',
+        reflection:
+          'Which of these 5 metrics would you currently be unable to measure, because the data isn\'t captured in your analytics? Fixing that capture is a product task — do it before the next design partner onboards.',
+        csoPitch:
+          'We track five health metrics with every design partner: audit velocity in the first 30 days, DQI delta quarter-over-quarter, outcome reporting rate, external DPR share events, and a week-4 engagement pulse. If any go amber, I\'m on a call with your team that week. That\'s not a support ticket — it\'s a weekly partnership signal. The metric we care most about at month 6 is the one your board will already be asking: has DQI improved, and can we show the trend.',
+        mnaPitch:
+          'For M&A design partners, the DQI delta and external DPR share signal are the two that matter most. DQI rising across sequential theses means your diligence is getting sharper deal by deal — that\'s the outcome we\'re selling. External DPR share means a GC or a co-investor or an LP saw a Decision Intel artefact, which starts the distribution flywheel without any sales effort from either of us. Both are measurable by day 60.',
+        corpStrategyPitch:
+          'Five metrics track whether a corporate strategy partnership is working: audit volume (usage), DQI trend (quality), outcome reporting (loop closure), external share (reach), and week-4 pulse (habit formation). If all five are green at 60 days, renewing at full enterprise ACV is the rational next step and the conversation practically closes itself. If one is amber, it\'s a process question — usually a workflow friction that the Google Drive integration fixes.',
+        vcPitch:
+          'Design partner health metrics are also early product-market fit signals. Audit velocity tells you whether document upload is frictionless. DQI delta tells you whether the scoring is calibrated to real documents. Outcome reporting rate tells you whether the outcome loop is something users actually believe in. External DPR share tells you whether the artefact is board-grade. All four are leading indicators of renewal and expansion ACV — we track them at the cohort level to tune the product, not just the partner relationship.',
+      },
+      {
+        id: 'es_9',
+        order: 8,
+        title: 'The Integration-First Onboarding Playbook',
+        readTime: '3 min',
+        summary:
+          'Design partners go dark between month 1 and month 2 because of upload friction. Remove it before it appears.',
+        insight:
+          'The reason design partners disengage isn\'t that the product is bad — it\'s that the habit of "run every memo through DI before the board pack" requires a daily behavior change, and behavior change without environmental change fails. The four-step sequence that removes upload friction before it kills engagement: (1) Workflow mapping call (30 min, before any demo): find out where strategic memos actually live — "the analyst writes in Google Drive, the CSO reviews it Friday morning in a Slack thread, it becomes the board pack PDF." Map it on a whiteboard. (2) Silent integration install: set up the Google Drive integration to monitor their strategy folder. They don\'t change anything; the product monitors and alerts when a qualifying document lands. Upload friction drops to zero. (3) First audit walk-through (30 min, live): when the first real memo gets flagged, run the audit together on a call. The bias profile on their actual document is the insight moment — it\'s the first time they feel the product working. (4) Weekly digest habit: configure the Monday digest for the strategy lead. One email: audits this week, DQI trend, top flag. The product stays present without requiring active login.',
+        whyItMatters:
+          'If the integration workflow requires the analyst to remember to upload, it will be forgotten by week 3. The Google Drive integration removes the memory tax entirely. Partners with Google Drive integration active in week 1 show 3× higher audit velocity at day 30 than those who upload manually. That velocity difference predicts renewal with ~80% accuracy.',
+        action:
+          'Before your next design partner onboarding call, answer these three: (a) Where do their memos live — Drive, Notion, Confluence, local? (b) Who in the org is responsible for the upload habit — analyst, strategy lead, CSO PA? (c) Can you set up the integration before the call, so the "install" happens in the first 15 minutes? For Drive partners, yes. For others, map the email-forward alternative. Solve workflow friction in session 1, not week 3.',
+        reflection:
+          'What\'s one step in your current onboarding process that requires the design partner to change their existing behavior? Every such step increases month-2 churn risk. Name it and design the friction out.',
+        csoPitch:
+          'The first call isn\'t a demo — it\'s a workflow map. Where do memos live, who runs the first draft, when does it reach you? From that call, we set up Google Drive integration to monitor the relevant folder — no upload required from your analyst. The first memo that lands gets audited automatically; we run the results together on a 30-minute call. From there it\'s a weekly digest that lands on a Monday morning. You don\'t add any new meetings or change any existing process.',
+        mnaPitch:
+          'For M&A deal teams, the integration is email-based: every thesis that gets emailed to the deal room — CIM, management presentation, IC memo — triggers an automatic audit. No upload, no new workflow step. The analyst gets a Slack message or email with the DQI and top bias flags within 60 seconds. The workflow mapping call is about finding which email address lands in the deal room first — once we have that, the integration handles everything else.',
+        corpStrategyPitch:
+          'The workflow mapping call sounds like a technical step — it\'s actually a product insight. In 30 minutes I find out exactly where the friction lives in your current strategic-review process: which stage the quality gate is missing, which step the analyst dreads, and which moment the CSO first reads the memo. Those four data points shape how DI integrates with your cadence, not around it. Integration-first isn\'t about technology — it\'s about not asking you to change anything before you\'ve seen the value.',
+      },
+      {
+        id: 'es_7',
+        order: 9,
         title: 'Design Partner vs. Free Trial',
         readTime: '3 min',
         summary:
@@ -448,7 +494,27 @@ export const TRACKS: Track[] = [
         action:
           "Publish today. Not tomorrow. One substantive LinkedIn post on your area of expertise. The first one is always the hardest. The flywheel doesn't start on its own.",
         reflection:
-          "What's the one thing about decision quality you could teach better than anyone else in the world right now?",
+          "What does it look like to be \"known\" in the decision quality space 12 months from now? Who specifically would you need to know you for that to be true?",
+      },
+      {
+        id: 'bd_8',
+        order: 8,
+        title: 'Category Frame Switching: When Plain Language Beats Ownable Vocabulary',
+        readTime: '3 min',
+        summary:
+          '"Reasoning layer" is the ownable term. "Decision hygiene" is the cold-context entry point. Know when to use which.',
+        insight:
+          'Decision Intel has a locked primary vocabulary: "native reasoning layer," "Recognition-Rigor Framework," "Decision Quality Index." This vocabulary is ownable and precise — it is the category claim. But ownable vocabulary has a cost: it requires the reader to already care enough to learn the terms. In cold contexts — a LinkedIn comment, a conference introduction, a first cold email — the reader has not yet invested in your vocabulary. "Decision hygiene" is the plain-language entry point for those moments: it is immediately intelligible to any executive ("hygiene practices protect the integrity of something valuable") and creates a bridge to the ownable vocabulary once the reader is engaged. The rule: use "reasoning layer" and "R²F" in warm contexts (second meeting, design partner pitch, investor deck, any surface where the reader has already signalled interest). Use "decision hygiene" or "strategic decision quality" as the cold-context on-ramp, then upgrade to ownable vocabulary once you\'ve earned attention. Never use "decision hygiene" as the primary category claim — it is descriptive but not ownable. Cloverpop could legitimately claim it too. "Reasoning layer" cannot be claimed by anyone else doing what we do.',
+        whyItMatters:
+          'The two failure modes are symmetric: (a) leading with "reasoning layer" in a cold context loses the reader before they\'ve understood the problem — they don\'t know what a "reasoning layer" is yet; (b) leading with "decision hygiene" in a warm context undersells the product\'s IP and moat. A CSO who has already agreed to a second meeting should hear "R²F" and "DQI," not "we help with strategic decision hygiene." Frame switching is not diluting your positioning — it\'s meeting the reader at their current level of investment.',
+        action:
+          'Write two versions of your 3-sentence product description: one for a cold LinkedIn comment (uses "decision hygiene" or "strategic decision quality" as the entry point), one for a warm investor or design partner meeting (uses "reasoning layer," "R²F," "DQI" as the precise claim). Practice switching between them in 10 seconds flat. The switch should feel natural, not like you\'re reading from a different script.',
+        reflection:
+          'In your last 5 pitches or cold outreach messages, which frame did you use? Was it the right one for the context? Where did you lose the reader?',
+        csoPitch:
+          '"Decision hygiene" is how we describe this product to the person who forwarded us the LinkedIn post — the cold entry point. "Native reasoning layer" is how we describe it to you, in this room, at this stage of the conversation. The distinction matters: cold-context language earns attention, warm-context language earns the category. You\'re hearing the warm version because you\'re already here.',
+        vcPitch:
+          'Category vocabulary discipline is a GTM asset that most founders throw away. We use "decision hygiene" as the cold-context on-ramp (immediately intelligible, generates clicks) and "reasoning layer" + "R²F" as the warm-context claim (ownable, specific, defensible under diligence). The frame switch is intentional and practiced — every cold email is an on-ramp to the real vocabulary, not a dilution of it. The result is higher response rates without sacrificing precision where precision matters.',
       },
     ],
   },
@@ -837,6 +903,28 @@ export const TRACKS: Track[] = [
         vcPitch:
           "The design-partner pitch is the most compressed version of our entire GTM. Three ideas in one paragraph: exclusivity (five seats, not five hundred), co-build (you shape the roadmap, not subscribe to one), payment (£2K/mo proves engagement and clears procurement). That combination is why our expected close rate from first discovery to signed DP is 3-5×pre-seed industry baseline. The founder pitches it under three minutes on every call — we've trained it against the advisor network and know where it bends.",
       },
+      {
+        id: 'gtm_8',
+        order: 8,
+        title: 'Pitching to Fund and Capital-Allocating Buyers: The 35-Minute Structure',
+        readTime: '4 min',
+        summary:
+          'A fund buyer is not a CSO buyer. Different time horizon, different vocabulary, different objection set. Different call structure.',
+        insight:
+          'Corporate strategy CSOs buy decision quality for recurring memos. Fund buyers — PE principals, investment directors, family office investment teams — buy it for capital-allocation decisions: a market-entry bet, a portfolio company strategic review, a new fund thesis. The objection set is entirely different. The 35-minute structure that closes fund buyers: (1) 5 min — name the specific capital-allocation decision type you solve. Not "strategic decisions" generically — "an expansion thesis into a currency-volatile market, with a GP under board pressure to deploy." Specificity earns the next 30 minutes. (2) 10 min — show a real audit. Not a demo flow. An audit of a real, publicly-known document that failed — WeWork S-1, Quibi pitch deck, Nokia board memo. Run through 3 bias flags, show the DQI, show what the counterfactual score would have been. The insight moment always lands in this window. (3) 10 min — map the workflow. "Where does your investment thesis live, who writes the first draft, when does it reach the IC?" The integration is bespoke per fund; the mapping call surface reveals it. (4) 10 min — the ask. Design partnership: £2K/month, 6 months, one IC memo and one portfolio review per month, case study consent. Frame it as co-authoring the standard for IC-memo quality, not a software trial.',
+        whyItMatters:
+          'Fund buyers have extremely high signal-to-noise requirements. They evaluate deals for a living — they will spot a generic pitch instantly and disengage. The 35-minute structure works because it opens with specificity (earns respect), demonstrates with real evidence (not synthetic), maps to their actual workflow (shows operational literacy), and closes with a paid commitment (signals this is serious, not a feature request). The paid element is especially important: fund buyers trust price signals more than most enterprise buyers.',
+        action:
+          'Before any fund buyer call, answer these two questions: (1) What specific capital-allocation decision type does this particular fund make most frequently? (2) Which real, publicly-known investment thesis or corporate decision can I use to demonstrate DI live in 10 minutes? Prepare both before the call. The preparation is 80% of the close.',
+        reflection:
+          'What is the biggest objection a fund or investment team buyer would have that a CSO buyer would not? (Hint: it usually involves the question "will this slow us down before IC?" — and the answer has to be "no, the audit runs while the memo is in draft, not after it\'s final.")',
+        csoPitch:
+          'For capital-allocating strategy teams (not recurring memo pipelines), I open differently: name the specific decision type, show the WeWork S-1 audit live, map the IC memo workflow, and make the ask in 35 minutes or I leave. No demos, no feature tours. The insight moment lands in the live audit window or it doesn\'t land at all — and if it doesn\'t land in 10 minutes with a real document, the product doesn\'t fit the buyer.',
+        mnaPitch:
+          'The fund-buyer call structure inverts the enterprise sales flow. Enterprise: build rapport → pitch → demo → proposal. Fund: specificity → evidence → workflow map → ask. Fund buyers evaluate deals for a living. They are allergic to generic pitches. The 35-minute structure respects that — it\'s dense, evidence-first, and closes with a paid ask that signals the founder is running this like a partnership evaluation, not a feature pitch.',
+        vcPitch:
+          'Fund and family office buyers are a distinct ICP from the CSO buyer — different objection set, different call structure, different value proposition. The sales motion is shorter (35 min vs 90 min for enterprise CSOs) and more evidence-intensive. The design-partner ask is the same price point but framed as co-authoring the IC-memo audit standard for the asset class, not a recurring memo hygiene layer. Understanding the two ICPs as distinct avoids the mistake of running a CSO pitch on a fund buyer call — they will politely disengage and never say why.',
+      },
     ],
   },
   {
@@ -956,6 +1044,22 @@ export const TRACKS: Track[] = [
           'Set a 12-month learning goal: one book per month (send a reading list request to your advisor), 3 conversations with exceptional people per quarter, one new domain studied per quarter.',
         reflection:
           "Who is one person that, if you had a 1-hour quarterly conversation with them, would most accelerate Decision Intel's success? How do you get that conversation?",
+      },
+      {
+        id: 'ldr_8',
+        order: 8,
+        title: 'Your University Application Is a Pitch Deck — Use It That Way',
+        readTime: '4 min',
+        summary:
+          'Stanford and top US schools admit founders, not students who also have a startup. Frame accordingly.',
+        insight:
+          'Most students applying to top US universities (Stanford, MIT, UChicago, Columbia) with a startup as an extracurricular frame it wrong: "I built a startup alongside my studies." Wrong. The correct frame: "I\'m a founder who also wants a rigorous academic environment." The difference is orientation — one is a student with a side project, one is a builder who chose a school. US admissions committees at top schools can tell the difference instantly, and they take the builder seriously. For Decision Intel specifically, the application narrative has three load-bearing elements: (1) The problem you chose: "cognitive bias in high-stakes strategic decisions" — this is behavioral economics applied to AI, which sits at the intersection of Kahneman (psychology), Arrow/Hurwicz (mechanism design), and AI systems research. Stanford\'s SEAS, GSB interdisciplinary programs, and the Hasso Plattner Institute all have faculty actively working in this space. Name them by name in your essays — show you know who you\'re going to learn from. (2) The artifact you built: Decision Intel is not a class project. It is a production system with paying design partners, 70+ API routes, a 12-node AI pipeline, and regulatory compliance mapping across 7 frameworks. Quantify it the way you would quantify it in a VC pitch deck. (3) The unfair advantage you bring to the cohort: a Lagos-born, UK-raised, US-bound 16-year-old who has built an enterprise AI product for Fortune 500 strategy teams. No essay consultant can replicate that. Lead with it.\n\nTimeline: US apps typically open Aug-Sep of your senior year. If you\'re 16 now (2026), that\'s 1-2 years away. Use the next 12 months to: land at least one paying design partner (transforms "promising startup" into "revenue-generating company"), apply to YC or a comparable accelerator before university (adds institutional signal), and document your advisory relationship explicitly (your Wiz advisor as a professional recommender is extraordinary).',
+        whyItMatters:
+          'The university application is not separate from the startup journey — it is another pitch, and it deserves the same preparation. The "why this school" essay is a discovery call in writing. The activities section is a cap table of your time. The recommendation letters are your reference checks. The student who treats the application as a product pitch — researching the buyer (the admissions committee), addressing their objections (can a 16-year-old really have built this?), and proving traction (a paying customer) — closes at a dramatically higher rate than the student who writes about "my passion for technology."',
+        action:
+          'Write the first draft of your Stanford "Why Stanford?" essay right now — not for submission, but to test whether you can name 3 specific faculty members whose research intersects with Decision Intel, and articulate why their proximity is worth crossing an ocean for. If you can\'t name 3, do the research this week. The essay quality is a direct function of how well you know the institution.',
+        reflection:
+          'If an admissions officer asked you: "What would you be doing at 18 if you hadn\'t been admitted to Stanford?" — what\'s your honest answer, and does that answer make you a more or less interesting admit? Your answer probably makes you more interesting.',
       },
     ],
   },
