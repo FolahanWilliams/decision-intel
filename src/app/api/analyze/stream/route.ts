@@ -183,6 +183,11 @@ export async function POST(request: NextRequest) {
           code: 'OUTCOME_GATE_BLOCKED',
           pendingCount: outcomeGate.pendingCount,
           pendingAnalysisIds: outcomeGate.pendingAnalysisIds,
+          // D11 Phase 3 deep (2026-04-27): the rich pending-analysis array
+          // lets the OutcomeGateModal render real filenames + decisionStatement
+          // subtitles + /documents/[documentId] deep-links instead of
+          // "Analysis #N" placeholders.
+          pendingAnalyses: outcomeGate.pendingAnalyses,
           level: outcomeGate.level,
         },
         { status: 409 }

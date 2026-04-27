@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Search, Filter, BookOpen, Brain } from 'lucide-react';
 import { BIAS_CATEGORIES, type BiasCategory } from '@/types';
 import { BiasEducationCard } from '@/components/ui/BiasEducationCard';
@@ -85,6 +85,28 @@ export function BiasLibraryContent() {
       }, 1500);
     }
   };
+
+  // Honor URL fragment deep-links (e.g. #bias-card-confirmation_bias from
+  // the Decision DNA preview card on /dashboard). The lazy() chunk for this
+  // component lands AFTER the browser's native hash-scroll fires, so we
+  // re-trigger the scroll + flash-highlight ourselves once the cards are
+  // mounted. Runs once on mount; no dependency on state changes.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const hash = window.location.hash;
+    if (!hash || !hash.startsWith('#bias-card-')) return;
+    // Slight delay so the DOM has the cards rendered before we measure.
+    const timer = setTimeout(() => {
+      const el = document.getElementById(hash.slice(1));
+      if (!el) return;
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.style.boxShadow = '0 0 0 2px var(--text-highlight)';
+      setTimeout(() => {
+        el.style.boxShadow = '';
+      }, 1500);
+    }, 250);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <div

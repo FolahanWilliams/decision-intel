@@ -38,9 +38,26 @@ interface StreamResult {
   [key: string]: unknown;
 }
 
+/**
+ * Rich pending-analysis metadata surfaced in the OutcomeGateModal so users
+ * see real filenames + decisionStatement subtitles + /documents/[id] deep-
+ * links instead of "Analysis #1" placeholders. Returned from /api/analyze/stream
+ * 409 responses (D11 Phase 3 deep, 2026-04-27).
+ */
+export interface PendingAnalysisRef {
+  id: string;
+  documentId: string;
+  filename: string;
+  decisionStatement: string | null;
+  createdAt: string;
+}
+
 export interface OutcomeGateInfo {
   pendingCount: number;
   pendingAnalysisIds: string[];
+  /** Rich per-analysis metadata. Optional for legacy callers; modal
+   *  falls back to "Analysis #N" placeholders when absent. */
+  pendingAnalyses?: PendingAnalysisRef[];
   message: string;
   /**
    * `'hard'` when the gate actually BLOCKED the upload (HTTP 409
@@ -206,6 +223,9 @@ export function useAnalysisStream(options: StreamOptions) {
             setOutcomeGate({
               pendingCount: errorData.pendingCount || 0,
               pendingAnalysisIds: errorData.pendingAnalysisIds || [],
+              pendingAnalyses: Array.isArray(errorData.pendingAnalyses)
+                ? (errorData.pendingAnalyses as PendingAnalysisRef[])
+                : undefined,
               message:
                 errorData.error ||
                 'Outcome Gate blocked — log outcomes on past analyses before running a new audit.',

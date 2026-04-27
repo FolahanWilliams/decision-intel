@@ -43,6 +43,21 @@ export const OUTCOME_GATE = {
   MIN_AGE_DAYS: 30,
 } as const;
 
+export interface PendingAnalysisRef {
+  /** Analysis row ID. */
+  id: string;
+  /** Owning document ID. Used by clients to deep-link to /documents/[id]. */
+  documentId: string;
+  /** Document filename — surfaced in the OutcomeGateModal so users see
+   *  "WeWork S-1 audit" instead of "Analysis #1". */
+  filename: string;
+  /** DecisionFrame.decisionStatement when present. Provides the "what was
+   *  the call?" subtitle for each pending analysis row. */
+  decisionStatement: string | null;
+  /** ISO timestamp the analysis was created. Useful for sorting + age display. */
+  createdAt: string;
+}
+
 export interface OutcomeGateResult {
   /** Whether the user is allowed to proceed */
   allowed: boolean;
@@ -54,6 +69,12 @@ export interface OutcomeGateResult {
   message: string | null;
   /** Analysis IDs that need outcomes (for linking in the UI) */
   pendingAnalysisIds: string[];
+  /** Rich pending-analysis metadata: filename + decisionStatement + documentId.
+   *  Added 2026-04-27 (D11 Phase 3 deep) so the modal can show real titles
+   *  + deep-link to /documents/[documentId]. Always populated when the SQL
+   *  succeeds; falls back to empty array on schema drift / error so callers
+   *  keep working off pendingAnalysisIds. */
+  pendingAnalyses: PendingAnalysisRef[];
 }
 
 /**
@@ -79,16 +100,30 @@ export async function checkOutcomeGate(
     level: 'none',
     message: null,
     pendingAnalysisIds: [],
+    pendingAnalyses: [],
   };
 
   try {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - OUTCOME_GATE.MIN_AGE_DAYS);
 
-    const pendingAnalyses = await prisma.$queryRaw<Array<{ id: string; createdAt: Date }>>`
-      SELECT a.id, a."createdAt"
+    const pendingAnalysesRaw = await prisma.$queryRaw<
+      Array<{
+        id: string;
+        documentId: string;
+        filename: string;
+        decisionStatement: string | null;
+        createdAt: Date;
+      }>
+    >`
+      SELECT a.id,
+             a."documentId",
+             d.filename,
+             df."decisionStatement",
+             a."createdAt"
       FROM "Analysis" a
       JOIN "Document" d ON d.id = a."documentId"
+      LEFT JOIN "DecisionFrame" df ON df."documentId" = d.id
       LEFT JOIN "DecisionOutcome" do2 ON do2."analysisId" = a.id
       WHERE d."userId" = ${userId}
         AND a."createdAt" < ${cutoffDate}
@@ -98,8 +133,15 @@ export async function checkOutcomeGate(
       LIMIT 20
     `;
 
-    const pendingCount = pendingAnalyses.length;
-    const pendingAnalysisIds = pendingAnalyses.map((a: { id: string; createdAt: Date }) => a.id);
+    const pendingCount = pendingAnalysesRaw.length;
+    const pendingAnalysisIds = pendingAnalysesRaw.map(a => a.id);
+    const pendingAnalyses: PendingAnalysisRef[] = pendingAnalysesRaw.map(a => ({
+      id: a.id,
+      documentId: a.documentId,
+      filename: a.filename,
+      decisionStatement: a.decisionStatement,
+      createdAt: a.createdAt.toISOString(),
+    }));
 
     if (pendingCount >= OUTCOME_GATE.HARD_THRESHOLD) {
       // Enforced HARD: block. Legacy soft HARD: still allow with reminder.
@@ -112,6 +154,7 @@ export async function checkOutcomeGate(
           ? `Outcome Gate blocked: log outcomes on ${pendingCount} pending analyses (older than ${OUTCOME_GATE.MIN_AGE_DAYS} days) before running a new audit. The flywheel only compounds when the loop closes.`
           : `You have ${pendingCount} analyses awaiting outcome reports. Reporting outcomes improves your calibration accuracy and unlocks personalized bias detection. We recommend catching up soon.`,
         pendingAnalysisIds,
+        pendingAnalyses,
       };
     }
 
@@ -122,10 +165,11 @@ export async function checkOutcomeGate(
         level: 'soft',
         message: `You have ${pendingCount} analyses awaiting outcome reports. Reporting outcomes improves your calibration accuracy and unlocks personalized bias detection.`,
         pendingAnalysisIds,
+        pendingAnalyses,
       };
     }
 
-    return { ...permissive, pendingCount, pendingAnalysisIds };
+    return { ...permissive, pendingCount, pendingAnalysisIds, pendingAnalyses };
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     const code = (error as { code?: string }).code;

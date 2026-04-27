@@ -1,27 +1,37 @@
 'use client';
 
 import Link from 'next/link';
-import { Brain, ArrowRight } from 'lucide-react';
+import { Brain, ArrowRight, ArrowUpRight } from 'lucide-react';
 import { useDecisionDNA } from '@/hooks/useDecisionDNA';
+import { SparklineChart } from '@/components/ui/SparklineChart';
 
 // Personal-calibration moat preview for the main dashboard. Three stats sourced
 // from /api/decision-dna: top-triggered bias (computed from biasTimeline by
 // summing count per biasType), belief-delta % and follow-analysis success rate
-// (both from DecisionStyleProfile, which requires sampleSize ≥ a few outcomes).
+// (both from DecisionStyleProfile, which requires sampleSize ≥ 3 outcomes).
 //
-// Three states: loading skeleton, discovery state when the user has no data
-// yet, and the populated 3-stat row. Discovery state names the moat without
-// promising specific numbers — the goal is "run more audits to unlock yours,"
-// not "this product is broken."
+// Three states: loading skeleton, discovery state when the user has no data,
+// and the populated 3-stat row. Discovery state's CTA routes to upload (the
+// real next action), not to /dashboard/decision-dna (a sibling empty state).
+//
+// Per category-grade depth audit (2026-04-27): the most-triggered bias name
+// is a deep-link to /dashboard/analytics?view=library#bias-card-{biasType}
+// — the bias library cards already render id="bias-card-{key}" so the
+// browser handles the auto-scroll. A small sparkline next to the count
+// shows the last 6 months of that bias's frequency (the data is in
+// dna.biasTimeline). Sample-size provenance ("X audits · Y outcomes")
+// renders below the stats so the buyer knows what's grounding the numbers.
 
 function formatBiasName(biasType: string): string {
   return biasType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
 function topBiasFromTimeline(
-  biasTimeline: Array<{ biasType: string; count: number }>
-): { biasType: string; total: number } | null {
+  biasTimeline: Array<{ biasType: string; month: string; count: number }>
+): { biasType: string; total: number; monthlyCounts: number[] } | null {
   if (biasTimeline.length === 0) return null;
+
+  // Sum counts per biasType to find the most-triggered.
   const totals = new Map<string, number>();
   for (const row of biasTimeline) {
     totals.set(row.biasType, (totals.get(row.biasType) ?? 0) + row.count);
@@ -34,7 +44,25 @@ function topBiasFromTimeline(
       topBias = biasType;
     }
   }
-  return topBias ? { biasType: topBias, total: topCount } : null;
+  if (!topBias) return null;
+
+  // Build last-6-months sparkline. Months absent from the data become 0 so
+  // the sparkline shows real cadence (gaps included), not a compressed view.
+  const now = new Date();
+  const monthKeys: string[] = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getUTCFullYear(), now.getUTCMonth() - i, 1);
+    const key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
+    monthKeys.push(key);
+  }
+  const byMonth = new Map<string, number>();
+  for (const row of biasTimeline) {
+    if (row.biasType !== topBias) continue;
+    byMonth.set(row.month, (byMonth.get(row.month) ?? 0) + row.count);
+  }
+  const monthlyCounts = monthKeys.map(k => byMonth.get(k) ?? 0);
+
+  return { biasType: topBias, total: topCount, monthlyCounts };
 }
 
 function StatCell({
@@ -42,12 +70,44 @@ function StatCell({
   value,
   sub,
   unlocked,
+  trailing,
+  href,
 }: {
   label: string;
   value: string;
   sub?: string;
   unlocked: boolean;
+  trailing?: React.ReactNode;
+  href?: string;
 }) {
+  const valueNode = (
+    <span
+      style={{
+        fontSize: 22,
+        fontWeight: 700,
+        color: unlocked ? 'var(--text-primary)' : 'var(--text-muted)',
+        lineHeight: 1.1,
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 6,
+        textDecoration: 'none',
+      }}
+      title={value}
+    >
+      {value}
+      {href && unlocked && (
+        <ArrowUpRight
+          size={13}
+          style={{ color: 'var(--text-muted)', opacity: 0.6, flexShrink: 0 }}
+          aria-hidden
+        />
+      )}
+    </span>
+  );
+
   return (
     <div style={{ flex: 1, minWidth: 0 }}>
       <div
@@ -63,18 +123,25 @@ function StatCell({
         {label}
       </div>
       <div
-        style={{
-          fontSize: 22,
-          fontWeight: 700,
-          color: unlocked ? 'var(--text-primary)' : 'var(--text-muted)',
-          lineHeight: 1.1,
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-        }}
-        title={value}
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}
       >
-        {value}
+        {href && unlocked ? (
+          <Link
+            href={href}
+            style={{
+              textDecoration: 'none',
+              color: 'inherit',
+              minWidth: 0,
+              flex: 1,
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            {valueNode}
+          </Link>
+        ) : (
+          valueNode
+        )}
+        {trailing}
       </div>
       {sub && (
         <div
@@ -94,8 +161,8 @@ function StatCell({
 export function DecisionDNAPreviewCard() {
   const { dna, isLoading, error } = useDecisionDNA();
 
-  // Loading skeleton matches the populated 3-stat row footprint so first paint
-  // doesn't shift when SWR resolves.
+  // Loading skeleton matches the populated 3-stat row footprint so first
+  // paint doesn't shift when SWR resolves.
   if (isLoading) {
     return (
       <div className="card" aria-label="Decision DNA loading">
@@ -141,24 +208,22 @@ export function DecisionDNAPreviewCard() {
     );
   }
 
-  // SWR error: fail loud at the warn level so the founder sees fetch issues
-  // in console, but render a graceful card so the dashboard doesn't break.
+  // SWR error: don't break the dashboard. Returning null is OK here because
+  // the card is a non-load-bearing surface (the buyer can still reach DNA
+  // via sidebar / palette); the underlying error surfaces in console.
   if (error || !dna) {
     return null;
   }
 
   const hasAnyData = dna.totals.totalDecisions > 0 || dna.biasTimeline.length > 0;
 
-  // Discovery state: no audits yet. Tease the moat without promising specific
-  // numbers. The CTA still goes to /dashboard/decision-dna so a curious user
-  // can preview the page (its own empty state lives there).
+  // Discovery state: no audits yet. Tease the moat AND route the click to
+  // the actual next action (upload), not to a sibling empty state. This was
+  // the category-grade audit gap caught 2026-04-27 — "Open →" was a
+  // look-at-more-data CTA, not an action; "Run your first audit →" is.
   if (!hasAnyData) {
     return (
-      <Link
-        href="/dashboard/decision-dna"
-        className="card"
-        style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}
-      >
+      <div className="card">
         <div className="card-body">
           <div
             style={{
@@ -172,36 +237,51 @@ export function DecisionDNAPreviewCard() {
             <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
               Decision DNA
             </span>
-            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-              · personal calibration
-            </span>
-            <span
+            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>· personal calibration</span>
+            <Link
+              href="/dashboard/decision-dna"
               style={{
                 marginLeft: 'auto',
-                fontSize: 12,
+                fontSize: 11,
                 color: 'var(--text-muted)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 4,
+                textDecoration: 'none',
               }}
             >
-              Open <ArrowRight size={12} />
-            </span>
+              Preview empty surface →
+            </Link>
           </div>
           <p
             style={{
               fontSize: 13,
               color: 'var(--text-secondary)',
               lineHeight: 1.5,
-              margin: 0,
+              margin: '0 0 12px 0',
             }}
           >
             The biases you trip most, the agents that help you most, the outcomes you log over time.
             Recalibrated for you specifically — not a generic benchmark. Run a few audits and log
             their outcomes to unlock yours.
           </p>
+          <Link
+            href="/dashboard?view=upload"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              fontSize: 12,
+              fontWeight: 600,
+              color: 'var(--accent-primary)',
+              textDecoration: 'none',
+              padding: '6px 12px',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--accent-primary)',
+              background: 'rgba(22, 163, 74, 0.06)',
+            }}
+          >
+            Run your first audit <ArrowRight size={12} />
+          </Link>
         </div>
-      </Link>
+      </div>
     );
   }
 
@@ -211,17 +291,29 @@ export function DecisionDNAPreviewCard() {
   const beliefDeltaUnlocked = !!style && sampleSize >= 3;
   const followRateUnlocked = !!style && sampleSize >= 3;
 
+  // Provenance: ground the stats with the sample size so a procurement-stage
+  // reader knows what they're looking at. Categorically more credible than
+  // bare numbers.
+  const provenanceParts: string[] = [];
+  if (dna.totals.totalDecisions > 0) {
+    provenanceParts.push(
+      `${dna.totals.totalDecisions} audit${dna.totals.totalDecisions === 1 ? '' : 's'}`
+    );
+  }
+  if (dna.totals.totalOutcomes > 0) {
+    provenanceParts.push(
+      `${dna.totals.totalOutcomes} outcome${dna.totals.totalOutcomes === 1 ? '' : 's'} logged`
+    );
+  }
+  const provenance = provenanceParts.join(' · ');
+
+  // Sparkline color: neutral muted; this is volume cadence, not a benchmark
+  // up/down signal (more instances of confirmation_bias isn't necessarily
+  // bad — could mean more audits this month, not worse calibration).
+  const sparklineColor = 'var(--text-muted)';
+
   return (
-    <Link
-      href="/dashboard/decision-dna"
-      className="card"
-      style={{
-        display: 'block',
-        textDecoration: 'none',
-        color: 'inherit',
-        transition: 'border-color 0.15s, box-shadow 0.15s',
-      }}
-    >
+    <div className="card">
       <div className="card-body">
         <div
           style={{
@@ -235,15 +327,9 @@ export function DecisionDNAPreviewCard() {
           <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
             Decision DNA
           </span>
-          <span
-            style={{
-              fontSize: 11,
-              color: 'var(--text-muted)',
-            }}
-          >
-            · personal calibration
-          </span>
-          <span
+          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>· personal calibration</span>
+          <Link
+            href="/dashboard/decision-dna"
             style={{
               marginLeft: 'auto',
               fontSize: 12,
@@ -252,10 +338,11 @@ export function DecisionDNAPreviewCard() {
               display: 'inline-flex',
               alignItems: 'center',
               gap: 4,
+              textDecoration: 'none',
             }}
           >
             Open your DNA <ArrowRight size={12} />
-          </span>
+          </Link>
         </div>
         <div
           style={{
@@ -269,9 +356,27 @@ export function DecisionDNAPreviewCard() {
             label="Most-triggered bias"
             value={topBias ? formatBiasName(topBias.biasType) : '—'}
             sub={
-              topBias ? `${topBias.total} instance${topBias.total === 1 ? '' : 's'}` : 'No bias data yet'
+              topBias
+                ? `${topBias.total} instance${topBias.total === 1 ? '' : 's'} · click to study`
+                : 'No bias data yet'
             }
             unlocked={!!topBias}
+            href={
+              topBias
+                ? `/dashboard/analytics?view=library#bias-card-${topBias.biasType}`
+                : undefined
+            }
+            trailing={
+              topBias && topBias.monthlyCounts.some(c => c > 0) ? (
+                <SparklineChart
+                  data={topBias.monthlyCounts}
+                  color={sparklineColor}
+                  width={56}
+                  height={20}
+                  strokeWidth={1.5}
+                />
+              ) : undefined
+            }
           />
           <StatCell
             label="Belief delta"
@@ -282,7 +387,7 @@ export function DecisionDNAPreviewCard() {
             }
             sub={
               beliefDeltaUnlocked
-                ? 'after analysis'
+                ? 'how often you change your mind after analysis'
                 : `Unlocks at ${Math.max(0, 3 - sampleSize)} more outcome${sampleSize === 2 ? '' : 's'}`
             }
             unlocked={beliefDeltaUnlocked}
@@ -302,6 +407,20 @@ export function DecisionDNAPreviewCard() {
             unlocked={followRateUnlocked}
           />
         </div>
+        {provenance && (
+          <div
+            style={{
+              marginTop: 'var(--spacing-md)',
+              paddingTop: 'var(--spacing-sm)',
+              borderTop: '1px solid var(--border-color)',
+              fontSize: 11,
+              color: 'var(--text-muted)',
+              fontFamily: "'JetBrains Mono', monospace",
+            }}
+          >
+            Calibrated on {provenance}
+          </div>
+        )}
       </div>
       <style>{`
         @media (max-width: 700px) {
@@ -311,6 +430,6 @@ export function DecisionDNAPreviewCard() {
           }
         }
       `}</style>
-    </Link>
+    </div>
   );
 }

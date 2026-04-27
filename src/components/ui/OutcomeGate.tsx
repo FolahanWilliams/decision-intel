@@ -9,17 +9,31 @@ import {
   Clock,
   Loader2,
   Lightbulb,
+  ExternalLink,
 } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSWRConfig } from 'swr';
 
 const CalibrationScorecard = lazy(() => import('@/components/visualizations/CalibrationScorecard'));
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
+interface PendingAnalysisRefForGate {
+  id: string;
+  documentId: string;
+  filename: string;
+  decisionStatement: string | null;
+  createdAt: string;
+}
+
 interface OutcomeGateInfo {
   pendingCount: number;
   pendingAnalysisIds: string[];
+  /** D11 Phase 3 deep (2026-04-27): rich pending-analysis metadata for
+   *  filename + decisionStatement + /documents/[id] deep-links. Optional —
+   *  modal falls back to "Analysis #N" placeholders when undefined. */
+  pendingAnalyses?: PendingAnalysisRefForGate[];
   message: string;
 }
 
@@ -122,6 +136,12 @@ interface DraftOutcomeForGate {
   source: string;
   confidence: number;
   evidence: string[];
+  /** Filename of the audited document — surfaced as the analysis row title
+   *  when /api/analyze/stream's pendingAnalyses isn't populated (legacy). */
+  analysisTitle?: string;
+  /** DecisionFrame.decisionStatement when the document had a frame at
+   *  ingest. Italicised subtitle on the analysis row. */
+  decisionStatement?: string | null;
 }
 
 function formatDraftSource(source: string): string {
@@ -170,6 +190,20 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<DraftOutcomeForGate[]>([]);
 
+  // SWR mutate is global — used here to invalidate /api/outcomes/draft
+  // after a confirm/dismiss so the DraftOutcomeBanner on the dashboard
+  // refreshes immediately rather than waiting for its refresh interval.
+  const { mutate: globalSwrMutate } = useSWRConfig();
+
+  // The 4 outcome values OutcomeGateModal can submit. Drafts may carry
+  // values outside this set (e.g. 'inconclusive' from outcome-inference);
+  // if so we surface a hint so the user knows the draft exists but needs
+  // a manual choice — never silently mismatch.
+  const VALID_OUTCOME_VALUES = useMemo(
+    () => new Set(['success', 'partial_success', 'failure', 'too_early']),
+    []
+  );
+
   // Phase 3: fetch auto-detected drafts so we can pre-fill the outcome
   // value when the user picks an analysis. Single fetch on mount; no deps.
   useEffect(() => {
@@ -199,18 +233,23 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
   }, [drafts]);
 
   const matchingDraft = selectedAnalysis ? draftsByAnalysisId.get(selectedAnalysis) ?? null : null;
-  // Confirm-path engages when the user picks an analysis WITH a draft and
-  // hasn't overridden the auto-detected outcome value. Any other state
-  // routes to the manual /api/outcomes POST path.
-  const onConfirmPath = !!matchingDraft && outcome === matchingDraft.outcome;
+  // Validation: only pre-fill when the draft's outcome is one of the 4 button
+  // values. Outcome-inference can emit 'inconclusive' or other states the
+  // modal doesn't render — surface those as a hint instead of silently
+  // mismatching (caught in the 2026-04-27 category-grade depth audit).
+  const draftOutcomeIsValid = !!matchingDraft && VALID_OUTCOME_VALUES.has(matchingDraft.outcome);
+  // Confirm-path engages when the user picks an analysis WITH a draft, the
+  // draft's outcome is in the valid set, and they haven't overridden the
+  // auto-detected value. Any other state routes to manual /api/outcomes POST.
+  const onConfirmPath =
+    !!matchingDraft && draftOutcomeIsValid && outcome === matchingDraft.outcome;
 
-  // When the user picks an analysis that has a matching draft, pre-fill
-  // the outcome with the auto-detected value. Re-runs whenever the
-  // selectedAnalysis changes; respects manual overrides because once the
-  // user changes `outcome`, equality with the draft breaks and the
-  // confirm-path flips off (handled above).
+  // When the user picks an analysis that has a matching draft with a VALID
+  // outcome, pre-fill. If the draft has an invalid outcome (e.g.
+  // 'inconclusive'), don't pre-fill — the user picks manually and we surface
+  // a hint above the buttons. Re-runs whenever selectedAnalysis changes.
   useEffect(() => {
-    if (selectedAnalysis && matchingDraft) {
+    if (selectedAnalysis && matchingDraft && draftOutcomeIsValid) {
       setOutcome(matchingDraft.outcome);
     } else {
       setOutcome('');
@@ -260,6 +299,14 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
       if (ok) {
         setSubmitted(true);
         onOutcomeSubmitted?.();
+        // Optimistic SWR refresh: any DraftOutcomeBanner / Draft consumer
+        // using SWR keyed off /api/outcomes/draft picks up the change
+        // immediately rather than waiting for the next refresh interval.
+        // Same applies to /api/decision-dna which derives from outcomes.
+        globalSwrMutate('/api/outcomes/draft');
+        globalSwrMutate('/api/decision-dna');
+        // Also refresh outcomes listing for any other consumer.
+        globalSwrMutate('/api/outcomes');
       } else {
         setSubmitError('Failed to submit outcome. Please try again.');
       }
@@ -268,7 +315,7 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
     } finally {
       setSubmitting(false);
     }
-  }, [selectedAnalysis, outcome, onConfirmPath, matchingDraft, onOutcomeSubmitted]);
+  }, [selectedAnalysis, outcome, onConfirmPath, matchingDraft, onOutcomeSubmitted, globalSwrMutate]);
 
   const OUTCOME_OPTIONS = [
     { value: 'success', label: 'Success', color: '#22c55e', icon: CheckCircle },
@@ -459,6 +506,13 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   {gateInfo.pendingAnalysisIds.slice(0, 5).map((id, i) => {
                     const draft = draftsByAnalysisId.get(id);
+                    // Rich pending-analysis metadata when /api/analyze/stream
+                    // returns it. Falls back to "Analysis #N" + the draft's
+                    // own analysisTitle when available, else generic label.
+                    const richInfo = gateInfo.pendingAnalyses?.find(p => p.id === id);
+                    const displayName = richInfo?.filename ?? draft?.analysisTitle ?? `Analysis #${i + 1}`;
+                    const subtitle = richInfo?.decisionStatement ?? draft?.decisionStatement ?? null;
+                    const documentId = richInfo?.documentId;
                     return (
                       <button
                         key={id}
@@ -471,7 +525,7 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
                           borderRadius: '8px',
                           cursor: 'pointer',
                           display: 'flex',
-                          alignItems: 'center',
+                          alignItems: 'flex-start',
                           justifyContent: 'space-between',
                           gap: 8,
                           color: 'var(--text-secondary)',
@@ -481,44 +535,106 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
                       >
                         <span
                           style={{
-                            fontFamily: "'JetBrains Mono', monospace",
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: 6,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 4,
                             minWidth: 0,
+                            flex: 1,
                           }}
                         >
-                          Analysis #{i + 1}
-                          {draft && (
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 6,
+                              minWidth: 0,
+                              color: 'var(--text-primary)',
+                              fontWeight: 600,
+                            }}
+                          >
                             <span
-                              title={`Auto-detected from ${formatDraftSource(draft.source)} · ${(draft.confidence * 100).toFixed(0)}% confidence`}
                               style={{
-                                fontSize: 9,
-                                fontWeight: 700,
-                                padding: '2px 6px',
-                                borderRadius: 999,
-                                background: 'rgba(99, 102, 241, 0.12)',
-                                color: '#a5b4fc',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.04em',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: 3,
-                                fontFamily: 'inherit',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                                minWidth: 0,
                               }}
+                              title={displayName}
                             >
-                              <Lightbulb size={9} />
-                              Draft ready
+                              {displayName}
+                            </span>
+                            {draft && (
+                              <span
+                                title={`Auto-detected from ${formatDraftSource(draft.source)} · ${(draft.confidence * 100).toFixed(0)}% confidence`}
+                                style={{
+                                  fontSize: 9,
+                                  fontWeight: 700,
+                                  padding: '2px 6px',
+                                  borderRadius: 999,
+                                  background: 'rgba(99, 102, 241, 0.12)',
+                                  color: '#a5b4fc',
+                                  textTransform: 'uppercase',
+                                  letterSpacing: '0.04em',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: 3,
+                                  flexShrink: 0,
+                                }}
+                              >
+                                <Lightbulb size={9} />
+                                Draft ready
+                              </span>
+                            )}
+                          </span>
+                          {subtitle && (
+                            <span
+                              style={{
+                                fontSize: 11,
+                                color: 'var(--text-muted)',
+                                fontStyle: 'italic',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                              }}
+                              title={subtitle}
+                            >
+                              &ldquo;{subtitle}&rdquo;
                             </span>
                           )}
                         </span>
-                        <Link
-                          href="/dashboard?view=browse&status=complete"
-                          onClick={e => e.stopPropagation()}
-                          style={{ color: 'var(--text-muted)', fontSize: '11px' }}
-                        >
-                          View <ArrowRight size={10} style={{ display: 'inline' }} />
-                        </Link>
+                        {documentId ? (
+                          <Link
+                            href={`/documents/${documentId}`}
+                            onClick={e => e.stopPropagation()}
+                            target="_blank"
+                            rel="noopener"
+                            title="Open the full audit in a new tab"
+                            style={{
+                              color: 'var(--text-muted)',
+                              fontSize: '11px',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 3,
+                              flexShrink: 0,
+                              marginTop: 2,
+                            }}
+                          >
+                            View <ExternalLink size={10} />
+                          </Link>
+                        ) : (
+                          <Link
+                            href="/dashboard?view=browse&status=complete"
+                            onClick={e => e.stopPropagation()}
+                            style={{
+                              color: 'var(--text-muted)',
+                              fontSize: '11px',
+                              flexShrink: 0,
+                              marginTop: 2,
+                            }}
+                          >
+                            View <ArrowRight size={10} style={{ display: 'inline' }} />
+                          </Link>
+                        )}
                       </button>
                     );
                   })}
@@ -554,8 +670,10 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
                           marginBottom: 10,
                           padding: '8px 12px',
                           borderRadius: 8,
-                          background: 'rgba(99, 102, 241, 0.08)',
-                          border: '1px solid rgba(99, 102, 241, 0.2)',
+                          background: draftOutcomeIsValid
+                            ? 'rgba(99, 102, 241, 0.08)'
+                            : 'rgba(245, 158, 11, 0.08)',
+                          border: `1px solid ${draftOutcomeIsValid ? 'rgba(99, 102, 241, 0.2)' : 'rgba(245, 158, 11, 0.25)'}`,
                           display: 'flex',
                           alignItems: 'flex-start',
                           gap: 8,
@@ -566,7 +684,11 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
                       >
                         <Lightbulb
                           size={13}
-                          style={{ color: '#a5b4fc', flexShrink: 0, marginTop: 1 }}
+                          style={{
+                            color: draftOutcomeIsValid ? '#a5b4fc' : '#fbbf24',
+                            flexShrink: 0,
+                            marginTop: 1,
+                          }}
                         />
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
@@ -591,8 +713,16 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
                               {matchingDraft.evidence[0].length > 90 ? '…' : ''}&rdquo;
                             </div>
                           )}
-                          <div style={{ color: 'var(--text-muted)', marginTop: 4, fontSize: 10 }}>
-                            Pre-filled below — confirm to log, or change to override.
+                          <div
+                            style={{
+                              color: draftOutcomeIsValid ? 'var(--text-muted)' : '#fbbf24',
+                              marginTop: 4,
+                              fontSize: 10,
+                            }}
+                          >
+                            {draftOutcomeIsValid
+                              ? 'Pre-filled below — confirm to log, or change to override.'
+                              : `Detected outcome was "${matchingDraft.outcome.replace(/_/g, ' ')}" which doesn't match the four categories below. Pick one manually; the draft will be dismissed when you submit.`}
                           </div>
                         </div>
                       </div>
