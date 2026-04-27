@@ -131,7 +131,7 @@ const RESEARCH_CITATIONS = [
     title: 'Noise: A Flaw in Human Judgment',
     year: '2021',
     connection:
-      'The three-judge jury and inter-judge variance scoring inside the Noise Judge node come directly from this framework.',
+      'Ensemble sampling across three Kahneman-side nodes plus inter-judge variance scoring inside the Noise Judge node come directly from this framework.',
     featureName: 'Noise Judge',
   },
   {

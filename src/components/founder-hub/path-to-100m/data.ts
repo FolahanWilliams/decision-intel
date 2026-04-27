@@ -45,8 +45,8 @@ export type RolePlaybook = {
   id: string;
   role: string;
   archetype: string;
-  buyerType: 'wedge' | 'expansion' | 'channel' | 'amplifier' | 'capital';
-  priority: 'now' | 'q3_2026' | 'q4_2026' | '2027';
+  buyerType: 'wedge' | 'expansion' | 'channel' | 'amplifier' | 'capital' | 'fast_validator';
+  priority: 'now' | 'summer_2026' | 'q3_2026' | 'q4_2026' | '2027';
   ticketBand: string;
   whatTheyWant: string[];
   whatKeepsThemUp: string[];
@@ -389,15 +389,300 @@ export const WEAKNESSES: Weakness[] = [
 
 export const ROLE_PLAYBOOKS: RolePlaybook[] = [
   // -----------------------------------------------------------------------
-  // 1. PAN-AFRICAN FUND PARTNER — the wedge buyer
+  // 1. MID-MARKET PE/VC ASSOCIATE — fastest paid validation (NotebookLM 2026-04-28)
+  // -----------------------------------------------------------------------
+  {
+    id: 'mid_market_pe_vc_associate',
+    role: 'Mid-Market PE/VC Associate · "Adaeze" archetype',
+    archetype:
+      '24-28-year-old analyst / associate · drafts IC memos until 2 AM on a 13-inch laptop · no firm-level budget authority but personal ambition · acute fear of looking stupid in front of the Managing Partner during IC · UK + EU mid-market PE/VC firms are highest density',
+    buyerType: 'fast_validator',
+    priority: 'now',
+    ticketBand:
+      '£149/mo Professional tier · sits below the corporate-card threshold that triggers CFO approval · paid in 14-30 days · 6-9 month retention pattern',
+    whatTheyWant: [
+      'A 60-second bias audit on their IC memo BEFORE the Managing Partner sees it',
+      'Specific named flags ("anchoring on the seller\'s asking price in section 3", "base-rate neglect in the synergy projections") with the exact sentence highlighted',
+      'A pre-meeting cheat sheet of "what the partners will grill you on" — the Dr Red Team output',
+      'Personal career-defending utility · their MD-impression matters more than their firm\'s decision quality at this career stage',
+    ],
+    whatKeepsThemUp: [
+      'Walking into IC and being humiliated by the MD over a flaw they should have caught',
+      'A junior-analyst-level bias error landing in a deal that closes badly — career-defining moment',
+      'Missing the obvious objection a senior partner sees in 30 seconds that they missed in 4 weeks of work',
+      'Being the analyst whose memo "needs more work" — the worst sentence in PE',
+    ],
+    howToReach: {
+      coldChannel:
+        'LinkedIn DM at scale to mid-market PE/VC associates · also: London networking events in private equity + corporate development circles where the founder can meet associates in person',
+      coldOpener:
+        'I built an 11-node bias auditor for investment memos. Run your draft through it before your MD sees it — it highlights the exact logical gaps the partners will grill you on, in 60 seconds. £149/mo, sits below the credit-card-approval threshold.',
+      coldBlunder:
+        'Pitching the firm-level value proposition ("decision quality across the portfolio") — the associate doesn\'t buy that. Pitch the personal MD-impression-defending value.',
+      warmIntroPath:
+        'TASIS England school network → Oxford / LSE / Imperial alumni now in PE/VC associate seats · the founder\'s extended-family McKinsey connections are also adjacent (associates frequently cross between MBB and PE).',
+    },
+    discoveryQuestions: {
+      opening: [
+        '"What\'s the worst feedback you\'ve gotten from your MD on an IC memo? What was the bias your draft missed?"',
+        '"How long do you spend on a memo before it goes to IC? Where\'s the bottleneck — research, framing, defending it in the room?"',
+        '"When the MD pushes back, what is usually the question you wish you\'d caught yourself?"',
+      ],
+      rigor: [
+        '"If you had a 60-second audit on your draft BEFORE the MD reviews it — flagging the 2-3 cognitive biases the partners will catch first — what\'s your cycle look like?"',
+        '"For your last 5 memos that went to IC, which got pushed back the hardest? Was it execution-quality or bias / blind-spot?"',
+        '"Walk me through the objection that hurt the most last quarter. What pattern would you have caught with 60 more seconds of pre-IC scrutiny?"',
+      ],
+      decisionGate: [
+        '"£149/mo on your corporate card — sits below the approval threshold. Want to run your next draft through it tonight?"',
+        '"If we\'re not flagging blind spots your MD catches in the first 3 audits, cancel — full refund."',
+        '"If this works, what would you tell your peers at firm X? Could you bring 2-3 associates on your team?"',
+      ],
+    },
+    artefactToLead:
+      'Live audit on a redacted public memo (WeWork S-1 or any famously failed IC document). Show the Dr Red Team objection FIRST — that\'s the feature that proves the AI is smarter than the analyst. The 12-node pipeline / R²F vocabulary stays warm-context only.',
+    killerPitch:
+      'You\'re drafting IC memos at 2 AM. Your MD sees flaws in 30 seconds that took you 4 weeks not to notice. £149/mo, on your credit card, sits below the CFO threshold. Run your draft through this BEFORE the MD sees it. If it\'s not catching things you missed in the first 3 audits, cancel. The Dr Red Team objection alone is worth £149.',
+    threePhrasesNeverToSay: [
+      '"Recognition-Rigor Framework arbitrating Kahneman + Klein" — they don\'t care about academic moats; they care about not being humiliated tomorrow',
+      '"Decision Provenance Record for audit committees" — that\'s an enterprise vocabulary; they\'re a personal user',
+      '"60-second audit on a strategic memo before the room sees it" — works for CSOs, NOT associates · associates already think in IC-memo language; mirror their language',
+    ],
+    meetingArc: [
+      { minute: '0:00-1:00', move: 'Frame: "Bias audit on your draft IC memo. 60 seconds. Names the 3 biggest flags before your MD sees it."' },
+      { minute: '1:00-3:00', move: 'Live audit on the WeWork S-1 (or a redacted memo they brought) — show DQI + 3 biases + Dr Red Team objection.' },
+      { minute: '3:00-7:00', move: 'Discovery: "What\'s the worst feedback you\'ve gotten from your MD recently? Would this have caught it?"' },
+      { minute: '7:00-12:00', move: 'Pricing: £149/mo, corporate card, sits below approval threshold. Cancel anytime. First audit free.' },
+      { minute: '12:00-15:00', move: 'Close: "Run your next draft tonight. If it\'s not catching things, full refund."' },
+    ],
+    signalsToListenFor: {
+      positive: [
+        'They name a specific recent IC memo where they got humiliated',
+        'They ask "can I run it on a draft tonight?" within the first 8 minutes',
+        'They volunteer the corporate-card-threshold detail unprompted',
+        'They mention a peer who would also benefit',
+      ],
+      negative: [
+        'They redirect to "let me ask my MD" — usually means they\'re too junior or too risk-averse to swipe their card without permission',
+        'They focus on firm-level value ("would this help our IC process?") — wrong frame; redirect to personal MD-impression',
+        'They ask about SOC 2 / EU AI Act — they\'re not the buyer; that\'s firm-level. Disqualify or escalate.',
+      ],
+    },
+    followUp: [
+      { day: 'T+0 (immediately after demo)', artifact: 'Free first-audit voucher · DPR PDF on the redacted memo they shared · 1-line follow-up "Run your next IC draft tonight."' },
+      { day: 'T+24h', artifact: 'Check-in DM: "Did you run a draft? What did the audit catch?"' },
+      { day: 'T+7d', artifact: 'Stripe checkout link · cancel-anytime framing · "If the first 3 audits don\'t catch things you missed, full refund"' },
+      { day: 'T+30d', artifact: 'Renewal check-in + ask for 2-3 peer-associate referrals at their firm or peer firms' },
+    ],
+    conversionWindow: '14-30 days · single-meeting close on credit card · no procurement cycle',
+    whyTheyConvert:
+      'Acute personal career fear + pricing under the corporate-card-approval threshold + Dr Red Team output that proves immediate value. The friction is near-zero: no procurement, no GC, no IT review. Just swipe.',
+    whyTheyDont:
+      'They\'re too junior to use a corporate card without MD approval (rare but real). Or their firm has a "no AI tools" blanket policy. Or they\'re not actually an associate — they\'re a partner shadowing as one. Disqualify quickly.',
+    notebookLmFollowUp:
+      'For mid-market PE/VC associates, what\'s the typical 6-month retention curve? When do they churn (graduation to associate director, firm AI-tool policy change, deal-flow drought)? What\'s the path to converting them as champions when they get promoted to associate director or principal?',
+  },
+
+  // -----------------------------------------------------------------------
+  // 2. BOUTIQUE SELL-SIDE M&A ADVISOR — fastest paid validation, direct revenue link
+  // -----------------------------------------------------------------------
+  {
+    id: 'boutique_sell_side_ma',
+    role: 'Boutique Sell-Side M&A Advisor · "Potomac" archetype',
+    archetype:
+      '2-10-person M&A advisory shop · paid only on closing · UK + US mid-market sell-side · 5-15 deals/year · CIM is the deliverable; valuation drops or deal dies if PE buyer\'s IC spots a flaw · MD or partner is the actual buyer (small enough firm that the MD has the corporate card)',
+    buyerType: 'fast_validator',
+    priority: 'now',
+    ticketBand:
+      '$499 per-deal audit OR £149-249/mo Professional · per-deal pricing matches their commission-on-close model · paid in 14-21 days',
+    whatTheyWant: [
+      'A pre-market Dr Red Team audit on the CIM — names the 3 fatal flaws a PE buyer\'s IC will spot',
+      'Cross-document conflict scan across the CIM + financial model + management presentation — catches inconsistencies that kill valuations',
+      'Independent third-party DPR they can attach to the CIM appendix · proves to PE buyer that the seller has done the rigor work',
+      'Direct revenue protection: a 7-minute audit that prevents a £100K-£2M commission from collapsing',
+    ],
+    whatKeepsThemUp: [
+      'A PE buyer\'s IC catches a hockey-stick projection or unsupported synergy claim → valuation drops 10-20%, commission drops 10-20%',
+      'A deal collapses on a flaw the team should have caught in week 4 of diligence → zero commission, 6 months of work gone',
+      'A buyer-side team uses better diligence tools than the sell-side does · negotiating asymmetry that costs money every quarter',
+      'The "we\'ve been doing this 20 years" trap — the team that stops self-auditing eventually meets a buyer team that doesn\'t',
+    ],
+    howToReach: {
+      coldChannel:
+        'Direct cold email to the MD or partner of UK / US boutique M&A shops · also: M&A networking events in London (Tier 1 city for mid-market sell-side) where the founder can meet partners in person',
+      coldOpener:
+        'I built a 60-second AI red-team that simulates a PE buyer\'s IC. Here are the 3 fatal flaws it found in a public CIM [attach the WeWork DPR]. Run your draft CIMs through this before going to market — bulletproofs your valuation. £499 per deal, no subscription required.',
+      coldBlunder:
+        'Pitching subscription pricing to a deal-cadence business. They think in commission-per-close, not monthly recurring. Lead with $499 per-deal · subscription is a secondary option for high-volume shops.',
+      warmIntroPath:
+        'Wiz advisor (Josh Rainer) → his M&A network · TASIS England network → Oxford / LSE alumni in mid-market M&A · extended-family McKinsey connections (alumni at boutique firms post-MBB).',
+    },
+    discoveryQuestions: {
+      opening: [
+        '"What was the last deal where a PE buyer\'s IC caught something you missed in your CIM? What did it cost on valuation?"',
+        '"Walk me through your typical CIM-to-market timeline. Where\'s the bias-review step?"',
+        '"On your last 5 deals, how many times did the buyer\'s diligence find something that should have surfaced in your prep?"',
+      ],
+      rigor: [
+        '"If you had a 60-second Dr Red Team audit on every CIM BEFORE going to market — flagging the 3 fatal flaws the buyer\'s IC would catch first — what\'s the commission delta on your last 12 months of deals?"',
+        '"For cross-document conflict detection — when was the last time you found a contradiction between the CIM and the management model AFTER the buyer\'s team did?"',
+        '"What\'s your team\'s current bias-review process pre-market? Who plays adversarial red-team internally?"',
+      ],
+      decisionGate: [
+        '"$499 per deal · runs in 60 seconds · pays for itself the first time we catch something that would have dropped your valuation 5%."',
+        '"Bring a redacted CIM from a deal you lost last year. I run the audit live in 7 minutes. If it doesn\'t flag the exact reason that deal died, this product isn\'t for you."',
+        '"If we close one deal this quarter, can we be your standard pre-market step on every deal next quarter?"',
+      ],
+    },
+    artefactToLead:
+      'WeWork S-1 DPR (cross-doc conflict scan + Dr Red Team objections + DQI) · then the live evidence-moment audit on a redacted CIM they bring. Frame the DPR as the artefact that ATTACHES to their CIM appendix — third-party rigor proof for the buyer.',
+    killerPitch:
+      'You get paid on close. A PE buyer\'s IC catching one bad assumption drops your valuation 10-20% — that\'s your commission. £499 per deal, 60 seconds, runs the Dr Red Team that simulates the buyer\'s IC review. Cheaper than one hour of legal work. Pays for itself the first time we catch something that would have killed your commission.',
+    threePhrasesNeverToSay: [
+      '"Decision Quality Index" — they think in valuation multiple and commission, not abstract scores',
+      '"Native reasoning layer" — too abstract for a deal-cadence business',
+      '"Subscription tier with seats" — wrong economic model · per-deal pricing matches their reality',
+    ],
+    meetingArc: [
+      { minute: '0:00-1:30', move: 'Frame: "Pre-market Dr Red Team on every CIM. £499 per deal. Catches the 3 flaws the buyer\'s IC would hit first."' },
+      { minute: '1:30-5:00', move: 'Live audit on the WeWork S-1 OR a redacted CIM they brought · cross-doc conflict scan · highlight the dollar-impact-of-catching-this-flaw on valuation.' },
+      { minute: '5:00-10:00', move: 'Discovery: "When did this last cost you commission? Walk me through it."' },
+      { minute: '10:00-15:00', move: 'Pricing: £499 per deal, runs in 60 seconds, attaches to CIM appendix as third-party rigor proof.' },
+      { minute: '15:00-20:00', move: 'Close: "Bring me your next CIM draft this week. Audit on me. If it doesn\'t flag something useful, no charge."' },
+    ],
+    signalsToListenFor: {
+      positive: [
+        'They name a specific past deal where the buyer\'s IC dropped the valuation',
+        'They volunteer "we don\'t have an internal red-team process" within the first 5 minutes',
+        'They ask about the cross-document conflict scan unprompted',
+        'They reference a peer firm using AI tools as competitive pressure',
+      ],
+      negative: [
+        'They redirect to "we have our own quality process" without naming what it IS',
+        'They focus on subscription pricing — wrong economic model · counter with per-deal',
+        'They ask about regulatory mapping (EU AI Act / SOX) — they\'re a sell-side advisor, not a regulated entity · disqualify or redirect to enterprise tier',
+      ],
+    },
+    followUp: [
+      { day: 'T+0 (immediately after demo)', artifact: 'Free audit voucher on next CIM · DPR specimen showing how it attaches to a CIM appendix · the Dr Red Team output from the live demo' },
+      { day: 'T+48h', artifact: 'Send a real CIM teardown (or specimen DPR adapted to their sector — tech / industrial / fintech) showing what the audit catches in their typical deal shape' },
+      { day: 'T+1w', artifact: 'Per-deal pricing confirm + Stripe checkout link · "Audit your next CIM, charged on close"' },
+      { day: 'T+30d', artifact: 'After first deal · ask for 2-3 boutique-firm peer referrals + case-study permission (anonymised)' },
+    ],
+    conversionWindow: '14-21 days · single-meeting close on per-deal pricing · no procurement cycle · MD has the card',
+    whyTheyConvert:
+      'Direct revenue link · per-deal pricing matches their commission-on-close model · the Dr Red Team output is a 60-second proof that the AI catches things their human team misses. Cheaper than one hour of legal work; pays for itself the first time it catches a flaw the buyer\'s IC would have caught.',
+    whyTheyDont:
+      'Their firm has a "we\'ve been doing this 20 years" cultural posture that defensively rejects external tools. Or they have an in-house adversarial-review process they trust. Force the Evidence Moment with a redacted CIM from a deal they lost — if the audit doesn\'t flag the exact reason it died, accept the no.',
+    notebookLmFollowUp:
+      'What\'s the typical mid-market boutique M&A advisor\'s deal cadence and tool budget? Specifically: how many deals/year does a typical 5-person shop close, what\'s the per-deal third-party-tool spend, and where in the workflow does the AI-tool spend currently land?',
+  },
+
+  // -----------------------------------------------------------------------
+  // 3. SOLO / FRACTIONAL CSO (ex-MBB) — fastest paid validation via DPR-as-deliverable
+  // -----------------------------------------------------------------------
+  {
+    id: 'solo_fractional_cso',
+    role: 'Solo / Fractional CSO · ex-MBB consultant · "Independent" archetype',
+    archetype:
+      'Ex-McKinsey / BCG / Bain consultant · operates as independent advisor or fractional CSO for mid-market companies · charges £150-£500/hr or £15-50K/month retainer · sells strategic judgment as the product · UK + US London / NYC / SF density · LinkedIn-discoverable',
+    buyerType: 'fast_validator',
+    priority: 'now',
+    ticketBand:
+      '£149/mo Professional OR £249/mo Individual · paid in 14-30 days · DPR-as-deliverable is the conversion lever',
+    whatTheyWant: [
+      'A tamper-evident DPR they can attach to every strategy deliverable as an appendix · proves to the client that their recommendation is debiased',
+      'Differentiation against other solo consultants who don\'t have algorithmic rigor proof',
+      'A defensible answer to the client question "how do I know your strategic recommendation isn\'t just YOUR biases?"',
+      'Time savings on bias-review — instead of self-auditing, run the audit, attach the artefact, move on',
+    ],
+    whatKeepsThemUp: [
+      'A client who terminates the retainer because they "could just hire McKinsey for the same thing"',
+      'A strategic recommendation that lands badly with the client\'s board → reputation damage → next-retainer-loss',
+      'A peer consultant landing the same client at a higher rate by claiming better methodology',
+      'The universal "consultants have their own biases" critique that erodes trust over time',
+    ],
+    howToReach: {
+      coldChannel:
+        'Cold email to LinkedIn-discoverable solo / fractional CSOs · UK + US filter · ex-MBB filter · 5-15 years post-MBB ideal · also: London speaking / networking events for ex-consultants and fractional executives',
+      coldOpener:
+        'You sell strategic rigor, but your clients know humans have bias. Attach our tamper-evident Decision Provenance Record to the appendix of your next strategy deck. It mathematically proves to your client that your recommendation is debiased against 30+ cognitive errors. £149/mo, no commitment.',
+      coldBlunder:
+        'Pitching it as a tool to replace their judgment — instant defensive shutdown. Frame as ""amplifies your expert intuition while suppressing bias"" — Klein RPD framing, not Kahneman replacement.',
+      warmIntroPath:
+        'Wiz advisor (Josh Rainer) → his ex-MBB-now-fractional-CSO network · the founder\'s extended-family McKinsey connections — direct ex-MBB relationships · TASIS England school network → Oxford / LSE / Imperial alumni in fractional-CSO roles.',
+    },
+    discoveryQuestions: {
+      opening: [
+        '"How do you currently respond when a client says \'how do I know your recommendation isn\'t just YOUR biases?\'"',
+        '"What\'s your differentiation against other ex-MBB fractional CSOs at the same rate?"',
+        '"On a typical strategy engagement, how much time do you spend on self-audit / bias-check before the deliverable goes to the client?"',
+      ],
+      rigor: [
+        '"If every strategy deliverable carried a tamper-evident DPR appendix proving the recommendation was debiased against 30+ cognitive errors — what would change about your client conversations?"',
+        '"For your next renewal conversation — what\'s the strongest evidence you currently have that your work is more rigorous than the alternative?"',
+        '"How often does the client board push back on your recommendation in a way that suggests a missed blind spot?"',
+      ],
+      decisionGate: [
+        '"£149/mo · cancel anytime · attach the DPR to your next deliverable. If the client doesn\'t notice or care, refund."',
+        '"Audit one of your past strategy decks live in 7 minutes. If the DPR doesn\'t make you more confident in the recommendation, it\'s not for you."',
+        '"What would you tell your peer fractional CSOs who are competing with you for the same retainer?"',
+      ],
+    },
+    artefactToLead:
+      'Live audit on a redacted past strategy deck they bring · show the DPR generation in real time · highlight that it attaches as a CIM-style appendix to their existing deliverable. The Klein RPD recognition framing matters more than the Kahneman bias-detection framing — they\'re selling expert intuition, not data.',
+    killerPitch:
+      'You sell strategic rigor at £150-500/hr. Your clients know humans have bias. Decision Intel doesn\'t replace your intuition — Klein\'s Recognition-Primed Decision framework AMPLIFIES your expert intuition while suppressing bias, giving you the auditable record to justify your retainer. £149/mo. Attach the DPR to every deliverable. Differentiates you from every other ex-MBB fractional CSO.',
+    threePhrasesNeverToSay: [
+      '"Replace your judgment" — instant defensive shutdown · they sell judgment',
+      '"Bias detection" alone — feels accusatory · use "amplifies expert intuition while suppressing bias" instead',
+      '"Enterprise procurement-grade" — they\'re solo, not procurement · pitch personal-brand differentiation',
+    ],
+    meetingArc: [
+      { minute: '0:00-1:30', move: 'Frame: "Tamper-evident rigor proof attached to every strategy deliverable. Differentiates you from every other ex-MBB."' },
+      { minute: '1:30-5:00', move: 'Live audit on a redacted past strategy deck they bring · show DPR generation in real time · point at the appendix-attachment shape.' },
+      { minute: '5:00-10:00', move: 'Discovery: "How do you currently answer the \'consultants have biases too\' critique?"' },
+      { minute: '10:00-15:00', move: 'Pricing: £149/mo, cancel anytime, DPR attaches to every deliverable.' },
+      { minute: '15:00-20:00', move: 'Close: "Try it on your next deliverable. If the client doesn\'t notice or care, refund."' },
+    ],
+    signalsToListenFor: {
+      positive: [
+        'They volunteer the "consultants have biases too" critique unprompted — proves the pain is real',
+        'They ask about the DPR-as-appendix shape within 5 minutes',
+        'They reference a peer using AI tools as competitive pressure',
+        'They mention a client who has pushed back on bias / blind spots recently',
+      ],
+      negative: [
+        'They focus exclusively on price — usually a junior consultant, not a fractional CSO',
+        'They ask "does this train on my data?" without engaging the DPR shape — privacy-anchored, not value-anchored',
+        'They redirect to "I\'ll discuss with my partners" — they\'re actually at a firm, not solo · disqualify',
+      ],
+    },
+    followUp: [
+      { day: 'T+0 (immediately after demo)', artifact: 'Free 14-day trial · the DPR specimen on the redacted deck they shared · 1-line follow-up "Use it on your next deliverable."' },
+      { day: 'T+48h', artifact: 'Check-in: "Did the client notice? What was the reaction?"' },
+      { day: 'T+1w', artifact: 'Stripe checkout link · cancel-anytime framing · "If your clients don\'t engage with the DPR appendix, refund"' },
+      { day: 'T+30d', artifact: 'Renewal check-in + ask for case-study permission (anonymised) + 2-3 ex-MBB peer referrals' },
+    ],
+    conversionWindow: '14-30 days · single-meeting close on monthly subscription · no procurement cycle · solo decision-maker',
+    whyTheyConvert:
+      'Universal "consultants have biases too" critique creates the pull · DPR-as-appendix is the differentiation lever against every other ex-MBB fractional CSO · Klein RPD framing positions DI as amplifier-not-replacer of their expert intuition · cancel-anytime removes risk.',
+    whyTheyDont:
+      'They\'re early in their fractional career and price-sensitive · or their clients are non-procurement-grade and won\'t engage with the DPR appendix shape · or they\'re actually at a firm and need partner approval. Force the live-audit Evidence Moment to test which case it is.',
+    notebookLmFollowUp:
+      'What\'s the typical solo / fractional CSO retention curve and upsell path? Specifically: when do they convert from £149/mo Professional to £249/mo Individual? When do they bring a client onto the platform as their own design partner (the "client-as-revenue-channel" pattern)? What\'s the LinkedIn-discoverability filter for ex-MBB fractional CSOs in the UK + US?',
+  },
+
+  // -----------------------------------------------------------------------
+  // 4. PAN-AFRICAN FUND PARTNER — summer 2026 design-partner wedge (12-month play)
   // -----------------------------------------------------------------------
   {
     id: 'pan_african_fund_partner',
-    role: 'Pan-African / EM Fund Partner',
+    role: 'Pan-African / EM Fund Partner · summer-2026 design-partner wedge',
     archetype:
-      'Sankore-class · $200M-$2B AUM · capital-allocation pressure across NGN/KES/GHS/EGP/CFA · IC-cycle calendar · procurement-grade compliance need (NDPR, CBN, WAEMU, PoPIA)',
+      'Sankore-class · $200M-$2B AUM · capital-allocation pressure across NGN/KES/GHS/EGP/CFA · IC-cycle calendar · procurement-grade compliance need (NDPR, CBN, ISA 2007, WAEMU, PoPIA) · DESIGN-PARTNER-only target until product is hardened with paid solo-tier validators · NOT primary outbound for next 30 days',
     buyerType: 'wedge',
-    priority: 'now',
+    priority: 'summer_2026',
     ticketBand:
       '£2,000-3,000/mo design partner → £30-50K ARR after 3 IC cycles · expansion path to firm-wide seat after 6 months',
     whatTheyWant: [
@@ -490,9 +775,9 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
   // -----------------------------------------------------------------------
   {
     id: 'f500_cso',
-    role: 'Fortune 500 Chief Strategy Officer',
+    role: 'Fortune 500 Chief Strategy Officer · 12-month ceiling play (NOT primary outbound)',
     archetype:
-      'Reports to CEO · $50-150M strategy budget · ships 40-60 strategic recommendations / year · audit-committee + board are the ultimate consumers · incumbent advisor: McKinsey / BCG / Bain at $500K-$5M per engagement',
+      'Reports to CEO · $50-150M strategy budget · ships 40-60 strategic recommendations / year · audit-committee + board are the ultimate consumers · incumbent advisor: McKinsey / BCG / Bain at $500K-$5M per engagement · 6-12 month procurement cycle requires SOC 2 Type II + EU AI Act mapping + audit-committee sign-off · this is the unicorn revenue ceiling, NOT the 30-day target',
     buyerType: 'expansion',
     priority: 'q4_2026',
     ticketBand: '£50-150K ARR · multi-seat Strategy contract · 12-month auto-renew · enterprise security review',
@@ -681,9 +966,9 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
   // -----------------------------------------------------------------------
   {
     id: 'f500_gc_audit_chair',
-    role: 'F500 General Counsel / Audit Committee Chair',
+    role: 'F500 General Counsel / Audit Committee Chair · 12-month gate (NOT outbound target)',
     archetype:
-      'Procurement gatekeeper · risk-management orientation · EU AI Act Art 14 + SOX + Basel III + GDPR Art 22 are personal worry-list · vendor-risk-register reviews every new SaaS · Reuters-headline allergy',
+      'Procurement gatekeeper, NOT early adopter · risk-management orientation · EU AI Act Art 14 + SOX + Basel III + GDPR Art 22 are personal worry-list · vendor-risk-register reviews every new SaaS · Reuters-headline allergy · their literal job is to find reasons NOT to sign · pitching pre-seed is corporate suicide · runs in parallel with CSO buying conversation, NEVER as primary',
     buyerType: 'expansion',
     priority: 'q4_2026',
     ticketBand:
@@ -1165,7 +1450,7 @@ export const R2F_CURRENT: R2FCurrentPillar[] = [
     label: 'Kahneman side · Rigor (System 2 debiasing)',
     pipelineNodes: ['biasDetective', 'noiseJudge', 'statisticalJury'],
     whatItDoes:
-      'Identifies overconfidence, anchoring, sunk-cost, base-rate neglect, framing effects · measures cross-judge variance · catches systemic noise · scores severity using weighted statistical-jury voting.',
+      'Identifies overconfidence, anchoring, sunk-cost, base-rate neglect, framing effects · measures cross-judge variance · catches systemic noise · scores severity using weighted ensemble-sampling consensus across 3 independent samplers (renamed from "statistical jury" 2026-04-28 per brutal-critique synthesis).',
     whyItMatters:
       'Suppresses bias before the recommendation reaches the room. The DQI weight on Kahneman-side outputs proves the analyst was not the only sceptic — a multi-judge audit was already on the side of rigor.',
   },
@@ -2054,6 +2339,56 @@ export const NETWORK_NODES: NetworkNode[] = [
       'Next 1:1: ask explicitly for the McKinsey QuantumBlack alliance intro to Lieven Van der Veken (or apply to Credo AI partner program as the side-door). Pre-qualify with: "I have prepared the R²F architecture overview + the EU AI Act Art 14 mapping + the joint-research angle. Cyberstarts and Index Ventures should be the next two pre-seed conversations — both know the Wiz pattern. Can you make those introductions?"',
   },
   {
+    id: 'uk_networking_events',
+    name: 'UK Networking Events · in-person CSO + PE/VC + M&A circles',
+    role: 'London-based networking events · founder physically in the room · highest signal-to-noise outreach channel for the 30-day fast-converter pivot',
+    relationship: 'untapped',
+    unlocks: [
+      'Direct in-person introductions to mid-market PE/VC associates and boutique M&A partners (the 3 fast-converter archetypes)',
+      'Solo / fractional CSO connections in London ex-MBB community',
+      'Real-time customer-feedback conversations · 5 minutes of in-person reaction beats 50 LinkedIn DMs',
+      'Discovery-call scheduling without the cold-DM friction · "I met you at X, want to walk through this on Tuesday?"',
+    ],
+    ask: {
+      tier1:
+        'Attend 2-3 high-density events / month: London PE & VC Networks · M&A Tuesday · The Strategic Advisors London · British Private Equity & Venture Capital Association (BVCA) socials · UK CSO Forum events · ex-McKinsey / BCG / Bain alumni socials · Founders Forum / Slush London',
+      tier2: 'Bring 1-page DPR specimen + the WeWork audit teaser · pitch in 30 seconds, qualify in 90, schedule 20-min call within the week',
+      tier3: 'Build a recurring presence · become known as "the kid who built the bias auditor" in 2-3 specific event communities',
+    },
+    status: 'untapped',
+    cadence: 'Weekly · 2-3 events / month minimum · the founder being PHYSICALLY in the room is the unlock',
+    notes:
+      'Per founder direction 2026-04-28: UK is the actual market focus for the 30-day pivot. Founder is in London. In-person beats LinkedIn DM by an order of magnitude for the fast-converter archetypes — they trust someone they\'ve looked in the eye before they swipe a credit card. The Naira pricing reality (£2K/mo Nigerian feels like £5K/mo in real purchasing power) is also why UK is the immediate market — Sankore stays as the summer design-partner wedge, not the immediate revenue source.',
+    nextStep:
+      'Identify 5 specific events in London for May 2026: list event date + likely attendees + specific 30-second pitch tuned to that audience + 3 follow-up DM templates for post-event. First event by week 2 of May.',
+  },
+  {
+    id: 'extended_family_mckinsey',
+    name: 'Extended-family McKinsey connections',
+    role: 'Direct family relationships with current / former McKinsey consultants · founder direction 2026-04-28',
+    relationship: 'family',
+    unlocks: [
+      'Warm intros to McKinsey London office partners and consultants (alongside Wiz advisor → QuantumBlack alliance path)',
+      'Real ex-MBB fractional CSOs in the founder\'s extended network · the solo-CSO archetype is most likely buyer in this network',
+      'Validation network for the 5 silent objections — family connections will give honest feedback that strangers won\'t',
+      'Long-term: McKinsey alumni who become F500 CSOs over time',
+    ],
+    ask: {
+      tier1:
+        'Specific ask: 1-2 introductions to current McKinsey London consultants who would benefit from running their own pre-IC drafts through DI · the associate-archetype price point ($149/mo) is well below their corporate-card threshold',
+      tier2:
+        'Honest customer-feedback conversation · "I\'m about to pitch this to mid-market PE/VC associates. What would you tell them? What would you push back on?"',
+      tier3:
+        'Long-term: McKinsey alumni introductions when they leave for fractional CSO careers (ex-MBB → independent advisor pattern)',
+    },
+    status: 'warm',
+    cadence: 'Per-relationship · activate 1 conversation / week starting week 1 of May 2026',
+    notes:
+      'Per founder direction 2026-04-28: extended-family connections compound when reciprocated. Treat with maximum respect; never burn the closest relationships. This is parallel to the Wiz-advisor → QuantumBlack alliance path — both routes to the same destination, both worth running.',
+    nextStep:
+      'List the named extended-family connections by name in private notes (NOT in this codebase — privacy). Reach out individually with a specific ask: "Can I get 30 minutes of your honest feedback on this product? I\'m about to pitch to associates and want to stress-test the message."',
+  },
+  {
     id: 'tasis_school_network',
     name: 'TASIS England School Network',
     role: 'Organic first-degree connections to Oxford / LSE / Imperial',
@@ -2078,8 +2413,8 @@ export const NETWORK_NODES: NetworkNode[] = [
   },
   {
     id: 'sankore_active_conversation',
-    name: 'Sankore (active design-partner conversation)',
-    role: 'Pan-African fund · first wedge buyer · Pan-African PE network',
+    name: 'Sankore · summer 2026 design-partner wedge (NOT immediate revenue)',
+    role: 'Pan-African fund · summer design-partner wedge for product rigor + Pan-African PE network · NOT primary outbound for the 30-day pivot per founder direction 2026-04-28',
     relationship: 'design_partner',
     unlocks: [
       'First paid design partner (the wedge that proves the wedge)',
@@ -2097,9 +2432,9 @@ export const NETWORK_NODES: NetworkNode[] = [
     cadence:
       'Day 1-7: integration-first onboarding (Drive polling or analyze+token@in.decision-intel.com forwarder live in 15 min during discovery call) · weekly Brier-score sync · Day 30 / 60 / 90 metric checkpoints · monthly partner 1:1 with founder',
     notes:
-      'Per NotebookLM 2026-04-27 Sankore Day-90 synthesis. Three highest-probability failure modes: (1) Integration "shelfware" (analysts abandon by week 4 — countermove: integration-first onboarding, zero behavior change, email forwarder live in 15 min); (2) Dormant data flywheel (audits run but outcomes never logged — countermove: enforce 409 Outcome Gate, architecturally block new audits on pending outcomes past 30-90 days); (3) Unpaid dev shop / scope creep (custom features delay roadmap — countermove: "no custom features outside published roadmap" rule before signing, frame partnership around CATEGORY co-building, not bespoke software). Sankore brief stays INSIDE the Founder Hub per CLAUDE.md no-named-prospects rule. The relationship IS the wedge proof.',
+      'Per founder direction 2026-04-28: Sankore is the SUMMER 2026 design-partner wedge — NOT the primary 30-day outbound target. The Naira pricing reality (£2K/mo Nigerian feels like £5K/mo in real purchasing power) means revenue mathematics are weaker for a UK-based founder than focusing on the 3 fast-converter archetypes (mid-market PE/VC associate, boutique M&A advisor, solo fractional CSO). Sankore is essential for product rigor + Pan-African network + Q4 2026 Bias Autopsy reference case. But pitching them now dilutes focus from the validators who will pay £149-£499 in 14-30 days. Per NotebookLM 2026-04-27 Day-90 synthesis: three highest-probability failure modes — (1) Integration shelfware (countermove: integration-first onboarding, zero behavior change); (2) Dormant data flywheel (countermove: enforce 409 Outcome Gate); (3) Unpaid dev shop / scope creep (countermove: "no custom features outside published roadmap" rule). Sankore brief stays INSIDE the Founder Hub per CLAUDE.md no-named-prospects rule.',
     nextStep:
-      'Close the contract by Q3 2026 with: (a) outcome-gate enforcement as contractual term, (b) "no custom features" rule pre-signed, (c) integration-first onboarding scheduled for Week 1 (Drive polling OR email forwarder), (d) Day-30 / 60 / 90 success metrics in the contract appendix. Schedule Q4 2026 Bias Autopsy publication target NOW.',
+      'Defer active sales outreach to summer 2026 (June-August). Use spring 2026 (May) for: (a) UK fast-converter validation (3 paid customers on £149-£499); (b) ISA 2007 + FRC Nigeria current code shipped in compliance/frameworks; (c) DPR Pan-African specimen refined based on UK-validator feedback. Then approach Sankore in summer 2026 from a position of paid validation + tight regulatory mapping, NOT a position of pre-revenue uncertainty.',
   },
   {
     id: 'lrqa_ian_spaulding',
@@ -2484,6 +2819,251 @@ export const NOTEBOOKLM_FOLLOW_UPS: NotebookLmFollowUp[] = [
 ];
 
 // =========================================================================
+// SECTION 14 · MARKET REALITY CHECK (NotebookLM 2026-04-28 brutal-critique synthesis)
+// =========================================================================
+
+export type SilentObjection = {
+  id: string;
+  rank: number;
+  buyerThinks: string;
+  whyItKills: string;
+  fixThisWeek: string;
+  status: 'shipped' | 'in_progress' | 'planned' | 'deferred';
+  shipBy: string;
+};
+
+export const SILENT_OBJECTIONS: SilentObjection[] = [
+  {
+    id: 'dqi_trust_me_math',
+    rank: 1,
+    buyerThinks:
+      '"You\'re charging £2,499/mo to tell me my memo is a \'D\' based on a weighting formula you invented. Where are the confidence intervals? My CFO will laugh me out of the room if I take heuristic dollar estimates to procurement."',
+    whyItKills:
+      'Audit committees and CFOs reject black-box financial estimates by definition. Heuristic-based USD numbers fail procurement on first pass.',
+    fixThisWeek:
+      'REMOVE hard counterfactual dollar amounts ("$2.3M in avoided losses", "£187k cost") from every user-facing surface. Replace with directional language: "Estimated DQI improvement · pre-validation phase · confidence intervals shipping when outcome-data validates." Add v0.x label to DQI methodology sections. Keep DQI score itself (academically grounded) — only the dollar counterfactuals come off.',
+    status: 'in_progress',
+    shipBy: 'This week — code change',
+  },
+  {
+    id: 'cathedral_no_nda_purge',
+    rank: 2,
+    buyerThinks:
+      '"You have an AI boardroom simulator and 14 RSS feeds, but I can\'t bulk-delete confidential target data when a deal dies or an NDA expires. This kid built 40 cool features but doesn\'t understand that data lifecycle governance is my actual job."',
+    whyItKills:
+      'M&A partners and GCs care more about NDA-expiry hard-purge than the 12-node pipeline. A 30-day soft-delete is catastrophic exposure. Without it they will not upload pipeline data.',
+    fixThisWeek:
+      'Build POST /api/deals/:id/archive endpoint for 7-day NDA-expiry hard purges. Add bulk-delete CSV upload (NDA expiry dates → automated purge schedule). Stop building new AI nodes; hide vanity surfaces (RSS feeds, extra dashboards) from procurement-stage demo views.',
+    status: 'planned',
+    shipBy: 'Next week — real infra change',
+  },
+  {
+    id: 'continuity_solo_founder',
+    rank: 3,
+    buyerThinks:
+      '"He\'s a genius but he\'s 16 and operating solo. What happens to my SLA when he has AP exams next May or leaves for Stanford? Zero technical continuity if he gets busy."',
+    whyItKills:
+      'Cannot sell "system of record for strategic reasoning" if the system itself is viewed as a fragile single-point-of-failure startup.',
+    fixThisWeek:
+      'DEFERRED until first design-partner sign per founder direction 2026-04-28. Solo / individual / fractional CSO targets in the 30-day window do NOT raise this objection — they\'re buying a personal tool, not enterprise SLA. Re-activate when Sankore / first F500 conversation enters procurement stage.',
+    status: 'deferred',
+    shipBy: 'When first design-partner conversation enters procurement stage',
+  },
+  {
+    id: 'chatgpt_wrapper_suspicion',
+    rank: 4,
+    buyerThinks:
+      '"This 3-judge statistical jury is just three Gemini API calls with different temperatures. My internal dev team could build this in a weekend with LangChain. I\'m not paying a premium for a UI wrapped around a foundation model."',
+    whyItKills:
+      'If they suspect we\'re a wrapper, they defer to existing Microsoft Copilot or Palantir AIP rollout instead of onboarding a new vendor.',
+    fixThisWeek:
+      'Rename "3-judge statistical jury" → "ensemble sampling" across all user-facing surfaces (lib/agents prompts, UI copy, /how-it-works, DPR sections, marketing pages). Move 100% of defensive messaging away from the LLM pipeline. Anchor exclusively on (a) the 135-case reference library and (b) the R²F Kahneman × Klein academic synthesis. The moat is historical pattern-matching + future outcome data, NOT the prompts.',
+    status: 'in_progress',
+    shipBy: 'This week — codebase rename',
+  },
+  {
+    id: 'pan_african_regulatory_illusion',
+    rank: 5,
+    buyerThinks:
+      '"You pitched a 17-framework compliance map for African funds, but you completely missed Nigerian SEC\'s Investment & Securities Act 2007, and you\'re referencing the outdated 2018 FRC Nigeria code. You claim you understand my market — you don\'t actually know my regulators."',
+    whyItKills:
+      'For a licensed firm like Sankore, regulatory mapping isn\'t marketing — it\'s a legal requirement. Incomplete coverage breaks trust permanently. One missing primary regulator turns the wedge into an outsider misstep.',
+    fixThisWeek:
+      'Ship ISA 2007 (Nigerian Investment & Securities Act) framework module. Update FRC Nigeria code to current standard (post-2018 revisions). Both extend the framework count from 17 → 18+ via the canonical getAllRegisteredFrameworks() source. Less critical for the immediate UK-focused 30-day pivot, but prerequisite for the Sankore summer design-partner conversation.',
+    status: 'in_progress',
+    shipBy: 'This week — framework module add',
+  },
+];
+
+// =========================================================================
+// SECTION 15 · SIMPLIFIED 30-DAY CONVERSION FUNNEL
+// =========================================================================
+
+export type FunnelScreen = {
+  id: string;
+  step: number;
+  name: string;
+  what: string;
+  action: string;
+  whatToHide: string[];
+};
+
+export const SIMPLIFIED_FUNNEL: FunnelScreen[] = [
+  {
+    id: 'landing',
+    step: 1,
+    name: 'Landing · the hook',
+    what: 'No "native reasoning layer." No "17 frameworks." Above-the-fold = a single H1 that names the buyer\'s acute fear.',
+    action:
+      'H1: "Bulletproof your IC memo / CIM before the partners tear it apart." Hero: massive textbox + PDF dropzone. Sub-CTA: "Paste your draft. Get the 3 fatal flaws in 60 seconds."',
+    whatToHide: [
+      'Founder Hub access link',
+      'Content Studio',
+      'Decision Knowledge Graph teasers',
+      'AI boardroom simulator',
+      'Multi-persona reveal copy',
+      'Hero credibility strip beyond "60-second audit · 30+ biases · DPR appendix"',
+    ],
+  },
+  {
+    id: 'upload',
+    step: 2,
+    name: 'Upload · the ingestion',
+    what: 'Immediate processing. No decision-frame form, no success-criteria input, no team invites. Drop file, audit fires.',
+    action: '60-second streaming progress bar with pipeline-node animation. No friction between drop and reveal.',
+    whatToHide: [
+      'Decision-frame capture form (if added per R²F lever 3, gate behind a "deeper audit" tier)',
+      'Success criteria input',
+      'Team-member invite step',
+      'Document-type selection dropdown (auto-detect from filename + content)',
+    ],
+  },
+  {
+    id: 'reveal_paywall',
+    step: 3,
+    name: 'Audit reveal + the wall',
+    what: '60-second progress completes. Screen reveals: DQI Score (e.g., "DQI: 42 · High Risk"), top-3 cognitive biases by name (e.g., "Anchoring · Sunk Cost · Overconfidence"), the Dr Red Team\'s SINGLE most-damaging objection.',
+    action:
+      'Above-the-fold reveal triggers urgency. Below-the-fold: the EXACT excerpts, mitigation playbooks, and counterfactual outputs are BLURRED with a paywall overlay.',
+    whatToHide: [
+      'Hard counterfactual dollar amounts (REMOVED — never show again until validated)',
+      'Full passage excerpts (blurred)',
+      'Mitigation playbooks (blurred)',
+      'Cross-document conflict scan (blurred — premium feature in the locked tier)',
+      '12-node pipeline visualisation (out of scope for this view; available in /how-it-works)',
+    ],
+  },
+  {
+    id: 'checkout',
+    step: 4,
+    name: 'Checkout · the conversion',
+    what: 'Single Stripe modal · two pricing options matched to the 3 fast-converter archetypes.',
+    action:
+      '"Unlock this audit: $499" (boutique M&A advisor · per-deal). "Upgrade to Professional: £149/mo · cancel anytime" (mid-market PE/VC associate + solo fractional CSO).',
+    whatToHide: [
+      'Strategy tier (£2,499/mo · enterprise-ish · do not show on the 30-day funnel)',
+      'Enterprise quote builder (out of scope for solo-tier conversion)',
+      'Team / multi-seat upsell (defer to month 2 when single-user retention is proven)',
+    ],
+  },
+];
+
+export type FeatureVerdict = {
+  id: string;
+  feature: string;
+  verdict: 'keep' | 'hide_flag' | 'enterprise_tier' | 'kill';
+  why: string;
+};
+
+export const FEATURE_VERDICTS: FeatureVerdict[] = [
+  // KEEP — front + center
+  {
+    id: 'dr_red_team',
+    feature: 'Dr Red Team adversarial node',
+    verdict: 'keep',
+    why: 'Single feature that proves "the AI is smarter than the analyst." Pre-paywall on the audit reveal. The reason the associate / advisor pays.',
+  },
+  {
+    id: 'browser_extension',
+    feature: 'Browser extension',
+    verdict: 'keep',
+    why: 'Massive ingestion-friction killer. 5-second quick-score on a DocSend CIM without download. Direct accelerator for the boutique M&A advisor archetype.',
+  },
+  {
+    id: 'dpr_pdf_export',
+    feature: 'DPR PDF export',
+    verdict: 'keep',
+    why: 'Literal deliverable the fractional CSO attaches to their strategy deck. The differentiation lever. If the PDF export is buried, the value prop vanishes.',
+  },
+  {
+    id: 'dqi_score',
+    feature: 'DQI score (without dollar counterfactuals)',
+    verdict: 'keep',
+    why: 'Bias detection + R²F arbitration is academically grounded. KEEP the score; REMOVE the unvalidated dollar counterfactuals.',
+  },
+
+  // HIDE BEHIND FEATURE FLAG — useful at month 6+, distracting at month 1
+  {
+    id: 'decision_knowledge_graph',
+    feature: 'Decision Knowledge Graph + Causal DAG',
+    verdict: 'hide_flag',
+    why: 'Empty graph at month 1 = zero value. Surface at month 6 when 30+ decisions logged. Hide entry point on solo-tier surfaces.',
+  },
+  {
+    id: 'ai_boardroom_simulator',
+    feature: 'Full 5-persona AI boardroom simulator',
+    verdict: 'hide_flag',
+    why: 'Too heavy for solo workflow. KEEP the Dr Red Team adversarial node (predicting the single hardest MD/buyer objection IS the value). Hide the multi-persona debate UI.',
+  },
+  {
+    id: 'meeting_recording',
+    feature: 'Zoom / meeting-recording analysis',
+    verdict: 'hide_flag',
+    why: '30-day wedge is auditing written memos and CIMs. Analyzing meetings is a different product with massive friction. Hide entry point until written-memo workflow is proven.',
+  },
+  {
+    id: 'rss_feeds',
+    feature: '14 RSS feeds + Content Studio',
+    verdict: 'hide_flag',
+    why: 'Procurement-stage signal is "this looks polished" — not "this team built 50 features." Hide RSS / Content Studio from solo-tier surfaces.',
+  },
+
+  // MOVE TO ENTERPRISE TIER — only F500 / Sankore-class care
+  {
+    id: 'team_cognitive_profiles',
+    feature: 'Team Cognitive Profiles + Org Benchmarking',
+    verdict: 'enterprise_tier',
+    why: 'Solo associates + advisors have no team to benchmark. Move to Strategy / Enterprise tier where team data is real.',
+  },
+  {
+    id: 'compliance_17_frameworks',
+    feature: '17-framework compliance mapping (SOX, EU AI Act, etc.)',
+    verdict: 'enterprise_tier',
+    why: 'A 24-year-old associate doesn\'t care about EU AI Act. F500 GCs care — but they\'re a 12-month play. Move to Strategy / Enterprise tier; surface only on enterprise quote pages.',
+  },
+  {
+    id: 'enterprise_slack',
+    feature: 'Enterprise Slack integration',
+    verdict: 'enterprise_tier',
+    why: 'Solo users aren\'t deploying Slack bots. Move to Strategy / Enterprise tier.',
+  },
+  {
+    id: 'outcome_gate_enforcement',
+    feature: 'Outcome Gate enforcement (blocking)',
+    verdict: 'enterprise_tier',
+    why: 'First-time solo buyer has no past decisions to log. Asking gates conversion. Defer outcome-gating to month 2 of any account; enforce contractually only on Sankore-class design partners.',
+  },
+
+  // KILL — vanity surfaces that dilute the focus
+  {
+    id: 'extra_dashboards',
+    feature: 'Extra "explore" dashboards (10+ tabs of SWOT / Noise / Logic / Intelligence views)',
+    verdict: 'kill',
+    why: 'They surface data, not the answer. The buyer wants "will my MD reject this?" — not "explore the data." Cathedral-of-code symptom.',
+  },
+];
+
+// =========================================================================
 // META · count helpers
 // =========================================================================
 
@@ -2500,4 +3080,7 @@ export const SECTION_COUNTS = {
   networkNodes: NETWORK_NODES.length,
   ninetyDayActions: NINETY_DAY_ACTIONS.length,
   notebookLmFollowUps: NOTEBOOKLM_FOLLOW_UPS.length,
+  silentObjections: SILENT_OBJECTIONS.length,
+  funnelScreens: SIMPLIFIED_FUNNEL.length,
+  featureVerdicts: FEATURE_VERDICTS.length,
 };

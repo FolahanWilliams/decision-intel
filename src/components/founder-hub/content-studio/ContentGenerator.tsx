@@ -40,7 +40,7 @@ const TOPIC_SUGGESTIONS: Record<string, string[]> = {
   ],
   decision_noise: [
     "Your Investment Committee Is a Rubber Stamp (Here's Proof)",
-    'The "Statistical Jury" Concept for Better IC Decisions',
+    'The "Ensemble Sampling" Concept for Better IC Decisions',
     "Winner's Curse: Why 65% of Deals Overpay",
     'Simulating the Boardroom: The Decision Twin Concept',
     'Why Your IC Produces Different Answers on Different Days',

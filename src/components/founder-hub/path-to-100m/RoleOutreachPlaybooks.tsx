@@ -18,7 +18,8 @@ import {
 import { ROLE_PLAYBOOKS, type RolePlaybook } from './data';
 
 const BUYER_TYPE_ACCENT: Record<RolePlaybook['buyerType'], string> = {
-  wedge: '#16A34A',
+  fast_validator: '#16A34A',
+  wedge: '#D97706',
   expansion: '#0EA5E9',
   channel: '#7C3AED',
   amplifier: '#D97706',
@@ -26,9 +27,10 @@ const BUYER_TYPE_ACCENT: Record<RolePlaybook['buyerType'], string> = {
 };
 
 const PRIORITY_LABEL: Record<RolePlaybook['priority'], string> = {
-  now: 'Active · this quarter',
+  now: '30-day fast-converter',
+  summer_2026: 'Summer 2026 design-partner wedge',
   q3_2026: 'Q3 2026',
-  q4_2026: 'Q4 2026',
+  q4_2026: 'Q4 2026 · 12-month ceiling',
   '2027': '2027 ceiling',
 };
 

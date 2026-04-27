@@ -535,9 +535,160 @@ export const BOT_FRAMEWORK: RegulatoryFramework = {
   ],
 };
 
+/**
+ * Nigerian Investment & Securities Act 2007 (ISA 2007) — added 2026-04-28.
+ *
+ * The primary statute governing securities markets, capital allocation,
+ * and investment-firm conduct in Nigeria. Critical missing-coverage gap
+ * surfaced by NotebookLM 2026-04-28 brutal-critique synthesis: a
+ * licensed Pan-African fund (Sankore-class) reading our 17-framework
+ * map and not seeing ISA 2007 reads it as "you don't actually know my
+ * regulators." We cover NDPR (data privacy) and CBN (banking) but the
+ * primary capital-markets statute was missing.
+ *
+ * Note: the Nigerian Investment & Securities Act was originally enacted
+ * 2007. The Investment & Securities Act 2025 was passed in March 2025
+ * to repeal and replace ISA 2007 with expanded provisions covering
+ * digital assets and ISA-licensed firms. We map the 2007 provisions
+ * here as the still-canonical historic reference + flag the 2025
+ * update in `lastUpdated` so DPR consumers see we are tracking the
+ * current statute.
+ */
+export const ISA_NIGERIA_FRAMEWORK: RegulatoryFramework = {
+  id: 'isa_nigeria_2007',
+  name: 'Nigerian Investment & Securities Act 2007 (with 2025 update)',
+  jurisdiction: 'Nigeria',
+  category: 'financial',
+  lastUpdated: '2025-03-29',
+  provisions: [
+    {
+      id: 'isa_s_13',
+      framework: 'isa_nigeria_2007',
+      section: 's. 13',
+      title: 'SEC Functions · Investor Protection & Market Integrity',
+      description:
+        'The Securities and Exchange Commission shall regulate investments and securities business in Nigeria, register and regulate market operators, and ensure the protection of investors. Decision-quality processes that fail to surface known cognitive biases in investment recommendations may be deemed inconsistent with investor-protection obligations.',
+      riskLevel: 'high',
+      keywords: ['investor protection', 'sec nigeria', 'market integrity', 'investment recommendations'],
+    },
+    {
+      id: 'isa_s_67',
+      framework: 'isa_nigeria_2007',
+      section: 's. 67',
+      title: 'Investment-Adviser & Portfolio-Manager Conduct',
+      description:
+        'Registered investment advisers and portfolio managers must act with the highest standards of integrity, fair dealing, and competence in advising clients. Decision processes that systematically embed cognitive biases (anchoring, sunk-cost, base-rate neglect) without reasonable mitigation may be examined under fair-dealing duties.',
+      riskLevel: 'high',
+      keywords: [
+        'investment adviser',
+        'portfolio manager',
+        'fair dealing',
+        'fiduciary duty',
+        'cognitive bias',
+      ],
+    },
+    {
+      id: 'isa_s_72',
+      framework: 'isa_nigeria_2007',
+      section: 's. 72',
+      title: 'Disclosure & Material Information',
+      description:
+        'Issuers and capital-market operators must disclose all material information that a reasonable investor would consider important. Suppressed dissent or unflagged blind spots in investment-committee memos that materially affect a recommendation can constitute disclosure failures.',
+      riskLevel: 'high',
+      keywords: ['disclosure', 'material information', 'reasonable investor', 'dissent'],
+    },
+    {
+      id: 'isa_s_115',
+      framework: 'isa_nigeria_2007',
+      section: 's. 115',
+      title: 'Record-Keeping for Investment Decisions',
+      description:
+        'Capital-market operators must maintain records of investment decisions, recommendations, and material communications for inspection by SEC Nigeria. The Decision Provenance Record satisfies this record-keeping requirement by hashing the input + decision rationale + judge variance + reviewer decisions in a tamper-evident artefact.',
+      riskLevel: 'high',
+      keywords: ['record keeping', 'investment decision record', 'sec inspection', 'audit trail'],
+    },
+    {
+      id: 'isa_2025_digital',
+      framework: 'isa_nigeria_2007',
+      section: 'ISA 2025 · Part XV',
+      title: 'Digital-Asset Operators & AI-Augmented Decision Tools',
+      description:
+        'The 2025 update expanded SEC Nigeria authority to include virtual asset service providers and AI-augmented investment-decision tools. Tools that materially shape capital-allocation decisions are subject to the same fair-dealing + disclosure standards as human advisers.',
+      riskLevel: 'high',
+      keywords: ['digital asset', 'ai-augmented decision', 'isa 2025', 'capital allocation tools'],
+    },
+  ],
+  biasMappings: [
+    {
+      biasType: 'anchoring_bias',
+      provisionId: 'isa_s_67',
+      riskWeight: 0.78,
+      mechanism:
+        'Anchoring on seller asking-price or prior valuation in advisory context can constitute breach of fair-dealing duty when not surfaced to the client',
+      example:
+        'Portfolio manager anchors valuation memo on prior-round price; SEC Nigeria examination finds the anchor was not disclosed to LPs',
+    },
+    {
+      biasType: 'confirmation_bias',
+      provisionId: 'isa_s_67',
+      riskWeight: 0.72,
+      mechanism:
+        'Selectively presenting evidence supporting the deal thesis while suppressing dissent breaches fair-dealing standards',
+      example:
+        'IC memo includes only positive analyst views on a Nigerian fintech investment; the dissenting risk note is footnoted in an annex',
+    },
+    {
+      biasType: 'overconfidence_bias',
+      provisionId: 'isa_s_72',
+      riskWeight: 0.74,
+      mechanism:
+        'Overconfident projections without confidence intervals or base-rate comparison violate the disclosure standard of "material information a reasonable investor would consider important"',
+      example:
+        'Hockey-stick growth projection (45% CAGR) presented without sector base rate (typical EM fintech CAGR 12-18%)',
+    },
+    {
+      biasType: 'sunk_cost_fallacy',
+      provisionId: 'isa_s_67',
+      riskWeight: 0.7,
+      mechanism:
+        'Recommending continued investment based on prior commitment rather than forward economics breaches fair-dealing obligations to current investors',
+      example:
+        'Follow-on round recommended primarily because £8M was already deployed; the forward-looking thesis is materially weaker',
+    },
+    {
+      biasType: 'base_rate_neglect',
+      provisionId: 'isa_s_72',
+      riskWeight: 0.68,
+      mechanism:
+        'Ignoring the failure base-rate for a deal class is a material disclosure gap when reasonable investors would weight that information',
+      example:
+        'Pan-African industrial-expansion thesis presented without referencing the 70-90% M&A failure rate cited in the McKinsey base rate',
+    },
+    {
+      biasType: 'planning_fallacy',
+      provisionId: 'isa_s_72',
+      riskWeight: 0.66,
+      mechanism:
+        'Systematic underestimation of timelines / costs without surfacing the typical overrun is a disclosure gap material to capital-allocation decisions',
+      example:
+        'Deal expected to close in 6 months; comparable deals in the same regulatory regime average 11-14 months',
+    },
+    {
+      biasType: 'algorithmic_bias',
+      provisionId: 'isa_2025_digital',
+      riskWeight: 0.82,
+      mechanism:
+        'AI-augmented investment-decision tools that systematically embed bias compound the fair-dealing exposure across every advisory relationship that uses the tool',
+      example:
+        'AI-screening tool trained on biased historical data systematically excludes Lagos-based growth-stage companies — fair-dealing breach across portfolio',
+    },
+  ],
+};
+
 export const AFRICA_FRAMEWORKS: RegulatoryFramework[] = [
   NDPR_FRAMEWORK,
   CBN_AI_FRAMEWORK,
+  ISA_NIGERIA_FRAMEWORK,
   WAEMU_FRAMEWORK,
   CMA_KENYA_FRAMEWORK,
   CBK_FRAMEWORK,

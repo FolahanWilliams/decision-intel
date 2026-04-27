@@ -459,7 +459,7 @@ export const PATTERNS: Pattern[] = [
     description:
       '3+ people describe a deal where "the senior person pushed it through" or where dissent was suppressed. Decision noise disguised as leadership.',
     wedge:
-      'Decision noise measurement + 3-judge jury disagreement index. The strongest wedge — confirms noise (not data) is the real issue.',
+      'Decision noise measurement + ensemble-sampling disagreement index. The strongest wedge — confirms noise (not data) is the real issue.',
     threshold: 3,
     color: '#EC4899',
   },

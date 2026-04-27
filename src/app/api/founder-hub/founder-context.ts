@@ -326,7 +326,7 @@ PILLAR 2 — Exposing "Decision Noise"
 Core thesis: Executive reviews and steering committees produce wildly inconsistent decisions that nobody measures (Kahneman's noise research).
 Key angles:
 - "Rubber-stamp review" problem: confirmation bias leads steering committees to validate the existing recommendation rather than stress-test it.
-- "Statistical Jury" concept: run strategic memos past multiple independent, objective evaluators to measure variance (noise) before capital is committed. This is exactly what DI's triple-judge scoring does.
+- "Ensemble sampling" concept (renamed from "Statistical Jury" 2026-04-28 per the brutal-critique synthesis — the prior name read as "ChatGPT wrapper" to sophisticated buyers): run strategic memos past multiple independent, objective evaluators to measure variance (noise) before capital is committed. This is exactly what DI's triple-sampler ensemble does. The moat is NOT the prompts — it is the 135-case reference library + the R²F Kahneman × Klein academic synthesis on top of the ensemble outputs.
 - "Decision Twin" / Simulating the Steering Committee: groupthink and authority bias silence genuine debate. Simulate committee personas (Chief Strategy Officer, Risk Committee, Sector Specialist, CEO) to predict objections and surface minority dissent before the meeting. This is DI's Boardroom Simulation feature.
 - Kahneman's insurance underwriter study: expected 10% variability, actual 55%. Noise is at least as damaging as bias.
 

@@ -84,7 +84,7 @@ const TENETS: Tenet[] = [
     claim: 'Every claim is anchored to a reference class.',
     detail:
       'The system surfaces the base-rate for the category of decision (e.g. cross-border acquisitions, market entry, enterprise software pivots) so the memo is read against prior precedent, not in isolation.',
-    pipelineStage: 'Statistical Jury',
+    pipelineStage: 'Ensemble Sampling',
   },
   {
     num: 4,

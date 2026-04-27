@@ -44,8 +44,12 @@ import {
   Network,
   Calendar,
   HelpCircle,
+  AlertCircle,
+  Filter,
 } from 'lucide-react';
 import { NorthStarHero } from './path-to-100m/NorthStarHero';
+import { MarketRealityCheck } from './path-to-100m/MarketRealityCheck';
+import { SimplifiedThirtyDayFunnel } from './path-to-100m/SimplifiedThirtyDayFunnel';
 import { StrengthsWeaknessesMatrix } from './path-to-100m/StrengthsWeaknessesMatrix';
 import { R2FDeepDive } from './path-to-100m/R2FDeepDive';
 import { CategoryAndPitchLibrary } from './path-to-100m/CategoryAndPitchLibrary';
@@ -117,6 +121,24 @@ export function PathToHundredMillionTab() {
   return (
     <div style={{ paddingBottom: 64 }}>
       <NorthStarHero />
+
+      <Section
+        icon={<AlertCircle size={16} />}
+        title="Market Reality Check · 30-day fast-converters vs 12-month ceiling plays"
+        subtitle="NotebookLM 2026-04-28 brutal-critique synthesis. Three time-horizons (30-day fast-converters · summer 2026 design-partner wedge · 12-month ceiling plays) + 5 silent objections that close tabs today + the this-week fix for each. The honest reframe: the current strategy is a 12-18 month play, not a 30-day play. For paid validation in the next 30 days, stop pitching the cathedral — start pitching individuals with a corporate expense card and acute career fear."
+        accent="#DC2626"
+      >
+        <MarketRealityCheck />
+      </Section>
+
+      <Section
+        icon={<Filter size={16} />}
+        title="Simplified 30-Day Conversion Funnel · 4 screens · feature verdicts"
+        subtitle="The 4-screen funnel that closes paid validation in 30 days: landing (no jargon, single H1) → upload (drop file, audit fires) → reveal + paywall (DQI + 3 biases + Dr Red Team objection, then blur) → checkout ($499/deal OR £149/mo). Below: 14 feature verdicts — keep / hide behind feature flag / move to enterprise tier / kill — that strip the cathedral down to the 30-day funnel without losing the long-tail value."
+        accent="#0EA5E9"
+      >
+        <SimplifiedThirtyDayFunnel />
+      </Section>
 
       <Section
         icon={<Scale size={16} />}

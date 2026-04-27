@@ -53,7 +53,7 @@ const SAMPLE_MODEL_LINEAGE: ModelLineage = {
 const SAMPLE_JUDGE_VARIANCE: JudgeVariance = {
   noiseScore: 22,
   metaVerdict:
-    'Concurred on three of four material flags; minority dissent on reference-class (preMortem flagged the 18-month break-even claim as optimistic; statisticalJury concurred only after base-rate pull).',
+    'Concurred on three of four material flags; minority dissent on reference-class (Pre-Mortem flagged the 18-month break-even claim as optimistic; Ensemble Sampling concurred only after base-rate pull).',
   note: 'Summary view of judge variance. Per-judge granular outputs are stored in the internal audit log and are available on request under the DPA; they are deliberately excluded from the client-facing record to protect prompt internals.',
 };
 
@@ -268,7 +268,7 @@ const SAMPLE_REVIEWER_DECISIONS: ReviewerDecisionLog = {
   ],
   dissentLog: [
     {
-      source: 'Statistical Jury (judge)',
+      source: 'Ensemble Sampling (judge)',
       objection:
         'Concurred only after base-rate pull on the 18-month break-even claim; pre-pull the model rated the claim as "supported".',
       resolution:

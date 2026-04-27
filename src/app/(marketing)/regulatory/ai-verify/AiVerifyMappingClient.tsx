@@ -111,7 +111,7 @@ const PRINCIPLES: PrincipleRow[] = [
     name: 'Safety',
     definition: 'The AI system behaves safely during deployment.',
     mechanism:
-      'GDPR anonymiser runs as the first node of the pipeline \u2014 no analysis LLM ever sees raw PII. Content is encrypted at rest with AES-256-GCM and a keyVersion rotation protocol. The three-judge noise jury (bias detective + noise judge + statistical jury) bounds individual-model failures.',
+      'GDPR anonymiser runs as the first node of the pipeline \u2014 no analysis LLM ever sees raw PII. Content is encrypted at rest with AES-256-GCM and a keyVersion rotation protocol. Ensemble sampling across three Kahneman-side nodes (bias detective + noise judge + reference-class pull) bounds individual-model failures by measuring inter-judge variance directly.',
     dprFields: ['Pipeline lineage', 'Judge variance (noise score)'],
   },
   {

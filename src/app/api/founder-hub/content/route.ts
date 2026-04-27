@@ -121,7 +121,7 @@ Focus on: 70-90% M&A failure rate from human factors, anchoring to entry price, 
 Suggested angles: Why perfect financial models fail, the human element DD misses, cognitive biases invisible in spreadsheets.`,
 
   decision_noise: `CONTENT PILLAR: Exposing "Decision Noise"
-Focus on: IC inconsistency nobody measures, "Rubber-Stamp" committees, winner's curse (65%), confirmation bias in deal advocacy. Reference Kahneman's noise research. Use "Statistical Jury" and "Decision Twin" concepts.
+Focus on: IC inconsistency nobody measures, "Rubber-Stamp" committees, winner's curse (65%), confirmation bias in deal advocacy. Reference Kahneman's noise research. Use "Ensemble Sampling" and "Decision Twin" concepts (the term "Statistical Jury" was retired 2026-04-28 because sophisticated buyers read it as "ChatGPT wrapper" — anchor on the 135-case reference library + R²F academic synthesis instead).
 Suggested angles: Why your IC produces different answers on different days, the rubber-stamp problem, simulating the boardroom.`,
 
   toxic_combos: `CONTENT PILLAR: "Toxic Combinations" and Compound Risk

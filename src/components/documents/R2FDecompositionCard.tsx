@@ -26,7 +26,7 @@ interface R2FDecompositionCardProps {
 const KAHNEMAN_SIDE = [
   { label: 'Bias Detective', note: '30+ bias scan across the memo' },
   { label: 'Noise Judge', note: 'Within-memo consistency check' },
-  { label: 'Statistical Jury', note: 'Base-rate and reference-class pull' },
+  { label: 'Ensemble Sampling', note: 'Base-rate and reference-class pull · multi-model consensus' },
 ];
 
 const KLEIN_SIDE = [

@@ -182,11 +182,11 @@ export function CounterfactualPanel({ analysisId, variant = 'full' }: Counterfac
               style={{
                 borderLeft: '1px solid var(--border-color)',
                 paddingLeft: 20,
-                minWidth: 140,
+                minWidth: 160,
               }}
             >
               <div className="section-heading" style={{ marginBottom: 2 }}>
-                Estimated Impact
+                DQI improvement
               </div>
               <div
                 style={{
@@ -196,8 +196,18 @@ export function CounterfactualPanel({ analysisId, variant = 'full' }: Counterfac
                   fontFamily: "'JetBrains Mono', monospace",
                 }}
               >
-                ~{currencySymbol}
-                {top.estimatedMonetaryImpact.toLocaleString()}
+                +{Math.round(top.expectedImprovement * 100)}%
+              </div>
+              <div
+                style={{
+                  fontSize: 10,
+                  color: 'var(--text-muted)',
+                  marginTop: 4,
+                  lineHeight: 1.35,
+                }}
+                title={`Estimated monetary impact: ~${currencySymbol}${top.estimatedMonetaryImpact.toLocaleString()} · pre-validation, suppressed pending outcome-data confidence intervals.`}
+              >
+                Monetary CIs ship with first 30 outcomes
               </div>
             </div>
           )}
@@ -242,6 +252,9 @@ export function CounterfactualPanel({ analysisId, variant = 'full' }: Counterfac
           >
             What if these biases were removed? Based on{' '}
             {data.scenarios.reduce((s, sc) => s + sc.historicalSampleSize, 0)} historical decisions
+            <span style={{ marginLeft: 6, color: 'var(--text-muted)' }}>
+              · v0.x · pre-validation
+            </span>
           </span>
         </div>
       </div>
@@ -323,14 +336,17 @@ export function CounterfactualPanel({ analysisId, variant = 'full' }: Counterfac
                 +{scenario.expectedImprovement.toFixed(1)}pp
               </span>
               {scenario.estimatedMonetaryImpact != null && scenario.estimatedMonetaryImpact > 0 && (
-                <span style={{ fontSize: '10px', color: 'var(--text-muted)', display: 'block' }}>
-                  ~
-                  {scenario.currency === 'GBP'
-                    ? '£'
-                    : scenario.currency === 'USD'
-                      ? '$'
-                      : scenario.currency}
-                  {scenario.estimatedMonetaryImpact.toLocaleString()}
+                <span
+                  style={{ fontSize: '10px', color: 'var(--text-muted)', display: 'block' }}
+                  title={`Underlying monetary estimate: ~${
+                    scenario.currency === 'GBP'
+                      ? '£'
+                      : scenario.currency === 'USD'
+                        ? '$'
+                        : scenario.currency
+                  }${scenario.estimatedMonetaryImpact.toLocaleString()} (pre-validation; CIs pending outcome data).`}
+                >
+                  Monetary impact: pre-validation
                 </span>
               )}
             </div>
