@@ -171,6 +171,7 @@ export function EnterpriseQuoteBuilderClient({
       </p>
 
       <div
+        className="quote-builder-grid"
         style={{
           display: 'grid',
           gridTemplateColumns: 'minmax(0, 1fr) 320px',
@@ -392,6 +393,16 @@ export function EnterpriseQuoteBuilderClient({
           <SummaryRow label="Region" value={region} />
         </aside>
       </div>
+      <style>{`
+        @media (max-width: 800px) {
+          .quote-builder-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .quote-builder-field-row {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
@@ -454,7 +465,14 @@ function Section({
 }
 
 function FieldRow({ children }: { children: React.ReactNode }) {
-  return <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>{children}</div>;
+  return (
+    <div
+      className="quote-builder-field-row"
+      style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}
+    >
+      {children}
+    </div>
+  );
 }
 
 function Field({

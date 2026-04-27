@@ -188,9 +188,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
                 phase: 'post_decision',
               },
             })
-            .catch(() => null)
+            .catch(err => log.warn('document_access_granted nudge dispatch failed:', err))
         )
-      ).catch(() => null);
+      ).catch(err => log.warn('document_access_granted nudge fan-out failed:', err));
     }
 
     if (removed.length > 0) {

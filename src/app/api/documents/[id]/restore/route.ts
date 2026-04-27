@@ -69,7 +69,7 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
       resource: 'Document',
       resourceId: id,
       details: { event: 'restored_within_grace', filename: doc.filename },
-    }).catch(() => null);
+    }).catch(err => log.warn('document-restore audit-log write failed:', err));
 
     log.info(`Document ${id} restored within grace window by ${user.id}`);
     return NextResponse.json({ ok: true });

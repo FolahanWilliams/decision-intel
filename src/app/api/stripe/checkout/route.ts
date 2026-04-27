@@ -38,13 +38,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Price not configured' }, { status: 503 });
     }
 
-    // Check for existing Stripe customer
-    const existing = await prisma.subscription
-      .findFirst({
+    // Check for existing Stripe customer.
+    // Fail-closed per CLAUDE.md commerce-dedup discipline: a silent failure
+    // here would skip the customer-reuse path, causing Stripe to create a NEW
+    // customer record for a user who already has one — duplicate customer
+    // records and downstream subscription-state confusion. On query failure
+    // surface a 503 retry, never silently fall through.
+    let existing: { stripeCustomerId: string | null } | null;
+    try {
+      existing = await prisma.subscription.findFirst({
         where: { userId: user.id },
         select: { stripeCustomerId: true },
-      })
-      .catch(() => null);
+      });
+    } catch (lookupErr) {
+      log.error('Subscription lookup failed during checkout:', lookupErr);
+      return NextResponse.json(
+        { error: 'Could not verify subscription state. Please retry.' },
+        { status: 503 }
+      );
+    }
 
     const origin =
       request.headers.get('origin') || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';

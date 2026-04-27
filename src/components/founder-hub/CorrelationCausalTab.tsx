@@ -201,7 +201,10 @@ export function CorrelationCausalTab() {
         {industryProfile ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {/* Stats row */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+            <div
+              className="cct-stats-row"
+              style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}
+            >
               <div>
                 <div style={label}>Case Count</div>
                 <div style={stat}>{industryProfile.caseCount}</div>
@@ -973,6 +976,13 @@ export function CorrelationCausalTab() {
           </div>
         )}
       </div>
+      <style>{`
+        @media (max-width: 700px) {
+          .cct-stats-row {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

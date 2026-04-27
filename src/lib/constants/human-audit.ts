@@ -59,6 +59,10 @@ export function getQualityLevel(score: number) {
 
 // ─── Nudge Types ────────────────────────────────────────────────────────────
 
+// Every nudgeType used in code MUST appear here, or the UI surfaces the raw
+// enum string (e.g. "pre_decision_coaching") because of the `|| nudge.nudgeType`
+// fallback in NudgeWidget / NudgesPageContent. Before adding a new value,
+// search the call-sites with: grep -rE "nudgeType: ?['\"]" src/
 export const NUDGE_TYPE_LABELS: Record<string, string> = {
   anchor_alert: 'Anchor Alert',
   dissent_prompt: 'Dissent Prompt',
@@ -68,6 +72,11 @@ export const NUDGE_TYPE_LABELS: Record<string, string> = {
   shallow_verification: 'Shallow Verification',
   graph_pattern_warning: 'Graph Pattern Warning',
   bias_comment_mention: 'Comment Mention',
+  toxic_combination: 'Toxic Combination',
+  pre_decision_coaching: 'Pre-Decision Coaching',
+  document_access_granted: 'Document Access Granted',
+  bias_task_assigned: 'Bias Task Assigned',
+  playbook_followup: 'Playbook Follow-Up',
 };
 
 // ─── Helpers ────────────────────────────────────────────────────────────────

@@ -18,6 +18,13 @@ import {
   FileDown,
 } from 'lucide-react';
 import { CrossReferenceCard } from './CrossReferenceCard';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 
 interface AggregationDto {
   compositeDqi: number | null;
@@ -1065,9 +1072,10 @@ function RemoveDocButton({
   onRemoved: () => void | Promise<void>;
 }) {
   const [removing, setRemoving] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
-  const remove = async () => {
-    if (!confirm('Remove this document from the package?')) return;
+  const confirmRemove = async () => {
+    setShowConfirm(false);
     setRemoving(true);
     try {
       const res = await fetch(`/api/decision-packages/${packageId}/documents/${joinId}`, {
@@ -1080,22 +1088,86 @@ function RemoveDocButton({
   };
 
   return (
-    <button
-      onClick={remove}
-      disabled={removing}
-      title="Remove from package"
-      style={{
-        background: 'transparent',
-        border: 'none',
-        color: 'var(--text-muted)',
-        cursor: removing ? 'wait' : 'pointer',
-        padding: 4,
-        display: 'inline-flex',
-        alignItems: 'center',
-      }}
-    >
-      {removing ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
-    </button>
+    <>
+      <button
+        onClick={() => setShowConfirm(true)}
+        disabled={removing}
+        title="Remove from package"
+        style={{
+          background: 'transparent',
+          border: 'none',
+          color: 'var(--text-muted)',
+          cursor: removing ? 'wait' : 'pointer',
+          padding: 4,
+          display: 'inline-flex',
+          alignItems: 'center',
+        }}
+      >
+        {removing ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
+      </button>
+      <Dialog
+        open={showConfirm}
+        onOpenChange={isOpen => {
+          if (!isOpen) setShowConfirm(false);
+        }}
+      >
+        <DialogContent className="sm:max-w-md" showCloseButton>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base">
+              <Trash2 size={18} style={{ color: 'var(--severity-high, #ef4444)' }} />
+              Remove document?
+            </DialogTitle>
+            <DialogDescription>
+              The document stays in your library — only its link to this Decision Package is
+              removed. The composite DQI and cross-reference run will recompute without it.
+            </DialogDescription>
+          </DialogHeader>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: 8,
+              marginTop: 16,
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setShowConfirm(false)}
+              className="btn"
+              style={{
+                padding: '8px 16px',
+                background: 'transparent',
+                color: 'var(--text-secondary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 'var(--radius-md)',
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              Keep in package
+            </button>
+            <button
+              type="button"
+              onClick={confirmRemove}
+              className="btn"
+              style={{
+                padding: '8px 16px',
+                background: 'var(--severity-high, #ef4444)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 'var(--radius-md)',
+                fontSize: 13,
+                fontWeight: 700,
+                cursor: 'pointer',
+              }}
+            >
+              Remove
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 

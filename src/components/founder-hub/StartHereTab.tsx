@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
 import {
   CheckCircle2,
   Circle,
@@ -415,7 +416,8 @@ function renderHero(
           expansion (Africa / EM). Two production DPRs in <code>public/</code>.
         </div>
         <div style={{ marginBottom: 4 }}>
-          <strong>Compliance moat:</strong> 17 frameworks across G7 / EU / GCC / African markets.
+          <strong>Compliance moat:</strong> {getAllRegisteredFrameworks().length} frameworks across
+          G7 / EU / GCC / African markets.
         </div>
         <div style={{ marginBottom: 4 }}>
           <strong>Audience:</strong> Corporate strategy + corp dev + funds (PE, EM-focused VC,

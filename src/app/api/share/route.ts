@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
         isCaseStudy: link.isCaseStudy,
         hasPassword: !!passwordHash,
       },
-    }).catch(() => null);
+    }).catch(err => log.warn('SHARE_LINK_CREATED audit-log write failed:', err));
 
     // Referrer/funnel attribution lives in AnalyticsEvent so we can answer
     // "shares created → viewed → signup_from_share" without a schema
@@ -342,7 +342,7 @@ export async function GET(req: NextRequest) {
         analysisId: link.analysisId,
         ipAddress: clientIp.slice(0, 45),
       },
-    }).catch(() => null);
+    }).catch(err => log.warn('SHARE_LINK_VIEWED audit-log write failed:', err));
 
     const responseData = {
       analysis: {
@@ -420,7 +420,7 @@ export async function DELETE(req: NextRequest) {
       resource: 'ShareLink',
       resourceId: id,
       details: { token: link.token, analysisId: link.analysisId },
-    }).catch(() => null);
+    }).catch(err => log.warn('SHARE_LINK_REVOKED audit-log write failed:', err));
 
     return NextResponse.json({ success: true });
   } catch (error) {
