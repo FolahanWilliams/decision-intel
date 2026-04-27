@@ -414,7 +414,7 @@ export async function detectToxicCombinations(
         }
       }
     } catch {
-      // Schema drift — deal table may not exist yet
+      // Schema-drift tolerance per CLAUDE.md fire-and-forget exceptions — deal table may not exist in older deployments.
     }
 
     return {

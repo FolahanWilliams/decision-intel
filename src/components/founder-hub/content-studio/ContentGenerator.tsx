@@ -153,7 +153,7 @@ export function ContentGenerator({
                 setGeneratedContent(accumulated);
               }
             } catch {
-              // malformed SSE line
+              // Malformed SSE line — skip silently per CLAUDE.md fire-and-forget exceptions (JSON.parse fallback).
             }
           }
         }

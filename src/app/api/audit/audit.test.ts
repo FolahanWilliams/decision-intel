@@ -7,53 +7,20 @@ import { NextRequest } from 'next/server';
 
 // NextResponse is used both as a constructor (`new NextResponse(csv, ...)`)
 // and as a namespace (`NextResponse.json(...)`), so the mock must handle both.
-// vi.mock is hoisted, so we must define the class inside the factory.
-vi.mock('next/server', () => {
-  class MockNextResponse {
-    status: number;
-    body: unknown;
-    headers: Map<string, string>;
-    constructor(body: unknown, init?: { status?: number; headers?: Record<string, string> }) {
-      this.body = body;
-      this.status = init?.status || 200;
-      this.headers = new Map(Object.entries(init?.headers || {}));
-    }
-    async json() {
-      return this.body;
-    }
-    async text() {
-      return String(this.body);
-    }
-    static json(body: unknown, init?: { status?: number }) {
-      return new MockNextResponse(body, init);
-    }
-  }
-  return {
-    NextRequest: class {
-      public url: string;
-      private _body: unknown;
-      constructor(
-        url: string,
-        init?: { method?: string; body?: string; headers?: Record<string, string> }
-      ) {
-        this.url = url;
-        this._body = init?.body ? JSON.parse(init.body) : null;
-      }
-      async json() {
-        return this._body;
-      }
-    },
-    NextResponse: MockNextResponse,
-  };
-});
+// vi.mock factories are hoisted above imports, so we use vi.hoisted() to load
+// the shared helpers in a way that's also hoisted. See @/test-utils/next-server-mock.
+const { nextServerMockFactory, supabaseServerMockFactory } = await vi.hoisted(
+  async () => ({
+    nextServerMockFactory: (await import('@/test-utils/next-server-mock'))
+      .nextServerMockFactory,
+    supabaseServerMockFactory: (await import('@/test-utils/supabase-server-mock'))
+      .supabaseServerMockFactory,
+  })
+);
+vi.mock('next/server', nextServerMockFactory);
 
 const mockGetUser = vi.fn();
-vi.mock('@/utils/supabase/server', () => ({
-  createClient: () =>
-    Promise.resolve({
-      auth: { getUser: () => mockGetUser() },
-    }),
-}));
+vi.mock('@/utils/supabase/server', () => supabaseServerMockFactory(() => mockGetUser));
 
 const mockLogAudit = vi.fn();
 vi.mock('@/lib/audit', () => ({

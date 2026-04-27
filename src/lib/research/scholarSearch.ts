@@ -218,8 +218,9 @@ async function cachePapers(biasType: string, papers: ResearchPaper[]): Promise<v
           },
         });
       }
-    } catch {
-      // Duplicate or DB error — skip
+    } catch (err) {
+      // Concurrent upsert collisions are expected; surface anything else for inspection per CLAUDE.md fire-and-forget discipline.
+      log.warn('researchCache upsert failed (skipping paper):', err);
     }
   }
 }

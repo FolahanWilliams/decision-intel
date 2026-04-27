@@ -72,8 +72,7 @@ export function savePlaceholderMap(analysisId: string, entries: PlaceholderMapEn
   try {
     sessionStorage.setItem(`${PLACEHOLDER_MAP_KEY_PREFIX}${analysisId}`, JSON.stringify(entries));
   } catch {
-    // QuotaExceeded / disabled storage — not fatal; the placeholders
-    // simply cannot be revealed locally.
+    // sessionStorage may throw on quota / private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions; placeholders simply cannot be revealed locally.
   }
 }
 
@@ -86,6 +85,7 @@ export function loadPlaceholderMap(analysisId: string): PlaceholderMapEntry[] | 
     if (!Array.isArray(parsed)) return null;
     return parsed;
   } catch {
+    // sessionStorage / JSON.parse may throw — silent fallback to null per CLAUDE.md fire-and-forget exceptions.
     return null;
   }
 }
@@ -95,7 +95,7 @@ export function clearPlaceholderMap(analysisId: string): void {
   try {
     sessionStorage.removeItem(`${PLACEHOLDER_MAP_KEY_PREFIX}${analysisId}`);
   } catch {
-    // ignore
+    // sessionStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
   }
 }
 
@@ -112,6 +112,6 @@ export async function postRedactionTrail(payload: RedactionTrailPayload): Promis
       body: JSON.stringify(payload),
     });
   } catch {
-    // No-op; we'd rather lose one audit row than block the user flow.
+    // Defense-in-depth audit row; offline browser shouldn't kill submission — silent per CLAUDE.md fire-and-forget exceptions.
   }
 }

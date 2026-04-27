@@ -22,6 +22,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createHash } from 'crypto';
 import { createLogger } from '@/lib/utils/logger';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
+import { extractIp } from '@/lib/utils/request';
 import {
   generateEnterpriseQuote,
   type EnterpriseQuoteInput,
@@ -32,12 +33,6 @@ const log = createLogger('EnterpriseQuotePublic');
 
 const WINDOW_MS = 24 * 60 * 60 * 1000;
 const PER_IP_MAX = 5;
-
-function extractIp(req: NextRequest): string {
-  const xff = req.headers.get('x-forwarded-for');
-  if (xff) return xff.split(',')[0]?.trim() || 'unknown';
-  return req.headers.get('x-real-ip') || 'unknown';
-}
 
 function isPlausibleEmail(s: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);

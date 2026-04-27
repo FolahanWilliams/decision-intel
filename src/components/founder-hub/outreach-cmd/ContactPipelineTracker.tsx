@@ -50,6 +50,7 @@ function readStages(): Record<string, PipelineStage> {
     const raw = localStorage.getItem(STORAGE_KEY_STAGES);
     return raw ? (JSON.parse(raw) as Record<string, PipelineStage>) : {};
   } catch {
+    // localStorage / JSON.parse may throw — silent fallback per CLAUDE.md fire-and-forget exceptions.
     return {};
   }
 }
@@ -59,6 +60,7 @@ function readCustom(): CustomContact[] {
     const raw = localStorage.getItem(STORAGE_KEY_CUSTOM);
     return raw ? (JSON.parse(raw) as CustomContact[]) : [];
   } catch {
+    // localStorage / JSON.parse may throw — silent fallback per CLAUDE.md fire-and-forget exceptions.
     return [];
   }
 }
@@ -68,6 +70,7 @@ function readNotes(): Record<string, string> {
     const raw = localStorage.getItem(STORAGE_KEY_NOTES);
     return raw ? (JSON.parse(raw) as Record<string, string>) : {};
   } catch {
+    // localStorage / JSON.parse may throw — silent fallback per CLAUDE.md fire-and-forget exceptions.
     return {};
   }
 }
@@ -93,7 +96,7 @@ export function ContactPipelineTracker() {
     try {
       localStorage.setItem(STORAGE_KEY_STAGES, JSON.stringify(next));
     } catch {
-      // non-fatal
+      // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
     }
   };
   const saveCustom = (next: CustomContact[]) => {
@@ -101,7 +104,7 @@ export function ContactPipelineTracker() {
     try {
       localStorage.setItem(STORAGE_KEY_CUSTOM, JSON.stringify(next));
     } catch {
-      // non-fatal
+      // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
     }
   };
   const saveNotes = (next: Record<string, string>) => {
@@ -109,7 +112,7 @@ export function ContactPipelineTracker() {
     try {
       localStorage.setItem(STORAGE_KEY_NOTES, JSON.stringify(next));
     } catch {
-      // non-fatal
+      // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
     }
   };
 

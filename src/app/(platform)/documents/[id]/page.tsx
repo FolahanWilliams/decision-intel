@@ -428,7 +428,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         return saved;
       }
     } catch {
-      /* ignore */
+      // localStorage may throw in private-mode Safari / SSR — silent fallback to default per CLAUDE.md fire-and-forget exceptions.
     }
     return 'cso';
   };
@@ -451,7 +451,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       const saved = localStorage.getItem('di-doc-phase');
       if (saved === 'before' || saved === 'during' || saved === 'after') return saved;
     } catch {
-      /* ignore */
+      // localStorage may throw in private-mode Safari / SSR — silent fallback to default per CLAUDE.md fire-and-forget exceptions.
     }
     return 'before';
   };
@@ -462,7 +462,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
     try {
       localStorage.setItem('di-doc-phase', next);
     } catch {
-      /* ignore */
+      // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
     }
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href);
@@ -485,7 +485,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       try {
         localStorage.setItem('di-doc-view-mode', next);
       } catch {
-        /* ignore */
+        // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
       }
       if (typeof window !== 'undefined') {
         const url = new URL(window.location.href);
@@ -1088,7 +1088,8 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         biasCount: biases.length,
         preMortemCount: analysis.preMortem?.failureScenarios?.length,
       });
-    } catch {
+    } catch (err) {
+      console.warn('[DocumentPage] computeDQChain failed (returning undefined fallback):', err);
       return undefined;
     }
   }, [analysis, biases.length]);
@@ -2231,7 +2232,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               try {
                 await handleBoardReportExport();
               } catch {
-                /* toast already shown by handler */
+                // handleBoardReportExport surfaces its own toast on failure — silent here is intentional per CLAUDE.md fire-and-forget exceptions.
               } finally {
                 setIsExportingBoardView(false);
               }
@@ -2596,6 +2597,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                               </a>
                             );
                           } catch {
+                            // Malformed URL from search source — skip silently per CLAUDE.md fire-and-forget exceptions (fallback to no-render).
                             return null;
                           }
                         })}

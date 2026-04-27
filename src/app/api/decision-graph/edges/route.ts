@@ -25,7 +25,8 @@ async function getUserOrgIds(userId: string): Promise<string[]> {
       select: { orgId: true },
     });
     return memberships.map(m => m.orgId);
-  } catch {
+  } catch (err) {
+    log.warn('getUserOrgIds failed (returning empty fallback):', err);
     return [];
   }
 }

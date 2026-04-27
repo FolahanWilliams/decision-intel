@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ChevronRight, GitBranch, GitCompareArrows, Loader2, Pencil, Check, X } from 'lucide-react';
 import { MemoDiffViewer } from './MemoDiffViewer';
+import { dqiColorFor } from '@/lib/utils/grade';
 
 interface Version {
   id: string;
@@ -41,14 +42,6 @@ function formatDate(iso: string): string {
   } catch {
     return iso;
   }
-}
-
-function dqiColorFor(score: number): string {
-  if (score >= 85) return 'var(--success, #10b981)';
-  if (score >= 70) return 'var(--accent-primary, #16A34A)';
-  if (score >= 55) return 'var(--warning, #d97706)';
-  if (score >= 40) return 'var(--severity-high, #ef4444)';
-  return 'var(--severity-critical, #b91c1c)';
 }
 
 export function VersionHistoryStrip({ documentId, hideWhenSingle = true, isOwner }: Props) {

@@ -302,8 +302,8 @@ function ExperimentDetail({
         const data = await res.json();
         setResults(data.results || []);
       }
-    } catch {
-      // ignore
+    } catch (err) {
+      console.warn('[ExperimentsContent] fetchResults failed:', err);
     } finally {
       setLoading(false);
     }
@@ -321,8 +321,8 @@ function ExperimentDetail({
         await fetchResults();
         onRefresh();
       }
-    } catch {
-      // ignore
+    } catch (err) {
+      console.warn('[ExperimentsContent] handleOptimize failed:', err);
     } finally {
       setOptimizing(false);
     }
@@ -339,8 +339,8 @@ function ExperimentDetail({
       if (res.ok) {
         onRefresh();
       }
-    } catch {
-      // ignore
+    } catch (err) {
+      console.warn('[ExperimentsContent] handleStatusChange failed:', err);
     } finally {
       setUpdating(false);
     }
@@ -502,8 +502,8 @@ export function ExperimentsContent() {
         const data = await res.json();
         setExperiments(data.experiments || []);
       }
-    } catch {
-      // ignore
+    } catch (err) {
+      console.warn('[ExperimentsContent] fetchExperiments failed:', err);
     } finally {
       setLoading(false);
     }

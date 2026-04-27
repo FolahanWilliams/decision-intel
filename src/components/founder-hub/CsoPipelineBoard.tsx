@@ -78,6 +78,7 @@ function formatDate(iso: string | null): string {
     const d = new Date(iso);
     return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
   } catch {
+    // Invalid date string — silent fallback to empty per CLAUDE.md fire-and-forget exceptions.
     return '';
   }
 }
@@ -87,6 +88,7 @@ function isFollowUpOverdue(iso: string | null): boolean {
   try {
     return new Date(iso).getTime() < Date.now();
   } catch {
+    // Invalid date string — silent fallback to false per CLAUDE.md fire-and-forget exceptions.
     return false;
   }
 }

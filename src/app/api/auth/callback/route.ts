@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
+import { createLogger } from '@/lib/utils/logger';
+
+const log = createLogger('AuthCallback');
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -49,8 +52,9 @@ export async function GET(request: Request) {
             return NextResponse.redirect(`${origin}/dashboard?welcome=true`);
           }
         }
-      } catch {
-        // Don't break login if onboarding detection fails
+      } catch (err) {
+        // Onboarding detection is non-blocking — log and continue to dashboard so login still succeeds.
+        log.warn('onboarding detection failed (continuing to dashboard):', err);
       }
 
       return NextResponse.redirect(`${origin}/dashboard`);

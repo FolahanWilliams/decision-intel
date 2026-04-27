@@ -247,7 +247,7 @@ export function useAnalysisStream(options: StreamOptions) {
             errorMessage = errorData.error || errorMessage;
           }
         } catch {
-          /* ignore JSON parse errors — use status-based message */
+          // res.json() may throw on non-JSON error body — silent fallback to status-based message per CLAUDE.md fire-and-forget exceptions.
         }
         throw new Error(errorMessage);
       }

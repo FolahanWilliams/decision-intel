@@ -28,6 +28,7 @@ function loadChecks(): Record<string, boolean> {
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? (JSON.parse(raw) as Record<string, boolean>) : {};
   } catch {
+    // localStorage / JSON.parse may throw — silent fallback per CLAUDE.md fire-and-forget exceptions.
     return {};
   }
 }
@@ -71,7 +72,7 @@ export function ThisWeekPriority() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
     } catch {
-      // storage quota — non-fatal
+      // localStorage may throw on quota / private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
     }
   };
 

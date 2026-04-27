@@ -20,7 +20,8 @@ async function resolveOrgId(user: { id: string }): Promise<string | null> {
       select: { orgId: true },
     });
     return membership?.orgId ?? null;
-  } catch {
+  } catch (err) {
+    log.warn('resolveOrgId failed (returning null fallback):', err);
     return null;
   }
 }

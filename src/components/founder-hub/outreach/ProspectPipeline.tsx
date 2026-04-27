@@ -81,8 +81,8 @@ export function ProspectPipeline({ founderPass, refreshKey }: ProspectPipelinePr
         const json = await res.json();
         setProspects(json.data?.prospects || []);
       }
-    } catch {
-      // silent
+    } catch (err) {
+      console.warn('[ProspectPipeline] fetchProspects failed:', err);
     } finally {
       setLoading(false);
     }

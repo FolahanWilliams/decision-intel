@@ -137,8 +137,9 @@ async function ensureSeeded(): Promise<void> {
           industry: cs.industry,
         },
       });
-    } catch {
-      // Already exists or other issue — continue
+    } catch (err) {
+      // Upsert may fail on concurrent seed attempts — log and continue per CLAUDE.md fire-and-forget discipline.
+      log.warn(`caseStudy upsert failed for ${cs.id} (continuing):`, err);
     }
   }
   seeded = true;

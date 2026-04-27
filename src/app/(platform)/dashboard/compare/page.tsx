@@ -69,8 +69,10 @@ export default function ComparePage() {
         })
       );
       setAnalyses(results.filter((r): r is AnalysisData => r !== null));
-    } catch {
-      // Non-critical; leave analyses as-is
+    } catch (err) {
+      // Non-critical; leave analyses as-is. Surface in console so a real
+      // fetch failure (e.g. /api/documents/[id] outage) doesn't fail silently.
+      console.warn('[Compare] fetchAnalyses failed:', err);
     } finally {
       setLoading(false);
     }

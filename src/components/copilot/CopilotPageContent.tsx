@@ -70,8 +70,8 @@ export function CopilotPageContent() {
         const data = await res.json();
         setSessions(data.sessions);
       }
-    } catch {
-      // Ignore
+    } catch (err) {
+      console.warn('[CopilotPage] fetchSessions failed:', err);
     } finally {
       setLoadingSessions(false);
     }
@@ -126,8 +126,8 @@ export function CopilotPageContent() {
           clearMessages();
         }
       }
-    } catch {
-      // Ignore
+    } catch (err) {
+      console.warn('[CopilotPage] handleDeleteSession failed:', err);
     }
   };
 

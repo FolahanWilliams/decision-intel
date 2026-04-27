@@ -107,6 +107,7 @@ function extractPreviewText(data: unknown, maxLength = 200): string {
       .trim()
       .slice(0, maxLength);
   } catch {
+    // JSON.stringify may throw on circular refs — silent fallback to empty preview per CLAUDE.md fire-and-forget exceptions.
     return '';
   }
 }

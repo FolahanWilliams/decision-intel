@@ -39,8 +39,8 @@ export function PersonaManager() {
         const data = await res.json();
         setPersonas(data);
       }
-    } catch {
-      // Silent
+    } catch (err) {
+      console.warn('[PersonaManager] fetchPersonas failed:', err);
     } finally {
       setLoading(false);
     }
@@ -65,8 +65,8 @@ export function PersonaManager() {
         setDraft(EMPTY_PERSONA);
         setShowNew(false);
       }
-    } catch {
-      // Error handling
+    } catch (err) {
+      console.warn('[PersonaManager] handleCreate failed:', err);
     } finally {
       setSaving(false);
     }
@@ -87,8 +87,8 @@ export function PersonaManager() {
         setEditingId(null);
         setDraft(EMPTY_PERSONA);
       }
-    } catch {
-      // Error
+    } catch (err) {
+      console.warn('[PersonaManager] handleUpdate failed:', err);
     } finally {
       setSaving(false);
     }
@@ -100,8 +100,8 @@ export function PersonaManager() {
       if (res.ok) {
         setPersonas(prev => prev.filter(p => p.id !== id));
       }
-    } catch {
-      // Error
+    } catch (err) {
+      console.warn('[PersonaManager] handleDelete failed:', err);
     }
   };
 

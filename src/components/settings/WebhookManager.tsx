@@ -48,8 +48,8 @@ export function WebhookManager() {
         const data = await res.json();
         setSubscriptions(data.subscriptions);
       }
-    } catch {
-      // ignore
+    } catch (err) {
+      console.warn('[WebhookManager] fetchSubscriptions failed:', err);
     } finally {
       setLoading(false);
     }

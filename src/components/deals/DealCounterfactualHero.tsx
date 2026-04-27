@@ -20,6 +20,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { GitBranch, Loader2, TrendingUp } from 'lucide-react';
+import { confidenceColor as getConfidenceColor } from '@/lib/utils/confidence';
 
 interface DealCounterfactualScenario {
   biasRemoved: string;
@@ -49,12 +50,6 @@ interface DealCounterfactualResponse {
 
 function formatBiasName(s: string): string {
   return s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-}
-
-function getConfidenceColor(c: number): string {
-  if (c >= 0.7) return '#22c55e';
-  if (c >= 0.4) return '#fbbf24';
-  return '#ef4444';
 }
 
 function currencySymbol(c: string): string {

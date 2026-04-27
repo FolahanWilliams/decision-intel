@@ -222,8 +222,9 @@ export async function POST(req: NextRequest) {
         },
         orgId || user.id
       );
-    } catch {
-      // Non-critical — webhook table may not exist
+    } catch (err) {
+      // Webhook emission failed — surfaced as warn (delivery path) per CLAUDE.md fire-and-forget discipline.
+      log.warn('webhook emit (outcome.reported) failed:', err);
     }
 
     // Auto-trigger recalibration if sufficient outcomes exist (behavioral data flywheel)

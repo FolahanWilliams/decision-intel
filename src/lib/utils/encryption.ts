@@ -324,7 +324,7 @@ export function decryptWebhookSecret(stored: string): string {
       });
     }
   } catch {
-    // Not valid JSON — treat as plaintext
+    // Not valid JSON — treat as plaintext (legacy secret format) per CLAUDE.md fire-and-forget exceptions.
   }
 
   // Fallback: return as-is (unrecognised format)

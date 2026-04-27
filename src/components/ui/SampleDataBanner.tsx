@@ -48,7 +48,7 @@ export function SampleDataBanner() {
       setSeedDismissed(localStorage.getItem(DISMISS_KEY_SEED) === '1');
       setClearDismissed(localStorage.getItem(DISMISS_KEY_CLEAR) === '1');
     } catch {
-      // SSR / incognito / quota — treat as not-dismissed
+      // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
     }
   }, []);
 
@@ -58,8 +58,9 @@ export function SampleDataBanner() {
       if (!res.ok) return;
       const data = (await res.json()) as DemoStatus;
       setStatus(data);
-    } catch {
-      // Silently fail — schema may not be migrated yet
+    } catch (err) {
+      // Schema-drift tolerance per CLAUDE.md fire-and-forget exceptions — pre-migration deployments may not have demo tables yet.
+      console.warn('[SampleDataBanner] fetchStatus failed:', err);
     } finally {
       setLoading(false);
     }
@@ -108,7 +109,7 @@ export function SampleDataBanner() {
     try {
       localStorage.setItem(DISMISS_KEY_SEED, '1');
     } catch {
-      // Ignore
+      // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
     }
   };
 
@@ -117,7 +118,7 @@ export function SampleDataBanner() {
     try {
       localStorage.setItem(DISMISS_KEY_CLEAR, '1');
     } catch {
-      // Ignore
+      // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
     }
   };
 

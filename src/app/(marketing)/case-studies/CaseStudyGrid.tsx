@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, CheckCircle, BookOpen } from 'lucide-react';
 import { isFailureOutcome, isSuccessOutcome, type CaseStudy } from '@/lib/data/case-studies';
+import { outcomeColor } from '@/lib/data/case-studies/outcome-color';
 import { trackEvent } from '@/lib/analytics/track';
 import { formatIndustry, formatOutcome, formatBiasName } from '@/lib/utils/labels';
 
@@ -38,12 +39,6 @@ const C = {
   slate500: '#64748B',
   slate700: '#334155',
 } as const;
-
-function outcomeColor(outcome: CaseStudy['outcome']): { bg: string; fg: string } {
-  if (isFailureOutcome(outcome)) return { bg: '#FEE2E2', fg: '#991B1B' };
-  if (isSuccessOutcome(outcome)) return { bg: '#DCFCE7', fg: '#166534' };
-  return { bg: '#FEF3C7', fg: '#92400E' };
-}
 
 export function CaseStudyGrid({ cases, industries }: CaseStudyGridProps) {
   const [industry, setIndustry] = useState<string>('all');

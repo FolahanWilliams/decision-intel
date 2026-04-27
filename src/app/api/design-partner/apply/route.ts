@@ -19,6 +19,7 @@ import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
+import { extractIp } from '@/lib/utils/request';
 import { apiError, apiSuccess } from '@/lib/utils/api-response';
 import { sendEmail } from '@/lib/notifications/email';
 import { z } from 'zod';
@@ -41,12 +42,6 @@ const ApplicationSchema = z.object({
   whyNow: z.string().trim().min(40).max(2000),
   source: z.enum(['warm-intro', 'linkedin', 'press', 'direct', 'other']).optional(),
 });
-
-function extractIp(req: NextRequest): string {
-  const xff = req.headers.get('x-forwarded-for');
-  if (xff) return xff.split(',')[0]?.trim() || 'unknown';
-  return req.headers.get('x-real-ip') || 'unknown';
-}
 
 async function notifySlack(payload: {
   name: string;

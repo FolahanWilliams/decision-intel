@@ -158,7 +158,7 @@ export function BulkUploadPanel({ onComplete }: BulkUploadPanelProps) {
             }
           }
         } catch {
-          // Polling error — will retry on next interval
+          // Polling error — will retry on next interval; silent per CLAUDE.md fire-and-forget exceptions.
         }
       };
 

@@ -69,7 +69,8 @@ async function resolveUserIdFromEmail(email: string): Promise<string | null> {
       select: { userId: true },
     });
     return member?.userId || null;
-  } catch {
+  } catch (err) {
+    log.warn('resolveUserIdFromEmail failed (returning null fallback):', err);
     return null;
   }
 }

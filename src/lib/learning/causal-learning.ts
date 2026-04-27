@@ -745,8 +745,9 @@ export async function generateCausalInsights(orgId: string): Promise<CausalInsig
           });
         }
       }
-    } catch {
-      // Non-critical — twin data may not be available
+    } catch (err) {
+      // Twin insights are non-critical — log and continue per CLAUDE.md fire-and-forget discipline.
+      log.warn('twin-insight aggregation failed:', err);
     }
 
     return insights;

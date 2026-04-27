@@ -78,6 +78,7 @@ export function ContentPerformanceWidget() {
       const raw = localStorage.getItem(STORAGE_KEY);
       return raw ? JSON.parse(raw) : [];
     } catch {
+      // localStorage / JSON.parse may throw — silent fallback per CLAUDE.md fire-and-forget exceptions.
       return [];
     }
   });
@@ -89,7 +90,7 @@ export function ContentPerformanceWidget() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
     } catch {
-      /* ignore */
+      // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
     }
   }, []);
 

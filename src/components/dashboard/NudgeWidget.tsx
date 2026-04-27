@@ -23,8 +23,8 @@ export function NudgeWidget() {
         body: JSON.stringify({ nudgeId, wasHelpful }),
       });
       if (res.ok) await mutate();
-    } catch {
-      // Silently fail — non-critical widget
+    } catch (err) {
+      console.warn('[NudgeWidget] acknowledge failed:', err);
     } finally {
       setAcknowledging(null);
     }

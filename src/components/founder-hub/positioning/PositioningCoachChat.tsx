@@ -59,7 +59,7 @@ export function PositioningCoachChat({ founderPass }: { founderPass: string }) {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(messages.slice(-60)));
     } catch {
-      // storage quota hit — non-fatal
+      // localStorage may throw on quota / private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
     }
   }, [messages]);
 
@@ -125,7 +125,7 @@ export function PositioningCoachChat({ founderPass }: { founderPass: string }) {
                   });
                 }
               } catch {
-                // malformed SSE line — keep streaming
+                // Malformed SSE line — skip silently per CLAUDE.md fire-and-forget exceptions (JSON.parse fallback).
               }
             }
           }
@@ -150,7 +150,7 @@ export function PositioningCoachChat({ founderPass }: { founderPass: string }) {
     try {
       localStorage.removeItem(STORAGE_KEY);
     } catch {
-      // non-fatal
+      // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
     }
   };
 

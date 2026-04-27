@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { GitBranch, Loader2, TrendingUp, AlertTriangle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { createClientLogger } from '@/lib/utils/logger';
+import { confidenceColor as getConfidenceColor } from '@/lib/utils/confidence';
 
 const log = createClientLogger('CounterfactualPanel');
 
@@ -43,12 +44,6 @@ interface CounterfactualPanelProps {
 
 function formatBiasName(s: string): string {
   return s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-}
-
-function getConfidenceColor(c: number): string {
-  if (c >= 0.7) return '#22c55e';
-  if (c >= 0.4) return '#fbbf24';
-  return '#ef4444';
 }
 
 export function CounterfactualPanel({ analysisId, variant = 'full' }: CounterfactualPanelProps) {

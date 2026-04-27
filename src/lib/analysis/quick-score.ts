@@ -98,13 +98,14 @@ Rules:
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-export function scoreToGrade(score: number): string {
-  if (score >= 90) return 'A';
-  if (score >= 70) return 'B';
-  if (score >= 50) return 'C';
-  if (score >= 30) return 'D';
-  return 'F';
-}
+// Re-exports the canonical grade-from-score helper. The previous local
+// implementation drifted from the locked CLAUDE.md scale (used 90/70/50/30
+// instead of 85/70/55/40); the published quick-score endpoint had been
+// returning grade-letters that didn't match the rest of the platform.
+// Caught 2026-04-27 during slop-scan Phase 3 dedup. Single source of truth
+// is now src/lib/utils/grade.ts.
+import { gradeFromScore } from '@/lib/utils/grade';
+export const scoreToGrade = gradeFromScore;
 
 function normalizeSeverity(severity: string): string {
   const s = severity.toLowerCase();

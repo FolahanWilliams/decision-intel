@@ -105,7 +105,7 @@ export async function checkAnalysisLimit(
         return { allowed: true, plan: 'enterprise' as PlanType, used: 0, limit: -1 };
       }
     } catch {
-      // Schema drift — DealAuditPurchase table may not exist
+      // Schema-drift tolerance per CLAUDE.md fire-and-forget exceptions — DealAuditPurchase may not be migrated in older deployments.
     }
   }
 

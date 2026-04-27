@@ -179,8 +179,9 @@ async function deliverWithRetry(
         log.warn(`Disabled webhook ${subscriptionId} after ${MAX_FAILURES} consecutive failures`);
         return;
       }
-    } catch {
-      // Non-critical — continue with retry
+    } catch (err) {
+      // failCount/lastError persistence failure is non-critical — log + continue with retry per CLAUDE.md fire-and-forget discipline.
+      log.warn('webhookSubscription failCount update failed:', err);
     }
 
     // Wait before retry (unless last attempt)

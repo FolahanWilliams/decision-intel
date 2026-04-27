@@ -884,8 +884,8 @@ function EmailForwardingSection() {
         const data = await res.json();
         setToken(data.token);
       }
-    } catch {
-      /* ignore */
+    } catch (err) {
+      log.warn('email/token regenerate failed:', err);
     } finally {
       setRegenerating(false);
     }

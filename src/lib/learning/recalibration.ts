@@ -15,6 +15,7 @@
 import type { PrismaClient } from '@prisma/client';
 import { canonicalOutcome, scoreOutcome, type BrierCategory } from './brier-scoring';
 import { createLogger } from '@/lib/utils/logger';
+import { gradeFromScore } from '@/lib/utils/grade';
 
 const log = createLogger('Recalibration');
 
@@ -40,15 +41,6 @@ export interface RecalibrationResult {
     grade: string;
   } | null;
   brier: { score: number; category: BrierCategory } | null;
-}
-
-/** Grade boundaries locked by CLAUDE.md: A 85+, B 70+, C 55+, D 40+, F 0+. */
-function gradeFor(score: number): string {
-  if (score >= 85) return 'A';
-  if (score >= 70) return 'B';
-  if (score >= 55) return 'C';
-  if (score >= 40) return 'D';
-  return 'F';
 }
 
 export async function recalibrateFromOutcome(
@@ -85,7 +77,7 @@ export async function recalibrateFromOutcome(
 
     recalibratedScore = Math.max(0, Math.min(100, Math.round(recalibratedScore)));
     const delta = recalibratedScore - Math.round(originalScore);
-    const grade = gradeFor(recalibratedScore);
+    const grade = gradeFromScore(recalibratedScore);
 
     const brier = scoreOutcome(originalScore, canonicalOutcome(outcome));
 

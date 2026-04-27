@@ -468,8 +468,8 @@ export async function POST(req: NextRequest) {
           processSlackOutcomeSignal(payload).catch(err => {
             log.warn('Slack outcome signal processing failed (non-critical):', err);
           });
-        } catch {
-          // outcome-inference module not available — skip silently
+        } catch (err) {
+          log.warn('Slack outcome-inference module load failed:', err);
         }
 
         // Not a decision-relevant message — acknowledge silently

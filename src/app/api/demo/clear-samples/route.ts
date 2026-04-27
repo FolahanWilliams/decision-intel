@@ -25,7 +25,8 @@ async function resolveOrgId(userId: string): Promise<string | null> {
       select: { orgId: true },
     });
     return membership?.orgId || null;
-  } catch {
+  } catch (err) {
+    log.warn('resolveOrgId failed (returning null fallback):', err);
     return null;
   }
 }
@@ -66,8 +67,9 @@ export async function POST() {
           details: result,
         },
       });
-    } catch {
-      // Audit log table may not exist in all envs — non-critical
+    } catch (err) {
+      // AuditLog write must never be silent per CLAUDE.md fire-and-forget discipline (security-sensitive action).
+      log.warn('AuditLog write failed for demo.clear_samples:', err);
     }
 
     return NextResponse.json(result);

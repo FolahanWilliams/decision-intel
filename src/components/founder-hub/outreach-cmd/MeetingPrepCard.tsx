@@ -146,7 +146,7 @@ export function MeetingPrepCard({ founderPass }: Props) {
                 setError(data.message ?? 'Generation failed.');
               }
             } catch {
-              /* malformed SSE line — keep reading */
+              // Malformed SSE line — skip silently per CLAUDE.md fire-and-forget exceptions (JSON.parse fallback).
             }
           }
         }
@@ -195,7 +195,8 @@ export function MeetingPrepCard({ founderPass }: Props) {
         } else if (json?.data?.meeting?.id) {
           setSavedMeetingId(json.data.meeting.id);
         }
-      } catch {
+      } catch (err) {
+        console.warn('[MeetingPrepCard] save to Meetings Log failed:', err);
         setSaveError('Plan generated, but the save to Meetings Log failed (network).');
       }
     }
@@ -218,7 +219,7 @@ export function MeetingPrepCard({ founderPass }: Props) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      /* clipboard blocked — no-op */
+      // Clipboard API may be blocked by browser permissions — silent no-op per CLAUDE.md fire-and-forget exceptions.
     }
   }, [plan]);
 

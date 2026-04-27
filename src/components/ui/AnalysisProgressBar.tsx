@@ -169,6 +169,7 @@ function usePipelineExpanded(): [boolean, (v: boolean) => void] {
     try {
       return localStorage.getItem('di-pipeline-expanded') === 'true';
     } catch {
+      // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
       return false;
     }
   });
@@ -178,7 +179,7 @@ function usePipelineExpanded(): [boolean, (v: boolean) => void] {
     try {
       localStorage.setItem('di-pipeline-expanded', String(value));
     } catch {
-      /* ignore */
+      // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
     }
   }, []);
 

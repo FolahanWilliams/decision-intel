@@ -134,8 +134,9 @@ export async function inferEdgesForAnalysis(
           },
         });
         created++;
-      } catch {
-        // Unique constraint or other error — skip
+      } catch (err) {
+        // Unique-constraint conflicts are expected during upsert race; surface anything else for inspection per CLAUDE.md fire-and-forget discipline (graph edge writes).
+        log.warn('decisionEdge upsert failed (skipping edge):', err);
       }
     }
 
@@ -673,8 +674,9 @@ export async function inferTemporalEdges(orgId: string): Promise<number> {
               },
             });
             edgesCreated++;
-          } catch {
-            // Skip duplicate
+          } catch (err) {
+            // Unique-constraint conflicts are expected during upsert race; surface anything else for inspection per CLAUDE.md fire-and-forget discipline (graph edge writes).
+            log.warn('decisionEdge upsert (Granger) failed (skipping edge):', err);
           }
         }
       }

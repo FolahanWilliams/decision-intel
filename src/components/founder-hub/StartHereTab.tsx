@@ -211,6 +211,7 @@ function loadProgress(): Progress {
     const parsed = JSON.parse(raw) as { completedTabs?: string[] };
     return { completedTabs: Array.isArray(parsed.completedTabs) ? parsed.completedTabs : [] };
   } catch {
+    // localStorage / JSON.parse may throw — silent fallback per CLAUDE.md fire-and-forget exceptions.
     return { completedTabs: [] };
   }
 }

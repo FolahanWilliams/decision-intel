@@ -119,8 +119,8 @@ export async function generateNudges(
         };
       }
     }
-  } catch {
-    // A/B testing not available — use default nudges
+  } catch (err) {
+    log.warn('A/B variant selection failed (using default nudges):', err);
   }
 
   log.info(

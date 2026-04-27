@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { GitCompare, Loader2, AlertTriangle, CheckCircle2, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { getBiasDisplayName } from '@/lib/utils/bias-normalize';
+import { confidenceColor as getConfidenceColor } from '@/lib/utils/confidence';
 import type { BiasInstance } from '@/types';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -23,12 +24,6 @@ interface InterventionPanelProps {
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
-
-function getConfidenceColor(c: number): string {
-  if (c >= 0.7) return '#22c55e';
-  if (c >= 0.4) return '#fbbf24';
-  return '#ef4444';
-}
 
 function getConfidenceLabel(c: number): string {
   if (c >= 0.7) return 'High';

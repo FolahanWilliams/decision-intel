@@ -723,6 +723,7 @@ export function FounderSchoolTab({ founderPass }: FounderSchoolTabProps) {
       const raw = localStorage.getItem(STORAGE_KEY);
       return raw ? JSON.parse(raw) : [];
     } catch {
+      // localStorage / JSON.parse may throw — silent fallback to empty array per CLAUDE.md fire-and-forget exceptions.
       return [];
     }
   });
@@ -735,7 +736,7 @@ export function FounderSchoolTab({ founderPass }: FounderSchoolTabProps) {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
       } catch {
-        /* ignore */
+        // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
       }
       return next;
     });

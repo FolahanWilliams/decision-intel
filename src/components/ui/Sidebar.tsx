@@ -68,7 +68,7 @@ export default function Sidebar() {
       try {
         localStorage.setItem(SIDEBAR_COLLAPSED_KEY, value ? '1' : '0');
       } catch {
-        /* quota or privacy mode — ignore */
+        // localStorage may throw on quota / private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
       }
       return value;
     });
@@ -80,7 +80,7 @@ export default function Sidebar() {
       const saved = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
       if (saved === '1') setCollapsedState(true);
     } catch {
-      /* ignore */
+      // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
     }
   }, []);
 
@@ -102,7 +102,7 @@ export default function Sidebar() {
       const saved = localStorage.getItem(SIDEBAR_SECTIONS_KEY);
       if (saved) setCollapsedSections(JSON.parse(saved));
     } catch {
-      /* ignore */
+      // localStorage / JSON.parse may throw — silent fallback per CLAUDE.md fire-and-forget exceptions.
     }
   }, []);
 
@@ -112,7 +112,7 @@ export default function Sidebar() {
       try {
         localStorage.setItem(SIDEBAR_SECTIONS_KEY, JSON.stringify(next));
       } catch {
-        /* ignore */
+        // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
       }
       return next;
     });

@@ -101,7 +101,7 @@ export function FounderChatWidget({
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(messages.slice(-MAX_STORED_MESSAGES)));
     } catch {
-      // storage quota hit — non-fatal, the chat keeps working in-memory
+      // localStorage may throw on quota / private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions; chat continues in-memory.
     }
   }, [messages]);
 
@@ -136,7 +136,7 @@ export function FounderChatWidget({
       try {
         localStorage.removeItem(STORAGE_KEY);
       } catch {
-        // ignore
+        // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
       }
     }
   }, [messages.length, streaming]);
@@ -249,14 +249,15 @@ export function FounderChatWidget({
                 }
               }
             } catch {
-              // malformed SSE line
+              // Malformed SSE line — skip silently per CLAUDE.md fire-and-forget exceptions (JSON.parse fallback).
             }
           }
         }
       } finally {
         reader.cancel();
       }
-    } catch {
+    } catch (err) {
+      console.warn('[FounderChatWidget] handleSend failed:', err);
       setMessages(prev => [
         ...prev,
         { role: 'assistant', content: 'Connection error. Please try again.' },

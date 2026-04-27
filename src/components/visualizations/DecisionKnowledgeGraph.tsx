@@ -433,16 +433,16 @@ export function DecisionKnowledgeGraph({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: edgeId, confidence: 1.0 }),
       });
-    } catch {
-      /* non-critical */
+    } catch (err) {
+      console.warn('[DecisionKnowledgeGraph] handleConfirmEdge failed:', err);
     }
   }, []);
 
   const handleDismissEdge = useCallback(async (edgeId: string) => {
     try {
       await fetch(`/api/decision-graph/edges?id=${edgeId}`, { method: 'DELETE' });
-    } catch {
-      /* non-critical */
+    } catch (err) {
+      console.warn('[DecisionKnowledgeGraph] handleDismissEdge failed:', err);
     }
   }, []);
 
@@ -460,8 +460,8 @@ export function DecisionKnowledgeGraph({
           const dot = exportToDot(filteredData.nodes, filteredData.edges);
           downloadFile(dot, 'decision-graph.dot', 'text/vnd.graphviz');
         }
-      } catch {
-        /* non-critical */
+      } catch (err) {
+        console.warn('[DecisionKnowledgeGraph] handleExport failed:', err);
       }
     },
     [filteredData]

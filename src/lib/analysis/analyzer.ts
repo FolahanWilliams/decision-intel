@@ -152,8 +152,9 @@ export async function analyzeDocument(
           `Bias types capped to ${maxBiasTypes} for ${plan} plan (${foundBiases.length} kept)`
         );
       }
-    } catch {
-      // Non-fatal: if limit check fails, keep all biases
+    } catch (err) {
+      // Plan limit check is non-fatal — log and keep all biases per CLAUDE.md fire-and-forget discipline.
+      log.warn('bias-type plan limit check failed (keeping all biases):', err);
     }
 
     // Also update the result object so the SSE response reflects the cap

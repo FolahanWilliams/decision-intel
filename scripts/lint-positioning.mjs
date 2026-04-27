@@ -132,6 +132,7 @@ function* walk(dir) {
   try {
     entries = readdirSync(dir);
   } catch {
+    // Directory may not exist or permissions denied — silent skip in this lint script.
     return;
   }
   for (const entry of entries) {
@@ -140,6 +141,7 @@ function* walk(dir) {
     try {
       stat = statSync(full);
     } catch {
+      // Skip entries we can't stat (broken symlinks, permission errors).
       continue;
     }
     if (stat.isDirectory()) {

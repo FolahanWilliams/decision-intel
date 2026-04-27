@@ -23,6 +23,7 @@ function readCalls(): DiscoveryCall[] {
     const raw = localStorage.getItem(STORAGE_KEY_CALLS);
     return raw ? (JSON.parse(raw) as DiscoveryCall[]) : [];
   } catch {
+    // localStorage / JSON.parse may throw — silent fallback per CLAUDE.md fire-and-forget exceptions.
     return [];
   }
 }

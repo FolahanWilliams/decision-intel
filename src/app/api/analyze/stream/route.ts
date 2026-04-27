@@ -1335,13 +1335,14 @@ export async function POST(request: NextRequest) {
                 doc.orgId || userId!
               );
             }
-          } catch {
-            // Non-critical — webhook table may not exist
+          } catch (err) {
+            // Webhook emission failed — surfaced as warn (delivery path) per CLAUDE.md fire-and-forget discipline.
+            log.warn('webhook emit (analysis.completed) failed:', err);
           }
 
-          // Clean up checkpoint cache on completion
+          // Clean up checkpoint cache on completion (in-memory eviction; silent per CLAUDE.md fire-and-forget exceptions).
           const cacheKey = `stream:${documentId}:${userId}`;
-          await prisma.cacheEntry.delete({ where: { key: cacheKey } }).catch(() => {}); // Ignore errors
+          await prisma.cacheEntry.delete({ where: { key: cacheKey } }).catch(() => {});
 
           if (heartbeatInterval) {
             clearInterval(heartbeatInterval);

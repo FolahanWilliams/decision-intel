@@ -6,15 +6,10 @@ import {
   REHEARSAL_PROMPTS,
   STATUS_LABEL,
 } from '@/lib/data/positioning-copilot';
+import { truncate } from '@/lib/utils/string';
 
 const PAGE_MARGIN = 14;
 const LINE_GAP = 4.8;
-
-function truncate(text: string, max: number): string {
-  if (!text) return '';
-  const clean = text.trim();
-  return clean.length > max ? clean.slice(0, max - 1).trimEnd() + '…' : clean;
-}
 
 export function generatePositioningCheatsheet(): void {
   const doc = new jsPDF({ format: 'a4', unit: 'mm' });

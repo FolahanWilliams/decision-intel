@@ -61,7 +61,7 @@ export function ContentStudioTab({ founderPass }: ContentStudioTabProps) {
         if (parsed.voiceNotes) setVoiceNotes(parsed.voiceNotes);
       }
     } catch {
-      // ignore
+      // localStorage / JSON.parse may throw — silent fallback to default per CLAUDE.md fire-and-forget exceptions.
     }
   }, []);
 
@@ -70,7 +70,7 @@ export function ContentStudioTab({ founderPass }: ContentStudioTabProps) {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ tone, voiceNotes }));
     } catch {
-      // ignore
+      // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
     }
   }, [tone, voiceNotes]);
 
@@ -89,8 +89,8 @@ export function ContentStudioTab({ founderPass }: ContentStudioTabProps) {
         const data = await res.json();
         setSavedItems(data.items || []);
       }
-    } catch {
-      // silent
+    } catch (err) {
+      console.warn('[ContentStudioTab] fetchLibrary failed:', err);
     } finally {
       setLibraryLoading(false);
     }
@@ -128,8 +128,8 @@ export function ContentStudioTab({ founderPass }: ContentStudioTabProps) {
         if (res.ok) {
           fetchLibrary();
         }
-      } catch {
-        // silent
+      } catch (err) {
+        console.warn('[ContentStudioTab] handleSave failed:', err);
       }
     },
     [founderPass, contentType, pillar, topic, tone, fetchLibrary]

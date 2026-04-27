@@ -1123,8 +1123,8 @@ function TeamActivityTab() {
           setDocuments(data.documents || []);
           setActivity(data.activity || []);
         }
-      } catch {
-        // Silently fail
+      } catch (err) {
+        console.warn('[TeamActivityTab] fetchActivity failed:', err);
       } finally {
         setLoading(false);
       }

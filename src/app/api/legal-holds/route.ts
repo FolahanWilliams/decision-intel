@@ -38,7 +38,8 @@ async function getOrgId(userId: string): Promise<string | null> {
       select: { orgId: true },
     });
     return m?.orgId ?? null;
-  } catch {
+  } catch (err) {
+    log.warn('getOrgId failed (returning null fallback):', err);
     return null;
   }
 }

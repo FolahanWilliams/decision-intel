@@ -129,8 +129,8 @@ function PlaybooksPageContent() {
         });
         fetchPlaybooks();
       }
-    } catch {
-      // Error handled by API
+    } catch (err) {
+      console.warn('[PlaybooksPage] handleCreate failed:', err);
     } finally {
       setCreating(false);
     }

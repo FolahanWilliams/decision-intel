@@ -442,8 +442,9 @@ export async function getOrgFingerprint(orgId: string): Promise<OrgFingerprint> 
           totalDecisions: profile.totalDecisions,
         });
       }
-    } catch {
-      // TeamCognitiveProfile data unavailable
+    } catch (err) {
+      // TeamCognitiveProfile may be missing in older deployments — log and continue per CLAUDE.md fire-and-forget discipline (schema-drift tolerance).
+      log.warn('TeamCognitiveProfile query failed (longitudinal trend skipped):', err);
     }
 
     // Active warnings (unacknowledged)

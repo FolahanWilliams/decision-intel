@@ -40,18 +40,13 @@
 
 import jsPDF, { GState } from 'jspdf';
 import type { ProvenanceRecordData } from './provenance-record-data';
+import { truncate } from '@/lib/utils/string';
 
 const MAX_TITLE_CHARS = 70;
 const PAGE_W = 210; // A4 mm
 const MARGIN_L = 20;
 const MARGIN_R = 20;
 const TEXT_W = PAGE_W - MARGIN_L - MARGIN_R;
-
-function truncate(text: string, max: number): string {
-  if (!text) return '';
-  const clean = text.trim();
-  return clean.length > max ? clean.slice(0, max - 1).trimEnd() + '…' : clean;
-}
 
 function slugify(s: string): string {
   return s

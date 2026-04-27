@@ -47,6 +47,6 @@ export async function releaseCronLock(jobName: string): Promise<void> {
   try {
     await prisma.cacheEntry.delete({ where: { key } });
   } catch {
-    // Already released or expired — safe to ignore
+    // Idempotent release — already deleted or expired; silent per CLAUDE.md fire-and-forget exceptions.
   }
 }

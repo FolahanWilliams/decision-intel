@@ -18,6 +18,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { GitBranch, ArrowUpRight, TrendingUp } from 'lucide-react';
+import { confidenceLabel } from '@/lib/utils/confidence';
 
 interface TopScenario {
   analysisId: string;
@@ -48,12 +49,6 @@ function formatMonetary(value: number | null, currency: string): string | null {
   if (value >= 1_000_000) return `${symbol}${(value / 1_000_000).toFixed(1)}M`;
   if (value >= 1_000) return `${symbol}${(value / 1_000).toFixed(0)}k`;
   return `${symbol}${Math.round(value)}`;
-}
-
-function confidenceLabel(c: number): string {
-  if (c >= 0.7) return 'high';
-  if (c >= 0.4) return 'moderate';
-  return 'low';
 }
 
 export function TopCounterfactualsCard() {

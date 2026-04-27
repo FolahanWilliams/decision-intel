@@ -73,6 +73,7 @@ const CONFIDENCE_THRESHOLD = 0.3;
 
 /**
  * Get all registered regulatory frameworks.
+ * Public alias over the registry implementation; keep both — callers depend on this name.
  */
 export function getAllFrameworks(): RegulatoryFramework[] {
   return getAllRegisteredFrameworks();

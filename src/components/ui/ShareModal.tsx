@@ -155,7 +155,7 @@ export function ShareModal({
     try {
       await onExportProvenanceRecord();
     } catch {
-      // Parent handler already showToast'd with the specific error.
+      // Parent handler shows its own toast on failure — silent here per CLAUDE.md fire-and-forget exceptions.
     } finally {
       setExportingRecord(false);
     }
@@ -167,7 +167,7 @@ export function ShareModal({
     try {
       await onExportHallwayBrief();
     } catch {
-      // Parent handler already showToast'd with the specific error.
+      // Parent handler shows its own toast on failure — silent here per CLAUDE.md fire-and-forget exceptions.
     } finally {
       setExportingBrief(false);
     }

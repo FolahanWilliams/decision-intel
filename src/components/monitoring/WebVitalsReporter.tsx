@@ -40,7 +40,7 @@ export function WebVitalsReporter() {
               );
             }
           } catch {
-            // Silently ignore beacon failures
+            // sendBeacon failures are non-blocking analytics; silent per CLAUDE.md fire-and-forget exceptions.
           }
         };
 

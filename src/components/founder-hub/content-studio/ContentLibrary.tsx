@@ -69,8 +69,8 @@ export function ContentLibrary({
           body: JSON.stringify({ id, status: nextStatus }),
         });
         onRefresh();
-      } catch {
-        // silent
+      } catch (err) {
+        console.warn('[ContentLibrary] handleStatusCycle failed:', err);
       }
     },
     [founderPass, onRefresh]

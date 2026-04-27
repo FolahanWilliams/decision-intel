@@ -203,8 +203,8 @@ export async function POST(req: NextRequest) {
       void computeMultiTouchAttribution(analysisId, analysis.document.orgId ?? null).catch(err =>
         log.warn('Attribution computation failed (non-critical):', err)
       );
-    } catch {
-      // multi-touch-attribution module not available — skip
+    } catch (err) {
+      log.warn('multi-touch-attribution module load failed:', err);
     }
 
     // Calibration milestone tracking (fire-and-forget)

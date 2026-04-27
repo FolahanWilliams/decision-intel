@@ -1,5 +1,7 @@
 import jsPDF from 'jspdf';
 import { formatBiasName } from '@/lib/utils/labels';
+import { truncate } from '@/lib/utils/string';
+import { gradeFromScore } from '@/lib/utils/grade';
 import type { ReportAnalysisData, ReportBiasInstance, SimulationData } from './pdf-generator';
 
 /** Projected-impact data for page 2's counterfactual section. Supplied by
@@ -146,19 +148,6 @@ const MAX_EXCERPT_CHARS = 180;
 const MAX_MITIGATION_CHARS = 400;
 const MAX_TITLE_CHARS = 70;
 
-function truncate(text: string, max: number): string {
-  if (!text) return '';
-  const clean = text.trim();
-  return clean.length > max ? clean.slice(0, max - 1).trimEnd() + '…' : clean;
-}
-
-function gradeFromScore(score: number): string {
-  if (score >= 85) return 'A';
-  if (score >= 70) return 'B';
-  if (score >= 55) return 'C';
-  if (score >= 40) return 'D';
-  return 'F';
-}
 
 function interpretGrade(grade: string): string {
   switch (grade) {
@@ -257,7 +246,7 @@ export class BoardReportGenerator {
         // second size arg is left undefined (we pass 0 to mean "auto").
         this.doc.addImage(branding.logoBase64, 'PNG', PAGE_W - MARGIN_R - 36, 10, 36, 0);
       } catch {
-        /* malformed logo — skip silently, the rest of the report stands */
+        // Malformed logo image — skip silently per CLAUDE.md fire-and-forget exceptions; the rest of the report still renders.
       }
     }
 

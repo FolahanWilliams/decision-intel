@@ -134,7 +134,9 @@ async function fetchOrgMeetings(orgId: string): Promise<MeetingRow[]> {
             });
           })
         ).map(m => ({ ...m, speakerBiases: null })) as MeetingRow[];
-      } catch {
+      } catch (err) {
+        // Schema-drift fallback also failed — log and return empty per CLAUDE.md fire-and-forget discipline.
+        log.warn('meeting fallback query failed (returning empty):', err);
         return [];
       }
     }

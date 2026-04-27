@@ -4,6 +4,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 // Mocks — declared before imports
 // ---------------------------------------------------------------------------
 
+// Shared Supabase mock factory — see @/test-utils/supabase-server-mock.
+const { supabaseServerMockFactory } = await vi.hoisted(async () => ({
+  supabaseServerMockFactory: (await import('@/test-utils/supabase-server-mock'))
+    .supabaseServerMockFactory,
+}));
+
 const mockHeaders = new Map<string, string>();
 
 vi.mock('next/server', () => ({
@@ -32,12 +38,7 @@ vi.mock('next/server', () => ({
 }));
 
 const mockGetUser = vi.fn();
-vi.mock('@/utils/supabase/server', () => ({
-  createClient: () =>
-    Promise.resolve({
-      auth: { getUser: () => mockGetUser() },
-    }),
-}));
+vi.mock('@/utils/supabase/server', () => supabaseServerMockFactory(() => mockGetUser));
 
 const mockCheckRateLimit = vi.fn();
 vi.mock('@/lib/utils/rate-limit', () => ({

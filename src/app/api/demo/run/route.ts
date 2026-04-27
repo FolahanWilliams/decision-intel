@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { apiSuccess, apiError } from '@/lib/utils/api-response';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
+import { extractIp } from '@/lib/utils/request';
 import { encryptDocumentContent, isDocumentEncryptionEnabled } from '@/lib/utils/encryption';
 import { isAdminUserId } from '@/lib/utils/admin';
 import { analyzeDocument } from '@/lib/analysis/analyzer';
@@ -19,12 +20,6 @@ const PER_IP_MAX_REQUESTS = 1;
 const GLOBAL_MAX_REQUESTS = 50; // ~$20/day ceiling
 const MIN_WORDS = 50;
 const MAX_WORDS = 4000;
-
-function extractIp(req: NextRequest): string {
-  const xff = req.headers.get('x-forwarded-for');
-  if (xff) return xff.split(',')[0]?.trim() || 'unknown';
-  return req.headers.get('x-real-ip') || 'unknown';
-}
 
 /**
  * POST /api/demo/run

@@ -230,8 +230,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         },
         user.id
       );
-    } catch {
-      // Non-critical — webhook table may not exist
+    } catch (err) {
+      // Webhook emission failed — surfaced as warn (delivery path) per CLAUDE.md fire-and-forget discipline.
+      log.warn('webhook emit (decision_room.updated) failed:', err);
     }
 
     return NextResponse.json(updatedRoom);

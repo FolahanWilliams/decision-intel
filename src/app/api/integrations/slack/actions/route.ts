@@ -97,8 +97,9 @@ export async function POST(req: NextRequest) {
             void adjustEdgeWeightsFromNudgeFeedback(nudgeId, wasHelpful).catch(err => {
               log.warn('Edge weight adjustment from nudge feedback failed:', err);
             });
-          } catch {
-            // edge-learning module not available — skip
+          } catch (err) {
+            // Edge-learning module import or call failed — surfaced as warn per CLAUDE.md fire-and-forget discipline (graph edge-weight adjustments).
+            log.warn('edge-learning module load/run failed:', err);
           }
         } catch (updateErr) {
           const code = (updateErr as { code?: string }).code;

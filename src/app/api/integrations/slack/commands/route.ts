@@ -710,8 +710,8 @@ async function handleAnalyzeCommand(params: {
           },
           { decisionId: recentDecision.id }
         ).catch(err => log.warn('Analyze command audit failed:', err));
-      } catch {
-        // analyzer not available
+      } catch (err) {
+        log.warn('human-audit analyzer module load failed:', err);
       }
 
       return NextResponse.json({
@@ -914,7 +914,7 @@ async function handleStatusCommand(params: { userId: string; teamId: string }) {
         }
       }
     } catch {
-      /* schema drift */
+      // Schema-drift tolerance per CLAUDE.md fire-and-forget exceptions — humanDecision/cognitiveAudit may not be migrated in older deployments.
     }
 
     // Nudge effectiveness

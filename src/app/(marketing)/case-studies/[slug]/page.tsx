@@ -12,6 +12,7 @@ import {
   type CaseStudy,
 } from '@/lib/data/case-studies';
 import { computeReferenceClass } from '@/lib/data/reference-class-forecasting';
+import { outcomeColor } from '@/lib/data/case-studies/outcome-color';
 import { MarketingNav, BRAND_COLORS as C } from '@/components/marketing/MarketingNav';
 import { CaseStudyCta } from './CaseStudyCta';
 import { CaseStudyGraphSection } from './CaseStudyGraphSection';
@@ -91,12 +92,6 @@ function outcomeTitle(outcome: CaseStudy['outcome']): string {
     case 'exceptional_success':
       return 'Exceptional success';
   }
-}
-
-function outcomeColor(outcome: CaseStudy['outcome']): { bg: string; fg: string } {
-  if (isFailureOutcome(outcome)) return { bg: '#FEE2E2', fg: '#991B1B' };
-  if (isSuccessOutcome(outcome)) return { bg: '#DCFCE7', fg: '#166534' };
-  return { bg: '#FEF3C7', fg: '#92400E' };
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {

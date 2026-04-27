@@ -160,8 +160,8 @@ function SlackChannelConfig() {
         mutateConfig();
         setTimeout(() => setSaved(false), 3000);
       }
-    } catch {
-      /* ignore */
+    } catch (err) {
+      console.warn('[IntegrationMarketplace] Slack config save failed:', err);
     } finally {
       setSaving(false);
     }
@@ -607,8 +607,8 @@ function GoogleDriveFolderConfig() {
         mutateConfig();
         setTimeout(() => setSaved(false), 3000);
       }
-    } catch {
-      /* ignore */
+    } catch (err) {
+      console.warn('[IntegrationMarketplace] Google Drive config save failed:', err);
     } finally {
       setSaving(false);
     }
@@ -1439,8 +1439,8 @@ export function IntegrationMarketplace() {
       if (res.ok) {
         setDriveConfig({ connected: false });
       }
-    } catch {
-      // silent
+    } catch (err) {
+      console.warn('[IntegrationMarketplace] Google Drive disconnect failed:', err);
     } finally {
       setDriveDisconnecting(false);
     }

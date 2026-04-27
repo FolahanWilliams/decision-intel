@@ -31,7 +31,7 @@ export const parseJSON = (text: string): any | null => {
     try {
       return JSON.parse(candidate);
     } catch {
-      // Fallback to robust parsing if optimistic attempt fails
+      // Optimistic JSON.parse failed; fall through to robust state-machine parsing per CLAUDE.md fire-and-forget exceptions.
     }
   }
 

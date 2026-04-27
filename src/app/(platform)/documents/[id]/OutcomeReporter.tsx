@@ -110,8 +110,8 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
           setMostAccurateTwin(data.mostAccurateTwin || '');
         }
       }
-    } catch {
-      // Silent fail
+    } catch (err) {
+      console.warn('[OutcomeReporter] fetchExisting failed:', err);
     } finally {
       setLoading(false);
     }
