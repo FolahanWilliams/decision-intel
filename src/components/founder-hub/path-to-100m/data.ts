@@ -987,13 +987,13 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
     ],
     howToReach: {
       coldChannel:
-        'Wiz advisor → operator angels in his network → pre-seed VCs in his portfolio overlap. Cold acceptable for thematic-fit pre-seed funds (e.g., Air Street, Saxon Advisors, regulator-tailwind-focused) with a tight 1-pager.',
+        'Josh Rainer (Wiz advisor) → his McKinsey-alumni-turned-operator-angel network → 5 named target funds (Cyberstarts, Index Ventures, Conviction · Sarah Guo, Neo · Ali Partovi, Elad Gil solo). Per NotebookLM 2026-04-27, the advisor opens 3 of 5 doors directly (Cyberstarts + Index + likely Conviction overlap). Elad Gil is the one cold-email path that works — he reads outlier-profile cold by design.',
       coldOpener:
-        'Decision Intel: 60-second AI audit on every strategic memo before the board sees it. Recognition-Rigor Framework operationalising 50 years of Nobel-winning behavioral economics. 17-framework regulatory map across G7 / EU / GCC / African markets — EU AI Act Article 14 enforcement is Aug 2, 2026. Worth a pre-seed conversation?',
+        'Decision Intel: 60-second AI audit on every strategic memo before the board sees it. Recognition-Rigor Framework operationalising 50 years of Nobel-winning behavioral economics. 17-framework regulatory map across G7 / EU / GCC / African markets — EU AI Act Article 14 enforcement Aug 2, 2026. 16-year-old solo founder who published academic research on bias mechanics (2008 financial crisis). 190K LOC shipped solo. Worth a pre-seed conversation?',
       coldBlunder:
         '"We are pre-revenue and looking for our first customer" — instant disqualification at pre-seed. Lead with the wedge + the regulatory tailwind + the design-partner pipeline (even if not closed yet).',
       warmIntroPath:
-        'Wiz advisor → his McKinsey-alumni-turned-operator-angel network → pre-seed VCs with enterprise-infra thesis.',
+        'Josh Rainer (Wiz advisor) → Cyberstarts (seeded Wiz) + Index Ventures (backed Wiz) + Conviction (Sarah Guo) — three of these are direct warm intros via the Wiz pattern recognition. Neo Residency (Ali Partovi) — apply summer 2026 cohort directly. Elad Gil — direct cold email when the founder arc is sufficiently outlier (this profile qualifies).',
     },
     discoveryQuestions: {
       opening: [
@@ -2031,26 +2031,27 @@ export const FAILURE_MODES: FailureMode[] = [
 export const NETWORK_NODES: NetworkNode[] = [
   {
     id: 'wiz_advisor',
-    name: 'Wiz Senior Advisor',
+    name: 'Josh Rainer (Wiz Senior Advisor)',
     role: 'Senior consultant, scaled Wiz from startup to $32B',
     relationship: 'advisor',
     unlocks: [
-      'McKinsey alumni network (heavily saturated per NotebookLM 2026-04-27 synthesis)',
-      'F500 CSO warm intros (his consulting portfolio overlap)',
-      'Pre-seed VC introductions (enterprise-infra-with-regulatory-tailwind thesis fit)',
+      'McKinsey alumni network heavily saturated · highest-ROI advisor ask per NotebookLM 2026-04-27',
+      'Direct warm line to Cyberstarts (Wiz seed backer) and Index Ventures (Wiz backer) — both already know the Wiz pattern intimately',
+      'F500 CSO warm intros via his consulting portfolio overlap',
+      'Conviction (Sarah Guo) — likely partner / LP overlap per NotebookLM synthesis',
       'GTM playbook learnings from Wiz first-paid-F500 pattern',
     ],
     ask: {
-      tier1: 'McKinsey QuantumBlack alliances introduction (target: Lieven Van der Veken or Head of Alliances) — highest-ROI per NotebookLM 2026-04-27',
-      tier2: 'Specific F500 CSO warm intros (one per quarter, named buyer with thesis fit)',
-      tier3: 'Operator-stage angel introductions for advisor convertibles + small pre-seed checks',
+      tier1: 'McKinsey QuantumBlack alliances introduction (target: Lieven Van der Veken — Senior Partner, led the Wonderful agentic-AI collaboration; alternative: Head of Alliances, Head of Ecosystem, QuantumBlack London office lead) — highest-ROI per NotebookLM 2026-04-27. Side-door alternative: apply to Credo AI partner program first (McKinsey is launch partner) — bypasses direct from-scratch onboarding friction',
+      tier2: 'Pre-seed warm intros to the 5 named target funds: Cyberstarts, Index Ventures, Conviction (Sarah Guo), Neo Residency (Ali Partovi), and a direct introduction route to Elad Gil',
+      tier3: 'Specific F500 CSO warm intros (one per quarter, named buyer with thesis fit) + operator-stage angel introductions for advisor convertibles',
     },
     status: 'active',
     cadence: 'Monthly 1:1 + ad-hoc check-ins · sharpen ask specificity each meeting',
     notes:
-      'Cadence quality matters more than cadence frequency. Specific pre-qualified asks convert 5× better than generic updates. Closed-loop feedback after every intro is non-negotiable.',
+      'Cadence quality matters more than cadence frequency. Specific pre-qualified asks convert 5× better than generic updates. Closed-loop feedback after every intro is non-negotiable. Per NotebookLM 2026-04-27, his Wiz-Cyberstarts-Index relationship is the most direct enterprise-pre-seed-VC route Decision Intel has — use it before going wider.',
     nextStep:
-      'Next 1:1: ask explicitly for the McKinsey QuantumBlack alliance intro. Pre-qualify with: "I have prepared the R²F architecture overview + the EU AI Act Art 14 mapping + the joint-research angle. Who is the right entry point — alliances org or a specific senior partner?"',
+      'Next 1:1: ask explicitly for the McKinsey QuantumBlack alliance intro to Lieven Van der Veken (or apply to Credo AI partner program as the side-door). Pre-qualify with: "I have prepared the R²F architecture overview + the EU AI Act Art 14 mapping + the joint-research angle. Cyberstarts and Index Ventures should be the next two pre-seed conversations — both know the Wiz pattern. Can you make those introductions?"',
   },
   {
     id: 'tasis_school_network',
@@ -2083,20 +2084,22 @@ export const NETWORK_NODES: NetworkNode[] = [
     unlocks: [
       'First paid design partner (the wedge that proves the wedge)',
       'Pan-African PE network introductions (sponsored conferences, peer GP network)',
-      'Reference case study when 6-month outcomes are logged',
+      'Q4 2026 anonymised "Bias Autopsy" reference case · target shape: "Across 30 audited deals in the Pan-African industrial / fintech sector, DQI scores improved by X%, mitigating Sunk-Ship toxic combination saved £Y in misallocated capital"',
       'LP-introduction pathway after 12 months of clean DPR usage',
     ],
     ask: {
-      tier1: 'Closed paid design-partner contract on £2,499/mo Strategy + outcome-gate enforcement contractual term',
-      tier2: 'Quarterly peer-network introductions (other Pan-African GPs, family offices, EM-focused funds)',
-      tier3: 'Co-authored anonymised reference case at month 6 (LP-publishable, named-prospect-redacted per CLAUDE.md)',
+      tier1:
+        'Closed paid design-partner contract on £2,499/mo Strategy + outcome-gate enforcement contractual term · Day-30 target ≥3 audits (habit formation) · Day-60 target ≥50% outcome-reporting rate (flywheel activation) · Day-90 target first External DPR Share Event (board-grade utility — the conversion signal that proves the artefact is being shared with LPs / co-investors / auditors)',
+      tier2: 'Quarterly peer-network introductions (other Pan-African GPs, family offices, EM-focused funds) once Day-90 metric hits',
+      tier3: 'Co-authored anonymised "Bias Autopsy" reference case at Q4 2026 publication (LP-publishable, named-prospect-redacted per CLAUDE.md no-named-prospects rule)',
     },
     status: 'active',
-    cadence: 'Per-conversation cadence · designed-partner playbook from Founder School lesson gtm_8',
+    cadence:
+      'Day 1-7: integration-first onboarding (Drive polling or analyze+token@in.decision-intel.com forwarder live in 15 min during discovery call) · weekly Brier-score sync · Day 30 / 60 / 90 metric checkpoints · monthly partner 1:1 with founder',
     notes:
-      'Sankore brief stays INSIDE the Founder Hub per CLAUDE.md no-named-prospects rule. Public surfaces never name Sankore. The relationship IS the wedge proof.',
+      'Per NotebookLM 2026-04-27 Sankore Day-90 synthesis. Three highest-probability failure modes: (1) Integration "shelfware" (analysts abandon by week 4 — countermove: integration-first onboarding, zero behavior change, email forwarder live in 15 min); (2) Dormant data flywheel (audits run but outcomes never logged — countermove: enforce 409 Outcome Gate, architecturally block new audits on pending outcomes past 30-90 days); (3) Unpaid dev shop / scope creep (custom features delay roadmap — countermove: "no custom features outside published roadmap" rule before signing, frame partnership around CATEGORY co-building, not bespoke software). Sankore brief stays INSIDE the Founder Hub per CLAUDE.md no-named-prospects rule. The relationship IS the wedge proof.',
     nextStep:
-      'Close the contract by Q3 2026 with outcome-gate enforcement as a contractual term. Plan the 90-day onboarding: integration-first, retro-audit 3 dead deals, then live IC memos.',
+      'Close the contract by Q3 2026 with: (a) outcome-gate enforcement as contractual term, (b) "no custom features" rule pre-signed, (c) integration-first onboarding scheduled for Week 1 (Drive polling OR email forwarder), (d) Day-30 / 60 / 90 success metrics in the contract appendix. Schedule Q4 2026 Bias Autopsy publication target NOW.',
   },
   {
     id: 'lrqa_ian_spaulding',
@@ -2124,25 +2127,25 @@ export const NETWORK_NODES: NetworkNode[] = [
   {
     id: 'mckinsey_quantumblack',
     name: 'McKinsey QuantumBlack (target — not yet engaged)',
-    role: 'McKinsey AI consulting arm · alliances org actively packaging gen-AI engagements with partners (Credo AI, C3 AI)',
+    role: 'McKinsey AI consulting arm · embeds 3rd-party tooling in $500K-5M F500 transformation engagements · alliances calendar packs gen-AI partners (Credo AI, C3 AI, Wonderful)',
     relationship: 'untapped',
     unlocks: [
-      'Co-sell channel into Fortune 500 CSOs (their existing buyer base)',
+      'Co-sell channel into Fortune 500 CSOs (McKinsey embeds tooling INTO $500K-5M engagements — not reseller, joint procurement) · reduces F500 friction of two separate purchase orders',
       'Category validation as the strategic-decision-tier peer to Credo AI (model tier)',
       'Co-publishable content (joint research, conference talks) elevating both brands',
-      'Long-term: F500 CSO direct ARR pull-through over 12-24 months',
+      'Long-term: F500 CSO direct ARR pull-through over 12-24 months · partner equity-investment pattern is common at this stage',
     ],
     ask: {
-      tier1: 'Alliance partnership inside QuantumBlack — DI as the EU AI Act Art 14 record-keeping artefact + bias-audit layer in their AI-transformation engagements',
-      tier2: 'Joint co-publishable content — "AI Governance + Decision Provenance: the EU AI Act Art 14 Answer" white paper',
-      tier3: 'Specific F500 CSO co-sell pilot embedded in one of their live engagements',
+      tier1: 'Direct alliance partnership inside QuantumBlack — entry points (in priority): (a) Lieven Van der Veken — Senior Partner, led Wonderful agentic-AI collaboration (highest-fit entry); (b) Head of Alliances; (c) Head of Ecosystem; (d) QuantumBlack London office lead. Frame as peer-level category conversation, NOT vendor pitch.',
+      tier2: 'Side-door via Credo AI partner program — McKinsey is launch partner; applying to Credo AI first gives streamlined indirect entry into McKinsey alliance ecosystem and bypasses friction of from-scratch consultancy onboarding',
+      tier3: 'Joint co-publishable content — "AI Governance + Decision Provenance: the EU AI Act Art 14 Answer" white paper · then specific F500 CSO co-sell pilot embedded in one of their live engagements',
     },
     status: 'untapped',
-    cadence: 'TBD post-Wiz-advisor introduction',
+    cadence: 'TBD post-Wiz-advisor introduction · NotebookLM 2026-04-27 confirmed alliance onboarding timeline is not codified but Credo AI side-door is the fastest entry point',
     notes:
-      'Per NotebookLM 2026-04-27, the Wiz advisor is the highest-ROI path. Target Lieven Van der Veken (Senior Partner at QuantumBlack) or the Head of Alliances. Frame the meeting as a peer-level category conversation, NOT a vendor pitch.',
+      'Per NotebookLM 2026-04-27 master-KB synthesis: McKinsey hesitates to partner with pre-revenue startups, but DI leverage = (a) execution velocity (16-year-old solo shipping at Claude time deters McKinsey from building in-house competitor) + (b) category timing (QuantumBlack governance positioning is crystallizing THIS quarter — be in their vocabulary now). Killer line for the meeting: "McKinsey provides the strategy. Decision Intel provides the continuous audit and the EU AI Act Art 14 regulatory record."',
     nextStep:
-      'Activate the Wiz-advisor McKinsey path explicitly in next 1:1. Pre-qualify the ask: "I have prepared a peer-level category conversation deck. Who is the right entry point for QuantumBlack alliances?"',
+      'Run TWO paths in parallel: (1) Activate Wiz-advisor McKinsey path explicitly in next 1:1 — pre-qualify "I want intro to Lieven Van der Veken or QuantumBlack alliances. I have prepared the peer-level category conversation deck + the EU AI Act Art 14 mapping + the joint-research angle. Cost is high, leverage is unique." (2) Apply to Credo AI partner program directly as side-door entry. Whichever responds first is the open door.',
   },
   {
     id: 'cloverpop_aera_ibm',
@@ -2168,25 +2171,26 @@ export const NETWORK_NODES: NetworkNode[] = [
   },
   {
     id: 'pre_seed_target_funds',
-    name: 'Pre-Seed Target Funds (untapped, awaiting NotebookLM follow-up)',
-    role: 'European + US pre-seed VCs with enterprise-infra-with-regulatory-tailwind thesis',
+    name: 'Pre-Seed Target Funds (5 named · NotebookLM 2026-04-27)',
+    role: 'European + US pre-seed VCs with enterprise-infra + regulatory-tailwind + EM-wedge + founder-led-category-creation thesis fit',
     relationship: 'untapped',
     unlocks: [
       'Pre-seed £4-8M raise at £20-30M pre-money',
-      'Strategic VC introductions (enterprise-infra co-investors)',
+      'Strategic VC introductions to thesis-fit co-investors',
       'Operator-angel network access via fund partners',
     ],
     ask: {
-      tier1: 'Pre-seed lead commitment — £2-4M check at £20-30M pre-money',
-      tier2: 'Strategic VC introductions to fund-co co-investors',
-      tier3: 'Operator-angel introductions from fund partners',
+      tier1:
+        '5 named target funds in priority order: (1) Cyberstarts — Wiz seed backer · direct warm line via Josh Rainer · enterprise-trust + regulatory thesis fit. (2) Index Ventures — Wiz backer · top-tier US/EU presence · uniquely equipped for Pan-African wedge + EU AI Act regulatory moat. (3) Conviction (Sarah Guo) — AI-native fund · backed Baseten, Anthropic · Josh Rainer likely LP/partner overlap. (4) Elad Gil (solo GP) — backed Perplexity, Cognition, Scale AI · explicitly reads cold email when founder arc is unusual · 16-year-old solo + 2008 paper + 190K LOC = exact outlier profile. (5) Neo Residency (Ali Partovi) — first cohort summer 2026 · backed Cursor, Kalshi · selective bet on unusually-exceptional individuals',
+      tier2: 'Strategic VC introductions to fund-co co-investors after lead commitment',
+      tier3: 'Operator-angel introductions from fund partners after term sheet',
     },
     status: 'untapped',
-    cadence: 'Activate post-NotebookLM follow-up (see NotebookLM Follow-Up Lab)',
+    cadence: 'Sequence: Cyberstarts + Index first (both via Josh Rainer warm intros) → Conviction (Sarah Guo) → Neo Residency (apply summer 2026) → Elad Gil (cold email)',
     notes:
-      'NotebookLM follow-up question pending: "Pre-seed European + US investors most likely to fund a 16-year-old solo founder building enterprise infra with a Pan-African wedge — name 5 with thesis fit + warm-intro paths." Ship the question + harvest names + map to network.',
+      'Per NotebookLM master KB synthesis 2026-04-27. Comparable check sizes: Conviction backed Baseten + Anthropic; Index backed Wiz; Elad Gil writes $250K-$1M solo checks; Neo backed Cursor + Kalshi. The Wiz advisor (Josh Rainer) opens 3 of the 5 doors directly — use that lever first. Elad Gil cold email is the only path that does NOT require the advisor (he reads outlier-profile cold email by design).',
     nextStep:
-      'Run the NotebookLM follow-up. Map the resulting 5 fund names to existing network (Wiz advisor, school network, design-partner referrals). Sequence outreach: warm-only first.',
+      'In the next Josh Rainer 1:1 ask explicitly: "Cyberstarts and Index — both knew the Wiz pattern, both fund enterprise infra. Can you make warm introductions?" In parallel, draft the Elad Gil cold email + reference the 2008 paper + the 190K LOC + the R²F intellectual moat in the first sentence. Time-box Neo Residency application to summer 2026 launch.',
   },
   {
     id: 'family_relationships',
