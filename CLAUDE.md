@@ -209,12 +209,17 @@ npm run dev          # Start dev server (port 3000)
 npm run build        # Production build (Next.js)
 npm run lint         # ESLint
 npm run test         # Vitest (unit tests, excludes e2e/)
+npm run slop-scan    # modem-dev/slop-scan v0.3 — second quality gate
 npx playwright test  # E2E tests
 npx prisma migrate dev  # Run pending migrations
 npx prisma generate  # Regenerate Prisma client
 ```
 
 **Pre-commit hook:** Runs `npm run audit:ai` (Gemini architectural audit). Can be bypassed with `--no-verify` but should generally be fixed instead.
+
+**Slop-scan as second quality gate (locked 2026-04-27).** Run `npm run slop-scan` alongside `npx tsc --noEmit` after any non-trivial ship — Tier-N planned-work commits, refactor sprints, anything where `git diff --cached --stat` shows > 10 files changed. Bug-fix singletons don't need it. The script is at [scripts/slop-scan.sh](scripts/slop-scan.sh) and runs the modem-dev/slop-scan v0.3.0 default-pack rules. **Target**: `scorePerKloc < 4.0` (mature-OSS median is 1.48; AI-default median is 10.90; we sit at 3.87 as of the 2026-04-27 cleanup). **Trip-wire**: if `scorePerKloc` regresses commit-over-commit by > 0.5, pause and investigate — that's slop accumulating, not legitimate growth. **Interpretation rules**: (a) `defensive.empty-catch` / `error-obscuring` / `error-swallowing` — check against the fire-and-forget exceptions list (see "Fire-and-forget discipline" lock); if exception applies add an inline comment per the saved memory `feedback-fire-and-forget-exceptions-need-comments`; otherwise upgrade to `log.warn(...)` or fail-closed for commerce. (b) `structure.duplicate-function-signatures` — check if duplication is real per the saved memory `feedback-search-canonical-before-extracting`; if yes extract to a shared utility in `src/lib/utils/` (existing utilities: `grade.ts`, `confidence.ts`, `string.ts`, `request.ts`). (c) `tests.duplicate-mock-setup` — only refactor when mock shapes truly match across ≥3 files; helpers live in [src/test-utils/](src/test-utils/). (d) `structure.directory-fanout-hotspot` / `barrel-density` / `async-noise` — false-positives at our scale; ignore.
+
+**Drift-class bug rule (locked 2026-04-27 after the `quick-score.ts:scoreToGrade` find).** When a constant or algorithm has a canonical source (e.g. `GRADE_THRESHOLDS` in `src/lib/scoring/dqi.ts`, model names in CLAUDE.md model policy, framework counts in `getAllRegisteredFrameworks()`), every consumer MUST import from that canonical source. Re-implementing the same logic in another file IS the drift-class bug — even if it's correct today, it'll diverge silently when one copy gets updated and the others don't. The 2026-04-27 slop-scan sweep caught `quick-score.ts:scoreToGrade` using 90/70/50/30 instead of the canonical 85/70/55/40 — the public quick-score endpoint had been returning grade letters that didn't match the rest of the platform. **Forward-looking**: when adding a small utility (truncate / extractIp / formatX / colorFor), grep `src/` for an existing equivalent before writing a new one (per saved memory `feedback-search-canonical-before-extracting`).
 
 ## Project Structure
 
