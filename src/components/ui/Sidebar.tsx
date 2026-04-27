@@ -25,6 +25,7 @@ import {
   Repeat,
   ShieldCheck,
   Package,
+  Brain,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { ThemeToggle, ThemeToggleCompact } from '@/components/ThemeToggle';
@@ -493,6 +494,15 @@ export default function Sidebar() {
               label="Decisions"
               description="Decision Packages — composite DQI + cross-doc audit"
               active={pathname.startsWith('/dashboard/decisions')}
+              collapsed={collapsed}
+              onNavigate={closeMobile}
+            />
+            <NavItem
+              href="/dashboard/decision-dna"
+              icon={<Brain size={18} />}
+              label="Decision DNA"
+              description="Your personal calibration — biases, agents, outcomes over time"
+              active={pathname.startsWith('/dashboard/decision-dna')}
               collapsed={collapsed}
               onNavigate={closeMobile}
             />

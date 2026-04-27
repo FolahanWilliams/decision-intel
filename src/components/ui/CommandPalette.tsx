@@ -191,6 +191,23 @@ export function CommandPalette() {
         keywords: ['outcome', 'flywheel', 'attribution', 'roi', 'impact'],
       },
       {
+        id: 'decision-dna',
+        label: 'Decision DNA',
+        description: 'Personal calibration — biases, agents, outcomes over time',
+        icon: <BrainCircuit size={16} />,
+        action: () => navigate('/dashboard/decision-dna'),
+        keywords: [
+          'dna',
+          'calibration',
+          'personal',
+          'profile',
+          'belief',
+          'twin',
+          'fingerprint',
+          'style',
+        ],
+      },
+      {
         id: 'bias-library',
         label: 'Bias Library',
         description: 'Learn about cognitive biases',

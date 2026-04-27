@@ -41,6 +41,14 @@ export interface GenerateTextOptions {
  *
  * Safety settings default to BLOCK_NONE (relaxed) to match the analysis
  * pipeline — documents may contain sensitive language that must be processed.
+ *
+ * Default model `gemini-3-flash-preview` is the locked CLAUDE.md "Gemini model
+ * policy" provider default for analytical / grounded / reasoning-heavy routes.
+ * Lighter routes (content-gen, classification) explicitly pass
+ * `model: 'gemini-3.1-flash-lite'` via options. The metaJudge final-verdict
+ * node uses `gemini-2.5-pro` via getProStandardSafetyGroundedModel() in
+ * lib/agents/nodes.ts — that's the only Pro-tier surface in the codebase.
+ * Don't introduce another model name without updating CLAUDE.md model policy.
  */
 export async function generateText(
   prompt: string,

@@ -28,6 +28,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { DecisionIQCard } from '@/components/ui/DecisionIQCard';
+import { DecisionDNAPreviewCard } from '@/components/dna/DecisionDNAPreviewCard';
 import { FirstRunInlineWalkthrough } from '@/components/onboarding/FirstRunInlineWalkthrough';
 import { useOnboardingRole } from '@/hooks/useOnboardingRole';
 import type { EmptyStateRole } from '@/lib/onboarding/role-empty-states';
@@ -1042,6 +1043,12 @@ export default function Dashboard() {
           })}
         </motion.div>
       </>
+
+      {/* Decision DNA preview — surfaces the personal-calibration moat as
+          a 3-stat row (top-triggered bias / belief delta / follow-success).
+          Renders a discovery card when the user has no data yet. The full
+          surface lives at /dashboard/decision-dna. */}
+      <DecisionDNAPreviewCard />
 
       {/* Banners / widgets — rendered bare (no mb-lg wrapper divs) so null
           returns don't create empty flex items that inflate stack-xl's
