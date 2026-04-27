@@ -190,6 +190,13 @@ const LrqaTab = dynamic(
     })),
   { loading: tabLoader }
 );
+const PathToHundredMillionTab = dynamic(
+  () =>
+    import('@/components/founder-hub/PathToHundredMillionTab').then(m => ({
+      default: m.PathToHundredMillionTab,
+    })),
+  { loading: tabLoader }
+);
 import {
   Rocket,
   Brain,
@@ -242,6 +249,7 @@ type TabId =
   | 'unicorn_roadmap'
   | 'meetings_log'
   | 'lrqa'
+  | 'path_to_100m'
   | 'todo';
 
 type TabGroup = 'Start' | 'Product' | 'Go-to-Market' | 'Intelligence' | 'Tools';
@@ -269,6 +277,12 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
   // Start — guided 2-day walkthrough entry point
   { id: 'start', label: 'Start Here', icon: <Compass size={16} />, group: 'Start' },
   { id: 'unicorn_roadmap', label: 'Unicorn Roadmap', icon: <Target size={16} />, group: 'Start' },
+  {
+    id: 'path_to_100m',
+    label: 'Path to $100M ARR',
+    icon: <Target size={16} />,
+    group: 'Start',
+  },
   // Product
   { id: 'overview', label: 'Product Overview', icon: <Rocket size={16} />, group: 'Product' },
   { id: 'product_deep', label: 'Pipeline & Scoring', icon: <Brain size={16} />, group: 'Product' },
@@ -609,6 +623,14 @@ const SEARCH_INDEX: SearchEntry[] = [
       'North star, executive memo, 5-year timeline, moat radar, 90-day sprint, pipeline funnel, pitfalls, fundraising gauge.',
     keywords:
       'unicorn roadmap north star vision executive memo synthesis kahneman klein moat 5 year timeline milestone sprint 90 day design partner funnel pipeline authority founder pitfall risk cadence weekly rhythm fundraising readiness pre-seed seed series a competitive map',
+  },
+  {
+    tabId: 'path_to_100m',
+    section: 'Path to $100M ARR',
+    preview:
+      'Strategic compass + per-role outreach playbooks (8 personas) + R²F intellectual moat deep-dive + 16 investor metrics + killer responses to "not for us" / "I’m confused" + warm-intro network map + 90-day action plan + NotebookLM follow-up lab.',
+    keywords:
+      'path 100m arr 100 million unicorn 2030 north star strengths weaknesses matrix r2f recognition rigor framework kahneman klein meta judge mercier sperber argumentative reasoning environmental validity decision framing gate provisional patents academic credentials category definition vocabulary cold warm bridge sentence persona pitch library cso vp strategy corp dev mna m&a pan-african fund partner sankore fortune 500 general counsel audit committee mckinsey quantumblack bcg gamma bain advanced analytics lrqa bureau veritas sgs intertek dnv pre-seed seed venture investor wiz advisor outreach playbook discovery questions killer pitch meeting arc cold opener warm intro follow-up cadence signals positive negative phrases never to say objection handling not for us right now jolt effect honest off-ramp pings echoes refrigerator confused vulnerability reset 5th grade financial anchor evidence challenge cloverpop aera ibm watsonx category contrast investor metrics bookings revenue arr mrr gross profit tcv acv ltv cac billings churn cmgr burn rate downloads vanity cumulative chart tricks size before growth failure modes watchtower quantellia consulting trap manual logging cathedral of code external attack vector ibm bundling agentic shift warm intro network map wiz tasis school sankore lrqa ian spaulding mckinsey pre-seed funds family relationships 90-day action plan may june july 2026 isa 2007 dqi confidence intervals gtm co-founder reference case term sheet notebooklm follow-up lab questions',
   },
   {
     tabId: 'design_partners',
@@ -1293,6 +1315,11 @@ function renderTab(
     unicorn_roadmap: (
       <ErrorBoundary sectionName="Unicorn Roadmap">
         <UnicornRoadmapTab />
+      </ErrorBoundary>
+    ),
+    path_to_100m: (
+      <ErrorBoundary sectionName="Path to $100M ARR">
+        <PathToHundredMillionTab />
       </ErrorBoundary>
     ),
     todo: (
