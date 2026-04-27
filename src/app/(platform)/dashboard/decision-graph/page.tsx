@@ -17,6 +17,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { CrossSiloAlertCards } from '@/components/ui/CrossSiloAlertCards';
 import { usePlanLabels } from '@/hooks/usePlanLabels';
+import { GraphShareModal } from '@/components/visualizations/GraphShareModal';
 import {
   Network,
   FileText,
@@ -27,6 +28,7 @@ import {
   Minus,
   Download,
   AlertTriangle,
+  Share2,
 } from 'lucide-react';
 
 interface GraphReport {
@@ -81,6 +83,7 @@ export default function DecisionGraphPage() {
   const [reportLoading, setReportLoading] = useState(false);
   const [orgError, setOrgError] = useState<string | null>(null);
   const [reportError, setReportError] = useState<string | null>(null);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
 
   // Fetch user's org
   useEffect(() => {
@@ -218,6 +221,19 @@ export default function DecisionGraphPage() {
         </div>
 
         <div className="flex items-center gap-sm" style={{ flexWrap: 'wrap' }}>
+          {/* Share button — opens GraphShareModal which snapshots the
+              current graph + creates a public read-only URL with optional
+              redaction + password + expiry. The leave-behind sales artefact
+              for CSOs sharing the moat with peers / CFOs / boards. */}
+          <button
+            onClick={() => setShareModalOpen(true)}
+            className="btn btn-primary btn-sm flex items-center gap-xs"
+            style={{ fontSize: '11px' }}
+            title="Share a snapshot of this graph as a public URL"
+          >
+            <Share2 size={12} /> Share graph
+          </button>
+
           {/* Export buttons */}
           <button
             onClick={exportSvg}
@@ -636,6 +652,15 @@ export default function DecisionGraphPage() {
           </ErrorBoundary>
         </div>
       )}
+
+      {/* Share modal — A2 deep, locked 2026-04-27. Snapshots the graph at
+          share-time + creates a public token URL the user can DM to a CFO
+          / LP / board reviewer. */}
+      <GraphShareModal
+        open={shareModalOpen}
+        onOpenChange={setShareModalOpen}
+        timeRangeDays={timeRange}
+      />
     </div>
   );
 }

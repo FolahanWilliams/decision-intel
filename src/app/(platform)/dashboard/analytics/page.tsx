@@ -43,6 +43,11 @@ const DecisionIntelligenceContent = lazy(() =>
 const BiasLibraryContent = lazy(() =>
   import('@/components/insights/BiasLibraryContent').then(m => ({ default: m.BiasLibraryContent }))
 );
+const BiasGenomeContributionCard = lazy(() =>
+  import('@/components/insights/BiasGenomeContributionCard').then(m => ({
+    default: m.BiasGenomeContributionCard,
+  }))
+);
 const StructuralExposureCard = lazy(() =>
   import('@/components/analysis/StructuralExposureCard').then(m => ({
     default: m.StructuralExposureCard,
@@ -340,6 +345,20 @@ function AnalyticsInner() {
             )}
             {view === 'intelligence' && (
               <>
+                {/* Bias Genome contribution surfaces the cross-org data
+                    network effect to the contributor (A3 deep, locked
+                    2026-04-27). Without this, the genome's compounding
+                    is invisible to the team funding it. Lives at the
+                    top of /intelligence so it's the first thing a CSO
+                    sees when she wants to know "is this getting smarter
+                    for us?" */}
+                <section>
+                  <SectionHeading icon={<Network size={13} />}>
+                    Bias Genome · Your Contribution
+                  </SectionHeading>
+                  <BiasGenomeContributionCard />
+                </section>
+
                 <section>
                   <SectionHeading icon={<BrainCircuit size={13} />}>
                     Decision Intelligence

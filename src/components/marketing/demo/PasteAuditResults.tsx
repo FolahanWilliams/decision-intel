@@ -57,7 +57,17 @@ export function PasteAuditResults({ documentId, analysisId, result }: PasteAudit
   const twins: DecisionTwin[] = (result.simulation?.twins ?? []).slice(0, 3);
   const redTeam = (result.preMortem?.redTeam ?? []).slice(0, 2);
 
-  const deepDiveHref = analysisId ? `/documents/${documentId}` : `/documents/${documentId}`;
+  // Demo claim flow (D9, locked 2026-04-27): the wow-moment audit lives
+  // under DEMO_USER_ID for 24h. The Save CTA routes through signup → claim
+  // → owned doc so the audit transfers ownership to the new user. Visitors
+  // who close the tab and come back later beyond 24h fall through to the
+  // existing deepDiveHref path (which 403s on a demo-owned doc, but the
+  // /onboarding/claim error UI handles the "no longer claimable" case).
+  const claimQuery = new URLSearchParams();
+  if (analysisId) claimQuery.set('demoAnalysisId', analysisId);
+  if (documentId) claimQuery.set('demoDocumentId', documentId);
+  const claimPath = `/onboarding/claim?${claimQuery.toString()}`;
+  const saveAuditHref = `/login?mode=signup&redirect=${encodeURIComponent(claimPath)}`;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -552,9 +562,13 @@ export function PasteAuditResults({ documentId, analysisId, result }: PasteAudit
         </p>
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 4 }}>
           <Link
-            href={`/login?next=${encodeURIComponent(deepDiveHref)}`}
+            href={saveAuditHref}
             onClick={() =>
-              trackEvent('demo_save_audit_clicked', { analysisId: analysisId ?? undefined })
+              trackEvent('demo_save_audit_clicked', {
+                analysisId: analysisId ?? undefined,
+                documentId,
+                claimFlow: 'enabled',
+              })
             }
             style={{
               display: 'inline-flex',

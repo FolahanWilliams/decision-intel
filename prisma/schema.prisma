@@ -1155,6 +1155,60 @@ model ShareLinkAccess {
   @@index([shareLinkId])
 }
 
+/// Decision Knowledge Graph share link (A2 deep, locked 2026-04-27).
+///
+/// Separate from ShareLink because the analysis-share model is keyed to a
+/// specific Analysis row (Cascade-deletes when the analysis is removed) and
+/// the graph-share is org-scoped (or user-scoped for personal accounts).
+///
+/// Snapshot semantics: at share-time, the server captures the org's
+/// graph-network report (metrics + top nodes + anti-patterns + risk state)
+/// as a JSON snapshot. The public shared viewer renders THAT snapshot,
+/// not live data — protects against shared URLs leaking new audits the
+/// sharer didn't intend to expose, and avoids the public viewer needing
+/// auth context to fetch live graph data.
+///
+/// Redaction: isRedacted=true strips bias-type labels from the snapshot
+/// (replacing with [BIAS_N]) so the artefact can be sent to LPs / audit
+/// committees without leaking competitive intelligence about which biases
+/// the team trips most. DQI counts + risk levels + structural patterns
+/// stay visible.
+model GraphShareLink {
+  id           String    @id @default(cuid())
+  token        String    @unique @default(cuid())
+  /// Sharer (who created the link). Owner-only revoke gate.
+  userId       String
+  /// Org whose graph is shared. Null for personal-scope graphs (Free /
+  /// Individual users without a TeamMember row).
+  orgId        String?
+  /// JSON snapshot of GraphNetworkReport at share-time. The shared
+  /// viewer renders this directly; never re-queries live data.
+  snapshot     Json
+  /// Sharer-friendly label captured at share-time (org name or "Personal
+  /// graph") so the public viewer can render "Shared by {label}".
+  sharerLabel  String
+  /// When TRUE, the public viewer hides bias-type labels (replaced with
+  /// generic placeholders) but keeps DQI counts + risk levels visible.
+  isRedacted   Boolean   @default(false)
+  /// 30-day default set in the API; null = never expires (founder-decision
+  /// per share). Past expiresAt the public route returns 410 Gone.
+  expiresAt    DateTime?
+  /// Manual revoke. Distinct from expiresAt so a revoked link returns
+  /// "this share has been revoked" rather than "expired."
+  revokedAt    DateTime?
+  /// Optional bcrypt hash. When set, the public viewer requires the
+  /// password before rendering the snapshot.
+  password     String?
+  viewCount    Int       @default(0)
+  lastViewedAt DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@index([userId])
+  @@index([orgId])
+  @@index([token])
+  @@index([expiresAt])
+}
+
 model BatchUpload {
   id         String   @id @default(cuid())
   userId     String

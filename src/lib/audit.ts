@@ -68,7 +68,11 @@ export type AuditAction =
   | 'DECISION_PACKAGE_CROSS_REFERENCE_RUN'
   | 'DECISION_PACKAGE_OUTCOME_LOGGED'
   // Account-scoped bulk export (P1 #27, 2026-04-26)
-  | 'EXPORT_ACCOUNT_BUNDLE';
+  | 'EXPORT_ACCOUNT_BUNDLE'
+  // Tier 2 ships (2026-04-27)
+  | 'CLAIM_DEMO_ANALYSIS' // D9 — visitor claims a /demo audit into their new account
+  | 'GRAPH_SHARE_CREATED' // A2 — Decision Knowledge Graph share link created
+  | 'GRAPH_SHARE_REVOKED'; // A2 — graph share link revoked
 
 export interface AuditLogParams {
   action: AuditAction;

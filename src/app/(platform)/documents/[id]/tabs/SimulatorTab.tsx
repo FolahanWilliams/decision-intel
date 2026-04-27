@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Info, PlayCircle, Loader2, RefreshCw, CheckCircle } from 'lucide-react';
 import { BiasInstance } from '@/types';
 import { useToast } from '@/components/ui/EnhancedToast';
+import { RPDSimulatorCard } from '@/components/analysis/RPDSimulatorCard';
 
 const SEVERITY_COLORS: Record<string, string> = {
   low: 'var(--severity-low)',
@@ -517,6 +518,15 @@ export function SimulatorTab({
           </div>
         </div>
       )}
+
+      {/* RPD Simulator (G24, locked 2026-04-27): Klein's Recognition-Primed
+          Decision framework as a clickable proof point. The "what-if"
+          simulator above is the Kahneman-side variance test (edit the memo,
+          re-score). The RPD card is the Klein-side recognition test (name
+          the action you're leaning toward, find historical analogs). Both
+          live on this tab so the buyer experiences the full R²F dual
+          tradition in one surface. */}
+      <RPDSimulatorCard documentId={documentId} />
     </>
   );
 }

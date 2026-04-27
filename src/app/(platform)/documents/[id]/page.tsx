@@ -539,6 +539,25 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
 
   const { showToast } = useToast();
 
+  // D9 (locked 2026-04-27): post-claim landing toast. The /onboarding/claim
+  // page redirects here with ?claimed=true after transferring ownership.
+  // Fires once per mount; the param is stripped from the URL afterward so
+  // a refresh doesn't re-fire and a copy-paste of the URL doesn't show
+  // a stale "claimed" message.
+  useEffect(() => {
+    if (searchParams.get('claimed') === 'true') {
+      showToast(
+        'Audit claimed from your demo run. It now lives in your account.',
+        'success'
+      );
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete('claimed');
+      const qs = params.toString();
+      router.replace(`/documents/${resolvedParams.id}${qs ? `?${qs}` : ''}`, { scroll: false });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleTabChange = useCallback(
     (tabId: TabId) => {
       setSelectedBias(null);
