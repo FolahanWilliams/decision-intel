@@ -126,14 +126,20 @@ export async function GET() {
       });
     }
 
-    // Parallel fetch: profile, causal weights, maturity score, flywheel
+    // Parallel fetch: profile, causal weights, maturity score, flywheel.
+    // Each fallback logs the error so transient DB failures surface in
+    // observability instead of silently rendering an empty/incomplete
+    // team-intelligence dashboard.
     const [profile, causalEdges, maturity, brierChip, outcomesPending] = await Promise.all([
       prisma.teamCognitiveProfile
         .findFirst({
           where: { orgId },
           orderBy: { periodEnd: 'desc' },
         })
-        .catch(() => null),
+        .catch(err => {
+          log.warn('teamCognitiveProfile fetch failed:', err);
+          return null;
+        }),
 
       // Fetch org-specific causal edges directly from the CausalEdge table
       prisma.causalEdge
@@ -142,9 +148,15 @@ export async function GET() {
           orderBy: { confidence: 'desc' },
           take: 20,
         })
-        .catch(() => []),
+        .catch(err => {
+          log.warn('causalEdge fetch failed:', err);
+          return [];
+        }),
 
-      computeMaturityScore(orgId).catch(() => null),
+      computeMaturityScore(orgId).catch(err => {
+        log.warn('maturity-score compute failed:', err);
+        return null;
+      }),
 
       computeOrgBrierChip(orgId, user.id),
       computeOutcomesPending(orgId, user.id),

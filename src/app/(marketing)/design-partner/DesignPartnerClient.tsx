@@ -25,7 +25,7 @@ import {
   Scale,
   Lock,
   Users,
-  Sparkles,
+  Sliders,
   BookOpen,
   GraduationCap,
   Building2,
@@ -63,7 +63,7 @@ const YOU_RECEIVE: Array<{ icon: typeof ShieldCheck; title: string; body: string
     body: 'The hashed, tamper-evident, 4-page artifact your General Counsel hands to the audit committee, mapped onto EU AI Act Article 14 record-keeping, SEC AI disclosure, and Basel III ICAAP. Bundled on every strategic memo you audit.',
   },
   {
-    icon: Sparkles,
+    icon: Sliders,
     title: 'Custom toxic-combination weights',
     body: 'The founder personally tunes the 20×20 interaction matrix to your industry\u2019s failure modes, using your historical memo library as calibration data.',
   },
