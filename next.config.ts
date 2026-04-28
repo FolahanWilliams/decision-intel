@@ -123,6 +123,29 @@ const nextConfig: NextConfig = {
     // container ceiling. No runtime impact; it only changes how webpack
     // does its bookkeeping during compile.
     webpackMemoryOptimizations: true,
+    // 2026-04-29: Vercel build OOM AGAIN (exit 137) after the heap was
+    // already at 7168 + webpackMemoryOptimizations was on. The codebase
+    // grew enough across the last ~7 days (Sparring Room v3, Education
+    // Room ~120 cards, Path-to-100M tab + ~3000-line data file, Closing
+    // Lab + Brinkmanship + Strategic Thinking sales-toolkit additions,
+    // founder-school lesson + visualization growth, the case-count
+    // refactor touching ~30 files) to push webpack peak memory over
+    // the 8 GB container ceiling again.
+    //
+    // Per CLAUDE.md "Webpack OOM" lock the next move is
+    // `webpackBuildWorker: false`. Next 16+ runs webpack in a worker
+    // by default; disabling it can PARADOXICALLY reduce peak memory
+    // because the worker duplicates internal state that already lives
+    // in the parent process.
+    //
+    // Do NOT raise NODE_OPTIONS heap above 7168 — that pushes into the
+    // parent-Node + container-overhead window and SIGKILL fires
+    // immediately. Stay at 7168 + this flag. Also NOT switching to
+    // Turbopack despite improved Next 16 support — Turbopack stalled
+    // in this codebase on 2026-04-22 ("Creating an optimized
+    // production build ..." never recovered). Treat Turbopack as
+    // experimental fallback ONLY if this commit's fix also OOMs.
+    webpackBuildWorker: false,
   },
   // 2026-04-22: Next.js 16.2.x SWC hits an infinite-loop bug when
   // processing inline `<style>{`@media ...`}</style>` blocks via the
