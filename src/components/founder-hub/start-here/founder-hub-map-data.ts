@@ -32,6 +32,7 @@ export type TabId =
   | 'positioning_copilot'
   | 'positioning'
   | 'sales'
+  | 'closing_lab'
   | 'outreach_hub'
   | 'category_position'
   | 'lrqa'
@@ -171,13 +172,13 @@ export const NODES: MapNode[] = [
     iconName: 'BookOpen',
   },
 
-  // ─── Go-to-Market (7) ─────────────────────────────────────────────
+  // ─── Go-to-Market (8) ─────────────────────────────────────────────
   {
     id: 'category_position',
     label: 'Category Position',
     group: 'Go-to-Market',
     x: 0.5,
-    y: 0.10,
+    y: 0.08,
     whatItsFor: 'The DI competitive landscape. 5 incumbents mapped, 3 gaps DI uniquely closes.',
     payoff: 'You can answer "how is this different from Cloverpop / IBM watsonx" in one sentence.',
     minutes: 15,
@@ -189,7 +190,7 @@ export const NODES: MapNode[] = [
     label: 'Positioning Copilot',
     group: 'Go-to-Market',
     x: 0.5,
-    y: 0.24,
+    y: 0.20,
     whatItsFor: "Sharp's brand spine, market thesis, strategic compass, pitch deck, AI rehearsal coach.",
     payoff: 'Rehearse a pitch out loud against the AI coach before a real meeting.',
     minutes: 35,
@@ -201,7 +202,7 @@ export const NODES: MapNode[] = [
     label: 'Competitive Positioning',
     group: 'Go-to-Market',
     x: 0.5,
-    y: 0.38,
+    y: 0.32,
     whatItsFor: 'Cloverpop comparison, 5 moat layers, capability matrix, 8 investor Q&As, top-3 DI-space gaps.',
     payoff: 'Direct answers to "why this, why now, why you" for any procurement reader.',
     minutes: 25,
@@ -213,7 +214,7 @@ export const NODES: MapNode[] = [
     label: 'Sales Toolkit',
     group: 'Go-to-Market',
     x: 0.5,
-    y: 0.52,
+    y: 0.44,
     whatItsFor: 'JOLT, SLIP, Cialdini, MEDDPICC, SPIN, Challenger, demo flow, audience pitches.',
     payoff: 'Tactical sales layer. Pick the framework that matches your current pipeline blocker.',
     minutes: 30,
@@ -221,15 +222,27 @@ export const NODES: MapNode[] = [
     iconName: 'MessageSquare',
   },
   {
+    id: 'closing_lab',
+    label: 'Closing Lab',
+    group: 'Go-to-Market',
+    x: 0.5,
+    y: 0.56,
+    whatItsFor: 'Maalouf 6 high-ticket-psychology principles + Satyam 5 sales-infrastructure pillars + 5 silent objections + 3 fastest-converter personas + 80% cut list.',
+    payoff: 'The exact phrase to use on the call, the silent objection that killed your last lost deal, and the 14-day outreach sequence per persona.',
+    minutes: 35,
+    prerequisites: ['sales'],
+    iconName: 'Target',
+  },
+  {
     id: 'outreach_hub',
     label: 'Outreach Hub',
     group: 'Go-to-Market',
     x: 0.5,
-    y: 0.66,
+    y: 0.68,
     whatItsFor: 'ICP events + persona map + channel matrix + contact tracker + LinkedIn message generator + design-partner triage.',
     payoff: 'The operational outbound layer. Every Monday-morning send-message lives here.',
     minutes: 40,
-    prerequisites: ['sales'],
+    prerequisites: ['closing_lab'],
     iconName: 'Zap',
   },
   {
@@ -249,7 +262,7 @@ export const NODES: MapNode[] = [
     label: 'LRQA / Ian Spaulding',
     group: 'Go-to-Market',
     x: 0.5,
-    y: 0.94,
+    y: 0.92,
     whatItsFor: 'Active warm-intro brief: Ian profile, LRQA company map, integration paths, ask hierarchy, meeting prep.',
     payoff: 'Walk into the meeting with the artefact + literal opening line + follow-up cadence ready.',
     minutes: 30,
@@ -408,8 +421,14 @@ export const EDGES: MapEdge[] = [
   },
   {
     from: 'sales',
+    to: 'closing_lab',
+    rationale: 'Sales toolkit names the frameworks (JOLT / SLIP / Cialdini); closing lab applies them to the 3 fastest-converter personas with verbatim phrases.',
+    strength: 'primary',
+  },
+  {
+    from: 'closing_lab',
     to: 'outreach_hub',
-    rationale: 'Sales frameworks fire when a specific message goes out from outreach hub.',
+    rationale: 'Closing lab gives the exact phrase per persona; outreach hub is where that phrase lands in the actual outbound message.',
     strength: 'primary',
   },
   {
@@ -487,17 +506,18 @@ export const JOURNEYS: Journey[] = [
   {
     id: 'pitch',
     label: 'Preparing a pitch',
-    description: 'You have a meeting in the next 48 hours. You need vocabulary, moat, and rehearsal.',
-    outcome: 'Walk into the meeting with the locked positioning, three case anchors, and a rehearsed open + ask.',
+    description: 'You have a meeting in the next 48 hours. You need vocabulary, moat, rehearsal, and the verbatim phrase per persona.',
+    outcome: 'Walk into the meeting with the locked positioning, three case anchors, the silent-objections list, and the persona-specific exact phrase.',
     path: [
       'overview',
       'category_position',
       'positioning',
       'positioning_copilot',
       'sales',
+      'closing_lab',
       'path_to_100m',
     ],
-    totalMinutes: 12 + 15 + 25 + 35 + 30 + 40,
+    totalMinutes: 12 + 15 + 25 + 35 + 30 + 35 + 40,
     color: '#16A34A',
   },
   {
@@ -519,18 +539,19 @@ export const JOURNEYS: Journey[] = [
   {
     id: 'outreach',
     label: 'Executing outreach',
-    description: 'You have prospects to reach this week. You want the message generator + persona map + warm-intro template ready.',
-    outcome: '5-10 Monday-morning outreach drafts queued. The right channel + the right opener for each one.',
+    description: 'You have prospects to reach this week. You want the persona-specific exact phrase + 14-day sequence + message generator + warm-intro template ready.',
+    outcome: '5-10 Monday-morning outreach drafts queued. The right channel + the right opener + the right silent-objection rebuttal for each one.',
     path: [
       'positioning',
       'sales',
+      'closing_lab',
       'outreach_hub',
       'content',
       'lrqa',
       'meetings_log',
       'todo',
     ],
-    totalMinutes: 25 + 30 + 40 + 15 + 30 + 10 + 5,
+    totalMinutes: 25 + 30 + 35 + 40 + 15 + 30 + 10 + 5,
     color: '#F59E0B',
   },
   {

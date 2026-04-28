@@ -116,6 +116,15 @@ const OutreachHubTab = dynamic(
     })),
   { loading: tabLoader }
 );
+// Closing Lab — sales-psychology playbook (Maalouf + Satyam + brutal-
+// honest critique synthesis). Locked 2026-04-28.
+const ClosingLabTab = dynamic(
+  () =>
+    import('@/components/founder-hub/ClosingLabTab').then(m => ({
+      default: m.ClosingLabTab,
+    })),
+  { loading: tabLoader }
+);
 const FounderSchoolTab = dynamic(
   () =>
     import('@/components/founder-hub/FounderSchoolTab').then(m => ({
@@ -232,6 +241,7 @@ type TabId =
   | 'positioning'
   | 'sales'
   | 'outreach_hub'
+  | 'closing_lab'
   | 'content'
   | 'data_ecosystem'
   | 'case_library'
@@ -307,6 +317,12 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
     group: 'Go-to-Market',
   },
   { id: 'sales', label: 'Sales Toolkit', icon: <MessageSquare size={16} />, group: 'Go-to-Market' },
+  {
+    id: 'closing_lab',
+    label: 'Closing Lab',
+    icon: <Target size={16} />,
+    group: 'Go-to-Market',
+  },
   {
     id: 'outreach_hub',
     label: 'Outreach Hub',
@@ -534,6 +550,50 @@ const SEARCH_INDEX: SearchEntry[] = [
     preview: 'Discovery questions, email templates, demo flow.',
     keywords:
       'sales toolkit discovery questions email templates demo flow outreach prospecting qualification',
+  },
+  // Closing Lab — Maalouf + Satyam + brutal-honest critique synthesis.
+  // Surfaced as 5 distinct search entries so a query for "fastest
+  // converters" or "silent objections" or "pressure without pressure"
+  // lands directly on the relevant section.
+  {
+    tabId: 'closing_lab',
+    section: 'Closing Lab · 3 fastest converters',
+    preview:
+      'Mid-market PE/VC associate · boutique sell-side M&A advisor · solo fractional CSO. The personas who can swipe a corporate card today.',
+    keywords:
+      'closing lab fastest converters mid market associate adaeze archetype potomac boutique sell side m&a advisor fractional cso ex mbb mckinsey bcg bain solo consultant 14 day outreach sequence corporate card swipe pre seed wedge personas',
+  },
+  {
+    tabId: 'closing_lab',
+    section: 'Closing Lab · Maalouf 6 high-ticket-psychology principles',
+    preview:
+      'Pressure without pressure · authority not trust · embody bigger and better · talk about other opportunities · stay in business longer.',
+    keywords:
+      'closing lab maalouf eddie psychology high ticket deals pressure without pressure authority not trust low ticket high ticket talk other opportunities embody bigger better stay in business longer status',
+  },
+  {
+    tabId: 'closing_lab',
+    section: 'Closing Lab · Satyam 5 sales-infrastructure pillars',
+    preview:
+      'Category of one · us-vs-them frame · conviction is the variable · charge more and win anyway · sales infrastructure is the weapon.',
+    keywords:
+      'closing lab satyam vizionaryfocuss sell so good competition becomes irrelevant category of one us vs them conviction infrastructure charge more sales experience product before product',
+  },
+  {
+    tabId: 'closing_lab',
+    section: 'Closing Lab · 5 silent objections',
+    preview:
+      'DQI is "trust me" math · NDA hard-purge · 16-year-old continuity · ChatGPT wrapper suspicion · Pan-African regulatory illusion.',
+    keywords:
+      'closing lab silent objections brutal honest critique pre mortem dqi trust me math confidence intervals nda hard purge cathedral of code 16 year old founder continuity stanford ap exams chatgpt wrapper ensemble sampling pan african regulatory isa 2007 frc nigeria',
+  },
+  {
+    tabId: 'closing_lab',
+    section: 'Closing Lab · 80% cut list + 4-step funnel + phrases to never say',
+    preview:
+      'What to kill / hide / move to enterprise · the simplified landing→demo→audit→checkout funnel · 3 phrases that kill deals.',
+    keywords:
+      'closing lab cut list 80 percent kill hide feature flag enterprise tier simplified funnel landing demo audit checkout four step never say phrases ai decision intelligence platform 12 node langgraph customize whatever you need',
   },
   // Outreach Hub — three internal sections, surfaced separately in
   // search so the founder lands on the right section directly.
@@ -1326,6 +1386,11 @@ function renderTab(
     sales: (
       <ErrorBoundary sectionName="Sales Toolkit">
         <SalesToolkitTab />
+      </ErrorBoundary>
+    ),
+    closing_lab: (
+      <ErrorBoundary sectionName="Closing Lab">
+        <ClosingLabTab />
       </ErrorBoundary>
     ),
     outreach_hub: (
