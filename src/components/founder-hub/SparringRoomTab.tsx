@@ -337,7 +337,7 @@ function Hero() {
           maxWidth: 800,
         }}
       >
-        Closing Lab gave you the frameworks. The Sparring Room makes you live them. Pick a buyer persona, pick a scenario mode, generate 3 questions in their voice, then record yourself answering with Wispr Flow and paste the transcript back. The AI grades you on 10 dimensions (Maalouf 4 + Satyam 3 + DI discipline 2 + fundamentals 1), simulates the buyer&rsquo;s internal monologue right after you finish, and hands you the verbatim phrase you should have used so you can rehearse it before the next call.
+        Closing Lab gave you the frameworks. The Sparring Room makes you live them. Pick a buyer persona, pick a scenario mode (including <strong>networking events in-person</strong>), generate 3 questions in their voice, then record yourself answering with Wispr Flow and paste the transcript back. The AI grades you on 11 dimensions — Maalouf 4 + Satyam 3 + DI discipline 2 + <strong>Kahneman loss-aversion framing</strong> + fundamentals — simulates the buyer&rsquo;s internal monologue right after you finish, and hands you the verbatim phrase you should have used so you can rehearse it before the next call.
       </p>
     </div>
   );
@@ -799,7 +799,7 @@ function ReviewingCard() {
         Grading your rep…
       </div>
       <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
-        Running 10-dimension Sales DQI · simulating the buyer&rsquo;s internal monologue · drafting the verbatim phrase you should have used.
+        Running 11-dimension Sales DQI · simulating the buyer&rsquo;s internal monologue · drafting the verbatim phrase you should have used.
       </div>
     </div>
   );
@@ -926,7 +926,8 @@ function ResultsCard(props: ResultsProps) {
             const sourceColor =
               dim.source === 'maalouf' ? '#DC2626' :
               dim.source === 'satyam' ? '#0EA5E9' :
-              dim.source === 'di_discipline' ? '#16A34A' : '#A78BFA';
+              dim.source === 'di_discipline' ? '#16A34A' :
+              dim.source === 'kahneman' ? '#F59E0B' : '#A78BFA';
             return (
               <DimensionRow key={dim.id} dim={dim} score={score} sourceColor={sourceColor} />
             );

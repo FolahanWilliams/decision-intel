@@ -170,6 +170,7 @@ Output ONLY valid JSON (no prose, no markdown fence). Format:
     "sales_infra_quality": 0-5,
     "vocabulary_discipline": 0-5,
     "empathic_mode_first": 0-5,
+    "loss_aversion_framing": 0-5,
     "specificity_over_vagueness": 0-5
   },
   "feedback": "...",
@@ -204,6 +205,7 @@ function mockResult(transcript: string, isWarmContext: boolean): SparringSession
     sales_infra_quality: 3,
     vocabulary_discipline: banned.length > 0 ? 1 : isWarmContext ? 4 : locked.length > 2 ? 2 : 3,
     empathic_mode_first: 3,
+    loss_aversion_framing: 3,
     specificity_over_vagueness: 3,
   };
 

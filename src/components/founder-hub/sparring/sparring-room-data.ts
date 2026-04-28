@@ -29,6 +29,7 @@ export type BuyerPersonaId =
   | 'preseed_vc_associate';
 
 export type ScenarioMode =
+  | 'networking_event_inperson'
   | 'cold_first_meeting'
   | 'skeptical_followup'
   | 'hot_inbound'
@@ -84,7 +85,7 @@ export interface GradingDimension {
   id: GradingDimensionId;
   label: string;
   /** Which framework this dimension comes from. */
-  source: 'maalouf' | 'satyam' | 'di_discipline' | 'fundamentals';
+  source: 'maalouf' | 'satyam' | 'di_discipline' | 'kahneman' | 'fundamentals';
   /** What a 5/5 looks like in 1 sentence. */
   excellentLooks: string;
   /** What a 1/5 looks like in 1 sentence. */
@@ -106,6 +107,8 @@ export type GradingDimensionId =
   // DI discipline 2
   | 'vocabulary_discipline'
   | 'empathic_mode_first'
+  // Kahneman 1 (added 2026-04-28)
+  | 'loss_aversion_framing'
   // Fundamentals 1
   | 'specificity_over_vagueness';
 
@@ -385,6 +388,19 @@ export const BUYER_PERSONAS: BuyerPersona[] = [
 
 export const SCENARIO_MODES: ScenarioContext[] = [
   {
+    id: 'networking_event_inperson',
+    label: 'Networking event · in-person',
+    description:
+      "You're at a London networking event. Drinks in hand. They asked 'so what do you do?' You have 30-60 seconds before someone interrupts or they politely peel away. NO platform vocabulary, no demo offer, no full pitch — connect first, follow-up second.",
+    founderObjective:
+      "Land the descriptive plain-language hook (one sentence). Surface ONE line of pain that lights up THIS specific buyer in the room. Earn the LinkedIn / coffee follow-up. The goal is NOT to pitch — it's to make them want the next conversation. End with the ask: 'mind if I send you the WeWork specimen on LinkedIn so you can see what I mean?'",
+    buyerStateOfMind:
+      "Drink in hand. Talked to 6 people already. Scanning the room for the one conversation worth following up on. Will give you 60 seconds of polite attention. If your opener sounds like a pitch, they're already mentally next-personning. If it sounds like genuine curiosity about THEIR work, they lean in.",
+    funnelStage: 'awareness',
+    recommendedDifficulty: 'beginner',
+    iconName: 'Handshake',
+  },
+  {
     id: 'cold_first_meeting',
     label: 'Cold first meeting',
     description:
@@ -476,7 +492,7 @@ export const GRADING_DIMENSIONS: GradingDimension[] = [
       "Buyer feels the urgency to move but cannot point to anywhere you pushed them. Naturally references other conversations or scarcity (5 design-partner seats, 4 left).",
     poorLooks:
       "Either flat (no urgency at all) or visibly pushy ('limited time', 'last chance'). Both fail.",
-    weight: 0.10,
+    weight: 0.08,
   },
   {
     id: 'authority_not_trust',
@@ -506,7 +522,7 @@ export const GRADING_DIMENSIONS: GradingDimension[] = [
       "Speaks from a category-creator position. Uses pause and pacing as power. Talks about other conversations naturally. Reads as someone the buyer should chase, not someone chasing the buyer.",
     poorLooks:
       "Eager. Over-explains. Rushes. 'Oh and another thing we can do is…' — every additional capability dilutes authority.",
-    weight: 0.10,
+    weight: 0.08,
   },
 
   // ── Satyam 3 ──
@@ -518,7 +534,7 @@ export const GRADING_DIMENSIONS: GradingDimension[] = [
       "Frames DI as not-comparable. Names what the existing category does AND fails to do. Makes Cloverpop / IBM watsonx / Aera feel like a different problem.",
     poorLooks:
       "Compares directly. 'We are like Cloverpop but better' is the worst-case framing — invites the buyer to cost-compare.",
-    weight: 0.10,
+    weight: 0.08,
   },
   {
     id: 'conviction_transmission',
@@ -528,7 +544,7 @@ export const GRADING_DIMENSIONS: GradingDimension[] = [
       "The voice carries belief. The buyer feels that you've seen this work before. No softening on the load-bearing claims. Anchored in something specific (a case study, a referenced mechanism, a regulator citation).",
     poorLooks:
       "Tentative on the core claim. Softens when challenged. 'Maybe' / 'we think' / 'possibly' on the highest-stakes lines.",
-    weight: 0.12,
+    weight: 0.10,
   },
   {
     id: 'sales_infra_quality',
@@ -550,7 +566,7 @@ export const GRADING_DIMENSIONS: GradingDimension[] = [
       "Uses the right vocab for reader temperature. Cold context → descriptive plain-language hooks (60-second audit, pre-IC bias detection). Warm context → locked vocabulary (reasoning layer, R²F, DPR). NEVER uses banned phrases (decision intelligence platform, decision hygiene, boardroom strategic decision).",
     poorLooks:
       "Drops 'reasoning layer' or 'R²F' on a cold buyer who has no context. Or uses 'decision intelligence platform' (Gartner-crowded). Or 'decision hygiene' (Kahneman's term — borrowing it cedes our category vocabulary).",
-    weight: 0.08,
+    weight: 0.06,
   },
   {
     id: 'empathic_mode_first',
@@ -560,6 +576,18 @@ export const GRADING_DIMENSIONS: GradingDimension[] = [
       "Leads with what the BUYER is trying to do, not what DI does. Lands the buyer's pain in the buyer's words BEFORE introducing the product. Buyer feels seen.",
     poorLooks:
       "Product-first framing. 'We have a 12-node pipeline.' 'Our DPR is hashed and tamper-evident.' Buyer hears: 'they don't see me yet, they want to talk about themselves.'",
+    weight: 0.10,
+  },
+
+  // ── Kahneman 1 (added 2026-04-28) — Prospect theory: losses weigh ~2-2.5× gains ──
+  {
+    id: 'loss_aversion_framing',
+    label: 'Loss-aversion framing',
+    source: 'kahneman',
+    excellentLooks:
+      "Frames the value as preventing a SPECIFIC, named loss the buyer is already worrying about — the regrettable strategic mistake, the career-limiting board disclosure, the LP pulling capital, the McKinsey bill that told them what they should have caught themselves. Anchors the price against a comparable cost the buyer already accepts ('the consultant fee for one bad memo, the headcount cost when one wrong recommendation triggers a hiring U-turn'). The buyer leaves the conversation feeling the price IS small relative to what they're already losing without it.",
+    poorLooks:
+      "Frames as upside / gain only. 'Better decisions.' 'Improved quality.' 'Faster outcomes.' The buyer hears upside and discounts (status-quo bias + loss aversion: the cost is certain, the gain is hypothetical). No specific loss-anchor. No comparable-cost framing. The $249/mo or $50K/yr feels like an addition to their cost stack rather than insurance against a much bigger loss.",
     weight: 0.10,
   },
 
@@ -648,6 +676,38 @@ export interface ScenarioTemplate {
 }
 
 export const SCENARIO_TEMPLATES: ScenarioTemplate[] = [
+  // ── Networking event · in-person (London-events focus 2026-04-28) ──
+  {
+    personaId: 'f500_cso',
+    mode: 'networking_event_inperson',
+    generatorHint:
+      "Margaret-class F500 CSO at a London strategy-network mixer. She's holding a glass of wine, scanning the room. She politely asks 'so what do you do?' Her tolerance for vendor-pitches at networking events is ZERO — every other founder she met tonight tried to pitch her. She's hoping for a real conversation. Generate her opener (the polite probe) + 3 questions she'd ask in 60 seconds if your first line surprised her enough to keep her standing there.",
+  },
+  {
+    personaId: 'boutique_ma_advisor',
+    mode: 'networking_event_inperson',
+    generatorHint:
+      "Potomac-class M&A head at a London City finance-network event. He's met 4 vendors already tonight. Drink in hand, slightly tired. His opener will be measured but warm — he's polite, not eager. Generate his casual probe + 3 questions he'd ask if you landed a CIM-shaped pain point in your first sentence. He's testing whether this is real or another sell-side commodity tool.",
+  },
+  {
+    personaId: 'pan_african_fund_partner',
+    mode: 'networking_event_inperson',
+    generatorHint:
+      "Titi-class Pan-African fund partner at a London EM-investing networking event. She'd start with personal warm-up (where in Nigeria, who you know mutual). When she pivots to 'what are you working on,' you have 45 seconds before the next person joins the circle. Generate her warm opener + 3 questions she'd ask if your first line connected to NDPR / IC-memo pain.",
+  },
+  {
+    personaId: 'fractional_cso',
+    mode: 'networking_event_inperson',
+    generatorHint:
+      "Marcus-class solo fractional CSO at a London consultancy-network event. He'll lead with what HE does (he's proud of his portfolio), expecting reciprocity. He'll then ask the polite 'and yourself?' Generate his quick self-intro + 3 questions he'd ask in the next 60 seconds if your first line connected to client-credibility pain.",
+  },
+  {
+    personaId: 'preseed_vc_associate',
+    mode: 'networking_event_inperson',
+    generatorHint:
+      "Riya-class pre-seed VC associate at a London founder-pitch mixer. She's there to source. Her opener will be the casual 'cool, what's the one-liner?' (she's heard 30 already tonight). Generate her opener + 3 questions she'd ask in 60 seconds if your first line surprised her — she's looking for the ONE founder worth dragging her partner to coffee.",
+  },
+
   // Cold first meeting per persona
   {
     personaId: 'mid_market_pe_associate',
@@ -793,6 +853,14 @@ export const MOCK_QUESTIONS: Record<string, { questions: string[]; openerLine: s
       'In your own words, what does this actually do for me — not for "strategy teams" generally, for ME?',
       'How is this different from what I already do with my analyst and ChatGPT?',
       'What would I need to see in the first 30 days to decide this is worth keeping?',
+    ],
+  },
+  networking_event_inperson: {
+    openerLine: "(holding a glass, half-turning towards you) — 'Sorry, I missed your name — what are you working on?'",
+    questions: [
+      "So what does it actually do — give me the one-line version?",
+      "Who's it for? Who's bought one yet?",
+      "Worth a coffee next week, or are you not in London much?",
     ],
   },
   cold_first_meeting: {

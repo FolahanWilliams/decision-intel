@@ -126,11 +126,20 @@ const ClosingLabTab = dynamic(
   { loading: tabLoader }
 );
 // Sparring Room — live sales-rep practice (paste Wispr Flow transcript →
-// 10-dim Sales DQI grading + buyer-perspective simulation). Locked 2026-04-28.
+// 11-dim Sales DQI grading + buyer-perspective simulation). Locked 2026-04-28.
 const SparringRoomTab = dynamic(
   () =>
     import('@/components/founder-hub/SparringRoomTab').then(m => ({
       default: m.SparringRoomTab,
+    })),
+  { loading: tabLoader }
+);
+// Education Room — flashcard + recall + apply mastery surface across 12
+// decks / ~100 cards. SM-2 spaced repetition + AI-graded recall. Locked 2026-04-28.
+const EducationRoomTab = dynamic(
+  () =>
+    import('@/components/founder-hub/EducationRoomTab').then(m => ({
+      default: m.EducationRoomTab,
     })),
   { loading: tabLoader }
 );
@@ -252,6 +261,7 @@ type TabId =
   | 'outreach_hub'
   | 'closing_lab'
   | 'sparring_room'
+  | 'education_room'
   | 'content'
   | 'data_ecosystem'
   | 'case_library'
@@ -337,6 +347,12 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
     id: 'sparring_room',
     label: 'Sparring Room',
     icon: <Brain size={16} />,
+    group: 'Go-to-Market',
+  },
+  {
+    id: 'education_room',
+    label: 'Education Room',
+    icon: <GraduationCap size={16} />,
     group: 'Go-to-Market',
   },
   {
@@ -638,11 +654,47 @@ const SEARCH_INDEX: SearchEntry[] = [
   },
   {
     tabId: 'sparring_room',
-    section: 'Sparring Room · 6 scenario modes (cold / skeptical / hot inbound / procurement / objection / live demo)',
+    section: 'Sparring Room · 7 scenario modes incl. networking-event in-person',
     preview:
-      'Cold first meeting · skeptical follow-up · hot inbound · procurement evaluation (GC + CISO + procurement) · live objection handling · live demo / specimen audit walkthrough.',
+      'Networking event in-person (London) · cold first meeting · skeptical follow-up · hot inbound · procurement evaluation · live objection handler · live demo specimen walkthrough.',
     keywords:
-      'sparring scenario modes cold first meeting skeptical follow up hot inbound procurement evaluation gc ciso live objection handling 30 seconds live demo specimen audit walkthrough wework dangote 7 minute',
+      'sparring scenario modes networking event in person london drinks party conference cold first meeting skeptical follow up hot inbound procurement evaluation gc ciso live objection handling 30 seconds live demo specimen audit walkthrough wework dangote 7 minute',
+  },
+  // Education Room — flashcard + recall + apply mastery engine across
+  // 12 decks. Surfaced as 4 distinct entries so a query for "flashcards"
+  // or "loss aversion" or "regulatory frameworks" lands on the deck
+  // picker.
+  {
+    tabId: 'education_room',
+    section: 'Education Room · Flashcard + recall + apply across 12 decks',
+    preview:
+      '~100 cards covering DI vocabulary, 7 buyer personas, Maalouf 6 + Satyam 5, 11-dim Sales DQI rubric, 5 silent objections, 17 regulatory frameworks, 12-node pipeline, R²F integration. SM-2 spaced repetition + AI-graded recall.',
+    keywords:
+      'education room flashcards recall apply spaced repetition sm2 mastery recollection wispr flow practice rehearsal vocabulary discipline locked banned r2f dpr dqi pipeline regulatory frameworks personas verbatim',
+  },
+  {
+    tabId: 'education_room',
+    section: 'Education Room · DI Vocabulary deck (locked + banned + cold-context bridges)',
+    preview:
+      '20 cards: reasoning layer, R²F, DPR, DQI, 135 historical decisions, 17 frameworks, 30+ biases, ~90% margin, banned phrases (decision intelligence platform / decision hygiene / boardroom strategic decision).',
+    keywords:
+      'education room di vocabulary deck reasoning layer r2f dpr dqi 135 decisions 17 frameworks 30 biases blended margin banned decision intelligence platform decision hygiene boardroom strategic decision warm cold context bridge specimen library wework dangote design partner seats',
+  },
+  {
+    tabId: 'education_room',
+    section: 'Education Room · Buyer Personas deck (Adaeze / Potomac / Marcus / Margaret / Titi / James / Riya)',
+    preview:
+      "14 cards: each persona's role + ticket band + primary concern + verbatim opener phrase + canonical objection-handler response.",
+    keywords:
+      'education room buyer personas deck adaeze mid market pe associate potomac boutique m&a advisor marcus solo fractional cso margaret f500 cso titi pan african fund partner james gc audit committee riya pre seed vc verbatim phrase opener objection',
+  },
+  {
+    tabId: 'education_room',
+    section: 'Education Room · Loss-aversion framing + 17 regulatory frameworks + R²F (Kahneman + Klein) + Founder one-liners',
+    preview:
+      'Kahneman & Tversky 1979 prospect theory applied to your sales pitch · the 17 regulatory frameworks card-by-card · how 3 nodes implement Kahneman + 3 implement Klein + metaJudge arbitrates · External Attack Vectors + ICP wedge vs ceiling.',
+    keywords:
+      'education room loss aversion framing kahneman tversky prospect theory regulatory frameworks eu ai act basel iii ndpr cbn waemu popia isa 2007 r2f kahneman klein recognition primed decision pre mortem external attack vectors icp wedge ceiling design partner contract',
   },
   // Outreach Hub — three internal sections, surfaced separately in
   // search so the founder lands on the right section directly.
@@ -1449,6 +1501,11 @@ function renderTab(
     sparring_room: (
       <ErrorBoundary sectionName="Sparring Room">
         <SparringRoomTab founderPass={FOUNDER_PASS} />
+      </ErrorBoundary>
+    ),
+    education_room: (
+      <ErrorBoundary sectionName="Education Room">
+        <EducationRoomTab founderPass={FOUNDER_PASS} />
       </ErrorBoundary>
     ),
     outreach_hub: (

@@ -34,6 +34,7 @@ export type TabId =
   | 'sales'
   | 'closing_lab'
   | 'sparring_room'
+  | 'education_room'
   | 'outreach_hub'
   | 'category_position'
   | 'lrqa'
@@ -173,13 +174,13 @@ export const NODES: MapNode[] = [
     iconName: 'BookOpen',
   },
 
-  // ─── Go-to-Market (9) ─────────────────────────────────────────────
+  // ─── Go-to-Market (10) ─────────────────────────────────────────────
   {
     id: 'category_position',
     label: 'Category Position',
     group: 'Go-to-Market',
     x: 0.5,
-    y: 0.08,
+    y: 0.07,
     whatItsFor: 'The DI competitive landscape. 5 incumbents mapped, 3 gaps DI uniquely closes.',
     payoff: 'You can answer "how is this different from Cloverpop / IBM watsonx" in one sentence.',
     minutes: 15,
@@ -191,7 +192,7 @@ export const NODES: MapNode[] = [
     label: 'Positioning Copilot',
     group: 'Go-to-Market',
     x: 0.5,
-    y: 0.18,
+    y: 0.16,
     whatItsFor: "Sharp's brand spine, market thesis, strategic compass, pitch deck, AI rehearsal coach.",
     payoff: 'Rehearse a pitch out loud against the AI coach before a real meeting.',
     minutes: 35,
@@ -203,7 +204,7 @@ export const NODES: MapNode[] = [
     label: 'Competitive Positioning',
     group: 'Go-to-Market',
     x: 0.5,
-    y: 0.28,
+    y: 0.25,
     whatItsFor: 'Cloverpop comparison, 5 moat layers, capability matrix, 8 investor Q&As, top-3 DI-space gaps.',
     payoff: 'Direct answers to "why this, why now, why you" for any procurement reader.',
     minutes: 25,
@@ -215,7 +216,7 @@ export const NODES: MapNode[] = [
     label: 'Sales Toolkit',
     group: 'Go-to-Market',
     x: 0.5,
-    y: 0.38,
+    y: 0.34,
     whatItsFor: 'JOLT, SLIP, Cialdini, MEDDPICC, SPIN, Challenger, demo flow, audience pitches.',
     payoff: 'Tactical sales layer. Pick the framework that matches your current pipeline blocker.',
     minutes: 30,
@@ -227,7 +228,7 @@ export const NODES: MapNode[] = [
     label: 'Closing Lab',
     group: 'Go-to-Market',
     x: 0.5,
-    y: 0.48,
+    y: 0.43,
     whatItsFor: 'Maalouf 6 high-ticket-psychology principles + Satyam 5 sales-infrastructure pillars + 5 silent objections + 3 fastest-converter personas + 80% cut list.',
     payoff: 'The exact phrase to use on the call, the silent objection that killed your last lost deal, and the 14-day outreach sequence per persona.',
     minutes: 35,
@@ -235,15 +236,27 @@ export const NODES: MapNode[] = [
     iconName: 'Target',
   },
   {
+    id: 'education_room',
+    label: 'Education Room',
+    group: 'Go-to-Market',
+    x: 0.5,
+    y: 0.52,
+    whatItsFor: 'Flashcard + recall + apply mastery across 12 decks (~100 cards): DI vocabulary, 7 buyer personas, Maalouf 6 + Satyam 5, 11-dim Sales DQI rubric, 5 silent objections, 17 regulatory frameworks, 12-node pipeline, R²F integration, founder one-liners. SM-2 spaced repetition + AI-graded recall.',
+    payoff: 'Mastery through recollection. Reading builds familiarity; recall under pressure builds the muscle that fires in a live conversation.',
+    minutes: 30,
+    prerequisites: ['closing_lab'],
+    iconName: 'BookOpen',
+  },
+  {
     id: 'sparring_room',
     label: 'Sparring Room',
     group: 'Go-to-Market',
     x: 0.5,
-    y: 0.58,
-    whatItsFor: 'Live sales-rep practice. AI generates a buyer-voice opener + 3 questions per persona × scenario; you record via Wispr Flow, paste the transcript, get a 10-dimension Sales DQI scorecard + buyer-perspective simulation + the verbatim phrase you should have used.',
-    payoff: 'The reading-into-doing loop. Closing Lab gives you the framework; Sparring Room makes you live it under pressure with rep-by-rep grade tracking.',
+    y: 0.61,
+    whatItsFor: 'Live sales-rep practice. AI generates a buyer-voice opener + 3 questions per persona × scenario (incl. networking-event in-person); you record via Wispr Flow, paste the transcript, get an 11-dimension Sales DQI scorecard (Maalouf 4 + Satyam 3 + DI discipline 2 + Kahneman loss-aversion + fundamentals) + buyer-perspective simulation + the verbatim phrase you should have used.',
+    payoff: 'The reading→recall→doing loop completes here. Closing Lab gives you the framework; Education Room makes you recall it; Sparring Room makes you live it under pressure with rep-by-rep grade tracking.',
     minutes: 25,
-    prerequisites: ['closing_lab'],
+    prerequisites: ['education_room'],
     iconName: 'Brain',
   },
   {
@@ -251,7 +264,7 @@ export const NODES: MapNode[] = [
     label: 'Outreach Hub',
     group: 'Go-to-Market',
     x: 0.5,
-    y: 0.68,
+    y: 0.70,
     whatItsFor: 'ICP events + persona map + channel matrix + contact tracker + LinkedIn message generator + design-partner triage.',
     payoff: 'The operational outbound layer. Every Monday-morning send-message lives here.',
     minutes: 40,
@@ -263,7 +276,7 @@ export const NODES: MapNode[] = [
     label: 'Content Studio',
     group: 'Go-to-Market',
     x: 0.5,
-    y: 0.80,
+    y: 0.79,
     whatItsFor: 'LinkedIn post generator, case-study analyzer, voice config, content opportunity scanner.',
     payoff: 'The content flywheel. Daily LinkedIn posts that warm up cold prospects.',
     minutes: 15,
@@ -275,7 +288,7 @@ export const NODES: MapNode[] = [
     label: 'LRQA / Ian Spaulding',
     group: 'Go-to-Market',
     x: 0.5,
-    y: 0.92,
+    y: 0.88,
     whatItsFor: 'Active warm-intro brief: Ian profile, LRQA company map, integration paths, ask hierarchy, meeting prep.',
     payoff: 'Walk into the meeting with the artefact + literal opening line + follow-up cadence ready.',
     minutes: 30,
@@ -440,9 +453,21 @@ export const EDGES: MapEdge[] = [
   },
   {
     from: 'closing_lab',
-    to: 'sparring_room',
-    rationale: 'Closing lab gives the verbatim phrase per persona; sparring room makes you live it under pressure — buyer-voice questions, voice answer, AI-graded.',
+    to: 'education_room',
+    rationale: 'Closing lab gives you the verbatim phrases. Education Room makes you RECALL them on demand — flashcard, AI-graded text recall, scenario-application drills with SM-2 spaced repetition.',
     strength: 'primary',
+  },
+  {
+    from: 'education_room',
+    to: 'sparring_room',
+    rationale: 'Education Room builds the recall muscle (text-grade mastery). Sparring Room tests it under speech pressure — buyer-voice questions, voice answer, AI-graded with buyer-perspective simulation.',
+    strength: 'primary',
+  },
+  {
+    from: 'closing_lab',
+    to: 'sparring_room',
+    rationale: 'Direct path when you skip the recall drill and go straight to live practice. The shorter loop for when a meeting is in 30 minutes.',
+    strength: 'secondary',
   },
   {
     from: 'sparring_room',
@@ -531,8 +556,8 @@ export const JOURNEYS: Journey[] = [
   {
     id: 'pitch',
     label: 'Preparing a pitch',
-    description: 'You have a meeting in the next 48 hours. You need vocabulary, moat, rehearsal, and the verbatim phrase per persona — and at least 2 graded sparring reps before walking in.',
-    outcome: 'Walk into the meeting with the locked positioning, three case anchors, the silent-objections list, the persona-specific exact phrase, AND a graded rep proving you can deliver it under pressure.',
+    description: 'You have a meeting in the next 48 hours. You need vocabulary, moat, recall mastery, rehearsal, and the verbatim phrase per persona — at least 2 graded sparring reps before walking in.',
+    outcome: 'Walk into the meeting with the locked positioning, three case anchors, the silent-objections list, the persona-specific exact phrase recalled cold from memory, AND a graded sparring rep proving you can deliver it under pressure.',
     path: [
       'overview',
       'category_position',
@@ -540,10 +565,11 @@ export const JOURNEYS: Journey[] = [
       'positioning_copilot',
       'sales',
       'closing_lab',
+      'education_room',
       'sparring_room',
       'path_to_100m',
     ],
-    totalMinutes: 12 + 15 + 25 + 35 + 30 + 35 + 25 + 40,
+    totalMinutes: 12 + 15 + 25 + 35 + 30 + 35 + 30 + 25 + 40,
     color: '#16A34A',
   },
   {
@@ -565,12 +591,13 @@ export const JOURNEYS: Journey[] = [
   {
     id: 'outreach',
     label: 'Executing outreach',
-    description: 'You have prospects to reach this week. You want the persona-specific exact phrase + a graded sparring rep proving you can deliver it + 14-day sequence + message generator + warm-intro template ready.',
-    outcome: '5-10 Monday-morning outreach drafts queued. The right channel + the right opener + the right silent-objection rebuttal for each one — backed by at least one graded rep on the persona you are about to call.',
+    description: 'You have prospects to reach this week. You want the persona-specific exact phrase, recall mastery on the silent-objections list, a graded sparring rep, plus the 14-day sequence + message generator + warm-intro template ready.',
+    outcome: '5-10 Monday-morning outreach drafts queued. The right channel + the right opener + the right silent-objection rebuttal — recalled cold from memory and backed by at least one graded rep on the persona you are about to call.',
     path: [
       'positioning',
       'sales',
       'closing_lab',
+      'education_room',
       'sparring_room',
       'outreach_hub',
       'content',
@@ -578,7 +605,7 @@ export const JOURNEYS: Journey[] = [
       'meetings_log',
       'todo',
     ],
-    totalMinutes: 25 + 30 + 35 + 25 + 40 + 15 + 30 + 10 + 5,
+    totalMinutes: 25 + 30 + 35 + 30 + 25 + 40 + 15 + 30 + 10 + 5,
     color: '#F59E0B',
   },
   {
