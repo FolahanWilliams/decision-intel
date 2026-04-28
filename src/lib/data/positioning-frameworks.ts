@@ -188,7 +188,7 @@ export const POSITIONING_FLOW: FlowStep[] = [
     title: 'Proof',
     question: 'Is there proof it works?',
     yesAnswer:
-      '135 historical decisions audited retrospectively. Every failure traceable to a bias.',
+      '143 historical decisions audited retrospectively. Every failure traceable to a bias.',
     noFailure: 'No proof = no trust.',
     diFlag: 'partial',
     diNote:
@@ -278,7 +278,7 @@ export const BRAND_STEPS: BrandStep[] = [
     title: 'Execution & Credibility',
     question: 'Do you have proof points to back up your claims?',
     diAnswer:
-      'Retrospective 135-case library. Published bias taxonomy (DI-B-001–020). /proof page with live detection demos. GAP: no paying pilot yet.',
+      'Retrospective 143-case library. Published bias taxonomy (DI-B-001–020). /proof page with live detection demos. GAP: no paying pilot yet.',
     status: 'partial',
     ifWeak: 'Brand gap. Fix operations or delivery. Collect proof stories and facts.',
   },
@@ -368,7 +368,7 @@ export const STORY_STEPS: StoryStep[] = [
     failureMode: 'Add surprise: contrarian take, provocative question, unexpected comparison.',
     byContext: {
       cold_email: '"Peer review is dangerous because peers are polite."',
-      demo: '"The bias that killed Kodak is in 78% of the 135 memos we audited."',
+      demo: '"The bias that killed Kodak is in 78% of the 143 memos we audited."',
       pitch: '"This is not the next Gong. This is Gong-before-it-was-obvious — 2016 Gong."',
     },
   },
@@ -382,7 +382,7 @@ export const STORY_STEPS: StoryStep[] = [
       cold_email: 'Link to /proof with the Kodak pre-decision memo + the 4 biases we flagged.',
       demo: 'Walk through the 12-node pipeline on THEIR document. Every flag has a citation to the passage that triggered it.',
       pitch:
-        '135 historical decisions. 30+ biases taxonomy. Published academic foundations (Kahneman, Tetlock).',
+        '143 historical decisions. 30+ biases taxonomy. Published academic foundations (Kahneman, Tetlock).',
     },
   },
   {

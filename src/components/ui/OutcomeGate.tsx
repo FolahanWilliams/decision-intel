@@ -232,7 +232,9 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
     return map;
   }, [drafts]);
 
-  const matchingDraft = selectedAnalysis ? draftsByAnalysisId.get(selectedAnalysis) ?? null : null;
+  const matchingDraft = selectedAnalysis
+    ? (draftsByAnalysisId.get(selectedAnalysis) ?? null)
+    : null;
   // Validation: only pre-fill when the draft's outcome is one of the 4 button
   // values. Outcome-inference can emit 'inconclusive' or other states the
   // modal doesn't render — surface those as a hint instead of silently
@@ -241,8 +243,7 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
   // Confirm-path engages when the user picks an analysis WITH a draft, the
   // draft's outcome is in the valid set, and they haven't overridden the
   // auto-detected value. Any other state routes to manual /api/outcomes POST.
-  const onConfirmPath =
-    !!matchingDraft && draftOutcomeIsValid && outcome === matchingDraft.outcome;
+  const onConfirmPath = !!matchingDraft && draftOutcomeIsValid && outcome === matchingDraft.outcome;
 
   // When the user picks an analysis that has a matching draft with a VALID
   // outcome, pre-fill. If the draft has an invalid outcome (e.g.
@@ -315,7 +316,14 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
     } finally {
       setSubmitting(false);
     }
-  }, [selectedAnalysis, outcome, onConfirmPath, matchingDraft, onOutcomeSubmitted, globalSwrMutate]);
+  }, [
+    selectedAnalysis,
+    outcome,
+    onConfirmPath,
+    matchingDraft,
+    onOutcomeSubmitted,
+    globalSwrMutate,
+  ]);
 
   const OUTCOME_OPTIONS = [
     { value: 'success', label: 'Success', color: '#22c55e', icon: CheckCircle },
@@ -510,8 +518,10 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
                     // returns it. Falls back to "Analysis #N" + the draft's
                     // own analysisTitle when available, else generic label.
                     const richInfo = gateInfo.pendingAnalyses?.find(p => p.id === id);
-                    const displayName = richInfo?.filename ?? draft?.analysisTitle ?? `Analysis #${i + 1}`;
-                    const subtitle = richInfo?.decisionStatement ?? draft?.decisionStatement ?? null;
+                    const displayName =
+                      richInfo?.filename ?? draft?.analysisTitle ?? `Analysis #${i + 1}`;
+                    const subtitle =
+                      richInfo?.decisionStatement ?? draft?.decisionStatement ?? null;
                     const documentId = richInfo?.documentId;
                     return (
                       <button

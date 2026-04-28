@@ -21,7 +21,7 @@ const log = createLogger('ROIAttribution');
 /**
  * Research-based loss rates per bias type.
  * Represents the probability-weighted expected loss as a fraction of ticket size.
- * Sources: Kahneman "Noise", Malmendier & Tate (2008), internal 135-case dataset.
+ * Sources: Kahneman "Noise", Malmendier & Tate (2008), internal case-study dataset (HISTORICAL_CASE_COUNT in src/lib/data/case-studies).
  */
 const BIAS_LOSS_RATES: Record<string, number> = {
   'Anchoring Bias': 0.15,

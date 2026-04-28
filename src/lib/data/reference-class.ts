@@ -3,9 +3,10 @@
  * corpus this memo resembles based on overlapping bias signature. Pure
  * function, no IO, client-safe.
  *
- * The 135-case figure referenced in marketing is the deduped corpus
- * count locked 2026-04-16. This function uses the live ALL_CASES length
- * so the numbers stay truthful even when the corpus is rebalanced.
+ * The case-count figure referenced in marketing derives from the live
+ * HISTORICAL_CASE_COUNT export in src/lib/data/case-studies. This
+ * function uses the live ALL_CASES length so the numbers stay truthful
+ * when the corpus is rebalanced.
  *
  * "Match" = case shares ≥ MIN_OVERLAP biases with the memo. Bias-signature
  * overlap is a coarse proxy for strategic analogy; it's defensible at a
@@ -19,7 +20,7 @@ const MIN_OVERLAP_STRONG = 2;
 const MIN_OVERLAP_FALLBACK = 1;
 
 export interface ReferenceClassResult {
-  /** Corpus size at compute time — use directly instead of hardcoding 135. */
+  /** Corpus size at compute time — use directly instead of hardcoding a number. */
   corpusSize: number;
   /** Cases matching the bias signature at the tighter threshold. */
   matches: number;

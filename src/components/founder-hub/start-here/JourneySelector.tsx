@@ -26,7 +26,12 @@ export function JourneySelector({ active, onSelect }: Props) {
           </div>
         </div>
         {active && (
-          <button type="button" onClick={() => onSelect(null)} style={resetBtn} aria-label="Clear journey">
+          <button
+            type="button"
+            onClick={() => onSelect(null)}
+            style={resetBtn}
+            aria-label="Clear journey"
+          >
             ✕ Clear
           </button>
         )}

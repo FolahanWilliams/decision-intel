@@ -33,7 +33,7 @@ const CHART_COLORS = {
 
 // ─── Data Points ─────────────────────────────────────────────────────────────
 // Realistic cumulative loss curve for a mid-market corporate strategy team over 12 quarters.
-// Derived from 135 case study failure rates and ROI attribution loss rates.
+// Derived from 143 case study failure rates and ROI attribution loss rates.
 
 interface DataPoint {
   quarter: string;
@@ -377,7 +377,7 @@ export function LossAversionChart() {
           >
             Average mid-market enterprise
             <br />
-            Based on 135 case studies
+            Based on 143 case studies
           </div>
         </motion.div>
       </div>

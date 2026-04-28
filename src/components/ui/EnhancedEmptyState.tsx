@@ -120,8 +120,7 @@ const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
   'cognitive-audits': {
     icon: <Brain className="w-12 h-12" />,
     title: 'No strategic memos audited yet',
-    description:
-      `Run your first audit and see the reasoning behind the numbers, scored against ${HISTORICAL_CASE_COUNT} historical decisions and 30+ cognitive biases.`,
+    description: `Run your first audit and see the reasoning behind the numbers, scored against ${HISTORICAL_CASE_COUNT} historical decisions and 30+ cognitive biases.`,
     suggestions: [
       'Walk into the board with rigor that matches your data',
       'Predict steering-committee objections before the meeting',

@@ -3,10 +3,30 @@
 import { Target, TrendingUp, Map as MapIcon } from 'lucide-react';
 
 const NORTH_STAR_BANDS = [
-  { label: 'Q4 2026', metric: '£70-90K ARR', detail: '3 paid design partners · Sankore + 2 EM funds', cumulative: 0.5 },
-  { label: 'Q4 2027', metric: '£950K-1.6M ARR', detail: '25-40 customers (3-5 F500 expansion)', cumulative: 0.175 },
-  { label: 'Q4 2029', metric: '£16-32M ARR', detail: '200-300 customers · Series B', cumulative: 0.0525 },
-  { label: 'Q4 2030', metric: '£80M+ ARR', detail: '500 enterprise teams · unicorn', cumulative: 0.0079 },
+  {
+    label: 'Q4 2026',
+    metric: '£70-90K ARR',
+    detail: '3 paid design partners · Sankore + 2 EM funds',
+    cumulative: 0.5,
+  },
+  {
+    label: 'Q4 2027',
+    metric: '£950K-1.6M ARR',
+    detail: '25-40 customers (3-5 F500 expansion)',
+    cumulative: 0.175,
+  },
+  {
+    label: 'Q4 2029',
+    metric: '£16-32M ARR',
+    detail: '200-300 customers · Series B',
+    cumulative: 0.0525,
+  },
+  {
+    label: 'Q4 2030',
+    metric: '£80M+ ARR',
+    detail: '500 enterprise teams · unicorn',
+    cumulative: 0.0079,
+  },
 ];
 
 export function NorthStarHero() {
@@ -54,13 +74,13 @@ export function NorthStarHero() {
           maxWidth: 820,
         }}
       >
-        The math is concrete. The path is conditional. Phase 1 (50%) → Phase 2 (35%) → Phase 3
-        (30%) → Phase 4 (15%) multiplies to <strong>0.79% absolute IPO outcome</strong> — 4× the
-        pre-seed B2B baseline. Most likely real outcome:{' '}
+        The math is concrete. The path is conditional. Phase 1 (50%) → Phase 2 (35%) → Phase 3 (30%)
+        → Phase 4 (15%) multiplies to <strong>0.79% absolute IPO outcome</strong> — 4× the pre-seed
+        B2B baseline. Most likely real outcome:{' '}
         <strong>Series-B-stage strategic acquisition at £400M-1B by Q4 2029</strong>. This page is
-        the single source of truth for how to make that happen — positioning, role-by-role
-        outreach, intellectual moat deepening, investor metrics, failure modes, network leverage,
-        90-day actions.
+        the single source of truth for how to make that happen — positioning, role-by-role outreach,
+        intellectual moat deepening, investor metrics, failure modes, network leverage, 90-day
+        actions.
       </p>
 
       <div
@@ -71,7 +91,7 @@ export function NorthStarHero() {
           gap: 10,
         }}
       >
-        {NORTH_STAR_BANDS.map((band) => (
+        {NORTH_STAR_BANDS.map(band => (
           <div
             key={band.label}
             style={{

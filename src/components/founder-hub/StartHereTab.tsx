@@ -38,12 +38,7 @@ import {
 import { FounderHubMap } from './start-here/FounderHubMap';
 import { JourneySelector } from './start-here/JourneySelector';
 import { JourneyDetailStrip } from './start-here/JourneyDetailStrip';
-import {
-  JOURNEYS,
-  NODES,
-  type Journey,
-  type TabId,
-} from './start-here/founder-hub-map-data';
+import { JOURNEYS, NODES, type Journey, type TabId } from './start-here/founder-hub-map-data';
 
 // Persistence keys — visited reuses the prior 2-day-plan key so progress
 // carries; journey is new for the rebuild.
@@ -172,9 +167,10 @@ export function StartHereTab({ onNavigateToTab }: Props) {
           'outreach_hub',
         ];
     const unvisited = candidates.filter(id => !visited.has(id));
-    return unvisited.slice(0, 4).map(id => NODES.find(n => n.id === id)).filter(Boolean) as Array<
-      (typeof NODES)[number]
-    >;
+    return unvisited
+      .slice(0, 4)
+      .map(id => NODES.find(n => n.id === id))
+      .filter(Boolean) as Array<(typeof NODES)[number]>;
   }, [activeJourney, visited, hydrated]);
 
   return (
@@ -192,11 +188,7 @@ export function StartHereTab({ onNavigateToTab }: Props) {
       />
 
       {activeJourney && (
-        <JourneyDetailStrip
-          journey={activeJourney}
-          visited={visited}
-          onNavigate={handleNavigate}
-        />
+        <JourneyDetailStrip journey={activeJourney} visited={visited} onNavigate={handleNavigate} />
       )}
 
       {quickJumps.length > 0 && (
@@ -258,8 +250,8 @@ function renderHero() {
       <h2 style={heroTitle}>The Founder Hub, on one map.</h2>
       <p style={heroSubtitle}>
         Every tab. Every connection. Pick what you&rsquo;re doing right now and the map highlights
-        the recommended sequence — pitch prep, market research, outreach execution, reflection on
-        a close, or a technical dive into the product. Click any node to jump straight in.
+        the recommended sequence — pitch prep, market research, outreach execution, reflection on a
+        close, or a technical dive into the product. Click any node to jump straight in.
       </p>
     </div>
   );
@@ -296,8 +288,7 @@ function renderPositioningAnchor() {
         <strong>Banned:</strong>{' '}
         {BANNED_VOCABULARY.map((b, i) => (
           <span key={b.phrase}>
-            &ldquo;{b.phrase}&rdquo; ({b.reason})
-            {i < BANNED_VOCABULARY.length - 1 ? ', ' : '.'}
+            &ldquo;{b.phrase}&rdquo; ({b.reason}){i < BANNED_VOCABULARY.length - 1 ? ', ' : '.'}
           </span>
         ))}{' '}
         Cold-context on-ramps:{' '}

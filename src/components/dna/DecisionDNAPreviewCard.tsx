@@ -400,9 +400,7 @@ export function DecisionDNAPreviewCard() {
                 : '—'
             }
             sub={
-              followRateUnlocked
-                ? 'when you followed the audit'
-                : 'Unlocks once you log outcomes'
+              followRateUnlocked ? 'when you followed the audit' : 'Unlocks once you log outcomes'
             }
             unlocked={followRateUnlocked}
           />

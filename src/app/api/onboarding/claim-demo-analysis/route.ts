@@ -66,10 +66,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
   }
   if (!body.analysisId && !body.documentId) {
-    return NextResponse.json(
-      { error: 'analysisId or documentId is required' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'analysisId or documentId is required' }, { status: 400 });
   }
 
   // 4. Resolve to documentId. Demo audits have one Document per analysis.
@@ -89,10 +86,7 @@ export async function POST(req: NextRequest) {
       if (doc.userId !== demoUserId) {
         // Already claimed by someone else, or never a demo audit. We don't
         // disclose which case to avoid leaking ownership info to non-owners.
-        return NextResponse.json(
-          { error: 'This audit is no longer claimable.' },
-          { status: 410 }
-        );
+        return NextResponse.json({ error: 'This audit is no longer claimable.' }, { status: 410 });
       }
       resolvedDocumentId = doc.id;
       docCreatedAt = doc.uploadedAt;
@@ -107,10 +101,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Audit not found' }, { status: 404 });
       }
       if (analysis.document.userId !== demoUserId) {
-        return NextResponse.json(
-          { error: 'This audit is no longer claimable.' },
-          { status: 410 }
-        );
+        return NextResponse.json({ error: 'This audit is no longer claimable.' }, { status: 410 });
       }
       resolvedDocumentId = analysis.document.id;
       docCreatedAt = analysis.document.uploadedAt;
@@ -149,10 +140,7 @@ export async function POST(req: NextRequest) {
     transferred = result.count;
   } catch (err) {
     log.error('Claim transfer failed:', err);
-    return NextResponse.json(
-      { error: 'Could not claim audit. Please retry.' },
-      { status: 503 }
-    );
+    return NextResponse.json({ error: 'Could not claim audit. Please retry.' }, { status: 503 });
   }
 
   if (transferred === 0) {
@@ -176,7 +164,9 @@ export async function POST(req: NextRequest) {
     },
   }).catch(err => log.warn('CLAIM_DEMO_ANALYSIS audit-log write failed:', err));
 
-  log.info(`Demo audit ${resolvedDocumentId} claimed by ${user.id} (age ${Math.round(ageMs / 1000)}s)`);
+  log.info(
+    `Demo audit ${resolvedDocumentId} claimed by ${user.id} (age ${Math.round(ageMs / 1000)}s)`
+  );
 
   return NextResponse.json({
     ok: true,

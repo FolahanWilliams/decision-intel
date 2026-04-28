@@ -379,7 +379,7 @@ export const INVESTOR_QA: InvestorQA[] = [
     topic: 'moat',
     question: "What's your moat? I can build this with OpenAI's API in a weekend hackathon.",
     answer:
-      'A weekend gets you one LLM opinion with zero noise measurement. We use 3 independent judges for Kahneman noise decomposition. We have a 20x20 bias interaction matrix with contextual multipliers — dissent absent amplifies groupthink 1.25x, time pressure shifts scoring 1.15x. We detect biological signals like Winner Effect language and cortisol stress patterns. We have 135 curated case studies with cross-correlation patterns and reference class forecasting. The compound scoring engine alone is 10,000+ LOC of proprietary IP. A weekend hackathon gets you layer zero. Our moat is five layers deep.',
+      'A weekend gets you one LLM opinion with zero noise measurement. We use 3 independent judges for Kahneman noise decomposition. We have a 20x20 bias interaction matrix with contextual multipliers — dissent absent amplifies groupthink 1.25x, time pressure shifts scoring 1.15x. We detect biological signals like Winner Effect language and cortisol stress patterns. We have 143 curated case studies with cross-correlation patterns and reference class forecasting. The compound scoring engine alone is 10,000+ LOC of proprietary IP. A weekend hackathon gets you layer zero. Our moat is five layers deep.',
     proof:
       'src/lib/scoring/compound-engine.ts — deterministic post-LLM scoring with bio-signal detection. src/lib/scoring/noise-decomposition.ts — ANOVA-framework noise measurement. src/lib/data/case-correlations.ts — cross-case statistical patterns',
   },
@@ -395,14 +395,14 @@ export const INVESTOR_QA: InvestorQA[] = [
     topic: 'defensibility',
     question: 'What if OpenAI or Anthropic just builds this into their platform?',
     answer:
-      "LLM providers are infrastructure, not vertical SaaS. They don't have 17 compliance frameworks implemented (G7, EU, GCC, African markets — including NDPR, CBN, WAEMU, PoPIA), 135 case studies with outcome correlations, two production specimen DPRs (WeWork S-1 + Dangote Pan-African expansion), the per-org Brier-scored recalibration flywheel (Tetlock superforecasting research), or the 20×20 bias interaction matrix with 18 named toxic combinations. It's like asking 'What if AWS builds Datadog?' The platform layer and the domain layer are different businesses. Our value is the R²F engine + 17-framework regulatory mapping + per-org outcome learning + Pan-African geographic moat — not the LLM inference. We swap LLM models freely (locked 2-model policy: gemini-3-flash-preview + gemini-3.1-flash-lite) — that's by design.",
+      "LLM providers are infrastructure, not vertical SaaS. They don't have 17 compliance frameworks implemented (G7, EU, GCC, African markets — including NDPR, CBN, WAEMU, PoPIA), 143 case studies with outcome correlations, two production specimen DPRs (WeWork S-1 + Dangote Pan-African expansion), the per-org Brier-scored recalibration flywheel (Tetlock superforecasting research), or the 20×20 bias interaction matrix with 18 named toxic combinations. It's like asking 'What if AWS builds Datadog?' The platform layer and the domain layer are different businesses. Our value is the R²F engine + 17-framework regulatory mapping + per-org outcome learning + Pan-African geographic moat — not the LLM inference. We swap LLM models freely (locked 2-model policy: gemini-3-flash-preview + gemini-3.1-flash-lite) — that's by design.",
   },
   {
     id: 'traction',
     topic: 'traction',
     question: 'Show me traction.',
     answer:
-      "Working product at production URL — full LangGraph 12-node analysis engine processing real strategic memos end-to-end, with the Decision Knowledge Graph seeding from document one. Full auth (Google OAuth via Supabase), multi-tenant orgs, team collaboration, blind-prior decision rooms, deal-level cross-document conflict detection, hashed + tamper-evident Decision Provenance Records. 17 regulatory frameworks fully mapped across G7, EU, GCC, and African markets (EU AI Act, SOC 2 Type II infrastructure, GDPR, Basel III, SOX, NDPR, CBN, WAEMU, PoPIA, CMA Kenya, more). Two production specimen DPRs (WeWork S-1 + Dangote 2014 Pan-African expansion) ship in public/ as cold-call evidence. Reviewed by the senior consultant who helped take Wiz from startup to $32B, quote: 'genuinely fascinated by the role of unconscious cognitive biases in decision-making.' 135 hand-curated case studies across 11 industries (deduplicated, primary-source cited). Cloverpop's Inc. 5000 #608 ranking with 300% growth validates enterprise demand exists for the workflow-tooling adjacent category — we audit the reasoning Cloverpop logs.",
+      "Working product at production URL — full LangGraph 12-node analysis engine processing real strategic memos end-to-end, with the Decision Knowledge Graph seeding from document one. Full auth (Google OAuth via Supabase), multi-tenant orgs, team collaboration, blind-prior decision rooms, deal-level cross-document conflict detection, hashed + tamper-evident Decision Provenance Records. 17 regulatory frameworks fully mapped across G7, EU, GCC, and African markets (EU AI Act, SOC 2 Type II infrastructure, GDPR, Basel III, SOX, NDPR, CBN, WAEMU, PoPIA, CMA Kenya, more). Two production specimen DPRs (WeWork S-1 + Dangote 2014 Pan-African expansion) ship in public/ as cold-call evidence. Reviewed by the senior consultant who helped take Wiz from startup to $32B, quote: 'genuinely fascinated by the role of unconscious cognitive biases in decision-making.' 143 hand-curated case studies across 12 industries / regions (deduplicated, primary-source cited). Cloverpop's Inc. 5000 #608 ranking with 300% growth validates enterprise demand exists for the workflow-tooling adjacent category — we audit the reasoning Cloverpop logs.",
   },
 ];
 
@@ -462,7 +462,7 @@ export const COMMON_OBJECTIONS: Objection[] = [
     id: 'advantage',
     objection: "What's your unfair advantage as a founder?",
     response:
-      'Deep domain expertise at the intersection of cognitive science and financial decision-making — a rare combination. A proprietary failure database (135 cases with computed correlations) that cannot be scraped or reproduced. A compliance framework stack that took months of legal mapping. And the hunger of a solo founder who has built a $0 to production-grade enterprise SaaS platform alone.',
+      'Deep domain expertise at the intersection of cognitive science and financial decision-making — a rare combination. A proprietary failure database (143 cases with computed correlations) that cannot be scraped or reproduced. A compliance framework stack that took months of legal mapping. And the hunger of a solo founder who has built a $0 to production-grade enterprise SaaS platform alone.',
     tag: 'Advantage',
   },
 ];

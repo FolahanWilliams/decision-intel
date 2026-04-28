@@ -55,7 +55,16 @@ export function SalesMovesGrid({ moves, accent = '#6366F1' }: Props) {
               }}
             >
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: accent,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.06em',
+                    marginBottom: 2,
+                  }}
+                >
                   {move.framework}
                 </div>
                 <div style={{ fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.4 }}>
@@ -90,26 +99,60 @@ export function SalesMovesGrid({ moves, accent = '#6366F1' }: Props) {
                     lineHeight: 1.5,
                   }}
                 >
-                  <Quote size={12} style={{ display: 'inline', marginRight: 4, color: accent, verticalAlign: '-1px' }} />
+                  <Quote
+                    size={12}
+                    style={{
+                      display: 'inline',
+                      marginRight: 4,
+                      color: accent,
+                      verticalAlign: '-1px',
+                    }}
+                  />
                   {move.verbatim}
                 </div>
 
                 <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontWeight: 700, color: '#16A34A', marginRight: 4 }}>
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      fontWeight: 700,
+                      color: '#16A34A',
+                      marginRight: 4,
+                    }}
+                  >
                     <Lightbulb size={11} /> Mechanism:
                   </span>
                   {move.mechanism}
                 </div>
 
                 <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontWeight: 700, color: '#DC2626', marginRight: 4 }}>
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      fontWeight: 700,
+                      color: '#DC2626',
+                      marginRight: 4,
+                    }}
+                  >
                     <AlertTriangle size={11} /> Anti-pattern:
                   </span>
                   {move.antiPattern}
                 </div>
 
                 {(move.scoresOn || move.bestForPersona) && (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, fontSize: 11, color: 'var(--text-muted)' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: 8,
+                      fontSize: 11,
+                      color: 'var(--text-muted)',
+                    }}
+                  >
                     {move.scoresOn && (
                       <span
                         style={{
@@ -119,7 +162,8 @@ export function SalesMovesGrid({ moves, accent = '#6366F1' }: Props) {
                           borderRadius: 4,
                         }}
                       >
-                        Sparring rubric: <strong style={{ color: 'var(--text-primary)' }}>{move.scoresOn}</strong>
+                        Sparring rubric:{' '}
+                        <strong style={{ color: 'var(--text-primary)' }}>{move.scoresOn}</strong>
                       </span>
                     )}
                     {move.bestForPersona && (
@@ -131,7 +175,10 @@ export function SalesMovesGrid({ moves, accent = '#6366F1' }: Props) {
                           borderRadius: 4,
                         }}
                       >
-                        Best for: <strong style={{ color: 'var(--text-primary)' }}>{move.bestForPersona}</strong>
+                        Best for:{' '}
+                        <strong style={{ color: 'var(--text-primary)' }}>
+                          {move.bestForPersona}
+                        </strong>
                       </span>
                     )}
                   </div>

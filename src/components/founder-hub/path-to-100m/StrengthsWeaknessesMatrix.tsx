@@ -18,7 +18,15 @@ const CATEGORY_COLOR = {
   compliance: '#DC2626',
 };
 
-function StrengthCard({ s, isOpen, onToggle }: { s: Strength; isOpen: boolean; onToggle: () => void }) {
+function StrengthCard({
+  s,
+  isOpen,
+  onToggle,
+}: {
+  s: Strength;
+  isOpen: boolean;
+  onToggle: () => void;
+}) {
   const accent = CATEGORY_COLOR[s.category];
   return (
     <div
@@ -101,7 +109,7 @@ function StrengthCard({ s, isOpen, onToggle }: { s: Strength; isOpen: boolean; o
               Evidence
             </div>
             <ul style={{ margin: 0, padding: '0 0 0 18px' }}>
-              {s.evidence.map((e) => (
+              {s.evidence.map(e => (
                 <li
                   key={e}
                   style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 4 }}
@@ -151,7 +159,7 @@ function StrengthCard({ s, isOpen, onToggle }: { s: Strength; isOpen: boolean; o
               How to weaponise
             </div>
             <ul style={{ margin: 0, padding: '0 0 0 18px' }}>
-              {s.howToWeaponize.map((h) => (
+              {s.howToWeaponize.map(h => (
                 <li
                   key={h}
                   style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 4 }}
@@ -295,7 +303,7 @@ function WeaknessCard({
               Evidence
             </div>
             <ul style={{ margin: 0, padding: '0 0 0 18px' }}>
-              {w.evidence.map((e) => (
+              {w.evidence.map(e => (
                 <li
                   key={e}
                   style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 4 }}
@@ -345,7 +353,7 @@ function WeaknessCard({
               Countermove
             </div>
             <ul style={{ margin: 0, padding: '0 0 0 18px' }}>
-              {w.countermove.map((c) => (
+              {w.countermove.map(c => (
                 <li
                   key={c}
                   style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 4 }}
@@ -438,7 +446,7 @@ export function StrengthsWeaknessesMatrix() {
         >
           <Zap size={12} /> 5 strengths to weaponise
         </div>
-        {STRENGTHS.map((s) => (
+        {STRENGTHS.map(s => (
           <StrengthCard
             key={s.id}
             s={s}
@@ -464,7 +472,7 @@ export function StrengthsWeaknessesMatrix() {
         >
           <ShieldAlert size={12} /> 5 weaknesses to neutralise
         </div>
-        {WEAKNESSES.map((w) => (
+        {WEAKNESSES.map(w => (
           <WeaknessCard
             key={w.id}
             w={w}

@@ -51,7 +51,7 @@ const CARDS = [
     href: '/bias-genome',
     eyebrow: 'The taxonomy, openly published',
     title: 'Which biases most often precede failure.',
-    body: '135 audited corporate decisions across thirteen industries. 30+ cognitive biases ranked by failure lift. Every number traceable to the underlying case — methodology and data are open.',
+    body: '143 audited corporate decisions across thirteen industries / regions. 30+ cognitive biases ranked by failure lift. Every number traceable to the underlying case — methodology and data are open.',
     cta: 'Explore the Bias Genome',
     thumb: 'genome' as const,
   },

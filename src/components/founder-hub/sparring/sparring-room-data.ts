@@ -85,7 +85,15 @@ export interface GradingDimension {
   id: GradingDimensionId;
   label: string;
   /** Which framework this dimension comes from. */
-  source: 'maalouf' | 'satyam' | 'di_discipline' | 'kahneman' | 'fundamentals' | 'jolt' | 'sandler' | 'cialdini';
+  source:
+    | 'maalouf'
+    | 'satyam'
+    | 'di_discipline'
+    | 'kahneman'
+    | 'fundamentals'
+    | 'jolt'
+    | 'sandler'
+    | 'cialdini';
   /** What a 5/5 looks like in 1 sentence. */
   excellentLooks: string;
   /** What a 1/5 looks like in 1 sentence. */
@@ -212,7 +220,16 @@ export const BUYER_PERSONAS: BuyerPersona[] = [
     verbalStyle:
       'Crisp, direct, references specific deals casually ("the Lagos consumer rollup we looked at last quarter…"), interrupts to ask sharp clarifying questions, uses "thesis" and "memo" naturally.',
     defaultSkepticism: 'medium',
-    nativeVocabulary: ['IC memo', 'thesis', 'diligence', 'returns', 'thesis violation', 'concentration', 'cycle', 'vintage'],
+    nativeVocabulary: [
+      'IC memo',
+      'thesis',
+      'diligence',
+      'returns',
+      'thesis violation',
+      'concentration',
+      'cycle',
+      'vintage',
+    ],
     triggerWords: [
       'AI-powered',
       'revolutionary',
@@ -242,7 +259,17 @@ export const BUYER_PERSONAS: BuyerPersona[] = [
     verbalStyle:
       'Slow, measured, formal but warm. Asks "walk me through" questions. Patient on the call but their patience is a test — they will close the conversation politely if you waste 5 minutes.',
     defaultSkepticism: 'medium',
-    nativeVocabulary: ['CIM', 'EV', 'multiple', 'comp', 'buyer pool', 'EBITDA bridge', 'normalisation', 'walkaway', 'process letter'],
+    nativeVocabulary: [
+      'CIM',
+      'EV',
+      'multiple',
+      'comp',
+      'buyer pool',
+      'EBITDA bridge',
+      'normalisation',
+      'walkaway',
+      'process letter',
+    ],
     triggerWords: [
       'AI-powered',
       'reasoning layer',
@@ -272,7 +299,16 @@ export const BUYER_PERSONAS: BuyerPersona[] = [
     verbalStyle:
       'High-bandwidth, fast-talking, drops MBB framings ("the 2x2 here is…"), confident. Uses "obviously" and "clearly" too often when actually unsure.',
     defaultSkepticism: 'medium',
-    nativeVocabulary: ['MECE', '2x2', 'thesis', 'recommendation', 'so-what', 'frame', 'pyramid principle', 'sanity check'],
+    nativeVocabulary: [
+      'MECE',
+      '2x2',
+      'thesis',
+      'recommendation',
+      'so-what',
+      'frame',
+      'pyramid principle',
+      'sanity check',
+    ],
     triggerWords: [
       'consultant',
       'consulting tool',
@@ -423,7 +459,17 @@ export const BUYER_PERSONAS: BuyerPersona[] = [
     verbalStyle:
       'Polite but pattern-matching mode the entire call. Asks 3 questions in a row. Will give vague feedback and ghost if not interested.',
     defaultSkepticism: 'medium',
-    nativeVocabulary: ['ARR', 'GTM', 'wedge', 'TAM', 'NDR', 'CAC', 'magic number', 'product-market fit', 'ICP'],
+    nativeVocabulary: [
+      'ARR',
+      'GTM',
+      'wedge',
+      'TAM',
+      'NDR',
+      'CAC',
+      'magic number',
+      'product-market fit',
+      'ICP',
+    ],
     triggerWords: [
       'lifestyle',
       'consulting',
@@ -467,7 +513,7 @@ export const SCENARIO_MODES: ScenarioContext[] = [
     founderObjective:
       'Land the descriptive plain-language hook (no platform vocabulary), make the buyer lean forward, earn the second meeting.',
     buyerStateOfMind:
-      "Pattern-matching against 50 other tools. Will close conversation in 5 min if framing is generic. Looking for the one phrase that surprises them.",
+      'Pattern-matching against 50 other tools. Will close conversation in 5 min if framing is generic. Looking for the one phrase that surprises them.',
     funnelStage: 'awareness',
     recommendedDifficulty: 'beginner',
     iconName: 'Target',
@@ -502,7 +548,7 @@ export const SCENARIO_MODES: ScenarioContext[] = [
     id: 'procurement_evaluation',
     label: 'Procurement evaluation',
     description:
-      "Third or fourth meeting. The GC + CISO + procurement lead are on the call. Every claim has to survive their notes. They are not the champion — the CSO is. But they are the veto holder.",
+      'Third or fourth meeting. The GC + CISO + procurement lead are on the call. Every claim has to survive their notes. They are not the champion — the CSO is. But they are the veto holder.',
     founderObjective:
       'Survive the questionnaire. Honest disclosure on SOC 2 / data residency / DPA. Show that you welcome the audit instead of dodging it. Hand the champion ammunition.',
     buyerStateOfMind:
@@ -532,7 +578,7 @@ export const SCENARIO_MODES: ScenarioContext[] = [
     founderObjective:
       "Narrate the artefact. Don't tour the UI — tour what the buyer sees. End with the procurement-grade artefact (specimen DPR) sitting on their screen.",
     buyerStateOfMind:
-      "Watching for whether the artefact actually does what your verbal pitch claimed. Skepticism resolves or hardens here.",
+      'Watching for whether the artefact actually does what your verbal pitch claimed. Skepticism resolves or hardens here.',
     funnelStage: 'evaluation',
     recommendedDifficulty: 'intermediate',
     iconName: 'Presentation',
@@ -548,7 +594,7 @@ export const GRADING_DIMENSIONS: GradingDimension[] = [
     label: 'Pressure without pressure',
     source: 'maalouf',
     excellentLooks:
-      "Buyer feels the urgency to move but cannot point to anywhere you pushed them. Naturally references other conversations or scarcity (5 design-partner seats, 4 left).",
+      'Buyer feels the urgency to move but cannot point to anywhere you pushed them. Naturally references other conversations or scarcity (5 design-partner seats, 4 left).',
     poorLooks:
       "Either flat (no urgency at all) or visibly pushy ('limited time', 'last chance'). Both fail.",
     weight: 0.05,
@@ -571,14 +617,14 @@ export const GRADING_DIMENSIONS: GradingDimension[] = [
       "Names the SPECIFIC pain in the buyer's vocabulary, not generic strategy-team pain. Buyer should think 'wait, how did they know that.'",
     poorLooks:
       "Generic pain ('strategic decisions are hard'). The buyer hears it and disengages — they came in with a SPECIFIC pain and you missed it.",
-    weight: 0.10,
+    weight: 0.1,
   },
   {
     id: 'embody_bigger',
     label: 'Embody bigger and better',
     source: 'maalouf',
     excellentLooks:
-      "Speaks from a category-creator position. Uses pause and pacing as power. Talks about other conversations naturally. Reads as someone the buyer should chase, not someone chasing the buyer.",
+      'Speaks from a category-creator position. Uses pause and pacing as power. Talks about other conversations naturally. Reads as someone the buyer should chase, not someone chasing the buyer.',
     poorLooks:
       "Eager. Over-explains. Rushes. 'Oh and another thing we can do is…' — every additional capability dilutes authority.",
     weight: 0.06,
@@ -590,7 +636,7 @@ export const GRADING_DIMENSIONS: GradingDimension[] = [
     label: 'Category of one',
     source: 'satyam',
     excellentLooks:
-      "Frames DI as not-comparable. Names what the existing category does AND fails to do. Makes Cloverpop / IBM watsonx / Aera feel like a different problem.",
+      'Frames DI as not-comparable. Names what the existing category does AND fails to do. Makes Cloverpop / IBM watsonx / Aera feel like a different problem.',
     poorLooks:
       "Compares directly. 'We are like Cloverpop but better' is the worst-case framing — invites the buyer to cost-compare.",
     weight: 0.08,
@@ -603,14 +649,14 @@ export const GRADING_DIMENSIONS: GradingDimension[] = [
       "The voice carries belief. The buyer feels that you've seen this work before. No softening on the load-bearing claims. Anchored in something specific (a case study, a referenced mechanism, a regulator citation).",
     poorLooks:
       "Tentative on the core claim. Softens when challenged. 'Maybe' / 'we think' / 'possibly' on the highest-stakes lines.",
-    weight: 0.10,
+    weight: 0.1,
   },
   {
     id: 'sales_infra_quality',
     label: 'Sales infrastructure quality',
     source: 'satyam',
     excellentLooks:
-      "The conversation has structure: discovery → diagnosis → mechanism → proof → ask. Each step lands cleanly. No skipping discovery to pitch features.",
+      'The conversation has structure: discovery → diagnosis → mechanism → proof → ask. Each step lands cleanly. No skipping discovery to pitch features.',
     poorLooks:
       "Pitch first, discover later. Or rambling — the buyer cannot tell what step you're on. Or no specific ask at the end ('we should talk again sometime').",
     weight: 0.06,
@@ -622,7 +668,7 @@ export const GRADING_DIMENSIONS: GradingDimension[] = [
     label: 'Vocabulary discipline',
     source: 'di_discipline',
     excellentLooks:
-      "Uses the right vocab for reader temperature. Cold context → descriptive plain-language hooks (60-second audit, pre-IC bias detection). Warm context → locked vocabulary (reasoning layer, R²F, DPR). NEVER uses banned phrases (decision intelligence platform, decision hygiene, boardroom strategic decision).",
+      'Uses the right vocab for reader temperature. Cold context → descriptive plain-language hooks (60-second audit, pre-IC bias detection). Warm context → locked vocabulary (reasoning layer, R²F, DPR). NEVER uses banned phrases (decision intelligence platform, decision hygiene, boardroom strategic decision).',
     poorLooks:
       "Drops 'reasoning layer' or 'R²F' on a cold buyer who has no context. Or uses 'decision intelligence platform' (Gartner-crowded). Or 'decision hygiene' (Kahneman's term — borrowing it cedes our category vocabulary).",
     weight: 0.06,
@@ -656,7 +702,7 @@ export const GRADING_DIMENSIONS: GradingDimension[] = [
     label: 'Specificity over vagueness',
     source: 'fundamentals',
     excellentLooks:
-      "Concrete examples land in every paragraph. Names a specific case (WeWork S-1, Dangote 2014, McKinsey 8% statistic), a specific bias (overconfidence, narrative fallacy), a specific regulation (EU AI Act Article 14, NDPR). The buyer can repeat the line back to a colleague.",
+      'Concrete examples land in every paragraph. Names a specific case (WeWork S-1, Dangote 2014, McKinsey 8% statistic), a specific bias (overconfidence, narrative fallacy), a specific regulation (EU AI Act Article 14, NDPR). The buyer can repeat the line back to a colleague.',
     poorLooks:
       "Vague throughout. 'Better outcomes.' 'Strategic clarity.' 'Improved decision-making.' The buyer cannot repeat anything specific to a colleague.",
     weight: 0.08,
@@ -837,7 +883,7 @@ export const SCENARIO_TEMPLATES: ScenarioTemplate[] = [
     personaId: 'boutique_ma_advisor',
     mode: 'cold_first_meeting',
     generatorHint:
-      "Potomac has seen 100 vendors. He is patient on the call but his patience is a test. He wants to know what this actually does in 60 seconds and whether his associate could use it without him babysitting it.",
+      'Potomac has seen 100 vendors. He is patient on the call but his patience is a test. He wants to know what this actually does in 60 seconds and whether his associate could use it without him babysitting it.',
   },
   {
     personaId: 'fractional_cso',
@@ -929,7 +975,7 @@ export const SCENARIO_TEMPLATES: ScenarioTemplate[] = [
     personaId: 'gc_audit_committee',
     mode: 'objection_handler',
     generatorHint:
-      'James just said: "Your DPR says \'tamper-evident\' but your roadmap admits private-key signing isn\'t shipped. That\'s an overclaim — explain." You have 30 seconds.',
+      "James just said: \"Your DPR says 'tamper-evident' but your roadmap admits private-key signing isn't shipped. That's an overclaim — explain.\" You have 30 seconds.",
   },
 
   // Live demo walkthrough per persona
@@ -962,11 +1008,12 @@ export const MOCK_QUESTIONS: Record<string, { questions: string[]; openerLine: s
     ],
   },
   networking_event_inperson: {
-    openerLine: "(holding a glass, half-turning towards you) — 'Sorry, I missed your name — what are you working on?'",
+    openerLine:
+      "(holding a glass, half-turning towards you) — 'Sorry, I missed your name — what are you working on?'",
     questions: [
-      "So what does it actually do — give me the one-line version?",
+      'So what does it actually do — give me the one-line version?',
       "Who's it for? Who's bought one yet?",
-      "Worth a coffee next week, or are you not in London much?",
+      'Worth a coffee next week, or are you not in London much?',
     ],
   },
   cold_first_meeting: {
@@ -1013,9 +1060,7 @@ export function gradeFromDqi(salesDqi: number): 'A' | 'B' | 'C' | 'D' | 'F' {
 }
 
 /** Compute composite Sales DQI from per-dimension scores 0-5. */
-export function computeSalesDqi(
-  dimensions: Record<GradingDimensionId, number>
-): number {
+export function computeSalesDqi(dimensions: Record<GradingDimensionId, number>): number {
   let total = 0;
   for (const dim of GRADING_DIMENSIONS) {
     const raw = dimensions[dim.id] ?? 0;

@@ -404,7 +404,7 @@ SYNTHESIS (Sequential)
             {
               label: 'Noise Measurement',
               value:
-                'Ensemble sampling: 3 independent Gemini instances score same document → mean, stddev, variance decomposition (the moat is the 135-case reference library + R²F arbitration, not the prompts)',
+                'Ensemble sampling: 3 independent Gemini instances score same document → mean, stddev, variance decomposition (the moat is the 143-case reference library + R²F arbitration, not the prompts)',
             },
             {
               label: 'RAG / Embeddings',

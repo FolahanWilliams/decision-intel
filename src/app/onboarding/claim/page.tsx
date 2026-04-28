@@ -249,7 +249,14 @@ export default function ClaimDemoAuditPage() {
   return (
     <Suspense
       fallback={
-        <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div
+          style={{
+            minHeight: '60vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
           <Loader2 size={28} className="animate-spin" style={{ color: 'var(--accent-primary)' }} />
         </div>
       }

@@ -49,10 +49,15 @@ interface Props {
 // ─── Helpers ──────────────────────────────────────────────────────
 
 function gradeColor(grade: 'A' | 'B' | 'C' | 'D' | 'F'): string {
-  return grade === 'A' ? '#16A34A' :
-    grade === 'B' ? '#22C55E' :
-    grade === 'C' ? '#EAB308' :
-    grade === 'D' ? '#F97316' : '#DC2626';
+  return grade === 'A'
+    ? '#16A34A'
+    : grade === 'B'
+      ? '#22C55E'
+      : grade === 'C'
+        ? '#EAB308'
+        : grade === 'D'
+          ? '#F97316'
+          : '#DC2626';
 }
 
 function dqiColor(dqi: number): string {
@@ -142,13 +147,11 @@ function DqiUptrendCard({ history }: { history: HistoryEntry[] }) {
     y: padT + chartH * (1 - v / 100),
   }));
 
-  const dqiPath = dqiPoints.length > 1
-    ? `M ${dqiPoints.map(p => `${p.x},${p.y}`).join(' L ')}`
-    : '';
+  const dqiPath =
+    dqiPoints.length > 1 ? `M ${dqiPoints.map(p => `${p.x},${p.y}`).join(' L ')}` : '';
 
-  const rollingPath = rollingPoints.length > 1
-    ? `M ${rollingPoints.map(p => `${p.x},${p.y}`).join(' L ')}`
-    : '';
+  const rollingPath =
+    rollingPoints.length > 1 ? `M ${rollingPoints.map(p => `${p.x},${p.y}`).join(' L ')}` : '';
 
   // Grade-band horizontal markers (85, 70, 55, 40)
   const bands = [
@@ -167,13 +170,29 @@ function DqiUptrendCard({ history }: { history: HistoryEntry[] }) {
         borderRadius: 'var(--radius-lg)',
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 12 }}>
-        <div className="section-heading" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 12,
+          marginBottom: 12,
+        }}
+      >
+        <div
+          className="section-heading"
+          style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}
+        >
           <TrendingUp size={12} /> Sales DQI · uptrend across {history.length} reps
         </div>
         <div style={{ display: 'flex', gap: 14, fontSize: 11, color: 'var(--text-muted)' }}>
           <Stat label="Best" value={`${stats.best}`} color={dqiColor(stats.best)} />
-          <Stat label="Last 5 avg" value={`${Math.round(stats.recentAvg)}`} color={dqiColor(stats.recentAvg)} />
+          <Stat
+            label="Last 5 avg"
+            value={`${Math.round(stats.recentAvg)}`}
+            color={dqiColor(stats.recentAvg)}
+          />
           {history.length >= 6 && (
             <Stat
               label="Lift vs first 5"
@@ -184,7 +203,11 @@ function DqiUptrendCard({ history }: { history: HistoryEntry[] }) {
         </div>
       </div>
 
-      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto', maxHeight: 260 }} preserveAspectRatio="xMidYMid meet">
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        style={{ width: '100%', height: 'auto', maxHeight: 260 }}
+        preserveAspectRatio="xMidYMid meet"
+      >
         {/* Y-axis grade bands */}
         {bands.map(b => {
           const y = padT + chartH * (1 - b.dqi / 100);
@@ -215,15 +238,38 @@ function DqiUptrendCard({ history }: { history: HistoryEntry[] }) {
         })}
 
         {/* Y-axis labels at 0 and 100 */}
-        <text x={padL - 6} y={padT + 3} fontSize="9" fill="var(--text-muted)" textAnchor="end">100</text>
-        <text x={padL - 6} y={padT + chartH + 3} fontSize="9" fill="var(--text-muted)" textAnchor="end">0</text>
+        <text x={padL - 6} y={padT + 3} fontSize="9" fill="var(--text-muted)" textAnchor="end">
+          100
+        </text>
+        <text
+          x={padL - 6}
+          y={padT + chartH + 3}
+          fontSize="9"
+          fill="var(--text-muted)"
+          textAnchor="end"
+        >
+          0
+        </text>
 
         {/* X-axis baseline */}
-        <line x1={padL} x2={W - padR} y1={padT + chartH} y2={padT + chartH} stroke="var(--border-color)" />
+        <line
+          x1={padL}
+          x2={W - padR}
+          y1={padT + chartH}
+          y2={padT + chartH}
+          stroke="var(--border-color)"
+        />
 
         {/* Rolling average line (dashed) */}
         {rollingPath && (
-          <path d={rollingPath} fill="none" stroke="#6366F1" strokeOpacity={0.5} strokeWidth={1.5} strokeDasharray="4 4" />
+          <path
+            d={rollingPath}
+            fill="none"
+            stroke="#6366F1"
+            strokeOpacity={0.5}
+            strokeWidth={1.5}
+            strokeDasharray="4 4"
+          />
         )}
 
         {/* Actual DQI line */}
@@ -266,11 +312,24 @@ function DqiUptrendCard({ history }: { history: HistoryEntry[] }) {
         })}
 
         {/* X-axis count labels (start, mid, end) */}
-        <text x={padL} y={H - padB / 3} fontSize="9" fill="var(--text-muted)" textAnchor="start">Rep 1</text>
-        <text x={W - padR} y={H - padB / 3} fontSize="9" fill="var(--text-muted)" textAnchor="end">Rep {history.length}</text>
+        <text x={padL} y={H - padB / 3} fontSize="9" fill="var(--text-muted)" textAnchor="start">
+          Rep 1
+        </text>
+        <text x={W - padR} y={H - padB / 3} fontSize="9" fill="var(--text-muted)" textAnchor="end">
+          Rep {history.length}
+        </text>
       </svg>
 
-      <div style={{ display: 'flex', gap: 14, marginTop: 8, fontSize: 11, color: 'var(--text-muted)', flexWrap: 'wrap' }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: 14,
+          marginTop: 8,
+          fontSize: 11,
+          color: 'var(--text-muted)',
+          flexWrap: 'wrap',
+        }}
+      >
         <LegendDot color="#16A34A" label="DQI per rep (color = grade)" />
         <LegendDot color="#6366F1" label="5-rep rolling average" dashed />
       </div>
@@ -331,17 +390,29 @@ function DimensionTrendsCard({ history }: { history: HistoryEntry[] }) {
       <div className="section-heading" style={{ marginBottom: 10 }}>
         Per-dimension trend · sorted by lift (last 5 vs first 5)
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 8 }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+          gap: 8,
+        }}
+      >
         {dims.map(d => {
           const sourceColor =
-            d.source === 'maalouf' ? '#DC2626' :
-            d.source === 'satyam' ? '#0EA5E9' :
-            d.source === 'di_discipline' ? '#16A34A' :
-            d.source === 'kahneman' ? '#F59E0B' : '#A78BFA';
+            d.source === 'maalouf'
+              ? '#DC2626'
+              : d.source === 'satyam'
+                ? '#0EA5E9'
+                : d.source === 'di_discipline'
+                  ? '#16A34A'
+                  : d.source === 'kahneman'
+                    ? '#F59E0B'
+                    : '#A78BFA';
           const recentPct = (d.recentAvg / 5) * 100;
           const earliestPct = (d.earliestAvg / 5) * 100;
           const liftSign = d.lift > 0.2 ? '+' : '';
-          const liftColor = d.lift > 0.2 ? '#16A34A' : d.lift < -0.2 ? '#DC2626' : 'var(--text-muted)';
+          const liftColor =
+            d.lift > 0.2 ? '#16A34A' : d.lift < -0.2 ? '#DC2626' : 'var(--text-muted)';
           return (
             <div
               key={d.id}
@@ -352,14 +423,39 @@ function DimensionTrendsCard({ history }: { history: HistoryEntry[] }) {
                 borderRadius: 'var(--radius-md)',
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
-                <span style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--text-primary)' }}>{d.label}</span>
-                <span style={{ fontSize: 11, fontWeight: 700, color: liftColor, fontVariantNumeric: 'tabular-nums' }}>
-                  {liftSign}{d.lift.toFixed(1)}
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'baseline',
+                  marginBottom: 4,
+                }}
+              >
+                <span style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--text-primary)' }}>
+                  {d.label}
+                </span>
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: liftColor,
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  {liftSign}
+                  {d.lift.toFixed(1)}
                 </span>
               </div>
               {/* Two stacked bars: earliest avg and recent avg */}
-              <div style={{ position: 'relative', height: 8, background: 'var(--bg-tertiary)', borderRadius: 2, overflow: 'hidden' }}>
+              <div
+                style={{
+                  position: 'relative',
+                  height: 8,
+                  background: 'var(--bg-tertiary)',
+                  borderRadius: 2,
+                  overflow: 'hidden',
+                }}
+              >
                 <div
                   style={{
                     position: 'absolute',
@@ -382,8 +478,16 @@ function DimensionTrendsCard({ history }: { history: HistoryEntry[] }) {
                   title={`Last 5 avg: ${d.recentAvg.toFixed(1)}/5`}
                 />
               </div>
-              <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 3, fontVariantNumeric: 'tabular-nums' }}>
-                {d.earliestAvg.toFixed(1)} → {d.recentAvg.toFixed(1)} <span style={{ marginLeft: 6, opacity: 0.7 }}>· {d.source.replace('_', ' ')}</span>
+              <div
+                style={{
+                  fontSize: 10,
+                  color: 'var(--text-muted)',
+                  marginTop: 3,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {d.earliestAvg.toFixed(1)} → {d.recentAvg.toFixed(1)}{' '}
+                <span style={{ marginLeft: 6, opacity: 0.7 }}>· {d.source.replace('_', ' ')}</span>
               </div>
             </div>
           );
@@ -431,17 +535,35 @@ function PersonaModeHeatmap({ history }: { history: HistoryEntry[] }) {
         overflowX: 'auto',
       }}
     >
-      <div className="section-heading" style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+      <div
+        className="section-heading"
+        style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}
+      >
         <Trophy size={12} /> Persona × Mode performance
       </div>
       <table style={{ borderCollapse: 'separate', borderSpacing: 4, fontSize: 11 }}>
         <thead>
           <tr>
-            <th style={{ textAlign: 'left', padding: '4px 8px', fontWeight: 600, color: 'var(--text-muted)' }}>
+            <th
+              style={{
+                textAlign: 'left',
+                padding: '4px 8px',
+                fontWeight: 600,
+                color: 'var(--text-muted)',
+              }}
+            >
               Persona
             </th>
             {practicedModes.map(m => (
-              <th key={m.id} style={{ padding: '4px 8px', fontWeight: 600, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+              <th
+                key={m.id}
+                style={{
+                  padding: '4px 8px',
+                  fontWeight: 600,
+                  color: 'var(--text-muted)',
+                  whiteSpace: 'nowrap',
+                }}
+              >
                 {m.label}
               </th>
             ))}
@@ -450,15 +572,41 @@ function PersonaModeHeatmap({ history }: { history: HistoryEntry[] }) {
         <tbody>
           {practicedPersonas.map(p => (
             <tr key={p.id}>
-              <td style={{ padding: '6px 8px', fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
-                <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: p.color, marginRight: 6 }} />
+              <td
+                style={{
+                  padding: '6px 8px',
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <span
+                  style={{
+                    display: 'inline-block',
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    background: p.color,
+                    marginRight: 6,
+                  }}
+                />
                 {p.label}
               </td>
               {practicedModes.map(m => {
                 const cell = cells.get(`${p.id}::${m.id}`);
                 if (!cell) {
                   return (
-                    <td key={m.id} style={{ padding: 6, textAlign: 'center', color: 'var(--text-muted)', opacity: 0.4 }}>—</td>
+                    <td
+                      key={m.id}
+                      style={{
+                        padding: 6,
+                        textAlign: 'center',
+                        color: 'var(--text-muted)',
+                        opacity: 0.4,
+                      }}
+                    >
+                      —
+                    </td>
                   );
                 }
                 const avg = Math.round(cell.sum / cell.count);
@@ -476,7 +624,16 @@ function PersonaModeHeatmap({ history }: { history: HistoryEntry[] }) {
                       }}
                       title={`${cell.count} rep${cell.count === 1 ? '' : 's'} · avg ${avg}`}
                     >
-                      <div style={{ fontSize: 14, fontWeight: 700, color, fontVariantNumeric: 'tabular-nums' }}>{avg}</div>
+                      <div
+                        style={{
+                          fontSize: 14,
+                          fontWeight: 700,
+                          color,
+                          fontVariantNumeric: 'tabular-nums',
+                        }}
+                      >
+                        {avg}
+                      </div>
                       <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>{cell.count}×</div>
                     </div>
                   </td>
@@ -495,8 +652,26 @@ function PersonaModeHeatmap({ history }: { history: HistoryEntry[] }) {
 function Stat(props: { label: string; value: string; color: string }) {
   return (
     <span style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-      <span style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{props.label}</span>
-      <span style={{ fontSize: 14, fontWeight: 700, color: props.color, fontVariantNumeric: 'tabular-nums' }}>{props.value}</span>
+      <span
+        style={{
+          fontSize: 10,
+          color: 'var(--text-muted)',
+          textTransform: 'uppercase',
+          letterSpacing: '0.06em',
+        }}
+      >
+        {props.label}
+      </span>
+      <span
+        style={{
+          fontSize: 14,
+          fontWeight: 700,
+          color: props.color,
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        {props.value}
+      </span>
     </span>
   );
 }

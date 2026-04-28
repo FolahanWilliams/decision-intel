@@ -28,6 +28,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { DESIGN_PARTNER_SEATS_AVAILABLE } from '@/lib/constants/company-info';
+import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 
 /* ─── Color Tokens ──────────────────────────────────────────────────────── */
 
@@ -241,9 +242,9 @@ export default function LandingPage() {
                 }}
               >
                 Every strategic memo runs through a cognitive-bias audit grounded in 30+ biases from
-                Kahneman and Klein, calibrated against 135 historical corporate decisions. Decision
-                Intel scores the reasoning, names the biases the room will catch first, and shows
-                exactly what shifts when you remove them.
+                Kahneman and Klein, calibrated against {HISTORICAL_CASE_COUNT} historical corporate
+                decisions. Decision Intel scores the reasoning, names the biases the room will catch
+                first, and shows exactly what shifts when you remove them.
               </p>
               <div
                 style={{
@@ -1014,7 +1015,7 @@ export default function LandingPage() {
                   maxWidth: 860,
                 }}
               >
-                135 decisions, audited in hindsight. The case library is open.
+                {HISTORICAL_CASE_COUNT} decisions, audited in hindsight. The case library is open.
               </h2>
               <p
                 style={{

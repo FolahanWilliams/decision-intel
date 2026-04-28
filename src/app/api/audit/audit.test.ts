@@ -9,14 +9,11 @@ import { NextRequest } from 'next/server';
 // and as a namespace (`NextResponse.json(...)`), so the mock must handle both.
 // vi.mock factories are hoisted above imports, so we use vi.hoisted() to load
 // the shared helpers in a way that's also hoisted. See @/test-utils/next-server-mock.
-const { nextServerMockFactory, supabaseServerMockFactory } = await vi.hoisted(
-  async () => ({
-    nextServerMockFactory: (await import('@/test-utils/next-server-mock'))
-      .nextServerMockFactory,
-    supabaseServerMockFactory: (await import('@/test-utils/supabase-server-mock'))
-      .supabaseServerMockFactory,
-  })
-);
+const { nextServerMockFactory, supabaseServerMockFactory } = await vi.hoisted(async () => ({
+  nextServerMockFactory: (await import('@/test-utils/next-server-mock')).nextServerMockFactory,
+  supabaseServerMockFactory: (await import('@/test-utils/supabase-server-mock'))
+    .supabaseServerMockFactory,
+}));
 vi.mock('next/server', nextServerMockFactory);
 
 const mockGetUser = vi.fn();

@@ -546,10 +546,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
   // a stale "claimed" message.
   useEffect(() => {
     if (searchParams.get('claimed') === 'true') {
-      showToast(
-        'Audit claimed from your demo run. It now lives in your account.',
-        'success'
-      );
+      showToast('Audit claimed from your demo run. It now lives in your account.', 'success');
       const params = new URLSearchParams(searchParams.toString());
       params.delete('claimed');
       const qs = params.toString();

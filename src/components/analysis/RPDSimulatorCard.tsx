@@ -13,6 +13,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import type { RpdSimulationResult } from '@/types';
+import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 
 // RPD Simulator card (G24 deep, locked 2026-04-27).
 //
@@ -95,11 +96,7 @@ function ConfidenceMeter({ value }: { value: number }) {
             width: `${pct}%`,
             height: '100%',
             background:
-              pct >= 70
-                ? 'var(--success)'
-                : pct >= 40
-                  ? 'var(--warning)'
-                  : 'var(--error)',
+              pct >= 70 ? 'var(--success)' : pct >= 40 ? 'var(--warning)' : 'var(--error)',
             borderRadius: 999,
             transition: 'width 0.4s',
           }}
@@ -260,9 +257,9 @@ export function RPDSimulatorCard({ documentId, initialAction = '' }: RPDSimulato
                 lineHeight: 1.5,
               }}
             >
-              Test the action you&apos;re leaning toward. The simulator pulls the closest
-              historical analogs from the case library, simulates the call forward, and tells you
-              what the comparable firms got right and got wrong.
+              Test the action you&apos;re leaning toward. The simulator pulls the closest historical
+              analogs from the case library, simulates the call forward, and tells you what the
+              comparable firms got right and got wrong.
             </p>
           </div>
         </header>
@@ -388,11 +385,7 @@ export function RPDSimulatorCard({ documentId, initialAction = '' }: RPDSimulato
                   opacity: !action.trim() || running ? 0.6 : 1,
                 }}
               >
-                {running ? (
-                  <Loader2 size={14} className="animate-spin" />
-                ) : (
-                  <Sparkle size={14} />
-                )}
+                {running ? <Loader2 size={14} className="animate-spin" /> : <Sparkle size={14} />}
                 {running ? 'Simulating…' : 'Run RPD simulation'}
               </button>
             </div>
@@ -511,10 +504,7 @@ export function RPDSimulatorCard({ documentId, initialAction = '' }: RPDSimulato
                 </ul>
               </div>
               <div>
-                <div
-                  className="section-heading"
-                  style={{ marginBottom: 8, color: 'var(--error)' }}
-                >
+                <div className="section-heading" style={{ marginBottom: 8, color: 'var(--error)' }}>
                   Critical failure points
                 </div>
                 <ul
@@ -559,8 +549,8 @@ export function RPDSimulatorCard({ documentId, initialAction = '' }: RPDSimulato
                     fontStyle: 'italic',
                   }}
                 >
-                  Pulled from the Decision Intel 135-case reference library, ranked by structural
-                  similarity to your current decision.
+                  Pulled from the Decision Intel {HISTORICAL_CASE_COUNT}-case reference library,
+                  ranked by structural similarity to your current decision.
                 </div>
                 <div
                   className="rpd-analogs-grid"
@@ -640,10 +630,10 @@ export function RPDSimulatorCard({ documentId, initialAction = '' }: RPDSimulato
                 }}
               >
                 <History size={12} style={{ display: 'inline', marginRight: 6 }} />
-                No close analogs in the 135-case library — your action is structurally novel.
-                The recommendation above relies more heavily on the mental simulation than on
-                pattern matching; treat it as directional guidance and validate the assumptions
-                deliberately.
+                No close analogs in the {HISTORICAL_CASE_COUNT}-case library — your action is
+                structurally novel. The recommendation above relies more heavily on the mental
+                simulation than on pattern matching; treat it as directional guidance and validate
+                the assumptions deliberately.
               </div>
             )}
 

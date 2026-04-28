@@ -196,7 +196,7 @@ export const STRENGTHS: Strength[] = [
       'In the pre-seed pitch deck, anchor "what does Decision Intel ship in 90 days vs Cloverpop ships in 12 months" with concrete examples (DPR v2, Outcome Gate Phase 3, etc.).',
     ],
     tripwire:
-      "Velocity becomes a weakness when it produces breadth without paid validation. If 90 days pass without a paid design partner, velocity is being misallocated — pause shipping, focus 100% on close.",
+      'Velocity becomes a weakness when it produces breadth without paid validation. If 90 days pass without a paid design partner, velocity is being misallocated — pause shipping, focus 100% on close.',
     nbLmCitation: 'NotebookLM strengths synthesis 2026-04-27 — point 1',
   },
   {
@@ -241,7 +241,8 @@ export const STRENGTHS: Strength[] = [
     ],
     tripwire:
       "If a US incumbent partners with an African legal-services firm to ship a competing compliance map, the wedge starts compressing. Track Cloverpop / IBM watsonx press releases for 'African expansion' or 'EM partnerships' quarterly.",
-    nbLmCitation: 'NotebookLM strengths synthesis 2026-04-27 — point 3 + CLAUDE.md ICP lock 2026-04-26',
+    nbLmCitation:
+      'NotebookLM strengths synthesis 2026-04-27 — point 3 + CLAUDE.md ICP lock 2026-04-26',
   },
   {
     id: 'wiz_advisor',
@@ -346,15 +347,15 @@ export const WEAKNESSES: Weakness[] = [
     title: 'Pre-sale workflow friction · infinite-pilot trap risk',
     severity: 'high',
     evidence: [
-      'Default onboarding requires analyst behavior change (login + manual upload) — Cloverpop\'s exact failure pattern (per Failure Modes Watchtower)',
+      "Default onboarding requires analyst behavior change (login + manual upload) — Cloverpop's exact failure pattern (per Failure Modes Watchtower)",
       'Founder hours capped at 50-70/week (16-year-old, school commitments, AP load 11th grade Aug 2026 - Jun 2027)',
       'Risk: the "please pilot users" trap — building custom features for free pilots instead of forcing the hard transition to paid Strategy contract',
     ],
     whyItHurts:
-      "If the analyst has to change behavior to use DI (vs. their existing email + Slack + Drive workflow), DI becomes shelfware by month three. Adoption is THE adoption metric — without it, even the few paid pilots churn before the data flywheel rotates.",
+      'If the analyst has to change behavior to use DI (vs. their existing email + Slack + Drive workflow), DI becomes shelfware by month three. Adoption is THE adoption metric — without it, even the few paid pilots churn before the data flywheel rotates.',
     countermove: [
       'Integration-first onboarding (Founder School es_9): map the workflow IN the discovery call, set up Google Drive polling or analyze+token@in.decision-intel.com forwarder in 15 minutes BEFORE contract',
-      'Make zero behavior change the default — DI runs on the analyst\'s existing artefact stream (memos arrive in Drive → audit fires automatically → email digest summarises)',
+      "Make zero behavior change the default — DI runs on the analyst's existing artefact stream (memos arrive in Drive → audit fires automatically → email digest summarises)",
       'On free pilots: hard 6-week ceiling, then conversion to paid. No "we will keep extending the pilot." (Founder School es_7 + es_11)',
     ],
     next30Days:
@@ -433,7 +434,7 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       'A 60-second bias audit on their IC memo BEFORE the Managing Partner sees it',
       'Specific named flags ("anchoring on the seller\'s asking price in section 3", "base-rate neglect in the synergy projections") with the exact sentence highlighted',
       'A pre-meeting cheat sheet of "what the partners will grill you on" — the Dr Red Team output',
-      'Personal career-defending utility · their MD-impression matters more than their firm\'s decision quality at this career stage',
+      "Personal career-defending utility · their MD-impression matters more than their firm's decision quality at this career stage",
     ],
     whatKeepsThemUp: [
       'Walking into IC and being humiliated by the MD over a flaw they should have caught',
@@ -449,7 +450,7 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       coldBlunder:
         'Pitching the firm-level value proposition ("decision quality across the portfolio") — the associate doesn\'t buy that. Pitch the personal MD-impression-defending value.',
       warmIntroPath:
-        'TASIS England school network → Oxford / LSE / Imperial alumni now in PE/VC associate seats · the founder\'s extended-family McKinsey connections are also adjacent (associates frequently cross between MBB and PE).',
+        "TASIS England school network → Oxford / LSE / Imperial alumni now in PE/VC associate seats · the founder's extended-family McKinsey connections are also adjacent (associates frequently cross between MBB and PE).",
     },
     discoveryQuestions: {
       opening: [
@@ -469,20 +470,35 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       ],
     },
     artefactToLead:
-      'Live audit on a redacted public memo (WeWork S-1 or any famously failed IC document). Show the Dr Red Team objection FIRST — that\'s the feature that proves the AI is smarter than the analyst. The 12-node pipeline / R²F vocabulary stays warm-context only.',
+      "Live audit on a redacted public memo (WeWork S-1 or any famously failed IC document). Show the Dr Red Team objection FIRST — that's the feature that proves the AI is smarter than the analyst. The 12-node pipeline / R²F vocabulary stays warm-context only.",
     killerPitch:
-      'You\'re drafting IC memos at 2 AM. Your MD sees flaws in 30 seconds that took you 4 weeks not to notice. £149/mo, on your credit card, sits below the CFO threshold. Run your draft through this BEFORE the MD sees it. If it\'s not catching things you missed in the first 3 audits, cancel. The Dr Red Team objection alone is worth £149.',
+      "You're drafting IC memos at 2 AM. Your MD sees flaws in 30 seconds that took you 4 weeks not to notice. £149/mo, on your credit card, sits below the CFO threshold. Run your draft through this BEFORE the MD sees it. If it's not catching things you missed in the first 3 audits, cancel. The Dr Red Team objection alone is worth £149.",
     threePhrasesNeverToSay: [
       '"Recognition-Rigor Framework arbitrating Kahneman + Klein" — they don\'t care about academic moats; they care about not being humiliated tomorrow',
       '"Decision Provenance Record for audit committees" — that\'s an enterprise vocabulary; they\'re a personal user',
       '"60-second audit on a strategic memo before the room sees it" — works for CSOs, NOT associates · associates already think in IC-memo language; mirror their language',
     ],
     meetingArc: [
-      { minute: '0:00-1:00', move: 'Frame: "Bias audit on your draft IC memo. 60 seconds. Names the 3 biggest flags before your MD sees it."' },
-      { minute: '1:00-3:00', move: 'Live audit on the WeWork S-1 (or a redacted memo they brought) — show DQI + 3 biases + Dr Red Team objection.' },
-      { minute: '3:00-7:00', move: 'Discovery: "What\'s the worst feedback you\'ve gotten from your MD recently? Would this have caught it?"' },
-      { minute: '7:00-12:00', move: 'Pricing: £149/mo, corporate card, sits below approval threshold. Cancel anytime. First audit free.' },
-      { minute: '12:00-15:00', move: 'Close: "Run your next draft tonight. If it\'s not catching things, full refund."' },
+      {
+        minute: '0:00-1:00',
+        move: 'Frame: "Bias audit on your draft IC memo. 60 seconds. Names the 3 biggest flags before your MD sees it."',
+      },
+      {
+        minute: '1:00-3:00',
+        move: 'Live audit on the WeWork S-1 (or a redacted memo they brought) — show DQI + 3 biases + Dr Red Team objection.',
+      },
+      {
+        minute: '3:00-7:00',
+        move: 'Discovery: "What\'s the worst feedback you\'ve gotten from your MD recently? Would this have caught it?"',
+      },
+      {
+        minute: '7:00-12:00',
+        move: 'Pricing: £149/mo, corporate card, sits below approval threshold. Cancel anytime. First audit free.',
+      },
+      {
+        minute: '12:00-15:00',
+        move: 'Close: "Run your next draft tonight. If it\'s not catching things, full refund."',
+      },
     ],
     signalsToListenFor: {
       positive: [
@@ -494,22 +510,34 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       negative: [
         'They redirect to "let me ask my MD" — usually means they\'re too junior or too risk-averse to swipe their card without permission',
         'They focus on firm-level value ("would this help our IC process?") — wrong frame; redirect to personal MD-impression',
-        'They ask about SOC 2 / EU AI Act — they\'re not the buyer; that\'s firm-level. Disqualify or escalate.',
+        "They ask about SOC 2 / EU AI Act — they're not the buyer; that's firm-level. Disqualify or escalate.",
       ],
     },
     followUp: [
-      { day: 'T+0 (immediately after demo)', artifact: 'Free first-audit voucher · DPR PDF on the redacted memo they shared · 1-line follow-up "Run your next IC draft tonight."' },
+      {
+        day: 'T+0 (immediately after demo)',
+        artifact:
+          'Free first-audit voucher · DPR PDF on the redacted memo they shared · 1-line follow-up "Run your next IC draft tonight."',
+      },
       { day: 'T+24h', artifact: 'Check-in DM: "Did you run a draft? What did the audit catch?"' },
-      { day: 'T+7d', artifact: 'Stripe checkout link · cancel-anytime framing · "If the first 3 audits don\'t catch things you missed, full refund"' },
-      { day: 'T+30d', artifact: 'Renewal check-in + ask for 2-3 peer-associate referrals at their firm or peer firms' },
+      {
+        day: 'T+7d',
+        artifact:
+          'Stripe checkout link · cancel-anytime framing · "If the first 3 audits don\'t catch things you missed, full refund"',
+      },
+      {
+        day: 'T+30d',
+        artifact:
+          'Renewal check-in + ask for 2-3 peer-associate referrals at their firm or peer firms',
+      },
     ],
     conversionWindow: '14-30 days · single-meeting close on credit card · no procurement cycle',
     whyTheyConvert:
       'Acute personal career fear + pricing under the corporate-card-approval threshold + Dr Red Team output that proves immediate value. The friction is near-zero: no procurement, no GC, no IT review. Just swipe.',
     whyTheyDont:
-      'They\'re too junior to use a corporate card without MD approval (rare but real). Or their firm has a "no AI tools" blanket policy. Or they\'re not actually an associate — they\'re a partner shadowing as one. Disqualify quickly.',
+      "They're too junior to use a corporate card without MD approval (rare but real). Or their firm has a \"no AI tools\" blanket policy. Or they're not actually an associate — they're a partner shadowing as one. Disqualify quickly.",
     notebookLmFollowUp:
-      'For mid-market PE/VC associates, what\'s the typical 6-month retention curve? When do they churn (graduation to associate director, firm AI-tool policy change, deal-flow drought)? What\'s the path to converting them as champions when they get promoted to associate director or principal?',
+      "For mid-market PE/VC associates, what's the typical 6-month retention curve? When do they churn (graduation to associate director, firm AI-tool policy change, deal-flow drought)? What's the path to converting them as champions when they get promoted to associate director or principal?",
   },
 
   // -----------------------------------------------------------------------
@@ -519,19 +547,19 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
     id: 'boutique_sell_side_ma',
     role: 'Boutique Sell-Side M&A Advisor · "Potomac" archetype',
     archetype:
-      '2-10-person M&A advisory shop · paid only on closing · UK + US mid-market sell-side · 5-15 deals/year · CIM is the deliverable; valuation drops or deal dies if PE buyer\'s IC spots a flaw · MD or partner is the actual buyer (small enough firm that the MD has the corporate card)',
+      "2-10-person M&A advisory shop · paid only on closing · UK + US mid-market sell-side · 5-15 deals/year · CIM is the deliverable; valuation drops or deal dies if PE buyer's IC spots a flaw · MD or partner is the actual buyer (small enough firm that the MD has the corporate card)",
     buyerType: 'fast_validator',
     priority: 'now',
     ticketBand:
       '$499 per-deal audit OR £149-249/mo Professional · per-deal pricing matches their commission-on-close model · paid in 14-21 days',
     whatTheyWant: [
-      'A pre-market Dr Red Team audit on the CIM — names the 3 fatal flaws a PE buyer\'s IC will spot',
+      "A pre-market Dr Red Team audit on the CIM — names the 3 fatal flaws a PE buyer's IC will spot",
       'Cross-document conflict scan across the CIM + financial model + management presentation — catches inconsistencies that kill valuations',
       'Independent third-party DPR they can attach to the CIM appendix · proves to PE buyer that the seller has done the rigor work',
       'Direct revenue protection: a 7-minute audit that prevents a £100K-£2M commission from collapsing',
     ],
     whatKeepsThemUp: [
-      'A PE buyer\'s IC catches a hockey-stick projection or unsupported synergy claim → valuation drops 10-20%, commission drops 10-20%',
+      "A PE buyer's IC catches a hockey-stick projection or unsupported synergy claim → valuation drops 10-20%, commission drops 10-20%",
       'A deal collapses on a flaw the team should have caught in week 4 of diligence → zero commission, 6 months of work gone',
       'A buyer-side team uses better diligence tools than the sell-side does · negotiating asymmetry that costs money every quarter',
       'The "we\'ve been doing this 20 years" trap — the team that stops self-auditing eventually meets a buyer team that doesn\'t',
@@ -540,7 +568,7 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       coldChannel:
         'Direct cold email to the MD or partner of UK / US boutique M&A shops · also: M&A networking events in London (Tier 1 city for mid-market sell-side) where the founder can meet partners in person',
       coldOpener:
-        'I built a 60-second AI red-team that simulates a PE buyer\'s IC. Here are the 3 fatal flaws it found in a public CIM [attach the WeWork DPR]. Run your draft CIMs through this before going to market — bulletproofs your valuation. £499 per deal, no subscription required.',
+        "I built a 60-second AI red-team that simulates a PE buyer's IC. Here are the 3 fatal flaws it found in a public CIM [attach the WeWork DPR]. Run your draft CIMs through this before going to market — bulletproofs your valuation. £499 per deal, no subscription required.",
       coldBlunder:
         'Pitching subscription pricing to a deal-cadence business. They think in commission-per-close, not monthly recurring. Lead with $499 per-deal · subscription is a secondary option for high-volume shops.',
       warmIntroPath:
@@ -566,22 +594,37 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
     artefactToLead:
       'WeWork S-1 DPR (cross-doc conflict scan + Dr Red Team objections + DQI) · then the live evidence-moment audit on a redacted CIM they bring. Frame the DPR as the artefact that ATTACHES to their CIM appendix — third-party rigor proof for the buyer.',
     killerPitch:
-      'You get paid on close. A PE buyer\'s IC catching one bad assumption drops your valuation 10-20% — that\'s your commission. £499 per deal, 60 seconds, runs the Dr Red Team that simulates the buyer\'s IC review. Cheaper than one hour of legal work. Pays for itself the first time we catch something that would have killed your commission.',
+      "You get paid on close. A PE buyer's IC catching one bad assumption drops your valuation 10-20% — that's your commission. £499 per deal, 60 seconds, runs the Dr Red Team that simulates the buyer's IC review. Cheaper than one hour of legal work. Pays for itself the first time we catch something that would have killed your commission.",
     threePhrasesNeverToSay: [
       '"Decision Quality Index" — they think in valuation multiple and commission, not abstract scores',
       '"Native reasoning layer" — too abstract for a deal-cadence business',
       '"Subscription tier with seats" — wrong economic model · per-deal pricing matches their reality',
     ],
     meetingArc: [
-      { minute: '0:00-1:30', move: 'Frame: "Pre-market Dr Red Team on every CIM. £499 per deal. Catches the 3 flaws the buyer\'s IC would hit first."' },
-      { minute: '1:30-5:00', move: 'Live audit on the WeWork S-1 OR a redacted CIM they brought · cross-doc conflict scan · highlight the dollar-impact-of-catching-this-flaw on valuation.' },
-      { minute: '5:00-10:00', move: 'Discovery: "When did this last cost you commission? Walk me through it."' },
-      { minute: '10:00-15:00', move: 'Pricing: £499 per deal, runs in 60 seconds, attaches to CIM appendix as third-party rigor proof.' },
-      { minute: '15:00-20:00', move: 'Close: "Bring me your next CIM draft this week. Audit on me. If it doesn\'t flag something useful, no charge."' },
+      {
+        minute: '0:00-1:30',
+        move: 'Frame: "Pre-market Dr Red Team on every CIM. £499 per deal. Catches the 3 flaws the buyer\'s IC would hit first."',
+      },
+      {
+        minute: '1:30-5:00',
+        move: 'Live audit on the WeWork S-1 OR a redacted CIM they brought · cross-doc conflict scan · highlight the dollar-impact-of-catching-this-flaw on valuation.',
+      },
+      {
+        minute: '5:00-10:00',
+        move: 'Discovery: "When did this last cost you commission? Walk me through it."',
+      },
+      {
+        minute: '10:00-15:00',
+        move: 'Pricing: £499 per deal, runs in 60 seconds, attaches to CIM appendix as third-party rigor proof.',
+      },
+      {
+        minute: '15:00-20:00',
+        move: 'Close: "Bring me your next CIM draft this week. Audit on me. If it doesn\'t flag something useful, no charge."',
+      },
     ],
     signalsToListenFor: {
       positive: [
-        'They name a specific past deal where the buyer\'s IC dropped the valuation',
+        "They name a specific past deal where the buyer's IC dropped the valuation",
         'They volunteer "we don\'t have an internal red-team process" within the first 5 minutes',
         'They ask about the cross-document conflict scan unprompted',
         'They reference a peer firm using AI tools as competitive pressure',
@@ -589,22 +632,39 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       negative: [
         'They redirect to "we have our own quality process" without naming what it IS',
         'They focus on subscription pricing — wrong economic model · counter with per-deal',
-        'They ask about regulatory mapping (EU AI Act / SOX) — they\'re a sell-side advisor, not a regulated entity · disqualify or redirect to enterprise tier',
+        "They ask about regulatory mapping (EU AI Act / SOX) — they're a sell-side advisor, not a regulated entity · disqualify or redirect to enterprise tier",
       ],
     },
     followUp: [
-      { day: 'T+0 (immediately after demo)', artifact: 'Free audit voucher on next CIM · DPR specimen showing how it attaches to a CIM appendix · the Dr Red Team output from the live demo' },
-      { day: 'T+48h', artifact: 'Send a real CIM teardown (or specimen DPR adapted to their sector — tech / industrial / fintech) showing what the audit catches in their typical deal shape' },
-      { day: 'T+1w', artifact: 'Per-deal pricing confirm + Stripe checkout link · "Audit your next CIM, charged on close"' },
-      { day: 'T+30d', artifact: 'After first deal · ask for 2-3 boutique-firm peer referrals + case-study permission (anonymised)' },
+      {
+        day: 'T+0 (immediately after demo)',
+        artifact:
+          'Free audit voucher on next CIM · DPR specimen showing how it attaches to a CIM appendix · the Dr Red Team output from the live demo',
+      },
+      {
+        day: 'T+48h',
+        artifact:
+          'Send a real CIM teardown (or specimen DPR adapted to their sector — tech / industrial / fintech) showing what the audit catches in their typical deal shape',
+      },
+      {
+        day: 'T+1w',
+        artifact:
+          'Per-deal pricing confirm + Stripe checkout link · "Audit your next CIM, charged on close"',
+      },
+      {
+        day: 'T+30d',
+        artifact:
+          'After first deal · ask for 2-3 boutique-firm peer referrals + case-study permission (anonymised)',
+      },
     ],
-    conversionWindow: '14-21 days · single-meeting close on per-deal pricing · no procurement cycle · MD has the card',
+    conversionWindow:
+      '14-21 days · single-meeting close on per-deal pricing · no procurement cycle · MD has the card',
     whyTheyConvert:
-      'Direct revenue link · per-deal pricing matches their commission-on-close model · the Dr Red Team output is a 60-second proof that the AI catches things their human team misses. Cheaper than one hour of legal work; pays for itself the first time it catches a flaw the buyer\'s IC would have caught.',
+      "Direct revenue link · per-deal pricing matches their commission-on-close model · the Dr Red Team output is a 60-second proof that the AI catches things their human team misses. Cheaper than one hour of legal work; pays for itself the first time it catches a flaw the buyer's IC would have caught.",
     whyTheyDont:
       'Their firm has a "we\'ve been doing this 20 years" cultural posture that defensively rejects external tools. Or they have an in-house adversarial-review process they trust. Force the Evidence Moment with a redacted CIM from a deal they lost — if the audit doesn\'t flag the exact reason it died, accept the no.',
     notebookLmFollowUp:
-      'What\'s the typical mid-market boutique M&A advisor\'s deal cadence and tool budget? Specifically: how many deals/year does a typical 5-person shop close, what\'s the per-deal third-party-tool spend, and where in the workflow does the AI-tool spend currently land?',
+      "What's the typical mid-market boutique M&A advisor's deal cadence and tool budget? Specifically: how many deals/year does a typical 5-person shop close, what's the per-deal third-party-tool spend, and where in the workflow does the AI-tool spend currently land?",
   },
 
   // -----------------------------------------------------------------------
@@ -621,13 +681,13 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       '£149/mo Professional OR £249/mo Individual · paid in 14-30 days · DPR-as-deliverable is the conversion lever',
     whatTheyWant: [
       'A tamper-evident DPR they can attach to every strategy deliverable as an appendix · proves to the client that their recommendation is debiased',
-      'Differentiation against other solo consultants who don\'t have algorithmic rigor proof',
+      "Differentiation against other solo consultants who don't have algorithmic rigor proof",
       'A defensible answer to the client question "how do I know your strategic recommendation isn\'t just YOUR biases?"',
       'Time savings on bias-review — instead of self-auditing, run the audit, attach the artefact, move on',
     ],
     whatKeepsThemUp: [
       'A client who terminates the retainer because they "could just hire McKinsey for the same thing"',
-      'A strategic recommendation that lands badly with the client\'s board → reputation damage → next-retainer-loss',
+      "A strategic recommendation that lands badly with the client's board → reputation damage → next-retainer-loss",
       'A peer consultant landing the same client at a higher rate by claiming better methodology',
       'The universal "consultants have their own biases" critique that erodes trust over time',
     ],
@@ -639,11 +699,11 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       coldBlunder:
         'Pitching it as a tool to replace their judgment — instant defensive shutdown. Frame as ""amplifies your expert intuition while suppressing bias"" — Klein RPD framing, not Kahneman replacement.',
       warmIntroPath:
-        'Wiz advisor (Josh Rainer) → his ex-MBB-now-fractional-CSO network · the founder\'s extended-family McKinsey connections — direct ex-MBB relationships · TASIS England school network → Oxford / LSE / Imperial alumni in fractional-CSO roles.',
+        "Wiz advisor (Josh Rainer) → his ex-MBB-now-fractional-CSO network · the founder's extended-family McKinsey connections — direct ex-MBB relationships · TASIS England school network → Oxford / LSE / Imperial alumni in fractional-CSO roles.",
     },
     discoveryQuestions: {
       opening: [
-        '"How do you currently respond when a client says \'how do I know your recommendation isn\'t just YOUR biases?\'"',
+        "\"How do you currently respond when a client says 'how do I know your recommendation isn't just YOUR biases?'\"",
         '"What\'s your differentiation against other ex-MBB fractional CSOs at the same rate?"',
         '"On a typical strategy engagement, how much time do you spend on self-audit / bias-check before the deliverable goes to the client?"',
       ],
@@ -659,20 +719,35 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       ],
     },
     artefactToLead:
-      'Live audit on a redacted past strategy deck they bring · show the DPR generation in real time · highlight that it attaches as a CIM-style appendix to their existing deliverable. The Klein RPD recognition framing matters more than the Kahneman bias-detection framing — they\'re selling expert intuition, not data.',
+      "Live audit on a redacted past strategy deck they bring · show the DPR generation in real time · highlight that it attaches as a CIM-style appendix to their existing deliverable. The Klein RPD recognition framing matters more than the Kahneman bias-detection framing — they're selling expert intuition, not data.",
     killerPitch:
-      'You sell strategic rigor at £150-500/hr. Your clients know humans have bias. Decision Intel doesn\'t replace your intuition — Klein\'s Recognition-Primed Decision framework AMPLIFIES your expert intuition while suppressing bias, giving you the auditable record to justify your retainer. £149/mo. Attach the DPR to every deliverable. Differentiates you from every other ex-MBB fractional CSO.',
+      "You sell strategic rigor at £150-500/hr. Your clients know humans have bias. Decision Intel doesn't replace your intuition — Klein's Recognition-Primed Decision framework AMPLIFIES your expert intuition while suppressing bias, giving you the auditable record to justify your retainer. £149/mo. Attach the DPR to every deliverable. Differentiates you from every other ex-MBB fractional CSO.",
     threePhrasesNeverToSay: [
       '"Replace your judgment" — instant defensive shutdown · they sell judgment',
       '"Bias detection" alone — feels accusatory · use "amplifies expert intuition while suppressing bias" instead',
       '"Enterprise procurement-grade" — they\'re solo, not procurement · pitch personal-brand differentiation',
     ],
     meetingArc: [
-      { minute: '0:00-1:30', move: 'Frame: "Tamper-evident rigor proof attached to every strategy deliverable. Differentiates you from every other ex-MBB."' },
-      { minute: '1:30-5:00', move: 'Live audit on a redacted past strategy deck they bring · show DPR generation in real time · point at the appendix-attachment shape.' },
-      { minute: '5:00-10:00', move: 'Discovery: "How do you currently answer the \'consultants have biases too\' critique?"' },
-      { minute: '10:00-15:00', move: 'Pricing: £149/mo, cancel anytime, DPR attaches to every deliverable.' },
-      { minute: '15:00-20:00', move: 'Close: "Try it on your next deliverable. If the client doesn\'t notice or care, refund."' },
+      {
+        minute: '0:00-1:30',
+        move: 'Frame: "Tamper-evident rigor proof attached to every strategy deliverable. Differentiates you from every other ex-MBB."',
+      },
+      {
+        minute: '1:30-5:00',
+        move: 'Live audit on a redacted past strategy deck they bring · show DPR generation in real time · point at the appendix-attachment shape.',
+      },
+      {
+        minute: '5:00-10:00',
+        move: 'Discovery: "How do you currently answer the \'consultants have biases too\' critique?"',
+      },
+      {
+        minute: '10:00-15:00',
+        move: 'Pricing: £149/mo, cancel anytime, DPR attaches to every deliverable.',
+      },
+      {
+        minute: '15:00-20:00',
+        move: 'Close: "Try it on your next deliverable. If the client doesn\'t notice or care, refund."',
+      },
     ],
     signalsToListenFor: {
       positive: [
@@ -688,16 +763,29 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       ],
     },
     followUp: [
-      { day: 'T+0 (immediately after demo)', artifact: 'Free 14-day trial · the DPR specimen on the redacted deck they shared · 1-line follow-up "Use it on your next deliverable."' },
+      {
+        day: 'T+0 (immediately after demo)',
+        artifact:
+          'Free 14-day trial · the DPR specimen on the redacted deck they shared · 1-line follow-up "Use it on your next deliverable."',
+      },
       { day: 'T+48h', artifact: 'Check-in: "Did the client notice? What was the reaction?"' },
-      { day: 'T+1w', artifact: 'Stripe checkout link · cancel-anytime framing · "If your clients don\'t engage with the DPR appendix, refund"' },
-      { day: 'T+30d', artifact: 'Renewal check-in + ask for case-study permission (anonymised) + 2-3 ex-MBB peer referrals' },
+      {
+        day: 'T+1w',
+        artifact:
+          'Stripe checkout link · cancel-anytime framing · "If your clients don\'t engage with the DPR appendix, refund"',
+      },
+      {
+        day: 'T+30d',
+        artifact:
+          'Renewal check-in + ask for case-study permission (anonymised) + 2-3 ex-MBB peer referrals',
+      },
     ],
-    conversionWindow: '14-30 days · single-meeting close on monthly subscription · no procurement cycle · solo decision-maker',
+    conversionWindow:
+      '14-30 days · single-meeting close on monthly subscription · no procurement cycle · solo decision-maker',
     whyTheyConvert:
       'Universal "consultants have biases too" critique creates the pull · DPR-as-appendix is the differentiation lever against every other ex-MBB fractional CSO · Klein RPD framing positions DI as amplifier-not-replacer of their expert intuition · cancel-anytime removes risk.',
     whyTheyDont:
-      'They\'re early in their fractional career and price-sensitive · or their clients are non-procurement-grade and won\'t engage with the DPR appendix shape · or they\'re actually at a firm and need partner approval. Force the live-audit Evidence Moment to test which case it is.',
+      "They're early in their fractional career and price-sensitive · or their clients are non-procurement-grade and won't engage with the DPR appendix shape · or they're actually at a firm and need partner approval. Force the live-audit Evidence Moment to test which case it is.",
     notebookLmFollowUp:
       'What\'s the typical solo / fractional CSO retention curve and upsell path? Specifically: when do they convert from £149/mo Professional to £249/mo Individual? When do they bring a client onto the platform as their own design partner (the "client-as-revenue-channel" pattern)? What\'s the LinkedIn-discoverability filter for ex-MBB fractional CSOs in the UK + US?',
   },
@@ -763,13 +851,34 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       '"Boardroom strategic decision" — funds do not have boards; the language cues "this is built for F500, not us"',
     ],
     meetingArc: [
-      { minute: '0:00-1:30', move: 'Frame: "60-second audit on every memo before IC. Here is one we ran on Dangote 2014."' },
-      { minute: '1:30-3:00', move: 'Live audit on a redacted IC memo they brought (or on Dangote DPR if they did not).' },
-      { minute: '3:00-5:00', move: 'Walk through 2-3 flagged biases and the regulatory framework cross-mapping.' },
-      { minute: '5:00-7:00', move: 'Show DQI + counterfactual + Client-Safe Export Mode for LP reporting.' },
-      { minute: '7:00-12:00', move: 'Discovery questions (above) — surface the post-close partner-question pain.' },
-      { minute: '12:00-18:00', move: 'Discuss Design Partnership shape: 3 retro-audits + live IC memos for 6 months at £2,499/mo.' },
-      { minute: '18:00-20:00', move: 'Close: "Two slots remain in the design-partner cohort. Are you the Pan-African anchor?"' },
+      {
+        minute: '0:00-1:30',
+        move: 'Frame: "60-second audit on every memo before IC. Here is one we ran on Dangote 2014."',
+      },
+      {
+        minute: '1:30-3:00',
+        move: 'Live audit on a redacted IC memo they brought (or on Dangote DPR if they did not).',
+      },
+      {
+        minute: '3:00-5:00',
+        move: 'Walk through 2-3 flagged biases and the regulatory framework cross-mapping.',
+      },
+      {
+        minute: '5:00-7:00',
+        move: 'Show DQI + counterfactual + Client-Safe Export Mode for LP reporting.',
+      },
+      {
+        minute: '7:00-12:00',
+        move: 'Discovery questions (above) — surface the post-close partner-question pain.',
+      },
+      {
+        minute: '12:00-18:00',
+        move: 'Discuss Design Partnership shape: 3 retro-audits + live IC memos for 6 months at £2,499/mo.',
+      },
+      {
+        minute: '18:00-20:00',
+        move: 'Close: "Two slots remain in the design-partner cohort. Are you the Pan-African anchor?"',
+      },
     ],
     signalsToListenFor: {
       positive: [
@@ -785,10 +894,26 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       ],
     },
     followUp: [
-      { day: 'T+0 (4 hours after meeting)', artifact: 'Thank-you note + Dangote DPR + the 2008 financial-crisis paper PDF + 1-page summary of what was discussed' },
-      { day: 'T+24h', artifact: 'Live audit run on a redacted version of THEIR memo, with the 2-3 biggest flags + counterfactual delta highlighted' },
-      { day: 'T+72h', artifact: 'Design-partnership term sheet (1 page): £2,499/mo, 6 months, 3 retro-audits + live IC, weekly Brier-score sync, Outcome Gate enforced contractually' },
-      { day: 'T+7d', artifact: 'Single concrete next step: "Either the term sheet works, or we found we are not a fit. Either way I want to know by Friday."' },
+      {
+        day: 'T+0 (4 hours after meeting)',
+        artifact:
+          'Thank-you note + Dangote DPR + the 2008 financial-crisis paper PDF + 1-page summary of what was discussed',
+      },
+      {
+        day: 'T+24h',
+        artifact:
+          'Live audit run on a redacted version of THEIR memo, with the 2-3 biggest flags + counterfactual delta highlighted',
+      },
+      {
+        day: 'T+72h',
+        artifact:
+          'Design-partnership term sheet (1 page): £2,499/mo, 6 months, 3 retro-audits + live IC, weekly Brier-score sync, Outcome Gate enforced contractually',
+      },
+      {
+        day: 'T+7d',
+        artifact:
+          'Single concrete next step: "Either the term sheet works, or we found we are not a fit. Either way I want to know by Friday."',
+      },
     ],
     conversionWindow: '2-3 meetings · 4-6 weeks · paid contract or paid no within 60 days',
     whyTheyConvert:
@@ -809,7 +934,8 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       'Reports to CEO · $50-150M strategy budget · ships 40-60 strategic recommendations / year · audit-committee + board are the ultimate consumers · incumbent advisor: McKinsey / BCG / Bain at $500K-$5M per engagement · 6-12 month procurement cycle requires SOC 2 Type II + EU AI Act mapping + audit-committee sign-off · this is the unicorn revenue ceiling, NOT the 30-day target',
     buyerType: 'expansion',
     priority: 'q4_2026',
-    ticketBand: '£50-150K ARR · multi-seat Strategy contract · 12-month auto-renew · enterprise security review',
+    ticketBand:
+      '£50-150K ARR · multi-seat Strategy contract · 12-month auto-renew · enterprise security review',
     whatTheyWant: [
       'A 60-second hygiene step BETWEEN the analyst and the steering committee — names the exact biases the room will catch first',
       'A board-ready DPR artefact for every recommendation — defends the call when audit committee asks "how was this decided"',
@@ -852,19 +978,37 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
     artefactToLead:
       'WeWork S-1 DPR (public/dpr-sample-wework.pdf) — anonymised 2019 audit on the famously biased filing — surfaces founder-overconfidence, anchoring, and disclosure-asymmetry. Pair with the 2008 paper as the credibility anchor.',
     killerPitch:
-      'You don\'t have a process for auditing strategic memos before they reach the board, because three years ago it was not technically possible. Now it is. Decision Intel is the 60-second hygiene step between your analyst and the committee — it makes your VP of Strategy the adult in the room on every recommendation.',
+      "You don't have a process for auditing strategic memos before they reach the board, because three years ago it was not technically possible. Now it is. Decision Intel is the 60-second hygiene step between your analyst and the committee — it makes your VP of Strategy the adult in the room on every recommendation.",
     threePhrasesNeverToSay: [
       '"Replace your consultants" — CSO needs consultants for political cover; never positioned as a competitor',
       '"AI-powered strategic platform" — buzzword bingo; CSO has heard it from 14 vendors this year',
       '"For founders / for individual users" — F500 CSO disqualifies as not procurement-grade in 2 seconds',
     ],
     meetingArc: [
-      { minute: '0:00-1:30', move: 'Frame: "Hygiene step between analyst and steering committee. Here is the WeWork S-1 audit."' },
-      { minute: '1:30-3:00', move: 'Walk through the WeWork DPR — biases flagged, regulatory mapping, DQI score, audit-committee artefact shape.' },
-      { minute: '3:00-5:00', move: 'Live audit on a redacted memo they brought (or offer to do this on the next call if they did not).' },
-      { minute: '5:00-12:00', move: 'Discovery questions — surface the steering-committee pain, the audit-committee documentation gap, the EU AI Act Art 14 timing.' },
-      { minute: '12:00-18:00', move: 'Position: 6-month enterprise pilot, 30 live memos + 5 retro, security review starts in parallel.' },
-      { minute: '18:00-20:00', move: 'Close: "What is the next step on your side? Who else needs to see the WeWork DPR?"' },
+      {
+        minute: '0:00-1:30',
+        move: 'Frame: "Hygiene step between analyst and steering committee. Here is the WeWork S-1 audit."',
+      },
+      {
+        minute: '1:30-3:00',
+        move: 'Walk through the WeWork DPR — biases flagged, regulatory mapping, DQI score, audit-committee artefact shape.',
+      },
+      {
+        minute: '3:00-5:00',
+        move: 'Live audit on a redacted memo they brought (or offer to do this on the next call if they did not).',
+      },
+      {
+        minute: '5:00-12:00',
+        move: 'Discovery questions — surface the steering-committee pain, the audit-committee documentation gap, the EU AI Act Art 14 timing.',
+      },
+      {
+        minute: '12:00-18:00',
+        move: 'Position: 6-month enterprise pilot, 30 live memos + 5 retro, security review starts in parallel.',
+      },
+      {
+        minute: '18:00-20:00',
+        move: 'Close: "What is the next step on your side? Who else needs to see the WeWork DPR?"',
+      },
     ],
     signalsToListenFor: {
       positive: [
@@ -880,12 +1024,29 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       ],
     },
     followUp: [
-      { day: 'T+4h', artifact: 'Thank-you + WeWork DPR + the 2008 paper + 1-page summary of the strategic-memo audit pain we surfaced' },
-      { day: 'T+48h', artifact: 'Live audit run on a redacted recent memo (if they shared one) OR a famous failed strategic call from their industry' },
-      { day: 'T+1w', artifact: 'Enterprise pilot proposal: 6 months, 30 live + 5 retro, security review schedule, success metric, conversion price' },
-      { day: 'T+2w', artifact: 'Single concrete next step — "Procurement intro by next Friday or this is not the right time for your org"' },
+      {
+        day: 'T+4h',
+        artifact:
+          'Thank-you + WeWork DPR + the 2008 paper + 1-page summary of the strategic-memo audit pain we surfaced',
+      },
+      {
+        day: 'T+48h',
+        artifact:
+          'Live audit run on a redacted recent memo (if they shared one) OR a famous failed strategic call from their industry',
+      },
+      {
+        day: 'T+1w',
+        artifact:
+          'Enterprise pilot proposal: 6 months, 30 live + 5 retro, security review schedule, success metric, conversion price',
+      },
+      {
+        day: 'T+2w',
+        artifact:
+          'Single concrete next step — "Procurement intro by next Friday or this is not the right time for your org"',
+      },
     ],
-    conversionWindow: '4-6 meetings · 12-24 weeks · enterprise procurement timeline · contract by month 6 of conversation',
+    conversionWindow:
+      '4-6 meetings · 12-24 weeks · enterprise procurement timeline · contract by month 6 of conversation',
     whyTheyConvert:
       'The WeWork DPR makes the audit committee comfortable. The R²F intellectual moat (Kahneman + Klein synthesis) survives McKinsey-trained scrutiny. The 17-framework regulatory map clears procurement on first pass. The DPR is the EU AI Act Art 14 answer that nobody else has.',
     whyTheyDont:
@@ -909,7 +1070,7 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
     whatTheyWant: [
       'Pre-IC bias audit on the deal thesis — confirmation, sunk-cost, base-rate neglect surfaced BEFORE the partner vote',
       'Cross-document conflict detection on the deal room (CIM + financial model + counsel memo + IC deck) — all 4 audited together',
-      'Historical-pattern matching against the 135-case library — "this thesis hits the same pattern Kraft-Heinz did on Unilever"',
+      'Historical-pattern matching against the 143-case library — "this thesis hits the same pattern Kraft-Heinz did on Unilever"',
       'Deal-level composite DQI + tamper-evident DPR for post-close diligence reviews',
     ],
     whatKeepsThemUp: [
@@ -922,7 +1083,7 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       coldChannel:
         'LinkedIn DM with the WeWork DPR + a teaser flag from the 2014 Dangote expansion (cross-border M&A precedent). Warm intro via Wiz advisor or via a portfolio CFO who has used DI on a strategy memo.',
       coldOpener:
-        'Pre-IC bias audit on the deal thesis in 60 seconds. Cross-document conflict detection across CIM, model, counsel memo, IC deck. Pattern-match against 135 deal-failure cases. Worth a 20-min call before your next IC?',
+        'Pre-IC bias audit on the deal thesis in 60 seconds. Cross-document conflict detection across CIM, model, counsel memo, IC deck. Pattern-match against 143 deal-failure cases. Worth a 20-min call before your next IC?',
       coldBlunder:
         '"M&A intelligence platform" — buyer hears Quantexa or DealCloud, defaults to "we already have that." Lead with the bias-audit + the historical-pattern match, NOT the data layer.',
       warmIntroPath:
@@ -955,18 +1116,36 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       '"Replace diligence" — never; we are the LAYER ON TOP of diligence, the bias-audit + reasoning-record-keeping artefact',
     ],
     meetingArc: [
-      { minute: '0:00-1:30', move: 'Frame: "Bias audit + cross-doc conflict + DPR for the audit committee."' },
-      { minute: '1:30-4:00', move: 'Live audit on a redacted IC deck or on the WeWork S-1 — show 4-doc cross-reference (CIM + model + counsel + IC deck).' },
-      { minute: '4:00-7:00', move: 'Walk historical-pattern match: "your thesis hits the same pattern Kraft-Heinz did on Unilever — here is the counterfactual."' },
-      { minute: '7:00-12:00', move: 'Discovery — surface the post-close partner-question pain, the IC-cycle bottleneck.' },
-      { minute: '12:00-18:00', move: 'Pricing options — per-deal vs annual seat. Pilot shape: 3 deals + 5 retro.' },
-      { minute: '18:00-20:00', move: 'Close: "When is the next IC? Can we run the audit on that thesis BEFORE the vote?"' },
+      {
+        minute: '0:00-1:30',
+        move: 'Frame: "Bias audit + cross-doc conflict + DPR for the audit committee."',
+      },
+      {
+        minute: '1:30-4:00',
+        move: 'Live audit on a redacted IC deck or on the WeWork S-1 — show 4-doc cross-reference (CIM + model + counsel + IC deck).',
+      },
+      {
+        minute: '4:00-7:00',
+        move: 'Walk historical-pattern match: "your thesis hits the same pattern Kraft-Heinz did on Unilever — here is the counterfactual."',
+      },
+      {
+        minute: '7:00-12:00',
+        move: 'Discovery — surface the post-close partner-question pain, the IC-cycle bottleneck.',
+      },
+      {
+        minute: '12:00-18:00',
+        move: 'Pricing options — per-deal vs annual seat. Pilot shape: 3 deals + 5 retro.',
+      },
+      {
+        minute: '18:00-20:00',
+        move: 'Close: "When is the next IC? Can we run the audit on that thesis BEFORE the vote?"',
+      },
     ],
     signalsToListenFor: {
       positive: [
         'They name a specific deal where the IC voter caught a blind spot post-close',
         'They ask about cross-document conflict detection unprompted',
-        'They volunteer the audit committee\'s next-meeting date',
+        "They volunteer the audit committee's next-meeting date",
         'They reference a specific historical M&A failure and ask "would you have caught this"',
       ],
       negative: [
@@ -976,14 +1155,31 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       ],
     },
     followUp: [
-      { day: 'T+4h', artifact: 'Thank-you + WeWork DPR + cross-doc conflict cheat-sheet (1 page) + the 2008 paper as credibility anchor' },
-      { day: 'T+24h', artifact: 'Live audit run on a redacted recent deal thesis (if shared) OR on a public M&A failure in their sector' },
-      { day: 'T+1w', artifact: '3-deal pilot proposal — pre-IC audit + 5 retro audits, weekly Brier sync, deal-level DPR for audit committee, $X per deal or $Y annual seat pricing' },
-      { day: 'T+2w', artifact: 'Single concrete next step — "Pre-IC audit on your next deal by Friday, or we are not the right tool for this cycle"' },
+      {
+        day: 'T+4h',
+        artifact:
+          'Thank-you + WeWork DPR + cross-doc conflict cheat-sheet (1 page) + the 2008 paper as credibility anchor',
+      },
+      {
+        day: 'T+24h',
+        artifact:
+          'Live audit run on a redacted recent deal thesis (if shared) OR on a public M&A failure in their sector',
+      },
+      {
+        day: 'T+1w',
+        artifact:
+          '3-deal pilot proposal — pre-IC audit + 5 retro audits, weekly Brier sync, deal-level DPR for audit committee, $X per deal or $Y annual seat pricing',
+      },
+      {
+        day: 'T+2w',
+        artifact:
+          'Single concrete next step — "Pre-IC audit on your next deal by Friday, or we are not the right tool for this cycle"',
+      },
     ],
-    conversionWindow: '3-5 meetings · 8-16 weeks · IC-cycle aligned · paid pilot by month 3 of conversation',
+    conversionWindow:
+      '3-5 meetings · 8-16 weeks · IC-cycle aligned · paid pilot by month 3 of conversation',
     whyTheyConvert:
-      'The 60-second pre-IC audit is genuinely 10× faster than the next 60 seconds of analyst review. The historical-pattern match against the 135-case library is unfakeable. The deal-level DPR is the artefact the audit committee already asks for verbally; we just generate it.',
+      'The 60-second pre-IC audit is genuinely 10× faster than the next 60 seconds of analyst review. The historical-pattern match against the 143-case library is unfakeable. The deal-level DPR is the artefact the audit committee already asks for verbally; we just generate it.',
     whyTheyDont:
       'Their existing diligence-tool stack (Datasite + Intralinks + a custom M&A scorecard) is sticky and they see DI as redundant. Counter: the bias-audit + DPR is NOT in any of those tools; we are layer-on-top, not replacement. Show them.',
     notebookLmFollowUp:
@@ -1051,11 +1247,26 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       '"Cloud-hosted on Vercel + Supabase" without context — leads to data-residency questions; lead with regulatory framework coverage, then technical posture',
     ],
     meetingArc: [
-      { minute: '0:00-2:00', move: 'Frame: "EU AI Act Art 14 + SOX + Basel III + GDPR Art 22 + 17-framework map. We are the artefact that satisfies all five."' },
-      { minute: '2:00-5:00', move: 'Walk through the DPR cover page → integrity fingerprints → regulatory-mapping section → reviewer-decisions HITL log → data-lifecycle footer.' },
-      { minute: '5:00-10:00', move: 'Walk through the Terms appendix — indemnification, SLA, exit assistance, sub-processor change notification, audit rights.' },
-      { minute: '10:00-15:00', move: 'Discovery — surface the GC\'s specific framework concerns + vendor-risk-register gates.' },
-      { minute: '15:00-20:00', move: 'Procurement timeline — security review, legal review, vendor risk, contract — agreed sequencing.' },
+      {
+        minute: '0:00-2:00',
+        move: 'Frame: "EU AI Act Art 14 + SOX + Basel III + GDPR Art 22 + 17-framework map. We are the artefact that satisfies all five."',
+      },
+      {
+        minute: '2:00-5:00',
+        move: 'Walk through the DPR cover page → integrity fingerprints → regulatory-mapping section → reviewer-decisions HITL log → data-lifecycle footer.',
+      },
+      {
+        minute: '5:00-10:00',
+        move: 'Walk through the Terms appendix — indemnification, SLA, exit assistance, sub-processor change notification, audit rights.',
+      },
+      {
+        minute: '10:00-15:00',
+        move: "Discovery — surface the GC's specific framework concerns + vendor-risk-register gates.",
+      },
+      {
+        minute: '15:00-20:00',
+        move: 'Procurement timeline — security review, legal review, vendor risk, contract — agreed sequencing.',
+      },
     ],
     signalsToListenFor: {
       positive: [
@@ -1071,12 +1282,29 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       ],
     },
     followUp: [
-      { day: 'T+4h', artifact: 'Thank-you + DPR specimen PDF + Terms appendix + DPA template + sub-processor list + 1-page summary of compliance posture' },
-      { day: 'T+48h', artifact: 'Specific responses to each procurement question raised (in writing) + vendor-risk-register draft answers' },
-      { day: 'T+1w', artifact: 'Procurement-timeline proposal — security review week 1-2, legal review week 2-3, contract negotiation week 3-4' },
-      { day: 'T+2w', artifact: 'Single concrete next step — "Vendor-risk-register sign-off by Friday or we move target sign date to next quarter"' },
+      {
+        day: 'T+4h',
+        artifact:
+          'Thank-you + DPR specimen PDF + Terms appendix + DPA template + sub-processor list + 1-page summary of compliance posture',
+      },
+      {
+        day: 'T+48h',
+        artifact:
+          'Specific responses to each procurement question raised (in writing) + vendor-risk-register draft answers',
+      },
+      {
+        day: 'T+1w',
+        artifact:
+          'Procurement-timeline proposal — security review week 1-2, legal review week 2-3, contract negotiation week 3-4',
+      },
+      {
+        day: 'T+2w',
+        artifact:
+          'Single concrete next step — "Vendor-risk-register sign-off by Friday or we move target sign date to next quarter"',
+      },
     ],
-    conversionWindow: '4-8 weeks of procurement-stage work · runs in parallel with the CSO or M&A buying conversation · NOT a separate sales cycle, a separate gate',
+    conversionWindow:
+      '4-8 weeks of procurement-stage work · runs in parallel with the CSO or M&A buying conversation · NOT a separate sales cycle, a separate gate',
     whyTheyConvert:
       'The DPR + Terms appendix is the most procurement-grade vendor artefact they have seen for a SaaS in their inbox this year. The 17-framework map closes the regulatory gap they were already worrying about. The trust-copy.ts vocabulary discipline ("hashed + tamper-evident", not "signed + hashed") signals operational honesty.',
     whyTheyDont:
@@ -1138,19 +1366,37 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
     artefactToLead:
       'A category-conversation deck (peer-level) — NOT a sales deck. The 2008 paper + the R²F intellectual moat + the 17-framework regulatory map. Layer the WeWork DPR as a working artefact later in the conversation.',
     killerPitch:
-      'McKinsey provides the strategy. Decision Intel provides the continuous audit and the EU AI Act Article 14 regulatory record. We are not a competitor to the QuantumBlack engagement — we are the artefact that ships with it, signed off by the client\'s audit committee, that proves you delivered governance and not just analytical insight.',
+      "McKinsey provides the strategy. Decision Intel provides the continuous audit and the EU AI Act Article 14 regulatory record. We are not a competitor to the QuantumBlack engagement — we are the artefact that ships with it, signed off by the client's audit committee, that proves you delivered governance and not just analytical insight.",
     threePhrasesNeverToSay: [
       '"Disrupt consulting" — instant defensive shutdown; the partner\'s entire P&L is the engagement',
       '"Replace your AI bias review" — never; we are the artefact, they are the process',
       '"Sell directly to your clients" — channel partnerships die when the partner suspects you will end-run them',
     ],
     meetingArc: [
-      { minute: '0:00-2:00', move: 'Frame: peer-level category conversation. "We are the audit layer; you are the strategy seat."' },
-      { minute: '2:00-7:00', move: 'Walk through the R²F intellectual moat + 17-framework regulatory map + the EU AI Act Art 14 timing argument.' },
-      { minute: '7:00-12:00', move: 'Discovery — surface engagement-margin pressure + client-side AI-governance questions.' },
-      { minute: '12:00-18:00', move: 'Position: 90-day co-pilot, one live engagement, joint co-publishable deliverable.' },
-      { minute: '18:00-25:00', move: 'Discuss alliance commercial structure (rev share / per-seat / embedded license / co-marketing).' },
-      { minute: '25:00-30:00', move: 'Close: "What is the next step on the alliances side? Who needs to see this?"' },
+      {
+        minute: '0:00-2:00',
+        move: 'Frame: peer-level category conversation. "We are the audit layer; you are the strategy seat."',
+      },
+      {
+        minute: '2:00-7:00',
+        move: 'Walk through the R²F intellectual moat + 17-framework regulatory map + the EU AI Act Art 14 timing argument.',
+      },
+      {
+        minute: '7:00-12:00',
+        move: 'Discovery — surface engagement-margin pressure + client-side AI-governance questions.',
+      },
+      {
+        minute: '12:00-18:00',
+        move: 'Position: 90-day co-pilot, one live engagement, joint co-publishable deliverable.',
+      },
+      {
+        minute: '18:00-25:00',
+        move: 'Discuss alliance commercial structure (rev share / per-seat / embedded license / co-marketing).',
+      },
+      {
+        minute: '25:00-30:00',
+        move: 'Close: "What is the next step on the alliances side? Who needs to see this?"',
+      },
     ],
     signalsToListenFor: {
       positive: [
@@ -1166,12 +1412,29 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       ],
     },
     followUp: [
-      { day: 'T+4h', artifact: 'Peer-level thank-you + 2008 paper + R²F architecture overview + 17-framework regulatory map summary' },
-      { day: 'T+48h', artifact: 'Co-pilot engagement proposal — 90-day, one live engagement, joint deliverable, alliance commercial structure draft' },
-      { day: 'T+1w', artifact: 'Joint co-publishable content draft — "AI governance and decision provenance: the EU AI Act Art 14 answer" white paper outline' },
-      { day: 'T+2w', artifact: 'Single concrete next step — "Alliances introduction by Friday or we are evaluating the BCG GAMMA + Bain alliance paths in parallel"' },
+      {
+        day: 'T+4h',
+        artifact:
+          'Peer-level thank-you + 2008 paper + R²F architecture overview + 17-framework regulatory map summary',
+      },
+      {
+        day: 'T+48h',
+        artifact:
+          'Co-pilot engagement proposal — 90-day, one live engagement, joint deliverable, alliance commercial structure draft',
+      },
+      {
+        day: 'T+1w',
+        artifact:
+          'Joint co-publishable content draft — "AI governance and decision provenance: the EU AI Act Art 14 answer" white paper outline',
+      },
+      {
+        day: 'T+2w',
+        artifact:
+          'Single concrete next step — "Alliances introduction by Friday or we are evaluating the BCG GAMMA + Bain alliance paths in parallel"',
+      },
     ],
-    conversionWindow: '6-12 weeks for partnership agreement · 3-6 months for first co-engagement · long-tail F500 CSO direct ARR pulls through over 12-24 months',
+    conversionWindow:
+      '6-12 weeks for partnership agreement · 3-6 months for first co-engagement · long-tail F500 CSO direct ARR pulls through over 12-24 months',
     whyTheyConvert:
       'The R²F intellectual moat survives partner-level scrutiny. The EU AI Act Art 14 regulatory tailwind is timing they can sell to their CSO clients THIS quarter. The co-publishable angle elevates both brands and gives the partner a name-on-paper outcome.',
     whyTheyDont:
@@ -1241,11 +1504,26 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       '"For 16-year-old solo founders" — disqualifies you from the C-level conversation',
     ],
     meetingArc: [
-      { minute: '0:00-2:00', move: 'Frame: peer-level category conversation. "We are the AI-native reasoning-audit layer that fits inside your service stack."' },
-      { minute: '2:00-10:00', move: 'Walk through DI architecture + 17-framework regulatory map + the specific fit with their service lines (LRQA = EiQ + Partner Africa).' },
-      { minute: '10:00-18:00', move: 'Discovery — surface AI-disruption pressure + EU AI Act timing + EM-region governance gap.' },
-      { minute: '18:00-25:00', move: 'Position: 90-day pilot embedded in one of their live engagements, joint co-publishable deliverable, alliance commercial structure draft.' },
-      { minute: '25:00-30:00', move: 'Close: "What is the next step internally? Who needs to see this?"' },
+      {
+        minute: '0:00-2:00',
+        move: 'Frame: peer-level category conversation. "We are the AI-native reasoning-audit layer that fits inside your service stack."',
+      },
+      {
+        minute: '2:00-10:00',
+        move: 'Walk through DI architecture + 17-framework regulatory map + the specific fit with their service lines (LRQA = EiQ + Partner Africa).',
+      },
+      {
+        minute: '10:00-18:00',
+        move: 'Discovery — surface AI-disruption pressure + EU AI Act timing + EM-region governance gap.',
+      },
+      {
+        minute: '18:00-25:00',
+        move: 'Position: 90-day pilot embedded in one of their live engagements, joint co-publishable deliverable, alliance commercial structure draft.',
+      },
+      {
+        minute: '25:00-30:00',
+        move: 'Close: "What is the next step internally? Who needs to see this?"',
+      },
     ],
     signalsToListenFor: {
       positive: [
@@ -1261,12 +1539,29 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       ],
     },
     followUp: [
-      { day: 'T+4h', artifact: 'Peer-level thank-you + 2008 paper + R²F architecture overview + 17-framework regulatory map summary + the integration paths specific to their service lines' },
-      { day: 'T+48h', artifact: 'Co-pilot engagement proposal — 90-day, one service line, joint deliverable, alliance commercial structure draft' },
-      { day: 'T+1w', artifact: 'Joint co-publishable content draft — e.g., "AI Governance for EM-Region Supply Chains: an LRQA × Decision Intel perspective"' },
-      { day: 'T+2w', artifact: 'Single concrete next step — "Alliances introduction by Friday or we are evaluating other channel paths in parallel"' },
+      {
+        day: 'T+4h',
+        artifact:
+          'Peer-level thank-you + 2008 paper + R²F architecture overview + 17-framework regulatory map summary + the integration paths specific to their service lines',
+      },
+      {
+        day: 'T+48h',
+        artifact:
+          'Co-pilot engagement proposal — 90-day, one service line, joint deliverable, alliance commercial structure draft',
+      },
+      {
+        day: 'T+1w',
+        artifact:
+          'Joint co-publishable content draft — e.g., "AI Governance for EM-Region Supply Chains: an LRQA × Decision Intel perspective"',
+      },
+      {
+        day: 'T+2w',
+        artifact:
+          'Single concrete next step — "Alliances introduction by Friday or we are evaluating other channel paths in parallel"',
+      },
     ],
-    conversionWindow: '8-16 weeks for partnership agreement · 3-6 months for first co-engagement · long-tail enterprise pull-through over 12-24 months',
+    conversionWindow:
+      '8-16 weeks for partnership agreement · 3-6 months for first co-engagement · long-tail enterprise pull-through over 12-24 months',
     whyTheyConvert:
       'The EU AI Act Art 14 timing pressure on their enterprise clients is real and immediate. Their service line (LRQA EiQ, BV Quality, SGS Risk Management) needs an AI-native augmentation to defend margin against AI-native disruptors. DI fills that gap without competing.',
     whyTheyDont:
@@ -1336,11 +1631,26 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       '"Just need our first customer" — pre-seed investors fund teams + thesis, not desperation',
     ],
     meetingArc: [
-      { minute: '0:00-2:00', move: 'Frame: native reasoning layer + Pan-African wedge + EU AI Act timing.' },
-      { minute: '2:00-10:00', move: 'Pitch deck — slides 1-9 (problem, R²F moat, regulatory tailwind, wedge, product).' },
-      { minute: '10:00-18:00', move: 'HonestProbabilityPath conditional-probability slide + 16 investor metrics tracker.' },
-      { minute: '18:00-25:00', move: 'Founder continuity playbook + Wiz-advisor unfair-network slide.' },
-      { minute: '25:00-30:00', move: 'Ask: £4-8M pre-seed at £20-30M pre-money + use-of-funds (3 paid design partners + GTM hire + ISA 2007 + DQI CIs + EU residency).' },
+      {
+        minute: '0:00-2:00',
+        move: 'Frame: native reasoning layer + Pan-African wedge + EU AI Act timing.',
+      },
+      {
+        minute: '2:00-10:00',
+        move: 'Pitch deck — slides 1-9 (problem, R²F moat, regulatory tailwind, wedge, product).',
+      },
+      {
+        minute: '10:00-18:00',
+        move: 'HonestProbabilityPath conditional-probability slide + 16 investor metrics tracker.',
+      },
+      {
+        minute: '18:00-25:00',
+        move: 'Founder continuity playbook + Wiz-advisor unfair-network slide.',
+      },
+      {
+        minute: '25:00-30:00',
+        move: 'Ask: £4-8M pre-seed at £20-30M pre-money + use-of-funds (3 paid design partners + GTM hire + ISA 2007 + DQI CIs + EU residency).',
+      },
     ],
     signalsToListenFor: {
       positive: [
@@ -1356,10 +1666,26 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       ],
     },
     followUp: [
-      { day: 'T+4h', artifact: 'Thank-you + the 12-slide pre-seed deck PDF + the 2008 paper as voice-anchoring proof + the WeWork DPR as product-shape proof' },
-      { day: 'T+48h', artifact: 'Specific responses to their diligence questions (in writing) — wedge metrics, design-partner pipeline status, continuity playbook' },
-      { day: 'T+1w', artifact: 'Reference-call request — Wiz advisor + 1-2 design-partner conversations (with permission)' },
-      { day: 'T+2w', artifact: 'Single concrete next step — "Term sheet by Friday or we close the round with the lead investor on parallel timeline"' },
+      {
+        day: 'T+4h',
+        artifact:
+          'Thank-you + the 12-slide pre-seed deck PDF + the 2008 paper as voice-anchoring proof + the WeWork DPR as product-shape proof',
+      },
+      {
+        day: 'T+48h',
+        artifact:
+          'Specific responses to their diligence questions (in writing) — wedge metrics, design-partner pipeline status, continuity playbook',
+      },
+      {
+        day: 'T+1w',
+        artifact:
+          'Reference-call request — Wiz advisor + 1-2 design-partner conversations (with permission)',
+      },
+      {
+        day: 'T+2w',
+        artifact:
+          'Single concrete next step — "Term sheet by Friday or we close the round with the lead investor on parallel timeline"',
+      },
     ],
     conversionWindow: '4-6 meetings · 6-12 weeks · pre-seed close in 12-16 weeks of process',
     whyTheyConvert:
@@ -1427,10 +1753,22 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       '"What should I do next" — pull the agenda, never push it onto the advisor',
     ],
     meetingArc: [
-      { minute: '0:00-3:00', move: 'Closed-loop on prior asks — outcomes of prior introductions, deal-stage progression, lessons learned.' },
-      { minute: '3:00-12:00', move: 'Specific pre-qualified ask of the meeting — "I want intro to X for Y reason. I have prepared Z. What should I add?"' },
-      { minute: '12:00-25:00', move: 'Strategic question — "based on your Wiz GTM lens, what would you do differently in the next 90 days?"' },
-      { minute: '25:00-30:00', move: 'Confirm next-meeting agenda + immediate-next-action commitments on both sides.' },
+      {
+        minute: '0:00-3:00',
+        move: 'Closed-loop on prior asks — outcomes of prior introductions, deal-stage progression, lessons learned.',
+      },
+      {
+        minute: '3:00-12:00',
+        move: 'Specific pre-qualified ask of the meeting — "I want intro to X for Y reason. I have prepared Z. What should I add?"',
+      },
+      {
+        minute: '12:00-25:00',
+        move: 'Strategic question — "based on your Wiz GTM lens, what would you do differently in the next 90 days?"',
+      },
+      {
+        minute: '25:00-30:00',
+        move: 'Confirm next-meeting agenda + immediate-next-action commitments on both sides.',
+      },
     ],
     signalsToListenFor: {
       positive: [
@@ -1446,12 +1784,26 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       ],
     },
     followUp: [
-      { day: 'T+4h', artifact: 'Closed-loop summary of the meeting + the specific next-action commitments + the 1-pager update on Decision Intel progress' },
-      { day: 'T+48h', artifact: 'Following up on each introduction made in the meeting — "had the call with X on Friday, here is what came of it"' },
-      { day: 'T+1w', artifact: 'Pre-prepared agenda for next meeting — specific asks, closed-loop on prior actions, strategic question' },
+      {
+        day: 'T+4h',
+        artifact:
+          'Closed-loop summary of the meeting + the specific next-action commitments + the 1-pager update on Decision Intel progress',
+      },
+      {
+        day: 'T+48h',
+        artifact:
+          'Following up on each introduction made in the meeting — "had the call with X on Friday, here is what came of it"',
+      },
+      {
+        day: 'T+1w',
+        artifact:
+          'Pre-prepared agenda for next meeting — specific asks, closed-loop on prior actions, strategic question',
+      },
     ],
-    conversionWindow: 'Ongoing relationship · cadence is the metric, not the conversion · monthly 1:1 + ad-hoc check-ins · 6-month equity / retainer formalization decision',
-    whyTheyConvert: 'Already converted — the relationship exists. The lever is the cadence quality + the specific-ask discipline.',
+    conversionWindow:
+      'Ongoing relationship · cadence is the metric, not the conversion · monthly 1:1 + ad-hoc check-ins · 6-month equity / retainer formalization decision',
+    whyTheyConvert:
+      'Already converted — the relationship exists. The lever is the cadence quality + the specific-ask discipline.',
     whyTheyDont:
       'Founder lapses on closed-loop feedback. Founder asks for vague introductions. Founder fails to act on the introductions made (lets the warm thread go cold). Each is a relationship-erosion signal — fix immediately.',
     notebookLmFollowUp:
@@ -1489,7 +1841,7 @@ export const R2F_CURRENT: R2FCurrentPillar[] = [
     label: 'Klein side · Recognition (System 1 pattern matching)',
     pipelineNodes: ['rpdRecognition', 'forgottenQuestions', 'preMortem'],
     whatItDoes:
-      'Surfaces historical analogues from the 135-case library · runs narrative "war story" pre-mortems · pattern-matches the deal thesis against prior failures and successes · raises the questions the analyst forgot to ask.',
+      'Surfaces historical analogues from the 143-case library · runs narrative "war story" pre-mortems · pattern-matches the deal thesis against prior failures and successes · raises the questions the analyst forgot to ask.',
     whyItMatters:
       'Amplifies the expert intuition that earned the recommendation a seat at the table in the first place. The Klein side IS the message that lands with senior buyers: "your 20 years of pattern recognition is your sharpest asset; we just protect it from occasional blind spots."',
   },
@@ -1548,7 +1900,8 @@ export const R2F_MOAT_LEVERS: R2FMoatLever[] = [
     howItDeepensMoat:
       'Static weights are easy to clone. Dynamic environmental-validity weighting is a research-backed feature that requires understanding the 2009 paper at depth. Competitors will try to copy after we publish, but by then we own the academic vocabulary AND the implementation.',
     estimatedEffort: 'medium',
-    estimatedCost: '3-4 weeks engineering + minimal added cost (single classification call per memo)',
+    estimatedCost:
+      '3-4 weeks engineering + minimal added cost (single classification call per memo)',
     shipBy: 'Q2 2026 — ship before Q3 DPR vocabulary refresh',
   },
   {
@@ -1654,7 +2007,8 @@ export const CATEGORY_DEFINITION: CategoryDefinition = {
         'Use this transition the moment the cold reader leans in. By minute 3 of the meeting they should be using the warm vocabulary — DPR, R²F, DQI — without it sounding foreign.',
     },
     {
-      context: 'Warm (second meeting onward, pitch decks, design-partner conversations, internal Founder Hub)',
+      context:
+        'Warm (second meeting onward, pitch decks, design-partner conversations, internal Founder Hub)',
       useThisLanguage:
         '"Native reasoning layer for every high-stakes call." "Recognition-Rigor Framework arbitrating Kahneman + Klein." "Decision Quality Index in 60 seconds." "Hashed + tamper-evident Decision Provenance Record."',
       example:
@@ -1669,7 +2023,12 @@ export const CATEGORY_DEFINITION: CategoryDefinition = {
 
 export type KillerResponse = {
   id: string;
-  scenario: 'not_right_now' | 'confused' | 'too_expensive' | 'we_have_a_process' | 'how_are_you_different';
+  scenario:
+    | 'not_right_now'
+    | 'confused'
+    | 'too_expensive'
+    | 'we_have_a_process'
+    | 'how_are_you_different';
   buyerSignal: string;
   underlyingRoadblock: string;
   responseCategory: string;
@@ -1699,7 +2058,8 @@ export const KILLER_RESPONSES: KillerResponse[] = [
   {
     id: 'not_right_now_pings_and_echoes',
     scenario: 'not_right_now',
-    buyerSignal: '"This isn\'t for us at the moment." (when off-ramp does not surface clear disinterest)',
+    buyerSignal:
+      '"This isn\'t for us at the moment." (when off-ramp does not surface clear disinterest)',
     underlyingRoadblock:
       '"Not right now" usually masks a fear of implementation risk OR organizational friction. You must "ping" that fear to see if it echoes back.',
     responseCategory: 'Pings and Echoes · diagnose the real fear',
@@ -1716,7 +2076,8 @@ export const KILLER_RESPONSES: KillerResponse[] = [
     buyerSignal: '"This isn\'t for us at the moment." (when timing genuinely is the issue)',
     underlyingRoadblock:
       'Real timing constraints (mid-IC-cycle, year-end close, quarterly board prep). You need to keep the deal alive without burning the relationship.',
-    responseCategory: 'Asynchronous Refrigerator · move the deal off the kitchen table without losing the lead',
+    responseCategory:
+      'Asynchronous Refrigerator · move the deal off the kitchen table without losing the lead',
     exactPhrasing:
       '"No problem. Whenever your next major IC memo is ready for a stress test, let me know. In the meantime, I will leave you with this 60-second audit we ran on the 2014 Dangote expansion — it catches the exact blind spots the market missed."',
     whyItWorks:
@@ -1731,10 +2092,12 @@ export const KILLER_RESPONSES: KillerResponse[] = [
   {
     id: 'confused_vulnerability_reset',
     scenario: 'confused',
-    buyerSignal: 'Eyes glaze over · "Can you walk me through that again?" · long silence after a feature explanation',
+    buyerSignal:
+      'Eyes glaze over · "Can you walk me through that again?" · long silence after a feature explanation',
     underlyingRoadblock:
       'Cognitive load is too high. You have fallen into the founder trap of over-explaining the technology instead of solving their business problem.',
-    responseCategory: 'Vulnerability Reset · reset the dynamic from vendor-pitch to peer-conversation',
+    responseCategory:
+      'Vulnerability Reset · reset the dynamic from vendor-pitch to peer-conversation',
     exactPhrasing:
       '"I apologize, I think I just fell into the founder trap of over-explaining the technology instead of your problem. Let me take a step back."',
     whyItWorks:
@@ -1745,7 +2108,8 @@ export const KILLER_RESPONSES: KillerResponse[] = [
   {
     id: 'confused_5th_grade_anchor',
     scenario: 'confused',
-    buyerSignal: 'Buyer cannot articulate the value back to you · "what does this actually do for me?"',
+    buyerSignal:
+      'Buyer cannot articulate the value back to you · "what does this actually do for me?"',
     underlyingRoadblock:
       'Your vocabulary is too technical. Switch from features (R²F, DPR, DQI, 12-node pipeline) to PROTECTED REVENUE.',
     responseCategory: '5th Grade Financial Anchor · feature → protected revenue',
@@ -1759,10 +2123,12 @@ export const KILLER_RESPONSES: KillerResponse[] = [
   {
     id: 'confused_evidence_challenge',
     scenario: 'confused',
-    buyerSignal: 'Words are not landing · the buyer is sceptical but not closing the conversation · they say "show me"',
+    buyerSignal:
+      'Words are not landing · the buyer is sceptical but not closing the conversation · they say "show me"',
     underlyingRoadblock:
       'You need to stop talking and let the artefact do the persuasion. Fund buyers and procurement-stage CSOs evaluate evidence for a living; they are allergic to generic pitches.',
-    responseCategory: 'Ultimate Evidence Challenge · put your product on the line against their own failed document',
+    responseCategory:
+      'Ultimate Evidence Challenge · put your product on the line against their own failed document',
     exactPhrasing:
       '"Don\'t take my word for it. Let\'s do this: bring a redacted IC memo from a deal of yours that went sideways to our next call. I will run the audit live in 7 minutes. If it does not immediately flag the exact blind spots that cost you money, the product is not for you."',
     whyItWorks:
@@ -1837,7 +2203,7 @@ export const PERSONA_PITCH_LIBRARY: PersonaPitch[] = [
     theirPain:
       'They ship 40-60 recommendations a year. Their biggest fear is a memo landing badly in front of the board because of a blind spot. The post-board "why was this not flagged earlier" question is career-defining.',
     pitch:
-      '"You don\'t have a process for auditing your own strategic memos before they reach the board, because three years ago it wasn\'t technically possible. Now it is. Decision Intel is the 60-second hygiene step that happens between your analyst and the committee. We aren\'t replacing your workflow; we are providing an insurance premium on your strategic-planning cadence. When your analyst runs a memo through our tool, it names the exact biases the room will catch first and generates a Decision Quality Index. It makes your VP of Strategy the adult in the room on every recommendation."',
+      "\"You don't have a process for auditing your own strategic memos before they reach the board, because three years ago it wasn't technically possible. Now it is. Decision Intel is the 60-second hygiene step that happens between your analyst and the committee. We aren't replacing your workflow; we are providing an insurance premium on your strategic-planning cadence. When your analyst runs a memo through our tool, it names the exact biases the room will catch first and generates a Decision Quality Index. It makes your VP of Strategy the adult in the room on every recommendation.\"",
     closingMove:
       'Bring the WeWork S-1 DPR. "This is the audit on a famously biased filing. Apply the same lens to your last quarterly memo — would your steering committee have caught these flags?"',
   },
@@ -1847,7 +2213,7 @@ export const PERSONA_PITCH_LIBRARY: PersonaPitch[] = [
     theirPain:
       '70-90% of acquisitions fail to create the value the IC voted for, often due to confirmation bias or sunk-cost anchoring during diligence. The post-close partner question that starts with "why didn\'t we see X in Q3" is a career-killing moment.',
     pitch:
-      '"Before a deal thesis reaches IC, it runs through Decision Intel. We flag overconfidence, sunk-cost anchoring, and base-rate neglect — highlighting the exact sentence they live in. Then we pattern-match your memo against our 135-case historical library. Your deal team can walk into IC and say \'we hit the same pattern Kraft-Heinz did on Unilever, and here is how we mitigate it,\' with evidence, not analogy. We aren\'t slowing deals down — we are removing the post-close partner question that starts with why didn\'t we see X."',
+      "\"Before a deal thesis reaches IC, it runs through Decision Intel. We flag overconfidence, sunk-cost anchoring, and base-rate neglect — highlighting the exact sentence they live in. Then we pattern-match your memo against our 143-case historical library. Your deal team can walk into IC and say 'we hit the same pattern Kraft-Heinz did on Unilever, and here is how we mitigate it,' with evidence, not analogy. We aren't slowing deals down — we are removing the post-close partner question that starts with why didn't we see X.\"",
     closingMove:
       'Offer to retro-audit 3 dead deals from the last quarter. "If we don\'t flag the exact pattern that killed those deals in 7 minutes each, this is not the right tool for your team."',
   },
@@ -1883,7 +2249,8 @@ export const PERSONA_PITCH_LIBRARY: PersonaPitch[] = [
   },
   {
     id: 'mckinsey_quantumblack',
-    persona: 'Management Consultant Partner (McKinsey QuantumBlack / BCG GAMMA / Bain Advanced Analytics)',
+    persona:
+      'Management Consultant Partner (McKinsey QuantumBlack / BCG GAMMA / Bain Advanced Analytics)',
     theirPain:
       'Generative-AI displacement eating engagement margin. Client question "what is your AI governance answer for EU AI Act Art 14" with no clear answer. Internal partner pressure on margin compression.',
     pitch:
@@ -1915,7 +2282,8 @@ export const LANGUAGE_PATTERNS: LanguagePattern[] = [
     protectedRevenueFraming: 'This bias cost you £187k — here is the fix.',
     whyItWorks:
       'Replaces the abstract feature ("we detect biases") with a specific dollar amount on a specific flag. The buyer\'s mind cannot un-see the £187k.',
-    source: 'NotebookLM positioning synthesis 2026-04-27 + Wiz / Snowflake / Datadog / Gong landing-page patterns',
+    source:
+      'NotebookLM positioning synthesis 2026-04-27 + Wiz / Snowflake / Datadog / Gong landing-page patterns',
   },
   {
     id: 'counterfactual_lift',
@@ -1931,10 +2299,9 @@ export const LANGUAGE_PATTERNS: LanguagePattern[] = [
     id: 'dollar_impact',
     pattern: 'The Dollar-Impact Estimation Pattern',
     featureFraming: 'We provide historical failure benchmarking.',
-    protectedRevenueFraming:
-      'Estimated risk: $22.5M based on 45% failure rate on $50M deal.',
+    protectedRevenueFraming: 'Estimated risk: $22.5M based on 45% failure rate on $50M deal.',
     whyItWorks:
-      'Ties the percentage benchmark (which is abstract) to the buyer\'s ticket size (which is concrete). The dollar amount survives every internal forwarding without needing context.',
+      "Ties the percentage benchmark (which is abstract) to the buyer's ticket size (which is concrete). The dollar amount survives every internal forwarding without needing context.",
     source: 'DiscoveryGradeImpactCard + CLAUDE.md "PROTECTED REVENUE" lock 2026-04-27',
   },
   {
@@ -1945,7 +2312,8 @@ export const LANGUAGE_PATTERNS: LanguagePattern[] = [
       'Consulting firms charge you $1M to tell you about cognitive bias — and they have the same biases themselves. We built an AI that does not. This is a £30K/year insurance premium on your strategic-planning cadence.',
     whyItWorks:
       'Anchors against the $300B consulting industry instead of against $50/mo SaaS tools. The "$1M to tell you about bias" line forces the buyer to do the math against their own consulting budget.',
-    source: 'NotebookLM positioning synthesis 2026-04-27 + Founder School lesson gtm_6 (charge more than you think)',
+    source:
+      'NotebookLM positioning synthesis 2026-04-27 + Founder School lesson gtm_6 (charge more than you think)',
   },
   {
     id: 'protected_revenue_anchor',
@@ -1972,8 +2340,10 @@ export const INVESTOR_METRICS: InvestorMetric[] = [
     name: 'Bookings vs. revenue',
     whatItIs:
       'Bookings = strict contractual obligation for a customer to pay. Revenue = service actually delivered + revenue recognized. Verbal agreements (e.g., Sankore "we are interested") are NEITHER.',
-    diCurrent: 'Zero contracted bookings · zero recognized revenue · multiple verbal agreements pending',
-    diTarget12mo: '3-5 paid design partners contracted · £180K-£420K bookings · ratable revenue recognition',
+    diCurrent:
+      'Zero contracted bookings · zero recognized revenue · multiple verbal agreements pending',
+    diTarget12mo:
+      '3-5 paid design partners contracted · £180K-£420K bookings · ratable revenue recognition',
     whyItMatters:
       'Investors will ignore "verbal interest" entirely. The first contract is the first real signal — only paid commitments count.',
     computeMethod:
@@ -2004,12 +2374,15 @@ export const INVESTOR_METRICS: InvestorMetric[] = [
     category: 'business',
     rank: 3,
     name: 'Gross Profit (and Gross Margin)',
-    whatItIs: 'Revenue minus direct cost of revenue (COGS). For SaaS: hosting, third-party APIs, payment processing.',
+    whatItIs:
+      'Revenue minus direct cost of revenue (COGS). For SaaS: hosting, third-party APIs, payment processing.',
     diCurrent: 'N/A (zero revenue)',
-    diTarget12mo: '~90% blended gross margin · honest math per CLAUDE.md (Individual typical 95%, Strategy typical 95%, Enterprise 70-88%)',
+    diTarget12mo:
+      '~90% blended gross margin · honest math per CLAUDE.md (Individual typical 95%, Strategy typical 95%, Enterprise 70-88%)',
     whyItMatters:
       '90% is elite SaaS territory. It signals that every £1 of incremental revenue funds growth, not COGS. Use the honest blended figure (not the 97% ghost-user math) in every investor conversation.',
-    computeMethod: '(Revenue - direct COGS) / Revenue. Direct COGS for DI: ~£0.30-0.50/audit Gemini cost + Vercel + Supabase + Resend + sentry.',
+    computeMethod:
+      '(Revenue - direct COGS) / Revenue. Direct COGS for DI: ~£0.30-0.50/audit Gemini cost + Vercel + Supabase + Resend + sentry.',
     tripwire:
       'If actual gross margin drops below 75% blended, scale economics are broken. Investigate: new model costs? higher API tier? whale-customer Drive polling?',
     status: 'on_track',
@@ -2019,13 +2392,14 @@ export const INVESTOR_METRICS: InvestorMetric[] = [
     category: 'business',
     rank: 4,
     name: 'Total Contract Value / Annual Contract Value',
-    whatItIs:
-      'TCV = entire contract length value. ACV = annualised contract value (TCV / years).',
+    whatItIs: 'TCV = entire contract length value. ACV = annualised contract value (TCV / years).',
     diCurrent: 'Target ACV: £30K (Strategy tier) for design partners; £80-200K for F500 enterprise',
-    diTarget12mo: 'ACV growth from £30K (wedge design partners) to £80-150K (F500 expansion) over 18 months',
+    diTarget12mo:
+      'ACV growth from £30K (wedge design partners) to £80-150K (F500 expansion) over 18 months',
     whyItMatters:
       'ACV growth signals upsell + procurement-grade positioning. Investors look for ACV expansion as a leading indicator of category-leadership.',
-    computeMethod: 'TCV: sum of all multi-year contracted commitments. ACV: TCV / contract length in years.',
+    computeMethod:
+      'TCV: sum of all multi-year contracted commitments. ACV: TCV / contract length in years.',
     tripwire:
       'If ACV stays at £30K across all contracts, expansion motion is broken. F500 conversations should drive £80K+.',
     status: 'unbuilt',
@@ -2035,7 +2409,7 @@ export const INVESTOR_METRICS: InvestorMetric[] = [
     category: 'business',
     rank: 5,
     name: 'Lifetime Value (LTV)',
-    whatItIs: 'Net profit generated per customer across the customer\'s entire lifetime.',
+    whatItIs: "Net profit generated per customer across the customer's entire lifetime.",
     diCurrent: 'N/A (no live customers)',
     diTarget12mo: 'Modeled LTV: £30K ACV × ~90% margin / 10% annual churn = £270K LTV (elite SaaS)',
     whyItMatters:
@@ -2075,7 +2449,8 @@ export const INVESTOR_METRICS: InvestorMetric[] = [
       'Paid CAC <£15K via warm-intro + content motion · payback period ~4-5 months at £30K ACV with 90% margin',
     whyItMatters:
       'Investors look for paid CAC viability. £10-15K CAC against a £270K LTV is exceptional. The sub-12-month payback period is the unit-economics close.',
-    computeMethod: 'Paid CAC = Paid Marketing Spend / Customers Acquired (in same period). Blended CAC = (Sales + Marketing Spend) / Customers Acquired.',
+    computeMethod:
+      'Paid CAC = Paid Marketing Spend / Customers Acquired (in same period). Blended CAC = (Sales + Marketing Spend) / Customers Acquired.',
     tripwire:
       'If paid CAC exceeds £25K without scaled paid channels, the GTM motion is over-reliant on founder time. Hire a GTM co-founder or paid-acquisition specialist.',
     status: 'gap',
@@ -2107,7 +2482,8 @@ export const INVESTOR_METRICS: InvestorMetric[] = [
     diTarget12mo: '3-5 design-partner orgs × ~20 audits/month + ≥40% outcome-reporting rate',
     whyItMatters:
       'Audit velocity proves the workflow stuck. Outcome reporting proves the data flywheel rotated. Together they prove DI is not shelfware.',
-    computeMethod: 'Audits per active user per month + (Outcomes Reported / Audits Run) per quarter.',
+    computeMethod:
+      'Audits per active user per month + (Outcomes Reported / Audits Run) per quarter.',
     tripwire:
       'If audits per user drop below 5/month sustained, the workflow integration broke (per Cloverpop manual-logging trap) — diagnose immediately.',
     status: 'gap',
@@ -2120,7 +2496,8 @@ export const INVESTOR_METRICS: InvestorMetric[] = [
     whatItIs:
       'Compounded Monthly Growth Rate (not simple averages). CMGR = ((Ending value / Starting value) ^ (1/months)) - 1.',
     diCurrent: 'N/A (no MRR yet)',
-    diTarget12mo: 'CMGR >15% on MRR for the first 12 months · slows to 8-12% as base grows · benchmark against pre-seed B2B median',
+    diTarget12mo:
+      'CMGR >15% on MRR for the first 12 months · slows to 8-12% as base grows · benchmark against pre-seed B2B median',
     whyItMatters:
       'Investors evaluate growth via CMGR to benchmark across cohorts. Simple month-over-month averages over-state growth on small bases.',
     computeMethod: '((End MRR / Start MRR) ^ (1/N months)) - 1, where N = number of months.',
@@ -2136,7 +2513,8 @@ export const INVESTOR_METRICS: InvestorMetric[] = [
     whatItIs:
       'Gross churn: actual MRR lost from cancellations. Net revenue churn: gross churn minus upsells / expansion. Negative net churn is the SaaS gold standard.',
     diCurrent: 'N/A (no live customers)',
-    diTarget12mo: 'Annual gross churn 5-10% · net revenue churn near-zero or negative as design partners expand seats',
+    diTarget12mo:
+      'Annual gross churn 5-10% · net revenue churn near-zero or negative as design partners expand seats',
     whyItMatters:
       'Cancellations grow exponentially with customer base — churn IS the ceiling on company size. Keeping it 5-10% prevents the ceiling from collapsing.',
     computeMethod:
@@ -2152,8 +2530,10 @@ export const INVESTOR_METRICS: InvestorMetric[] = [
     name: 'Burn Rate — Net + Gross Burn',
     whatItIs:
       'Net burn: actual cash burned per month (expenses minus revenue). Gross burn: total expenses regardless of revenue.',
-    diCurrent: 'Net burn: ~£1-2K/month (founder solo, mostly Gemini API + Vercel + Supabase + domain). Gross burn = Net burn (zero revenue offset).',
-    diTarget12mo: 'Maintain net burn under £5K/month pre-revenue · 12+ months runway by pre-seed close · target: 18 months at pre-seed',
+    diCurrent:
+      'Net burn: ~£1-2K/month (founder solo, mostly Gemini API + Vercel + Supabase + domain). Gross burn = Net burn (zero revenue offset).',
+    diTarget12mo:
+      'Maintain net burn under £5K/month pre-revenue · 12+ months runway by pre-seed close · target: 18 months at pre-seed',
     whyItMatters:
       'Long runway = leverage in negotiations. Investors prefer founders who do not need to close THIS quarter.',
     computeMethod: 'Net Burn = Total Expenses - Revenue. Gross Burn = Total Expenses.',
@@ -2172,7 +2552,8 @@ export const INVESTOR_METRICS: InvestorMetric[] = [
     whyItMatters:
       'Skip entirely. Mentioning downloads in a B2B SaaS pitch (no downloadable app) reads as confused.',
     computeMethod: 'N/A',
-    tripwire: 'Never let an investor anchor on downloads — redirect to active users + audit velocity.',
+    tripwire:
+      'Never let an investor anchor on downloads — redirect to active users + audit velocity.',
     status: 'on_track',
   },
 
@@ -2184,7 +2565,8 @@ export const INVESTOR_METRICS: InvestorMetric[] = [
     name: 'Cumulative Charts · NEVER USE',
     whatItIs: 'Charts showing total cumulative customers / revenue / users over time.',
     diCurrent: 'N/A',
-    diTarget12mo: 'NEVER use cumulative charts in pre-seed or seed decks — they always go up-and-to-the-right even when growth is decelerating.',
+    diTarget12mo:
+      'NEVER use cumulative charts in pre-seed or seed decks — they always go up-and-to-the-right even when growth is decelerating.',
     whyItMatters:
       'Cumulative charts visually deceive. Investors who notice the chart trick weight against the founder. Use monthly new users / MRR instead.',
     computeMethod: 'Use Monthly New X (e.g., Monthly New MRR) charts instead.',
@@ -2202,8 +2584,10 @@ export const INVESTOR_METRICS: InvestorMetric[] = [
     diTarget12mo: 'Always show absolute numbers + Y-axis labelled + scale unmanipulated.',
     whyItMatters:
       'Sophisticated investors spot chart tricks instantly and the trust collapses. Honesty is the multiplier on trust.',
-    computeMethod: 'Always: Y-axis labelled, scale 0-baseline, absolute numbers next to percentages.',
-    tripwire: 'If a deck draft has a chart without a labelled Y-axis or scaled-from-zero baseline, fix it before sending.',
+    computeMethod:
+      'Always: Y-axis labelled, scale 0-baseline, absolute numbers next to percentages.',
+    tripwire:
+      'If a deck draft has a chart without a labelled Y-axis or scaled-from-zero baseline, fix it before sending.',
     status: 'on_track',
   },
   {
@@ -2213,12 +2597,16 @@ export const INVESTOR_METRICS: InvestorMetric[] = [
     name: 'Order of Operations — Size BEFORE Growth',
     whatItIs:
       'Investor narrative pattern: introduce SIZE first (bookings, revenue, ARR), then GROWTH (MoM, CMGR, churn), then UNIT ECONOMICS (LTV/CAC, gross margin).',
-    diCurrent: 'Pre-revenue — size = zero today. Growth narrative anchored in the wedge + ceiling sequence.',
-    diTarget12mo: 'For Q3 2026 pre-seed deck: lead with the £70-90K booked ARR + 3 design partners (size), then growth, then unit economics.',
+    diCurrent:
+      'Pre-revenue — size = zero today. Growth narrative anchored in the wedge + ceiling sequence.',
+    diTarget12mo:
+      'For Q3 2026 pre-seed deck: lead with the £70-90K booked ARR + 3 design partners (size), then growth, then unit economics.',
     whyItMatters:
       'Investors evaluate size BEFORE growth. Leading with growth on a tiny base (e.g., 200% MoM growth from £100 → £300 MRR) reads as desperate.',
-    computeMethod: 'Deck slide order: 1) Size (booked ARR + customer count) 2) Growth (CMGR + churn) 3) Unit economics (LTV/CAC + margin).',
-    tripwire: 'If a deck draft leads with a growth chart on a sub-£100K-ARR base, restructure to lead with size + thesis instead.',
+    computeMethod:
+      'Deck slide order: 1) Size (booked ARR + customer count) 2) Growth (CMGR + churn) 3) Unit economics (LTV/CAC + margin).',
+    tripwire:
+      'If a deck draft leads with a growth chart on a sub-£100K-ARR base, restructure to lead with size + thesis instead.',
     status: 'on_track',
   },
 ];
@@ -2244,7 +2632,8 @@ export const FAILURE_MODES: FailureMode[] = [
       'If a design-partner conversation requires "let me build that just for you" within the first 30 days, surface the trade-off explicitly. Either the feature is generally applicable (build into the pipeline) or it is not (decline with a why).',
     whatToWatch:
       'Per-customer custom code paths. Engineering hours spent on bespoke vs productized. If bespoke exceeds 30% of weekly engineering, the trap is engaged.',
-    evidence: 'NotebookLM external attack synthesis 2026-04-27 + Founder School lessons es_7 + es_11 + CLAUDE.md anti-scope-creep',
+    evidence:
+      'NotebookLM external attack synthesis 2026-04-27 + Founder School lessons es_7 + es_11 + CLAUDE.md anti-scope-creep',
   },
   {
     id: 'cloverpop_adoption_trap',
@@ -2255,14 +2644,15 @@ export const FAILURE_MODES: FailureMode[] = [
     diExposure: 'critical',
     countermove: [
       'Integration-first onboarding (Founder School es_9): map workflow IN the discovery call, set up Drive polling or analyze+token@in.decision-intel.com forwarder in 15 minutes BEFORE contract',
-      'Zero behavior change is the default — DI runs on the analyst\'s existing artefact stream',
+      "Zero behavior change is the default — DI runs on the analyst's existing artefact stream",
       'Outcome Gate Phase 3 (shipped 2026-04-27) auto-prefills outcome drafts so the user clicks ONCE to confirm',
     ],
     tripwire:
       'If audits per active user drop below 5/month sustained, integration broke. Diagnose: is the email forwarder firing? is Drive polling stuck? did the analyst manually disable?',
     whatToWatch:
       'Audit velocity per design partner per month. Time from analysis-complete to outcome-logged. Both should be under 24 hours when integration is healthy.',
-    evidence: 'NotebookLM Q6 pre-mortem (note `9a249bd8`) + CLAUDE.md Outcome Gate locks + NotebookLM PITFALLS.cloverpop_trap entry',
+    evidence:
+      'NotebookLM Q6 pre-mortem (note `9a249bd8`) + CLAUDE.md Outcome Gate locks + NotebookLM PITFALLS.cloverpop_trap entry',
   },
   {
     id: 'cathedral_of_code',
@@ -2280,7 +2670,8 @@ export const FAILURE_MODES: FailureMode[] = [
       'If 60 days pass without a paid pilot signed, this weakness is no longer dormant — it IS the active unicorn-killer. Stop building, start closing.',
     whatToWatch:
       'Days since last paid contract signed. Engineering hours spent on net-new features vs. closing-related work. Founder time on building vs founder time on outbound + meetings.',
-    evidence: 'CLAUDE.md "Cathedral of code" section + NotebookLM Q6 pre-mortem (note `9a249bd8`) + Honest Probability Path Hard Truth Risks',
+    evidence:
+      'CLAUDE.md "Cathedral of code" section + NotebookLM Q6 pre-mortem (note `9a249bd8`) + Honest Probability Path Hard Truth Risks',
   },
   {
     id: 'cloverpop_data_advantage',
@@ -2298,7 +2689,8 @@ export const FAILURE_MODES: FailureMode[] = [
       'If Clearbox launches "Cloverpop AI Audit" with bias-detection capability before Q3 2026, they have closed the gap. Track Clearbox Decisions press releases monthly.',
     whatToWatch:
       'Clearbox Decisions hiring page (any behavioral-science academic hires?) + Cloverpop product release notes + Google Scholar for "decision intelligence + bias" papers from their team',
-    evidence: 'CLAUDE.md External Attack Vectors lock 2026-04-26 + NotebookLM external attack synthesis (note `9a249bd8`)',
+    evidence:
+      'CLAUDE.md External Attack Vectors lock 2026-04-26 + NotebookLM external attack synthesis (note `9a249bd8`)',
   },
   {
     id: 'ibm_watsonx_bundling',
@@ -2309,14 +2701,15 @@ export const FAILURE_MODES: FailureMode[] = [
     diExposure: 'high',
     countermove: [
       'Pan-African / EM-fund wedge is the bypass — IBM does not sell into Pan-African corp dev or EM-focused fund partners with our regulatory depth',
-      'The DPR\'s Pan-African regulatory mapping (NDPR / CBN / WAEMU / PoPIA / CMA Kenya) is something IBM watsonx does NOT cover',
+      "The DPR's Pan-African regulatory mapping (NDPR / CBN / WAEMU / PoPIA / CMA Kenya) is something IBM watsonx does NOT cover",
       'Long-term: position Decision Intel as the audit layer that integrates WITH IBM watsonx rather than competes — but only after the wedge is established + references exist',
     ],
     tripwire:
       'If IBM watsonx product roadmap shipping notes mention "human decision provenance" or "strategic memo audit" as a Q2-Q3 2026 feature, the bundle threat is active.',
     whatToWatch:
       'IBM watsonx.governance product release notes + IBM Think conference announcements + IBM partner-program AI governance changes + IBM hiring for "AI ethics + decision audit" roles',
-    evidence: 'CLAUDE.md External Attack Vectors lock 2026-04-26 + NotebookLM external attack synthesis (note `9a249bd8`)',
+    evidence:
+      'CLAUDE.md External Attack Vectors lock 2026-04-26 + NotebookLM external attack synthesis (note `9a249bd8`)',
   },
   {
     id: 'agentic_shift',
@@ -2334,7 +2727,8 @@ export const FAILURE_MODES: FailureMode[] = [
       'If two F500 prospects independently mention "agents are doing this for us now" in 2026, the memo format is declining faster than the wedge can close. Pivot to audit-layer-for-agents.',
     whatToWatch:
       'Palantir + Databricks + Aera + Snowflake quarterly earnings calls for agentic-decision case studies. Track F500 CSO LinkedIn posts for "agent-led strategy" framing. NotebookLM monitor for the agentic-shift narrative shift.',
-    evidence: 'CLAUDE.md External Attack Vectors lock 2026-04-26 + NotebookLM external attack synthesis (note `9a249bd8`)',
+    evidence:
+      'CLAUDE.md External Attack Vectors lock 2026-04-26 + NotebookLM external attack synthesis (note `9a249bd8`)',
   },
 ];
 
@@ -2356,9 +2750,12 @@ export const NETWORK_NODES: NetworkNode[] = [
       'GTM playbook learnings from Wiz first-paid-F500 pattern',
     ],
     ask: {
-      tier1: 'McKinsey QuantumBlack alliances introduction (target: Lieven Van der Veken — Senior Partner, led the Wonderful agentic-AI collaboration; alternative: Head of Alliances, Head of Ecosystem, QuantumBlack London office lead) — highest-ROI per NotebookLM 2026-04-27. Side-door alternative: apply to Credo AI partner program first (McKinsey is launch partner) — bypasses direct from-scratch onboarding friction',
-      tier2: 'Pre-seed warm intros to the 5 named target funds: Cyberstarts, Index Ventures, Conviction (Sarah Guo), Neo Residency (Ali Partovi), and a direct introduction route to Elad Gil',
-      tier3: 'Specific F500 CSO warm intros (one per quarter, named buyer with thesis fit) + operator-stage angel introductions for advisor convertibles',
+      tier1:
+        'McKinsey QuantumBlack alliances introduction (target: Lieven Van der Veken — Senior Partner, led the Wonderful agentic-AI collaboration; alternative: Head of Alliances, Head of Ecosystem, QuantumBlack London office lead) — highest-ROI per NotebookLM 2026-04-27. Side-door alternative: apply to Credo AI partner program first (McKinsey is launch partner) — bypasses direct from-scratch onboarding friction',
+      tier2:
+        'Pre-seed warm intros to the 5 named target funds: Cyberstarts, Index Ventures, Conviction (Sarah Guo), Neo Residency (Ali Partovi), and a direct introduction route to Elad Gil',
+      tier3:
+        'Specific F500 CSO warm intros (one per quarter, named buyer with thesis fit) + operator-stage angel introductions for advisor convertibles',
     },
     status: 'active',
     cadence: 'Monthly 1:1 + ad-hoc check-ins · sharpen ask specificity each meeting',
@@ -2381,13 +2778,16 @@ export const NETWORK_NODES: NetworkNode[] = [
     ask: {
       tier1:
         'Attend 2-3 high-density events / month: London PE & VC Networks · M&A Tuesday · The Strategic Advisors London · British Private Equity & Venture Capital Association (BVCA) socials · UK CSO Forum events · ex-McKinsey / BCG / Bain alumni socials · Founders Forum / Slush London',
-      tier2: 'Bring 1-page DPR specimen + the WeWork audit teaser · pitch in 30 seconds, qualify in 90, schedule 20-min call within the week',
-      tier3: 'Build a recurring presence · become known as "the kid who built the bias auditor" in 2-3 specific event communities',
+      tier2:
+        'Bring 1-page DPR specimen + the WeWork audit teaser · pitch in 30 seconds, qualify in 90, schedule 20-min call within the week',
+      tier3:
+        'Build a recurring presence · become known as "the kid who built the bias auditor" in 2-3 specific event communities',
     },
     status: 'untapped',
-    cadence: 'Weekly · 2-3 events / month minimum · the founder being PHYSICALLY in the room is the unlock',
+    cadence:
+      'Weekly · 2-3 events / month minimum · the founder being PHYSICALLY in the room is the unlock',
     notes:
-      'Per founder direction 2026-04-28: UK is the actual market focus for the 30-day pivot. Founder is in London. In-person beats LinkedIn DM by an order of magnitude for the fast-converter archetypes — they trust someone they\'ve looked in the eye before they swipe a credit card. The Naira pricing reality (£2K/mo Nigerian feels like £5K/mo in real purchasing power) is also why UK is the immediate market — Sankore stays as the summer design-partner wedge, not the immediate revenue source.',
+      "Per founder direction 2026-04-28: UK is the actual market focus for the 30-day pivot. Founder is in London. In-person beats LinkedIn DM by an order of magnitude for the fast-converter archetypes — they trust someone they've looked in the eye before they swipe a credit card. The Naira pricing reality (£2K/mo Nigerian feels like £5K/mo in real purchasing power) is also why UK is the immediate market — Sankore stays as the summer design-partner wedge, not the immediate revenue source.",
     nextStep:
       'Identify 5 specific events in London for May 2026: list event date + likely attendees + specific 30-second pitch tuned to that audience + 3 follow-up DM templates for post-event. First event by week 2 of May.',
   },
@@ -2398,8 +2798,8 @@ export const NETWORK_NODES: NetworkNode[] = [
     relationship: 'family',
     unlocks: [
       'Warm intros to McKinsey London office partners and consultants (alongside Wiz advisor → QuantumBlack alliance path)',
-      'Real ex-MBB fractional CSOs in the founder\'s extended network · the solo-CSO archetype is most likely buyer in this network',
-      'Validation network for the 5 silent objections — family connections will give honest feedback that strangers won\'t',
+      "Real ex-MBB fractional CSOs in the founder's extended network · the solo-CSO archetype is most likely buyer in this network",
+      "Validation network for the 5 silent objections — family connections will give honest feedback that strangers won't",
       'Long-term: McKinsey alumni who become F500 CSOs over time',
     ],
     ask: {
@@ -2430,11 +2830,13 @@ export const NETWORK_NODES: NetworkNode[] = [
     ],
     ask: {
       tier1: 'Warm intros to McKinsey London office staff (alumni from Oxford / LSE / Imperial)',
-      tier2: 'Introduction to senior academic mentors (cognitive science, behavioral economics) for academic-credential stacking',
+      tier2:
+        'Introduction to senior academic mentors (cognitive science, behavioral economics) for academic-credential stacking',
       tier3: 'Speaking opportunity at Oxford / LSE / Imperial student finance / strategy clubs',
     },
     status: 'warm',
-    cadence: 'Quarterly outreach to school network · annual alumni events · attend whenever possible',
+    cadence:
+      'Quarterly outreach to school network · annual alumni events · attend whenever possible',
     notes:
       'School network is dormant unless explicitly activated. Most TASIS connections do not yet know about Decision Intel. The activation move is a 1-page school-context update with the 2008 paper + the pre-seed deck attached.',
     nextStep:
@@ -2454,8 +2856,10 @@ export const NETWORK_NODES: NetworkNode[] = [
     ask: {
       tier1:
         'Closed paid design-partner contract on £2,499/mo Strategy + outcome-gate enforcement contractual term · Day-30 target ≥3 audits (habit formation) · Day-60 target ≥50% outcome-reporting rate (flywheel activation) · Day-90 target first External DPR Share Event (board-grade utility — the conversion signal that proves the artefact is being shared with LPs / co-investors / auditors)',
-      tier2: 'Quarterly peer-network introductions (other Pan-African GPs, family offices, EM-focused funds) once Day-90 metric hits',
-      tier3: 'Co-authored anonymised "Bias Autopsy" reference case at Q4 2026 publication (LP-publishable, named-prospect-redacted per CLAUDE.md no-named-prospects rule)',
+      tier2:
+        'Quarterly peer-network introductions (other Pan-African GPs, family offices, EM-focused funds) once Day-90 metric hits',
+      tier3:
+        'Co-authored anonymised "Bias Autopsy" reference case at Q4 2026 publication (LP-publishable, named-prospect-redacted per CLAUDE.md no-named-prospects rule)',
     },
     status: 'active',
     cadence:
@@ -2477,9 +2881,12 @@ export const NETWORK_NODES: NetworkNode[] = [
       'Advisor-grade strategic perspective from a global assurance executive',
     ],
     ask: {
-      tier1: 'Integration partnership inside LRQA EiQ — DI as the AI-native reasoning-audit layer for their supply-chain intelligence offering',
-      tier2: 'Introductions to his network of CSOs / M&A leaders (warm intros at the highest possible level)',
-      tier3: 'Advisor-grade strategic perspective + Founder Hub learnings (no formal advisor relationship needed)',
+      tier1:
+        'Integration partnership inside LRQA EiQ — DI as the AI-native reasoning-audit layer for their supply-chain intelligence offering',
+      tier2:
+        'Introductions to his network of CSOs / M&A leaders (warm intros at the highest possible level)',
+      tier3:
+        'Advisor-grade strategic perspective + Founder Hub learnings (no formal advisor relationship needed)',
     },
     status: 'warm',
     cadence: 'Per-meeting cadence · upcoming meeting Q2/Q3 2026 (active warm intro)',
@@ -2500,12 +2907,16 @@ export const NETWORK_NODES: NetworkNode[] = [
       'Long-term: F500 CSO direct ARR pull-through over 12-24 months · partner equity-investment pattern is common at this stage',
     ],
     ask: {
-      tier1: 'Direct alliance partnership inside QuantumBlack — entry points (in priority): (a) Lieven Van der Veken — Senior Partner, led Wonderful agentic-AI collaboration (highest-fit entry); (b) Head of Alliances; (c) Head of Ecosystem; (d) QuantumBlack London office lead. Frame as peer-level category conversation, NOT vendor pitch.',
-      tier2: 'Side-door via Credo AI partner program — McKinsey is launch partner; applying to Credo AI first gives streamlined indirect entry into McKinsey alliance ecosystem and bypasses friction of from-scratch consultancy onboarding',
-      tier3: 'Joint co-publishable content — "AI Governance + Decision Provenance: the EU AI Act Art 14 Answer" white paper · then specific F500 CSO co-sell pilot embedded in one of their live engagements',
+      tier1:
+        'Direct alliance partnership inside QuantumBlack — entry points (in priority): (a) Lieven Van der Veken — Senior Partner, led Wonderful agentic-AI collaboration (highest-fit entry); (b) Head of Alliances; (c) Head of Ecosystem; (d) QuantumBlack London office lead. Frame as peer-level category conversation, NOT vendor pitch.',
+      tier2:
+        'Side-door via Credo AI partner program — McKinsey is launch partner; applying to Credo AI first gives streamlined indirect entry into McKinsey alliance ecosystem and bypasses friction of from-scratch consultancy onboarding',
+      tier3:
+        'Joint co-publishable content — "AI Governance + Decision Provenance: the EU AI Act Art 14 Answer" white paper · then specific F500 CSO co-sell pilot embedded in one of their live engagements',
     },
     status: 'untapped',
-    cadence: 'TBD post-Wiz-advisor introduction · NotebookLM 2026-04-27 confirmed alliance onboarding timeline is not codified but Credo AI side-door is the fastest entry point',
+    cadence:
+      'TBD post-Wiz-advisor introduction · NotebookLM 2026-04-27 confirmed alliance onboarding timeline is not codified but Credo AI side-door is the fastest entry point',
     notes:
       'Per NotebookLM 2026-04-27 master-KB synthesis: McKinsey hesitates to partner with pre-revenue startups, but DI leverage = (a) execution velocity (16-year-old solo shipping at Claude time deters McKinsey from building in-house competitor) + (b) category timing (QuantumBlack governance positioning is crystallizing THIS quarter — be in their vocabulary now). Killer line for the meeting: "McKinsey provides the strategy. Decision Intel provides the continuous audit and the EU AI Act Art 14 regulatory record."',
     nextStep:
@@ -2522,12 +2933,15 @@ export const NETWORK_NODES: NetworkNode[] = [
       'Long-term: potential acquirer set if the most-likely outcome (Series-B-stage strategic acquisition at $400M-1B by Q4 2029) lands',
     ],
     ask: {
-      tier1: 'Track quarterly product release notes + alliance announcements + senior hires (bias-audit + AI ethics)',
-      tier2: 'Monitor for "human decision provenance" or "strategic memo audit" feature additions (IBM watsonx) and "AI bias detection" feature additions (Cloverpop / Clearbox)',
+      tier1:
+        'Track quarterly product release notes + alliance announcements + senior hires (bias-audit + AI ethics)',
+      tier2:
+        'Monitor for "human decision provenance" or "strategic memo audit" feature additions (IBM watsonx) and "AI bias detection" feature additions (Cloverpop / Clearbox)',
       tier3: 'Evaluate as potential acquirers in the Series B → strategic-acquisition path',
     },
     status: 'cold',
-    cadence: 'Monthly competitive intelligence sweep · feed signals into Failure Modes Watchtower tripwires',
+    cadence:
+      'Monthly competitive intelligence sweep · feed signals into Failure Modes Watchtower tripwires',
     notes:
       'NEVER initiate engagement. NEVER ask for partnership. Track from the outside. The moment any of them ship a competing feature, it triggers a Failure Modes Watchtower tripwire and the strategic posture shifts.',
     nextStep:
@@ -2550,7 +2964,8 @@ export const NETWORK_NODES: NetworkNode[] = [
       tier3: 'Operator-angel introductions from fund partners after term sheet',
     },
     status: 'untapped',
-    cadence: 'Sequence: Cyberstarts + Index first (both via Josh Rainer warm intros) → Conviction (Sarah Guo) → Neo Residency (apply summer 2026) → Elad Gil (cold email)',
+    cadence:
+      'Sequence: Cyberstarts + Index first (both via Josh Rainer warm intros) → Conviction (Sarah Guo) → Neo Residency (apply summer 2026) → Elad Gil (cold email)',
     notes:
       'Per NotebookLM master KB synthesis 2026-04-27. Comparable check sizes: Conviction backed Baseten + Anthropic; Index backed Wiz; Elad Gil writes $250K-$1M solo checks; Neo backed Cursor + Kalshi. The Wiz advisor (Josh Rainer) opens 3 of the 5 doors directly — use that lever first. Elad Gil cold email is the only path that does NOT require the advisor (he reads outlier-profile cold email by design).',
     nextStep:
@@ -2567,9 +2982,11 @@ export const NETWORK_NODES: NetworkNode[] = [
       'Personal-investor network for advisor convertibles or operator-angel checks',
     ],
     ask: {
-      tier1: 'Specific high-leverage warm intros (LRQA pattern — execute exceptionally well, then earn the next ask)',
+      tier1:
+        'Specific high-leverage warm intros (LRQA pattern — execute exceptionally well, then earn the next ask)',
       tier2: 'Personal-investor cheques for advisor convertibles or pre-seed top-up',
-      tier3: 'Voice-anchoring artefacts (school speech recording, 2008 paper PDF, family permissions for narrative usage)',
+      tier3:
+        'Voice-anchoring artefacts (school speech recording, 2008 paper PDF, family permissions for narrative usage)',
     },
     status: 'warm',
     cadence: 'Per-relationship · the LRQA pattern is the template',
@@ -2593,8 +3010,10 @@ export const NINETY_DAY_ACTIONS: NinetyDayAction[] = [
     category: 'gtm',
     action: 'Close 3 paid design partners on £2,499/mo Strategy contract or equivalent',
     why: 'Outcome-gate-enforcement requires contracted partners. Cathedral-of-code trap requires paid validation. Pre-seed deck requires booked ARR.',
-    successCriterion: '3 signed contracts · £7,497/mo MRR · outcome-gate enforced contractually · integration-first onboarding live',
-    blocker: 'Slow procurement cycles · founder time on inbound vs outbound · advisor-network activation cadence',
+    successCriterion:
+      '3 signed contracts · £7,497/mo MRR · outcome-gate enforced contractually · integration-first onboarding live',
+    blocker:
+      'Slow procurement cycles · founder time on inbound vs outbound · advisor-network activation cadence',
     effort: 'large',
   },
   {
@@ -2604,8 +3023,10 @@ export const NINETY_DAY_ACTIONS: NinetyDayAction[] = [
     category: 'gtm',
     action: 'Close Sankore on contract — first wedge proof',
     why: 'Sankore brief is at-the-ready. Pan-African anchor IS the moat. Closed Sankore unlocks the Pan-African PE network referrals.',
-    successCriterion: 'Sankore signed contract · 90-day onboarding plan · 3 retro-audits + live IC pipeline · outcome-gate enforced',
-    blocker: 'ISA 2007 framework gap (critical Nigerian regulator). DQI explainability + CIs not yet shipped.',
+    successCriterion:
+      'Sankore signed contract · 90-day onboarding plan · 3 retro-audits + live IC pipeline · outcome-gate enforced',
+    blocker:
+      'ISA 2007 framework gap (critical Nigerian regulator). DQI explainability + CIs not yet shipped.',
     dependsOn: ['ship_isa_2007', 'ship_dqi_cis'],
     effort: 'medium',
   },
@@ -2616,7 +3037,8 @@ export const NINETY_DAY_ACTIONS: NinetyDayAction[] = [
     category: 'product',
     action: 'Ship ISA 2007 (Nigerian Investment & Securities Act 2007) framework module',
     why: 'Sankore-class deal-killer. The Pan-African 17-framework map drops to 18 with this. CLAUDE.md Enterprise Friction Matrix lock 2026-04-26.',
-    successCriterion: 'ISA 2007 framework live in getAllRegisteredFrameworks() · DPR specimens regenerated · /security page updated',
+    successCriterion:
+      'ISA 2007 framework live in getAllRegisteredFrameworks() · DPR specimens regenerated · /security page updated',
     blocker: 'Solo dev time. ISA 2007 statute reading time.',
     effort: 'medium',
   },
@@ -2627,8 +3049,10 @@ export const NINETY_DAY_ACTIONS: NinetyDayAction[] = [
     category: 'product',
     action: 'Add 90% confidence intervals on counterfactual dollar outputs',
     why: 'F500 audit chairs reject heuristic-based financial estimates without CIs. DQI explainability is the procurement-gate enabler for F500 expansion.',
-    successCriterion: 'CounterfactualPanel renders ±X% CI band · DPR Counterfactual Impact section carries Wilson-CI text · regression tests pass',
-    blocker: 'Sample-size requirements (Wilson CI requires N≥10 outcomes for tightest band). Acceptable to ship with low-N caveat.',
+    successCriterion:
+      'CounterfactualPanel renders ±X% CI band · DPR Counterfactual Impact section carries Wilson-CI text · regression tests pass',
+    blocker:
+      'Sample-size requirements (Wilson CI requires N≥10 outcomes for tightest band). Acceptable to ship with low-N caveat.',
     effort: 'medium',
   },
 
@@ -2640,7 +3064,8 @@ export const NINETY_DAY_ACTIONS: NinetyDayAction[] = [
     category: 'authority',
     action: 'Activate Wiz advisor → McKinsey QuantumBlack alliance intro',
     why: 'Per NotebookLM McKinsey synthesis 2026-04-27, this is the highest-ROI advisor ask. Channel partnership unlocks F500 CSO direct ARR pull-through.',
-    successCriterion: 'First peer-level conversation booked with QuantumBlack senior partner or alliances head · category-conversation deck delivered',
+    successCriterion:
+      'First peer-level conversation booked with QuantumBlack senior partner or alliances head · category-conversation deck delivered',
     blocker: 'Advisor-relationship cadence. Specific-ask preparation discipline.',
     effort: 'small',
   },
@@ -2651,7 +3076,8 @@ export const NINETY_DAY_ACTIONS: NinetyDayAction[] = [
     category: 'authority',
     action: 'Execute LRQA / Ian Spaulding meeting + 48h follow-up playbook',
     why: 'Family-warm-intro at C-level. EiQ + Partner Africa integration paths are uniquely fit. The LRQA precedent becomes the template for future warm-intro briefs.',
-    successCriterion: 'Meeting delivered · 48h follow-up cadence executed · second meeting booked OR decline-with-reason logged',
+    successCriterion:
+      'Meeting delivered · 48h follow-up cadence executed · second meeting booked OR decline-with-reason logged',
     blocker: 'Single highest-stakes meeting of the quarter. Preparation must be category-grade.',
     effort: 'large',
   },
@@ -2660,10 +3086,13 @@ export const NINETY_DAY_ACTIONS: NinetyDayAction[] = [
     week: 'Weeks 5-8',
     weekNumber: 5,
     category: 'fundraise',
-    action: 'Draft pre-seed deck v1 — 12 slides + the HonestProbabilityPath + the 16 investor metrics tracker',
+    action:
+      'Draft pre-seed deck v1 — 12 slides + the HonestProbabilityPath + the 16 investor metrics tracker',
     why: 'Once 3 design partners closed + LRQA second meeting + QuantumBlack alliance conversation, the deck is the next leverage point.',
-    successCriterion: 'Deck draft v1 reviewed by Wiz advisor · 3 specific revisions complete · ready for warm investor intros',
-    blocker: 'Deck writing time. Investor-narrative discipline (size before growth, no chart tricks).',
+    successCriterion:
+      'Deck draft v1 reviewed by Wiz advisor · 3 specific revisions complete · ready for warm investor intros',
+    blocker:
+      'Deck writing time. Investor-narrative discipline (size before growth, no chart tricks).',
     dependsOn: ['close_3_design_partners'],
     effort: 'medium',
   },
@@ -2676,8 +3105,10 @@ export const NINETY_DAY_ACTIONS: NinetyDayAction[] = [
     category: 'authority',
     action: 'Launch GTM co-founder / advisor search via Wiz-advisor network + operator-angel list',
     why: 'Founder continuity question is the #1 pre-seed VC objection. GTM co-founder addresses both continuity AND outbound capacity.',
-    successCriterion: '5 GTM-co-founder conversations completed · 2 advisor convertibles closed · continuity playbook v1 drafted for pre-seed deck',
-    blocker: 'Co-founder economic alignment (equity grant + cash compensation). Founder evaluation discipline.',
+    successCriterion:
+      '5 GTM-co-founder conversations completed · 2 advisor convertibles closed · continuity playbook v1 drafted for pre-seed deck',
+    blocker:
+      'Co-founder economic alignment (equity grant + cash compensation). Founder evaluation discipline.',
     effort: 'large',
   },
   {
@@ -2687,7 +3118,8 @@ export const NINETY_DAY_ACTIONS: NinetyDayAction[] = [
     category: 'authority',
     action: 'Publish first anonymised reference case (Sankore-anchored, name-redacted)',
     why: 'Wedge generates references. References unlock F500 ceiling. CLAUDE.md no-named-prospects rule is the discipline gate.',
-    successCriterion: 'First anonymised reference case live on /case-studies · LinkedIn announcement drives X content engagements',
+    successCriterion:
+      'First anonymised reference case live on /case-studies · LinkedIn announcement drives X content engagements',
     blocker: 'Sankore approval for anonymised publication. Outcome-data accumulation timeline.',
     dependsOn: ['sankore_close'],
     effort: 'medium',
@@ -2699,8 +3131,10 @@ export const NINETY_DAY_ACTIONS: NinetyDayAction[] = [
     category: 'fundraise',
     action: 'Secure pre-seed lead term sheet · target £2-4M lead at £20-30M pre-money',
     why: 'Pre-seed close by Q4 2026 is the HonestProbabilityPath Phase 1 conditional probability gate. Without it, the path collapses.',
-    successCriterion: 'Term sheet from a thesis-fit pre-seed VC · co-investor confirmation · 12-week close timeline',
-    blocker: 'Investor due-diligence cycle. Continuity playbook strength. Design-partner reference readiness.',
+    successCriterion:
+      'Term sheet from a thesis-fit pre-seed VC · co-investor confirmation · 12-week close timeline',
+    blocker:
+      'Investor due-diligence cycle. Continuity playbook strength. Design-partner reference readiness.',
     dependsOn: ['close_3_design_partners', 'gtm_co_founder_search', 'pre_seed_deck_v1'],
     effort: 'large',
   },
@@ -2711,9 +3145,11 @@ export const NINETY_DAY_ACTIONS: NinetyDayAction[] = [
     week: 'Continuous',
     weekNumber: 0,
     category: 'data',
-    action: 'Monitor outcome-gate telemetry weekly · audit velocity per design partner · time-to-outcome-logged',
+    action:
+      'Monitor outcome-gate telemetry weekly · audit velocity per design partner · time-to-outcome-logged',
     why: 'Cloverpop manual-logging trap is the #1 active failure mode. Audit velocity drop signals integration broke.',
-    successCriterion: 'Audits per active user per month >5 sustained · time-from-analysis-to-outcome <48h sustained',
+    successCriterion:
+      'Audits per active user per month >5 sustained · time-from-analysis-to-outcome <48h sustained',
     blocker: 'Manual telemetry today. Automated dashboard would be ideal but is not blocking.',
     effort: 'small',
   },
@@ -2722,9 +3158,11 @@ export const NINETY_DAY_ACTIONS: NinetyDayAction[] = [
     week: 'Continuous · monthly',
     weekNumber: 0,
     category: 'positioning',
-    action: 'Monthly competitive intelligence sweep · Cloverpop / Aera / IBM watsonx / Palantir / Quantexa / Snowflake',
+    action:
+      'Monthly competitive intelligence sweep · Cloverpop / Aera / IBM watsonx / Palantir / Quantexa / Snowflake',
     why: 'External attack vectors require active monitoring. The moment any incumbent ships a competing feature, the strategic posture shifts.',
-    successCriterion: 'Monthly sweep documented · Failure Modes Watchtower tripwires updated · CLAUDE.md External Attack Vectors section refreshed if needed',
+    successCriterion:
+      'Monthly sweep documented · Failure Modes Watchtower tripwires updated · CLAUDE.md External Attack Vectors section refreshed if needed',
     blocker: 'Time investment (~2-3 hours per month).',
     effort: 'small',
   },
@@ -2783,7 +3221,7 @@ export const NOTEBOOKLM_FOLLOW_UPS: NotebookLmFollowUp[] = [
     id: 'cloverpop_disclosed_acvs',
     category: 'failure_modes',
     question:
-      'Cloverpop\'s actual ACV and customer-count progression — find any disclosed numbers from press, court filings, acquisition disclosure (Clearbox Decisions Sept 2025), Crunchbase, or PitchBook. What did their first 10 paid customers look like? What was the typical ACV at acquisition?',
+      "Cloverpop's actual ACV and customer-count progression — find any disclosed numbers from press, court filings, acquisition disclosure (Clearbox Decisions Sept 2025), Crunchbase, or PitchBook. What did their first 10 paid customers look like? What was the typical ACV at acquisition?",
     whyAsk:
       'Cloverpop data-advantage external attack vector requires us to know the depth of their data moat. Knowing their customer count + ACV progression sharpens the wedge-vs-Cloverpop positioning.',
     expectedOutput:
@@ -2816,7 +3254,7 @@ export const NOTEBOOKLM_FOLLOW_UPS: NotebookLmFollowUp[] = [
     id: 'lp_decision_quality_questions',
     category: 'compliance',
     question:
-      'What questions will an LP ask the GP about Decision Intel\'s DPR before they let the GP use it for IC reporting? Specific framework concerns (anti-money laundering, data residency, indemnification, exit rights), specific procurement-grade gates.',
+      "What questions will an LP ask the GP about Decision Intel's DPR before they let the GP use it for IC reporting? Specific framework concerns (anti-money laundering, data residency, indemnification, exit rights), specific procurement-grade gates.",
     whyAsk:
       'LP procurement-gate clearing is the long-tail expansion path for Pan-African / EM-fund design partners. Knowing the LP-side concerns lets DI ship the LP-grade DPR variant before the LP asks.',
     expectedOutput:
@@ -2866,7 +3304,7 @@ export const SILENT_OBJECTIONS: SilentObjection[] = [
     id: 'dqi_trust_me_math',
     rank: 1,
     buyerThinks:
-      '"You\'re charging £2,499/mo to tell me my memo is a \'D\' based on a weighting formula you invented. Where are the confidence intervals? My CFO will laugh me out of the room if I take heuristic dollar estimates to procurement."',
+      "\"You're charging £2,499/mo to tell me my memo is a 'D' based on a weighting formula you invented. Where are the confidence intervals? My CFO will laugh me out of the room if I take heuristic dollar estimates to procurement.\"",
     whyItKills:
       'Audit committees and CFOs reject black-box financial estimates by definition. Heuristic-based USD numbers fail procurement on first pass.',
     fixThisWeek:
@@ -2894,7 +3332,7 @@ export const SILENT_OBJECTIONS: SilentObjection[] = [
     whyItKills:
       'Cannot sell "system of record for strategic reasoning" if the system itself is viewed as a fragile single-point-of-failure startup.',
     fixThisWeek:
-      'DEFERRED until first design-partner sign per founder direction 2026-04-28. Solo / individual / fractional CSO targets in the 30-day window do NOT raise this objection — they\'re buying a personal tool, not enterprise SLA. Re-activate when Sankore / first F500 conversation enters procurement stage.',
+      "DEFERRED until first design-partner sign per founder direction 2026-04-28. Solo / individual / fractional CSO targets in the 30-day window do NOT raise this objection — they're buying a personal tool, not enterprise SLA. Re-activate when Sankore / first F500 conversation enters procurement stage.",
     status: 'deferred',
     shipBy: 'When first design-partner conversation enters procurement stage',
   },
@@ -2904,9 +3342,9 @@ export const SILENT_OBJECTIONS: SilentObjection[] = [
     buyerThinks:
       '"This 3-judge statistical jury is just three Gemini API calls with different temperatures. My internal dev team could build this in a weekend with LangChain. I\'m not paying a premium for a UI wrapped around a foundation model."',
     whyItKills:
-      'If they suspect we\'re a wrapper, they defer to existing Microsoft Copilot or Palantir AIP rollout instead of onboarding a new vendor.',
+      "If they suspect we're a wrapper, they defer to existing Microsoft Copilot or Palantir AIP rollout instead of onboarding a new vendor.",
     fixThisWeek:
-      'Rename "3-judge statistical jury" → "ensemble sampling" across all user-facing surfaces (lib/agents prompts, UI copy, /how-it-works, DPR sections, marketing pages). Move 100% of defensive messaging away from the LLM pipeline. Anchor exclusively on (a) the 135-case reference library and (b) the R²F Kahneman × Klein academic synthesis. The moat is historical pattern-matching + future outcome data, NOT the prompts.',
+      'Rename "3-judge statistical jury" → "ensemble sampling" across all user-facing surfaces (lib/agents prompts, UI copy, /how-it-works, DPR sections, marketing pages). Move 100% of defensive messaging away from the LLM pipeline. Anchor exclusively on (a) the 143-case reference library and (b) the R²F Kahneman × Klein academic synthesis. The moat is historical pattern-matching + future outcome data, NOT the prompts.',
     status: 'in_progress',
     shipBy: 'This week — codebase rename',
   },
@@ -2914,9 +3352,9 @@ export const SILENT_OBJECTIONS: SilentObjection[] = [
     id: 'pan_african_regulatory_illusion',
     rank: 5,
     buyerThinks:
-      '"You pitched a 17-framework compliance map for African funds, but you completely missed Nigerian SEC\'s Investment & Securities Act 2007, and you\'re referencing the outdated 2018 FRC Nigeria code. You claim you understand my market — you don\'t actually know my regulators."',
+      "\"You pitched a 17-framework compliance map for African funds, but you completely missed Nigerian SEC's Investment & Securities Act 2007, and you're referencing the outdated 2018 FRC Nigeria code. You claim you understand my market — you don't actually know my regulators.\"",
     whyItKills:
-      'For a licensed firm like Sankore, regulatory mapping isn\'t marketing — it\'s a legal requirement. Incomplete coverage breaks trust permanently. One missing primary regulator turns the wedge into an outsider misstep.',
+      "For a licensed firm like Sankore, regulatory mapping isn't marketing — it's a legal requirement. Incomplete coverage breaks trust permanently. One missing primary regulator turns the wedge into an outsider misstep.",
     fixThisWeek:
       'Ship ISA 2007 (Nigerian Investment & Securities Act) framework module. Update FRC Nigeria code to current standard (post-2018 revisions). Both extend the framework count from 17 → 18+ via the canonical getAllRegisteredFrameworks() source. Less critical for the immediate UK-focused 30-day pivot, but prerequisite for the Sankore summer design-partner conversation.',
     status: 'in_progress',
@@ -2959,7 +3397,8 @@ export const SIMPLIFIED_FUNNEL: FunnelScreen[] = [
     step: 2,
     name: 'Upload · the ingestion',
     what: 'Immediate processing. No decision-frame form, no success-criteria input, no team invites. Drop file, audit fires.',
-    action: '60-second streaming progress bar with pipeline-node animation. No friction between drop and reveal.',
+    action:
+      '60-second streaming progress bar with pipeline-node animation. No friction between drop and reveal.',
     whatToHide: [
       'Decision-frame capture form (if added per R²F lever 3, gate behind a "deeper audit" tier)',
       'Success criteria input',
@@ -3068,13 +3507,13 @@ export const FEATURE_VERDICTS: FeatureVerdict[] = [
     id: 'compliance_17_frameworks',
     feature: '17-framework compliance mapping (SOX, EU AI Act, etc.)',
     verdict: 'enterprise_tier',
-    why: 'A 24-year-old associate doesn\'t care about EU AI Act. F500 GCs care — but they\'re a 12-month play. Move to Strategy / Enterprise tier; surface only on enterprise quote pages.',
+    why: "A 24-year-old associate doesn't care about EU AI Act. F500 GCs care — but they're a 12-month play. Move to Strategy / Enterprise tier; surface only on enterprise quote pages.",
   },
   {
     id: 'enterprise_slack',
     feature: 'Enterprise Slack integration',
     verdict: 'enterprise_tier',
-    why: 'Solo users aren\'t deploying Slack bots. Move to Strategy / Enterprise tier.',
+    why: "Solo users aren't deploying Slack bots. Move to Strategy / Enterprise tier.",
   },
   {
     id: 'outcome_gate_enforcement',

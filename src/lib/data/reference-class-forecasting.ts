@@ -4,7 +4,7 @@
  * Instead of forecasting deal success from inside-view deal specifics,
  * pull the base rate from the comparable historical reference class.
  *
- * Source data: the 135 curated case studies in src/lib/data/case-studies.
+ * Source data: the curated case studies in src/lib/data/case-studies (HISTORICAL_CASE_COUNT).
  * All math is deterministic and runs at import time on the client — no
  * network, no DB, no async.
  */

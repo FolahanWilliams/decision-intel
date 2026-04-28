@@ -17,6 +17,7 @@ import { createLogger } from '@/lib/utils/logger';
 import { verifyFounderPass as checkFounderPass } from '@/lib/utils/founder-auth';
 import { prisma } from '@/lib/prisma';
 import { FOUNDER_CONTEXT } from '../founder-context';
+import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 
 const log = createLogger('FounderContentStudio');
 const ENCODER = new TextEncoder();
@@ -121,7 +122,7 @@ Focus on: 70-90% M&A failure rate from human factors, anchoring to entry price, 
 Suggested angles: Why perfect financial models fail, the human element DD misses, cognitive biases invisible in spreadsheets.`,
 
   decision_noise: `CONTENT PILLAR: Exposing "Decision Noise"
-Focus on: IC inconsistency nobody measures, "Rubber-Stamp" committees, winner's curse (65%), confirmation bias in deal advocacy. Reference Kahneman's noise research. Use "Ensemble Sampling" and "Decision Twin" concepts (the term "Statistical Jury" was retired 2026-04-28 because sophisticated buyers read it as "ChatGPT wrapper" — anchor on the 135-case reference library + R²F academic synthesis instead).
+Focus on: IC inconsistency nobody measures, "Rubber-Stamp" committees, winner's curse (65%), confirmation bias in deal advocacy. Reference Kahneman's noise research. Use "Ensemble Sampling" and "Decision Twin" concepts (the term "Statistical Jury" was retired 2026-04-28 because sophisticated buyers read it as "ChatGPT wrapper" — anchor on the ${HISTORICAL_CASE_COUNT}-case reference library + R²F academic synthesis instead).
 Suggested angles: Why your IC produces different answers on different days, the rubber-stamp problem, simulating the boardroom.`,
 
   toxic_combos: `CONTENT PILLAR: "Toxic Combinations" and Compound Risk

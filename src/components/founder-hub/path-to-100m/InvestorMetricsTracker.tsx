@@ -37,9 +37,9 @@ export function InvestorMetricsTracker() {
     setOpenIds(next);
   };
 
-  const grouped = (['business', 'product', 'presentation'] as const).map((cat) => ({
+  const grouped = (['business', 'product', 'presentation'] as const).map(cat => ({
     cat,
-    metrics: INVESTOR_METRICS.filter((m) => m.category === cat),
+    metrics: INVESTOR_METRICS.filter(m => m.category === cat),
   }));
 
   return (
@@ -64,7 +64,7 @@ export function InvestorMetricsTracker() {
               <Icon size={12} /> {CATEGORY_LABEL[cat]} · {metrics.length} metrics
             </div>
 
-            {metrics.map((m) => {
+            {metrics.map(m => {
               const isOpen = openIds.has(m.id);
               const accent = STATUS_COLOR[m.status];
               return (
@@ -122,7 +122,8 @@ export function InvestorMetricsTracker() {
                         {m.name}
                       </div>
                       <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
-                        Now: {m.diCurrent.length > 60 ? m.diCurrent.slice(0, 60) + '…' : m.diCurrent}
+                        Now:{' '}
+                        {m.diCurrent.length > 60 ? m.diCurrent.slice(0, 60) + '…' : m.diCurrent}
                       </div>
                     </div>
                     <div
@@ -165,7 +166,9 @@ export function InvestorMetricsTracker() {
                         >
                           What it is
                         </div>
-                        <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                        <div
+                          style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}
+                        >
                           {m.whatItIs}
                         </div>
                       </div>
@@ -184,7 +187,13 @@ export function InvestorMetricsTracker() {
                           >
                             Current state
                           </div>
-                          <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                          <div
+                            style={{
+                              fontSize: 12,
+                              color: 'var(--text-secondary)',
+                              lineHeight: 1.5,
+                            }}
+                          >
                             {m.diCurrent}
                           </div>
                         </div>
@@ -201,7 +210,13 @@ export function InvestorMetricsTracker() {
                           >
                             12-month target
                           </div>
-                          <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                          <div
+                            style={{
+                              fontSize: 12,
+                              color: 'var(--text-secondary)',
+                              lineHeight: 1.5,
+                            }}
+                          >
                             {m.diTarget12mo}
                           </div>
                         </div>
@@ -220,7 +235,9 @@ export function InvestorMetricsTracker() {
                         >
                           Why it matters
                         </div>
-                        <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                        <div
+                          style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}
+                        >
                           {m.whyItMatters}
                         </div>
                       </div>
@@ -257,7 +274,9 @@ export function InvestorMetricsTracker() {
                         >
                           Tripwire
                         </div>
-                        <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                        <div
+                          style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}
+                        >
                           {m.tripwire}
                         </div>
                       </div>

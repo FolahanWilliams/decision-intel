@@ -117,7 +117,8 @@ export const NODES: MapNode[] = [
     group: 'Start',
     x: 0.07,
     y: 0.28,
-    whatItsFor: 'The 2026→2030 roadmap from pre-seed to IPO with conditional probabilities at each phase.',
+    whatItsFor:
+      'The 2026→2030 roadmap from pre-seed to IPO with conditional probabilities at each phase.',
     payoff: 'Honest probability path, hard-truth risks, named tripwires per phase.',
     minutes: 15,
     prerequisites: [],
@@ -129,8 +130,10 @@ export const NODES: MapNode[] = [
     group: 'Start',
     x: 0.07,
     y: 0.62,
-    whatItsFor: 'Strategic compass + per-role outreach playbooks (8 personas) + R²F moat-deepening levers.',
-    payoff: '90-day plan, 16 investor metrics tracker, warm-intro network map, NotebookLM follow-ups.',
+    whatItsFor:
+      'Strategic compass + per-role outreach playbooks (8 personas) + R²F moat-deepening levers.',
+    payoff:
+      '90-day plan, 16 investor metrics tracker, warm-intro network map, NotebookLM follow-ups.',
     minutes: 40,
     prerequisites: ['unicorn_roadmap'],
     iconName: 'Compass',
@@ -143,8 +146,9 @@ export const NODES: MapNode[] = [
     group: 'Product',
     x: 0.27,
     y: 0.18,
-    whatItsFor: 'The four-moments narrative + locked vocabulary + Decision Knowledge Graph framing.',
-    payoff: "You can pitch the product in 60 seconds without reaching for notes.",
+    whatItsFor:
+      'The four-moments narrative + locked vocabulary + Decision Knowledge Graph framing.',
+    payoff: 'You can pitch the product in 60 seconds without reaching for notes.',
     minutes: 12,
     prerequisites: [],
     iconName: 'Rocket',
@@ -155,7 +159,8 @@ export const NODES: MapNode[] = [
     group: 'Product',
     x: 0.27,
     y: 0.5,
-    whatItsFor: '12-node LangGraph pipeline, scoring engine with toxic-combination detection, DQI methodology.',
+    whatItsFor:
+      '12-node LangGraph pipeline, scoring engine with toxic-combination detection, DQI methodology.',
     payoff: 'Technical depth for a CTO call. Scoring weights, calibration, the 20×20 matrix.',
     minutes: 30,
     prerequisites: ['overview'],
@@ -167,8 +172,9 @@ export const NODES: MapNode[] = [
     group: 'Product',
     x: 0.27,
     y: 0.82,
-    whatItsFor: '37-thinker constellation: Kahneman, Klein, Sibony, Tetlock, Strebulaev, and 32 others.',
-    payoff: "Anchors the IP claim. The Noise moment alone is a Monday-morning sales line.",
+    whatItsFor:
+      '37-thinker constellation: Kahneman, Klein, Sibony, Tetlock, Strebulaev, and 32 others.',
+    payoff: 'Anchors the IP claim. The Noise moment alone is a Monday-morning sales line.',
     minutes: 25,
     prerequisites: ['overview'],
     iconName: 'BookOpen',
@@ -193,7 +199,8 @@ export const NODES: MapNode[] = [
     group: 'Go-to-Market',
     x: 0.5,
     y: 0.16,
-    whatItsFor: "Sharp's brand spine, market thesis, strategic compass, pitch deck, AI rehearsal coach.",
+    whatItsFor:
+      "Sharp's brand spine, market thesis, strategic compass, pitch deck, AI rehearsal coach.",
     payoff: 'Rehearse a pitch out loud against the AI coach before a real meeting.',
     minutes: 35,
     prerequisites: ['overview'],
@@ -205,7 +212,8 @@ export const NODES: MapNode[] = [
     group: 'Go-to-Market',
     x: 0.5,
     y: 0.25,
-    whatItsFor: 'Cloverpop comparison, 5 moat layers, capability matrix, 8 investor Q&As, top-3 DI-space gaps.',
+    whatItsFor:
+      'Cloverpop comparison, 5 moat layers, capability matrix, 8 investor Q&As, top-3 DI-space gaps.',
     payoff: 'Direct answers to "why this, why now, why you" for any procurement reader.',
     minutes: 25,
     prerequisites: ['category_position'],
@@ -229,8 +237,10 @@ export const NODES: MapNode[] = [
     group: 'Go-to-Market',
     x: 0.5,
     y: 0.43,
-    whatItsFor: 'Maalouf 6 high-ticket-psychology principles + Satyam 5 sales-infrastructure pillars + 5 silent objections + 3 fastest-converter personas + 80% cut list.',
-    payoff: 'The exact phrase to use on the call, the silent objection that killed your last lost deal, and the 14-day outreach sequence per persona.',
+    whatItsFor:
+      'Maalouf 6 high-ticket-psychology principles + Satyam 5 sales-infrastructure pillars + 5 silent objections + 3 fastest-converter personas + 80% cut list.',
+    payoff:
+      'The exact phrase to use on the call, the silent objection that killed your last lost deal, and the 14-day outreach sequence per persona.',
     minutes: 35,
     prerequisites: ['sales'],
     iconName: 'Target',
@@ -241,8 +251,10 @@ export const NODES: MapNode[] = [
     group: 'Go-to-Market',
     x: 0.5,
     y: 0.52,
-    whatItsFor: 'Flashcard + recall + apply mastery across 12 decks (~100 cards): DI vocabulary, 7 buyer personas, Maalouf 6 + Satyam 5, 11-dim Sales DQI rubric, 5 silent objections, 17 regulatory frameworks, 12-node pipeline, R²F integration, founder one-liners. SM-2 spaced repetition + AI-graded recall.',
-    payoff: 'Mastery through recollection. Reading builds familiarity; recall under pressure builds the muscle that fires in a live conversation.',
+    whatItsFor:
+      'Flashcard + recall + apply mastery across 12 decks (~100 cards): DI vocabulary, 7 buyer personas, Maalouf 6 + Satyam 5, 11-dim Sales DQI rubric, 5 silent objections, 17 regulatory frameworks, 12-node pipeline, R²F integration, founder one-liners. SM-2 spaced repetition + AI-graded recall.',
+    payoff:
+      'Mastery through recollection. Reading builds familiarity; recall under pressure builds the muscle that fires in a live conversation.',
     minutes: 30,
     prerequisites: ['closing_lab'],
     iconName: 'BookOpen',
@@ -253,8 +265,10 @@ export const NODES: MapNode[] = [
     group: 'Go-to-Market',
     x: 0.5,
     y: 0.61,
-    whatItsFor: 'Live sales-rep practice. AI generates a buyer-voice opener + 3 questions per persona × scenario (incl. networking-event in-person); you record via Wispr Flow, paste the transcript, get an 11-dimension Sales DQI scorecard (Maalouf 4 + Satyam 3 + DI discipline 2 + Kahneman loss-aversion + fundamentals) + buyer-perspective simulation + the verbatim phrase you should have used.',
-    payoff: 'The reading→recall→doing loop completes here. Closing Lab gives you the framework; Education Room makes you recall it; Sparring Room makes you live it under pressure with rep-by-rep grade tracking.',
+    whatItsFor:
+      'Live sales-rep practice. AI generates a buyer-voice opener + 3 questions per persona × scenario (incl. networking-event in-person); you record via Wispr Flow, paste the transcript, get an 11-dimension Sales DQI scorecard (Maalouf 4 + Satyam 3 + DI discipline 2 + Kahneman loss-aversion + fundamentals) + buyer-perspective simulation + the verbatim phrase you should have used.',
+    payoff:
+      'The reading→recall→doing loop completes here. Closing Lab gives you the framework; Education Room makes you recall it; Sparring Room makes you live it under pressure with rep-by-rep grade tracking.',
     minutes: 25,
     prerequisites: ['education_room'],
     iconName: 'Brain',
@@ -264,8 +278,9 @@ export const NODES: MapNode[] = [
     label: 'Outreach Hub',
     group: 'Go-to-Market',
     x: 0.5,
-    y: 0.70,
-    whatItsFor: 'ICP events + persona map + channel matrix + contact tracker + LinkedIn message generator + design-partner triage.',
+    y: 0.7,
+    whatItsFor:
+      'ICP events + persona map + channel matrix + contact tracker + LinkedIn message generator + design-partner triage.',
     payoff: 'The operational outbound layer. Every Monday-morning send-message lives here.',
     minutes: 40,
     prerequisites: ['sparring_room'],
@@ -277,7 +292,8 @@ export const NODES: MapNode[] = [
     group: 'Go-to-Market',
     x: 0.5,
     y: 0.79,
-    whatItsFor: 'LinkedIn post generator, case-study analyzer, voice config, content opportunity scanner.',
+    whatItsFor:
+      'LinkedIn post generator, case-study analyzer, voice config, content opportunity scanner.',
     payoff: 'The content flywheel. Daily LinkedIn posts that warm up cold prospects.',
     minutes: 15,
     prerequisites: ['positioning'],
@@ -289,8 +305,10 @@ export const NODES: MapNode[] = [
     group: 'Go-to-Market',
     x: 0.5,
     y: 0.88,
-    whatItsFor: 'Active warm-intro brief: Ian profile, LRQA company map, integration paths, ask hierarchy, meeting prep.',
-    payoff: 'Walk into the meeting with the artefact + literal opening line + follow-up cadence ready.',
+    whatItsFor:
+      'Active warm-intro brief: Ian profile, LRQA company map, integration paths, ask hierarchy, meeting prep.',
+    payoff:
+      'Walk into the meeting with the artefact + literal opening line + follow-up cadence ready.',
     minutes: 30,
     prerequisites: ['outreach_hub'],
     iconName: 'Handshake',
@@ -315,8 +333,9 @@ export const NODES: MapNode[] = [
     group: 'Intelligence',
     x: 0.73,
     y: 0.62,
-    whatItsFor: '135 historical decisions + bias interaction matrix + Decision Alpha leaderboard.',
-    payoff: 'Pick 3 cases to anchor every cold pitch. The corpus is the procurement-grade reference.',
+    whatItsFor: '143 historical decisions + bias interaction matrix + Decision Alpha leaderboard.',
+    payoff:
+      'Pick 3 cases to anchor every cold pitch. The corpus is the procurement-grade reference.',
     minutes: 25,
     prerequisites: ['research'],
     iconName: 'Library',
@@ -354,7 +373,8 @@ export const NODES: MapNode[] = [
     x: 0.92,
     y: 0.42,
     whatItsFor: 'Bootstrap vs. VC lanes, 4 quarters, milestone drill-down with tripwires.',
-    payoff: 'The lane decision. Quarterly milestones written down so you can hold yourself to them.',
+    payoff:
+      'The lane decision. Quarterly milestones written down so you can hold yourself to them.',
     minutes: 20,
     prerequisites: ['unicorn_roadmap'],
     iconName: 'Map',
@@ -377,8 +397,10 @@ export const NODES: MapNode[] = [
     group: 'Tools',
     x: 0.92,
     y: 0.72,
-    whatItsFor: '66 lessons across 8 tracks: Platform Foundations, Enterprise Sales, Product, GTM, BD, Leadership.',
-    payoff: 'Sample one or two lessons that match your current bottleneck. Cited research, not blogspam.',
+    whatItsFor:
+      '66 lessons across 8 tracks: Platform Foundations, Enterprise Sales, Product, GTM, BD, Leadership.',
+    payoff:
+      'Sample one or two lessons that match your current bottleneck. Cited research, not blogspam.',
     minutes: 25,
     prerequisites: [],
     iconName: 'GraduationCap',
@@ -389,7 +411,8 @@ export const NODES: MapNode[] = [
     group: 'Tools',
     x: 0.92,
     y: 0.87,
-    whatItsFor: 'Manual triggers for outcome-detection / playbook-followup / weekly-digest crons. Admin only.',
+    whatItsFor:
+      'Manual triggers for outcome-detection / playbook-followup / weekly-digest crons. Admin only.',
     payoff: 'Force a cron to run when you need to validate a fix without waiting for the schedule.',
     minutes: 5,
     prerequisites: [],
@@ -408,7 +431,8 @@ export const EDGES: MapEdge[] = [
   {
     from: 'unicorn_roadmap',
     to: 'path_to_100m',
-    rationale: 'The roadmap names the destination; the path lays out the warm-intro and persona moves to get there.',
+    rationale:
+      'The roadmap names the destination; the path lays out the warm-intro and persona moves to get there.',
     strength: 'primary',
   },
 
@@ -448,37 +472,43 @@ export const EDGES: MapEdge[] = [
   {
     from: 'sales',
     to: 'closing_lab',
-    rationale: 'Sales toolkit names the frameworks (JOLT / SLIP / Cialdini); closing lab applies them to the 3 fastest-converter personas with verbatim phrases.',
+    rationale:
+      'Sales toolkit names the frameworks (JOLT / SLIP / Cialdini); closing lab applies them to the 3 fastest-converter personas with verbatim phrases.',
     strength: 'primary',
   },
   {
     from: 'closing_lab',
     to: 'education_room',
-    rationale: 'Closing lab gives you the verbatim phrases. Education Room makes you RECALL them on demand — flashcard, AI-graded text recall, scenario-application drills with SM-2 spaced repetition.',
+    rationale:
+      'Closing lab gives you the verbatim phrases. Education Room makes you RECALL them on demand — flashcard, AI-graded text recall, scenario-application drills with SM-2 spaced repetition.',
     strength: 'primary',
   },
   {
     from: 'education_room',
     to: 'sparring_room',
-    rationale: 'Education Room builds the recall muscle (text-grade mastery). Sparring Room tests it under speech pressure — buyer-voice questions, voice answer, AI-graded with buyer-perspective simulation.',
+    rationale:
+      'Education Room builds the recall muscle (text-grade mastery). Sparring Room tests it under speech pressure — buyer-voice questions, voice answer, AI-graded with buyer-perspective simulation.',
     strength: 'primary',
   },
   {
     from: 'closing_lab',
     to: 'sparring_room',
-    rationale: 'Direct path when you skip the recall drill and go straight to live practice. The shorter loop for when a meeting is in 30 minutes.',
+    rationale:
+      'Direct path when you skip the recall drill and go straight to live practice. The shorter loop for when a meeting is in 30 minutes.',
     strength: 'secondary',
   },
   {
     from: 'sparring_room',
     to: 'outreach_hub',
-    rationale: 'Practice rep first, outbound message second. Once a rep grades B+ in the room, the cold-message draft writes itself.',
+    rationale:
+      'Practice rep first, outbound message second. Once a rep grades B+ in the room, the cold-message draft writes itself.',
     strength: 'primary',
   },
   {
     from: 'closing_lab',
     to: 'outreach_hub',
-    rationale: 'Direct path when you skip practice and just want to write outbound. Reading the verbatim phrase still beats nothing.',
+    rationale:
+      'Direct path when you skip practice and just want to write outbound. Reading the verbatim phrase still beats nothing.',
     strength: 'secondary',
   },
   {
@@ -490,7 +520,8 @@ export const EDGES: MapEdge[] = [
   {
     from: 'outreach_hub',
     to: 'lrqa',
-    rationale: 'Concrete prospect briefs (LRQA) are the next layer down from generic outreach moves.',
+    rationale:
+      'Concrete prospect briefs (LRQA) are the next layer down from generic outreach moves.',
     strength: 'secondary',
   },
 
@@ -498,7 +529,8 @@ export const EDGES: MapEdge[] = [
   {
     from: 'research',
     to: 'case_library',
-    rationale: 'Research names the principles; the case library shows the evidence behind each one.',
+    rationale:
+      'Research names the principles; the case library shows the evidence behind each one.',
     strength: 'primary',
   },
   {
@@ -536,7 +568,8 @@ export const EDGES: MapEdge[] = [
   {
     from: 'path_to_100m',
     to: 'founder_school',
-    rationale: 'The path identifies the personas; founder school covers each persona move in depth.',
+    rationale:
+      'The path identifies the personas; founder school covers each persona move in depth.',
     strength: 'secondary',
   },
   {
@@ -556,8 +589,10 @@ export const JOURNEYS: Journey[] = [
   {
     id: 'pitch',
     label: 'Preparing a pitch',
-    description: 'You have a meeting in the next 48 hours. You need vocabulary, moat, recall mastery, rehearsal, and the verbatim phrase per persona — at least 2 graded sparring reps before walking in.',
-    outcome: 'Walk into the meeting with the locked positioning, three case anchors, the silent-objections list, the persona-specific exact phrase recalled cold from memory, AND a graded sparring rep proving you can deliver it under pressure.',
+    description:
+      'You have a meeting in the next 48 hours. You need vocabulary, moat, recall mastery, rehearsal, and the verbatim phrase per persona — at least 2 graded sparring reps before walking in.',
+    outcome:
+      'Walk into the meeting with the locked positioning, three case anchors, the silent-objections list, the persona-specific exact phrase recalled cold from memory, AND a graded sparring rep proving you can deliver it under pressure.',
     path: [
       'overview',
       'category_position',
@@ -575,8 +610,10 @@ export const JOURNEYS: Journey[] = [
   {
     id: 'research',
     label: 'Researching the market',
-    description: 'You want to understand the competitive landscape and what makes Decision Intel structurally different.',
-    outcome: 'You can answer "what is decision intelligence" + "why is DI structurally different" in two sentences each.',
+    description:
+      'You want to understand the competitive landscape and what makes Decision Intel structurally different.',
+    outcome:
+      'You can answer "what is decision intelligence" + "why is DI structurally different" in two sentences each.',
     path: [
       'overview',
       'research',
@@ -591,8 +628,10 @@ export const JOURNEYS: Journey[] = [
   {
     id: 'outreach',
     label: 'Executing outreach',
-    description: 'You have prospects to reach this week. You want the persona-specific exact phrase, recall mastery on the silent-objections list, a graded sparring rep, plus the 14-day sequence + message generator + warm-intro template ready.',
-    outcome: '5-10 Monday-morning outreach drafts queued. The right channel + the right opener + the right silent-objection rebuttal — recalled cold from memory and backed by at least one graded rep on the persona you are about to call.',
+    description:
+      'You have prospects to reach this week. You want the persona-specific exact phrase, recall mastery on the silent-objections list, a graded sparring rep, plus the 14-day sequence + message generator + warm-intro template ready.',
+    outcome:
+      '5-10 Monday-morning outreach drafts queued. The right channel + the right opener + the right silent-objection rebuttal — recalled cold from memory and backed by at least one graded rep on the persona you are about to call.',
     path: [
       'positioning',
       'sales',
@@ -611,23 +650,21 @@ export const JOURNEYS: Journey[] = [
   {
     id: 'reflect',
     label: 'Reflecting on a close',
-    description: 'A pitch just closed (or didn’t). You want to capture the lesson and feed it back into the path.',
-    outcome: 'A 1-paragraph tip captured + the strategic compass updated + the relevant tripwires flipped.',
-    path: [
-      'founder_tips',
-      'path_to_100m',
-      'forecast',
-      'unicorn_roadmap',
-      'founder_school',
-    ],
+    description:
+      'A pitch just closed (or didn’t). You want to capture the lesson and feed it back into the path.',
+    outcome:
+      'A 1-paragraph tip captured + the strategic compass updated + the relevant tripwires flipped.',
+    path: ['founder_tips', 'path_to_100m', 'forecast', 'unicorn_roadmap', 'founder_school'],
     totalMinutes: 8 + 40 + 20 + 15 + 25,
     color: '#8B5CF6',
   },
   {
     id: 'product',
     label: 'Diving into the product',
-    description: 'You want to explain the product to a technical buyer. CTO, head of data, or an engineering audience.',
-    outcome: 'You can walk through the 12-node pipeline + DQI methodology + scoring engine + outcome flywheel.',
+    description:
+      'You want to explain the product to a technical buyer. CTO, head of data, or an engineering audience.',
+    outcome:
+      'You can walk through the 12-node pipeline + DQI methodology + scoring engine + outcome flywheel.',
     path: [
       'overview',
       'product_deep',

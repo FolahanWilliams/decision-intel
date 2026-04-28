@@ -67,10 +67,22 @@ function getModel() {
   const model = genAI.getGenerativeModel({
     model: modelName,
     safetySettings: [
-      { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-      { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-      { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-      { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+      {
+        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
     ],
     generationConfig: { maxOutputTokens: 2500, temperature: 0.4 },
   });
@@ -120,27 +132,35 @@ function detectVocabularyHits(transcript: string, vocabList: string[]): string[]
 
 // ─── Grading prompt ──────────────────────────────────────────────
 
-function buildGradingPrompt(body: RequestBody, persona: ReturnType<typeof findPersonaById>, scenario: ReturnType<typeof findScenarioById>): string {
+function buildGradingPrompt(
+  body: RequestBody,
+  persona: ReturnType<typeof findPersonaById>,
+  scenario: ReturnType<typeof findScenarioById>
+): string {
   if (!persona || !scenario) throw new Error('Persona or scenario not found');
 
-  const dimensionsBlock = GRADING_DIMENSIONS.map(d =>
-    `  - ${d.id} (source: ${d.source}, weight: ${d.weight}): ${d.label}\n      Excellent (5/5): ${d.excellentLooks}\n      Poor (1/5): ${d.poorLooks}`
+  const dimensionsBlock = GRADING_DIMENSIONS.map(
+    d =>
+      `  - ${d.id} (source: ${d.source}, weight: ${d.weight}): ${d.label}\n      Excellent (5/5): ${d.excellentLooks}\n      Poor (1/5): ${d.poorLooks}`
   ).join('\n');
 
   const warmContextNote = body.isWarmContext
-    ? 'The conversation context is WARM — the buyer has already had at least one prior meeting and has earned exposure to DI\'s locked vocabulary (reasoning layer / R²F / DPR / DQI). Using locked vocabulary HERE is positive.'
+    ? "The conversation context is WARM — the buyer has already had at least one prior meeting and has earned exposure to DI's locked vocabulary (reasoning layer / R²F / DPR / DQI). Using locked vocabulary HERE is positive."
     : 'The conversation context is COLD — the buyer has not yet earned exposure to DI\'s platform vocabulary. Using "reasoning layer" / "R²F" / "DPR" without descriptive bridging is a negative; the salesperson should lead with descriptive plain language ("60-second audit", "pre-IC bias detection", "decision quality auditing").';
 
   // Pattern detection — only enabled when the founder has 3+ reps logged.
   const recentReps = body.totalRepsCompleted ?? 0;
   const recentDims = body.recentDimensionAverages || {};
-  const recentTrendBlock = recentReps >= 3 && Object.keys(recentDims).length > 0
-    ? `\nLONGITUDINAL CONTEXT — the founder has completed ${recentReps} reps total. Their last-5 rolling average per dimension (where data exists):\n${
-        Object.entries(recentDims)
+  const recentTrendBlock =
+    recentReps >= 3 && Object.keys(recentDims).length > 0
+      ? `\nLONGITUDINAL CONTEXT — the founder has completed ${recentReps} reps total. Their last-5 rolling average per dimension (where data exists):\n${Object.entries(
+          recentDims
+        )
           .map(([dim, avg]) => `  - ${dim}: ${(avg as number).toFixed(1)}/5`)
-          .join('\n')
-      }\nUse this to detect PATTERNS — if a dimension scored 2/5 here AND the rolling average is also <=2.5, that's a recurring weakness, not a one-off. Surface it in patternFlag with the rootCause + breakthroughMove.`
-    : `\nThe founder has completed ${recentReps} reps total — pattern detection is unlocked at 3+ reps. patternFlag should be omitted in this response.`;
+          .join(
+            '\n'
+          )}\nUse this to detect PATTERNS — if a dimension scored 2/5 here AND the rolling average is also <=2.5, that's a recurring weakness, not a one-off. Surface it in patternFlag with the rootCause + breakthroughMove.`
+      : `\nThe founder has completed ${recentReps} reps total — pattern detection is unlocked at 3+ reps. patternFlag should be omitted in this response.`;
 
   return `You are an elite B2B sales coach. You grade reps with rigor BUT your job is to be a coach, not a judge. Every response must end with a concrete plan the founder can execute, not a list of things they did wrong.
 
@@ -197,12 +217,24 @@ REQUIRED OUTPUT — you must produce ALL of the following as a coach, not a judg
 8. confidenceBuild: ONE sentence (max 2) naming what was GENUINELY good in this rep. Quote a specific phrase if you can. NOT generic praise like "good effort" — name the move. Why: founders transmit conviction more readily when they know what specifically worked. This is the opposite of the strengths array; strengths are specific tactical wins, confidenceBuild is the "you can do this" foundation.
 
 9. nextRepSetup: object with { recommendedPersonaId, recommendedMode, rationale }. The persona must be one of: ${[
-    'mid_market_pe_associate', 'boutique_ma_advisor', 'fractional_cso',
-    'f500_cso', 'pan_african_fund_partner', 'gc_audit_committee', 'preseed_vc_associate',
+    'mid_market_pe_associate',
+    'boutique_ma_advisor',
+    'fractional_cso',
+    'f500_cso',
+    'pan_african_fund_partner',
+    'gc_audit_committee',
+    'preseed_vc_associate',
   ].join(' | ')}. The mode must be one of: ${[
-    'networking_event_inperson', 'cold_first_meeting', 'skeptical_followup',
-    'hot_inbound', 'procurement_evaluation', 'objection_handler', 'live_demo_walkthrough',
-  ].join(' | ')}. Rationale logic: if salesDqi >= 80, recommend a HARDER mode (move from cold_first_meeting to skeptical_followup, or change to a higher-skepticism persona like Margaret/James). If 60-79, recommend SAME persona × different mode for skill consolidation. If <60, recommend SAME persona × EASIER mode (or networking_event_inperson if they were doing procurement_evaluation) — meet the founder where they are.
+    'networking_event_inperson',
+    'cold_first_meeting',
+    'skeptical_followup',
+    'hot_inbound',
+    'procurement_evaluation',
+    'objection_handler',
+    'live_demo_walkthrough',
+  ].join(
+    ' | '
+  )}. Rationale logic: if salesDqi >= 80, recommend a HARDER mode (move from cold_first_meeting to skeptical_followup, or change to a higher-skepticism persona like Margaret/James). If 60-79, recommend SAME persona × different mode for skill consolidation. If <60, recommend SAME persona × EASIER mode (or networking_event_inperson if they were doing procurement_evaluation) — meet the founder where they are.
 
 10. patternFlag: ONLY include if recentReps >= 3 AND a clear recurring weakness exists. Object with { pattern, rootCause, breakthroughMove }. The pattern names the recurring under-performance ("you've under-scored on loss-aversion-framing in 3 of last 5 reps"). The rootCause is the deeper "why" (e.g. "you keep framing in upside language because the product genuinely IS upside — but the buyer's loss-averse brain hears upside and discounts"). The breakthroughMove is the ONE concrete change that breaks the pattern. If recentReps < 3 OR no clear pattern exists, OMIT the patternFlag field entirely.
 
@@ -282,27 +314,30 @@ function mockResult(transcript: string, isWarmContext: boolean): SparringSession
     grade: gradeFromDqi(salesDqi),
     dimensions: dims,
     feedback:
-      "Mock response — GOOGLE_API_KEY not set. The grading is illustrative only. Set GOOGLE_API_KEY to get real coach feedback.",
+      'Mock response — GOOGLE_API_KEY not set. The grading is illustrative only. Set GOOGLE_API_KEY to get real coach feedback.',
     strengths: [
-      { point: 'Engaged the buyer\'s question directly without spinning.', framework: 'Fundamentals' },
+      {
+        point: "Engaged the buyer's question directly without spinning.",
+        framework: 'Fundamentals',
+      },
       { point: 'Used a specific reference point.', framework: 'DI Discipline' },
     ],
     improvements: [
       {
-        point: 'Lead with the buyer\'s pain in their own vocabulary BEFORE introducing the product.',
+        point: "Lead with the buyer's pain in their own vocabulary BEFORE introducing the product.",
         framework: 'DI Discipline (empathic-mode-first)',
         exactPhrase:
-          'You\'re trying to make sure the partners stop pushing back on diligence depth — that\'s exactly what this fixes in 60 seconds.',
+          "You're trying to make sure the partners stop pushing back on diligence depth — that's exactly what this fixes in 60 seconds.",
       },
       {
         point: 'Cut the hedging language. State load-bearing claims as fact, not as belief.',
         framework: 'Maalouf (authority not trust)',
-        exactPhrase: 'This catches the bias the room will catch first. That\'s what it does.',
+        exactPhrase: "This catches the bias the room will catch first. That's what it does.",
       },
       {
         point: 'Anchor with one specific case the buyer will recognise.',
         framework: 'Fundamentals (specificity)',
-        exactPhrase: 'Here\'s the WeWork S-1 audit — same shape as your last memo. Look at flag 3.',
+        exactPhrase: "Here's the WeWork S-1 audit — same shape as your last memo. Look at flag 3.",
       },
     ],
     buyerThought:
@@ -316,13 +351,17 @@ function mockResult(transcript: string, isWarmContext: boolean): SparringSession
     nextSessionFocus: [
       {
         dimensionId: 'empathic_mode_first',
-        whyItMatters: 'Buyers disengage in the first 30 seconds when they hear product-first framing.',
-        concreteAction: 'Open your next rep with the BUYER\'s pain in BUYER\'s vocabulary before naming a single feature.',
+        whyItMatters:
+          'Buyers disengage in the first 30 seconds when they hear product-first framing.',
+        concreteAction:
+          "Open your next rep with the BUYER's pain in BUYER's vocabulary before naming a single feature.",
       },
       {
         dimensionId: 'specificity_over_vagueness',
-        whyItMatters: "If the buyer can't repeat one specific thing to a colleague, the deal dies in the next 24 hours.",
-        concreteAction: 'Anchor with WeWork S-1 + one named bias + one named regulation per response.',
+        whyItMatters:
+          "If the buyer can't repeat one specific thing to a colleague, the deal dies in the next 24 hours.",
+        concreteAction:
+          'Anchor with WeWork S-1 + one named bias + one named regulation per response.',
       },
     ],
     drillPlan: [
@@ -332,7 +371,7 @@ function mockResult(transcript: string, isWarmContext: boolean): SparringSession
         estimatedMinutes: 8,
       },
       {
-        action: 'Re-read the Closing Lab section on the persona\'s exact phrase.',
+        action: "Re-read the Closing Lab section on the persona's exact phrase.",
         location: 'Closing Lab → Fastest Converters → exact phrase block',
         estimatedMinutes: 5,
       },
@@ -343,11 +382,12 @@ function mockResult(transcript: string, isWarmContext: boolean): SparringSession
       },
     ],
     confidenceBuild:
-      'You stayed on-topic and didn\'t let the buyer\'s opener push you off your frame. That\'s the foundation everything else builds on.',
+      "You stayed on-topic and didn't let the buyer's opener push you off your frame. That's the foundation everything else builds on.",
     nextRepSetup: {
       recommendedPersonaId: 'mid_market_pe_associate',
       recommendedMode: 'cold_first_meeting',
-      rationale: 'Mock recommendation — set GOOGLE_API_KEY for the real coach to recommend based on your dimension scores.',
+      rationale:
+        'Mock recommendation — set GOOGLE_API_KEY for the real coach to recommend based on your dimension scores.',
     },
   };
 }
@@ -381,10 +421,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 
   if (!Array.isArray(body.questions) || body.questions.length === 0) {
-    return NextResponse.json(
-      { error: 'Questions array is required.' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'Questions array is required.' }, { status: 400 });
   }
 
   // Mechanical analysis (no LLM call needed for these).
@@ -416,14 +453,27 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       strengths: Array<{ point: string; framework: string }>;
       improvements: Array<{ point: string; framework: string; exactPhrase: string }>;
       buyerThought: string;
-      nextSessionFocus?: Array<{ dimensionId: GradingDimensionId; whyItMatters: string; concreteAction: string }>;
+      nextSessionFocus?: Array<{
+        dimensionId: GradingDimensionId;
+        whyItMatters: string;
+        concreteAction: string;
+      }>;
       drillPlan?: Array<{ action: string; location: string; estimatedMinutes: number }>;
       confidenceBuild?: string;
-      nextRepSetup?: { recommendedPersonaId: BuyerPersonaId; recommendedMode: ScenarioMode; rationale: string };
+      nextRepSetup?: {
+        recommendedPersonaId: BuyerPersonaId;
+        recommendedMode: ScenarioMode;
+        rationale: string;
+      };
       patternFlag?: { pattern: string; rootCause: string; breakthroughMove: string };
     };
 
-    if (!data.dimensions || !data.feedback || !Array.isArray(data.strengths) || !Array.isArray(data.improvements)) {
+    if (
+      !data.dimensions ||
+      !data.feedback ||
+      !Array.isArray(data.strengths) ||
+      !Array.isArray(data.improvements)
+    ) {
       throw new Error('Malformed grading response from Gemini');
     }
 
@@ -439,19 +489,31 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     // Validate next-rep-setup persona/mode against the unions; fall back to
     // the current persona/mode if the AI returns an unknown id.
     const validPersonas: BuyerPersonaId[] = [
-      'mid_market_pe_associate', 'boutique_ma_advisor', 'fractional_cso',
-      'f500_cso', 'pan_african_fund_partner', 'gc_audit_committee', 'preseed_vc_associate',
+      'mid_market_pe_associate',
+      'boutique_ma_advisor',
+      'fractional_cso',
+      'f500_cso',
+      'pan_african_fund_partner',
+      'gc_audit_committee',
+      'preseed_vc_associate',
     ];
     const validModes: ScenarioMode[] = [
-      'networking_event_inperson', 'cold_first_meeting', 'skeptical_followup',
-      'hot_inbound', 'procurement_evaluation', 'objection_handler', 'live_demo_walkthrough',
+      'networking_event_inperson',
+      'cold_first_meeting',
+      'skeptical_followup',
+      'hot_inbound',
+      'procurement_evaluation',
+      'objection_handler',
+      'live_demo_walkthrough',
     ];
-    const recommendedPersonaId = data.nextRepSetup && validPersonas.includes(data.nextRepSetup.recommendedPersonaId)
-      ? data.nextRepSetup.recommendedPersonaId
-      : body.personaId;
-    const recommendedMode = data.nextRepSetup && validModes.includes(data.nextRepSetup.recommendedMode)
-      ? data.nextRepSetup.recommendedMode
-      : body.mode;
+    const recommendedPersonaId =
+      data.nextRepSetup && validPersonas.includes(data.nextRepSetup.recommendedPersonaId)
+        ? data.nextRepSetup.recommendedPersonaId
+        : body.personaId;
+    const recommendedMode =
+      data.nextRepSetup && validModes.includes(data.nextRepSetup.recommendedMode)
+        ? data.nextRepSetup.recommendedMode
+        : body.mode;
 
     const sessionResult: SparringSessionResult = {
       salesDqi,
@@ -485,7 +547,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         ? data.drillPlan.slice(0, 4).map(d => ({
             action: String(d.action || '').slice(0, 200),
             location: String(d.location || '').slice(0, 200),
-            estimatedMinutes: Math.max(1, Math.min(60, Math.round(Number(d.estimatedMinutes) || 10))),
+            estimatedMinutes: Math.max(
+              1,
+              Math.min(60, Math.round(Number(d.estimatedMinutes) || 10))
+            ),
           }))
         : [],
       confidenceBuild: String(data.confidenceBuild || '').slice(0, 400),

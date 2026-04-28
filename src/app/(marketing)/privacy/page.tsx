@@ -966,8 +966,8 @@ export default function PrivacyPage() {
                   The controller responds within 30 days
                 </strong>{' '}
                 under GDPR Art 12(3). The response includes the meaningful information about the
-                logic, which the Decision Provenance Record is engineered to provide. You
-                may then express your point of view and contest the decision under Art 22(3).
+                logic, which the Decision Provenance Record is engineered to provide. You may then
+                express your point of view and contest the decision under Art 22(3).
               </li>
               <li>
                 <strong style={{ color: C.slate900 }}>If unresolved</strong>, you retain the right

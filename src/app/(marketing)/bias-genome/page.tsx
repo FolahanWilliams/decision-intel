@@ -418,9 +418,10 @@ export default function BiasGenomePage() {
               }}
             >
               Two language signals that materially change how bias load translates to outcome.
-              Detected automatically from the memo text, applied as a multiplier on the toxic-pattern
-              detection score. The behavioral-finance literature on these is solid; we&rsquo;re the
-              only decision-intelligence platform we know of that operationalises them.
+              Detected automatically from the memo text, applied as a multiplier on the
+              toxic-pattern detection score. The behavioral-finance literature on these is solid;
+              we&rsquo;re the only decision-intelligence platform we know of that operationalises
+              them.
             </p>
             <div
               style={{
@@ -469,8 +470,8 @@ export default function BiasGenomePage() {
                   haven&rsquo;t missed in two years,&rdquo; &ldquo;the team is in flow&rdquo;)
                   amplifies overconfidence and disposition effects. The neuroendocrine literature
                   links winning streaks to elevated testosterone and risk preference. We surface the
-                  signal so the audit committee sees what the memo&rsquo;s authors were riding
-                  when they wrote it.
+                  signal so the audit committee sees what the memo&rsquo;s authors were riding when
+                  they wrote it.
                 </p>
               </div>
               {/* Stress / Cortisol */}

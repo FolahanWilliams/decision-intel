@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { trackEvent } from '@/lib/analytics/track';
+import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 
 export default function LoginPage() {
   return (
@@ -542,7 +543,7 @@ function LoginContent() {
           {[
             { Icon: ShieldCheck, label: 'SOC 2 ready' },
             { Icon: Search, label: 'GDPR + EU AI Act mapped' },
-            { Icon: BarChart3, label: '135-case reference library' },
+            { Icon: BarChart3, label: `${HISTORICAL_CASE_COUNT}-case reference library` },
           ].map(({ Icon, label }) => (
             <div
               key={label}

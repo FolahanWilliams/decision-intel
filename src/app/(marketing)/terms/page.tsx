@@ -68,10 +68,10 @@ export default function TermsOfServicePage() {
               2. Description of Service
             </h2>
             <p>
-              Decision Intel is the native reasoning layer for every high-stakes call. The
-              Platform analyzes strategic documents for cognitive bias and decision noise, and
-              provides bias detection, noise scoring, decision quality indexing, outcome tracking,
-              and related analytics tools. Analysis results are generated with the assistance of
+              Decision Intel is the native reasoning layer for every high-stakes call. The Platform
+              analyzes strategic documents for cognitive bias and decision noise, and provides bias
+              detection, noise scoring, decision quality indexing, outcome tracking, and related
+              analytics tools. Analysis results are generated with the assistance of
               machine-learning models and should be used as a supplement to, not a replacement for,
               professional judgment.
             </p>

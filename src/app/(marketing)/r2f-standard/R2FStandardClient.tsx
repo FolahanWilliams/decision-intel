@@ -27,6 +27,7 @@ import {
   BookOpen,
   ShieldCheck,
 } from 'lucide-react';
+import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 
 const C = {
   white: '#FFFFFF',
@@ -384,7 +385,7 @@ export function R2FStandardClient() {
               gap: 4,
             }}
           >
-            135 cases in the reference corpus
+            {HISTORICAL_CASE_COUNT} cases in the reference corpus
             <ArrowRight size={12} strokeWidth={2.25} aria-hidden />
           </Link>
         </div>

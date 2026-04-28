@@ -400,7 +400,7 @@ export function GenomeMethodologyViz() {
 
   const steps = [
     {
-      title: '135 strategic decisions',
+      title: '143 strategic decisions',
       descriptor:
         'Real, documented calls drawn from SEC filings, NTSB reports, FDA actions, and academic post-mortems. Every case cites its primary source.',
       viz: <SourceViz reduced={reduced} />,

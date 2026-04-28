@@ -45,10 +45,22 @@ function getModel() {
   const model = genAI.getGenerativeModel({
     model: modelName,
     safetySettings: [
-      { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-      { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-      { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-      { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+      {
+        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
     ],
     generationConfig: { maxOutputTokens: 1500, temperature: 0.3 },
   });
@@ -77,7 +89,8 @@ function mockResult(canonical: string, userAnswer: string): RecallGradeResult {
     whatLanded: ['Mock response — GOOGLE_API_KEY not set. The grading is illustrative only.'],
     whatMissed: ['Set GOOGLE_API_KEY for real coach-grade feedback.'],
     canonicalAnswer: canonical,
-    coachNote: 'When the API key is set, the AI will compare your answer semantically against the canonical and surface specific gaps.',
+    coachNote:
+      'When the API key is set, the AI will compare your answer semantically against the canonical and surface specific gaps.',
   };
 }
 
@@ -173,8 +186,12 @@ Output ONLY valid JSON (no prose, no markdown fence):
     const response: RecallGradeResult = {
       score,
       grade: gradeFromRecallScore(score),
-      whatLanded: Array.isArray(data.whatLanded) ? data.whatLanded.slice(0, 3).map(s => String(s).slice(0, 300)) : [],
-      whatMissed: Array.isArray(data.whatMissed) ? data.whatMissed.slice(0, 3).map(s => String(s).slice(0, 300)) : [],
+      whatLanded: Array.isArray(data.whatLanded)
+        ? data.whatLanded.slice(0, 3).map(s => String(s).slice(0, 300))
+        : [],
+      whatMissed: Array.isArray(data.whatMissed)
+        ? data.whatMissed.slice(0, 3).map(s => String(s).slice(0, 300))
+        : [],
       canonicalAnswer: card.canonicalAnswer,
       coachNote: String(data.coachNote || '').slice(0, 400),
     };

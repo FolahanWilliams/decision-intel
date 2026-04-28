@@ -32,9 +32,9 @@ export function NotebookLmFollowUpLab() {
     }
   };
 
-  const grouped = (['now', 'soon', 'later'] as const).map((p) => ({
+  const grouped = (['now', 'soon', 'later'] as const).map(p => ({
     priority: p,
-    items: NOTEBOOKLM_FOLLOW_UPS.filter((q) => q.priority === p),
+    items: NOTEBOOKLM_FOLLOW_UPS.filter(q => q.priority === p),
   }));
 
   return (
@@ -84,7 +84,7 @@ export function NotebookLmFollowUpLab() {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {items.map((q) => {
+              {items.map(q => {
                 const isCopied = copiedId === q.id;
                 return (
                   <div
@@ -97,7 +97,14 @@ export function NotebookLmFollowUpLab() {
                       borderRadius: 'var(--radius-md)',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 8 }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: 10,
+                        marginBottom: 8,
+                      }}
+                    >
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div
                           style={{

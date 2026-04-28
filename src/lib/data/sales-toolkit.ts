@@ -647,11 +647,11 @@ export const CIALDINI_FOR_DI: CialdiniPrinciple[] = [
     id: 'social_proof',
     name: 'Social Proof',
     oneLineTactic:
-      'Leverage the 135-case library to demonstrate that peer enterprise teams are actively mitigating these exact risks.',
+      'Leverage the 143-case library to demonstrate that peer enterprise teams are actively mitigating these exact risks.',
     examplePhrase:
       '"Your memo\'s structural profile matches 12 historical recommendations from comparable funds; 9 produced negative outcomes. The pattern is well-documented in the case library."',
     antiPattern:
-      "Naming specific competitors as customers. Decision Intel's peer-validation comes from the 135-case CASE LIBRARY (well-documented historical decisions), not from a logo wall.",
+      "Naming specific competitors as customers. Decision Intel's peer-validation comes from the 143-case CASE LIBRARY (well-documented historical decisions), not from a logo wall.",
     citationContext:
       'Cialdini Ch. 4: in conditions of uncertainty, people look to similar others to determine correct behaviour.',
   },
@@ -948,7 +948,7 @@ export const DEAL_STALL_DIAGNOSTICS: DealStallDiagnostic[] = [
     recoveryMove:
       'Don\'t pester with "checking in" emails. Switch to providing asymmetric value to keep the deal warm. Send a high-value bias autopsy of a recent public corporate failure in their specific sector — proves the R²F framework\'s value asynchronously.',
     recoveryScript:
-      '"Wanted to share something you might find useful — I just published a 300-word bias autopsy on [recent public sector-specific failure] using our 135-case pattern matcher. The toxic combination that drove the collapse maps to a recurring pattern in your sector. Attached. Whenever your next major IC memo is ready for a stress test, let me know."',
+      '"Wanted to share something you might find useful — I just published a 300-word bias autopsy on [recent public sector-specific failure] using our 143-case pattern matcher. The toxic combination that drove the collapse maps to a recurring pattern in your sector. Attached. Whenever your next major IC memo is ready for a stress test, let me know."',
   },
 ];
 
@@ -1076,9 +1076,9 @@ export const SALES_FRAMEWORK_GAPS: SalesMove[] = [
     id: 'sandler_negative_reverse',
     framework: 'Sandler Selling System · Negative reverse / Honest off-ramp',
     whenToFire:
-      'In the first 5 minutes, when the buyer is still pattern-matching. Or any time the conversation feels like you\'re chasing them.',
+      "In the first 5 minutes, when the buyer is still pattern-matching. Or any time the conversation feels like you're chasing them.",
     verbatim:
-      "To be completely honest, if your IC never gets blindsided post-close, and your team already has a mathematical system of record for tracking why strategic decisions were made, you absolutely do not need this tool. We only step in when firms realise their M&A failure rate is bleeding alpha.",
+      'To be completely honest, if your IC never gets blindsided post-close, and your team already has a mathematical system of record for tracking why strategic decisions were made, you absolutely do not need this tool. We only step in when firms realise their M&A failure rate is bleeding alpha.',
     mechanism:
       "Breaks the comparison frame. Most founders chase; the negative reverse forces the BUYER to defend why they need YOU. Establishes absolute authority by signalling you're not desperate for the logo.",
     antiPattern:
@@ -1095,7 +1095,7 @@ export const SALES_FRAMEWORK_GAPS: SalesMove[] = [
     mechanism:
       "Volunteering a specific limitation triggers Cialdini's 'trustworthy authority' bias. The buyer realises only an honest expert would name the weakness this clearly. Every subsequent claim becomes more credible by contrast.",
     antiPattern:
-      'Listing 12 capabilities to compensate for the one you don\'t want named. Buyer\'s suspicion spikes precisely because everything sounds too clean.',
+      "Listing 12 capabilities to compensate for the one you don't want named. Buyer's suspicion spikes precisely because everything sounds too clean.",
     scoresOn: 'damaging_admission',
   },
   {
@@ -1106,7 +1106,7 @@ export const SALES_FRAMEWORK_GAPS: SalesMove[] = [
     verbatim:
       "Consulting firms charge £1M to tell you about cognitive bias, but they suffer from the exact same biases themselves. Look at this WeWork S-1 audit. In 60 seconds, the engine flagged narrative fallacy + overconfidence on TAM + sunk cost. Those three blind spots cost billions. Bring a redacted CIM from a deal of yours that went sideways last year. I'll run the audit live in 7 minutes. If it doesn't flag the exact blind spots that cost you the deal, this product isn't for you.",
     mechanism:
-      "Teaches the buyer something new about their own pain (cognitive bias as quantified revenue erosion) using a specific artefact (WeWork DPR) instead of generic claims. The teaching IS the qualification — buyers who lean in at the WeWork moment self-select.",
+      'Teaches the buyer something new about their own pain (cognitive bias as quantified revenue erosion) using a specific artefact (WeWork DPR) instead of generic claims. The teaching IS the qualification — buyers who lean in at the WeWork moment self-select.',
     antiPattern:
       'Opening a slide deck or running a feature tour. CSOs see 50 vendor decks a quarter; the artefact-led teardown is what makes you memorable.',
     scoresOn: 'pinpoint_pain + specificity_over_vagueness',
@@ -1150,7 +1150,7 @@ export const AGE_ASYMMETRY_TACTICS: SalesMove[] = [
     verbatim:
       "Yes, it's just me. If you hire McKinsey they'll charge you £1M to tell you about cognitive bias, but they suffer from the exact same biases themselves, and they'll put a 24-year-old associate on your account who runs every recommendation through three layers of management. I wrote every line of the Decision Intel pipeline myself. When you need ISA 2007 mapped into the compliance engine, I don't need board approval — I'll code it and ship it overnight.",
     mechanism:
-      "Frames being a solo teenage founder NOT as a liability to excuse, but as a ruthless competitive advantage massive incumbents structurally cannot match. The age becomes the proof of the speed claim.",
+      'Frames being a solo teenage founder NOT as a liability to excuse, but as a ruthless competitive advantage massive incumbents structurally cannot match. The age becomes the proof of the speed claim.',
     antiPattern:
       "Apologising for being solo. 'Yeah I know it's just me but…' — the qualifier already lost the conversation.",
     bestForPersona: 'fractional_cso, boutique_ma_advisor',
@@ -1174,18 +1174,17 @@ export const AGE_ASYMMETRY_TACTICS: SalesMove[] = [
     whenToFire:
       'When negotiating pilot pricing, or when the buyer pushes on the £499/deal or £2,499/mo cost.',
     verbatim:
-      "You can absolutely decline because of my age. But that means walking into your next IC meeting with a £50M allocation on the line, relying on the hope that nobody in the room is suffering from confirmation bias. Or, for £499 per deal, I mathematically eliminate that risk before the memo ever leaves your desk.",
+      'You can absolutely decline because of my age. But that means walking into your next IC meeting with a £50M allocation on the line, relying on the hope that nobody in the room is suffering from confirmation bias. Or, for £499 per deal, I mathematically eliminate that risk before the memo ever leaves your desk.',
     mechanism:
-      "Forces the buyer to contrast the massive career-ending financial risk against a hyper-specific, quantifiable fee. Your age and the price both appear as microscopic rounding errors against the deal-size loss anchor.",
+      'Forces the buyer to contrast the massive career-ending financial risk against a hyper-specific, quantifiable fee. Your age and the price both appear as microscopic rounding errors against the deal-size loss anchor.',
     antiPattern:
-      "Discounting on price when the buyer pushes back. The discount IS the signal that the price was made up.",
+      'Discounting on price when the buyer pushes back. The discount IS the signal that the price was made up.',
     bestForPersona: 'mid_market_pe_associate, fractional_cso',
   },
   {
     id: 'klein_competence_specificity',
     framework: 'Gary Klein / Cal Newport · Competence-signalling via extreme specificity',
-    whenToFire:
-      "When they ask 'why did you build this?' or express ChatGPT-wrapper suspicion.",
+    whenToFire: "When they ask 'why did you build this?' or express ChatGPT-wrapper suspicion.",
     verbatim:
       "I didn't build a ChatGPT wrapper. ChatGPT gives you one generative guess. I operationalised the 2009 Kahneman-Klein synthesis into a deterministic 12-node pipeline. The engine runs your memo through a 20×20 toxic-combination matrix and maps every flag to EU AI Act Article 14 record-keeping requirements. I built this because I published a paper on the neuro-cognitive roots of the 2008 financial crisis, and I realised the Fortune 500 still has no software to stop those exact same bias cascades from happening today.",
     mechanism:
@@ -1227,11 +1226,12 @@ export const VOSS_TACTICS: SalesMove[] = [
   },
   {
     id: 'voss_calibrated_questions',
-    framework: 'Voss · Calibrated Questions (How / What questions that force the buyer to solve for you)',
+    framework:
+      'Voss · Calibrated Questions (How / What questions that force the buyer to solve for you)',
     whenToFire:
       "When the buyer is stuck in 'we need to think about it' mode. Replaces 'do you have any questions?'",
     verbatim:
-      "How would you explain this to your steering committee? What would they want to see in the first 30 days for this to feel like a win?",
+      'How would you explain this to your steering committee? What would they want to see in the first 30 days for this to feel like a win?',
     mechanism:
       "Calibrated 'How' / 'What' questions force the buyer to think through the operational details of YES rather than the binary YES/NO. By the end of the answer, they've designed their own pilot.",
     antiPattern:
@@ -1243,8 +1243,7 @@ export const VOSS_TACTICS: SalesMove[] = [
     framework: 'Voss · Mirroring (echo last 1-3 words as a question)',
     whenToFire:
       "Any time the buyer makes a vague claim like 'we already have something like this' or 'it's not really a priority right now'.",
-    verbatim:
-      "Buyer: 'We already have something like this.' You: 'Something like this?'",
+    verbatim: "Buyer: 'We already have something like this.' You: 'Something like this?'",
     mechanism:
       "Repeating their last 1-3 words as an upward-inflection question prompts them to elaborate. They reveal the real objection (or reveal that 'something like this' was a deflection) without you having to challenge them.",
     antiPattern:
@@ -1254,8 +1253,7 @@ export const VOSS_TACTICS: SalesMove[] = [
   {
     id: 'voss_no_strategy',
     framework: "Voss · The 'No' strategy / 'How am I supposed to do that?'",
-    whenToFire:
-      'When the buyer pushes for a discount, free pilot, or free customisation.',
+    whenToFire: 'When the buyer pushes for a discount, free pilot, or free customisation.',
     verbatim:
       "Buyer: 'Can you do this for free for the first three months?' You: 'How am I supposed to do that? My cost per audit is £0.30 just on the API call. The £499/deal is calibrated to a margin that lets me keep the lights on for design partners. I want to find a way to make this work — what are you actually trying to solve?'",
     mechanism:
@@ -1298,7 +1296,8 @@ export const VOSS_TACTICS: SalesMove[] = [
 export const BRINKMANSHIP_MOVES: SalesMove[] = [
   {
     id: 'brinkmanship_evidence_ultimatum',
-    framework: 'Brinkmanship · Evidence Moment as Ultimatum (Schelling, "The Strategy of Conflict")',
+    framework:
+      'Brinkmanship · Evidence Moment as Ultimatum (Schelling, "The Strategy of Conflict")',
     whenToFire:
       'When pitching to boutique sell-side M&A advisors (Potomac archetype) or any analyst-grade buyer who responds to live evidence. Use this to compress a 6-week evaluation cycle into a 7-minute pass/fail test.',
     verbatim:
@@ -1318,7 +1317,7 @@ export const BRINKMANSHIP_MOVES: SalesMove[] = [
     verbatim:
       "To be completely honest, if your IC never gets blindsided post-close and your team already has a perfectly auditable system of record for tracking why strategic decisions were made, you absolutely do not need this tool. We only step in when firms realise their M&A failure rate is bleeding alpha. If that's not your situation, let's both save the time.",
     mechanism:
-      "Volunteering to walk away projects the status and authority of someone who does not need to compromise on scope or price. By deliberately creating the risk that THEY lose access to YOU, you flip the power dynamic. The buyer has to defend why they want to continue — which is the opposite of having to defend why they should buy.",
+      'Volunteering to walk away projects the status and authority of someone who does not need to compromise on scope or price. By deliberately creating the risk that THEY lose access to YOU, you flip the power dynamic. The buyer has to defend why they want to continue — which is the opposite of having to defend why they should buy.',
     antiPattern:
       "Following the off-ramp with 'but if you'd like to learn more...' — destroys the brinkmanship instantly. The off-ramp must be unqualified. Silence after the line is the move.",
     scoresOn: 'mutual_disqualification + pressure_without_pressure + authority_not_trust',
@@ -1332,7 +1331,7 @@ export const BRINKMANSHIP_MOVES: SalesMove[] = [
     verbatim:
       "I'm going to say no to that, even though I know the deal is meaningful. Building bespoke software for one client is a terrible business model — it makes you slower, makes the product weaker for everyone else, and creates a permanent maintenance liability. We sell what's in the published pipeline. If your specific need isn't there, this isn't the right vendor for you yet.",
     mechanism:
-      "Brinkmanship through credible commitment: the buyer cannot extract custom work from you regardless of deal size. By being willing to kill a lucrative deal rather than become an unpaid dev shop, you establish an unmoveable boundary. Buyers respect the line because they cannot exploit it.",
+      'Brinkmanship through credible commitment: the buyer cannot extract custom work from you regardless of deal size. By being willing to kill a lucrative deal rather than become an unpaid dev shop, you establish an unmoveable boundary. Buyers respect the line because they cannot exploit it.',
     antiPattern:
       "Saying 'we could maybe explore that for the right scope' — once the door is open, the buyer drags you through 6 months of free scoping calls. 'No' must be unqualified. The credible commitment IS the strategic move.",
     scoresOn: 'mutual_disqualification + authority_not_trust + damaging_admission',
@@ -1340,13 +1339,14 @@ export const BRINKMANSHIP_MOVES: SalesMove[] = [
   },
   {
     id: 'brinkmanship_natural_scarcity_seats',
-    framework: 'Brinkmanship · Natural Scarcity on Pilot Seats (Cialdini scarcity × Schelling commitment)',
+    framework:
+      'Brinkmanship · Natural Scarcity on Pilot Seats (Cialdini scarcity × Schelling commitment)',
     whenToFire:
       "When the buyer is interested but non-committal about timing, OR asks 'what's the cost to start a pilot?'",
     verbatim:
       "We have 4 design-partner seats open. Because the outcome flywheel needs me to map your firm's specific decision pipeline to the 17-framework regulatory engine, I physically don't have capacity for a fifth. The seats come with strict operational requirements — 90-day outcome logging, audit-before-meeting on every IC, and the engagement is a contractual data flywheel commitment. If those terms don't fit, we hold the seat for someone else.",
     mechanism:
-      "The scarcity is structurally true (founder bandwidth + outcome calibration), not marketing. By tying the seat to non-negotiable operational commitments, you create a deliberate risk: the buyer either accepts your terms or loses access entirely. The brinkmanship: the buyer cannot get the seat AND escape the commitments.",
+      'The scarcity is structurally true (founder bandwidth + outcome calibration), not marketing. By tying the seat to non-negotiable operational commitments, you create a deliberate risk: the buyer either accepts your terms or loses access entirely. The brinkmanship: the buyer cannot get the seat AND escape the commitments.',
     antiPattern:
       "Discounting the operational requirements when the buyer pushes back ('we could be flexible on the outcome logging for the first 60 days') — destroys the scarcity. The terms must be the terms.",
     scoresOn: 'pressure_without_pressure + mutual_disqualification + prescriptive_recommendation',
@@ -1399,21 +1399,21 @@ export const STRATEGIC_THINKING_PRINCIPLES: StrategicPrinciple[] = [
     id: 'credible_commitments_procurement',
     principle: 'Credible Commitments (Schelling)',
     summary:
-      "If you want to influence a buyer, your promises and responses must carry credibility in a strategic sense — meaning they must be backed by something the buyer cannot doubt.",
+      'If you want to influence a buyer, your promises and responses must carry credibility in a strategic sense — meaning they must be backed by something the buyer cannot doubt.',
     diApplication:
       "As a 16-year-old solo founder, enterprise buyers will inherently doubt your operational maturity. You cannot just promise data is safe. You make a credible commitment by pointing to hardcoded infrastructure: the POST /api/deals/[id]/archive endpoint that triggers a 7-day hard purge upon NDA expiry, AES-256-GCM encryption at rest, the documented Vendor Continuity Plan, the published SLA tiers in the public Enterprise quote PDF. The architecture IS the commitment device. You can't abandon it without abandoning the product.",
     whenItBites:
-      "Every procurement-stage call with a James-class GC or Margaret-class CSO. Credibility is asserted not through founder credentials but through architecture you cannot walk back.",
+      'Every procurement-stage call with a James-class GC or Margaret-class CSO. Credibility is asserted not through founder credentials but through architecture you cannot walk back.',
   },
   {
     id: 'set_ground_rules_category',
-    principle: "Setting the Ground Rules for Category Design (Dixit & Nalebuff)",
+    principle: 'Setting the Ground Rules for Category Design (Dixit & Nalebuff)',
     summary:
-      "In some situations, the key time for strategic maneuvering is while the GROUND RULES of the game are being decided — not while playing the game.",
+      'In some situations, the key time for strategic maneuvering is while the GROUND RULES of the game are being decided — not while playing the game.',
     diApplication:
       "The enterprise AI governance and decision-intelligence categories are crystallising right now. By positioning Decision Intel explicitly as the 'native reasoning layer' — differentiating from Aera (operational automation) and Cloverpop (decision logging) — you establish the ground rules of the category in your favour BEFORE competitors define them for you. The R²F (Recognition-Rigor Framework) IP claim is the same move applied to the academic anchor: you claim the Kahneman+Klein synthesis territory before someone else does.",
     whenItBites:
-      "Right now, in 2026. The window for setting ground rules closes when one of Cloverpop / IBM watsonx / Aera defines the category. Every published-for-procurement piece of work (DPR, Bias Genome, /how-it-works) is a ground-rule-setting move.",
+      'Right now, in 2026. The window for setting ground rules closes when one of Cloverpop / IBM watsonx / Aera defines the category. Every published-for-procurement piece of work (DPR, Bias Genome, /how-it-works) is a ground-rule-setting move.',
   },
   {
     id: 'cooperation_coordination',

@@ -250,7 +250,8 @@ function StrategicPrinciplesList({ principles }: { principles: StrategicPrincipl
               <strong style={{ color: 'var(--text-primary)' }}>Summary:</strong> {p.summary}
             </div>
             <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
-              <strong style={{ color: '#8B5CF6' }}>Decision Intel application:</strong> {p.diApplication}
+              <strong style={{ color: '#8B5CF6' }}>Decision Intel application:</strong>{' '}
+              {p.diApplication}
             </div>
             <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
               <strong style={{ color: '#16A34A' }}>When it bites:</strong> {p.whenItBites}

@@ -9,7 +9,8 @@ const VOCAB_ICON = [Snowflake, Zap, Flame];
 
 export function CategoryAndPitchLibrary() {
   const [activePersona, setActivePersona] = useState(PERSONA_PITCH_LIBRARY[0].id);
-  const persona = PERSONA_PITCH_LIBRARY.find((p) => p.id === activePersona) ?? PERSONA_PITCH_LIBRARY[0];
+  const persona =
+    PERSONA_PITCH_LIBRARY.find(p => p.id === activePersona) ?? PERSONA_PITCH_LIBRARY[0];
 
   return (
     <div>
@@ -35,7 +36,9 @@ export function CategoryAndPitchLibrary() {
           >
             Warm category claim
           </div>
-          <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.3 }}>
+          <div
+            style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.3 }}
+          >
             {CATEGORY_DEFINITION.warmCategoryClaim}
           </div>
         </div>
@@ -60,7 +63,9 @@ export function CategoryAndPitchLibrary() {
           >
             Cold descriptive
           </div>
-          <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.3 }}>
+          <div
+            style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.3 }}
+          >
             {CATEGORY_DEFINITION.coldDescriptive}
           </div>
         </div>
@@ -119,10 +124,15 @@ export function CategoryAndPitchLibrary() {
           <Skull size={11} /> What it IS NOT
         </div>
         <ul style={{ margin: 0, padding: '0 0 0 18px' }}>
-          {CATEGORY_DEFINITION.whatItIsNot.map((n) => (
+          {CATEGORY_DEFINITION.whatItIsNot.map(n => (
             <li
               key={n}
-              style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 4, lineHeight: 1.5 }}
+              style={{
+                fontSize: 12,
+                color: 'var(--text-secondary)',
+                marginBottom: 4,
+                lineHeight: 1.5,
+              }}
             >
               {n}
             </li>
@@ -170,7 +180,7 @@ export function CategoryAndPitchLibrary() {
             The four-tool graveyard
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            {CATEGORY_DEFINITION.fourToolGraveyard.map((t) => (
+            {CATEGORY_DEFINITION.fourToolGraveyard.map(t => (
               <span
                 key={t}
                 style={{
@@ -299,7 +309,7 @@ export function CategoryAndPitchLibrary() {
         Persona pitch library · click any persona for the full pitch
       </div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
-        {PERSONA_PITCH_LIBRARY.map((p) => (
+        {PERSONA_PITCH_LIBRARY.map(p => (
           <button
             key={p.id}
             type="button"
@@ -407,7 +417,7 @@ export function CategoryAndPitchLibrary() {
       >
         Language patterns · feature → protected revenue
       </div>
-      {LANGUAGE_PATTERNS.map((l) => (
+      {LANGUAGE_PATTERNS.map(l => (
         <div
           key={l.id}
           style={{

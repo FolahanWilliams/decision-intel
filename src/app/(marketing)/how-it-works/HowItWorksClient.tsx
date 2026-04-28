@@ -253,10 +253,10 @@ export function HowItWorksClient() {
                   maxWidth: 560,
                 }}
               >
-                The engine behind the native reasoning layer for every high-stakes call.
-                Twelve specialized agents, thirty cognitive biases, and a ten-pattern interaction
-                model grounded in Kahneman, Klein, and Tetlock. Every memo audited in under sixty
-                seconds, so the reasoning lives in one surface instead of four.
+                The engine behind the native reasoning layer for every high-stakes call. Twelve
+                specialized agents, thirty cognitive biases, and a ten-pattern interaction model
+                grounded in Kahneman, Klein, and Tetlock. Every memo audited in under sixty seconds,
+                so the reasoning lives in one surface instead of four.
               </p>
               <p style={{ fontSize: 14, color: C.slate500, margin: 0, maxWidth: 560 }}>
                 This is a general-but-detailed walk-through of our methodology. It omits proprietary

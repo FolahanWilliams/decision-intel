@@ -43,6 +43,7 @@ import {
   PROCUREMENT_CONTACT_EMAIL,
   FOUNDER_NARRATIVE_SHORT,
 } from '@/lib/constants/company-info';
+import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
 
@@ -157,9 +158,9 @@ export default function AboutPage() {
             }}
           >
             Decision Intel audits the reasoning behind every strategic memo, simulates the
-            steering-committee objections it&rsquo;ll face, runs what-if interventions against a
-            135-case public reference library, and compounds confirmed outcomes back into a
-            calibrated Decision Quality Index your audit committee can defend.
+            steering-committee objections it&rsquo;ll face, runs what-if interventions against a{' '}
+            {HISTORICAL_CASE_COUNT}-case public reference library, and compounds confirmed outcomes
+            back into a calibrated Decision Quality Index your audit committee can defend.
           </p>
         </div>
       </section>
@@ -207,9 +208,8 @@ export default function AboutPage() {
               {FOUNDED_YEAR}
             </FactRow>
             <FactRow label="Stage" icon={<Target size={14} strokeWidth={2.2} />}>
-              {COMPANY_STAGE}, running a structured design-partner program with Fortune 500
-              strategy and M&amp;A teams. Procurement diligence questions welcomed at the contact
-              below.
+              {COMPANY_STAGE}, running a structured design-partner program with Fortune 500 strategy
+              and M&amp;A teams. Procurement diligence questions welcomed at the contact below.
             </FactRow>
             <FactRow label="Founder" icon={<Users size={14} strokeWidth={2.2} />}>
               <strong style={{ fontWeight: 700 }}>{FOUNDER_NAME}</strong>
@@ -263,9 +263,9 @@ export default function AboutPage() {
             <p>
               Every Fortune 500 has invested in data governance, code review, and security audit.
               The reasoning behind a strategic decision (the memo, the model assumption, the
-              boardroom argument that closed the discussion) arrives at the audit committee
-              without any of it. Decision Intel is the reasoning layer that brings the same
-              discipline to that artefact.
+              boardroom argument that closed the discussion) arrives at the audit committee without
+              any of it. Decision Intel is the reasoning layer that brings the same discipline to
+              that artefact.
             </p>
             <p style={{ marginTop: 16 }}>
               The Recognition-Rigor Framework (R&sup2;F) underneath the platform is the only

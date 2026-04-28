@@ -157,10 +157,7 @@ export function CopilotChat({
         {messages.map(msg => {
           const isUser = msg.role === 'user';
           return (
-            <div
-              key={msg.id}
-              className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}
-            >
+            <div key={msg.id} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
               <div
                 className="max-w-[80%] rounded-lg px-4 py-3"
                 style={
@@ -195,10 +192,7 @@ export function CopilotChat({
                   )}
                 </div>
                 {msg.sources && msg.sources.length > 0 && (
-                  <div
-                    className="mt-2 pt-2"
-                    style={{ borderTop: '1px solid var(--border-color)' }}
-                  >
+                  <div className="mt-2 pt-2" style={{ borderTop: '1px solid var(--border-color)' }}>
                     <SourceAttribution sources={msg.sources} />
                   </div>
                 )}

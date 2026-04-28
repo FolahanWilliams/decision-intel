@@ -48,7 +48,7 @@ export function R2FDeepDive() {
       </div>
 
       <div className="r2f-grid">
-        {R2F_CURRENT.map((p) => {
+        {R2F_CURRENT.map(p => {
           const Icon = SIDE_ICON[p.side];
           const accent = SIDE_ACCENT[p.side];
           return (
@@ -110,7 +110,7 @@ export function R2FDeepDive() {
                   Pipeline nodes
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                  {p.pipelineNodes.map((n) => (
+                  {p.pipelineNodes.map(n => (
                     <span
                       key={n}
                       style={{
@@ -167,7 +167,7 @@ export function R2FDeepDive() {
         5 levers to deepen the moat (NotebookLM 2026-04-27 synthesis)
       </div>
 
-      {R2F_MOAT_LEVERS.map((l) => {
+      {R2F_MOAT_LEVERS.map(l => {
         const isOpen = openLeverIds.has(l.id);
         return (
           <div

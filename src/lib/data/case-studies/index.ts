@@ -85,6 +85,26 @@ export const SUCCESS_CASES: CaseStudy[] = [...NEW_SUCCESS_CASES];
 /** Every case study in the database */
 export const ALL_CASES: CaseStudy[] = [...FAILURE_CASES, ...SUCCESS_CASES];
 
+/**
+ * Canonical case-count constants — derived from ALL_CASES at module load.
+ *
+ * Per CLAUDE.md count-derivation discipline: any production copy that
+ * references the case-library size MUST import these constants instead
+ * of hardcoding a number. The number drifts as new cases land; literals
+ * become stale immediately. Use `${HISTORICAL_CASE_COUNT}` template-string
+ * injection in narrative copy (e.g. founder-hub system prompts).
+ *
+ * Last drift caught: 2026-04-29 — bias-genome page was correctly
+ * deriving "143" from ALL_CASES.length while CLAUDE.md and ~30
+ * marketing/platform/founder-hub surfaces still hardcoded "135"
+ * from the prior 2026-04-16 dedup. The discipline hadn't been applied
+ * comprehensively. Now the constants below are the single source of
+ * truth.
+ */
+export const HISTORICAL_CASE_COUNT = ALL_CASES.length;
+export const FAILURE_CASE_COUNT = FAILURE_CASES.length;
+export const SUCCESS_CASE_COUNT = SUCCESS_CASES.length;
+
 // ---------------------------------------------------------------------------
 // Query helpers
 // ---------------------------------------------------------------------------

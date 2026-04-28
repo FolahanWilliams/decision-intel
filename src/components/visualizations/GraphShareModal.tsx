@@ -40,11 +40,7 @@ interface ShareLinkResult {
   hasPassword: boolean;
 }
 
-export function GraphShareModal({
-  open,
-  onOpenChange,
-  timeRangeDays,
-}: GraphShareModalProps) {
+export function GraphShareModal({ open, onOpenChange, timeRangeDays }: GraphShareModalProps) {
   const { showToast } = useToast();
   const [isRedacted, setIsRedacted] = useState(false);
   const [usePassword, setUsePassword] = useState(false);
@@ -473,7 +469,8 @@ export function GraphShareModal({
                   color: 'var(--text-muted)',
                 }}
               >
-                Expires {new Date(result.expiresAt).toLocaleDateString(undefined, {
+                Expires{' '}
+                {new Date(result.expiresAt).toLocaleDateString(undefined, {
                   year: 'numeric',
                   month: 'short',
                   day: 'numeric',
@@ -495,8 +492,7 @@ export function GraphShareModal({
               <strong style={{ color: 'var(--text-primary)' }}>What viewers will see:</strong> a
               read-only snapshot of the graph as it stands now — top decisions, bias patterns, risk
               state, structural anti-patterns. No live data, no future audits.
-              {result.isRedacted &&
-                ' Bias names are hidden; counts and severity stay visible.'}
+              {result.isRedacted && ' Bias names are hidden; counts and severity stay visible.'}
             </div>
 
             {/* Inline revoke confirmation — replaces native window.confirm

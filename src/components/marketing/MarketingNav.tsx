@@ -46,6 +46,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { BookDemoCTA } from '@/components/marketing/BookDemoCTA';
+import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 
 const C = {
   navy: '#0F172A',
@@ -148,8 +149,8 @@ const MENUS: MegaMenu[] = [
         links: [
           {
             icon: Library,
-            label: '135-case library',
-            description: '135 audited corporate decisions across 11 industries.',
+            label: `${HISTORICAL_CASE_COUNT}-case library`,
+            description: `${HISTORICAL_CASE_COUNT} audited corporate decisions across 12 industries / regions.`,
             href: '/case-studies',
           },
           {

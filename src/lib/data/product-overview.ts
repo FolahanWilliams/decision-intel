@@ -2,6 +2,8 @@
 // so it can be driven visually. Preserves every hard-coded number, citation,
 // and quote verbatim. Update here when product state changes.
 
+import { HISTORICAL_CASE_COUNT } from './case-studies';
+
 export interface ProductMetric {
   value: string;
   label: string;
@@ -50,7 +52,7 @@ export const PRODUCT_METRICS: ProductMetric[] = [
     icon: 'pipeline',
   },
   {
-    value: '135',
+    value: String(HISTORICAL_CASE_COUNT),
     label: 'Case Studies',
     sub: 'failures + successes',
     accent: '#F59E0B',

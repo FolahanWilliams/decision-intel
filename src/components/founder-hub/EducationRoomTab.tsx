@@ -72,14 +72,33 @@ const SESSION_KEY = 'di-education-room-session-v1';
 // ─── Icon resolver ─────────────────────────────────────────────────
 
 const ICON_MAP: Record<string, typeof BookOpen> = {
-  BookOpen, Users, Target, Shield, AlertCircle, CheckSquare,
-  Brain, Workflow, BarChart3, Lock, Compass, Quote, TrendingUp,
+  BookOpen,
+  Users,
+  Target,
+  Shield,
+  AlertCircle,
+  CheckSquare,
+  Brain,
+  Workflow,
+  BarChart3,
+  Lock,
+  Compass,
+  Quote,
+  TrendingUp,
 };
 
 // DeckIcon is declared at module scope so React's react-hooks/static-components
 // lint rule is satisfied — call sites render <DeckIcon name=... /> instead of
 // resolving an icon-component reference inside the parent's render body.
-function DeckIcon({ name, size, style }: { name: string; size: number; style?: React.CSSProperties }) {
+function DeckIcon({
+  name,
+  size,
+  style,
+}: {
+  name: string;
+  size: number;
+  style?: React.CSSProperties;
+}) {
   const Icon = ICON_MAP[name] || BookOpen;
   return <Icon size={size} style={style} />;
 }
@@ -134,45 +153,51 @@ export function EducationRoomTab({ founderPass }: Props) {
     }
   }, []);
 
-  const startDeck = useCallback((deckId: DeckId, studyMode: StudyMode) => {
-    const cards = cardsForDeck(deckId);
-    // Sort: due cards first (by nextDue ascending), then unseen, then reviewed-and-not-due.
-    const now = Date.now();
-    const ranked = [...cards].sort((a, b) => {
-      const sa = sm2States[a.id];
-      const sb = sm2States[b.id];
-      const aDue = sa ? new Date(sa.nextDue).getTime() : 0;
-      const bDue = sb ? new Date(sb.nextDue).getTime() : 0;
-      const aIsDue = !sa || aDue <= now;
-      const bIsDue = !sb || bDue <= now;
-      if (aIsDue && !bIsDue) return -1;
-      if (!aIsDue && bIsDue) return 1;
-      return aDue - bDue;
-    });
-    setActiveDeck(deckId);
-    setMode(studyMode);
-    setCardQueue(ranked);
-    setCurrentCardIndex(0);
-    setIsFlipped(false);
-    setUserAnswer('');
-    setRecallResult(null);
-    setError(null);
-    setStep(studyMode === 'flashcard' ? 'card' : 'recall_input');
-  }, [sm2States]);
+  const startDeck = useCallback(
+    (deckId: DeckId, studyMode: StudyMode) => {
+      const cards = cardsForDeck(deckId);
+      // Sort: due cards first (by nextDue ascending), then unseen, then reviewed-and-not-due.
+      const now = Date.now();
+      const ranked = [...cards].sort((a, b) => {
+        const sa = sm2States[a.id];
+        const sb = sm2States[b.id];
+        const aDue = sa ? new Date(sa.nextDue).getTime() : 0;
+        const bDue = sb ? new Date(sb.nextDue).getTime() : 0;
+        const aIsDue = !sa || aDue <= now;
+        const bIsDue = !sb || bDue <= now;
+        if (aIsDue && !bIsDue) return -1;
+        if (!aIsDue && bIsDue) return 1;
+        return aDue - bDue;
+      });
+      setActiveDeck(deckId);
+      setMode(studyMode);
+      setCardQueue(ranked);
+      setCurrentCardIndex(0);
+      setIsFlipped(false);
+      setUserAnswer('');
+      setRecallResult(null);
+      setError(null);
+      setStep(studyMode === 'flashcard' ? 'card' : 'recall_input');
+    },
+    [sm2States]
+  );
 
   const currentCard = cardQueue[currentCardIndex] || null;
 
-  const recordReview = useCallback((quality: number) => {
-    if (!currentCard) return;
-    const updated = applySm2(sm2States[currentCard.id] || null, quality, currentCard.id);
-    persistSm2({ ...sm2States, [currentCard.id]: updated });
-    persistSession({
-      reviewed: sessionStats.reviewed + 1,
-      gotIt: sessionStats.gotIt + (quality >= 4 ? 1 : 0),
-      almost: sessionStats.almost + (quality === 3 ? 1 : 0),
-      missed: sessionStats.missed + (quality < 3 ? 1 : 0),
-    });
-  }, [currentCard, sm2States, persistSm2, sessionStats, persistSession]);
+  const recordReview = useCallback(
+    (quality: number) => {
+      if (!currentCard) return;
+      const updated = applySm2(sm2States[currentCard.id] || null, quality, currentCard.id);
+      persistSm2({ ...sm2States, [currentCard.id]: updated });
+      persistSession({
+        reviewed: sessionStats.reviewed + 1,
+        gotIt: sessionStats.gotIt + (quality >= 4 ? 1 : 0),
+        almost: sessionStats.almost + (quality === 3 ? 1 : 0),
+        missed: sessionStats.missed + (quality < 3 ? 1 : 0),
+      });
+    },
+    [currentCard, sm2States, persistSm2, sessionStats, persistSession]
+  );
 
   const advance = useCallback(() => {
     if (currentCardIndex + 1 >= cardQueue.length) {
@@ -214,7 +239,16 @@ export function EducationRoomTab({ founderPass }: Props) {
       setRecallResult(data);
 
       // Translate score → SM-2 quality 0-5.
-      const quality = data.score >= 85 ? 5 : data.score >= 70 ? 4 : data.score >= 55 ? 3 : data.score >= 40 ? 2 : 1;
+      const quality =
+        data.score >= 85
+          ? 5
+          : data.score >= 70
+            ? 4
+            : data.score >= 55
+              ? 3
+              : data.score >= 40
+                ? 2
+                : 1;
       recordReview(quality);
 
       setStep('recall_results');
@@ -225,10 +259,13 @@ export function EducationRoomTab({ founderPass }: Props) {
     }
   }, [currentCard, userAnswer, founderPass, recordReview]);
 
-  const flashcardSelfGrade = useCallback((quality: number) => {
-    recordReview(quality);
-    advance();
-  }, [recordReview, advance]);
+  const flashcardSelfGrade = useCallback(
+    (quality: number) => {
+      recordReview(quality);
+      advance();
+    },
+    [recordReview, advance]
+  );
 
   const exitDeck = useCallback(() => {
     setStep('deck_picker');
@@ -319,8 +356,7 @@ function Hero() {
     <div
       style={{
         padding: 18,
-        background:
-          'linear-gradient(135deg, rgba(139, 92, 246, 0.10), rgba(22, 163, 74, 0.05))',
+        background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.10), rgba(22, 163, 74, 0.05))',
         border: '1px solid var(--border-color)',
         borderRadius: 'var(--radius-lg)',
       }}
@@ -359,7 +395,13 @@ function Hero() {
           maxWidth: 800,
         }}
       >
-        12 decks across {ALL_CARDS.length} cards covering DI&rsquo;s entire knowledge surface — vocabulary discipline, the 7 buyer personas with verbatim phrases, Maalouf 6 + Satyam 5 + 11-dim Sales DQI rubric, the 5 silent objections with status, the 17 regulatory frameworks, the 12-node pipeline, R²F&rsquo;s Kahneman+Klein integration. Three modes per deck: <strong>Flashcard</strong> (passive recall, self-graded with SM-2 spaced repetition), <strong>Recall</strong> (active recall, AI-graded against the canonical answer), and <strong>Apply</strong> (scenario application drills).
+        12 decks across {ALL_CARDS.length} cards covering DI&rsquo;s entire knowledge surface —
+        vocabulary discipline, the 7 buyer personas with verbatim phrases, Maalouf 6 + Satyam 5 +
+        11-dim Sales DQI rubric, the 5 silent objections with status, the 17 regulatory frameworks,
+        the 12-node pipeline, R²F&rsquo;s Kahneman+Klein integration. Three modes per deck:{' '}
+        <strong>Flashcard</strong> (passive recall, self-graded with SM-2 spaced repetition),{' '}
+        <strong>Recall</strong> (active recall, AI-graded against the canonical answer), and{' '}
+        <strong>Apply</strong> (scenario application drills).
       </p>
     </div>
   );
@@ -382,7 +424,10 @@ function DeckPicker(props: {
 
   // Compute per-deck mastery: % of cards with successful repetitions >= 1.
   const deckMastery = useMemo(() => {
-    const out: Record<DeckId, { mastered: number; due: number; total: number }> = {} as Record<DeckId, { mastered: number; due: number; total: number }>;
+    const out: Record<DeckId, { mastered: number; due: number; total: number }> = {} as Record<
+      DeckId,
+      { mastered: number; due: number; total: number }
+    >;
     for (const deck of DECKS) {
       const cards = cardsForDeck(deck.id);
       let mastered = 0;
@@ -412,11 +457,21 @@ function DeckPicker(props: {
           1 · Pick study mode
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-          {([
-            { id: 'flashcard', label: 'Flashcard', desc: 'Flip & self-grade. Fast.' },
-            { id: 'recall', label: 'Recall', desc: 'Type the answer. AI-graded against canonical.' },
-            { id: 'apply', label: 'Apply', desc: 'Use the concept in a real scenario. AI-graded.' },
-          ] as const).map(m => {
+          {(
+            [
+              { id: 'flashcard', label: 'Flashcard', desc: 'Flip & self-grade. Fast.' },
+              {
+                id: 'recall',
+                label: 'Recall',
+                desc: 'Type the answer. AI-graded against canonical.',
+              },
+              {
+                id: 'apply',
+                label: 'Apply',
+                desc: 'Use the concept in a real scenario. AI-graded.',
+              },
+            ] as const
+          ).map(m => {
             const isActive = m.id === mode;
             return (
               <button
@@ -433,7 +488,14 @@ function DeckPicker(props: {
                   transition: 'all 0.15s',
                 }}
               >
-                <div style={{ fontSize: 13, fontWeight: 700, color: isActive ? '#8B5CF6' : 'var(--text-primary)', marginBottom: 2 }}>
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: isActive ? '#8B5CF6' : 'var(--text-primary)',
+                    marginBottom: 2,
+                  }}
+                >
                   {m.label}
                 </div>
                 <div style={{ fontSize: 11.5, color: 'var(--text-muted)', lineHeight: 1.4 }}>
@@ -464,51 +526,63 @@ function DeckPicker(props: {
             gap: 10,
           }}
         >
-          {[...DECKS].sort((a, b) => a.order - b.order).map(deck => {
-            const stats = deckMastery[deck.id];
-            const isHovered = hoveredDeck === deck.id;
-            return (
-              <button
-                key={deck.id}
-                onClick={() => props.onStart(deck.id, mode)}
-                onMouseEnter={() => setHoveredDeck(deck.id)}
-                onMouseLeave={() => setHoveredDeck(null)}
-                style={{
-                  padding: 12,
-                  background: isHovered ? `${deck.color}10` : 'var(--bg-elevated)',
-                  border: `1px solid ${isHovered ? deck.color : 'var(--border-color)'}`,
-                  borderRadius: 'var(--radius-md)',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 6,
-                  minHeight: 130,
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <DeckIcon name={deck.iconName} size={16} style={{ color: deck.color, flexShrink: 0 }} />
-                  <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
-                    {deck.label}
-                  </span>
-                </div>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4 }}>
-                  {deck.description}
-                </div>
-                <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11 }}>
-                  <span style={{ color: 'var(--text-muted)' }}>
-                    {stats.total} cards · {stats.mastered} mastered
-                  </span>
-                  {stats.due > 0 && (
-                    <span style={{ color: deck.color, fontWeight: 700 }}>
-                      {stats.due} due
+          {[...DECKS]
+            .sort((a, b) => a.order - b.order)
+            .map(deck => {
+              const stats = deckMastery[deck.id];
+              const isHovered = hoveredDeck === deck.id;
+              return (
+                <button
+                  key={deck.id}
+                  onClick={() => props.onStart(deck.id, mode)}
+                  onMouseEnter={() => setHoveredDeck(deck.id)}
+                  onMouseLeave={() => setHoveredDeck(null)}
+                  style={{
+                    padding: 12,
+                    background: isHovered ? `${deck.color}10` : 'var(--bg-elevated)',
+                    border: `1px solid ${isHovered ? deck.color : 'var(--border-color)'}`,
+                    borderRadius: 'var(--radius-md)',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 6,
+                    minHeight: 130,
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <DeckIcon
+                      name={deck.iconName}
+                      size={16}
+                      style={{ color: deck.color, flexShrink: 0 }}
+                    />
+                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
+                      {deck.label}
                     </span>
-                  )}
-                </div>
-              </button>
-            );
-          })}
+                  </div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                    {deck.description}
+                  </div>
+                  <div
+                    style={{
+                      marginTop: 'auto',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      fontSize: 11,
+                    }}
+                  >
+                    <span style={{ color: 'var(--text-muted)' }}>
+                      {stats.total} cards · {stats.mastered} mastered
+                    </span>
+                    {stats.due > 0 && (
+                      <span style={{ color: deck.color, fontWeight: 700 }}>{stats.due} due</span>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
         </div>
       </div>
     </div>
@@ -530,7 +604,12 @@ function FlashcardCard(props: {
   const deck = DECKS.find(d => d.id === props.deckId)!;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      <CardHeader deck={deck} progress={props.progress} sm2State={props.sm2State} onExit={props.onExit} />
+      <CardHeader
+        deck={deck}
+        progress={props.progress}
+        sm2State={props.sm2State}
+        onExit={props.onExit}
+      />
 
       <div
         onClick={props.onFlip}
@@ -549,10 +628,31 @@ function FlashcardCard(props: {
       >
         {!props.isFlipped ? (
           <>
-            <div style={{ fontSize: 11, fontWeight: 700, color: deck.color, textTransform: 'uppercase', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                color: deck.color,
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+              }}
+            >
               <Eye size={12} /> Front · click to flip
             </div>
-            <div style={{ fontSize: 18, fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.5, flex: 1, display: 'flex', alignItems: 'center' }}>
+            <div
+              style={{
+                fontSize: 18,
+                fontWeight: 600,
+                color: 'var(--text-primary)',
+                lineHeight: 1.5,
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
               {props.card.prompt}
             </div>
             {props.card.hint && (
@@ -563,14 +663,35 @@ function FlashcardCard(props: {
           </>
         ) : (
           <>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#16A34A', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                color: '#16A34A',
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+              }}
+            >
               <EyeOff size={12} /> Back · canonical answer
             </div>
             <div style={{ fontSize: 14, color: 'var(--text-primary)', lineHeight: 1.6, flex: 1 }}>
               {props.card.canonicalAnswer}
             </div>
             {props.card.applicationContext && (
-              <div style={{ marginTop: 8, padding: 8, background: 'var(--bg-elevated)', borderRadius: 4, fontSize: 12, color: 'var(--text-secondary)', borderLeft: `3px solid ${deck.color}` }}>
+              <div
+                style={{
+                  marginTop: 8,
+                  padding: 8,
+                  background: 'var(--bg-elevated)',
+                  borderRadius: 4,
+                  fontSize: 12,
+                  color: 'var(--text-secondary)',
+                  borderLeft: `3px solid ${deck.color}`,
+                }}
+              >
                 <strong>When this comes up:</strong> {props.card.applicationContext}
               </div>
             )}
@@ -589,7 +710,12 @@ function FlashcardCard(props: {
   );
 }
 
-function SelfGradeButton(props: { color: string; label: string; quality: number; onClick: (q: number) => void }) {
+function SelfGradeButton(props: {
+  color: string;
+  label: string;
+  quality: number;
+  onClick: (q: number) => void;
+}) {
   return (
     <button
       onClick={() => props.onClick(props.quality)}
@@ -642,10 +768,20 @@ function RecallInputCard(props: {
           gap: 12,
         }}
       >
-        <div style={{ fontSize: 11, fontWeight: 700, color: deck.color, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            color: deck.color,
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+          }}
+        >
           {isApply ? 'Apply · use this in scenario' : 'Recall · type the answer in your own words'}
         </div>
-        <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.5 }}>
+        <div
+          style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.5 }}
+        >
           {props.card.prompt}
         </div>
 
@@ -668,9 +804,10 @@ function RecallInputCard(props: {
         <textarea
           value={props.userAnswer}
           onChange={e => props.onAnswerChange(e.target.value)}
-          placeholder={isApply
-            ? "How would you USE this concept in the scenario above? Type your answer as if speaking to the buyer."
-            : "Type the answer in your own voice. Don't aim for verbatim — aim for the load-bearing concepts."
+          placeholder={
+            isApply
+              ? 'How would you USE this concept in the scenario above? Type your answer as if speaking to the buyer.'
+              : "Type the answer in your own voice. Don't aim for verbatim — aim for the load-bearing concepts."
           }
           rows={8}
           style={{
@@ -730,10 +867,15 @@ function RecallResultsCard(props: {
   const deck = DECKS.find(d => d.id === props.deckId)!;
   const r = props.result;
   const gradeColor =
-    r.grade === 'A' ? '#16A34A' :
-    r.grade === 'B' ? '#22C55E' :
-    r.grade === 'C' ? '#EAB308' :
-    r.grade === 'D' ? '#F97316' : '#DC2626';
+    r.grade === 'A'
+      ? '#16A34A'
+      : r.grade === 'B'
+        ? '#22C55E'
+        : r.grade === 'C'
+          ? '#EAB308'
+          : r.grade === 'D'
+            ? '#F97316'
+            : '#DC2626';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -767,15 +909,41 @@ function RecallResultsCard(props: {
           <div style={{ fontSize: 24, fontWeight: 800, color: gradeColor, lineHeight: 1 }}>
             {r.score}
           </div>
-          <div style={{ fontSize: 9, fontWeight: 700, color: gradeColor, textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 2 }}>
+          <div
+            style={{
+              fontSize: 9,
+              fontWeight: 700,
+              color: gradeColor,
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              marginTop: 2,
+            }}
+          >
             Grade {r.grade}
           </div>
         </div>
         <div style={{ flex: 1, minWidth: 240 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: deck.color, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              color: deck.color,
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              marginBottom: 4,
+            }}
+          >
             {deck.label} · recall
           </div>
-          <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 6, lineHeight: 1.4 }}>
+          <div
+            style={{
+              fontSize: 14,
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+              marginBottom: 6,
+              lineHeight: 1.4,
+            }}
+          >
             {props.card.prompt}
           </div>
           <div
@@ -795,7 +963,10 @@ function RecallResultsCard(props: {
       </div>
 
       {/* Landed + Missed */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }} className="recall-twocol">
+      <div
+        style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}
+        className="recall-twocol"
+      >
         <div
           style={{
             padding: 14,
@@ -804,12 +975,35 @@ function RecallResultsCard(props: {
             borderRadius: 'var(--radius-lg)',
           }}
         >
-          <div className="section-heading" style={{ color: '#16A34A', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 4 }}>
+          <div
+            className="section-heading"
+            style={{
+              color: '#16A34A',
+              marginBottom: 8,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+            }}
+          >
             <CheckCircle2 size={12} /> What landed
           </div>
-          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12.5, color: 'var(--text-primary)', lineHeight: 1.5 }}>
-            {r.whatLanded.length === 0 && <li style={{ color: 'var(--text-muted)' }}>(nothing — see what you missed)</li>}
-            {r.whatLanded.map((p, i) => <li key={i} style={{ marginBottom: 4 }}>{p}</li>)}
+          <ul
+            style={{
+              margin: 0,
+              paddingLeft: 18,
+              fontSize: 12.5,
+              color: 'var(--text-primary)',
+              lineHeight: 1.5,
+            }}
+          >
+            {r.whatLanded.length === 0 && (
+              <li style={{ color: 'var(--text-muted)' }}>(nothing — see what you missed)</li>
+            )}
+            {r.whatLanded.map((p, i) => (
+              <li key={i} style={{ marginBottom: 4 }}>
+                {p}
+              </li>
+            ))}
           </ul>
         </div>
 
@@ -821,12 +1015,35 @@ function RecallResultsCard(props: {
             borderRadius: 'var(--radius-lg)',
           }}
         >
-          <div className="section-heading" style={{ color: '#D97706', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 4 }}>
+          <div
+            className="section-heading"
+            style={{
+              color: '#D97706',
+              marginBottom: 8,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+            }}
+          >
             <XCircle size={12} /> What you missed
           </div>
-          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12.5, color: 'var(--text-primary)', lineHeight: 1.5 }}>
-            {r.whatMissed.length === 0 && <li style={{ color: 'var(--text-muted)' }}>(nothing — solid recall)</li>}
-            {r.whatMissed.map((p, i) => <li key={i} style={{ marginBottom: 4 }}>{p}</li>)}
+          <ul
+            style={{
+              margin: 0,
+              paddingLeft: 18,
+              fontSize: 12.5,
+              color: 'var(--text-primary)',
+              lineHeight: 1.5,
+            }}
+          >
+            {r.whatMissed.length === 0 && (
+              <li style={{ color: 'var(--text-muted)' }}>(nothing — solid recall)</li>
+            )}
+            {r.whatMissed.map((p, i) => (
+              <li key={i} style={{ marginBottom: 4 }}>
+                {p}
+              </li>
+            ))}
           </ul>
         </div>
       </div>
@@ -849,7 +1066,16 @@ function RecallResultsCard(props: {
           {r.canonicalAnswer}
         </div>
         <div style={{ marginTop: 12, paddingTop: 8, borderTop: '1px solid var(--border-color)' }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              color: 'var(--text-muted)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              marginBottom: 4,
+            }}
+          >
             Your answer was:
           </div>
           <div style={{ lineHeight: 1.5, fontStyle: 'italic' }}>{props.userAnswer}</div>
@@ -913,9 +1139,10 @@ function CardHeader(props: {
   onExit: () => void;
 }) {
   const reps = props.sm2State?.repetitions ?? 0;
-  const masteryPct = props.sm2State && props.sm2State.totalReviews > 0
-    ? Math.round((props.sm2State.successfulReviews / props.sm2State.totalReviews) * 100)
-    : null;
+  const masteryPct =
+    props.sm2State && props.sm2State.totalReviews > 0
+      ? Math.round((props.sm2State.successfulReviews / props.sm2State.totalReviews) * 100)
+      : null;
   return (
     <div
       style={{
@@ -984,51 +1211,149 @@ function SessionStatsPanel(props: {
       }}
     >
       <div style={{ minWidth: 140 }}>
-        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 2 }}>
+        <div
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            color: 'var(--text-muted)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            marginBottom: 2,
+          }}
+        >
           Total mastery
         </div>
-        <div style={{ fontSize: 22, fontWeight: 800, color: '#8B5CF6', fontVariantNumeric: 'tabular-nums' }}>
+        <div
+          style={{
+            fontSize: 22,
+            fontWeight: 800,
+            color: '#8B5CF6',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
           {masteredCards} / {totalCards}
         </div>
-        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{masteryPct}% across all decks</div>
+        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+          {masteryPct}% across all decks
+        </div>
       </div>
       <div style={{ minWidth: 120 }}>
-        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 2 }}>
+        <div
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            color: 'var(--text-muted)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            marginBottom: 2,
+          }}
+        >
           Cards touched
         </div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}>
+        <div
+          style={{
+            fontSize: 18,
+            fontWeight: 700,
+            color: 'var(--text-primary)',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
           {cardsTouched}
         </div>
       </div>
       <div style={{ minWidth: 120 }}>
-        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 2 }}>
+        <div
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            color: 'var(--text-muted)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            marginBottom: 2,
+          }}
+        >
           Reviewed (lifetime)
         </div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}>
+        <div
+          style={{
+            fontSize: 18,
+            fontWeight: 700,
+            color: 'var(--text-primary)',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
           {props.sessionStats.reviewed}
         </div>
       </div>
       <div style={{ minWidth: 120 }}>
-        <div style={{ fontSize: 10, fontWeight: 700, color: '#16A34A', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 2 }}>
+        <div
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            color: '#16A34A',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            marginBottom: 2,
+          }}
+        >
           Got it
         </div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: '#16A34A', fontVariantNumeric: 'tabular-nums' }}>
+        <div
+          style={{
+            fontSize: 18,
+            fontWeight: 700,
+            color: '#16A34A',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
           {props.sessionStats.gotIt}
         </div>
       </div>
       <div style={{ minWidth: 120 }}>
-        <div style={{ fontSize: 10, fontWeight: 700, color: '#F59E0B', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 2 }}>
+        <div
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            color: '#F59E0B',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            marginBottom: 2,
+          }}
+        >
           Almost
         </div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: '#F59E0B', fontVariantNumeric: 'tabular-nums' }}>
+        <div
+          style={{
+            fontSize: 18,
+            fontWeight: 700,
+            color: '#F59E0B',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
           {props.sessionStats.almost}
         </div>
       </div>
       <div style={{ minWidth: 120 }}>
-        <div style={{ fontSize: 10, fontWeight: 700, color: '#DC2626', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 2 }}>
+        <div
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            color: '#DC2626',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            marginBottom: 2,
+          }}
+        >
           Missed
         </div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: '#DC2626', fontVariantNumeric: 'tabular-nums' }}>
+        <div
+          style={{
+            fontSize: 18,
+            fontWeight: 700,
+            color: '#DC2626',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
           {props.sessionStats.missed}
         </div>
       </div>

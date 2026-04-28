@@ -42,7 +42,8 @@ export function JourneyDetailStrip({ journey, visited, onNavigate }: Props) {
           />
           <strong style={{ fontSize: 14, color: 'var(--text-primary)' }}>{journey.label}</strong>
           <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-            · {completedCount} of {journey.path.length} steps · ~{Math.round(journey.totalMinutes / 60)}h total
+            · {completedCount} of {journey.path.length} steps · ~
+            {Math.round(journey.totalMinutes / 60)}h total
           </span>
         </div>
         <div style={progressTrack}>
@@ -76,7 +77,11 @@ export function JourneyDetailStrip({ journey, visited, onNavigate }: Props) {
                 onClick={() => onNavigate(tabId)}
                 style={{
                   ...stepBtn,
-                  borderColor: isNext ? journey.color : isVisited ? journey.color : 'var(--border-color)',
+                  borderColor: isNext
+                    ? journey.color
+                    : isVisited
+                      ? journey.color
+                      : 'var(--border-color)',
                   background: isVisited
                     ? 'rgba(22, 163, 74, 0.06)'
                     : isNext

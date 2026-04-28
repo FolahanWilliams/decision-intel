@@ -54,10 +54,7 @@ function statusFor(link: NonNullable<Awaited<ReturnType<typeof loadByToken>>>) {
   return null;
 }
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: Promise<{ token: string }> }
-) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
   if (!token) {
     return NextResponse.json({ error: 'Missing token' }, { status: 400 });
@@ -121,10 +118,7 @@ export async function GET(
   });
 }
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: Promise<{ token: string }> }
-) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ token: string }> }) {
   // Password-unlock path. We accept the password via POST so it doesn't
   // land in browser history / referrer headers.
   const { token } = await params;

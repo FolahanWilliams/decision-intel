@@ -67,7 +67,7 @@ const DQI_COMPONENTS: Array<{
     label: 'Historical Alignment',
     weight: 10,
     measures:
-      'Pattern match against 135 historical cases. Prior failure signatures drag the score down.',
+      'Pattern match against 143 historical cases. Prior failure signatures drag the score down.',
     color: C.slate600,
   },
 ];

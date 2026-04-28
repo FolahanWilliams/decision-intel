@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { FounderChatWidget } from '@/components/founder-hub/FounderChatWidget';
 import { Loader2 } from 'lucide-react';
-import { ALL_CASES } from '@/lib/data/case-studies';
+import { ALL_CASES, HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 
 const CASES_WITH_PRE_DECISION_EVIDENCE = ALL_CASES.filter(c => c.preDecisionEvidence).length;
 
@@ -494,8 +494,7 @@ const SEARCH_INDEX: SearchEntry[] = [
     tabId: 'product_deep',
     section: 'DQI Methodology',
     preview: 'Decision Quality Index formula, percentiles, calibration.',
-    keywords:
-      'dqi decision quality index methodology formula percentile calibration 135 historical decisions benchmark',
+    keywords: `dqi decision quality index methodology formula percentile calibration ${HISTORICAL_CASE_COUNT} historical decisions benchmark`,
     sectionId: 'dqi-methodology',
   },
   {
@@ -638,7 +637,8 @@ const SEARCH_INDEX: SearchEntry[] = [
   },
   {
     tabId: 'sparring_room',
-    section: 'Sparring Room · 7 buyer personas (Adaeze / Margaret / Titi / Potomac / Marcus / James / Riya)',
+    section:
+      'Sparring Room · 7 buyer personas (Adaeze / Margaret / Titi / Potomac / Marcus / James / Riya)',
     preview:
       'Three fastest-converters + Margaret-class F500 CSO + Titi-class Pan-African fund partner + James-class GC + Riya-class pre-seed VC associate.',
     keywords:
@@ -646,7 +646,8 @@ const SEARCH_INDEX: SearchEntry[] = [
   },
   {
     tabId: 'sparring_room',
-    section: 'Sparring Room · Sales DQI rubric (Maalouf 4 + Satyam 3 + DI discipline 2 + fundamentals 1)',
+    section:
+      'Sparring Room · Sales DQI rubric (Maalouf 4 + Satyam 3 + DI discipline 2 + fundamentals 1)',
     preview:
       '10-dimension grading: pressure-without-pressure, authority-not-trust, pinpoint-pain, embody-bigger, category-of-one, conviction, infrastructure, vocabulary, empathic-mode-first, specificity.',
     keywords:
@@ -675,14 +676,13 @@ const SEARCH_INDEX: SearchEntry[] = [
   {
     tabId: 'education_room',
     section: 'Education Room · DI Vocabulary deck (locked + banned + cold-context bridges)',
-    preview:
-      '20 cards: reasoning layer, R²F, DPR, DQI, 135 historical decisions, 17 frameworks, 30+ biases, ~90% margin, banned phrases (decision intelligence platform / decision hygiene / boardroom strategic decision).',
-    keywords:
-      'education room di vocabulary deck reasoning layer r2f dpr dqi 135 decisions 17 frameworks 30 biases blended margin banned decision intelligence platform decision hygiene boardroom strategic decision warm cold context bridge specimen library wework dangote design partner seats',
+    preview: `20 cards: reasoning layer, R²F, DPR, DQI, ${HISTORICAL_CASE_COUNT} historical decisions, 17 frameworks, 30+ biases, ~90% margin, banned phrases (decision intelligence platform / decision hygiene / boardroom strategic decision).`,
+    keywords: `education room di vocabulary deck reasoning layer r2f dpr dqi ${HISTORICAL_CASE_COUNT} decisions 17 frameworks 30 biases blended margin banned decision intelligence platform decision hygiene boardroom strategic decision warm cold context bridge specimen library wework dangote design partner seats`,
   },
   {
     tabId: 'education_room',
-    section: 'Education Room · Buyer Personas deck (Adaeze / Potomac / Marcus / Margaret / Titi / James / Riya)',
+    section:
+      'Education Room · Buyer Personas deck (Adaeze / Potomac / Marcus / Margaret / Titi / James / Riya)',
     preview:
       "14 cards: each persona's role + ticket band + primary concern + verbatim opener phrase + canonical objection-handler response.",
     keywords:
@@ -690,7 +690,8 @@ const SEARCH_INDEX: SearchEntry[] = [
   },
   {
     tabId: 'education_room',
-    section: 'Education Room · Loss-aversion framing + 17 regulatory frameworks + R²F (Kahneman + Klein) + Founder one-liners',
+    section:
+      'Education Room · Loss-aversion framing + 17 regulatory frameworks + R²F (Kahneman + Klein) + Founder one-liners',
     preview:
       'Kahneman & Tversky 1979 prospect theory applied to your sales pitch · the 17 regulatory frameworks card-by-card · how 3 nodes implement Kahneman + 3 implement Klein + metaJudge arbitrates · External Attack Vectors + ICP wedge vs ceiling.',
     keywords:

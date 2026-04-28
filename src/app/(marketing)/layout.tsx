@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { SOC2_JSON_LD_DATA_PROTECTION } from '@/lib/constants/trust-copy';
+import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 
 export const metadata: Metadata = {
   title: 'Decision Intel · The native reasoning layer for every high-stakes call',
@@ -80,7 +81,7 @@ const jsonLd = [
       'AI boardroom simulation: CEO, CFO, and board objections rehearsed before the meeting',
       'Human-AI reasoning audit: every recommendation traceable to the evidence that triggered it',
       'What-if interventions: see how removing a bias changes outcome probability',
-      'Decision Quality Index (DQI): benchmarked against a 135-case public reference library',
+      `Decision Quality Index (DQI): benchmarked against a ${HISTORICAL_CASE_COUNT}-case public reference library`,
       '30+ cognitive biases detected automatically, with severity scoring and evidence excerpts',
       'Compliance mapping: SOX, FCA, EU AI Act, Basel III, GDPR, SEC, LPOA',
       'Board-ready PDF export with regulatory citations',
@@ -186,7 +187,7 @@ const jsonLd = [
         name: 'How is Decision Intel different from ChatGPT or a general AI assistant?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'ChatGPT gives one opinion from one model: ungoverned, untraceable, unaudited. Decision Intel is the native reasoning layer underneath every high-stakes call. It measures the noise in your reasoning the same way Kahneman did in the insurance underwriter study, simulates an AI boardroom of CEO, CFO, and board personas, runs what-if interventions against a 135-case public reference library, and compounds every confirmed outcome back into a calibrated Decision Quality Index your audit committee can defend. Not a chatbot; a reasoning layer, checkable from memo to outcome.',
+          text: `ChatGPT gives one opinion from one model: ungoverned, untraceable, unaudited. Decision Intel is the native reasoning layer underneath every high-stakes call. It measures the noise in your reasoning the same way Kahneman did in the insurance underwriter study, simulates an AI boardroom of CEO, CFO, and board personas, runs what-if interventions against a ${HISTORICAL_CASE_COUNT}-case public reference library, and compounds every confirmed outcome back into a calibrated Decision Quality Index your audit committee can defend. Not a chatbot; a reasoning layer, checkable from memo to outcome.`,
         },
       },
     ],

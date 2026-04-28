@@ -34,7 +34,7 @@ export function NinetyDayActionPlan() {
   const filtered =
     activeFilter === 'all'
       ? NINETY_DAY_ACTIONS
-      : NINETY_DAY_ACTIONS.filter((a) => a.category === activeFilter);
+      : NINETY_DAY_ACTIONS.filter(a => a.category === activeFilter);
 
   const categories: Array<NinetyDayAction['category'] | 'all'> = [
     'all',
@@ -49,7 +49,7 @@ export function NinetyDayActionPlan() {
   return (
     <div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 14 }}>
-        {categories.map((c) => {
+        {categories.map(c => {
           const isActive = activeFilter === c;
           const accent = c === 'all' ? '#16A34A' : CATEGORY_ACCENT[c];
           return (
@@ -76,7 +76,7 @@ export function NinetyDayActionPlan() {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {filtered.map((a) => {
+        {filtered.map(a => {
           const accent = CATEGORY_ACCENT[a.category];
           const Icon = CATEGORY_ICON[a.category];
           return (

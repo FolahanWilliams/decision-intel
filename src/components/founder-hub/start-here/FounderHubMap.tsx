@@ -257,9 +257,7 @@ export function FounderHubMap({ activeJourney, visited, onNavigate, onToggleVisi
                   opacity: dim ? 0.4 : 1,
                   transition: 'opacity 0.3s',
                 }}
-                onMouseEnter={() =>
-                  setHover({ tabId: node.id, cx: pxX(node), cy: pxY(node) })
-                }
+                onMouseEnter={() => setHover({ tabId: node.id, cx: pxX(node), cy: pxY(node) })}
                 onMouseLeave={() => setHover(null)}
                 onClick={() => onNavigate(node.id)}
                 tabIndex={0}
@@ -365,9 +363,7 @@ export function FounderHubMap({ activeJourney, visited, onNavigate, onToggleVisi
               color: 'var(--text-primary)',
               lineHeight: 1.5,
             }}
-            onMouseEnter={() =>
-              setHover({ tabId: hoveredNode.id, cx: hover.cx, cy: hover.cy })
-            }
+            onMouseEnter={() => setHover({ tabId: hoveredNode.id, cx: hover.cx, cy: hover.cy })}
             onMouseLeave={() => setHover(null)}
           >
             <div
@@ -419,9 +415,7 @@ export function FounderHubMap({ activeJourney, visited, onNavigate, onToggleVisi
             {hoveredNode.prerequisites.length > 0 && (
               <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8 }}>
                 Easier after:{' '}
-                {hoveredNode.prerequisites
-                  .map(p => nodesById.get(p)?.label ?? p)
-                  .join(' · ')}
+                {hoveredNode.prerequisites.map(p => nodesById.get(p)?.label ?? p).join(' · ')}
               </div>
             )}
             <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>

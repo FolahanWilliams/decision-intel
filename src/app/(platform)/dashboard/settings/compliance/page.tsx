@@ -10,6 +10,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 
 // ─── Static compliance mapping: DI features → framework controls ────────────
 
@@ -221,8 +222,7 @@ const FRAMEWORKS: FrameworkPosture[] = [
         controlId: 'Art. 10',
         controlName: 'Data Governance',
         description: 'Training data must be relevant, representative, and free of errors',
-        diFeature:
-          '135 annotated case studies with pre-decision evidence, curated bias taxonomy (DI-B-001 through DI-B-020), academic citations for all bias detection methodology',
+        diFeature: `${HISTORICAL_CASE_COUNT} annotated case studies with pre-decision evidence, curated bias taxonomy (DI-B-001 through DI-B-020), academic citations for all bias detection methodology`,
         status: 'pass',
       },
       {

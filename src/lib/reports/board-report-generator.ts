@@ -148,7 +148,6 @@ const MAX_EXCERPT_CHARS = 180;
 const MAX_MITIGATION_CHARS = 400;
 const MAX_TITLE_CHARS = 70;
 
-
 function interpretGrade(grade: string): string {
   switch (grade) {
     case 'A':

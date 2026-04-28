@@ -47,7 +47,10 @@ import {
   type CutVerdict,
 } from './closing-lab/closing-lab-data';
 
-const STATUS_COLORS: Record<SilentObjection['status'], { bg: string; border: string; fg: string; label: string }> = {
+const STATUS_COLORS: Record<
+  SilentObjection['status'],
+  { bg: string; border: string; fg: string; label: string }
+> = {
   shipped: {
     bg: 'rgba(22, 163, 74, 0.10)',
     border: 'rgba(22, 163, 74, 0.35)',
@@ -68,7 +71,10 @@ const STATUS_COLORS: Record<SilentObjection['status'], { bg: string; border: str
   },
 };
 
-const VERDICT_COLORS: Record<CutVerdict, { bg: string; border: string; fg: string; label: string }> = {
+const VERDICT_COLORS: Record<
+  CutVerdict,
+  { bg: string; border: string; fg: string; label: string }
+> = {
   kill: {
     bg: 'rgba(239, 68, 68, 0.10)',
     border: 'rgba(239, 68, 68, 0.40)',
@@ -117,8 +123,7 @@ function Hero() {
     <div
       style={{
         padding: 18,
-        background:
-          'linear-gradient(135deg, rgba(22,163,74,0.10), rgba(245,158,11,0.06))',
+        background: 'linear-gradient(135deg, rgba(22,163,74,0.10), rgba(245,158,11,0.06))',
         border: '1px solid var(--border-color)',
         borderRadius: 'var(--radius-lg)',
       }}
@@ -158,12 +163,11 @@ function Hero() {
         }}
       >
         Eddie Maalouf&rsquo;s 6 high-ticket-psychology principles, Satyam&rsquo;s 5
-        sales-infrastructure pillars, and the unvarnished pre-mortem critique — applied
-        verbatim to the three personas who can swipe a corporate card today
-        (mid-market PE/VC associate, boutique sell-side M&amp;A advisor, solo /
-        fractional CSO). Read the exact phrase for the persona you are about to call.
-        Read the silent objections after every lost deal — the objection that killed
-        it is almost certainly one of the five.
+        sales-infrastructure pillars, and the unvarnished pre-mortem critique — applied verbatim to
+        the three personas who can swipe a corporate card today (mid-market PE/VC associate,
+        boutique sell-side M&amp;A advisor, solo / fractional CSO). Read the exact phrase for the
+        persona you are about to call. Read the silent objections after every lost deal — the
+        objection that killed it is almost certainly one of the five.
       </p>
     </div>
   );
@@ -227,7 +231,12 @@ function FastestConvertersSection() {
           accent={active.color}
           bodyStyle="quote"
         />
-        <DetailRow label="Satyam category-of-one framing" body={active.categoryFraming} accent={active.color} bodyStyle="quote" />
+        <DetailRow
+          label="Satyam category-of-one framing"
+          body={active.categoryFraming}
+          accent={active.color}
+          bodyStyle="quote"
+        />
         <DetailRow
           label={`Top silent objection · ${objection?.label}`}
           body={`What they think: ${objection?.whatBuyerThinks}`}
@@ -240,7 +249,11 @@ function FastestConvertersSection() {
           bodyStyle="quote"
         />
         <DetailRow label="Conviction anchor" body={active.convictionAnchor} accent={active.color} />
-        <DetailRow label="Pre-call nurture asset" body={active.preCallAsset} accent={active.color} />
+        <DetailRow
+          label="Pre-call nurture asset"
+          body={active.preCallAsset}
+          accent={active.color}
+        />
 
         <div style={{ marginTop: 18 }}>
           <div style={subHeader(active.color)}>14-day outreach sequence</div>
@@ -273,8 +286,18 @@ function TrapPersonasSection() {
         {TRAP_PERSONAS.map(t => (
           <div key={t.id} style={trapCard(t.color)}>
             <div style={trapLabel}>{t.label}</div>
-            <DetailRow label="Why they look attractive" body={t.whyTheyLookAttractive} accent={t.color} compact />
-            <DetailRow label="Why they are a trap" body={t.whyTheyAreATrap} accent="#DC2626" compact />
+            <DetailRow
+              label="Why they look attractive"
+              body={t.whyTheyLookAttractive}
+              accent={t.color}
+              compact
+            />
+            <DetailRow
+              label="Why they are a trap"
+              body={t.whyTheyAreATrap}
+              accent="#DC2626"
+              compact
+            />
             <DetailRow label="When to revisit" body={t.whenToRevisit} accent={t.color} compact />
           </div>
         ))}
@@ -329,7 +352,12 @@ function MaaloufSection() {
           body={active.antiPattern}
           accent="#DC2626"
         />
-        <DetailRow label="Ideal phrase" body={active.idealPhrase} accent="#0EA5E9" bodyStyle="quote" />
+        <DetailRow
+          label="Ideal phrase"
+          body={active.idealPhrase}
+          accent="#0EA5E9"
+          bodyStyle="quote"
+        />
       </div>
     </section>
   );
@@ -407,10 +435,18 @@ function SilentObjectionsSection() {
                 <span style={statusBadge(status)}>{status.label}</span>
               </div>
               <div style={objectionThought}>
-                <Quote size={12} style={{ flexShrink: 0, marginTop: 2, color: 'var(--text-muted)' }} />
+                <Quote
+                  size={12}
+                  style={{ flexShrink: 0, marginTop: 2, color: 'var(--text-muted)' }}
+                />
                 <em>&ldquo;{o.whatBuyerThinks}&rdquo;</em>
               </div>
-              <DetailRow label="Why it kills the deal" body={o.whyItKillsTheDeal} accent="#DC2626" compact />
+              <DetailRow
+                label="Why it kills the deal"
+                body={o.whyItKillsTheDeal}
+                accent="#DC2626"
+                compact
+              />
               <DetailRow label="This-week fix" body={o.thisWeekFix} accent={status.fg} compact />
               {o.verbatimResponse && (
                 <DetailRow
@@ -450,7 +486,9 @@ function CutListAndFunnelSection() {
             return (
               <div key={item.feature} style={cutCard(v)}>
                 <div style={cutCardHeader}>
-                  <strong style={{ fontSize: 13, color: 'var(--text-primary)' }}>{item.feature}</strong>
+                  <strong style={{ fontSize: 13, color: 'var(--text-primary)' }}>
+                    {item.feature}
+                  </strong>
                   <span style={verdictBadge(v)}>{v.label}</span>
                 </div>
                 <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
@@ -472,7 +510,12 @@ function CutListAndFunnelSection() {
                 <div style={funnelStepNumber}>{step.number}</div>
                 <div style={funnelStepLabel}>{step.label}</div>
                 <DetailRow label="What it IS" body={step.what} accent="#16A34A" compact />
-                <DetailRow label="What it is NOT" body={step.whatItIsNot} accent="#DC2626" compact />
+                <DetailRow
+                  label="What it is NOT"
+                  body={step.whatItIsNot}
+                  accent="#DC2626"
+                  compact
+                />
                 <DetailRow label="Action" body={step.action} accent="#0EA5E9" compact />
               </div>
               {i < SIMPLIFIED_FUNNEL.length - 1 && (
@@ -509,7 +552,13 @@ function NeverSaySection() {
               <span style={{ fontStyle: 'italic' }}>&ldquo;{p.phrase}&rdquo;</span>
             </div>
             <DetailRow label="Why it kills the deal" body={p.whyItKills} accent="#DC2626" compact />
-            <DetailRow label="Say this instead" body={p.saySteadInstead} accent="#16A34A" bodyStyle="quote" compact />
+            <DetailRow
+              label="Say this instead"
+              body={p.saySteadInstead}
+              accent="#16A34A"
+              bodyStyle="quote"
+              compact
+            />
           </div>
         ))}
       </div>
@@ -891,4 +940,3 @@ const neverPhrase: React.CSSProperties = {
   paddingBottom: 10,
   borderBottom: '1px solid var(--border-color)',
 };
-

@@ -569,7 +569,12 @@ export const ISA_NIGERIA_FRAMEWORK: RegulatoryFramework = {
       description:
         'The Securities and Exchange Commission shall regulate investments and securities business in Nigeria, register and regulate market operators, and ensure the protection of investors. Decision-quality processes that fail to surface known cognitive biases in investment recommendations may be deemed inconsistent with investor-protection obligations.',
       riskLevel: 'high',
-      keywords: ['investor protection', 'sec nigeria', 'market integrity', 'investment recommendations'],
+      keywords: [
+        'investor protection',
+        'sec nigeria',
+        'market integrity',
+        'investment recommendations',
+      ],
     },
     {
       id: 'isa_s_67',

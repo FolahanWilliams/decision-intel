@@ -19,8 +19,7 @@
  * Locked: 2026-04-28.
  */
 
-export const POSITIONING_HERO_PRIMARY =
-  'The native reasoning layer for every high-stakes call.';
+export const POSITIONING_HERO_PRIMARY = 'The native reasoning layer for every high-stakes call.';
 
 export const POSITIONING_HERO_SECONDARY =
   'The reasoning layer the Fortune 500 needs before regulators start asking.';
@@ -58,8 +57,7 @@ export const ICP_WEDGE = {
  */
 export const ICP_CEILING = {
   label: 'Revenue ceiling (12-18 months out)',
-  audience:
-    'Fortune 500 Chief Strategy Officers, audit committees, GCs at regulated entities.',
+  audience: 'Fortune 500 Chief Strategy Officers, audit committees, GCs at regulated entities.',
   whyItUnlocks:
     'The R²F + DPR + 17-framework regulatory map are designed to clear F500 procurement once the wedge has produced 3+ published reference cases.',
 } as const;

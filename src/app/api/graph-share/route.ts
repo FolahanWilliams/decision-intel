@@ -131,11 +131,7 @@ export async function POST(req: NextRequest) {
   let snapshot: GraphNetworkReport | null = null;
   if (orgId) {
     try {
-      snapshot = await generateGraphReport(
-        orgId,
-        user.id,
-        body.timeRangeDays ?? 90
-      );
+      snapshot = await generateGraphReport(orgId, user.id, body.timeRangeDays ?? 90);
     } catch (err) {
       log.error('Snapshot generation failed during graph-share create:', err);
       return NextResponse.json(
@@ -146,8 +142,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Apply redaction if requested
-  const finalSnapshot =
-    snapshot && body.isRedacted ? redactSnapshot(snapshot) : snapshot;
+  const finalSnapshot = snapshot && body.isRedacted ? redactSnapshot(snapshot) : snapshot;
 
   // Hash password if provided
   let passwordHash: string | undefined;
@@ -156,12 +151,9 @@ export async function POST(req: NextRequest) {
   }
 
   // Compute expiresAt
-  const expiresInDays =
-    body.expiresInDays === undefined ? DEFAULT_EXPIRY_DAYS : body.expiresInDays;
+  const expiresInDays = body.expiresInDays === undefined ? DEFAULT_EXPIRY_DAYS : body.expiresInDays;
   const expiresAt =
-    expiresInDays === null
-      ? null
-      : new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000);
+    expiresInDays === null ? null : new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000);
 
   // Create the row
   let link;
@@ -170,8 +162,9 @@ export async function POST(req: NextRequest) {
       data: {
         userId: user.id,
         orgId,
-        snapshot:
-          (finalSnapshot ?? { metrics: { nodeCount: 0, edgeCount: 0 } }) as Prisma.InputJsonValue,
+        snapshot: (finalSnapshot ?? {
+          metrics: { nodeCount: 0, edgeCount: 0 },
+        }) as Prisma.InputJsonValue,
         sharerLabel,
         isRedacted: body.isRedacted ?? false,
         expiresAt,

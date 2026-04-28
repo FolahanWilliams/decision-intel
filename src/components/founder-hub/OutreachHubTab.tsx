@@ -143,7 +143,9 @@ export function OutreachHubTab({ founderPass, initialSection }: Props) {
                 fontWeight: 600,
                 background: active ? 'var(--bg-card)' : 'transparent',
                 color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
-                border: active ? '1px solid var(--border-active, var(--border-color))' : '1px solid transparent',
+                border: active
+                  ? '1px solid var(--border-active, var(--border-color))'
+                  : '1px solid transparent',
                 borderLeft: active ? `3px solid ${s.accent}` : '3px solid transparent',
                 borderRadius: 'var(--radius-sm)',
                 cursor: 'pointer',

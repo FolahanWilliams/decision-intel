@@ -157,7 +157,7 @@ export function OutreachCommandCenterTab({ founderPass }: Props) {
 
       {/* Dynamic meeting preparation — grounded in ethos / pathos / logos
           + Cialdini influence principles + Decision Intel's real assets
-          (Wiz advisor, R²F, DPR, 135-case corpus, design-partner cohort)
+          (Wiz advisor, R²F, DPR, 143-case corpus, design-partner cohort)
           + the founder's specific profile. Ephemeral by design: generate,
           use, re-run if the meeting reschedules. Top-of-tab slot because
           this is the single highest-stakes daily-use surface — every

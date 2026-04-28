@@ -132,7 +132,7 @@ function LessonsList({
    *  founder-chat-ask event the per-lesson button uses, but with a
    *  prompt that spans the entire curriculum in one go. Platform
    *  Foundations is the most rehearse-worthy track (Kahneman, Noise,
-   *  DQI, pre-mortems, 20×20 matrix, 12-node pipeline, 135-case lib) so
+   *  DQI, pre-mortems, 20×20 matrix, 12-node pipeline, 143-case lib) so
    *  the button is surfaced on every track header uniformly and the
    *  prompt is shaped to match the track's actual content. */
   const handleQuizTrack = () => {

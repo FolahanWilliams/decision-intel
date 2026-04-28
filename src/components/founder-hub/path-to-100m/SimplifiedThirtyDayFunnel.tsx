@@ -34,7 +34,7 @@ export function SimplifiedThirtyDayFunnel() {
   const filteredVerdicts =
     verdictFilter === 'all'
       ? FEATURE_VERDICTS
-      : FEATURE_VERDICTS.filter((v) => v.verdict === verdictFilter);
+      : FEATURE_VERDICTS.filter(v => v.verdict === verdictFilter);
 
   return (
     <div>
@@ -107,7 +107,14 @@ export function SimplifiedThirtyDayFunnel() {
                     >
                       {s.name}
                     </div>
-                    <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4, lineHeight: 1.4 }}>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        color: 'var(--text-secondary)',
+                        marginTop: 4,
+                        lineHeight: 1.4,
+                      }}
+                    >
                       {s.what}
                     </div>
                   </div>
@@ -117,7 +124,12 @@ export function SimplifiedThirtyDayFunnel() {
                 </div>
               </button>
               {isOpen && (
-                <div style={{ padding: '0 12px 12px 44px', borderTop: '1px solid var(--border-color)' }}>
+                <div
+                  style={{
+                    padding: '0 12px 12px 44px',
+                    borderTop: '1px solid var(--border-color)',
+                  }}
+                >
                   <div style={{ marginTop: 10 }}>
                     <div
                       style={{
@@ -156,10 +168,15 @@ export function SimplifiedThirtyDayFunnel() {
                       Hide / kill from this view
                     </div>
                     <ul style={{ margin: 0, padding: '0 0 0 14px' }}>
-                      {s.whatToHide.map((h) => (
+                      {s.whatToHide.map(h => (
                         <li
                           key={h}
-                          style={{ fontSize: 11, color: 'var(--text-secondary)', marginBottom: 3, lineHeight: 1.4 }}
+                          style={{
+                            fontSize: 11,
+                            color: 'var(--text-secondary)',
+                            marginBottom: 3,
+                            lineHeight: 1.4,
+                          }}
                         >
                           {h}
                         </li>
@@ -189,13 +206,13 @@ export function SimplifiedThirtyDayFunnel() {
       </div>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
-        {(['all', 'keep', 'hide_flag', 'enterprise_tier', 'kill'] as const).map((f) => {
+        {(['all', 'keep', 'hide_flag', 'enterprise_tier', 'kill'] as const).map(f => {
           const isActive = verdictFilter === f;
           const accent = f === 'all' ? '#0EA5E9' : VERDICT_COLOR[f];
           const label =
             f === 'all'
               ? `All · ${FEATURE_VERDICTS.length}`
-              : `${VERDICT_LABEL[f]} · ${FEATURE_VERDICTS.filter((v) => v.verdict === f).length}`;
+              : `${VERDICT_LABEL[f]} · ${FEATURE_VERDICTS.filter(v => v.verdict === f).length}`;
           return (
             <button
               key={f}
@@ -221,7 +238,7 @@ export function SimplifiedThirtyDayFunnel() {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {filteredVerdicts.map((v) => {
+        {filteredVerdicts.map(v => {
           const accent = VERDICT_COLOR[v.verdict];
           const Icon = VERDICT_ICON[v.verdict];
           return (

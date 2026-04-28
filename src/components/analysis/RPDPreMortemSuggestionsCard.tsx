@@ -2,6 +2,7 @@
 
 import { Compass, ArrowRight } from 'lucide-react';
 import type { BiasInstance } from '@/types';
+import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 
 // RPD pre-mortem suggestions card (D3 lock 2026-04-28).
 //
@@ -64,7 +65,7 @@ const BIAS_PREMORTEM_TEMPLATES: Record<
     action:
       'Proceed with the recommendation, but assume the actual variance on every projection is double what we modelled.',
     rationale:
-      "Overconfidence flagged — the variance bands are likely too narrow. Test the recommendation under realistic uncertainty.",
+      'Overconfidence flagged — the variance bands are likely too narrow. Test the recommendation under realistic uncertainty.',
   },
   groupthink: {
     label: 'What if a senior dissenter walked in tomorrow?',
@@ -78,7 +79,7 @@ const BIAS_PREMORTEM_TEMPLATES: Record<
     action:
       'Proceed only if the recommendation makes sense for a clean-sheet investor with zero prior commitment to this decision path.',
     rationale:
-      "Sunk-cost flagged — the recommendation may be partly justified by money already gone. Test the clean-sheet version.",
+      'Sunk-cost flagged — the recommendation may be partly justified by money already gone. Test the clean-sheet version.',
   },
   availability_heuristic: {
     label: 'What if our recent reference deal was an outlier?',
@@ -92,28 +93,28 @@ const BIAS_PREMORTEM_TEMPLATES: Record<
     action:
       'Proceed with the recommendation, but assume every milestone slips by 6 months and 30% of the synergies never materialise.',
     rationale:
-      "Optimism flagged — the execution timeline may be aspirational. Stress-test the realistic-friction version.",
+      'Optimism flagged — the execution timeline may be aspirational. Stress-test the realistic-friction version.',
   },
   loss_aversion: {
     label: 'What if the downside scenario is actually the base case?',
     action:
       'Proceed with the recommendation as if the downside scenario in the memo is the median outcome, not the tail.',
     rationale:
-      "Loss aversion flagged — the memo may have under-weighted the realistic downside. Test the inverted case.",
+      'Loss aversion flagged — the memo may have under-weighted the realistic downside. Test the inverted case.',
   },
   recency_bias: {
     label: 'What if last quarter was the anomaly?',
     action:
       'Proceed with the recommendation, but assume the last quarter of data points were anomalous and the longer-term mean reverts.',
     rationale:
-      "Recency flagged — recent data may be over-weighted. Test the longer-horizon mean-reverting version.",
+      'Recency flagged — recent data may be over-weighted. Test the longer-horizon mean-reverting version.',
   },
   status_quo_bias: {
     label: 'What if we made the bigger move instead?',
     action:
       'Proceed with the recommendation, but at twice the proposed scope (acquisition size, market entry depth, hire count).',
     rationale:
-      "Status-quo flagged — the recommendation may be the conservative-by-default option. Test the more ambitious version.",
+      'Status-quo flagged — the recommendation may be the conservative-by-default option. Test the more ambitious version.',
   },
 };
 
@@ -132,8 +133,7 @@ function buildSuggestions(biases: BiasInstance[]): PreMortemSuggestion[] {
   };
   const seen = new Set<string>();
   const ranked = [...biases].sort(
-    (a, b) =>
-      (SEVERITY_RANK[b.severity ?? 'low'] ?? 0) - (SEVERITY_RANK[a.severity ?? 'low'] ?? 0)
+    (a, b) => (SEVERITY_RANK[b.severity ?? 'low'] ?? 0) - (SEVERITY_RANK[a.severity ?? 'low'] ?? 0)
   );
   const out: PreMortemSuggestion[] = [];
   for (const bias of ranked) {
@@ -207,8 +207,8 @@ export function RPDPreMortemSuggestionsCard({
           }}
         >
           Each pre-mortem stress-tests the recommendation against a specific blind spot the audit
-          flagged. Click to load the scenario into the RPD simulator and see what historical
-          analogs from the 135-case reference library did.
+          flagged. Click to load the scenario into the RPD simulator and see what historical analogs
+          from the {HISTORICAL_CASE_COUNT}-case reference library did.
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {suggestions.map(s => (

@@ -1,7 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronRight, ChevronDown, Star, Briefcase, GraduationCap, Handshake, Network, Heart } from 'lucide-react';
+import {
+  ChevronRight,
+  ChevronDown,
+  Star,
+  Briefcase,
+  GraduationCap,
+  Handshake,
+  Network,
+  Heart,
+} from 'lucide-react';
 import { NETWORK_NODES, type NetworkNode } from './data';
 
 const STATUS_COLOR: Record<NetworkNode['status'], string> = {
@@ -11,7 +20,10 @@ const STATUS_COLOR: Record<NetworkNode['status'], string> = {
   cold: '#94A3B8',
 };
 
-const RELATIONSHIP_ICON: Record<NetworkNode['relationship'], React.ComponentType<{ size?: number }>> = {
+const RELATIONSHIP_ICON: Record<
+  NetworkNode['relationship'],
+  React.ComponentType<{ size?: number }>
+> = {
   family: Heart,
   advisor: Star,
   school: GraduationCap,
@@ -22,7 +34,7 @@ const RELATIONSHIP_ICON: Record<NetworkNode['relationship'], React.ComponentType
 
 export function WarmIntroNetworkMap() {
   const [openIds, setOpenIds] = useState<Set<string>>(
-    new Set(NETWORK_NODES.filter((n) => n.status === 'active').map((n) => n.id))
+    new Set(NETWORK_NODES.filter(n => n.status === 'active').map(n => n.id))
   );
 
   const toggle = (id: string) => {
@@ -34,7 +46,7 @@ export function WarmIntroNetworkMap() {
 
   return (
     <div>
-      {NETWORK_NODES.map((n) => {
+      {NETWORK_NODES.map(n => {
         const isOpen = openIds.has(n.id);
         const accent = STATUS_COLOR[n.status];
         const Icon = RELATIONSHIP_ICON[n.relationship];
@@ -147,7 +159,7 @@ export function WarmIntroNetworkMap() {
                     What they unlock
                   </div>
                   <ul style={{ margin: 0, padding: '0 0 0 16px' }}>
-                    {n.unlocks.map((u) => (
+                    {n.unlocks.map(u => (
                       <li
                         key={u}
                         style={{
@@ -179,7 +191,11 @@ export function WarmIntroNetworkMap() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {(['tier1', 'tier2', 'tier3'] as const).map((tier, i) => {
                       const tierColors = ['#16A34A', '#D97706', '#0EA5E9'];
-                      const tierLabels = ['Tier 1 · ideal', 'Tier 2 · high-value', 'Tier 3 · fallback'];
+                      const tierLabels = [
+                        'Tier 1 · ideal',
+                        'Tier 2 · high-value',
+                        'Tier 3 · fallback',
+                      ];
                       return (
                         <div
                           key={tier}
@@ -203,7 +219,13 @@ export function WarmIntroNetworkMap() {
                           >
                             {tierLabels[i]}
                           </div>
-                          <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                          <div
+                            style={{
+                              fontSize: 12,
+                              color: 'var(--text-secondary)',
+                              lineHeight: 1.5,
+                            }}
+                          >
                             {n.ask[tier]}
                           </div>
                         </div>

@@ -181,9 +181,7 @@ export default function SharedGraphPage() {
       setError({
         status: 500,
         message:
-          err instanceof Error
-            ? err.message
-            : 'Network error while loading the shared graph.',
+          err instanceof Error ? err.message : 'Network error while loading the shared graph.',
       });
     } finally {
       setLoading(false);
@@ -479,19 +477,23 @@ export default function SharedGraphPage() {
             }}
           >
             <span>
-              Captured {new Date(data.createdAt).toLocaleDateString(undefined, {
+              Captured{' '}
+              {new Date(data.createdAt).toLocaleDateString(undefined, {
                 year: 'numeric',
                 month: 'short',
                 day: 'numeric',
               })}
             </span>
             <span>·</span>
-            <span>{data.viewCount} view{data.viewCount === 1 ? '' : 's'}</span>
+            <span>
+              {data.viewCount} view{data.viewCount === 1 ? '' : 's'}
+            </span>
             {data.expiresAt && (
               <>
                 <span>·</span>
                 <span>
-                  Expires {new Date(data.expiresAt).toLocaleDateString(undefined, {
+                  Expires{' '}
+                  {new Date(data.expiresAt).toLocaleDateString(undefined, {
                     year: 'numeric',
                     month: 'short',
                     day: 'numeric',
@@ -572,9 +574,9 @@ export default function SharedGraphPage() {
                 marginRight: 'auto',
               }}
             >
-              {data.sharerLabel} has shared their Decision Knowledge Graph workspace, but no
-              audited decisions are in the snapshot yet. Decisions, biases, and outcomes will
-              appear here as the team audits more strategic memos and logs their outcomes.
+              {data.sharerLabel} has shared their Decision Knowledge Graph workspace, but no audited
+              decisions are in the snapshot yet. Decisions, biases, and outcomes will appear here as
+              the team audits more strategic memos and logs their outcomes.
             </p>
           </div>
         )}
@@ -880,8 +882,8 @@ export default function SharedGraphPage() {
               marginRight: 'auto',
             }}
           >
-            Every audited memo, every logged outcome, compounding into a calibration moat your
-            team owns. Start free — no card required.
+            Every audited memo, every logged outcome, compounding into a calibration moat your team
+            owns. Start free — no card required.
           </p>
           <Link
             href="/login?mode=signup"

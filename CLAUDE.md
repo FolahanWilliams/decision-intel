@@ -56,7 +56,7 @@ Decision Intel is a decision intelligence platform for corporate strategy teams.
 - "Decision Knowledge Graph" (always full name)
 - "Decision Quality Index" / "DQI"
 - "quarter after quarter" (cadence)
-- "135 historical decisions" (benchmark number — defensible; deduped 2026-04-16 from 146)
+- "143 historical decisions" (benchmark number — derived from `HISTORICAL_CASE_COUNT = ALL_CASES.length` in [src/lib/data/case-studies/index.ts](src/lib/data/case-studies/index.ts); was 135 in the 2026-04-16 dedup, grew to 143 with the emerging-markets failure cases + new success cases through 2026-04-29; production copy MUST import the constant rather than hardcoding the number)
 - "30+ cognitive biases" (taxonomy scope)
 - **"native system of record for strategic reasoning"** — the category-defining phrase (2026-04-22 lock). Lives in the landing H1, /how-it-works subtitle, pitch deck slide 2. Softer alternative "native medium for strategic reasoning" is interchangeable for surfaces where "system of record" feels over-procurement-coded.
 - **"Recognition-Rigor Framework" / "R²F"** — the category-defining framework name (2026-04-22 lock). Kahneman's rigor (System 2 debiasing) + Klein's recognition (System 1 amplification) arbitrated in one pipeline. Trademark filing DEFERRED until pre-seed close; use consistently now so vocabulary is owned by usage alone. Anchor citation: 2009 Kahneman-Klein paper "Conditions for Intuitive Expertise: a failure to disagree."
@@ -138,7 +138,7 @@ The locked vocabulary above ("native reasoning layer," "R²F," "DQI," "DPR — h
 - Concrete artefacts: "strategic memo", "board deck", "audit committee", "steering committee", "Decision Provenance Record" (2026-04-22 rename from "Audit Defense Packet"), "Decision Knowledge Graph", "Decision Quality Index"
 - Compliance vocabulary: SOC 2, GDPR, EU AI Act, Basel III, SEC Reg D — specific, named, defensible
 - Enterprise shapes: the audit committee, the GC review, the procurement bar, the regulator meeting
-- Numbers that survive due diligence: "135 audited corporate decisions", "30+ cognitive biases", "~90% blended margin" — publicly verifiable or internally defensible
+- Numbers that survive due diligence: "143 audited corporate decisions" (derive from `HISTORICAL_CASE_COUNT`), "30+ cognitive biases", "~90% blended margin" — publicly verifiable or internally defensible
 - Quiet confidence: "checkable", "traceable", "defensible", "one click away, no login, no gate"
 
 **Where the jargon CAN live:** `/how-it-works` is the only public page that can name the 12-node pipeline, the node zones, and the interaction matrix — and even there, the manifest in `src/lib/data/pipeline-nodes.ts` is the ceiling. Founder Hub, Founder School, and the pitch deck can be as technical as useful because they're behind Supabase auth or the founder's own outreach.

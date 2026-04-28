@@ -114,7 +114,7 @@ export const SPINE_STEPS: SpineStep[] = [
     failureMode: 'Random branding kills recall. Repeat what works.',
     status: 'partial',
     nextAction:
-      'Lock the post format: [Company] failed because of [Bias]. DQI would have scored this a [Grade]. 135 other cases show the same pattern.',
+      'Lock the post format: [Company] failed because of [Bias]. DQI would have scored this a [Grade]. 143 other cases show the same pattern.',
   },
   {
     id: 'availability',
@@ -495,7 +495,7 @@ export const PITCH_SLIDES: PitchSlide[] = [
     title: 'Proof',
     purpose: 'Show real usage — evidence matters more than features',
     decisionIntelAnswer:
-      'Pre-pilot: 135 historical decisions audited retrospectively. Kodak, Blockbuster, Nokia, Enron, Theranos — every failure has a traceable bias. /proof page shows the flagged evidence before the outcome reveal.',
+      'Pre-pilot: 143 historical decisions audited retrospectively. Kodak, Blockbuster, Nokia, Enron, Theranos — every failure has a traceable bias. /proof page shows the flagged evidence before the outcome reveal.',
     kind: 'proof',
   },
   {
@@ -673,7 +673,7 @@ export const POSITIONING_NODES: PositioningNode[] = [
   },
   {
     id: 'cases',
-    label: '135 Cases',
+    label: '143 Cases',
     kind: 'proof',
     detail:
       'Historical case library. Kodak, Blockbuster, Nokia, Theranos, Enron. Every failure traceable to a bias.',
@@ -768,7 +768,7 @@ export const REHEARSAL_PROMPTS: string[] = [
   '1-line category: "Decision intelligence for corporate strategy — catches bias before the steering committee does."',
   '1-line buyer: "Chief Strategy Officer at a Fortune 500 or late-stage private. Signs the contract. Cares about board credibility quarter after quarter."',
   '1-line problem: "CSO average tenure is 3 years. Careers end over one bad board recommendation. No tool audits reasoning before the meeting."',
-  '1-line proof: "135 historical decisions audited retrospectively. Every failure traceable to a named bias. /proof shows it live."',
+  '1-line proof: "143 historical decisions audited retrospectively. Every failure traceable to a named bias. /proof shows it live."',
   '1-line moat: "The Decision Knowledge Graph compounds every call. GPT wrappers reset at zero."',
   '1-line ask: "Audit one real memo on a 30-minute call, or one warm intro to a CSO who lost sleep this quarter."',
 ];

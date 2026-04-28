@@ -164,7 +164,7 @@ export const LRQA_COMPANY = {
       date: '2026-02 (2mo ago)',
       move: 'Mission AI Possible internal hackathon — 87 ideas, 13 teams shortlisted, 3 finalists, 5 AI projects already deployed (scheduling, report writing, insights x2, technical reviews)',
       diRelevance:
-        'LRQA is investing in AI internally. This means they have organisational maturity to evaluate AI products + technical staff who can integrate them. It also means Folahan should NOT pitch DI as "we\'ll do AI for you" — pitch DI as "we bring R²F + 17-framework regulatory IP + 135-case library that you would not build internally."',
+        'LRQA is investing in AI internally. This means they have organisational maturity to evaluate AI products + technical staff who can integrate them. It also means Folahan should NOT pitch DI as "we\'ll do AI for you" — pitch DI as "we bring R²F + 17-framework regulatory IP + 143-case library that you would not build internally."',
       strategicWeight: 'high',
     },
     {
@@ -268,9 +268,9 @@ export const INTEGRATION_PATHS: IntegrationPath[] = [
     whereInLrqaStack:
       'Mission AI Possible hackathon (87 ideas, 5 deployed projects). LRQA AI capability stack.',
     diValueAdd:
-      "LRQA's internal AI initiative produces tactical AI tools (scheduling, report writing, insights, technical reviews). It does NOT produce category-defining IP like the R²F (Kahneman-Klein synthesis) + 20-bias taxonomy + 17-framework regulatory map + 135-case library + Brier-scored outcome flywheel. These take 5+ years of academic + product work. LRQA could license or partner with DI to bring this IP into the LRQA platform without rebuilding.",
+      "LRQA's internal AI initiative produces tactical AI tools (scheduling, report writing, insights, technical reviews). It does NOT produce category-defining IP like the R²F (Kahneman-Klein synthesis) + 20-bias taxonomy + 17-framework regulatory map + 143-case library + Brier-scored outcome flywheel. These take 5+ years of academic + product work. LRQA could license or partner with DI to bring this IP into the LRQA platform without rebuilding.",
     pitchPositioning:
-      "\"Your Mission AI Possible hackathon shows internal AI capability. The question for any enterprise AI strategy is what to build vs partner. R²F + the 17-framework map + the 135-case library would take a team 3-5 years to recreate from scratch — and the academic IP (Kahneman-Klein 2009 'Conditions for Intuitive Expertise', the 50-year heuristics-and-biases program) anchors the credibility in a way internal builds rarely match. Worth exploring whether DI is a partner-don't-build candidate for LRQA.\"",
+      "\"Your Mission AI Possible hackathon shows internal AI capability. The question for any enterprise AI strategy is what to build vs partner. R²F + the 17-framework map + the 143-case library would take a team 3-5 years to recreate from scratch — and the academic IP (Kahneman-Klein 2009 'Conditions for Intuitive Expertise', the 50-year heuristics-and-biases program) anchors the credibility in a way internal builds rarely match. Worth exploring whether DI is a partner-don't-build candidate for LRQA.\"",
     proofArtefact:
       'Send the Kahneman-Klein 2009 paper PDF (the R²F intellectual anchor) + a one-page IP moat brief.',
     realisticTimeline:
@@ -432,7 +432,7 @@ export const MEETING_PREP: PrepItem[] = [
     category: 'rehearse',
     item: 'The "why this matters to LRQA" 3-sentence pitch',
     detail:
-      '"Your acquisition of Partner Africa + your Reuters piece on 2026 risk convergence + the EiQ supply chain intelligence software are the three signals I read as Decision Intel being uniquely complementary to LRQA. We bring R²F + the 17-framework Pan-African regulatory map + 135-case library. Together with EiQ + Partner Africa, that\'s a Pan-African reasoning audit offering no competitor can replicate in 12 months."',
+      '"Your acquisition of Partner Africa + your Reuters piece on 2026 risk convergence + the EiQ supply chain intelligence software are the three signals I read as Decision Intel being uniquely complementary to LRQA. We bring R²F + the 17-framework Pan-African regulatory map + 143-case library. Together with EiQ + Partner Africa, that\'s a Pan-African reasoning audit offering no competitor can replicate in 12 months."',
   },
   {
     category: 'avoid',

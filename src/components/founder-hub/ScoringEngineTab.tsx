@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { BarChart3, Zap, AlertTriangle, Brain, Network, HelpCircle } from 'lucide-react';
+import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 import { card, sectionTitle, badge, tableRow } from '@/components/founder-hub/shared-styles';
 
 // ─── Toxic Pattern Knowledge Base ──────────────────────────────────────────
@@ -338,8 +339,8 @@ export function ScoringEngineTab() {
             </li>
             <li>Org-calibrated: thresholds adjust from your outcome data via CausalEdge weights</li>
             <li>
-              Historical failure &amp; success rates from 135-case database with false-positive
-              damping
+              Historical failure &amp; success rates from {HISTORICAL_CASE_COUNT}-case database with
+              false-positive damping
             </li>
             <li>
               <strong>NEW: Mitigation Playbooks</strong> — auto-generated, research-backed debiasing
@@ -415,8 +416,8 @@ export function ScoringEngineTab() {
               desc: 'Org-specific learned weights amplifying severity from historical impact',
             },
             {
-              title: '135 Case Studies',
-              desc: '120 failures + 15 successes across 11 industries, with pre-decision evidence',
+              title: `${HISTORICAL_CASE_COUNT} Case Studies`,
+              desc: '128 failures + 15 successes across 12 industries / regions, with pre-decision evidence',
             },
             {
               title: 'Bio Signals',

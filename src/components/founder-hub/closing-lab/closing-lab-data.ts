@@ -164,7 +164,7 @@ export const FASTEST_CONVERTERS: FastestConverter[] = [
     archetype: 'Adaeze',
     label: 'Mid-market PE/VC associate',
     description:
-      "24-year-old associate up at 2 AM drafting an IC memo, terrified of looking stupid in front of the Managing Partner. Has a corporate card. Does not need CFO approval below the procurement threshold.",
+      '24-year-old associate up at 2 AM drafting an IC memo, terrified of looking stupid in front of the Managing Partner. Has a corporate card. Does not need CFO approval below the procurement threshold.',
     whyReadyNow:
       'Acute career fear: looking stupid at the next IC meeting. The product makes them the smartest person in the room. They swipe today because the cost of looking stupid > the cost of $149/month.',
     ticketBand: '£149/mo Professional · sub-procurement-approval at every fund',
@@ -175,7 +175,7 @@ export const FASTEST_CONVERTERS: FastestConverter[] = [
       "We don't provide deal templates or logging software. We run an 11-node bias auditor that acts as an outsourced adversarial red-team, simulating the exact logical gaps the partners will grill you on in 60 seconds.",
     topSilentObjection: 'chatgpt_wrapper',
     objectionResponse:
-      'You might think you can just run this through ChatGPT. You cannot. ChatGPT gives you one generative opinion. We use Ensemble Sampling across a 135-case historical reference library based on the Kahneman-Klein R²F academic synthesis to give you a deterministic, auditable record. ChatGPT guesses; we audit.',
+      'You might think you can just run this through ChatGPT. You cannot. ChatGPT gives you one generative opinion. We use Ensemble Sampling across a 143-case historical reference library based on the Kahneman-Klein R²F academic synthesis to give you a deterministic, auditable record. ChatGPT guesses; we audit.',
     convictionAnchor:
       'The Fear of Messing Up (JOLT effect). This 24-year-old is up until 2 AM terrified of looking stupid in front of the IC. The tool makes them the smartest person in the room. The conviction is real because the pain is real.',
     preCallAsset:
@@ -197,7 +197,7 @@ export const FASTEST_CONVERTERS: FastestConverter[] = [
     archetype: 'Potomac',
     label: 'Boutique sell-side M&A advisor',
     description:
-      'Runs a 2-10 person sell-side shop. Paid strictly on closing. If a PE buyer\'s IC spots a flaw in their CIM (ungrounded hockey-stick projections, weak comps), the valuation drops or the deal dies. Buys per-deal.',
+      "Runs a 2-10 person sell-side shop. Paid strictly on closing. If a PE buyer's IC spots a flaw in their CIM (ungrounded hockey-stick projections, weak comps), the valuation drops or the deal dies. Buys per-deal.",
     whyReadyNow:
       'Direct commission risk. Every CIM with a hidden flaw costs them a $1M commission. The £499 audit is rounding-error insurance against losing the deal.',
     ticketBand: '£499 per-deal audit OR £149/mo Professional for active pipeline',
@@ -237,12 +237,12 @@ export const FASTEST_CONVERTERS: FastestConverter[] = [
     exactPhrase:
       'We are actively attaching our Decision Provenance Records to the strategy decks of ex-MBB consultants who want to mathematically prove to their clients that their recommendations are debiased. I am talking to three other fractional CSOs this week about standardizing this.',
     categoryFraming:
-      "Consulting firms charge $1M to tell clients about cognitive bias, but have the same biases themselves. We built the AI that does not. We provide the 60-second insurance premium on your strategic-planning cadence.",
+      'Consulting firms charge $1M to tell clients about cognitive bias, but have the same biases themselves. We built the AI that does not. We provide the 60-second insurance premium on your strategic-planning cadence.',
     topSilentObjection: 'founder_continuity',
     objectionResponse:
       "You aren't buying a fragile startup; you're buying a productized academic synthesis. Our SOC 2 Type II infrastructure runs on Vercel and Supabase, and our data room includes a Vendor Continuity Plan backed by a senior engineering network that previously scaled Wiz to $32B.",
     convictionAnchor:
-      "Charge more and win anyway (Satyam). Price is perceived value constructed in real-time. You are giving them the ultimate Cialdini Authority weapon — an academic, stamped DPR they can hand to their clients to justify their £20K/month retainer.",
+      'Charge more and win anyway (Satyam). Price is perceived value constructed in real-time. You are giving them the ultimate Cialdini Authority weapon — an academic, stamped DPR they can hand to their clients to justify their £20K/month retainer.',
     preCallAsset:
       'A blank but fully formatted Decision Provenance Record (DPR) PDF aligned with EU AI Act Article 14, demonstrating the exact artifact they will hand to their clients.',
     outreachSequence: [
@@ -263,33 +263,33 @@ export const TRAP_PERSONAS: TrapPersona[] = [
     id: 'f500_cso',
     label: 'Fortune 500 Chief Strategy Officer',
     whyTheyLookAttractive:
-      "$50K-$150K ACV ceiling. $250M pain from bad strategic decisions. The unicorn-revenue path runs through them. They look like the obvious target on a TAM slide.",
+      '$50K-$150K ACV ceiling. $250M pain from bad strategic decisions. The unicorn-revenue path runs through them. They look like the obvious target on a TAM slide.',
     whyTheyAreATrap:
-      "Structurally 12-18 months out. Selling to them requires surviving a 6-12 month procurement cycle that demands SOC 2 Type II compliance, EU AI Act Article 14 mapping, Audit Committee sign-off, and a vendor-risk register review. You do not have the outcome data flywheel or the published reference cases to survive this cycle yet. Pitching them today bleeds runway.",
+      'Structurally 12-18 months out. Selling to them requires surviving a 6-12 month procurement cycle that demands SOC 2 Type II compliance, EU AI Act Article 14 mapping, Audit Committee sign-off, and a vendor-risk register review. You do not have the outcome data flywheel or the published reference cases to survive this cycle yet. Pitching them today bleeds runway.',
     whenToRevisit:
-      "After 3+ published wedge cases (mid-market associate or boutique advisor case studies with named outcomes). The 12-18 month F500 unlock is gated on social proof you generate from the fastest-converter cohort.",
+      'After 3+ published wedge cases (mid-market associate or boutique advisor case studies with named outcomes). The 12-18 month F500 unlock is gated on social proof you generate from the fastest-converter cohort.',
     color: '#94A3B8',
   },
   {
     id: 'pan_african_partner',
     label: 'Pan-African fund partner (Sankore-class MD)',
     whyTheyLookAttractive:
-      "Your tri-cultural moat (Lagos / UK / US) + capital-allocation pressure across volatile FX regimes makes them the ultimate enterprise beachhead. Sankore is your first design partner. The fit is real.",
+      'Your tri-cultural moat (Lagos / UK / US) + capital-allocation pressure across volatile FX regimes makes them the ultimate enterprise beachhead. Sankore is your first design partner. The fit is real.',
     whyTheyAreATrap:
-      "Enterprise PE/VC sales cycles take 9-18 months. Selling to the partner requires proving ROI across multiple deals + satisfying strict regional regulatory frameworks (Nigerian SEC ISA 2007, NDPR, FRC Nigeria current code). Waiting for them to sign a $30K/year contract drains your immediate 30-day momentum. The partnership is real but it is not a 30-day close.",
+      'Enterprise PE/VC sales cycles take 9-18 months. Selling to the partner requires proving ROI across multiple deals + satisfying strict regional regulatory frameworks (Nigerian SEC ISA 2007, NDPR, FRC Nigeria current code). Waiting for them to sign a $30K/year contract drains your immediate 30-day momentum. The partnership is real but it is not a 30-day close.',
     whenToRevisit:
-      "After the Sankore design partnership produces a published reference case AND the 18-framework regulatory map closes the ISA 2007 gap. Then bundle with adjacent Pan-African funds for a multi-deal close motion.",
+      'After the Sankore design partnership produces a published reference case AND the 18-framework regulatory map closes the ISA 2007 gap. Then bundle with adjacent Pan-African funds for a multi-deal close motion.',
     color: '#475569',
   },
   {
     id: 'gc_audit_committee',
     label: 'General Counsels / Audit Committees',
     whyTheyLookAttractive:
-      "Your 18-framework compliance map (post-ISA 2007 fix) makes them look like a great target. Regulatory tailwinds (EU AI Act Article 14 enforceable Aug 2026) make their pain real and dated.",
+      'Your 18-framework compliance map (post-ISA 2007 fix) makes them look like a great target. Regulatory tailwinds (EU AI Act Article 14 enforceable Aug 2026) make their pain real and dated.',
     whyTheyAreATrap:
-      "GCs are gatekeepers, not early adopters. Their literal job on any enterprise contract is to find reasons NOT to sign. They will relentlessly scrutinize your data retention windows, NDA compliance, lack of statistical confidence intervals on DQI, and your continuity-of-vendor risk as a 16-year-old solo founder. Pitching them directly at pre-seed is corporate suicide.",
+      'GCs are gatekeepers, not early adopters. Their literal job on any enterprise contract is to find reasons NOT to sign. They will relentlessly scrutinize your data retention windows, NDA compliance, lack of statistical confidence intervals on DQI, and your continuity-of-vendor risk as a 16-year-old solo founder. Pitching them directly at pre-seed is corporate suicide.',
     whenToRevisit:
-      "ONLY after a CSO or M&A head champions the deal and pulls the GC into the procurement loop. Never sell to the GC first. Equip the champion with the GC artefact (DPR + DPA + Vendor Continuity Plan) so they can clear the GC review themselves.",
+      'ONLY after a CSO or M&A head champions the deal and pulls the GC into the procurement loop. Never sell to the GC first. Equip the champion with the GC artefact (DPR + DPA + Vendor Continuity Plan) so they can clear the GC review themselves.',
     color: '#64748B',
   },
 ];
@@ -328,11 +328,11 @@ export const MAALOUF_PRINCIPLES: MaaloufPrinciple[] = [
     maaloufQuote:
       'Authority is not trust. Do they perceive you as someone of status? Do you make them feel like you are more important to them than they are to you?',
     diApplication:
-      "Your authority anchors are NOT 'I am a 16-year-old founder.' They are: published Decision Provenance Records, the 135-case academic reference library, the Wiz advisor, the Recognition-Rigor Framework. Lead with the artefact, not the founder bio.",
+      "Your authority anchors are NOT 'I am a 16-year-old founder.' They are: published Decision Provenance Records, the 143-case academic reference library, the Wiz advisor, the Recognition-Rigor Framework. Lead with the artefact, not the founder bio.",
     antiPattern:
       'Apologizing for your age, your stage, your lack of paying customers. Every apology drops your authority by 30%. The buyer reads it as "this person needs me more than I need them" and they pull teeth on price.',
     idealPhrase:
-      'Lead with: "We have audited 135 historical strategic decisions to calibrate the engine. Every flagged bias is mapped to a peer-reviewed paper at /taxonomy. The Decision Provenance Record we ship today maps onto EU AI Act Article 14 record-keeping by design."',
+      'Lead with: "We have audited 143 historical strategic decisions to calibrate the engine. Every flagged bias is mapped to a peer-reviewed paper at /taxonomy. The Decision Provenance Record we ship today maps onto EU AI Act Article 14 record-keeping by design."',
   },
   {
     id: 'talk_about_other_opportunities',
@@ -365,9 +365,9 @@ export const MAALOUF_PRINCIPLES: MaaloufPrinciple[] = [
     number: 6,
     label: 'Stay in business longer',
     maaloufQuote:
-      "If you are in business for six months and I am in business for six years, and we are fighting for the same client — I am gonna win. People do not like to be the only people working with you.",
+      'If you are in business for six months and I am in business for six years, and we are fighting for the same client — I am gonna win. People do not like to be the only people working with you.',
     diApplication:
-      "You cannot fake six years of operation, but you CAN fake the social-proof equivalents: a 135-case reference library shipped, a 17-framework compliance map (soon 18), the Wiz advisor relationship documented, R²F as a category claim with academic anchors.",
+      'You cannot fake six years of operation, but you CAN fake the social-proof equivalents: a 143-case reference library shipped, a 17-framework compliance map (soon 18), the Wiz advisor relationship documented, R²F as a category claim with academic anchors.',
     antiPattern:
       'Pretending you have customers you do not have. Sophisticated buyers triangulate via LinkedIn, Crunchbase, and direct reference checks. One discovered lie ends the deal.',
     idealPhrase:
@@ -394,9 +394,9 @@ export const SATYAM_PILLARS: SatyamPillar[] = [
     number: 2,
     label: 'Run the us-vs-them conversation without arrogance',
     summary:
-      "Let the prospect raise the comparison. Listen to what they say about competitors. Their complaints are doors into your differentiation.",
+      'Let the prospect raise the comparison. Listen to what they say about competitors. Their complaints are doors into your differentiation.',
     satyamQuote:
-      "Most people in this space will place someone and their involvement ends there. What I have found is that the placement failing usually has nothing to do with the rep. It has to do with the infrastructure they walked into.",
+      'Most people in this space will place someone and their involvement ends there. What I have found is that the placement failing usually has nothing to do with the rep. It has to do with the infrastructure they walked into.',
     diApplication:
       'On every discovery call, ask: "You have probably looked at Cloverpop or asked your team to use ChatGPT for this. What did those conversations look like?" Then listen — every complaint about Cloverpop ("just logging, no audit") is a door into the R²F + DPR differentiation.',
     thisWeekMove:
@@ -407,7 +407,7 @@ export const SATYAM_PILLARS: SatyamPillar[] = [
     number: 3,
     label: 'Conviction is the variable that makes everything else work',
     summary:
-      "Conviction cannot be performed. Sophisticated buyers read energy. Real conviction transmits; faked conviction loses the deal in the first 30 seconds.",
+      'Conviction cannot be performed. Sophisticated buyers read energy. Real conviction transmits; faked conviction loses the deal in the first 30 seconds.',
     satyamQuote:
       'Conviction is not performance. You cannot fake it at a high level with sophisticated buyers. They have been sold to too many times. They notice the tiny hesitations.',
     diApplication:
@@ -455,13 +455,13 @@ export const SILENT_OBJECTIONS: SilentObjection[] = [
       'Suppress hard counterfactual dollar amounts on the DPR + InlineAnalysisResultCard. Replace with "DQI improvement +X%" + a "Monetary impact: pre-validation (v0.x)" tag. Keep the dollar math hidden in tooltips for internal inspection only. Until N>30 outcome-validated audits per org exist, dollar claims fail procurement.',
     status: 'in_progress',
     verbatimResponse:
-      'The DQI is currently in v2.0 calibration — the methodology is published at /how-it-works and the weights derive from the 135-case historical reference library. Statistical confidence intervals roll out as the per-org outcome flywheel produces N>30 validated audits. Until then we ship the directional grade, not the false-precision dollar figure.',
+      'The DQI is currently in v2.0 calibration — the methodology is published at /how-it-works and the weights derive from the 143-case historical reference library. Statistical confidence intervals roll out as the per-org outcome flywheel produces N>30 validated audits. Until then we ship the directional grade, not the false-precision dollar figure.',
   },
   {
     id: 'no_nda_hard_purge',
     label: 'Cathedral of code without NDA hard-purge',
     whatBuyerThinks:
-      "You have an AI boardroom simulator, 14 RSS feeds, and a dozen dashboards, but I cannot bulk-delete my confidential target data when a deal dies or an NDA expires. This kid built 40 cool features but does not understand that data lifecycle governance is my actual job.",
+      'You have an AI boardroom simulator, 14 RSS feeds, and a dozen dashboards, but I cannot bulk-delete my confidential target data when a deal dies or an NDA expires. This kid built 40 cool features but does not understand that data lifecycle governance is my actual job.',
     whyItKillsTheDeal:
       'M&A partners and F500 GCs care more about data compartmentalization and legal exposure than your 12-node pipeline. A 30-day soft-delete window is a catastrophic liability for a broken NDA. If they cannot purge confidential targets instantly, they will never upload their pipeline.',
     thisWeekFix:
@@ -474,14 +474,14 @@ export const SILENT_OBJECTIONS: SilentObjection[] = [
     id: 'founder_continuity',
     label: '16-year-old solo founder continuity risk',
     whatBuyerThinks:
-      "He is a genius, but he is 16 and operating solo. What happens to my enterprise SLA, compliance records, and £30K contract when he has AP exams next May, or leaves for Stanford? There is zero technical continuity if he gets hit by a bus or just gets busy.",
+      'He is a genius, but he is 16 and operating solo. What happens to my enterprise SLA, compliance records, and £30K contract when he has AP exams next May, or leaves for Stanford? There is zero technical continuity if he gets hit by a bus or just gets busy.',
     whyItKillsTheDeal:
       'You cannot sell a "system of record for strategic reasoning" if the system itself is viewed as a fragile single-point-of-failure startup. A Fortune 500 enterprise will not migrate board-level processes to a platform that might be abandoned during college midterms.',
     thisWeekFix:
       'Write a formal "Vendor Continuity & Succession Plan" one-pager for the data room. Document who maintains the codebase (e.g., a senior engineer sourced via the Wiz advisor network) if the founder is incapacitated or in exams. Answer the question before procurement asks it.',
     status: 'todo',
     verbatimResponse:
-      "You are not buying a fragile startup. You are buying a productized academic synthesis with SOC 2 Type II infrastructure on Vercel + Supabase, and our data room includes a Vendor Continuity Plan backed by a senior engineering network that previously scaled Wiz to $32B. The Decision Provenance Record format is open and the codebase is documented; no single point of failure.",
+      'You are not buying a fragile startup. You are buying a productized academic synthesis with SOC 2 Type II infrastructure on Vercel + Supabase, and our data room includes a Vendor Continuity Plan backed by a senior engineering network that previously scaled Wiz to $32B. The Decision Provenance Record format is open and the codebase is documented; no single point of failure.',
   },
   {
     id: 'chatgpt_wrapper',
@@ -491,10 +491,10 @@ export const SILENT_OBJECTIONS: SilentObjection[] = [
     whyItKillsTheDeal:
       'If a buyer believes your product is just clever prompt engineering, they will defer to their existing enterprise Microsoft Copilot or Palantir AIP rollout rather than onboarding a new vendor.',
     thisWeekFix:
-      'Already shipped: rename "3-judge jury" to "Ensemble Sampling" across all marketing. Forward-looking discipline: shift 100% of defensive messaging from the LLM pipeline to the 135-case reference library + Kahneman × Klein R²F academic synthesis. The moat is the historical pattern-matching and the future outcome data, NOT the prompts.',
+      'Already shipped: rename "3-judge jury" to "Ensemble Sampling" across all marketing. Forward-looking discipline: shift 100% of defensive messaging from the LLM pipeline to the 143-case reference library + Kahneman × Klein R²F academic synthesis. The moat is the historical pattern-matching and the future outcome data, NOT the prompts.',
     status: 'shipped',
     verbatimResponse:
-      'You can spin up three Gemini calls in a weekend. You cannot spin up the 135-case Decision Knowledge Graph, the Recognition-Rigor Framework with peer-reviewed academic anchors, the Decision Provenance Record mapped to EU AI Act Article 14, and the per-org Brier-scored outcome flywheel. The prompts are 10% of the moat. The rest is the IP.',
+      'You can spin up three Gemini calls in a weekend. You cannot spin up the 143-case Decision Knowledge Graph, the Recognition-Rigor Framework with peer-reviewed academic anchors, the Decision Provenance Record mapped to EU AI Act Article 14, and the per-org Brier-scored outcome flywheel. The prompts are 10% of the moat. The rest is the IP.',
   },
   {
     id: 'pan_african_regulatory',
@@ -545,8 +545,7 @@ export const CUT_LIST: CutListItem[] = [
   {
     feature: 'Team Cognitive Profiles & Org Benchmarking',
     verdict: 'enterprise_only',
-    rationale:
-      'Solo advisors and individual associates do not have teams to benchmark.',
+    rationale: 'Solo advisors and individual associates do not have teams to benchmark.',
   },
   {
     feature: '17/18-framework Compliance Mapping (SOX, EU AI Act, etc.)',
@@ -557,8 +556,7 @@ export const CUT_LIST: CutListItem[] = [
   {
     feature: 'Enterprise Slack Integration',
     verdict: 'enterprise_only',
-    rationale:
-      'Solo users are not deploying enterprise Slack bots to capture team deliberations.',
+    rationale: 'Solo users are not deploying enterprise Slack bots to capture team deliberations.',
   },
   {
     feature: 'Browser Extension (5-second quick-score on DocSend)',

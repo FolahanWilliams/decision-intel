@@ -56,7 +56,7 @@ const C = {
    the same pentagon. Local STAGE_SUBTITLES below reads
    ANATOMY_CAPABILITIES — single source of truth. */
 
-/* ─── Live audit ticker — seeded from the 135-case corpus ───────────
+/* ─── Live audit ticker — seeded from the 143-case corpus ───────────
    Until real production audit volume exists, the ticker cycles through
    a curated set of anonymized events that could plausibly be a user in
    a given industry running a given audit type. Every event carries a
@@ -425,7 +425,7 @@ export function ScrollRevealGraph() {
             {/* Footer — before the constellation is fully composed, invite
                 the reader to expand the graph. Once composed (stage === 5),
                 swap in the live-style audit ticker that cycles every 8s
-                through anonymized events seeded from the 135-case corpus.
+                through anonymized events seeded from the 143-case corpus.
                 This is the moment that reads as social proof rather than
                 marketing copy. */}
             {tickerActive ? (

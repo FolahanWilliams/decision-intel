@@ -72,7 +72,10 @@ export function PerspectivesTab({
     if (typeof window === 'undefined') return;
     const handler = (e: Event) => {
       const detail = (e as CustomEvent<{ subView?: SubView }>).detail;
-      if (detail?.subView && (SUB_VIEWS as { key: SubView }[]).some(s => s.key === detail.subView)) {
+      if (
+        detail?.subView &&
+        (SUB_VIEWS as { key: SubView }[]).some(s => s.key === detail.subView)
+      ) {
         setSubView(detail.subView);
       }
     };

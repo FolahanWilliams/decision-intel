@@ -312,7 +312,7 @@ const VIZ_FUNDRAISING: Record<string, LessonViz> = {
         num: 3,
         label: 'Us',
         detail:
-          '12-node LangGraph pipeline · 135-case library · per-org outcome-calibrated DQI. Category-creator position.',
+          '12-node LangGraph pipeline · 143-case library · per-org outcome-calibrated DQI. Category-creator position.',
       },
       {
         num: 4,
@@ -1328,7 +1328,7 @@ const VIZ_PLATFORM_FOUNDATIONS: Record<string, LessonViz> = {
   },
   pf_9: {
     type: 'pyramid',
-    caption: 'The 135-case library — why this is a training prior, not marketing.',
+    caption: 'The 143-case library — why this is a training prior, not marketing.',
     tiers: [
       {
         label: 'Cross-decision intelligence',
@@ -1336,7 +1336,7 @@ const VIZ_PLATFORM_FOUNDATIONS: Record<string, LessonViz> = {
       },
       { label: 'Bias Genome', detail: 'Failure-lift leaderboard computed from the library.' },
       {
-        label: '135 Tier-2 cases',
+        label: '143 Tier-2 cases',
         detail: 'Each with pre-decision memo, biases, red flags, counter-exemplars.',
       },
       {

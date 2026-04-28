@@ -101,7 +101,7 @@ export const INCUMBENTS: Incumbent[] = [
     oneLiner: 'Lightweight decision-logging and behavioral-nudging platform.',
     strength:
       'First mover in explicit "decision management." Useful for process logging and nudges.',
-    gap: 'No causal layer, no bias taxonomy, no DQI, no 135-case benchmark. Surface-level decision logging, not audit.',
+    gap: 'No causal layer, no bias taxonomy, no DQI, no 143-case benchmark. Surface-level decision logging, not audit.',
     x: 62,
     y: 18,
     isDI: false,
@@ -116,7 +116,7 @@ export const INCUMBENTS: Incumbent[] = [
     focus: 'Causal decision audit · Strategic memos + M&A',
     oneLiner: 'Decision Knowledge Graph for strategic memos — the four moments others miss.',
     strength:
-      'Only DI platform with per-org causal weights (PC algorithm), published DQI standard, 30+ bias taxonomy, 135-case benchmark, and closed outcome loop.',
+      'Only DI platform with per-org causal weights (PC algorithm), published DQI standard, 30+ bias taxonomy, 143-case benchmark, and closed outcome loop.',
     gap: 'Zero paying customers yet. Distribution, brand, and enterprise sales machinery are the build-out.',
     x: 86,
     y: 88,
@@ -329,7 +329,7 @@ export const LEADING_EDGES: ScorecardItem[] = [
   {
     label: 'DQI as published external standard',
     detail:
-      'Decision Quality Index with 6 components, A–F grade scale, 135-decision calibration benchmark. Competitors would have to build this from scratch.',
+      'Decision Quality Index with 6 components, A–F grade scale, 143-decision calibration benchmark. Competitors would have to build this from scratch.',
   },
   {
     label: 'Strategic-memo vertical focus',
@@ -362,7 +362,7 @@ export const BUILD_OUT: ScorecardItem[] = [
   {
     label: 'Referenceable case studies',
     detail:
-      '135 historical cases are defensible content but not customer proof. Need 2–3 named live case studies by Q4.',
+      '143 historical cases are defensible content but not customer proof. Need 2–3 named live case studies by Q4.',
   },
   {
     label: 'Analyst relationships',

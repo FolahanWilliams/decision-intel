@@ -29,15 +29,15 @@ const SCENARIO_ICON: Record<KillerResponse['scenario'], React.ComponentType<{ si
 };
 
 export function KillerResponsesPlaybook() {
-  const scenarios = Array.from(new Set(KILLER_RESPONSES.map((r) => r.scenario)));
+  const scenarios = Array.from(new Set(KILLER_RESPONSES.map(r => r.scenario)));
   const [activeScenario, setActiveScenario] = useState<KillerResponse['scenario']>(scenarios[0]);
 
-  const filtered = KILLER_RESPONSES.filter((r) => r.scenario === activeScenario);
+  const filtered = KILLER_RESPONSES.filter(r => r.scenario === activeScenario);
 
   return (
     <div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 14 }}>
-        {scenarios.map((s) => {
+        {scenarios.map(s => {
           const Icon = SCENARIO_ICON[s];
           const accent = SCENARIO_ACCENT[s];
           const isActive = s === activeScenario;
@@ -67,7 +67,7 @@ export function KillerResponsesPlaybook() {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {filtered.map((r) => {
+        {filtered.map(r => {
           const accent = SCENARIO_ACCENT[r.scenario];
           return (
             <div

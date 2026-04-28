@@ -20,7 +20,7 @@ const EXPOSURE_LABEL: Record<FailureMode['diExposure'], string> = {
 
 export function FailureModesWatchtower() {
   const [openIds, setOpenIds] = useState<Set<string>>(
-    new Set(FAILURE_MODES.filter((f) => f.diExposure === 'critical').map((f) => f.id))
+    new Set(FAILURE_MODES.filter(f => f.diExposure === 'critical').map(f => f.id))
   );
 
   const toggle = (id: string) => {
@@ -32,7 +32,7 @@ export function FailureModesWatchtower() {
 
   return (
     <div>
-      {FAILURE_MODES.map((f) => {
+      {FAILURE_MODES.map(f => {
         const isOpen = openIds.has(f.id);
         const accent = EXPOSURE_COLOR[f.diExposure];
         return (
@@ -145,7 +145,7 @@ export function FailureModesWatchtower() {
                     Countermove
                   </div>
                   <ul style={{ margin: 0, padding: '0 0 0 18px' }}>
-                    {f.countermove.map((c) => (
+                    {f.countermove.map(c => (
                       <li
                         key={c}
                         style={{

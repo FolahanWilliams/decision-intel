@@ -1455,28 +1455,27 @@ export default function Dashboard() {
                     artefactLabel + topBiasLabel from the just-completed
                     analysis so the framing reads "your decision" not
                     "a generic sample". (C4 lock 2026-04-28.) */}
-                {(totalDocs ?? 0) <= 3 &&
-                  lastCompletedAnalysis.detectedBiases.length > 0 && (
-                    <div style={{ marginBottom: 'var(--spacing-md)' }}>
-                      <DiscoveryGradeImpactCard
-                        variant="post-upload"
-                        anchor={
-                          {
-                            ...STATIC_DEMO_ANCHOR,
-                            contextLabel: 'Your audit',
-                            artefactLabel: lastCompletedAnalysis.filename,
-                            topBiasLabel: lastCompletedAnalysis.detectedBiases[0]?.type
-                              ? lastCompletedAnalysis.detectedBiases[0].type
-                                  .replace(/_/g, ' ')
-                                  .replace(/\b\w/g, (c: string) => c.toUpperCase())
-                              : STATIC_DEMO_ANCHOR.topBiasLabel,
-                          } satisfies DiscoveryGradeAnchor
-                        }
-                        ctaLabel="See what your audit found ↓"
-                        ctaHref="#inline-analysis-result"
-                      />
-                    </div>
-                  )}
+                {(totalDocs ?? 0) <= 3 && lastCompletedAnalysis.detectedBiases.length > 0 && (
+                  <div style={{ marginBottom: 'var(--spacing-md)' }}>
+                    <DiscoveryGradeImpactCard
+                      variant="post-upload"
+                      anchor={
+                        {
+                          ...STATIC_DEMO_ANCHOR,
+                          contextLabel: 'Your audit',
+                          artefactLabel: lastCompletedAnalysis.filename,
+                          topBiasLabel: lastCompletedAnalysis.detectedBiases[0]?.type
+                            ? lastCompletedAnalysis.detectedBiases[0].type
+                                .replace(/_/g, ' ')
+                                .replace(/\b\w/g, (c: string) => c.toUpperCase())
+                            : STATIC_DEMO_ANCHOR.topBiasLabel,
+                        } satisfies DiscoveryGradeAnchor
+                      }
+                      ctaLabel="See what your audit found ↓"
+                      ctaHref="#inline-analysis-result"
+                    />
+                  </div>
+                )}
                 <div id="inline-analysis-result">
                   <InlineAnalysisResultCard
                     analysis={lastCompletedAnalysis}

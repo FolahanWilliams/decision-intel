@@ -70,7 +70,14 @@ function PlaybookDetail({ p }: { p: RolePlaybook }) {
         >
           Archetype · {p.buyerType.replace('_', ' ')} · {PRIORITY_LABEL[p.priority]}
         </div>
-        <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 8, lineHeight: 1.55 }}>
+        <div
+          style={{
+            fontSize: 12,
+            color: 'var(--text-secondary)',
+            marginBottom: 8,
+            lineHeight: 1.55,
+          }}
+        >
           {p.archetype}
         </div>
         <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
@@ -100,10 +107,15 @@ function PlaybookDetail({ p }: { p: RolePlaybook }) {
             What they want
           </div>
           <ul style={{ margin: 0, padding: '0 0 0 16px' }}>
-            {p.whatTheyWant.map((w) => (
+            {p.whatTheyWant.map(w => (
               <li
                 key={w}
-                style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 3, lineHeight: 1.5 }}
+                style={{
+                  fontSize: 12,
+                  color: 'var(--text-secondary)',
+                  marginBottom: 3,
+                  lineHeight: 1.5,
+                }}
               >
                 {w}
               </li>
@@ -132,10 +144,15 @@ function PlaybookDetail({ p }: { p: RolePlaybook }) {
             What keeps them up
           </div>
           <ul style={{ margin: 0, padding: '0 0 0 16px' }}>
-            {p.whatKeepsThemUp.map((u) => (
+            {p.whatKeepsThemUp.map(u => (
               <li
                 key={u}
-                style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 3, lineHeight: 1.5 }}
+                style={{
+                  fontSize: 12,
+                  color: 'var(--text-secondary)',
+                  marginBottom: 3,
+                  lineHeight: 1.5,
+                }}
               >
                 {u}
               </li>
@@ -169,7 +186,14 @@ function PlaybookDetail({ p }: { p: RolePlaybook }) {
         >
           <Mail size={11} /> How to reach
         </div>
-        <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 8, lineHeight: 1.55 }}>
+        <div
+          style={{
+            fontSize: 12,
+            color: 'var(--text-secondary)',
+            marginBottom: 8,
+            lineHeight: 1.55,
+          }}
+        >
           <strong>Channel:</strong> {p.howToReach.coldChannel}
         </div>
         <div
@@ -256,7 +280,7 @@ function PlaybookDetail({ p }: { p: RolePlaybook }) {
           Discovery questions · ask in this order
         </div>
         <div className="role-discovery-grid">
-          {(['opening', 'rigor', 'decisionGate'] as const).map((stage) => (
+          {(['opening', 'rigor', 'decisionGate'] as const).map(stage => (
             <div key={stage}>
               <div
                 style={{
@@ -271,7 +295,7 @@ function PlaybookDetail({ p }: { p: RolePlaybook }) {
                 {stage === 'decisionGate' ? 'decision gate' : stage}
               </div>
               <ul style={{ margin: 0, padding: '0 0 0 14px' }}>
-                {p.discoveryQuestions[stage].map((q) => (
+                {p.discoveryQuestions[stage].map(q => (
                   <li
                     key={q}
                     style={{
@@ -351,10 +375,15 @@ function PlaybookDetail({ p }: { p: RolePlaybook }) {
           3 phrases never to say
         </div>
         <ul style={{ margin: 0, padding: '0 0 0 16px' }}>
-          {p.threePhrasesNeverToSay.map((ph) => (
+          {p.threePhrasesNeverToSay.map(ph => (
             <li
               key={ph}
-              style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 4, lineHeight: 1.5 }}
+              style={{
+                fontSize: 12,
+                color: 'var(--text-secondary)',
+                marginBottom: 4,
+                lineHeight: 1.5,
+              }}
             >
               {ph}
             </li>
@@ -387,7 +416,7 @@ function PlaybookDetail({ p }: { p: RolePlaybook }) {
           <CalendarClock size={11} /> Meeting arc · minute by minute
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {p.meetingArc.map((step) => (
+          {p.meetingArc.map(step => (
             <div
               key={step.minute}
               style={{
@@ -443,10 +472,15 @@ function PlaybookDetail({ p }: { p: RolePlaybook }) {
             <Check size={11} /> Positive signals
           </div>
           <ul style={{ margin: 0, padding: '0 0 0 16px' }}>
-            {p.signalsToListenFor.positive.map((s) => (
+            {p.signalsToListenFor.positive.map(s => (
               <li
                 key={s}
-                style={{ fontSize: 11, color: 'var(--text-secondary)', marginBottom: 3, lineHeight: 1.5 }}
+                style={{
+                  fontSize: 11,
+                  color: 'var(--text-secondary)',
+                  marginBottom: 3,
+                  lineHeight: 1.5,
+                }}
               >
                 {s}
               </li>
@@ -477,10 +511,15 @@ function PlaybookDetail({ p }: { p: RolePlaybook }) {
             <AlertCircle size={11} /> Negative signals
           </div>
           <ul style={{ margin: 0, padding: '0 0 0 16px' }}>
-            {p.signalsToListenFor.negative.map((s) => (
+            {p.signalsToListenFor.negative.map(s => (
               <li
                 key={s}
-                style={{ fontSize: 11, color: 'var(--text-secondary)', marginBottom: 3, lineHeight: 1.5 }}
+                style={{
+                  fontSize: 11,
+                  color: 'var(--text-secondary)',
+                  marginBottom: 3,
+                  lineHeight: 1.5,
+                }}
               >
                 {s}
               </li>
@@ -511,7 +550,7 @@ function PlaybookDetail({ p }: { p: RolePlaybook }) {
           Follow-up cadence
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {p.followUp.map((f) => (
+          {p.followUp.map(f => (
             <div
               key={f.day}
               style={{
@@ -644,7 +683,7 @@ function PlaybookDetail({ p }: { p: RolePlaybook }) {
 
 export function RoleOutreachPlaybooks() {
   const [activeRoleId, setActiveRoleId] = useState(ROLE_PLAYBOOKS[0].id);
-  const active = ROLE_PLAYBOOKS.find((r) => r.id === activeRoleId) ?? ROLE_PLAYBOOKS[0];
+  const active = ROLE_PLAYBOOKS.find(r => r.id === activeRoleId) ?? ROLE_PLAYBOOKS[0];
 
   return (
     <div>
@@ -656,7 +695,7 @@ export function RoleOutreachPlaybooks() {
           marginBottom: 16,
         }}
       >
-        {ROLE_PLAYBOOKS.map((r) => {
+        {ROLE_PLAYBOOKS.map(r => {
           const Icon = ROLE_ICON[r.id] ?? Briefcase;
           const accent = BUYER_TYPE_ACCENT[r.buyerType];
           const isActive = r.id === activeRoleId;

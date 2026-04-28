@@ -176,13 +176,17 @@ export function SparringRoomTab({ founderPass }: Props) {
       const sums: Partial<Record<GradingDimensionId, { sum: number; count: number }>> = {};
       for (const h of recentWithDims) {
         if (!h.dimensions) continue;
-        for (const [dim, score] of Object.entries(h.dimensions) as Array<[GradingDimensionId, number]>) {
+        for (const [dim, score] of Object.entries(h.dimensions) as Array<
+          [GradingDimensionId, number]
+        >) {
           if (!sums[dim]) sums[dim] = { sum: 0, count: 0 };
           sums[dim]!.sum += score;
           sums[dim]!.count += 1;
         }
       }
-      for (const [dim, agg] of Object.entries(sums) as Array<[GradingDimensionId, { sum: number; count: number }]>) {
+      for (const [dim, agg] of Object.entries(sums) as Array<
+        [GradingDimensionId, { sum: number; count: number }]
+      >) {
         recentDimensionAverages[dim] = agg.sum / agg.count;
       }
     }
@@ -210,7 +214,10 @@ export function SparringRoomTab({ founderPass }: Props) {
 
       // Append to history (v2 shape — dimensions + fillerCount captured for trend viz).
       const entry: HistoryEntry = {
-        sessionId: typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : String(Date.now()),
+        sessionId:
+          typeof crypto !== 'undefined' && 'randomUUID' in crypto
+            ? crypto.randomUUID()
+            : String(Date.now()),
         dateISO: new Date().toISOString(),
         personaId,
         mode,
@@ -314,9 +321,7 @@ export function SparringRoomTab({ founderPass }: Props) {
         />
       )}
 
-      {step === 'reviewing' && (
-        <ReviewingCard />
-      )}
+      {step === 'reviewing' && <ReviewingCard />}
 
       {step === 'results' && result && persona && scenario && (
         <ResultsCard
@@ -343,8 +348,7 @@ function Hero() {
     <div
       style={{
         padding: 18,
-        background:
-          'linear-gradient(135deg, rgba(99, 102, 241, 0.10), rgba(22, 163, 74, 0.05))',
+        background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.10), rgba(22, 163, 74, 0.05))',
         border: '1px solid var(--border-color)',
         borderRadius: 'var(--radius-lg)',
       }}
@@ -383,7 +387,13 @@ function Hero() {
           maxWidth: 800,
         }}
       >
-        Closing Lab gave you the frameworks. The Sparring Room makes you live them. Pick a buyer persona, pick a scenario mode (including <strong>networking events in-person</strong>), generate 3 questions in their voice, then record yourself answering with Wispr Flow and paste the transcript back. The AI grades you on 11 dimensions — Maalouf 4 + Satyam 3 + DI discipline 2 + <strong>Kahneman loss-aversion framing</strong> + fundamentals — simulates the buyer&rsquo;s internal monologue right after you finish, and hands you the verbatim phrase you should have used so you can rehearse it before the next call.
+        Closing Lab gave you the frameworks. The Sparring Room makes you live them. Pick a buyer
+        persona, pick a scenario mode (including <strong>networking events in-person</strong>),
+        generate 3 questions in their voice, then record yourself answering with Wispr Flow and
+        paste the transcript back. The AI grades you on 11 dimensions — Maalouf 4 + Satyam 3 + DI
+        discipline 2 + <strong>Kahneman loss-aversion framing</strong> + fundamentals — simulates
+        the buyer&rsquo;s internal monologue right after you finish, and hands you the verbatim
+        phrase you should have used so you can rehearse it before the next call.
       </p>
     </div>
   );
@@ -420,7 +430,15 @@ function SetupCard(props: SetupProps) {
       <div className="section-heading">Step 1 · Pick your buyer + scenario</div>
 
       <div>
-        <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 6, display: 'block' }}>
+        <label
+          style={{
+            fontSize: 12,
+            fontWeight: 700,
+            color: 'var(--text-secondary)',
+            marginBottom: 6,
+            display: 'block',
+          }}
+        >
           Buyer persona
         </label>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
@@ -453,7 +471,15 @@ function SetupCard(props: SetupProps) {
       </div>
 
       <div>
-        <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 6, display: 'block' }}>
+        <label
+          style={{
+            fontSize: 12,
+            fontWeight: 700,
+            color: 'var(--text-secondary)',
+            marginBottom: 6,
+            display: 'block',
+          }}
+        >
           Scenario mode
         </label>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
@@ -502,8 +528,9 @@ function SetupCard(props: SetupProps) {
           style={{ accentColor: '#6366F1' }}
         />
         <span>
-          Warm context (this buyer has had a prior meeting and earned exposure to DI&rsquo;s locked vocabulary).
-          When unchecked, locked vocabulary on a cold buyer is graded as a discipline failure.
+          Warm context (this buyer has had a prior meeting and earned exposure to DI&rsquo;s locked
+          vocabulary). When unchecked, locked vocabulary on a cold buyer is graded as a discipline
+          failure.
         </span>
       </label>
 
@@ -572,17 +599,37 @@ function BriefCard(props: BriefProps) {
           lineHeight: 1.6,
         }}
       >
-        <div style={{ fontSize: 11, fontWeight: 700, color: '#6366F1', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            color: '#6366F1',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            marginBottom: 4,
+          }}
+        >
           Setting
         </div>
         {props.brief.scenarioFraming}
         {props.isWarmContext && (
-          <span style={{ fontSize: 11, marginLeft: 8, color: '#16A34A', fontWeight: 700 }}>· Warm context</span>
+          <span style={{ fontSize: 11, marginLeft: 8, color: '#16A34A', fontWeight: 700 }}>
+            · Warm context
+          </span>
         )}
       </div>
 
       <div>
-        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            color: 'var(--text-secondary)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            marginBottom: 6,
+          }}
+        >
           Buyer&rsquo;s opener
         </div>
         <div
@@ -602,10 +649,21 @@ function BriefCard(props: BriefProps) {
       </div>
 
       <div>
-        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            color: 'var(--text-secondary)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            marginBottom: 6,
+          }}
+        >
           The 3 questions they ask
         </div>
-        <ol style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <ol
+          style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 8 }}
+        >
           {props.brief.questions.map((q, i) => (
             <li key={i} style={{ fontSize: 14, color: 'var(--text-primary)', lineHeight: 1.5 }}>
               {q}
@@ -625,7 +683,10 @@ function BriefCard(props: BriefProps) {
           lineHeight: 1.6,
         }}
       >
-        <strong style={{ color: '#D97706' }}>Your move:</strong> Open Wispr Flow on your machine. When you click <em>Start prep</em> below, you get 5 seconds to read the questions one more time, then the recording prompt appears. Speak your full answer in your voice — aim for 60-120 seconds. Wispr Flow transcribes; you paste the transcript back.
+        <strong style={{ color: '#D97706' }}>Your move:</strong> Open Wispr Flow on your machine.
+        When you click <em>Start prep</em> below, you get 5 seconds to read the questions one more
+        time, then the recording prompt appears. Speak your full answer in your voice — aim for
+        60-120 seconds. Wispr Flow transcribes; you paste the transcript back.
       </div>
 
       {props.prepCountdown > 0 ? (
@@ -753,13 +814,23 @@ function RecordingCard(props: RecordingProps) {
         </div>
         <ol style={{ margin: 0, paddingLeft: 20, color: 'var(--text-primary)' }}>
           {props.brief.questions.map((q, i) => (
-            <li key={i} style={{ marginBottom: 2 }}>{q}</li>
+            <li key={i} style={{ marginBottom: 2 }}>
+              {q}
+            </li>
           ))}
         </ol>
       </div>
 
       <div>
-        <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 6, display: 'block' }}>
+        <label
+          style={{
+            fontSize: 12,
+            fontWeight: 700,
+            color: 'var(--text-secondary)',
+            marginBottom: 6,
+            display: 'block',
+          }}
+        >
           Pasted transcript ({wordCount} words)
         </label>
         <textarea
@@ -840,12 +911,16 @@ function ReviewingCard() {
         textAlign: 'center',
       }}
     >
-      <Brain size={32} style={{ color: '#6366F1', marginBottom: 12, animation: 'pulse 1.5s ease-in-out infinite' }} />
+      <Brain
+        size={32}
+        style={{ color: '#6366F1', marginBottom: 12, animation: 'pulse 1.5s ease-in-out infinite' }}
+      />
       <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6 }}>
         Grading your rep…
       </div>
       <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
-        Running 11-dimension Sales DQI · simulating the buyer&rsquo;s internal monologue · drafting the verbatim phrase you should have used.
+        Running 11-dimension Sales DQI · simulating the buyer&rsquo;s internal monologue · drafting
+        the verbatim phrase you should have used.
       </div>
     </div>
   );
@@ -865,10 +940,15 @@ interface ResultsProps {
 function ResultsCard(props: ResultsProps) {
   const r = props.result;
   const gradeColor =
-    r.grade === 'A' ? '#16A34A' :
-    r.grade === 'B' ? '#22C55E' :
-    r.grade === 'C' ? '#EAB308' :
-    r.grade === 'D' ? '#F97316' : '#DC2626';
+    r.grade === 'A'
+      ? '#16A34A'
+      : r.grade === 'B'
+        ? '#22C55E'
+        : r.grade === 'C'
+          ? '#EAB308'
+          : r.grade === 'D'
+            ? '#F97316'
+            : '#DC2626';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -901,21 +981,55 @@ function ResultsCard(props: ResultsProps) {
               flexShrink: 0,
             }}
           >
-            <div style={{ fontSize: 32, fontWeight: 800, color: gradeColor, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+            <div
+              style={{
+                fontSize: 32,
+                fontWeight: 800,
+                color: gradeColor,
+                lineHeight: 1,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
               {r.salesDqi}
             </div>
-            <div style={{ fontSize: 10, fontWeight: 700, color: gradeColor, textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 2 }}>
+            <div
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                color: gradeColor,
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                marginTop: 2,
+              }}
+            >
               Sales DQI
             </div>
           </div>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 4 }}>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                color: 'var(--text-muted)',
+                marginBottom: 4,
+              }}
+            >
               Grade · {props.persona.label} · {props.scenarioLabel}
             </div>
             <div style={{ fontSize: 28, fontWeight: 800, color: gradeColor, lineHeight: 1 }}>
               {r.grade}
             </div>
-            <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4, maxWidth: 480, lineHeight: 1.5 }}>
+            <div
+              style={{
+                fontSize: 13,
+                color: 'var(--text-secondary)',
+                marginTop: 4,
+                maxWidth: 480,
+                lineHeight: 1.5,
+              }}
+            >
               {r.feedback}
             </div>
           </div>
@@ -949,10 +1063,29 @@ function ResultsCard(props: ResultsProps) {
           borderRadius: 'var(--radius-lg)',
         }}
       >
-        <div style={{ fontSize: 11, fontWeight: 700, color: props.persona.color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            color: props.persona.color,
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+            marginBottom: 8,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+          }}
+        >
           <Quote size={12} /> What {props.persona.archetype} is thinking after your answer
         </div>
-        <div style={{ fontSize: 14, color: 'var(--text-primary)', lineHeight: 1.6, fontStyle: 'italic' }}>
+        <div
+          style={{
+            fontSize: 14,
+            color: 'var(--text-primary)',
+            lineHeight: 1.6,
+            fontStyle: 'italic',
+          }}
+        >
           {r.buyerThought}
         </div>
       </div>
@@ -966,24 +1099,38 @@ function ResultsCard(props: ResultsProps) {
           borderRadius: 'var(--radius-lg)',
         }}
       >
-        <div className="section-heading" style={{ marginBottom: 12 }}>10 dimensions · scored 0-5</div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 10 }}>
+        <div className="section-heading" style={{ marginBottom: 12 }}>
+          10 dimensions · scored 0-5
+        </div>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+            gap: 10,
+          }}
+        >
           {GRADING_DIMENSIONS.map(dim => {
             const score = r.dimensions[dim.id] ?? 0;
             const sourceColor =
-              dim.source === 'maalouf' ? '#DC2626' :
-              dim.source === 'satyam' ? '#0EA5E9' :
-              dim.source === 'di_discipline' ? '#16A34A' :
-              dim.source === 'kahneman' ? '#F59E0B' : '#A78BFA';
-            return (
-              <DimensionRow key={dim.id} dim={dim} score={score} sourceColor={sourceColor} />
-            );
+              dim.source === 'maalouf'
+                ? '#DC2626'
+                : dim.source === 'satyam'
+                  ? '#0EA5E9'
+                  : dim.source === 'di_discipline'
+                    ? '#16A34A'
+                    : dim.source === 'kahneman'
+                      ? '#F59E0B'
+                      : '#A78BFA';
+            return <DimensionRow key={dim.id} dim={dim} score={score} sourceColor={sourceColor} />;
           })}
         </div>
       </div>
 
       {/* Strengths + Improvements */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: 12 }} className="results-twocol">
+      <div
+        style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: 12 }}
+        className="results-twocol"
+      >
         <div
           style={{
             padding: 16,
@@ -999,7 +1146,17 @@ function ResultsCard(props: ResultsProps) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {r.strengths.map((s, i) => (
               <div key={i} style={{ fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.5 }}>
-                <span style={{ fontSize: 10, fontWeight: 700, color: '#16A34A', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: 2 }}>
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    color: '#16A34A',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    display: 'block',
+                    marginBottom: 2,
+                  }}
+                >
                   {s.framework}
                 </span>
                 {s.point}
@@ -1023,7 +1180,17 @@ function ResultsCard(props: ResultsProps) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {r.improvements.map((imp, i) => (
               <div key={i} style={{ fontSize: 13, lineHeight: 1.5 }}>
-                <span style={{ fontSize: 10, fontWeight: 700, color: '#D97706', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: 2 }}>
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    color: '#D97706',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    display: 'block',
+                    marginBottom: 2,
+                  }}
+                >
                   {imp.framework}
                 </span>
                 <div style={{ color: 'var(--text-primary)', marginBottom: 6 }}>{imp.point}</div>
@@ -1099,7 +1266,16 @@ function ResultsCard(props: ResultsProps) {
             borderRadius: 'var(--radius-md)',
           }}
         >
-          <div style={{ fontSize: 10, fontWeight: 700, color: '#6366F1', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>
+          <div
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              color: '#6366F1',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              marginBottom: 4,
+            }}
+          >
             Confidence build · what genuinely worked
           </div>
           <div style={{ fontSize: 14, color: 'var(--text-primary)', lineHeight: 1.5 }}>
@@ -1117,17 +1293,39 @@ function ResultsCard(props: ResultsProps) {
             borderRadius: 'var(--radius-lg)',
           }}
         >
-          <div style={{ fontSize: 10, fontWeight: 700, color: '#D97706', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              color: '#D97706',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              marginBottom: 6,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+            }}
+          >
             <AlertCircle size={11} /> Pattern flag · across your recent reps
           </div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
+          <div
+            style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}
+          >
             {r.patternFlag.pattern}
           </div>
-          <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 6 }}>
+          <div
+            style={{
+              fontSize: 12,
+              color: 'var(--text-secondary)',
+              lineHeight: 1.5,
+              marginBottom: 6,
+            }}
+          >
             <strong>Root cause:</strong> {r.patternFlag.rootCause}
           </div>
           <div style={{ fontSize: 12, color: 'var(--text-primary)', lineHeight: 1.5 }}>
-            <strong style={{ color: '#16A34A' }}>Breakthrough move:</strong> {r.patternFlag.breakthroughMove}
+            <strong style={{ color: '#16A34A' }}>Breakthrough move:</strong>{' '}
+            {r.patternFlag.breakthroughMove}
           </div>
         </div>
       )}
@@ -1141,20 +1339,37 @@ function ResultsCard(props: ResultsProps) {
             borderRadius: 'var(--radius-lg)',
           }}
         >
-          <div className="section-heading" style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div
+            className="section-heading"
+            style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}
+          >
             <Target size={12} /> Next session · focus areas
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 10 }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+              gap: 10,
+            }}
+          >
             {r.nextSessionFocus.map((focus, i) => {
               const dim = GRADING_DIMENSIONS.find(d => d.id === focus.dimensionId);
               const sourceColor =
-                dim?.source === 'maalouf' ? '#DC2626' :
-                dim?.source === 'satyam' ? '#0EA5E9' :
-                dim?.source === 'di_discipline' ? '#16A34A' :
-                dim?.source === 'kahneman' ? '#F59E0B' :
-                dim?.source === 'jolt' ? '#6366F1' :
-                dim?.source === 'cialdini' ? '#EC4899' :
-                dim?.source === 'sandler' ? '#14B8A6' : '#A78BFA';
+                dim?.source === 'maalouf'
+                  ? '#DC2626'
+                  : dim?.source === 'satyam'
+                    ? '#0EA5E9'
+                    : dim?.source === 'di_discipline'
+                      ? '#16A34A'
+                      : dim?.source === 'kahneman'
+                        ? '#F59E0B'
+                        : dim?.source === 'jolt'
+                          ? '#6366F1'
+                          : dim?.source === 'cialdini'
+                            ? '#EC4899'
+                            : dim?.source === 'sandler'
+                              ? '#14B8A6'
+                              : '#A78BFA';
               return (
                 <div
                   key={i}
@@ -1166,14 +1381,25 @@ function ResultsCard(props: ResultsProps) {
                     borderRadius: 'var(--radius-md)',
                   }}
                 >
-                  <div style={{ fontSize: 11, fontWeight: 700, color: sourceColor, marginBottom: 6 }}>
+                  <div
+                    style={{ fontSize: 11, fontWeight: 700, color: sourceColor, marginBottom: 6 }}
+                  >
                     {dim?.label || focus.dimensionId}
                   </div>
-                  <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 8 }}>
-                    <strong style={{ color: 'var(--text-primary)' }}>Why it matters:</strong> {focus.whyItMatters}
+                  <div
+                    style={{
+                      fontSize: 12,
+                      color: 'var(--text-secondary)',
+                      lineHeight: 1.5,
+                      marginBottom: 8,
+                    }}
+                  >
+                    <strong style={{ color: 'var(--text-primary)' }}>Why it matters:</strong>{' '}
+                    {focus.whyItMatters}
                   </div>
                   <div style={{ fontSize: 12, color: 'var(--text-primary)', lineHeight: 1.5 }}>
-                    <strong style={{ color: '#16A34A' }}>Concrete action:</strong> {focus.concreteAction}
+                    <strong style={{ color: '#16A34A' }}>Concrete action:</strong>{' '}
+                    {focus.concreteAction}
                   </div>
                 </div>
               );
@@ -1191,10 +1417,22 @@ function ResultsCard(props: ResultsProps) {
             borderRadius: 'var(--radius-lg)',
           }}
         >
-          <div className="section-heading" style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div
+            className="section-heading"
+            style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}
+          >
             <CheckCircle2 size={12} /> Drill plan · before your next rep
           </div>
-          <ol style={{ margin: 0, paddingLeft: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <ol
+            style={{
+              margin: 0,
+              paddingLeft: 0,
+              listStyle: 'none',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 8,
+            }}
+          >
             {r.drillPlan.map((d, i) => (
               <li
                 key={i}
@@ -1226,11 +1464,21 @@ function ResultsCard(props: ResultsProps) {
                   {i + 1}
                 </span>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: 'var(--text-primary)',
+                      marginBottom: 2,
+                    }}
+                  >
                     {d.action}
                   </div>
                   <div style={{ fontSize: 11.5, color: 'var(--text-muted)', lineHeight: 1.4 }}>
-                    {d.location} <span style={{ marginLeft: 8, fontVariantNumeric: 'tabular-nums' }}>· ~{d.estimatedMinutes} min</span>
+                    {d.location}{' '}
+                    <span style={{ marginLeft: 8, fontVariantNumeric: 'tabular-nums' }}>
+                      · ~{d.estimatedMinutes} min
+                    </span>
                   </div>
                 </div>
               </li>
@@ -1243,7 +1491,8 @@ function ResultsCard(props: ResultsProps) {
         <div
           style={{
             padding: 14,
-            background: 'linear-gradient(135deg, rgba(22, 163, 74, 0.08), rgba(99, 102, 241, 0.04))',
+            background:
+              'linear-gradient(135deg, rgba(22, 163, 74, 0.08), rgba(99, 102, 241, 0.04))',
             border: '1px solid rgba(22, 163, 74, 0.25)',
             borderRadius: 'var(--radius-lg)',
             display: 'flex',
@@ -1254,12 +1503,30 @@ function ResultsCard(props: ResultsProps) {
           }}
         >
           <div style={{ flex: 1, minWidth: 240 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: '#16A34A', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>
+            <div
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                color: '#16A34A',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                marginBottom: 4,
+              }}
+            >
               Coach recommends · your next rep
             </div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
+            <div
+              style={{
+                fontSize: 13,
+                fontWeight: 700,
+                color: 'var(--text-primary)',
+                marginBottom: 4,
+              }}
+            >
               {(() => {
-                const recPersona = BUYER_PERSONAS.find(p => p.id === r.nextRepSetup.recommendedPersonaId);
+                const recPersona = BUYER_PERSONAS.find(
+                  p => p.id === r.nextRepSetup.recommendedPersonaId
+                );
                 const recMode = SCENARIO_MODES.find(m => m.id === r.nextRepSetup.recommendedMode);
                 return `${recPersona?.label || r.nextRepSetup.recommendedPersonaId} · ${recMode?.label || r.nextRepSetup.recommendedMode}`;
               })()}
@@ -1297,53 +1564,112 @@ function ResultsCard(props: ResultsProps) {
           }
         }
         @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.4; }
+          0%,
+          100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.4;
+          }
         }
       `}</style>
     </div>
   );
 }
 
-function DimensionRow(props: { dim: typeof GRADING_DIMENSIONS[number]; score: number; sourceColor: string }) {
+function DimensionRow(props: {
+  dim: (typeof GRADING_DIMENSIONS)[number];
+  score: number;
+  sourceColor: string;
+}) {
   const pct = (props.score / 5) * 100;
   return (
     <div
-      style={{
-        padding: 10,
-        background: 'var(--bg-elevated)',
-        border: '1px solid var(--border-color)',
-        borderRadius: 'var(--radius-md)',
-        title: props.dim.excellentLooks,
-      } as React.CSSProperties}
+      style={
+        {
+          padding: 10,
+          background: 'var(--bg-elevated)',
+          border: '1px solid var(--border-color)',
+          borderRadius: 'var(--radius-md)',
+          title: props.dim.excellentLooks,
+        } as React.CSSProperties
+      }
       title={`Excellent (5/5): ${props.dim.excellentLooks}\nPoor (1/5): ${props.dim.poorLooks}`}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-        <span style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--text-primary)' }}>{props.dim.label}</span>
-        <span style={{ fontSize: 11, fontWeight: 700, color: props.sourceColor, fontVariantNumeric: 'tabular-nums' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 4,
+        }}
+      >
+        <span style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--text-primary)' }}>
+          {props.dim.label}
+        </span>
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            color: props.sourceColor,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
           {props.score}/5
         </span>
       </div>
-      <div style={{ height: 4, background: 'var(--bg-tertiary)', borderRadius: 2, overflow: 'hidden' }}>
-        <div style={{ width: `${pct}%`, height: '100%', background: props.sourceColor, transition: 'width 0.3s' }} />
+      <div
+        style={{ height: 4, background: 'var(--bg-tertiary)', borderRadius: 2, overflow: 'hidden' }}
+      >
+        <div
+          style={{
+            width: `${pct}%`,
+            height: '100%',
+            background: props.sourceColor,
+            transition: 'width 0.3s',
+          }}
+        />
       </div>
-      <div style={{ fontSize: 9.5, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: 4 }}>
+      <div
+        style={{
+          fontSize: 9.5,
+          color: 'var(--text-muted)',
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em',
+          marginTop: 4,
+        }}
+      >
         {props.dim.source.replace('_', ' ')}
       </div>
     </div>
   );
 }
 
-function Stat(props: { label: string; value: string; tone?: 'ok' | 'warn' | 'error'; detail?: string }) {
+function Stat(props: {
+  label: string;
+  value: string;
+  tone?: 'ok' | 'warn' | 'error';
+  detail?: string;
+}) {
   const color =
-    props.tone === 'error' ? '#DC2626' :
-    props.tone === 'warn' ? '#D97706' : 'var(--text-primary)';
+    props.tone === 'error' ? '#DC2626' : props.tone === 'warn' ? '#D97706' : 'var(--text-primary)';
   return (
     <div style={{ minWidth: 120 }}>
-      <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 2 }}>
+      <div
+        style={{
+          fontSize: 10,
+          fontWeight: 700,
+          textTransform: 'uppercase',
+          letterSpacing: '0.08em',
+          color: 'var(--text-muted)',
+          marginBottom: 2,
+        }}
+      >
         {props.label}
       </div>
-      <div style={{ fontSize: 16, fontWeight: 700, color, fontVariantNumeric: 'tabular-nums' }}>{props.value}</div>
+      <div style={{ fontSize: 16, fontWeight: 700, color, fontVariantNumeric: 'tabular-nums' }}>
+        {props.value}
+      </div>
       {props.detail && (
         <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{props.detail}</div>
       )}
@@ -1359,9 +1685,7 @@ function HistoryPanel(props: { history: HistoryEntry[]; onClear: () => void }) {
   const avg = props.history.reduce((s, h) => s + h.salesDqi, 0) / props.history.length;
   const lastFive = props.history.slice(-5);
   const trend =
-    lastFive.length >= 2
-      ? lastFive[lastFive.length - 1].salesDqi - lastFive[0].salesDqi
-      : 0;
+    lastFive.length >= 2 ? lastFive[lastFive.length - 1].salesDqi - lastFive[0].salesDqi : 0;
 
   return (
     <div
@@ -1372,17 +1696,34 @@ function HistoryPanel(props: { history: HistoryEntry[]; onClear: () => void }) {
         borderRadius: 'var(--radius-lg)',
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 12,
+        }}
+      >
         <div className="section-heading" style={{ margin: 0 }}>
-          <Trophy size={12} style={{ display: 'inline', marginRight: 4 }} /> Session history · {props.history.length} reps
+          <Trophy size={12} style={{ display: 'inline', marginRight: 4 }} /> Session history ·{' '}
+          {props.history.length} reps
         </div>
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
           <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
             Avg <strong style={{ color: 'var(--text-primary)' }}>{Math.round(avg)}</strong>
           </span>
           {trend !== 0 && (
-            <span style={{ fontSize: 11, color: trend > 0 ? '#16A34A' : '#DC2626', display: 'flex', alignItems: 'center', gap: 4 }}>
-              <TrendingUp size={11} /> {trend > 0 ? '+' : ''}{trend} last 5
+            <span
+              style={{
+                fontSize: 11,
+                color: trend > 0 ? '#16A34A' : '#DC2626',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+              }}
+            >
+              <TrendingUp size={11} /> {trend > 0 ? '+' : ''}
+              {trend} last 5
             </span>
           )}
           <button
@@ -1406,10 +1747,15 @@ function HistoryPanel(props: { history: HistoryEntry[]; onClear: () => void }) {
           const persona = findPersonaById(entry.personaId);
           const scenario = findScenarioById(entry.mode);
           const gradeColor =
-            entry.grade === 'A' ? '#16A34A' :
-            entry.grade === 'B' ? '#22C55E' :
-            entry.grade === 'C' ? '#EAB308' :
-            entry.grade === 'D' ? '#F97316' : '#DC2626';
+            entry.grade === 'A'
+              ? '#16A34A'
+              : entry.grade === 'B'
+                ? '#22C55E'
+                : entry.grade === 'C'
+                  ? '#EAB308'
+                  : entry.grade === 'D'
+                    ? '#F97316'
+                    : '#DC2626';
           return (
             <div
               key={entry.sessionId}
@@ -1425,23 +1771,43 @@ function HistoryPanel(props: { history: HistoryEntry[]; onClear: () => void }) {
               }}
             >
               <span style={{ fontSize: 10, color: 'var(--text-muted)', minWidth: 70 }}>
-                {new Date(entry.dateISO).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}{' '}
-                {new Date(entry.dateISO).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+                {new Date(entry.dateISO).toLocaleDateString(undefined, {
+                  month: 'short',
+                  day: 'numeric',
+                })}{' '}
+                {new Date(entry.dateISO).toLocaleTimeString(undefined, {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
               </span>
-              <span style={{ minWidth: 32, fontSize: 14, fontWeight: 700, color: gradeColor, textAlign: 'center' }}>
+              <span
+                style={{
+                  minWidth: 32,
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: gradeColor,
+                  textAlign: 'center',
+                }}
+              >
                 {entry.grade}
               </span>
-              <span style={{ fontVariantNumeric: 'tabular-nums', color: 'var(--text-primary)', fontWeight: 600 }}>
+              <span
+                style={{
+                  fontVariantNumeric: 'tabular-nums',
+                  color: 'var(--text-primary)',
+                  fontWeight: 600,
+                }}
+              >
                 {entry.salesDqi}
               </span>
-              <span style={{ color: 'var(--text-secondary)' }}>
-                {persona?.label}
-              </span>
-              <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>
-                {scenario?.label}
-              </span>
+              <span style={{ color: 'var(--text-secondary)' }}>{persona?.label}</span>
+              <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>{scenario?.label}</span>
               {entry.isWarmContext && (
-                <span style={{ fontSize: 10, color: '#16A34A', fontWeight: 700, marginLeft: 'auto' }}>warm</span>
+                <span
+                  style={{ fontSize: 10, color: '#16A34A', fontWeight: 700, marginLeft: 'auto' }}
+                >
+                  warm
+                </span>
               )}
             </div>
           );

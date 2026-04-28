@@ -71,14 +71,8 @@ export function ResolveDecisionModal({ onResolve, onClose }: ResolveDecisionModa
             boxShadow: 'var(--shadow-lg)',
           }}
         >
-          <CheckCircle2
-            className="mx-auto h-12 w-12 mb-4"
-            style={{ color: 'var(--success)' }}
-          />
-          <h3
-            className="text-lg font-semibold mb-2"
-            style={{ color: 'var(--text-primary)' }}
-          >
+          <CheckCircle2 className="mx-auto h-12 w-12 mb-4" style={{ color: 'var(--success)' }} />
+          <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
             Decision Logged
           </h3>
           <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>

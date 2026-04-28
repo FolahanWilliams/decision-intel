@@ -1,7 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronRight, ChevronDown, AlertOctagon, CheckCircle2, Clock, MinusCircle } from 'lucide-react';
+import {
+  ChevronRight,
+  ChevronDown,
+  AlertOctagon,
+  CheckCircle2,
+  Clock,
+  MinusCircle,
+} from 'lucide-react';
 import { SILENT_OBJECTIONS, type SilentObjection } from './data';
 
 const STATUS_ACCENT: Record<SilentObjection['status'], string> = {
@@ -34,8 +41,7 @@ const TIMEFRAMES = [
       'Boutique Sell-Side M&A Advisor · £499/deal',
       'Solo Fractional CSO · £149-249/mo',
     ],
-    note:
-      'Acute personal career fear + corporate-card-approval threshold pricing + zero procurement cycle. Single-meeting close on credit card. This is where 30-day paid validation actually happens.',
+    note: 'Acute personal career fear + corporate-card-approval threshold pricing + zero procurement cycle. Single-meeting close on credit card. This is where 30-day paid validation actually happens.',
   },
   {
     label: 'Summer 2026 design-partner wedge',
@@ -44,8 +50,7 @@ const TIMEFRAMES = [
       'Sankore (Pan-African fund partner)',
       'LRQA / Ian Spaulding (channel partnership)',
     ],
-    note:
-      'Product-rigor partner conversations — not immediate revenue. Approach from a position of UK-validator paid traction, NOT pre-revenue uncertainty. Naira pricing reality means £2K/mo Nigerian feels like £5K/mo.',
+    note: 'Product-rigor partner conversations — not immediate revenue. Approach from a position of UK-validator paid traction, NOT pre-revenue uncertainty. Naira pricing reality means £2K/mo Nigerian feels like £5K/mo.',
   },
   {
     label: '12-month ceiling plays · NOT primary outbound now',
@@ -55,14 +60,13 @@ const TIMEFRAMES = [
       'F500 General Counsel / Audit Committee Chair',
       'Management Consultant Partner (McKinsey QuantumBlack)',
     ],
-    note:
-      '6-12 month procurement cycle. Requires SOC 2 Type II + EU AI Act mapping + audit-committee sign-off + outcome data flywheel + published reference cases — none of which exist yet. Pitching them at pre-seed is corporate suicide. Wait for wedge references.',
+    note: '6-12 month procurement cycle. Requires SOC 2 Type II + EU AI Act mapping + audit-committee sign-off + outcome data flywheel + published reference cases — none of which exist yet. Pitching them at pre-seed is corporate suicide. Wait for wedge references.',
   },
 ];
 
 export function MarketRealityCheck() {
   const [openIds, setOpenIds] = useState<Set<string>>(
-    new Set(SILENT_OBJECTIONS.filter((o) => o.status === 'in_progress').map((o) => o.id))
+    new Set(SILENT_OBJECTIONS.filter(o => o.status === 'in_progress').map(o => o.id))
   );
 
   const toggle = (id: string) => {
@@ -96,7 +100,9 @@ export function MarketRealityCheck() {
         >
           Honest reframe · NotebookLM 2026-04-28 brutal-critique synthesis
         </div>
-        <div style={{ fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.55, fontWeight: 500 }}>
+        <div
+          style={{ fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.55, fontWeight: 500 }}
+        >
           The current strategy is a 12-18 month play, not a 30-day play. Pan-African fund partners,
           F500 CSOs, GCs/audit committees ARE the unicorn revenue ceiling — but they require 6-12
           month procurement cycles you cannot survive pre-revenue. For paid validation in the next
@@ -144,7 +150,7 @@ export function MarketRealityCheck() {
               {tf.label}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 10 }}>
-              {tf.archetypes.map((a) => (
+              {tf.archetypes.map(a => (
                 <div
                   key={a}
                   style={{
@@ -182,7 +188,7 @@ export function MarketRealityCheck() {
         5 silent objections closing tabs today · the buyer thinks but won&apos;t say
       </div>
 
-      {SILENT_OBJECTIONS.map((o) => {
+      {SILENT_OBJECTIONS.map(o => {
         const isOpen = openIds.has(o.id);
         const accent = STATUS_ACCENT[o.status];
         const Icon = STATUS_ICON[o.status];

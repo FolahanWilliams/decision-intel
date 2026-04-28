@@ -498,7 +498,11 @@ export function BiasGenomeContributionCard() {
                     >
                       <span>{b.count} flagged</span>
                       <span>·</span>
-                      <span style={{ color: confirmRate >= 50 ? 'var(--success)' : 'var(--text-muted)' }}>
+                      <span
+                        style={{
+                          color: confirmRate >= 50 ? 'var(--success)' : 'var(--text-muted)',
+                        }}
+                      >
                         {confirmRate}% confirmed
                       </span>
                       <ArrowUpRight size={11} />
@@ -526,7 +530,7 @@ export function BiasGenomeContributionCard() {
             <strong style={{ color: 'var(--text-primary)' }}>
               {ordinal(cohortPercentile)} percentile
             </strong>{' '}
-            of contributors across the genome — {' '}
+            of contributors across the genome —{' '}
             {cohortPercentile >= 75
               ? 'every outcome you log measurably sharpens detection for the cohort.'
               : cohortPercentile >= 50
@@ -547,16 +551,15 @@ export function BiasGenomeContributionCard() {
               lineHeight: 1.5,
             }}
           >
-            Your team is not currently in the cross-org genome cohort. Enable anonymous
-            contribution in{' '}
+            Your team is not currently in the cross-org genome cohort. Enable anonymous contribution
+            in{' '}
             <Link
               href="/dashboard/team"
               style={{ color: 'var(--text-primary)', textDecoration: 'underline' }}
             >
               Team settings
             </Link>{' '}
-            to compare your calibration against the cohort and benefit from cross-org bias
-            patterns.
+            to compare your calibration against the cohort and benefit from cross-org bias patterns.
           </div>
         )}
       </div>

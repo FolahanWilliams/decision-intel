@@ -249,10 +249,11 @@ const DI_VOCABULARY_CARDS: EducationCard[] = [
     deckId: 'di_vocabulary',
     prompt: 'What is the canonical category claim for Decision Intel?',
     canonicalAnswer:
-      "The native reasoning layer for every high-stakes call. \"Reasoning layer\" is the ownable category anchor. \"Native\" does the \"built for this, not retrofitted\" work. \"High-stakes call\" is the universal noun phrase that lands across all six buyer personas (CSO, head of strategic planning, M&A partner, fund analyst, GC, board director).",
+      'The native reasoning layer for every high-stakes call. "Reasoning layer" is the ownable category anchor. "Native" does the "built for this, not retrofitted" work. "High-stakes call" is the universal noun phrase that lands across all six buyer personas (CSO, head of strategic planning, M&A partner, fund analyst, GC, board director).',
     hint: 'Think category-creator language, not feature-list.',
     difficulty: 'foundation',
-    applicationContext: 'You are introducing Decision Intel to a warm-context F500 CSO who has had a prior meeting.',
+    applicationContext:
+      'You are introducing Decision Intel to a warm-context F500 CSO who has had a prior meeting.',
     source: 'CLAUDE.md One-liner section',
     tag: 'locked',
   },
@@ -261,7 +262,7 @@ const DI_VOCABULARY_CARDS: EducationCard[] = [
     deckId: 'di_vocabulary',
     prompt: 'What does R²F stand for and what does it integrate?',
     canonicalAnswer:
-      "Recognition-Rigor Framework. It arbitrates Kahneman's rigor (System 2 debiasing — biasDetective, noiseJudge, statisticalJury) WITH Klein's recognition (System 1 amplification — rpdRecognition, forgottenQuestions, pre-mortem) in one pipeline. No competitor combines both traditions. Anchor citation: Kahneman-Klein 2009 paper \"Conditions for Intuitive Expertise: a failure to disagree.\"",
+      'Recognition-Rigor Framework. It arbitrates Kahneman\'s rigor (System 2 debiasing — biasDetective, noiseJudge, statisticalJury) WITH Klein\'s recognition (System 1 amplification — rpdRecognition, forgottenQuestions, pre-mortem) in one pipeline. No competitor combines both traditions. Anchor citation: Kahneman-Klein 2009 paper "Conditions for Intuitive Expertise: a failure to disagree."',
     difficulty: 'core',
     applicationContext: 'Investor asks: "what is your IP / why is this defensible?"',
     source: 'CLAUDE.md Positioning section + KahnemanKleinSynthesis component',
@@ -272,9 +273,10 @@ const DI_VOCABULARY_CARDS: EducationCard[] = [
     deckId: 'di_vocabulary',
     prompt: 'What is the Decision Provenance Record (DPR) and what does it currently provide?',
     canonicalAnswer:
-      "The procurement-grade artefact every audit produces. It is hashed and tamper-evident (SHA-256 input hash + record fingerprint). Private-key signing is on the roadmap, NOT shipped today. The artefact carries integrity fingerprints, model lineage, judge variance, academic citations, 17-framework regulatory mapping, pipeline lineage, blind-prior aggregations, and (when applicable) reviewer-decisions HITL log + data-lifecycle footer. Use the EXACT phrase \"hashed and tamper-evident\" — never overclaim \"signed\" until that ships.",
+      'The procurement-grade artefact every audit produces. It is hashed and tamper-evident (SHA-256 input hash + record fingerprint). Private-key signing is on the roadmap, NOT shipped today. The artefact carries integrity fingerprints, model lineage, judge variance, academic citations, 17-framework regulatory mapping, pipeline lineage, blind-prior aggregations, and (when applicable) reviewer-decisions HITL log + data-lifecycle footer. Use the EXACT phrase "hashed and tamper-evident" — never overclaim "signed" until that ships.',
     difficulty: 'core',
-    applicationContext: 'A GC asks: "what does your audit actually produce that I can show to a regulator?"',
+    applicationContext:
+      'A GC asks: "what does your audit actually produce that I can show to a regulator?"',
     source: 'CLAUDE.md DPR vocabulary lock 2026-04-26',
     tag: 'locked',
   },
@@ -283,7 +285,7 @@ const DI_VOCABULARY_CARDS: EducationCard[] = [
     deckId: 'di_vocabulary',
     prompt: 'What is the Decision Quality Index (DQI) and what is its grade scale?',
     canonicalAnswer:
-      "DQI is the composite 0-100 score that decomposes the quality of a strategic decision across 6 weighted components. Grade scale: A 85+ / B 70+ / C 55+ / D 40+ / F (<40). The boundaries are canonical and live in src/lib/scoring/dqi.ts → GRADE_THRESHOLDS. Any consumer that maps score-to-grade must import from this canonical source — never re-implement.",
+      'DQI is the composite 0-100 score that decomposes the quality of a strategic decision across 6 weighted components. Grade scale: A 85+ / B 70+ / C 55+ / D 40+ / F (<40). The boundaries are canonical and live in src/lib/scoring/dqi.ts → GRADE_THRESHOLDS. Any consumer that maps score-to-grade must import from this canonical source — never re-implement.',
     difficulty: 'foundation',
     applicationContext: 'Founder explaining the score in a discovery call.',
     source: 'CLAUDE.md DQI Grade Boundaries lock + dqi.ts',
@@ -296,7 +298,8 @@ const DI_VOCABULARY_CARDS: EducationCard[] = [
     canonicalAnswer:
       'Decision archaeology is the canonical verb for the pain Decision Intel replaces — reconstructing past reasoning from the four-tool graveyard (Google Docs drafts, Slack threads, Confluence writeups, the board deck). It is the name of the manual, painful, lossy work the platform makes obsolete by capturing reasoning at decision-time as a Decision Knowledge Graph that compounds quarter after quarter.',
     difficulty: 'core',
-    applicationContext: 'Cold opener with a CSO who is tired of reconstructing why a decision was made 6 months ago.',
+    applicationContext:
+      'Cold opener with a CSO who is tired of reconstructing why a decision was made 6 months ago.',
     source: 'CLAUDE.md Vocabulary section',
     tag: 'locked',
   },
@@ -314,9 +317,10 @@ const DI_VOCABULARY_CARDS: EducationCard[] = [
   {
     id: 'voc_native_system_of_record',
     deckId: 'di_vocabulary',
-    prompt: 'What is the procurement-friendly category framing alternative to "decision intelligence platform"?',
+    prompt:
+      'What is the procurement-friendly category framing alternative to "decision intelligence platform"?',
     canonicalAnswer:
-      "\"Native system of record for strategic reasoning.\" This is the procurement-friendly category claim. The softer alternative \"native medium for strategic reasoning\" works on surfaces where \"system of record\" feels over-procurement-coded. Both replace \"decision intelligence platform\" (Gartner-crowded — Peak.ai, Cloverpop, Quantellia, Aera). \"Decision intelligence\" is fine inside a sentence; never as the headline claim.",
+      '"Native system of record for strategic reasoning." This is the procurement-friendly category claim. The softer alternative "native medium for strategic reasoning" works on surfaces where "system of record" feels over-procurement-coded. Both replace "decision intelligence platform" (Gartner-crowded — Peak.ai, Cloverpop, Quantellia, Aera). "Decision intelligence" is fine inside a sentence; never as the headline claim.',
     difficulty: 'core',
     applicationContext: 'Procurement-stage call where the GC asks for a clean category descriptor.',
     source: 'CLAUDE.md Positioning + Vocabulary discipline 2026-04-22',
@@ -325,11 +329,13 @@ const DI_VOCABULARY_CARDS: EducationCard[] = [
   {
     id: 'voc_banned_di_platform',
     deckId: 'di_vocabulary',
-    prompt: 'Why is "decision intelligence platform" BANNED in marketing leads, and what do you say instead?',
+    prompt:
+      'Why is "decision intelligence platform" BANNED in marketing leads, and what do you say instead?',
     canonicalAnswer:
-      "Gartner-crowded category. Cloverpop, Peak.ai, Quantellia, Aera all claim the same descriptor. Using it locks Decision Intel into a price-comparison frame against incumbents who have more proof. Replacement: \"native reasoning layer\" (warm context) or \"60-second audit on strategic memos\" (cold context). \"Decision intelligence\" is fine as a descriptor INSIDE a sentence, never as the headline claim.",
+      'Gartner-crowded category. Cloverpop, Peak.ai, Quantellia, Aera all claim the same descriptor. Using it locks Decision Intel into a price-comparison frame against incumbents who have more proof. Replacement: "native reasoning layer" (warm context) or "60-second audit on strategic memos" (cold context). "Decision intelligence" is fine as a descriptor INSIDE a sentence, never as the headline claim.',
     difficulty: 'core',
-    applicationContext: 'You catch yourself about to say "decision intelligence platform" in a cold meeting.',
+    applicationContext:
+      'You catch yourself about to say "decision intelligence platform" in a cold meeting.',
     source: 'CLAUDE.md Marketing Voice Enterprise Discipline',
     tag: 'banned',
   },
@@ -338,9 +344,10 @@ const DI_VOCABULARY_CARDS: EducationCard[] = [
     deckId: 'di_vocabulary',
     prompt: 'Why is "decision hygiene" BANNED, and what is the DI replacement?',
     canonicalAnswer:
-      "\"Decision hygiene\" is Daniel Kahneman's term from his 2021 book \"Noise.\" Borrowing it cedes our category vocabulary to a more famous author who already owns the phrase. We don't use the cleaner-than-thou framing either; cleanliness is a corrective frame. Our replacement vocabulary: \"decision archaeology\" (the pain we replace) + \"reasoning audit\" + \"Recognition-Rigor Framework\" (the IP). NEVER use \"decision hygiene\" in any DI material.",
+      '"Decision hygiene" is Daniel Kahneman\'s term from his 2021 book "Noise." Borrowing it cedes our category vocabulary to a more famous author who already owns the phrase. We don\'t use the cleaner-than-thou framing either; cleanliness is a corrective frame. Our replacement vocabulary: "decision archaeology" (the pain we replace) + "reasoning audit" + "Recognition-Rigor Framework" (the IP). NEVER use "decision hygiene" in any DI material.',
     difficulty: 'core',
-    applicationContext: 'A founder peer suggests "you should call this decision hygiene" — you decline.',
+    applicationContext:
+      'A founder peer suggests "you should call this decision hygiene" — you decline.',
     source: 'CLAUDE.md Vocabulary discipline by reader temperature',
     tag: 'banned',
   },
@@ -349,7 +356,7 @@ const DI_VOCABULARY_CARDS: EducationCard[] = [
     deckId: 'di_vocabulary',
     prompt: 'Why was "boardroom strategic decision" retired as the H1 noun phrase?',
     canonicalAnswer:
-      "It narrowed funds (Sankore — first design partner) and non-board-reporting teams out of the audience. The 2026-04-26 empathic-mode-first review caught the narrowing. Replacement: \"high-stakes call\" — universal noun phrase that lands across all six buyer personas (CSO, head of strategic planning, M&A partner, fund analyst, GC, board director). \"Boardroom\" is only valid in long-form writing where the audience is explicitly F500 board-reporting (e.g., /decision-intel-for-boards). The H1 sweep replaced \"the board will catch first\" with \"the room will catch first\" so the universalisation actually holds.",
+      'It narrowed funds (Sankore — first design partner) and non-board-reporting teams out of the audience. The 2026-04-26 empathic-mode-first review caught the narrowing. Replacement: "high-stakes call" — universal noun phrase that lands across all six buyer personas (CSO, head of strategic planning, M&A partner, fund analyst, GC, board director). "Boardroom" is only valid in long-form writing where the audience is explicitly F500 board-reporting (e.g., /decision-intel-for-boards). The H1 sweep replaced "the board will catch first" with "the room will catch first" so the universalisation actually holds.',
     difficulty: 'advanced',
     applicationContext: 'Editing landing page copy. You see "boardroom" in a heading.',
     source: 'CLAUDE.md One-liner re-lock 2026-04-26',
@@ -358,7 +365,8 @@ const DI_VOCABULARY_CARDS: EducationCard[] = [
   {
     id: 'voc_cold_descriptive',
     deckId: 'di_vocabulary',
-    prompt: 'For a COLD context (LinkedIn DM, conference 1:1, landing-page above-the-fold for unaware traffic), what is the canonical descriptive bridge?',
+    prompt:
+      'For a COLD context (LinkedIn DM, conference 1:1, landing-page above-the-fold for unaware traffic), what is the canonical descriptive bridge?',
     canonicalAnswer:
       '"60-second audit on a strategic memo." Or "pre-IC audit layer." Or "strategic memo audits." Or "decision quality auditing." Plain language, no acronyms, no platform vocabulary. NEVER lead cold with "reasoning layer" / "R²F" / "DPR" — the reader has not earned the term yet and will scroll past. The bridge sentence that converts cold→warm in two beats: "We run 60-second audits on strategic memos. The technical name is a reasoning layer — Recognition-Rigor Framework, scored as a Decision Quality Index."',
     difficulty: 'core',
@@ -369,11 +377,13 @@ const DI_VOCABULARY_CARDS: EducationCard[] = [
   {
     id: 'voc_warm_locked',
     deckId: 'di_vocabulary',
-    prompt: 'For a WARM context (second meeting, pitch deck, design-partner conversation), what category vocabulary do you use?',
+    prompt:
+      'For a WARM context (second meeting, pitch deck, design-partner conversation), what category vocabulary do you use?',
     canonicalAnswer:
       '"Native reasoning layer for every high-stakes call." "Recognition-Rigor Framework arbitrating Kahneman + Klein." "Decision Quality Index in 60 seconds." This is the OWNABLE category vocabulary where category creation happens. Warm contexts have earned the term through prior context. Do NOT default to descriptive language here — that under-leverages the category framing.',
     difficulty: 'core',
-    applicationContext: 'Second meeting with a CSO who already heard the cold pitch and is now asking for depth.',
+    applicationContext:
+      'Second meeting with a CSO who already heard the cold pitch and is now asking for depth.',
     source: 'CLAUDE.md Vocabulary discipline by reader temperature',
     tag: 'warm_locked',
   },
@@ -382,9 +392,10 @@ const DI_VOCABULARY_CARDS: EducationCard[] = [
     deckId: 'di_vocabulary',
     prompt: 'What is the canonical historical-decision benchmark number Decision Intel cites?',
     canonicalAnswer:
-      '"135 audited corporate decisions" — defensible, internally curated, deduped 2026-04-16 from the prior 146. Always say "135 historical decisions" or "135 audited corporate decisions" — never round to "~100" or "~150" or claim larger numbers. The dataset is the procurement-grade reference for cross-referencing patterns. Use it as the first anchor in any cold pitch ("we have audited 135 corporate decisions across the last decade").',
+      '"143 audited corporate decisions" — defensible, internally curated, deduped 2026-04-16 from the prior 146. Always say "143 historical decisions" or "143 audited corporate decisions" — never round to "~100" or "~150" or claim larger numbers. The dataset is the procurement-grade reference for cross-referencing patterns. Use it as the first anchor in any cold pitch ("we have audited 143 corporate decisions across the last decade").',
     difficulty: 'foundation',
-    applicationContext: 'Cold pitch to a CSO. You need a single number that makes the work feel real.',
+    applicationContext:
+      'Cold pitch to a CSO. You need a single number that makes the work feel real.',
     source: 'CLAUDE.md Positioning section',
     tag: 'numbers',
   },
@@ -413,7 +424,8 @@ const DI_VOCABULARY_CARDS: EducationCard[] = [
   {
     id: 'voc_blended_margin',
     deckId: 'di_vocabulary',
-    prompt: 'What is the honest blended margin claim for Decision Intel, and why was the prior "97%" claim wrong?',
+    prompt:
+      'What is the honest blended margin claim for Decision Intel, and why was the prior "97%" claim wrong?',
     canonicalAnswer:
       '"~90% blended margin" — Individual typical ~95%, Strategy typical ~95%, Strategy heavy 85-88%, Enterprise 70% without volume floor. The prior "~97%" claim was ghost-user math (assumed everyone was on the cheapest path). Use "~90% blended" in every outward-facing material — pitch deck, investor Q&A, cold email. "97%" will not survive due diligence.',
     difficulty: 'core',
@@ -426,7 +438,7 @@ const DI_VOCABULARY_CARDS: EducationCard[] = [
     deckId: 'di_vocabulary',
     prompt: 'What is the per-audit Gemini API cost, and how many LLM calls does an audit fire?',
     canonicalAnswer:
-      "~£0.30-0.50 (~$0.40-0.65) per audit on Gemini paid tier 1. Each audit fires ~17 LLM calls across the 12-node pipeline. Cost-tier routing (Apr 2026) moved gdprAnonymizer/structurer/intelligenceGatherer to gemini-3.1-flash-lite for 15-25% savings. The metaJudge final-verdict node runs on gemini-2.5-pro (the highest-leverage single call — reasoning-quality matters more than cost).",
+      '~£0.30-0.50 (~$0.40-0.65) per audit on Gemini paid tier 1. Each audit fires ~17 LLM calls across the 12-node pipeline. Cost-tier routing (Apr 2026) moved gdprAnonymizer/structurer/intelligenceGatherer to gemini-3.1-flash-lite for 15-25% savings. The metaJudge final-verdict node runs on gemini-2.5-pro (the highest-leverage single call — reasoning-quality matters more than cost).',
     difficulty: 'advanced',
     applicationContext: 'CTO asks for the actual operating cost per audit.',
     source: 'CLAUDE.md Founder Context — model policy',
@@ -486,7 +498,7 @@ const BUYER_PERSONAS_CARDS: EducationCard[] = [
     deckId: 'buyer_personas',
     prompt: "What is Adaeze's primary concern, and what verbatim phrase do you open with?",
     canonicalAnswer:
-      "Primary concern: \"Will this make my next IC memo defensible enough that the partners stop questioning my judgement on diligence depth?\" Verbatim opener: \"You're trying to make sure your partners stop pushing back on diligence depth — that's exactly what this fixes in 60 seconds. Look at the WeWork S-1 audit; same shape as your last memo.\" Lead with HER specific career-pain (partner pushback), then the artefact, then the comparable-cost frame.",
+      'Primary concern: "Will this make my next IC memo defensible enough that the partners stop questioning my judgement on diligence depth?" Verbatim opener: "You\'re trying to make sure your partners stop pushing back on diligence depth — that\'s exactly what this fixes in 60 seconds. Look at the WeWork S-1 audit; same shape as your last memo." Lead with HER specific career-pain (partner pushback), then the artefact, then the comparable-cost frame.',
     difficulty: 'core',
     applicationContext: 'Cold call with Adaeze. You have 60 seconds for the opener.',
     source: 'closing-lab-data.ts FASTEST_CONVERTERS + sparring-room-data.ts',
@@ -508,7 +520,7 @@ const BUYER_PERSONAS_CARDS: EducationCard[] = [
     deckId: 'buyer_personas',
     prompt: "What is Potomac's primary concern, and what verbatim opener do you use?",
     canonicalAnswer:
-      "Primary concern: \"Can I get my associate to spot the bias gap in a CIM before our client sees buyer questions and we lose 5% of EV on the term sheet?\" Verbatim opener: \"The blind spots in a CIM cost you 5% of EV at term sheet. The audit catches them before the buyer pool sees the deck — your associate runs it, you don't have to.\" Lead with EV-loss anchor (loss aversion), then who runs it (his associate, not him), then the timing.",
+      'Primary concern: "Can I get my associate to spot the bias gap in a CIM before our client sees buyer questions and we lose 5% of EV on the term sheet?" Verbatim opener: "The blind spots in a CIM cost you 5% of EV at term sheet. The audit catches them before the buyer pool sees the deck — your associate runs it, you don\'t have to." Lead with EV-loss anchor (loss aversion), then who runs it (his associate, not him), then the timing.',
     difficulty: 'core',
     applicationContext: 'You have a coffee meeting booked with a boutique M&A MD.',
     source: 'closing-lab-data.ts',
@@ -530,7 +542,7 @@ const BUYER_PERSONAS_CARDS: EducationCard[] = [
     deckId: 'buyer_personas',
     prompt: "What is Marcus's primary concern, and what verbatim opener do you use?",
     canonicalAnswer:
-      "Primary concern: \"My credibility is my product. If a client questions one of my recommendations, can I show them I stress-tested it with something more rigorous than my own brain?\" Verbatim opener: \"Your credibility is your product — when a client pushes back on a recommendation, you need an answer sharper than 'trust me, I'm ex-MBB.' This is the sharper answer in 60 seconds.\" Lead with credibility-as-product framing, NOT the consultant×AI angle (he's worried it makes him look less senior).",
+      'Primary concern: "My credibility is my product. If a client questions one of my recommendations, can I show them I stress-tested it with something more rigorous than my own brain?" Verbatim opener: "Your credibility is your product — when a client pushes back on a recommendation, you need an answer sharper than \'trust me, I\'m ex-MBB.\' This is the sharper answer in 60 seconds." Lead with credibility-as-product framing, NOT the consultant×AI angle (he\'s worried it makes him look less senior).',
     difficulty: 'core',
     applicationContext: 'Casual conversation with a fractional CSO at a networking event.',
     source: 'closing-lab-data.ts',
@@ -550,7 +562,8 @@ const BUYER_PERSONAS_CARDS: EducationCard[] = [
   {
     id: 'persona_margaret_phrase',
     deckId: 'buyer_personas',
-    prompt: "Margaret says 'I cannot put a 16-year-old's name in front of my CEO.' Verbatim 30-second response?",
+    prompt:
+      "Margaret says 'I cannot put a 16-year-old's name in front of my CEO.' Verbatim 30-second response?",
     canonicalAnswer:
       "\"My name doesn't go in front of your CEO — your DPR does. The DPR is what your audit committee reads. The fact that a teenager built the audit layer is a footnote at best, irrelevant at procurement-stage. What's in front of your CEO is whether your strategy team can produce a defensible reasoning record under EU AI Act Article 14 — and that's what your CEO actually wants to know about.\" Reframe from founder-identity to artefact-defensibility. Don't apologise for age. Don't pivot to advisor credentials.",
     difficulty: 'advanced',
@@ -572,9 +585,10 @@ const BUYER_PERSONAS_CARDS: EducationCard[] = [
   {
     id: 'persona_titi_phrase',
     deckId: 'buyer_personas',
-    prompt: "Titi says 'I worry you'll close 5 wedge cases and pivot to F500 next year. Where does that leave my fund?' Verbatim 30-second response?",
+    prompt:
+      "Titi says 'I worry you'll close 5 wedge cases and pivot to F500 next year. Where does that leave my fund?' Verbatim 30-second response?",
     canonicalAnswer:
-      "\"You should worry about that with US-only vendors. The 17-framework regulatory map covers NDPR, CBN, WAEMU, PoPIA, CMA Kenya — that's not a feature I added because you asked. That's the structural moat. The Dangote DPR carries Pan-African regulatory mapping by default. Pivoting to F500 means killing the moat, which means killing the company. The wedge IS the company. The F500 ceiling is the natural expansion vector — not the replacement.\" Lead with structural commitment (the regulatory map IS the moat), not promise-based reassurance.",
+      '"You should worry about that with US-only vendors. The 17-framework regulatory map covers NDPR, CBN, WAEMU, PoPIA, CMA Kenya — that\'s not a feature I added because you asked. That\'s the structural moat. The Dangote DPR carries Pan-African regulatory mapping by default. Pivoting to F500 means killing the moat, which means killing the company. The wedge IS the company. The F500 ceiling is the natural expansion vector — not the replacement." Lead with structural commitment (the regulatory map IS the moat), not promise-based reassurance.',
     difficulty: 'advanced',
     applicationContext: 'Live objection handling with a Pan-African fund partner.',
     source: 'closing-lab-data.ts',
@@ -585,7 +599,7 @@ const BUYER_PERSONAS_CARDS: EducationCard[] = [
     deckId: 'buyer_personas',
     prompt: 'Who is James, and why is he NOT a buyer himself?',
     canonicalAnswer:
-      "James = General Counsel at a regulated entity, archetype. Reports to the audit committee chair. Career-long focus on regulatory exposure, not business growth. Every new vendor gets a 90-day vendor-risk review. James is NOT a buyer — he is the VETO HOLDER on Margaret-class deals. The CSO is the champion; James is the gate. Default skepticism: very high. He notices every overclaim instantly — uses regulator vocabulary natively (EU AI Act Article 14, Basel III Pillar 2 ICAAP, GDPR Art 22).",
+      'James = General Counsel at a regulated entity, archetype. Reports to the audit committee chair. Career-long focus on regulatory exposure, not business growth. Every new vendor gets a 90-day vendor-risk review. James is NOT a buyer — he is the VETO HOLDER on Margaret-class deals. The CSO is the champion; James is the gate. Default skepticism: very high. He notices every overclaim instantly — uses regulator vocabulary natively (EU AI Act Article 14, Basel III Pillar 2 ICAAP, GDPR Art 22).',
     difficulty: 'core',
     applicationContext: 'Should you treat James as a primary persona to convert?',
     source: 'sparring-room-data.ts BUYER_PERSONAS',
@@ -594,7 +608,8 @@ const BUYER_PERSONAS_CARDS: EducationCard[] = [
   {
     id: 'persona_james_phrase',
     deckId: 'buyer_personas',
-    prompt: 'James asks "your DPR says tamper-evident but your roadmap admits private-key signing isn\'t shipped — explain." Verbatim 30-second response?',
+    prompt:
+      'James asks "your DPR says tamper-evident but your roadmap admits private-key signing isn\'t shipped — explain." Verbatim 30-second response?',
     canonicalAnswer:
       "\"You're right. Tamper-evident today is SHA-256 input hash plus record fingerprint — which means you can prove the artefact wasn't modified after generation, given the input. Cryptographic signing with a Decision Intel private key is on the Q3 2026 roadmap. We chose the plain-language 'tamper-evident' over 'signed' specifically because over-claiming would fail your kind of review. The current shape is enough to satisfy EU AI Act Article 14 record-keeping; the signing layer adds non-repudiation, which is procurement-tier.\" Honest disclosure. Name the timeline. Show you UNDERSTAND why he asked.",
     difficulty: 'advanced',
@@ -607,7 +622,7 @@ const BUYER_PERSONAS_CARDS: EducationCard[] = [
     deckId: 'buyer_personas',
     prompt: 'Who is Riya, and what is the asymmetry between her and her partner?',
     canonicalAnswer:
-      "Riya = pre-seed VC associate archetype. Associate at a $100M pre-seed/seed B2B SaaS fund. Sees 50 founders/month. Decision authority is \"should we put this in the partner meeting\" — the PARTNER makes the actual call. Riya is the gatekeeper, not the buyer. She wants to look smart bringing this to her partner — does it survive the 60-second elevator question without her having to defend it?",
+      'Riya = pre-seed VC associate archetype. Associate at a $100M pre-seed/seed B2B SaaS fund. Sees 50 founders/month. Decision authority is "should we put this in the partner meeting" — the PARTNER makes the actual call. Riya is the gatekeeper, not the buyer. She wants to look smart bringing this to her partner — does it survive the 60-second elevator question without her having to defend it?',
     difficulty: 'core',
     applicationContext: 'Differentiating buyer pathways from investor pathways.',
     source: 'sparring-room-data.ts BUYER_PERSONAS',
@@ -616,9 +631,10 @@ const BUYER_PERSONAS_CARDS: EducationCard[] = [
   {
     id: 'persona_riya_phrase',
     deckId: 'buyer_personas',
-    prompt: 'Riya asks "is this a wrapper that GPT-5 with vision eats in 6 months?" Verbatim 30-second response?',
+    prompt:
+      'Riya asks "is this a wrapper that GPT-5 with vision eats in 6 months?" Verbatim 30-second response?',
     canonicalAnswer:
-      "\"What GPT-5 doesn't eat: the 135-decision case library, the 17-framework regulatory mapping across G7 / EU / GCC / African markets, the Brier-scored per-org outcome flywheel that recalibrates the DQI for THIS organisation specifically. Wrapper-class products are the prompt; we're the prompt PLUS the procurement-grade artefact PLUS the data flywheel. The architectural moat is the regulatory + outcome data, not the model call.\" Name three specific structural moats. Don't deny the wrapper concern abstractly.",
+      "\"What GPT-5 doesn't eat: the 143-decision case library, the 17-framework regulatory mapping across G7 / EU / GCC / African markets, the Brier-scored per-org outcome flywheel that recalibrates the DQI for THIS organisation specifically. Wrapper-class products are the prompt; we're the prompt PLUS the procurement-grade artefact PLUS the data flywheel. The architectural moat is the regulatory + outcome data, not the model call.\" Name three specific structural moats. Don't deny the wrapper concern abstractly.",
     difficulty: 'advanced',
     applicationContext: 'Pre-seed investor call. The wrapper question always comes up.',
     source: 'CLAUDE.md External Attack Vectors',
@@ -636,7 +652,8 @@ const MAALOUF_PRINCIPLES_CARDS: EducationCard[] = [
     canonicalAnswer:
       "Maalouf #1: the buyer feels urgency to move WITHOUT being able to point to anywhere you pushed them. Created by referencing other conversations naturally (\"the fund partner I spoke to yesterday\"), surfacing scarcity that's structurally true (5 design-partner seats, 4 left), and letting silence work after a high-impact line. The opposite is being pushy ('limited time', 'last chance') — both flat and pushy fail.",
     difficulty: 'core',
-    applicationContext: 'You sense the buyer is interested but not ready to commit — how do you nudge without pushing?',
+    applicationContext:
+      'You sense the buyer is interested but not ready to commit — how do you nudge without pushing?',
     source: 'closing-lab-data.ts MAALOUF_PRINCIPLES',
     tag: 'principle_1',
   },
@@ -654,7 +671,7 @@ const MAALOUF_PRINCIPLES_CARDS: EducationCard[] = [
   {
     id: 'maalouf_low_vs_high_ticket',
     deckId: 'maalouf_principles',
-    prompt: 'What is the low-ticket vs. high-ticket distinction in Maalouf\'s framework?',
+    prompt: "What is the low-ticket vs. high-ticket distinction in Maalouf's framework?",
     canonicalAnswer:
       "Maalouf #3: low-ticket is sold on convenience and feature comparison. High-ticket is sold on identity and outcome. A $249/mo product CAN be sold high-ticket if you frame the buyer's IDENTITY as someone who can no longer afford the comparable cost (the partner pushback, the bad memo, the reputational hit). The price tier is the lens; the conversation determines the perceived value.",
     difficulty: 'core',
@@ -669,7 +686,7 @@ const MAALOUF_PRINCIPLES_CARDS: EducationCard[] = [
     canonicalAnswer:
       "Maalouf #4: reference other conversations as context, not as social proof. Bad: 'Just last week I spoke to the CSO at [F500 Co.]...' (name-drop, status-display). Good: 'I had a similar conversation with a fund partner in Lagos last week — they were stuck on the same NDPR question. The way we resolved it for them was...' Frames YOU as moving in many high-stakes conversations, signals you're chosen by buyers, makes the current buyer ONE of N rather than the only fish.",
     difficulty: 'advanced',
-    applicationContext: 'You want to signal you\'re busy without bragging.',
+    applicationContext: "You want to signal you're busy without bragging.",
     source: 'closing-lab-data.ts',
     tag: 'principle_4',
   },
@@ -716,7 +733,7 @@ const SATYAM_PILLARS_CARDS: EducationCard[] = [
     deckId: 'satyam_pillars',
     prompt: 'How do you do "us vs them" framing without being tacky?',
     canonicalAnswer:
-      "Satyam #2: name the FAILURE MODE of the category, not the competitor. \"Most decision-intelligence tools score the OUTCOMES — they tell you which decisions worked. We score the REASONING — we catch the bias before the call. That's a structural difference, not a feature comparison.\" Identifies the gap, doesn't bash competitors, leaves the buyer to draw their own conclusion.",
+      'Satyam #2: name the FAILURE MODE of the category, not the competitor. "Most decision-intelligence tools score the OUTCOMES — they tell you which decisions worked. We score the REASONING — we catch the bias before the call. That\'s a structural difference, not a feature comparison." Identifies the gap, doesn\'t bash competitors, leaves the buyer to draw their own conclusion.',
     difficulty: 'core',
     applicationContext: 'You want to differentiate without sounding defensive.',
     source: 'closing-lab-data.ts',
@@ -789,7 +806,8 @@ const SILENT_OBJECTIONS_CARDS: EducationCard[] = [
     canonicalAnswer:
       "Silent objection: 'You're 16. You'll go to university in 2 years. What happens to my data and the platform if you walk away?' The mitigation isn't dismissive ('I'll never walk away') — it's structural: (a) Vendor Continuity & Succession Plan one-pager naming the 2 senior advisors who'd take over operationally + the data-portability commitment in the DPA + the KMS-managed encryption keys with rotation independent of any single founder. Status: TODO — the one-pager doesn't exist yet. Until it does, the objection lives.",
     difficulty: 'advanced',
-    applicationContext: 'Margaret-class CSO asks about company longevity in procurement-stage call.',
+    applicationContext:
+      'Margaret-class CSO asks about company longevity in procurement-stage call.',
     source: 'closing-lab-data.ts',
     tag: 'objection_3',
   },
@@ -798,20 +816,22 @@ const SILENT_OBJECTIONS_CARDS: EducationCard[] = [
     deckId: 'silent_objections',
     prompt: 'What is the ChatGPT-wrapper objection, and what 3 specific moats answer it?',
     canonicalAnswer:
-      "Silent objection: 'This looks like a system prompt around GPT-4 with a UI. Why pay you?' Three structural moats answer: (1) The 135-decision case library (cross-referenced patterns, not just prompt context). (2) The 17-framework regulatory mapping across G7 / EU / GCC / African markets (NDPR, CBN, WAEMU, PoPIA — Cloverpop / IBM watsonx don't cover). (3) The per-org Brier-scored outcome flywheel that recalibrates DQI weights for THIS organisation specifically (data moat that compounds with every audit — Cloverpop's data advantage but in YOUR direction). Plus: ensemble sampling across 3 model judges, NOT a single GPT call.",
+      "Silent objection: 'This looks like a system prompt around GPT-4 with a UI. Why pay you?' Three structural moats answer: (1) The 143-decision case library (cross-referenced patterns, not just prompt context). (2) The 17-framework regulatory mapping across G7 / EU / GCC / African markets (NDPR, CBN, WAEMU, PoPIA — Cloverpop / IBM watsonx don't cover). (3) The per-org Brier-scored outcome flywheel that recalibrates DQI weights for THIS organisation specifically (data moat that compounds with every audit — Cloverpop's data advantage but in YOUR direction). Plus: ensemble sampling across 3 model judges, NOT a single GPT call.",
     difficulty: 'advanced',
-    applicationContext: "Pre-seed investor or Adaeze-class associate asks the wrapper question.",
+    applicationContext: 'Pre-seed investor or Adaeze-class associate asks the wrapper question.',
     source: 'closing-lab-data.ts + CLAUDE.md External Attack Vectors',
     tag: 'objection_4',
   },
   {
     id: 'silent_pan_african_regulatory',
     deckId: 'silent_objections',
-    prompt: 'What is the Pan-African regulatory illusion objection, and where does it live structurally?',
+    prompt:
+      'What is the Pan-African regulatory illusion objection, and where does it live structurally?',
     canonicalAnswer:
       "Silent objection: 'You CLAIM Pan-African regulatory coverage but does the audit actually map to ISA 2007 / FRC Nigeria current code, or just NDPR?' The reality: the African-frameworks file (src/lib/compliance/frameworks/africa-frameworks.ts) covers NDPR, CBN, FRC Nigeria, WAEMU, CMA Kenya, CBK, BoG, CBE, PoPIA s.71, SARB Model Risk, BoT FinTech. ISA 2007 + FRC Nigeria current-code mapping: TODO. Until that mapping ships, a Pan-African GC who reads the framework list will catch the gap. Status: TODO.",
     difficulty: 'advanced',
-    applicationContext: 'Titi-class fund partner shares brief with her IC partner — IC partner asks the question.',
+    applicationContext:
+      'Titi-class fund partner shares brief with her IC partner — IC partner asks the question.',
     source: 'closing-lab-data.ts + CLAUDE.md positioning',
     tag: 'objection_5',
   },
@@ -823,7 +843,8 @@ const GRADING_DIMENSIONS_CARDS: EducationCard[] = [
   {
     id: 'rubric_pressure_without_pressure',
     deckId: 'grading_dimensions',
-    prompt: 'In the Sales DQI rubric, what does "pressure without pressure" measure, and what is excellent vs poor?',
+    prompt:
+      'In the Sales DQI rubric, what does "pressure without pressure" measure, and what is excellent vs poor?',
     canonicalAnswer:
       "Maalouf source. Weight: 0.08. Excellent (5/5): buyer feels urgency to move but cannot point to anywhere you pushed them. Naturally references other conversations or scarcity (5 design-partner seats, 4 left). Poor (1/5): either flat (no urgency) or visibly pushy ('limited time', 'last chance'). Both fail.",
     difficulty: 'core',
@@ -882,7 +903,7 @@ const GRADING_DIMENSIONS_CARDS: EducationCard[] = [
     canonicalAnswer:
       "Satyam source. Weight: 0.10. Excellent (5/5): the voice carries belief. Buyer feels you've seen this work before. No softening on load-bearing claims. Anchored in something specific (case study, mechanism, regulator citation). Poor (1/5): tentative on the core claim. Softens when challenged. 'Maybe' / 'we think' / 'possibly' on the highest-stakes lines.",
     difficulty: 'core',
-    applicationContext: "You feel the urge to soften your strongest claim — STOP.",
+    applicationContext: 'You feel the urge to soften your strongest claim — STOP.',
     source: 'sparring-room-data.ts',
     tag: 'satyam',
   },
@@ -900,7 +921,8 @@ const GRADING_DIMENSIONS_CARDS: EducationCard[] = [
   {
     id: 'rubric_vocabulary_discipline',
     deckId: 'grading_dimensions',
-    prompt: 'In the Sales DQI rubric, what does "vocabulary discipline" measure, and what trips it up?',
+    prompt:
+      'In the Sales DQI rubric, what does "vocabulary discipline" measure, and what trips it up?',
     canonicalAnswer:
       "DI discipline source. Weight: 0.06. Excellent (5/5): uses right vocab for reader temperature. Cold → descriptive plain-language. Warm → locked vocabulary (reasoning layer, R²F, DPR). NEVER uses banned phrases. Poor (1/5): drops 'reasoning layer' or 'R²F' on a cold buyer. Or uses 'decision intelligence platform' (Gartner-crowded). Or 'decision hygiene' (Kahneman's term — borrowing it cedes our category vocabulary).",
     difficulty: 'core',
@@ -915,18 +937,20 @@ const GRADING_DIMENSIONS_CARDS: EducationCard[] = [
     canonicalAnswer:
       "DI discipline source. Weight: 0.10. Excellent (5/5): leads with what the BUYER is trying to do, not what DI does. Lands the buyer's pain in the buyer's words BEFORE introducing the product. Buyer feels seen. Poor (1/5): product-first framing. 'We have a 12-node pipeline.' 'Our DPR is hashed and tamper-evident.' Buyer hears: 'they don't see me yet.'",
     difficulty: 'core',
-    applicationContext: "First sentence to a cold buyer — is it about you or them?",
+    applicationContext: 'First sentence to a cold buyer — is it about you or them?',
     source: 'sparring-room-data.ts',
     tag: 'di_discipline',
   },
   {
     id: 'rubric_loss_aversion_framing',
     deckId: 'grading_dimensions',
-    prompt: 'In the Sales DQI rubric, what does "loss-aversion framing" measure, and what is the academic anchor?',
+    prompt:
+      'In the Sales DQI rubric, what does "loss-aversion framing" measure, and what is the academic anchor?',
     canonicalAnswer:
       "Kahneman source — prospect theory. Weight: 0.10. Academic anchor: Kahneman & Tversky 1979 — losses weight ~2-2.5× gains in decision-making. Excellent (5/5): frames value as preventing a SPECIFIC, named loss the buyer is already worrying about — the regrettable strategic mistake, the career-limiting board disclosure, the LP pulling capital, the McKinsey bill that told them what they should have caught themselves. Anchors price against a comparable cost the buyer already accepts. The buyer feels the price IS small relative to what they're already losing without it. Poor (1/5): frames as upside / gain only ('better decisions', 'improved quality'). The buyer hears upside and discounts (status-quo bias + loss aversion: the cost is certain, the gain is hypothetical).",
     difficulty: 'advanced',
-    applicationContext: 'Pricing conversation: do you say "you could improve" or "you could prevent X"?',
+    applicationContext:
+      'Pricing conversation: do you say "you could improve" or "you could prevent X"?',
     source: 'sparring-room-data.ts (added 2026-04-28)',
     tag: 'kahneman',
   },
@@ -937,7 +961,7 @@ const GRADING_DIMENSIONS_CARDS: EducationCard[] = [
     canonicalAnswer:
       "Fundamentals source. Weight: 0.12 (highest single weight). Excellent (5/5): concrete examples in every paragraph. Names a specific case (WeWork S-1, Dangote 2014, McKinsey 8% statistic), a specific bias (overconfidence, narrative fallacy), a specific regulation (EU AI Act Article 14, NDPR). Buyer can repeat the line back to a colleague. Poor (1/5): vague throughout. 'Better outcomes.' 'Strategic clarity.' 'Improved decision-making.' Buyer cannot repeat anything specific.",
     difficulty: 'core',
-    applicationContext: "Self-grading: can the buyer repeat ONE thing you said to a colleague?",
+    applicationContext: 'Self-grading: can the buyer repeat ONE thing you said to a colleague?',
     source: 'sparring-room-data.ts',
     tag: 'fundamentals',
   },
@@ -951,9 +975,10 @@ const COGNITIVE_BIASES_CARDS: EducationCard[] = [
     deckId: 'cognitive_biases',
     prompt: 'What is confirmation bias and how does it show up in a strategic memo?',
     canonicalAnswer:
-      "Confirmation bias: the tendency to search for, interpret, and recall information that confirms a prior belief while discounting contradicting evidence. In a strategic memo, it shows up as cherry-picked supporting data, dismissive treatment of counter-evidence ('but those cases are different because...'), and recommendation language that assumes the conclusion before laying out the reasoning. The DI audit catches this through the structuralAssumptions node + cross-referencing the memo against the 135-decision case library.",
+      "Confirmation bias: the tendency to search for, interpret, and recall information that confirms a prior belief while discounting contradicting evidence. In a strategic memo, it shows up as cherry-picked supporting data, dismissive treatment of counter-evidence ('but those cases are different because...'), and recommendation language that assumes the conclusion before laying out the reasoning. The DI audit catches this through the structuralAssumptions node + cross-referencing the memo against the 143-decision case library.",
     difficulty: 'foundation',
-    applicationContext: "Reviewing a strategic memo where the conclusion was reached before the analysis.",
+    applicationContext:
+      'Reviewing a strategic memo where the conclusion was reached before the analysis.',
     source: 'src/lib/constants/bias-education.ts DI-B-001',
     tag: 'foundational',
   },
@@ -986,7 +1011,7 @@ const COGNITIVE_BIASES_CARDS: EducationCard[] = [
     canonicalAnswer:
       "Narrative fallacy (Taleb): the human tendency to construct compelling stories from ambiguous data, then mistake the story for reality. In IC memos: 'this CEO grew the business 3x in 4 years — they will replicate that here' constructs a causal narrative from past success, ignoring base rates, regression to the mean, and survivor bias. DI's metaJudge final-verdict node specifically tests for narrative-fallacy structure: does the memo argue from anecdote-as-pattern?",
     difficulty: 'core',
-    applicationContext: "An IC memo that leans heavily on the founder/CEO biography.",
+    applicationContext: 'An IC memo that leans heavily on the founder/CEO biography.',
     source: 'bias-education.ts',
     tag: 'foundational',
   },
@@ -1006,9 +1031,10 @@ const COGNITIVE_BIASES_CARDS: EducationCard[] = [
     deckId: 'cognitive_biases',
     prompt: 'What is availability heuristic and what is the DI defense?',
     canonicalAnswer:
-      "Availability heuristic: judging probability by how easily examples come to mind. Recent or vivid events feel more likely than they statistically are. In M&A: a recent successful deal in the sector feels like 'the sector is hot' even when the success rate hasn't actually shifted. DI's intelligenceGatherer node pulls statistical base rates from the 135-decision case library and surfaces the gap between 'how this case feels' and 'how similar cases historically performed.'",
+      "Availability heuristic: judging probability by how easily examples come to mind. Recent or vivid events feel more likely than they statistically are. In M&A: a recent successful deal in the sector feels like 'the sector is hot' even when the success rate hasn't actually shifted. DI's intelligenceGatherer node pulls statistical base rates from the 143-decision case library and surfaces the gap between 'how this case feels' and 'how similar cases historically performed.'",
     difficulty: 'core',
-    applicationContext: 'CSO says "everyone is doing X right now" — but is that statistically true?',
+    applicationContext:
+      'CSO says "everyone is doing X right now" — but is that statistically true?',
     source: 'bias-education.ts',
     tag: 'foundational',
   },
@@ -1030,7 +1056,8 @@ const COGNITIVE_BIASES_CARDS: EducationCard[] = [
     canonicalAnswer:
       "Illusion of control: people overestimate their ability to influence outcomes that are largely determined by external factors (FX cycles, regulator decisions, macro shocks). In Pan-African investing: 'we will time the naira devaluation correctly' is a classic illusion of control. DI's structuralAssumptions node (extended 2026-04-26) injects sovereign-context branching for Nigeria, Kenya, Ghana, WAEMU, South Africa, Egypt — surfacing the macro factors the memo is implicitly assuming control over.",
     difficulty: 'core',
-    applicationContext: 'A Nigeria-focused fund memo that assumes the team can hedge naira FX risk.',
+    applicationContext:
+      'A Nigeria-focused fund memo that assumes the team can hedge naira FX risk.',
     source: 'bias-education.ts + sovereign-context branching',
     tag: 'foundational',
   },
@@ -1048,11 +1075,13 @@ const COGNITIVE_BIASES_CARDS: EducationCard[] = [
   {
     id: 'bias_loss_aversion',
     deckId: 'cognitive_biases',
-    prompt: 'What is loss aversion (the bias) and how do you BOTH defend against it AND use it in your own sales pitch?',
+    prompt:
+      'What is loss aversion (the bias) and how do you BOTH defend against it AND use it in your own sales pitch?',
     canonicalAnswer:
       "Loss aversion (Kahneman & Tversky 1979): losses weight ~2-2.5× gains in decision-making. As a BIAS to defend against: organisations refuse to exit failing markets because exit is framed as 'taking the loss' rather than 'redeploying capital to higher-return opportunities.' DI's audit reframes exit decisions as forward-looking expected-value comparisons. As a SALES TOOL: frame DI's value as preventing a specific named loss (the regrettable strategic mistake, the McKinsey bill, the partner pushback). The buyer's loss-aversion makes the price feel SMALL relative to what they're losing without it. Same psychology, two directions — defense for clients, weapon for your own pitch.",
     difficulty: 'advanced',
-    applicationContext: 'You\'re both auditing a CSO\'s exit decision AND pitching them on the audit tool.',
+    applicationContext:
+      "You're both auditing a CSO's exit decision AND pitching them on the audit tool.",
     source: 'bias-education.ts + sparring-room loss_aversion_framing dimension',
     tag: 'kahneman',
   },
@@ -1088,7 +1117,7 @@ const PIPELINE_NODES_CARDS: EducationCard[] = [
     deckId: 'pipeline_nodes',
     prompt: 'What does the noiseJudge node do, and what is its academic anchor?',
     canonicalAnswer:
-      "Runs an independent SECOND judgement of the same memo and measures variance against the primary biasDetective output. Academic anchor: Kahneman, Sibony & Sunstein 2021 NOISE — \"the chief enemy of good judgement is not bias, it is NOISE\" (variance between judges who should agree). The noise score is a separate signal from the bias score. High noise + low bias = the memo is provoking inconsistent reads; not necessarily biased but structurally ambiguous. Low noise + high bias = the bias is consistent and easy to flag. The interaction matters.",
+      'Runs an independent SECOND judgement of the same memo and measures variance against the primary biasDetective output. Academic anchor: Kahneman, Sibony & Sunstein 2021 NOISE — "the chief enemy of good judgement is not bias, it is NOISE" (variance between judges who should agree). The noise score is a separate signal from the bias score. High noise + low bias = the memo is provoking inconsistent reads; not necessarily biased but structurally ambiguous. Low noise + high bias = the bias is consistent and easy to flag. The interaction matters.',
     difficulty: 'advanced',
     applicationContext: 'Investor asks "why two judges instead of one?"',
     source: 'CLAUDE.md research foundations + nodes.ts',
@@ -1099,7 +1128,7 @@ const PIPELINE_NODES_CARDS: EducationCard[] = [
     deckId: 'pipeline_nodes',
     prompt: 'What does the rpdRecognition node do, and how does it complete R²F?',
     canonicalAnswer:
-      "Klein's Recognition-Primed Decision framework. Identifies the situation pattern in the memo (M&A target like 'losing-battle commitment', or market-entry like 'naira-devaluation timing') and pulls historical analogs from the 135-decision case library. Returns: situational pattern + historical analogs ranked by structural similarity + recognition-based recommendation. This is Klein's HALF of R²F — recognition (System 1 amplification). The Kahneman half (debiasing — biasDetective + noiseJudge + statisticalJury) is System 2 rigor. Together they ARE R²F. No competitor combines both.",
+      "Klein's Recognition-Primed Decision framework. Identifies the situation pattern in the memo (M&A target like 'losing-battle commitment', or market-entry like 'naira-devaluation timing') and pulls historical analogs from the 143-decision case library. Returns: situational pattern + historical analogs ranked by structural similarity + recognition-based recommendation. This is Klein's HALF of R²F — recognition (System 1 amplification). The Kahneman half (debiasing — biasDetective + noiseJudge + statisticalJury) is System 2 rigor. Together they ARE R²F. No competitor combines both.",
     difficulty: 'core',
     applicationContext: 'Investor asks about IP / why is this defensible.',
     source: 'CLAUDE.md Kahneman×Klein synthesis lock',
@@ -1121,7 +1150,7 @@ const PIPELINE_NODES_CARDS: EducationCard[] = [
     deckId: 'pipeline_nodes',
     prompt: 'What does the metaJudge node do, and why does it run on gemini-2.5-pro?',
     canonicalAnswer:
-      "The final-verdict node. Reviews ALL upstream node outputs (structuralAssumptions, biasDetective, noiseJudge, rpdRecognition, forgottenQuestions, pre-mortem, statisticalJury) and produces the integrated DQI score with explanatory narrative. Runs on gemini-2.5-pro (the Pro-tier exception in the model policy) because reasoning quality matters more than cost on the highest-leverage single call in the pipeline. The metaJudge output is what the buyer SEES first in the analysis — the executive summary, the DQI score, the recommendation. Override via GEMINI_MODEL_PRO env var.",
+      'The final-verdict node. Reviews ALL upstream node outputs (structuralAssumptions, biasDetective, noiseJudge, rpdRecognition, forgottenQuestions, pre-mortem, statisticalJury) and produces the integrated DQI score with explanatory narrative. Runs on gemini-2.5-pro (the Pro-tier exception in the model policy) because reasoning quality matters more than cost on the highest-leverage single call in the pipeline. The metaJudge output is what the buyer SEES first in the analysis — the executive summary, the DQI score, the recommendation. Override via GEMINI_MODEL_PRO env var.',
     difficulty: 'advanced',
     applicationContext: 'CTO asks about the model policy and per-audit cost composition.',
     source: 'CLAUDE.md Gemini model policy lock 2026-04-27',
@@ -1137,7 +1166,7 @@ const DQI_METHODOLOGY_CARDS: EducationCard[] = [
     deckId: 'dqi_methodology',
     prompt: 'What are the 6 components of the DQI score and their weights?',
     canonicalAnswer:
-      "The DQI decomposes into 6 weighted components (defined in src/lib/scoring/dqi.ts): (1) Bias score (severity-weighted), (2) Structural assumptions score, (3) Noise / inter-judge variance, (4) Pre-mortem coverage (failure modes considered), (5) Recognition score (historical-analog grounding), (6) Statistical / base-rate alignment. Weights are calibrated against the 135-case library. The recalibratedDqi field on Analysis is updated per-org based on Brier-scored outcomes — so the weights drift toward what THIS org actually predicts.",
+      'The DQI decomposes into 6 weighted components (defined in src/lib/scoring/dqi.ts): (1) Bias score (severity-weighted), (2) Structural assumptions score, (3) Noise / inter-judge variance, (4) Pre-mortem coverage (failure modes considered), (5) Recognition score (historical-analog grounding), (6) Statistical / base-rate alignment. Weights are calibrated against the 143-case library. The recalibratedDqi field on Analysis is updated per-org based on Brier-scored outcomes — so the weights drift toward what THIS org actually predicts.',
     difficulty: 'core',
     applicationContext: 'CSO asks "what does the score actually measure?"',
     source: 'src/lib/scoring/dqi.ts',
@@ -1148,9 +1177,9 @@ const DQI_METHODOLOGY_CARDS: EducationCard[] = [
     deckId: 'dqi_methodology',
     prompt: 'What are the canonical DQI grade boundaries?',
     canonicalAnswer:
-      "A: 85+ / B: 70+ / C: 55+ / D: 40+ / F: <40. Defined in src/lib/scoring/dqi.ts → GRADE_THRESHOLDS. The boundaries are CANONICAL — every consumer that maps score-to-grade MUST import from this canonical source. Re-implementing the same logic in another file is the drift-class bug (caught quick-score.ts:scoreToGrade using the wrong thresholds 90/70/50/30 in the 2026-04-27 slop-scan sweep). When changing boundaries, update both GRADE_THRESHOLDS and the JSDoc at the top of dqi.ts in the same commit.",
+      'A: 85+ / B: 70+ / C: 55+ / D: 40+ / F: <40. Defined in src/lib/scoring/dqi.ts → GRADE_THRESHOLDS. The boundaries are CANONICAL — every consumer that maps score-to-grade MUST import from this canonical source. Re-implementing the same logic in another file is the drift-class bug (caught quick-score.ts:scoreToGrade using the wrong thresholds 90/70/50/30 in the 2026-04-27 slop-scan sweep). When changing boundaries, update both GRADE_THRESHOLDS and the JSDoc at the top of dqi.ts in the same commit.',
     difficulty: 'foundation',
-    applicationContext: "Buyer sees a 67/100 — what grade?",
+    applicationContext: 'Buyer sees a 67/100 — what grade?',
     source: 'src/lib/scoring/dqi.ts + CLAUDE.md DQI Grade Boundaries lock',
     tag: 'methodology',
   },
@@ -1181,10 +1210,10 @@ const DQI_METHODOLOGY_CARDS: EducationCard[] = [
     deckId: 'dqi_methodology',
     prompt: 'What is the validation discipline for DQI scoring?',
     canonicalAnswer:
-      "DQI is calibrated against the 135-decision case library (deduped 2026-04-16 from 146). Each historical case has a known outcome — DQI weights are tuned so that historically-failed decisions score lower and historically-successful ones score higher, with appropriate variance. The Bias Genome page (/bias-genome) surfaces aggregated cohort-level patterns — 'failure lift' = bias failure rate / baseline failure rate. n>=5 for headline rankings; n<3 surfaces with a warning flag.",
+      "DQI is calibrated against the 143-decision case library (deduped 2026-04-16 from 146). Each historical case has a known outcome — DQI weights are tuned so that historically-failed decisions score lower and historically-successful ones score higher, with appropriate variance. The Bias Genome page (/bias-genome) surfaces aggregated cohort-level patterns — 'failure lift' = bias failure rate / baseline failure rate. n>=5 for headline rankings; n<3 surfaces with a warning flag.",
     difficulty: 'advanced',
     applicationContext: 'Procurement asks for the validation methodology.',
-    source: 'CLAUDE.md Bias Genome + 135 historical decisions lock',
+    source: 'CLAUDE.md Bias Genome + 143 historical decisions lock',
     tag: 'methodology',
   },
 ];
@@ -1195,9 +1224,10 @@ const REGULATORY_FRAMEWORKS_CARDS: EducationCard[] = [
   {
     id: 'reg_eu_ai_act',
     deckId: 'regulatory_frameworks',
-    prompt: 'EU AI Act: what is the anchor article DI maps to, and what is the enforcement timeline?',
+    prompt:
+      'EU AI Act: what is the anchor article DI maps to, and what is the enforcement timeline?',
     canonicalAnswer:
-      "Article 14 (human oversight) is the anchor — the DPR maps onto Art 14 record-keeping by design. Also relevant: Art 13 (transparency), Art 15 (accuracy + record-keeping), Annex III (high-risk use cases). Timeline: EU AI Act in force since Aug 2024. Prohibited practices enforceable Feb 2, 2025. General-purpose AI obligations Aug 2, 2025. High-risk decision-support systems Aug 2, 2026 — THE date that anchors most procurement-stage urgency. This is the #1 regulatory tailwind for DI.",
+      'Article 14 (human oversight) is the anchor — the DPR maps onto Art 14 record-keeping by design. Also relevant: Art 13 (transparency), Art 15 (accuracy + record-keeping), Annex III (high-risk use cases). Timeline: EU AI Act in force since Aug 2024. Prohibited practices enforceable Feb 2, 2025. General-purpose AI obligations Aug 2, 2025. High-risk decision-support systems Aug 2, 2026 — THE date that anchors most procurement-stage urgency. This is the #1 regulatory tailwind for DI.',
     difficulty: 'core',
     applicationContext: 'GC asks about EU AI Act readiness in vendor-risk review.',
     source: 'CLAUDE.md Regulatory Tailwinds 2026-04-22',
@@ -1210,7 +1240,8 @@ const REGULATORY_FRAMEWORKS_CARDS: EducationCard[] = [
     canonicalAnswer:
       "Basel III Pillar 2 — the Internal Capital Adequacy Assessment Process. Requires regulated banks to document the qualitative reasoning behind capital decisions, NOT just the quantitative numbers. DPR's Reviewer Decisions / HITL log (page 5 of the v2 DPR) provides exactly this — accepted mitigations, dismissed flags with reasons, dissent log, final sign-off. Live for regulated banks. The DPR attaches a Basel III provision to every flagged bias when the org context is a regulated financial entity.",
     difficulty: 'advanced',
-    applicationContext: "Bank GC asks 'how do you cover Basel III ICAAP qualitative documentation?'",
+    applicationContext:
+      "Bank GC asks 'how do you cover Basel III ICAAP qualitative documentation?'",
     source: 'CLAUDE.md Regulatory Tailwinds + DPR v2 enhancements',
     tag: 'banking',
   },
@@ -1219,7 +1250,7 @@ const REGULATORY_FRAMEWORKS_CARDS: EducationCard[] = [
     deckId: 'regulatory_frameworks',
     prompt: 'GDPR Art 22: what does it require, and how does DI handle it?',
     canonicalAnswer:
-      "Article 22: rights of data subjects in automated decision-making — they have the right to meaningful information about the LOGIC involved, plus the right to contest. DPR citations provide that without exposing platform IP. Decision Intel is the PROCESSOR; the customer is the CONTROLLER — the privacy page names the routing explicitly with a 4-step contestation flow (mailto:team@decision-intel.com → 5-day acknowledgment → 30-day controller response → supervisory complaint fallback). Live since 2018. Updated /privacy 2026-04-26 with explicit Art 22 third-party path section.",
+      'Article 22: rights of data subjects in automated decision-making — they have the right to meaningful information about the LOGIC involved, plus the right to contest. DPR citations provide that without exposing platform IP. Decision Intel is the PROCESSOR; the customer is the CONTROLLER — the privacy page names the routing explicitly with a 4-step contestation flow (mailto:team@decision-intel.com → 5-day acknowledgment → 30-day controller response → supervisory complaint fallback). Live since 2018. Updated /privacy 2026-04-26 with explicit Art 22 third-party path section.',
     difficulty: 'core',
     applicationContext: 'A subject named in a memo contests how a decision was reached.',
     source: 'CLAUDE.md GDPR Art 22 third-party path',
@@ -1241,7 +1272,7 @@ const REGULATORY_FRAMEWORKS_CARDS: EducationCard[] = [
     deckId: 'regulatory_frameworks',
     prompt: 'CBN: what does it cover, and what kind of memos does it apply to?',
     canonicalAnswer:
-      "Central Bank of Nigeria (CBN). Covers Nigerian financial-services regulatory rules including the I&E (Investors & Exporters) FX window guidance, banking capital adequacy, and lending standards. Applies to memos involving Nigerian financial entities or NGN-denominated capital allocation. The structuralAssumptions node injects CBN sovereign-context (naira free-float + I&E window dynamics) for Nigeria-mentioning memos automatically.",
+      'Central Bank of Nigeria (CBN). Covers Nigerian financial-services regulatory rules including the I&E (Investors & Exporters) FX window guidance, banking capital adequacy, and lending standards. Applies to memos involving Nigerian financial entities or NGN-denominated capital allocation. The structuralAssumptions node injects CBN sovereign-context (naira free-float + I&E window dynamics) for Nigeria-mentioning memos automatically.',
     difficulty: 'core',
     applicationContext: 'Memo about a Lagos-based fintech expansion.',
     source: 'africa-frameworks.ts + sovereign-context branching',
@@ -1254,7 +1285,7 @@ const REGULATORY_FRAMEWORKS_CARDS: EducationCard[] = [
     canonicalAnswer:
       "WAEMU (West African Economic and Monetary Union) — covers 8 West African countries that share the CFA franc currency: Benin, Burkina Faso, Côte d'Ivoire, Guinea-Bissau, Mali, Niger, Senegal, Togo. Banking + capital markets regulation under the BCEAO (central bank). The CFA-zone peg to the euro is a structural assumption that any WAEMU memo implicitly carries — the structuralAssumptions node surfaces this. Important for Pan-African funds with cross-border WAEMU exposure.",
     difficulty: 'advanced',
-    applicationContext: 'Memo about a Côte d\'Ivoire consumer rollup.',
+    applicationContext: "Memo about a Côte d'Ivoire consumer rollup.",
     source: 'africa-frameworks.ts',
     tag: 'african',
   },
@@ -1276,7 +1307,8 @@ const REGULATORY_FRAMEWORKS_CARDS: EducationCard[] = [
     canonicalAnswer:
       "Investments and Securities Act 2007 (Nigeria) — the primary statute governing securities markets in Nigeria, administered by the SEC Nigeria. Covers public offerings, private placements, and investor disclosures. The current FRC Nigeria code adds corporate-governance overlays. Current DI gap (per closing-lab silent-objections): the audit framework registry covers NDPR / CBN / FRC Nigeria / WAEMU but does NOT yet map specifically to ISA 2007 sections. Status: TODO. Until ISA 2007 + current FRC Nigeria code mapping ships, the 'Pan-African regulatory illusion' silent objection lives.",
     difficulty: 'advanced',
-    applicationContext: 'Pan-African fund partner asks about ISA 2007 coverage in procurement-stage call.',
+    applicationContext:
+      'Pan-African fund partner asks about ISA 2007 coverage in procurement-stage call.',
     source: 'closing-lab-data.ts SILENT_OBJECTIONS + africa-frameworks.ts',
     tag: 'african',
   },
@@ -1290,7 +1322,7 @@ const R2F_FRAMEWORK_CARDS: EducationCard[] = [
     deckId: 'r2f_framework',
     prompt: 'What 3 pipeline nodes implement the KAHNEMAN side of R²F?',
     canonicalAnswer:
-      "Kahneman's side = System 2 debiasing rigor. Implemented by: (1) biasDetective (catches the 30+ named biases), (2) noiseJudge (measures inter-judge variance — Kahneman/Sibony/Sunstein NOISE 2021), (3) statisticalJury (compares against base rates from the 135-case library). Together they implement the rigorous-skepticism layer: 'what's wrong with this reasoning, statistically.'",
+      "Kahneman's side = System 2 debiasing rigor. Implemented by: (1) biasDetective (catches the 30+ named biases), (2) noiseJudge (measures inter-judge variance — Kahneman/Sibony/Sunstein NOISE 2021), (3) statisticalJury (compares against base rates from the 143-case library). Together they implement the rigorous-skepticism layer: 'what's wrong with this reasoning, statistically.'",
     difficulty: 'core',
     applicationContext: "Investor asks 'where is the Kahneman in your pipeline?'",
     source: 'CLAUDE.md Kahneman×Klein synthesis lock',
@@ -1301,7 +1333,7 @@ const R2F_FRAMEWORK_CARDS: EducationCard[] = [
     deckId: 'r2f_framework',
     prompt: 'What 3 pipeline nodes implement the KLEIN side of R²F?',
     canonicalAnswer:
-      "Klein's side = System 1 amplification through pattern recognition. Implemented by: (1) rpdRecognition (Recognition-Primed Decision — pattern-matches the situation to historical analogs in the 135-case library), (2) forgottenQuestions (surfaces what the memo SHOULD be asking but isn't, drawn from analogs), (3) pre-mortem (Klein's failure-imagination technique — imagines the project failed in 18 months and asks why). Together they implement the experiential-pattern layer: 'what would an expert recognise in this situation that the memo is missing?'",
+      "Klein's side = System 1 amplification through pattern recognition. Implemented by: (1) rpdRecognition (Recognition-Primed Decision — pattern-matches the situation to historical analogs in the 143-case library), (2) forgottenQuestions (surfaces what the memo SHOULD be asking but isn't, drawn from analogs), (3) pre-mortem (Klein's failure-imagination technique — imagines the project failed in 18 months and asks why). Together they implement the experiential-pattern layer: 'what would an expert recognise in this situation that the memo is missing?'",
     difficulty: 'core',
     applicationContext: "Investor asks 'where is the Klein in your pipeline?'",
     source: 'CLAUDE.md',
@@ -1314,7 +1346,8 @@ const R2F_FRAMEWORK_CARDS: EducationCard[] = [
     canonicalAnswer:
       "The metaJudge runs LAST in the pipeline (gemini-2.5-pro). It receives outputs from BOTH the Kahneman side (biasDetective + noiseJudge + statisticalJury) AND the Klein side (rpdRecognition + forgottenQuestions + pre-mortem) and produces an integrated DQI score with explanatory narrative. When the two sides DISAGREE — e.g., bias-detection says 'high anchoring bias' but recognition says 'this is the right pattern-match' — the metaJudge weighs the disagreement and surfaces it as a noise signal. Disagreement is itself information; consensus across both traditions raises confidence.",
     difficulty: 'advanced',
-    applicationContext: 'Sophisticated investor asks how you handle the tension between the two frameworks.',
+    applicationContext:
+      'Sophisticated investor asks how you handle the tension between the two frameworks.',
     source: 'CLAUDE.md',
     tag: 'integration',
   },
@@ -1323,7 +1356,7 @@ const R2F_FRAMEWORK_CARDS: EducationCard[] = [
     deckId: 'r2f_framework',
     prompt: 'What is the anchor academic paper for the R²F integration claim?',
     canonicalAnswer:
-      "Kahneman & Klein 2009 — \"Conditions for Intuitive Expertise: a failure to disagree\" (American Psychologist 64:6, 515-526). The paper itself is two icons of opposing decision-research traditions trying to find common ground. Their conclusion: expert intuition is reliable in domains with regular feedback and stable conditions; unreliable elsewhere. R²F operationalises this: amplify intuition where it's reliable (Klein recognition), debias where it isn't (Kahneman rigor), let the metaJudge arbitrate. The trademark filing on R²F is DEFERRED until pre-seed close; use consistently now so vocabulary is owned by usage alone.",
+      'Kahneman & Klein 2009 — "Conditions for Intuitive Expertise: a failure to disagree" (American Psychologist 64:6, 515-526). The paper itself is two icons of opposing decision-research traditions trying to find common ground. Their conclusion: expert intuition is reliable in domains with regular feedback and stable conditions; unreliable elsewhere. R²F operationalises this: amplify intuition where it\'s reliable (Klein recognition), debias where it isn\'t (Kahneman rigor), let the metaJudge arbitrate. The trademark filing on R²F is DEFERRED until pre-seed close; use consistently now so vocabulary is owned by usage alone.',
     difficulty: 'advanced',
     applicationContext: 'Investor asks for the IP grounding of your category claim.',
     source: 'CLAUDE.md Positioning + R²F lock',
@@ -1334,7 +1367,7 @@ const R2F_FRAMEWORK_CARDS: EducationCard[] = [
     deckId: 'r2f_framework',
     prompt: 'Why does NO competitor combine both traditions, and what does that mean for the moat?',
     canonicalAnswer:
-      "Cloverpop scores OUTCOMES (after the fact, structured logging). Aera executes decisions autonomously (agentic). IBM watsonx.governance audits the MODEL (not the human reasoning). Quantellia / Peak.ai are predictive-analytics dashboards. NONE attempt to integrate Kahneman's debiasing tradition WITH Klein's recognition tradition into one pipeline. The R²F claim is the slide-2 pitch-deck claim — the IP moat. Replicating it requires: (a) the academic synthesis (the rare one paper they wrote together), (b) the implementation across 12 pipeline nodes, (c) the validation against 135 cases. Years of work, not a feature ship.",
+      "Cloverpop scores OUTCOMES (after the fact, structured logging). Aera executes decisions autonomously (agentic). IBM watsonx.governance audits the MODEL (not the human reasoning). Quantellia / Peak.ai are predictive-analytics dashboards. NONE attempt to integrate Kahneman's debiasing tradition WITH Klein's recognition tradition into one pipeline. The R²F claim is the slide-2 pitch-deck claim — the IP moat. Replicating it requires: (a) the academic synthesis (the rare one paper they wrote together), (b) the implementation across 12 pipeline nodes, (c) the validation against 143 cases. Years of work, not a feature ship.",
     difficulty: 'advanced',
     applicationContext: "Investor asks 'why hasn't anyone done this before?'",
     source: 'CLAUDE.md Kahneman×Klein synthesis + External Attack Vectors',
@@ -1348,7 +1381,8 @@ const FOUNDER_ONELINERS_CARDS: EducationCard[] = [
   {
     id: 'oneliner_external_attack_vectors',
     deckId: 'founder_oneliners',
-    prompt: 'Name the 3 External Attack Vectors that could derail Decision Intel regardless of execution quality.',
+    prompt:
+      'Name the 3 External Attack Vectors that could derail Decision Intel regardless of execution quality.',
     canonicalAnswer:
       "(1) Cloverpop's data advantage: they have years of structured enterprise decision data we don't; if Clearbox (their parent) bolts a Kahneman prompt onto their existing repo, they instantly replicate audit capability with REAL data. (2) IBM watsonx.governance bundling: F500 GCs don't want two governance SKUs; if IBM adds a 'Human Decision Provenance' module, F500 procurement checks the EU AI Act box with IBM by Aug 2026. (3) Agentic shift makes the strategic memo obsolete: Palantir / Databricks / Aera are eliminating human-authored memos via agentic execution; we're building the spell-checker for a format the enterprise is automating away. Defenses: outcome-gate enforcement (Cloverpop), Pan-African wedge (IBM), audit-layer-for-agents long-game pivot (agentic).",
     difficulty: 'advanced',
@@ -1374,14 +1408,16 @@ const FOUNDER_ONELINERS_CARDS: EducationCard[] = [
     canonicalAnswer:
       "Generic US/European VC firms with NO Africa exposure. Why: small AUM-per-decision, relationship-driven without the capital-allocation pressure that makes the audit valuable, sceptical because they have no procurement need for compliance-grade DPRs. The wedge is Pan-African / EM-focused funds with capital-allocation pressure across volatile FX regimes (NGN, KES, GHS, EGP) AND procurement-grade compliance requirements (NDPR, CBN, WAEMU, PoPIA). The 'PE/VC is NOT a target audience' framing applies HERE — to the generic segment, not the EM-fund subset.",
     difficulty: 'advanced',
-    applicationContext: 'You get a warm intro to a generic Sand Hill Road VC firm — do you take the meeting?',
+    applicationContext:
+      'You get a warm intro to a generic Sand Hill Road VC firm — do you take the meeting?',
     source: 'CLAUDE.md ICP wedge+ceiling',
     tag: 'strategic',
   },
   {
     id: 'oneliner_one_liner_primary',
     deckId: 'founder_oneliners',
-    prompt: 'What is the canonical hero one-liner for warm contexts (pitch deck, LinkedIn headline)?',
+    prompt:
+      'What is the canonical hero one-liner for warm contexts (pitch deck, LinkedIn headline)?',
     canonicalAnswer:
       "\"The native reasoning layer for every high-stakes call.\" That is the H1. \"Reasoning layer\" is the ownable category anchor — treat it like the category term. \"Native\" does the 'built for this, not retrofitted' work. \"High-stakes call\" is the universal noun phrase that lands across all six buyer personas. NEVER use 'collaborative' / 'collaborator' / 'medium' / 'protect outcomes' framings. NEVER use 'decision intelligence platform' as the headline claim.",
     difficulty: 'foundation',
@@ -1392,9 +1428,10 @@ const FOUNDER_ONELINERS_CARDS: EducationCard[] = [
   {
     id: 'oneliner_secondary_regulatory',
     deckId: 'founder_oneliners',
-    prompt: 'What is the secondary one-liner for regulatory-tailwind moments (cold outreach, investor narrative)?',
+    prompt:
+      'What is the secondary one-liner for regulatory-tailwind moments (cold outreach, investor narrative)?',
     canonicalAnswer:
-      "\"The reasoning layer the Fortune 500 needs before regulators start asking.\" Carries the regulatory tailwind story in one breath. Use it where TENSION beats elegance — cold DMs, VC pitches, LinkedIn replies. NEVER use it as a hero H1. The primary remains 'the native reasoning layer for every high-stakes call.' This secondary is the version that fits the EU AI Act / Aug 2026 / Basel III calendar pressure context.",
+      '"The reasoning layer the Fortune 500 needs before regulators start asking." Carries the regulatory tailwind story in one breath. Use it where TENSION beats elegance — cold DMs, VC pitches, LinkedIn replies. NEVER use it as a hero H1. The primary remains \'the native reasoning layer for every high-stakes call.\' This secondary is the version that fits the EU AI Act / Aug 2026 / Basel III calendar pressure context.',
     difficulty: 'core',
     applicationContext: 'Drafting a cold email to a F500 GC about EU AI Act readiness.',
     source: 'CLAUDE.md One-liner secondary',
@@ -1427,9 +1464,10 @@ const FOUNDER_ONELINERS_CARDS: EducationCard[] = [
     deckId: 'founder_oneliners',
     prompt: 'What 3 contractual asks define a real Decision Intel design partnership?',
     canonicalAnswer:
-      "From Founder School lesson es_11 / discovery-call language: \"three things are non-negotiable: (1) workflow mapping in this call, (2) audit-before-meeting requirement (every IC / steering / board meeting has a DI audit attached as part of the prep), (3) outcome-gate enforced at platform level (every audit's outcome must be logged before the next audit fires).\" The data flywheel becomes contractual, not aspirational. Without these, the design partnership is a paid pilot with no compounding value. WITH these, every signed partner accelerates the moat.",
+      'From Founder School lesson es_11 / discovery-call language: "three things are non-negotiable: (1) workflow mapping in this call, (2) audit-before-meeting requirement (every IC / steering / board meeting has a DI audit attached as part of the prep), (3) outcome-gate enforced at platform level (every audit\'s outcome must be logged before the next audit fires)." The data flywheel becomes contractual, not aspirational. Without these, the design partnership is a paid pilot with no compounding value. WITH these, every signed partner accelerates the moat.',
     difficulty: 'advanced',
-    applicationContext: 'Closing a design-partner conversation — what are the asks you DON\'T compromise on?',
+    applicationContext:
+      "Closing a design-partner conversation — what are the asks you DON'T compromise on?",
     source: 'Founder School lesson es_11 + CLAUDE.md Outcome Gate',
     tag: 'strategic',
   },
@@ -1441,29 +1479,34 @@ const GRADING_DIMENSIONS_V2_CARDS: EducationCard[] = [
   {
     id: 'rubric_fomu_calibration',
     deckId: 'grading_dimensions',
-    prompt: 'In the Sales DQI rubric, what does "FOMU calibration" measure, and what is the academic anchor?',
+    prompt:
+      'In the Sales DQI rubric, what does "FOMU calibration" measure, and what is the academic anchor?',
     canonicalAnswer:
       "JOLT Effect (Matt Dixon) source. Weight: 0.06. FOMU = Fear of Messing Up (the buyer's fear of getting fired for picking the wrong tool — distinct from FOMO, which is fear of missing out on upside). Excellent (5/5): you DETECT the buyer agreeing with the pain ('I get it, biases cost us money') and PIVOT from selling pain to taking risk off the table BEFORE they ask. Pre-buttal pattern: 'I know putting an IC memo into a new AI feels like a massive compliance risk. I wouldn't either. That's why we built [risk-reducer].' Pairs with loss-aversion-framing — use loss aversion for the front half of the call to break status quo; FOMU calibration for the back half to close. Poor (1/5): buyer signals they're sold but you keep DIALING UP fear, driving them into analysis paralysis.",
     difficulty: 'advanced',
-    applicationContext: "Buyer says 'this could really help' — what's your move in the next 30 seconds?",
+    applicationContext:
+      "Buyer says 'this could really help' — what's your move in the next 30 seconds?",
     source: 'sparring-room-data.ts (added 2026-04-28 PM)',
     tag: 'jolt',
   },
   {
     id: 'rubric_damaging_admission',
     deckId: 'grading_dimensions',
-    prompt: 'In the Sales DQI rubric, what does "damaging admission" measure, and how does it differ from generic humility?',
+    prompt:
+      'In the Sales DQI rubric, what does "damaging admission" measure, and how does it differ from generic humility?',
     canonicalAnswer:
       "Cialdini Influence + Jason Cohen Naked Business source. Weight: 0.05. Excellent (5/5): you VOLUNTEER a specific weakness or limitation BEFORE the buyer probes for it — and the admission is HYPER-SPECIFIC, not vague humility. 'I'm 16, this is my first paid customer attempt, you'll be onboarded by me directly because there is no one else.' 'If you want an AI that makes the decision for you, this isn't it — ChatGPT guesses, we audit.' Triggers Cialdini's 'trustworthy authority' bias: the buyer realises only an honest expert would name the weakness this clearly. Every subsequent claim becomes more credible by contrast. Generic humility ('we're still learning', 'we have a lot to improve') does NOT trigger this — it reads as weakness. Specific damaging admission triggers authority. Poor (1/5): you camouflage limitations, hedge on age ('I have advisors'), or list 12 capabilities to compensate for the one you don't want named.",
     difficulty: 'advanced',
-    applicationContext: 'Buyer asks about your team size or compares you to McKinsey/Palantir — how do you respond?',
+    applicationContext:
+      'Buyer asks about your team size or compares you to McKinsey/Palantir — how do you respond?',
     source: 'sparring-room-data.ts (added 2026-04-28 PM)',
     tag: 'cialdini',
   },
   {
     id: 'rubric_mutual_disqualification',
     deckId: 'grading_dimensions',
-    prompt: 'In the Sales DQI rubric, what does "mutual disqualification" measure, and what failure mode does it prevent?',
+    prompt:
+      'In the Sales DQI rubric, what does "mutual disqualification" measure, and what failure mode does it prevent?',
     canonicalAnswer:
       "Sandler Selling System source. Weight: 0.05. Excellent (5/5): you EXPLICITLY OUTLINE the conditions under which this is a BAD fit and give the buyer permission to walk away. 'If your IC never gets blindsided post-close, and your team already has a mathematical system of record for why decisions were made, you absolutely do not need this tool.' Negative reverse breaks the comparison frame, signals genuine confidence, and forces the buyer to defend why they DO need it. The exact mechanical execution of 'pressure without pressure' — Maalouf names the principle, Sandler names the move. Prevents the 'unpaid dev shop' failure mode where you say 'yes, we can customise that' to every feature request and the buyer drags you through 12-month procurement cycles for free. Poor (1/5): you agree to everything the buyer floats; you chase the deal too hard; you validate every objection.",
     difficulty: 'advanced',
@@ -1474,11 +1517,13 @@ const GRADING_DIMENSIONS_V2_CARDS: EducationCard[] = [
   {
     id: 'rubric_prescriptive_recommendation',
     deckId: 'grading_dimensions',
-    prompt: 'In the Sales DQI rubric, what does "prescriptive recommendation" measure, and why is it the close move?',
+    prompt:
+      'In the Sales DQI rubric, what does "prescriptive recommendation" measure, and why is it the close move?',
     canonicalAnswer:
       "JOLT Effect + Y Combinator Enterprise Sales School source. Weight: 0.05. Excellent (5/5): once the diagnosis lands, you PRESCRIBE the EXACT next step. 'Other fractional CSOs like you don't start by auditing live client data — they run three dead deals from last year through the pipeline first. Let's set up a 15-minute onboarding next Tuesday for your first dead deal.' Buyer doesn't know how to buy DI; you command the path based on what peers did. Limits exploration, removes choice paralysis, gives a concrete time + concrete action. Pairs with empathic-mode-first — empathic for discovery in the first 15 min; prescriptive to close in the last 10 min. Poor (1/5): you end the call with 'what features are most important to you?' or 'how would you like to proceed?' or 'let me know if you have questions.' Forces the confused buyer to design their own implementation plan; they ghost within 72 hours because they don't know what 'yes' actually means operationally.",
     difficulty: 'advanced',
-    applicationContext: "Last 3 minutes of the call — buyer is interested. What do you say to convert?",
+    applicationContext:
+      'Last 3 minutes of the call — buyer is interested. What do you say to convert?',
     source: 'sparring-room-data.ts (added 2026-04-28 PM)',
     tag: 'jolt',
   },
@@ -1491,7 +1536,8 @@ const ADVANCED_SALES_MOVES_CARDS: EducationCard[] = [
   {
     id: 'move_pre_buttal',
     deckId: 'advanced_sales_moves',
-    prompt: "When and how do you fire the JOLT 'pre-buttal' move on a live call? Give the verbatim phrase.",
+    prompt:
+      "When and how do you fire the JOLT 'pre-buttal' move on a live call? Give the verbatim phrase.",
     canonicalAnswer:
       "Fire it in the FIRST 2 MINUTES, immediately after introductions, BEFORE the buyer asks about security / founder continuity / ChatGPT-wrapper. Verbatim: 'I know putting an IC memo into a new AI feels like a massive compliance risk. I wouldn't either. That's why your data never trains our models, the architecture is AES-256-GCM at rest, and you can hit our API archive endpoint to trigger a 7-day hard purge the moment an NDA expires. For the pilot, we start by retro-auditing three dead deals from last year so you take zero pipeline risk.' Mechanism: defuses silent FOMU by voicing the buyer's worst fear LOUDER than they would. Once you've named the risk and shown the architectural answer, their analysis-paralysis defence dissolves. Anti-pattern: waiting for them to ask 'what about data security?' — by then you're on the defensive.",
     difficulty: 'advanced',
@@ -1513,7 +1559,8 @@ const ADVANCED_SALES_MOVES_CARDS: EducationCard[] = [
   {
     id: 'move_arguing_against_self',
     deckId: 'advanced_sales_moves',
-    prompt: 'What is the Cialdini "arguing against your own interest" move and when does it land hardest?',
+    prompt:
+      'What is the Cialdini "arguing against your own interest" move and when does it land hardest?',
     canonicalAnswer:
       "Fire when the buyer probes the boundaries of the product, asks if it can replace their analysts, or expresses ChatGPT-wrapper suspicion. Verbatim: 'If you're looking for an AI that makes the strategic decision FOR you, this isn't it. ChatGPT gives you one generative guess, and Aera automates supply chains. We don't replace your expert intuition. We run a 12-node audit on your draft memo, catch the cognitive biases the room will grill you on, and output a Decision Provenance Record. We don't execute the decision; we make sure the human reasoning behind it is defensible.' Mechanism: volunteering a limitation triggers Cialdini's 'trustworthy authority' bias. The buyer realises only an honest expert would name the weakness this clearly. Every subsequent claim becomes more credible. Anti-pattern: listing 12 capabilities to compensate for the one you don't want named.",
     difficulty: 'advanced',
@@ -1535,7 +1582,8 @@ const ADVANCED_SALES_MOVES_CARDS: EducationCard[] = [
   {
     id: 'move_natural_scarcity',
     deckId: 'advanced_sales_moves',
-    prompt: 'How do you operationalise "natural scarcity" without sounding like a desperate startup?',
+    prompt:
+      'How do you operationalise "natural scarcity" without sounding like a desperate startup?',
     canonicalAnswer:
       "Frame the constraint as STRUCTURALLY TRUE (founder bandwidth + outcome calibration), not marketing scarcity. Verbatim: 'We're onboarding 4 more design partners this quarter. Because the outcome flywheel needs me to map your firm's specific decision pipeline to the 17-framework regulatory engine, I physically don't have capacity for a fifth. If we partner, the ask is that your team commits to 90-day outcome logging so the model recalibrates against your firm's specific failure patterns.' Mechanism: triggers loss-aversion (buyer who hesitates loses the seat) AND establishes the contractual ask early so it's not a surprise at procurement. Anti-pattern: fake scarcity ('limited-time offer', 'only this month') — sophisticated buyers detect this in 5 seconds.",
     difficulty: 'advanced',
@@ -1563,7 +1611,8 @@ const ADVANCED_SALES_MOVES_CARDS: EducationCard[] = [
     canonicalAnswer:
       "Verbatim: 'Yes, it's just me. If you hire McKinsey they'll charge you £1M to tell you about cognitive bias, but they suffer from the exact same biases themselves, and they'll put a 24-year-old associate on your account who runs every recommendation through three layers of management. I wrote every line of the Decision Intel pipeline myself. When you need ISA 2007 mapped into the compliance engine, I don't need board approval — I'll code it and ship it overnight.' Mechanism: frames being a solo teenage founder NOT as a liability to excuse, but as a ruthless competitive advantage massive incumbents structurally cannot match. The age becomes the proof of the speed claim. Anti-pattern: 'yeah I know it's just me but…' — the qualifier already lost the conversation.",
     difficulty: 'advanced',
-    applicationContext: "Buyer asks 'how big is your team?' or compares you to McKinsey QuantumBlack.",
+    applicationContext:
+      "Buyer asks 'how big is your team?' or compares you to McKinsey QuantumBlack.",
     source: 'sales-toolkit.ts AGE_ASYMMETRY_TACTICS · cohen_naked_business',
     tag: 'cohen',
   },
@@ -1581,7 +1630,7 @@ const ADVANCED_SALES_MOVES_CARDS: EducationCard[] = [
   {
     id: 'move_perceptual_contrast',
     deckId: 'advanced_sales_moves',
-    prompt: 'How do you use Cialdini\'s perceptual contrast to defend the price?',
+    prompt: "How do you use Cialdini's perceptual contrast to defend the price?",
     canonicalAnswer:
       "Verbatim: 'You can absolutely decline because of my age. But that means walking into your next IC meeting with a £50M allocation on the line, relying on the hope that nobody in the room is suffering from confirmation bias. Or, for £499 per deal, I mathematically eliminate that risk before the memo ever leaves your desk.' Mechanism: forces the buyer to contrast the massive career-ending financial risk against a hyper-specific, quantifiable fee. Both your age AND the price appear as microscopic rounding errors against the deal-size loss anchor. Anti-pattern: discounting on price when the buyer pushes back — the discount IS the signal that the price was made up.",
     difficulty: 'advanced',
@@ -1592,11 +1641,13 @@ const ADVANCED_SALES_MOVES_CARDS: EducationCard[] = [
   {
     id: 'move_competence_specificity',
     deckId: 'advanced_sales_moves',
-    prompt: 'How does "competence-signalling via extreme specificity" beat the ChatGPT-wrapper question?',
+    prompt:
+      'How does "competence-signalling via extreme specificity" beat the ChatGPT-wrapper question?',
     canonicalAnswer:
       "Verbatim: 'I didn't build a ChatGPT wrapper. ChatGPT gives you one generative guess. I operationalised the 2009 Kahneman-Klein synthesis into a deterministic 12-node pipeline. The engine runs your memo through a 20×20 toxic-combination matrix and maps every flag to EU AI Act Article 14 record-keeping requirements. I built this because I published a paper on the neuro-cognitive roots of the 2008 financial crisis, and I realised the Fortune 500 still has no software to stop those exact same bias cascades from happening today.' Mechanism: true experts don't use buzzwords; they signal elite status by describing the architecture of a problem with such terrifying granular precision that the older buyer instantly realises the teenager has done the deep academic work they haven't. Anti-pattern: vague generic claims ('AI-powered', 'next-generation governance') — specificity is the only credibility-builder against age skepticism.",
     difficulty: 'advanced',
-    applicationContext: "Buyer asks 'why did you build this?' or hints at ChatGPT-wrapper suspicion.",
+    applicationContext:
+      "Buyer asks 'why did you build this?' or hints at ChatGPT-wrapper suspicion.",
     source: 'sales-toolkit.ts AGE_ASYMMETRY_TACTICS · klein_competence_specificity',
     tag: 'klein',
   },
@@ -1607,7 +1658,7 @@ const ADVANCED_SALES_MOVES_CARDS: EducationCard[] = [
     canonicalAnswer:
       "Verbatim: 'If your team already has a mathematically auditable system of record for tracking why strategic decisions were made, this is useless to you. I didn't build an automated analyst. I built a 12-node ensemble audit to catch the exact cognitive biases your humans miss — so you don't get ambushed by the board.' Mechanism: explicitly stating what your product CANNOT do, while limiting your scope, proves you're a calibrated expert rather than a desperate junior trying to score a logo. The age vanishes once authority is established. Anti-pattern: being a 'bobblehead' that says yes to everything — each yes destroys authority by ~10%.",
     difficulty: 'advanced',
-    applicationContext: "CSO asks if you can replace their analyst team or automate strategy.",
+    applicationContext: 'CSO asks if you can replace their analyst team or automate strategy.',
     source: 'sales-toolkit.ts AGE_ASYMMETRY_TACTICS · arguing_against_own_interest_age',
     tag: 'cialdini',
   },
@@ -1638,7 +1689,7 @@ const ADVANCED_SALES_MOVES_CARDS: EducationCard[] = [
   {
     id: 'move_voss_mirroring',
     deckId: 'advanced_sales_moves',
-    prompt: 'What is Voss\'s mirroring tactic — give a Decision Intel example?',
+    prompt: "What is Voss's mirroring tactic — give a Decision Intel example?",
     canonicalAnswer:
       "Repeat the buyer's last 1-3 words as an upward-inflection question. Example: Buyer: 'We already have something like this.' You: 'Something like this?' Mechanism: prompts them to elaborate. They reveal the real objection (or reveal that 'something like this' was a deflection) without you having to challenge them. Anti-pattern: arguing back ('actually no, our 12-node R²F pipeline is unique because...'). The buyer hears defensiveness and digs in. The mirror invites them to defend their own claim.",
     difficulty: 'advanced',
@@ -1680,7 +1731,8 @@ const BRINKMANSHIP_CARDS: EducationCard[] = [
     canonicalAnswer:
       "Source: Schelling 'The Strategy of Conflict'. Fire when pitching boutique sell-side M&A advisors (Potomac archetype). Verbatim: 'Bring a redacted CIM from a deal you lost last year. I'll run the audit live in 7 minutes. If it doesn't flag the exact blind spots that cost you the deal, this isn't for you — and we don't waste each other's time pretending it might be.' Mechanism: pure brinkmanship — you deliberately put the entire relationship on a 7-minute window. The buyer faces a mutually-bad outcome (no deal, wasted intro) unless they engage with the evidence. Authority transmits through the fact that you're willing to lose them on a single test. Anti-pattern: hedging the ultimatum ('we could try a small audit, see how it feels') — kills the brinkmanship effect.",
     difficulty: 'advanced',
-    applicationContext: 'Cold meeting with a Potomac-class M&A advisor — how do you compress the eval cycle?',
+    applicationContext:
+      'Cold meeting with a Potomac-class M&A advisor — how do you compress the eval cycle?',
     source: 'sales-toolkit.ts BRINKMANSHIP_MOVES · brinkmanship_evidence_ultimatum',
     tag: 'brinkmanship',
   },
@@ -1698,11 +1750,12 @@ const BRINKMANSHIP_CARDS: EducationCard[] = [
   {
     id: 'brink_no_custom_features',
     deckId: 'advanced_sales_moves',
-    prompt: "Why does brinkmanship require killing lucrative deals that ask for custom features?",
+    prompt: 'Why does brinkmanship require killing lucrative deals that ask for custom features?',
     canonicalAnswer:
       "Source: Schelling commitment principle. Verbatim: 'I'm going to say no to that, even though I know the deal is meaningful. Building bespoke software for one client is a terrible business model — it makes you slower, makes the product weaker for everyone else, and creates a permanent maintenance liability. We sell what's in the published pipeline. If your specific need isn't there, this isn't the right vendor for you yet.' Mechanism: brinkmanship through credible commitment — the buyer cannot extract custom work from you regardless of deal size. By being willing to kill a lucrative deal rather than become an unpaid dev shop, you establish an unmoveable boundary. Anti-pattern: 'we could maybe explore that for the right scope' — once the door is open, the buyer drags you through 6 months of free scoping calls.",
     difficulty: 'advanced',
-    applicationContext: "Margaret-class CSO offers a £200K deal IF you build a custom Snowflake integration.",
+    applicationContext:
+      'Margaret-class CSO offers a £200K deal IF you build a custom Snowflake integration.',
     source: 'sales-toolkit.ts BRINKMANSHIP_MOVES · brinkmanship_no_custom_features',
     tag: 'brinkmanship',
   },
@@ -1725,29 +1778,34 @@ const STRATEGIC_THINKING_CARDS: EducationCard[] = [
   {
     id: 'strat_look_forward_reason_backward',
     deckId: 'strategic_thinking',
-    prompt: '"Look forward and reason backward" — how does this principle govern Decision Intel\'s 30-day pivot?',
+    prompt:
+      '"Look forward and reason backward" — how does this principle govern Decision Intel\'s 30-day pivot?',
     canonicalAnswer:
       "Source: Dixit & Nalebuff 'Thinking Strategically'. The primary rule of strategic thinking: look forward to where any early decisions will lead, and use that to reason backward to determine your best present choice. Application: the revenue ceiling is F500 CSOs (12-month procurement + SOC 2 Type II + outcome flywheel). Reasoning backward from that endpoint, the present move is the wedge — mid-market PE/VC associates and boutique M&A advisors who can swipe a corporate card today for £149/mo or £499/deal. The wedge is not a settling — it IS the path to the ceiling. When it bites: whenever you're tempted to chase an F500 logo because the meeting feels prestigious. Reason forward (cycle time, custom-feature pressure) before chasing.",
     difficulty: 'advanced',
-    applicationContext: 'You get a warm intro to a Fortune 100 CSO right now — do you take the meeting?',
+    applicationContext:
+      'You get a warm intro to a Fortune 100 CSO right now — do you take the meeting?',
     source: 'sales-toolkit.ts STRATEGIC_THINKING_PRINCIPLES · look_forward_reason_backward',
     tag: 'dixit_nalebuff',
   },
   {
     id: 'strat_limit_options',
     deckId: 'strategic_thinking',
-    prompt: 'Why does "limiting your options" make Decision Intel more credible to enterprise buyers?',
+    prompt:
+      'Why does "limiting your options" make Decision Intel more credible to enterprise buyers?',
     canonicalAnswer:
       "Source: Schelling, Dixit & Nalebuff. A strategic move alters the beliefs and actions of the other party — its distinguishing feature is that you PURPOSEFULLY limit your options. The constraint IS the move. Application: hiding 80% of the 'Cathedral of Code' (RSS feeds, copilot, team benchmarking) and enforcing a strict no-custom-features rule is a deliberate option-limit. It alters buyer perception: it proves Decision Intel is a productized academic synthesis (the 12-node bias auditor as a finished thing), not a flexible dev shop. Credibility comes from what you refuse to do. When it bites: every time a sales conversation pulls you toward 'we could also build...' — the right move is the opposite, trim what's visible, sharpen the boundary.",
     difficulty: 'advanced',
-    applicationContext: "Buyer asks if you can 'just add a Salesforce integration' — how does limiting your options actually win the deal?",
+    applicationContext:
+      "Buyer asks if you can 'just add a Salesforce integration' — how does limiting your options actually win the deal?",
     source: 'sales-toolkit.ts STRATEGIC_THINKING_PRINCIPLES · strategic_moves_limit_options',
     tag: 'dixit_nalebuff',
   },
   {
     id: 'strat_credible_commitments',
     deckId: 'strategic_thinking',
-    prompt: 'What is a "credible commitment" in the Schelling sense, and what makes Decision Intel\'s data-purge pledge credible?',
+    prompt:
+      'What is a "credible commitment" in the Schelling sense, and what makes Decision Intel\'s data-purge pledge credible?',
     canonicalAnswer:
       "Source: Schelling. If you want to influence a buyer, your promises must carry CREDIBILITY in a strategic sense — backed by something the buyer cannot doubt. Application: as a 16-year-old solo founder, enterprise buyers will inherently doubt your operational maturity. You cannot just promise data is safe. You make a credible commitment by pointing to hardcoded infrastructure: the POST /api/deals/[id]/archive endpoint that triggers a 7-day hard purge upon NDA expiry, AES-256-GCM encryption at rest, the documented Vendor Continuity Plan, the published SLA tiers in the public Enterprise quote PDF. The architecture IS the commitment device — you can't abandon it without abandoning the product. When it bites: every procurement-stage call with a James-class GC or Margaret-class CSO. Credibility is asserted not through founder credentials but through architecture you cannot walk back.",
     difficulty: 'advanced',
@@ -1762,7 +1820,8 @@ const STRATEGIC_THINKING_CARDS: EducationCard[] = [
     canonicalAnswer:
       "Source: Dixit & Nalebuff. In some situations, the key time for strategic maneuvering is while the GROUND RULES are being decided — not while playing the game. Application: the enterprise AI governance and decision-intelligence categories are crystallising right now (2026). By positioning Decision Intel explicitly as the 'native reasoning layer' — differentiating from Aera (operational automation) and Cloverpop (decision logging) — you establish the ground rules of the category in your favour BEFORE competitors define them for you. The R²F (Recognition-Rigor Framework) IP claim is the same move applied to the academic anchor: you claim the Kahneman+Klein synthesis territory before someone else does. When it bites: right now. The window closes when one of Cloverpop / IBM watsonx / Aera defines the category. Every published-for-procurement piece of work (DPR, Bias Genome, /how-it-works) is a ground-rule-setting move.",
     difficulty: 'advanced',
-    applicationContext: 'You see a competitor pitch "decision intelligence platform" on LinkedIn — what is the right competitive move?',
+    applicationContext:
+      'You see a competitor pitch "decision intelligence platform" on LinkedIn — what is the right competitive move?',
     source: 'sales-toolkit.ts STRATEGIC_THINKING_PRINCIPLES · set_ground_rules_category',
     tag: 'dixit_nalebuff',
   },
@@ -1773,7 +1832,8 @@ const STRATEGIC_THINKING_CARDS: EducationCard[] = [
     canonicalAnswer:
       "Source: Dixit & Nalebuff. Strategy is not just about outsmarting rivals — it is also about forging strong bonds of cooperation and coordination when it serves your own interests. Application: refuse to compete head-to-head with the $300B consulting industry. Position Decision Intel as a COMPLEMENTARY asset to McKinsey QuantumBlack or LRQA's EiQ — the continuous, EU AI Act Article 14-compliant audit layer that embeds INTO their multi-million-dollar strategy engagements. Same principle for the LRQA / Ian Spaulding warm intro: that's not a sale, it's a COORDINATION BID. Turn potential competitors into massive distribution channels by making yourself the layer they want to integrate. When it bites: whenever you see a strategic vendor that looks like a competitor (LRQA EiQ, McKinsey QuantumBlack, IBM watsonx.governance bundle). Ask: do we beat them, or slot in beside them? The slot-in answer compounds; the beat-them answer requires capital we don't have.",
     difficulty: 'advanced',
-    applicationContext: "LRQA acquired Partner Africa in April 2026 + has €500M for partnerships. Beat them or slot in?",
+    applicationContext:
+      'LRQA acquired Partner Africa in April 2026 + has €500M for partnerships. Beat them or slot in?',
     source: 'sales-toolkit.ts STRATEGIC_THINKING_PRINCIPLES · cooperation_coordination',
     tag: 'dixit_nalebuff',
   },
@@ -1845,10 +1905,7 @@ export function applySm2(prev: SM2CardState | null, quality: number, cardId: str
     else intervalDays = Math.round(prior.intervalDays * easeFactor);
   }
 
-  easeFactor = Math.max(
-    1.3,
-    easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02))
-  );
+  easeFactor = Math.max(1.3, easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)));
 
   const nextDue = new Date(now.getTime() + intervalDays * 24 * 60 * 60 * 1000).toISOString();
 
@@ -1871,5 +1928,3 @@ export function gradeFromRecallScore(score: number): 'A' | 'B' | 'C' | 'D' | 'F'
   if (score >= 40) return 'D';
   return 'F';
 }
-
-

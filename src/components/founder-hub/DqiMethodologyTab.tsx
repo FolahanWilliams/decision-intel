@@ -17,7 +17,12 @@ import {
   computeSyntheticDQI,
   computeHistoricalPercentile,
 } from '@/lib/scoring/dqi';
-import { ALL_CASES, isFailureOutcome, isSuccessOutcome } from '@/lib/data/case-studies';
+import {
+  ALL_CASES,
+  HISTORICAL_CASE_COUNT,
+  isFailureOutcome,
+  isSuccessOutcome,
+} from '@/lib/data/case-studies';
 import {
   card,
   sectionTitle,
@@ -246,7 +251,7 @@ export function DqiMethodologyTab() {
             marginBottom: 16,
           }}
         >
-          <div style={badge('#16A34A')}>135 Case Studies</div>
+          <div style={badge('#16A34A')}>{HISTORICAL_CASE_COUNT} Case Studies</div>
           <span style={{ color: 'var(--text-muted, #71717a)', fontSize: 18 }}>→</span>
           <div
             style={{
@@ -288,8 +293,8 @@ export function DqiMethodologyTab() {
           }}
         >
           <p style={{ margin: 0 }}>
-            When your document is analyzed, the detected biases are compared against our database of
-            135 real-world failure and success case studies.
+            When your document is analyzed, the detected biases are compared against our database of{' '}
+            {HISTORICAL_CASE_COUNT} real-world failure and success case studies.
           </p>
           <p style={{ margin: 0 }}>
             If your bias pattern matches known failure patterns (like overconfidence + anchoring in
