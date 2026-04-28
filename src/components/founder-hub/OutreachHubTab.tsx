@@ -89,6 +89,7 @@ export function OutreachHubTab({ founderPass, initialSection }: Props) {
     if (typeof window === 'undefined') return;
     try {
       const saved = window.localStorage.getItem(STORAGE_KEY);
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage hydration on mount; lazy useState init would mismatch SSR/client first render
       if (isSection(saved)) setSection(saved);
     } catch {
       // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.

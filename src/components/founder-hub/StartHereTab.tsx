@@ -115,7 +115,6 @@ export function StartHereTab({ onNavigateToTab }: Props) {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage hydration on mount
     setVisited(loadVisited());
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage hydration on mount
     setActiveJourney(loadJourney());
     setHydrated(true);
   }, []);
