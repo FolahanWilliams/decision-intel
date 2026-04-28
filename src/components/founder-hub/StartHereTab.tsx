@@ -1,7 +1,29 @@
 'use client';
 
+/**
+ * StartHereTab — dynamic Founder Hub landing page (rebuilt 2026-04-28).
+ *
+ * Replaces the prior 4-session 2-day study plan with an interactive
+ * map of every tab + 5 journey overlays so the founder picks the
+ * sequence that matches what they're actually doing right now (pitch
+ * prep, market research, outreach execution, post-close reflection,
+ * product deep-dive).
+ *
+ * Persistence: re-uses `di-study-plan-progress-v1` so any progress the
+ * founder accumulated under the old 2-day plan carries over as
+ * "visited" markers on the map. The active journey is persisted under
+ * `di-start-here-journey` so coming back to the tab restores context.
+ *
+ * The Current Positioning Anchor card stays on top — it's the
+ * canonical reference for the locked vocabulary (icp.ts constants
+ * locked in C1 the same week) and the 17-framework count derives from
+ * the canonical compliance registry per the count-derivation
+ * discipline.
+ */
+
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+import { CheckCircle2, Sparkles, Compass, ArrowRight } from 'lucide-react';
 import {
   POSITIONING_HERO_PRIMARY,
   POSITIONING_HERO_SECONDARY,
@@ -13,1092 +35,437 @@ import {
   BANNED_VOCABULARY,
   COLD_CONTEXT_ONRAMPS,
 } from '@/lib/constants/icp';
+import { FounderHubMap } from './start-here/FounderHubMap';
+import { JourneySelector } from './start-here/JourneySelector';
+import { JourneyDetailStrip } from './start-here/JourneyDetailStrip';
 import {
-  CheckCircle2,
-  Circle,
-  Clock,
-  ArrowRight,
-  RefreshCw,
-  BookOpen,
-  Target,
-  Radar,
-  MessageSquare,
-  Shield,
-  Zap,
-  Crosshair,
-  Brain,
-  Plug,
-  Library,
-  Lightbulb,
-  GraduationCap,
-  Map,
-  Rocket,
-  Sparkles,
-  Compass,
-} from 'lucide-react';
+  JOURNEYS,
+  NODES,
+  type Journey,
+  type TabId,
+} from './start-here/founder-hub-map-data';
 
-// ─── Study-plan data ─────────────────────────────────────────────
-// A 2-day walkthrough of every Founder Hub tab organised into 4 sessions.
-// Designed so you finish Day 2 with the entire hub in your head and
-// outreach as the only remaining to-do.
+// Persistence keys — visited reuses the prior 2-day-plan key so progress
+// carries; journey is new for the rebuild.
+const VISITED_KEY = 'di-study-plan-progress-v1';
+const JOURNEY_KEY = 'di-start-here-journey';
 
-interface TabLink {
-  tabId: string;
-  label: string;
-  icon: React.ReactNode;
-  minutes: number;
-  why: string;
+interface VisitedShape {
+  completedTabs?: string[];
 }
 
-interface StudySession {
-  num: 1 | 2 | 3 | 4;
-  title: string;
-  slot: string;
-  color: string;
-  bg: string;
-  goal: string;
-  tabs: TabLink[];
-}
-
-const SESSIONS: StudySession[] = [
-  {
-    num: 1,
-    title: 'Foundation — what you actually built',
-    slot: 'Day 1 · Morning',
-    color: '#16A34A',
-    bg: 'rgba(22, 163, 74, 0.14)',
-    goal: 'You can explain the 12-node pipeline, why DQI exists, and the 260-year intellectual genealogy in under 2 minutes, without notes.',
-    tabs: [
-      {
-        tabId: 'overview',
-        label: 'Product Overview',
-        icon: <Rocket size={14} />,
-        minutes: 15,
-        why: 'The product vision — Decision Knowledge Graph as foundation, four moments, locked vocabulary. Start here.',
-      },
-      {
-        tabId: 'product_deep',
-        label: 'Pipeline & Scoring',
-        icon: <Brain size={14} />,
-        minutes: 30,
-        why: '12-node LangGraph pipeline, scoring engine with toxic combinations, and DQI methodology. The technical core.',
-      },
-      {
-        tabId: 'research',
-        label: 'Research & Foundations',
-        icon: <BookOpen size={14} />,
-        minutes: 45,
-        why: 'Every thinker and paper that shaped the product. Start with the Noise moment — that 55% stat is your Monday sales line.',
-      },
-    ],
-  },
-  {
-    num: 2,
-    title: 'Position — how you differ from incumbents',
-    slot: 'Day 1 · Afternoon',
-    color: '#0EA5E9',
-    bg: 'rgba(14, 165, 233, 0.14)',
-    goal: 'You know where each of the 5 DI incumbents sits, the 3 gaps you close with shipped evidence, and the moat narrative cold.',
-    tabs: [
-      {
-        tabId: 'category_position',
-        label: 'Category Position',
-        icon: <Radar size={14} />,
-        minutes: 20,
-        why: 'DI landscape map. Three gaps (causal / outcome loop / governance) anchored to actual shipped files.',
-      },
-      {
-        tabId: 'positioning',
-        label: 'Competitive Positioning',
-        icon: <Shield size={14} />,
-        minutes: 25,
-        why: 'Cloverpop comparison, 5 moat layers, capability matrix, 8 investor Q&As, and the common objection rebuttals.',
-      },
-      {
-        tabId: 'positioning_copilot',
-        label: 'Positioning Copilot',
-        icon: <Compass size={14} />,
-        minutes: 45,
-        why: 'Sharp\u2019s brand spine, market thesis, strategic compass, pitch deck, plus 7 bonus positioning frameworks.',
-      },
-      {
-        tabId: 'sales',
-        label: 'Sales Toolkit',
-        icon: <MessageSquare size={14} />,
-        minutes: 30,
-        why: 'Challenger Sale, SPIN, MEDDPICC, demo flow, and audience-specific pitches. Tactical sales layer.',
-      },
-    ],
-  },
-  {
-    num: 3,
-    title: 'Execution — this week\u2019s outreach motion',
-    slot: 'Day 2 · Morning',
-    color: '#F59E0B',
-    bg: 'rgba(245, 158, 11, 0.14)',
-    goal: 'You have 5\u201310 Monday-morning outreach drafts queued and you know exactly which pattern to listen for on the first discovery call.',
-    tabs: [
-      {
-        tabId: 'outreach_cmd',
-        label: 'Outreach Strategy',
-        icon: <Zap size={14} />,
-        minutes: 40,
-        why: 'This-week priority, buyer personas, industry atlas, channel matrix, contact pipeline, discovery call companion, pattern dashboard, templates, POC kit, deal-closer docs. The strategic layer — who, why, through which channels.',
-      },
-      {
-        tabId: 'outreach',
-        label: 'Message Generator',
-        icon: <Crosshair size={14} />,
-        minutes: 20,
-        why: 'Paste a LinkedIn URL, generate a tailored message, save the prospect to the pipeline. The tactical layer — paired with Outreach Strategy, not a duplicate of it.',
-      },
-      {
-        tabId: 'content',
-        label: 'Content Studio',
-        icon: <Zap size={14} />,
-        minutes: 15,
-        why: 'LinkedIn post generator, case study analyzer, voice config. The content flywheel.',
-      },
-    ],
-  },
-  {
-    num: 4,
-    title: 'Intelligence & personal — the flywheel + your path',
-    slot: 'Day 2 · Afternoon',
-    color: '#8B5CF6',
-    bg: 'rgba(139, 92, 246, 0.14)',
-    goal: 'You understand the outcome flywheel, know which of the 135 cases to cite in pitches, and you\u2019ve committed to bootstrap vs. VC with explicit gates.',
-    tabs: [
-      {
-        tabId: 'case_library',
-        label: 'Case Library',
-        icon: <Library size={14} />,
-        minutes: 20,
-        why: '135 historical decisions, bias interaction matrix, Decision Alpha leaderboard. Pick 3 to cite.',
-      },
-      {
-        tabId: 'data_ecosystem',
-        label: 'Data Ecosystem',
-        icon: <Plug size={14} />,
-        minutes: 15,
-        why: 'Integrations (Slack, Drive, email, webhooks) + live stats. The flywheel inputs and outputs.',
-      },
-      {
-        tabId: 'forecast',
-        label: '12-Month Forecast',
-        icon: <Map size={14} />,
-        minutes: 20,
-        why: 'Bootstrap vs. VC lanes, 4 quarters, milestone drill-down. Pick a lane.',
-      },
-      {
-        tabId: 'founder_tips',
-        label: 'Founder Tips',
-        icon: <Lightbulb size={14} />,
-        minutes: 10,
-        why: 'Playbook notes, session learnings, honest self-reflection.',
-      },
-      {
-        tabId: 'founder_school',
-        label: 'Founder School',
-        icon: <GraduationCap size={14} />,
-        minutes: 25,
-        why: '58 lessons across 8 tracks. Sample one or two that match your current bottleneck.',
-      },
-    ],
-  },
-];
-
-const STORAGE_KEY = 'di-study-plan-progress-v1';
-
-interface Progress {
-  completedTabs: string[];
-}
-
-function loadProgress(): Progress {
-  if (typeof window === 'undefined') return { completedTabs: [] };
+function loadVisited(): Set<TabId> {
+  if (typeof window === 'undefined') return new Set();
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { completedTabs: [] };
-    const parsed = JSON.parse(raw) as { completedTabs?: string[] };
-    return { completedTabs: Array.isArray(parsed.completedTabs) ? parsed.completedTabs : [] };
+    const raw = localStorage.getItem(VISITED_KEY);
+    if (!raw) return new Set();
+    const parsed = JSON.parse(raw) as VisitedShape;
+    const arr = Array.isArray(parsed.completedTabs) ? parsed.completedTabs : [];
+    return new Set(arr.filter(t => NODES.some(n => n.id === t)) as TabId[]);
   } catch {
     // localStorage / JSON.parse may throw — silent fallback per CLAUDE.md fire-and-forget exceptions.
-    return { completedTabs: [] };
+    return new Set();
   }
 }
 
-function saveProgress(p: Progress) {
+function saveVisited(set: Set<TabId>) {
   if (typeof window === 'undefined') return;
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(p));
+    localStorage.setItem(
+      VISITED_KEY,
+      JSON.stringify({ completedTabs: Array.from(set) } satisfies VisitedShape)
+    );
   } catch {
-    /* quota/private mode — silent */
+    // localStorage may throw on quota / private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
   }
 }
 
-// ─── Flow SVG layout ────────────────────────────────────────────────
-const FLOW_W = 1000;
-const FLOW_H = 220;
-const NODE_POSITIONS: Array<{ x: number; y: number }> = [
-  { x: 120, y: 140 },
-  { x: 380, y: 70 },
-  { x: 620, y: 140 },
-  { x: 880, y: 70 },
-];
-const NODE_R = 38;
+function loadJourney(): Journey | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(JOURNEY_KEY);
+    if (!raw) return null;
+    return JOURNEYS.find(j => j.id === raw) ?? null;
+  } catch {
+    // localStorage may throw — silent fallback per CLAUDE.md fire-and-forget exceptions.
+    return null;
+  }
+}
+
+function saveJourney(journey: Journey | null) {
+  if (typeof window === 'undefined') return;
+  try {
+    if (journey) localStorage.setItem(JOURNEY_KEY, journey.id);
+    else localStorage.removeItem(JOURNEY_KEY);
+  } catch {
+    // localStorage may throw — silent fallback per CLAUDE.md fire-and-forget exceptions.
+  }
+}
 
 interface Props {
   onNavigateToTab: (tabId: string) => void;
 }
 
 export function StartHereTab({ onNavigateToTab }: Props) {
-  const [completedTabs, setCompletedTabs] = useState<Set<string>>(new Set());
+  const [visited, setVisited] = useState<Set<TabId>>(new Set());
+  const [activeJourney, setActiveJourney] = useState<Journey | null>(null);
   const [hydrated, setHydrated] = useState(false);
 
+  // Hydrate persistence once after mount.
   useEffect(() => {
-    const p = loadProgress();
     // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage hydration on mount
-    setCompletedTabs(new Set(p.completedTabs));
+    setVisited(loadVisited());
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage hydration on mount
+    setActiveJourney(loadJourney());
     setHydrated(true);
   }, []);
 
-  const toggleTab = useCallback((tabId: string) => {
-    setCompletedTabs(prev => {
+  const handleNavigate = useCallback(
+    (tabId: TabId) => {
+      // Visiting a tab marks it visited automatically (the same posture the
+      // 2-day plan had — clicking through the tab counted as "done").
+      setVisited(prev => {
+        if (prev.has(tabId)) return prev;
+        const next = new Set(prev);
+        next.add(tabId);
+        saveVisited(next);
+        return next;
+      });
+      onNavigateToTab(tabId);
+    },
+    [onNavigateToTab]
+  );
+
+  const handleToggleVisited = useCallback((tabId: TabId) => {
+    setVisited(prev => {
       const next = new Set(prev);
       if (next.has(tabId)) next.delete(tabId);
       else next.add(tabId);
-      saveProgress({ completedTabs: Array.from(next) });
+      saveVisited(next);
       return next;
     });
   }, []);
 
-  const reset = useCallback(() => {
-    setCompletedTabs(new Set());
-    saveProgress({ completedTabs: [] });
+  const handleSelectJourney = useCallback((journey: Journey | null) => {
+    setActiveJourney(journey);
+    saveJourney(journey);
   }, []);
 
-  const totals = useMemo(() => {
-    const totalTabs = SESSIONS.reduce((a, s) => a + s.tabs.length, 0);
-    const totalDone = SESSIONS.reduce(
-      (a, s) => a + s.tabs.filter(t => completedTabs.has(t.tabId)).length,
-      0
-    );
-    const totalMinutes = SESSIONS.reduce(
-      (a, s) => a + s.tabs.reduce((b, t) => b + t.minutes, 0),
-      0
-    );
-    const doneMinutes = SESSIONS.reduce(
-      (a, s) =>
-        a + s.tabs.filter(t => completedTabs.has(t.tabId)).reduce((b, t) => b + t.minutes, 0),
-      0
-    );
-    return { totalTabs, totalDone, totalMinutes, doneMinutes };
-  }, [completedTabs]);
+  const handleResetVisited = useCallback(() => {
+    setVisited(new Set());
+    saveVisited(new Set());
+  }, []);
 
-  const overallPct = totals.totalTabs === 0 ? 0 : totals.totalDone / totals.totalTabs;
-
-  function sessionProgress(s: StudySession): number {
-    if (s.tabs.length === 0) return 0;
-    return s.tabs.filter(t => completedTabs.has(t.tabId)).length / s.tabs.length;
-  }
-
-  function scrollToSession(num: number) {
-    if (typeof document === 'undefined') return;
-    const el = document.getElementById(`study-session-${num}`);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
+  // Adaptive quick-jump cards — surface unvisited tabs the founder
+  // might want to start with. Uses the active journey's path when
+  // available, else falls back to the highest-payoff unvisited nodes
+  // from the Start + Go-to-Market clusters.
+  const quickJumps = useMemo(() => {
+    if (!hydrated) return [];
+    const candidates: TabId[] = activeJourney
+      ? activeJourney.path
+      : [
+          'unicorn_roadmap',
+          'path_to_100m',
+          'overview',
+          'category_position',
+          'positioning',
+          'outreach_hub',
+        ];
+    const unvisited = candidates.filter(id => !visited.has(id));
+    return unvisited.slice(0, 4).map(id => NODES.find(n => n.id === id)).filter(Boolean) as Array<
+      (typeof NODES)[number]
+    >;
+  }, [activeJourney, visited, hydrated]);
 
   return (
     <div>
-      {renderHero(totals, overallPct, reset)}
-      {renderFlow(sessionProgress, scrollToSession)}
-      {SESSIONS.map(s => (
-        <SessionCard
-          key={s.num}
-          session={s}
-          completedTabs={completedTabs}
-          onToggleTab={toggleTab}
-          onNavigateToTab={onNavigateToTab}
-          hydrated={hydrated}
+      {renderHero()}
+      {renderPositioningAnchor()}
+
+      <JourneySelector active={activeJourney} onSelect={handleSelectJourney} />
+
+      <FounderHubMap
+        activeJourney={activeJourney}
+        visited={visited}
+        onNavigate={handleNavigate}
+        onToggleVisited={handleToggleVisited}
+      />
+
+      {activeJourney && (
+        <JourneyDetailStrip
+          journey={activeJourney}
+          visited={visited}
+          onNavigate={handleNavigate}
         />
-      ))}
-      {renderNextAction(overallPct)}
-    </div>
-  );
-}
+      )}
 
-// ─── Hero with progress ring ─────────────────────────────────────
-
-function renderHero(
-  totals: { totalTabs: number; totalDone: number; totalMinutes: number; doneMinutes: number },
-  overallPct: number,
-  reset: () => void
-) {
-  return (
-    <div
-      style={{
-        padding: 18,
-        background: 'linear-gradient(135deg, rgba(22,163,74,0.09), rgba(139,92,246,0.08))',
-        border: '1px solid var(--border-color)',
-        borderRadius: 'var(--radius-lg)',
-        marginBottom: 14,
-      }}
-    >
-      <div
-        style={{
-          fontSize: 10,
-          fontWeight: 800,
-          textTransform: 'uppercase',
-          letterSpacing: '0.08em',
-          color: '#16A34A',
-          marginBottom: 6,
-        }}
-      >
-        Start Here
-      </div>
-      <h2
-        style={{
-          fontSize: 20,
-          fontWeight: 800,
-          color: 'var(--text-primary)',
-          margin: 0,
-          lineHeight: 1.2,
-        }}
-      >
-        Your Founder Hub, in 2 days.
-      </h2>
-      <p
-        style={{
-          fontSize: 13,
-          color: 'var(--text-secondary)',
-          marginTop: 8,
-          marginBottom: 12,
-          lineHeight: 1.55,
-          maxWidth: 760,
-        }}
-      >
-        Four focused sessions, 15 tabs, ~{Math.round((totals.totalMinutes / 60) * 10) / 10} hours.
-        Designed so you finish Day 2 with everything in your head and nothing on the to-do list
-        except outreach. Tick tabs as you read them — progress saves automatically.
-      </p>
-
-      {/* Current positioning anchor — at-a-glance reference for the
-          locked vocabulary so the founder doesn't have to re-derive it
-          from CLAUDE.md every session. Updated 2026-04-26 to reflect
-          the high-stakes-call + Pan-African + 17-framework lock. */}
-      <div
-        style={{
-          marginBottom: 12,
-          padding: 12,
-          background: 'var(--bg-card)',
-          border: '1px solid var(--border-color)',
-          borderLeft: '3px solid #16A34A',
-          borderRadius: 'var(--radius-md)',
-          fontSize: 12,
-          lineHeight: 1.55,
-          color: 'var(--text-primary)',
-        }}
-      >
-        <div
-          style={{
-            fontSize: 9,
-            fontWeight: 800,
-            textTransform: 'uppercase',
-            letterSpacing: '0.1em',
-            color: '#16A34A',
-            marginBottom: 6,
-          }}
-        >
-          Current positioning anchor — locked 2026-04-26
-        </div>
-        <div style={{ marginBottom: 4 }}>
-          <strong>Primary hero:</strong> &ldquo;{POSITIONING_HERO_PRIMARY}&rdquo;
-        </div>
-        <div style={{ marginBottom: 4 }}>
-          <strong>Secondary (regulatory):</strong> &ldquo;{POSITIONING_HERO_SECONDARY}&rdquo;
-        </div>
-        <div style={{ marginBottom: 4 }}>
-          <strong>IP moat:</strong> {IP_MOAT_NAME} — {IP_MOAT_DESCRIPTION}
-        </div>
-        <div style={{ marginBottom: 4 }}>
-          <strong>Specimen library:</strong> {SPECIMEN_LIBRARY_DESCRIPTION}
-        </div>
-        <div style={{ marginBottom: 4 }}>
-          <strong>Compliance moat:</strong> {getAllRegisteredFrameworks().length} frameworks across{' '}
-          {COMPLIANCE_MOAT_REGIONS}.
-        </div>
-        <div style={{ marginBottom: 4 }}>
-          <strong>Audience:</strong> {ICP_AUDIENCE_SUMMARY}
-        </div>
-        <div style={{ color: 'var(--text-muted)', fontSize: 11, marginTop: 8 }}>
-          <strong>Banned:</strong>{' '}
-          {BANNED_VOCABULARY.map((b, i) => (
-            <span key={b.phrase}>
-              &ldquo;{b.phrase}&rdquo; ({b.reason})
-              {i < BANNED_VOCABULARY.length - 1 ? ', ' : '.'}
+      {quickJumps.length > 0 && (
+        <div style={quickJumpsWrap}>
+          <div style={quickJumpsHeader}>
+            <Sparkles size={14} color="var(--accent-primary)" />
+            <span style={quickJumpsEyebrow}>
+              {activeJourney
+                ? `Next four steps in ${activeJourney.label.toLowerCase()}`
+                : 'Quick jumps you have not explored yet'}
             </span>
-          ))}{' '}
-          Cold-context on-ramps:{' '}
-          {COLD_CONTEXT_ONRAMPS.map((onramp, i) => (
-            <span key={onramp}>
-              &ldquo;{onramp}&rdquo;{i < COLD_CONTEXT_ONRAMPS.length - 1 ? ', ' : ''}
-            </span>
-          ))}{' '}
-          — descriptive, no academic borrowing.
-        </div>
-      </div>
-
-      {/* Progress bar */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 14,
-          flexWrap: 'wrap',
-          padding: 12,
-          background: 'var(--bg-card)',
-          border: '1px solid var(--border-color)',
-          borderRadius: 'var(--radius-md)',
-        }}
-      >
-        <div
-          style={{
-            width: 64,
-            height: 64,
-            flexShrink: 0,
-            position: 'relative',
-          }}
-        >
-          <svg width="64" height="64" viewBox="0 0 64 64">
-            <circle
-              cx={32}
-              cy={32}
-              r={27}
-              fill="none"
-              stroke="var(--border-color)"
-              strokeWidth={5}
-            />
-            <circle
-              cx={32}
-              cy={32}
-              r={27}
-              fill="none"
-              stroke="#16A34A"
-              strokeWidth={5}
-              strokeLinecap="round"
-              strokeDasharray={2 * Math.PI * 27}
-              strokeDashoffset={2 * Math.PI * 27 * (1 - overallPct)}
-              transform="rotate(-90 32 32)"
-              style={{ transition: 'stroke-dashoffset 0.4s ease' }}
-            />
-          </svg>
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 13,
-              fontWeight: 800,
-              color: '#16A34A',
-            }}
-          >
-            {Math.round(overallPct * 100)}%
-          </div>
-        </div>
-        <div style={{ flex: 1, minWidth: 180 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>
-            {totals.totalDone} of {totals.totalTabs} tabs complete
-          </div>
-          <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
-            {totals.doneMinutes} of {totals.totalMinutes} minutes studied
-          </div>
-        </div>
-        <button
-          onClick={reset}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 4,
-            padding: '6px 10px',
-            fontSize: 11,
-            fontWeight: 600,
-            color: 'var(--text-muted)',
-            background: 'transparent',
-            border: '1px solid var(--border-color)',
-            borderRadius: 'var(--radius-sm, 4px)',
-            cursor: 'pointer',
-          }}
-        >
-          <RefreshCw size={11} /> Reset progress
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ─── Flow visualization (S-curve with 4 nodes) ───────────────────
-
-function renderFlow(
-  sessionProgress: (s: StudySession) => number,
-  scrollToSession: (num: number) => void
-) {
-  return (
-    <section
-      style={{
-        padding: 18,
-        background: 'var(--bg-secondary)',
-        border: '1px solid var(--border-color)',
-        borderRadius: 'var(--radius-lg)',
-        marginBottom: 14,
-      }}
-    >
-      <div style={{ marginBottom: 10 }}>
-        <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>The path</div>
-        <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
-          Four sessions flow into each other. Click any stop to jump to its session card below.
-        </div>
-      </div>
-
-      <div style={{ width: '100%', overflowX: 'auto' }}>
-        <svg
-          viewBox={`0 0 ${FLOW_W} ${FLOW_H}`}
-          style={{ width: '100%', minWidth: 720, height: 'auto', display: 'block' }}
-          role="img"
-          aria-label="Study plan flow"
-        >
-          {/* Connecting path — S-curve through the 4 nodes */}
-          <path
-            d={`M ${NODE_POSITIONS[0].x},${NODE_POSITIONS[0].y}
-                C ${(NODE_POSITIONS[0].x + NODE_POSITIONS[1].x) / 2},${NODE_POSITIONS[0].y}
-                  ${(NODE_POSITIONS[0].x + NODE_POSITIONS[1].x) / 2},${NODE_POSITIONS[1].y}
-                  ${NODE_POSITIONS[1].x},${NODE_POSITIONS[1].y}
-                C ${(NODE_POSITIONS[1].x + NODE_POSITIONS[2].x) / 2},${NODE_POSITIONS[1].y}
-                  ${(NODE_POSITIONS[1].x + NODE_POSITIONS[2].x) / 2},${NODE_POSITIONS[2].y}
-                  ${NODE_POSITIONS[2].x},${NODE_POSITIONS[2].y}
-                C ${(NODE_POSITIONS[2].x + NODE_POSITIONS[3].x) / 2},${NODE_POSITIONS[2].y}
-                  ${(NODE_POSITIONS[2].x + NODE_POSITIONS[3].x) / 2},${NODE_POSITIONS[3].y}
-                  ${NODE_POSITIONS[3].x},${NODE_POSITIONS[3].y}`}
-            fill="none"
-            stroke="var(--border-color)"
-            strokeWidth={3}
-            strokeLinecap="round"
-            strokeDasharray="2 8"
-          />
-
-          {/* Start label */}
-          <text
-            x={NODE_POSITIONS[0].x - NODE_R - 10}
-            y={NODE_POSITIONS[0].y + 4}
-            textAnchor="end"
-            fontSize={11}
-            fontWeight={700}
-            fill="var(--text-muted)"
-          >
-            START
-          </text>
-
-          {/* Finish label */}
-          <text
-            x={NODE_POSITIONS[3].x + NODE_R + 10}
-            y={NODE_POSITIONS[3].y + 4}
-            textAnchor="start"
-            fontSize={11}
-            fontWeight={700}
-            fill="var(--text-muted)"
-          >
-            OUTREACH
-          </text>
-
-          {/* Session nodes */}
-          {SESSIONS.map((s, i) => {
-            const pos = NODE_POSITIONS[i];
-            const p = sessionProgress(s);
-            const isDone = p >= 1;
-            const isStarted = p > 0 && p < 1;
-            return (
-              <g
-                key={s.num}
-                style={{ cursor: 'pointer' }}
-                onClick={() => scrollToSession(s.num)}
-                role="button"
-                aria-label={`Session ${s.num}: ${s.title}`}
-              >
-                {/* Outer ring (progress) */}
-                <circle
-                  cx={pos.x}
-                  cy={pos.y}
-                  r={NODE_R}
-                  fill="none"
-                  stroke="var(--border-color)"
-                  strokeWidth={4}
-                />
-                <circle
-                  cx={pos.x}
-                  cy={pos.y}
-                  r={NODE_R}
-                  fill="none"
-                  stroke={s.color}
-                  strokeWidth={4}
-                  strokeLinecap="round"
-                  strokeDasharray={2 * Math.PI * NODE_R}
-                  strokeDashoffset={2 * Math.PI * NODE_R * (1 - p)}
-                  transform={`rotate(-90 ${pos.x} ${pos.y})`}
-                  style={{ transition: 'stroke-dashoffset 0.4s ease' }}
-                />
-                {/* Inner filled circle */}
-                <circle
-                  cx={pos.x}
-                  cy={pos.y}
-                  r={NODE_R - 8}
-                  fill={isDone ? s.color : s.bg}
-                  stroke={s.color}
-                  strokeWidth={1.5}
-                />
-                {/* Pulsing halo for in-progress */}
-                {isStarted && (
-                  <circle
-                    cx={pos.x}
-                    cy={pos.y}
-                    r={NODE_R + 6}
-                    fill="none"
-                    stroke={s.color}
-                    strokeWidth={2}
-                    strokeOpacity={0.4}
-                  >
-                    <animate
-                      attributeName="r"
-                      values={`${NODE_R + 6};${NODE_R + 12};${NODE_R + 6}`}
-                      dur="2s"
-                      repeatCount="indefinite"
-                    />
-                    <animate
-                      attributeName="stroke-opacity"
-                      values="0.4;0.1;0.4"
-                      dur="2s"
-                      repeatCount="indefinite"
-                    />
-                  </circle>
-                )}
-                {/* Session number or checkmark */}
-                {isDone ? (
-                  <g transform={`translate(${pos.x - 7} ${pos.y - 7})`}>
-                    <path
-                      d="M 2 7 L 6 11 L 14 3"
-                      fill="none"
-                      stroke="#fff"
-                      strokeWidth={2.5}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </g>
-                ) : (
-                  <text
-                    x={pos.x}
-                    y={pos.y + 6}
-                    textAnchor="middle"
-                    fontSize={20}
-                    fontWeight={800}
-                    fill={s.color}
-                  >
-                    {s.num}
-                  </text>
-                )}
-                {/* Label below node */}
-                <text
-                  x={pos.x}
-                  y={pos.y + NODE_R + 18}
-                  textAnchor="middle"
-                  fontSize={10}
-                  fontWeight={700}
-                  fill={s.color}
-                  style={{ textTransform: 'uppercase', letterSpacing: '0.08em' }}
-                >
-                  {s.slot}
-                </text>
-                <text
-                  x={pos.x}
-                  y={pos.y + NODE_R + 32}
-                  textAnchor="middle"
-                  fontSize={11}
-                  fontWeight={600}
-                  fill="var(--text-primary)"
-                >
-                  {(s.title.split(' — ')[0] ?? s.title).slice(0, 22)}
-                </text>
-              </g>
-            );
-          })}
-        </svg>
-      </div>
-    </section>
-  );
-}
-
-// ─── Session card ────────────────────────────────────────────────
-
-function SessionCard({
-  session,
-  completedTabs,
-  onToggleTab,
-  onNavigateToTab,
-  hydrated,
-}: {
-  session: StudySession;
-  completedTabs: Set<string>;
-  onToggleTab: (tabId: string) => void;
-  onNavigateToTab: (tabId: string) => void;
-  hydrated: boolean;
-}) {
-  const doneCount = session.tabs.filter(t => completedTabs.has(t.tabId)).length;
-  const isComplete = doneCount === session.tabs.length;
-  const totalMinutes = session.tabs.reduce((a, t) => a + t.minutes, 0);
-
-  return (
-    <section
-      id={`study-session-${session.num}`}
-      style={{
-        padding: 18,
-        background: 'var(--bg-secondary)',
-        border: '1px solid var(--border-color)',
-        borderLeft: `3px solid ${session.color}`,
-        borderRadius: 'var(--radius-lg)',
-        marginBottom: 14,
-        scrollMarginTop: 16,
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          gap: 12,
-          marginBottom: 12,
-          flexWrap: 'wrap',
-        }}
-      >
-        <div
-          style={{
-            width: 44,
-            height: 44,
-            borderRadius: 10,
-            background: session.bg,
-            color: session.color,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 20,
-            fontWeight: 800,
-            flexShrink: 0,
-          }}
-        >
-          {isComplete ? <CheckCircle2 size={22} /> : session.num}
-        </div>
-        <div style={{ flex: 1, minWidth: 200 }}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              flexWrap: 'wrap',
-              marginBottom: 2,
-            }}
-          >
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: 800,
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                color: session.color,
-                padding: '3px 8px',
-                background: session.bg,
-                borderRadius: 4,
-              }}
-            >
-              {session.slot}
-            </span>
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 4,
-                fontSize: 11,
-                color: 'var(--text-muted)',
-              }}
-            >
-              <Clock size={10} /> {totalMinutes} min
-            </span>
-            {hydrated && (
-              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                · {doneCount}/{session.tabs.length} read
-              </span>
+            {visited.size > 0 && (
+              <button type="button" onClick={handleResetVisited} style={resetVisitedBtn}>
+                Reset progress
+              </button>
             )}
           </div>
-          <h3
-            style={{
-              fontSize: 17,
-              fontWeight: 800,
-              color: 'var(--text-primary)',
-              margin: 0,
-              lineHeight: 1.3,
-            }}
-          >
-            {session.title}
-          </h3>
-        </div>
-      </div>
-
-      {/* Learning goal */}
-      <div
-        style={{
-          padding: 12,
-          background: 'var(--bg-card)',
-          border: '1px solid var(--border-color)',
-          borderLeft: `3px solid ${session.color}`,
-          borderRadius: 'var(--radius-md)',
-          marginBottom: 14,
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            marginBottom: 4,
-          }}
-        >
-          <Target size={12} style={{ color: session.color }} />
-          <span
-            style={{
-              fontSize: 9,
-              fontWeight: 800,
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              color: session.color,
-            }}
-          >
-            Learning goal
-          </span>
-        </div>
-        <div style={{ fontSize: 12, color: 'var(--text-primary)', lineHeight: 1.55 }}>
-          {session.goal}
-        </div>
-      </div>
-
-      {/* Tab list */}
-      <ol
-        style={{
-          margin: 0,
-          padding: 0,
-          listStyle: 'none',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 8,
-        }}
-      >
-        {session.tabs.map((tab, i) => {
-          const isDone = completedTabs.has(tab.tabId);
-          return (
-            <li
-              key={tab.tabId}
-              style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: 10,
-                padding: 12,
-                background: isDone ? session.bg : 'var(--bg-card)',
-                border: '1px solid var(--border-color)',
-                borderRadius: 'var(--radius-md)',
-                transition: 'background 0.15s ease',
-              }}
-            >
-              {/* Tick button */}
+          <div style={quickJumpsGrid}>
+            {quickJumps.map(node => (
               <button
-                onClick={() => onToggleTab(tab.tabId)}
-                aria-label={`Mark ${tab.label} as ${isDone ? 'unread' : 'read'}`}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  padding: 0,
-                  cursor: 'pointer',
-                  color: isDone ? session.color : 'var(--text-muted)',
-                  flexShrink: 0,
-                  marginTop: 2,
-                  display: 'flex',
-                }}
+                key={node.id}
+                type="button"
+                onClick={() => handleNavigate(node.id)}
+                style={quickJumpCard}
               >
-                {isDone ? <CheckCircle2 size={18} /> : <Circle size={18} />}
+                <div style={quickJumpLabel}>{node.label}</div>
+                <div style={quickJumpBody}>{node.payoff}</div>
+                <div style={quickJumpFoot}>
+                  Open <ArrowRight size={11} />
+                </div>
               </button>
+            ))}
+          </div>
+        </div>
+      )}
 
-              {/* Number + icon + name */}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    marginBottom: 4,
-                    flexWrap: 'wrap',
-                  }}
-                >
-                  <span
-                    style={{
-                      width: 22,
-                      height: 22,
-                      borderRadius: '50%',
-                      background: session.bg,
-                      color: session.color,
-                      fontSize: 11,
-                      fontWeight: 800,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                    }}
-                  >
-                    {i + 1}
-                  </span>
-                  <span
-                    style={{
-                      color: session.color,
-                      display: 'flex',
-                      flexShrink: 0,
-                    }}
-                  >
-                    {tab.icon}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: 14,
-                      fontWeight: 700,
-                      color: 'var(--text-primary)',
-                      textDecoration: isDone ? 'line-through' : 'none',
-                      textDecorationColor: session.color,
-                    }}
-                  >
-                    {tab.label}
-                  </span>
-                  <span
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 3,
-                      fontSize: 11,
-                      color: 'var(--text-muted)',
-                      marginLeft: 'auto',
-                    }}
-                  >
-                    <Clock size={10} /> {tab.minutes} min
-                  </span>
-                </div>
-                <div
-                  style={{
-                    fontSize: 12,
-                    color: 'var(--text-secondary)',
-                    lineHeight: 1.55,
-                    marginBottom: 8,
-                  }}
-                >
-                  {tab.why}
-                </div>
-                <button
-                  onClick={() => onNavigateToTab(tab.tabId)}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 5,
-                    padding: '5px 10px',
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: '#fff',
-                    background: session.color,
-                    border: 'none',
-                    borderRadius: 'var(--radius-sm, 4px)',
-                    cursor: 'pointer',
-                  }}
-                >
-                  Open tab <ArrowRight size={11} />
-                </button>
-              </div>
-            </li>
-          );
-        })}
-      </ol>
-    </section>
+      {/* Empty-state: founder has visited everything. Still useful to
+          show the "switch journey" call so they keep using the map
+          rather than treating it as a checklist. */}
+      {hydrated && visited.size === NODES.length && (
+        <div style={emptyAllVisited}>
+          <CheckCircle2 size={18} color="var(--success)" />
+          <div>
+            <strong>Every tab explored.</strong> Pick a different journey above to revisit the
+            sequence in a new context, or browse freely with all connections lit.
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
-// ─── Next action ─────────────────────────────────────────────────
+// ─── Hero ───────────────────────────────────────────────────────────
 
-function renderNextAction(overallPct: number) {
-  const isComplete = overallPct >= 1;
+function renderHero() {
   return (
-    <section
-      style={{
-        padding: 18,
-        background: isComplete
-          ? 'linear-gradient(135deg, rgba(22,163,74,0.14), rgba(22,163,74,0.06))'
-          : 'var(--bg-secondary)',
-        border: '1px solid var(--border-color)',
-        borderTop: isComplete ? '3px solid #16A34A' : '1px solid var(--border-color)',
-        borderRadius: 'var(--radius-lg)',
-        marginBottom: 4,
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-        <div
-          style={{
-            width: 32,
-            height: 32,
-            borderRadius: 8,
-            background: 'rgba(22, 163, 74, 0.18)',
-            color: '#16A34A',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-          }}
-        >
-          {isComplete ? <Sparkles size={16} /> : <ArrowRight size={16} />}
-        </div>
-        <div>
-          <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)' }}>
-            {isComplete ? 'All four sessions complete.' : 'When you finish all four sessions:'}
-          </div>
-          <div
-            style={{
-              fontSize: 13,
-              color: 'var(--text-secondary)',
-              lineHeight: 1.55,
-              marginTop: 6,
-            }}
-          >
-            Your next action is Monday-morning outreach — 5 to 10 messages from the Outreach
-            Strategy templates, sent before noon. Nothing else. Everything in the hub only matters
-            if a CSO replies.
-          </div>
-          {isComplete && (
-            <div
-              style={{
-                marginTop: 10,
-                padding: 10,
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border-color)',
-                borderRadius: 'var(--radius-md)',
-                fontSize: 12,
-                color: 'var(--text-primary)',
-                lineHeight: 1.55,
-              }}
-            >
-              <strong style={{ color: '#16A34A' }}>Well done.</strong> You now have 260 years of
-              decision science, 37 thinkers, 5 incumbents, 3 market gaps, 9 Strebulaev principles,
-              and 135 historical cases loaded in context. The only thing that converts this into
-              revenue is a reply — go send the messages.
-            </div>
-          )}
-        </div>
-      </div>
-    </section>
+    <div style={heroStyle}>
+      <div style={heroEyebrow}>Start Here</div>
+      <h2 style={heroTitle}>The Founder Hub, on one map.</h2>
+      <p style={heroSubtitle}>
+        Every tab. Every connection. Pick what you&rsquo;re doing right now and the map highlights
+        the recommended sequence — pitch prep, market research, outreach execution, reflection on
+        a close, or a technical dive into the product. Click any node to jump straight in.
+      </p>
+    </div>
   );
 }
+
+// ─── Current positioning anchor (preserved from prior tab) ──────────
+
+function renderPositioningAnchor() {
+  return (
+    <div style={anchorStyle}>
+      <div style={anchorEyebrow}>
+        <Compass size={11} /> Current positioning anchor — locked 2026-04-26
+      </div>
+      <div style={anchorRow}>
+        <strong>Primary hero:</strong> &ldquo;{POSITIONING_HERO_PRIMARY}&rdquo;
+      </div>
+      <div style={anchorRow}>
+        <strong>Secondary (regulatory):</strong> &ldquo;{POSITIONING_HERO_SECONDARY}&rdquo;
+      </div>
+      <div style={anchorRow}>
+        <strong>IP moat:</strong> {IP_MOAT_NAME} — {IP_MOAT_DESCRIPTION}
+      </div>
+      <div style={anchorRow}>
+        <strong>Specimen library:</strong> {SPECIMEN_LIBRARY_DESCRIPTION}
+      </div>
+      <div style={anchorRow}>
+        <strong>Compliance moat:</strong> {getAllRegisteredFrameworks().length} frameworks across{' '}
+        {COMPLIANCE_MOAT_REGIONS}.
+      </div>
+      <div style={anchorRow}>
+        <strong>Audience:</strong> {ICP_AUDIENCE_SUMMARY}
+      </div>
+      <div style={anchorBanned}>
+        <strong>Banned:</strong>{' '}
+        {BANNED_VOCABULARY.map((b, i) => (
+          <span key={b.phrase}>
+            &ldquo;{b.phrase}&rdquo; ({b.reason})
+            {i < BANNED_VOCABULARY.length - 1 ? ', ' : '.'}
+          </span>
+        ))}{' '}
+        Cold-context on-ramps:{' '}
+        {COLD_CONTEXT_ONRAMPS.map((onramp, i) => (
+          <span key={onramp}>
+            &ldquo;{onramp}&rdquo;{i < COLD_CONTEXT_ONRAMPS.length - 1 ? ', ' : ''}
+          </span>
+        ))}{' '}
+        — descriptive, no academic borrowing.
+      </div>
+    </div>
+  );
+}
+
+// ─── Styles ─────────────────────────────────────────────────────────
+
+const heroStyle: React.CSSProperties = {
+  padding: 18,
+  background: 'linear-gradient(135deg, rgba(22,163,74,0.10), rgba(14,165,233,0.06))',
+  border: '1px solid var(--border-color)',
+  borderRadius: 'var(--radius-lg)',
+  marginBottom: 14,
+};
+
+const heroEyebrow: React.CSSProperties = {
+  fontSize: 10,
+  fontWeight: 800,
+  textTransform: 'uppercase',
+  letterSpacing: '0.1em',
+  color: '#16A34A',
+  marginBottom: 6,
+};
+
+const heroTitle: React.CSSProperties = {
+  fontSize: 22,
+  fontWeight: 800,
+  color: 'var(--text-primary)',
+  margin: 0,
+  lineHeight: 1.2,
+  letterSpacing: '-0.01em',
+};
+
+const heroSubtitle: React.CSSProperties = {
+  fontSize: 13,
+  color: 'var(--text-secondary)',
+  marginTop: 8,
+  marginBottom: 0,
+  lineHeight: 1.6,
+  maxWidth: 720,
+};
+
+const anchorStyle: React.CSSProperties = {
+  marginBottom: 14,
+  padding: 12,
+  background: 'var(--bg-card)',
+  border: '1px solid var(--border-color)',
+  borderLeft: '3px solid #16A34A',
+  borderRadius: 'var(--radius-md)',
+  fontSize: 12,
+  lineHeight: 1.55,
+  color: 'var(--text-primary)',
+};
+
+const anchorEyebrow: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 6,
+  fontSize: 9,
+  fontWeight: 800,
+  textTransform: 'uppercase',
+  letterSpacing: '0.1em',
+  color: '#16A34A',
+  marginBottom: 6,
+};
+
+const anchorRow: React.CSSProperties = {
+  marginBottom: 4,
+};
+
+const anchorBanned: React.CSSProperties = {
+  color: 'var(--text-muted)',
+  fontSize: 11,
+  marginTop: 8,
+};
+
+const quickJumpsWrap: React.CSSProperties = {
+  marginTop: 14,
+};
+
+const quickJumpsHeader: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 8,
+  marginBottom: 8,
+};
+
+const quickJumpsEyebrow: React.CSSProperties = {
+  fontSize: 11,
+  fontWeight: 800,
+  textTransform: 'uppercase',
+  letterSpacing: '0.1em',
+  color: 'var(--accent-primary)',
+};
+
+const resetVisitedBtn: React.CSSProperties = {
+  marginLeft: 'auto',
+  padding: '4px 10px',
+  fontSize: 11,
+  fontWeight: 600,
+  background: 'transparent',
+  color: 'var(--text-muted)',
+  border: '1px solid var(--border-color)',
+  borderRadius: 'var(--radius-sm)',
+  cursor: 'pointer',
+};
+
+const quickJumpsGrid: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+  gap: 8,
+};
+
+const quickJumpCard: React.CSSProperties = {
+  textAlign: 'left',
+  padding: '12px 14px',
+  background: 'var(--bg-card)',
+  border: '1px solid var(--border-color)',
+  borderLeft: '3px solid var(--accent-primary)',
+  borderRadius: 'var(--radius-md)',
+  cursor: 'pointer',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 6,
+  transition: 'border-color 0.2s, transform 0.15s',
+};
+
+const quickJumpLabel: React.CSSProperties = {
+  fontSize: 13,
+  fontWeight: 700,
+  color: 'var(--text-primary)',
+};
+
+const quickJumpBody: React.CSSProperties = {
+  fontSize: 11.5,
+  color: 'var(--text-secondary)',
+  lineHeight: 1.5,
+};
+
+const quickJumpFoot: React.CSSProperties = {
+  marginTop: 'auto',
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 4,
+  fontSize: 11,
+  fontWeight: 600,
+  color: 'var(--accent-primary)',
+};
+
+const emptyAllVisited: React.CSSProperties = {
+  marginTop: 14,
+  padding: 12,
+  background: 'rgba(34, 197, 94, 0.06)',
+  border: '1px solid rgba(34, 197, 94, 0.2)',
+  borderRadius: 'var(--radius-md)',
+  display: 'flex',
+  alignItems: 'center',
+  gap: 10,
+  fontSize: 13,
+  color: 'var(--text-primary)',
+};

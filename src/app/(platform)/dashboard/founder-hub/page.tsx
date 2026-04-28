@@ -105,10 +105,14 @@ const FounderTipsTab = dynamic(
     import('@/components/founder-hub/FounderTipsTab').then(m => ({ default: m.FounderTipsTab })),
   { loading: tabLoader }
 );
-const OutreachAndMeetingsTab = dynamic(
+// A2 outreach consolidation (locked 2026-04-28): OutreachHubTab wraps
+// OutreachCommandCenterTab + OutreachAndMeetingsTab + DesignPartnersTab
+// into one tab with internal section toggle. The three underlying
+// components stay where they are; this hub composes them.
+const OutreachHubTab = dynamic(
   () =>
-    import('@/components/founder-hub/OutreachAndMeetingsTab').then(m => ({
-      default: m.OutreachAndMeetingsTab,
+    import('@/components/founder-hub/OutreachHubTab').then(m => ({
+      default: m.OutreachHubTab,
     })),
   { loading: tabLoader }
 );
@@ -140,13 +144,8 @@ const CompetitivePositioningTab = dynamic(
     })),
   { loading: tabLoader }
 );
-const OutreachCommandCenterTab = dynamic(
-  () =>
-    import('@/components/founder-hub/OutreachCommandCenterTab').then(m => ({
-      default: m.OutreachCommandCenterTab,
-    })),
-  { loading: tabLoader }
-);
+// OutreachCommandCenterTab now imported through OutreachHubTab above
+// (A2 consolidation 2026-04-28).
 const ForecastRoadmapTab = dynamic(
   () =>
     import('@/components/founder-hub/ForecastRoadmapTab').then(m => ({
@@ -179,13 +178,8 @@ const MeetingsLogTab = dynamic(
     })),
   { loading: tabLoader }
 );
-const DesignPartnersTab = dynamic(
-  () =>
-    import('@/components/founder-hub/DesignPartnersTab').then(m => ({
-      default: m.DesignPartnersTab,
-    })),
-  { loading: tabLoader }
-);
+// DesignPartnersTab now imported through OutreachHubTab above
+// (A2 consolidation 2026-04-28).
 const LrqaTab = dynamic(
   () =>
     import('@/components/founder-hub/LrqaTab').then(m => ({
@@ -209,7 +203,6 @@ import {
   MessageSquare,
   Zap,
   Lock,
-  Crosshair,
   Search,
   X,
   Library,
@@ -238,9 +231,7 @@ type TabId =
   | 'positioning_copilot'
   | 'positioning'
   | 'sales'
-  | 'outreach_cmd'
-  | 'outreach'
-  | 'design_partners'
+  | 'outreach_hub'
   | 'content'
   | 'data_ecosystem'
   | 'case_library'
@@ -273,7 +264,14 @@ const LEGACY_TAB_REDIRECTS: Record<string, TabId> = {
   correlation_causal: 'case_library',
   decision_alpha: 'case_library',
   content_studio: 'content',
-  meeting_prep: 'outreach',
+  meeting_prep: 'outreach_hub',
+  // A2 outreach consolidation (locked 2026-04-28): three tabs collapsed
+  // into one OutreachHubTab with internal Pipeline / Messages /
+  // Design Partners sections. Legacy slugs route to the consolidated
+  // tab; the section deep-link is handled by URL `&section=` param.
+  outreach_cmd: 'outreach_hub',
+  outreach: 'outreach_hub',
+  design_partners: 'outreach_hub',
 };
 
 const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabGroup }> = [
@@ -310,8 +308,8 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
   },
   { id: 'sales', label: 'Sales Toolkit', icon: <MessageSquare size={16} />, group: 'Go-to-Market' },
   {
-    id: 'outreach_cmd',
-    label: 'Outreach Strategy',
+    id: 'outreach_hub',
+    label: 'Outreach Hub',
     icon: <Zap size={16} />,
     group: 'Go-to-Market',
   },
@@ -319,18 +317,6 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
     id: 'category_position',
     label: 'Category Position',
     icon: <Radar size={16} />,
-    group: 'Go-to-Market',
-  },
-  {
-    id: 'outreach',
-    label: 'Message Generator',
-    icon: <Crosshair size={16} />,
-    group: 'Go-to-Market',
-  },
-  {
-    id: 'design_partners',
-    label: 'Design Partners',
-    icon: <Handshake size={16} />,
     group: 'Go-to-Market',
   },
   {
@@ -549,12 +535,28 @@ const SEARCH_INDEX: SearchEntry[] = [
     keywords:
       'sales toolkit discovery questions email templates demo flow outreach prospecting qualification',
   },
+  // Outreach Hub — three internal sections, surfaced separately in
+  // search so the founder lands on the right section directly.
   {
-    tabId: 'outreach',
-    section: 'Outreach & Meetings',
-    preview: 'Prospect pipeline, weekly brief, meeting prep.',
+    tabId: 'outreach_hub',
+    section: 'Outreach Hub · Pipeline & Strategy',
+    preview: 'ICP events, this-week priority, persona map, channel matrix, contact tracker.',
     keywords:
-      'outreach meetings prospects pipeline weekly brief meeting prep calendar stakeholders linkedin',
+      'outreach pipeline strategy icp events this week priority persona map channel matrix contact tracker poc kit framework punch list traction plan command center',
+  },
+  {
+    tabId: 'outreach_hub',
+    section: 'Outreach Hub · Message Generator',
+    preview: 'Paste a profile, pick an intent, draft a tailored message.',
+    keywords:
+      'outreach message generator linkedin draft compose tailored message intent connect pilot poc investor history meetings',
+  },
+  {
+    tabId: 'outreach_hub',
+    section: 'Outreach Hub · Design Partners',
+    preview: 'Inbound prospect intake + design-partner program structure.',
+    keywords:
+      'design partners inbound prospect intake program structure conversion poc paid pilot loi',
   },
   {
     tabId: 'content',
@@ -652,8 +654,8 @@ const SEARCH_INDEX: SearchEntry[] = [
       'path 100m arr 100 million unicorn 2030 north star strengths weaknesses matrix r2f recognition rigor framework kahneman klein meta judge mercier sperber argumentative reasoning environmental validity decision framing gate provisional patents academic credentials category definition vocabulary cold warm bridge sentence persona pitch library cso vp strategy corp dev mna m&a pan-african fund partner sankore fortune 500 general counsel audit committee mckinsey quantumblack bcg gamma bain advanced analytics lrqa bureau veritas sgs intertek dnv pre-seed seed venture investor wiz advisor outreach playbook discovery questions killer pitch meeting arc cold opener warm intro follow-up cadence signals positive negative phrases never to say objection handling not for us right now jolt effect honest off-ramp pings echoes refrigerator confused vulnerability reset 5th grade financial anchor evidence challenge cloverpop aera ibm watsonx category contrast investor metrics bookings revenue arr mrr gross profit tcv acv ltv cac billings churn cmgr burn rate downloads vanity cumulative chart tricks size before growth failure modes watchtower quantellia consulting trap manual logging cathedral of code external attack vector ibm bundling agentic shift warm intro network map wiz tasis school sankore lrqa ian spaulding mckinsey pre-seed funds family relationships 90-day action plan may june july 2026 isa 2007 dqi confidence intervals gtm co-founder reference case term sheet notebooklm follow-up lab questions',
   },
   {
-    tabId: 'design_partners',
-    section: 'Design Partners',
+    tabId: 'outreach_hub',
+    section: 'Outreach Hub · Design Partner Triage',
     preview:
       'Triage inbound design-partner applications. Capacity strip (5 seats). Status transitions + founder notes.',
     keywords:
@@ -1326,15 +1328,9 @@ function renderTab(
         <SalesToolkitTab />
       </ErrorBoundary>
     ),
-    outreach_cmd: (
-      <ErrorBoundary sectionName="Outreach Command Center">
-        <OutreachCommandCenterTab founderPass={FOUNDER_PASS} />
-      </ErrorBoundary>
-    ),
-    outreach: <OutreachAndMeetingsTab founderPass={FOUNDER_PASS} />,
-    design_partners: (
-      <ErrorBoundary sectionName="Design Partners">
-        <DesignPartnersTab founderPass={FOUNDER_PASS} />
+    outreach_hub: (
+      <ErrorBoundary sectionName="Outreach Hub">
+        <OutreachHubTab founderPass={FOUNDER_PASS} />
       </ErrorBoundary>
     ),
     lrqa: (
