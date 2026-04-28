@@ -75,8 +75,13 @@ const ICON_MAP: Record<string, typeof BookOpen> = {
   BookOpen, Users, Target, Shield, AlertCircle, CheckSquare,
   Brain, Workflow, BarChart3, Lock, Compass, Quote, TrendingUp,
 };
-function getIcon(name: string): typeof BookOpen {
-  return ICON_MAP[name] || BookOpen;
+
+// DeckIcon is declared at module scope so React's react-hooks/static-components
+// lint rule is satisfied — call sites render <DeckIcon name=... /> instead of
+// resolving an icon-component reference inside the parent's render body.
+function DeckIcon({ name, size, style }: { name: string; size: number; style?: React.CSSProperties }) {
+  const Icon = ICON_MAP[name] || BookOpen;
+  return <Icon size={size} style={style} />;
 }
 
 // ─── Component ─────────────────────────────────────────────────────
@@ -369,11 +374,15 @@ function DeckPicker(props: {
 }) {
   const [hoveredDeck, setHoveredDeck] = useState<DeckId | null>(null);
   const [mode, setMode] = useState<StudyMode>('flashcard');
+  // Capture `now` once at mount (lazy initializer keeps it stable across
+  // renders so useMemo stays pure per the react-hooks/purity lint rule).
+  // Minute-level precision is enough for due-card counting; we don't need
+  // to refresh as the user sits on the page.
+  const [mountTime] = useState<number>(() => Date.now());
 
   // Compute per-deck mastery: % of cards with successful repetitions >= 1.
   const deckMastery = useMemo(() => {
     const out: Record<DeckId, { mastered: number; due: number; total: number }> = {} as Record<DeckId, { mastered: number; due: number; total: number }>;
-    const now = Date.now();
     for (const deck of DECKS) {
       const cards = cardsForDeck(deck.id);
       let mastered = 0;
@@ -381,12 +390,12 @@ function DeckPicker(props: {
       for (const c of cards) {
         const st = props.sm2States[c.id];
         if (st && st.successfulReviews >= 2) mastered += 1;
-        if (!st || new Date(st.nextDue).getTime() <= now) due += 1;
+        if (!st || new Date(st.nextDue).getTime() <= mountTime) due += 1;
       }
       out[deck.id] = { mastered, due, total: cards.length };
     }
     return out;
-  }, [props.sm2States]);
+  }, [props.sm2States, mountTime]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -456,7 +465,6 @@ function DeckPicker(props: {
           }}
         >
           {[...DECKS].sort((a, b) => a.order - b.order).map(deck => {
-            const Icon = getIcon(deck.iconName);
             const stats = deckMastery[deck.id];
             const isHovered = hoveredDeck === deck.id;
             return (
@@ -480,7 +488,7 @@ function DeckPicker(props: {
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <Icon size={16} style={{ color: deck.color, flexShrink: 0 }} />
+                  <DeckIcon name={deck.iconName} size={16} style={{ color: deck.color, flexShrink: 0 }} />
                   <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
                     {deck.label}
                   </span>
@@ -904,7 +912,6 @@ function CardHeader(props: {
   sm2State: SM2CardState | null;
   onExit: () => void;
 }) {
-  const Icon = getIcon(props.deck.iconName);
   const reps = props.sm2State?.repetitions ?? 0;
   const masteryPct = props.sm2State && props.sm2State.totalReviews > 0
     ? Math.round((props.sm2State.successfulReviews / props.sm2State.totalReviews) * 100)
@@ -925,7 +932,7 @@ function CardHeader(props: {
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <Icon size={14} style={{ color: props.deck.color }} />
+        <DeckIcon name={props.deck.iconName} size={14} style={{ color: props.deck.color }} />
         <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{props.deck.label}</span>
         <span style={{ color: 'var(--text-muted)', fontVariantNumeric: 'tabular-nums' }}>
           · {props.progress.current} of {props.progress.total}

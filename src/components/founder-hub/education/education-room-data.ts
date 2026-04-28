@@ -37,7 +37,8 @@ export type DeckId =
   | 'regulatory_frameworks'
   | 'r2f_framework'
   | 'founder_oneliners'
-  | 'advanced_sales_moves';
+  | 'advanced_sales_moves'
+  | 'strategic_thinking';
 
 export type CardDifficulty = 'foundation' | 'core' | 'advanced';
 export type CardMode = 'flashcard' | 'recall' | 'apply';
@@ -224,10 +225,19 @@ export const DECKS: EducationDeck[] = [
     id: 'advanced_sales_moves',
     label: 'Advanced Sales Moves',
     description:
-      'JOLT pre-buttal · Sandler negative reverse · Cialdini arguing-against-self · Voss tactics (mirroring / labeling / accusation audit / calibrated questions / "no" strategy) · age-asymmetry tactics. Source: NotebookLM 2026-04-28 synthesis.',
+      'JOLT pre-buttal · Sandler negative reverse · Cialdini arguing-against-self · Voss tactics · age-asymmetry tactics · Brinkmanship (Schelling/Dixit-Nalebuff). Source: NotebookLM 2026-04-28 synthesis.',
     iconName: 'TrendingUp',
     color: '#6366F1',
     order: 13,
+  },
+  {
+    id: 'strategic_thinking',
+    label: 'Strategic Thinking',
+    description:
+      "Dixit & Nalebuff's 5 game-theory anchors for higher-order positioning: look-forward-reason-backward, strategic moves by limiting options, credible commitments, setting category ground rules, cooperation over competition.",
+    iconName: 'Compass',
+    color: '#8B5CF6',
+    order: 14,
   },
 ];
 
@@ -1660,6 +1670,115 @@ const ADVANCED_SALES_MOVES_CARDS: EducationCard[] = [
   },
 ];
 
+// ─── Cards: 4 Brinkmanship moves (Schelling / Dixit-Nalebuff) ──
+
+const BRINKMANSHIP_CARDS: EducationCard[] = [
+  {
+    id: 'brink_evidence_ultimatum',
+    deckId: 'advanced_sales_moves',
+    prompt: "What is the brinkmanship 'Evidence Moment as ultimatum' move and when do you fire it?",
+    canonicalAnswer:
+      "Source: Schelling 'The Strategy of Conflict'. Fire when pitching boutique sell-side M&A advisors (Potomac archetype). Verbatim: 'Bring a redacted CIM from a deal you lost last year. I'll run the audit live in 7 minutes. If it doesn't flag the exact blind spots that cost you the deal, this isn't for you — and we don't waste each other's time pretending it might be.' Mechanism: pure brinkmanship — you deliberately put the entire relationship on a 7-minute window. The buyer faces a mutually-bad outcome (no deal, wasted intro) unless they engage with the evidence. Authority transmits through the fact that you're willing to lose them on a single test. Anti-pattern: hedging the ultimatum ('we could try a small audit, see how it feels') — kills the brinkmanship effect.",
+    difficulty: 'advanced',
+    applicationContext: 'Cold meeting with a Potomac-class M&A advisor — how do you compress the eval cycle?',
+    source: 'sales-toolkit.ts BRINKMANSHIP_MOVES · brinkmanship_evidence_ultimatum',
+    tag: 'brinkmanship',
+  },
+  {
+    id: 'brink_honest_off_ramp',
+    deckId: 'advanced_sales_moves',
+    prompt: 'How do you weaponise the "honest off-ramp" as brinkmanship — give the verbatim?',
+    canonicalAnswer:
+      "Source: Schelling. Fire when the buyer is dragging the process or lowballing on price. Verbatim: 'To be completely honest, if your IC never gets blindsided post-close and your team already has a perfectly auditable system of record for tracking why strategic decisions were made, you absolutely do not need this tool. We only step in when firms realise their M&A failure rate is bleeding alpha. If that's not your situation, let's both save the time.' Mechanism: by deliberately creating the risk that THEY lose access to YOU, you flip the power dynamic. The buyer has to defend why they want to continue — opposite of having to defend why they should buy. Anti-pattern: following the off-ramp with 'but if you'd like to learn more...' — destroys brinkmanship instantly.",
+    difficulty: 'advanced',
+    applicationContext: 'Buyer is dragging a procurement cycle — how do you flip the dynamic?',
+    source: 'sales-toolkit.ts BRINKMANSHIP_MOVES · brinkmanship_honest_off_ramp',
+    tag: 'brinkmanship',
+  },
+  {
+    id: 'brink_no_custom_features',
+    deckId: 'advanced_sales_moves',
+    prompt: "Why does brinkmanship require killing lucrative deals that ask for custom features?",
+    canonicalAnswer:
+      "Source: Schelling commitment principle. Verbatim: 'I'm going to say no to that, even though I know the deal is meaningful. Building bespoke software for one client is a terrible business model — it makes you slower, makes the product weaker for everyone else, and creates a permanent maintenance liability. We sell what's in the published pipeline. If your specific need isn't there, this isn't the right vendor for you yet.' Mechanism: brinkmanship through credible commitment — the buyer cannot extract custom work from you regardless of deal size. By being willing to kill a lucrative deal rather than become an unpaid dev shop, you establish an unmoveable boundary. Anti-pattern: 'we could maybe explore that for the right scope' — once the door is open, the buyer drags you through 6 months of free scoping calls.",
+    difficulty: 'advanced',
+    applicationContext: "Margaret-class CSO offers a £200K deal IF you build a custom Snowflake integration.",
+    source: 'sales-toolkit.ts BRINKMANSHIP_MOVES · brinkmanship_no_custom_features',
+    tag: 'brinkmanship',
+  },
+  {
+    id: 'brink_natural_scarcity_seats',
+    deckId: 'advanced_sales_moves',
+    prompt: 'How does brinkmanship apply to your 4 design-partner seats?',
+    canonicalAnswer:
+      "Source: Cialdini scarcity × Schelling commitment. Verbatim: 'We have 4 design-partner seats open. Because the outcome flywheel needs me to map your firm's specific decision pipeline to the 17-framework regulatory engine, I physically don't have capacity for a fifth. The seats come with strict operational requirements — 90-day outcome logging, audit-before-meeting on every IC, and the engagement is a contractual data flywheel commitment. If those terms don't fit, we hold the seat for someone else.' Mechanism: scarcity is structurally true (founder bandwidth + outcome calibration), not marketing. By tying the seat to non-negotiable operational commitments, you create a deliberate risk: the buyer either accepts your terms or loses access entirely. Anti-pattern: discounting the operational requirements when the buyer pushes back — destroys the scarcity.",
+    difficulty: 'advanced',
+    applicationContext: "Buyer says 'we'd want to do this next quarter, can you hold a seat?'",
+    source: 'sales-toolkit.ts BRINKMANSHIP_MOVES · brinkmanship_natural_scarcity_seats',
+    tag: 'brinkmanship',
+  },
+];
+
+// ─── Cards: 5 Strategic Thinking principles (Dixit & Nalebuff) ──
+
+const STRATEGIC_THINKING_CARDS: EducationCard[] = [
+  {
+    id: 'strat_look_forward_reason_backward',
+    deckId: 'strategic_thinking',
+    prompt: '"Look forward and reason backward" — how does this principle govern Decision Intel\'s 30-day pivot?',
+    canonicalAnswer:
+      "Source: Dixit & Nalebuff 'Thinking Strategically'. The primary rule of strategic thinking: look forward to where any early decisions will lead, and use that to reason backward to determine your best present choice. Application: the revenue ceiling is F500 CSOs (12-month procurement + SOC 2 Type II + outcome flywheel). Reasoning backward from that endpoint, the present move is the wedge — mid-market PE/VC associates and boutique M&A advisors who can swipe a corporate card today for £149/mo or £499/deal. The wedge is not a settling — it IS the path to the ceiling. When it bites: whenever you're tempted to chase an F500 logo because the meeting feels prestigious. Reason forward (cycle time, custom-feature pressure) before chasing.",
+    difficulty: 'advanced',
+    applicationContext: 'You get a warm intro to a Fortune 100 CSO right now — do you take the meeting?',
+    source: 'sales-toolkit.ts STRATEGIC_THINKING_PRINCIPLES · look_forward_reason_backward',
+    tag: 'dixit_nalebuff',
+  },
+  {
+    id: 'strat_limit_options',
+    deckId: 'strategic_thinking',
+    prompt: 'Why does "limiting your options" make Decision Intel more credible to enterprise buyers?',
+    canonicalAnswer:
+      "Source: Schelling, Dixit & Nalebuff. A strategic move alters the beliefs and actions of the other party — its distinguishing feature is that you PURPOSEFULLY limit your options. The constraint IS the move. Application: hiding 80% of the 'Cathedral of Code' (RSS feeds, copilot, team benchmarking) and enforcing a strict no-custom-features rule is a deliberate option-limit. It alters buyer perception: it proves Decision Intel is a productized academic synthesis (the 12-node bias auditor as a finished thing), not a flexible dev shop. Credibility comes from what you refuse to do. When it bites: every time a sales conversation pulls you toward 'we could also build...' — the right move is the opposite, trim what's visible, sharpen the boundary.",
+    difficulty: 'advanced',
+    applicationContext: "Buyer asks if you can 'just add a Salesforce integration' — how does limiting your options actually win the deal?",
+    source: 'sales-toolkit.ts STRATEGIC_THINKING_PRINCIPLES · strategic_moves_limit_options',
+    tag: 'dixit_nalebuff',
+  },
+  {
+    id: 'strat_credible_commitments',
+    deckId: 'strategic_thinking',
+    prompt: 'What is a "credible commitment" in the Schelling sense, and what makes Decision Intel\'s data-purge pledge credible?',
+    canonicalAnswer:
+      "Source: Schelling. If you want to influence a buyer, your promises must carry CREDIBILITY in a strategic sense — backed by something the buyer cannot doubt. Application: as a 16-year-old solo founder, enterprise buyers will inherently doubt your operational maturity. You cannot just promise data is safe. You make a credible commitment by pointing to hardcoded infrastructure: the POST /api/deals/[id]/archive endpoint that triggers a 7-day hard purge upon NDA expiry, AES-256-GCM encryption at rest, the documented Vendor Continuity Plan, the published SLA tiers in the public Enterprise quote PDF. The architecture IS the commitment device — you can't abandon it without abandoning the product. When it bites: every procurement-stage call with a James-class GC or Margaret-class CSO. Credibility is asserted not through founder credentials but through architecture you cannot walk back.",
+    difficulty: 'advanced',
+    applicationContext: 'GC asks "what guarantees that my data is purged when our NDA expires?"',
+    source: 'sales-toolkit.ts STRATEGIC_THINKING_PRINCIPLES · credible_commitments_procurement',
+    tag: 'schelling',
+  },
+  {
+    id: 'strat_ground_rules',
+    deckId: 'strategic_thinking',
+    prompt: 'Why is NOW the strategic window for Decision Intel to set the category ground rules?',
+    canonicalAnswer:
+      "Source: Dixit & Nalebuff. In some situations, the key time for strategic maneuvering is while the GROUND RULES are being decided — not while playing the game. Application: the enterprise AI governance and decision-intelligence categories are crystallising right now (2026). By positioning Decision Intel explicitly as the 'native reasoning layer' — differentiating from Aera (operational automation) and Cloverpop (decision logging) — you establish the ground rules of the category in your favour BEFORE competitors define them for you. The R²F (Recognition-Rigor Framework) IP claim is the same move applied to the academic anchor: you claim the Kahneman+Klein synthesis territory before someone else does. When it bites: right now. The window closes when one of Cloverpop / IBM watsonx / Aera defines the category. Every published-for-procurement piece of work (DPR, Bias Genome, /how-it-works) is a ground-rule-setting move.",
+    difficulty: 'advanced',
+    applicationContext: 'You see a competitor pitch "decision intelligence platform" on LinkedIn — what is the right competitive move?',
+    source: 'sales-toolkit.ts STRATEGIC_THINKING_PRINCIPLES · set_ground_rules_category',
+    tag: 'dixit_nalebuff',
+  },
+  {
+    id: 'strat_cooperation_coordination',
+    deckId: 'strategic_thinking',
+    prompt: 'When does cooperation beat competition for Decision Intel — give a specific example?',
+    canonicalAnswer:
+      "Source: Dixit & Nalebuff. Strategy is not just about outsmarting rivals — it is also about forging strong bonds of cooperation and coordination when it serves your own interests. Application: refuse to compete head-to-head with the $300B consulting industry. Position Decision Intel as a COMPLEMENTARY asset to McKinsey QuantumBlack or LRQA's EiQ — the continuous, EU AI Act Article 14-compliant audit layer that embeds INTO their multi-million-dollar strategy engagements. Same principle for the LRQA / Ian Spaulding warm intro: that's not a sale, it's a COORDINATION BID. Turn potential competitors into massive distribution channels by making yourself the layer they want to integrate. When it bites: whenever you see a strategic vendor that looks like a competitor (LRQA EiQ, McKinsey QuantumBlack, IBM watsonx.governance bundle). Ask: do we beat them, or slot in beside them? The slot-in answer compounds; the beat-them answer requires capital we don't have.",
+    difficulty: 'advanced',
+    applicationContext: "LRQA acquired Partner Africa in April 2026 + has €500M for partnerships. Beat them or slot in?",
+    source: 'sales-toolkit.ts STRATEGIC_THINKING_PRINCIPLES · cooperation_coordination',
+    tag: 'dixit_nalebuff',
+  },
+];
+
 // ─── Aggregator + Helpers ───────────────────────────────────────
 
 export const ALL_CARDS: EducationCard[] = [
@@ -1677,6 +1796,8 @@ export const ALL_CARDS: EducationCard[] = [
   ...R2F_FRAMEWORK_CARDS,
   ...FOUNDER_ONELINERS_CARDS,
   ...ADVANCED_SALES_MOVES_CARDS,
+  ...BRINKMANSHIP_CARDS,
+  ...STRATEGIC_THINKING_CARDS,
 ];
 
 export function findDeck(id: DeckId): EducationDeck | undefined {

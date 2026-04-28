@@ -1279,3 +1279,150 @@ export const VOSS_TACTICS: SalesMove[] = [
   },
 ];
 
+// ─── 4 Brinkmanship moves (Schelling / Dixit-Nalebuff game theory) ──
+//
+// Locked: 2026-04-28 PM. Source: Thomas Schelling "The Strategy of Conflict"
+// (1960) + Avinash Dixit & Barry Nalebuff "Thinking Strategically" (1991).
+//
+// Brinkmanship is the skill of deliberately creating and manipulating the
+// risk of a mutually bad outcome to encourage the other party to compromise.
+// For a 16-year-old solo founder, brinkmanship breaks the traditional power
+// dynamic: by demonstrating you are willing to walk away from bad deals or
+// bad terms, you force buyers to evaluate Decision Intel on YOUR terms.
+//
+// These four moves operationalise the principle on a live call. Each maps
+// onto Sparring Room dimensions that already exist (mutual_disqualification,
+// pressure_without_pressure, damaging_admission) — brinkmanship is the
+// META-PATTERN that fires when those dimensions cluster high together.
+
+export const BRINKMANSHIP_MOVES: SalesMove[] = [
+  {
+    id: 'brinkmanship_evidence_ultimatum',
+    framework: 'Brinkmanship · Evidence Moment as Ultimatum (Schelling, "The Strategy of Conflict")',
+    whenToFire:
+      'When pitching to boutique sell-side M&A advisors (Potomac archetype) or any analyst-grade buyer who responds to live evidence. Use this to compress a 6-week evaluation cycle into a 7-minute pass/fail test.',
+    verbatim:
+      "Bring a redacted CIM from a deal you lost last year. I'll run the audit live in 7 minutes. If it doesn't flag the exact blind spots that cost you the deal, this isn't for you — and we don't waste each other's time pretending it might be.",
+    mechanism:
+      "Pure brinkmanship: you deliberately put the entire relationship on a 7-minute window. The buyer faces a mutually-bad outcome (no deal, wasted intro) unless they engage with the evidence. The risk forces them to either accept undeniable proof of your audit or end the conversation. Authority transmits through the fact that you're willing to lose them on a single test.",
+    antiPattern:
+      "Hedging the ultimatum ('we could try a small audit, see how it feels') — kills the brinkmanship effect. The asymmetric stakes are the move. Soften it and you're back to a normal vendor pitch.",
+    scoresOn: 'mutual_disqualification + category_of_one + conviction_transmission',
+    bestForPersona: 'boutique_ma_advisor, mid_market_pe_associate',
+  },
+  {
+    id: 'brinkmanship_honest_off_ramp',
+    framework: 'Brinkmanship · Weaponized Honest Off-Ramp (Schelling)',
+    whenToFire:
+      "When you sense the buyer is starting to drag the process or lowball on price. Or any time the conversation feels like you're chasing them.",
+    verbatim:
+      "To be completely honest, if your IC never gets blindsided post-close and your team already has a perfectly auditable system of record for tracking why strategic decisions were made, you absolutely do not need this tool. We only step in when firms realise their M&A failure rate is bleeding alpha. If that's not your situation, let's both save the time.",
+    mechanism:
+      "Volunteering to walk away projects the status and authority of someone who does not need to compromise on scope or price. By deliberately creating the risk that THEY lose access to YOU, you flip the power dynamic. The buyer has to defend why they want to continue — which is the opposite of having to defend why they should buy.",
+    antiPattern:
+      "Following the off-ramp with 'but if you'd like to learn more...' — destroys the brinkmanship instantly. The off-ramp must be unqualified. Silence after the line is the move.",
+    scoresOn: 'mutual_disqualification + pressure_without_pressure + authority_not_trust',
+    bestForPersona: 'all',
+  },
+  {
+    id: 'brinkmanship_no_custom_features',
+    framework: 'Brinkmanship · Reject the Unpaid Dev Shop (Schelling commitment principle)',
+    whenToFire:
+      "When a large prospect asks for a bespoke integration, custom feature, or 'just one small thing' outside your published 11-agent pipeline.",
+    verbatim:
+      "I'm going to say no to that, even though I know the deal is meaningful. Building bespoke software for one client is a terrible business model — it makes you slower, makes the product weaker for everyone else, and creates a permanent maintenance liability. We sell what's in the published pipeline. If your specific need isn't there, this isn't the right vendor for you yet.",
+    mechanism:
+      "Brinkmanship through credible commitment: the buyer cannot extract custom work from you regardless of deal size. By being willing to kill a lucrative deal rather than become an unpaid dev shop, you establish an unmoveable boundary. Buyers respect the line because they cannot exploit it.",
+    antiPattern:
+      "Saying 'we could maybe explore that for the right scope' — once the door is open, the buyer drags you through 6 months of free scoping calls. 'No' must be unqualified. The credible commitment IS the strategic move.",
+    scoresOn: 'mutual_disqualification + authority_not_trust + damaging_admission',
+    bestForPersona: 'f500_cso, pan_african_fund_partner',
+  },
+  {
+    id: 'brinkmanship_natural_scarcity_seats',
+    framework: 'Brinkmanship · Natural Scarcity on Pilot Seats (Cialdini scarcity × Schelling commitment)',
+    whenToFire:
+      "When the buyer is interested but non-committal about timing, OR asks 'what's the cost to start a pilot?'",
+    verbatim:
+      "We have 4 design-partner seats open. Because the outcome flywheel needs me to map your firm's specific decision pipeline to the 17-framework regulatory engine, I physically don't have capacity for a fifth. The seats come with strict operational requirements — 90-day outcome logging, audit-before-meeting on every IC, and the engagement is a contractual data flywheel commitment. If those terms don't fit, we hold the seat for someone else.",
+    mechanism:
+      "The scarcity is structurally true (founder bandwidth + outcome calibration), not marketing. By tying the seat to non-negotiable operational commitments, you create a deliberate risk: the buyer either accepts your terms or loses access entirely. The brinkmanship: the buyer cannot get the seat AND escape the commitments.",
+    antiPattern:
+      "Discounting the operational requirements when the buyer pushes back ('we could be flexible on the outcome logging for the first 60 days') — destroys the scarcity. The terms must be the terms.",
+    scoresOn: 'pressure_without_pressure + mutual_disqualification + prescriptive_recommendation',
+    bestForPersona: 'mid_market_pe_associate, pan_african_fund_partner, fractional_cso',
+  },
+];
+
+// ─── 5 Strategic-Thinking principles (Dixit-Nalebuff "Thinking Strategically") ──
+//
+// Locked: 2026-04-28 PM. Source: Avinash Dixit & Barry Nalebuff "Thinking
+// Strategically" (1991). Higher-order strategic positioning principles
+// that govern HOW Decision Intel is built, sold, and positioned — not
+// per-call tactics. Reference these when making roadmap, positioning,
+// or competitive-strategy decisions, not when rehearsing a sales rep.
+
+export interface StrategicPrinciple {
+  id: string;
+  /** Principle name + originator. */
+  principle: string;
+  /** One-sentence summary of what the principle says. */
+  summary: string;
+  /** How DI applies it specifically — concrete operational expression. */
+  diApplication: string;
+  /** When to invoke this principle — the decision context where it bites. */
+  whenItBites: string;
+}
+
+export const STRATEGIC_THINKING_PRINCIPLES: StrategicPrinciple[] = [
+  {
+    id: 'look_forward_reason_backward',
+    principle: 'Look Forward and Reason Backward (Dixit & Nalebuff)',
+    summary:
+      'The primary rule of strategic thinking: look forward to where any early decisions will lead, and use that to reason backward to determine your best present choice.',
+    diApplication:
+      'The 30-day pivot to mid-market PE/VC associates and boutique M&A advisors is the reasoned-backward result. The revenue ceiling is F500 CSOs (12-month procurement + SOC 2 Type II + outcome flywheel). Reasoning backward from that endpoint, the present move is the wedge that lets you survive AND build the data flywheel that unlocks the ceiling. This is why the wedge is not a settling — it IS the path.',
+    whenItBites:
+      "Whenever you're tempted to chase an F500 logo because the meeting feels prestigious. Reason forward — what does that single deal cost in cycle time, custom-feature pressure, distraction from the wedge? Reason backward from the F500 destination via 3 published wedge cases.",
+  },
+  {
+    id: 'strategic_moves_limit_options',
+    principle: 'Strategic Moves by Limiting Your Options (Schelling, Dixit & Nalebuff)',
+    summary:
+      'A strategic move alters the beliefs and actions of the other party — and its distinguishing feature is that you PURPOSEFULLY limit your options. The constraint is the move.',
+    diApplication:
+      'Hiding 80% of the "Cathedral of Code" (RSS feeds, copilot, team benchmarking) and enforcing a strict no-custom-features rule is a deliberate option-limit. It alters buyer perception: it proves Decision Intel is a productized academic synthesis (the 11-node bias auditor as a finished thing), not a flexible dev shop willing to build whatever they ask for. The credibility comes from what you refuse to do.',
+    whenItBites:
+      "Every time a sales conversation pulls you toward 'we could also build...' as a closing tactic. The right move is the opposite: trim what's visible, sharpen the boundary, let the constraint do the persuasion.",
+  },
+  {
+    id: 'credible_commitments_procurement',
+    principle: 'Credible Commitments (Schelling)',
+    summary:
+      "If you want to influence a buyer, your promises and responses must carry credibility in a strategic sense — meaning they must be backed by something the buyer cannot doubt.",
+    diApplication:
+      "As a 16-year-old solo founder, enterprise buyers will inherently doubt your operational maturity. You cannot just promise data is safe. You make a credible commitment by pointing to hardcoded infrastructure: the POST /api/deals/[id]/archive endpoint that triggers a 7-day hard purge upon NDA expiry, AES-256-GCM encryption at rest, the documented Vendor Continuity Plan, the published SLA tiers in the public Enterprise quote PDF. The architecture IS the commitment device. You can't abandon it without abandoning the product.",
+    whenItBites:
+      "Every procurement-stage call with a James-class GC or Margaret-class CSO. Credibility is asserted not through founder credentials but through architecture you cannot walk back.",
+  },
+  {
+    id: 'set_ground_rules_category',
+    principle: "Setting the Ground Rules for Category Design (Dixit & Nalebuff)",
+    summary:
+      "In some situations, the key time for strategic maneuvering is while the GROUND RULES of the game are being decided — not while playing the game.",
+    diApplication:
+      "The enterprise AI governance and decision-intelligence categories are crystallising right now. By positioning Decision Intel explicitly as the 'native reasoning layer' — differentiating from Aera (operational automation) and Cloverpop (decision logging) — you establish the ground rules of the category in your favour BEFORE competitors define them for you. The R²F (Recognition-Rigor Framework) IP claim is the same move applied to the academic anchor: you claim the Kahneman+Klein synthesis territory before someone else does.",
+    whenItBites:
+      "Right now, in 2026. The window for setting ground rules closes when one of Cloverpop / IBM watsonx / Aera defines the category. Every published-for-procurement piece of work (DPR, Bias Genome, /how-it-works) is a ground-rule-setting move.",
+  },
+  {
+    id: 'cooperation_coordination',
+    principle: 'Cooperation and Coordination (Dixit & Nalebuff)',
+    summary:
+      'Strategy is not just about outsmarting rivals — it is also about forging strong bonds of cooperation and coordination when it serves your own interests.',
+    diApplication:
+      "Refuse to compete head-to-head with the $300B consulting industry. Position Decision Intel as a COMPLEMENTARY asset to McKinsey QuantumBlack or LRQA's EiQ — the continuous, EU AI Act Article 14-compliant audit layer that embeds INTO their multi-million-dollar strategy engagements. Same principle for the LRQA / Ian Spaulding warm intro: that's not a sale, it's a coordination bid. Turn potential competitors into massive distribution channels by making yourself the layer they want to integrate.",
+    whenItBites:
+      "Whenever you see a strategic vendor that looks like a competitor on the surface (LRQA's EiQ, McKinsey QuantumBlack, an IBM watsonx.governance bundle). Ask: do we beat them, or do we slot in beside them? The slot-in answer compounds; the beat-them answer requires capital we don't have.",
+  },
+];

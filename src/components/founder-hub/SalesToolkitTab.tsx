@@ -12,7 +12,10 @@ import {
   Activity,
   Lightbulb,
   TrendingUp,
+  Zap,
+  Compass,
 } from 'lucide-react';
+import type { StrategicPrinciple } from '@/lib/data/sales-toolkit';
 import { PitchReframeToggle } from './sales/PitchReframeToggle';
 import { ObjectionFlashcards } from './sales/ObjectionFlashcards';
 import { DemoStepperTimeline } from './sales/DemoStepperTimeline';
@@ -27,6 +30,8 @@ import {
   SALES_FRAMEWORK_GAPS,
   AGE_ASYMMETRY_TACTICS,
   VOSS_TACTICS,
+  BRINKMANSHIP_MOVES,
+  STRATEGIC_THINKING_PRINCIPLES,
 } from '@/lib/data/sales-toolkit';
 
 interface SectionProps {
@@ -156,6 +161,24 @@ export function SalesToolkitTab() {
       </Section>
 
       <Section
+        icon={<Zap size={16} />}
+        title="Brinkmanship · 4 game-theory moves that flip the power dynamic"
+        subtitle="Schelling (The Strategy of Conflict) + Dixit & Nalebuff (Thinking Strategically). The skill of deliberately creating the risk of a mutually-bad outcome — the deal dying — to force the buyer to evaluate DI on YOUR terms. Evidence-Moment ultimatum · weaponized honest off-ramp · reject the unpaid dev shop · natural scarcity on pilot seats. Brinkmanship is the META-PATTERN that fires when mutual_disqualification + pressure_without_pressure + damaging_admission cluster high in your Sparring Room reps."
+        accent="#DC2626"
+      >
+        <SalesMovesGrid moves={BRINKMANSHIP_MOVES} accent="#DC2626" />
+      </Section>
+
+      <Section
+        icon={<Compass size={16} />}
+        title="Strategic Thinking Principles · 5 game-theory anchors for positioning"
+        subtitle="Dixit & Nalebuff (Thinking Strategically). HIGHER-ORDER principles that govern HOW Decision Intel is built, sold, and positioned — not per-call tactics. Reference these when making roadmap, positioning, or competitive-strategy decisions. Look-forward-reason-backward · strategic moves by limiting options · credible commitments · setting category ground rules · cooperation/coordination over competition."
+        accent="#8B5CF6"
+      >
+        <StrategicPrinciplesList principles={STRATEGIC_THINKING_PRINCIPLES} />
+      </Section>
+
+      <Section
         icon={<AlertTriangle size={16} />}
         title="Enterprise Friction Matrix · 5 deal-killers + responses"
         subtitle="The frictions enterprise buyers will surface during procurement (Nigerian SEC ISA 2007 gap, Client-Safe DPR Export, VDR integration, DQI explainability, shelfware risk). Each card carries the pre-baked response + the underlying product status — so frictions also surface real product gaps to fix."
@@ -190,6 +213,51 @@ export function SalesToolkitTab() {
       >
         <DemoStepperTimeline />
       </Section>
+    </div>
+  );
+}
+
+// ─── StrategicPrinciplesList ──────────────────────────────────────
+// Renders a 5-principle game-theory list for the Strategic Thinking
+// section. Each card collapses by default to keep the section scannable.
+
+function StrategicPrinciplesList({ principles }: { principles: StrategicPrinciple[] }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      {principles.map(p => (
+        <details
+          key={p.id}
+          style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            borderLeft: '3px solid #8B5CF6',
+            borderRadius: 'var(--radius-md)',
+            padding: '10px 12px',
+          }}
+        >
+          <summary
+            style={{
+              cursor: 'pointer',
+              fontSize: 13,
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+            }}
+          >
+            {p.principle}
+          </summary>
+          <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+              <strong style={{ color: 'var(--text-primary)' }}>Summary:</strong> {p.summary}
+            </div>
+            <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+              <strong style={{ color: '#8B5CF6' }}>Decision Intel application:</strong> {p.diApplication}
+            </div>
+            <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+              <strong style={{ color: '#16A34A' }}>When it bites:</strong> {p.whenItBites}
+            </div>
+          </div>
+        </details>
+      ))}
     </div>
   );
 }
