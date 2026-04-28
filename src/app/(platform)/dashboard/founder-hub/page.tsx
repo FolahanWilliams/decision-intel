@@ -125,6 +125,15 @@ const ClosingLabTab = dynamic(
     })),
   { loading: tabLoader }
 );
+// Sparring Room — live sales-rep practice (paste Wispr Flow transcript →
+// 10-dim Sales DQI grading + buyer-perspective simulation). Locked 2026-04-28.
+const SparringRoomTab = dynamic(
+  () =>
+    import('@/components/founder-hub/SparringRoomTab').then(m => ({
+      default: m.SparringRoomTab,
+    })),
+  { loading: tabLoader }
+);
 const FounderSchoolTab = dynamic(
   () =>
     import('@/components/founder-hub/FounderSchoolTab').then(m => ({
@@ -242,6 +251,7 @@ type TabId =
   | 'sales'
   | 'outreach_hub'
   | 'closing_lab'
+  | 'sparring_room'
   | 'content'
   | 'data_ecosystem'
   | 'case_library'
@@ -321,6 +331,12 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
     id: 'closing_lab',
     label: 'Closing Lab',
     icon: <Target size={16} />,
+    group: 'Go-to-Market',
+  },
+  {
+    id: 'sparring_room',
+    label: 'Sparring Room',
+    icon: <Brain size={16} />,
     group: 'Go-to-Market',
   },
   {
@@ -594,6 +610,39 @@ const SEARCH_INDEX: SearchEntry[] = [
       'What to kill / hide / move to enterprise · the simplified landing→demo→audit→checkout funnel · 3 phrases that kill deals.',
     keywords:
       'closing lab cut list 80 percent kill hide feature flag enterprise tier simplified funnel landing demo audit checkout four step never say phrases ai decision intelligence platform 12 node langgraph customize whatever you need',
+  },
+  // Sparring Room — live sales-rep practice. Wispr Flow voice → grade.
+  {
+    tabId: 'sparring_room',
+    section: 'Sparring Room · Live sales-rep practice with AI grading',
+    preview:
+      'Pick a buyer persona × scenario, hear their opener + 3 questions, speak via Wispr Flow, paste transcript, get a 10-dim Sales DQI scorecard.',
+    keywords:
+      'sparring room practice live rep wispr flow voice transcript sales dqi grade buyer persona scenario rehearse pitch coach mid market pe associate margaret titi adaeze potomac marcus james riya cold first meeting skeptical follow up hot inbound procurement objection handler live demo',
+  },
+  {
+    tabId: 'sparring_room',
+    section: 'Sparring Room · 7 buyer personas (Adaeze / Margaret / Titi / Potomac / Marcus / James / Riya)',
+    preview:
+      'Three fastest-converters + Margaret-class F500 CSO + Titi-class Pan-African fund partner + James-class GC + Riya-class pre-seed VC associate.',
+    keywords:
+      'sparring buyer personas adaeze mid market pe associate margaret f500 cso fortune 500 chief strategy officer titi pan african fund partner potomac boutique sell side m&a advisor marcus solo fractional cso james gc audit committee general counsel riya pre seed vc associate',
+  },
+  {
+    tabId: 'sparring_room',
+    section: 'Sparring Room · Sales DQI rubric (Maalouf 4 + Satyam 3 + DI discipline 2 + fundamentals 1)',
+    preview:
+      '10-dimension grading: pressure-without-pressure, authority-not-trust, pinpoint-pain, embody-bigger, category-of-one, conviction, infrastructure, vocabulary, empathic-mode-first, specificity.',
+    keywords:
+      'sparring sales dqi rubric grading dimensions pressure without pressure authority not trust pinpoint pain embody bigger better category of one conviction transmission sales infrastructure quality vocabulary discipline empathic mode first specificity over vagueness maalouf satyam',
+  },
+  {
+    tabId: 'sparring_room',
+    section: 'Sparring Room · 6 scenario modes (cold / skeptical / hot inbound / procurement / objection / live demo)',
+    preview:
+      'Cold first meeting · skeptical follow-up · hot inbound · procurement evaluation (GC + CISO + procurement) · live objection handling · live demo / specimen audit walkthrough.',
+    keywords:
+      'sparring scenario modes cold first meeting skeptical follow up hot inbound procurement evaluation gc ciso live objection handling 30 seconds live demo specimen audit walkthrough wework dangote 7 minute',
   },
   // Outreach Hub — three internal sections, surfaced separately in
   // search so the founder lands on the right section directly.
@@ -1391,6 +1440,11 @@ function renderTab(
     closing_lab: (
       <ErrorBoundary sectionName="Closing Lab">
         <ClosingLabTab />
+      </ErrorBoundary>
+    ),
+    sparring_room: (
+      <ErrorBoundary sectionName="Sparring Room">
+        <SparringRoomTab founderPass={FOUNDER_PASS} />
       </ErrorBoundary>
     ),
     outreach_hub: (
