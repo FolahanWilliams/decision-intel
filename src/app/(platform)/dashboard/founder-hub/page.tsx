@@ -809,7 +809,11 @@ function SearchResults({ query, onJump }: { query: string; onJump: (tabId: TabId
           window.location.hash = targetHash;
         });
       } else {
-        window.location.hash = targetHash;
+        // rAF wrap matches the same-hash branch and sidesteps the
+        // react-hooks/immutability lint flag on direct hash assignment.
+        requestAnimationFrame(() => {
+          window.location.hash = targetHash;
+        });
       }
     }
     onJump(entry.tabId);

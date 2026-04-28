@@ -264,7 +264,7 @@ export async function DELETE(req: NextRequest) {
   return NextResponse.json({ ok: true });
 }
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   // Owner-list of share links (used by the share modal to surface
   // existing links so the user doesn't create duplicates).
   const supabase = await createClient();
