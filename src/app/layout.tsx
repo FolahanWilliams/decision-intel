@@ -20,11 +20,11 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.c
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'Decision Intel | The native reasoning layer for every boardroom strategic decision',
+    default: 'Decision Intel | The native reasoning layer for every high-stakes call',
     template: '%s | Decision Intel',
   },
   description:
-    'The native reasoning layer for every boardroom strategic decision. Audit the reasoning in every strategic memo, predict steering-committee objections before the meeting, and compound a living Decision Knowledge Graph quarter after quarter.',
+    'The native reasoning layer for every high-stakes call. Audit the reasoning in every strategic memo, predict the questions the room will ask, and compound a living Decision Knowledge Graph quarter after quarter.',
   keywords: [
     'reasoning layer',
     'decision provenance record',
@@ -40,16 +40,16 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     siteName: 'Decision Intel',
-    title: 'Decision Intel | The native reasoning layer for every boardroom strategic decision',
+    title: 'Decision Intel | The native reasoning layer for every high-stakes call',
     description:
-      'The native reasoning layer for every boardroom strategic decision. Audit the reasoning in every strategic memo. See the questions the board will ask. Compound your team\u2019s judgment, quarter after quarter.',
+      'The native reasoning layer for every high-stakes call. Audit the reasoning in every strategic memo. See the questions the room will ask. Compound your team\u2019s judgment, quarter after quarter.',
     url: siteUrl,
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Decision Intel | The native reasoning layer for every boardroom strategic decision',
+    title: 'Decision Intel | The native reasoning layer for every high-stakes call',
     description:
-      'The native reasoning layer for every boardroom strategic decision. Audit the reasoning in every strategic memo. See the questions the board will ask. Compound your team\u2019s judgment.',
+      'The native reasoning layer for every high-stakes call. Audit the reasoning in every strategic memo. See the questions the room will ask. Compound your team\u2019s judgment.',
   },
   robots: { index: true, follow: true },
   icons: {

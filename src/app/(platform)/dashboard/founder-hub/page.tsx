@@ -5,6 +5,9 @@ import dynamic from 'next/dynamic';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { FounderChatWidget } from '@/components/founder-hub/FounderChatWidget';
 import { Loader2 } from 'lucide-react';
+import { ALL_CASES } from '@/lib/data/case-studies';
+
+const CASES_WITH_PRE_DECISION_EVIDENCE = ALL_CASES.filter(c => c.preDecisionEvidence).length;
 
 // ─── Lazy-loaded tabs (~12,000 lines total — only active tab is loaded) ─────
 const tabLoader = () => (
@@ -565,7 +568,7 @@ const SEARCH_INDEX: SearchEntry[] = [
   {
     tabId: 'case_library',
     section: 'Historical Cases',
-    preview: '50+ case studies with pre-decision evidence.',
+    preview: `${ALL_CASES.length} case studies, ${CASES_WITH_PRE_DECISION_EVIDENCE} with pre-decision evidence.`,
     keywords:
       'historical cases kodak blockbuster nokia enron case studies library evidence corporate decisions',
   },
@@ -1268,7 +1271,7 @@ function renderTab(
       <>
         <AccordionSection
           title="Historical Cases"
-          subtitle="14 case studies with pre-decision evidence"
+          subtitle={`${CASES_WITH_PRE_DECISION_EVIDENCE} case studies with pre-decision evidence`}
         >
           <CaseStudiesTab />
         </AccordionSection>

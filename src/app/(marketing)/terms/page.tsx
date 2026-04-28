@@ -4,11 +4,11 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'Terms of Service | Decision Intel',
   description:
-    'Terms and conditions for using Decision Intel, the native reasoning layer for boardroom strategic decisions across corporate strategy and M&A teams.',
+    'Terms and conditions for using Decision Intel, the native reasoning layer for every high-stakes call across corporate strategy, M&A, and fund-investment teams.',
   openGraph: {
     title: 'Terms of Service | Decision Intel',
     description:
-      'Terms and conditions for using Decision Intel, the native reasoning layer for boardroom strategic decisions across corporate strategy and M&A teams.',
+      'Terms and conditions for using Decision Intel, the native reasoning layer for every high-stakes call across corporate strategy, M&A, and fund-investment teams.',
   },
 };
 
@@ -68,7 +68,7 @@ export default function TermsOfServicePage() {
               2. Description of Service
             </h2>
             <p>
-              Decision Intel is the native reasoning layer for boardroom strategic decisions. The
+              Decision Intel is the native reasoning layer for every high-stakes call. The
               Platform analyzes strategic documents for cognitive bias and decision noise, and
               provides bias detection, noise scoring, decision quality indexing, outcome tracking,
               and related analytics tools. Analysis results are generated with the assistance of

@@ -452,7 +452,7 @@ function LoginContent() {
             }}
           >
             The native reasoning layer for{' '}
-            <span style={{ color: '#16A34A' }}>boardroom strategic decisions.</span>
+            <span style={{ color: '#16A34A' }}>every high-stakes call.</span>
           </h2>
           <p
             style={{

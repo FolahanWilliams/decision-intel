@@ -12,7 +12,7 @@ export interface ProductMetric {
 
 export const HERO = {
   eyebrow: 'Positioning',
-  headline: 'The native reasoning layer for every boardroom strategic decision',
+  headline: 'The native reasoning layer for every high-stakes call',
   body: 'Audit the reasoning in every strategic memo, predict steering-committee objections before the meeting, and compound a living Decision Knowledge Graph quarter after quarter. Purpose-built for corporate strategy and M&A teams.',
   pillars: [
     {

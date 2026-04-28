@@ -253,7 +253,7 @@ export function HowItWorksClient() {
                   maxWidth: 560,
                 }}
               >
-                The engine behind the native reasoning layer for every boardroom strategic decision.
+                The engine behind the native reasoning layer for every high-stakes call.
                 Twelve specialized agents, thirty cognitive biases, and a ten-pattern interaction
                 model grounded in Kahneman, Klein, and Tetlock. Every memo audited in under sixty
                 seconds, so the reasoning lives in one surface instead of four.

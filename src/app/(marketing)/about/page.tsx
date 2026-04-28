@@ -49,12 +49,12 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.c
 export const metadata: Metadata = {
   title: 'About · Decision Intel',
   description:
-    'About Decision Intel — the native reasoning layer for boardroom strategic decisions. Legal entity, founder, stage, and procurement contact in one place for vendor-risk diligence.',
+    'About Decision Intel — the native reasoning layer for every high-stakes call. Legal entity, founder, stage, and procurement contact in one place for vendor-risk diligence.',
   alternates: { canonical: `${siteUrl}/about` },
   openGraph: {
     title: 'About Decision Intel',
     description:
-      'The native reasoning layer for boardroom strategic decisions. Legal entity, founder, stage, and procurement contact in one place.',
+      'The native reasoning layer for every high-stakes call. Legal entity, founder, stage, and procurement contact in one place.',
     url: `${siteUrl}/about`,
   },
 };
@@ -145,7 +145,7 @@ export default function AboutPage() {
               letterSpacing: '-0.02em',
             }}
           >
-            The native reasoning layer for every boardroom strategic decision.
+            The native reasoning layer for every high-stakes call.
           </h1>
           <p
             style={{

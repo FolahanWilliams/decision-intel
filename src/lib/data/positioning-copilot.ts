@@ -610,7 +610,7 @@ export const POSITIONING_NODES: PositioningNode[] = [
     id: 'core',
     label: 'Decision Intel',
     kind: 'core',
-    detail: 'The native reasoning layer for every boardroom strategic decision.',
+    detail: 'The native reasoning layer for every high-stakes call.',
   },
   {
     id: 'category',
