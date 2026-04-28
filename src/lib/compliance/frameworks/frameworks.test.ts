@@ -193,9 +193,9 @@ describe('SEC_REG_D_FRAMEWORK', () => {
 // ─── Registry ──────────────────────────────────────────────────────────────
 
 describe('getAllRegisteredFrameworks', () => {
-  it('should return all 18 frameworks (7 international anchors + 11 African-market regimes)', () => {
+  it('should return all 19 frameworks (7 international anchors + 12 African-market regimes)', () => {
     const frameworks = getAllRegisteredFrameworks();
-    expect(frameworks).toHaveLength(18);
+    expect(frameworks).toHaveLength(19);
   });
 
   it('should return frameworks with unique IDs', () => {

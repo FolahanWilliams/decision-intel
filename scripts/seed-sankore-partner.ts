@@ -203,7 +203,7 @@ const SANKORE_RICH_PROFILE: PartnerRichProfile = {
   },
 
   positioning: {
-    categoryAnchor: 'The native reasoning layer for every boardroom strategic decision',
+    categoryAnchor: 'The native reasoning layer for every high-stakes call',
     avoidFraming: [
       "'AI bias detection tool' — positions Decision Intel in the ChatGPT bucket in their mental model.",
       "'Decision intelligence platform' — Gartner-crowded, competes with Cloverpop / Peak.ai / Quantellia.",
@@ -343,7 +343,7 @@ Their workflows are decision-heavy in exactly the shapes Decision Intel is built
 5. African / emerging-markets context. Their heritage framing ("Sankore University, centre of learning") aligns with our positioning ("native reasoning layer"). No competitor in their market is selling this category. First-mover advantage for both sides.
 
 HOW I COME IN — POSITIONING FOR THIS MEETING
-Category anchor: "native reasoning layer for every boardroom strategic decision." Do NOT open with bias-detection language — they will hear "AI tool" and mentally file alongside ChatGPT. Open with category, anchor with Kahneman × Klein (R²F), close with the regulatory calendar.
+Category anchor: "native reasoning layer for every high-stakes call." Do NOT open with bias-detection language — they will hear "AI tool" and mentally file alongside ChatGPT. Open with category, anchor with Kahneman × Klein (R²F), close with the regulatory calendar.
 
 THE OPENING 60 SECONDS (ETHOS)
 "Sankore takes its name from a 13th-century university in Mali — the oldest centre of scholarly rigor in the continent. Decision Intel is the native reasoning layer for the exact thing that university was built to test: can the argument on the page survive scrutiny. I've built it so every one of your investment committee memos gets the scrutiny a regulator, a board, and a future LP will eventually demand — before they ask."
