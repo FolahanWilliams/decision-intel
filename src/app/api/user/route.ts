@@ -87,8 +87,8 @@ export async function DELETE() {
     // Order matters: dependent tables first (FK constraints), then parents.
     // Document → Analysis cascade handles BiasInstance, DecisionEmbedding, AnalysisVersion.
     //
-    // Schema-drift guard: some tables may not exist yet if migrations are pending.
-    // We only swallow P2021/P2022 errors — all other errors propagate and abort
+    // @schema-drift-tolerant — some tables may not exist yet if migrations are pending.
+    // We only swallow P2021/P2022 errors; all other errors propagate and abort
     // the transaction so data integrity is preserved.
     const schemaDriftSafe = async (fn: () => Promise<unknown>) => {
       try {

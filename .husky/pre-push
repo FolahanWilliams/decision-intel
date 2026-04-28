@@ -1,0 +1,60 @@
+#!/bin/sh
+# ==============================================================================
+# Pre-Push Hook: slop-scan trip-wire
+# ==============================================================================
+# Runs the modem-dev/slop-scan v0.3 default-pack rules on the working tree.
+# Blocks the push if scorePerKloc >= 4.0 (the "AI-default median is 10.90;
+# mature OSS is 1.48; we sit at 3.79" trip-wire from CLAUDE.md "Slop-scan as
+# second quality gate" + "Drift-class bug rule").
+#
+# Bypass with `git push --no-verify` if you've audited the regression and
+# need to ship — but the next session won't know you bypassed unless you
+# leave a commit-message trail.
+# ==============================================================================
+
+echo ""
+echo "🧪 Running slop-scan trip-wire (target scorePerKloc < 4.0)..."
+echo ""
+
+# Capture both stdout and exit; we tolerate non-zero exits from the underlying
+# tool as long as the threshold check below passes.
+SLOP_OUTPUT=$(npm run --silent slop-scan 2>&1)
+SLOP_EXIT=$?
+
+# Echo the raw output so the founder sees the breakdown.
+echo "$SLOP_OUTPUT"
+
+# Extract the scorePerKloc number. Format from slop-scan.sh:
+#   "scorePerKloc:   3.79  (target <4.0 — closer to mature-OSS median 1.48 than AI-default 10.90)"
+SCORE=$(echo "$SLOP_OUTPUT" | awk '/^scorePerKloc:/ {print $2; exit}')
+
+if [ -z "$SCORE" ]; then
+    echo ""
+    echo "⚠️  slop-scan ran but produced no scorePerKloc line. Push allowed (graceful)."
+    echo "   Investigate scripts/slop-scan.sh if this persists."
+    exit 0
+fi
+
+# Compare via awk — POSIX shell can't do floating-point.
+TRIPPED=$(awk -v s="$SCORE" 'BEGIN { print (s+0 >= 4.0) ? "1" : "0" }')
+
+if [ "$TRIPPED" = "1" ]; then
+    echo ""
+    echo "╔══════════════════════════════════════════════════════════════╗"
+    echo "║  ❌ PUSH BLOCKED: slop-scan trip-wire                        ║"
+    echo "╠══════════════════════════════════════════════════════════════╣"
+    echo "║  scorePerKloc = $SCORE — at or above the 4.0 trip-wire.            ║"
+    echo "║  Reduce the offending rule classes (defensive.empty-catch,  ║"
+    echo "║  structure.duplicate-function-signatures, etc.) before push.║"
+    echo "║  See CLAUDE.md > Slop-scan as second quality gate.          ║"
+    echo "║                                                              ║"
+    echo "║  Bypass: git push --no-verify (leave a commit-msg note).    ║"
+    echo "╚══════════════════════════════════════════════════════════════╝"
+    echo ""
+    exit 1
+fi
+
+echo ""
+echo "✅ slop-scan: scorePerKloc $SCORE below 4.0 trip-wire."
+echo ""
+exit 0

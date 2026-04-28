@@ -20,6 +20,7 @@
     "audit:ai": "bash ./scripts/gemini-audit.sh",
     "slop-scan": "bash ./scripts/slop-scan.sh",
     "lint:positioning": "node scripts/lint-positioning.mjs",
+    "lint:silent-catches": "node scripts/lint-silent-catches.mjs",
     "rotate:encryption-key": "tsx ./scripts/rotate-encryption-key.ts",
     "sentry:upload-sourcemaps": "npx -y @sentry/cli@latest sourcemaps upload --org=decision-intel-bu --project=decisionintelsentry --release=${VERCEL_GIT_COMMIT_SHA:-$(git rev-parse HEAD)} .next",
     "format": "prettier --write .",

@@ -6,6 +6,7 @@ import { ArrowRight, Calendar, CheckCircle, FileText, Scale, Trash2, X } from 'l
 import { motion } from 'framer-motion';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 import { ScoreReveal } from '@/components/ui/ScoreReveal';
+import { AnatomyOfACallGraph } from '@/components/marketing/AnatomyOfACallGraph';
 import { CounterfactualPanel } from '@/components/ui/CounterfactualPanel';
 import {
   Dialog,
@@ -365,6 +366,53 @@ export function InlineAnalysisResultCard({
               </div>
             </div>
           )}
+          {/* Anatomy-of-a-call signature — the same pentagon used on the
+              landing-page ScrollRevealGraph and /how-it-works. Lit at
+              stage=5 because the audit has fully run; the wow-moment
+              card is now visually consistent with the marketing surfaces
+              the user will see if they share the URL with a peer.
+              (C2 lock 2026-04-28.) */}
+          <div
+            aria-hidden
+            style={{
+              marginTop: 18,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              padding: '10px 14px',
+              background: 'var(--bg-secondary)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-md, 8px)',
+            }}
+          >
+            <div style={{ width: 96, height: 96, flexShrink: 0 }}>
+              <AnatomyOfACallGraph stage={5} size={96} captionOverride={null} />
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <div
+                style={{
+                  fontSize: 10,
+                  fontWeight: 800,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.12em',
+                  color: 'var(--accent-primary)',
+                  marginBottom: 4,
+                }}
+              >
+                Decision Intel ran
+              </div>
+              <div
+                style={{
+                  fontSize: 11.5,
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.45,
+                }}
+              >
+                Five layers active. Knowledge graph, AI boardroom, reasoning audit, what-if, and
+                outcome loop all touched this memo.
+              </div>
+            </div>
+          </div>
         </div>
 
         <div>

@@ -86,6 +86,18 @@ export function FounderChatWidget({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const hydrated = useRef(false);
 
+  // External open trigger — the mobile-only "Ask AI" header button on the
+  // Founder Hub dispatches this event because the floating bubble at
+  // bottom-right can be hard to find on a 320-375px viewport (the back of
+  // a cab, between meetings — the cold-context use cases the founder flagged).
+  // (B5 lock 2026-04-28.)
+  useEffect(() => {
+    if (variant !== 'floating' || typeof window === 'undefined') return;
+    const handler = () => setOpen(true);
+    window.addEventListener('founder-chat-open', handler);
+    return () => window.removeEventListener('founder-chat-open', handler);
+  }, [variant]);
+
   // Hydrate from localStorage on mount so the conversation continues
   // across sessions. Only runs once; subsequent state changes go through
   // setMessages and the persistence effect below.
@@ -316,6 +328,7 @@ export function FounderChatWidget({
 
   return (
     <div
+      className={isPane ? undefined : 'founder-chat-floating-shell'}
       style={
         isPane
           ? {
@@ -677,6 +690,27 @@ export function FounderChatWidget({
           {streaming ? '...' : 'Send'}
         </button>
       </div>
+      {/* Mobile fullscreen override: on narrow viewports the floating
+          400×520 panel is too small for a real conversation and the
+          bottom-right placement is hard to reach with one thumb. Below
+          640px the floating shell takes the full viewport. (B5 lock
+          2026-04-28.) */}
+      <style jsx>{`
+        @media (max-width: 640px) {
+          :global(.founder-chat-floating-shell) {
+            top: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100dvh !important;
+            max-width: none !important;
+            max-height: none !important;
+            border-radius: 0 !important;
+            border: none !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { formatBiasName } from '@/lib/utils/labels';
 import { Brain, Lightbulb, ExternalLink, BarChart3, Eye, ChevronDown } from 'lucide-react';
 import { DocumentTextHighlighter } from '@/components/visualizations/DocumentTextHighlighter';
 import { BiasSparklineWithData } from '@/components/visualizations/BiasSparkline';
+import { RPDPreMortemSuggestionsCard } from '@/components/analysis/RPDPreMortemSuggestionsCard';
 import dynamic from 'next/dynamic';
 const BiasNetwork3D = dynamic(() => import('@/components/visualizations/BiasNetwork3DCanvas'), {
   ssr: false,
@@ -64,6 +65,8 @@ interface DQIData {
 
 interface OverviewTabProps {
   documentContent: string;
+  /** Document id — used by RPDPreMortemSuggestionsCard to namespace the sessionStorage prefill (D3 lock 2026-04-28). */
+  documentId?: string;
   biases: BiasInstance[];
   uploadedAt: string;
   analysisCreatedAt?: string;
@@ -111,6 +114,7 @@ const SEVERITY_BORDER_STYLES: Record<string, string> = {
 
 export function OverviewTab({
   documentContent,
+  documentId,
   biases,
   uploadedAt,
   analysisCreatedAt,
@@ -348,6 +352,16 @@ export function OverviewTab({
           </div>
         </div>
       </ErrorBoundary>
+
+      {/* 3.5 Pre-mortem suggestions — proactive Klein-side surface
+          (D3 lock 2026-04-28). Maps the dominant bias patterns to
+          concrete scenarios worth stress-testing in the RPD simulator.
+          Click pre-fills the simulator + switches to Perspectives →
+          What-If. Renders null when no biases match the template
+          mapping, so it's safe to render unconditionally. */}
+      {documentId && biases.length > 0 && (
+        <RPDPreMortemSuggestionsCard documentId={documentId} biases={biases} />
+      )}
 
       {/* 4. Bias Details with inline sparklines */}
       <div className="card">

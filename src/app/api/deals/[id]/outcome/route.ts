@@ -198,8 +198,8 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       .filter((x): x is NonNullable<typeof x> => x !== null);
     const aggregation = aggregateDeal(latestAnalyses);
 
-    // 3.1 deep — most recent cross-reference run if any. Schema-drift
-    // tolerant; pre-3.1 environments simply return null here.
+    // 3.1 deep — most recent cross-reference run if any.
+    // @schema-drift-tolerant — pre-3.1 environments simply return null here.
     const crossReference = await prisma.dealCrossReference
       .findFirst({
         where: { dealId },

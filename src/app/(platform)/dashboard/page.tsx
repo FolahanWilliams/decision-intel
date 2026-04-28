@@ -84,6 +84,11 @@ import {
   InlineAnalysisResultCard,
   type CompletedAnalysisSummary,
 } from '@/components/analysis/InlineAnalysisResultCard';
+import {
+  DiscoveryGradeImpactCard,
+  STATIC_DEMO_ANCHOR,
+  type DiscoveryGradeAnchor,
+} from '@/components/discovery/DiscoveryGradeImpactCard';
 
 const ANALYSIS_STEPS: { name: string; icon: React.ReactNode }[] = [
   { name: 'Preparing document', icon: <FileText size={16} /> },
@@ -1437,11 +1442,49 @@ export default function Dashboard() {
           {/* Upload Zone - Enhanced with drag feedback */}
           <ErrorBoundary sectionName="Upload">
             {!uploading && !pendingFile && lastCompletedAnalysis ? (
-              <InlineAnalysisResultCard
-                analysis={lastCompletedAnalysis}
-                onDismiss={() => setLastCompletedAnalysis(null)}
-                preResolvedAnalysisId={lastCompletedAnalysis.analysisId ?? null}
-              />
+              <>
+                {/* Empathic-mode Discovery card for cold users (first 3
+                    audits). totalDocs already counts the just-completed
+                    audit, so `<= 3` matches the founder's "first three
+                    audits" cold-context window. The discovery card sets
+                    a per-decision dollar frame BEFORE the platform
+                    vocabulary in InlineAnalysisResultCard appears below.
+                    Anchor uses STATIC_DEMO_ANCHOR for the dollar math
+                    (we don't know the user's ticket size from the
+                    dashboard upload path) but personalises the
+                    artefactLabel + topBiasLabel from the just-completed
+                    analysis so the framing reads "your decision" not
+                    "a generic sample". (C4 lock 2026-04-28.) */}
+                {(totalDocs ?? 0) <= 3 &&
+                  lastCompletedAnalysis.detectedBiases.length > 0 && (
+                    <div style={{ marginBottom: 'var(--spacing-md)' }}>
+                      <DiscoveryGradeImpactCard
+                        variant="post-upload"
+                        anchor={
+                          {
+                            ...STATIC_DEMO_ANCHOR,
+                            contextLabel: 'Your audit',
+                            artefactLabel: lastCompletedAnalysis.filename,
+                            topBiasLabel: lastCompletedAnalysis.detectedBiases[0]?.type
+                              ? lastCompletedAnalysis.detectedBiases[0].type
+                                  .replace(/_/g, ' ')
+                                  .replace(/\b\w/g, (c: string) => c.toUpperCase())
+                              : STATIC_DEMO_ANCHOR.topBiasLabel,
+                          } satisfies DiscoveryGradeAnchor
+                        }
+                        ctaLabel="See what your audit found ↓"
+                        ctaHref="#inline-analysis-result"
+                      />
+                    </div>
+                  )}
+                <div id="inline-analysis-result">
+                  <InlineAnalysisResultCard
+                    analysis={lastCompletedAnalysis}
+                    onDismiss={() => setLastCompletedAnalysis(null)}
+                    preResolvedAnalysisId={lastCompletedAnalysis.analysisId ?? null}
+                  />
+                </div>
+              </>
             ) : !uploading && !pendingFile && inlineMode === 'paste' ? (
               <InlinePasteMemoCard
                 onClose={() => {

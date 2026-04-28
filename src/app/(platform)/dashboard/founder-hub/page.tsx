@@ -394,6 +394,14 @@ type SearchEntry = {
   section: string;
   preview: string;
   keywords: string;
+  /**
+   * Optional URL hash slug. When set, clicking the search result sets
+   * `window.location.hash = '#${sectionId}'` so the matching AccordionSection
+   * inside the destination tab auto-opens, scrolls into view, and flashes.
+   * Without this the user lands at the top of the tab and still has to
+   * click the right accordion header. (B1 lock 2026-04-28.)
+   */
+  sectionId?: string;
 };
 
 const SEARCH_INDEX: SearchEntry[] = [
@@ -438,6 +446,7 @@ const SEARCH_INDEX: SearchEntry[] = [
     preview: '12-node LangGraph sequence that produces every audit.',
     keywords:
       'pipeline langgraph 12 node analysis extract detect score bias flow graph architecture nodes prompts',
+    sectionId: 'analysis-pipeline',
   },
   {
     tabId: 'product_deep',
@@ -445,6 +454,7 @@ const SEARCH_INDEX: SearchEntry[] = [
     preview: 'Toxic patterns, risk multipliers, compound bias interactions.',
     keywords:
       'scoring engine toxic combinations interaction matrix risk multipliers weights composite',
+    sectionId: 'scoring-engine',
   },
   {
     tabId: 'product_deep',
@@ -452,6 +462,7 @@ const SEARCH_INDEX: SearchEntry[] = [
     preview: 'Decision Quality Index formula, percentiles, calibration.',
     keywords:
       'dqi decision quality index methodology formula percentile calibration 135 historical decisions benchmark',
+    sectionId: 'dqi-methodology',
   },
   {
     tabId: 'research',
@@ -558,12 +569,14 @@ const SEARCH_INDEX: SearchEntry[] = [
     preview: 'Input channels: Slack, Drive, email, webhooks.',
     keywords:
       'integrations flywheel slack google drive email webhook ingestion sources data ecosystem connections',
+    sectionId: 'integrations-flywheel',
   },
   {
     tabId: 'data_ecosystem',
     section: 'Live Stats',
     preview: 'Output metrics, usage, activation.',
     keywords: 'live stats metrics usage activation kpi analytics dashboard numbers',
+    sectionId: 'live-stats',
   },
   {
     tabId: 'case_library',
@@ -571,18 +584,21 @@ const SEARCH_INDEX: SearchEntry[] = [
     preview: `${ALL_CASES.length} case studies, ${CASES_WITH_PRE_DECISION_EVIDENCE} with pre-decision evidence.`,
     keywords:
       'historical cases kodak blockbuster nokia enron case studies library evidence corporate decisions',
+    sectionId: 'historical-cases',
   },
   {
     tabId: 'case_library',
     section: 'Correlation & Causal',
     preview: 'Bias interaction matrix, toxic combinations.',
     keywords: 'correlation causal bias interaction matrix toxic combinations compound patterns',
+    sectionId: 'correlation-causal',
   },
   {
     tabId: 'case_library',
     section: 'Decision Alpha',
     preview: 'CEO decision quality leaderboard.',
     keywords: 'decision alpha ceo leaderboard quality buffett musk huang zuck rankings',
+    sectionId: 'decision-alpha',
   },
   {
     tabId: 'founder_tips',
@@ -665,6 +681,29 @@ function SearchResults({ query, onJump }: { query: string; onJump: (tabId: TabId
   const q = query.toLowerCase().trim();
   if (!q) return null;
 
+  // Click handler that deep-links into the matching accordion section when
+  // sectionId is set. Sets the URL hash BEFORE onJump so when the new tab's
+  // AccordionSection mounts, its hashchange-aware effect catches it and
+  // auto-opens + scrolls. (B1 lock 2026-04-28.)
+  const jumpToEntry = (entry: SearchEntry) => {
+    if (entry.sectionId && typeof window !== 'undefined') {
+      const targetHash = `#${entry.sectionId}`;
+      // Replace the hash unconditionally so consecutive clicks on the same
+      // section re-fire the hashchange listener inside AccordionSection.
+      if (window.location.hash === targetHash) {
+        // Same hash twice in a row — clear then re-set on next tick so the
+        // event fires again (the user clicked search expecting a re-scroll).
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+        requestAnimationFrame(() => {
+          window.location.hash = targetHash;
+        });
+      } else {
+        window.location.hash = targetHash;
+      }
+    }
+    onJump(entry.tabId);
+  };
+
   const matches = SEARCH_INDEX.filter(entry => {
     const haystack = `${entry.section} ${entry.preview} ${entry.keywords}`.toLowerCase();
     return haystack.includes(q);
@@ -708,7 +747,7 @@ function SearchResults({ query, onJump }: { query: string; onJump: (tabId: TabId
           return (
             <button
               key={`${entry.tabId}-${entry.section}`}
-              onClick={() => onJump(entry.tabId)}
+              onClick={() => jumpToEntry(entry)}
               style={{
                 display: 'flex',
                 alignItems: 'flex-start',
@@ -996,6 +1035,14 @@ export default function FounderHubPage() {
         }
         /* .founder-hub-chat 340px pane column retired 2026-04-23; the
            chat is now a floating bubble and owns its own positioning. */
+        /* Mobile-only Ask AI pill in the header. Hidden ≥768px where
+           the floating bubble at bottom-right is reachable. (B5 lock
+           2026-04-28.) */
+        @media (max-width: 767px) {
+          .founder-hub-ask-ai-pill {
+            display: inline-flex !important;
+          }
+        }
       `}</style>
     </ErrorBoundary>
   );
@@ -1024,6 +1071,40 @@ export default function FounderHubPage() {
             >
               Founder Hub
             </h1>
+            {/* Mobile-only Ask AI pill — the floating bubble at bottom-right
+                is hard to reach + signal-quiet on a 320px viewport. This
+                button dispatches `founder-chat-open` which the
+                FounderChatWidget listener catches; the chat then snaps to
+                full-screen below 640px via the widget's own media query.
+                Hidden ≥768px since the floating bubble works fine there.
+                (B5 lock 2026-04-28.) */}
+            <button
+              type="button"
+              className="founder-hub-ask-ai-pill"
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new Event('founder-chat-open'));
+                }
+              }}
+              aria-label="Ask the Founder AI"
+              style={{
+                marginLeft: 8,
+                display: 'none',
+                alignItems: 'center',
+                gap: 6,
+                padding: '6px 12px',
+                fontSize: 12,
+                fontWeight: 700,
+                color: '#fff',
+                background: '#16A34A',
+                border: 'none',
+                borderRadius: 999,
+                cursor: 'pointer',
+              }}
+            >
+              <MessageSquare size={13} />
+              Ask AI
+            </button>
           </div>
           <div style={{ position: 'relative', width: 260 }}>
             <Search
@@ -1201,17 +1282,29 @@ function renderTab(
     ),
     product_deep: (
       <>
-        <AccordionSection title="Analysis Pipeline" subtitle="12-node LangGraph sequence">
+        <AccordionSection
+          title="Analysis Pipeline"
+          subtitle="12-node LangGraph sequence"
+          sectionId="analysis-pipeline"
+        >
           <ErrorBoundary sectionName="Analysis Pipeline">
             <CorePipelineTab />
           </ErrorBoundary>
         </AccordionSection>
-        <AccordionSection title="Scoring Engine" subtitle="Toxic patterns and risk multipliers">
+        <AccordionSection
+          title="Scoring Engine"
+          subtitle="Toxic patterns and risk multipliers"
+          sectionId="scoring-engine"
+        >
           <ErrorBoundary sectionName="Scoring Engine">
             <ScoringEngineTab />
           </ErrorBoundary>
         </AccordionSection>
-        <AccordionSection title="DQI Methodology" subtitle="Formula, percentiles, calibration">
+        <AccordionSection
+          title="DQI Methodology"
+          subtitle="Formula, percentiles, calibration"
+          sectionId="dqi-methodology"
+        >
           <ErrorBoundary sectionName="DQI Methodology">
             <DqiMethodologyTab />
           </ErrorBoundary>
@@ -1259,10 +1352,15 @@ function renderTab(
         <AccordionSection
           title="Integrations & Flywheel"
           subtitle="Input channels: Slack, Drive, email, webhooks"
+          sectionId="integrations-flywheel"
         >
           <IntegrationsAndFlywheelTab />
         </AccordionSection>
-        <AccordionSection title="Live Stats" subtitle="Output metrics, usage, activation">
+        <AccordionSection
+          title="Live Stats"
+          subtitle="Output metrics, usage, activation"
+          sectionId="live-stats"
+        >
           <LiveStatsTab />
         </AccordionSection>
       </>
@@ -1272,18 +1370,24 @@ function renderTab(
         <AccordionSection
           title="Historical Cases"
           subtitle={`${CASES_WITH_PRE_DECISION_EVIDENCE} case studies with pre-decision evidence`}
+          sectionId="historical-cases"
         >
           <CaseStudiesTab />
         </AccordionSection>
         <AccordionSection
           title="Correlation & Causal Graph"
           subtitle="Bias interaction matrix, toxic combinations"
+          sectionId="correlation-causal"
         >
           <ErrorBoundary sectionName="Correlation & Causal">
             <CorrelationCausalTab />
           </ErrorBoundary>
         </AccordionSection>
-        <AccordionSection title="Decision Alpha" subtitle="CEO decision quality leaderboard">
+        <AccordionSection
+          title="Decision Alpha"
+          subtitle="CEO decision quality leaderboard"
+          sectionId="decision-alpha"
+        >
           <ErrorBoundary sectionName="Decision Alpha">
             <DecisionAlphaTab />
           </ErrorBoundary>

@@ -365,6 +365,177 @@ export default function BiasGenomePage() {
         </div>
       </section>
 
+      {/* BIOLOGICAL-STATE SIGNALS — IP claim no other decision-intel
+          platform makes. Modeling cortisol/winner-effect language as a
+          multiplier on bias-driven failure isn't in Cloverpop, Aera,
+          IBM watsonx, or Quantellia. Surfacing this on /bias-genome
+          rather than burying it in scoring docs because procurement
+          readers asking "what's structurally different here" are
+          exactly the audience this differentiates against. (F2 lock
+          2026-04-28.) */}
+      <section style={{ padding: '64px 24px 0' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div
+            style={{
+              background: C.navy,
+              color: C.white,
+              borderRadius: 16,
+              padding: 'clamp(28px, 4vw, 40px)',
+            }}
+          >
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 800,
+                textTransform: 'uppercase',
+                letterSpacing: '0.14em',
+                color: C.green,
+                marginBottom: 14,
+              }}
+            >
+              Biological-state amplifiers · unique to Decision Intel
+            </div>
+            <h2
+              style={{
+                fontSize: 'clamp(22px, 3vw, 30px)',
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+                margin: 0,
+                marginBottom: 14,
+                color: C.white,
+              }}
+            >
+              Memos written under stress or after a winning streak fail differently.
+            </h2>
+            <p
+              style={{
+                fontSize: 15,
+                lineHeight: 1.65,
+                color: C.slate300,
+                margin: 0,
+                marginBottom: 24,
+                maxWidth: 760,
+              }}
+            >
+              Two language signals that materially change how bias load translates to outcome.
+              Detected automatically from the memo text, applied as a multiplier on the toxic-pattern
+              detection score. The behavioral-finance literature on these is solid; we&rsquo;re the
+              only decision-intelligence platform we know of that operationalises them.
+            </p>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                gap: 16,
+              }}
+            >
+              {/* Winner Effect */}
+              <div
+                style={{
+                  background: 'rgba(22,163,74,0.10)',
+                  border: '1px solid rgba(22,163,74,0.35)',
+                  borderRadius: 12,
+                  padding: '20px 22px',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    fontSize: 11,
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em',
+                    color: C.green,
+                    marginBottom: 10,
+                  }}
+                >
+                  ↑ 1.20× multiplier
+                </div>
+                <div
+                  style={{
+                    fontSize: 17,
+                    fontWeight: 700,
+                    color: C.white,
+                    marginBottom: 8,
+                    letterSpacing: '-0.01em',
+                  }}
+                >
+                  Winner Effect
+                </div>
+                <p style={{ fontSize: 13.5, color: C.slate300, margin: 0, lineHeight: 1.6 }}>
+                  Success-streak language (&ldquo;our last three deals closed,&rdquo; &ldquo;we
+                  haven&rsquo;t missed in two years,&rdquo; &ldquo;the team is in flow&rdquo;)
+                  amplifies overconfidence and disposition effects. The neuroendocrine literature
+                  links winning streaks to elevated testosterone and risk preference. We surface the
+                  signal so the audit committee sees what the memo&rsquo;s authors were riding
+                  when they wrote it.
+                </p>
+              </div>
+              {/* Stress / Cortisol */}
+              <div
+                style={{
+                  background: 'rgba(245,158,11,0.10)',
+                  border: '1px solid rgba(245,158,11,0.35)',
+                  borderRadius: 12,
+                  padding: '20px 22px',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    fontSize: 11,
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em',
+                    color: C.amber,
+                    marginBottom: 10,
+                  }}
+                >
+                  ↑ 1.18× multiplier
+                </div>
+                <div
+                  style={{
+                    fontSize: 17,
+                    fontWeight: 700,
+                    color: C.white,
+                    marginBottom: 8,
+                    letterSpacing: '-0.01em',
+                  }}
+                >
+                  Stress / Cortisol
+                </div>
+                <p style={{ fontSize: 13.5, color: C.slate300, margin: 0, lineHeight: 1.6 }}>
+                  Crisis language (&ldquo;urgent,&rdquo; &ldquo;regulator deadline,&rdquo; &ldquo;we
+                  have to move now,&rdquo; &ldquo;the window is closing&rdquo;) amplifies System 1
+                  decisions and shortens the deliberation horizon. Cortisol-driven cognition
+                  collapses the option set the memo writer considered before recommending. The
+                  multiplier surfaces that compression so the reader knows the recommendation came
+                  from a narrowed search, not an exhaustive one.
+                </p>
+              </div>
+            </div>
+            <p
+              style={{
+                fontSize: 12,
+                color: C.slate400,
+                margin: 0,
+                marginTop: 18,
+                lineHeight: 1.55,
+              }}
+            >
+              Implementation: <code style={{ color: C.slate200 }}>detectWinnerEffect</code> +{' '}
+              <code style={{ color: C.slate200 }}>detectStressSignals</code> in the compound-scoring
+              engine. Multipliers compound with the bias-load and noise terms, capped at 3.0× total
+              to avoid runaway scores.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* METHODOLOGY ─────────────────────────────────────────────── */}
       <section style={{ padding: '64px 24px 0' }}>
         <div style={{ maxWidth: 900, margin: '0 auto' }}>

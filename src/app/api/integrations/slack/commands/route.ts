@@ -914,7 +914,7 @@ async function handleStatusCommand(params: { userId: string; teamId: string }) {
         }
       }
     } catch {
-      // Schema-drift tolerance per CLAUDE.md fire-and-forget exceptions — humanDecision/cognitiveAudit may not be migrated in older deployments.
+      // @schema-drift-tolerant — humanDecision/cognitiveAudit may not be migrated in older deployments.
     }
 
     // Nudge effectiveness

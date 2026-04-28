@@ -32,6 +32,8 @@ interface ContributionPayload {
   isAnonymized: boolean;
   pairsContributed: number;
   outcomeValidatedAnalysesCount: number;
+  /** Total distinct bias types this org has produced ground-truth signal on (D2 lock 2026-04-28). */
+  distinctBiasTypesContributed: number;
   topContributedBiases: Array<{
     biasType: string;
     count: number;
@@ -197,6 +199,7 @@ export function BiasGenomeContributionCard() {
   const {
     pairsContributed,
     outcomeValidatedAnalysesCount,
+    distinctBiasTypesContributed,
     topContributedBiases,
     cohortTotalOrgs,
     cohortTotalDecisions,
@@ -381,6 +384,64 @@ export function BiasGenomeContributionCard() {
             </div>
           </div>
         </div>
+
+        {/* Network-effect breadth — names the count of cross-org bias
+            patterns this org's outcomes have produced validated signal on.
+            Click-through opens /bias-genome where the cohort-wide effect
+            of the org's contribution is visible. (D2 lock 2026-04-28.) */}
+        {distinctBiasTypesContributed > 0 && (
+          <Link
+            href="/bias-genome"
+            target="_blank"
+            rel="noopener"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 12,
+              marginBottom: 'var(--spacing-md)',
+              padding: '10px 14px',
+              borderRadius: 'var(--radius-md)',
+              background: 'rgba(22, 163, 74, 0.06)',
+              border: '1px solid rgba(22, 163, 74, 0.25)',
+              textDecoration: 'none',
+              color: 'inherit',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
+              <span
+                style={{
+                  fontSize: 18,
+                  fontWeight: 700,
+                  color: 'var(--accent-primary)',
+                  fontFamily: "'JetBrains Mono', monospace",
+                }}
+              >
+                {distinctBiasTypesContributed}
+              </span>
+              <span style={{ fontSize: 13, color: 'var(--text-primary)', fontWeight: 600 }}>
+                cross-org bias pattern
+                {distinctBiasTypesContributed === 1 ? '' : 's'} sharpened
+              </span>
+              <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                · your team has produced ground-truth signal on each
+              </span>
+            </div>
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 600,
+                color: 'var(--accent-primary)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              See cohort effect <ArrowUpRight size={11} />
+            </span>
+          </Link>
+        )}
 
         {/* Top contributions list */}
         {topThree.length > 0 && (

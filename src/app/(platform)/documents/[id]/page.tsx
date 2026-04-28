@@ -558,6 +558,26 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // D3 (lock 2026-04-28): RPD pre-mortem suggestions cross-tab navigation.
+  // RPDPreMortemSuggestionsCard on the Overview tab dispatches
+  // 'document-detail-navigate' when a suggestion is clicked. We push the
+  // target tab into the URL; PerspectivesTab listens for the same event
+  // to set its sub-view (what-if), and RPDSimulatorCard reads the
+  // sessionStorage prefill on mount.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<{ tab?: string }>).detail;
+      const tab = detail?.tab;
+      if (!tab || !VALID_TABS.includes(tab as TabId)) return;
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('tab', tab);
+      router.push(`/documents/${resolvedParams.id}?${params.toString()}`, { scroll: false });
+    };
+    window.addEventListener('document-detail-navigate', handler);
+    return () => window.removeEventListener('document-detail-navigate', handler);
+  }, [router, searchParams, resolvedParams.id]);
+
   const handleTabChange = useCallback(
     (tabId: TabId) => {
       setSelectedBias(null);
@@ -2949,6 +2969,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                     <ErrorBoundary sectionName="Overview">
                       <OverviewTab
                         documentContent={document.content}
+                        documentId={document.id}
                         biases={biases}
                         uploadedAt={document.uploadedAt}
                         analysisCreatedAt={analysis?.createdAt}

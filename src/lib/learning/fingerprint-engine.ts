@@ -443,7 +443,7 @@ export async function getOrgFingerprint(orgId: string): Promise<OrgFingerprint> 
         });
       }
     } catch (err) {
-      // TeamCognitiveProfile may be missing in older deployments — log and continue per CLAUDE.md fire-and-forget discipline (schema-drift tolerance).
+      // @schema-drift-tolerant — TeamCognitiveProfile may be missing in older deployments; log and continue.
       log.warn('TeamCognitiveProfile query failed (longitudinal trend skipped):', err);
     }
 

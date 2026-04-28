@@ -34,6 +34,15 @@ interface ContributionResponse {
   isAnonymized: boolean;
   pairsContributed: number;
   outcomeValidatedAnalysesCount: number;
+  /**
+   * Count of DISTINCT bias types this org has contributed
+   * outcome-validated signal on. Differs from topContributedBiases
+   * which is capped at 5 — this is the full cardinality (D2 lock
+   * 2026-04-28). Surfaced as "you've sharpened detection on N cross-org
+   * bias patterns" so the contributor sees the breadth of the network
+   * effect they're funding, not just the top entries.
+   */
+  distinctBiasTypesContributed: number;
   topContributedBiases: Array<{
     biasType: string;
     count: number;
@@ -54,9 +63,13 @@ interface ContributionResponse {
   computedAt: string;
 }
 
-const EMPTY_NON_AUTHED: Pick<ContributionResponse, 'orgId' | 'isAnonymized'> = {
+const EMPTY_NON_AUTHED: Pick<
+  ContributionResponse,
+  'orgId' | 'isAnonymized' | 'distinctBiasTypesContributed'
+> = {
   orgId: null,
   isAnonymized: false,
+  distinctBiasTypesContributed: 0,
 };
 
 export async function GET() {
@@ -131,6 +144,7 @@ export async function GET() {
     //    "outcome-validated" qualifier the panel surfaces.
     let pairsContributed = 0;
     let outcomeValidatedAnalysesCount = 0;
+    let distinctBiasTypesContributed = 0;
     let topContributedBiases: ContributionResponse['topContributedBiases'] = [];
 
     try {
@@ -175,6 +189,16 @@ export async function GET() {
         count: Number(r.count),
         confirmedCount: Number(r.confirmed_count),
       }));
+
+      const distinctRaw = await prisma.$queryRaw<Array<{ count: bigint }>>`
+        SELECT COUNT(DISTINCT bi."biasType")::bigint as count
+        FROM "BiasInstance" bi
+        JOIN "Analysis" a ON a.id = bi."analysisId"
+        JOIN "Document" d ON d.id = a."documentId"
+        JOIN "DecisionOutcome" do2 ON do2."analysisId" = a.id
+        WHERE d."orgId" = ${orgId}
+      `;
+      distinctBiasTypesContributed = Number(distinctRaw[0]?.count ?? 0);
     } catch (err) {
       // P2021/P2022 → schema drift; surface empty contribution so the
       // dashboard doesn't break on partial migration states.
@@ -238,6 +262,7 @@ export async function GET() {
       isAnonymized,
       pairsContributed,
       outcomeValidatedAnalysesCount,
+      distinctBiasTypesContributed,
       topContributedBiases,
       cohortTotalOrgs,
       cohortTotalDecisions,

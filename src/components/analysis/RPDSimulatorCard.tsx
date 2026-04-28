@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Compass,
   Loader2,
@@ -146,6 +146,24 @@ export function RPDSimulatorCard({ documentId, initialAction = '' }: RPDSimulato
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState<RpdSimulationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Pre-fill from the Overview tab's RPDPreMortemSuggestionsCard (D3 lock
+  // 2026-04-28). The suggestions card writes the chosen scenario to
+  // sessionStorage and dispatches a navigate event; when this card mounts
+  // we pick up the prefill and clear it so subsequent visits start clean.
+  useEffect(() => {
+    if (typeof window === 'undefined' || initialAction) return;
+    try {
+      const key = `rpd-prefill-${documentId}`;
+      const stored = sessionStorage.getItem(key);
+      if (stored) {
+        setAction(stored);
+        sessionStorage.removeItem(key);
+      }
+    } catch {
+      // sessionStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
+    }
+  }, [documentId, initialAction]);
 
   const handleRun = async () => {
     if (!action.trim() || running) return;

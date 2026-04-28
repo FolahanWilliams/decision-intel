@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CognitiveAnalysisResult } from '@/types';
 import { RedTeamTab } from './RedTeamTab';
 import { BoardroomTab } from './BoardroomTab';
@@ -62,6 +62,23 @@ export function PerspectivesTab({
   originalBiasTypes,
 }: PerspectivesTabProps) {
   const [subView, setSubView] = useState<SubView>('adversarial');
+
+  // D3 (lock 2026-04-28): RPDPreMortemSuggestionsCard on the Overview tab
+  // dispatches 'document-detail-navigate' with { tab: 'perspectives',
+  // subView: 'what-if' }. The page-level listener sets the URL tab; we
+  // listen for the same event here to set our sub-view. Useeffect mounts
+  // when this tab actually mounts, so the user is already moving here.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<{ subView?: SubView }>).detail;
+      if (detail?.subView && (SUB_VIEWS as { key: SubView }[]).some(s => s.key === detail.subView)) {
+        setSubView(detail.subView);
+      }
+    };
+    window.addEventListener('document-detail-navigate', handler);
+    return () => window.removeEventListener('document-detail-navigate', handler);
+  }, []);
 
   return (
     <div>

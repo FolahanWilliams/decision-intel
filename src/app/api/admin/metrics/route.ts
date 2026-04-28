@@ -52,7 +52,7 @@ export async function GET(request: Request) {
       totalCost: u._sum.cost ?? 0,
     }));
   } catch {
-    // ApiUsage table may not exist in schema-drift scenario
+    // @schema-drift-tolerant — ApiUsage table may not exist in older deployments.
   }
 
   // 3. Recent error count

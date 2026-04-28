@@ -28,6 +28,29 @@ if [ $POSITIONING_EXIT_CODE -ne 0 ]; then
 fi
 
 echo ""
+echo "🛡  Running silent-catch ratchet..."
+echo ""
+
+npm run lint:silent-catches
+SILENT_CATCH_EXIT_CODE=$?
+
+if [ $SILENT_CATCH_EXIT_CODE -ne 0 ]; then
+    echo ""
+    echo "╔══════════════════════════════════════════════════════════════╗"
+    echo "║  ❌ COMMIT BLOCKED: silent-catch ratchet failed              ║"
+    echo "╠══════════════════════════════════════════════════════════════╣"
+    echo "║  New silent .catch(() => null/{}/[]) introduced. Either:    ║"
+    echo "║   • Replace an existing silent catch                        ║"
+    echo "║   • Upgrade the new one to log.warn(...)                    ║"
+    echo "║   • Bump the baseline in lint-silent-catches.mjs with an    ║"
+    echo "║     inline comment naming the legitimate exception class    ║"
+    echo "║     (CLAUDE.md > Components & Patterns > Fire-and-forget).  ║"
+    echo "╚══════════════════════════════════════════════════════════════╝"
+    echo ""
+    exit 1
+fi
+
+echo ""
 echo "🔍 Running AI Architectural Audit..."
 echo ""
 

@@ -59,7 +59,7 @@ export function SampleDataBanner() {
       const data = (await res.json()) as DemoStatus;
       setStatus(data);
     } catch (err) {
-      // Schema-drift tolerance per CLAUDE.md fire-and-forget exceptions — pre-migration deployments may not have demo tables yet.
+      // @schema-drift-tolerant — pre-migration deployments may not have demo tables yet.
       console.warn('[SampleDataBanner] fetchStatus failed:', err);
     } finally {
       setLoading(false);
