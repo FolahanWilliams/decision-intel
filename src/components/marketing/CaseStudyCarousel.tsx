@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { AlertTriangle, CheckCircle, Sparkles, ArrowRight } from 'lucide-react';
+import { AlertTriangle, CheckCircle, ArrowRight } from 'lucide-react';
 import { CaseStudyBiasGraph } from './CaseStudyBiasGraph';
 import {
   ALL_CASES,
@@ -228,7 +228,7 @@ export function CaseStudyCarousel({ embedded = false }: { embedded?: boolean } =
                           textTransform: 'uppercase',
                         }}
                       >
-                        <Sparkles size={9} /> Deep
+                        Deep
                       </span>
                     )}
                   </div>

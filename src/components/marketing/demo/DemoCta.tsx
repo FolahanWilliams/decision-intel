@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 /** Bottom CTA for the demo — pushes prospects from a historical
  *  reconstruction to running their own memo. */
@@ -30,7 +30,6 @@ export function DemoCta({ company }: { company: string }) {
           marginBottom: 12,
         }}
       >
-        <Sparkles size={12} />
         Your memo, not {company}&apos;s
       </div>
       <h2

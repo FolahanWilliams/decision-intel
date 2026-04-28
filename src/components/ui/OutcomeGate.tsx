@@ -728,6 +728,7 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
                       </div>
                     )}
                     <div
+                      className="outcome-gate-options-grid"
                       style={{
                         display: 'grid',
                         gridTemplateColumns: 'repeat(4, 1fr)',
@@ -834,6 +835,13 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
           )}
         </div>
       </motion.div>
+      <style>{`
+        @media (max-width: 520px) {
+          .outcome-gate-options-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

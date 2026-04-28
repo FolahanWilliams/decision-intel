@@ -106,13 +106,24 @@ function SingleBadge({
 
       {/* Tooltip */}
       {showTooltip && (
-        <div className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 p-3 rounded-lg bg-zinc-900 border border-zinc-700 shadow-xl text-xs text-zinc-300 leading-relaxed">
+        <div
+          role="tooltip"
+          className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 p-3 rounded-lg shadow-md text-xs leading-relaxed"
+          style={{
+            background: 'var(--bg-secondary)',
+            border: '1px solid var(--border-color)',
+            color: 'var(--text-secondary)',
+          }}
+        >
           <div className={`font-semibold mb-1 ${config.textClass}`}>
             {config.label} Detected (+{amplification}% amplification)
           </div>
           <p>{signal.description}</p>
           {/* Arrow */}
-          <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-zinc-700" />
+          <div
+            className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px]"
+            style={{ borderTopColor: 'var(--border-color)' }}
+          />
         </div>
       )}
     </div>

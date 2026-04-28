@@ -11,7 +11,7 @@ import {
   BookOpen,
   Lightbulb,
   Landmark,
-  Sparkles,
+  AlertTriangle,
   ChevronDown,
   X,
 } from 'lucide-react';
@@ -286,7 +286,7 @@ export function TaxonomyClient() {
               sub="Kahneman, Klein, Tetlock, Duke, Sibony."
             />
             <StatCard
-              icon={Sparkles}
+              icon={AlertTriangle}
               label="Named failures"
               value="20 case studies"
               sub="Kodak, Enron, Boeing, WeWork and more."
