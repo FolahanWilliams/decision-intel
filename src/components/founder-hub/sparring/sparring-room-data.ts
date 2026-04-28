@@ -85,7 +85,7 @@ export interface GradingDimension {
   id: GradingDimensionId;
   label: string;
   /** Which framework this dimension comes from. */
-  source: 'maalouf' | 'satyam' | 'di_discipline' | 'kahneman' | 'fundamentals';
+  source: 'maalouf' | 'satyam' | 'di_discipline' | 'kahneman' | 'fundamentals' | 'jolt' | 'sandler' | 'cialdini';
   /** What a 5/5 looks like in 1 sentence. */
   excellentLooks: string;
   /** What a 1/5 looks like in 1 sentence. */
@@ -110,7 +110,14 @@ export type GradingDimensionId =
   // Kahneman 1 (added 2026-04-28)
   | 'loss_aversion_framing'
   // Fundamentals 1
-  | 'specificity_over_vagueness';
+  | 'specificity_over_vagueness'
+  // 4 dimensions added 2026-04-28 PM from NotebookLM synthesis on
+  // "what failure modes is the rubric NOT catching." See KB note
+  // 0cc18c5d ("4 dimensions missing from my 11-dim Sales DQI rubric").
+  | 'fomu_calibration'
+  | 'damaging_admission'
+  | 'mutual_disqualification'
+  | 'prescriptive_recommendation';
 
 export interface SparringSessionResult {
   /** Composite 0-100 sales DQI. */
@@ -137,6 +144,58 @@ export interface SparringSessionResult {
   bannedVocabularyHits: string[];
   /** Detected DI-locked vocabulary uses (reasoning layer / R²F / DPR / etc.) — only counts as positive in WARM contexts. */
   lockedVocabularyHits: string[];
+
+  // ── Actionable insights (added 2026-04-28 PM — coach-not-judge upgrade) ──
+  /**
+   * 2-3 dimensions to focus on for the NEXT rep. Each carries a concrete
+   * why + how, not just "score was low here." Lets the founder walk away
+   * from the rep with a plan, not a list of regrets.
+   */
+  nextSessionFocus: Array<{
+    dimensionId: GradingDimensionId;
+    whyItMatters: string;
+    concreteAction: string;
+  }>;
+  /**
+   * Drill plan — concrete things to DO before the next rep, in order.
+   * Each item references a specific Founder Hub surface (Closing Lab
+   * principle X, Education Room deck Y, founder-context section Z) so
+   * the founder doesn't have to invent the practice.
+   */
+  drillPlan: Array<{
+    action: string;
+    /** Where to do it (e.g. "Education Room → Buyer Personas deck → Adaeze cards"). */
+    location: string;
+    estimatedMinutes: number;
+  }>;
+  /**
+   * Confidence-build note — what was GENUINELY good in this rep (not
+   * generic praise). Names a specific phrase or move that landed.
+   * Feeds the conviction-transmission dimension — you transmit
+   * conviction more readily when you know what specifically worked.
+   */
+  confidenceBuild: string;
+  /**
+   * Suggested setup for the next rep. Either same-persona-different-mode
+   * for skill consolidation, or different-persona-same-mode for
+   * breadth, or harder/easier based on this rep's grade. Comes with
+   * the rationale the founder can choose to follow or override.
+   */
+  nextRepSetup: {
+    recommendedPersonaId: BuyerPersonaId;
+    recommendedMode: ScenarioMode;
+    rationale: string;
+  };
+  /**
+   * If a recurring weakness pattern is detected across the founder's
+   * recent reps (passed as recentDimensionAverages), name it. Optional —
+   * only populated when there's a clear pattern.
+   */
+  patternFlag?: {
+    pattern: string;
+    rootCause: string;
+    breakthroughMove: string;
+  };
 }
 
 // ─── Buyer Personas ────────────────────────────────────────────────
@@ -492,7 +551,7 @@ export const GRADING_DIMENSIONS: GradingDimension[] = [
       "Buyer feels the urgency to move but cannot point to anywhere you pushed them. Naturally references other conversations or scarcity (5 design-partner seats, 4 left).",
     poorLooks:
       "Either flat (no urgency at all) or visibly pushy ('limited time', 'last chance'). Both fail.",
-    weight: 0.08,
+    weight: 0.05,
   },
   {
     id: 'authority_not_trust',
@@ -502,7 +561,7 @@ export const GRADING_DIMENSIONS: GradingDimension[] = [
       "Speaks AS the category creator, not someone hoping to be trusted. References work as fact, not as a request for buy-in. No 'I believe' or 'I think' on the load-bearing claims.",
     poorLooks:
       "Hedging language. 'I think we can help.' 'Hopefully this is useful.' Reads as asking for permission to be the expert.",
-    weight: 0.10,
+    weight: 0.08,
   },
   {
     id: 'pinpoint_pain',
@@ -522,7 +581,7 @@ export const GRADING_DIMENSIONS: GradingDimension[] = [
       "Speaks from a category-creator position. Uses pause and pacing as power. Talks about other conversations naturally. Reads as someone the buyer should chase, not someone chasing the buyer.",
     poorLooks:
       "Eager. Over-explains. Rushes. 'Oh and another thing we can do is…' — every additional capability dilutes authority.",
-    weight: 0.08,
+    weight: 0.06,
   },
 
   // ── Satyam 3 ──
@@ -554,7 +613,7 @@ export const GRADING_DIMENSIONS: GradingDimension[] = [
       "The conversation has structure: discovery → diagnosis → mechanism → proof → ask. Each step lands cleanly. No skipping discovery to pitch features.",
     poorLooks:
       "Pitch first, discover later. Or rambling — the buyer cannot tell what step you're on. Or no specific ask at the end ('we should talk again sometime').",
-    weight: 0.08,
+    weight: 0.06,
   },
 
   // ── DI discipline 2 ──
@@ -576,7 +635,7 @@ export const GRADING_DIMENSIONS: GradingDimension[] = [
       "Leads with what the BUYER is trying to do, not what DI does. Lands the buyer's pain in the buyer's words BEFORE introducing the product. Buyer feels seen.",
     poorLooks:
       "Product-first framing. 'We have a 12-node pipeline.' 'Our DPR is hashed and tamper-evident.' Buyer hears: 'they don't see me yet, they want to talk about themselves.'",
-    weight: 0.10,
+    weight: 0.06,
   },
 
   // ── Kahneman 1 (added 2026-04-28) — Prospect theory: losses weigh ~2-2.5× gains ──
@@ -588,7 +647,7 @@ export const GRADING_DIMENSIONS: GradingDimension[] = [
       "Frames the value as preventing a SPECIFIC, named loss the buyer is already worrying about — the regrettable strategic mistake, the career-limiting board disclosure, the LP pulling capital, the McKinsey bill that told them what they should have caught themselves. Anchors the price against a comparable cost the buyer already accepts ('the consultant fee for one bad memo, the headcount cost when one wrong recommendation triggers a hiring U-turn'). The buyer leaves the conversation feeling the price IS small relative to what they're already losing without it.",
     poorLooks:
       "Frames as upside / gain only. 'Better decisions.' 'Improved quality.' 'Faster outcomes.' The buyer hears upside and discounts (status-quo bias + loss aversion: the cost is certain, the gain is hypothetical). No specific loss-anchor. No comparable-cost framing. The $249/mo or $50K/yr feels like an addition to their cost stack rather than insurance against a much bigger loss.",
-    weight: 0.10,
+    weight: 0.06,
   },
 
   // ── Fundamentals 1 ──
@@ -600,7 +659,54 @@ export const GRADING_DIMENSIONS: GradingDimension[] = [
       "Concrete examples land in every paragraph. Names a specific case (WeWork S-1, Dangote 2014, McKinsey 8% statistic), a specific bias (overconfidence, narrative fallacy), a specific regulation (EU AI Act Article 14, NDPR). The buyer can repeat the line back to a colleague.",
     poorLooks:
       "Vague throughout. 'Better outcomes.' 'Strategic clarity.' 'Improved decision-making.' The buyer cannot repeat anything specific to a colleague.",
-    weight: 0.12,
+    weight: 0.08,
+  },
+
+  // ── 4 dimensions added 2026-04-28 PM from NotebookLM synthesis (KB note
+  // 0cc18c5d) on "what failure modes is the rubric NOT catching." These
+  // dimensions specifically capture the moments when the founder has the
+  // verbatim phrase right but the BUYER STILL doesn't move forward —
+  // the unmeasured variable that kills reps. ──
+
+  {
+    id: 'fomu_calibration',
+    label: 'FOMU calibration (pre-buttal)',
+    source: 'jolt',
+    excellentLooks:
+      "The founder detects the buyer agreeing with the pain ('I get it, biases cost us money') and PIVOTS from selling pain to taking risk off the table BEFORE the buyer asks. Names the buyer's silent FOMU (Fear of Messing Up — getting fired for picking the wrong tool) and addresses it head-on. Pre-buttal pattern: 'I know putting an M&A thesis into a new AI feels like a massive compliance risk. I wouldn't either. That's why we built [specific risk-reducer].' Pairs with loss-aversion-framing (use loss-aversion for the front half of the call to break status quo; use FOMU calibration for the back half to close).",
+    poorLooks:
+      "Buyer signals they're sold ('this could really help'), but the founder keeps DIALING UP fear (more bias examples, more disasters, more McKinsey horror stories). Drives the buyer into analysis paralysis. Or: misses the buyer's silent FOMU completely — buyer asks 'what about data security?' and gets a defensive technical answer instead of the warm 'I wouldn't trust a teenager either, here's why my architecture solves that' pre-buttal.",
+    weight: 0.06,
+  },
+  {
+    id: 'damaging_admission',
+    label: 'Damaging admission (naked honesty)',
+    source: 'cialdini',
+    excellentLooks:
+      "Founder VOLUNTEERS a specific weakness or limitation BEFORE the buyer probes for it. 'I'm 16, this is my first paid customer attempt, you'll be onboarded by me directly because there is no one else.' 'If you want an AI that makes the decision for you, this isn't it — ChatGPT guesses, we audit.' The damaging admission is hyper-specific (not vague humility). Triggers Cialdini's 'trustworthy authority' bias because the buyer realises only an honest expert would name the weakness this clearly. Pairs with authority-not-trust.",
+    poorLooks:
+      "Founder camouflages limitations. Hedges on age ('I have advisors'), gives evasive answers when probed ('we have a team'), or lists 12 capabilities to compensate for the one weakness they don't want named. Buyer's ChatGPT-wrapper suspicion spikes precisely because everything sounds too clean.",
+    weight: 0.05,
+  },
+  {
+    id: 'mutual_disqualification',
+    label: 'Mutual disqualification (honest off-ramp)',
+    source: 'sandler',
+    excellentLooks:
+      "Founder explicitly outlines the conditions under which this is a BAD fit and gives the buyer permission to walk away. 'If your IC never gets blindsided post-close, and your team already has a mathematical system of record for why decisions were made, you absolutely do not need this tool.' Negative reverse breaks the comparison frame, signals genuine confidence, and forces the buyer to defend why they DO need it. The exact mechanical execution of 'pressure without pressure' — Maalouf names the principle, Sandler names the move.",
+    poorLooks:
+      "Founder agrees to every feature request the buyer floats. 'Yes, we can customize that.' 'Yes, we can integrate that.' 'Yes, we can build that for you.' Triggers the 'unpaid dev shop' failure mode where the buyer drags the founder through 12-month procurement cycles for free. Or: chases the deal too hard, validates every objection, comes across as a desperate junior trying to win a logo.",
+    weight: 0.05,
+  },
+  {
+    id: 'prescriptive_recommendation',
+    label: 'Prescriptive recommendation (quarterbacking)',
+    source: 'jolt',
+    excellentLooks:
+      "Once the diagnosis lands, founder prescribes the EXACT next step. 'Other fractional CSOs like you don't start by auditing live client data — they run three dead deals from last year through the pipeline first. Let's set up a 15-minute onboarding next Tuesday for your first dead deal.' Buyer doesn't know how to buy DI; founder commands the path based on what peers did. Limits exploration, removes choice paralysis, gives a concrete time + action. Pairs with empathic-mode-first (empathic for discovery in the first 15 min; prescriptive to close in the last 10 min).",
+    poorLooks:
+      "Founder ends the call with 'what features are most important to you?' or 'how would you like to proceed from here?' or 'let me know if you have questions.' Forces the confused buyer to design their own implementation plan; buyer ghosts within 72 hours because they don't know what 'yes' actually means operationally.",
+    weight: 0.05,
   },
 ];
 

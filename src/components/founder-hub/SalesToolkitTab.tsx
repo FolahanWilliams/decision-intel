@@ -10,6 +10,8 @@ import {
   Heart,
   Users,
   Activity,
+  Lightbulb,
+  TrendingUp,
 } from 'lucide-react';
 import { PitchReframeToggle } from './sales/PitchReframeToggle';
 import { ObjectionFlashcards } from './sales/ObjectionFlashcards';
@@ -20,6 +22,12 @@ import { EnterpriseFrictionMatrix } from './sales/EnterpriseFrictionMatrix';
 import { CialdiniInfluenceWheel } from './sales/CialdiniInfluenceWheel';
 import { BuyingCommitteeMap } from './sales/BuyingCommitteeMap';
 import { DealStallDiagnosticTree } from './sales/DealStallDiagnosticTree';
+import { SalesMovesGrid } from './sales/SalesMovesGrid';
+import {
+  SALES_FRAMEWORK_GAPS,
+  AGE_ASYMMETRY_TACTICS,
+  VOSS_TACTICS,
+} from '@/lib/data/sales-toolkit';
 
 interface SectionProps {
   icon: React.ReactNode;
@@ -118,6 +126,33 @@ export function SalesToolkitTab() {
         accent="#8B5CF6"
       >
         <SalesFrameworkBrowser />
+      </Section>
+
+      <Section
+        icon={<Lightbulb size={16} />}
+        title="Sales-Framework Gaps · 5 moves you are NOT yet operationalising"
+        subtitle="JOLT Pre-buttal · Sandler negative reverse · Cialdini arguing-against-self · Challenger artefact-led teardown · Cialdini natural scarcity. Each carries the verbatim phrase + the mechanism + the anti-pattern + which Sparring Room dimension it scores against. Source: NotebookLM master KB synthesis 2026-04-28 (note 1a28e9f4)."
+        accent="#6366F1"
+      >
+        <SalesMovesGrid moves={SALES_FRAMEWORK_GAPS} accent="#6366F1" />
+      </Section>
+
+      <Section
+        icon={<TrendingUp size={16} />}
+        title="Age Asymmetry · 6 tactics that turn 16 into an asset"
+        subtitle="Voss accusation audit · Cohen naked-business advantage · Grove/Scott constructive confrontation · Cialdini perceptual contrast · Klein/Newport competence-specificity · Cialdini arguing-against-self. For when the buyer is 35-55 and you are 16. Source: NotebookLM master KB synthesis 2026-04-28 (note b18d07af)."
+        accent="#16A34A"
+      >
+        <SalesMovesGrid moves={AGE_ASYMMETRY_TACTICS} accent="#16A34A" />
+      </Section>
+
+      <Section
+        icon={<MessageSquare size={16} />}
+        title="Chris Voss Tactics · 5 hostage-negotiator moves applied to DI"
+        subtitle="Tactical empathy · calibrated questions · mirroring · the 'how am I supposed to do that' strategy · labeling. Each tagged to the persona it works best for. Voss specialised in hostage negotiation — your buyers have similar skepticism levels (their reputation/career is on the line for picking the wrong tool)."
+        accent="#0EA5E9"
+      >
+        <SalesMovesGrid moves={VOSS_TACTICS} accent="#0EA5E9" />
       </Section>
 
       <Section

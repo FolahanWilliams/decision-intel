@@ -1025,3 +1025,257 @@ export const ARTIFACT_LED_PITCH_BEATS: PitchBeat[] = [
       'Asking "what do you think?" or "do you have any questions?" — both invite endless objection-surfacing instead of closing the next concrete step.',
   },
 ];
+
+// ─── Sales Framework Library v2 ───────────────────────────────────
+//
+// Added 2026-04-28 PM from NotebookLM synthesis on:
+//   • "5 sales frameworks I am missing" (KB note 1a28e9f4)
+//   • "6 tactics for the 16yo×F500-CSO asymmetric power dynamic" (KB note b18d07af)
+//   • "4 dimensions missing from the 11-dim Sales DQI rubric" (KB note 0cc18c5d)
+//
+// These augment (not replace) the existing JOLT / SLIP / CIALDINI_FOR_DI /
+// CHALLENGER / SPIN / MEDDPICC frameworks above. Surface in the SalesToolkitTab
+// and feed the Sparring Room grading rubric (4 new dimensions: fomu_calibration,
+// damaging_admission, mutual_disqualification, prescriptive_recommendation).
+
+export interface SalesMove {
+  id: string;
+  /** Framework name + originator. */
+  framework: string;
+  /** When to fire it on a live call. */
+  whenToFire: string;
+  /** The exact verbatim phrase, tailored to a Decision Intel conversation. */
+  verbatim: string;
+  /** Mechanism — why this works psychologically. */
+  mechanism: string;
+  /** Anti-pattern — what kills this move. */
+  antiPattern: string;
+  /** Which Sparring Room grading dimension this move scores against. */
+  scoresOn?: string;
+  /** Which buyer persona this move works best for. Optional — universal moves omit. */
+  bestForPersona?: string;
+}
+
+// ─── 5 sales-framework moves the founder is NOT yet operationalising ──
+
+export const SALES_FRAMEWORK_GAPS: SalesMove[] = [
+  {
+    id: 'jolt_pre_buttal',
+    framework: 'JOLT Effect (Matt Dixon) · Pre-buttal',
+    whenToFire:
+      'In the first 2 minutes, immediately after introductions. BEFORE the buyer asks about security, founder continuity, or the ChatGPT-wrapper concern.',
+    verbatim:
+      "I know putting an IC memo into a new AI feels like a massive compliance risk. I wouldn't either. That's why your data never trains our models, the architecture is AES-256-GCM at rest, and you can hit our API archive endpoint to trigger a 7-day hard purge the moment an NDA expires. For the pilot, we start by retro-auditing three 'dead' deals from last year so you take zero pipeline risk.",
+    mechanism:
+      "Defuses the silent FOMU (Fear of Messing Up — getting fired for picking the wrong tool) by voicing the buyer's worst fears louder than they would. Once you've named the risk and showed the architectural answer, the buyer's analysis-paralysis defence dissolves.",
+    antiPattern:
+      'Waiting for the buyer to ask "what about data security?" — the question itself signals you didn\'t pre-emptively earn trust. By the time they ask, you\'re already on the defensive.',
+    scoresOn: 'fomu_calibration',
+  },
+  {
+    id: 'sandler_negative_reverse',
+    framework: 'Sandler Selling System · Negative reverse / Honest off-ramp',
+    whenToFire:
+      'In the first 5 minutes, when the buyer is still pattern-matching. Or any time the conversation feels like you\'re chasing them.',
+    verbatim:
+      "To be completely honest, if your IC never gets blindsided post-close, and your team already has a mathematical system of record for tracking why strategic decisions were made, you absolutely do not need this tool. We only step in when firms realise their M&A failure rate is bleeding alpha.",
+    mechanism:
+      "Breaks the comparison frame. Most founders chase; the negative reverse forces the BUYER to defend why they need YOU. Establishes absolute authority by signalling you're not desperate for the logo.",
+    antiPattern:
+      'Saying "yes, we can customise that" to every feature request the buyer floats. Triggers the unpaid-dev-shop failure mode where the buyer drags you through 12-month procurement cycles for free.',
+    scoresOn: 'mutual_disqualification',
+  },
+  {
+    id: 'cialdini_arguing_against_self',
+    framework: 'Cialdini Influence · Arguing against your own interest (Trustworthy Authority)',
+    whenToFire:
+      'When the buyer probes the boundaries of the product, asks if it can replace their analysts, or expresses ChatGPT-wrapper suspicion.',
+    verbatim:
+      "If you're looking for an AI that makes the strategic decision FOR you, this isn't it. ChatGPT gives you one generative guess, and Aera automates supply chains. We don't replace your expert intuition. We run a 12-node audit on your draft memo, catch the cognitive biases the room will grill you on, and output a Decision Provenance Record. We don't execute the decision; we make sure the human reasoning behind it is defensible.",
+    mechanism:
+      "Volunteering a specific limitation triggers Cialdini's 'trustworthy authority' bias. The buyer realises only an honest expert would name the weakness this clearly. Every subsequent claim becomes more credible by contrast.",
+    antiPattern:
+      'Listing 12 capabilities to compensate for the one you don\'t want named. Buyer\'s suspicion spikes precisely because everything sounds too clean.',
+    scoresOn: 'damaging_admission',
+  },
+  {
+    id: 'challenger_artifact_teardown',
+    framework: 'Challenger Sale (Dixon/Adamson) · Commercial Teaching · Artifact-Led Teardown',
+    whenToFire:
+      'Open the conversation here when you have a hot inbound or a procurement-stage call. Replaces the "let me show you our deck" instinct.',
+    verbatim:
+      "Consulting firms charge £1M to tell you about cognitive bias, but they suffer from the exact same biases themselves. Look at this WeWork S-1 audit. In 60 seconds, the engine flagged narrative fallacy + overconfidence on TAM + sunk cost. Those three blind spots cost billions. Bring a redacted CIM from a deal of yours that went sideways last year. I'll run the audit live in 7 minutes. If it doesn't flag the exact blind spots that cost you the deal, this product isn't for you.",
+    mechanism:
+      "Teaches the buyer something new about their own pain (cognitive bias as quantified revenue erosion) using a specific artefact (WeWork DPR) instead of generic claims. The teaching IS the qualification — buyers who lean in at the WeWork moment self-select.",
+    antiPattern:
+      'Opening a slide deck or running a feature tour. CSOs see 50 vendor decks a quarter; the artefact-led teardown is what makes you memorable.',
+    scoresOn: 'pinpoint_pain + specificity_over_vagueness',
+  },
+  {
+    id: 'cialdini_natural_scarcity',
+    framework: 'Cialdini Influence · Scarcity (operationalised through capacity, not gimmick)',
+    whenToFire:
+      'When the buyer expresses interest but is non-committal about timing. Or when they ask "what does it cost to start a pilot?"',
+    verbatim:
+      "We're onboarding 4 more design partners this quarter. Because the outcome flywheel needs me to map your firm's specific decision pipeline to the 17-framework regulatory engine, I physically don't have capacity for a fifth. If we partner, the ask is that your team commits to 90-day outcome logging so the model recalibrates against your firm's specific failure patterns.",
+    mechanism:
+      "Frames the constraint as structurally true (founder bandwidth + outcome calibration), not marketing scarcity. Triggers loss-aversion: the buyer who hesitates loses the seat. Names the contractual ask early so it's not a surprise at procurement.",
+    antiPattern:
+      "Using fake scarcity ('limited-time offer', 'only this month') — sophisticated buyers detect this in 5 seconds and write you off as a desperate startup. The scarcity must be true and structural.",
+    scoresOn: 'pressure_without_pressure',
+  },
+];
+
+// ─── 6 age-asymmetry tactics for the 16yo × 35-55yo buyer dynamic ──
+
+export const AGE_ASYMMETRY_TACTICS: SalesMove[] = [
+  {
+    id: 'voss_accusation_audit',
+    framework: 'Chris Voss (Never Split the Difference) · Accusation Audit',
+    whenToFire:
+      'First 2 minutes of the call, after introductions, BEFORE any product talk. Every Margaret-class CSO and James-class GC conversation MUST start here.',
+    verbatim:
+      "Before I show you the engine, I want to address the obvious. I'm 16 years old, and you're managing a multi-billion-dollar strategy team. It would be completely irrational for your audit committee to trust live deal flow to a teenage solo founder, because a data leak would cost you your job. That's exactly why I'm not asking for your live deals. For the pilot we retro-audit three 'dead' decisions from last year — you take zero pipeline risk while we prove the value.",
+    mechanism:
+      "Voicing the buyer's worst fear about you LOUDER than they would dare to defuses the unstated, deal-killing elephant in the room. By the time they were going to bring up your age, you've already named it AND shown the architectural answer. They have nothing to push on.",
+    antiPattern:
+      "Camouflaging your age. Saying 'I have advisors' or 'we have a team' when probed. Sophisticated buyers detect evasion in 30 seconds.",
+    bestForPersona: 'f500_cso, gc_audit_committee',
+  },
+  {
+    id: 'cohen_naked_business',
+    framework: 'Jason Cohen (Naked Business) · Asymmetric advantage from constraint',
+    whenToFire:
+      'When the buyer asks about team size, or compares you to McKinsey QuantumBlack / Palantir AIP / IBM watsonx.',
+    verbatim:
+      "Yes, it's just me. If you hire McKinsey they'll charge you £1M to tell you about cognitive bias, but they suffer from the exact same biases themselves, and they'll put a 24-year-old associate on your account who runs every recommendation through three layers of management. I wrote every line of the Decision Intel pipeline myself. When you need ISA 2007 mapped into the compliance engine, I don't need board approval — I'll code it and ship it overnight.",
+    mechanism:
+      "Frames being a solo teenage founder NOT as a liability to excuse, but as a ruthless competitive advantage massive incumbents structurally cannot match. The age becomes the proof of the speed claim.",
+    antiPattern:
+      "Apologising for being solo. 'Yeah I know it's just me but…' — the qualifier already lost the conversation.",
+    bestForPersona: 'fractional_cso, boutique_ma_advisor',
+  },
+  {
+    id: 'grove_radical_candor',
+    framework: 'Andy Grove / Kim Scott (Radical Candor) · Constructive Confrontation',
+    whenToFire:
+      'The Evidence Moment — running a live audit on a redacted CIM or famous failed deal. Demonstrating the gap in their current process.',
+    verbatim:
+      "Your current analysts are rubber-stamping the deal thesis instead of stress-testing it because of authority bias. This isn't a theory — the engine just flagged anchoring-to-entry-price and overconfidence-on-TAM on page 4 of your memo. If this was a live deal, ignoring those two flags would cost you millions. The engine catches what your room is afraid to say to the partner.",
+    mechanism:
+      "Challenging a senior executive's core operational process with objective, data-backed friction establishes you as an intellectual peer who cares enough about their revenue to tell them they're wrong.",
+    antiPattern:
+      "Diplomatic hedging ('there's a chance the team might want to look at this'). The buyer respects directness; the hedge reads as junior-trying-to-please.",
+    bestForPersona: 'mid_market_pe_associate, boutique_ma_advisor',
+  },
+  {
+    id: 'cialdini_perceptual_contrast',
+    framework: 'Cialdini Influence · Perceptual Contrast (price reframe)',
+    whenToFire:
+      'When negotiating pilot pricing, or when the buyer pushes on the £499/deal or £2,499/mo cost.',
+    verbatim:
+      "You can absolutely decline because of my age. But that means walking into your next IC meeting with a £50M allocation on the line, relying on the hope that nobody in the room is suffering from confirmation bias. Or, for £499 per deal, I mathematically eliminate that risk before the memo ever leaves your desk.",
+    mechanism:
+      "Forces the buyer to contrast the massive career-ending financial risk against a hyper-specific, quantifiable fee. Your age and the price both appear as microscopic rounding errors against the deal-size loss anchor.",
+    antiPattern:
+      "Discounting on price when the buyer pushes back. The discount IS the signal that the price was made up.",
+    bestForPersona: 'mid_market_pe_associate, fractional_cso',
+  },
+  {
+    id: 'klein_competence_specificity',
+    framework: 'Gary Klein / Cal Newport · Competence-signalling via extreme specificity',
+    whenToFire:
+      "When they ask 'why did you build this?' or express ChatGPT-wrapper suspicion.",
+    verbatim:
+      "I didn't build a ChatGPT wrapper. ChatGPT gives you one generative guess. I operationalised the 2009 Kahneman-Klein synthesis into a deterministic 12-node pipeline. The engine runs your memo through a 20×20 toxic-combination matrix and maps every flag to EU AI Act Article 14 record-keeping requirements. I built this because I published a paper on the neuro-cognitive roots of the 2008 financial crisis, and I realised the Fortune 500 still has no software to stop those exact same bias cascades from happening today.",
+    mechanism:
+      "True experts don't use buzzwords; they signal elite status by describing the architecture of a problem with such terrifying granular precision that the older buyer instantly realises the teenager has done the deep academic work they haven't.",
+    antiPattern:
+      "Vague generic claims about 'AI-powered' or 'next-generation governance'. Specificity is the only credibility-builder against age skepticism.",
+    bestForPersona: 'all',
+  },
+  {
+    id: 'arguing_against_own_interest_age',
+    framework: 'Cialdini Influence · Arguing against own interest (applied to age)',
+    whenToFire:
+      'When setting the agenda, or when a CSO asks if you can replace their analysts or automate M&A strategy.',
+    verbatim:
+      "If your team already has a mathematically auditable system of record for tracking why strategic decisions were made, this is useless to you. I didn't build an automated analyst. I built a 12-node ensemble audit to catch the exact cognitive biases your humans miss — so you don't get ambushed by the board.",
+    mechanism:
+      "Explicitly stating what your product CANNOT do, while limiting your scope, proves you're a calibrated expert rather than a desperate junior trying to score a logo. The age vanishes once authority is established.",
+    antiPattern:
+      "Being a 'bobblehead' that says yes to everything. 'Yes we can do that.' 'Yes we can integrate.' 'Yes we can build that.' Each yes destroys authority by 10%.",
+    bestForPersona: 'f500_cso, fractional_cso',
+  },
+];
+
+// ─── 5 Chris Voss tactics applied to DI personas ──
+
+export const VOSS_TACTICS: SalesMove[] = [
+  {
+    id: 'voss_tactical_empathy',
+    framework: 'Voss · Tactical Empathy',
+    whenToFire:
+      'When the buyer is anxious about the upload-confidential-data-to-a-teenager risk. Margaret-class and Titi-class buyers in particular.',
+    verbatim:
+      "It sounds like the bigger concern isn't whether the audit works — it's whether you can defend the vendor choice to your audit committee if something goes sideways.",
+    mechanism:
+      "Naming the buyer's emotional state with surgical precision (Voss's labeling technique) signals you SEE them. They drop their guard because someone finally understands the actual fear.",
+    antiPattern:
+      "Skipping straight to the technical answer ('we have AES-256-GCM') without first naming the emotional concern. The technical fix lands 5x harder once the emotion is named first.",
+    bestForPersona: 'f500_cso, pan_african_fund_partner, gc_audit_committee',
+  },
+  {
+    id: 'voss_calibrated_questions',
+    framework: 'Voss · Calibrated Questions (How / What questions that force the buyer to solve for you)',
+    whenToFire:
+      "When the buyer is stuck in 'we need to think about it' mode. Replaces 'do you have any questions?'",
+    verbatim:
+      "How would you explain this to your steering committee? What would they want to see in the first 30 days for this to feel like a win?",
+    mechanism:
+      "Calibrated 'How' / 'What' questions force the buyer to think through the operational details of YES rather than the binary YES/NO. By the end of the answer, they've designed their own pilot.",
+    antiPattern:
+      "Yes/no questions ('does this make sense?', 'do you want to try a pilot?') — they trigger reflexive caution. Calibrated questions trigger committed thinking.",
+    bestForPersona: 'mid_market_pe_associate, fractional_cso',
+  },
+  {
+    id: 'voss_mirroring',
+    framework: 'Voss · Mirroring (echo last 1-3 words as a question)',
+    whenToFire:
+      "Any time the buyer makes a vague claim like 'we already have something like this' or 'it's not really a priority right now'.",
+    verbatim:
+      "Buyer: 'We already have something like this.' You: 'Something like this?'",
+    mechanism:
+      "Repeating their last 1-3 words as an upward-inflection question prompts them to elaborate. They reveal the real objection (or reveal that 'something like this' was a deflection) without you having to challenge them.",
+    antiPattern:
+      "Arguing back ('actually no, our 12-node R²F pipeline is unique because...'). The buyer hears defensiveness and digs in. The mirror invites them to defend their own claim.",
+    bestForPersona: 'all',
+  },
+  {
+    id: 'voss_no_strategy',
+    framework: "Voss · The 'No' strategy / 'How am I supposed to do that?'",
+    whenToFire:
+      'When the buyer pushes for a discount, free pilot, or free customisation.',
+    verbatim:
+      "Buyer: 'Can you do this for free for the first three months?' You: 'How am I supposed to do that? My cost per audit is £0.30 just on the API call. The £499/deal is calibrated to a margin that lets me keep the lights on for design partners. I want to find a way to make this work — what are you actually trying to solve?'",
+    mechanism:
+      "'How am I supposed to do that?' forces the buyer to defend their ask without you saying NO. Triggers the buyer's empathy + creativity. Often they invent a better arrangement than you would have offered.",
+    antiPattern:
+      "Saying 'no, we don't discount.' Triggers the buyer's reactance. The 'how' question turns the same NO into a collaboration.",
+    bestForPersona: 'mid_market_pe_associate, boutique_ma_advisor, fractional_cso',
+  },
+  {
+    id: 'voss_labeling',
+    framework: 'Voss · Labeling (it sounds like / it seems like / it looks like)',
+    whenToFire:
+      'When you sense an unspoken objection. The buyer is polite but their body language or tone says something is off.',
+    verbatim:
+      "It seems like the procurement timeline is the part that's giving you pause, more than the product itself.",
+    mechanism:
+      "Naming the unstated emotion or concern with 'it seems like' or 'it sounds like' opens the door. Buyer either confirms (you address it) or corrects you (you learn the real concern). Either way, you advance.",
+    antiPattern:
+      "Asking 'is something wrong?' or 'do you have concerns?' — both put the burden on the buyer. The label does the work for them.",
+    bestForPersona: 'all',
+  },
+];
+

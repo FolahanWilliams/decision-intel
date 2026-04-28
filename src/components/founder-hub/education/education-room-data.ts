@@ -36,7 +36,8 @@ export type DeckId =
   | 'dqi_methodology'
   | 'regulatory_frameworks'
   | 'r2f_framework'
-  | 'founder_oneliners';
+  | 'founder_oneliners'
+  | 'advanced_sales_moves';
 
 export type CardDifficulty = 'foundation' | 'core' | 'advanced';
 export type CardMode = 'flashcard' | 'recall' | 'apply';
@@ -218,6 +219,15 @@ export const DECKS: EducationDeck[] = [
     iconName: 'Quote',
     color: '#EC4899',
     order: 12,
+  },
+  {
+    id: 'advanced_sales_moves',
+    label: 'Advanced Sales Moves',
+    description:
+      'JOLT pre-buttal · Sandler negative reverse · Cialdini arguing-against-self · Voss tactics (mirroring / labeling / accusation audit / calibrated questions / "no" strategy) · age-asymmetry tactics. Source: NotebookLM 2026-04-28 synthesis.',
+    iconName: 'TrendingUp',
+    color: '#6366F1',
+    order: 13,
   },
 ];
 
@@ -1415,6 +1425,241 @@ const FOUNDER_ONELINERS_CARDS: EducationCard[] = [
   },
 ];
 
+// ─── Cards: 4 new grading dimensions (added 2026-04-28 PM) ──────
+
+const GRADING_DIMENSIONS_V2_CARDS: EducationCard[] = [
+  {
+    id: 'rubric_fomu_calibration',
+    deckId: 'grading_dimensions',
+    prompt: 'In the Sales DQI rubric, what does "FOMU calibration" measure, and what is the academic anchor?',
+    canonicalAnswer:
+      "JOLT Effect (Matt Dixon) source. Weight: 0.06. FOMU = Fear of Messing Up (the buyer's fear of getting fired for picking the wrong tool — distinct from FOMO, which is fear of missing out on upside). Excellent (5/5): you DETECT the buyer agreeing with the pain ('I get it, biases cost us money') and PIVOT from selling pain to taking risk off the table BEFORE they ask. Pre-buttal pattern: 'I know putting an IC memo into a new AI feels like a massive compliance risk. I wouldn't either. That's why we built [risk-reducer].' Pairs with loss-aversion-framing — use loss aversion for the front half of the call to break status quo; FOMU calibration for the back half to close. Poor (1/5): buyer signals they're sold but you keep DIALING UP fear, driving them into analysis paralysis.",
+    difficulty: 'advanced',
+    applicationContext: "Buyer says 'this could really help' — what's your move in the next 30 seconds?",
+    source: 'sparring-room-data.ts (added 2026-04-28 PM)',
+    tag: 'jolt',
+  },
+  {
+    id: 'rubric_damaging_admission',
+    deckId: 'grading_dimensions',
+    prompt: 'In the Sales DQI rubric, what does "damaging admission" measure, and how does it differ from generic humility?',
+    canonicalAnswer:
+      "Cialdini Influence + Jason Cohen Naked Business source. Weight: 0.05. Excellent (5/5): you VOLUNTEER a specific weakness or limitation BEFORE the buyer probes for it — and the admission is HYPER-SPECIFIC, not vague humility. 'I'm 16, this is my first paid customer attempt, you'll be onboarded by me directly because there is no one else.' 'If you want an AI that makes the decision for you, this isn't it — ChatGPT guesses, we audit.' Triggers Cialdini's 'trustworthy authority' bias: the buyer realises only an honest expert would name the weakness this clearly. Every subsequent claim becomes more credible by contrast. Generic humility ('we're still learning', 'we have a lot to improve') does NOT trigger this — it reads as weakness. Specific damaging admission triggers authority. Poor (1/5): you camouflage limitations, hedge on age ('I have advisors'), or list 12 capabilities to compensate for the one you don't want named.",
+    difficulty: 'advanced',
+    applicationContext: 'Buyer asks about your team size or compares you to McKinsey/Palantir — how do you respond?',
+    source: 'sparring-room-data.ts (added 2026-04-28 PM)',
+    tag: 'cialdini',
+  },
+  {
+    id: 'rubric_mutual_disqualification',
+    deckId: 'grading_dimensions',
+    prompt: 'In the Sales DQI rubric, what does "mutual disqualification" measure, and what failure mode does it prevent?',
+    canonicalAnswer:
+      "Sandler Selling System source. Weight: 0.05. Excellent (5/5): you EXPLICITLY OUTLINE the conditions under which this is a BAD fit and give the buyer permission to walk away. 'If your IC never gets blindsided post-close, and your team already has a mathematical system of record for why decisions were made, you absolutely do not need this tool.' Negative reverse breaks the comparison frame, signals genuine confidence, and forces the buyer to defend why they DO need it. The exact mechanical execution of 'pressure without pressure' — Maalouf names the principle, Sandler names the move. Prevents the 'unpaid dev shop' failure mode where you say 'yes, we can customise that' to every feature request and the buyer drags you through 12-month procurement cycles for free. Poor (1/5): you agree to everything the buyer floats; you chase the deal too hard; you validate every objection.",
+    difficulty: 'advanced',
+    applicationContext: "Buyer asks 'can you also do X?' — when is the right answer no?",
+    source: 'sparring-room-data.ts (added 2026-04-28 PM)',
+    tag: 'sandler',
+  },
+  {
+    id: 'rubric_prescriptive_recommendation',
+    deckId: 'grading_dimensions',
+    prompt: 'In the Sales DQI rubric, what does "prescriptive recommendation" measure, and why is it the close move?',
+    canonicalAnswer:
+      "JOLT Effect + Y Combinator Enterprise Sales School source. Weight: 0.05. Excellent (5/5): once the diagnosis lands, you PRESCRIBE the EXACT next step. 'Other fractional CSOs like you don't start by auditing live client data — they run three dead deals from last year through the pipeline first. Let's set up a 15-minute onboarding next Tuesday for your first dead deal.' Buyer doesn't know how to buy DI; you command the path based on what peers did. Limits exploration, removes choice paralysis, gives a concrete time + concrete action. Pairs with empathic-mode-first — empathic for discovery in the first 15 min; prescriptive to close in the last 10 min. Poor (1/5): you end the call with 'what features are most important to you?' or 'how would you like to proceed?' or 'let me know if you have questions.' Forces the confused buyer to design their own implementation plan; they ghost within 72 hours because they don't know what 'yes' actually means operationally.",
+    difficulty: 'advanced',
+    applicationContext: "Last 3 minutes of the call — buyer is interested. What do you say to convert?",
+    source: 'sparring-room-data.ts (added 2026-04-28 PM)',
+    tag: 'jolt',
+  },
+];
+
+// ─── Cards: Advanced Sales Moves deck (16 cards) ────────────────
+
+const ADVANCED_SALES_MOVES_CARDS: EducationCard[] = [
+  // 5 framework gaps
+  {
+    id: 'move_pre_buttal',
+    deckId: 'advanced_sales_moves',
+    prompt: "When and how do you fire the JOLT 'pre-buttal' move on a live call? Give the verbatim phrase.",
+    canonicalAnswer:
+      "Fire it in the FIRST 2 MINUTES, immediately after introductions, BEFORE the buyer asks about security / founder continuity / ChatGPT-wrapper. Verbatim: 'I know putting an IC memo into a new AI feels like a massive compliance risk. I wouldn't either. That's why your data never trains our models, the architecture is AES-256-GCM at rest, and you can hit our API archive endpoint to trigger a 7-day hard purge the moment an NDA expires. For the pilot, we start by retro-auditing three dead deals from last year so you take zero pipeline risk.' Mechanism: defuses silent FOMU by voicing the buyer's worst fear LOUDER than they would. Once you've named the risk and shown the architectural answer, their analysis-paralysis defence dissolves. Anti-pattern: waiting for them to ask 'what about data security?' — by then you're on the defensive.",
+    difficulty: 'advanced',
+    applicationContext: 'About to get on a call with Margaret-class F500 CSO or James-class GC.',
+    source: 'sales-toolkit.ts SALES_FRAMEWORK_GAPS · jolt_pre_buttal',
+    tag: 'jolt',
+  },
+  {
+    id: 'move_negative_reverse',
+    deckId: 'advanced_sales_moves',
+    prompt: 'What is the Sandler negative-reverse move and when do you fire it?',
+    canonicalAnswer:
+      "Fire in the first 5 minutes when the buyer is still pattern-matching, OR any time the conversation feels like you're chasing them. Verbatim: 'To be completely honest, if your IC never gets blindsided post-close, and your team already has a mathematical system of record for tracking why strategic decisions were made, you absolutely do not need this tool. We only step in when firms realise their M&A failure rate is bleeding alpha.' Mechanism: breaks the comparison frame; forces the BUYER to defend why they need YOU. Establishes absolute authority by signalling you're not desperate for the logo. Anti-pattern: saying 'yes, we can customise that' to every feature request — triggers the unpaid-dev-shop failure mode.",
+    difficulty: 'advanced',
+    applicationContext: 'You sense the buyer is about to ghost or de-prioritise.',
+    source: 'sales-toolkit.ts SALES_FRAMEWORK_GAPS · sandler_negative_reverse',
+    tag: 'sandler',
+  },
+  {
+    id: 'move_arguing_against_self',
+    deckId: 'advanced_sales_moves',
+    prompt: 'What is the Cialdini "arguing against your own interest" move and when does it land hardest?',
+    canonicalAnswer:
+      "Fire when the buyer probes the boundaries of the product, asks if it can replace their analysts, or expresses ChatGPT-wrapper suspicion. Verbatim: 'If you're looking for an AI that makes the strategic decision FOR you, this isn't it. ChatGPT gives you one generative guess, and Aera automates supply chains. We don't replace your expert intuition. We run a 12-node audit on your draft memo, catch the cognitive biases the room will grill you on, and output a Decision Provenance Record. We don't execute the decision; we make sure the human reasoning behind it is defensible.' Mechanism: volunteering a limitation triggers Cialdini's 'trustworthy authority' bias. The buyer realises only an honest expert would name the weakness this clearly. Every subsequent claim becomes more credible. Anti-pattern: listing 12 capabilities to compensate for the one you don't want named.",
+    difficulty: 'advanced',
+    applicationContext: "Buyer asks 'can this replace my analyst team?'",
+    source: 'sales-toolkit.ts SALES_FRAMEWORK_GAPS · cialdini_arguing_against_self',
+    tag: 'cialdini',
+  },
+  {
+    id: 'move_artifact_teardown',
+    deckId: 'advanced_sales_moves',
+    prompt: 'What is the Challenger "artefact-led teardown" move and what does it replace?',
+    canonicalAnswer:
+      "Replaces the 'let me show you our deck' instinct on hot inbound or procurement-stage calls. Verbatim: 'Consulting firms charge £1M to tell you about cognitive bias, but they suffer from the exact same biases themselves. Look at this WeWork S-1 audit. In 60 seconds, the engine flagged narrative fallacy + overconfidence on TAM + sunk cost. Those three blind spots cost billions. Bring a redacted CIM from a deal of yours that went sideways last year. I'll run the audit live in 7 minutes. If it doesn't flag the exact blind spots that cost you the deal, this product isn't for you.' Mechanism: teaches the buyer something new about their own pain (cognitive bias as quantified revenue erosion) using a specific artefact (WeWork DPR) instead of generic claims. The teaching IS the qualification — buyers who lean in at the WeWork moment self-select. Anti-pattern: opening a slide deck or running a feature tour.",
+    difficulty: 'advanced',
+    applicationContext: 'Hot inbound — buyer reached out via warm intro and wants to see depth.',
+    source: 'sales-toolkit.ts SALES_FRAMEWORK_GAPS · challenger_artifact_teardown',
+    tag: 'challenger',
+  },
+  {
+    id: 'move_natural_scarcity',
+    deckId: 'advanced_sales_moves',
+    prompt: 'How do you operationalise "natural scarcity" without sounding like a desperate startup?',
+    canonicalAnswer:
+      "Frame the constraint as STRUCTURALLY TRUE (founder bandwidth + outcome calibration), not marketing scarcity. Verbatim: 'We're onboarding 4 more design partners this quarter. Because the outcome flywheel needs me to map your firm's specific decision pipeline to the 17-framework regulatory engine, I physically don't have capacity for a fifth. If we partner, the ask is that your team commits to 90-day outcome logging so the model recalibrates against your firm's specific failure patterns.' Mechanism: triggers loss-aversion (buyer who hesitates loses the seat) AND establishes the contractual ask early so it's not a surprise at procurement. Anti-pattern: fake scarcity ('limited-time offer', 'only this month') — sophisticated buyers detect this in 5 seconds.",
+    difficulty: 'advanced',
+    applicationContext: "Buyer says 'we'd want to look at this next quarter.'",
+    source: 'sales-toolkit.ts SALES_FRAMEWORK_GAPS · cialdini_natural_scarcity',
+    tag: 'cialdini',
+  },
+
+  // 6 age-asymmetry tactics
+  {
+    id: 'move_accusation_audit',
+    deckId: 'advanced_sales_moves',
+    prompt: 'What is Voss\'s "accusation audit" move and when do you fire it?',
+    canonicalAnswer:
+      "Fire in the FIRST 2 MINUTES, after introductions, BEFORE any product talk. Mandatory for every Margaret-class F500 CSO and James-class GC conversation. Verbatim: 'Before I show you the engine, I want to address the obvious. I'm 16 years old, and you're managing a multi-billion-dollar strategy team. It would be completely irrational for your audit committee to trust live deal flow to a teenage solo founder, because a data leak would cost you your job. That's exactly why I'm not asking for your live deals. For the pilot we retro-audit three dead decisions from last year — you take zero pipeline risk while we prove the value.' Mechanism: voicing the buyer's worst fear about you LOUDER than they would dare to defuses the unstated, deal-killing elephant in the room. By the time they were going to bring up your age, you've already named it AND shown the architectural answer. Anti-pattern: camouflaging your age — sophisticated buyers detect evasion in 30 seconds.",
+    difficulty: 'advanced',
+    applicationContext: 'First call with a Margaret-class CSO or James-class GC.',
+    source: 'sales-toolkit.ts AGE_ASYMMETRY_TACTICS · voss_accusation_audit',
+    tag: 'voss',
+  },
+  {
+    id: 'move_naked_business',
+    deckId: 'advanced_sales_moves',
+    prompt: 'How do you turn "yes, it\'s just me" into a competitive advantage?',
+    canonicalAnswer:
+      "Verbatim: 'Yes, it's just me. If you hire McKinsey they'll charge you £1M to tell you about cognitive bias, but they suffer from the exact same biases themselves, and they'll put a 24-year-old associate on your account who runs every recommendation through three layers of management. I wrote every line of the Decision Intel pipeline myself. When you need ISA 2007 mapped into the compliance engine, I don't need board approval — I'll code it and ship it overnight.' Mechanism: frames being a solo teenage founder NOT as a liability to excuse, but as a ruthless competitive advantage massive incumbents structurally cannot match. The age becomes the proof of the speed claim. Anti-pattern: 'yeah I know it's just me but…' — the qualifier already lost the conversation.",
+    difficulty: 'advanced',
+    applicationContext: "Buyer asks 'how big is your team?' or compares you to McKinsey QuantumBlack.",
+    source: 'sales-toolkit.ts AGE_ASYMMETRY_TACTICS · cohen_naked_business',
+    tag: 'cohen',
+  },
+  {
+    id: 'move_constructive_confrontation',
+    deckId: 'advanced_sales_moves',
+    prompt: 'What is the Grove/Scott "constructive confrontation" move and when does it land?',
+    canonicalAnswer:
+      "Fire during the Evidence Moment — running a live audit on a redacted CIM or famous failed deal. Verbatim: 'Your current analysts are rubber-stamping the deal thesis instead of stress-testing it because of authority bias. This isn't a theory — the engine just flagged anchoring-to-entry-price and overconfidence-on-TAM on page 4 of your memo. If this was a live deal, ignoring those two flags would cost you millions. The engine catches what your room is afraid to say to the partner.' Mechanism: challenging a senior executive's core operational process with objective, data-backed friction establishes you as an intellectual peer who cares enough about their revenue to tell them they're wrong. Anti-pattern: diplomatic hedging ('there's a chance the team might want to look at this') — reads as junior-trying-to-please.",
+    difficulty: 'advanced',
+    applicationContext: 'Mid-call live audit on a memo the buyer brought.',
+    source: 'sales-toolkit.ts AGE_ASYMMETRY_TACTICS · grove_radical_candor',
+    tag: 'grove',
+  },
+  {
+    id: 'move_perceptual_contrast',
+    deckId: 'advanced_sales_moves',
+    prompt: 'How do you use Cialdini\'s perceptual contrast to defend the price?',
+    canonicalAnswer:
+      "Verbatim: 'You can absolutely decline because of my age. But that means walking into your next IC meeting with a £50M allocation on the line, relying on the hope that nobody in the room is suffering from confirmation bias. Or, for £499 per deal, I mathematically eliminate that risk before the memo ever leaves your desk.' Mechanism: forces the buyer to contrast the massive career-ending financial risk against a hyper-specific, quantifiable fee. Both your age AND the price appear as microscopic rounding errors against the deal-size loss anchor. Anti-pattern: discounting on price when the buyer pushes back — the discount IS the signal that the price was made up.",
+    difficulty: 'advanced',
+    applicationContext: 'Buyer pushes on the £499/deal or £2,499/mo price.',
+    source: 'sales-toolkit.ts AGE_ASYMMETRY_TACTICS · cialdini_perceptual_contrast',
+    tag: 'cialdini',
+  },
+  {
+    id: 'move_competence_specificity',
+    deckId: 'advanced_sales_moves',
+    prompt: 'How does "competence-signalling via extreme specificity" beat the ChatGPT-wrapper question?',
+    canonicalAnswer:
+      "Verbatim: 'I didn't build a ChatGPT wrapper. ChatGPT gives you one generative guess. I operationalised the 2009 Kahneman-Klein synthesis into a deterministic 12-node pipeline. The engine runs your memo through a 20×20 toxic-combination matrix and maps every flag to EU AI Act Article 14 record-keeping requirements. I built this because I published a paper on the neuro-cognitive roots of the 2008 financial crisis, and I realised the Fortune 500 still has no software to stop those exact same bias cascades from happening today.' Mechanism: true experts don't use buzzwords; they signal elite status by describing the architecture of a problem with such terrifying granular precision that the older buyer instantly realises the teenager has done the deep academic work they haven't. Anti-pattern: vague generic claims ('AI-powered', 'next-generation governance') — specificity is the only credibility-builder against age skepticism.",
+    difficulty: 'advanced',
+    applicationContext: "Buyer asks 'why did you build this?' or hints at ChatGPT-wrapper suspicion.",
+    source: 'sales-toolkit.ts AGE_ASYMMETRY_TACTICS · klein_competence_specificity',
+    tag: 'klein',
+  },
+  {
+    id: 'move_arguing_against_age',
+    deckId: 'advanced_sales_moves',
+    prompt: 'How do you apply "arguing against your own interest" specifically to age skepticism?',
+    canonicalAnswer:
+      "Verbatim: 'If your team already has a mathematically auditable system of record for tracking why strategic decisions were made, this is useless to you. I didn't build an automated analyst. I built a 12-node ensemble audit to catch the exact cognitive biases your humans miss — so you don't get ambushed by the board.' Mechanism: explicitly stating what your product CANNOT do, while limiting your scope, proves you're a calibrated expert rather than a desperate junior trying to score a logo. The age vanishes once authority is established. Anti-pattern: being a 'bobblehead' that says yes to everything — each yes destroys authority by ~10%.",
+    difficulty: 'advanced',
+    applicationContext: "CSO asks if you can replace their analyst team or automate strategy.",
+    source: 'sales-toolkit.ts AGE_ASYMMETRY_TACTICS · arguing_against_own_interest_age',
+    tag: 'cialdini',
+  },
+
+  // 5 Voss tactics
+  {
+    id: 'move_voss_tactical_empathy',
+    deckId: 'advanced_sales_moves',
+    prompt: 'What is Voss\'s "tactical empathy" move and when do you fire it?',
+    canonicalAnswer:
+      "Fire when the buyer is anxious about the upload-confidential-data-to-a-teenager risk (Margaret/Titi/James). Verbatim: 'It sounds like the bigger concern isn't whether the audit works — it's whether you can defend the vendor choice to your audit committee if something goes sideways.' Mechanism: naming the buyer's emotional state with surgical precision (Voss's labeling technique) signals you SEE them. They drop their guard because someone finally understands the actual fear. Anti-pattern: skipping straight to the technical answer ('we have AES-256-GCM') without first naming the emotional concern — the technical fix lands 5x harder once the emotion is named first.",
+    difficulty: 'advanced',
+    applicationContext: 'Margaret/Titi/James seems polite but withdrawn.',
+    source: 'sales-toolkit.ts VOSS_TACTICS · voss_tactical_empathy',
+    tag: 'voss',
+  },
+  {
+    id: 'move_voss_calibrated_questions',
+    deckId: 'advanced_sales_moves',
+    prompt: 'What replaces "do you have any questions?" — give the Voss verbatim.',
+    canonicalAnswer:
+      "Calibrated questions force the buyer to think through the operational details of YES rather than the binary YES/NO. Verbatim: 'How would you explain this to your steering committee? What would they want to see in the first 30 days for this to feel like a win?' Mechanism: 'How' / 'What' questions trigger the buyer to design their own pilot. By the end of the answer, they've sold themselves. Anti-pattern: yes/no questions ('does this make sense?', 'do you want to try a pilot?') — they trigger reflexive caution.",
+    difficulty: 'advanced',
+    applicationContext: "Buyer says 'we need to think about it' — what do you ask next?",
+    source: 'sales-toolkit.ts VOSS_TACTICS · voss_calibrated_questions',
+    tag: 'voss',
+  },
+  {
+    id: 'move_voss_mirroring',
+    deckId: 'advanced_sales_moves',
+    prompt: 'What is Voss\'s mirroring tactic — give a Decision Intel example?',
+    canonicalAnswer:
+      "Repeat the buyer's last 1-3 words as an upward-inflection question. Example: Buyer: 'We already have something like this.' You: 'Something like this?' Mechanism: prompts them to elaborate. They reveal the real objection (or reveal that 'something like this' was a deflection) without you having to challenge them. Anti-pattern: arguing back ('actually no, our 12-node R²F pipeline is unique because...'). The buyer hears defensiveness and digs in. The mirror invites them to defend their own claim.",
+    difficulty: 'advanced',
+    applicationContext: "Buyer makes a vague claim that doesn't quite fit.",
+    source: 'sales-toolkit.ts VOSS_TACTICS · voss_mirroring',
+    tag: 'voss',
+  },
+  {
+    id: 'move_voss_no_strategy',
+    deckId: 'advanced_sales_moves',
+    prompt: 'How do you handle a free-pilot or discount request without saying NO?',
+    canonicalAnswer:
+      "Use 'How am I supposed to do that?' Verbatim: Buyer: 'Can you do this for free for the first three months?' You: 'How am I supposed to do that? My cost per audit is £0.30 just on the API call. The £499/deal is calibrated to a margin that lets me keep the lights on for design partners. I want to find a way to make this work — what are you actually trying to solve?' Mechanism: forces the buyer to defend their ask without you saying NO. Triggers the buyer's empathy + creativity. Often they invent a better arrangement than you would have offered. Anti-pattern: saying 'no, we don't discount' — triggers the buyer's reactance.",
+    difficulty: 'advanced',
+    applicationContext: 'Buyer asks for a discount or free pilot.',
+    source: 'sales-toolkit.ts VOSS_TACTICS · voss_no_strategy',
+    tag: 'voss',
+  },
+  {
+    id: 'move_voss_labeling',
+    deckId: 'advanced_sales_moves',
+    prompt: 'What is Voss\'s "labeling" tactic — give the verbatim?',
+    canonicalAnswer:
+      "Use 'it sounds like' / 'it seems like' / 'it looks like' to name the unstated concern. Verbatim: 'It seems like the procurement timeline is the part that's giving you pause, more than the product itself.' Mechanism: naming the unstated emotion or concern opens the door. Buyer either confirms (you address it) or corrects you (you learn the real concern). Either way, you advance. Anti-pattern: asking 'is something wrong?' or 'do you have concerns?' — both put the burden on the buyer. The label does the work for them.",
+    difficulty: 'advanced',
+    applicationContext: 'Buyer is polite but their tone says something is off.',
+    source: 'sales-toolkit.ts VOSS_TACTICS · voss_labeling',
+    tag: 'voss',
+  },
+];
+
 // ─── Aggregator + Helpers ───────────────────────────────────────
 
 export const ALL_CARDS: EducationCard[] = [
@@ -1424,12 +1669,14 @@ export const ALL_CARDS: EducationCard[] = [
   ...SATYAM_PILLARS_CARDS,
   ...SILENT_OBJECTIONS_CARDS,
   ...GRADING_DIMENSIONS_CARDS,
+  ...GRADING_DIMENSIONS_V2_CARDS,
   ...COGNITIVE_BIASES_CARDS,
   ...PIPELINE_NODES_CARDS,
   ...DQI_METHODOLOGY_CARDS,
   ...REGULATORY_FRAMEWORKS_CARDS,
   ...R2F_FRAMEWORK_CARDS,
   ...FOUNDER_ONELINERS_CARDS,
+  ...ADVANCED_SALES_MOVES_CARDS,
 ];
 
 export function findDeck(id: DeckId): EducationDeck | undefined {

@@ -41,6 +41,7 @@ import {
   Lock,
   Compass,
   Quote,
+  TrendingUp,
   ArrowRight,
   Eye,
   EyeOff,
@@ -72,7 +73,7 @@ const SESSION_KEY = 'di-education-room-session-v1';
 
 const ICON_MAP: Record<string, typeof BookOpen> = {
   BookOpen, Users, Target, Shield, AlertCircle, CheckSquare,
-  Brain, Workflow, BarChart3, Lock, Compass, Quote,
+  Brain, Workflow, BarChart3, Lock, Compass, Quote, TrendingUp,
 };
 function getIcon(name: string): typeof BookOpen {
   return ICON_MAP[name] || BookOpen;

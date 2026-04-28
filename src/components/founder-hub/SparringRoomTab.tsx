@@ -47,7 +47,10 @@ import {
   type BuyerPersonaId,
   type ScenarioMode,
   type SparringSessionResult,
+  type GradingDimensionId,
 } from './sparring/sparring-room-data';
+import { Target } from 'lucide-react';
+import { SparringTrendViz } from './sparring/SparringTrendViz';
 
 interface Props {
   founderPass: string;
@@ -70,8 +73,15 @@ interface HistoryEntry {
   salesDqi: number;
   grade: 'A' | 'B' | 'C' | 'D' | 'F';
   isWarmContext: boolean;
+  /** Per-dimension scores 0-5. Optional for back-compat with v1 entries
+   * (entries from before 2026-04-28 trend-viz extension lack this field). */
+  dimensions?: Record<GradingDimensionId, number>;
+  /** Filler-word count from the rep — used for "delivery cleanliness" trend. */
+  fillerCount?: number;
 }
 
+// v2: extended HistoryEntry shape (added dimensions + fillerCount). Old v1
+// entries still load (dimensions undefined → trend viz handles gracefully).
 const HISTORY_KEY = 'di-sparring-room-history-v1';
 const MAX_HISTORY = 50;
 
@@ -157,6 +167,26 @@ export function SparringRoomTab({ founderPass }: Props) {
     setStep('reviewing');
     setBusy(true);
     setError(null);
+
+    // Compute recent-history context (last 5 reps' rolling per-dimension
+    // averages) so the grader can identify recurring weakness patterns.
+    const recentDimensionAverages: Partial<Record<GradingDimensionId, number>> = {};
+    const recentWithDims = history.slice(-5).filter(h => h.dimensions);
+    if (recentWithDims.length > 0) {
+      const sums: Partial<Record<GradingDimensionId, { sum: number; count: number }>> = {};
+      for (const h of recentWithDims) {
+        if (!h.dimensions) continue;
+        for (const [dim, score] of Object.entries(h.dimensions) as Array<[GradingDimensionId, number]>) {
+          if (!sums[dim]) sums[dim] = { sum: 0, count: 0 };
+          sums[dim]!.sum += score;
+          sums[dim]!.count += 1;
+        }
+      }
+      for (const [dim, agg] of Object.entries(sums) as Array<[GradingDimensionId, { sum: number; count: number }]>) {
+        recentDimensionAverages[dim] = agg.sum / agg.count;
+      }
+    }
+
     try {
       const res = await fetch('/api/founder-hub/sparring/grade', {
         method: 'POST',
@@ -167,6 +197,8 @@ export function SparringRoomTab({ founderPass }: Props) {
           questions: brief.questions,
           transcript,
           isWarmContext,
+          recentDimensionAverages,
+          totalRepsCompleted: history.length,
         }),
       });
       if (!res.ok) {
@@ -176,7 +208,7 @@ export function SparringRoomTab({ founderPass }: Props) {
       const data = (await res.json()) as SparringSessionResult;
       setResult(data);
 
-      // Append to history.
+      // Append to history (v2 shape — dimensions + fillerCount captured for trend viz).
       const entry: HistoryEntry = {
         sessionId: typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : String(Date.now()),
         dateISO: new Date().toISOString(),
@@ -185,6 +217,8 @@ export function SparringRoomTab({ founderPass }: Props) {
         salesDqi: data.salesDqi,
         grade: data.grade,
         isWarmContext,
+        dimensions: data.dimensions,
+        fillerCount: data.fillerCount,
       };
       persistHistory([...history, entry]);
 
@@ -205,6 +239,15 @@ export function SparringRoomTab({ founderPass }: Props) {
     setPrepCountdown(0);
     setStep('setup');
   }, []);
+
+  /** Apply the AI's nextRepSetup recommendation and jump straight back to setup. */
+  const goAgainWithRecommendation = useCallback(() => {
+    if (result?.nextRepSetup) {
+      setPersonaId(result.nextRepSetup.recommendedPersonaId);
+      setMode(result.nextRepSetup.recommendedMode);
+    }
+    goAgain();
+  }, [result, goAgain]);
 
   const persona = findPersonaById(personaId);
   const scenario = findScenarioById(mode);
@@ -282,8 +325,11 @@ export function SparringRoomTab({ founderPass }: Props) {
           scenarioLabel={scenario.label}
           isWarmContext={isWarmContext}
           onGoAgain={goAgain}
+          onGoAgainWithRec={goAgainWithRecommendation}
         />
       )}
+
+      <SparringTrendViz history={history} />
 
       <HistoryPanel history={history} onClear={() => persistHistory([])} />
     </div>
@@ -813,6 +859,7 @@ interface ResultsProps {
   scenarioLabel: string;
   isWarmContext: boolean;
   onGoAgain: () => void;
+  onGoAgainWithRec: () => void;
 }
 
 function ResultsCard(props: ResultsProps) {
@@ -1040,6 +1087,208 @@ function ResultsCard(props: ResultsProps) {
           />
         )}
       </div>
+
+      {/* ── Actionable insights — coach not judge ────────────────────── */}
+
+      {r.confidenceBuild && (
+        <div
+          style={{
+            padding: 14,
+            background: 'rgba(99, 102, 241, 0.06)',
+            borderLeft: '3px solid #6366F1',
+            borderRadius: 'var(--radius-md)',
+          }}
+        >
+          <div style={{ fontSize: 10, fontWeight: 700, color: '#6366F1', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>
+            Confidence build · what genuinely worked
+          </div>
+          <div style={{ fontSize: 14, color: 'var(--text-primary)', lineHeight: 1.5 }}>
+            {r.confidenceBuild}
+          </div>
+        </div>
+      )}
+
+      {r.patternFlag && (
+        <div
+          style={{
+            padding: 14,
+            background: 'rgba(245, 158, 11, 0.08)',
+            border: '1px solid rgba(245, 158, 11, 0.30)',
+            borderRadius: 'var(--radius-lg)',
+          }}
+        >
+          <div style={{ fontSize: 10, fontWeight: 700, color: '#D97706', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <AlertCircle size={11} /> Pattern flag · across your recent reps
+          </div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
+            {r.patternFlag.pattern}
+          </div>
+          <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 6 }}>
+            <strong>Root cause:</strong> {r.patternFlag.rootCause}
+          </div>
+          <div style={{ fontSize: 12, color: 'var(--text-primary)', lineHeight: 1.5 }}>
+            <strong style={{ color: '#16A34A' }}>Breakthrough move:</strong> {r.patternFlag.breakthroughMove}
+          </div>
+        </div>
+      )}
+
+      {r.nextSessionFocus && r.nextSessionFocus.length > 0 && (
+        <div
+          style={{
+            padding: 14,
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-lg)',
+          }}
+        >
+          <div className="section-heading" style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Target size={12} /> Next session · focus areas
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 10 }}>
+            {r.nextSessionFocus.map((focus, i) => {
+              const dim = GRADING_DIMENSIONS.find(d => d.id === focus.dimensionId);
+              const sourceColor =
+                dim?.source === 'maalouf' ? '#DC2626' :
+                dim?.source === 'satyam' ? '#0EA5E9' :
+                dim?.source === 'di_discipline' ? '#16A34A' :
+                dim?.source === 'kahneman' ? '#F59E0B' :
+                dim?.source === 'jolt' ? '#6366F1' :
+                dim?.source === 'cialdini' ? '#EC4899' :
+                dim?.source === 'sandler' ? '#14B8A6' : '#A78BFA';
+              return (
+                <div
+                  key={i}
+                  style={{
+                    padding: 12,
+                    background: 'var(--bg-elevated)',
+                    border: '1px solid var(--border-color)',
+                    borderLeft: `3px solid ${sourceColor}`,
+                    borderRadius: 'var(--radius-md)',
+                  }}
+                >
+                  <div style={{ fontSize: 11, fontWeight: 700, color: sourceColor, marginBottom: 6 }}>
+                    {dim?.label || focus.dimensionId}
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 8 }}>
+                    <strong style={{ color: 'var(--text-primary)' }}>Why it matters:</strong> {focus.whyItMatters}
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--text-primary)', lineHeight: 1.5 }}>
+                    <strong style={{ color: '#16A34A' }}>Concrete action:</strong> {focus.concreteAction}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {r.drillPlan && r.drillPlan.length > 0 && (
+        <div
+          style={{
+            padding: 14,
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-lg)',
+          }}
+        >
+          <div className="section-heading" style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <CheckCircle2 size={12} /> Drill plan · before your next rep
+          </div>
+          <ol style={{ margin: 0, paddingLeft: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {r.drillPlan.map((d, i) => (
+              <li
+                key={i}
+                style={{
+                  display: 'flex',
+                  gap: 10,
+                  padding: 10,
+                  background: 'var(--bg-elevated)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 'var(--radius-md)',
+                  alignItems: 'flex-start',
+                }}
+              >
+                <span
+                  style={{
+                    width: 24,
+                    height: 24,
+                    flexShrink: 0,
+                    borderRadius: '50%',
+                    background: '#16A34A20',
+                    color: '#16A34A',
+                    fontSize: 12,
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {i + 1}
+                </span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>
+                    {d.action}
+                  </div>
+                  <div style={{ fontSize: 11.5, color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                    {d.location} <span style={{ marginLeft: 8, fontVariantNumeric: 'tabular-nums' }}>· ~{d.estimatedMinutes} min</span>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+
+      {r.nextRepSetup && (
+        <div
+          style={{
+            padding: 14,
+            background: 'linear-gradient(135deg, rgba(22, 163, 74, 0.08), rgba(99, 102, 241, 0.04))',
+            border: '1px solid rgba(22, 163, 74, 0.25)',
+            borderRadius: 'var(--radius-lg)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: 12,
+            flexWrap: 'wrap',
+          }}
+        >
+          <div style={{ flex: 1, minWidth: 240 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: '#16A34A', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>
+              Coach recommends · your next rep
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
+              {(() => {
+                const recPersona = BUYER_PERSONAS.find(p => p.id === r.nextRepSetup.recommendedPersonaId);
+                const recMode = SCENARIO_MODES.find(m => m.id === r.nextRepSetup.recommendedMode);
+                return `${recPersona?.label || r.nextRepSetup.recommendedPersonaId} · ${recMode?.label || r.nextRepSetup.recommendedMode}`;
+              })()}
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+              {r.nextRepSetup.rationale}
+            </div>
+          </div>
+          <button
+            onClick={props.onGoAgainWithRec}
+            style={{
+              padding: '10px 16px',
+              background: '#16A34A',
+              border: 'none',
+              borderRadius: 'var(--radius-md)',
+              color: '#fff',
+              fontSize: 13,
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              flexShrink: 0,
+            }}
+          >
+            Use this setup <ArrowRight size={13} />
+          </button>
+        </div>
+      )}
 
       <style jsx>{`
         @media (max-width: 760px) {
