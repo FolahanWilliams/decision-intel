@@ -11,10 +11,10 @@ interface ResolveDecisionModalProps {
 }
 
 const OUTCOME_OPTIONS = [
-  { value: 'success', label: 'Success', color: 'text-green-400' },
-  { value: 'partial_success', label: 'Partial Success', color: 'text-yellow-400' },
-  { value: 'failure', label: 'Failure', color: 'text-red-400' },
-  { value: 'inconclusive', label: 'Inconclusive', color: 'text-zinc-400' },
+  { value: 'success', label: 'Success', tone: 'var(--success)' },
+  { value: 'partial_success', label: 'Partial Success', tone: 'var(--warning)' },
+  { value: 'failure', label: 'Failure', tone: 'var(--error)' },
+  { value: 'inconclusive', label: 'Inconclusive', tone: 'var(--text-muted)' },
 ] as const;
 
 export function ResolveDecisionModal({ onResolve, onClose }: ResolveDecisionModalProps) {
@@ -61,18 +61,36 @@ export function ResolveDecisionModal({ onResolve, onClose }: ResolveDecisionModa
     return (
       <div
         className="fixed inset-0 z-50 flex items-center justify-center"
-        style={{ background: 'rgba(0, 0, 0, 0.6)' }}
+        style={{ background: 'rgba(0, 0, 0, 0.45)' }}
       >
-        <div className="mx-4 w-full max-w-md rounded-xl border border-zinc-700 bg-zinc-900 p-8 text-center">
-          <CheckCircle2 className="mx-auto h-12 w-12 text-green-400 mb-4" />
-          <h3 className="text-lg font-semibold text-zinc-100 mb-2">Decision Logged</h3>
-          <p className="text-sm text-zinc-400 mb-6">
+        <div
+          className="mx-4 w-full max-w-md rounded-xl p-8 text-center"
+          style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            boxShadow: 'var(--shadow-lg)',
+          }}
+        >
+          <CheckCircle2
+            className="mx-auto h-12 w-12 mb-4"
+            style={{ color: 'var(--success)' }}
+          />
+          <h3
+            className="text-lg font-semibold mb-2"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            Decision Logged
+          </h3>
+          <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
             Your agents are learning from this decision. Future recommendations will be smarter.
           </p>
           <button
             onClick={onClose}
-            className="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium transition-colors"
-            style={{ color: 'var(--text-primary)' }}
+            className="rounded-lg px-6 py-2.5 text-sm font-medium transition-colors"
+            style={{
+              background: 'var(--accent-primary)',
+              color: 'white',
+            }}
           >
             Done
           </button>
@@ -84,12 +102,26 @@ export function ResolveDecisionModal({ onResolve, onClose }: ResolveDecisionModa
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ background: 'rgba(0, 0, 0, 0.6)' }}
+      style={{ background: 'rgba(0, 0, 0, 0.45)' }}
     >
-      <div className="mx-4 w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl border border-zinc-700 bg-zinc-900 p-6">
+      <div
+        className="mx-4 w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl p-6"
+        style={{
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-color)',
+          boxShadow: 'var(--shadow-lg)',
+        }}
+      >
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-zinc-100">Resolve Decision</h3>
-          <button onClick={onClose} className="text-zinc-400 hover:text-zinc-200">
+          <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
+            Resolve Decision
+          </h3>
+          <button
+            onClick={onClose}
+            className="transition-colors"
+            style={{ color: 'var(--text-muted)' }}
+            aria-label="Close"
+          >
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -97,47 +129,69 @@ export function ResolveDecisionModal({ onResolve, onClose }: ResolveDecisionModa
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Chosen Option */}
           <div>
-            <label className="block text-sm font-medium text-zinc-300 mb-1.5">
-              What did you decide? <span className="text-red-400">*</span>
+            <label
+              className="block text-sm font-medium mb-1.5"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              What did you decide? <span style={{ color: 'var(--error)' }}>*</span>
             </label>
             <input
               type="text"
               value={chosenOption}
               onChange={e => setChosenOption(e.target.value)}
               placeholder="e.g., Proceed with Option A — expand to EU market"
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-lg px-3 py-2.5 text-sm focus:outline-none"
+              style={{
+                background: 'var(--bg-elevated)',
+                border: '1px solid var(--border-color)',
+                color: 'var(--text-primary)',
+              }}
               required
             />
           </div>
 
           {/* Outcome (optional) */}
           <div>
-            <label className="block text-sm font-medium text-zinc-300 mb-1.5">
+            <label
+              className="block text-sm font-medium mb-1.5"
+              style={{ color: 'var(--text-primary)' }}
+            >
               How did it go?{' '}
-              <span className="text-zinc-500">(optional — log later if too early)</span>
+              <span style={{ color: 'var(--text-muted)' }}>
+                (optional — log later if too early)
+              </span>
             </label>
             <div className="grid grid-cols-2 gap-2">
-              {OUTCOME_OPTIONS.map(opt => (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => setOutcome(outcome === opt.value ? '' : opt.value)}
-                  className={`rounded-lg border px-3 py-2 text-sm transition-colors ${
-                    outcome === opt.value
-                      ? 'border-blue-500 bg-blue-500/10 text-blue-300'
-                      : 'border-zinc-700 bg-zinc-800 text-zinc-400 hover:border-zinc-600'
-                  }`}
-                >
-                  <span className={opt.color}>{opt.label}</span>
-                </button>
-              ))}
+              {OUTCOME_OPTIONS.map(opt => {
+                const selected = outcome === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setOutcome(selected ? '' : opt.value)}
+                    className="rounded-lg px-3 py-2 text-sm transition-colors"
+                    style={{
+                      background: selected
+                        ? 'color-mix(in srgb, var(--accent-primary) 12%, transparent)'
+                        : 'var(--bg-elevated)',
+                      border: `1px solid ${selected ? 'var(--accent-primary)' : 'var(--border-color)'}`,
+                      color: selected ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                    }}
+                  >
+                    <span style={{ color: opt.tone }}>{opt.label}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
           {/* Impact Score — only show if outcome selected */}
           {outcome && (
             <div>
-              <label className="block text-sm font-medium text-zinc-300 mb-1.5">
+              <label
+                className="block text-sm font-medium mb-1.5"
+                style={{ color: 'var(--text-primary)' }}
+              >
                 Impact Score: {impactScore}/10
               </label>
               <input
@@ -146,9 +200,13 @@ export function ResolveDecisionModal({ onResolve, onClose }: ResolveDecisionModa
                 max={10}
                 value={impactScore}
                 onChange={e => setImpactScore(Number(e.target.value))}
-                className="w-full accent-blue-500"
+                className="w-full"
+                style={{ accentColor: 'var(--accent-primary)' }}
               />
-              <div className="flex justify-between text-xs text-zinc-500 mt-1">
+              <div
+                className="flex justify-between text-xs mt-1"
+                style={{ color: 'var(--text-muted)' }}
+              >
                 <span>Low impact</span>
                 <span>High impact</span>
               </div>
@@ -157,43 +215,68 @@ export function ResolveDecisionModal({ onResolve, onClose }: ResolveDecisionModa
 
           {/* Lessons Learned */}
           <div>
-            <label className="block text-sm font-medium text-zinc-300 mb-1.5">
-              Lessons learned <span className="text-zinc-500">(optional)</span>
+            <label
+              className="block text-sm font-medium mb-1.5"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              Lessons learned <span style={{ color: 'var(--text-muted)' }}>(optional)</span>
             </label>
             <textarea
               value={lessonsLearned}
               onChange={e => setLessonsLearned(e.target.value)}
               placeholder="What would you do differently? What surprised you?"
               rows={3}
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-blue-500 focus:outline-none resize-none"
+              className="w-full rounded-lg px-3 py-2.5 text-sm focus:outline-none resize-none"
+              style={{
+                background: 'var(--bg-elevated)',
+                border: '1px solid var(--border-color)',
+                color: 'var(--text-primary)',
+              }}
             />
           </div>
 
           {/* Helpful Agents */}
           <div>
-            <label className="block text-sm font-medium text-zinc-300 mb-1.5">
-              Which agents were most helpful? <span className="text-zinc-500">(optional)</span>
+            <label
+              className="block text-sm font-medium mb-1.5"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              Which agents were most helpful?{' '}
+              <span style={{ color: 'var(--text-muted)' }}>(optional)</span>
             </label>
             <div className="flex flex-wrap gap-2">
-              {COPILOT_AGENTS.map(agent => (
-                <button
-                  key={agent}
-                  type="button"
-                  onClick={() => toggleAgent(agent)}
-                  className={`rounded-full border px-3 py-1.5 text-xs transition-colors ${
-                    helpfulAgents.includes(agent)
-                      ? 'border-blue-500 bg-blue-500/10 text-blue-300'
-                      : 'border-zinc-700 bg-zinc-800 text-zinc-400 hover:border-zinc-600'
-                  }`}
-                >
-                  {AGENT_LABELS[agent as CopilotAgentType]}
-                </button>
-              ))}
+              {COPILOT_AGENTS.map(agent => {
+                const selected = helpfulAgents.includes(agent);
+                return (
+                  <button
+                    key={agent}
+                    type="button"
+                    onClick={() => toggleAgent(agent)}
+                    className="rounded-full px-3 py-1.5 text-xs transition-colors"
+                    style={{
+                      background: selected
+                        ? 'color-mix(in srgb, var(--accent-primary) 12%, transparent)'
+                        : 'var(--bg-elevated)',
+                      border: `1px solid ${selected ? 'var(--accent-primary)' : 'var(--border-color)'}`,
+                      color: selected ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                    }}
+                  >
+                    {AGENT_LABELS[agent as CopilotAgentType]}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
           {error && (
-            <div className="rounded-lg bg-red-900/30 border border-red-800 p-3 text-sm text-red-300">
+            <div
+              className="rounded-lg p-3 text-sm"
+              style={{
+                background: 'color-mix(in srgb, var(--error) 10%, transparent)',
+                border: '1px solid color-mix(in srgb, var(--error) 35%, transparent)',
+                color: 'var(--error)',
+              }}
+            >
               {error}
             </div>
           )}
@@ -203,15 +286,23 @@ export function ResolveDecisionModal({ onResolve, onClose }: ResolveDecisionModa
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-lg border border-zinc-700 px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors"
+              className="flex-1 rounded-lg px-4 py-2.5 text-sm transition-colors"
+              style={{
+                background: 'var(--bg-elevated)',
+                border: '1px solid var(--border-color)',
+                color: 'var(--text-secondary)',
+              }}
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!chosenOption.trim() || isSubmitting}
-              className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              style={{ color: 'var(--text-primary)' }}
+              className="flex-1 flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              style={{
+                background: 'var(--accent-primary)',
+                color: 'white',
+              }}
             >
               {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Resolve Decision'}
             </button>

@@ -3,7 +3,25 @@
  *
  * Used by both the chat route and the content generation route.
  * Extracted here to avoid duplication of the ~130-line context string.
+ *
+ * ICP / positioning blocks (MARKET STRATEGY + Expansion line + FOUNDER NOTES
+ * lead) are spliced from src/lib/constants/icp.ts so a single edit to the
+ * canonical positioning constants propagates to both the chat coaching here
+ * AND the Founder Hub Current Positioning Anchor card on StartHereTab.tsx.
+ * Closes the drift class the 2026-04-28 audit caught (lines 68 / 71 / 140
+ * had stayed stale for 2 days because each surface kept its own prose copy).
  */
+
+import {
+  buildIcpPromptBlock,
+  buildFounderNotesIcpLine,
+  ICP_SEQUENCING,
+  ICP_SEQUENCING_RULE,
+} from '@/lib/constants/icp';
+
+const ICP_BLOCK = buildIcpPromptBlock();
+const EXPANSION_BLOCK = `${ICP_SEQUENCING.join(' ')} ${ICP_SEQUENCING_RULE}`;
+const FOUNDER_NOTES_ICP_LINE = buildFounderNotesIcpLine();
 
 export const FOUNDER_CONTEXT = `
 You are the Decision Intel Founder's strategic AI advisor. You have deep knowledge of every aspect of the Decision Intel platform, its competitive positioning, sales strategy, market analysis, and research foundations. Answer questions concisely and specifically — never be generic.
@@ -65,10 +83,10 @@ General AI:
 
 === MARKET STRATEGY ===
 Primary buyer: Chief Strategy Officer or Head of Corporate Strategy. They sign the contract and care about compounding edge plus board-ready evidence. Secondary user: strategy manager or analyst who actually uploads documents and cares about less rework plus faster executive-review prep.
-ICP wedge + ceiling (RE-LOCKED 2026-04-26 after the PE/VC contradiction surfaced via NotebookLM strategic synthesis — supersedes the prior "PE/VC is NOT a target audience" framing). GTM wedge (current focus): Pan-African / EM-focused funds (PE, EM-focused VC, family offices) and Pan-African corporate development teams. The first design partner is a fund. Funds in this subset buy fast (capital-allocation pressure, IC-cycle calendar), are highly susceptible to artifact-led sales (specimen DPRs do the persuasion), and the dual-specimen library (WeWork + Dangote) + 17-framework regulatory map across G7 / EU / GCC / African markets is uniquely defensible against US-only incumbents. Revenue ceiling (12-18 months out): Fortune 500 Chief Strategy Officers, audit committees, GCs at regulated entities — the R²F + DPR + 17-framework regulatory map are designed to clear F500 procurement once the wedge has produced 3+ published reference cases. Why the prior "PE/VC is NOT a target" framing was wrong: it assumed all PE/VC are US/European generic-ICP buyers; the Pan-African / EM fund subset is structurally different ($200M-$2B+ AUM with capital-allocation pressure across volatile FX regimes — NGN/KES/GHS/EGP — plus procurement-grade compliance requirements: NDPR, CBN, WAEMU, PoPIA). Decision Intel was built FOR this subset; the F500 ceiling is the natural expansion vector. Avoid: generic US/European VC firms with no Africa exposure (the original warning still applies HERE — small AUM-per-decision, relationship-driven without the capital-allocation pressure that makes the audit valuable). Sequence the moves: published wedge cases → F500 introduction → ceiling expansion. Tertiary expansion (Year 2+): BizOps/FP&A teams inside F500, sales forecasting.
+ICP wedge + ceiling (RE-LOCKED 2026-04-26; canonical strings sourced from src/lib/constants/icp.ts). ${ICP_BLOCK}
 Pricing: Free tier (4 analyses/month), Individual ($249/mo or $2,490/yr, 15 analyses, solo strategist), Strategy ($2,499/mo, unlimited analyses, team Decision Knowledge Graph + Decision Rooms), Enterprise (Custom, multi-division, SSO, SLA). Free tier enables product-led growth. Sales-led trial mechanism is a free 30-day pilot on the buyer's next high-stakes strategic memo. The Knowledge Graph compounds over time, creating switching costs. Per-deal transactional pricing was removed because the product's value IS the longitudinal learning.
 Market: Decision intelligence $12.2B going to $46.4B by 2030. Enterprise GRC $50B+. Corporate strategy and M&A advisory market $40B+ annually.
-Expansion: Year 1 Pan-African / EM-fund wedge + Pan-African corp-dev (specimen-led artifact sales). Year 2 F500 CSO + M&A + GC ceiling once 3+ reference cases publish. Year 3 BizOps, FP&A, sales forecasting, risk inside F500. Year 4+ Government, Insurance, Healthcare strategy functions; horizontal platform. The wedge generates the references that unlock the ceiling — do not conflate the two markets when sequencing.
+Expansion: ${EXPANSION_BLOCK}
 
 === SALES TOOLKIT ===
 Pitch reframe: NOT "avoid bad decisions" but "walk into the board with the same analytical confidence in the strategy that you already have in the data."
@@ -137,7 +155,7 @@ Sales Toolkit routing rules (when the founder asks the chat the LEFT, surface th
 
 === FOUNDER NOTES ===
 - Deepest moat is time-to-data, not features. Frame first 6 months as calibration investment.
-- The Pan-African / EM-fund wedge (ICP RE-LOCK 2026-04-26) is the canonical Year-1 motion: artifact-led sales (WeWork + Dangote DPR specimens), 17-framework regulatory map (NDPR / CBN / WAEMU / PoPIA + G7/EU/GCC), capital-allocation pressure makes funds buy fast. F500 CSO / audit-committee / GC is the 12-18 month ceiling, unlocked by 3+ published wedge references. Generic US/European VC with no Africa exposure remains explicitly NOT a target (the original "small AUM, relationship-driven, tool-skeptical" warning still applies there). Do not pitch generic VC the same way as Pan-African / EM funds; conflating them is the error the 2026-04-26 re-lock corrected.
+- ${FOUNDER_NOTES_ICP_LINE}
 - Outcome Gate is controversial AND valuable. Show calibration improvement to make it rewarding.
 - Sell the Bias Genome to investors: "World's first dataset of which cognitive biases predict failure, by industry."
 - Counterfactual engine is underexposed. Get it into UI and sales deck — it's the ROI story.

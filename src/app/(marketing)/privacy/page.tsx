@@ -207,7 +207,7 @@ const LAWFUL_BASIS: Array<{ activity: string; basis: string; rationale: string }
 const PROCESSORS = [
   {
     name: 'Supabase',
-    role: 'Authentication and encrypted Postgres hosting (US production region; EU residency available on Enterprise design-partner configurations — confirm with the Decision Intel team before signature).',
+    role: 'Authentication and encrypted Postgres hosting (US production region; EU residency available on Enterprise design-partner configurations, subject to confirmation with the Decision Intel team before signature).',
   },
   {
     name: 'Google AI',
@@ -857,7 +857,7 @@ export default function PrivacyPage() {
             <span>
               If you believe your rights under GDPR or UK GDPR have not been respected, you may
               lodge a complaint with the supervisory authority of your habitual residence, place of
-              work, or place of the alleged infringement &mdash; for example the{' '}
+              work, or place of the alleged infringement. Examples include the{' '}
               <a
                 href="https://ico.org.uk"
                 target="_blank"
@@ -918,7 +918,7 @@ export default function PrivacyPage() {
           <SectionHeader
             eyebrow="If you're named in someone else's document"
             title="A path for third-party data subjects"
-            body="If you're identified or referenced inside a strategic memo a Decision Intel customer uploaded — and that document's analysis bears on a decision that significantly affects you — GDPR Article 22 (and equivalent NDPR / PoPIA / UK GDPR provisions) gives you the right to obtain meaningful information about the logic involved, to express your point of view, and to contest the decision."
+            body="If you're identified or referenced inside a strategic memo a Decision Intel customer uploaded, and that document's analysis bears on a decision that significantly affects you, GDPR Article 22 (and equivalent NDPR / PoPIA / UK GDPR provisions) gives you the right to obtain meaningful information about the logic involved, to express your point of view, and to contest the decision."
           />
           <div
             style={{
@@ -952,7 +952,7 @@ export default function PrivacyPage() {
                   </a>
                 </strong>{' '}
                 with the subject line{' '}
-                <em>&ldquo;Art 22 request — third-party data subject&rdquo;</em>. Tell us your name
+                <em>&ldquo;Art 22 request · third-party data subject&rdquo;</em>. Tell us your name
                 and (where you can) the customer organisation whose document identifies you.
               </li>
               <li>
@@ -966,7 +966,7 @@ export default function PrivacyPage() {
                   The controller responds within 30 days
                 </strong>{' '}
                 under GDPR Art 12(3). The response includes the meaningful information about the
-                logic — the Decision Provenance Record is engineered to provide exactly this. You
+                logic, which the Decision Provenance Record is engineered to provide. You
                 may then express your point of view and contest the decision under Art 22(3).
               </li>
               <li>
@@ -988,7 +988,7 @@ export default function PrivacyPage() {
               }}
             >
               <strong style={{ color: C.slate900 }}>Note:</strong> Decision Intel never produces
-              automated decisions about a third-party subject in isolation — every output is a
+              automated decisions about a third-party subject in isolation. Every output is a
               decision-quality audit on a strategic memo authored by a Decision Intel customer. The
               Art 22 contestation right applies when that customer&rsquo;s decision (informed by the
               audit) significantly affects you. The DPR provides the &ldquo;meaningful information

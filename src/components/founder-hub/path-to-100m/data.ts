@@ -11,6 +11,35 @@
  * synthesis evolves (new design partners closed, new ICP signals,
  * confirmed Cloverpop ACVs, etc.), update HERE — every visualization
  * pulls from these typed exports.
+ *
+ * ─── Consumers ──────────────────────────────────────────────────────
+ * Each export is rendered by exactly one tab sub-component (mapped at
+ * commit time 2026-04-28; check `grep -l "from './data'"` if drift
+ * suspected). Update both the export and the consumer when you add
+ * a field — the components type-check against the type aliases here,
+ * so a breaking shape change ripples loudly via tsc.
+ *
+ *   STRENGTHS, WEAKNESSES                         → StrengthsWeaknessesMatrix
+ *   R2F_CURRENT, R2F_MOAT_LEVERS                  → R2FDeepDive
+ *   CATEGORY_DEFINITION, PERSONA_PITCH_LIBRARY,
+ *   LANGUAGE_PATTERNS                             → CategoryAndPitchLibrary
+ *   ROLE_PLAYBOOKS                                → RoleOutreachPlaybooks
+ *   KILLER_RESPONSES                              → KillerResponsesPlaybook
+ *   INVESTOR_METRICS                              → InvestorMetricsTracker
+ *   FAILURE_MODES                                 → FailureModesWatchtower
+ *   NETWORK_NODES                                 → WarmIntroNetworkMap
+ *   NINETY_DAY_ACTIONS                            → NinetyDayActionPlan
+ *   NOTEBOOKLM_FOLLOW_UPS                         → NotebookLmFollowUpLab
+ *   SILENT_OBJECTIONS                             → MarketRealityCheck
+ *   SIMPLIFIED_FUNNEL, FEATURE_VERDICTS           → SimplifiedThirtyDayFunnel
+ *
+ * NorthStarHero + PITFALLS read from constants composed inline above
+ * (kept here for proximity, not exported).
+ *
+ * Some exports are reused BY REFERENCE from sibling data files
+ * (competitive-positioning.ts, sales-toolkit.ts, unicorn-roadmap data,
+ * company-info.ts) rather than duplicated — search for the import name
+ * in this file to find the canonical source for each.
  */
 
 // =========================================================================

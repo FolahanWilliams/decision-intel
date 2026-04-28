@@ -180,6 +180,60 @@ export function PasteAuditResults({ documentId, analysisId, result }: PasteAudit
             </span>
           )}
         </div>
+
+        {/* Inline Save CTA — anchored to the score-reveal moment so a cold
+            reader sees the conversion path the instant the wow lands, before
+            scrolling past. The fuller pitch CTA below stays for readers who
+            scroll through. (B3 lock 2026-04-28.) */}
+        <div
+          style={{
+            marginTop: 18,
+            paddingTop: 16,
+            borderTop: `1px solid ${C.slate200}`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
+            flexWrap: 'wrap',
+          }}
+        >
+          <div
+            style={{
+              fontSize: 13,
+              color: C.slate600,
+              lineHeight: 1.5,
+            }}
+          >
+            <Lock size={12} style={{ display: 'inline', marginRight: 6, color: C.slate500 }} />
+            Save this audit to your account &mdash; free, no card.
+          </div>
+          <Link
+            href={saveAuditHref}
+            onClick={() =>
+              trackEvent('demo_save_audit_clicked', {
+                analysisId: analysisId ?? undefined,
+                documentId,
+                claimFlow: 'enabled',
+                placement: 'inline_score_reveal',
+              })
+            }
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              fontSize: 13,
+              fontWeight: 700,
+              color: C.white,
+              background: C.green,
+              padding: '8px 16px',
+              borderRadius: 8,
+              textDecoration: 'none',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Save audit <ArrowRight size={13} />
+          </Link>
+        </div>
       </motion.div>
 
       {/* Top biases */}

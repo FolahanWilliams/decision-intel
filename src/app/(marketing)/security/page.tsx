@@ -155,7 +155,7 @@ const FRAMEWORKS = [
     code: 'CBN AI Guidelines',
     name: 'Central Bank of Nigeria',
     gates:
-      'Financial-services AI governance obligations (draft 2024) — model governance, explainability and consumer-protection duties for regulated Nigerian financial institutions.',
+      'Financial-services AI governance obligations (draft 2024): model governance, explainability, and consumer-protection duties for regulated Nigerian financial institutions.',
   },
   {
     code: 'WAEMU',
@@ -171,13 +171,13 @@ const FRAMEWORKS = [
   },
   {
     code: 'CBK',
-    name: 'Central Bank of Kenya — Banking & Digital Lending',
+    name: 'Central Bank of Kenya · Banking & Digital Lending',
     gates:
       'Digital-lending licensing, AI/ML model-risk management, and consumer-disclosure obligations under the Banking (Amendment) Act 2024 §33B and CBK Risk Management Guidelines (rev. 2023).',
   },
   {
     code: 'BoG Cyber & ICT Risk',
-    name: 'Bank of Ghana — Cyber & Information Security Directive',
+    name: 'Bank of Ghana · Cyber & Information Security Directive',
     gates:
       'Cyber, data, and AI/ML model-governance obligations for Ghanaian regulated financial institutions (2018 directive + 2023 update).',
   },
@@ -185,7 +185,7 @@ const FRAMEWORKS = [
     code: 'FRC Nigeria',
     name: 'Financial Reporting Council of Nigeria',
     gates:
-      'Nigerian Code of Corporate Governance — board-level decisioning, dissent capture, and risk-management documentation duties for public-interest entities.',
+      'Nigerian Code of Corporate Governance covering board-level decisioning, dissent capture, and risk-management documentation duties for public-interest entities.',
   },
   {
     code: 'CBE AI Guidelines',
@@ -201,13 +201,13 @@ const FRAMEWORKS = [
   },
   {
     code: 'SARB Model Risk',
-    name: 'South African Reserve Bank — Model Risk Governance',
+    name: 'South African Reserve Bank · Model Risk Governance',
     gates:
       'Model risk + AI governance obligations for SA-regulated banks (Directive D2/2022 + Joint Standard 2 of 2024 on cybersecurity).',
   },
   {
     code: 'BoT FinTech',
-    name: 'Bank of Tanzania — FinTech Regulatory Sandbox',
+    name: 'Bank of Tanzania · FinTech Regulatory Sandbox',
     gates:
       'Tanzanian financial-services AI/ML decisioning obligations under the BoT FinTech Regulatory Sandbox Guidelines (2023).',
   },
@@ -376,7 +376,7 @@ const DR_BCP = [
   {
     label: 'Geographic redundancy',
     value: 'US production · multi-region edge',
-    body: 'Vercel runs the application across global edge locations; Supabase production database is US-region single-AZ on the standard tier with multi-AZ on Enterprise. EU-region residency is available on Enterprise design-partner configurations — confirm with the Decision Intel team before signature.',
+    body: 'Vercel runs the application across global edge locations; Supabase production database is US-region single-AZ on the standard tier with multi-AZ on Enterprise. EU-region residency is available on Enterprise design-partner configurations. Confirm with the Decision Intel team before signature.',
   },
   {
     label: 'Annual restore drill',
@@ -1290,7 +1290,7 @@ export default function SecurityPage() {
           <SectionHeader
             eyebrow="Disaster recovery + business continuity"
             title="What happens if production fails"
-            body="The numbers a Fortune 500 security questionnaire opens with. Recovery objectives, backup cadence, redundancy posture — sized against what the production-tier infrastructure SLA actually delivers, not what would sound nice."
+            body="The numbers a Fortune 500 security questionnaire opens with. Recovery objectives, backup cadence, and redundancy posture, sized against what the production-tier infrastructure SLA actually delivers, not what would sound nice."
           />
           <div
             style={{
@@ -1356,7 +1356,7 @@ export default function SecurityPage() {
           <SectionHeader
             eyebrow="Retention SLA"
             title="How long your documents live, and how to delete them"
-            body="Documents auto-soft-delete at the end of your tier's window. A 30-day grace window applies before permanent purge — recoverable via support during the grace, irrecoverable after. Self-serve Delete is on every document detail page and on the post-upload reveal card."
+            body="Documents auto-soft-delete at the end of your tier's window. A 30-day grace window applies before permanent purge: recoverable via support during the grace, irrecoverable after. Self-serve Delete is on every document detail page and on the post-upload reveal card."
           />
           <div
             style={{

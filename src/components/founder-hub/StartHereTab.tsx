@@ -3,6 +3,17 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
 import {
+  POSITIONING_HERO_PRIMARY,
+  POSITIONING_HERO_SECONDARY,
+  IP_MOAT_NAME,
+  IP_MOAT_DESCRIPTION,
+  SPECIMEN_LIBRARY_DESCRIPTION,
+  COMPLIANCE_MOAT_REGIONS,
+  ICP_AUDIENCE_SUMMARY,
+  BANNED_VOCABULARY,
+  COLD_CONTEXT_ONRAMPS,
+} from '@/lib/constants/icp';
+import {
   CheckCircle2,
   Circle,
   Clock,
@@ -401,36 +412,39 @@ function renderHero(
           Current positioning anchor — locked 2026-04-26
         </div>
         <div style={{ marginBottom: 4 }}>
-          <strong>Primary hero:</strong> &ldquo;The native reasoning layer for every high-stakes
-          call.&rdquo;
+          <strong>Primary hero:</strong> &ldquo;{POSITIONING_HERO_PRIMARY}&rdquo;
         </div>
         <div style={{ marginBottom: 4 }}>
-          <strong>Secondary (regulatory):</strong> &ldquo;The reasoning layer the Fortune 500 needs
-          before regulators start asking.&rdquo;
+          <strong>Secondary (regulatory):</strong> &ldquo;{POSITIONING_HERO_SECONDARY}&rdquo;
         </div>
         <div style={{ marginBottom: 4 }}>
-          <strong>IP moat:</strong> Recognition-Rigor Framework (R²F) — Kahneman&apos;s debiasing +
-          Klein&apos;s Recognition-Primed Decisions, arbitrated in one pipeline.
+          <strong>IP moat:</strong> {IP_MOAT_NAME} — {IP_MOAT_DESCRIPTION}
         </div>
         <div style={{ marginBottom: 4 }}>
-          <strong>Specimen library:</strong> WeWork S-1 (US/global) + Dangote 2014 Pan-African
-          expansion (Africa / EM). Two production DPRs in <code>public/</code>.
+          <strong>Specimen library:</strong> {SPECIMEN_LIBRARY_DESCRIPTION}
         </div>
         <div style={{ marginBottom: 4 }}>
-          <strong>Compliance moat:</strong> {getAllRegisteredFrameworks().length} frameworks across
-          G7 / EU / GCC / African markets.
+          <strong>Compliance moat:</strong> {getAllRegisteredFrameworks().length} frameworks across{' '}
+          {COMPLIANCE_MOAT_REGIONS}.
         </div>
         <div style={{ marginBottom: 4 }}>
-          <strong>Audience:</strong> Corporate strategy + corp dev + funds (PE, EM-focused VC,
-          family offices) + audit committees + GCs. NOT F500-board-narrow.
+          <strong>Audience:</strong> {ICP_AUDIENCE_SUMMARY}
         </div>
         <div style={{ color: 'var(--text-muted)', fontSize: 11, marginTop: 8 }}>
-          <strong>Banned:</strong> &ldquo;decision intelligence platform&rdquo; (Gartner-crowded),
-          &ldquo;decision hygiene&rdquo; (Kahneman&apos;s 2021 term — cedes vocabulary),
-          &ldquo;boardroom strategic decision&rdquo; (audience-narrowing — replaced by
-          &ldquo;high-stakes call&rdquo; 2026-04-26). Cold-context on-ramps: &ldquo;60-second audit
-          on a strategic memo&rdquo;, &ldquo;pre-IC audit layer&rdquo;, &ldquo;strategic memo
-          audits&rdquo; — descriptive, no academic borrowing.
+          <strong>Banned:</strong>{' '}
+          {BANNED_VOCABULARY.map((b, i) => (
+            <span key={b.phrase}>
+              &ldquo;{b.phrase}&rdquo; ({b.reason})
+              {i < BANNED_VOCABULARY.length - 1 ? ', ' : '.'}
+            </span>
+          ))}{' '}
+          Cold-context on-ramps:{' '}
+          {COLD_CONTEXT_ONRAMPS.map((onramp, i) => (
+            <span key={onramp}>
+              &ldquo;{onramp}&rdquo;{i < COLD_CONTEXT_ONRAMPS.length - 1 ? ', ' : ''}
+            </span>
+          ))}{' '}
+          — descriptive, no academic borrowing.
         </div>
       </div>
 

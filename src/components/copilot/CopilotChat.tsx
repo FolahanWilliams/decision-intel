@@ -84,12 +84,10 @@ export function CopilotChat({
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const bottomAnchorRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom on new messages or streaming updates
   useEffect(() => {
     bottomAnchorRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Focus input on mount and after error dismissal
   useEffect(() => {
     if (!isStreaming) {
       inputRef.current?.focus();
@@ -115,15 +113,26 @@ export function CopilotChat({
     <div className="flex h-full flex-col">
       {/* Pinned document banner */}
       {pinnedDocName && (
-        <div className="flex items-center justify-between px-4 py-2 border-b border-zinc-800 bg-zinc-800/40">
-          <span className="text-xs text-zinc-400">
+        <div
+          className="flex items-center justify-between px-4 py-2"
+          style={{
+            borderBottom: '1px solid var(--border-color)',
+            background: 'var(--bg-secondary)',
+          }}
+        >
+          <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
             <Pin className="inline h-3 w-3 mr-1" />
-            Chatting about <span className="font-medium text-zinc-200">{pinnedDocName}</span>
+            Chatting about{' '}
+            <span className="font-medium" style={{ color: 'var(--text-primary)' }}>
+              {pinnedDocName}
+            </span>
           </span>
           {onUnpinDoc && (
             <button
               onClick={onUnpinDoc}
-              className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+              className="text-xs transition-colors"
+              style={{ color: 'var(--text-muted)' }}
+              aria-label="Unpin document"
             >
               <X className="h-3 w-3" />
             </button>
@@ -134,56 +143,87 @@ export function CopilotChat({
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 && (
-          <div className="flex h-full items-center justify-center text-zinc-500">
+          <div
+            className="flex h-full items-center justify-center"
+            style={{ color: 'var(--text-muted)' }}
+          >
             <div className="text-center space-y-2">
-              <Sparkles className="mx-auto h-8 w-8 text-zinc-400" />
+              <Sparkles className="mx-auto h-8 w-8" style={{ color: 'var(--accent-primary)' }} />
               <p className="text-sm">Start the conversation — your copilot agents are ready.</p>
             </div>
           </div>
         )}
 
-        {messages.map(msg => (
-          <div
-            key={msg.id}
-            className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-          >
+        {messages.map(msg => {
+          const isUser = msg.role === 'user';
+          return (
             <div
-              className={`max-w-[80%] rounded-lg px-4 py-3 ${
-                msg.role === 'user'
-                  ? 'bg-blue-600'
-                  : 'bg-zinc-800 text-zinc-100 border border-zinc-700'
-              }`}
-              style={msg.role === 'user' ? { color: 'var(--text-primary)' } : undefined}
+              key={msg.id}
+              className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}
             >
-              {msg.role === 'agent' && msg.agentType && (
-                <div className="mb-2">
-                  <AgentBadge agentType={msg.agentType} />
-                </div>
-              )}
-              <div className="text-sm leading-relaxed prose prose-invert prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-headings:my-2">
-                {msg.role === 'agent' ? (
-                  <ReactMarkdown>{msg.content}</ReactMarkdown>
-                ) : (
-                  <span className="whitespace-pre-wrap">{msg.content}</span>
+              <div
+                className="max-w-[80%] rounded-lg px-4 py-3"
+                style={
+                  isUser
+                    ? {
+                        background: 'var(--accent-primary)',
+                        color: 'white',
+                      }
+                    : {
+                        background: 'var(--bg-elevated)',
+                        color: 'var(--text-primary)',
+                        border: '1px solid var(--border-color)',
+                      }
+                }
+              >
+                {msg.role === 'agent' && msg.agentType && (
+                  <div className="mb-2">
+                    <AgentBadge agentType={msg.agentType} />
+                  </div>
                 )}
-                {msg.isStreaming && (
-                  <span className="ml-1 inline-block h-4 w-1 animate-pulse bg-zinc-400" />
+                <div className="text-sm leading-relaxed prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-headings:my-2">
+                  {msg.role === 'agent' ? (
+                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                  ) : (
+                    <span className="whitespace-pre-wrap">{msg.content}</span>
+                  )}
+                  {msg.isStreaming && (
+                    <span
+                      className="ml-1 inline-block h-4 w-1 animate-pulse"
+                      style={{ background: 'var(--text-muted)' }}
+                    />
+                  )}
+                </div>
+                {msg.sources && msg.sources.length > 0 && (
+                  <div
+                    className="mt-2 pt-2"
+                    style={{ borderTop: '1px solid var(--border-color)' }}
+                  >
+                    <SourceAttribution sources={msg.sources} />
+                  </div>
                 )}
               </div>
-              {msg.sources && msg.sources.length > 0 && (
-                <div className="mt-2 border-t border-zinc-600 pt-2">
-                  <SourceAttribution sources={msg.sources} />
-                </div>
-              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         {error && (
-          <div className="rounded-lg bg-red-900/30 border border-red-800 p-3 text-sm text-red-300 flex items-center justify-between">
+          <div
+            className="rounded-lg p-3 text-sm flex items-center justify-between"
+            style={{
+              background: 'color-mix(in srgb, var(--error) 10%, transparent)',
+              border: '1px solid color-mix(in srgb, var(--error) 35%, transparent)',
+              color: 'var(--error)',
+            }}
+          >
             <span>{error}</span>
             {onDismissError && (
-              <button onClick={onDismissError} className="ml-2 text-red-400 hover:text-red-200">
+              <button
+                onClick={onDismissError}
+                className="ml-2 transition-colors"
+                style={{ color: 'var(--error)' }}
+                aria-label="Dismiss error"
+              >
                 <X className="h-4 w-4" />
               </button>
             )}
@@ -203,12 +243,20 @@ export function CopilotChat({
 
       {/* Quick actions */}
       {messages.length > 0 && !isStreaming && (
-        <div className="border-t border-zinc-800 px-4 py-2 flex gap-2 flex-wrap">
+        <div
+          className="px-4 py-2 flex gap-2 flex-wrap"
+          style={{ borderTop: '1px solid var(--border-color)' }}
+        >
           {QUICK_ACTIONS.map(action => (
             <button
               key={action.agent}
               onClick={() => onSendMessage(action.prompt, action.agent)}
-              className="inline-flex items-center gap-1 rounded-full border border-zinc-700 bg-zinc-800/50 px-3 py-1.5 text-xs text-zinc-300 hover:bg-zinc-700 hover:text-zinc-100 transition-colors"
+              className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs transition-colors"
+              style={{
+                background: 'var(--bg-elevated)',
+                border: '1px solid var(--border-color)',
+                color: 'var(--text-secondary)',
+              }}
             >
               <action.icon className="h-3 w-3" />
               {action.label}
@@ -217,7 +265,12 @@ export function CopilotChat({
           {onResolve && (
             <button
               onClick={onResolve}
-              className="inline-flex items-center gap-1 rounded-full border border-green-700 bg-green-900/30 px-3 py-1.5 text-xs text-green-300 hover:bg-green-800/40 hover:text-green-200 transition-colors ml-auto"
+              className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs transition-colors ml-auto"
+              style={{
+                background: 'color-mix(in srgb, var(--success) 12%, transparent)',
+                border: '1px solid color-mix(in srgb, var(--success) 40%, transparent)',
+                color: 'var(--success)',
+              }}
             >
               <CheckCircle className="h-3 w-3" />
               Resolve Decision
@@ -227,7 +280,11 @@ export function CopilotChat({
       )}
 
       {/* Input */}
-      <form onSubmit={handleSubmit} className="border-t border-zinc-800 p-4">
+      <form
+        onSubmit={handleSubmit}
+        className="p-4"
+        style={{ borderTop: '1px solid var(--border-color)' }}
+      >
         <div className="flex items-end gap-2">
           <div className="relative flex-1">
             <textarea
@@ -242,15 +299,23 @@ export function CopilotChat({
               }
               disabled={isStreaming}
               rows={1}
-              className="w-full resize-none rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
-              style={{ maxHeight: '120px' }}
+              className="w-full resize-none rounded-lg px-4 py-3 text-sm focus:outline-none disabled:opacity-50"
+              style={{
+                background: 'var(--bg-elevated)',
+                border: '1px solid var(--border-color)',
+                color: 'var(--text-primary)',
+                maxHeight: '120px',
+              }}
             />
           </div>
           <button
             type="submit"
             disabled={!input.trim() || isStreaming}
-            className="flex h-11 w-11 items-center justify-center rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            style={{ color: 'var(--text-primary)' }}
+            className="flex h-11 w-11 items-center justify-center rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            style={{
+              background: 'var(--accent-primary)',
+              color: 'white',
+            }}
           >
             {isStreaming ? (
               <Loader2 className="h-4 w-4 animate-spin" />

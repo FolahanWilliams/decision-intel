@@ -49,7 +49,7 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.c
 export const metadata: Metadata = {
   title: 'About · Decision Intel',
   description:
-    'About Decision Intel — the native reasoning layer for every high-stakes call. Legal entity, founder, stage, and procurement contact in one place for vendor-risk diligence.',
+    'About Decision Intel, the native reasoning layer for every high-stakes call. Legal entity, founder, stage, and procurement contact in one place for vendor-risk diligence.',
   alternates: { canonical: `${siteUrl}/about` },
   openGraph: {
     title: 'About Decision Intel',
@@ -207,7 +207,7 @@ export default function AboutPage() {
               {FOUNDED_YEAR}
             </FactRow>
             <FactRow label="Stage" icon={<Target size={14} strokeWidth={2.2} />}>
-              {COMPANY_STAGE} — running a structured design-partner program with Fortune 500
+              {COMPANY_STAGE}, running a structured design-partner program with Fortune 500
               strategy and M&amp;A teams. Procurement diligence questions welcomed at the contact
               below.
             </FactRow>
@@ -262,8 +262,8 @@ export default function AboutPage() {
           <div style={{ marginTop: 24, color: C.slate600, fontSize: 15, lineHeight: 1.7 }}>
             <p>
               Every Fortune 500 has invested in data governance, code review, and security audit.
-              The reasoning behind a strategic decision &mdash; the memo, the model assumption, the
-              boardroom argument that closed the discussion &mdash; arrives at the audit committee
+              The reasoning behind a strategic decision (the memo, the model assumption, the
+              boardroom argument that closed the discussion) arrives at the audit committee
               without any of it. Decision Intel is the reasoning layer that brings the same
               discipline to that artefact.
             </p>
@@ -273,7 +273,7 @@ export default function AboutPage() {
               Klein&rsquo;s recognition-primed decision framework in one pipeline, arbitrated by a
               meta-judge stage. Every audit produces a hashed, tamper-evident Decision Provenance
               Record &mdash; the artefact your General Counsel hands to the audit committee or
-              regulator, mapped onto EU AI Act Article 14 record-keeping, Basel III ICAAP, and SEC
+              regulator. It maps onto EU AI Act Article 14 record-keeping, Basel III ICAAP, and SEC
               AI disclosure requirements (plus eight Africa-anchored regulators where the firm
               operates Pan-African).
             </p>

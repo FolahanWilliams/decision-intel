@@ -61,7 +61,7 @@ export function BiasGenomeClient({ genome }: Props) {
     const filtered = filterGenomeByIndustry(industry as Industry);
     return {
       entries: filtered,
-      scopeLabel: `Filtered to ${INDUSTRY_LABEL[industry] ?? industry}. Sample sizes are small — use as a directional signal.`,
+      scopeLabel: `Filtered to ${INDUSTRY_LABEL[industry] ?? industry}. Sample sizes are small; use as a directional signal.`,
     };
   }, [industry, genome]);
 
