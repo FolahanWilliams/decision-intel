@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import { FileText, MoreHorizontal } from 'lucide-react';
+import { FileText, MoreHorizontal, Calendar, Activity } from 'lucide-react';
 import {
   DEAL_STAGES,
   STAGE_COLORS,
@@ -11,6 +11,32 @@ import {
   formatTicketSize,
   type DealSummary,
 } from '@/types/deals';
+import { dqiColorFor } from '@/lib/utils/grade';
+
+// Day-precision relative-date for kanban IC chip. Returns one of:
+//   "Today"           — IC is today
+//   "Tomorrow"        — IC is tomorrow
+//   "in 5d" / "in 3w" — IC is in the future
+//   "5d ago"          — IC has passed (deal stuck post-IC)
+function formatIcCountdown(icDate: string | null): string | null {
+  if (!icDate) return null;
+  const target = new Date(icDate);
+  if (Number.isNaN(target.getTime())) return null;
+  const now = new Date();
+  const dayMs = 24 * 60 * 60 * 1000;
+  // Round to nearest day in local time.
+  const targetDay = new Date(target.getFullYear(), target.getMonth(), target.getDate()).getTime();
+  const todayDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const days = Math.round((targetDay - todayDay) / dayMs);
+  if (days === 0) return 'Today';
+  if (days === 1) return 'Tomorrow';
+  if (days === -1) return 'Yesterday';
+  if (days > 0 && days < 14) return `in ${days}d`;
+  if (days >= 14 && days < 60) return `in ${Math.round(days / 7)}w`;
+  if (days >= 60) return `in ${Math.round(days / 30)}mo`;
+  return `${Math.abs(days)}d ago`;
+}
+
 
 interface DealKanbanProps {
   deals: DealSummary[];
@@ -100,13 +126,77 @@ function KanbanCard({
         )}
       </div>
 
-      {/* Doc count */}
-      {deal._count?.documents > 0 && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 6 }}>
-          <FileText size={11} style={{ color: 'var(--text-muted)' }} />
-          <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>
-            {deal._count.documents} doc{deal._count.documents !== 1 ? 's' : ''}
-          </span>
+      {/* Footer row — doc count, IC date, composite DQI. A1 lock 2026-04-29:
+          M&A users (Adaeze persona) scan the card for IC date + composite
+          score first; both surfaces ship to-glance instead of requiring
+          a click into the deal page. */}
+      {(deal._count?.documents > 0 ||
+        deal.icDate ||
+        (deal.compositeDqi !== null && deal.compositeDqi !== undefined)) && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            marginTop: 8,
+            flexWrap: 'wrap',
+          }}
+        >
+          {deal._count?.documents > 0 && (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <FileText size={11} style={{ color: 'var(--text-muted)' }} />
+              <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>
+                {deal._count.documents} doc{deal._count.documents !== 1 ? 's' : ''}
+              </span>
+            </span>
+          )}
+          {deal.icDate &&
+            (() => {
+              const countdown = formatIcCountdown(deal.icDate);
+              if (!countdown) return null;
+              const isPast = countdown.endsWith('ago') || countdown === 'Yesterday';
+              const isImminent =
+                countdown === 'Today' ||
+                countdown === 'Tomorrow' ||
+                /^in [1-3]d$/.test(countdown);
+              const color = isPast
+                ? 'var(--error)'
+                : isImminent
+                  ? 'var(--warning)'
+                  : 'var(--text-muted)';
+              return (
+                <span
+                  title={`IC review: ${new Date(deal.icDate as string).toLocaleDateString()}`}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    fontSize: 10,
+                    color,
+                    fontWeight: isImminent || isPast ? 700 : 500,
+                  }}
+                >
+                  <Calendar size={11} />
+                  IC {countdown}
+                </span>
+              );
+            })()}
+          {deal.compositeDqi !== null && deal.compositeDqi !== undefined && (
+            <span
+              title="Composite DQI across all analyzed documents in this deal"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                fontSize: 10,
+                fontWeight: 700,
+                color: dqiColorFor(deal.compositeDqi),
+              }}
+            >
+              <Activity size={11} />
+              DQI {Math.round(deal.compositeDqi)}
+            </span>
+          )}
         </div>
       )}
 

@@ -20,7 +20,86 @@ import { CopilotChat } from '@/components/copilot/CopilotChat';
 import { ResolveDecisionModal } from '@/components/copilot/ResolveDecisionModal';
 import { useCopilotStream } from '@/hooks/useCopilotStream';
 import { useDocuments } from '@/hooks/useDocuments';
+import { useOnboardingRole } from '@/hooks/useOnboardingRole';
 import { type CopilotAgentType } from '@/lib/copilot/types';
+import type { EmptyStateRole } from '@/lib/onboarding/role-empty-states';
+
+// Role-tuned Copilot starter prompts (A8 lock 2026-04-30). The generic
+// founder-level set ("Should we pivot our product strategy?") was on
+// every persona's screen regardless of buyer archetype; the M&A audit
+// flagged it as the wrong altitude. Each set keeps DI vocabulary
+// consistent with the rest of the platform — DQI, biases, IC memo,
+// counterfactual, regulatory exposure — so the prompts read as the
+// platform's voice, not generic ChatGPT.
+//
+// Forward-looking rule: when the role enum extends, add a matching
+// entry below. The TypeScript Record<EmptyStateRole, ...> enforces
+// completeness at compile time.
+const STARTER_DECISION_PROMPTS: Record<EmptyStateRole, string[]> = {
+  cso: [
+    'Walk me through the strongest 3 risks across this strategic memo.',
+    'What questions will the board ask first about this recommendation?',
+    'Compare this strategic plan against the historical case library — closest analogues?',
+    'Where in the memo is the weakest assumption that the IC will catch?',
+  ],
+  ma: [
+    "What's the implied IRR if integration costs come in 20% higher than the model?",
+    'Which IC members are most likely to push back, and on which assumptions?',
+    'Compare risk profiles across my active deal pipeline — which is most exposed?',
+    'Did the seller anchor the valuation, and where does the memo absorb that anchor?',
+  ],
+  pe_vc: [
+    'How does this IC memo stack against the last 5 deals we closed?',
+    "What's the cross-fund pattern in our anchoring biases this vintage?",
+    'Stress-test the FX assumption — what breaks the IRR if local currency drops 30%?',
+    "What would the LP procurement reader flag first in this DPR?",
+  ],
+  bizops: [
+    'Which biases recur across this quarter’s strategic decisions?',
+    'Where is process maturity dragging the DQI down most across active decisions?',
+    'Which decisions are overdue for outcome reporting and why?',
+    'What’s the highest-ROI fix to the recurring bias my team keeps showing?',
+  ],
+  other: [
+    'What patterns do you see in my decision-making?',
+    'What biases were most commonly found across my documents?',
+    'Compare the risk levels across my analyzed documents.',
+    'Which document had the best decision quality and why?',
+  ],
+};
+
+const STARTER_DECISION_QUESTIONS: Record<EmptyStateRole, string[]> = {
+  cso: [
+    'Should we pivot the strategic plan based on Q3 outcomes?',
+    "Is this market-entry recommendation IC-ready?",
+    'How should we handle the dissent on the capital-allocation decision?',
+    'Should we expand into the new market or defer another quarter?',
+  ],
+  ma: [
+    "Should we proceed to LOI on Project Phoenix given the diligence findings?",
+    'Is the FX risk on this deal tolerable for our fund mandate?',
+    'How should we structure the earn-out given the seller’s revenue concentration?',
+    'Should we pass on this deal or surface conditions to the IC?',
+  ],
+  pe_vc: [
+    "Should we lead the round or wait for a co-investor signal?",
+    "Is the founder-CEO transition risk priced into our entry valuation?",
+    'How should we structure governance rights given the syndicate composition?',
+    'Should we approve at this price or counter with structured terms?',
+  ],
+  bizops: [
+    'Should we recommit to the OKR or pivot the team?',
+    'Is the vendor risk acceptable given the SLA carve-outs?',
+    'How should we sequence the migration to keep operational risk bounded?',
+    'Should we approve the budget reallocation or defer to next quarter?',
+  ],
+  other: [
+    'Should we pivot our product strategy?',
+    'How should we handle this key hire decision?',
+    'Is this partnership worth pursuing?',
+    'Should we expand to a new market now?',
+  ],
+};
 
 interface SessionSummary {
   id: string;
@@ -57,6 +136,8 @@ export function CopilotPageContent() {
 
   const { documents } = useDocuments();
   const [showDocPicker, setShowDocPicker] = useState(false);
+  const role = useOnboardingRole();
+  const effectiveRole: EmptyStateRole = role ?? 'other';
 
   // Documents available for pinning (those that have a score / have been analyzed)
   const analyzedDocs = documents.filter(d => d.score != null);
@@ -88,11 +169,17 @@ export function CopilotPageContent() {
     }
   }, [sessionId, fetchSessions]);
 
-  // Auto-start session from Command Palette prompt param
+  // Auto-start session from Command Palette prompt param + auto-pin
+  // document from any deep link that passes ?documentId=X (C4 lock
+  // 2026-04-30). Lets a "Ask Copilot about this audit" CTA on a doc /
+  // deal page route to /dashboard/ask?documentId=<id> and arrive with
+  // the document already in context.
   const searchParams = useSearchParams();
   const router = useRouter();
   const initialPrompt = searchParams.get('prompt');
+  const initialDocumentId = searchParams.get('documentId');
   const promptHandledRef = useRef(false);
+  const documentPinnedRef = useRef(false);
 
   useEffect(() => {
     if (initialPrompt && !sessionId && !promptHandledRef.current) {
@@ -102,6 +189,23 @@ export function CopilotPageContent() {
       router.replace('/dashboard/ask');
     }
   }, [initialPrompt, sessionId, startNewSession, sendMessage, router]);
+
+  useEffect(() => {
+    if (
+      initialDocumentId &&
+      !documentPinnedRef.current &&
+      analyzedDocs.some(d => d.id === initialDocumentId)
+    ) {
+      documentPinnedRef.current = true;
+      setPinnedDocumentId(initialDocumentId);
+      // Strip the param so a refresh doesn't re-fire — but keep ?prompt
+      // if it's also present so it can still drive the session start.
+      const remaining = new URLSearchParams(searchParams.toString());
+      remaining.delete('documentId');
+      const qs = remaining.toString();
+      router.replace(qs ? `/dashboard/ask?${qs}` : '/dashboard/ask');
+    }
+  }, [initialDocumentId, analyzedDocs, setPinnedDocumentId, searchParams, router]);
 
   const handleNewDecision = () => {
     setShowPromptInput(true);
@@ -397,12 +501,7 @@ export function CopilotPageContent() {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                {[
-                  'Should we pivot our product strategy?',
-                  'How should we handle this key hire decision?',
-                  'Is this partnership worth pursuing?',
-                  'Should we expand to a new market now?',
-                ].map(example => (
+                {STARTER_DECISION_QUESTIONS[effectiveRole].map(example => (
                   <button
                     key={example}
                     onClick={() => setPromptInput(example)}
@@ -483,12 +582,7 @@ export function CopilotPageContent() {
                   Or try asking
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {[
-                    'What patterns do you see in my decision-making?',
-                    'What biases were most commonly found across my documents?',
-                    'Compare the risk levels across my analyzed documents.',
-                    'Which document had the best decision quality and why?',
-                  ].map(q => (
+                  {STARTER_DECISION_PROMPTS[effectiveRole].map(q => (
                     <button
                       key={q}
                       onClick={() => {

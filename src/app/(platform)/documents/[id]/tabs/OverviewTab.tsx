@@ -8,6 +8,7 @@ import { Brain, Lightbulb, ExternalLink, BarChart3, Eye, ChevronDown } from 'luc
 import { DocumentTextHighlighter } from '@/components/visualizations/DocumentTextHighlighter';
 import { BiasSparklineWithData } from '@/components/visualizations/BiasSparkline';
 import { RPDPreMortemSuggestionsCard } from '@/components/analysis/RPDPreMortemSuggestionsCard';
+import { RemediationChecklist } from '@/components/analysis/RemediationChecklist';
 import dynamic from 'next/dynamic';
 const BiasNetwork3D = dynamic(() => import('@/components/visualizations/BiasNetwork3DCanvas'), {
   ssr: false,
@@ -352,6 +353,14 @@ export function OverviewTab({
           </div>
         </div>
       </ErrorBoundary>
+
+      {/* 3.4 Remediation Roadmap — E4 lock 2026-04-30. Reframes the
+          bias list from "you got a 42" into a prioritized 3-step action
+          plan (Fix → Address → Review) sorted by severity × confidence.
+          Renders null when biases.length === 0 so it's safe to mount
+          unconditionally. The richer Bias Details list still renders
+          below for analysts who want every detected pattern. */}
+      <RemediationChecklist biases={biases} documentId={documentId} />
 
       {/* 3.5 Pre-mortem suggestions — proactive Klein-side surface
           (D3 lock 2026-04-28). Maps the dominant bias patterns to

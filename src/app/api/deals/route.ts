@@ -34,6 +34,9 @@ const CreateDealSchema = z.object({
   fundName: z.string().max(200).optional(),
   vintage: z.number().int().min(1990).max(2100).optional(),
   targetCompany: z.string().max(200).optional(),
+  /** Expected Investment Committee review date — accepts ISO 8601
+   *  ("2026-05-15T14:00:00Z") or YYYY-MM-DD. Nullable on purpose. */
+  icDate: z.string().datetime().nullable().optional(),
 });
 
 const UpdateDealSchema = CreateDealSchema.partial().extend({
@@ -100,6 +103,7 @@ export async function POST(request: NextRequest) {
         fundName: parsed.data.fundName,
         vintage: parsed.data.vintage,
         targetCompany: parsed.data.targetCompany,
+        icDate: parsed.data.icDate ? new Date(parsed.data.icDate) : null,
       },
     });
 
@@ -195,9 +199,44 @@ export async function GET(request: NextRequest) {
       prisma.deal.count({ where }),
     ]);
 
+    // Composite DQI per deal — A1 lock 2026-04-29. One raw query that
+    // averages the latest analysis overallScore across all analyzed
+    // documents in each deal. Skipped quietly on schema drift so the
+    // kanban list still renders without scores rather than 500ing.
+    const dealIds = deals.map(d => d.id);
+    const compositeMap = new Map<string, number>();
+    if (dealIds.length > 0) {
+      try {
+        const rows = await prisma.$queryRaw<Array<{ dealId: string; composite: number | null }>>`
+          SELECT d."dealId" as "dealId",
+                 AVG(latest_score) AS composite
+          FROM (
+            SELECT DISTINCT ON (a."documentId") a."documentId", a."overallScore" AS latest_score
+            FROM "Analysis" a
+            ORDER BY a."documentId", a."createdAt" DESC
+          ) AS doc_latest
+          JOIN "Document" d ON d.id = doc_latest."documentId"
+          WHERE d."dealId" = ANY(${dealIds}::text[])
+          GROUP BY d."dealId"
+        `;
+        for (const r of rows) {
+          if (r.composite !== null) {
+            compositeMap.set(r.dealId, Math.round(Number(r.composite) * 10) / 10);
+          }
+        }
+      } catch (err) {
+        log.warn('Composite DQI aggregation failed (rendering kanban without scores):', err);
+      }
+    }
+
+    const dealsWithComposite = deals.map(d => ({
+      ...d,
+      compositeDqi: compositeMap.get(d.id) ?? null,
+    }));
+
     return NextResponse.json(
       {
-        data: deals,
+        data: dealsWithComposite,
         pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
       },
       {
@@ -257,12 +296,16 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Deal not found' }, { status: 404 });
     }
 
-    // Use updateMany with orgId predicate to ensure ownership at DB level
+    // Use updateMany with orgId predicate to ensure ownership at DB level.
+    // ISO date strings are coerced into Date objects for Prisma; passing a
+    // raw string causes a P2009 type error.
+    const { exitDate, icDate, ...rest } = parsed.data;
     const updateResult = await prisma.deal.updateMany({
       where: { id, orgId: effectiveOrgId },
       data: {
-        ...parsed.data,
-        ...(parsed.data.exitDate ? { exitDate: new Date(parsed.data.exitDate) } : {}),
+        ...rest,
+        ...(exitDate ? { exitDate: new Date(exitDate) } : {}),
+        ...(icDate !== undefined ? { icDate: icDate ? new Date(icDate) : null } : {}),
       },
     });
 

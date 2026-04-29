@@ -441,54 +441,81 @@ export function InlineAnalysisResultCard({
             )}
           </div>
           {top3.length > 0 ? (
-            <ul
-              style={{
-                listStyle: 'none',
-                padding: 0,
-                margin: 0,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 8,
-              }}
-            >
-              {top3.map((b, i) => (
-                <li
-                  key={i}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 10,
-                    fontSize: 13.5,
-                    color: 'var(--text-primary)',
-                  }}
-                >
-                  <span
-                    style={{
-                      display: 'inline-block',
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                      background: severityColor(b.severity),
-                      flexShrink: 0,
-                    }}
-                  />
-                  <span style={{ fontWeight: 500 }}>{humanizeBias(b.type)}</span>
-                  {b.severity && b.severity !== 'unknown' && (
-                    <span
+            <>
+              <div
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: 'var(--text-muted)',
+                  marginBottom: 8,
+                }}
+              >
+                Prioritized fixes — open Deep Dive for the full plan
+              </div>
+              <ol
+                style={{
+                  listStyle: 'none',
+                  padding: 0,
+                  margin: 0,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 8,
+                }}
+              >
+                {top3.map((b, i) => {
+                  const accent = severityColor(b.severity);
+                  return (
+                    <li
+                      key={i}
                       style={{
-                        fontSize: 10,
-                        color: 'var(--text-muted)',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.08em',
-                        fontWeight: 600,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 10,
+                        fontSize: 13.5,
+                        color: 'var(--text-primary)',
                       }}
                     >
-                      {b.severity}
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: 22,
+                          height: 22,
+                          borderRadius: 'var(--radius-sm)',
+                          background: 'var(--bg-secondary)',
+                          border: `1px solid ${accent}`,
+                          color: accent,
+                          fontWeight: 800,
+                          fontSize: 11,
+                          fontVariantNumeric: 'tabular-nums',
+                          flexShrink: 0,
+                        }}
+                        aria-label={`Priority ${i + 1}`}
+                      >
+                        #{i + 1}
+                      </span>
+                      <span style={{ fontWeight: 600 }}>{humanizeBias(b.type)}</span>
+                      {b.severity && b.severity !== 'unknown' && (
+                        <span
+                          style={{
+                            fontSize: 9.5,
+                            fontWeight: 700,
+                            color: accent,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.08em',
+                          }}
+                        >
+                          {b.severity}
+                        </span>
+                      )}
+                    </li>
+                  );
+                })}
+              </ol>
+            </>
           ) : (
             <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
               Reasoning chain scanned — no high-risk cognitive patterns surfaced.

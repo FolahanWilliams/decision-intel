@@ -13,6 +13,7 @@ import {
   AlertTriangle,
   Shield,
   TrendingUp,
+  GitCompareArrows,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useDeal } from '@/hooks/useDeals';
@@ -26,7 +27,10 @@ import { DealCounterfactualHero } from '@/components/deals/DealCounterfactualHer
 import { UploadToDealButton } from '@/components/deals/UploadToDealButton';
 import { CrossReferenceCard } from '@/components/deals/CrossReferenceCard';
 import { CrossRefBadge } from '@/components/deals/CrossRefBadge';
+import { IcReadinessGate } from '@/components/deals/IcReadinessGate';
+import { InlineDealUploadZone } from '@/components/deals/InlineDealUploadZone';
 import type { DealCrossReferenceFinding } from '@/types/deals';
+import { extractCrossReferenceFindings as extractFindings } from '@/lib/utils/deal-cross-reference';
 import {
   STAGE_COLORS,
   DEAL_TYPE_COLORS,
@@ -285,6 +289,13 @@ export default function DealDetailPage() {
           )}
         </div>
 
+        {/* IC Readiness gate — A2/S7 lock 2026-04-29. The first thing an
+            analyst (Adaeze persona) sees on the deal page: 5 gates +
+            aggregate readiness % + countdown to IC. Advisory, not
+            blocking — but surfaces what a procurement-grade reader will
+            catch before walking into Thursday's IC. */}
+        <IcReadinessGate deal={deal} />
+
         {/* Composite DQI + bias signature (3.1 deal-as-decision-unit hero) */}
         {deal.aggregation && (
           <DealCompositeHero
@@ -309,16 +320,50 @@ export default function DealDetailPage() {
           onRunCompleted={() => mutate()}
         />
 
-        {/* Upload-to-deal CTA — sits above the tabs so it's the primary verb
-            on the page. Pre-binds dealId so the new doc lands in this deal
-            automatically. */}
+        {/* Upload-to-deal CTA + Ask Copilot — sit above the tabs so they're
+            the primary verbs on the page. UploadToDealButton pre-binds
+            dealId; the Copilot CTA picks the latest analyzed document
+            in the deal and deep-links via ?documentId so the conversation
+            opens already pinned to the most-relevant context (C4 lock
+            2026-04-30). */}
         <div
           style={{
             display: 'flex',
             justifyContent: 'flex-end',
+            gap: 8,
             marginBottom: 14,
+            flexWrap: 'wrap',
           }}
         >
+          {(() => {
+            // Find the latest analyzed document — sort by the latest
+            // analysis createdAt across all docs in the deal.
+            const latestAnalyzedDoc = (deal.documents ?? [])
+              .filter(d => d.status === 'analyzed' && d.analyses?.[0]?.id)
+              .sort((a, b) => {
+                const ta = new Date(a.analyses?.[0]?.createdAt ?? 0).getTime();
+                const tb = new Date(b.analyses?.[0]?.createdAt ?? 0).getTime();
+                return tb - ta;
+              })[0];
+            if (!latestAnalyzedDoc) return null;
+            return (
+              <Link
+                href={`/dashboard/ask?documentId=${latestAnalyzedDoc.id}`}
+                className="btn btn-secondary"
+                style={{
+                  padding: '8px 14px',
+                  fontSize: 12.5,
+                  fontWeight: 700,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  textDecoration: 'none',
+                }}
+              >
+                Ask Copilot about this deal
+              </Link>
+            );
+          })()}
           <UploadToDealButton dealId={deal.id} dealName={deal.name} onUploaded={() => mutate()} />
         </div>
 
@@ -354,6 +399,8 @@ export default function DealDetailPage() {
           <DocumentsTab
             documents={deal.documents || []}
             dealId={deal.id}
+            dealName={deal.name}
+            onUploaded={() => mutate()}
             crossRefFindings={extractFindings(deal.crossReference)}
           />
         )}
@@ -377,23 +424,11 @@ export default function DealDetailPage() {
 
 // ─── Documents Tab ────────────────────────────────────────────────────────────
 
-/**
- * Pull the findings array out of a DealCrossReference run regardless of
- * which JSON shape is persisted (legacy bare-array vs the wrapped
- * { findings, summary } object). Returns [] when no run / no findings.
- */
-function extractFindings(
-  run: { findings?: unknown } | null | undefined
-): DealCrossReferenceFinding[] {
-  if (!run || !run.findings) return [];
-  if (Array.isArray(run.findings)) return run.findings as DealCrossReferenceFinding[];
-  const wrapped = run.findings as { findings?: DealCrossReferenceFinding[] };
-  return wrapped.findings ?? [];
-}
-
 function DocumentsTab({
   documents,
-  dealId: _dealId,
+  dealId,
+  dealName,
+  onUploaded,
   crossRefFindings = [],
 }: {
   documents: Array<{
@@ -404,51 +439,154 @@ function DocumentsTab({
     analyses?: Array<{ id: string; overallScore: number; createdAt: string }>;
   }>;
   dealId: string;
+  dealName: string;
+  onUploaded: () => void;
   crossRefFindings?: DealCrossReferenceFinding[];
 }) {
   const router = useRouter();
+  const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
+
+  // Compare URL: 2-3 docs only (matches /dashboard/compare cap). The
+  // chip mirrors the canonical pattern from src/app/(platform)/dashboard/page.tsx
+  // documents browse — same vocabulary so users learn the discipline once.
+  const selectedCount = selectedDocs.size;
+  const canCompare = selectedCount >= 2 && selectedCount <= 3;
+  const compareHref = canCompare
+    ? `/dashboard/compare?doc=${Array.from(selectedDocs).join(',')}`
+    : '/dashboard/compare';
+  const compareLabel =
+    selectedCount === 0
+      ? 'Compare documents'
+      : selectedCount === 1
+        ? 'Select 1 more to compare'
+        : selectedCount > 3
+          ? 'Select 2–3 to compare'
+          : `Compare ${selectedCount}`;
+  const compareActive = selectedCount === 0 || canCompare;
 
   if (documents.length === 0) {
     return (
-      <div
-        style={{
-          textAlign: 'center',
-          padding: '40px 20px',
-          background: 'var(--bg-card)',
-          borderRadius: 10,
-          border: '1px dashed var(--bg-active)',
-        }}
-      >
-        <FileText size={32} style={{ color: 'var(--text-muted)', marginBottom: 8 }} />
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <InlineDealUploadZone dealId={dealId} dealName={dealName} onUploaded={onUploaded} />
         <div
-          style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}
-        >
-          No documents linked to this project
-        </div>
-        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 14 }}>
-          Upload strategic documents, board memos, or assessments from the dashboard and link them
-          to this project.
-        </div>
-        <button
-          onClick={() => router.push('/dashboard')}
-          className="btn btn-primary"
           style={{
-            padding: '6px 16px',
-            fontSize: 12,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4,
-            margin: '0 auto',
+            textAlign: 'center',
+            padding: '40px 20px',
+            background: 'var(--bg-card)',
+            borderRadius: 10,
+            border: '1px dashed var(--bg-active)',
           }}
         >
-          <Upload size={13} /> Upload Document
-        </button>
+          <FileText size={32} style={{ color: 'var(--text-muted)', marginBottom: 8 }} />
+          <div
+            style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}
+          >
+            No documents linked to this project
+          </div>
+          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 14 }}>
+            Drop a document above to upload it directly into this deal, or open the dashboard
+            to link an existing analysis.
+          </div>
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="btn btn-secondary"
+            style={{
+              padding: '6px 16px',
+              fontSize: 12,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              margin: '0 auto',
+            }}
+          >
+            <Upload size={13} /> Open dashboard
+          </button>
+        </div>
       </div>
     );
   }
 
+  const allSelected = selectedDocs.size === documents.length && documents.length > 0;
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <InlineDealUploadZone dealId={dealId} dealName={dealName} onUploaded={onUploaded} />
+
+      {/* Multi-select header — S15-fix lock 2026-04-30. Mirrors the
+          /dashboard documents browse multi-select pattern so users
+          learn the discipline once. Compare chip activates at 2-3
+          selected; deeper than 3 is disabled with hint. */}
+      {documents.length >= 2 && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '8px 12px',
+            background: 'var(--bg-secondary)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-sm)',
+            marginBottom: 4,
+          }}
+        >
+          <label
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              cursor: 'pointer',
+              fontSize: 11.5,
+              color: 'var(--text-secondary)',
+            }}
+          >
+            <input
+              type="checkbox"
+              aria-label="Select all documents"
+              checked={allSelected}
+              onChange={e => {
+                if (e.target.checked) {
+                  setSelectedDocs(new Set(documents.map(d => d.id)));
+                } else {
+                  setSelectedDocs(new Set());
+                }
+              }}
+              style={{
+                width: 13,
+                height: 13,
+                accentColor: 'var(--accent-primary)',
+                cursor: 'pointer',
+              }}
+            />
+            {selectedCount > 0
+              ? `${selectedCount} selected`
+              : `${documents.length} documents`}
+          </label>
+          <Link
+            href={compareHref}
+            onClick={e => {
+              if (!compareActive) e.preventDefault();
+            }}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              fontSize: 11,
+              fontWeight: 600,
+              color: compareActive ? 'var(--accent-primary)' : 'var(--text-muted)',
+              padding: '4px 10px',
+              borderRadius: 'var(--radius-full)',
+              background: compareActive ? 'rgba(22, 163, 74, 0.08)' : 'var(--bg-tertiary)',
+              border: `1px solid ${compareActive ? 'rgba(22, 163, 74, 0.22)' : 'var(--border-color)'}`,
+              cursor: compareActive ? 'pointer' : 'not-allowed',
+              textDecoration: 'none',
+            }}
+          >
+            <GitCompareArrows size={12} />
+            {compareLabel}
+          </Link>
+        </div>
+      )}
+
       {documents.map(doc => {
         const latestScore = doc.analyses?.[0]?.overallScore;
         const scoreColour =
@@ -461,19 +599,54 @@ function DocumentsTab({
                 : latestScore >= 55
                   ? '#D97706'
                   : '#DC2626';
+        const isSelected = selectedDocs.has(doc.id);
         return (
-          <Link
+          <div
             key={doc.id}
-            href={`/documents/${doc.id}`}
-            style={{ textDecoration: 'none', color: 'inherit' }}
+            className="card"
+            style={{
+              padding: '12px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              borderColor: isSelected ? 'var(--accent-primary)' : undefined,
+              background: isSelected ? 'rgba(22, 163, 74, 0.04)' : undefined,
+            }}
           >
-            <div
-              className="card"
+            {documents.length >= 2 && (
+              <input
+                type="checkbox"
+                aria-label={`Select ${doc.filename}`}
+                checked={isSelected}
+                onChange={e => {
+                  e.stopPropagation();
+                  setSelectedDocs(prev => {
+                    const next = new Set(prev);
+                    if (e.target.checked) next.add(doc.id);
+                    else next.delete(doc.id);
+                    return next;
+                  });
+                }}
+                onClick={e => e.stopPropagation()}
+                style={{
+                  width: 13,
+                  height: 13,
+                  accentColor: 'var(--accent-primary)',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                }}
+              />
+            )}
+            <Link
+              href={`/documents/${doc.id}`}
               style={{
-                padding: '12px 16px',
+                flex: 1,
+                minWidth: 0,
                 display: 'flex',
                 alignItems: 'center',
                 gap: 12,
+                textDecoration: 'none',
+                color: 'inherit',
               }}
             >
               <FileText size={16} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
@@ -545,8 +718,8 @@ function DocumentsTab({
               >
                 {doc.status}
               </span>
-            </div>
-          </Link>
+            </Link>
+          </div>
         );
       })}
     </div>

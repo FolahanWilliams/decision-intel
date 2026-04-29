@@ -260,7 +260,16 @@ export interface DealSummary {
   targetCompany: string | null;
   status: string;
   exitDate: string | null;
+  /** Expected IC review date — ISO string when set, null otherwise.
+   *  Powers the kanban card IC-date tile + IC Readiness countdown
+   *  chip. Added 2026-04-29 (Deal.icDate migration). */
+  icDate: string | null;
   outcome: DealOutcome | null;
+  /** Composite DQI across all analyzed documents in the deal — present
+   *  only when `aggregation` was computed server-side. The kanban list
+   *  endpoint includes a tiny version of this so cards can render the
+   *  composite at-a-glance. */
+  compositeDqi?: number | null;
   _count: { documents: number };
   createdAt: string;
   updatedAt: string;

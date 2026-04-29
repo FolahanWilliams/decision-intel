@@ -17,14 +17,6 @@ function getTier(ticketSize: number) {
   return TIERS.find(t => ticketSize <= t.maxTicket) || TIERS[TIERS.length - 1];
 }
 
-function formatCurrency(amount: number, currency: string = 'USD') {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
-
 function formatTicketSize(amount: number) {
   if (amount >= 1_000_000_000) return `$${(amount / 1_000_000_000).toFixed(1)}B`;
   if (amount >= 1_000_000) return `$${(amount / 1_000_000).toFixed(0)}M`;
@@ -146,7 +138,11 @@ export function DealAuditCTA({
           marginBottom: '4px',
         }}
       >
-        {formatCurrency(tier.price, currency)}
+        {new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency,
+          maximumFractionDigits: 0,
+        }).format(tier.price)}
         <span
           style={{
             fontSize: '13px',

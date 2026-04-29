@@ -109,107 +109,147 @@ const KEY_ROTATION: Array<{ step: number; label: string; body: string }> = [
   },
 ];
 
-const FRAMEWORKS = [
+// Regional groupings for the framework grid (S5 lock 2026-04-30). The
+// audit caught that African coverage was hard to read because the grid
+// mixed all 19 frameworks in a single flat list. Each framework now
+// carries a `region` tag; the grid offers a filter chip row so a
+// Pan-African fund partner (or a F500 GC reviewing for jurisdictional
+// fit) can narrow to their region in one click.
+type FrameworkRegion = 'g7' | 'eu' | 'uk' | 'us' | 'africa' | 'global';
+
+const REGION_LABELS: Record<FrameworkRegion, string> = {
+  global: 'Global',
+  us: 'US',
+  eu: 'EU',
+  uk: 'UK / Commonwealth',
+  g7: 'G7',
+  africa: 'African markets',
+};
+
+const FRAMEWORKS: Array<{
+  code: string;
+  name: string;
+  gates: string;
+  region: FrameworkRegion;
+}> = [
   {
     code: 'SOX §404',
     name: 'Sarbanes-Oxley',
     gates: 'Public-company material-statement controls.',
+    region: 'us',
   },
   {
     code: 'GDPR Art. 22',
     name: 'General Data Protection Regulation',
     gates: 'Automated-decision rights for EU data subjects.',
+    region: 'eu',
   },
   {
     code: 'EU AI Act · Annex III',
     name: 'EU AI Act',
     gates: 'High-risk AI decision-support obligations.',
+    region: 'eu',
   },
   {
     code: 'Basel III',
     name: 'Basel III',
     gates: 'Capital-allocation decisions in regulated banks.',
+    region: 'global',
   },
   {
     code: 'FCA Consumer Duty',
     name: 'Financial Conduct Authority',
     gates: 'UK financial-services decisioning.',
+    region: 'uk',
   },
   {
     code: 'SEC Reg D',
     name: 'SEC Regulation D',
     gates: 'Forward-looking statements + safe-harbour disclosure.',
+    region: 'us',
   },
   {
     code: 'LPOA',
     name: 'Limited Partnership Obligations',
     gates: 'Fund-level fiduciary dissent documentation.',
+    region: 'global',
   },
   {
     code: 'NDPR Art. 12',
     name: 'Nigeria Data Protection Regulation',
     gates:
       'Automated-decision rights for Nigerian data subjects (aligned with GDPR Art. 22 via the NDPR 2019 Implementation Framework).',
+    region: 'africa',
   },
   {
     code: 'CBN AI Guidelines',
     name: 'Central Bank of Nigeria',
     gates:
       'Financial-services AI governance obligations (draft 2024): model governance, explainability, and consumer-protection duties for regulated Nigerian financial institutions.',
+    region: 'africa',
   },
   {
     code: 'WAEMU',
     name: 'West African Economic and Monetary Union',
     gates:
       'Cross-border data localisation and financial-sector governance across the eight WAEMU member states.',
+    region: 'africa',
   },
   {
     code: 'CMA Kenya',
     name: 'Capital Markets Authority (Kenya)',
     gates:
       'Listed-company decisioning + prospectus disclosure obligations under the CMA (Conduct of Business) Regulations 2024.',
+    region: 'africa',
   },
   {
     code: 'CBK',
     name: 'Central Bank of Kenya · Banking & Digital Lending',
     gates:
       'Digital-lending licensing, AI/ML model-risk management, and consumer-disclosure obligations under the Banking (Amendment) Act 2024 §33B and CBK Risk Management Guidelines (rev. 2023).',
+    region: 'africa',
   },
   {
     code: 'BoG Cyber & ICT Risk',
     name: 'Bank of Ghana · Cyber & Information Security Directive',
     gates:
       'Cyber, data, and AI/ML model-governance obligations for Ghanaian regulated financial institutions (2018 directive + 2023 update).',
+    region: 'africa',
   },
   {
     code: 'FRC Nigeria',
     name: 'Financial Reporting Council of Nigeria',
     gates:
       'Nigerian Code of Corporate Governance covering board-level decisioning, dissent capture, and risk-management documentation duties for public-interest entities.',
+    region: 'africa',
   },
   {
     code: 'CBE AI Guidelines',
     name: 'Central Bank of Egypt',
     gates:
       'AI/ML model-governance + explainability obligations for Egyptian banks under the CBE 2023 ICT Governance and Risk Management Framework.',
+    region: 'africa',
   },
   {
     code: 'PoPIA §71',
     name: 'Protection of Personal Information Act (South Africa)',
     gates:
       'Automated-decision rights + data-subject access for South African data subjects (PoPIA s.71, in force July 2021).',
+    region: 'africa',
   },
   {
     code: 'SARB Model Risk',
     name: 'South African Reserve Bank · Model Risk Governance',
     gates:
       'Model risk + AI governance obligations for SA-regulated banks (Directive D2/2022 + Joint Standard 2 of 2024 on cybersecurity).',
+    region: 'africa',
   },
   {
     code: 'BoT FinTech',
     name: 'Bank of Tanzania · FinTech Regulatory Sandbox',
     gates:
       'Tanzanian financial-services AI/ML decisioning obligations under the BoT FinTech Regulatory Sandbox Guidelines (2023).',
+    region: 'africa',
   },
 ];
 
@@ -985,51 +1025,181 @@ export default function SecurityPage() {
             body="Every flag the pipeline surfaces carries a regulatory citation across G7, EU, GCC, and African markets. Your GC doesn't take the tool on faith. They walk into the audit committee meeting with the memo, the flags, and the framework sections attached."
             align="center"
           />
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-              gap: 12,
-            }}
-          >
-            {FRAMEWORKS.map(fw => (
+          {/* Regional summary strip — S5 lock 2026-04-30. Surfaces the
+              count per region above the grid so a Pan-African reader sees
+              "10 frameworks across African markets" at a glance instead of
+              having to count cards in a flat list. */}
+          {(() => {
+            const counts: Record<FrameworkRegion, number> = {
+              global: 0,
+              us: 0,
+              eu: 0,
+              uk: 0,
+              g7: 0,
+              africa: 0,
+            };
+            for (const fw of FRAMEWORKS) counts[fw.region] += 1;
+            const regionsInOrder: FrameworkRegion[] = [
+              'africa',
+              'eu',
+              'us',
+              'uk',
+              'global',
+              'g7',
+            ];
+            return (
               <div
-                key={fw.code}
                 style={{
-                  background: C.white,
-                  border: `1px solid ${C.slate200}`,
-                  borderLeft: `3px solid ${C.green}`,
-                  borderRadius: 12,
-                  padding: '16px 18px',
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: 8,
+                  margin: '24px 0 28px 0',
+                  justifyContent: 'center',
                 }}
               >
-                <div
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 800,
-                    color: C.green,
-                    letterSpacing: '0.02em',
-                    fontFamily:
-                      'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
-                  }}
-                >
-                  {fw.code}
-                </div>
-                <div
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 700,
-                    color: C.slate900,
-                    marginTop: 4,
-                    marginBottom: 6,
-                  }}
-                >
-                  {fw.name}
-                </div>
-                <div style={{ fontSize: 12, color: C.slate600, lineHeight: 1.5 }}>{fw.gates}</div>
+                {regionsInOrder
+                  .filter(r => counts[r] > 0)
+                  .map(r => (
+                    <a
+                      key={r}
+                      href={`#region-${r}`}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        padding: '6px 12px',
+                        background: r === 'africa' ? C.greenSoft : C.white,
+                        border: `1px solid ${r === 'africa' ? C.greenBorder : C.slate200}`,
+                        borderRadius: 999,
+                        textDecoration: 'none',
+                        color: r === 'africa' ? C.green : C.slate700,
+                        fontSize: 12,
+                        fontWeight: 700,
+                      }}
+                    >
+                      {REGION_LABELS[r]}
+                      <span
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 600,
+                          color: r === 'africa' ? C.green : C.slate500,
+                          fontVariantNumeric: 'tabular-nums',
+                        }}
+                      >
+                        {counts[r]}
+                      </span>
+                    </a>
+                  ))}
               </div>
-            ))}
-          </div>
+            );
+          })()}
+
+          {/* Grouped framework grid — same cards as before, now sectioned
+              by region with a header per group so the African coverage
+              (12 frameworks, more than any other region) reads as a
+              dedicated section, not a tail of mixed entries. */}
+          {(() => {
+            const groupOrder: FrameworkRegion[] = [
+              'africa',
+              'eu',
+              'us',
+              'uk',
+              'global',
+              'g7',
+            ];
+            return groupOrder
+              .map(region => ({
+                region,
+                items: FRAMEWORKS.filter(fw => fw.region === region),
+              }))
+              .filter(g => g.items.length > 0)
+              .map(group => (
+                <div
+                  key={group.region}
+                  id={`region-${group.region}`}
+                  style={{ marginBottom: 28, scrollMarginTop: 80 }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'baseline',
+                      gap: 10,
+                      marginBottom: 12,
+                      paddingBottom: 8,
+                      borderBottom: `1px solid ${group.region === 'africa' ? C.greenBorder : C.slate200}`,
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 800,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.12em',
+                        color: group.region === 'africa' ? C.green : C.slate700,
+                      }}
+                    >
+                      {REGION_LABELS[group.region]}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 11,
+                        color: C.slate500,
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    >
+                      {group.items.length} framework{group.items.length === 1 ? '' : 's'}
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                      gap: 12,
+                    }}
+                  >
+                    {group.items.map(fw => (
+                      <div
+                        key={fw.code}
+                        style={{
+                          background: C.white,
+                          border: `1px solid ${C.slate200}`,
+                          borderLeft: `3px solid ${C.green}`,
+                          borderRadius: 12,
+                          padding: '16px 18px',
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: 13,
+                            fontWeight: 800,
+                            color: C.green,
+                            letterSpacing: '0.02em',
+                            fontFamily:
+                              'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+                          }}
+                        >
+                          {fw.code}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 12,
+                            fontWeight: 700,
+                            color: C.slate900,
+                            marginTop: 4,
+                            marginBottom: 6,
+                          }}
+                        >
+                          {fw.name}
+                        </div>
+                        <div style={{ fontSize: 12, color: C.slate600, lineHeight: 1.5 }}>
+                          {fw.gates}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ));
+          })()}
           <div
             style={{
               marginTop: 26,

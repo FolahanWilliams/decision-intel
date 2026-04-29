@@ -1700,6 +1700,11 @@ model Deal {
   targetCompany String? // Company being evaluated
   status        String       @default("active") // active | passed | invested | written_off | exited
   exitDate      DateTime?
+  /// Expected Investment Committee review date. Powers the deal kanban
+  /// card "IC date" tile, sorts the IC-near pipeline view, and feeds
+  /// the IC Readiness gate's "T-N days until IC" prompt. Nullable —
+  /// deals in screening / portfolio stages don't have one yet.
+  icDate        DateTime?
   documents          Document[]
   outcome            DealOutcome?
   auditPurchases     DealAuditPurchase[]
