@@ -29,6 +29,9 @@ import {
 } from 'lucide-react';
 import { DESIGN_PARTNER_SEATS_AVAILABLE } from '@/lib/constants/company-info';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
+import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+
+const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
 
 /* ─── Color Tokens ──────────────────────────────────────────────────────── */
 
@@ -1516,7 +1519,8 @@ export default function LandingPage() {
    framework name we coined and own by usage; AI Verify alignment is
    a real principle-mapping exercise (not a certification claim);
    SOC 2 refers to the infrastructure stack (Vercel + Supabase);
-   17 frameworks is the registry-derived count. No fabricated logos. */
+   The framework count is registry-derived (getAllRegisteredFrameworks().length)
+   so it never drifts when africa-frameworks.ts grows. No fabricated logos. */
 
 function HeroCredibilityStrip() {
   const items = [
@@ -1537,7 +1541,7 @@ function HeroCredibilityStrip() {
     },
     {
       icon: Globe2,
-      label: '17 regulatory frameworks',
+      label: `${FRAMEWORK_COUNT} regulatory frameworks`,
       note: 'G7, EU, GCC, African markets',
     },
   ];

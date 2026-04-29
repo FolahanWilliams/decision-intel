@@ -48,15 +48,15 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }
     color: 'var(--accent-primary)',
     bg: 'rgba(249,115,22,0.12)',
   },
-  analyzing: { label: 'Analyzing', color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
-  complete: { label: 'Complete', color: '#22c55e', bg: 'rgba(34,197,94,0.12)' },
-  error: { label: 'Error', color: '#ef4444', bg: 'rgba(239,68,68,0.12)' },
+  analyzing: { label: 'Analyzing', color: 'var(--warning)', bg: 'rgba(245,158,11,0.12)' },
+  complete: { label: 'Complete', color: 'var(--success)', bg: 'rgba(34,197,94,0.12)' },
+  error: { label: 'Error', color: 'var(--error)', bg: 'rgba(239,68,68,0.12)' },
 };
 
 function getScoreColor(score: number): string {
-  if (score >= 0.7) return '#22c55e';
-  if (score >= 0.4) return '#f59e0b';
-  return '#ef4444';
+  if (score >= 0.7) return 'var(--success)';
+  if (score >= 0.4) return 'var(--warning)';
+  return 'var(--error)';
 }
 
 // ─── Sub-Components ────────────────────────────────────────────────────────────

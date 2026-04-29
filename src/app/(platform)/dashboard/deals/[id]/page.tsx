@@ -53,10 +53,10 @@ const tabStyle = (active: boolean): React.CSSProperties => ({
   padding: '8px 16px',
   fontSize: 13,
   fontWeight: active ? 600 : 400,
-  color: active ? '#16A34A' : 'var(--text-muted)',
+  color: active ? 'var(--accent-primary)' : 'var(--text-muted)',
   background: active ? 'rgba(22, 163, 74, 0.1)' : 'transparent',
   border: 'none',
-  borderBottom: active ? '2px solid #16A34A' : '2px solid transparent',
+  borderBottom: active ? '2px solid var(--accent-primary)' : '2px solid transparent',
   cursor: 'pointer',
   transition: 'all 0.15s',
 });
@@ -119,13 +119,13 @@ export default function DealDetailPage() {
         className="container"
         style={{ maxWidth: 1000, padding: '24px 20px', textAlign: 'center' }}
       >
-        <AlertTriangle size={40} style={{ color: '#ef4444', marginBottom: 12 }} />
+        <AlertTriangle size={40} style={{ color: 'var(--error)', marginBottom: 12 }} />
         <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>
           Project not found
         </div>
         <Link
           href="/dashboard/deals"
-          style={{ color: '#16A34A', fontSize: 13, marginTop: 8, display: 'inline-block' }}
+          style={{ color: 'var(--accent-primary)', fontSize: 13, marginTop: 8, display: 'inline-block' }}
         >
           Back to Projects
         </Link>
