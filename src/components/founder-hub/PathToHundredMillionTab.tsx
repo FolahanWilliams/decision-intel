@@ -20,8 +20,10 @@
  *      meeting arc, follow-up cadence, signals-to-listen-for, killer pitch
  *   6. Killer Responses Playbook — JOLT-effect handling for "not for us"
  *      and "I'm confused" + category contrast for incumbent comparisons
- *   7. Investor Metrics Tracker — 16 metrics with current state + 12mo
- *      target + tripwires
+ *   7. Investor Metrics Tracker — 17 metrics with current state + 12mo
+ *      target + tripwires (incl. Platform Calibration Credibility, the
+ *      seed Brier baseline derived from the 143-case library — F1 lock
+ *      2026-04-29)
  *   8. Failure Modes Watchtower — 3 internal traps + 3 external attack
  *      vectors with named tripwires
  *   9. Warm-Intro Network Map — Wiz advisor / TASIS / Sankore / LRQA /

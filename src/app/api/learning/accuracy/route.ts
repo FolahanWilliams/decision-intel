@@ -46,7 +46,7 @@ export async function GET() {
         where,
         select: {
           confirmedBiases: true,
-          falsPositiveBiases: true,
+          falsePositiveBiases: true,
           reportedAt: true,
         },
         orderBy: { reportedAt: 'asc' },
@@ -54,7 +54,7 @@ export async function GET() {
 
       // Overall accuracy
       const totalConfirmed = outcomes.reduce((s, o) => s + o.confirmedBiases.length, 0);
-      const totalFalsePositives = outcomes.reduce((s, o) => s + o.falsPositiveBiases.length, 0);
+      const totalFalsePositives = outcomes.reduce((s, o) => s + o.falsePositiveBiases.length, 0);
       const totalRated = totalConfirmed + totalFalsePositives;
       const overallAccuracy = totalRated > 0 ? Math.round((totalConfirmed / totalRated) * 100) : 0;
 
@@ -65,7 +65,7 @@ export async function GET() {
           if (!biasStats[b]) biasStats[b] = { confirmed: 0, fp: 0 };
           biasStats[b].confirmed++;
         }
-        for (const b of o.falsPositiveBiases) {
+        for (const b of o.falsePositiveBiases) {
           if (!biasStats[b]) biasStats[b] = { confirmed: 0, fp: 0 };
           biasStats[b].fp++;
         }
@@ -88,7 +88,7 @@ export async function GET() {
         const month = o.reportedAt.toISOString().slice(0, 7);
         if (!monthlyBuckets[month]) monthlyBuckets[month] = { confirmed: 0, fp: 0 };
         monthlyBuckets[month].confirmed += o.confirmedBiases.length;
-        monthlyBuckets[month].fp += o.falsPositiveBiases.length;
+        monthlyBuckets[month].fp += o.falsePositiveBiases.length;
       }
 
       const accuracyTrend = Object.entries(monthlyBuckets)

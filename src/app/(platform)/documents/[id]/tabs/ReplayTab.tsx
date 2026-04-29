@@ -22,7 +22,7 @@ import { CounterfactualPanel } from '@/components/replay/CounterfactualPanel';
 interface OutcomeData {
   outcome: string;
   confirmedBiases: string[];
-  falsPositiveBiases: string[];
+  falsePositiveBiases: string[];
   lessonsLearned?: string | null;
   notes?: string | null;
   impactScore?: number | null;
@@ -610,7 +610,7 @@ export function ReplayTab({ analysisData, outcome, recalibratedDqi }: ReplayTabP
 
                   {/* Confirmed & False-Positive Biases */}
                   {(outcome.confirmedBiases.length > 0 ||
-                    outcome.falsPositiveBiases.length > 0) && (
+                    outcome.falsePositiveBiases.length > 0) && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                       <div
                         style={{
@@ -643,7 +643,7 @@ export function ReplayTab({ analysisData, outcome, recalibratedDqi }: ReplayTabP
                             {bias.replace(/_/g, ' ')}
                           </span>
                         ))}
-                        {outcome.falsPositiveBiases.map(bias => (
+                        {outcome.falsePositiveBiases.map(bias => (
                           <span
                             key={`false-${bias}`}
                             style={{

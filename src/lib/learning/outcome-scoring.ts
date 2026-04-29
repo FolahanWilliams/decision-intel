@@ -78,7 +78,7 @@ export async function getOrgBiasHistory(orgId: string): Promise<OrgBiasHistory> 
         outcome: true,
         impactScore: true,
         confirmedBiases: true,
-        falsPositiveBiases: true,
+        falsePositiveBiases: true,
         analysisId: true,
       },
     });
@@ -116,7 +116,7 @@ export async function getOrgBiasHistory(orgId: string): Promise<OrgBiasHistory> 
         }
       }
 
-      for (const bias of o.falsPositiveBiases) {
+      for (const bias of o.falsePositiveBiases) {
         if (!statsMap[bias])
           statsMap[bias] = { confirmed: 0, falsePositive: 0, failureImpacts: [] };
         statsMap[bias].falsePositive++;
@@ -774,12 +774,12 @@ export async function getAccuracyImprovement(orgId: string): Promise<AccuracyImp
     const outcomes = await prisma.decisionOutcome.findMany({
       where: {
         orgId,
-        OR: [{ confirmedBiases: { isEmpty: false } }, { falsPositiveBiases: { isEmpty: false } }],
+        OR: [{ confirmedBiases: { isEmpty: false } }, { falsePositiveBiases: { isEmpty: false } }],
       },
       orderBy: { reportedAt: 'asc' },
       select: {
         confirmedBiases: true,
-        falsPositiveBiases: true,
+        falsePositiveBiases: true,
         reportedAt: true,
       },
     });
@@ -787,7 +787,7 @@ export async function getAccuracyImprovement(orgId: string): Promise<AccuracyImp
     if (outcomes.length < BUCKET_SIZE * 2) {
       // Not enough data to compare early vs recent
       const totalConfirmed = outcomes.reduce((s, o) => s + o.confirmedBiases.length, 0);
-      const totalFP = outcomes.reduce((s, o) => s + o.falsPositiveBiases.length, 0);
+      const totalFP = outcomes.reduce((s, o) => s + o.falsePositiveBiases.length, 0);
       const totalAll = totalConfirmed + totalFP;
       const overallRate = totalAll > 0 ? Number(((totalConfirmed / totalAll) * 100).toFixed(1)) : 0;
 
@@ -807,14 +807,14 @@ export async function getAccuracyImprovement(orgId: string): Promise<AccuracyImp
     // Calculate confirmation rate for early bucket
     const earlyBucket = outcomes.slice(0, BUCKET_SIZE);
     const earlyConfirmed = earlyBucket.reduce((s, o) => s + o.confirmedBiases.length, 0);
-    const earlyFP = earlyBucket.reduce((s, o) => s + o.falsPositiveBiases.length, 0);
+    const earlyFP = earlyBucket.reduce((s, o) => s + o.falsePositiveBiases.length, 0);
     const earlyTotal = earlyConfirmed + earlyFP;
     const earlyAccuracy = earlyTotal > 0 ? (earlyConfirmed / earlyTotal) * 100 : 0;
 
     // Calculate confirmation rate for recent bucket
     const recentBucket = outcomes.slice(-BUCKET_SIZE);
     const recentConfirmed = recentBucket.reduce((s, o) => s + o.confirmedBiases.length, 0);
-    const recentFP = recentBucket.reduce((s, o) => s + o.falsPositiveBiases.length, 0);
+    const recentFP = recentBucket.reduce((s, o) => s + o.falsePositiveBiases.length, 0);
     const recentTotal = recentConfirmed + recentFP;
     const recentAccuracy = recentTotal > 0 ? (recentConfirmed / recentTotal) * 100 : 0;
 

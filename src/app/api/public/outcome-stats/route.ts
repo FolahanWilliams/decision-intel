@@ -51,7 +51,7 @@ export async function GET() {
         outcome: true,
         impactScore: true,
         confirmedBiases: true,
-        falsPositiveBiases: true,
+        falsePositiveBiases: true,
         analysis: {
           select: {
             overallScore: true,
@@ -80,7 +80,7 @@ export async function GET() {
     for (const o of outcomes) {
       // Bias accuracy
       const confirmed = Array.isArray(o.confirmedBiases) ? o.confirmedBiases.length : 0;
-      const falsePos = Array.isArray(o.falsPositiveBiases) ? o.falsPositiveBiases.length : 0;
+      const falsePos = Array.isArray(o.falsePositiveBiases) ? o.falsePositiveBiases.length : 0;
       totalConfirmed += confirmed;
       totalFalsePositive += falsePos;
 

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ShieldAlert, HelpCircle, GitCompare } from 'lucide-react';
-import { KILLER_RESPONSES, type KillerResponse } from './data';
+import { KILLER_RESPONSES, type KillerResponse } from './data/killer-responses';
 
 const SCENARIO_ACCENT: Record<KillerResponse['scenario'], string> = {
   not_right_now: '#D97706',

@@ -24,7 +24,7 @@ export interface RecalibrationInput {
   analysisId: string;
   outcome: string;
   confirmedBiases: string[];
-  falsPositiveBiases: string[];
+  falsePositiveBiases: string[];
   /** If provided, the Brier score will also be stamped on this
    *  DecisionOutcome row (enables per-org aggregation via indexed
    *  column). Leave unset for the legacy POST /api/outcomes path which
@@ -46,7 +46,7 @@ export interface RecalibrationResult {
 export async function recalibrateFromOutcome(
   input: RecalibrationInput
 ): Promise<RecalibrationResult> {
-  const { prisma, analysisId, outcome, confirmedBiases, falsPositiveBiases, decisionOutcomeId } =
+  const { prisma, analysisId, outcome, confirmedBiases, falsePositiveBiases, decisionOutcomeId } =
     input;
 
   try {
@@ -60,7 +60,7 @@ export async function recalibrateFromOutcome(
 
     const originalScore = analysis.overallScore;
     const confirmedCount = confirmedBiases.length;
-    const falsePositiveCount = falsPositiveBiases.length;
+    const falsePositiveCount = falsePositiveBiases.length;
     const totalBiases = analysis.biases?.length || 0;
 
     let recalibratedScore = originalScore;

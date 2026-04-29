@@ -3059,7 +3059,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                   outcome?: {
                                     outcome: string;
                                     confirmedBiases: string[];
-                                    falsPositiveBiases: string[];
+                                    falsePositiveBiases: string[];
                                     lessonsLearned?: string;
                                     notes?: string;
                                     impactScore?: number;

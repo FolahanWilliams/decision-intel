@@ -43,6 +43,7 @@ import { createLogger } from '@/lib/utils/logger';
 import { aggregateBlindPriors, type BlindPriorRow } from '@/lib/learning/blind-prior-aggregate';
 import { computeCounterfactuals } from '@/lib/analysis/counterfactual';
 import { getOrgBrierStats, brierCategory } from '@/lib/learning/brier-scoring';
+import { computePlatformCalibrationBaseline } from '@/lib/learning/platform-baseline';
 import {
   getUserPlan,
   getOrgPlan,
@@ -390,11 +391,15 @@ export interface ReviewerDecisionLog {
 /**
  * Org calibration / Decision Debt summary. Cloverpop-defense block —
  * proves the DQI shown is calibrated against THIS org's outcome
- * history, not a generic global benchmark. Null fields are honest
- * disclosure: a cold-start org with zero closed outcomes renders the
- * "calibration pending" note rather than an invented number.
+ * history, not a generic global benchmark. When the org has no closed
+ * outcomes yet, falls back to the platform seed baseline (the Brier-
+ * scored prediction over the 143-case library) so every DPR carries
+ * calibration evidence — never "(empty)" — until customer outcomes
+ * supersede the seed.
  */
 export interface OrgCalibrationSummary {
+  /** 'org' once the org has ≥1 closed outcome, 'platform_seed' until then. */
+  source: 'org' | 'platform_seed';
   decisionsTracked: number;
   outcomesClosed: number;
   meanBrierScore: number | null;
@@ -404,6 +409,15 @@ export interface OrgCalibrationSummary {
     recalibratedScore: number;
     delta: number;
   } | null;
+  /** Platform seed numbers — populated when source === 'platform_seed'.
+   *  Re-derivable from public case-study data; safe to render in any
+   *  client-safe DPR. */
+  platformSeed?: {
+    n: number;
+    meanBrier: number;
+    classificationAccuracy: number;
+    methodologyVersion: string;
+  };
   calibrationNote: string;
 }
 
@@ -548,18 +562,46 @@ async function buildOrgCalibration(
   orgId: string | null,
   recalibratedDqi: unknown
 ): Promise<OrgCalibrationSummary | undefined> {
-  if (!orgId) return undefined;
   let stats: Awaited<ReturnType<typeof getOrgBrierStats>> | null = null;
-  try {
-    stats = await getOrgBrierStats(prisma, orgId, 365);
-  } catch (err) {
-    log.warn(
-      'Brier stats lookup for DPR failed (likely schema drift or empty org):',
-      err instanceof Error ? err.message : String(err)
-    );
-    return undefined;
+  if (orgId) {
+    try {
+      stats = await getOrgBrierStats(prisma, orgId, 365);
+    } catch (err) {
+      log.warn(
+        'Brier stats lookup for DPR failed (likely schema drift or empty org):',
+        err instanceof Error ? err.message : String(err)
+      );
+      stats = null;
+    }
   }
-  if (!stats || stats.count === 0) return undefined;
+
+  // Platform seed fallback — when the org has no closed outcomes yet
+  // (cold start, design-partner phase, or schema drift) render the
+  // 143-case Brier-scored baseline so the DPR always carries
+  // calibration evidence. Replaced by per-org calibration as soon as
+  // the org has ≥1 closed outcome.
+  if (!stats || stats.count === 0) {
+    const baseline = computePlatformCalibrationBaseline();
+    const seedBrierCat = brierCategory(baseline.meanBrier);
+    return {
+      source: 'platform_seed',
+      decisionsTracked: 0,
+      outcomesClosed: 0,
+      meanBrierScore: null,
+      brierCategory: null,
+      recalibratedFromOriginal: null,
+      platformSeed: {
+        n: baseline.n,
+        meanBrier: baseline.meanBrier,
+        classificationAccuracy: baseline.classificationAccuracy,
+        methodologyVersion: baseline.methodologyVersion,
+      },
+      calibrationNote: `Platform calibration baseline · Brier ${baseline.meanBrier.toFixed(3)} (${seedBrierCat}) over ${baseline.n} audited corporate decisions, ${Math.round(
+        baseline.classificationAccuracy * 100
+      )}% classification accuracy at the investigate-further cutoff. This is the seed methodology applied without hindsight; per-org calibration replaces the seed once this organisation has ≥1 closed outcome.`,
+    };
+  }
+
   const brierCat = stats.avg > 0 ? brierCategory(stats.avg) : null;
   let recalibratedFromOriginal: OrgCalibrationSummary['recalibratedFromOriginal'] = null;
   if (
@@ -579,6 +621,7 @@ async function buildOrgCalibration(
     ? `DQI shown is calibrated against this organisation's outcome history (${stats.count} closed decisions, mean Brier ${stats.avg.toFixed(3)} · ${brierCat ?? 'unscored'}). Original-vs-recalibrated delta: ${recalibratedFromOriginal.delta >= 0 ? '+' : ''}${recalibratedFromOriginal.delta}.`
     : `Org calibration baseline: ${stats.count} closed decisions tracked, mean Brier ${stats.avg.toFixed(3)} (${brierCat ?? 'unscored'}). Recalibration applied only after the outcome flywheel reaches a per-org statistical floor; this audit shows the absolute DQI.`;
   return {
+    source: 'org',
     decisionsTracked: stats.count,
     outcomesClosed: stats.count,
     meanBrierScore: stats.avg,

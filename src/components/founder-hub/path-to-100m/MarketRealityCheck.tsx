@@ -9,7 +9,7 @@ import {
   Clock,
   MinusCircle,
 } from 'lucide-react';
-import { SILENT_OBJECTIONS, type SilentObjection } from './data';
+import { SILENT_OBJECTIONS, type SilentObjection } from './data/silent-objections';
 
 const STATUS_ACCENT: Record<SilentObjection['status'], string> = {
   shipped: '#16A34A',

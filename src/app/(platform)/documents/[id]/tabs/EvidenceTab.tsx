@@ -7,7 +7,7 @@ import type { AnalysisResult, LogicalAnalysisResult } from '@/types';
 interface OutcomeData {
   outcome: string;
   confirmedBiases: string[];
-  falsPositiveBiases: string[];
+  falsePositiveBiases: string[];
   lessonsLearned?: string | null;
   notes?: string | null;
   impactScore?: number | null;

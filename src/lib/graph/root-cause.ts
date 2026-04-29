@@ -37,13 +37,13 @@ export async function attributeRootCauses(
     // Get outcome
     const outcome = await prisma.decisionOutcome.findUnique({
       where: { analysisId },
-      select: { outcome: true, confirmedBiases: true, falsPositiveBiases: true },
+      select: { outcome: true, confirmedBiases: true, falsePositiveBiases: true },
     });
 
     if (!outcome) return [];
 
     const confirmed = new Set(outcome.confirmedBiases);
-    const falsePositives = new Set(outcome.falsPositiveBiases);
+    const falsePositives = new Set(outcome.falsePositiveBiases);
 
     // Get causal edge data for these bias types
     const causalEdges = await prisma.causalEdge.findMany({

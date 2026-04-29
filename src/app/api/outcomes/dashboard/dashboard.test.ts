@@ -88,7 +88,7 @@ function makeOutcome(overrides: Record<string, unknown> = {}) {
     outcome: 'success',
     impactScore: 75,
     confirmedBiases: [],
-    falsPositiveBiases: [],
+    falsePositiveBiases: [],
     mostAccurateTwin: null,
     reportedAt: new Date(),
     ...overrides,
@@ -157,25 +157,25 @@ describe('GET /api/outcomes/dashboard', () => {
         outcome: 'success',
         impactScore: 80,
         confirmedBiases: ['anchoring'],
-        falsPositiveBiases: ['sunk_cost'],
+        falsePositiveBiases: ['sunk_cost'],
       }),
       makeOutcome({
         outcome: 'failure',
         impactScore: 30,
         confirmedBiases: ['anchoring'],
-        falsPositiveBiases: [],
+        falsePositiveBiases: [],
       }),
       makeOutcome({
         outcome: 'partial_success',
         impactScore: 60,
         confirmedBiases: [],
-        falsPositiveBiases: [],
+        falsePositiveBiases: [],
       }),
       makeOutcome({
         outcome: 'too_early',
         impactScore: null,
         confirmedBiases: [],
-        falsPositiveBiases: [],
+        falsePositiveBiases: [],
       }),
     ]);
 

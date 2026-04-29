@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
       notes,
       lessonsLearned,
       confirmedBiases,
-      falsPositiveBiases,
+      falsePositiveBiases,
       mostAccurateTwin,
     } = body;
 
@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
         notes,
         lessonsLearned,
         confirmedBiases: confirmedBiases || [],
-        falsPositiveBiases: falsPositiveBiases || [],
+        falsePositiveBiases: falsePositiveBiases || [],
         mostAccurateTwin,
       },
       create: {
@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
         notes,
         lessonsLearned,
         confirmedBiases: confirmedBiases || [],
-        falsPositiveBiases: falsPositiveBiases || [],
+        falsePositiveBiases: falsePositiveBiases || [],
         mostAccurateTwin,
       },
     });
@@ -115,7 +115,7 @@ export async function POST(req: NextRequest) {
     log.info(`Upserted outcome for analysis ${analysisId}: ${outcome}`);
 
     // Update bias accuracy based on confirmed/false positives
-    if (confirmedBiases?.length || falsPositiveBiases?.length) {
+    if (confirmedBiases?.length || falsePositiveBiases?.length) {
       // Update confirmed biases with high rating
       if (confirmedBiases?.length) {
         await prisma.biasInstance.updateMany({
@@ -128,11 +128,11 @@ export async function POST(req: NextRequest) {
       }
 
       // Update false positives with low rating
-      if (falsPositiveBiases?.length) {
+      if (falsePositiveBiases?.length) {
         await prisma.biasInstance.updateMany({
           where: {
             analysisId,
-            biasType: { in: falsPositiveBiases },
+            biasType: { in: falsePositiveBiases },
           },
           data: { userRating: 1 },
         });
@@ -166,7 +166,7 @@ export async function POST(req: NextRequest) {
       analysisId,
       outcome,
       confirmedBiases: confirmedBiases || [],
-      falsPositiveBiases: falsPositiveBiases || [],
+      falsePositiveBiases: falsePositiveBiases || [],
       decisionOutcomeId: decisionOutcome.id,
     });
 
@@ -465,7 +465,7 @@ function calculateBiasAccuracy(outcomes: DecisionOutcome[]): {
       confirmedBiases.add(bias);
     });
 
-    outcome.falsPositiveBiases?.forEach((bias: string) => {
+    outcome.falsePositiveBiases?.forEach((bias: string) => {
       allBiases.add(bias);
       falsePositiveBiases.add(bias);
     });

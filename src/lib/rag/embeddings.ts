@@ -627,7 +627,7 @@ export async function searchSimilarWithOutcomes(
       impactScore: number | null;
       lessonsLearned: string | null;
       confirmedBiases: string[];
-      falsPositiveBiases: string[];
+      falsePositiveBiases: string[];
       mostAccurateTwin: string | null;
       timeframe: string | null;
     };
@@ -657,7 +657,7 @@ export async function searchSimilarWithOutcomes(
       impactScore: number | null;
       lessonsLearned: string | null;
       confirmedBiases: string[];
-      falsPositiveBiases: string[];
+      falsePositiveBiases: string[];
       mostAccurateTwin: string | null;
       timeframe: string | null;
     }> = [];
@@ -672,7 +672,7 @@ export async function searchSimilarWithOutcomes(
             impactScore: true,
             lessonsLearned: true,
             confirmedBiases: true,
-            falsPositiveBiases: true,
+            falsePositiveBiases: true,
             mostAccurateTwin: true,
             timeframe: true,
           },
@@ -698,7 +698,7 @@ export async function searchSimilarWithOutcomes(
               impactScore: outcome.impactScore,
               lessonsLearned: outcome.lessonsLearned,
               confirmedBiases: outcome.confirmedBiases,
-              falsPositiveBiases: outcome.falsPositiveBiases,
+              falsePositiveBiases: outcome.falsePositiveBiases,
               mostAccurateTwin: outcome.mostAccurateTwin,
               timeframe: outcome.timeframe,
             }

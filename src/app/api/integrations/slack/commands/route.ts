@@ -1116,7 +1116,7 @@ async function handleOutcomeCommand(params: {
         outcome,
         notes: notes || null,
         confirmedBiases: [],
-        falsPositiveBiases: [],
+        falsePositiveBiases: [],
       },
       update: { outcome, notes: notes || null },
     });

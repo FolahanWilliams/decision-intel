@@ -261,9 +261,15 @@ export class DecisionProvenanceRecordGenerator {
       this.doc.setFontSize(8.5);
       this.doc.setTextColor(80, 80, 80);
       const cal = data.orgCalibration;
-      const calStrip = cal.recalibratedFromOriginal
-        ? `Calibrated against ${cal.decisionsTracked} closed decisions for this organisation \u00b7 mean Brier ${cal.meanBrierScore?.toFixed(3) ?? '\u2014'} (${cal.brierCategory ?? 'unscored'}) \u00b7 recalibrated ${cal.recalibratedFromOriginal.delta >= 0 ? '+' : ''}${cal.recalibratedFromOriginal.delta} from absolute`
-        : `Calibration baseline: ${cal.decisionsTracked} closed decisions, mean Brier ${cal.meanBrierScore?.toFixed(3) ?? '\u2014'} (${cal.brierCategory ?? 'unscored'}) \u00b7 absolute DQI shown until per-org statistical floor`;
+      let calStrip: string;
+      if (cal.source === 'platform_seed' && cal.platformSeed) {
+        const seed = cal.platformSeed;
+        calStrip = `Calibration \u00b7 platform seed baseline \u00b7 Brier ${seed.meanBrier.toFixed(3)} over ${seed.n} audited corporate decisions \u00b7 ${Math.round(seed.classificationAccuracy * 100)}% classification accuracy at the investigate-further cutoff \u00b7 per-org calibration replaces the seed once this organisation has \u22651 closed outcome`;
+      } else if (cal.recalibratedFromOriginal) {
+        calStrip = `Calibrated against ${cal.decisionsTracked} closed decisions for this organisation \u00b7 mean Brier ${cal.meanBrierScore?.toFixed(3) ?? '\u2014'} (${cal.brierCategory ?? 'unscored'}) \u00b7 recalibrated ${cal.recalibratedFromOriginal.delta >= 0 ? '+' : ''}${cal.recalibratedFromOriginal.delta} from absolute`;
+      } else {
+        calStrip = `Calibration baseline: ${cal.decisionsTracked} closed decisions, mean Brier ${cal.meanBrierScore?.toFixed(3) ?? '\u2014'} (${cal.brierCategory ?? 'unscored'}) \u00b7 absolute DQI shown until per-org statistical floor`;
+      }
       const calLines = this.doc.splitTextToSize(calStrip, TEXT_W);
       this.doc.text(calLines, MARGIN_L, y);
       y += calLines.length * 4 + 4;

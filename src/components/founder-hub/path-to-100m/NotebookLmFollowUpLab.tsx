@@ -2,7 +2,10 @@
 
 import { useState } from 'react';
 import { Copy, Check, BookOpen } from 'lucide-react';
-import { NOTEBOOKLM_FOLLOW_UPS, type NotebookLmFollowUp } from './data';
+import {
+  NOTEBOOKLM_FOLLOW_UPS,
+  type NotebookLmFollowUp,
+} from './data/notebook-lm-follow-ups';
 
 const PRIORITY_COLOR: Record<NotebookLmFollowUp['priority'], string> = {
   now: '#DC2626',

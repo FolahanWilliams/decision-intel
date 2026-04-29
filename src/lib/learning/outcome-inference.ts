@@ -978,7 +978,7 @@ export async function confirmDraftOutcome(
         outcome: draft.outcome,
         notes: `Auto-detected via ${draft.source.replace(/_/g, ' ')}. Evidence: ${draft.evidence.join('; ')}`,
         confirmedBiases: [],
-        falsPositiveBiases: [],
+        falsePositiveBiases: [],
       },
     });
 

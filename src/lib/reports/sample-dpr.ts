@@ -288,6 +288,7 @@ const SAMPLE_REVIEWER_DECISIONS: ReviewerDecisionLog = {
 };
 
 const SAMPLE_ORG_CALIBRATION: OrgCalibrationSummary = {
+  source: 'org',
   decisionsTracked: 42,
   outcomesClosed: 28,
   meanBrierScore: 0.183,

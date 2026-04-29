@@ -26,12 +26,19 @@ import {
   Globe2,
   FileText,
   AlertCircle,
+  Activity,
 } from 'lucide-react';
 import { DESIGN_PARTNER_SEATS_AVAILABLE } from '@/lib/constants/company-info';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+import { PLATFORM_BASELINE_SNAPSHOT } from '@/lib/learning/platform-baseline-snapshot';
 
 const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
+// PLATFORM_BASELINE_SNAPSHOT is a tiny no-dep mirror of the live
+// computePlatformCalibrationBaseline(). Importing the live function on
+// this `'use client'` page would pull the 750KB case library into the
+// client bundle. Drift between the snapshot and the live function is
+// caught by platform-baseline-snapshot.test.ts.
 
 /* ─── Color Tokens ──────────────────────────────────────────────────────── */
 
@@ -1511,7 +1518,7 @@ export default function LandingPage() {
 }
 
 /* ─── HeroCredibilityStrip ──────────────────────────────────────────────
-   Static row of trust signals below the hero grid. All four signals
+   Static row of trust signals below the hero grid. All five signals
    visible at once. Persona audit (Marcus, Elena, Richard) flagged the
    prior 4.2s rotating ticker as reading "indecision" / "desperation" /
    "rationing your good credentials" — Bloomberg, S&P Capital IQ,
@@ -1520,7 +1527,9 @@ export default function LandingPage() {
    a real principle-mapping exercise (not a certification claim);
    SOC 2 refers to the infrastructure stack (Vercel + Supabase);
    The framework count is registry-derived (getAllRegisteredFrameworks().length)
-   so it never drifts when africa-frameworks.ts grows. No fabricated logos. */
+   so it never drifts when africa-frameworks.ts grows. The Brier
+   calibration item (added F1 lock 2026-04-29) reads from the bundle-
+   safe PLATFORM_BASELINE_SNAPSHOT — no fabricated logos. */
 
 function HeroCredibilityStrip() {
   const items = [
@@ -1543,6 +1552,11 @@ function HeroCredibilityStrip() {
       icon: Globe2,
       label: `${FRAMEWORK_COUNT} regulatory frameworks`,
       note: 'G7, EU, GCC, African markets',
+    },
+    {
+      icon: Activity,
+      label: `Brier ${PLATFORM_BASELINE_SNAPSHOT.meanBrier.toFixed(3)} calibration`,
+      note: `${PLATFORM_BASELINE_SNAPSHOT.n} audited corporate decisions`,
     },
   ];
 

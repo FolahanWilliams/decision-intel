@@ -11,7 +11,7 @@ import {
   Network,
   Heart,
 } from 'lucide-react';
-import { NETWORK_NODES, type NetworkNode } from './data';
+import { NETWORK_NODES, type NetworkNode } from './data/network-nodes';
 
 const STATUS_COLOR: Record<NetworkNode['status'], string> = {
   active: '#16A34A',

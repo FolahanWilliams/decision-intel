@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
           outcome: true,
           impactScore: true,
           confirmedBiases: true,
-          falsPositiveBiases: true,
+          falsePositiveBiases: true,
           reportedAt: true,
         },
       });
@@ -116,7 +116,7 @@ export async function GET(req: NextRequest) {
 
     // Outcome exists — compute what was learned
     const confirmedBiases = outcome.confirmedBiases as string[];
-    const falsPositiveBiases = outcome.falsPositiveBiases as string[];
+    const falsePositiveBiases = outcome.falsePositiveBiases as string[];
 
     // Count edge weights that were updated (graph edges connected to this analysis)
     let edgesUpdated = 0;
@@ -141,11 +141,11 @@ export async function GET(req: NextRequest) {
             orgId,
             OR: [
               { confirmedBiases: { isEmpty: false } },
-              { falsPositiveBiases: { isEmpty: false } },
+              { falsePositiveBiases: { isEmpty: false } },
             ],
           },
           orderBy: { reportedAt: 'asc' },
-          select: { confirmedBiases: true, falsPositiveBiases: true, analysisId: true },
+          select: { confirmedBiases: true, falsePositiveBiases: true, analysisId: true },
         });
 
         if (allOutcomes.length >= 5) {
@@ -154,7 +154,7 @@ export async function GET(req: NextRequest) {
           if (idx >= 0) {
             const calcRate = (slice: typeof allOutcomes) => {
               const confirmed = slice.reduce((s, o) => s + o.confirmedBiases.length, 0);
-              const fp = slice.reduce((s, o) => s + o.falsPositiveBiases.length, 0);
+              const fp = slice.reduce((s, o) => s + o.falsePositiveBiases.length, 0);
               return confirmed + fp > 0 ? (confirmed / (confirmed + fp)) * 100 : 0;
             };
 
@@ -182,7 +182,7 @@ export async function GET(req: NextRequest) {
         impactScore: outcome.impactScore,
       },
       confirmedBiases,
-      falsPositiveBiases,
+      falsePositiveBiases,
       edgesUpdated,
       orgAccuracyMessage,
     });

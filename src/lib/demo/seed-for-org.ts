@@ -169,7 +169,7 @@ async function seedOneEntry(
         impactScore: entry.seedOutcome.impactScore,
         notes: entry.seedOutcome.notes,
         confirmedBiases: entry.seedOutcome.confirmedBiases,
-        falsPositiveBiases: [],
+        falsePositiveBiases: [],
       },
     });
   }

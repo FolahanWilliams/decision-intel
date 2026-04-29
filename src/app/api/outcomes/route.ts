@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
       notes,
       lessonsLearned,
       confirmedBiases,
-      falsPositiveBiases,
+      falsePositiveBiases,
       mostAccurateTwin,
     } = body;
 
@@ -51,8 +51,8 @@ export async function POST(req: NextRequest) {
     if (confirmedBiases !== undefined && !Array.isArray(confirmedBiases)) {
       return NextResponse.json({ error: 'confirmedBiases must be an array' }, { status: 400 });
     }
-    if (falsPositiveBiases !== undefined && !Array.isArray(falsPositiveBiases)) {
-      return NextResponse.json({ error: 'falsPositiveBiases must be an array' }, { status: 400 });
+    if (falsePositiveBiases !== undefined && !Array.isArray(falsePositiveBiases)) {
+      return NextResponse.json({ error: 'falsePositiveBiases must be an array' }, { status: 400 });
     }
 
     if (!VALID_OUTCOMES.includes(outcome)) {
@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
         notes: notes || null,
         lessonsLearned: lessonsLearned || null,
         confirmedBiases: confirmedBiases || [],
-        falsPositiveBiases: falsPositiveBiases || [],
+        falsePositiveBiases: falsePositiveBiases || [],
         mostAccurateTwin: mostAccurateTwin || null,
       },
       update: {
@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
         notes: notes || null,
         lessonsLearned: lessonsLearned || null,
         confirmedBiases: confirmedBiases || [],
-        falsPositiveBiases: falsPositiveBiases || [],
+        falsePositiveBiases: falsePositiveBiases || [],
         mostAccurateTwin: mostAccurateTwin || null,
       },
     });
@@ -140,7 +140,7 @@ export async function POST(req: NextRequest) {
       analysisId,
       outcome,
       confirmedBiases: confirmedBiases || [],
-      falsPositiveBiases: falsPositiveBiases || [],
+      falsePositiveBiases: falsePositiveBiases || [],
       decisionOutcomeId: result.id,
     });
 
@@ -185,7 +185,7 @@ export async function POST(req: NextRequest) {
         analysisId,
         outcome,
         confirmedBiases || [],
-        falsPositiveBiases || []
+        falsePositiveBiases || []
       );
       if (edgesUpdated > 0) {
         log.info(`Adjusted ${edgesUpdated} edge weight(s) from outcome for ${analysisId}`);

@@ -25,8 +25,19 @@ import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { isSchemaDrift } from '@/lib/utils/error';
 import { computeBiasGenome } from '@/lib/learning/bias-genome';
+import { computePlatformCalibrationBaseline } from '@/lib/learning/platform-baseline';
 
 const log = createLogger('BiasGenomeContributionRoute');
+
+function getPlatformBaseline(): ContributionResponse['platformBaseline'] {
+  const b = computePlatformCalibrationBaseline();
+  return {
+    n: b.n,
+    meanBrier: b.meanBrier,
+    meanCategory: b.meanCategory,
+    classificationAccuracy: b.classificationAccuracy,
+  };
+}
 
 interface ContributionResponse {
   // Per-org contribution
@@ -58,6 +69,20 @@ interface ContributionResponse {
    * fair to compare them against it). Null otherwise. 0-100; 100 = top.
    */
   cohortPercentile: number | null;
+
+  /** Platform calibration baseline — Brier-scored prediction over the
+   *  143-case library using the published DQI methodology with
+   *  evidence-quality neutralised. Surfaced in the discovery-state of
+   *  the contribution card so a CSO with zero outcomes still sees a
+   *  defensible calibration number anchored against Tetlock-band
+   *  comparators. Replaced by per-org calibration once outcomes
+   *  accumulate. */
+  platformBaseline: {
+    n: number;
+    meanBrier: number;
+    meanCategory: 'excellent' | 'good' | 'fair' | 'poor';
+    classificationAccuracy: number;
+  };
 
   /** ISO timestamp the data was computed; client uses this for freshness UI. */
   computedAt: string;
@@ -114,6 +139,7 @@ export async function GET() {
           cohortTotalOrgs: 0,
           cohortTotalDecisions: 0,
           cohortPercentile: null,
+          platformBaseline: getPlatformBaseline(),
           computedAt: new Date().toISOString(),
         } satisfies ContributionResponse);
       }
@@ -131,6 +157,7 @@ export async function GET() {
           cohortTotalOrgs: 0,
           cohortTotalDecisions: 0,
           cohortPercentile: null,
+          platformBaseline: getPlatformBaseline(),
           computedAt: new Date().toISOString(),
         } satisfies ContributionResponse,
         {
@@ -267,6 +294,7 @@ export async function GET() {
       cohortTotalOrgs,
       cohortTotalDecisions,
       cohortPercentile,
+      platformBaseline: getPlatformBaseline(),
       computedAt: new Date().toISOString(),
     };
 

@@ -981,8 +981,8 @@ model DecisionOutcome {
   impactScore        Int?
   notes              String?
   lessonsLearned     String?
-  confirmedBiases    String[]
-  falsPositiveBiases String[]
+  confirmedBiases     String[]
+  falsePositiveBiases String[]
   mostAccurateTwin   String?
   /// Brier score between predicted DQI and actual outcome. Lower is
   /// better calibrated (0 = perfect, 1 = worst). Nullable for rows

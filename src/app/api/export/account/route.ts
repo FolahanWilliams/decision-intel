@@ -164,7 +164,7 @@ export async function GET(request: NextRequest) {
           notes: true,
           lessonsLearned: true,
           confirmedBiases: true,
-          falsPositiveBiases: true,
+          falsePositiveBiases: true,
           mostAccurateTwin: true,
           brierScore: true,
           brierCategory: true,

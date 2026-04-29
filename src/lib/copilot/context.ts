@@ -141,7 +141,7 @@ export async function loadDecisionStyleProfile(userId: string): Promise<Decision
         impactScore: true,
         lessonsLearned: true,
         confirmedBiases: true,
-        falsPositiveBiases: true,
+        falsePositiveBiases: true,
         mostAccurateTwin: true,
         reportedAt: true,
         analysis: {
@@ -244,7 +244,7 @@ export async function loadDecisionStyleProfile(userId: string): Promise<Decision
       for (const b of o.confirmedBiases) {
         confirmedCounts.set(b, (confirmedCounts.get(b) || 0) + 1);
       }
-      for (const b of o.falsPositiveBiases) {
+      for (const b of o.falsePositiveBiases) {
         fpCounts.set(b, (fpCounts.get(b) || 0) + 1);
       }
     }

@@ -82,7 +82,7 @@ export async function computeBiasGenome(): Promise<BiasGenomeResult> {
       id: string;
       outcome: string;
       confirmedBiases: string[];
-      falsPositiveBiases: string[];
+      falsePositiveBiases: string[];
       analysis: {
         biases: Array<{ biasType: string }>;
       };
@@ -95,7 +95,7 @@ export async function computeBiasGenome(): Promise<BiasGenomeResult> {
           id: true,
           outcome: true,
           confirmedBiases: true,
-          falsPositiveBiases: true,
+          falsePositiveBiases: true,
           analysis: {
             select: {
               biases: {
@@ -168,7 +168,7 @@ export async function computeBiasGenome(): Promise<BiasGenomeResult> {
         biasStats.set(biasType, stats);
       }
 
-      for (const biasType of outcome.falsPositiveBiases) {
+      for (const biasType of outcome.falsePositiveBiases) {
         const stats = biasStats.get(biasType) ?? {
           present: 0,
           successes: 0,

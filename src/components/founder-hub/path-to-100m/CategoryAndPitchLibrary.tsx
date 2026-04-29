@@ -2,7 +2,11 @@
 
 import { useState } from 'react';
 import { Skull, Snowflake, Zap, Flame, X } from 'lucide-react';
-import { CATEGORY_DEFINITION, PERSONA_PITCH_LIBRARY, LANGUAGE_PATTERNS } from './data';
+import {
+  CATEGORY_DEFINITION,
+  PERSONA_PITCH_LIBRARY,
+  LANGUAGE_PATTERNS,
+} from './data/category-pitch';
 
 const VOCAB_ACCENT = ['#0EA5E9', '#7C3AED', '#16A34A'];
 const VOCAB_ICON = [Snowflake, Zap, Flame];

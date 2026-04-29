@@ -20,7 +20,7 @@ interface OutcomeData {
   notes?: string;
   lessonsLearned?: string;
   confirmedBiases?: string[];
-  falsPositiveBiases?: string[];
+  falsePositiveBiases?: string[];
   mostAccurateTwin?: string;
   reportedAt?: string;
 }
@@ -90,7 +90,7 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
   const [notes, setNotes] = useState('');
   const [lessonsLearned, setLessonsLearned] = useState('');
   const [confirmedBiases, setConfirmedBiases] = useState<string[]>([]);
-  const [falsPositiveBiases, setFalsPositiveBiases] = useState<string[]>([]);
+  const [falsePositiveBiases, setFalsPositiveBiases] = useState<string[]>([]);
   const [mostAccurateTwin, setMostAccurateTwin] = useState('');
 
   const fetchExisting = useCallback(async () => {
@@ -106,7 +106,7 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
           setNotes(data.notes || '');
           setLessonsLearned(data.lessonsLearned || '');
           setConfirmedBiases(data.confirmedBiases || []);
-          setFalsPositiveBiases(data.falsPositiveBiases || []);
+          setFalsPositiveBiases(data.falsePositiveBiases || []);
           setMostAccurateTwin(data.mostAccurateTwin || '');
         }
       }
@@ -136,7 +136,7 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
           notes: notes || undefined,
           lessonsLearned: lessonsLearned || undefined,
           confirmedBiases,
-          falsPositiveBiases,
+          falsePositiveBiases,
           mostAccurateTwin: mostAccurateTwin || undefined,
         }),
       });
@@ -432,7 +432,7 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                     {biases.map(bias => {
                       const isConfirmed = confirmedBiases.includes(bias.biasType);
-                      const isFalse = falsPositiveBiases.includes(bias.biasType);
+                      const isFalse = falsePositiveBiases.includes(bias.biasType);
                       return (
                         <div
                           key={bias.biasType}

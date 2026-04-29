@@ -173,7 +173,7 @@ export async function GET(request: NextRequest) {
           ...(context.orgId ? { orgId: context.orgId } : { userId: context.userId }),
           reportedAt: { gte: startDate },
         },
-        select: { outcome: true, confirmedBiases: true, falsPositiveBiases: true },
+        select: { outcome: true, confirmedBiases: true, falsePositiveBiases: true },
         take: 500,
       });
 
@@ -183,7 +183,7 @@ export async function GET(request: NextRequest) {
         ).length;
         const failures = outcomes.filter(o => o.outcome === 'failure').length;
         const totalConfirmed = outcomes.reduce((s, o) => s + o.confirmedBiases.length, 0);
-        const totalFP = outcomes.reduce((s, o) => s + o.falsPositiveBiases.length, 0);
+        const totalFP = outcomes.reduce((s, o) => s + o.falsePositiveBiases.length, 0);
         const totalRated = totalConfirmed + totalFP;
 
         outcomeStats = {

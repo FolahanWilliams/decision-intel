@@ -10,6 +10,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { computeGenomeFromSeed } from '@/lib/data/bias-genome-seed';
+import { computePlatformCalibrationBaseline } from '@/lib/learning/platform-baseline';
 import { MarketingNav } from '@/components/marketing/MarketingNav';
 import { HeadlineStatCard } from '@/components/marketing/genome/HeadlineStatCard';
 import { ToxicComboCard } from '@/components/marketing/genome/ToxicComboCard';
@@ -59,6 +60,7 @@ const C = {
 export default function BiasGenomePage() {
   const genome = computeGenomeFromSeed();
   const { meta, headline, toxicPatterns } = genome;
+  const calibration = computePlatformCalibrationBaseline();
 
   return (
     <div style={{ background: C.slate50, color: C.slate900, minHeight: '100vh' }}>
@@ -146,6 +148,11 @@ export default function BiasGenomePage() {
               label="Industries"
               value={String(meta.industriesCovered.length)}
               sublabel="with meaningful coverage"
+            />
+            <Pill
+              label="Calibration baseline"
+              value={`Brier ${calibration.meanBrier.toFixed(3)}`}
+              sublabel={`${calibration.meanCategory} band · methodology ${calibration.methodologyVersion}`}
             />
             <Pill label="Data source" value="Seed" sublabel="live on customer opt-in" />
             <Pill label="Refreshed" value={meta.computedAt} sublabel="ISO date" />

@@ -42,6 +42,15 @@ interface ContributionPayload {
   cohortTotalOrgs: number;
   cohortTotalDecisions: number;
   cohortPercentile: number | null;
+  /** Platform calibration baseline shipped 2026-04-29 — F1 lock.
+   *  Surfaced in the discovery state so a cold-start org sees a
+   *  defensible Tetlock-anchored number before they have outcomes. */
+  platformBaseline: {
+    n: number;
+    meanBrier: number;
+    meanCategory: 'excellent' | 'good' | 'fair' | 'poor';
+    classificationAccuracy: number;
+  };
   computedAt: string;
 }
 
@@ -172,6 +181,9 @@ export function BiasGenomeContributionCard() {
             disconfirmed bias instances become part of the calibration signal everyone benefits
             from.
           </p>
+          {data.platformBaseline ? (
+            <PlatformBaselineCallout baseline={data.platformBaseline} />
+          ) : null}
           <Link
             href="/dashboard/outcome-flywheel"
             style={{
@@ -571,6 +583,50 @@ export function BiasGenomeContributionCard() {
           }
         }
       `}</style>
+    </div>
+  );
+}
+
+function PlatformBaselineCallout({
+  baseline,
+}: {
+  baseline: ContributionPayload['platformBaseline'];
+}) {
+  const accuracyPct = Math.round(baseline.classificationAccuracy * 100);
+  return (
+    <div
+      style={{
+        margin: '0 0 12px 0',
+        padding: '8px 10px',
+        borderRadius: 'var(--radius-md)',
+        background: 'rgba(99, 102, 241, 0.06)',
+        border: '1px solid rgba(99, 102, 241, 0.20)',
+        fontSize: 11.5,
+        color: 'var(--text-secondary)',
+        lineHeight: 1.5,
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          gap: 6,
+          alignItems: 'center',
+          marginBottom: 2,
+          fontWeight: 700,
+          fontSize: 10,
+          textTransform: 'uppercase',
+          letterSpacing: '0.5px',
+          color: 'rgb(79, 70, 229)',
+        }}
+      >
+        Until your outcomes accumulate
+      </div>
+      Platform calibration baseline · Brier{' '}
+      <strong style={{ color: 'var(--text-primary)' }}>{baseline.meanBrier.toFixed(3)}</strong>{' '}
+      ({baseline.meanCategory}) over {baseline.n} audited corporate decisions ·{' '}
+      <strong style={{ color: 'var(--text-primary)' }}>{accuracyPct}%</strong> classification
+      accuracy at the investigate-further cutoff. Per-org calibration replaces the seed once
+      this organisation has ≥1 closed outcome.
     </div>
   );
 }

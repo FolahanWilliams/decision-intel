@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronRight, ChevronDown, Briefcase, Activity, Eye } from 'lucide-react';
-import { INVESTOR_METRICS, type InvestorMetric } from './data';
+import { INVESTOR_METRICS, type InvestorMetric } from './data/investor-metrics';
 
 const STATUS_COLOR: Record<InvestorMetric['status'], string> = {
   on_track: '#16A34A',

@@ -93,7 +93,7 @@ export async function computeROIAttribution(dealId: string): Promise<ROIAttribut
                 outcome: {
                   select: {
                     confirmedBiases: true,
-                    falsPositiveBiases: true,
+                    falsePositiveBiases: true,
                   },
                 },
               },
@@ -122,7 +122,7 @@ export async function computeROIAttribution(dealId: string): Promise<ROIAttribut
         }
         if (analysis.outcome) {
           const confirmed = analysis.outcome.confirmedBiases;
-          const falsePos = analysis.outcome.falsPositiveBiases;
+          const falsePos = analysis.outcome.falsePositiveBiases;
           if (Array.isArray(confirmed)) confirmed.forEach((b: string) => allConfirmed.add(b));
           if (Array.isArray(falsePos)) falsePos.forEach((b: string) => allFalsePositive.add(b));
         }

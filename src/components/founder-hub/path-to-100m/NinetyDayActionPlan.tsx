@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Package, Briefcase, DollarSign, Database, Compass, Trophy } from 'lucide-react';
-import { NINETY_DAY_ACTIONS, type NinetyDayAction } from './data';
+import { NINETY_DAY_ACTIONS, type NinetyDayAction } from './data/ninety-day-actions';
 
 const CATEGORY_ACCENT: Record<NinetyDayAction['category'], string> = {
   product: '#16A34A',

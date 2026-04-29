@@ -18,7 +18,7 @@ export async function adjustEdgeWeightsFromOutcome(
   analysisId: string,
   outcome: string,
   confirmedBiases: string[],
-  falsPositiveBiases: string[]
+  falsePositiveBiases: string[]
 ): Promise<number> {
   try {
     // Find all edges connected to this analysis
@@ -52,7 +52,7 @@ export async function adjustEdgeWeightsFromOutcome(
           confidenceDelta = 0.03;
         }
         // If biases were false positives, weaken the connection
-        if (falsPositiveBiases.length > 0) {
+        if (falsePositiveBiases.length > 0) {
           strengthDelta = -0.03;
           confidenceDelta = -0.02;
         }

@@ -2,7 +2,12 @@
 
 import { useState } from 'react';
 import { Zap, ShieldAlert, ChevronRight, ChevronDown } from 'lucide-react';
-import { STRENGTHS, WEAKNESSES, type Strength, type Weakness } from './data';
+import {
+  STRENGTHS,
+  WEAKNESSES,
+  type Strength,
+  type Weakness,
+} from './data/strengths-weaknesses';
 
 const SEVERITY_COLOR = {
   critical: '#DC2626',

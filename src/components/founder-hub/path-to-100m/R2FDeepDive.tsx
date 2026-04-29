@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Brain, Lightbulb, GitMerge, ChevronRight, ChevronDown } from 'lucide-react';
-import { R2F_CURRENT, R2F_MOAT_LEVERS } from './data';
+import { R2F_CURRENT, R2F_MOAT_LEVERS } from './data/r2f';
 
 const SIDE_ACCENT = {
   kahneman: '#0EA5E9',

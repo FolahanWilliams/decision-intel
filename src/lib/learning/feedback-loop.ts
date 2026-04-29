@@ -184,11 +184,11 @@ export async function recalibrateBiasSeverity(
     const outcomes = await prisma.decisionOutcome.findMany({
       where: {
         ...(orgId ? { orgId } : {}),
-        OR: [{ confirmedBiases: { isEmpty: false } }, { falsPositiveBiases: { isEmpty: false } }],
+        OR: [{ confirmedBiases: { isEmpty: false } }, { falsePositiveBiases: { isEmpty: false } }],
       },
       select: {
         confirmedBiases: true,
-        falsPositiveBiases: true,
+        falsePositiveBiases: true,
         outcome: true,
         impactScore: true,
       },
@@ -224,7 +224,7 @@ export async function recalibrateBiasSeverity(
           if (!orgBiasStats[bias]) orgBiasStats[bias] = { confirmed: 0, falsePositive: 0 };
           orgBiasStats[bias].confirmed++;
         }
-        for (const bias of outcome.falsPositiveBiases) {
+        for (const bias of outcome.falsePositiveBiases) {
           if (!orgBiasStats[bias]) orgBiasStats[bias] = { confirmed: 0, falsePositive: 0 };
           orgBiasStats[bias].falsePositive++;
         }
@@ -299,7 +299,7 @@ export async function recalibrateBiasSeverity(
         if (!biasStats[bias]) biasStats[bias] = { confirmed: 0, falsePositive: 0 };
         biasStats[bias].confirmed++;
       }
-      for (const bias of outcome.falsPositiveBiases) {
+      for (const bias of outcome.falsePositiveBiases) {
         if (!biasStats[bias]) biasStats[bias] = { confirmed: 0, falsePositive: 0 };
         biasStats[bias].falsePositive++;
       }

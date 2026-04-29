@@ -104,7 +104,7 @@ export async function GET(req: NextRequest) {
             outcome: true,
             impactScore: true,
             confirmedBiases: true,
-            falsPositiveBiases: true,
+            falsePositiveBiases: true,
             mostAccurateTwin: true,
             reportedAt: true,
           },
@@ -122,13 +122,13 @@ export async function GET(req: NextRequest) {
         : 0;
 
       // Bias detection accuracy: confirmed / (confirmed + false positives).
-      // Cannot use groupBy here because confirmedBiases and falsPositiveBiases
+      // Cannot use groupBy here because confirmedBiases and falsePositiveBiases
       // are JSON array fields — Prisma groupBy does not support JSON aggregation.
       let totalConfirmed = 0;
       let totalFalsePositives = 0;
       for (const o of outcomes) {
         totalConfirmed += o.confirmedBiases.length;
-        totalFalsePositives += (o.falsPositiveBiases ?? []).length;
+        totalFalsePositives += (o.falsePositiveBiases ?? []).length;
       }
       const biasDetectionAccuracy =
         totalConfirmed + totalFalsePositives > 0

@@ -20,7 +20,7 @@ interface LearningImpactData {
   // When outcome exists
   outcome?: { outcome: string; impactScore: number | null };
   confirmedBiases?: string[];
-  falsPositiveBiases?: string[];
+  falsePositiveBiases?: string[];
   edgesUpdated?: number;
   orgAccuracyMessage?: string | null;
   // When no outcome
@@ -60,7 +60,7 @@ export function LearningImpactCard({ analysisId }: { analysisId: string }) {
   if (data.hasOutcome && data.outcome) {
     const outcomeInfo = OUTCOME_LABELS[data.outcome.outcome] || OUTCOME_LABELS.too_early;
     const confirmed = data.confirmedBiases || [];
-    const falsePositives = data.falsPositiveBiases || [];
+    const falsePositives = data.falsePositiveBiases || [];
     const hasDetails = confirmed.length > 0 || falsePositives.length > 0 || data.edgesUpdated;
 
     return (

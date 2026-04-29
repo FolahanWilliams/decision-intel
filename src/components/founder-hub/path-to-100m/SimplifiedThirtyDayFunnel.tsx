@@ -2,7 +2,11 @@
 
 import { useState } from 'react';
 import { ChevronRight, ChevronDown, Check, EyeOff, Building2, X } from 'lucide-react';
-import { SIMPLIFIED_FUNNEL, FEATURE_VERDICTS, type FeatureVerdict } from './data';
+import {
+  SIMPLIFIED_FUNNEL,
+  FEATURE_VERDICTS,
+  type FeatureVerdict,
+} from './data/simplified-funnel';
 
 const VERDICT_COLOR: Record<FeatureVerdict['verdict'], string> = {
   keep: '#16A34A',

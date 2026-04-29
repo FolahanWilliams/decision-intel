@@ -48,7 +48,7 @@ interface CaseStudyDef {
     outcome: string;
     impactScore: number;
     confirmedBiases: string[];
-    falsPositiveBiases: string[];
+    falsePositiveBiases: string[];
     notes: string;
   };
   dealOutcome?: {
@@ -112,7 +112,7 @@ const CASE_STUDIES: CaseStudyDef[] = [
       outcome: 'failure',
       impactScore: 85,
       confirmedBiases: ['Anchoring Bias', 'Confirmation Bias', 'Overconfidence'],
-      falsPositiveBiases: [],
+      falsePositiveBiases: [],
       notes:
         'Company missed Y1 revenue target by 31%. Net retention continued declining to 96%. Cross-sell initiative failed to gain traction. Deal ultimately restructured at 0.7x MOIC.',
     },
@@ -157,7 +157,7 @@ const CASE_STUDIES: CaseStudyDef[] = [
       outcome: 'success',
       impactScore: 45,
       confirmedBiases: ['Anchoring Bias'],
-      falsPositiveBiases: ['Authority Bias'],
+      falsePositiveBiases: ['Authority Bias'],
       notes:
         'Company exceeded Y1 revenue target by 18%. Regulatory tailwind thesis played out as predicted. Strategic partnership with major bank announced. Authority bias flag was a false positive — co-investor added genuine operational value.',
     },
@@ -211,7 +211,7 @@ const CASE_STUDIES: CaseStudyDef[] = [
       outcome: 'partial_success',
       impactScore: 62,
       confirmedBiases: ['Planning Fallacy', 'Groupthink'],
-      falsPositiveBiases: [],
+      falsePositiveBiases: [],
       notes:
         'Integration took 14 months vs. 6-month projection (planning fallacy confirmed). Synergies eventually materialized but 8 months late. Devil advocacy would have surfaced the integration risk earlier.',
     },
@@ -282,7 +282,7 @@ const CASE_STUDIES: CaseStudyDef[] = [
         'Anchoring Bias',
         'Commitment Escalation',
       ],
-      falsPositiveBiases: [],
+      falsePositiveBiases: [],
       notes:
         'Brand failed to reverse declining trajectory. Same-store sales continued falling (-12% in Y2). New management team replaced after 14 months. Investment written down to 0.3x MOIC.',
     },
@@ -326,7 +326,7 @@ const CASE_STUDIES: CaseStudyDef[] = [
       outcome: 'success',
       impactScore: 25,
       confirmedBiases: [],
-      falsPositiveBiases: ['Optimism Bias'],
+      falsePositiveBiases: ['Optimism Bias'],
       notes:
         'Company hit 38% market penetration (above the suggested 32% base case, invalidating the optimism bias flag). Channel GTM continued scaling effectively through $50M ARR. High-quality memo with genuinely low bias load.',
     },
@@ -392,7 +392,7 @@ const CASE_STUDIES: CaseStudyDef[] = [
       outcome: 'failure',
       impactScore: 94,
       confirmedBiases: ['Anchoring Bias', 'Sunk Cost Bias', 'Groupthink'],
-      falsPositiveBiases: [],
+      falsePositiveBiases: [],
       notes:
         'Integration stalled at 18 months with only 15% of projected synergies realized. Key engineering talent departed during integration. $800M write-down announced in Year 2. Board later acknowledged insufficient challenge of the acquisition thesis.',
     },
@@ -440,7 +440,7 @@ const CASE_STUDIES: CaseStudyDef[] = [
       outcome: 'partial_success',
       impactScore: 55,
       confirmedBiases: ['Planning Fallacy', 'Status Quo Bias'],
-      falsPositiveBiases: [],
+      falsePositiveBiases: [],
       notes:
         'Initiative delivered core capabilities but 18 months behind schedule (42 vs. 24 months) and 2.5x over budget ($375M vs. $150M). The phased approach recommended by legacy system defenders added unnecessary complexity. Cost savings are materializing but at roughly 60% of original projections.',
     },
@@ -499,7 +499,7 @@ const CASE_STUDIES: CaseStudyDef[] = [
       outcome: 'success',
       impactScore: 35,
       confirmedBiases: ['Authority Bias', 'Framing Effect'],
-      falsPositiveBiases: ['Availability Bias'],
+      falsePositiveBiases: ['Availability Bias'],
       notes:
         "The evaluation committee used the bias analysis to challenge their initial preference for the market leader. After a debiased re-evaluation, they chose Vendor B, saving $12M over 5 years with better interoperability scores. The availability bias flag was a false positive — Vendor C's reliability issues were later confirmed as systemic, not anecdotal.",
     },
@@ -562,7 +562,7 @@ const CASE_STUDIES: CaseStudyDef[] = [
         'Overconfidence',
         'Planning Fallacy',
       ],
-      falsPositiveBiases: [],
+      falsePositiveBiases: [],
       notes:
         'Product launched 6 months late (15 months vs. 9-month estimate). New market segment had fundamentally different needs that existing-customer research failed to surface. Product pulled after 12 months with $22M in sunk costs. Post-mortem confirmed all four detected biases were present in the decision process.',
     },
@@ -644,7 +644,7 @@ async function main() {
             outcome: cs.outcome.outcome,
             impactScore: cs.outcome.impactScore,
             confirmedBiases: cs.outcome.confirmedBiases,
-            falsPositiveBiases: cs.outcome.falsPositiveBiases,
+            falsePositiveBiases: cs.outcome.falsePositiveBiases,
             notes: cs.outcome.notes,
           },
         });

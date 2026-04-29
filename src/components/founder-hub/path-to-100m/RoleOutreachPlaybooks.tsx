@@ -15,7 +15,7 @@ import {
   Check,
   AlertCircle,
 } from 'lucide-react';
-import { ROLE_PLAYBOOKS, type RolePlaybook } from './data';
+import { ROLE_PLAYBOOKS, type RolePlaybook } from './data/role-playbooks';
 
 const BUYER_TYPE_ACCENT: Record<RolePlaybook['buyerType'], string> = {
   fast_validator: '#16A34A',

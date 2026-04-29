@@ -71,9 +71,9 @@ export async function computeMaturityScore(orgId: string): Promise<MaturityScore
       prisma.decisionOutcome.findMany({
         where: {
           orgId,
-          OR: [{ confirmedBiases: { isEmpty: false } }, { falsPositiveBiases: { isEmpty: false } }],
+          OR: [{ confirmedBiases: { isEmpty: false } }, { falsePositiveBiases: { isEmpty: false } }],
         },
-        select: { confirmedBiases: true, falsPositiveBiases: true },
+        select: { confirmedBiases: true, falsePositiveBiases: true },
       }),
 
       // Recent decision quality (last 45 days)
@@ -132,7 +132,7 @@ export async function computeMaturityScore(orgId: string): Promise<MaturityScore
         0
       );
       const totalFP = outcomesWithBiasFeedback.reduce(
-        (sum, o) => sum + o.falsPositiveBiases.length,
+        (sum, o) => sum + o.falsePositiveBiases.length,
         0
       );
       const total = totalConfirmed + totalFP;

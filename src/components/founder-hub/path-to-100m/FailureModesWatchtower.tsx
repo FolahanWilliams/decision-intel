@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronRight, ChevronDown, AlertOctagon, Eye } from 'lucide-react';
-import { FAILURE_MODES, type FailureMode } from './data';
+import { FAILURE_MODES, type FailureMode } from './data/failure-modes';
 
 const EXPOSURE_COLOR: Record<FailureMode['diExposure'], string> = {
   critical: '#DC2626',
