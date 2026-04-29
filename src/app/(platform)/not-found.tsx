@@ -16,7 +16,14 @@ export default function PlatformNotFound() {
           404
         </p>
 
-        <h1 className="text-2xl font-semibold -mt-4" style={{ color: 'var(--text-primary)' }}>
+        <h1
+          className="font-semibold -mt-4"
+          style={{
+            fontSize: 'var(--fs-page-h1-platform)',
+            letterSpacing: '-0.03em',
+            color: 'var(--text-primary)',
+          }}
+        >
           Page not found
         </h1>
 

@@ -115,7 +115,13 @@ export default function NewDecisionPage() {
               <Target className="h-6 w-6 text-indigo-400" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-[var(--text-primary)]">
+              <h1
+                className="font-bold text-[var(--text-primary)]"
+                style={{
+                  fontSize: 'var(--fs-page-h1-platform)',
+                  letterSpacing: '-0.03em',
+                }}
+              >
                 Frame Your Decision{' '}
                 <span className="text-sm font-normal text-[var(--text-muted)]">(optional)</span>
               </h1>

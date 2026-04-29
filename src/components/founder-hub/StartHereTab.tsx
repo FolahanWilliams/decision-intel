@@ -23,7 +23,13 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
-import { CheckCircle2, Sparkles, Compass, ArrowRight } from 'lucide-react';
+import {
+  CheckCircle2,
+  Sparkles,
+  Compass,
+  ArrowRight,
+  Activity,
+} from 'lucide-react';
 import {
   POSITIONING_HERO_PRIMARY,
   POSITIONING_HERO_SECONDARY,
@@ -35,6 +41,10 @@ import {
   BANNED_VOCABULARY,
   COLD_CONTEXT_ONRAMPS,
 } from '@/lib/constants/icp';
+import {
+  PLATFORM_BASELINE_SNAPSHOT,
+  PLATFORM_BASELINE_SNAPSHOT_COMPUTED_AT,
+} from '@/lib/learning/platform-baseline-snapshot';
 import { FounderHubMap } from './start-here/FounderHubMap';
 import { JourneySelector } from './start-here/JourneySelector';
 import { JourneyDetailStrip } from './start-here/JourneyDetailStrip';
@@ -177,6 +187,7 @@ export function StartHereTab({ onNavigateToTab }: Props) {
     <div>
       {renderHero()}
       {renderPositioningAnchor()}
+      {renderCalibrationCard(onNavigateToTab)}
 
       <JourneySelector active={activeJourney} onSelect={handleSelectJourney} />
 
@@ -303,6 +314,68 @@ function renderPositioningAnchor() {
   );
 }
 
+// ─── Platform calibration anchor (F1 lock 2026-04-29) ──────────────
+//
+// Surfaces the seed Brier baseline so the founder sees the deck-grade
+// answer to "show me your outcome calibration" the moment they land on
+// the founder hub. Numbers come from PLATFORM_BASELINE_SNAPSHOT — the
+// same bundle-safe literals that power the landing-page credibility
+// strip; drift between snapshot and live function is caught by
+// platform-baseline-snapshot.test.ts.
+//
+// Click jumps to the InvestorMetricsTracker (rank 17, "Platform
+// Calibration Credibility") inside Path to $100M ARR for the full
+// metric card.
+
+function renderCalibrationCard(onNavigateToTab: (tabId: string) => void) {
+  const baseline = PLATFORM_BASELINE_SNAPSHOT;
+  const accuracyPct = Math.round(baseline.classificationAccuracy * 100);
+  return (
+    <div style={calibrationCardStyle}>
+      <div style={calibrationEyebrow}>
+        <Activity size={11} /> Platform calibration · investor anchor — F1 lock 2026-04-29
+      </div>
+      <div className="calibration-card-grid" style={calibrationGrid}>
+        <div style={calibrationStat}>
+          <div style={calibrationValue}>{baseline.meanBrier.toFixed(3)}</div>
+          <div style={calibrationLabel}>Mean Brier ({baseline.meanCategory})</div>
+        </div>
+        <div style={calibrationStat}>
+          <div style={calibrationValue}>{accuracyPct}%</div>
+          <div style={calibrationLabel}>
+            Classification accuracy · DQI 55 cutoff · {baseline.classificationCounts.correct}/
+            {baseline.classificationCounts.scored}
+          </div>
+        </div>
+        <div style={calibrationStat}>
+          <div style={calibrationValue}>{baseline.n}</div>
+          <div style={calibrationLabel}>Audited corporate decisions</div>
+        </div>
+      </div>
+      <div style={calibrationContext}>
+        Seed methodology · published DQI weights applied without hindsight to the case-study
+        library. Tetlock superforecasters score Brier ~0.13; CIA analysts ~0.23. Per-org Brier
+        replaces this seed once a customer org has ≥1 closed outcome (Outcome Gate Phase 1+2+3
+        already enforce the workflow). Snapshot regenerated {PLATFORM_BASELINE_SNAPSHOT_COMPUTED_AT}.
+      </div>
+      <button
+        type="button"
+        onClick={() => onNavigateToTab('path_to_100m')}
+        style={calibrationCta}
+      >
+        Open Path to $100M ARR · Investor Metrics Tracker <ArrowRight size={11} />
+      </button>
+      <style>{`
+        @media (max-width: 700px) {
+          .calibration-card-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 // ─── Styles ─────────────────────────────────────────────────────────
 
 const heroStyle: React.CSSProperties = {
@@ -372,6 +445,80 @@ const anchorBanned: React.CSSProperties = {
   color: 'var(--text-muted)',
   fontSize: 11,
   marginTop: 8,
+};
+
+const calibrationCardStyle: React.CSSProperties = {
+  marginBottom: 14,
+  padding: 14,
+  background: 'var(--bg-card)',
+  border: '1px solid var(--border-color)',
+  borderLeft: '3px solid rgb(79, 70, 229)',
+  borderRadius: 'var(--radius-md)',
+  fontSize: 12,
+  color: 'var(--text-primary)',
+};
+
+const calibrationEyebrow: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 6,
+  fontSize: 9,
+  fontWeight: 800,
+  textTransform: 'uppercase',
+  letterSpacing: '0.1em',
+  color: 'rgb(79, 70, 229)',
+  marginBottom: 10,
+};
+
+const calibrationGrid: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(3, 1fr)',
+  gap: 12,
+  marginBottom: 10,
+};
+
+const calibrationStat: React.CSSProperties = {
+  padding: '8px 10px',
+  background: 'rgba(99, 102, 241, 0.05)',
+  border: '1px solid rgba(99, 102, 241, 0.18)',
+  borderRadius: 'var(--radius-sm)',
+};
+
+const calibrationValue: React.CSSProperties = {
+  fontSize: 20,
+  fontWeight: 800,
+  color: 'var(--text-primary)',
+  fontVariantNumeric: 'tabular-nums',
+  letterSpacing: '-0.01em',
+  lineHeight: 1.05,
+  marginBottom: 4,
+};
+
+const calibrationLabel: React.CSSProperties = {
+  fontSize: 10.5,
+  color: 'var(--text-muted)',
+  lineHeight: 1.35,
+};
+
+const calibrationContext: React.CSSProperties = {
+  fontSize: 11.5,
+  color: 'var(--text-secondary)',
+  lineHeight: 1.55,
+  marginBottom: 10,
+};
+
+const calibrationCta: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 6,
+  padding: '6px 10px',
+  fontSize: 11.5,
+  fontWeight: 600,
+  background: 'rgba(99, 102, 241, 0.06)',
+  border: '1px solid rgba(99, 102, 241, 0.30)',
+  borderRadius: 'var(--radius-sm)',
+  color: 'rgb(79, 70, 229)',
+  cursor: 'pointer',
 };
 
 const quickJumpsWrap: React.CSSProperties = {

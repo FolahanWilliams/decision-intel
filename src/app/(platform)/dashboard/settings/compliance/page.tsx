@@ -503,7 +503,15 @@ export default function CompliancePosturePage() {
         <div style={{ marginBottom: 32 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
             <Shield size={24} style={{ color: 'var(--accent-primary, #16a34a)' }} />
-            <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
+            <h1
+              style={{
+                fontSize: 'var(--fs-page-h1-platform)',
+                fontWeight: 800,
+                letterSpacing: '-0.03em',
+                color: 'var(--text-primary)',
+                margin: 0,
+              }}
+            >
               Compliance Posture
             </h1>
           </div>

@@ -182,7 +182,16 @@ export default function PersonProfilePage({
             <User size={28} color="#fff" />
           </div>
           <div>
-            <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>{titleCase(canonicalName)}</h1>
+            <h1
+              style={{
+                fontSize: 'var(--fs-page-h1-platform)',
+                fontWeight: 700,
+                letterSpacing: '-0.03em',
+                margin: 0,
+              }}
+            >
+              {titleCase(canonicalName)}
+            </h1>
             <p className="text-muted text-sm" style={{ margin: 0 }}>
               {profile
                 ? `${profile.decisionCount} decision${profile.decisionCount === 1 ? '' : 's'} in this organization`
