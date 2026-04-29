@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Loader2, Sparkles, AlertTriangle } from 'lucide-react';
+import { ArrowRight, Loader2, AlertTriangle } from 'lucide-react';
 import { createClientLogger } from '@/lib/utils/logger';
 
 const log = createClientLogger('SimulateCeoClient');
@@ -261,8 +261,8 @@ export function SimulateCeoClient() {
                 </>
               ) : (
                 <>
-                  <Sparkles size={16} />
                   Simulate CEO questions
+                  <ArrowRight size={16} />
                 </>
               )}
             </button>

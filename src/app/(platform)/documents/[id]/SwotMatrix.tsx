@@ -60,14 +60,24 @@ export function SwotMatrix({ data }: { data: SwotAnalysisResult }) {
       <div
         className="md:col-span-2 mt-4 p-4"
         style={{
-          background: 'linear-gradient(to right, #0f172a, #1e293b)',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
+          background: 'var(--bg-secondary)',
+          border: '1px solid var(--border-color)',
+          borderLeft: '3px solid var(--warning)',
+          borderRadius: 'var(--radius-md)',
         }}
       >
-        <h4 className="font-semibold mb-2 flex items-center gap-2" style={{ color: '#FBBF24' }}>
+        <h4
+          className="font-semibold mb-2 flex items-center gap-2"
+          style={{ color: 'var(--warning)' }}
+        >
           <Target className="w-4 h-4" /> Strategic Advice
         </h4>
-        <p className="text-slate-300 text-sm leading-relaxed">{data.strategicAdvice}</p>
+        <p
+          className="text-sm leading-relaxed"
+          style={{ color: 'var(--text-primary)' }}
+        >
+          {data.strategicAdvice}
+        </p>
       </div>
     </div>
   );
