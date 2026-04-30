@@ -1231,8 +1231,9 @@ export default function FounderHubPage() {
             <Rocket size={26} style={{ color: 'var(--accent-primary)' }} />
             <h1
               style={{
-                fontSize: 24,
+                fontSize: 'var(--fs-page-h1-platform)',
                 fontWeight: 800,
+                letterSpacing: '-0.03em',
                 color: 'var(--text-primary, #fff)',
                 margin: 0,
               }}
@@ -1264,7 +1265,7 @@ export default function FounderHubPage() {
                 fontSize: 12,
                 fontWeight: 700,
                 color: '#fff',
-                background: '#16A34A',
+                background: 'var(--accent-primary)',
                 border: 'none',
                 borderRadius: 999,
                 cursor: 'pointer',

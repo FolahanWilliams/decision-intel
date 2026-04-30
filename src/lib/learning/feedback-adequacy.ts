@@ -57,7 +57,6 @@ import type { PrismaClient } from '@prisma/client';
 
 const log = (...args: unknown[]) => {
   if (process.env.DEBUG_FEEDBACK_ADEQUACY) {
-    // eslint-disable-next-line no-console
     console.warn('[feedback-adequacy]', ...args);
   }
 };

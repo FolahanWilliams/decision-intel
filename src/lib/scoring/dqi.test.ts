@@ -377,9 +377,14 @@ describe('computeDQI', () => {
     expect(result.score).toBeLessThanOrEqual(100);
   });
 
-  it('methodologyVersion is 2.0.0', () => {
+  it('methodologyVersion is 2.1.0 when validityClass is provided', () => {
+    const result = computeDQI(makeInput({ validityClass: 'high' }));
+    expect(result.methodologyVersion).toBe('2.1.0');
+  });
+
+  it('methodologyVersion falls back to 2.0.0-no-validity when validityClass is absent', () => {
     const result = computeDQI(makeInput());
-    expect(result.methodologyVersion).toBe('2.0.0');
+    expect(result.methodologyVersion).toBe('2.0.0-no-validity');
   });
 
   it('topImprovement identifies lowest-weighted-potential component', () => {

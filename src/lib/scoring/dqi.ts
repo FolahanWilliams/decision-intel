@@ -22,6 +22,7 @@ import { createLogger } from '@/lib/utils/logger';
 import { ALL_CASES, isFailureOutcome, isSuccessOutcome } from '@/lib/data/case-studies';
 import type { CaseStudy } from '@/lib/data/case-studies';
 import { computeCorrelationMultiplier } from '@/lib/data/case-correlations';
+import { getValidityWeightShift } from '@/lib/learning/validity-classifier';
 
 const logger = createLogger('DQI');
 
@@ -751,11 +752,10 @@ export function computeDQI(
   // (locked 2026-04-30) — see src/lib/learning/validity-classifier.ts.
   let baseWeights = options?.orgWeightOverrides;
   if (input.validityClass) {
-    // Lazy require to avoid a circular dep at module load time —
-    // validity-classifier imports the WEIGHTS type from this file.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { getValidityWeightShift } =
-      require('@/lib/learning/validity-classifier') as typeof import('@/lib/learning/validity-classifier');
+    // validity-classifier only imports `WEIGHTS` as a type from this file
+    // (erased at compile time), so a static import is safe — no runtime
+    // circular dep. Required for ESM/Vitest path-alias resolution; the
+    // prior lazy require() bypassed `@/` alias resolution under Vitest.
     const validityShift = getValidityWeightShift(input.validityClass);
     if (validityShift) {
       baseWeights = { ...validityShift, ...(baseWeights ?? {}) };

@@ -367,7 +367,7 @@ export const MAALOUF_PRINCIPLES: MaaloufPrinciple[] = [
     maaloufQuote:
       'If you are in business for six months and I am in business for six years, and we are fighting for the same client — I am gonna win. People do not like to be the only people working with you.',
     diApplication:
-      'You cannot fake six years of operation, but you CAN fake the social-proof equivalents: a 143-case reference library shipped, a 17-framework compliance map (soon 18), the Wiz advisor relationship documented, R²F as a category claim with academic anchors.',
+      'You cannot fake six years of operation, but you CAN fake the social-proof equivalents: a 143-case reference library shipped, a multi-jurisdiction compliance map covering G7 / EU / GCC / African markets, the Wiz advisor relationship documented, R²F as a category claim with academic anchors.',
     antiPattern:
       'Pretending you have customers you do not have. Sophisticated buyers triangulate via LinkedIn, Crunchbase, and direct reference checks. One discovered lie ends the deal.',
     idealPhrase:
@@ -500,12 +500,12 @@ export const SILENT_OBJECTIONS: SilentObjection[] = [
     id: 'pan_african_regulatory',
     label: 'The Pan-African regulatory illusion',
     whatBuyerThinks:
-      "You pitched me a 17-framework compliance map tailored for African funds, but you completely missed the Nigerian SEC's Investment and Securities Act 2007 (ISA), and you are referencing the outdated 2018 FRC Nigeria code. You claim to understand my market, but you do not actually know my regulators.",
+      "You pitched me a Pan-African compliance map tailored for African funds, but I want to know whether you cover MY primary regulator (e.g. Nigerian SEC ISA 2007, current FRC Nigeria code, CBN, NDPR). If those are not in the audit by name, you do not actually know my market.",
     whyItKillsTheDeal:
-      'For a licensed firm like Sankore managing ₦120B AUM, regulatory mapping is not a marketing bullet point — it is a legal requirement. Falsely claiming or presenting incomplete regional compliance breaks trust instantly and turns an "insider" wedge into an "outsider" misstep.',
+      'For a licensed firm managing significant AUM, regulatory mapping is not a marketing bullet point — it is a legal requirement. Presenting incomplete regional compliance breaks trust instantly and turns an "insider" wedge into an "outsider" misstep.',
     thisWeekFix:
-      'Map the Nigerian SEC (ISA 2007) and current FRC Nigeria code into the compliance engine today. Update all copy from "17 frameworks" to "18 frameworks" — the count must derive from getAllRegisteredFrameworks().length so the change ripples without manual edits. Never present the regulatory map to an EM fund without their primary governing body included.',
-    status: 'todo',
+      'ISA 2007 was added to africa-frameworks.ts in the 2026-04-29 ship; the Pan-African map now covers 12 African regimes (NDPR, CBN, FRC Nigeria, ISA 2007, WAEMU, CMA Kenya, CBK, BoG, CBE, PoPIA, SARB, BoT). Every consumer surface MUST derive the count from getAllRegisteredFrameworks().length so additions ripple automatically — never literal a number. When entering a new market, add the primary governing body in the same week you enter, not after.',
+    status: 'shipped',
     verbatimResponse:
       "You are right, and that is exactly why we map directly with the regulator's primary instrument. The Nigerian SEC ISA 2007 and the current FRC Nigeria Code are mapped flag-by-flag to the relevant DPR sections. Bring me your toughest compliance question and we will walk through how the engine catches it.",
   },
@@ -578,7 +578,7 @@ export const SIMPLIFIED_FUNNEL: FunnelStep[] = [
     label: 'Landing Page · The Hook',
     what: 'H1: "Bulletproof your IC Memo / CIM before the partners tear it apart." Massive center-page text box and PDF dropzone. "Paste your draft. Get the 3 fatal flaws in 60 seconds."',
     whatItIsNot:
-      'NO "native reasoning layer" abstraction. NO "17-framework compliance map" wall. NO category-creation framing for cold readers. The hook is fear, not category claims.',
+      'NO "native reasoning layer" abstraction. NO "X-framework compliance map" wall. NO category-creation framing for cold readers. The hook is fear, not category claims.',
     action:
       'The visitor pastes their draft memo or drops a PDF. The 60-second progress bar starts immediately. No registration wall.',
   },

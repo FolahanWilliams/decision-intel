@@ -64,7 +64,7 @@ export function InlineDealUploadZone({ dealId, dealName, onUploaded }: Props) {
       setProgress({ done: 0, total: list.length });
       let succeeded = 0;
       for (let i = 0; i < list.length; i += 1) {
-        // eslint-disable-next-line no-await-in-loop -- sequential by design (see component header)
+        // Sequential by design (see component header) — uploads happen one at a time.
         const ok = await uploadFile(list[i]);
         if (ok) succeeded += 1;
         setProgress({ done: i + 1, total: list.length });

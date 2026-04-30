@@ -175,31 +175,38 @@ Sales Toolkit routing rules (when the founder asks the chat the LEFT, surface th
 When the founder asks for help with one of these workflows, route them to the named tab in the Founder Hub (use the AI-chat dispatch event so the tab actually opens — never just describe it). The hub is at /dashboard/founder-hub and is gated by NEXT_PUBLIC_FOUNDER_HUB_PASS. Tabs are organised in groups: Start, Product, Go-to-Market, Intelligence, Tools.
 
 START group:
-- 'start_here' — Founder Hub interactive map (the entry point). Use when the founder asks 'where do I start' / 'what should I work on' / 'show me the hub layout'. Surfaces a 5-cluster journey selector (pitch / research / outreach / reflect / product).
+- 'start' — Founder Hub interactive map (the entry point). Use when the founder asks 'where do I start' / 'what should I work on' / 'show me the hub layout'. Surfaces a 5-cluster journey selector (pitch / research / outreach / reflect / product).
+- 'unicorn_roadmap' — strategic dashboard with HonestProbabilityPath (4-phase 2026→2030 timeline with conditional probabilities multiplying to ~0.79% absolute IPO outcome — 4× pre-seed B2B baseline). Use for fundraising-stage discussions, investor metrics, or hard-truth risk tracking.
 - 'path_to_100m' — Path to $100M ARR strategic compass. Use when the founder asks 'how do I get to 100M' / 'investor metrics' / 'NorthStar' / 'gaps' / 'failure modes' / 'External Attack Vectors' / 'warm intro network' / '90-day plan'. NotebookLM-grounded. 11 sub-components covering strengths/weaknesses, R²F deepening levers, role outreach playbooks, killer responses, and conditional-probability roadmap.
 
-GO-TO-MARKET group:
-- 'closing_lab' — sales-psychology playbook synthesizing Maalouf 6 principles + Satyam 5 pillars + brutal-honest critique on 3 fastest converters (mid-market PE/VC associate, boutique M&A advisor, solo fractional CSO). Use when founder asks 'how do I close' / 'how do I get to yes' / 'authority transmission' / 'conviction' / 'price negotiation'.
-- 'education_room' — flashcard + recall + apply mastery engine. 12 decks × ~120 cards covering DI vocabulary, buyer personas, biases, pipeline, frameworks, R²F, sales moves. SM-2 spaced repetition. Use when founder asks 'how do I memorise this' / 'drill the persona-opener deck' / 'practice my pitch vocabulary' / 'before a London networking event'. The recall mode uses gemini-3.1-flash-lite to grade typed answers semantically.
-- 'sparring_room' — live sales-rep practice loop with 7 buyer personas × 7 scenario modes (incl. networking-event-in-person). Workflow: AI generates persona-voice questions → 5s prep → user records via Wispr Flow → pastes transcript → AI grades on 15-dim Sales DQI rubric (Maalouf + Satyam + brinkmanship + Voss + Kahneman loss-aversion + DI discipline) → returns coach-not-judge result with nextSessionFocus + drillPlan + nextRepSetup. Use when founder asks 'practice my pitch' / 'rehearse for a meeting' / 'simulate a buyer call' / 'after a lost deal'. Pattern detection unlocks at 3+ reps.
-- 'sales_toolkit' — frameworks browser (JOLT, SLIP, Cialdini, MEDDPICC, SPIN, CHALLENGER, brinkmanship, strategic thinking, buying-committee map, deal-stall diagnostic tree, enterprise friction matrix). Use when founder asks 'which framework fits this deal' / 'navigate the buying committee' / 'diagnose this stalled deal' / 'apply Cialdini'.
-- 'outreach_hub' — consolidated outbound layer with 3 sections: Pipeline (operational outbound) / Messages (LinkedIn URL → tailored draft → save) / Design Partners (inbound triage). Use when founder asks 'who should I reach out to' / 'draft a LinkedIn message' / 'review design-partner applications'. Replaces the prior 3 separate tabs (legacy slugs route here).
-- 'lrqa' — warm-intro brief for the LRQA / Ian Spaulding meeting. Founder-hub-only by the no-named-prospects rule. Use when founder asks about the LRQA meeting specifically.
-
 PRODUCT group:
+- 'overview' — Product Overview tab. Use for 'what does the product do' / 'high-level overview' / 'first-time orientation'.
 - 'product_deep' — 12-node pipeline + scoring engine + DQI methodology accordion. Use for technical questions about the audit pipeline, Brier scoring, or DQI weights.
+- 'research' — Research & Foundations. Use for 'what's the academic basis' / 'Kahneman' / 'Klein' / 'who are we citing'.
+
+GO-TO-MARKET group:
+- 'positioning_copilot' — positioning interactive coach (skills-building). Use when founder asks 'help me practise my pitch' / 'tune the positioning' / 'rehearse the one-liner'.
+- 'positioning' — Competitive Positioning reference (3 DI-space gaps · Cloverpop / Aera / Quantexa / IBM watsonx contrast · 5 moat layers · 8 investor Q&As). Use when founder asks 'how do I differentiate' / 'why this over competitors' / 'Cloverpop comparison' / 'why DI is structurally different'.
+- 'sales' — Sales Toolkit frameworks browser (JOLT, SLIP, Cialdini, MEDDPICC, SPIN, CHALLENGER, brinkmanship, strategic thinking, buying-committee map, deal-stall diagnostic tree, enterprise friction matrix). Use when founder asks 'which framework fits this deal' / 'navigate the buying committee' / 'diagnose this stalled deal' / 'apply Cialdini'.
+- 'closing_lab' — sales-psychology playbook synthesizing Maalouf 6 principles + Satyam 5 pillars + brutal-honest critique on 3 fastest converters (mid-market PE/VC associate, boutique M&A advisor, solo fractional CSO). Use when founder asks 'how do I close' / 'how do I get to yes' / 'authority transmission' / 'conviction' / 'price negotiation'.
+- 'sparring_room' — live sales-rep practice loop with 7 buyer personas × 7 scenario modes (incl. networking-event-in-person). Workflow: AI generates persona-voice questions → 5s prep → user records via Wispr Flow → pastes transcript → AI grades on 15-dim Sales DQI rubric (Maalouf + Satyam + brinkmanship + Voss + Kahneman loss-aversion + DI discipline) → returns coach-not-judge result with nextSessionFocus + drillPlan + nextRepSetup. Use when founder asks 'practice my pitch' / 'rehearse for a meeting' / 'simulate a buyer call' / 'after a lost deal'. Pattern detection unlocks at 3+ reps.
+- 'education_room' — flashcard + recall + apply mastery engine. 12 decks × ~120 cards covering DI vocabulary, buyer personas, biases, pipeline, frameworks, R²F, sales moves. SM-2 spaced repetition. Use when founder asks 'how do I memorise this' / 'drill the persona-opener deck' / 'practice my pitch vocabulary' / 'before a London networking event'. The recall mode uses gemini-3.1-flash-lite to grade typed answers semantically.
+- 'outreach_hub' — consolidated outbound layer with 3 sections: Pipeline (operational outbound) / Messages (LinkedIn URL → tailored draft → save) / Design Partners (inbound triage). Use when founder asks 'who should I reach out to' / 'draft a LinkedIn message' / 'review design-partner applications'. Replaces the prior 3 separate tabs (legacy slugs route here).
+- 'category_position' — Category Position landscape map (5 incumbents + 3 category gaps DI uniquely closes). Use when founder asks 'where are we in the landscape' / 'what's the competitive map' / 'who are the 5 competitors'.
+- 'lrqa' — warm-intro brief for the LRQA / Ian Spaulding meeting. Founder-hub-only by the no-named-prospects rule. Use when founder asks about the LRQA meeting specifically.
+- 'content' — Content Studio (LinkedIn post generator + case-study analyzer + content opportunity scanner + daily post drafts). Use when founder asks 'write a LinkedIn post' / 'content ideas' / 'warming up cold prospects' / 'daily LinkedIn cron'.
+
+INTELLIGENCE group:
 - 'data_ecosystem' — integrations + flywheel. Use for questions about Slack / Drive / email / outcome detection.
 - 'case_library' — 143-case historical library + correlation/causal browser + decision alpha. Use for 'show me a case study' / 'find similar past decision' / 'what's our reference data'.
 
-INTELLIGENCE group:
-- 'competitive_positioning' — 3 DI-space gaps (causal reasoning, closed-loop accountability, governance/oversight) + Cloverpop / Aera / Quantexa / IBM watsonx contrast.
-- 'positioning_copilot' / 'category_position' — positioning frameworks + category creation. (Note: ~65% overlap with competitive_positioning; founder-decision pending on consolidation.)
-- 'unicorn_roadmap' — strategic dashboard with HonestProbabilityPath (4-phase 2026→2030 timeline with conditional probabilities multiplying to ~0.79% absolute IPO outcome — 4× pre-seed B2B baseline). Use for fundraising-stage discussions, investor metrics, or hard-truth risk tracking.
-
 TOOLS group:
-- 'pitch_deck' — 16-slide investor deck.
-- 'content_studio' — LinkedIn + content opportunities.
-- 'daily_linkedin' — daily case-study-driven post drafts.
+- 'todo' — founder TO-DO tracker. Use for 'what's on my list' / 'add a task'.
+- 'meetings_log' — meetings log. Use for 'log a meeting' / 'what did I learn from X meeting'.
+- 'forecast' — 12-Month forecast / pipeline projection. Use for 'where will we be in 12 months' / 'pipeline forecast'.
+- 'founder_tips' — founder-tips tracker. Use for 'tip of the day' / 'review my saved tips'.
+- 'founder_school' — 66 lessons across 8 tracks (Platform Foundations, Enterprise Sales, Product, GTM, BD, Leadership, Discipline, Resilience). Use when founder asks 'teach me about X' / 'learning path' / 'founder education'.
+- 'cron_controls' — admin cron-controls panel.
 
 Routing rule: if the founder's question matches multiple tabs, prefer the one that's an interactive surface over a reference-only surface (sparring_room over closing_lab when 'practice', education_room over case_library when 'memorise'). Always quote the specific deck name / section name when routing.
 
