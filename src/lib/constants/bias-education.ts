@@ -743,6 +743,103 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
       'If your team has been evaluating options for weeks without converging, you probably have too many options.',
     difficulty: 'easy',
   },
+  illusion_of_validity: {
+    taxonomyId: 'DI-B-021',
+    realWorldExample: {
+      title: 'Long-Term Israeli Officer-Selection Forecasts',
+      description:
+        "Kahneman's own first encounter with the illusion: as a young Israeli army psychologist running officer-candidate assessments, he and his colleagues felt highly confident in their predictions of who would succeed in officer school — even after the validity of their forecasts was repeatedly shown to be near zero. Their confidence, the paper concludes, came from the coherence of the story they could construct from each candidate's behavior, not from any evidence the predictions actually worked.",
+      company: 'Israel Defense Forces / Kahneman & Klein 2009',
+      year: '1955–2009',
+    },
+    debiasingTechniques: [
+      'Decouple confidence from accuracy: ask the author to score how confident they are AND how often similar judgments by similar people have been right historically. The gap is the illusion.',
+      'Penalize rhetorical certainty in low-validity environments. Phrases like "we are certain", "guaranteed", "highly predictable", "clear path to" without external base-rate evidence are signals — not strengths.',
+      'Run the memo past a reader who does NOT share the author\'s prior context. Coherence collapses when the reader cannot reconstruct the same story from the same data.',
+      'Force a counter-narrative: write the same memo from the perspective of a sceptic who reaches the opposite conclusion using the same facts. If both narratives feel equally coherent, neither is evidence.',
+    ],
+    relatedBiases: [
+      {
+        key: 'overconfidence_bias',
+        reason:
+          'Overconfidence is the broader umbrella; illusion of validity is the specific mechanism — narrative coherence creating false confidence',
+      },
+      {
+        key: 'confirmation_bias',
+        reason:
+          'Confirmation bias supplies the coherent story (selectively gathered evidence); illusion of validity is the confidence that follows',
+      },
+      {
+        key: 'halo_effect',
+        reason:
+          'Halo effect makes the story easier to construct (one positive feature carries the whole assessment); illusion of validity is the confidence the story produces',
+      },
+    ],
+    academicReference: {
+      citation:
+        'Kahneman, D. & Klein, G. (2009). "Conditions for intuitive expertise: A failure to disagree." American Psychologist, 64(6), 515–526.',
+      authors: 'Kahneman, D. & Klein, G.',
+      year: '2009',
+      title: 'Conditions for intuitive expertise: A failure to disagree',
+      venue: 'American Psychologist, 64(6), 515–526',
+      doi: '10.1037/a0016755',
+    },
+    quickTip:
+      'High confidence in a low-validity environment (M&A, long-term strategy, long-horizon market forecasts) is a liability, not an asset. The clearer the story feels, the more carefully you should look at the evidence behind it.',
+    difficulty: 'hard',
+  },
+  inside_view_dominance: {
+    taxonomyId: 'DI-B-022',
+    realWorldExample: {
+      title: 'The Israeli Curriculum-Writing Team',
+      description:
+        "Kahneman's canonical example (revisited in the 2003 Delusions of Success paper): a curriculum-writing team estimated they would finish in 18 months, even though the team's most senior member knew that 40% of such projects had previously been abandoned and the rest averaged 8 years. The inside-view narrative (we are talented, motivated, on track, etc.) completely dominated the outside-view base rate (40% abandonment, 8-year median for completed projects). The team finished in 8 years.",
+      company: 'Israeli Ministry of Education / Kahneman 1979 (revisited 2003)',
+      year: '1976-1984',
+    },
+    debiasingTechniques: [
+      'Construct the reference class first, the inside-view second. Force the memo to begin with "the historical class of similar decisions failed in N% of cases" before stating the recommendation.',
+      'Use Kahneman & Lovallo (2003) reference-class forecasting: identify 5-10 historically similar decisions, look up their actual outcomes, and benchmark the current decision against that distribution.',
+      'Penalize "this case is special" / "we are different" / "the comparables don\'t apply" framing. When the inside-view narrative explicitly dismisses the outside-view base rate, that dismissal is itself the bias.',
+      'In low-validity environments (M&A, market entry, long-horizon strategy), require the recommendation to be defended explicitly against the matched reference class — not just on its inside-view merits.',
+    ],
+    relatedBiases: [
+      {
+        key: 'planning_fallacy',
+        reason:
+          'Planning fallacy is inside-view dominance applied to time and cost estimates specifically — same mechanism, narrower target',
+      },
+      {
+        key: 'overconfidence_bias',
+        reason:
+          'Inside-view-dominated narratives produce overconfidence because the absence of the reference class is mistaken for the absence of the risk',
+      },
+      {
+        key: 'illusion_of_validity',
+        reason:
+          'A coherent inside-view story produces illusion of validity; the outside-view base rate is the procedural antidote to both',
+      },
+      {
+        key: 'narrative_fallacy' as never,
+        reason: 'Both rely on storytelling to substitute for statistical reasoning',
+      },
+    ].filter(b => b.key !== 'narrative_fallacy') as Array<{
+      key: BiasCategory;
+      reason: string;
+    }>,
+    academicReference: {
+      citation:
+        'Kahneman, D. & Lovallo, D. (2003). "Delusions of Success: How Optimism Undermines Executives\' Decisions." Harvard Business Review, 81(7), 56–63.',
+      authors: 'Kahneman, D. & Lovallo, D.',
+      year: '2003',
+      title: "Delusions of Success: How Optimism Undermines Executives' Decisions",
+      venue: 'Harvard Business Review, 81(7), 56–63',
+      url: 'https://hbr.org/2003/07/delusions-of-success-how-optimism-undermines-executives-decisions',
+    },
+    quickTip:
+      'Before you read a strategic memo as written, find 5-10 historically similar decisions. The base rate of THAT class is the only valid first benchmark for THIS decision. Anything the memo says afterwards must defend itself against that base rate.',
+    difficulty: 'hard',
+  },
 };
 
 /** Get education content for a bias, with safe fallback for unrecognized keys. */

@@ -13,6 +13,7 @@ import { computeDQI, generateDQIBadge, type DQIInput } from '@/lib/scoring/dqi';
 import { BIAS_NODES } from '@/lib/ontology/bias-graph';
 import { createLogger } from '@/lib/utils/logger';
 import { getDocumentContent } from '@/lib/utils/encryption';
+import { classifyValidity } from '@/lib/learning/validity-classifier';
 
 const log = createLogger('DQIInternalRoute');
 
@@ -52,8 +53,15 @@ export async function GET(request: NextRequest) {
         factCheck: true,
         compliance: true,
         simulation: true,
+        judgeOutputs: true,
         document: {
-          select: { content: true, contentEncrypted: true, contentIv: true, contentTag: true },
+          select: {
+            content: true,
+            contentEncrypted: true,
+            contentIv: true,
+            contentTag: true,
+            documentType: true,
+          },
         },
       },
     });
@@ -183,6 +191,30 @@ export async function GET(request: NextRequest) {
     if (compoundData?.calibratedScore !== undefined) {
       dqiInput.compoundScore = compoundData.calibratedScore;
     }
+
+    // Validity-aware DQI shift (Kahneman & Klein 2009 first-condition
+    // operationalisation, locked 2026-04-30). Reads the persisted band
+    // from judgeOutputs.validityClassification first (set at audit-
+    // completion time); falls back to live compute for legacy
+    // analyses. The persisted value is the source of truth — every
+    // surface (DPR cover, document-detail UI, this DQI computation)
+    // reads the SAME band the audit was originally scored against.
+    const documentType =
+      (analysis.document as unknown as { documentType?: string | null })?.documentType ?? null;
+    const persistedValidity = (
+      analysis.judgeOutputs as { validityClassification?: { validityClass?: string } } | null
+    )?.validityClassification?.validityClass as
+      | 'high'
+      | 'medium'
+      | 'low'
+      | 'zero'
+      | undefined;
+    dqiInput.validityClass =
+      persistedValidity ??
+      classifyValidity({
+        documentType,
+        industry: null,
+      }).validityClass;
 
     // ── Compute DQI ───────────────────────────────────────────────────
     const dqi = computeDQI(dqiInput);

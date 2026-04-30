@@ -295,6 +295,14 @@ function renderPositioningAnchor() {
       <div style={anchorRow}>
         <strong>Audience:</strong> {ICP_AUDIENCE_SUMMARY}
       </div>
+      <div style={anchorRow}>
+        <strong>R²F operationalisation (locked 2026-04-30):</strong> 22-bias taxonomy (DI-B-001
+        through DI-B-022) · DQI methodology v2.1.0 with validity-aware structural weight shift ·
+        six paper-anchored signals on every DPR cover (Validity Classification → Org Calibration →
+        Feedback Adequacy → Reference Class Forecast → Counterfactual Impact → Recommended Action).
+        Academic anchors: Kahneman & Klein 2009, Kahneman & Lovallo 2003 HBR, Klein & Mitchell
+        1995. Paper-application sprint: 6 of 10 ranked items shipped.
+      </div>
       <div style={anchorBanned}>
         <strong>Banned:</strong>{' '}
         {BANNED_VOCABULARY.map((b, i) => (

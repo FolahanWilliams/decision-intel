@@ -49,6 +49,17 @@ const ALIASES: Record<string, BiasCategory> = {
   confirmation: 'confirmation_bias',
   'cognitive misering': 'cognitive_misering',
   'cognitive miser': 'cognitive_misering',
+  'illusion of validity': 'illusion_of_validity',
+  'illusory validity': 'illusion_of_validity',
+  'narrative coherence': 'illusion_of_validity',
+  'confidence by coherence': 'illusion_of_validity',
+  'inside view dominance': 'inside_view_dominance',
+  'inside-view dominance': 'inside_view_dominance',
+  'inside view bias': 'inside_view_dominance',
+  'inside view': 'inside_view_dominance',
+  'reference class neglect': 'inside_view_dominance',
+  'base rate neglect': 'inside_view_dominance',
+  'outside view neglect': 'inside_view_dominance',
 };
 
 /**

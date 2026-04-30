@@ -415,7 +415,9 @@ export type BiasCategory =
   | 'halo_effect'
   | 'gamblers_fallacy'
   | 'zeigarnik_effect'
-  | 'paradox_of_choice';
+  | 'paradox_of_choice'
+  | 'illusion_of_validity'
+  | 'inside_view_dominance';
 
 export const BIAS_CATEGORIES: Record<
   BiasCategory,
@@ -522,6 +524,18 @@ export const BIAS_CATEGORIES: Record<
     name: 'Paradox of Choice',
     description: 'Decision paralysis or lower satisfaction caused by having too many options',
     category: 'Judgment',
+  },
+  illusion_of_validity: {
+    name: 'Illusion of Validity',
+    description:
+      'Subjective confidence rooted in narrative coherence, not evidence quality — the strength of the story the brain has constructed substitutes for the strength of the evidence behind it (Kahneman & Klein, 2009)',
+    category: 'Overconfidence',
+  },
+  inside_view_dominance: {
+    name: 'Inside-View Dominance',
+    description:
+      'Reasoning from case-specific details (the "inside view") while ignoring the historical base rate of similar decisions (the "outside view"). The memo argues the deal is special, novel, or structurally different from prior comparables — when the reference class is the only valid signal in low-validity environments (Kahneman & Lovallo, "Delusions of Success", HBR 2003)',
+    category: 'Information',
   },
 };
 

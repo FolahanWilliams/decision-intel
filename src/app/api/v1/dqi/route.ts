@@ -14,6 +14,7 @@ import { validateApiKey, type ValidateError } from '@/lib/api/auth';
 import { computeDQI, generateDQIBadge, type DQIInput } from '@/lib/scoring/dqi';
 import { BIAS_NODES } from '@/lib/ontology/bias-graph';
 import { createLogger } from '@/lib/utils/logger';
+import { classifyValidity } from '@/lib/learning/validity-classifier';
 
 const log = createLogger('DQIRoute');
 
@@ -58,9 +59,11 @@ export async function GET(request: NextRequest) {
         factCheck: true,
         compliance: true,
         simulation: true,
+        judgeOutputs: true,
         document: {
           select: {
             content: true,
+            documentType: true,
           },
         },
       },
@@ -188,6 +191,26 @@ export async function GET(request: NextRequest) {
     if (compoundData?.calibratedScore !== undefined) {
       dqiInput.compoundScore = compoundData.calibratedScore;
     }
+
+    // ── Validity-aware DQI shift (Kahneman & Klein 2009, locked 2026-04-30) ─
+    // Reads persisted validityClass from judgeOutputs first; falls back
+    // to live compute for legacy analyses.
+    const documentType =
+      (analysis.document as unknown as { documentType?: string | null })?.documentType ?? null;
+    const persistedValidityV1 = (
+      analysis.judgeOutputs as { validityClassification?: { validityClass?: string } } | null
+    )?.validityClassification?.validityClass as
+      | 'high'
+      | 'medium'
+      | 'low'
+      | 'zero'
+      | undefined;
+    dqiInput.validityClass =
+      persistedValidityV1 ??
+      classifyValidity({
+        documentType,
+        industry: null,
+      }).validityClass;
 
     // ── Compute DQI ─────────────────────────────────────────────────────
     const dqi = computeDQI(dqiInput);

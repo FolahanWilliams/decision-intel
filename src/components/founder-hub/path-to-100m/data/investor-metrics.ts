@@ -319,6 +319,25 @@ export const INVESTOR_METRICS: InvestorMetric[] = [
       'If the seed Brier drifts > 0.05 commit-over-commit without an explicit methodology change, audit the predicted-DQI formula (likely a regression in the bias-load or process-maturity scoring). The number should only move when the corpus or methodology version changes.',
     status: 'on_track',
   },
+  {
+    id: 'paper_application_surface_area',
+    category: 'presentation',
+    rank: 18,
+    name: 'R²F Paper-Application Surface Area',
+    whatItIs:
+      'Number of Kahneman / Klein / Lovallo paper findings operationalised as live signals on the audit pipeline + DPR cover, each anchored in a DOI-citable academic reference. The single most defensible upgrade against Cloverpop / Aera / Quantellia / IBM watsonx — none of whom run any of these on their pipelines.',
+    diCurrent:
+      '6 of 10 ranked applications shipped (locked 2026-04-30): Validity Classifier (Kahneman & Klein 2009 first condition · DQI methodology v2.1.0 with structural weight shift) · Feedback Adequacy (2009 second condition) · Reference Class Forecast (Kahneman & Lovallo 2003 HBR) · Illusion of Validity DI-B-021 (2009 central finding) · Inside-View Dominance DI-B-022 (Lovallo 2003) · Prospective Hindsight pre-mortem (Klein & Mitchell 1995). Total stable bias taxonomy: 22 entries (DI-B-001 through DI-B-022).',
+    diTarget12mo:
+      'All 10 paper applications shipped. Remaining 4: #1 Fractionation of Expertise (M&A buyer-conversion play) · #10 Calibrated Rejection of Subjective Confidence (author-vs-evidence confidence delta on DPR) · #7 Algorithm-aversion Counter-programming (surface platform calibration on rubric outputs) · #4 Improper Linear Models / Decision Rubric (new artefact class comparable to DPR — third specimen alongside WeWork + Dangote).',
+    whyItMatters:
+      'R²F was previously claimed in marketing copy but only partially operationalised. Each paper-application surface that ships is one more procurement-grade signal a Fortune 500 GC can read AND CITE. Investor narrative: "we name the moat with the same vocabulary the academic literature uses; the moat is the academic literature, applied as code." Six anchors with DOIs is harder for an incumbent to clone than five marketing claims.',
+    computeMethod:
+      'Count of paper-application surfaces in src/lib/learning/ + src/lib/agents/prompts.ts that (a) are anchored in a peer-reviewed paper with a DOI in bias-education.ts academicReference, (b) carry an Education Room flashcard with the kahneman_klein tag, (c) ship a procurement-grade surface (DPR section / bias detector / pipeline prompt change).',
+    tripwire:
+      'If the next paper application ships without (a) academic anchor in bias-education.ts, (b) Education Room flashcard, OR (c) a procurement-grade surface — pause and complete the cascade before the next one. The moat is the citability, not the count.',
+    status: 'on_track',
+  },
 ];
 
 // =========================================================================

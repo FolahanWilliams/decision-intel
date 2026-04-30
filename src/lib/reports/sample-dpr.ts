@@ -24,6 +24,9 @@ import type {
   OrgCalibrationSummary,
   DataLifecyclePolicy,
 } from './provenance-record-data';
+import type { FeedbackAdequacy } from '@/lib/learning/feedback-adequacy';
+import type { ReferenceClassForecast } from '@/lib/learning/reference-class-forecast';
+import type { ValidityClassification } from '@/lib/learning/validity-classifier';
 import { PIPELINE_NODES } from '@/lib/data/pipeline-nodes';
 
 function hash(input: string): string {
@@ -302,6 +305,99 @@ const SAMPLE_ORG_CALIBRATION: OrgCalibrationSummary = {
     "DQI shown is calibrated against this organisation's outcome history (28 closed decisions, mean Brier 0.183 · good). Original-vs-recalibrated delta: -4 (the organisation has historically been over-confident on DACH-style market entries; the recalibrator pulls the headline score down accordingly).",
 };
 
+const SAMPLE_FEEDBACK_ADEQUACY: FeedbackAdequacy = {
+  verdict: 'sparse',
+  closedOutcomes: 6,
+  recentClosedOutcomes: 4,
+  daysSinceLastOutcome: 95,
+  meanBrier: 0.21,
+  domainMatchCount: 2,
+  domainHint: 'market_entry',
+  note: 'Only 2 closed-loop outcomes on market_entry decisions in the past 18 months — too few for calibrated intuition by Kahneman & Klein’s (2009) standard. Experience-based justifications in this memo should be cross-checked against external base rates. Mean Brier 0.210 across 4 scored outcomes (CIA-analyst band).',
+};
+
+const SAMPLE_REFERENCE_CLASS_FORECAST: ReferenceClassForecast = {
+  poolSize: 143,
+  matchedClassSize: 11,
+  baselineFailureRate: 0.636,
+  baselineSampleSize: 11,
+  predictedOutcomeBand: 'reference_class_struggles',
+  topAnalogs: [
+    {
+      caseId: 'wework-ipo-2019',
+      slug: 'wework-the-wework-collapse',
+      title: 'The WeWork S-1 Collapse',
+      company: 'WeWork',
+      industry: 'real_estate',
+      year: 2019,
+      outcome: 'catastrophic_failure',
+      similarityScore: 0.74,
+      matchReason: '64% bias overlap · industry match (real_estate) · high-stakes context',
+    },
+    {
+      caseId: 'walmart-germany',
+      slug: 'walmart-germany-market-entry',
+      title: 'Walmart Germany Market Entry',
+      company: 'Walmart',
+      industry: 'retail',
+      year: 1997,
+      outcome: 'failure',
+      similarityScore: 0.61,
+      matchReason: '52% bias overlap · ic_memo pattern',
+    },
+    {
+      caseId: 'tesco-fresh-easy',
+      slug: 'tesco-fresh-easy-us-expansion',
+      title: 'Tesco Fresh & Easy US Expansion',
+      company: 'Tesco',
+      industry: 'retail',
+      year: 2007,
+      outcome: 'failure',
+      similarityScore: 0.58,
+      matchReason: '47% bias overlap · ic_memo pattern',
+    },
+    {
+      caseId: 'home-depot-china',
+      slug: 'home-depot-china-exit',
+      title: 'Home Depot China Exit',
+      company: 'Home Depot',
+      industry: 'retail',
+      year: 2006,
+      outcome: 'failure',
+      similarityScore: 0.55,
+      matchReason: '43% bias overlap · ic_memo pattern',
+    },
+    {
+      caseId: 'starbucks-australia',
+      slug: 'starbucks-australia-failure',
+      title: 'Starbucks Australia Failure',
+      company: 'Starbucks',
+      industry: 'consumer',
+      year: 2000,
+      outcome: 'partial_failure',
+      similarityScore: 0.49,
+      matchReason: '40% bias overlap',
+    },
+  ],
+  note: 'Reference class of 11 historically-similar decisions failed in 64% of cases. Per Kahneman & Lovallo (2003), this is a structurally challenging base rate — the memo’s confidence should be calibrated against this rate, not against the inside-view narrative. Closest analog: WeWork (2019) — outcome: catastrophic failure.',
+  inputs: {
+    biasTypes: ['confirmation_bias', 'overconfidence_bias', 'anchoring_bias', 'halo_effect'],
+    industry: 'real_estate',
+    documentType: 'ic_memo',
+  },
+};
+
+const SAMPLE_VALIDITY_CLASSIFICATION: ValidityClassification = {
+  validityClass: 'low',
+  rationale:
+    'documentType="ic_memo" maps to low-validity per the Kahneman & Klein 2009 environment taxonomy; industry="real_estate" tilts the band down (already at low)',
+  signals: {
+    documentType: 'ic_memo',
+    industry: 'real_estate',
+    decisionHorizon: '18-month integration horizon',
+  },
+};
+
 const SAMPLE_DATA_LIFECYCLE: DataLifecyclePolicy = {
   retentionDays: 365,
   retentionTier: 'team',
@@ -388,6 +484,9 @@ export function buildSampleDprData(): ProvenanceRecordData {
     counterfactualImpact: SAMPLE_COUNTERFACTUAL_IMPACT,
     reviewerDecisions: SAMPLE_REVIEWER_DECISIONS,
     orgCalibration: SAMPLE_ORG_CALIBRATION,
+    feedbackAdequacy: SAMPLE_FEEDBACK_ADEQUACY,
+    referenceClassForecast: SAMPLE_REFERENCE_CLASS_FORECAST,
+    validityClassification: SAMPLE_VALIDITY_CLASSIFICATION,
     dataLifecycle: SAMPLE_DATA_LIFECYCLE,
     clientSafe: undefined,
     schemaVersion: 2,

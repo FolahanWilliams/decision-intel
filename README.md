@@ -43,7 +43,7 @@ Most deal teams have no way to:
 
 **Decision Intel** is an AI-powered decision performance platform for corporate strategy teams, M&A departments, and executive committees. Upload a strategy memo, M&A proposal, diligence report, board paper, or any decision document and get a comprehensive bias audit in under 60 seconds — detecting **20+ cognitive biases** with 11 additional domain-specific overlays for M&A, corporate strategy, and deal diligence.
 
-The platform runs documents through an **11-agent analysis pipeline** with deal-stage-specific overlays (screening → due diligence → committee review → closing → monitoring → post-close) to detect bias, measure noise, simulate executive deliberations, and generate actionable intelligence that protects strategic outcomes. The engine combines **Kahneman-style debiasing** (noise measurement, bias detection, compound scoring) with **Klein's Recognition-Primed Decision framework** (pattern recognition cues, expert heuristics, narrative pre-mortems, mental simulation) — suppressing bias while amplifying expert intuition.
+The platform runs documents through an **12-node analysis pipeline** with deal-stage-specific overlays (screening → due diligence → committee review → closing → monitoring → post-close) to detect bias, measure noise, simulate executive deliberations, and generate actionable intelligence that protects strategic outcomes. The engine combines **Kahneman-style debiasing** (noise measurement, bias detection, compound scoring) with **Klein's Recognition-Primed Decision framework** (pattern recognition cues, expert heuristics, narrative pre-mortems, mental simulation) — suppressing bias while amplifying expert intuition.
 
 ---
 
@@ -92,7 +92,7 @@ One-time deal audit purchases scale with investment size — no subscription req
 For corporate strategy and M&A teams, we offer a guided pilot:
 
 - **Guided onboarding** — we configure deal-specific taxonomies, strategy bias profiles, and noise benchmarks for your team
-- **50 deal analyses** — run your actual strategy memos and diligence reports through the 11-agent pipeline
+- **50 deal analyses** — run your actual strategy memos and diligence reports through the 12-node pipeline
 - **Outcome tracking setup** — connect your deal pipeline so the system starts learning from decision outcomes immediately
 - **Calibration report** — at 30 days, receive a full report: bias patterns, noise levels, and ROI projections
 
@@ -175,24 +175,50 @@ Complements Kahneman-style debiasing with Gary Klein's Recognition-Primed Decisi
 - **Cognitive Blind Spots** — Red-team counter-arguments with verified sources
 - **Sentiment Analysis** — Emotional tone scoring across document sections
 
+### Recognition-Rigor Framework (R²F)
+
+The category-defining framework. R²F is the productized synthesis of two decision-research traditions that the field had treated as opposed: **Kahneman's debiasing** (System 2 — bias detection, noise measurement, evidence verification) and **Klein's Recognition-Primed Decision framework** (System 1 — pattern matching against historical analogs, expert intuition amplification, prospective hindsight). Anchor citation: **Kahneman & Klein (2009) "Conditions for Intuitive Expertise: A Failure to Disagree"**, _American Psychologist_ 64(6), 515–526.
+
+The 12-node pipeline runs both halves in parallel and arbitrates them in the metaJudge. No competitor (Cloverpop, Aera, IBM watsonx, Quantellia, Palantir) runs both traditions in one pipeline.
+
+**Six paper-anchored signals on every Decision Provenance Record (locked 2026-04-30):**
+
+| Signal                       | Anchor                                          | What it measures                                                                                                                                                                            |
+| :--------------------------- | :---------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Validity Classification**  | Kahneman & Klein 2009 (1st condition)           | High / medium / low / zero validity band per documentType + industry. Drives DQI methodology v2.1.0 structural weight shift in low-validity domains.                                        |
+| **Org Calibration**          | Brier scoring over historical outcomes          | Whether the DQI shown is calibrated against THIS organization's outcome history (Cloverpop-defense move). Falls back to platform seed baseline (Brier 0.258 over 143 cases) on cold start.  |
+| **Feedback Adequacy**        | Kahneman & Klein 2009 (2nd condition)           | Closed-loop feedback verdict for the user (adequate / sparse / cold_start). Per the 2009 paper, intuitive expertise requires repeated rapid feedback in the relevant domain.                |
+| **Reference Class Forecast** | Kahneman & Lovallo 2003 HBR                     | Top-5 historical analogs from the 143-case library + matched-class baseline failure rate + four-band predicted-outcome verdict. The outside-view benchmark to the memo's inside-view story. |
+| **Counterfactual Impact**    | Wilson confidence over historical outcome data  | Top-3 bias-specific scenarios with expected DQI improvement %, sample size, and monetary anchor where the DecisionFrame carries a deal value.                                               |
+| **Recommended Action**       | Highest-priority mitigation from biasDetective  | The single forward-looking action the GC or audit committee can take before signing.                                                                                                        |
+
+**Two new bias detectors (locked 2026-04-30, items #3 + #9 of the paper-application sprint):**
+
+- **DI-B-021 · Illusion of Validity** (Kahneman & Klein 2009 central finding) — confidence rooted in narrative coherence, not evidence quality. Detects rhetorical-certainty signals ("guaranteed", "highly predictable", "clear path to") not backed by base rates. Compound interactions: + Overconfidence 1.5×, + Confirmation 1.4×, + Halo 1.3×, + Authority 1.3×. New toxic combination: **"Coherent Confidence"**.
+- **DI-B-022 · Inside-View Dominance** (Kahneman & Lovallo 2003 HBR) — reasoning from case-specific details while ignoring the historical base rate. Detects "this case is special" / "the comparables don't apply" / projections without grounded comparables. Compound interactions: + Planning Fallacy 1.6×, + Overconfidence 1.5×, + Illusion of Validity 1.4×. New toxic combination: **"Reference-Class Blindness"** — the canonical Lovallo failure pattern.
+
+**Pre-mortem prompts** now enforce **prospective hindsight** (Klein & Mitchell 1995 / Mitchell, Russo, Pennington 1989) — past-tense fait-accompli framing ("the failure began when…", "the warning sign everyone missed was…") rather than conditional voice. The 25-30% lift in failure-cause insight quality from this framing is now live on every audit.
+
 ### Proprietary Scoring & Intelligence Engine
 
-The platform's core differentiator: a deterministic, mathematically rigorous scoring layer that runs **after** LLM analysis. Competitors can call the same LLMs — they cannot replicate the scoring math, the ontology, or the 146-case statistical database.
+The platform's core differentiator: a deterministic, mathematically rigorous scoring layer that runs **after** LLM analysis. Competitors can call the same LLMs — they cannot replicate the scoring math, the ontology, or the 143-case statistical database.
 
 #### Decision Quality Index (DQI)
 
-A branded **0-100 composite score** (like FICO for decisions) with letter grades (A-F) computed from 6 weighted dimensions (v2.0.0):
+A branded **0-100 composite score** (like FICO for decisions) with letter grades (A-F) computed from 6 weighted dimensions. **Methodology v2.1.0 (locked 2026-04-30)** — adds Kahneman & Klein 2009 first-condition validity-aware structural weight shift; legacy inputs (no `validityClass`) report `2.0.0-no-validity` so the procurement reader can tell which methodology produced a given DQI.
 
-| Component                | Weight | Measures                                                           |
-| :----------------------- | :----- | :----------------------------------------------------------------- |
-| **Bias Load**            | 28%    | Severity-weighted bias count vs. document complexity               |
-| **Noise Level**          | 18%    | Inter-judge variance from triple-judge noise measurement           |
-| **Evidence Quality**     | 18%    | Fact-check verification rate and source reliability                |
-| **Process Maturity**     | 13%    | Prior submitted, outcomes tracked, dissent present, System 1 ratio |
-| **Compliance Risk**      | 13%    | Regulatory framework violation score                               |
-| **Historical Alignment** | 10%    | Correlation with 146-case database failure/success patterns        |
+| Component                | Default Weight | Measures                                                                              |
+| :----------------------- | :------------- | :------------------------------------------------------------------------------------ |
+| **Bias Load**            | 28%            | Severity-weighted bias count over the 22-bias taxonomy (DI-B-001 through DI-B-022)    |
+| **Noise Level**          | 18%            | Inter-judge variance from triple-judge noise measurement                              |
+| **Evidence Quality**     | 18%            | Fact-check verification rate and source reliability                                   |
+| **Process Maturity**     | 13%            | Prior submitted, outcomes tracked, dissent present, System 1 ratio                    |
+| **Compliance Risk**      | 13%            | Regulatory framework violation score                                                  |
+| **Historical Alignment** | 10%            | Correlation with 143-case database failure/success patterns                           |
 
-Grades: **A** (80-100), **B** (65-79), **C** (50-64), **D** (35-49), **F** (0-34). Surfaced as an SVG badge on every analysis with component breakdown and top improvement recommendation.
+**Validity-aware shift** (locked 2026-04-30): in **low-validity** environments (M&A, market entry, long-horizon strategy) the engine reweights `+0.10 historicalAlignment, +0.02 biasLoad, −0.05 evidenceQuality, −0.04 processMaturity, −0.03 complianceRisk` (re-normalized to sum 1.0). In **zero-validity** environments (5+ year forecasts, novel-market predictions): `+0.20 historicalAlignment, +0.04 biasLoad, −0.08 evidenceQuality, −0.10 processMaturity, −0.06 complianceRisk`. The reference-class signal becomes the dominant DQI driver where verifiable facts about the present don't predict outcomes.
+
+Grades: **A** (85-100), **B** (70-84), **C** (55-69), **D** (40-54), **F** (0-39). Canonical thresholds in [`src/lib/scoring/dqi.ts`](src/lib/scoring/dqi.ts) → `GRADE_THRESHOLDS`. Surfaced as an SVG badge on every analysis with component breakdown and top improvement recommendation.
 
 #### Compound Scoring Engine
 
@@ -201,7 +227,7 @@ Deterministic post-LLM scoring that transforms raw bias detections into calibrat
 - **20x20 Interaction Matrix** — 400 empirically-grounded pairwise interaction weights between all cognitive biases (e.g., confirmation_bias + groupthink = 1.35x amplification)
 - **Context Multipliers** — Monetary stakes (1.0-1.6x), absent dissent (+0.25), time pressure (+0.15), group size effects
 - **Detectability Weighting** — Hard-to-detect biases (low detectability in the ontology) get 3-8% severity boost when found at high confidence — finding them is more meaningful
-- **Historical Correlation** — Cross-references detected bias combinations against the 146-case study database to compute empirical amplification ratios
+- **Historical Correlation** — Cross-references detected bias combinations against the 143-case study database to compute empirical amplification ratios
 - **Confidence Decay** — Sigmoid temporal decay (documents older than 6 months get progressively reduced confidence)
 - **Org Calibration** — Per-organization learned weights that adjust severity based on historical outcomes
 
@@ -240,7 +266,7 @@ A proprietary **directed graph** encoding empirically-grounded relationships bet
 
 #### Cross-Case Correlation Engine
 
-**146 annotated real-world case studies** (131 failures + 15 successes) sourced from SEC filings, NTSB reports, GAO audits, FDA actions, FCA enforcement, board memos, and academic case studies — spanning 8 industries. Includes pre-decision evidence (original documents from before outcomes were known) showing what the platform would have flagged:
+**143 annotated real-world case studies** (failures + successes) sourced from SEC filings, NTSB reports, GAO audits, FDA actions, FCA enforcement, board memos, and academic case studies — spanning 8 industries. Includes pre-decision evidence (original documents from before outcomes were known) showing what the platform would have flagged. The case-count value is derived from `HISTORICAL_CASE_COUNT = ALL_CASES.length` in [`src/lib/data/case-studies/index.ts`](src/lib/data/case-studies/index.ts) and propagates through every consumer surface — never hardcoded:
 
 | Industry           | Cases | Avg Impact | Catastrophic Rate |
 | :----------------- | :---- | :--------- | :---------------- |
@@ -427,7 +453,7 @@ Each message in a deliberation thread is analyzed for new biases, and only novel
 When a tracked deliberation thread resolves to a commitment ("let's approve it", "we've decided"), the platform:
 
 1. Creates a `HumanDecision` record linked to the pre-decision context
-2. Runs a full cognitive audit via the 11-agent pipeline
+2. Runs a full cognitive audit via the 12-node pipeline
 3. Posts a rich Block Kit summary card to the Slack thread with:
    - Decision Quality Score (color-coded gauge)
    - Noise Score and bias count
@@ -497,13 +523,13 @@ Real-time intelligence enrichment from external sources:
 
 - **News & Signals** — 14 RSS feeds across psychology, business, regulatory, industry, and academic sources (HBR, McKinsey, MIT Sloan, SEC EDGAR, FCA, Reuters, BBC Business, SSRN, and more)
 - **Research Papers** — Semantic Scholar integration for academic research matching
-- **Case Studies** — 146 annotated case studies (131 failures + 15 successes) across 8 industries (Lehman Brothers, Boeing 737 MAX, Fukushima, VW Dieselgate, Apple iPhone, Netflix Streaming, etc.) matched by bias type, toxic pattern, and industry — with pre-decision evidence
+- **Case Studies** — 143 annotated case studies (failures + successes) across 8 industries (Lehman Brothers, Boeing 737 MAX, Fukushima, VW Dieselgate, Apple iPhone, Netflix Streaming, WeWork, Dangote, etc.) matched by bias type, toxic pattern, and industry — with pre-decision evidence. Drives the new **Reference Class Forecast** block on every Decision Provenance Record (locked 2026-04-30, Kahneman & Lovallo 2003).
 - **Macro Context** — FRED economic indicators for market backdrop
 - **Intelligence Hub** — Dedicated dashboard page with filterable news grid, research counts, and freshness monitoring
 
 ### Decision Replay & Counterfactual Analysis
 
-Step through your analysis like a debugger steps through code. The **Replay** tab decomposes the 11-agent pipeline into a visual timeline, showing exactly how each stage influenced the final score:
+Step through your analysis like a debugger steps through code. The **Replay** tab decomposes the 12-node pipeline into a visual timeline, showing exactly how each stage influenced the final score:
 
 - **Score Waterfall** — Horizontal bar chart showing score progression from 100 → final through each analysis stage
 - **Step-by-Step Replay** — Expandable cards for each pipeline stage: Document Intelligence → Bias Detection → Noise Analysis → Fact Check → Deep Analysis → Boardroom → Final Score
@@ -515,9 +541,9 @@ Step through your analysis like a debugger steps through code. The **Replay** ta
 
 ### Bias Education Library
 
-A comprehensive learning resource for all 20 cognitive biases, accessible at `/dashboard/bias-library`:
+A comprehensive learning resource for all **22 cognitive biases** (DI-B-001 through DI-B-022), accessible at `/dashboard/bias-library`:
 
-- **20 Rich Education Cards** — Each bias includes a real-world business case study (Kodak, Bay of Pigs, Theranos, Concorde, etc.), 3 actionable debiasing techniques, academic references, difficulty rating, and related biases. Includes 4 newly-added biases: Halo Effect, Gambler's Fallacy, Zeigarnik Effect, and Paradox of Choice
+- **22 Rich Education Cards** — Each bias includes a real-world business case study (Kodak, Bay of Pigs, Theranos, Concorde, the Israeli officer-selection program, the 1976 curriculum-writing team, etc.), actionable debiasing techniques, DOI-citable academic references, difficulty rating, and related biases. The taxonomy includes the four 2026-04-30 paper-application sprint additions: **Halo Effect**, **Gambler's Fallacy**, **Zeigarnik Effect**, **Paradox of Choice**, **Illusion of Validity** (DI-B-021, Kahneman & Klein 2009), and **Inside-View Dominance** (DI-B-022, Kahneman & Lovallo 2003)
 - **"Your Detected Biases" Banner** — Aggregates bias detections across all your documents, showing which biases appear most in your decision-making
 - **Search & Filter** — Filter by category (Judgment, Group Dynamics, Overconfidence, Risk Assessment, Information) or search by name
 - **Integrated Learning** — The BiasDetailModal on document pages now includes a "Learn & Debias" section with real-world examples and debiasing techniques inline
@@ -1199,7 +1225,7 @@ Use `/dashboard/search` to find similar documents and analyses using vector simi
 Install the Chrome extension from the `/extension/` directory for real-time bias checking:
 
 - **Quick Score** — Click the extension icon for a <5 second bias-only scan of the current page
-- **Full Analysis** — Open the side panel for a complete 11-agent pipeline analysis
+- **Full Analysis** — Open the side panel for a complete 12-node pipeline analysis
 - **Inline Annotations** — Content script highlights detected biases directly on the page
 
 Load as an unpacked extension in Chrome Developer Mode. See `extension/README.md` for detailed setup.
@@ -1333,7 +1359,7 @@ These counters are displayed on the [landing page](https://www.decision-intel.co
 
 ### Shipped
 
-- [x] 11-agent cognitive bias detection pipeline
+- [x] 12-node cognitive bias detection pipeline
 - [x] Decision noise measurement (Statistical Jury)
 - [x] Financial fact-checking (Finnhub + Google Search Grounding)
 - [x] GDPR PII anonymization (pre-analysis)

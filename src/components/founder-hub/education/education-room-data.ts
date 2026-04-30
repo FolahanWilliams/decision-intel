@@ -1085,6 +1085,85 @@ const COGNITIVE_BIASES_CARDS: EducationCard[] = [
     source: 'bias-education.ts + sparring-room loss_aversion_framing dimension',
     tag: 'kahneman',
   },
+  {
+    id: 'bias_illusion_of_validity',
+    deckId: 'cognitive_biases',
+    prompt:
+      "What is illusion of validity (DI-B-021), what is the Kahneman & Klein 2009 paper's finding about it, and how does the DI audit catch it?",
+    canonicalAnswer:
+      "Illusion of validity (Kahneman & Klein 2009 'Conditions for Intuitive Expertise: A Failure to Disagree'): subjective confidence comes from the COHERENCE of the story the brain has constructed, not from the strength of the evidence behind that story. The 2009 paper agrees that confidence is decoupled from accuracy — a coherent narrative produces high confidence even when the underlying evidence is thin or misleading. In strategic memos: 'we are certain', 'guaranteed market capture', 'highly predictable cash flows', 'clear path to scale' without external base rates or reference-class comparisons. DI catches it via biasDetective DI-B-021 (rhetorical-certainty scanner) plus validity-aware scoring: in low-validity environments (M&A, market entry, long-horizon strategy), confidence-language is penalised harder than in high-validity environments. The toxic combination 'Coherent Confidence' (Illusion of Validity + Overconfidence + Confirmation/Halo) is the most dangerous pattern in low-validity domains.",
+    difficulty: 'advanced',
+    applicationContext:
+      'Reviewing a memo whose recommendation reads as obviously right because the story is so well-constructed.',
+    source: 'bias-education.ts DI-B-021 + Kahneman & Klein 2009',
+    tag: 'kahneman_klein',
+  },
+  {
+    id: 'bias_prospective_hindsight',
+    deckId: 'cognitive_biases',
+    prompt:
+      "What is 'prospective hindsight' (Mitchell, Russo, Pennington 1989 / Klein 1995) and why is it the load-bearing instruction in a pre-mortem?",
+    canonicalAnswer:
+      "Prospective hindsight: the cognitive technique of projecting yourself into a future where an event has ALREADY OCCURRED, then explaining how it happened — instead of asking 'what could go wrong?' in conditional voice. Mitchell, Russo & Pennington (1989) showed this framing produces 25-30% more, and substantially higher-quality, failure-cause insights than the conditional alternative. Klein (1995) operationalised it as the pre-mortem technique: 'we are 1 year in the future; the plan was implemented; the outcome was a TOTAL DISASTER; write the HISTORY of that disaster.' Past tense, fait-accompli framing, no 'might' or 'could'. DI's pre-mortem prompts (3 surfaces in src/lib/agents/prompts.ts) enforce this exact framing — locked 2026-04-30 in the paper-application sprint. The mechanism is that generating an EXPLANATION for a fait-accompli outcome fires causal-reasoning circuits that the conditional 'what if' frame doesn't.",
+    difficulty: 'advanced',
+    applicationContext:
+      "Running a pre-mortem on your own decision in the Founder Hub copilot, OR auditing a memo whose pre-mortem section reads as boilerplate risk-listing.",
+    source: 'src/lib/agents/prompts.ts + Klein & Mitchell 1995 + Mitchell, Russo, Pennington 1989',
+    tag: 'kahneman_klein',
+  },
+  {
+    id: 'bias_feedback_adequacy',
+    deckId: 'cognitive_biases',
+    prompt:
+      "What is the second condition for trustworthy intuition (Kahneman & Klein 2009), and how does DI's Feedback Adequacy block on the DPR operationalise it?",
+    canonicalAnswer:
+      "Kahneman & Klein (2009) agree that intuitive judgments can only be trusted when TWO conditions hold: (1) the environment is high-validity (predictable cue→outcome mappings), AND (2) the decision-maker has had ADEQUATE OPPORTUNITY TO LEARN — repeated rapid feedback in that environment. Without condition #2, 'years of experience' produces no actual expertise; the person has years of exposure to ambiguous feedback but no calibrated cue→outcome map. DI's biasDetective + structuralAssumptions audit condition #1; the new Feedback Adequacy block on the DPR cover (locked 2026-04-30) audits condition #2. Verdict bands: 'adequate' (≥10 closed outcomes in domain in past 18 months — sufficient calibration), 'sparse' (3-9 — too few for calibrated weight), 'cold_start' (<3 — no track record yet, treat experience-claims with cold-start scrutiny). The block reads honestly: a procurement reader sees whether the memo's author has the closed-loop history their experience claims rely on. Implementation: src/lib/learning/feedback-adequacy.ts.",
+    difficulty: 'advanced',
+    applicationContext:
+      "Procurement-grade conversations where a buyer asks 'how do you know this audit is right?' — the DPR's Feedback Adequacy block is part of the answer.",
+    source: 'src/lib/learning/feedback-adequacy.ts + Kahneman & Klein 2009',
+    tag: 'kahneman_klein',
+  },
+  {
+    id: 'bias_reference_class_forecasting',
+    deckId: 'cognitive_biases',
+    prompt:
+      "What is reference-class forecasting (Kahneman & Lovallo 2003), and how does DI's Reference Class Forecast on the DPR cover operationalise it as a procurement signal?",
+    canonicalAnswer:
+      "Reference-class forecasting (Kahneman & Lovallo 2003 'Delusions of Success', HBR): the technique of stepping out of the inside-view narrative a memo constructs and benchmarking its predicted outcome against a REFERENCE CLASS — a set of historically similar decisions whose outcomes are already known. The 70-90% M&A failure rate in the DI hero copy IS a reference-class statistic. DI now ships this as a MANDATORY block on every DPR cover (locked 2026-04-30): pure-function similarity scoring against the 143-case library returns top-5 historical analogs + matched-class baseline failure rate + a four-band predicted-outcome verdict (succeeds / mixed / struggles / fails / too_small_to_judge). No LLM call — deterministic, runs <5ms. The block answers 'is this audit benchmarked against historical outcomes or generated from inside-view narrative?' with a public-checkable artefact. Implementation: src/lib/learning/reference-class-forecast.ts.",
+    difficulty: 'advanced',
+    applicationContext:
+      "Pitching the DPR to a Pan-African fund partner or F500 GC — 'every audit benchmarks against the 143-case library; the procurement-stage answer is one click.'",
+    source: 'src/lib/learning/reference-class-forecast.ts + Kahneman & Lovallo 2003',
+    tag: 'kahneman_klein',
+  },
+  {
+    id: 'bias_validity_classifier',
+    deckId: 'cognitive_biases',
+    prompt:
+      "What is the validity-aware DQI shift (locked 2026-04-30, methodology v2.1.0), and what does it actually change about how DI scores a memo?",
+    canonicalAnswer:
+      "Kahneman & Klein (2009) FIRST condition for trustworthy intuition: the environment must be HIGH-VALIDITY — predictable cue→outcome mappings, rapid feedback (medicine, firefighting, chess all qualify; M&A, market entry, long-horizon strategy do NOT). DI's validity classifier (src/lib/learning/validity-classifier.ts) maps each audit onto one of four bands (high / medium / low / zero) based on documentType + industry + decision horizon. The DQI engine reads the band and applies a STRUCTURAL WEIGHT SHIFT in low- and zero-validity environments: increases historicalAlignment weight (+0.10 in low, +0.20 in zero), increases biasLoad weight, decreases evidenceQuality + processMaturity + complianceRisk weights. The reference-class signal becomes the dominant DQI driver where verifiable facts about the present don't predict outcomes. Methodology version on the result reads '2.1.0' when the shift was applied; '2.0.0-no-validity' for legacy inputs. The DPR cover surfaces the validity band + rationale + methodology version, so a procurement reader can see whether the score in front of them was computed with the validity shift applied.",
+    difficulty: 'advanced',
+    applicationContext:
+      "When a CSO or fund partner asks 'why does your audit score lower than the analyst's confidence reads?' — answer with the validity band + reweight rationale.",
+    source:
+      'src/lib/learning/validity-classifier.ts + src/lib/scoring/dqi.ts + Kahneman & Klein 2009',
+    tag: 'kahneman_klein',
+  },
+  {
+    id: 'bias_inside_view_dominance',
+    deckId: 'cognitive_biases',
+    prompt:
+      "What is inside-view dominance (DI-B-022, Kahneman & Lovallo 2003), and what is the canonical example?",
+    canonicalAnswer:
+      "Inside-view dominance: reasoning from CASE-SPECIFIC details (we are talented, motivated, on track, this case is special) while ignoring the historical BASE RATE of similar decisions. Kahneman's canonical example (1976 Israeli curriculum-writing team): the team estimated 18 months to completion, even though the most senior member knew that 40% of such projects had previously been abandoned and the rest averaged 8 years. The inside-view narrative completely dominated the outside-view base rate. The team finished in 8 years. DI-B-022 detects: 'this case is special' / 'the comparables don't apply' / 'industry data doesn't reflect our situation' / projections without grounding in a named comparable set. Severity scales: 'critical' when the memo explicitly dismisses an industry base rate; 'high' when it's silent on base rates; 'medium' when it cites comparables but doesn't engage with their distribution; 'low' when one comparable is named but the fuller class is omitted. New compound interactions: + Planning Fallacy (1.6×), + Overconfidence (1.5×), + Illusion of Validity (1.4×). New toxic combination: 'Reference-Class Blindness' (Inside-View Dominance + Planning Fallacy + Overconfidence) — the canonical Kahneman & Lovallo failure pattern.",
+    difficulty: 'advanced',
+    applicationContext:
+      "Reviewing an IC memo that opens with 'this deal is different because…' — the dismissal of comparables is itself the bias. DI-B-022 catches it.",
+    source: 'src/lib/constants/bias-education.ts DI-B-022 + Kahneman & Lovallo 2003',
+    tag: 'kahneman_klein',
+  },
 ];
 
 // ─── Cards: 12-Node Pipeline (representative 6) ──────────────────

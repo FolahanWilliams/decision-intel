@@ -45,6 +45,18 @@ import { computeCounterfactuals } from '@/lib/analysis/counterfactual';
 import { getOrgBrierStats, brierCategory } from '@/lib/learning/brier-scoring';
 import { computePlatformCalibrationBaseline } from '@/lib/learning/platform-baseline';
 import {
+  getFeedbackAdequacy,
+  type FeedbackAdequacy,
+} from '@/lib/learning/feedback-adequacy';
+import {
+  getReferenceClassForecast,
+  type ReferenceClassForecast,
+} from '@/lib/learning/reference-class-forecast';
+import {
+  classifyValidity,
+  type ValidityClassification,
+} from '@/lib/learning/validity-classifier';
+import {
   getUserPlan,
   getOrgPlan,
   getRetentionDaysForUser,
@@ -99,6 +111,42 @@ export interface ProvenanceRecordData {
    * benchmark. Null on cold-start orgs with no closed outcomes.
    */
   orgCalibration?: OrgCalibrationSummary;
+  /**
+   * Feedback Adequacy block (locked 2026-04-30 — Kahneman & Klein
+   * 2009 "second condition for trustworthy intuition"). Operationalises
+   * the claim that experience-based intuition only carries weight when
+   * the decision-maker has had repeated rapid feedback in the relevant
+   * domain. Always populated — `verdict='cold_start'` is the explicit
+   * "no track record" answer rather than an absent block. The PDF
+   * generator renders this as a dedicated section on page 1 below
+   * Org Calibration.
+   */
+  feedbackAdequacy?: FeedbackAdequacy;
+  /**
+   * Reference-Class Forecast block (locked 2026-04-30 — Kahneman &
+   * Lovallo 2003 "Delusions of Success" + Kahneman & Klein 2009
+   * outside-view operationalisation). Always populated on per-analysis
+   * DPRs — pure-function similarity scoring against the 143-case
+   * library, no LLM call. Surfaces the matched-class baseline failure
+   * rate + top-5 analogs so the procurement reader can compare the
+   * memo's inside-view confidence against the outside-view base rate.
+   * The cold-start posture (`predictedOutcomeBand='reference_class_too_small_to_judge'`)
+   * is honest — structurally novel decisions get a cold-start note
+   * rather than a fabricated forecast.
+   */
+  referenceClassForecast?: ReferenceClassForecast;
+  /**
+   * Validity Classification block (locked 2026-04-30 — Kahneman &
+   * Klein 2009 first condition for trustworthy intuition). Records
+   * which validity band the audit was scored under (high / medium /
+   * low / zero) and the rationale; the DQI engine applies a
+   * structural weight shift in low- and zero-validity environments
+   * (methodology version 2.1.0). The DPR renders a validity strip on
+   * page 1 + the methodology version on the cover so a procurement
+   * reader can see whether the score in front of them was computed
+   * with the validity shift applied.
+   */
+  validityClassification?: ValidityClassification;
   /**
    * Data lifecycle / retention policy footer (DPR v2, P2 #4). Always
    * populated — this is the procurement-grade contractual statement of
@@ -865,14 +913,45 @@ export async function assembleProvenanceRecordData(
   // section honestly rather than fabricating data.
   const orgId = analysis.document.orgId ?? null;
   const userId = analysis.document.userId;
-  const [counterfactualImpact, orgCalibration, dataLifecycle] = await Promise.all([
-    buildCounterfactualImpact(analysis.id, orgId),
-    buildOrgCalibration(
-      orgId,
-      (analysis as unknown as { recalibratedDqi?: unknown }).recalibratedDqi ?? null
-    ),
-    buildDataLifecycle(userId, orgId),
-  ]);
+  const documentType =
+    (analysis.document as unknown as { documentType?: string | null }).documentType ?? null;
+  const industry =
+    (analysis.document as unknown as { industry?: string | null }).industry ?? null;
+  const domainHint = documentType ?? industry;
+  const [counterfactualImpact, orgCalibration, dataLifecycle, feedbackAdequacy] =
+    await Promise.all([
+      buildCounterfactualImpact(analysis.id, orgId),
+      buildOrgCalibration(
+        orgId,
+        (analysis as unknown as { recalibratedDqi?: unknown }).recalibratedDqi ?? null
+      ),
+      buildDataLifecycle(userId, orgId),
+      getFeedbackAdequacy(prisma, userId, { domainHint }),
+    ]);
+  // Reference-class forecast — pure function, deterministic, runs in
+  // <5ms. Computed synchronously after the Promise.all so it can use
+  // the deduplicated biasTypes computed above.
+  const referenceClassForecast = getReferenceClassForecast({
+    biasTypes,
+    industry,
+    documentType,
+  });
+  // Validity classification — read the persisted value from
+  // judgeOutputs first (set at audit-completion time by /api/analyze/
+  // stream); fall back to live compute for legacy analyses where the
+  // pipeline didn't persist it. The DPR + UI surfaces always show the
+  // SAME band the DQI engine scored against; never silently drift.
+  const persistedValidity = (
+    analysis as unknown as {
+      judgeOutputs?: { validityClassification?: ValidityClassification | null } | null;
+    }
+  ).judgeOutputs?.validityClassification;
+  const validityClassification =
+    persistedValidity ??
+    classifyValidity({
+      documentType,
+      industry,
+    });
 
   return {
     analysisId: analysis.id,
@@ -895,6 +974,9 @@ export async function assembleProvenanceRecordData(
     // what the section will look like once the UI ships.
     reviewerDecisions: undefined,
     orgCalibration,
+    feedbackAdequacy,
+    referenceClassForecast,
+    validityClassification,
     dataLifecycle,
     clientSafe: undefined,
     schemaVersion: 2,
@@ -1025,6 +1107,9 @@ export async function assembleProvenanceRecordDataForPackage(
       counterfactualImpact: undefined,
       reviewerDecisions: undefined,
       orgCalibration: undefined,
+      feedbackAdequacy: undefined,
+      referenceClassForecast: undefined,
+      validityClassification: undefined,
       dataLifecycle: await buildDataLifecycle('', null),
       clientSafe: undefined,
       schemaVersion: 2,
@@ -1264,6 +1349,9 @@ export async function assembleProvenanceRecordDataForDeal(
       counterfactualImpact: undefined,
       reviewerDecisions: undefined,
       orgCalibration: undefined,
+      feedbackAdequacy: undefined,
+      referenceClassForecast: undefined,
+      validityClassification: undefined,
       dataLifecycle: await buildDataLifecycle('', null),
       clientSafe: undefined,
       schemaVersion: 2,

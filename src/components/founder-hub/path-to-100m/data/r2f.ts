@@ -49,6 +49,23 @@ export const R2F_CURRENT: R2FCurrentPillar[] = [
     whyItMatters:
       'This is the academic synthesis no competitor (Cloverpop, Aera, IBM watsonx, Palantir) has built. The metaJudge node uses the highest-tier Pro-level model (gemini-2.5-pro) per CLAUDE.md model policy — the only Pro-tier surface in the entire pipeline. Reasoning quality at the synthesis seat matters more than cost.',
   },
+  {
+    id: 'paper_application_layer',
+    side: 'arbitration',
+    label: 'Paper-Application Layer · Six DPR signals (locked 2026-04-30)',
+    pipelineNodes: [
+      'validityClassifier',
+      'feedbackAdequacy',
+      'referenceClassForecast',
+      'illusionOfValidityDetector',
+      'insideViewDominanceDetector',
+      'prospectiveHindsight',
+    ],
+    whatItDoes:
+      'Six procurement-grade signals on every DPR cover, each anchored in a Kahneman/Klein/Lovallo paper with DOI-citable references: (1) Validity Classifier (high/medium/low/zero band per Kahneman & Klein 2009 first condition; bumps DQI methodology to v2.1.0 with structural weight shift in low-validity domains); (2) Feedback Adequacy (closed-outcome history vs the 2009 second condition); (3) Reference Class Forecast (top-5 historical analogs + matched-class baseline failure rate per Kahneman & Lovallo 2003 HBR); (4) Illusion of Validity detector DI-B-021 (rhetorical-certainty signals, 2009 paper central finding); (5) Inside-View Dominance detector DI-B-022 (the canonical 1976 curriculum-team failure pattern); (6) Prospective Hindsight pre-mortem framing (Klein & Mitchell 1995, past-tense fait-accompli framing produces 25-30% more failure-cause insights).',
+    whyItMatters:
+      'R²F is now operationalised, not just claimed. Every DPR carries six signals a Fortune 500 GC can read AND CITE — academic anchors with DOIs, not marketing copy. The single most defensible upgrade against Cloverpop / Aera / Quantellia / IBM watsonx, none of whom run any of these six on their pipelines.',
+  },
 ];
 
 export type R2FMoatLever = {

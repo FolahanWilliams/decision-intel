@@ -78,6 +78,16 @@ export interface DQIInput {
     /** Beneficial damping factor (1.0 = no damping) */
     beneficialDamping: number;
   };
+  /** Optional: validity class of the decision environment per Kahneman
+   *  & Klein 2009 (high / medium / low / zero). When supplied, the DQI
+   *  engine applies a structural weight shift that increases historical-
+   *  alignment + bias-load weight and decreases evidence-quality weight
+   *  in low- and zero-validity environments. Methodology version bumps
+   *  to '2.1.0' when the shift is applied; legacy 2.0.0 behaviour
+   *  preserved when this field is undefined.
+   *  See src/lib/learning/validity-classifier.ts for the full
+   *  rationale + the band definitions. */
+  validityClass?: 'high' | 'medium' | 'low' | 'zero';
 }
 
 export interface DQIResult {
@@ -186,7 +196,14 @@ export const GRADE_THRESHOLDS: Array<{
   { min: 0, grade: 'F', label: 'Critical Decision Risk', color: '#ef4444' },
 ];
 
-export const METHODOLOGY_VERSION = '2.0.0';
+/** DQI methodology version. Bumped 2.0.0 → 2.1.0 (locked 2026-04-30)
+ *  to mark the validity-aware structural weight shift (Kahneman &
+ *  Klein 2009 first-condition operationalisation). Legacy behaviour
+ *  preserved: when an audit input does not carry `validityClass`, the
+ *  engine reports methodology version '2.0.0-no-validity' so the DPR
+ *  reader can tell which methodology produced a given DQI. */
+export const METHODOLOGY_VERSION = '2.1.0';
+export const METHODOLOGY_VERSION_LEGACY = '2.0.0-no-validity';
 
 /** Biases associated with fast, heuristic (System 1) processing */
 export const SYSTEM1_BIASES = new Set([
@@ -728,8 +745,23 @@ export function computeDQI(
     historicalAlignment,
   };
 
-  // Compute weighted total using effective weights (org-blended if overrides provided)
-  const ew = computeEffectiveWeights(options?.orgWeightOverrides, options?.orgOutcomeCount);
+  // Compute weighted total using effective weights (org-blended if overrides provided
+  // AND validity-aware shift if validityClass is supplied).
+  // Validity shift derives from Kahneman & Klein 2009 first condition
+  // (locked 2026-04-30) — see src/lib/learning/validity-classifier.ts.
+  let baseWeights = options?.orgWeightOverrides;
+  if (input.validityClass) {
+    // Lazy require to avoid a circular dep at module load time —
+    // validity-classifier imports the WEIGHTS type from this file.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { getValidityWeightShift } =
+      require('@/lib/learning/validity-classifier') as typeof import('@/lib/learning/validity-classifier');
+    const validityShift = getValidityWeightShift(input.validityClass);
+    if (validityShift) {
+      baseWeights = { ...validityShift, ...(baseWeights ?? {}) };
+    }
+  }
+  const ew = computeEffectiveWeights(baseWeights, options?.orgOutcomeCount);
   const rawScore =
     biasLoad.score * ew.biasLoad +
     noiseLevel.score * ew.noiseLevel +
@@ -763,7 +795,7 @@ export function computeDQI(
     percentile: computeHistoricalPercentile(finalScore),
     topImprovement,
     system1Ratio: input.process.system1Ratio ?? null,
-    methodologyVersion: METHODOLOGY_VERSION,
+    methodologyVersion: input.validityClass ? METHODOLOGY_VERSION : METHODOLOGY_VERSION_LEGACY,
   };
 
   logger.info('DQI computed', {

@@ -254,6 +254,43 @@ export class DecisionProvenanceRecordGenerator {
     );
     y += 7;
 
+    // Validity Classification strip (locked 2026-04-30 \u2014 Kahneman &
+    // Klein 2009 first condition for trustworthy intuition). Tells the
+    // procurement reader which validity band the audit was scored
+    // under and whether the structural weight shift was applied
+    // (methodology version 2.1.0).
+    if (data.validityClassification) {
+      const vc = data.validityClassification;
+      const bandColor: [number, number, number] =
+        vc.validityClass === 'high'
+          ? [22, 163, 74]
+          : vc.validityClass === 'medium'
+            ? [101, 163, 74]
+            : vc.validityClass === 'low'
+              ? [202, 138, 4]
+              : [220, 38, 38];
+      const label =
+        vc.validityClass === 'high'
+          ? 'HIGH-VALIDITY ENVIRONMENT'
+          : vc.validityClass === 'medium'
+            ? 'MEDIUM-VALIDITY ENVIRONMENT'
+            : vc.validityClass === 'low'
+              ? 'LOW-VALIDITY ENVIRONMENT'
+              : 'ZERO-VALIDITY ENVIRONMENT';
+      this.doc.setFont('helvetica', 'bold');
+      this.doc.setFontSize(8);
+      this.doc.setTextColor(...bandColor);
+      this.doc.text(`VALIDITY \u00b7 ${label}`, MARGIN_L, y);
+      y += 4;
+      this.doc.setFont('helvetica', 'italic');
+      this.doc.setFontSize(8);
+      this.doc.setTextColor(80, 80, 80);
+      const note = `${vc.rationale}. DQI methodology v2.1.0 (Kahneman & Klein 2009 validity-aware shift) applied; in low- and zero-validity environments the engine reweights toward historical alignment + bias load and away from evidence quality.`;
+      const vcLines = this.doc.splitTextToSize(note, TEXT_W);
+      this.doc.text(vcLines, MARGIN_L, y);
+      y += vcLines.length * 3.6 + 4;
+    }
+
     // Org calibration strip — DPR v2 #6. Cloverpop-defense move: proves
     // the DQI shown is calibrated against THIS org's outcome history.
     if (data.orgCalibration) {
@@ -273,6 +310,97 @@ export class DecisionProvenanceRecordGenerator {
       const calLines = this.doc.splitTextToSize(calStrip, TEXT_W);
       this.doc.text(calLines, MARGIN_L, y);
       y += calLines.length * 4 + 4;
+    }
+
+    // Feedback Adequacy strip (locked 2026-04-30 — Kahneman & Klein
+    // 2009 second condition for trustworthy intuition). Decoupled from
+    // org calibration above: org calibration tells the procurement
+    // reader whether the PLATFORM's predictions calibrate against this
+    // org's outcomes; feedback adequacy tells them whether THIS USER's
+    // experience-based intuition has been calibrated by repeated rapid
+    // feedback. Both matter; they answer different questions.
+    if (data.feedbackAdequacy) {
+      const fa = data.feedbackAdequacy;
+      const verdictColor: [number, number, number] =
+        fa.verdict === 'adequate'
+          ? [22, 163, 74] // success green
+          : fa.verdict === 'sparse'
+            ? [202, 138, 4] // warning amber
+            : fa.verdict === 'cold_start'
+              ? [120, 120, 120] // muted slate (honest "no signal yet")
+              : [120, 120, 120]; // unknown — same muted treatment
+      const verdictLabel =
+        fa.verdict === 'adequate'
+          ? 'ADEQUATE'
+          : fa.verdict === 'sparse'
+            ? 'SPARSE'
+            : fa.verdict === 'cold_start'
+              ? 'COLD START'
+              : 'UNAVAILABLE';
+      this.doc.setFont('helvetica', 'bold');
+      this.doc.setFontSize(8);
+      this.doc.setTextColor(...verdictColor);
+      this.doc.text(`FEEDBACK ADEQUACY · ${verdictLabel}`, MARGIN_L, y);
+      y += 4;
+      this.doc.setFont('helvetica', 'italic');
+      this.doc.setFontSize(8);
+      this.doc.setTextColor(80, 80, 80);
+      const faLines = this.doc.splitTextToSize(fa.note, TEXT_W);
+      this.doc.text(faLines, MARGIN_L, y);
+      y += faLines.length * 3.6 + 4;
+    }
+
+    // Reference Class Forecast strip (locked 2026-04-30 — Kahneman &
+    // Lovallo 2003). Outside-view baseline against the 143-case library
+    // — proves the audit is benchmarked against historical outcomes,
+    // not generated from an inside-view narrative alone.
+    if (data.referenceClassForecast) {
+      const rcf = data.referenceClassForecast;
+      const bandColor: [number, number, number] =
+        rcf.predictedOutcomeBand === 'reference_class_succeeds'
+          ? [22, 163, 74] // success green
+          : rcf.predictedOutcomeBand === 'reference_class_mixed'
+            ? [202, 138, 4] // amber
+            : rcf.predictedOutcomeBand === 'reference_class_struggles' ||
+                rcf.predictedOutcomeBand === 'reference_class_fails'
+              ? [220, 38, 38] // red
+              : [120, 120, 120]; // too small to judge
+      const bandLabel =
+        rcf.predictedOutcomeBand === 'reference_class_succeeds'
+          ? 'FAVOURABLE BASE RATE'
+          : rcf.predictedOutcomeBand === 'reference_class_mixed'
+            ? 'MIXED BASE RATE'
+            : rcf.predictedOutcomeBand === 'reference_class_struggles'
+              ? 'CHALLENGING BASE RATE'
+              : rcf.predictedOutcomeBand === 'reference_class_fails'
+                ? 'HOSTILE BASE RATE'
+                : 'STRUCTURALLY NOVEL';
+      this.doc.setFont('helvetica', 'bold');
+      this.doc.setFontSize(8);
+      this.doc.setTextColor(...bandColor);
+      this.doc.text(`REFERENCE CLASS FORECAST · ${bandLabel}`, MARGIN_L, y);
+      y += 4;
+      this.doc.setFont('helvetica', 'italic');
+      this.doc.setFontSize(8);
+      this.doc.setTextColor(80, 80, 80);
+      const rcfLines = this.doc.splitTextToSize(rcf.note, TEXT_W);
+      this.doc.text(rcfLines, MARGIN_L, y);
+      y += rcfLines.length * 3.6 + 2;
+      // Top-3 analogs as a compact strip — names + outcome chips.
+      if (rcf.topAnalogs.length > 0 && y < 268) {
+        this.doc.setFont('helvetica', 'normal');
+        this.doc.setFontSize(7.5);
+        this.doc.setTextColor(110, 110, 110);
+        for (const analog of rcf.topAnalogs.slice(0, 3)) {
+          if (y > 270) break;
+          const sim = `${Math.round(analog.similarityScore * 100)}%`;
+          const line = `${analog.company} (${analog.year}) · ${analog.outcome.replace(/_/g, ' ')} · sim ${sim} · ${analog.matchReason}`;
+          const truncated = line.length > 110 ? `${line.slice(0, 107)}...` : line;
+          this.doc.text(truncated, MARGIN_L + 2, y);
+          y += 3.4;
+        }
+        y += 2;
+      }
     }
 
     // Counterfactual Impact Block — DPR v2 #2. Top-3 bias scenarios with

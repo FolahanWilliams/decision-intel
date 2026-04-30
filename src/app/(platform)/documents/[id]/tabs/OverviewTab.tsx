@@ -9,6 +9,7 @@ import { DocumentTextHighlighter } from '@/components/visualizations/DocumentTex
 import { BiasSparklineWithData } from '@/components/visualizations/BiasSparkline';
 import { RPDPreMortemSuggestionsCard } from '@/components/analysis/RPDPreMortemSuggestionsCard';
 import { RemediationChecklist } from '@/components/analysis/RemediationChecklist';
+import { PaperApplicationsCard } from '@/components/analysis/PaperApplicationsCard';
 import dynamic from 'next/dynamic';
 const BiasNetwork3D = dynamic(() => import('@/components/visualizations/BiasNetwork3DCanvas'), {
   ssr: false,
@@ -361,6 +362,17 @@ export function OverviewTab({
           unconditionally. The richer Bias Details list still renders
           below for analysts who want every detected pattern. */}
       <RemediationChecklist biases={biases} documentId={documentId} />
+
+      {/* 3.45 R²F Paper-Application Signals (locked 2026-04-30 — paper-
+          application sprint UI surfacing). Three blocks: Validity
+          Classification (Kahneman & Klein 2009 first condition · drives
+          DQI methodology v2.1.0) → Reference Class Forecast (Kahneman &
+          Lovallo 2003 HBR · top-5 historical analogs from the 143-case
+          library) → Feedback Adequacy (Kahneman & Klein 2009 second
+          condition · author's closed-loop history). Mirrors the DPR
+          cover-page strips so a procurement reader sees the SAME bands
+          before downloading the PDF. Source: /api/analysis/[id]/insights. */}
+      {analysisId && <PaperApplicationsCard analysisId={analysisId} />}
 
       {/* 3.5 Pre-mortem suggestions — proactive Klein-side surface
           (D3 lock 2026-04-28). Maps the dominant bias patterns to

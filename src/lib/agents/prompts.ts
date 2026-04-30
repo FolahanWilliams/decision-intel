@@ -26,6 +26,8 @@ Taxonomy of Biases to Detect:
 18. Gambler's Fallacy - Misjudging independent events as having "memory" — e.g. "we've had 3 bad quarters, so the next must be good" or "the market always bounces back after a dip"
 19. Zeigarnik Effect - Incomplete or open tasks create anxiety that drives rushed, poorly-considered decisions to gain closure, rather than leaving the question open for more data
 20. Paradox of Choice - Decision fatigue or paralysis caused by too many options, leading to either status quo inaction, shallow satisficing, or defaulting to the popular choice
+21. Illusion of Validity - Subjective confidence rooted in NARRATIVE COHERENCE, not evidence quality. Detect rhetorical-certainty signals — "we are certain", "guaranteed", "highly predictable cash flows", "clear path to", "management is confident", "obvious", "no doubt", "without question", "without exception" — that are NOT backed by external base rates, calibration evidence, or reference-class comparisons. Per Kahneman & Klein (2009), expert intuition can only be trusted when (a) the environment is high-validity (predictable cue→outcome mappings) AND (b) the decision-maker has had repeated rapid feedback in that environment. Long-term M&A, market-entry strategy, and macro forecasting are LOW-VALIDITY environments where confidence is decoupled from accuracy. Penalize confidence-language when the surrounding evidence is anecdotal, narrative, or coherent-but-unverified. Mark severity 'high' when rhetorical certainty appears without external evidence; 'critical' when it appears in a zero-validity domain (long-horizon forecasts, behavioural predictions, novel market dynamics).
+22. Inside-View Dominance - Reasoning from CASE-SPECIFIC details (the "inside view") while ignoring the historical BASE RATE of similar decisions (the "outside view"). Per Kahneman & Lovallo (2003) "Delusions of Success" (HBR), the inside-view narrative (we are talented, motivated, on track, this case is special) routinely overrides the outside-view base rate (40% of similar projects abandoned, 8-year median for completed). Detect signals: "this case is special" / "the comparables don't apply" / "we are different because…" / "industry data doesn't reflect our situation" / "our circumstances are unique" / arguing against historical analogs without producing a stronger reference class / making projections without grounding them in a named comparable set. Severity scales with stakes: 'critical' when the memo explicitly dismisses an industry base rate without producing a substitute reference class; 'high' when the memo is silent on base rates entirely; 'medium' when the memo cites comparables but doesn't engage with their distribution; 'low' when one comparable is named but a fuller class is omitted.
 
 COMPOUND BIAS INTERACTIONS — When you detect one bias, actively look for its amplifiers:
 • Confirmation Bias + Anchoring Bias (1.4x amplification) — Seeking confirming evidence strengthens initial anchors
@@ -44,6 +46,14 @@ COMPOUND BIAS INTERACTIONS — When you detect one bias, actively look for its a
 • Zeigarnik Effect + Planning Fallacy (1.4x) — Incomplete task anxiety compresses timelines unrealistically
 • Paradox of Choice + Status Quo Bias (1.4x) — Option overload triggers default to current state
 • Paradox of Choice + Cognitive Misering (1.3x) — Too many options forces shallow, heuristic-based decisions
+• Illusion of Validity + Overconfidence (1.5x) — Narrative coherence creates false confidence, which then reinforces over-claiming
+• Illusion of Validity + Confirmation Bias (1.4x) — Selectively-gathered evidence makes the story feel coherent, which then feels like proof
+• Illusion of Validity + Halo Effect (1.3x) — One impressive feature (founder pedigree, prior win) supplies the coherent story that justifies dismissing all counter-evidence
+• Illusion of Validity + Authority Bias (1.3x) — A confident senior voice supplies the coherence; subordinates conflate the speaker's certainty with validity
+• Inside-View Dominance + Planning Fallacy (1.6x) — When the inside-view dominates time and cost estimates specifically; same mechanism, narrower target
+• Inside-View Dominance + Overconfidence (1.5x) — Absence of the reference class is mistaken for absence of the risk
+• Inside-View Dominance + Illusion of Validity (1.4x) — A coherent inside-view story produces illusion of validity; the outside-view base rate is the antidote
+• Inside-View Dominance + Confirmation Bias (1.3x) — Selectively-gathered evidence reinforces the inside-view narrative; together they make the reference class invisible
 
 TOXIC COMBINATIONS to flag explicitly:
 • "Echo Chamber" — Groupthink + Confirmation Bias present together
@@ -55,6 +65,10 @@ TOXIC COMBINATIONS to flag explicitly:
 • "Doubling Down" — Gambler's Fallacy + Sunk Cost Fallacy (belief in reversal justifies continued investment)
 • "Analysis Paralysis" — Paradox of Choice + Cognitive Misering + Status Quo Bias (overwhelm → inaction)
 • "Deadline Panic" — Zeigarnik Effect + Planning Fallacy + Cognitive Misering (open tasks → rushed decisions)
+• "Coherent Confidence" — Illusion of Validity + Overconfidence + (Confirmation Bias OR Halo Effect) — the most dangerous pattern in low-validity domains: a coherent story produces high confidence, the high confidence is mistaken for evidence, and counter-evidence is then filtered out. Flag whenever you detect rhetorical certainty paired with narrative-driven justification in M&A, market entry, or long-horizon forecasting memos.
+• "Reference-Class Blindness" — Inside-View Dominance + Planning Fallacy + Overconfidence — the canonical Kahneman & Lovallo (2003) failure pattern. The memo (a) reasons exclusively from inside-view details, (b) projects optimistic timelines or costs, and (c) dismisses or ignores the historical base rate of similar decisions. This is the dominant failure mode in low-validity environments and the single most predictive pattern in the historical case library.
+
+VALIDITY-AWARE SCORING — Kahneman & Klein (2009) distinguish high-validity environments (predictable cue→outcome mappings + rapid feedback: medicine, firefighting, chess) from low-validity environments (M&A, macro forecasting, long-horizon strategy, novel-market dynamics). When you can infer the decision domain from the document, treat confidence-language and intuition-based justifications more harshly in low-validity contexts: a sentence that reads as 'measured experience' in a high-validity domain reads as 'illusion of validity' in a low-validity one. Do not invent an environment classification — when in doubt, treat the document as low-validity (the conservative posture).
 
 Analysis Instructions:
 - Read the text CAREFULLY and look for subtle signs of each bias
@@ -383,7 +397,9 @@ export const STRATEGIC_ANALYSIS_PROMPT = `
    You are a Chief Strategy Officer (CSO) and Risk Architect.
    Perform a comprehensive strategic assessment:
    1. SWOT Analysis: Internal Strengths/Weaknesses, External Opportunities/Threats.
-   2. Pre-Mortem: Imagine this initiative has FAILED 1 year from now. Why? And how to prevent it.
+   2. Pre-Mortem (PROSPECTIVE HINDSIGHT FRAMING — Klein & Mitchell 1995 / Mitchell, Russo, Pennington 1989): Project yourself ONE YEAR INTO THE FUTURE. The plan in this document was implemented EXACTLY AS WRITTEN. The outcome was a TOTAL DISASTER — material capital was destroyed, the strategic position is worse than before, and a post-mortem committee is now reviewing what went wrong.
+      Your task: write a brief HISTORY of that disaster from the future-tense vantage point. Treat the failure as a fait accompli — do NOT speak in conditionals ("might fail because…", "could go wrong if…"). Speak in past tense from inside the future ("the failure began when…", "the warning sign everyone missed was…", "by Q3 it was clear that…"). This phrasing is the load-bearing instruction; the cognitive science (Mitchell et al. 1989) shows that generating explanations for an outcome framed AS IF IT HAS ALREADY OCCURRED produces 25–30% more, and substantially higher-quality, failure-cause insights than asking "what could go wrong?" in conditional voice.
+      Output: 4-7 distinct failure mechanisms with the temporal sequence in which they unfolded, plus the specific preventive action that would have arrested each mechanism if taken at the time the plan was committed.
 
    CRITICAL GROUNDING INSTRUCTION:
    - You MUST use Google Search to verify the "External Opportunities" and "External Threats".
@@ -472,7 +488,7 @@ Perform a comprehensive MULTI-DIMENSIONAL analysis on the provided text in a SIN
 
 ## DIMENSION 2: STRATEGIC ASSESSMENT
 - SWOT Analysis: Internal Strengths/Weaknesses, External Opportunities/Threats.
-- Pre-Mortem: Imagine this initiative has FAILED 1 year from now — identify failure causes and preventive measures.
+- Pre-Mortem (PROSPECTIVE HINDSIGHT — Klein & Mitchell 1995 / Mitchell, Russo, Pennington 1989). Project yourself ONE YEAR INTO THE FUTURE. The plan was implemented exactly as written and the outcome was a TOTAL DISASTER. From that future vantage point, write a HISTORY of the disaster in past tense — "the failure began when…", "the warning sign everyone missed was…", "by Q3 it was clear that…". This past-tense, fait-accompli framing is load-bearing; treating the failure as already-occurred produces 25–30% more and higher-quality failure-cause insights (Mitchell, Russo, Pennington 1989) than the conditional voice of "what could go wrong?". Do NOT use conditional language ("might", "could", "if"). Identify 4–7 failure mechanisms in their temporal order plus the preventive action that would have arrested each at commit time.
 - Inversion (Munger): Invert the success criteria. List 3-5 concrete actions or conditions that would GUARANTEE this initiative fails. Do not list vague risks; list causal levers a hostile actor could pull.
 - Red Team / 10th Man dissent (RAND): Write 2-4 of the sharpest objections a hostile reviewer would raise. Each must cite a specific claim in the document and explain why it is the weakest load-bearing assumption.
 - Use Google Search to verify external Opportunities and Threats with real-world data.
@@ -1062,9 +1078,12 @@ IMPORTANT:
 export function buildNarrativePreMortemPrompt(): string {
   return `You are also tasked with generating NARRATIVE WAR STORIES for the pre-mortem analysis.
 Gary Klein's research shows that vivid stories are far more memorable and actionable than bullet lists.
+The PROSPECTIVE HINDSIGHT framing (Klein & Mitchell 1995; Mitchell, Russo, Pennington 1989) — narrate failures
+in PAST TENSE from a future vantage point, not in conditional voice — is the load-bearing instruction.
 
-For each major failure scenario, generate a WAR STORY: a vivid, specific narrative of how a similar
-deal/decision failed in the past. These should read like cautionary tales, not academic case studies.
+For each major failure scenario you have already identified, generate a WAR STORY: a vivid, specific
+narrative of how a similar deal/decision ACTUALLY failed in the past. These should read like cautionary
+tales, not academic case studies. Each story is told as if the disaster has already happened.
 
 Add a "warStories" array to your pre-mortem output:
 "warStories": [
@@ -1114,13 +1133,14 @@ METHODOLOGY — follow this exactly:
 2. Check the memo under review — does it address those same questions?
 3. A "forgotten question" is one that (a) an analog had to answer, and
    (b) the memo never raises, and (c) maps to a specific bias in the
-   31-bias taxonomy (Confirmation, Anchoring, Sunk Cost, Overconfidence,
+   33-bias taxonomy (Confirmation, Anchoring, Sunk Cost, Overconfidence,
    Groupthink, Authority, Bandwagon, Loss Aversion, Availability,
    Hindsight, Planning Fallacy, Status Quo, Framing, Selective Perception,
    Recency, Cognitive Misering, Halo Effect, Gambler's Fallacy, Zeigarnik,
-   Paradox of Choice, Survivorship, Dunning-Kruger, Narrative Fallacy,
-   IKEA Effect, Endowment, Illusion of Control, Base Rate Neglect,
-   Conjunction Fallacy, Curse of Knowledge, Optimism Bias, Outcome Bias).
+   Paradox of Choice, Illusion of Validity, Inside-View Dominance,
+   Survivorship, Dunning-Kruger, Narrative Fallacy, IKEA Effect, Endowment,
+   Illusion of Control, Base Rate Neglect, Conjunction Fallacy,
+   Curse of Knowledge, Optimism Bias, Outcome Bias).
 
 HARD CONSTRAINTS:
 - Return exactly 3-7 forgotten questions. Fewer if the memo is unusually
@@ -1145,7 +1165,7 @@ OUTPUT FORMAT (JSON, no markdown, no prose):
       {
         "question": "The specific question the memo should have asked.",
         "whyItMatters": "One sentence explaining what the analog had to answer and why that matters here.",
-        "biasGuarded": "Exact name from the 31-bias taxonomy",
+        "biasGuarded": "Exact name from the 33-bias taxonomy",
         "analogCompany": "Specific analog this came from",
         "severity": "low | medium | high | critical"
       }

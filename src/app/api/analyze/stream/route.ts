@@ -15,6 +15,7 @@ import { logAudit } from '@/lib/audit';
 import { trackApiUsage, estimateCost } from '@/lib/utils/cost-tracker';
 import { checkOutcomeGate, formatOutcomeReminder } from '@/lib/learning/outcome-gate';
 import { getDocumentContent } from '@/lib/utils/encryption';
+import { classifyValidity } from '@/lib/learning/validity-classifier';
 import {
   NoiseStatsSchema,
   FactCheckSchema,
@@ -687,6 +688,18 @@ export async function POST(request: NextRequest) {
                         inversionCount: Array.isArray(pm.inversion) ? pm.inversion.length : 0,
                       };
                     })(),
+                    // Validity classification (locked 2026-04-30 — Kahneman
+                    // & Klein 2009 first condition, paper-application
+                    // sprint #2 structural). Persisted in judgeOutputs so
+                    // every downstream surface (DPR cover, document-detail
+                    // UI cards, DQI methodology version) reads the SAME
+                    // band the pipeline computed at audit time. Live
+                    // compute is the fallback for legacy analyses where
+                    // judgeOutputs.validityClassification is null.
+                    validityClassification: classifyValidity({
+                      documentType: documentType ?? null,
+                      industry: null,
+                    }),
                     capturedAt: new Date().toISOString(),
                   }),
                 } satisfies Prisma.AnalysisUncheckedCreateInput,

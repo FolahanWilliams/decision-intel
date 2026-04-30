@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authenticateApiRequest } from '@/lib/utils/api-auth';
 import { prisma } from '@/lib/prisma';
 import { computeDQI } from '@/lib/scoring/dqi';
+import { classifyValidity } from '@/lib/learning/validity-classifier';
 import { computeCounterfactuals } from '@/lib/analysis/counterfactual';
 import { attributeRootCauses } from '@/lib/graph/root-cause';
 import { INTERACTION_MATRIX, type InteractionEntry } from '@/lib/ontology/interaction-matrix';
@@ -36,7 +37,7 @@ export async function GET(
         biases: true,
         outcome: true,
         document: {
-          select: { userId: true, orgId: true, content: true },
+          select: { userId: true, orgId: true, content: true, documentType: true },
         },
         toxicCombinations: true,
         prior: true,
@@ -88,6 +89,23 @@ export async function GET(
           violationsFound: 0,
         };
       })(),
+      // Validity-aware DQI shift (Kahneman & Klein 2009, locked 2026-04-30).
+      // Reads persisted validityClass from judgeOutputs first; falls
+      // back to live compute for legacy analyses.
+      validityClass:
+        ((analysis.judgeOutputs as { validityClassification?: { validityClass?: string } } | null)
+          ?.validityClassification?.validityClass as
+          | 'high'
+          | 'medium'
+          | 'low'
+          | 'zero'
+          | undefined) ??
+        classifyValidity({
+          documentType:
+            (analysis.document as unknown as { documentType?: string | null })?.documentType ??
+            null,
+          industry: null,
+        }).validityClass,
     });
 
     // 3. Run counterfactuals and root causes in parallel
