@@ -149,6 +149,145 @@ function formatDraftSource(source: string): string {
 }
 
 /**
+ * "Why this matters" inline rationale block — v3.2 lock 2026-04-30.
+ *
+ * Locked in GTM Plan v3.2 §4 (Outcome Gate enforced on Individual tier). The
+ * one-sentence default surfaces the value the user receives from logging the
+ * outcome; the expandable view goes deeper with the academic anchor (Klein &
+ * Mitchell 1995 prospective hindsight; the 143-case calibration baseline; the
+ * per-org Brier-scored recalibration). NOT marketing copy — procurement-grade
+ * voice. The user reads ONE sentence and understands they're training their
+ * decision instincts on their own historical pattern, not entering boring data.
+ *
+ * The discipline: Outcome Gate becomes the unlock mechanism, not the tax.
+ * Every closed outcome compounds the platform's value to the user specifically
+ * AND compounds the data moat that makes a $50–150M strategic acquisition
+ * defensible (vs. Cloverpop's data-advantage attack vector).
+ */
+function WhyThisMattersBlock() {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div
+      style={{
+        margin: '0 0 16px',
+        padding: '12px 14px',
+        background: 'rgba(99, 102, 241, 0.06)',
+        border: '1px solid rgba(99, 102, 241, 0.18)',
+        borderRadius: '8px',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '8px',
+        }}
+      >
+        <Lightbulb
+          size={14}
+          style={{ color: '#a5b4fc', flexShrink: 0, marginTop: 2 }}
+          aria-hidden="true"
+        />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p
+            style={{
+              fontSize: '12.5px',
+              color: 'var(--text-primary)',
+              fontWeight: 600,
+              margin: '0 0 4px',
+              lineHeight: 1.5,
+            }}
+          >
+            Why this matters
+          </p>
+          <p
+            style={{
+              fontSize: '12.5px',
+              color: 'var(--text-secondary)',
+              margin: 0,
+              lineHeight: 1.55,
+            }}
+          >
+            Your closed outcome teaches the platform <em>your</em> decision pattern. After 3
+            outcomes, your DQI starts calibrating to you — not the generic 143-case library.
+          </p>
+          <button
+            type="button"
+            onClick={() => setExpanded(v => !v)}
+            aria-expanded={expanded}
+            style={{
+              marginTop: 6,
+              padding: 0,
+              background: 'none',
+              border: 'none',
+              color: '#a5b4fc',
+              fontSize: 11,
+              fontWeight: 600,
+              cursor: 'pointer',
+              textDecoration: 'underline',
+              textUnderlineOffset: 2,
+            }}
+          >
+            {expanded ? 'Show less' : 'How exactly?'}
+          </button>
+          <AnimatePresence>
+            {expanded && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                style={{ overflow: 'hidden' }}
+              >
+                <ul
+                  style={{
+                    margin: '8px 0 0',
+                    padding: '0 0 0 16px',
+                    fontSize: 11.5,
+                    color: 'var(--text-muted)',
+                    lineHeight: 1.55,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 4,
+                  }}
+                >
+                  <li>
+                    <strong style={{ color: 'var(--text-secondary)' }}>Per-org Brier
+                    recalibration:</strong> every closed outcome updates the Brier-scored
+                    weighting of your DQI components, so the score gets sharper at predicting how
+                    decisions like yours actually play out.
+                  </li>
+                  <li>
+                    <strong style={{ color: 'var(--text-secondary)' }}>Pre-mortem framing
+                    (Klein &amp; Mitchell 1995):</strong> when you log lessons-learned in
+                    past-tense prospective-hindsight voice (&ldquo;the failure began when…&rdquo;),
+                    you produce 25–30% more failure-cause insights than asking &ldquo;what could
+                    go wrong?&rdquo; in conditional voice.
+                  </li>
+                  <li>
+                    <strong style={{ color: 'var(--text-secondary)' }}>Audit-committee
+                    artefact:</strong> closed outcomes flow into your Decision Knowledge Graph —
+                    the institutional-memory record your CFO can pull up in 60 seconds when the
+                    audit committee asks &ldquo;what was the reasoning?&rdquo;
+                  </li>
+                  <li>
+                    <strong style={{ color: 'var(--text-secondary)' }}>Cohort
+                    contribution:</strong> at ≥1 closed outcome you start sharpening bias patterns
+                    across the cross-org cohort. The platform-wide calibration baseline (Brier
+                    0.258 across 143 audited corporate decisions) tightens with every new closed
+                    outcome.
+                  </li>
+                </ul>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
  * Outcome Gate hard-block modal. Surfaces when the user has hit the hard
  * threshold (5+ pending outcomes past 30 days old) AND their org has
  * `Organization.enforceOutcomeGate=true` (typically design-partner orgs).
@@ -484,6 +623,7 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
                   {submitError}
                 </div>
               )}
+              <WhyThisMattersBlock />
               <p
                 style={{
                   fontSize: '13px',
@@ -492,7 +632,6 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
                   lineHeight: 1.6,
                 }}
               >
-                Every outcome you report makes future analyses more accurate for your organization.
                 Report at least one outcome to unlock new analyses.
               </p>
 

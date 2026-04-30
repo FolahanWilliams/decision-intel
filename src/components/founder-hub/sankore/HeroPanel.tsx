@@ -79,7 +79,7 @@ export function HeroPanel() {
           lineHeight: 1.6,
           color: 'var(--text-secondary)',
           maxWidth: 880,
-          marginBottom: 26,
+          marginBottom: 14,
         }}
       >
         The audit Titi ran on Decision Intel concluded the platform was a strong intellectual
@@ -87,6 +87,47 @@ export function HeroPanel() {
         every Sankore-specific gap she flagged has either shipped to production, scaffolded for
         activation, or scheduled into the 12-week plan. This page is the live ledger.
       </p>
+
+      {/* v3.2 lock: engagement-context strip — London office + summer 2026 */}
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 8,
+          alignItems: 'center',
+          padding: '10px 14px',
+          background: 'rgba(22,163,74,0.06)',
+          border: '1px solid rgba(22,163,74,0.20)',
+          borderRadius: 'var(--radius-md)',
+          marginBottom: 24,
+          fontSize: 12.5,
+          color: 'var(--text-secondary)',
+        }}
+      >
+        <span
+          style={{
+            fontSize: 9.5,
+            letterSpacing: '0.10em',
+            textTransform: 'uppercase',
+            fontWeight: 800,
+            color: 'var(--accent-primary)',
+            padding: '2px 7px',
+            borderRadius: 999,
+            background: 'rgba(22,163,74,0.10)',
+            border: '1px solid rgba(22,163,74,0.25)',
+          }}
+        >
+          Engagement
+        </span>
+        <span>
+          <strong style={{ color: 'var(--text-primary)' }}>London office</strong>, in-person
+          summer 2026 · Design Foundation rate{' '}
+          <strong style={{ color: 'var(--text-primary)' }}>£1,999/mo</strong> (20% off Strategy
+          tier) for the founding cohort, optional equity-warrant + outcome-share clause. Per the
+          GTM Plan v3.2 lock, Sankore is the design-partner bridge — not the GTM wedge — and
+          produces the published reference DPRs that unlock the F500 ceiling.
+        </span>
+      </div>
 
       <div
         style={{
