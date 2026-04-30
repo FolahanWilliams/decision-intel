@@ -310,7 +310,7 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
   { id: 'unicorn_roadmap', label: 'Unicorn Roadmap', icon: <Target size={16} />, group: 'Start' },
   {
     id: 'path_to_100m',
-    label: 'Path to $100M ARR',
+    label: 'Path to £100M Exits',
     icon: <Target size={16} />,
     group: 'Start',
   },
@@ -809,7 +809,7 @@ const SEARCH_INDEX: SearchEntry[] = [
   },
   {
     tabId: 'path_to_100m',
-    section: 'Path to $100M ARR',
+    section: 'Path to £100M Exits',
     preview:
       'Strategic compass + per-role outreach playbooks (8 personas) + R²F intellectual moat deep-dive + 16 investor metrics + killer responses to "not for us" / "I’m confused" + warm-intro network map + 90-day action plan + NotebookLM follow-up lab.',
     keywords:
@@ -1603,7 +1603,7 @@ function renderTab(
       </ErrorBoundary>
     ),
     path_to_100m: (
-      <ErrorBoundary sectionName="Path to $100M ARR">
+      <ErrorBoundary sectionName="Path to £100M Exits">
         <PathToHundredMillionTab />
       </ErrorBoundary>
     ),

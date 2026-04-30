@@ -212,12 +212,16 @@ export const AUDIENCE_PITCHES: AudiencePitch[] = [
   },
   {
     id: 'fund',
-    audience: 'Fund Partner / EM Investor',
+    audience: 'Sankore-class fund (design-partner bridge, NOT primary buyer)',
     seconds: 35,
     pitch:
-      "For capital-allocating teams (PE, EM-focused VC, family office IC), the audit anchor is geography-specific. Africa-focused funds see the Dangote 2014 pan-African expansion DPR — three Dalio determinants (currency cycle, trade share, governance) plus regulatory mapping across NDPR, CBN, WAEMU, PoPIA, CMA Kenya, Basel III. US/global funds see the WeWork S-1. The pitch is the evidence moment: 90 seconds to frame, then I run the audit live on a document you already know. Then the ask: bring a redacted IC memo from a deal that didn't go to plan, and we run THAT live next time.",
+      "Funds aren't the GTM wedge — Individual £249/mo CSOs / M&A heads / corp dev directors are (UK + US). For warm-intro fund relationships specifically (Sankore-class — Pan-African / EM-focused, capital-allocation pressure, IC-cycle calendar), I open the Design Foundation founding-pilot offer: £1,999/mo (20% off Strategy tier) for 12 months OR £20-25K bundle, optional equity-warrant + outcome-share clause. The strategic value isn't fund-buyer-budget; it's real fund operational insight + reference-grade artefacts that unlock the F500 corp dev ceiling 12-24 months out. Anchor artefact: Dangote 2014 pan-African expansion DPR — three Dalio determinants + regulatory mapping across NDPR, CBN, WAEMU, PoPIA, SARB, ISA Nigeria 2007.",
     color: '#D97706',
-    emphasis: ['Dangote 2014 pan-African expansion', 'evidence moment', 'NDPR, CBN, WAEMU'],
+    emphasis: [
+      'design-partner bridge, not primary buyer',
+      'Design Foundation £1,999/mo or £20-25K bundle',
+      'reference-grade artefacts unlock F500 ceiling',
+    ],
   },
   {
     id: 'board',

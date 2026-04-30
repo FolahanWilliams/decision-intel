@@ -371,7 +371,7 @@ function renderCalibrationCard(onNavigateToTab: (tabId: string) => void) {
         onClick={() => onNavigateToTab('path_to_100m')}
         style={calibrationCta}
       >
-        Open Path to $100M ARR · Investor Metrics Tracker <ArrowRight size={11} />
+        Open Path to £100M Exits · Investor Metrics Tracker <ArrowRight size={11} />
       </button>
       <style>{`
         @media (max-width: 700px) {

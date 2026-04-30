@@ -126,7 +126,7 @@ export const NODES: MapNode[] = [
   },
   {
     id: 'path_to_100m',
-    label: 'Path to $100M ARR',
+    label: 'Path to £100M Exits',
     group: 'Start',
     x: 0.07,
     y: 0.62,

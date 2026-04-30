@@ -214,7 +214,126 @@ export function BiasGenomeContributionCard() {
     );
   }
 
-  // Populated state.
+  // v3.2 unlock-progress state (locked 2026-04-30): 1-2 closed outcomes.
+  // Outcome Gate becomes the unlock mechanic, not the tax — show contribution
+  // stats but gate the cohort comparison + top-biases reveal until ≥3 closed
+  // outcomes (where the per-org Brier-scored recalibration starts producing
+  // statistically meaningful signal). Per CLAUDE.md ICP block: "outcome
+  // logging becomes the unlock mechanic, not the tax."
+  const OUTCOME_UNLOCK_THRESHOLD = 3;
+  if (
+    data.outcomeValidatedAnalysesCount > 0 &&
+    data.outcomeValidatedAnalysesCount < OUTCOME_UNLOCK_THRESHOLD
+  ) {
+    const remaining = OUTCOME_UNLOCK_THRESHOLD - data.outcomeValidatedAnalysesCount;
+    const progressPct = Math.round(
+      (data.outcomeValidatedAnalysesCount / OUTCOME_UNLOCK_THRESHOLD) * 100
+    );
+    return (
+      <div className="card">
+        <div className="card-body">
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              marginBottom: 8,
+              flexWrap: 'wrap',
+            }}
+          >
+            <Network size={16} style={{ color: 'var(--accent-primary)' }} />
+            <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
+              Bias Genome
+            </span>
+            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+              · your team&apos;s contribution
+            </span>
+            <span
+              style={{
+                marginLeft: 'auto',
+                fontSize: 10,
+                fontWeight: 700,
+                padding: '2px 8px',
+                borderRadius: 999,
+                background: 'rgba(99, 102, 241, 0.10)',
+                color: '#a5b4fc',
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+                border: '1px solid rgba(99, 102, 241, 0.25)',
+              }}
+            >
+              {data.outcomeValidatedAnalysesCount} of {OUTCOME_UNLOCK_THRESHOLD} unlocked
+            </span>
+          </div>
+          <p
+            style={{
+              fontSize: 13,
+              color: 'var(--text-secondary)',
+              lineHeight: 1.55,
+              margin: '0 0 12px 0',
+            }}
+          >
+            You&apos;ve started contributing —{' '}
+            <strong style={{ color: 'var(--text-primary)' }}>
+              {data.pairsContributed.toLocaleString()} bias-instance pair
+              {data.pairsContributed === 1 ? '' : 's'}
+            </strong>{' '}
+            across {data.outcomeValidatedAnalysesCount} closed outcome
+            {data.outcomeValidatedAnalysesCount === 1 ? '' : 's'}. Log {remaining} more closed
+            outcome{remaining === 1 ? '' : 's'} to unlock the cross-org cohort comparison + your
+            top-bias contribution breakdown — that&apos;s where the per-org Brier-scored
+            recalibration starts sharpening the platform for your team specifically.
+          </p>
+          {/* Progress bar */}
+          <div
+            style={{
+              height: 6,
+              background: 'rgba(99, 102, 241, 0.10)',
+              borderRadius: 999,
+              overflow: 'hidden',
+              marginBottom: 12,
+            }}
+            aria-label={`Outcome unlock progress: ${progressPct}%`}
+          >
+            <div
+              style={{
+                height: '100%',
+                width: `${progressPct}%`,
+                background:
+                  'linear-gradient(90deg, var(--accent-primary), rgba(99, 102, 241, 0.7))',
+                borderRadius: 999,
+                transition: 'width 0.4s ease',
+              }}
+            />
+          </div>
+          {data.platformBaseline ? (
+            <PlatformBaselineCallout baseline={data.platformBaseline} />
+          ) : null}
+          <Link
+            href="/dashboard/outcome-flywheel"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              fontSize: 12,
+              fontWeight: 600,
+              color: 'var(--accent-primary)',
+              textDecoration: 'none',
+              padding: '6px 12px',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--accent-primary)',
+              marginTop: 8,
+            }}
+          >
+            Log {remaining === 1 ? 'the next outcome' : `${remaining} more outcomes`}{' '}
+            <ArrowUpRight size={12} />
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Populated state (≥3 outcomes — full unlock).
   const {
     pairsContributed,
     outcomeValidatedAnalysesCount,

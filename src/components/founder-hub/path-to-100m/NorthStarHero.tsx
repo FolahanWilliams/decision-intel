@@ -2,30 +2,41 @@
 
 import { Target, TrendingUp, Map as MapIcon } from 'lucide-react';
 
+// v3.2 lock 2026-04-30 · the goal is founder cash $30M+ at strategic
+// acquisition exit, NOT unicorn ARR. Bootstrap-leaning + ONE strategic seed
+// round Q4 2026 / Q1 2027. Exit at 8-12× ARR multiple = £30-95M EV; founder
+// retains 60-78% post-seed → personal cash $25-70M. Probability range 35-55%
+// per NotebookLM v3.2 critique-adjusted estimate.
 const NORTH_STAR_BANDS = [
   {
-    label: 'Q4 2026',
-    metric: '£70-90K ARR',
-    detail: '3 paid design partners · Sankore + 2 EM funds',
+    label: 'Q3 2026',
+    metric: 'Graduation rule fires',
+    detail: '5 paid Individual £249/mo · 10 raving advocates · 1 verifiable referral via DPR',
     cumulative: 0.5,
   },
   {
+    label: 'Q4 2026 / Q1 2027',
+    metric: 'Seed raised',
+    detail: '£1.5-2.5M @ £8-15M post · founder retains 60-78% · Sankore Design Foundation pilot live',
+    cumulative: 0.4,
+  },
+  {
     label: 'Q4 2027',
-    metric: '£950K-1.6M ARR',
-    detail: '25-40 customers (3-5 F500 expansion)',
-    cumulative: 0.175,
+    metric: '£500K-1M ARR',
+    detail: '1-2 published reference DPRs · F500 corp dev procurement conversations open',
+    cumulative: 0.3,
   },
   {
     label: 'Q4 2029',
-    metric: '£16-32M ARR',
-    detail: '200-300 customers · Series B',
-    cumulative: 0.0525,
+    metric: '£3-8M ARR',
+    detail: 'F500 ceiling unlocking · strategic-acquisition discussions',
+    cumulative: 0.2,
   },
   {
-    label: 'Q4 2030',
-    metric: '£80M+ ARR',
-    detail: '500 enterprise teams · unicorn',
-    cumulative: 0.0079,
+    label: '2031-2033',
+    metric: '£30-95M EV exit',
+    detail: 'Founder cash $30M+ · likely acquirers: LRQA / IBM watsonx.gov / Big-4',
+    cumulative: 0.45,
   },
 ];
 
@@ -51,7 +62,7 @@ export function NorthStarHero() {
           marginBottom: 8,
         }}
       >
-        North Star · path to $100M ARR · 2030
+        North Star · path to £100M Exits · 2031-2033
       </div>
       <h2
         style={{
@@ -62,7 +73,7 @@ export function NorthStarHero() {
           lineHeight: 1.15,
         }}
       >
-        500 enterprise strategy teams · £200K average ACV · £100M ARR by 2030.
+        £30M+ founder cash exit · most equity retained · 5-7 years.
       </h2>
       <p
         style={{
@@ -74,13 +85,14 @@ export function NorthStarHero() {
           maxWidth: 820,
         }}
       >
-        The math is concrete. The path is conditional. Phase 1 (50%) → Phase 2 (35%) → Phase 3 (30%)
-        → Phase 4 (15%) multiplies to <strong>0.79% absolute IPO outcome</strong> — 4× the pre-seed
-        B2B baseline. Most likely real outcome:{' '}
-        <strong>Series-B-stage strategic acquisition at £400M-1B by Q4 2029</strong>. This page is
-        the single source of truth for how to make that happen — positioning, role-by-role outreach,
-        intellectual moat deepening, investor metrics, failure modes, network leverage, 90-day
-        actions.
+        Bootstrap-leaning + ONE strategic seed round Q4 2026 / Q1 2027 (£1.5-2.5M @ £8-15M post,
+        founder dilution 12-20%). Bootstrap to £3-8M ARR over 3-5 years post-seed. Strategic
+        acquisition exit at 8-12× ARR multiple = <strong>£30-95M EV</strong>; founder retains 60-78%
+        → personal cash <strong>$25-70M</strong>, comfortably clearing the $30M floor. Probability
+        of $30M+ outcome: <strong>35-55%</strong> if next 90 days execute tightly and the Individual
+        → Sankore graduation fires (NotebookLM v3.2-critique-adjusted estimate). Likely acquirers:
+        LRQA, IBM watsonx.governance arm, Big-4 governance practice, or a strategic AI-governance
+        player TBD. This page is the single source of truth for how to make that happen.
       </p>
 
       <div
@@ -127,7 +139,7 @@ export function NorthStarHero() {
                 fontFamily: 'var(--font-mono, monospace)',
               }}
             >
-              cumulative P = {(band.cumulative * 100).toFixed(2)}%
+              conditional P = {(band.cumulative * 100).toFixed(0)}%
             </div>
           </div>
         ))}

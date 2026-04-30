@@ -177,7 +177,7 @@ When the founder asks for help with one of these workflows, route them to the na
 START group:
 - 'start' — Founder Hub interactive map (the entry point). Use when the founder asks 'where do I start' / 'what should I work on' / 'show me the hub layout'. Surfaces a 5-cluster journey selector (pitch / research / outreach / reflect / product).
 - 'unicorn_roadmap' — strategic dashboard with HonestProbabilityPath (4-phase 2026→2030 timeline with conditional probabilities multiplying to ~0.79% absolute IPO outcome — 4× pre-seed B2B baseline). Use for fundraising-stage discussions, investor metrics, or hard-truth risk tracking.
-- 'path_to_100m' — Path to $100M ARR strategic compass. Use when the founder asks 'how do I get to 100M' / 'investor metrics' / 'NorthStar' / 'gaps' / 'failure modes' / 'External Attack Vectors' / 'warm intro network' / '90-day plan'. NotebookLM-grounded. 11 sub-components covering strengths/weaknesses, R²F deepening levers, role outreach playbooks, killer responses, and conditional-probability roadmap.
+- 'path_to_100m' — Path to £100M Exits strategic compass (renamed v3.2 2026-04-30 from "Path to $100M ARR"; goal is now founder cash $30M+ at exit, NOT unicorn ARR). Use when the founder asks 'how do I get to 30M cash' / 'exit math' / 'investor metrics' / 'NorthStar' / 'gaps' / 'failure modes' / 'External Attack Vectors' / 'warm intro network' / '90-day plan'. NotebookLM-grounded. 11 sub-components covering strengths/weaknesses, R²F deepening levers, role outreach playbooks, killer responses, and conditional-probability roadmap.
 
 PRODUCT group:
 - 'overview' — Product Overview tab. Use for 'what does the product do' / 'high-level overview' / 'first-time orientation'.
