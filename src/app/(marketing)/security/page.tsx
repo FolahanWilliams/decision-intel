@@ -397,6 +397,78 @@ const INCIDENT_COMMITMENTS = [
  * multi-region Supabase configuration on Enterprise design-partner
  * deployments), update HERE so the questionnaire-response is consistent.
  */
+/**
+ * Vendor Continuity Plan (added 2026-04-30 GTM v3.2 Round 3 — NotebookLM
+ * upgraded this above the original Round 3 queue as a Margaret-class
+ * procurement gate-killer). The 16-year-old solo founder continuity risk is
+ * the single most-asked F500 GC procurement question against Decision Intel
+ * and was structurally absent from v3.2. Without these in writing, £30K
+ * Design Foundation pilots fail vendor-risk-register review before they
+ * start. When real-world facts change (incorporation completes, escrow
+ * provider chosen, second technical contributor added), update HERE so the
+ * questionnaire-response stays accurate.
+ */
+const VENDOR_CONTINUITY = [
+  {
+    label: 'Key-person provisions',
+    value: 'Documented per pilot',
+    body: 'Every Design Foundation pilot agreement includes a key-person clause naming the founder + an explicit escalation path. Pilot data export to a customer-controlled S3 bucket is committed to within 30 days of any service interruption longer than 5 business days, regardless of cause.',
+  },
+  {
+    label: 'Source-code escrow option',
+    value: 'Available · Enterprise',
+    body: 'Enterprise customers can require source-code escrow with NCC Group or Iron Mountain at signature, releasable to the customer on Insolvency / Service Discontinuation / Material Breach. Standard Strategy + Individual tiers do not include escrow but do include the data-export commitment below.',
+  },
+  {
+    label: 'Data export on termination',
+    value: 'Within 30 days',
+    body: 'On service termination (customer-initiated, vendor-initiated, or insolvency), every customer can request a complete export of (a) all uploaded documents in original format, (b) all generated DPRs as PDF + JSON, (c) the Decision Knowledge Graph as a JSON snapshot. Export endpoint is /api/export/account; bundle delivered within 30 days, no retention beyond what the active subscription specifies.',
+  },
+  {
+    label: 'Incorporation roadmap',
+    value: 'UK Ltd · Q3 2026',
+    body: 'Decision Intel operates pre-incorporation through 2026-Q2 per Mr. Gabe (Megasuto) advice — defer entity registration until first 1-2 pilot revenues fund the cost. UK Ltd incorporation calendared for Q3 2026 at the latest, immediately after the 5-paid-Individual graduation rule fires. Incorporation status confirmed in writing on every pilot agreement.',
+  },
+  {
+    label: 'Service-continuity insurance',
+    value: 'On Enterprise roadmap',
+    body: 'Cyber-liability + errors-and-omissions insurance carriage planned for Q1 2027 alongside SOC 2 Type II audit. Until live, Enterprise customers receive a written disclosure of the insurance gap and the contractual commitments that substitute for it.',
+  },
+];
+
+/**
+ * Trial / discovery-audit data handling (added 2026-04-30 GTM v3.2 Round 3 —
+ * NotebookLM identified the missing T+7-day-max-retention guarantee as the
+ * data-leak objection M&A professionals will have when asked to upload a
+ * confidential memo for a 20-minute audit). The infrastructure (AES-256-GCM,
+ * /api/documents/[id] DELETE, plan-tier retention) already existed; what was
+ * missing was the visible packaging on /security so a procurement reader
+ * can quote the guarantee in their vendor-risk register without opening
+ * the privacy policy.
+ */
+const TRIAL_DATA_HANDLING = [
+  {
+    label: 'Trial-audit max retention',
+    value: 'T+7 days',
+    body: 'Documents uploaded for free 60-second audits or 20-minute discovery audits are auto-purged 7 days after upload unless the customer signs into a paid tier. The 7-day window covers the founder follow-up + reference-call window; nothing beyond. No exceptions.',
+  },
+  {
+    label: 'Per-document hard-purge',
+    value: 'One-click · any time',
+    body: 'Every document detail page surfaces a "Purge now" action that immediately deletes the document, its analysis, all derived artefacts (DPR, fingerprints, cache entries), and any pending nudges. Encrypted backup copies are zeroed within 24 hours of the purge call. The action is logged to the customer-visible AuditLog so the purge itself is auditable.',
+  },
+  {
+    label: 'Standard NDA template',
+    value: 'Mutual · 7-day default',
+    body: 'A standard mutual NDA template covering the 20-minute audit conversation is available at /docs/nda-template.pdf. Default term: 7 days from signature, extending to the active subscription term once a paid tier is signed. Sankore-class design-partner pilots use a separate Master Services Agreement with longer confidentiality terms.',
+  },
+  {
+    label: 'No model training on customer data',
+    value: 'Contractual',
+    body: 'Customer document content is never used to train, fine-tune, or evaluate any large language model — Gemini, Claude, or otherwise. Provider terms (Google Cloud Platform + Anthropic) explicitly disclaim training on enterprise inputs. The same commitment is mirrored in the DPA + every pilot agreement. Bias-genome cohort signals (anonymised, opt-in) are derived from outcome metadata, never document content.',
+  },
+];
+
 const DR_BCP = [
   {
     label: 'Recovery Point Objective (RPO)',
@@ -1471,6 +1543,138 @@ export default function SecurityPage() {
             }}
           >
             {DR_BCP.map(item => (
+              <div
+                key={item.label}
+                style={{
+                  background: C.white,
+                  border: `1px solid ${C.slate200}`,
+                  borderRadius: 12,
+                  padding: '18px 20px',
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 800,
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    color: C.slate500,
+                    marginBottom: 6,
+                  }}
+                >
+                  {item.label}
+                </div>
+                <div
+                  style={{
+                    fontSize: 18,
+                    fontWeight: 700,
+                    color: C.green,
+                    letterSpacing: '-0.01em',
+                    marginBottom: 8,
+                    fontFamily:
+                      'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+                  }}
+                >
+                  {item.value}
+                </div>
+                <div style={{ fontSize: 12.5, color: C.slate600, lineHeight: 1.55 }}>
+                  {item.body}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Vendor Continuity Plan (GTM v3.2 Round 3 — NotebookLM upgrade · Margaret persona) */}
+      <section
+        id="vendor-continuity"
+        style={{
+          padding: '72px 24px',
+          background: C.white,
+        }}
+      >
+        <div style={{ maxWidth: 1080, margin: '0 auto' }}>
+          <SectionHeader
+            eyebrow="Vendor continuity"
+            title="What happens to your data and your service if the vendor stops"
+            body="The 16-year-old solo-founder continuity question, answered in the form a Fortune 500 GC or vendor-risk-register reviewer expects. Each provision is documented in the relevant pilot or subscription agreement; nothing here is aspirational."
+          />
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              gap: 12,
+              marginTop: 24,
+            }}
+          >
+            {VENDOR_CONTINUITY.map(item => (
+              <div
+                key={item.label}
+                style={{
+                  background: C.white,
+                  border: `1px solid ${C.slate200}`,
+                  borderRadius: 12,
+                  padding: '18px 20px',
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 800,
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    color: C.slate500,
+                    marginBottom: 6,
+                  }}
+                >
+                  {item.label}
+                </div>
+                <div
+                  style={{
+                    fontSize: 18,
+                    fontWeight: 700,
+                    color: C.green,
+                    letterSpacing: '-0.01em',
+                    marginBottom: 8,
+                    fontFamily:
+                      'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+                  }}
+                >
+                  {item.value}
+                </div>
+                <div style={{ fontSize: 12.5, color: C.slate600, lineHeight: 1.55 }}>
+                  {item.body}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Trial / discovery-audit data handling (GTM v3.2 Round 3 — NotebookLM upgrade · M&A confidentiality) */}
+      <section
+        id="trial-data"
+        style={{
+          padding: '72px 24px',
+          background: C.slate50,
+        }}
+      >
+        <div style={{ maxWidth: 1080, margin: '0 auto' }}>
+          <SectionHeader
+            eyebrow="Trial-audit data handling"
+            title="Upload a confidential memo for a 20-minute audit · safely"
+            body="The data-leak objection M&A and corp-dev professionals raise first. Maximum trial retention, one-click hard-purge, mutual NDA template, and the contractual no-training-on-customer-data commitment — packaged here so a procurement reader can quote the exact guarantee in their vendor-risk register."
+          />
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              gap: 12,
+              marginTop: 24,
+            }}
+          >
+            {TRIAL_DATA_HANDLING.map(item => (
               <div
                 key={item.label}
                 style={{

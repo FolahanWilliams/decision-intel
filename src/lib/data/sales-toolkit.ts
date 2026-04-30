@@ -185,26 +185,28 @@ export interface AudiencePitch {
 export const AUDIENCE_PITCHES: AudiencePitch[] = [
   {
     id: 'cso',
-    audience: 'Chief Strategy Officer',
+    audience: 'Chief Strategy Officer (Individual £249/mo wedge)',
     seconds: 35,
     pitch:
-      "Decision Intel is the native reasoning layer for every high-stakes call your strategy office makes. Upload a board memo, get an R²F audit (Recognition-Rigor Framework — Kahneman's debiasing plus Klein's Recognition-Primed Decisions, arbitrated in one pipeline) and a Decision Quality Index in 60 seconds. Before you say yes, let me run a live audit on a document you already know — the WeWork S-1 from 2019 — so you see the work, not the pitch.",
+      "Decision Intel is the native reasoning layer for every high-stakes call your strategy office makes. Upload a board memo, get an R²F audit (Recognition-Rigor Framework — Kahneman's debiasing plus Klein's Recognition-Primed Decisions, arbitrated in one pipeline) and a Decision Quality Index in 60 seconds. Entry tier is £249/mo Individual — fits in your t-card budget, no procurement gate, frictionless. Before you say yes, let me run a live audit on a document you already know — the WeWork S-1 from 2019 — so you see the work, not the pitch.",
     color: '#16A34A',
     emphasis: [
       'native reasoning layer',
       'high-stakes call',
+      '£249/mo Individual · t-card · no procurement gate',
       'WeWork S-1',
       'see the work, not the pitch',
     ],
   },
   {
     id: 'ma',
-    audience: 'M&A / Corp Dev Lead',
+    audience: 'M&A / Corp Dev Lead (Individual £249/mo wedge → corp-team Strategy tier)',
     seconds: 35,
     pitch:
-      "Every IC memo, CIM, and management presentation gets an R²F audit before it reaches the partners — bias flags with the exact paragraphs they appear in, cross-document conflict detection (CIM says 40% growth, model assumes 15%), and a deal-level composite Decision Quality Index. Sample DPR (Decision Provenance Record) on the WeWork S-1 — if you bring one redacted IC memo from a deal that went sideways, I'll run the audit live on our next call. About a third of partners say yes; that call closes at materially higher rates.",
+      "Every IC memo, CIM, and management presentation gets an R²F audit before it reaches the partners — bias flags with the exact paragraphs they appear in, cross-document conflict detection (CIM says 40% growth, model assumes 15%), and a deal-level composite Decision Quality Index. Start at £249/mo Individual on your card; team rolls up to Strategy tier (£2,499/mo, 12 seats) once two more deals run through. Sample DPR (Decision Provenance Record) on the WeWork S-1 — if you bring one redacted IC memo from a deal that went sideways, I'll run the audit live on our next call. About a third of partners say yes; that call closes at materially higher rates.",
     color: '#8B5CF6',
     emphasis: [
+      '£249/mo Individual entry · roll up to Strategy tier later',
       'cross-document conflict detection',
       'composite Decision Quality Index',
       'redacted IC memo',

@@ -297,8 +297,10 @@ export default function AboutPage() {
               meta-judge stage. Every audit produces a hashed, tamper-evident Decision Provenance
               Record &mdash; the artefact your General Counsel hands to the audit committee or
               regulator. It maps onto EU AI Act Article 14 record-keeping, Basel III ICAAP, and SEC
-              AI disclosure requirements (plus eight Africa-anchored regulators where the firm
-              operates Pan-African).
+              AI disclosure requirements, plus the cross-border M&amp;A coverage no US-only
+              incumbent carries: NDPR, CBN, WAEMU, PoPIA, SARB, ISA Nigeria 2007, FRC Nigeria,
+              CMA Kenya. The Africa-anchored coverage is the differentiator for Fortune 500
+              corporate development teams running cross-border acquisitions into emerging markets.
             </p>
           </div>
         </div>

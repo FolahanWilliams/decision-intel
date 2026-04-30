@@ -38,7 +38,8 @@ export type DeckId =
   | 'r2f_framework'
   | 'founder_oneliners'
   | 'advanced_sales_moves'
-  | 'strategic_thinking';
+  | 'strategic_thinking'
+  | 'goldner_discovery';
 
 export type CardDifficulty = 'foundation' | 'core' | 'advanced';
 export type CardMode = 'flashcard' | 'recall' | 'apply';
@@ -238,6 +239,15 @@ export const DECKS: EducationDeck[] = [
     iconName: 'Compass',
     color: '#8B5CF6',
     order: 14,
+  },
+  {
+    id: 'goldner_discovery',
+    label: 'Goldner Discovery',
+    description:
+      "Mr. Goldner's 3 rules + the 4-question discovery script in dual variants — wedge (Individual CSO / M&A head @ £249/mo) and ceiling (corp dev / corp strategy M&A). Drill before every warm-intro call.",
+    iconName: 'MessageCircleQuestion',
+    color: '#0EA5E9',
+    order: 15,
   },
 ];
 
@@ -1918,6 +1928,111 @@ const STRATEGIC_THINKING_CARDS: EducationCard[] = [
   },
 ];
 
+// ─── Cards: Goldner Discovery (8 — locked v3.2 2026-04-30) ─────────────────
+
+const GOLDNER_DISCOVERY_CARDS: EducationCard[] = [
+  {
+    id: 'goldner_3_rules',
+    deckId: 'goldner_discovery',
+    prompt: "What are Mr. Goldner's 3 rules for customer discovery — recite verbatim?",
+    canonicalAnswer:
+      "(1) Talk to 10 people before building anything (or before structuring a new GTM motion). (2) Find the pattern in their answers, not your assumption. (3) Sell to the pattern, not to the product you wish you had built.",
+    hint: '3 short sentences. The third is about what to sell to.',
+    difficulty: 'foundation',
+    applicationContext:
+      'Use as the framework anchor before any 20-min discovery audit conversation — silently recite the 3 rules to remind yourself you\'re there to find the pattern, not to pitch your assumption.',
+    source: 'src/lib/constants/icp.ts GOLDNER_3_RULES · GTM Plan v3.2 §5',
+    tag: 'foundation',
+  },
+  {
+    id: 'goldner_when_to_use_which',
+    deckId: 'goldner_discovery',
+    prompt:
+      'Two Goldner discovery scripts exist (wedge-individual and corp-dev-ceiling) — which do you run with which buyer, and why?',
+    canonicalAnswer:
+      "Wedge-individual script (£249/mo CSO / M&A head / corp dev director / fractional CSO at FTSE 250 / scale-up): leads with the writing surface (four-tool graveyard) → predicted-question gap → bias-hidden-in-plain-sight replay → DPR-as-leave-behind. Corp-dev-ceiling script (F500 corp dev / corp strategy M&A team @ £50K-150K ACV): leads with cross-border acquisition memo + structural assumptions → post-IC regulatory surprise → 24-month replay against IRR → audit-committee artefact requirement. Pick by procurement gate: wedge buyer = no procurement gate (their own card), ceiling = audit committee + GC.",
+    difficulty: 'core',
+    applicationContext:
+      'Before every warm-intro call, decide which script. Mr. Reiner-introduced US prospects with corp dev / strategy titles → likely wedge unless they explicitly mention IC / committee. Mr. Gabe-introduced UK prospects from his investor clients\' portfolio → mostly wedge initially. Sankore-class fund partners → wedge (they\'re a design partner, not the procurement gate).',
+    source: 'src/lib/constants/icp.ts GOLDNER_DISCOVERY_QUESTIONS_INDIVIDUAL + _CORP_DEV',
+    tag: 'core',
+  },
+  {
+    id: 'goldner_individual_q1',
+    deckId: 'goldner_discovery',
+    prompt:
+      "Wedge-individual script · question 1 — recite verbatim, then explain what you're listening for.",
+    canonicalAnswer:
+      "VERBATIM: 'Walk me through the last strategic decision you wrote up. Where did the writing happen — Google Doc, Slack threads, Confluence, board deck? And how much of the original reasoning made it through to the final artefact?' LISTENING FOR: the four-tool graveyard pain (the answer will name 2-4 of those tools as places where reasoning went to die). If they describe a clean single-source workflow, that's a NEGATIVE signal — they have process discipline, may not feel the pain. If they describe fragmentation + wishing they had ONE record, that's the wedge.",
+    difficulty: 'core',
+    applicationContext:
+      'Always question 1. Sets the surface. Follow-ups: "Which one did the actual decision rationale end up in?" / "Did anything important get lost between drafts?"',
+    source: 'icp.ts GOLDNER_DISCOVERY_QUESTIONS_INDIVIDUAL[0]',
+    tag: 'wedge',
+  },
+  {
+    id: 'goldner_individual_q2',
+    deckId: 'goldner_discovery',
+    prompt: "Wedge-individual script · question 2 — recite verbatim + listening criteria.",
+    canonicalAnswer:
+      "VERBATIM: 'What's the question your CEO / board / parent company asked that you didn't see coming?' LISTENING FOR: the predicted-question gap. If they describe getting blindsided by a question that — in retrospect — should have been obvious, that's the simulate-CEO + forgotten-questions wedge. The strongest signal: when they laugh nervously and say something like 'oh, the time my CEO asked X and I had nothing.' Don't push for the answer; let the silence sit.",
+    difficulty: 'core',
+    applicationContext:
+      'Question 2. Surfaces predicted-question gap. Follow-ups: "How did you handle it in the moment?" / "If you could replay that meeting with one extra slide, what would it have shown?"',
+    source: 'icp.ts GOLDNER_DISCOVERY_QUESTIONS_INDIVIDUAL[1]',
+    tag: 'wedge',
+  },
+  {
+    id: 'goldner_individual_q3_q4',
+    deckId: 'goldner_discovery',
+    prompt:
+      "Wedge-individual script · questions 3 + 4 — recite verbatim and name what each surfaces.",
+    canonicalAnswer:
+      "Q3 VERBATIM: 'If you could replay one decision from the last 12 months knowing what you know now — what was the bias hiding in plain sight?' SURFACES: named-bias resonance (pre-screens whether they self-identify with the R²F frame; if they say 'we anchored on the comp' or 'we got captured by management', that's strong fit). Q4 VERBATIM: 'What's the artefact you wish you'd had to defend that decision when it was reviewed?' SURFACES: DPR-as-leave-behind value. The strongest signal is when they describe wanting an artefact that combines (a) the reasoning trail, (b) the regulatory mapping, (c) the named biases. That artefact IS the DPR.",
+    difficulty: 'advanced',
+    applicationContext:
+      'Q3 + Q4 close the script. Run them only if Q1 + Q2 surfaced strong pain signal. If Q1+Q2 were weak, end the call gracefully and move on — Goldner Rule 2: find the pattern, don\'t force fit.',
+    source: 'icp.ts GOLDNER_DISCOVERY_QUESTIONS_INDIVIDUAL[2,3]',
+    tag: 'wedge',
+  },
+  {
+    id: 'goldner_corp_dev_q1',
+    deckId: 'goldner_discovery',
+    prompt: "Corp-dev-ceiling script · question 1 — recite verbatim + listening criteria.",
+    canonicalAnswer:
+      "VERBATIM: 'Walk me through your last cross-border acquisition memo. Where did the diligence + assumption-setting happen, and how did you carry the structural assumptions (sovereign cycle, FX regime, regulatory exposure) into the IC deck?' LISTENING FOR: cross-border M&A surface area + Dalio determinant blindness (currency cycle, trade share, governance). If the answer reveals that structural assumptions are tracked in a side-doc that doesn't make it into the IC deck, that's the wedge for the 19-framework regulatory map + structural-assumptions audit. Strongest signal: 'we had the data but it wasn't in the room.'",
+    difficulty: 'advanced',
+    applicationContext:
+      'Use ONLY when the buyer is corp dev / corp strategy M&A at F500 with cross-border acquisitions. Frames the problem in their vocabulary (IC deck, sovereign cycle, FX regime). Never lead a wedge buyer with this question — too jargon-y for an Individual-tier first call.',
+    source: 'icp.ts GOLDNER_DISCOVERY_QUESTIONS_CORP_DEV[0]',
+    tag: 'ceiling',
+  },
+  {
+    id: 'goldner_corp_dev_q2_q3',
+    deckId: 'goldner_discovery',
+    prompt: "Corp-dev-ceiling script · questions 2 + 3 — verbatim + what each surfaces.",
+    canonicalAnswer:
+      "Q2 VERBATIM: 'What's the regulatory question — FCA, SEC, EU AI Act, GDPR, sovereign-context regime — that surfaced AFTER IC approval, when you wished it had surfaced before?' SURFACES: post-IC regulatory blindside; the 19-framework regulatory map directly addresses this. Q3 VERBATIM: 'If you could replay one M&A approval from the last 24 months — what was the bias the room missed that the IRR / outcome later exposed?' SURFACES: outcome-validated bias pattern; this is where the per-org Brier-scored recalibration matters. Together Q2 + Q3 establish that DI is for THIS specific problem, not generic decision support.",
+    difficulty: 'advanced',
+    applicationContext:
+      'Run sequentially after Q1. Watch for the IRR/MOIC framing — if they reach for those metrics naturally, they\'re in the buying-power band. If they reach for ROIC / NPV / softer language, they\'re corp strategy not corp dev — pivot the next question accordingly.',
+    source: 'icp.ts GOLDNER_DISCOVERY_QUESTIONS_CORP_DEV[1,2]',
+    tag: 'ceiling',
+  },
+  {
+    id: 'goldner_corp_dev_q4',
+    deckId: 'goldner_discovery',
+    prompt: "Corp-dev-ceiling script · question 4 — verbatim + close.",
+    canonicalAnswer:
+      "VERBATIM: 'What's the artefact your audit committee or GC would need to see to approve another deal of similar profile in the next 12 months — and what would it have to contain that today's diligence pack doesn't?' SURFACES: the DPR procurement requirement in the buyer's voice. Strongest signal: they describe wanting (a) bias provenance, (b) cross-document reconciliation, (c) regulatory mapping, (d) reviewer decisions / dissent log — those are literally the DPR's existing pages. Close: 'I have a sample DPR on a public deal — the Dangote 2014 cross-border expansion. 20 minutes on a real memo of yours, anonymised, and we'll see if it passes your audit committee's bar.'",
+    difficulty: 'advanced',
+    applicationContext:
+      'The closing question. Sets up the 20-minute audit + DPR-on-real-memo offer. Always end with the offer in their voice (the artefact their audit committee needs), not yours (the product features).',
+    source: 'icp.ts GOLDNER_DISCOVERY_QUESTIONS_CORP_DEV[3]',
+    tag: 'ceiling',
+  },
+];
+
 // ─── Aggregator + Helpers ───────────────────────────────────────
 
 export const ALL_CARDS: EducationCard[] = [
@@ -1937,6 +2052,7 @@ export const ALL_CARDS: EducationCard[] = [
   ...ADVANCED_SALES_MOVES_CARDS,
   ...BRINKMANSHIP_CARDS,
   ...STRATEGIC_THINKING_CARDS,
+  ...GOLDNER_DISCOVERY_CARDS,
 ];
 
 export function findDeck(id: DeckId): EducationDeck | undefined {

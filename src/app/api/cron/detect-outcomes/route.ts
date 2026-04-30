@@ -11,6 +11,18 @@
  *
  * Protected by CRON_SECRET. Add to vercel.json:
  *   { "path": "/api/cron/detect-outcomes", "schedule": "0 10 * * *" }
+ *
+ * v3.2 lock 2026-04-30 (GTM Plan v3.2 Round 3 #5): Individual tier accounts
+ * (orgId=null) are supported through detectOutcomesFromWeb's user-scoped
+ * fallback path — no code change required. The function and downstream
+ * inferOutcomesFromIntegrations handlers all accept (userId, orgId|null)
+ * and filter on document.userId when orgId is null. Individual-tier
+ * subscribers get the same daily web-detection sweep as org accounts; the
+ * 10-search cap is a global cost control, not a tier gate. When the daily
+ * cap is reached, prioritisation falls back to FIFO on pending analyses
+ * across all tiers — confirmed acceptable for the Outcome Gate enforced
+ * motion since the WhyThisMattersBlock UX layer surfaces the cohort
+ * contribution + per-org Brier upside that drives manual logging too.
  */
 
 import { NextRequest, NextResponse } from 'next/server';

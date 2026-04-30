@@ -446,6 +446,72 @@ export function DecisionDNAPageContent() {
       {/* Breadcrumbs handled by parent */}
       <BackToTop />
 
+      {/* v3.2 Outcome-Gated Unlock Progress Banner (locked 2026-04-30 GTM Plan v3.2 Round 3).
+          When the user has 1-2 closed decisions/outcomes, surface the unlock-progress
+          framing so the gate becomes a visible compounding mechanic, not a tax.
+          Per CLAUDE.md ICP block: outcome logging IS the unlock mechanism. */}
+      {dna.totals.totalDecisions > 0 && dna.totals.totalDecisions < 3 && (
+        <div
+          style={{
+            marginBottom: 'var(--spacing-md)',
+            padding: '12px 16px',
+            background: 'rgba(99, 102, 241, 0.06)',
+            border: '1px solid rgba(99, 102, 241, 0.18)',
+            borderRadius: 'var(--radius-md)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            flexWrap: 'wrap',
+          }}
+        >
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 800,
+              padding: '3px 8px',
+              borderRadius: 999,
+              background: 'rgba(99, 102, 241, 0.10)',
+              color: '#a5b4fc',
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              border: '1px solid rgba(99, 102, 241, 0.25)',
+              flexShrink: 0,
+            }}
+          >
+            {dna.totals.totalDecisions} of 3 unlocked
+          </span>
+          <span style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+            Decision DNA gets sharper at <strong style={{ color: 'var(--text-primary)' }}>3+
+            closed decisions</strong>. Today the per-domain calibration trend, belief delta, and
+            follow-success rate render below; at 3+ they calibrate to <em>your</em> pattern. Log{' '}
+            {3 - dna.totals.totalDecisions} more closed{' '}
+            {dna.totals.totalDecisions === 2 ? 'decision' : 'decisions'} to unlock the populated
+            view.
+          </span>
+          <div
+            style={{
+              width: 80,
+              height: 4,
+              background: 'rgba(99, 102, 241, 0.10)',
+              borderRadius: 999,
+              overflow: 'hidden',
+              flexShrink: 0,
+            }}
+            aria-label={`Unlock progress: ${Math.round((dna.totals.totalDecisions / 3) * 100)}%`}
+          >
+            <div
+              style={{
+                height: '100%',
+                width: `${Math.round((dna.totals.totalDecisions / 3) * 100)}%`,
+                background: 'linear-gradient(90deg, var(--accent-primary), rgba(99, 102, 241, 0.7))',
+                borderRadius: 999,
+                transition: 'width 0.4s ease',
+              }}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div
         className="animate-slide-up"
