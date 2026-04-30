@@ -1482,20 +1482,20 @@ const FOUNDER_ONELINERS_CARDS: EducationCard[] = [
   {
     id: 'oneliner_wedge_vs_ceiling',
     deckId: 'founder_oneliners',
-    prompt: 'What is the ICP wedge vs ceiling distinction, and why does it matter?',
+    prompt: 'What is the ICP wedge / bridge / ceiling distinction (v3.2), and why does it matter?',
     canonicalAnswer:
-      "WEDGE (next 12 months): Pan-African / EM-focused funds (PE, EM-focused VC, family offices) and Pan-African corporate-development teams. They buy fast (capital-allocation pressure, IC-cycle calendar), are highly susceptible to artifact-led sales (specimen DPRs do the persuasion), and the dual-specimen library + 17-framework regulatory map is uniquely defensible against US-only incumbents. CEILING (12-18 months): Fortune 500 CSOs, audit committees, GCs at regulated entities. R²F + DPR + 17-framework map are designed to clear F500 procurement once the wedge has produced 3+ published reference cases. THE WEDGE GENERATES THE REFERENCES THAT UNLOCK THE CEILING. Don't conflate.",
+      "WEDGE (next 6 months): Individual buyers @ £249/mo — UK + US CSOs / Heads of M&A / corp dev directors / fractional CSOs. Frictionless, personal-card / t-card budget, zero procurement gate. BRIDGE (months 6-12): Sankore (London office, summer 2026) as the design-partner bridge + 1-2 Individual graduates at £1,999/mo Design Foundation rate or £20-25K founding-pilot bundle. Sankore's strategic value isn't fund-buyer-budget — it's real fund operational insight + reference-grade artefact production. CEILING (12-24+ months): F500 corporate strategy + corp dev M&A teams @ £50K-150K ACV — UK + US primary, cross-border M&A specifically (where the 19-framework regulatory map becomes a live moat layer Cloverpop and IBM watsonx don't carry). THE WEDGE GENERATES THE CASHFLOW + WORD-OF-MOUTH THAT FUNDS THE BRIDGE. THE BRIDGE GENERATES THE PUBLISHED REFERENCES THAT UNLOCK THE CEILING. Do NOT chase enterprise procurement before the graduation rule fires (5 paid Individual + 10 raving + 1 verifiable referral via DPR).",
     difficulty: 'core',
-    applicationContext: 'Should you spend Q3 chasing F500 CSOs or Pan-African fund partners?',
-    source: 'CLAUDE.md ICP — wedge + ceiling lock 2026-04-26',
+    applicationContext: 'Should you spend Q3 chasing F500 CSOs or Individual buyers? (Answer: Individual.)',
+    source: 'CLAUDE.md ICP — wedge + bridge + ceiling lock 2026-04-30 (GTM Plan v3.2)',
     tag: 'strategic',
   },
   {
     id: 'oneliner_avoid_vc_segment',
     deckId: 'founder_oneliners',
-    prompt: 'Which PE/VC segment do you EXPLICITLY avoid, and why?',
+    prompt: 'Which segments do you EXPLICITLY avoid (v3.2), and why?',
     canonicalAnswer:
-      "Generic US/European VC firms with NO Africa exposure. Why: small AUM-per-decision, relationship-driven without the capital-allocation pressure that makes the audit valuable, sceptical because they have no procurement need for compliance-grade DPRs. The wedge is Pan-African / EM-focused funds with capital-allocation pressure across volatile FX regimes (NGN, KES, GHS, EGP) AND procurement-grade compliance requirements (NDPR, CBN, WAEMU, PoPIA). The 'PE/VC is NOT a target audience' framing applies HERE — to the generic segment, not the EM-fund subset.",
+      "Three explicit non-target audiences (v3.2 lock): (1) Boutique sell-side M&A advisors — no software budget, relationship-driven, sceptical. (2) Generic small VC funds with no Africa/EM exposure — no procurement need, AUM-per-decision too small, relationship-driven without the capital-allocation pressure that makes the audit valuable. (3) US-only Fortune 500 with zero international M&A exposure — Cloverpop + IBM watsonx will out-bundle us in their backyard; pick fights where the cross-border regulatory moat matters. Note: Pan-African / EM-focused funds are NOT a wedge in v3.2 (that was the 2026-04-26 lock; v3.2 superseded it with the Individual-tier wedge). Sankore stays as the DESIGN PARTNER bridge — warm-intro accessible, reference-producing — but funds are not the buyer market. Pan-African / EM regulatory coverage is preserved as the cross-border M&A differentiator (moat layer for the F500 ceiling).",
     difficulty: 'advanced',
     applicationContext:
       'You get a warm intro to a generic Sand Hill Road VC firm — do you take the meeting?',

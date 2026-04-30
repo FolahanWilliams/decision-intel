@@ -415,13 +415,18 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
   },
 
   // -----------------------------------------------------------------------
-  // 4. PAN-AFRICAN FUND PARTNER — summer 2026 design-partner wedge (12-month play)
+  // 4. PAN-AFRICAN / EM FUND PARTNER — summer 2026 design-partner BRIDGE (NOT GTM wedge per v3.2)
   // -----------------------------------------------------------------------
+  // v3.2 lock 2026-04-30: Pan-African / EM-focused funds are NOT the GTM wedge.
+  // The GTM wedge is Individual buyers @ £249/mo (UK + US CSOs / M&A heads / corp dev directors).
+  // Sankore-class fund partners are the DESIGN-PARTNER BRIDGE — the warm-intro path that
+  // produces reference DPRs to unlock the F500 ceiling. Strategic value isn't fund-buyer-budget;
+  // it's fund operational insight + reference-grade artefact production.
   {
     id: 'pan_african_fund_partner',
-    role: 'Pan-African / EM Fund Partner · summer-2026 design-partner wedge',
+    role: 'Pan-African / EM Fund Partner · summer-2026 design-partner BRIDGE (v3.2)',
     archetype:
-      'Sankore-class · $200M-$2B AUM · capital-allocation pressure across NGN/KES/GHS/EGP/CFA · IC-cycle calendar · procurement-grade compliance need (NDPR, CBN, ISA 2007, WAEMU, PoPIA) · DESIGN-PARTNER-only target until product is hardened with paid solo-tier validators · NOT primary outbound for next 30 days',
+      'Sankore-class · $200M-$2B AUM · capital-allocation pressure across NGN/KES/GHS/EGP/CFA · IC-cycle calendar · procurement-grade compliance need (NDPR, CBN, ISA 2007, WAEMU, PoPIA) · DESIGN-PARTNER bridge (NOT primary buyer per v3.2) · target only AFTER 5 paid Individual subscribers + 10 raving advocates + 1 verifiable referral via DPR fire (graduation rule)',
     buyerType: 'wedge',
     priority: 'summer_2026',
     ticketBand:
@@ -1246,9 +1251,9 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       ],
     },
     artefactToLead:
-      'A 12-slide pre-seed deck — H1: native reasoning layer for every high-stakes call · slide 2: R²F intellectual moat (Kahneman + Klein) · slide 3: regulatory tailwinds (EU AI Act Aug 2026, SEC, Basel III) · slide 4: Pan-African wedge + 17-framework map · slides 5-9: product · slide 10: HonestProbabilityPath + 16 metrics · slide 11: continuity playbook · slide 12: ask + use of funds.',
+      'A 12-slide pre-seed deck — H1: native reasoning layer for every high-stakes call · slide 2: R²F intellectual moat (Kahneman + Klein) · slide 3: regulatory tailwinds (EU AI Act Aug 2026, SEC, Basel III) · slide 4: ICP wedge (Individual £249/mo · UK + US) → bridge (Sankore Design Foundation) → ceiling (F500 corp dev M&A · cross-border · 19-framework map differentiator) · slides 5-9: product · slide 10: HonestProbabilityPath + 16 metrics · slide 11: vendor continuity playbook · slide 12: ask + use of funds.',
     killerPitch:
-      'Decision Intel is the native reasoning layer for every high-stakes call. We catch the cognitive bias McKinsey charges $1M to find — and McKinsey has the same biases themselves. Our wedge is Pan-African EM funds, our ceiling is Fortune 500 CSOs, and our timing is the EU AI Act Article 14 enforcement on Aug 2, 2026. The Recognition-Rigor Framework operationalising Kahneman + Klein gives us a defensible IP moat no incumbent has matched in 16 years of academic debate. Conditional probability of unicorn outcome is 0.79% — 4× the pre-seed B2B baseline. Most likely real outcome is Series-B-stage strategic acquisition at $400M-1B.',
+      'Decision Intel is the native reasoning layer for every high-stakes call. We catch the cognitive bias McKinsey charges $1M to find — and McKinsey has the same biases themselves. Our wedge is Individual UK + US CSOs / M&A heads / corp dev directors at £249/mo (frictionless, no procurement gate); Sankore (Pan-African fund, London office, summer 2026) is the design-partner bridge that produces reference DPRs; the ceiling is F500 corporate strategy + corp dev M&A at £50K-150K ACV — cross-border M&A specifically, where the 19-framework regulatory map (Pan-African + G7/EU/GCC) becomes a moat layer no US-only incumbent carries. Timing: EU AI Act Article 14 enforcement Aug 2, 2026. The Recognition-Rigor Framework operationalising Kahneman + Klein gives us a defensible IP moat no incumbent has matched in 16 years of academic debate. Goal: $30M+ founder cash exit by 2031-2033 at a £30-95M EV strategic acquisition (8-12× ARR multiple), 35-55% probability range. Most likely acquirers: LRQA, IBM watsonx.governance arm, Big-4 governance practice.',
     threePhrasesNeverToSay: [
       '"Disrupting strategy consulting" — investor hears "competing with McKinsey/BCG/Bain"; instant skepticism',
       '"For everyone making decisions" — non-segment, instant disqualification',
@@ -1257,7 +1262,7 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
     meetingArc: [
       {
         minute: '0:00-2:00',
-        move: 'Frame: native reasoning layer + Pan-African wedge + EU AI Act timing.',
+        move: 'Frame: native reasoning layer + Individual £249/mo wedge + Sankore design-partner bridge + EU AI Act Aug 2026 timing. Note: NOT "Pan-African wedge" — that was the v3.1 framing; v3.2 lock has Pan-African as cross-border M&A differentiator (moat layer for the F500 ceiling), not the GTM wedge.',
       },
       {
         minute: '2:00-10:00',

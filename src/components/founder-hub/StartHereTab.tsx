@@ -274,7 +274,7 @@ function renderPositioningAnchor() {
   return (
     <div style={anchorStyle}>
       <div style={anchorEyebrow}>
-        <Compass size={11} /> Current positioning anchor — locked 2026-04-26
+        <Compass size={11} /> Current positioning anchor — locked 2026-04-30 (GTM Plan v3.2)
       </div>
       <div style={anchorRow}>
         <strong>Primary hero:</strong> &ldquo;{POSITIONING_HERO_PRIMARY}&rdquo;
@@ -332,7 +332,7 @@ function renderPositioningAnchor() {
 // platform-baseline-snapshot.test.ts.
 //
 // Click jumps to the InvestorMetricsTracker (rank 17, "Platform
-// Calibration Credibility") inside Path to $100M ARR for the full
+// Calibration Credibility") inside Path to £100M Exits for the full
 // metric card.
 
 function renderCalibrationCard(onNavigateToTab: (tabId: string) => void) {

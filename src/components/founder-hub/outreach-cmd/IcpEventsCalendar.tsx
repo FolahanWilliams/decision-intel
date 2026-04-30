@@ -6,7 +6,7 @@ interface Event {
   name: string;
   date: string;
   venue: string;
-  icpRelevance: 'very_high' | 'high' | 'medium';
+  icpRelevance: 'very_high' | 'high' | 'medium' | 'low';
   icpWho: string;
   tactic: string;
   url?: string;
@@ -73,11 +73,11 @@ const EVENTS: Event[] = [
     name: 'SuperReturn International (Berlin) + London afterparties',
     date: 'June 2026 (Berlin main; London-based fund partners often host pre/post events in London)',
     venue: 'Berlin (main) + London (PE/VC house events)',
-    icpRelevance: 'medium',
+    icpRelevance: 'low',
     icpWho:
-      'PE / VC fund partners, LP relations, fund strategy leads — the fund-buyer ICP from gtm_8',
+      'PE / VC fund partners — DOWNGRADED in GTM v3.2: fund partners are no longer the primary buyer; they\'re the design-partner BRIDGE (Sankore-class warm-intro path). The Individual £249/mo wedge runs on UK + US CSOs / M&A heads / corp dev directors at FTSE 250 / S&P 500. Skip generic fund events unless you have a specific Sankore-class warm-intro target attending.',
     tactic:
-      'Berlin trip is high cost / high ICP density; London afterparties are medium cost / similar density. If budget-constrained, target the London events instead — PE houses (Permira, Cinven, BC Partners) often host portfolio receptions in the week. Practice the gtm_8 evidence-moment pitch on at least 3 fund partners that week.',
+      'Skip Berlin (high cost, wrong audience for v3.2 wedge). London afterparties only worth attending if a specific Sankore-class warm-intro target is confirmed. The 20-min audit motion converts on individual CSO + M&A head conversations — those happen at strategy / corp dev / governance events, not at LP-fund gatherings. Reference: CLAUDE.md ICP block (v3.2 lock 2026-04-30) + GTM Plan §9 events discipline (cap 2 events/month, prefer Mergermarket / CSO Network / AI Governance Summit / FT Strategy Summit).',
     url: 'https://informaconnect.com/superreturn-international',
   },
   {
@@ -106,6 +106,7 @@ const RELEVANCE_CONFIG = {
   very_high: { label: 'Core ICP', color: '#16A34A', bg: '#DCFCE7' },
   high: { label: 'High ICP', color: '#0891B2', bg: '#E0F2FE' },
   medium: { label: 'Adjacent', color: '#D97706', bg: '#FEF3C7' },
+  low: { label: 'Skip (v3.2)', color: '#64748B', bg: '#F1F5F9' },
 };
 
 export function IcpEventsCalendar() {

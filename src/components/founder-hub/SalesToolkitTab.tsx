@@ -108,8 +108,8 @@ export function SalesToolkitTab() {
 
       <Section
         icon={<Users size={16} />}
-        title="Buying Committee Map · Pan-African fund vs F500 CSO"
-        subtitle="The full committee for each ICP — who has budget, who's the champion path, who vetoes. Toggle between the GTM wedge (Pan-African fund, 6 roles) and the revenue ceiling (F500 CSO, 5 roles). Click any role for the navigation script."
+        title="Buying Committee Map · Sankore-class fund (bridge) vs F500 CSO (ceiling)"
+        subtitle="The full committee for each ICP — who has budget, who's the champion path, who vetoes. Toggle between the Sankore-class fund design-partner bridge (6 roles, the warm-intro path that produces reference DPRs) and the revenue ceiling (F500 CSO, 5 roles, where £50K-150K ACV deals close after wedge references publish). Note: the Individual £249/mo wedge buyer (CSO / M&A head / corp dev director on personal card) has NO committee — just them. Click any role for the navigation script."
         accent="#16A34A"
       >
         <BuyingCommitteeMap />

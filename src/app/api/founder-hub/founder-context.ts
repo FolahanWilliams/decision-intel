@@ -93,7 +93,7 @@ General AI:
 
 === MARKET STRATEGY ===
 Primary buyer: Chief Strategy Officer or Head of Corporate Strategy. They sign the contract and care about compounding edge plus board-ready evidence. Secondary user: strategy manager or analyst who actually uploads documents and cares about less rework plus faster executive-review prep.
-ICP wedge + ceiling (RE-LOCKED 2026-04-26; canonical strings sourced from src/lib/constants/icp.ts). ${ICP_BLOCK}
+ICP wedge + bridge + ceiling (RE-LOCKED 2026-04-30 in GTM Plan v3.2 — supersedes the 2026-04-26 fund-wedge lock; canonical strings sourced from src/lib/constants/icp.ts which auto-includes the new wedge / bridge / ceiling shape, the graduation rule, kill criterion, Goldner discovery questions for both wedge and ceiling buyers, Mr. Reiner + Mr. Gabe principles, Sharran 1-1-1, and the decision-system-of-record positioning extension). ${ICP_BLOCK}
 Pricing: Free tier (4 analyses/month), Individual ($249/mo or $2,490/yr, 15 analyses, solo strategist), Strategy ($2,499/mo, unlimited analyses, team Decision Knowledge Graph + Decision Rooms), Enterprise (Custom, multi-division, SSO, SLA). Free tier enables product-led growth. Sales-led trial mechanism is a free 30-day pilot on the buyer's next high-stakes strategic memo. The Knowledge Graph compounds over time, creating switching costs. Per-deal transactional pricing was removed because the product's value IS the longitudinal learning.
 Market: Decision intelligence $12.2B going to $46.4B by 2030. Enterprise GRC $50B+. Corporate strategy and M&A advisory market $40B+ annually.
 Expansion: ${EXPANSION_BLOCK}
