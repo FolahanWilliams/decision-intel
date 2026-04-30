@@ -158,7 +158,7 @@ export function EnterpriseQuoteBuilderClient({
       </h1>
       <p
         style={{
-          margin: '8px 0 24px',
+          margin: '8px 0 14px',
           color: 'var(--text-secondary)',
           fontSize: 14,
           lineHeight: 1.55,
@@ -169,6 +169,30 @@ export function EnterpriseQuoteBuilderClient({
         floor. The PDF carries the same R²F + DPR provenance footer Enterprise procurement will see
         on every audit.
       </p>
+      {/* B3 lock 2026-04-30 (Margaret + Titi persona ask) — visible-before-
+          email reassurance banner. Reinforces that the live ACV figure on
+          the right (or below on mobile) updates as inputs change AND the
+          PDF download requires no email — the email field exists only to
+          address the PDF inside, never to gate anything. */}
+      <div
+        style={{
+          margin: '0 0 24px',
+          maxWidth: 720,
+          padding: '10px 14px',
+          borderRadius: 10,
+          background: 'rgba(22, 163, 74, 0.06)',
+          border: '1px solid rgba(22, 163, 74, 0.22)',
+          fontSize: 12.5,
+          color: 'var(--text-secondary)',
+          lineHeight: 1.55,
+        }}
+      >
+        <strong style={{ color: 'var(--accent-primary)', fontWeight: 700 }}>
+          Live ACV updates as you change inputs.
+        </strong>{' '}
+        Email is optional and never required to see your quote — the field below addresses the PDF
+        only. Customer name is the only required input.
+      </div>
 
       <div
         className="quote-builder-grid"
@@ -188,7 +212,7 @@ export function EnterpriseQuoteBuilderClient({
               <Field label="Contact name">
                 <Input value={contactName} onChange={setContactName} placeholder="Sarah Adekunle" />
               </Field>
-              <Field label="Contact email">
+              <Field label="Contact email (optional)">
                 <Input
                   value={contactEmail}
                   onChange={setContactEmail}

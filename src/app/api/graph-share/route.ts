@@ -17,6 +17,8 @@ import { createLogger } from '@/lib/utils/logger';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { logAudit } from '@/lib/audit';
 import { generateGraphReport, type GraphNetworkReport } from '@/lib/reports/graph-report';
+import { buildOrgCalibration } from '@/lib/reports/provenance-record-data';
+import { computePlatformCalibrationBaseline } from '@/lib/learning/platform-baseline';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import { Prisma } from '@prisma/client';
@@ -143,6 +145,38 @@ export async function POST(req: NextRequest) {
 
   // Apply redaction if requested
   const finalSnapshot = snapshot && body.isRedacted ? redactSnapshot(snapshot) : snapshot;
+
+  // N1 lock 2026-04-30 — embed snapshot-time org calibration onto the
+  // shared artefact so the partner / CFO / regulator opening the link
+  // sees calibration the moment the page loads. Frozen at share-creation
+  // time; subsequent outcomes do NOT mutate the share. Cloverpop-defense
+  // surface (CLAUDE.md External Attack Vectors).
+  if (finalSnapshot) {
+    try {
+      const cal = await buildOrgCalibration(orgId, null);
+      if (cal) {
+        const baseline = computePlatformCalibrationBaseline();
+        finalSnapshot.calibration = {
+          source: cal.source,
+          decisionsTracked: cal.decisionsTracked,
+          outcomesClosed: cal.outcomesClosed,
+          meanBrierScore: cal.meanBrierScore,
+          brierCategory: cal.brierCategory,
+          // Classification accuracy is only on the platform_seed branch
+          // today; per-org Brier-stats don't compute classification yet.
+          classificationAccuracy:
+            cal.source === 'platform_seed' ? baseline.classificationAccuracy : null,
+          classificationCounts:
+            cal.source === 'platform_seed' ? baseline.classificationCounts : undefined,
+          note: cal.calibrationNote,
+        };
+      }
+    } catch (err) {
+      // Fail-open — never break a graph share because calibration
+      // lookup hit a transient issue. The viewer simply omits the band.
+      log.warn('Org calibration snapshot during graph-share create failed:', err);
+    }
+  }
 
   // Hash password if provided
   let passwordHash: string | undefined;

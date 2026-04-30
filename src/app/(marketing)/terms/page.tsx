@@ -38,7 +38,7 @@ export default function TermsOfServicePage() {
           Terms of Service
         </h1>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '48px' }}>
-          Last updated: March 29, 2026
+          Last updated: April 30, 2026
         </p>
 
         <div
@@ -226,10 +226,30 @@ export default function TermsOfServicePage() {
             </h2>
             <p>
               On any termination, you may request a machine-readable export of all Analyses,
-              Decision Provenance Records, and associated metadata in JSON + PDF format. We will
-              fulfil the request within fourteen (14) calendar days. Production data is preserved
-              against deletion during any active export window (up to thirty days post-termination)
-              before the standard 30-day permanent purge runs.
+              Decision Provenance Records, blind priors, outcomes, and associated metadata in JSON
+              + PDF format. We will fulfil the request within fourteen (14) calendar days.
+              Production data is preserved against deletion during any active export window (up to
+              thirty days post-termination) before the standard 30-day permanent purge runs.
+            </p>
+            <p style={{ marginTop: '12px' }}>
+              <strong style={{ color: 'var(--text-primary)' }}>
+                GDPR Article 20 — raw-document portability.
+              </strong>{' '}
+              The standard export bundle contains derived artefacts (Analyses, DPRs, outcomes,
+              metadata). Source documents you uploaded are NOT included in the standard bundle for
+              storage-economy reasons. To the extent any source document constitutes personal data
+              under GDPR Article 4, you may request a raw-document export covering all source files
+              you authored or controlled by writing to{' '}
+              <a
+                href="mailto:compliance@decision-intel.com"
+                style={{ color: 'var(--text-primary)', textDecoration: 'underline' }}
+              >
+                compliance@decision-intel.com
+              </a>
+              . Raw-document requests are fulfilled within fourteen (14) calendar days of the
+              request, in the original file format with associated content hashes. This mechanism
+              honours your portability right under GDPR Art. 20 and the equivalent rights under
+              UK GDPR, NDPR (Nigeria), PoPIA (South Africa), and CMA (Kenya).
             </p>
           </section>
 
@@ -248,16 +268,58 @@ export default function TermsOfServicePage() {
 
           <section>
             <h2 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '12px' }}>
-              10C. Service Level (Enterprise)
+              10C. Service Level Commitments
             </h2>
             <p>
-              Enterprise subscriptions carry tiered service levels: Standard (99.0% monthly
-              availability for the document analysis pipeline), Premium (99.5% monthly availability
-              and sub-12-hour RTO), or Custom (as separately agreed in the executed Order Form).
-              Service credits accrue against the next monthly invoice when measured uptime falls
-              below the tier target, calculated on a per-percentage-point basis up to a cap of 30%
-              of the monthly fee. Scheduled maintenance and force-majeure events are excluded from
-              availability calculations and are notified in advance where practicable.
+              <strong style={{ color: 'var(--text-primary)' }}>Availability targets</strong> for the
+              document analysis pipeline are committed by subscription tier:
+            </p>
+            <ul style={{ marginTop: '8px', marginBottom: '12px', paddingLeft: '20px' }}>
+              <li>
+                <strong style={{ color: 'var(--text-primary)' }}>Free and Individual:</strong>{' '}
+                Best-effort availability. No service-credit commitment.
+              </li>
+              <li>
+                <strong style={{ color: 'var(--text-primary)' }}>Strategy:</strong> 99.5% monthly
+                uptime. Recovery time objective (RTO) under 4 hours; recovery point objective
+                (RPO) under 15 minutes.
+              </li>
+              <li>
+                <strong style={{ color: 'var(--text-primary)' }}>Enterprise:</strong> 99.9% monthly
+                uptime, RTO under 4 hours, RPO under 15 minutes. Custom SLAs available in the
+                executed Order Form.
+              </li>
+            </ul>
+            <p style={{ marginTop: '12px' }}>
+              <strong style={{ color: 'var(--text-primary)' }}>Service credits.</strong> When
+              measured uptime falls below the tier target in a calendar month, eligible Strategy
+              and Enterprise customers may claim a credit against the next monthly invoice:
+            </p>
+            <ul style={{ marginTop: '8px', marginBottom: '12px', paddingLeft: '20px' }}>
+              <li>
+                Below the tier target but at or above 99.0%: <strong>10% of the monthly fee</strong>{' '}
+                for the affected service.
+              </li>
+              <li>
+                Below 99.0% but at or above 95.0%: <strong>20% of the monthly fee</strong>.
+              </li>
+              <li>
+                Below 95.0%: <strong>30% of the monthly fee</strong> (the cap).
+              </li>
+            </ul>
+            <p>
+              Service credits are claimed in writing within 30 calendar days of the affected
+              month. Credits are the customer&apos;s sole and exclusive remedy for availability
+              shortfalls. Scheduled maintenance windows (notified at least seven calendar days in
+              advance, capped at four hours per month outside business hours) and force-majeure
+              events are excluded from availability calculations. Live status is published at{' '}
+              <Link
+                href="/security"
+                style={{ color: 'var(--text-primary)', textDecoration: 'underline' }}
+              >
+                /security
+              </Link>
+              .
             </p>
           </section>
 
@@ -279,9 +341,62 @@ export default function TermsOfServicePage() {
               10E. Sub-Processor Change Notification
             </h2>
             <p>
-              The current sub-processor list is maintained at /security and /privacy. Any addition
-              of a new sub-processor that processes customer data is preceded by thirty (30)
-              calendar days&apos; written notice, during which you may object on reasonable grounds.
+              The current sub-processor list is maintained at{' '}
+              <Link
+                href="/security"
+                style={{ color: 'var(--text-primary)', textDecoration: 'underline' }}
+              >
+                /security
+              </Link>{' '}
+              and{' '}
+              <Link
+                href="/privacy"
+                style={{ color: 'var(--text-primary)', textDecoration: 'underline' }}
+              >
+                /privacy
+              </Link>
+              . Any addition or replacement of a sub-processor that processes customer data is
+              preceded by thirty (30) calendar days&apos; written notice (delivered to the account
+              email of record), during which you may object on reasonable grounds.
+            </p>
+            <p style={{ marginTop: '12px' }}>
+              <strong style={{ color: 'var(--text-primary)' }}>Objection window.</strong> You have
+              fifteen (15) calendar days from the notice to register a written objection to{' '}
+              <a
+                href="mailto:compliance@decision-intel.com"
+                style={{ color: 'var(--text-primary)', textDecoration: 'underline' }}
+              >
+                compliance@decision-intel.com
+              </a>
+              . If your objection is sustained on reasonable grounds (regulatory conflict,
+              material security regression, sanctions exposure) and we are unable to offer a
+              commercially-reasonable alternative within thirty (30) calendar days of the
+              objection, you may terminate the affected portion of the Services without penalty
+              and receive a pro-rata refund of any pre-paid fees attributable to the unused
+              remainder of the term.
+            </p>
+          </section>
+
+          <section>
+            <h2 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '12px' }}>
+              10H. AI Sub-Processor No-Training Commitment
+            </h2>
+            <p>
+              The AI inference layer of the Platform uses Google Gemini and Anthropic Claude as
+              sub-processors. Both providers contractually commit, in their enterprise data
+              processing terms, that customer prompts and outputs are NOT used to train upstream
+              foundation models. Decision Intel itself does not train or fine-tune any model on
+              customer content. The current provider DPA references are mirrored at{' '}
+              <Link
+                href="/security"
+                style={{ color: 'var(--text-primary)', textDecoration: 'underline' }}
+              >
+                /security
+              </Link>
+              {' '}
+              and updated within thirty (30) days of any provider-policy change. Where a customer
+              elects sovereign-AI routing (Enterprise tier, executed Order Form), the same
+              no-training commitment applies to the routed alternative provider.
             </p>
           </section>
 

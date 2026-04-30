@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { SOC2_FULL_STATEMENT } from '@/lib/constants/trust-copy';
 import {
   ArrowRight,
   FileCheck2,
@@ -90,7 +91,7 @@ const OBJECTIONS: Objection[] = [
     number: '02',
     question: 'What happens to our data?',
     answer:
-      'Documents are encrypted at rest with authenticated AES-256-GCM (keyVersion-rotated). A GDPR anonymizer runs as the literal first node of the pipeline, so no analysis model ever sees raw PII. No customer data is used to train upstream models. Hosted on SOC 2 Type II infrastructure (Vercel + Supabase); our own product-level SOC 2 Type I completion is targeted for Q4 2026 with the Type II observation window opening immediately after, and in-flight controls already mirror Type II. Full posture at /security.',
+      `Documents are encrypted at rest with authenticated AES-256-GCM (keyVersion-rotated). A GDPR anonymizer runs as the literal first node of the pipeline, so no analysis model ever sees raw PII. No customer data is used to train upstream models. ${SOC2_FULL_STATEMENT} Full posture at /security.`,
   },
   {
     number: '03',

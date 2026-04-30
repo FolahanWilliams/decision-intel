@@ -73,6 +73,28 @@ export const SECURITY_CONTACT_EMAIL = 'security@decision-intel.com';
 export const PRIVACY_CONTACT_EMAIL = 'team@decision-intel.com';
 
 /**
+ * Compliance / Data Protection contact — the named counterparty a Fortune
+ * 500 GC or audit-committee chair looks for when executing a DPA, raising
+ * a sub-processor objection, or routing a GDPR Art 22 contestation.
+ *
+ * Margaret persona finding (2026-04-30): /about lists a procurement email
+ * but no NAMED individual responsible for compliance. F500 GCs need a
+ * counterparty before signing.
+ *
+ * Until the team scales beyond the founder, the founder IS the compliance
+ * counterparty. That's honest and procurement-grade — a 24h response SLA
+ * from the CEO is stronger than a generic inbox.
+ *
+ * TODO(founder): when a dedicated DPO / Head of Compliance is hired,
+ * update COMPLIANCE_CONTACT_NAME + COMPLIANCE_CONTACT_TITLE here; every
+ * surface (/about, /privacy, ToS sub-processor block) picks up the change.
+ */
+export const COMPLIANCE_CONTACT_NAME = FOUNDER_NAME;
+export const COMPLIANCE_CONTACT_TITLE = `${FOUNDER_TITLE} & CEO`;
+export const COMPLIANCE_CONTACT_EMAIL = 'compliance@decision-intel.com';
+export const COMPLIANCE_RESPONSE_SLA = '24-hour acknowledgement, 5-business-day substantive response';
+
+/**
  * Short founder narrative — surfaces on /about and (compressed) on the
  * landing-page credibility strip if needed. Lagos-anchored per
  * CLAUDE.md "Lead the story with Lagos/Nigeria — it's the narrative

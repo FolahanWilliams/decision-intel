@@ -164,6 +164,12 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
                 overallScore: true,
                 biases: true,
                 createdAt: true,
+                // B7 lock 2026-04-30 (Titi persona) — pull market-context
+                // signals so the deal page can render a Pan-African
+                // regulatory belt chip when EM jurisdictions are
+                // detected anywhere across the deal's analyses.
+                marketContextApplied: true,
+                marketContextOverride: true,
               },
             },
           },
@@ -198,6 +204,32 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       .filter((x): x is NonNullable<typeof x> => x !== null);
     const aggregation = aggregateDeal(latestAnalyses);
 
+    // B7 lock 2026-04-30 (Titi persona) — collect every EM-jurisdiction
+    // signal across the deal's analyses. The structural-assumptions
+    // pipeline writes either `marketContextOverride` (manual override)
+    // or `marketContextApplied` (auto-detected); we prefer override
+    // when both exist, mirroring the per-document UI rendering rule.
+    const emergingMarketCountries: string[] = [];
+    {
+      const seen = new Set<string>();
+      for (const doc of deal.documents || []) {
+        const latest = doc.analyses?.[0];
+        if (!latest) continue;
+        const ctx =
+          (latest.marketContextOverride as { emergingMarketCountries?: string[] } | null) ??
+          (latest.marketContextApplied as { emergingMarketCountries?: string[] } | null);
+        const arr = ctx?.emergingMarketCountries;
+        if (!Array.isArray(arr)) continue;
+        for (const c of arr) {
+          if (typeof c !== 'string') continue;
+          const key = c.trim().toLowerCase();
+          if (!key || seen.has(key)) continue;
+          seen.add(key);
+          emergingMarketCountries.push(c.trim());
+        }
+      }
+    }
+
     // 3.1 deep — most recent cross-reference run if any.
     // @schema-drift-tolerant — pre-3.1 environments simply return null here.
     const crossReference = await prisma.dealCrossReference
@@ -207,7 +239,12 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       })
       .catch(() => null);
 
-    return NextResponse.json({ ...deal, aggregation, crossReference });
+    return NextResponse.json({
+      ...deal,
+      aggregation,
+      crossReference,
+      emergingMarketCountries,
+    });
   } catch (error) {
     log.error('Failed to fetch deal outcome:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

@@ -459,12 +459,19 @@ export interface OrgCalibrationSummary {
   } | null;
   /** Platform seed numbers — populated when source === 'platform_seed'.
    *  Re-derivable from public case-study data; safe to render in any
-   *  client-safe DPR. */
+   *  client-safe DPR. Extended 2026-04-30 (B1 lock) with bootstrap CI
+   *  half-width + iterations + seed + computed-at so the DPR cover
+   *  carries the procurement-grade methodology footnote (Margaret +
+   *  James persona ask). */
   platformSeed?: {
     n: number;
     meanBrier: number;
     classificationAccuracy: number;
     methodologyVersion: string;
+    brierCi95?: { lower: number; upper: number; halfWidth: number };
+    bootstrapIterations?: number;
+    bootstrapSeed?: number;
+    computedAt?: string;
   };
   calibrationNote: string;
 }
@@ -605,8 +612,12 @@ async function buildCounterfactualImpact(
 
 /** Build the Org Calibration / Decision Debt summary. Pulls Brier
  *  stats + the analysis's own `recalibratedDqi` JSON field. Null is the
- *  honest answer for cold-start orgs with no closed outcomes. */
-async function buildOrgCalibration(
+ *  honest answer for cold-start orgs with no closed outcomes.
+ *
+ *  Exported 2026-04-30 (B5 lock) so the deal-page calibration chip
+ *  can reuse the same builder the DPR uses — single source of truth
+ *  for the per-org-vs-seed calibration shape. */
+export async function buildOrgCalibration(
   orgId: string | null,
   recalibratedDqi: unknown
 ): Promise<OrgCalibrationSummary | undefined> {
@@ -643,10 +654,14 @@ async function buildOrgCalibration(
         meanBrier: baseline.meanBrier,
         classificationAccuracy: baseline.classificationAccuracy,
         methodologyVersion: baseline.methodologyVersion,
+        brierCi95: baseline.brierCi95,
+        bootstrapIterations: baseline.bootstrapIterations,
+        bootstrapSeed: baseline.bootstrapSeed,
+        computedAt: baseline.computedAt.slice(0, 10),
       },
-      calibrationNote: `Platform calibration baseline · Brier ${baseline.meanBrier.toFixed(3)} (${seedBrierCat}) over ${baseline.n} audited corporate decisions, ${Math.round(
+      calibrationNote: `Platform calibration baseline · Brier ${baseline.meanBrier.toFixed(3)} ± ${baseline.brierCi95.halfWidth.toFixed(3)} (${seedBrierCat}, 95% CI) over ${baseline.n} audited corporate decisions, ${Math.round(
         baseline.classificationAccuracy * 100
-      )}% classification accuracy at the investigate-further cutoff. This is the seed methodology applied without hindsight; per-org calibration replaces the seed once this organisation has ≥1 closed outcome.`,
+      )}% classification accuracy at the investigate-further cutoff. ${baseline.bootstrapIterations.toLocaleString('en-US')}-iteration bootstrap, seed ${baseline.bootstrapSeed}, methodology v${baseline.methodologyVersion}. This is the seed methodology applied without hindsight; per-org calibration replaces the seed once this organisation has ≥1 closed outcome.`,
     };
   }
 

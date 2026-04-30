@@ -47,7 +47,9 @@ import {
   ExternalLink,
   Printer,
   FileText,
+  Info,
 } from 'lucide-react';
+import { AI_VERIFY_DISCLAIMER_LONG } from '@/lib/constants/trust-copy';
 
 const C = {
   white: '#FFFFFF',
@@ -123,7 +125,7 @@ const PRINCIPLES: PrincipleRow[] = [
     name: 'Security',
     definition: 'The AI system resists unauthorised access and tampering.',
     mechanism:
-      'TLS 1.2+ in transit, AES-256-GCM at rest with keyVersion rotation, Supabase SOC 2-adjacent infrastructure, CSRF protection via middleware, signed cryptographic fingerprints on the DPR itself. Every encrypted row carries a keyVersion stamp so keys rotate without bricking historical data.',
+      'TLS 1.2+ in transit, AES-256-GCM at rest with keyVersion rotation, SOC 2 Type II infrastructure (Vercel + Supabase) with Decision Intel’s own product-level Type I targeted for Q4 2026, CSRF protection via middleware, hashed + tamper-evident fingerprints on the DPR itself. Every encrypted row carries a keyVersion stamp so keys rotate without bricking historical data.',
     dprFields: ['Input-document hash', 'Prompt fingerprint', 'Reviewer signatures'],
   },
   {
@@ -268,21 +270,50 @@ export function AiVerifyMappingClient() {
             and the OECD AI Principles. The reference implementation a Fortune 500 procurement team
             can paste into a vendor risk assessment.
           </p>
-          <p
+          {/* Self-assessment disclaimer banner — locked 2026-04-30 (B2 lock,
+              James persona ask). Above-the-fold, visually distinct from
+              prose so a procurement reviewer cannot miss the
+              "self-assessment, no third-party certification" framing.
+              Sources from AI_VERIFY_DISCLAIMER_LONG in trust-copy.ts so
+              every consumer surface stays in lock-step. */}
+          <div
             style={{
-              fontSize: 14,
-              color: C.slate500,
-              lineHeight: 1.65,
-              maxWidth: 820,
               marginBottom: 30,
-              fontStyle: 'italic',
+              maxWidth: 820,
+              padding: '14px 18px',
+              borderRadius: 10,
+              background: 'rgba(202, 138, 4, 0.08)',
+              border: '1px solid rgba(202, 138, 4, 0.30)',
+              display: 'flex',
+              gap: 12,
+              alignItems: 'flex-start',
             }}
           >
-            AI Verify is a self-assessment governance framework under the AI Verify Foundation, a
-            subsidiary of Singapore&rsquo;s Infocomm Media Development Authority (IMDA). It does not
-            certify products. &ldquo;Aligned with&rdquo; is the accurate claim; we state this
-            openly.
-          </p>
+            <Info
+              size={18}
+              color="rgb(180, 122, 4)"
+              strokeWidth={2.2}
+              style={{ flexShrink: 0, marginTop: 1 }}
+              aria-hidden
+            />
+            <div>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 800,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: 'rgb(140, 96, 0)',
+                  marginBottom: 4,
+                }}
+              >
+                Self-assessment · no third-party certification
+              </div>
+              <div style={{ fontSize: 13.5, color: C.slate700, lineHeight: 1.55 }}>
+                {AI_VERIFY_DISCLAIMER_LONG}
+              </div>
+            </div>
+          </div>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             <button
               onClick={handlePrint}

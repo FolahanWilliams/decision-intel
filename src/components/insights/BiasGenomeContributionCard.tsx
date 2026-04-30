@@ -44,12 +44,19 @@ interface ContributionPayload {
   cohortPercentile: number | null;
   /** Platform calibration baseline shipped 2026-04-29 — F1 lock.
    *  Surfaced in the discovery state so a cold-start org sees a
-   *  defensible Tetlock-anchored number before they have outcomes. */
+   *  defensible Tetlock-anchored number before they have outcomes.
+   *  Extended 2026-04-30 with the Margaret + James procurement-grade
+   *  methodology footnote (n + 95% CI + iterations + seed + version). */
   platformBaseline: {
     n: number;
     meanBrier: number;
     meanCategory: 'excellent' | 'good' | 'fair' | 'poor';
     classificationAccuracy: number;
+    brierCi95?: { lower: number; upper: number; halfWidth: number };
+    bootstrapIterations?: number;
+    bootstrapSeed?: number;
+    methodologyVersion?: string;
+    computedAt?: string;
   };
   computedAt: string;
 }
@@ -622,11 +629,33 @@ function PlatformBaselineCallout({
         Until your outcomes accumulate
       </div>
       Platform calibration baseline · Brier{' '}
-      <strong style={{ color: 'var(--text-primary)' }}>{baseline.meanBrier.toFixed(3)}</strong>{' '}
+      <strong style={{ color: 'var(--text-primary)' }}>{baseline.meanBrier.toFixed(3)}</strong>
+      {baseline.brierCi95 && (
+        <>
+          {' '}
+          ± <strong>{baseline.brierCi95.halfWidth.toFixed(3)}</strong>
+        </>
+      )}{' '}
       ({baseline.meanCategory}) over {baseline.n} audited corporate decisions ·{' '}
       <strong style={{ color: 'var(--text-primary)' }}>{accuracyPct}%</strong> classification
       accuracy at the investigate-further cutoff. Per-org calibration replaces the seed once
       this organisation has ≥1 closed outcome.
+      {baseline.brierCi95 && baseline.bootstrapIterations && (
+        <div
+          style={{
+            marginTop: 6,
+            fontSize: 10.5,
+            fontStyle: 'italic',
+            color: 'var(--text-muted)',
+            lineHeight: 1.5,
+          }}
+        >
+          95% CI from a {baseline.bootstrapIterations.toLocaleString('en-US')}-iteration bootstrap
+          {baseline.bootstrapSeed ? ` (seed ${baseline.bootstrapSeed})` : ''}
+          {baseline.methodologyVersion ? ` · methodology v${baseline.methodologyVersion}` : ''}
+          {baseline.computedAt ? ` · computed ${baseline.computedAt}` : ''}.
+        </div>
+      )}
     </div>
   );
 }

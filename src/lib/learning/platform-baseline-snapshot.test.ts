@@ -32,5 +32,16 @@ describe('platform-baseline-snapshot drift', () => {
     expect(snap.classificationCounts.correct).toBe(live.classificationCounts.correct);
     expect(snap.classificationCounts.scored).toBe(live.classificationCounts.scored);
     expect(snap.methodologyVersion).toBe(live.methodologyVersion);
+    // Bootstrap CI fields — seeded mulberry32 means the CI is fully
+    // deterministic, so the literals must match exactly to within
+    // display rounding. The drift test catches any silent change to
+    // either the sample variance OR the bootstrap seed.
+    expect(Math.abs(snap.brierCi95.lower - live.brierCi95.lower)).toBeLessThanOrEqual(0.005);
+    expect(Math.abs(snap.brierCi95.upper - live.brierCi95.upper)).toBeLessThanOrEqual(0.005);
+    expect(Math.abs(snap.brierCi95.halfWidth - live.brierCi95.halfWidth)).toBeLessThanOrEqual(
+      0.005
+    );
+    expect(snap.bootstrapIterations).toBe(live.bootstrapIterations);
+    expect(snap.bootstrapSeed).toBe(live.bootstrapSeed);
   });
 });

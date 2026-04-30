@@ -12,6 +12,7 @@
 import { Activity, AlertTriangle } from 'lucide-react';
 import { formatBiasName } from '@/lib/utils/labels';
 import type { DealAggregationDto } from '@/types/deals';
+import { DealCalibrationChip } from './DealCalibrationChip';
 
 const GRADE_HEX: Record<NonNullable<DealAggregationDto['compositeGrade']>, string> = {
   A: '#16A34A',
@@ -126,6 +127,11 @@ export function DealCompositeHero({ aggregation, totalDocs }: Props) {
             Grade {compositeGrade} · {analyzedDocCount} of {totalDocs} doc
             {totalDocs !== 1 ? 's' : ''} analyzed
           </div>
+          {/* Calibration evidence — per-org Brier when outcomes have
+              accumulated, platform seed baseline as the honest fallback.
+              Cloverpop-defense surface (CLAUDE.md External Attack
+              Vectors). B5 lock 2026-04-30. */}
+          <DealCalibrationChip />
         </div>
       </div>
 

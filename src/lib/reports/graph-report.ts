@@ -51,6 +51,36 @@ export interface GraphNetworkReport {
   }>;
   edgeTypeDistribution: Record<string, number>;
   nodeTypeDistribution: Record<string, number>;
+  /**
+   * Snapshot-time org calibration evidence — N1 lock 2026-04-30.
+   *
+   * When the founder shares a Decision Knowledge Graph snapshot, the
+   * public viewer renders this band ABOVE the graph content so the
+   * partner / CFO / regulator opening the link sees the org's
+   * calibration the moment the page loads. CLAUDE.md External Attack
+   * Vector #1 (Cloverpop's data advantage) — the moat is "our outcomes
+   * close faster so calibration sharpens faster," and N1 moves that
+   * proof from inside-the-platform onto the artefact.
+   *
+   * Frozen at share-creation time: the field is populated by the
+   * graph-share POST route via `buildOrgCalibration(orgId, null)`, then
+   * embedded in the persisted GraphShareLink.snapshot. Subsequent
+   * outcomes the org logs do NOT mutate the share — the trust property
+   * the sharer needs to send the URL without anxiety.
+   *
+   * Optional for back-compat: pre-N1 snapshots simply don't render the
+   * banner (the public viewer checks for presence).
+   */
+  calibration?: {
+    source: 'org' | 'platform_seed';
+    decisionsTracked: number;
+    outcomesClosed: number;
+    meanBrierScore: number | null;
+    brierCategory: string | null;
+    classificationAccuracy?: number | null;
+    classificationCounts?: { correct: number; scored: number };
+    note: string;
+  };
 }
 
 export async function generateGraphReport(

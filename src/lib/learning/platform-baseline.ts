@@ -96,6 +96,19 @@ export interface PlatformCalibrationBaseline {
   /** Numerator and denominator behind classificationAccuracy so a
    *  procurement reader can verify the math. */
   classificationCounts: { correct: number; scored: number };
+  /** 95% confidence interval on the mean Brier from a 10,000-iteration
+   *  bootstrap with replacement, seeded for reproducibility. The CI
+   *  answers Margaret's procurement question "is your Brier number
+   *  precise enough to be a meaningful claim?" — `halfWidth` is the
+   *  ±value that surfaces in marketing copy. Seeded mulberry32 means
+   *  every process / test / build computes the same CI. */
+  brierCi95: { lower: number; upper: number; halfWidth: number };
+  /** Number of bootstrap iterations used to derive `brierCi95`. */
+  bootstrapIterations: number;
+  /** Bootstrap PRNG seed — pinned for reproducibility. Document on the
+   *  /bias-genome methodology footnote so a procurement auditor can
+   *  re-run the computation and match. */
+  bootstrapSeed: number;
   /** ISO timestamp the baseline was computed (module-init time). Stable across the process. */
   computedAt: string;
   /** Source label for citation. Always "seed-case-studies" until customer outcomes supersede. */
@@ -202,6 +215,61 @@ function round4(value: number): number {
   return Math.round(value * 10_000) / 10_000;
 }
 
+/**
+ * mulberry32 — tiny, fast, full-period 32-bit PRNG. Seeded so the
+ * bootstrap CI is deterministic across processes / tests / CI / browser
+ * + Node. Procurement auditors can re-run the computation and match the
+ * published CI to four decimals.
+ */
+function mulberry32(seed: number): () => number {
+  let t = seed >>> 0;
+  return function () {
+    t = (t + 0x6d2b79f5) >>> 0;
+    let r = t;
+    r = Math.imul(r ^ (r >>> 15), r | 1);
+    r ^= r + Math.imul(r ^ (r >>> 7), r | 61);
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+const BOOTSTRAP_SEED = 17_039_507; // pinned; see PlatformCalibrationBaseline.bootstrapSeed
+const BOOTSTRAP_ITERATIONS = 10_000;
+
+/**
+ * Bootstrap 95% CI on the mean of `values` using `iterations` resamples
+ * with replacement, seeded for reproducibility. Returns lower / upper /
+ * halfWidth (which is what marketing copy surfaces as ±X).
+ */
+function bootstrapMeanCi95(
+  values: number[],
+  iterations: number,
+  seed: number
+): { lower: number; upper: number; halfWidth: number } {
+  if (values.length === 0) return { lower: 0, upper: 0, halfWidth: 0 };
+  const rng = mulberry32(seed);
+  const n = values.length;
+  const means = new Float64Array(iterations);
+  for (let i = 0; i < iterations; i += 1) {
+    let sum = 0;
+    for (let j = 0; j < n; j += 1) {
+      const idx = Math.floor(rng() * n);
+      sum += values[idx];
+    }
+    means[i] = sum / n;
+  }
+  // Sort ascending then read 2.5 / 97.5 percentiles.
+  const sorted = Array.from(means).sort((a, b) => a - b);
+  const lowerIdx = Math.floor(0.025 * iterations);
+  const upperIdx = Math.floor(0.975 * iterations);
+  const lower = round4(sorted[lowerIdx]);
+  const upper = round4(sorted[upperIdx]);
+  // halfWidth uses (upper - lower) / 2 — the symmetric margin around the
+  // mean that reads cleanly as ±X in copy. Source data is mildly
+  // right-skewed but the asymmetry is below display precision at n=143.
+  const halfWidth = round4((upper - lower) / 2);
+  return { lower, upper, halfWidth };
+}
+
 function computeBaselineUncached(): PlatformCalibrationBaseline {
   const perCase: Array<{ brier: number; outcomeCode: OutcomeCode; predictedDqi: number }> =
     ALL_CASES.map(c => {
@@ -256,6 +324,8 @@ function computeBaselineUncached(): PlatformCalibrationBaseline {
   const classificationAccuracy =
     labelled.length === 0 ? 0 : round4(correct / labelled.length);
 
+  const brierCi95 = bootstrapMeanCi95(briers, BOOTSTRAP_ITERATIONS, BOOTSTRAP_SEED);
+
   return {
     n: ALL_CASES.length,
     meanBrier: round4(meanBrier),
@@ -265,6 +335,9 @@ function computeBaselineUncached(): PlatformCalibrationBaseline {
     byOutcome,
     classificationAccuracy,
     classificationCounts: { correct, scored: labelled.length },
+    brierCi95,
+    bootstrapIterations: BOOTSTRAP_ITERATIONS,
+    bootstrapSeed: BOOTSTRAP_SEED,
     computedAt: new Date().toISOString(),
     dataSource: 'seed-case-studies',
     methodologyVersion: '2.0.0-seed',
@@ -308,5 +381,26 @@ export function formatBaselineLine(baseline: PlatformCalibrationBaseline): strin
 export function formatClassificationLine(baseline: PlatformCalibrationBaseline): string {
   const pct = Math.round(baseline.classificationAccuracy * 100);
   return `${pct}% classification accuracy at the investigate-further cutoff (${baseline.classificationCounts.correct} of ${baseline.classificationCounts.scored} historical decisions)`;
+}
+
+/**
+ * Methodology footnote — the procurement-grade transparency strip that
+ * Margaret + James asked for: n, mean Brier with ±halfWidth 95% CI,
+ * iterations + seed, classification-accuracy denominator, methodology
+ * version, computed-at date. Surfaces under the corpus mean on every
+ * marketing surface that quotes the calibration number.
+ *
+ * Pass the snapshot's `computedAt` (ISO date) when calling from a
+ * client-bundle surface that uses PLATFORM_BASELINE_SNAPSHOT — that
+ * snapshot has a stable date, while the live `baseline.computedAt` is
+ * the process-start ISO timestamp which is too noisy for marketing.
+ */
+export function formatCalibrationFootnote(
+  baseline: PlatformCalibrationBaseline,
+  computedAtOverride?: string
+): string {
+  const ci = baseline.brierCi95;
+  const date = computedAtOverride ?? baseline.computedAt.slice(0, 10);
+  return `n = ${baseline.n} historical corporate decisions · mean Brier ${baseline.meanBrier.toFixed(3)} ± ${ci.halfWidth.toFixed(3)} (95% CI, ${baseline.bootstrapIterations.toLocaleString('en-US')}-iteration bootstrap, seed ${baseline.bootstrapSeed}) · methodology v${baseline.methodologyVersion} · computed ${date}`;
 }
 

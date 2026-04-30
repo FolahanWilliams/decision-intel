@@ -16,6 +16,7 @@ import {
   GitCompareArrows,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { gradeMetaFromScore } from '@/lib/utils/grade';
 import { useDeal } from '@/hooks/useDeals';
 import { DealFormModal } from '@/components/deals/DealFormModal';
 import { DealOutcomeForm } from '@/components/deals/DealOutcomeForm';
@@ -28,6 +29,7 @@ import { UploadToDealButton } from '@/components/deals/UploadToDealButton';
 import { CrossReferenceCard } from '@/components/deals/CrossReferenceCard';
 import { CrossRefBadge } from '@/components/deals/CrossRefBadge';
 import { IcReadinessGate } from '@/components/deals/IcReadinessGate';
+import { DealRegulatoryBelt } from '@/components/deals/DealRegulatoryBelt';
 import { InlineDealUploadZone } from '@/components/deals/InlineDealUploadZone';
 import type { DealCrossReferenceFinding } from '@/types/deals';
 import { extractCrossReferenceFindings as extractFindings } from '@/lib/utils/deal-cross-reference';
@@ -295,6 +297,15 @@ export default function DealDetailPage() {
             blocking — but surfaces what a procurement-grade reader will
             catch before walking into Thursday's IC. */}
         <IcReadinessGate deal={deal} />
+
+        {/* Pan-African Regulatory Belt — B7 lock 2026-04-30 (Titi
+            persona ask). When the deal's analyses surface any African
+            EM jurisdiction, render the chip naming the primary
+            regulators (NDPR / CBN / FRC Nigeria / WAEMU / PoPIA / etc.).
+            Procurement-grade signal that IBM watsonx + US incumbents
+            cannot reach. Renders null when no African jurisdiction
+            mapped. */}
+        <DealRegulatoryBelt countries={deal.emergingMarketCountries} />
 
         {/* Composite DQI + bias signature (3.1 deal-as-decision-unit hero) */}
         {deal.aggregation && (
@@ -589,16 +600,11 @@ function DocumentsTab({
 
       {documents.map(doc => {
         const latestScore = doc.analyses?.[0]?.overallScore;
+        // Use gradeMetaFromScore(...).color (raw hex from GRADE_THRESHOLDS) here
+        // because the chip below concatenates `${scoreColour}18`/`${scoreColour}33`
+        // alpha suffixes which require hex, not CSS var expressions.
         const scoreColour =
-          latestScore === undefined
-            ? null
-            : latestScore >= 85
-              ? '#16A34A'
-              : latestScore >= 70
-                ? '#2563EB'
-                : latestScore >= 55
-                  ? '#D97706'
-                  : '#DC2626';
+          latestScore === undefined ? null : gradeMetaFromScore(latestScore).color;
         const isSelected = selectedDocs.has(doc.id);
         return (
           <div
@@ -687,7 +693,7 @@ function DocumentsTab({
                   style={{
                     fontSize: 10,
                     fontWeight: 500,
-                    color: '#16A34A',
+                    color: 'var(--accent-primary)',
                     background: 'rgba(22, 163, 74, 0.1)',
                     padding: '2px 6px',
                     borderRadius: 4,
@@ -702,10 +708,10 @@ function DocumentsTab({
                   fontWeight: 500,
                   color:
                     doc.status === 'analyzed'
-                      ? '#10b981'
+                      ? 'var(--success)'
                       : doc.status === 'error'
-                        ? '#ef4444'
-                        : '#f59e0b',
+                        ? 'var(--error)'
+                        : 'var(--warning)',
                   background:
                     doc.status === 'analyzed'
                       ? 'rgba(16, 185, 129, 0.1)'
@@ -863,12 +869,12 @@ function BiasSummaryTab({
                   textTransform: 'capitalize',
                   color:
                     b.topSeverity === 'critical'
-                      ? '#7F1D1D'
+                      ? 'var(--severity-critical)'
                       : b.topSeverity === 'high'
-                        ? '#DC2626'
+                        ? 'var(--severity-high)'
                         : b.topSeverity === 'medium'
-                          ? '#D97706'
-                          : '#2563EB',
+                          ? 'var(--warning)'
+                          : 'var(--info)',
                 }}
               >
                 {b.topSeverity}
@@ -918,7 +924,7 @@ function BiasSummaryTab({
                   alignItems: 'center',
                   gap: 8,
                   fontSize: 12,
-                  color: '#16A34A',
+                  color: 'var(--accent-primary)',
                   textDecoration: 'none',
                 }}
               >
@@ -965,8 +971,8 @@ function ValueProtectedCard({ dealId }: { dealId: string }) {
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-        <Shield className="w-4 h-4" style={{ color: '#22c55e' }} />
-        <span style={{ fontSize: 13, fontWeight: 600, color: '#22c55e' }}>Value Protected</span>
+        <Shield className="w-4 h-4" style={{ color: 'var(--success)' }} />
+        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--success)' }}>Value Protected</span>
       </div>
 
       <div style={{ fontSize: 28, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
@@ -985,7 +991,7 @@ function ValueProtectedCard({ dealId }: { dealId: string }) {
         </div>
         <div>
           <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Confirmed</div>
-          <div style={{ fontSize: 15, fontWeight: 600, color: '#22c55e' }}>
+          <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--success)' }}>
             {roi.confirmedBiases}
           </div>
         </div>
@@ -1016,7 +1022,7 @@ function ValueProtectedCard({ dealId }: { dealId: string }) {
                 }}
               >
                 <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <TrendingUp className="w-3 h-3" style={{ color: '#22c55e' }} />
+                  <TrendingUp className="w-3 h-3" style={{ color: 'var(--success)' }} />
                   {b.biasType}
                 </span>
                 <span style={{ fontWeight: 600, fontFamily: "'JetBrains Mono', monospace" }}>

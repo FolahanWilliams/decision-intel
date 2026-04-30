@@ -31,7 +31,15 @@ import {
 import { DESIGN_PARTNER_SEATS_AVAILABLE } from '@/lib/constants/company-info';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
-import { PLATFORM_BASELINE_SNAPSHOT } from '@/lib/learning/platform-baseline-snapshot';
+import {
+  PLATFORM_BASELINE_FOOTNOTE,
+  PLATFORM_BASELINE_SNAPSHOT,
+} from '@/lib/learning/platform-baseline-snapshot';
+import {
+  SOC2_LANDING_STRIP_LABEL,
+  SOC2_LANDING_STRIP_NOTE,
+  AI_VERIFY_DISCLAIMER_SHORT,
+} from '@/lib/constants/trust-copy';
 
 const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
 // PLATFORM_BASELINE_SNAPSHOT is a tiny no-dep mirror of the live
@@ -1541,12 +1549,16 @@ function HeroCredibilityStrip() {
     {
       icon: Scale,
       label: 'Aligned with AI Verify',
-      note: '11 governance principles',
+      // B2 lock 2026-04-30 (James persona): caller-readable disclaimer
+      // imported from trust-copy SSOT prevents the chip from drifting
+      // into "certified by AI Verify" framing on a casual read.
+      note: `11 governance principles · ${AI_VERIFY_DISCLAIMER_SHORT}`,
     },
     {
       icon: ShieldCheck,
-      label: 'SOC 2 Type II infrastructure',
-      note: 'Vercel + Supabase, Type I Q4 2026',
+      // SOC 2 chip pulls from trust-copy SSOT — never hardcode here.
+      label: SOC2_LANDING_STRIP_LABEL,
+      note: SOC2_LANDING_STRIP_NOTE,
     },
     {
       icon: Globe2,
@@ -1555,8 +1567,8 @@ function HeroCredibilityStrip() {
     },
     {
       icon: Activity,
-      label: `Brier ${PLATFORM_BASELINE_SNAPSHOT.meanBrier.toFixed(3)} calibration`,
-      note: `${PLATFORM_BASELINE_SNAPSHOT.n} audited corporate decisions`,
+      label: `Brier ${PLATFORM_BASELINE_SNAPSHOT.meanBrier.toFixed(3)} ± ${PLATFORM_BASELINE_SNAPSHOT.brierCi95.halfWidth.toFixed(3)} calibration`,
+      note: `${PLATFORM_BASELINE_SNAPSHOT.n} audited corporate decisions, 95% CI`,
     },
   ];
 
@@ -1624,6 +1636,24 @@ function HeroCredibilityStrip() {
             </div>
           );
         })}
+      </div>
+      {/* Methodology footnote (Margaret + James persona ask, B1 lock 2026-04-30) —
+          surfaces the n + 95% CI half-width + bootstrap iterations + seed +
+          methodology version + computed-at date so a vendor-risk reviewer
+          can verify the calibration claim, not just read it. */}
+      <div
+        style={{
+          marginTop: 14,
+          fontSize: 11,
+          lineHeight: 1.5,
+          color: C.slate500,
+          textAlign: 'center',
+          maxWidth: 920,
+          marginLeft: 'auto',
+          marginRight: 'auto',
+        }}
+      >
+        {PLATFORM_BASELINE_FOOTNOTE}
       </div>
     </div>
   );

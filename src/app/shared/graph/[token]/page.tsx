@@ -63,6 +63,101 @@ const C = {
   white: '#FFFFFF',
 };
 
+/**
+ * Snapshot-time calibration band — N1 lock 2026-04-30.
+ *
+ * Renders ABOVE the graph content so the public viewer answers
+ * "is this org's reasoning calibrated?" the moment the page loads.
+ * Two visual variants:
+ *
+ *   org branch (cal.source === 'org')     — green band; shows the org's
+ *                                            per-decision Brier + outcomes
+ *                                            count + band label.
+ *   platform_seed branch                   — slate band; shows the seed
+ *                                            baseline + classification
+ *                                            accuracy with the explicit
+ *                                            "before customer outcomes
+ *                                            accumulate" framing.
+ *
+ * Both variants are SAFE to render to anonymous viewers — the data is
+ * derived from public case-study fields (seed) or aggregated org Brier
+ * (no per-decision details exposed).
+ */
+function CalibrationBand({
+  calibration,
+}: {
+  calibration: NonNullable<GraphNetworkReport['calibration']>;
+}) {
+  const isOrg = calibration.source === 'org';
+  const accent = isOrg ? C.green : C.slate500;
+  const tint = isOrg ? 'rgba(22, 163, 74, 0.06)' : 'rgba(148, 163, 184, 0.10)';
+  const border = isOrg ? 'rgba(22, 163, 74, 0.25)' : 'rgba(148, 163, 184, 0.30)';
+  const label = isOrg
+    ? `${calibration.outcomesClosed} outcome${calibration.outcomesClosed === 1 ? '' : 's'} logged`
+    : 'Platform calibration baseline';
+  const number =
+    calibration.meanBrierScore !== null && calibration.meanBrierScore !== undefined
+      ? calibration.meanBrierScore.toFixed(3)
+      : null;
+  const accuracyPct =
+    typeof calibration.classificationAccuracy === 'number'
+      ? Math.round(calibration.classificationAccuracy * 100)
+      : null;
+
+  return (
+    <div
+      style={{
+        background: tint,
+        borderBottom: `1px solid ${border}`,
+        padding: '12px 24px',
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 1080,
+          margin: '0 auto',
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'baseline',
+          gap: 14,
+          fontSize: 13,
+          color: C.slate700,
+          lineHeight: 1.5,
+        }}
+      >
+        <Activity size={14} style={{ color: accent, flexShrink: 0, alignSelf: 'center' }} />
+        <span
+          style={{
+            fontSize: 10.5,
+            fontWeight: 800,
+            letterSpacing: '0.10em',
+            textTransform: 'uppercase',
+            color: accent,
+          }}
+        >
+          {isOrg ? 'Audited with calibration' : 'Calibration baseline'}
+        </span>
+        {number && (
+          <span style={{ color: C.slate900 }}>
+            Brier <strong style={{ fontWeight: 700 }}>{number}</strong>
+            {calibration.brierCategory && (
+              <span style={{ color: C.slate500 }}> ({calibration.brierCategory})</span>
+            )}
+          </span>
+        )}
+        <span style={{ color: C.slate500 }}>· {label}</span>
+        {accuracyPct !== null && calibration.classificationCounts && (
+          <span style={{ color: C.slate500 }}>
+            · <strong style={{ color: C.slate900 }}>{accuracyPct}%</strong> classification accuracy
+            ({calibration.classificationCounts.correct} of{' '}
+            {calibration.classificationCounts.scored})
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function StatTile({
   label,
   value,
@@ -504,6 +599,13 @@ export default function SharedGraphPage() {
           </div>
         </div>
       </header>
+
+      {/* N1 lock 2026-04-30 — Snapshot-time calibration band. Sits
+          ABOVE the graph content so the partner / CFO / regulator
+          opening this link sees the org's calibration before any
+          numbers below. Frozen at share-creation time; mutates with
+          subsequent outcomes only on a new share. */}
+      {r.calibration && <CalibrationBand calibration={r.calibration} />}
 
       {/* Redaction notice */}
       {data.isRedacted && (

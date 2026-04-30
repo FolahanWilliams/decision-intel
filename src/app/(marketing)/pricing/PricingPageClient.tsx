@@ -12,6 +12,7 @@ import {
   DPR_PROVENANCE_CARD_SUB,
 } from '@/lib/constants/trust-copy';
 import { DESIGN_PARTNER_SEATS_TOTAL } from '@/lib/constants/company-info';
+import { ENTERPRISE_QUOTE_DEFAULTS } from '@/lib/stripe';
 
 type BillingCycle = 'monthly' | 'annual';
 
@@ -51,6 +52,20 @@ interface Tier {
   anchor?: string;
   highlights: Array<{ label: string; strong?: boolean }>;
   cta: { label: string; href?: string; action?: 'checkout-pro' | 'checkout-team' | 'contact' };
+  /**
+   * Optional sibling CTA — locked 2026-04-30 (B3 lock; Margaret + Titi
+   * persona ask). On Enterprise the primary CTA promotes the
+   * self-serve quote builder so the buyer sees a real ACV without
+   * an email gate; the secondary CTA preserves the talk-to-sales
+   * path side-by-side. Rendered as an outlined button below the
+   * primary green button. Other tiers omit this; the original
+   * secondary text-link pattern is preserved for them.
+   */
+  secondaryCta?: {
+    label: string;
+    href?: string;
+    action?: 'checkout-pro' | 'checkout-team' | 'contact';
+  };
   badge?: string;
   featured?: boolean;
 }
@@ -130,17 +145,34 @@ function buildTiers(_cycle: BillingCycle): Tier[] {
         'Audit-defensible decisions across the entire strategy function. The provenance record your audit committee asks for and your General Counsel signs off on, before regulators start asking.',
       priceMonthly: null,
       priceAnnual: null,
-      customPrice: 'Custom',
-      anchor: '20-30 seats from $4,000/mo · custom above that',
+      // B3 lock 2026-04-30 (Margaret + Titi persona ask) — surface a real
+      // starting ACV BEFORE the customer has to give an email or contact
+      // sales. Derived from ENTERPRISE_QUOTE_DEFAULTS so the number stays
+      // in lock-step with the quote builder. 25 seats × $119/mo × 12.
+      customPrice: `From $${(
+        ENTERPRISE_QUOTE_DEFAULTS.minSeats *
+        ENTERPRISE_QUOTE_DEFAULTS.perSeatMonthly *
+        12
+      ).toLocaleString()}/yr`,
+      anchor: `${ENTERPRISE_QUOTE_DEFAULTS.minSeats} seats × $${ENTERPRISE_QUOTE_DEFAULTS.perSeatMonthly}/mo · build your number in 3 minutes`,
       highlights: [
-        { label: '20-30 seats from $4,000/month', strong: true },
+        {
+          label: `Starts at ${ENTERPRISE_QUOTE_DEFAULTS.minSeats} seats × $${ENTERPRISE_QUOTE_DEFAULTS.perSeatMonthly}/mo`,
+          strong: true,
+        },
         { label: 'Unlimited audits and Decision Packages' },
         { label: 'SAML 2.0 / OIDC SSO (coming soon) + custom taxonomy' },
         { label: 'Multi-division management' },
         { label: 'Signed DPA + audit-log retention SLA' },
         { label: 'Everything in Strategy' },
       ],
-      cta: { label: 'Contact sales', action: 'contact' },
+      cta: { label: 'Get a quote', href: '/pricing/quote' },
+      // Sibling secondary CTA — sold side-by-side with the primary
+      // self-serve quote builder, not buried in a tiny text link.
+      secondaryCta: {
+        label: 'Talk to sales',
+        action: 'contact' as const,
+      },
     },
   ];
 }
@@ -775,23 +807,104 @@ export function PricingPageClient() {
                       <span style={{ color: C.green, fontWeight: 600 }}>Talk to the founder →</span>
                     </Link>
                   )}
+                  {/* B3 lock 2026-04-30 — Sibling secondary CTA for tiers
+                      that opt in (Enterprise: "Talk to sales" beneath the
+                      promoted "Get a quote" primary). Outlined slate
+                      button so it sits as a real peer to the primary CTA,
+                      not a tiny grey text link. */}
+                  {tier.secondaryCta &&
+                    (tier.secondaryCta.href ? (
+                      <Link
+                        href={tier.secondaryCta.href}
+                        onClick={() =>
+                          trackEvent('pricing_secondary_cta_clicked', { tier: tier.id, cycle })
+                        }
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 6,
+                          width: '100%',
+                          marginTop: 10,
+                          padding: '12px 18px',
+                          borderRadius: 12,
+                          background: C.white,
+                          border: `1px solid ${C.slate200}`,
+                          color: C.slate900,
+                          fontSize: 13.5,
+                          fontWeight: 600,
+                          textDecoration: 'none',
+                        }}
+                      >
+                        {tier.secondaryCta.label} <ArrowRight size={13} />
+                      </Link>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          if (tier.secondaryCta?.action === 'contact') handleContact();
+                          else if (tier.secondaryCta?.action === 'checkout-pro')
+                            handleCheckout('pro');
+                          else if (tier.secondaryCta?.action === 'checkout-team')
+                            handleCheckout('team');
+                          trackEvent('pricing_secondary_cta_clicked', {
+                            tier: tier.id,
+                            cycle,
+                          });
+                        }}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 6,
+                          width: '100%',
+                          marginTop: 10,
+                          padding: '12px 18px',
+                          borderRadius: 12,
+                          background: C.white,
+                          border: `1px solid ${C.slate200}`,
+                          color: C.slate900,
+                          fontSize: 13.5,
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {tier.secondaryCta.label} <ArrowRight size={13} />
+                      </button>
+                    ))}
                   {tier.cta.action === 'contact' && (
-                    <Link
-                      href="/pricing/quote"
-                      onClick={() => trackEvent('pricing_quote_builder_clicked', { tier: tier.id })}
+                    <div
                       style={{
-                        display: 'block',
                         marginTop: 10,
                         textAlign: 'center',
-                        fontSize: 12.5,
+                        fontSize: 12,
                         color: C.slate500,
-                        textDecoration: 'none',
                         lineHeight: 1.5,
                       }}
                     >
-                      Or build a procurement-grade quote PDF —{' '}
-                      <span style={{ color: C.green, fontWeight: 600 }}>no login →</span>
-                    </Link>
+                      <span style={{ color: C.green, fontWeight: 600 }}>
+                        See your number before any contact info —
+                      </span>{' '}
+                      live ACV, no email required.
+                    </div>
+                  )}
+                  {/* Enterprise tiers with a quote-builder primary CTA also
+                      surface the same "see-your-number" hint so the
+                      visible-before-email promise is unambiguous. */}
+                  {tier.cta.href === '/pricing/quote' && tier.cta.action !== 'contact' && (
+                    <div
+                      style={{
+                        marginTop: 10,
+                        textAlign: 'center',
+                        fontSize: 12,
+                        color: C.slate500,
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      <span style={{ color: C.green, fontWeight: 600 }}>
+                        See your number before any contact info —
+                      </span>{' '}
+                      live ACV, no email required.
+                    </div>
                   )}
                 </div>
               </div>

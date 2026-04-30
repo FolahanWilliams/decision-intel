@@ -345,6 +345,17 @@ export interface DealDetail extends DealSummary {
   documents: DealDocument[];
   aggregation?: DealAggregationDto;
   crossReference?: DealCrossReferenceRun | null;
+  /**
+   * EM-jurisdiction signal aggregated across the deal's analyses
+   * (B7 lock 2026-04-30, Titi persona ask). Contains every distinct
+   * country surfaced in `marketContextApplied.emergingMarketCountries`
+   * or `marketContextOverride.emergingMarketCountries` on any analysis
+   * attached to the deal. The deal page maps this onto African
+   * regulators via `getAfricanRegulatorBelt` to render the Pan-African
+   * Regulatory Belt chip — the procurement-grade signal that IBM
+   * watsonx.governance + US incumbents cannot reach.
+   */
+  emergingMarketCountries?: string[];
 }
 
 export interface DealFilters {

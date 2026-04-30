@@ -36,6 +36,15 @@ function getPlatformBaseline(): ContributionResponse['platformBaseline'] {
     meanBrier: b.meanBrier,
     meanCategory: b.meanCategory,
     classificationAccuracy: b.classificationAccuracy,
+    // Extended 2026-04-30 (B1 lock) — Margaret + James procurement-grade
+    // methodology footnote: 95% CI half-width + iterations + seed +
+    // methodology version + computed-at date. Lets a vendor-risk reader
+    // verify the calibration claim, not just read it.
+    brierCi95: b.brierCi95,
+    bootstrapIterations: b.bootstrapIterations,
+    bootstrapSeed: b.bootstrapSeed,
+    methodologyVersion: b.methodologyVersion,
+    computedAt: b.computedAt.slice(0, 10),
   };
 }
 
@@ -82,6 +91,11 @@ interface ContributionResponse {
     meanBrier: number;
     meanCategory: 'excellent' | 'good' | 'fair' | 'poor';
     classificationAccuracy: number;
+    brierCi95?: { lower: number; upper: number; halfWidth: number };
+    bootstrapIterations?: number;
+    bootstrapSeed?: number;
+    methodologyVersion?: string;
+    computedAt?: string;
   };
 
   /** ISO timestamp the data was computed; client uses this for freshness UI. */

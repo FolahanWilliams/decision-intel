@@ -10,7 +10,10 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { computeGenomeFromSeed } from '@/lib/data/bias-genome-seed';
-import { computePlatformCalibrationBaseline } from '@/lib/learning/platform-baseline';
+import {
+  computePlatformCalibrationBaseline,
+  formatCalibrationFootnote,
+} from '@/lib/learning/platform-baseline';
 import { MarketingNav } from '@/components/marketing/MarketingNav';
 import { HeadlineStatCard } from '@/components/marketing/genome/HeadlineStatCard';
 import { ToxicComboCard } from '@/components/marketing/genome/ToxicComboCard';
@@ -151,11 +154,28 @@ export default function BiasGenomePage() {
             />
             <Pill
               label="Calibration baseline"
-              value={`Brier ${calibration.meanBrier.toFixed(3)}`}
-              sublabel={`${calibration.meanCategory} band · methodology ${calibration.methodologyVersion}`}
+              value={`Brier ${calibration.meanBrier.toFixed(3)} ± ${calibration.brierCi95.halfWidth.toFixed(3)}`}
+              sublabel={`${calibration.meanCategory} band · 95% CI`}
             />
             <Pill label="Data source" value="Seed" sublabel="live on customer opt-in" />
             <Pill label="Refreshed" value={meta.computedAt} sublabel="ISO date" />
+          </div>
+          {/* Methodology footnote — Margaret + James persona ask. Lets a
+              vendor-risk reviewer verify the math without reading source. */}
+          <div
+            style={{
+              marginTop: 18,
+              fontSize: 11.5,
+              lineHeight: 1.55,
+              color: C.slate500,
+              fontStyle: 'italic',
+              maxWidth: 920,
+            }}
+          >
+            {formatCalibrationFootnote(calibration, meta.computedAt)}.{' '}
+            <span style={{ color: C.slate600 }}>
+              Tetlock superforecasters land at ~0.13 · CIA analysts at ~0.23 · coin-flip at 0.25.
+            </span>
           </div>
         </div>
       </section>

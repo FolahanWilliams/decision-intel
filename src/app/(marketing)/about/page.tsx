@@ -41,6 +41,10 @@ import {
   FOUNDER_NAME,
   FOUNDER_TITLE,
   PROCUREMENT_CONTACT_EMAIL,
+  COMPLIANCE_CONTACT_NAME,
+  COMPLIANCE_CONTACT_TITLE,
+  COMPLIANCE_CONTACT_EMAIL,
+  COMPLIANCE_RESPONSE_SLA,
   FOUNDER_NARRATIVE_SHORT,
 } from '@/lib/constants/company-info';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
@@ -226,6 +230,25 @@ export default function AboutPage() {
               <div style={{ color: C.slate500, marginTop: 4, fontSize: 13 }}>
                 Vendor-risk questionnaires, DPA execution, security-questionnaire requests, and
                 regulatory mapping queries all route here.
+              </div>
+            </FactRow>
+            <FactRow label="Compliance contact" icon={<Mail size={14} strokeWidth={2.2} />}>
+              <strong style={{ fontWeight: 700, color: C.slate900 }}>
+                {COMPLIANCE_CONTACT_NAME}
+              </strong>
+              <span style={{ color: C.slate500 }}>, {COMPLIANCE_CONTACT_TITLE}</span>
+              <div style={{ marginTop: 6 }}>
+                <a
+                  href={`mailto:${COMPLIANCE_CONTACT_EMAIL}`}
+                  style={{ color: C.slate900, fontWeight: 600, textDecoration: 'underline' }}
+                >
+                  {COMPLIANCE_CONTACT_EMAIL}
+                </a>
+              </div>
+              <div style={{ color: C.slate500, marginTop: 4, fontSize: 13 }}>
+                Named counterparty for DPA execution, sub-processor objections, GDPR Art 22
+                automated-decision contestations, and audit-committee diligence.{' '}
+                <span style={{ color: C.slate600 }}>{COMPLIANCE_RESPONSE_SLA}.</span>
               </div>
             </FactRow>
           </div>

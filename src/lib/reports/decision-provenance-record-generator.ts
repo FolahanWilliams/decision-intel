@@ -301,7 +301,19 @@ export class DecisionProvenanceRecordGenerator {
       let calStrip: string;
       if (cal.source === 'platform_seed' && cal.platformSeed) {
         const seed = cal.platformSeed;
-        calStrip = `Calibration \u00b7 platform seed baseline \u00b7 Brier ${seed.meanBrier.toFixed(3)} over ${seed.n} audited corporate decisions \u00b7 ${Math.round(seed.classificationAccuracy * 100)}% classification accuracy at the investigate-further cutoff \u00b7 per-org calibration replaces the seed once this organisation has \u22651 closed outcome`;
+        // B1 lock 2026-04-30 \u2014 surface the bootstrap CI half-width
+        // alongside the mean Brier when present, so the DPR cover
+        // carries the procurement-grade methodology footnote Margaret
+        // + James asked for. Falls back to the prior shape when the
+        // CI fields are missing (defensive against snapshot drift).
+        const ciStr = seed.brierCi95
+          ? ` \u00b1 ${seed.brierCi95.halfWidth.toFixed(3)} (95% CI)`
+          : '';
+        const provenanceStr =
+          seed.bootstrapIterations && seed.bootstrapSeed
+            ? ` \u00b7 ${seed.bootstrapIterations.toLocaleString('en-US')}-iteration bootstrap, seed ${seed.bootstrapSeed} \u00b7 methodology v${seed.methodologyVersion}${seed.computedAt ? `, computed ${seed.computedAt}` : ''}`
+            : '';
+        calStrip = `Calibration \u00b7 platform seed baseline \u00b7 Brier ${seed.meanBrier.toFixed(3)}${ciStr} over ${seed.n} audited corporate decisions \u00b7 ${Math.round(seed.classificationAccuracy * 100)}% classification accuracy at the investigate-further cutoff${provenanceStr} \u00b7 per-org calibration replaces the seed once this organisation has \u22651 closed outcome`;
       } else if (cal.recalibratedFromOriginal) {
         calStrip = `Calibrated against ${cal.decisionsTracked} closed decisions for this organisation \u00b7 mean Brier ${cal.meanBrierScore?.toFixed(3) ?? '\u2014'} (${cal.brierCategory ?? 'unscored'}) \u00b7 recalibrated ${cal.recalibratedFromOriginal.delta >= 0 ? '+' : ''}${cal.recalibratedFromOriginal.delta} from absolute`;
       } else {
