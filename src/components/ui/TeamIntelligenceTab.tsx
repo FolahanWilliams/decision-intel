@@ -15,6 +15,14 @@ import {
 import { SparklineChart } from '@/components/ui/SparklineChart';
 import { getBiasDisplayName } from '@/lib/utils/bias-normalize';
 import { getBiasColor } from '@/lib/utils/bias-colors';
+import { SEVERITY_COLORS } from '@/lib/constants/human-audit';
+
+// 8% / 19% alpha tints. SEVERITY_COLORS resolves to var() so the
+// `${hex}15` / `${hex}30` concatenations no longer apply.
+function severityTint(level: string, alphaPct: number): string {
+  const color = SEVERITY_COLORS[level] || 'var(--text-muted)';
+  return `color-mix(in srgb, ${color} ${alphaPct}%, transparent)`;
+}
 
 interface CausalWeight {
   biasType: string;
@@ -63,13 +71,6 @@ const BREAKDOWN_LABELS: Record<string, string> = {
   nudgeResponsiveness: 'Nudge Response',
   dissentHealth: 'Dissent Health',
   priorSubmissionRate: 'Prior Capture',
-};
-
-const SEVERITY_COLORS: Record<string, string> = {
-  critical: '#f87171',
-  high: '#fb923c',
-  medium: '#fbbf24',
-  low: '#34d399',
 };
 
 export default function TeamIntelligenceTab({ orgId }: { orgId: string }) {
@@ -328,9 +329,9 @@ export default function TeamIntelligenceTab({ orgId }: { orgId: string }) {
                       fontWeight: 600,
                       padding: '2px 8px',
                       borderRadius: '6px',
-                      background: `${SEVERITY_COLORS[dangerLevel]}15`,
+                      background: severityTint(dangerLevel, 8),
                       color: SEVERITY_COLORS[dangerLevel],
-                      border: `1px solid ${SEVERITY_COLORS[dangerLevel]}30`,
+                      border: `1px solid ${severityTint(dangerLevel, 19)}`,
                       whiteSpace: 'nowrap',
                     }}
                   >

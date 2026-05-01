@@ -12,20 +12,20 @@ import {
   Clock,
   ShieldCheck,
 } from 'lucide-react';
+import { SEVERITY_COLORS } from '@/lib/constants/human-audit';
 
-const SEVERITY_COLORS: Record<string, string> = {
-  critical: '#ef4444',
-  high: '#f97316',
-  medium: '#eab308',
-  low: '#22c55e',
-};
+// RISK_COLORS aliases SEVERITY_COLORS — likelihood + impact use the same
+// 4-level severity scale, so kept as a re-export rather than a copy.
+const RISK_COLORS = SEVERITY_COLORS;
 
-const RISK_COLORS: Record<string, string> = {
-  critical: '#ef4444',
-  high: '#f97316',
-  medium: '#eab308',
-  low: '#22c55e',
-};
+// 8%-alpha tint of any severity color. SEVERITY_COLORS resolves to CSS
+// var() expressions, so the prior `${hex}15` (hex + 1-byte alpha) hack
+// no longer applies. color-mix() is the modern equivalent and ships in
+// every evergreen browser DI targets.
+function severityTint(level: string | undefined, fallback = 'var(--text-muted)'): string {
+  const color = (level && SEVERITY_COLORS[level]) || fallback;
+  return `color-mix(in srgb, ${color} 8%, transparent)`;
+}
 
 const ACTION_CONFIG: Record<string, { color: string; icon: typeof CheckCircle; label: string }> = {
   proceed: { color: '#22c55e', icon: CheckCircle, label: 'Proceed' },
@@ -272,7 +272,7 @@ export function DecisionBriefTab({ dealId }: { dealId: string }) {
                   padding: '8px 10px',
                   background: 'var(--bg-card)',
                   borderRadius: 6,
-                  borderLeft: `3px solid ${SEVERITY_COLORS[f.severity] || '#6b7280'}`,
+                  borderLeft: `3px solid ${SEVERITY_COLORS[f.severity] || 'var(--text-muted)'}`,
                 }}
               >
                 <div style={{ flex: 1 }}>
@@ -289,7 +289,7 @@ export function DecisionBriefTab({ dealId }: { dealId: string }) {
                   style={{
                     fontSize: 10,
                     fontWeight: 600,
-                    color: SEVERITY_COLORS[f.severity] || '#6b7280',
+                    color: SEVERITY_COLORS[f.severity] || 'var(--text-muted)',
                     textTransform: 'uppercase',
                     whiteSpace: 'nowrap',
                   }}
@@ -311,7 +311,7 @@ export function DecisionBriefTab({ dealId }: { dealId: string }) {
             gap: 6,
             padding: '4px 10px',
             borderRadius: 4,
-            background: `${RISK_COLORS[brief.riskAssessment.overallRisk] || '#6b7280'}15`,
+            background: severityTint(brief.riskAssessment.overallRisk),
             marginBottom: 10,
           }}
         >
@@ -320,14 +320,14 @@ export function DecisionBriefTab({ dealId }: { dealId: string }) {
               width: 8,
               height: 8,
               borderRadius: '50%',
-              background: RISK_COLORS[brief.riskAssessment.overallRisk] || '#6b7280',
+              background: RISK_COLORS[brief.riskAssessment.overallRisk] || 'var(--text-muted)',
             }}
           />
           <span
             style={{
               fontSize: 12,
               fontWeight: 600,
-              color: RISK_COLORS[brief.riskAssessment.overallRisk] || '#6b7280',
+              color: RISK_COLORS[brief.riskAssessment.overallRisk] || 'var(--text-muted)',
               textTransform: 'uppercase',
             }}
           >
@@ -415,8 +415,8 @@ export function DecisionBriefTab({ dealId }: { dealId: string }) {
                     fontSize: 11,
                     padding: '3px 8px',
                     borderRadius: 4,
-                    background: `${SEVERITY_COLORS[b.avgSeverity] || '#6b7280'}15`,
-                    color: SEVERITY_COLORS[b.avgSeverity] || '#6b7280',
+                    background: severityTint(b.avgSeverity),
+                    color: SEVERITY_COLORS[b.avgSeverity] || 'var(--text-muted)',
                     fontWeight: 500,
                   }}
                 >

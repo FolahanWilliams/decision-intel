@@ -51,6 +51,31 @@ if [ $SILENT_CATCH_EXIT_CODE -ne 0 ]; then
 fi
 
 echo ""
+echo "🔢 Running count-drift ratchet..."
+echo ""
+
+npm run lint:counts
+COUNT_LINT_EXIT_CODE=$?
+
+if [ $COUNT_LINT_EXIT_CODE -ne 0 ]; then
+    echo ""
+    echo "╔══════════════════════════════════════════════════════════════╗"
+    echo "║  ❌ COMMIT BLOCKED: count-drift ratchet failed               ║"
+    echo "╠══════════════════════════════════════════════════════════════╣"
+    echo "║  New hardcoded count literal introduced. Either:            ║"
+    echo "║   • Interpolate from canonical                              ║"
+    echo "║     (\${BIAS_COUNT}, \${FRAMEWORK_COUNT}, etc.)               ║"
+    echo "║   • Use getAllRegisteredFrameworks().length                 ║"
+    echo "║   • Add // drift-tolerant — <reason> on the same / above    ║"
+    echo "║   • Replace an existing count literal                       ║"
+    echo "║                                                              ║"
+    echo "║  See CLAUDE.md > Drift-class lint discipline.               ║"
+    echo "╚══════════════════════════════════════════════════════════════╝"
+    echo ""
+    exit 1
+fi
+
+echo ""
 echo "🔍 Running AI Architectural Audit..."
 echo ""
 

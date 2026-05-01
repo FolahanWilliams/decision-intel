@@ -303,6 +303,7 @@ SYNTHESIS (Sequential)
             Kahneman-style judgment disagreement. Upgrade to cross-model jury by setting{' '}
             <code style={{ fontSize: 10 }}>NOISE_JURY_MODELS</code> env var.
             <br />
+            {/* drift-tolerant — 2 refers to NOISE_JURY model count, not the 3-tier model policy. */}
             <strong style={{ color: '#16A34A' }}>
               Locked 2026-04-24 policy (2 models only):
             </strong>{' '}

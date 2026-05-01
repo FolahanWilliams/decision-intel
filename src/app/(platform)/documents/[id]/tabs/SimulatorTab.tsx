@@ -5,13 +5,7 @@ import { Info, PlayCircle, Loader2, RefreshCw, CheckCircle } from 'lucide-react'
 import { BiasInstance } from '@/types';
 import { useToast } from '@/components/ui/EnhancedToast';
 import { RPDSimulatorCard } from '@/components/analysis/RPDSimulatorCard';
-
-const SEVERITY_COLORS: Record<string, string> = {
-  low: 'var(--severity-low)',
-  medium: 'var(--severity-medium)',
-  high: 'var(--severity-high)',
-  critical: 'var(--severity-critical)',
-};
+import { SEVERITY_COLORS } from '@/lib/constants/human-audit';
 
 interface SimulationResult {
   overallScore: number;

@@ -15,15 +15,9 @@ import {
 import { BiasInstance } from '@/types';
 import { createClientLogger } from '@/lib/utils/logger';
 import { getBiasEducation, DIFFICULTY_COLORS } from '@/lib/constants/bias-education';
+import { SEVERITY_COLORS } from '@/lib/constants/human-audit';
 
 const log = createClientLogger('BiasDetailModal');
-
-const SEVERITY_COLORS: Record<string, string> = {
-  low: 'var(--severity-low)',
-  medium: 'var(--severity-medium)',
-  high: 'var(--severity-high)',
-  critical: 'var(--severity-critical)',
-};
 
 function getBiasDefinition(biasType: string): string {
   const definitions: Record<string, string> = {

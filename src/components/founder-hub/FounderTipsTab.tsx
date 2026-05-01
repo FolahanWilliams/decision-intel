@@ -159,13 +159,13 @@ const SECTION_MOAT: Tip[] = [
       'This sprint: add a DecisionEvent model to Prisma with columns (id, orgId, userId, eventType, subjectType, subjectId, payload JSONB, occurredAt). Hook every meaningful user action into it. The ML engineer you hire in 18 months will thank you.',
   },
   {
-    title: 'Publish a stable Bias Taxonomy with permanent IDs (DI-B-001 through DI-B-020)',
+    title: 'Publish a stable Bias Taxonomy with permanent IDs (DI-B-001 through DI-B-022)',
     principle:
       'Give every bias in your ontology a stable, citable identifier like a CWE for cognitive biases. Let other tools, researchers, and journalists reference them by ID.',
     rationale:
       'Owning a taxonomy in a category is one of the most durable and cheapest moats in software. Once your bias IDs are cited in academic papers, trade publications, and compliance documents, you own the vocabulary of the space. Every time someone writes "DI-B-007 (Echo Chamber)" you get free authority and SEO. This takes maybe two days of work and has a 10-year payoff. The biases are already defined in src/lib/constants/bias-education.ts — all you need to do is assign stable IDs, publish them at decisionintel.com/taxonomy, and start citing them yourself in every research-footnote and PDF export.',
     action:
-      'Week 1 action. Assign DI-B-001 through DI-B-020 to the 20 biases. Add a public page /taxonomy that lists each one with citation, academic grounding, and detection methodology. Include the taxonomy IDs in the Decision Provenance Record. Cite them in the "bias of the week" newsletter.',
+      'Week 1 action. Assign DI-B-001 through DI-B-022 to the 22 biases. Add a public page /taxonomy that lists each one with citation, academic grounding, and detection methodology. Include the taxonomy IDs in the Decision Provenance Record. Cite them in the "bias of the week" newsletter.',
   },
   {
     title: 'Build the Decision Incident Database — your Bloomberg Terminal seed',

@@ -30,6 +30,7 @@ import { StoryArcConstructor } from './positioning/StoryArcConstructor';
 import { ContentCadenceCalendar } from './positioning/ContentCadenceCalendar';
 import { SalesCallScript } from './positioning/SalesCallScript';
 import { ICPFunnelBuilder } from './positioning/ICPFunnelBuilder';
+import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
 import { generatePositioningCheatsheet } from '@/lib/exports/positioning-cheatsheet';
 
 interface PositioningCopilotTabProps {
@@ -289,7 +290,7 @@ export function PositioningCopilotTab({ founderPass }: PositioningCopilotTabProp
                 color: '#16A34A',
               }}
             >
-              Positioning Copilot — 13 frameworks
+              Positioning Copilot &middot; {getAllRegisteredFrameworks().length} frameworks
             </div>
           </div>
           <h2

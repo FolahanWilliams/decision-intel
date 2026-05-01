@@ -3,6 +3,11 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Check, Minus, X } from 'lucide-react';
+import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+
+// Drift-safe framework count — derives from the registry so a new framework
+// addition flows into the comparison table without a copy edit.
+const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
 
 /**
  * "How We Compare" card for the landing page.
@@ -88,7 +93,7 @@ const PROFILES: CompetitorProfile[] = [
         dimension: 'Compliance mapping',
         themLabel: 'Not offered',
         themRating: 'none',
-        usLabel: '7 frameworks + audit packet',
+        usLabel: `${FRAMEWORK_COUNT} frameworks + audit packet`,
         usRating: 'full',
       },
       {

@@ -575,7 +575,7 @@ export const FRAMEWORKS_BRIEF: FrameworkBrief[] = [
     status: 'live',
     dprCoverage: 'Fund-level fiduciary dissent + IC-meeting record.',
   },
-  // African — 10 frameworks now registered (lean ship: 3; deep ship: +7).
+  // African — 12 frameworks now registered (lean ship: 3; deep ship: +7; ISA Nigeria 2007 + 1 more added 2026-04-29 → 30). drift-tolerant — sankore-sprint count, not registry-driven.
   {
     code: 'NDPR Art. 12',
     name: 'Nigeria Data Protection Regulation',
@@ -809,7 +809,7 @@ export const CAPABILITY_SURFACES: CapabilitySurface[] = [
   },
   {
     title: '/security · Retention SLA + frameworks',
-    oneLiner: '10 frameworks (incl. NDPR/CBN/WAEMU). Per-tier retention table.',
+    oneLiner: '12 African frameworks (incl. NDPR/CBN/WAEMU/ISA Nigeria 2007). Per-tier retention table.',
     href: '/security#retention',
     internal: false,
     demoNote: 'Scroll to Retention SLA + then to Frameworks. Both are live.',

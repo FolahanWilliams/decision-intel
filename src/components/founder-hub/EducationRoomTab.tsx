@@ -21,8 +21,10 @@
  * Pattern lifted from Nexus Tracker MindForge (vocab + summary modules
  * with SM-2 spaced repetition), extended for DI's specific knowledge
  * domain — vocabulary discipline, persona-specific verbatim phrases,
- * grading-rubric dimensions, the 17 frameworks, the 12-node pipeline,
- * R²F's Kahneman+Klein integration, and the locked positioning claims.
+ * grading-rubric dimensions, the regulatory-framework registry, the
+ * 12-node pipeline, R²F's Kahneman+Klein integration, and the locked
+ * positioning claims. drift-tolerant — narrative description, deck
+ * counts derive from DECKS array at render time.
  *
  * Locked: 2026-04-28.
  */

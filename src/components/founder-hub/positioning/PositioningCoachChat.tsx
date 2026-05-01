@@ -3,6 +3,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Send, Sparkles, Loader2 } from 'lucide-react';
 import { REHEARSAL_PROMPTS } from '@/lib/data/positioning-copilot';
+import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
+
+// Drift-safe canonical counts for the Coach AI system prompt. If the
+// framework registry or case-study corpus grows, the Copilot's coaching
+// language stays in sync without a copy edit.
+const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
 
 interface ChatMsg {
   role: 'user' | 'assistant';
@@ -40,7 +47,7 @@ function loadStoredMessages(): ChatMsg[] {
 }
 
 const COACH_PREAMBLE =
-  'You are my Positioning Copilot. Always ground your answer in: (1) my locked CLAUDE.md positioning — primary hero "the native reasoning layer for every high-stakes call," secondary "the reasoning layer the Fortune 500 needs before regulators start asking," Recognition-Rigor Framework (R²F) as the IP moat, Decision Quality Index (DQI) as the scoring artefact, Decision Provenance Record (DPR — hashed + tamper-evident) as the regulator-grade output, Pan-African anchor (WeWork S-1 + Dangote DPR specimens, 17 frameworks across G7/EU/GCC/African markets), broad audience (corporate strategy + corp dev + funds — NOT F500-board-narrow); (2) Byron Sharp\'s 8-step brand spine; (3) the 6 "Market Worth Entering" questions; (4) the Strategic Thinking compass; (5) the 16-slide ideal pitch deck structure. NEVER use "decision intelligence platform" as a category claim (Gartner-crowded — banned per CLAUDE.md). NEVER use "decision hygiene" — that\'s Kahneman\'s 2021 Noise term, borrowing it cedes category vocabulary. In cold contexts use descriptive language ("60-second audit on a strategic memo," "pre-IC audit layer," "strategic memo audits"); in warm contexts use the locked vocabulary above. Answer like a CSO advisor who has read all 143 case studies. Push back if I hedge. Never generic. Now:\n\n';
+  `You are my Positioning Copilot. Always ground your answer in: (1) my locked CLAUDE.md positioning — primary hero "the native reasoning layer for every high-stakes call," secondary "the reasoning layer the Fortune 500 needs before regulators start asking," Recognition-Rigor Framework (R²F) as the IP moat, Decision Quality Index (DQI) as the scoring artefact, Decision Provenance Record (DPR — hashed + tamper-evident) as the regulator-grade output, Pan-African anchor (WeWork S-1 + Dangote DPR specimens, ${FRAMEWORK_COUNT} frameworks across G7/EU/GCC/African markets), broad audience (corporate strategy + corp dev + funds — NOT F500-board-narrow); (2) Byron Sharp's 8-step brand spine; (3) the 6 "Market Worth Entering" questions; (4) the Strategic Thinking compass; (5) the 16-slide ideal pitch deck structure. NEVER use "decision intelligence platform" as a category claim (Gartner-crowded — banned per CLAUDE.md). NEVER use "decision hygiene" — that's Kahneman's 2021 Noise term, borrowing it cedes category vocabulary. In cold contexts use descriptive language ("60-second audit on a strategic memo," "pre-IC audit layer," "strategic memo audits"); in warm contexts use the locked vocabulary above. Answer like a CSO advisor who has read all ${HISTORICAL_CASE_COUNT} case studies. Push back if I hedge. Never generic. Now:\n\n`;
 
 export function PositioningCoachChat({ founderPass }: { founderPass: string }) {
   const [messages, setMessages] = useState<ChatMsg[]>([]);

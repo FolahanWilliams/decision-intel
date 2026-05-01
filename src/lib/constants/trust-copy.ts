@@ -104,3 +104,152 @@ export const AI_VERIFY_DISCLAIMER_SHORT =
   'Self-assessment framework · no third-party certification';
 export const AI_VERIFY_DISCLAIMER_LONG =
   'AI Verify is a self-assessment governance framework codified by the AI Verify Foundation (Singapore IMDA, aligned with EU and OECD). The Foundation does not certify products. Decision Intel’s alignment with the 11 internationally-recognised AI governance principles is self-attested; no third-party audit has yet been performed against this mapping.';
+
+/**
+ * SOC 2 receipts catalogue — locked 2026-05-01 in response to the James
+ * (F500 GC) persona finding that /security claimed "SOC 2 Type II
+ * infrastructure" without surfacing the audit metadata a vendor-risk
+ * register reviewer expects: issue date, auditor name, expiry, scope.
+ *
+ * Sourced from each vendor's public SOC 2 trust portal as of the lock
+ * date. Decision Intel's own product-level audit is targeted (not yet
+ * issued) — that row carries `status: 'targeted'` and an audit-firm
+ * placeholder explicitly named as TBD-at-engagement so the page never
+ * claims more than the actual posture.
+ *
+ * Consumers as of 2026-05-01:
+ *   - src/app/(marketing)/security/page.tsx (SOC 2 Receipts section)
+ *
+ * Update HERE when (a) a Type I report is issued, (b) Vercel/Supabase
+ * publish a renewed observation window, (c) a sub-processor is added or
+ * removed. Every consumer picks up the change.
+ */
+export type Soc2ReceiptStatus = 'attested' | 'targeted';
+
+export interface Soc2Receipt {
+  party: string;
+  role: string;
+  reportType: string;
+  status: Soc2ReceiptStatus;
+  observationWindow: string;
+  auditor: string;
+  scope: string;
+  verification: string;
+}
+
+export const SOC2_RECEIPTS: Soc2Receipt[] = [
+  {
+    party: 'Decision Intel Ltd. (Processor)',
+    role: 'Application + reasoning-audit pipeline',
+    reportType: 'SOC 2 Type I',
+    status: 'targeted',
+    observationWindow: 'Targeted Q4 2026 issuance · Type II window opens immediately after',
+    auditor:
+      'Audit firm to be named at engagement (Big-4 or AICPA-listed Tier-1 specialist). In-flight controls already mirror Type II.',
+    scope:
+      'Decision Intel application, analysis pipeline, Decision Provenance Record generation, audit-log immutability, encryption-key rotation, and access control for customer-uploaded documents.',
+    verification: 'Status disclosed in writing on every Enterprise pilot agreement.',
+  },
+  {
+    party: 'Vercel Inc. (Sub-processor)',
+    role: 'Application hosting + edge compute',
+    reportType: 'SOC 2 Type II',
+    status: 'attested',
+    observationWindow: 'Continuous · current report covers a rolling 12-month window',
+    auditor: 'Insight Assurance · AICPA-registered',
+    scope:
+      'Edge runtime, deployment pipeline, build infrastructure, and the platform on which Decision Intel runs.',
+    verification: 'Trust portal · vercel.com/legal/soc2',
+  },
+  {
+    party: 'Supabase Inc. (Sub-processor)',
+    role: 'Postgres + Auth + file storage',
+    reportType: 'SOC 2 Type II + HIPAA',
+    status: 'attested',
+    observationWindow: 'Continuous · current report covers a rolling 12-month window',
+    auditor: 'Prescient Assurance · AICPA-registered',
+    scope:
+      'Database, authentication, file storage, point-in-time recovery, and backup infrastructure that holds customer documents and audit logs.',
+    verification: 'Trust portal · supabase.com/security · HIPAA BAA available on Enterprise',
+  },
+  {
+    party: 'Sentry (Sub-processor)',
+    role: 'Error monitoring',
+    reportType: 'SOC 2 Type II',
+    status: 'attested',
+    observationWindow: 'Continuous · current report covers a rolling 12-month window',
+    auditor: 'Audit firm disclosed in trust portal',
+    scope:
+      'Error capture and runtime telemetry. PII scrubbing is enabled at SDK level so Sentry never receives raw document content.',
+    verification: 'Trust portal · sentry.io/trust',
+  },
+  {
+    party: 'Stripe Inc. (Sub-processor)',
+    role: 'Billing',
+    reportType: 'SOC 2 Type II + SOC 1 Type II + PCI-DSS Level 1',
+    status: 'attested',
+    observationWindow: 'Continuous · current report covers a rolling 12-month window',
+    auditor: 'Audit firm disclosed in trust portal',
+    scope: 'Subscription billing, payment-method storage, and invoicing. No document content flows through Stripe.',
+    verification: 'Trust portal · stripe.com/docs/security',
+  },
+];
+
+/**
+ * Indemnification cap — locked 2026-05-01 (James persona ask). The
+ * /security page previously documented audit-trail and incident SLAs
+ * without surfacing the contractual cap a F500 GC asks about as soon as
+ * the technical posture passes review. Standard cap is the typical
+ * SaaS shape (12 months' fees); custom mutual indemnification is
+ * available on Enterprise pilots.
+ *
+ * Update HERE when (a) the standard cap changes (e.g. cyber-liability
+ * carriage lifts the floor), (b) a custom shape becomes the default
+ * for a tier, (c) the carve-outs change.
+ */
+export const INDEMNIFICATION_LABEL = 'Indemnification cap';
+export const INDEMNIFICATION_VALUE = 'Standard 12 months’ fees · custom mutual on request';
+export const INDEMNIFICATION_BODY =
+  'Standard subscription contracts cap each party’s aggregate liability at 12 months of fees paid by Controller in the 12 months immediately before the claim, excluding (a) breach of confidentiality, (b) wilful misconduct, (c) third-party IP indemnities, and (d) sub-processor data-protection failures where Decision Intel is the engaging Processor. Enterprise customers may negotiate a mutual indemnification cap and an uncapped third-party-IP indemnity at signature. Cyber-liability + errors-and-omissions insurance carriage is on the Q1 2027 roadmap; until live, Enterprise customers receive a written disclosure of the insurance gap and the contractual commitments that substitute for it.';
+
+/**
+ * Bias Genome data ownership — locked 2026-05-01 (Margaret persona
+ * blocker). The platform's per-org Brier-scored recalibration moat
+ * (the answer to Cloverpop's data-advantage attack vector) requires
+ * outcome metadata aggregation across consenting organisations. F500
+ * GCs and audit committees won't sign without an explicit ownership
+ * statement: who keeps what, what gets aggregated, who can opt out,
+ * how withdrawal works. The clauses below are the contractual
+ * commitments — mirrored in the DPA + every pilot agreement.
+ *
+ * Update HERE when (a) the aggregation scope changes, (b) the
+ * opt-out/withdrawal mechanism changes, (c) the ownership posture
+ * itself shifts (e.g. a new tier offering paid contribution).
+ */
+export const BIAS_GENOME_OWNERSHIP = [
+  {
+    label: 'Customer-owned: document content',
+    value: 'Always · no exceptions',
+    body: 'Every uploaded strategic memo, board deck, IC document, and reasoning artefact remains Customer property. Decision Intel processes the content under the DPA and never claims any IP, derived-work, or training right over the source bytes. The same posture applies to Decision Provenance Records: the artefact is Customer-owned, signed by Decision Intel.',
+  },
+  {
+    label: 'Platform-aggregated: outcome metadata only',
+    value: 'Anonymised · opt-in',
+    body: 'Bias Genome cohort signals are derived exclusively from outcome METADATA: bias type, decision-domain class, predicted-vs-realised quality, time-to-outcome window. Document content, persona names, deal terms, and any text fragments are NEVER part of the cohort signal. Aggregation happens server-side after k-anonymity guards (≥3 contributing organisations per signal). The aggregation is opt-in and can be disabled per organisation in Settings &rsaquo; Org without affecting the rest of the product.',
+  },
+  {
+    label: 'Withdrawal path',
+    value: 'One-click · 30-day backfill',
+    body: 'A Customer who joins the cohort and later opts out can request that prior outcome-metadata contributions be withdrawn from future Bias Genome computations. Withdrawal completes within 30 days; the backfill is logged to the Customer-visible audit log so the action is auditable. Already-published cohort statistics that incorporated the contribution are not retroactively recomputed (they are timestamped artefacts), but the Customer is excluded from every subsequent computation.',
+  },
+  {
+    label: 'No model training on Customer data',
+    value: 'Contractual',
+    body: 'Customer document content is never used to train, fine-tune, or evaluate any large language model: Gemini, Claude, or otherwise. Provider terms (Google Cloud Platform + Anthropic) explicitly disclaim training on enterprise inputs. The same commitment is mirrored in the DPA and every pilot agreement.',
+  },
+  {
+    label: 'Cohort export on Enterprise',
+    value: 'On request',
+    body: 'Enterprise customers contributing outcome metadata may request a quarterly extract of the cohort signal their organisation contributed to, anonymised, in CSV + JSON. Useful for internal calibration audits and audit-committee briefings.',
+  },
+];

@@ -4,7 +4,15 @@
  * out from monolithic data.ts at F2 lock 2026-04-29.
  *
  * Source synthesis: 2026-04-27 killer-responses NotebookLM synthesis.
+ *
+ * Drift-safe count interpolation: framework count derives from the
+ * canonical registry so cold-context buyer scripts cannot drift
+ * silently when a new African / EM framework lands.
  */
+
+import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+
+const FW = getAllRegisteredFrameworks().length;
 
 export type KillerResponse = {
   id: string;
@@ -133,9 +141,9 @@ export const KILLER_RESPONSES: KillerResponse[] = [
       'Buyer has heard of Cloverpop and is anchoring DI to it — the comparison flattens our category claim. We need to surface the structural difference in one sentence.',
     responseCategory: 'Category Contrast · one-sentence structural difference',
     exactPhrasing:
-      '"Cloverpop logs decisions; Decision Intel audits them. They are a logging + collaboration tool relying on humans to manually fill out templates. We are a 12-node Recognition-Rigor reasoning audit — Kahneman + Klein synthesised into one pipeline, with a 30+ bias academic taxonomy and 17-framework regulatory mapping."',
+      `"Cloverpop logs decisions; Decision Intel audits them. They are a logging + collaboration tool relying on humans to manually fill out templates. We are a 12-node Recognition-Rigor reasoning audit — Kahneman + Klein synthesised into one pipeline, with a 30+ bias academic taxonomy and ${FW}-framework regulatory mapping."`,
     whyItWorks:
-      'Names the structural difference (logging vs auditing) in one sentence, then anchors the depth (R²F, 30+ taxonomy, 17 frameworks) so the buyer cannot collapse us back into the Cloverpop category.',
+      `Names the structural difference (logging vs auditing) in one sentence, then anchors the depth (R²F, 30+ taxonomy, ${FW} frameworks) so the buyer cannot collapse us back into the Cloverpop category.`,
     followUpMove:
       'Hand over the WeWork or Dangote DPR. "Cloverpop cannot generate this artefact. Their architecture does not have the Klein-side, the regulatory mapping, or the metaJudge synthesis."',
   },

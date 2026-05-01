@@ -44,6 +44,7 @@ export function R2FDeepDive() {
           marginBottom: 10,
         }}
       >
+        {/* drift-tolerant — pillar + node count refers to the R²F-specific subset (3 paper-anchored pillars across 7 named pipeline nodes), not the full 12-node pipeline. */}
         Current state · 3 pillars · 7 pipeline nodes
       </div>
 

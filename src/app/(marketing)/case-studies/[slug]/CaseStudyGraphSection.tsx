@@ -36,12 +36,14 @@ const CaseStudyBiasGraph3D = dynamic(
   }
 );
 
-const SEVERITY_COLORS: Record<string, string> = {
-  critical: '#EF4444',
-  high: '#F97316',
-  medium: '#EAB308',
-  low: '#84CC16',
-};
+import { SEVERITY_COLORS } from '@/lib/constants/human-audit';
+
+// 9%-alpha tint helper. SEVERITY_COLORS resolves to var(...) expressions,
+// so the prior `${hex}18` concatenation no longer applies.
+function severityTint(level: string | undefined, fallback = 'var(--text-muted)'): string {
+  const color = (level && SEVERITY_COLORS[level]) || fallback;
+  return `color-mix(in srgb, ${color} 9%, transparent)`;
+}
 
 interface Props {
   biases: string[];
@@ -180,7 +182,7 @@ export function CaseStudyGraphSection({ biases, primaryBias, toxicCombinations, 
                       textTransform: 'uppercase',
                       letterSpacing: '0.5px',
                       color: SEVERITY_COLORS[selectedData.severity ?? 'medium'],
-                      background: SEVERITY_COLORS[selectedData.severity ?? 'medium'] + '18',
+                      background: severityTint(selectedData.severity ?? 'medium'),
                       padding: '2px 7px',
                       borderRadius: 4,
                     }}

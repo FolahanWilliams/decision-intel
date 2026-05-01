@@ -6,7 +6,15 @@
  *
  * Source synthesis: 2026-04-27 buyer-persona-tailored-explanation pass.
  * When personas evolve, update HERE only.
+ *
+ * Drift-safe count interpolation: framework count derives from the
+ * canonical registry so the GC killer-pitch + meeting-arc copy cannot
+ * drift when a new framework lands.
  */
+
+import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+
+const FW = getAllRegisteredFrameworks().length;
 
 export type RolePlaybook = {
   id: string;
@@ -869,7 +877,7 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
     artefactToLead:
       'DPR specimen + Terms appendix from the public Enterprise Quote PDF + the /security regulatory-tailwinds page + the /privacy GDPR-Art-13 mandatory-disclosure block. The GC reads regulatory artefacts, not product demos.',
     killerPitch:
-      'Decision Intel is the reasoning layer the Fortune 500 needs before regulators start asking. EU AI Act Art 14 record-keeping. Basel III Pillar 2 ICAAP qualitative-decision documentation. SOX §404 internal controls. 17 frameworks mapped flag-by-flag. Hashed and tamper-evident DPR on every audit. Your audit committee does not have to take the tool on faith — they review each flag against its cited regulatory source in a single artefact.',
+      `Decision Intel is the reasoning layer the Fortune 500 needs before regulators start asking. EU AI Act Art 14 record-keeping. Basel III Pillar 2 ICAAP qualitative-decision documentation. SOX §404 internal controls. ${FW} frameworks mapped flag-by-flag. Hashed and tamper-evident DPR on every audit. Your audit committee does not have to take the tool on faith — they review each flag against its cited regulatory source in a single artefact.`,
     threePhrasesNeverToSay: [
       '"AI does the work" — GC hears liability. Frame as "the human decision-maker is in control; AI provides the audit layer they are required to produce anyway."',
       '"It is just for strategic memos" — narrows scope; the GC needs the same governance for M&A theses, fund IC memos, board recommendations',

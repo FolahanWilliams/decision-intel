@@ -11,8 +11,9 @@
  * Pattern lifted from Nexus Tracker MindForge (vocab + summary modules
  * with SM-2 spaced repetition), extended for DI's specific knowledge
  * domain — vocabulary discipline, persona-specific verbatim phrases,
- * grading-rubric dimensions, the 17 frameworks, the 12-node pipeline,
- * R²F's Kahneman+Klein integration, and the locked positioning claims.
+ * grading-rubric dimensions, the regulatory-framework registry, the
+ * 12-node pipeline, R²F's Kahneman+Klein integration, and the locked
+ * positioning claims. drift-tolerant — narrative description.
  *
  * Locked: 2026-04-28. When CLAUDE.md positioning vocabulary changes or
  * a new persona / framework / lesson lands, update HERE only — the

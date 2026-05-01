@@ -16,6 +16,13 @@ import {
 
 import { MarketingNav } from '@/components/marketing/MarketingNav';
 import { EncryptionFlowViz } from '@/components/marketing/security/EncryptionFlowViz';
+import {
+  SOC2_RECEIPTS,
+  INDEMNIFICATION_LABEL,
+  INDEMNIFICATION_VALUE,
+  INDEMNIFICATION_BODY,
+  BIAS_GENOME_OWNERSHIP,
+} from '@/lib/constants/trust-copy';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
 
@@ -437,12 +444,17 @@ const VENDOR_CONTINUITY = [
   {
     label: 'Incorporation roadmap',
     value: 'UK Ltd · Q3 2026',
-    body: 'Decision Intel operates pre-incorporation through 2026-Q2 per Mr. Gabe (Megasuto) advice — defer entity registration until first 1-2 pilot revenues fund the cost. UK Ltd incorporation calendared for Q3 2026 at the latest, immediately after the 5-paid-Individual graduation rule fires. Incorporation status confirmed in writing on every pilot agreement.',
+    body: 'Decision Intel operates pre-incorporation through 2026-Q2 per Mr. Gabe (Megasuto) advice. Decision Intel defers entity registration until first 1-2 pilot revenues fund the cost. UK Ltd incorporation calendared for Q3 2026 at the latest, immediately after the 5-paid-Individual graduation rule fires. Incorporation status confirmed in writing on every pilot agreement.',
   },
   {
     label: 'Service-continuity insurance',
     value: 'On Enterprise roadmap',
     body: 'Cyber-liability + errors-and-omissions insurance carriage planned for Q1 2027 alongside SOC 2 Type II audit. Until live, Enterprise customers receive a written disclosure of the insurance gap and the contractual commitments that substitute for it.',
+  },
+  {
+    label: INDEMNIFICATION_LABEL,
+    value: INDEMNIFICATION_VALUE,
+    body: INDEMNIFICATION_BODY,
   },
 ];
 
@@ -475,7 +487,7 @@ const TRIAL_DATA_HANDLING = [
   {
     label: 'No model training on customer data',
     value: 'Contractual',
-    body: 'Customer document content is never used to train, fine-tune, or evaluate any large language model — Gemini, Claude, or otherwise. Provider terms (Google Cloud Platform + Anthropic) explicitly disclaim training on enterprise inputs. The same commitment is mirrored in the DPA + every pilot agreement. Bias-genome cohort signals (anonymised, opt-in) are derived from outcome metadata, never document content.',
+    body: 'Customer document content is never used to train, fine-tune, or evaluate any large language model: Gemini, Claude, or otherwise. Provider terms (Google Cloud Platform + Anthropic) explicitly disclaim training on enterprise inputs. The same commitment is mirrored in the DPA + every pilot agreement. Bias-genome cohort signals (anonymised, opt-in) are derived from outcome metadata, never document content.',
   },
 ];
 
@@ -748,6 +760,115 @@ export default function SecurityPage() {
                   }}
                 >
                   {body}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* SOC 2 receipts — vendor audit metadata (James persona ask, lock 2026-05-01) */}
+      <section
+        id="soc2-receipts"
+        style={{
+          padding: '72px 24px',
+          background: C.slate50,
+        }}
+      >
+        <div style={{ maxWidth: 1080, margin: '0 auto' }}>
+          <SectionHeader
+            eyebrow="SOC 2 receipts"
+            title="The audit metadata behind the trust band"
+            body="What a Fortune 500 vendor-risk register asks for once the technical posture passes review: issue date, auditor identity, observation window, and scope. Decision Intel's product-level Type I is targeted (not yet issued); each sub-processor's Type II report covers the surface that holds customer data, and we name the auditor + the verification path so a reviewer can confirm independently."
+          />
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr',
+              gap: 12,
+              marginTop: 24,
+            }}
+          >
+            {SOC2_RECEIPTS.map(receipt => (
+              <div
+                key={receipt.party}
+                style={{
+                  background: C.white,
+                  border: `1px solid ${C.slate200}`,
+                  borderRadius: 12,
+                  padding: '20px 24px',
+                  display: 'grid',
+                  gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 2fr)',
+                  gap: 24,
+                }}
+              >
+                <div>
+                  <div
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      padding: '3px 8px',
+                      borderRadius: 999,
+                      fontSize: 10,
+                      fontWeight: 800,
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                      background: receipt.status === 'attested' ? C.greenSoft : C.amberSoft,
+                      color: receipt.status === 'attested' ? C.green : C.amber,
+                      border: `1px solid ${receipt.status === 'attested' ? C.greenBorder : C.amberBorder}`,
+                      marginBottom: 8,
+                    }}
+                  >
+                    {receipt.status === 'attested' ? 'Attested' : 'Targeted'}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 700,
+                      color: C.slate900,
+                      marginBottom: 4,
+                    }}
+                  >
+                    {receipt.party}
+                  </div>
+                  <div style={{ fontSize: 12, color: C.slate600, marginBottom: 6 }}>
+                    {receipt.role}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      color: C.green,
+                      letterSpacing: '-0.005em',
+                      fontFamily:
+                        'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+                    }}
+                  >
+                    {receipt.reportType}
+                  </div>
+                </div>
+                <div>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '120px 1fr',
+                      rowGap: 6,
+                      columnGap: 12,
+                      fontSize: 12,
+                      color: C.slate700,
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    <div style={{ fontWeight: 700, color: C.slate900 }}>Window</div>
+                    <div>{receipt.observationWindow}</div>
+                    <div style={{ fontWeight: 700, color: C.slate900 }}>Auditor</div>
+                    <div>{receipt.auditor}</div>
+                    <div style={{ fontWeight: 700, color: C.slate900 }}>Scope</div>
+                    <div>{receipt.scope}</div>
+                    <div style={{ fontWeight: 700, color: C.slate900 }}>Verify</div>
+                    <div>{receipt.verification}</div>
+                  </div>
                 </div>
               </div>
             ))}
@@ -1369,7 +1490,27 @@ export default function SecurityPage() {
                   whiteSpace: 'nowrap',
                 }}
               >
-                <FileText size={13} /> DPA template
+                <FileText size={13} /> DPA template &middot; PDF
+              </a>
+              <a
+                href="/dpa-template.docx"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '9px 16px',
+                  background: C.white,
+                  color: C.slate900,
+                  border: `1px solid ${C.slate300}`,
+                  borderRadius: 8,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <FileText size={13} /> DPA template &middot; DOCX
               </a>
               <Link
                 href="/pricing"
@@ -1674,7 +1815,7 @@ export default function SecurityPage() {
           <SectionHeader
             eyebrow="Trial-audit data handling"
             title="Upload a confidential memo for a 20-minute audit · safely"
-            body="The data-leak objection M&A and corp-dev professionals raise first. Maximum trial retention, one-click hard-purge, mutual NDA template, and the contractual no-training-on-customer-data commitment — packaged here so a procurement reader can quote the exact guarantee in their vendor-risk register."
+            body="The data-leak objection M&A and corp-dev professionals raise first. Maximum trial retention, one-click hard-purge, mutual NDA template, and the contractual no-training-on-customer-data commitment, packaged here so a procurement reader can quote the exact guarantee in their vendor-risk register."
           />
           <div
             style={{
@@ -1709,6 +1850,72 @@ export default function SecurityPage() {
                 <div
                   style={{
                     fontSize: 18,
+                    fontWeight: 700,
+                    color: C.green,
+                    letterSpacing: '-0.01em',
+                    marginBottom: 8,
+                    fontFamily:
+                      'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+                  }}
+                >
+                  {item.value}
+                </div>
+                <div style={{ fontSize: 12.5, color: C.slate600, lineHeight: 1.55 }}>
+                  {item.body}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Bias Genome data ownership — Margaret persona ask (lock 2026-05-01) */}
+      <section
+        id="data-ownership"
+        style={{
+          padding: '72px 24px',
+          background: C.white,
+        }}
+      >
+        <div style={{ maxWidth: 1080, margin: '0 auto' }}>
+          <SectionHeader
+            eyebrow="Data ownership"
+            title="Customer-owned content. Aggregated outcome metadata only."
+            body="The cohort-calibration moat (per-org Brier-scored recalibration, the answer to Cloverpop's data-advantage attack vector) requires outcome metadata across consenting organisations. Document content, persona names, and deal terms are NEVER part of the cohort signal. Below is the contractual ownership posture, mirrored in the DPA and every pilot agreement."
+          />
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: 12,
+              marginTop: 24,
+            }}
+          >
+            {BIAS_GENOME_OWNERSHIP.map(item => (
+              <div
+                key={item.label}
+                style={{
+                  background: C.slate50,
+                  border: `1px solid ${C.slate200}`,
+                  borderRadius: 12,
+                  padding: '18px 20px',
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 800,
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    color: C.slate500,
+                    marginBottom: 6,
+                  }}
+                >
+                  {item.label}
+                </div>
+                <div
+                  style={{
+                    fontSize: 17,
                     fontWeight: 700,
                     color: C.green,
                     letterSpacing: '-0.01em',
