@@ -36,7 +36,11 @@ const SCAN_DIR = join(ROOT, 'src');
 // localStorage in private-mode Safari, fetch+stats null fallbacks rendered
 // as empty UI states. Bumping is allowed; reducing is encouraged. Never
 // silently drift up.
-const SILENT_CATCH_BASELINE = 117;
+// 2026-05-01: bumped 117 → 118 for the new res.json().catch(() => null)
+// in src/app/(platform)/documents/[id]/page.tsx refetchDocument — body
+// parsing on a non-2xx response so we can surface the API's error message
+// (per CLAUDE.md fire-and-forget exception list, body parsing is allowed).
+const SILENT_CATCH_BASELINE = 118;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

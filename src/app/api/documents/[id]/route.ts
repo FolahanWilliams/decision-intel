@@ -147,9 +147,21 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     // Decrypt content transparently — never send encrypted fields to the client
     const docAny = document as Record<string, unknown>;
     const { contentEncrypted: _ce, contentIv: _ci, contentTag: _ct, ...docFields } = docAny;
-    const decryptedContent = getDocumentContent(
-      document as Parameters<typeof getDocumentContent>[0]
-    );
+    let decryptedContent: string;
+    try {
+      decryptedContent = getDocumentContent(
+        document as Parameters<typeof getDocumentContent>[0]
+      );
+    } catch (decryptErr) {
+      log.error('Document decryption failed:', decryptErr);
+      return NextResponse.json(
+        {
+          error:
+            'Document decryption failed. The encryption key version on this row is no longer resolvable in this deployment — check DOCUMENT_ENCRYPTION_KEY_V{N} env vars.',
+        },
+        { status: 500 }
+      );
+    }
     // Normalise Prisma Decimal (deal.ticketSize) to a plain number so the
     // client can compare it numerically without importing Decimal.
     const dealRaw = (docFields as { deal?: { ticketSize?: unknown } | null }).deal;

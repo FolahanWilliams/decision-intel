@@ -593,7 +593,14 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
   const refetchDocument = useCallback(async () => {
     try {
       const res = await fetch(`/api/documents/${resolvedParams.id}`);
-      if (!res.ok) throw new Error('Document not found');
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        const apiMessage = body && typeof body.error === 'string' ? body.error : null;
+        if (res.status === 404) {
+          throw new Error(apiMessage || 'Document not found');
+        }
+        throw new Error(apiMessage || `Could not load document (HTTP ${res.status})`);
+      }
       const data = await res.json();
       setDocument(data);
       if (data.visibility) setVisibilityState(data.visibility as DocumentVisibility);
