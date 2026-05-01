@@ -22,7 +22,7 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.c
 export const metadata: Metadata = {
   title: 'Security · Decision Intel',
   description:
-    'Enterprise-grade security posture on a founder budget. AES-256-GCM at rest with keyVersion rotation, TLS 1.2+ in transit, immutable audit log, 17 regulatory frameworks mapped flag-by-flag across G7, EU, GCC and African markets, and a Decision Provenance Record (EU AI Act Article 14 aligned) your GC can walk into a regulator meeting with.',
+    'Enterprise-grade security posture on a founder budget. AES-256-GCM at rest with keyVersion rotation, TLS 1.2+ in transit, immutable audit log, 19 regulatory frameworks mapped flag-by-flag across G7, EU, GCC and African markets, and a Decision Provenance Record (EU AI Act Article 14 aligned) your GC can walk into a regulator meeting with.',
   alternates: { canonical: `${siteUrl}/security` },
   openGraph: {
     title: 'Security · Decision Intel',
@@ -71,7 +71,10 @@ const TRUST_SPINE: Array<{ icon: LucideIcon; label: string; body: string }> = [
   },
   {
     icon: FileCheck2,
-    label: '17 regulatory frameworks, provision-level',
+    // Count must match FRAMEWORKS.length declared below (currently 19 with
+    // ISA Nigeria 2007). Hardcoded literal because TRUST_SPINE is declared
+    // before FRAMEWORKS; update both in lockstep when adding entries.
+    label: '19 regulatory frameworks, provision-level',
     body: 'Every flag we surface carries a citation across SOX §404, GDPR Article 22, EU AI Act Annex III, Basel III, FCA Consumer Duty, SEC Reg D, and LPOA. Your GC can defend each flag against its source.',
   },
   {
@@ -179,6 +182,13 @@ const FRAMEWORKS: Array<{
     name: 'Nigeria Data Protection Regulation',
     gates:
       'Automated-decision rights for Nigerian data subjects (aligned with GDPR Art. 22 via the NDPR 2019 Implementation Framework).',
+    region: 'africa',
+  },
+  {
+    code: 'ISA Nigeria 2007',
+    name: 'Investment & Securities Act (with 2025 update)',
+    gates:
+      'SEC Nigeria capital-markets governance: prospectus disclosure rigor, fit-and-proper directors, AML/CFT controls, market-abuse prohibitions; ISA 2025 update extends coverage to digital-asset issuers.',
     region: 'africa',
   },
   {

@@ -604,6 +604,15 @@ export function TaxonomyClient() {
 function BiasConstellation({ entries }: { entries: BiasEntry[] }) {
   // Simple 5×4 grid of bias ID pills colored by difficulty. Animates
   // a subtle shimmer across the grid so the hero has motion without noise.
+  // Counts derived from BIAS_EDUCATION (count-discipline rule) so when a
+  // new bias lands the constellation header updates automatically.
+  const difficultyCounts = entries.reduce(
+    (acc, [, b]) => {
+      acc[b.difficulty] = (acc[b.difficulty] ?? 0) + 1;
+      return acc;
+    },
+    { easy: 0, moderate: 0, hard: 0 } as Record<Difficulty, number>,
+  );
   return (
     <div
       style={{
@@ -634,7 +643,7 @@ function BiasConstellation({ entries }: { entries: BiasEntry[] }) {
               fontFamily: 'var(--font-mono, monospace)',
             }}
           >
-            20 biases · 5E / 10M / 5H
+            {entries.length} biases · {difficultyCounts.easy}E / {difficultyCounts.moderate}M / {difficultyCounts.hard}H
           </div>
           <div style={{ fontSize: 15, fontWeight: 700, color: C.slate900 }}>
             Every dot is a stable ID.

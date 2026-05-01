@@ -3,6 +3,10 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FileText, Layers, AlertTriangle, GitCompare, Scale, Cpu, Hash } from 'lucide-react';
+import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+
+// Count derived per CLAUDE.md count-discipline rule.
+const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
 
 /**
  * DprAnatomyViz — Interactive layered visualization of a Decision
@@ -103,7 +107,7 @@ const SECTIONS: DprSection[] = [
     id: 'regulatory',
     icon: Scale,
     label: 'Regulatory mapping',
-    oneLiner: 'Each flagged bias mapped to the provisions it touches across 18 frameworks.',
+    oneLiner: `Each flagged bias mapped to the provisions it touches across ${FRAMEWORK_COUNT} frameworks.`,
     contains: [
       'Per-bias: every regulatory framework the bias triggers',
       'Aggregate risk score per bias (0–10)',

@@ -27,6 +27,11 @@ import { CounterfactualLiftViz } from '@/components/marketing/how-it-works/Count
 import { ResearchCitationCard } from '@/components/marketing/how-it-works/ResearchCitationCard';
 import { ToxicNetworkGraph } from '@/components/marketing/genome/ToxicNetworkGraph';
 import { computeGenomeFromSeed } from '@/lib/data/bias-genome-seed';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+
+// Bias count derived from BIAS_EDUCATION (count-discipline rule); when DI-B-023
+// lands the marketing copy picks it up automatically.
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
 const C = {
   navy: '#0F172A',
@@ -444,7 +449,7 @@ export function HowItWorksClient() {
                 textDecoration: 'none',
               }}
             >
-              See all 20 biases with academic citations <ArrowRight size={14} />
+              See all {BIAS_COUNT} biases with academic citations <ArrowRight size={14} />
             </Link>
           </div>
         </div>

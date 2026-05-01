@@ -48,6 +48,12 @@ import {
   FOUNDER_NARRATIVE_SHORT,
 } from '@/lib/constants/company-info';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
+import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+
+// Framework count derived from registry per CLAUDE.md count-discipline rule:
+// when a new African / EM framework lands the about page picks it up
+// without a copy edit.
+const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
 
@@ -334,7 +340,7 @@ export default function AboutPage() {
                 Security posture
               </div>
               <div style={{ fontSize: 13, color: C.slate600, lineHeight: 1.5 }}>
-                Encryption, key rotation, sub-processors, regulatory mapping across 18 frameworks.
+                Encryption, key rotation, sub-processors, regulatory mapping across {FRAMEWORK_COUNT} frameworks.
               </div>
               <div
                 style={{
