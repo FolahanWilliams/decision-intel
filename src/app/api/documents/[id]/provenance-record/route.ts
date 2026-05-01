@@ -189,43 +189,67 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  let stage: 'auth' | 'assemble' | 'persist' | 'unknown' = 'unknown';
   try {
     const { id } = await params;
+    stage = 'auth';
     const auth = await getAuthorizedAnalysisId(id);
     if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
+    stage = 'assemble';
     const data = await assembleProvenanceRecordData(auth.analysisId);
 
-    // Persist (upsert) — one record per analysis.
-    const persisted = await prisma.decisionProvenanceRecord.upsert({
-      where: { analysisId: auth.analysisId },
-      create: {
-        analysisId: data.analysisId,
-        documentId: data.documentId,
-        userId: data.userId,
-        orgId: data.orgId,
-        promptFingerprint: data.promptFingerprint,
-        inputHash: data.inputHash,
-        modelLineage: data.modelLineage as unknown as Prisma.InputJsonValue,
-        judgeVariance: data.judgeVariance as unknown as Prisma.InputJsonValue,
-        citations: data.citations as unknown as Prisma.InputJsonValue,
-        regulatoryMapping: data.regulatoryMapping as unknown as Prisma.InputJsonValue,
-        pipelineLineage: data.pipelineLineage as unknown as Prisma.InputJsonValue,
-        schemaVersion: data.schemaVersion,
-        generatedAt: data.generatedAt,
-      },
-      update: {
-        promptFingerprint: data.promptFingerprint,
-        inputHash: data.inputHash,
-        modelLineage: data.modelLineage as unknown as Prisma.InputJsonValue,
-        judgeVariance: data.judgeVariance as unknown as Prisma.InputJsonValue,
-        citations: data.citations as unknown as Prisma.InputJsonValue,
-        regulatoryMapping: data.regulatoryMapping as unknown as Prisma.InputJsonValue,
-        pipelineLineage: data.pipelineLineage as unknown as Prisma.InputJsonValue,
-        schemaVersion: data.schemaVersion,
-        generatedAt: data.generatedAt,
-      },
-    });
+    stage = 'persist';
+    // Persist (upsert) — one record per analysis. Schema-drift tolerant:
+    // if the DecisionProvenanceRecord table doesn't exist in this
+    // deployment (P2021) or has missing columns (P2022), skip persistence
+    // and return the assembled data so the client can still generate the
+    // PDF. The persisted row is a "we already generated this DPR" cache,
+    // not a load-bearing artefact for the PDF itself.
+    let persisted: unknown = null;
+    try {
+      persisted = await prisma.decisionProvenanceRecord.upsert({
+        where: { analysisId: auth.analysisId },
+        create: {
+          analysisId: data.analysisId,
+          documentId: data.documentId,
+          userId: data.userId,
+          orgId: data.orgId,
+          promptFingerprint: data.promptFingerprint,
+          inputHash: data.inputHash,
+          modelLineage: data.modelLineage as unknown as Prisma.InputJsonValue,
+          judgeVariance: data.judgeVariance as unknown as Prisma.InputJsonValue,
+          citations: data.citations as unknown as Prisma.InputJsonValue,
+          regulatoryMapping: data.regulatoryMapping as unknown as Prisma.InputJsonValue,
+          pipelineLineage: data.pipelineLineage as unknown as Prisma.InputJsonValue,
+          schemaVersion: data.schemaVersion,
+          generatedAt: data.generatedAt,
+        },
+        update: {
+          promptFingerprint: data.promptFingerprint,
+          inputHash: data.inputHash,
+          modelLineage: data.modelLineage as unknown as Prisma.InputJsonValue,
+          judgeVariance: data.judgeVariance as unknown as Prisma.InputJsonValue,
+          citations: data.citations as unknown as Prisma.InputJsonValue,
+          regulatoryMapping: data.regulatoryMapping as unknown as Prisma.InputJsonValue,
+          pipelineLineage: data.pipelineLineage as unknown as Prisma.InputJsonValue,
+          schemaVersion: data.schemaVersion,
+          generatedAt: data.generatedAt,
+        },
+      });
+    } catch (persistErr) {
+      const code = (persistErr as { code?: string }).code;
+      if (code === 'P2021' || code === 'P2022') {
+        log.warn(
+          `DecisionProvenanceRecord persistence failed (schema drift ${code}) — returning assembled data without persisting. Run prisma migrate deploy to enable caching.`
+        );
+        // Continue without persisting — assembled data is all the client needs.
+      } else {
+        // @schema-drift-tolerant — re-throw non-drift errors so the
+        // outer catch can surface a real diagnostic to the client.
+        throw persistErr;
+      }
+    }
 
     log.info(`Provenance record generated for analysis ${auth.analysisId} (doc ${id})`);
 
@@ -233,7 +257,14 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
     // meta) so the client can hand `data` straight to the PDF generator.
     return NextResponse.json({ record: persisted, data });
   } catch (err) {
-    log.error('POST provenance-record failed:', err);
-    return NextResponse.json({ error: 'Failed to generate provenance record.' }, { status: 500 });
+    const code = (err as { code?: string }).code ?? 'unknown';
+    const msg = err instanceof Error ? err.message : String(err);
+    log.error(`POST provenance-record failed at stage=${stage} [code=${code}]: ${msg}`);
+    return NextResponse.json(
+      {
+        error: `Could not generate provenance record (stage: ${stage}${code !== 'unknown' ? `, ${code}` : ''}). ${msg.slice(0, 200)}`,
+      },
+      { status: 500 }
+    );
   }
 }

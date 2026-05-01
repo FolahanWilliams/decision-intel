@@ -813,10 +813,14 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         method: 'POST',
       });
       if (!res.ok) {
-        const body = (await res.json().catch(() => ({ error: 'Failed to generate record.' }))) as {
-          error?: string;
-        };
-        throw new Error(body.error || 'Failed to generate record.');
+        const body = (await res.json().catch(() => null)) as { error?: string } | null;
+        const apiMsg = body && typeof body.error === 'string' ? body.error : null;
+        // Improved 2026-05-01: surface the API's stage-tagged error instead
+        // of the generic "Failed to generate record" so the founder can
+        // tell auth vs assemble vs persist failures at a glance. Pre-fix
+        // the toast just said "Failed to generate provenance record" with
+        // no diagnostic, mirroring the visibility:null incident pattern.
+        throw new Error(apiMsg || `Could not generate provenance record (HTTP ${res.status}).`);
       }
       const { data } = (await res.json()) as {
         data: import('@/lib/reports/provenance-record-data').ProvenanceRecordData;

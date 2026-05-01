@@ -749,29 +749,79 @@ async function buildDataLifecycle(
 export async function assembleProvenanceRecordData(
   analysisId: string
 ): Promise<ProvenanceRecordData> {
-  const analysis = await prisma.analysis.findUnique({
-    where: { id: analysisId },
-    include: {
-      biases: {
-        select: { biasType: true, severity: true, suggestion: true },
-      },
-      promptVersion: {
-        select: { hash: true, name: true, version: true },
-      },
+  // Schema-drift tolerant: try the full query first; fall back to a
+  // narrower query if PromptVersion relation or Document.contentHash are
+  // missing (P2021/P2022). Without the fallback, a missing migration
+  // silently aborted every DPR generation with a generic 500.
+  let analysis: Awaited<ReturnType<typeof prisma.analysis.findUnique>> &
+    {
+      biases?: Array<{ biasType: string; severity: string; suggestion: string | null }>;
+      promptVersion?: { hash: string; name: string; version: number } | null;
       document: {
-        select: {
-          id: true,
-          filename: true,
-          contentHash: true,
-          userId: true,
-          orgId: true,
+        id: string;
+        filename: string;
+        contentHash: string | null;
+        userId: string;
+        orgId: string | null;
+      };
+    };
+  try {
+    const full = await prisma.analysis.findUnique({
+      where: { id: analysisId },
+      include: {
+        biases: {
+          select: { biasType: true, severity: true, suggestion: true },
+        },
+        promptVersion: {
+          select: { hash: true, name: true, version: true },
+        },
+        document: {
+          select: {
+            id: true,
+            filename: true,
+            contentHash: true,
+            userId: true,
+            orgId: true,
+          },
         },
       },
-    },
-  });
-
-  if (!analysis) {
-    throw new Error(`Analysis ${analysisId} not found — cannot assemble provenance record.`);
+    });
+    if (!full) {
+      throw new Error(`Analysis ${analysisId} not found — cannot assemble provenance record.`);
+    }
+    // The cast is required because Prisma's narrowing of `findUnique` returns
+    // a unioned type; we know our shape after `include`.
+    analysis = full as typeof analysis;
+  } catch (queryErr: unknown) {
+    const code = (queryErr as { code?: string }).code;
+    if (code !== 'P2021' && code !== 'P2022') {
+      throw queryErr;
+    }
+    // Fallback: drop the PromptVersion relation + contentHash column.
+    // promptFingerprint will fall back to the prompts.ts file hash;
+    // inputHash will be 'UNAVAILABLE'.
+    const fallback = await prisma.analysis.findUnique({
+      where: { id: analysisId },
+      include: {
+        biases: {
+          select: { biasType: true, severity: true, suggestion: true },
+        },
+        document: {
+          select: { id: true, filename: true, userId: true, orgId: true },
+        },
+      },
+    });
+    if (!fallback) {
+      throw new Error(`Analysis ${analysisId} not found — cannot assemble provenance record.`);
+    }
+    analysis = {
+      ...fallback,
+      promptVersion: null,
+      document: {
+        ...fallback.document,
+        contentHash: null,
+      },
+    } as typeof analysis;
   }
 
   const biasTypes = Array.from(new Set((analysis.biases ?? []).map(b => b.biasType)));

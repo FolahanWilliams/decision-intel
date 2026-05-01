@@ -40,7 +40,11 @@ const SCAN_DIR = join(ROOT, 'src');
 // in src/app/(platform)/documents/[id]/page.tsx refetchDocument — body
 // parsing on a non-2xx response so we can surface the API's error message
 // (per CLAUDE.md fire-and-forget exception list, body parsing is allowed).
-const SILENT_CATCH_BASELINE = 118;
+// 2026-05-01 (Phase 2 DPR fix): bumped 118 → 119 for the new
+// res.json().catch(() => null) in handleProvenanceRecordExport — same
+// body-parsing pattern (parse the API error body so the toast shows the
+// real diagnostic instead of generic "Failed to generate record").
+const SILENT_CATCH_BASELINE = 119;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /
