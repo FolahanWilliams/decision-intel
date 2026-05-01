@@ -515,13 +515,156 @@ export function DecisionKnowledgeGraph({
   if (!graphData || graphData.nodes.length === 0) {
     return (
       <div className="card">
-        <div
-          className="card-body flex flex-col items-center justify-center h-64"
-          style={{ color: 'var(--text-muted)' }}
-        >
-          <Network className="h-10 w-10 mb-3 opacity-40" />
-          <p>No decisions to graph yet.</p>
-          <p className="text-xs mt-1">Upload documents or submit decisions to build the graph.</p>
+        <div className="card-body" style={{ padding: 28 }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 14,
+              marginBottom: 18,
+            }}
+          >
+            <div
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: 'var(--radius-lg)',
+                background: 'rgba(22,163,74,0.08)',
+                border: '1px solid rgba(22,163,74,0.25)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--accent-primary)',
+                flexShrink: 0,
+              }}
+            >
+              <Network size={22} />
+            </div>
+            <div>
+              <h3
+                style={{
+                  fontSize: 18,
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  margin: 0,
+                  letterSpacing: '-0.01em',
+                }}
+              >
+                Decision Knowledge Graph &middot; not yet populated
+              </h3>
+              <p
+                style={{
+                  fontSize: 13,
+                  color: 'var(--text-secondary)',
+                  margin: '4px 0 0 0',
+                  lineHeight: 1.55,
+                }}
+              >
+                Every audit you run becomes a node here. Edges form when biases repeat,
+                outcomes confirm patterns, or assumptions chain across decisions. The graph
+                compounds quarter over quarter &mdash; the system gets sharper for the way
+                you specifically decide.
+              </p>
+            </div>
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: 10,
+              marginBottom: 18,
+            }}
+          >
+            {[
+              {
+                href: '/dashboard',
+                icon: '📄',
+                label: 'Upload a document',
+                body: 'Strategic memo, IC deck, or board paper. Audit runs in 60s; the result becomes a node.',
+              },
+              {
+                href: '/dashboard/cognitive-audits/submit',
+                icon: '✍️',
+                label: 'Submit a cognitive audit',
+                body: 'Paste a decision, meeting transcript, or Slack thread. Maps to a HumanDecision node.',
+              },
+              {
+                href: '/dashboard/settings/integrations',
+                icon: '🔌',
+                label: 'Connect Slack or Drive',
+                body: 'Auto-ingest decisions as they happen. Every commit becomes a graph node automatically.',
+              },
+              {
+                href: '/dashboard/decisions/new',
+                icon: '🎯',
+                label: 'Frame a decision package',
+                body: 'Multi-document strategic decisions composite into a single graph node with linked sub-nodes.',
+              },
+            ].map(card => (
+              <a
+                key={card.href}
+                href={card.href}
+                style={{
+                  display: 'block',
+                  padding: 14,
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 'var(--radius-md)',
+                  textDecoration: 'none',
+                  transition: 'border-color 0.15s, background 0.15s',
+                }}
+                className="dkg-empty-cta"
+              >
+                <div style={{ fontSize: 18, marginBottom: 6 }}>{card.icon}</div>
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: 'var(--text-primary)',
+                    marginBottom: 4,
+                  }}
+                >
+                  {card.label}
+                </div>
+                <div
+                  style={{
+                    fontSize: 11.5,
+                    color: 'var(--text-secondary)',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {card.body}
+                </div>
+              </a>
+            ))}
+          </div>
+
+          <div
+            style={{
+              padding: 12,
+              background: 'var(--bg-secondary)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-md)',
+              fontSize: 11.5,
+              color: 'var(--text-secondary)',
+              lineHeight: 1.55,
+            }}
+          >
+            <strong style={{ color: 'var(--text-primary)' }}>What lives here:</strong>{' '}
+            5 node types (decisions, biases, outcomes, themes, people) connected by 7 edge
+            types (caused-by, repeats, contradicts, confirmed-by, depends-on, similar-to,
+            attended-by). Density compounds with every closed-loop outcome &mdash; the
+            graph IS the moat. No customer data leaves the platform; everything you see
+            here derives from your own audits.
+          </div>
+
+          <style>{`
+            .dkg-empty-cta:hover {
+              border-color: var(--accent-primary) !important;
+              background: rgba(22,163,74,0.04) !important;
+            }
+          `}</style>
         </div>
       </div>
     );
