@@ -1,12 +1,30 @@
 'use client';
 
-import { AlertTriangle, Brain, Activity, Sparkles } from 'lucide-react';
+/**
+ * ExecutiveSummary — the LLM-generated audit summary card (dark hero).
+ *
+ * Refactored 2026-05-01 (Phase 2D, persona-validated layout):
+ * - Removed the 3 StatTiles (Cognitive biases / Noise score / Risk level)
+ *   that duplicated VerdictBand's signals. The verdict + numeric
+ *   counterparts now live ONCE on the page in VerdictBand at the top;
+ *   ExecutiveSummary focuses on the LLM-generated summary text — its
+ *   unique value is the narrative, not the numbers.
+ * - Removed the banned Sparkles eyebrow icon (CLAUDE.md Sparkles
+ *   Icon Discipline). Replaced with a plain "Audit summary" eyebrow.
+ * - Cleaned up unused imports (Brain / Activity / AlertTriangle no
+ *   longer needed after StatTile removal).
+ * - Props biasCount / noiseScore / riskLevel still accepted for
+ *   backwards-compat with the call site; ignored internally.
+ */
 
 interface ExecutiveSummaryProps {
   overallScore: number;
-  noiseScore: number;
-  biasCount: number;
-  riskLevel: 'low' | 'medium' | 'high' | 'critical';
+  /** @deprecated kept for backwards-compat; rendered in VerdictBand now. */
+  noiseScore?: number;
+  /** @deprecated kept for backwards-compat; rendered in VerdictBand now. */
+  biasCount?: number;
+  /** @deprecated kept for backwards-compat; rendered in VerdictBand status pill. */
+  riskLevel?: 'low' | 'medium' | 'high' | 'critical';
   summary: string;
   verdict?: 'APPROVED' | 'REJECTED' | 'MIXED';
 }
@@ -47,24 +65,13 @@ const VERDICT_META: Record<string, { bg: string; fg: string; ring: string; copy:
   },
 };
 
-const RISK_COLOR: Record<string, string> = {
-  low: '#22c55e',
-  medium: '#eab308',
-  high: '#f97316',
-  critical: '#ef4444',
-};
-
 export function ExecutiveSummary({
   overallScore,
-  noiseScore,
-  biasCount,
-  riskLevel,
   summary,
   verdict,
 }: ExecutiveSummaryProps) {
   const meta = getGradeMeta(Math.round(overallScore));
   const verdictMeta = verdict ? VERDICT_META[verdict] : null;
-  const riskColor = RISK_COLOR[riskLevel] || '#94a3b8';
 
   return (
     <div
@@ -100,8 +107,7 @@ export function ExecutiveSummary({
             color: '#16A34A',
           }}
         >
-          <Sparkles size={12} />
-          Executive summary
+          Audit summary
         </div>
         {verdictMeta && (
           <span
@@ -181,103 +187,10 @@ export function ExecutiveSummary({
         </div>
       </div>
 
-      {/* Stat tiles */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-          gap: 12,
-          marginTop: 20,
-        }}
-      >
-        <StatTile
-          icon={<Brain size={18} />}
-          value={biasCount.toString()}
-          label="Cognitive biases"
-          tone="#A78BFA"
-        />
-        <StatTile
-          icon={<Activity size={18} />}
-          value={noiseScore.toFixed(1)}
-          label="Noise score"
-          tone="#38BDF8"
-        />
-        <StatTile
-          icon={<AlertTriangle size={18} />}
-          value={riskLevel}
-          label="Risk level"
-          tone={riskColor}
-          capitalize
-        />
-      </div>
-    </div>
-  );
-}
-
-function StatTile({
-  icon,
-  value,
-  label,
-  tone,
-  capitalize,
-}: {
-  icon: React.ReactNode;
-  value: string;
-  label: string;
-  tone: string;
-  capitalize?: boolean;
-}) {
-  return (
-    <div
-      style={{
-        background: 'rgba(255,255,255,0.04)',
-        border: '1px solid rgba(255,255,255,0.08)',
-        borderRadius: 12,
-        padding: '14px 16px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
-      }}
-    >
-      <span
-        style={{
-          width: 36,
-          height: 36,
-          borderRadius: 10,
-          background: `${tone}1F`,
-          color: tone,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-        }}
-      >
-        {icon}
-      </span>
-      <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        <span
-          style={{
-            fontSize: 22,
-            fontWeight: 800,
-            color: '#F8FAFC',
-            lineHeight: 1.1,
-            textTransform: capitalize ? 'capitalize' : undefined,
-          }}
-        >
-          {value}
-        </span>
-        <span
-          style={{
-            fontSize: 11,
-            color: '#94A3B8',
-            textTransform: 'uppercase',
-            letterSpacing: '0.08em',
-            marginTop: 2,
-          }}
-        >
-          {label}
-        </span>
-      </div>
+      {/* Stat tiles removed 2026-05-01 (Phase 2D): all three (Cognitive
+          biases / Noise score / Risk level) duplicated VerdictBand at the
+          top of the page. ExecutiveSummary now focuses on the LLM-
+          generated narrative summary — its unique value. */}
     </div>
   );
 }

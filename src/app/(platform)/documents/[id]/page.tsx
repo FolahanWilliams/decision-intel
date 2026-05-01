@@ -27,6 +27,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClientLogger } from '@/lib/utils/logger';
 import { formatDate } from '@/lib/constants/human-audit';
 import { VerdictBand } from '@/components/ui/VerdictBand';
+import { DetailTabBar } from '@/components/ui/DetailTabBar';
 import { RemediationChecklist } from '@/components/analysis/RemediationChecklist';
 import { PaperApplicationsCard } from '@/components/analysis/PaperApplicationsCard';
 import { formatBiasName } from '@/lib/utils/labels';
@@ -2730,81 +2731,26 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             style={{ gridTemplateColumns: '1fr 380px', gap: 'var(--spacing-xl)' }}
           >
             <div className="flex flex-col gap-lg">
-              {/* Tab Bar with group labels */}
-              <div
-                className="flex flex-wrap items-end gap-0 mb-lg doc-detail-tab-bar"
-                role="tablist"
-                aria-label="Analysis tabs"
-                style={{
-                  borderBottom: '1px solid var(--border-color)',
-                  borderRadius: '8px 8px 0 0',
-                  overflow: 'hidden',
-                }}
-              >
-                {TAB_GROUPS.map((group, gi) => (
-                  <div key={group.label} className="flex items-end">
-                    {gi > 0 && (
-                      <div
-                        style={{
-                          width: 1,
-                          height: 24,
-                          background: 'var(--border-color)',
-                          margin: '0 4px',
-                          alignSelf: 'center',
-                        }}
-                      />
-                    )}
-                    <div className="flex flex-col">
-                      {group.label !== 'Overview' && (
-                        <span
-                          style={{
-                            fontSize: '9px',
-                            fontWeight: 600,
-                            color: 'var(--text-muted)',
-                            letterSpacing: '0.08em',
-                            textTransform: 'uppercase',
-                            padding: '0 16px 2px',
-                            userSelect: 'none',
-                          }}
-                        >
-                          {group.label}
-                        </span>
-                      )}
-                      <div className="flex">
-                        {group.tabs.map(tab => (
-                          <button
-                            key={tab.id}
-                            role="tab"
-                            aria-selected={activeTab === tab.id}
-                            aria-controls={`tabpanel-${tab.id}`}
-                            onClick={() => handleTabChange(tab.id)}
-                            className="flex items-center gap-sm text-sm font-medium transition-colors -mb-px"
-                            style={
-                              activeTab === tab.id
-                                ? {
-                                    padding: '10px 18px',
-                                    background: 'var(--bg-card)',
-                                    color: 'var(--text-primary)',
-                                    borderBottom: '2px solid var(--accent-primary)',
-                                    borderRadius: '8px 8px 0 0',
-                                  }
-                                : {
-                                    padding: '10px 18px',
-                                    color: 'var(--text-muted)',
-                                    background: 'transparent',
-                                    borderBottom: '2px solid transparent',
-                                    borderRadius: '8px 8px 0 0',
-                                  }
-                            }
-                          >
-                            <tab.icon size={14} />
-                            {tab.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ))}
+              {/* Tab Bar — canonical DetailTabBar component (DESIGN.md §104,
+                  Phase 2A locked 2026-05-01). Replaces ~75 lines of inline
+                  hand-rolled tab markup with hardcoded font-sizes (9px
+                  eyebrow labels — below the fs-3xs floor) + hardcoded
+                  padding (10px 18px) + awkward border+overflow:hidden
+                  container that read as half-baked card-meets-divider on
+                  every page. The new component uses DESIGN.md tokens
+                  throughout, supports group labels, mobile horizontal
+                  scroll-snap with hidden scrollbar, and clean underline
+                  styling on the active tab. */}
+              <div className="mb-lg">
+                <DetailTabBar
+                  groups={TAB_GROUPS.map(g => ({
+                    label: g.label === 'Overview' ? undefined : g.label,
+                    tabs: g.tabs,
+                  }))}
+                  activeId={activeTab}
+                  onChange={handleTabChange}
+                  ariaLabel="Analysis tabs"
+                />
               </div>
 
               {/* Tab Panels (lazy loaded, each wrapped in ErrorBoundary) */}
@@ -3330,17 +3276,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           .doc-detail-main-grid {
             grid-template-columns: 1fr !important;
           }
-          .doc-detail-tab-bar {
-            flex-wrap: nowrap !important;
-            overflow-x: auto !important;
-            overflow-y: hidden !important;
-            -webkit-overflow-scrolling: touch;
-            scroll-snap-type: x proximity;
-          }
-          .doc-detail-tab-bar > * {
-            flex-shrink: 0;
-          }
         }
+        /* .doc-detail-tab-bar rules removed 2026-05-01 (Phase 2A): the new
+           DetailTabBar component (src/components/ui/DetailTabBar.tsx) owns
+           its own mobile scroll-snap + hidden-scrollbar styling. The class
+           name no longer exists in the JSX. */
       `}</style>
     </div>
   );
