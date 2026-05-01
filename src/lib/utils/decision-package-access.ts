@@ -47,10 +47,10 @@ export async function buildPackageAccessFilter(
   ];
 
   if (membershipOrgId) {
+    // 2026-05-01: dropped the `visibility: null` clause — DecisionPackage's
+    // visibility column is non-null String @default("team"), so Prisma 7.8+
+    // rejects `visibility: null` filters. Same fix as document-access.ts.
     orClauses.push({ orgId: membershipOrgId, visibility: 'team' });
-    // Pre-flag rows: treat null visibility as team-visible, in case future
-    // migrations leave it unset on legacy data.
-    orClauses.push({ orgId: membershipOrgId, visibility: null });
   }
 
   return {

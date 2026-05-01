@@ -68,20 +68,21 @@ export async function buildDocumentAccessFilter(userId: string): Promise<Documen
     // DocumentAccess table missing — pre-3.5 schema. Fall through.
   }
 
+  // 2026-05-01 fix: removed `visibility: null` clauses. The schema makes
+  // `visibility` a non-null String with @default("team"), so Prisma 7.8+
+  // rejects `visibility: null` filters with "Argument visibility is missing"
+  // — broke every Document list/detail read. The pre-3.5 nullable-column
+  // window the original null clauses guarded for is long closed.
   const orClauses: Array<Record<string, unknown>> = [
-    // Owner — always wins, every visibility mode included so private docs
-    // remain visible to their own creator.
+    // Owner — always wins, every concrete visibility mode included so
+    // private docs remain visible to their own creator.
     { userId, visibility: 'private' },
     { userId, visibility: 'team' },
     { userId, visibility: 'specific' },
-    { userId, visibility: null },
   ];
 
   if (membershipOrgId) {
     orClauses.push({ orgId: membershipOrgId, visibility: 'team' });
-    // Pre-3.5 docs have no `visibility` set — treat null as team-visible so
-    // existing rows don't disappear when the migration runs.
-    orClauses.push({ orgId: membershipOrgId, visibility: null });
   }
 
   if (grantedDocumentIds.length > 0) {
