@@ -27,6 +27,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClientLogger } from '@/lib/utils/logger';
 import { formatDate } from '@/lib/constants/human-audit';
 import { VerdictBand } from '@/components/ui/VerdictBand';
+import { DecisionBriefView } from '@/components/documents/DecisionBriefView';
 import { DetailTabBar } from '@/components/ui/DetailTabBar';
 import { RemediationChecklist } from '@/components/analysis/RemediationChecklist';
 import { PaperApplicationsCard } from '@/components/analysis/PaperApplicationsCard';
@@ -1604,6 +1605,33 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             for verdict + remediation + R²F signals only. */}
       </header>
 
+      {/* DecisionBriefView — McKinsey-grade post-audit deliverable.
+          Locked 2026-05-01 from NotebookLM master-KB synthesis Q1-Q4.
+          Renders for cso / ic / board view modes (the procurement-grade
+          buyer experience). Analyst mode keeps the existing dashboard
+          for power-users who want every panel.
+          The brief intentionally HIDES: tabs, R²F SignalBlocks,
+          structural assumptions, cross-references, RPD pre-mortems,
+          decision rooms, phase scrub, 4-tile metric grid. Those live
+          in the analyst dashboard one click away. */}
+      {analysis && viewMode !== 'analyst' && (
+        <ErrorBoundary sectionName="Decision Brief">
+          <DecisionBriefView
+            filename={document.filename}
+            documentType={document.documentType ?? null}
+            analysis={
+              analysis as unknown as Parameters<typeof DecisionBriefView>[0]['analysis']
+            }
+            biases={biases}
+            onExportDpr={() => {
+              void handleProvenanceRecordExport();
+            }}
+            onShareExport={() => setShowShareModal(true)}
+            onOpenDeepDive={() => setViewMode('analyst')}
+          />
+        </ErrorBoundary>
+      )}
+
       {/* Overdue outcome banner — prompts the user to close the flywheel loop
           by reporting what actually happened. The server's outcome-reminders
           cron flips outcomeStatus to 'outcome_overdue' past outcomeDueAt; we
@@ -1788,8 +1816,14 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         </ErrorBoundary>
       )}
 
-      {/* Executive Summary */}
-      {analysis && (
+      {/* Executive Summary + entire analyst dashboard body — gated to
+          viewMode === 'analyst' (Phase 3 lock 2026-05-01). For cso / ic /
+          board view modes, DecisionBriefView above is the deliverable
+          (per NotebookLM master-KB synthesis Q1-Q4). The analyst keeps
+          the existing dashboard for power-user deep dives.
+          The closing `)}` for this conditional is at the end of the
+          page body, just before the modals. */}
+      {analysis && viewMode === 'analyst' && (
         <ErrorBoundary sectionName="Executive Summary">
           <div className="mb-xl">
             <ExecutiveSummary
