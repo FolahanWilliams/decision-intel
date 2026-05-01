@@ -21,24 +21,17 @@ import {
   ArrowRight,
   Check,
   ShieldCheck,
-  Scale,
   GraduationCap,
   Globe2,
   FileText,
   AlertCircle,
-  Activity,
 } from 'lucide-react';
 import { DESIGN_PARTNER_SEATS_AVAILABLE } from '@/lib/constants/company-info';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
 import {
-  PLATFORM_BASELINE_FOOTNOTE,
-  PLATFORM_BASELINE_SNAPSHOT,
-} from '@/lib/learning/platform-baseline-snapshot';
-import {
   SOC2_LANDING_STRIP_LABEL,
   SOC2_LANDING_STRIP_NOTE,
-  AI_VERIFY_DISCLAIMER_SHORT,
 } from '@/lib/constants/trust-copy';
 
 const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
@@ -1540,20 +1533,17 @@ export default function LandingPage() {
    safe PLATFORM_BASELINE_SNAPSHOT — no fabricated logos. */
 
 function HeroCredibilityStrip() {
+  // Tightened 2026-05-01: reduced from 5 items + methodology footnote to
+  // 3 items, no footnote. The hero close was over-loaded — too many
+  // sub-headings competing for attention. Kept the three strongest
+  // procurement signals (universal SOC 2, the cross-border framework
+  // count, R²F brand claim). Dropped: AI Verify (its disclaimer line
+  // crowded the strip and the framework is less-recognised) and Brier
+  // 0.258 (per GTM v3.3 lock — the Brier number stays in technical
+  // surfaces + DPR cover, not in cold-context credibility chips).
+  // Methodology footnote also dropped — the strip's chip-level claims
+  // are sufficient; the dense footnote read as defensive over-disclosure.
   const items = [
-    {
-      icon: GraduationCap,
-      label: 'Recognition-Rigor Framework',
-      note: 'Kahneman and Klein, one pipeline',
-    },
-    {
-      icon: Scale,
-      label: 'Aligned with AI Verify',
-      // B2 lock 2026-04-30 (James persona): caller-readable disclaimer
-      // imported from trust-copy SSOT prevents the chip from drifting
-      // into "certified by AI Verify" framing on a casual read.
-      note: `11 governance principles · ${AI_VERIFY_DISCLAIMER_SHORT}`,
-    },
     {
       icon: ShieldCheck,
       // SOC 2 chip pulls from trust-copy SSOT — never hardcode here.
@@ -1566,9 +1556,9 @@ function HeroCredibilityStrip() {
       note: 'G7, EU, GCC, African markets',
     },
     {
-      icon: Activity,
-      label: `Brier ${PLATFORM_BASELINE_SNAPSHOT.meanBrier.toFixed(3)} ± ${PLATFORM_BASELINE_SNAPSHOT.brierCi95.halfWidth.toFixed(3)} calibration`,
-      note: `${PLATFORM_BASELINE_SNAPSHOT.n} audited corporate decisions, 95% CI`,
+      icon: GraduationCap,
+      label: 'Recognition-Rigor Framework',
+      note: 'Kahneman and Klein, one pipeline',
     },
   ];
 
@@ -1636,24 +1626,6 @@ function HeroCredibilityStrip() {
             </div>
           );
         })}
-      </div>
-      {/* Methodology footnote (Margaret + James persona ask, B1 lock 2026-04-30) —
-          surfaces the n + 95% CI half-width + bootstrap iterations + seed +
-          methodology version + computed-at date so a vendor-risk reviewer
-          can verify the calibration claim, not just read it. */}
-      <div
-        style={{
-          marginTop: 14,
-          fontSize: 11,
-          lineHeight: 1.5,
-          color: C.slate500,
-          textAlign: 'center',
-          maxWidth: 920,
-          marginLeft: 'auto',
-          marginRight: 'auto',
-        }}
-      >
-        {PLATFORM_BASELINE_FOOTNOTE}
       </div>
     </div>
   );

@@ -22,7 +22,9 @@
  * here" mark.
  */
 
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useReducedMotion, motion } from 'framer-motion';
 import {
   ArrowLeft,
@@ -35,6 +37,12 @@ import {
   ClipboardList,
   FileText,
 } from 'lucide-react';
+
+/** Seconds to auto-redirect after 404 lands. User can cancel by clicking
+ * any branch card (which navigates them somewhere else). 5 seconds is
+ * long enough to read the heading + scan the cards but short enough
+ * that the dead-end isn't a sticky frustration. */
+const REDIRECT_AFTER_SECONDS = 5;
 
 interface DecisionBranch {
   id: string;
@@ -127,12 +135,45 @@ interface NotFoundContentProps {
 
 export function NotFoundContent({ fullPage = false }: NotFoundContentProps) {
   const reduceMotion = useReducedMotion();
+  const router = useRouter();
   const deadEnd = polarToXY(DEAD_END_ANGLE, BRANCH_LENGTH);
   // Public 404 (root) gets the marketing branch set; platform 404 gets the
   // daily-verb tabs. Neither set advertises confidential routes.
   const liveBranches = fullPage ? PUBLIC_BRANCHES : PLATFORM_BRANCHES;
   const backLinkHref = fullPage ? '/' : '/dashboard';
   const backLinkLabel = fullPage ? 'Back to home' : 'Back to dashboard';
+  const redirectHref = fullPage ? '/' : '/dashboard';
+  const redirectLabel = fullPage ? 'home' : 'dashboard';
+
+  // Auto-redirect countdown. Cancellable by clicking any nav card / link
+  // (the click navigates BEFORE the timer fires, which is enough — but we
+  // also flip `cancelled` on click so the countdown UI disappears, and we
+  // clear the timer on unmount.
+  const [secondsLeft, setSecondsLeft] = useState(REDIRECT_AFTER_SECONDS);
+  const [cancelled, setCancelled] = useState(false);
+  // Mirror in a ref so the timer callbacks (which close over the initial
+  // state) read the latest cancelled flag without re-creating the effect.
+  const cancelledRef = useRef(false);
+  cancelledRef.current = cancelled;
+
+  useEffect(() => {
+    const tickId = setInterval(() => {
+      if (cancelledRef.current) return;
+      setSecondsLeft(s => Math.max(0, s - 1));
+    }, 1000);
+    const redirectId = setTimeout(() => {
+      if (cancelledRef.current) return;
+      router.push(redirectHref);
+    }, REDIRECT_AFTER_SECONDS * 1000);
+    return () => {
+      clearInterval(tickId);
+      clearTimeout(redirectId);
+    };
+  }, [router, redirectHref]);
+
+  const cancelRedirect = () => {
+    setCancelled(true);
+  };
 
   const containerStyle: React.CSSProperties = fullPage
     ? {
@@ -343,6 +384,7 @@ export function NotFoundContent({ fullPage = false }: NotFoundContentProps) {
             <Link
               key={id}
               href={href}
+              onClick={cancelRedirect}
               className="not-found-branch-card"
               style={{
                 display: 'flex',
@@ -385,6 +427,7 @@ export function NotFoundContent({ fullPage = false }: NotFoundContentProps) {
         <div style={{ textAlign: 'center' }}>
           <Link
             href={backLinkHref}
+            onClick={cancelRedirect}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -400,6 +443,41 @@ export function NotFoundContent({ fullPage = false }: NotFoundContentProps) {
             <ArrowLeft size={13} />
             {backLinkLabel}
           </Link>
+
+          {/* Auto-redirect countdown — visible so the redirect isn't surprising;
+              clicking any branch card OR the back-link cancels (the navigation
+              fires before the timer; we also flip cancelledRef.current so the
+              countdown stops updating). */}
+          {!cancelled && secondsLeft > 0 && (
+            <div
+              style={{
+                marginTop: 14,
+                fontSize: 11,
+                color: 'var(--text-muted)',
+                opacity: 0.75,
+              }}
+            >
+              Auto-redirecting to {redirectLabel} in {secondsLeft}{' '}
+              {secondsLeft === 1 ? 'second' : 'seconds'}
+              <button
+                type="button"
+                onClick={cancelRedirect}
+                style={{
+                  marginLeft: 8,
+                  fontSize: 11,
+                  color: 'var(--accent-primary)',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 0,
+                  textDecoration: 'underline',
+                  fontFamily: 'inherit',
+                }}
+              >
+                stay here
+              </button>
+            </div>
+          )}
         </div>
 
         <style>{`
