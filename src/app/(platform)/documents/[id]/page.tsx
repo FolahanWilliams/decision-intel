@@ -29,6 +29,8 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClientLogger } from '@/lib/utils/logger';
 import { formatDate } from '@/lib/constants/human-audit';
 import { VerdictBand } from '@/components/ui/VerdictBand';
+import { RemediationChecklist } from '@/components/analysis/RemediationChecklist';
+import { PaperApplicationsCard } from '@/components/analysis/PaperApplicationsCard';
 import { formatBiasName } from '@/lib/utils/labels';
 import { computeConviction } from '@/lib/scoring/conviction';
 import { computeDQChain } from '@/lib/scoring/dq-chain';
@@ -2741,6 +2743,28 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               inside the tab content + right rail; risk alerts surface
               via the ToxicAlertBanner directly above. See DESIGN.md
               "Persona-validated layout direction (locked 2026-05-01)". */}
+
+          {/* Remediation Roadmap + R²F Signal strip — promoted above the
+              tab bar 2026-05-01 per persona-validated layout direction.
+              All four buyer personas (Margaret / Adaeze / Richard / James)
+              converged on "the three things to fix" as the action layer
+              directly under the verdict, and the R²F signals (Validity /
+              Outside View / Author Calibration) as the second-most-
+              important above-fold artefact. Mounted at the page level
+              (not inside OverviewTab) so they render regardless of which
+              tab the user is on — they're the verdict's supporting
+              evidence, not analysis-specific deep content. */}
+          {analysis && biases.length > 0 && (
+            <ErrorBoundary sectionName="Remediation Roadmap">
+              <RemediationChecklist biases={biases} documentId={resolvedParams.id} />
+            </ErrorBoundary>
+          )}
+
+          {analysis && (
+            <ErrorBoundary sectionName="R²F Signal Strip">
+              <PaperApplicationsCard analysisId={analysis.id} />
+            </ErrorBoundary>
+          )}
 
           {/* Tabs + Content */}
           <div
