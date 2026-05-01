@@ -1453,7 +1453,16 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    log.error('API Error:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    // Outer setup-error handler. Anything that throws BEFORE the SSE stream
+    // starts (auth, document lookup, outcome gate check, etc.) lands here.
+    // Pre-2026-05-01 this returned the literal string "Internal Server Error"
+    // which gave the client zero diagnostic value. Now: log the raw Prisma
+    // code + message internally (Vercel logs see the cause), return a
+    // sanitised but specific message via getSafeErrorMessage so the
+    // useAnalysisStream hook can surface it in the UI.
+    const rawCode = (error as { code?: string }).code ?? 'none';
+    const rawMsg = error instanceof Error ? error.message : String(error);
+    log.error(`Stream setup error [code=${rawCode}]: ${rawMsg}`);
+    return NextResponse.json({ error: getSafeErrorMessage(error) }, { status: 500 });
   }
 }
