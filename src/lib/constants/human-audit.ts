@@ -38,7 +38,7 @@ export const SOURCE_ICONS: Record<string, typeof MessageSquare> = {
 
 export const SEVERITY_COLORS: Record<string, string> = {
   critical: 'var(--error)',
-  high: '#f97316',
+  high: 'var(--severity-high)',
   medium: 'var(--warning)',
   low: 'var(--success)',
 };
