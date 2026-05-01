@@ -3,6 +3,33 @@ generator client {
   previewFeatures = ["postgresqlExtensions"]
 }
 
+// Zod schema generation (added 2026-05-01).
+// Lean config — emits ONE model schema per Prisma model (Document, Analysis,
+// etc.) into a single file. Skips Create/Update/Where input schemas (~100s
+// of generated types we'd never use) so prisma generate stays fast.
+//
+// Use the generated `DocumentSchema` etc. as the canonical "shape of a
+// Document" when serializing back to clients OR as a base for hand-written
+// API request schemas: `DocumentSchema.pick({ filename: true, ... })`.
+//
+// Convention for new POST/PATCH routes: hand-write a Zod schema in
+// src/lib/validation/<route-slug>.ts that derives from the generated model
+// schema — keeps API input validation in lockstep with the Prisma schema.
+generator zod {
+  provider                         = "zod-prisma-types"
+  output                           = "../src/generated/zod"
+  useMultipleFiles                 = false
+  createInputTypes                 = false
+  createModelTypes                 = true
+  addInputTypeValidation           = false
+  createOptionalDefaultValuesTypes = false
+  createRelationValuesTypes        = false
+  writeBarrelFiles                 = false
+  useDefaultValidators             = true
+  coerceDate                       = false
+  prismaClientPath                 = "@prisma/client"
+}
+
 datasource db {
   provider   = "postgresql"
   extensions = [pg_graphql(schema: "graphql"), pg_stat_statements(schema: "extensions"), pgcrypto(schema: "extensions"), uuid_ossp(map: "uuid-ossp", schema: "extensions"), vector(schema: "extensions")]

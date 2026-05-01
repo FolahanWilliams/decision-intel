@@ -24,6 +24,9 @@
     "lint:counts": "node scripts/lint-counts.mjs",
     "rotate:encryption-key": "tsx ./scripts/rotate-encryption-key.ts",
     "sentry:upload-sourcemaps": "npx -y @sentry/cli@latest sourcemaps upload --org=decision-intel-bu --project=decisionintelsentry --release=${VERCEL_GIT_COMMIT_SHA:-$(git rev-parse HEAD)} .next",
+    "vercel:logs": "vercel logs --follow",
+    "vercel:logs:prod": "vercel logs --prod --follow",
+    "vercel:logs:errors": "vercel logs --prod --since=1h --output=raw | grep -iE 'error|exception|prismaclient|failed|warn' | tail -100",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky"
@@ -120,6 +123,7 @@
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "5.9.3",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "zod-prisma-types": "^3.3.11"
   }
 }

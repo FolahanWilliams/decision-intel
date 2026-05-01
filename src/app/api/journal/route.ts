@@ -6,22 +6,16 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { toPrismaStringArray } from '@/lib/utils/prisma-json';
 import { createLogger } from '@/lib/utils/logger';
 import { isSchemaDrift } from '@/lib/utils/error';
 import { isDecisionMessage, extractDecisionFrame } from '@/lib/integrations/slack/handler';
-
-const JournalEntrySchema = z.object({
-  source: z.enum(['email_forward', 'calendar_webhook', 'manual', 'slack_digest']),
-  sourceRef: z.string().max(500).optional(),
-  title: z.string().min(1, 'Title is required').max(500),
-  content: z.string().min(1, 'Content is required').max(100_000),
-  participants: z.array(z.string().max(200)).max(100).optional().default([]),
-  scheduledAt: z.string().datetime().optional().nullable(),
-});
+// 2026-05-01: input schema migrated to src/lib/validation/journal.ts so it
+// derives from the generated Prisma model schema. Canonical pattern — see
+// src/lib/validation/README.md before adding new POST/PATCH routes.
+import { CreateJournalEntrySchema } from '@/lib/validation/journal';
 
 const log = createLogger('JournalRoute');
 
@@ -71,7 +65,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
     }
 
-    const parsed = JournalEntrySchema.safeParse(body);
+    const parsed = CreateJournalEntrySchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
         { error: parsed.error.issues[0]?.message || 'Invalid input' },
