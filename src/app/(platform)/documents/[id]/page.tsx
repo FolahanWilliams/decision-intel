@@ -17,8 +17,6 @@ import {
   Brain,
   Users,
   Globe,
-  GitCompareArrows,
-  BookOpen,
   Link2,
   HelpCircle,
   X,
@@ -1395,9 +1393,10 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                   flexWrap: 'wrap',
                 }}
               >
-                <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-                  {formatDate(document.uploadedAt)} • {(document.fileSize / 1024).toFixed(1)} KB
-                </span>
+                {/* Date + filesize chip removed 2026-05-01 (Phase 1E declutter):
+                    duplicates the audit-metadata footer in VerdictBand above.
+                    Visible chips below this point are document-level controls
+                    only (visibility / legal hold / overdue-outcome nudge). */}
                 {/* "Analyzed" verdict pill + R2FBadge removed 2026-05-01:
                     persona-validated VerdictBand above carries both signals
                     via its status pill + DQI grade. Keep only the document-
@@ -1483,23 +1482,13 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             {/* Conviction Score — complementary to DQI (shown in ExecutiveSummary hero) */}
             {analysis && <ConvictionBadge analysis={analysis} />}
 
-            {/* Header actions grouped 2026-04-26 (Opus 4.6 audit) into:
-                  PRIMARY (Share & Export — accent fill)
-                  SECONDARY (Explain Score, Upload new version)
-                  DANGER (Delete — separated by a visual divider).
-                The 8-item flat row was cognitively overloading; the grouping
-                gives the eye a hierarchy without rearranging the JSX wholesale. */}
+            {/* Header actions — Phase 1E declutter pass 2026-05-01:
+                Share & Export removed from this row (duplicated VerdictBand's
+                primary CTA). Kept: Explain Score (secondary deep-link),
+                Upload new version (primary owner action), Delete (danger).
+                This row now reads as "secondary actions only" — the verdict
+                + DPR export both live in VerdictBand at the top. */}
             <div className="flex items-center gap-sm">
-              {analysis && (
-                <button
-                  onClick={() => setShowShareModal(true)}
-                  className="btn btn-primary btn-sm flex items-center gap-sm"
-                  aria-label="Share and export"
-                >
-                  <Share2 size={14} />
-                  Share & Export
-                </button>
-              )}
               {analysis && (
                 <Link
                   href={`/dashboard/analytics?view=explainability&analysisId=${analysis.id}`}
@@ -1602,41 +1591,12 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           }}
         />
 
-        {/* Contextual actions */}
-        {analysis && (
-          <div className="flex items-center gap-sm" style={{ marginTop: 'var(--spacing-sm)' }}>
-            <Link
-              href={`/dashboard/compare?doc=${document.id}`}
-              className="flex items-center gap-xs text-xs"
-              style={{
-                padding: '4px 12px',
-                borderRadius: 'var(--radius-full)',
-                border: '1px solid var(--border-color)',
-                color: 'var(--text-muted)',
-                textDecoration: 'none',
-                transition: 'all 0.15s',
-              }}
-            >
-              <GitCompareArrows size={12} />
-              Compare
-            </Link>
-            <Link
-              href="/dashboard/analytics?view=library"
-              className="flex items-center gap-xs text-xs"
-              style={{
-                padding: '4px 12px',
-                borderRadius: 'var(--radius-full)',
-                border: '1px solid var(--border-color)',
-                color: 'var(--text-muted)',
-                textDecoration: 'none',
-                transition: 'all 0.15s',
-              }}
-            >
-              <BookOpen size={12} />
-              Bias Library
-            </Link>
-          </div>
-        )}
+        {/* Contextual actions removed 2026-05-01 (Phase 1E declutter):
+            "Compare" + "Bias Library" inline pills were extra above-fold
+            visual weight. Both still reachable via the global Command
+            Palette (⌘K → "Compare documents" / "Bias Library") and the
+            sidebar (Reflect cluster). Above-fold real estate now reserved
+            for verdict + remediation + R²F signals only. */}
       </header>
 
       {/* Overdue outcome banner — prompts the user to close the flywheel loop
@@ -1753,18 +1713,16 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         );
       })()}
 
-      {/* Temporal phase scrub — sits above the Executive Summary since
-          it frames the entire document view. Swapping phases swaps the
-          body below (before = full analyst/cso/board; during = human
-          decision panel; after = outcome + recalibrated DQI). */}
-      {/* Phase scrubber renders only when viewMode === 'analyst' (the
-          only mode that has during/after panels). Hiding it on cso/ic/
-          board views — instead of the prior silent-snap-back-to-before
-          behaviour — eliminates the blank-state combinations Opus 4.6
-          flagged ("3 phases × 4 view modes = 12 cells, only 4 work").
-          The auto-snap effect still fires on direct-URL ?phase=after
-          loads so a stale link doesn't strand the user. */}
-      {analysis && viewMode === 'analyst' && (
+      {/* Phase scrub demoted 2026-05-01 (Phase 1E declutter): the full-
+          width "Decision Timeline · Before / During / After" strip was
+          ~60px of vertical real estate above the fold for what's really
+          methodology vocabulary, not a reader-first signal. Per DESIGN.md
+          persona-validated layout (locked 2026-05-01) all four buyers
+          flagged this as noise.
+          The before/during/after content is still reachable: direct URL
+          via ?phase=during or ?phase=after, or via the Outcomes tab.
+          A smaller corner-pill variant lands in Phase 2. */}
+      {false && analysis && viewMode === 'analyst' && (
         <ErrorBoundary sectionName="Decision timeline phase scrub">
           <TimelinePhaseScrub phase={phase} onChange={setPhase} />
         </ErrorBoundary>
