@@ -30,79 +30,84 @@
   "packageRules": [
     {
       "description": "Group all React + Next + Vercel runtime updates — they ship in lockstep and break together",
-      "matchPackagePatterns": [
-        "^next$",
-        "^next-",
-        "^@next/",
-        "^react$",
-        "^react-",
-        "^@react-",
-        "^@vercel/"
-      ],
       "groupName": "react + next + vercel ecosystem",
-      "schedule": ["before 5am on Monday"]
+      "schedule": ["before 5am on Monday"],
+      "matchPackageNames": [
+        "/^next$/",
+        "/^next-/",
+        "/^@next//",
+        "/^react$/",
+        "/^react-/",
+        "/^@react-/",
+        "/^@vercel//"
+      ]
     },
     {
       "description": "Group Prisma updates — schema regeneration + minor-version validation changes ship together (e.g. 7.5 → 7.8 strict where validation)",
-      "matchPackagePatterns": ["^prisma$", "^@prisma/"],
       "groupName": "prisma ecosystem",
-      "schedule": ["before 5am on Monday"]
+      "schedule": ["before 5am on Monday"],
+      "matchPackageNames": ["/^prisma$/", "/^@prisma//"]
     },
     {
       "description": "Group Supabase + auth + storage updates",
-      "matchPackagePatterns": ["^@supabase/"],
       "groupName": "supabase ecosystem",
-      "schedule": ["before 5am on Monday"]
+      "schedule": ["before 5am on Monday"],
+      "matchPackageNames": ["/^@supabase//"]
     },
     {
       "description": "Group AI provider SDK updates — model name churn lives here",
-      "matchPackagePatterns": [
-        "^@google/genai",
-        "^@google-cloud/",
-        "^@anthropic-ai/",
-        "^@langchain/",
-        "^langchain"
-      ],
       "groupName": "ai provider ecosystem",
-      "schedule": ["before 5am on Monday"]
+      "schedule": ["before 5am on Monday"],
+      "matchPackageNames": [
+        "/^@google/genai/",
+        "/^@google-cloud//",
+        "/^@anthropic-ai//",
+        "/^@langchain//",
+        "/^langchain/"
+      ]
     },
     {
       "description": "Group Sentry runtime + CLI updates",
-      "matchPackagePatterns": ["^@sentry/"],
       "groupName": "sentry ecosystem",
-      "schedule": ["before 5am on Monday"]
+      "schedule": ["before 5am on Monday"],
+      "matchPackageNames": ["/^@sentry//"]
     },
     {
       "description": "Group Tailwind + design-token updates",
-      "matchPackagePatterns": ["^tailwind", "^@tailwindcss/", "^autoprefixer", "^postcss"],
       "groupName": "tailwind + css ecosystem",
-      "schedule": ["before 5am on Monday"]
+      "schedule": ["before 5am on Monday"],
+      "matchPackageNames": [
+        "/^tailwind/",
+        "/^@tailwindcss//",
+        "/^autoprefixer/",
+        "/^postcss/"
+      ]
     },
     {
       "description": "Group test tooling — vitest + playwright + testing-library",
-      "matchPackagePatterns": [
-        "^vitest",
-        "^@vitest/",
-        "^@playwright/",
-        "^playwright",
-        "^@testing-library/"
-      ],
       "groupName": "test tooling",
-      "schedule": ["before 5am on Monday"]
+      "schedule": ["before 5am on Monday"],
+      "matchPackageNames": [
+        "/^vitest/",
+        "/^@vitest//",
+        "/^@playwright//",
+        "/^playwright/",
+        "/^@testing-library//"
+      ]
     },
     {
       "description": "Group build + lint tooling — eslint, prettier, husky, typescript",
-      "matchPackagePatterns": [
-        "^eslint",
-        "^@eslint/",
-        "^@typescript-eslint/",
-        "^prettier",
-        "^husky",
-        "^typescript$",
-        "^tsx$"
-      ],
       "groupName": "build + lint tooling",
-      "schedule": ["before 5am on Monday"]
+      "schedule": ["before 5am on Monday"],
+      "matchPackageNames": [
+        "/^eslint/",
+        "/^@eslint//",
+        "/^@typescript-eslint//",
+        "/^prettier/",
+        "/^husky/",
+        "/^typescript$/",
+        "/^tsx$/"
+      ]
     },
     {
       "description": "Pin major bumps separately — never group across major. Add 7-day soak to let GitHub surface major-bump regressions.",
@@ -120,20 +125,25 @@
     },
     {
       "description": "Patch + minor for safe utility libs can auto-merge after passing CI",
-      "matchPackagePatterns": [
-        "^date-fns",
-        "^lodash",
-        "^uuid",
-        "^clsx",
-        "^class-variance-authority"
-      ],
       "matchUpdateTypes": ["patch", "minor"],
       "automerge": true,
       "platformAutomerge": false,
-      "labels": ["dependencies", "auto-merge"]
+      "labels": ["dependencies", "auto-merge"],
+      "matchPackageNames": [
+        "/^date-fns/",
+        "/^lodash/",
+        "/^uuid/",
+        "/^clsx/",
+        "/^class-variance-authority/"
+      ]
     }
   ],
   "postUpdateOptions": ["npmDedupe"],
   "ignoreDeps": [],
-  "ignorePaths": ["**/node_modules/**", "**/.next/**", "**/dist/**", "**/build/**"]
+  "ignorePaths": [
+    "**/node_modules/**",
+    "**/.next/**",
+    "**/dist/**",
+    "**/build/**"
+  ]
 }
