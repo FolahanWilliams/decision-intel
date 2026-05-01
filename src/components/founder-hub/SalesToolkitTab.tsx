@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import type { StrategicPrinciple } from '@/lib/data/sales-toolkit';
 import { PitchReframeToggle } from './sales/PitchReframeToggle';
+import { DiscoveryPitchPanel } from './sales/DiscoveryPitchPanel';
 import { ObjectionFlashcards } from './sales/ObjectionFlashcards';
 import { DemoStepperTimeline } from './sales/DemoStepperTimeline';
 import { AudiencePitchTabs } from './sales/AudiencePitchTabs';
@@ -88,6 +89,15 @@ function Section({ icon, title, subtitle, accent, children }: SectionProps) {
 export function SalesToolkitTab() {
   return (
     <div>
+      {/* Discovery + tailored-pitch hybrid motion (v3.3 lock 2026-05-01) —
+          mounts at the TOP because it is the most-load-bearing pre-event
+          reference for the next 90 days. Discovery FIRST within every
+          conversation, THEN tailored pitch keyed off the signal. The
+          deflection script + persona openers + 4-line follow-up template
+          are all here so the founder reads ONE surface in the back of
+          an Uber on the way to a London networking event. */}
+      <DiscoveryPitchPanel />
+
       <Section
         icon={<Rocket size={16} />}
         title="Critical Pitch Reframe"

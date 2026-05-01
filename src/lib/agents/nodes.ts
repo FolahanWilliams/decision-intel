@@ -17,7 +17,7 @@ import {
 } from '@google/generative-ai';
 import {
   buildEnrichedBiasPrompt,
-  NOISE_JUDGE_PROMPT,
+  NOISE_JUDGE_FRAMES,
   STRUCTURER_PROMPT,
   INTELLIGENCE_EXTRACTION_PROMPT,
   GDPR_ANONYMIZER_PROMPT,
@@ -620,35 +620,48 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
         ? `\n\nEXTERNAL BENCHMARKS FOR COMPARISON:\n${macroContext ? `Macro: ${macroContext}\n` : ''}${benchmarkContext ? `Industry: ${benchmarkContext}` : ''}`
         : '';
 
-    // Corporate Strategy / M&A Vertical: Append strategy noise overlay if applicable
+    // Corporate Strategy / M&A Vertical: build the investment overlay once and
+    // append it to each frame prompt, so all 3 frames score against the same
+    // strategic-decision context but through different professional lenses.
     const investmentNoiseOverlay = buildInvestmentNoiseOverlay(state.documentType);
-    const noisePrompt = investmentNoiseOverlay
-      ? `${NOISE_JUDGE_PROMPT}\n\n--- STRATEGIC DECISION CONTEXT ---\n${investmentNoiseOverlay}`
-      : NOISE_JUDGE_PROMPT;
     if (investmentNoiseOverlay) {
       log.info(`Using investment-specific noise evaluation (docType=${state.documentType})`);
     }
+    const composeFramePrompt = (basePrompt: string): string =>
+      investmentNoiseOverlay
+        ? `${basePrompt}\n\n--- STRATEGIC DECISION CONTEXT ---\n${investmentNoiseOverlay}`
+        : basePrompt;
 
-    // Multi-model noise jury: uses NOISE_JURY_MODELS env var for cross-model disagreement
-    // (more meaningful than same-model sampling variance). Falls back to default model.
+    // Multi-model noise jury: uses NOISE_JURY_MODELS env var for cross-model
+    // architectural diversity. Frame diversity (analyst-skeptical /
+    // regulator-hostile / contrarian-strategist per NOISE_JUDGE_FRAMES) is the
+    // second axis — see prompts.ts for the theoretical anchor. Combined, the
+    // jury measures three orthogonal sources of variance: stochastic (random
+    // seed), architectural (model family), framing (professional lens).
     const juryModels = getNoiseJuryModels();
     const isMultiModelJury = juryModels.length >= 2;
     if (isMultiModelJury) {
       log.info(`Multi-model noise jury: ${juryModels.join(', ')}`);
     }
+    log.info(
+      `Multi-frame noise jury: ${NOISE_JUDGE_FRAMES.map(f => f.id).join(', ')}`
+    );
 
-    // Parallel Judges for Noise Scoring (circuit breaker prevents pile-up if Gemini is down)
-    // Temperature 0.3 for deterministic scoring; random seed still injects variance
+    // Parallel Judges for Noise Scoring (circuit breaker prevents pile-up if Gemini is down).
+    // Each judge uses a DIFFERENT frame prompt; if NOISE_JURY_MODELS is set, also a different
+    // model. Temperature 0.3 for deterministic scoring; random seed still injects variance.
     const promises = [0, 1, 2].map(i => {
+      const frame = NOISE_JUDGE_FRAMES[i];
+      const framedPrompt = composeFramePrompt(frame.prompt);
       const model = juryModels[i]
         ? createModelByName(juryModels[i], { temperature: 0.3 })
         : createModelInstance({ safetyLevel: 'relaxed', temperature: 0.3 });
       return withGeminiResilience(() =>
         withTimeout(
           model.generateContent([
-            noisePrompt,
+            framedPrompt,
             `Decision Text to Rate:\n<input_text>\n${content}\n</input_text>${contextSuffix}`,
-            `\n(Random Seed: ${Math.random()})`,
+            `\n(Frame: ${frame.label}; Random Seed: ${Math.random()})`,
           ])
         )
       );

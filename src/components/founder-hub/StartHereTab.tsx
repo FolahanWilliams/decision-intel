@@ -45,6 +45,12 @@ import {
   PLATFORM_BASELINE_SNAPSHOT,
   PLATFORM_BASELINE_SNAPSHOT_COMPUTED_AT,
 } from '@/lib/learning/platform-baseline-snapshot';
+import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
+
+// Drift-safe case count for the Defensible Investor Answer card. Reads
+// from the canonical ALL_CASES.length so when the corpus grows the
+// answer the founder rehearses always matches reality.
+const HISTORICAL_CASE_COUNT_DISPLAY = HISTORICAL_CASE_COUNT;
 import { FounderHubMap } from './start-here/FounderHubMap';
 import { JourneySelector } from './start-here/JourneySelector';
 import { JourneyDetailStrip } from './start-here/JourneyDetailStrip';
@@ -188,6 +194,8 @@ export function StartHereTab({ onNavigateToTab }: Props) {
       {renderHero()}
       {renderPositioningAnchor()}
       {renderCalibrationCard(onNavigateToTab)}
+      {renderInvestorAnswerCard()}
+      {renderNoiseJuryCard()}
 
       <JourneySelector active={activeJourney} onSelect={handleSelectJourney} />
 
@@ -384,6 +392,190 @@ function renderCalibrationCard(onNavigateToTab: (tabId: string) => void) {
   );
 }
 
+// ─── Defensible investor-answer card (locked 2026-05-01) ──────────
+//
+// drift-tolerant — the "143 case studies" reference below is the verbatim
+// investor question being rehearsed; the rendered card itself uses
+// HISTORICAL_CASE_COUNT_DISPLAY so the answer stays accurate when the
+// corpus grows.
+//
+// The exact framing the founder uses when an investor / accelerator partner
+// drift-tolerant: literal is the verbatim investor question being rehearsed.
+// asks "where did the 143 case studies come from?" or "is the Brier 0.258
+// real?" — produced from the synthesis with the other Claude. Two
+// overstatement traps that ANY sophisticated reader will probe; surfacing
+// the defensible answer here means the founder has the exact language
+// memorised before the meeting, not improvised in it.
+//
+// Update this card when the corpus / methodology / spot-check count
+// changes — never the meeting.
+
+function renderInvestorAnswerCard() {
+  return (
+    <div style={investorAnswerCardStyle}>
+      <div style={investorAnswerEyebrow}>
+        <Compass size={11} /> Defensible investor answer · locked 2026-05-01
+      </div>
+      <div style={investorAnswerSubhead}>
+        For the &ldquo;is the dataset real?&rdquo; / &ldquo;is the Brier number real?&rdquo; questions.
+        Use these EXACT framings. Never improvise.
+      </div>
+
+      <div style={investorAnswerBlockHeader}>
+        Q: &ldquo;Where did the {HISTORICAL_CASE_COUNT_DISPLAY} case studies come from?&rdquo;
+      </div>
+      <div style={investorAnswerQuote}>
+        &ldquo;{HISTORICAL_CASE_COUNT_DISPLAY} case studies hand-curated from primary sources
+        &mdash; SEC filings, court records, biographies, post-mortem investigations &mdash; and tagged
+        against our 22-bias DI-B taxonomy. Every case carries the verbatim pre-decision document
+        excerpt so a reader can audit the tag against the source. The corpus is the seed for the
+        platform&rsquo;s reference-class forecaster, not the validation set; per-org Brier-scored
+        recalibration replaces it once design partners&rsquo; outcomes accumulate.&rdquo;
+      </div>
+      <div style={investorAnswerNote}>
+        Why it works: honest about LLM-annotation provenance + honest about validation gap +
+        positions seed-vs-validated as a flywheel narrative (&ldquo;sharper with your data&rdquo;)
+        rather than a weakness. Pattern-matches as &ldquo;thoughtful seed corpus&rdquo;, not
+        Potemkin dataset.
+      </div>
+
+      <div style={investorAnswerBlockHeader}>
+        Q: &ldquo;Is the Brier 0.258 number real?&rdquo;
+      </div>
+      <div style={investorAnswerQuote}>
+        &ldquo;It&rsquo;s a synthetic baseline &mdash; methodology version 2.0.0-seed &mdash;
+        from running the published DQI weights over the case-study library with hindsight
+        neutralised on the evidence-quality dimension. Same posture as Tetlock&rsquo;s CIA-analyst
+        baseline before the superforecaster cohort had cumulative outcomes. Per-org Brier replaces
+        it once a customer org has a closed outcome.&rdquo;
+      </div>
+      <div style={investorAnswerNote}>
+        Where it lives: technical README + /bias-genome page + DPR cover for orgs with no
+        outcomes yet. Where it does NOT live: cold-context moat sentences (LinkedIn DM, accelerator
+        application, conference 1:1 elevator). The other moat elements (R²F, 12-node pipeline, DPR,
+        regulatory map) are architectural claims; the Brier line is the only one that reads as a
+        performance claim and gets cross-examined hardest. In cold contexts, replace with
+        &ldquo;143-case reference-class corpus from primary sources&rdquo; &mdash; same factual
+        content, no performance claim that can be picked apart.
+      </div>
+
+      <div style={investorAnswerBlockHeader}>
+        Q: &ldquo;Have you used Cloverpop / Aera / Quantellia?&rdquo;
+      </div>
+      <div style={investorAnswerQuote}>
+        &ldquo;I&rsquo;ve studied their public documentation, product surfaces, and customer
+        case studies in depth. I haven&rsquo;t hands-on used them as a paying customer. The
+        differentiation claim is structured around what they describe publicly &mdash; logging vs.
+        auditing, single-judge vs. R²F, no validity-aware DQI shift, no cross-border regulatory
+        map &mdash; not against private knowledge of their internals.&rdquo;
+      </div>
+      <div style={investorAnswerNote}>
+        Why it works: honest about depth of competitive research, defensible because the
+        differentiation claim is bounded to public documentation rather than overclaimed
+        first-hand usage. Sophisticated readers respect a founder who knows the limits of their
+        own knowledge.
+      </div>
+
+      <div style={investorAnswerBlockHeader}>
+        Q: &ldquo;Three independent AI judges &mdash; aren&rsquo;t they correlated?&rdquo;
+      </div>
+      <div style={investorAnswerQuote}>
+        &ldquo;Decorrelated samples, not formally independent &mdash; the standard noise-audit
+        framing (Kahneman et al. 2021). Three frames, three different model architectures, plus
+        random-seed stochasticity. Different professional lenses on the same rubric: equity-research
+        skeptical, GC + Basel III ICAAP regulatory-hostile, Kahneman & Lovallo 2003 reference-class
+        contrarian. Their disagreement IS the noise signal.&rdquo;
+      </div>
+      <div style={investorAnswerNote}>
+        Why it works: precision in language. &ldquo;Independent&rdquo; is the wrong word
+        statistically (LLMs share training data); &ldquo;decorrelated samples&rdquo; is the right
+        one and tells the technical reader you&rsquo;ve thought about it. See the dedicated
+        3-Frame Noise Jury card below for the architecture detail.
+      </div>
+    </div>
+  );
+}
+
+// ─── 3-frame noise jury card (locked 2026-05-01) ───────────────────
+//
+// Mirrors the noise-jury 3-frame discipline lock in CLAUDE.md (the
+// 2026-05-01 ship that replaced 3-calls-of-the-same-prompt with three
+// professional lenses). Surfaces the architecture in one card so the
+// founder can describe the noise-audit IP on the road without consulting
+// notes.
+
+function renderNoiseJuryCard() {
+  return (
+    <div style={noiseJuryCardStyle}>
+      <div style={noiseJuryEyebrow}>
+        <Activity size={11} /> 3-frame noise jury · locked 2026-05-01
+      </div>
+      <div style={noiseJuryHeadline}>
+        Three orthogonal sources of variance: stochastic + architectural + framing.
+      </div>
+
+      <div style={noiseJuryFrameRow}>
+        <div style={noiseJuryFrameLabel}>Stochastic</div>
+        <div style={noiseJuryFrameBody}>
+          Random seed appended at call time. Catches sampling-level variance.
+        </div>
+      </div>
+      <div style={noiseJuryFrameRow}>
+        <div style={noiseJuryFrameLabel}>Architectural</div>
+        <div style={noiseJuryFrameBody}>
+          Two model families &mdash; <code>gemini-3-flash-preview</code> +{' '}
+          <code>gemini-3.1-flash-lite</code> (NOISE_JURY_MODELS env). Catches model-family bias.
+        </div>
+      </div>
+      <div style={noiseJuryFrameRow}>
+        <div style={noiseJuryFrameLabel}>Framing</div>
+        <div style={noiseJuryFrameBody}>
+          Three different professional lenses applying the same 0&ndash;100 rubric (this is what
+          the literature actually means by &ldquo;noise audit&rdquo;):
+        </div>
+      </div>
+
+      <div style={noiseJuryFramesGrid}>
+        <div style={noiseJuryFrameCard}>
+          <div style={noiseJuryFrameId}>analyst_skeptical</div>
+          <div style={noiseJuryFrameTitle}>Equity-research lens</div>
+          <div style={noiseJuryFrameDescription}>
+            Penalises unsupported quantitative claims, missing comparables, missing sensitivity
+            analysis, confidence in low-validity domains.
+          </div>
+        </div>
+        <div style={noiseJuryFrameCard}>
+          <div style={noiseJuryFrameId}>regulator_hostile</div>
+          <div style={noiseJuryFrameTitle}>GC + Basel III ICAAP lens</div>
+          <div style={noiseJuryFrameDescription}>
+            Penalises ambiguity in accountability, missing risk-factor disclosure, vague stewardship
+            language, unhedged forward-looking statements.
+          </div>
+        </div>
+        <div style={noiseJuryFrameCard}>
+          <div style={noiseJuryFrameId}>contrarian_strategist</div>
+          <div style={noiseJuryFrameTitle}>Kahneman &amp; Lovallo 2003 lens</div>
+          <div style={noiseJuryFrameDescription}>
+            Penalises narrative coherence without reference class, &ldquo;this case is
+            special&rdquo; framing, hostile comparables ignored, inside-view confidence without
+            outside-view bound.
+          </div>
+        </div>
+      </div>
+
+      <div style={noiseJuryInterpretation}>
+        <strong>Interpretation:</strong> low stdDev across 3 frames &rarr; robust quality (the
+        document survives multiple lenses). High stdDev &rarr; framing-sensitive quality &mdash;
+        the document survives one lens but collapses under another, which is itself the noise
+        signal: it tells the reviewer which audience will be harshest. Source: prompts.ts
+        <code>NOISE_JUDGE_FRAMES</code>; node:{' '}
+        <code>nodes.ts:noiseJudgeNode</code>; theory: Kahneman et al. 2021 &ldquo;Noise: A Flaw
+        in Human Judgment.&rdquo;
+      </div>
+    </div>
+  );
+}
+
 // ─── Styles ─────────────────────────────────────────────────────────
 
 const heroStyle: React.CSSProperties = {
@@ -527,6 +719,163 @@ const calibrationCta: React.CSSProperties = {
   borderRadius: 'var(--radius-sm)',
   color: 'rgb(79, 70, 229)',
   cursor: 'pointer',
+};
+
+// ─── Defensible investor-answer card styles ────────────────────────
+
+const investorAnswerCardStyle: React.CSSProperties = {
+  marginBottom: 14,
+  padding: 16,
+  background: 'var(--bg-card)',
+  border: '1px solid var(--border-color)',
+  borderLeft: '3px solid #D97706', // amber — read as "high-stakes recall"
+  borderRadius: 'var(--radius-md)',
+  fontSize: 12,
+  lineHeight: 1.55,
+  color: 'var(--text-primary)',
+};
+
+const investorAnswerEyebrow: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 6,
+  fontSize: 9,
+  fontWeight: 800,
+  textTransform: 'uppercase',
+  letterSpacing: '0.1em',
+  color: '#D97706',
+  marginBottom: 4,
+};
+
+const investorAnswerSubhead: React.CSSProperties = {
+  fontSize: 12,
+  color: 'var(--text-secondary)',
+  marginBottom: 14,
+  lineHeight: 1.5,
+};
+
+const investorAnswerBlockHeader: React.CSSProperties = {
+  fontSize: 12,
+  fontWeight: 700,
+  color: 'var(--text-primary)',
+  marginTop: 12,
+  marginBottom: 6,
+};
+
+const investorAnswerQuote: React.CSSProperties = {
+  fontSize: 12,
+  color: 'var(--text-primary)',
+  background: 'rgba(217, 119, 6, 0.04)',
+  border: '1px solid rgba(217, 119, 6, 0.18)',
+  padding: '10px 12px',
+  borderRadius: 'var(--radius-sm)',
+  fontStyle: 'italic',
+  lineHeight: 1.6,
+  marginBottom: 6,
+};
+
+const investorAnswerNote: React.CSSProperties = {
+  fontSize: 11,
+  color: 'var(--text-secondary)',
+  lineHeight: 1.55,
+  marginBottom: 4,
+};
+
+// ─── 3-frame noise jury card styles ────────────────────────────────
+
+const noiseJuryCardStyle: React.CSSProperties = {
+  marginBottom: 14,
+  padding: 16,
+  background: 'var(--bg-card)',
+  border: '1px solid var(--border-color)',
+  borderLeft: '3px solid #6366F1', // indigo — read as "technical IP"
+  borderRadius: 'var(--radius-md)',
+  fontSize: 12,
+  lineHeight: 1.55,
+  color: 'var(--text-primary)',
+};
+
+const noiseJuryEyebrow: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 6,
+  fontSize: 9,
+  fontWeight: 800,
+  textTransform: 'uppercase',
+  letterSpacing: '0.1em',
+  color: '#6366F1',
+  marginBottom: 4,
+};
+
+const noiseJuryHeadline: React.CSSProperties = {
+  fontSize: 13,
+  fontWeight: 700,
+  color: 'var(--text-primary)',
+  marginBottom: 10,
+};
+
+const noiseJuryFrameRow: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: '120px 1fr',
+  gap: 12,
+  fontSize: 12,
+  lineHeight: 1.5,
+  marginBottom: 4,
+};
+
+const noiseJuryFrameLabel: React.CSSProperties = {
+  fontWeight: 700,
+  color: '#6366F1',
+};
+
+const noiseJuryFrameBody: React.CSSProperties = {
+  color: 'var(--text-secondary)',
+};
+
+const noiseJuryFramesGrid: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+  gap: 10,
+  marginTop: 12,
+  marginBottom: 12,
+};
+
+const noiseJuryFrameCard: React.CSSProperties = {
+  padding: 10,
+  background: 'rgba(99, 102, 241, 0.04)',
+  border: '1px solid rgba(99, 102, 241, 0.18)',
+  borderRadius: 'var(--radius-sm)',
+};
+
+const noiseJuryFrameId: React.CSSProperties = {
+  fontFamily:
+    'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+  fontSize: 11,
+  color: '#6366F1',
+  marginBottom: 4,
+};
+
+const noiseJuryFrameTitle: React.CSSProperties = {
+  fontSize: 12,
+  fontWeight: 700,
+  color: 'var(--text-primary)',
+  marginBottom: 4,
+};
+
+const noiseJuryFrameDescription: React.CSSProperties = {
+  fontSize: 11.5,
+  color: 'var(--text-secondary)',
+  lineHeight: 1.5,
+};
+
+const noiseJuryInterpretation: React.CSSProperties = {
+  fontSize: 11.5,
+  color: 'var(--text-secondary)',
+  lineHeight: 1.6,
+  padding: 10,
+  background: 'var(--bg-secondary)',
+  border: '1px solid var(--border-color)',
+  borderRadius: 'var(--radius-sm)',
 };
 
 const quickJumpsWrap: React.CSSProperties = {
