@@ -27,7 +27,9 @@ import { useToast } from '@/components/ui/EnhancedToast';
 import { SSEReader } from '@/lib/sse';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClientLogger } from '@/lib/utils/logger';
-import { formatDate } from '@/lib/constants/human-audit';
+import { formatDate, SEVERITY_COLORS } from '@/lib/constants/human-audit';
+import { dqiColorFor, gradeFromScore } from '@/lib/utils/grade';
+import { MetricTile, MetricTileGrid } from '@/components/ui/MetricTile';
 import { formatBiasName } from '@/lib/utils/labels';
 import { computeConviction } from '@/lib/scoring/conviction';
 import { computeDQChain } from '@/lib/scoring/dq-chain';
@@ -2736,150 +2738,70 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           {/* Toxic Combination Alert Banner */}
           {toxicCombinations.length > 0 && <ToxicAlertBanner combinations={toxicCombinations} />}
 
-          {/* Key Findings Summary Bar */}
+          {/* Key Findings Summary Bar — 4 metric tiles using the canonical
+              MetricTile component (DESIGN.md §104). 2026-05-01: replaced
+              138 lines of inline duplicated tile JSX + hardcoded hex
+              severity with the canonical pattern. */}
           {analysis && (
             <div
-              className="grid grid-cols-2 md:grid-cols-4 gap-lg mb-xl"
               style={{ marginTop: toxicCombinations.length > 0 ? 0 : 'var(--spacing-md)' }}
+              className="mb-xl"
             >
-              <div className="card" style={{ padding: '20px 24px', borderRadius: 12 }}>
-                <div
-                  style={{
-                    fontSize: '10px',
-                    fontWeight: 600,
-                    color: 'var(--text-muted)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                  }}
-                >
-                  Decision Quality
-                </div>
-                <div
-                  style={{
-                    fontSize: '24px',
-                    fontWeight: 700,
-                    fontFamily: "'JetBrains Mono', monospace",
-                    color:
-                      analysis.overallScore >= 70
-                        ? '#34d399'
-                        : analysis.overallScore >= 40
-                          ? '#fbbf24'
-                          : '#f87171',
-                  }}
-                >
-                  {Math.round(analysis.overallScore)}
-                  <span style={{ fontSize: '12px', fontWeight: 400, color: 'var(--text-muted)' }}>
-                    /100
-                  </span>
-                </div>
-              </div>
-
-              <div className="card" style={{ padding: '20px 24px', borderRadius: 12 }}>
-                <div
-                  style={{
-                    fontSize: '10px',
-                    fontWeight: 600,
-                    color: 'var(--text-muted)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                  }}
-                >
-                  Biases Found
-                </div>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                  <span
-                    style={{
-                      fontSize: '24px',
-                      fontWeight: 700,
-                      fontFamily: "'JetBrains Mono', monospace",
-                      color:
-                        biases.length === 0
-                          ? '#34d399'
-                          : biases.length <= 3
-                            ? '#fbbf24'
-                            : '#f87171',
-                    }}
-                  >
-                    {biases.length}
-                  </span>
-                  {biases.length > 0 && (
-                    <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                      {biases.filter(b => b.severity === 'high' || b.severity === 'critical')
-                        .length > 0
+              <MetricTileGrid>
+                <MetricTile
+                  label="Decision Quality"
+                  value={Math.round(analysis.overallScore)}
+                  suffix={`/100 · ${gradeFromScore(analysis.overallScore)}`}
+                  valueColor={dqiColorFor(analysis.overallScore)}
+                />
+                <MetricTile
+                  label="Biases Found"
+                  value={biases.length}
+                  valueColor={
+                    biases.length === 0
+                      ? SEVERITY_COLORS.low
+                      : biases.length <= 3
+                        ? SEVERITY_COLORS.medium
+                        : SEVERITY_COLORS.high
+                  }
+                  subline={
+                    biases.length > 0
+                      ? biases.filter(b => b.severity === 'high' || b.severity === 'critical')
+                          .length > 0
                         ? `${biases.filter(b => b.severity === 'high' || b.severity === 'critical').length} high severity`
-                        : 'low-medium severity'}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div className="card" style={{ padding: '20px 24px', borderRadius: 12 }}>
-                <div
-                  style={{
-                    fontSize: '10px',
-                    fontWeight: 600,
-                    color: 'var(--text-muted)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                  }}
-                >
-                  Noise Score
-                </div>
-                <div
-                  style={{
-                    fontSize: '24px',
-                    fontWeight: 700,
-                    fontFamily: "'JetBrains Mono', monospace",
-                    color:
-                      analysis.noiseScore <= 30
-                        ? '#34d399'
-                        : analysis.noiseScore <= 60
-                          ? '#fbbf24'
-                          : '#f87171',
-                  }}
-                >
-                  {Math.round(analysis.noiseScore)}
-                  <span style={{ fontSize: '12px', fontWeight: 400, color: 'var(--text-muted)' }}>
-                    /100
-                  </span>
-                </div>
-              </div>
-
-              <div className="card" style={{ padding: '20px 24px', borderRadius: 12 }}>
-                <div
-                  style={{
-                    fontSize: '10px',
-                    fontWeight: 600,
-                    color: 'var(--text-muted)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                  }}
-                >
-                  Risk Alerts
-                </div>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                  <span
-                    style={{
-                      fontSize: '24px',
-                      fontWeight: 700,
-                      fontFamily: "'JetBrains Mono', monospace",
-                      color:
-                        toxicCombinations.length === 0
-                          ? '#34d399'
-                          : toxicCombinations.length <= 2
-                            ? '#fbbf24'
-                            : '#f87171',
-                    }}
-                  >
-                    {toxicCombinations.length}
-                  </span>
-                  {toxicCombinations.length > 0 && (
-                    <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                      toxic combination{toxicCombinations.length !== 1 ? 's' : ''}
-                    </span>
-                  )}
-                </div>
-              </div>
+                        : 'low-medium severity'
+                      : null
+                  }
+                />
+                <MetricTile
+                  label="Noise Score"
+                  value={Math.round(analysis.noiseScore)}
+                  suffix="/100"
+                  valueColor={
+                    analysis.noiseScore <= 30
+                      ? SEVERITY_COLORS.low
+                      : analysis.noiseScore <= 60
+                        ? SEVERITY_COLORS.medium
+                        : SEVERITY_COLORS.high
+                  }
+                />
+                <MetricTile
+                  label="Risk Alerts"
+                  value={toxicCombinations.length}
+                  valueColor={
+                    toxicCombinations.length === 0
+                      ? SEVERITY_COLORS.low
+                      : toxicCombinations.length <= 2
+                        ? SEVERITY_COLORS.medium
+                        : SEVERITY_COLORS.high
+                  }
+                  subline={
+                    toxicCombinations.length > 0
+                      ? `toxic combination${toxicCombinations.length !== 1 ? 's' : ''}`
+                      : null
+                  }
+                />
+              </MetricTileGrid>
             </div>
           )}
 

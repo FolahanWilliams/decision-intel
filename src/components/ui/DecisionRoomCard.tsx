@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Users, Lock, Unlock, CheckCircle, Loader2, Target, Eye, EyeOff, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { InlineEmptyRow } from '@/components/ui/InlineEmptyRow';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -93,6 +94,23 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
     );
   }
   if (loading) return null;
+
+  // 2026-05-01 (DESIGN.md §115): when the room list is empty AND the user
+  // hasn't opened the create form, collapse to a single inline row instead
+  // of rendering a 150px-tall framed card with paragraph copy. Saves
+  // above-fold real estate on every fresh document.
+  if (rooms.length === 0 && !showCreate) {
+    return (
+      <InlineEmptyRow
+        icon={Users}
+        headline="Decision Rooms"
+        body="Collect blind independent priors from your team."
+        ctaLabel="New Room"
+        ctaIcon={Plus}
+        onCtaClick={() => setShowCreate(true)}
+      />
+    );
+  }
 
   return (
     <div
