@@ -28,6 +28,10 @@ import { createClientLogger } from '@/lib/utils/logger';
 import { formatDate } from '@/lib/constants/human-audit';
 import { VerdictBand } from '@/components/ui/VerdictBand';
 import { DecisionBriefView } from '@/components/documents/DecisionBriefView';
+import { DiscoveryHookView } from '@/components/documents/DiscoveryHookView';
+import { RehearsalView } from '@/components/documents/RehearsalView';
+import { DocumentViewStateSwitcher } from '@/components/documents/DocumentViewStateSwitcher';
+import { useDocumentViewState } from '@/hooks/useDocumentViewState';
 import { DetailTabBar } from '@/components/ui/DetailTabBar';
 import { RemediationChecklist } from '@/components/analysis/RemediationChecklist';
 import { PaperApplicationsCard } from '@/components/analysis/PaperApplicationsCard';
@@ -1082,6 +1086,16 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
   const biases = useMemo(() => analysis?.biases || [], [analysis]);
   const selectedBiasIndex = selectedBias ? biases.findIndex(b => b.id === selectedBias.id) : -1;
 
+  // Document view state machine (locked 2026-05-01 from NotebookLM Q5).
+  // Auto-detects discovery / rehearsal / provenance / analyst from
+  // visit_count + outcomeStatus + URL ?mode= override. Discovery is the
+  // default for fresh uploads; analyst is the power-user escape hatch.
+  const docViewState = useDocumentViewState({
+    documentId: resolvedParams.id,
+    outcomeStatus: (analysis as unknown as { outcomeStatus?: string })?.outcomeStatus ?? null,
+    hasAnalysis: !!analysis,
+  });
+
   // Listen for command-palette-triggered board report export
   useEffect(() => {
     const handler = () => {
@@ -1605,17 +1619,71 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             for verdict + remediation + R²F signals only. */}
       </header>
 
-      {/* DecisionBriefView — McKinsey-grade post-audit deliverable.
-          Locked 2026-05-01 from NotebookLM master-KB synthesis Q1-Q4.
-          Renders for cso / ic / board view modes (the procurement-grade
-          buyer experience). Analyst mode keeps the existing dashboard
-          for power-users who want every panel.
-          The brief intentionally HIDES: tabs, R²F SignalBlocks,
-          structural assumptions, cross-references, RPD pre-mortems,
-          decision rooms, phase scrub, 4-tile metric grid. Those live
-          in the analyst dashboard one click away. */}
-      {analysis && viewMode !== 'analyst' && (
-        <ErrorBoundary sectionName="Decision Brief">
+      {/* 4-state view machine (locked 2026-05-01 from NotebookLM Q5).
+          User intent shifts based on where they are in the decision lifecycle.
+          A static page was wrong because it forced one intent onto every
+          visit. Auto-detected from visit_count + outcomeStatus + URL ?mode=.
+            - Discovery   = fresh upload, "did I mess up?"
+            - Rehearsal   = returning visit, "what will the room ask?"
+            - Provenance  = outcome logged, "prove rigor to GC / board"
+            - Analyst     = the existing dense dashboard (power-user escape) */}
+      {analysis && (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            marginBottom: 'var(--spacing-md)',
+          }}
+        >
+          <DocumentViewStateSwitcher
+            state={docViewState.state}
+            onChange={next => {
+              docViewState.setState(next);
+              if (next === 'analyst') setViewMode('analyst');
+              else if (viewMode === 'analyst') setViewMode('cso');
+            }}
+          />
+        </div>
+      )}
+
+      {analysis && docViewState.state === 'discovery' && (
+        <ErrorBoundary sectionName="Discovery Hook">
+          <DiscoveryHookView
+            filename={document.filename}
+            documentType={document.documentType ?? null}
+            analysis={
+              analysis as unknown as Parameters<typeof DiscoveryHookView>[0]['analysis']
+            }
+            biases={biases}
+            onExportDpr={() => {
+              void handleProvenanceRecordExport();
+            }}
+            onUnlock={() => setShowShareModal(true)}
+            onEnterRehearsal={() => docViewState.setState('rehearsal')}
+          />
+        </ErrorBoundary>
+      )}
+
+      {analysis && docViewState.state === 'rehearsal' && (
+        <ErrorBoundary sectionName="Rehearsal">
+          <RehearsalView
+            filename={document.filename}
+            documentType={document.documentType ?? null}
+            analysis={
+              analysis as unknown as Parameters<typeof RehearsalView>[0]['analysis']
+            }
+            biases={biases}
+            onEnterDiscovery={() => docViewState.setState('discovery')}
+            onEnterProvenance={() => docViewState.setState('provenance')}
+            onExportDpr={() => {
+              void handleProvenanceRecordExport();
+            }}
+          />
+        </ErrorBoundary>
+      )}
+
+      {analysis && docViewState.state === 'provenance' && (
+        <ErrorBoundary sectionName="Provenance">
           <DecisionBriefView
             filename={document.filename}
             documentType={document.documentType ?? null}
@@ -1627,7 +1695,10 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               void handleProvenanceRecordExport();
             }}
             onShareExport={() => setShowShareModal(true)}
-            onOpenDeepDive={() => setViewMode('analyst')}
+            onOpenDeepDive={() => {
+              docViewState.setState('analyst');
+              setViewMode('analyst');
+            }}
           />
         </ErrorBoundary>
       )}
