@@ -15,6 +15,7 @@
  * for callers that need to know which mode resolved access.
  */
 
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 
 export interface DocumentAccessFilter {
@@ -26,8 +27,14 @@ export interface DocumentAccessFilter {
    * Use as a top-level filter on Document queries (list, count) OR as a
    * nested filter under `analysis.document: { ... }`, `share.analysis.document`,
    * etc. — the shape is the same.
+   *
+   * Typed as `Prisma.DocumentWhereInput` so any field-shape mismatch (e.g.
+   * `visibility: null` against the non-null `String` schema column) is a
+   * compile error, not a runtime PrismaClientValidationError. This is the
+   * compile-time gate that would have caught the 2026-05-01 visibility:null
+   * bug before it shipped.
    */
-  where: Record<string, unknown>;
+  where: Prisma.DocumentWhereInput;
   membershipOrgId: string | null;
   grantedDocumentIds: string[];
 }
@@ -73,7 +80,9 @@ export async function buildDocumentAccessFilter(userId: string): Promise<Documen
   // rejects `visibility: null` filters with "Argument visibility is missing"
   // — broke every Document list/detail read. The pre-3.5 nullable-column
   // window the original null clauses guarded for is long closed.
-  const orClauses: Array<Record<string, unknown>> = [
+  // Typed as Prisma.DocumentWhereInput[] so the compiler catches any future
+  // schema-drift on these clauses at edit time, not at user-traffic time.
+  const orClauses: Prisma.DocumentWhereInput[] = [
     // Owner — always wins, every concrete visibility mode included so
     // private docs remain visible to their own creator.
     { userId, visibility: 'private' },

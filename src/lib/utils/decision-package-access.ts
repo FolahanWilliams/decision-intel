@@ -18,11 +18,19 @@
  * the use case actually surfaces.)
  */
 
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 
 export interface DecisionPackageAccessFilter {
-  /** Prisma `where` for DecisionPackage findMany / findFirst. */
-  where: Record<string, unknown>;
+  /**
+   * Prisma `where` for DecisionPackage findMany / findFirst.
+   *
+   * Typed as `Prisma.DecisionPackageWhereInput` so any field-shape mismatch
+   * (e.g. `visibility: null` against the non-null `String` schema column)
+   * is a compile error, not a runtime PrismaClientValidationError. Mirrors
+   * the document-access.ts compile-time guard added 2026-05-01.
+   */
+  where: Prisma.DecisionPackageWhereInput;
   /** The user's org membership at the time of the call. */
   membershipOrgId: string | null;
 }
@@ -41,7 +49,7 @@ export async function buildPackageAccessFilter(
     // Schema drift — fall back to ownership-only.
   }
 
-  const orClauses: Array<Record<string, unknown>> = [
+  const orClauses: Prisma.DecisionPackageWhereInput[] = [
     // Owner always wins, every visibility mode included.
     { ownerUserId: userId },
   ];
