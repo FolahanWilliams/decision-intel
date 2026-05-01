@@ -180,8 +180,15 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       isOwner,
     });
   } catch (error) {
-    log.error('Error fetching document:', error);
-    return NextResponse.json({ error: 'Failed to fetch document' }, { status: 500 });
+    const code = (error as { code?: string }).code ?? 'unknown';
+    const msg = error instanceof Error ? error.message : String(error);
+    log.error(`Error fetching document [code=${code}]: ${msg}`);
+    return NextResponse.json(
+      {
+        error: `Could not load document. ${code !== 'unknown' ? `(${code}) ` : ''}${msg.slice(0, 240)}`,
+      },
+      { status: 500 }
+    );
   }
 }
 
