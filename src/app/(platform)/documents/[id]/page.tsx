@@ -27,9 +27,8 @@ import { useToast } from '@/components/ui/EnhancedToast';
 import { SSEReader } from '@/lib/sse';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClientLogger } from '@/lib/utils/logger';
-import { formatDate, SEVERITY_COLORS } from '@/lib/constants/human-audit';
-import { dqiColorFor, gradeFromScore } from '@/lib/utils/grade';
-import { MetricTile, MetricTileGrid } from '@/components/ui/MetricTile';
+import { formatDate } from '@/lib/constants/human-audit';
+import { VerdictBand } from '@/components/ui/VerdictBand';
 import { formatBiasName } from '@/lib/utils/labels';
 import { computeConviction } from '@/lib/scoring/conviction';
 import { computeDQChain } from '@/lib/scoring/dq-chain';
@@ -53,7 +52,6 @@ import { ScoringBreakdown } from '@/components/visualizations/ScoringBreakdown';
 import { RelatedDecisions } from '@/components/ui/RelatedDecisions';
 import { DecisionScorecard } from '@/components/analysis/DecisionScorecard';
 import { R2FDecompositionCard } from '@/components/documents/R2FDecompositionCard';
-import { R2FBadge } from '@/components/ui/R2FBadge';
 import { ReferenceClassChip } from '@/components/documents/ReferenceClassChip';
 import { ReportOutcomeFab } from '@/components/documents/ReportOutcomeFab';
 import {
@@ -1291,7 +1289,13 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         label: 'Deep Analysis',
         tabs: [
           { id: 'evidence', label: 'Evidence', icon: CheckCircle },
-          { id: 'swot', label: 'SWOT', icon: Lightbulb },
+          // SWOT tab dropped 2026-05-01 per persona-validated layout direction
+          // (DESIGN.md "Persona-validated layout"). Adaeze killed it explicitly:
+          // "SWOT on a $42M cross-border rollup is McKinsey-2003." The SWOT
+          // analysis data on the Analysis row stays — it's still computed by
+          // the pipeline — but the dedicated tab is removed. SwotMatrix lives
+          // inside the Evidence tab as a collapsible sub-section now (handled
+          // in OverviewTab/EvidenceTab routing further down).
           { id: 'noise', label: 'Noise', icon: Info },
           { id: 'dq-chain', label: 'DQ Chain', icon: Link2 },
         ],
@@ -1344,7 +1348,36 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         ]}
       />
 
-      {/* Header */}
+      {/* VerdictBand — DESIGN.md persona-validated layout (locked 2026-05-01).
+          The single first-impression hero card carrying memo title + DQI grade
+          + status pill + cross-doc conflicts + DPR export CTA. Replaces the
+          four-tile metric grid below the toxic alert banner; the chip row in
+          the header is trimmed below to non-verdict signals only. */}
+      <div style={{ marginBottom: 'var(--spacing-md)' }}>
+        <VerdictBand
+          title={document.filename}
+          dqiScore={analysis?.overallScore ?? null}
+          isPending={document.status === 'analyzing'}
+          methodologyVersion="v2.1.0"
+          auditLogHref={`/dashboard/admin/audit-log?resourceId=${document.id}`}
+          primaryAction={
+            analysis
+              ? {
+                  label: 'Share & Export',
+                  onClick: () => setShowShareModal(true),
+                  icon: Share2,
+                }
+              : undefined
+          }
+          badges={document.isSample ? <SampleBadge /> : undefined}
+        />
+      </div>
+
+      {/* Header — secondary chrome only (DESIGN.md persona-validated layout
+          locked 2026-05-01). The H1 + verdict status pill + R2FBadge that
+          used to live here moved to VerdictBand above. What remains: the
+          metadata chip row (visibility, legal hold, overdue-outcome nudge)
+          and the action button cluster on the right. */}
       <header style={{ marginBottom: 'var(--spacing-lg)' }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-md">
@@ -1352,59 +1385,21 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               <ArrowLeft size={20} />
             </Link>
             <div style={{ minWidth: 0 }}>
-              <h1
-                style={{
-                  /* Shared platform page-H1 token so this page feels
-                     continuous with /dashboard, /projects, etc. rather
-                     than reading as smaller/lighter. Token definition
-                     lives in globals.css → --fs-page-h1-platform
-                     (28-40px clamp). */
-                  fontSize: 'var(--fs-page-h1-platform)',
-                  fontWeight: 800,
-                  letterSpacing: '-0.03em',
-                  lineHeight: 1.15,
-                  color: 'var(--text-primary)',
-                  margin: 0,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  flexWrap: 'wrap',
-                }}
-              >
-                {document.filename}
-                {document.isSample && <SampleBadge />}
-              </h1>
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: 12,
-                  marginTop: 6,
                   flexWrap: 'wrap',
                 }}
               >
                 <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
                   {formatDate(document.uploadedAt)} • {(document.fileSize / 1024).toFixed(1)} KB
                 </span>
-                {document.status === 'complete' && (
-                  <span
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 4,
-                      fontSize: 11,
-                      fontWeight: 600,
-                      color: 'var(--success)',
-                      padding: '2px 8px',
-                      borderRadius: 999,
-                      background: 'rgba(22,163,74,0.1)',
-                      border: '1px solid rgba(22,163,74,0.25)',
-                    }}
-                  >
-                    <CheckCircle size={11} /> Analyzed
-                  </span>
-                )}
-                {analysis && <R2FBadge size="xs" compact />}
+                {/* "Analyzed" verdict pill + R2FBadge removed 2026-05-01:
+                    persona-validated VerdictBand above carries both signals
+                    via its status pill + DQI grade. Keep only the document-
+                    level chrome (visibility / legal hold / overdue) below. */}
                 {visibilityState && (
                   <DocumentVisibilityPill
                     visibility={visibilityState}
@@ -2738,72 +2733,14 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           {/* Toxic Combination Alert Banner */}
           {toxicCombinations.length > 0 && <ToxicAlertBanner combinations={toxicCombinations} />}
 
-          {/* Key Findings Summary Bar — 4 metric tiles using the canonical
-              MetricTile component (DESIGN.md §104). 2026-05-01: replaced
-              138 lines of inline duplicated tile JSX + hardcoded hex
-              severity with the canonical pattern. */}
-          {analysis && (
-            <div
-              style={{ marginTop: toxicCombinations.length > 0 ? 0 : 'var(--spacing-md)' }}
-              className="mb-xl"
-            >
-              <MetricTileGrid>
-                <MetricTile
-                  label="Decision Quality"
-                  value={Math.round(analysis.overallScore)}
-                  suffix={`/100 · ${gradeFromScore(analysis.overallScore)}`}
-                  valueColor={dqiColorFor(analysis.overallScore)}
-                />
-                <MetricTile
-                  label="Biases Found"
-                  value={biases.length}
-                  valueColor={
-                    biases.length === 0
-                      ? SEVERITY_COLORS.low
-                      : biases.length <= 3
-                        ? SEVERITY_COLORS.medium
-                        : SEVERITY_COLORS.high
-                  }
-                  subline={
-                    biases.length > 0
-                      ? biases.filter(b => b.severity === 'high' || b.severity === 'critical')
-                          .length > 0
-                        ? `${biases.filter(b => b.severity === 'high' || b.severity === 'critical').length} high severity`
-                        : 'low-medium severity'
-                      : null
-                  }
-                />
-                <MetricTile
-                  label="Noise Score"
-                  value={Math.round(analysis.noiseScore)}
-                  suffix="/100"
-                  valueColor={
-                    analysis.noiseScore <= 30
-                      ? SEVERITY_COLORS.low
-                      : analysis.noiseScore <= 60
-                        ? SEVERITY_COLORS.medium
-                        : SEVERITY_COLORS.high
-                  }
-                />
-                <MetricTile
-                  label="Risk Alerts"
-                  value={toxicCombinations.length}
-                  valueColor={
-                    toxicCombinations.length === 0
-                      ? SEVERITY_COLORS.low
-                      : toxicCombinations.length <= 2
-                        ? SEVERITY_COLORS.medium
-                        : SEVERITY_COLORS.high
-                  }
-                  subline={
-                    toxicCombinations.length > 0
-                      ? `toxic combination${toxicCombinations.length !== 1 ? 's' : ''}`
-                      : null
-                  }
-                />
-              </MetricTileGrid>
-            </div>
-          )}
+          {/* Key Findings Summary Bar removed 2026-05-01: the four-tile
+              metric grid (DQI / Biases / Noise / Risk Alerts) was the
+              single most-flagged "noise above the fold" section by all
+              four buyer personas. VerdictBand at the top of the page now
+              carries DQI + grade + status; bias count + noise score live
+              inside the tab content + right rail; risk alerts surface
+              via the ToxicAlertBanner directly above. See DESIGN.md
+              "Persona-validated layout direction (locked 2026-05-01)". */}
 
           {/* Tabs + Content */}
           <div
