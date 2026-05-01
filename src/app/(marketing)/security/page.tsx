@@ -444,7 +444,7 @@ const VENDOR_CONTINUITY = [
   {
     label: 'Incorporation roadmap',
     value: 'UK Ltd · Q3 2026',
-    body: 'Decision Intel operates pre-incorporation through 2026-Q2 per Mr. Gabe (Megasuto) advice. Decision Intel defers entity registration until first 1-2 pilot revenues fund the cost. UK Ltd incorporation calendared for Q3 2026 at the latest, immediately after the 5-paid-Individual graduation rule fires. Incorporation status confirmed in writing on every pilot agreement.',
+    body: 'Decision Intel operates pre-incorporation through 2026-Q2 by deliberate design — entity registration is deferred until first 1-2 pilot revenues fund the cost. UK Ltd incorporation calendared for Q3 2026 at the latest, immediately after the 5-paid-Individual graduation rule fires. Incorporation status confirmed in writing on every pilot agreement.',
   },
   {
     label: 'Service-continuity insurance',
@@ -482,7 +482,7 @@ const TRIAL_DATA_HANDLING = [
   {
     label: 'Standard NDA template',
     value: 'Mutual · 7-day default',
-    body: 'A standard mutual NDA template covering the 20-minute audit conversation is available at /docs/nda-template.pdf. Default term: 7 days from signature, extending to the active subscription term once a paid tier is signed. Sankore-class design-partner pilots use a separate Master Services Agreement with longer confidentiality terms.',
+    body: 'A standard mutual NDA template covering the 20-minute audit conversation is available at /docs/nda-template.pdf. Default term: 7 days from signature, extending to the active subscription term once a paid tier is signed. Design-partner pilots in our founding cohort use a separate Master Services Agreement with longer confidentiality terms.',
   },
   {
     label: 'No model training on customer data',

@@ -24,7 +24,17 @@
 
 import Link from 'next/link';
 import { useReducedMotion, motion } from 'framer-motion';
-import { ArrowLeft, LayoutDashboard, Network, FileText, Compass } from 'lucide-react';
+import {
+  ArrowLeft,
+  Home,
+  BookOpen,
+  Shield,
+  Tag,
+  LayoutDashboard,
+  Network,
+  ClipboardList,
+  FileText,
+} from 'lucide-react';
 
 interface DecisionBranch {
   id: string;
@@ -36,7 +46,34 @@ interface DecisionBranch {
   Icon: typeof LayoutDashboard;
 }
 
-const LIVE_BRANCHES: DecisionBranch[] = [
+/**
+ * Branch sets are split by context to prevent leaking founder-only or
+ * admin routes onto public-internet 404 surfaces.
+ *
+ * PUBLIC_BRANCHES: rendered when the 404 fires on a root URL (an
+ * unauthenticated visitor hits a non-existent path). Only links to
+ * surfaces that are already visible on the marketing nav.
+ *
+ * PLATFORM_BRANCHES: rendered when the 404 fires inside the auth-gated
+ * platform shell. Lists only the daily-verb tabs (dashboard / graph /
+ * decision log / new audit). Founder-only and admin surfaces are NEVER
+ * advertised on either 404 set; users who know about them navigate
+ * directly.
+ */
+const PUBLIC_BRANCHES: DecisionBranch[] = [
+  { id: 'home', href: '/', label: 'Home', angle: 220, Icon: Home },
+  {
+    id: 'how-it-works',
+    href: '/how-it-works',
+    label: 'How it works',
+    angle: 270,
+    Icon: BookOpen,
+  },
+  { id: 'security', href: '/security', label: 'Security', angle: 320, Icon: Shield },
+  { id: 'pricing', href: '/pricing', label: 'Pricing', angle: 90, Icon: Tag },
+];
+
+const PLATFORM_BRANCHES: DecisionBranch[] = [
   {
     id: 'dashboard',
     href: '/dashboard',
@@ -52,18 +89,18 @@ const LIVE_BRANCHES: DecisionBranch[] = [
     Icon: Network,
   },
   {
-    id: 'documents',
-    href: '/dashboard',
-    label: 'Documents',
+    id: 'decision-log',
+    href: '/dashboard/decision-log',
+    label: 'Decision Log',
     angle: 320,
-    Icon: FileText,
+    Icon: ClipboardList,
   },
   {
-    id: 'founder-hub',
-    href: '/dashboard/founder-hub',
-    label: 'Founder Hub',
+    id: 'cognitive-audit',
+    href: '/dashboard/cognitive-audits/submit',
+    label: 'New audit',
     angle: 90,
-    Icon: Compass,
+    Icon: FileText,
   },
 ];
 
@@ -82,14 +119,20 @@ function polarToXY(angleDeg: number, length: number): { x: number; y: number } {
 }
 
 interface NotFoundContentProps {
-  /** When `true`, wraps in fixed full-screen overlay (root not-found). When `false`,
-   *  sits inside the platform shell as a flex-1 region (platform not-found). */
+  /** When `true`, wraps in fixed full-screen overlay (root not-found, public).
+   *  When `false`, sits inside the platform shell as a flex-1 region
+   *  (platform not-found, auth-gated). */
   fullPage?: boolean;
 }
 
 export function NotFoundContent({ fullPage = false }: NotFoundContentProps) {
   const reduceMotion = useReducedMotion();
   const deadEnd = polarToXY(DEAD_END_ANGLE, BRANCH_LENGTH);
+  // Public 404 (root) gets the marketing branch set; platform 404 gets the
+  // daily-verb tabs. Neither set advertises confidential routes.
+  const liveBranches = fullPage ? PUBLIC_BRANCHES : PLATFORM_BRANCHES;
+  const backLinkHref = fullPage ? '/' : '/dashboard';
+  const backLinkLabel = fullPage ? 'Back to home' : 'Back to dashboard';
 
   const containerStyle: React.CSSProperties = fullPage
     ? {
@@ -141,7 +184,7 @@ export function NotFoundContent({ fullPage = false }: NotFoundContentProps) {
             <circle cx={CENTER.x} cy={CENTER.y} r="42" fill="url(#not-found-core)" />
 
             {/* Live branches — four green lines + terminal labels (clickable as Link below) */}
-            {LIVE_BRANCHES.map((branch, i) => {
+            {liveBranches.map((branch, i) => {
               const end = polarToXY(branch.angle, BRANCH_LENGTH);
               return (
                 <motion.g
@@ -296,7 +339,7 @@ export function NotFoundContent({ fullPage = false }: NotFoundContentProps) {
             marginBottom: 24,
           }}
         >
-          {LIVE_BRANCHES.map(({ id, href, label, Icon }) => (
+          {liveBranches.map(({ id, href, label, Icon }) => (
             <Link
               key={id}
               href={href}
@@ -341,7 +384,7 @@ export function NotFoundContent({ fullPage = false }: NotFoundContentProps) {
         {/* Quiet back link */}
         <div style={{ textAlign: 'center' }}>
           <Link
-            href="/dashboard"
+            href={backLinkHref}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -355,7 +398,7 @@ export function NotFoundContent({ fullPage = false }: NotFoundContentProps) {
             className="not-found-back-link"
           >
             <ArrowLeft size={13} />
-            Back to dashboard
+            {backLinkLabel}
           </Link>
         </div>
 
