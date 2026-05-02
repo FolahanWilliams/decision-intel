@@ -30,6 +30,7 @@ import { VerdictBand } from '@/components/ui/VerdictBand';
 import { DecisionBriefView } from '@/components/documents/DecisionBriefView';
 import { DiscoveryHookView } from '@/components/documents/DiscoveryHookView';
 import { RehearsalView } from '@/components/documents/RehearsalView';
+import { DocumentTrustFooter } from '@/components/documents/DocumentTrustFooter';
 import { DocumentViewStateSwitcher } from '@/components/documents/DocumentViewStateSwitcher';
 import { useDocumentViewState } from '@/hooks/useDocumentViewState';
 import { DetailTabBar } from '@/components/ui/DetailTabBar';
@@ -1618,6 +1619,19 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             sidebar (Reflect cluster). Above-fold real estate now reserved
             for verdict + remediation + R²F signals only. */}
       </header>
+
+      {/* DocumentTrustFooter — James-class procurement-grade signal
+          (locked 2026-05-02). Sub-processor list (SOC2_RECEIPTS) +
+          retention countdown (Document.uploadedAt + plan.retentionDays)
+          + indemnification anchor. F500 vendor-risk reviewers open
+          intake calls with these three questions; surfacing them in
+          the doc-detail header (vs. buried on /security) is the
+          difference between "passed procurement gate" and "GC asks
+          a follow-up call." Per persona-audit J-2 + J-3 consolidated
+          ship: one trust footer + matching Enterprise quote PDF
+          appendix lifts INDEMNIFICATION_* + SOC2_RECEIPTS to where
+          the buyer reads them at decision time. */}
+      <DocumentTrustFooter uploadedAt={document.uploadedAt} />
 
       {/* 4-state view machine (locked 2026-05-01 from NotebookLM Q5).
           User intent shifts based on where they are in the decision lifecycle.

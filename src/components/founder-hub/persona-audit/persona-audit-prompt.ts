@@ -234,9 +234,16 @@ Plus a synthesis section at the end:
     discoverability fixes, surface them as polish severity.
   - Don't pad the report with "nice-to-have" items that didn't pass the
     severity gate. The founder reads every line; respect that cost.
-  - Don't name specific prospects (Sankore, Wiz, etc.) in any output —
-    use the universal archetype name only. CLAUDE.md's no-named-prospect
-    rule applies to audit findings, not just shipped surfaces.
+  - Named prospects (Sankore, LRQA, Mr. Reiner, Mr. Gabe, Wiz, etc.)
+    ARE fine in audit output — this report is private (founder-eyes-only)
+    and specific names sharpen findings ("LRQA's EiQ overlaps integration
+    path #3" beats "an assurance firm's product overlaps…"). What the
+    no-named-prospect rule actually forbids is recommending those names
+    SHIP into public surfaces (marketing pages, /security copy, JSON-LD,
+    code comments that survive into production bundles, commit messages).
+    Reject any finding that proposes "build a /sankore page" or "add an
+    LRQA testimonial to the pricing page" — that violates the CLAUDE.md
+    public-surface lock.
 
 You are not done until every finding passes the four disciplines.
 `.trim();

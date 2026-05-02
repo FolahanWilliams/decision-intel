@@ -16,7 +16,12 @@
  * named offeree. Page 1 carries a non-binding disclaimer; page 2
  * carries the Enterprise terms appendix (indemnification, SLA, data
  * portability, audit rights, exit assistance, sub-processor change
- * notice, governing law). Do NOT remove either; both are load-bearing.
+ * notice, governing law); page 3 carries Schedule A — the canonical
+ * SOC 2-attested sub-processor list lifted from trust-copy.ts. All
+ * three are load-bearing; do NOT remove. The Schedule A on page 3
+ * was added 2026-05-02 (James persona ask J-3) so a procurement
+ * reviewer signs off on the appendix in isolation rather than having
+ * to cross-reference /security mid-review.
  *
  * Strategic intent: a CSO + GC reviewing this PDF should recognise the
  * artefact as the same one they'll receive at audit time. Vocabulary
@@ -25,6 +30,10 @@
 
 import { jsPDF } from 'jspdf';
 import { createHash } from 'node:crypto';
+import {
+  INDEMNIFICATION_BODY,
+  SOC2_RECEIPTS,
+} from '@/lib/constants/trust-copy';
 
 const PAGE_W = 210;
 const PAGE_H = 297;
@@ -257,14 +266,14 @@ export function generateEnterpriseQuote(input: EnterpriseQuoteInput): Enterprise
   doc.setFontSize(10);
   doc.setTextColor(40, 40, 40);
   doc.text(
-    `Pricing herein remains indicative through ${expires.toLocaleDateString()} (${validityDays} days from generation), after which it is subject to refresh. This document is not a binding offer — see disclaimer above and Enterprise Terms Appendix on page 2.`,
+    `Pricing herein remains indicative through ${expires.toLocaleDateString()} (${validityDays} days from generation), after which it is subject to refresh. This document is not a binding offer — see disclaimer above, Enterprise Terms Appendix on page 2, and Sub-processor Schedule on page 3.`,
     MARGIN_L,
     y,
     { maxWidth: TEXT_W }
   );
   y += 14;
 
-  drawProvenanceFooter(doc, quoteHash, generated, input.authorUserId, 'Page 1 of 2');
+  drawProvenanceFooter(doc, quoteHash, generated, input.authorUserId, 'Page 1 of 3');
 
   // ─── PAGE 2: Enterprise Terms Appendix ───
   doc.addPage();
@@ -288,8 +297,7 @@ export function generateEnterpriseQuote(input: EnterpriseQuoteInput): Enterprise
   const provisions: Array<{ label: string; clause: string }> = [
     {
       label: '1. Indemnification',
-      clause:
-        'Decision Intel will defend the customer against third-party claims that the service infringes a US patent, copyright, or trade secret. The customer will defend Decision Intel against third-party claims arising from the customer’s use of the service in violation of law or this agreement. Each party’s aggregate liability under this clause is capped at the fees paid by the customer in the twelve (12) months preceding the claim, except for breaches of confidentiality, indemnification obligations, or wilful misconduct.',
+      clause: INDEMNIFICATION_BODY,
     },
     {
       label: `2. Service Level (${input.slaTier} tier)`,
@@ -313,7 +321,7 @@ export function generateEnterpriseQuote(input: EnterpriseQuoteInput): Enterprise
     {
       label: '6. Sub-processor change notification',
       clause:
-        'Decision Intel maintains the public sub-processor list at /security and /privacy. Any addition of a new sub-processor that processes customer data is preceded by thirty (30) calendar days’ written notice, during which the customer may object on reasonable grounds. The current list is the operative one as of the Order Form effective date.',
+        'Decision Intel maintains the canonical sub-processor list at /security and /privacy; the operative list as of the Order Form effective date is reproduced in Schedule A on page 3. Any addition of a new sub-processor that processes customer data is preceded by thirty (30) calendar days’ written notice, during which the customer may object on reasonable grounds. Resend (transactional email) and Cloudflare (DNS + inbound email routing) are processors documented in /privacy but excluded from Schedule A because they do not yet carry SOC 2 attestations Decision Intel can vouch for; the customer is informed in advance of any change in their attestation status.',
     },
     {
       label: '7. Audit rights',
@@ -345,7 +353,89 @@ export function generateEnterpriseQuote(input: EnterpriseQuoteInput): Enterprise
     py += clauseLines.length * 4 + 4;
   }
 
-  drawProvenanceFooter(doc, quoteHash, generated, input.authorUserId, 'Page 2 of 2');
+  drawProvenanceFooter(doc, quoteHash, generated, input.authorUserId, 'Page 2 of 3');
+
+  // ─── PAGE 3: Schedule A — Sub-processor list ───
+  // Lifts SOC2_RECEIPTS from trust-copy.ts (the canonical, SOC 2-attested
+  // list rendered on /security#soc2-receipts) into the quote PDF so a
+  // procurement reviewer can sign off on the appendix in isolation
+  // without opening the marketing site. Provision #6 above references
+  // this page; keeping the list and the reference in lockstep is the
+  // discipline. Resend + Cloudflare deliberately excluded — they're
+  // processors but not SOC 2-attested by us; their inclusion is
+  // documented in provision #6 above and on /privacy.
+  doc.addPage();
+  drawHeaderBand(doc, 'SCHEDULE A · SUB-PROCESSOR LIST · ATTESTATION DETAIL', generated);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(16);
+  doc.setTextColor(15, 15, 15);
+  doc.text('Schedule A — Sub-processor List', MARGIN_L, 36);
+
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(9.5);
+  doc.setTextColor(80, 80, 80);
+  const scheduleLeadLines = doc.splitTextToSize(
+    'The list below enumerates every SOC 2-attested processor in the Decision Intel production environment as of the date of generation, together with the auditor + observation window the customer can independently verify. Each entry mirrors what the customer sees on /security#soc2-receipts and what is reproduced verbatim in the Master Services Agreement. Decision Intel is named first as the engaging Processor; the remaining entries are sub-processors. Any change to this list is governed by provision 6 of the Enterprise Terms Appendix on page 2.',
+    TEXT_W
+  );
+  doc.text(scheduleLeadLines, MARGIN_L, 44);
+  let sy = 44 + scheduleLeadLines.length * 4.6 + 4;
+
+  for (const r of SOC2_RECEIPTS) {
+    if (sy > PAGE_H - 38) {
+      // Defensive — schedule sized to one page; bail rather than overflow.
+      // If the canonical list grows past page-fit, split into Schedule A
+      // (Controllers + primary sub-processors) and Schedule A.1 in a
+      // future revision.
+      break;
+    }
+
+    // Party header line — bold green for visual scanability.
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(22, 163, 74);
+    doc.text(r.party, MARGIN_L, sy);
+
+    // Status pill on the right edge of the same line.
+    const statusLabel = r.status === 'attested' ? 'Attested' : 'Targeted';
+    const statusColor = r.status === 'attested' ? [22, 163, 74] : [161, 98, 7];
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(statusColor[0], statusColor[1], statusColor[2]);
+    doc.text(statusLabel.toUpperCase(), PAGE_W - MARGIN_R, sy, { align: 'right' });
+    sy += 5;
+
+    // Role + report type — single italic line.
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(8.5);
+    doc.setTextColor(80, 80, 80);
+    doc.text(`${r.role} · ${r.reportType}`, MARGIN_L, sy);
+    sy += 4.5;
+
+    // Detail block — observation window, auditor, scope, verification.
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(40, 40, 40);
+
+    const detailRows: Array<[string, string]> = [
+      ['Observation', r.observationWindow],
+      ['Auditor', r.auditor],
+      ['Scope', r.scope],
+      ['Verification', r.verification],
+    ];
+
+    for (const [label, value] of detailRows) {
+      const labelLine = `${label}: ${value}`;
+      const wrapped = doc.splitTextToSize(labelLine, TEXT_W);
+      doc.text(wrapped, MARGIN_L, sy);
+      sy += wrapped.length * 3.6 + 0.6;
+    }
+
+    sy += 4; // breathing room between entries
+  }
+
+  drawProvenanceFooter(doc, quoteHash, generated, input.authorUserId, 'Page 3 of 3');
 
   return { pdf: doc, quoteHash, annualContractValue };
 }
