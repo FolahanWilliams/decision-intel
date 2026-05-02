@@ -252,7 +252,7 @@ export const NODES: MapNode[] = [
     x: 0.5,
     y: 0.52,
     whatItsFor:
-      'Flashcard + recall + apply mastery across 12 decks (~100 cards): DI vocabulary, 7 buyer personas, Maalouf 6 + Satyam 5, 11-dim Sales DQI rubric, 5 silent objections, 17 regulatory frameworks, 12-node pipeline, R²F integration, founder one-liners. SM-2 spaced repetition + AI-graded recall.',
+      'Flashcard + recall + apply mastery across 15 decks (160+ cards): DI vocabulary, 7 buyer personas, Maalouf 6 + Satyam 5, 15-dim Sales DQI rubric, 5 silent objections, regulatory frameworks (count derived), 12-node pipeline, R²F integration, founder one-liners, advanced sales moves, strategic thinking, Goldner discovery. SM-2 spaced repetition + AI-graded recall.',
     payoff:
       'Mastery through recollection. Reading builds familiarity; recall under pressure builds the muscle that fires in a live conversation.',
     minutes: 30,
@@ -266,7 +266,7 @@ export const NODES: MapNode[] = [
     x: 0.5,
     y: 0.61,
     whatItsFor:
-      'Live sales-rep practice. AI generates a buyer-voice opener + 3 questions per persona × scenario (incl. networking-event in-person); you record via Wispr Flow, paste the transcript, get an 11-dimension Sales DQI scorecard (Maalouf 4 + Satyam 3 + DI discipline 2 + Kahneman loss-aversion + fundamentals) + buyer-perspective simulation + the verbatim phrase you should have used.',
+      'Live sales-rep practice. AI generates a buyer-voice opener + 3 questions per persona × scenario (incl. networking-event in-person); you record via Wispr Flow, paste the transcript, get a 15-dimension Sales DQI scorecard (Maalouf 4 + Satyam 3 + DI discipline 2 + Kahneman loss-aversion + fundamentals + JOLT/Sandler/Cohen 4 meta-dimensions) + buyer-perspective simulation + the verbatim phrase you should have used.',
     payoff:
       'The reading→recall→doing loop completes here. Closing Lab gives you the framework; Education Room makes you recall it; Sparring Room makes you live it under pressure with rep-by-rep grade tracking.',
     minutes: 25,

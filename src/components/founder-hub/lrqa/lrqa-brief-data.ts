@@ -116,7 +116,7 @@ export const IAN_PROFILE = {
       thrust:
         '"The risk today isn\'t ambition, it\'s proof. Targets are everywhere, but real demonstrable progress is much harder to find. In a more regulated, more scrutinised world, evidence is what separates leaders from the rest."',
       diRelevance:
-        "This quote is the Decision Provenance Record thesis in Ian's own words. The DPR — hashed, tamper-evident, mapped against 17 regulatory frameworks — IS evidence that separates leaders from the rest. Folahan should literally repeat this back to Ian in the meeting: \"Your Earth Day quote — 'evidence is what separates leaders from the rest' — that's exactly the DPR thesis.\"",
+        "This quote is the Decision Provenance Record thesis in Ian's own words. The DPR — hashed, tamper-evident, mapped against the platform's full regulatory framework registry — IS evidence that separates leaders from the rest. Folahan should literally repeat this back to Ian in the meeting: \"Your Earth Day quote — 'evidence is what separates leaders from the rest' — that's exactly the DPR thesis.\"",
     },
   ],
 } as const;

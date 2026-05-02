@@ -62,7 +62,7 @@ const SCAN_PATHS = [
 // the 12 IS PIPELINE_NODES.length but the literal is in a content
 // string). New count literals must replace one of these or annotate
 // with `// drift-tolerant`.
-const COUNT_BASELINE = 90;
+const COUNT_BASELINE = 82;
 
 // Plural nouns we audit. Each must have a canonical source-of-truth in
 // the codebase; adding a new noun here requires adding the canonical

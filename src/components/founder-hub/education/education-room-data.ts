@@ -19,9 +19,14 @@
  * a new persona / framework / lesson lands, update HERE only — the
  * EducationRoomTab pulls all decks + cards from these typed exports.
  *
- * Total cards as of 2026-04-28: see DECKS array. Aim for ~120-150 cards
- * across 12 decks for a complete first-mastery curriculum.
+ * Current state (2026-05-02): 15 decks, 161 cards. Was 12 decks/~100 cards
+ * at 2026-04-28 lock; expanded with advanced_sales_moves, strategic_thinking,
+ * and goldner_discovery decks.
  */
+
+import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+
+const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -164,7 +169,7 @@ export const DECKS: EducationDeck[] = [
     id: 'grading_dimensions',
     label: 'Sales DQI Rubric',
     description:
-      'The 11-dimension Sales DQI scorecard (Maalouf 4 + Satyam 3 + DI discipline 2 + Kahneman 1 + fundamentals 1).',
+      'The 15-dimension Sales DQI scorecard (Maalouf 4 + Satyam 3 + DI discipline 2 + Kahneman 1 + fundamentals 1 + 4 meta-dimensions: JOLT/Sandler/Cohen).',
     iconName: 'CheckSquare',
     color: '#6366F1',
     order: 6,
@@ -425,8 +430,7 @@ const DI_VOCABULARY_CARDS: EducationCard[] = [
     id: 'voc_17_frameworks',
     deckId: 'di_vocabulary',
     prompt: 'How many regulatory frameworks does DI map across, and what is the regional shape?',
-    canonicalAnswer:
-      '17 frameworks across G7 / EU / GCC / African markets. The count is structurally derived from getAllRegisteredFrameworks().length — never literal a number that can drift. African coverage uniquely strong: NDPR (Nigeria), CBN, FRC Nigeria, WAEMU, CMA Kenya, CBK, BoG, CBE (Egypt), PoPIA s.71 (South Africa), SARB Model Risk, BoT FinTech. This is a structural moat against US-only incumbents.',
+    canonicalAnswer: `${FRAMEWORK_COUNT} frameworks across G7 / EU / GCC / African markets. The count is structurally derived from getAllRegisteredFrameworks().length — never literal a number that can drift. African coverage uniquely strong: NDPR (Nigeria), CBN, FRC Nigeria, ISA Nigeria 2007, WAEMU, CMA Kenya, CBK, BoG, CBE (Egypt), PoPIA s.71 (South Africa), SARB Model Risk, BoT FinTech. This is a structural moat against US-only incumbents.`,
     difficulty: 'foundation',
     applicationContext: 'Pan-African fund partner asks "do you actually cover OUR regulators?"',
     source: 'CLAUDE.md positioning + africa-frameworks.ts',

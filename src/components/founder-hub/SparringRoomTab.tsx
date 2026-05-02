@@ -390,8 +390,8 @@ function Hero() {
         Closing Lab gave you the frameworks. The Sparring Room makes you live them. Pick a buyer
         persona, pick a scenario mode (including <strong>networking events in-person</strong>),
         generate 3 questions in their voice, then record yourself answering with Wispr Flow and
-        paste the transcript back. The AI grades you on 11 dimensions — Maalouf 4 + Satyam 3 + DI
-        discipline 2 + <strong>Kahneman loss-aversion framing</strong> + fundamentals — simulates
+        paste the transcript back. The AI grades you on {GRADING_DIMENSIONS.length} dimensions — Maalouf 4 + Satyam 3 + DI
+        discipline 2 + <strong>Kahneman loss-aversion framing</strong> + fundamentals + 4 meta-dimensions (JOLT/Sandler/Cohen) — simulates
         the buyer&rsquo;s internal monologue right after you finish, and hands you the verbatim
         phrase you should have used so you can rehearse it before the next call.
       </p>
@@ -919,7 +919,7 @@ function ReviewingCard() {
         Grading your rep…
       </div>
       <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
-        Running 11-dimension Sales DQI · simulating the buyer&rsquo;s internal monologue · drafting
+        Running {GRADING_DIMENSIONS.length}-dimension Sales DQI · simulating the buyer&rsquo;s internal monologue · drafting
         the verbatim phrase you should have used.
       </div>
     </div>

@@ -2,13 +2,16 @@
 // Extracted verbatim from the legacy StrategyAndPositioningTab + InvestorDefenseTab
 // so the new visual presentation preserves every quote, file reference, and number.
 
+import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+
+const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
+
 // ─── Elevator pitch + Cloverpop contrast ──────────────────────────────────
 
 export const ELEVATOR_PITCH = {
   quote:
     "You might be familiar with Cloverpop — they did a great job digitizing the decision-making workflow. We do something different: we are the native reasoning layer for every high-stakes call. Decision Quality Index in 60 seconds, Decision Provenance Record on every audit, Recognition-Rigor Framework (R²F) — Kahneman's debiasing plus Klein's Recognition-Primed Decisions, arbitrated in one pipeline.",
-  closing:
-    'Cloverpop logs decisions. We audit the reasoning behind them. The Decision Provenance Record is hashed, tamper-evident, and mapped to 17 regulatory frameworks across G7, EU, GCC, and African markets — the artefact your audit committee will eventually require evidence of, before regulators start asking.',
+  closing: `Cloverpop logs decisions. We audit the reasoning behind them. The Decision Provenance Record is hashed, tamper-evident, and mapped to ${FRAMEWORK_COUNT} regulatory frameworks across G7, EU, GCC, and African markets — the artefact your audit committee will eventually require evidence of, before regulators start asking.`,
 };
 
 export const CATEGORY_CONTRAST = {
@@ -66,8 +69,7 @@ export const CLOVERPOP_COMPARISON: ComparisonRow[] = [
   {
     dimension: 'Compliance Mapping',
     cloverpop: 'None',
-    decisionIntel:
-      '17 frameworks across G7 / EU / GCC / African markets (EU AI Act, SOC 2, GDPR, Basel III, SOX, NDPR, CBN, WAEMU, PoPIA, CMA Kenya, more — derived dynamically from FRAMEWORKS.length)',
+    decisionIntel: `${FRAMEWORK_COUNT} frameworks across G7 / EU / GCC / African markets (EU AI Act, SOC 2, GDPR, Basel III, SOX, NDPR, CBN, WAEMU, PoPIA, CMA Kenya, more — derived dynamically from getAllRegisteredFrameworks().length)`,
   },
   {
     dimension: 'Target Market',
@@ -152,10 +154,9 @@ export const MOAT_LAYERS: MoatLayer[] = [
     name: 'Compliance + Pan-African Regulatory Lock-in',
     strength: 'very_high',
     timeline: 'Day 1',
-    description:
-      '17 regulatory frameworks across G7, EU, GCC, and African markets — EU AI Act Art 14, SOC 2 Type II, GDPR Art 22, Basel III Pillar 2 ICAAP, SOX §404, NDPR, CBN, WAEMU, PoPIA §71, CMA Kenya, SARB Model Risk, and more. Provision-level mapping per flag, hashed + tamper-evident Decision Provenance Record on every audit. The 17-framework count is structurally derived from FRAMEWORKS.length so additions extend the moat automatically.',
+    description: `${FRAMEWORK_COUNT} regulatory frameworks across G7, EU, GCC, and African markets — EU AI Act Art 14, SOC 2 Type II, GDPR Art 22, Basel III Pillar 2 ICAAP, SOX §404, NDPR, CBN, FRC Nigeria, ISA Nigeria 2007, WAEMU, PoPIA §71, CMA Kenya, SARB Model Risk, and more. Provision-level mapping per flag, hashed + tamper-evident Decision Provenance Record on every audit. The framework count is structurally derived from getAllRegisteredFrameworks().length so additions extend the moat automatically.`,
     files: 'src/lib/compliance/frameworks/, src/lib/constants/trust-copy.ts',
-    why: "Competitors need 17 frameworks' worth of legal + cultural review before shipping a single page. The Pan-African coverage specifically (NDPR, CBN, WAEMU, PoPIA, etc.) is what removes the 'this is a US-only product' procurement objection from African and EM-focused buyers — Cloverpop, Palantir, IBM Watson, and Aera have no defensible answer here.",
+    why: `Competitors need ${FRAMEWORK_COUNT} frameworks' worth of legal + cultural review before shipping a single page. The Pan-African coverage specifically (NDPR, CBN, WAEMU, PoPIA, etc.) is what removes the 'this is a US-only product' procurement objection from African and EM-focused buyers — Cloverpop, Palantir, IBM Watson, and Aera have no defensible answer here.`,
   },
 ];
 
@@ -401,8 +402,7 @@ export const INVESTOR_QA: InvestorQA[] = [
     id: 'traction',
     topic: 'traction',
     question: 'Show me traction.',
-    answer:
-      "Working product at production URL — full LangGraph 12-node analysis engine processing real strategic memos end-to-end, with the Decision Knowledge Graph seeding from document one. Full auth (Google OAuth via Supabase), multi-tenant orgs, team collaboration, blind-prior decision rooms, deal-level cross-document conflict detection, hashed + tamper-evident Decision Provenance Records. 17 regulatory frameworks fully mapped across G7, EU, GCC, and African markets (EU AI Act, SOC 2 Type II infrastructure, GDPR, Basel III, SOX, NDPR, CBN, WAEMU, PoPIA, CMA Kenya, more). Two production specimen DPRs (WeWork S-1 + Dangote 2014 Pan-African expansion) ship in public/ as cold-call evidence. Reviewed by the senior consultant who helped take Wiz from startup to $32B, quote: 'genuinely fascinated by the role of unconscious cognitive biases in decision-making.' 143 hand-curated case studies across 12 industries / regions (deduplicated, primary-source cited). Cloverpop's Inc. 5000 #608 ranking with 300% growth validates enterprise demand exists for the workflow-tooling adjacent category — we audit the reasoning Cloverpop logs.",
+    answer: `Working product at production URL — full LangGraph 12-node analysis engine processing real strategic memos end-to-end, with the Decision Knowledge Graph seeding from document one. Full auth (Google OAuth via Supabase), multi-tenant orgs, team collaboration, blind-prior decision rooms, deal-level cross-document conflict detection, hashed + tamper-evident Decision Provenance Records. ${FRAMEWORK_COUNT} regulatory frameworks fully mapped across G7, EU, GCC, and African markets (EU AI Act, SOC 2 Type II infrastructure, GDPR, Basel III, SOX, NDPR, CBN, WAEMU, PoPIA, CMA Kenya, more). Two production specimen DPRs (WeWork S-1 + Dangote 2014 Pan-African expansion) ship in public/ as cold-call evidence. Reviewed by the senior consultant who helped take Wiz from startup to $32B, quote: 'genuinely fascinated by the role of unconscious cognitive biases in decision-making.' 143 hand-curated case studies across 12 industries / regions (deduplicated, primary-source cited). Cloverpop's Inc. 5000 #608 ranking with 300% growth validates enterprise demand exists for the workflow-tooling adjacent category — we audit the reasoning Cloverpop logs.`,
   },
 ];
 
@@ -426,8 +426,7 @@ export const COMMON_OBJECTIONS: Objection[] = [
   {
     id: 'category',
     objection: 'Market timing — is this a real category?',
-    response:
-      "We frame it as the regulatory tailwind moment, not the market-size pitch. EU AI Act in force since Aug 2024 (Article 14 record-keeping for high-risk decision-support systems enforceable Aug 2026, Article 13 transparency, Article 15 accuracy + record-keeping). SEC AI disclosure proposed 2024, evolving through 2026. Basel III Pillar 2 ICAAP live for regulated banks. GDPR Article 22 live since 2018 (automated-decision rights). Colorado SB24-205 (Feb 2026 enforceable). NDPR / CBN / WAEMU / PoPIA on the African side. Every tailwind has a statute, a regulator guidance, or an enforcement date — these are calendars, not predictions. The DPR is the artefact each one will eventually require evidence of. Cloverpop's #608 Inc. 5000 ranking validates workflow tooling adjacent to ours; AI Verify Foundation (IMDA, Singapore, Apache 2.0) gives us 11 internationally-recognised AI governance principles to align with. The category has named enforceable regulations across 17 frameworks — that's the why-now, not a market-size slide.",
+    response: `We frame it as the regulatory tailwind moment, not the market-size pitch. EU AI Act in force since Aug 2024 (Article 14 record-keeping for high-risk decision-support systems enforceable Aug 2026, Article 13 transparency, Article 15 accuracy + record-keeping). SEC AI disclosure proposed 2024, evolving through 2026. Basel III Pillar 2 ICAAP live for regulated banks. GDPR Article 22 live since 2018 (automated-decision rights). Colorado SB24-205 (Feb 2026 enforceable). NDPR / CBN / WAEMU / PoPIA on the African side. Every tailwind has a statute, a regulator guidance, or an enforcement date — these are calendars, not predictions. The DPR is the artefact each one will eventually require evidence of. Cloverpop's #608 Inc. 5000 ranking validates workflow tooling adjacent to ours; AI Verify Foundation (IMDA, Singapore, Apache 2.0) gives us 11 internationally-recognised AI governance principles to align with. The category has named enforceable regulations across ${FRAMEWORK_COUNT} frameworks — that's the why-now, not a market-size slide.`,
     tag: 'Category',
   },
   {
@@ -572,11 +571,10 @@ export const TOP_3_DI_GAPS: DiSpaceGap[] = [
       "IBM watsonx.governance audits the MODEL but not the human decision made on the model's output. Cloverpop logs the decision text but not the regulatory provisions it touches. Quantexa surfaces relationship-graph context but doesn't produce a regulator-grade audit artefact. Most platforms treat governance as a post-hoc reporting layer, not as a structurally embedded property of every decision.",
     whyItBlocksValue:
       "Without traceable oversight, regulators can't accept the platform's output as evidence. Boards can't use it for accountability. Procurement teams veto adoption when the EU AI Act compliance question surfaces. The platform fails the \"would you cite this in a board minute?\" test that determines enterprise scale.",
-    howDiSolves:
-      'The Decision Provenance Record (DPR) is hashed + tamper-evident + cited against 17 regulatory frameworks across G7, EU, GCC, and African markets (NDPR, CBN, FRC Nigeria, WAEMU, CMA Kenya, CBK, BoG, CBE, PoPIA §71, SARB Model Risk, BoT FinTech, plus EU AI Act Articles 13/14/15, GDPR Art 22, Basel III Pillar 2, SOX §404, NIST AI RMF, AI Verify Foundation alignment). Every flag carries a regulatory provision citation. Per CLAUDE.md AI Verify alignment, the DPR maps to the 11 internationally-recognised AI governance principles (transparency, explainability, repeatability, safety, security, robustness, fairness, data governance, accountability, human agency & oversight, inclusive growth) — never claiming "certified" but always demonstrating principle-by-principle alignment.',
+    howDiSolves: `The Decision Provenance Record (DPR) is hashed + tamper-evident + cited against ${FRAMEWORK_COUNT} regulatory frameworks across G7, EU, GCC, and African markets (NDPR, CBN, FRC Nigeria, ISA Nigeria 2007, WAEMU, CMA Kenya, CBK, BoG, CBE, PoPIA §71, SARB Model Risk, BoT FinTech, plus EU AI Act Articles 13/14/15, GDPR Art 22, Basel III Pillar 2, SOX §404, NIST AI RMF, AI Verify Foundation alignment). Every flag carries a regulatory provision citation. Per CLAUDE.md AI Verify alignment, the DPR maps to the 11 internationally-recognised AI governance principles (transparency, explainability, repeatability, safety, security, robustness, fairness, data governance, accountability, human agency & oversight, inclusive growth) — never claiming "certified" but always demonstrating principle-by-principle alignment.`,
     diProductSurfaces: [
       'src/lib/reports/decision-provenance-record-generator.ts — DPR generator producing the hashed PDF',
-      'src/lib/compliance/frameworks/ — 17-framework registry (FRAMEWORKS.length-derived; African coverage in africa-frameworks.ts)',
+      `src/lib/compliance/frameworks/ — ${FRAMEWORK_COUNT}-framework registry (getAllRegisteredFrameworks().length-derived; African coverage in africa-frameworks.ts)`,
       'src/lib/constants/trust-copy.ts — single source of truth for SOC 2 / DPR vocabulary across all surfaces',
       '/regulatory/ai-verify — public mapping page for the 11 AI governance principles',
       '/security — Pan-African regulatory bridge + DR/BCP disclosure (RPO ≤ 15min, RTO < 4h)',
@@ -802,13 +800,11 @@ export const DI_GAPS: DiGap[] = [
       '"We can\'t use AI in board memos because our GC doesn\'t know how to defend it in an EU AI Act audit." Strategic decisions stall in limbo: the tool surfaces a flag, the GC asks which regulation it touches, and nobody can answer without a week of legal review.',
     evidence:
       'Every Fortune 500 procurement team vetoes a tool that cannot produce regulator-grade defence documents. The EU AI Act, SOX §404, and GDPR Article 22 each gate different customer categories, and all three are rising, not falling, as AI enters decision workflows.',
-    diApproach:
-      'Decision Intel delivers governance as product, not documentation. Every flag cross-links to a specific provision across 17 frameworks spanning G7, EU, GCC, and African markets. The Decision Provenance Record exports as a regulator-grade PDF on Pro tier, so a General Counsel can walk into a regulator meeting with the memo, the flags, and the framework citations in a single document.',
+    diApproach: `Decision Intel delivers governance as product, not documentation. Every flag cross-links to a specific provision across ${FRAMEWORK_COUNT} frameworks spanning G7, EU, GCC, and African markets. The Decision Provenance Record exports as a regulator-grade PDF on Pro tier, so a General Counsel can walk into a regulator meeting with the memo, the flags, and the framework citations in a single document.`,
     diCapabilities: [
       {
-        label: '17 regulatory framework mappers',
-        detail:
-          'International anchors (SOX §404, GDPR Art. 22, EU AI Act Annex III, Basel III, FCA Consumer Duty, SEC Reg D, LPOA) plus African-market regimes (NDPR, CBN, WAEMU, CMA Kenya, BoG, FRC Nigeria, CBE, PoPIA, SARB, BoT). Provision-level mapping across all 17.',
+        label: `${FRAMEWORK_COUNT} regulatory framework mappers`,
+        detail: `International anchors (SOX §404, GDPR Art. 22, EU AI Act Annex III, Basel III, FCA Consumer Duty, SEC Reg D, LPOA) plus African-market regimes (NDPR, CBN, WAEMU, CMA Kenya, BoG, FRC Nigeria, ISA Nigeria 2007, CBE, PoPIA, SARB, BoT). Provision-level mapping across all ${FRAMEWORK_COUNT}.`,
         proofFile: 'src/lib/compliance/frameworks/',
       },
       {
