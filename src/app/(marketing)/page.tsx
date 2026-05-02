@@ -32,6 +32,7 @@ import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
 import {
   SOC2_LANDING_STRIP_LABEL,
   SOC2_LANDING_STRIP_NOTE,
+  AI_VERIFY_DISCLAIMER_SHORT,
 } from '@/lib/constants/trust-copy';
 
 const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
@@ -972,6 +973,22 @@ export default function LandingPage() {
                 <div style={{ fontSize: 13.5, color: '#CBD5E1', lineHeight: 1.5 }}>
                   Aligned with the 11 internationally-recognised AI governance principles:
                   cross-aligned with the EU AI Act and OECD AI Principles.
+                </div>
+                {/* Self-assessment disclaimer (locked 2026-05-02 from persona-audit
+                    item 7). Without this inline, a cold reviewer who doesn't click
+                    through to /regulatory/ai-verify reads "AI Verify certified" —
+                    which is misrepresentation territory. AI Verify Foundation does
+                    not certify products; alignment is self-attested. */}
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: '#94A3B8',
+                    fontStyle: 'italic',
+                    marginTop: 4,
+                    letterSpacing: '0.01em',
+                  }}
+                >
+                  {AI_VERIFY_DISCLAIMER_SHORT}
                 </div>
               </div>
               <Link

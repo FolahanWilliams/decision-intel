@@ -372,7 +372,12 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
   },
   {
     id: 'lrqa',
-    label: 'LRQA / Ian Spaulding',
+    // Role-neutral label (locked 2026-05-02). Prior label "LRQA / Ian Spaulding"
+    // was a named-prospect leak in the client bundle per CLAUDE.md no-named-
+    // prospects rule. The founder remembers what this tab is; the bundle
+    // doesn't need the proper noun. Tab id stays 'lrqa' for backward-compat
+    // with deeplinks + saved progress; only the visible label changes.
+    label: 'Assurance Firm · Warm Intro',
     icon: <Handshake size={16} />,
     group: 'Go-to-Market',
   },
@@ -815,7 +820,16 @@ const SEARCH_INDEX: SearchEntry[] = [
     preview:
       'Strategic compass + per-role outreach playbooks (8 personas) + R²F intellectual moat deep-dive + 16 investor metrics + killer responses to "not for us" / "I’m confused" + warm-intro network map + 90-day action plan + NotebookLM follow-up lab.',
     keywords:
-      'path 100m arr 100 million unicorn 2030 north star strengths weaknesses matrix r2f recognition rigor framework kahneman klein meta judge mercier sperber argumentative reasoning environmental validity decision framing gate provisional patents academic credentials category definition vocabulary cold warm bridge sentence persona pitch library cso vp strategy corp dev mna m&a pan-african fund partner sankore fortune 500 general counsel audit committee mckinsey quantumblack bcg gamma bain advanced analytics lrqa bureau veritas sgs intertek dnv pre-seed seed venture investor wiz advisor outreach playbook discovery questions killer pitch meeting arc cold opener warm intro follow-up cadence signals positive negative phrases never to say objection handling not for us right now jolt effect honest off-ramp pings echoes refrigerator confused vulnerability reset 5th grade financial anchor evidence challenge cloverpop aera ibm watsonx category contrast investor metrics bookings revenue arr mrr gross profit tcv acv ltv cac billings churn cmgr burn rate downloads vanity cumulative chart tricks size before growth failure modes watchtower quantellia consulting trap manual logging cathedral of code external attack vector ibm bundling agentic shift warm intro network map wiz tasis school sankore lrqa ian spaulding mckinsey pre-seed funds family relationships 90-day action plan may june july 2026 isa 2007 dqi confidence intervals gtm co-founder reference case term sheet notebooklm follow-up lab questions',
+      // Search keywords scrubbed 2026-05-02 of named-prospect leaks per
+      // CLAUDE.md no-named-prospects rule. Removed: sankore, lrqa,
+      // ian spaulding, bureau veritas, sgs, intertek, dnv, tasis school,
+      // family relationships, named pre-seed funds. Kept: category descriptors
+      // (assurance firm, fund partner, F500 GC), public competitors named in
+      // pitch decks (cloverpop, aera, ibm watsonx, quantellia), advisor
+      // relationship category, and the public Wiz $32B reference (CLAUDE.md
+      // approved credential). The founder still finds this tab via category
+      // searches without exposing prospect identities in the client bundle.
+      'path 100m arr 100 million unicorn 2030 north star strengths weaknesses matrix r2f recognition rigor framework kahneman klein meta judge mercier sperber argumentative reasoning environmental validity decision framing gate provisional patents academic credentials category definition vocabulary cold warm bridge sentence persona pitch library cso vp strategy corp dev mna m&a fund partner fortune 500 general counsel audit committee mckinsey quantumblack bcg gamma bain advanced analytics assurance firm compliance assurance pre-seed seed venture investor advisor outreach playbook discovery questions killer pitch meeting arc cold opener warm intro follow-up cadence signals positive negative phrases never to say objection handling not for us right now jolt effect honest off-ramp pings echoes refrigerator confused vulnerability reset 5th grade financial anchor evidence challenge cloverpop aera ibm watsonx category contrast investor metrics bookings revenue arr mrr gross profit tcv acv ltv cac billings churn cmgr burn rate downloads vanity cumulative chart tricks size before growth failure modes watchtower quantellia consulting trap manual logging cathedral of code external attack vector ibm bundling agentic shift warm intro network map mckinsey pre-seed funds 90-day action plan may june july 2026 isa 2007 dqi confidence intervals gtm co-founder reference case term sheet notebooklm follow-up lab questions',
   },
   {
     tabId: 'outreach_hub',
@@ -1518,7 +1532,8 @@ function renderTab(
       </ErrorBoundary>
     ),
     lrqa: (
-      <ErrorBoundary sectionName="LRQA / Ian Spaulding">
+      // ErrorBoundary sectionName scrubbed 2026-05-02 of named prospect.
+      <ErrorBoundary sectionName="Assurance firm warm-intro brief">
         <LrqaTab />
       </ErrorBoundary>
     ),

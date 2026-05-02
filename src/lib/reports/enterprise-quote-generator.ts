@@ -82,11 +82,20 @@ function fmtMoney(n: number): string {
  * Enterprise terms appendix page. When a tier's uptime commitment
  * changes, update HERE so the appendix and any downstream Order Form
  * generator stay aligned.
+ *
+ * Aligned 2026-05-02 to /terms §10C SLA tier commitments — Standard now
+ * mirrors Strategy-tier (99.5% / RTO 4h / RPO 15min) and Premium mirrors
+ * Enterprise-tier (99.9% / RTO 4h / RPO 15min). The prior values
+ * (99.0% no RTO / 99.5% sub-12h) drifted from /terms, which the persona
+ * audit flagged as a procurement-grade inconsistency a James-class GC
+ * catches in <30 seconds when reading both surfaces.
  */
 const SLA_TIER_UPTIME: Record<'Standard' | 'Premium' | 'Custom', string> = {
-  Standard: '99.0% monthly availability for the document analysis pipeline',
-  Premium: '99.5% monthly availability for the document analysis pipeline + sub-12-hour RTO',
-  Custom: 'as separately agreed in the executed Order Form',
+  Standard:
+    '99.5% monthly availability for the document analysis pipeline. Recovery time objective (RTO) under 4 hours; recovery point objective (RPO) under 15 minutes. Matches the Strategy tier commitment in our published Terms §10C.',
+  Premium:
+    '99.9% monthly availability for the document analysis pipeline. Recovery time objective (RTO) under 4 hours; recovery point objective (RPO) under 15 minutes. Matches the Enterprise tier commitment in our published Terms §10C.',
+  Custom: 'as separately agreed in the executed Order Form.',
 };
 
 export function generateEnterpriseQuote(input: EnterpriseQuoteInput): EnterpriseQuoteResult {
