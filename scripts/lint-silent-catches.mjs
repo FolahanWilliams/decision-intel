@@ -29,7 +29,7 @@ const ROOT = process.cwd();
 const SCAN_DIR = join(ROOT, 'src');
 
 // Baseline count as of 2026-04-28 (the commit shipping this linter).
-// All 117 sites at baseline have been audited as legitimate exceptions per
+// All 119 sites at baseline have been audited as legitimate exceptions per
 // CLAUDE.md Components & Patterns > Fire-and-forget error handling: in-memory
 // cache cleanup (lib/utils/cache.ts), schema-drift tolerance with @schema-
 // drift-tolerant comments, `req.json().catch(() => null)` body parsing,

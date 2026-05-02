@@ -214,7 +214,7 @@ export function NoiseDistributionViz() {
           marginBottom: 4,
         }}
       >
-        Noise decomposition · three independent judges
+        Noise decomposition · three decorrelated samples
       </div>
       <div
         style={{
