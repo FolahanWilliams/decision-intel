@@ -25,7 +25,7 @@ In 2009 they published a paper together titled "Conditions for Intuitive Experti
 
 We built it.
 
-At Decision Intel, every strategic memo passes through what we call the Recognition-Rigor Framework — R²F for short. The rigor side runs Kahneman's tradition: a bias detective trained on thirty-plus cognitive biases, a noise judge that measures inter-judge variance on the same memo, a statistical jury that checks whether the evidence actually supports the argument's confidence level. The recognition side runs Klein's tradition: an RPD recognition engine that pattern-matches against 135 historical corporate decisions, a forgotten-questions node that surfaces what a veteran operator would have asked, a pre-mortem step that imagines the outcome backwards. A meta-judge arbitrates.
+At Decision Intel, every strategic memo passes through what we call the Recognition-Rigor Framework — R²F for short. The rigor side runs Kahneman's tradition: a bias detective trained on the 22-bias DI-B taxonomy, a noise judge that runs three decorrelated samples (analyst-skeptical / regulator-hostile / contrarian-strategist frames across two model architectures) on the same memo, a statistical jury that checks whether the evidence actually supports the argument's confidence level. The recognition side runs Klein's tradition: an RPD recognition engine that pattern-matches against 143 audited historical corporate decisions, a forgotten-questions node that surfaces what a veteran operator would have asked, a pre-mortem step that imagines the outcome backwards. A meta-judge arbitrates.
 
 The output isn't one score. It's the reasoning reinforced from both sides.
 

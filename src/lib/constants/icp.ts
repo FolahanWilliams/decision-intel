@@ -72,16 +72,20 @@ export const ICP_WEDGE = {
 } as const;
 
 /**
- * Pilot bridge — months 6-12. Sankore design partner (London office, Summer
- * 2026 in-person engagement) + 1-2 Individual graduates. Sankore IS a fund;
- * the strategic value isn't fund-buyer-budget, it's real fund operational
- * insight + reference-grade artefact production for the references the F500
- * ceiling buyer requires.
+ * Pilot bridge — months 6-12. Sankore (London office, Summer 2026 in-person
+ * engagement) is the TARGET first reference-grade pilot, in active scoping —
+ * not "confirmed" until a Design Foundation MoU is signed. v3.3 §0 honesty
+ * repair: the wedge motion runs unchanged if Sankore slips, but Sankore IS
+ * load-bearing on the graduation rule's "1+ verifiable referral or warm
+ * intro generated via DPR" condition if no Individual graduate produces a
+ * shareable DPR by Q4 2026. Sankore IS a fund; the strategic value isn't
+ * fund-buyer-budget, it's real fund operational insight + reference-grade
+ * artefact production for the references the F500 ceiling buyer requires.
  */
 export const ICP_PILOT_BRIDGE = {
   label: 'Pilot bridge (months 6-12)',
   audience:
-    'Sankore (London office, Summer 2026 in-person engagement) — confirmed first design partner. Plus 1-2 Individual graduates converted to differentiated pilots.',
+    'Sankore (London office, Summer 2026 in-person engagement) — target first reference-grade pilot, in active scoping. Plus 1-2 Individual graduates converted to differentiated pilots.',
   whyItWorks:
     'Sankore provides real fund operational insight + reference-grade artefacts; Individual graduates provide reference cases that unlock F500 procurement. Design Foundation rate £1,999/mo (20% off Strategy tier) for first 5 founding cohort customers, OR £20-25K founding-pilot bundle for 12-month commitment with optional equity-warrant + outcome-share clause.',
   output: '1-2 published reference DPR specimens (anonymised, in the WeWork + Dangote pattern).',
@@ -122,7 +126,7 @@ export const ICP_AVOID = {
  */
 export const ICP_SEQUENCING = [
   'Months 1-6: Individual buyers @ £249/mo (wedge) — UK + US, LinkedIn + warm-intro driven.',
-  'Months 6-12: Sankore design partner (London summer 2026) + 1-2 Individual graduates @ £1,999/mo Design Foundation rate (bridge) — produces published reference DPRs.',
+  'Months 6-12: Sankore (target first reference-grade pilot, in active scoping; London summer 2026) + 1-2 Individual graduates @ £1,999/mo Design Foundation rate (bridge) — produces published reference DPRs.',
   'Months 12-24+: F500 corporate strategy + corp dev M&A teams @ £50K-150K ACV (ceiling) — UK + US cross-border M&A specifically.',
   'Year 3+: Audit committees, GCs at regulated entities, BizOps / FP&A within F500.',
 ] as const;
@@ -291,7 +295,7 @@ export function buildIcpPromptBlock(): string {
  */
 export function buildFounderNotesIcpLine(): string {
   const wedge = `Individual buyers @ £249/mo (UK + US CSOs, M&A heads, corp dev directors, fractional CSOs) is the canonical wedge motion: LinkedIn + warm-intro driven, 60-sec audit + DPR specimen as conversion mechanism, graduation rule = 5 paid + 10 raving + 1 verifiable referral via DPR.`;
-  const bridge = `Sankore (London office, Summer 2026 in-person) + 1-2 Individual graduates is the design-partner bridge — produces the published references that unlock the F500 ceiling.`;
+  const bridge = `Sankore (London office, Summer 2026 in-person) is the TARGET first reference-grade design-partner pilot, in active scoping (per GTM v3.3 §0 honesty repair — not "confirmed" until a Design Foundation MoU is signed). Plus 1-2 Individual graduates produces the published references that unlock the F500 ceiling.`;
   const ceiling = `${ICP_CEILING.audience.replace(/\.$/, '')} is the 12-24+ month ceiling, unlocked by 3+ published wedge / bridge references.`;
   const avoid = `Avoid: ${ICP_AVOID.audience.replace(/\.$/, '')} — ${ICP_AVOID.why}`;
   return `${wedge} ${bridge} ${ceiling} ${avoid}`;

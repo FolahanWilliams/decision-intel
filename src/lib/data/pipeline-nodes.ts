@@ -105,11 +105,11 @@ export const PIPELINE_NODES: PipelineNode[] = [
     id: 'noiseJudge',
     zone: 'analysis',
     label: 'Noise Judge',
-    tagline: 'Three independent judges, measure the variance.',
+    tagline: 'Three decorrelated samples across frame and architecture, measure the variance.',
     iconName: 'Scale',
     purpose:
-      'Runs the same memo through three independent scoring passes with different temperature and role-priming. We then measure the inter-judge variance directly. Low variance means the reasoning is stable under rewording; high variance means the memo is saying something the judges read differently — a reliability signal orthogonal to bias.',
-    output: 'A noise score, the raw three judge scores, and mean / stdDev / variance statistics.',
+      'Runs the same memo through three decorrelated scoring passes — three professional lenses (analyst-skeptical, regulator-hostile, contrarian-strategist) layered across two model architectures with random seed. The samples are decorrelated, not formally independent: LLMs share training data. We then measure the variance directly. Low variance means the reasoning is stable across framings; high variance tells you which audience will read the memo hardest.',
+    output: 'A noise score, the raw three frame-scored samples, and mean / stdDev / variance statistics.',
     academicAnchor: 'Kahneman, Sibony & Sunstein — Noise (2021).',
   },
   {
