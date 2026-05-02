@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Copy, Check, BookOpen } from 'lucide-react';
+import { ExternalMemoryArchitecture } from './FounderOSPanel';
 import {
   NOTEBOOKLM_FOLLOW_UPS,
   type NotebookLmFollowUp,
@@ -42,6 +43,51 @@ export function NotebookLmFollowUpLab() {
 
   return (
     <div>
+      {/* External Memory Architecture — interwoven 2026-05-02 per the
+          founder's "interweave, don't pile" course-correct. NotebookLM is
+          Layer 1 of the founder's 4-layer external memory stack. Surfacing
+          the full architecture HERE (the lab's natural home) makes the
+          synthesis path conscious: queries land in NotebookLM (Layer 1) →
+          synthesis propagates to Founder Hub sections (Layer 2) → locks
+          into CLAUDE.md (Layer 3) → renders on customer DPRs (Layer 4).
+          The 10 questions below are not isolated queries; they are
+          deliberate inputs to a stack that compounds. */}
+      <div style={{ marginBottom: 16 }}>
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 800,
+            color: 'var(--accent-primary)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            marginBottom: 8,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+          }}
+        >
+          <BookOpen size={12} /> External memory stack · why these queries compound
+        </div>
+        <div
+          style={{
+            fontSize: 12,
+            color: 'var(--text-secondary)',
+            lineHeight: 1.55,
+            marginBottom: 10,
+          }}
+        >
+          NotebookLM is Layer 1 of the founder&apos;s 4-layer external memory architecture. The
+          synthesis path (visualized below) is what turns isolated queries into compounding
+          institutional memory: queries land in NotebookLM → synthesis propagates to Founder Hub
+          sections → locks into CLAUDE.md → renders on customer Decision Provenance Records as
+          procurement-grade vocabulary. This is the founder&apos;s personal moat-architecture mirror
+          of what Decision Intel runs on a customer&apos;s memo (capture → encode → recall →
+          outcome flywheel). The 10 questions below are not standalone queries; they are
+          deliberate inputs to a stack that compounds.
+        </div>
+        <ExternalMemoryArchitecture />
+      </div>
+
       <div
         style={{
           padding: 12,

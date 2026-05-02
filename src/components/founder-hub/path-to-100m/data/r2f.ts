@@ -163,6 +163,22 @@ export const R2F_MOAT_LEVERS: R2FMoatLever[] = [
     estimatedCost: '£200-1500 per certification + 6-12 weeks of evening time per certification',
     shipBy: 'Rolling — first credential complete Q3 2026',
   },
+  {
+    id: 'personal_r2f_encoding_mirror',
+    rank: 6,
+    title: 'Personal R²F encoding mirror — the founder\'s mind compounds the same way the platform\'s moat compounds',
+    source:
+      'Karpicke 2008 (Active Recall, Science 319:966) + Bjork 1994 (Elaborative Encoding / Desirable Difficulty) + Tiago Forte Building a Second Brain (Progressive Summarization) + Wozniak 1990 SuperMemo SM-2 + the 2026-05-02 sociotechnical-convergence research synthesis (Reverse Flynn Effect, neurobiological protection, digital asceticism, agentic-shift positioning).',
+    shortPitch:
+      'The 12-node R²F pipeline (capture → encode → recall + outcome flywheel) IS the founder\'s personal-mind protocol externalized. Visible alignment between product architecture and personal protocol becomes the ownable narrative.',
+    whatToBuild:
+      'Codify the personal encoding protocol the founder runs OUTSIDE the platform: (a) Capture stage — time-stamped raw notes during long-form content (30-90+ min interviews, papers, books). (b) Encode stage — Elaborative Encoding within 24h: explain WHY in own words + connect to existing knowledge (CLAUDE.md / product feature / buyer-persona pain). (c) Recall stage — Active Recall + Progressive Summarization at SM-2 spaced intervals (Day 1, Day 6, Week 4, Month 3+). The Education Room learning_efficiency deck (12 cards) is the canonical study artefact. The protocol mirrors what the platform does: capture (document upload) → encode (R²F + DPR provenance) → recall (Decision Knowledge Graph) + outcome flywheel.',
+    howItDeepensMoat:
+      'Three layers. (1) Investor narrative — the founder demonstrates the protocol they sell. The platform cannot be marketed as cognitive sovereignty if the founder is dopaminergically captured by short-form video. (2) Compounding personal moat — Active Recall + Elaborative Encoding + SM-2 produce 2-3× retention vs re-reading (Karpicke 2008) and durable conceptual transfer vs rote (Bjork 1994). Compounded over 2026-2030, the founder becomes the single most informed operator on decision-intelligence in the GTM corridor. (3) Cognitive Sovereignty Stack as visible architecture — the 4-tier stack (protect → acquire → encode → deploy) renders inside StrengthsWeaknessesMatrix; the External Memory Architecture (NotebookLM → Founder Hub → CLAUDE.md → DPR) renders inside NotebookLmFollowUpLab. The platform and the operator are isomorphic; sophisticated investors and procurement readers register this alignment without it needing to be sold.',
+    estimatedEffort: 'small',
+    estimatedCost: 'Zero engineering cost — protocol discipline + Education Room SM-2 reviews. Visualizations interwoven into existing PathToHundredMillion sections (no new sections added).',
+    shipBy: 'Live 2026-05-02 — visualizations interwoven, learning_efficiency deck shipped, ldr_5 + ldr_7 lessons refined.',
+  },
 ];
 
 // =========================================================================

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Brain, Lightbulb, GitMerge, ChevronRight, ChevronDown } from 'lucide-react';
 import { R2F_CURRENT, R2F_MOAT_LEVERS } from './data/r2f';
+import { EncodingProtocolsFlow } from './FounderOSPanel';
 
 const SIDE_ACCENT = {
   kahneman: '#0EA5E9',
@@ -362,6 +363,24 @@ export function R2FDeepDive() {
                 >
                   Estimated cost: {l.estimatedCost}
                 </div>
+
+                {l.id === 'personal_r2f_encoding_mirror' && (
+                  <div style={{ marginTop: 14 }}>
+                    <div
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.08em',
+                        color: 'var(--accent-primary)',
+                        marginBottom: 6,
+                      }}
+                    >
+                      The encoding loop · capture → encode → recall
+                    </div>
+                    <EncodingProtocolsFlow />
+                  </div>
+                )}
               </div>
             )}
           </div>

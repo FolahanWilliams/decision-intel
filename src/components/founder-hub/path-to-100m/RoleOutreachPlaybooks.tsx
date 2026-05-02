@@ -16,6 +16,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { ROLE_PLAYBOOKS, type RolePlaybook } from './data/role-playbooks';
+import { FounderLedMarketingRhythm } from './FounderOSPanel';
 
 const BUYER_TYPE_ACCENT: Record<RolePlaybook['buyerType'], string> = {
   fast_validator: '#16A34A',
@@ -687,6 +688,51 @@ export function RoleOutreachPlaybooks() {
 
   return (
     <div>
+      {/* 1-1-1 Marketing Rhythm — interwoven 2026-05-02 per the founder's
+          "interweave, don't pile" course-correct. The Sharran 1-1-1 lock
+          (GTM v3.3 §6) is the discipline ALL 8 role playbooks below
+          operate within. ONE traffic source · ONE conversion mechanism ·
+          ONE delivery model. Reading this header FIRST reframes the
+          playbooks: every persona-specific cold opener / discovery
+          script / killer pitch is calibrated to a SINGLE conversion
+          mechanism (the 20-min audit on a real strategic memo) and a
+          SINGLE delivery model (Individual £249/mo). If a playbook ever
+          drifts into a second mechanism or delivery model, this header
+          surfaces the violation. */}
+      <div style={{ marginBottom: 18 }}>
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 800,
+            color: 'var(--accent-primary)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            marginBottom: 8,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+          }}
+        >
+          <Handshake size={12} /> The discipline these playbooks operate within
+        </div>
+        <div
+          style={{
+            fontSize: 12,
+            color: 'var(--text-secondary)',
+            lineHeight: 1.55,
+            marginBottom: 10,
+          }}
+        >
+          Founder-led marketing only scales if the channel + offer + delivery model are protected
+          from drift. The 1-1-1 framework (locked GTM v3.3 §6) is layered ABOVE the 8 role
+          playbooks below — every cold opener, discovery question, and killer pitch must funnel
+          into the same conversion mechanism (the 20-min audit on a real strategic memo) and the
+          same delivery model (Individual £249/mo). When a playbook tempts you toward a second
+          channel or a custom delivery shape, return here.
+        </div>
+        <FounderLedMarketingRhythm />
+      </div>
+
       <div
         style={{
           display: 'grid',

@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Zap, ShieldAlert, ChevronRight, ChevronDown } from 'lucide-react';
+import { Zap, ShieldAlert, ChevronRight, ChevronDown, Shield } from 'lucide-react';
+import { CognitiveSovereigntyStack } from './FounderOSPanel';
 import {
   STRENGTHS,
   WEAKNESSES,
@@ -434,6 +435,50 @@ export function StrengthsWeaknessesMatrix() {
   };
 
   return (
+    <>
+      {/* Foundation block — Cognitive Sovereignty Stack interwoven 2026-05-02
+          per the founder's "interweave, don't pile" course-correct. The 4
+          tiers (protect → acquire → encode → deploy) are the operating-
+          system-level strengths that all 5 weaponisable strengths below
+          rest on. Without Tier 1 (neurobiological protection) the upper
+          tiers collapse — the prefrontal cortex can't orchestrate the 5
+          strengths if its dopaminergic baseline is hijacked by short-form
+          video. Reading this block FIRST reframes the strengths-vs-weaknesses
+          matrix: every weakness below is what happens when a sovereignty
+          tier is neglected. */}
+      <div style={{ marginBottom: 18 }}>
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 800,
+            color: 'var(--accent-primary)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            marginBottom: 8,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+          }}
+        >
+          <Shield size={12} /> Foundation · Cognitive Sovereignty Stack
+        </div>
+        <div
+          style={{
+            fontSize: 12,
+            color: 'var(--text-secondary)',
+            lineHeight: 1.55,
+            marginBottom: 10,
+          }}
+        >
+          The 4-tier protocol stack underwriting every strength below. Each tier
+          names the protocol + the source. Tier 1 is the foundation — without
+          neurobiological protection, the upper tiers collapse. The 5 strengths
+          to weaponise (right) and 5 weaknesses to neutralise (further right)
+          all rest on this stack being maintained.
+        </div>
+        <CognitiveSovereigntyStack />
+      </div>
+
     <div className="sw-grid">
       <div>
         <div
@@ -500,5 +545,6 @@ export function StrengthsWeaknessesMatrix() {
         }
       `}</style>
     </div>
+    </>
   );
 }

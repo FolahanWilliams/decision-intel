@@ -19,9 +19,13 @@
  * a new persona / framework / lesson lands, update HERE only — the
  * EducationRoomTab pulls all decks + cards from these typed exports.
  *
- * Current state (2026-05-02): 15 decks, 161 cards. Was 12 decks/~100 cards
+ * Current state (2026-05-02): 16 decks, 173 cards. Was 12 decks/~100 cards
  * at 2026-04-28 lock; expanded with advanced_sales_moves, strategic_thinking,
- * and goldner_discovery decks.
+ * goldner_discovery, and learning_efficiency decks (last added 2026-05-02
+ * with the FounderOSPanel ship — 12 cards on Active Recall + Elaborative
+ * Encoding + Progressive Summarization + SM-2 + tolerance for boredom +
+ * digital asceticism + cognitive offloading + System 1/2 ratio + locus of
+ * control + distress tolerance + the compounding-loop synthesis).
  */
 
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
@@ -45,7 +49,8 @@ export type DeckId =
   | 'founder_oneliners'
   | 'advanced_sales_moves'
   | 'strategic_thinking'
-  | 'goldner_discovery';
+  | 'goldner_discovery'
+  | 'learning_efficiency';
 
 export type CardDifficulty = 'foundation' | 'core' | 'advanced';
 export type CardMode = 'flashcard' | 'recall' | 'apply';
@@ -254,6 +259,15 @@ export const DECKS: EducationDeck[] = [
     iconName: 'MessageCircleQuestion',
     color: '#0EA5E9',
     order: 15,
+  },
+  {
+    id: 'learning_efficiency',
+    label: 'Personal R²F Encoding Mirror',
+    description:
+      "The founder's personal-mind protocol that mirrors the platform's R²F architecture (capture → encode → recall + outcome flywheel). Drill these to operationalise PathToHundredMillion → R²F Deep Dive → 6th lever (encoding mirror) and Founder School ldr_7 (Learning Velocity refined 2026-05-02). Active Recall (Karpicke 2008) · Elaborative Encoding (Bjork 1994) · Progressive Summarization (Tiago Forte) · SM-2 spaced repetition (Wozniak 1990) · long-form vs short-form discipline · tolerance for boredom · digital asceticism · cognitive offloading defense · System 1/2 ratio · internal locus · distress tolerance · the compounding-loop synthesis.",
+    iconName: 'Brain',
+    color: '#7C3AED',
+    order: 16,
   },
 ];
 
@@ -2038,6 +2052,155 @@ const GOLDNER_DISCOVERY_CARDS: EducationCard[] = [
   },
 ];
 
+// ─── Cards: Learning Efficiency (12) ────────────────────────────────
+
+const LEARNING_EFFICIENCY_CARDS: EducationCard[] = [
+  {
+    id: 'learn_active_recall',
+    deckId: 'learning_efficiency',
+    prompt: 'What is Active Recall and why does it beat re-reading on retention tests?',
+    canonicalAnswer:
+      'Active Recall is the deliberate retrieval of information from memory rather than re-exposure to source material. The mental strain of retrieval — pausing the video / closing the book and writing the concept down from memory — is the load-bearing mechanism. Karpicke 2008 showed retrieval practice produces 2-3× better long-term retention than re-reading or concept-mapping in college students on conceptual material. Re-reading FEELS more productive (fluent processing) but produces an illusion of mastery; recall PROVES mastery. The act of failing to retrieve is also load-bearing — it identifies what you have not actually encoded yet.',
+    hint: 'Cue: pause the input source, close eyes, write from memory, then check.',
+    difficulty: 'foundation',
+    applicationContext: 'Mid-way through a 60-min long-form interview on a successful founder. Pause every 10-15 min to write down the 3 most important claims from memory before resuming.',
+    source: 'Karpicke & Roediger 2008 (Science 319:966) + sociotechnical-convergence research paper 2026-05-02',
+    tag: 'protocol',
+  },
+  {
+    id: 'learn_elaborative_encoding',
+    deckId: 'learning_efficiency',
+    prompt: 'What is Elaborative Encoding and what question does it force you to answer?',
+    canonicalAnswer:
+      'Elaborative Encoding is the deliberate enrichment of a new concept by tying it to existing knowledge — explaining WHY the concept is true in your own words, naming what it reminds you of, and predicting where else it would apply. The forcing question is "why is this true and what does it remind me of?" Bjork & Bjork 1994 desirable-difficulty framework: harder encoding produces more durable retrieval. Pure rote rehearsal builds a brittle surface; elaboration builds a network. For Decision Intel: every new concept should connect to (a) something already in CLAUDE.md, (b) a Decision Intel product feature it sharpens, or (c) a buyer-persona pain it addresses. Three connections per concept beats ten flat facts.',
+    hint: 'The test: can you state the new concept in 3 sentences using at least one analogy from your existing knowledge?',
+    difficulty: 'core',
+    applicationContext: 'Reading a paper on prospective hindsight (Klein & Mitchell 1995). Encoding move: "this is why DI\'s pre-mortem prompts use past-tense framing — past tense forces the brain to generate an explanation as if for an outcome already occurred, which produces 25-30% more failure-cause insights than conditional voice. The connection: this is the operationalisation of R²F #5 in CLAUDE.md."',
+    source: 'Bjork & Bjork 1994 (desirable difficulty) + sociotechnical-convergence research paper',
+    tag: 'protocol',
+  },
+  {
+    id: 'learn_progressive_summarization',
+    deckId: 'learning_efficiency',
+    prompt: "What is Progressive Summarization and how do its layers compound?",
+    canonicalAnswer:
+      'Progressive Summarization (Tiago Forte, Building a Second Brain) is a 4-layer compression system that distills information into progressively concentrated layers without re-reading the whole source: Layer 1 = raw notes / quotes captured during the source. Layer 2 = bold the most important sentences. Layer 3 = highlight the bold passages that survive a second read. Layer 4 = write a 2-3 sentence synthesis of just the highlights. Each layer is added on a separate pass, days or weeks apart. The compounding effect: by Layer 4 the founder retrieves the highest-density 1-2% of the source in seconds, but the deeper layers stay accessible if needed. Ties directly to the SM-2 spaced-repetition system in Education Room — recall sessions reinforce Layer 4 first, drilling deeper on miss.',
+    hint: 'Layers: capture → bold → highlight → synthesize. Each on a separate pass.',
+    difficulty: 'core',
+    applicationContext: 'After watching a 90-min Naval Ravikant interview. Day 1: 30 timestamped bullets. Day 3: bold 10. Week 1: highlight 4 of the 10 bold lines. Month 1: write a 3-sentence synthesis of the 4 highlights. By month 6 the synthesis is recallable in 15 seconds; the bold passages take 60 seconds to retrieve.',
+    source: 'Tiago Forte, Building a Second Brain (2022) + sociotechnical-convergence research paper',
+    tag: 'protocol',
+  },
+  {
+    id: 'learn_sm2_logic',
+    deckId: 'learning_efficiency',
+    prompt: 'Why does the SM-2 spaced-repetition algorithm space reviews exponentially instead of evenly?',
+    canonicalAnswer:
+      'SM-2 (SuperMemo 2, Wozniak 1990) schedules reviews at progressively widening intervals — typically Day 1, Day 6, then multiplying by an ease factor (~2.5×) on each successful recall. The exponential spacing matches the forgetting curve: as a memory consolidates, the interval before retrieval becomes useful (vs. wasted re-exposure) grows exponentially. Reviewing every day after initial encoding wastes attention; reviewing too late causes retrieval failure and wasted re-encoding cost. Each successful recall pushes the next due-date further out (compounding); each failed recall resets to Day 1 (cost of skipping reviews). Education Room implements SM-2 lite: each card tracks easeFactor (starts 2.5, decreases on miss), repetitions (count of consecutive successful reviews), intervalDays (current waiting period), and nextDue (auto-computed). The deck-picker shows due-card count + per-deck mastery percentage.',
+    hint: 'Forgetting curve = exponential decay → optimal review schedule = exponential spacing.',
+    difficulty: 'core',
+    applicationContext: 'Drilling the buyer_personas deck before a Wednesday warm-intro call. Cards last reviewed 2 weeks ago surface first; cards reviewed yesterday do not appear. The system optimizes attention allocation automatically.',
+    source: 'Wozniak 1990 SuperMemo 2 algorithm + Education Room SM-2 implementation in education-room-data.ts',
+    tag: 'theory',
+  },
+  {
+    id: 'learn_tolerance_for_boredom',
+    deckId: 'learning_efficiency',
+    prompt: 'Why is tolerance for boredom a foundational protocol for deep work?',
+    canonicalAnswer:
+      'The modern brain expects instant stimulation. Algorithmic short-form video platforms have trained the dopaminergic baseline upward — the brain demands constant novelty to stay engaged. Tolerance for boredom is the deliberate practice of staying present with low-stimulation work (deep reading, writing, problem-solving) without reaching for a screen. The mechanism: by progressively extending periods of uninterrupted low-stimulation focus, the dopaminergic baseline resets downward, restoring the psychological endurance required to tackle complex, frustrating, ambiguous problems. Without this protocol, deep work is impossible — the brain bails out of high-friction cognitive tasks within minutes because they feel intolerable relative to the SFV-trained baseline. Practical implementation: phone-free morning (no first-look screen), 90-min focused blocks with no notifications, structured boredom (a 20-min walk without earbuds).',
+    hint: 'The dopaminergic baseline is set by your last 30 days of consumption. Reset it deliberately.',
+    difficulty: 'foundation',
+    applicationContext: 'Saturday morning startup time — instead of opening LinkedIn first, sit with one paper for 60 min (silent, no music, no phone). The first 15 min feel restless; minutes 15-60 produce the deepest synthesis of the week.',
+    source: 'Cal Newport, Deep Work (2016) + sociotechnical-convergence research paper · neurobiology of SFV addiction studies',
+    tag: 'protocol',
+  },
+  {
+    id: 'learn_long_vs_short_form',
+    deckId: 'learning_efficiency',
+    prompt: 'What is the optimal video length for deep insights, and why?',
+    canonicalAnswer:
+      'For deep insights into world trends, frameworks, and the characteristics of successful operators: long-form, 30 minutes to 2 hours. While short-form media trains speed and shallow reaction, long-form trains depth, patience, and synthesis. Consuming long, in-depth interviews forces the brain to tolerate effort, ambiguity, and complexity — exactly the System 2 muscle the founder needs. The neurological mechanism: short-form algorithmic content downregulates the Dorsolateral Prefrontal Cortex (DLPFC) and Anterior Cingulate Cortex (ACC) — the seats of executive functioning and conflict resolution. Long-form content does the opposite: sustained attention strengthens neural connectivity in those regions over time. Practical sources: Lex Fridman, Tim Ferriss, The Knowledge Project (Shane Parrish), Acquired podcast, founder interviews on YC channel, BG2 (Brad Gerstner), All-In, Howard Marks memos read aloud. Drop algorithmic SFV (TikTok / Reels / Shorts) entirely.',
+    hint: '30-min floor for depth · 90-min sweet spot · 2-hour ceiling before fatigue degrades retention.',
+    difficulty: 'foundation',
+    applicationContext: 'Walking 45 min to an event — listen to one Acquired podcast episode (typically 90-180 min, split across 2 walks). Encode via Active Recall during the walk back: voice-memo the 3 most important claims before checking the phone.',
+    source: 'sociotechnical-convergence research paper 2026-05-02 · fMRI/EEG SFV addiction neuroimaging',
+    tag: 'consumption',
+  },
+  {
+    id: 'learn_digital_asceticism',
+    deckId: 'learning_efficiency',
+    prompt: 'What is Digital Asceticism and how does it differ from a "digital detox"?',
+    canonicalAnswer:
+      'Digital Asceticism (per the sociotechnical-convergence research paper) is the deliberate, rigorous, structural minimization of digital noise to reclaim cognitive bandwidth — distinct from a temporary detox. A detox is a vacation followed by relapse to baseline; asceticism is a permanent reduction in the consumption surface. Specifically: (a) eliminate algorithmic short-form video platforms (TikTok / Reels / Shorts) — these operate on variable-reward schedules that hijack dopaminergic pathways. (b) remove non-essential push notifications. (c) phone-free morning routines (no screen before deep work). (d) physical environments devoid of digital distractions during work blocks. Why permanent: because the dopaminergic baseline only resets if the lower-stimulation environment becomes the steady state. Asceticism is to the digital environment what a low-glycemic diet is to insulin sensitivity — the discipline IS the result. For a 16-year-old founder targeting Stanford / SF / pre-seed in 2027, this is the protocol that compounds.',
+    hint: 'Detox = vacation. Asceticism = steady state.',
+    difficulty: 'foundation',
+    applicationContext: "Friday evening — instead of unwinding via Instagram Reels (which spikes cortisol + downregulates DLPFC), unwind via a 2-hour deep-read session on a paper that connects to DI's moat (e.g. one of the Kahneman & Klein papers). The discipline becomes the leisure.",
+    source: 'sociotechnical-convergence research paper 2026-05-02 (High-Agency Protocols section)',
+    tag: 'protocol',
+  },
+  {
+    id: 'learn_cognitive_offloading',
+    deckId: 'learning_efficiency',
+    prompt: 'What is the "Google Effect" / cognitive offloading and why is it especially dangerous for adolescents?',
+    canonicalAnswer:
+      'When individuals anticipate that information will be stored externally and instantly accessible (search engines, AI assistants, cloud notes), they fail to internally consolidate the knowledge — the brain offloads the encoding step entirely. This is colloquially the "Google Effect" or digital amnesia. For adults whose neural architecture is already built, this means atrophy of existing skills that can theoretically be rebuilt. For ADOLESCENTS the consequence is structurally worse: by relying on AI for summarization, writing, and problem-solving, they may NEVER build the foundational neural architecture for critical thinking, conceptual understanding, and complex auditing in the first place. The defense: deliberate, asymmetric offloading. Use AI as a system to direct (orchestration), not as an oracle to query (replacement). Always run the encoding pass yourself BEFORE asking the AI for a summary — the encoding is what builds the architecture, the AI summary just confirms or sharpens it.',
+    hint: 'Encode first. Query AI second. Never the inverse.',
+    difficulty: 'foundation',
+    applicationContext: "After a NotebookLM synthesis on the master KB, write down the 3 most important insights from memory BEFORE re-reading the synthesis. The friction is the point — if you can't recall any of it 30 minutes later without the synthesis open, the encoding hasn't happened.",
+    source: 'Sparrow et al. 2011 (Google Effects on Memory, Science 333:776) + sociotechnical-convergence research paper',
+    tag: 'risk',
+  },
+  {
+    id: 'learn_system1_system2_ratio',
+    deckId: 'learning_efficiency',
+    prompt: 'What is the System 1 / System 2 ratio and how does Decision Intel measure it on a memo?',
+    canonicalAnswer:
+      "Per Kahneman (Thinking, Fast and Slow), System 1 is fast / intuitive / pattern-matching cognition. System 2 is slow / deliberate / analytical cognition. Most cognitive biases are System 1 failure modes — heuristics applied where deliberate analysis was warranted. Decision Intel scores process maturity (one of the six DQI components, weight 13%) partly via the System 1 / System 2 ratio of detected biases. A memo where >70% of detected biases are System 1 (anchoring, availability, framing, recency) signals a heuristic-dominant decision process — penalized. A memo where the ratio is balanced or System 2-leaning (with explicit pre-mortem, dissent, base rates, blind priors) is rewarded. For the founder personally: the same ratio applies. If most of your daily knowledge work is System 1 (scrolling feeds, reactive replies, surface skim), the founder brain is not building System 2 capacity. Long-form reading + Active Recall + writing = System 2 amplification.",
+    hint: 'System 1 = fast/intuitive (patterns). System 2 = slow/deliberate (analysis). The ratio is auditable.',
+    difficulty: 'core',
+    applicationContext: 'A founder asks ChatGPT to summarize a 30-page strategy paper without reading it first. That is a System 1 move (cognitive offloading). Reading the paper, writing your own 3-sentence summary from memory, THEN asking ChatGPT to surface what you missed — that is System 2 amplification by AI.',
+    source: 'Kahneman 2011 + DQI process-maturity component in src/lib/scoring/dqi.ts',
+    tag: 'theory',
+  },
+  {
+    id: 'learn_locus_of_control',
+    deckId: 'learning_efficiency',
+    prompt: 'What is internal vs external locus of control and why does it matter for high-agency founders?',
+    canonicalAnswer:
+      "Locus of control (Rotter 1966) is the degree to which an individual believes outcomes are under their own control vs determined by external forces (luck, fate, system, others). Internal locus = 'my outcomes track my actions and discipline.' External locus = 'my outcomes track macro forces, gatekeepers, what's-in-the-air.' For a 16-year-old founder navigating an Age of Displacement scenario (per the sociotechnical-convergence research paper), the macro environment IS chaotic and structurally flawed — but personal capacity to adapt, learn, and exert discipline remains entirely within control. Adopting an internal locus is not denying the macro reality; it is choosing the operating frame that produces action. Frame life as a strategic game of asset and skill allocation. View AI not as a terminator of human potential but as a lever to multiply your own agency. The macro decline is real; your individual response is also real. The two facts are not in tension.",
+    hint: "Internal locus = 'my response is the variable I control.' External locus = 'I'm a passenger.' The first compounds; the second collapses.",
+    difficulty: 'foundation',
+    applicationContext: 'When a peer says "everything is rigged / AI is going to take all the jobs / it doesn\'t matter what we do" — recognize this as external-locus framing. The honest response: the macro is rigged, AND the individual response still determines the individual outcome. Both. Then redirect to action.',
+    source: 'Rotter 1966 (locus of control) + sociotechnical-convergence research paper (High-Agency Protocols section)',
+    tag: 'mindset',
+  },
+  {
+    id: 'learn_distress_tolerance',
+    deckId: 'learning_efficiency',
+    prompt: 'Why is distress tolerance a load-bearing protocol and how do you build it deliberately?',
+    canonicalAnswer:
+      'Distress tolerance is the capacity to operate effectively under stress, ambiguity, and adversity without dropping into avoidance or emotional dysregulation. The Gen Z workforce data (Deloitte: 47% report stress / anxiety most or all the time; Gallup: 1.1-year average tenure for Gen Z first-five-years vs 2.8 for Gen X) signals a generational deficit in this capacity. Modern cultural and educational frameworks have inadvertently sheltered youth from adversity, contributing to fragility. The defense is deliberate exposure: actively seek out difficult challenges (academic, physical, social) and practice operating effectively under stress. Specifics: cold exposure (2-3 min cold shower); physical exercise that progressively pushes effort tolerance; doing the hardest task of the day FIRST; deliberately presenting ideas to senior people who will push back. The compounding: each tolerated friction expands the capacity. Without this, the founder cannot navigate the tumultuous transition phase the macro environment is entering.',
+    hint: 'Adversity is a deliberate input variable, not a thing that happens to you.',
+    difficulty: 'core',
+    applicationContext: 'Pre-event nerves before a Wednesday warm-intro with an F500 GC. Distress tolerance protocol: instead of avoiding the meeting via over-prep, actively rehearse the most difficult question they could ask (e.g. "give me a customer reference I can call today"). The friction of admitting "no live customer references yet" + having a clean honest answer ready expands the tolerance for the actual moment.',
+    source: 'Deloitte Gen Z survey + Gallup engagement data + sociotechnical-convergence research paper (High-Agency Protocols section)',
+    tag: 'protocol',
+  },
+  {
+    id: 'learn_compounding_loop',
+    deckId: 'learning_efficiency',
+    prompt: 'How do all 11 learning-efficiency protocols compose into a single compounding loop?',
+    canonicalAnswer:
+      'The protocols compose hierarchically. (1) Tier 1 / Protect: digital asceticism + tolerance for boredom + distress tolerance reset the dopaminergic + stress baselines. (2) Tier 2 / Acquire: with the baseline reset, long-form content (30-90+ min) becomes consumable; deep reading rebuilds inferential-reasoning circuitry. (3) Tier 3 / Encode: Active Recall + Elaborative Encoding + Progressive Summarization convert consumption into long-term memory. (4) Tier 4 / Retain: SM-2 spaced repetition reinforces the encoded knowledge at exponentially widening intervals; the System 1 / System 2 ratio audit catches drift toward heuristic-dominant cognition. (5) Tier 5 / Deploy: internal locus of control reframes the macro chaos as the operating environment; high-agency action allocates the encoded knowledge into product / pitch / decision artefacts. The compounding: each loop iteration deepens prior tiers. Year 1: capacity to consume a 90-min interview without bailing. Year 3: capacity to synthesize 200 sources into a single defensible thesis. Year 10: capacity to architect a category like Decision Intel. The protocols are not optional — they are the operating system the rest of the founder hub runs on.',
+    hint: 'Protect → Acquire → Encode → Retain → Deploy. Each tier feeds the next.',
+    difficulty: 'advanced',
+    applicationContext: 'Asked by a peer: "if you had to pick ONE habit that compounds the most for an aspiring founder, what would it be?" The honest answer: there is no single habit. There are protocols that compose. The composition itself is the moat.',
+    source: 'Synthesis of all 11 learning-efficiency cards + FounderOSPanel Cognitive Sovereignty Stack visualization',
+    tag: 'synthesis',
+  },
+];
+
 // ─── Aggregator + Helpers ───────────────────────────────────────
 
 export const ALL_CARDS: EducationCard[] = [
@@ -2058,6 +2221,7 @@ export const ALL_CARDS: EducationCard[] = [
   ...BRINKMANSHIP_CARDS,
   ...STRATEGIC_THINKING_CARDS,
   ...GOLDNER_DISCOVERY_CARDS,
+  ...LEARNING_EFFICIENCY_CARDS,
 ];
 
 export function findDeck(id: DeckId): EducationDeck | undefined {
