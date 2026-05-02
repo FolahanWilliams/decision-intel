@@ -92,8 +92,40 @@ async function runGenerateTest(model: string): Promise<boolean> {
 async function main() {
   if (!process.env.AI_GATEWAY_API_KEY) {
     process.stderr.write(
-      '✗ AI_GATEWAY_API_KEY is not set in .env.local — add it before running this test.\n'
+      '✗ AI_GATEWAY_API_KEY is not set after loading .env.local.\n'
     );
+
+    // Common failure mode: case-sensitivity typo when the var was added in
+    // the Vercel dashboard (e.g. `Ai_GATEWAY_API_KEY` with lowercase i).
+    // Surface near-matches so the founder spots the typo without having to
+    // manually grep .env.local. We only print key names, never values.
+    const TARGET = 'AI_GATEWAY_API_KEY';
+    const similar = Object.keys(process.env).filter(k => {
+      if (k === TARGET) return false;
+      const upper = k.toUpperCase();
+      return upper === TARGET || upper.includes('GATEWAY') || upper.includes('AI_GATEWAY');
+    });
+
+    if (similar.length > 0) {
+      process.stderr.write(
+        '\n  Possible typo — these similarly-named env vars ARE set:\n'
+      );
+      for (const k of similar) {
+        process.stderr.write(`    · ${k}\n`);
+      }
+      process.stderr.write(
+        `\n  If one of those is the gateway key, rename it to ${TARGET} in your\n` +
+          '  Vercel dashboard → Settings → Environment Variables, then re-run\n' +
+          '  `vercel env pull .env.local` and `npm run test:gateway`.\n'
+      );
+    } else {
+      process.stderr.write(
+        '\n  No similarly-named vars found. Add AI_GATEWAY_API_KEY to .env.local\n' +
+          '  (or to your Vercel project → Settings → Environment Variables, then\n' +
+          '  pull with `vercel env pull .env.local`).\n'
+      );
+    }
+
     process.exit(1);
   }
 
