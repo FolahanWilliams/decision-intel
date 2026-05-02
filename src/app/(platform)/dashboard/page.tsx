@@ -147,12 +147,27 @@ const ROLE_DASHBOARD_SUBTITLE: Record<EmptyStateRole, string> = {
   other: 'Decision intelligence overview',
 };
 
+/** Persona-grade dashboard headline (locked 2026-05-02 from DiscoveryHookView
+ *  aesthetic propagation). Display serif (Instrument Serif) at clamp(28-44px)
+ *  matching the doc-detail Discovery hook so the entry-point feels continuous
+ *  with where uploads land. The subtitle below picks up the role-aware tagline. */
+const ROLE_DASHBOARD_HEADLINE: Record<EmptyStateRole, string> = {
+  cso: 'Audited before the room sees it.',
+  ma: 'IC-ready, before IC.',
+  bizops: 'Quality gates on every strategic call.',
+  pe_vc: 'Audited before the partners&rsquo; room.',
+  other: 'Strategic memos, audited in 60 seconds.',
+};
+
 export default function Dashboard() {
   const { knowledgeGraphLabel, isTeamPlan } = usePlanLabels();
   const onboardingRole = useOnboardingRole();
   const dashboardSubtitle = onboardingRole
     ? ROLE_DASHBOARD_SUBTITLE[onboardingRole]
     : ROLE_DASHBOARD_SUBTITLE.other;
+  const dashboardHeadline = onboardingRole
+    ? ROLE_DASHBOARD_HEADLINE[onboardingRole]
+    : ROLE_DASHBOARD_HEADLINE.other;
   const [isDragOver, setIsDragOver] = useState(false);
   const [kgConsent, setKgConsent] = useState<{
     status: 'pending' | 'merged' | 'private' | 'not_applicable';
@@ -839,13 +854,45 @@ export default function Dashboard() {
       {/* Welcome modal for first-time users */}
       {showWelcome && <WelcomeModal onClose={() => setShowWelcome(false)} />}
 
-      {/* Header with view tabs */}
+      {/* Header — persona-grade hero (locked 2026-05-02). Display serif
+          H1 matches the DiscoveryHookView aesthetic on doc-detail so the
+          entry-point feels continuous with where uploads land. The
+          eyebrow + subtitle hierarchy is identical to the Discovery hook
+          for visual coherence. Globals.css rule against display serif on
+          platform surfaces is intentionally extended here — the dashboard
+          IS the entry-point deliverable surface, not an analyst panel. */}
       <div className="page-header" style={{ marginBottom: 0 }}>
-        <div>
-          <h1>
-            <span className="text-gradient">Dashboard</span>
-          </h1>
-          <p className="page-subtitle">{dashboardSubtitle}</p>
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div
+            style={{
+              fontSize: 'var(--fs-3xs)',
+              fontWeight: 600,
+              color: 'var(--text-muted)',
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              marginBottom: 8,
+            }}
+          >
+            Dashboard
+          </div>
+          <h1
+            style={{
+              fontFamily: 'var(--font-display, "Instrument Serif", Georgia, serif)',
+              fontSize: 'clamp(28px, 3.4vw, 44px)',
+              lineHeight: 1.1,
+              fontWeight: 400,
+              letterSpacing: '-0.02em',
+              color: 'var(--text-primary)',
+              margin: 0,
+            }}
+            dangerouslySetInnerHTML={{ __html: dashboardHeadline }}
+          />
+          <p
+            className="page-subtitle"
+            style={{ marginTop: 8, fontSize: 'var(--fs-sm)', color: 'var(--text-muted)' }}
+          >
+            {dashboardSubtitle}
+          </p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <button

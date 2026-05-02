@@ -36,17 +36,17 @@ function AskSurfaceInner() {
           panel, not like /dashboard/analytics. */}
       <div
         style={{
-          padding: '16px 24px 14px',
+          padding: '20px 32px 18px',
           flexShrink: 0,
           borderBottom: '1px solid var(--border-color)',
           background: 'var(--bg-card)',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <div
             style={{
-              width: 36,
-              height: 36,
+              width: 40,
+              height: 40,
               borderRadius: 'var(--radius-md)',
               background: 'rgba(22, 163, 74, 0.10)',
               border: '1px solid rgba(22, 163, 74, 0.22)',
@@ -58,27 +58,41 @@ function AskSurfaceInner() {
           >
             <Sparkles size={18} style={{ color: 'var(--accent-primary)' }} />
           </div>
-          <div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div
+              style={{
+                fontSize: 'var(--fs-3xs)',
+                fontWeight: 600,
+                color: 'var(--text-muted)',
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                marginBottom: 4,
+              }}
+            >
+              AI Copilot
+            </div>
             <h1
               style={{
-                fontSize: 18,
-                fontWeight: 700,
+                fontFamily: 'var(--font-display, "Instrument Serif", Georgia, serif)',
+                fontSize: 'clamp(22px, 2.4vw, 28px)',
+                fontWeight: 400,
+                lineHeight: 1.15,
                 margin: 0,
                 color: 'var(--text-primary)',
                 letterSpacing: '-0.015em',
               }}
             >
-              Ask
+              Your AI advisory team.
             </h1>
             <p
               style={{
-                fontSize: 12,
+                fontSize: 'var(--fs-xs)',
                 color: 'var(--text-muted)',
-                margin: '2px 0 0 0',
+                margin: '4px 0 0 0',
                 lineHeight: 1.4,
               }}
             >
-              Your AI advisory team — structured decisions, document Q&amp;A, and source citations
+              Structured decisions · document Q&amp;A · source citations
             </p>
           </div>
         </div>
