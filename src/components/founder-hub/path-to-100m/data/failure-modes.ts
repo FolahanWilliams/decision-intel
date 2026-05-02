@@ -117,22 +117,24 @@ export const FAILURE_MODES: FailureMode[] = [
   },
   {
     id: 'agentic_shift',
-    trap: 'Agentic Shift Makes Strategic Memo Obsolete (External Attack Vector #3)',
+    trap: 'Agentic Shift Makes Strategic Memo Obsolete (External Attack Vector #3) · investigation in flight',
     killedCompany: 'Palantir + Databricks + Aera Technology + Snowflake (the threat is structural)',
     diagnostic:
-      'Palantir launched its "Agentic AI Hives" manifesto. Databricks is positioning Unity Catalog as an agent control tower. Aera Technology is deploying autonomous agents that execute supply-chain decisions directly. Snowflake is pitching agents acting over governed data. Our entire product is built around uploading a written "strategic memo" — but the volume of human-authored 40-page strategy memos may plummet as enterprises shift from decision-SUPPORT to decision-EXECUTION via agents.',
+      'Citation-grade evidence (sourced 2026-05-02): WEF Future of Jobs 2030 projects 92M jobs eliminated + 170M new roles requiring hyper-specialized human-AI collaboration. The British Standards Institution seven-economy study finds 31% of organizations evaluate AI before considering hiring + 41% confirm AI is reducing headcount + 25% believe most entry-level cognitive tasks are doable by AI today. The Agentic Task Exposure (ATE) framework projects 93.2% of information-sector occupations cross moderate-to-high displacement risk over 2025-2030. Palantir / Databricks / Aera / Snowflake are productizing agentic decision-execution NOW. The fatal-threat framing: our entire product is built around uploading a written "strategic memo" — but the volume of human-authored 40-page strategy memos may plummet as enterprises shift from decision-SUPPORT to decision-EXECUTION via agents.',
     diExposure: 'medium',
     countermove: [
-      'The 7-minute live audit motion on specimens (Founder School es_10) does NOT depend on memo format — depends on the bias-detection IP being applicable to ANY structured artefact (IC memos, board decks, agent decision logs, agentic system prompts)',
-      'Strategic question to revisit Q3 2026: position Decision Intel as the audit layer FOR agents — agentic systems making capital-allocation decisions need a reasoning audit too',
-      'Track the agentic-shift telemetry: is the 12-month-out F500 CSO ICP shrinking the volume of human-authored strategic memos?',
+      'Authorship-agnostic R²F · the 22-bias DI-B-001 → DI-B-022 taxonomy fires on REASONING PATTERNS inside artefacts, not on artefact format. DI-B-021 (illusion_of_validity) detects narrative coherence not backed by base rates — fires HARDER on agent outputs because LLM auto-regression prioritises coherence by construction. As agent-authored artefacts proliferate, R²F becomes MORE valuable, not less. The moat compounds.',
+      'DPR is the contractual artefact regardless of input source · EU AI Act Art 14 + Basel III ICAAP + SEC AI disclosure require auditable records for HIGH-STAKES decisions, not for human-authored decisions specifically. The hashed + tamper-evident provenance with six R²F cover signals + 19-framework regulatory mapping is the contractual answer the F500 GC needs whether the input was a memo or an agent decision-chain log.',
+      'Structurer node accepts arbitrary structured input · extending the input schema from "uploaded document" to "agent decision-chain log" or "agent system prompt + output trace" is an INPUT-LAYER change, not a pipeline rewrite. The 12-node pipeline + 20×20 toxic-combinations matrix + 143-case reference-class engine work the same way once the input is structured.',
+      'The 7-minute live audit motion on specimens (Founder School es_10) does NOT depend on memo format — bias-detection IP is applicable to ANY structured artefact.',
+      '30-day investigation in flight · scaffolded 2026-05-02 at docs/agentic-shift-investigation-q2-2026.md. 10 prospect conversations, end-of-June 2026 synthesis memo, three forward paths: Path A (>70% human-authored → wedge holds, pivot stays Q1 2027 reserve), Path B (40-70% AI-assisted → ship AI-assistance signature detector as next R²F paper application), Path C (>30% agent-generated → extend structurer for agent decision-chain logs in 2026 H2).',
     ],
     tripwire:
-      'If two F500 prospects independently mention "agents are doing this for us now" in 2026, the memo format is declining faster than the wedge can close. Pivot to audit-layer-for-agents.',
+      'June 30 2026 path-lock: if Path C threshold (>30% of 10-prospect sample reports agent-generated artefacts), extend structurer input schema in 2026 H2 + reposition DI as audit layer for STRATEGIC DECISIONS regardless of input format. If Path B (40-70% AI-assisted), keep wedge motion + ship AI-assistance signature detector. If Path A (>70% human-authored), reserve item stays Q1 2027.',
     whatToWatch:
-      'Palantir + Databricks + Aera + Snowflake quarterly earnings calls for agentic-decision case studies. Track F500 CSO LinkedIn posts for "agent-led strategy" framing. NotebookLM monitor for the agentic-shift narrative shift.',
+      'Palantir + Databricks + Aera + Snowflake quarterly earnings calls for agentic-decision case studies. F500 CSO LinkedIn posts for "agent-led strategy" framing. The 10-prospect investigation discovery answers as they accumulate (the discovery question fires AFTER the 4 §7 hybrid-motion questions, BEFORE any tailored pitch). NotebookLM monitor for the agentic-shift narrative shift.',
     evidence:
-      'CLAUDE.md External Attack Vectors lock 2026-04-26 + NotebookLM external attack synthesis (note `9a249bd8`)',
+      'CLAUDE.md External Attack Vectors locked 2026-04-26, sharpened 2026-05-02 with citation-grade evidence (WEF / BSI / ATE / JEPA) + authorship-agnostic-R²F defense framing. Investigation scaffolding at docs/agentic-shift-investigation-q2-2026.md. NotebookLM master-KB note `9a249bd8`.',
   },
 ];
 

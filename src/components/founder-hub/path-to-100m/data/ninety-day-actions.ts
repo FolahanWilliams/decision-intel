@@ -76,6 +76,20 @@ export const NINETY_DAY_ACTIONS: NinetyDayAction[] = [
 
   // Weeks 5-8 (June 2026)
   {
+    id: 'agentic_shift_investigation',
+    week: 'Weeks 1-8 · May-June 2026 (synthesis at end of June)',
+    weekNumber: 5,
+    category: 'positioning',
+    action:
+      'Run agentic-shift Q2 2026 investigation · 10 prospect discovery conversations + end-of-June synthesis memo + path-lock (A/B/C)',
+    why: 'External Attack Vector #3 needs evidence-grounded triage before the wedge sequencing reaches the design-partner conversion gate. The discovery question slots into the §7 hybrid-motion script as Q5 (after the 4 discovery questions, before the tailored pitch). Investigation scaffolding ships docs/agentic-shift-investigation-q2-2026.md; the founder writes the one-page synthesis end of June + locks Path A (wedge holds) / Path B (ship AI-assistance signature detector) / Path C (extend structurer for agent decision-chain logs in 2026 H2). Without this triage, Vector #3 stays a generic risk instead of a navigable decision tree.',
+    successCriterion:
+      '10 discovery conversations logged in the memo sample table · synthesis memo written + path-locked by 2026-06-30 · CLAUDE.md Vector #3 + founder-context.ts + GTM v3.3 §5 propagated lock-step',
+    blocker:
+      'Warm-intro velocity (need ~10 conversations sampled across F500 CSO + PE M&A + Pan-African fund + corp-dev + GC archetypes — persona diversity discipline, no clustering 5+ in same buyer org). Discovery-before-pitch discipline (poisoning the data with pitches kills the sample).',
+    effort: 'medium',
+  },
+  {
     id: 'mckinsey_quantumblack_intro',
     week: 'Weeks 5-6 · June 2026',
     weekNumber: 5,
