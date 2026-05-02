@@ -11,6 +11,10 @@
  * concept being taught.
  */
 
+import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+
+const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
+
 export type LessonViz =
   | ChainViz
   | QuadrantsViz
@@ -1277,7 +1281,7 @@ const VIZ_PLATFORM_FOUNDATIONS: Record<string, LessonViz> = {
       { label: 'Fact-check', detail: 'Quantitative-claim verification.' },
       {
         label: 'Compliance mapper',
-        detail: 'Cross-links 17 frameworks (G7 + EU + GCC + African).',
+        detail: `Cross-links ${FRAMEWORK_COUNT} frameworks (G7 + EU + GCC + African).`,
       },
       { label: 'Compound-risk scorer', detail: 'Applies 20×20 matrix.' },
       { label: 'Verdict synthesiser', detail: 'DQI + exec summary.', emphasis: true },
@@ -1285,9 +1289,8 @@ const VIZ_PLATFORM_FOUNDATIONS: Record<string, LessonViz> = {
   },
   pf_8: {
     type: 'radialNetwork',
-    caption:
-      '17 regulatory frameworks across G7 / EU / GCC / African markets — each gates a category of customer or removes a procurement objection. The Pan-African coverage is the moat layer no US-incumbent has.',
-    center: 'DI flags\n(every one carries a citation across 17 frameworks)',
+    caption: `${FRAMEWORK_COUNT} regulatory frameworks across G7 / EU / GCC / African markets — each gates a category of customer or removes a procurement objection. The Pan-African coverage is the moat layer no US-incumbent has.`,
+    center: `DI flags\n(every one carries a citation across ${FRAMEWORK_COUNT} frameworks)`,
     nodes: [
       {
         label: 'EU AI Act · Art 14',

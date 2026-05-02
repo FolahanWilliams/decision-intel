@@ -71,9 +71,9 @@ export const SILENT_OBJECTIONS: SilentObjection[] = [
     whyItKills:
       "For a licensed firm like Sankore, regulatory mapping isn't marketing — it's a legal requirement. Incomplete coverage breaks trust permanently. One missing primary regulator turns the wedge into an outsider misstep.",
     fixThisWeek:
-      'Ship ISA 2007 (Nigerian Investment & Securities Act) framework module. Update FRC Nigeria code to current standard (post-2018 revisions). Both extend the framework count from 17 → 18+ via the canonical getAllRegisteredFrameworks() source. Less critical for the immediate UK-focused 30-day pivot, but prerequisite for the Sankore summer design-partner conversation.',
-    status: 'in_progress',
-    shipBy: 'This week — framework module add',
+      'ISA 2007 (Nigerian Investment & Securities Act) framework module SHIPPED 2026-04-29 in africa-frameworks.ts; lifted the count to 19. Remaining work: confirm FRC Nigeria code reflects post-2018 revisions, and audit each African framework citation in DPR generator against current statute text. Less critical for the immediate UK-focused 30-day pivot, but already-procurement-ready for the Sankore summer design-partner conversation.',
+    status: 'shipped',
+    shipBy: 'Shipped 2026-04-29',
   },
 ];
 

@@ -2,6 +2,10 @@
 // Preserves every verbatim objection, demo step, audience pitch, and
 // framework (Challenger, MEDDPICC, SPIN). Update here when pitch evolves.
 
+import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+
+const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
+
 // ─── Pitch Reframe (Strebulaev-inspired) ──────────────────────────────────
 
 export const PITCH_REFRAME = {
@@ -229,13 +233,12 @@ export const AUDIENCE_PITCHES: AudiencePitch[] = [
     id: 'board',
     audience: 'Board / Audit Committee',
     seconds: 60,
-    pitch:
-      'Decision Intel is the reasoning layer the Fortune 500 needs before regulators start asking. Every audit produces a Decision Provenance Record — hashed, tamper-evident, mapped to the regulatory provision it touches across 17 frameworks (EU AI Act Article 14 record-keeping, SEC AI disclosure, Basel III Pillar 2 ICAAP, GDPR Article 22, NDPR, CBN, WAEMU, SOX §404, plus more). The DPR is the artefact your audit committee will eventually require evidence of. We ship it on every audit, today, before the regulator asks.',
+    pitch: `Decision Intel is the reasoning layer the Fortune 500 needs before regulators start asking. Every audit produces a Decision Provenance Record — hashed, tamper-evident, mapped to the regulatory provision it touches across ${FRAMEWORK_COUNT} frameworks (EU AI Act Article 14 record-keeping, SEC AI disclosure, Basel III Pillar 2 ICAAP, GDPR Article 22, NDPR, CBN, WAEMU, SOX §404, plus more). The DPR is the artefact your audit committee will eventually require evidence of. We ship it on every audit, today, before the regulator asks.`,
     color: '#F59E0B',
     emphasis: [
       'reasoning layer the Fortune 500 needs before regulators start asking',
       'Decision Provenance Record',
-      '17 frameworks',
+      `${FRAMEWORK_COUNT} frameworks`,
     ],
   },
   {

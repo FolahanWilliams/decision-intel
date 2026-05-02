@@ -41,8 +41,9 @@ export default function ApiDocsPage() {
     <div style={{ padding: '24px', maxWidth: 1200, margin: '0 auto' }}>
       <h1
         style={{
-          fontSize: '24px',
+          fontSize: 'var(--fs-page-h1-platform)',
           fontWeight: 700,
+          letterSpacing: '-0.03em',
           marginBottom: '8px',
           color: 'var(--text-primary)',
         }}

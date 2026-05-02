@@ -11,6 +11,10 @@
  * changes (nodes added/removed/reordered), update this file to match.
  */
 
+import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+
+const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
+
 export type PipelineZone = 'preprocessing' | 'analysis' | 'synthesis';
 
 export interface PipelineNode {
@@ -114,8 +118,7 @@ export const PIPELINE_NODES: PipelineNode[] = [
     label: 'Verification',
     tagline: 'Fact-checks claims and maps compliance exposure.',
     iconName: 'CheckCircle2',
-    purpose:
-      'Extracts quantitative and factual claims and verifies them against grounded search. In parallel, maps the memo against 17 regulatory frameworks — international anchors (FCA Consumer Duty, SOX, Basel III, EU AI Act, SEC Reg D, GDPR Art. 22, LPOA) plus African-market regimes (NDPR, CBN, WAEMU, CMA Kenya, BoG, FRC Nigeria, CBE, PoPIA, SARB, BoT) — for exposure the author may not have flagged.',
+    purpose: `Extracts quantitative and factual claims and verifies them against grounded search. In parallel, maps the memo against ${FRAMEWORK_COUNT} regulatory frameworks — international anchors (FCA Consumer Duty, SOX, Basel III, EU AI Act, SEC Reg D, GDPR Art. 22, LPOA) plus African-market regimes (NDPR, CBN, FRC Nigeria, ISA Nigeria 2007, WAEMU, CMA Kenya, BoG, CBE, PoPIA, SARB, BoT) — for exposure the author may not have flagged.`,
     output:
       'Verification verdicts (VERIFIED / CONTRADICTED / UNVERIFIABLE) and a compliance exposure report.',
     academicAnchor: 'Grounded LLM reasoning with search + structured regulatory ontology.',

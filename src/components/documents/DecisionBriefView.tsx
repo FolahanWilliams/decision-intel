@@ -41,6 +41,9 @@ import {
 } from 'lucide-react';
 import type { AnalysisResult, BiasInstance } from '@/types';
 import { dqiColorFor, gradeFromScore } from '@/lib/utils/grade';
+import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+
+const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
 import {
   buildCostOfIgnoring,
   deriveDocumentType,
@@ -663,7 +666,7 @@ function ActionFooter({
         }}
       >
         Hashed + tamper-evident. Maps onto EU AI Act Article 14, Basel III ICAAP, and
-        the 17 regulatory frameworks the platform tracks. Attach it to your board
+        the {FRAMEWORK_COUNT} regulatory frameworks the platform tracks. Attach it to your board
         pre-read or hand it to your GC.
       </p>
       <div

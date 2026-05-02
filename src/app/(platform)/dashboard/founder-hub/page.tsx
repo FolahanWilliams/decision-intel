@@ -6,6 +6,9 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { FounderChatWidget } from '@/components/founder-hub/FounderChatWidget';
 import { Loader2 } from 'lucide-react';
 import { ALL_CASES, HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
+import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+
+const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
 
 const CASES_WITH_PRE_DECISION_EVIDENCE = ALL_CASES.filter(c => c.preDecisionEvidence).length;
 
@@ -126,7 +129,7 @@ const ClosingLabTab = dynamic(
   { loading: tabLoader }
 );
 // Sparring Room — live sales-rep practice (paste Wispr Flow transcript →
-// 11-dim Sales DQI grading + buyer-perspective simulation). Locked 2026-04-28.
+// 15-dim Sales DQI grading + buyer-perspective simulation). v3 locked 2026-04-28.
 const SparringRoomTab = dynamic(
   () =>
     import('@/components/founder-hub/SparringRoomTab').then(m => ({
@@ -134,8 +137,8 @@ const SparringRoomTab = dynamic(
     })),
   { loading: tabLoader }
 );
-// Education Room — flashcard + recall + apply mastery surface across 12
-// decks / ~100 cards. SM-2 spaced repetition + AI-graded recall. Locked 2026-04-28.
+// Education Room — flashcard + recall + apply mastery surface across 15
+// decks / 160+ cards. SM-2 spaced repetition + AI-graded recall. Locked 2026-04-28.
 const EducationRoomTab = dynamic(
   () =>
     import('@/components/founder-hub/EducationRoomTab').then(m => ({
@@ -662,22 +665,21 @@ const SEARCH_INDEX: SearchEntry[] = [
       'sparring scenario modes networking event in person london drinks party conference cold first meeting skeptical follow up hot inbound procurement evaluation gc ciso live objection handling 30 seconds live demo specimen audit walkthrough wework dangote 7 minute',
   },
   // Education Room — flashcard + recall + apply mastery engine across
-  // 12 decks. Surfaced as 4 distinct entries so a query for "flashcards"
-  // or "loss aversion" or "regulatory frameworks" lands on the deck
-  // picker.
+  // 15 decks / 160+ cards. Surfaced as 4 distinct entries so a query for
+  // "flashcards" or "loss aversion" or "regulatory frameworks" lands on
+  // the deck picker.
   {
     tabId: 'education_room',
-    section: 'Education Room · Flashcard + recall + apply across 12 decks',
-    preview:
-      '~100 cards covering DI vocabulary, 7 buyer personas, Maalouf 6 + Satyam 5, 11-dim Sales DQI rubric, 5 silent objections, 17 regulatory frameworks, 12-node pipeline, R²F integration. SM-2 spaced repetition + AI-graded recall.',
+    section: 'Education Room · Flashcard + recall + apply across 15 decks',
+    preview: `160+ cards covering DI vocabulary, 7 buyer personas, Maalouf 6 + Satyam 5, 15-dim Sales DQI rubric, 5 silent objections, ${FRAMEWORK_COUNT} regulatory frameworks, 12-node pipeline, R²F integration, advanced sales moves, strategic thinking, Goldner discovery. SM-2 spaced repetition + AI-graded recall.`,
     keywords:
-      'education room flashcards recall apply spaced repetition sm2 mastery recollection wispr flow practice rehearsal vocabulary discipline locked banned r2f dpr dqi pipeline regulatory frameworks personas verbatim',
+      'education room flashcards recall apply spaced repetition sm2 mastery recollection wispr flow practice rehearsal vocabulary discipline locked banned r2f dpr dqi pipeline regulatory frameworks personas verbatim brinkmanship strategic thinking goldner',
   },
   {
     tabId: 'education_room',
     section: 'Education Room · DI Vocabulary deck (locked + banned + cold-context bridges)',
-    preview: `20 cards: reasoning layer, R²F, DPR, DQI, ${HISTORICAL_CASE_COUNT} historical decisions, 17 frameworks, 30+ biases, ~90% margin, banned phrases (decision intelligence platform / decision hygiene / boardroom strategic decision).`,
-    keywords: `education room di vocabulary deck reasoning layer r2f dpr dqi ${HISTORICAL_CASE_COUNT} decisions 17 frameworks 30 biases blended margin banned decision intelligence platform decision hygiene boardroom strategic decision warm cold context bridge specimen library wework dangote design partner seats`,
+    preview: `20 cards: reasoning layer, R²F, DPR, DQI, ${HISTORICAL_CASE_COUNT} historical decisions, ${FRAMEWORK_COUNT} frameworks, 30+ biases, ~90% margin, banned phrases (decision intelligence platform / decision hygiene / boardroom strategic decision).`,
+    keywords: `education room di vocabulary deck reasoning layer r2f dpr dqi ${HISTORICAL_CASE_COUNT} decisions ${FRAMEWORK_COUNT} frameworks 30 biases blended margin banned decision intelligence platform decision hygiene boardroom strategic decision warm cold context bridge specimen library wework dangote design partner seats`,
   },
   {
     tabId: 'education_room',

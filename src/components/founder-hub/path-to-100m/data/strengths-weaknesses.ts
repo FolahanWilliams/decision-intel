@@ -9,6 +9,10 @@
  * importing these typed exports.
  */
 
+import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+
+const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
+
 export type Strength = {
   id: string;
   rank: number;
@@ -130,13 +134,13 @@ export const STRENGTHS: Strength[] = [
   {
     id: 'compliance_moat',
     rank: 5,
-    title: '17-framework regulatory map · procurement-grade compliance moat',
+    title: `${FRAMEWORK_COUNT}-framework regulatory map · procurement-grade compliance moat`,
     category: 'compliance',
     evidence: [
       'EU AI Act Art 13/14/15 + Annex III mapped (the anchor tailwind, Aug 2026 enforcement)',
       'Basel III Pillar 2 ICAAP + SOX §404 + SEC Reg D + GDPR Art 22 + Colorado SB24-205 + California SB942',
       '11 internationally-recognised AI Verify Foundation principles — dedicated mapping page at /regulatory/ai-verify',
-      '17 frameworks structurally derived from getAllRegisteredFrameworks().length so copy never drifts (CLAUDE.md count-discipline rule)',
+      `${FRAMEWORK_COUNT} frameworks structurally derived from getAllRegisteredFrameworks().length so copy never drifts (CLAUDE.md count-discipline rule)`,
     ],
     whyItMatters:
       "Regulatory tailwinds ARE the timing argument for investors. EU AI Act Art 14 record-keeping enforcement on Aug 2, 2026 — every F500 GC is rushing to clear that gate. DI is the artefact that already maps onto the regulator's vocabulary.",

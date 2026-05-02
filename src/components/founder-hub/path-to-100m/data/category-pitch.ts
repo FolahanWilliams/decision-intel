@@ -7,6 +7,10 @@
  * persona-tailored-explanation + protected-revenue language synthesis.
  */
 
+import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+
+const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
+
 export type LanguagePattern = {
   id: string;
   pattern: string;
@@ -41,8 +45,7 @@ export const CATEGORY_DEFINITION: CategoryDefinition = {
   ],
   whatProblemItSolves:
     'Strategic decisions die in a four-tool graveyard — Google Docs draft, Slack feedback thread, Confluence writeup, board deck. The WHAT is recorded. The WHY is lost to "decision archaeology" — reconstructing past reasoning from incomplete artefacts. Decision Intel is the missing system of record that audits the reasoning ITSELF in 60 seconds, before the call is made, with the artefact the audit committee asks for after.',
-  whyItIsPossibleNow:
-    'Three years ago, no LLM could run a 12-node multi-agent debate, score outputs against a 30+ bias taxonomy, cross-map to 17 regulatory frameworks, and produce a 4-page tamper-evident DPR in 60 seconds. Now it can. The EU AI Act Article 14 enforcement on Aug 2, 2026 makes the regulatory artefact non-optional. The timing is the answer to the why-now question.',
+  whyItIsPossibleNow: `Three years ago, no LLM could run a 12-node multi-agent debate, score outputs against a 30+ bias taxonomy, cross-map to ${FRAMEWORK_COUNT} regulatory frameworks, and produce a 4-page tamper-evident DPR in 60 seconds. Now it can. The EU AI Act Article 14 enforcement on Aug 2, 2026 makes the regulatory artefact non-optional. The timing is the answer to the why-now question.`,
   fourToolGraveyard: [
     'Google Docs — the draft (ephemeral, version chaos, no audit trail)',
     'Slack — the feedback thread (signal lost in noise, untraceable)',
