@@ -81,6 +81,46 @@ export default defineAgent({
    * detection + interruption handling.
    */
   prewarm: async (proc: JobProcess) => {
+    // Connectivity probe — runs once per worker process boot. The rtc-node
+    // Rust engine hits https://<livekit-host>/settings/regions BEFORE
+    // attempting to dial signaling. From inside a Railway container that
+    // request was failing with reqwest's "error sending request for url"
+    // (couldn't even get a response), but the same URL returns HTTP/2 200
+    // from a developer laptop. We need to know which side is broken: the
+    // container's network egress, or the rtc-node Rust HTTP/TLS stack
+    // specifically. Node's built-in fetch uses OpenSSL + Undici (totally
+    // separate from rtc-node's rustls + reqwest), so a Node fetch result
+    // pins the failure cleanly.
+    try {
+      const probeHost = new URL(config.livekit.url.replace(/^ws/, 'http')).host;
+      const probeUrl = `https://${probeHost}/settings/regions`;
+      const t0 = Date.now();
+      const res = await fetch(probeUrl, {
+        method: 'GET',
+        // 8s timeout — well under the worker init timeout (10s).
+        signal: AbortSignal.timeout(8000),
+      });
+      const body = await res.text();
+      // eslint-disable-next-line no-console
+      console.log(
+        `[voice-worker] connectivity probe — url=${probeUrl} status=${res.status} bodyBytes=${body.length} elapsedMs=${Date.now() - t0}`
+      );
+    } catch (probeErr) {
+      const e = probeErr as { name?: string; message?: string; cause?: unknown };
+      // eslint-disable-next-line no-console
+      console.error(
+        '[voice-worker] connectivity probe FAILED — Node fetch cannot reach LiveKit regions endpoint',
+        '\n  name:', e?.name,
+        '\n  message:', e?.message,
+        '\n  cause:', typeof e?.cause === 'object' ? JSON.stringify(e.cause, Object.getOwnPropertyNames(e.cause as object)) : e?.cause
+      );
+      // Don't throw — let the worker continue to boot so we can compare
+      // probe failure vs ctx.connect failure for the same session. If the
+      // probe fails we expect ctx.connect to fail too with the matching
+      // pattern; if the probe succeeds and ctx.connect still fails, the
+      // bug is in the rtc-node Rust client.
+    }
+
     proc.userData.vad = await silero.VAD.load();
   },
 
