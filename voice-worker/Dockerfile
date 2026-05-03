@@ -1,21 +1,29 @@
 # Multi-stage Dockerfile for the LiveKit voice worker.
-# Railway can also build straight from the npm scripts (no Dockerfile
-# needed — the `start` script + `engines.node` is enough), but this
-# Dockerfile is the deterministic path if you want it.
+#
+# Base image: node:20-slim (Debian glibc), NOT alpine.
+# LiveKit's @livekit/rtc-node ships native bindings only for glibc Linux
+# (`linux-x64-gnu` / `linux-arm64-gnu`), darwin, and win32 — there is NO
+# `linux-x64-musl` (Alpine) build. Running on alpine fails at boot with
+# "Cannot find module @livekit/rtc-ffi-bindings-linux-x64-musl".
+# Verified against @livekit/rtc-ffi-bindings@0.12.52 optionalDependencies.
 
-FROM node:20-alpine AS deps
+FROM node:20-slim AS deps
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN npm install --ignore-scripts
+# --include=optional ensures the platform-specific native binding from
+# optionalDependencies is installed. Without it, npm's optional-deps
+# bug (npm/cli#4828) sometimes drops the binding when there's a
+# package-lock.json present.
+RUN npm install --include=optional --ignore-scripts
 
-FROM node:20-alpine AS build
+FROM node:20-slim AS build
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY package.json tsconfig.json ./
 COPY src ./src
 RUN npm run build
 
-FROM node:20-alpine AS runtime
+FROM node:20-slim AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=deps /app/node_modules ./node_modules
