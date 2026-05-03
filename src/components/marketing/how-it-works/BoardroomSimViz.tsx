@@ -1,6 +1,7 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
 
 const C = {
   white: '#FFFFFF',
@@ -89,9 +90,14 @@ export function BoardroomSimViz() {
         ? 'REJECTED'
         : 'MIXED';
   const verdictColor = verdict === 'APPROVED' ? C.green : verdict === 'REJECTED' ? C.red : C.amber;
+  // Single IntersectionObserver on the outer container for mobile-safe
+  // staggered animation — see PipelineFlowDiagram for the rationale.
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(containerRef, { once: true, margin: '-40px' });
 
   return (
     <div
+      ref={containerRef}
       style={{
         background: C.slate100,
         border: `1px solid ${C.slate200}`,
@@ -131,8 +137,7 @@ export function BoardroomSimViz() {
             <motion.div
               key={p.role}
               initial={{ opacity: 0, x: -8 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: '-40px' }}
+              animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: -8 }}
               transition={{ duration: 0.35, delay: 0.05 + i * 0.08, ease: 'easeOut' }}
               style={{
                 display: 'grid',

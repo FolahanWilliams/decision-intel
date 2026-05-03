@@ -8,7 +8,8 @@
  * the "every flag traces to the exact line" proof point.
  */
 
-import { motion } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
 
 const C = {
   green: '#16A34A',
@@ -48,9 +49,15 @@ export function AuditTraceViz() {
   const memoW = 240;
   const memoY = 28;
   const memoH = 200;
+  // Single IntersectionObserver on the outer SVG — `whileInView` on SVG
+  // child elements is unreliable on iOS Safari; one observer + driving
+  // each child's `animate` off this boolean fixes mobile rendering.
+  const svgRef = useRef<SVGSVGElement>(null);
+  const inView = useInView(svgRef, { amount: 0.3 });
 
   return (
     <svg
+      ref={svgRef}
       viewBox="0 0 480 340"
       width="100%"
       height="100%"
@@ -85,8 +92,7 @@ export function AuditTraceViz() {
             rx="1.75"
             fill={isFlagged ? C.slate700 : C.slate200}
             initial={{ width: 0 }}
-            whileInView={{ width: line.w }}
-            viewport={{ once: false, amount: 0.3 }}
+            animate={inView ? { width: line.w } : { width: 0 }}
             transition={{ duration: 0.4, delay: 0.1 + i * 0.03 }}
           />
         );
@@ -103,8 +109,7 @@ export function AuditTraceViz() {
           rx="2"
           fill="rgba(239,68,68,0.10)"
           initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: false, amount: 0.3 }}
+          animate={inView ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: 0.3, delay: 0.7 }}
         />
       ))}
@@ -119,8 +124,7 @@ export function AuditTraceViz() {
           <motion.g
             key={ann.flag}
             initial={{ opacity: 0, x: 16 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: false, amount: 0.3 }}
+            animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: 16 }}
             transition={{ duration: 0.4, delay: 0.85 + i * 0.12 }}
           >
             {/* Connector line */}
@@ -188,8 +192,7 @@ export function AuditTraceViz() {
       {/* Footer badge: "every flag traces to a line" */}
       <motion.g
         initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: false, amount: 0.3 }}
+        animate={inView ? { opacity: 1 } : { opacity: 0 }}
         transition={{ duration: 0.4, delay: 1.3 }}
       >
         <rect x="140" y="260" width="200" height="24" rx="12" fill="rgba(22,163,74,0.1)" />

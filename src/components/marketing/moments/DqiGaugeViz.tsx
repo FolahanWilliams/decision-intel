@@ -17,7 +17,8 @@
  * to r+40 for extra breathing room.
  */
 
-import { motion } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
 
 const C = {
   green: '#16A34A',
@@ -76,8 +77,15 @@ export function DqiGaugeViz() {
   const baselinePt = polar(cx, cy, r, baselineAngle);
   const whatifPt = polar(cx, cy, r, whatifAngle);
 
+  // Single IntersectionObserver on the outer SVG — `whileInView` on SVG
+  // child elements is unreliable on iOS Safari; one observer + driving
+  // each child's `animate` off this boolean fixes mobile rendering.
+  const svgRef = useRef<SVGSVGElement>(null);
+  const inView = useInView(svgRef, { amount: 0.3 });
+
   return (
     <svg
+      ref={svgRef}
       viewBox="0 0 480 340"
       width="100%"
       height="100%"
@@ -121,8 +129,7 @@ export function DqiGaugeViz() {
       {/* Baseline marker — where the memo lands unchanged */}
       <motion.g
         initial={{ opacity: 0, scale: 0.5 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ once: false, amount: 0.3 }}
+        animate={inView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.5 }}
         transition={{ duration: 0.5, delay: 0.3 }}
       >
         <line
@@ -153,8 +160,7 @@ export function DqiGaugeViz() {
         strokeLinecap="butt"
         fill="none"
         initial={{ pathLength: 0 }}
-        whileInView={{ pathLength: 1 }}
-        viewport={{ once: false, amount: 0.3 }}
+        animate={inView ? { pathLength: 1 } : { pathLength: 0 }}
         transition={{ duration: 1.0, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
         strokeOpacity="0.95"
       />
@@ -162,8 +168,7 @@ export function DqiGaugeViz() {
       {/* What-if marker */}
       <motion.g
         initial={{ opacity: 0, scale: 0.5 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ once: false, amount: 0.3 }}
+        animate={inView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.5 }}
         transition={{ duration: 0.5, delay: 1.2 }}
       >
         <line
@@ -194,8 +199,7 @@ export function DqiGaugeViz() {
           clean. */}
       <motion.g
         initial={{ opacity: 0, y: 6 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: false, amount: 0.3 }}
+        animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 6 }}
         transition={{ duration: 0.4, delay: 1.6 }}
       >
         <rect
@@ -239,8 +243,7 @@ export function DqiGaugeViz() {
           like a legend, not a shout. */}
       <motion.g
         initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: false, amount: 0.3 }}
+        animate={inView ? { opacity: 1 } : { opacity: 0 }}
         transition={{ duration: 0.4, delay: 1.4 }}
       >
         <g transform="translate(166, 222)">

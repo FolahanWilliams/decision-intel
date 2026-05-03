@@ -13,9 +13,9 @@
  * full /how-it-works page.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { PIPELINE_NODES, type PipelineNode, type PipelineZone } from '@/lib/data/pipeline-nodes';
 import { useReducedMotion } from './useReducedMotion';
@@ -337,9 +337,14 @@ function ZoneGroup({
 }) {
   const active = zone === activeZone;
   const accent = ZONE_ACCENT[zone];
+  // Single IntersectionObserver on the outer container — see
+  // PipelineFlowDiagram for the rationale (mobile-safe stagger).
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(containerRef, { once: true, margin: '-60px' });
 
   return (
     <div
+      ref={containerRef}
       style={{
         display: 'grid',
         gridTemplateColumns: layout === 'grid' ? 'repeat(4, auto)' : '1fr',
@@ -356,8 +361,7 @@ function ZoneGroup({
           <motion.div
             key={n.id}
             initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: '-60px' }}
+            animate={inView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.3, delay: 0.05 + i * 0.035 }}
             title={`${n.label} — ${n.tagline}`}
             style={{
