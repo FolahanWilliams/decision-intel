@@ -121,6 +121,45 @@ export default defineAgent({
       // bug is in the rtc-node Rust client.
     }
 
+    // Cold-start prewarm — establish DNS resolution + TLS handshake
+    // for the three downstream API endpoints (Cartesia TTS, Deepgram
+    // STT, AI Gateway LLM) at worker boot, so the first session's
+    // first turn doesn't pay the connection-setup cost. ~50-200ms
+    // saved per provider per first turn — adds up to roughly 0.5s
+    // off the time-to-first-audio for a fresh user. HEAD requests
+    // touch zero API quota beyond the trivial connection overhead.
+    // Promise.allSettled so a failure on any one provider doesn't
+    // block the others (or the worker boot).
+    const prewarmEndpoints = [
+      { name: 'cartesia', url: 'https://api.cartesia.ai' },
+      { name: 'deepgram', url: 'https://api.deepgram.com' },
+      { name: 'ai-gateway', url: config.llm.baseUrl },
+    ];
+    await Promise.allSettled(
+      prewarmEndpoints.map(async ({ name, url }) => {
+        const t0 = Date.now();
+        try {
+          const res = await fetch(url, {
+            method: 'HEAD',
+            signal: AbortSignal.timeout(3000),
+          });
+          // eslint-disable-next-line no-console
+          console.log(
+            `[voice-worker] api prewarm ${name} — url=${url} status=${res.status} elapsedMs=${Date.now() - t0}`
+          );
+        } catch (warmErr) {
+          // Non-fatal: if a provider is reachable from this worker on
+          // the actual session call but blocks HEAD requests (some do),
+          // session-time TLS still has to handshake. Logged so we know
+          // which provider didn't warm.
+          // eslint-disable-next-line no-console
+          console.warn(
+            `[voice-worker] api prewarm ${name} skipped — ${(warmErr as Error).message} (session-time will pay full TLS cost for this provider)`
+          );
+        }
+      })
+    );
+
     proc.userData.vad = await silero.VAD.load();
   },
 

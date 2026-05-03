@@ -38,7 +38,24 @@ export const config = {
   },
   cartesia: {
     apiKey: require_('CARTESIA_API_KEY'),
-    model: process.env.CARTESIA_MODEL || 'sonic-2',
+    // Default to sonic-3 — Cartesia's newest model. Two reasons it's
+    // the right default over sonic-2 (the prior config):
+    //   1. sonic-3 supports the `speed` + emotion control parameters
+    //      we send for per-persona prosody. The bare `sonic-2` model
+    //      does NOT — passing `speed: 'normal'/'slow'/'fast'` against
+    //      sonic-2 makes Cartesia return an error mid-synthesis, the
+    //      playback gets interrupted, and the founder hears nothing.
+    //      (Per Cartesia changelog at
+    //      https://docs.cartesia.ai/developer-tools/changelog, only
+    //      sonic-2-2025-03-07 and sonic-3 carry these controls.)
+    //   2. sonic-3 has higher voice fidelity than sonic-2 with similar
+    //      latency. Newer model = better default for a brand-new
+    //      voice mode product.
+    // Override via CARTESIA_MODEL env if a specific persona needs
+    // a different model (e.g. cost optimisation on sonic-2-2025-03-07
+    // for high-volume sessions). NEVER set CARTESIA_MODEL=sonic-2
+    // bare — that breaks speed parsing and crashes synthesis.
+    model: process.env.CARTESIA_MODEL || 'sonic-3',
   },
   /** Hard cap on a single voice session — matches the JWT TTL minted
    *  by /api/founder-hub/voice-token. The agent loop also enforces this
