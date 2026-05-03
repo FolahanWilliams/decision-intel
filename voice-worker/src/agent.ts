@@ -399,7 +399,7 @@ export default defineAgent({
 
     // Greet the founder so they know the session is live. The persona's
     // voice rule + voice-mode addendum keep the greeting in character.
-    const greetingHint =
+    const greetingText =
       personaId === 'skeptical_investor'
         ? "I've read your context. What are we pressure-testing?"
         : personaId === 'cognitive_psychologist'
@@ -408,30 +408,44 @@ export default defineAgent({
             ? "I've reviewed the context. What strategic question are we testing?"
             : "I'm here. What are we working on?";
 
-    // generateReply was previously fire-and-forget — if Grok rejected
-    // the request shape (AI Gateway model slug wrong, response format
-    // unexpected) or Cartesia rejected the synthesis (voice UUID
-    // missing from the account, model name unsupported), the error
-    // was swallowed and the room sat silent. Catch + log structurally.
-    Promise.resolve(session.generateReply({ instructions: `Greet briefly: "${greetingHint}"` }))
-      .then(() => {
-        // eslint-disable-next-line no-console
-        console.log(`[voice-worker] greeting dispatched — TTS audio should be flowing to room=${(ctx.room.name ?? 'unknown-room')}`);
-      })
-      .catch(replyErr => {
-        const e = replyErr as { name?: string; message?: string; stack?: string; cause?: unknown };
-        // eslint-disable-next-line no-console
-        console.error(
-          '[voice-worker] generateReply FAILED — greeting never synthesized. ' +
-          'Most likely: AI Gateway rejected the model slug, OR Cartesia rejected the voice UUID, OR a plugin-internal error.',
-          '\n  name:', e?.name,
-          '\n  message:', e?.message,
-          '\n  cause:', typeof e?.cause === 'object' ? JSON.stringify(e.cause, Object.getOwnPropertyNames(e.cause as object)) : e?.cause,
-          '\n  llmModel:', config.llm.model,
-          '\n  cartesiaVoiceId:', voiceId,
-          '\n  stack:', e?.stack
-        );
-      });
+    // Use session.say() instead of session.generateReply() for the
+    // greeting. Two reasons this is the right shape:
+    //
+    //   1. session.say(text) feeds the literal string straight into
+    //      Cartesia for synthesis — no LLM round-trip. Grok via AI
+    //      Gateway was returning empty greetings (the OpenAI plugin
+    //      either doesn't parse Grok's streaming format correctly OR
+    //      Grok interprets `Greet briefly: "..."` as instructions
+    //      not a target response and emits nothing). Empty LLM output
+    //      → empty Cartesia input → "Invalid transcript: Your initial
+    //      transcript is empty" rejection → no audio. session.say()
+    //      sidesteps that entire failure surface.
+    //
+    //   2. The greeting text is fixed per persona and chosen for the
+    //      product voice — there's no benefit to letting the LLM
+    //      regenerate it on every session start. addToChatCtx=true so
+    //      subsequent LLM turns know the agent already greeted.
+    //
+    // Subsequent turns (founder speaks → STT → LLM → TTS) still go
+    // through the normal AgentSession pipeline. If that path also
+    // returns empty from Grok, we'd need to debug separately, but
+    // the greeting failure was the immediately blocking symptom.
+    try {
+      session.say(greetingText, { addToChatCtx: true });
+      // eslint-disable-next-line no-console
+      console.log(`[voice-worker] greeting dispatched via session.say() — text="${greetingText}" room=${(ctx.room.name ?? 'unknown-room')}`);
+    } catch (sayErr) {
+      const e = sayErr as { name?: string; message?: string; stack?: string; cause?: unknown };
+      // eslint-disable-next-line no-console
+      console.error(
+        '[voice-worker] session.say FAILED — greeting never synthesized.',
+        '\n  name:', e?.name,
+        '\n  message:', e?.message,
+        '\n  cause:', typeof e?.cause === 'object' ? JSON.stringify(e.cause, Object.getOwnPropertyNames(e.cause as object)) : e?.cause,
+        '\n  cartesiaVoiceId:', voiceId,
+        '\n  stack:', e?.stack
+      );
+    }
   },
 });
 
