@@ -87,9 +87,37 @@ export default defineAgent({
   entry: async (ctx: JobContext) => {
     const startedAt = Date.now();
 
+    // Log the assignment URL the rtc-node engine will dial. The Railway
+    // log row for an entry-function failure truncates the underlying
+    // cause after the colon (`failed to retrieve regio...`), so we need
+    // to capture (a) the URL in case it's malformed, (b) the FULL error
+    // chain (message + stack + cause) ourselves before re-throwing.
+    const assignedUrl = (ctx.info as { url?: string } | undefined)?.url ?? '<no-url-in-ctx.info>';
+    // eslint-disable-next-line no-console
+    console.log(
+      `[voice-worker] entry start — jobId=${ctx.job.id} room=${(ctx.room.name ?? 'unknown-room')} assignedUrl=${assignedUrl}`
+    );
+
     // Connect to the room — audio only, we don't need to subscribe to
     // video tracks even though the founder may share screen later.
-    await ctx.connect(undefined, AutoSubscribe.AUDIO_ONLY);
+    try {
+      await ctx.connect(undefined, AutoSubscribe.AUDIO_ONLY);
+    } catch (err) {
+      // Print the full error structure so the Railway log carries the
+      // underlying region-fetch / signaling cause that pino truncates
+      // when the worker harness logs the bare exception.
+      const e = err as { message?: string; stack?: string; cause?: unknown; name?: string };
+      // eslint-disable-next-line no-console
+      console.error(
+        '[voice-worker] ctx.connect failed — full error chain follows',
+        '\n  name:', e?.name,
+        '\n  message:', e?.message,
+        '\n  cause:', typeof e?.cause === 'object' ? JSON.stringify(e.cause, Object.getOwnPropertyNames(e.cause as object)) : e?.cause,
+        '\n  assignedUrl:', assignedUrl,
+        '\n  stack:', e?.stack
+      );
+      throw err; // re-throw so the worker harness still records the failure
+    }
 
     // Wait for the founder to actually join. Until then there's no one
     // to talk to and Cartesia/Deepgram should not be billed.
