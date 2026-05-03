@@ -197,6 +197,52 @@ export function VoiceModePanel({ persona, founderPass, onEnd }: Props) {
         document.body.appendChild(audioEl);
         audioElRef.current = audioEl;
 
+        // Audio-progress diagnostics: log when actual audio data arrives
+        // and progresses. play() can resolve successfully on a stream
+        // that produces ZERO audio data — readyState stays at 0, the
+        // user hears silence, and we have no signal that anything is
+        // wrong unless we listen for these events.
+        let lastTimeUpdate = 0;
+        audioEl.addEventListener('loadedmetadata', () => {
+          console.log(
+            '[VoiceModePanel] audio loadedmetadata —',
+            `duration=${audioEl.duration}`,
+            `readyState=${audioEl.readyState}`
+          );
+        });
+        audioEl.addEventListener('canplay', () => {
+          console.log('[VoiceModePanel] audio canplay — buffer has enough data to start');
+        });
+        audioEl.addEventListener('playing', () => {
+          console.log('[VoiceModePanel] audio playing — actually emitting sound now');
+        });
+        audioEl.addEventListener('waiting', () => {
+          console.warn('[VoiceModePanel] audio waiting — playback paused waiting for more data');
+        });
+        audioEl.addEventListener('stalled', () => {
+          console.warn('[VoiceModePanel] audio stalled — no data arriving');
+        });
+        audioEl.addEventListener('ended', () => {
+          console.log('[VoiceModePanel] audio ended — track finished');
+        });
+        audioEl.addEventListener('error', (e) => {
+          console.error(
+            '[VoiceModePanel] audio error —',
+            audioEl.error?.code,
+            audioEl.error?.message
+          );
+        });
+        audioEl.addEventListener('timeupdate', () => {
+          // Throttle to once per second so the console isn't spammed
+          if (audioEl.currentTime - lastTimeUpdate >= 1.0) {
+            console.log(
+              `[VoiceModePanel] audio timeupdate — currentTime=${audioEl.currentTime.toFixed(2)}s ` +
+                `paused=${audioEl.paused} ended=${audioEl.ended}`
+            );
+            lastTimeUpdate = audioEl.currentTime;
+          }
+        });
+
         // Stream live captions. LiveKit's TranscriptionReceived event
         // fires for both the founder's STT and the worker's TTS — we
         // disambiguate by participant identity (the worker joins as

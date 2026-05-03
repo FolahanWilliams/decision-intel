@@ -229,10 +229,31 @@ export default defineAgent({
       );
     }
 
-    // Connect to the room — audio only, we don't need to subscribe to
-    // video tracks even though the founder may share screen later.
+    // Connect to the room with SUBSCRIBE_ALL (NOT AUDIO_ONLY).
+    //
+    // AUDIO_ONLY in @livekit/agents v1.3.x has a hidden trap: it
+    // sets the underlying room.connect's autoSubscribe to false,
+    // then iterates EXISTING remote participants and subscribes to
+    // their audio tracks once. The founder joins AFTER ctx.connect
+    // runs (worker is dispatched before founder publishes mic), so
+    // the iteration is over an empty set, the room-level
+    // autoSubscribe is off, and the founder's mic publishes into
+    // the room with subscribed=false. STT then receives zero audio
+    // frames and turns=0 forever.
+    //
+    // SUBSCRIBE_ALL sets room-level autoSubscribe=true, which
+    // auto-subscribes to ANY new published track from the founder
+    // (or any future participant). The founder doesn't publish
+    // video, so SUBSCRIBE_ALL is functionally equivalent to
+    // AUDIO_ONLY for our use case but actually works for late-
+    // joining participants.
+    //
+    // Verified via room snapshot log on 2026-05-04: with
+    // AUDIO_ONLY, founder's mic showed kind=KIND_AUDIO source=
+    // SOURCE_MICROPHONE subscribed=FALSE. Switching to
+    // SUBSCRIBE_ALL fixes the subscription.
     try {
-      await ctx.connect(undefined, AutoSubscribe.AUDIO_ONLY);
+      await ctx.connect(undefined, AutoSubscribe.SUBSCRIBE_ALL);
     } catch (err) {
       // Print the full error structure so the Railway log carries the
       // underlying region-fetch / signaling cause that pino truncates
