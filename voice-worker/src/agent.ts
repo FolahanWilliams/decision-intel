@@ -65,10 +65,33 @@ function parseRoomMetadata(raw: string | undefined | null): RoomMetadata {
   }
 }
 
-/** Cartesia speed parameter accepts either a named preset or a number.
- *  Our persona profiles store numeric speed (-0.1 to 0.15); map onto
- *  the named presets the plugin prefers for portability. */
-function mapSpeed(numeric: number): 'slow' | 'normal' | 'fast' {
+/** Cartesia speed parameter is model-dependent — the API contract
+ *  changed between sonic-2 and sonic-3:
+ *
+ *    sonic-3:  speed must be a NUMBER in [0.6, 2.0]; 1.0 = neutral.
+ *              The plugin's own validation only fires a warning when
+ *              speed IS a number AND out of range — passing a string
+ *              like 'normal' silently sends invalid data and Cartesia
+ *              rejects with an opaque "returned error".
+ *    sonic-2-2025-03-07: speed accepts named presets via the legacy
+ *              experimental-controls API version ('fastest' | 'fast'
+ *              | 'normal' | 'slow' | 'slowest').
+ *    sonic-2 (bare): speed not supported at all.
+ *
+ *  Our persona profiles store numeric speed (-0.1 to 0.15) which is
+ *  the LiveKit/Cartesia native scale. Map on read:
+ *    - sonic-3 family: 1.0 + persona_speed, clamped to [0.6, 2.0].
+ *      So persona 0   → 1.0 (neutral); persona 0.15 → 1.15; -0.1 → 0.9.
+ *    - other models: named preset by sign of persona_speed.
+ *
+ *  Detection by substring on the model name keeps this future-proof
+ *  for sonic-3 patches like 'sonic-3-2025-XX-XX' or 'sonic-3-preview'.
+ */
+function mapSpeed(numeric: number, model: string): number | 'slow' | 'normal' | 'fast' {
+  if (model.includes('sonic-3')) {
+    const value = 1.0 + numeric;
+    return Math.max(0.6, Math.min(2.0, value));
+  }
   if (numeric < -0.05) return 'slow';
   if (numeric > 0.05) return 'fast';
   return 'normal';
@@ -288,7 +311,13 @@ export default defineAgent({
       apiKey: config.cartesia.apiKey,
       model: config.cartesia.model,
       voice: voiceId,
-      speed: mapSpeed(voiceContext.voiceProfile.speed),
+      // mapSpeed picks the right type per model — number for sonic-3,
+      // named preset for sonic-2 family. Passing a string preset to
+      // sonic-3 makes Cartesia reject every synthesis with no useful
+      // error body in the plugin output (just "Cartesia returned
+      // error" repeating), which was the symptom the founder hit on
+      // 2026-05-04 after switching CARTESIA_MODEL=sonic-3.
+      speed: mapSpeed(voiceContext.voiceProfile.speed, config.cartesia.model),
     });
 
     const vad = ctx.proc.userData.vad as silero.VAD;
