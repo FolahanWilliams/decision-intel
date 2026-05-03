@@ -138,6 +138,35 @@ export default defineAgent({
       `[voice-worker] entry start — jobId=${ctx.job.id} room=${(ctx.room.name ?? 'unknown-room')} assignedUrl=${assignedUrl}`
     );
 
+    // Re-run the connectivity probe HERE in the entry function. The
+    // prewarm probe runs in the worker process; entry runs in a child
+    // job process spawned per dispatch (LiveKit Agents architecture).
+    // If the entry-process probe also succeeds but ctx.connect still
+    // fails, the bug is locked into the rtc-node Rust client (reqwest
+    // + rustls cannot do what Node fetch can in the SAME process).
+    try {
+      const probeUrl = `https://${new URL(assignedUrl.replace(/^ws/, 'http')).host}/settings/regions`;
+      const t0 = Date.now();
+      const res = await fetch(probeUrl, {
+        method: 'GET',
+        signal: AbortSignal.timeout(8000),
+      });
+      const body = await res.text();
+      // eslint-disable-next-line no-console
+      console.log(
+        `[voice-worker] entry-process probe — url=${probeUrl} status=${res.status} bodyBytes=${body.length} elapsedMs=${Date.now() - t0}`
+      );
+    } catch (probeErr) {
+      const e = probeErr as { name?: string; message?: string; cause?: unknown };
+      // eslint-disable-next-line no-console
+      console.error(
+        '[voice-worker] entry-process probe FAILED — Node fetch cannot reach LiveKit regions endpoint from job process',
+        '\n  name:', e?.name,
+        '\n  message:', e?.message,
+        '\n  cause:', typeof e?.cause === 'object' ? JSON.stringify(e.cause, Object.getOwnPropertyNames(e.cause as object)) : e?.cause
+      );
+    }
+
     // Connect to the room — audio only, we don't need to subscribe to
     // video tracks even though the founder may share screen later.
     try {
