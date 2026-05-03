@@ -44,7 +44,13 @@ const SCAN_DIR = join(ROOT, 'src');
 // res.json().catch(() => null) in handleProvenanceRecordExport — same
 // body-parsing pattern (parse the API error body so the toast shows the
 // real diagnostic instead of generic "Failed to generate record").
-const SILENT_CATCH_BASELINE = 119;
+// 2026-05-03 (voice mode ship): bumped 119 → 120 for the new
+// tokenRes.json().catch(() => null) in
+// src/components/founder-hub/voice/VoiceModePanel.tsx voice-token error
+// path — body-parsing pattern (parse the /voice-token API error body so
+// the panel shows the real diagnostic if mint fails). Body-parsing is
+// the canonical legitimate exception per CLAUDE.md fire-and-forget rule.
+const SILENT_CATCH_BASELINE = 120;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

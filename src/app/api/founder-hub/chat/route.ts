@@ -21,6 +21,7 @@ import { verifyFounderPass } from '@/lib/utils/founder-auth';
 import { parseFile } from '@/lib/utils/file-parser';
 import { FOUNDER_CONTEXT } from '../founder-context';
 import { buildRecentMeetingsBlock } from '@/lib/founder-hub/recent-meetings-context';
+import { getThinkingPartner, isThinkingPartnerId } from '@/lib/data/thinking-partners';
 
 const log = createLogger('FounderHubChat');
 const ENCODER = new TextEncoder();
@@ -40,6 +41,10 @@ interface ParsedBody {
   history: Array<{ role: string; content: string }>;
   fileText: string | null;
   fileName: string | null;
+  /** Optional persona id; null/unknown falls back to the default coach
+   *  inside the route so old clients without persona awareness keep
+   *  working unchanged. */
+  personaId: string | null;
 }
 
 async function parseRequestBody(req: NextRequest): Promise<ParsedBody> {
@@ -81,7 +86,10 @@ async function parseRequestBody(req: NextRequest): Promise<ParsedBody> {
       fileText = parsed.slice(0, MAX_FILE_TEXT);
     }
 
-    return { message, history, fileText, fileName };
+    const personaIdRaw = formData.get('personaId');
+    const personaId = typeof personaIdRaw === 'string' ? personaIdRaw : null;
+
+    return { message, history, fileText, fileName, personaId };
   }
 
   // Default: JSON body
@@ -99,7 +107,9 @@ async function parseRequestBody(req: NextRequest): Promise<ParsedBody> {
         .slice(-20)
     : [];
 
-  return { message, history, fileText: null, fileName: null };
+  const personaId = typeof body.personaId === 'string' ? body.personaId : null;
+
+  return { message, history, fileText: null, fileName: null, personaId };
 }
 
 // ─── Route Handler ──────────────────────────────────────────────────────────
@@ -115,7 +125,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { message, history, fileText, fileName } = await parseRequestBody(req);
+    const { message, history, fileText, fileName, personaId } = await parseRequestBody(req);
 
     if (!message) {
       return NextResponse.json({ error: 'message is required' }, { status: 400 });
@@ -140,13 +150,19 @@ export async function POST(req: NextRequest) {
     // an empty string is fine, chat continues without the block.
     const recentMeetingsBlock = await buildRecentMeetingsBlock();
 
+    // Resolve the active persona. Unknown / missing ids fall back to
+    // the default decision-coach so old clients without persona
+    // awareness keep working unchanged. The persona's systemPrompt
+    // REPLACES the prior hardcoded coach instruction; FOUNDER_CONTEXT
+    // and the recent-meetings block stay loaded above so every persona
+    // sees the same grounding data, just through a different lens.
+    const persona = getThinkingPartner(
+      isThinkingPartnerId(personaId) ? personaId : null
+    );
+
     const messages: GatewayMessage[] = [
       { role: 'system', content: FOUNDER_CONTEXT },
-      {
-        role: 'system',
-        content:
-          "You are the founder's decision-quality advisor, not a generic assistant. Lead with the answer; name biases in his framing when they appear; run pre-mortems on high-stakes decisions; push back when the reasoning is thin. When he's rehearsing a CSO or VC pitch, take the skeptical side hard. Clear prose, no markdown bold, no em dashes, no section headers.",
-      },
+      { role: 'system', content: persona.systemPrompt },
     ];
     if (recentMeetingsBlock) {
       messages.push({ role: 'system', content: recentMeetingsBlock });
