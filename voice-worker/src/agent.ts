@@ -295,10 +295,39 @@ export default defineAgent({
       metrics.log('end');
     });
 
-    await session.start({
-      agent,
-      room: ctx.room,
-    });
+    // Wrap session.start in try/catch so plugin-init failures surface
+    // with their plugin name + error chain. A silent failure here means
+    // the room shows "connected" on both sides but no STT/LLM/TTS ever
+    // fires, and the only signal is "no audio." Make that loud.
+    try {
+      await session.start({
+        agent,
+        room: ctx.room,
+      });
+      // eslint-disable-next-line no-console
+      console.log(
+        `[voice-worker] session.start completed — pipeline ready (vad+stt+llm+tts wired). room=${(ctx.room.name ?? 'unknown-room')}`
+      );
+    } catch (startErr) {
+      const e = startErr as { name?: string; message?: string; stack?: string; cause?: unknown };
+      // eslint-disable-next-line no-console
+      console.error(
+        '[voice-worker] session.start FAILED — pipeline never initialized',
+        '\n  name:', e?.name,
+        '\n  message:', e?.message,
+        '\n  cause:', typeof e?.cause === 'object' ? JSON.stringify(e.cause, Object.getOwnPropertyNames(e.cause as object)) : e?.cause,
+        '\n  cartesiaModel:', config.cartesia.model,
+        '\n  cartesiaVoiceId:', voiceId,
+        '\n  llmModel:', config.llm.model,
+        '\n  llmBaseUrl:', config.llm.baseUrl,
+        '\n  sttModel: nova-3',
+        '\n  stack:', e?.stack
+      );
+      // Disconnect so the browser sees a clean error instead of a
+      // silent-empty-room timeout.
+      await ctx.room.disconnect();
+      return;
+    }
 
     // Greet the founder so they know the session is live. The persona's
     // voice rule + voice-mode addendum keep the greeting in character.
@@ -311,7 +340,30 @@ export default defineAgent({
             ? "I've reviewed the context. What strategic question are we testing?"
             : "I'm here. What are we working on?";
 
-    session.generateReply({ instructions: `Greet briefly: "${greetingHint}"` });
+    // generateReply was previously fire-and-forget — if Grok rejected
+    // the request shape (AI Gateway model slug wrong, response format
+    // unexpected) or Cartesia rejected the synthesis (voice UUID
+    // missing from the account, model name unsupported), the error
+    // was swallowed and the room sat silent. Catch + log structurally.
+    Promise.resolve(session.generateReply({ instructions: `Greet briefly: "${greetingHint}"` }))
+      .then(() => {
+        // eslint-disable-next-line no-console
+        console.log(`[voice-worker] greeting dispatched — TTS audio should be flowing to room=${(ctx.room.name ?? 'unknown-room')}`);
+      })
+      .catch(replyErr => {
+        const e = replyErr as { name?: string; message?: string; stack?: string; cause?: unknown };
+        // eslint-disable-next-line no-console
+        console.error(
+          '[voice-worker] generateReply FAILED — greeting never synthesized. ' +
+          'Most likely: AI Gateway rejected the model slug, OR Cartesia rejected the voice UUID, OR a plugin-internal error.',
+          '\n  name:', e?.name,
+          '\n  message:', e?.message,
+          '\n  cause:', typeof e?.cause === 'object' ? JSON.stringify(e.cause, Object.getOwnPropertyNames(e.cause as object)) : e?.cause,
+          '\n  llmModel:', config.llm.model,
+          '\n  cartesiaVoiceId:', voiceId,
+          '\n  stack:', e?.stack
+        );
+      });
   },
 });
 

@@ -176,10 +176,25 @@ export function VoiceModePanel({ persona, founderPass, onEnd }: Props) {
         roomRef.current = room as unknown as { disconnect: () => Promise<void> };
 
         // Audio sink — attached lazily once the worker publishes its
-        // TTS track. Browsers require a user gesture before autoplay,
-        // which the click on the mic button satisfies.
+        // TTS track. Three settings are load-bearing here:
+        //   1. autoplay — required so the element starts playing the
+        //      moment livekit-client's track.attach pipes a stream into
+        //      it. The mic-click gesture authorizes autoplay for this
+        //      tab; without autoplay the founder would have to click
+        //      a play button after every greeting.
+        //   2. playsinline — required by Safari (incl. macOS Safari +
+        //      iOS WebKit). Without it, attaching an audio track on
+        //      Safari can either silently no-op or trigger a fullscreen
+        //      media controller, neither of which we want.
+        //   3. document.body.appendChild — DETACHED audio elements (not
+        //      in the DOM) can fail to play on Safari and some Chrome
+        //      configs even with autoplay=true. Appending is free, the
+        //      element has no visual footprint, and it's the LiveKit JS
+        //      SDK's recommended pattern. Cleanup removes it on unmount.
         const audioEl = document.createElement('audio');
         audioEl.autoplay = true;
+        audioEl.setAttribute('playsinline', 'true');
+        document.body.appendChild(audioEl);
         audioElRef.current = audioEl;
 
         // Stream live captions. LiveKit's TranscriptionReceived event
@@ -205,12 +220,26 @@ export function VoiceModePanel({ persona, founderPass, onEnd }: Props) {
         );
 
         // Worker publishes its TTS audio as a track — attach to the
-        // hidden audio element so the founder hears it.
+        // hidden audio element so the founder hears it. Then call
+        // .play() explicitly. Even with autoplay=true, browsers may
+        // not auto-start playback if the track arrives more than
+        // ~5s after the user gesture (Chrome's autoplay policy
+        // sometimes needs an explicit nudge for late-attached tracks).
+        // .play() returns a Promise that rejects with NotAllowedError
+        // when blocked — log it loudly so a future "no audio" symptom
+        // surfaces the actual cause instead of looking like a worker
+        // bug.
         room.on(
           RoomEvent.TrackSubscribed,
           (track: { kind: string; attach: (el: HTMLAudioElement) => void }) => {
             if (track.kind === Track.Kind.Audio) {
               track.attach(audioEl);
+              audioEl.play().catch(playErr => {
+                console.error(
+                  '[VoiceModePanel] audio.play() rejected — browser autoplay policy may have blocked playback:',
+                  playErr
+                );
+              });
             }
           }
         );
