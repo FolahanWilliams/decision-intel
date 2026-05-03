@@ -220,29 +220,84 @@ export function VoiceModePanel({ persona, founderPass, onEnd }: Props) {
         );
 
         // Worker publishes its TTS audio as a track — attach to the
-        // hidden audio element so the founder hears it. Then call
-        // .play() explicitly. Even with autoplay=true, browsers may
-        // not auto-start playback if the track arrives more than
-        // ~5s after the user gesture (Chrome's autoplay policy
-        // sometimes needs an explicit nudge for late-attached tracks).
-        // .play() returns a Promise that rejects with NotAllowedError
-        // when blocked — log it loudly so a future "no audio" symptom
-        // surfaces the actual cause instead of looking like a worker
-        // bug.
+        // hidden audio element so the founder hears it. Verbose
+        // logging so we can pin "no audio" failures precisely:
+        //   - TrackSubscribed never fires → agent never published a track
+        //     (worker issue, NOT a browser issue)
+        //   - fires but kind != Audio → enum comparison bug
+        //   - fires, kind matches, attach OK, play() rejects → autoplay
+        //     policy blocked playback (UI fix needed)
+        //   - all of the above succeed but still no sound → output device
+        //     issue (system-side, not code)
         room.on(
           RoomEvent.TrackSubscribed,
-          (track: { kind: string; attach: (el: HTMLAudioElement) => void }) => {
+          (
+            track: { kind: string; attach: (el: HTMLAudioElement) => void; sid?: string },
+            publication?: { trackName?: string; trackSid?: string },
+            participant?: { identity?: string }
+          ) => {
+            console.log(
+              '[VoiceModePanel] TrackSubscribed —',
+              `kind=${track.kind}`,
+              `expectedKind=${Track.Kind.Audio}`,
+              `match=${track.kind === Track.Kind.Audio}`,
+              `participantIdentity=${participant?.identity}`,
+              `trackName=${publication?.trackName}`,
+              `trackSid=${publication?.trackSid ?? track.sid}`
+            );
             if (track.kind === Track.Kind.Audio) {
-              track.attach(audioEl);
-              audioEl.play().catch(playErr => {
-                console.error(
-                  '[VoiceModePanel] audio.play() rejected — browser autoplay policy may have blocked playback:',
-                  playErr
+              try {
+                track.attach(audioEl);
+                console.log(
+                  '[VoiceModePanel] audio attached to <audio> element —',
+                  `inDOM=${document.body.contains(audioEl)}`,
+                  `paused=${audioEl.paused}`,
+                  `readyState=${audioEl.readyState}`,
+                  `volume=${audioEl.volume}`,
+                  `muted=${audioEl.muted}`
                 );
-              });
+              } catch (attachErr) {
+                console.error('[VoiceModePanel] track.attach threw:', attachErr);
+              }
+              audioEl
+                .play()
+                .then(() => {
+                  console.log(
+                    '[VoiceModePanel] audio.play() resolved — playing now. paused=',
+                    audioEl.paused
+                  );
+                })
+                .catch(playErr => {
+                  console.error(
+                    '[VoiceModePanel] audio.play() rejected — browser autoplay policy may have blocked playback. ' +
+                      'name=' +
+                      (playErr as Error).name +
+                      ' message=' +
+                      (playErr as Error).message
+                  );
+                });
             }
           }
         );
+
+        // Verbose log for every other interesting room event so we can
+        // see the full lifecycle when debugging "no audio" symptoms.
+        room.on(RoomEvent.TrackPublished, (publication: { trackName?: string; kind?: string }, participant: { identity?: string }) => {
+          console.log(
+            '[VoiceModePanel] TrackPublished —',
+            `participantIdentity=${participant?.identity}`,
+            `trackName=${publication?.trackName}`,
+            `kind=${publication?.kind}`
+          );
+        });
+        room.on(RoomEvent.TrackUnsubscribed, (track: { kind: string }, publication: { trackName?: string }, participant: { identity?: string }) => {
+          console.log(
+            '[VoiceModePanel] TrackUnsubscribed —',
+            `participantIdentity=${participant?.identity}`,
+            `trackName=${publication?.trackName}`,
+            `kind=${track?.kind}`
+          );
+        });
 
         // Mark agent as joined as soon as ANY remote participant
         // arrives — that's our Railway worker. The 'no agent joined'

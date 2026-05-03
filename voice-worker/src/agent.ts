@@ -363,6 +363,47 @@ export default defineAgent({
       metrics.log('end');
     });
 
+    // Verbose track-event logging so we can pin "no audio" / "STT got
+    // zero seconds" symptoms. The most diagnostic question is: does
+    // the agent SEE the founder's mic track being published? If not,
+    // STT never gets audio and turns=0. Logged before session.start
+    // so we capture the trackPublished event whether it arrives early
+    // or late.
+    type TrackPubInfo = { sid?: string; name?: string; kind?: number };
+    type ParticipantInfo = { identity?: string; trackPublications?: Map<string, TrackPubInfo> };
+    ctx.room.on('trackPublished', (publication: TrackPubInfo, participant: ParticipantInfo) => {
+      // eslint-disable-next-line no-console
+      console.log(
+        `[voice-worker] trackPublished — participantIdentity=${participant.identity} ` +
+          `trackSid=${publication.sid} trackName=${publication.name} kind=${publication.kind}`
+      );
+    });
+    ctx.room.on('trackSubscribed', (_track: unknown, publication: TrackPubInfo, participant: ParticipantInfo) => {
+      // eslint-disable-next-line no-console
+      console.log(
+        `[voice-worker] trackSubscribed — participantIdentity=${participant.identity} ` +
+          `trackSid=${publication.sid} trackName=${publication.name} kind=${publication.kind}`
+      );
+    });
+
+    // Snapshot of remote participants + their tracks RIGHT NOW so we
+    // know the room state at session-start time. If founder's mic
+    // isn't here yet, the trackPublished/Subscribed logs above will
+    // catch it when it arrives.
+    const remoteSnapshot = Array.from(ctx.room.remoteParticipants.values()).map(p => ({
+      identity: p.identity,
+      tracks: Array.from(p.trackPublications.values()).map(pub => ({
+        sid: pub.sid,
+        name: pub.name,
+        kind: pub.kind,
+        subscribed: pub.subscribed,
+      })),
+    }));
+    // eslint-disable-next-line no-console
+    console.log(
+      `[voice-worker] room snapshot at session.start — ${JSON.stringify(remoteSnapshot)}`
+    );
+
     // Wrap session.start in try/catch so plugin-init failures surface
     // with their plugin name + error chain. A silent failure here means
     // the room shows "connected" on both sides but no STT/LLM/TTS ever
