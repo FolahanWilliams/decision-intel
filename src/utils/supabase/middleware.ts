@@ -54,7 +54,14 @@ export async function updateSession(request: NextRequest) {
       !request.nextUrl.pathname.startsWith('/api/cron') &&
       !request.nextUrl.pathname.startsWith('/api/health') &&
       !request.nextUrl.pathname.startsWith('/api/integrations/slack') &&
-      !request.nextUrl.pathname.startsWith('/api/pilot-interest'));
+      !request.nextUrl.pathname.startsWith('/api/pilot-interest') &&
+      // Voice mode worker calls /api/founder-hub/voice-context with its own
+      // shared-secret bearer (VOICE_WORKER_SECRET, validated inside the
+      // route). The Railway worker has no Supabase session — auth-redirecting
+      // it to /login made the worker JSON.parse the login page HTML and
+      // crash silently with "failed to load voice context". Server-to-server
+      // pattern, same as the slack/stripe/cron exemptions above.
+      !request.nextUrl.pathname.startsWith('/api/founder-hub/voice-context'));
 
   // Allow extension requests to bypass middleware protection so the route handler
   // can authenticate them using the custom x-extension-key.
