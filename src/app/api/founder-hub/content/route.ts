@@ -10,8 +10,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
-import { getRequiredEnvVar, getOptionalEnvVar } from '@/lib/env';
+import { streamChat } from '@/lib/ai/providers/gateway';
+import { MODEL_CHEAP } from '@/lib/ai/gateway-models';
 import { formatSSE } from '@/lib/sse';
 import { createLogger } from '@/lib/utils/logger';
 import { verifyFounderPass as checkFounderPass } from '@/lib/utils/founder-auth';
@@ -28,41 +28,10 @@ function verifyFounderPass(req: NextRequest): boolean {
   return checkFounderPass(req.headers.get('x-founder-pass')).ok;
 }
 
-// ─── Gemini Setup ───────────────────────────────────────────────────────────
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let cachedModel: any = null;
-
-function getModel() {
-  if (cachedModel) return cachedModel;
-  const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const modelName = getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview');
-  const model = genAI.getGenerativeModel({
-    model: modelName,
-    safetySettings: [
-      {
-        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-    ],
-    generationConfig: { maxOutputTokens: 8192 },
-  });
-  cachedModel = model;
-  return model;
-}
+// Model: Gemini 3.1 Flash Lite (cheap-tier) via Vercel AI Gateway —
+// Phase 2 lock 2026-05-02. Content Studio is content-gen / classification,
+// not deep reasoning. Cheap-tier is the right fit + matches the existing
+// CLAUDE.md "Flash lightweight content-gen" lock.
 
 // ─── Content-type prompt instructions ───────────────────────────────────────
 
@@ -231,25 +200,25 @@ VOICE/TONE: ${toneLabel}${voiceExtra}${pillarExtra}${topicLine}
 Write the content now. Output ONLY the content itself — no meta-commentary, no "Here's your post:", no wrapper text.`;
 
     try {
-      const model = getModel();
-      const chat = model.startChat({
-        history: [
-          { role: 'user', parts: [{ text: systemPrompt }] },
-          { role: 'model', parts: [{ text: 'Ready to generate content.' }] },
-        ],
-      });
+      const userMessage = topic
+        ? `Generate a ${contentType.replace('_', ' ')} about: ${topic}`
+        : `Generate a ${contentType.replace('_', ' ')} about decision intelligence`;
 
-      const result = await chat.sendMessageStream(
-        topic
-          ? `Generate a ${contentType.replace('_', ' ')} about: ${topic}`
-          : `Generate a ${contentType.replace('_', ' ')} about decision intelligence`
-      );
+      const result = streamChat({
+        model: MODEL_CHEAP,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'assistant', content: 'Ready to generate content.' },
+          { role: 'user', content: userMessage },
+        ],
+        maxOutputTokens: 8192,
+      });
 
       const stream = new ReadableStream({
         async start(controller) {
           try {
-            for await (const chunk of result.stream) {
-              const text = chunk.text();
+            for await (const chunk of result.textStream) {
+              const text = chunk;
               if (text) {
                 controller.enqueue(ENCODER.encode(formatSSE({ type: 'chunk', text })));
               }

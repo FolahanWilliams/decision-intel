@@ -5,8 +5,8 @@ import { buildDocumentAccessWhere, filterDocumentIdsByAccess } from '@/lib/utils
 import { formatSSE } from '@/lib/sse';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
-import { getRequiredEnvVar, getOptionalEnvVar } from '@/lib/env';
+import { streamChat, type GatewayMessage } from '@/lib/ai/providers/gateway';
+import { MODEL_ANALYTICAL } from '@/lib/ai/gateway-models';
 import { logAudit } from '@/lib/audit';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
@@ -36,36 +36,11 @@ interface ChatMessage {
   content: string;
 }
 
-function getModel() {
-  const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const modelName = getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview');
-
-  return genAI.getGenerativeModel({
-    model: modelName,
-    safetySettings: [
-      {
-        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-    ],
-    generationConfig: {
-      maxOutputTokens: 4096,
-    },
-  });
-}
+// Phase 2 lock 2026-05-02: route via Vercel AI Gateway with Gemini 3
+// Flash Preview (analytical default) for the user-facing chat surface.
+// RAG-backed Q&A across analyzed documents — analytical reasoning helps
+// when stitching multi-document context. Mock-fallback handled by route
+// auth check + the Gateway provider's env-presence guard.
 
 function buildSystemPrompt(
   ragContext: Array<{
@@ -218,31 +193,25 @@ export async function POST(request: NextRequest) {
 
     // 2. Build prompt with RAG context
     const systemPrompt = buildSystemPrompt(ragResults);
-    const model = getModel();
 
-    // 3. Build Gemini chat history
-    const geminiHistory = safeHistory.map(m => ({
-      role: m.role === 'user' ? ('user' as const) : ('model' as const),
-      parts: [{ text: m.content }],
+    // 3. Map history to Gateway message shape
+    const priorTurns: GatewayMessage[] = safeHistory.map(m => ({
+      role: m.role === 'user' ? ('user' as const) : ('assistant' as const),
+      content: m.content,
     }));
 
-    const chat = model.startChat({
-      history: [
-        { role: 'user', parts: [{ text: 'System context: ' + systemPrompt }] },
-        {
-          role: 'model',
-          parts: [
-            {
-              text: 'Understood. I will answer questions based on the retrieved document analyses and follow the rules provided.',
-            },
-          ],
-        },
-        ...geminiHistory,
-      ],
-    });
+    const messages: GatewayMessage[] = [
+      { role: 'system', content: systemPrompt },
+      ...priorTurns,
+      { role: 'user', content: message },
+    ];
 
     // 4. Stream the response via SSE
-    const result = await chat.sendMessageStream(message);
+    const result = streamChat({
+      model: MODEL_ANALYTICAL,
+      messages,
+      maxOutputTokens: 4096,
+    });
     const encoder = new TextEncoder();
 
     const sources = ragResults.map(r => ({
@@ -259,8 +228,8 @@ export async function POST(request: NextRequest) {
           controller.enqueue(encoder.encode(formatSSE({ type: 'sources', sources })));
 
           // Stream text chunks
-          for await (const chunk of result.stream) {
-            const text = chunk.text();
+          for await (const chunk of result.textStream) {
+            const text = chunk;
             if (text) {
               controller.enqueue(encoder.encode(formatSSE({ type: 'chunk', text })));
             }
@@ -271,11 +240,15 @@ export async function POST(request: NextRequest) {
 
           // Generate follow-up suggestions (fire-and-forget, non-blocking)
           try {
-            const suggestModel = getModel();
-            const suggestResult = await suggestModel.generateContent(
-              `Based on this conversation, suggest 2-3 short follow-up questions the user might want to ask next. The user's latest question was: "${message}". Return ONLY a JSON array of strings, no other text. Example: ["Question 1?", "Question 2?"]`
+            const { generateText: suggestGenerate } = await import(
+              '@/lib/ai/providers/gateway'
             );
-            const suggestText = suggestResult.response.text().trim();
+            const { MODEL_CHEAP: SUGGEST_MODEL } = await import('@/lib/ai/gateway-models');
+            const suggestResult = await suggestGenerate(
+              `Based on this conversation, suggest 2-3 short follow-up questions the user might want to ask next. The user's latest question was: "${message}". Return ONLY a JSON array of strings, no other text. Example: ["Question 1?", "Question 2?"]`,
+              { model: SUGGEST_MODEL, maxOutputTokens: 256 }
+            );
+            const suggestText = suggestResult.text.trim();
             // Extract JSON array from response
             const match = suggestText.match(/\[[\s\S]*\]/);
             if (match) {

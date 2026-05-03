@@ -86,13 +86,11 @@ async function classifyArticles(articles: ParsedArticle[]): Promise<
   if (articles.length === 0) return [];
 
   try {
-    const { GoogleGenerativeAI } = await import('@google/generative-ai');
-    const { getRequiredEnvVar } = await import('@/lib/env');
-    const genAI = new GoogleGenerativeAI(getRequiredEnvVar('GOOGLE_API_KEY'));
-    const model = genAI.getGenerativeModel({
-      model: process.env.GEMINI_MODEL_NAME || 'gemini-3-flash-preview',
-      generationConfig: { responseMimeType: 'application/json', temperature: 0.1 },
-    });
+    // Phase 2 lock 2026-05-02: Gateway-routed Gemini Flash Lite for
+    // article classification — cheap-tier classification (topic +
+    // bias-type tagging), JSON output, batch of 20 articles per call.
+    const { generateText } = await import('@/lib/ai/providers/gateway');
+    const { MODEL_CHEAP } = await import('@/lib/ai/gateway-models');
 
     // Batch classify up to 20 articles at a time to minimize LLM calls
     const batches: ParsedArticle[][] = [];
@@ -124,11 +122,11 @@ Return a JSON array of objects in the same order.`;
 
       try {
         const result = await withTimeout(
-          () => model.generateContent(prompt),
+          () => generateText(prompt, { model: MODEL_CHEAP, temperature: 0.1 }),
           30_000,
           'Classification timeout'
         );
-        const text = result.response?.text?.() || '[]';
+        const text = result.text || '[]';
         const classifications = JSON.parse(
           text
             .replace(/```json\n?/g, '')

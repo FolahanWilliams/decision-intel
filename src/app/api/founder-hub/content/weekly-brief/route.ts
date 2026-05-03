@@ -9,7 +9,8 @@
  */
 
 import { NextRequest } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { generateText } from '@/lib/ai/providers/gateway';
+import { MODEL_CHEAP } from '@/lib/ai/gateway-models';
 import { apiError, apiSuccess } from '@/lib/utils/api-response';
 import { createLogger } from '@/lib/utils/logger';
 import { verifyFounderPass } from '@/lib/utils/founder-auth';
@@ -91,17 +92,17 @@ No markdown, no explanation — raw JSON array only.`;
 export async function GET(req: NextRequest) {
   if (!verify(req)) return apiError({ error: 'Unauthorized', status: 401 });
 
-  const apiKey = process.env.GOOGLE_API_KEY;
+  const apiKey = process.env.AI_GATEWAY_API_KEY;
   if (!apiKey) return apiError({ error: 'AI not configured', status: 503 });
 
   try {
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: process.env.GEMINI_MODEL_NAME || 'gemini-3.1-flash-lite',
+    // Phase 2 lock 2026-05-02: route via Vercel AI Gateway with Gemini
+    // 3.1 Flash Lite (cheap-tier). Weekly brief is a content-gen surface,
+    // not deep reasoning.
+    const result = await generateText(SYSTEM_PROMPT, {
+      model: MODEL_CHEAP,
     });
-
-    const result = await model.generateContent(SYSTEM_PROMPT);
-    const text = result.response.text().trim();
+    const text = result.text.trim();
     const cleaned = text
       .replace(/^```(?:json)?\n?/, '')
       .replace(/\n?```$/, '')

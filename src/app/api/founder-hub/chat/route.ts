@@ -13,8 +13,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
-import { getRequiredEnvVar, getOptionalEnvVar } from '@/lib/env';
+import { streamChat, type GatewayMessage } from '@/lib/ai/providers/gateway';
+import { MODEL_FOUNDER_HUB } from '@/lib/ai/gateway-models';
 import { formatSSE } from '@/lib/sse';
 import { createLogger } from '@/lib/utils/logger';
 import { verifyFounderPass } from '@/lib/utils/founder-auth';
@@ -28,41 +28,10 @@ const ENCODER = new TextEncoder();
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 const MAX_FILE_TEXT = 80_000; // ~80K chars to leave room for context + history
 
-// ─── Gemini Setup (cached at module scope) ──────────────────────────────────
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let cachedModel: any = null;
-
-function getModel() {
-  if (cachedModel) return cachedModel;
-  const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const modelName = getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview');
-  const model = genAI.getGenerativeModel({
-    model: modelName,
-    safetySettings: [
-      {
-        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-    ],
-    generationConfig: { maxOutputTokens: 4096 },
-  });
-  cachedModel = model;
-  return model;
-}
+// Model: Grok 4.3 (xai/grok-4.3) via Vercel AI Gateway — Phase 2 lock
+// 2026-05-02. Founder-hub AI Copilot, single-user. Multi-turn chat
+// with founder context + (optional) recent-meetings block + chat
+// history as a single messages array.
 
 // ─── Parse request body (JSON or FormData) ─────────────────────────────────
 
@@ -158,12 +127,12 @@ export async function POST(req: NextRequest) {
       userMessage = `[Attached file: ${fileName}]\n\nFile content:\n${fileText}\n\nUser message: ${message}`;
     }
 
-    const model = getModel();
-
-    // Build Gemini history with founder context as system prompt
-    const geminiHistory = history.map(m => ({
-      role: m.role === 'user' ? ('user' as const) : ('model' as const),
-      parts: [{ text: m.content }],
+    // Map prior turns to the Gateway-message shape. AI SDK v6 takes
+    // {role, content} where role ∈ system|user|assistant — we only see
+    // user|assistant from prior turns; assistant is the model voice.
+    const priorTurns: GatewayMessage[] = history.map(m => ({
+      role: m.role === 'user' ? ('user' as const) : ('assistant' as const),
+      content: m.content,
     }));
 
     // Pull the live recent-meetings block so the mentor knows "where
@@ -171,33 +140,25 @@ export async function POST(req: NextRequest) {
     // an empty string is fine, chat continues without the block.
     const recentMeetingsBlock = await buildRecentMeetingsBlock();
 
-    const chatHistory: Array<{ role: 'user' | 'model'; parts: Array<{ text: string }> }> = [
-      { role: 'user', parts: [{ text: FOUNDER_CONTEXT }] },
+    const messages: GatewayMessage[] = [
+      { role: 'system', content: FOUNDER_CONTEXT },
       {
-        role: 'model',
-        parts: [
-          {
-            text: "Understood. I'm your decision-quality advisor, not a generic assistant. I'll lead with the answer, name biases in your framing when they appear, run pre-mortems on high-stakes decisions, and push back when the reasoning is thin. When you're rehearsing a CSO or VC pitch, I'll take the skeptical side hard. Clear prose, no markdown bold, no em dashes, no section headers.",
-          },
-        ],
+        role: 'system',
+        content:
+          "You are the founder's decision-quality advisor, not a generic assistant. Lead with the answer; name biases in his framing when they appear; run pre-mortems on high-stakes decisions; push back when the reasoning is thin. When he's rehearsing a CSO or VC pitch, take the skeptical side hard. Clear prose, no markdown bold, no em dashes, no section headers.",
       },
     ];
     if (recentMeetingsBlock) {
-      chatHistory.push({ role: 'user', parts: [{ text: recentMeetingsBlock }] });
-      chatHistory.push({
-        role: 'model',
-        parts: [
-          {
-            text: 'Got the meetings snapshot. I will reference specific meetings by name and date when you ask about follow-ups, continuity across calls, or what to prioritise next — without making you re-explain what you already logged.',
-          },
-        ],
-      });
+      messages.push({ role: 'system', content: recentMeetingsBlock });
     }
-    chatHistory.push(...geminiHistory);
+    messages.push(...priorTurns);
+    messages.push({ role: 'user', content: userMessage });
 
-    const chat = model.startChat({ history: chatHistory });
-
-    const result = await chat.sendMessageStream(userMessage);
+    const result = streamChat({
+      model: MODEL_FOUNDER_HUB,
+      messages,
+      maxOutputTokens: 4096,
+    });
 
     const stream = new ReadableStream({
       async start(controller) {
@@ -218,8 +179,8 @@ export async function POST(req: NextRequest) {
             .replace(/[\u2014\u2013]/g, ', ');
         };
         try {
-          for await (const chunk of result.stream) {
-            const text = sanitize(chunk.text());
+          for await (const chunk of result.textStream) {
+            const text = sanitize(chunk);
             if (text) {
               controller.enqueue(ENCODER.encode(formatSSE({ type: 'chunk', text })));
             }

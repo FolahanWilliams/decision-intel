@@ -19,10 +19,10 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
+import { streamChat } from '@/lib/ai/providers/gateway';
+import { MODEL_FOUNDER_HUB } from '@/lib/ai/gateway-models';
 import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
-import { getRequiredEnvVar, getOptionalEnvVar } from '@/lib/env';
 import { formatSSE } from '@/lib/sse';
 import { createLogger } from '@/lib/utils/logger';
 import { verifyFounderPass } from '@/lib/utils/founder-auth';
@@ -32,38 +32,10 @@ import type { PartnerRichProfile } from '@/types/partner-profile';
 const log = createLogger('PartnerContactPrep');
 const ENCODER = new TextEncoder();
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let cachedModel: any = null;
-function getModel() {
-  if (cachedModel) return cachedModel;
-  const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const modelName = getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview');
-  const model = genAI.getGenerativeModel({
-    model: modelName,
-    safetySettings: [
-      {
-        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-    ],
-    generationConfig: { maxOutputTokens: 6144, temperature: 0.35 },
-  });
-  cachedModel = model;
-  return model;
-}
+// Model: Grok 4.3 (xai/grok-4.3) via Vercel AI Gateway — Phase 2 lock
+// 2026-05-02. Founder-hub AI surface, single-user. Multi-turn chat
+// with founder context + partner-specific rich profile + system prompt
+// as system-role messages.
 
 const PARTNER_PREP_SYSTEM_PROMPT = `
 You are Decision Intel's executive meeting-preparation strategist. You write ONE custom plan per request. No templates, no generic advice. The founder has a specific meeting coming up with a specific person at a specific design partner; return the plan he will use in the room.
@@ -248,45 +220,25 @@ export async function POST(
   ].join('\n');
 
   try {
-    const model = getModel();
-    const chat = model.startChat({
-      history: [
-        { role: 'user', parts: [{ text: FOUNDER_CONTEXT }] },
+    const result = streamChat({
+      model: MODEL_FOUNDER_HUB,
+      messages: [
+        { role: 'system', content: FOUNDER_CONTEXT },
         {
-          role: 'model',
-          parts: [
-            {
-              text: 'Founder context loaded. Ready for the partner-specific context and then the meeting brief.',
-            },
-          ],
+          role: 'system',
+          content: `PARTNER CONTEXT BEGINS\n\n${partnerContextBlock}\n\nPARTNER CONTEXT ENDS`,
         },
+        { role: 'system', content: PARTNER_PREP_SYSTEM_PROMPT },
         {
-          role: 'user',
-          parts: [
-            { text: `PARTNER CONTEXT BEGINS\n\n${partnerContextBlock}\n\nPARTNER CONTEXT ENDS` },
-          ],
+          role: 'assistant',
+          content:
+            'Ready. Share the contact info, the meeting context, and the desired outcome and I will return the custom plan.',
         },
-        {
-          role: 'model',
-          parts: [
-            {
-              text: "Partner context loaded. Every section of the plan will ground in this partner's world.",
-            },
-          ],
-        },
-        { role: 'user', parts: [{ text: PARTNER_PREP_SYSTEM_PROMPT }] },
-        {
-          role: 'model',
-          parts: [
-            {
-              text: 'Ready. Share the contact info, the meeting context, and the desired outcome and I will return the custom plan.',
-            },
-          ],
-        },
+        { role: 'user', content: userPayload },
       ],
+      maxOutputTokens: 6144,
+      temperature: 0.35,
     });
-
-    const result = await chat.sendMessageStream(userPayload);
 
     const stream = new ReadableStream({
       async start(controller) {
@@ -305,8 +257,8 @@ export async function POST(
           return s.replace(/\*\*/g, '').replace(/__/g, '').replace(/[—–]/g, ', ');
         };
         try {
-          for await (const chunk of result.stream) {
-            const text = sanitize(chunk.text());
+          for await (const chunk of result.textStream) {
+            const text = sanitize(chunk);
             if (text) {
               accumulated += text;
               controller.enqueue(ENCODER.encode(formatSSE({ type: 'chunk', text })));

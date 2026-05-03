@@ -14,7 +14,8 @@
  */
 
 import { NextRequest } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { generateText } from '@/lib/ai/providers/gateway';
+import { MODEL_CHEAP } from '@/lib/ai/gateway-models';
 import { apiError, apiSuccess } from '@/lib/utils/api-response';
 import { createLogger } from '@/lib/utils/logger';
 import { verifyFounderPass } from '@/lib/utils/founder-auth';
@@ -46,7 +47,7 @@ export async function GET(req: NextRequest) {
     return apiError({ error: 'trackId and lessonTitle are required', status: 400 });
   }
 
-  const apiKey = process.env.GOOGLE_API_KEY;
+  const apiKey = process.env.AI_GATEWAY_API_KEY;
   if (!apiKey) return apiError({ error: 'AI not configured', status: 503 });
 
   const prompt = `${FOUNDER_CONTEXT}
@@ -71,13 +72,10 @@ Return ONLY a JSON array of exactly 5 objects with these exact keys:
 No markdown, no explanation, no preamble. Raw JSON array only.`;
 
   try {
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: process.env.GEMINI_MODEL_NAME || 'gemini-3.1-flash-lite',
-    });
-
-    const result = await model.generateContent(prompt);
-    const text = result.response.text().trim();
+    // Phase 2 lock 2026-05-02: Gateway-routed Gemini Flash Lite for
+    // resource curation — cheap, classification-style synthesis.
+    const result = await generateText(prompt, { model: MODEL_CHEAP });
+    const text = result.text.trim();
     const cleaned = text
       .replace(/^```(?:json)?\n?/, '')
       .replace(/\n?```$/, '')

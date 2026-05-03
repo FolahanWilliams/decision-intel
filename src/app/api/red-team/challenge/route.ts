@@ -20,7 +20,8 @@ import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { buildRedTeamPersonaPrompt } from '@/lib/agents/prompts';
-import { generateText } from '@/lib/ai/providers/gemini';
+import { generateText } from '@/lib/ai/providers/gateway';
+import { MODEL_ANALYTICAL } from '@/lib/ai/gateway-models';
 
 const log = createLogger('RedTeamChallengeAPI');
 
@@ -193,9 +194,14 @@ export async function POST(req: NextRequest) {
     const llmStart = Date.now();
     let rawText: string;
     try {
+      // Phase 2 lock 2026-05-02: Gateway-routed Gemini 3 Flash Preview
+      // (analytical default) — red-team challenge generation needs
+      // sharper reasoning than Flash Lite to produce non-trivial
+      // counter-arguments.
       const result = await generateText(prompt, {
+        model: MODEL_ANALYTICAL,
         temperature: 0.8,
-        maxTokens: 2048,
+        maxOutputTokens: 2048,
       });
       rawText = result.text;
     } catch (llmErr) {

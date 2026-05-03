@@ -9,13 +9,8 @@
  *   5. Similar past meetings via RAG institutional memory
  */
 
-import {
-  GoogleGenerativeAI,
-  HarmCategory,
-  HarmBlockThreshold,
-  type GenerativeModel,
-} from '@google/generative-ai';
-import { getRequiredEnvVar, getOptionalEnvVar } from '@/lib/env';
+import { generateText } from '@/lib/ai/providers/gateway';
+import { MODEL_ANALYTICAL } from '@/lib/ai/gateway-models';
 import { createLogger } from '@/lib/utils/logger';
 import { withRetry } from '@/lib/utils/resilience';
 import { parseJSON } from '@/lib/utils/json';
@@ -86,40 +81,19 @@ export interface MeetingIntelligenceResult {
 }
 
 // ─── AI Model ───────────────────────────────────────────────────────────────
+//
+// Phase 2 lock 2026-05-02: Gateway-routed Gemini 3 Flash Preview
+// (analytical default) for meeting-intelligence extraction (action
+// items, key decisions, summary, speaker bias profiling). Higher-
+// quality reasoning needed than Flash Lite — extracting commitments
+// and implicit decisions from a transcript needs nuance.
 
-let modelInstance: GenerativeModel | null = null;
-
-function getModel(): GenerativeModel {
-  if (!modelInstance) {
-    const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
-    const genAI = new GoogleGenerativeAI(apiKey);
-    modelInstance = genAI.getGenerativeModel({
-      model: getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview'),
-      generationConfig: {
-        responseMimeType: 'application/json',
-        maxOutputTokens: 16384,
-      },
-      safetySettings: [
-        {
-          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-          threshold: HarmBlockThreshold.BLOCK_NONE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-          threshold: HarmBlockThreshold.BLOCK_NONE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-          threshold: HarmBlockThreshold.BLOCK_NONE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-          threshold: HarmBlockThreshold.BLOCK_NONE,
-        },
-      ],
-    });
-  }
-  return modelInstance;
+async function callModel(prompt: string): Promise<string> {
+  const result = await generateText(prompt, {
+    model: MODEL_ANALYTICAL,
+    maxOutputTokens: 16384,
+  });
+  return result.text;
 }
 
 // ─── Extract Action Items ───────────────────────────────────────────────────
@@ -128,7 +102,7 @@ export async function extractActionItems(
   transcript: string,
   speakers: SpeakerInfo[]
 ): Promise<ActionItem[]> {
-  const model = getModel();
+  
   const speakerNames = speakers.map(s => s.name).join(', ');
 
   const prompt = `You are an expert meeting analyst. Extract ALL action items from this meeting transcript.
@@ -164,8 +138,8 @@ Rules:
 
   const result = await withRetry(
     async () => {
-      const response = await model.generateContent(prompt);
-      return response.response.text();
+      const responseText = await callModel(prompt);
+      return responseText;
     },
     2,
     1500
@@ -193,7 +167,7 @@ export async function extractKeyDecisions(
   transcript: string,
   speakers: SpeakerInfo[]
 ): Promise<KeyDecision[]> {
-  const model = getModel();
+  
   const speakerNames = speakers.map(s => s.name).join(', ');
 
   const prompt = `You are an expert meeting analyst. Identify ALL key decisions made during this meeting.
@@ -230,8 +204,8 @@ Rules:
 
   const result = await withRetry(
     async () => {
-      const response = await model.generateContent(prompt);
-      return response.response.text();
+      const responseText = await callModel(prompt);
+      return responseText;
     },
     2,
     1500
@@ -258,7 +232,7 @@ export async function generateMeetingSummary(
   meetingType: string,
   speakers: SpeakerInfo[]
 ): Promise<MeetingSummary> {
-  const model = getModel();
+  
   const totalWords = speakers.reduce((s, sp) => s + sp.wordCount, 0);
   const speakerBreakdown = speakers
     .map(
@@ -298,8 +272,8 @@ Rules:
 
   const result = await withRetry(
     async () => {
-      const response = await model.generateContent(prompt);
-      return response.response.text();
+      const responseText = await callModel(prompt);
+      return responseText;
     },
     2,
     1500
@@ -338,7 +312,7 @@ export async function analyzeSpeakerBiases(
   segments: TranscriptSegment[],
   speakers: SpeakerInfo[]
 ): Promise<SpeakerBiasProfile[]> {
-  const model = getModel();
+  
 
   // Build per-speaker transcript excerpts
   const speakerTexts = new Map<string, string[]>();
@@ -395,8 +369,8 @@ Rules:
 
   const result = await withRetry(
     async () => {
-      const response = await model.generateContent(prompt);
-      return response.response.text();
+      const responseText = await callModel(prompt);
+      return responseText;
     },
     2,
     1500

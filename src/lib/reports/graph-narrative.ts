@@ -3,21 +3,17 @@
  * executive summary of the decision knowledge graph.
  */
 
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { generateText } from '@/lib/ai/providers/gateway';
+import { MODEL_ANALYTICAL } from '@/lib/ai/gateway-models';
 import type { GraphNetworkReport } from './graph-report';
 import { createLogger } from '@/lib/utils/logger';
-import { getOptionalEnvVar } from '@/lib/env';
 
 const log = createLogger('GraphNarrative');
 
-let genAI: GoogleGenerativeAI | null = null;
-function getGenAI(): GoogleGenerativeAI {
-  if (!genAI) {
-    const apiKey = process.env.GOOGLE_AI_API_KEY || process.env.GEMINI_API_KEY || '';
-    genAI = new GoogleGenerativeAI(apiKey);
-  }
-  return genAI;
-}
+// Phase 2 lock 2026-05-02: Gateway-routed Gemini 3 Flash Preview
+// (analytical default) for executive-narrative generation over the
+// decision knowledge graph state. Higher-quality reasoning needed than
+// Flash Lite — the narrative shapes how leadership reads the graph.
 
 /**
  * Generate a 3-5 paragraph executive narrative summarizing the
@@ -25,11 +21,6 @@ function getGenAI(): GoogleGenerativeAI {
  */
 export async function generateGraphNarrative(report: GraphNetworkReport): Promise<string> {
   try {
-    const ai = getGenAI();
-    const model = ai.getGenerativeModel({
-      model: getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview'),
-    });
-
     const prompt = `You are an executive advisor analyzing an organization's decision-making intelligence graph. Generate a concise, actionable 3-5 paragraph narrative summary for senior leadership. Use a professional, direct tone. No bullet points — flowing prose only.
 
 ## Graph Data
@@ -61,9 +52,8 @@ ${report.cascadeRisks.length > 0 ? report.cascadeRisks.map(r => `- Risk score ${
 
 Write the narrative focusing on: (1) overall health of decision-making, (2) key patterns and risks, (3) specific actionable recommendations. Keep it under 400 words.`;
 
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
-    return text.trim();
+    const result = await generateText(prompt, { model: MODEL_ANALYTICAL });
+    return result.text.trim();
   } catch (error) {
     log.error('Narrative generation failed:', error);
     return `Decision Intelligence Report: Your organization has tracked ${report.metrics.nodeCount} decisions with ${report.metrics.edgeCount} relationships across ${report.metrics.clusterCount} clusters. Overall risk level: ${report.riskState.overallRisk}. ${report.antiPatterns.length > 0 ? `${report.antiPatterns.length} anti-pattern(s) detected requiring attention.` : 'No critical anti-patterns detected.'} Detailed analysis requires AI narrative generation to be available.`;

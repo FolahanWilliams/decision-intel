@@ -16,8 +16,9 @@ import { createLogger } from '@/lib/utils/logger';
 import { safeCompare } from '@/lib/utils/safe-compare';
 import { ALL_CASES } from '@/lib/data/case-studies';
 import { getSlugForCase } from '@/lib/data/case-studies/slugs';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import { getRequiredEnvVar, getOptionalEnvVar } from '@/lib/env';
+import { generateText } from '@/lib/ai/providers/gateway';
+import { MODEL_CHEAP } from '@/lib/ai/gateway-models';
+import { getRequiredEnvVar } from '@/lib/env';
 import { sendEmail, isEmailConfigured } from '@/lib/notifications/email';
 
 const log = createLogger('DailyLinkedIn');
@@ -84,14 +85,12 @@ export async function GET() {
     const slug = getSlugForCase(caseStudy);
     const caseUrl = `${SITE_URL}/case-studies/${slug}`;
 
-    // Generate LinkedIn post via Gemini
-    const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const modelName = getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview');
-    const model = genAI.getGenerativeModel({
-      model: modelName,
-      generationConfig: { maxOutputTokens: 2048 },
-    });
+    // Phase 2 lock 2026-05-02: Gateway-routed Gemini Flash Lite for the
+    // daily LinkedIn-post cron — content-gen on a fixed-template prompt,
+    // not deep reasoning. Env-presence guard (FOUNDER_EMAIL +
+    // RESEND_API_KEY) at the top of this route already prevents the call
+    // from firing when the delivery path is broken.
+    const apiKey = getRequiredEnvVar('AI_GATEWAY_API_KEY');
 
     const biasNames = caseStudy.biasesPresent.map(formatBiasName).join(', ');
     const toxicCombos =
@@ -119,9 +118,12 @@ Rules:
 - Do NOT use markdown bold, italic, or headers. Plain text only.
 - Do NOT use em dashes. Use commas or periods instead.`;
 
-    const result = await model.generateContent(prompt);
-    const postText = result.response
-      .text()
+    void apiKey; // env-presence asserted; the `ai` package picks it up automatically
+    const result = await generateText(prompt, {
+      model: MODEL_CHEAP,
+      maxOutputTokens: 2048,
+    });
+    const postText = result.text
       .replace(/\*\*/g, '')
       .replace(/__/g, '')
       .replace(/[\u2014\u2013]/g, ', ');

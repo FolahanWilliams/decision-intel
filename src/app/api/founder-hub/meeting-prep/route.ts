@@ -20,8 +20,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
-import { getRequiredEnvVar, getOptionalEnvVar } from '@/lib/env';
+import { streamChat } from '@/lib/ai/providers/gateway';
+import { MODEL_FOUNDER_HUB } from '@/lib/ai/gateway-models';
 import { formatSSE } from '@/lib/sse';
 import { createLogger } from '@/lib/utils/logger';
 import { verifyFounderPass } from '@/lib/utils/founder-auth';
@@ -31,39 +31,11 @@ import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 const log = createLogger('MeetingPrep');
 const ENCODER = new TextEncoder();
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let cachedModel: any = null;
-
-function getModel() {
-  if (cachedModel) return cachedModel;
-  const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const modelName = getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview');
-  const model = genAI.getGenerativeModel({
-    model: modelName,
-    safetySettings: [
-      {
-        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-    ],
-    generationConfig: { maxOutputTokens: 6144, temperature: 0.35 },
-  });
-  cachedModel = model;
-  return model;
-}
+// Model: Grok 4.3 (xai/grok-4.3) via Vercel AI Gateway — Phase 2 lock
+// 2026-05-02. Founder-hub AI surface, single-user. Multi-turn chat
+// flow uses streamChat with the FOUNDER_CONTEXT + system prompt as
+// system-role messages so the gateway routes the same shape regardless
+// of underlying provider.
 
 const MEETING_TYPES = [
   'cso_discovery',
@@ -219,31 +191,26 @@ export async function POST(req: NextRequest) {
   ].join('\n');
 
   try {
-    const model = getModel();
-    const chat = model.startChat({
-      history: [
-        { role: 'user', parts: [{ text: FOUNDER_CONTEXT }] },
+    // Multi-turn seed mirrors the prior Gemini chat history: founder
+    // context as system prompt, then a user→assistant priming pair to
+    // anchor the model's voice, then the user payload. AI SDK v6
+    // passes this directly through the gateway to whichever provider
+    // backs the model id (Grok 4.3 here).
+    const result = streamChat({
+      model: MODEL_FOUNDER_HUB,
+      messages: [
+        { role: 'system', content: FOUNDER_CONTEXT },
+        { role: 'system', content: MEETING_PREP_SYSTEM_PROMPT },
         {
-          role: 'model',
-          parts: [
-            {
-              text: "Understood. I have the founder context loaded and will ground every meeting-prep plan in Decision Intel's real assets, the founder's specific position, and the three-mode ethos/pathos/logos frame with Cialdini principles named where used.",
-            },
-          ],
+          role: 'assistant',
+          content:
+            'Ready. Share the prospect info, the meeting context, and what a win looks like — I will return a custom plan he can use in the room.',
         },
-        { role: 'user', parts: [{ text: MEETING_PREP_SYSTEM_PROMPT }] },
-        {
-          role: 'model',
-          parts: [
-            {
-              text: 'Ready. Share the prospect info, the meeting context, and what a win looks like — I will return a custom plan he can use in the room.',
-            },
-          ],
-        },
+        { role: 'user', content: userPayload },
       ],
+      maxOutputTokens: 6144,
+      temperature: 0.35,
     });
-
-    const result = await chat.sendMessageStream(userPayload);
 
     const stream = new ReadableStream({
       async start(controller) {
@@ -261,8 +228,8 @@ export async function POST(req: NextRequest) {
           return s.replace(/\*\*/g, '').replace(/__/g, '').replace(/[—–]/g, ', ');
         };
         try {
-          for await (const chunk of result.stream) {
-            const text = sanitize(chunk.text());
+          for await (const chunk of result.textStream) {
+            const text = sanitize(chunk);
             if (text) {
               controller.enqueue(ENCODER.encode(formatSSE({ type: 'chunk', text })));
             }

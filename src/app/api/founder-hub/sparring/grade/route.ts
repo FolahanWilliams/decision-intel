@@ -8,12 +8,15 @@
  * counts.
  *
  * Auth: founder-only. Rate limit: 50/day per user (matches generate).
- * Model: gemini-3-flash-preview. Mock fallback when no API key.
+ * Model: Grok 4.3 (xai/grok-4.3) via Vercel AI Gateway — Phase 2 lock
+ * 2026-05-02. Founder-hub AI surface, single-user. Mock fallback when
+ * AI_GATEWAY_API_KEY missing.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
-import { getRequiredEnvVar, getOptionalEnvVar } from '@/lib/env';
+import { generateText } from '@/lib/ai/providers/gateway';
+import { MODEL_FOUNDER_HUB } from '@/lib/ai/gateway-models';
+import { getRequiredEnvVar } from '@/lib/env';
 import { createLogger } from '@/lib/utils/logger';
 import { verifyFounderPass } from '@/lib/utils/founder-auth';
 import {
@@ -55,40 +58,6 @@ interface RequestBody {
 }
 
 const MAX_TRANSCRIPT_CHARS = 8000;
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let cachedModel: any = null;
-
-function getModel() {
-  if (cachedModel) return cachedModel;
-  const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const modelName = getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview');
-  const model = genAI.getGenerativeModel({
-    model: modelName,
-    safetySettings: [
-      {
-        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-    ],
-    generationConfig: { maxOutputTokens: 2500, temperature: 0.4 },
-  });
-  cachedModel = model;
-  return model;
-}
 
 function extractJSON(text: string): unknown {
   const match = text.match(/```json\s*([\s\S]*?)\s*```/) || text.match(/```\s*([\s\S]*?)\s*```/);
@@ -314,7 +283,7 @@ function mockResult(transcript: string, isWarmContext: boolean): SparringSession
     grade: gradeFromDqi(salesDqi),
     dimensions: dims,
     feedback:
-      'Mock response — GOOGLE_API_KEY not set. The grading is illustrative only. Set GOOGLE_API_KEY to get real coach feedback.',
+      'Mock response — AI_GATEWAY_API_KEY not set. The grading is illustrative only. Set AI_GATEWAY_API_KEY to get real coach feedback.',
     strengths: [
       {
         point: "Engaged the buyer's question directly without spinning.",
@@ -387,7 +356,7 @@ function mockResult(transcript: string, isWarmContext: boolean): SparringSession
       recommendedPersonaId: 'mid_market_pe_associate',
       recommendedMode: 'cold_first_meeting',
       rationale:
-        'Mock recommendation — set GOOGLE_API_KEY for the real coach to recommend based on your dimension scores.',
+        'Mock recommendation — set AI_GATEWAY_API_KEY for the real coach to recommend based on your dimension scores.',
     },
   };
 }
@@ -433,7 +402,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   // Mock fallback when no API key.
   let apiKey: string | null;
   try {
-    apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
+    apiKey = getRequiredEnvVar('AI_GATEWAY_API_KEY');
   } catch {
     apiKey = null;
   }
@@ -441,13 +410,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json(mockResult(body.transcript, body.isWarmContext ?? false));
   }
 
-  const model = getModel();
   const prompt = buildGradingPrompt(body, persona, scenario);
 
   try {
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
-    const data = extractJSON(text) as {
+    const result = await generateText(prompt, {
+      model: MODEL_FOUNDER_HUB,
+      maxOutputTokens: 2500,
+      temperature: 0.4,
+    });
+    const data = extractJSON(result.text) as {
       dimensions: Record<GradingDimensionId, number>;
       feedback: string;
       strengths: Array<{ point: string; framework: string }>;

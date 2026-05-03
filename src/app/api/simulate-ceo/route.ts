@@ -3,7 +3,8 @@ import { createHash } from 'crypto';
 import { apiSuccess, apiError } from '@/lib/utils/api-response';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
-import { generateText } from '@/lib/ai/providers/gemini';
+import { generateText } from '@/lib/ai/providers/gateway';
+import { MODEL_CHEAP } from '@/lib/ai/gateway-models';
 import { parseJSON } from '@/lib/utils/json';
 
 const log = createLogger('SimulateCeo');
@@ -123,10 +124,12 @@ ${memo}
 
 Three questions, JSON only.`;
 
+    // Phase 2 lock 2026-05-02: Gateway-routed Gemini Flash Lite for the
+    // 3-question CEO-simulation teaser — cheap, single-shot, no grounding.
     const result = await generateText(prompt, {
-      model: 'gemini-3.1-flash-lite',
+      model: MODEL_CHEAP,
       temperature: 0.35,
-      maxTokens: 900,
+      maxOutputTokens: 900,
     });
 
     const parsed = parseJSON(result.text) as {

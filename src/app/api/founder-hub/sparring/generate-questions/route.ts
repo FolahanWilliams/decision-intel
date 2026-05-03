@@ -7,13 +7,15 @@
  *
  * Auth: founder-only (FOUNDER_HUB_PASS / NEXT_PUBLIC_FOUNDER_HUB_PASS).
  * Rate limit: 50/day per user (this fires on every fresh rep).
- * Model: gemini-3-flash-preview (analytical default — generating realistic
- * buyer questions needs nuance). Mock fallback when GOOGLE_API_KEY missing.
+ * Model: Grok 4.3 (xai/grok-4.3) via Vercel AI Gateway — Phase 2 lock
+ * 2026-05-02. Founder-hub AI surface, single-user. Mock fallback when
+ * AI_GATEWAY_API_KEY missing.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
-import { getRequiredEnvVar, getOptionalEnvVar } from '@/lib/env';
+import { generateText } from '@/lib/ai/providers/gateway';
+import { MODEL_FOUNDER_HUB } from '@/lib/ai/gateway-models';
+import { getRequiredEnvVar } from '@/lib/env';
 import { createLogger } from '@/lib/utils/logger';
 import { verifyFounderPass } from '@/lib/utils/founder-auth';
 import {
@@ -37,40 +39,6 @@ interface ResponseBody {
   questions: string[];
   scenarioFraming: string;
   isMock?: boolean;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let cachedModel: any = null;
-
-function getModel() {
-  if (cachedModel) return cachedModel;
-  const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const modelName = getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview');
-  const model = genAI.getGenerativeModel({
-    model: modelName,
-    safetySettings: [
-      {
-        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-    ],
-    generationConfig: { maxOutputTokens: 1500, temperature: 0.7 },
-  });
-  cachedModel = model;
-  return model;
 }
 
 function extractJSON(text: string): unknown {
@@ -107,7 +75,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   // Mock fallback when no API key.
   let apiKey: string | null;
   try {
-    apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
+    apiKey = getRequiredEnvVar('AI_GATEWAY_API_KEY');
   } catch {
     apiKey = null;
   }
@@ -122,7 +90,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json(response);
   }
 
-  const model = getModel();
   const triggerWordsBlock = persona.triggerWords.length
     ? `\nThis persona will mentally disengage if they hear: ${persona.triggerWords.join(', ')}.`
     : '';
@@ -168,12 +135,15 @@ Output ONLY valid JSON (no prose, no markdown fence). Format:
 }`;
 
   try {
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
-    const data = extractJSON(text) as { openerLine: string; questions: string[] };
+    const result = await generateText(prompt, {
+      model: MODEL_FOUNDER_HUB,
+      maxOutputTokens: 1500,
+      temperature: 0.7,
+    });
+    const data = extractJSON(result.text) as { openerLine: string; questions: string[] };
 
     if (!data.openerLine || !Array.isArray(data.questions) || data.questions.length === 0) {
-      throw new Error('Malformed response from Gemini');
+      throw new Error('Malformed response from Gateway');
     }
 
     const response: ResponseBody = {

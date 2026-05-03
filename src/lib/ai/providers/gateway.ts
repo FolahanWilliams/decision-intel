@@ -60,6 +60,20 @@ export interface GatewayGenerateTextOptions {
 }
 
 /**
+ * Multi-turn chat message — used by surfaces that need conversation
+ * history (meeting-prep, founder-hub chat). When `messages` is set,
+ * `prompt` is ignored.
+ */
+export interface GatewayMessage {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+}
+
+export interface GatewayChatOptions extends Omit<GatewayGenerateTextOptions, 'system'> {
+  messages: GatewayMessage[];
+}
+
+/**
  * Generate text via the Vercel AI Gateway.
  *
  * Use this when:
@@ -143,5 +157,66 @@ export function streamText(
       totalTokens: u.totalTokens,
     })),
     model: options.model,
+  };
+}
+
+/**
+ * Stream text with multi-turn message history. Use for surfaces that
+ * need a conversation seed (system prompt + assistant priming + user
+ * follow-ups) — meeting-prep, founder-hub chat, copilot.
+ *
+ * AI SDK v6 supports the same `messages` shape as OpenAI / Anthropic
+ * via the gateway, so the same shape works regardless of underlying
+ * provider.
+ */
+export function streamChat(options: GatewayChatOptions): GatewayStreamTextResult {
+  getRequiredEnvVar('AI_GATEWAY_API_KEY');
+
+  const result = aiStreamText({
+    model: options.model,
+    messages: options.messages,
+    maxOutputTokens: options.maxOutputTokens ?? 16384,
+    ...(options.temperature !== undefined ? { temperature: options.temperature } : {}),
+  });
+
+  return {
+    textStream: result.textStream,
+    usage: Promise.resolve(result.usage).then(u => ({
+      inputTokens: u.inputTokens,
+      outputTokens: u.outputTokens,
+      totalTokens: u.totalTokens,
+    })),
+    model: options.model,
+  };
+}
+
+/**
+ * Generate text with multi-turn message history (non-streaming).
+ * Mirrors generateText's contract but accepts a messages array.
+ */
+export async function generateChat(
+  options: GatewayChatOptions
+): Promise<GatewayGenerateTextResult> {
+  getRequiredEnvVar('AI_GATEWAY_API_KEY');
+
+  const start = Date.now();
+  const result = await aiGenerateText({
+    model: options.model,
+    messages: options.messages,
+    maxOutputTokens: options.maxOutputTokens ?? 16384,
+    ...(options.temperature !== undefined ? { temperature: options.temperature } : {}),
+  });
+  const latencyMs = Date.now() - start;
+
+  log.debug(
+    `Gateway chat response (${options.model}): ${result.text.length} chars in ${latencyMs}ms`
+  );
+
+  return {
+    text: result.text,
+    model: options.model,
+    latencyMs,
+    inputTokens: result.usage?.inputTokens,
+    outputTokens: result.usage?.outputTokens,
   };
 }

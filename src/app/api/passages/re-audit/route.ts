@@ -3,7 +3,8 @@ import { createClient } from '@/utils/supabase/server';
 import { apiSuccess, apiError } from '@/lib/utils/api-response';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
-import { generateText } from '@/lib/ai/providers/gemini';
+import { generateText } from '@/lib/ai/providers/gateway';
+import { MODEL_CHEAP } from '@/lib/ai/gateway-models';
 import { parseJSON } from '@/lib/utils/json';
 
 const log = createLogger('PassageReAudit');
@@ -129,14 +130,13 @@ export async function POST(req: NextRequest) {
     }
 
     const prompt = `${SYSTEM_PROMPT}\n\nPASSAGE:\n<passage>\n${passage}\n</passage>`;
+    // Phase 2 lock 2026-05-02: Gateway-routed Gemini Flash Lite for
+    // passage-level bias classification — cheap-tier, no grounding
+    // required (the pipeline metaJudge handles grounded calls in Phase 3).
     const result = await generateText(prompt, {
-      // gemini-3.1-flash-lite is the right cost-tier for short passage-level
-      // bias classification — fast, cheap, and strong enough on structured
-      // output. The full pipeline uses grounded gemini-3-flash-preview for
-      // the primary bias pass; this endpoint does not need grounding.
-      model: 'gemini-3.1-flash-lite',
+      model: MODEL_CHEAP,
       temperature: 0.2,
-      maxTokens: 800,
+      maxOutputTokens: 800,
     });
 
     const parsed = parseJSON(result.text) as { biases?: PassageBias[] } | null;

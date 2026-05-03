@@ -6,14 +6,18 @@
  * what missed, and a coach note for next time.
  *
  * Auth: founder-only.
- * Model: gemini-3.1-flash-lite (cheap, classification-grade — recall
- * grading is shallow semantic similarity, not deep reasoning).
- * Mock fallback when GOOGLE_API_KEY missing.
+ * Model: Grok 4.3 (xai/grok-4.3) via Vercel AI Gateway — Phase 2 lock
+ * 2026-05-02. Founder-hub AI surfaces use Grok per founder pick (similar
+ * pricing to Gemini 3 Flash with reportedly better instruction-following
+ * on persona-voice + grading tasks). Single-user surface (founder only),
+ * so model variation doesn't cascade across customers.
+ * Mock fallback when AI_GATEWAY_API_KEY missing.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
-import { getRequiredEnvVar, getOptionalEnvVar } from '@/lib/env';
+import { generateText } from '@/lib/ai/providers/gateway';
+import { MODEL_FOUNDER_HUB } from '@/lib/ai/gateway-models';
+import { getRequiredEnvVar } from '@/lib/env';
 import { createLogger } from '@/lib/utils/logger';
 import { verifyFounderPass } from '@/lib/utils/founder-auth';
 import {
@@ -31,42 +35,6 @@ interface RequestBody {
 }
 
 const MAX_USER_ANSWER_CHARS = 4000;
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let cachedModel: any = null;
-
-function getModel() {
-  if (cachedModel) return cachedModel;
-  const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
-  const genAI = new GoogleGenerativeAI(apiKey);
-  // Use the cheap flash-lite tier for recall grading — classification-grade,
-  // not deep reasoning.
-  const modelName = getOptionalEnvVar('GEMINI_MODEL_NAME_LITE', 'gemini-3.1-flash-lite');
-  const model = genAI.getGenerativeModel({
-    model: modelName,
-    safetySettings: [
-      {
-        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-    ],
-    generationConfig: { maxOutputTokens: 1500, temperature: 0.3 },
-  });
-  cachedModel = model;
-  return model;
-}
 
 function extractJSON(text: string): unknown {
   const match = text.match(/```json\s*([\s\S]*?)\s*```/) || text.match(/```\s*([\s\S]*?)\s*```/);
@@ -86,11 +54,11 @@ function mockResult(canonical: string, userAnswer: string): RecallGradeResult {
   return {
     score,
     grade: gradeFromRecallScore(score),
-    whatLanded: ['Mock response — GOOGLE_API_KEY not set. The grading is illustrative only.'],
-    whatMissed: ['Set GOOGLE_API_KEY for real coach-grade feedback.'],
+    whatLanded: ['Mock response — AI_GATEWAY_API_KEY not set. The grading is illustrative only.'],
+    whatMissed: ['Set AI_GATEWAY_API_KEY for real coach-grade feedback.'],
     canonicalAnswer: canonical,
     coachNote:
-      'When the API key is set, the AI will compare your answer semantically against the canonical and surface specific gaps.',
+      'When the gateway key is set, the AI will compare your answer semantically against the canonical and surface specific gaps.',
   };
 }
 
@@ -122,10 +90,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
   const userAnswer = body.userAnswer.slice(0, MAX_USER_ANSWER_CHARS);
 
-  // Mock fallback when no API key.
+  // Mock fallback when no Gateway key.
   let apiKey: string | null;
   try {
-    apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
+    apiKey = getRequiredEnvVar('AI_GATEWAY_API_KEY');
   } catch {
     apiKey = null;
   }
@@ -133,7 +101,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json(mockResult(card.canonicalAnswer, userAnswer));
   }
 
-  const model = getModel();
   const prompt = `You are a knowledge-recall coach grading a founder's typed recall of a Decision Intel concept. The founder is studying for live sales conversations — they need to recall this information under pressure.
 
 THE PROMPT THE FOUNDER WAS GIVEN:
@@ -173,9 +140,12 @@ Output ONLY valid JSON (no prose, no markdown fence):
 }`;
 
   try {
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
-    const data = extractJSON(text) as {
+    const result = await generateText(prompt, {
+      model: MODEL_FOUNDER_HUB,
+      maxOutputTokens: 1500,
+      temperature: 0.3,
+    });
+    const data = extractJSON(result.text) as {
       score: number;
       whatLanded: string[];
       whatMissed: string[];
