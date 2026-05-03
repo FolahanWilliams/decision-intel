@@ -81,6 +81,15 @@ export function VoiceModePanel({ persona, founderPass, onEnd }: Props) {
   const transcriptRef = useRef<ChatMsg[]>([]);
   const sessionStartRef = useRef<number>(Date.now());
   const captionsRef = useRef<CaptionSegment[]>([]);
+  /** True once the user explicitly clicks End (or the hard 30-min cap
+   *  fires). Lets the Disconnected handler distinguish a clean end
+   *  from a server-side disconnect — the latter is an error condition
+   *  worth surfacing in the panel rather than silently unmounting. */
+  const userInitiatedEndRef = useRef<boolean>(false);
+  /** Cleared once the agent participant joins. Lets the no-agent
+   *  watchdog tell the founder "Railway worker isn't joining the room"
+   *  instead of leaving the panel stuck on "Connecting...". */
+  const agentJoinedRef = useRef<boolean>(false);
   // captionsRef stays in sync with the `captions` state so the
   // pre-disconnect transcript flush sees the latest segments without
   // racing the React render.
@@ -109,6 +118,7 @@ export function VoiceModePanel({ persona, founderPass, onEnd }: Props) {
   }, []);
 
   const endSession = useCallback(async () => {
+    userInitiatedEndRef.current = true;
     setStatus('ending');
     try {
       await roomRef.current?.disconnect();
@@ -205,12 +215,36 @@ export function VoiceModePanel({ persona, founderPass, onEnd }: Props) {
           }
         );
 
-        room.on(RoomEvent.Disconnected, () => {
+        // Mark agent as joined as soon as ANY remote participant
+        // arrives — that's our Railway worker. The 'no agent joined'
+        // watchdog below uses this ref to distinguish a stuck panel
+        // from a real session in progress.
+        room.on(RoomEvent.ParticipantConnected, () => {
+          agentJoinedRef.current = true;
+        });
+
+        room.on(RoomEvent.Disconnected, (reason?: unknown) => {
           if (cancelled) return;
-          // Worker-initiated disconnect (e.g. hard timeout reached).
-          // Hand back whatever transcript we've accumulated so the
-          // chat widget can splice it into the message history.
-          onEnd([...transcriptRef.current, ...flushTranscript()]);
+          // Distinguish user-initiated end (clean handoff to text chat)
+          // from server-side disconnect (worker crash / room timeout /
+          // network drop). The latter should surface a specific error
+          // in the panel rather than silently unmounting it — silent
+          // unmount was the 2026-05-04 "panel disappears" bug class.
+          if (userInitiatedEndRef.current) {
+            onEnd([...transcriptRef.current, ...flushTranscript()]);
+            return;
+          }
+          const detail = typeof reason === 'string' ? ` (${reason})` : '';
+          if (!agentJoinedRef.current) {
+            setError(
+              `Voice agent never joined the room${detail}. Most likely cause: the Railway worker isn't dispatching into this LiveKit project. Check Railway logs for [voice-worker] session start lines + verify LIVEKIT_URL matches between Vercel and Railway.`
+            );
+          } else {
+            setError(
+              `Voice session ended unexpectedly${detail}. Check the Railway worker logs for the most recent [voice-worker] error.`
+            );
+          }
+          setStatus('error');
         });
 
         // Step 3: connect, publish microphone.
@@ -223,6 +257,26 @@ export function VoiceModePanel({ persona, founderPass, onEnd }: Props) {
 
         sessionStartRef.current = Date.now();
         setStatus('connected');
+
+        // Watchdog: if no agent joins within 10 seconds of connecting,
+        // surface a clear error pointing at the Railway worker. Without
+        // this, the panel sits forever on 'connected' showing 0:00 and
+        // no captions — which looks like a UI bug but is actually
+        // "your worker isn't being dispatched."
+        setTimeout(() => {
+          if (cancelled) return;
+          if (agentJoinedRef.current) return;
+          if (userInitiatedEndRef.current) return;
+          setError(
+            'Voice agent did not join within 10 seconds. The Railway worker is either not running, not registered with your LiveKit project, or env vars (LIVEKIT_URL / VOICE_WORKER_SECRET / MAIN_APP_URL) are mismatched. Check Railway logs and the LiveKit Cloud Sessions tab.'
+          );
+          setStatus('error');
+          // Drop the room so we stop billing for the empty session.
+          userInitiatedEndRef.current = true;
+          void roomRef.current?.disconnect().catch(err => {
+            console.warn('[VoiceModePanel] watchdog disconnect:', err);
+          });
+        }, 10_000);
       } catch (err) {
         if (cancelled) return;
         const msg = err instanceof Error ? err.message : 'Voice session failed';
