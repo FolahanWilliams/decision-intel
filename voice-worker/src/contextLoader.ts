@@ -26,14 +26,47 @@ export async function loadVoiceContext(personaId: string): Promise<VoiceContextR
     },
   });
 
+  // Pull text first so we can log a useful body preview on either branch
+  // (status-error or JSON-parse-error). This prevents the "Unexpected
+  // token '<'" crash class — the body is HTML (Vercel deployment
+  // protection page, wrong-host landing page, Next not-found HTML) and
+  // we need to surface what we actually received, not a stack trace from
+  // JSON.parse with no context.
+  const contentType = res.headers.get('content-type') || '<no-content-type>';
+  const rawBody = await res.text();
+
   if (!res.ok) {
-    const errBody = await res.text().catch(() => '');
     throw new Error(
-      `[voice-worker] /voice-context fetch failed: ${res.status} ${res.statusText} — ${errBody.slice(0, 200)}`
+      `[voice-worker] /voice-context fetch failed: ${res.status} ${res.statusText} ` +
+        `url=${url} content-type=${contentType} bodyPreview=${rawBody.slice(0, 200)}`
     );
   }
 
-  const data = (await res.json()) as VoiceContextResponse;
+  // Detect HTML-instead-of-JSON before JSON.parse throws an opaque
+  // SyntaxError. Vercel deployment protection returns 200 OK with an
+  // HTML auth prompt page; misconfigured MAIN_APP_URL pointing at a
+  // landing page returns 200 OK with marketing HTML; either way the
+  // useful diagnostic is the URL + content-type + body preview.
+  const bodyTrimmed = rawBody.trimStart();
+  if (bodyTrimmed.startsWith('<')) {
+    throw new Error(
+      `[voice-worker] /voice-context returned HTML, expected JSON. ` +
+        `MAIN_APP_URL likely points at a Vercel preview with deployment protection, ` +
+        `a wrong host, or an unauthenticated page. ` +
+        `url=${url} status=${res.status} content-type=${contentType} bodyPreview=${rawBody.slice(0, 250)}`
+    );
+  }
+
+  let data: VoiceContextResponse;
+  try {
+    data = JSON.parse(rawBody) as VoiceContextResponse;
+  } catch (parseErr) {
+    throw new Error(
+      `[voice-worker] /voice-context body did not parse as JSON: ${(parseErr as Error).message} ` +
+        `url=${url} content-type=${contentType} bodyPreview=${rawBody.slice(0, 200)}`
+    );
+  }
+
   if (!Array.isArray(data.systemPromptParts) || data.systemPromptParts.length === 0) {
     throw new Error('[voice-worker] /voice-context returned empty systemPromptParts');
   }
