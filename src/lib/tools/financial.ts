@@ -73,7 +73,7 @@ export async function getEnrichedFinancialContext(
   const context: Record<string, unknown> = {};
 
   try {
-    const profile = await getCompanyProfile(ticker, apiKey);
+    const profile = await getFinnhubProfile(ticker, apiKey);
     if (profile) {
       context.profile = profile;
     }
@@ -98,7 +98,7 @@ export async function getEnrichedFinancialContext(
 
     if (claimTypes.includes('competitor')) {
       fetchPromises.push(
-        getStockPeers(ticker, apiKey).then(peers => {
+        getFinnhubPeers(ticker, apiKey).then(peers => {
           if (peers) context.peers = peers;
         })
       );
@@ -112,14 +112,7 @@ export async function getEnrichedFinancialContext(
   }
 }
 
-// Individual endpoint functions (Adapters)
-export async function getCompanyProfile(
-  ticker: string,
-  apiKey: string
-): Promise<StockProfile | null> {
-  return await getFinnhubProfile(ticker, apiKey);
-}
-
+// Quote enricher: combines Finnhub quote with metrics-derived fields.
 export async function getStockQuote(ticker: string, apiKey: string): Promise<StockQuote | null> {
   const quote = await getFinnhubQuote(ticker, apiKey);
   const metrics = await getFinnhubMetrics(ticker, apiKey);
@@ -172,18 +165,10 @@ export async function getQuarterlyIncomeStatement(
   return null;
 }
 
-export async function getKeyMetrics(ticker: string, apiKey: string): Promise<object | null> {
-  return await getFinnhubMetrics(ticker, apiKey);
-}
-
 export async function getHistoricalPrice(_ticker: string, _apiKey: string): Promise<object | null> {
   // Basic metrics doesn't support generic history without 'candle'
   // For now returning null
   return null;
-}
-
-export async function getStockPeers(ticker: string, apiKey: string): Promise<string[] | null> {
-  return await getFinnhubPeers(ticker, apiKey);
 }
 
 export async function getSectorPerformance(_apiKey: string): Promise<object[] | null> {
@@ -242,7 +227,7 @@ export async function executeDataRequest(
 
     switch (request.dataType) {
       case 'profile':
-        data = await getCompanyProfile(request.ticker, apiKey);
+        data = await getFinnhubProfile(request.ticker, apiKey);
         break;
       case 'quote':
         data = await getStockQuote(request.ticker, apiKey);
@@ -254,13 +239,13 @@ export async function executeDataRequest(
         data = await getQuarterlyIncomeStatement(request.ticker, apiKey);
         break;
       case 'key_metrics':
-        data = await getKeyMetrics(request.ticker, apiKey);
+        data = await getFinnhubMetrics(request.ticker, apiKey);
         break;
       case 'historical_price':
         data = await getHistoricalPrice(request.ticker, apiKey);
         break;
       case 'peers':
-        data = await getStockPeers(request.ticker, apiKey);
+        data = await getFinnhubPeers(request.ticker, apiKey);
         break;
       case 'sector_performance':
         data = await getSectorPerformance(apiKey);

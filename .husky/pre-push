@@ -24,9 +24,25 @@ SLOP_EXIT=$?
 # Echo the raw output so the founder sees the breakdown.
 echo "$SLOP_OUTPUT"
 
-# Extract the scorePerKloc number. Format from slop-scan.sh:
-#   "scorePerKloc:   3.79  (target <4.0 — closer to mature-OSS median 1.48 than AI-default 10.90)"
-SCORE=$(echo "$SLOP_OUTPUT" | awk '/^scorePerKloc:/ {print $2; exit}')
+# Read scorePerKloc from the raw JSON the script writes — avoids the
+# 2-decimal display rounding that caused the 2026-05-03 false trip
+# (display showed "4.00" but actual value was 3.996, under threshold).
+SCORE=""
+JSON_PATH="/tmp/slop-scan-di-latest.json"
+if [ -f "$JSON_PATH" ]; then
+    SCORE=$(python3 -c "
+import json
+with open('$JSON_PATH') as f:
+    d = json.load(f)
+print(d.get('summary', {}).get('normalized', {}).get('scorePerKloc', ''))
+" 2>/dev/null || true)
+fi
+
+# Fallback: if JSON read failed, parse the rounded display number — better
+# than letting the push through unchecked.
+if [ -z "$SCORE" ]; then
+    SCORE=$(echo "$SLOP_OUTPUT" | awk '/^scorePerKloc:/ {print $2; exit}')
+fi
 
 if [ -z "$SCORE" ]; then
     echo ""
