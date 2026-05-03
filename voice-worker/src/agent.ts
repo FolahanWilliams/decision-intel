@@ -1,5 +1,5 @@
 /**
- * Decision Intel — voice mode agent entrypoint.
+ * Decision Intel — voice mode agent entrypoint (LiveKit Agents v1.3.x).
  *
  * Architecture:
  *   Browser ─── WebRTC audio ──→ LiveKit Cloud ──→ this worker
@@ -17,11 +17,13 @@
  *
  * Deployment: Railway. See ../README.md for the deployment recipe.
  *
- * NOTE on LiveKit Agents Node SDK version: this worker is built against
- * @livekit/agents 0.7.x. The Agents API has been evolving; if the LiveKit
- * project upgrades and the import surface shifts, the changes are
- * usually localised to the imports + the VoicePipelineAgent constructor.
- * The persona-loading + system-prompt-assembly logic below is stable.
+ * v1.3.x notes vs the prior 0.7.x scaffold:
+ *   - `pipeline.VoicePipelineAgent(...)` → `voice.AgentSession(...)` + `voice.Agent(...)`
+ *   - `agent.start(room, participant)` → `session.start({ agent, room })`
+ *   - `agent.say(text)` → `session.generateReply({ instructions: '...' })`
+ *   - `chatCtx.append({ role: ChatRole.SYSTEM, text })` →
+ *     `chatCtx.addMessage({ role: 'system', content: text })`
+ *   - VAD + plugin construction patterns unchanged
  */
 
 import {
@@ -29,9 +31,10 @@ import {
   cli,
   defineAgent,
   llm,
-  pipeline,
+  voice,
   WorkerOptions,
   type JobContext,
+  type JobProcess,
 } from '@livekit/agents';
 import * as deepgram from '@livekit/agents-plugin-deepgram';
 import * as cartesia from '@livekit/agents-plugin-cartesia';
@@ -62,13 +65,22 @@ function parseRoomMetadata(raw: string | undefined | null): RoomMetadata {
   }
 }
 
+/** Cartesia speed parameter accepts either a named preset or a number.
+ *  Our persona profiles store numeric speed (-0.1 to 0.15); map onto
+ *  the named presets the plugin prefers for portability. */
+function mapSpeed(numeric: number): 'slow' | 'normal' | 'fast' {
+  if (numeric < -0.05) return 'slow';
+  if (numeric > 0.05) return 'fast';
+  return 'normal';
+}
+
 export default defineAgent({
   /**
    * Prewarm: load Silero VAD once per worker process so the per-session
    * cold start is sub-100ms. VAD is the gatekeeper for voice activity
    * detection + interruption handling.
    */
-  prewarm: async (proc) => {
+  prewarm: async (proc: JobProcess) => {
     proc.userData.vad = await silero.VAD.load();
   },
 
@@ -104,17 +116,23 @@ export default defineAgent({
 
     // eslint-disable-next-line no-console
     console.log(
-      `[voice-worker] session start — room=${ctx.room.name} persona=${voiceContext.label} voiceId=${voiceId} participant=${participant.identity}`
+      `[voice-worker] session start — room=${(ctx.room.name ?? 'unknown-room')} persona=${voiceContext.label} voiceId=${voiceId} participant=${participant.identity}`
     );
 
-    // Build the LLM ChatContext from the assembled system prompt parts.
+    // Concatenate the system-prompt parts (FOUNDER_CONTEXT + persona
+    // prompt + voice addendum + recent meetings) into a single
+    // `instructions` string for the v1.3.x Agent API. The previous
+    // ChatContext.append pattern was 0.7.x-only; v1.3.x prefers
+    // `instructions` on the Agent + an optional ChatContext seed.
+    const instructions = voiceContext.systemPromptParts
+      .map(p => p.content)
+      .join('\n\n');
+
+    // Optional initial chat context — empty for now since we have no
+    // prior turns to seed. The Agent's `instructions` carries the
+    // system prompt; chatCtx is for prior conversation history when
+    // we wire text→voice handoff in a follow-up.
     const initialChatCtx = new llm.ChatContext();
-    for (const part of voiceContext.systemPromptParts) {
-      initialChatCtx.append({
-        role: llm.ChatRole.SYSTEM,
-        text: part.content,
-      });
-    }
 
     const sttPlugin = new deepgram.STT({
       apiKey: config.deepgram.apiKey,
@@ -134,27 +152,35 @@ export default defineAgent({
       apiKey: config.cartesia.apiKey,
       model: config.cartesia.model,
       voice: voiceId,
-      speed: voiceContext.voiceProfile.speed,
+      speed: mapSpeed(voiceContext.voiceProfile.speed),
     });
 
     const vad = ctx.proc.userData.vad as silero.VAD;
 
-    const agent = new pipeline.VoicePipelineAgent(vad, sttPlugin, llmPlugin, ttsPlugin, {
-      chatCtx: initialChatCtx,
-      allowInterruptions: true,
-      interruptSpeechDuration: 500, // ms — match the 300-500ms grace we agreed on
-      // The persona system prompt already covers turn pacing + concise-
-      // ness; no additional prompt-level gating needed here.
+    // v1.3.x AgentSession owns the voice loop (VAD + STT + LLM + TTS).
+    // Interruptions are enabled by default in v1.3.x (turnHandling.
+    // interruption.enabled defaults to true), so no explicit option
+    // needed — the founder can barge in mid-response naturally.
+    const session = new voice.AgentSession({
+      vad,
+      stt: sttPlugin,
+      llm: llmPlugin,
+      tts: ttsPlugin,
     });
 
-    const metrics = new SessionMetrics(ctx.room.name, voiceContext.personaId);
+    const agent = new voice.Agent({
+      instructions,
+      chatCtx: initialChatCtx,
+    });
+
+    const metrics = new SessionMetrics((ctx.room.name ?? 'unknown-room'), voiceContext.personaId);
 
     // Hard session timeout — safety net if the JWT TTL is somehow
     // bypassed. Disconnects the room cleanly at 30 min and logs the
     // final session metrics for the Railway log stream.
     const sessionTimeout = setTimeout(() => {
       // eslint-disable-next-line no-console
-      console.log(`[voice-worker] hard timeout reached — disconnecting room=${ctx.room.name}`);
+      console.log(`[voice-worker] hard timeout reached — disconnecting room=${(ctx.room.name ?? 'unknown-room')}`);
       metrics.log('hard-timeout');
       void ctx.room.disconnect();
     }, config.sessionTimeoutMs);
@@ -167,26 +193,28 @@ export default defineAgent({
       const elapsed = Math.round((Date.now() - startedAt) / 1000);
       // eslint-disable-next-line no-console
       console.log(
-        `[voice-worker] session end — room=${ctx.room.name} elapsedSec=${elapsed}`
+        `[voice-worker] session end — room=${(ctx.room.name ?? 'unknown-room')} elapsedSec=${elapsed}`
       );
       metrics.log('end');
     });
 
-    agent.start(ctx.room, participant);
+    await session.start({
+      agent,
+      room: ctx.room,
+    });
 
-    // Greet the founder with a single short acknowledgement so they
-    // know the session is live. The persona's voice rule + voice-mode
-    // addendum keep the greeting in character.
-    await agent.say(
+    // Greet the founder so they know the session is live. The persona's
+    // voice rule + voice-mode addendum keep the greeting in character.
+    const greetingHint =
       personaId === 'skeptical_investor'
         ? "I've read your context. What are we pressure-testing?"
         : personaId === 'cognitive_psychologist'
           ? 'I have your context loaded. What decision are we examining?'
           : personaId === 'business_strategist'
             ? "I've reviewed the context. What strategic question are we testing?"
-            : "I'm here. What are we working on?",
-      true
-    );
+            : "I'm here. What are we working on?";
+
+    session.generateReply({ instructions: `Greet briefly: "${greetingHint}"` });
   },
 });
 
