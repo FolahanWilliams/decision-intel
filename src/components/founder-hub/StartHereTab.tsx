@@ -23,13 +23,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
-import {
-  CheckCircle2,
-  Sparkles,
-  Compass,
-  ArrowRight,
-  Activity,
-} from 'lucide-react';
+import { CheckCircle2, Sparkles, Compass, ArrowRight, Activity } from 'lucide-react';
 import {
   POSITIONING_HERO_PRIMARY,
   POSITIONING_HERO_SECONDARY,
@@ -196,6 +190,7 @@ export function StartHereTab({ onNavigateToTab }: Props) {
       {renderCalibrationCard(onNavigateToTab)}
       {renderInvestorAnswerCard()}
       {renderNoiseJuryCard()}
+      {renderBiasGenomeMoatCard()}
 
       <JourneySelector active={activeJourney} onSelect={handleSelectJourney} />
 
@@ -305,11 +300,11 @@ function renderPositioningAnchor() {
       </div>
       <div style={anchorRow}>
         <strong>R²F operationalisation (locked 2026-04-30):</strong> 22-bias taxonomy (DI-B-001
-        through DI-B-022) · DQI methodology v2.1.0 with validity-aware structural weight shift ·
-        six paper-anchored signals on every DPR cover (Validity Classification → Org Calibration →
+        through DI-B-022) · DQI methodology v2.1.0 with validity-aware structural weight shift · six
+        paper-anchored signals on every DPR cover (Validity Classification → Org Calibration →
         Feedback Adequacy → Reference Class Forecast → Counterfactual Impact → Recommended Action).
-        Academic anchors: Kahneman & Klein 2009, Kahneman & Lovallo 2003 HBR, Klein & Mitchell
-        1995. Paper-application sprint: 6 of 10 ranked items shipped.
+        Academic anchors: Kahneman & Klein 2009, Kahneman & Lovallo 2003 HBR, Klein & Mitchell 1995.
+        Paper-application sprint: 6 of 10 ranked items shipped.
       </div>
       <div style={anchorBanned}>
         <strong>Banned:</strong>{' '}
@@ -372,13 +367,10 @@ function renderCalibrationCard(onNavigateToTab: (tabId: string) => void) {
         Seed methodology · published DQI weights applied without hindsight to the case-study
         library. Tetlock superforecasters score Brier ~0.13; CIA analysts ~0.23. Per-org Brier
         replaces this seed once a customer org has ≥1 closed outcome (Outcome Gate Phase 1+2+3
-        already enforce the workflow). Snapshot regenerated {PLATFORM_BASELINE_SNAPSHOT_COMPUTED_AT}.
+        already enforce the workflow). Snapshot regenerated {PLATFORM_BASELINE_SNAPSHOT_COMPUTED_AT}
+        .
       </div>
-      <button
-        type="button"
-        onClick={() => onNavigateToTab('path_to_100m')}
-        style={calibrationCta}
-      >
+      <button type="button" onClick={() => onNavigateToTab('path_to_100m')} style={calibrationCta}>
         Open Path to £100M Exits · Investor Metrics Tracker <ArrowRight size={11} />
       </button>
       <style>{`
@@ -417,8 +409,8 @@ function renderInvestorAnswerCard() {
         <Compass size={11} /> Defensible investor answer · locked 2026-05-01
       </div>
       <div style={investorAnswerSubhead}>
-        For the &ldquo;is the dataset real?&rdquo; / &ldquo;is the Brier number real?&rdquo; questions.
-        Use these EXACT framings. Never improvise.
+        For the &ldquo;is the dataset real?&rdquo; / &ldquo;is the Brier number real?&rdquo;
+        questions. Use these EXACT framings. Never improvise.
       </div>
 
       <div style={investorAnswerBlockHeader}>
@@ -426,11 +418,12 @@ function renderInvestorAnswerCard() {
       </div>
       <div style={investorAnswerQuote}>
         &ldquo;{HISTORICAL_CASE_COUNT_DISPLAY} case studies hand-curated from primary sources
-        &mdash; SEC filings, court records, biographies, post-mortem investigations &mdash; and tagged
-        against our 22-bias DI-B taxonomy. Every case carries the verbatim pre-decision document
-        excerpt so a reader can audit the tag against the source. The corpus is the seed for the
-        platform&rsquo;s reference-class forecaster, not the validation set; per-org Brier-scored
-        recalibration replaces it once design partners&rsquo; outcomes accumulate.&rdquo;
+        &mdash; SEC filings, court records, biographies, post-mortem investigations &mdash; and
+        tagged against our 22-bias DI-B taxonomy. Every case carries the verbatim pre-decision
+        document excerpt so a reader can audit the tag against the source. The corpus is the seed
+        for the platform&rsquo;s reference-class forecaster, not the validation set; per-org
+        Brier-scored recalibration replaces it once design partners&rsquo; outcomes
+        accumulate.&rdquo;
       </div>
       <div style={investorAnswerNote}>
         Why it works: honest about LLM-annotation provenance + honest about validation gap +
@@ -439,19 +432,17 @@ function renderInvestorAnswerCard() {
         Potemkin dataset.
       </div>
 
-      <div style={investorAnswerBlockHeader}>
-        Q: &ldquo;Is the Brier 0.258 number real?&rdquo;
-      </div>
+      <div style={investorAnswerBlockHeader}>Q: &ldquo;Is the Brier 0.258 number real?&rdquo;</div>
       <div style={investorAnswerQuote}>
-        &ldquo;It&rsquo;s a synthetic baseline &mdash; methodology version 2.0.0-seed &mdash;
-        from running the published DQI weights over the case-study library with hindsight
-        neutralised on the evidence-quality dimension. Same posture as Tetlock&rsquo;s CIA-analyst
-        baseline before the superforecaster cohort had cumulative outcomes. Per-org Brier replaces
-        it once a customer org has a closed outcome.&rdquo;
+        &ldquo;It&rsquo;s a synthetic baseline &mdash; methodology version 2.0.0-seed &mdash; from
+        running the published DQI weights over the case-study library with hindsight neutralised on
+        the evidence-quality dimension. Same posture as Tetlock&rsquo;s CIA-analyst baseline before
+        the superforecaster cohort had cumulative outcomes. Per-org Brier replaces it once a
+        customer org has a closed outcome.&rdquo;
       </div>
       <div style={investorAnswerNote}>
-        Where it lives: technical README + /bias-genome page + DPR cover for orgs with no
-        outcomes yet. Where it does NOT live: cold-context moat sentences (LinkedIn DM, accelerator
+        Where it lives: technical README + /bias-genome page + DPR cover for orgs with no outcomes
+        yet. Where it does NOT live: cold-context moat sentences (LinkedIn DM, accelerator
         application, conference 1:1 elevator). The other moat elements (R²F, 12-node pipeline, DPR,
         regulatory map) are architectural claims; the Brier line is the only one that reads as a
         performance claim and gets cross-examined hardest. In cold contexts, replace with
@@ -463,17 +454,16 @@ function renderInvestorAnswerCard() {
         Q: &ldquo;Have you used Cloverpop / Aera / Quantellia?&rdquo;
       </div>
       <div style={investorAnswerQuote}>
-        &ldquo;I&rsquo;ve studied their public documentation, product surfaces, and customer
-        case studies in depth. I haven&rsquo;t hands-on used them as a paying customer. The
+        &ldquo;I&rsquo;ve studied their public documentation, product surfaces, and customer case
+        studies in depth. I haven&rsquo;t hands-on used them as a paying customer. The
         differentiation claim is structured around what they describe publicly &mdash; logging vs.
-        auditing, single-judge vs. R²F, no validity-aware DQI shift, no cross-border regulatory
-        map &mdash; not against private knowledge of their internals.&rdquo;
+        auditing, single-judge vs. R²F, no validity-aware DQI shift, no cross-border regulatory map
+        &mdash; not against private knowledge of their internals.&rdquo;
       </div>
       <div style={investorAnswerNote}>
         Why it works: honest about depth of competitive research, defensible because the
-        differentiation claim is bounded to public documentation rather than overclaimed
-        first-hand usage. Sophisticated readers respect a founder who knows the limits of their
-        own knowledge.
+        differentiation claim is bounded to public documentation rather than overclaimed first-hand
+        usage. Sophisticated readers respect a founder who knows the limits of their own knowledge.
       </div>
 
       <div style={investorAnswerBlockHeader}>
@@ -489,8 +479,8 @@ function renderInvestorAnswerCard() {
       <div style={investorAnswerNote}>
         Why it works: precision in language. &ldquo;Independent&rdquo; is the wrong word
         statistically (LLMs share training data); &ldquo;decorrelated samples&rdquo; is the right
-        one and tells the technical reader you&rsquo;ve thought about it. See the dedicated
-        3-Frame Noise Jury card below for the architecture detail.
+        one and tells the technical reader you&rsquo;ve thought about it. See the dedicated 3-Frame
+        Noise Jury card below for the architecture detail.
       </div>
     </div>
   );
@@ -530,8 +520,8 @@ function renderNoiseJuryCard() {
       <div style={noiseJuryFrameRow}>
         <div style={noiseJuryFrameLabel}>Framing</div>
         <div style={noiseJuryFrameBody}>
-          Three different professional lenses applying the same 0&ndash;100 rubric (this is what
-          the literature actually means by &ldquo;noise audit&rdquo;):
+          Three different professional lenses applying the same 0&ndash;100 rubric (this is what the
+          literature actually means by &ldquo;noise audit&rdquo;):
         </div>
       </div>
 
@@ -565,12 +555,112 @@ function renderNoiseJuryCard() {
 
       <div style={noiseJuryInterpretation}>
         <strong>Interpretation:</strong> low stdDev across 3 frames &rarr; robust quality (the
-        document survives multiple lenses). High stdDev &rarr; framing-sensitive quality &mdash;
-        the document survives one lens but collapses under another, which is itself the noise
-        signal: it tells the reviewer which audience will be harshest. Source: prompts.ts
-        <code>NOISE_JUDGE_FRAMES</code>; node:{' '}
-        <code>nodes.ts:noiseJudgeNode</code>; theory: Kahneman et al. 2021 &ldquo;Noise: A Flaw
-        in Human Judgment.&rdquo;
+        document survives multiple lenses). High stdDev &rarr; framing-sensitive quality &mdash; the
+        document survives one lens but collapses under another, which is itself the noise signal: it
+        tells the reviewer which audience will be harshest. Source: prompts.ts
+        <code>NOISE_JUDGE_FRAMES</code>; node: <code>nodes.ts:noiseJudgeNode</code>; theory:
+        Kahneman et al. 2021 &ldquo;Noise: A Flaw in Human Judgment.&rdquo;
+      </div>
+    </div>
+  );
+}
+
+// ─── Bias Genome moat card (locked 2026-05-03) ─────────────────────
+//
+// Pitch the Bias Genome as a structurally non-replicable data asset.
+// Four blocks: Foundation (Outcome Gate produces the longitudinal
+// closed-outcome substrate) → Convergence Threshold (≥30 outcomes →
+// Brier stabilises at <0.05 std error, the moat compounds at scale) →
+// Attack on Incumbents (Cloverpop is rear-view logging; we are the
+// windshield audit) → Strategic Acquirer Hook (the asset IBM watsonx /
+// LRQA / Big-4 governance practices structurally cannot retrofit).
+//
+// Source: NotebookLM master KB synthesis on Bias Genome defensibility,
+// reframed for the recall-stack format. Designed to live alongside the
+// Defensible Investor Answer + 3-Frame Noise Jury cards as the founder's
+// pre-pitch warm-up; rehearse before any seed / pre-seed conversation.
+
+function renderBiasGenomeMoatCard() {
+  return (
+    <div style={biasGenomeCardStyle}>
+      <div style={biasGenomeEyebrow}>
+        <Activity size={11} /> Bias Genome moat · how to pitch the data asset
+      </div>
+      <div style={biasGenomeHeadline}>
+        Structurally non-replicable. Legacy incumbents and Big-4 firms cannot retrofit it.
+      </div>
+
+      <div style={biasGenomeBlockHeader}>1 · The foundation — longitudinal closed-outcome data</div>
+      <div style={biasGenomeQuote}>
+        &ldquo;The Outcome Gate auto-detects the result of every audited decision twelve weeks
+        later. While competitors build LLM wrappers, our Brier-scored causal AI recalibrates on
+        closed outcomes. Without strict outcome enforcement, an AI moat is just a story; with it, we
+        are building an undeniable proprietary data substrate.&rdquo;
+      </div>
+      <div style={biasGenomeNote}>
+        Why it works: names the mechanism (Outcome Gate) + the artefact (Brier-scored recalibration)
+        + the structural reason competitors can&rsquo;t shortcut it. The story-vs-substrate framing
+        inoculates against &ldquo;just another AI wrapper&rdquo; objection.
+      </div>
+
+      <div style={biasGenomeBlockHeader}>
+        2 · The convergence threshold — when the moat compounds
+      </div>
+      <div style={biasGenomeQuote}>
+        &ldquo;Once an organisation logs 30 closed outcomes, the platform&rsquo;s Brier-scored
+        calibration stabilises at &lt;0.05 standard error. At scale the Bias Genome learns the
+        unique failure patterns of THAT organisation &mdash; the same bias combination is fatal at
+        firm A and benign at firm B. Data network effects act like gravity; they only become
+        invincible at scale.&rdquo;
+      </div>
+      <div style={biasGenomeNote}>
+        Why it works: gives a falsifiable threshold (30 outcomes, &lt;0.05 std error) that
+        sophisticated investors can pressure-test, while making clear that the moat is per-org
+        calibration &mdash; not generic benchmark accuracy. &ldquo;Gravity at scale&rdquo; is the
+        data-network-effects framing VCs already understand.
+      </div>
+
+      <div style={biasGenomeBlockHeader}>
+        3 · The attack on incumbents — windshield, not rear-view
+      </div>
+      <div style={biasGenomeQuote}>
+        &ldquo;Cloverpop possesses years of manual decision logs &mdash; the rear-view. Our platform
+        is an AI-native audit that uses the Bias Genome to predict failure cascades before they
+        happen &mdash; the windshield. They store the past; we catch the bias in the memo that
+        hasn&rsquo;t reached IC yet.&rdquo;
+      </div>
+      <div style={biasGenomeNote}>
+        Why it works: makes the category contrast intuitive in two words (rear-view / windshield).
+        Cloverpop&rsquo;s data advantage is real; this framing concedes it precisely while
+        relocating the buyer&rsquo;s attention to the failure-prevention surface where they
+        don&rsquo;t compete. See External Attack Vectors lock in CLAUDE.md for the full
+        Cloverpop-defense map.
+      </div>
+
+      <div style={biasGenomeBlockHeader}>
+        4 · The strategic acquirer hook &mdash; the £30M+ exit lever
+      </div>
+      <div style={biasGenomeQuote}>
+        &ldquo;Pulse-survey decision logging is a low-value lifestyle utility. An 18-month
+        longitudinal database of closed financial outcomes &mdash; with bias signatures attached to
+        each &mdash; is an indispensable enterprise asset. IBM watsonx and LRQA structurally cannot
+        generate this data themselves. The Bias Genome is acquirer-ready by design.&rdquo;
+      </div>
+      <div style={biasGenomeNote}>
+        Why it works: ties the moat directly to the founder cash-out math without naming a number in
+        cold context. Names two specific acquirers procurement readers will recognise. The
+        &ldquo;cannot generate themselves&rdquo; framing closes the sentence on a structural
+        constraint rather than a competitive opinion.
+      </div>
+
+      <div style={biasGenomeInterpretation}>
+        <strong>Where this lives:</strong> warm-context investor conversations, Founder Hub
+        rehearsal, pitch-deck slide 8 (Data Moat) + slide 13 (Defensibility).{' '}
+        <strong>Where it does NOT live:</strong> cold LinkedIn DMs, accelerator applications,
+        conference 1:1 elevator pitches &mdash; in cold context, replace with the descriptive bridge
+        sentence per the warm/cold vocabulary discipline lock. Source: NotebookLM master KB
+        synthesis on Bias Genome defensibility (2026-05-03). See also: External Attack Vectors lock
+        in CLAUDE.md for Cloverpop / IBM watsonx / agentic-shift coverage.
       </div>
     </div>
   );
@@ -848,8 +938,7 @@ const noiseJuryFrameCard: React.CSSProperties = {
 };
 
 const noiseJuryFrameId: React.CSSProperties = {
-  fontFamily:
-    'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+  fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
   fontSize: 11,
   color: '#6366F1',
   marginBottom: 4,
@@ -873,6 +962,77 @@ const noiseJuryInterpretation: React.CSSProperties = {
   color: 'var(--text-secondary)',
   lineHeight: 1.6,
   padding: 10,
+  background: 'var(--bg-secondary)',
+  border: '1px solid var(--border-color)',
+  borderRadius: 'var(--radius-sm)',
+};
+
+// ─── Bias Genome moat card styles ──────────────────────────────────
+
+const biasGenomeCardStyle: React.CSSProperties = {
+  marginBottom: 14,
+  padding: 16,
+  background: 'var(--bg-card)',
+  border: '1px solid var(--border-color)',
+  borderLeft: '3px solid #16A34A', // green — read as "data moat"
+  borderRadius: 'var(--radius-md)',
+  fontSize: 12,
+  lineHeight: 1.55,
+  color: 'var(--text-primary)',
+};
+
+const biasGenomeEyebrow: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 6,
+  fontSize: 9,
+  fontWeight: 800,
+  textTransform: 'uppercase',
+  letterSpacing: '0.1em',
+  color: '#16A34A',
+  marginBottom: 4,
+};
+
+const biasGenomeHeadline: React.CSSProperties = {
+  fontSize: 13,
+  fontWeight: 700,
+  color: 'var(--text-primary)',
+  marginBottom: 10,
+};
+
+const biasGenomeBlockHeader: React.CSSProperties = {
+  fontSize: 12,
+  fontWeight: 700,
+  color: 'var(--text-primary)',
+  marginTop: 12,
+  marginBottom: 6,
+};
+
+const biasGenomeQuote: React.CSSProperties = {
+  fontSize: 12,
+  color: 'var(--text-primary)',
+  background: 'rgba(22, 163, 74, 0.04)',
+  border: '1px solid rgba(22, 163, 74, 0.18)',
+  padding: '10px 12px',
+  borderRadius: 'var(--radius-sm)',
+  fontStyle: 'italic',
+  lineHeight: 1.6,
+  marginBottom: 6,
+};
+
+const biasGenomeNote: React.CSSProperties = {
+  fontSize: 11,
+  color: 'var(--text-secondary)',
+  lineHeight: 1.55,
+  marginBottom: 4,
+};
+
+const biasGenomeInterpretation: React.CSSProperties = {
+  fontSize: 11.5,
+  color: 'var(--text-secondary)',
+  lineHeight: 1.6,
+  padding: 10,
+  marginTop: 12,
   background: 'var(--bg-secondary)',
   border: '1px solid var(--border-color)',
   borderRadius: 'var(--radius-sm)',
