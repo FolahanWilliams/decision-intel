@@ -61,7 +61,7 @@ const nextConfig: NextConfig = {
       style-src 'self' 'unsafe-inline';
       img-src 'self' data: blob: https:;
       font-src 'self' data:;
-      connect-src 'self' https://*.supabase.co https://generativelanguage.googleapis.com https://cdn.jsdelivr.net https://fonts.gstatic.com;
+      connect-src 'self' https://*.supabase.co https://generativelanguage.googleapis.com https://cdn.jsdelivr.net https://fonts.gstatic.com https://*.livekit.cloud wss://*.livekit.cloud;
       frame-ancestors 'none';
       base-uri 'self';
       form-action 'self';
@@ -76,7 +76,12 @@ const nextConfig: NextConfig = {
       { key: 'X-Content-Type-Options', value: 'nosniff' },
       { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
       { key: 'X-DNS-Prefetch-Control', value: 'on' },
-      { key: 'Permissions-Policy', value: 'geolocation=(), microphone=(), camera=()' },
+      // microphone=(self) is required for the founder-hub voice mode
+      // (LiveKit/livekit-client calls navigator.mediaDevices.getUserMedia
+      // for the audio track). microphone=() would block the mic for ALL
+      // origins including same-origin, which prevents voice mode entirely.
+      // Geolocation + camera stay disabled — DI doesn't use either.
+      { key: 'Permissions-Policy', value: 'geolocation=(), microphone=(self), camera=()' },
     ];
 
     // Only add HSTS in production (when ALLOWED_ORIGIN is set)
