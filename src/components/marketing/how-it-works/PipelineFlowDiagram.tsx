@@ -13,8 +13,8 @@
  * - Respects prefers-reduced-motion (static layout, no pulse).
  */
 
-import { useEffect, useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { motion, useInView } from 'framer-motion';
 import { useReducedMotion } from './useReducedMotion';
 import { PIPELINE_NODES, type PipelineNode, type PipelineZone } from '@/lib/data/pipeline-nodes';
 import { PipelineNodeGlyph } from './PipelineNodeGlyph';
@@ -133,6 +133,12 @@ interface PipelineFlowDiagramProps {
 export function PipelineFlowDiagram({ activeNodeId, onSelectNode }: PipelineFlowDiagramProps) {
   const [activeZone, setActiveZone] = useState<PipelineZone>('preprocessing');
   const reducedMotion = useReducedMotion();
+  // Single IntersectionObserver on the outer container — `whileInView` on
+  // SVG child elements fires unreliably on iOS Safari, leaving every
+  // animated node/edge stuck at opacity 0. One observer on a real DOM
+  // node + driving each child's `animate` off this boolean fixes it.
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(containerRef, { once: true, margin: '-80px' });
 
   // Loop through the three zones to create a breathing "alive" feel
   useEffect(() => {
@@ -154,6 +160,7 @@ export function PipelineFlowDiagram({ activeNodeId, onSelectNode }: PipelineFlow
 
   return (
     <div
+      ref={containerRef}
       style={{
         background: C.slate50,
         border: `1px solid ${C.slate200}`,
@@ -227,8 +234,7 @@ export function PipelineFlowDiagram({ activeNodeId, onSelectNode }: PipelineFlow
               strokeWidth={zoneActive ? 2 : 1.3}
               strokeOpacity={zoneActive ? 0.7 : 0.45}
               initial={{ pathLength: 0, opacity: 0 }}
-              whileInView={{ pathLength: 1, opacity: 1 }}
-              viewport={{ once: true, margin: '-80px' }}
+              animate={inView ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
               transition={{ duration: 0.8, delay: 0.1, ease: 'easeOut' }}
               style={{ transition: 'stroke 0.4s, stroke-width 0.4s, stroke-opacity 0.4s' }}
             />
@@ -245,8 +251,7 @@ export function PipelineFlowDiagram({ activeNodeId, onSelectNode }: PipelineFlow
           strokeWidth={activeZone === 'synthesis' ? 2 : 1.3}
           strokeOpacity={0.7}
           initial={{ pathLength: 0 }}
-          whileInView={{ pathLength: 1 }}
-          viewport={{ once: true }}
+          animate={inView ? { pathLength: 1 } : { pathLength: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
           style={{ transition: 'stroke 0.4s, stroke-width 0.4s' }}
         />
@@ -254,8 +259,7 @@ export function PipelineFlowDiagram({ activeNodeId, onSelectNode }: PipelineFlow
         {/* DQI output badge */}
         <motion.g
           initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
           transition={{ duration: 0.5, delay: 0.8 }}
         >
           <rect
@@ -305,8 +309,7 @@ export function PipelineFlowDiagram({ activeNodeId, onSelectNode }: PipelineFlow
             <motion.g
               key={node.id}
               initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
+              animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
               transition={{ duration: 0.4, delay: 0.15 + i * 0.04 }}
               onClick={() => onSelectNode?.(node.id)}
               style={{ cursor: onSelectNode ? 'pointer' : 'default' }}

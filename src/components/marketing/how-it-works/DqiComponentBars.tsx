@@ -1,6 +1,7 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
 
 const C = {
   white: '#FFFFFF',
@@ -112,9 +113,14 @@ const GRADES: Array<{
 
 export function DqiComponentBars() {
   const maxWeight = Math.max(...DQI_COMPONENTS.map(c => c.weight));
+  // Single IntersectionObserver on the outer container for mobile-safe
+  // staggered animation — see PipelineFlowDiagram for the rationale.
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(containerRef, { once: true, margin: '-40px' });
 
   return (
     <div
+      ref={containerRef}
       style={{
         background: C.white,
         border: `1px solid ${C.slate200}`,
@@ -187,8 +193,7 @@ export function DqiComponentBars() {
               >
                 <motion.div
                   initial={{ width: 0 }}
-                  whileInView={{ width: `${widthPct}%` }}
-                  viewport={{ once: true, margin: '-40px' }}
+                  animate={inView ? { width: `${widthPct}%` } : { width: 0 }}
                   transition={{ duration: 0.7, delay: 0.05 + i * 0.06, ease: 'easeOut' }}
                   style={{
                     height: '100%',

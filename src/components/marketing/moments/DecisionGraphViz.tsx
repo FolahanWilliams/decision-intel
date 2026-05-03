@@ -17,7 +17,8 @@
  * Pyramid-style: sits alongside copy, not a dominant focal point.
  */
 
-import { motion } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
 
 const C = {
   green: '#16A34A',
@@ -108,7 +109,15 @@ function kindStyle(kind: NodeKind) {
 
 /** Renders a node at (cx,cy) whose shape depends on kind. Circle for
  *  decisions, diamond for biases, rounded square for outcomes. */
-function NodeShape({ n, animDelay }: { n: Node | typeof LIVE_NODE; animDelay: number }) {
+function NodeShape({
+  n,
+  animDelay,
+  inView,
+}: {
+  n: Node | typeof LIVE_NODE;
+  animDelay: number;
+  inView: boolean;
+}) {
   const { x, y, kind } = n;
   const style = kindStyle(kind);
   const r = 6.5;
@@ -116,8 +125,7 @@ function NodeShape({ n, animDelay }: { n: Node | typeof LIVE_NODE; animDelay: nu
   return (
     <motion.g
       initial={{ opacity: 0, scale: 0.4 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: false, amount: 0.3 }}
+      animate={inView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.4 }}
       transition={{ duration: 0.4, delay: animDelay, ease: [0.22, 1, 0.36, 1] }}
     >
       {/* tinted halo */}
@@ -203,8 +211,16 @@ function QuarterArcs() {
 }
 
 export function DecisionGraphViz() {
+  // Single IntersectionObserver on the outer SVG — `whileInView` on SVG
+  // child elements fires unreliably on iOS Safari, leaving every motion
+  // node/edge stuck at opacity 0. One observer + driving each child's
+  // `animate` off this boolean fixes mobile while preserving desktop UX.
+  const svgRef = useRef<SVGSVGElement>(null);
+  const inView = useInView(svgRef, { amount: 0.3 });
+
   return (
     <svg
+      ref={svgRef}
       viewBox="0 0 480 340"
       width="100%"
       height="100%"
@@ -250,8 +266,7 @@ export function DecisionGraphViz() {
             strokeOpacity={isStrong ? 0.6 : 0.35}
             strokeDasharray={isStrong ? undefined : '3 4'}
             initial={{ pathLength: 0 }}
-            whileInView={{ pathLength: 1 }}
-            viewport={{ once: false, amount: 0.3 }}
+            animate={inView ? { pathLength: 1 } : { pathLength: 0 }}
             transition={{
               duration: 0.7,
               delay: 0.5 + i * 0.05,
@@ -268,8 +283,7 @@ export function DecisionGraphViz() {
         r="56"
         fill="url(#central-glow-01)"
         initial={{ scale: 0, opacity: 0 }}
-        whileInView={{ scale: 1, opacity: 1 }}
-        viewport={{ once: false, amount: 0.3 }}
+        animate={inView ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
         transition={{ duration: 0.6, delay: 1.0 }}
       />
 
@@ -277,14 +291,13 @@ export function DecisionGraphViz() {
           then Q2, then Q3 closest to present). */}
       {NODES.map(n => {
         const ringDelay = n.quarter === 'Q1' ? 0.05 : n.quarter === 'Q2' ? 0.2 : 0.35;
-        return <NodeShape key={n.id} n={n} animDelay={ringDelay} />;
+        return <NodeShape key={n.id} n={n} animDelay={ringDelay} inView={inView} />;
       })}
 
       {/* Central today's-memo node */}
       <motion.g
         initial={{ opacity: 0, scale: 0.5 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ once: false, amount: 0.3 }}
+        animate={inView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.5 }}
         transition={{ duration: 0.55, delay: 1.1, ease: [0.22, 1, 0.36, 1] }}
       >
         <circle
@@ -331,15 +344,13 @@ export function DecisionGraphViz() {
         strokeWidth="1.6"
         strokeOpacity="0.8"
         initial={{ pathLength: 0, opacity: 0 }}
-        whileInView={{ pathLength: 1, opacity: 0.8 }}
-        viewport={{ once: false, amount: 0.3 }}
+        animate={inView ? { pathLength: 1, opacity: 0.8 } : { pathLength: 0, opacity: 0 }}
         transition={{ duration: 0.6, delay: 2.6, ease: [0.22, 1, 0.36, 1] }}
       />
-      <NodeShape n={LIVE_NODE} animDelay={2.5} />
+      <NodeShape n={LIVE_NODE} animDelay={2.5} inView={inView} />
       <motion.g
         initial={{ opacity: 0, y: -4 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: false, amount: 0.3 }}
+        animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: -4 }}
         transition={{ duration: 0.35, delay: 2.8 }}
       >
         <rect
@@ -375,8 +386,7 @@ export function DecisionGraphViz() {
       {/* Footer badge: reframed from "inherits 4 lessons" to compounds-quarterly */}
       <motion.g
         initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: false, amount: 0.3 }}
+        animate={inView ? { opacity: 1 } : { opacity: 0 }}
         transition={{ duration: 0.4, delay: 1.8 }}
       >
         <rect

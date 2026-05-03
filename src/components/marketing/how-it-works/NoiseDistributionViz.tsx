@@ -1,6 +1,7 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
 
 const C = {
   white: '#FFFFFF',
@@ -58,6 +59,11 @@ function JudgePanel({
 }) {
   const W = 360;
   const H = 140;
+  // Single IntersectionObserver on the outer SVG — `whileInView` on SVG
+  // child elements is unreliable on iOS Safari; one observer + driving
+  // each child's `animate` off this boolean fixes mobile rendering.
+  const svgRef = useRef<SVGSVGElement>(null);
+  const inView = useInView(svgRef, { once: true });
   return (
     <div
       style={{
@@ -103,6 +109,7 @@ function JudgePanel({
       </div>
 
       <svg
+        ref={svgRef}
         viewBox={`0 0 ${W} ${H}`}
         preserveAspectRatio="none"
         style={{ width: '100%', height: 'auto', display: 'block' }}
@@ -137,8 +144,7 @@ function JudgePanel({
             stroke={c.color}
             strokeWidth={1.5}
             initial={{ opacity: 0, scale: 0.92 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
+            animate={inView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.92 }}
             transition={{ duration: 0.55, delay: 0.1 + i * 0.1, ease: 'easeOut' }}
             style={{ transformOrigin: 'center bottom' }}
           />
