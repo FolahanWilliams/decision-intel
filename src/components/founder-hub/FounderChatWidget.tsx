@@ -29,6 +29,11 @@ import {
   type ThinkingPartnerId,
   type ThinkingPartner,
 } from '@/lib/data/thinking-partners';
+import {
+  DEFAULT_FOUNDER_CHAT_MODEL_ID,
+  isFounderChatModelId,
+} from '@/lib/ai/founder-chat-models';
+import { ModelPicker, ModelPickerPanel } from './ModelPicker';
 
 /**
  * Voice mode panel — owns the LiveKit room connection. Lazy-loaded so
@@ -52,6 +57,9 @@ const STORAGE_KEY = 'founder-chat-messages';
  *  can switch personas mid-thread without losing context — the same memo
  *  gets challenged by Kahneman, then Porter, then a Sequoia partner. */
 const PERSONA_STORAGE_KEY = 'founder-chat-persona';
+/** Persisted active model id (Grok 4.3 / Gemini 3 Flash / DeepSeek V4 Pro).
+ *  Independent of persona — same persona can speak through any model. */
+const MODEL_STORAGE_KEY = 'founder-chat-model';
 const MAX_STORED_MESSAGES = 100;
 const MAX_SENT_HISTORY = 30;
 
@@ -112,6 +120,16 @@ function loadStoredPersonaId(): ThinkingPartnerId {
   }
 }
 
+function loadStoredModelId(): string {
+  if (typeof window === 'undefined') return DEFAULT_FOUNDER_CHAT_MODEL_ID;
+  try {
+    const raw = localStorage.getItem(MODEL_STORAGE_KEY);
+    return isFounderChatModelId(raw) ? raw : DEFAULT_FOUNDER_CHAT_MODEL_ID;
+  } catch {
+    return DEFAULT_FOUNDER_CHAT_MODEL_ID;
+  }
+}
+
 interface FounderChatWidgetProps {
   founderPass: string;
   /**
@@ -141,6 +159,10 @@ export function FounderChatWidget({
    *  coach) so first-load behavior is unchanged for existing users. */
   const [personaId, setPersonaId] = useState<ThinkingPartnerId>('default');
   const [personaPickerOpen, setPersonaPickerOpen] = useState(false);
+  /** Active model id — Grok 4.3 default. Validated against the registry
+   *  before being passed to the chat API. */
+  const [modelId, setModelId] = useState<string>(DEFAULT_FOUNDER_CHAT_MODEL_ID);
+  const [modelPickerOpen, setModelPickerOpen] = useState(false);
   /** Voice mode flag. When true, the input row is replaced with the
    *  VoiceModePanel which owns the LiveKit room connection. */
   const [voiceMode, setVoiceMode] = useState(false);
@@ -148,6 +170,7 @@ export function FounderChatWidget({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const hydrated = useRef(false);
   const personaHydrated = useRef(false);
+  const modelHydrated = useRef(false);
 
   const activePersona = useMemo(() => getThinkingPartner(personaId), [personaId]);
 
@@ -171,6 +194,8 @@ export function FounderChatWidget({
     hydrated.current = true;
     setPersonaId(loadStoredPersonaId());
     personaHydrated.current = true;
+    setModelId(loadStoredModelId());
+    modelHydrated.current = true;
   }, []);
 
   // Persist every message change to localStorage. Skipped on the first
@@ -194,6 +219,18 @@ export function FounderChatWidget({
       // localStorage may throw on quota / private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
     }
   }, [personaId]);
+
+  // Persist model selection. Same pattern as persona — skipped on
+  // first render so the hydrated value isn't overwritten by the
+  // initial DEFAULT_FOUNDER_CHAT_MODEL_ID.
+  useEffect(() => {
+    if (!modelHydrated.current) return;
+    try {
+      localStorage.setItem(MODEL_STORAGE_KEY, modelId);
+    } catch {
+      // localStorage may throw on quota / private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
+    }
+  }, [modelId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -252,6 +289,7 @@ export function FounderChatWidget({
         formData.append('history', JSON.stringify(messages.slice(-MAX_SENT_HISTORY)));
         formData.append('file', file);
         formData.append('personaId', personaId);
+        formData.append('modelId', modelId);
 
         res = await fetch('/api/founder-hub/chat', {
           method: 'POST',
@@ -269,6 +307,7 @@ export function FounderChatWidget({
             message: userMsg,
             history: messages.slice(-MAX_SENT_HISTORY),
             personaId,
+            modelId,
           }),
         });
       }
@@ -357,7 +396,7 @@ export function FounderChatWidget({
     } finally {
       setStreaming(false);
     }
-  }, [input, messages, streaming, founderPass, attachedFile, personaId]);
+  }, [input, messages, streaming, founderPass, attachedFile, personaId, modelId]);
 
   // Voice mode lifecycle. handleVoiceStart simply flips the flag —
   // VoiceModePanel mounts, owns the LiveKit connection, and either
@@ -506,6 +545,19 @@ export function FounderChatWidget({
               }}
             />
           </button>
+          <ModelPicker
+            activeModelId={modelId}
+            onChange={setModelId}
+            open={modelPickerOpen}
+            onToggleOpen={next => {
+              setModelPickerOpen(next);
+              // Mutually exclusive with persona picker — opening one
+              // closes the other so the two dropdowns can't stack and
+              // confuse the layout.
+              if (next) setPersonaPickerOpen(false);
+            }}
+            accentColor={activePersona.color}
+          />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
           <button
@@ -665,6 +717,17 @@ export function FounderChatWidget({
             );
           })}
         </div>
+      )}
+
+      {/* Model picker panel — same render-below-header pattern as the
+          persona picker. Mutually exclusive with the persona picker
+          (the trigger button closes the other one when opened). */}
+      {modelPickerOpen && (
+        <ModelPickerPanel
+          activeModelId={modelId}
+          onChange={setModelId}
+          onClose={() => setModelPickerOpen(false)}
+        />
       )}
 
       {/* Messages */}

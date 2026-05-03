@@ -15,6 +15,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { streamChat, type GatewayMessage } from '@/lib/ai/providers/gateway';
 import { MODEL_FOUNDER_HUB } from '@/lib/ai/gateway-models';
+import {
+  getFounderChatModel,
+  isFounderChatModelId,
+} from '@/lib/ai/founder-chat-models';
 import { formatSSE } from '@/lib/sse';
 import { createLogger } from '@/lib/utils/logger';
 import { verifyFounderPass } from '@/lib/utils/founder-auth';
@@ -45,6 +49,11 @@ interface ParsedBody {
    *  inside the route so old clients without persona awareness keep
    *  working unchanged. */
   personaId: string | null;
+  /** Optional model id from the picker. Validated against the registry
+   *  allowlist before use; null/unknown falls back to the default
+   *  (Grok 4.3). NEVER trust this value as a raw gateway slug — always
+   *  resolve through getFounderChatModel(). */
+  modelId: string | null;
 }
 
 async function parseRequestBody(req: NextRequest): Promise<ParsedBody> {
@@ -88,8 +97,10 @@ async function parseRequestBody(req: NextRequest): Promise<ParsedBody> {
 
     const personaIdRaw = formData.get('personaId');
     const personaId = typeof personaIdRaw === 'string' ? personaIdRaw : null;
+    const modelIdRaw = formData.get('modelId');
+    const modelId = typeof modelIdRaw === 'string' ? modelIdRaw : null;
 
-    return { message, history, fileText, fileName, personaId };
+    return { message, history, fileText, fileName, personaId, modelId };
   }
 
   // Default: JSON body
@@ -108,8 +119,9 @@ async function parseRequestBody(req: NextRequest): Promise<ParsedBody> {
     : [];
 
   const personaId = typeof body.personaId === 'string' ? body.personaId : null;
+  const modelId = typeof body.modelId === 'string' ? body.modelId : null;
 
-  return { message, history, fileText: null, fileName: null, personaId };
+  return { message, history, fileText: null, fileName: null, personaId, modelId };
 }
 
 // ─── Route Handler ──────────────────────────────────────────────────────────
@@ -125,7 +137,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { message, history, fileText, fileName, personaId } = await parseRequestBody(req);
+    const { message, history, fileText, fileName, personaId, modelId } = await parseRequestBody(req);
 
     if (!message) {
       return NextResponse.json({ error: 'message is required' }, { status: 400 });
@@ -170,8 +182,20 @@ export async function POST(req: NextRequest) {
     messages.push(...priorTurns);
     messages.push({ role: 'user', content: userMessage });
 
+    // Resolve the model from the registry. Validation: only ids on the
+    // allowlist resolve to a slug; anything else falls back to the
+    // default (Grok 4.3). The fallback covers both stale localStorage
+    // values from old client builds AND any malicious request trying to
+    // route through an off-allowlist gateway model. MODEL_FOUNDER_HUB
+    // (the prior single-model constant) is kept as the import-time
+    // default for any other surface that hasn't moved to the registry.
+    const selectedModel = isFounderChatModelId(modelId)
+      ? getFounderChatModel(modelId)
+      : null;
+    const modelSlug = selectedModel?.slug ?? MODEL_FOUNDER_HUB;
+
     const result = streamChat({
-      model: MODEL_FOUNDER_HUB,
+      model: modelSlug,
       messages,
       maxOutputTokens: 4096,
     });
