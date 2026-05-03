@@ -1,0 +1,30 @@
+{
+  "name": "decision-intel-voice-worker",
+  "version": "0.1.0",
+  "private": true,
+  "description": "LiveKit Agents worker for Decision Intel voice mode. Deployed to Railway, separate from the Vercel main app. Loads persona system prompts on session start from /api/founder-hub/voice-context, then runs Deepgram STT + Grok via Vercel AI Gateway + Cartesia Sonic-2 TTS through LiveKit's voice pipeline.",
+  "type": "module",
+  "main": "dist/agent.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/agent.ts dev",
+    "start": "node dist/agent.js start",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@livekit/agents": "^0.7.6",
+    "@livekit/agents-plugin-cartesia": "^0.5.5",
+    "@livekit/agents-plugin-deepgram": "^0.6.4",
+    "@livekit/agents-plugin-openai": "^0.13.0",
+    "@livekit/agents-plugin-silero": "^0.6.4",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.10",
+    "tsx": "^4.21.0",
+    "typescript": "5.9.3"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

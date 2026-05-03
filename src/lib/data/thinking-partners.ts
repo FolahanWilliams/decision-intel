@@ -27,6 +27,42 @@ export type ThinkingPartnerId =
   | 'business_strategist'
   | 'skeptical_investor';
 
+/**
+ * Per-persona Cartesia voice profile for the voice mode (Sonic-2 TTS).
+ *
+ * Voice IDs are sourced from environment variables so the founder can
+ * swap voices without code changes — pick a voice in Cartesia's
+ * dashboard, paste its UUID into the env var, redeploy the worker.
+ *
+ * The defaults below are well-known stock voices in Cartesia's public
+ * library. Verify them in the Cartesia dashboard before deploy; if
+ * Cartesia rotates a stock voice ID, the env-var override is the
+ * production-safe fix.
+ *
+ * `speed` is Cartesia's prosody parameter: -1.0 (slow) to 1.0 (fast),
+ * 0 is neutral. Slightly slower for the cognitive psychologist (lands
+ * citations precisely); slightly faster for the skeptical investor
+ * (blunt + conversion-focused per voice rule).
+ *
+ * `maxWordsPerVoiceTurn` tunes per-persona conciseness in voice mode
+ * without changing text-mode behaviour. Voice should sound like a
+ * thoughtful phone call, not a 4-paragraph email read aloud.
+ */
+export interface VoiceProfile {
+  /** Default Cartesia voice UUID. Override at runtime via envVar. */
+  defaultVoiceId: string;
+  /** Env var name on the worker (Railway). Set in Railway dashboard
+   *  to override the stock voice without redeploying. */
+  envVar: string;
+  /** Human-readable style description for picker UI + worker logs. */
+  voiceStyle: string;
+  /** Cartesia speed parameter, -1.0 to 1.0; 0 is neutral. */
+  speed: number;
+  /** Max words per spoken turn — soft cap injected into the voice-
+   *  mode addendum. Voice prefers conversational pacing over essays. */
+  maxWordsPerVoiceTurn: number;
+}
+
 export interface ThinkingPartner {
   id: ThinkingPartnerId;
   /** Short label shown on the persona picker. */
@@ -61,6 +97,10 @@ export interface ThinkingPartner {
    *  so a fresh conversation lands on questions THIS persona is best
    *  positioned to answer. 4-6 entries. */
   starterPrompts: string[];
+  /** Voice mode profile. Used by the LiveKit worker to pick the
+   *  Cartesia voice + speed and by the system-prompt builder to
+   *  inject the per-persona word cap into the voice addendum. */
+  voiceProfile: VoiceProfile;
 }
 
 // ─── The 4 thinking partners ──────────────────────────────────────────
@@ -88,6 +128,14 @@ const DEFAULT_COACH: ThinkingPartner = {
     'Reference-class forecast: how long does pre-seed close usually take?',
     "Red-team my current week plan. Where am I avoiding customer conversations?",
   ],
+  voiceProfile: {
+    // Cartesia stock "Helpful Woman" — warm, conversational, neutral US English.
+    defaultVoiceId: '156fb8d2-335b-4950-9cb3-a2d33befec77',
+    envVar: 'CARTESIA_VOICE_DEFAULT',
+    voiceStyle: 'Warm, conversational US English',
+    speed: 0,
+    maxWordsPerVoiceTurn: 100,
+  },
 };
 
 const COGNITIVE_PSYCHOLOGIST: ThinkingPartner = {
@@ -137,6 +185,14 @@ const COGNITIVE_PSYCHOLOGIST: ThinkingPartner = {
     'Is the 3-frame noise jury actually independent? Critique it from a measurement-theory standpoint',
     'Walk me through the Mercier-Sperber argumentative-theory lens on my last pitch attempt',
   ],
+  voiceProfile: {
+    // Cartesia stock "British Lady" — calm, precise, slightly formal British English.
+    defaultVoiceId: 'a0e99841-438c-4a64-b679-ae501e7d6091',
+    envVar: 'CARTESIA_VOICE_PSYCHOLOGIST',
+    voiceStyle: 'Thoughtful British academic, precise, slightly formal',
+    speed: -0.1,
+    maxWordsPerVoiceTurn: 140,
+  },
 };
 
 const BUSINESS_STRATEGIST: ThinkingPartner = {
@@ -185,6 +241,14 @@ const BUSINESS_STRATEGIST: ThinkingPartner = {
     'Five Forces on the decision-intelligence space. Where is the structural advantage?',
     'Is the Sankore design-partner motion the right Where-to-Play, or are we anchoring on availability?',
   ],
+  voiceProfile: {
+    // Cartesia stock "Newsman" — confident, structured US professional.
+    defaultVoiceId: 'd46abd1d-2d02-43e8-819f-51fb652c1c61',
+    envVar: 'CARTESIA_VOICE_STRATEGIST',
+    voiceStyle: 'Crisp American executive, confident and structured',
+    speed: 0,
+    maxWordsPerVoiceTurn: 120,
+  },
 };
 
 const SKEPTICAL_INVESTOR: ThinkingPartner = {
@@ -234,6 +298,14 @@ const SKEPTICAL_INVESTOR: ThinkingPartner = {
     'On current evidence, what would you tell your partners on Monday? PASS, WATCH, or TAKE TO PARTNERS?',
     'Audit the $30M founder-cash exit math against Series A fund-returner economics. Reconcile it for me',
   ],
+  voiceProfile: {
+    // Cartesia stock "Salesman" — fast, direct, conversion-focused US English.
+    defaultVoiceId: '820a3788-2b37-4d21-847a-b65d8a68c99a',
+    envVar: 'CARTESIA_VOICE_INVESTOR',
+    voiceStyle: 'Blunt fast NYC partner, direct and probing',
+    speed: 0.15,
+    maxWordsPerVoiceTurn: 80,
+  },
 };
 
 export const THINKING_PARTNERS: readonly ThinkingPartner[] = [
@@ -272,4 +344,60 @@ export function isThinkingPartnerId(id: unknown): id is ThinkingPartnerId {
       id === 'business_strategist' ||
       id === 'skeptical_investor')
   );
+}
+
+/**
+ * Build the voice-mode addendum that augments a persona's text-mode
+ * systemPrompt when the founder is speaking instead of typing.
+ *
+ * Honest design notes:
+ * - Conciseness cap (`maxWordsPerVoiceTurn`) enforced via prompt, not
+ *   token cutoff; the model keeps verbal flow rather than truncating
+ *   mid-sentence. The cap is per-persona — see VoiceProfile.
+ * - No markdown / bullets / section headers in voice mode (TTS reads
+ *   them literally as "asterisk asterisk" / "dash" — kills the flow).
+ * - Citation handling: the persona speaks the SHORT citation form
+ *   (author + year), not the full bibliographic reference. The
+ *   visible transcript carries the full citation alongside the audio
+ *   so the founder can scroll back to find the paper. This cuts ~5-10%
+ *   of TTS chars on the citation-heavy psychologist persona AND makes
+ *   the spoken stream sound natural rather than academic.
+ * - Interruption directive: on barge-in, stop and pivot — don't
+ *   restart the same sentence. LiveKit's VAD handles the audio cutoff;
+ *   this directive shapes the model's recovery behaviour.
+ */
+export function buildVoiceModeAddendum(persona: ThinkingPartner): string {
+  const cap = persona.voiceProfile.maxWordsPerVoiceTurn;
+  return [
+    '',
+    '── VOICE MODE ──',
+    `You are now speaking aloud through Cartesia text-to-speech, not typing. Adjust as follows:`,
+    '',
+    `1. Conversational pacing. Default each turn to ${cap} words or fewer (roughly 20 to 35 seconds of speech). Voice mode is Socratic dialogue, not a 4-paragraph essay read aloud. Pause for the listener to think and respond.`,
+    `2. Plain spoken prose. No markdown bold, no bullet lists, no section headers, no asterisks, no dashes used as separators. The TTS reads punctuation literally; keep it natural.`,
+    `3. Citation discipline. Speak short citations only (e.g. "per Kahneman & Klein 2009" or "per the 2003 inside-view paper"). Do NOT speak full bibliographic references; the visible transcript carries the full citation automatically alongside the audio.`,
+    `4. Voice rule still applies: ${persona.voiceRule}`,
+    `5. Interruption recovery. If the listener speaks while you are speaking, the audio will cut off automatically. Do NOT restart the previous sentence. Pivot to address what they just said. If their interruption was a clarifying question, answer it directly; if they pushed back, engage the pushback.`,
+    `6. End most turns with a single specific question or a direct prompt to respond. Voice is back-and-forth; long monologues kill the rhythm.`,
+    '── END VOICE MODE ──',
+    '',
+  ].join('\n');
+}
+
+/**
+ * Resolve the actual Cartesia voice UUID for a persona at runtime.
+ *
+ * Reads from the persona's configured env var first (production override
+ * path — set in Railway dashboard), falls back to the documented default.
+ *
+ * Called by the LiveKit worker when constructing the Cartesia TTS client
+ * for each session. Must be safe to call from a Node environment with
+ * `process.env` available; in browser bundles this should never be hit
+ * (the voice profile resolution lives server-side in the worker only).
+ */
+export function resolveVoiceId(
+  persona: ThinkingPartner,
+  env: Record<string, string | undefined>
+): string {
+  return env[persona.voiceProfile.envVar] ?? persona.voiceProfile.defaultVoiceId;
 }

@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo, lazy, Suspense } from 'react';
 import {
   Brain,
   Compass,
   Landmark,
+  Mic,
   MessageSquare,
   Paperclip,
   TrendingUp,
@@ -28,6 +29,15 @@ import {
   type ThinkingPartnerId,
   type ThinkingPartner,
 } from '@/lib/data/thinking-partners';
+
+/**
+ * Voice mode panel — owns the LiveKit room connection. Lazy-loaded so
+ * the ~200KB livekit-client bundle only ships when the founder
+ * actually clicks the mic toggle, not on every chat-widget mount.
+ */
+const VoiceModePanel = lazy(() =>
+  import('./voice/VoiceModePanel').then(m => ({ default: m.VoiceModePanel }))
+);
 
 interface ChatMsg {
   role: 'user' | 'assistant';
@@ -131,6 +141,9 @@ export function FounderChatWidget({
    *  coach) so first-load behavior is unchanged for existing users. */
   const [personaId, setPersonaId] = useState<ThinkingPartnerId>('default');
   const [personaPickerOpen, setPersonaPickerOpen] = useState(false);
+  /** Voice mode flag. When true, the input row is replaced with the
+   *  VoiceModePanel which owns the LiveKit room connection. */
+  const [voiceMode, setVoiceMode] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const hydrated = useRef(false);
@@ -345,6 +358,23 @@ export function FounderChatWidget({
       setStreaming(false);
     }
   }, [input, messages, streaming, founderPass, attachedFile, personaId]);
+
+  // Voice mode lifecycle. handleVoiceStart simply flips the flag —
+  // VoiceModePanel mounts, owns the LiveKit connection, and either
+  // self-disconnects or signals via onEnd. handleVoiceEnd splices the
+  // accumulated transcript back into the message history so the same
+  // thread continues seamlessly between voice and text.
+  const handleVoiceStart = useCallback(() => {
+    if (streaming) return;
+    setVoiceMode(true);
+  }, [streaming]);
+
+  const handleVoiceEnd = useCallback((transcript: ChatMsg[]) => {
+    setVoiceMode(false);
+    if (transcript.length > 0) {
+      setMessages(prev => [...prev, ...transcript]);
+    }
+  }, []);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -831,79 +861,121 @@ export function FounderChatWidget({
         </div>
       )}
 
-      {/* Input */}
-      <div
-        style={{
-          padding: '10px 12px',
-          borderTop: attachedFile ? 'none' : '1px solid var(--border-primary, #333)',
-          display: 'flex',
-          gap: 6,
-          alignItems: 'center',
-        }}
-      >
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept={ACCEPTED_TYPES}
-          onChange={handleFileSelect}
-          hidden
-        />
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          disabled={streaming}
-          title="Attach a file (PDF, DOCX, PPTX, etc.)"
-          style={{
-            background: 'none',
-            border: 'none',
-            color: attachedFile ? '#16A34A' : 'var(--text-muted)',
-            cursor: streaming ? 'wait' : 'pointer',
-            padding: 4,
-            flexShrink: 0,
-          }}
-        >
-          <Paperclip size={16} />
-        </button>
-        <input
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
-          placeholder={
-            attachedFile
-              ? 'What do you want me to audit in this file?'
-              : 'Bring a decision, a pitch to rehearse, or a question…'
+      {/* Voice mode replaces the input row entirely while a session
+          is active. Lazy-loaded — the livekit-client bundle (~200KB)
+          only ships to the browser on first activation. */}
+      {voiceMode ? (
+        <Suspense
+          fallback={
+            <div
+              style={{
+                padding: '14px',
+                borderTop: '1px solid var(--border-primary, #333)',
+                background: `${activePersona.color}10`,
+                fontSize: 11,
+                color: 'var(--text-muted)',
+                textAlign: 'center',
+              }}
+            >
+              Loading voice mode...
+            </div>
           }
-          disabled={streaming}
+        >
+          <VoiceModePanel
+            persona={activePersona}
+            founderPass={founderPass}
+            onEnd={handleVoiceEnd}
+          />
+        </Suspense>
+      ) : (
+        <div
           style={{
-            flex: 1,
-            padding: '8px 12px',
-            fontSize: 12,
-            borderRadius: 8,
-            border: '1px solid var(--border-primary, #333)',
-            background: 'var(--bg-tertiary, #0a0a0a)',
-            color: 'var(--text-primary)',
-            outline: 'none',
-          }}
-        />
-        <button
-          onClick={handleSend}
-          disabled={streaming || (!input.trim() && !attachedFile)}
-          style={{
-            padding: '8px 14px',
-            fontSize: 12,
-            fontWeight: 600,
-            borderRadius: 8,
-            border: 'none',
-            background:
-              (input.trim() || attachedFile) && !streaming
-                ? activePersona.color
-                : 'var(--bg-tertiary, #1a1a1a)',
-            color: (input.trim() || attachedFile) && !streaming ? '#fff' : 'var(--text-muted)',
-            cursor: streaming ? 'wait' : 'pointer',
+            padding: '10px 12px',
+            borderTop: attachedFile ? 'none' : '1px solid var(--border-primary, #333)',
+            display: 'flex',
+            gap: 6,
+            alignItems: 'center',
           }}
         >
-          {streaming ? '...' : 'Send'}
-        </button>
-      </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept={ACCEPTED_TYPES}
+            onChange={handleFileSelect}
+            hidden
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={streaming}
+            title="Attach a file (PDF, DOCX, PPTX, etc.)"
+            style={{
+              background: 'none',
+              border: 'none',
+              color: attachedFile ? '#16A34A' : 'var(--text-muted)',
+              cursor: streaming ? 'wait' : 'pointer',
+              padding: 4,
+              flexShrink: 0,
+            }}
+          >
+            <Paperclip size={16} />
+          </button>
+          <button
+            onClick={handleVoiceStart}
+            disabled={streaming}
+            title={`Talk to the ${activePersona.label} (voice mode)`}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--text-muted)',
+              cursor: streaming ? 'wait' : 'pointer',
+              padding: 4,
+              flexShrink: 0,
+            }}
+          >
+            <Mic size={16} />
+          </button>
+          <input
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
+            placeholder={
+              attachedFile
+                ? 'What do you want me to audit in this file?'
+                : 'Bring a decision, a pitch to rehearse, or a question…'
+            }
+            disabled={streaming}
+            style={{
+              flex: 1,
+              padding: '8px 12px',
+              fontSize: 12,
+              borderRadius: 8,
+              border: '1px solid var(--border-primary, #333)',
+              background: 'var(--bg-tertiary, #0a0a0a)',
+              color: 'var(--text-primary)',
+              outline: 'none',
+            }}
+          />
+          <button
+            onClick={handleSend}
+            disabled={streaming || (!input.trim() && !attachedFile)}
+            style={{
+              padding: '8px 14px',
+              fontSize: 12,
+              fontWeight: 600,
+              borderRadius: 8,
+              border: 'none',
+              background:
+                (input.trim() || attachedFile) && !streaming
+                  ? activePersona.color
+                  : 'var(--bg-tertiary, #1a1a1a)',
+              color: (input.trim() || attachedFile) && !streaming ? '#fff' : 'var(--text-muted)',
+              cursor: streaming ? 'wait' : 'pointer',
+            }}
+          >
+            {streaming ? '...' : 'Send'}
+          </button>
+        </div>
+      )}
       {/* Mobile fullscreen override: on narrow viewports the floating
           400×520 panel is too small for a real conversation and the
           bottom-right placement is hard to reach with one thumb. Below
