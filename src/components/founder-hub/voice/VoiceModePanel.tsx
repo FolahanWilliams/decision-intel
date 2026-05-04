@@ -291,6 +291,10 @@ export function VoiceModePanel({ persona, founderPass, onEnd }: Props) {
               `trackName=${publication?.trackName}`,
               `trackSid=${publication?.trackSid ?? track.sid}`
             );
+            // Flip the "agent joined" ref here too — if we got an
+            // audio track from a remote, the remote IS connected by
+            // definition (Track 2 of the watchdog-defeat).
+            agentJoinedRef.current = true;
             if (track.kind === Track.Kind.Audio) {
               try {
                 track.attach(audioEl);
@@ -349,6 +353,24 @@ export function VoiceModePanel({ persona, founderPass, onEnd }: Props) {
         // arrives — that's our Railway worker. The 'no agent joined'
         // watchdog below uses this ref to distinguish a stuck panel
         // from a real session in progress.
+        //
+        // CRITICAL: ParticipantConnected does NOT fire for participants
+        // already in the room when this listener is registered. The
+        // voice worker dispatches faster than the browser can join
+        // (Railway worker → LiveKit dispatch → join room runs faster
+        // than browser → fetch /voice-token → wss handshake → publish
+        // mic). So by the time we attach this listener, the agent is
+        // typically already a remote participant. ParticipantConnected
+        // never fires. agentJoinedRef stays false. The 10s watchdog
+        // below fires a "no agent joined" disconnect that the user
+        // experiences as voice mode auto-ending after exactly 10s.
+        //
+        // Three guards now flip agentJoinedRef:
+        //   1. ParticipantConnected event (late-joining agent)
+        //   2. TrackSubscribed event (the agent published audio — they
+        //      had to be connected to do that, so they count as joined)
+        //   3. Initial scan after connect (catches the race where the
+        //      agent joined before our listener registration)
         room.on(RoomEvent.ParticipantConnected, () => {
           agentJoinedRef.current = true;
         });
@@ -383,6 +405,29 @@ export function VoiceModePanel({ persona, founderPass, onEnd }: Props) {
           await room.disconnect();
           return;
         }
+
+        // Race-defeat for the watchdog: scan existing remote
+        // participants. If the agent was already in the room when
+        // we registered the ParticipantConnected listener, that
+        // event never fires. Without this scan, the watchdog at 10s
+        // sees agentJoinedRef.current === false and disconnects the
+        // session — which the founder experiences as voice mode
+        // auto-ending exactly 10 seconds after starting.
+        // (Track 3 of the watchdog-defeat — the explicit init scan.)
+        const remoteCount = (room as unknown as { remoteParticipants?: Map<string, unknown> })
+          .remoteParticipants?.size ?? 0;
+        if (remoteCount > 0) {
+          agentJoinedRef.current = true;
+          console.log(
+            '[VoiceModePanel] post-connect scan — agent already in room, agentJoinedRef set true. remoteCount=',
+            remoteCount
+          );
+        } else {
+          console.log(
+            '[VoiceModePanel] post-connect scan — no remote participants yet, will rely on TrackSubscribed/ParticipantConnected'
+          );
+        }
+
         await room.localParticipant.setMicrophoneEnabled(true);
 
         sessionStartRef.current = Date.now();
