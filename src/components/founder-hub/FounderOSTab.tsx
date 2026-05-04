@@ -9,22 +9,26 @@
  * + outcome capture sustainably for 6 years. That motion is only physically
  * possible with the cognitive hardware to support it.
  *
- * The asymmetric arbitrage: as the cognitive baseline of peers actively falls
- * (Reverse Flynn Effect, prefrontal cortex suppression from short-form video,
- * executive functioning erosion in Gen Z), an individual who refuses
- * algorithmic pacification builds a near-insurmountable competitive
- * advantage WITHOUT having to outwork anyone — they just have to refuse to
- * crash. This is the strongest tailwind v3.5 has and it costs the founder
- * nothing except discipline.
+ * Persistence: Supabase via /api/founder-os/* routes. Dual-gated by founder
+ * pass (founder hub access) + Supabase user.id (per-user data partition).
+ * Multi-device sync via the same Supabase user across phone + laptop.
  *
- * The tab is checked once daily — first thing, before LinkedIn, before the
- * dashboard, before email. Daily checkin + SFC-zero streak counter +
- * weekly review prompt + long-form content log + skill acquisition tracker.
+ * The tab composes:
+ *   - BibleVersePill — daily-rotating verse anchor at the top
+ *   - Hero card — strategic framing
+ *   - SFC streak counter + today's checkin
+ *   - 91-day discipline heatmap
+ *   - 6-axis pillar adherence radar + 30-day cognitive trend chart
+ *   - Compound-math callout (asymmetric arbitrage)
+ *   - Six pillars cards
+ *   - Long-form content log
+ *   - Skill acquisition tracker + skill timeline visualization
+ *   - WhySfcSection — research + sabotage tables (read when unmotivated)
+ *   - CommitmentRecord — the physical record
+ *   - Weekly review prompt
  *
- * Persistence: localStorage for now (single-user surface, no backend cost,
- * survives across sessions). Migrating to Prisma is a follow-up if the
- * founder wants permanent records or wants to expose anonymised cohort
- * stats to other founders later.
+ * Mobile-first responsive: collapses to single column below 800px so the
+ * tab is fully usable on phone.
  */
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
@@ -36,55 +40,62 @@ import {
   Activity,
   Target,
   Flame,
-  TrendingUp,
   Plus,
-  Check,
   X,
   CalendarDays,
+  RefreshCw,
 } from 'lucide-react';
-
-const STORAGE_KEYS = {
-  CHECKINS: 'di-founder-os-checkins-v1',
-  CONTENT_LOG: 'di-founder-os-content-log-v1',
-  SKILL_TRACKER: 'di-founder-os-skill-tracker-v1',
-  WEEKLY_REVIEWS: 'di-founder-os-weekly-reviews-v1',
-};
+import {
+  StreakHeatmap,
+  CognitiveTrendChart,
+  PillarAdherenceRadar,
+  CompoundMathCallout,
+  SkillTimeline,
+  type CheckinRecord,
+} from '@/components/founder-hub/founder-os/visualizations';
+import {
+  BibleVersePill,
+  WhySfcSection,
+  CommitmentRecord,
+} from '@/components/founder-hub/founder-os/sections';
 
 interface DailyCheckin {
-  date: string; // YYYY-MM-DD
+  id: string;
+  date: string;
   sfcZero: boolean;
   deepWorkHours: number;
   deepReadingMinutes: number;
   exercise: boolean;
   meditation: boolean;
-  notes?: string;
+  notes: string | null;
 }
 
 interface ContentLogItem {
   id: string;
-  date: string;
+  capturedAt: string;
   title: string;
-  source: string; // YouTube, book, paper, podcast
+  source: string;
   durationMin: number;
   activeRecallSummary: string;
 }
 
 interface SkillItem {
   id: string;
-  quarter: string; // e.g., "Q3 2026"
+  quarter: string;
   skill: string;
-  whyItMatters: string;
-  preAssessment: string;
-  postAssessment?: string;
+  whyItMatters: string | null;
+  preAssessment: string | null;
+  postAssessment: string | null;
   status: 'planned' | 'in_progress' | 'complete';
 }
 
 interface WeeklyReviewItem {
   id: string;
   weekStartDate: string;
-  topLongForm: string; // 3 best long-form pieces
-  oneSkillNote: string;
+  topLongForm: string;
+  oneSkillNote: string | null;
   internalLocusReflection: string;
+  createdAt: string;
 }
 
 const PILLARS = [
@@ -132,49 +143,43 @@ const PILLARS = [
   },
 ];
 
-function todayISO(): string {
-  return new Date().toISOString().slice(0, 10);
+function todayLocalISO(): string {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }
 
-function loadJSON<T>(key: string, fallback: T): T {
-  if (typeof window === 'undefined') return fallback;
-  try {
-    const raw = localStorage.getItem(key);
-    if (!raw) return fallback;
-    return JSON.parse(raw) as T;
-  } catch {
-    return fallback;
-  }
-}
-
-function saveJSON<T>(key: string, value: T): void {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch {
-    // Silent — localStorage quota / private mode
-  }
+function shiftDateISO(dateISO: string, days: number): string {
+  const d = new Date(dateISO + 'T00:00:00');
+  d.setDate(d.getDate() + days);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
 }
 
 function computeSfcZeroStreak(checkins: DailyCheckin[]): number {
   if (checkins.length === 0) return 0;
-  const sorted = [...checkins].sort((a, b) => b.date.localeCompare(a.date));
+  const map = new Map(checkins.map(c => [c.date, c]));
   let streak = 0;
-  let cursor = new Date(todayISO());
-  for (const c of sorted) {
-    const cursorISO = cursor.toISOString().slice(0, 10);
-    if (c.date !== cursorISO) {
-      // Allow today to not be filled yet — if we're checking and today's
-      // entry doesn't exist, fall back to yesterday as the start.
-      if (c.date === new Date(cursor.getTime() - 86400000).toISOString().slice(0, 10) && streak === 0) {
-        cursor = new Date(cursor.getTime() - 86400000);
-      } else {
-        break;
+  let cursor = todayLocalISO();
+  // Today might not be filled yet — check today first; if not present
+  // OR present-with-sfc-zero, walk backward.
+  for (let i = 0; i < 400; i++) {
+    const c = map.get(cursor);
+    if (!c) {
+      // First gap stops the streak unless it's today and today wasn't logged yet.
+      if (i === 0) {
+        cursor = shiftDateISO(cursor, -1);
+        continue;
       }
+      break;
     }
     if (c.sfcZero) {
       streak += 1;
-      cursor = new Date(cursor.getTime() - 86400000);
+      cursor = shiftDateISO(cursor, -1);
     } else {
       break;
     }
@@ -182,8 +187,13 @@ function computeSfcZeroStreak(checkins: DailyCheckin[]): number {
   return streak;
 }
 
-function genId(): string {
-  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+function getFounderPass(): string {
+  return process.env.NEXT_PUBLIC_FOUNDER_HUB_PASS ?? '';
+}
+
+interface ApiEnvelope<T> {
+  success?: boolean;
+  data?: T;
 }
 
 export function FounderOSTab() {
@@ -192,10 +202,11 @@ export function FounderOSTab() {
   const [contentLog, setContentLog] = useState<ContentLogItem[]>([]);
   const [skills, setSkills] = useState<SkillItem[]>([]);
   const [reviews, setReviews] = useState<WeeklyReviewItem[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
 
-  // Today's checkin draft
-  const [todayDraft, setTodayDraft] = useState<DailyCheckin>({
-    date: todayISO(),
+  // Today's draft
+  const [todayDraft, setTodayDraft] = useState<Omit<DailyCheckin, 'id'>>({
+    date: todayLocalISO(),
     sfcZero: true,
     deepWorkHours: 0,
     deepReadingMinutes: 0,
@@ -204,39 +215,93 @@ export function FounderOSTab() {
     notes: '',
   });
 
-  // Add-content form
-  const [contentForm, setContentForm] = useState<Partial<ContentLogItem>>({
+  // Forms
+  const [contentForm, setContentForm] = useState({
     title: '',
     source: 'YouTube',
     durationMin: 30,
     activeRecallSummary: '',
   });
   const [showContentForm, setShowContentForm] = useState(false);
+  const [contentError, setContentError] = useState<string | null>(null);
 
-  // Add-skill form
-  const [skillForm, setSkillForm] = useState<Partial<SkillItem>>({
+  const [skillForm, setSkillForm] = useState({
     quarter: '',
     skill: '',
     whyItMatters: '',
     preAssessment: '',
-    status: 'planned',
   });
   const [showSkillForm, setShowSkillForm] = useState(false);
+  const [skillError, setSkillError] = useState<string | null>(null);
 
-  // Hydrate from localStorage on mount
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewForm, setReviewForm] = useState({
+    topLongForm: '',
+    oneSkillNote: '',
+    internalLocusReflection: '',
+  });
+  const [reviewError, setReviewError] = useState<string | null>(null);
+
+  // Save-status indicator for daily checkin
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+
+  const headers = useMemo(
+    () => ({ 'Content-Type': 'application/json', 'x-founder-pass': getFounderPass() }),
+    []
+  );
+
+  const fetchAll = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      const [cRes, lRes, sRes, wRes] = await Promise.all([
+        fetch('/api/founder-os/checkins?days=180', { cache: 'no-store', headers }),
+        fetch('/api/founder-os/content-log?limit=50', { cache: 'no-store', headers }),
+        fetch('/api/founder-os/skills', { cache: 'no-store', headers }),
+        fetch('/api/founder-os/weekly-reviews?limit=12', { cache: 'no-store', headers }),
+      ]);
+      if (cRes.ok) {
+        const j = (await cRes.json()) as ApiEnvelope<{ checkins: DailyCheckin[] }>;
+        setCheckins(j.data?.checkins ?? []);
+      }
+      if (lRes.ok) {
+        const j = (await lRes.json()) as ApiEnvelope<{ items: ContentLogItem[] }>;
+        setContentLog(j.data?.items ?? []);
+      }
+      if (sRes.ok) {
+        const j = (await sRes.json()) as ApiEnvelope<{ skills: SkillItem[] }>;
+        setSkills(j.data?.skills ?? []);
+      }
+      if (wRes.ok) {
+        const j = (await wRes.json()) as ApiEnvelope<{ reviews: WeeklyReviewItem[] }>;
+        setReviews(j.data?.reviews ?? []);
+      }
+    } catch {
+      // Silent — empty state acceptable; banners show below if relevant
+    } finally {
+      setRefreshing(false);
+      setHydrated(true);
+    }
+  }, [headers]);
+
   useEffect(() => {
-    setCheckins(loadJSON<DailyCheckin[]>(STORAGE_KEYS.CHECKINS, []));
-    setContentLog(loadJSON<ContentLogItem[]>(STORAGE_KEYS.CONTENT_LOG, []));
-    setSkills(loadJSON<SkillItem[]>(STORAGE_KEYS.SKILL_TRACKER, []));
-    setReviews(loadJSON<WeeklyReviewItem[]>(STORAGE_KEYS.WEEKLY_REVIEWS, []));
-    setHydrated(true);
-  }, []);
+    fetchAll();
+  }, [fetchAll]);
 
   // Pre-load today's existing checkin if any
   useEffect(() => {
     if (!hydrated) return;
-    const existing = checkins.find(c => c.date === todayISO());
-    if (existing) setTodayDraft(existing);
+    const existing = checkins.find(c => c.date === todayLocalISO());
+    if (existing) {
+      setTodayDraft({
+        date: existing.date,
+        sfcZero: existing.sfcZero,
+        deepWorkHours: existing.deepWorkHours,
+        deepReadingMinutes: existing.deepReadingMinutes,
+        exercise: existing.exercise,
+        meditation: existing.meditation,
+        notes: existing.notes ?? '',
+      });
+    }
   }, [hydrated, checkins]);
 
   const sfcStreak = useMemo(() => computeSfcZeroStreak(checkins), [checkins]);
@@ -244,54 +309,160 @@ export function FounderOSTab() {
   const sfcZeroDays = checkins.filter(c => c.sfcZero).length;
   const adherencePct = totalCheckins === 0 ? 0 : Math.round((sfcZeroDays / totalCheckins) * 100);
 
-  const handleSaveCheckin = useCallback(() => {
-    const next = [...checkins.filter(c => c.date !== todayDraft.date), todayDraft];
-    setCheckins(next);
-    saveJSON(STORAGE_KEYS.CHECKINS, next);
-  }, [checkins, todayDraft]);
+  const totalDeepWorkHours = useMemo(
+    () => checkins.reduce((s, c) => s + c.deepWorkHours, 0),
+    [checkins]
+  );
+  const totalReadingMinutes = useMemo(
+    () => checkins.reduce((s, c) => s + c.deepReadingMinutes, 0),
+    [checkins]
+  );
 
-  const handleAddContent = useCallback(() => {
-    if (!contentForm.title?.trim() || !contentForm.activeRecallSummary?.trim()) return;
-    const item: ContentLogItem = {
-      id: genId(),
-      date: todayISO(),
-      title: contentForm.title.trim(),
-      source: contentForm.source || 'YouTube',
-      durationMin: Number(contentForm.durationMin) || 30,
-      activeRecallSummary: contentForm.activeRecallSummary.trim(),
-    };
-    const next = [item, ...contentLog].slice(0, 200);
-    setContentLog(next);
-    saveJSON(STORAGE_KEYS.CONTENT_LOG, next);
-    setContentForm({ title: '', source: 'YouTube', durationMin: 30, activeRecallSummary: '' });
-    setShowContentForm(false);
-  }, [contentForm, contentLog]);
+  // Long-form pieces in last 30 days
+  const longFormLast30 = useMemo(() => {
+    const cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    return contentLog.filter(c => new Date(c.capturedAt) >= cutoff).length;
+  }, [contentLog]);
 
-  const handleAddSkill = useCallback(() => {
-    if (!skillForm.skill?.trim() || !skillForm.quarter?.trim()) return;
-    const item: SkillItem = {
-      id: genId(),
-      quarter: skillForm.quarter.trim(),
-      skill: skillForm.skill.trim(),
-      whyItMatters: skillForm.whyItMatters?.trim() || '',
-      preAssessment: skillForm.preAssessment?.trim() || '',
-      status: (skillForm.status as SkillItem['status']) || 'planned',
-    };
-    const next = [item, ...skills];
-    setSkills(next);
-    saveJSON(STORAGE_KEYS.SKILL_TRACKER, next);
-    setSkillForm({ quarter: '', skill: '', whyItMatters: '', preAssessment: '', status: 'planned' });
-    setShowSkillForm(false);
-  }, [skillForm, skills]);
-
-  const updateSkillStatus = useCallback(
-    (id: string, status: SkillItem['status']) => {
-      const next = skills.map(s => (s.id === id ? { ...s, status } : s));
-      setSkills(next);
-      saveJSON(STORAGE_KEYS.SKILL_TRACKER, next);
-    },
+  const skillsActive = useMemo(
+    () => skills.filter(s => s.status !== 'planned').length,
     [skills]
   );
+
+  // Weekly reviews in last 4 weeks
+  const reviewsLast4w = useMemo(() => {
+    const cutoff = new Date(Date.now() - 28 * 24 * 60 * 60 * 1000);
+    return reviews.filter(r => new Date(r.createdAt) >= cutoff).length;
+  }, [reviews]);
+
+  const handleSaveCheckin = useCallback(async () => {
+    setSaveStatus('saving');
+    try {
+      const res = await fetch('/api/founder-os/checkins', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(todayDraft),
+      });
+      if (!res.ok) {
+        const j = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(j?.error ?? 'Save failed');
+      }
+      setSaveStatus('saved');
+      await fetchAll();
+      setTimeout(() => setSaveStatus('idle'), 2000);
+    } catch {
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    }
+  }, [headers, todayDraft, fetchAll]);
+
+  const handleAddContent = useCallback(async () => {
+    if (!contentForm.title.trim() || !contentForm.activeRecallSummary.trim()) {
+      setContentError('Title + active-recall summary required.');
+      return;
+    }
+    setContentError(null);
+    try {
+      const res = await fetch('/api/founder-os/content-log', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          title: contentForm.title.trim(),
+          source: contentForm.source,
+          durationMin: Number(contentForm.durationMin) || 30,
+          activeRecallSummary: contentForm.activeRecallSummary.trim(),
+        }),
+      });
+      if (!res.ok) {
+        const j = (await res.json().catch(() => null)) as { error?: string } | null;
+        setContentError(j?.error ?? 'Save failed');
+        return;
+      }
+      setContentForm({ title: '', source: 'YouTube', durationMin: 30, activeRecallSummary: '' });
+      setShowContentForm(false);
+      await fetchAll();
+    } catch (e) {
+      setContentError(e instanceof Error ? e.message : 'Save failed');
+    }
+  }, [contentForm, headers, fetchAll]);
+
+  const handleAddSkill = useCallback(async () => {
+    if (!skillForm.skill.trim() || !skillForm.quarter.trim()) {
+      setSkillError('Skill + quarter required.');
+      return;
+    }
+    setSkillError(null);
+    try {
+      const res = await fetch('/api/founder-os/skills', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          quarter: skillForm.quarter.trim(),
+          skill: skillForm.skill.trim(),
+          whyItMatters: skillForm.whyItMatters.trim() || undefined,
+          preAssessment: skillForm.preAssessment.trim() || undefined,
+        }),
+      });
+      if (!res.ok) {
+        const j = (await res.json().catch(() => null)) as { error?: string } | null;
+        setSkillError(j?.error ?? 'Save failed');
+        return;
+      }
+      setSkillForm({ quarter: '', skill: '', whyItMatters: '', preAssessment: '' });
+      setShowSkillForm(false);
+      await fetchAll();
+    } catch (e) {
+      setSkillError(e instanceof Error ? e.message : 'Save failed');
+    }
+  }, [skillForm, headers, fetchAll]);
+
+  const updateSkillStatus = useCallback(
+    async (id: string, status: SkillItem['status']) => {
+      try {
+        await fetch(`/api/founder-os/skills?id=${encodeURIComponent(id)}`, {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify({ status }),
+        });
+        await fetchAll();
+      } catch {
+        // silent
+      }
+    },
+    [headers, fetchAll]
+  );
+
+  const handleSaveReview = useCallback(async () => {
+    if (!reviewForm.topLongForm.trim() || !reviewForm.internalLocusReflection.trim()) {
+      setReviewError('Top long-form + internal locus reflection required.');
+      return;
+    }
+    setReviewError(null);
+    try {
+      // Use today as week-start for simplicity; the API uniques on userId+weekStartDate.
+      const weekStartDate = todayLocalISO();
+      const res = await fetch('/api/founder-os/weekly-reviews', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          weekStartDate,
+          topLongForm: reviewForm.topLongForm.trim(),
+          oneSkillNote: reviewForm.oneSkillNote.trim() || undefined,
+          internalLocusReflection: reviewForm.internalLocusReflection.trim(),
+        }),
+      });
+      if (!res.ok) {
+        const j = (await res.json().catch(() => null)) as { error?: string } | null;
+        setReviewError(j?.error ?? 'Save failed');
+        return;
+      }
+      setReviewForm({ topLongForm: '', oneSkillNote: '', internalLocusReflection: '' });
+      setShowReviewForm(false);
+      await fetchAll();
+    } catch (e) {
+      setReviewError(e instanceof Error ? e.message : 'Save failed');
+    }
+  }, [reviewForm, headers, fetchAll]);
 
   if (!hydrated) {
     return (
@@ -301,8 +472,21 @@ export function FounderOSTab() {
     );
   }
 
+  // Map checkins to the visualization shape (drop the id, keep fields).
+  const checkinRecords: CheckinRecord[] = checkins.map(c => ({
+    date: c.date,
+    sfcZero: c.sfcZero,
+    deepWorkHours: c.deepWorkHours,
+    deepReadingMinutes: c.deepReadingMinutes,
+    exercise: c.exercise,
+    meditation: c.meditation,
+  }));
+
   return (
-    <div>
+    <div className="founder-os-tab">
+      {/* DAILY VERSE PILL */}
+      <BibleVersePill />
+
       {/* HERO */}
       <div
         style={{
@@ -317,57 +501,83 @@ export function FounderOSTab() {
       >
         <div
           style={{
-            fontSize: 11,
-            fontWeight: 700,
-            textTransform: 'uppercase',
-            letterSpacing: '0.1em',
-            color: 'var(--accent-primary)',
-            marginBottom: 6,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            gap: 12,
+            flexWrap: 'wrap',
           }}
         >
-          GTM v3.5 §11 Founder Operating System · RATIFIED 2026-05-05
+          <div style={{ flex: 1, minWidth: 240 }}>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                color: 'var(--accent-primary)',
+                marginBottom: 6,
+              }}
+            >
+              GTM v3.5 §11 Founder Operating System · synced across phone + laptop
+            </div>
+            <h2
+              style={{
+                fontSize: 24,
+                fontWeight: 800,
+                margin: 0,
+                color: 'var(--text-primary)',
+                letterSpacing: '-0.02em',
+                lineHeight: 1.2,
+              }}
+            >
+              The cognitive infrastructure that makes the GTM strategy executable.
+            </h2>
+            <p
+              style={{
+                fontSize: 13.5,
+                color: 'var(--text-secondary)',
+                margin: '8px 0 0',
+                lineHeight: 1.55,
+                maxWidth: 760,
+              }}
+            >
+              v3.5 assumes a solo founder running 5-10 personalised LinkedIn DMs/week + 2 London
+              events/month + Vohra survey discipline + Sankore engagement + outcome capture
+              sustainably for 6 years. That motion is only physically possible with the cognitive
+              hardware to support it. The asymmetric arbitrage: as the baseline of your peers
+              actively falls, your gap widens daily without you having to run faster. Check this
+              tab once daily, first thing, before LinkedIn or email.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={fetchAll}
+            disabled={refreshing}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '6px 12px',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-full)',
+              fontSize: 12,
+              fontWeight: 600,
+              color: 'var(--text-secondary)',
+              cursor: refreshing ? 'wait' : 'pointer',
+              opacity: refreshing ? 0.6 : 1,
+            }}
+            aria-label="Refresh OS data"
+          >
+            <RefreshCw size={12} className={refreshing ? 'animate-spin' : ''} />
+            {refreshing ? 'Syncing…' : 'Refresh'}
+          </button>
         </div>
-        <h2
-          style={{
-            fontSize: 26,
-            fontWeight: 800,
-            margin: 0,
-            color: 'var(--text-primary)',
-            letterSpacing: '-0.02em',
-            lineHeight: 1.15,
-          }}
-        >
-          The cognitive infrastructure that makes the GTM strategy executable.
-        </h2>
-        <p
-          style={{
-            fontSize: 14,
-            color: 'var(--text-secondary)',
-            margin: '8px 0 0',
-            lineHeight: 1.55,
-            maxWidth: 760,
-          }}
-        >
-          v3.5 assumes a solo founder running 5-10 personalised LinkedIn DMs/week + 2 London
-          events/month + Vohra survey discipline + Sankore engagement + outcome capture
-          sustainably for 6 years. That motion is only physically possible with the cognitive
-          hardware to support it. The asymmetric arbitrage: as the baseline of your peers actively
-          falls, your gap widens daily without you having to run faster — you just have to refuse
-          to crash. Check this tab once daily, first thing, before LinkedIn or email.
-        </p>
       </div>
 
       {/* STREAK + TODAY CHECKIN */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(220px, 280px) 1fr',
-          gap: 16,
-          marginBottom: 20,
-        }}
-        className="founder-os-grid"
-      >
-        {/* SFC streak card */}
+      <div className="founder-os-streak-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(220px, 280px) 1fr', gap: 16, marginBottom: 20 }}>
         <div
           style={{
             background: 'var(--bg-card)',
@@ -418,7 +628,6 @@ export function FounderOSTab() {
               style={{
                 fontSize: 14,
                 color: 'var(--text-muted)',
-                fontFamily: 'inherit',
                 fontWeight: 600,
                 marginLeft: 6,
               }}
@@ -429,7 +638,7 @@ export function FounderOSTab() {
           <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
             {totalCheckins === 0
               ? 'Log today\'s checkin to start the streak.'
-              : `${sfcZeroDays} of ${totalCheckins} days SFC-free (${adherencePct}% lifetime adherence)`}
+              : `${sfcZeroDays} of ${totalCheckins} days SFC-free (${adherencePct}% lifetime)`}
           </div>
           {sfcStreak >= 30 && (
             <div
@@ -443,12 +652,11 @@ export function FounderOSTab() {
                 marginTop: 4,
               }}
             >
-              Dopaminergic baseline reset territory · keep going
+              Dopaminergic baseline reset · keep going
             </div>
           )}
         </div>
 
-        {/* Today's checkin */}
         <div
           style={{
             background: 'var(--bg-card)',
@@ -478,7 +686,7 @@ export function FounderOSTab() {
                   marginBottom: 4,
                 }}
               >
-                Today&apos;s checkin · {todayISO()}
+                Today&apos;s checkin · {todayLocalISO()}
               </div>
               <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>
                 Five questions, thirty seconds.
@@ -487,23 +695,36 @@ export function FounderOSTab() {
             <button
               type="button"
               onClick={handleSaveCheckin}
+              disabled={saveStatus === 'saving'}
               style={{
                 padding: '8px 16px',
-                background: 'var(--accent-primary)',
+                background:
+                  saveStatus === 'saved'
+                    ? 'var(--success)'
+                    : saveStatus === 'error'
+                      ? 'var(--error)'
+                      : 'var(--accent-primary)',
                 color: '#fff',
-                border: '1px solid var(--accent-primary)',
+                border: 'none',
                 borderRadius: 'var(--radius-full)',
                 fontSize: 13,
                 fontWeight: 600,
-                cursor: 'pointer',
+                cursor: saveStatus === 'saving' ? 'wait' : 'pointer',
+                opacity: saveStatus === 'saving' ? 0.7 : 1,
+                transition: 'background 0.2s',
               }}
             >
-              Save checkin
+              {saveStatus === 'saving'
+                ? 'Saving…'
+                : saveStatus === 'saved'
+                  ? '✓ Saved'
+                  : saveStatus === 'error'
+                    ? 'Try again'
+                    : 'Save checkin'}
             </button>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {/* SFC = 0 today */}
             <label
               style={{
                 display: 'flex',
@@ -639,7 +860,7 @@ export function FounderOSTab() {
             <textarea
               value={todayDraft.notes ?? ''}
               onChange={e => setTodayDraft({ ...todayDraft, notes: e.target.value.slice(0, 1000) })}
-              placeholder="Anything to capture from today (optional). One sentence about what surprised you, what you learned, or what fragmented you."
+              placeholder="Anything to capture (optional). One sentence about what surprised you, what you learned, or what fragmented you."
               rows={2}
               style={{
                 padding: '10px 12px',
@@ -655,6 +876,39 @@ export function FounderOSTab() {
         </div>
       </div>
 
+      {/* COMPOUND MATH CALLOUT */}
+      <div style={{ marginBottom: 20 }}>
+        <CompoundMathCallout
+          sfcZeroDays={sfcZeroDays}
+          totalDeepWorkHours={totalDeepWorkHours}
+          totalReadingMinutes={totalReadingMinutes}
+        />
+      </div>
+
+      {/* HEATMAP */}
+      <div style={{ marginBottom: 20 }}>
+        <StreakHeatmap checkins={checkinRecords} />
+      </div>
+
+      {/* RADAR + TREND CHART */}
+      <div
+        className="founder-os-charts-grid"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'minmax(280px, 1fr) minmax(360px, 1.4fr)',
+          gap: 16,
+          marginBottom: 20,
+        }}
+      >
+        <PillarAdherenceRadar
+          checkins={checkinRecords}
+          longFormPiecesLast30Days={longFormLast30}
+          skillsInProgressOrComplete={skillsActive}
+          weeklyReviewsLast4Weeks={reviewsLast4w}
+        />
+        <CognitiveTrendChart checkins={checkinRecords} />
+      </div>
+
       {/* SIX PILLARS */}
       <div
         style={{
@@ -664,7 +918,7 @@ export function FounderOSTab() {
           letterSpacing: '0.1em',
           color: 'var(--text-muted)',
           marginBottom: 10,
-          marginTop: 24,
+          marginTop: 8,
         }}
       >
         The six pillars (locked v3.5 §11)
@@ -674,6 +928,7 @@ export function FounderOSTab() {
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
           gap: 12,
+          marginBottom: 24,
         }}
       >
         {PILLARS.map(p => {
@@ -713,10 +968,10 @@ export function FounderOSTab() {
         })}
       </div>
 
-      {/* LONG-FORM CONTENT LOG */}
+      {/* CONTENT LOG */}
       <div
         style={{
-          marginTop: 28,
+          marginTop: 8,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -778,38 +1033,18 @@ export function FounderOSTab() {
             gap: 10,
           }}
         >
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '2fr 1fr 1fr',
-              gap: 10,
-            }}
-          >
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 10 }}>
             <input
               type="text"
               placeholder="Title (e.g. 'Lex Fridman × Yann LeCun on World Models')"
-              value={contentForm.title ?? ''}
-              onChange={e => setContentForm({ ...contentForm, title: e.target.value.slice(0, 200) })}
-              style={{
-                padding: '8px 10px',
-                border: '1px solid var(--border-color)',
-                borderRadius: 'var(--radius-md)',
-                background: 'var(--bg-card)',
-                color: 'var(--text-primary)',
-                fontSize: 13,
-              }}
+              value={contentForm.title}
+              onChange={e => setContentForm({ ...contentForm, title: e.target.value.slice(0, 500) })}
+              style={inputStyle}
             />
             <select
               value={contentForm.source}
               onChange={e => setContentForm({ ...contentForm, source: e.target.value })}
-              style={{
-                padding: '8px 10px',
-                border: '1px solid var(--border-color)',
-                borderRadius: 'var(--radius-md)',
-                background: 'var(--bg-card)',
-                color: 'var(--text-primary)',
-                fontSize: 13,
-              }}
+              style={inputStyle}
             >
               <option>YouTube</option>
               <option>Book</option>
@@ -820,60 +1055,33 @@ export function FounderOSTab() {
             </select>
             <input
               type="number"
-              min={30}
-              max={600}
+              min={1}
+              max={1000}
               step={5}
               placeholder="Duration (min)"
-              value={contentForm.durationMin ?? 30}
-              onChange={e => setContentForm({ ...contentForm, durationMin: Number(e.target.value) })}
-              style={{
-                padding: '8px 10px',
-                border: '1px solid var(--border-color)',
-                borderRadius: 'var(--radius-md)',
-                background: 'var(--bg-card)',
-                color: 'var(--text-primary)',
-                fontSize: 13,
-              }}
+              value={contentForm.durationMin}
+              onChange={e =>
+                setContentForm({ ...contentForm, durationMin: Number(e.target.value) })
+              }
+              style={inputStyle}
             />
           </div>
           <textarea
-            value={contentForm.activeRecallSummary ?? ''}
+            value={contentForm.activeRecallSummary}
             onChange={e =>
-              setContentForm({ ...contentForm, activeRecallSummary: e.target.value.slice(0, 2000) })
+              setContentForm({ ...contentForm, activeRecallSummary: e.target.value.slice(0, 4000) })
             }
             placeholder="Active recall summary — write 2-4 sentences from MEMORY. Don't peek at notes. The retrieval IS the encoding."
             rows={3}
-            style={{
-              padding: '10px 12px',
-              border: '1px solid var(--border-color)',
-              borderRadius: 'var(--radius-md)',
-              background: 'var(--bg-card)',
-              color: 'var(--text-primary)',
-              fontSize: 13,
-              resize: 'vertical',
-            }}
+            style={{ ...inputStyle, resize: 'vertical' }}
           />
+          {contentError && <ErrorBanner text={contentError} />}
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <button
               type="button"
               onClick={handleAddContent}
-              disabled={
-                !contentForm.title?.trim() || !contentForm.activeRecallSummary?.trim()
-              }
-              style={{
-                padding: '8px 18px',
-                background: 'var(--accent-primary)',
-                color: '#fff',
-                border: '1px solid var(--accent-primary)',
-                borderRadius: 'var(--radius-full)',
-                fontSize: 13,
-                fontWeight: 600,
-                cursor: 'pointer',
-                opacity:
-                  !contentForm.title?.trim() || !contentForm.activeRecallSummary?.trim()
-                    ? 0.6
-                    : 1,
-              }}
+              disabled={!contentForm.title.trim() || !contentForm.activeRecallSummary.trim()}
+              style={primaryBtnStyle}
             >
               Save piece
             </button>
@@ -883,7 +1091,7 @@ export function FounderOSTab() {
 
       {contentLog.length > 0 && (
         <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {contentLog.slice(0, 20).map(item => (
+          {contentLog.slice(0, 12).map(item => (
             <div
               key={item.id}
               style={{
@@ -913,7 +1121,7 @@ export function FounderOSTab() {
                     fontFamily: "'JetBrains Mono', monospace",
                   }}
                 >
-                  {item.source} · {item.durationMin}min · {item.date}
+                  {item.source} · {item.durationMin}min · {new Date(item.capturedAt).toLocaleDateString()}
                 </span>
               </div>
               <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
@@ -924,10 +1132,15 @@ export function FounderOSTab() {
         </div>
       )}
 
-      {/* SKILL ACQUISITION TRACKER */}
+      {/* SKILL TIMELINE */}
+      <div style={{ marginTop: 28 }}>
+        <SkillTimeline skills={skills} />
+      </div>
+
+      {/* SKILL TRACKER FORMS */}
       <div
         style={{
-          marginTop: 28,
+          marginTop: 16,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -993,82 +1206,43 @@ export function FounderOSTab() {
             <input
               type="text"
               placeholder="Quarter (e.g. Q3 2026)"
-              value={skillForm.quarter ?? ''}
+              value={skillForm.quarter}
               onChange={e => setSkillForm({ ...skillForm, quarter: e.target.value.slice(0, 20) })}
-              style={{
-                padding: '8px 10px',
-                border: '1px solid var(--border-color)',
-                borderRadius: 'var(--radius-md)',
-                background: 'var(--bg-card)',
-                color: 'var(--text-primary)',
-                fontSize: 13,
-              }}
+              style={inputStyle}
             />
             <input
               type="text"
               placeholder="Skill (e.g. Causal inference + counterfactual reasoning)"
-              value={skillForm.skill ?? ''}
-              onChange={e => setSkillForm({ ...skillForm, skill: e.target.value.slice(0, 200) })}
-              style={{
-                padding: '8px 10px',
-                border: '1px solid var(--border-color)',
-                borderRadius: 'var(--radius-md)',
-                background: 'var(--bg-card)',
-                color: 'var(--text-primary)',
-                fontSize: 13,
-              }}
+              value={skillForm.skill}
+              onChange={e => setSkillForm({ ...skillForm, skill: e.target.value.slice(0, 500) })}
+              style={inputStyle}
             />
           </div>
           <textarea
-            placeholder="Why it matters (connect to v3.5 phase / customer want / specific buyer-class persona)"
-            value={skillForm.whyItMatters ?? ''}
+            placeholder="Why it matters — connect to v3.5 phase / customer want / specific buyer-class persona"
+            value={skillForm.whyItMatters}
             onChange={e =>
-              setSkillForm({ ...skillForm, whyItMatters: e.target.value.slice(0, 800) })
+              setSkillForm({ ...skillForm, whyItMatters: e.target.value.slice(0, 2000) })
             }
             rows={2}
-            style={{
-              padding: '8px 10px',
-              border: '1px solid var(--border-color)',
-              borderRadius: 'var(--radius-md)',
-              background: 'var(--bg-card)',
-              color: 'var(--text-primary)',
-              fontSize: 13,
-              resize: 'vertical',
-            }}
+            style={{ ...inputStyle, resize: 'vertical' }}
           />
           <textarea
             placeholder="Pre-assessment — current state, what you can / can't do today"
-            value={skillForm.preAssessment ?? ''}
+            value={skillForm.preAssessment}
             onChange={e =>
-              setSkillForm({ ...skillForm, preAssessment: e.target.value.slice(0, 800) })
+              setSkillForm({ ...skillForm, preAssessment: e.target.value.slice(0, 2000) })
             }
             rows={2}
-            style={{
-              padding: '8px 10px',
-              border: '1px solid var(--border-color)',
-              borderRadius: 'var(--radius-md)',
-              background: 'var(--bg-card)',
-              color: 'var(--text-primary)',
-              fontSize: 13,
-              resize: 'vertical',
-            }}
+            style={{ ...inputStyle, resize: 'vertical' }}
           />
+          {skillError && <ErrorBanner text={skillError} />}
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <button
               type="button"
               onClick={handleAddSkill}
-              disabled={!skillForm.skill?.trim() || !skillForm.quarter?.trim()}
-              style={{
-                padding: '8px 18px',
-                background: 'var(--accent-primary)',
-                color: '#fff',
-                border: '1px solid var(--accent-primary)',
-                borderRadius: 'var(--radius-full)',
-                fontSize: 13,
-                fontWeight: 600,
-                cursor: 'pointer',
-                opacity: !skillForm.skill?.trim() || !skillForm.quarter?.trim() ? 0.6 : 1,
-              }}
+              disabled={!skillForm.skill.trim() || !skillForm.quarter.trim()}
+              style={primaryBtnStyle}
             >
               Save skill
             </button>
@@ -1133,21 +1307,13 @@ export function FounderOSTab() {
                 </select>
               </div>
               {skill.whyItMatters && (
-                <div
-                  style={{
-                    fontSize: 12.5,
-                    color: 'var(--text-secondary)',
-                    lineHeight: 1.5,
-                    marginBottom: 4,
-                  }}
-                >
+                <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 4 }}>
                   <strong style={{ color: 'var(--text-primary)' }}>Why:</strong> {skill.whyItMatters}
                 </div>
               )}
               {skill.preAssessment && (
                 <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5 }}>
-                  <strong style={{ color: 'var(--text-secondary)' }}>Pre:</strong>{' '}
-                  {skill.preAssessment}
+                  <strong style={{ color: 'var(--text-secondary)' }}>Pre:</strong> {skill.preAssessment}
                 </div>
               )}
             </div>
@@ -1155,7 +1321,7 @@ export function FounderOSTab() {
         </div>
       )}
 
-      {/* WEEKLY REVIEW PROMPT */}
+      {/* WEEKLY REVIEW */}
       <div
         style={{
           marginTop: 28,
@@ -1166,66 +1332,151 @@ export function FounderOSTab() {
           borderRadius: 'var(--radius-lg)',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-          <CalendarDays size={16} style={{ color: 'var(--accent-primary)' }} />
-          <span
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              color: 'var(--text-muted)',
-            }}
-          >
-            Weekly review · every Sunday
-          </span>
-        </div>
-        <h3
-          style={{
-            fontSize: 16,
-            fontWeight: 700,
-            margin: 0,
-            color: 'var(--text-primary)',
-            marginBottom: 6,
-          }}
-        >
-          Three questions, twenty minutes.
-        </h3>
-        <ol
-          style={{
-            margin: 0,
-            paddingLeft: 20,
-            fontSize: 13.5,
-            color: 'var(--text-secondary)',
-            lineHeight: 1.7,
-          }}
-        >
-          <li>
-            What were your top 3 long-form pieces this week? Write a 2-sentence active-recall
-            summary of each from memory.
-          </li>
-          <li>
-            Skill acquisition: one note on what you learned, where you got stuck, what new
-            primary source you need next.
-          </li>
-          <li>
-            Internal locus: one reflection on what was outside your control this week, what was
-            inside, and where did you conflate the two?
-          </li>
-        </ol>
         <div
           style={{
-            marginTop: 12,
-            fontSize: 12,
-            color: 'var(--text-muted)',
-            lineHeight: 1.5,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            gap: 12,
+            flexWrap: 'wrap',
+            marginBottom: 10,
           }}
         >
-          {reviews.length === 0
-            ? 'No weekly reviews logged yet. Block 20 minutes Sunday evening; the review compounds across years.'
-            : `${reviews.length} weekly review${reviews.length === 1 ? '' : 's'} logged. Continue.`}
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+              <CalendarDays size={16} style={{ color: 'var(--accent-primary)' }} />
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: 'var(--text-muted)',
+                }}
+              >
+                Weekly review · every Sunday
+              </span>
+            </div>
+            <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>
+              Three questions, twenty minutes.
+            </h3>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>
+              {reviews.length === 0
+                ? 'No weekly reviews logged yet. Block 20 minutes Sunday evening.'
+                : `${reviews.length} weekly review${reviews.length === 1 ? '' : 's'} logged.`}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowReviewForm(s => !s)}
+            style={{
+              padding: '8px 14px',
+              background: showReviewForm ? 'var(--bg-card)' : 'var(--accent-primary)',
+              color: showReviewForm ? 'var(--text-primary)' : '#fff',
+              border: showReviewForm
+                ? '1px solid var(--border-color)'
+                : '1px solid var(--accent-primary)',
+              borderRadius: 'var(--radius-full)',
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            {showReviewForm ? 'Cancel' : 'Write this week\'s review'}
+          </button>
         </div>
+
+        {showReviewForm && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 8 }}>
+            <textarea
+              placeholder="1. Top 3 long-form pieces this week + 2-sentence active-recall summary of each (from memory)"
+              value={reviewForm.topLongForm}
+              onChange={e =>
+                setReviewForm({ ...reviewForm, topLongForm: e.target.value.slice(0, 4000) })
+              }
+              rows={5}
+              style={{ ...inputStyle, resize: 'vertical' }}
+            />
+            <textarea
+              placeholder="2. Skill acquisition note (optional) — what you learned, what got you stuck, what primary source you need next"
+              value={reviewForm.oneSkillNote}
+              onChange={e =>
+                setReviewForm({ ...reviewForm, oneSkillNote: e.target.value.slice(0, 2000) })
+              }
+              rows={3}
+              style={{ ...inputStyle, resize: 'vertical' }}
+            />
+            <textarea
+              placeholder="3. Internal locus reflection — what was outside your control this week, what was inside, where did you conflate the two"
+              value={reviewForm.internalLocusReflection}
+              onChange={e =>
+                setReviewForm({ ...reviewForm, internalLocusReflection: e.target.value.slice(0, 4000) })
+              }
+              rows={4}
+              style={{ ...inputStyle, resize: 'vertical' }}
+            />
+            {reviewError && <ErrorBanner text={reviewError} />}
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                onClick={handleSaveReview}
+                disabled={
+                  !reviewForm.topLongForm.trim() || !reviewForm.internalLocusReflection.trim()
+                }
+                style={primaryBtnStyle}
+              >
+                Save weekly review
+              </button>
+            </div>
+          </div>
+        )}
+
+        {reviews.length > 0 && !showReviewForm && (
+          <details
+            style={{ marginTop: 12, fontSize: 13, color: 'var(--text-secondary)' }}
+          >
+            <summary
+              style={{ cursor: 'pointer', fontWeight: 600 }}
+            >
+              Re-read recent reviews
+            </summary>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 12 }}>
+              {reviews.slice(0, 6).map(r => (
+                <div
+                  key={r.id}
+                  style={{
+                    padding: '12px 14px',
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: 'var(--radius-md)',
+                  }}
+                >
+                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent-primary)', marginBottom: 6 }}>
+                    Week of {new Date(r.createdAt).toLocaleDateString()}
+                  </div>
+                  <div style={{ fontSize: 12.5, color: 'var(--text-primary)', lineHeight: 1.55, whiteSpace: 'pre-wrap', marginBottom: 6 }}>
+                    <strong>Top long-form:</strong> {r.topLongForm}
+                  </div>
+                  {r.oneSkillNote && (
+                    <div style={{ fontSize: 12.5, color: 'var(--text-primary)', lineHeight: 1.55, whiteSpace: 'pre-wrap', marginBottom: 6 }}>
+                      <strong>Skill note:</strong> {r.oneSkillNote}
+                    </div>
+                  )}
+                  <div style={{ fontSize: 12.5, color: 'var(--text-primary)', lineHeight: 1.55, whiteSpace: 'pre-wrap' }}>
+                    <strong>Internal locus:</strong> {r.internalLocusReflection}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </details>
+        )}
       </div>
+
+      {/* COMMITMENT RECORD */}
+      <CommitmentRecord />
+
+      {/* WHY SFC IS BAD + SABOTAGE TABLES */}
+      <WhySfcSection />
 
       <div
         style={{
@@ -1239,18 +1490,18 @@ export function FounderOSTab() {
           lineHeight: 1.55,
         }}
       >
-        <strong style={{ color: 'var(--text-primary)' }}>Why this is in v3.5 § 11:</strong> The
-        Founder OS is not productivity advice. It&apos;s the cognitive infrastructure that turns
-        v3.5 from a document into an executable plan. A v3.5 plan with no OS is a roadmap with no
-        driver. When v3.5 is reviewed, the OS gets reviewed alongside. Data lives in your browser
-        (localStorage) — single-user surface, no backend cost. Migration to Prisma is a follow-up
-        if permanent records or multi-device sync becomes useful.
+        <strong style={{ color: 'var(--text-primary)' }}>Sync:</strong> Data persists to Supabase
+        and follows your Supabase auth across phone + laptop. Daily checkin, content log, skill
+        tracker, weekly reviews, and personal commitments all survive across devices and across
+        browser-cache clears. Open this tab on phone first thing in the morning to log SFC=0; the
+        laptop view tonight shows the same data.
       </div>
 
-      {/* Reduce two-column streak/checkin grid to single column on narrow viewports */}
+      {/* Mobile-first responsive — collapse the two-column grids on narrow viewports */}
       <style jsx>{`
         @media (max-width: 800px) {
-          .founder-os-grid {
+          :global(.founder-os-streak-grid),
+          :global(.founder-os-charts-grid) {
             grid-template-columns: 1fr !important;
           }
         }
@@ -1259,7 +1510,39 @@ export function FounderOSTab() {
   );
 }
 
-// Reference unused icons to satisfy the static-components rule and keep the
-// imports honest — they're available for future skill-icon mappings.
-void TrendingUp;
-void Check;
+const inputStyle: React.CSSProperties = {
+  padding: '8px 10px',
+  border: '1px solid var(--border-color)',
+  borderRadius: 'var(--radius-md)',
+  background: 'var(--bg-card)',
+  color: 'var(--text-primary)',
+  fontSize: 13,
+};
+
+const primaryBtnStyle: React.CSSProperties = {
+  padding: '8px 18px',
+  background: 'var(--accent-primary)',
+  color: '#fff',
+  border: '1px solid var(--accent-primary)',
+  borderRadius: 'var(--radius-full)',
+  fontSize: 13,
+  fontWeight: 600,
+  cursor: 'pointer',
+};
+
+function ErrorBanner({ text }: { text: string }) {
+  return (
+    <div
+      style={{
+        padding: '8px 12px',
+        background: 'color-mix(in srgb, var(--error) 10%, transparent)',
+        border: '1px solid var(--error)',
+        borderRadius: 'var(--radius-md)',
+        color: 'var(--error)',
+        fontSize: 12,
+      }}
+    >
+      {text}
+    </div>
+  );
+}

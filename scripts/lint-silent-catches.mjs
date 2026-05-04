@@ -68,7 +68,13 @@ const SCAN_DIR = join(ROOT, 'src');
 // catches form a coherent exception class: real-time metrics
 // fail-soft reads (each query is independently fault-tolerant; if one
 // errors, the dashboard still renders with the remaining tiles populated).
-const SILENT_CATCH_BASELINE = 150;
+// 2026-05-05: bumped 150 → 155 for the v3.5 §11 Founder Operating System
+// API routes — each endpoint (checkins / content-log / skills /
+// weekly-reviews / commitments) catches Prisma read failures and falls
+// back to an empty list so the OS tab never crashes the whole founder
+// hub if the database is briefly unreachable. The 5 catches form a
+// coherent exception class: founder-os fail-soft reads.
+const SILENT_CATCH_BASELINE = 155;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

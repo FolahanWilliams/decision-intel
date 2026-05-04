@@ -1040,6 +1040,115 @@ model TeamCognitiveProfile {
   @@index([periodStart])
 }
 
+/// GTM v3.5 §11 RATIFIED 2026-05-05 — Founder Operating System.
+/// Five models persist the cognitive-discipline surface across devices
+/// (phone + laptop + future) tied to Supabase user ID. Single-user today
+/// (the founder); multi-user safe by construction. The OS is load-bearing
+/// for v3.5: Phase 1 motion is only physically executable with the
+/// cognitive hardware these models track. Deletes cascade via userId
+/// (no FK constraint to Supabase auth.users — userId is a string ref).
+
+/// Daily checkin — one row per user per date. SFC-zero is the core signal;
+/// deep work + reading + exercise + meditation are the supporting habits.
+/// upserted on save (date is the natural key), so re-saving today's state
+/// idempotently overwrites.
+model FounderOsCheckin {
+  id                 String   @id @default(cuid())
+  userId             String
+  /// Local date string YYYY-MM-DD — not a DateTime so day-boundaries are
+  /// stable across timezones (the founder's day is HIS day, not UTC).
+  date               String
+  /// Did the founder consume zero short-form content today? The streak
+  /// counter aggregates this; the visualisations key off it.
+  sfcZero            Boolean
+  /// Hours of deep work logged. Half-hour resolution acceptable.
+  deepWorkHours      Float    @default(0)
+  /// Minutes of deep reading (books / papers / long-form articles, NOT
+  /// social or news feeds). Used by the Cognitive Trend Chart.
+  deepReadingMinutes Int      @default(0)
+  exercise           Boolean  @default(false)
+  meditation         Boolean  @default(false)
+  notes              String?  @db.Text
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@unique([userId, date])
+  @@index([userId])
+  @@index([userId, date])
+}
+
+/// Long-form content the user encoded via active recall. Each row carries
+/// the active-recall summary written FROM MEMORY (the retrieval IS the
+/// encoding). Source is YouTube / Book / Paper / Podcast / Long-form
+/// article / Other.
+model FounderOsContentLog {
+  id                  String   @id @default(cuid())
+  userId              String
+  capturedAt          DateTime @default(now())
+  title               String   @db.VarChar(500)
+  source              String
+  durationMin         Int
+  activeRecallSummary String   @db.Text
+
+  @@index([userId])
+  @@index([userId, capturedAt])
+}
+
+/// One irreplaceable skill per quarter. Pre/post assessment captures the
+/// growth delta. Status: planned | in_progress | complete.
+model FounderOsSkill {
+  id             String   @id @default(cuid())
+  userId         String
+  /// Free-text quarter ("Q3 2026") so the user controls cadence; the UI
+  /// validates format on capture.
+  quarter        String
+  skill          String   @db.VarChar(500)
+  whyItMatters   String?  @db.Text
+  preAssessment  String?  @db.Text
+  postAssessment String?  @db.Text
+  status         String   @default("planned")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([userId])
+  @@index([userId, status])
+}
+
+/// Sunday weekly review — three questions, twenty minutes. Top-3 long-form
+/// pieces with active-recall summaries, one skill note, internal-locus
+/// reflection. Unique per user per weekStartDate.
+model FounderOsWeeklyReview {
+  id                      String   @id @default(cuid())
+  userId                  String
+  /// YYYY-MM-DD of the week-start (typically the Sunday).
+  weekStartDate           String
+  topLongForm             String   @db.Text
+  oneSkillNote            String?  @db.Text
+  internalLocusReflection String   @db.Text
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  @@unique([userId, weekStartDate])
+  @@index([userId])
+  @@index([userId, weekStartDate])
+}
+
+/// Personal commitment statement. The "physical record" the founder comes
+/// back to when feeling unmotivated. Multiple commitments allowed (one
+/// at first sign-up; more added over time as discipline deepens). The UI
+/// surfaces the most recent + lets the user re-read all prior ones.
+model FounderOsCommitment {
+  id        String   @id @default(cuid())
+  userId    String
+  text      String   @db.Text
+  /// Optional title / context (e.g. "Day 1 commitment", "After Sankore call").
+  title     String?  @db.VarChar(200)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([userId, createdAt])
+}
+
 /// GTM v3.5 RATIFIED 2026-05-04 — micro-deliberation outcome event.
 /// Fast-feedback signal that closes Cloverpop's data-advantage attack vector
 /// without requiring 5-7-year macro-outcome wait times. Each Analysis can
