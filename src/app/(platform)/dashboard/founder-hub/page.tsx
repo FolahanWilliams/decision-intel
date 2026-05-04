@@ -201,6 +201,13 @@ const TodoTab = dynamic(
   () => import('@/components/founder-hub/TodoTab').then(m => ({ default: m.TodoTab })),
   { loading: tabLoader }
 );
+const VoiceActivityTab = dynamic(
+  () =>
+    import('@/components/founder-hub/VoiceActivityTab').then(m => ({
+      default: m.VoiceActivityTab,
+    })),
+  { loading: tabLoader }
+);
 const MeetingsLogTab = dynamic(
   () =>
     import('@/components/founder-hub/MeetingsLogTab').then(m => ({
@@ -246,6 +253,7 @@ import {
   CheckSquare,
   Presentation,
   Handshake,
+  Mic,
 } from 'lucide-react';
 import { card } from '@/components/founder-hub/shared-styles';
 import { AccordionSection } from '@/components/founder-hub/AccordionSection';
@@ -277,6 +285,7 @@ type TabId =
   | 'meetings_log'
   | 'lrqa'
   | 'path_to_100m'
+  | 'voice_activity'
   | 'todo';
 
 type TabGroup = 'Start' | 'Product' | 'Go-to-Market' | 'Intelligence' | 'Tools';
@@ -390,6 +399,12 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
     group: 'Intelligence',
   },
   { id: 'case_library', label: 'Case Library', icon: <Library size={16} />, group: 'Intelligence' },
+  {
+    id: 'voice_activity',
+    label: 'Voice Activity',
+    icon: <Mic size={16} />,
+    group: 'Intelligence',
+  },
   // Tools
   {
     id: 'todo',
@@ -1632,6 +1647,11 @@ function renderTab(
     meetings_log: (
       <ErrorBoundary sectionName="Meetings Log">
         <MeetingsLogTab founderPass={FOUNDER_PASS} />
+      </ErrorBoundary>
+    ),
+    voice_activity: (
+      <ErrorBoundary sectionName="Voice Activity">
+        <VoiceActivityTab founderPass={FOUNDER_PASS} />
       </ErrorBoundary>
     ),
   };

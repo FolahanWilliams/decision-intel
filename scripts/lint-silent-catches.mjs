@@ -50,7 +50,10 @@ const SCAN_DIR = join(ROOT, 'src');
 // path — body-parsing pattern (parse the /voice-token API error body so
 // the panel shows the real diagnostic if mint fails). Body-parsing is
 // the canonical legitimate exception per CLAUDE.md fire-and-forget rule.
-const SILENT_CATCH_BASELINE = 120;
+// 2026-05-04: bumped 120 → 121 for VoiceActivityTab body-parse fallback
+// when /api/founder-hub/voice-activity returns a non-2xx — same exact
+// pattern as the existing voice-token catch, just on the read side.
+const SILENT_CATCH_BASELINE = 121;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /
