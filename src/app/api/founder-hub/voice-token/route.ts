@@ -40,6 +40,42 @@ const FOUNDER_IDENTITY = 'founder';
 
 interface RequestBody {
   personaId?: unknown;
+  /** Recent text-chat messages (last ~10) the client wants the voice
+   *  agent to seed its conversation context with. Cross-session memory
+   *  continuity — without this every voice session starts cold. Each
+   *  message: { role: 'user' | 'assistant', content: string }. */
+  recentChatMessages?: unknown;
+}
+
+interface ChatHistoryMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+/** Validate + clamp the recent chat history payload. Caps total bytes
+ *  at 12KB so room metadata (LiveKit limit ~16KB) doesn't overflow. */
+function sanitizeChatHistory(raw: unknown): ChatHistoryMessage[] {
+  if (!Array.isArray(raw)) return [];
+  const MAX_BYTES = 12_000;
+  const MAX_MESSAGES = 12;
+  const sanitized: ChatHistoryMessage[] = [];
+  let totalBytes = 0;
+  // Walk newest-first so oldest get dropped if we hit the cap (more
+  // recent context is more valuable for memory continuity).
+  for (let i = raw.length - 1; i >= 0 && sanitized.length < MAX_MESSAGES; i--) {
+    const item = raw[i];
+    if (typeof item !== 'object' || item === null) continue;
+    const msg = item as Record<string, unknown>;
+    if (msg.role !== 'user' && msg.role !== 'assistant') continue;
+    if (typeof msg.content !== 'string' || msg.content.trim() === '') continue;
+    // Truncate very long messages to keep budget
+    const content = msg.content.slice(0, 2000);
+    const bytes = content.length + 20; // overhead for role + JSON
+    if (totalBytes + bytes > MAX_BYTES) break;
+    totalBytes += bytes;
+    sanitized.unshift({ role: msg.role, content });
+  }
+  return sanitized;
 }
 
 export async function POST(req: NextRequest) {
@@ -76,6 +112,14 @@ export async function POST(req: NextRequest) {
     ? body.personaId
     : 'default';
 
+  // Memory continuity: serialize last ~10 chat messages into room
+  // metadata so the worker can seed the AgentSession's chatCtx with
+  // them. Without this every voice session starts cold; with it the
+  // founder can pick up exactly where the last text-chat conversation
+  // left off and have it continue in voice. Capped at 12KB (LiveKit
+  // metadata limit ~16KB; rest of metadata + JSON overhead < 4KB).
+  const recentChatMessages = sanitizeChatHistory(body.recentChatMessages);
+
   // Unique room name per session. `founder-voice-{personaId}-{timestamp}-{rand}`
   // gives the worker a clean room scope and survives client retries
   // without collision. Random suffix prevents brute-force room joining.
@@ -90,10 +134,21 @@ export async function POST(req: NextRequest) {
     const roomService = new RoomServiceClient(livekitUrl, apiKey, apiSecret);
     await roomService.createRoom({
       name: roomName,
-      metadata: JSON.stringify({ personaId, createdAt: Date.now() }),
+      metadata: JSON.stringify({
+        personaId,
+        createdAt: Date.now(),
+        // Optional cross-session memory: last ~10 text-chat turns
+        // the worker should seed the AgentSession with. Empty array
+        // means "fresh session, no memory" (greeting will be generic).
+        recentChatMessages,
+      }),
       emptyTimeout: 60,
       maxParticipants: 2, // founder + agent
     });
+
+    log.info(
+      `voice-token: minted token for personaId=${personaId} memorySeedCount=${recentChatMessages.length}`
+    );
 
     const at = new AccessToken(apiKey, apiSecret, {
       identity: FOUNDER_IDENTITY,

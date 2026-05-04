@@ -39,6 +39,10 @@ interface Props {
    *  so the parent chat widget can append it to its message history,
    *  preserving the conversation when the founder switches back to text. */
   onEnd: (transcript: ChatMsg[]) => void;
+  /** Recent text-chat messages to seed the voice session with — gives
+   *  the agent memory continuity across mode switches. Optional; if
+   *  omitted the voice session starts cold. Capped server-side. */
+  recentChatMessages?: ChatMsg[];
 }
 
 interface CaptionSegment {
@@ -61,7 +65,7 @@ function formatElapsed(ms: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-export function VoiceModePanel({ persona, founderPass, onEnd }: Props) {
+export function VoiceModePanel({ persona, founderPass, onEnd, recentChatMessages }: Props) {
   const [status, setStatus] = useState<
     'requesting' | 'connecting' | 'connected' | 'ending' | 'error'
   >('requesting');
@@ -146,7 +150,14 @@ export function VoiceModePanel({ persona, founderPass, onEnd }: Props) {
             'Content-Type': 'application/json',
             'x-founder-pass': founderPass,
           },
-          body: JSON.stringify({ personaId: persona.id }),
+          body: JSON.stringify({
+            personaId: persona.id,
+            // Seed the voice session with the recent text-chat history
+            // so the agent has memory continuity. Server clamps to last
+            // ~10 messages and caps total bytes; safe to send the full
+            // local history and let the server do the trimming.
+            recentChatMessages: recentChatMessages ?? [],
+          }),
         });
         if (!tokenRes.ok) {
           const errBody = (await tokenRes.json().catch(() => null)) as {

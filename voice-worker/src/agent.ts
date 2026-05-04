@@ -49,6 +49,13 @@ import { SessionMetrics } from './metrics.js';
 interface RoomMetadata {
   personaId?: string;
   createdAt?: number;
+  /** Optional cross-session memory continuity. Server (voice-token
+   *  route) serializes the last ~10 text-chat messages into room
+   *  metadata at room-creation time. Worker reads these here at
+   *  session start and seeds AgentSession.chatCtx so the LLM has
+   *  the prior conversation context — voice picks up where text
+   *  chat left off. */
+  recentChatMessages?: Array<{ role: 'user' | 'assistant'; content: string }>;
 }
 
 function parseRoomMetadata(raw: string | undefined | null): RoomMetadata {
@@ -353,11 +360,36 @@ export default defineAgent({
       .map(p => p.content)
       .join('\n\n');
 
-    // Optional initial chat context — empty for now since we have no
-    // prior turns to seed. The Agent's `instructions` carries the
-    // system prompt; chatCtx is for prior conversation history when
-    // we wire text→voice handoff in a follow-up.
+    // Initial chat context — seed with recent text-chat history (if
+    // provided in room metadata) so voice mode picks up where the
+    // last conversation left off. Cross-session memory continuity:
+    // founder switches voice on after a long text exchange and the
+    // agent already knows what was discussed; or starts a new voice
+    // session after a previous one and the prior voice transcript
+    // (which auto-flushed to text chat on disconnect) is here too.
     const initialChatCtx = new llm.ChatContext();
+    const seedHistory = meta.recentChatMessages ?? [];
+    if (seedHistory.length > 0) {
+      for (const turn of seedHistory) {
+        // Use the v1.3.x ChatContext.addMessage API. Both 'user' and
+        // 'assistant' roles are accepted; system prompts ride on
+        // Agent({ instructions }) above so we don't duplicate them
+        // here.
+        initialChatCtx.addMessage({
+          role: turn.role,
+          content: turn.content,
+        });
+      }
+      // eslint-disable-next-line no-console
+      console.log(
+        `[voice-worker] seeded chatCtx with ${seedHistory.length} prior messages — memory continuity active`
+      );
+    } else {
+      // eslint-disable-next-line no-console
+      console.log(
+        `[voice-worker] no prior chat history — voice session starts cold`
+      );
+    }
 
     // Latency tuning: drop default endpointing to detect end-of-utterance
     // faster. Default is ~10ms VAD endpointing + 1000ms silence-utterance,
@@ -639,14 +671,32 @@ export default defineAgent({
 
     // Greet the founder so they know the session is live. The persona's
     // voice rule + voice-mode addendum keep the greeting in character.
-    const greetingText =
-      personaId === 'skeptical_investor'
+    // Two greeting modes:
+    //   - Cold (no memory seed): generic "what are we working on" prompt
+    //   - Warm (memory seed): "picking back up" to acknowledge continuity
+    // The warm version is short — the actual context is already in the
+    // chatCtx above so the agent's first response (when the founder
+    // speaks) draws on that history naturally.
+    const hasMemory = seedHistory.length > 0;
+    const greetingText = hasMemory
+      ? personaId === 'skeptical_investor'
+        ? "Picking up where we left off. Where do you want to push?"
+        : personaId === 'cognitive_psychologist'
+          ? "I've got our prior thread. What are we examining now?"
+          : personaId === 'business_strategist'
+            ? "Carrying over what we were working on. Where do you want to go?"
+            : personaId === 'pitch_sharpener'
+              ? "Carrying over what you were sharpening. What's the next angle you want me to push on?"
+              : "Picking up where we left off. What's next?"
+      : personaId === 'skeptical_investor'
         ? "I've read your context. What are we pressure-testing?"
         : personaId === 'cognitive_psychologist'
-          ? 'I have your context loaded. What decision are we examining?'
+          ? "I have your context loaded. What decision are we examining?"
           : personaId === 'business_strategist'
             ? "I've reviewed the context. What strategic question are we testing?"
-            : "I'm here. What are we working on?";
+            : personaId === 'pitch_sharpener'
+              ? "I'd love to understand what you're building. Want to walk me through the one-liner first?"
+              : "I'm here. What are we working on?";
 
     // Use session.say() instead of session.generateReply() for the
     // greeting. Two reasons this is the right shape:

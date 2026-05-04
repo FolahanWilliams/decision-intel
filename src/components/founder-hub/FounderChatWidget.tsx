@@ -7,6 +7,7 @@ import {
   Landmark,
   Mic,
   MessageSquare,
+  MessageCircle,
   Paperclip,
   TrendingUp,
   X,
@@ -86,6 +87,8 @@ function PersonaIcon({
       return <TrendingUp size={size} style={style} />;
     case 'Landmark':
       return <Landmark size={size} style={style} />;
+    case 'MessageCircle':
+      return <MessageCircle size={size} style={style} />;
   }
 }
 
@@ -948,6 +951,11 @@ export function FounderChatWidget({
             persona={activePersona}
             founderPass={founderPass}
             onEnd={handleVoiceEnd}
+            // Seed voice session with last ~10 messages for memory
+            // continuity. Server clamps further; this just hands over
+            // the recent conversation so the agent picks up where the
+            // text chat left off.
+            recentChatMessages={messages.slice(-10)}
           />
         </Suspense>
       ) : (
