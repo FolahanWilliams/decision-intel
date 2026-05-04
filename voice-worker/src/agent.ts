@@ -392,14 +392,23 @@ export default defineAgent({
       );
     }
 
-    // Latency tuning: drop default endpointing to detect end-of-utterance
-    // faster. Default is ~10ms VAD endpointing + 1000ms silence-utterance,
-    // which makes the agent wait a full second after the founder stops
-    // speaking before the LLM is invoked. Setting endpointing=300ms +
-    // utteranceEndMs=600ms cuts ~700ms of dead air per turn while
-    // still being safe enough to not chop the tail of a sentence.
-    // Tune higher if Deepgram starts cutting words mid-sentence.
-    // @see https://developers.deepgram.com/docs/utterance-end
+    // STT endpointing tuning (revised 2026-05-04 after the multi-FINAL
+    // race the founder hit). Original tuning (300/600) was too aggressive:
+    // a natural mid-sentence pause of 600ms+ caused Deepgram to emit a
+    // FINAL transcript, which fired generate_reply, which cascaded into
+    // queued speech tasks racing each other when the founder continued
+    // mid-sentence ("How do I get into Stanford. [800ms pause] What
+    // steps should I take?" → two FINALs → two generate_replies → three
+    // Cartesia errors in 4 seconds → AgentActivity dies). Bumped to
+    // endpointing=500ms + utteranceEndMs=1000ms which gives a full
+    // second of silence buffer before Deepgram declares end-of-turn —
+    // long enough for natural pauses, short enough that the agent still
+    // feels conversational. Combined with the AgentSession-level
+    // turnHandling.endpointing.minDelay default of 500ms, total quiet
+    // time before generate_reply fires = 500 + 500 = 1000ms. Tune lower
+    // if the agent feels sluggish; tune higher (800/1500) if multi-FINAL
+    // races resurface.
+    // @see https://developers.deepgram.com/docs/endpointing
     //
     // Cast through `as never` because the typed STT options interface
     // doesn't expose endpointing/utteranceEndMs in @types but the
@@ -410,8 +419,8 @@ export default defineAgent({
       model: 'nova-3',
       smartFormat: true,
       interimResults: true,
-      endpointing: 300,
-      utteranceEndMs: 600,
+      endpointing: 500,
+      utteranceEndMs: 1000,
     } as never);
 
     // LLM plugin selection branches on the model slug prefix:
@@ -478,18 +487,38 @@ export default defineAgent({
     //   STT FINAL fires; both turns get speech handles created;
     //   Cartesia receives two synthesis requests racing each other
     //   and errors out; the AgentActivity gets stuck and won't accept
-    //   subsequent turns. Verified in Railway logs t=58272 → 60841:
-    //   thinking → listening WITH NO SPEAKING state, then immediate
-    //   Cartesia error on the next turn. Disabling preemptive
-    //   generation makes turn handling strictly serial: STT FINAL
-    //   → LLM call → TTS → done → next turn. Predictable, no races.
-    //   Cost is ~200-500ms of perceived added latency per turn (the
-    //   LLM no longer has a head start), which is the right trade
-    //   for a working session over a faster-but-broken one.
+    //   subsequent turns. Disabling preemptive generation makes turn
+    //   handling strictly serial: STT FINAL → LLM call → TTS → done
+    //   → next turn. Cost: ~200-500ms of perceived added latency.
     //
-    // Interruptions are still enabled by default — the founder can
-    // still barge in mid-response naturally; only the speculative
-    // LLM-pre-call optimization is off.
+    // turnHandling.interruption (added 2026-05-04 after the second
+    // multi-FINAL race the founder hit despite preemptive being off):
+    //   The Cartesia-error cascade can also fire when the founder is
+    //   still speaking when the FIRST generate_reply launches. STT
+    //   emits FINAL, agent thinks → speaks, founder continues with
+    //   the rest of the sentence which the agent reads as an
+    //   "interruption" (default minDuration 500ms / minWords 0
+    //   accepts ANY VAD-detected sound), agent kills the in-flight
+    //   TTS, queues a new generate_reply on the new partial — three
+    //   of those in 4 seconds and Cartesia rate-collapses.
+    //
+    //   Tuning:
+    //   - minDuration 1000ms (default 500): a real interruption needs
+    //     a full second of speech, not a backchannel "uh huh" or
+    //     throat-clear.
+    //   - minWords 2 (default 0): the interruption transcript must
+    //     contain at least 2 words. Single-word utterances ("yeah",
+    //     "okay", "hmm") count as backchannel and the agent keeps
+    //     speaking.
+    //   - falseInterruptionTimeout 2000ms (default — kept explicit):
+    //     if the agent decided to pause and then no real interrupt
+    //     comes in within 2s, fire agent_false_interruption and
+    //     resume the original reply (resumeFalseInterruption=true is
+    //     default).
+    //   - discardAudioIfUninterruptible true (default — kept
+    //     explicit): when the agent is mid-TTS and an interrupt is
+    //     judged too short to be real, the buffered VAD audio is
+    //     dropped instead of queued for re-evaluation.
     const session = new voice.AgentSession({
       vad,
       stt: sttPlugin,
@@ -497,6 +526,14 @@ export default defineAgent({
       tts: ttsPlugin,
       turnHandling: {
         preemptiveGeneration: { enabled: false },
+        interruption: {
+          enabled: true,
+          minDuration: 1000,
+          minWords: 2,
+          falseInterruptionTimeout: 2000,
+          resumeFalseInterruption: true,
+          discardAudioIfUninterruptible: true,
+        },
       },
     });
 
