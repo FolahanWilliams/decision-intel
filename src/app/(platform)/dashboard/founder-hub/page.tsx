@@ -208,6 +208,13 @@ const MetricsTab = dynamic(
     })),
   { loading: tabLoader }
 );
+const FounderOSTab = dynamic(
+  () =>
+    import('@/components/founder-hub/FounderOSTab').then(m => ({
+      default: m.FounderOSTab,
+    })),
+  { loading: tabLoader }
+);
 const VoiceActivityTab = dynamic(
   () =>
     import('@/components/founder-hub/VoiceActivityTab').then(m => ({
@@ -295,6 +302,7 @@ type TabId =
   | 'path_to_100m'
   | 'voice_activity'
   | 'metrics'
+  | 'founder_os'
   | 'todo';
 
 type TabGroup = 'Start' | 'Product' | 'Go-to-Market' | 'Intelligence' | 'Tools';
@@ -328,6 +336,12 @@ const LEGACY_TAB_REDIRECTS: Record<string, TabId> = {
 const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabGroup }> = [
   // Start — guided 2-day walkthrough entry point
   { id: 'start', label: 'Start Here', icon: <Compass size={16} />, group: 'Start' },
+  // GTM v3.5 §11 (RATIFIED 2026-05-05) — the cognitive-discipline surface
+  // that supports the Phase 1 motion. Mounted in 'Start' so it's the
+  // first-thing-of-the-day check before any other tab. Daily checkin +
+  // SFC-zero streak counter + 6 pillars + content log + skill tracker.
+  // Persisted in localStorage (single-user; no backend cost yet).
+  { id: 'founder_os', label: 'Founder OS', icon: <Shield size={16} />, group: 'Start' },
   { id: 'unicorn_roadmap', label: 'Unicorn Roadmap', icon: <Target size={16} />, group: 'Start' },
   {
     id: 'path_to_100m',
@@ -895,6 +909,14 @@ const SEARCH_INDEX: SearchEntry[] = [
       'Persistent record of every prep’d meeting with the AI-generated plan, post-call notes, learnings, next steps, and outcome. One place instead of scattered across Docs, Slack, and Drive. Auto-populated from the Meeting Preparation card on the Outreach Strategy tab.',
     keywords:
       'meetings meeting log history record notes learnings followup follow-up outcome cso vc advisor design partner reference call pitch prep plan ethos pathos logos cialdini past upcoming scheduled completed reschedule no-show journal',
+  },
+  {
+    tabId: 'founder_os',
+    section: 'Founder OS',
+    preview:
+      'GTM v3.5 §11 (RATIFIED 2026-05-05) — the cognitive-discipline surface that makes the Phase 1 motion executable. Six pillars: Neurobiological Protection (zero SFC), Long-Form Information Diet (30-min minimum, primary sources), Active Recall + Elaborative Encoding, AI Orchestration NOT Cognitive Offloading, Distress Tolerance + Emotional Regulation, Internal Locus of Control. Daily checkin (SFC = 0?, deep work hours, deep reading minutes, exercise, meditation), SFC-zero streak counter, long-form content log with active-recall summaries, quarterly skill acquisition tracker, weekly review prompt every Sunday. Check first thing daily before LinkedIn or email.',
+    keywords:
+      'founder os operating system discipline cognitive sfc short-form short form content tiktok reels shorts ban eliminate dopamine prefrontal cortex executive function deep work deep reading active recall elaborative encoding ai orchestration cognitive offloading distress tolerance emotional regulation locus of control reverse flynn effect long-form youtube interviews 30 minutes pillars checkin streak weekly review skill acquisition quarterly progressive summarisation neurobiology',
   },
   {
     tabId: 'metrics',
@@ -1691,6 +1713,11 @@ function renderTab(
     metrics: (
       <ErrorBoundary sectionName="Metrics">
         <MetricsTab founderPass={FOUNDER_PASS} />
+      </ErrorBoundary>
+    ),
+    founder_os: (
+      <ErrorBoundary sectionName="Founder OS">
+        <FounderOSTab />
       </ErrorBoundary>
     ),
   };
