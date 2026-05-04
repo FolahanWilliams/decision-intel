@@ -119,9 +119,10 @@ export interface ThinkingPartner {
 
 /** Shared core sections that every persona gets in voice mode. The
  *  founder identity + product identity + current phase + vocabulary
- *  + the real risks. ~15-20KB total. Each persona's specific list
- *  extends this. Defined here so a section added to the core only
- *  needs ONE edit to propagate to all personas. */
+ *  + the real risks + the response/mentor style. ~15-20KB total.
+ *  Each persona's specific list extends this. Defined here so a
+ *  section added to the core only needs ONE edit to propagate to
+ *  all personas. */
 const SHARED_VOICE_SECTIONS = [
   'product overview',
   'founder notes',
@@ -129,7 +130,43 @@ const SHARED_VOICE_SECTIONS = [
   'positioning vocabulary lock — decision provenance record',
   'external attack vectors',
   'one-liner lock',
+  'response style',
+  'mentor mode',
 ] as const;
+
+/**
+ * BLOCKLIST — sections in FOUNDER_CONTEXT that are deliberately NEVER
+ * included in any voice persona's context. These are changelog noise,
+ * UI-specific routing, or engineering-convention content that doesn't
+ * help a voice conversation and just inflates prompt size + LLM
+ * latency. Documented here as the rule (the parser doesn't enforce it
+ * — personas that try to add a blocked section just won't see it
+ * referenced anywhere else, which is the audit trail).
+ *
+ * Blocked sections (canonical keys):
+ *   recently shipped features (all dates — multiple sections match)
+ *   previously shipped
+ *   polish sweep log
+ *   consolidation sweep
+ *   page-header + typography polish
+ *   moat visualization reuse
+ *   founder-hub sweep
+ *   founder hub recent additions
+ *   founder hub tab routing
+ *   background jobs / crons
+ *   email infrastructure
+ *   security posture
+ *   open flags
+ *   navigation markers — [[nav:tabid]]
+ *   additional product surfaces
+ *   fire-and-forget discipline
+ *
+ * If you find yourself wanting to add one of these to a persona,
+ * pause — the symptom you're trying to fix is probably better
+ * addressed via the persona's systemPrompt or by adding a NEW
+ * section to FOUNDER_CONTEXT with content tuned for voice rather
+ * than reusing a section authored for text-chat or engineering use.
+ */
 
 // ─── The 4 thinking partners ──────────────────────────────────────────
 
@@ -164,19 +201,21 @@ const DEFAULT_COACH: ThinkingPartner = {
     speed: 0,
     maxWordsPerVoiceTurn: 100,
   },
-  // Decision Coach is the all-purpose lens. Gets the strategic-execution
-  // + market-strategy + integrations slices on top of the shared core.
+  // Decision Coach is the all-purpose lens — the founder's working
+  // advisor. Needs broad strategic grounding + the artefacts the
+  // founder rehearses against most often (sales toolkit + pitch deck +
+  // moat narrative). Dropped: integrations / hub routing / flywheel
+  // closure (UI noise), founder tips appendix (low-leverage).
   voiceContextSections: [
     ...SHARED_VOICE_SECTIONS,
     'execution discipline',
     'market strategy',
-    'integrations',
-    'founder hub tab routing',
-    'flywheel closure surfaces',
+    'competitive moat',
+    'sales toolkit',
+    'pitch deck framework',
     '5 levels of entrepreneurship thinking',
     'how to use these frameworks',
     'regulatory tailwinds positioning',
-    'founder tips appendix',
     'fundraising state',
   ],
 };
@@ -241,15 +280,18 @@ const COGNITIVE_PSYCHOLOGIST: ThinkingPartner = {
   },
   // Cognitive Psychologist needs the bias / decision-science substrate:
   // the moat (R²F is the moat), the toxic-combinations narrative (the
-  // 22-bias taxonomy), and the research foundations (Kahneman, Klein,
-  // Tetlock anchors). The shared core gives the founder identity +
-  // current phase + risks. Skips MARKET STRATEGY, SALES TOOLKIT,
-  // PITCH DECK FRAMEWORK, etc — not this lens's job.
+  // 22-bias taxonomy), the research foundations (Kahneman, Klein,
+  // Tetlock anchors), the AI infrastructure (so they can talk about
+  // technical implementation of R²F not just the theory), and the
+  // engineering lessons (sober view of what's actually shipped vs
+  // aspirational — important for honest research-grade discussion).
   voiceContextSections: [
     ...SHARED_VOICE_SECTIONS,
     'competitive moat',
     'toxic combinations narrative',
     'research foundations',
+    'ai infrastructure',
+    'known engineering lessons learned',
     'regulatory tailwinds positioning',
   ],
 };
@@ -388,12 +430,15 @@ const SKEPTICAL_INVESTOR: ThinkingPartner = {
     speed: 0.15,
     maxWordsPerVoiceTurn: 80,
   },
-  // Skeptical Investor needs the diligence substrate: moat (defensive),
-  // competitors (who Cloverpop / IBM watsonx ARE), market strategy
-  // (TAM + ICP), fundraising state (the $1.5-2.5M seed math), pitch
-  // deck framework (what they'll see), Decision Alpha (the equity
-  // thesis hook), and the competitive-reality memo. External attack
-  // vectors are critical here — an investor will probe them first.
+  // Skeptical Investor needs the diligence substrate. Probes the
+  // moat (defensive), competitors (who Cloverpop / IBM watsonx ARE),
+  // market strategy (TAM + ICP), fundraising state (the $1.5-2.5M
+  // seed math), pitch deck framework (what they'll see), Decision
+  // Alpha (the equity thesis hook), competitive-reality memo,
+  // AI infrastructure (technical proof points), and — critically —
+  // the engineering lessons + gotchas (what an investor will dig
+  // into during technical/operational risk diligence). External
+  // attack vectors via the shared core — investors probe those first.
   voiceContextSections: [
     ...SHARED_VOICE_SECTIONS,
     'competitive moat',
@@ -405,6 +450,8 @@ const SKEPTICAL_INVESTOR: ThinkingPartner = {
     'competitive reality to remember',
     'regulatory tailwinds positioning',
     'ai infrastructure',
+    'known engineering lessons learned',
+    'gotchas learned in practice',
     'latest positioning lock',
   ],
 };

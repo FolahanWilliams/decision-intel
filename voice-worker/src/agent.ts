@@ -39,6 +39,7 @@ import {
 import * as deepgram from '@livekit/agents-plugin-deepgram';
 import * as cartesia from '@livekit/agents-plugin-cartesia';
 import * as openai from '@livekit/agents-plugin-openai';
+import * as google from '@livekit/agents-plugin-google';
 import * as silero from '@livekit/agents-plugin-silero';
 import { fileURLToPath } from 'node:url';
 import { config } from './config.js';
@@ -109,14 +110,16 @@ export default defineAgent({
     // OpenAI-compat streaming format that some providers emit through
     // Vercel AI Gateway. Symptom: "TTS stream stalled after producing
     // audio, forcing close" + "Cartesia returned error" mid-reply.
-    // Verified broken combos as of 2026-05-04:
-    //   - xai/grok-4.3, xai/grok-4 (Grok via AI Gateway)
-    //   - google/gemini-3-flash-preview (Gemini via AI Gateway → OpenAI plugin)
-    //   - deepseek/deepseek-chat (untested but suspect)
+    // Verified broken combos via the LiveKit OpenAI plugin + AI Gateway
+    // (the OpenAI-compat shim doesn't preserve their streaming format):
+    //   - xai/grok-* (Grok)
+    //   - deepseek/* (DeepSeek)
     // Verified working:
+    //   - google/* (Gemini) — uses NATIVE @livekit/agents-plugin-google,
+    //     not the OpenAI shim. Removed from broken list 2026-05-04.
     //   - openai/gpt-4o-mini, openai/gpt-4o
     //   - anthropic/claude-haiku-4-5 (likely; not yet tested in voice)
-    const knownBrokenLlmPrefixes = ['xai/', 'google/', 'deepseek/'];
+    const knownBrokenLlmPrefixes = ['xai/', 'deepseek/'];
     if (knownBrokenLlmPrefixes.some(p => config.llm.model.startsWith(p))) {
       // eslint-disable-next-line no-console
       console.warn(
@@ -184,7 +187,8 @@ export default defineAgent({
     const prewarmEndpoints = [
       { name: 'cartesia', url: 'https://api.cartesia.ai' },
       { name: 'deepgram', url: 'https://api.deepgram.com' },
-      { name: 'ai-gateway', url: config.llm.baseUrl },
+      { name: 'ai-gateway', url: config.llm.aiGatewayBaseUrl },
+      { name: 'google-ai', url: 'https://generativelanguage.googleapis.com' },
     ];
     await Promise.allSettled(
       prewarmEndpoints.map(async ({ name, url }) => {
@@ -377,12 +381,42 @@ export default defineAgent({
       utteranceEndMs: 600,
     } as never);
 
-    const llmPlugin = new openai.LLM({
-      apiKey: config.llm.apiKey,
-      baseURL: config.llm.baseUrl,
-      model: config.llm.model,
-      temperature: 0.6,
-    });
+    // LLM plugin selection branches on the model slug prefix:
+    //   google/<model>  → native Google plugin (uses GOOGLE_API_KEY)
+    //   anything else   → LiveKit OpenAI plugin via Vercel AI Gateway
+    //
+    // Google plugin talks directly to Gemini's native API — bypasses
+    // the OpenAI-compat shim that broke Grok/Gemini through the
+    // gateway. Faster TTFT (~100-200ms vs 300-500ms) + higher
+    // generation rate (~200 tok/s vs ~80) + native context caching.
+    let llmPlugin;
+    if (config.llm.model.startsWith('google/')) {
+      const geminiModel = config.llm.model.slice('google/'.length);
+      if (!config.llm.googleApiKey) {
+        throw new Error(
+          '[voice-worker] GOOGLE_API_KEY missing — required when VOICE_LLM_MODEL starts with "google/". ' +
+            'Set it in Railway Variables.'
+        );
+      }
+      llmPlugin = new google.LLM({
+        apiKey: config.llm.googleApiKey,
+        model: geminiModel as never,
+        temperature: 0.6,
+      });
+    } else {
+      if (!config.llm.aiGatewayApiKey) {
+        throw new Error(
+          '[voice-worker] AI_GATEWAY_API_KEY missing — required when VOICE_LLM_MODEL is non-google. ' +
+            'Set it in Railway Variables, or change VOICE_LLM_MODEL to start with "google/".'
+        );
+      }
+      llmPlugin = new openai.LLM({
+        apiKey: config.llm.aiGatewayApiKey,
+        baseURL: config.llm.aiGatewayBaseUrl,
+        model: config.llm.model,
+        temperature: 0.6,
+      });
+    }
 
     const ttsPlugin = new cartesia.TTS({
       apiKey: config.cartesia.apiKey,
@@ -593,7 +627,7 @@ export default defineAgent({
         '\n  cartesiaModel:', config.cartesia.model,
         '\n  cartesiaVoiceId:', voiceId,
         '\n  llmModel:', config.llm.model,
-        '\n  llmBaseUrl:', config.llm.baseUrl,
+        '\n  llmProvider:', config.llm.model.startsWith('google/') ? 'google-native' : 'ai-gateway',
         '\n  sttModel: nova-3',
         '\n  stack:', e?.stack
       );

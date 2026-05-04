@@ -32,30 +32,42 @@ export const config = {
     apiKey: require_('DEEPGRAM_API_KEY'),
   },
   llm: {
-    apiKey: require_('AI_GATEWAY_API_KEY'),
-    baseUrl: process.env.AI_GATEWAY_BASE_URL || 'https://ai-gateway.vercel.sh/v1',
-    // VOICE_LLM_MODEL is the canonical env var. GROK_MODEL kept as a
-    // deprecated fallback for envs that haven't migrated yet (the
-    // worker shipped with GROK_MODEL before we generalised to any AI
-    // Gateway provider).
+    // VOICE_LLM_MODEL is the canonical env var. Format: "provider/model"
+    // matching Vercel AI Gateway's slug convention.
     //
-    // Default `openai/gpt-4o-mini` because it's the cheapest LLM that
-    // is verified to work with the LiveKit OpenAI plugin's streaming
-    // format. Grok 4.3 (`xai/grok-4.3`) returns empty replies through
-    // this plugin (the plugin's streaming parser doesn't match Grok's
-    // OpenAI-compat response shape). Override via Railway env if you
-    // want a different model — any AI Gateway slug works.
+    // Default `google/gemini-3-flash-preview` — uses the LiveKit native
+    // Google plugin (@livekit/agents-plugin-google). 50-70% faster than
+    // gpt-4o-mini at lower cost (~$0.075/$0.30 per 1M tokens) and Google
+    // has reliable native context caching that survives across turns.
     //
-    // Verified-working slugs (per the LiveKit OpenAI plugin parser):
-    //   - openai/gpt-4o-mini       cheapest, fast
-    //   - openai/gpt-4o            stronger, ~10× cost
-    //   - anthropic/claude-haiku-4-5  cheap, strong instruction-following
-    //   - google/gemini-3-flash-preview  Vercel default for analytical tier
+    // Routing logic (in agent.ts buildLlmPlugin):
+    //   - `google/<model>` → Google plugin natively (uses GOOGLE_API_KEY)
+    //   - anything else → LiveKit OpenAI plugin via Vercel AI Gateway
+    //     (uses AI_GATEWAY_API_KEY + AI_GATEWAY_BASE_URL)
     //
-    // Untested with this plugin (may produce empty output):
-    //   - xai/grok-4.3
-    //   - deepseek/deepseek-chat
-    model: process.env.VOICE_LLM_MODEL || process.env.GROK_MODEL || 'openai/gpt-4o-mini',
+    // Verified-working slugs:
+    //   - google/gemini-3-flash-preview  ← default, fastest + cheapest
+    //   - google/gemini-2.5-flash         older but stable
+    //   - openai/gpt-4o-mini              fallback when Google quota issues
+    //   - openai/gpt-4o                   stronger, ~10× cost
+    //
+    // Known-broken (the LiveKit OpenAI plugin's streaming parser doesn't
+    // match these providers' OpenAI-compat format via AI Gateway):
+    //   - xai/grok-* (Grok)
+    //   - deepseek/* (DeepSeek)
+    // Use Anthropic plugin for Claude when we need it (not yet wired).
+    //
+    // GROK_MODEL kept as a deprecated fallback for envs that still
+    // have it set (won't work, will hit the broken-list boot warning).
+    model: process.env.VOICE_LLM_MODEL || process.env.GROK_MODEL || 'google/gemini-3-flash-preview',
+    // GOOGLE_API_KEY is required when model is google/*. The require_()
+    // call would crash boot if missing, but we only need it conditionally
+    // — read here as a plain env, validated at LLM-plugin build time
+    // in agent.ts. Same pattern for AI_GATEWAY_API_KEY (required only
+    // when model is non-google).
+    googleApiKey: process.env.GOOGLE_API_KEY ?? '',
+    aiGatewayApiKey: process.env.AI_GATEWAY_API_KEY ?? '',
+    aiGatewayBaseUrl: process.env.AI_GATEWAY_BASE_URL || 'https://ai-gateway.vercel.sh/v1',
   },
   cartesia: {
     apiKey: require_('CARTESIA_API_KEY'),
