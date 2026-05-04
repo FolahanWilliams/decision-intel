@@ -204,5 +204,155 @@ export function buildTools(ctx: ToolCallContext): llm.ToolContext {
       },
       execute: (args) => callVoiceTool('lookup_design_partners', args, ctx),
     }),
+
+    // ─── Phase-2-extended write tools ─────────────────────────────────
+    log_outreach_event: llm.tool({
+      description:
+        "Log an outreach event with a specific person — when the founder reports they made an intro, got a reply, met someone, etc. Distinct from add_todo (which is for FUTURE work) — this captures a PAST interaction. Event types: 'intro_made' (founder asked someone to intro them), 'replied' (target responded to outreach), 'met' (in-person or call happened), 'no_response' (outreach ignored), 'rescheduled' (meeting moved), 'lost_contact' (gave up), 'note' (general remark).",
+      parameters: {
+        type: 'object',
+        properties: {
+          personName: {
+            type: 'string',
+            description: 'Name of the person involved (e.g., "Mr. Reiner", "Adaeze at Conviction")',
+          },
+          eventType: {
+            type: 'string',
+            enum: ['intro_made', 'replied', 'met', 'no_response', 'rescheduled', 'lost_contact', 'note'],
+            description: 'What happened in this outreach interaction',
+          },
+          note: {
+            type: 'string',
+            description: 'Brief context — what was said, what came of it, what the next step is',
+          },
+        },
+        required: ['personName', 'eventType'],
+      },
+      execute: (args) => callVoiceTool('log_outreach_event', args, ctx),
+    }),
+
+    log_meeting: llm.tool({
+      description:
+        "Log a meeting that just happened or that the founder is recapping. Use when the founder narrates a meeting they had — captures the title, attendees, free-form notes, and any high-stakes decisions raised so the meetings log + decision archaeology stay current.",
+      parameters: {
+        type: 'object',
+        properties: {
+          title: {
+            type: 'string',
+            description: "Short title (e.g., 'Sankore investment scoping call', 'Mr. Reiner advisor sync')",
+          },
+          attendees: {
+            type: 'array',
+            items: { type: 'string' },
+            description: "Names of who was present (e.g., ['Folahan', 'Mr. Reiner'])",
+          },
+          notes: {
+            type: 'string',
+            description: 'Free-form notes — what got discussed, what got committed, what surprised',
+          },
+          decisionsRaised: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Strategic decisions that came up that should be added to the decision log',
+          },
+        },
+        required: ['title'],
+      },
+      execute: (args) => callVoiceTool('log_meeting', args, ctx),
+    }),
+
+    log_lesson_learned: llm.tool({
+      description:
+        "Save a lesson learned that's worth remembering. Use when the founder articulates an insight, a pattern they noticed, or a mistake they want to avoid repeating. These accumulate into the Founder Tips Appendix over time.",
+      parameters: {
+        type: 'object',
+        properties: {
+          category: {
+            type: 'string',
+            description: "Category for the lesson (e.g., 'sales', 'fundraise', 'product', 'positioning', 'general')",
+          },
+          learning: {
+            type: 'string',
+            description: "The lesson itself, in the founder's own words",
+          },
+        },
+        required: ['learning'],
+      },
+      execute: (args) => callVoiceTool('log_lesson_learned', args, ctx),
+    }),
+
+    schedule_followup: llm.tool({
+      description:
+        "Schedule a follow-up with a specific person on a specific date. Distinct from add_todo (which is general task tracking) — this is specifically for outbound contact follow-ups, so it can drive an outreach reminder cadence later. Use when founder says 'remind me to follow up with X on Y' or 'set a follow-up for Friday with Z'.",
+      parameters: {
+        type: 'object',
+        properties: {
+          personName: {
+            type: 'string',
+            description: 'Person to follow up with',
+          },
+          dueDate: {
+            type: 'string',
+            description: 'ISO date string YYYY-MM-DD',
+          },
+          context: {
+            type: 'string',
+            description: 'What the follow-up is about — context for future-self',
+          },
+        },
+        required: ['personName', 'dueDate'],
+      },
+      execute: (args) => callVoiceTool('schedule_followup', args, ctx),
+    }),
+
+    // ─── Phase-2-extended read tools ──────────────────────────────────
+    lookup_outreach_status: llm.tool({
+      description:
+        "Look up recent outreach activity. Optionally filter by person name. Returns the agent's own log_outreach_event entries from the last N days — useful when founder asks 'what's the status with X?' or 'when did I last talk to Y?'.",
+      parameters: {
+        type: 'object',
+        properties: {
+          personName: {
+            type: 'string',
+            description: 'Optional — filter to one person (substring match, case-insensitive)',
+          },
+          lookbackDays: {
+            type: 'number',
+            description: 'How far back to look (default 30, max 90)',
+          },
+        },
+      },
+      execute: (args) => callVoiceTool('lookup_outreach_status', args, ctx),
+    }),
+
+    lookup_sparring_history: llm.tool({
+      description:
+        "Get recent Sparring Room rep history (sales DQI scores, dimensions, persona+mode). Use when founder asks about their pitching practice trends. Note: sparring history is currently stored client-side; this tool returns a placeholder until server-side persistence ships.",
+      parameters: {
+        type: 'object',
+        properties: {
+          limit: {
+            type: 'number',
+            description: 'Number of recent reps to fetch (default 5, max 10)',
+          },
+        },
+      },
+      execute: (args) => callVoiceTool('lookup_sparring_history', args, ctx),
+    }),
+
+    lookup_recent_audits: llm.tool({
+      description:
+        "Get the founder's most recent strategic memo audits with DQI score + grade + doc title. Use when founder asks 'what was my last audit?' or 'what's the trend on my DQI scores?'.",
+      parameters: {
+        type: 'object',
+        properties: {
+          limit: {
+            type: 'number',
+            description: 'Number of recent audits to fetch (default 5, max 10)',
+          },
+        },
+      },
+      execute: (args) => callVoiceTool('lookup_recent_audits', args, ctx),
+    }),
   };
 }

@@ -27,6 +27,11 @@ import {
   RefreshCw,
   Activity as ActivityIcon,
   Loader2,
+  Handshake,
+  Calendar,
+  Presentation,
+  GraduationCap,
+  FileText,
 } from 'lucide-react';
 
 interface VoiceSessionEvent {
@@ -55,13 +60,21 @@ interface Props {
 }
 
 const EVENT_TYPE_META: Record<string, { label: string; icon: React.ComponentType<{ size?: number }>; color: string }> = {
+  // Write actions
   todo_created: { label: 'Todos created', icon: CheckSquare, color: '#16A34A' },
   demo_conversion: { label: 'Demo conversions', icon: TrendingUp, color: '#0EA5E9' },
   positioning_note: { label: 'Positioning notes', icon: Lightbulb, color: '#F59E0B' },
+  outreach_event: { label: 'Outreach events', icon: Handshake, color: '#0EA5E9' },
+  meeting_logged: { label: 'Meetings logged', icon: Presentation, color: '#16A34A' },
+  lesson_learned: { label: 'Lessons learned', icon: GraduationCap, color: '#A78BFA' },
+  followup_scheduled: { label: 'Follow-ups scheduled', icon: Calendar, color: '#16A34A' },
+  // Read actions (lookups)
   decision_lookup: { label: 'Decision-log lookups', icon: Search, color: '#7C3AED' },
   meeting_lookup: { label: 'Meeting lookups', icon: Search, color: '#7C3AED' },
   design_partner_lookup: { label: 'Design-partner lookups', icon: Search, color: '#7C3AED' },
   outreach_lookup: { label: 'Outreach lookups', icon: Search, color: '#7C3AED' },
+  sparring_lookup: { label: 'Sparring lookups', icon: Search, color: '#7C3AED' },
+  audit_lookup: { label: 'Audit lookups', icon: FileText, color: '#7C3AED' },
 };
 
 function formatRelative(iso: string): string {
@@ -86,6 +99,14 @@ function summariseEvent(ev: VoiceSessionEvent): string {
       return `${args.prospectName ?? 'Unknown'} → ${args.status ?? 'unknown'}${args.note ? ` · ${String(args.note).slice(0, 80)}` : ''}`;
     case 'positioning_note':
       return typeof args.articulation === 'string' ? args.articulation : 'Positioning note';
+    case 'outreach_event':
+      return `${args.personName ?? 'Unknown'} → ${args.eventType ?? 'note'}${args.note ? ` · ${String(args.note).slice(0, 80)}` : ''}`;
+    case 'meeting_logged':
+      return `${args.title ?? 'Meeting'}${Array.isArray(args.attendees) && args.attendees.length > 0 ? ` · ${args.attendees.length} attendee(s)` : ''}`;
+    case 'lesson_learned':
+      return `[${args.category ?? 'general'}] ${typeof args.learning === 'string' ? args.learning.slice(0, 100) : 'Lesson'}`;
+    case 'followup_scheduled':
+      return `Follow up with ${args.personName ?? 'someone'} on ${args.dueDate ?? '(no date)'}`;
     case 'decision_lookup':
       return `Searched decisions: "${args.query ?? '(no query)'}"`;
     case 'meeting_lookup':
@@ -93,7 +114,11 @@ function summariseEvent(ev: VoiceSessionEvent): string {
     case 'design_partner_lookup':
       return `Checked design-partner pipeline`;
     case 'outreach_lookup':
-      return `Checked outreach: ${args.personName ?? 'all'}`;
+      return `Checked outreach: ${args.personName ?? 'all'} (last ${args.lookbackDays ?? 30}d)`;
+    case 'sparring_lookup':
+      return `Checked sparring history (limit ${args.limit ?? 5})`;
+    case 'audit_lookup':
+      return `Checked recent audits (limit ${args.limit ?? 5})`;
     default:
       return ev.eventType;
   }

@@ -248,6 +248,200 @@ const TOOLS: ToolDef[] = [
       }
     },
   },
+
+  // ─── Phase-2-extended write tools ────────────────────────────────────
+  {
+    name: 'log_outreach_event',
+    eventType: 'outreach_event',
+    async handler(args) {
+      const personName = typeof args.personName === 'string' ? args.personName.slice(0, 200) : '';
+      const eventTypeArg = typeof args.eventType === 'string' ? args.eventType : 'note';
+      const note = typeof args.note === 'string' ? args.note.slice(0, 1000) : null;
+      const validTypes = ['intro_made', 'replied', 'met', 'no_response', 'rescheduled', 'lost_contact', 'note'];
+      if (!personName) return { ok: false, error: 'personName is required' };
+      if (!validTypes.includes(eventTypeArg)) {
+        return { ok: false, error: `eventType must be one of: ${validTypes.join(', ')}` };
+      }
+      // The event itself is captured into VoiceSessionEvent.payload by
+      // the dispatcher. If a future schema adds OutreachEvent we can
+      // double-write here. Note arg captured via dispatcher payload.
+      void note;
+      return {
+        ok: true,
+        message: `Outreach logged: ${personName} → ${eventTypeArg}`,
+      };
+    },
+  },
+
+  {
+    name: 'log_meeting',
+    eventType: 'meeting_logged',
+    async handler(args) {
+      const title = typeof args.title === 'string' ? args.title.slice(0, 300) : '';
+      const attendees = Array.isArray(args.attendees) ? args.attendees.slice(0, 20).map(a => String(a).slice(0, 200)) : [];
+      const notes = typeof args.notes === 'string' ? args.notes.slice(0, 4000) : null;
+      const decisionsRaised = Array.isArray(args.decisionsRaised) ? args.decisionsRaised.slice(0, 10).map(d => String(d).slice(0, 500)) : [];
+      if (!title) return { ok: false, error: 'title is required' };
+      // Notes + attendees + decisions captured via dispatcher payload.
+      void notes;
+      return {
+        ok: true,
+        message: `Meeting logged: "${title}" (${attendees.length} attendee(s), ${decisionsRaised.length} decision(s) raised)`,
+      };
+    },
+  },
+
+  {
+    name: 'log_lesson_learned',
+    eventType: 'lesson_learned',
+    async handler(args) {
+      const category = typeof args.category === 'string' ? args.category.slice(0, 100) : 'general';
+      const learning = typeof args.learning === 'string' ? args.learning.slice(0, 2000) : '';
+      if (!learning) return { ok: false, error: 'learning is required' };
+      return {
+        ok: true,
+        message: `Lesson saved [${category}]: "${learning.slice(0, 80)}${learning.length > 80 ? '...' : ''}"`,
+      };
+    },
+  },
+
+  {
+    name: 'schedule_followup',
+    eventType: 'followup_scheduled',
+    async handler(args) {
+      const personName = typeof args.personName === 'string' ? args.personName.slice(0, 200) : '';
+      const dueDate = typeof args.dueDate === 'string' ? args.dueDate : '';
+      const context = typeof args.context === 'string' ? args.context.slice(0, 1000) : null;
+      if (!personName) return { ok: false, error: 'personName is required' };
+      if (!dueDate) return { ok: false, error: 'dueDate is required (ISO YYYY-MM-DD)' };
+      void context;
+      return {
+        ok: true,
+        message: `Follow-up scheduled: ${personName} on ${dueDate}`,
+      };
+    },
+  },
+
+  // ─── Phase-2-extended read tools ─────────────────────────────────────
+  {
+    name: 'lookup_outreach_status',
+    eventType: 'outreach_lookup',
+    async handler(args) {
+      const personName = typeof args.personName === 'string' ? args.personName.slice(0, 200) : null;
+      const lookback = typeof args.lookbackDays === 'number' ? Math.min(Math.max(args.lookbackDays, 1), 90) : 30;
+      try {
+        // Pull the last N outreach_event entries from VoiceSessionEvent
+        // (where the agent's own log_outreach_event tool writes them).
+        // Filtered by personName if provided.
+        const since = new Date(Date.now() - lookback * 24 * 60 * 60 * 1000);
+        const events = await prisma.voiceSessionEvent.findMany({
+          where: {
+            eventType: 'outreach_event',
+            createdAt: { gte: since },
+          },
+          orderBy: { createdAt: 'desc' },
+          take: 30,
+        });
+        const filtered = personName
+          ? events.filter(ev => {
+              const p = (ev.payload as { args?: { personName?: string } } | null)?.args?.personName;
+              return typeof p === 'string' && p.toLowerCase().includes(personName.toLowerCase());
+            })
+          : events;
+        return {
+          ok: true,
+          count: filtered.length,
+          events: filtered.map(ev => {
+            const payload = (ev.payload as { args?: Record<string, unknown> } | null)?.args ?? {};
+            return {
+              personName: payload.personName ?? '(unknown)',
+              eventType: payload.eventType ?? 'note',
+              note: payload.note ?? null,
+              at: ev.createdAt.toISOString(),
+            };
+          }),
+        };
+      } catch (err) {
+        log.warn('lookup_outreach_status failed:', err);
+        return { ok: true, count: 0, events: [], note: 'Outreach lookup unavailable' };
+      }
+    },
+  },
+
+  {
+    name: 'lookup_sparring_history',
+    eventType: 'sparring_lookup',
+    async handler(args) {
+      const limit = Math.min(typeof args.limit === 'number' ? args.limit : 5, 10);
+      try {
+        // Sparring sessions are stored client-side in localStorage by
+        // SparringRoomTab — no server-side persistence yet. Return a
+        // helpful note pointing the founder at the right surface
+        // instead of pretending we have the data.
+        void limit;
+        return {
+          ok: true,
+          count: 0,
+          sessions: [],
+          note: 'Sparring history is currently stored client-side in localStorage (SparringRoomTab di-sparring-room-history-v1). Server-side sparring persistence not yet shipped — when it lands, this tool will return real data without code change here.',
+        };
+      } catch (err) {
+        log.warn('lookup_sparring_history failed:', err);
+        return { ok: true, count: 0, sessions: [], note: 'Sparring lookup unavailable' };
+      }
+    },
+  },
+
+  {
+    name: 'lookup_recent_audits',
+    eventType: 'audit_lookup',
+    async handler(args) {
+      const limit = Math.min(typeof args.limit === 'number' ? args.limit : 5, 10);
+      try {
+        // Recent strategic memo audits — Analysis rows joined to
+        // Document. Returns dqi + grade + doc title so the agent
+        // can answer "what did I last audit?".
+        const analyses = await (
+          prisma as unknown as {
+            analysis?: {
+              findMany: (args: Record<string, unknown>) => Promise<Array<{
+                id: string;
+                overallScore?: number | null;
+                grade?: string | null;
+                createdAt?: Date;
+                document?: { title?: string | null };
+              }>>;
+            };
+          }
+        ).analysis?.findMany({
+          orderBy: { createdAt: 'desc' },
+          take: limit,
+          select: {
+            id: true,
+            overallScore: true,
+            grade: true,
+            createdAt: true,
+            document: { select: { title: true } },
+          },
+        });
+        return {
+          ok: true,
+          count: analyses?.length ?? 0,
+          audits: (analyses ?? []).map(a => ({
+            id: a.id,
+            title: a.document?.title ?? '(untitled)',
+            dqi: a.overallScore ?? null,
+            grade: a.grade ?? null,
+            at: a.createdAt?.toISOString() ?? null,
+          })),
+        };
+      } catch (err) {
+        // @schema-drift-tolerant — Analysis schema may differ in older envs
+        log.warn('lookup_recent_audits failed:', err);
+        return { ok: true, count: 0, audits: [], note: 'Recent audits lookup unavailable in this environment' };
+      }
+    },
+  },
 ];
 
 const TOOLS_BY_NAME = new Map(TOOLS.map(t => [t.name, t] as const));
