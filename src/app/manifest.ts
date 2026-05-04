@@ -2,10 +2,10 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Decision Intel — Reasoning Layer for High-Stakes Calls',
+    name: 'Decision Intel — The Reasoning Audit Platform',
     short_name: 'Decision Intel',
     description:
-      'The native reasoning layer for every high-stakes call. Audit every strategic memo, simulate the questions the room will ask, and compound your team’s judgment quarter after quarter.',
+      'The reasoning audit platform. Most tools audit your data; we audit your reasoning — and catch the fatal blind spots in strategic memos before the committee does.',
     start_url: '/',
     display: 'standalone',
     background_color: '#0a0a0a',

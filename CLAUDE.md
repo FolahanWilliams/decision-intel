@@ -44,25 +44,34 @@ Decision Intel is a decision intelligence platform for corporate strategy teams.
 
 **Anti-scope-creep vs boil-the-ocean — resolution rule (locked 2026-04-27).** This file's "push back on scope creep" instruction and the user-memory `feedback-boil-the-ocean` ("do the whole thing right on non-trivial builds; no workarounds, no dangling threads") both apply. The decision rule when they collide: **was the work explicitly approved as planned/Tier-N execution?** If yes (founder said "proceed with Tier 1," "ship the deep version," "implement this list," etc.) — boil-the-ocean wins. Default to the category-grade enterprise version of every approved item; never the lean cut. If the work is an unsolicited polish opportunity, a side-quest discovered mid-task, or an "I noticed we could also…" — anti-scope-creep wins; flag it, don't ship it. Test for category-grade-on-planned-work: before declaring done, sit in the buyer's seat (CSO / fund partner / GC / IC reviewer) and answer (a) "what's the next question I'd ask on this surface?" (b) "what action would I take from here?" (c) "what claim looks weak from a procurement reader's perspective?" If any of those reveal a gap, deepen before shipping. Time estimates on planned work are depth signals ("this much depth is the target"), NOT time budgets ("come in under this if you can").
 
-## One-liner (RE-LOCKED 2026-04-26 — broader audience pass)
+## One-liner (RE-LOCKED 2026-05-04 — CATEGORY-CLAIM PIVOT)
 
-**Primary (hero + pitch-deck + LinkedIn headline):**
+**Primary H1 (landing + pitch-deck slide 1 + LinkedIn headline):**
 
-> **The native reasoning layer for every high-stakes call.**
+> **Decision Intel is the reasoning audit platform.**
 
-**Secondary (cold outreach + investor-narrative moments, carries the regulatory tailwind story in one breath):**
+**Contrast sub-head (use as second sentence on landing + pitch deck):**
 
-> **The reasoning layer the Fortune 500 needs before regulators start asking.**
+> **Most tools audit your data. We audit your reasoning — and catch the fatal blind spots in strategic memos before the committee does.**
+
+**Asymmetric-tail body (justification for running the audit on every memo, not just the suspicious ones):**
+
+> **Most strategic memos pass cleanly. The ones that don't are the ones that destroy value. You can't tell the catastrophic memo from the clean memo without auditing both — which is why you run the audit on every memo, not just the suspicious ones.**
+
+**Secondary H1 (cold investor + regulatory-tailwind contexts only):**
+
+> **The reasoning audit platform the Fortune 500 needs before EU AI Act enforcement begins August 2026.**
 
 **Rules:**
 
-- "Reasoning layer" is the ownable anchor — treat it like the category term. Any new surface defaults to this. Untouched in the 2026-04-26 refactor.
-- "Native" does the "built for this, not retrofitted" work. Untouched.
-- **"High-stakes call"** (replaced "boardroom strategic decision" 2026-04-26) is the universal noun phrase that lands across all six buyer personas — CSO, head of strategic planning, M&A partner, fund analyst, GC, board director — without narrowing funds or non-board-reporting teams out. The prior "boardroom" lock predated Sankore (a fund) becoming the first design partner; the empathic-mode-first review (2026-04-26) caught the narrowing. "High-stakes call" reads procurement-grade for Margaret/Richard while staying universal for fund/IC/regulator audiences. Subhead also swapped "the board will catch first" → "the room will catch first" so the H1 universalisation actually holds.
-- Do NOT use "collaborative," "collaborator," "medium," or "protect outcomes" framings. "Collaborative" codes as Slack/Notion/consensus-tool in a CSO's ear; we are an audit + simulation engine, not a collaboration layer. "Protect" is reactive.
-- "System of record for strategic reasoning" is still valid supporting vocabulary in long-form writing, but it is NOT the category claim. "Reasoning layer" is.
-- The secondary variant is for moments where tension beats elegance (cold DMs, VC pitches, LinkedIn replies). Never use it as a hero H1.
-- "Boardroom strategic decision" — the prior locked H1 noun phrase — is now retired across the landing surface. Only valid in long-form writing where the audience is explicitly F500 board-reporting (e.g., `/decision-intel-for-boards`).
+- **"The reasoning audit platform"** is the protected category noun. Treat like R²F / DPR / DQI — never substitute synonyms ("reasoning analyser", "reasoning checker", "decision audit platform") in shipped surfaces. The category becomes ownable through CONSISTENT REPETITION; one-off paraphrases dilute the claim. Only allowed deviation: drop "platform" → "the reasoning audit" for cold contexts (LinkedIn DM character limits, conference 1-line introductions) where SaaS-platform vocabulary feels heavy.
+- **The category-claim test (James Pursey 15-second test):** a stranger hears the H1 and resolves all three terms (software → audits → human thinking) immediately without lookup. The new claim passes; the prior "native reasoning layer for every high-stakes call" failed because both "reasoning layer" and "high-stakes call" required the reader to pause and define abstract terms before the sentence completed.
+- **The category-claim move ("THE platform" not "A platform")** asserts category ownership the way "Stripe is the payments infrastructure for the internet" does. The category — *reasoning-audit-platform* — does not exist as a Gartner segment, which means it's ours by usage. The claim differentiates cleanly from BI tools (audit data) and model-risk-management tools (audit algorithms) by baking the human-reasoning differentiator into the noun itself.
+- **The contrast sub-head** does the differentiator work the H1 alone can't carry. Use as the second sentence on the landing page and pitch deck slide 1.
+- **The asymmetric-tail body** captures the "very much might not but when it does, it's a big thing" insight that justifies running the audit on EVERY memo. Goes immediately below the contrast sub-head; never in the H1 itself.
+- **Do NOT** use "collaborative," "collaborator," "medium," or "protect outcomes" framings. **Banned drift targets** (per `BANNED_VOCABULARY` in `icp.ts`): `decision intelligence platform` (Gartner-crowded), `decision hygiene` (Kahneman's term), `boardroom strategic decision` (audience-narrowing), `company knowledge base` (dilutes the decision-specific moat), `AI decision tool` (generic SaaS tell), `AI-powered decision platform` (AI-powered prefix is a generic SaaS tell), and **`native reasoning layer`** (deprecated 2026-05-04 — failed Pursey 15-second test).
+- "Reasoning layer" stays valid in long-form technical writing where the architectural metaphor is load-bearing (e.g., explaining how DI sits between data infrastructure and decision execution), but it is NEVER the H1 or first impression. The category is "the reasoning audit platform"; "reasoning layer" is now legacy supporting vocabulary.
+- "Protected revenue" framing (per the 2026-04-27 lock) stays valid as a body-copy explainer but the H1 leads with the category claim, not the protected-revenue framing. The two layer cleanly: H1 = category, body = protected revenue.
 
 ## Positioning & Vocabulary (locked 2026-04-13)
 

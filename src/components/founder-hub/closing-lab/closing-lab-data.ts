@@ -385,9 +385,9 @@ export const SATYAM_PILLARS: SatyamPillar[] = [
     satyamQuote:
       'When you present a category of one, that comparison mechanism breaks down. There is nothing to compare it against. The prospect has to evaluate it on its own terms.',
     diApplication:
-      "Decision Intel is NOT 'an AI decision-intelligence platform' — that invites comparison to Cloverpop and Aera. It IS the 'native reasoning layer for every high-stakes call.' The reasoning-layer category does not exist yet; you are creating it. Cloverpop logs decisions; Decision Intel audits them.",
+      "Decision Intel is NOT 'an AI decision-intelligence platform' — that invites comparison to Cloverpop and Aera. It IS 'the reasoning audit platform' (locked 2026-05-04 category claim). The reasoning-audit-platform category does not exist yet; you are creating it. Cloverpop logs decisions; Decision Intel audits the reasoning behind them.",
     thisWeekMove:
-      'Strip every "AI decision-intelligence platform" and "decision intelligence" framing from cold-context surfaces. Replace with "reasoning layer" or "60-second audit on a strategic memo" per the cold-context-onramp rule.',
+      'Strip every "AI decision-intelligence platform" and "decision intelligence" framing from cold-context surfaces. Replace with "the reasoning audit platform" (warm) or "60-second audit on a strategic memo" (cold) per the cold-context-onramp rule.',
   },
   {
     id: 'us_vs_them_frame',
@@ -578,7 +578,7 @@ export const SIMPLIFIED_FUNNEL: FunnelStep[] = [
     label: 'Landing Page · The Hook',
     what: 'H1: "Bulletproof your IC Memo / CIM before the partners tear it apart." Massive center-page text box and PDF dropzone. "Paste your draft. Get the 3 fatal flaws in 60 seconds."',
     whatItIsNot:
-      'NO "native reasoning layer" abstraction. NO "X-framework compliance map" wall. NO category-creation framing for cold readers. The hook is fear, not category claims.',
+      'NO "the reasoning audit platform" abstraction. NO "X-framework compliance map" wall. NO category-creation framing for cold readers. The category-claim H1 is for warm-context marketing surfaces (landing page, pitch deck); the demo-funnel page leads with fear, not category.',
     action:
       'The visitor pastes their draft memo or drops a PDF. The 60-second progress bar starts immediately. No registration wall.',
   },
@@ -631,6 +631,6 @@ export const NEVER_SAY_PHRASES: NeverSayPhrase[] = [
     whyItKills:
       'Violates Satyam\'s "Category of One" rule by inviting direct comparison to Aera (which owns the analyst term) or Cloverpop. Drops you into a Gartner-crowded category where you lose on every dimension except technical depth — which they will not see.',
     saySteadInstead:
-      '"We are the Reasoning Layer for every high-stakes call. Cloverpop logs decisions. Decision Intel audits them. The category does not exist yet — we are creating it."',
+      '"Decision Intel is the reasoning audit platform. Most tools audit your data; we audit your reasoning — and catch the fatal blind spots in strategic memos before the committee does. Cloverpop logs decisions. We audit them. The category does not exist yet — we are creating it."',
   },
 ];

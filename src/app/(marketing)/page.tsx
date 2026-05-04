@@ -241,22 +241,37 @@ export default function LandingPage() {
                   marginBottom: 22,
                 }}
               >
-                The native reasoning layer for every{' '}
-                <span style={{ color: C.green, fontStyle: 'italic' }}>high-stakes call.</span>
+                Decision Intel is{' '}
+                <span style={{ color: C.green, fontStyle: 'italic' }}>
+                  the reasoning audit platform.
+                </span>
               </h1>
               <p
                 style={{
                   fontSize: 18,
                   color: C.slate600,
                   lineHeight: 1.6,
-                  marginBottom: 28,
-                  maxWidth: 540,
+                  marginBottom: 18,
+                  maxWidth: 560,
+                  fontWeight: 500,
                 }}
               >
-                Every strategic memo runs through a cognitive-bias audit grounded in 30+ biases from
-                Kahneman and Klein, calibrated against {HISTORICAL_CASE_COUNT} historical corporate
-                decisions. Decision Intel scores the reasoning, names the biases the room will catch
-                first, and shows exactly what shifts when you remove them.
+                Most tools audit your data. We audit your reasoning &mdash; and catch the fatal blind
+                spots in strategic memos before the committee does.
+              </p>
+              <p
+                style={{
+                  fontSize: 15,
+                  color: C.slate600,
+                  lineHeight: 1.6,
+                  marginBottom: 28,
+                  maxWidth: 560,
+                }}
+              >
+                Most strategic memos pass cleanly. The ones that don&rsquo;t are the ones that destroy
+                value. You can&rsquo;t tell the catastrophic memo from the clean memo without auditing
+                both. Built on {HISTORICAL_CASE_COUNT} historical corporate decisions and 30+ biases
+                from Kahneman and Klein.
               </p>
               <div
                 style={{

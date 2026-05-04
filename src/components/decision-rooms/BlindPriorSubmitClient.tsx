@@ -395,7 +395,7 @@ export function BlindPriorSubmitClient({ token, room, invite, existingPrior }: P
             textAlign: 'center',
           }}
         >
-          Powered by Decision Intel · the native reasoning layer for boardroom decisions.
+          Powered by Decision Intel · the reasoning audit platform.
         </p>
       </div>
     </main>

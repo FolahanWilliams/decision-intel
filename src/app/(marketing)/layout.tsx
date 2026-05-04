@@ -3,13 +3,13 @@ import { SOC2_JSON_LD_DATA_PROTECTION } from '@/lib/constants/trust-copy';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 
 export const metadata: Metadata = {
-  title: 'Decision Intel · The native reasoning layer for every high-stakes call',
+  title: 'Decision Intel · The reasoning audit platform',
   description:
     'Decision Intel audits every board memo, simulates steering-committee objections, runs what-if interventions, and compounds your team’s judgment into a living Decision Knowledge Graph, so decision quality, scalability, and reliability improve quarter after quarter.',
   openGraph: {
-    title: 'Decision Intel · The native reasoning layer for every high-stakes call',
+    title: 'Decision Intel · The reasoning audit platform',
     description:
-      'Governance on the reasoning layer, not just the data. Audit every strategic memo, simulate the boardroom, run what-if interventions, and compound your team’s judgment quarter after quarter.',
+      'Most tools audit your data. We audit your reasoning — and catch the fatal blind spots in strategic memos before the committee does. Simulate the boardroom, run what-if interventions, compound judgment quarter after quarter.',
     url: '/',
     siteName: 'Decision Intel',
     type: 'website',
@@ -17,17 +17,19 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Decision Intel · The native reasoning layer for every high-stakes call',
+    title: 'Decision Intel · The reasoning audit platform',
     description:
-      'Audit the reasoning behind every strategic memo. Simulate the boardroom. Run what-if interventions. Compound your team’s judgment quarter after quarter.',
+      'The reasoning audit platform. Catch the fatal blind spots in your strategic memo before the committee does. Simulate the boardroom. Run what-if interventions.',
   },
   keywords: [
-    // Category-creator positioning
-    'reasoning layer',
+    // Category-creator positioning (locked 2026-05-04 with the H1 pivot)
+    'reasoning audit platform',
+    'reasoning audit',
+    'fatal blind spots',
     'decision provenance record',
     'recognition-rigor framework',
     'strategic decision auditing',
-    'decision quality platform',
+    'cognitive bias audit',
     // Product identity
     'decision knowledge graph',
     'strategic memo audit',
@@ -44,7 +46,7 @@ export const metadata: Metadata = {
     // Compliance + trust
     'strategic decision governance',
     'compliance mapping SOX FCA',
-    'EU AI Act decision tool',
+    'EU AI Act audit',
     // Research-backed
     'Kahneman decision noise',
     'Tetlock forecasting',
@@ -75,7 +77,7 @@ const jsonLd = [
     operatingSystem: 'Web',
     url: siteUrl,
     description:
-      'The native reasoning layer for every high-stakes call. Decision Intel audits every strategic memo, simulates the questions the room will ask, runs what-if interventions, and compounds your team’s judgment into a living Decision Knowledge Graph so decision quality, scalability, and reliability improve quarter after quarter.',
+      'Decision Intel is the reasoning audit platform. Most tools audit your data; we audit your reasoning — and catch the fatal blind spots in strategic memos before the committee does. Simulates the questions the room will ask, runs what-if interventions, compounds your team’s judgment into a living Decision Knowledge Graph so decision quality improves quarter after quarter.',
     featureList: [
       'Decision Knowledge Graph: every strategic call, compounded in one living system',
       'AI boardroom simulation: CEO, CFO, and board objections rehearsed before the meeting',
@@ -143,7 +145,7 @@ const jsonLd = [
     url: siteUrl,
     logo: `${siteUrl}/logo.png`,
     description:
-      'Decision Intel is the native reasoning layer for every high-stakes call. Chief Strategy Officers, corporate development teams, and fund partners use Decision Intel to audit every strategic memo, simulate the questions the room will ask, run what-if interventions, and compound their team’s judgment into a living Decision Knowledge Graph.',
+      'Decision Intel is the reasoning audit platform. Chief Strategy Officers, corporate development teams, and fund partners use Decision Intel to catch the fatal blind spots in their strategic memos before the committee does — simulating the questions the room will ask, running what-if interventions, and compounding their team’s judgment into a living Decision Knowledge Graph.',
     foundingDate: '2024',
     sameAs: ['https://www.linkedin.com/company/decision-intel'],
     contactPoint: {
@@ -187,7 +189,7 @@ const jsonLd = [
         name: 'How is Decision Intel different from ChatGPT or a general AI assistant?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: `ChatGPT gives one opinion from one model: ungoverned, untraceable, unaudited. Decision Intel is the native reasoning layer underneath every high-stakes call. It measures the noise in your reasoning the same way Kahneman did in the insurance underwriter study, simulates an AI boardroom of CEO, CFO, and board personas, runs what-if interventions against a ${HISTORICAL_CASE_COUNT}-case public reference library, and compounds every confirmed outcome back into a calibrated Decision Quality Index your audit committee can defend. Not a chatbot; a reasoning layer, checkable from memo to outcome.`,
+          text: `ChatGPT gives one opinion from one model: ungoverned, untraceable, unaudited. Decision Intel is the reasoning audit platform. Most tools audit your data; we audit your reasoning — and catch the fatal blind spots in strategic memos before the committee does. It measures the noise in your reasoning the same way Kahneman did in the insurance underwriter study, simulates an AI boardroom of CEO, CFO, and board personas, runs what-if interventions against a ${HISTORICAL_CASE_COUNT}-case public reference library, and compounds every confirmed outcome back into a calibrated Decision Quality Index your audit committee can defend. Not a chatbot; a reasoning audit, checkable from memo to outcome.`,
         },
       },
     ],

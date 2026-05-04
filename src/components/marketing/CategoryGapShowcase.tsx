@@ -467,7 +467,7 @@ export function CategoryGapShowcase() {
               margin: '0 0 14px',
             }}
           >
-            The reasoning layer
+            The reasoning audit platform
           </p>
           <h2
             style={{

@@ -20,13 +20,15 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.c
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'Decision Intel | The native reasoning layer for every high-stakes call',
+    default: 'Decision Intel | The reasoning audit platform',
     template: '%s | Decision Intel',
   },
   description:
-    'The native reasoning layer for every high-stakes call. Audit the reasoning in every strategic memo, predict the questions the room will ask, and compound a living Decision Knowledge Graph quarter after quarter.',
+    'Decision Intel is the reasoning audit platform. Most tools audit your data; we audit your reasoning — and catch the fatal blind spots in strategic memos before the committee does. Compound a living Decision Knowledge Graph quarter after quarter.',
   keywords: [
-    'reasoning layer',
+    'reasoning audit platform',
+    'reasoning audit',
+    'fatal blind spots',
     'decision provenance record',
     'recognition-rigor framework',
     'corporate strategy',
@@ -40,16 +42,16 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     siteName: 'Decision Intel',
-    title: 'Decision Intel | The native reasoning layer for every high-stakes call',
+    title: 'Decision Intel | The reasoning audit platform',
     description:
-      'The native reasoning layer for every high-stakes call. Audit the reasoning in every strategic memo. See the questions the room will ask. Compound your team\u2019s judgment, quarter after quarter.',
+      'The reasoning audit platform. Most tools audit your data; we audit your reasoning \u2014 and catch the fatal blind spots in strategic memos before the committee does.',
     url: siteUrl,
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Decision Intel | The native reasoning layer for every high-stakes call',
+    title: 'Decision Intel | The reasoning audit platform',
     description:
-      'The native reasoning layer for every high-stakes call. Audit the reasoning in every strategic memo. See the questions the room will ask. Compound your team\u2019s judgment.',
+      'The reasoning audit platform. Most tools audit your data; we audit your reasoning \u2014 and catch the fatal blind spots in strategic memos before the committee does.',
   },
   robots: { index: true, follow: true },
   icons: {

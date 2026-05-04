@@ -505,7 +505,7 @@ function drawProvenanceFooter(
     MARGIN_L,
     footerY + 14
   );
-  const footerRight = `Decision Intel · the native reasoning layer for boardroom decisions`;
+  const footerRight = `Decision Intel · the reasoning audit platform`;
   doc.text(footerRight, PAGE_W - MARGIN_R, footerY + 14, { align: 'right' });
 }
 

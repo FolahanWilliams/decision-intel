@@ -26,7 +26,10 @@ import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
 import { CheckCircle2, Sparkles, Compass, ArrowRight, Activity } from 'lucide-react';
 import {
   POSITIONING_HERO_PRIMARY,
+  POSITIONING_HERO_CONTRAST,
+  POSITIONING_ASYMMETRIC_TAIL_BODY,
   POSITIONING_HERO_SECONDARY,
+  CATEGORY_CLAIM,
   IP_MOAT_NAME,
   IP_MOAT_DESCRIPTION,
   SPECIMEN_LIBRARY_DESCRIPTION,
@@ -277,13 +280,24 @@ function renderPositioningAnchor() {
   return (
     <div style={anchorStyle}>
       <div style={anchorEyebrow}>
-        <Compass size={11} /> Current positioning anchor — locked 2026-04-30 (GTM Plan v3.2)
+        <Compass size={11} /> Current positioning anchor — locked 2026-05-04 (CATEGORY-CLAIM PIVOT)
       </div>
       <div style={anchorRow}>
-        <strong>Primary hero:</strong> &ldquo;{POSITIONING_HERO_PRIMARY}&rdquo;
+        <strong>Category claim:</strong> {CATEGORY_CLAIM} (treated like R²F / DPR / DQI — protected,
+        never substituted with synonyms)
       </div>
       <div style={anchorRow}>
-        <strong>Secondary (regulatory):</strong> &ldquo;{POSITIONING_HERO_SECONDARY}&rdquo;
+        <strong>Primary H1:</strong> &ldquo;{POSITIONING_HERO_PRIMARY}&rdquo;
+      </div>
+      <div style={anchorRow}>
+        <strong>Contrast sub-head:</strong> &ldquo;{POSITIONING_HERO_CONTRAST}&rdquo;
+      </div>
+      <div style={anchorRow}>
+        <strong>Asymmetric-tail body:</strong> &ldquo;{POSITIONING_ASYMMETRIC_TAIL_BODY}&rdquo;
+      </div>
+      <div style={anchorRow}>
+        <strong>Secondary (cold investor + regulatory):</strong> &ldquo;
+        {POSITIONING_HERO_SECONDARY}&rdquo;
       </div>
       <div style={anchorRow}>
         <strong>IP moat:</strong> {IP_MOAT_NAME} — {IP_MOAT_DESCRIPTION}

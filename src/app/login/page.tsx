@@ -452,8 +452,8 @@ function LoginContent() {
               letterSpacing: '-0.025em',
             }}
           >
-            The native reasoning layer for{' '}
-            <span style={{ color: '#16A34A' }}>every high-stakes call.</span>
+            Decision Intel is{' '}
+            <span style={{ color: '#16A34A' }}>the reasoning audit platform.</span>
           </h2>
           <p
             style={{

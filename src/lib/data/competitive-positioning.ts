@@ -10,7 +10,7 @@ const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
 
 export const ELEVATOR_PITCH = {
   quote:
-    "You might be familiar with Cloverpop — they did a great job digitizing the decision-making workflow. We do something different: we are the native reasoning layer for every high-stakes call. Decision Quality Index in 60 seconds, Decision Provenance Record on every audit, Recognition-Rigor Framework (R²F) — Kahneman's debiasing plus Klein's Recognition-Primed Decisions, arbitrated in one pipeline.",
+    "You might be familiar with Cloverpop — they did a great job digitizing the decision-making workflow. We do something different: Decision Intel is the reasoning audit platform. Most tools audit your data; we audit your reasoning — and catch the fatal blind spots in strategic memos before the committee does. Decision Quality Index in 60 seconds, Decision Provenance Record on every audit, Recognition-Rigor Framework (R²F) — Kahneman's debiasing plus Klein's Recognition-Primed Decisions, arbitrated in one pipeline.",
   closing: `Cloverpop logs decisions. We audit the reasoning behind them. The Decision Provenance Record is hashed, tamper-evident, and mapped to ${FRAMEWORK_COUNT} regulatory frameworks across G7, EU, GCC, and African markets — the artefact your audit committee will eventually require evidence of, before regulators start asking.`,
 };
 
@@ -23,7 +23,7 @@ export const CATEGORY_CONTRAST = {
   },
   decisionIntel: {
     label: 'Decision Intel',
-    role: 'Native reasoning layer',
+    role: 'The reasoning audit platform',
     tagline: 'R²F audit on every memo — DQI in 60 seconds, DPR on every artefact',
     accent: '#16A34A',
   },

@@ -225,12 +225,13 @@ export default function DecisionIntelForBoardsPage() {
         {/* What it is */}
         <h2 style={h2Style}>What your CSO is proposing</h2>
         <p style={bodyStyle}>
-          Decision Intel is the native reasoning layer for every boardroom strategic decision. It
-          sits between the strategy team drafting a memo and the committee that will vote on it. In
-          roughly sixty seconds, it scores thirty-plus cognitive biases, predicts the questions the
-          CEO or board chair is most likely to ask, simulates five role-primed committee personas
-          against the memo, and attaches every decision to a Decision Knowledge Graph that compounds
-          over time.
+          Decision Intel is the reasoning audit platform. It sits between the strategy team drafting
+          a memo and the committee that will vote on it. Most tools audit your data; we audit the
+          reasoning &mdash; and catch the fatal blind spots before the committee does. In roughly
+          sixty seconds, it scores thirty-plus cognitive biases, predicts the questions the CEO or
+          board chair is most likely to ask, simulates five role-primed committee personas against
+          the memo, and attaches every decision to a Decision Knowledge Graph that compounds over
+          time.
         </p>
         <p style={bodyStyle}>
           Every audit produces a Decision Provenance Record: the hashed, tamper-evident,
@@ -436,8 +437,8 @@ export default function DecisionIntelForBoardsPage() {
         >
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <TrendingUp size={13} strokeWidth={2} />
-            Decision Intel · the reasoning layer the Fortune 500 needs before regulators start
-            asking
+            Decision Intel · the reasoning audit platform the Fortune 500 needs before EU AI Act
+            enforcement begins August 2026
           </span>
           <Link href="/" style={{ color: C.green, textDecoration: 'none', fontWeight: 600 }}>
             decision-intel.com

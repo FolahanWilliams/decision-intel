@@ -124,7 +124,7 @@ export const HONEST_PROBABILITY_PATH: RoadmapPhase[] = [
     quarter: 'Q4 2030',
     headline: '$100M ARR or $1B valuation — the unicorn outcome',
     framing:
-      '500 enterprise teams at ~$200K average ACV. Decision Intel is the irreplaceable native reasoning layer for global capital allocation. IPO path open; acquisition path priced at $1.5-3B from a strategic incumbent (IBM, Palantir, Salesforce, ServiceNow).',
+      '500 enterprise teams at ~$200K average ACV. Decision Intel is the irreplaceable reasoning audit platform for global capital allocation. IPO path open; acquisition path priced at $1.5-3B from a strategic incumbent (IBM, Palantir, Salesforce, ServiceNow).',
     targets: {
       logos: '500+ enterprise teams',
       arr: '£80M+ (US$100M+)',

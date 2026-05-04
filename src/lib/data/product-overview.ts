@@ -14,8 +14,8 @@ export interface ProductMetric {
 
 export const HERO = {
   eyebrow: 'Positioning',
-  headline: 'The native reasoning layer for every high-stakes call',
-  body: 'Audit the reasoning in every strategic memo, predict steering-committee objections before the meeting, and compound a living Decision Knowledge Graph quarter after quarter. Purpose-built for corporate strategy and M&A teams.',
+  headline: 'Decision Intel is the reasoning audit platform',
+  body: 'Most tools audit your data. We audit your reasoning — and catch the fatal blind spots in strategic memos before the committee does. Purpose-built for corporate strategy, M&A, and fund-investment teams.',
   pillars: [
     {
       label: 'Decision Knowledge Graph',

@@ -32,8 +32,8 @@ export type CategoryDefinition = {
 };
 
 export const CATEGORY_DEFINITION: CategoryDefinition = {
-  warmCategoryClaim: 'The native reasoning layer for every high-stakes call.',
-  coldDescriptive: '60-second AI audit on a strategic memo before the room sees it.',
+  warmCategoryClaim: 'Decision Intel is the reasoning audit platform.',
+  coldDescriptive: '60-second audit on a strategic memo before the room sees it.',
   whatItIs:
     'A native system of record for strategic reasoning. Every memo, IC thesis, board recommendation, fund decision is audited against the Recognition-Rigor Framework — Kahneman debiasing on one side, Klein recognition-primed pattern matching on the other, arbitrated by a Pro-tier meta-judge. The output is a Decision Quality Index, a hashed and tamper-evident Decision Provenance Record, and a counterfactual that names the exact biases the room would catch first.',
   whatItIsNot: [
@@ -63,7 +63,7 @@ export const CATEGORY_DEFINITION: CategoryDefinition = {
     {
       context: 'Bridge sentence (the cold → warm conversion, 10-second move)',
       useThisLanguage:
-        '"We run 60-second audits on strategic memos. The technical name is a reasoning layer — Recognition-Rigor Framework, scored as a Decision Quality Index."',
+        '"We run 60-second audits on strategic memos. The category name is the reasoning audit platform — Recognition-Rigor Framework, scored as a Decision Quality Index."',
       example:
         'Use this transition the moment the cold reader leans in. By minute 3 of the meeting they should be using the warm vocabulary — DPR, R²F, DQI — without it sounding foreign.',
     },
@@ -71,7 +71,7 @@ export const CATEGORY_DEFINITION: CategoryDefinition = {
       context:
         'Warm (second meeting onward, pitch decks, design-partner conversations, internal Founder Hub)',
       useThisLanguage:
-        '"Native reasoning layer for every high-stakes call." "Recognition-Rigor Framework arbitrating Kahneman + Klein." "Decision Quality Index in 60 seconds." "Hashed + tamper-evident Decision Provenance Record."',
+        '"Decision Intel is the reasoning audit platform." "Most tools audit your data; we audit your reasoning — and catch the fatal blind spots in strategic memos before the committee does." "Recognition-Rigor Framework arbitrating Kahneman + Klein." "Decision Quality Index in 60 seconds." "Hashed + tamper-evident Decision Provenance Record."',
       example:
         '"Slide 2: We are the only platform combining Kahneman\'s debiasing methodology with Klein\'s Recognition-Primed Decision framework — suppressing bias while amplifying expert intuition."',
     },
@@ -128,7 +128,7 @@ export const PERSONA_PITCH_LIBRARY: PersonaPitch[] = [
     theirPain:
       'Unmanaged legal exposure. Reuters-headline risk. Upcoming AI regulation (EU AI Act Aug 2, 2026 enforcement on high-risk decision-support; Basel III ICAAP qualitative-decision documentation; SOX §404 internal controls; GDPR Art 22).',
     pitch:
-      '"Decision Intel is the reasoning layer the Fortune 500 needs before regulators start asking. Every bias flag we surface is cross-mapped to 17 global regulatory frameworks. We provide a hashed, tamper-evident Decision Provenance Record for every memo. If you need to satisfy EU AI Act Article 14 record-keeping, or African regimes like NDPR / CBN / WAEMU, your audit committee doesn\'t have to take the tool on faith — they review each flag against its cited regulatory source in a single artefact."',
+      '"Decision Intel is the reasoning audit platform the Fortune 500 needs before EU AI Act enforcement begins August 2026. Every bias flag we surface is cross-mapped to 19 global regulatory frameworks. We provide a hashed, tamper-evident Decision Provenance Record for every memo. If you need to satisfy EU AI Act Article 14 record-keeping, or African regimes like NDPR / CBN / WAEMU, your audit committee doesn\'t have to take the tool on faith — they review each flag against its cited regulatory source in a single artefact."',
     closingMove:
       'Hand over the DPR specimen + the Terms appendix + the DPA template. "Send these to your vendor-risk register. We will respond in writing to every question within 48 hours."',
   },
@@ -138,7 +138,7 @@ export const PERSONA_PITCH_LIBRARY: PersonaPitch[] = [
     theirPain:
       'Pattern-match risk. Founder-continuity risk. Category-clarity risk. They want a clear unicorn-shape ICP with a structural moat, an honest path with conditional probabilities, and a procurement-grade traction signal. They want NOT another "AI for X" pitch.',
     pitch:
-      '"Native reasoning layer for every high-stakes call. Recognition-Rigor Framework operationalising 50 years of Nobel-winning behavioral economics. 17-framework regulatory map across G7 / EU / GCC / African markets — EU AI Act Article 14 enforcement is Aug 2, 2026. Our wedge is Pan-African EM funds; our ceiling is Fortune 500 CSOs. Conditional probability of unicorn outcome is 0.79% — 4× the pre-seed B2B baseline. Most likely outcome is Series-B-stage strategic acquisition at $400M-1B by Q4 2029."',
+      '"Decision Intel is the reasoning audit platform. Most tools audit your data; we audit your reasoning — and catch the fatal blind spots in strategic memos before the committee does. Recognition-Rigor Framework operationalising 50 years of Nobel-winning behavioral economics. 19-framework regulatory map across G7 / EU / GCC / African markets — EU AI Act Article 14 enforcement is Aug 2, 2026. Our wedge is Individual buyers @ £249/mo; our ceiling is Fortune 500 CSOs. Conditional probability of unicorn outcome is 0.79% — 4× the pre-seed B2B baseline. Most likely outcome is Series-B-stage strategic acquisition at $400M-1B by Q4 2029."',
     closingMove:
       'Show them the HonestProbabilityPath conditional-probability slide + the Hard Truth Risks tracker. "Honest math, named tripwires. Your fund will not get this clarity from another pre-seed pitch this quarter."',
   },
@@ -159,7 +159,7 @@ export const PERSONA_PITCH_LIBRARY: PersonaPitch[] = [
     theirPain:
       'AI-native disruption eating their existing assurance services. EU AI Act creating a new compliance category they cannot serve fast enough. EM-region client demand without local capacity (LRQA × Partner Africa April 2026).',
     pitch:
-      '"You provide global assurance. Decision Intel provides the AI-native reasoning-audit layer that lives inside that assurance — the EU AI Act Article 14 record-keeping artefact your enterprise clients are already required to produce. We are not a competitor to your service revenue; we are the technology layer that makes your existing service line the answer to the EU AI Act question."',
+      '"You provide global assurance. Decision Intel is the reasoning audit platform that lives inside that assurance — the EU AI Act Article 14 record-keeping artefact your enterprise clients are already required to produce. We are not a competitor to your service revenue; we are the technology layer that makes your existing service line the answer to the EU AI Act question."',
     closingMove:
       'Frame as a category conversation, not a vendor pitch. "What would a 90-day co-pilot inside one of your existing service lines look like?"',
   },

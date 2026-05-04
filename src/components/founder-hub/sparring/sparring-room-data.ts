@@ -668,9 +668,9 @@ export const GRADING_DIMENSIONS: GradingDimension[] = [
     label: 'Vocabulary discipline',
     source: 'di_discipline',
     excellentLooks:
-      'Uses the right vocab for reader temperature. Cold context → descriptive plain-language hooks (60-second audit, pre-IC bias detection). Warm context → locked vocabulary (reasoning layer, R²F, DPR). NEVER uses banned phrases (decision intelligence platform, decision hygiene, boardroom strategic decision).',
+      'Uses the right vocab for reader temperature. Cold context → descriptive plain-language hooks (60-second audit, pre-IC bias detection). Warm context → locked vocabulary (the reasoning audit platform, R²F, DPR, fatal blind spots). NEVER uses banned phrases (decision intelligence platform, decision hygiene, boardroom strategic decision, AI decision tool, native reasoning layer).',
     poorLooks:
-      "Drops 'reasoning layer' or 'R²F' on a cold buyer who has no context. Or uses 'decision intelligence platform' (Gartner-crowded). Or 'decision hygiene' (Kahneman's term — borrowing it cedes our category vocabulary).",
+      "Drops 'the reasoning audit platform' or 'R²F' on a cold buyer who has no context. Or uses 'decision intelligence platform' (Gartner-crowded). Or 'decision hygiene' (Kahneman's term — borrowing it cedes our category vocabulary). Or 'native reasoning layer' (deprecated 2026-05-04 — failed Pursey 15-second test).",
     weight: 0.06,
   },
   {
@@ -797,10 +797,18 @@ export const DI_BANNED_VOCABULARY = [
   'early days',
 ];
 
-/** Locked DI vocabulary — counts as positive in WARM contexts only. */
+/** Locked DI vocabulary — counts as positive in WARM contexts only.
+ *  Refreshed 2026-05-04 with the category-claim pivot: "the reasoning audit
+ *  platform" is now the canonical category claim. "Reasoning layer" stays
+ *  in this list as legacy long-form vocabulary (some technical writing
+ *  still uses it) but it's no longer the H1. */
 export const DI_LOCKED_VOCABULARY = [
+  'the reasoning audit platform',
+  'reasoning audit platform',
+  'reasoning audit',
+  'fatal blind spots',
+  'before the committee does',
   'reasoning layer',
-  'native reasoning layer',
   'recognition-rigor framework',
   'r²f',
   'r2f',

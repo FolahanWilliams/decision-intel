@@ -61,11 +61,36 @@ const BANNED = [
   // walked away from on 2026-04-22.
   {
     pattern: /\bdecision intelligence platform\b/i,
-    label: '"decision intelligence platform" (Gartner-crowded; use "native reasoning layer")',
+    label: '"decision intelligence platform" (Gartner-crowded; use "the reasoning audit platform")',
   },
   {
     pattern: /\bhuman-AI governance (system|layer)?\b/i,
     label: '"human-AI governance" (retired 2026-04-22)',
+  },
+  // Category-claim pivot 2026-05-04: deprecated the "native reasoning layer"
+  // framing because it failed Pursey's 15-second test. The new category
+  // claim is "the reasoning audit platform". These three patterns are
+  // banned on marketing surfaces but kept legal in:
+  //   - icp.ts (BANNED_VOCABULARY data + deprecation comment)
+  //   - founder-context.ts (chat coaching uses the old phrase as a
+  //     teaching example of what NOT to use)
+  //   - founder-school lessons.ts (curriculum text references the
+  //     deprecated phrase by way of explaining the pivot)
+  // Scan roots are already restricted to (marketing) + components/marketing
+  // + case-studies, so those internal files are out-of-scope by default.
+  {
+    pattern: /\bnative reasoning layer\b/i,
+    label:
+      '"native reasoning layer" (DEPRECATED 2026-05-04 — failed Pursey 15-second test; use "the reasoning audit platform")',
+  },
+  {
+    pattern: /\bAI decision tool\b/i,
+    label: '"AI decision tool" (generic SaaS tell — too crowded; use "the reasoning audit platform")',
+  },
+  {
+    pattern: /\bAI-powered decision (platform|tool|system)\b/i,
+    label:
+      '"AI-powered decision X" (generic SaaS prefix — drop "AI-powered"; use "the reasoning audit platform")',
   },
 
   // Stage-of-company language banned on marketing surfaces.

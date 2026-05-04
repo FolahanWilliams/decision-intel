@@ -19,7 +19,7 @@ export const SIMPLIFIED_FUNNEL: FunnelScreen[] = [
     name: 'Landing · the hook',
     // drift-tolerant — banned-phrase example (the count is a quote demonstrating
     // what NOT to lead with on cold-context surfaces).
-    what: 'No "native reasoning layer." No "17 frameworks." Above-the-fold = a single H1 that names the buyer\'s acute fear.',
+    what: 'No "the reasoning audit platform." No "19 frameworks." Above-the-fold = a single H1 that names the buyer\'s acute fear. The category-claim H1 lives on the marketing site for warm-context readers; the funnel-page H1 leads with pain.',
     action:
       'H1: "Bulletproof your IC memo / CIM before the partners tear it apart." Hero: massive textbox + PDF dropzone. Sub-CTA: "Paste your draft. Get the 3 fatal flaws in 60 seconds."',
     whatToHide: [

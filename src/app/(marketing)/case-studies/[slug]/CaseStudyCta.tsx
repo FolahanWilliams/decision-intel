@@ -127,7 +127,7 @@ export function CaseStudyCta({ slug, company, hasDeepAnalysis }: CaseStudyCtaPro
       <p style={{ fontSize: 14, color: C.slate400, marginBottom: 20, lineHeight: 1.6 }}>
         Upload a strategic memo or board deck. Get the same{' '}
         {hasDeepAnalysis ? 'hindsight-stripped analysis' : 'bias audit'} you just saw for {company},
-        on your own high-stakes call, in under 60 seconds.
+        on your own next decision, in under 60 seconds.
       </p>
 
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 16 }}>

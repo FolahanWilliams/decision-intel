@@ -192,11 +192,12 @@ export const AUDIENCE_PITCHES: AudiencePitch[] = [
     audience: 'Chief Strategy Officer (Individual £249/mo wedge)',
     seconds: 35,
     pitch:
-      "Decision Intel is the native reasoning layer for every high-stakes call your strategy office makes. Upload a board memo, get an R²F audit (Recognition-Rigor Framework — Kahneman's debiasing plus Klein's Recognition-Primed Decisions, arbitrated in one pipeline) and a Decision Quality Index in 60 seconds. Entry tier is £249/mo Individual — fits in your t-card budget, no procurement gate, frictionless. Before you say yes, let me run a live audit on a document you already know — the WeWork S-1 from 2019 — so you see the work, not the pitch.",
+      "Decision Intel is the reasoning audit platform. Most tools audit your data; we audit your reasoning — and catch the fatal blind spots in strategic memos before the committee does. Upload a board memo, get an R²F audit (Kahneman's debiasing + Klein's Recognition-Primed Decisions, arbitrated in one pipeline) and a Decision Quality Index in 60 seconds. Entry tier is £249/mo Individual — fits in your t-card budget, no procurement gate, frictionless. Before you say yes, let me run a live audit on a document you already know — the WeWork S-1 from 2019 — so you see the work, not the pitch.",
     color: '#16A34A',
     emphasis: [
-      'native reasoning layer',
-      'high-stakes call',
+      'the reasoning audit platform',
+      'we audit your reasoning, not your data',
+      'fatal blind spots before the committee does',
       '£249/mo Individual · t-card · no procurement gate',
       'WeWork S-1',
       'see the work, not the pitch',
@@ -233,10 +234,10 @@ export const AUDIENCE_PITCHES: AudiencePitch[] = [
     id: 'board',
     audience: 'Board / Audit Committee',
     seconds: 60,
-    pitch: `Decision Intel is the reasoning layer the Fortune 500 needs before regulators start asking. Every audit produces a Decision Provenance Record — hashed, tamper-evident, mapped to the regulatory provision it touches across ${FRAMEWORK_COUNT} frameworks (EU AI Act Article 14 record-keeping, SEC AI disclosure, Basel III Pillar 2 ICAAP, GDPR Article 22, NDPR, CBN, WAEMU, SOX §404, plus more). The DPR is the artefact your audit committee will eventually require evidence of. We ship it on every audit, today, before the regulator asks.`,
+    pitch: `Decision Intel is the reasoning audit platform the Fortune 500 needs before EU AI Act enforcement begins August 2026. Every audit produces a Decision Provenance Record — hashed, tamper-evident, mapped to the regulatory provision it touches across ${FRAMEWORK_COUNT} frameworks (EU AI Act Article 14 record-keeping, SEC AI disclosure, Basel III Pillar 2 ICAAP, GDPR Article 22, NDPR, CBN, WAEMU, SOX §404, plus more). The DPR is the artefact your audit committee will eventually require evidence of. We ship it on every audit, today, before the regulator asks.`,
     color: '#F59E0B',
     emphasis: [
-      'reasoning layer the Fortune 500 needs before regulators start asking',
+      'the reasoning audit platform the Fortune 500 needs before regulators ask',
       'Decision Provenance Record',
       `${FRAMEWORK_COUNT} frameworks`,
     ],
@@ -1420,7 +1421,7 @@ export const STRATEGIC_THINKING_PRINCIPLES: StrategicPrinciple[] = [
     summary:
       'In some situations, the key time for strategic maneuvering is while the GROUND RULES of the game are being decided — not while playing the game.',
     diApplication:
-      "The enterprise AI governance and decision-intelligence categories are crystallising right now. By positioning Decision Intel explicitly as the 'native reasoning layer' — differentiating from Aera (operational automation) and Cloverpop (decision logging) — you establish the ground rules of the category in your favour BEFORE competitors define them for you. The R²F (Recognition-Rigor Framework) IP claim is the same move applied to the academic anchor: you claim the Kahneman+Klein synthesis territory before someone else does.",
+      "The enterprise AI governance and decision-intelligence categories are crystallising right now. By positioning Decision Intel explicitly as 'the reasoning audit platform' (locked 2026-05-04 category claim) — differentiating from Aera (operational automation) and Cloverpop (decision logging) — you establish the ground rules of the category in your favour BEFORE competitors define them for you. The R²F (Recognition-Rigor Framework) IP claim is the same move applied to the academic anchor: you claim the Kahneman+Klein synthesis territory before someone else does.",
     whenItBites:
       'Right now, in 2026. The window for setting ground rules closes when one of Cloverpop / IBM watsonx / Aera defines the category. Every published-for-procurement piece of work (DPR, Bias Genome, /how-it-works) is a ground-rule-setting move.',
   },

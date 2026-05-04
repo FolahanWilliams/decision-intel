@@ -74,16 +74,19 @@ WHO IS WRITING (voice anchors — only claim what's on this list):
 const EMPATHIC_MODE_FIRST = `
 EMPATHIC-MODE-FIRST RULE (META — applies to every post):
 A LinkedIn / X reader is COLD context — they have NOT earned the locked
-category vocabulary yet. NEVER lead with "DPR", "DQI", "R²F", "reasoning
-layer", or "Decision Knowledge Graph" as the first impression. Lead with
-the buyer's PAIN in the buyer's WORDS — the panic of a hostile committee
+category vocabulary yet. NEVER lead with "DPR", "DQI", "R²F", "the reasoning
+audit platform", or "Decision Knowledge Graph" as the first impression. Lead
+with the buyer's PAIN in the buyer's WORDS — the panic of a hostile committee
 question they can't answer, the commission at risk if a deal goes sideways,
 the LP letter they don't want to write. Earn the term across the bridge
-sentence first, then introduce platform vocabulary in the second half if
+sentence first, then introduce the category claim in the second half if
 at all. Cold-context on-ramps: ${COLD_CONTEXT_ONRAMPS.join(' / ')}.
 
 If you write a post that opens with platform vocabulary, you have failed
 this rule. Rewrite from the reader's career anxiety, not the product feature.
+The category claim ("Decision Intel is the reasoning audit platform") is
+the WARM-CONTEXT closer once the cold reader has earned the term — never
+the cold opener.
 `.trim();
 
 // ─── Protected-revenue framing rule ─────────────────────────────────────────

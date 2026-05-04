@@ -4,11 +4,11 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'Terms of Service | Decision Intel',
   description:
-    'Terms and conditions for using Decision Intel, the native reasoning layer for every high-stakes call across corporate strategy, M&A, and fund-investment teams.',
+    'Terms and conditions for using Decision Intel, the reasoning audit platform for corporate strategy, M&A, and fund-investment teams.',
   openGraph: {
     title: 'Terms of Service | Decision Intel',
     description:
-      'Terms and conditions for using Decision Intel, the native reasoning layer for every high-stakes call across corporate strategy, M&A, and fund-investment teams.',
+      'Terms and conditions for using Decision Intel, the reasoning audit platform for corporate strategy, M&A, and fund-investment teams.',
   },
 };
 
@@ -68,12 +68,11 @@ export default function TermsOfServicePage() {
               2. Description of Service
             </h2>
             <p>
-              Decision Intel is the native reasoning layer for every high-stakes call. The Platform
-              analyzes strategic documents for cognitive bias and decision noise, and provides bias
-              detection, noise scoring, decision quality indexing, outcome tracking, and related
-              analytics tools. Analysis results are generated with the assistance of
-              machine-learning models and should be used as a supplement to, not a replacement for,
-              professional judgment.
+              Decision Intel is the reasoning audit platform. The Platform analyzes strategic
+              documents for cognitive bias and decision noise, and provides bias detection, noise
+              scoring, decision quality indexing, outcome tracking, and related analytics tools.
+              Analysis results are generated with the assistance of machine-learning models and
+              should be used as a supplement to, not a replacement for, professional judgment.
             </p>
           </section>
 

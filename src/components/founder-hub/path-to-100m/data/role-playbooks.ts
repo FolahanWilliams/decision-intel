@@ -229,7 +229,7 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       "You get paid on close. A PE buyer's IC catching one bad assumption drops your valuation 10-20% — that's your commission. £499 per deal, 60 seconds, runs the Dr Red Team that simulates the buyer's IC review. Cheaper than one hour of legal work. Pays for itself the first time we catch something that would have killed your commission.",
     threePhrasesNeverToSay: [
       '"Decision Quality Index" — they think in valuation multiple and commission, not abstract scores',
-      '"Native reasoning layer" — too abstract for a deal-cadence business',
+      '"Reasoning audit platform" — works for procurement-grade buyers but feels too abstract for a deal-cadence business; default to "60-second audit, £499 per deal"',
       '"Subscription tier with seats" — wrong economic model · per-deal pricing matches their reality',
     ],
     meetingArc: [
@@ -457,7 +457,7 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       coldOpener:
         '60-second audit on a strategic memo. Attached: an anonymised Decision Provenance Record on the 2014 Dangote Pan-African expansion plan. Same audit fires on your IC memos in 60 seconds. Worth a 20-minute call to walk you through one of yours?',
       coldBlunder:
-        '"Decision intelligence platform powered by AI" — generic SaaS framing reads as US-import noise; the partner deletes the message in 3 seconds. NEVER lead cold with "reasoning layer," R²F, DPR, or DQI as first impressions.',
+        '"Decision intelligence platform powered by AI" — generic SaaS framing reads as US-import noise; the partner deletes the message in 3 seconds. NEVER lead cold with "the reasoning audit platform," R²F, DPR, or DQI as first impressions — earn the term in the bridge sentence first.',
       warmIntroPath:
         'Wiz advisor → Pan-African fund partners in his network → 30-min framing call → live audit on a redacted IC memo from a deal of theirs that went sideways.',
     },
@@ -877,7 +877,7 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
     artefactToLead:
       'DPR specimen + Terms appendix from the public Enterprise Quote PDF + the /security regulatory-tailwinds page + the /privacy GDPR-Art-13 mandatory-disclosure block. The GC reads regulatory artefacts, not product demos.',
     killerPitch:
-      `Decision Intel is the reasoning layer the Fortune 500 needs before regulators start asking. EU AI Act Art 14 record-keeping. Basel III Pillar 2 ICAAP qualitative-decision documentation. SOX §404 internal controls. ${FW} frameworks mapped flag-by-flag. Hashed and tamper-evident DPR on every audit. Your audit committee does not have to take the tool on faith — they review each flag against its cited regulatory source in a single artefact.`,
+      `Decision Intel is the reasoning audit platform the Fortune 500 needs before EU AI Act enforcement begins August 2026. EU AI Act Art 14 record-keeping. Basel III Pillar 2 ICAAP qualitative-decision documentation. SOX §404 internal controls. ${FW} frameworks mapped flag-by-flag. Hashed and tamper-evident DPR on every audit. Your audit committee does not have to take the tool on faith — they review each flag against its cited regulatory source in a single artefact.`,
     threePhrasesNeverToSay: [
       '"AI does the work" — GC hears liability. Frame as "the human decision-maker is in control; AI provides the audit layer they are required to produce anyway."',
       '"It is just for strategic memos" — narrows scope; the GC needs the same governance for M&A theses, fund IC memos, board recommendations',
@@ -1134,7 +1134,7 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
     artefactToLead:
       'For LRQA: the LrqaTab brief inside the Founder Hub (already detailed). For other firms: the 17-framework regulatory map + the EU AI Act Art 14 mapping + the R²F architecture overview. NOT a product demo first — a category conversation.',
     killerPitch:
-      'You provide global assurance. Decision Intel provides the AI-native reasoning-audit layer that lives inside that assurance — the EU AI Act Article 14 record-keeping artefact your enterprise clients are already required to produce. We are not a competitor to your service revenue; we are the technology layer that makes your existing service line the answer to the EU AI Act question.',
+      'You provide global assurance. Decision Intel is the reasoning audit platform that lives inside that assurance — the EU AI Act Article 14 record-keeping artefact your enterprise clients are already required to produce. We are not a competitor to your service revenue; we are the technology layer that makes your existing service line the answer to the EU AI Act question.',
     threePhrasesNeverToSay: [
       '"We will go direct to your clients" — channel partnerships die on this signal',
       '"We replace your assurance work" — never; we layer onto their service',
@@ -1143,7 +1143,7 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
     meetingArc: [
       {
         minute: '0:00-2:00',
-        move: 'Frame: peer-level category conversation. "We are the AI-native reasoning-audit layer that fits inside your service stack."',
+        move: 'Frame: peer-level category conversation. "We are the reasoning audit platform that fits inside your service stack."',
       },
       {
         minute: '2:00-10:00',
@@ -1259,9 +1259,9 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
       ],
     },
     artefactToLead:
-      'A 12-slide pre-seed deck — H1: native reasoning layer for every high-stakes call · slide 2: R²F intellectual moat (Kahneman + Klein) · slide 3: regulatory tailwinds (EU AI Act Aug 2026, SEC, Basel III) · slide 4: ICP wedge (Individual £249/mo · UK + US) → bridge (Sankore Design Foundation) → ceiling (F500 corp dev M&A · cross-border · 19-framework map differentiator) · slides 5-9: product · slide 10: HonestProbabilityPath + 16 metrics · slide 11: vendor continuity playbook · slide 12: ask + use of funds.',
+      'A 12-slide pre-seed deck — H1: Decision Intel is the reasoning audit platform · slide 2: R²F intellectual moat (Kahneman + Klein) · slide 3: regulatory tailwinds (EU AI Act Aug 2026, SEC, Basel III) · slide 4: ICP wedge (Individual £249/mo · UK + US) → bridge (Sankore Design Foundation) → ceiling (F500 corp dev M&A · cross-border · 19-framework map differentiator) · slides 5-9: product · slide 10: HonestProbabilityPath + 16 metrics · slide 11: vendor continuity playbook · slide 12: ask + use of funds.',
     killerPitch:
-      'Decision Intel is the native reasoning layer for every high-stakes call. We catch the cognitive bias McKinsey charges $1M to find — and McKinsey has the same biases themselves. Our wedge is Individual UK + US CSOs / M&A heads / corp dev directors at £249/mo (frictionless, no procurement gate); Sankore (Pan-African fund, London office, summer 2026) is the design-partner bridge that produces reference DPRs; the ceiling is F500 corporate strategy + corp dev M&A at £50K-150K ACV — cross-border M&A specifically, where the 19-framework regulatory map (Pan-African + G7/EU/GCC) becomes a moat layer no US-only incumbent carries. Timing: EU AI Act Article 14 enforcement Aug 2, 2026. The Recognition-Rigor Framework operationalising Kahneman + Klein gives us a defensible IP moat no incumbent has matched in 16 years of academic debate. Goal: $30M+ founder cash exit by 2031-2033 at a £30-95M EV strategic acquisition (8-12× ARR multiple), 35-55% probability range. Most likely acquirers: LRQA, IBM watsonx.governance arm, Big-4 governance practice.',
+      'Decision Intel is the reasoning audit platform. Most tools audit your data; we audit your reasoning — and catch the fatal blind spots in strategic memos before the committee does. We catch the cognitive bias McKinsey charges $1M to find — and McKinsey has the same biases themselves. Our wedge is Individual UK + US CSOs / M&A heads / corp dev directors at £249/mo (frictionless, no procurement gate); Sankore (Pan-African fund, London office, summer 2026) is the design-partner bridge that produces reference DPRs; the ceiling is F500 corporate strategy + corp dev M&A at £50K-150K ACV — cross-border M&A specifically, where the 19-framework regulatory map (Pan-African + G7/EU/GCC) becomes a moat layer no US-only incumbent carries. Timing: EU AI Act Article 14 enforcement Aug 2, 2026. The Recognition-Rigor Framework operationalising Kahneman + Klein gives us a defensible IP moat no incumbent has matched in 16 years of academic debate. Goal: $30M+ founder cash exit by 2031-2033 at a £30-95M EV strategic acquisition (8-12× ARR multiple), 35-55% probability range. Most likely acquirers: LRQA, IBM watsonx.governance arm, Big-4 governance practice.',
     threePhrasesNeverToSay: [
       '"Disrupting strategy consulting" — investor hears "competing with McKinsey/BCG/Bain"; instant skepticism',
       '"For everyone making decisions" — non-segment, instant disqualification',
@@ -1270,7 +1270,7 @@ export const ROLE_PLAYBOOKS: RolePlaybook[] = [
     meetingArc: [
       {
         minute: '0:00-2:00',
-        move: 'Frame: native reasoning layer + Individual £249/mo wedge + Sankore design-partner bridge + EU AI Act Aug 2026 timing. Note: NOT "Pan-African wedge" — that was the v3.1 framing; v3.2 lock has Pan-African as cross-border M&A differentiator (moat layer for the F500 ceiling), not the GTM wedge.',
+        move: 'Frame: the reasoning audit platform + Individual £249/mo wedge + Sankore design-partner bridge + EU AI Act Aug 2026 timing. Note: NOT "Pan-African wedge" — that was the v3.1 framing; v3.2 lock has Pan-African as cross-border M&A differentiator (moat layer for the F500 ceiling), not the GTM wedge.',
       },
       {
         minute: '2:00-10:00',

@@ -128,7 +128,7 @@ export const DECKS: EducationDeck[] = [
     id: 'di_vocabulary',
     label: 'DI Vocabulary',
     description:
-      'Locked terms (reasoning layer, R²F, DPR, DQI), banned phrases with cold-context bridges, and the warm/cold reader-temperature discipline.',
+      'Locked terms (the reasoning audit platform, R²F, DPR, DQI), banned phrases with cold-context bridges, and the warm/cold reader-temperature discipline.',
     iconName: 'BookOpen',
     color: '#16A34A',
     order: 1,
@@ -287,12 +287,12 @@ const DI_VOCABULARY_CARDS: EducationCard[] = [
     deckId: 'di_vocabulary',
     prompt: 'What is the canonical category claim for Decision Intel?',
     canonicalAnswer:
-      'The native reasoning layer for every high-stakes call. "Reasoning layer" is the ownable category anchor. "Native" does the "built for this, not retrofitted" work. "High-stakes call" is the universal noun phrase that lands across all six buyer personas (CSO, head of strategic planning, M&A partner, fund analyst, GC, board director).',
-    hint: 'Think category-creator language, not feature-list.',
+      'Decision Intel is the reasoning audit platform. (Locked 2026-05-04 — replaces "the native reasoning layer for every high-stakes call" which failed James Pursey\'s 15-second test.) The category claim is THE platform, not A platform — it claims category ownership the way "Stripe is the payments infrastructure for the internet" does. Three words; every term resolves immediately for a stranger: software (platform) that audits (audit) human thinking (reasoning). Differentiated cleanly from BI tools (which audit data) and model-risk tools (which audit algorithms). The contrast sub-head used as the second sentence on landing + pitch deck: "Most tools audit your data. We audit your reasoning — and catch the fatal blind spots in strategic memos before the committee does." Treat "the reasoning audit platform" as protected vocabulary alongside R²F / DPR / DQI — never substitute synonyms in shipped surfaces.',
+    hint: 'Category-creator language, not feature-list. Three words.',
     difficulty: 'foundation',
     applicationContext:
-      'You are introducing Decision Intel to a warm-context F500 CSO who has had a prior meeting.',
-    source: 'CLAUDE.md One-liner section',
+      'You are introducing Decision Intel to a warm-context F500 CSO who has had a prior meeting, OR drafting the H1 for a marketing surface, OR opening pitch deck slide 1.',
+    source: 'CLAUDE.md One-liner section + icp.ts CATEGORY_CLAIM',
     tag: 'locked',
   },
   {
@@ -370,7 +370,7 @@ const DI_VOCABULARY_CARDS: EducationCard[] = [
     prompt:
       'Why is "decision intelligence platform" BANNED in marketing leads, and what do you say instead?',
     canonicalAnswer:
-      'Gartner-crowded category. Cloverpop, Peak.ai, Quantellia, Aera all claim the same descriptor. Using it locks Decision Intel into a price-comparison frame against incumbents who have more proof. Replacement: "native reasoning layer" (warm context) or "60-second audit on strategic memos" (cold context). "Decision intelligence" is fine as a descriptor INSIDE a sentence, never as the headline claim.',
+      'Gartner-crowded category. Cloverpop, Peak.ai, Quantellia, Aera all claim the same descriptor. Using it locks Decision Intel into a price-comparison frame against incumbents who have more proof. Replacement: "the reasoning audit platform" (warm context, locked 2026-05-04) or "60-second audit on strategic memos" (cold context). "Decision intelligence" is fine as a descriptor INSIDE a sentence, never as the headline claim.',
     difficulty: 'core',
     applicationContext:
       'You catch yourself about to say "decision intelligence platform" in a cold meeting.',
@@ -406,7 +406,7 @@ const DI_VOCABULARY_CARDS: EducationCard[] = [
     prompt:
       'For a COLD context (LinkedIn DM, conference 1:1, landing-page above-the-fold for unaware traffic), what is the canonical descriptive bridge?',
     canonicalAnswer:
-      '"60-second audit on a strategic memo." Or "pre-IC audit layer." Or "strategic memo audits." Or "decision quality auditing." Plain language, no acronyms, no platform vocabulary. NEVER lead cold with "reasoning layer" / "R²F" / "DPR" — the reader has not earned the term yet and will scroll past. The bridge sentence that converts cold→warm in two beats: "We run 60-second audits on strategic memos. The technical name is a reasoning layer — Recognition-Rigor Framework, scored as a Decision Quality Index."',
+      '"60-second audit on a strategic memo." Or "pre-IC audit." Or "strategic memo audits." Or "reasoning audit." Plain language, no acronyms, no platform vocabulary. NEVER lead cold with "the reasoning audit platform" / "R²F" / "DPR" — the reader has not earned the term yet and will scroll past. The bridge sentence that converts cold→warm in two beats: "We run 60-second audits on strategic memos. The category name is the reasoning audit platform — Recognition-Rigor Framework, scored as a Decision Quality Index."',
     difficulty: 'core',
     applicationContext: 'Drafting a cold LinkedIn DM to a CSO you have never met.',
     source: 'CLAUDE.md Vocabulary discipline by reader temperature',
@@ -418,7 +418,7 @@ const DI_VOCABULARY_CARDS: EducationCard[] = [
     prompt:
       'For a WARM context (second meeting, pitch deck, design-partner conversation), what category vocabulary do you use?',
     canonicalAnswer:
-      '"Native reasoning layer for every high-stakes call." "Recognition-Rigor Framework arbitrating Kahneman + Klein." "Decision Quality Index in 60 seconds." This is the OWNABLE category vocabulary where category creation happens. Warm contexts have earned the term through prior context. Do NOT default to descriptive language here — that under-leverages the category framing.',
+      '"Decision Intel is the reasoning audit platform." Plus the contrast: "Most tools audit your data. We audit your reasoning — and catch the fatal blind spots in strategic memos before the committee does." Plus: "Recognition-Rigor Framework arbitrating Kahneman + Klein." "Decision Quality Index in 60 seconds." "Hashed and tamper-evident Decision Provenance Record." This is the OWNABLE category vocabulary where category creation happens. Warm contexts have earned the term through prior context. Do NOT default to descriptive language here — that under-leverages the category framing.',
     difficulty: 'core',
     applicationContext:
       'Second meeting with a CSO who already heard the cold pitch and is now asking for depth.',
@@ -497,7 +497,7 @@ const DI_VOCABULARY_CARDS: EducationCard[] = [
     deckId: 'di_vocabulary',
     prompt: 'Who is the first design partner, and what shape of buyer are they?',
     canonicalAnswer:
-      'Sankore — a Pan-African PE fund. They are NOT a Fortune 500 board-reporting strategy team — they are a fund. This is why the H1 was de-narrowed from "boardroom strategic decision" to "high-stakes call" in April 2026. CRITICAL: Sankore stays inside the Founder Hub and confidential channels — NEVER ship the name in production HTML, JSON-LD, public marketing copy, or "Sankore-class buyers" coding patterns. Founders can reference the SHAPE of buyer (Pan-African PE fund partner) publicly without naming.',
+      'Sankore — a Pan-African PE fund. They are NOT a Fortune 500 board-reporting strategy team — they are a fund. The 2026-04-26 review caught that "boardroom strategic decision" narrowed funds + corp-dev partners out of the H1; the H1 was de-narrowed to "high-stakes call" in April, then re-locked again 2026-05-04 to "the reasoning audit platform" (category-claim) — both broader-audience moves. CRITICAL: Sankore stays inside the Founder Hub and confidential channels — NEVER ship the name in production HTML, JSON-LD, public marketing copy, or "Sankore-class buyers" coding patterns. Founders can reference the SHAPE of buyer (Pan-African PE fund partner) publicly without naming.',
     difficulty: 'advanced',
     applicationContext: 'You catch yourself about to say "Sankore" in a public LinkedIn post.',
     source: 'CLAUDE.md Marketing Voice — no named-prospect leaks',
@@ -1535,10 +1535,10 @@ const FOUNDER_ONELINERS_CARDS: EducationCard[] = [
     prompt:
       'What is the canonical hero one-liner for warm contexts (pitch deck, LinkedIn headline)?',
     canonicalAnswer:
-      "\"The native reasoning layer for every high-stakes call.\" That is the H1. \"Reasoning layer\" is the ownable category anchor — treat it like the category term. \"Native\" does the 'built for this, not retrofitted' work. \"High-stakes call\" is the universal noun phrase that lands across all six buyer personas. NEVER use 'collaborative' / 'collaborator' / 'medium' / 'protect outcomes' framings. NEVER use 'decision intelligence platform' as the headline claim.",
+      "\"Decision Intel is the reasoning audit platform.\" That is the H1 (locked 2026-05-04 — replaces the prior \"native reasoning layer for every high-stakes call\" which failed Pursey 15-second test). The contrast sub-head as second sentence: \"Most tools audit your data. We audit your reasoning — and catch the fatal blind spots in strategic memos before the committee does.\" Treat \"the reasoning audit platform\" as protected vocabulary alongside R²F / DPR / DQI. NEVER use 'collaborative' / 'collaborator' / 'protect outcomes' framings. NEVER use 'decision intelligence platform' / 'AI decision tool' / 'native reasoning layer' as the headline claim — all banned drift targets.",
     difficulty: 'foundation',
     applicationContext: 'Updating your LinkedIn headline.',
-    source: 'CLAUDE.md One-liner re-lock 2026-04-26',
+    source: 'CLAUDE.md One-liner re-lock 2026-05-04',
     tag: 'positioning',
   },
   {
@@ -1547,7 +1547,7 @@ const FOUNDER_ONELINERS_CARDS: EducationCard[] = [
     prompt:
       'What is the secondary one-liner for regulatory-tailwind moments (cold outreach, investor narrative)?',
     canonicalAnswer:
-      '"The reasoning layer the Fortune 500 needs before regulators start asking." Carries the regulatory tailwind story in one breath. Use it where TENSION beats elegance — cold DMs, VC pitches, LinkedIn replies. NEVER use it as a hero H1. The primary remains \'the native reasoning layer for every high-stakes call.\' This secondary is the version that fits the EU AI Act / Aug 2026 / Basel III calendar pressure context.',
+      '"The reasoning audit platform the Fortune 500 needs before EU AI Act enforcement begins August 2026." Carries the regulatory tailwind story in one breath. Use it where TENSION beats elegance — cold DMs, VC pitches, LinkedIn replies. NEVER use it as the primary H1. The primary remains \'Decision Intel is the reasoning audit platform.\' This secondary is the version that fits the EU AI Act / Aug 2026 / Basel III calendar pressure context.',
     difficulty: 'core',
     applicationContext: 'Drafting a cold email to a F500 GC about EU AI Act readiness.',
     source: 'CLAUDE.md One-liner secondary',
@@ -1934,7 +1934,7 @@ const STRATEGIC_THINKING_CARDS: EducationCard[] = [
     deckId: 'strategic_thinking',
     prompt: 'Why is NOW the strategic window for Decision Intel to set the category ground rules?',
     canonicalAnswer:
-      "Source: Dixit & Nalebuff. In some situations, the key time for strategic maneuvering is while the GROUND RULES are being decided — not while playing the game. Application: the enterprise AI governance and decision-intelligence categories are crystallising right now (2026). By positioning Decision Intel explicitly as the 'native reasoning layer' — differentiating from Aera (operational automation) and Cloverpop (decision logging) — you establish the ground rules of the category in your favour BEFORE competitors define them for you. The R²F (Recognition-Rigor Framework) IP claim is the same move applied to the academic anchor: you claim the Kahneman+Klein synthesis territory before someone else does. When it bites: right now. The window closes when one of Cloverpop / IBM watsonx / Aera defines the category. Every published-for-procurement piece of work (DPR, Bias Genome, /how-it-works) is a ground-rule-setting move.",
+      "Source: Dixit & Nalebuff. In some situations, the key time for strategic maneuvering is while the GROUND RULES are being decided — not while playing the game. Application: the enterprise AI governance and decision-intelligence categories are crystallising right now (2026). By positioning Decision Intel explicitly as 'the reasoning audit platform' (locked 2026-05-04) — differentiating from Aera (operational automation) and Cloverpop (decision logging) — you establish the ground rules of the category in your favour BEFORE competitors define them for you. The R²F (Recognition-Rigor Framework) IP claim is the same move applied to the academic anchor: you claim the Kahneman+Klein synthesis territory before someone else does. When it bites: right now. The window closes when one of Cloverpop / IBM watsonx / Aera defines the category. Every published-for-procurement piece of work (DPR, Bias Genome, /how-it-works) is a ground-rule-setting move.",
     difficulty: 'advanced',
     applicationContext:
       'You see a competitor pitch "decision intelligence platform" on LinkedIn — what is the right competitive move?',

@@ -60,12 +60,12 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.c
 export const metadata: Metadata = {
   title: 'About · Decision Intel',
   description:
-    'About Decision Intel, the native reasoning layer for every high-stakes call. Legal entity, founder, stage, and procurement contact in one place for vendor-risk diligence.',
+    'About Decision Intel, the reasoning audit platform. Legal entity, founder, stage, and procurement contact in one place for vendor-risk diligence.',
   alternates: { canonical: `${siteUrl}/about` },
   openGraph: {
     title: 'About Decision Intel',
     description:
-      'The native reasoning layer for every high-stakes call. Legal entity, founder, stage, and procurement contact in one place.',
+      'The reasoning audit platform. Legal entity, founder, stage, and procurement contact in one place.',
     url: `${siteUrl}/about`,
   },
 };
@@ -156,7 +156,7 @@ export default function AboutPage() {
               letterSpacing: '-0.02em',
             }}
           >
-            The native reasoning layer for every high-stakes call.
+            Decision Intel is the reasoning audit platform.
           </h1>
           <p
             style={{
@@ -293,8 +293,8 @@ export default function AboutPage() {
               Every Fortune 500 has invested in data governance, code review, and security audit.
               The reasoning behind a strategic decision (the memo, the model assumption, the
               boardroom argument that closed the discussion) arrives at the audit committee without
-              any of it. Decision Intel is the reasoning layer that brings the same discipline to
-              that artefact.
+              any of it. Decision Intel is the reasoning audit platform that brings the same
+              discipline to that artefact.
             </p>
             <p style={{ marginTop: 16 }}>
               The Recognition-Rigor Framework (R&sup2;F) underneath the platform is the only

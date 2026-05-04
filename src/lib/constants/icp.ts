@@ -12,18 +12,71 @@
  * so the chat-coaching prompt + the founder-facing reference card + every
  * downstream surface stay in lockstep automatically.
  *
- * Locked: 2026-04-30 (GTM Plan v3.2). Supersedes the 2026-04-28 Pan-African
- * fund-wedge lock — funds are no longer the GTM wedge; Pan-African coverage is
- * preserved as the cross-border M&A differentiator (moat layer for the F500
- * ceiling buyer). The new wedge is individual UK + US buyers @ £249/mo;
- * Sankore is the design-partner bridge; F500 corp strategy / corp dev M&A is
- * the ceiling.
+ * Locked: 2026-05-04 (CATEGORY-CLAIM PIVOT). Supersedes the 2026-04-30 v3.2
+ * "native reasoning layer for every high-stakes call" lock. The H1 was
+ * failing James Pursey's 15-second test ("can a stranger fully understand
+ * the startup in ~15 seconds, leaving zero doubt?") because both "reasoning
+ * layer" and "high-stakes call" required the reader to pause and resolve
+ * the abstract terms. The new H1 — "Decision Intel is the reasoning audit
+ * platform" — claims a fresh ownable category (reasoning-audit-platform
+ * doesn't exist as a Gartner category, so we own it by usage), bakes the
+ * human-reasoning differentiator into the noun itself (vs BI tools that
+ * audit data, vs model-risk tools that audit algorithms), passes Pursey
+ * cleanly (3 words, every term resolves immediately), and stays compatible
+ * with the existing positioning ecosystem (R²F, DPR, DQI, the moat).
+ *
+ * The wedge / bridge / ceiling sequencing stays unchanged — only the
+ * category claim and surrounding hero copy change.
  */
 
-export const POSITIONING_HERO_PRIMARY = 'The native reasoning layer for every high-stakes call.';
+/**
+ * The protected category noun. Treat this string like "R²F" or "DPR" —
+ * never substitute synonyms ("reasoning analyser", "reasoning checker",
+ * "decision audit platform") in shipped surfaces. The category becomes
+ * ownable through CONSISTENT REPETITION; one-off paraphrases dilute the
+ * claim. If a surface needs a softer variant for cold contexts where
+ * "platform" sounds SaaS-coded, drop "platform" — "the reasoning audit"
+ * (without platform) is the only allowed deviation.
+ */
+export const CATEGORY_CLAIM = 'the reasoning audit platform' as const;
 
+/**
+ * Primary H1 — landing-page above-the-fold, pitch deck slide 1, LinkedIn
+ * headline. The category-claim move ("Decision Intel is THE [noun]")
+ * asserts ownership the way "Stripe is the payments infrastructure for
+ * the internet" does — THE not A.
+ */
+export const POSITIONING_HERO_PRIMARY = 'Decision Intel is the reasoning audit platform.';
+
+/**
+ * Sub-head / immediate follow-up — the contrast move. Sharpens the
+ * differentiator by explicitly distinguishing from existing categories
+ * (BI tools audit data; model-risk tools audit algorithms; we audit the
+ * human reasoning). Best deployed as the second sentence on the landing
+ * page, NOT as a standalone H1.
+ */
+export const POSITIONING_HERO_CONTRAST =
+  'Most tools audit your data. We audit your reasoning — and catch the fatal blind spots in strategic memos before the committee does.';
+
+/**
+ * Asymmetric-tail body copy — the JUSTIFICATION for running the audit
+ * on every memo, not just the suspicious ones. Captures the "very much
+ * might not but when it does, it's a big thing" insight: most memos
+ * pass cleanly, but the catastrophic ones look identical to the clean
+ * ones until they're audited. Goes immediately below the contrast
+ * sub-head on the landing page.
+ */
+export const POSITIONING_ASYMMETRIC_TAIL_BODY =
+  "Most strategic memos pass cleanly. The ones that don't are the ones that destroy value. You can't tell the catastrophic memo from the clean memo without auditing both — which is why you run the audit on every memo, not just the suspicious ones.";
+
+/**
+ * Secondary H1 — for cold investor / regulatory-tailwind contexts where
+ * tension beats elegance. Pairs the category claim with the regulatory
+ * urgency. Used in cold investor DMs, VC pitches, "Why Now" deck slides.
+ * NOT used as the primary landing H1 — that's POSITIONING_HERO_PRIMARY.
+ */
 export const POSITIONING_HERO_SECONDARY =
-  'The reasoning layer the Fortune 500 needs before regulators start asking.';
+  'The reasoning audit platform the Fortune 500 needs before EU AI Act enforcement begins August 2026.';
 
 export const IP_MOAT_NAME = 'Recognition-Rigor Framework (R²F)';
 
@@ -240,7 +293,11 @@ export const CONNECTION_LEVERAGE_ASKS = {
 /**
  * Banned vocabulary — never use as the headline claim. Each entry carries the
  * reason so future-you can judge edge cases instead of just memorising the list.
- * v3.2 added "company knowledge base" — positioning hygiene against generic-KB drift.
+ * v3.2 added "company knowledge base"; 2026-05-04 added "AI decision tool" +
+ * "AI-powered decision platform" + "decision intelligence" (as headline) per
+ * the category-claim pivot. The category we own is "the reasoning audit
+ * platform" — every alternative noun phrase that drifts toward the Gartner
+ * decision-intelligence category is a banned drift target.
  */
 export const BANNED_VOCABULARY: ReadonlyArray<{ phrase: string; reason: string }> = [
   {
@@ -253,26 +310,60 @@ export const BANNED_VOCABULARY: ReadonlyArray<{ phrase: string; reason: string }
   },
   {
     phrase: 'boardroom strategic decision',
-    reason: 'Audience-narrowing — replaced by "high-stakes call" 2026-04-26.',
+    reason: 'Audience-narrowing — replaced by "high-stakes call" 2026-04-26, then by "strategic memo" 2026-05-04.',
   },
   {
     phrase: 'company knowledge base',
     reason:
       "v3.2 lock: dilutes the decision-specific moat into Notion / Confluence / Drive territory. Decision Intel is the decision system of record, NOT the company knowledge base.",
   },
+  {
+    phrase: 'AI decision tool',
+    reason:
+      '2026-05-04: too crowded. Every B2B AI startup calls itself an "AI tool". The category is "the reasoning audit platform"; never let it drift to generic AI-tool framing.',
+  },
+  {
+    phrase: 'AI-powered decision platform',
+    reason:
+      '2026-05-04: AI-powered prefix is a generic SaaS tell. The platform name carries its differentiator (reasoning audit) without the AI-powered prefix.',
+  },
+  {
+    phrase: 'native reasoning layer',
+    reason:
+      'Deprecated 2026-05-04. Failed Pursey 15-second test (reader has to define "reasoning layer" before the sentence resolves). Replaced by "the reasoning audit platform" — keeps the human-reasoning differentiator but in a noun phrase a stranger immediately understands.',
+  },
+] as const;
+
+/**
+ * Protected vocabulary — terms that should NEVER be substituted with synonyms
+ * in shipped surfaces. The category becomes ownable through consistent
+ * repetition; paraphrases dilute the claim. Only allowed deviation: "the
+ * reasoning audit" (drop "platform") for cold contexts where SaaS-platform
+ * vocabulary sounds heavy. Otherwise the full phrase is canonical.
+ */
+export const PROTECTED_VOCABULARY: ReadonlyArray<string> = [
+  'the reasoning audit platform', // primary category claim (CATEGORY_CLAIM)
+  'reasoning audit', // softer variant for cold contexts
+  'fatal blind spots', // the load-bearing stake noun in the H1 + sub-head
+  'before the committee does', // the time-anchor closing in the contrast sub-head
+  'R²F', // existing IP moat
+  'DPR', // existing artefact noun
+  'DQI', // existing scoring metric
 ] as const;
 
 /**
  * Cold-context on-ramps — descriptive plain-language phrases for the first
- * 10 seconds of a cold reader's attention. Never lead cold with the locked
- * category vocabulary (R²F / DPR / DQI / "reasoning layer") — the reader
- * hasn't earned the term yet.
+ * 10 seconds of a cold reader's attention IN SURFACES TOO SMALL FOR THE FULL
+ * H1 (LinkedIn DM character limits, conference 1-line introductions). The
+ * primary H1 ("Decision Intel is the reasoning audit platform") passes
+ * Pursey's 15-second test on its own, but a 60-character LinkedIn DM
+ * subject line can't carry it — that's where these on-ramps live.
  */
 export const COLD_CONTEXT_ONRAMPS: ReadonlyArray<string> = [
   '60-second audit on a strategic memo',
-  'pre-IC audit layer',
+  'pre-IC audit',
   'strategic memo audits',
-  'decision quality auditing',
+  'reasoning audit',
 ] as const;
 
 /**
@@ -286,6 +377,29 @@ export function buildIcpPromptBlock(): string {
   const avoid = `${ICP_AVOID.label}: ${ICP_AVOID.audience} ${ICP_AVOID.why}`;
   const sequence = ICP_SEQUENCING.join(' ');
   return `${wedge} ${bridge} ${ceiling} ${avoid} Sequencing — ${sequence} ${ICP_SEQUENCING_RULE}`;
+}
+
+/**
+ * Build a chat-prompt-ready POSITIONING block — the new category-claim
+ * vocabulary that the chat persona MUST use when coaching the founder on
+ * pitching, drafting cold outreach, or rehearsing investor conversations.
+ * Locked 2026-05-04 with the H1 pivot. The prompt makes the chat coaching
+ * explicit about WHEN to use the contrast sub-head + asymmetric-tail body.
+ */
+export function buildPositioningPromptBlock(): string {
+  return [
+    `CATEGORY CLAIM (locked 2026-05-04 — replaces the prior "native reasoning layer" lock):`,
+    `Primary H1: "${POSITIONING_HERO_PRIMARY}"`,
+    `Contrast sub-head (use as second sentence on landing / pitch deck): "${POSITIONING_HERO_CONTRAST}"`,
+    `Asymmetric-tail body (use as JUSTIFICATION for running the audit on every memo): "${POSITIONING_ASYMMETRIC_TAIL_BODY}"`,
+    `Secondary H1 (cold investor / regulatory-tailwind contexts only): "${POSITIONING_HERO_SECONDARY}"`,
+    ``,
+    `Protected category noun: "${CATEGORY_CLAIM}". Treat like R²F / DPR / DQI — never substitute synonyms in shipped surfaces. Only allowed deviation: "the reasoning audit" (drop "platform") for cold LinkedIn DMs / conference introductions where SaaS-platform vocabulary sounds heavy.`,
+    ``,
+    `Why this category claim works (Pursey 15-second test): a stranger hears "Decision Intel is the reasoning audit platform" and immediately knows — software (platform) that audits (audit) human thinking (reasoning). Three words; every term resolves immediately. Differentiated from BI tools (which audit data) and model-risk-management tools (which audit algorithms). The category doesn't exist as a Gartner segment, which means it's ours by usage.`,
+    ``,
+    `Banned drift targets (do not let the category claim drift toward these): ${BANNED_VOCABULARY.map(b => `"${b.phrase}"`).join(', ')}. When the founder uses any of these in rehearsal, correct it on the spot.`,
+  ].join('\n');
 }
 
 /**
