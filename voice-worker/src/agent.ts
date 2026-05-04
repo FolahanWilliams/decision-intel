@@ -104,6 +104,34 @@ export default defineAgent({
    * detection + interruption handling.
    */
   prewarm: async (proc: JobProcess) => {
+    // Loud startup warning for known-broken LLM/AI-Gateway combos.
+    // The LiveKit OpenAI plugin's streaming parser doesn't match the
+    // OpenAI-compat streaming format that some providers emit through
+    // Vercel AI Gateway. Symptom: "TTS stream stalled after producing
+    // audio, forcing close" + "Cartesia returned error" mid-reply.
+    // Verified broken combos as of 2026-05-04:
+    //   - xai/grok-4.3, xai/grok-4 (Grok via AI Gateway)
+    //   - google/gemini-3-flash-preview (Gemini via AI Gateway → OpenAI plugin)
+    //   - deepseek/deepseek-chat (untested but suspect)
+    // Verified working:
+    //   - openai/gpt-4o-mini, openai/gpt-4o
+    //   - anthropic/claude-haiku-4-5 (likely; not yet tested in voice)
+    const knownBrokenLlmPrefixes = ['xai/', 'google/', 'deepseek/'];
+    if (knownBrokenLlmPrefixes.some(p => config.llm.model.startsWith(p))) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        '\n' +
+          '═══════════════════════════════════════════════════════════════════\n' +
+          `[voice-worker] ⚠ LLM model ${config.llm.model} is in the known-broken list.\n` +
+          '  The LiveKit OpenAI plugin\'s streaming parser does not match this\n' +
+          '  provider\'s OpenAI-compat format via Vercel AI Gateway. Symptom:\n' +
+          '  "TTS stream stalled" + "Cartesia returned error" mid-reply.\n' +
+          '  FIX: in Railway Variables, set VOICE_LLM_MODEL=openai/gpt-4o-mini\n' +
+          '  (or remove VOICE_LLM_MODEL/GROK_MODEL so the default kicks in).\n' +
+          '═══════════════════════════════════════════════════════════════════\n'
+      );
+    }
+
     // Connectivity probe — runs once per worker process boot. The rtc-node
     // Rust engine hits https://<livekit-host>/settings/regions BEFORE
     // attempting to dial signaling. From inside a Railway container that
