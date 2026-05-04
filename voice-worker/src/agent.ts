@@ -296,7 +296,20 @@ export default defineAgent({
 
     // eslint-disable-next-line no-console
     console.log(
-      `[voice-worker] session start — room=${(ctx.room.name ?? 'unknown-room')} persona=${voiceContext.label} voiceId=${voiceId} participant=${participant.identity}`
+      `[voice-worker] session start — room=${(ctx.room.name ?? 'unknown-room')} persona=${voiceContext.label} voiceId=${voiceId} participant=${participant.identity} llmModel=${config.llm.model} cartesiaModel=${config.cartesia.model}`
+    );
+
+    // Latency instrumentation: log the size of system prompts being
+    // sent to the LLM. Big prompts = slow first-token = perceived lag.
+    // After the lean VOICE_FOUNDER_CONTEXT cut, this should report
+    // ~2-5KB total instead of the previous ~280KB.
+    const promptBytes = voiceContext.systemPromptParts.reduce(
+      (sum, p) => sum + (p.content?.length ?? 0),
+      0
+    );
+    // eslint-disable-next-line no-console
+    console.log(
+      `[voice-worker] system prompt size — ${promptBytes} chars (~${Math.round(promptBytes / 1024)}KB) across ${voiceContext.systemPromptParts.length} blocks`
     );
 
     // Concatenate the system-prompt parts (FOUNDER_CONTEXT + persona
@@ -314,12 +327,27 @@ export default defineAgent({
     // we wire text→voice handoff in a follow-up.
     const initialChatCtx = new llm.ChatContext();
 
+    // Latency tuning: drop default endpointing to detect end-of-utterance
+    // faster. Default is ~10ms VAD endpointing + 1000ms silence-utterance,
+    // which makes the agent wait a full second after the founder stops
+    // speaking before the LLM is invoked. Setting endpointing=300ms +
+    // utteranceEndMs=600ms cuts ~700ms of dead air per turn while
+    // still being safe enough to not chop the tail of a sentence.
+    // Tune higher if Deepgram starts cutting words mid-sentence.
+    // @see https://developers.deepgram.com/docs/utterance-end
+    //
+    // Cast through `as never` because the typed STT options interface
+    // doesn't expose endpointing/utteranceEndMs in @types but the
+    // underlying Deepgram WebSocket API + LiveKit plugin both honor
+    // these keys at runtime.
     const sttPlugin = new deepgram.STT({
       apiKey: config.deepgram.apiKey,
       model: 'nova-3',
       smartFormat: true,
       interimResults: true,
-    });
+      endpointing: 300,
+      utteranceEndMs: 600,
+    } as never);
 
     const llmPlugin = new openai.LLM({
       apiKey: config.llm.apiKey,
@@ -375,6 +403,33 @@ export default defineAgent({
     // (string literal). Cast through `as never` because the typed-emitter
     // generic doesn't quite line up at the call site, but the runtime
     // event name is correct per the SDK enum.
+    // Per-turn lifecycle logging — pin which step is slow or which
+    // turn fails silently. UserInputTranscribed fires when STT
+    // finalizes the founder's speech; AgentStateChanged tracks
+    // listening → thinking → speaking; SpeechCreated fires when a
+    // TTS speech handle is created. Comparing these timestamps shows
+    // STT-end → LLM-start → first-audio gap per turn.
+    session.on('user_input_transcribed' as never, ((ev: { transcript?: string; isFinal?: boolean }) => {
+      if (ev.isFinal) {
+        // eslint-disable-next-line no-console
+        console.log(
+          `[voice-worker] turn — STT FINAL — t=${Date.now()} transcript="${(ev.transcript ?? '').slice(0, 200)}"`
+        );
+      }
+    }) as never);
+    session.on('agent_state_changed' as never, ((ev: { oldState?: string; newState?: string }) => {
+      // eslint-disable-next-line no-console
+      console.log(
+        `[voice-worker] turn — AGENT STATE — t=${Date.now()} ${ev.oldState} → ${ev.newState}`
+      );
+    }) as never);
+    session.on('speech_created' as never, ((ev: { source?: string; userInitiated?: boolean }) => {
+      // eslint-disable-next-line no-console
+      console.log(
+        `[voice-worker] turn — SPEECH CREATED — t=${Date.now()} source=${ev.source} userInitiated=${ev.userInitiated}`
+      );
+    }) as never);
+
     session.on('error' as never, ((payload: SessionErrorPayload) => {
       const err = payload?.error as Record<string, unknown> | undefined;
       // eslint-disable-next-line no-console

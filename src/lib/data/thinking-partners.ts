@@ -233,7 +233,10 @@ const COGNITIVE_PSYCHOLOGIST: ThinkingPartner = {
     defaultVoiceId: 'a0e99841-438c-4a64-b679-ae501e7d6091',
     envVar: 'CARTESIA_VOICE_PSYCHOLOGIST',
     voiceStyle: 'Thoughtful British academic, precise, slightly formal',
-    speed: -0.1,
+    // Neutral speed (was -0.1 = 10% slower in sonic-3, which felt
+    // sluggish in conversation). The "calm, precise" character comes
+    // through in word choice + pacing rather than raw playback rate.
+    speed: 0,
     maxWordsPerVoiceTurn: 140,
   },
   // Cognitive Psychologist needs the bias / decision-science substrate:
