@@ -57,6 +57,7 @@ import {
   BibleVersePill,
   WhySfcSection,
   CommitmentRecord,
+  BuildInPublicSection,
 } from '@/components/founder-hub/founder-os/sections';
 
 interface DailyCheckin {
@@ -1474,6 +1475,9 @@ export function FounderOSTab() {
 
       {/* COMMITMENT RECORD */}
       <CommitmentRecord />
+
+      {/* BUILD-IN-PUBLIC PROTOCOL — the SFC ↔ audience-building paradox dissolved */}
+      <BuildInPublicSection />
 
       {/* WHY SFC IS BAD + SABOTAGE TABLES */}
       <WhySfcSection />

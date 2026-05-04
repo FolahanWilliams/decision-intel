@@ -257,3 +257,142 @@ export function verseForDate(date: Date = new Date()): BibleVerse {
   const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
   return DAILY_BIBLE_VERSES[dayOfYear % DAILY_BIBLE_VERSES.length];
 }
+
+// =============================================================================
+// BUILD-IN-PUBLIC PROTOCOL — the resolution to the SFC ↔ audience-building
+// paradox. Codified 2026-05-05. Lives next to the SFC sabotage tables so the
+// 11pm rationalization ("but I need to consume to know what to produce")
+// hits a written counter-argument written by the present-you who is clear.
+// =============================================================================
+
+/**
+ * The asymmetry rule. Consumption ≠ production, neurologically OR
+ * strategically. Produce on long-form-friendly surfaces; refuse to
+ * consume the algorithmic feeds those surfaces also host. The variable-
+ * reward dopamine cycle that suppresses the prefrontal cortex is a
+ * CONSUMPTION pattern, not a production one.
+ */
+export const PRODUCER_CONSUMER_ASYMMETRY_RULE = {
+  rule: 'Produce deliberately on long-form surfaces. Never consume the algorithmic feeds those surfaces also host.',
+  why:
+    'Building in public is not the same activity as scrolling. Composition uses System 2; passive feed-receiving uses System 1 + variable-reward dopamine. The cognitive damage that the OS is built to prevent comes from the latter, not the former. Pieter Levels, Lenny Rachitsky, Naval Ravikant, and Tope Awotona all built compounding audiences while keeping their own consumption ruthlessly disciplined. Their move is the move.',
+  fourMechanics: [
+    'Compose in a focused tool (Notion / Drafts / a markdown editor) where there is no "for you" feed to ambush you while writing.',
+    'Schedule via Buffer / Typefully / native scheduling — fire and forget. The platform never sees you "in the wild."',
+    'Open the platform itself only to reply to direct mentions / DMs once a day. No scroll. No Discover tab. No Trending tab. No "what are people saying about my post."',
+    'Check engagement metrics once per week max, Sunday only, as part of the weekly review. Never as a between-meetings dopamine top-up.',
+  ],
+} as const;
+
+export interface BuildInPublicFormatRow {
+  format: string;
+  rule: string;
+  why: string;
+}
+
+/**
+ * Format-locked table — what a "produce only, do not consume" motion
+ * actually looks like per surface. The moment a format pulls you back
+ * INTO the algorithmic ecosystem to study it (Shorts, Reels, daily
+ * shitposting), the asymmetry breaks and the OS starts losing.
+ */
+export const BUILD_IN_PUBLIC_FORMAT_TABLE: ReadonlyArray<BuildInPublicFormatRow> = [
+  {
+    format: 'LinkedIn',
+    rule: '1500-3000 char long-form posts, weekly bias-case-study cadence (per v3.5 Phase 1 motion). NO LinkedIn carousel-clips designed to mimic SFC.',
+    why: 'Already locked in v3.5 Phase 1 acquisition mix. Long-form rewards System 2 reading; the audience that engages with 1500+ char posts is the audience that becomes a 60-second-audit booking.',
+  },
+  {
+    format: 'Twitter / X',
+    rule: 'Long-form posts (25K char now) or 5-10-tweet threads. Skip daily shitposting + one-liners + engagement-farming. Schedule via Typefully or Buffer.',
+    why: 'X long-form posts now compete cleanly with Substack for long-form audience. Daily one-liners condition you to seek the engagement loop, which is the EXACT dopamine-cycle SFC trains. The motion that built Pieter Levels and Naval was long-form, not shitposting.',
+  },
+  {
+    format: 'YouTube',
+    rule: '30+ minute content only. Demo videos, founder vlogs, deep-dive technical walkthroughs. NEVER make a Short.',
+    why: 'The moment you make one Short, you have to study Shorts to know what works — and you are back inside the algorithmic ecosystem you just spent six months escaping. There is no "controlled" Shorts strategy for a solo founder.',
+  },
+  {
+    format: 'Substack / blog',
+    rule: '2000+ word essays, primary-source anchored. Once a month is fine — does not have to be weekly.',
+    why: 'Compounding asset. Each essay accrues SEO value and gets re-shared by your audience. SEO content averages 702% ROI but takes ~7 months to break even — Phase 1 motion is not dependent on it, but it compounds quietly through Phase 2-4.',
+  },
+  {
+    format: 'Podcast guesting',
+    rule: 'Guest on long-form (Lex Fridman / Lenny Rachitsky / a16z / 20VC shape, NOT 10-min clip podcasts). Hosting your own is a Phase 3+ motion.',
+    why: 'Highest-leverage build-in-public move for a 16-yo solo founder. Zero scroll required to participate; reaches audiences your own channels have not built yet; track record adds credibility for Stanford application + Series A pitch later.',
+  },
+  {
+    format: 'Speaking at events',
+    rule: 'The 2 London events/month (Strategy World, AI in Business, etc.) plus occasional invited talks. Pre-publish your talk as a long-form post.',
+    why: 'Already in the v3.5 Phase 1 motion. In-person speaking compounds with the LinkedIn long-form motion — your post-event recap goes back onto LinkedIn as a long-form post.',
+  },
+  {
+    format: 'TikTok / Reels / Shorts',
+    rule: 'Do not produce. Do not consume. There is no version of this that is OS-compatible.',
+    why: 'Production forces consumption (you cannot make Shorts that work without studying the algorithm), and consumption is what the OS exists to prevent. Pieter Levels, Lenny Rachitsky, Naval Ravikant — none of them have a TikTok motion. £10M ARR by 2032 does not require one.',
+  },
+];
+
+/**
+ * The honest test — apply at 90-day intervals so you can tell
+ * dopamine-rationalized motion from v3.5-aligned motion. Engagement
+ * metrics looking great is NOT the test. The test is whether the
+ * motion produced a measurable Phase 1 outcome.
+ */
+export const BUILD_IN_PUBLIC_HONEST_TEST = {
+  cadence: 'Every 90 days',
+  question:
+    'Did the build-in-public motion produce a measurable Phase 1 outcome — a new paid customer, an ROI case study, a warm intro to a mid-market buyer?',
+  ifYes: 'Keep going. The motion is v3.5-aligned. Double down on the formats that produced the outcome.',
+  ifNo:
+    'The motion is dopamine-rationalized, not v3.5-aligned. Even if engagement metrics look great. Cut it. The fact that posts get likes is not evidence the motion is working — likes are the same dopamine cycle SFC consumption uses, just self-administered.',
+} as const;
+
+export interface BuildInPublicExample {
+  founder: string;
+  motion: string;
+  outcome: string;
+}
+
+/**
+ * Anchor cases — solo founders who built compounding audiences while
+ * keeping their own consumption disciplined. Each is a primary-source
+ * existence proof that the asymmetry works.
+ */
+export const BUILD_IN_PUBLIC_EXAMPLES: ReadonlyArray<BuildInPublicExample> = [
+  {
+    founder: 'Pieter Levels (Nomad List, Photo AI, Remote OK)',
+    motion:
+      'Long-form Twitter posts + Stripe-dashboard screenshots. Building entirely in public, zero TikTok, zero Shorts.',
+    outcome:
+      'Photo AI hit $132K+ MRR (~$1.6M ARR) within 18 months as a solo founder, 87% profit margin. Multi-product solo portfolio.',
+  },
+  {
+    founder: 'Lenny Rachitsky (Lenny\'s Newsletter)',
+    motion:
+      'Long-form Substack newsletter + long-form podcast. No daily-Twitter shitposting; no Shorts. Schedule-and-post discipline.',
+    outcome:
+      '$1M+ ARR Substack, top product newsletter on the platform, podcast in the top product / startup chart.',
+  },
+  {
+    founder: 'Naval Ravikant',
+    motion:
+      'Long-form Twitter threads + the Almanack book + occasional podcast appearances. No Shorts ever.',
+    outcome:
+      'One of the most-cited Twitter audiences in tech. Almanack is a perennial bestseller. Built without algorithmic-feed dependency.',
+  },
+  {
+    founder: 'Tope Awotona (Calendly)',
+    motion:
+      'Built quietly for years. Used product-led growth + virality of the scheduling link itself, not a content motion.',
+    outcome: 'Bootstrapped to a $3B valuation. Zero SFC strategy required.',
+  },
+  {
+    founder: 'Jason Cohen (WP Engine, Smart Bear)',
+    motion:
+      'Long-form blog ("A Smart Bear" — anchor essays still get cited a decade after publication). No SFC.',
+    outcome:
+      'Bootstrapped two SaaS companies to acquisition-grade outcomes. Long-form essays are STILL his highest-ROI marketing channel.',
+  },
+];

@@ -162,11 +162,18 @@ describe('PATCH /api/onboarding', () => {
       where: { userId: 'user_123' },
       create: { userId: 'user_123', onboardingCompleted: true },
       update: { onboardingCompleted: true },
+      // GTM v3.5 (RATIFIED 2026-05-04) extended the select clause with
+      // phase1Persona / phase1PersonaRoleDetail / phase1HxcEligible so the
+      // sign-up persona gating + Vohra HXC filter can read these fields
+      // on the same payload that returns onboarding state.
       select: {
         onboardingCompleted: true,
         onboardingStep: true,
         onboardingRole: true,
         onboardingTourSeen: true,
+        phase1Persona: true,
+        phase1PersonaRoleDetail: true,
+        phase1HxcEligible: true,
       },
     });
   });
@@ -188,6 +195,9 @@ describe('PATCH /api/onboarding', () => {
         onboardingStep: true,
         onboardingRole: true,
         onboardingTourSeen: true,
+        phase1Persona: true,
+        phase1PersonaRoleDetail: true,
+        phase1HxcEligible: true,
       },
     });
   });

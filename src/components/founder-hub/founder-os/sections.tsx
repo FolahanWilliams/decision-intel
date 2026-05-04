@@ -11,12 +11,16 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { AlertTriangle, ScrollText, Plus, X, Sparkles } from 'lucide-react';
+import { AlertTriangle, ScrollText, Plus, X, Sparkles, Megaphone } from 'lucide-react';
 import {
   WHY_SFC_IS_BAD,
   HOW_SFC_SABOTAGES_DI,
   HOW_SFC_SABOTAGES_STANFORD,
   verseForDate,
+  PRODUCER_CONSUMER_ASYMMETRY_RULE,
+  BUILD_IN_PUBLIC_FORMAT_TABLE,
+  BUILD_IN_PUBLIC_HONEST_TEST,
+  BUILD_IN_PUBLIC_EXAMPLES,
   type BibleVerse,
 } from './content';
 
@@ -652,4 +656,297 @@ export function CommitmentRecord() {
 // API — never a silent failure.
 function getFounderPass(): string {
   return process.env.NEXT_PUBLIC_FOUNDER_HUB_PASS ?? '';
+}
+
+// =============================================================================
+// BUILD-IN-PUBLIC PROTOCOL — the resolution to the SFC ↔ audience-building
+// paradox. Producer-consumer asymmetry rule + format-locked table + 90-day
+// honest test + anchor examples.
+// =============================================================================
+
+export function BuildInPublicSection() {
+  return (
+    <div
+      style={{
+        marginTop: 28,
+        padding: '20px 22px',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-color)',
+        borderLeft: '3px solid var(--info)',
+        borderRadius: 'var(--radius-lg)',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+        <Megaphone size={16} style={{ color: 'var(--info)' }} />
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            color: 'var(--text-muted)',
+          }}
+        >
+          The build-in-public protocol · the SFC paradox dissolved
+        </span>
+      </div>
+      <h3
+        style={{
+          fontSize: 20,
+          fontWeight: 800,
+          margin: 0,
+          color: 'var(--text-primary)',
+          lineHeight: 1.25,
+          letterSpacing: '-0.01em',
+        }}
+      >
+        How to build in public without breaking the OS.
+      </h3>
+      <p
+        style={{
+          fontSize: 13.5,
+          color: 'var(--text-secondary)',
+          margin: '6px 0 18px',
+          lineHeight: 1.55,
+        }}
+      >
+        Audience-building and SFC-elimination are not in tension when you separate consumption
+        from production. Composition uses System 2 + the prefrontal cortex you are protecting.
+        Passive feed-receiving uses System 1 + the variable-reward cycle that suppresses it. The
+        cognitive damage the OS is built to prevent comes from the latter, not the former.
+      </p>
+
+      {/* THE ASYMMETRY RULE */}
+      <div
+        style={{
+          padding: '14px 16px',
+          background: 'color-mix(in srgb, var(--info) 6%, transparent)',
+          border: '1px solid color-mix(in srgb, var(--info) 30%, transparent)',
+          borderRadius: 'var(--radius-md)',
+          marginBottom: 18,
+        }}
+      >
+        <div
+          style={{
+            fontSize: 13,
+            fontWeight: 700,
+            color: 'var(--text-primary)',
+            lineHeight: 1.45,
+            marginBottom: 10,
+          }}
+        >
+          {PRODUCER_CONSUMER_ASYMMETRY_RULE.rule}
+        </div>
+        <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 12 }}>
+          {PRODUCER_CONSUMER_ASYMMETRY_RULE.why}
+        </div>
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            color: 'var(--text-muted)',
+            marginBottom: 6,
+          }}
+        >
+          The four mechanics
+        </div>
+        <ol style={{ margin: 0, paddingLeft: 20, fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.6 }}>
+          {PRODUCER_CONSUMER_ASYMMETRY_RULE.fourMechanics.map((m, i) => (
+            <li key={i} style={{ marginBottom: 4 }}>
+              {m}
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      {/* FORMAT TABLE */}
+      <h4
+        style={{
+          fontSize: 15,
+          fontWeight: 700,
+          margin: '0 0 8px',
+          color: 'var(--text-primary)',
+        }}
+      >
+        Format rules — what production looks like per surface
+      </h4>
+      <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '0 0 12px', lineHeight: 1.55 }}>
+        The moment a format pulls you back INTO the algorithmic ecosystem to study it (Shorts,
+        Reels, daily shitposting), the asymmetry breaks and the OS starts losing.
+      </p>
+      <div
+        style={{
+          border: '1px solid var(--border-color)',
+          borderRadius: 'var(--radius-md)',
+          overflow: 'hidden',
+        }}
+      >
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'minmax(120px, 0.7fr) minmax(280px, 1.6fr) minmax(280px, 1.4fr)',
+            background: 'var(--bg-secondary)',
+            padding: '10px 14px',
+            fontSize: 11,
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            color: 'var(--text-muted)',
+            borderBottom: '1px solid var(--border-color)',
+            gap: 16,
+          }}
+        >
+          <div>Format</div>
+          <div>Rule</div>
+          <div>Why</div>
+        </div>
+        {BUILD_IN_PUBLIC_FORMAT_TABLE.map((row, idx) => {
+          const isBan = row.format.includes('TikTok') || row.format.includes('Shorts');
+          return (
+            <div
+              key={idx}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'minmax(120px, 0.7fr) minmax(280px, 1.6fr) minmax(280px, 1.4fr)',
+                padding: '12px 14px',
+                gap: 16,
+                borderBottom:
+                  idx < BUILD_IN_PUBLIC_FORMAT_TABLE.length - 1
+                    ? '1px solid var(--border-color)'
+                    : 'none',
+                fontSize: 13,
+                color: 'var(--text-primary)',
+                lineHeight: 1.55,
+                background: isBan
+                  ? 'color-mix(in srgb, var(--error) 4%, transparent)'
+                  : 'transparent',
+              }}
+            >
+              <div
+                style={{
+                  fontWeight: 700,
+                  color: isBan ? 'var(--error)' : 'var(--text-primary)',
+                }}
+              >
+                {row.format}
+              </div>
+              <div style={{ color: 'var(--text-primary)' }}>{row.rule}</div>
+              <div style={{ color: 'var(--text-secondary)' }}>{row.why}</div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* THE HONEST TEST */}
+      <div
+        style={{
+          marginTop: 18,
+          padding: '14px 16px',
+          background: 'color-mix(in srgb, var(--accent-primary) 6%, transparent)',
+          border: '1px solid color-mix(in srgb, var(--accent-primary) 30%, transparent)',
+          borderRadius: 'var(--radius-md)',
+        }}
+      >
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            color: 'var(--accent-primary)',
+            marginBottom: 6,
+          }}
+        >
+          The honest test · {BUILD_IN_PUBLIC_HONEST_TEST.cadence}
+        </div>
+        <div
+          style={{
+            fontSize: 14,
+            fontWeight: 700,
+            color: 'var(--text-primary)',
+            lineHeight: 1.4,
+            marginBottom: 10,
+          }}
+        >
+          {BUILD_IN_PUBLIC_HONEST_TEST.question}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div
+            style={{
+              fontSize: 12.5,
+              color: 'var(--text-primary)',
+              lineHeight: 1.55,
+            }}
+          >
+            <strong style={{ color: 'var(--success)' }}>If yes:</strong>{' '}
+            {BUILD_IN_PUBLIC_HONEST_TEST.ifYes}
+          </div>
+          <div
+            style={{
+              fontSize: 12.5,
+              color: 'var(--text-primary)',
+              lineHeight: 1.55,
+            }}
+          >
+            <strong style={{ color: 'var(--error)' }}>If no:</strong>{' '}
+            {BUILD_IN_PUBLIC_HONEST_TEST.ifNo}
+          </div>
+        </div>
+      </div>
+
+      {/* EXAMPLES */}
+      <h4
+        style={{
+          fontSize: 15,
+          fontWeight: 700,
+          margin: '24px 0 4px',
+          color: 'var(--text-primary)',
+        }}
+      >
+        Anchor cases — solo founders who proved the asymmetry works
+      </h4>
+      <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '0 0 12px', lineHeight: 1.55 }}>
+        Five primary-source existence proofs that compounding audiences get built without an
+        algorithmic-feed motion. None of them have a TikTok strategy.
+      </p>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+          gap: 10,
+        }}
+      >
+        {BUILD_IN_PUBLIC_EXAMPLES.map(ex => (
+          <div
+            key={ex.founder}
+            style={{
+              padding: '12px 14px',
+              background: 'var(--bg-secondary)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-md)',
+            }}
+          >
+            <div
+              style={{
+                fontSize: 13,
+                fontWeight: 700,
+                color: 'var(--text-primary)',
+                marginBottom: 6,
+              }}
+            >
+              {ex.founder}
+            </div>
+            <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.55, marginBottom: 4 }}>
+              <strong style={{ color: 'var(--text-primary)' }}>Motion:</strong> {ex.motion}
+            </div>
+            <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+              <strong style={{ color: 'var(--accent-primary)' }}>Outcome:</strong> {ex.outcome}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
