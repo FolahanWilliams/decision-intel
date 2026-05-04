@@ -821,13 +821,13 @@ export const RESEARCH_LIBRARY: LibraryEntry[] = [
     insight:
       'Kahneman\u2019s co-author on Noise, former McKinsey partner. Framework: checklists, pre-mortems, structured independent assessments, and noise audits. Noise audits should be the starting point — orgs need to see how bad the problem is before buying a solution.',
     product:
-      'Your entire product IS decision hygiene. Sibony\u2019s framework validates every feature: structured analysis, independent assessments (triple-judge), pre-mortems, noise audits.',
+      'Sibony\u2019s framework \u2014 checklists, pre-mortems, structured independent assessments, noise audits \u2014 is the closest academic anchor for what DI does. We cite Sibony as a research foundation; we do NOT adopt his "decision hygiene" term as our category language (BANNED_VOCABULARY in src/lib/constants/icp.ts: borrowing it cedes our category vocabulary to a more famous author). Position DI as "reasoning layer / R\u00b2F / pre-decision audit", quote Sibony as the academic ancestor.',
     startup:
       'His "noise audit first" approach suggests a sales motion: offer a free noise audit of 5 strategic documents. Let prospects SEE the problem before pitching the solution.',
     actions: [
       'Build free noise audit landing page as lead gen',
-      'Quote Sibony in marketing: "decision hygiene"',
-      'Position DI as the decision hygiene platform',
+      'Cite Sibony as research foundation (not as DI category language)',
+      'NEVER adopt "decision hygiene" as DI positioning \u2014 it is banned vocabulary per icp.ts',
     ],
     category: 'foundations',
     color: '#F59E0B',

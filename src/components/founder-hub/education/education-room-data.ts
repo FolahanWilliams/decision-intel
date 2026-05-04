@@ -183,7 +183,7 @@ export const DECKS: EducationDeck[] = [
     id: 'cognitive_biases',
     label: 'Cognitive Biases',
     description:
-      "20 named biases from DI's taxonomy (DI-B-001 through DI-B-020). What it is + how it shows up in strategic memos.",
+      "Named biases from DI's taxonomy (DI-B-001 onward, currently 22 stable IDs through DI-B-022 with the Kahneman-Klein paper-application sprint). What it is + how it shows up in strategic memos.",
     iconName: 'Brain',
     color: '#A78BFA',
     order: 7,
@@ -434,7 +434,7 @@ const DI_VOCABULARY_CARDS: EducationCard[] = [
     deckId: 'di_vocabulary',
     prompt: 'How many cognitive biases does DI claim, and where does the taxonomy live?',
     canonicalAnswer:
-      '"30+ cognitive biases" — the canonical claim. The 20 stable taxonomy IDs (DI-B-001 through DI-B-020) are PERMANENT and published at /taxonomy. The "30+" allows for taxonomy growth without re-numbering. Biases referenced by snake_case keys (confirmation_bias, anchoring_bias). Defined in src/lib/constants/bias-education.ts. Never renumber or reassign IDs.',
+      '"30+ cognitive biases" — the canonical claim. The DI-B taxonomy IDs (currently 22 entries through DI-B-022, growing with the Kahneman-Klein paper-application sprint) are PERMANENT and published at /taxonomy. The "30+" allows for taxonomy growth + the 11 strategy-specific extensions without re-numbering. Biases referenced by snake_case keys (confirmation_bias, anchoring_bias). Defined in src/lib/constants/bias-education.ts. Never renumber or reassign IDs.',
     difficulty: 'foundation',
     applicationContext: 'Investor asks: "how do you scope cognitive bias detection?"',
     source: 'CLAUDE.md Bias Taxonomy section',
@@ -1214,7 +1214,7 @@ const PIPELINE_NODES_CARDS: EducationCard[] = [
     deckId: 'pipeline_nodes',
     prompt: 'What does the biasDetective node do and what taxonomy does it use?',
     canonicalAnswer:
-      "Detects cognitive biases in the memo against the 30+ bias DI taxonomy (DI-B-001 through DI-B-020 stable IDs + extended set). Returns flagged passages with bias name, severity (high/medium/low), confidence, and explanation. Academic anchor: Kahneman & Tversky's heuristics-and-biases program. The bias names use snake_case keys (confirmation_bias, anchoring_bias). Definitions live in src/lib/constants/bias-education.ts. The flagged passages are what surface in the InlineAnalysisResultCard top-3 biases list.",
+      "Detects cognitive biases in the memo against the 30+ bias DI taxonomy (DI-B-001 onward stable IDs, currently through DI-B-022 + extended strategy-specific set). Returns flagged passages with bias name, severity (high/medium/low), confidence, and explanation. Academic anchor: Kahneman & Tversky's heuristics-and-biases program. The bias names use snake_case keys (confirmation_bias, anchoring_bias). Definitions live in src/lib/constants/bias-education.ts. The flagged passages are what surface in the InlineAnalysisResultCard top-3 biases list.",
     difficulty: 'foundation',
     applicationContext: 'Demoing the 60-second audit — what runs first?',
     source: 'src/lib/agents/nodes.ts',

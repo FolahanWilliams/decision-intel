@@ -408,7 +408,7 @@ export function GenomeMethodologyViz() {
     {
       title: '30+ biases per case, mapped',
       descriptor:
-        'The Decision Intel taxonomy (DI-B-001 through DI-B-020, plus eleven strategy-specific patterns) assigns biases to each case with an excerpt and an academic citation.',
+        'The Decision Intel taxonomy (DI-B-001 onward, plus eleven strategy-specific patterns) assigns biases to each case with an excerpt and an academic citation.',
       viz: <ExtractViz reduced={reduced} />,
     },
     {

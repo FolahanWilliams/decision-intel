@@ -338,7 +338,7 @@ export function CommandPalette() {
       {
         id: 'taxonomy',
         label: 'Bias Taxonomy',
-        description: 'Published cognitive bias taxonomy (DI-B-001 through DI-B-020)',
+        description: 'Published cognitive bias taxonomy (DI-B-001 onward)',
         icon: <BookOpen size={16} />,
         action: () => navigate('/taxonomy'),
         keywords: ['taxonomy', 'bias', 'catalog', 'DI-B', 'reference'],

@@ -98,7 +98,7 @@ const PRINCIPLES: PrincipleRow[] = [
     name: 'Explainability',
     definition: 'The AI system\u2019s outputs can be understood in human terms.',
     mechanism:
-      'Every flagged bias carries a stable taxonomy ID (DI-B-001 through DI-B-020, plus 11 strategy-specific biases) and a primary APA academic reference with DOI where available. A GC reading the DPR can trace every flag back to its peer-reviewed source.',
+      'Every flagged bias carries a stable taxonomy ID (DI-B-001 onward, plus 11 strategy-specific biases) and a primary APA academic reference with DOI where available. A GC reading the DPR can trace every flag back to its peer-reviewed source.',
     dprFields: ['Academic citations', '30+ bias taxonomy with DOIs'],
   },
   {

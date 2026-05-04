@@ -340,7 +340,7 @@ export function ProofPageClient() {
                 >
                   /taxonomy
                 </Link>
-                , DI-B-001 through DI-B-020) against each: a blind test against your own library.
+                , DI-B-001 onward) against each: a blind test against your own library.
                 Our findings are the red flags the original authors, auditors, and committees missed
                 at the time.
               </p>

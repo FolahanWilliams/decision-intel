@@ -26,6 +26,11 @@ export {
   AFRICA_FRAMEWORKS,
   NDPR_FRAMEWORK,
   CBN_AI_FRAMEWORK,
+  // ISA Nigeria 2007 added 2026-04-29 to the AFRICA_FRAMEWORKS array;
+  // also surfacing it as a named export here so downstream consumers
+  // can import the framework constant individually (preserves the
+  // symmetry pattern of the 11 sibling Pan-African framework exports).
+  ISA_NIGERIA_FRAMEWORK,
   WAEMU_FRAMEWORK,
   CMA_KENYA_FRAMEWORK,
   CBK_FRAMEWORK,

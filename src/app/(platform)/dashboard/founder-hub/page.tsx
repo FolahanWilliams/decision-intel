@@ -552,10 +552,15 @@ const SEARCH_INDEX: SearchEntry[] = [
   },
   {
     tabId: 'research',
-    section: 'Decision Hygiene',
+    section: 'Pre-Decision Audit Practices',
+    // Section name avoids Sibony's "decision hygiene" term — that's
+    // borrowed academic vocabulary that we do NOT use as DI category
+    // language (banned per src/lib/constants/icp.ts BANNED_VOCABULARY).
+    // Cite Sibony as research foundation, position OUR product as
+    // "pre-decision audit" / "reasoning layer" / "R²F" instead.
     preview: 'Sibony — checklists, pre-mortems, structured assessment, noise audits.',
     keywords:
-      'decision hygiene sibony checklists pre-mortems structured independent assessment noise audits quadrants',
+      'pre-decision audit sibony checklists pre-mortems structured independent assessment noise audits quadrants',
   },
   {
     tabId: 'research',

@@ -392,7 +392,7 @@ export function HowItWorksClient() {
           <SectionHeader
             eyebrow="Bias detection"
             title="Thirty-plus cognitive biases. Every detection citable."
-            body="Our taxonomy is published openly at /taxonomy (DI-B-001 through DI-B-020), extended with eleven strategy-specific biases drawn from Stanford VC and PE decision research. Every detection comes back with an excerpt, a severity, and a confidence score."
+            body="Our taxonomy is published openly at /taxonomy (DI-B-001 onward, growing as the Kahneman-Klein paper-application sprint lands new detectors), extended with eleven strategy-specific biases drawn from Stanford VC and PE decision research. Every detection comes back with an excerpt, a severity, and a confidence score."
           />
 
           <div

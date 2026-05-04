@@ -488,7 +488,7 @@ export default function DecisionAlphaPage() {
             },
             {
               title: 'Bias detection',
-              body: 'The Decision Intel 30+ bias taxonomy (DI-B-001 through DI-B-020 core + toxic combinations). Same scoring model that audits client memos, applied symmetrically to public disclosures.',
+              body: 'The Decision Intel 30+ bias taxonomy (DI-B-001 onward + toxic combinations). Same scoring model that audits client memos, applied symmetrically to public disclosures.',
             },
             {
               title: 'DQI formula',
