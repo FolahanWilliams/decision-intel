@@ -51,13 +51,14 @@ export const INVESTOR_METRICS: InvestorMetric[] = [
     whatItIs:
       'ARR = annualized contract value of recurring subscriptions. MRR = monthly value. Excludes one-off services / consulting.',
     diCurrent: '£0 ARR · £0 MRR',
-    diTarget12mo: '£70-90K ARR (3 design partners × £2,499/mo) → £950K-1.6M ARR by Q4 2027',
+    diTarget12mo:
+      'GTM v3.5 RATIFIED targets — Phase 1 (Mo 6): 8-12 paid Individual £249/mo = ~£24-36K ARR (15-25 stretch = £45-75K). Phase 2 (Mo 12): + Sankore £1,999/mo + 5-10 mid-market Strategy = £200-400K. Phase 3 (Mo 24): £750K-£1.5M.',
     whyItMatters:
-      'ARR / MRR scales 5-10× more than one-off professional-services revenue. Investors weight ARR heavily for SaaS valuations (8-15× ARR multiples at Series A).',
+      'ARR / MRR scales 5-10× more than one-off professional-services revenue. Investors weight ARR heavily for SaaS valuations (8-15× ARR multiples at Series A). The v3.5 sequencing intentionally posts modest Phase 1 ARR — the goal is PMF evidence + ROI case studies + warm-intro fuel for Phase 2, NOT the Series A traction story (that comes in Phase 3).',
     computeMethod:
       'Sum of (active monthly subscription value) × 12 = ARR. Monthly active subscription value = MRR.',
     tripwire:
-      'If MRR plateaus for 3+ months without organic growth, GTM motion is broken. Diagnose: pricing? targeting? friction?',
+      'If MRR plateaus below £2,000 (8 paid Individuals) for 3+ months by month 4, the Phase 1 motion is broken. Diagnose: pricing? persona gating? Vohra HXC %? friction?',
     status: 'unbuilt',
   },
   {
@@ -337,6 +338,44 @@ export const INVESTOR_METRICS: InvestorMetric[] = [
     tripwire:
       'If the next paper application ships without (a) academic anchor in bias-education.ts, (b) Education Room flashcard, OR (c) a procurement-grade surface — pause and complete the cascade before the next one. The moat is the citability, not the count.',
     status: 'on_track',
+  },
+  {
+    id: 'vohra_hxc_pmf',
+    category: 'presentation',
+    rank: 19,
+    name: 'Vohra HXC PMF % (the Phase 1 graduation gate)',
+    whatItIs:
+      'Sean Ellis / Rahul Vohra "very disappointed" % computed on the HXC cohort (the four buyer-class-continuous personas: fractional CSO, mid-market Corp Dev, smaller-fund GP, PE-backed founder). The canonical pre-eminent measure of B2B PMF, locked in GTM v3.5 RATIFIED 2026-05-04 as the Phase 1 → Phase 2 graduation gate.',
+    diCurrent:
+      'Infrastructure shipped 2026-05-04: VohraPMFResponse model + /api/cron/vohra-pmf-trigger fires daily on users completing 2 audits in 14 days + in-app modal + /api/founder-hub/vohra-pmf metrics endpoint. Awaiting first ≥5 HXC respondents to lock v3.5 from RATIFIED → fully LOCKED.',
+    diTarget12mo:
+      'Phase 1 (Mo 6): ≥40% "very disappointed" on HXC cohort with N≥5 respondents = graduation gate passed. <30% by month 4 with N≥5 = phase-kill criterion fires (revert to product discovery sprint with somewhat-disappointed + not-disappointed cohorts).',
+    whyItMatters:
+      'GTM v3.5 cross-source synthesis named Vohra 40% as the canonical pre-eminent measure of B2B PMF — strictly more defensible than top-line ARR or sign-up volume during Phase 1. Companies above 40% exhibit compounding organic growth; below 40% struggle to grow consistently. The HXC filter is load-bearing: a 40% score on the wrong cohort (junior analysts, generic mid-market) is noise. The Continuity Chasm risk #1 mitigation is keeping the HXC sample clean.',
+    computeMethod:
+      'computeHxcCohortMetrics() in src/lib/learning/vohra-pmf.ts: filters VohraPMFResponse to {completedAt: not null, hxcEligibleAtTime: true, triggeredAt: ≥ 90 days ago}. Computes (very_disappointed / total_respondents) × 100. Per-persona breakdown surfaced in admin dashboard.',
+    tripwire:
+      'If the % drops by >5 points commit-over-commit (e.g., 42% → 36%) WITHOUT a corresponding product change, the persona gating is leaking — audit the sign-up form + cohort breakdown for non-HXC respondents that slipped through.',
+    status: 'on_track',
+  },
+  {
+    id: 'phase_1_paid_customer_count',
+    category: 'business',
+    rank: 20,
+    name: 'Phase 1 Paid Customer Count (the v3.5 baseline)',
+    whatItIs:
+      'Number of paid Individual £249/mo customers retained 90+ days, restricted to the HXC cohort (phase1HxcEligible=true). The v3.5 RATIFIED Phase 1 → Phase 2 graduation milestone alongside the Vohra HXC PMF %.',
+    diCurrent:
+      '0 paid Individual customers (Phase 1 motion launches with v3.5 ratification 2026-05-04). LinkedIn DM motion (5-10/week to 4 personas) + 2 London events/month (Strategy World June 9-10 + AI in Business May 14) is the Phase 1 acquisition mix.',
+    diTarget12mo:
+      'Phase 1 by month 6: 8-12 paid Individual £249/mo (baseline) · 15-25 (stretch) · <5 by month 4 = phase-kill. Founder ratified the 8-12 baseline 2026-05-04 — calibrated to a solo founder starting cold without an existing audience, NOT the Pieter Levels-tier 40-customer assumption from the Gemini PMF report.',
+    whyItMatters:
+      'Phase 1 ARR (~£24-36K) is intentionally NOT the Series A traction story. The customer count is the proof-of-concept count: ≥8 retained paying users from the right buyer class, generating ≥3 documented ROI case studies + ≥2 warm intros to mid-market peers, is the structural evidence that the Phase 2 mid-market motion has fuel. Below 5 customers by month 4 = the wedge motion is broken (not just slow).',
+    computeMethod:
+      'COUNT(*) on UserSettings WHERE phase1HxcEligible=true AND user has an active Individual subscription AND user has been a paying customer ≥ 90 days.',
+    tripwire:
+      'Calendar gate at 2026-08-15 (month 4 of Phase 1): if paid HXC count <5, halt scaling, run product-discovery sprint with somewhat-disappointed + not-disappointed cohorts. NEVER push harder on the same motion when the early-warning signal is red.',
+    status: 'unbuilt',
   },
 ];
 

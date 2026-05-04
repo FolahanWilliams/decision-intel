@@ -414,3 +414,171 @@ export function buildFounderNotesIcpLine(): string {
   const avoid = `Avoid: ${ICP_AVOID.audience.replace(/\.$/, '')} — ${ICP_AVOID.why}`;
   return `${wedge} ${bridge} ${ceiling} ${avoid}`;
 }
+
+// =============================================================================
+// GTM v3.5 — Phase 1 buyer-class-continuous personas (RATIFIED 2026-05-04)
+// =============================================================================
+// The v3.5 amendment narrows the Phase 1 wedge to FOUR buyer-class-continuous
+// personas. The narrowing fixes the Continuity Chasm risk surfaced in the
+// PMF-Discipline Deep Research report: junior analysts paying £249 personally
+// have no graduation path to F500 procurement, so they collapse the MQL→SQL
+// conversion to the 15-21% industry baseline. Buyer-class continuity ensures
+// the person validating PMF in Phase 1 is the exact person signing procurement
+// in Phase 3.
+//
+// All four personas share three load-bearing properties:
+//  (a) regulatory urgency (LP pressure, audit-committee demand, or active
+//      cross-border M&A regulatory exposure);
+//  (b) personal-decisive budget (no procurement committee at the wedge price);
+//  (c) deal volume sufficient to graduate to Strategy tier within 24-36 months.
+//
+// HXC = "High Expectation Customer" per Vohra/Superhuman methodology — these
+// four personas are the cohort the Vohra "very disappointed" survey filters
+// to. The phase-graduation gate is ≥40% on the HXC cohort.
+//
+// RULE — when v3.5 wedge personas change, edit HERE only. Sign-up persona
+// gating, Vohra HXC filter, founder-hub ICP card, chat coaching, and the
+// post-survey HXC computation all read from PHASE_1_PERSONAS by import.
+
+export type Phase1PersonaId =
+  | 'fractional_cso'
+  | 'midmarket_corp_dev'
+  | 'smaller_fund_gp'
+  | 'pe_backed_founder'
+  | 'other';
+
+export interface Phase1Persona {
+  id: Phase1PersonaId;
+  // Sign-up form label (the radio / dropdown label shown to the user).
+  label: string;
+  // One-line description visible below the label in the sign-up form.
+  description: string;
+  // Whether this persona counts for the HXC cohort (the Vohra survey filter).
+  // 'other' is FALSE; the four buyer-class-continuous personas are TRUE.
+  hxcEligible: boolean;
+  // The "buyer-class-continuous" graduation path — what they upgrade INTO
+  // at Phase 2 / 3.
+  graduationPath: string;
+  // Sample DPR specimen to lead with for this persona.
+  preferredSpecimen: 'wework' | 'dangote' | 'either';
+  // Personal-decisive budget signal — what budget line they pay from.
+  budgetSignal: string;
+  // Deal volume signal — how many high-stakes calls/year they typically run.
+  dealVolumeSignal: string;
+}
+
+export const PHASE_1_PERSONAS: ReadonlyArray<Phase1Persona> = [
+  {
+    id: 'fractional_cso',
+    label: 'Fractional CSO / strategy consultant',
+    description:
+      'Independent strategist running 3-5 client engagements with regular memo flow.',
+    hxcEligible: true,
+    graduationPath:
+      'Brings DI to one of their client firms as a Strategy tier (£1,999-£4,999/mo) team-tier engagement. The fractional CSO becomes the internal champion + power user.',
+    preferredSpecimen: 'either',
+    budgetSignal: 'Personal card / consulting expense; £249/mo absorbs into existing client retainer billing.',
+    dealVolumeSignal: '3-5 active engagements × 4-8 strategic memos / year per client = 15-30 memos / year.',
+  },
+  {
+    id: 'midmarket_corp_dev',
+    label: 'Head of Corp Dev / M&A at scale-up',
+    description:
+      'Owns the IC memo workflow at a $50M-$500M revenue company, paying personally pre-team-budget.',
+    hxcEligible: true,
+    graduationPath:
+      'Authorises team-tier purchase at the same firm OR moves to a larger firm and brings the tool. Same buying motion as F500 ceiling at smaller scale.',
+    preferredSpecimen: 'wework',
+    budgetSignal: 'Personal card; divisional discretionary spend up to £5K-£10K/yr without procurement.',
+    dealVolumeSignal: '1-3 acquisitions / year + ongoing build-vs-buy decisions = 6-12 strategic memos / year.',
+  },
+  {
+    id: 'smaller_fund_gp',
+    label: 'GP / principal at smaller fund',
+    description:
+      'Partner at £5M-£100M AUM PE / VC / family-office fund with active deal flow OR LP-governance pressure.',
+    hxcEligible: true,
+    graduationPath:
+      'Fund itself becomes a Strategy-tier customer at Phase 2 / 3. Fund partner refers to portfolio CSOs (LP-pressure-driven governance asks compound through portfolio).',
+    preferredSpecimen: 'dangote',
+    budgetSignal: 'Personal-decisive at GP level; fund management fee covers tooling line items <£5K/yr.',
+    dealVolumeSignal: '4-10 deals / year × 5-7 year hold cycle = 20-70 closed outcomes within 5 years (within Convergence Threshold range).',
+  },
+  {
+    id: 'pe_backed_founder',
+    label: 'PE-backed founder / CEO',
+    description:
+      'Founder at PE-backed mid-market firm, owning the strategic memo and IC-presentation workflow.',
+    hxcEligible: true,
+    graduationPath:
+      'CEO authorises team-tier upgrade for full strategy team. PE sponsor may mandate adoption across portfolio if reference is strong.',
+    preferredSpecimen: 'wework',
+    budgetSignal: 'Founder personal card OR company tooling line; under board / investor reporting threshold.',
+    dealVolumeSignal: '2-6 board-level memos / year + acquisition memos when active = 6-15 memos / year.',
+  },
+  {
+    id: 'other',
+    label: 'Other (tell us your role)',
+    description:
+      'Decision Intel is currently optimised for the four roles above. If your role is different, we will reach out when the platform extends to your use case.',
+    hxcEligible: false,
+    graduationPath:
+      'No graduation path during Phase 1; sign-up captured for waitlist only. Auto-redirect to a "thank you, we will reach out" page.',
+    preferredSpecimen: 'either',
+    budgetSignal: 'Out of scope for Phase 1.',
+    dealVolumeSignal: 'Out of scope for Phase 1.',
+  },
+];
+
+/**
+ * Returns the Phase 1 persona definition for the given id, or undefined.
+ * Use this anywhere the user's persona drives display logic (sign-up form,
+ * Vohra modal cohort labelling, founder-hub Phase 1 dashboard).
+ */
+export function getPhase1Persona(id: string | null | undefined): Phase1Persona | undefined {
+  if (!id) return undefined;
+  return PHASE_1_PERSONAS.find(p => p.id === id);
+}
+
+/**
+ * Returns true if the given persona id is HXC-eligible (one of the four
+ * buyer-class-continuous personas). Used by the Vohra HXC filter and the
+ * Phase 1 metrics dashboard.
+ */
+export function isHxcEligible(id: string | null | undefined): boolean {
+  return Boolean(getPhase1Persona(id)?.hxcEligible);
+}
+
+/**
+ * The HXC subset (the four continuous personas), excluding 'other'. Use
+ * this for sign-up gating where you only want to show the four allowed
+ * personas, with 'other' rendered separately as an opt-out path.
+ */
+export const PHASE_1_HXC_PERSONAS: ReadonlyArray<Phase1Persona> =
+  PHASE_1_PERSONAS.filter(p => p.hxcEligible);
+
+/**
+ * Phase-graduation gate per Vohra / Superhuman methodology — locked v3.5.
+ * A user-tier reaches PMF when ≥40% of HXC respondents report being "very
+ * disappointed" if they could no longer use the product. Below 30% by month 4
+ * is the kill criterion.
+ */
+export const VOHRA_PMF_GRADUATION_THRESHOLD = 40 as const;
+export const VOHRA_PMF_KILL_THRESHOLD = 30 as const;
+
+/**
+ * Phase 1 customer-count milestones (locked v3.5 — founder ratified 2026-05-04).
+ * Baseline = 8-12 paid customers retained 90+ days by month 6.
+ * Stretch = 15-25 (graduate to Phase 2 ahead of schedule).
+ * Kill = <5 by month 4 (revert to product discovery).
+ *
+ * The Gemini PMF-Discipline report's 40-customer / £10K MRR target is the
+ * Phase 1 STRETCH goal, not the baseline. Pieter Levels-tier velocity assumes
+ * an existing audience; v3.5 baseline is calibrated to a solo founder
+ * starting cold without paid acquisition.
+ */
+export const PHASE_1_CUSTOMER_BASELINE_MIN = 8 as const;
+export const PHASE_1_CUSTOMER_BASELINE_MAX = 12 as const;
+export const PHASE_1_CUSTOMER_STRETCH_MIN = 15 as const;
+export const PHASE_1_CUSTOMER_STRETCH_MAX = 25 as const;
+export const PHASE_1_CUSTOMER_KILL_BY_MONTH_4 = 5 as const;

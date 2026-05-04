@@ -142,22 +142,29 @@ export async function POST(request: NextRequest) {
     const docContent = getDocumentContent(doc);
 
     // ── Outcome Gate ──────────────────────────────────────────────────
-    // Two modes (locked 2026-04-26 — closes the cathedral-of-code trap
-    // identified by NotebookLM strategic synthesis Q6 pre-mortem):
+    // Three modes (extended 2026-05-04 for GTM v3.5 lock criterion #3):
     //
-    //   1. Default (org.enforceOutcomeGate = false): non-blocking. SSE
+    //   1. Default (legacy users, free / non-HXC): non-blocking. SSE
     //      reminder fires at SOFT/HARD thresholds; user can always run
-    //      a new audit. Preserves the legacy free / individual experience.
+    //      a new audit. Preserves the legacy experience for users who
+    //      signed up before v3.5 and aren't HXC-eligible.
     //
-    //   2. Enforced (org.enforceOutcomeGate = true, set per-org as a
-    //      design-partner contractual term): hard-blocks at HARD threshold
-    //      (5+ pending past 30 days). Returns HTTP 409 with code
-    //      'OUTCOME_GATE_BLOCKED' and the pending analysis IDs so the
-    //      client can route the user to the outcome reporter.
+    //   2. Enforced via org flag (org.enforceOutcomeGate = true, set
+    //      per-org as a design-partner contractual term): hard-blocks at
+    //      HARD threshold (5+ pending past 30 days). Returns HTTP 409
+    //      with code 'OUTCOME_GATE_BLOCKED' and the pending analysis IDs
+    //      so the client can route the user to the outcome reporter.
     //
-    // The org's enforcement flag is the org of any Document the user owns
-    // (or null for personal accounts). Non-throwing: any DB error falls
-    // back to enforce=false (permissive).
+    //   3. Enforced via Phase 1 HXC eligibility (locked 2026-05-04):
+    //      users who self-identified as one of the four buyer-class-
+    //      continuous personas (phase1HxcEligible=true) get Outcome Gate
+    //      enforced from day one. Per the GTM v3.5 lock — Bias Genome
+    //      moat accumulates only when outcomes are actually closed, and
+    //      HXC users are the cohort that drives the Phase 1 graduation
+    //      gate. Non-HXC and 'other' personas keep the legacy permissive
+    //      mode so accidental sign-ups aren't hard-blocked.
+    //
+    // Non-throwing: any DB error falls back to enforce=false (permissive).
     let enforceGate = false;
     try {
       // Find any org the user is a member of via TeamMember; if multiple,
@@ -171,6 +178,17 @@ export async function POST(request: NextRequest) {
         take: 1,
       });
       enforceGate = orgs.length > 0;
+
+      // GTM v3.5 lock criterion #3 — also enforce for Phase 1 HXC users.
+      if (!enforceGate) {
+        const settings = await prisma.userSettings
+          .findUnique({
+            where: { userId },
+            select: { phase1HxcEligible: true },
+          })
+          .catch(() => null);
+        if (settings?.phase1HxcEligible) enforceGate = true;
+      }
     } catch (err) {
       log.warn('Outcome gate enforcement lookup failed (defaulting to non-enforced):', err);
     }

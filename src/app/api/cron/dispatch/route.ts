@@ -101,6 +101,7 @@ export async function GET() {
     '/api/cron/google-drive-sync',
     '/api/cron/daily-linkedin',
     '/api/cron/enforce-retention',
+    '/api/cron/vohra-pmf-trigger',
     '/api/cache/cleanup',
   ];
 

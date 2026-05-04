@@ -10,6 +10,8 @@ import { AuthGuard } from '@/components/ui/AuthGuard';
 import { UsageMeter } from '@/components/billing/UsageMeter';
 import { NotificationBell } from '@/components/ui/NotificationCenter';
 import { OnboardingTourProvider } from '@/components/onboarding/OnboardingTour';
+import { Phase1PersonaModal } from '@/components/onboarding/Phase1PersonaModal';
+import { VohraPMFSurveyModal } from '@/components/vohra/VohraPMFSurveyModal';
 export default async function PlatformLayout({ children }: { children: React.ReactNode }) {
   return (
     <OnboardingTourProvider>
@@ -70,6 +72,8 @@ export default async function PlatformLayout({ children }: { children: React.Rea
         <AnalysisProgressFloat />
         <CommandPalette />
         <NewDecisionModal />
+        <Phase1PersonaModal />
+        <VohraPMFSurveyModal />
       </AnalysisProgressProvider>
     </OnboardingTourProvider>
   );

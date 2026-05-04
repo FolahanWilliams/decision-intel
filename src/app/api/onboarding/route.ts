@@ -3,16 +3,31 @@ import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { z } from 'zod';
+import { isHxcEligible } from '@/lib/constants/icp';
 
 const log = createLogger('OnboardingRoute');
 
 const ROLE_VALUES = ['cso', 'ma', 'bizops', 'pe_vc', 'other'] as const;
+
+// GTM v3.5 — Phase 1 buyer-class-continuous persona gating.
+// 'other' is captured for waitlist routing; the four continuous personas
+// are HXC-eligible.
+const PHASE_1_PERSONA_VALUES = [
+  'fractional_cso',
+  'midmarket_corp_dev',
+  'smaller_fund_gp',
+  'pe_backed_founder',
+  'other',
+] as const;
 
 const DEFAULTS = {
   onboardingCompleted: false,
   onboardingStep: 0,
   onboardingRole: null as string | null,
   onboardingTourSeen: false,
+  phase1Persona: null as string | null,
+  phase1PersonaRoleDetail: null as string | null,
+  phase1HxcEligible: false,
   hasContent: false,
 };
 
@@ -47,6 +62,9 @@ export async function GET() {
           onboardingStep: true,
           onboardingRole: true,
           onboardingTourSeen: true,
+          phase1Persona: true,
+          phase1PersonaRoleDetail: true,
+          phase1HxcEligible: true,
         },
       });
 
@@ -97,6 +115,10 @@ const PatchSchema = z.object({
   onboardingStep: z.number().int().min(0).max(10).optional(),
   onboardingRole: z.enum(ROLE_VALUES).optional(),
   onboardingTourSeen: z.boolean().optional(),
+  // GTM v3.5 Phase 1 persona gating. phase1HxcEligible is COMPUTED server-side
+  // from phase1Persona — never trust a client-supplied eligibility flag.
+  phase1Persona: z.enum(PHASE_1_PERSONA_VALUES).optional(),
+  phase1PersonaRoleDetail: z.string().max(200).optional(),
 });
 
 /**
@@ -124,16 +146,27 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: 'No fields to update' }, { status: 400 });
     }
 
+    // Server-side derive phase1HxcEligible from phase1Persona so the client
+    // can never lie about eligibility. The Vohra HXC cohort filter depends
+    // on this field; client-tampering would distort the PMF metric.
+    const writeData: Record<string, unknown> = { ...data };
+    if (typeof data.phase1Persona === 'string') {
+      writeData.phase1HxcEligible = isHxcEligible(data.phase1Persona);
+    }
+
     try {
       const updated = await prisma.userSettings.upsert({
         where: { userId: user.id },
-        create: { userId: user.id, ...data },
-        update: data,
+        create: { userId: user.id, ...writeData },
+        update: writeData,
         select: {
           onboardingCompleted: true,
           onboardingStep: true,
           onboardingRole: true,
           onboardingTourSeen: true,
+          phase1Persona: true,
+          phase1PersonaRoleDetail: true,
+          phase1HxcEligible: true,
         },
       });
 

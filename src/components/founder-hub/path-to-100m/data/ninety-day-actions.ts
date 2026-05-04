@@ -2,6 +2,8 @@
  * NinetyDayActionPlan consumer data — May-Jul 2026 sequenced moves
  * across product / GTM / fundraise / data / positioning / authority.
  * Split out from monolithic data.ts at F2 lock 2026-04-29.
+ * Re-framed 2026-05-04 around GTM v3.5 RATIFIED Phase 1 Individual wedge
+ * (NOT the v3.4 mid-market £2,499/mo direct motion that v3.5 superseded).
  *
  * When the sprint plan rolls forward (next 90-day window), update HERE.
  */
@@ -20,34 +22,77 @@ export type NinetyDayAction = {
 };
 
 export const NINETY_DAY_ACTIONS: NinetyDayAction[] = [
-  // Weeks 1-4 (May 2026)
+  // Weeks 1-2 — GTM v3.5 operational lock criteria
   {
-    id: 'close_3_design_partners',
-    week: 'Weeks 1-4 · May 2026',
+    id: 'ship_vohra_pmf',
+    week: 'Week 1 · May 2026',
+    weekNumber: 1,
+    category: 'product',
+    action:
+      'Ship Vohra PMF survey infrastructure (modal + cron + admin metrics) + Phase 1 persona gating + Outcome Gate auto-enforce on HXC users',
+    why: 'GTM v3.5 lock criteria 1-3 (RATIFIED 2026-05-04). Without Vohra surveying running monthly + persona gating filtering non-buyer-class users + Outcome Gate enforcing on Individual tier, the Phase 1 graduation gate (≥40% "very disappointed" on HXC cohort) cannot fire — and the data flywheel never starts.',
+    successCriterion:
+      'In-app modal fires after 2 audits in 14 days · /api/cron/vohra-pmf-trigger live · /api/founder-hub/vohra-pmf returns HXC % · sign-up form gates 4 personas + auto-redirects "other" · Outcome Gate enforces on phase1HxcEligible=true',
+    blocker: 'Migration deployment timing on production Supabase',
+    effort: 'medium',
+  },
+  {
+    id: 'phase_1_wedge_outreach',
+    week: 'Weeks 1-12 · May-July 2026',
     weekNumber: 1,
     category: 'gtm',
-    action: 'Close 3 paid design partners on £2,499/mo Strategy contract or equivalent',
-    why: 'Outcome-gate-enforcement requires contracted partners. Cathedral-of-code trap requires paid validation. Pre-seed deck requires booked ARR.',
+    action:
+      'Run 5-10 personalised LinkedIn DMs/week to buyer-class-continuous personas (fractional CSO, mid-market Corp Dev, smaller-fund GP, PE-backed founder)',
+    // drift-tolerant — "143 cases" is the founder's verbatim DM-script anchor at v3.5 ratification time; will be re-locked when historical-case corpus next grows.
+    why: 'GTM v3.5 ratified Phase 1 motion. Script discipline: lead with a specific bias from one of the 143 cases that matches the prospect industry, offer a free 60-second audit on their next memo. NOT direct outbound at scale; targeted high-signal DMs to people who fit the wedge.',
     successCriterion:
-      '3 signed contracts · £7,497/mo MRR · outcome-gate enforced contractually · integration-first onboarding live',
+      '8-12 paid Individual £249/mo customers retained 90+ days by month 6 · ≥3 documented ROI case studies · ≥2 warm intros to mid-market peers generated',
     blocker:
-      'Slow procurement cycles · founder time on inbound vs outbound · advisor-network activation cadence',
+      'Founder time on outbound vs product · LinkedIn API rate limits · finding the 4 personas without Sales Navigator',
     effort: 'large',
   },
   {
-    id: 'sankore_close',
-    week: 'Weeks 1-2',
-    weekNumber: 1,
+    id: 'phase_1_kill_criterion_calendar',
+    week: 'Month 4 · August 2026',
+    weekNumber: 13,
     category: 'gtm',
-    action: 'Close Sankore on contract — first wedge proof',
-    why: 'Sankore brief is at-the-ready. Pan-African anchor IS the moat. Closed Sankore unlocks the Pan-African PE network referrals.',
+    action: 'Phase 1 kill-criterion review — 8-12 paid customers OR pivot',
+    why: 'GTM v3.5 baseline: <5 paid customers by month 4 OR Vohra "very disappointed" <30% on HXC cohort = halt scaling, run product-discovery sprint with somewhat-disappointed + not-disappointed cohorts. Founder ratified the 8-12 baseline (not the 40 stretch goal from Gemini report — that assumes existing audience).',
     successCriterion:
-      'Sankore signed contract · 90-day onboarding plan · 3 retro-audits + live IC pipeline · outcome-gate enforced',
-    blocker:
-      'ISA 2007 framework gap (critical Nigerian regulator). DQI explainability + CIs not yet shipped.',
-    dependsOn: ['ship_isa_2007', 'ship_dqi_cis'],
+      'If baseline hit: graduate to Phase 2 (Sankore bridge). If kill fires: 5+ qualitative interviews with non-fits to surface the right pivot. NEVER push harder on the same motion when the early-warning signal is red.',
+    blocker: 'None — calendar-locked review',
+    effort: 'small',
+  },
+  {
+    id: 'london_strategy_world_june',
+    week: 'Weeks 5-6 · June 2026',
+    weekNumber: 5,
+    category: 'gtm',
+    action: 'Strategy World London (June 9-10, BAFTA) + AI in Business Conference (May 14, Prospero House)',
+    why: 'GTM v3.5 ratified events list. Strategy World is the highest-signal CSO event in London; AI in Business is high-signal for fractional CSOs + mid-market Heads of Strategic Planning. Cap at 2/month maximum to protect 1-1-1 traffic-source discipline.',
+    successCriterion:
+      '5+ pre-booked 1:1 coffees with target-persona attendees per event · Hybrid Discovery + Tailored-Pitch script run in every conversation · post-event CRM record per conversation · 2-3 follow-up audits booked',
+    blocker: 'Travel + accommodation cost (~£500/event) · founder time vs product velocity',
     effort: 'medium',
   },
+  // Existing v3.4 actions — kept but re-framed below as Phase 2 / 3 work
+  {
+    id: 'sankore_phase_2_close',
+    week: 'Weeks 5-12 · June-July 2026 (ramp to summer engagement)',
+    weekNumber: 5,
+    category: 'gtm',
+    action: 'Close Sankore on £1,999/mo founding-pilot contract — Phase 2 BRIDGE (NOT Phase 1 wedge)',
+    why: 'Sankore is the v3.5 Phase 2 design-partner BRIDGE, not the Phase 1 wedge. £1,999/mo founding-pilot rate (locked from v3.3 brief; £4,999/mo is the post-Sankore Phase 3 mid-market wedge price). Pan-African anchor IS the moat. 12-week structured engagement produces 3+ anonymised DPR specimens + 5+ warm intros to mid-market peer GPs / portfolio CSOs.',
+    successCriterion:
+      'Sankore signed at £1,999/mo · 12-week engagement plan with concrete deliverables · ≥3 anonymised DPRs published · ≥5 mid-market warm intros queued for Phase 3 activation · Outcome Gate enforced contractually',
+    blocker:
+      'ISA 2007 framework gap (critical Nigerian regulator). DQI explainability + CIs not yet shipped. Phase 1 Individual evidence not yet accumulated.',
+    dependsOn: ['ship_isa_2007', 'ship_dqi_cis', 'phase_1_wedge_outreach'],
+    effort: 'medium',
+  },
+  // Note: legacy sankore_close action superseded 2026-05-04 by sankore_phase_2_close
+  // above (re-framed as Phase 2 BRIDGE per GTM v3.5, with locked £1,999/mo
+  // founding-pilot rate from v3.3 Sankore brief, NOT a Phase 1 wedge proof).
   {
     id: 'ship_isa_2007',
     week: 'Weeks 1-2',

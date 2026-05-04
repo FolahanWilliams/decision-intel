@@ -53,7 +53,13 @@ const SCAN_DIR = join(ROOT, 'src');
 // 2026-05-04: bumped 120 → 121 for VoiceActivityTab body-parse fallback
 // when /api/founder-hub/voice-activity returns a non-2xx — same exact
 // pattern as the existing voice-token catch, just on the read side.
-const SILENT_CATCH_BASELINE = 121;
+// 2026-05-04 (later, GTM v3.5 RATIFIED): bumped 121 → 130 for
+// src/lib/learning/vohra-pmf.ts read-fallback catches (count fallbacks to
+// 0, lookup fallbacks to null/[]). The Vohra PMF survey trigger logic is
+// designed to fail soft on every read so the in-app modal never crashes
+// the dashboard if the survey-state lookup transiently fails. The 9
+// catches form a coherent exception class: PMF-trigger fail-soft reads.
+const SILENT_CATCH_BASELINE = 130;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

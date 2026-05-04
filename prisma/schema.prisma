@@ -575,8 +575,46 @@ model UserSettings {
   onboardingRole       String?
   onboardingTourSeen   Boolean  @default(false)
   emailForwardToken    String?  @unique
+  // GTM v3.5 Phase 1 buyer-class-continuous persona gating.
+  // Allowed values: 'fractional_cso' | 'midmarket_corp_dev' | 'smaller_fund_gp' | 'pe_backed_founder' | 'other'.
+  // hxcEligible is computed: true iff phase1Persona is one of the 4 continuous personas.
+  phase1Persona           String?
+  phase1PersonaRoleDetail String?
+  phase1HxcEligible       Boolean @default(false)
 
   @@index([userId])
+}
+
+/// GTM v3.5 — Vohra/Sean Ellis PMF survey response.
+/// Trigger: user completes 2 audits within 14 days AND no completed survey in last 30 days.
+/// HXC filter: phase1HxcEligible at trigger time. Phase-graduation gate: ≥40% "very_disappointed" on HXC cohort.
+model VohraPMFResponse {
+  id                String    @id @default(cuid())
+  userId            String
+  triggeredAt       DateTime  @default(now())
+  completedAt       DateTime?
+  // Vohra Q1 — the central PMF question. null = pending.
+  veryDisappointed  String? // "very_disappointed" | "somewhat_disappointed" | "not_disappointed"
+  // Vohra Q2-5 — qualitative.
+  hxcType            String?
+  mainBenefit        String?
+  improvement        String?
+  referralWillingness Int?
+  // Cohort metadata snapshotted at trigger time so reporting stays consistent
+  // even if the user's persona is later edited.
+  phase1PersonaAtTime String?
+  hxcEligibleAtTime   Boolean @default(false)
+  auditCountAtTrigger Int     @default(0)
+  daysSinceSignup     Int     @default(0)
+  triggerReason       String  @default("audits_complete_2_in_14d")
+  // Dismissal tracking (user can defer the modal up to 3 times before forced).
+  dismissedCount      Int     @default(0)
+  lastDismissedAt     DateTime?
+
+  @@index([userId])
+  @@index([triggeredAt])
+  @@index([hxcEligibleAtTime])
+  @@index([completedAt])
 }
 
 model CacheEntry {

@@ -136,6 +136,49 @@ export const FAILURE_MODES: FailureMode[] = [
     evidence:
       'CLAUDE.md External Attack Vectors locked 2026-04-26, sharpened 2026-05-02 with citation-grade evidence (WEF / BSI / ATE / JEPA) + authorship-agnostic-R²F defense framing. Investigation scaffolding at docs/agentic-shift-investigation-q2-2026.md. NotebookLM master-KB note `9a249bd8`.',
   },
+  // GTM v3.5 RATIFIED 2026-05-04 — two new internal failure modes added
+  // explicitly because the 4-pass cross-source synthesis surfaced them as
+  // structural risks the v3.3 / v3.4 plans did not name.
+  {
+    id: 'continuity_chasm',
+    trap: 'The Continuity Chasm (GTM v3.5 internal failure mode #1)',
+    killedCompany: 'Generic decision-tooling startups that sold to junior analysts',
+    diagnostic:
+      'Phase 1 dilutes the £249/mo wedge with non-decision-makers — junior strategic planners, generic mid-market C-suite without M&A budget, fractional-CSO-curious-not-fractional-CSO-actually. MQL-to-SQL conversion collapses to the 15-21% industry baseline. The Phase 2 mid-market motion has no warm-intro fuel because Individual users are NOT in the same buyer-class as the team-tier ICP. Word-of-mouth doesn’t compound across the boundary.',
+    diExposure: 'critical',
+    countermove: [
+      'Sign-up persona gating shipped 2026-05-04: 4 buyer-class-continuous personas (fractional CSO, mid-market Corp Dev, smaller-fund GP, PE-backed founder) + auto-redirect for "other" to a friendly waitlist',
+      'Vohra HXC cohort filter — the % "very disappointed" metric is computed ONLY on phase1HxcEligible=true users; the noise from non-fits cannot dilute the signal',
+      'Marketing copy + LinkedIn DM script discipline: every outreach explicitly addresses one of the four personas; refuse to broaden to "general strategy professionals"',
+      'Per-customer expansion-intent + referral-willingness tracking via the Vohra survey Q5 — surfaces non-fits early so they get the waitlist treatment, not the upgrade pitch',
+    ],
+    tripwire:
+      'If sign-up form non-fit ("other") rate exceeds 25% of new sign-ups for 2 consecutive weeks, the Phase 1 traffic source is broken. Diagnose: are the LinkedIn DMs targeting the right cohort? Are events filling with non-buyer-class attendees? Are referrals coming from legitimate HXC users or from fringe accounts?',
+    whatToWatch:
+      'Phase 1 sign-up persona distribution (target: ≥75% one of the 4 HXC personas). Vohra HXC cohort sample size (target: ≥5 respondents by month 4). MQL-to-SQL on Strategy-tier upgrades from Phase 1 graduates (target: ≥40%, not the 15-21% industry baseline).',
+    evidence:
+      'GTM v3.5 PMF-Discipline Deep Research report (docs/research/gemini-deep-research-pmf-sequencing-2026-05-04.md) §4 Buyer-class continuity + cross-source synthesis 5 locks (notebook 809f5104, query 2026-05-04).',
+  },
+  {
+    id: 'premature_enterprise_escalation',
+    trap: 'Premature Enterprise Escalation (GTM v3.5 single most likely failure mode)',
+    killedCompany: 'Solo-founder startups that activated their warmest network at zero-evidence',
+    diagnostic:
+      'Founder activates Mr. Reiner / Mr. Gabe networks for warm intros to F500 buyers BEFORE Phase 1 produces 5+ paid Individual customers + 3+ ROI case studies + Sankore reference artefact. The warm intros are evidence-burning — every conversation with no proof points trains the network to associate Decision Intel with "interesting but unproven." Founder gets dragged into custom integrations and 120-day enterprise sales cycles, exhausting $200K runway. Wedge motion stalls; Phase 2 fuel never arrives.',
+    diExposure: 'critical',
+    countermove: [
+      'Phase 3 activation gate locked: NO warm-intro asks of Mr. Reiner / Mr. Gabe until Phase 1 produces 5+ paid + 3+ ROI case studies + 1+ Individual customer asking about team-tier AND Phase 2 produces the Sankore reference artefact',
+      'Phase 1 OUTBOUND only via founder LinkedIn DMs (5-10/week) + 2 London events/month — NOT advisor-network warm intros',
+      'Zero F500 custom PoCs accepted during Phase 1 / Phase 2 — refuse with "we are running a Phase 1 validation right now; let me come back when we have 5 customer references for you" framing',
+      'Mr. Gabe customers-before-investors discipline applies recursively: customers before investors, AND evidence before warm-intro asks',
+    ],
+    tripwire:
+      'If founder catches themselves drafting a "hi Mr. Reiner, would you please introduce me to..." message before Phase 1 produces evidence — STOP. The temptation to pull this lever spikes when Phase 1 outreach feels slow. The evidence-burning math: a single failed warm intro costs 10× the conversation time of a successful one because it reduces future warm-intro production rate.',
+    whatToWatch:
+      'Founder calendar for unscheduled F500 calls. Inbox for "remember to follow up with..." threads. Phase 1 LinkedIn DM volume (target: 5-10/week sustained). Days since last Phase 1 outbound activity (target: never more than 3 days).',
+    evidence:
+      'GTM v3.5 PROPOSED §3 Risks + Mitigations + §5 Verification Gate timing logic (docs/gtm-plan-v3-5-2026-05-04.md). Cross-source synthesis confirmed Mr. Gabe customers-before-investors discipline applies recursively to warm-intro asks (notebook 809f5104, query 2026-05-04).',
+  },
 ];
 
 // =========================================================================
