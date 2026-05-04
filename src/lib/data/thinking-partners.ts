@@ -101,7 +101,35 @@ export interface ThinkingPartner {
    *  Cartesia voice + speed and by the system-prompt builder to
    *  inject the per-persona word cap into the voice addendum. */
   voiceProfile: VoiceProfile;
+  /** Sections of FOUNDER_CONTEXT this persona needs in voice mode.
+   *  Canonical keys (lowercase, parens stripped) — see
+   *  `splitFounderContextSections()` in `src/lib/utils/founder-context-sections.ts`.
+   *
+   *  Voice latency is dominated by LLM prompt-processing of the full
+   *  273KB FOUNDER_CONTEXT. Per-persona slicing keeps each lens
+   *  knowledgeable WITHIN its specialty (~30-50KB each) without
+   *  forcing every voice turn to chew the whole context.
+   *
+   *  Text chat keeps the full context — only voice mode uses these
+   *  slices. If a persona needs deeper context for a specific
+   *  question, the agent's voice rule tells it to offer to expand
+   *  in text chat. */
+  voiceContextSections: readonly string[];
 }
+
+/** Shared core sections that every persona gets in voice mode. The
+ *  founder identity + product identity + current phase + vocabulary
+ *  + the real risks. ~15-20KB total. Each persona's specific list
+ *  extends this. Defined here so a section added to the core only
+ *  needs ONE edit to propagate to all personas. */
+const SHARED_VOICE_SECTIONS = [
+  'product overview',
+  'founder notes',
+  'current phase',
+  'positioning vocabulary lock — decision provenance record',
+  'external attack vectors',
+  'one-liner lock',
+] as const;
 
 // ─── The 4 thinking partners ──────────────────────────────────────────
 
@@ -136,6 +164,21 @@ const DEFAULT_COACH: ThinkingPartner = {
     speed: 0,
     maxWordsPerVoiceTurn: 100,
   },
+  // Decision Coach is the all-purpose lens. Gets the strategic-execution
+  // + market-strategy + integrations slices on top of the shared core.
+  voiceContextSections: [
+    ...SHARED_VOICE_SECTIONS,
+    'execution discipline',
+    'market strategy',
+    'integrations',
+    'founder hub tab routing',
+    'flywheel closure surfaces',
+    '5 levels of entrepreneurship thinking',
+    'how to use these frameworks',
+    'regulatory tailwinds positioning',
+    'founder tips appendix',
+    'fundraising state',
+  ],
 };
 
 const COGNITIVE_PSYCHOLOGIST: ThinkingPartner = {
@@ -193,6 +236,19 @@ const COGNITIVE_PSYCHOLOGIST: ThinkingPartner = {
     speed: -0.1,
     maxWordsPerVoiceTurn: 140,
   },
+  // Cognitive Psychologist needs the bias / decision-science substrate:
+  // the moat (R²F is the moat), the toxic-combinations narrative (the
+  // 22-bias taxonomy), and the research foundations (Kahneman, Klein,
+  // Tetlock anchors). The shared core gives the founder identity +
+  // current phase + risks. Skips MARKET STRATEGY, SALES TOOLKIT,
+  // PITCH DECK FRAMEWORK, etc — not this lens's job.
+  voiceContextSections: [
+    ...SHARED_VOICE_SECTIONS,
+    'competitive moat',
+    'toxic combinations narrative',
+    'research foundations',
+    'regulatory tailwinds positioning',
+  ],
 };
 
 const BUSINESS_STRATEGIST: ThinkingPartner = {
@@ -249,6 +305,29 @@ const BUSINESS_STRATEGIST: ThinkingPartner = {
     speed: 0,
     maxWordsPerVoiceTurn: 120,
   },
+  // Business Strategist needs the strategy substrate: moat, competitors,
+  // market strategy, sales toolkit, content strategy, all 4 named
+  // frameworks (positioning / ICP / storytelling / brand), pitch deck
+  // structure, latest positioning lock. This is the heaviest pack
+  // because strategy questions span the most ground.
+  voiceContextSections: [
+    ...SHARED_VOICE_SECTIONS,
+    'competitive moat',
+    'competitors',
+    'market strategy',
+    'sales toolkit',
+    'content strategy',
+    'pitch deck framework',
+    'positioning framework',
+    'ideal customer profile framework',
+    'storytelling framework',
+    'brand building framework',
+    'how to use these frameworks',
+    'regulatory tailwinds positioning',
+    'latest positioning lock',
+    'competitive reality to remember',
+    'ai infrastructure',
+  ],
 };
 
 const SKEPTICAL_INVESTOR: ThinkingPartner = {
@@ -306,6 +385,25 @@ const SKEPTICAL_INVESTOR: ThinkingPartner = {
     speed: 0.15,
     maxWordsPerVoiceTurn: 80,
   },
+  // Skeptical Investor needs the diligence substrate: moat (defensive),
+  // competitors (who Cloverpop / IBM watsonx ARE), market strategy
+  // (TAM + ICP), fundraising state (the $1.5-2.5M seed math), pitch
+  // deck framework (what they'll see), Decision Alpha (the equity
+  // thesis hook), and the competitive-reality memo. External attack
+  // vectors are critical here — an investor will probe them first.
+  voiceContextSections: [
+    ...SHARED_VOICE_SECTIONS,
+    'competitive moat',
+    'competitors',
+    'market strategy',
+    'fundraising state',
+    'decision alpha — public markets bias signals',
+    'pitch deck framework',
+    'competitive reality to remember',
+    'regulatory tailwinds positioning',
+    'ai infrastructure',
+    'latest positioning lock',
+  ],
 };
 
 export const THINKING_PARTNERS: readonly ThinkingPartner[] = [
