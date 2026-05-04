@@ -61,7 +61,11 @@ export async function updateSession(request: NextRequest) {
       // it to /login made the worker JSON.parse the login page HTML and
       // crash silently with "failed to load voice context". Server-to-server
       // pattern, same as the slack/stripe/cron exemptions above.
-      !request.nextUrl.pathname.startsWith('/api/founder-hub/voice-context'));
+      !request.nextUrl.pathname.startsWith('/api/founder-hub/voice-context') &&
+      // Voice tool dispatch endpoint — same shared-secret bearer pattern.
+      // The agent calls this when LLM tool use fires (add_todo,
+      // track_demo_conversion, lookup_decision_log, etc).
+      !request.nextUrl.pathname.startsWith('/api/founder-hub/voice-tools'));
 
   // Allow extension requests to bypass middleware protection so the route handler
   // can authenticate them using the custom x-extension-key.

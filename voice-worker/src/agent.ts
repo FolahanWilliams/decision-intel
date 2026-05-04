@@ -45,6 +45,7 @@ import { fileURLToPath } from 'node:url';
 import { config } from './config.js';
 import { loadVoiceContext, resolveVoiceId } from './contextLoader.js';
 import { SessionMetrics } from './metrics.js';
+import { buildTools } from './tools.js';
 
 interface RoomMetadata {
   personaId?: string;
@@ -564,9 +565,28 @@ export default defineAgent({
       );
     }) as never);
 
+    // Build the tool registry — agent can now READ and WRITE on the
+    // founder's behalf (add todos, log demo conversions, look up
+    // decision log, fetch recent meetings, check design-partner
+    // pipeline status). Tool calls flow through /api/founder-hub/
+    // voice-tools which auth-gates with VOICE_WORKER_SECRET and
+    // logs every call to VoiceSessionEvent for the cross-tracking
+    // dashboard. sessionId + personaId are baked into the tool
+    // closures so the server can attribute every event correctly
+    // without the LLM having to pass them.
+    const tools = buildTools({
+      sessionId: ctx.room.name ?? 'unknown-room',
+      personaId: voiceContext.personaId,
+    });
+    // eslint-disable-next-line no-console
+    console.log(
+      `[voice-worker] tools registered — ${Object.keys(tools).join(', ')}`
+    );
+
     const agent = new voice.Agent({
       instructions,
       chatCtx: initialChatCtx,
+      tools,
     });
 
     const metrics = new SessionMetrics((ctx.room.name ?? 'unknown-room'), voiceContext.personaId);

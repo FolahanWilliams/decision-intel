@@ -1917,6 +1917,56 @@ model AnalyticsEvent {
   @@index([createdAt])
 }
 
+// ─── Voice Session Cross-Tracking ────────────────────────────────────────
+//
+// Logs structured events captured during voice mode sessions. The
+// LiveKit voice worker calls /api/founder-hub/voice-tools/* endpoints
+// (with VOICE_WORKER_SECRET bearer) when the agent's tool use fires —
+// e.g., the founder says "add a todo to follow up with Mr. Reiner",
+// the agent calls the add_todo tool, the tool handler POSTs to the
+// voice-tools API, the API writes here.
+//
+// The Founder Hub "Voice Activity" surface reads from this table to
+// show: what got created during voice sessions, demo conversion
+// signals, todos written by voice, lookups the agent performed.
+//
+// Event types (canonical):
+//   - 'todo_created'        agent wrote a todo on founder's behalf
+//   - 'demo_conversion'     founder noted a prospect's signal during
+//                          a demo / call (yes / maybe / no / objection)
+//   - 'meeting_logged'      founder asked the agent to log a meeting
+//   - 'decision_lookup'     agent fetched a decision-log entry
+//   - 'outreach_lookup'     agent fetched outreach pipeline state
+//   - 'meeting_lookup'      agent fetched recent meetings list
+//   - 'design_partner_lookup' agent fetched DP pipeline status
+//   - 'positioning_note'    founder + agent landed on a sharper
+//                          articulation worth saving
+//
+// payload shape varies per eventType; see voice-tools API for the
+// authoritative shape per type.
+model VoiceSessionEvent {
+  id        String   @id @default(cuid())
+  // LiveKit room name — matches the worker's session id and the
+  // chat-widget's voice-token roomName. Lets us group events by
+  // session for the activity dashboard.
+  sessionId String
+  eventType String
+  payload   Json     @default("{}")
+  // Which persona was active when the event fired. Useful for
+  // "Pitch Sharpener landed 3 positioning notes this week" rollups.
+  personaId String?
+  // The user / founder id (for multi-user expansion later). Nullable
+  // because the voice worker authenticates via shared-secret, not
+  // user session — we'd derive this from room metadata if we want
+  // per-user attribution.
+  userId    String?
+  createdAt DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([eventType, createdAt])
+  @@index([createdAt])
+}
+
 // ─── Stripe Billing ──────────────────────────────────────────────────────
 
 model Subscription {
