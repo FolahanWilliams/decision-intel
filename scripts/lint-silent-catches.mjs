@@ -59,7 +59,16 @@ const SCAN_DIR = join(ROOT, 'src');
 // designed to fail soft on every read so the in-app modal never crashes
 // the dashboard if the survey-state lookup transiently fails. The 9
 // catches form a coherent exception class: PMF-trigger fail-soft reads.
-const SILENT_CATCH_BASELINE = 130;
+// 2026-05-04 (later still): bumped 130 → 150 for the GTM v3.5 metrics
+// dashboard infrastructure — src/app/api/founder-hub/metrics/route.ts
+// is intentionally fault-tolerant on every individual aggregation query
+// (count fallbacks to 0, list fallbacks to []) so a single failed query
+// never blocks the whole dashboard render. src/lib/learning/micro-
+// deliberation.ts list / aggregate falls into the same class. The 20
+// catches form a coherent exception class: real-time metrics
+// fail-soft reads (each query is independently fault-tolerant; if one
+// errors, the dashboard still renders with the remaining tiles populated).
+const SILENT_CATCH_BASELINE = 150;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

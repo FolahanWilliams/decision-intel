@@ -438,6 +438,10 @@ model Analysis {
   draftOutcomes       DraftOutcome[]
   fingerprintWarnings FingerprintWarning[]
   provenanceRecord    DecisionProvenanceRecord?
+  /// GTM v3.5 — fast-feedback micro-deliberation events captured during
+  /// or after the IC / board review meeting where this analysis was
+  /// presented. Each row is one predicted-reaction confirmation/refutation.
+  microDeliberationOutcomes MicroDeliberationOutcome[]
 
   @@index([documentId])
   @@index([createdAt])
@@ -1034,6 +1038,68 @@ model TeamCognitiveProfile {
   @@unique([orgId, periodStart, periodEnd])
   @@index([orgId])
   @@index([periodStart])
+}
+
+/// GTM v3.5 RATIFIED 2026-05-04 — micro-deliberation outcome event.
+/// Fast-feedback signal that closes Cloverpop's data-advantage attack vector
+/// without requiring 5-7-year macro-outcome wait times. Each Analysis can
+/// produce many MicroDeliberationOutcome rows (one per predicted reaction
+/// confirmed or refuted in the IC discussion / board review).
+///
+/// Why this exists: NotebookLM Q1 + Q3.1 (2026-05-04) converged on the
+/// finding that v3.5's "Sankore engineers Brier loops in 12 weeks" assumption
+/// is mathematically impossible for MACRO outcomes (deal IRR years out) but
+/// trivially achievable for MICRO outcomes (committee reactions days out).
+/// Brier scoring aggregates BOTH macro (DecisionOutcome) and micro
+/// (MicroDeliberationOutcome) — the per-org calibration moat compounds
+/// faster as a result.
+model MicroDeliberationOutcome {
+  id           String   @id @default(cuid())
+  analysisId   String
+  userId       String
+  orgId        String?
+  /// One of: 'committee_pushback' | 'gc_flag' | 'chairman_concern' |
+  /// 'reviewer_dismissal' | 'predicted_bias_surfaced' | 'cfo_objection' |
+  /// 'compliance_block' | 'lp_question' | 'audit_committee_query' | 'other'.
+  eventType    String
+  /// The bias the audit predicted would surface in deliberation. Nullable
+  /// for events that don't bind to a specific bias (e.g., 'lp_question').
+  targetBiasId String?
+  /// What the audit predicted would happen in the deliberation, captured
+  /// verbatim from the audit output at the time the user opened the
+  /// micro-deliberation capture panel.
+  predictedReaction String  @db.Text
+  /// What actually happened. Free text from the user.
+  actualReaction    String? @db.Text
+  /// Did the predicted reaction match the actual reaction? null = not
+  /// yet observed (the IC meeting hasn't happened, the board hasn't met).
+  /// true = the audit predicted it AND it surfaced. false = the audit
+  /// predicted it AND it did NOT surface (false-positive prediction).
+  confirmed Boolean?
+  /// Confidence the audit assigned to this specific prediction at audit
+  /// time (0-1). Used to compute per-prediction Brier increments when
+  /// the user confirms/refutes.
+  predictedConfidence Float?
+  /// When the deliberation event actually occurred (the IC meeting / board
+  /// review date). Null until the user logs the confirmation.
+  happenedAt DateTime?
+  /// When the user captured this micro-deliberation event in the UI.
+  capturedAt DateTime  @default(now())
+  /// Optional context — e.g. "GC raised the NDPR question 8 minutes into
+  /// the discussion before I'd even brought it up."
+  notes      String?  @db.Text
+
+  analysis Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+
+  @@index([analysisId])
+  @@index([userId])
+  @@index([orgId])
+  @@index([userId, capturedAt])
+  @@index([orgId, capturedAt])
+  /// Dedicated index for per-org calibration aggregation queries — the
+  /// Brier flywheel groups by orgId + confirmed and counts confirmations
+  /// per bias type, so this composite is the hot path.
+  @@index([orgId, eventType, confirmed])
 }
 
 model DecisionOutcome {

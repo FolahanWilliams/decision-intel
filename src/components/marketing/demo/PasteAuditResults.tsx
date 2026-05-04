@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Brain, Users, Sparkles, Lock, CheckCircle2 } from 'lucide-react';
 import type { AnalysisResult, BiasDetectionResult, DecisionTwin } from '@/types';
 import { DQIBadge } from '@/components/ui/DQIBadge';
+import { DiscoverySynthesisLine } from '@/components/analysis/DiscoverySynthesisLine';
 import { trackEvent } from '@/lib/analytics/track';
 
 const C = {
@@ -127,6 +128,18 @@ export function PasteAuditResults({ documentId, analysisId, result }: PasteAudit
         <p style={{ fontSize: 15, color: C.slate600, lineHeight: 1.65, margin: '0 0 14px' }}>
           {result.summary}
         </p>
+
+        {/* GTM v3.5 Discovery-Grade synthesis line — single visceral hook for
+            the Phase 1 conversion mechanic at coffee chats / London events.
+            Renders BEFORE the noise / bias-count chips so the prospect hears
+            "X flags · ~£Y at risk · 60-second audit" in one breath. */}
+        <div style={{ margin: '0 -28px 14px', borderRadius: 12, overflow: 'hidden' }}>
+          <DiscoverySynthesisLine
+            analysisId={analysisId}
+            biasCount={topBiases.length}
+            variant="demo"
+          />
+        </div>
 
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           <span

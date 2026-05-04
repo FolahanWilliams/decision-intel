@@ -201,6 +201,13 @@ const TodoTab = dynamic(
   () => import('@/components/founder-hub/TodoTab').then(m => ({ default: m.TodoTab })),
   { loading: tabLoader }
 );
+const MetricsTab = dynamic(
+  () =>
+    import('@/components/founder-hub/MetricsTab').then(m => ({
+      default: m.MetricsTab,
+    })),
+  { loading: tabLoader }
+);
 const VoiceActivityTab = dynamic(
   () =>
     import('@/components/founder-hub/VoiceActivityTab').then(m => ({
@@ -254,6 +261,7 @@ import {
   Presentation,
   Handshake,
   Mic,
+  Activity,
 } from 'lucide-react';
 import { card } from '@/components/founder-hub/shared-styles';
 import { AccordionSection } from '@/components/founder-hub/AccordionSection';
@@ -286,6 +294,7 @@ type TabId =
   | 'lrqa'
   | 'path_to_100m'
   | 'voice_activity'
+  | 'metrics'
   | 'todo';
 
 type TabGroup = 'Start' | 'Product' | 'Go-to-Market' | 'Intelligence' | 'Tools';
@@ -403,6 +412,18 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
     id: 'voice_activity',
     label: 'Voice Activity',
     icon: <Mic size={16} />,
+    group: 'Intelligence',
+  },
+  {
+    // GTM v3.5 RATIFIED 2026-05-04 — real-time Phase 1 graduation
+    // dashboard. Pulls /api/founder-hub/metrics every 60s for the Vohra
+    // HXC PMF %, paid HXC retention, demos completed, audit cadence,
+    // outcome closure rate, micro-deliberation events, Brier baseline,
+    // and the days-since-X tripwires. The single surface a founder
+    // checks every morning to decide whether to scale or pivot.
+    id: 'metrics',
+    label: 'Metrics',
+    icon: <Activity size={16} />,
     group: 'Intelligence',
   },
   // Tools
@@ -874,6 +895,14 @@ const SEARCH_INDEX: SearchEntry[] = [
       'Persistent record of every prep’d meeting with the AI-generated plan, post-call notes, learnings, next steps, and outcome. One place instead of scattered across Docs, Slack, and Drive. Auto-populated from the Meeting Preparation card on the Outreach Strategy tab.',
     keywords:
       'meetings meeting log history record notes learnings followup follow-up outcome cso vc advisor design partner reference call pitch prep plan ethos pathos logos cialdini past upcoming scheduled completed reschedule no-show journal',
+  },
+  {
+    tabId: 'metrics',
+    section: 'Metrics',
+    preview:
+      'Real-time GTM v3.5 Phase 1 dashboard. Vohra HXC PMF % vs the 40% graduation gate, paid HXC customers retained 90+ days vs the 8-12 baseline, demos completed, audit volume per HXC user per week, outcome closure rate, micro-deliberation events with confirmation rate, Brier baseline, Bias Genome distinct-bias contribution, days-since-X cadence tripwires. Auto-refreshes every 60 seconds. The single surface to glance at every morning to decide scale-or-pivot.',
+    keywords:
+      'metrics dashboard pmf vohra hxc graduation kill threshold paid customers retention 90 days demos completed audits weekly monthly outcome closure rate brier calibration bias genome moat micro-deliberation funnel signups conversion phase 1 real-time refresh trend cadence tripwires days since',
   },
 ];
 
@@ -1657,6 +1686,11 @@ function renderTab(
     voice_activity: (
       <ErrorBoundary sectionName="Voice Activity">
         <VoiceActivityTab founderPass={FOUNDER_PASS} />
+      </ErrorBoundary>
+    ),
+    metrics: (
+      <ErrorBoundary sectionName="Metrics">
+        <MetricsTab founderPass={FOUNDER_PASS} />
       </ErrorBoundary>
     ),
   };

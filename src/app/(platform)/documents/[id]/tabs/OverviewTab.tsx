@@ -8,6 +8,7 @@ import { Brain, Lightbulb, ExternalLink, BarChart3, Eye, ChevronDown } from 'luc
 import { DocumentTextHighlighter } from '@/components/visualizations/DocumentTextHighlighter';
 import { BiasSparklineWithData } from '@/components/visualizations/BiasSparkline';
 import { RPDPreMortemSuggestionsCard } from '@/components/analysis/RPDPreMortemSuggestionsCard';
+import { MicroDeliberationCapture } from '@/components/analysis/MicroDeliberationCapture';
 import dynamic from 'next/dynamic';
 const BiasNetwork3D = dynamic(() => import('@/components/visualizations/BiasNetwork3DCanvas'), {
   ssr: false,
@@ -369,6 +370,13 @@ export function OverviewTab({
       {documentId && biases.length > 0 && (
         <RPDPreMortemSuggestionsCard documentId={documentId} biases={biases} />
       )}
+
+      {/* GTM v3.5 Micro-deliberation capture (RATIFIED 2026-05-04) — fast-
+          feedback Brier signal that closes Cloverpop's data-advantage
+          attack vector. After the IC discussion / board review, the user
+          logs which of the audit's predictions surfaced; the per-org
+          calibration moat compounds in days, not years. */}
+      {analysisId && <MicroDeliberationCapture analysisId={analysisId} />}
 
       {/* 4. Bias Details with inline sparklines */}
       <div className="card">

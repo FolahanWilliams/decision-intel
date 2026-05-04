@@ -8,6 +8,7 @@ import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 import { ScoreReveal } from '@/components/ui/ScoreReveal';
 import { AnatomyOfACallGraph } from '@/components/marketing/AnatomyOfACallGraph';
 import { CounterfactualPanel } from '@/components/ui/CounterfactualPanel';
+import { DiscoverySynthesisLine } from '@/components/analysis/DiscoverySynthesisLine';
 import {
   Dialog,
   DialogContent,
@@ -281,6 +282,13 @@ export function InlineAnalysisResultCard({
           </button>
         </div>
       </div>
+
+      {/* GTM v3.5 Discovery-Grade synthesis line — single visceral hook
+          designed for the Phase 1 conversion mechanic (20-min coffee chat
+          at a London event). Renders BEFORE the score reveal so the
+          fractional CSO / mid-market Head of Corp Dev hears the threat in
+          one breath: "X flags · ~£Y at risk · 60-second audit." */}
+      <DiscoverySynthesisLine analysisId={analysisId} biasCount={analysis.biasCount} />
 
       <div
         className="inline-result-body"
