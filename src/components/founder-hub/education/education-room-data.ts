@@ -19,13 +19,11 @@
  * a new persona / framework / lesson lands, update HERE only — the
  * EducationRoomTab pulls all decks + cards from these typed exports.
  *
- * Current state (2026-05-02): 16 decks, 173 cards. Was 12 decks/~100 cards
- * at 2026-04-28 lock; expanded with advanced_sales_moves, strategic_thinking,
- * goldner_discovery, and learning_efficiency decks (last added 2026-05-02
- * with the FounderOSPanel ship — 12 cards on Active Recall + Elaborative
- * Encoding + Progressive Summarization + SM-2 + tolerance for boredom +
- * digital asceticism + cognitive offloading + System 1/2 ratio + locus of
- * control + distress tolerance + the compounding-loop synthesis).
+ * Current state (2026-05-04): 17 decks, 181 cards. Was 16 decks / 173 cards
+ * at 2026-05-02; expanded with personal_social_archetypes (2026-05-04 ship
+ * with the personal-social SSOT — 8 cards: 6 archetype shapes from NotebookLM
+ * master KB synthesis ranked by 1-1-1 wedge ROI + the empathic-mode-first
+ * cold-context discipline + the "Polite but Brutal Pragmatist" META rule).
  */
 
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
@@ -50,7 +48,8 @@ export type DeckId =
   | 'advanced_sales_moves'
   | 'strategic_thinking'
   | 'goldner_discovery'
-  | 'learning_efficiency';
+  | 'learning_efficiency'
+  | 'personal_social_archetypes';
 
 export type CardDifficulty = 'foundation' | 'core' | 'advanced';
 export type CardMode = 'flashcard' | 'recall' | 'apply';
@@ -268,6 +267,15 @@ export const DECKS: EducationDeck[] = [
     iconName: 'Brain',
     color: '#7C3AED',
     order: 16,
+  },
+  {
+    id: 'personal_social_archetypes',
+    label: 'Personal Social Archetypes',
+    description:
+      "The 6 LinkedIn / X post archetypes ranked by 1-1-1 wedge ROI from the NotebookLM master KB synthesis (2026-05-04). Drill these so you can write the post HIMSELF when the AI is unavailable, and so you recognise which archetype a conversation is asking for in real time. Includes the empathic-mode-first META rule and the Polite-but-Brutal Pragmatist voice anchor.",
+    iconName: 'Linkedin',
+    color: '#0A66C2',
+    order: 17,
   },
 ];
 
@@ -2201,6 +2209,117 @@ const LEARNING_EFFICIENCY_CARDS: EducationCard[] = [
   },
 ];
 
+// ─── Cards: Personal Social Archetypes (8) ──────────────────────────
+
+const PERSONAL_SOCIAL_ARCHETYPES_CARDS: EducationCard[] = [
+  {
+    id: 'arch_billion_dollar_autopsy',
+    deckId: 'personal_social_archetypes',
+    prompt:
+      'Name the rank-1 personal-social archetype + its hook → middle → CTA shape.',
+    canonicalAnswer:
+      'Billion-Dollar Autopsy. HOOK: empathise with how a famous failed deal felt correct in the room — name the dollar amount destroyed. MIDDLE: reveal the cognitive trap that killed it (name the bias by name from the 22-bias taxonomy), cite the historical anchor, show that the team was not stupid — they were trapped in a named pattern. CTA: do not let your next memo hide this; paste it for a 60-second check before the committee sees it. Lands hardest with: boutique M&A advisor / PE associate (terrified of looking stupid).',
+    hint: 'Channels the 2008-financial-crisis paper thesis directly.',
+    difficulty: 'core',
+    applicationContext:
+      'When you see a corporate failure in the news (WeWork, Lehman, Theranos, new headline) and want to write a LinkedIn post that lands with M&A and PE buyers.',
+    source: 'src/lib/data/personal-social-system-prompt.ts POST_ARCHETYPES[0]',
+    tag: 'archetype',
+  },
+  {
+    id: 'arch_room_dynamics_fomu',
+    deckId: 'personal_social_archetypes',
+    prompt:
+      'Name the rank-2 personal-social archetype + when to reach for it.',
+    canonicalAnswer:
+      "Room Dynamics / FOMU Play. HOOK: the emotional panic of submitting a memo to a hostile committee. MIDDLE: name the specific adversarial reviewer ('the Dr. Red Team objection', 'the MD who attacks base-rate comparables'); name the cognitive failure they will exploit (Reference-Class Blindness, Inside-View Dominance, Illusion of Validity); show the brain fails under pressure in predictable ways. CTA: find your blind spot before they do; protect your commission. Lands hardest with: mid-market PE associate / corporate development head. Reach for it when the topic is IC pressure, defending a deal, presenting under scrutiny.",
+    difficulty: 'core',
+    applicationContext:
+      'Reach for it when the topic is IC pressure, defending a deal, presenting under scrutiny — anything where the reader is about to walk into a room they could lose.',
+    source: 'src/lib/data/personal-social-system-prompt.ts POST_ARCHETYPES[1]',
+    tag: 'archetype',
+  },
+  {
+    id: 'arch_cross_border_reality',
+    deckId: 'personal_social_archetypes',
+    prompt:
+      'Name the rank-3 personal-social archetype + the founder edge it weaponises.',
+    canonicalAnswer:
+      'Cross-Border Reality Check. HOOK: everyone loves the growth projections of a Pan-African / EM market entry; almost no one audits the cross-border compliance assumptions driving them. MIDDLE: name 2-3 specific frameworks (NDPR, CBN, WAEMU, ISA Nigeria 2007, PoPIA, CMA Kenya); show the 19-framework regulatory map is structural. CTA: one frictionless artefact your General Counsel can actually defend. Edge: the Lagos / UK / US lived experience — a generic Silicon Valley founder cannot fake this. Lands hardest with: Pan-African fund partner / F500 General Counsel / cross-border M&A head.',
+    hint: 'Lagos is the narrative edge. Lead with it.',
+    difficulty: 'core',
+    applicationContext:
+      'Reach for it when topic mentions Africa / Nigeria / Lagos / Kenya / cross-border / regulatory / GC. The Dangote DPR specimen is the leave-behind proof.',
+    source: 'src/lib/data/personal-social-system-prompt.ts POST_ARCHETYPES[2]',
+    tag: 'archetype',
+  },
+  {
+    id: 'arch_retainer_justification',
+    deckId: 'personal_social_archetypes',
+    prompt:
+      'Name the rank-4 personal-social archetype + the founder anchor.',
+    canonicalAnswer:
+      "Retainer Justification Flex. HOOK: clients don't pay £20k/month for data — they pay for undeniable rigor. MIDDLE: a fractional CSO's biggest threat isn't a bad strategy; it's a client who can't visually distinguish brilliant strategy from a generic ChatGPT output; people judge a book by its cover; show the artefact converts the memo into a hashed, tamper-evident audit PDF in 60 seconds. CTA: generate the record that justifies your fee; attach it to your next client invoice. Anchor: the financial-literacy initiative — teaching people to STRUCTURE, VALUE, and visually present financial reasoning so it commands respect. Lands hardest with: fractional CSO / independent M&A advisor / boutique consultancy founder.",
+    difficulty: 'core',
+    applicationContext:
+      'Reach for it when topic mentions fees, retainers, fractional consulting, client invoices, authority through presentation.',
+    source: 'src/lib/data/personal-social-system-prompt.ts POST_ARCHETYPES[3]',
+    tag: 'archetype',
+  },
+  {
+    id: 'arch_naked_business_velocity',
+    deckId: 'personal_social_archetypes',
+    prompt:
+      'Name the rank-5 personal-social archetype + how it weaponises the 16-year-old constraint.',
+    canonicalAnswer:
+      "Naked Business Velocity Flex. HOOK: last week between AP Calculus / a school day / a study hall, [Fortune 500 advisor / procurement reader / fund partner] pointed out a massive gap in my product. MIDDLE: name the gap honestly (specific blocker); show the fix shipped within days; show the comparable enterprise vendor cycle time (6 months / a roadmap promise); use Jason Cohen's Naked Business principle — vulnerability + proof of velocity. CTA: if a solo founder ships X in Y days, imagine what the product does for your deal flow. The 16-year-old constraint is WEAPONISED, not hidden — proves out-execution against incumbents who hold meetings for 6 months. NEVER use stage-of-company language ('we are pre-seed', 'we just launched') — those are banned. Lands hardest with: fractional CSO / M&A head / fellow founder.",
+    difficulty: 'advanced',
+    applicationContext:
+      'Reach for it when you just shipped something concrete (a feature, a fix, a regulatory mapping, a continuity plan) AND it solves a real procurement-grade objection.',
+    source: 'src/lib/data/personal-social-system-prompt.ts POST_ARCHETYPES[4]',
+    tag: 'archetype',
+  },
+  {
+    id: 'arch_advice_vs_reality',
+    deckId: 'personal_social_archetypes',
+    prompt:
+      'Name the rank-6 personal-social archetype + what to AVOID with it.',
+    canonicalAnswer:
+      'Advice vs. Reality Market Read. HOOK: conventional M&A / strategy advice says X (something dead wrong); historical data says Y (the actual base rate). MIDDLE: show why the conventional advice fails — name the cognitive failure (low-validity environments, inside-view dominance, planning fallacy); reference the 143-case library as the outside-view benchmark; show the engine pulls the closest historical analogs and predicts the base-rate outcome. CTA: trust the gut, but audit the reasoning. AVOID: mentioning specific Brier scores or DQI numbers in cold posts (those are technical-README claims, not cold-context moat sentences); use the "143-case reference-class corpus" framing instead; do NOT pick fights with named living strategists / consultants. Lands hardest with: head of strategic planning / CSO / consulting partner.',
+    difficulty: 'advanced',
+    applicationContext:
+      'Reach for it when topic mentions conventional wisdom, best practice, gut intuition, operator experience — anything where you can contrast received wisdom with the historical base rate.',
+    source: 'src/lib/data/personal-social-system-prompt.ts POST_ARCHETYPES[5]',
+    tag: 'archetype',
+  },
+  {
+    id: 'arch_meta_polite_brutal',
+    deckId: 'personal_social_archetypes',
+    prompt:
+      'What is the META-rule that makes a post unmistakably Folahan vs generic SaaS founder content?',
+    canonicalAnswer:
+      'The "Polite but Brutal Pragmatist." A generic SaaS founder posts: "Excited to announce our new AI feature to help teams collaborate!" Folahan posts: "Your team\'s collaboration is an Echo Chamber that is going to cost you $20M. Here\'s the mathematical proof, and the 60-second artefact to fix it." Every post must read like a 16-year-old who has done more homework than the adults in the room. NEVER beg for attention. ALWAYS diagnose a fatal corporate illness the reader didn\'t know they had, back it up with Kahneman-grade academic rigor + Lagos-forged operational pragmatism, and offer them the exact cure. ALWAYS frame the problem as a threat to their personal career or commission, and the product as their undeniable armor. Tone: calm 1:1 voice; polite delivery, brutal substance. NEVER critique the reader\'s judgment. NEVER reveal nervousness, hedging, or stage-of-company language. One em-dash maximum per post.',
+    difficulty: 'foundation',
+    applicationContext:
+      'Run every drafted post through this filter before publishing. If it sounds like a generic SaaS announcement, REWRITE.',
+    source: 'src/lib/data/personal-social-system-prompt.ts META_RULE_POLITE_BRUTAL_PRAGMATIST',
+    tag: 'meta_rule',
+  },
+  {
+    id: 'arch_empathic_mode_first',
+    deckId: 'personal_social_archetypes',
+    prompt:
+      'What is the empathic-mode-first rule for cold-context personal social posts?',
+    canonicalAnswer:
+      "A LinkedIn / X reader is COLD context — they have NOT earned the locked category vocabulary yet. NEVER lead with 'DPR', 'DQI', 'R²F', 'reasoning layer', or 'Decision Knowledge Graph' as the first impression. Lead with the buyer's PAIN in the buyer's WORDS — the panic of a hostile committee question they can't answer, the commission at risk if a deal goes sideways, the LP letter they don't want to write. Earn the term across the bridge sentence first, then introduce platform vocabulary in the second half if at all. Cold-context on-ramps: '60-second audit on a strategic memo' / 'pre-IC audit layer' / 'strategic memo audits' / 'decision quality auditing'. If you write a post that opens with platform vocabulary, you have failed this rule — rewrite from the reader's career anxiety, not the product feature.",
+    difficulty: 'foundation',
+    applicationContext:
+      'The first 1-3 lines of every personal social post. If they fail this test, the rest of the post will not be read.',
+    source: 'src/lib/data/personal-social-system-prompt.ts EMPATHIC_MODE_FIRST',
+    tag: 'meta_rule',
+  },
+];
+
 // ─── Aggregator + Helpers ───────────────────────────────────────
 
 export const ALL_CARDS: EducationCard[] = [
@@ -2222,6 +2341,7 @@ export const ALL_CARDS: EducationCard[] = [
   ...STRATEGIC_THINKING_CARDS,
   ...GOLDNER_DISCOVERY_CARDS,
   ...LEARNING_EFFICIENCY_CARDS,
+  ...PERSONAL_SOCIAL_ARCHETYPES_CARDS,
 ];
 
 export function findDeck(id: DeckId): EducationDeck | undefined {

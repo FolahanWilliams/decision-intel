@@ -18,6 +18,10 @@ import { verifyFounderPass as checkFounderPass } from '@/lib/utils/founder-auth'
 import { prisma } from '@/lib/prisma';
 import { FOUNDER_CONTEXT } from '../founder-context';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
+import {
+  buildPersonalSocialSystemPrompt,
+  type PostArchetypeId,
+} from '@/lib/data/personal-social-system-prompt';
 
 const log = createLogger('FounderContentStudio');
 const ENCODER = new TextEncoder();
@@ -109,15 +113,19 @@ Suggested angles: CEO leaderboard rankings, bias showdowns (Buffett vs Musk), wh
 Tone: Authoritative but accessible. Data-driven. Use specific DQI scores and bias names. Position this as proof that Decision Intel's engine works on the most public, scrutinized documents in markets.`,
 };
 
+// Minto + tactical-empathy instructions are appended to the per-content-type
+// shape so the composer (buildPersonalSocialSystemPrompt) inherits them.
+// Voice + archetype + META rule live in the SSOT.
+
 const MINTO_INSTRUCTION = `
 STRUCTURE (Minto Pyramid — BLUF):
 1. LEAD with the provocative conclusion or key insight first (the "so what")
 2. SUPPORT with 2-3 key arguments
 3. DETAIL with specific data, case studies, or research citations
-Corporate strategy and M&A leaders want the conclusion first, evidence on demand.`;
+The reader wants the conclusion first, evidence on demand.`;
 
 const TACTICAL_EMPATHY_INSTRUCTION = `
-TACTICAL EMPATHY: Acknowledge the audience's expertise before challenging their process. Use labeling ("It might seem like..."). Frame as augmenting expert judgment, not replacing it. Lead with curiosity ("What if..."), not criticism. Mirror corporate-strategy language (strategic memo, steering committee, board deck, recommendation, conviction).`;
+TACTICAL EMPATHY: Acknowledge the audience's expertise before challenging their process. Use labeling ("It might seem like..."). Frame as augmenting expert judgment, not replacing it. Lead with curiosity ("What if..."), not criticism.`;
 
 // ─── POST: Generate (SSE) or Save ───────────────────────────────────────────
 
@@ -165,7 +173,7 @@ export async function POST(request: NextRequest) {
 
   // ── Generate (SSE stream) ──
   if (action === 'generate') {
-    const { contentType, topic, tone, voiceNotes, pillar } = body;
+    const { contentType, topic, tone, voiceNotes, pillar, archetypeId } = body;
     if (!contentType || !CONTENT_INSTRUCTIONS[contentType]) {
       return NextResponse.json(
         {
@@ -176,33 +184,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const typeInstructions = CONTENT_INSTRUCTIONS[contentType];
-    const toneLabel = tone || 'authoritative';
-    const voiceExtra = voiceNotes
-      ? `\n\nAdditional voice/style notes from the founder:\n${String(voiceNotes).slice(0, 2000)}`
-      : '';
-    const topicLine = topic
-      ? `\n\nTopic/angle to write about: ${String(topic).slice(0, 1000)}`
-      : '';
-    const pillarExtra = pillar && PILLAR_CONTEXT[pillar] ? `\n\n${PILLAR_CONTEXT[pillar]}` : '';
+    const contentTypeInstructions = `${CONTENT_INSTRUCTIONS[contentType]}\n${MINTO_INSTRUCTION}\n${TACTICAL_EMPATHY_INSTRUCTION}`;
+    const pillarContext = pillar && PILLAR_CONTEXT[pillar] ? PILLAR_CONTEXT[pillar] : undefined;
 
-    const systemPrompt = `${FOUNDER_CONTEXT}
+    const { systemPrompt, archetype } = buildPersonalSocialSystemPrompt({
+      founderContext: FOUNDER_CONTEXT,
+      contentTypeInstructions,
+      topic: topic ? String(topic) : undefined,
+      archetypeId: archetypeId as PostArchetypeId | undefined,
+      voiceNotes: voiceNotes ? String(voiceNotes) : undefined,
+      pillarContext,
+      tone: tone ? String(tone) : undefined,
+    });
 
-You are the founder's personal content writer. Generate social media content that builds thought leadership in strategic-reasoning auditing and cognitive-bias detection for Chief Strategy Officers, Heads of Corporate Strategy, M&A directors, and the steering committees they answer to.
-
-CONTENT TYPE INSTRUCTIONS:
-${typeInstructions}
-${MINTO_INSTRUCTION}
-${TACTICAL_EMPATHY_INSTRUCTION}
-
-VOICE/TONE: ${toneLabel}${voiceExtra}${pillarExtra}${topicLine}
-
-Write the content now. Output ONLY the content itself — no meta-commentary, no "Here's your post:", no wrapper text.`;
+    log.info(`Content gen — type=${contentType} archetype=${archetype.id} (${archetype.name})`);
 
     try {
       const userMessage = topic
-        ? `Generate a ${contentType.replace('_', ' ')} about: ${topic}`
-        : `Generate a ${contentType.replace('_', ' ')} about decision intelligence`;
+        ? `Write a ${contentType.replace('_', ' ')} about: ${topic}. Use the "${archetype.name}" archetype shape from the system prompt.`
+        : `Write a ${contentType.replace('_', ' ')} using the "${archetype.name}" archetype shape from the system prompt. Pick a concrete real-world hook the founder could plausibly write today.`;
 
       const result = streamChat({
         model: MODEL_CHEAP,

@@ -49,6 +49,8 @@ import {
   EyeOff,
   CheckCircle2,
   XCircle,
+  Linkedin,
+  MessageCircleQuestion,
 } from 'lucide-react';
 import {
   DECKS,
@@ -91,6 +93,8 @@ const ICON_MAP: Record<string, typeof BookOpen> = {
   Compass,
   Quote,
   TrendingUp,
+  Linkedin,
+  MessageCircleQuestion,
 };
 
 // DeckIcon is declared at module scope so React's react-hooks/static-components

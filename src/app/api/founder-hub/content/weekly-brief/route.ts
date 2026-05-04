@@ -14,9 +14,11 @@ import { MODEL_CHEAP } from '@/lib/ai/gateway-models';
 import { apiError, apiSuccess } from '@/lib/utils/api-response';
 import { createLogger } from '@/lib/utils/logger';
 import { verifyFounderPass } from '@/lib/utils/founder-auth';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 import { FOUNDER_CONTEXT } from '../../founder-context';
 
 const log = createLogger('WeeklyBrief');
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
 function verify(req: NextRequest): boolean {
   return verifyFounderPass(req.headers.get('x-founder-pass')).ok;
@@ -68,11 +70,12 @@ ${BRAND_PILLARS}
 You are acting as a B2B content strategist and ghostwriter for Folahan Williams, the founder of Decision Intel.
 
 Generate a 5-post content brief for this week — one post per brand pillar, spread across Monday through Friday. Every post must:
-- Be grounded in Decision Intel's actual capabilities (DQI score, 20-bias taxonomy, 12-node pipeline, conviction score, forgotten-questions detector)
+- Be grounded in Decision Intel's actual capabilities (DQI score, ${BIAS_COUNT}-bias taxonomy, 12-node pipeline, conviction score, forgotten-questions detector)
 - Position Folahan as a genuine expert, not a product pusher
-- Have a hook that would make a corporate strategy director stop scrolling
+- Have a hook that would make ANY of these readers stop scrolling: a CSO at an FTSE 250 / S&P 500, a head of M&A or corporate development, a Pan-African / EM fund partner, a fractional CSO running a multi-client portfolio, a head of strategic planning, an F500 General Counsel
 - Be specific — no generic "AI is changing everything" or "here's why decisions matter"
 - Mix platforms: at least 3 LinkedIn posts, 1 Twitter/X thread, 1 Newsletter or Blog piece
+- Apply the empathic-mode-first rule: NEVER lead a cold reader with platform vocabulary (DPR / DQI / R²F / "reasoning layer"). Earn the term across a bridge sentence first.
 
 Return ONLY a JSON array of exactly 5 objects. Each object must have these exact keys:
 - id: "brief_1" through "brief_5"

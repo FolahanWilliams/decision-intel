@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import {
   Loader2,
   Copy,
@@ -13,6 +13,10 @@ import {
   Video,
 } from 'lucide-react';
 import { card, sectionTitle } from '../shared-styles';
+import {
+  ARCHETYPE_OPTIONS,
+  pickArchetype,
+} from '@/lib/data/personal-social-system-prompt';
 
 const CONTENT_TYPES = [
   { id: 'linkedin_post', label: 'LinkedIn', icon: Linkedin, color: '#0a66c2' },
@@ -78,6 +82,9 @@ interface ContentGeneratorProps {
   setIsEditing: (e: boolean) => void;
   pillar: string;
   setPillar: (p: string) => void;
+  /** Empty string = auto-pick by topic (default). PostArchetypeId = manual override. */
+  archetypeId: string;
+  setArchetypeId: (a: string) => void;
 }
 
 export function ContentGenerator({
@@ -97,7 +104,21 @@ export function ContentGenerator({
   setIsEditing,
   pillar,
   setPillar,
+  archetypeId,
+  setArchetypeId,
 }: ContentGeneratorProps) {
+  // Auto-picked archetype hint shown when archetypeId is empty (auto mode).
+  const autoPickedArchetype = useMemo(
+    () => (archetypeId ? null : pickArchetype(topic.trim() || undefined)),
+    [archetypeId, topic]
+  );
+
+  // Detail card source: either the manually-selected option, or null when in auto mode (autoPickedArchetype handles that branch separately).
+  const activeArchetypeDetail = useMemo(
+    () => (archetypeId ? ARCHETYPE_OPTIONS.find(a => a.id === archetypeId) ?? null : null),
+    [archetypeId]
+  );
+
   const handleGenerate = useCallback(async () => {
     if (isGenerating) return;
     setIsGenerating(true);
@@ -118,6 +139,7 @@ export function ContentGenerator({
           tone,
           voiceNotes: voiceNotes.trim() || undefined,
           pillar: pillar || undefined,
+          archetypeId: archetypeId || undefined,
         }),
       });
 
@@ -172,6 +194,7 @@ export function ContentGenerator({
     tone,
     voiceNotes,
     pillar,
+    archetypeId,
     isGenerating,
     setIsGenerating,
     setGeneratedContent,
@@ -253,6 +276,150 @@ export function ContentGenerator({
             );
           })}
         </div>
+      </div>
+
+      {/* Voice archetype picker */}
+      <div style={{ marginBottom: 16 }}>
+        <div
+          style={{
+            fontSize: 12,
+            fontWeight: 600,
+            color: 'var(--text-muted, #71717a)',
+            marginBottom: 8,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
+          }}
+        >
+          <span>Voice Archetype</span>
+          {autoPickedArchetype && (
+            <span style={{ fontWeight: 400, fontSize: 11, color: 'var(--text-muted, #71717a)' }}>
+              Auto-picked: <strong style={{ color: 'var(--text-secondary, #a1a1aa)' }}>{autoPickedArchetype.name}</strong>
+            </span>
+          )}
+        </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          <button
+            onClick={() => setArchetypeId('')}
+            title="Auto-pick the best archetype based on your topic"
+            style={{
+              padding: '6px 14px',
+              borderRadius: 8,
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: 'pointer',
+              border: archetypeId === ''
+                ? '2px solid #16a34a'
+                : '2px solid var(--border-primary, #222)',
+              background: archetypeId === '' ? '#16a34a15' : 'transparent',
+              color: archetypeId === '' ? '#16a34a' : 'var(--text-secondary, #a1a1aa)',
+              transition: 'all 0.15s',
+            }}
+          >
+            Auto-pick
+          </button>
+          {ARCHETYPE_OPTIONS.map(opt => {
+            const active = archetypeId === opt.id;
+            return (
+              <button
+                key={opt.id}
+                onClick={() => setArchetypeId(opt.id)}
+                title={`${opt.oneLiner}\n\nLands hardest with: ${opt.bestForPersona}`}
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: 8,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  border: active
+                    ? '2px solid #16a34a'
+                    : '2px solid var(--border-primary, #222)',
+                  background: active ? '#16a34a15' : 'transparent',
+                  color: active ? '#16a34a' : 'var(--text-secondary, #a1a1aa)',
+                  transition: 'all 0.15s',
+                }}
+              >
+                #{opt.rank} · {opt.name}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Archetype detail card — visible whenever a specific archetype is picked OR auto-pick has resolved one. Surfaces the shape so the founder learns the pattern while the AI uses it. */}
+        {(activeArchetypeDetail || autoPickedArchetype) && (
+          <div
+            style={{
+              marginTop: 12,
+              padding: 14,
+              borderRadius: 8,
+              border: '1px solid var(--border-primary, #222)',
+              background: 'rgba(22, 163, 74, 0.04)',
+              fontSize: 12,
+              lineHeight: 1.55,
+              color: 'var(--text-secondary, #a1a1aa)',
+            }}
+          >
+            {(() => {
+              const detail = activeArchetypeDetail ?? autoPickedArchetype!;
+              return (
+                <>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      letterSpacing: '0.06em',
+                      color: '#16a34a',
+                      textTransform: 'uppercase',
+                      marginBottom: 6,
+                    }}
+                  >
+                    {activeArchetypeDetail
+                      ? 'Selected archetype shape'
+                      : 'Auto-picked from your topic — preview the shape'}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 700,
+                      color: 'var(--text-primary, #fff)',
+                      marginBottom: 4,
+                    }}
+                  >
+                    {detail.name}
+                  </div>
+                  <div style={{ marginBottom: 10, fontStyle: 'italic' }}>{detail.oneLiner}</div>
+                  <div style={{ marginBottom: 6 }}>
+                    <strong style={{ color: 'var(--text-primary, #fff)' }}>HOOK:</strong>{' '}
+                    {detail.structuralShape.hook}
+                  </div>
+                  <div style={{ marginBottom: 6 }}>
+                    <strong style={{ color: 'var(--text-primary, #fff)' }}>MIDDLE:</strong>{' '}
+                    {detail.structuralShape.middle}
+                  </div>
+                  <div style={{ marginBottom: 10 }}>
+                    <strong style={{ color: 'var(--text-primary, #fff)' }}>CTA:</strong>{' '}
+                    {detail.structuralShape.cta}
+                  </div>
+                  <div
+                    style={{
+                      padding: 10,
+                      borderRadius: 6,
+                      background: 'rgba(239, 68, 68, 0.06)',
+                      border: '1px solid rgba(239, 68, 68, 0.18)',
+                      marginBottom: 10,
+                    }}
+                  >
+                    <strong style={{ color: '#ef4444' }}>AVOID:</strong> {detail.avoid}
+                  </div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted, #71717a)' }}>
+                    Lands hardest with: <strong>{detail.bestForPersona}</strong>
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        )}
       </div>
 
       {/* Topic input */}

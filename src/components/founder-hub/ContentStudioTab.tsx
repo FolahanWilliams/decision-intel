@@ -38,6 +38,8 @@ export function ContentStudioTab({ founderPass }: ContentStudioTabProps) {
   const [contentType, setContentType] = useState('linkedin_post');
   const [pillar, setPillar] = useState('');
   const [topic, setTopic] = useState('');
+  // Empty string = auto-pick by topic (default). Set to a PostArchetypeId to force a specific shape.
+  const [archetypeId, setArchetypeId] = useState('');
   const [generatedContent, setGeneratedContent] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -170,6 +172,8 @@ export function ContentStudioTab({ founderPass }: ContentStudioTabProps) {
         setPillar={setPillar}
         topic={topic}
         setTopic={setTopic}
+        archetypeId={archetypeId}
+        setArchetypeId={setArchetypeId}
         generatedContent={generatedContent}
         setGeneratedContent={setGeneratedContent}
         isGenerating={isGenerating}
