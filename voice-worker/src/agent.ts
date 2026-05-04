@@ -392,22 +392,31 @@ export default defineAgent({
       );
     }
 
-    // STT endpointing tuning (revised 2026-05-04 after the multi-FINAL
-    // race the founder hit). Original tuning (300/600) was too aggressive:
-    // a natural mid-sentence pause of 600ms+ caused Deepgram to emit a
-    // FINAL transcript, which fired generate_reply, which cascaded into
-    // queued speech tasks racing each other when the founder continued
-    // mid-sentence ("How do I get into Stanford. [800ms pause] What
-    // steps should I take?" → two FINALs → two generate_replies → three
-    // Cartesia errors in 4 seconds → AgentActivity dies). Bumped to
-    // endpointing=500ms + utteranceEndMs=1000ms which gives a full
-    // second of silence buffer before Deepgram declares end-of-turn —
-    // long enough for natural pauses, short enough that the agent still
-    // feels conversational. Combined with the AgentSession-level
-    // turnHandling.endpointing.minDelay default of 500ms, total quiet
-    // time before generate_reply fires = 500 + 500 = 1000ms. Tune lower
-    // if the agent feels sluggish; tune higher (800/1500) if multi-FINAL
-    // races resurface.
+    // STT endpointing tuning (revised AGAIN 2026-05-04 PM after the
+    // founder hit a SECOND multi-FINAL race despite the first fix).
+    // Timeline of the bug we're fixing this round:
+    //   t=941971: STT FINAL "I find myself explaining the data side..."
+    //   t=944037: agent commits → SPEECH CREATED (2.07s after FINAL)
+    //   t=944041: thinking
+    //   t=944364: STT FINAL "How do I strengthen my pitch?" (+0.3s)
+    //   t=944365: thinking → listening (1ms cancel)
+    //   "Cartesia returned error" → cascade → session dies
+    // → user paused 2.4s between two related sentences. With the prior
+    // tuning (500 STT + 500 session minDelay default = 1s total quiet
+    // time), the agent committed during the pause, the user's
+    // continuation arrived as a second FINAL 0.3s after commit, the
+    // first reply got canceled mid-flight and Cartesia errored.
+    //
+    // This round: keep STT endpointing at 500ms (Deepgram-level FINAL
+    // emission stays responsive), bump utteranceEndMs to 1500ms for
+    // breathing room, and CRUCIALLY bump the AGENT-side minDelay to
+    // 1500ms (set explicitly below in AgentSession turnHandling.
+    // endpointing). Total quiet-time tolerance: 500ms (Deepgram) +
+    // 1500ms (session) = 2 seconds. Natural pauses up to 2s won't fire
+    // turn end; clear thought-completion (>2s silence) will. Cost is
+    // ~1s extra perceived latency per turn — that's the price of zero
+    // dead sessions.
+    //
     // @see https://developers.deepgram.com/docs/endpointing
     //
     // Cast through `as never` because the typed STT options interface
@@ -420,7 +429,7 @@ export default defineAgent({
       smartFormat: true,
       interimResults: true,
       endpointing: 500,
-      utteranceEndMs: 1000,
+      utteranceEndMs: 1500,
     } as never);
 
     // LLM plugin selection branches on the model slug prefix:
@@ -491,34 +500,42 @@ export default defineAgent({
     //   handling strictly serial: STT FINAL → LLM call → TTS → done
     //   → next turn. Cost: ~200-500ms of perceived added latency.
     //
-    // turnHandling.interruption (added 2026-05-04 after the second
-    // multi-FINAL race the founder hit despite preemptive being off):
-    //   The Cartesia-error cascade can also fire when the founder is
-    //   still speaking when the FIRST generate_reply launches. STT
-    //   emits FINAL, agent thinks → speaks, founder continues with
-    //   the rest of the sentence which the agent reads as an
-    //   "interruption" (default minDuration 500ms / minWords 0
-    //   accepts ANY VAD-detected sound), agent kills the in-flight
-    //   TTS, queues a new generate_reply on the new partial — three
-    //   of those in 4 seconds and Cartesia rate-collapses.
+    // turnHandling.interruption (revised 2026-05-04 PM with the second
+    // multi-FINAL fix). The Cartesia-error cascade fires when the
+    // founder is still speaking when the FIRST generate_reply launches,
+    // OR when the founder finishes one sentence, pauses, and adds a
+    // clarifying second sentence — both look like the SAME problem to
+    // the framework: a new turn started while the previous turn's reply
+    // is mid-flight.
     //
-    //   Tuning:
-    //   - minDuration 1000ms (default 500): a real interruption needs
-    //     a full second of speech, not a backchannel "uh huh" or
-    //     throat-clear.
-    //   - minWords 2 (default 0): the interruption transcript must
-    //     contain at least 2 words. Single-word utterances ("yeah",
-    //     "okay", "hmm") count as backchannel and the agent keeps
-    //     speaking.
-    //   - falseInterruptionTimeout 2000ms (default — kept explicit):
-    //     if the agent decided to pause and then no real interrupt
-    //     comes in within 2s, fire agent_false_interruption and
-    //     resume the original reply (resumeFalseInterruption=true is
-    //     default).
-    //   - discardAudioIfUninterruptible true (default — kept
-    //     explicit): when the agent is mid-TTS and an interrupt is
-    //     judged too short to be real, the buffered VAD audio is
-    //     dropped instead of queued for re-evaluation.
+    // Tightening the interruption filter further this round (from the
+    // 1000/2 tuning that wasn't enough):
+    //   - minDuration 1500ms (was 1000): a real interruption now needs
+    //     1.5 seconds of speech. A short "wait" or "yeah but" no longer
+    //     counts; "wait, no, actually..." still does.
+    //   - minWords 3 (was 2): the interruption transcript must contain
+    //     at least 3 words. Filters out 2-word interjections like
+    //     "yeah but", "no wait" that were still tripping the filter.
+    //   - Other defaults preserved (falseInterruptionTimeout 2000,
+    //     resumeFalseInterruption true, discardAudioIfUninterruptible
+    //     true) — the agent still resumes from accidental pauses.
+    //
+    // turnHandling.endpointing (NEW THIS ROUND — was relying on default
+    // minDelay 500ms):
+    //   - minDelay 1500ms (default 500): the agent waits 1.5s of
+    //     post-FINAL silence before committing to generate_reply.
+    //     Combined with the Deepgram endpointing of 500ms, total
+    //     quiet-time tolerance is 2 seconds. The founder can pause
+    //     mid-thought, finish one sentence and start another, or
+    //     correct himself within a 2-second window — all of those
+    //     stay within ONE TURN.
+    //   - maxDelay 3000ms (default — kept explicit): hard cap on how
+    //     long the agent will wait. Even if speech keeps being detected
+    //     (background noise misclassified as VAD signal), the turn
+    //     completes after 3 seconds.
+    //   - mode 'fixed' (default — kept explicit): the dynamic mode
+    //     uses an end-of-utterance prediction model that we don't
+    //     need with this clear-silence threshold.
     const session = new voice.AgentSession({
       vad,
       stt: sttPlugin,
@@ -526,10 +543,15 @@ export default defineAgent({
       tts: ttsPlugin,
       turnHandling: {
         preemptiveGeneration: { enabled: false },
+        endpointing: {
+          mode: 'fixed',
+          minDelay: 1500,
+          maxDelay: 3000,
+        },
         interruption: {
           enabled: true,
-          minDuration: 1000,
-          minWords: 2,
+          minDuration: 1500,
+          minWords: 3,
           falseInterruptionTimeout: 2000,
           resumeFalseInterruption: true,
           discardAudioIfUninterruptible: true,
