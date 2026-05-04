@@ -124,7 +124,10 @@ export function Phase1PersonaModal() {
               </DialogDescription>
             </DialogHeader>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
+            <div
+              className="phase1-persona-grid"
+              style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 6 }}
+            >
               {PHASE_1_PERSONAS.map(persona => {
                 const isSelected = selected === persona.id;
                 return (
@@ -132,45 +135,99 @@ export function Phase1PersonaModal() {
                     key={persona.id}
                     type="button"
                     onClick={() => setSelected(persona.id)}
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 4,
-                      padding: '12px 14px',
-                      background: isSelected
-                        ? 'color-mix(in srgb, var(--accent-primary) 8%, transparent)'
-                        : 'var(--bg-card)',
-                      border: `1px solid ${
-                        isSelected ? 'var(--accent-primary)' : 'var(--border-color)'
-                      }`,
-                      borderRadius: 'var(--radius-md)',
-                      cursor: 'pointer',
-                      textAlign: 'left',
-                      transition: 'background 0.15s, border-color 0.15s',
-                    }}
+                    className={`phase1-persona-card ${isSelected ? 'is-selected' : ''}`}
                   >
-                    <div
-                      style={{
-                        fontSize: 14,
-                        fontWeight: 600,
-                        color: 'var(--text-primary)',
-                      }}
-                    >
-                      {persona.label}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 12,
-                        color: 'var(--text-muted)',
-                        lineHeight: 1.45,
-                      }}
-                    >
-                      {persona.description}
-                    </div>
+                    {/* Top accent strip — full green when selected, soft hint
+                        when not. Lives inside overflow:hidden so it respects
+                        the rounded corners cleanly. */}
+                    <span aria-hidden className="phase1-persona-card__accent" />
+                    <span className="phase1-persona-card__label">{persona.label}</span>
+                    <span className="phase1-persona-card__desc">{persona.description}</span>
                   </button>
                 );
               })}
             </div>
+
+            <style jsx>{`
+              .phase1-persona-card {
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                padding: 18px 18px 16px;
+                background: var(--bg-card);
+                border: 1px solid var(--border-color);
+                border-radius: 12px;
+                cursor: pointer;
+                text-align: left;
+                overflow: hidden;
+                box-shadow:
+                  0 1px 2px rgba(15, 23, 42, 0.04),
+                  0 0 0 1px rgba(15, 23, 42, 0.01) inset;
+                transition:
+                  border-color 0.18s ease,
+                  background 0.18s ease,
+                  box-shadow 0.18s ease,
+                  transform 0.18s ease;
+                appearance: none;
+                font: inherit;
+                color: inherit;
+                width: 100%;
+                box-sizing: border-box;
+              }
+
+              .phase1-persona-card:hover {
+                border-color: color-mix(in srgb, var(--accent-primary) 35%, var(--border-color));
+                box-shadow:
+                  0 4px 12px rgba(15, 23, 42, 0.06),
+                  0 0 0 1px color-mix(in srgb, var(--accent-primary) 10%, transparent) inset;
+                transform: translateY(-1px);
+              }
+
+              .phase1-persona-card:hover .phase1-persona-card__accent {
+                background: color-mix(in srgb, var(--accent-primary) 55%, transparent);
+              }
+
+              .phase1-persona-card:focus-visible {
+                outline: 2px solid var(--accent-primary);
+                outline-offset: 2px;
+              }
+
+              .phase1-persona-card.is-selected {
+                background: color-mix(in srgb, var(--accent-primary) 6%, var(--bg-card));
+                border-color: var(--accent-primary);
+                box-shadow:
+                  0 6px 18px color-mix(in srgb, var(--accent-primary) 18%, transparent),
+                  0 0 0 1px var(--accent-primary) inset;
+              }
+
+              .phase1-persona-card__accent {
+                position: absolute;
+                inset: 0 0 auto 0;
+                height: 3px;
+                background: color-mix(in srgb, var(--accent-primary) 22%, transparent);
+                transition: background 0.18s ease;
+              }
+
+              .phase1-persona-card.is-selected .phase1-persona-card__accent {
+                background: var(--accent-primary);
+                height: 4px;
+              }
+
+              .phase1-persona-card__label {
+                font-size: 14px;
+                font-weight: 600;
+                color: var(--text-primary);
+                line-height: 1.35;
+                letter-spacing: -0.005em;
+              }
+
+              .phase1-persona-card__desc {
+                font-size: 12.5px;
+                color: var(--text-muted);
+                line-height: 1.5;
+              }
+            `}</style>
 
             {otherPicked && (
               <label style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 8 }}>
