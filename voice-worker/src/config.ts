@@ -34,7 +34,28 @@ export const config = {
   llm: {
     apiKey: require_('AI_GATEWAY_API_KEY'),
     baseUrl: process.env.AI_GATEWAY_BASE_URL || 'https://ai-gateway.vercel.sh/v1',
-    model: process.env.GROK_MODEL || 'xai/grok-4.3',
+    // VOICE_LLM_MODEL is the canonical env var. GROK_MODEL kept as a
+    // deprecated fallback for envs that haven't migrated yet (the
+    // worker shipped with GROK_MODEL before we generalised to any AI
+    // Gateway provider).
+    //
+    // Default `openai/gpt-4o-mini` because it's the cheapest LLM that
+    // is verified to work with the LiveKit OpenAI plugin's streaming
+    // format. Grok 4.3 (`xai/grok-4.3`) returns empty replies through
+    // this plugin (the plugin's streaming parser doesn't match Grok's
+    // OpenAI-compat response shape). Override via Railway env if you
+    // want a different model — any AI Gateway slug works.
+    //
+    // Verified-working slugs (per the LiveKit OpenAI plugin parser):
+    //   - openai/gpt-4o-mini       cheapest, fast
+    //   - openai/gpt-4o            stronger, ~10× cost
+    //   - anthropic/claude-haiku-4-5  cheap, strong instruction-following
+    //   - google/gemini-3-flash-preview  Vercel default for analytical tier
+    //
+    // Untested with this plugin (may produce empty output):
+    //   - xai/grok-4.3
+    //   - deepseek/deepseek-chat
+    model: process.env.VOICE_LLM_MODEL || process.env.GROK_MODEL || 'openai/gpt-4o-mini',
   },
   cartesia: {
     apiKey: require_('CARTESIA_API_KEY'),

@@ -354,6 +354,44 @@ export default defineAgent({
       tts: ttsPlugin,
     });
 
+    // Wire the session's error event so STT/LLM/TTS plugin failures
+    // surface with their full type + cause. Without this, the Cartesia
+    // plugin's "Cartesia returned error" log line carries no body —
+    // the actual API error (model unavailable, voice mismatch, empty
+    // input, rate limit) gets swallowed and we can only guess. Same
+    // for LLM errors when AI Gateway rejects the model slug.
+    type SessionErrorPayload = {
+      type?: string;
+      error?: {
+        name?: string;
+        message?: string;
+        cause?: unknown;
+        stack?: string;
+        body?: unknown;
+        status?: number;
+      } | unknown;
+    };
+    // 'error' is the enum value of voice.AgentSessionEventTypes.Error
+    // (string literal). Cast through `as never` because the typed-emitter
+    // generic doesn't quite line up at the call site, but the runtime
+    // event name is correct per the SDK enum.
+    session.on('error' as never, ((payload: SessionErrorPayload) => {
+      const err = payload?.error as Record<string, unknown> | undefined;
+      // eslint-disable-next-line no-console
+      console.error(
+        '[voice-worker] session error event —',
+        '\n  type:', payload?.type,
+        '\n  errorName:', err?.name,
+        '\n  errorMessage:', err?.message,
+        '\n  errorBody:', err?.body !== undefined ? JSON.stringify(err.body) : undefined,
+        '\n  errorStatus:', err?.status,
+        '\n  errorCause:', err?.cause !== undefined ?
+          (typeof err.cause === 'object' ? JSON.stringify(err.cause, Object.getOwnPropertyNames(err.cause as object)) : String(err.cause))
+          : undefined,
+        '\n  errorStack:', err?.stack
+      );
+    }) as never);
+
     const agent = new voice.Agent({
       instructions,
       chatCtx: initialChatCtx,
