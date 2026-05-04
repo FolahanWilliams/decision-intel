@@ -32,6 +32,7 @@ import {
   Presentation,
   GraduationCap,
   FileText,
+  Bookmark,
 } from 'lucide-react';
 
 interface VoiceSessionEvent {
@@ -68,6 +69,10 @@ const EVENT_TYPE_META: Record<string, { label: string; icon: React.ComponentType
   meeting_logged: { label: 'Meetings logged', icon: Presentation, color: '#16A34A' },
   lesson_learned: { label: 'Lessons learned', icon: GraduationCap, color: '#A78BFA' },
   followup_scheduled: { label: 'Follow-ups scheduled', icon: Calendar, color: '#16A34A' },
+  // Captured ideas — the autonomous output of the IDEATION_PROTOCOL in
+  // thinking-partners.ts. Reviewed by the founder for reintegration into
+  // Decision Intel as features / new bias detectors / positioning shifts.
+  idea_captured: { label: 'Ideas captured', icon: Bookmark, color: '#A78BFA' },
   // Read actions (lookups)
   decision_lookup: { label: 'Decision-log lookups', icon: Search, color: '#7C3AED' },
   meeting_lookup: { label: 'Meeting lookups', icon: Search, color: '#7C3AED' },
@@ -107,6 +112,12 @@ function summariseEvent(ev: VoiceSessionEvent): string {
       return `[${args.category ?? 'general'}] ${typeof args.learning === 'string' ? args.learning.slice(0, 100) : 'Lesson'}`;
     case 'followup_scheduled':
       return `Follow up with ${args.personName ?? 'someone'} on ${args.dueDate ?? '(no date)'}`;
+    case 'idea_captured': {
+      const title = typeof args.title === 'string' ? args.title : 'Idea';
+      const verdict = typeof args.reintegrationVerdict === 'string' ? args.reintegrationVerdict.replace(/_/g, ' ') : 'review';
+      const mechanism = typeof args.mechanism === 'string' ? ` · ${args.mechanism.slice(0, 100)}` : '';
+      return `${title} [${verdict}]${mechanism}`;
+    }
     case 'decision_lookup':
       return `Searched decisions: "${args.query ?? '(no query)'}"`;
     case 'meeting_lookup':

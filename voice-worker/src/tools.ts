@@ -354,5 +354,38 @@ export function buildTools(ctx: ToolCallContext): llm.ToolContext {
       },
       execute: (args) => callVoiceTool('lookup_recent_audits', args, ctx),
     }),
+
+    capture_novel_idea: llm.tool({
+      description:
+        "AUTONOMOUS — fire when the conversation has produced a genuinely novel idea, mechanism, analogy, or falsifier the founder should review later. Do NOT ask permission; capture and tell him you did. Reserve for: (a) a causal mechanism articulated for the first time in this conversation, (b) a cross-domain analogy that opened a non-obvious next step, (c) a steelman/red-team that surfaced a real falsifier, (d) a reintegration candidate worth shipping back into Decision Intel as a feature / new bias detector / positioning shift / new persona. Do NOT capture summaries of things the founder already knows, restatements of locked positioning, or generic encouragement. Three or four genuine captures per week is the right cadence; thirty is noise. The founder reviews captures on the Voice Activity dashboard.",
+      parameters: {
+        type: 'object',
+        properties: {
+          title: {
+            type: 'string',
+            description: 'Tight idea title, 6-12 words, action-oriented (e.g., "DI-B-023 candidate: anchor-shift bias in cross-currency comparables")',
+          },
+          mechanism: {
+            type: 'string',
+            description: 'The causal chain in one sentence — X causes Y because of intermediate steps A and B. The mechanism IS the captured insight; without it the capture is decorative.',
+          },
+          summary: {
+            type: 'string',
+            description: 'Brief context — what the founder was working through when this surfaced, and why it qualified for capture.',
+          },
+          reintegrationVerdict: {
+            type: 'string',
+            enum: ['ship_to_di', 'shift_positioning', 'new_bias_detector', 'new_persona', 'side_bet_outside_di', 'falsifier_to_test', 'discard_after_review'],
+            description: 'Where this idea lives next. ship_to_di = becomes a feature in Decision Intel. shift_positioning = changes how DI is described to buyers. new_bias_detector = candidate for the bias taxonomy (DI-B-023+). new_persona = candidate for a new voice persona / chat persona. side_bet_outside_di = explore on its own track, not part of DI. falsifier_to_test = a specific test that would validate or kill an existing claim. discard_after_review = capture for memory but the founder will likely drop it.',
+          },
+          falsifier: {
+            type: 'string',
+            description: 'Optional — what evidence in the next 90 days would prove this idea wrong? A capture without a falsifier is a story; a capture WITH one is a hypothesis.',
+          },
+        },
+        required: ['title', 'mechanism', 'reintegrationVerdict'],
+      },
+      execute: (args) => callVoiceTool('capture_novel_idea', args, ctx),
+    }),
   };
 }

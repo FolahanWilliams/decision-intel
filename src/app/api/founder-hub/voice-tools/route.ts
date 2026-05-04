@@ -442,6 +442,60 @@ const TOOLS: ToolDef[] = [
       }
     },
   },
+
+  {
+    name: 'capture_novel_idea',
+    eventType: 'idea_captured',
+    async handler(args) {
+      // Persistence strategy: VoiceSessionEvent.payload.args carries the
+      // full capture (title / mechanism / summary / reintegrationVerdict /
+      // falsifier) — no separate table needed. The Voice Activity dashboard
+      // queries by eventType='idea_captured' to surface the capture
+      // queue. If a future "Reintegration Queue" surface ships, it reads
+      // from the same VoiceSessionEvent rows by eventType — no schema
+      // migration required.
+      //
+      // Validation is structural (lengths + enum membership). The LLM
+      // is instructed to capture only when a real novelty bar is met
+      // (see capture_novel_idea description in voice-worker/src/tools.ts +
+      // the IDEATION_PROTOCOL block in thinking-partners.ts) — the
+      // server doesn't second-guess the LLM's novelty judgment.
+      const title = typeof args.title === 'string' ? args.title.slice(0, 240) : '';
+      const mechanism = typeof args.mechanism === 'string' ? args.mechanism.slice(0, 1000) : '';
+      const summary = typeof args.summary === 'string' ? args.summary.slice(0, 2000) : null;
+      const falsifier = typeof args.falsifier === 'string' ? args.falsifier.slice(0, 1000) : null;
+      const validVerdicts = [
+        'ship_to_di',
+        'shift_positioning',
+        'new_bias_detector',
+        'new_persona',
+        'side_bet_outside_di',
+        'falsifier_to_test',
+        'discard_after_review',
+      ];
+      const reintegrationVerdict =
+        typeof args.reintegrationVerdict === 'string' && validVerdicts.includes(args.reintegrationVerdict)
+          ? args.reintegrationVerdict
+          : '';
+      if (!title) return { ok: false, error: 'title is required' };
+      if (!mechanism) return { ok: false, error: 'mechanism is required (one-sentence causal chain)' };
+      if (!reintegrationVerdict) {
+        return {
+          ok: false,
+          error: `reintegrationVerdict must be one of: ${validVerdicts.join(', ')}`,
+        };
+      }
+      // The dispatcher writes the full payload to VoiceSessionEvent.
+      // Returning a confirmation message that the founder will hear
+      // through TTS — keep it short.
+      void summary;
+      void falsifier;
+      return {
+        ok: true,
+        message: `Captured: "${title}" (${reintegrationVerdict.replace(/_/g, ' ')}). Review on Voice Activity dashboard.`,
+      };
+    },
+  },
 ];
 
 const TOOLS_BY_NAME = new Map(TOOLS.map(t => [t.name, t] as const));
