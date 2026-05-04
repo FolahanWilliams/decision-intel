@@ -372,14 +372,37 @@ export default defineAgent({
     const vad = ctx.proc.userData.vad as silero.VAD;
 
     // v1.3.x AgentSession owns the voice loop (VAD + STT + LLM + TTS).
-    // Interruptions are enabled by default in v1.3.x (turnHandling.
-    // interruption.enabled defaults to true), so no explicit option
-    // needed — the founder can barge in mid-response naturally.
+    //
+    // turnHandling.preemptiveGeneration.enabled = false:
+    //   v1.3.x defaults preemptive generation ON, which starts LLM
+    //   generation BEFORE the founder finishes speaking. Optimistic,
+    //   but creates a race-condition class when the founder gives
+    //   two utterances close together (e.g. "I want to strengthen my
+    //   role positioning" → 2s pause → "Sorry, I meant overall
+    //   positioning"). Pre-emptive turn 1 is mid-flight when turn 2's
+    //   STT FINAL fires; both turns get speech handles created;
+    //   Cartesia receives two synthesis requests racing each other
+    //   and errors out; the AgentActivity gets stuck and won't accept
+    //   subsequent turns. Verified in Railway logs t=58272 → 60841:
+    //   thinking → listening WITH NO SPEAKING state, then immediate
+    //   Cartesia error on the next turn. Disabling preemptive
+    //   generation makes turn handling strictly serial: STT FINAL
+    //   → LLM call → TTS → done → next turn. Predictable, no races.
+    //   Cost is ~200-500ms of perceived added latency per turn (the
+    //   LLM no longer has a head start), which is the right trade
+    //   for a working session over a faster-but-broken one.
+    //
+    // Interruptions are still enabled by default — the founder can
+    // still barge in mid-response naturally; only the speculative
+    // LLM-pre-call optimization is off.
     const session = new voice.AgentSession({
       vad,
       stt: sttPlugin,
       llm: llmPlugin,
       tts: ttsPlugin,
+      turnHandling: {
+        preemptiveGeneration: { enabled: false },
+      },
     });
 
     // Wire the session's error event so STT/LLM/TTS plugin failures
