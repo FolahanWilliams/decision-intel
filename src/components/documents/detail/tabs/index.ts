@@ -17,3 +17,20 @@ export type { FindingsTabProps, FindingsTabToxicCombination } from './FindingsTa
 
 export { ActionsTab } from './ActionsTab';
 export type { ActionsTabProps } from './ActionsTab';
+
+export { StressTestTab } from './StressTestTab';
+export type {
+  StressTestTabProps,
+  StressTestSubTab,
+  StressTestSlot,
+} from './StressTestTab';
+
+export { PerspectivesTab } from './PerspectivesTab';
+export type { PerspectivesTabProps, PerspectiveLens } from './PerspectivesTab';
+
+export { RegulatoryTab } from './RegulatoryTab';
+export type {
+  RegulatoryTabProps,
+  RegulatoryTabFrameworkTrigger,
+  RegulatoryTabSovereignContext,
+} from './RegulatoryTab';
