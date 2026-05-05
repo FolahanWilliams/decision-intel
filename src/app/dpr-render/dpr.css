@@ -1,0 +1,515 @@
+/* ---------------------------------------------------------------- */
+/* DPR Visual Language — locked 2026-05-05                          */
+/*                                                                  */
+/* Legal-evidence-record style (NOT McKinsey-deck) per master KB    */
+/* synthesis. Cryptographic provenance + verification first;        */
+/* methodological defensibility second; findings third.             */
+/*                                                                  */
+/* Typography: Inter Variable (body), Source Serif 4 Variable       */
+/* (display headers), JetBrains Mono Variable (hashes / cryptographic*/
+/* identifiers). All loaded via @fontsource — local, GDPR-safe,     */
+/* zero network dependency at print time.                           */
+/*                                                                  */
+/* Color palette (Kahneman-grade contrast: bright red/blue beat     */
+/* middling green): warm-grey 100-950 hierarchy + bright severity-  */
+/* led accents + navy 900 brand band only.                          */
+/* ---------------------------------------------------------------- */
+
+/* ---------------- Color tokens ------------------------------- */
+
+.dpr-document-root {
+  /* Warm grey scale — body hierarchy. Tuned for print contrast.    */
+  --dpr-grey-50: #fafaf9;
+  --dpr-grey-100: #f5f5f4;
+  --dpr-grey-200: #e7e5e4;
+  --dpr-grey-300: #d6d3d1;
+  --dpr-grey-400: #a8a29e;
+  --dpr-grey-500: #78716c;
+  --dpr-grey-600: #57534e;
+  --dpr-grey-700: #44403c;
+  --dpr-grey-800: #292524;
+  --dpr-grey-900: #1c1917;
+  --dpr-grey-950: #0c0a09;
+
+  /* Brand anchor — used only for the navy header band per page.    */
+  --dpr-navy-900: #0a0e27;
+  --dpr-navy-800: #131a3a;
+
+  /* Severity scale — Kahneman discipline: bright red + bright blue */
+  /* beat middling green/yellow for procurement-grade credibility.  */
+  --dpr-severity-critical: #dc2626; /* bright red — must-act */
+  --dpr-severity-high: #2563eb; /* bright blue — material */
+  --dpr-severity-medium: #d97706; /* amber — material caveat */
+  --dpr-severity-low: #16a34a; /* DI green — positive / no concern */
+  --dpr-severity-info: #0891b2; /* cyan — informational */
+
+  /* Severity background tints (for callout fills). */
+  --dpr-severity-critical-bg: #fef2f2;
+  --dpr-severity-high-bg: #eff6ff;
+  --dpr-severity-medium-bg: #fffbeb;
+  --dpr-severity-low-bg: #f0fdf4;
+
+  /* Severity border tints (for callout edges). */
+  --dpr-severity-critical-border: #fecaca;
+  --dpr-severity-high-border: #bfdbfe;
+  --dpr-severity-medium-border: #fde68a;
+  --dpr-severity-low-border: #bbf7d0;
+
+  /* Document chrome */
+  --dpr-paper: #ffffff;
+  --dpr-rule: var(--dpr-grey-200);
+  --dpr-rule-strong: var(--dpr-grey-300);
+  --dpr-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.04);
+
+  /* Type scale — print-optimised. */
+  --dpr-type-xxs: 9pt;
+  --dpr-type-xs: 10pt;
+  --dpr-type-sm: 10.5pt;
+  --dpr-type-body: 11pt;
+  --dpr-type-md: 12pt;
+  --dpr-type-lg: 14pt;
+  --dpr-type-xl: 18pt;
+  --dpr-type-display: 26pt;
+  --dpr-type-display-lg: 34pt;
+
+  /* Spacing scale — generous whitespace per CLAUDE.md polish bar. */
+  --dpr-space-1: 4px;
+  --dpr-space-2: 8px;
+  --dpr-space-3: 12px;
+  --dpr-space-4: 16px;
+  --dpr-space-5: 20px;
+  --dpr-space-6: 24px;
+  --dpr-space-7: 32px;
+  --dpr-space-8: 40px;
+  --dpr-space-9: 48px;
+  --dpr-space-10: 64px;
+}
+
+/* ---------------- Reset + base typography -------------------- */
+
+.dpr-document-root,
+.dpr-document-root * {
+  box-sizing: border-box;
+}
+
+.dpr-document-root {
+  font-family:
+    'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-feature-settings: 'cv11', 'ss01', 'ss03';
+  font-variant-numeric: tabular-nums;
+  font-size: var(--dpr-type-body);
+  line-height: 1.55;
+  color: var(--dpr-grey-900);
+  background: var(--dpr-grey-100);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  letter-spacing: -0.005em;
+  margin: 0;
+  padding: 0;
+}
+
+.dpr-document-root .dpr-display {
+  font-family: 'Source Serif 4', 'Source Serif Pro', Georgia, serif;
+  font-feature-settings: 'liga', 'kern';
+  letter-spacing: -0.015em;
+}
+
+.dpr-document-root .dpr-mono {
+  font-family:
+    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo,
+    Consolas, monospace;
+  font-feature-settings: 'zero', 'cv01', 'cv02';
+  letter-spacing: -0.01em;
+}
+
+/* ---------------- Page architecture -------------------------- */
+
+/*
+ * Each .dpr-page is one printed A4 page. On screen, pages are
+ * stacked with a soft shadow + margin so the reader can scroll
+ * through the document. On print, @page rules + page-break-after
+ * force one page per .dpr-page.
+ *
+ * Page dimensions: A4 = 210mm × 297mm. Print margins: 18mm top,
+ * 22mm bottom (room for footer), 16mm left/right. The interior
+ * .dpr-page-canvas is what content sits on; .dpr-page-frame is
+ * the outer page boundary.
+ */
+
+.dpr-page {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto var(--dpr-space-7);
+  background: var(--dpr-paper);
+  box-shadow: var(--dpr-shadow);
+  position: relative;
+  page-break-after: always;
+  break-after: page;
+  display: flex;
+  flex-direction: column;
+}
+
+.dpr-page:last-of-type {
+  margin-bottom: 0;
+  page-break-after: auto;
+}
+
+.dpr-page-band {
+  background: var(--dpr-navy-900);
+  color: white;
+  padding: 7mm 16mm;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--dpr-type-xxs);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.dpr-page-band-mark {
+  display: flex;
+  align-items: center;
+  gap: var(--dpr-space-3);
+  letter-spacing: 0.16em;
+}
+
+.dpr-page-band-mark-rule {
+  width: 18px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.dpr-page-band-flag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dpr-space-2);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 3px 8px;
+  border-radius: 2px;
+  font-size: 7.5pt;
+  letter-spacing: 0.12em;
+}
+
+.dpr-page-canvas {
+  padding: 14mm 16mm 22mm 16mm;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.dpr-page-footer {
+  position: absolute;
+  bottom: 12mm;
+  left: 16mm;
+  right: 16mm;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--dpr-space-3);
+  border-top: 1px solid var(--dpr-rule);
+  font-size: 7.5pt;
+  color: var(--dpr-grey-500);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ---------------- Section primitives ------------------------- */
+
+.dpr-section {
+  margin-top: var(--dpr-space-7);
+}
+
+.dpr-section:first-child {
+  margin-top: 0;
+}
+
+.dpr-section-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dpr-space-2);
+  font-size: 7.5pt;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--dpr-grey-500);
+  margin-bottom: var(--dpr-space-2);
+}
+
+.dpr-section-eyebrow-rule {
+  width: 24px;
+  height: 1px;
+  background: var(--dpr-grey-400);
+}
+
+.dpr-section-title {
+  font-size: var(--dpr-type-lg);
+  font-weight: 600;
+  color: var(--dpr-grey-900);
+  margin: 0 0 var(--dpr-space-2) 0;
+  letter-spacing: -0.012em;
+}
+
+.dpr-section-strap {
+  font-size: var(--dpr-type-sm);
+  color: var(--dpr-grey-600);
+  margin: 0 0 var(--dpr-space-4) 0;
+  line-height: 1.55;
+}
+
+.dpr-section-rule {
+  height: 1px;
+  background: var(--dpr-rule);
+  margin: var(--dpr-space-4) 0;
+}
+
+/* ---------------- Cover page ---------------------------------- */
+
+.dpr-cover-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--dpr-space-3);
+  font-size: 8pt;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--dpr-grey-500);
+  margin-bottom: var(--dpr-space-5);
+}
+
+.dpr-cover-eyebrow-rule {
+  width: 32px;
+  height: 1px;
+  background: var(--dpr-grey-400);
+}
+
+.dpr-cover-title {
+  font-family: 'Source Serif 4', 'Source Serif Pro', Georgia, serif;
+  font-feature-settings: 'liga', 'kern';
+  font-size: var(--dpr-type-display-lg);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.022em;
+  color: var(--dpr-grey-950);
+  margin: 0 0 var(--dpr-space-4) 0;
+}
+
+.dpr-cover-subtitle {
+  font-family: 'Source Serif 4', 'Source Serif Pro', Georgia, serif;
+  font-feature-settings: 'liga', 'kern';
+  font-size: var(--dpr-type-md);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--dpr-grey-600);
+  margin: 0 0 var(--dpr-space-7) 0;
+  max-width: 90%;
+}
+
+.dpr-cover-classification {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dpr-space-2);
+  background: var(--dpr-grey-100);
+  border: 1px solid var(--dpr-grey-200);
+  padding: 4px 10px;
+  border-radius: 2px;
+  font-size: 8pt;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dpr-grey-700);
+}
+
+.dpr-cover-classification--specimen {
+  background: var(--dpr-severity-medium-bg);
+  border-color: var(--dpr-severity-medium-border);
+  color: var(--dpr-severity-medium);
+}
+
+.dpr-cover-classification--client-safe {
+  background: var(--dpr-severity-info);
+  color: white;
+  border-color: var(--dpr-severity-info);
+}
+
+/* ---------------- Integrity / KV grid ------------------------ */
+
+.dpr-kv-grid {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: var(--dpr-space-3) var(--dpr-space-5);
+  font-size: var(--dpr-type-sm);
+  border-top: 1px solid var(--dpr-rule);
+  padding-top: var(--dpr-space-4);
+}
+
+.dpr-kv-key {
+  color: var(--dpr-grey-500);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.dpr-kv-value {
+  color: var(--dpr-grey-900);
+  font-weight: 500;
+}
+
+.dpr-kv-value--mono {
+  font-family:
+    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo,
+    Consolas, monospace;
+  font-size: 10pt;
+  font-weight: 400;
+  letter-spacing: -0.005em;
+}
+
+.dpr-kv-value-with-mark {
+  display: flex;
+  align-items: center;
+  gap: var(--dpr-space-2);
+  flex-wrap: wrap;
+}
+
+.dpr-kv-mark {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 2px;
+  font-size: 8pt;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.dpr-kv-mark--ok {
+  background: var(--dpr-severity-low-bg);
+  color: var(--dpr-severity-low);
+}
+
+.dpr-kv-mark--info {
+  background: var(--dpr-severity-high-bg);
+  color: var(--dpr-severity-high);
+}
+
+/* ---------------- Verification block ------------------------- */
+
+.dpr-verification {
+  margin-top: var(--dpr-space-6);
+  padding: var(--dpr-space-5);
+  background: var(--dpr-grey-50);
+  border: 1px solid var(--dpr-rule);
+  border-left: 3px solid var(--dpr-severity-high);
+  border-radius: 2px;
+}
+
+.dpr-verification-head {
+  display: flex;
+  align-items: center;
+  gap: var(--dpr-space-2);
+  font-size: 8pt;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--dpr-severity-high);
+  margin-bottom: var(--dpr-space-3);
+}
+
+.dpr-verification-body {
+  font-size: var(--dpr-type-sm);
+  line-height: 1.6;
+  color: var(--dpr-grey-700);
+  margin: 0 0 var(--dpr-space-3) 0;
+}
+
+.dpr-verification-url {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dpr-space-2);
+  padding: var(--dpr-space-2) var(--dpr-space-3);
+  background: white;
+  border: 1px solid var(--dpr-rule-strong);
+  border-radius: 2px;
+  font-family:
+    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo,
+    Consolas, monospace;
+  font-size: 9pt;
+  color: var(--dpr-grey-800);
+  text-decoration: none;
+}
+
+.dpr-verification-disclosure {
+  margin-top: var(--dpr-space-3);
+  padding-top: var(--dpr-space-3);
+  border-top: 1px solid var(--dpr-rule);
+  font-size: 8.5pt;
+  font-style: italic;
+  color: var(--dpr-grey-500);
+  line-height: 1.55;
+}
+
+/* ---------------- Footnotes / honest-disclosure ------------- */
+
+.dpr-honest-disclosure {
+  margin-top: var(--dpr-space-5);
+  padding: var(--dpr-space-4);
+  background: var(--dpr-severity-medium-bg);
+  border: 1px solid var(--dpr-severity-medium-border);
+  border-radius: 2px;
+  font-size: 8.5pt;
+  line-height: 1.55;
+  color: var(--dpr-grey-800);
+}
+
+.dpr-honest-disclosure-mark {
+  display: inline-block;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dpr-severity-medium);
+  margin-right: var(--dpr-space-2);
+}
+
+/* ---------------- Browser-only shell ------------------------- */
+/* On screen we render a soft grey backdrop around the page so the
+   reader sees the document as a printable artefact. On print these
+   are zeroed out by @page. */
+
+@media screen {
+  .dpr-document-root {
+    padding: var(--dpr-space-7) 0;
+    min-height: 100vh;
+  }
+}
+
+/* ---------------- Print rules -------------------------------- */
+
+@page {
+  size: A4;
+  margin: 0;
+}
+
+@media print {
+  .dpr-document-root {
+    padding: 0;
+    background: white;
+  }
+
+  .dpr-page {
+    margin: 0;
+    box-shadow: none;
+    page-break-after: always;
+    break-after: page;
+  }
+
+  .dpr-page:last-of-type {
+    page-break-after: auto;
+  }
+
+  /* Hide any preview-only chrome on print. */
+  .dpr-preview-only {
+    display: none !important;
+  }
+}
