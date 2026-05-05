@@ -1380,6 +1380,42 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         ]}
       />
 
+      {/* v2 preview link — locked 2026-05-06. Lets the founder verify the
+          McKinsey-grade refactored doc-detail UX on real audits before the
+          route swap retires this v1 page. The v2 page is at /documents/[id]/v2
+          and ships in commits 1-5 of the refactor. */}
+      <div style={{ marginBottom: 'var(--spacing-md)' }}>
+        <a
+          href={`/documents/${resolvedParams.id}/v2`}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '6px 12px',
+            fontSize: 12,
+            fontWeight: 600,
+            color: 'var(--accent-primary)',
+            background: 'color-mix(in srgb, var(--accent-primary) 8%, transparent)',
+            border: '1px solid var(--accent-primary)',
+            borderRadius: 999,
+            textDecoration: 'none',
+            letterSpacing: '0.04em',
+          }}
+        >
+          <span
+            style={{
+              fontSize: 9.5,
+              fontWeight: 800,
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+            }}
+          >
+            New
+          </span>
+          Try the McKinsey-grade v2 layout →
+        </a>
+      </div>
+
       {/* VerdictBand — DESIGN.md persona-validated layout (locked 2026-05-01).
           The single first-impression hero card carrying memo title + DQI grade
           + status pill + cross-doc conflicts + DPR export CTA. Replaces the

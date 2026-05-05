@@ -80,7 +80,11 @@ const SCAN_DIR = join(ROOT, 'src');
 // response body is parsed with .catch(() => null) per the canonical
 // body-parsing exception. The pre-Phase-4 jsPDF flow had one body-parse
 // catch in the same handler; Phase 4 adds a second for the PDF route.
-const SILENT_CATCH_BASELINE = 156;
+// 2026-05-06 (doc-detail v2 commit 5): bumped 156 → 157 for the new
+// /documents/[id]/v2 page refetch handler. Same body-parsing exception
+// class — the v2 page parses non-2xx response bodies to surface the
+// real API error message in the toast / error banner.
+const SILENT_CATCH_BASELINE = 157;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /
