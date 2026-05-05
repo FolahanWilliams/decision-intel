@@ -121,6 +121,7 @@ export default async function DprRenderPage({
         classification={classification}
         totalPages={totalPages}
         footerTitle="Decision Provenance Record"
+        documentIdentity={buildDocumentIdentity(data, type, id)}
       />
       <DprPageTwoMethodology
         judgeVariance={data.judgeVariance}
@@ -340,4 +341,58 @@ function prettyCase(s: string): string {
   return s
     .replace(/_/g, ' ')
     .replace(/\b\w/g, c => c.toUpperCase());
+}
+
+/**
+ * Build the Document Identity panel data for the cover. Reads from the
+ * validity classification signals (which carry document type / industry /
+ * decision horizon) and overrides per-specimen with the right scope
+ * label so a procurement reader can tell at-a-glance which decision
+ * shape was audited.
+ */
+function buildDocumentIdentity(
+  data: ProvenanceRecordData,
+  type: DprType,
+  id: string
+): {
+  documentType: string | null;
+  industry: string | null;
+  decisionHorizon: string | null;
+  geographicScope: string | null;
+} {
+  const signals = data.validityClassification?.signals ?? {
+    documentType: null,
+    industry: null,
+    decisionHorizon: null,
+  };
+
+  // Specimen-specific overrides — the validity classifier's signals on
+  // sample data are intentionally generic; the cover should render the
+  // narrative-specific scope so a procurement reader instantly sees
+  // "Pan-African industrial expansion" vs. "DACH market entry."
+  if (type === 'specimen') {
+    if (id === 'dangote') {
+      return {
+        documentType: 'Strategic memo',
+        industry: 'Manufacturing · Cement',
+        decisionHorizon: '36 months',
+        geographicScope: 'Pan-African (8 markets)',
+      };
+    }
+    return {
+      documentType: 'Strategic memo',
+      industry: 'Real estate',
+      decisionHorizon: '18 months',
+      geographicScope: 'DACH market entry',
+    };
+  }
+
+  // Real audit — use what the validity classifier surfaced. Geographic
+  // scope isn't in the classifier signals today; falls through as null.
+  return {
+    documentType: signals.documentType,
+    industry: signals.industry,
+    decisionHorizon: signals.decisionHorizon,
+    geographicScope: null,
+  };
 }

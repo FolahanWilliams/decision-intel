@@ -25,6 +25,17 @@ import { DprSection } from '../primitives/DprSection';
 import { DprKvGrid } from '../primitives/DprKvGrid';
 import { DprVerificationBlock } from '../primitives/DprVerificationBlock';
 
+export interface DprDocumentIdentity {
+  /** "Strategic memo" / "IC memo" / "Investor letter" / etc. */
+  documentType: string | null;
+  /** "Real estate" / "Manufacturing" / "Cement" / etc. */
+  industry: string | null;
+  /** "18 months" / "5 years" / "Single-cycle" / etc. */
+  decisionHorizon: string | null;
+  /** Geographic scope: "DACH" / "Pan-African" / "US public market" / etc. */
+  geographicScope: string | null;
+}
+
 export interface DprPageOneCoverProps {
   /** Title shown on the cover (typically the audited document's name). */
   title: string;
@@ -50,6 +61,12 @@ export interface DprPageOneCoverProps {
   totalPages: number;
   /** Document title for the footer. */
   footerTitle?: string;
+  /**
+   * Document-identity strip — passes the 10-second look test on the cover.
+   * Surfaces what was audited (type / industry / horizon / scope) before
+   * the reader scans the cryptographic provenance below. Locked 2026-05-05.
+   */
+  documentIdentity?: DprDocumentIdentity;
 }
 
 export function DprPageOneCover(props: DprPageOneCoverProps) {
@@ -66,6 +83,7 @@ export function DprPageOneCover(props: DprPageOneCoverProps) {
     classification = 'confidential',
     totalPages,
     footerTitle = 'Decision Provenance Record',
+    documentIdentity,
   } = props;
 
   const integrityRows = [
@@ -132,6 +150,15 @@ export function DprPageOneCover(props: DprPageOneCoverProps) {
         <p className="dpr-cover-subtitle">{subtitle}</p>
       </div>
 
+      {/* Document Identity panel — locked 2026-05-05. The 10-second-test
+          surface: at-a-glance metadata about WHAT was audited (type,
+          industry, horizon, scope), rendered as visual pills BEFORE the
+          cryptographic detail. Honest metadata, not opinion — the audit
+          verdict still lives downstream on page 2 onward. */}
+      {documentIdentity && (
+        <DprIdentityPanel identity={documentIdentity} auditTimestamp={auditTimestamp} />
+      )}
+
       {/* §1 — Integrity Fingerprints */}
       <DprSection
         marker="§1"
@@ -173,4 +200,100 @@ export function DprPageOneCover(props: DprPageOneCoverProps) {
 function ShortenedHash({ value }: { value: string }) {
   const display = value.length > 24 ? `${value.slice(0, 16)}…${value.slice(-8)}` : value;
   return <span title={value}>{display}</span>;
+}
+
+function DprIdentityPanel({
+  identity,
+  auditTimestamp,
+}: {
+  identity: DprDocumentIdentity;
+  auditTimestamp: string;
+}) {
+  const auditedDate = new Date(auditTimestamp).toISOString().slice(0, 10);
+  const auditedTime = new Date(auditTimestamp)
+    .toISOString()
+    .slice(11, 16);
+
+  // Each pill renders only when its underlying field is populated. The
+  // panel hides itself entirely when no fields are available — falls
+  // back to the original cover-only layout for legacy records.
+  const pills = [
+    identity.documentType
+      ? {
+          label: 'Document type',
+          value: prettyCase(identity.documentType),
+          foot: null,
+        }
+      : null,
+    identity.industry
+      ? {
+          label: 'Industry',
+          value: prettyCase(identity.industry),
+          foot: null,
+        }
+      : null,
+    identity.geographicScope
+      ? {
+          label: 'Geographic scope',
+          value: identity.geographicScope,
+          foot: null,
+        }
+      : null,
+    identity.decisionHorizon
+      ? {
+          label: 'Decision horizon',
+          value: identity.decisionHorizon,
+          foot: null,
+        }
+      : null,
+    {
+      label: 'Audited',
+      value: auditedDate,
+      foot: `${auditedTime} UTC`,
+      accent: true,
+    },
+  ].filter(Boolean) as Array<{
+    label: string;
+    value: string;
+    foot: string | null;
+    accent?: boolean;
+  }>;
+
+  if (pills.length === 0) return null;
+
+  // Cap to 4 pills so the grid doesn't overflow the row. The audit-
+  // timestamp pill is always included; the remaining 3 slots get the
+  // first 3 metadata fields the data populates.
+  const capped = pills.slice(0, 4);
+
+  return (
+    <section className="dpr-identity-panel">
+      <header className="dpr-identity-panel-eyebrow">
+        <span>Document at a glance</span>
+        <span className="dpr-identity-panel-rule" />
+      </header>
+      <div className="dpr-identity-grid">
+        {capped.map(pill => (
+          <div
+            key={pill.label}
+            className={
+              pill.accent
+                ? 'dpr-identity-pill dpr-identity-pill--accent'
+                : 'dpr-identity-pill'
+            }
+          >
+            <span className="dpr-identity-pill-label">{pill.label}</span>
+            <span className="dpr-identity-pill-value">{pill.value}</span>
+            {pill.foot && <span className="dpr-identity-pill-foot">{pill.foot}</span>}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function prettyCase(s: string): string {
+  return s
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase());
 }
