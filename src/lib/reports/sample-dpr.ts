@@ -37,20 +37,28 @@ const SAMPLE_FILENAME = 'ProjectHeliograph-MarketEntry-Memo-v3.pdf';
 const SAMPLE_ANALYSIS_ID = 'specimen-analysis-0000';
 const SAMPLE_DOCUMENT_ID = 'specimen-document-0000';
 
+// Sample lineage mirrors the canonical 12-node manifest in
+// `src/lib/data/pipeline-nodes.ts` so the DPR's pipeline-lineage row count
+// always matches the count cited in marketing surfaces (e.g. "12-node
+// LangGraph pipeline"). Drift between this map and PIPELINE_NODES would
+// surface a "10 instead of 12" inconsistency on the DPR — caught
+// 2026-05-05.
 const SAMPLE_MODEL_LINEAGE: ModelLineage = {
   nodes: {
     gdprAnonymizer: { model: 'preprocessing-tier', temperature: 0.0, topP: 0.95 },
-    dataStructurer: { model: 'preprocessing-tier', temperature: 0.0, topP: 0.95 },
+    structurer: { model: 'preprocessing-tier', temperature: 0.0, topP: 0.95 },
     intelligenceGatherer: { model: 'preprocessing-tier', temperature: 0.2, topP: 0.95 },
     biasDetective: { model: 'analysis-tier', temperature: 0.2, topP: 0.95 },
     noiseJudge: { model: 'analysis-tier', temperature: 0.4, topP: 0.95 },
-    statisticalJury: { model: 'analysis-tier', temperature: 0.3, topP: 0.95 },
-    rpdRecognition: { model: 'analysis-tier', temperature: 0.25, topP: 0.95 },
-    forgottenQuestions: { model: 'analysis-tier', temperature: 0.35, topP: 0.95 },
-    metaJudge: { model: 'analysis-tier', temperature: 0.15, topP: 0.95 },
+    verificationNode: { model: 'analysis-tier', temperature: 0.2, topP: 0.95 },
+    deepAnalysisNode: { model: 'analysis-tier', temperature: 0.3, topP: 0.95 },
+    simulationNode: { model: 'analysis-tier', temperature: 0.4, topP: 0.95 },
+    rpdRecognitionNode: { model: 'analysis-tier', temperature: 0.25, topP: 0.95 },
+    forgottenQuestionsNode: { model: 'analysis-tier', temperature: 0.35, topP: 0.95 },
+    metaJudgeNode: { model: 'pro-tier', temperature: 0.15, topP: 0.95 },
     riskScorer: { model: 'deterministic', temperature: 0.0, topP: 1.0 },
   },
-  note: 'Cost-tier routing: preprocessing and analysis tiers run on separate model classes; final risk score is deterministic, not model-generated. Actual model IDs are resolved at audit time and available to design partners on request under NDA.',
+  note: 'Cost-tier routing across the 12-node pipeline: preprocessing and analysis tiers run on separate model classes; the meta-judge — the highest-leverage single call — uses a Pro-grade model; final risk score is deterministic, not model-generated. Actual model IDs are resolved at audit time and available to design partners on request under NDA.',
 };
 
 const SAMPLE_JUDGE_VARIANCE: JudgeVariance = {

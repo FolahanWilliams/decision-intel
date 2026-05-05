@@ -85,8 +85,19 @@ export async function renderDprPdf(opts: RenderDprPdfOpts): Promise<RenderDprPdf
       format: 'A4',
       printBackground: true,
       preferCSSPageSize: true,
-      margin: { top: '0', bottom: '12mm', left: '0', right: '0' },
+      // Top margin reserves room for the per-sheet accent rule below.
+      // 8mm gives a clean breather without crowding the navy band.
+      // Bottom margin reserves room for the page-number footer.
+      margin: { top: '8mm', bottom: '12mm', left: '0', right: '0' },
       displayHeaderFooter: true,
+      // Header stays empty — Chromium's print-header DOM strips
+      // background-color, gradient, border, and inline SVG reliably.
+      // The per-sheet top breather is supplied instead by `@page {
+      // margin-top: 8mm }` in dpr.css, which gives every physical
+      // sheet (including continuation sheets) consistent breathing
+      // room above the body content. The per-LOGICAL-page navy band
+      // remains as the primary visual anchor on the first sheet of
+      // each section.
       headerTemplate: '<span></span>',
       footerTemplate: `
         <div style="

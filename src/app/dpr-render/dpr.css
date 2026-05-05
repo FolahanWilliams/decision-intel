@@ -144,21 +144,35 @@
   box-shadow: var(--dpr-shadow);
   position: relative;
   /*
-   * Scroll-performance — locked 2026-05-05.
+   * Scroll-performance — re-tuned 2026-05-05 (second pass).
    *
-   * `contain: layout paint` tells the browser that .dpr-page is a self-
-   * contained layout/paint boundary; descendants can't affect layout
-   * outside the page, and the page only needs to be repainted when its
-   * own contents change. With 15 stacked pages this dramatically
-   * reduces per-frame work during scroll.
+   * `contain: layout paint` (NOT `strict`) is correct — `strict`
+   * includes size containment which collapses page heights at print
+   * time and merged logical pages into 1/3 their actual count when
+   * tried. Layout + paint containment is the right ceiling here:
+   * descendants can't affect outside layout / paint, but the page's
+   * own intrinsic size still flows from its content.
    *
-   * `content-visibility: auto` lets the browser skip rendering pages
-   * that are far off-screen; combined with the `contain-intrinsic-size`
-   * fallback it preserves scroll position without flicker.
+   * `content-visibility: auto` skips rendering of far-offscreen pages.
+   * `contain-intrinsic-size` is the placeholder size used while a page
+   * is skipped — pinned to A4 height so scroll position stays stable.
+   *
+   * `transform: translateZ(0)` promotes each page to its own GPU
+   * compositing layer. With 15 stacked pages and per-card shadows /
+   * top accents, this is the single biggest scroll-perf win — the GPU
+   * composites pre-rasterised page tiles instead of the CPU re-painting
+   * every card on every scroll frame. GPU memory cost: ~A4 worth of
+   * pixels per page × 15 pages ≈ 60-100MB, acceptable for a desktop
+   * document viewer.
+   *
+   * `will-change: transform` is intentionally OMITTED — it is for
+   * actively-animating elements; on a static document it would force
+   * layer promotion permanently and bloat GPU memory.
    */
   contain: layout paint;
   content-visibility: auto;
   contain-intrinsic-size: auto 297mm;
+  transform: translateZ(0);
 }
 
 /*
@@ -223,6 +237,18 @@
 .dpr-page-canvas {
   padding: 14mm 16mm 14mm 16mm;
 }
+
+/*
+ * Page-top breather rule — locked 2026-05-05.
+ *
+ * The accent line at the top of every physical sheet (including
+ * continuation sheets where the in-document `.dpr-page-band` doesn't
+ * repeat) is rendered by Puppeteer's `headerTemplate` in
+ * `src/lib/reports/render-dpr-pdf.ts`, with the print top margin set
+ * to 8mm to reserve breathing space. Don't add a `::before` rule here
+ * — that paints once per logical .dpr-page (e.g. once per "Structural
+ * Assumptions" section), not once per physical sheet, so it'd be
+ * absent on the very continuation sheets we want to decorate. */
 
 /*
  * Page footer renders inline at the END of each logical page's content.
@@ -540,7 +566,7 @@
   padding: var(--dpr-space-5);
   background: var(--dpr-grey-50);
   border: 1px solid var(--dpr-rule);
-  border-left: 3px solid var(--dpr-severity-high);
+  border-top: 3px solid var(--dpr-severity-high);
   border-radius: 2px;
 }
 
@@ -596,6 +622,7 @@
   padding: var(--dpr-space-4);
   background: var(--dpr-severity-medium-bg);
   border: 1px solid var(--dpr-severity-medium-border);
+  border-top: 3px solid var(--dpr-severity-medium);
   border-radius: 2px;
   font-size: 8.5pt;
   line-height: 1.55;
@@ -1221,7 +1248,20 @@
  */
 @page {
   size: A4;
-  margin: 0;
+  /*
+   * Top margin reserves room for Puppeteer's `headerTemplate` (the per-
+   * sheet accent rule that paints on EVERY physical sheet, including
+   * continuation sheets). Bottom margin reserves room for the per-
+   * sheet footer (page X of Y · domain). Left/right stay at 0 because
+   * the in-document `.dpr-page-canvas` already applies its own 16mm
+   * horizontal padding; doubling it would crush the column width.
+   *
+   * preferCSSPageSize is true on the Puppeteer side — the CSS values
+   * here are the authoritative print margins, NOT the Puppeteer
+   * margin option. Keep them aligned with the Puppeteer config in
+   * src/lib/reports/render-dpr-pdf.ts.
+   */
+  margin: 8mm 0 12mm 0;
 }
 
 @media print {
