@@ -21,8 +21,11 @@ import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
 import { createLogger } from '@/lib/utils/logger';
 import { assembleProvenanceRecordDataForDeal } from '@/lib/reports/provenance-record-data';
-import { DecisionProvenanceRecordGenerator } from '@/lib/reports/decision-provenance-record-generator';
+import { renderDprPdf } from '@/lib/reports/render-dpr-pdf';
 import { logAudit } from '@/lib/audit';
+
+export const runtime = 'nodejs';
+export const maxDuration = 60;
 // TODO(notify): wire notifyExternalDprDownload from
 // @/lib/notifications/dpr-share-alert here when Deal gains a creatorUserId
 // field. Today Deal only carries orgId; "external share" can't be detected
@@ -71,9 +74,21 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const data = await assembleProvenanceRecordDataForDeal(dealId);
 
     if (format === 'pdf') {
-      const generator = new DecisionProvenanceRecordGenerator();
-      const pdf = generator.generate(data, { clientSafe });
-      const bytes = pdf.output('arraybuffer');
+      // Phase 4 wire-in: render via the shared HTML/CSS Puppeteer flow
+      // (CLAUDE.md DPR architecture lock 2026-05-05).
+      const reqUrl = request.nextUrl;
+      const baseUrl =
+        process.env.NEXT_PUBLIC_APP_URL ?? `${reqUrl.protocol}//${reqUrl.host}`;
+      const renderUrl = `${baseUrl}/dpr-render/deal/${dealId}${
+        clientSafe ? '?clientSafe=1' : ''
+      }`;
+      const { pdf } = await renderDprPdf({
+        baseUrl,
+        type: 'deal',
+        id: dealId,
+        authCookieHeader: request.headers.get('cookie') ?? undefined,
+        renderUrlOverride: renderUrl,
+      });
 
       await logAudit({
         action: 'EXPORT_PDF',
@@ -86,7 +101,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         },
       });
 
-      return new NextResponse(bytes, {
+      return new NextResponse(new Uint8Array(pdf), {
         headers: {
           'Content-Type': 'application/pdf',
           'Content-Disposition': `attachment; filename="dpr-deal-${deal.name.replace(/[^a-z0-9-]/gi, '_').slice(0, 60)}.pdf"`,

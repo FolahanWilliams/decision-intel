@@ -805,41 +805,52 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
     }
   };
 
-  // Decision Provenance Record — design-partner perk. Fetches the record
-  // JSON from /api/documents/[id]/provenance-record (POST persists + returns
-  // data), then hands the data to DecisionProvenanceRecordGenerator
-  // client-side. The generator is client-side jsPDF so the PDF download is
-  // a browser action.
+  // Decision Provenance Record — McKinsey-grade procurement deliverable.
+  // Locked 2026-05-05 (Phase 4): the export hits the server-side
+  // GET /api/documents/[id]/provenance-record?format=pdf endpoint which
+  // renders via the new HTML/CSS Puppeteer flow (replaces the prior
+  // client-side jsPDF generator). Triggers a browser download via blob URL.
   //
   // Renamed from handleDefensePacketExport on 2026-04-22.
   const handleProvenanceRecordExport = async () => {
     if (!document) return;
     try {
-      const res = await fetch(`/api/documents/${document.id}/provenance-record`, {
+      // POST first to persist the assembled record (cache for /verify path),
+      // then hit GET ?format=pdf to download the rendered PDF.
+      const persistRes = await fetch(`/api/documents/${document.id}/provenance-record`, {
         method: 'POST',
       });
-      if (!res.ok) {
-        const body = (await res.json().catch(() => null)) as { error?: string } | null;
+      if (!persistRes.ok && persistRes.status !== 503) {
+        const body = (await persistRes.json().catch(() => null)) as { error?: string } | null;
         const apiMsg = body && typeof body.error === 'string' ? body.error : null;
-        // Improved 2026-05-01: surface the API's stage-tagged error instead
-        // of the generic "Failed to generate record" so the founder can
-        // tell auth vs assemble vs persist failures at a glance. Pre-fix
-        // the toast just said "Failed to generate provenance record" with
-        // no diagnostic, mirroring the visibility:null incident pattern.
-        throw new Error(apiMsg || `Could not generate provenance record (HTTP ${res.status}).`);
+        throw new Error(
+          apiMsg || `Could not persist provenance record (HTTP ${persistRes.status}).`
+        );
       }
-      const { data } = (await res.json()) as {
-        data: import('@/lib/reports/provenance-record-data').ProvenanceRecordData;
-      };
-      const { DecisionProvenanceRecordGenerator } =
-        await import('@/lib/reports/decision-provenance-record-generator');
-      const generator = new DecisionProvenanceRecordGenerator();
-      // ProvenanceRecordData serialized through JSON loses the Date type on
-      // generatedAt — rehydrate before handing to jsPDF.
-      generator.generateAndDownload({
-        ...data,
-        generatedAt: new Date(data.generatedAt as unknown as string),
-      });
+
+      const pdfRes = await fetch(
+        `/api/documents/${document.id}/provenance-record?format=pdf`
+      );
+      if (!pdfRes.ok) {
+        const body = (await pdfRes.json().catch(() => null)) as { error?: string } | null;
+        const apiMsg = body && typeof body.error === 'string' ? body.error : null;
+        throw new Error(apiMsg || `Could not render PDF (HTTP ${pdfRes.status}).`);
+      }
+      const blob = await pdfRes.blob();
+      const url = URL.createObjectURL(blob);
+      const cd = pdfRes.headers.get('Content-Disposition') ?? '';
+      const match = /filename="([^"]+)"/.exec(cd);
+      const filename = match
+        ? match[1]
+        : `DPR-${document.filename.replace(/\.[^.]+$/, '').replace(/[^a-z0-9-_]+/gi, '-')}.pdf`;
+      const a = window.document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      window.document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+
       fetch('/api/audit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -847,7 +858,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           action: 'EXPORT_PROVENANCE_RECORD',
           resource: 'Document',
           resourceId: document.id,
-          details: { filename: document.filename },
+          details: { filename: document.filename, channel: 'mckinsey-grade-html' },
         }),
       }).catch(err => log.warn('audit EXPORT_PROVENANCE_RECORD failed:', err));
       showToast('Decision Provenance Record generated', 'success');

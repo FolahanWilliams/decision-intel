@@ -74,7 +74,13 @@ const SCAN_DIR = join(ROOT, 'src');
 // back to an empty list so the OS tab never crashes the whole founder
 // hub if the database is briefly unreachable. The 5 catches form a
 // coherent exception class: founder-os fail-soft reads.
-const SILENT_CATCH_BASELINE = 155;
+// 2026-05-05 (later, DPR Phase 4): bumped 155 → 156 for the new
+// /documents/[id] Export DPR button flow. The export handler now hits
+// two server endpoints (POST persist + GET ?format=pdf) and each non-2xx
+// response body is parsed with .catch(() => null) per the canonical
+// body-parsing exception. The pre-Phase-4 jsPDF flow had one body-parse
+// catch in the same handler; Phase 4 adds a second for the PDF route.
+const SILENT_CATCH_BASELINE = 156;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

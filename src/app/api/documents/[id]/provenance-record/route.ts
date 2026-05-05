@@ -25,10 +25,13 @@ import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 import { createLogger } from '@/lib/utils/logger';
 import { assembleProvenanceRecordData } from '@/lib/reports/provenance-record-data';
-import { DecisionProvenanceRecordGenerator } from '@/lib/reports/decision-provenance-record-generator';
+import { renderDprPdf } from '@/lib/reports/render-dpr-pdf';
 import { getUserPlan, getOrgPlan } from '@/lib/utils/plan-limits';
 import { buildDocumentAccessWhere } from '@/lib/utils/document-access';
 import { notifyExternalDprDownload } from '@/lib/notifications/dpr-share-alert';
+
+export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 const log = createLogger('ProvenanceRecordRoute');
 
@@ -108,11 +111,25 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         );
       }
 
+      // Phase 4 wire-in: render via the shared HTML/CSS Puppeteer flow
+      // (CLAUDE.md DPR architecture lock 2026-05-05). Forwards the
+      // caller's Supabase auth cookies so /dpr-render/document/[analysisId]
+      // re-verifies ownership server-side as defense-in-depth.
       const data = await assembleProvenanceRecordData(auth.analysisId);
-      const generator = new DecisionProvenanceRecordGenerator();
-      const doc = generator.generate(data, { clientSafe });
-      const pdfArrayBuffer = doc.output('arraybuffer') as ArrayBuffer;
-      const pdfBytes = new Uint8Array(pdfArrayBuffer);
+      const reqUrl = new URL(req.url);
+      const baseUrl =
+        process.env.NEXT_PUBLIC_APP_URL ?? `${reqUrl.protocol}//${reqUrl.host}`;
+      const renderUrl = `${baseUrl}/dpr-render/document/${auth.analysisId}${
+        clientSafe ? '?clientSafe=1' : ''
+      }`;
+      const { pdf: pdfBuffer } = await renderDprPdf({
+        baseUrl,
+        type: 'document',
+        id: auth.analysisId + (clientSafe ? '?clientSafe=1' : ''),
+        authCookieHeader: req.headers.get('cookie') ?? undefined,
+        renderUrlOverride: renderUrl,
+      });
+      const pdfBytes = new Uint8Array(pdfBuffer);
 
       const safeName = data.meta.filename
         .replace(/\.[^.]+$/, '')

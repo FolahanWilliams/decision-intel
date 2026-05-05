@@ -1061,9 +1061,26 @@ function buildDpaDocx() {
 // ------------------------------------------------------------
 // Run
 // ------------------------------------------------------------
+//
+// Locked 2026-05-05 (Phase 4 of the DPR rebuild): DPR generation has been
+// migrated to the McKinsey-grade HTML/CSS Puppeteer flow at
+// /dpr-render/specimen/{wework,dangote}. The DPR generators below
+// (buildDprSample, buildDprDangote) are retained only for emergency
+// fallback if the new render is broken; they are NOT called in the
+// normal build path. To regenerate the public DPR sample PDFs, use:
+//
+//   npm run dev   # in one terminal
+//   DPR_URL='http://localhost:3000/dpr-render/specimen/wework' \
+//     DPR_OUTPUT='public/dpr-sample-wework.pdf' \
+//     node scripts/dev-dpr-preview.mjs
+//   DPR_URL='http://localhost:3000/dpr-render/specimen/dangote' \
+//     DPR_OUTPUT='public/dpr-sample-dangote.pdf' \
+//     node scripts/dev-dpr-preview.mjs
+//
+// The DPA template (PDF + DOCX) stays on jsPDF since it's a contractual
+// document, not a procurement-grade audit deliverable — the typography
+// upgrade was only worth the migration cost on the DPR.
 
 buildDpaTemplate();
-buildDprSample();
-buildDprDangote();
 await buildDpaDocx();
-console.log('done.');
+console.log('done. (DPR samples now generated via /dpr-render + Puppeteer; see scripts/dev-dpr-preview.mjs)');

@@ -464,6 +464,51 @@ export const SAMPLE_FINDINGS_AUGMENT: Record<
 };
 
 /**
+ * Dangote specimen — Pan-African industrial expansion variant.
+ *
+ * Locked 2026-05-05 (Phase 4). Different filename + summary + cover
+ * narrative; same regulatory mapping + bias structure (the canonical
+ * specimen biases that fire on this shape — confirmation, anchoring,
+ * sunk-cost, overconfidence — also fire on Pan-African expansion
+ * memos). The findings
+ * augment is tailored to the Pan-African expansion narrative without
+ * naming any real prospect.
+ */
+const DANGOTE_FILENAME = 'PanAfricanCement-MarketEntry-2014-Anonymised.pdf';
+const DANGOTE_SUMMARY =
+  'Proposal to extend cement-manufacturing capacity from a Nigerian base into eight additional African markets over thirty-six months, anchored to a single internal review of comparable peer expansions and a per-market gross-margin assumption of 38%. Analysis flags confirmation bias on currency-cycle determinants, anchoring on the Nigerian-base economics, sunk-cost framing on the existing kiln investment, and overconfidence on per-market regulatory clearance timelines. Recommended action: stage capex per-market with explicit FX-cycle gates and an outside-view forecaster on the WAEMU / SADC clearance windows before committee approval.';
+
+export const DANGOTE_FINDINGS_AUGMENT: Record<
+  string,
+  { evidenceQuote: string; mitigation: string }
+> = {
+  confirmation_bias: {
+    evidenceQuote:
+      'Internal review confirmed the Nigerian-base economics are reproducible across the eight target markets; the two markets that surfaced concerns were assessed as outliers driven by transient FX volatility.',
+    mitigation:
+      'Re-interview the two flagged markets with structured disconfirmation framing. Add an independent currency-cycle analyst with no internal reporting line to the project sponsor. Require the memo to surface at least three structural reasons the Nigerian-base economics would NOT reproduce in WAEMU + SADC + EAC at current parities.',
+  },
+  overconfidence_bias: {
+    evidenceQuote:
+      'We project per-market regulatory clearance within 8-12 months from agreement, consistent with our prior expansion in the home market and within tolerance of historical industry norms.',
+    mitigation:
+      'Surface explicit P10/P50/P90 confidence intervals on per-market clearance timelines. Pull the historical realised-vs-planned ratios for cement-manufacturing market entries in WAEMU + SADC specifically over the past 8 years; apply as a Bayesian prior. Stage capex per-market behind explicit clearance-completion gates rather than amortising the prior commitment.',
+  },
+  anchoring_bias: {
+    evidenceQuote:
+      'The 38% gross-margin assumption per market is anchored to our home-market gross margin (39.2% over the last four fiscal years) and reflects the structural advantages that translate.',
+    mitigation:
+      'Drop the home-market anchor. Re-size the per-market gross margin from three independent anchors: (a) bottom-up cost-of-goods + logistics + tariff model per target market, (b) top-down comparable Pan-African cement peer financials, (c) zero-based per-market cost stack. Triangulate before defending the headline.',
+  },
+  sunk_cost_fallacy: {
+    evidenceQuote:
+      'The existing kiln investment in our home market represents capacity we plan to leverage across the African expansion. Re-platforming to a partner-led distribution motion would write off that investment, so we recommend extending the existing capacity into the eight target markets.',
+    mitigation:
+      'Re-evaluate the existing kiln capacity on forward economics only. If the prior investment were zero-cost, would the memo still recommend extending it across all eight markets simultaneously? If not, surface the present-day opportunity cost of the alternative (partner-led, capital-light) motion the memo is rejecting.',
+  },
+};
+
+/**
  * Build the SPECIMEN ProvenanceRecordData. Timestamps are frozen to the
  * release date of the SPECIMEN so re-generating produces byte-identical
  * content (helpful for caching, not strictly required).
@@ -539,6 +584,31 @@ export function buildSampleDprData(): ProvenanceRecordData {
       biasCount: SAMPLE_CITATIONS.length,
       topMitigation:
         'Commission an independent reference-class forecast against eight to twelve comparable European DACH expansions before the committee vote. Require the forecaster to submit base-rate break-even distributions alongside point estimates so the committee sees the range, not a single number.',
+      topMitigationFor: 'Overconfidence Bias',
+    },
+  };
+}
+
+/**
+ * Build the DANGOTE SPECIMEN — Pan-African industrial expansion variant.
+ * Locked 2026-05-05 (Phase 4). Reuses the same regulatory mapping +
+ * citations + R²F strips as the WeWork specimen (the regulatory grid
+ * already covers African + EU + US frameworks); overrides the meta
+ * narrative to match the Pan-African expansion shape.
+ */
+export function buildDangoteDprData(): ProvenanceRecordData {
+  const base = buildSampleDprData();
+  return {
+    ...base,
+    meta: {
+      ...base.meta,
+      filename: DANGOTE_FILENAME,
+      overallScore: 58,
+      summary: DANGOTE_SUMMARY,
+      metaVerdict:
+        'Proceed only with per-market staged capex behind explicit FX-cycle + regulatory clearance gates. Not board-ready as drafted at the simultaneous 8-market scope.',
+      topMitigation:
+        'Stage capex per-market with explicit FX-cycle gates and an outside-view forecaster on WAEMU + SADC + EAC regulatory clearance windows. Require per-market gross-margin re-grounding from three independent anchors (bottom-up cost stack, top-down peer financials, zero-based per-market) before committee approval.',
       topMitigationFor: 'Overconfidence Bias',
     },
   };

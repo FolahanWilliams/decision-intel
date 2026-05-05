@@ -35,6 +35,13 @@ export interface RenderDprPdfOpts {
    * package / deal). Specimen routes are public; pass undefined.
    */
   authCookieHeader?: string;
+  /**
+   * Optional explicit URL to navigate to. Used when callers need to pass
+   * query params (e.g. ?clientSafe=1) — the default `${baseUrl}/dpr-render/
+   * ${type}/${id}` doesn't support per-call query params. When provided,
+   * baseUrl + type + id are still used for logging only.
+   */
+  renderUrlOverride?: string;
 }
 
 export interface RenderDprPdfResult {
@@ -44,8 +51,8 @@ export interface RenderDprPdfResult {
 }
 
 export async function renderDprPdf(opts: RenderDprPdfOpts): Promise<RenderDprPdfResult> {
-  const { baseUrl, type, id, authCookieHeader } = opts;
-  const renderUrl = `${baseUrl}/dpr-render/${type}/${id}`;
+  const { baseUrl, type, id, authCookieHeader, renderUrlOverride } = opts;
+  const renderUrl = renderUrlOverride ?? `${baseUrl}/dpr-render/${type}/${id}`;
   const start = Date.now();
 
   const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH

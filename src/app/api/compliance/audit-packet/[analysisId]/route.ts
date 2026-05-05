@@ -32,12 +32,14 @@ import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 import { createLogger } from '@/lib/utils/logger';
 import { assembleProvenanceRecordData } from '@/lib/reports/provenance-record-data';
-import { DecisionProvenanceRecordGenerator } from '@/lib/reports/decision-provenance-record-generator';
+import { renderDprPdf } from '@/lib/reports/render-dpr-pdf';
 import { getUserPlan, getOrgPlan } from '@/lib/utils/plan-limits';
 import { resolveAnalysisAccess } from '@/lib/utils/document-access';
 
 const log = createLogger('DprExport');
 
+export const runtime = 'nodejs';
+export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 function safeFilename(raw: string): string {
@@ -140,10 +142,19 @@ export async function GET(
       log.warn('DPR upsert failed on server export (non-fatal):', persistErr);
     }
 
-    const generator = new DecisionProvenanceRecordGenerator();
-    const doc = generator.generate(data);
-    const pdfArrayBuffer = doc.output('arraybuffer') as ArrayBuffer;
-    const pdfBytes = new Uint8Array(pdfArrayBuffer);
+    // Phase 4 wire-in: render via the shared HTML/CSS Puppeteer flow.
+    // Forwards Supabase auth cookies so the headless browser arrives at
+    // /dpr-render/document/[analysisId] already logged in as the caller.
+    const reqUrl = new URL(_request.url);
+    const baseUrl =
+      process.env.NEXT_PUBLIC_APP_URL ?? `${reqUrl.protocol}//${reqUrl.host}`;
+    const { pdf } = await renderDprPdf({
+      baseUrl,
+      type: 'document',
+      id: analysisId,
+      authCookieHeader: _request.headers.get('cookie') ?? undefined,
+    });
+    const pdfBytes = new Uint8Array(pdf);
 
     const filename = `DPR-${safeFilename(data.meta.filename)}-${data.analysisId.slice(0, 8)}.pdf`;
 

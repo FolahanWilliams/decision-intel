@@ -65,6 +65,23 @@ import {
 
 const log = createLogger('ProvenanceRecordData');
 
+/**
+ * Per-bias finding augmentation map — keyed by biasType, populated by the
+ * data assembler from analysis.biases (excerpt + suggestion + severity +
+ * confidence). The new HTML/CSS DPR render at /dpr-render reads this map
+ * to populate the per-bias finding cards (Phase 3 visual). For specimens
+ * the route uses SAMPLE_FINDINGS_AUGMENT; for real audits this field
+ * carries the live data.
+ *
+ * Locked 2026-05-05 (Phase 4 of the DPR rebuild).
+ */
+export interface DprFindingsAugmentRow {
+  evidenceQuote: string | null;
+  mitigation: string | null;
+  severityOverride?: 'critical' | 'high' | 'medium' | 'low';
+  confidenceOverride?: number;
+}
+
 export interface ProvenanceRecordData {
   analysisId: string;
   documentId: string;
@@ -77,6 +94,14 @@ export interface ProvenanceRecordData {
   citations: CitationEntry[];
   regulatoryMapping: RegulatoryEntry[];
   pipelineLineage: PipelineLineageEntry[];
+  /**
+   * Per-bias evidence + mitigation map populated from analysis.biases.
+   * Phase 4 enables real-audit findings to render with verbatim memo
+   * excerpts (BiasInstance.excerpt) + recommended mitigations
+   * (BiasInstance.suggestion) on the new /dpr-render output. Null only
+   * for legacy assembled data that pre-dates this field.
+   */
+  findingsAugment?: Record<string, DprFindingsAugmentRow>;
   /**
    * Pre-IC blind-prior aggregations attached to this analysis (4.1
    * deep). One entry per Decision Room that ran a blind-prior survey
@@ -755,7 +780,13 @@ export async function assembleProvenanceRecordData(
   // silently aborted every DPR generation with a generic 500.
   let analysis: Awaited<ReturnType<typeof prisma.analysis.findUnique>> &
     {
-      biases?: Array<{ biasType: string; severity: string; suggestion: string | null }>;
+      biases?: Array<{
+        biasType: string;
+        severity: string;
+        suggestion: string | null;
+        excerpt: string | null;
+        confidence: number | null;
+      }>;
       promptVersion?: { hash: string; name: string; version: number } | null;
       document: {
         id: string;
@@ -770,7 +801,13 @@ export async function assembleProvenanceRecordData(
       where: { id: analysisId },
       include: {
         biases: {
-          select: { biasType: true, severity: true, suggestion: true },
+          select: {
+            biasType: true,
+            severity: true,
+            suggestion: true,
+            excerpt: true,
+            confidence: true,
+          },
         },
         promptVersion: {
           select: { hash: true, name: true, version: true },
@@ -804,7 +841,13 @@ export async function assembleProvenanceRecordData(
       where: { id: analysisId },
       include: {
         biases: {
-          select: { biasType: true, severity: true, suggestion: true },
+          select: {
+            biasType: true,
+            severity: true,
+            suggestion: true,
+            excerpt: true,
+            confidence: true,
+          },
         },
         document: {
           select: { id: true, filename: true, userId: true, orgId: true },
@@ -1018,6 +1061,26 @@ export async function assembleProvenanceRecordData(
       industry,
     });
 
+  // Phase 4 wire-in: build the per-bias findings augment from the live
+  // analysis.biases data. The new HTML/CSS DPR render at /dpr-render
+  // reads this map to populate finding cards with verbatim memo
+  // excerpts + recommended mitigations + severity overrides.
+  const findingsAugment: Record<string, DprFindingsAugmentRow> = {};
+  for (const bias of analysis.biases ?? []) {
+    // Keep the FIRST occurrence per biasType (the canonical instance).
+    // BiasInstances can appear multiple times if the same bias fires on
+    // different excerpts of the same memo; the DPR card is per-type so
+    // we surface the leading excerpt + suggestion. Reviewer decisions UI
+    // can extend this later if multi-instance per type becomes important.
+    if (findingsAugment[bias.biasType]) continue;
+    findingsAugment[bias.biasType] = {
+      evidenceQuote: bias.excerpt?.trim() || null,
+      mitigation: bias.suggestion?.trim() || null,
+      severityOverride: normaliseSeverity(bias.severity),
+      confidenceOverride: bias.confidence ?? undefined,
+    };
+  }
+
   return {
     analysisId: analysis.id,
     documentId: analysis.document.id,
@@ -1030,6 +1093,7 @@ export async function assembleProvenanceRecordData(
     citations,
     regulatoryMapping,
     pipelineLineage,
+    findingsAugment,
     blindPriorAggregates,
     counterfactualImpact,
     // reviewerDecisions intentionally undefined in the live assembler —
@@ -1057,6 +1121,15 @@ export async function assembleProvenanceRecordData(
       topMitigationFor,
     },
   };
+}
+
+function normaliseSeverity(
+  s: string | null | undefined
+): 'critical' | 'high' | 'medium' | 'low' | undefined {
+  const lower = (s ?? '').toLowerCase();
+  if (lower === 'critical' || lower === 'high' || lower === 'medium' || lower === 'low')
+    return lower;
+  return undefined;
 }
 
 function formatBiasLabel(biasType: string): string {

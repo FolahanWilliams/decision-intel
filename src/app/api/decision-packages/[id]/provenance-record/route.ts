@@ -15,10 +15,13 @@ import { createClient } from '@/utils/supabase/server';
 import { createLogger } from '@/lib/utils/logger';
 import { resolvePackageAccess } from '@/lib/utils/decision-package-access';
 import { assembleProvenanceRecordDataForPackage } from '@/lib/reports/provenance-record-data';
-import { DecisionProvenanceRecordGenerator } from '@/lib/reports/decision-provenance-record-generator';
+import { renderDprPdf } from '@/lib/reports/render-dpr-pdf';
 import { logAudit } from '@/lib/audit';
 
 const log = createLogger('DecisionPackageProvenance');
+
+export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -41,9 +44,21 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const data = await assembleProvenanceRecordDataForPackage(id);
 
     if (format === 'pdf') {
-      const generator = new DecisionProvenanceRecordGenerator();
-      const pdf = generator.generate(data, { clientSafe });
-      const bytes = pdf.output('arraybuffer');
+      // Phase 4 wire-in: render via the shared HTML/CSS Puppeteer flow
+      // (CLAUDE.md DPR architecture lock 2026-05-05).
+      const reqUrl = request.nextUrl;
+      const baseUrl =
+        process.env.NEXT_PUBLIC_APP_URL ?? `${reqUrl.protocol}//${reqUrl.host}`;
+      const renderUrl = `${baseUrl}/dpr-render/package/${id}${
+        clientSafe ? '?clientSafe=1' : ''
+      }`;
+      const { pdf } = await renderDprPdf({
+        baseUrl,
+        type: 'package',
+        id,
+        authCookieHeader: request.headers.get('cookie') ?? undefined,
+        renderUrlOverride: renderUrl,
+      });
 
       await logAudit({
         action: 'EXPORT_PDF',
@@ -52,7 +67,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         details: { packageName: pkg.name, memberCount: data.packageContext?.members.length ?? 0 },
       });
 
-      return new NextResponse(bytes, {
+      return new NextResponse(new Uint8Array(pdf), {
         headers: {
           'Content-Type': 'application/pdf',
           'Content-Disposition': `attachment; filename="dpr-${pkg.name.replace(/[^a-z0-9-]/gi, '_').slice(0, 60)}.pdf"`,

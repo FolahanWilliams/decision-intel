@@ -9,19 +9,40 @@
  *
  * URL shape: /dpr-render/[type]/[id]
  *   type = specimen → public, no auth (rate-limited at the API layer)
- *   type = document → Supabase-auth + ownership check (Phase 4)
- *   type = package  → Supabase-auth + ownership check (Phase 4)
- *   type = deal     → Supabase-auth + ownership check (Phase 4)
+ *   type = document → Supabase-auth + ownership check; [id] = analysisId
+ *   type = package  → Supabase-auth + ownership check; [id] = packageId
+ *   type = deal     → Supabase-auth + ownership check; [id] = dealId
  *
- * Phase 1: page 1 (cover + integrity).
- * Phase 2: page 2 (methodology) + page 3 (R²F strips).
- * Phase 3: page 4 (per-bias findings) + page 5 (Dalio structural assumptions)
- *          + page 6 (regulatory crosswalk).
- * Phase 4 will wire the document/package/deal types + retire legacy generator.
+ * Auth model (Phase 4): the API consumer routes (/api/documents/[id]/...,
+ * /api/decision-packages/[id]/..., /api/deals/[id]/...) do their own auth
+ * + ownership check, then forward the user's Supabase auth cookies to the
+ * Puppeteer headless browser (via renderDprPdf({authCookieHeader})). The
+ * headless browser arrives at this route already authenticated, and the
+ * Supabase server client below verifies ownership a SECOND time as
+ * defense-in-depth — same access bar as the API route enforces.
+ *
+ * Search-param `?clientSafe=1` enables Client-Safe Export Mode (entity
+ * names + person names + amounts replaced with placeholders) so the
+ * artefact can be shared with an LP, regulator, or assurance partner
+ * without leaking competitive intelligence.
  */
 
 import { notFound } from 'next/navigation';
-import { buildSampleDprData, SAMPLE_FINDINGS_AUGMENT } from '@/lib/reports/sample-dpr';
+import { createClient } from '@/utils/supabase/server';
+import { prisma } from '@/lib/prisma';
+import { createLogger } from '@/lib/utils/logger';
+import {
+  buildSampleDprData,
+  buildDangoteDprData,
+  SAMPLE_FINDINGS_AUGMENT,
+  DANGOTE_FINDINGS_AUGMENT,
+} from '@/lib/reports/sample-dpr';
+import {
+  assembleProvenanceRecordData,
+  assembleProvenanceRecordDataForPackage,
+  assembleProvenanceRecordDataForDeal,
+} from '@/lib/reports/provenance-record-data';
+import { resolvePackageAccess } from '@/lib/utils/decision-package-access';
 import { DprPageOneCover } from '@/components/dpr/pages/DprPageOneCover';
 import { DprPageTwoMethodology } from '@/components/dpr/pages/DprPageTwoMethodology';
 import { DprPageThreeR2fStrips } from '@/components/dpr/pages/DprPageThreeR2fStrips';
@@ -34,17 +55,23 @@ import { DprPageRegulatoryCrosswalk } from '@/components/dpr/pages/DprPageRegula
 import { deriveDprFindings } from '@/lib/reports/dpr-findings';
 import type { ProvenanceRecordData } from '@/lib/reports/provenance-record-data';
 
+const log = createLogger('DprRenderRoute');
+
 const VALID_TYPES = ['specimen', 'document', 'package', 'deal'] as const;
 type DprType = (typeof VALID_TYPES)[number];
 
 export default async function DprRenderPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ type: string; id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const resolved = await params;
+  const search = await searchParams;
   const type = resolved.type as DprType;
   const id = resolved.id;
+  const clientSafe = search.clientSafe === '1';
 
   if (!VALID_TYPES.includes(type)) {
     notFound();
@@ -57,29 +84,33 @@ export default async function DprRenderPage({
 
   const recordId = formatRecordId(data);
   const verifyUrl = `https://decision-intel.com/verify/${recordId}`;
-  const classification = type === 'specimen' ? 'specimen' : 'confidential';
+  const classification = computeClassification(type, clientSafe);
   const auditTimestamp = data.generatedAt.toISOString();
 
-  // Phase 3: derive findings from canonical data + per-bias augmentation.
-  // Specimens get hand-curated evidence + mitigations; real audits will
-  // populate from analysis.biases in Phase 4.
-  const augment = type === 'specimen' ? SAMPLE_FINDINGS_AUGMENT : {};
+  // Phase 4: real audits populate findingsAugment in the data assembler;
+  // specimens use the hand-curated SAMPLE_FINDINGS_AUGMENT. Both reach
+  // the deriver via the same path so the visual rendering is identical.
+  const augment =
+    type === 'specimen'
+      ? id === 'dangote'
+        ? DANGOTE_FINDINGS_AUGMENT
+        : SAMPLE_FINDINGS_AUGMENT
+      : (data.findingsAugment ?? {});
   const findings = deriveDprFindings(data, augment);
 
-  // Phase 3: Dalio structural assumptions. Specimens use the curated
-  // 4-determinant set; real audits will read Analysis.structuralAssumptions
-  // JSON in Phase 4.
-  const structuralAssumptions =
-    type === 'specimen' ? SAMPLE_STRUCTURAL_ASSUMPTIONS : [];
+  // Specimens get the curated 4-determinant Dalio set; real audits read
+  // Analysis.structuralAssumptions JSON when populated by the structural-
+  // assumptions endpoint (today rendered live in the app, persistence
+  // landing in a follow-up commit). Empty array hides the page silently.
+  const structuralAssumptions = type === 'specimen' ? SAMPLE_STRUCTURAL_ASSUMPTIONS : [];
 
-  const totalPages = 6; // Phase 3 — 6 logical pages, but Puppeteer's @page
-  // counter renders the actual physical sheet count regardless.
+  const totalPages = 6;
 
   return (
     <>
       <DprPageOneCover
-        title={titleForData(data)}
-        subtitle={subtitleForData(data)}
+        title={titleForData(data, type)}
+        subtitle={subtitleForData(data, type)}
         recordId={recordId}
         auditTimestamp={auditTimestamp}
         inputHash={data.inputHash}
@@ -135,19 +166,123 @@ export default async function DprRenderPage({
 
 async function loadDprData(type: DprType, id: string): Promise<ProvenanceRecordData | null> {
   if (type === 'specimen') {
-    if (id !== 'wework' && id !== 'heliograph') {
-      return null;
+    if (id === 'dangote') {
+      return buildDangoteDprData();
     }
-    return buildSampleDprData();
+    if (id === 'wework' || id === 'heliograph') {
+      return buildSampleDprData();
+    }
+    return null;
   }
-  // Phase 4: document / package / deal paths land here with full auth +
-  // ownership checks routed through assembleProvenanceRecordData*.
+
+  // Authenticated paths — Supabase auth + ownership check before we
+  // assemble the data. Defense-in-depth: the API route that called
+  // Puppeteer already did this check, but a direct hit on /dpr-render
+  // (e.g. someone bookmarked the URL) MUST re-verify.
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user?.id) {
+    log.warn(`Unauthenticated /dpr-render/${type}/${id} request — returning notFound.`);
+    return null;
+  }
+
+  try {
+    if (type === 'document') {
+      // [id] is analysisId (the API consumer resolves documentId →
+      // analysisId before forwarding to /dpr-render).
+      const analysis = await prisma.analysis.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          document: { select: { userId: true, orgId: true } },
+        },
+      });
+      if (!analysis) return null;
+      // Ownership: user must own the document OR be in its org.
+      const userOwns = analysis.document.userId === user.id;
+      const userInOrg = analysis.document.orgId
+        ? await userIsInOrg(user.id, analysis.document.orgId)
+        : false;
+      if (!userOwns && !userInOrg) {
+        log.warn(`User ${user.id} not authorised on analysis ${id}.`);
+        return null;
+      }
+      return assembleProvenanceRecordData(id);
+    }
+
+    if (type === 'package') {
+      const pkg = await resolvePackageAccess(id, user.id);
+      if (!pkg) return null;
+      return assembleProvenanceRecordDataForPackage(id);
+    }
+
+    if (type === 'deal') {
+      // Deal access: must belong to the same org as the user.
+      const orgId = await getUserOrgId(user.id);
+      const deal = await prisma.deal.findFirst({
+        where: { id, orgId: orgId || user.id },
+        select: { id: true },
+      });
+      if (!deal) return null;
+      return assembleProvenanceRecordDataForDeal(id);
+    }
+  } catch (err) {
+    log.error(`Failed to load DPR data for ${type}/${id}:`, err);
+    return null;
+  }
+
   return null;
 }
 
-function titleForData(data: ProvenanceRecordData): string {
-  if (data.userId === 'specimen') {
+async function userIsInOrg(userId: string, orgId: string): Promise<boolean> {
+  try {
+    const m = await prisma.teamMember.findFirst({
+      where: { userId, orgId },
+      select: { id: true },
+    });
+    return Boolean(m);
+  } catch {
+    return false;
+  }
+}
+
+async function getUserOrgId(userId: string): Promise<string | null> {
+  try {
+    const m = await prisma.teamMember.findFirst({
+      where: { userId },
+      select: { orgId: true },
+    });
+    return m?.orgId ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function computeClassification(
+  type: DprType,
+  clientSafe: boolean
+): 'sample' | 'specimen' | 'confidential' | 'client-safe-export' {
+  if (clientSafe) return 'client-safe-export';
+  if (type === 'specimen') return 'specimen';
+  return 'confidential';
+}
+
+function titleForData(data: ProvenanceRecordData, type: DprType): string {
+  if (type === 'specimen') {
+    if (data.meta.filename.startsWith('PanAfrican')) {
+      return 'Audit of a Pan-African industrial market-entry plan';
+    }
     return 'Audit of a private-market growth-company prospectus';
+  }
+  // Deal-rooted DPR: lead with the deal name.
+  if (type === 'deal' && data.dealContext?.dealName) {
+    return data.dealContext.dealName;
+  }
+  // Package-rooted DPR: lead with the package name.
+  if (type === 'package' && data.packageContext?.packageName) {
+    return data.packageContext.packageName;
   }
   const filename = data.meta.filename ?? 'Strategic decision audit';
   return filename
@@ -156,9 +291,32 @@ function titleForData(data: ProvenanceRecordData): string {
     .replace(/([a-z])([A-Z])/g, '$1 $2');
 }
 
-function subtitleForData(data: ProvenanceRecordData): string {
-  if (data.userId === 'specimen') {
+function subtitleForData(data: ProvenanceRecordData, type: DprType): string {
+  if (type === 'specimen') {
+    if (data.meta.filename.startsWith('PanAfrican')) {
+      return 'Anonymised from a 2014 Pan-African cement-manufacturing capacity-extension plan. Independently re-verifiable hashed evidence record produced by the Decision Intel pipeline.';
+    }
     return 'Anonymised from a 2019 Form S-1 that was withdrawn 33 days after filing. Independently re-verifiable hashed evidence record produced by the Decision Intel pipeline.';
+  }
+  if (type === 'deal' && data.dealContext) {
+    const ctx = data.dealContext;
+    const parts = [
+      ctx.dealType ? prettyCase(ctx.dealType) : null,
+      ctx.sector ? prettyCase(ctx.sector) : null,
+      ctx.fundName,
+      ctx.targetCompany,
+      ctx.compositeDqi != null ? `Composite DQI ${Math.round(ctx.compositeDqi)}/100` : null,
+    ].filter(Boolean);
+    return `${parts.join(' · ')}. Independently re-verifiable hashed evidence record produced by the Decision Intel pipeline.`;
+  }
+  if (type === 'package' && data.packageContext) {
+    const ctx = data.packageContext;
+    const parts = [
+      ctx.decisionFrame,
+      ctx.compositeDqi != null ? `Composite DQI ${Math.round(ctx.compositeDqi)}/100` : null,
+      `${ctx.members.length} member${ctx.members.length === 1 ? '' : 's'}`,
+    ].filter(Boolean);
+    return `${parts.join(' · ')}. Independently re-verifiable hashed evidence record produced by the Decision Intel pipeline.`;
   }
   const firstSentence = data.meta.summary?.split('. ')[0] ?? '';
   return `${firstSentence}. Independently re-verifiable hashed evidence record produced by the Decision Intel pipeline.`;
@@ -176,4 +334,10 @@ function formatRecordId(data: ProvenanceRecordData): string {
 function pipelineVersionFromLineage(data: ProvenanceRecordData): string {
   const nodes = Object.keys(data.modelLineage.nodes ?? {});
   return `di-pipeline · ${nodes.length} nodes · v2.1.0`;
+}
+
+function prettyCase(s: string): string {
+  return s
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase());
 }
