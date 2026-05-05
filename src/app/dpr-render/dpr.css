@@ -723,6 +723,370 @@
   border-bottom: 1px solid var(--dpr-rule);
 }
 
+/* ---------------- Severity meter (Phase 3) ------------------- */
+
+.dpr-severity-meter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dpr-space-3);
+}
+
+.dpr-severity-meter-bar {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.dpr-severity-meter-seg {
+  display: inline-block;
+  width: 14px;
+  height: 6px;
+  border-radius: 1px;
+}
+
+.dpr-severity-meter-label {
+  font-size: 8.5pt;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.dpr-severity-meter-conf {
+  margin-left: var(--dpr-space-1);
+  color: var(--dpr-grey-500);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+/* ---------------- Finding cards (Phase 3) -------------------- */
+
+.dpr-finding {
+  background: var(--dpr-paper);
+  border: 1px solid var(--dpr-rule);
+  border-top-width: 3px;
+  border-radius: 2px;
+  padding: var(--dpr-space-5) var(--dpr-space-5);
+  margin-top: var(--dpr-space-4);
+}
+
+.dpr-finding--critical {
+  border-top-color: var(--dpr-severity-critical);
+}
+.dpr-finding--high {
+  border-top-color: var(--dpr-severity-high);
+}
+.dpr-finding--medium {
+  border-top-color: var(--dpr-severity-medium);
+}
+.dpr-finding--low {
+  border-top-color: var(--dpr-severity-low);
+}
+
+.dpr-finding-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--dpr-space-5);
+  margin-bottom: var(--dpr-space-3);
+}
+
+.dpr-finding-head-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.dpr-finding-taxonomy {
+  font-size: 8pt;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--dpr-grey-500);
+  margin-bottom: var(--dpr-space-1);
+  font-family:
+    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+}
+
+.dpr-finding-title {
+  font-family: 'Source Serif 4', 'Source Serif Pro', Georgia, serif;
+  font-size: var(--dpr-type-lg);
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  color: var(--dpr-grey-950);
+  margin: 0;
+  line-height: 1.25;
+}
+
+.dpr-finding-block {
+  margin-top: var(--dpr-space-4);
+}
+
+.dpr-finding-block-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dpr-space-2);
+  font-size: 8pt;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--dpr-grey-500);
+  margin-bottom: var(--dpr-space-2);
+}
+
+.dpr-finding-block-rule {
+  width: 16px;
+  height: 1px;
+  background: var(--dpr-grey-300);
+}
+
+.dpr-finding-evidence {
+  background: var(--dpr-grey-50);
+  border-left: 3px solid var(--dpr-grey-400);
+  padding: var(--dpr-space-3) var(--dpr-space-4);
+  font-family: 'Source Serif 4', 'Source Serif Pro', Georgia, serif;
+  font-size: var(--dpr-type-sm);
+  font-style: italic;
+  color: var(--dpr-grey-800);
+  line-height: 1.6;
+}
+
+.dpr-finding-harden {
+  background: var(--dpr-severity-high-bg);
+  border-left: 3px solid var(--dpr-severity-high);
+  padding: var(--dpr-space-3) var(--dpr-space-4);
+  font-size: var(--dpr-type-sm);
+  color: var(--dpr-grey-900);
+  line-height: 1.55;
+}
+
+.dpr-finding-harden-question {
+  font-weight: 600;
+  color: var(--dpr-grey-950);
+  margin-bottom: var(--dpr-space-2);
+}
+
+.dpr-finding-harden-rationale {
+  font-size: 8.5pt;
+  color: var(--dpr-grey-700);
+  font-style: italic;
+}
+
+.dpr-finding-mitigation {
+  font-size: var(--dpr-type-sm);
+  color: var(--dpr-grey-800);
+  line-height: 1.55;
+  background: var(--dpr-severity-low-bg);
+  border-left: 3px solid var(--dpr-severity-low);
+  padding: var(--dpr-space-3) var(--dpr-space-4);
+}
+
+.dpr-finding-regulatory {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dpr-space-2);
+}
+
+.dpr-finding-framework {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--dpr-space-3);
+  font-size: 9pt;
+  line-height: 1.5;
+  color: var(--dpr-grey-700);
+}
+
+.dpr-finding-framework-name {
+  font-weight: 700;
+  color: var(--dpr-grey-900);
+  flex-shrink: 0;
+  width: 30%;
+}
+
+.dpr-finding-framework-provisions {
+  flex: 1;
+  color: var(--dpr-grey-600);
+}
+
+.dpr-finding-foot {
+  margin-top: var(--dpr-space-4);
+  padding-top: var(--dpr-space-3);
+  border-top: 1px solid var(--dpr-rule);
+  display: flex;
+  justify-content: space-between;
+  gap: var(--dpr-space-4);
+  font-size: 8pt;
+  color: var(--dpr-grey-500);
+  letter-spacing: 0.04em;
+}
+
+.dpr-finding-foot-key {
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.dpr-finding-citation {
+  font-size: 8.5pt;
+  color: var(--dpr-grey-600);
+  font-style: italic;
+  line-height: 1.5;
+}
+
+/* ---------------- Dalio structural assumptions (Phase 3) ----- */
+
+.dpr-dalio-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--dpr-space-4);
+  margin-top: var(--dpr-space-4);
+}
+
+.dpr-dalio-card {
+  background: var(--dpr-paper);
+  border: 1px solid var(--dpr-rule);
+  border-left-width: 3px;
+  border-radius: 2px;
+  padding: var(--dpr-space-4) var(--dpr-space-5);
+}
+
+.dpr-dalio-card--critical {
+  border-left-color: var(--dpr-severity-critical);
+}
+.dpr-dalio-card--high {
+  border-left-color: var(--dpr-severity-high);
+}
+.dpr-dalio-card--medium {
+  border-left-color: var(--dpr-severity-medium);
+}
+.dpr-dalio-card--low {
+  border-left-color: var(--dpr-severity-low);
+}
+
+.dpr-dalio-card-head {
+  display: flex;
+  align-items: center;
+  gap: var(--dpr-space-3);
+  margin-bottom: var(--dpr-space-3);
+  padding-bottom: var(--dpr-space-3);
+  border-bottom: 1px solid var(--dpr-rule);
+}
+
+.dpr-dalio-card-icon {
+  font-size: 18pt;
+  color: var(--dpr-grey-500);
+  line-height: 1;
+}
+
+.dpr-dalio-card-label {
+  font-family: 'Source Serif 4', 'Source Serif Pro', Georgia, serif;
+  font-size: var(--dpr-type-md);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--dpr-grey-950);
+}
+
+.dpr-dalio-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dpr-space-3);
+}
+
+.dpr-dalio-card-row-label {
+  display: block;
+  font-size: 7.5pt;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--dpr-grey-500);
+  margin-bottom: 4px;
+}
+
+.dpr-dalio-card-row-text {
+  margin: 0;
+  font-size: 9.5pt;
+  line-height: 1.5;
+  color: var(--dpr-grey-700);
+}
+
+.dpr-dalio-card-row--question .dpr-dalio-card-row-label {
+  color: var(--dpr-severity-high);
+}
+
+.dpr-dalio-card-row--question .dpr-dalio-card-row-text {
+  color: var(--dpr-grey-900);
+  font-weight: 500;
+}
+
+/* ---------------- Regulatory crosswalk grid (Phase 3) -------- */
+
+.dpr-crosswalk-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dpr-space-5);
+  margin-top: var(--dpr-space-4);
+}
+
+.dpr-crosswalk-region {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.dpr-crosswalk-region-title {
+  font-family: 'Source Serif 4', 'Source Serif Pro', Georgia, serif;
+  font-size: 11pt;
+  font-weight: 600;
+  color: var(--dpr-grey-900);
+  margin: 0 0 var(--dpr-space-3) 0;
+  padding-bottom: var(--dpr-space-2);
+  border-bottom: 1px solid var(--dpr-rule);
+  letter-spacing: -0.01em;
+}
+
+.dpr-crosswalk-region-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dpr-space-2);
+}
+
+.dpr-crosswalk-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dpr-space-2);
+  padding: 5px 10px;
+  background: var(--dpr-grey-50);
+  border: 1px solid var(--dpr-rule);
+  border-radius: 2px;
+  font-size: 9pt;
+  font-weight: 500;
+  color: var(--dpr-grey-600);
+  letter-spacing: -0.005em;
+}
+
+.dpr-crosswalk-chip--triggered {
+  background: var(--dpr-severity-high-bg);
+  border-color: var(--dpr-severity-high-border);
+  color: var(--dpr-severity-high);
+  font-weight: 600;
+}
+
+.dpr-crosswalk-chip-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: var(--dpr-severity-high);
+  color: white;
+  border-radius: 8px;
+  font-size: 7.5pt;
+  font-weight: 700;
+}
+
+/* ---------------- Findings stream container ----------------- */
+
+.dpr-findings-stream {
+  display: flex;
+  flex-direction: column;
+}
+
 /* ---------------- Browser-only shell ------------------------- */
 /* On screen we render a soft grey backdrop around the page so the
    reader sees the document as a printable artefact. On print these

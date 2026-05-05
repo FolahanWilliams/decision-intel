@@ -426,6 +426,44 @@ const SAMPLE_SUMMARY =
   'Proposal to launch a direct sales motion into DACH markets with a projected 18-month break-even, anchored to a single customer-discovery cohort of 14 prospects. Analysis flags confirmation bias in source selection, overconfidence in the break-even claim, and sunk-cost framing around the incumbent go-to-market build. Recommended action: commission an independent reference-class forecast against comparable European expansions before the committee vote.';
 
 /**
+ * SPECIMEN findings augmentation — verbatim evidence excerpts + recommended
+ * mitigations per bias. Locked 2026-05-05 (Phase 3). For real audits, the
+ * data assembler populates this from analysis.biases.excerpt +
+ * analysis.biases.suggestion (Phase 4 wire-in). For specimens, the values
+ * here are hand-curated to match the Project Heliograph DACH expansion
+ * narrative without naming any real prospect.
+ */
+export const SAMPLE_FINDINGS_AUGMENT: Record<
+  string,
+  { evidenceQuote: string; mitigation: string }
+> = {
+  confirmation_bias: {
+    evidenceQuote:
+      'Of fourteen prospects interviewed, twelve confirmed strong demand for the localised offering. The two outliers cited price sensitivity, which we assess as addressable through promotional pricing. Customer-discovery cohort therefore validates demand.',
+    mitigation:
+      'Re-interview the two outliers with a structured disconfirmation protocol (Klein pre-mortem framing). Add a third disconfirmation source: an independent industry analyst with no commercial interest in the deal closing. Require the memo to surface at least two reasons the localised offering would NOT win in DACH at current pricing.',
+  },
+  overconfidence_bias: {
+    evidenceQuote:
+      'We project break-even at 18 months from go-live. This compares favourably to the 24-month industry benchmark and reflects our team\'s execution speed in prior expansions.',
+    mitigation:
+      'Surface explicit confidence intervals around the 18-month projection (P10 / P50 / P90). Pull the prior-expansion realised-vs-planned ratios for this team and apply them as a Bayesian prior. Commission an independent reference-class forecast against eight to twelve comparable European DACH expansions before the committee vote.',
+  },
+  anchoring_bias: {
+    evidenceQuote:
+      'The €14M budget is anchored to our prior US market-entry, which delivered 22% IRR over five years. We therefore size the DACH opportunity at €14M as the appropriate parallel.',
+    mitigation:
+      'Drop the US-precedent anchor. Re-size the DACH opportunity from three independent anchors: (a) bottom-up TAM × penetration model with explicit competitive-share assumptions, (b) top-down comparable EU peer revenue / market-share data, (c) zero-based budget on the minimum viable team + go-to-market plan. Triangulate before defending the headline.',
+  },
+  sunk_cost_fallacy: {
+    evidenceQuote:
+      'Our incumbent go-to-market build represents twelve months of engineering investment. Re-platforming to a partner-led motion would write off that investment, so we recommend extending the existing build into DACH.',
+    mitigation:
+      'Re-evaluate the incumbent build on forward economics only. If the prior twelve months of engineering were zero-cost, would the memo still recommend extending it? If not, surface the present-day opportunity cost of the alternative (partner-led) motion the memo is rejecting and let the committee weigh it on its own merits.',
+  },
+};
+
+/**
  * Build the SPECIMEN ProvenanceRecordData. Timestamps are frozen to the
  * release date of the SPECIMEN so re-generating produces byte-identical
  * content (helpful for caching, not strictly required).

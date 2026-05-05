@@ -5,8 +5,7 @@
  * Locked 2026-05-05. Single source of truth for every DPR surface — server-
  * side Puppeteer hits this URL to produce PDFs, the client-side Export DPR
  * button opens this URL in a new tab and triggers window.print(), and the
- * build-time sample script (Phase 4) renders specimen URLs to the public/
- * directory.
+ * build-time sample script renders specimen URLs to the public/ directory.
  *
  * URL shape: /dpr-render/[type]/[id]
  *   type = specimen → public, no auth (rate-limited at the API layer)
@@ -14,17 +13,25 @@
  *   type = package  → Supabase-auth + ownership check (Phase 4)
  *   type = deal     → Supabase-auth + ownership check (Phase 4)
  *
- * Phase 1 shipped: page 1 (cover + integrity).
- * Phase 2 shipped: page 2 (methodology) + page 3 (R²F strips).
- * Phase 3 will add: pages 4-N (per-bias findings + Dalio + regulatory crosswalk).
+ * Phase 1: page 1 (cover + integrity).
+ * Phase 2: page 2 (methodology) + page 3 (R²F strips).
+ * Phase 3: page 4 (per-bias findings) + page 5 (Dalio structural assumptions)
+ *          + page 6 (regulatory crosswalk).
  * Phase 4 will wire the document/package/deal types + retire legacy generator.
  */
 
 import { notFound } from 'next/navigation';
-import { buildSampleDprData } from '@/lib/reports/sample-dpr';
+import { buildSampleDprData, SAMPLE_FINDINGS_AUGMENT } from '@/lib/reports/sample-dpr';
 import { DprPageOneCover } from '@/components/dpr/pages/DprPageOneCover';
 import { DprPageTwoMethodology } from '@/components/dpr/pages/DprPageTwoMethodology';
 import { DprPageThreeR2fStrips } from '@/components/dpr/pages/DprPageThreeR2fStrips';
+import { DprPageFindings } from '@/components/dpr/pages/DprPageFindings';
+import {
+  DprPageStructuralAssumptions,
+  SAMPLE_STRUCTURAL_ASSUMPTIONS,
+} from '@/components/dpr/pages/DprPageStructuralAssumptions';
+import { DprPageRegulatoryCrosswalk } from '@/components/dpr/pages/DprPageRegulatoryCrosswalk';
+import { deriveDprFindings } from '@/lib/reports/dpr-findings';
 import type { ProvenanceRecordData } from '@/lib/reports/provenance-record-data';
 
 const VALID_TYPES = ['specimen', 'document', 'package', 'deal'] as const;
@@ -53,10 +60,20 @@ export default async function DprRenderPage({
   const classification = type === 'specimen' ? 'specimen' : 'confidential';
   const auditTimestamp = data.generatedAt.toISOString();
 
-  // Compute total pages from what we have available. Phase 2 ships 3
-  // fixed pages (cover + methodology + R²F strips); Phase 3 will add
-  // more dynamically based on bias count + Dalio assumptions + crosswalk.
-  const totalPages = computeTotalPages(data);
+  // Phase 3: derive findings from canonical data + per-bias augmentation.
+  // Specimens get hand-curated evidence + mitigations; real audits will
+  // populate from analysis.biases in Phase 4.
+  const augment = type === 'specimen' ? SAMPLE_FINDINGS_AUGMENT : {};
+  const findings = deriveDprFindings(data, augment);
+
+  // Phase 3: Dalio structural assumptions. Specimens use the curated
+  // 4-determinant set; real audits will read Analysis.structuralAssumptions
+  // JSON in Phase 4.
+  const structuralAssumptions =
+    type === 'specimen' ? SAMPLE_STRUCTURAL_ASSUMPTIONS : [];
+
+  const totalPages = 6; // Phase 3 — 6 logical pages, but Puppeteer's @page
+  // counter renders the actual physical sheet count regardless.
 
   return (
     <>
@@ -85,6 +102,29 @@ export default async function DprRenderPage({
       <DprPageThreeR2fStrips
         data={data}
         pageNumber={3}
+        totalPages={totalPages}
+        classification={classification}
+        auditTimestamp={auditTimestamp}
+      />
+      <DprPageFindings
+        findings={findings}
+        pageNumber={4}
+        totalPages={totalPages}
+        classification={classification}
+        auditTimestamp={auditTimestamp}
+      />
+      {structuralAssumptions.length > 0 && (
+        <DprPageStructuralAssumptions
+          assumptions={structuralAssumptions}
+          pageNumber={5}
+          totalPages={totalPages}
+          classification={classification}
+          auditTimestamp={auditTimestamp}
+        />
+      )}
+      <DprPageRegulatoryCrosswalk
+        data={data}
+        pageNumber={6}
         totalPages={totalPages}
         classification={classification}
         auditTimestamp={auditTimestamp}
@@ -136,10 +176,4 @@ function formatRecordId(data: ProvenanceRecordData): string {
 function pipelineVersionFromLineage(data: ProvenanceRecordData): string {
   const nodes = Object.keys(data.modelLineage.nodes ?? {});
   return `di-pipeline · ${nodes.length} nodes · v2.1.0`;
-}
-
-function computeTotalPages(_data: ProvenanceRecordData): number {
-  // Phase 2: 3 fixed pages. Phase 3 will compute dynamically from
-  // citations.length + Dalio assumption count + crosswalk presence.
-  return 3;
 }
