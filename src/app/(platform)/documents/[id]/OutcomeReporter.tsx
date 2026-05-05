@@ -37,28 +37,28 @@ const OUTCOME_OPTIONS = [
     value: 'success',
     label: 'Success',
     icon: CheckCircle,
-    color: '#22c55e',
+    color: 'var(--success)',
     description: 'Decision achieved intended results',
   },
   {
     value: 'partial_success',
     label: 'Partial',
     icon: TrendingUp,
-    color: '#f59e0b',
+    color: 'var(--warning)',
     description: 'Some goals met, some missed',
   },
   {
     value: 'failure',
     label: 'Failed',
     icon: XCircle,
-    color: '#ef4444',
+    color: 'var(--error)',
     description: 'Decision did not achieve goals',
   },
   {
     value: 'too_early',
     label: 'Too Early',
     icon: Clock,
-    color: '#a1a1aa',
+    color: 'var(--text-muted)',
     description: 'Not enough time to evaluate',
   },
 ] as const;
@@ -90,7 +90,7 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
   const [notes, setNotes] = useState('');
   const [lessonsLearned, setLessonsLearned] = useState('');
   const [confirmedBiases, setConfirmedBiases] = useState<string[]>([]);
-  const [falsePositiveBiases, setFalsPositiveBiases] = useState<string[]>([]);
+  const [falsePositiveBiases, setFalsePositiveBiases] = useState<string[]>([]);
   const [mostAccurateTwin, setMostAccurateTwin] = useState('');
 
   const fetchExisting = useCallback(async () => {
@@ -106,7 +106,7 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
           setNotes(data.notes || '');
           setLessonsLearned(data.lessonsLearned || '');
           setConfirmedBiases(data.confirmedBiases || []);
-          setFalsPositiveBiases(data.falsePositiveBiases || []);
+          setFalsePositiveBiases(data.falsePositiveBiases || []);
           setMostAccurateTwin(data.mostAccurateTwin || '');
         }
       }
@@ -172,9 +172,9 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
       setConfirmedBiases(prev =>
         prev.includes(biasType) ? prev.filter(b => b !== biasType) : [...prev, biasType]
       );
-      setFalsPositiveBiases(prev => prev.filter(b => b !== biasType));
+      setFalsePositiveBiases(prev => prev.filter(b => b !== biasType));
     } else {
-      setFalsPositiveBiases(prev =>
+      setFalsePositiveBiases(prev =>
         prev.includes(biasType) ? prev.filter(b => b !== biasType) : [...prev, biasType]
       );
       setConfirmedBiases(prev => prev.filter(b => b !== biasType));
