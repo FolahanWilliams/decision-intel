@@ -53,9 +53,24 @@ export function DprPageShell({
   hideBand = false,
   children,
 }: DprPageShellProps) {
-  const formattedTimestamp = auditTimestamp
-    ? new Date(auditTimestamp).toISOString().replace('T', ' ').replace(/\..+$/, ' UTC')
+  const formattedDate = auditTimestamp
+    ? new Date(auditTimestamp).toISOString().slice(0, 10)
     : '';
+
+  // pageNumber + totalPages are accepted for back-compat but no longer
+  // rendered in the inline footer — Puppeteer's displayHeaderFooter
+  // (Phase 4 polish) supplies real per-sheet page numbers via @page
+  // rules. Logical page numbering broke when a logical page overflowed
+  // to a second physical sheet (the same "Page 2 of 3" appeared on
+  // both physical pages of a logical-page-2 spillover).
+  void pageNumber;
+  void totalPages;
+
+  // Inline footer suppressed — Puppeteer's displayHeaderFooter supplies
+  // per-physical-sheet chrome (page X of Y · document title · domain)
+  // via @page rules. Inline + @page footers double-up unnecessarily.
+  void documentTitle;
+  void formattedDate;
 
   return (
     <article className="dpr-page">
@@ -72,13 +87,6 @@ export function DprPageShell({
         </header>
       )}
       <section className="dpr-page-canvas">{children}</section>
-      <footer className="dpr-page-footer">
-        <span>{documentTitle}</span>
-        <span>
-          Page {pageNumber} of {totalPages}
-        </span>
-        <span>{formattedTimestamp}</span>
-      </footer>
     </article>
   );
 }

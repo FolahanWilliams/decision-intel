@@ -139,20 +139,31 @@
 
 .dpr-page {
   width: 210mm;
-  min-height: 297mm;
   margin: 0 auto var(--dpr-space-7);
   background: var(--dpr-paper);
   box-shadow: var(--dpr-shadow);
   position: relative;
-  page-break-after: always;
-  break-after: page;
-  display: flex;
-  flex-direction: column;
 }
 
-.dpr-page:last-of-type {
-  margin-bottom: 0;
-  page-break-after: auto;
+/*
+ * Print pagination: each logical .dpr-page starts on a fresh sheet via
+ * `break-before: page`, but the content is allowed to flow within that
+ * sheet without forcing a min-height. Combined with @page rules and
+ * break-inside:avoid on section primitives, this gives clean sheet
+ * transitions without spillover-creating fake page numbers. On screen,
+ * page-break properties are no-ops so we render the soft-shadow cards.
+ */
+.dpr-page + .dpr-page {
+  break-before: page;
+  page-break-before: always;
+}
+
+/* Suppress the soft margin-bottom and shadow on print so each sheet is
+   indistinguishable from a properly typeset PDF. */
+@media screen {
+  .dpr-page {
+    min-height: 297mm;
+  }
 }
 
 .dpr-page-band {
@@ -194,22 +205,27 @@
 }
 
 .dpr-page-canvas {
-  padding: 14mm 16mm 22mm 16mm;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+  padding: 14mm 16mm 14mm 16mm;
 }
 
+/*
+ * Page footer renders inline at the END of each logical page's content.
+ * On print, native CSS @page rules supply persistent page-number chrome
+ * across overflow sheets; the inline footer below documents the audit
+ * timestamp and document title once per logical page so a reader who
+ * downloads a single sheet still sees the provenance metadata.
+ *
+ * (Position:absolute pinned to bottom: 12mm was tried and produced
+ *  duplicated footers on multi-sheet logical pages — the McKinsey-grade
+ *  behaviour is page-counters via @page rules, not absolute positioning.)
+ */
 .dpr-page-footer {
-  position: absolute;
-  bottom: 12mm;
-  left: 16mm;
-  right: 16mm;
+  margin: var(--dpr-space-7) 16mm 14mm;
+  padding-top: var(--dpr-space-3);
+  border-top: 1px solid var(--dpr-rule);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: var(--dpr-space-3);
-  border-top: 1px solid var(--dpr-rule);
   font-size: 7.5pt;
   color: var(--dpr-grey-500);
   letter-spacing: 0.06em;
@@ -224,6 +240,21 @@
 
 .dpr-section:first-child {
   margin-top: 0;
+}
+
+/* Avoid awkward splits inside cards / strips / KV grids when printing.
+ * Note: .dpr-section deliberately omitted — keeping a whole section
+ * intact pushes the entire block to the next sheet when it doesn't fit,
+ * leaving an empty sheet with just the band. Sections are allowed to
+ * split across sheets; only individual cards / strips / notices stay
+ * intact. */
+.dpr-stat-card,
+.dpr-risk-strip,
+.dpr-verification,
+.dpr-honest-disclosure,
+.dpr-notice {
+  break-inside: avoid;
+  page-break-inside: avoid;
 }
 
 .dpr-section-eyebrow {
@@ -472,6 +503,226 @@
   margin-right: var(--dpr-space-2);
 }
 
+/* ---------------- Stat card grid (Phase 2) ------------------- */
+
+.dpr-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--dpr-space-4);
+  margin-top: var(--dpr-space-4);
+}
+
+.dpr-stat-grid--four {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.dpr-stat-card {
+  background: var(--dpr-grey-50);
+  border: 1px solid var(--dpr-rule);
+  border-radius: 2px;
+  padding: var(--dpr-space-4) var(--dpr-space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--dpr-space-2);
+}
+
+.dpr-stat-card-label {
+  font-size: 8pt;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--dpr-grey-500);
+}
+
+.dpr-stat-card-value {
+  font-family:
+    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo,
+    Consolas, monospace;
+  font-size: var(--dpr-type-display);
+  font-weight: 500;
+  color: var(--dpr-grey-950);
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+
+.dpr-stat-card-value--text {
+  font-family: 'Source Serif 4', 'Source Serif Pro', Georgia, serif;
+  font-size: var(--dpr-type-xl);
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  line-height: 1.15;
+}
+
+.dpr-stat-card-foot {
+  font-size: 8.5pt;
+  color: var(--dpr-grey-600);
+  line-height: 1.5;
+  margin-top: auto;
+}
+
+/* ---------------- R²F risk strips ---------------------------- */
+
+.dpr-risk-strip {
+  background: var(--dpr-paper);
+  border: 1px solid var(--dpr-rule);
+  border-left-width: 3px;
+  border-radius: 2px;
+  padding: var(--dpr-space-4) var(--dpr-space-5);
+  margin-top: var(--dpr-space-3);
+}
+
+.dpr-risk-strip--critical {
+  border-left-color: var(--dpr-severity-critical);
+}
+
+.dpr-risk-strip--high {
+  border-left-color: var(--dpr-severity-high);
+}
+
+.dpr-risk-strip--medium {
+  border-left-color: var(--dpr-severity-medium);
+}
+
+.dpr-risk-strip--low {
+  border-left-color: var(--dpr-severity-low);
+}
+
+.dpr-risk-strip--info {
+  border-left-color: var(--dpr-severity-info);
+}
+
+.dpr-risk-strip-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--dpr-space-4);
+  margin-bottom: var(--dpr-space-2);
+}
+
+.dpr-risk-strip-label {
+  font-size: 8pt;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.dpr-risk-strip-label--critical {
+  color: var(--dpr-severity-critical);
+}
+.dpr-risk-strip-label--high {
+  color: var(--dpr-severity-high);
+}
+.dpr-risk-strip-label--medium {
+  color: var(--dpr-severity-medium);
+}
+.dpr-risk-strip-label--low {
+  color: var(--dpr-severity-low);
+}
+.dpr-risk-strip-label--info {
+  color: var(--dpr-severity-info);
+}
+
+.dpr-risk-strip-band {
+  font-size: 8pt;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dpr-grey-500);
+}
+
+.dpr-risk-strip-headline {
+  font-family: 'Source Serif 4', 'Source Serif Pro', Georgia, serif;
+  font-size: var(--dpr-type-md);
+  font-weight: 600;
+  color: var(--dpr-grey-900);
+  margin: 0 0 var(--dpr-space-2) 0;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+}
+
+.dpr-risk-strip-body {
+  font-size: var(--dpr-type-sm);
+  color: var(--dpr-grey-700);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.dpr-risk-strip-foot {
+  margin-top: var(--dpr-space-3);
+  padding-top: var(--dpr-space-3);
+  border-top: 1px solid var(--dpr-rule);
+  font-size: 8.5pt;
+  color: var(--dpr-grey-500);
+  line-height: 1.55;
+}
+
+.dpr-risk-strip-foot-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--dpr-space-4);
+  margin-top: 4px;
+}
+
+.dpr-risk-strip-foot-row:first-child {
+  margin-top: 0;
+}
+
+.dpr-risk-strip-foot-key {
+  font-weight: 600;
+  color: var(--dpr-grey-700);
+  letter-spacing: 0.04em;
+}
+
+.dpr-risk-strip-foot-val {
+  text-align: right;
+  font-family:
+    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace;
+  letter-spacing: -0.005em;
+}
+
+/* ---------------- Notice / annotation block ------------------ */
+
+.dpr-notice {
+  margin-top: var(--dpr-space-4);
+  padding: var(--dpr-space-4);
+  background: var(--dpr-grey-50);
+  border: 1px solid var(--dpr-rule);
+  border-radius: 2px;
+  font-size: 8.5pt;
+  line-height: 1.55;
+  color: var(--dpr-grey-700);
+}
+
+.dpr-notice-mark {
+  display: inline-block;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 8pt;
+  color: var(--dpr-grey-500);
+  margin-right: var(--dpr-space-2);
+}
+
+/* ---------------- Two-column section split ----------------- */
+
+.dpr-split-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--dpr-space-7);
+  margin-top: var(--dpr-space-4);
+}
+
+.dpr-split-col-title {
+  font-size: 8pt;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--dpr-grey-500);
+  margin: 0 0 var(--dpr-space-3) 0;
+  padding-bottom: var(--dpr-space-2);
+  border-bottom: 1px solid var(--dpr-rule);
+}
+
 /* ---------------- Browser-only shell ------------------------- */
 /* On screen we render a soft grey backdrop around the page so the
    reader sees the document as a printable artefact. On print these
@@ -486,6 +737,16 @@
 
 /* ---------------- Print rules -------------------------------- */
 
+/*
+ * Print page chrome — locked 2026-05-05.
+ *
+ * @page rules provide the persistent footer (page X of Y · audit
+ * timestamp · document title) that prints on every physical sheet,
+ * including overflow sheets when a logical .dpr-page expands beyond
+ * one A4 page. The inline .dpr-page-footer carries the same
+ * information once per logical page so screen-mode preview readers
+ * see the same chrome the print output produces.
+ */
 @page {
   size: A4;
   margin: 0;
@@ -500,12 +761,6 @@
   .dpr-page {
     margin: 0;
     box-shadow: none;
-    page-break-after: always;
-    break-after: page;
-  }
-
-  .dpr-page:last-of-type {
-    page-break-after: auto;
   }
 
   /* Hide any preview-only chrome on print. */

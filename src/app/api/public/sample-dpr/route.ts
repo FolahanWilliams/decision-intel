@@ -2,24 +2,32 @@
  * GET /api/public/sample-dpr
  *
  * Public, unauthenticated SPECIMEN Decision Provenance Record. A GC,
- * journalist, or regulator can download a real 4-page DPR PDF before
- * anyone signs a contract. The record is rendered from frozen seed
- * data in src/lib/reports/sample-dpr.ts and watermarked diagonally
- * with "SPECIMEN" on every page so it can't be mistaken for a live
- * audit.
+ * journalist, or regulator can download a real McKinsey-grade DPR PDF
+ * before anyone signs a contract. The record is rendered from frozen
+ * seed data via the new HTML/CSS Next.js route (/dpr-render/specimen/wework)
+ * + Puppeteer — locked 2026-05-05 architecture (CLAUDE.md "DPR
+ * architecture lock 2026-05-05").
+ *
+ * Migration note: this route previously called the legacy 1,696-LOC
+ * jsPDF generator. Phase 2 wired it to the new HTML/CSS rendering via
+ * the shared renderDprPdf() helper so a procurement reviewer who hits
+ * the public URL gets the new visual language. The legacy generator
+ * (decision-provenance-record-generator.ts) will be retired in Phase 4
+ * once all 6 consumers have been swapped.
  *
  * Rate-limited per IP (10/hour) to keep public traffic cheap and bots
- * from hot-looping the generator.
+ * from hot-looping the Puppeteer renderer (~$0.001 per render).
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createLogger } from '@/lib/utils/logger';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
-import { buildSampleDprData } from '@/lib/reports/sample-dpr';
-import { DecisionProvenanceRecordGenerator } from '@/lib/reports/decision-provenance-record-generator';
+import { renderDprPdf } from '@/lib/reports/render-dpr-pdf';
 
 const log = createLogger('SampleDpr');
 
+export const runtime = 'nodejs';
+export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 function clientIp(req: NextRequest): string {
@@ -50,25 +58,18 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // ?clientSafe=1 lets a curious LP / journalist / regulator preview
-    // the LP-export shape on the same SPECIMEN bytes — same tracking
-    // limit, no auth, watermark stays.
-    const clientSafe = req.nextUrl.searchParams.get('clientSafe') === '1';
-    const data = buildSampleDprData();
-    const generator = new DecisionProvenanceRecordGenerator();
-    const doc = generator.generate(data, { watermark: 'SPECIMEN', clientSafe });
-    const pdfArrayBuffer = doc.output('arraybuffer') as ArrayBuffer;
-    const pdfBytes = new Uint8Array(pdfArrayBuffer);
+    const baseUrl =
+      process.env.NEXT_PUBLIC_APP_URL ?? `${req.nextUrl.protocol}//${req.nextUrl.host}`;
+    const { pdf } = await renderDprPdf({ baseUrl, type: 'specimen', id: 'wework' });
+    log.info(`SPECIMEN DPR served to ${ip} (${pdf.length} bytes)`);
 
-    log.info(`SPECIMEN DPR served to ${ip}`);
-
-    return new NextResponse(pdfBytes as unknown as BodyInit, {
+    return new NextResponse(new Uint8Array(pdf), {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': 'inline; filename="decision-provenance-record-specimen.pdf"',
         // Public specimen — safe to cache aggressively on the CDN since
-        // the content is frozen at build time.
+        // the seed data is frozen + the rendering is deterministic.
         'Cache-Control': 'public, max-age=3600, s-maxage=86400',
       },
     });

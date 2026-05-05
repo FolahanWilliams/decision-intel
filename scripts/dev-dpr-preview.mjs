@@ -1,6 +1,17 @@
-// Quick visual verification: render the DPR Phase 1 specimen via
-// local full Puppeteer (not chromium-min) so we don't have to wait
-// for the CDN chromium download. Dev-only.
+// DPR specimen renderer — used both as a dev preview AND as the
+// build-time replacement for scripts/generate-legal-pdfs.mjs (the legacy
+// jsPDF sample generator). When DPR_OUTPUT points at public/, this
+// script regenerates the public-facing sample PDFs from the new HTML/CSS
+// Next.js route. Dev server must be running on PORT (default 3000).
+//
+// Usage:
+//   # Preview (write to /tmp):
+//   node scripts/dev-dpr-preview.mjs
+//
+//   # Regenerate the public sample:
+//   DPR_URL='http://localhost:3000/dpr-render/specimen/wework' \
+//     DPR_OUTPUT='public/dpr-sample-wework.pdf' \
+//     node scripts/dev-dpr-preview.mjs
 
 import puppeteer from 'puppeteer';
 import { writeFileSync } from 'node:fs';
@@ -26,7 +37,29 @@ const pdf = await page.pdf({
   format: 'A4',
   printBackground: true,
   preferCSSPageSize: true,
-  margin: { top: '0', bottom: '0', left: '0', right: '0' },
+  margin: { top: '0', bottom: '12mm', left: '0', right: '0' },
+  displayHeaderFooter: true,
+  headerTemplate: '<span></span>',
+  footerTemplate: `
+    <div style="
+      width: 100%;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 7.5pt;
+      color: #78716c;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0 16mm;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    ">
+      <span style="flex: 1; text-align: left;">Decision Provenance Record</span>
+      <span style="flex: 1; text-align: center;">
+        Page <span class="pageNumber"></span> of <span class="totalPages"></span>
+      </span>
+      <span style="flex: 1; text-align: right;">decision-intel.com</span>
+    </div>
+  `,
 });
 console.log(`[test] PDF generated in ${Date.now() - pdfStart}ms (${pdf.length} bytes).`);
 

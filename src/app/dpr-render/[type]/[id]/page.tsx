@@ -2,32 +2,33 @@
  * DPR rendering route — server component, renders the McKinsey-grade
  * Decision Provenance Record as HTML.
  *
- * Locked 2026-05-05. This is the single source of truth for every DPR
- * surface — server-side Puppeteer hits this URL to produce PDFs, the
- * client-side Export DPR button opens this URL in a new tab and triggers
- * window.print(), and the build-time sample script (Phase 4) renders
- * specimen URLs to the public/ directory.
+ * Locked 2026-05-05. Single source of truth for every DPR surface — server-
+ * side Puppeteer hits this URL to produce PDFs, the client-side Export DPR
+ * button opens this URL in a new tab and triggers window.print(), and the
+ * build-time sample script (Phase 4) renders specimen URLs to the public/
+ * directory.
  *
  * URL shape: /dpr-render/[type]/[id]
- *   type = specimen → public, no auth (rate-limited at the API layer
- *                     when going through the Puppeteer endpoint)
+ *   type = specimen → public, no auth (rate-limited at the API layer)
  *   type = document → Supabase-auth + ownership check (Phase 4)
  *   type = package  → Supabase-auth + ownership check (Phase 4)
  *   type = deal     → Supabase-auth + ownership check (Phase 4)
  *
- * Phase 1 (this commit): renders the specimen path only. Phase 4 wires
- * the other three types + replaces the existing API consumers.
+ * Phase 1 shipped: page 1 (cover + integrity).
+ * Phase 2 shipped: page 2 (methodology) + page 3 (R²F strips).
+ * Phase 3 will add: pages 4-N (per-bias findings + Dalio + regulatory crosswalk).
+ * Phase 4 will wire the document/package/deal types + retire legacy generator.
  */
 
 import { notFound } from 'next/navigation';
 import { buildSampleDprData } from '@/lib/reports/sample-dpr';
 import { DprPageOneCover } from '@/components/dpr/pages/DprPageOneCover';
+import { DprPageTwoMethodology } from '@/components/dpr/pages/DprPageTwoMethodology';
+import { DprPageThreeR2fStrips } from '@/components/dpr/pages/DprPageThreeR2fStrips';
 import type { ProvenanceRecordData } from '@/lib/reports/provenance-record-data';
 
 const VALID_TYPES = ['specimen', 'document', 'package', 'deal'] as const;
 type DprType = (typeof VALID_TYPES)[number];
-
-const TOTAL_PAGES_PHASE_1 = 1;
 
 export default async function DprRenderPage({
   params,
@@ -49,22 +50,46 @@ export default async function DprRenderPage({
 
   const recordId = formatRecordId(data);
   const verifyUrl = `https://decision-intel.com/verify/${recordId}`;
+  const classification = type === 'specimen' ? 'specimen' : 'confidential';
+  const auditTimestamp = data.generatedAt.toISOString();
+
+  // Compute total pages from what we have available. Phase 2 ships 3
+  // fixed pages (cover + methodology + R²F strips); Phase 3 will add
+  // more dynamically based on bias count + Dalio assumptions + crosswalk.
+  const totalPages = computeTotalPages(data);
 
   return (
-    <DprPageOneCover
-      title={titleForData(data)}
-      subtitle={subtitleForData(data)}
-      recordId={recordId}
-      auditTimestamp={data.generatedAt.toISOString()}
-      inputHash={data.inputHash}
-      promptFingerprint={data.promptFingerprint}
-      schemaVersion={`${data.schemaVersion}.1.0`}
-      pipelineVersion={pipelineVersionFromLineage(data)}
-      verifyUrl={verifyUrl}
-      classification={type === 'specimen' ? 'specimen' : 'confidential'}
-      totalPages={TOTAL_PAGES_PHASE_1}
-      footerTitle="Decision Provenance Record"
-    />
+    <>
+      <DprPageOneCover
+        title={titleForData(data)}
+        subtitle={subtitleForData(data)}
+        recordId={recordId}
+        auditTimestamp={auditTimestamp}
+        inputHash={data.inputHash}
+        promptFingerprint={data.promptFingerprint}
+        schemaVersion={`${data.schemaVersion}.1.0`}
+        pipelineVersion={pipelineVersionFromLineage(data)}
+        verifyUrl={verifyUrl}
+        classification={classification}
+        totalPages={totalPages}
+        footerTitle="Decision Provenance Record"
+      />
+      <DprPageTwoMethodology
+        judgeVariance={data.judgeVariance}
+        modelLineage={data.modelLineage}
+        pageNumber={2}
+        totalPages={totalPages}
+        classification={classification}
+        auditTimestamp={auditTimestamp}
+      />
+      <DprPageThreeR2fStrips
+        data={data}
+        pageNumber={3}
+        totalPages={totalPages}
+        classification={classification}
+        auditTimestamp={auditTimestamp}
+      />
+    </>
   );
 }
 
@@ -81,13 +106,10 @@ async function loadDprData(type: DprType, id: string): Promise<ProvenanceRecordD
 }
 
 function titleForData(data: ProvenanceRecordData): string {
-  // Specimen + procurement copy: lead with the audit, not the filename.
-  // The filename is preserved as a secondary identifier in §1.
   if (data.userId === 'specimen') {
     return 'Audit of a private-market growth-company prospectus';
   }
   const filename = data.meta.filename ?? 'Strategic decision audit';
-  // Strip extension, replace separators with spaces, split camelCase.
   return filename
     .replace(/\.[^.]+$/, '')
     .replace(/[-_]/g, ' ')
@@ -114,4 +136,10 @@ function formatRecordId(data: ProvenanceRecordData): string {
 function pipelineVersionFromLineage(data: ProvenanceRecordData): string {
   const nodes = Object.keys(data.modelLineage.nodes ?? {});
   return `di-pipeline · ${nodes.length} nodes · v2.1.0`;
+}
+
+function computeTotalPages(_data: ProvenanceRecordData): number {
+  // Phase 2: 3 fixed pages. Phase 3 will compute dynamically from
+  // citations.length + Dalio assumption count + crosswalk presence.
+  return 3;
 }
