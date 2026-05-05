@@ -14,3 +14,6 @@
 
 export { FindingsTab } from './FindingsTab';
 export type { FindingsTabProps, FindingsTabToxicCombination } from './FindingsTab';
+
+export { ActionsTab } from './ActionsTab';
+export type { ActionsTabProps } from './ActionsTab';
