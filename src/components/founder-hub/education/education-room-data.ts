@@ -19,11 +19,12 @@
  * a new persona / framework / lesson lands, update HERE only — the
  * EducationRoomTab pulls all decks + cards from these typed exports.
  *
- * Current state (2026-05-04): 17 decks, 181 cards. Was 16 decks / 173 cards
- * at 2026-05-02; expanded with personal_social_archetypes (2026-05-04 ship
- * with the personal-social SSOT — 8 cards: 6 archetype shapes from NotebookLM
- * master KB synthesis ranked by 1-1-1 wedge ROI + the empathic-mode-first
- * cold-context discipline + the "Polite but Brutal Pragmatist" META rule).
+ * Current state (2026-05-05): 18 decks, 187 cards. Was 17 decks / 181 cards
+ * at 2026-05-04; expanded with common_mistakes (2026-05-05 ship from the
+ * archived Goldner 4-Week Traction Plan — 6 cards: pitching before pain is
+ * named, synthetic-memo POCs, burning warm intros pre-sharp-pitch,
+ * not-writing-quotes-immediately, demoing-the-whole-platform, leaving the
+ * case-study ask to the close).
  */
 
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
@@ -49,7 +50,8 @@ export type DeckId =
   | 'strategic_thinking'
   | 'goldner_discovery'
   | 'learning_efficiency'
-  | 'personal_social_archetypes';
+  | 'personal_social_archetypes'
+  | 'common_mistakes';
 
 export type CardDifficulty = 'foundation' | 'core' | 'advanced';
 export type CardMode = 'flashcard' | 'recall' | 'apply';
@@ -276,6 +278,15 @@ export const DECKS: EducationDeck[] = [
     iconName: 'Linkedin',
     color: '#0A66C2',
     order: 17,
+  },
+  {
+    id: 'common_mistakes',
+    label: 'Common Mistakes',
+    description:
+      'The 6 high-frequency selling mistakes from the archived Goldner 4-Week Traction Plan. Drill these so the rationalisation at 11pm hits a written counter-argument. Pitching before the pain is named, synthetic POCs, burning warm intros pre-pitch, late quote capture, demoing the whole platform, leaving the case-study ask to the close.',
+    iconName: 'AlertTriangle',
+    color: '#DC2626',
+    order: 18,
   },
 ];
 
@@ -2320,6 +2331,97 @@ const PERSONAL_SOCIAL_ARCHETYPES_CARDS: EducationCard[] = [
   },
 ];
 
+// ─── Cards: Common Mistakes (6) ─────────────────────────────────
+//
+// Locked 2026-05-05 (archived Goldner 4-Week Traction Plan archaeology).
+// Six high-frequency selling mistakes that compound across calls. Each
+// card carries the rule, the WHY (what failure mode it produces), and
+// the corrective move. Drill these before every event week so the
+// rationalisation at 11pm hits a written counter-argument.
+
+const COMMON_MISTAKES_CARDS: EducationCard[] = [
+  {
+    id: 'mistake_pitch_before_pain',
+    deckId: 'common_mistakes',
+    prompt:
+      'Why is pitching before the prospect names the pain unprompted the most expensive mistake?',
+    canonicalAnswer:
+      'You skip the moment where they say "yes, that exact thing happened to us." That moment is the wedge — without it, you are selling a solution to a problem they have not acknowledged yet. The brain treats unacknowledged pain as a hypothetical; acknowledged pain triggers the System 1 recognition that converts. Goldner\'s locked rule: discovery FIRST, all 4 questions, no exceptions. The pivot to pitch is "Based on what you said about [their specific pain in their words], I think I have something you should see." The pivot only works if THEY named the pain. Discipline rule: talk for less than 25% of the conversation. If you are talking more, you are pitching not discovering.',
+    hint: 'The wedge moment is when THEY say it, not when you say it for them.',
+    difficulty: 'foundation',
+    applicationContext:
+      'Every cold call, warm intro, and event 1:1. Especially when you are tired or the conversation is dragging — that is exactly when you will rationalise pitching early.',
+    source:
+      'discovery-pitch-toolkit.ts DISCOVERY_DISCIPLINE_RULES + archived Goldner 4-Week Traction Plan',
+    tag: 'discovery',
+  },
+  {
+    id: 'mistake_synthetic_poc',
+    deckId: 'common_mistakes',
+    prompt:
+      'Why must POCs (paid pilots and free retrospective audits) run on real past deals, never on synthetic or hypothetical memos?',
+    canonicalAnswer:
+      'The emotional resonance comes from THEIR actual history. A synthetic memo carries zero risk and zero recognition — they read the audit as an interesting demo. A real past memo carries the bias they actually missed and the outcome they actually saw — they read the audit as a forensic mirror. Conversion happens at the moment of recognition, which only fires on real artefacts. Pattern B (post-close surprises) is Goldner\'s "safest starter" precisely because the deal is closed and the political risk is zero — but the artefact is real, so the recognition fires intact. If a prospect says "I don\'t have anything I can share," do not offer to run a synthetic memo — instead ask "is there an old deal from 2 years ago, even one that worked out?" The retrospective frame removes the political resistance.',
+    difficulty: 'core',
+    applicationContext:
+      'Every POC kickoff. Every demo offer. Every time a prospect hedges on sharing material — the answer is to lower the political stakes (older deal, redacted, retrospective), not to offer a synthetic substitute.',
+    source: 'archived 4-Week Traction Plan + PAIN_PATTERNS.post_close_surprise',
+    tag: 'demo',
+  },
+  {
+    id: 'mistake_burn_warm_intros_early',
+    deckId: 'common_mistakes',
+    prompt:
+      'Why do you NEVER burn warm intros (Mr. Reiner, Mr. Gabe networks) before the wedge motion has produced 5+ paid customers + 3+ ROI case studies?',
+    canonicalAnswer:
+      "Warm intros are the warmest channel you have and they degrade with each use. A warm intro to a warm prospect with NO references is exposed for what it is — a bet on the founder. A warm intro to a warm prospect with 5 paid customers + 3 ROI case studies + a Sankore reference is a closing move. Same channel, opposite conversion rates. Goldner's rule: use cold contacts for Week 1 discovery — it sharpens your pitch before you spend your best bullets. CLAUDE.md v3.5 lock: Mr. Reiner / Mr. Gabe network activation is reserved for Phase 3 (Q2 2027), AFTER Phase 1 produces 5+ paid + 3+ ROI case studies AND Phase 2 produces the Sankore reference. The single most likely failure mode of v3.5 is Premature Enterprise Escalation — burning the warmest channels at zero-evidence.",
+    difficulty: 'core',
+    applicationContext:
+      "Every founder fundraising / outreach decision. When the temptation hits ('Mr. Reiner could intro me to a F500 corp dev head NOW'), this card is the counter-argument.",
+    source: 'CLAUDE.md GTM v3.5 Phase 3 activation gate + External Attack Vectors note',
+    tag: 'sequencing',
+  },
+  {
+    id: 'mistake_no_quote_capture',
+    deckId: 'common_mistakes',
+    prompt:
+      'Why must you write down the prospect\'s verbatim quotes within 10 minutes of every conversation?',
+    canonicalAnswer:
+      "You will forget the exact wording within an hour. Paraphrased pain is generic; verbatim pain is specific. The validation summary that lands an investor (\"3 corp dev VPs said almost the same sentence: 'we got to IC and realised X'\") only works if you captured the sentence verbatim. Generic paraphrase reads as marketing copy and is dismissed. The 5 words they actually use for the pain ARE your future marketing copy — the landing-page H1, the LinkedIn DM opener, the cold-email subject line. Discipline: open a Notes / phone memo IMMEDIATELY after every call (including 2-min hallway conversations). 30 seconds of capture saves an hour of reconstruction. Discovery-pitch-toolkit Q1 watchFor: 'the 5 words they actually use for the pain (write them verbatim — those are your future marketing copy).'",
+    difficulty: 'foundation',
+    applicationContext:
+      'Every conversation. The 10-minute rule is non-negotiable. If you cannot capture in 10 minutes, capture in 60 seconds at the door before walking away.',
+    source: 'archived 4-Week Traction Plan + DISCOVERY_QUESTIONS Q1 watchFor',
+    tag: 'capture',
+  },
+  {
+    id: 'mistake_demo_whole_platform',
+    deckId: 'common_mistakes',
+    prompt:
+      'Why is demoing the whole platform a mistake? What do you demo instead?',
+    canonicalAnswer:
+      'Trying to solve everything in the demo dilutes the wedge. The buyer remembers nothing because nothing was emphasised. Demo the ONE feature that solves their SPECIFIC pain pattern — keyed to which of the 3 patterns they described. Pattern A (pre-IC gaps) → Forgotten Questions output + structural-assumptions audit. Pattern B (post-close surprises) → retrospective audit on a closed deal. Pattern C (IC friction) → noise score (3-frame jury disagreement). The pattern→feature crosswalk is in PAIN_PATTERNS in discovery-pitch-toolkit.ts. The discipline: one memo, one pain pattern, one clear output. Walk away from the demo with the buyer able to repeat what the audit caught in one sentence. If they cannot, you demoed too much.',
+    difficulty: 'core',
+    applicationContext:
+      'Every demo. Especially live 60-second demos at events where you have ~5 minutes total — pick the feature that matches the pattern, ignore the rest.',
+    source: 'discovery-pitch-toolkit.ts PAIN_PATTERNS + archived 4-Week Traction Plan',
+    tag: 'demo',
+  },
+  {
+    id: 'mistake_late_case_study_ask',
+    deckId: 'common_mistakes',
+    prompt:
+      'When do you ask permission to document a customer engagement as a case study — at the kick-off or at the close?',
+    canonicalAnswer:
+      'At the KICK-OFF. Always. Built into the pilot agreement / NDA on day one as an expected term: "Decision Intel may produce an anonymised case study describing the engagement; you have 10 business days to redact any specifics." If you wait until the close, you are asking for a favour after the value transfer is complete — they have no incentive to help and every incentive to hedge. At kick-off, it is part of the deal — anchored before they have evaluated the outcome. The case study is the asset that converts the NEXT 5 customers. Without it, the engagement produced revenue but not compounding leverage. Goldner\'s locked rule: ask for permission to document at kick-off, never at close. Same discipline applies to verbatim quotes (capture during, not after) and to referrals (ask after the first ROI artefact lands, not at contract end).',
+    difficulty: 'foundation',
+    applicationContext:
+      'Every pilot kick-off, every NDA review, every contract draft. Build the case-study clause into the template so you never forget.',
+    source: 'archived 4-Week Traction Plan + Decision Foundation MoU template',
+    tag: 'closing',
+  },
+];
+
 // ─── Aggregator + Helpers ───────────────────────────────────────
 
 export const ALL_CARDS: EducationCard[] = [
@@ -2342,6 +2444,7 @@ export const ALL_CARDS: EducationCard[] = [
   ...GOLDNER_DISCOVERY_CARDS,
   ...LEARNING_EFFICIENCY_CARDS,
   ...PERSONAL_SOCIAL_ARCHETYPES_CARDS,
+  ...COMMON_MISTAKES_CARDS,
 ];
 
 export function findDeck(id: DeckId): EducationDeck | undefined {

@@ -230,6 +230,98 @@ export const PITCH_TRIGGERS: PitchTrigger[] = [
   },
 ];
 
+// ─── Pain patterns × feature crosswalk ───────────────────────────
+//
+// Locked 2026-05-05 (Mr. Goldner's 4-Week Traction Plan archaeology). The
+// three pain patterns cut ACROSS personas — same pattern arrives from a
+// fractional CSO, a mid-market corp dev head, a small-fund GP. Once you
+// hear which pattern the prospect described, the demo move is determined:
+// you don't have to rehearse all 4 personas × 7 scenarios; you match the
+// pattern to its feature and run.
+//
+// Source: archived 4-Week Traction Plan (April 2026, pre-v3.5). The plan
+// itself is superseded (the F500-corp-dev wedge is now narrowed to 4
+// buyer-class-continuous personas), but this tactical framework survives
+// the supersedure intact because it's persona-agnostic.
+//
+// Pattern A is the highest-frequency hit on the wedge personas.
+// Pattern B is Goldner's "safest starter" move — running the audit on a
+//   PAST deal removes future-deal political risk and earns trust.
+// Pattern C is the IC-process angle that lands hardest on mid-market PE
+//   and small-fund GP personas.
+
+export interface PainPattern {
+  /** Stable slug used for UI keys + sales-toolkit cross-reference. */
+  id: 'pre_ic_gap' | 'post_close_surprise' | 'ic_friction';
+  /** Short label for chips + headlines. */
+  label: string;
+  /** What the prospect says in their words (verbatim signal phrases). */
+  signalPhrases: string[];
+  /** The DI feature that addresses this pattern (what to demo). */
+  featureWedge: string;
+  /** The exact demo move to run when this pattern fires on a live call. */
+  demoMove: string;
+  /** Pre-existing bias-hook archetypes from the 143-case library that
+   * map onto this pattern (anchors the demo in a recognisable case). */
+  biasHookAnchors: string[];
+  /** Why this pattern is the safest / highest-leverage starter move. */
+  starterRationale: string;
+}
+
+export const PAIN_PATTERNS: PainPattern[] = [
+  {
+    id: 'pre_ic_gap',
+    label: 'Pattern A · Pre-IC gaps',
+    signalPhrases: [
+      "We got to IC and realised we hadn't fully validated X.",
+      'The reviewer asked a question we should have caught at draft time.',
+      "There's a diligence area we always seem to miss.",
+      'We re-do the same memo three times before it lands.',
+    ],
+    featureWedge:
+      'Forgotten Questions engine + structural-assumptions audit. The pipeline runs the prospect\'s memo through a 33-question taxonomy of "what would a sceptical reviewer ask" (rooted in Klein\'s pre-mortem + RPD framework + the 22-bias detector taxonomy), surfaces the gaps the IC will catch first, and outputs the questions in the order the room is most likely to ask them.',
+    demoMove:
+      "Ask if they have a memo handy from a deal where IC pushed back hard. Run it through /demo live — the Forgotten Questions output is what they react to. Watch for the moment they say 'that's exactly what was asked' — that's the wedge.",
+    biasHookAnchors: ['WeWork S-1 (illusion of validity)', 'AOL-Time Warner (overconfidence)', 'Daimler-Chrysler (inside-view dominance)'],
+    starterRationale:
+      "Highest-frequency pattern on the wedge personas. Mid-market corp dev heads + small-fund GPs name this pain unprompted in 60-70% of discovery calls (per the 4-Week Traction Plan post-mortem). The Forgotten Questions output is the single most demoable feature — they read 5 questions and recognise 2-3 they were asked.",
+  },
+  {
+    id: 'post_close_surprise',
+    label: 'Pattern B · Post-close surprises',
+    signalPhrases: [
+      "The synergies didn't materialise the way the memo said they would.",
+      "We integrated and discovered [X] that wasn't in any model.",
+      "We had to take a markdown 18 months in.",
+      "Looking back, the bias was obvious — we just couldn't see it at the time.",
+    ],
+    featureWedge:
+      "Retrospective audit on a CLOSED deal. Run the audit on a memo from 12-24 months ago where the outcome is known. The DPR surfaces the structural assumptions that didn't hold + the biases that drove them. This is forensic, not predictive — and that's why it's safe.",
+    demoMove:
+      "Goldner's 'safest starter' move. Ask: 'Do you have an old memo handy — even one from 2 years ago? Send it over right now, I'll run it in the next 60 seconds and show you what we surface.' The retrospective frame removes political risk (no live deal in scope) and the reaction is immediate — they SEE the bias they missed.",
+    biasHookAnchors: ['Quibi launch (planning fallacy)', 'Boeing 737 MAX (optimism bias)', 'Theranos investor decisions (halo effect + authority bias)'],
+    starterRationale:
+      "Goldner's locked move from the 4-Week Traction Plan: 'safest starter' because the deal is already closed — there's no live political stake. Use this when the prospect is curious but hesitant to commit a live deal to the audit. Retrospective audits convert at higher rates than live audits when the prospect is in evaluation mode.",
+  },
+  {
+    id: 'ic_friction',
+    label: 'Pattern C · IC process friction',
+    signalPhrases: [
+      "IC debates drag because the reasoning in the memo isn't clear.",
+      'We argue the same points every meeting and never resolve them.',
+      "The senior partner's gut overrides the analysis half the time.",
+      "We don't have a way to compare this memo to past decisions.",
+    ],
+    featureWedge:
+      'Noise score (3-frame jury — analyst-skeptical, regulator-hostile, contrarian-strategist) + Decision Knowledge Graph cross-decision comparison. The noise score quantifies how much the audit verdict varies across professional lenses; high stdDev = the memo will be argued at IC because the reasoning is framing-sensitive. The Knowledge Graph surfaces decisions of the same shape from the prospect\'s history with their realised outcomes.',
+    demoMove:
+      'Open the demo with the WeWork DPR specimen. Show the noise score panel (analyst-skeptical disagrees with regulator-hostile by 30+ points) and the explanation: "this is the conversation IC is going to have at length. The audit names it before the meeting." For a follow-on demo, run their actual memo through and show whether the same pattern appears.',
+    biasHookAnchors: ['Long-Term Capital Management (loss aversion mis-framing)', 'Sears retail strategy (status quo bias)', 'FTX investor decisions (authority bias)'],
+    starterRationale:
+      'Highest leverage on mid-market PE associates + small-fund GPs who already have IC infrastructure but feel friction. The noise score is the conversation differentiator — competitors quantify the audit verdict; we quantify the DISAGREEMENT.',
+  },
+];
+
 // ─── Discipline rules (the do-not list) ──────────────────────────
 
 export const DISCOVERY_DISCIPLINE_RULES = [

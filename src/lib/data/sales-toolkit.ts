@@ -1348,6 +1348,20 @@ export const BRINKMANSHIP_MOVES: SalesMove[] = [
     bestForPersona: 'f500_cso, pan_african_fund_partner',
   },
   {
+    id: 'brinkmanship_live_60_second_demo',
+    framework: 'Brinkmanship · 60-Second Live Demo Mid-Call (Goldner archaeology, locked 2026-05-05)',
+    whenToFire:
+      'WARM context only. The prospect has already articulated a specific pain pattern in the conversation (Pattern A pre-IC gap, Pattern B post-close surprise, or Pattern C IC friction). They are curious but non-committal. NOT for cold opens — the brinkmanship_evidence_ultimatum is the cold version.',
+    verbatim:
+      "Do you have an old memo handy — even one from two years ago? Send it over right now. I'll run it in the next 60 seconds and show you what we surface. No commitment, no slides, no follow-up unless you want one.",
+    mechanism:
+      "Distinct from the 7-minute Evidence Ultimatum: this is conversational, mid-call, and the time-cost to the buyer is zero (they email you a memo they already have, you screenshare). The brinkmanship is in the IMMEDIACY — saying 'right now' commits both sides to the moment. The buyer either follows through (they're warm) or hedges ('let me find one and send it later') which surfaces whether they're a real prospect or a polite listener. Goldner's locked move from the 4-Week Traction Plan: 'this is your superpower — do it as often as possible.'",
+    antiPattern:
+      "Sending a calendar invite for a separate demo call ('let's set up 30 minutes next week to walk through it') — kills the brinkmanship. The conversion advantage is the LIVE moment of recognition. Once they hang up, they have time to rationalise the pain away. The 60-second demo IS the closing move; treating it as a separate meeting destroys the mechanic.",
+    scoresOn: 'pressure_without_pressure + conviction_transmission + category_of_one',
+    bestForPersona: 'fractional_cso, mid_market_corp_dev, pe_backed_founder, small_fund_gp',
+  },
+  {
     id: 'brinkmanship_natural_scarcity_seats',
     framework:
       'Brinkmanship · Natural Scarcity on Pilot Seats (Cialdini scarcity × Schelling commitment)',

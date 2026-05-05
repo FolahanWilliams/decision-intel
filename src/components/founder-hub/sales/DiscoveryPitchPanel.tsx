@@ -25,6 +25,7 @@ import {
   Target,
   ChevronDown,
   ChevronRight,
+  GitBranch,
 } from 'lucide-react';
 import {
   DISCOVERY_QUESTIONS,
@@ -32,9 +33,11 @@ import {
   DEFLECTION_DISCIPLINE,
   PERSONA_OPENERS,
   PITCH_TRIGGERS,
+  PAIN_PATTERNS,
   DISCOVERY_DISCIPLINE_RULES,
   FOLLOWUP_EMAIL_TEMPLATE,
   WHAT_30_CONVERSATIONS_PRODUCE,
+  type PainPattern,
   type PersonaId,
 } from '@/lib/data/discovery-pitch-toolkit';
 import { MomDiscoveryFrameworkViz } from './MomDiscoveryFrameworkViz';
@@ -57,6 +60,7 @@ const C = {
 export function DiscoveryPitchPanel() {
   const [persona, setPersona] = useState<PersonaId>('cso');
   const [expandedTrigger, setExpandedTrigger] = useState<number | null>(null);
+  const [expandedPattern, setExpandedPattern] = useState<PainPattern['id'] | null>(null);
   const activePersona = PERSONA_OPENERS.find(p => p.id === persona)!;
 
   return (
@@ -402,6 +406,83 @@ export function DiscoveryPitchPanel() {
         })}
       </div>
 
+      {/* Pain patterns × feature crosswalk · Goldner archaeology, locked 2026-05-05 */}
+      <div
+        style={{
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-color)',
+          borderLeft: `3px solid ${C.indigo}`,
+          borderRadius: 'var(--radius-md)',
+          padding: 16,
+          marginBottom: 14,
+        }}
+      >
+        <div style={blockEyebrow(C.indigo)}>
+          <GitBranch size={11} /> Pain patterns · the demo move is determined by which one fires
+        </div>
+        <div
+          style={{
+            fontSize: 11.5,
+            color: 'var(--text-secondary)',
+            lineHeight: 1.55,
+            marginBottom: 12,
+          }}
+        >
+          The three patterns cut ACROSS personas. Once you hear which one the prospect described,
+          you don&rsquo;t need to rehearse all 4 personas &times; 7 scenarios &mdash; you match the
+          pattern to its feature and run. Click to expand each pattern for signal phrases, feature
+          wedge, demo move, and bias-hook anchors.
+        </div>
+        {PAIN_PATTERNS.map(pattern => {
+          const isExpanded = expandedPattern === pattern.id;
+          return (
+            <div
+              key={pattern.id}
+              style={{
+                marginBottom: 8,
+                border: '1px solid var(--border-color)',
+                borderRadius: 'var(--radius-sm)',
+                background: isExpanded ? C.indigoSoft : 'var(--bg-secondary)',
+                overflow: 'hidden',
+              }}
+            >
+              <button
+                type="button"
+                onClick={() =>
+                  setExpandedPattern(isExpanded ? null : pattern.id)
+                }
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 8,
+                  textAlign: 'left',
+                  fontSize: 12.5,
+                  color: 'var(--text-primary)',
+                  fontWeight: 600,
+                }}
+              >
+                {isExpanded ? (
+                  <ChevronDown size={14} style={{ flexShrink: 0, marginTop: 2 }} />
+                ) : (
+                  <ChevronRight size={14} style={{ flexShrink: 0, marginTop: 2 }} />
+                )}
+                <span style={{ flex: 1, color: C.indigo }}>{pattern.label}</span>
+              </button>
+              {isExpanded && (
+                <div style={{ padding: '0 12px 12px 34px' }}>
+                  <PatternDetailBlock pattern={pattern} />
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
       {/* Follow-up email template */}
       <div
         style={{
@@ -558,6 +639,128 @@ function SectionHeader({
       >
         {body}
       </p>
+    </div>
+  );
+}
+
+function PatternDetailBlock({ pattern }: { pattern: PainPattern }) {
+  const indigo = '#6366F1';
+  const green = '#16A34A';
+  const amber = '#D97706';
+  return (
+    <div>
+      {/* Signal phrases */}
+      <div style={{ marginBottom: 10 }}>
+        <div
+          style={{
+            fontSize: 10.5,
+            fontWeight: 700,
+            color: indigo,
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            marginBottom: 4,
+          }}
+        >
+          Signal phrases (their words)
+        </div>
+        <ul style={{ margin: 0, paddingLeft: 16, fontSize: 11.5, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+          {pattern.signalPhrases.map(phrase => (
+            <li key={phrase} style={{ marginBottom: 2 }}>
+              &ldquo;{phrase}&rdquo;
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Feature wedge */}
+      <div style={{ marginBottom: 10 }}>
+        <div
+          style={{
+            fontSize: 10.5,
+            fontWeight: 700,
+            color: green,
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            marginBottom: 4,
+          }}
+        >
+          Feature wedge (what to demo)
+        </div>
+        <div style={{ fontSize: 11.5, color: 'var(--text-primary)', lineHeight: 1.55 }}>
+          {pattern.featureWedge}
+        </div>
+      </div>
+
+      {/* Demo move */}
+      <div style={{ marginBottom: 10 }}>
+        <div
+          style={{
+            fontSize: 10.5,
+            fontWeight: 700,
+            color: amber,
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            marginBottom: 4,
+          }}
+        >
+          Demo move (run it on the call)
+        </div>
+        <div style={{ fontSize: 11.5, color: 'var(--text-primary)', lineHeight: 1.55, fontStyle: 'italic' }}>
+          {pattern.demoMove}
+        </div>
+      </div>
+
+      {/* Bias hook anchors */}
+      <div style={{ marginBottom: 10 }}>
+        <div
+          style={{
+            fontSize: 10.5,
+            fontWeight: 700,
+            color: 'var(--text-muted)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            marginBottom: 4,
+          }}
+        >
+          Bias-hook anchors (lead with the matching one)
+        </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+          {pattern.biasHookAnchors.map(anchor => (
+            <span
+              key={anchor}
+              style={{
+                fontSize: 10.5,
+                color: 'var(--text-secondary)',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 'var(--radius-sm)',
+                padding: '3px 8px',
+              }}
+            >
+              {anchor}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Why this is the move */}
+      <div>
+        <div
+          style={{
+            fontSize: 10.5,
+            fontWeight: 700,
+            color: 'var(--text-muted)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            marginBottom: 4,
+          }}
+        >
+          Why this is the highest-leverage move
+        </div>
+        <div style={{ fontSize: 11.5, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+          {pattern.starterRationale}
+        </div>
+      </div>
     </div>
   );
 }
