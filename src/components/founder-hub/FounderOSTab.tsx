@@ -33,12 +33,6 @@
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import {
-  Shield,
-  BookOpen,
-  Brain,
-  Cpu,
-  Activity,
-  Target,
   Flame,
   Plus,
   X,
@@ -55,10 +49,11 @@ import {
 } from '@/components/founder-hub/founder-os/visualizations';
 import {
   BibleVersePill,
-  WhySfcSection,
   CommitmentRecord,
   BuildInPublicSection,
 } from '@/components/founder-hub/founder-os/sections';
+import { InteractivePillars, type PillarAdherenceData } from '@/components/founder-hub/founder-os/InteractivePillars';
+import { InteractiveSfcMatrix } from '@/components/founder-hub/founder-os/InteractiveSfcMatrix';
 
 interface DailyCheckin {
   id: string;
@@ -98,51 +93,6 @@ interface WeeklyReviewItem {
   internalLocusReflection: string;
   createdAt: string;
 }
-
-const PILLARS = [
-  {
-    id: 'neuro',
-    icon: Shield,
-    title: 'Pillar 1 — Neurobiological Protection',
-    rule: 'Zero short-form content. Period.',
-    why: 'Algorithmic SFV (TikTok / Reels / Shorts) suppresses prefrontal cortex activity, downregulates executive function, and wires the brain to reject sustained focus — the exact cognitive substrate Phase 1 motion requires. Treat like alcohol for an alcoholic, not sugar for a non-diabetic.',
-  },
-  {
-    id: 'longform',
-    icon: BookOpen,
-    title: 'Pillar 2 — Long-Form Information Diet',
-    rule: '30-minute minimum. Primary sources preferred.',
-    why: 'YouTube interviews 30+ min only. Daily deep reading 30-60 min from books, papers, long-form articles — never social or news feeds. Primary sources (Kahneman, Klein, Roger Martin, Dalio) over derivative content. Rule: if it can be tweeted, it isn\'t the source you should be reading.',
-  },
-  {
-    id: 'recall',
-    icon: Brain,
-    title: 'Pillar 3 — Active Recall + Elaborative Encoding',
-    rule: 'Pause + retrieve + connect. Abandon passive consumption.',
-    why: 'After every long-form session: explain the core concept aloud OR write it from memory. Connect new insights to existing knowledge or future business decisions. Progressive summarisation: bullet → highlight → distil. The mental strain of retrieval IS the neural-architecture-building exercise.',
-  },
-  {
-    id: 'orchestrate',
-    icon: Cpu,
-    title: 'Pillar 4 — AI Orchestration (NOT Cognitive Offloading)',
-    rule: 'Direct AI; do not query it. Build neural architecture first.',
-    why: 'Treat AI as a system to direct, not an oracle. Build foundational neural architecture FIRST, then leverage AI as the multiplier on top. Avoid AI summarisation for foundational learning — the cognitive shortcut steals the architecture-building exercise. The skill is orchestration + auditing, not prompt-engineering.',
-  },
-  {
-    id: 'distress',
-    icon: Activity,
-    title: 'Pillar 5 — Distress Tolerance + Emotional Regulation',
-    rule: 'Daily exercise. Daily mindfulness. Absorb rejection without fragmenting.',
-    why: 'Chronic anxiety + panic actively consume working memory, reducing cognitive bandwidth available for complex reasoning under pressure. Phase 1 motion involves rejection (DMs ignored, audits booked then no-show, prospects who stall); the OS must absorb that without fragmenting.',
-  },
-  {
-    id: 'agency',
-    icon: Target,
-    title: 'Pillar 6 — Internal Locus of Control + High-Agency Framing',
-    rule: 'Reject victimhood. Frame challenges as strategic problems.',
-    why: 'The macro-environment is undeniably chaotic and structurally flawed. Personal capacity to adapt, learn, and exert discipline remains entirely within control. Weekly "what\'s within my control" review. The framing IS the neurological re-anchor.',
-  },
-];
 
 function todayLocalISO(): string {
   const now = new Date();
@@ -335,6 +285,27 @@ export function FounderOSTab() {
     const cutoff = new Date(Date.now() - 28 * 24 * 60 * 60 * 1000);
     return reviews.filter(r => new Date(r.createdAt) >= cutoff).length;
   }, [reviews]);
+
+  // Compute pillar adherence data for InteractivePillars (same logic as PillarAdherenceRadar).
+  const pillarAdherence = useMemo((): PillarAdherenceData => {
+    const today = todayLocalISO();
+    const cutoff = shiftDateISO(today, -29);
+    const last30 = checkins.filter(c => c.date >= cutoff && c.date <= today);
+    const sfcZeroPct = last30.length === 0 ? 0 : last30.filter(c => c.sfcZero).length / 30;
+    const longFormPct = Math.min(longFormLast30 / 8, 1);
+    const activeRecallPct = longFormPct;
+    const orchestrationPct = Math.min(skillsActive / 2, 1);
+    const distressPct = last30.length === 0 ? 0 : last30.filter(c => c.exercise || c.meditation).length / 30;
+    const locusPct = Math.min(reviewsLast4w / 4, 1);
+    return {
+      neuro: sfcZeroPct,
+      longform: longFormPct,
+      recall: activeRecallPct,
+      orchestrate: orchestrationPct,
+      distress: distressPct,
+      agency: locusPct,
+    };
+  }, [checkins, longFormLast30, skillsActive, reviewsLast4w]);
 
   const handleSaveCheckin = useCallback(async () => {
     setSaveStatus('saving');
@@ -910,64 +881,8 @@ export function FounderOSTab() {
         <CognitiveTrendChart checkins={checkinRecords} />
       </div>
 
-      {/* SIX PILLARS */}
-      <div
-        style={{
-          fontSize: 11,
-          fontWeight: 700,
-          textTransform: 'uppercase',
-          letterSpacing: '0.1em',
-          color: 'var(--text-muted)',
-          marginBottom: 10,
-          marginTop: 8,
-        }}
-      >
-        The six pillars (locked v3.5 §11)
-      </div>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: 12,
-          marginBottom: 24,
-        }}
-      >
-        {PILLARS.map(p => {
-          const Icon = p.icon;
-          return (
-            <div
-              key={p.id}
-              style={{
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border-color)',
-                borderRadius: 'var(--radius-md)',
-                padding: '14px 16px',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                <Icon size={16} style={{ color: 'var(--accent-primary)' }} />
-                <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>
-                  {p.title}
-                </span>
-              </div>
-              <div
-                style={{
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: 'var(--text-primary)',
-                  marginBottom: 8,
-                  lineHeight: 1.4,
-                }}
-              >
-                {p.rule}
-              </div>
-              <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
-                {p.why}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      {/* SIX PILLARS — Interactive System Map */}
+      <InteractivePillars adherence={pillarAdherence} />
 
       {/* CONTENT LOG */}
       <div
@@ -1479,8 +1394,8 @@ export function FounderOSTab() {
       {/* BUILD-IN-PUBLIC PROTOCOL — the SFC ↔ audience-building paradox dissolved */}
       <BuildInPublicSection />
 
-      {/* WHY SFC IS BAD + SABOTAGE TABLES */}
-      <WhySfcSection />
+      {/* WHY SFC IS BAD + SABOTAGE TABLES — Interactive Threat Matrix */}
+      <InteractiveSfcMatrix />
 
       <div
         style={{
