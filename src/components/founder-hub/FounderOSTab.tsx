@@ -54,6 +54,7 @@ import {
 } from '@/components/founder-hub/founder-os/sections';
 import { InteractivePillars, type PillarAdherenceData } from '@/components/founder-hub/founder-os/InteractivePillars';
 import { InteractiveSfcMatrix } from '@/components/founder-hub/founder-os/InteractiveSfcMatrix';
+import { EventPrepCard } from '@/components/founder-hub/founder-os/EventPrepCard';
 
 interface DailyCheckin {
   id: string;
@@ -547,6 +548,9 @@ export function FounderOSTab() {
           </button>
         </div>
       </div>
+
+      {/* EVENT PREP — Phase 1 wedge calendar (deep nightly audit Section 9.1, locked 2026-05-05) */}
+      <EventPrepCard />
 
       {/* STREAK + TODAY CHECKIN */}
       <div className="founder-os-streak-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(220px, 280px) 1fr', gap: 16, marginBottom: 20 }}>

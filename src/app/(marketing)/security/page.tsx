@@ -22,6 +22,10 @@ import {
   INDEMNIFICATION_VALUE,
   INDEMNIFICATION_BODY,
   BIAS_GENOME_OWNERSHIP,
+  AUDIT_LOG_RETENTION_LABEL,
+  AUDIT_LOG_RETENTION_TIERS,
+  AUDIT_LOG_RETENTION_BODY,
+  VENDOR_QUESTIONNAIRE_ROWS,
 } from '@/lib/constants/trust-copy';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
@@ -872,6 +876,204 @@ export default function SecurityPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Audit log retention SLA — James persona ask, deep nightly audit 2026-05-05 Section 8 B3 */}
+      <section
+        id="audit-log-retention"
+        style={{
+          padding: '72px 24px',
+          background: C.white,
+        }}
+      >
+        <div style={{ maxWidth: 1080, margin: '0 auto' }}>
+          <SectionHeader
+            eyebrow={AUDIT_LOG_RETENTION_LABEL}
+            title="How long every action lives in the audit trail"
+            body={AUDIT_LOG_RETENTION_BODY}
+          />
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              gap: 12,
+              marginTop: 24,
+            }}
+          >
+            {AUDIT_LOG_RETENTION_TIERS.map(tier => (
+              <div
+                key={tier.tier}
+                style={{
+                  background: C.slate50,
+                  border: `1px solid ${C.slate200}`,
+                  borderRadius: 12,
+                  padding: '18px 20px',
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 800,
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    color: C.slate500,
+                    marginBottom: 6,
+                  }}
+                >
+                  {tier.tier}
+                </div>
+                <div
+                  style={{
+                    fontSize: 18,
+                    fontWeight: 700,
+                    color: C.green,
+                    letterSpacing: '-0.01em',
+                    marginBottom: 8,
+                    fontFamily:
+                      'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+                  }}
+                >
+                  {tier.window}
+                </div>
+                <div style={{ fontSize: 12.5, color: C.slate600, lineHeight: 1.55 }}>
+                  {tier.note}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Vendor-risk questionnaire shape — James persona ask, deep nightly audit 2026-05-05 Section 8 B2 */}
+      <section
+        id="vendor-questionnaire"
+        style={{
+          padding: '72px 24px',
+          background: C.slate50,
+        }}
+      >
+        <div style={{ maxWidth: 1080, margin: '0 auto' }}>
+          <SectionHeader
+            eyebrow="Vendor-risk questionnaire"
+            title="The SIG / VSA / CAIQ rows answered up front"
+            body="A Fortune 500 vendor-risk register works in question→answer→verification triples and circles every gap in red. Below: the ten rows that recur on every SIG (Standardized Information Gathering), VSA (Vendor Security Assessment) and CAIQ (Cloud Security Alliance Consensus Assessment Initiative Questionnaire) that lands on a CSO or GC desk. Copy answers row-for-row into the questionnaire; each verification path resolves to a public trust portal or a contractual commitment in the pilot agreement."
+          />
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr',
+              gap: 12,
+              marginTop: 24,
+            }}
+          >
+            {VENDOR_QUESTIONNAIRE_ROWS.map(row => {
+              const categoryColor = (() => {
+                switch (row.category) {
+                  case 'control':
+                    return C.green;
+                  case 'data':
+                    return C.green;
+                  case 'incident':
+                    return C.amber;
+                  case 'continuity':
+                    return C.amber;
+                  case 'contractual':
+                    return C.slate700;
+                  default:
+                    return C.slate700;
+                }
+              })();
+              const categoryBg = (() => {
+                switch (row.category) {
+                  case 'control':
+                  case 'data':
+                    return C.greenSoft;
+                  case 'incident':
+                  case 'continuity':
+                    return C.amberSoft;
+                  case 'contractual':
+                  default:
+                    return C.slate100;
+                }
+              })();
+              return (
+                <div
+                  key={row.question}
+                  style={{
+                    background: C.white,
+                    border: `1px solid ${C.slate200}`,
+                    borderRadius: 12,
+                    padding: '20px 24px',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      padding: '3px 8px',
+                      borderRadius: 999,
+                      fontSize: 10,
+                      fontWeight: 800,
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                      background: categoryBg,
+                      color: categoryColor,
+                      border: `1px solid ${categoryColor}33`,
+                      marginBottom: 12,
+                    }}
+                  >
+                    {row.category}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 14.5,
+                      fontWeight: 700,
+                      color: C.slate900,
+                      marginBottom: 10,
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    {row.question}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      color: C.slate700,
+                      lineHeight: 1.6,
+                      marginBottom: 10,
+                    }}
+                  >
+                    {row.answer}
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: 8,
+                      paddingTop: 10,
+                      borderTop: `1px solid ${C.slate200}`,
+                      fontSize: 12,
+                      color: C.slate600,
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontWeight: 700,
+                        color: C.slate900,
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      Verify:
+                    </span>
+                    <span>{row.verification}</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>

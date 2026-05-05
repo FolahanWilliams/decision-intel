@@ -226,6 +226,157 @@ export const INDEMNIFICATION_BODY =
  * opt-out/withdrawal mechanism changes, (c) the ownership posture
  * itself shifts (e.g. a new tier offering paid contribution).
  */
+/**
+ * Audit log retention SLA — locked 2026-05-05 (James persona blocker, deep
+ * nightly audit Section 8 B3 + 9.2-adjacent). The /security page documented
+ * SOC 2 receipts, DR/BCP, and indemnification but had no explicit
+ * retention SLA on the audit log itself — the artefact a F500 GC reads
+ * during a vendor-risk review BEFORE getting to indemnification. SOX
+ * §404 requires 7-year retention on internal-controls evidence; that's
+ * the procurement floor for any Enterprise customer with public-company
+ * exposure.
+ *
+ * The tier shape is the standard SaaS retention ladder: Individual gets
+ * the floor (legal-defensible 1y), Strategy gets the typical
+ * mid-market 3y, Enterprise gets SOX-aligned 7y. Custom retention
+ * (HIPAA, banking, government) is negotiable on Enterprise pilots.
+ *
+ * Update HERE when (a) the retention shape changes per tier, (b) a new
+ * tier with a different floor lands, (c) immutability or export posture
+ * changes.
+ */
+export const AUDIT_LOG_RETENTION_LABEL = 'Audit log retention';
+export const AUDIT_LOG_RETENTION_TIERS = [
+  {
+    tier: 'Individual',
+    window: '1 year',
+    note: 'Legal-defensible floor for individual-buyer accounts.',
+  },
+  {
+    tier: 'Strategy (team)',
+    window: '3 years',
+    note: 'Mid-market default for team accounts running quarterly board cycles.',
+  },
+  {
+    tier: 'Enterprise',
+    window: '7 years',
+    note: 'SOX §404 internal-controls aligned. Custom retention (HIPAA, banking, government) negotiable on pilot agreement.',
+  },
+];
+export const AUDIT_LOG_RETENTION_BODY =
+  'Every audit log entry is immutable, append-only, and timestamped at write. Entries are queryable via the AdminAuditLog UI inside the customer account and exportable as a single JSON bundle via the account-data export endpoint (Enterprise tier). The retention window starts at the entry write timestamp; expired entries are archived to cold storage for an additional 90 days before cryptographic destruction. When a customer leaves the platform, the active retention window survives the contract end-date so post-departure regulatory queries can still be answered.';
+
+/**
+ * Vendor-risk questionnaire shape — locked 2026-05-05 (James persona ask,
+ * deep nightly audit Section 8 B2). The /security page already surfaced
+ * SOC 2 receipts in a flat tile shape; a F500 GC running a SIG / VSA /
+ * Cloud Security Alliance CAIQ questionnaire works in
+ * question→answer→verification triples and circles every gap in red.
+ * Reshaping the same data into questionnaire row-shape lets a procurement
+ * reviewer copy answers row-for-row into the questionnaire without
+ * paraphrasing — which is the speed difference between "vendor cleared
+ * Wednesday" and "vendor cleared next quarter" on a procurement queue.
+ *
+ * The questionnaire blocks below are derived from SOC2_RECEIPTS,
+ * AUDIT_LOG_RETENTION_*, INDEMNIFICATION_*, and DR_BCP entries already on
+ * the page. The shape is additive — the existing flat receipts grid stays
+ * for readers who want to scan; the questionnaire view is the procurement
+ * accelerator.
+ *
+ * Source-of-truth pattern: every entry below should map to a value
+ * already exported from this file or already rendered on /security. If a
+ * questionnaire row needs a new fact, add the fact to the canonical
+ * export FIRST, then reference it in the questionnaire row.
+ *
+ * Update HERE when SIG / VSA / CAIQ standards change row labels (rare),
+ * or when a new question class becomes a recurring procurement blocker.
+ */
+export interface QuestionnaireRow {
+  question: string;
+  answer: string;
+  verification: string;
+  category: 'control' | 'data' | 'incident' | 'continuity' | 'contractual';
+}
+
+export const VENDOR_QUESTIONNAIRE_ROWS: QuestionnaireRow[] = [
+  {
+    question:
+      'Are SOC 2 Type II reports issued by an independent registered auditor for the platform infrastructure?',
+    answer:
+      'Yes. Vercel (application hosting + edge compute) — SOC 2 Type II by Insight Assurance, AICPA-registered, continuous rolling 12-month observation window. Supabase (Postgres + Auth + file storage) — SOC 2 Type II + HIPAA by Prescient Assurance, AICPA-registered, continuous rolling 12-month window. Both reports cover the platform on which Decision Intel runs.',
+    verification: 'vercel.com/legal/soc2 · supabase.com/security · trust portals public',
+    category: 'control',
+  },
+  {
+    question: 'Does the application processor itself hold a SOC 2 attestation?',
+    answer:
+      'Decision Intel’s product-level SOC 2 Type I audit is targeted Q4 2026 issuance, with the Type II observation window opening immediately after. Audit firm to be named at engagement (Big-4 or AICPA-listed Tier-1 specialist). In-flight controls already mirror Type II requirements; the gap between today and Type I issuance is documented in the Enterprise pilot agreement.',
+    verification: 'Status disclosed in writing on every Enterprise pilot agreement.',
+    category: 'control',
+  },
+  {
+    question: 'Is data encrypted at rest and in transit?',
+    answer:
+      'Yes. AES-256-GCM for documents and audit-log content at rest. TLS 1.2+ for every transit hop (browser to platform, platform to AI providers, platform to sub-processors). A GDPR + NDPR anonymization layer strips PII before any AI processing — the LLM provider never sees raw customer content with identifiers attached.',
+    verification: '/privacy data lifecycle section · processor list with sub-processor details',
+    category: 'data',
+  },
+  {
+    question: 'What is the audit log retention window?',
+    answer:
+      'Individual tier: 1 year. Strategy tier (team): 3 years. Enterprise tier: 7 years (SOX §404 internal-controls aligned). Every entry is immutable, append-only, and timestamped at write. Entries are queryable via the customer-facing AdminAuditLog UI and exportable as a single JSON bundle via the Enterprise account-data export endpoint. Custom retention (HIPAA, banking, government) is negotiable on Enterprise pilot agreement.',
+    verification:
+      '/security audit-log retention SLA section · contractual commitment in pilot agreement.',
+    category: 'data',
+  },
+  {
+    question: 'What is the disaster recovery posture (RPO / RTO)?',
+    answer:
+      'Recovery Point Objective ≤ 15 minutes (Postgres WAL streaming + daily snapshots). Recovery Time Objective < 4 hours. Production region is US (Vercel + Supabase US). EU region is available on Enterprise pilot agreement; multi-region production is on the published roadmap. Annual restore drill is performed and documented; the most recent drill date is disclosed on every Enterprise pilot agreement.',
+    verification: '/security DR/BCP section · drill date in pilot agreement.',
+    category: 'continuity',
+  },
+  {
+    question: 'What is the security-incident response SLA?',
+    answer:
+      'Customer notification within 72 hours of confirmed security incident affecting customer data — mirrors GDPR Art. 33 controller-notification timing as the procurement floor. Faster notification (24 hours / 12 hours) is negotiable on Enterprise pilot agreement when the customer’s own regulatory posture requires it. A written incident report is delivered within 7 days of notification, including root cause, scope of affected records, remediation steps, and the controls hardened to prevent recurrence.',
+    verification: 'Pilot agreement · incident report template available on request.',
+    category: 'incident',
+  },
+  {
+    question: 'What is the standard liability cap?',
+    answer:
+      '12 months of fees paid by Controller in the 12 months immediately before the claim, excluding (a) breach of confidentiality, (b) wilful misconduct, (c) third-party IP indemnities, and (d) sub-processor data-protection failures where Decision Intel is the engaging Processor. Mutual indemnification cap and uncapped third-party-IP indemnity are negotiable at Enterprise signature.',
+    verification: 'Subscription agreement § 12 · Enterprise pilot indemnification schedule.',
+    category: 'contractual',
+  },
+  {
+    question:
+      'Is cyber-liability insurance and errors-and-omissions insurance carried?',
+    answer:
+      'On the Q1 2027 roadmap. Until carriage is live, Enterprise customers receive a written disclosure of the insurance gap and the contractual commitments that substitute for it (uncapped breach-of-confidentiality, mutual indemnification, escrowed remediation budget on request).',
+    verification:
+      'Enterprise pilot agreement · insurance gap disclosure clause · roadmap status updated quarterly.',
+    category: 'contractual',
+  },
+  {
+    question: 'Where is customer data trained on for AI improvements?',
+    answer:
+      'Customer document content is never used to train, fine-tune, or evaluate any LLM (Gemini, Claude, or otherwise). Provider terms (Google Cloud Platform + Anthropic) explicitly disclaim training on enterprise inputs. The same commitment is mirrored in the DPA and every pilot agreement. Bias Genome cohort signals are derived from outcome METADATA only (bias type, decision-domain class, predicted-vs-realised quality, time-to-outcome window) — never document content, persona names, or deal terms.',
+    verification:
+      'DPA § Bias Genome ownership · provider terms (GCP + Anthropic enterprise DPA).',
+    category: 'data',
+  },
+  {
+    question:
+      'What is the data portability and exit-assistance posture on contract termination?',
+    answer:
+      'Customer-owned content (every uploaded artefact + every Decision Provenance Record) is exportable as a single account-data JSON bundle at any time during the contract and within 60 days of termination. Cohort export (anonymised outcome metadata the customer organisation contributed to Bias Genome) is available on quarterly cadence on Enterprise tier. After the 60-day exit window, customer content is cryptographically destroyed; audit log entries follow the retention window above.',
+    verification: '/api/export/account · DPA § 5 · pilot agreement termination clause.',
+    category: 'data',
+  },
+];
+
 export const BIAS_GENOME_OWNERSHIP = [
   {
     label: 'Customer-owned: document content',
