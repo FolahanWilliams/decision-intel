@@ -1,10 +1,33 @@
 {
-  "hooks": {
-    "PreCommit": [
-      {
-        "command": "npx tsc --noEmit 2>&1 | grep 'error TS' | grep -v 'e2e/' | grep -v 'Cannot find module' | grep -v 'JSX element implicitly' | grep -v 'Cannot find namespace' | grep -v \"module path 'react/jsx-runtime'\" | grep -v \"Parameter.*implicitly has an 'any'\" | grep -v \"Cannot find name 'process'\" | grep -v 'TS2322.*key.*string' | head -5",
-        "description": "Type-check before commit — catches real errors while filtering pre-existing env-level issues"
-      }
+  "permissions": {
+    "allow": [
+      "Bash(NODE_OPTIONS='--max-old-space-size=3584' npx tsc --noEmit)",
+      "WebSearch",
+      "WebFetch(domain:boeing.mediaroom.com)",
+      "WebFetch(domain:www.fool.com)",
+      "Bash([ -f \"/Users/folahan/decision-intel/src/app/\\(platform\\)/dashboard/$path/page.tsx\" ])",
+      "Bash([ -f \"/Users/folahan/decision-intel/src/app/api/$endpoint/route.ts\" ])",
+      "Bash(pdfinfo /tmp/dpr-phase1-preview.pdf)",
+      "Bash(pdftoppm -png -r 200 /tmp/dpr-phase1-preview.pdf /tmp/dpr-phase1-hires-page)",
+      "Bash(pdftoppm -png -r 150 /tmp/dpr-phase1-preview.pdf /tmp/dpr-phase2-page)",
+      "Bash(pdftoppm -png -r 150 /tmp/dpr-phase1-preview.pdf /tmp/dpr-p2v2)",
+      "Bash(pdftoppm -png -r 150 /tmp/dpr-phase1-preview.pdf /tmp/dpr-p2v3)",
+      "Bash(pdftoppm -png -r 150 /tmp/dpr-phase1-preview.pdf /tmp/dpr-p2v4)",
+      "Bash(pdftoppm -png -r 150 /tmp/dpr-phase1-preview.pdf /tmp/dpr-p2v5)",
+      "Bash(DPR_URL='http://localhost:3000/dpr-render/specimen/wework' DPR_OUTPUT='/Users/folahan/decision-intel/public/dpr-sample-wework.pdf' node /Users/folahan/decision-intel/scripts/dev-dpr-preview.mjs)",
+      "Bash(pdftoppm -png -r 130 /tmp/dpr-phase1-preview.pdf /tmp/dpr-p3)",
+      "Bash(pdftoppm -png -r 130 /tmp/dpr-phase1-preview.pdf /tmp/dpr-p3v2)",
+      "Bash(pdftoppm -png -r 130 /tmp/dpr-phase1-preview.pdf /tmp/dpr-p3v3)",
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Bash(tee /tmp/dpr-dev.log)",
+      "Bash(wait)",
+      "Bash(break)",
+      "Bash(pdfimages -list public/dpr-sample-wework.pdf)"
+    ],
+    "additionalDirectories": [
+      "/Users/folahan/decision-intel/src/app/(platform)/documents/[id]/legacy",
+      "/Users/folahan/decision-intel/src/app/(platform)/documents/[id]"
     ]
   }
 }

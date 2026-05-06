@@ -1,5 +1,18 @@
 /* SettingsDrawer — CSS module replacing styled-jsx global.
- * Keyframe animations for drawer slide-in + backdrop fade. */
+ * Class names are scoped + hashed by the css-modules loader; the
+ * SettingsDrawer.tsx component imports them via the default `styles`
+ * binding (`className={styles.backdrop}`) NOT via a side-effect-only
+ * import. Keyframes are local to this module too, which is what the
+ * css-modules loader expects when scoped class names reference them
+ * inside the same file.
+ *
+ * Locked 2026-05-06 (build-failure fix): the prior version used
+ * `:global(.dpr-drawer-*)` selectors loaded via a side-effect-only
+ * `import './SettingsDrawer.module.css';` — that combination produced
+ * a CssSyntaxError webpack couldn't serialize, blocking production
+ * builds. Switched to the canonical CSS-module pattern (named
+ * import + scoped classes).
+ */
 
 @keyframes dpr-drawer-fade {
   from {
@@ -19,12 +32,10 @@
   }
 }
 
-/* Applied via global scope — the drawer uses these animation names
-   in inline style attributes. */
-:global(.dpr-drawer-backdrop) {
+.backdrop {
   animation: dpr-drawer-fade 0.18s ease;
 }
 
-:global(.dpr-drawer-panel) {
+.panel {
   animation: dpr-drawer-slide 0.22s cubic-bezier(0.2, 0.7, 0.3, 1);
 }

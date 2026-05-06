@@ -21,7 +21,7 @@
 
 import { type ReactNode, useEffect } from 'react';
 import { X, BarChart3, Cpu, Share2, Trash2, FlaskConical } from 'lucide-react';
-import './SettingsDrawer.module.css';
+import styles from './SettingsDrawer.module.css';
 
 export interface SettingsDrawerProps {
   open: boolean;
@@ -58,7 +58,7 @@ export function SettingsDrawer(props: SettingsDrawerProps) {
     <>
       {/* Backdrop */}
       <div
-        className="dpr-drawer-backdrop"
+        className={styles.backdrop}
         onClick={onClose}
         aria-hidden
         style={{
@@ -70,7 +70,7 @@ export function SettingsDrawer(props: SettingsDrawerProps) {
         }}
       />
       <aside
-        className="dpr-drawer-panel"
+        className={styles.panel}
         role="dialog"
         aria-label="Document settings"
         style={{
