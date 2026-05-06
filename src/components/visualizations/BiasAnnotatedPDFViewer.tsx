@@ -27,12 +27,22 @@ interface BiasAnnotatedPDFViewerProps {
   documentId: string;
   biases: BiasInstance[];
   onBiasSelect?: (bias: BiasInstance) => void;
+  /** Controlled-mode active bias id. When provided, the parent owns
+   *  highlight state — useful for the v2 doc-detail layout where the
+   *  audit pane and the PDF share a single source of truth. When
+   *  undefined, the viewer uses its internal state (legacy mode). */
+  controlledActiveBiasId?: string | null;
+  /** Hide the built-in bias sidebar — used when the parent renders its
+   *  own audit pane next to this viewer (v2 layout). */
+  hideSidebar?: boolean;
 }
 
 export function BiasAnnotatedPDFViewer({
   documentId,
   biases,
   onBiasSelect,
+  controlledActiveBiasId,
+  hideSidebar = false,
 }: BiasAnnotatedPDFViewerProps) {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [numPages, setNumPages] = useState(0);
@@ -40,8 +50,12 @@ export function BiasAnnotatedPDFViewer({
   const [scale, setScale] = useState(1.0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeBias, setActiveBias] = useState<string | null>(null);
+  const [internalActiveBias, setInternalActiveBias] = useState<string | null>(null);
   const pageRef = useRef<HTMLDivElement>(null);
+
+  // Resolve active bias from controlled prop OR internal state.
+  const activeBias =
+    controlledActiveBiasId !== undefined ? controlledActiveBiasId : internalActiveBias;
 
   useEffect(() => {
     async function fetchPdfUrl() {
@@ -116,10 +130,13 @@ export function BiasAnnotatedPDFViewer({
 
   const handleBiasClick = useCallback(
     (bias: BiasInstance) => {
-      setActiveBias(prev => (prev === bias.id ? null : bias.id));
+      // In controlled mode, parent owns state — only fire onBiasSelect.
+      if (controlledActiveBiasId === undefined) {
+        setInternalActiveBias(prev => (prev === bias.id ? null : bias.id));
+      }
       onBiasSelect?.(bias);
     },
-    [onBiasSelect]
+    [onBiasSelect, controlledActiveBiasId]
   );
 
   if (loading) {
@@ -271,7 +288,8 @@ export function BiasAnnotatedPDFViewer({
         </div>
       </div>
 
-      {/* Bias Sidebar */}
+      {/* Bias Sidebar — hidden in v2 layout where audit pane lives next door */}
+      {!hideSidebar && (
       <div
         style={{
           width: 260,
@@ -350,6 +368,7 @@ export function BiasAnnotatedPDFViewer({
           );
         })}
       </div>
+      )}
     </div>
   );
 }
