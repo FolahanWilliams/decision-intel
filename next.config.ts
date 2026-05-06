@@ -162,6 +162,34 @@ const nextConfig: NextConfig = {
   compiler: {
     styledJsx: false,
   },
+  // 2026-05-06: Vercel build OOM (exit 137) AGAIN even with heap at
+  // 7168 + webpackBuildWorker: false + webpackMemoryOptimizations: true.
+  // The build log named the culprit — webpack's PackFileCacheStrategy
+  // was serialising 700+ MB cache packs (.next/cache/webpack/
+  // server-production/1.pack at 702MB, 43.pack at 428MB, etc.) and
+  // holding them in memory during serialisation, pushing peak heap
+  // past the 8 GB container ceiling.
+  //
+  // Fix: disable webpack's filesystem cache for production builds.
+  // Vercel runs each deploy on a fresh container, so the cache hit
+  // rate is near-zero anyway — the disk packs are compute that never
+  // pays back. Trade-off: cold first-build locally on every restart
+  // (~3 min addition) but no impact on Vercel CI behaviour.
+  //
+  // Why not memory cache: webpack's memory cache also holds modules
+  // for the duration of the build — at the codebase's current size,
+  // that path also OOMs. The only stable option is no cache.
+  //
+  // Do NOT replace this with experimental.optimizeCss or other
+  // alternative caching schemes without re-running the deploy and
+  // confirming the build stays under 8 GB. Per the build-hang
+  // diagnostic chain in CLAUDE.md: bisect, don't theorise.
+  webpack: (config, { dev }) => {
+    if (!dev) {
+      config.cache = false;
+    }
+    return config;
+  },
 };
 
 export default withSentryConfig(nextConfig, {

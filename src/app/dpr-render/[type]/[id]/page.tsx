@@ -150,6 +150,7 @@ export default async function DprRenderPage({
         totalPages={totalPages}
         classification={classification}
         auditTimestamp={auditTimestamp}
+        clientSafe={clientSafe}
       />
       {structuralAssumptions.length > 0 && (
         <DprPageStructuralAssumptions

@@ -40,6 +40,7 @@
 
 import jsPDF, { GState } from 'jspdf';
 import type { ProvenanceRecordData } from './provenance-record-data';
+import { scrubClientSafe, type ScrubCounters } from './client-safe-scrub';
 import { truncate } from '@/lib/utils/string';
 
 const MAX_TITLE_CHARS = 70;
@@ -1577,75 +1578,15 @@ function formatMoney(value: number): string {
 
 // ─── Client-Safe scrub (DPR v2 #5) ─────────────────────────────────
 // Replaces entity names, amounts, and person names in the meta strip
-// + summary + reviewer notes with stable placeholders. Uses the SAME
-// regex patterns as src/lib/utils/redaction-scanner.ts for parity, but
-// inlined here to keep the generator client-side and zero-dep.
-const CS_ENTITY_RE =
-  /\b((?:[A-Z][A-Za-z0-9&'.-]+(?:\s+(?:&\s+|of\s+|the\s+)?)?){1,5}),?\s+(?:Inc|LLC|L\.L\.C\.|Ltd|Limited|GmbH|Pty|Plc|PLC|AG|SA|N\.V\.|NV|Corp|Corporation|Co\.|Company|S\.A\.|S\.A\.R\.L|S\.r\.l|S\.p\.A|BV|B\.V\.|AB|AS|ApS|Oy|S\.L\.|S\.L|Pvt|Pvt\.|Holdings|Group|Trust|Fund|Capital|Partners|Ventures|Bank|Limited\.)(?=[\s.,;:!?\]\)\}'"]|$)/g;
-const CS_AMOUNT_RE =
-  /(?:[$£€₦¥]|USD|GBP|EUR|NGN|JPY)\s?\d+(?:[.,]\d+)?\s?(?:million|billion|trillion|m|bn?|tn?|k)\b|(?:[$£€₦¥]|USD|GBP|EUR|NGN|JPY)\s?\d{1,3}(?:,\d{3}){2,}(?:\.\d+)?|\b\d+(?:[.,]\d+)?\s?(?:million|billion|trillion)\b/gi;
-const CS_NAME_RE = /\b([A-Z][a-z]{1,15})\s+([A-Z][a-z]{1,20})\b/g;
-
-const CS_NAME_DENYLIST = new Set(
-  [
-    'Decision Intel',
-    'Decision Quality',
-    'Bias Genome',
-    'Recognition Rigor',
-    'European Union',
-    'United Kingdom',
-    'United States',
-    'South Africa',
-    'New York',
-    'San Francisco',
-    'Cape Town',
-    'Annual Report',
-    'Board Members',
-    'Audit Committee',
-    'Steering Committee',
-    'Investment Committee',
-    'EU AI',
-    'UK White',
-    'SEC Reg',
-    'Basel III',
-    'Reserve Bank',
-    'Central Bank',
-    'National Bank',
-    'General Partner',
-    'Limited Partner',
-  ].map(s => s.toLowerCase())
-);
-
+// + summary + reviewer notes with stable placeholders. Patterns +
+// denylist + masking now live in src/lib/reports/client-safe-scrub.ts
+// (shared with the McKinsey-grade /dpr-render finding-cards path, which
+// scrubs per-bias evidence quotes server-side at render time).
 function applyClientSafeScrub(data: ProvenanceRecordData): ProvenanceRecordData {
-  let entities = 0;
-  let amounts = 0;
-  let names = 0;
-
+  const counters: ScrubCounters = { entities: 0, amounts: 0, names: 0 };
   const scrub = (text: string | null | undefined): string => {
     if (!text) return text ?? '';
-    let out = text;
-    // Entities first (longer matches) so person-name regex doesn't cannibalise them.
-    let eIdx = 0;
-    out = out.replace(CS_ENTITY_RE, () => {
-      eIdx += 1;
-      entities += 1;
-      return `[ENTITY_${eIdx}]`;
-    });
-    let aIdx = 0;
-    out = out.replace(CS_AMOUNT_RE, () => {
-      aIdx += 1;
-      amounts += 1;
-      return `[AMOUNT_${aIdx}]`;
-    });
-    let nIdx = 0;
-    out = out.replace(CS_NAME_RE, (m, first: string, last: string) => {
-      const key = `${first} ${last}`.toLowerCase();
-      if (CS_NAME_DENYLIST.has(key)) return m;
-      nIdx += 1;
-      names += 1;
-      return `[NAME_${nIdx}]`;
-    });
-    return out;
+    return scrubClientSafe(text, counters);
   };
 
   const scrubbedFilename = scrub(data.meta.filename);
@@ -1687,9 +1628,9 @@ function applyClientSafeScrub(data: ProvenanceRecordData): ProvenanceRecordData 
     reviewerDecisions: scrubbedReviewer,
     clientSafe: {
       enabled: true,
-      entitiesMasked: entities,
-      amountsMasked: amounts,
-      namesMasked: names,
+      entitiesMasked: counters.entities,
+      amountsMasked: counters.amounts,
+      namesMasked: counters.names,
       scrubAppliedAt: new Date().toISOString(),
     },
   };

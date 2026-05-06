@@ -28,10 +28,46 @@ import { ResearchCitationCard } from '@/components/marketing/how-it-works/Resear
 import { ToxicNetworkGraph } from '@/components/marketing/genome/ToxicNetworkGraph';
 import { computeGenomeFromSeed } from '@/lib/data/bias-genome-seed';
 import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+import { PLATFORM_BASELINE_SNAPSHOT } from '@/lib/learning/platform-baseline-snapshot';
 
 // Bias count derived from BIAS_EDUCATION (count-discipline rule); when DI-B-023
 // lands the marketing copy picks it up automatically.
 const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
+
+// R²F detectors — the three operationalisations of Kahneman & Klein 2009 +
+// Kahneman & Lovallo 2003 that fire on every audit. Each ships as a
+// first-class strip on the DPR cover; here they get a public marketing
+// surface so a procurement reader can verify the methodology against the
+// source paper before procurement-stage diligence.
+const R2F_DETECTORS = [
+  {
+    id: 'R²F · Detector 1',
+    label: 'Validity Classifier',
+    body: 'Classifies the decision domain into high / medium / low / zero validity. High-validity domains have stable rules and rapid feedback (chess, weather forecasting one week out). Low-validity domains are noisy with delayed feedback (M&A, market entry, long-horizon strategy). Most strategic memos sit in the low / zero band.',
+    dqiShift:
+      'Confidence-language is penalised harder in low-validity domains (the same rhetorical certainty that scores neutrally on a high-validity decision becomes an Illusion-of-Validity flag in low-validity contexts). Methodology v2.1.0.',
+    anchor:
+      'Anchor: Kahneman & Klein, "Conditions for Intuitive Expertise: A Failure to Disagree" (American Psychologist, 2009) — first condition.',
+  },
+  {
+    id: 'R²F · Detector 2',
+    label: 'Reference Class Forecast',
+    body: `Pure-function similarity scoring against the ${PLATFORM_BASELINE_SNAPSHOT.n}-case reference-class corpus. Returns top-5 historical analogs + matched-class baseline failure rate + four-band predicted outcome (succeeds / mixed / struggles / fails / too-small-to-judge). Structurally novel decisions return "too small to judge" rather than a fabricated forecast — the cold-start posture is honest.`,
+    dqiShift:
+      'When the matched class shows a higher base-rate failure than the memo concedes, the audit flags Inside-View Dominance (DI-B-022) and the audit-committee-ready hardening question lands on the cover of the DPR.',
+    anchor:
+      'Anchor: Kahneman & Lovallo, "Delusions of Success: How Optimism Undermines Executives\' Decisions" (Harvard Business Review, July 2003).',
+  },
+  {
+    id: 'R²F · Detector 3',
+    label: 'Feedback Adequacy',
+    body: 'Audits the second condition for trustworthy intuition — has the decision-maker had enough closed-loop feedback in this specific domain for their experience to be calibrated? Verdict bands: adequate (≥10 closed outcomes in domain past 18 months) / sparse (3-9) / cold-start (<3) / unknown.',
+    dqiShift:
+      'Cold-start posture: an audit by a domain-novice carries the same scrutiny rules as one with high closed-outcome history but the experience-based confidence claims are flagged for the reviewer rather than discounted silently.',
+    anchor:
+      'Anchor: Kahneman & Klein (2009) — second condition (adequate opportunity to learn from rapid feedback).',
+  },
+] as const;
 
 const C = {
   navy: '#0F172A',
@@ -552,6 +588,171 @@ export function HowItWorksClient() {
                 </p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 5.25 — R²F DETECTORS ───────────────────────────── */}
+      <section id="r2f-detectors" style={{ padding: '72px 24px 0' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+          <SectionHeader
+            eyebrow="Recognition-Rigor Framework · the three detectors"
+            title="What R²F actually does on every audit. Three load-bearing checks, three published papers."
+            body={
+              <>
+                Three detectors fire on the audit before the DQI is finalised. Each is grounded in a
+                specific cognitive-science paper, each shifts the score, and each appears as a
+                first-class strip on the cover of the Decision Provenance Record. Procurement
+                readers can verify the methodology against the source paper directly.
+              </>
+            }
+          />
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+              gap: 18,
+            }}
+          >
+            {R2F_DETECTORS.map(d => (
+              <div
+                key={d.id}
+                style={{
+                  background: C.white,
+                  border: `1px solid ${C.slate200}`,
+                  borderTop: `3px solid ${C.green}`,
+                  borderRadius: 14,
+                  padding: '22px 24px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 10,
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.14em',
+                    color: C.green,
+                  }}
+                >
+                  {d.id}
+                </div>
+                <h3
+                  style={{
+                    margin: 0,
+                    fontSize: 18,
+                    fontWeight: 700,
+                    color: C.slate900,
+                    letterSpacing: '-0.01em',
+                  }}
+                >
+                  {d.label}
+                </h3>
+                <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.55, color: C.slate600 }}>
+                  {d.body}
+                </p>
+                <div
+                  style={{
+                    marginTop: 6,
+                    paddingTop: 12,
+                    borderTop: `1px dashed ${C.slate200}`,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 4,
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 700,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.1em',
+                      color: C.slate400,
+                    }}
+                  >
+                    What shifts in the DQI
+                  </div>
+                  <div style={{ fontSize: 12.5, color: C.slate700, lineHeight: 1.5 }}>
+                    {d.dqiShift}
+                  </div>
+                </div>
+                <div
+                  style={{
+                    marginTop: 4,
+                    fontSize: 11.5,
+                    color: C.slate500,
+                    fontStyle: 'italic',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {d.anchor}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div
+            style={{
+              marginTop: 28,
+              padding: '20px 24px',
+              background: C.slate50,
+              border: `1px solid ${C.slate200}`,
+              borderLeft: `3px solid ${C.green}`,
+              borderRadius: 12,
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 16,
+            }}
+          >
+            <div style={{ flex: '1 1 320px' }}>
+              <div
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.14em',
+                  color: C.green,
+                  marginBottom: 6,
+                }}
+              >
+                Calibration anchor
+              </div>
+              <div style={{ fontSize: 14.5, color: C.slate700, lineHeight: 1.55 }}>
+                The same R²F methodology applied retrospectively to {' '}
+                <strong style={{ color: C.slate900 }}>
+                  {PLATFORM_BASELINE_SNAPSHOT.n} historical corporate decisions
+                </strong>{' '}
+                produces a mean Brier score of{' '}
+                <strong style={{ color: C.slate900 }}>
+                  {PLATFORM_BASELINE_SNAPSHOT.meanBrier.toFixed(3)}
+                </strong>{' '}
+                — fair band, between CIA-analyst (0.23) and motivated-amateur (0.35) per Tetlock
+                anchors.
+              </div>
+            </div>
+            <Link
+              href="/r2f-standard#calibration"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '10px 18px',
+                background: C.slate900,
+                color: C.white,
+                borderRadius: 999,
+                fontSize: 13,
+                fontWeight: 600,
+                textDecoration: 'none',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              See the calibration baseline
+              <ArrowRight size={14} />
+            </Link>
           </div>
         </div>
       </section>

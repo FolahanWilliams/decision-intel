@@ -26,6 +26,7 @@ import { DprSection } from '../primitives/DprSection';
 import { DprSeverityMeter } from '../primitives/DprSeverityMeter';
 import { DprNotice } from '../primitives/DprNotice';
 import type { DprFinding } from '@/lib/reports/dpr-findings';
+import { scrubClientSafe } from '@/lib/reports/client-safe-scrub';
 
 export interface DprPageFindingsProps {
   findings: DprFinding[];
@@ -34,6 +35,13 @@ export interface DprPageFindingsProps {
   classification?: 'sample' | 'specimen' | 'confidential' | 'client-safe-export';
   auditTimestamp: string;
   footerTitle?: string;
+  /**
+   * When true, per-bias evidence quotes get the same client-safe scrub
+   * (entity / amount / person-name placeholders) the legacy PDF generator
+   * applies to the meta strip + summary. Forwarded by /dpr-render/[type]/[id]
+   * when the URL carries `?clientSafe=1`.
+   */
+  clientSafe?: boolean;
 }
 
 export function DprPageFindings(props: DprPageFindingsProps) {
@@ -44,6 +52,7 @@ export function DprPageFindings(props: DprPageFindingsProps) {
     classification = 'confidential',
     auditTimestamp,
     footerTitle = 'Decision Provenance Record',
+    clientSafe = false,
   } = props;
 
   if (findings.length === 0) {
@@ -87,7 +96,7 @@ export function DprPageFindings(props: DprPageFindingsProps) {
       >
         <div className="dpr-findings-stream">
           {findings.map(f => (
-            <FindingCard key={f.biasType} finding={f} />
+            <FindingCard key={f.biasType} finding={f} clientSafe={clientSafe} />
           ))}
         </div>
       </DprSection>
@@ -95,7 +104,21 @@ export function DprPageFindings(props: DprPageFindingsProps) {
   );
 }
 
-function FindingCard({ finding }: { finding: DprFinding }) {
+function FindingCard({ finding, clientSafe }: { finding: DprFinding; clientSafe: boolean }) {
+  // Per-call scrub — no shared counter, since the McKinsey-grade DPR
+  // doesn't surface the {entitiesMasked, amountsMasked, namesMasked}
+  // telemetry block the legacy PDF generator carries (the classification
+  // banner already signals "this artefact is redacted").
+  const evidence = finding.evidenceQuote
+    ? clientSafe
+      ? scrubClientSafe(finding.evidenceQuote)
+      : finding.evidenceQuote
+    : null;
+  const mitigation = finding.mitigation
+    ? clientSafe
+      ? scrubClientSafe(finding.mitigation)
+      : finding.mitigation
+    : null;
   return (
     <article className={`dpr-finding dpr-finding--${finding.severity}`}>
       <header className="dpr-finding-head">
@@ -108,13 +131,13 @@ function FindingCard({ finding }: { finding: DprFinding }) {
         <DprSeverityMeter severity={finding.severity} confidence={finding.confidence} />
       </header>
 
-      {finding.evidenceQuote && (
+      {evidence && (
         <div className="dpr-finding-block">
           <div className="dpr-finding-block-label">
             <span className="dpr-finding-block-rule" />
             <span>Evidence from the memo</span>
           </div>
-          <blockquote className="dpr-finding-evidence">&ldquo;{finding.evidenceQuote}&rdquo;</blockquote>
+          <blockquote className="dpr-finding-evidence">&ldquo;{evidence}&rdquo;</blockquote>
         </div>
       )}
 
@@ -148,13 +171,13 @@ function FindingCard({ finding }: { finding: DprFinding }) {
         </div>
       )}
 
-      {finding.mitigation && (
+      {mitigation && (
         <div className="dpr-finding-block">
           <div className="dpr-finding-block-label">
             <span className="dpr-finding-block-rule" />
             <span>Mitigation</span>
           </div>
-          <div className="dpr-finding-mitigation">{finding.mitigation}</div>
+          <div className="dpr-finding-mitigation">{mitigation}</div>
         </div>
       )}
 

@@ -26,8 +26,33 @@ import {
   CheckCircle2,
   BookOpen,
   ShieldCheck,
+  Activity,
 } from 'lucide-react';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
+import {
+  PLATFORM_BASELINE_SNAPSHOT,
+  PLATFORM_BASELINE_FOOTNOTE,
+} from '@/lib/learning/platform-baseline-snapshot';
+
+// Tetlock-anchored Brier scale — ordered low→high (low = better calibration).
+// "self" marks where DI's seed baseline lands so the scale reads as procurement
+// proof, not a marketing pitch.
+interface CalibrationAnchor {
+  label: string;
+  value: number;
+  self?: boolean;
+}
+const CALIBRATION_ANCHORS: readonly CalibrationAnchor[] = [
+  { label: 'Tetlock superforecasters', value: 0.13 },
+  { label: 'CIA analysts (calibrated)', value: 0.23 },
+  {
+    label: 'Decision Intel · platform seed',
+    value: PLATFORM_BASELINE_SNAPSHOT.meanBrier,
+    self: true,
+  },
+  { label: 'Coin-flip benchmark', value: 0.25 },
+  { label: 'Motivated amateur', value: 0.35 },
+];
 
 const C = {
   white: '#FFFFFF',
@@ -621,6 +646,214 @@ export function R2FStandardClient() {
               </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Calibration baseline — procurement-grade answer to "show me your outcome calibration" */}
+      <section
+        id="calibration"
+        style={{
+          maxWidth: 1100,
+          margin: '0 auto',
+          padding: '40px 24px 24px',
+          scrollMarginTop: 80,
+        }}
+      >
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            color: C.green,
+            fontSize: 11,
+            fontWeight: 800,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            marginBottom: 12,
+          }}
+        >
+          <Activity size={12} strokeWidth={2.5} aria-hidden />
+          Calibration baseline · seed
+        </div>
+        <h2
+          style={{
+            margin: 0,
+            fontSize: 'clamp(24px, 3vw, 34px)',
+            fontWeight: 700,
+            letterSpacing: '-0.02em',
+            color: C.slate900,
+            lineHeight: 1.15,
+            marginBottom: 12,
+          }}
+        >
+          Brier {PLATFORM_BASELINE_SNAPSHOT.meanBrier.toFixed(3)} across{' '}
+          {PLATFORM_BASELINE_SNAPSHOT.n} historical corporate decisions.
+        </h2>
+        <p
+          style={{
+            margin: 0,
+            fontSize: 15.5,
+            lineHeight: 1.6,
+            color: C.slate600,
+            maxWidth: 760,
+            marginBottom: 24,
+          }}
+        >
+          Procurement-stage diligence asks <em>show me your outcome calibration</em>. The published
+          R²F methodology is run retrospectively over {PLATFORM_BASELINE_SNAPSHOT.n} historical
+          corporate decisions where the outcome is known — Brier-fair (evidence dimension
+          neutralised, no peek at ground truth). The proper-scoring rule does the rest. Result
+          below, with reproducibility seed for any auditor who wants to re-run the bootstrap.
+        </p>
+
+        {/* Tetlock-anchored scale */}
+        <div
+          style={{
+            background: C.slate50,
+            border: `1px solid ${C.slate200}`,
+            borderRadius: 14,
+            padding: '24px 28px',
+            marginBottom: 18,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.14em',
+              color: C.slate500,
+              marginBottom: 16,
+            }}
+          >
+            Where the seed baseline lands · Tetlock-anchored scale
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {CALIBRATION_ANCHORS.map(a => (
+              <div
+                key={a.label}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 16,
+                  padding: a.self ? '12px 14px' : '6px 0',
+                  background: a.self ? C.greenSoft : 'transparent',
+                  border: a.self ? `1px solid ${C.greenBorder}` : 'none',
+                  borderRadius: a.self ? 10 : 0,
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: 'var(--font-mono, monospace)',
+                    fontSize: 19,
+                    fontWeight: 700,
+                    color: a.self ? C.green : C.slate900,
+                    minWidth: 70,
+                    letterSpacing: '-0.02em',
+                  }}
+                >
+                  {a.value.toFixed(3)}
+                </div>
+                <div
+                  style={{
+                    fontSize: 14,
+                    fontWeight: a.self ? 700 : 600,
+                    color: a.self ? C.green : C.slate900,
+                  }}
+                >
+                  {a.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Honesty + reproducibility */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: 12,
+            marginBottom: 8,
+          }}
+        >
+          <div
+            style={{
+              background: C.amberSoft,
+              border: `1px solid rgba(217, 119, 6, 0.22)`,
+              borderRadius: 10,
+              padding: '16px 18px',
+            }}
+          >
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.12em',
+                color: C.amber,
+                marginBottom: 6,
+              }}
+            >
+              Seed, not forecast
+            </div>
+            <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.55, color: C.slate700 }}>
+              These cases were audited retrospectively. The platform did NOT predict them ahead of
+              time. The Brier number reads: &ldquo;if the methodology had been applied at decision
+              time using only pre-decision signal, this is how it would have calibrated against
+              ground truth.&rdquo;
+            </p>
+          </div>
+          <div
+            style={{
+              background: C.blueSoft,
+              border: `1px solid rgba(37, 99, 235, 0.22)`,
+              borderRadius: 10,
+              padding: '16px 18px',
+            }}
+          >
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.12em',
+                color: C.blue,
+                marginBottom: 6,
+              }}
+            >
+              Per-org Brier supersedes
+            </div>
+            <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.55, color: C.slate700 }}>
+              When a customer org accumulates closed outcomes via Outcome Gate enforcement, per-org
+              calibration replaces the seed baseline on every DPR they generate. Until then, the
+              seed is the contractual answer.
+            </p>
+          </div>
+          <div
+            style={{
+              background: C.slate100,
+              border: `1px solid ${C.slate200}`,
+              borderRadius: 10,
+              padding: '16px 18px',
+            }}
+          >
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.12em',
+                color: C.slate600,
+                marginBottom: 6,
+              }}
+            >
+              Reproducibility
+            </div>
+            <p style={{ margin: 0, fontSize: 12, lineHeight: 1.55, color: C.slate700 }}>
+              {PLATFORM_BASELINE_FOOTNOTE}.
+            </p>
+          </div>
         </div>
       </section>
 
