@@ -25,6 +25,9 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
+import { DecisionDetailShell } from '@/components/documents/detail/DocumentDetailShell';
+import { SettingsDrawer } from '@/components/documents/detail/SettingsDrawer';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 interface AggregationDto {
   compositeDqi: number | null;
@@ -151,6 +154,10 @@ function formatDate(iso: string): string {
   });
 }
 
+type PackageTab = 'documents' | 'findings' | 'verdict' | 'stress' | 'outcome';
+
+const PACKAGE_TAB_KEYS: PackageTab[] = ['documents', 'findings', 'verdict', 'stress', 'outcome'];
+
 export function DecisionPackageDetailClient({ packageId, initial }: Props) {
   const router = useRouter();
   const [pkg, setPkg] = useState<PackageDto>(initial.package);
@@ -160,6 +167,8 @@ export function DecisionPackageDetailClient({ packageId, initial }: Props) {
   const [outcome, setOutcome] = useState<OutcomeDto | null>(initial.outcome);
   const [editingHeader, setEditingHeader] = useState(false);
   const [showAddDoc, setShowAddDoc] = useState(false);
+  const [activeTab, setActiveTab] = useState<PackageTab>('documents');
+  const [showSettings, setShowSettings] = useState(false);
 
   const refetch = useCallback(async () => {
     const res = await fetch(`/api/decision-packages/${packageId}`, { cache: 'no-store' });
@@ -172,28 +181,52 @@ export function DecisionPackageDetailClient({ packageId, initial }: Props) {
     setOutcome(data.outcome);
   }, [packageId]);
 
-  return (
-    <div style={{ padding: 'var(--spacing-xl)', maxWidth: 1240, margin: '0 auto' }}>
-      <div style={{ marginBottom: 'var(--spacing-md)' }}>
-        <Link
-          href="/dashboard/decisions"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            color: 'var(--text-muted)',
-            fontSize: 12,
-            textDecoration: 'none',
-            letterSpacing: '0.04em',
-            textTransform: 'uppercase',
-            fontWeight: 600,
-          }}
-        >
-          <ChevronLeft size={14} /> Back to packages
-        </Link>
-      </div>
+  const tint = STATUS_COLORS[pkg.status] ?? '#94a3b8';
+  const statusLabel = STATUS_LABEL[pkg.status] ?? pkg.status;
+  const totalDocs = documents.length;
+  const analyzedDocs = aggregation.analyzedDocCount;
 
-      {/* Hero */}
+  /* ────── Header chips ────── */
+  const headerChips = (
+    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+      <span
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 6,
+          padding: '3px 10px',
+          borderRadius: 999,
+          background: `${tint}1f`,
+          border: `1px solid ${tint}66`,
+          color: tint,
+          fontSize: 10.5,
+          fontWeight: 700,
+          letterSpacing: '0.06em',
+          textTransform: 'uppercase',
+        }}
+      >
+        <Package size={11} /> {statusLabel}
+      </span>
+      {pkg.decidedAt && (
+        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+          Decided {formatDate(pkg.decidedAt)}
+        </span>
+      )}
+    </div>
+  );
+
+  /* ────── Left pane: PackageHero + DPR strip + cross-ref ────── */
+  const leftPane = (
+    <div
+      style={{
+        flex: 1,
+        overflowY: 'auto',
+        padding: 16,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 14,
+      }}
+    >
       <PackageHero
         pkg={pkg}
         aggregation={aggregation}
@@ -208,7 +241,7 @@ export function DecisionPackageDetailClient({ packageId, initial }: Props) {
         }}
       />
 
-      {/* Provenance + DPR download */}
+      {/* DPR strip */}
       <div
         style={{
           display: 'flex',
@@ -219,7 +252,6 @@ export function DecisionPackageDetailClient({ packageId, initial }: Props) {
           background: 'rgba(22,163,74,0.06)',
           border: '1px solid rgba(22,163,74,0.2)',
           borderRadius: 'var(--radius-md)',
-          marginTop: 16,
           flexWrap: 'wrap',
         }}
       >
@@ -253,8 +285,7 @@ export function DecisionPackageDetailClient({ packageId, initial }: Props) {
         </a>
       </div>
 
-      {/* Cross-reference card */}
-      <div style={{ marginTop: 16 }}>
+      <ErrorBoundary sectionName="Cross-reference">
         <CrossReferenceCard
           endpoint={`/api/decision-packages/${packageId}/cross-reference`}
           initialRun={crossRef}
@@ -263,274 +294,738 @@ export function DecisionPackageDetailClient({ packageId, initial }: Props) {
             await refetch();
           }}
         />
-      </div>
+      </ErrorBoundary>
+    </div>
+  );
 
-      {/* Recurring biases */}
-      {aggregation.recurringBiases.length > 0 && (
-        <div className="card" style={{ background: 'var(--bg-card)', marginTop: 16 }}>
-          <div className="card-header">
-            <h3
-              style={{
-                margin: 0,
-                color: 'var(--text-primary)',
-                fontSize: 14,
-                fontWeight: 700,
-              }}
-            >
-              Recurring biases
-            </h3>
-            <p style={{ margin: '2px 0 0', color: 'var(--text-muted)', fontSize: 12 }}>
-              Biases that appear in ≥2 member documents — the package&rsquo;s decision-quality
-              signature.
-            </p>
-          </div>
-          <div className="card-body" style={{ paddingTop: 0 }}>
-            <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: 6 }}>
-              {aggregation.recurringBiases.slice(0, 8).map(b => (
-                <li
-                  key={b.biasType}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: 12,
-                    padding: '8px 12px',
-                    borderRadius: 'var(--radius-sm)',
-                    background: 'var(--bg-elevated)',
-                    fontSize: 13,
-                  }}
-                >
-                  <span
-                    style={{
-                      color: 'var(--text-primary)',
-                      textTransform: 'capitalize',
-                    }}
-                  >
-                    {b.biasType.replace(/_/g, ' ')}
-                  </span>
-                  <span style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <span
-                      style={{
-                        fontSize: 11,
-                        fontWeight: 700,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.04em',
-                        color:
-                          b.topSeverity === 'critical'
-                            ? '#b91c1c'
-                            : b.topSeverity === 'high'
-                              ? '#ef4444'
-                              : b.topSeverity === 'medium'
-                                ? '#d97706'
-                                : '#3b82f6',
-                      }}
-                    >
-                      {b.topSeverity}
-                    </span>
-                    <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                      ×{b.documentCount} docs · ×{b.totalOccurrences} flags
-                    </span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
+  /* ────── Tabs ────── */
+  const tabs = [
+    { id: 'documents' as const, label: 'Documents', badge: totalDocs || undefined },
+    {
+      id: 'findings' as const,
+      label: 'Findings',
+      available: analyzedDocs > 0,
+    },
+    { id: 'verdict' as const, label: 'Verdict' },
+    {
+      id: 'stress' as const,
+      label: 'Stress test',
+      available: analyzedDocs >= 2,
+    },
+    { id: 'outcome' as const, label: 'Outcome' },
+  ];
 
-      {/* Document roster */}
-      <div className="card" style={{ background: 'var(--bg-card)', marginTop: 16 }}>
-        <div
-          className="card-header"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 12,
-            flexWrap: 'wrap',
-          }}
-        >
-          <div>
-            <h3
-              style={{
-                margin: 0,
-                color: 'var(--text-primary)',
-                fontSize: 14,
-                fontWeight: 700,
-              }}
-            >
-              Documents in this package
-            </h3>
-            <p style={{ margin: '2px 0 0', color: 'var(--text-muted)', fontSize: 12 }}>
-              {documents.length} doc{documents.length === 1 ? '' : 's'} ·{' '}
-              {aggregation.analyzedDocCount} analyzed
-            </p>
+  /* ────── Tab body ────── */
+  const tabBody = (() => {
+    switch (activeTab) {
+      case 'documents':
+        return (
+          <PackageDocumentsTab
+            packageId={packageId}
+            documents={documents}
+            isOwner={pkg.isOwner}
+            showAddDoc={showAddDoc}
+            onToggleAddDoc={() => setShowAddDoc(s => !s)}
+            onCancelAddDoc={() => setShowAddDoc(false)}
+            onChanged={refetch}
+            analyzedDocCount={aggregation.analyzedDocCount}
+          />
+        );
+      case 'findings':
+        return <PackageFindingsTab aggregation={aggregation} analyzedDocs={analyzedDocs} />;
+      case 'verdict':
+        return (
+          <PackageVerdictTab
+            decisionFrame={pkg.decisionFrame}
+            isOwner={pkg.isOwner}
+            onEdit={() => {
+              setEditingHeader(true);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          />
+        );
+      case 'stress':
+        return <PackageStressPlaceholder />;
+      case 'outcome':
+        return (
+          <OutcomeBlock
+            packageId={packageId}
+            outcome={outcome}
+            compositeDqi={pkg.compositeDqi}
+            canReport={pkg.isOwner}
+            onReported={async () => {
+              await refetch();
+            }}
+          />
+        );
+      default:
+        return null;
+    }
+  })();
+
+  return (
+    <ErrorBoundary sectionName="Decision Package Detail">
+      <DecisionDetailShell
+        title={pkg.name}
+        dqiScore={pkg.compositeDqi}
+        classification="confidential"
+        headerChips={headerChips}
+        primaryAction={
+          analyzedDocs > 0
+            ? {
+                label: 'Download DPR',
+                onClick: () => {
+                  window.open(
+                    `/api/decision-packages/${packageId}/provenance-record?format=pdf`,
+                    '_blank',
+                    'noopener'
+                  );
+                },
+              }
+            : undefined
+        }
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabChange={t => {
+          if (PACKAGE_TAB_KEYS.includes(t as PackageTab)) setActiveTab(t as PackageTab);
+        }}
+        leftPane={leftPane}
+        rightPaneContent={tabBody}
+        hasPreview
+        onOpenSettings={() => setShowSettings(true)}
+        settingsLabel="Package settings"
+        breadcrumbs={
+          <Link
+            href="/dashboard/decisions"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              color: 'var(--text-muted)',
+              fontSize: 12,
+              textDecoration: 'none',
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase',
+              fontWeight: 600,
+            }}
+          >
+            <ChevronLeft size={14} /> Back to packages
+          </Link>
+        }
+      />
+
+      <SettingsDrawer
+        open={showSettings}
+        onClose={() => setShowSettings(false)}
+        methodologySlot={
+          <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+            Composite DQI averages the latest analysis from every analyzed document in the
+            package. Cross-reference flags surface contradictions across docs. The package-
+            level DPR carries the composite verdict + per-doc lineage in a single hashed
+            artefact for the audit committee.
           </div>
-          {pkg.isOwner && (
+        }
+        reproducibilitySlot={
+          <div
+            style={{
+              fontSize: 12,
+              color: 'var(--text-muted)',
+              fontFamily: 'ui-monospace, monospace',
+              lineHeight: 1.6,
+            }}
+          >
+            <div>package_id: {packageId}</div>
+            <div>
+              analyzed_docs: {analyzedDocs} / {totalDocs}
+            </div>
+            <div>cross_ref: {crossRef ? 'on file' : '—'}</div>
+            <div>visibility: {pkg.visibility}</div>
+          </div>
+        }
+        sharingSlot={
+          pkg.isOwner ? (
             <button
-              onClick={() => setShowAddDoc(!showAddDoc)}
+              type="button"
+              onClick={() => {
+                setShowSettings(false);
+                setEditingHeader(true);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 6,
-                padding: '7px 12px',
-                borderRadius: 'var(--radius-sm)',
-                background: showAddDoc ? 'var(--bg-elevated)' : 'var(--accent-primary)',
-                color: showAddDoc ? 'var(--text-secondary)' : '#fff',
-                border: showAddDoc ? '1px solid var(--border-color)' : 'none',
-                fontSize: 12,
-                fontWeight: 700,
+                gap: 8,
+                padding: '8px 14px',
+                fontSize: 13,
+                fontWeight: 600,
+                color: 'var(--text-primary)',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 6,
                 cursor: 'pointer',
               }}
             >
-              {showAddDoc ? <X size={13} /> : <Plus size={13} />}
-              {showAddDoc ? 'Cancel' : 'Add document'}
+              <Pencil size={13} /> Edit package details
             </button>
-          )}
-        </div>
-        <div className="card-body">
-          {showAddDoc && pkg.isOwner && (
-            <AddDocumentForm
-              packageId={packageId}
-              onAdded={async () => {
-                setShowAddDoc(false);
-                await refetch();
-              }}
-            />
-          )}
-          {documents.length === 0 ? (
-            <p style={{ color: 'var(--text-muted)', fontSize: 13, marginTop: 16 }}>
-              No documents yet. Add at least 2 analyzed docs to enable cross-document review.
-            </p>
           ) : (
-            <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: 8 }}>
-              {documents.map(d => (
-                <li
-                  key={d.id}
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr auto',
-                    alignItems: 'center',
-                    gap: 12,
-                    padding: '10px 12px',
-                    borderRadius: 'var(--radius-sm)',
-                    background: 'var(--bg-elevated)',
-                  }}
-                >
-                  <div style={{ minWidth: 0 }}>
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 8,
-                        marginBottom: 2,
-                      }}
-                    >
-                      {d.role && (
-                        <span
-                          style={{
-                            fontSize: 10,
-                            letterSpacing: '0.06em',
-                            textTransform: 'uppercase',
-                            fontWeight: 700,
-                            color: 'var(--accent-primary)',
-                            background: 'rgba(22,163,74,0.12)',
-                            padding: '1px 8px',
-                            borderRadius: 'var(--radius-full)',
-                          }}
-                        >
-                          {d.role}
-                        </span>
-                      )}
-                      <span
-                        style={{
-                          fontSize: 10,
-                          color: 'var(--text-muted)',
-                          letterSpacing: '0.04em',
-                          textTransform: 'uppercase',
-                          fontWeight: 600,
-                        }}
-                      >
-                        {d.visibility}
-                      </span>
-                    </div>
-                    <Link
-                      href={`/documents/${d.documentId}`}
-                      style={{
-                        color: 'var(--text-primary)',
-                        textDecoration: 'none',
-                        fontWeight: 700,
-                        fontSize: 13,
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 4,
-                      }}
-                    >
-                      {d.filename}
-                      <ExternalLink size={11} style={{ opacity: 0.6 }} />
-                    </Link>
-                    {d.latestAnalysis && (
-                      <p
-                        style={{
-                          margin: '2px 0 0',
-                          color: 'var(--text-muted)',
-                          fontSize: 11,
-                          lineHeight: 1.4,
-                          overflow: 'hidden',
-                          display: '-webkit-box',
-                          WebkitLineClamp: 1,
-                          WebkitBoxOrient: 'vertical',
-                        }}
-                      >
-                        {d.latestAnalysis.summary}
-                      </p>
-                    )}
-                  </div>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 12,
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {d.latestAnalysis ? (
-                      <span
-                        style={{
-                          fontSize: 14,
-                          fontWeight: 700,
-                          color: dqiTint(d.latestAnalysis.overallScore),
-                        }}
-                      >
-                        DQI {Math.round(d.latestAnalysis.overallScore)}
-                      </span>
-                    ) : (
-                      <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Not analyzed</span>
-                    )}
-                    {pkg.isOwner && (
-                      <RemoveDocButton joinId={d.id} packageId={packageId} onRemoved={refetch} />
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
+            <div
+              style={{
+                fontSize: 12,
+                color: 'var(--text-muted)',
+                fontStyle: 'italic',
+              }}
+            >
+              You don&apos;t own this package; only the owner can edit details.
+            </div>
+          )
+        }
+        dangerSlot={
+          pkg.isOwner ? (
+            <DeletePackageButton
+              packageId={packageId}
+              packageName={pkg.name}
+              onDeleted={() => router.push('/dashboard/decisions')}
+            />
+          ) : undefined
+        }
+      />
+    </ErrorBoundary>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/*                  Tab body components                            */
+/* ────────────────────────────────────────────────────────────── */
+
+function PackageDocumentsTab({
+  packageId,
+  documents,
+  isOwner,
+  showAddDoc,
+  onToggleAddDoc,
+  onCancelAddDoc,
+  onChanged,
+}: {
+  packageId: string;
+  documents: MemberDocDto[];
+  isOwner: boolean;
+  showAddDoc: boolean;
+  onToggleAddDoc: () => void;
+  onCancelAddDoc: () => void;
+  onChanged: () => Promise<void>;
+  analyzedDocCount: number;
+}) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 12,
+          flexWrap: 'wrap',
+        }}
+      >
+        <div>
+          <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: 12 }}>
+            {documents.length} doc{documents.length === 1 ? '' : 's'} attached. Add at least
+            two analyzed documents to enable cross-document review.
+          </p>
         </div>
+        {isOwner && (
+          <button
+            onClick={onToggleAddDoc}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '7px 12px',
+              borderRadius: 'var(--radius-sm)',
+              background: showAddDoc ? 'var(--bg-elevated)' : 'var(--accent-primary)',
+              color: showAddDoc ? 'var(--text-secondary)' : '#fff',
+              border: showAddDoc ? '1px solid var(--border-color)' : 'none',
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: 'pointer',
+            }}
+          >
+            {showAddDoc ? <X size={13} /> : <Plus size={13} />}
+            {showAddDoc ? 'Cancel' : 'Add document'}
+          </button>
+        )}
       </div>
 
-      {/* Outcome reporter */}
-      <OutcomeBlock
-        packageId={packageId}
-        outcome={outcome}
-        compositeDqi={pkg.compositeDqi}
-        canReport={pkg.isOwner}
-        onReported={async () => {
-          await refetch();
-        }}
-      />
+      {showAddDoc && isOwner && (
+        <AddDocumentForm
+          packageId={packageId}
+          onAdded={async () => {
+            onCancelAddDoc();
+            await onChanged();
+          }}
+        />
+      )}
+
+      {documents.length === 0 ? (
+        <p
+          style={{
+            color: 'var(--text-muted)',
+            fontSize: 13,
+            margin: 0,
+            padding: '32px 16px',
+            textAlign: 'center',
+            border: '1px dashed var(--border-color)',
+            borderRadius: 'var(--radius-md, 8px)',
+          }}
+        >
+          No documents yet. Add at least 2 analyzed docs to enable cross-document review.
+        </p>
+      ) : (
+        <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: 8 }}>
+          {documents.map(d => (
+            <li
+              key={d.id}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr auto',
+                alignItems: 'center',
+                gap: 12,
+                padding: '10px 12px',
+                borderRadius: 'var(--radius-sm)',
+                background: 'var(--bg-elevated)',
+              }}
+            >
+              <div style={{ minWidth: 0 }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    marginBottom: 2,
+                  }}
+                >
+                  {d.role && (
+                    <span
+                      style={{
+                        fontSize: 10,
+                        letterSpacing: '0.06em',
+                        textTransform: 'uppercase',
+                        fontWeight: 700,
+                        color: 'var(--accent-primary)',
+                        background: 'rgba(22,163,74,0.12)',
+                        padding: '1px 8px',
+                        borderRadius: 'var(--radius-full)',
+                      }}
+                    >
+                      {d.role}
+                    </span>
+                  )}
+                  <span
+                    style={{
+                      fontSize: 10,
+                      color: 'var(--text-muted)',
+                      letterSpacing: '0.04em',
+                      textTransform: 'uppercase',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {d.visibility}
+                  </span>
+                </div>
+                <Link
+                  href={`/documents/${d.documentId}`}
+                  style={{
+                    color: 'var(--text-primary)',
+                    textDecoration: 'none',
+                    fontWeight: 700,
+                    fontSize: 13,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4,
+                  }}
+                >
+                  {d.filename}
+                  <ExternalLink size={11} style={{ opacity: 0.6 }} />
+                </Link>
+                {d.latestAnalysis && (
+                  <p
+                    style={{
+                      margin: '2px 0 0',
+                      color: 'var(--text-muted)',
+                      fontSize: 11,
+                      lineHeight: 1.4,
+                      overflow: 'hidden',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 1,
+                      WebkitBoxOrient: 'vertical',
+                    }}
+                  >
+                    {d.latestAnalysis.summary}
+                  </p>
+                )}
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {d.latestAnalysis ? (
+                  <span
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 700,
+                      color: dqiTint(d.latestAnalysis.overallScore),
+                    }}
+                  >
+                    DQI {Math.round(d.latestAnalysis.overallScore)}
+                  </span>
+                ) : (
+                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Not analyzed</span>
+                )}
+                {isOwner && (
+                  <RemoveDocButton joinId={d.id} packageId={packageId} onRemoved={onChanged} />
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
+
+function PackageFindingsTab({
+  aggregation,
+  analyzedDocs,
+}: {
+  aggregation: AggregationDto;
+  analyzedDocs: number;
+}) {
+  if (analyzedDocs === 0) {
+    return (
+      <div
+        style={{
+          textAlign: 'center',
+          padding: '40px 20px',
+          color: 'var(--text-muted)',
+          fontSize: 13,
+          border: '1px dashed var(--border-color)',
+          borderRadius: 'var(--radius-md, 8px)',
+        }}
+      >
+        Findings appear once at least one member document has been analyzed.
+      </div>
+    );
+  }
+  if (aggregation.recurringBiases.length === 0) {
+    return (
+      <div
+        style={{
+          textAlign: 'center',
+          padding: '40px 20px',
+          color: 'var(--text-muted)',
+          fontSize: 13,
+          border: '1px dashed var(--border-color)',
+          borderRadius: 'var(--radius-md, 8px)',
+        }}
+      >
+        No recurring biases across the analyzed documents — clean signature, or audits are
+        too independent for cross-document patterns to surface yet.
+      </div>
+    );
+  }
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div
+        style={{
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-color)',
+          borderRadius: 'var(--radius-md, 8px)',
+          padding: 16,
+        }}
+      >
+        <h3
+          style={{
+            margin: 0,
+            fontSize: 13,
+            fontWeight: 700,
+            color: 'var(--text-secondary)',
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            marginBottom: 4,
+          }}
+        >
+          Recurring biases
+        </h3>
+        <p style={{ margin: '2px 0 14px', color: 'var(--text-muted)', fontSize: 12 }}>
+          Biases that appear in two-or-more member documents — the package&rsquo;s decision-
+          quality signature.
+        </p>
+        <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: 6 }}>
+          {aggregation.recurringBiases.slice(0, 12).map(b => (
+            <li
+              key={b.biasType}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 12,
+                padding: '8px 12px',
+                borderRadius: 'var(--radius-sm)',
+                background: 'var(--bg-elevated)',
+                fontSize: 13,
+              }}
+            >
+              <span style={{ color: 'var(--text-primary)', textTransform: 'capitalize' }}>
+                {b.biasType.replace(/_/g, ' ')}
+              </span>
+              <span style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                    color:
+                      b.topSeverity === 'critical'
+                        ? '#b91c1c'
+                        : b.topSeverity === 'high'
+                          ? '#ef4444'
+                          : b.topSeverity === 'medium'
+                            ? '#d97706'
+                            : '#3b82f6',
+                  }}
+                >
+                  {b.topSeverity}
+                </span>
+                <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                  ×{b.documentCount} docs · ×{b.totalOccurrences} flags
+                </span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+function PackageVerdictTab({
+  decisionFrame,
+  isOwner,
+  onEdit,
+}: {
+  decisionFrame: string | null;
+  isOwner: boolean;
+  onEdit: () => void;
+}) {
+  return (
+    <div
+      style={{
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-color)',
+        borderRadius: 'var(--radius-md, 8px)',
+        padding: 20,
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 12,
+          marginBottom: 12,
+        }}
+      >
+        <h3
+          style={{
+            margin: 0,
+            fontSize: 13,
+            fontWeight: 700,
+            color: 'var(--text-secondary)',
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+          }}
+        >
+          Decision frame
+        </h3>
+        {isOwner && (
+          <button
+            type="button"
+            onClick={onEdit}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '4px 10px',
+              fontSize: 11.5,
+              fontWeight: 600,
+              color: 'var(--text-secondary)',
+              background: 'transparent',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-sm)',
+              cursor: 'pointer',
+            }}
+          >
+            <Pencil size={11} /> Edit
+          </button>
+        )}
+      </div>
+      {decisionFrame ? (
+        <p
+          style={{
+            margin: 0,
+            fontSize: 14,
+            lineHeight: 1.65,
+            color: 'var(--text-primary)',
+            whiteSpace: 'pre-wrap',
+          }}
+        >
+          {decisionFrame}
+        </p>
+      ) : (
+        <p
+          style={{
+            margin: 0,
+            fontSize: 13,
+            color: 'var(--text-muted)',
+            fontStyle: 'italic',
+            lineHeight: 1.55,
+          }}
+        >
+          No decision frame yet. The frame is the question this package answers — a single
+          sentence the audit committee can quote in their review.
+          {isOwner && ' Click Edit to add one.'}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function PackageStressPlaceholder() {
+  return (
+    <div
+      style={{
+        textAlign: 'center',
+        padding: '40px 20px',
+        color: 'var(--text-muted)',
+        fontSize: 13,
+        border: '1px dashed var(--border-color)',
+        borderRadius: 'var(--radius-md, 8px)',
+        lineHeight: 1.55,
+      }}
+    >
+      Cross-document stress-test surface lands in a follow-up commit.
+      <br />
+      Today: scenario testing happens at the per-document level on the document detail page.
+    </div>
+  );
+}
+
+function DeletePackageButton({
+  packageId,
+  packageName,
+  onDeleted,
+}: {
+  packageId: string;
+  packageName: string;
+  onDeleted: () => void;
+}) {
+  const [confirming, setConfirming] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  if (!confirming) {
+    return (
+      <button
+        type="button"
+        onClick={() => setConfirming(true)}
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 6,
+          padding: '8px 14px',
+          fontSize: 13,
+          fontWeight: 600,
+          color: 'var(--severity-critical)',
+          background: 'transparent',
+          border: '1px solid var(--severity-critical)',
+          borderRadius: 6,
+          cursor: 'pointer',
+        }}
+      >
+        <Trash2 size={13} /> Delete package
+      </button>
+    );
+  }
+
+  const handleDelete = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/decision-packages/${packageId}`, { method: 'DELETE' });
+      if (res.ok) {
+        onDeleted();
+      } else {
+        setLoading(false);
+        setConfirming(false);
+      }
+    } catch {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{ display: 'grid', gap: 8 }}>
+      <p style={{ margin: 0, fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+        Deleting <strong>{packageName}</strong> removes the package, its document
+        attachments, cross-reference runs, and outcome record. The underlying documents
+        themselves are NOT deleted — they remain accessible from /dashboard/documents.
+      </p>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <button
+          type="button"
+          onClick={handleDelete}
+          disabled={loading}
+          style={{
+            flex: 1,
+            padding: '8px 14px',
+            fontSize: 13,
+            fontWeight: 600,
+            color: '#fff',
+            background: 'var(--severity-critical)',
+            border: 'none',
+            borderRadius: 6,
+            cursor: loading ? 'wait' : 'pointer',
+            opacity: loading ? 0.6 : 1,
+          }}
+        >
+          {loading ? 'Deleting…' : 'Confirm delete'}
+        </button>
+        <button
+          type="button"
+          onClick={() => setConfirming(false)}
+          style={{
+            padding: '8px 14px',
+            fontSize: 13,
+            fontWeight: 500,
+            color: 'var(--text-secondary)',
+            background: 'transparent',
+            border: '1px solid var(--border-color)',
+            borderRadius: 6,
+            cursor: 'pointer',
+          }}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* The legacy inline JSX below this point has been migrated into the
+ * tab body components above. Kept this comment as a tombstone marker
+ * so a future reader knows the migration was intentional, not lost. */
 
 function PackageHero({
   pkg,
