@@ -20,7 +20,8 @@
 'use client';
 
 import { type ReactNode, useEffect } from 'react';
-import { X, BarChart3, Cpu, Share2, Trash2 } from 'lucide-react';
+import { X, BarChart3, Cpu, Share2, Trash2, FlaskConical } from 'lucide-react';
+import './SettingsDrawer.module.css';
 
 export interface SettingsDrawerProps {
   open: boolean;
@@ -33,10 +34,12 @@ export interface SettingsDrawerProps {
   sharingSlot?: ReactNode;
   /** Danger zone slot — delete document. */
   dangerSlot?: ReactNode;
+  /** Blind-prior slot — request / view Bayesian priors. */
+  blindPriorSlot?: ReactNode;
 }
 
 export function SettingsDrawer(props: SettingsDrawerProps) {
-  const { open, onClose, methodologySlot, reproducibilitySlot, sharingSlot, dangerSlot } =
+  const { open, onClose, methodologySlot, reproducibilitySlot, sharingSlot, dangerSlot, blindPriorSlot } =
     props;
 
   // Close on Escape.
@@ -55,6 +58,7 @@ export function SettingsDrawer(props: SettingsDrawerProps) {
     <>
       {/* Backdrop */}
       <div
+        className="dpr-drawer-backdrop"
         onClick={onClose}
         aria-hidden
         style={{
@@ -63,10 +67,10 @@ export function SettingsDrawer(props: SettingsDrawerProps) {
           background: 'rgba(0, 0, 0, 0.32)',
           zIndex: 90,
           backdropFilter: 'blur(2px)',
-          animation: 'dpr-drawer-fade 0.18s ease',
         }}
       />
       <aside
+        className="dpr-drawer-panel"
         role="dialog"
         aria-label="Document settings"
         style={{
@@ -81,7 +85,6 @@ export function SettingsDrawer(props: SettingsDrawerProps) {
           zIndex: 100,
           display: 'flex',
           flexDirection: 'column',
-          animation: 'dpr-drawer-slide 0.22s cubic-bezier(0.2, 0.7, 0.3, 1)',
         }}
       >
         {/* Header */}
@@ -173,6 +176,15 @@ export function SettingsDrawer(props: SettingsDrawerProps) {
               {sharingSlot}
             </DrawerSection>
           )}
+          {blindPriorSlot && (
+            <DrawerSection
+              icon={<FlaskConical size={14} />}
+              title="Bayesian priors"
+              hint="Request blind priors from decision room participants. Anchors independent judgment before audit results are revealed."
+            >
+              {blindPriorSlot}
+            </DrawerSection>
+          )}
           {dangerSlot && (
             <DrawerSection
               icon={<Trash2 size={14} />}
@@ -185,24 +197,7 @@ export function SettingsDrawer(props: SettingsDrawerProps) {
           )}
         </div>
       </aside>
-      <style jsx global>{`
-        @keyframes dpr-drawer-fade {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-        @keyframes dpr-drawer-slide {
-          from {
-            transform: translateX(100%);
-          }
-          to {
-            transform: translateX(0);
-          }
-        }
-      `}</style>
+      {/* Animations now in SettingsDrawer.module.css */}
     </>
   );
 }

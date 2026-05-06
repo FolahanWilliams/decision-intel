@@ -17,8 +17,10 @@ export async function createClient() {
             cookiesToSet.forEach(({ name, value, options }) =>
               cookieStore.set(name, value, options)
             );
-          } catch {
-            // Supabase SSR pattern: cookies.set() throws in RSC contexts (Next.js 15+). Silent per Supabase docs and CLAUDE.md fire-and-forget exceptions — the proxy/middleware refreshes sessions.
+          } catch (_sscErr) {
+            // Supabase SSR pattern: cookies.set() throws in RSC contexts (Next.js 15+).
+            // Silent per Supabase docs — the proxy/middleware refreshes sessions.
+            void _sscErr;
           }
         },
       },

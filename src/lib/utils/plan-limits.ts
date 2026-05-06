@@ -22,8 +22,9 @@ export async function getUserPlan(userId: string): Promise<PlanType> {
       select: { plan: true },
     });
     return (sub?.plan as PlanType) || 'free';
-  } catch {
+  } catch (_driftErr) {
     // Schema drift — default to free
+    void _driftErr;
     return 'free';
   }
 }
@@ -49,8 +50,9 @@ export async function getOrgPlan(orgId: string): Promise<PlanType> {
       select: { userId: true },
     });
     if (owner?.userId) return getUserPlan(owner.userId);
-  } catch {
+  } catch (_driftErr) {
     // Schema drift — default to free
+    void _driftErr;
   }
   return 'free';
 }
@@ -104,8 +106,9 @@ export async function checkAnalysisLimit(
       if (dealAudit) {
         return { allowed: true, plan: 'enterprise' as PlanType, used: 0, limit: -1 };
       }
-    } catch {
+    } catch (_driftErr) {
       // @schema-drift-tolerant — DealAuditPurchase may not be migrated in older deployments.
+      void _driftErr;
     }
   }
 
@@ -130,9 +133,9 @@ export async function checkAnalysisLimit(
       used,
       limit: limits.analysesPerMonth,
     };
-  } catch {
+  } catch (_countErr) {
     // On error, deny (fail closed to prevent limit bypass)
-    log.error('Analysis count check failed, denying by default');
+    log.error('Analysis count check failed, denying by default:', _countErr);
     return { allowed: false, plan, used: 0, limit: limits.analysesPerMonth };
   }
 }

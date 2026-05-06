@@ -28,6 +28,7 @@
 import type { ReactNode } from 'react';
 import { Settings as SettingsIcon, FileText } from 'lucide-react';
 import { DqiPill } from './primitives/DqiPill';
+import styles from './DocumentDetailShell.module.css';
 
 export type DocDetailTab =
   | 'findings'
@@ -220,7 +221,7 @@ export function DocumentDetailShell(props: DocumentDetailShellProps) {
 
       {/* Two-pane body */}
       <div
-        className="doc-detail-v2-body"
+        className={`doc-detail-v2-body ${styles.body}`}
         style={{
           display: 'grid',
           gridTemplateColumns: 'minmax(0, 58fr) minmax(0, 42fr)',
@@ -232,7 +233,7 @@ export function DocumentDetailShell(props: DocumentDetailShellProps) {
       >
         {/* Left pane — PDF / text / empty */}
         <section
-          className="doc-detail-v2-left"
+          className={`doc-detail-v2-left ${styles.left}`}
           style={{
             background: 'var(--bg-card)',
             border: '1px solid var(--border-color)',
@@ -352,32 +353,8 @@ export function DocumentDetailShell(props: DocumentDetailShellProps) {
         </section>
       </div>
 
-      {/* Mobile collapse — single column with PDF on top, audit below.
-         The PDF pane caps at 70vh on mobile (was 60vh) — gives long
-         documents enough vertical room to read a paragraph without
-         scrolling, while keeping ~30vh visible for the audit pane below
-         so the reader can jump between PDF and findings. Below 640px
-         the cap drops further to 60vh because audit-pane priority
-         climbs on phone-sized screens. */}
-      <style jsx>{`
-        @media (max-width: 1100px) {
-          .doc-detail-v2-body {
-            grid-template-columns: 1fr !important;
-            padding: 16px 16px 32px !important;
-          }
-          .doc-detail-v2-left {
-            position: static !important;
-            max-height: 70vh !important;
-            margin-right: 0 !important;
-            margin-bottom: 16px !important;
-          }
-        }
-        @media (max-width: 640px) {
-          .doc-detail-v2-left {
-            max-height: 60vh !important;
-          }
-        }
-      `}</style>
+      {/* Mobile collapse now handled by DocumentDetailShell.module.css
+         (replaces the disabled styled-jsx block). */}
     </div>
   );
 }

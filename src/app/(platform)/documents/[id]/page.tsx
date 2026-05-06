@@ -766,6 +766,41 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
             <Share2 size={13} /> Open share modal
           </button>
         }
+        blindPriorSlot={
+          <div style={{ display: 'grid', gap: 10 }}>
+            <p style={{ margin: 0, fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+              Blind priors anchor independent probability estimates from decision-room
+              participants <em>before</em> audit results are revealed — reducing anchoring
+              bias and surfacing genuine disagreement.
+            </p>
+            {analysis?.id ? (
+              <a
+                href={`/dashboard/decision-rooms?doc=${document.id}`}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '8px 14px',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 6,
+                  textDecoration: 'none',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                Open decision rooms →
+              </a>
+            ) : (
+              <span style={{ fontSize: 12, color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                Run analysis first to enable blind prior collection.
+              </span>
+            )}
+          </div>
+        }
         dangerSlot={
           <DeleteDocumentButton
             documentId={document.id}

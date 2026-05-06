@@ -30,8 +30,9 @@ export const parseJSON = (text: string): any | null => {
     const candidate = text.slice(start, end + 1);
     try {
       return JSON.parse(candidate);
-    } catch {
-      // Optimistic JSON.parse failed; fall through to robust state-machine parsing per CLAUDE.md fire-and-forget exceptions.
+    } catch (_fastErr) {
+      // Optimistic JSON.parse failed; fall through to robust state-machine parsing.
+      void _fastErr;
     }
   }
 

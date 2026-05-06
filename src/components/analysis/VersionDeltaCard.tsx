@@ -91,10 +91,34 @@ export function VersionDeltaCard({ current, previousAnalysisId, previousPreloade
   }
 
   if (error || !previous) {
-    // Silent unmount on missing previous — better than a permanent error
-    // banner on the detail page. The DPR / version-history strip cover the
-    // missing-history case.
-    return null;
+    // Graceful fallback — previous analysis was soft-deleted or unavailable.
+    // Show a subtle card explaining the gap instead of silently unmounting.
+    return (
+      <div
+        className="card mb-md"
+        style={{
+          borderLeft: '3px solid var(--text-muted)',
+          opacity: 0.7,
+        }}
+      >
+        <div
+          className="card-body"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            fontSize: 13,
+            color: 'var(--text-muted)',
+          }}
+        >
+          <Minus size={14} />
+          <span>
+            <strong>Version delta unavailable</strong> — {error || 'previous audit data has been archived or purged per data-retention policy'}.
+            The current audit stands on its own.
+          </span>
+        </div>
+      </div>
+    );
   }
 
   const delta = computeVersionDelta(previous, current);

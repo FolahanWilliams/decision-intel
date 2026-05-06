@@ -142,8 +142,9 @@ export async function POST(request: NextRequest) {
           const txAny = tx as Record<string, { deleteMany: (args: unknown) => Promise<unknown> }>;
           try {
             await txAny.chatMessage.deleteMany({ where: { sessionId: id } });
-          } catch {
-            // chatMessage table may not exist yet
+          } catch (msgErr) {
+            // chatMessage table may not exist yet (schema drift)
+            log.debug('chatMessage.deleteMany drift:', msgErr);
           }
           return (
             tx as {

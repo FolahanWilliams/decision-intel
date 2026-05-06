@@ -1,0 +1,30 @@
+/* SettingsDrawer — CSS module replacing styled-jsx global.
+ * Keyframe animations for drawer slide-in + backdrop fade. */
+
+@keyframes dpr-drawer-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dpr-drawer-slide {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Applied via global scope — the drawer uses these animation names
+   in inline style attributes. */
+:global(.dpr-drawer-backdrop) {
+  animation: dpr-drawer-fade 0.18s ease;
+}
+
+:global(.dpr-drawer-panel) {
+  animation: dpr-drawer-slide 0.22s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
