@@ -132,8 +132,8 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
-    } catch {
-      // Table may not exist yet — will fail on create below
+    } catch (_tableErr) {
+      void _tableErr; // Table may not exist yet — will fail on create below
     }
 
     const playbook = await prisma.decisionPlaybook.create({

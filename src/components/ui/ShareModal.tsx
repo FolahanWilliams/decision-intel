@@ -129,7 +129,7 @@ export function ShareModal({
     try {
       await onExportPdf();
       showToast('PDF exported', 'success');
-    } catch {
+    } catch (_err3) {
       showToast('PDF export failed', 'error');
     } finally {
       setExportingPdf(false);
@@ -142,7 +142,7 @@ export function ShareModal({
     try {
       await onExportBoardReport();
       showToast('Board report exported', 'success');
-    } catch {
+    } catch (_err4) {
       showToast('Board report export failed', 'error');
     } finally {
       setExportingBoard(false);
@@ -154,8 +154,9 @@ export function ShareModal({
     setExportingRecord(true);
     try {
       await onExportProvenanceRecord();
-    } catch {
+    } catch (_err1) {
       // Parent handler shows its own toast on failure — silent here per CLAUDE.md fire-and-forget exceptions.
+      void _err1;
     } finally {
       setExportingRecord(false);
     }
@@ -166,8 +167,9 @@ export function ShareModal({
     setExportingBrief(true);
     try {
       await onExportHallwayBrief();
-    } catch {
+    } catch (_err2) {
       // Parent handler shows its own toast on failure — silent here per CLAUDE.md fire-and-forget exceptions.
+      void _err2;
     } finally {
       setExportingBrief(false);
     }
@@ -181,7 +183,7 @@ export function ShareModal({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
       showToast('Summary copied to clipboard', 'success');
-    } catch {
+    } catch (_err5) {
       showToast('Failed to copy', 'error');
     }
   }, [analysisData, documentName, showToast]);
@@ -211,7 +213,7 @@ export function ShareModal({
         const data = await res.json();
         showToast(data.error || 'Failed to create share link', 'error');
       }
-    } catch {
+    } catch (_err6) {
       showToast('Failed to create share link', 'error');
     } finally {
       setCreatingLink(false);
@@ -239,7 +241,7 @@ export function ShareModal({
         const data = await res.json();
         showToast(data.error || 'Failed to create case study link', 'error');
       }
-    } catch {
+    } catch (_err7) {
       showToast('Failed to create case study link', 'error');
     } finally {
       setCreatingCaseStudy(false);
@@ -257,7 +259,7 @@ export function ShareModal({
       } else {
         setManageLinks([]);
       }
-    } catch {
+    } catch (_err8) {
       setManageLinks([]);
     } finally {
       setLoadingLinks(false);
@@ -282,7 +284,7 @@ export function ShareModal({
           const data = await res.json().catch(() => ({}));
           showToast(data.error || 'Revoke failed.', 'error');
         }
-      } catch {
+      } catch (_err9) {
         showToast('Revoke failed.', 'error');
       } finally {
         setRevokingId(null);
@@ -296,7 +298,7 @@ export function ShareModal({
       try {
         await navigator.clipboard.writeText(url);
         showToast('Link copied!', 'success');
-      } catch {
+      } catch (_err10) {
         showToast('Failed to copy.', 'error');
       }
     },

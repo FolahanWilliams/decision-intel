@@ -68,7 +68,7 @@ function parseRoomMetadata(raw: string | undefined | null): RoomMetadata {
     // Bad metadata JSON should never happen — token endpoint always
     // produces valid stringified JSON. Log loudly if it does so we can
     // diagnose without falling back silently.
-    // eslint-disable-next-line no-console
+     
     console.warn('[voice-worker] room metadata not valid JSON, falling back to defaults:', err);
     return {};
   }
@@ -129,7 +129,7 @@ export default defineAgent({
     //   - anthropic/claude-haiku-4-5 (likely; not yet tested in voice)
     const knownBrokenLlmPrefixes = ['xai/', 'deepseek/'];
     if (knownBrokenLlmPrefixes.some(p => config.llm.model.startsWith(p))) {
-      // eslint-disable-next-line no-console
+       
       console.warn(
         '\n' +
           '═══════════════════════════════════════════════════════════════════\n' +
@@ -163,13 +163,13 @@ export default defineAgent({
         signal: AbortSignal.timeout(8000),
       });
       const body = await res.text();
-      // eslint-disable-next-line no-console
+       
       console.log(
         `[voice-worker] connectivity probe — url=${probeUrl} status=${res.status} bodyBytes=${body.length} elapsedMs=${Date.now() - t0}`
       );
     } catch (probeErr) {
       const e = probeErr as { name?: string; message?: string; cause?: unknown };
-      // eslint-disable-next-line no-console
+       
       console.error(
         '[voice-worker] connectivity probe FAILED — Node fetch cannot reach LiveKit regions endpoint',
         '\n  name:', e?.name,
@@ -206,7 +206,7 @@ export default defineAgent({
             method: 'HEAD',
             signal: AbortSignal.timeout(3000),
           });
-          // eslint-disable-next-line no-console
+           
           console.log(
             `[voice-worker] api prewarm ${name} — url=${url} status=${res.status} elapsedMs=${Date.now() - t0}`
           );
@@ -215,7 +215,7 @@ export default defineAgent({
           // the actual session call but blocks HEAD requests (some do),
           // session-time TLS still has to handshake. Logged so we know
           // which provider didn't warm.
-          // eslint-disable-next-line no-console
+           
           console.warn(
             `[voice-worker] api prewarm ${name} skipped — ${(warmErr as Error).message} (session-time will pay full TLS cost for this provider)`
           );
@@ -235,7 +235,7 @@ export default defineAgent({
     // to capture (a) the URL in case it's malformed, (b) the FULL error
     // chain (message + stack + cause) ourselves before re-throwing.
     const assignedUrl = (ctx.info as { url?: string } | undefined)?.url ?? '<no-url-in-ctx.info>';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `[voice-worker] entry start — jobId=${ctx.job.id} room=${(ctx.room.name ?? 'unknown-room')} assignedUrl=${assignedUrl}`
     );
@@ -254,13 +254,13 @@ export default defineAgent({
         signal: AbortSignal.timeout(8000),
       });
       const body = await res.text();
-      // eslint-disable-next-line no-console
+       
       console.log(
         `[voice-worker] entry-process probe — url=${probeUrl} status=${res.status} bodyBytes=${body.length} elapsedMs=${Date.now() - t0}`
       );
     } catch (probeErr) {
       const e = probeErr as { name?: string; message?: string; cause?: unknown };
-      // eslint-disable-next-line no-console
+       
       console.error(
         '[voice-worker] entry-process probe FAILED — Node fetch cannot reach LiveKit regions endpoint from job process',
         '\n  name:', e?.name,
@@ -299,7 +299,7 @@ export default defineAgent({
       // underlying region-fetch / signaling cause that pino truncates
       // when the worker harness logs the bare exception.
       const e = err as { message?: string; stack?: string; cause?: unknown; name?: string };
-      // eslint-disable-next-line no-console
+       
       console.error(
         '[voice-worker] ctx.connect failed — full error chain follows',
         '\n  name:', e?.name,
@@ -326,7 +326,7 @@ export default defineAgent({
     try {
       voiceContext = await loadVoiceContext(personaId);
     } catch (err) {
-      // eslint-disable-next-line no-console
+       
       console.error('[voice-worker] failed to load voice context:', err);
       await ctx.room.disconnect();
       return;
@@ -334,7 +334,7 @@ export default defineAgent({
 
     const voiceId = resolveVoiceId(voiceContext.voiceProfile);
 
-    // eslint-disable-next-line no-console
+     
     console.log(
       `[voice-worker] session start — room=${(ctx.room.name ?? 'unknown-room')} persona=${voiceContext.label} voiceId=${voiceId} participant=${participant.identity} llmModel=${config.llm.model} cartesiaModel=${config.cartesia.model}`
     );
@@ -347,7 +347,7 @@ export default defineAgent({
       (sum, p) => sum + (p.content?.length ?? 0),
       0
     );
-    // eslint-disable-next-line no-console
+     
     console.log(
       `[voice-worker] system prompt size — ${promptBytes} chars (~${Math.round(promptBytes / 1024)}KB) across ${voiceContext.systemPromptParts.length} blocks`
     );
@@ -381,12 +381,12 @@ export default defineAgent({
           content: turn.content,
         });
       }
-      // eslint-disable-next-line no-console
+       
       console.log(
         `[voice-worker] seeded chatCtx with ${seedHistory.length} prior messages — memory continuity active`
       );
     } else {
-      // eslint-disable-next-line no-console
+       
       console.log(
         `[voice-worker] no prior chat history — voice session starts cold`
       );
@@ -588,20 +588,20 @@ export default defineAgent({
     // STT-end → LLM-start → first-audio gap per turn.
     session.on('user_input_transcribed' as never, ((ev: { transcript?: string; isFinal?: boolean }) => {
       if (ev.isFinal) {
-        // eslint-disable-next-line no-console
+         
         console.log(
           `[voice-worker] turn — STT FINAL — t=${Date.now()} transcript="${(ev.transcript ?? '').slice(0, 200)}"`
         );
       }
     }) as never);
     session.on('agent_state_changed' as never, ((ev: { oldState?: string; newState?: string }) => {
-      // eslint-disable-next-line no-console
+       
       console.log(
         `[voice-worker] turn — AGENT STATE — t=${Date.now()} ${ev.oldState} → ${ev.newState}`
       );
     }) as never);
     session.on('speech_created' as never, ((ev: { source?: string; userInitiated?: boolean }) => {
-      // eslint-disable-next-line no-console
+       
       console.log(
         `[voice-worker] turn — SPEECH CREATED — t=${Date.now()} source=${ev.source} userInitiated=${ev.userInitiated}`
       );
@@ -609,7 +609,7 @@ export default defineAgent({
 
     session.on('error' as never, ((payload: SessionErrorPayload) => {
       const err = payload?.error as Record<string, unknown> | undefined;
-      // eslint-disable-next-line no-console
+       
       console.error(
         '[voice-worker] session error event —',
         '\n  type:', payload?.type,
@@ -637,7 +637,7 @@ export default defineAgent({
       sessionId: ctx.room.name ?? 'unknown-room',
       personaId: voiceContext.personaId,
     });
-    // eslint-disable-next-line no-console
+     
     console.log(
       `[voice-worker] tools registered — ${Object.keys(tools).join(', ')}`
     );
@@ -654,7 +654,7 @@ export default defineAgent({
     // bypassed. Disconnects the room cleanly at 30 min and logs the
     // final session metrics for the Railway log stream.
     const sessionTimeout = setTimeout(() => {
-      // eslint-disable-next-line no-console
+       
       console.log(`[voice-worker] hard timeout reached — disconnecting room=${(ctx.room.name ?? 'unknown-room')}`);
       metrics.log('hard-timeout');
       void ctx.room.disconnect();
@@ -666,7 +666,7 @@ export default defineAgent({
     ctx.room.once('disconnected', () => {
       clearTimeout(sessionTimeout);
       const elapsed = Math.round((Date.now() - startedAt) / 1000);
-      // eslint-disable-next-line no-console
+       
       console.log(
         `[voice-worker] session end — room=${(ctx.room.name ?? 'unknown-room')} elapsedSec=${elapsed}`
       );
@@ -682,14 +682,14 @@ export default defineAgent({
     type TrackPubInfo = { sid?: string; name?: string; kind?: number };
     type ParticipantInfo = { identity?: string; trackPublications?: Map<string, TrackPubInfo> };
     ctx.room.on('trackPublished', (publication: TrackPubInfo, participant: ParticipantInfo) => {
-      // eslint-disable-next-line no-console
+       
       console.log(
         `[voice-worker] trackPublished — participantIdentity=${participant.identity} ` +
           `trackSid=${publication.sid} trackName=${publication.name} kind=${publication.kind}`
       );
     });
     ctx.room.on('trackSubscribed', (_track: unknown, publication: TrackPubInfo, participant: ParticipantInfo) => {
-      // eslint-disable-next-line no-console
+       
       console.log(
         `[voice-worker] trackSubscribed — participantIdentity=${participant.identity} ` +
           `trackSid=${publication.sid} trackName=${publication.name} kind=${publication.kind}`
@@ -709,7 +709,7 @@ export default defineAgent({
         subscribed: pub.subscribed,
       })),
     }));
-    // eslint-disable-next-line no-console
+     
     console.log(
       `[voice-worker] room snapshot at session.start — ${JSON.stringify(remoteSnapshot)}`
     );
@@ -723,13 +723,13 @@ export default defineAgent({
         agent,
         room: ctx.room,
       });
-      // eslint-disable-next-line no-console
+       
       console.log(
         `[voice-worker] session.start completed — pipeline ready (vad+stt+llm+tts wired). room=${(ctx.room.name ?? 'unknown-room')}`
       );
     } catch (startErr) {
       const e = startErr as { name?: string; message?: string; stack?: string; cause?: unknown };
-      // eslint-disable-next-line no-console
+       
       console.error(
         '[voice-worker] session.start FAILED — pipeline never initialized',
         '\n  name:', e?.name,
@@ -801,11 +801,11 @@ export default defineAgent({
     // the greeting failure was the immediately blocking symptom.
     try {
       session.say(greetingText, { addToChatCtx: true });
-      // eslint-disable-next-line no-console
+       
       console.log(`[voice-worker] greeting dispatched via session.say() — text="${greetingText}" room=${(ctx.room.name ?? 'unknown-room')}`);
     } catch (sayErr) {
       const e = sayErr as { name?: string; message?: string; stack?: string; cause?: unknown };
-      // eslint-disable-next-line no-console
+       
       console.error(
         '[voice-worker] session.say FAILED — greeting never synthesized.',
         '\n  name:', e?.name,

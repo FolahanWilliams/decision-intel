@@ -70,11 +70,16 @@ export function DocumentTrustFooter({ uploadedAt }: DocumentTrustFooterProps) {
   const retentionDays = planConfig.retentionDays;
   const planLabel = planConfig.name;
 
+  // Mount-time snapshot — daysRemaining is a slowly-changing
+  // chip caption; computing it once at mount avoids react-hooks/purity
+  // failures from calling Date.now() during render. A remount on
+  // next page-visit refreshes the count.
+  const [mountTime] = useState(() => Date.now());
   const uploadedDate = typeof uploadedAt === 'string' ? new Date(uploadedAt) : uploadedAt;
   const expiresAt = new Date(uploadedDate.getTime() + retentionDays * 86_400_000);
   const daysRemaining = Math.max(
     0,
-    Math.ceil((expiresAt.getTime() - Date.now()) / 86_400_000)
+    Math.ceil((expiresAt.getTime() - mountTime) / 86_400_000)
   );
 
   // Show the full SOC2_RECEIPTS list (5 entries: Controller + 4 sub-processors).

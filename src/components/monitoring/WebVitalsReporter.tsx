@@ -39,8 +39,9 @@ export function WebVitalsReporter() {
                 })
               );
             }
-          } catch {
+          } catch (_err1) {
             // sendBeacon failures are non-blocking analytics; silent per CLAUDE.md fire-and-forget exceptions.
+            void _err1;
           }
         };
 

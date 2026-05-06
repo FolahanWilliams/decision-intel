@@ -76,7 +76,7 @@ export class SessionMetrics {
   }
 
   log(prefix = 'session'): void {
-    // eslint-disable-next-line no-console -- worker uses stdout for Railway logs
+     
     console.log(`[voice-worker:${prefix}]`, JSON.stringify(this.summary()));
   }
 }

@@ -134,14 +134,16 @@ export function EducationRoomTab({ founderPass }: Props) {
     try {
       const raw = localStorage.getItem(SM2_STATE_KEY);
       if (raw) setSm2States(JSON.parse(raw) as Record<string, SM2CardState>);
-    } catch {
+    } catch (_err1) {
       // localStorage in private-mode Safari, unparseable JSON, etc.
+      void _err1;
     }
     try {
       const sess = localStorage.getItem(SESSION_KEY);
       if (sess) setSessionStats(JSON.parse(sess));
-    } catch {
+    } catch (_err2) {
       // ignore
+      void _err2;
     }
   }, []);
 
@@ -149,8 +151,9 @@ export function EducationRoomTab({ founderPass }: Props) {
     setSm2States(next);
     try {
       localStorage.setItem(SM2_STATE_KEY, JSON.stringify(next));
-    } catch {
+    } catch (_err3) {
       // ignore
+      void _err3;
     }
   }, []);
 
@@ -158,8 +161,9 @@ export function EducationRoomTab({ founderPass }: Props) {
     setSessionStats(next);
     try {
       localStorage.setItem(SESSION_KEY, JSON.stringify(next));
-    } catch {
+    } catch (_err4) {
       // ignore
+      void _err4;
     }
   }, []);
 

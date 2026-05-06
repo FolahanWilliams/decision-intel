@@ -207,8 +207,9 @@ export function FounderChatWidget({
     if (!hydrated.current) return;
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(messages.slice(-MAX_STORED_MESSAGES)));
-    } catch {
+    } catch (_err1) {
       // localStorage may throw on quota / private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions; chat continues in-memory.
+      void _err1;
     }
   }, [messages]);
 
@@ -218,8 +219,9 @@ export function FounderChatWidget({
     if (!personaHydrated.current) return;
     try {
       localStorage.setItem(PERSONA_STORAGE_KEY, personaId);
-    } catch {
+    } catch (_err2) {
       // localStorage may throw on quota / private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
+      void _err2;
     }
   }, [personaId]);
 
@@ -230,8 +232,9 @@ export function FounderChatWidget({
     if (!modelHydrated.current) return;
     try {
       localStorage.setItem(MODEL_STORAGE_KEY, modelId);
-    } catch {
+    } catch (_err3) {
       // localStorage may throw on quota / private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
+      void _err3;
     }
   }, [modelId]);
 
@@ -265,8 +268,9 @@ export function FounderChatWidget({
       setMessages([]);
       try {
         localStorage.removeItem(STORAGE_KEY);
-      } catch {
+      } catch (_err4) {
         // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
+        void _err4;
       }
     }
   }, [messages.length, streaming]);
@@ -382,8 +386,9 @@ export function FounderChatWidget({
                   break;
                 }
               }
-            } catch {
+            } catch (_err5) {
               // Malformed SSE line — skip silently per CLAUDE.md fire-and-forget exceptions (JSON.parse fallback).
+              void _err5;
             }
           }
         }
@@ -550,7 +555,6 @@ export function FounderChatWidget({
           </button>
           <ModelPicker
             activeModelId={modelId}
-            onChange={setModelId}
             open={modelPickerOpen}
             onToggleOpen={next => {
               setModelPickerOpen(next);

@@ -17,8 +17,9 @@ vi.mock('@/lib/sse', () => ({
         if (match) {
           try {
             callback(JSON.parse(match[1]));
-          } catch {
+          } catch (_err1) {
             // Test mock: malformed SSE JSON — silent per CLAUDE.md fire-and-forget exceptions.
+            void _err1;
           }
         }
       }

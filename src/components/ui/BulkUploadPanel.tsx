@@ -157,8 +157,9 @@ export function BulkUploadPanel({ onComplete }: BulkUploadPanelProps) {
               onComplete?.();
             }
           }
-        } catch {
+        } catch (_err1) {
           // Polling error — will retry on next interval; silent per CLAUDE.md fire-and-forget exceptions.
+          void _err1;
         }
       };
 
@@ -168,7 +169,7 @@ export function BulkUploadPanel({ onComplete }: BulkUploadPanelProps) {
       pollRef.current = setInterval(pollStatus, 3000);
       // Also poll immediately
       pollStatus();
-    } catch {
+    } catch (_e1) {
       setError('Failed to start bulk upload');
       setUploading(false);
     }

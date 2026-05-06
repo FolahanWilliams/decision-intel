@@ -55,8 +55,8 @@ function getProvider(): 'assemblyai' | 'whisper' {
   try {
     const key = getOptionalEnvVar('ASSEMBLYAI_API_KEY', '');
     if (key && key.length > 0) return 'assemblyai';
-  } catch {
-    // env var not set — silent fallback to whisper per CLAUDE.md fire-and-forget exceptions.
+  } catch (_envErr) {
+    void _envErr; // env var not set — silent fallback to whisper per CLAUDE.md fire-and-forget exceptions.
   }
   return 'whisper';
 }

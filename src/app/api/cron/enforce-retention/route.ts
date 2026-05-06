@@ -90,8 +90,8 @@ async function resolveRetentionMap(): Promise<{
     for (const o of orgs) {
       if (o.retentionDaysOverride != null) orgOverride.set(o.id, o.retentionDaysOverride);
     }
-  } catch {
-    // Schema drift — pre-2.1-deep environment. Continue with plan defaults only.
+  } catch (_driftErr) {
+    void _driftErr; // Schema drift — pre-2.1-deep environment. Continue with plan defaults only.
   }
 
   return { userPlan, orgPlan, orgOverride, retention: buildRetentionPlan() };

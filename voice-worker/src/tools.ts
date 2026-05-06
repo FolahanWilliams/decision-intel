@@ -60,7 +60,7 @@ async function callVoiceTool(
     const elapsed = Date.now() - t0;
     if (!res.ok) {
       const body = await res.text().catch(() => '');
-      // eslint-disable-next-line no-console
+       
       console.error(
         `[voice-worker] tool ${toolName} HTTP error: ${res.status} ${res.statusText} elapsedMs=${elapsed} body=${body.slice(0, 200)}`
       );
@@ -69,7 +69,7 @@ async function callVoiceTool(
       return `Tool error (${res.status}): ${body.slice(0, 150) || res.statusText}`;
     }
     const data = (await res.json()) as { ok?: boolean; result?: unknown };
-    // eslint-disable-next-line no-console
+     
     console.log(
       `[voice-worker] tool ${toolName} ok=${data.ok} elapsedMs=${elapsed} args=${JSON.stringify(args).slice(0, 200)}`
     );
@@ -78,7 +78,7 @@ async function callVoiceTool(
     // shape.
     return JSON.stringify(data.result ?? data);
   } catch (err) {
-    // eslint-disable-next-line no-console
+     
     console.error(`[voice-worker] tool ${toolName} threw:`, err);
     return `Tool error: ${(err as Error).message}`;
   }

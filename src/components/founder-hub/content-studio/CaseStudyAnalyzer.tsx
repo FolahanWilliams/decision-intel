@@ -143,8 +143,9 @@ export function CaseStudyAnalyzer({ caseStudy, onBack, onUseInPost, founderPass 
                 accumulated += data.text;
                 setLinkedinPost(accumulated);
               }
-            } catch {
+            } catch (_err1) {
               // Malformed SSE line — skip silently per CLAUDE.md fire-and-forget exceptions (JSON.parse fallback).
+              void _err1;
             }
           }
         }

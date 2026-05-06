@@ -68,8 +68,9 @@ export function VohraPMFSurveyModal() {
         setPendingId(null);
         setOpen(false);
       }
-    } catch {
+    } catch (_err1) {
       // Silent — pending check failures are not user-facing
+      void _err1;
     }
   }, []);
 
@@ -126,8 +127,9 @@ export function VohraPMFSurveyModal() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ surveyId: pendingId }),
       });
-    } catch {
+    } catch (_err2) {
       // Silent on dismiss failures — best effort
+      void _err2;
     }
     setOpen(false);
   };

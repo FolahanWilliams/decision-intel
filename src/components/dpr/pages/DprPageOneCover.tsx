@@ -188,7 +188,7 @@ export function DprPageOneCover(props: DprPageOneCoverProps) {
         <span className="dpr-honest-disclosure-mark">Disclosure</span>
         Decision Intel runs on SOC 2 Type II infrastructure (Vercel + Supabase) and is aligned with
         the eleven internationally-recognised AI governance principles codified by AI Verify
-        (Singapore IMDA). Decision Intel's own product-level SOC 2 Type I audit is targeted for Q4
+        (Singapore IMDA). Decision Intel&apos;s own product-level SOC 2 Type I audit is targeted for Q4
         2026; AI Verify alignment is self-attested and no third-party audit has yet been performed
         against the mapping. Vocabulary in this record is calibrated to be defensible during a
         vendor-risk register review.

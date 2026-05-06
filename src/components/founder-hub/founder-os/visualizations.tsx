@@ -90,9 +90,9 @@ export function StreakHeatmap({ checkins }: StreakHeatmapProps) {
   const todayDOW = dayOfWeek(todayLocalISO());
   const columns: Array<Array<{ date: string; checkin: CheckinRecord | null; isToday: boolean } | null>> = [];
   // Pad-out the trailing column so today aligns with its real day-of-week.
-  let queue = [...cells];
+  const queue = [...cells];
   // Build columns from oldest to newest.
-  let firstCol: Array<typeof cells[number] | null> = [];
+  const firstCol: Array<typeof cells[number] | null> = [];
   // First column: pad with nulls until the first cell's day-of-week aligns
   const firstDOW = dayOfWeek(queue[0].date);
   for (let i = 0; i < firstDOW; i++) firstCol.push(null);

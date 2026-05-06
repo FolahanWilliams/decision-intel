@@ -48,8 +48,9 @@ export function useCanvasFitOnVisible({
       try {
         r.fitNodesInView(undefined, { animated: false });
         fired = true;
-      } catch {
+      } catch (_err1) {
         // Layout not converged yet — next retry will catch it; silent per CLAUDE.md fire-and-forget exceptions.
+        void _err1;
       }
     };
 
@@ -208,8 +209,9 @@ export function useEdgeNarrativeReveal({
     if (typeof window === 'undefined') return false;
     try {
       return window.sessionStorage.getItem(storageKey) === '1';
-    } catch {
+    } catch (_err2) {
       // sessionStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
+      void _err2;
       return false;
     }
   });
@@ -286,8 +288,9 @@ export function useEdgeNarrativeReveal({
         setDone(true);
         try {
           window.sessionStorage.setItem(storageKey, '1');
-        } catch {
+        } catch (_err3) {
           // sessionStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
+          void _err3;
         }
       }, cursor + 150)
     );

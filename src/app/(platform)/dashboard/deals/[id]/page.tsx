@@ -493,7 +493,12 @@ function Chip({ color, children }: { color: string; children: React.ReactNode })
 }
 
 function IcCountdownChip({ icDate }: { icDate: string }) {
-  const ms = new Date(icDate).getTime() - Date.now();
+  // Capture a stable mount-time so the countdown is computed during
+  // render purely (Date.now() in render trips react-hooks/purity).
+  // Minute-level precision is fine — the chip caption changes slowly,
+  // and a remount on next page-visit refreshes it.
+  const [mountTime] = useState(() => Date.now());
+  const ms = new Date(icDate).getTime() - mountTime;
   if (Number.isNaN(ms)) return null;
   const days = Math.ceil(ms / (1000 * 60 * 60 * 24));
   const isOverdue = days < 0;
@@ -1076,7 +1081,7 @@ function BiasSummaryTab({
           lineHeight: 1.55,
         }}
       >
-        <strong style={{ color: 'var(--text-primary)' }}>What's shown:</strong> aggregated bias
+        <strong style={{ color: 'var(--text-primary)' }}>What&apos;s shown:</strong> aggregated bias
         flags across every analyzed document in this deal. The cross-reference card on the
         composite pane shows where the documents <em>contradict</em> each other — the second
         signal an audit-committee reader looks for.

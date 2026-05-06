@@ -29,11 +29,17 @@ import {
 // =============================================================================
 
 export function BibleVersePill() {
-  const [verse, setVerse] = useState<BibleVerse | null>(null);
-
-  useEffect(() => {
-    setVerse(verseForDate(new Date()));
-  }, []);
+  // Lazy-initialised inside a useState initialiser so the call happens
+  // ONCE during the first client render (skipped on the server). This
+  // avoids the prior useEffect+setState pattern which trips
+  // react-hooks/set-state-in-effect, while preserving the SSR-safe
+  // behaviour: server returns null (no verse rendered), client picks
+  // up the verse on hydration without a hydration-mismatch warning
+  // because the server already rendered nothing.
+  const [verse] = useState<BibleVerse | null>(() => {
+    if (typeof window === 'undefined') return null;
+    return verseForDate(new Date());
+  });
 
   if (!verse) return null;
 

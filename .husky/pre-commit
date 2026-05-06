@@ -76,6 +76,47 @@ if [ $COUNT_LINT_EXIT_CODE -ne 0 ]; then
 fi
 
 echo ""
+echo "🧹 Running ESLint --fix (auto-fix what we can, fail on remaining errors)..."
+echo ""
+
+# Locked 2026-05-06: ESLint runs in --fix mode so trivially-fixable issues
+# (trailing-spaces, prefer-const, sort-imports, missing semicolons, etc.)
+# auto-correct without blocking the commit. Anything that REMAINS after
+# auto-fix is genuine and gets surfaced as a hard block. Any auto-fixed
+# files get re-staged so the commit includes the fix.
+#
+# Why this exists: prior pre-commit chain skipped ESLint entirely, so
+# errors accumulated until a CI run surfaced them. Founder asked
+# "shouldnt you be autofixing eslint errors and not letting them add up"
+# 2026-05-06 — this is the answer.
+npm run lint:fix
+LINT_EXIT_CODE=$?
+
+if [ $LINT_EXIT_CODE -ne 0 ]; then
+    echo ""
+    echo "╔══════════════════════════════════════════════════════════════╗"
+    echo "║  ❌ COMMIT BLOCKED: ESLint errors remain after auto-fix      ║"
+    echo "╠══════════════════════════════════════════════════════════════╣"
+    echo "║  Auto-fix handled what it could. The remaining errors need  ║"
+    echo "║  manual attention — fix them in this commit, or bypass with ║"
+    echo "║  git commit --no-verify (NOT recommended; CI will block).   ║"
+    echo "╚══════════════════════════════════════════════════════════════╝"
+    echo ""
+    exit 1
+fi
+
+# Re-stage any files ESLint --fix modified so the commit picks up the
+# auto-corrections. `git update-index --refresh` is a no-op when nothing
+# changed; non-zero exit just means "stat refreshed", not error.
+git update-index --refresh > /dev/null 2>&1 || true
+CHANGED_AFTER_FIX=$(git diff --name-only)
+if [ -n "$CHANGED_AFTER_FIX" ]; then
+    echo "→ ESLint auto-fixed:"
+    echo "$CHANGED_AFTER_FIX" | sed 's/^/    /'
+    echo "$CHANGED_AFTER_FIX" | xargs git add
+fi
+
+echo ""
 echo "🔍 Running AI Architectural Audit..."
 echo ""
 

@@ -168,8 +168,9 @@ function usePipelineExpanded(): [boolean, (v: boolean) => void] {
     if (typeof window === 'undefined') return false;
     try {
       return localStorage.getItem('di-pipeline-expanded') === 'true';
-    } catch {
+    } catch (_err1) {
       // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
+      void _err1;
       return false;
     }
   });
@@ -178,8 +179,9 @@ function usePipelineExpanded(): [boolean, (v: boolean) => void] {
     setExpandedState(value);
     try {
       localStorage.setItem('di-pipeline-expanded', String(value));
-    } catch {
+    } catch (_err2) {
       // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
+      void _err2;
     }
   }, []);
 

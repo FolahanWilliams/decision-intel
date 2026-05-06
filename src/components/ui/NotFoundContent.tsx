@@ -153,8 +153,12 @@ export function NotFoundContent({ fullPage = false }: NotFoundContentProps) {
   const [cancelled, setCancelled] = useState(false);
   // Mirror in a ref so the timer callbacks (which close over the initial
   // state) read the latest cancelled flag without re-creating the effect.
+  // Update the ref inside an effect (NOT during render) per
+  // react-hooks/refs — refs are not for rendering.
   const cancelledRef = useRef(false);
-  cancelledRef.current = cancelled;
+  useEffect(() => {
+    cancelledRef.current = cancelled;
+  }, [cancelled]);
 
   useEffect(() => {
     const tickId = setInterval(() => {

@@ -181,8 +181,8 @@ export async function GET(request: NextRequest) {
             slackRemindersSent++;
           }
         }
-      } catch {
-        // Schema drift or missing tables — skip Slack reminder
+      } catch (_slackErr) {
+        void _slackErr; // Schema drift or missing tables — skip Slack reminder
       }
     }
 

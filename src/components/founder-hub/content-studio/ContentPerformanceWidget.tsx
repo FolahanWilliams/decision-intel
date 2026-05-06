@@ -77,8 +77,9 @@ export function ContentPerformanceWidget() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       return raw ? JSON.parse(raw) : [];
-    } catch {
+    } catch (_err1) {
       // localStorage / JSON.parse may throw — silent fallback per CLAUDE.md fire-and-forget exceptions.
+      void _err1;
       return [];
     }
   });
@@ -89,8 +90,9 @@ export function ContentPerformanceWidget() {
     setEntries(next);
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-    } catch {
+    } catch (_err2) {
       // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
+      void _err2;
     }
   }, []);
 

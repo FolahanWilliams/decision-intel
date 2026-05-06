@@ -236,7 +236,7 @@ export function VoiceModePanel({ persona, founderPass, onEnd, recentChatMessages
         audioEl.addEventListener('ended', () => {
           console.log('[VoiceModePanel] audio ended — track finished');
         });
-        audioEl.addEventListener('error', (e) => {
+        audioEl.addEventListener('error', (_e) => {
           console.error(
             '[VoiceModePanel] audio error —',
             audioEl.error?.code,

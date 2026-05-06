@@ -47,8 +47,9 @@ export function CsoDashboardRail() {
     if (typeof window === 'undefined') return false;
     try {
       return localStorage.getItem(COLLAPSE_KEY) === '1';
-    } catch {
+    } catch (_err1) {
       // localStorage may throw in private-mode Safari — silent fallback to default per CLAUDE.md fire-and-forget exceptions.
+      void _err1;
       return false;
     }
   });
@@ -74,8 +75,9 @@ export function CsoDashboardRail() {
       const value = !next;
       try {
         localStorage.setItem(COLLAPSE_KEY, value ? '1' : '0');
-      } catch {
+      } catch (_err2) {
         // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
+        void _err2;
       }
       return value;
     });

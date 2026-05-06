@@ -74,8 +74,9 @@ export function usePersistedChecks(storageKey: string): {
       const next = { ...current, [id]: !current[id] };
       try {
         localStorage.setItem(storageKey, JSON.stringify(next));
-      } catch {
+      } catch (_err1) {
         // localStorage may throw on quota / private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
+        void _err1;
       }
       emit(storageKey);
     },

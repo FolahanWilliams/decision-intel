@@ -145,8 +145,9 @@ export function MeetingPrepCard({ founderPass }: Props) {
               } else if (data.type === 'error') {
                 setError(data.message ?? 'Generation failed.');
               }
-            } catch {
+            } catch (_err1) {
               // Malformed SSE line — skip silently per CLAUDE.md fire-and-forget exceptions (JSON.parse fallback).
+              void _err1;
             }
           }
         }
@@ -218,8 +219,9 @@ export function MeetingPrepCard({ founderPass }: Props) {
       await navigator.clipboard.writeText(plan);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {
+    } catch (_err2) {
       // Clipboard API may be blocked by browser permissions — silent no-op per CLAUDE.md fire-and-forget exceptions.
+      void _err2;
     }
   }, [plan]);
 

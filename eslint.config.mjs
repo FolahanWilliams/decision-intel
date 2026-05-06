@@ -26,16 +26,26 @@ const eslintConfig = defineConfig([
       'react/no-unescaped-entities': 'off',
     },
   },
+  ...nextVitals,
+  ...nextTs,
+  // Override AFTER nextTs so the ignore patterns stick (the next-ts
+  // preset configures @typescript-eslint/no-unused-vars with its own
+  // defaults; later rules win in flat-config). The caughtErrors entry
+  // (added 2026-05-06) silences the underscore-prefixed catch-param
+  // warnings the silent-catch sweep created when it converted bare
+  // `} catch {` blocks to `} catch (_err) {` to attach context.
   {
     rules: {
       '@typescript-eslint/no-unused-vars': [
         'warn',
-        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
       ],
     },
   },
-  ...nextVitals,
-  ...nextTs,
 ]);
 
 export default eslintConfig;

@@ -24,7 +24,6 @@ import {
 
 interface Props {
   activeModelId: string;
-  onChange: (modelId: string) => void;
   open: boolean;
   onToggleOpen: (next: boolean) => void;
   /** Color borrowed from the active persona so the picker visually
@@ -32,9 +31,12 @@ interface Props {
   accentColor: string;
 }
 
+// The picker button itself only opens/closes the dropdown — selection
+// is handled by ModelPickerPanel below. Earlier the `onChange` prop
+// was passed in here too but never wired (button doesn't fire it),
+// which produced an "unused parameter" warning. Removed 2026-05-06.
 export function ModelPicker({
   activeModelId,
-  onChange,
   open,
   onToggleOpen,
   accentColor,

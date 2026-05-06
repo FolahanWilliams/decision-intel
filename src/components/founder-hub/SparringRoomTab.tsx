@@ -105,8 +105,9 @@ export function SparringRoomTab({ founderPass }: Props) {
     try {
       const raw = localStorage.getItem(HISTORY_KEY);
       if (raw) setHistory(JSON.parse(raw) as HistoryEntry[]);
-    } catch {
+    } catch (_err1) {
       // localStorage in private-mode Safari, unparseable JSON, etc.
+      void _err1;
     }
   }, []);
 
@@ -114,8 +115,9 @@ export function SparringRoomTab({ founderPass }: Props) {
     setHistory(next);
     try {
       localStorage.setItem(HISTORY_KEY, JSON.stringify(next.slice(-MAX_HISTORY)));
-    } catch {
+    } catch (_err2) {
       // localStorage full or unavailable.
+      void _err2;
     }
   }, []);
 

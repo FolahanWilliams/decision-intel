@@ -47,8 +47,9 @@ export function SampleDataBanner() {
     try {
       setSeedDismissed(localStorage.getItem(DISMISS_KEY_SEED) === '1');
       setClearDismissed(localStorage.getItem(DISMISS_KEY_CLEAR) === '1');
-    } catch {
+    } catch (_err1) {
       // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
+      void _err1;
     }
   }, []);
 
@@ -80,7 +81,7 @@ export function SampleDataBanner() {
         return;
       }
       await fetchStatus();
-    } catch {
+    } catch (_e1) {
       setError('Could not populate sample data. Please try again.');
     } finally {
       setActionLoading(null);
@@ -97,7 +98,7 @@ export function SampleDataBanner() {
         return;
       }
       await fetchStatus();
-    } catch {
+    } catch (_e2) {
       setError('Could not clear sample data. Please try again.');
     } finally {
       setActionLoading(null);
@@ -108,8 +109,9 @@ export function SampleDataBanner() {
     setSeedDismissed(true);
     try {
       localStorage.setItem(DISMISS_KEY_SEED, '1');
-    } catch {
+    } catch (_err2) {
       // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
+      void _err2;
     }
   };
 
@@ -117,8 +119,9 @@ export function SampleDataBanner() {
     setClearDismissed(true);
     try {
       localStorage.setItem(DISMISS_KEY_CLEAR, '1');
-    } catch {
+    } catch (_err3) {
       // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
+      void _err3;
     }
   };
 

@@ -227,8 +227,9 @@ export function FounderOSTab() {
         const j = (await wRes.json()) as ApiEnvelope<{ reviews: WeeklyReviewItem[] }>;
         setReviews(j.data?.reviews ?? []);
       }
-    } catch {
+    } catch (_err1) {
       // Silent — empty state acceptable; banners show below if relevant
+      void _err1;
     } finally {
       setRefreshing(false);
       setHydrated(true);
@@ -398,8 +399,9 @@ export function FounderOSTab() {
           body: JSON.stringify({ status }),
         });
         await fetchAll();
-      } catch {
+      } catch (_err2) {
         // silent
+        void _err2;
       }
     },
     [headers, fetchAll]

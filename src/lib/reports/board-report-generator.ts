@@ -244,8 +244,8 @@ export class BoardReportGenerator {
         // 18mm tall, max 36mm wide; jspdf preserves aspect ratio when the
         // second size arg is left undefined (we pass 0 to mean "auto").
         this.doc.addImage(branding.logoBase64, 'PNG', PAGE_W - MARGIN_R - 36, 10, 36, 0);
-      } catch {
-        // Malformed logo image — skip silently per CLAUDE.md fire-and-forget exceptions; the rest of the report still renders.
+      } catch (_logoErr) {
+        void _logoErr; // Malformed logo image — skip silently per CLAUDE.md fire-and-forget exceptions; the rest of the report still renders.
       }
     }
 

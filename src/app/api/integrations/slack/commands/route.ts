@@ -644,8 +644,9 @@ async function handleAnalyzeCommand(params: {
         if (copilotSession) {
           copilotUrl = `${appUrl}/dashboard/ask?mode=copilot&session=${copilotSession.id}`;
         }
-      } catch {
+      } catch (_err1) {
         // JSON path query not supported or schema drift
+        void _err1;
       }
 
       const summaryCard = formatAuditSummaryForSlack({
@@ -913,8 +914,9 @@ async function handleStatusCommand(params: { userId: string; teamId: string }) {
           });
         }
       }
-    } catch {
+    } catch (_err2) {
       // @schema-drift-tolerant — humanDecision/cognitiveAudit may not be migrated in older deployments.
+      void _err2;
     }
 
     // Nudge effectiveness

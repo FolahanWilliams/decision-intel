@@ -49,8 +49,9 @@ function readStages(): Record<string, PipelineStage> {
   try {
     const raw = localStorage.getItem(STORAGE_KEY_STAGES);
     return raw ? (JSON.parse(raw) as Record<string, PipelineStage>) : {};
-  } catch {
+  } catch (_err1) {
     // localStorage / JSON.parse may throw — silent fallback per CLAUDE.md fire-and-forget exceptions.
+    void _err1;
     return {};
   }
 }
@@ -59,8 +60,9 @@ function readCustom(): CustomContact[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY_CUSTOM);
     return raw ? (JSON.parse(raw) as CustomContact[]) : [];
-  } catch {
+  } catch (_err2) {
     // localStorage / JSON.parse may throw — silent fallback per CLAUDE.md fire-and-forget exceptions.
+    void _err2;
     return [];
   }
 }
@@ -69,8 +71,9 @@ function readNotes(): Record<string, string> {
   try {
     const raw = localStorage.getItem(STORAGE_KEY_NOTES);
     return raw ? (JSON.parse(raw) as Record<string, string>) : {};
-  } catch {
+  } catch (_err3) {
     // localStorage / JSON.parse may throw — silent fallback per CLAUDE.md fire-and-forget exceptions.
+    void _err3;
     return {};
   }
 }
@@ -95,24 +98,27 @@ export function ContactPipelineTracker() {
     setStages(next);
     try {
       localStorage.setItem(STORAGE_KEY_STAGES, JSON.stringify(next));
-    } catch {
+    } catch (_err4) {
       // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
+      void _err4;
     }
   };
   const saveCustom = (next: CustomContact[]) => {
     setCustom(next);
     try {
       localStorage.setItem(STORAGE_KEY_CUSTOM, JSON.stringify(next));
-    } catch {
+    } catch (_err5) {
       // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
+      void _err5;
     }
   };
   const saveNotes = (next: Record<string, string>) => {
     setNotes(next);
     try {
       localStorage.setItem(STORAGE_KEY_NOTES, JSON.stringify(next));
-    } catch {
+    } catch (_err6) {
       // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
+      void _err6;
     }
   };
 

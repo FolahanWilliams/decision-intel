@@ -62,8 +62,9 @@ export function ContentStudioTab({ founderPass }: ContentStudioTabProps) {
         if (parsed.tone) setTone(parsed.tone);
         if (parsed.voiceNotes) setVoiceNotes(parsed.voiceNotes);
       }
-    } catch {
+    } catch (_err1) {
       // localStorage / JSON.parse may throw — silent fallback to default per CLAUDE.md fire-and-forget exceptions.
+      void _err1;
     }
   }, []);
 
@@ -71,8 +72,9 @@ export function ContentStudioTab({ founderPass }: ContentStudioTabProps) {
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ tone, voiceNotes }));
-    } catch {
+    } catch (_err2) {
       // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
+      void _err2;
     }
   }, [tone, voiceNotes]);
 

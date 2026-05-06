@@ -161,8 +161,9 @@ export function RPDPreMortemSuggestionsCard({
     if (typeof window === 'undefined') return;
     try {
       sessionStorage.setItem(`rpd-prefill-${documentId}`, suggestion.action);
-    } catch {
+    } catch (_err1) {
       // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
+      void _err1;
     }
     // Dispatch the same event the doc-detail page already uses to switch
     // tabs (the SimulatorTab listens via the perspectives sub-view tabs).

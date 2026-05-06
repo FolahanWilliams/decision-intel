@@ -235,7 +235,12 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
 
   /* ───── derived ───── */
   const analysis = document?.analyses?.[0] ?? null;
-  const biases = analysis?.biases ?? [];
+  // Wrap in useMemo so the `[]` fallback is stable across renders —
+  // raw `analysis?.biases ?? []` produced a fresh array on every
+  // render, which made downstream useMemo deps recompute every render
+  // (react-hooks/exhaustive-deps warned about this). The memo only
+  // recomputes when analysis.biases actually changes.
+  const biases = useMemo(() => analysis?.biases ?? [], [analysis?.biases]);
 
   const taxonomyIdByType = useMemo(() => {
     const m: Record<string, string> = {};

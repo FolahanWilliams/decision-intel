@@ -22,8 +22,9 @@ function readCalls(): DiscoveryCall[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY_CALLS);
     return raw ? (JSON.parse(raw) as DiscoveryCall[]) : [];
-  } catch {
+  } catch (_err1) {
     // localStorage / JSON.parse may throw — silent fallback per CLAUDE.md fire-and-forget exceptions.
+    void _err1;
     return [];
   }
 }
@@ -43,8 +44,9 @@ export function DiscoveryCallCompanion() {
     setCalls(next);
     try {
       localStorage.setItem(STORAGE_KEY_CALLS, JSON.stringify(next));
-    } catch {
+    } catch (_err2) {
       // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
+      void _err2;
     }
   };
 

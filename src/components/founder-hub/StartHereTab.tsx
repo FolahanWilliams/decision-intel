@@ -70,8 +70,9 @@ function loadVisited(): Set<TabId> {
     const parsed = JSON.parse(raw) as VisitedShape;
     const arr = Array.isArray(parsed.completedTabs) ? parsed.completedTabs : [];
     return new Set(arr.filter(t => NODES.some(n => n.id === t)) as TabId[]);
-  } catch {
+  } catch (_err1) {
     // localStorage / JSON.parse may throw — silent fallback per CLAUDE.md fire-and-forget exceptions.
+    void _err1;
     return new Set();
   }
 }
@@ -83,8 +84,9 @@ function saveVisited(set: Set<TabId>) {
       VISITED_KEY,
       JSON.stringify({ completedTabs: Array.from(set) } satisfies VisitedShape)
     );
-  } catch {
+  } catch (_err2) {
     // localStorage may throw on quota / private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
+    void _err2;
   }
 }
 
@@ -94,8 +96,9 @@ function loadJourney(): Journey | null {
     const raw = localStorage.getItem(JOURNEY_KEY);
     if (!raw) return null;
     return JOURNEYS.find(j => j.id === raw) ?? null;
-  } catch {
+  } catch (_err3) {
     // localStorage may throw — silent fallback per CLAUDE.md fire-and-forget exceptions.
+    void _err3;
     return null;
   }
 }
@@ -105,8 +108,9 @@ function saveJourney(journey: Journey | null) {
   try {
     if (journey) localStorage.setItem(JOURNEY_KEY, journey.id);
     else localStorage.removeItem(JOURNEY_KEY);
-  } catch {
+  } catch (_err4) {
     // localStorage may throw — silent fallback per CLAUDE.md fire-and-forget exceptions.
+    void _err4;
   }
 }
 

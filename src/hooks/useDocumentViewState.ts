@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 
 /**
@@ -95,14 +95,18 @@ export function useDocumentViewState({
   const router = useRouter();
   const pathname = usePathname();
 
-  // Visit count: bump once per documentId per mount. Lazy-init so SSR
-  // returns 1 (matches the bump fallback) and we don't double-increment.
-  const [visitCount, setVisitCount] = useState<number>(1);
-  useEffect(() => {
-    if (!documentId || !hasAnalysis) return;
-    const next = bumpVisitCount(documentId);
-    setVisitCount(next);
-  }, [documentId, hasAnalysis]);
+  // Visit count: bump once per mount via a useState lazy initialiser.
+  // The initialiser runs during the first client render only (it's
+  // skipped on the server because typeof window === 'undefined' inside
+  // bumpVisitCount); subsequent re-renders preserve the same number.
+  // This replaces the prior useEffect+setState pattern which tripped
+  // react-hooks/set-state-in-effect — the bump is naturally a render-
+  // phase concern (we want the visit count for the current visit, not
+  // the next one), so the lazy initialiser is the right primitive.
+  const [visitCount] = useState<number>(() => {
+    if (typeof window === 'undefined' || !documentId || !hasAnalysis) return 1;
+    return bumpVisitCount(documentId);
+  });
 
   const overrideFromUrl = parseState(searchParams.get('mode'));
 
