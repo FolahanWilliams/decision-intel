@@ -50,6 +50,7 @@ import { DprPageFindings } from '@/components/dpr/pages/DprPageFindings';
 import {
   DprPageStructuralAssumptions,
   SAMPLE_STRUCTURAL_ASSUMPTIONS,
+  type DprStructuralAssumption,
 } from '@/components/dpr/pages/DprPageStructuralAssumptions';
 import { DprPageRegulatoryCrosswalk } from '@/components/dpr/pages/DprPageRegulatoryCrosswalk';
 import { deriveDprFindings } from '@/lib/reports/dpr-findings';
@@ -99,10 +100,15 @@ export default async function DprRenderPage({
   const findings = deriveDprFindings(data, augment);
 
   // Specimens get the curated 4-determinant Dalio set; real audits read
-  // Analysis.structuralAssumptions JSON when populated by the structural-
-  // assumptions endpoint (today rendered live in the app, persistence
-  // landing in a follow-up commit). Empty array hides the page silently.
-  const structuralAssumptions = type === 'specimen' ? SAMPLE_STRUCTURAL_ASSUMPTIONS : [];
+  // from the StructuralAssumption table (populated by the structural-
+  // assumptions endpoint when the audit ran). Page hides itself silently
+  // when no assumptions are on file.
+  const structuralAssumptions =
+    type === 'specimen'
+      ? SAMPLE_STRUCTURAL_ASSUMPTIONS
+      : type === 'document'
+        ? await loadStructuralAssumptionsForDpr(id)
+        : [];
 
   const totalPages = 6;
 
@@ -395,4 +401,140 @@ function buildDocumentIdentity(
     decisionHorizon: signals.decisionHorizon,
     geographicScope: null,
   };
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/*       Structural assumptions persistence loader (DPR)          */
+/* ────────────────────────────────────────────────────────────── */
+
+/**
+ * Maps the rich 18-determinant persisted shape onto the DPR's 4-macro
+ * Dalio decomposition (debt cycle / governance / productivity / currency).
+ * For each DPR macro, picks the highest-severity assumption from the
+ * matching persisted determinants — so the page surfaces the worst
+ * audit-committee-relevant gap per macro, not the chronological first
+ * one. Determinants outside the four macros are ignored at the DPR
+ * surface (the live in-app StructuralAssumptionsPanel renders the full
+ * 18-determinant set; the DPR is the leave-behind summary).
+ */
+async function loadStructuralAssumptionsForDpr(
+  analysisId: string
+): Promise<DprStructuralAssumption[]> {
+  let rows: Array<{
+    determinantId: string;
+    assumption: string;
+    evidenceFromMemo: string | null;
+    hardeningQuestion: string | null;
+    severity: string;
+    defensibility: string;
+  }>;
+  try {
+    rows = await prisma.structuralAssumption.findMany({
+      where: { analysisId },
+      orderBy: { generatedAt: 'desc' },
+      select: {
+        determinantId: true,
+        assumption: true,
+        evidenceFromMemo: true,
+        hardeningQuestion: true,
+        severity: true,
+        defensibility: true,
+      },
+    });
+  } catch (err) {
+    log.warn(
+      `loadStructuralAssumptionsForDpr(${analysisId}) — table read failed:`,
+      err instanceof Error ? err.message : String(err)
+    );
+    return [];
+  }
+  if (rows.length === 0) return [];
+
+  // Macro mapping — 18 determinants → 4 DPR macros. Determinants not
+  // in this map are intentionally dropped at the DPR surface.
+  const MACRO_MAP: Record<string, DprStructuralAssumption['determinant']> = {
+    debt_cycle: 'debt_cycle',
+    currency_cycle: 'currency',
+    productivity: 'productivity',
+    governance: 'governance',
+    // Sensible secondary mappings for richer audits:
+    cost_competitiveness: 'productivity',
+    economic_output: 'productivity',
+    civility: 'governance',
+    wealth_gaps: 'governance',
+    reserve_currency_status: 'currency',
+    markets_financial_center: 'currency',
+  };
+
+  const SEVERITY_RANK: Record<string, number> = {
+    critical: 4,
+    high: 3,
+    medium: 2,
+    low: 1,
+  };
+
+  // Group by macro and pick highest-severity per group.
+  const byMacro: Record<string, (typeof rows)[number]> = {};
+  for (const row of rows) {
+    const macro = MACRO_MAP[row.determinantId];
+    if (!macro) continue;
+    const existing = byMacro[macro];
+    if (
+      !existing ||
+      (SEVERITY_RANK[row.severity] ?? 0) > (SEVERITY_RANK[existing.severity] ?? 0)
+    ) {
+      byMacro[macro] = row;
+    }
+  }
+
+  const out: DprStructuralAssumption[] = [];
+  for (const macro of ['debt_cycle', 'governance', 'productivity', 'currency'] as const) {
+    const row = byMacro[macro];
+    if (!row) continue;
+    const severity = (
+      ['critical', 'high', 'medium', 'low'].includes(row.severity)
+        ? row.severity
+        : 'medium'
+    ) as DprStructuralAssumption['severity'];
+
+    out.push({
+      determinant: macro,
+      implicitAssumption: row.assumption,
+      // The persisted shape has `evidenceFromMemo` (the memo's quoted
+      // claim) and `defensibility` (well_supported / unsupported / etc.).
+      // The DPR's "outsideViewAnchor" is the independent-data reading
+      // that EARNS the severity band. We synthesize it from defensibility
+      // + evidenceFromMemo so the section surfaces a defensible band
+      // even when the audit didn't author a verbatim outside-view
+      // sentence.
+      outsideViewAnchor: synthesiseOutsideView(row.defensibility, row.evidenceFromMemo),
+      reviewerQuestion:
+        row.hardeningQuestion ??
+        'What independent base-rate evidence would change the defensibility band on this determinant?',
+      severity,
+    });
+  }
+  return out;
+}
+
+function synthesiseOutsideView(defensibility: string, memoEvidence: string | null): string {
+  const band = defensibility.toLowerCase();
+  if (band === 'contradicted') {
+    return memoEvidence
+      ? `Outside-view reading contradicts the memo's claim. Memo evidence on file: "${memoEvidence}"`
+      : 'Outside-view reading contradicts the memo\'s implicit assumption.';
+  }
+  if (band === 'unsupported') {
+    return memoEvidence
+      ? `Outside-view reading does not support the memo's claim. Memo evidence on file: "${memoEvidence}"`
+      : 'Outside-view reading does not support the memo\'s implicit assumption — base-rate evidence missing.';
+  }
+  if (band === 'partially_supported') {
+    return memoEvidence
+      ? `Outside-view reading partially supports the memo. Memo evidence on file: "${memoEvidence}"`
+      : 'Outside-view reading partially supports the assumption — material caveats apply.';
+  }
+  return memoEvidence
+    ? `Outside-view reading aligns with the memo. Memo evidence on file: "${memoEvidence}"`
+    : 'Outside-view reading aligns with the memo\'s implicit assumption.';
 }

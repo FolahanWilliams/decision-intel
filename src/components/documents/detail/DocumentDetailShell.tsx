@@ -352,7 +352,13 @@ export function DocumentDetailShell(props: DocumentDetailShellProps) {
         </section>
       </div>
 
-      {/* Mobile collapse — single column with PDF behind a pill */}
+      {/* Mobile collapse — single column with PDF on top, audit below.
+         The PDF pane caps at 70vh on mobile (was 60vh) — gives long
+         documents enough vertical room to read a paragraph without
+         scrolling, while keeping ~30vh visible for the audit pane below
+         so the reader can jump between PDF and findings. Below 640px
+         the cap drops further to 60vh because audit-pane priority
+         climbs on phone-sized screens. */}
       <style jsx>{`
         @media (max-width: 1100px) {
           .doc-detail-v2-body {
@@ -361,9 +367,14 @@ export function DocumentDetailShell(props: DocumentDetailShellProps) {
           }
           .doc-detail-v2-left {
             position: static !important;
-            max-height: 60vh !important;
+            max-height: 70vh !important;
             margin-right: 0 !important;
             margin-bottom: 16px !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .doc-detail-v2-left {
+            max-height: 60vh !important;
           }
         }
       `}</style>

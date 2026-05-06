@@ -252,6 +252,40 @@ export function BiasAnnotatedPDFViewer({
             >
               <ZoomIn size={14} />
             </button>
+            {/* Escape hatch — long documents on mobile cap at 60-70vh
+               of the device viewport. The "open in new tab" link lets
+               users hand the PDF off to the device's native PDF viewer
+               for full-screen + native gestures. */}
+            <a
+              href={pdfUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Open full PDF in new tab"
+              style={{
+                marginLeft: 8,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 3,
+                fontSize: 11,
+                fontWeight: 600,
+                color: 'var(--text-muted)',
+                textDecoration: 'none',
+                padding: '2px 6px',
+                borderRadius: 3,
+                letterSpacing: '0.04em',
+                transition: 'color 0.15s ease, background 0.15s ease',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.color = 'var(--text-primary)';
+                e.currentTarget.style.background = 'var(--bg-tertiary)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.color = 'var(--text-muted)';
+                e.currentTarget.style.background = 'transparent';
+              }}
+            >
+              ↗ tab
+            </a>
           </div>
         </div>
 

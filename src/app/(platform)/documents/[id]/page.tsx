@@ -563,18 +563,10 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
           analysisId={analysis.id}
           documentName={document.filename}
           analysisData={{ score: analysis.overallScore, biases: analysis.biases }}
-          onExportPdf={async () => {
-            // Body-parse fallback wired in commit 5c (route swap follow-up).
-          }}
-          onExportCsv={() => {
-            /* wired in 5c */
-          }}
-          onExportMarkdown={() => {
-            /* wired in 5c */
-          }}
-          onExportJson={() => {
-            /* wired in 5c */
-          }}
+          onExportPdf={() => handleExportPdf(document, analysis, showToast)}
+          onExportCsv={() => handleExportCsv(document, analysis, showToast)}
+          onExportMarkdown={() => handleExportMarkdown(document, analysis, biases)}
+          onExportJson={() => handleExportJson(document, analysis, biases)}
         />
       )}
     </>
@@ -1006,6 +998,126 @@ function deriveSovereignContexts(
     jurisdiction: c.toUpperCase(),
     note: NOTES[c.toLowerCase()] ?? 'Emerging-market sovereign cycle exposure flagged.',
   }));
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/*                  Export handlers                               */
+/* ────────────────────────────────────────────────────────────── */
+
+type ToastFn = (message: string, kind?: 'success' | 'error' | 'info' | 'warning') => void;
+
+/** Audit-log a fire-and-forget export action. */
+function logExportAudit(
+  action: 'EXPORT_PDF' | 'EXPORT_CSV' | 'EXPORT_MARKDOWN' | 'EXPORT_JSON',
+  documentId: string,
+  filename: string
+) {
+  fetch('/api/audit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action,
+      resource: 'Document',
+      resourceId: documentId,
+      details: { filename },
+    }),
+  }).catch(err => log.warn(`audit ${action} failed:`, err));
+}
+
+async function handleExportPdf(
+  document: Document,
+  analysis: Analysis,
+  showToast: ToastFn
+): Promise<void> {
+  try {
+    const { PdfGenerator } = await import('@/lib/reports/pdf-generator');
+    const generator = new PdfGenerator();
+    generator.generateReport({
+      filename: document.filename,
+      analysis: analysis as unknown as Parameters<typeof generator.generateReport>[0]['analysis'],
+    });
+    logExportAudit('EXPORT_PDF', document.id, document.filename);
+    showToast('PDF report generated successfully', 'success');
+  } catch (err) {
+    log.error('Failed to generate PDF:', err);
+    showToast('Failed to generate PDF report', 'error');
+  }
+}
+
+async function handleExportCsv(
+  document: Document,
+  analysis: Analysis,
+  showToast: ToastFn
+): Promise<void> {
+  try {
+    const { CsvGenerator } = await import('@/lib/reports/csv-generator');
+    const generator = new CsvGenerator();
+    generator.generateReport(
+      document.filename,
+      analysis as unknown as Parameters<typeof generator.generateReport>[1]
+    );
+    logExportAudit('EXPORT_CSV', document.id, document.filename);
+    showToast('CSV export generated successfully', 'success');
+  } catch (err) {
+    log.error('Failed to generate CSV:', err);
+    showToast('Failed to generate CSV report', 'error');
+  }
+}
+
+async function handleExportMarkdown(
+  document: Document,
+  analysis: Analysis,
+  biases: BiasInstance[]
+): Promise<void> {
+  const { generateMarkdownReport, downloadMarkdown } = await import(
+    '@/lib/reports/markdown-generator'
+  );
+  const md = generateMarkdownReport({
+    filename: document.filename,
+    uploadedAt: document.uploadedAt,
+    overallScore: analysis.overallScore,
+    noiseScore: analysis.noiseScore,
+    summary: analysis.summary,
+    biases: biases.map(b => ({
+      biasType: b.biasType,
+      severity: b.severity,
+      excerpt: b.excerpt,
+      explanation: b.explanation,
+      suggestion: b.suggestion,
+    })),
+    swotAnalysis: analysis.swotAnalysis as Parameters<typeof generateMarkdownReport>[0]['swotAnalysis'],
+    simulation: analysis.simulation as Parameters<typeof generateMarkdownReport>[0]['simulation'],
+    compliance: analysis.compliance as Parameters<typeof generateMarkdownReport>[0]['compliance'],
+  });
+  downloadMarkdown(md, document.filename);
+  logExportAudit('EXPORT_MARKDOWN', document.id, document.filename);
+}
+
+async function handleExportJson(
+  document: Document,
+  analysis: Analysis,
+  biases: BiasInstance[]
+): Promise<void> {
+  const { generateJsonReport, downloadJson } = await import('@/lib/reports/json-generator');
+  const json = generateJsonReport({
+    filename: document.filename,
+    uploadedAt: document.uploadedAt,
+    overallScore: analysis.overallScore,
+    noiseScore: analysis.noiseScore,
+    summary: analysis.summary,
+    biases: biases.map(b => ({
+      biasType: b.biasType,
+      severity: b.severity,
+      excerpt: b.excerpt,
+      explanation: b.explanation,
+      suggestion: b.suggestion,
+    })),
+    swotAnalysis: analysis.swotAnalysis as Parameters<typeof generateJsonReport>[0]['swotAnalysis'],
+    simulation: analysis.simulation as Parameters<typeof generateJsonReport>[0]['simulation'],
+    compliance: analysis.compliance as Parameters<typeof generateJsonReport>[0]['compliance'],
+  });
+  downloadJson(json, document.filename);
+  logExportAudit('EXPORT_JSON', document.id, document.filename);
 }
 
 /* Suppress unused-react-import warning when ReactNode is only used in JSX. */
