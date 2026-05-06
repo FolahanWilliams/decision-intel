@@ -1,19 +1,42 @@
+/**
+ * Deal Detail · v2 — McKinsey-grade refactor.
+ *
+ * Locked 2026-05-06. Same shell + visual rhythm as /documents/[id]:
+ *
+ *   ┌─── Header (sticky) ───────────────────────────────────┐
+ *   │ deal name · DqiPill · stage chip · IC countdown · DPR │
+ *   └───────────────────────────────────────────────────────┘
+ *   ┌── Composite pane (~58%) ──┬── Audit pane (~42%) ──────┐
+ *   │ DealCompositeHero          │ Documents · Findings     │
+ *   │ DealCounterfactualHero     │ Brief · Stress · Outcome │
+ *   │ CrossReferenceCard         │ ⚙ corner gear            │
+ *   │ IcReadinessGate            │   (Edit + Archive deal)  │
+ *   │ DealRegulatoryBelt         │                          │
+ *   └───────────────────────────┴───────────────────────────┘
+ *
+ * The composite pane carries the always-visible "what does this deal
+ * look like at a glance" view (composite DQI + bias signature + IC
+ * readiness + regulatory exposure). The audit pane holds the 5 buyer-
+ * question tabs. Settings drawer wires the new POST /api/deals/[id]/archive
+ * endpoint shipped 2026-05-06 alongside the existing edit modal.
+ */
+
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useToast } from '@/components/ui/EnhancedToast';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   ArrowLeft,
-  Edit2,
   ChevronRight,
   FileText,
   Upload,
   AlertTriangle,
-  Shield,
-  TrendingUp,
   GitCompareArrows,
+  Clock,
+  Pencil,
+  Archive,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { gradeMetaFromScore } from '@/lib/utils/grade';
@@ -31,6 +54,8 @@ import { CrossRefBadge } from '@/components/deals/CrossRefBadge';
 import { IcReadinessGate } from '@/components/deals/IcReadinessGate';
 import { DealRegulatoryBelt } from '@/components/deals/DealRegulatoryBelt';
 import { InlineDealUploadZone } from '@/components/deals/InlineDealUploadZone';
+import { DecisionDetailShell } from '@/components/documents/detail/DocumentDetailShell';
+import { SettingsDrawer } from '@/components/documents/detail/SettingsDrawer';
 import type { DealCrossReferenceFinding } from '@/types/deals';
 import { extractCrossReferenceFindings as extractFindings } from '@/lib/utils/deal-cross-reference';
 import {
@@ -45,45 +70,30 @@ import {
   type DealSummary,
 } from '@/types/deals';
 
-const badgeStyle = (color: string): React.CSSProperties => ({
-  fontSize: 11,
-  fontWeight: 600,
-  color: color,
-  background: `${color}18`,
-  padding: '3px 8px',
-  borderRadius: 4,
-  whiteSpace: 'nowrap',
-});
+type DealTab = 'documents' | 'findings' | 'brief' | 'stress' | 'outcome';
 
-const tabStyle = (active: boolean): React.CSSProperties => ({
-  padding: '8px 16px',
-  fontSize: 13,
-  fontWeight: active ? 600 : 400,
-  color: active ? 'var(--accent-primary)' : 'var(--text-muted)',
-  background: active ? 'rgba(22, 163, 74, 0.1)' : 'transparent',
-  border: 'none',
-  borderBottom: active ? '2px solid var(--accent-primary)' : '2px solid transparent',
-  cursor: 'pointer',
-  transition: 'all 0.15s',
-});
+const TAB_KEYS: DealTab[] = ['documents', 'findings', 'brief', 'stress', 'outcome'];
+
+/* ────────────────────────────────────────────────────────────── */
+/*                  Page                                          */
+/* ────────────────────────────────────────────────────────────── */
 
 export default function DealDetailPage() {
   const params = useParams();
   const dealId = params.id as string;
+  const router = useRouter();
+  const { showToast } = useToast();
 
   const { deal, isLoading, error, mutate } = useDeal(dealId);
-  const [activeTab, setActiveTab] = useState<'documents' | 'bias' | 'outcome' | 'brief'>(
-    'documents'
-  );
+  const [activeTab, setActiveTab] = useState<DealTab>('documents');
   const [showEditForm, setShowEditForm] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [advancingStage, setAdvancingStage] = useState(false);
-  const { showToast } = useToast();
 
   const handleAdvanceStage = useCallback(async () => {
     if (!deal) return;
     const next = getNextStage(deal.stage);
     if (!next) return;
-
     setAdvancingStage(true);
     try {
       const res = await fetch('/api/deals', {
@@ -104,13 +114,24 @@ export default function DealDetailPage() {
     }
   }, [deal, mutate, showToast]);
 
+  const crossRefFindings: DealCrossReferenceFinding[] = useMemo(
+    () => (deal ? extractFindings(deal.crossReference) : []),
+    [deal]
+  );
+
+  const compositeDqi = deal?.aggregation?.compositeDqi ?? null;
+  const analyzedDocCount = deal?.aggregation?.analyzedDocCount ?? 0;
+  const totalDocCount = deal?.documents?.length ?? 0;
+
+  /* ────── Loading / Error ────── */
+
   if (isLoading) {
     return (
-      <div className="container" style={{ maxWidth: 1000, padding: '24px 20px' }}>
+      <div style={{ padding: '32px 24px', maxWidth: 1600, margin: '0 auto' }}>
         <div
           style={{
-            height: 200,
-            background: 'var(--bg-card-hover)',
+            height: 240,
+            background: 'var(--bg-card-hover, var(--bg-tertiary))',
             borderRadius: 12,
             animation: 'pulse 1.5s infinite',
           }}
@@ -131,7 +152,12 @@ export default function DealDetailPage() {
         </div>
         <Link
           href="/dashboard/deals"
-          style={{ color: 'var(--accent-primary)', fontSize: 13, marginTop: 8, display: 'inline-block' }}
+          style={{
+            color: 'var(--accent-primary)',
+            fontSize: 13,
+            marginTop: 8,
+            display: 'inline-block',
+          }}
         >
           Back to Projects
         </Link>
@@ -139,301 +165,502 @@ export default function DealDetailPage() {
     );
   }
 
+  /* ────── Header chrome ────── */
+
   const stageColor = STAGE_COLORS[deal.stage] || '#6b7280';
   const typeColor = DEAL_TYPE_COLORS[deal.dealType] || '#6b7280';
   const statusColor = STATUS_COLORS[deal.status] || '#6b7280';
   const nextStage = getNextStage(deal.stage);
 
-  return (
-    <ErrorBoundary sectionName="Project Detail">
-      <div className="container" style={{ maxWidth: 1000, padding: '24px 20px' }}>
-        {/* Back link */}
-        <Link
-          href="/dashboard/deals"
+  const headerChips = (
+    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+      <Chip color={typeColor}>{getDealTypeLabel(deal.dealType)}</Chip>
+      <Chip color={stageColor}>{getStageLabel(deal.stage)}</Chip>
+      {deal.status !== 'active' && <Chip color={statusColor}>{deal.status}</Chip>}
+      {deal.icDate && <IcCountdownChip icDate={deal.icDate as unknown as string} />}
+      {deal.ticketSize && (
+        <span
           style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 4,
-            color: 'var(--text-muted)',
-            fontSize: 12,
-            textDecoration: 'none',
-            marginBottom: 16,
+            fontSize: 11,
+            fontWeight: 600,
+            color: 'var(--text-secondary)',
+            fontVariantNumeric: 'tabular-nums',
           }}
         >
-          <ArrowLeft size={14} /> Projects
-        </Link>
+          {formatTicketSize(deal.ticketSize, deal.currency)}
+        </span>
+      )}
+    </div>
+  );
 
-        <UpgradeFromAudit dealId={dealId} />
+  /* ────── Left pane (always-visible composite) ────── */
 
-        {/* Header */}
-        <div
-          style={{
-            background: 'var(--bg-card)',
-            border: '1px solid var(--bg-elevated)',
-            borderRadius: 12,
-            padding: '20px 24px',
-            marginBottom: 20,
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'flex-start',
-              marginBottom: 12,
-            }}
-          >
-            <div>
-              <h1
-                style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}
-              >
-                {deal.name}
-              </h1>
-              {deal.targetCompany && (
-                <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
-                  {deal.targetCompany}
-                </div>
-              )}
-            </div>
-            <button
-              onClick={() => setShowEditForm(true)}
-              className="btn btn-ghost"
-              style={{
-                padding: '6px 12px',
-                fontSize: 12,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 4,
-              }}
-            >
-              <Edit2 size={13} /> Edit
-            </button>
-          </div>
+  const leftPane = (
+    <div
+      style={{
+        flex: 1,
+        overflowY: 'auto',
+        padding: 16,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 14,
+      }}
+    >
+      <UpgradeFromAudit dealId={dealId} />
 
-          {/* Badges row */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              flexWrap: 'wrap',
-              marginBottom: 14,
-            }}
-          >
-            <span style={badgeStyle(typeColor)}>{getDealTypeLabel(deal.dealType)}</span>
-            <span style={badgeStyle(stageColor)}>{getStageLabel(deal.stage)}</span>
-            <span style={badgeStyle(statusColor)}>{deal.status}</span>
-            {deal.sector && (
-              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{deal.sector}</span>
-            )}
-          </div>
-
-          {/* Key metrics */}
-          <div
-            style={{
-              display: 'flex',
-              gap: 24,
-              flexWrap: 'wrap',
-              fontSize: 12,
-              color: 'var(--text-secondary)',
-            }}
-          >
-            {deal.ticketSize && (
-              <div>
-                <span style={{ color: 'var(--text-muted)' }}>Ticket:</span>{' '}
-                <span style={{ fontWeight: 600 }}>
-                  {formatTicketSize(deal.ticketSize, deal.currency)}
-                </span>
-              </div>
-            )}
-            {deal.fundName && (
-              <div>
-                <span style={{ color: 'var(--text-muted)' }}>Fund:</span>{' '}
-                <span style={{ fontWeight: 600 }}>{deal.fundName}</span>
-              </div>
-            )}
-            {deal.vintage && (
-              <div>
-                <span style={{ color: 'var(--text-muted)' }}>Vintage:</span>{' '}
-                <span style={{ fontWeight: 600 }}>{deal.vintage}</span>
-              </div>
-            )}
-            <div>
-              <span style={{ color: 'var(--text-muted)' }}>Documents:</span>{' '}
-              <span style={{ fontWeight: 600 }}>{deal.documents?.length || 0}</span>
-            </div>
-          </div>
-
-          {/* Stage advance */}
-          {nextStage && deal.status === 'active' && (
-            <div
-              style={{
-                marginTop: 14,
-                paddingTop: 14,
-                borderTop: '1px solid var(--bg-card-hover)',
-              }}
-            >
-              <button
-                onClick={handleAdvanceStage}
-                disabled={advancingStage}
-                className="btn btn-primary"
-                style={{
-                  padding: '6px 16px',
-                  fontSize: 12,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 4,
-                }}
-              >
-                Advance to {getStageLabel(nextStage)} <ChevronRight size={14} />
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* IC Readiness gate — A2/S7 lock 2026-04-29. The first thing an
-            analyst (Adaeze persona) sees on the deal page: 5 gates +
-            aggregate readiness % + countdown to IC. Advisory, not
-            blocking — but surfaces what a procurement-grade reader will
-            catch before walking into Thursday's IC. */}
+      <ErrorBoundary sectionName="IC Readiness">
         <IcReadinessGate deal={deal} />
+      </ErrorBoundary>
 
-        {/* Pan-African Regulatory Belt — B7 lock 2026-04-30 (Titi
-            persona ask). When the deal's analyses surface any African
-            EM jurisdiction, render the chip naming the primary
-            regulators (NDPR / CBN / FRC Nigeria / WAEMU / PoPIA / etc.).
-            Procurement-grade signal that IBM watsonx + US incumbents
-            cannot reach. Renders null when no African jurisdiction
-            mapped. */}
-        <DealRegulatoryBelt countries={deal.emergingMarketCountries} />
+      <DealRegulatoryBelt countries={deal.emergingMarketCountries} />
 
-        {/* Composite DQI + bias signature (3.1 deal-as-decision-unit hero) */}
-        {deal.aggregation && (
-          <DealCompositeHero
-            aggregation={deal.aggregation}
-            totalDocs={deal.documents?.length || 0}
-          />
-        )}
+      {deal.aggregation && (
+        <ErrorBoundary sectionName="Composite hero">
+          <DealCompositeHero aggregation={deal.aggregation} totalDocs={totalDocCount} />
+        </ErrorBoundary>
+      )}
 
-        {/* Deal-level counterfactual ROI (Marcus's audit ask). Renders
-            null until the deal has ≥2 analyzed docs AND the aggregate
-            improvement is positive — single-doc deals already have the
-            CounterfactualPanel on the document page. */}
-        <DealCounterfactualHero dealId={deal.id} />
-
-        {/* Cross-document conflict surface (3.1 deep) — the deal-level
-            agent that catches "CIM says 40% growth, model assumes 15%"
-            class contradictions across the docs. */}
+      <ErrorBoundary sectionName="Cross-reference">
         <CrossReferenceCard
           dealId={deal.id}
           initialRun={deal.crossReference ?? null}
           aggregation={deal.aggregation ?? null}
           onRunCompleted={() => mutate()}
         />
+      </ErrorBoundary>
 
-        {/* Upload-to-deal CTA + Ask Copilot — sit above the tabs so they're
-            the primary verbs on the page. UploadToDealButton pre-binds
-            dealId; the Copilot CTA picks the latest analyzed document
-            in the deal and deep-links via ?documentId so the conversation
-            opens already pinned to the most-relevant context (C4 lock
-            2026-04-30). */}
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            gap: 8,
-            marginBottom: 14,
-            flexWrap: 'wrap',
-          }}
-        >
-          {(() => {
-            // Find the latest analyzed document — sort by the latest
-            // analysis createdAt across all docs in the deal.
-            const latestAnalyzedDoc = (deal.documents ?? [])
-              .filter(d => d.status === 'analyzed' && d.analyses?.[0]?.id)
-              .sort((a, b) => {
-                const ta = new Date(a.analyses?.[0]?.createdAt ?? 0).getTime();
-                const tb = new Date(b.analyses?.[0]?.createdAt ?? 0).getTime();
-                return tb - ta;
-              })[0];
-            if (!latestAnalyzedDoc) return null;
-            return (
-              <Link
-                href={`/dashboard/ask?documentId=${latestAnalyzedDoc.id}`}
-                className="btn btn-secondary"
-                style={{
-                  padding: '8px 14px',
-                  fontSize: 12.5,
-                  fontWeight: 700,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  textDecoration: 'none',
-                }}
-              >
-                Ask Copilot about this deal
-              </Link>
-            );
-          })()}
-          <UploadToDealButton dealId={deal.id} dealName={deal.name} onUploaded={() => mutate()} />
-        </div>
-
-        {/* Tabs */}
-        <div
-          style={{
-            display: 'flex',
-            gap: 0,
-            borderBottom: '1px solid var(--bg-elevated)',
-            marginBottom: 20,
-          }}
-        >
+      {/* Verb cluster — Upload + Ask Copilot. Lives at the bottom of the
+         composite pane so the daily-flow primary actions are reachable
+         without scrolling past the at-a-glance view. */}
+      <div
+        style={{
+          marginTop: 'auto',
+          display: 'flex',
+          gap: 8,
+          flexWrap: 'wrap',
+          paddingTop: 12,
+          borderTop: '1px solid var(--border-color)',
+        }}
+      >
+        <UploadToDealButton dealId={deal.id} dealName={deal.name} onUploaded={() => mutate()} />
+        {(() => {
+          const latest = (deal.documents ?? [])
+            .filter(d => d.status === 'analyzed' && d.analyses?.[0]?.id)
+            .sort((a, b) => {
+              const ta = new Date(a.analyses?.[0]?.createdAt ?? 0).getTime();
+              const tb = new Date(b.analyses?.[0]?.createdAt ?? 0).getTime();
+              return tb - ta;
+            })[0];
+          if (!latest) return null;
+          return (
+            <Link
+              href={`/dashboard/ask?documentId=${latest.id}`}
+              className="btn btn-secondary"
+              style={{
+                padding: '8px 14px',
+                fontSize: 12.5,
+                fontWeight: 600,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                textDecoration: 'none',
+              }}
+            >
+              Ask Copilot about this deal
+            </Link>
+          );
+        })()}
+        {nextStage && deal.status === 'active' && (
           <button
-            onClick={() => setActiveTab('documents')}
-            style={tabStyle(activeTab === 'documents')}
+            onClick={handleAdvanceStage}
+            disabled={advancingStage}
+            className="btn btn-primary"
+            style={{
+              padding: '8px 14px',
+              fontSize: 12.5,
+              fontWeight: 600,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+            }}
           >
-            Documents
+            Advance to {getStageLabel(nextStage)} <ChevronRight size={13} />
           </button>
-          <button onClick={() => setActiveTab('bias')} style={tabStyle(activeTab === 'bias')}>
-            Bias Summary
-          </button>
-          <button onClick={() => setActiveTab('outcome')} style={tabStyle(activeTab === 'outcome')}>
-            Outcome
-          </button>
-          <button onClick={() => setActiveTab('brief')} style={tabStyle(activeTab === 'brief')}>
-            <FileText size={13} style={{ marginRight: 4, verticalAlign: -2 }} />
-            Decision Brief
-          </button>
-        </div>
+        )}
+      </div>
+    </div>
+  );
 
-        {/* Tab Content */}
-        {activeTab === 'documents' && (
+  /* ────── Tabs ────── */
+
+  const tabs = [
+    { id: 'documents' as const, label: 'Documents', badge: totalDocCount || undefined },
+    {
+      id: 'findings' as const,
+      label: 'Findings',
+      available: analyzedDocCount > 0,
+    },
+    {
+      id: 'brief' as const,
+      label: 'Brief',
+      available: analyzedDocCount > 0,
+    },
+    {
+      id: 'stress' as const,
+      label: 'Stress test',
+      available: analyzedDocCount >= 2,
+    },
+    { id: 'outcome' as const, label: 'Outcome' },
+  ];
+
+  const tabBody = (() => {
+    switch (activeTab) {
+      case 'documents':
+        return (
           <DocumentsTab
             documents={deal.documents || []}
             dealId={deal.id}
             dealName={deal.name}
             onUploaded={() => mutate()}
-            crossRefFindings={extractFindings(deal.crossReference)}
+            crossRefFindings={crossRefFindings}
           />
-        )}
-        {activeTab === 'bias' && (
-          <BiasSummaryTab documents={deal.documents || []} aggregation={deal.aggregation ?? null} />
-        )}
-        {activeTab === 'outcome' && <OutcomeTab deal={deal} onUpdate={() => mutate()} />}
-        {activeTab === 'brief' && <DecisionBriefTab dealId={dealId} />}
+        );
+      case 'findings':
+        return (
+          <BiasSummaryTab
+            documents={deal.documents || []}
+            aggregation={deal.aggregation ?? null}
+          />
+        );
+      case 'brief':
+        return <DecisionBriefTab dealId={dealId} />;
+      case 'stress':
+        return (
+          <ErrorBoundary sectionName="Counterfactual hero">
+            <DealCounterfactualHero dealId={deal.id} />
+          </ErrorBoundary>
+        );
+      case 'outcome':
+        return <OutcomeTab deal={deal} onUpdate={() => mutate()} />;
+      default:
+        return null;
+    }
+  })();
 
-        {/* Edit modal */}
-        <DealFormModal
-          open={showEditForm}
-          onOpenChange={setShowEditForm}
-          deal={deal as unknown as DealSummary}
-          onSuccess={() => mutate()}
-        />
-      </div>
+  return (
+    <ErrorBoundary sectionName="Deal Detail">
+      <DecisionDetailShell
+        title={deal.name}
+        dqiScore={compositeDqi}
+        classification="confidential"
+        headerChips={headerChips}
+        primaryAction={
+          analyzedDocCount > 0
+            ? {
+                label: 'Export Deal DPR',
+                onClick: () => {
+                  window.open(
+                    `/api/deals/${deal.id}/provenance-record?format=pdf`,
+                    '_blank',
+                    'noopener'
+                  );
+                },
+              }
+            : undefined
+        }
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabChange={t => {
+          if (TAB_KEYS.includes(t as DealTab)) setActiveTab(t as DealTab);
+        }}
+        leftPane={leftPane}
+        rightPaneContent={tabBody}
+        hasPreview
+        onOpenSettings={() => setShowSettings(true)}
+        settingsLabel="Deal settings"
+        breadcrumbs={
+          <Link
+            href="/dashboard/deals"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              color: 'var(--text-muted)',
+              fontSize: 12,
+              textDecoration: 'none',
+            }}
+          >
+            <ArrowLeft size={14} /> Projects
+          </Link>
+        }
+      />
+
+      <SettingsDrawer
+        open={showSettings}
+        onClose={() => setShowSettings(false)}
+        methodologySlot={
+          <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+            Composite DQI averages the latest analysis from every analyzed document in the
+            deal. Cross-reference flags surface contradictions across docs (CIM vs model vs
+            IC deck). The deal-level DPR carries the composite verdict + per-doc audit
+            lineage in a single hashed artefact for the audit committee.
+          </div>
+        }
+        reproducibilitySlot={
+          <div
+            style={{
+              fontSize: 12,
+              color: 'var(--text-muted)',
+              fontFamily: 'ui-monospace, monospace',
+              lineHeight: 1.6,
+            }}
+          >
+            <div>deal_id: {deal.id}</div>
+            <div>analyzed_docs: {analyzedDocCount} / {totalDocCount}</div>
+            <div>cross_ref: {deal.crossReference ? 'on file' : '—'}</div>
+          </div>
+        }
+        sharingSlot={
+          <button
+            type="button"
+            onClick={() => {
+              setShowSettings(false);
+              setShowEditForm(true);
+            }}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '8px 14px',
+              fontSize: 13,
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+              background: 'var(--bg-secondary)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 6,
+              cursor: 'pointer',
+            }}
+          >
+            <Pencil size={13} /> Edit deal details
+          </button>
+        }
+        dangerSlot={
+          <ArchiveDealButton
+            dealId={deal.id}
+            dealName={deal.name}
+            isArchived={deal.status === 'archived'}
+            onArchived={() => {
+              showToast('Deal archived. Documents purge after the grace window.', 'success');
+              router.push('/dashboard/deals');
+            }}
+          />
+        }
+      />
+
+      <DealFormModal
+        open={showEditForm}
+        onOpenChange={setShowEditForm}
+        deal={deal as unknown as DealSummary}
+        onSuccess={() => mutate()}
+      />
     </ErrorBoundary>
   );
 }
 
-// ─── Documents Tab ────────────────────────────────────────────────────────────
+/* ────────────────────────────────────────────────────────────── */
+/*                  Helper components                             */
+/* ────────────────────────────────────────────────────────────── */
+
+function Chip({ color, children }: { color: string; children: React.ReactNode }) {
+  return (
+    <span
+      style={{
+        fontSize: 10.5,
+        fontWeight: 700,
+        color,
+        background: `${color}18`,
+        border: `1px solid ${color}33`,
+        padding: '2px 8px',
+        borderRadius: 999,
+        letterSpacing: '0.04em',
+        textTransform: 'capitalize',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {children}
+    </span>
+  );
+}
+
+function IcCountdownChip({ icDate }: { icDate: string }) {
+  const ms = new Date(icDate).getTime() - Date.now();
+  if (Number.isNaN(ms)) return null;
+  const days = Math.ceil(ms / (1000 * 60 * 60 * 24));
+  const isOverdue = days < 0;
+  const isImminent = !isOverdue && days <= 7;
+  const color = isOverdue
+    ? 'var(--severity-critical)'
+    : isImminent
+      ? 'var(--severity-medium)'
+      : 'var(--info)';
+  const label = isOverdue
+    ? `IC ${Math.abs(days)}d overdue`
+    : days === 0
+      ? 'IC today'
+      : `IC in ${days}d`;
+  return (
+    <span
+      title={`IC date · ${new Date(icDate).toISOString().slice(0, 10)}`}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 4,
+        fontSize: 10.5,
+        fontWeight: 700,
+        color,
+        background: `color-mix(in srgb, ${color} 12%, transparent)`,
+        border: `1px solid ${color}`,
+        padding: '2px 8px',
+        borderRadius: 999,
+        letterSpacing: '0.04em',
+      }}
+    >
+      <Clock size={11} /> {label}
+    </span>
+  );
+}
+
+function ArchiveDealButton({
+  dealId,
+  dealName,
+  isArchived,
+  onArchived,
+}: {
+  dealId: string;
+  dealName: string;
+  isArchived: boolean;
+  onArchived: () => void;
+}) {
+  const [confirming, setConfirming] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { showToast } = useToast();
+
+  if (isArchived) {
+    return (
+      <div
+        style={{
+          fontSize: 12,
+          color: 'var(--text-muted)',
+          fontStyle: 'italic',
+          padding: '8px 14px',
+          background: 'var(--bg-tertiary)',
+          border: '1px solid var(--border-color)',
+          borderRadius: 6,
+        }}
+      >
+        Deal already archived. Attached documents are scheduled for purge after the grace window.
+      </div>
+    );
+  }
+
+  const handleArchive = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/deals/${dealId}/archive`, { method: 'POST' });
+      if (res.ok) {
+        onArchived();
+      } else {
+        // Body-parse fallback so we can surface the API's error message.
+        const body = await res.json().catch(() => null);
+        const msg =
+          body && typeof body.error === 'string'
+            ? body.error
+            : `Archive failed (HTTP ${res.status})`;
+        showToast(msg, 'error');
+        setLoading(false);
+        setConfirming(false);
+      }
+    } catch {
+      showToast('Archive failed. Please try again.', 'error');
+      setLoading(false);
+    }
+  };
+
+  if (!confirming) {
+    return (
+      <button
+        type="button"
+        onClick={() => setConfirming(true)}
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 6,
+          padding: '8px 14px',
+          fontSize: 13,
+          fontWeight: 600,
+          color: 'var(--severity-critical)',
+          background: 'transparent',
+          border: '1px solid var(--severity-critical)',
+          borderRadius: 6,
+          cursor: 'pointer',
+        }}
+      >
+        <Archive size={13} /> Archive deal
+      </button>
+    );
+  }
+
+  return (
+    <div style={{ display: 'grid', gap: 8 }}>
+      <p style={{ margin: 0, fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+        Archiving <strong>{dealName}</strong> marks it as archived and soft-deletes attached
+        documents. They will be permanently purged after the retention grace window. This
+        action is recoverable during the grace window only via support.
+      </p>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <button
+          type="button"
+          onClick={handleArchive}
+          disabled={loading}
+          style={{
+            flex: 1,
+            padding: '8px 14px',
+            fontSize: 13,
+            fontWeight: 600,
+            color: '#fff',
+            background: 'var(--severity-critical)',
+            border: 'none',
+            borderRadius: 6,
+            cursor: loading ? 'wait' : 'pointer',
+            opacity: loading ? 0.6 : 1,
+          }}
+        >
+          {loading ? 'Archiving…' : 'Confirm archive'}
+        </button>
+        <button
+          type="button"
+          onClick={() => setConfirming(false)}
+          style={{
+            padding: '8px 14px',
+            fontSize: 13,
+            fontWeight: 500,
+            color: 'var(--text-secondary)',
+            background: 'transparent',
+            border: '1px solid var(--border-color)',
+            borderRadius: 6,
+            cursor: 'pointer',
+          }}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/*                  Documents Tab                                 */
+/* ────────────────────────────────────────────────────────────── */
 
 function DocumentsTab({
   documents,
@@ -457,9 +684,6 @@ function DocumentsTab({
   const router = useRouter();
   const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
 
-  // Compare URL: 2-3 docs only (matches /dashboard/compare cap). The
-  // chip mirrors the canonical pattern from src/app/(platform)/dashboard/page.tsx
-  // documents browse — same vocabulary so users learn the discipline once.
   const selectedCount = selectedDocs.size;
   const canCompare = selectedCount >= 2 && selectedCount <= 3;
   const compareHref = canCompare
@@ -485,7 +709,7 @@ function DocumentsTab({
             padding: '40px 20px',
             background: 'var(--bg-card)',
             borderRadius: 10,
-            border: '1px dashed var(--bg-active)',
+            border: '1px dashed var(--border-color)',
           }}
         >
           <FileText size={32} style={{ color: 'var(--text-muted)', marginBottom: 8 }} />
@@ -523,10 +747,6 @@ function DocumentsTab({
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
       <InlineDealUploadZone dealId={dealId} dealName={dealName} onUploaded={onUploaded} />
 
-      {/* Multi-select header — S15-fix lock 2026-04-30. Mirrors the
-          /dashboard documents browse multi-select pattern so users
-          learn the discipline once. Compare chip activates at 2-3
-          selected; deeper than 3 is disabled with hint. */}
       {documents.length >= 2 && (
         <div
           style={{
@@ -568,9 +788,7 @@ function DocumentsTab({
                 cursor: 'pointer',
               }}
             />
-            {selectedCount > 0
-              ? `${selectedCount} selected`
-              : `${documents.length} documents`}
+            {selectedCount > 0 ? `${selectedCount} selected` : `${documents.length} documents`}
           </label>
           <Link
             href={compareHref}
@@ -587,7 +805,9 @@ function DocumentsTab({
               padding: '4px 10px',
               borderRadius: 'var(--radius-full)',
               background: compareActive ? 'rgba(22, 163, 74, 0.08)' : 'var(--bg-tertiary)',
-              border: `1px solid ${compareActive ? 'rgba(22, 163, 74, 0.22)' : 'var(--border-color)'}`,
+              border: `1px solid ${
+                compareActive ? 'rgba(22, 163, 74, 0.22)' : 'var(--border-color)'
+              }`,
               cursor: compareActive ? 'pointer' : 'not-allowed',
               textDecoration: 'none',
             }}
@@ -600,9 +820,6 @@ function DocumentsTab({
 
       {documents.map(doc => {
         const latestScore = doc.analyses?.[0]?.overallScore;
-        // Use gradeMetaFromScore(...).color (raw hex from GRADE_THRESHOLDS) here
-        // because the chip below concatenates `${scoreColour}18`/`${scoreColour}33`
-        // alpha suffixes which require hex, not CSS var expressions.
         const scoreColour =
           latestScore === undefined ? null : gradeMetaFromScore(latestScore).color;
         const isSelected = selectedDocs.has(doc.id);
@@ -732,7 +949,9 @@ function DocumentsTab({
   );
 }
 
-// ─── Bias Summary Tab ─────────────────────────────────────────────────────────
+/* ────────────────────────────────────────────────────────────── */
+/*                  Bias Summary (Findings) Tab                   */
+/* ────────────────────────────────────────────────────────────── */
 
 function BiasSummaryTab({
   documents,
@@ -751,295 +970,124 @@ function BiasSummaryTab({
           padding: '40px 20px',
           color: 'var(--text-muted)',
           fontSize: 13,
+          border: '1px dashed var(--border-color)',
+          borderRadius: 'var(--radius-md, 8px)',
         }}
       >
-        No documents to summarize. Upload and analyze deal documents first.
+        No documents to summarise. Upload and analyze deal documents first.
+      </div>
+    );
+  }
+
+  if (analyzedCount === 0) {
+    return (
+      <div
+        style={{
+          textAlign: 'center',
+          padding: '40px 20px',
+          color: 'var(--text-muted)',
+          fontSize: 13,
+          border: '1px dashed var(--border-color)',
+          borderRadius: 'var(--radius-md, 8px)',
+        }}
+      >
+        Documents are still analyzing. Findings appear once at least one analysis completes.
       </div>
     );
   }
 
   const allBiases = aggregation?.allBiases ?? [];
+  const biasFrequency: Record<string, number> = {};
+  for (const bias of allBiases) {
+    biasFrequency[bias.biasType] = (biasFrequency[bias.biasType] ?? 0) + 1;
+  }
+  const sortedBiases = Object.entries(biasFrequency).sort(([, a], [, b]) => b - a);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       <div
         style={{
           background: 'var(--bg-card)',
-          border: '1px solid var(--bg-elevated)',
-          borderRadius: 10,
-          padding: '18px 22px',
+          border: '1px solid var(--border-color)',
+          borderRadius: 'var(--radius-md, 8px)',
+          padding: 16,
         }}
       >
-        <div
+        <h3
           style={{
-            fontSize: 14,
-            fontWeight: 600,
-            color: 'var(--text-primary)',
-            marginBottom: 6,
-          }}
-        >
-          Bias signature across this deal
-        </div>
-        <div
-          style={{
-            fontSize: 12.5,
+            margin: 0,
+            fontSize: 13,
+            fontWeight: 700,
             color: 'var(--text-secondary)',
-            lineHeight: 1.6,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            marginBottom: 10,
           }}
         >
-          {analyzedCount} of {documents.length} document
-          {documents.length !== 1 ? 's' : ''} analyzed. The composite Deal DQI and recurring biases
-          are shown above the tabs. Below: every bias flagged on any document linked to this deal,
-          ranked by how many documents share it.
-        </div>
-      </div>
-
-      {allBiases.length > 0 ? (
-        <div
-          style={{
-            background: 'var(--bg-card)',
-            border: '1px solid var(--bg-elevated)',
-            borderRadius: 10,
-            overflow: 'hidden',
-          }}
-        >
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 80px 80px 80px',
-              gap: 12,
-              padding: '10px 16px',
-              background: 'var(--bg-elevated)',
-              fontSize: 11,
-              fontWeight: 800,
-              letterSpacing: '0.06em',
-              textTransform: 'uppercase',
-              color: 'var(--text-muted)',
-            }}
-          >
-            <div>Bias</div>
-            <div style={{ textAlign: 'right' }}>Docs</div>
-            <div style={{ textAlign: 'right' }}>Flags</div>
-            <div style={{ textAlign: 'right' }}>Top sev.</div>
+          Aggregated bias signature · {allBiases.length} flag{allBiases.length === 1 ? '' : 's'}{' '}
+          across {analyzedCount} document{analyzedCount === 1 ? '' : 's'}
+        </h3>
+        {sortedBiases.length === 0 ? (
+          <div style={{ fontSize: 12.5, color: 'var(--text-muted)', fontStyle: 'italic' }}>
+            No bias flags surfaced across the analyzed documents.
           </div>
-          {allBiases.map(b => (
-            <div
-              key={b.biasType}
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 80px 80px 80px',
-                gap: 12,
-                padding: '10px 16px',
-                borderTop: '1px solid var(--bg-elevated)',
-                fontSize: 12.5,
-                color: 'var(--text-primary)',
-                alignItems: 'center',
-              }}
-            >
-              <div style={{ fontWeight: 600 }}>
-                {b.biasType
-                  .split('_')
-                  .map(w => w[0]?.toUpperCase() + w.slice(1))
-                  .join(' ')}
-              </div>
+        ) : (
+          <div style={{ display: 'grid', gap: 6 }}>
+            {sortedBiases.slice(0, 12).map(([type, count]) => (
               <div
-                style={{
-                  textAlign: 'right',
-                  fontVariantNumeric: 'tabular-nums',
-                  color: b.documentCount >= 2 ? 'var(--accent-primary)' : 'var(--text-secondary)',
-                  fontWeight: b.documentCount >= 2 ? 700 : 500,
-                }}
-              >
-                {b.documentCount}
-              </div>
-              <div
-                style={{
-                  textAlign: 'right',
-                  fontVariantNumeric: 'tabular-nums',
-                  color: 'var(--text-secondary)',
-                }}
-              >
-                {b.totalOccurrences}
-              </div>
-              <div
-                style={{
-                  textAlign: 'right',
-                  fontSize: 11,
-                  fontWeight: 600,
-                  textTransform: 'capitalize',
-                  color:
-                    b.topSeverity === 'critical'
-                      ? 'var(--severity-critical)'
-                      : b.topSeverity === 'high'
-                        ? 'var(--severity-high)'
-                        : b.topSeverity === 'medium'
-                          ? 'var(--warning)'
-                          : 'var(--info)',
-                }}
-              >
-                {b.topSeverity}
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div
-          style={{
-            fontSize: 12.5,
-            color: 'var(--text-muted)',
-            padding: '14px 18px',
-            background: 'var(--bg-card)',
-            borderRadius: 10,
-            border: '1px dashed var(--border-color)',
-          }}
-        >
-          {analyzedCount === 0
-            ? 'Analyze the linked documents to see the deal-level bias signature.'
-            : 'No biases flagged on the analyzed documents — clean reasoning so far.'}
-        </div>
-      )}
-
-      {analyzedCount > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 800,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              color: 'var(--text-muted)',
-              marginBottom: 4,
-            }}
-          >
-            Drill into individual analyses
-          </div>
-          {documents
-            .filter(d => d.status === 'analyzed')
-            .map(doc => (
-              <Link
-                key={doc.id}
-                href={`/documents/${doc.id}`}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  fontSize: 12,
-                  color: 'var(--accent-primary)',
-                  textDecoration: 'none',
-                }}
-              >
-                <FileText size={12} />
-                {doc.filename} — view audit
-              </Link>
-            ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Outcome Tab ──────────────────────────────────────────────────────────────
-
-interface ROIData {
-  ticketSize: number;
-  totalBiasesDetected: number;
-  confirmedBiases: number;
-  biasImpactRate: number;
-  valueProtected: number;
-  breakdown: { biasType: string; confirmed: boolean; estimatedLoss: number }[];
-}
-
-function ValueProtectedCard({ dealId }: { dealId: string }) {
-  const [roi, setRoi] = useState<ROIData | null>(null);
-
-  useEffect(() => {
-    fetch(`/api/deals/${dealId}/roi`)
-      .then(r => (r.ok ? r.json() : null))
-      .then(d => setRoi(d))
-      .catch(() => null);
-  }, [dealId]);
-
-  if (!roi || roi.valueProtected === 0) return null;
-
-  return (
-    <div
-      style={{
-        background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(59, 130, 246, 0.06))',
-        border: '1px solid rgba(34, 197, 94, 0.2)',
-        borderRadius: 10,
-        padding: '18px 22px',
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-        <Shield className="w-4 h-4" style={{ color: 'var(--success)' }} />
-        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--success)' }}>Value Protected</span>
-      </div>
-
-      <div style={{ fontSize: 28, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
-        ${roi.valueProtected.toLocaleString()}
-      </div>
-      <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16 }}>
-        Estimated capital protected by bias detection on ${roi.ticketSize.toLocaleString()} ticket
-      </div>
-
-      <div style={{ display: 'flex', gap: 16, marginBottom: 12 }}>
-        <div>
-          <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Biases Detected</div>
-          <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>
-            {roi.totalBiasesDetected}
-          </div>
-        </div>
-        <div>
-          <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Confirmed</div>
-          <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--success)' }}>
-            {roi.confirmedBiases}
-          </div>
-        </div>
-        <div>
-          <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Impact Rate</div>
-          <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>
-            {Math.round(roi.biasImpactRate * 100)}%
-          </div>
-        </div>
-      </div>
-
-      {roi.breakdown.filter(b => b.confirmed).length > 0 && (
-        <div style={{ borderTop: '1px solid var(--bg-card-hover)', paddingTop: 10 }}>
-          <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6 }}>
-            Confirmed Bias Breakdown
-          </div>
-          {roi.breakdown
-            .filter(b => b.confirmed)
-            .map((b, i) => (
-              <div
-                key={i}
+                key={type}
                 style={{
                   display: 'flex',
                   justifyContent: 'space-between',
-                  fontSize: 12,
-                  color: 'var(--text-secondary)',
-                  padding: '3px 0',
+                  alignItems: 'center',
+                  padding: '8px 12px',
+                  background: 'var(--bg-secondary)',
+                  borderRadius: 'var(--radius-sm)',
+                  fontSize: 12.5,
                 }}
               >
-                <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <TrendingUp className="w-3 h-3" style={{ color: 'var(--success)' }} />
-                  {b.biasType}
+                <span style={{ color: 'var(--text-primary)', textTransform: 'capitalize' }}>
+                  {type.replace(/_/g, ' ').replace(/bias$/i, '').trim()}
                 </span>
-                <span style={{ fontWeight: 600, fontFamily: "'JetBrains Mono', monospace" }}>
-                  ${b.estimatedLoss.toLocaleString()}
+                <span
+                  style={{
+                    fontWeight: 700,
+                    color: 'var(--accent-primary)',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  ×{count}
                 </span>
               </div>
             ))}
-        </div>
-      )}
+          </div>
+        )}
+      </div>
 
-      <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 10, fontStyle: 'italic' }}>
-        Methodology: ticket size x research-based loss rate per confirmed bias type (Kahneman,
-        Malmendier & Tate)
+      <div
+        style={{
+          background: 'var(--bg-secondary)',
+          border: '1px solid var(--border-color)',
+          borderLeft: '3px solid var(--info)',
+          borderRadius: 'var(--radius-md, 8px)',
+          padding: 14,
+          fontSize: 12.5,
+          color: 'var(--text-secondary)',
+          lineHeight: 1.55,
+        }}
+      >
+        <strong style={{ color: 'var(--text-primary)' }}>What's shown:</strong> aggregated bias
+        flags across every analyzed document in this deal. The cross-reference card on the
+        composite pane shows where the documents <em>contradict</em> each other — the second
+        signal an audit-committee reader looks for.
       </div>
     </div>
   );
 }
+
+/* ────────────────────────────────────────────────────────────── */
+/*                  Outcome Tab                                   */
+/* ────────────────────────────────────────────────────────────── */
 
 function OutcomeTab({
   deal,
@@ -1049,19 +1097,14 @@ function OutcomeTab({
   onUpdate: () => void;
 }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      {/* Value Protected Card */}
-      <ValueProtectedCard dealId={deal.id} />
-
-      {/* Display existing outcome */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {deal.outcome && <DealOutcomeDisplay outcome={deal.outcome} currency={deal.currency} />}
 
-      {/* Outcome notes */}
       {deal.outcome?.notes && (
         <div
           style={{
             background: 'var(--bg-card)',
-            border: '1px solid var(--bg-elevated)',
+            border: '1px solid var(--border-color)',
             borderRadius: 10,
             padding: '14px 18px',
           }}
@@ -1071,28 +1114,13 @@ function OutcomeTab({
           >
             Notes
           </div>
-          <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+          <div style={{ fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.5 }}>
             {deal.outcome.notes}
           </div>
         </div>
       )}
 
-      {/* Form */}
-      <div
-        style={{
-          background: 'var(--bg-card)',
-          border: '1px solid var(--bg-elevated)',
-          borderRadius: 10,
-          padding: '18px 22px',
-        }}
-      >
-        <DealOutcomeForm
-          dealId={deal.id}
-          currency={deal.currency}
-          existingOutcome={deal.outcome}
-          onSuccess={onUpdate}
-        />
-      </div>
+      <DealOutcomeForm dealId={deal.id} currency={deal.currency} onSuccess={onUpdate} />
     </div>
   );
 }

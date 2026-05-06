@@ -1,26 +1,28 @@
 /**
- * DocumentDetailShell — the new McKinsey-grade doc-detail layout.
+ * DecisionDetailShell — the McKinsey-grade detail layout shared across
+ * every "decision under audit" surface: standalone documents, deals,
+ * decision packages.
  *
- * Two-pane architecture (locked 2026-05-05):
+ * Two-pane architecture (locked 2026-05-05, generalised 2026-05-06):
  *
  *   ┌─── Header (sticky, minimal) ───────────────────────┐
- *   │  filename · DqiPill · classification · Export DPR  │
+ *   │  title · DqiPill · classification · primary action │
  *   └────────────────────────────────────────────────────┘
- *   ┌── PDF / Text pane (~58%) ──┬── Audit pane (~42%) ──┐
- *   │  BiasAnnotatedPDFViewer    │  Tab bar              │
- *   │  or extracted-text fallback│  ─────                │
- *   │  or empty-preview state    │  Tab content          │
- *   │                            │  ⚙ corner gear        │
- *   └────────────────────────────┴───────────────────────┘
+ *   ┌── Evidence pane (~58%) ──┬── Audit pane (~42%) ────┐
+ *   │  PDF / docs list / text  │  Tab bar                │
+ *   │  or empty-preview state  │  ─────                  │
+ *   │                          │  Tab content            │
+ *   │                          │  ⚙ corner gear          │
+ *   └──────────────────────────┴─────────────────────────┘
  *
- * The PDF pane and audit pane are linked: clicking a finding in the
- * audit pane scrolls the PDF to the highlighted passage; clicking a
- * highlight jumps the audit pane to that finding.
+ * Shell is layout-only — it doesn't own data state. Parent passes the
+ * tabs array, active tab, and slot content. The shell handles header
+ * chrome, sticky behaviour, mobile collapse, and corner-gear settings
+ * trigger.
  *
- * Shell is layout-only — it doesn't own analysis state. Parent passes
- * the document, analysis, biases, and the activeBiasId controlled by
- * the linked-PDF event bus. Tab content is supplied via children +
- * tabId switch.
+ * The original `DocumentDetailShell` export is aliased to
+ * `DecisionDetailShell` for backward compatibility — both names point
+ * at the same generic component now that deals and packages share it.
  */
 
 'use client';
@@ -30,6 +32,11 @@ import { Settings as SettingsIcon, FileText } from 'lucide-react';
 import { DqiPill } from './primitives/DqiPill';
 import styles from './DocumentDetailShell.module.css';
 
+/**
+ * Legacy 5-tab union for the document-detail page. Other detail
+ * pages (deals, packages) supply their own union via the generic
+ * `tabs` prop on `DecisionDetailShellProps`.
+ */
 export type DocDetailTab =
   | 'findings'
   | 'actions'
@@ -37,43 +44,65 @@ export type DocDetailTab =
   | 'perspectives'
   | 'regulatory';
 
-export interface DocumentDetailShellProps {
-  /** Document filename — header H1. */
-  filename: string;
-  /** DQI score (0-100) for the header pill. */
-  dqiScore: number | null;
-  /** Optional classification chip text. */
-  classification?: 'specimen' | 'confidential' | 'client-safe-export' | 'sample';
-  /** Header's primary action (e.g. "Share & Export DPR"). */
-  primaryAction?: { label: string; onClick: () => void };
-  /** Active tab. */
-  activeTab: DocDetailTab;
-  onTabChange: (tab: DocDetailTab) => void;
-  /** Active bias id for cross-pane sync. */
-  activeBiasId?: string | null;
-  /** Render the left pane. Parent supplies a PDF viewer, text fallback, or empty state. */
-  leftPane: ReactNode;
-  /** Right-pane tab content. Parent renders the active tab's body. */
-  rightPaneContent: ReactNode;
-  /** Whether the active document type supports inline preview. */
-  hasPreview?: boolean;
-  /** Settings drawer trigger — parent owns drawer state. */
-  onOpenSettings: () => void;
-  /** Optional outcome-due strip below header. */
-  outcomeStrip?: ReactNode;
-  /** Optional toxic alert / pre-decision strip ABOVE the panes. */
-  topAlert?: ReactNode;
-  /** Optional breadcrumb row above the header. */
-  breadcrumbs?: ReactNode;
-}
-
-const TAB_DEFS: { id: DocDetailTab; label: string }[] = [
+const DOC_TAB_DEFS: { id: DocDetailTab; label: string }[] = [
   { id: 'findings', label: 'Findings' },
   { id: 'actions', label: 'Actions' },
   { id: 'stress', label: 'Stress test' },
   { id: 'perspectives', label: 'Perspectives' },
   { id: 'regulatory', label: 'Regulatory' },
 ];
+
+export interface DetailShellTab {
+  id: string;
+  label: string;
+  /** Optional badge — e.g. "3" or "new". */
+  badge?: number | string;
+  /** When false, tab renders disabled with a tooltip. */
+  available?: boolean;
+}
+
+export interface DecisionDetailShellProps {
+  /** Header H1 — filename for documents, deal name for deals, package name for packages. */
+  title: string;
+  /** DQI score (0-100) for the header pill — null when no audit yet. */
+  dqiScore: number | null;
+  /** Optional classification chip text. */
+  classification?: 'specimen' | 'confidential' | 'client-safe-export' | 'sample';
+  /** Optional per-detail-page header chips slotted to the right of the DqiPill (stage, IC date countdown, status). */
+  headerChips?: ReactNode;
+  /** Header's primary action (e.g. "Share & Export DPR" / "Export Deal DPR"). */
+  primaryAction?: { label: string; onClick: () => void };
+  /** Tab definitions — array of { id, label, badge?, available? }. */
+  tabs?: DetailShellTab[];
+  /** Active tab id. */
+  activeTab: string;
+  onTabChange: (tab: string) => void;
+  /** Render the left pane. Parent supplies a PDF viewer, doc list, text fallback, or empty state. */
+  leftPane: ReactNode;
+  /** Right-pane tab content. Parent renders the active tab's body. */
+  rightPaneContent: ReactNode;
+  /** Whether the active surface supports inline preview. False renders the empty-preview placeholder. */
+  hasPreview?: boolean;
+  /** Settings drawer trigger — parent owns drawer state. */
+  onOpenSettings: () => void;
+  /** Optional outcome-due / version-history strip below header. */
+  outcomeStrip?: ReactNode;
+  /** Optional toxic alert / pre-decision strip ABOVE the panes. */
+  topAlert?: ReactNode;
+  /** Optional breadcrumb row above the header. */
+  breadcrumbs?: ReactNode;
+  /** Settings button aria-label / title — defaults to "Document settings". */
+  settingsLabel?: string;
+}
+
+/** Backward-compatible alias preserving the doc-detail page's existing import. */
+export interface DocumentDetailShellProps extends Omit<DecisionDetailShellProps, 'title' | 'tabs' | 'activeTab' | 'onTabChange'> {
+  filename: string;
+  activeTab: DocDetailTab;
+  onTabChange: (tab: DocDetailTab) => void;
+  /** Active bias id for cross-pane sync — passthrough; not consumed by the shell. */
+  activeBiasId?: string | null;
+}
 
 const CLASSIFICATION_TONE: Record<NonNullable<DocumentDetailShellProps['classification']>, {
   bg: string;
@@ -102,12 +131,19 @@ const CLASSIFICATION_TONE: Record<NonNullable<DocumentDetailShellProps['classifi
   },
 };
 
-export function DocumentDetailShell(props: DocumentDetailShellProps) {
+/**
+ * Generic shell consumed by deals + packages + documents. Documents go
+ * through the `DocumentDetailShell` alias below, which forwards into
+ * this component with the legacy 5-tab DOC_TAB_DEFS preset.
+ */
+export function DecisionDetailShell(props: DecisionDetailShellProps) {
   const {
-    filename,
+    title,
     dqiScore,
     classification = 'confidential',
+    headerChips,
     primaryAction,
+    tabs,
     activeTab,
     onTabChange,
     leftPane,
@@ -117,9 +153,14 @@ export function DocumentDetailShell(props: DocumentDetailShellProps) {
     outcomeStrip,
     topAlert,
     breadcrumbs,
+    settingsLabel = 'Settings',
   } = props;
 
+  const resolvedTabs: DetailShellTab[] = tabs ?? DOC_TAB_DEFS;
   const tone = CLASSIFICATION_TONE[classification];
+
+  // Map the legacy variable name `filename` references in JSX below.
+  const filename = title;
 
   return (
     <div
@@ -166,6 +207,7 @@ export function DocumentDetailShell(props: DocumentDetailShellProps) {
           </h1>
         </div>
         <DqiPill score={dqiScore} size="md" />
+        {headerChips}
         <span
           style={{
             display: 'inline-flex',
@@ -275,13 +317,20 @@ export function DocumentDetailShell(props: DocumentDetailShellProps) {
               marginBottom: 18,
             }}
           >
-            {TAB_DEFS.map(t => {
+            {resolvedTabs.map(t => {
               const active = t.id === activeTab;
+              const disabled = t.available === false;
               return (
                 <button
                   key={t.id}
                   type="button"
-                  onClick={() => onTabChange(t.id)}
+                  disabled={disabled}
+                  onClick={() => !disabled && onTabChange(t.id)}
+                  title={
+                    disabled
+                      ? `${t.label} — no data on this surface yet.`
+                      : t.label
+                  }
                   style={{
                     padding: '10px 14px',
                     background: 'transparent',
@@ -290,21 +339,47 @@ export function DocumentDetailShell(props: DocumentDetailShellProps) {
                       ? '2px solid var(--accent-primary)'
                       : '2px solid transparent',
                     marginBottom: -1,
-                    color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
+                    color: disabled
+                      ? 'var(--text-muted)'
+                      : active
+                        ? 'var(--text-primary)'
+                        : 'var(--text-secondary)',
                     fontSize: 13,
                     fontWeight: active ? 600 : 500,
-                    cursor: 'pointer',
+                    cursor: disabled ? 'not-allowed' : 'pointer',
+                    opacity: disabled ? 0.55 : 1,
                     transition: 'color 0.15s ease, border-color 0.15s ease',
                     letterSpacing: '-0.005em',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
                   }}
                   onMouseEnter={e => {
-                    if (!active) e.currentTarget.style.color = 'var(--text-primary)';
+                    if (!active && !disabled) e.currentTarget.style.color = 'var(--text-primary)';
                   }}
                   onMouseLeave={e => {
-                    if (!active) e.currentTarget.style.color = 'var(--text-secondary)';
+                    if (!active && !disabled) e.currentTarget.style.color = 'var(--text-secondary)';
                   }}
                 >
                   {t.label}
+                  {t.badge != null && (
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        padding: '1px 6px',
+                        borderRadius: 999,
+                        background: active
+                          ? 'var(--accent-primary)'
+                          : 'var(--bg-tertiary)',
+                        color: active ? '#fff' : 'var(--text-muted)',
+                        minWidth: 16,
+                        textAlign: 'center',
+                      }}
+                    >
+                      {t.badge}
+                    </span>
+                  )}
                 </button>
               );
             })}
@@ -312,8 +387,8 @@ export function DocumentDetailShell(props: DocumentDetailShellProps) {
             <button
               type="button"
               onClick={onOpenSettings}
-              aria-label="Document settings"
-              title="Document settings"
+              aria-label={settingsLabel}
+              title={settingsLabel}
               style={{
                 width: 28,
                 height: 28,
@@ -403,5 +478,32 @@ function EmptyPreviewState() {
         cross-reference.
       </div>
     </div>
+  );
+}
+
+/**
+ * DocumentDetailShell — backward-compat alias preserving the original
+ * 5-tab document-detail API so the existing /documents/[id] page
+ * doesn't need to migrate. New surfaces (deals, packages) call
+ * DecisionDetailShell directly with their own tabs[] array.
+ */
+export function DocumentDetailShell({
+  filename,
+  activeTab,
+  onTabChange,
+  // activeBiasId is consumed by parent for cross-pane sync; the shell
+  // only forwards it as a prop without rendering anything from it.
+  activeBiasId: _activeBiasId,
+  ...rest
+}: DocumentDetailShellProps) {
+  void _activeBiasId;
+  return (
+    <DecisionDetailShell
+      title={filename}
+      activeTab={activeTab}
+      onTabChange={tab => onTabChange(tab as DocDetailTab)}
+      settingsLabel="Document settings"
+      {...rest}
+    />
   );
 }
