@@ -72,7 +72,9 @@ export type AuditAction =
   // Tier 2 ships (2026-04-27)
   | 'CLAIM_DEMO_ANALYSIS' // D9 — visitor claims a /demo audit into their new account
   | 'GRAPH_SHARE_CREATED' // A2 — Decision Knowledge Graph share link created
-  | 'GRAPH_SHARE_REVOKED'; // A2 — graph share link revoked
+  | 'GRAPH_SHARE_REVOKED' // A2 — graph share link revoked
+  // Deal lifecycle (2026-05-06)
+  | 'ARCHIVE_DEAL'; // POST /api/deals/[id]/archive — soft-archive deal + cascade-soft-delete docs
 
 export interface AuditLogParams {
   action: AuditAction;

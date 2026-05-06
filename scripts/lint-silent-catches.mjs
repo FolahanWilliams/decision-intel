@@ -84,7 +84,14 @@ const SCAN_DIR = join(ROOT, 'src');
 // /documents/[id]/v2 page refetch handler. Same body-parsing exception
 // class — the v2 page parses non-2xx response bodies to surface the
 // real API error message in the toast / error banner.
-const SILENT_CATCH_BASELINE = 157;
+// 2026-05-06 (later, hardening sweep 62a3fe6b): RATCHETED DOWN 157 → 153
+// after the Antigravity hardening commit upgraded 4 silent catches in
+// encryption.ts / plan-limits.ts / cron-lock.ts / json.ts /
+// supabase/server.ts / chat/sessions/route.ts to log.warn calls.
+// "Reducing is encouraged" per the file header — every legitimate
+// silent catch the founder is willing to log.warn drops the noise floor
+// for the next audit.
+const SILENT_CATCH_BASELINE = 153;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /
