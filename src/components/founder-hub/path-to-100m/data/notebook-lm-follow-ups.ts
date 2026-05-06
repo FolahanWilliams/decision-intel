@@ -132,4 +132,3 @@ export const NOTEBOOKLM_FOLLOW_UPS: NotebookLmFollowUp[] = [
 // =========================================================================
 // SECTION 14 · MARKET REALITY CHECK (NotebookLM 2026-04-28 brutal-critique synthesis)
 // =========================================================================
-

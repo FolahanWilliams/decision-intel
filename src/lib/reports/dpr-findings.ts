@@ -104,12 +104,9 @@ export function deriveDprFindings(
     const augmentRow = augment[biasType] ?? {};
     const hardening = getHardeningQuestion(biasType);
 
-    const severity =
-      augmentRow.severityOverride ??
-      computeSeverity(counterfactual, regulatory);
+    const severity = augmentRow.severityOverride ?? computeSeverity(counterfactual, regulatory);
     const confidence =
-      augmentRow.confidenceOverride ??
-      computeConfidence(counterfactual, regulatory);
+      augmentRow.confidenceOverride ?? computeConfidence(counterfactual, regulatory);
 
     findings.push({
       biasType,
@@ -184,10 +181,7 @@ function prettyBiasLabel(biasType: string): string {
     .join(' ');
 }
 
-function indexBy<T, K extends string | number>(
-  items: T[],
-  key: (item: T) => K
-): Record<K, T> {
+function indexBy<T, K extends string | number>(items: T[], key: (item: T) => K): Record<K, T> {
   const out = {} as Record<K, T>;
   for (const item of items) {
     out[key(item)] = item;

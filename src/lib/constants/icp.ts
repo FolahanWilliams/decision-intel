@@ -250,7 +250,7 @@ export const GOLDNER_3_RULES: ReadonlyArray<string> = [
  * Mr. Reiner's principle — the Wiz advisor's word-of-mouth philosophy.
  */
 export const MR_REINER_PRINCIPLE =
-  "Word-of-mouth is the only marketing channel that scales without paid acquisition. Optimise the Individual tier for shareability — every delighted customer is a referral source if the artefact is good enough to forward. The verifiable-referral graduation rule is the explicit instrumentation of this principle.";
+  'Word-of-mouth is the only marketing channel that scales without paid acquisition. Optimise the Individual tier for shareability — every delighted customer is a referral source if the artefact is good enough to forward. The verifiable-referral graduation rule is the explicit instrumentation of this principle.';
 
 /**
  * Mr. Gabe's principles — captured from the Apr 23 2026 CFO Strategy Call.
@@ -284,10 +284,9 @@ export const SHARRAN_111 = {
 export const CONNECTION_LEVERAGE_ASKS = {
   reiner:
     "Mr. Reiner — Wiz network → US enterprise SaaS / cybersecurity / governance acquirers. Primary ask: 'Who in your network runs strategy, M&A, or corp dev at a US F500 — and would benefit from a 60-second audit on a real strategic memo? I'm looking for 3-5 warm intros to people who'd give me honest 20-minute feedback on the audit, even if they're not buying.' Output target: 3-5 US-side warm intros in 8 weeks; convert ≥1 to design-partner / paid Individual.",
-  gabe:
-    "Mr. Gabe (Gabriel Osamor, CEO of Megasuto) — UK investor-side network → UK CSO + corp dev contacts via his investor relationships. Primary ask: 'The UK companies your investor clients have invested in — do any of them have a CSO, head of strategic planning, or head of corporate development who'd be the right person to give me 20 minutes of feedback on a 60-second audit? I'm not pitching them to buy — I'm collecting honest feedback to sharpen the product before I open Design Foundation pilots.' Output target: 3-5 UK-side warm intros in 8 weeks.",
+  gabe: "Mr. Gabe (Gabriel Osamor, CEO of Megasuto) — UK investor-side network → UK CSO + corp dev contacts via his investor relationships. Primary ask: 'The UK companies your investor clients have invested in — do any of them have a CSO, head of strategic planning, or head of corporate development who'd be the right person to give me 20 minutes of feedback on a 60-second audit? I'm not pitching them to buy — I'm collecting honest feedback to sharpen the product before I open Design Foundation pilots.' Output target: 3-5 UK-side warm intros in 8 weeks.",
   discipline:
-    "Every warm intro = 20-min audit on a real memo, NOT a sales pitch (the artefact does the persuasion). Send the introducer a 4-line follow-up after every intro. Track in Founder Hub Outreach Hub. Pattern-match across 10+ intros before declaring the motion working.",
+    'Every warm intro = 20-min audit on a real memo, NOT a sales pitch (the artefact does the persuasion). Send the introducer a 4-line follow-up after every intro. Track in Founder Hub Outreach Hub. Pattern-match across 10+ intros before declaring the motion working.',
 } as const;
 
 /**
@@ -310,12 +309,13 @@ export const BANNED_VOCABULARY: ReadonlyArray<{ phrase: string; reason: string }
   },
   {
     phrase: 'boardroom strategic decision',
-    reason: 'Audience-narrowing — replaced by "high-stakes call" 2026-04-26, then by "strategic memo" 2026-05-04.',
+    reason:
+      'Audience-narrowing — replaced by "high-stakes call" 2026-04-26, then by "strategic memo" 2026-05-04.',
   },
   {
     phrase: 'company knowledge base',
     reason:
-      "v3.2 lock: dilutes the decision-specific moat into Notion / Confluence / Drive territory. Decision Intel is the decision system of record, NOT the company knowledge base.",
+      'v3.2 lock: dilutes the decision-specific moat into Notion / Confluence / Drive territory. Decision Intel is the decision system of record, NOT the company knowledge base.',
   },
   {
     phrase: 'AI decision tool',
@@ -471,14 +471,15 @@ export const PHASE_1_PERSONAS: ReadonlyArray<Phase1Persona> = [
   {
     id: 'fractional_cso',
     label: 'Fractional CSO / strategy consultant',
-    description:
-      'Independent strategist running 3-5 client engagements with regular memo flow.',
+    description: 'Independent strategist running 3-5 client engagements with regular memo flow.',
     hxcEligible: true,
     graduationPath:
       'Brings DI to one of their client firms as a Strategy tier (£1,999-£4,999/mo) team-tier engagement. The fractional CSO becomes the internal champion + power user.',
     preferredSpecimen: 'either',
-    budgetSignal: 'Personal card / consulting expense; £249/mo absorbs into existing client retainer billing.',
-    dealVolumeSignal: '3-5 active engagements × 4-8 strategic memos / year per client = 15-30 memos / year.',
+    budgetSignal:
+      'Personal card / consulting expense; £249/mo absorbs into existing client retainer billing.',
+    dealVolumeSignal:
+      '3-5 active engagements × 4-8 strategic memos / year per client = 15-30 memos / year.',
   },
   {
     id: 'midmarket_corp_dev',
@@ -489,8 +490,10 @@ export const PHASE_1_PERSONAS: ReadonlyArray<Phase1Persona> = [
     graduationPath:
       'Authorises team-tier purchase at the same firm OR moves to a larger firm and brings the tool. Same buying motion as F500 ceiling at smaller scale.',
     preferredSpecimen: 'wework',
-    budgetSignal: 'Personal card; divisional discretionary spend up to £5K-£10K/yr without procurement.',
-    dealVolumeSignal: '1-3 acquisitions / year + ongoing build-vs-buy decisions = 6-12 strategic memos / year.',
+    budgetSignal:
+      'Personal card; divisional discretionary spend up to £5K-£10K/yr without procurement.',
+    dealVolumeSignal:
+      '1-3 acquisitions / year + ongoing build-vs-buy decisions = 6-12 strategic memos / year.',
   },
   {
     id: 'smaller_fund_gp',
@@ -501,8 +504,10 @@ export const PHASE_1_PERSONAS: ReadonlyArray<Phase1Persona> = [
     graduationPath:
       'Fund itself becomes a Strategy-tier customer at Phase 2 / 3. Fund partner refers to portfolio CSOs (LP-pressure-driven governance asks compound through portfolio).',
     preferredSpecimen: 'dangote',
-    budgetSignal: 'Personal-decisive at GP level; fund management fee covers tooling line items <£5K/yr.',
-    dealVolumeSignal: '4-10 deals / year × 5-7 year hold cycle = 20-70 closed outcomes within 5 years (within Convergence Threshold range).',
+    budgetSignal:
+      'Personal-decisive at GP level; fund management fee covers tooling line items <£5K/yr.',
+    dealVolumeSignal:
+      '4-10 deals / year × 5-7 year hold cycle = 20-70 closed outcomes within 5 years (within Convergence Threshold range).',
   },
   {
     id: 'pe_backed_founder',
@@ -513,8 +518,10 @@ export const PHASE_1_PERSONAS: ReadonlyArray<Phase1Persona> = [
     graduationPath:
       'CEO authorises team-tier upgrade for full strategy team. PE sponsor may mandate adoption across portfolio if reference is strong.',
     preferredSpecimen: 'wework',
-    budgetSignal: 'Founder personal card OR company tooling line; under board / investor reporting threshold.',
-    dealVolumeSignal: '2-6 board-level memos / year + acquisition memos when active = 6-15 memos / year.',
+    budgetSignal:
+      'Founder personal card OR company tooling line; under board / investor reporting threshold.',
+    dealVolumeSignal:
+      '2-6 board-level memos / year + acquisition memos when active = 6-15 memos / year.',
   },
   {
     id: 'other',
@@ -554,8 +561,9 @@ export function isHxcEligible(id: string | null | undefined): boolean {
  * this for sign-up gating where you only want to show the four allowed
  * personas, with 'other' rendered separately as an opt-out path.
  */
-export const PHASE_1_HXC_PERSONAS: ReadonlyArray<Phase1Persona> =
-  PHASE_1_PERSONAS.filter(p => p.hxcEligible);
+export const PHASE_1_HXC_PERSONAS: ReadonlyArray<Phase1Persona> = PHASE_1_PERSONAS.filter(
+  p => p.hxcEligible
+);
 
 /**
  * Phase-graduation gate per Vohra / Superhuman methodology — locked v3.5.

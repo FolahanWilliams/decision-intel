@@ -274,7 +274,7 @@ export const DECKS: EducationDeck[] = [
     id: 'personal_social_archetypes',
     label: 'Personal Social Archetypes',
     description:
-      "The 6 LinkedIn / X post archetypes ranked by 1-1-1 wedge ROI from the NotebookLM master KB synthesis (2026-05-04). Drill these so you can write the post HIMSELF when the AI is unavailable, and so you recognise which archetype a conversation is asking for in real time. Includes the empathic-mode-first META rule and the Polite-but-Brutal Pragmatist voice anchor.",
+      'The 6 LinkedIn / X post archetypes ranked by 1-1-1 wedge ROI from the NotebookLM master KB synthesis (2026-05-04). Drill these so you can write the post HIMSELF when the AI is unavailable, and so you recognise which archetype a conversation is asking for in real time. Includes the empathic-mode-first META rule and the Polite-but-Brutal Pragmatist voice anchor.',
     iconName: 'Linkedin',
     color: '#0A66C2',
     order: 17,
@@ -1155,7 +1155,7 @@ const COGNITIVE_BIASES_CARDS: EducationCard[] = [
       "Prospective hindsight: the cognitive technique of projecting yourself into a future where an event has ALREADY OCCURRED, then explaining how it happened — instead of asking 'what could go wrong?' in conditional voice. Mitchell, Russo & Pennington (1989) showed this framing produces 25-30% more, and substantially higher-quality, failure-cause insights than the conditional alternative. Klein (1995) operationalised it as the pre-mortem technique: 'we are 1 year in the future; the plan was implemented; the outcome was a TOTAL DISASTER; write the HISTORY of that disaster.' Past tense, fait-accompli framing, no 'might' or 'could'. DI's pre-mortem prompts (3 surfaces in src/lib/agents/prompts.ts) enforce this exact framing — locked 2026-04-30 in the paper-application sprint. The mechanism is that generating an EXPLANATION for a fait-accompli outcome fires causal-reasoning circuits that the conditional 'what if' frame doesn't.",
     difficulty: 'advanced',
     applicationContext:
-      "Running a pre-mortem on your own decision in the Founder Hub copilot, OR auditing a memo whose pre-mortem section reads as boilerplate risk-listing.",
+      'Running a pre-mortem on your own decision in the Founder Hub copilot, OR auditing a memo whose pre-mortem section reads as boilerplate risk-listing.',
     source: 'src/lib/agents/prompts.ts + Klein & Mitchell 1995 + Mitchell, Russo, Pennington 1989',
     tag: 'kahneman_klein',
   },
@@ -1189,7 +1189,7 @@ const COGNITIVE_BIASES_CARDS: EducationCard[] = [
     id: 'bias_validity_classifier',
     deckId: 'cognitive_biases',
     prompt:
-      "What is the validity-aware DQI shift (locked 2026-04-30, methodology v2.1.0), and what does it actually change about how DI scores a memo?",
+      'What is the validity-aware DQI shift (locked 2026-04-30, methodology v2.1.0), and what does it actually change about how DI scores a memo?',
     canonicalAnswer:
       "Kahneman & Klein (2009) FIRST condition for trustworthy intuition: the environment must be HIGH-VALIDITY — predictable cue→outcome mappings, rapid feedback (medicine, firefighting, chess all qualify; M&A, market entry, long-horizon strategy do NOT). DI's validity classifier (src/lib/learning/validity-classifier.ts) maps each audit onto one of four bands (high / medium / low / zero) based on documentType + industry + decision horizon. The DQI engine reads the band and applies a STRUCTURAL WEIGHT SHIFT in low- and zero-validity environments: increases historicalAlignment weight (+0.10 in low, +0.20 in zero), increases biasLoad weight, decreases evidenceQuality + processMaturity + complianceRisk weights. The reference-class signal becomes the dominant DQI driver where verifiable facts about the present don't predict outcomes. Methodology version on the result reads '2.1.0' when the shift was applied; '2.0.0-no-validity' for legacy inputs. The DPR cover surfaces the validity band + rationale + methodology version, so a procurement reader can see whether the score in front of them was computed with the validity shift applied.",
     difficulty: 'advanced',
@@ -1203,7 +1203,7 @@ const COGNITIVE_BIASES_CARDS: EducationCard[] = [
     id: 'bias_inside_view_dominance',
     deckId: 'cognitive_biases',
     prompt:
-      "What is inside-view dominance (DI-B-022, Kahneman & Lovallo 2003), and what is the canonical example?",
+      'What is inside-view dominance (DI-B-022, Kahneman & Lovallo 2003), and what is the canonical example?',
     canonicalAnswer:
       "Inside-view dominance: reasoning from CASE-SPECIFIC details (we are talented, motivated, on track, this case is special) while ignoring the historical BASE RATE of similar decisions. Kahneman's canonical example (1976 Israeli curriculum-writing team): the team estimated 18 months to completion, even though the most senior member knew that 40% of such projects had previously been abandoned and the rest averaged 8 years. The inside-view narrative completely dominated the outside-view base rate. The team finished in 8 years. DI-B-022 detects: 'this case is special' / 'the comparables don't apply' / 'industry data doesn't reflect our situation' / projections without grounding in a named comparable set. Severity scales: 'critical' when the memo explicitly dismisses an industry base rate; 'high' when it's silent on base rates; 'medium' when it cites comparables but doesn't engage with their distribution; 'low' when one comparable is named but the fuller class is omitted. New compound interactions: + Planning Fallacy (1.6×), + Overconfidence (1.5×), + Illusion of Validity (1.4×). New toxic combination: 'Reference-Class Blindness' (Inside-View Dominance + Planning Fallacy + Overconfidence) — the canonical Kahneman & Lovallo failure pattern.",
     difficulty: 'advanced',
@@ -1524,7 +1524,8 @@ const FOUNDER_ONELINERS_CARDS: EducationCard[] = [
     canonicalAnswer:
       "WEDGE (next 6 months): Individual buyers @ £249/mo — UK + US CSOs / Heads of M&A / corp dev directors / fractional CSOs. Frictionless, personal-card / t-card budget, zero procurement gate. BRIDGE (months 6-12): Sankore (London office, summer 2026) as the design-partner bridge + 1-2 Individual graduates at £1,999/mo Design Foundation rate or £20-25K founding-pilot bundle. Sankore's strategic value isn't fund-buyer-budget — it's real fund operational insight + reference-grade artefact production. CEILING (12-24+ months): F500 corporate strategy + corp dev M&A teams @ £50K-150K ACV — UK + US primary, cross-border M&A specifically (where the 19-framework regulatory map becomes a live moat layer Cloverpop and IBM watsonx don't carry). THE WEDGE GENERATES THE CASHFLOW + WORD-OF-MOUTH THAT FUNDS THE BRIDGE. THE BRIDGE GENERATES THE PUBLISHED REFERENCES THAT UNLOCK THE CEILING. Do NOT chase enterprise procurement before the graduation rule fires (5 paid Individual + 10 raving + 1 verifiable referral via DPR).",
     difficulty: 'core',
-    applicationContext: 'Should you spend Q3 chasing F500 CSOs or Individual buyers? (Answer: Individual.)',
+    applicationContext:
+      'Should you spend Q3 chasing F500 CSOs or Individual buyers? (Answer: Individual.)',
     source: 'CLAUDE.md ICP — wedge + bridge + ceiling lock 2026-04-30 (GTM Plan v3.2)',
     tag: 'strategic',
   },
@@ -1533,7 +1534,7 @@ const FOUNDER_ONELINERS_CARDS: EducationCard[] = [
     deckId: 'founder_oneliners',
     prompt: 'Which segments do you EXPLICITLY avoid (v3.2), and why?',
     canonicalAnswer:
-      "Three explicit non-target audiences (v3.2 lock): (1) Boutique sell-side M&A advisors — no software budget, relationship-driven, sceptical. (2) Generic small VC funds with no Africa/EM exposure — no procurement need, AUM-per-decision too small, relationship-driven without the capital-allocation pressure that makes the audit valuable. (3) US-only Fortune 500 with zero international M&A exposure — Cloverpop + IBM watsonx will out-bundle us in their backyard; pick fights where the cross-border regulatory moat matters. Note: Pan-African / EM-focused funds are NOT a wedge in v3.2 (that was the 2026-04-26 lock; v3.2 superseded it with the Individual-tier wedge). Sankore stays as the DESIGN PARTNER bridge — warm-intro accessible, reference-producing — but funds are not the buyer market. Pan-African / EM regulatory coverage is preserved as the cross-border M&A differentiator (moat layer for the F500 ceiling).",
+      'Three explicit non-target audiences (v3.2 lock): (1) Boutique sell-side M&A advisors — no software budget, relationship-driven, sceptical. (2) Generic small VC funds with no Africa/EM exposure — no procurement need, AUM-per-decision too small, relationship-driven without the capital-allocation pressure that makes the audit valuable. (3) US-only Fortune 500 with zero international M&A exposure — Cloverpop + IBM watsonx will out-bundle us in their backyard; pick fights where the cross-border regulatory moat matters. Note: Pan-African / EM-focused funds are NOT a wedge in v3.2 (that was the 2026-04-26 lock; v3.2 superseded it with the Individual-tier wedge). Sankore stays as the DESIGN PARTNER bridge — warm-intro accessible, reference-producing — but funds are not the buyer market. Pan-African / EM regulatory coverage is preserved as the cross-border M&A differentiator (moat layer for the F500 ceiling).',
     difficulty: 'advanced',
     applicationContext:
       'You get a warm intro to a generic Sand Hill Road VC firm — do you take the meeting?',
@@ -1974,11 +1975,11 @@ const GOLDNER_DISCOVERY_CARDS: EducationCard[] = [
     deckId: 'goldner_discovery',
     prompt: "What are Mr. Goldner's 3 rules for customer discovery — recite verbatim?",
     canonicalAnswer:
-      "(1) Talk to 10 people before building anything (or before structuring a new GTM motion). (2) Find the pattern in their answers, not your assumption. (3) Sell to the pattern, not to the product you wish you had built.",
+      '(1) Talk to 10 people before building anything (or before structuring a new GTM motion). (2) Find the pattern in their answers, not your assumption. (3) Sell to the pattern, not to the product you wish you had built.',
     hint: '3 short sentences. The third is about what to sell to.',
     difficulty: 'foundation',
     applicationContext:
-      'Use as the framework anchor before any 20-min discovery audit conversation — silently recite the 3 rules to remind yourself you\'re there to find the pattern, not to pitch your assumption.',
+      "Use as the framework anchor before any 20-min discovery audit conversation — silently recite the 3 rules to remind yourself you're there to find the pattern, not to pitch your assumption.",
     source: 'src/lib/constants/icp.ts GOLDNER_3_RULES · GTM Plan v3.2 §5',
     tag: 'foundation',
   },
@@ -1988,10 +1989,10 @@ const GOLDNER_DISCOVERY_CARDS: EducationCard[] = [
     prompt:
       'Two Goldner discovery scripts exist (wedge-individual and corp-dev-ceiling) — which do you run with which buyer, and why?',
     canonicalAnswer:
-      "Wedge-individual script (£249/mo CSO / M&A head / corp dev director / fractional CSO at FTSE 250 / scale-up): leads with the writing surface (four-tool graveyard) → predicted-question gap → bias-hidden-in-plain-sight replay → DPR-as-leave-behind. Corp-dev-ceiling script (F500 corp dev / corp strategy M&A team @ £50K-150K ACV): leads with cross-border acquisition memo + structural assumptions → post-IC regulatory surprise → 24-month replay against IRR → audit-committee artefact requirement. Pick by procurement gate: wedge buyer = no procurement gate (their own card), ceiling = audit committee + GC.",
+      'Wedge-individual script (£249/mo CSO / M&A head / corp dev director / fractional CSO at FTSE 250 / scale-up): leads with the writing surface (four-tool graveyard) → predicted-question gap → bias-hidden-in-plain-sight replay → DPR-as-leave-behind. Corp-dev-ceiling script (F500 corp dev / corp strategy M&A team @ £50K-150K ACV): leads with cross-border acquisition memo + structural assumptions → post-IC regulatory surprise → 24-month replay against IRR → audit-committee artefact requirement. Pick by procurement gate: wedge buyer = no procurement gate (their own card), ceiling = audit committee + GC.',
     difficulty: 'core',
     applicationContext:
-      'Before every warm-intro call, decide which script. Mr. Reiner-introduced US prospects with corp dev / strategy titles → likely wedge unless they explicitly mention IC / committee. Mr. Gabe-introduced UK prospects from his investor clients\' portfolio → mostly wedge initially. Sankore-class fund partners → wedge (they\'re a design partner, not the procurement gate).',
+      "Before every warm-intro call, decide which script. Mr. Reiner-introduced US prospects with corp dev / strategy titles → likely wedge unless they explicitly mention IC / committee. Mr. Gabe-introduced UK prospects from his investor clients' portfolio → mostly wedge initially. Sankore-class fund partners → wedge (they're a design partner, not the procurement gate).",
     source: 'src/lib/constants/icp.ts GOLDNER_DISCOVERY_QUESTIONS_INDIVIDUAL + _CORP_DEV',
     tag: 'core',
   },
@@ -2011,7 +2012,7 @@ const GOLDNER_DISCOVERY_CARDS: EducationCard[] = [
   {
     id: 'goldner_individual_q2',
     deckId: 'goldner_discovery',
-    prompt: "Wedge-individual script · question 2 — recite verbatim + listening criteria.",
+    prompt: 'Wedge-individual script · question 2 — recite verbatim + listening criteria.',
     canonicalAnswer:
       "VERBATIM: 'What's the question your CEO / board / parent company asked that you didn't see coming?' LISTENING FOR: the predicted-question gap. If they describe getting blindsided by a question that — in retrospect — should have been obvious, that's the simulate-CEO + forgotten-questions wedge. The strongest signal: when they laugh nervously and say something like 'oh, the time my CEO asked X and I had nothing.' Don't push for the answer; let the silence sit.",
     difficulty: 'core',
@@ -2024,19 +2025,19 @@ const GOLDNER_DISCOVERY_CARDS: EducationCard[] = [
     id: 'goldner_individual_q3_q4',
     deckId: 'goldner_discovery',
     prompt:
-      "Wedge-individual script · questions 3 + 4 — recite verbatim and name what each surfaces.",
+      'Wedge-individual script · questions 3 + 4 — recite verbatim and name what each surfaces.',
     canonicalAnswer:
       "Q3 VERBATIM: 'If you could replay one decision from the last 12 months knowing what you know now — what was the bias hiding in plain sight?' SURFACES: named-bias resonance (pre-screens whether they self-identify with the R²F frame; if they say 'we anchored on the comp' or 'we got captured by management', that's strong fit). Q4 VERBATIM: 'What's the artefact you wish you'd had to defend that decision when it was reviewed?' SURFACES: DPR-as-leave-behind value. The strongest signal is when they describe wanting an artefact that combines (a) the reasoning trail, (b) the regulatory mapping, (c) the named biases. That artefact IS the DPR.",
     difficulty: 'advanced',
     applicationContext:
-      'Q3 + Q4 close the script. Run them only if Q1 + Q2 surfaced strong pain signal. If Q1+Q2 were weak, end the call gracefully and move on — Goldner Rule 2: find the pattern, don\'t force fit.',
+      "Q3 + Q4 close the script. Run them only if Q1 + Q2 surfaced strong pain signal. If Q1+Q2 were weak, end the call gracefully and move on — Goldner Rule 2: find the pattern, don't force fit.",
     source: 'icp.ts GOLDNER_DISCOVERY_QUESTIONS_INDIVIDUAL[2,3]',
     tag: 'wedge',
   },
   {
     id: 'goldner_corp_dev_q1',
     deckId: 'goldner_discovery',
-    prompt: "Corp-dev-ceiling script · question 1 — recite verbatim + listening criteria.",
+    prompt: 'Corp-dev-ceiling script · question 1 — recite verbatim + listening criteria.',
     canonicalAnswer:
       "VERBATIM: 'Walk me through your last cross-border acquisition memo. Where did the diligence + assumption-setting happen, and how did you carry the structural assumptions (sovereign cycle, FX regime, regulatory exposure) into the IC deck?' LISTENING FOR: cross-border M&A surface area + Dalio determinant blindness (currency cycle, trade share, governance). If the answer reveals that structural assumptions are tracked in a side-doc that doesn't make it into the IC deck, that's the wedge for the 19-framework regulatory map + structural-assumptions audit. Strongest signal: 'we had the data but it wasn't in the room.'",
     difficulty: 'advanced',
@@ -2048,19 +2049,19 @@ const GOLDNER_DISCOVERY_CARDS: EducationCard[] = [
   {
     id: 'goldner_corp_dev_q2_q3',
     deckId: 'goldner_discovery',
-    prompt: "Corp-dev-ceiling script · questions 2 + 3 — verbatim + what each surfaces.",
+    prompt: 'Corp-dev-ceiling script · questions 2 + 3 — verbatim + what each surfaces.',
     canonicalAnswer:
       "Q2 VERBATIM: 'What's the regulatory question — FCA, SEC, EU AI Act, GDPR, sovereign-context regime — that surfaced AFTER IC approval, when you wished it had surfaced before?' SURFACES: post-IC regulatory blindside; the 19-framework regulatory map directly addresses this. Q3 VERBATIM: 'If you could replay one M&A approval from the last 24 months — what was the bias the room missed that the IRR / outcome later exposed?' SURFACES: outcome-validated bias pattern; this is where the per-org Brier-scored recalibration matters. Together Q2 + Q3 establish that DI is for THIS specific problem, not generic decision support.",
     difficulty: 'advanced',
     applicationContext:
-      'Run sequentially after Q1. Watch for the IRR/MOIC framing — if they reach for those metrics naturally, they\'re in the buying-power band. If they reach for ROIC / NPV / softer language, they\'re corp strategy not corp dev — pivot the next question accordingly.',
+      "Run sequentially after Q1. Watch for the IRR/MOIC framing — if they reach for those metrics naturally, they're in the buying-power band. If they reach for ROIC / NPV / softer language, they're corp strategy not corp dev — pivot the next question accordingly.",
     source: 'icp.ts GOLDNER_DISCOVERY_QUESTIONS_CORP_DEV[1,2]',
     tag: 'ceiling',
   },
   {
     id: 'goldner_corp_dev_q4',
     deckId: 'goldner_discovery',
-    prompt: "Corp-dev-ceiling script · question 4 — verbatim + close.",
+    prompt: 'Corp-dev-ceiling script · question 4 — verbatim + close.',
     canonicalAnswer:
       "VERBATIM: 'What's the artefact your audit committee or GC would need to see to approve another deal of similar profile in the next 12 months — and what would it have to contain that today's diligence pack doesn't?' SURFACES: the DPR procurement requirement in the buyer's voice. Strongest signal: they describe wanting (a) bias provenance, (b) cross-document reconciliation, (c) regulatory mapping, (d) reviewer decisions / dissent log — those are literally the DPR's existing pages. Close: 'I have a sample DPR on a public deal — the Dangote 2014 cross-border expansion. 20 minutes on a real memo of yours, anonymised, and we'll see if it passes your audit committee's bar.'",
     difficulty: 'advanced',
@@ -2082,8 +2083,10 @@ const LEARNING_EFFICIENCY_CARDS: EducationCard[] = [
       'Active Recall is the deliberate retrieval of information from memory rather than re-exposure to source material. The mental strain of retrieval — pausing the video / closing the book and writing the concept down from memory — is the load-bearing mechanism. Karpicke 2008 showed retrieval practice produces 2-3× better long-term retention than re-reading or concept-mapping in college students on conceptual material. Re-reading FEELS more productive (fluent processing) but produces an illusion of mastery; recall PROVES mastery. The act of failing to retrieve is also load-bearing — it identifies what you have not actually encoded yet.',
     hint: 'Cue: pause the input source, close eyes, write from memory, then check.',
     difficulty: 'foundation',
-    applicationContext: 'Mid-way through a 60-min long-form interview on a successful founder. Pause every 10-15 min to write down the 3 most important claims from memory before resuming.',
-    source: 'Karpicke & Roediger 2008 (Science 319:966) + sociotechnical-convergence research paper 2026-05-02',
+    applicationContext:
+      'Mid-way through a 60-min long-form interview on a successful founder. Pause every 10-15 min to write down the 3 most important claims from memory before resuming.',
+    source:
+      'Karpicke & Roediger 2008 (Science 319:966) + sociotechnical-convergence research paper 2026-05-02',
     tag: 'protocol',
   },
   {
@@ -2094,32 +2097,38 @@ const LEARNING_EFFICIENCY_CARDS: EducationCard[] = [
       'Elaborative Encoding is the deliberate enrichment of a new concept by tying it to existing knowledge — explaining WHY the concept is true in your own words, naming what it reminds you of, and predicting where else it would apply. The forcing question is "why is this true and what does it remind me of?" Bjork & Bjork 1994 desirable-difficulty framework: harder encoding produces more durable retrieval. Pure rote rehearsal builds a brittle surface; elaboration builds a network. For Decision Intel: every new concept should connect to (a) something already in CLAUDE.md, (b) a Decision Intel product feature it sharpens, or (c) a buyer-persona pain it addresses. Three connections per concept beats ten flat facts.',
     hint: 'The test: can you state the new concept in 3 sentences using at least one analogy from your existing knowledge?',
     difficulty: 'core',
-    applicationContext: 'Reading a paper on prospective hindsight (Klein & Mitchell 1995). Encoding move: "this is why DI\'s pre-mortem prompts use past-tense framing — past tense forces the brain to generate an explanation as if for an outcome already occurred, which produces 25-30% more failure-cause insights than conditional voice. The connection: this is the operationalisation of R²F #5 in CLAUDE.md."',
+    applicationContext:
+      'Reading a paper on prospective hindsight (Klein & Mitchell 1995). Encoding move: "this is why DI\'s pre-mortem prompts use past-tense framing — past tense forces the brain to generate an explanation as if for an outcome already occurred, which produces 25-30% more failure-cause insights than conditional voice. The connection: this is the operationalisation of R²F #5 in CLAUDE.md."',
     source: 'Bjork & Bjork 1994 (desirable difficulty) + sociotechnical-convergence research paper',
     tag: 'protocol',
   },
   {
     id: 'learn_progressive_summarization',
     deckId: 'learning_efficiency',
-    prompt: "What is Progressive Summarization and how do its layers compound?",
+    prompt: 'What is Progressive Summarization and how do its layers compound?',
     canonicalAnswer:
       'Progressive Summarization (Tiago Forte, Building a Second Brain) is a 4-layer compression system that distills information into progressively concentrated layers without re-reading the whole source: Layer 1 = raw notes / quotes captured during the source. Layer 2 = bold the most important sentences. Layer 3 = highlight the bold passages that survive a second read. Layer 4 = write a 2-3 sentence synthesis of just the highlights. Each layer is added on a separate pass, days or weeks apart. The compounding effect: by Layer 4 the founder retrieves the highest-density 1-2% of the source in seconds, but the deeper layers stay accessible if needed. Ties directly to the SM-2 spaced-repetition system in Education Room — recall sessions reinforce Layer 4 first, drilling deeper on miss.',
     hint: 'Layers: capture → bold → highlight → synthesize. Each on a separate pass.',
     difficulty: 'core',
-    applicationContext: 'After watching a 90-min Naval Ravikant interview. Day 1: 30 timestamped bullets. Day 3: bold 10. Week 1: highlight 4 of the 10 bold lines. Month 1: write a 3-sentence synthesis of the 4 highlights. By month 6 the synthesis is recallable in 15 seconds; the bold passages take 60 seconds to retrieve.',
-    source: 'Tiago Forte, Building a Second Brain (2022) + sociotechnical-convergence research paper',
+    applicationContext:
+      'After watching a 90-min Naval Ravikant interview. Day 1: 30 timestamped bullets. Day 3: bold 10. Week 1: highlight 4 of the 10 bold lines. Month 1: write a 3-sentence synthesis of the 4 highlights. By month 6 the synthesis is recallable in 15 seconds; the bold passages take 60 seconds to retrieve.',
+    source:
+      'Tiago Forte, Building a Second Brain (2022) + sociotechnical-convergence research paper',
     tag: 'protocol',
   },
   {
     id: 'learn_sm2_logic',
     deckId: 'learning_efficiency',
-    prompt: 'Why does the SM-2 spaced-repetition algorithm space reviews exponentially instead of evenly?',
+    prompt:
+      'Why does the SM-2 spaced-repetition algorithm space reviews exponentially instead of evenly?',
     canonicalAnswer:
       'SM-2 (SuperMemo 2, Wozniak 1990) schedules reviews at progressively widening intervals — typically Day 1, Day 6, then multiplying by an ease factor (~2.5×) on each successful recall. The exponential spacing matches the forgetting curve: as a memory consolidates, the interval before retrieval becomes useful (vs. wasted re-exposure) grows exponentially. Reviewing every day after initial encoding wastes attention; reviewing too late causes retrieval failure and wasted re-encoding cost. Each successful recall pushes the next due-date further out (compounding); each failed recall resets to Day 1 (cost of skipping reviews). Education Room implements SM-2 lite: each card tracks easeFactor (starts 2.5, decreases on miss), repetitions (count of consecutive successful reviews), intervalDays (current waiting period), and nextDue (auto-computed). The deck-picker shows due-card count + per-deck mastery percentage.',
     hint: 'Forgetting curve = exponential decay → optimal review schedule = exponential spacing.',
     difficulty: 'core',
-    applicationContext: 'Drilling the buyer_personas deck before a Wednesday warm-intro call. Cards last reviewed 2 weeks ago surface first; cards reviewed yesterday do not appear. The system optimizes attention allocation automatically.',
-    source: 'Wozniak 1990 SuperMemo 2 algorithm + Education Room SM-2 implementation in education-room-data.ts',
+    applicationContext:
+      'Drilling the buyer_personas deck before a Wednesday warm-intro call. Cards last reviewed 2 weeks ago surface first; cards reviewed yesterday do not appear. The system optimizes attention allocation automatically.',
+    source:
+      'Wozniak 1990 SuperMemo 2 algorithm + Education Room SM-2 implementation in education-room-data.ts',
     tag: 'theory',
   },
   {
@@ -2130,8 +2139,10 @@ const LEARNING_EFFICIENCY_CARDS: EducationCard[] = [
       'The modern brain expects instant stimulation. Algorithmic short-form video platforms have trained the dopaminergic baseline upward — the brain demands constant novelty to stay engaged. Tolerance for boredom is the deliberate practice of staying present with low-stimulation work (deep reading, writing, problem-solving) without reaching for a screen. The mechanism: by progressively extending periods of uninterrupted low-stimulation focus, the dopaminergic baseline resets downward, restoring the psychological endurance required to tackle complex, frustrating, ambiguous problems. Without this protocol, deep work is impossible — the brain bails out of high-friction cognitive tasks within minutes because they feel intolerable relative to the SFV-trained baseline. Practical implementation: phone-free morning (no first-look screen), 90-min focused blocks with no notifications, structured boredom (a 20-min walk without earbuds).',
     hint: 'The dopaminergic baseline is set by your last 30 days of consumption. Reset it deliberately.',
     difficulty: 'foundation',
-    applicationContext: 'Saturday morning startup time — instead of opening LinkedIn first, sit with one paper for 60 min (silent, no music, no phone). The first 15 min feel restless; minutes 15-60 produce the deepest synthesis of the week.',
-    source: 'Cal Newport, Deep Work (2016) + sociotechnical-convergence research paper · neurobiology of SFV addiction studies',
+    applicationContext:
+      'Saturday morning startup time — instead of opening LinkedIn first, sit with one paper for 60 min (silent, no music, no phone). The first 15 min feel restless; minutes 15-60 produce the deepest synthesis of the week.',
+    source:
+      'Cal Newport, Deep Work (2016) + sociotechnical-convergence research paper · neurobiology of SFV addiction studies',
     tag: 'protocol',
   },
   {
@@ -2142,8 +2153,10 @@ const LEARNING_EFFICIENCY_CARDS: EducationCard[] = [
       'For deep insights into world trends, frameworks, and the characteristics of successful operators: long-form, 30 minutes to 2 hours. While short-form media trains speed and shallow reaction, long-form trains depth, patience, and synthesis. Consuming long, in-depth interviews forces the brain to tolerate effort, ambiguity, and complexity — exactly the System 2 muscle the founder needs. The neurological mechanism: short-form algorithmic content downregulates the Dorsolateral Prefrontal Cortex (DLPFC) and Anterior Cingulate Cortex (ACC) — the seats of executive functioning and conflict resolution. Long-form content does the opposite: sustained attention strengthens neural connectivity in those regions over time. Practical sources: Lex Fridman, Tim Ferriss, The Knowledge Project (Shane Parrish), Acquired podcast, founder interviews on YC channel, BG2 (Brad Gerstner), All-In, Howard Marks memos read aloud. Drop algorithmic SFV (TikTok / Reels / Shorts) entirely.',
     hint: '30-min floor for depth · 90-min sweet spot · 2-hour ceiling before fatigue degrades retention.',
     difficulty: 'foundation',
-    applicationContext: 'Walking 45 min to an event — listen to one Acquired podcast episode (typically 90-180 min, split across 2 walks). Encode via Active Recall during the walk back: voice-memo the 3 most important claims before checking the phone.',
-    source: 'sociotechnical-convergence research paper 2026-05-02 · fMRI/EEG SFV addiction neuroimaging',
+    applicationContext:
+      'Walking 45 min to an event — listen to one Acquired podcast episode (typically 90-180 min, split across 2 walks). Encode via Active Recall during the walk back: voice-memo the 3 most important claims before checking the phone.',
+    source:
+      'sociotechnical-convergence research paper 2026-05-02 · fMRI/EEG SFV addiction neuroimaging',
     tag: 'consumption',
   },
   {
@@ -2154,56 +2167,68 @@ const LEARNING_EFFICIENCY_CARDS: EducationCard[] = [
       'Digital Asceticism (per the sociotechnical-convergence research paper) is the deliberate, rigorous, structural minimization of digital noise to reclaim cognitive bandwidth — distinct from a temporary detox. A detox is a vacation followed by relapse to baseline; asceticism is a permanent reduction in the consumption surface. Specifically: (a) eliminate algorithmic short-form video platforms (TikTok / Reels / Shorts) — these operate on variable-reward schedules that hijack dopaminergic pathways. (b) remove non-essential push notifications. (c) phone-free morning routines (no screen before deep work). (d) physical environments devoid of digital distractions during work blocks. Why permanent: because the dopaminergic baseline only resets if the lower-stimulation environment becomes the steady state. Asceticism is to the digital environment what a low-glycemic diet is to insulin sensitivity — the discipline IS the result. For a 16-year-old founder targeting Stanford / SF / pre-seed in 2027, this is the protocol that compounds.',
     hint: 'Detox = vacation. Asceticism = steady state.',
     difficulty: 'foundation',
-    applicationContext: "Friday evening — instead of unwinding via Instagram Reels (which spikes cortisol + downregulates DLPFC), unwind via a 2-hour deep-read session on a paper that connects to DI's moat (e.g. one of the Kahneman & Klein papers). The discipline becomes the leisure.",
+    applicationContext:
+      "Friday evening — instead of unwinding via Instagram Reels (which spikes cortisol + downregulates DLPFC), unwind via a 2-hour deep-read session on a paper that connects to DI's moat (e.g. one of the Kahneman & Klein papers). The discipline becomes the leisure.",
     source: 'sociotechnical-convergence research paper 2026-05-02 (High-Agency Protocols section)',
     tag: 'protocol',
   },
   {
     id: 'learn_cognitive_offloading',
     deckId: 'learning_efficiency',
-    prompt: 'What is the "Google Effect" / cognitive offloading and why is it especially dangerous for adolescents?',
+    prompt:
+      'What is the "Google Effect" / cognitive offloading and why is it especially dangerous for adolescents?',
     canonicalAnswer:
       'When individuals anticipate that information will be stored externally and instantly accessible (search engines, AI assistants, cloud notes), they fail to internally consolidate the knowledge — the brain offloads the encoding step entirely. This is colloquially the "Google Effect" or digital amnesia. For adults whose neural architecture is already built, this means atrophy of existing skills that can theoretically be rebuilt. For ADOLESCENTS the consequence is structurally worse: by relying on AI for summarization, writing, and problem-solving, they may NEVER build the foundational neural architecture for critical thinking, conceptual understanding, and complex auditing in the first place. The defense: deliberate, asymmetric offloading. Use AI as a system to direct (orchestration), not as an oracle to query (replacement). Always run the encoding pass yourself BEFORE asking the AI for a summary — the encoding is what builds the architecture, the AI summary just confirms or sharpens it.',
     hint: 'Encode first. Query AI second. Never the inverse.',
     difficulty: 'foundation',
-    applicationContext: "After a NotebookLM synthesis on the master KB, write down the 3 most important insights from memory BEFORE re-reading the synthesis. The friction is the point — if you can't recall any of it 30 minutes later without the synthesis open, the encoding hasn't happened.",
-    source: 'Sparrow et al. 2011 (Google Effects on Memory, Science 333:776) + sociotechnical-convergence research paper',
+    applicationContext:
+      "After a NotebookLM synthesis on the master KB, write down the 3 most important insights from memory BEFORE re-reading the synthesis. The friction is the point — if you can't recall any of it 30 minutes later without the synthesis open, the encoding hasn't happened.",
+    source:
+      'Sparrow et al. 2011 (Google Effects on Memory, Science 333:776) + sociotechnical-convergence research paper',
     tag: 'risk',
   },
   {
     id: 'learn_system1_system2_ratio',
     deckId: 'learning_efficiency',
-    prompt: 'What is the System 1 / System 2 ratio and how does Decision Intel measure it on a memo?',
+    prompt:
+      'What is the System 1 / System 2 ratio and how does Decision Intel measure it on a memo?',
     canonicalAnswer:
-      "Per Kahneman (Thinking, Fast and Slow), System 1 is fast / intuitive / pattern-matching cognition. System 2 is slow / deliberate / analytical cognition. Most cognitive biases are System 1 failure modes — heuristics applied where deliberate analysis was warranted. Decision Intel scores process maturity (one of the six DQI components, weight 13%) partly via the System 1 / System 2 ratio of detected biases. A memo where >70% of detected biases are System 1 (anchoring, availability, framing, recency) signals a heuristic-dominant decision process — penalized. A memo where the ratio is balanced or System 2-leaning (with explicit pre-mortem, dissent, base rates, blind priors) is rewarded. For the founder personally: the same ratio applies. If most of your daily knowledge work is System 1 (scrolling feeds, reactive replies, surface skim), the founder brain is not building System 2 capacity. Long-form reading + Active Recall + writing = System 2 amplification.",
+      'Per Kahneman (Thinking, Fast and Slow), System 1 is fast / intuitive / pattern-matching cognition. System 2 is slow / deliberate / analytical cognition. Most cognitive biases are System 1 failure modes — heuristics applied where deliberate analysis was warranted. Decision Intel scores process maturity (one of the six DQI components, weight 13%) partly via the System 1 / System 2 ratio of detected biases. A memo where >70% of detected biases are System 1 (anchoring, availability, framing, recency) signals a heuristic-dominant decision process — penalized. A memo where the ratio is balanced or System 2-leaning (with explicit pre-mortem, dissent, base rates, blind priors) is rewarded. For the founder personally: the same ratio applies. If most of your daily knowledge work is System 1 (scrolling feeds, reactive replies, surface skim), the founder brain is not building System 2 capacity. Long-form reading + Active Recall + writing = System 2 amplification.',
     hint: 'System 1 = fast/intuitive (patterns). System 2 = slow/deliberate (analysis). The ratio is auditable.',
     difficulty: 'core',
-    applicationContext: 'A founder asks ChatGPT to summarize a 30-page strategy paper without reading it first. That is a System 1 move (cognitive offloading). Reading the paper, writing your own 3-sentence summary from memory, THEN asking ChatGPT to surface what you missed — that is System 2 amplification by AI.',
+    applicationContext:
+      'A founder asks ChatGPT to summarize a 30-page strategy paper without reading it first. That is a System 1 move (cognitive offloading). Reading the paper, writing your own 3-sentence summary from memory, THEN asking ChatGPT to surface what you missed — that is System 2 amplification by AI.',
     source: 'Kahneman 2011 + DQI process-maturity component in src/lib/scoring/dqi.ts',
     tag: 'theory',
   },
   {
     id: 'learn_locus_of_control',
     deckId: 'learning_efficiency',
-    prompt: 'What is internal vs external locus of control and why does it matter for high-agency founders?',
+    prompt:
+      'What is internal vs external locus of control and why does it matter for high-agency founders?',
     canonicalAnswer:
       "Locus of control (Rotter 1966) is the degree to which an individual believes outcomes are under their own control vs determined by external forces (luck, fate, system, others). Internal locus = 'my outcomes track my actions and discipline.' External locus = 'my outcomes track macro forces, gatekeepers, what's-in-the-air.' For a 16-year-old founder navigating an Age of Displacement scenario (per the sociotechnical-convergence research paper), the macro environment IS chaotic and structurally flawed — but personal capacity to adapt, learn, and exert discipline remains entirely within control. Adopting an internal locus is not denying the macro reality; it is choosing the operating frame that produces action. Frame life as a strategic game of asset and skill allocation. View AI not as a terminator of human potential but as a lever to multiply your own agency. The macro decline is real; your individual response is also real. The two facts are not in tension.",
     hint: "Internal locus = 'my response is the variable I control.' External locus = 'I'm a passenger.' The first compounds; the second collapses.",
     difficulty: 'foundation',
-    applicationContext: 'When a peer says "everything is rigged / AI is going to take all the jobs / it doesn\'t matter what we do" — recognize this as external-locus framing. The honest response: the macro is rigged, AND the individual response still determines the individual outcome. Both. Then redirect to action.',
-    source: 'Rotter 1966 (locus of control) + sociotechnical-convergence research paper (High-Agency Protocols section)',
+    applicationContext:
+      'When a peer says "everything is rigged / AI is going to take all the jobs / it doesn\'t matter what we do" — recognize this as external-locus framing. The honest response: the macro is rigged, AND the individual response still determines the individual outcome. Both. Then redirect to action.',
+    source:
+      'Rotter 1966 (locus of control) + sociotechnical-convergence research paper (High-Agency Protocols section)',
     tag: 'mindset',
   },
   {
     id: 'learn_distress_tolerance',
     deckId: 'learning_efficiency',
-    prompt: 'Why is distress tolerance a load-bearing protocol and how do you build it deliberately?',
+    prompt:
+      'Why is distress tolerance a load-bearing protocol and how do you build it deliberately?',
     canonicalAnswer:
       'Distress tolerance is the capacity to operate effectively under stress, ambiguity, and adversity without dropping into avoidance or emotional dysregulation. The Gen Z workforce data (Deloitte: 47% report stress / anxiety most or all the time; Gallup: 1.1-year average tenure for Gen Z first-five-years vs 2.8 for Gen X) signals a generational deficit in this capacity. Modern cultural and educational frameworks have inadvertently sheltered youth from adversity, contributing to fragility. The defense is deliberate exposure: actively seek out difficult challenges (academic, physical, social) and practice operating effectively under stress. Specifics: cold exposure (2-3 min cold shower); physical exercise that progressively pushes effort tolerance; doing the hardest task of the day FIRST; deliberately presenting ideas to senior people who will push back. The compounding: each tolerated friction expands the capacity. Without this, the founder cannot navigate the tumultuous transition phase the macro environment is entering.',
     hint: 'Adversity is a deliberate input variable, not a thing that happens to you.',
     difficulty: 'core',
-    applicationContext: 'Pre-event nerves before a Wednesday warm-intro with an F500 GC. Distress tolerance protocol: instead of avoiding the meeting via over-prep, actively rehearse the most difficult question they could ask (e.g. "give me a customer reference I can call today"). The friction of admitting "no live customer references yet" + having a clean honest answer ready expands the tolerance for the actual moment.',
-    source: 'Deloitte Gen Z survey + Gallup engagement data + sociotechnical-convergence research paper (High-Agency Protocols section)',
+    applicationContext:
+      'Pre-event nerves before a Wednesday warm-intro with an F500 GC. Distress tolerance protocol: instead of avoiding the meeting via over-prep, actively rehearse the most difficult question they could ask (e.g. "give me a customer reference I can call today"). The friction of admitting "no live customer references yet" + having a clean honest answer ready expands the tolerance for the actual moment.',
+    source:
+      'Deloitte Gen Z survey + Gallup engagement data + sociotechnical-convergence research paper (High-Agency Protocols section)',
     tag: 'protocol',
   },
   {
@@ -2214,8 +2239,10 @@ const LEARNING_EFFICIENCY_CARDS: EducationCard[] = [
       'The protocols compose hierarchically. (1) Tier 1 / Protect: digital asceticism + tolerance for boredom + distress tolerance reset the dopaminergic + stress baselines. (2) Tier 2 / Acquire: with the baseline reset, long-form content (30-90+ min) becomes consumable; deep reading rebuilds inferential-reasoning circuitry. (3) Tier 3 / Encode: Active Recall + Elaborative Encoding + Progressive Summarization convert consumption into long-term memory. (4) Tier 4 / Retain: SM-2 spaced repetition reinforces the encoded knowledge at exponentially widening intervals; the System 1 / System 2 ratio audit catches drift toward heuristic-dominant cognition. (5) Tier 5 / Deploy: internal locus of control reframes the macro chaos as the operating environment; high-agency action allocates the encoded knowledge into product / pitch / decision artefacts. The compounding: each loop iteration deepens prior tiers. Year 1: capacity to consume a 90-min interview without bailing. Year 3: capacity to synthesize 200 sources into a single defensible thesis. Year 10: capacity to architect a category like Decision Intel. The protocols are not optional — they are the operating system the rest of the founder hub runs on.',
     hint: 'Protect → Acquire → Encode → Retain → Deploy. Each tier feeds the next.',
     difficulty: 'advanced',
-    applicationContext: 'Asked by a peer: "if you had to pick ONE habit that compounds the most for an aspiring founder, what would it be?" The honest answer: there is no single habit. There are protocols that compose. The composition itself is the moat.',
-    source: 'Synthesis of all 11 learning-efficiency cards + FounderOSPanel Cognitive Sovereignty Stack visualization',
+    applicationContext:
+      'Asked by a peer: "if you had to pick ONE habit that compounds the most for an aspiring founder, what would it be?" The honest answer: there is no single habit. There are protocols that compose. The composition itself is the moat.',
+    source:
+      'Synthesis of all 11 learning-efficiency cards + FounderOSPanel Cognitive Sovereignty Stack visualization',
     tag: 'synthesis',
   },
 ];
@@ -2226,8 +2253,7 @@ const PERSONAL_SOCIAL_ARCHETYPES_CARDS: EducationCard[] = [
   {
     id: 'arch_billion_dollar_autopsy',
     deckId: 'personal_social_archetypes',
-    prompt:
-      'Name the rank-1 personal-social archetype + its hook → middle → CTA shape.',
+    prompt: 'Name the rank-1 personal-social archetype + its hook → middle → CTA shape.',
     canonicalAnswer:
       'Billion-Dollar Autopsy. HOOK: empathise with how a famous failed deal felt correct in the room — name the dollar amount destroyed. MIDDLE: reveal the cognitive trap that killed it (name the bias by name from the 22-bias taxonomy), cite the historical anchor, show that the team was not stupid — they were trapped in a named pattern. CTA: do not let your next memo hide this; paste it for a 60-second check before the committee sees it. Lands hardest with: boutique M&A advisor / PE associate (terrified of looking stupid).',
     hint: 'Channels the 2008-financial-crisis paper thesis directly.',
@@ -2240,8 +2266,7 @@ const PERSONAL_SOCIAL_ARCHETYPES_CARDS: EducationCard[] = [
   {
     id: 'arch_room_dynamics_fomu',
     deckId: 'personal_social_archetypes',
-    prompt:
-      'Name the rank-2 personal-social archetype + when to reach for it.',
+    prompt: 'Name the rank-2 personal-social archetype + when to reach for it.',
     canonicalAnswer:
       "Room Dynamics / FOMU Play. HOOK: the emotional panic of submitting a memo to a hostile committee. MIDDLE: name the specific adversarial reviewer ('the Dr. Red Team objection', 'the MD who attacks base-rate comparables'); name the cognitive failure they will exploit (Reference-Class Blindness, Inside-View Dominance, Illusion of Validity); show the brain fails under pressure in predictable ways. CTA: find your blind spot before they do; protect your commission. Lands hardest with: mid-market PE associate / corporate development head. Reach for it when the topic is IC pressure, defending a deal, presenting under scrutiny.",
     difficulty: 'core',
@@ -2253,8 +2278,7 @@ const PERSONAL_SOCIAL_ARCHETYPES_CARDS: EducationCard[] = [
   {
     id: 'arch_cross_border_reality',
     deckId: 'personal_social_archetypes',
-    prompt:
-      'Name the rank-3 personal-social archetype + the founder edge it weaponises.',
+    prompt: 'Name the rank-3 personal-social archetype + the founder edge it weaponises.',
     canonicalAnswer:
       'Cross-Border Reality Check. HOOK: everyone loves the growth projections of a Pan-African / EM market entry; almost no one audits the cross-border compliance assumptions driving them. MIDDLE: name 2-3 specific frameworks (NDPR, CBN, WAEMU, ISA Nigeria 2007, PoPIA, CMA Kenya); show the 19-framework regulatory map is structural. CTA: one frictionless artefact your General Counsel can actually defend. Edge: the Lagos / UK / US lived experience — a generic Silicon Valley founder cannot fake this. Lands hardest with: Pan-African fund partner / F500 General Counsel / cross-border M&A head.',
     hint: 'Lagos is the narrative edge. Lead with it.',
@@ -2267,8 +2291,7 @@ const PERSONAL_SOCIAL_ARCHETYPES_CARDS: EducationCard[] = [
   {
     id: 'arch_retainer_justification',
     deckId: 'personal_social_archetypes',
-    prompt:
-      'Name the rank-4 personal-social archetype + the founder anchor.',
+    prompt: 'Name the rank-4 personal-social archetype + the founder anchor.',
     canonicalAnswer:
       "Retainer Justification Flex. HOOK: clients don't pay £20k/month for data — they pay for undeniable rigor. MIDDLE: a fractional CSO's biggest threat isn't a bad strategy; it's a client who can't visually distinguish brilliant strategy from a generic ChatGPT output; people judge a book by its cover; show the artefact converts the memo into a hashed, tamper-evident audit PDF in 60 seconds. CTA: generate the record that justifies your fee; attach it to your next client invoice. Anchor: the financial-literacy initiative — teaching people to STRUCTURE, VALUE, and visually present financial reasoning so it commands respect. Lands hardest with: fractional CSO / independent M&A advisor / boutique consultancy founder.",
     difficulty: 'core',
@@ -2293,8 +2316,7 @@ const PERSONAL_SOCIAL_ARCHETYPES_CARDS: EducationCard[] = [
   {
     id: 'arch_advice_vs_reality',
     deckId: 'personal_social_archetypes',
-    prompt:
-      'Name the rank-6 personal-social archetype + what to AVOID with it.',
+    prompt: 'Name the rank-6 personal-social archetype + what to AVOID with it.',
     canonicalAnswer:
       'Advice vs. Reality Market Read. HOOK: conventional M&A / strategy advice says X (something dead wrong); historical data says Y (the actual base rate). MIDDLE: show why the conventional advice fails — name the cognitive failure (low-validity environments, inside-view dominance, planning fallacy); reference the 143-case library as the outside-view benchmark; show the engine pulls the closest historical analogs and predicts the base-rate outcome. CTA: trust the gut, but audit the reasoning. AVOID: mentioning specific Brier scores or DQI numbers in cold posts (those are technical-README claims, not cold-context moat sentences); use the "143-case reference-class corpus" framing instead; do NOT pick fights with named living strategists / consultants. Lands hardest with: head of strategic planning / CSO / consulting partner.',
     difficulty: 'advanced',
@@ -2319,8 +2341,7 @@ const PERSONAL_SOCIAL_ARCHETYPES_CARDS: EducationCard[] = [
   {
     id: 'arch_empathic_mode_first',
     deckId: 'personal_social_archetypes',
-    prompt:
-      'What is the empathic-mode-first rule for cold-context personal social posts?',
+    prompt: 'What is the empathic-mode-first rule for cold-context personal social posts?',
     canonicalAnswer:
       "A LinkedIn / X reader is COLD context — they have NOT earned the locked category vocabulary yet. NEVER lead with 'DPR', 'DQI', 'R²F', 'reasoning layer', or 'Decision Knowledge Graph' as the first impression. Lead with the buyer's PAIN in the buyer's WORDS — the panic of a hostile committee question they can't answer, the commission at risk if a deal goes sideways, the LP letter they don't want to write. Earn the term across the bridge sentence first, then introduce platform vocabulary in the second half if at all. Cold-context on-ramps: '60-second audit on a strategic memo' / 'pre-IC audit layer' / 'strategic memo audits' / 'decision quality auditing'. If you write a post that opens with platform vocabulary, you have failed this rule — rewrite from the reader's career anxiety, not the product feature.",
     difficulty: 'foundation',
@@ -2385,7 +2406,7 @@ const COMMON_MISTAKES_CARDS: EducationCard[] = [
     id: 'mistake_no_quote_capture',
     deckId: 'common_mistakes',
     prompt:
-      'Why must you write down the prospect\'s verbatim quotes within 10 minutes of every conversation?',
+      "Why must you write down the prospect's verbatim quotes within 10 minutes of every conversation?",
     canonicalAnswer:
       "You will forget the exact wording within an hour. Paraphrased pain is generic; verbatim pain is specific. The validation summary that lands an investor (\"3 corp dev VPs said almost the same sentence: 'we got to IC and realised X'\") only works if you captured the sentence verbatim. Generic paraphrase reads as marketing copy and is dismissed. The 5 words they actually use for the pain ARE your future marketing copy — the landing-page H1, the LinkedIn DM opener, the cold-email subject line. Discipline: open a Notes / phone memo IMMEDIATELY after every call (including 2-min hallway conversations). 30 seconds of capture saves an hour of reconstruction. Discovery-pitch-toolkit Q1 watchFor: 'the 5 words they actually use for the pain (write them verbatim — those are your future marketing copy).'",
     difficulty: 'foundation',
@@ -2397,8 +2418,7 @@ const COMMON_MISTAKES_CARDS: EducationCard[] = [
   {
     id: 'mistake_demo_whole_platform',
     deckId: 'common_mistakes',
-    prompt:
-      'Why is demoing the whole platform a mistake? What do you demo instead?',
+    prompt: 'Why is demoing the whole platform a mistake? What do you demo instead?',
     canonicalAnswer:
       'Trying to solve everything in the demo dilutes the wedge. The buyer remembers nothing because nothing was emphasised. Demo the ONE feature that solves their SPECIFIC pain pattern — keyed to which of the 3 patterns they described. Pattern A (pre-IC gaps) → Forgotten Questions output + structural-assumptions audit. Pattern B (post-close surprises) → retrospective audit on a closed deal. Pattern C (IC friction) → noise score (3-frame jury disagreement). The pattern→feature crosswalk is in PAIN_PATTERNS in discovery-pitch-toolkit.ts. The discipline: one memo, one pain pattern, one clear output. Walk away from the demo with the buyer able to repeat what the audit caught in one sentence. If they cannot, you demoed too much.',
     difficulty: 'core',

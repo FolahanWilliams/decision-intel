@@ -140,10 +140,8 @@ export const KILLER_RESPONSES: KillerResponse[] = [
     underlyingRoadblock:
       'Buyer has heard of Cloverpop and is anchoring DI to it — the comparison flattens our category claim. We need to surface the structural difference in one sentence.',
     responseCategory: 'Category Contrast · one-sentence structural difference',
-    exactPhrasing:
-      `"Cloverpop logs decisions; Decision Intel audits them. They are a logging + collaboration tool relying on humans to manually fill out templates. We are a 12-node Recognition-Rigor reasoning audit — Kahneman + Klein synthesised into one pipeline, with a 30+ bias academic taxonomy and ${FW}-framework regulatory mapping."`,
-    whyItWorks:
-      `Names the structural difference (logging vs auditing) in one sentence, then anchors the depth (R²F, 30+ taxonomy, ${FW} frameworks) so the buyer cannot collapse us back into the Cloverpop category.`,
+    exactPhrasing: `"Cloverpop logs decisions; Decision Intel audits them. They are a logging + collaboration tool relying on humans to manually fill out templates. We are a 12-node Recognition-Rigor reasoning audit — Kahneman + Klein synthesised into one pipeline, with a 30+ bias academic taxonomy and ${FW}-framework regulatory mapping."`,
+    whyItWorks: `Names the structural difference (logging vs auditing) in one sentence, then anchors the depth (R²F, 30+ taxonomy, ${FW} frameworks) so the buyer cannot collapse us back into the Cloverpop category.`,
     followUpMove:
       'Hand over the WeWork or Dangote DPR. "Cloverpop cannot generate this artefact. Their architecture does not have the Klein-side, the regulatory mapping, or the metaJudge synthesis."',
   },
@@ -180,4 +178,3 @@ export const KILLER_RESPONSES: KillerResponse[] = [
 // =========================================================================
 // SECTION 7 · PERSONA PITCH LIBRARY (the WHY by buyer persona)
 // =========================================================================
-

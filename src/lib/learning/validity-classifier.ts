@@ -153,7 +153,10 @@ export function classifyValidity(input: {
   decisionHorizon?: string | null;
 }): ValidityClassification {
   const docType = (input.documentType ?? '').toLowerCase().trim();
-  const industry = (input.industry ?? '').toLowerCase().trim().replace(/[^a-z]+/g, '_');
+  const industry = (input.industry ?? '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z]+/g, '_');
 
   let base: ValidityClass = DOC_TYPE_VALIDITY[docType] ?? 'low';
   let rationale = docType

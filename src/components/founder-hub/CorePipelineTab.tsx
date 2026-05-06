@@ -311,17 +311,15 @@ SYNTHESIS (Sequential)
             Gemini 3 Flash). Stochastic variance comes from a per-call random seed, architectural
             variance from the Gemini ↔ Grok split, framing variance from the lens swap.
             <br />
-            <strong style={{ color: '#16A34A' }}>
-              Default jury (locked 2026-05-06):
-            </strong>{' '}
+            <strong style={{ color: '#16A34A' }}>Default jury (locked 2026-05-06):</strong>{' '}
             <code style={{ fontSize: 10 }}>
               gemini-3-flash-preview,xai/grok-4.3,gemini-3-flash-preview
             </code>
             <br />
             <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>
-              Override via the <code>NOISE_JURY_MODELS</code> env var. The Gemini and Grok arms
-              run through separate circuit breakers (`gemini` vs `gateway`) so a single-provider
-              outage degrades to single-architecture diversity instead of failing the whole jury.
+              Override via the <code>NOISE_JURY_MODELS</code> env var. The Gemini and Grok arms run
+              through separate circuit breakers (`gemini` vs `gateway`) so a single-provider outage
+              degrades to single-architecture diversity instead of failing the whole jury.
             </span>
           </div>
         </div>

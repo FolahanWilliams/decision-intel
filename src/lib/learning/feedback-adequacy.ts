@@ -213,7 +213,9 @@ export async function getFeedbackAdequacy(
   const recent = outcomes.filter(o => o.reportedAt >= recencyCutoff);
   const briers = outcomes.map(o => o.brierScore).filter((s): s is number => typeof s === 'number');
   const meanBrier =
-    briers.length > 0 ? Math.round((briers.reduce((a, b) => a + b, 0) / briers.length) * 10_000) / 10_000 : null;
+    briers.length > 0
+      ? Math.round((briers.reduce((a, b) => a + b, 0) / briers.length) * 10_000) / 10_000
+      : null;
 
   let domainMatchCount: number | null = null;
   if (domainHint) {

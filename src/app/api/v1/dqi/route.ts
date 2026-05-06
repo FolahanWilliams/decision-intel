@@ -199,12 +199,7 @@ export async function GET(request: NextRequest) {
       (analysis.document as unknown as { documentType?: string | null })?.documentType ?? null;
     const persistedValidityV1 = (
       analysis.judgeOutputs as { validityClassification?: { validityClass?: string } } | null
-    )?.validityClassification?.validityClass as
-      | 'high'
-      | 'medium'
-      | 'low'
-      | 'zero'
-      | undefined;
+    )?.validityClassification?.validityClass as 'high' | 'medium' | 'low' | 'zero' | undefined;
     dqiInput.validityClass =
       persistedValidityV1 ??
       classifyValidity({

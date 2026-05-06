@@ -235,7 +235,8 @@ const ENCODING_STAGES: EncodingStage[] = [
     id: 'capture',
     label: 'Capture',
     protocol: 'Bullets while watching',
-    technique: 'Time-stamped notes during long-form video / book / paper. Don\'t paraphrase yet — capture the raw quote + the timestamp.',
+    technique:
+      "Time-stamped notes during long-form video / book / paper. Don't paraphrase yet — capture the raw quote + the timestamp.",
     whenItFires: 'During a long-form interview · podcast · book session',
     icon: <BookOpen size={16} />,
     color: '#0EA5E9',
@@ -244,7 +245,8 @@ const ENCODING_STAGES: EncodingStage[] = [
     id: 'encode',
     label: 'Encode',
     protocol: 'Elaborative Encoding',
-    technique: 'Explain WHY the concept is true in your own words. Connect it to existing knowledge — what does this remind you of in CLAUDE.md, in your product, in a prior decision?',
+    technique:
+      'Explain WHY the concept is true in your own words. Connect it to existing knowledge — what does this remind you of in CLAUDE.md, in your product, in a prior decision?',
     whenItFires: 'Within 24h of capture · before recall starts decaying',
     icon: <Brain size={16} />,
     color: WARNING,
@@ -253,7 +255,8 @@ const ENCODING_STAGES: EncodingStage[] = [
     id: 'recall',
     label: 'Recall',
     protocol: 'Active Recall + Progressive Summarization',
-    technique: 'Pause the video / close the book. Retrieve the concept from memory in writing. Then revisit notes, highlight only the most important parts, summarize the highlights again. Each layer compounds.',
+    technique:
+      'Pause the video / close the book. Retrieve the concept from memory in writing. Then revisit notes, highlight only the most important parts, summarize the highlights again. Each layer compounds.',
     whenItFires: 'Day 1 · Day 3 · Week 1 · Month 1 (SM-2 schedule)',
     icon: <Repeat size={16} />,
     color: SUCCESS,
@@ -381,9 +384,9 @@ export function EncodingProtocolsFlow() {
           lineHeight: 1.55,
         }}
       >
-        <strong style={{ color: TEXT_PRIMARY }}>The compounding loop:</strong>{' '}
-        This mirrors what Decision Intel runs on every customer memo — capture (document upload) →
-        encode (R²F + DPR provenance) → recall (Decision Knowledge Graph). The product&apos;s moat is the
+        <strong style={{ color: TEXT_PRIMARY }}>The compounding loop:</strong> This mirrors what
+        Decision Intel runs on every customer memo — capture (document upload) → encode (R²F + DPR
+        provenance) → recall (Decision Knowledge Graph). The product&apos;s moat is the
         founder&apos;s personal protocol made into an enterprise-grade artefact.
       </div>
 
@@ -419,14 +422,17 @@ const MEMORY_LAYERS: MemoryLayer[] = [
   {
     layer: 3,
     label: 'CLAUDE.md (canonical project lock)',
-    example: 'Positioning vocabulary · External Attack Vectors · drift-class rules · founder constraints',
-    feeds: 'Every Claude Code session loads this · every nightly audit reads it · founder-context.ts mirrors it',
+    example:
+      'Positioning vocabulary · External Attack Vectors · drift-class rules · founder constraints',
+    feeds:
+      'Every Claude Code session loads this · every nightly audit reads it · founder-context.ts mirrors it',
     icon: <Layers size={14} />,
   },
   {
     layer: 2,
     label: 'Founder Hub (operational interface)',
-    example: '28 tabs · PathToHundredMillion + Education Room + Sparring Room + Founder School + Outreach Hub',
+    example:
+      '28 tabs · PathToHundredMillion + Education Room + Sparring Room + Founder School + Outreach Hub',
     feeds: 'Daily founder workflow · pre-event drilling · live conversations',
     icon: <NetworkIcon size={14} />,
   },
@@ -434,7 +440,8 @@ const MEMORY_LAYERS: MemoryLayer[] = [
     layer: 1,
     label: 'NotebookLM master KB (synthesis layer)',
     example: 'Notebook 809f5104 · 200+ sources · cross-document synthesis · primary research',
-    feeds: 'Strategic decisions · positioning shifts · investor-narrative drafts · NotebookLM follow-up lab',
+    feeds:
+      'Strategic decisions · positioning shifts · investor-narrative drafts · NotebookLM follow-up lab',
     icon: <Brain size={14} />,
   },
 ];
@@ -561,23 +568,28 @@ const MARKETING_PILLARS: MarketingPillar[] = [
     label: 'ONE traffic source',
     primaryChannel: 'LinkedIn + warm intros + in-person events',
     cadence: '1× post per week + warm intros from Mr. Reiner / Mr. Gabe + 2 events/month max',
-    detail: 'Build in public anchored to a famous bias-resonance corporate decision (Kodak / Blockbuster / Nokia / WeWork / Theranos / Wirecard) from the 143-case library. Each post drives 1:1 conversations.',
+    detail:
+      'Build in public anchored to a famous bias-resonance corporate decision (Kodak / Blockbuster / Nokia / WeWork / Theranos / Wirecard) from the 143-case library. Each post drives 1:1 conversations.',
     icon: <Megaphone size={14} />,
   },
   {
     type: 'conversion',
     label: 'ONE conversion mechanism',
     primaryChannel: 'Hybrid discovery + tailored-pitch motion (GTM v3.3 §7)',
-    cadence: '20-min audit on a real strategic memo. Discovery first (4 questions), then pitch tailored to revealed signal',
-    detail: 'The artefact does the persuasion. The DPR (anonymized) goes home with every prospect. Pattern-match across 10+ before declaring the motion working.',
+    cadence:
+      '20-min audit on a real strategic memo. Discovery first (4 questions), then pitch tailored to revealed signal',
+    detail:
+      'The artefact does the persuasion. The DPR (anonymized) goes home with every prospect. Pattern-match across 10+ before declaring the motion working.',
     icon: <Zap size={14} />,
   },
   {
     type: 'delivery',
     label: 'ONE delivery model',
     primaryChannel: 'Self-serve + Individual £249/mo subscription',
-    cadence: 'Frictionless · personal-card / t-card budget · zero procurement gate · WoM scale (Mr. Reiner principle)',
-    detail: 'Sankore-class pilots and F500 ceiling come later. Do not split focus. Word of mouth is the only marketing channel that scales without paid acquisition.',
+    cadence:
+      'Frictionless · personal-card / t-card budget · zero procurement gate · WoM scale (Mr. Reiner principle)',
+    detail:
+      'Sankore-class pilots and F500 ceiling come later. Do not split focus. Word of mouth is the only marketing channel that scales without paid acquisition.',
     icon: <Activity size={14} />,
   },
 ];
@@ -694,9 +706,9 @@ export function FounderLedMarketingRhythm() {
         <strong style={{ color: TEXT_PRIMARY }}>Why this stays narrow:</strong> founder-led
         marketing only scales if the channel + offer + delivery are protected from drift. Adding a
         second traffic source (e.g. Twitter/X, paid ads, podcasts) before the first hits the
-        graduation rule (5+ paid Individual subscribers retained 90+ days + 10 raving advocates +
-        1+ verifiable referral) splits attention without compounding. The 1-1-1 lock is a
-        commitment device against the founder&apos;s own future temptation.
+        graduation rule (5+ paid Individual subscribers retained 90+ days + 10 raving advocates + 1+
+        verifiable referral) splits attention without compounding. The 1-1-1 lock is a commitment
+        device against the founder&apos;s own future temptation.
       </div>
 
       <style jsx>{`

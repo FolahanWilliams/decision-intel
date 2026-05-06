@@ -256,8 +256,8 @@ export default function LandingPage() {
                   fontWeight: 500,
                 }}
               >
-                Most tools audit your data. We audit your reasoning &mdash; and catch the fatal blind
-                spots in strategic memos before the committee does.
+                Most tools audit your data. We audit your reasoning &mdash; and catch the fatal
+                blind spots in strategic memos before the committee does.
               </p>
               <p
                 style={{
@@ -268,10 +268,10 @@ export default function LandingPage() {
                   maxWidth: 560,
                 }}
               >
-                Most strategic memos pass cleanly. The ones that don&rsquo;t are the ones that destroy
-                value. You can&rsquo;t tell the catastrophic memo from the clean memo without auditing
-                both. Built on {HISTORICAL_CASE_COUNT} historical corporate decisions and 30+ biases
-                from Kahneman and Klein.
+                Most strategic memos pass cleanly. The ones that don&rsquo;t are the ones that
+                destroy value. You can&rsquo;t tell the catastrophic memo from the clean memo
+                without auditing both. Built on {HISTORICAL_CASE_COUNT} historical corporate
+                decisions and 30+ biases from Kahneman and Klein.
               </p>
               <div
                 style={{

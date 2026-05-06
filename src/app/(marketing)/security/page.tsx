@@ -1444,14 +1444,7 @@ export default function SecurityPage() {
               africa: 0,
             };
             for (const fw of FRAMEWORKS) counts[fw.region] += 1;
-            const regionsInOrder: FrameworkRegion[] = [
-              'africa',
-              'eu',
-              'us',
-              'uk',
-              'global',
-              'g7',
-            ];
+            const regionsInOrder: FrameworkRegion[] = ['africa', 'eu', 'us', 'uk', 'global', 'g7'];
             return (
               <div
                 style={{
@@ -1504,14 +1497,7 @@ export default function SecurityPage() {
               (12 frameworks, more than any other region) reads as a
               dedicated section, not a tail of mixed entries. */}
           {(() => {
-            const groupOrder: FrameworkRegion[] = [
-              'africa',
-              'eu',
-              'us',
-              'uk',
-              'global',
-              'g7',
-            ];
+            const groupOrder: FrameworkRegion[] = ['africa', 'eu', 'us', 'uk', 'global', 'g7'];
             return groupOrder
               .map(region => ({
                 region,

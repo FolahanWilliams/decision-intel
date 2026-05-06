@@ -190,8 +190,8 @@ export function DiscoveryHookView({
             }}
           >
             Recognition-Rigor Framework — Kahneman&rsquo;s rigor + Klein&rsquo;s recognition,
-            arbitrated through a 12-node pipeline. Hashed and tamper-evident; the
-            full audit record is one click away.
+            arbitrated through a 12-node pipeline. Hashed and tamper-evident; the full audit record
+            is one click away.
           </p>
         </div>
       </div>
@@ -411,8 +411,8 @@ export function DiscoveryHookView({
           lineHeight: 1.55,
         }}
       >
-        Your closed outcome teaches the platform YOUR decision pattern. After 3 outcomes,
-        the audit calibrates to you — not the generic 143-case library.
+        Your closed outcome teaches the platform YOUR decision pattern. After 3 outcomes, the audit
+        calibrates to you — not the generic 143-case library.
       </p>
 
       <style jsx>{`

@@ -88,9 +88,7 @@ const BoardroomTab = lazy(() =>
 const SimulatorTab = lazy(() =>
   import('./tabs/SimulatorTab').then(m => ({ default: m.SimulatorTab }))
 );
-const RedTeamTab = lazy(() =>
-  import('./tabs/RedTeamTab').then(m => ({ default: m.RedTeamTab }))
-);
+const RedTeamTab = lazy(() => import('./tabs/RedTeamTab').then(m => ({ default: m.RedTeamTab })));
 const SwotTab = lazy(() => import('./tabs/SwotTab').then(m => ({ default: m.SwotTab })));
 const ForgottenQuestionsTab = lazy(() =>
   import('./tabs/ForgottenQuestionsTab').then(m => ({ default: m.ForgottenQuestionsTab }))
@@ -293,10 +291,7 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
     () => deriveRegulatoryTriggers(analysis?.compliance),
     [analysis?.compliance]
   );
-  const sovereignContexts = useMemo(
-    () => deriveSovereignContexts(marketContext),
-    [marketContext]
-  );
+  const sovereignContexts = useMemo(() => deriveSovereignContexts(marketContext), [marketContext]);
 
   /* ───── states ───── */
   if (loading) return <LoadingState />;
@@ -307,8 +302,7 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
   const classification = document.isSample ? ('sample' as const) : ('confidential' as const);
 
   /* ───── left pane ───── */
-  const isPdf =
-    document.fileType === 'application/pdf' || filename?.toLowerCase().endsWith('.pdf');
+  const isPdf = document.fileType === 'application/pdf' || filename?.toLowerCase().endsWith('.pdf');
 
   const leftPane = isPdf ? (
     <Suspense fallback={<PaneFallback label="Loading PDF…" />}>
@@ -581,11 +575,7 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
             }
             icSlot={
               analysis ? (
-                <IcLensView
-                  analysis={analysis}
-                  biases={biases}
-                  marketContext={marketContext}
-                />
+                <IcLensView analysis={analysis} biases={biases} marketContext={marketContext} />
               ) : (
                 <PaneFallback label="Awaiting analysis" />
               )
@@ -600,9 +590,7 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
                       summary={analysis.summary}
                       biases={biases}
                       simulation={analysis.simulation}
-                      onExportPdf={() =>
-                        Promise.resolve(setShowShareModal(true))
-                      }
+                      onExportPdf={() => Promise.resolve(setShowShareModal(true))}
                     />
                   </ErrorBoundary>
                 </Suspense>
@@ -623,10 +611,7 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
       case 'regulatory':
         return (
           <div style={{ display: 'grid', gap: 16 }}>
-            <RegulatoryTab
-              triggers={regulatoryTriggers}
-              sovereignContexts={sovereignContexts}
-            />
+            <RegulatoryTab triggers={regulatoryTriggers} sovereignContexts={sovereignContexts} />
             {/* Regulatory Horizon — calendared regulatory tailwinds (EU AI
                Act, Basel III, SEC AI disclosure, GDPR Art 22, etc.) with
                enforcement dates. Procurement reviewers ask "when does
@@ -773,10 +758,17 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
         }
         blindPriorSlot={
           <div style={{ display: 'grid', gap: 10 }}>
-            <p style={{ margin: 0, fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
-              Blind priors anchor independent probability estimates from decision-room
-              participants <em>before</em> audit results are revealed — reducing anchoring
-              bias and surfacing genuine disagreement.
+            <p
+              style={{
+                margin: 0,
+                fontSize: 12.5,
+                color: 'var(--text-secondary)',
+                lineHeight: 1.55,
+              }}
+            >
+              Blind priors anchor independent probability estimates from decision-room participants{' '}
+              <em>before</em> audit results are revealed — reducing anchoring bias and surfacing
+              genuine disagreement.
             </p>
             {analysis?.id ? (
               <a
@@ -1023,8 +1015,8 @@ function ExtractedTextFallback({ content }: { content?: string }) {
           Source preview · audit basis
         </div>
         <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-          Inline preview is not yet wired for non-PDF document types. The audit on the
-          right runs against the extracted text the pipeline indexed at upload time.
+          Inline preview is not yet wired for non-PDF document types. The audit on the right runs
+          against the extracted text the pipeline indexed at upload time.
         </div>
       </div>
     );
@@ -1053,8 +1045,7 @@ function ExtractedTextFallback({ content }: { content?: string }) {
       <pre
         style={{
           margin: 0,
-          fontFamily:
-            '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+          fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
           fontSize: 13,
           color: 'var(--text-primary)',
           lineHeight: 1.65,
@@ -1185,10 +1176,7 @@ function deriveProtectedItems(biases: BiasInstance[]) {
   ];
 }
 
-function deriveSuppressedItems(
-  biases: BiasInstance[],
-  taxonomyIdByType: Record<string, string>
-) {
+function deriveSuppressedItems(biases: BiasInstance[], taxonomyIdByType: Record<string, string>) {
   const order = ['critical', 'high', 'medium', 'low'];
   const top = [...biases]
     .sort((a, b) => {
@@ -1330,9 +1318,8 @@ async function handleExportMarkdown(
   analysis: Analysis,
   biases: BiasInstance[]
 ): Promise<void> {
-  const { generateMarkdownReport, downloadMarkdown } = await import(
-    '@/lib/reports/markdown-generator'
-  );
+  const { generateMarkdownReport, downloadMarkdown } =
+    await import('@/lib/reports/markdown-generator');
   const md = generateMarkdownReport({
     filename: document.filename,
     uploadedAt: document.uploadedAt,
@@ -1346,7 +1333,9 @@ async function handleExportMarkdown(
       explanation: b.explanation,
       suggestion: b.suggestion,
     })),
-    swotAnalysis: analysis.swotAnalysis as Parameters<typeof generateMarkdownReport>[0]['swotAnalysis'],
+    swotAnalysis: analysis.swotAnalysis as Parameters<
+      typeof generateMarkdownReport
+    >[0]['swotAnalysis'],
     simulation: analysis.simulation as Parameters<typeof generateMarkdownReport>[0]['simulation'],
     compliance: analysis.compliance as Parameters<typeof generateMarkdownReport>[0]['compliance'],
   });

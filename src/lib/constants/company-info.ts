@@ -92,7 +92,8 @@ export const PRIVACY_CONTACT_EMAIL = 'team@decision-intel.com';
 export const COMPLIANCE_CONTACT_NAME = FOUNDER_NAME;
 export const COMPLIANCE_CONTACT_TITLE = `${FOUNDER_TITLE} & CEO`;
 export const COMPLIANCE_CONTACT_EMAIL = 'compliance@decision-intel.com';
-export const COMPLIANCE_RESPONSE_SLA = '24-hour acknowledgement, 5-business-day substantive response';
+export const COMPLIANCE_RESPONSE_SLA =
+  '24-hour acknowledgement, 5-business-day substantive response';
 
 /**
  * Short founder narrative — surfaces on /about and (compressed) on the

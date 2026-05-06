@@ -722,7 +722,7 @@ export function HowItWorksClient() {
                 Calibration anchor
               </div>
               <div style={{ fontSize: 14.5, color: C.slate700, lineHeight: 1.55 }}>
-                The same R²F methodology applied retrospectively to {' '}
+                The same R²F methodology applied retrospectively to{' '}
                 <strong style={{ color: C.slate900 }}>
                   {PLATFORM_BASELINE_SNAPSHOT.n} historical corporate decisions
                 </strong>{' '}

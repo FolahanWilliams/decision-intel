@@ -317,7 +317,13 @@ function renderPositioningAnchor() {
         <strong>Audience:</strong> {ICP_AUDIENCE_SUMMARY}
       </div>
       <div style={anchorRow}>
-        <strong>GTM v3.5 RATIFIED 2026-05-04:</strong> Phase 1 Individual £249/mo wedge on 4 buyer-class-continuous personas (fractional CSO / mid-market Corp Dev / smaller-fund GP / PE-backed founder) → Phase 2 Sankore design-partner bridge at £1,999/mo founding-pilot → Phase 3 mid-market Strategy £1,999-£4,999/mo → Phase 4 Enterprise £50K-£150K ACV. Phase 1 graduation gate = Vohra ≥40% &ldquo;very disappointed&rdquo; on HXC cohort + 8-12 paid customers (founder-ratified baseline) by month 6. Mr. Reiner / Mr. Gabe asks activate Phase 3 only. Canonical at <code>docs/gtm-plan-v3-5-2026-05-04.md</code> + Path-to-£100M tab.
+        <strong>GTM v3.5 RATIFIED 2026-05-04:</strong> Phase 1 Individual £249/mo wedge on 4
+        buyer-class-continuous personas (fractional CSO / mid-market Corp Dev / smaller-fund GP /
+        PE-backed founder) → Phase 2 Sankore design-partner bridge at £1,999/mo founding-pilot →
+        Phase 3 mid-market Strategy £1,999-£4,999/mo → Phase 4 Enterprise £50K-£150K ACV. Phase 1
+        graduation gate = Vohra ≥40% &ldquo;very disappointed&rdquo; on HXC cohort + 8-12 paid
+        customers (founder-ratified baseline) by month 6. Mr. Reiner / Mr. Gabe asks activate Phase
+        3 only. Canonical at <code>docs/gtm-plan-v3-5-2026-05-04.md</code> + Path-to-£100M tab.
       </div>
       <div style={anchorRow}>
         <strong>R²F operationalisation (locked 2026-04-30):</strong> 22-bias taxonomy (DI-B-001

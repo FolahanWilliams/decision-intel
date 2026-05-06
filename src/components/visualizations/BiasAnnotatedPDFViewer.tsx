@@ -324,84 +324,84 @@ export function BiasAnnotatedPDFViewer({
 
       {/* Bias Sidebar — hidden in v2 layout where audit pane lives next door */}
       {!hideSidebar && (
-      <div
-        style={{
-          width: 260,
-          flexShrink: 0,
-          borderLeft: '1px solid var(--border-color)',
-          background: 'var(--bg-secondary)',
-          overflowY: 'auto',
-          fontSize: 12,
-        }}
-      >
         <div
           style={{
-            padding: '10px 12px',
-            borderBottom: '1px solid var(--border-color)',
-            fontWeight: 600,
-            color: 'var(--text-primary)',
-            fontSize: 13,
+            width: 260,
+            flexShrink: 0,
+            borderLeft: '1px solid var(--border-color)',
+            background: 'var(--bg-secondary)',
+            overflowY: 'auto',
+            fontSize: 12,
           }}
         >
-          Detected Biases ({biases.length})
-        </div>
-        {biases.map(bias => {
-          const color = SEVERITY_COLORS[bias.severity] ?? '#EAB308';
-          const isActive = activeBias === bias.id;
-          return (
-            <button
-              key={bias.id}
-              onClick={() => handleBiasClick(bias)}
-              style={{
-                display: 'block',
-                width: '100%',
-                textAlign: 'left',
-                padding: '10px 12px',
-                borderBottom: '1px solid var(--border-color)',
-                background: isActive ? color + '12' : 'transparent',
-                border: 'none',
-                borderLeft: `3px solid ${isActive ? color : 'transparent'}`,
-                cursor: 'pointer',
-                transition: 'background 0.15s',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                <span
-                  style={{
-                    fontSize: 9,
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.4px',
-                    color,
-                    background: color + '18',
-                    padding: '1px 5px',
-                    borderRadius: 3,
-                  }}
-                >
-                  {bias.severity}
-                </span>
-                <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: 12 }}>
-                  {formatBiasName(bias.biasType)}
-                </span>
-              </div>
-              <div
+          <div
+            style={{
+              padding: '10px 12px',
+              borderBottom: '1px solid var(--border-color)',
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+              fontSize: 13,
+            }}
+          >
+            Detected Biases ({biases.length})
+          </div>
+          {biases.map(bias => {
+            const color = SEVERITY_COLORS[bias.severity] ?? '#EAB308';
+            const isActive = activeBias === bias.id;
+            return (
+              <button
+                key={bias.id}
+                onClick={() => handleBiasClick(bias)}
                 style={{
-                  color: 'var(--text-muted)',
-                  fontSize: 11,
-                  lineHeight: 1.4,
-                  overflow: 'hidden',
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical',
+                  display: 'block',
+                  width: '100%',
+                  textAlign: 'left',
+                  padding: '10px 12px',
+                  borderBottom: '1px solid var(--border-color)',
+                  background: isActive ? color + '12' : 'transparent',
+                  border: 'none',
+                  borderLeft: `3px solid ${isActive ? color : 'transparent'}`,
+                  cursor: 'pointer',
+                  transition: 'background 0.15s',
                 }}
               >
-                {bias.excerpt.slice(0, 120)}
-                {bias.excerpt.length > 120 ? '...' : ''}
-              </div>
-            </button>
-          );
-        })}
-      </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                  <span
+                    style={{
+                      fontSize: 9,
+                      fontWeight: 700,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.4px',
+                      color,
+                      background: color + '18',
+                      padding: '1px 5px',
+                      borderRadius: 3,
+                    }}
+                  >
+                    {bias.severity}
+                  </span>
+                  <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: 12 }}>
+                    {formatBiasName(bias.biasType)}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    color: 'var(--text-muted)',
+                    fontSize: 11,
+                    lineHeight: 1.4,
+                    overflow: 'hidden',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                  }}
+                >
+                  {bias.excerpt.slice(0, 120)}
+                  {bias.excerpt.length > 120 ? '...' : ''}
+                </div>
+              </button>
+            );
+          })}
+        </div>
       )}
     </div>
   );

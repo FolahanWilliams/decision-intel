@@ -382,4 +382,3 @@ export const INVESTOR_METRICS: InvestorMetric[] = [
 // =========================================================================
 // SECTION 10 · FAILURE MODES WATCHTOWER (6 traps, 3 internal + 3 external)
 // =========================================================================
-

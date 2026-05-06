@@ -30,10 +30,7 @@
 
 import { jsPDF } from 'jspdf';
 import { createHash } from 'node:crypto';
-import {
-  INDEMNIFICATION_BODY,
-  SOC2_RECEIPTS,
-} from '@/lib/constants/trust-copy';
+import { INDEMNIFICATION_BODY, SOC2_RECEIPTS } from '@/lib/constants/trust-copy';
 
 const PAGE_W = 210;
 const PAGE_H = 297;

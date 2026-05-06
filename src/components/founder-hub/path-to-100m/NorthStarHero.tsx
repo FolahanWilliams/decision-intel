@@ -17,7 +17,8 @@ const NORTH_STAR_BANDS = [
   {
     label: 'Q4 2026 / Q1 2027',
     metric: 'Seed raised',
-    detail: '£1.5-2.5M @ £8-15M post · founder retains 60-78% · Sankore Design Foundation pilot live',
+    detail:
+      '£1.5-2.5M @ £8-15M post · founder retains 60-78% · Sankore Design Foundation pilot live',
     cumulative: 0.4,
   },
   {

@@ -104,9 +104,7 @@ export async function generateText(
   });
   const latencyMs = Date.now() - start;
 
-  log.debug(
-    `Gateway response (${options.model}): ${result.text.length} chars in ${latencyMs}ms`
-  );
+  log.debug(`Gateway response (${options.model}): ${result.text.length} chars in ${latencyMs}ms`);
 
   return {
     text: result.text,

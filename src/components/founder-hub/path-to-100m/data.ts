@@ -38,11 +38,7 @@ export { ROLE_PLAYBOOKS } from './data/role-playbooks';
 export type { R2FCurrentPillar, R2FMoatLever } from './data/r2f';
 export { R2F_CURRENT, R2F_MOAT_LEVERS } from './data/r2f';
 
-export type {
-  CategoryDefinition,
-  PersonaPitch,
-  LanguagePattern,
-} from './data/category-pitch';
+export type { CategoryDefinition, PersonaPitch, LanguagePattern } from './data/category-pitch';
 export {
   CATEGORY_DEFINITION,
   PERSONA_PITCH_LIBRARY,
@@ -76,10 +72,7 @@ export { SIMPLIFIED_FUNNEL, FEATURE_VERDICTS } from './data/simplified-funnel';
 import { STRENGTHS, WEAKNESSES } from './data/strengths-weaknesses';
 import { ROLE_PLAYBOOKS } from './data/role-playbooks';
 import { R2F_MOAT_LEVERS } from './data/r2f';
-import {
-  PERSONA_PITCH_LIBRARY,
-  LANGUAGE_PATTERNS,
-} from './data/category-pitch';
+import { PERSONA_PITCH_LIBRARY, LANGUAGE_PATTERNS } from './data/category-pitch';
 import { KILLER_RESPONSES } from './data/killer-responses';
 import { INVESTOR_METRICS } from './data/investor-metrics';
 import { FAILURE_MODES } from './data/failure-modes';

@@ -22,18 +22,12 @@ import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { resolveAnalysisAccess } from '@/lib/utils/document-access';
-import {
-  classifyValidity,
-  type ValidityClassification,
-} from '@/lib/learning/validity-classifier';
+import { classifyValidity, type ValidityClassification } from '@/lib/learning/validity-classifier';
 import {
   getReferenceClassForecast,
   type ReferenceClassForecast,
 } from '@/lib/learning/reference-class-forecast';
-import {
-  getFeedbackAdequacy,
-  type FeedbackAdequacy,
-} from '@/lib/learning/feedback-adequacy';
+import { getFeedbackAdequacy, type FeedbackAdequacy } from '@/lib/learning/feedback-adequacy';
 
 const log = createLogger('AnalysisInsightsAPI');
 
@@ -51,10 +45,7 @@ export interface AnalysisInsightsResponse {
   validitySource: 'persisted' | 'live';
 }
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   // Auth

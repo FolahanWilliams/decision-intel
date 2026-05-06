@@ -179,8 +179,7 @@ const PRINCIPLES: PrincipleRow[] = [
     name: 'Inclusive Growth, Societal & Environmental Well-being',
     definition:
       'The AI system contributes to outcomes that are socially and environmentally positive.',
-    mechanism:
-      `Cross-framework regulatory mapping across ${FRAMEWORK_COUNT} frameworks — international anchors (Basel III, EU AI Act, SEC Reg D, FCA Consumer Duty, SOX, GDPR Art 22, LPOA) plus African-market regimes (NDPR, CBN, ISA Nigeria 2007, WAEMU, CMA Kenya, BoG, FRC Nigeria, CBE, PoPIA, SARB, BoT) — aligns Decision Intel with societal governance objectives. Decision-quality audits reduce the strategic-decision failures that cascade into stakeholder harm. Cost-tier model routing reduces inference energy per audit where decision quality allows.`,
+    mechanism: `Cross-framework regulatory mapping across ${FRAMEWORK_COUNT} frameworks — international anchors (Basel III, EU AI Act, SEC Reg D, FCA Consumer Duty, SOX, GDPR Art 22, LPOA) plus African-market regimes (NDPR, CBN, ISA Nigeria 2007, WAEMU, CMA Kenya, BoG, FRC Nigeria, CBE, PoPIA, SARB, BoT) — aligns Decision Intel with societal governance objectives. Decision-quality audits reduce the strategic-decision failures that cascade into stakeholder harm. Cost-tier model routing reduces inference energy per audit where decision quality allows.`,
     dprFields: ['Regulatory mapping', 'Model lineage (cost-tier routing)'],
   },
 ];

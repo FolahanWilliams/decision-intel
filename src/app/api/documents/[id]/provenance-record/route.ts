@@ -117,8 +117,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       // re-verifies ownership server-side as defense-in-depth.
       const data = await assembleProvenanceRecordData(auth.analysisId);
       const reqUrl = new URL(req.url);
-      const baseUrl =
-        process.env.NEXT_PUBLIC_APP_URL ?? `${reqUrl.protocol}//${reqUrl.host}`;
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? `${reqUrl.protocol}//${reqUrl.host}`;
       const renderUrl = `${baseUrl}/dpr-render/document/${auth.analysisId}${
         clientSafe ? '?clientSafe=1' : ''
       }`;

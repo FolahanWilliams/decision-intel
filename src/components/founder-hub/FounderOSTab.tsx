@@ -32,13 +32,7 @@
  */
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import {
-  Flame,
-  Plus,
-  X,
-  CalendarDays,
-  RefreshCw,
-} from 'lucide-react';
+import { Flame, Plus, X, CalendarDays, RefreshCw } from 'lucide-react';
 import {
   StreakHeatmap,
   CognitiveTrendChart,
@@ -52,7 +46,10 @@ import {
   CommitmentRecord,
   BuildInPublicSection,
 } from '@/components/founder-hub/founder-os/sections';
-import { InteractivePillars, type PillarAdherenceData } from '@/components/founder-hub/founder-os/InteractivePillars';
+import {
+  InteractivePillars,
+  type PillarAdherenceData,
+} from '@/components/founder-hub/founder-os/InteractivePillars';
 import { InteractiveSfcMatrix } from '@/components/founder-hub/founder-os/InteractiveSfcMatrix';
 import { EventPrepCard } from '@/components/founder-hub/founder-os/EventPrepCard';
 
@@ -277,10 +274,7 @@ export function FounderOSTab() {
     return contentLog.filter(c => new Date(c.capturedAt) >= cutoff).length;
   }, [contentLog]);
 
-  const skillsActive = useMemo(
-    () => skills.filter(s => s.status !== 'planned').length,
-    [skills]
-  );
+  const skillsActive = useMemo(() => skills.filter(s => s.status !== 'planned').length, [skills]);
 
   // Weekly reviews in last 4 weeks
   const reviewsLast4w = useMemo(() => {
@@ -297,7 +291,8 @@ export function FounderOSTab() {
     const longFormPct = Math.min(longFormLast30 / 8, 1);
     const activeRecallPct = longFormPct;
     const orchestrationPct = Math.min(skillsActive / 2, 1);
-    const distressPct = last30.length === 0 ? 0 : last30.filter(c => c.exercise || c.meditation).length / 30;
+    const distressPct =
+      last30.length === 0 ? 0 : last30.filter(c => c.exercise || c.meditation).length / 30;
     const locusPct = Math.min(reviewsLast4w / 4, 1);
     return {
       neuro: sfcZeroPct,
@@ -521,8 +516,8 @@ export function FounderOSTab() {
               events/month + Vohra survey discipline + Sankore engagement + outcome capture
               sustainably for 6 years. That motion is only physically possible with the cognitive
               hardware to support it. The asymmetric arbitrage: as the baseline of your peers
-              actively falls, your gap widens daily without you having to run faster. Check this
-              tab once daily, first thing, before LinkedIn or email.
+              actively falls, your gap widens daily without you having to run faster. Check this tab
+              once daily, first thing, before LinkedIn or email.
             </p>
           </div>
           <button
@@ -555,7 +550,15 @@ export function FounderOSTab() {
       <EventPrepCard />
 
       {/* STREAK + TODAY CHECKIN */}
-      <div className="founder-os-streak-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(220px, 280px) 1fr', gap: 16, marginBottom: 20 }}>
+      <div
+        className="founder-os-streak-grid"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'minmax(220px, 280px) 1fr',
+          gap: 16,
+          marginBottom: 20,
+        }}
+      >
         <div
           style={{
             background: 'var(--bg-card)',
@@ -615,7 +618,7 @@ export function FounderOSTab() {
           </div>
           <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
             {totalCheckins === 0
-              ? 'Log today\'s checkin to start the streak.'
+              ? "Log today's checkin to start the streak."
               : `${sfcZeroDays} of ${totalCheckins} days SFC-free (${adherencePct}% lifetime)`}
           </div>
           {sfcStreak >= 30 && (
@@ -666,7 +669,9 @@ export function FounderOSTab() {
               >
                 Today&apos;s checkin · {todayLocalISO()}
               </div>
-              <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>
+              <h3
+                style={{ fontSize: 16, fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}
+              >
                 Five questions, thirty seconds.
               </h3>
             </div>
@@ -960,7 +965,9 @@ export function FounderOSTab() {
               type="text"
               placeholder="Title (e.g. 'Lex Fridman × Yann LeCun on World Models')"
               value={contentForm.title}
-              onChange={e => setContentForm({ ...contentForm, title: e.target.value.slice(0, 500) })}
+              onChange={e =>
+                setContentForm({ ...contentForm, title: e.target.value.slice(0, 500) })
+              }
               style={inputStyle}
             />
             <select
@@ -1043,7 +1050,8 @@ export function FounderOSTab() {
                     fontFamily: "'JetBrains Mono', monospace",
                   }}
                 >
-                  {item.source} · {item.durationMin}min · {new Date(item.capturedAt).toLocaleDateString()}
+                  {item.source} · {item.durationMin}min ·{' '}
+                  {new Date(item.capturedAt).toLocaleDateString()}
                 </span>
               </div>
               <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
@@ -1209,9 +1217,7 @@ export function FounderOSTab() {
                 </span>
                 <select
                   value={skill.status}
-                  onChange={e =>
-                    updateSkillStatus(skill.id, e.target.value as SkillItem['status'])
-                  }
+                  onChange={e => updateSkillStatus(skill.id, e.target.value as SkillItem['status'])}
                   style={{
                     marginLeft: 'auto',
                     padding: '3px 8px',
@@ -1229,13 +1235,22 @@ export function FounderOSTab() {
                 </select>
               </div>
               {skill.whyItMatters && (
-                <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 4 }}>
-                  <strong style={{ color: 'var(--text-primary)' }}>Why:</strong> {skill.whyItMatters}
+                <div
+                  style={{
+                    fontSize: 12.5,
+                    color: 'var(--text-secondary)',
+                    lineHeight: 1.5,
+                    marginBottom: 4,
+                  }}
+                >
+                  <strong style={{ color: 'var(--text-primary)' }}>Why:</strong>{' '}
+                  {skill.whyItMatters}
                 </div>
               )}
               {skill.preAssessment && (
                 <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5 }}>
-                  <strong style={{ color: 'var(--text-secondary)' }}>Pre:</strong> {skill.preAssessment}
+                  <strong style={{ color: 'var(--text-secondary)' }}>Pre:</strong>{' '}
+                  {skill.preAssessment}
                 </div>
               )}
             </div>
@@ -1304,7 +1319,7 @@ export function FounderOSTab() {
               cursor: 'pointer',
             }}
           >
-            {showReviewForm ? 'Cancel' : 'Write this week\'s review'}
+            {showReviewForm ? 'Cancel' : "Write this week's review"}
           </button>
         </div>
 
@@ -1332,7 +1347,10 @@ export function FounderOSTab() {
               placeholder="3. Internal locus reflection — what was outside your control this week, what was inside, where did you conflate the two"
               value={reviewForm.internalLocusReflection}
               onChange={e =>
-                setReviewForm({ ...reviewForm, internalLocusReflection: e.target.value.slice(0, 4000) })
+                setReviewForm({
+                  ...reviewForm,
+                  internalLocusReflection: e.target.value.slice(0, 4000),
+                })
               }
               rows={4}
               style={{ ...inputStyle, resize: 'vertical' }}
@@ -1354,14 +1372,8 @@ export function FounderOSTab() {
         )}
 
         {reviews.length > 0 && !showReviewForm && (
-          <details
-            style={{ marginTop: 12, fontSize: 13, color: 'var(--text-secondary)' }}
-          >
-            <summary
-              style={{ cursor: 'pointer', fontWeight: 600 }}
-            >
-              Re-read recent reviews
-            </summary>
+          <details style={{ marginTop: 12, fontSize: 13, color: 'var(--text-secondary)' }}>
+            <summary style={{ cursor: 'pointer', fontWeight: 600 }}>Re-read recent reviews</summary>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 12 }}>
               {reviews.slice(0, 6).map(r => (
                 <div
@@ -1373,18 +1385,48 @@ export function FounderOSTab() {
                     borderRadius: 'var(--radius-md)',
                   }}
                 >
-                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent-primary)', marginBottom: 6 }}>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      color: 'var(--accent-primary)',
+                      marginBottom: 6,
+                    }}
+                  >
                     Week of {new Date(r.createdAt).toLocaleDateString()}
                   </div>
-                  <div style={{ fontSize: 12.5, color: 'var(--text-primary)', lineHeight: 1.55, whiteSpace: 'pre-wrap', marginBottom: 6 }}>
+                  <div
+                    style={{
+                      fontSize: 12.5,
+                      color: 'var(--text-primary)',
+                      lineHeight: 1.55,
+                      whiteSpace: 'pre-wrap',
+                      marginBottom: 6,
+                    }}
+                  >
                     <strong>Top long-form:</strong> {r.topLongForm}
                   </div>
                   {r.oneSkillNote && (
-                    <div style={{ fontSize: 12.5, color: 'var(--text-primary)', lineHeight: 1.55, whiteSpace: 'pre-wrap', marginBottom: 6 }}>
+                    <div
+                      style={{
+                        fontSize: 12.5,
+                        color: 'var(--text-primary)',
+                        lineHeight: 1.55,
+                        whiteSpace: 'pre-wrap',
+                        marginBottom: 6,
+                      }}
+                    >
                       <strong>Skill note:</strong> {r.oneSkillNote}
                     </div>
                   )}
-                  <div style={{ fontSize: 12.5, color: 'var(--text-primary)', lineHeight: 1.55, whiteSpace: 'pre-wrap' }}>
+                  <div
+                    style={{
+                      fontSize: 12.5,
+                      color: 'var(--text-primary)',
+                      lineHeight: 1.55,
+                      whiteSpace: 'pre-wrap',
+                    }}
+                  >
                     <strong>Internal locus:</strong> {r.internalLocusReflection}
                   </div>
                 </div>

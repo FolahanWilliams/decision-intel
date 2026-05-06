@@ -188,10 +188,10 @@ export function DprPageOneCover(props: DprPageOneCoverProps) {
         <span className="dpr-honest-disclosure-mark">Disclosure</span>
         Decision Intel runs on SOC 2 Type II infrastructure (Vercel + Supabase) and is aligned with
         the eleven internationally-recognised AI governance principles codified by AI Verify
-        (Singapore IMDA). Decision Intel&apos;s own product-level SOC 2 Type I audit is targeted for Q4
-        2026; AI Verify alignment is self-attested and no third-party audit has yet been performed
-        against the mapping. Vocabulary in this record is calibrated to be defensible during a
-        vendor-risk register review.
+        (Singapore IMDA). Decision Intel&apos;s own product-level SOC 2 Type I audit is targeted for
+        Q4 2026; AI Verify alignment is self-attested and no third-party audit has yet been
+        performed against the mapping. Vocabulary in this record is calibrated to be defensible
+        during a vendor-risk register review.
       </div>
     </DprPageShell>
   );
@@ -210,9 +210,7 @@ function DprIdentityPanel({
   auditTimestamp: string;
 }) {
   const auditedDate = new Date(auditTimestamp).toISOString().slice(0, 10);
-  const auditedTime = new Date(auditTimestamp)
-    .toISOString()
-    .slice(11, 16);
+  const auditedTime = new Date(auditTimestamp).toISOString().slice(11, 16);
 
   // Each pill renders only when its underlying field is populated. The
   // panel hides itself entirely when no fields are available — falls
@@ -277,9 +275,7 @@ function DprIdentityPanel({
           <div
             key={pill.label}
             className={
-              pill.accent
-                ? 'dpr-identity-pill dpr-identity-pill--accent'
-                : 'dpr-identity-pill'
+              pill.accent ? 'dpr-identity-pill dpr-identity-pill--accent' : 'dpr-identity-pill'
             }
           >
             <span className="dpr-identity-pill-label">{pill.label}</span>
@@ -293,7 +289,5 @@ function DprIdentityPanel({
 }
 
 function prettyCase(s: string): string {
-  return s
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase());
+  return s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }

@@ -236,7 +236,7 @@ export function VoiceModePanel({ persona, founderPass, onEnd, recentChatMessages
         audioEl.addEventListener('ended', () => {
           console.log('[VoiceModePanel] audio ended — track finished');
         });
-        audioEl.addEventListener('error', (_e) => {
+        audioEl.addEventListener('error', _e => {
           console.error(
             '[VoiceModePanel] audio error —',
             audioEl.error?.code,
@@ -262,7 +262,7 @@ export function VoiceModePanel({ persona, founderPass, onEnd, recentChatMessages
           RoomEvent.TranscriptionReceived,
           (
             segments: Array<{ id: string; text: string; final: boolean }>,
-            participant?: { identity?: string },
+            participant?: { identity?: string }
           ) => {
             const role: 'user' | 'assistant' =
               participant?.identity === 'founder' ? 'user' : 'assistant';
@@ -343,22 +343,35 @@ export function VoiceModePanel({ persona, founderPass, onEnd, recentChatMessages
 
         // Verbose log for every other interesting room event so we can
         // see the full lifecycle when debugging "no audio" symptoms.
-        room.on(RoomEvent.TrackPublished, (publication: { trackName?: string; kind?: string }, participant: { identity?: string }) => {
-          console.log(
-            '[VoiceModePanel] TrackPublished —',
-            `participantIdentity=${participant?.identity}`,
-            `trackName=${publication?.trackName}`,
-            `kind=${publication?.kind}`
-          );
-        });
-        room.on(RoomEvent.TrackUnsubscribed, (track: { kind: string }, publication: { trackName?: string }, participant: { identity?: string }) => {
-          console.log(
-            '[VoiceModePanel] TrackUnsubscribed —',
-            `participantIdentity=${participant?.identity}`,
-            `trackName=${publication?.trackName}`,
-            `kind=${track?.kind}`
-          );
-        });
+        room.on(
+          RoomEvent.TrackPublished,
+          (
+            publication: { trackName?: string; kind?: string },
+            participant: { identity?: string }
+          ) => {
+            console.log(
+              '[VoiceModePanel] TrackPublished —',
+              `participantIdentity=${participant?.identity}`,
+              `trackName=${publication?.trackName}`,
+              `kind=${publication?.kind}`
+            );
+          }
+        );
+        room.on(
+          RoomEvent.TrackUnsubscribed,
+          (
+            track: { kind: string },
+            publication: { trackName?: string },
+            participant: { identity?: string }
+          ) => {
+            console.log(
+              '[VoiceModePanel] TrackUnsubscribed —',
+              `participantIdentity=${participant?.identity}`,
+              `trackName=${publication?.trackName}`,
+              `kind=${track?.kind}`
+            );
+          }
+        );
 
         // Mark agent as joined as soon as ANY remote participant
         // arrives — that's our Railway worker. The 'no agent joined'
@@ -425,8 +438,9 @@ export function VoiceModePanel({ persona, founderPass, onEnd, recentChatMessages
         // session — which the founder experiences as voice mode
         // auto-ending exactly 10 seconds after starting.
         // (Track 3 of the watchdog-defeat — the explicit init scan.)
-        const remoteCount = (room as unknown as { remoteParticipants?: Map<string, unknown> })
-          .remoteParticipants?.size ?? 0;
+        const remoteCount =
+          (room as unknown as { remoteParticipants?: Map<string, unknown> }).remoteParticipants
+            ?.size ?? 0;
         if (remoteCount > 0) {
           agentJoinedRef.current = true;
           console.log(
@@ -598,8 +612,7 @@ export function VoiceModePanel({ persona, founderPass, onEnd, recentChatMessages
               style={{
                 fontSize: 11,
                 lineHeight: 1.45,
-                color:
-                  seg.role === 'user' ? 'var(--text-primary)' : persona.color,
+                color: seg.role === 'user' ? 'var(--text-primary)' : persona.color,
                 fontStyle: seg.final ? 'normal' : 'italic',
                 opacity: seg.final ? 1 : 0.65,
               }}

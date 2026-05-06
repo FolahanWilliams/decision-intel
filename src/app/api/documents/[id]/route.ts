@@ -149,9 +149,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const { contentEncrypted: _ce, contentIv: _ci, contentTag: _ct, ...docFields } = docAny;
     let decryptedContent: string;
     try {
-      decryptedContent = getDocumentContent(
-        document as Parameters<typeof getDocumentContent>[0]
-      );
+      decryptedContent = getDocumentContent(document as Parameters<typeof getDocumentContent>[0]);
     } catch (decryptErr) {
       log.error('Document decryption failed:', decryptErr);
       return NextResponse.json(

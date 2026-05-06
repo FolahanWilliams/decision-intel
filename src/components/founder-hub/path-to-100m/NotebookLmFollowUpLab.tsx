@@ -3,10 +3,7 @@
 import { useState } from 'react';
 import { Copy, Check, BookOpen } from 'lucide-react';
 import { ExternalMemoryArchitecture } from './FounderOSPanel';
-import {
-  NOTEBOOKLM_FOLLOW_UPS,
-  type NotebookLmFollowUp,
-} from './data/notebook-lm-follow-ups';
+import { NOTEBOOKLM_FOLLOW_UPS, type NotebookLmFollowUp } from './data/notebook-lm-follow-ups';
 
 const PRIORITY_COLOR: Record<NotebookLmFollowUp['priority'], string> = {
   now: '#DC2626',
@@ -81,9 +78,9 @@ export function NotebookLmFollowUpLab() {
           institutional memory: queries land in NotebookLM → synthesis propagates to Founder Hub
           sections → locks into CLAUDE.md → renders on customer Decision Provenance Records as
           procurement-grade vocabulary. This is the founder&apos;s personal moat-architecture mirror
-          of what Decision Intel runs on a customer&apos;s memo (capture → encode → recall →
-          outcome flywheel). The 10 questions below are not standalone queries; they are
-          deliberate inputs to a stack that compounds.
+          of what Decision Intel runs on a customer&apos;s memo (capture → encode → recall → outcome
+          flywheel). The 10 questions below are not standalone queries; they are deliberate inputs
+          to a stack that compounds.
         </div>
         <ExternalMemoryArchitecture />
       </div>

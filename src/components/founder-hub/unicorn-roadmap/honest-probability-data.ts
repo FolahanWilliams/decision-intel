@@ -80,7 +80,8 @@ export const HONEST_PROBABILITY_PATH: RoadmapPhase[] = [
     framing:
       'GTM v3.5 Phase 2 (months 6-12): Sankore engagement at £1,999/mo founding-pilot rate produces the first reference-grade team artefact + Bias Genome calibration loops + 5+ warm intros to mid-market Heads of Corp Dev / GPs. Phase 1 Individual case studies (≥3 ROI documented) provide the credibility for the mid-market £1,999-£2,499/mo conversion. Mr. Reiner / Mr. Gabe asks activate AFTER Phase 1 produces evidence.',
     targets: {
-      logos: 'Sankore (paid £1,999/mo) + 5-10 mid-market Strategy customers + Phase 1 cohort retained',
+      logos:
+        'Sankore (paid £1,999/mo) + 5-10 mid-market Strategy customers + Phase 1 cohort retained',
       arr: '£200-£400K',
       valuation: 'Pre-seed close + early seed conversation opens (£8-15M post)',
     },

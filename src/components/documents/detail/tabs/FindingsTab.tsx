@@ -109,11 +109,7 @@ export function FindingsTab(props: FindingsTabProps) {
       <BiasFrequencyStrip counts={counts} total={biases.length} />
 
       {/* R²F per-document map */}
-      <R2FPerDocMap
-        protected_={r2fProtected}
-        suppressed={r2fSuppressed}
-        summary={r2fSummary}
-      />
+      <R2FPerDocMap protected_={r2fProtected} suppressed={r2fSuppressed} summary={r2fSummary} />
 
       {/* Toxic combinations */}
       {toxicCombinations.length > 0 && (
@@ -147,8 +143,8 @@ export function FindingsTab(props: FindingsTabProps) {
               fontStyle: 'italic',
             }}
           >
-            No biases detected on this audit. Either the memo is exceptionally clean — or
-            the analysis is still in flight.
+            No biases detected on this audit. Either the memo is exceptionally clean — or the
+            analysis is still in flight.
           </div>
         ) : (
           sorted.map(bias => (
@@ -349,9 +345,7 @@ function BiasFindingCard({ bias, active, onClick, taxonomyId }: BiasFindingCardP
             {Math.round(confidence * 100)}% confidence
           </span>
         )}
-        {bias.userRating != null && (
-          <span style={{ fontStyle: 'italic' }}>marked relevant</span>
-        )}
+        {bias.userRating != null && <span style={{ fontStyle: 'italic' }}>marked relevant</span>}
       </footer>
     </SeverityEdgeCard>
   );

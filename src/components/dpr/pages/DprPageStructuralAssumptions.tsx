@@ -108,9 +108,9 @@ export function DprPageStructuralAssumptions(props: DprPageStructuralAssumptions
         <DprNotice mark="On the framework">
           The four-determinant decomposition is the canonical structural-decision lens used by Ray
           Dalio (Bridgewater) and adapted in Decision Intel&apos;s structural-assumptions audit. The
-          memo&apos;s recommendation is only as robust as the weakest determinant; the reviewer&apos;s
-          discipline is to surface the determinant the memo argues least convincingly and pressure-
-          test it before capital commitment.
+          memo&apos;s recommendation is only as robust as the weakest determinant; the
+          reviewer&apos;s discipline is to surface the determinant the memo argues least
+          convincingly and pressure- test it before capital commitment.
         </DprNotice>
       </DprSection>
     </DprPageShell>
@@ -134,7 +134,7 @@ export const SAMPLE_STRUCTURAL_ASSUMPTIONS: DprStructuralAssumption[] = [
     implicitAssumption:
       'EU regulatory regime is stable; existing GDPR + AI Act compliance for the parent firm extends seamlessly to DACH operations.',
     outsideViewAnchor:
-      'EU AI Act high-risk decision-support obligations enter force August 2026 — 8 months after planned go-live. The memo assumes the parent\'s existing compliance posture covers the new obligations; this is not automatic for new market-entry workflows.',
+      "EU AI Act high-risk decision-support obligations enter force August 2026 — 8 months after planned go-live. The memo assumes the parent's existing compliance posture covers the new obligations; this is not automatic for new market-entry workflows.",
     reviewerQuestion:
       'What incremental EU AI Act obligations apply to the DACH-localised decision-support workflow specifically (Article 14 human oversight, Article 15 record-keeping), and what is the implementation cost + timeline to clear them BEFORE go-live, not after?',
     severity: 'critical',
@@ -142,9 +142,9 @@ export const SAMPLE_STRUCTURAL_ASSUMPTIONS: DprStructuralAssumption[] = [
   {
     determinant: 'productivity',
     implicitAssumption:
-      'DACH labour productivity matches the parent firm\'s home-market productivity for the localised functions (sales engineering, customer success, regulatory liaison).',
+      "DACH labour productivity matches the parent firm's home-market productivity for the localised functions (sales engineering, customer success, regulatory liaison).",
     outsideViewAnchor:
-      'DACH labour productivity in B2B SaaS roles is ~85-92% of US benchmarks per OECD 2025 data (Eurostat structural-business statistics). Wage costs are higher; output-per-FTE is meaningfully lower. The memo\'s headcount model implicitly assumes parity.',
+      "DACH labour productivity in B2B SaaS roles is ~85-92% of US benchmarks per OECD 2025 data (Eurostat structural-business statistics). Wage costs are higher; output-per-FTE is meaningfully lower. The memo's headcount model implicitly assumes parity.",
     reviewerQuestion:
       'Re-cost the headcount model at 88% productivity (mid-point of DACH B2B SaaS range) and 110% wage-cost. What is the revised break-even? If it slips past 22 months, does the memo still recommend at €14M, or does it recommend a smaller pilot first?',
     severity: 'high',

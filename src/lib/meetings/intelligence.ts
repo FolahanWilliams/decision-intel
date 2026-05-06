@@ -102,7 +102,6 @@ export async function extractActionItems(
   transcript: string,
   speakers: SpeakerInfo[]
 ): Promise<ActionItem[]> {
-  
   const speakerNames = speakers.map(s => s.name).join(', ');
 
   const prompt = `You are an expert meeting analyst. Extract ALL action items from this meeting transcript.
@@ -167,7 +166,6 @@ export async function extractKeyDecisions(
   transcript: string,
   speakers: SpeakerInfo[]
 ): Promise<KeyDecision[]> {
-  
   const speakerNames = speakers.map(s => s.name).join(', ');
 
   const prompt = `You are an expert meeting analyst. Identify ALL key decisions made during this meeting.
@@ -232,7 +230,6 @@ export async function generateMeetingSummary(
   meetingType: string,
   speakers: SpeakerInfo[]
 ): Promise<MeetingSummary> {
-  
   const totalWords = speakers.reduce((s, sp) => s + sp.wordCount, 0);
   const speakerBreakdown = speakers
     .map(
@@ -312,8 +309,6 @@ export async function analyzeSpeakerBiases(
   segments: TranscriptSegment[],
   speakers: SpeakerInfo[]
 ): Promise<SpeakerBiasProfile[]> {
-  
-
   // Build per-speaker transcript excerpts
   const speakerTexts = new Map<string, string[]>();
   for (const seg of segments) {

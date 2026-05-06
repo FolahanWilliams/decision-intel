@@ -37,7 +37,6 @@ function formatIcCountdown(icDate: string | null): string | null {
   return `${Math.abs(days)}d ago`;
 }
 
-
 interface DealKanbanProps {
   deals: DealSummary[];
   onStageChange: (dealId: string, newStage: string) => Promise<boolean>;
@@ -156,9 +155,7 @@ function KanbanCard({
               if (!countdown) return null;
               const isPast = countdown.endsWith('ago') || countdown === 'Yesterday';
               const isImminent =
-                countdown === 'Today' ||
-                countdown === 'Tomorrow' ||
-                /^in [1-3]d$/.test(countdown);
+                countdown === 'Today' || countdown === 'Tomorrow' || /^in [1-3]d$/.test(countdown);
               const color = isPast
                 ? 'var(--error)'
                 : isImminent

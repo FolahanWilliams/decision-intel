@@ -2124,6 +2124,23 @@ export default function Dashboard() {
           </div>
 
           {/* Documents List */}
+          <style>
+            {`
+              .docrow {
+                position: relative;
+              }
+              .docrow:hover {
+                background: var(--bg-secondary);
+                border-left-color: var(--accent-primary) !important;
+              }
+              .docrow:hover .docrow-fileicon {
+                transform: translateY(-1px);
+              }
+              .docrow .docrow-fileicon {
+                transition: transform 0.18s ease;
+              }
+            `}
+          </style>
           <div id="documents" className="card">
             <div className="card-header flex items-center justify-between">
               <div className="flex items-center gap-md">
@@ -2333,8 +2350,11 @@ export default function Dashboard() {
                   {sortedDocs.map((doc, idx) => (
                     <div
                       key={doc.id}
-                      className="flex items-center justify-between p-md hover:bg-secondary/50 transition-colors animate-fade-in"
-                      style={{ animationDelay: `${idx * 0.03}s` }}
+                      className="docrow flex items-center justify-between p-md transition-all animate-fade-in"
+                      style={{
+                        animationDelay: `${idx * 0.03}s`,
+                        borderLeft: '3px solid transparent',
+                      }}
                     >
                       <div className="flex items-center gap-md min-w-0">
                         <input
@@ -2358,18 +2378,31 @@ export default function Dashboard() {
                           }}
                         />
                         <div
+                          className="docrow-fileicon"
                           style={{
-                            width: 32,
-                            height: 32,
+                            width: 36,
+                            height: 36,
                             flexShrink: 0,
                             borderRadius: 'var(--radius-md)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            background: 'rgba(255, 255, 255, 0.06)',
+                            background: doc.isSample
+                              ? 'rgba(22, 163, 74, 0.08)'
+                              : 'var(--bg-secondary)',
+                            border: doc.isSample
+                              ? '1px solid rgba(22, 163, 74, 0.18)'
+                              : '1px solid var(--border-color)',
                           }}
                         >
-                          <FileText size={16} style={{ color: 'var(--text-secondary)' }} />
+                          <FileText
+                            size={16}
+                            style={{
+                              color: doc.isSample
+                                ? 'var(--accent-primary)'
+                                : 'var(--text-secondary)',
+                            }}
+                          />
                         </div>
                         <span className="truncate text-sm font-medium inline-flex items-center gap-2">
                           {doc.filename}
@@ -2403,6 +2436,24 @@ export default function Dashboard() {
                             </button>
                           </div>
                         )}
+
+                        {/* Fallback: doc has a status that didn't match analyzing/error/pending/complete
+                            (e.g. legacy 'queued', sample memos with status='ready', etc.). Without this
+                            block the row would render empty on the right side — the visible bug on the
+                            documents browse where sample docs sat with no action. */}
+                        {doc.status !== 'analyzing' &&
+                          doc.status !== 'error' &&
+                          doc.status !== 'pending' &&
+                          doc.status !== 'complete' && (
+                            <Link
+                              href={`/documents/${doc.id}`}
+                              className="btn btn-ghost btn-sm flex items-center gap-2"
+                              title="Open document"
+                            >
+                              <ArrowRight size={14} />
+                              Open
+                            </Link>
+                          )}
 
                         {doc.status === 'complete' && (
                           <>

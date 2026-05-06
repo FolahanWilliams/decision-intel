@@ -240,9 +240,7 @@ export async function POST(request: NextRequest) {
 
           // Generate follow-up suggestions (fire-and-forget, non-blocking)
           try {
-            const { generateText: suggestGenerate } = await import(
-              '@/lib/ai/providers/gateway'
-            );
+            const { generateText: suggestGenerate } = await import('@/lib/ai/providers/gateway');
             const { MODEL_CHEAP: SUGGEST_MODEL } = await import('@/lib/ai/gateway-models');
             const suggestResult = await suggestGenerate(
               `Based on this conversation, suggest 2-3 short follow-up questions the user might want to ask next. The user's latest question was: "${message}". Return ONLY a JSON array of strings, no other text. Example: ["Question 1?", "Question 2?"]`,

@@ -3,12 +3,7 @@
 import { useState } from 'react';
 import { Zap, ShieldAlert, ChevronRight, ChevronDown, Shield } from 'lucide-react';
 import { CognitiveSovereigntyStack } from './FounderOSPanel';
-import {
-  STRENGTHS,
-  WEAKNESSES,
-  type Strength,
-  type Weakness,
-} from './data/strengths-weaknesses';
+import { STRENGTHS, WEAKNESSES, type Strength, type Weakness } from './data/strengths-weaknesses';
 
 const SEVERITY_COLOR = {
   critical: '#DC2626',
@@ -470,69 +465,68 @@ export function StrengthsWeaknessesMatrix() {
             marginBottom: 10,
           }}
         >
-          The 4-tier protocol stack underwriting every strength below. Each tier
-          names the protocol + the source. Tier 1 is the foundation — without
-          neurobiological protection, the upper tiers collapse. The 5 strengths
-          to weaponise (right) and 5 weaknesses to neutralise (further right)
-          all rest on this stack being maintained.
+          The 4-tier protocol stack underwriting every strength below. Each tier names the protocol
+          + the source. Tier 1 is the foundation — without neurobiological protection, the upper
+          tiers collapse. The 5 strengths to weaponise (right) and 5 weaknesses to neutralise
+          (further right) all rest on this stack being maintained.
         </div>
         <CognitiveSovereigntyStack />
       </div>
 
-    <div className="sw-grid">
-      <div>
-        <div
-          style={{
-            fontSize: 11,
-            fontWeight: 800,
-            color: '#16A34A',
-            textTransform: 'uppercase',
-            letterSpacing: '0.08em',
-            marginBottom: 10,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-          }}
-        >
-          <Zap size={12} /> 5 strengths to weaponise
+      <div className="sw-grid">
+        <div>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 800,
+              color: '#16A34A',
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              marginBottom: 10,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+            }}
+          >
+            <Zap size={12} /> 5 strengths to weaponise
+          </div>
+          {STRENGTHS.map(s => (
+            <StrengthCard
+              key={s.id}
+              s={s}
+              isOpen={openStrengthIds.has(s.id)}
+              onToggle={() => toggle(openStrengthIds, s.id, setOpenStrengthIds)}
+            />
+          ))}
         </div>
-        {STRENGTHS.map(s => (
-          <StrengthCard
-            key={s.id}
-            s={s}
-            isOpen={openStrengthIds.has(s.id)}
-            onToggle={() => toggle(openStrengthIds, s.id, setOpenStrengthIds)}
-          />
-        ))}
-      </div>
 
-      <div>
-        <div
-          style={{
-            fontSize: 11,
-            fontWeight: 800,
-            color: '#DC2626',
-            textTransform: 'uppercase',
-            letterSpacing: '0.08em',
-            marginBottom: 10,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-          }}
-        >
-          <ShieldAlert size={12} /> 5 weaknesses to neutralise
+        <div>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 800,
+              color: '#DC2626',
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              marginBottom: 10,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+            }}
+          >
+            <ShieldAlert size={12} /> 5 weaknesses to neutralise
+          </div>
+          {WEAKNESSES.map(w => (
+            <WeaknessCard
+              key={w.id}
+              w={w}
+              isOpen={openWeaknessIds.has(w.id)}
+              onToggle={() => toggle(openWeaknessIds, w.id, setOpenWeaknessIds)}
+            />
+          ))}
         </div>
-        {WEAKNESSES.map(w => (
-          <WeaknessCard
-            key={w.id}
-            w={w}
-            isOpen={openWeaknessIds.has(w.id)}
-            onToggle={() => toggle(openWeaknessIds, w.id, setOpenWeaknessIds)}
-          />
-        ))}
-      </div>
 
-      <style>{`
+        <style>{`
         .sw-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -544,7 +538,7 @@ export function StrengthsWeaknessesMatrix() {
           }
         }
       `}</style>
-    </div>
+      </div>
     </>
   );
 }

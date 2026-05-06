@@ -140,7 +140,7 @@ export const EVENTS: PrepEvent[] = [
     primaryPersonas: ['fractional_cso', 'mid_market_corp_dev'],
     prepArcWeeks: 6,
     rationale:
-      "v3.5 §2 lock: the single highest-signal CSO event. Pre-book 5+ 1:1 coffees with target-persona attendees, NOT booth + waiting. Each conversation = 20-min audit on a real strategic memo.",
+      'v3.5 §2 lock: the single highest-signal CSO event. Pre-book 5+ 1:1 coffees with target-persona attendees, NOT booth + waiting. Each conversation = 20-min audit on a real strategic memo.',
   },
   {
     id: 'ai_in_business_2026_05_14',
@@ -207,7 +207,8 @@ export const WEDGE_PERSONAS: WedgePersona[] = [
       {
         bias: 'Confirmation Bias',
         case: 'Kodak digital photography exit (1989)',
-        whatItDid: 'leadership filtered every market signal through the existing-film-business lens',
+        whatItDid:
+          'leadership filtered every market signal through the existing-film-business lens',
       },
       {
         bias: 'Sunk-Cost Fallacy',
@@ -288,7 +289,8 @@ export const WEDGE_PERSONAS: WedgePersona[] = [
       {
         bias: 'Optimism Bias',
         case: 'Boeing 737 MAX certification (2018)',
-        whatItDid: 'cost + timeline projections systematically underweighted catastrophic-tail risk',
+        whatItDid:
+          'cost + timeline projections systematically underweighted catastrophic-tail risk',
       },
       {
         bias: 'Loss Aversion (mis-framed)',
@@ -320,7 +322,7 @@ export const DM_TEMPLATES: DmTemplate[] = [
     discoveryAsk:
       "Want to do a 20-min call this week or next? No agenda from my side. I'll ask 4 questions about how strategic memos move from draft to client review at your firm — workflow questions, not sales questions. If anything I learn maps onto something the audit can fix at draft time, I'll show you; if not, I'll send you the closest historical cases I have on file for your blind spots.",
     introducerFollowUp:
-      "Hi {introducer} — quick note that {prospect} and I had a great 20-min on {date}. Came out of it with {one-specific-insight}. Genuinely useful for both sides. Will keep you posted as the conversation develops; if {prospect} mentions us back to you, the framing they responded to was {framing}. Thanks again for the bridge.",
+      'Hi {introducer} — quick note that {prospect} and I had a great 20-min on {date}. Came out of it with {one-specific-insight}. Genuinely useful for both sides. Will keep you posted as the conversation develops; if {prospect} mentions us back to you, the framing they responded to was {framing}. Thanks again for the bridge.',
   },
   {
     personaId: 'mid_market_corp_dev',
@@ -338,7 +340,7 @@ export const DM_TEMPLATES: DmTemplate[] = [
     opener:
       "Hi {name} — saw your {recent-LP-letter or deal-thread}. Quick context: the bias patterns that killed Theranos and FTX investor decisions — halo effect, authority bias from Tier-1 backer presence — are detectable at draft time, not just in retrospect. I've been auditing IC memos for them for a few months. Happy to run a 60-second audit on your next memo, free, no slides, no pitch. The framing isn't 'here's a tool' — it's 'here's what your LPs will ask first when something goes sideways, before they ask.'",
     curiosityReply:
-      "Easiest path: paste the IC memo at decision-intel.com — first audit is free. The artefact you get back is the kind of structured evidence record an LP audit committee asks for: bias-by-bias confidence scores, the cross-document conflicts, the structural assumptions a sceptical LP would pressure-test. Useful as a pre-IC checklist or as the cover-page of the LP quarterly.",
+      'Easiest path: paste the IC memo at decision-intel.com — first audit is free. The artefact you get back is the kind of structured evidence record an LP audit committee asks for: bias-by-bias confidence scores, the cross-document conflicts, the structural assumptions a sceptical LP would pressure-test. Useful as a pre-IC checklist or as the cover-page of the LP quarterly.',
     discoveryAsk:
       "Want to do 20 min this week or next? Discovery, not pitch. I'll ask 4 questions about how IC memos move from draft to LP-letter at your firm — what your LPs ask post-mortem when a deal goes wrong, who catches what at draft time, the calibration loops you've already built. If the audit compresses any of that, I'll show you on a real recent decision (anonymised). If not, I'll send the 3 historical cases closest to your portfolio.",
     introducerFollowUp:
@@ -372,7 +374,8 @@ export const ACTION_CADENCE = {
   prepArc: [
     {
       weeksBeforeEvent: 6,
-      action: 'Pull the published attendee list. Filter to the 4 wedge personas. Target 20-30 names.',
+      action:
+        'Pull the published attendee list. Filter to the 4 wedge personas. Target 20-30 names.',
     },
     {
       weeksBeforeEvent: 5,

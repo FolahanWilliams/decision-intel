@@ -103,8 +103,7 @@ const SEVERITY_RANK: Record<string, number> = { critical: 0, high: 1, medium: 2,
 
 function gradeFor(score: number) {
   return (
-    GRADE_THRESHOLDS.find(g => score >= g.min) ??
-    GRADE_THRESHOLDS[GRADE_THRESHOLDS.length - 1]
+    GRADE_THRESHOLDS.find(g => score >= g.min) ?? GRADE_THRESHOLDS[GRADE_THRESHOLDS.length - 1]
   );
 }
 
@@ -145,8 +144,7 @@ export default async function CognitiveAuditDetailPage({ params }: PageProps) {
       ? (audit.noiseStats as Record<string, unknown>)
       : null;
   const noiseMean = typeof noiseStats?.mean === 'number' ? noiseStats.mean : null;
-  const noiseStdDev =
-    typeof noiseStats?.stdDev === 'number' ? noiseStats.stdDev : null;
+  const noiseStdDev = typeof noiseStats?.stdDev === 'number' ? noiseStats.stdDev : null;
 
   return (
     <ErrorBoundary sectionName="Cognitive Audit Detail">
@@ -221,9 +219,12 @@ export default async function CognitiveAuditDetailPage({ params }: PageProps) {
             >
               Audit running &middot; results land here when the analyzer completes
             </h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, lineHeight: 1.6, margin: 0 }}>
-              The cognitive audit pipeline runs bias detection, noise scoring, sentiment, compliance,
-              pre-mortem, logical analysis, and SWOT in parallel. Refresh in 30-60 seconds.{' '}
+            <p
+              style={{ color: 'var(--text-secondary)', fontSize: 13.5, lineHeight: 1.6, margin: 0 }}
+            >
+              The cognitive audit pipeline runs bias detection, noise scoring, sentiment,
+              compliance, pre-mortem, logical analysis, and SWOT in parallel. Refresh in 30-60
+              seconds.{' '}
               <code
                 style={{
                   fontFamily: 'ui-monospace, monospace',
@@ -260,9 +261,11 @@ export default async function CognitiveAuditDetailPage({ params }: PageProps) {
             >
               Audit failed
             </h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, lineHeight: 1.6, margin: 0 }}>
-              The cognitive audit pipeline returned an error and the result was not stored. Re-submit
-              the decision from{' '}
+            <p
+              style={{ color: 'var(--text-secondary)', fontSize: 13.5, lineHeight: 1.6, margin: 0 }}
+            >
+              The cognitive audit pipeline returned an error and the result was not stored.
+              Re-submit the decision from{' '}
               <Link
                 href="/dashboard/cognitive-audits/submit"
                 style={{ color: 'var(--accent-primary)', textDecoration: 'underline' }}

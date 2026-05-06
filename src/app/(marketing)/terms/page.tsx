@@ -225,10 +225,10 @@ export default function TermsOfServicePage() {
             </h2>
             <p>
               On any termination, you may request a machine-readable export of all Analyses,
-              Decision Provenance Records, blind priors, outcomes, and associated metadata in JSON
-              + PDF format. We will fulfil the request within fourteen (14) calendar days.
-              Production data is preserved against deletion during any active export window (up to
-              thirty days post-termination) before the standard 30-day permanent purge runs.
+              Decision Provenance Records, blind priors, outcomes, and associated metadata in JSON +
+              PDF format. We will fulfil the request within fourteen (14) calendar days. Production
+              data is preserved against deletion during any active export window (up to thirty days
+              post-termination) before the standard 30-day permanent purge runs.
             </p>
             <p style={{ marginTop: '12px' }}>
               <strong style={{ color: 'var(--text-primary)' }}>
@@ -247,8 +247,8 @@ export default function TermsOfServicePage() {
               </a>
               . Raw-document requests are fulfilled within fourteen (14) calendar days of the
               request, in the original file format with associated content hashes. This mechanism
-              honours your portability right under GDPR Art. 20 and the equivalent rights under
-              UK GDPR, NDPR (Nigeria), PoPIA (South Africa), and CMA (Kenya).
+              honours your portability right under GDPR Art. 20 and the equivalent rights under UK
+              GDPR, NDPR (Nigeria), PoPIA (South Africa), and CMA (Kenya).
             </p>
           </section>
 
@@ -280,8 +280,8 @@ export default function TermsOfServicePage() {
               </li>
               <li>
                 <strong style={{ color: 'var(--text-primary)' }}>Strategy:</strong> 99.5% monthly
-                uptime. Recovery time objective (RTO) under 4 hours; recovery point objective
-                (RPO) under 15 minutes.
+                uptime. Recovery time objective (RTO) under 4 hours; recovery point objective (RPO)
+                under 15 minutes.
               </li>
               <li>
                 <strong style={{ color: 'var(--text-primary)' }}>Enterprise:</strong> 99.9% monthly
@@ -291,8 +291,8 @@ export default function TermsOfServicePage() {
             </ul>
             <p style={{ marginTop: '12px' }}>
               <strong style={{ color: 'var(--text-primary)' }}>Service credits.</strong> When
-              measured uptime falls below the tier target in a calendar month, eligible Strategy
-              and Enterprise customers may claim a credit against the next monthly invoice:
+              measured uptime falls below the tier target in a calendar month, eligible Strategy and
+              Enterprise customers may claim a credit against the next monthly invoice:
             </p>
             <ul style={{ marginTop: '8px', marginBottom: '12px', paddingLeft: '20px' }}>
               <li>
@@ -307,11 +307,11 @@ export default function TermsOfServicePage() {
               </li>
             </ul>
             <p>
-              Service credits are claimed in writing within 30 calendar days of the affected
-              month. Credits are the customer&apos;s sole and exclusive remedy for availability
-              shortfalls. Scheduled maintenance windows (notified at least seven calendar days in
-              advance, capped at four hours per month outside business hours) and force-majeure
-              events are excluded from availability calculations. Live status is published at{' '}
+              Service credits are claimed in writing within 30 calendar days of the affected month.
+              Credits are the customer&apos;s sole and exclusive remedy for availability shortfalls.
+              Scheduled maintenance windows (notified at least seven calendar days in advance,
+              capped at four hours per month outside business hours) and force-majeure events are
+              excluded from availability calculations. Live status is published at{' '}
               <Link
                 href="/security"
                 style={{ color: 'var(--text-primary)', textDecoration: 'underline' }}
@@ -367,12 +367,11 @@ export default function TermsOfServicePage() {
               >
                 compliance@decision-intel.com
               </a>
-              . If your objection is sustained on reasonable grounds (regulatory conflict,
-              material security regression, sanctions exposure) and we are unable to offer a
-              commercially-reasonable alternative within thirty (30) calendar days of the
-              objection, you may terminate the affected portion of the Services without penalty
-              and receive a pro-rata refund of any pre-paid fees attributable to the unused
-              remainder of the term.
+              . If your objection is sustained on reasonable grounds (regulatory conflict, material
+              security regression, sanctions exposure) and we are unable to offer a
+              commercially-reasonable alternative within thirty (30) calendar days of the objection,
+              you may terminate the affected portion of the Services without penalty and receive a
+              pro-rata refund of any pre-paid fees attributable to the unused remainder of the term.
             </p>
           </section>
 
@@ -391,8 +390,7 @@ export default function TermsOfServicePage() {
                 style={{ color: 'var(--text-primary)', textDecoration: 'underline' }}
               >
                 /security
-              </Link>
-              {' '}
+              </Link>{' '}
               and updated within thirty (30) days of any provider-policy change. Where a customer
               elects sovereign-AI routing (Enterprise tier, executed Order Form), the same
               no-training commitment applies to the routed alternative provider.

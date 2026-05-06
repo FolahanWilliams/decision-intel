@@ -334,7 +334,11 @@ export function InlinePasteMemoCard({
               marginBottom: 12,
             }}
           >
-            <Loader2 size={16} className="animate-spin" style={{ color: 'var(--accent-primary)' }} />
+            <Loader2
+              size={16}
+              className="animate-spin"
+              style={{ color: 'var(--accent-primary)' }}
+            />
             <span style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--text-primary)' }}>
               {phase === 'uploading'
                 ? 'Uploading and encrypting&hellip;'
@@ -402,15 +406,15 @@ export function InlinePasteMemoCard({
                     }}
                   >
                     {step.status === 'complete' && <CheckCircle2 size={10} />}
-                    {step.status === 'running' && (
-                      <Loader2 size={10} className="animate-spin" />
-                    )}
+                    {step.status === 'running' && <Loader2 size={10} className="animate-spin" />}
                     {step.name}
                   </span>
                 ))}
               </div>
 
-              <p style={{ fontSize: 11.5, color: 'var(--text-muted)', lineHeight: 1.55, margin: 0 }}>
+              <p
+                style={{ fontSize: 11.5, color: 'var(--text-muted)', lineHeight: 1.55, margin: 0 }}
+              >
                 You&rsquo;ll be redirected to the full document detail page when the audit
                 completes. The Decision Provenance Record, boardroom simulation, reference class
                 forecast, counterfactual impact, and Knowledge Graph nodes all generate as part of

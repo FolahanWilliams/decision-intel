@@ -537,7 +537,8 @@ export function VerdictBand({
 function formatExposure(amount: number): string {
   // Compact monetary formatter: 600M / 1.2B / 25K
   const abs = Math.abs(amount);
-  if (abs >= 1_000_000_000) return `${(amount / 1_000_000_000).toFixed(abs >= 10_000_000_000 ? 0 : 1)}B`;
+  if (abs >= 1_000_000_000)
+    return `${(amount / 1_000_000_000).toFixed(abs >= 10_000_000_000 ? 0 : 1)}B`;
   if (abs >= 1_000_000) return `${(amount / 1_000_000).toFixed(abs >= 10_000_000 ? 0 : 1)}M`;
   if (abs >= 1_000) return `${(amount / 1_000).toFixed(abs >= 10_000 ? 0 : 1)}K`;
   return amount.toFixed(0);

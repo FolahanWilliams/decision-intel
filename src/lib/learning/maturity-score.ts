@@ -71,7 +71,10 @@ export async function computeMaturityScore(orgId: string): Promise<MaturityScore
       prisma.decisionOutcome.findMany({
         where: {
           orgId,
-          OR: [{ confirmedBiases: { isEmpty: false } }, { falsePositiveBiases: { isEmpty: false } }],
+          OR: [
+            { confirmedBiases: { isEmpty: false } },
+            { falsePositiveBiases: { isEmpty: false } },
+          ],
         },
         select: { confirmedBiases: true, falsePositiveBiases: true },
       }),

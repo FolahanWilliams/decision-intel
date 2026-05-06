@@ -35,10 +35,7 @@ const MAX_DISMISSAL_COUNT = 3;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-export type VohraResponseValue =
-  | 'very_disappointed'
-  | 'somewhat_disappointed'
-  | 'not_disappointed';
+export type VohraResponseValue = 'very_disappointed' | 'somewhat_disappointed' | 'not_disappointed';
 
 export interface VohraEligibility {
   eligible: boolean;
@@ -50,9 +47,7 @@ export interface VohraEligibility {
  * Returns whether a user is currently eligible to receive a new Vohra survey.
  * Used by the cron trigger AND by manual-trigger admin tooling.
  */
-export async function checkVohraEligibility(
-  userId: string,
-): Promise<VohraEligibility> {
+export async function checkVohraEligibility(userId: string): Promise<VohraEligibility> {
   const windowStart = new Date(Date.now() - TRIGGER_AUDIT_WINDOW_DAYS * DAY_MS);
 
   // Count audits the user has completed in the trigger window.
@@ -113,7 +108,7 @@ export async function checkVohraEligibility(
  */
 export async function createPendingSurvey(
   userId: string,
-  triggerReason: string = 'audits_complete_2_in_14d',
+  triggerReason: string = 'audits_complete_2_in_14d'
 ): Promise<{ id: string }> {
   const settings = await prisma.userSettings
     .findUnique({
@@ -193,7 +188,7 @@ export interface VohraSubmitInput {
 export async function submitVohraResponse(
   userId: string,
   surveyId: string,
-  input: VohraSubmitInput,
+  input: VohraSubmitInput
 ): Promise<{ id: string }> {
   const updated = await prisma.vohraPMFResponse.update({
     where: { id: surveyId },
@@ -222,7 +217,7 @@ export async function submitVohraResponse(
  */
 export async function dismissPendingSurvey(
   userId: string,
-  surveyId: string,
+  surveyId: string
 ): Promise<{ dismissedCount: number; forceNextShow: boolean }> {
   const updated = await prisma.vohraPMFResponse.update({
     where: { id: surveyId },
@@ -266,9 +261,7 @@ export interface HxcCohortMetrics {
  * Returns the % "very disappointed", graduation-gate status, kill-threshold
  * status, plus per-persona breakdown.
  */
-export async function computeHxcCohortMetrics(
-  windowDays: number = 90,
-): Promise<HxcCohortMetrics> {
+export async function computeHxcCohortMetrics(windowDays: number = 90): Promise<HxcCohortMetrics> {
   const windowStart = new Date(Date.now() - windowDays * DAY_MS);
   const windowEnd = new Date();
 
@@ -284,7 +277,7 @@ export async function computeHxcCohortMetrics(
 
   const veryDisappointed = responses.filter(r => r.veryDisappointed === 'very_disappointed').length;
   const somewhatDisappointed = responses.filter(
-    r => r.veryDisappointed === 'somewhat_disappointed',
+    r => r.veryDisappointed === 'somewhat_disappointed'
   ).length;
   const notDisappointed = responses.filter(r => r.veryDisappointed === 'not_disappointed').length;
   const totalRespondents = responses.length;
@@ -293,7 +286,9 @@ export async function computeHxcCohortMetrics(
 
   const cohortBreakdown = PHASE_1_HXC_PERSONAS.map(p => {
     const subset = responses.filter(r => r.phase1PersonaAtTime === p.id);
-    const subsetVeryDisappointed = subset.filter(r => r.veryDisappointed === 'very_disappointed').length;
+    const subsetVeryDisappointed = subset.filter(
+      r => r.veryDisappointed === 'very_disappointed'
+    ).length;
     return {
       personaId: p.id,
       personaLabel: p.label,

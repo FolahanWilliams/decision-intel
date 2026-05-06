@@ -327,10 +327,7 @@ export default function DealDetailPage() {
         );
       case 'findings':
         return (
-          <BiasSummaryTab
-            documents={deal.documents || []}
-            aggregation={deal.aggregation ?? null}
-          />
+          <BiasSummaryTab documents={deal.documents || []} aggregation={deal.aggregation ?? null} />
         );
       case 'brief':
         return <DecisionBriefTab dealId={dealId} />;
@@ -400,10 +397,10 @@ export default function DealDetailPage() {
         onClose={() => setShowSettings(false)}
         methodologySlot={
           <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
-            Composite DQI averages the latest analysis from every analyzed document in the
-            deal. Cross-reference flags surface contradictions across docs (CIM vs model vs
-            IC deck). The deal-level DPR carries the composite verdict + per-doc audit
-            lineage in a single hashed artefact for the audit committee.
+            Composite DQI averages the latest analysis from every analyzed document in the deal.
+            Cross-reference flags surface contradictions across docs (CIM vs model vs IC deck). The
+            deal-level DPR carries the composite verdict + per-doc audit lineage in a single hashed
+            artefact for the audit committee.
           </div>
         }
         reproducibilitySlot={
@@ -416,7 +413,9 @@ export default function DealDetailPage() {
             }}
           >
             <div>deal_id: {deal.id}</div>
-            <div>analyzed_docs: {analyzedDocCount} / {totalDocCount}</div>
+            <div>
+              analyzed_docs: {analyzedDocCount} / {totalDocCount}
+            </div>
             <div>cross_ref: {deal.crossReference ? 'on file' : '—'}</div>
           </div>
         }
@@ -619,8 +618,8 @@ function ArchiveDealButton({
     <div style={{ display: 'grid', gap: 8 }}>
       <p style={{ margin: 0, fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
         Archiving <strong>{dealName}</strong> marks it as archived and soft-deletes attached
-        documents. They will be permanently purged after the retention grace window. This
-        action is recoverable during the grace window only via support.
+        documents. They will be permanently purged after the retention grace window. This action is
+        recoverable during the grace window only via support.
       </p>
       <div style={{ display: 'flex', gap: 8 }}>
         <button
@@ -724,8 +723,8 @@ function DocumentsTab({
             No documents linked to this project
           </div>
           <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 14 }}>
-            Drop a document above to upload it directly into this deal, or open the dashboard
-            to link an existing analysis.
+            Drop a document above to upload it directly into this deal, or open the dashboard to
+            link an existing analysis.
           </div>
           <button
             onClick={() => router.push('/dashboard')}
@@ -1082,9 +1081,9 @@ function BiasSummaryTab({
         }}
       >
         <strong style={{ color: 'var(--text-primary)' }}>What&apos;s shown:</strong> aggregated bias
-        flags across every analyzed document in this deal. The cross-reference card on the
-        composite pane shows where the documents <em>contradict</em> each other — the second
-        signal an audit-committee reader looks for.
+        flags across every analyzed document in this deal. The cross-reference card on the composite
+        pane shows where the documents <em>contradict</em> each other — the second signal an
+        audit-committee reader looks for.
       </div>
     </div>
   );

@@ -90,8 +90,7 @@ const OBJECTIONS: Objection[] = [
   {
     number: '02',
     question: 'What happens to our data?',
-    answer:
-      `Documents are encrypted at rest with authenticated AES-256-GCM (keyVersion-rotated). A GDPR anonymizer runs as the literal first node of the pipeline, so no analysis model ever sees raw PII. No customer data is used to train upstream models. ${SOC2_FULL_STATEMENT} Full posture at /security.`,
+    answer: `Documents are encrypted at rest with authenticated AES-256-GCM (keyVersion-rotated). A GDPR anonymizer runs as the literal first node of the pipeline, so no analysis model ever sees raw PII. No customer data is used to train upstream models. ${SOC2_FULL_STATEMENT} Full posture at /security.`,
   },
   {
     number: '03',

@@ -500,7 +500,7 @@ export const SILENT_OBJECTIONS: SilentObjection[] = [
     id: 'pan_african_regulatory',
     label: 'The Pan-African regulatory illusion',
     whatBuyerThinks:
-      "You pitched me a Pan-African compliance map tailored for African funds, but I want to know whether you cover MY primary regulator (e.g. Nigerian SEC ISA 2007, current FRC Nigeria code, CBN, NDPR). If those are not in the audit by name, you do not actually know my market.",
+      'You pitched me a Pan-African compliance map tailored for African funds, but I want to know whether you cover MY primary regulator (e.g. Nigerian SEC ISA 2007, current FRC Nigeria code, CBN, NDPR). If those are not in the audit by name, you do not actually know my market.',
     whyItKillsTheDeal:
       'For a licensed firm managing significant AUM, regulatory mapping is not a marketing bullet point — it is a legal requirement. Presenting incomplete regional compliance breaks trust instantly and turns an "insider" wedge into an "outsider" misstep.',
     thisWeekFix:

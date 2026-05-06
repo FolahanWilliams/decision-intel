@@ -244,8 +244,8 @@ export function RemediationChecklist({ biases, documentId }: Props) {
             }}
           >
             <ChevronRight size={11} />
-            {biases.length - 3} additional {biases.length - 3 === 1 ? 'bias' : 'biases'}{' '}
-            flagged · resolve the top 3 first, then revisit the full list below.
+            {biases.length - 3} additional {biases.length - 3 === 1 ? 'bias' : 'biases'} flagged ·
+            resolve the top 3 first, then revisit the full list below.
           </div>
         )}
       </div>

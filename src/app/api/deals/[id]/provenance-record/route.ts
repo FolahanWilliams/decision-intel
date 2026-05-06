@@ -77,11 +77,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       // Phase 4 wire-in: render via the shared HTML/CSS Puppeteer flow
       // (CLAUDE.md DPR architecture lock 2026-05-05).
       const reqUrl = request.nextUrl;
-      const baseUrl =
-        process.env.NEXT_PUBLIC_APP_URL ?? `${reqUrl.protocol}//${reqUrl.host}`;
-      const renderUrl = `${baseUrl}/dpr-render/deal/${dealId}${
-        clientSafe ? '?clientSafe=1' : ''
-      }`;
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? `${reqUrl.protocol}//${reqUrl.host}`;
+      const renderUrl = `${baseUrl}/dpr-render/deal/${dealId}${clientSafe ? '?clientSafe=1' : ''}`;
       const { pdf } = await renderDprPdf({
         baseUrl,
         type: 'deal',

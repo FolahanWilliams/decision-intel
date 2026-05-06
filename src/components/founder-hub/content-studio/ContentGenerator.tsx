@@ -13,10 +13,7 @@ import {
   Video,
 } from 'lucide-react';
 import { card, sectionTitle } from '../shared-styles';
-import {
-  ARCHETYPE_OPTIONS,
-  pickArchetype,
-} from '@/lib/data/personal-social-system-prompt';
+import { ARCHETYPE_OPTIONS, pickArchetype } from '@/lib/data/personal-social-system-prompt';
 
 const CONTENT_TYPES = [
   { id: 'linkedin_post', label: 'LinkedIn', icon: Linkedin, color: '#0a66c2' },
@@ -115,7 +112,7 @@ export function ContentGenerator({
 
   // Detail card source: either the manually-selected option, or null when in auto mode (autoPickedArchetype handles that branch separately).
   const activeArchetypeDetail = useMemo(
-    () => (archetypeId ? ARCHETYPE_OPTIONS.find(a => a.id === archetypeId) ?? null : null),
+    () => (archetypeId ? (ARCHETYPE_OPTIONS.find(a => a.id === archetypeId) ?? null) : null),
     [archetypeId]
   );
 
@@ -296,7 +293,10 @@ export function ContentGenerator({
           <span>Voice Archetype</span>
           {autoPickedArchetype && (
             <span style={{ fontWeight: 400, fontSize: 11, color: 'var(--text-muted, #71717a)' }}>
-              Auto-picked: <strong style={{ color: 'var(--text-secondary, #a1a1aa)' }}>{autoPickedArchetype.name}</strong>
+              Auto-picked:{' '}
+              <strong style={{ color: 'var(--text-secondary, #a1a1aa)' }}>
+                {autoPickedArchetype.name}
+              </strong>
             </span>
           )}
         </div>
@@ -310,9 +310,8 @@ export function ContentGenerator({
               fontSize: 12,
               fontWeight: 600,
               cursor: 'pointer',
-              border: archetypeId === ''
-                ? '2px solid #16a34a'
-                : '2px solid var(--border-primary, #222)',
+              border:
+                archetypeId === '' ? '2px solid #16a34a' : '2px solid var(--border-primary, #222)',
               background: archetypeId === '' ? '#16a34a15' : 'transparent',
               color: archetypeId === '' ? '#16a34a' : 'var(--text-secondary, #a1a1aa)',
               transition: 'all 0.15s',
@@ -333,9 +332,7 @@ export function ContentGenerator({
                   fontSize: 12,
                   fontWeight: 600,
                   cursor: 'pointer',
-                  border: active
-                    ? '2px solid #16a34a'
-                    : '2px solid var(--border-primary, #222)',
+                  border: active ? '2px solid #16a34a' : '2px solid var(--border-primary, #222)',
                   background: active ? '#16a34a15' : 'transparent',
                   color: active ? '#16a34a' : 'var(--text-secondary, #a1a1aa)',
                   transition: 'all 0.15s',

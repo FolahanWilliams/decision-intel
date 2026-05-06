@@ -18,11 +18,7 @@ export { DqiPill } from './DqiPill';
 export type { DqiPillProps } from './DqiPill';
 
 export { R2FPerDocMap } from './R2FPerDocMap';
-export type {
-  R2FPerDocMapProps,
-  R2FProtectedItem,
-  R2FSuppressedItem,
-} from './R2FPerDocMap';
+export type { R2FPerDocMapProps, R2FProtectedItem, R2FSuppressedItem } from './R2FPerDocMap';
 
 export { ToxicCombinationsRadial } from './ToxicCombinationsRadial';
 export type {

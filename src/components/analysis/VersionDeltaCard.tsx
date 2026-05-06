@@ -113,7 +113,8 @@ export function VersionDeltaCard({ current, previousAnalysisId, previousPreloade
         >
           <Minus size={14} />
           <span>
-            <strong>Version delta unavailable</strong> — {error || 'previous audit data has been archived or purged per data-retention policy'}.
+            <strong>Version delta unavailable</strong> —{' '}
+            {error || 'previous audit data has been archived or purged per data-retention policy'}.
             The current audit stands on its own.
           </span>
         </div>

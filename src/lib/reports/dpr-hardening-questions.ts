@@ -42,13 +42,13 @@ const TABLE: Record<string, HardeningQuestion> = {
     question:
       'Which two pieces of disconfirming evidence did the memo author actively seek out, and what would change in the recommendation if either turned out to be true?',
     rationale:
-      'Per Nickerson (1998), confirmation bias is rarely visible to the author. The reviewer\'s discipline is to demand evidence the author would NOT have surfaced naturally.',
+      "Per Nickerson (1998), confirmation bias is rarely visible to the author. The reviewer's discipline is to demand evidence the author would NOT have surfaced naturally.",
   },
   anchoring_bias: {
     question:
       'Which numeric anchor in the memo (TAM, valuation, break-even, comparable transaction) was selected first, and what does the analysis look like with three alternative anchors drawn from independent sources?',
     rationale:
-      'Per Tversky & Kahneman (1974), the first anchor introduced into a discussion captures subsequent reasoning. The reviewer\'s discipline: re-anchor before deciding.',
+      "Per Tversky & Kahneman (1974), the first anchor introduced into a discussion captures subsequent reasoning. The reviewer's discipline: re-anchor before deciding.",
   },
   sunk_cost_fallacy: {
     question:
@@ -66,7 +66,7 @@ const TABLE: Record<string, HardeningQuestion> = {
     question:
       'Which specific feature of this case (industry, deal size, regulatory regime, market structure) makes the matched-class base rate inapplicable, and what evidence supports that exclusion?',
     rationale:
-      'Per Kahneman & Klein (2009), narrative coherence creates false confidence. The reviewer\'s discipline is to force the memo to defend why the outside-view evidence does NOT apply.',
+      "Per Kahneman & Klein (2009), narrative coherence creates false confidence. The reviewer's discipline is to force the memo to defend why the outside-view evidence does NOT apply.",
   },
   inside_view_dominance: {
     question:
@@ -82,9 +82,9 @@ const TABLE: Record<string, HardeningQuestion> = {
   },
   authority_bias: {
     question:
-      'Which independent verification of the cited authority (deal terms, audit findings, board minutes, regulator engagement) does the memo carry, and what changes if that verification is inconsistent with the authority\'s representation?',
+      "Which independent verification of the cited authority (deal terms, audit findings, board minutes, regulator engagement) does the memo carry, and what changes if that verification is inconsistent with the authority's representation?",
     rationale:
-      'Per Cialdini (1984) + Theranos / FTX cases, presence of a Tier-1 backer is not evidence of correctness. The reviewer\'s discipline is to demand independent verification.',
+      "Per Cialdini (1984) + Theranos / FTX cases, presence of a Tier-1 backer is not evidence of correctness. The reviewer's discipline is to demand independent verification.",
   },
   halo_effect: {
     question:

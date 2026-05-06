@@ -77,19 +77,14 @@ export function DocumentTrustFooter({ uploadedAt }: DocumentTrustFooterProps) {
   const [mountTime] = useState(() => Date.now());
   const uploadedDate = typeof uploadedAt === 'string' ? new Date(uploadedAt) : uploadedAt;
   const expiresAt = new Date(uploadedDate.getTime() + retentionDays * 86_400_000);
-  const daysRemaining = Math.max(
-    0,
-    Math.ceil((expiresAt.getTime() - mountTime) / 86_400_000)
-  );
+  const daysRemaining = Math.max(0, Math.ceil((expiresAt.getTime() - mountTime) / 86_400_000));
 
   // Show the full SOC2_RECEIPTS list (5 entries: Controller + 4 sub-processors).
   // Strip the parenthetical role qualifier and corporate suffix for compact
   // chip-row display. The Controller row carries status='targeted' so the GC
   // sees the in-flight Type I attestation honestly named, not glossed over.
   const receipts = SOC2_RECEIPTS.map(r => {
-    const label = r.party
-      .replace(/\s*\([^)]+\)\s*$/, '')
-      .replace(/\s+(Inc\.|Ltd\.)$/, '');
+    const label = r.party.replace(/\s*\([^)]+\)\s*$/, '').replace(/\s+(Inc\.|Ltd\.)$/, '');
     return { label, status: r.status };
   });
 
@@ -117,9 +112,7 @@ export function DocumentTrustFooter({ uploadedAt }: DocumentTrustFooterProps) {
         style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}
       >
         <ShieldCheck size={13} style={{ color: 'var(--accent-primary)' }} aria-hidden />
-        <span style={{ fontWeight: 600, color: 'var(--text-secondary)' }}>
-          Trust posture
-        </span>
+        <span style={{ fontWeight: 600, color: 'var(--text-secondary)' }}>Trust posture</span>
       </span>
 
       <span className="dtf-chip">

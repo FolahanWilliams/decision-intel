@@ -33,10 +33,7 @@ import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('DealArchiveRoute');
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id: dealId } = await params;
     const supabase = await createClient();

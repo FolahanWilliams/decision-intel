@@ -83,18 +83,12 @@ export function DprPageTwoMethodology(props: DprPageTwoMethodologyProps) {
           />
           <DprStatCard
             label="Std. deviation"
-            value={
-              noiseJudge?.stdDev != null
-                ? noiseJudge.stdDev.toFixed(1)
-                : '—'
-            }
+            value={noiseJudge?.stdDev != null ? noiseJudge.stdDev.toFixed(1) : '—'}
             foot="Variance across the jury sample. Lower = stronger convergence."
           />
           <DprStatCard
             label="Inter-judge variance"
-            value={
-              variancePct != null ? `${(variancePct * 100).toFixed(1)}%` : '—'
-            }
+            value={variancePct != null ? `${(variancePct * 100).toFixed(1)}%` : '—'}
             foot={convergenceBand.foot}
           />
           <DprStatCard
@@ -114,9 +108,7 @@ export function DprPageTwoMethodology(props: DprPageTwoMethodologyProps) {
           </DprNotice>
         )}
 
-        {judgeVariance.note && (
-          <DprNotice mark="On per-judge IP">{judgeVariance.note}</DprNotice>
-        )}
+        {judgeVariance.note && <DprNotice mark="On per-judge IP">{judgeVariance.note}</DprNotice>}
       </DprSection>
 
       {/* §3 — Model Lineage & Prompt Fingerprint */}
@@ -165,9 +157,7 @@ function buildLineageRows(lineage: ModelLineage) {
 }
 
 function prettyNodeName(nodeId: string): string {
-  return nodeId
-    .replace(/([a-z])([A-Z])/g, '$1 $2')
-    .replace(/^./, c => c.toUpperCase());
+  return nodeId.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, c => c.toUpperCase());
 }
 
 function computeConvergenceBand(variancePct: number | null) {

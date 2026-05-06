@@ -72,10 +72,8 @@ function phaseColor(phase: Stage['phase']): {
   stroke: string;
   text: string;
 } {
-  if (phase === 'pivot')
-    return { fill: C.amberSoft, stroke: C.amber, text: C.amber };
-  if (phase === 'pitch')
-    return { fill: C.indigoSoft, stroke: C.indigo, text: C.indigo };
+  if (phase === 'pivot') return { fill: C.amberSoft, stroke: C.amber, text: C.amber };
+  if (phase === 'pitch') return { fill: C.indigoSoft, stroke: C.indigo, text: C.indigo };
   return { fill: C.greenSoft, stroke: C.green, text: C.green };
 }
 
@@ -140,10 +138,9 @@ export function MomDiscoveryFrameworkViz() {
           lineHeight: 1.55,
         }}
       >
-        Click any stage to zoom into the verbatim language. The green band is the
-        Mom-Test-grade discovery you must complete before any pitch lands. The amber
-        node is the non-negotiable pivot sentence. The indigo stage is where pitch
-        happens, keyed off what they revealed.
+        Click any stage to zoom into the verbatim language. The green band is the Mom-Test-grade
+        discovery you must complete before any pitch lands. The amber node is the non-negotiable
+        pivot sentence. The indigo stage is where pitch happens, keyed off what they revealed.
       </p>
 
       {/* SVG flow diagram */}
@@ -252,11 +249,7 @@ export function MomDiscoveryFrameworkViz() {
                   stroke={colors.stroke}
                   strokeWidth={isActive ? 3 : 2}
                   initial={false}
-                  animate={
-                    reduceMotion
-                      ? undefined
-                      : { r: isActive ? 26 : 22 }
-                  }
+                  animate={reduceMotion ? undefined : { r: isActive ? 26 : 22 }}
                   transition={{ duration: 0.18 }}
                 />
                 <text
@@ -288,10 +281,7 @@ export function MomDiscoveryFrameworkViz() {
           })}
 
           {/* Pivot node */}
-          <g
-            onClick={() => setActiveStage('pivot')}
-            style={{ cursor: 'pointer' }}
-          >
+          <g onClick={() => setActiveStage('pivot')} style={{ cursor: 'pointer' }}>
             <motion.rect
               x={490}
               y={20}
@@ -330,10 +320,7 @@ export function MomDiscoveryFrameworkViz() {
           </g>
 
           {/* Pitch node */}
-          <g
-            onClick={() => setActiveStage('pitch')}
-            style={{ cursor: 'pointer' }}
-          >
+          <g onClick={() => setActiveStage('pitch')} style={{ cursor: 'pointer' }}>
             <motion.rect
               x={605}
               y={20}
@@ -400,14 +387,7 @@ export function MomDiscoveryFrameworkViz() {
           />
 
           {/* Edge Pivot → Pitch */}
-          <line
-            x1={550}
-            y1={45}
-            x2={605}
-            y2={45}
-            stroke={C.indigo}
-            strokeWidth="2.5"
-          />
+          <line x1={550} y1={45} x2={605} y2={45} stroke={C.indigo} strokeWidth="2.5" />
 
           {/* Arrow markers (simple inline triangles) */}
           <polygon points="488,40 488,50 494,45" fill={C.amber} />
@@ -465,10 +445,7 @@ export function MomDiscoveryFrameworkViz() {
         {stageQuestion && <DiscoveryQuestionDetail q={stageQuestion} />}
         {stage.id === 'pivot' && <PivotDetail />}
         {stage.id === 'pitch' && (
-          <PitchDetail
-            activeTrigger={activeTrigger}
-            onSelectTrigger={setActiveTrigger}
-          />
+          <PitchDetail activeTrigger={activeTrigger} onSelectTrigger={setActiveTrigger} />
         )}
       </div>
     </div>
@@ -552,9 +529,9 @@ function PivotDetail() {
           lineHeight: 1.55,
         }}
       >
-        Non-negotiable. The sentence is the conversion from listener to advocate. Skip it
-        and you relapse into generic pitching. Quote the buyer&rsquo;s exact words inside
-        the [bracket] — that&rsquo;s the signal that you listened.
+        Non-negotiable. The sentence is the conversion from listener to advocate. Skip it and you
+        relapse into generic pitching. Quote the buyer&rsquo;s exact words inside the [bracket] —
+        that&rsquo;s the signal that you listened.
       </div>
     </div>
   );
@@ -578,8 +555,8 @@ function PitchDetail({
           lineHeight: 1.5,
         }}
       >
-        Pitch is keyed to the signal — what they revealed in Q1-Q3. Pick the trigger that
-        matches what you heard:
+        Pitch is keyed to the signal — what they revealed in Q1-Q3. Pick the trigger that matches
+        what you heard:
       </div>
       <select
         value={activeTrigger}

@@ -757,8 +757,8 @@ function PlatformBaselineCallout({
       )}{' '}
       ({baseline.meanCategory}) over {baseline.n} audited corporate decisions ·{' '}
       <strong style={{ color: 'var(--text-primary)' }}>{accuracyPct}%</strong> classification
-      accuracy at the investigate-further cutoff. Per-org calibration replaces the seed once
-      this organisation has ≥1 closed outcome.
+      accuracy at the investigate-further cutoff. Per-org calibration replaces the seed once this
+      organisation has ≥1 closed outcome.
       {baseline.brierCi95 && baseline.bootstrapIterations && (
         <div
           style={{

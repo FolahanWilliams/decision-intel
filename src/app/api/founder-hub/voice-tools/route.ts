@@ -72,7 +72,9 @@ const TOOLS: ToolDef[] = [
       try {
         const todo = await (
           prisma as unknown as {
-            founderTodo?: { create: (args: { data: Record<string, unknown> }) => Promise<{ id: string }> };
+            founderTodo?: {
+              create: (args: { data: Record<string, unknown> }) => Promise<{ id: string }>;
+            };
           }
         ).founderTodo?.create({
           data: {
@@ -103,12 +105,21 @@ const TOOLS: ToolDef[] = [
     name: 'track_demo_conversion',
     eventType: 'demo_conversion',
     async handler(args) {
-      const prospectName = typeof args.prospectName === 'string' ? args.prospectName.slice(0, 200) : '';
+      const prospectName =
+        typeof args.prospectName === 'string' ? args.prospectName.slice(0, 200) : '';
       const status = typeof args.status === 'string' ? args.status : 'unknown';
       // note (founder's qualitative comment) is captured by the
       // dispatcher into VoiceSessionEvent.payload.args, so the
       // dashboard sees it; we don't need to read it here.
-      const validStatuses = ['interested', 'qualified', 'objection_raised', 'not_a_fit', 'next_step_set', 'converted', 'lost'];
+      const validStatuses = [
+        'interested',
+        'qualified',
+        'objection_raised',
+        'not_a_fit',
+        'next_step_set',
+        'converted',
+        'lost',
+      ];
       if (!prospectName) return { ok: false, error: 'prospectName is required' };
       if (!validStatuses.includes(status)) {
         return { ok: false, error: `status must be one of: ${validStatuses.join(', ')}` };
@@ -127,7 +138,8 @@ const TOOLS: ToolDef[] = [
     name: 'log_positioning_note',
     eventType: 'positioning_note',
     async handler(args) {
-      const articulation = typeof args.articulation === 'string' ? args.articulation.slice(0, 2000) : '';
+      const articulation =
+        typeof args.articulation === 'string' ? args.articulation.slice(0, 2000) : '';
       // context (the previous version that triggered the realisation)
       // is read by the LLM via args + persisted to VoiceSessionEvent
       // payload below by the dispatcher; we don't need to read it here.
@@ -153,13 +165,13 @@ const TOOLS: ToolDef[] = [
         const decisions = await (
           prisma as unknown as {
             document?: {
-              findMany: (args: Record<string, unknown>) => Promise<Array<{ id: string; title?: string; uploadedAt?: Date }>>;
+              findMany: (
+                args: Record<string, unknown>
+              ) => Promise<Array<{ id: string; title?: string; uploadedAt?: Date }>>;
             };
           }
         ).document?.findMany({
-          where: query
-            ? { OR: [{ title: { contains: query, mode: 'insensitive' } }] }
-            : {},
+          where: query ? { OR: [{ title: { contains: query, mode: 'insensitive' } }] } : {},
           orderBy: { uploadedAt: 'desc' },
           take: limit,
           select: { id: true, title: true, uploadedAt: true },
@@ -176,7 +188,12 @@ const TOOLS: ToolDef[] = [
       } catch (err) {
         // @schema-drift-tolerant — Document model may not have these fields in old envs
         log.warn('lookup_decision_log query failed:', err);
-        return { ok: true, count: 0, decisions: [], note: 'Decision log lookup not available in this environment' };
+        return {
+          ok: true,
+          count: 0,
+          decisions: [],
+          note: 'Decision log lookup not available in this environment',
+        };
       }
     },
   },
@@ -190,7 +207,9 @@ const TOOLS: ToolDef[] = [
         const meetings = await (
           prisma as unknown as {
             meeting?: {
-              findMany: (args: Record<string, unknown>) => Promise<Array<{ id: string; title?: string; createdAt?: Date }>>;
+              findMany: (
+                args: Record<string, unknown>
+              ) => Promise<Array<{ id: string; title?: string; createdAt?: Date }>>;
             };
           }
         ).meeting?.findMany({
@@ -210,7 +229,12 @@ const TOOLS: ToolDef[] = [
       } catch (err) {
         // @schema-drift-tolerant — Meeting model may not exist in all envs
         log.warn('lookup_recent_meetings query failed:', err);
-        return { ok: true, count: 0, meetings: [], note: 'Recent meetings lookup not available in this environment' };
+        return {
+          ok: true,
+          count: 0,
+          meetings: [],
+          note: 'Recent meetings lookup not available in this environment',
+        };
       }
     },
   },
@@ -223,7 +247,11 @@ const TOOLS: ToolDef[] = [
         const partners = await (
           prisma as unknown as {
             designPartner?: {
-              findMany: (args: Record<string, unknown>) => Promise<Array<{ id: string; companyName?: string; status?: string; createdAt?: Date }>>;
+              findMany: (
+                args: Record<string, unknown>
+              ) => Promise<
+                Array<{ id: string; companyName?: string; status?: string; createdAt?: Date }>
+              >;
             };
           }
         ).designPartner?.findMany({
@@ -244,7 +272,12 @@ const TOOLS: ToolDef[] = [
       } catch (err) {
         // @schema-drift-tolerant — DesignPartner model may not exist
         log.warn('lookup_design_partners query failed:', err);
-        return { ok: true, count: 0, partners: [], note: 'Design partner pipeline lookup not available in this environment' };
+        return {
+          ok: true,
+          count: 0,
+          partners: [],
+          note: 'Design partner pipeline lookup not available in this environment',
+        };
       }
     },
   },
@@ -257,7 +290,15 @@ const TOOLS: ToolDef[] = [
       const personName = typeof args.personName === 'string' ? args.personName.slice(0, 200) : '';
       const eventTypeArg = typeof args.eventType === 'string' ? args.eventType : 'note';
       const note = typeof args.note === 'string' ? args.note.slice(0, 1000) : null;
-      const validTypes = ['intro_made', 'replied', 'met', 'no_response', 'rescheduled', 'lost_contact', 'note'];
+      const validTypes = [
+        'intro_made',
+        'replied',
+        'met',
+        'no_response',
+        'rescheduled',
+        'lost_contact',
+        'note',
+      ];
       if (!personName) return { ok: false, error: 'personName is required' };
       if (!validTypes.includes(eventTypeArg)) {
         return { ok: false, error: `eventType must be one of: ${validTypes.join(', ')}` };
@@ -278,9 +319,13 @@ const TOOLS: ToolDef[] = [
     eventType: 'meeting_logged',
     async handler(args) {
       const title = typeof args.title === 'string' ? args.title.slice(0, 300) : '';
-      const attendees = Array.isArray(args.attendees) ? args.attendees.slice(0, 20).map(a => String(a).slice(0, 200)) : [];
+      const attendees = Array.isArray(args.attendees)
+        ? args.attendees.slice(0, 20).map(a => String(a).slice(0, 200))
+        : [];
       const notes = typeof args.notes === 'string' ? args.notes.slice(0, 4000) : null;
-      const decisionsRaised = Array.isArray(args.decisionsRaised) ? args.decisionsRaised.slice(0, 10).map(d => String(d).slice(0, 500)) : [];
+      const decisionsRaised = Array.isArray(args.decisionsRaised)
+        ? args.decisionsRaised.slice(0, 10).map(d => String(d).slice(0, 500))
+        : [];
       if (!title) return { ok: false, error: 'title is required' };
       // Notes + attendees + decisions captured via dispatcher payload.
       void notes;
@@ -328,7 +373,8 @@ const TOOLS: ToolDef[] = [
     eventType: 'outreach_lookup',
     async handler(args) {
       const personName = typeof args.personName === 'string' ? args.personName.slice(0, 200) : null;
-      const lookback = typeof args.lookbackDays === 'number' ? Math.min(Math.max(args.lookbackDays, 1), 90) : 30;
+      const lookback =
+        typeof args.lookbackDays === 'number' ? Math.min(Math.max(args.lookbackDays, 1), 90) : 30;
       try {
         // Pull the last N outreach_event entries from VoiceSessionEvent
         // (where the agent's own log_outreach_event tool writes them).
@@ -404,13 +450,15 @@ const TOOLS: ToolDef[] = [
         const analyses = await (
           prisma as unknown as {
             analysis?: {
-              findMany: (args: Record<string, unknown>) => Promise<Array<{
-                id: string;
-                overallScore?: number | null;
-                grade?: string | null;
-                createdAt?: Date;
-                document?: { title?: string | null };
-              }>>;
+              findMany: (args: Record<string, unknown>) => Promise<
+                Array<{
+                  id: string;
+                  overallScore?: number | null;
+                  grade?: string | null;
+                  createdAt?: Date;
+                  document?: { title?: string | null };
+                }>
+              >;
             };
           }
         ).analysis?.findMany({
@@ -438,7 +486,12 @@ const TOOLS: ToolDef[] = [
       } catch (err) {
         // @schema-drift-tolerant — Analysis schema may differ in older envs
         log.warn('lookup_recent_audits failed:', err);
-        return { ok: true, count: 0, audits: [], note: 'Recent audits lookup unavailable in this environment' };
+        return {
+          ok: true,
+          count: 0,
+          audits: [],
+          note: 'Recent audits lookup unavailable in this environment',
+        };
       }
     },
   },
@@ -474,11 +527,13 @@ const TOOLS: ToolDef[] = [
         'discard_after_review',
       ];
       const reintegrationVerdict =
-        typeof args.reintegrationVerdict === 'string' && validVerdicts.includes(args.reintegrationVerdict)
+        typeof args.reintegrationVerdict === 'string' &&
+        validVerdicts.includes(args.reintegrationVerdict)
           ? args.reintegrationVerdict
           : '';
       if (!title) return { ok: false, error: 'title is required' };
-      if (!mechanism) return { ok: false, error: 'mechanism is required (one-sentence causal chain)' };
+      if (!mechanism)
+        return { ok: false, error: 'mechanism is required (one-sentence causal chain)' };
       if (!reintegrationVerdict) {
         return {
           ok: false,
@@ -522,9 +577,10 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const args = (typeof body.args === 'object' && body.args !== null
-    ? body.args
-    : {}) as Record<string, unknown>;
+  const args = (typeof body.args === 'object' && body.args !== null ? body.args : {}) as Record<
+    string,
+    unknown
+  >;
   const sessionId = typeof body.sessionId === 'string' ? body.sessionId : '<unknown-session>';
   const personaId = isThinkingPartnerId(body.personaId) ? body.personaId : null;
 

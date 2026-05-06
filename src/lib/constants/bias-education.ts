@@ -755,7 +755,7 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     debiasingTechniques: [
       'Decouple confidence from accuracy: ask the author to score how confident they are AND how often similar judgments by similar people have been right historically. The gap is the illusion.',
       'Penalize rhetorical certainty in low-validity environments. Phrases like "we are certain", "guaranteed", "highly predictable", "clear path to" without external base-rate evidence are signals — not strengths.',
-      'Run the memo past a reader who does NOT share the author\'s prior context. Coherence collapses when the reader cannot reconstruct the same story from the same data.',
+      "Run the memo past a reader who does NOT share the author's prior context. Coherence collapses when the reader cannot reconstruct the same story from the same data.",
       'Force a counter-narrative: write the same memo from the perspective of a sceptic who reaches the opposite conclusion using the same facts. If both narratives feel equally coherent, neither is evidence.',
     ],
     relatedBiases: [

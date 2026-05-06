@@ -190,7 +190,8 @@ export const SOC2_RECEIPTS: Soc2Receipt[] = [
     status: 'attested',
     observationWindow: 'Continuous · current report covers a rolling 12-month window',
     auditor: 'Audit firm disclosed in trust portal',
-    scope: 'Subscription billing, payment-method storage, and invoicing. No document content flows through Stripe.',
+    scope:
+      'Subscription billing, payment-method storage, and invoicing. No document content flows through Stripe.',
     verification: 'Trust portal · stripe.com/docs/security',
   },
 ];
@@ -351,8 +352,7 @@ export const VENDOR_QUESTIONNAIRE_ROWS: QuestionnaireRow[] = [
     category: 'contractual',
   },
   {
-    question:
-      'Is cyber-liability insurance and errors-and-omissions insurance carried?',
+    question: 'Is cyber-liability insurance and errors-and-omissions insurance carried?',
     answer:
       'On the Q1 2027 roadmap. Until carriage is live, Enterprise customers receive a written disclosure of the insurance gap and the contractual commitments that substitute for it (uncapped breach-of-confidentiality, mutual indemnification, escrowed remediation budget on request).',
     verification:
@@ -363,13 +363,11 @@ export const VENDOR_QUESTIONNAIRE_ROWS: QuestionnaireRow[] = [
     question: 'Where is customer data trained on for AI improvements?',
     answer:
       'Customer document content is never used to train, fine-tune, or evaluate any LLM (Gemini, Claude, or otherwise). Provider terms (Google Cloud Platform + Anthropic) explicitly disclaim training on enterprise inputs. The same commitment is mirrored in the DPA and every pilot agreement. Bias Genome cohort signals are derived from outcome METADATA only (bias type, decision-domain class, predicted-vs-realised quality, time-to-outcome window) — never document content, persona names, or deal terms.',
-    verification:
-      'DPA § Bias Genome ownership · provider terms (GCP + Anthropic enterprise DPA).',
+    verification: 'DPA § Bias Genome ownership · provider terms (GCP + Anthropic enterprise DPA).',
     category: 'data',
   },
   {
-    question:
-      'What is the data portability and exit-assistance posture on contract termination?',
+    question: 'What is the data portability and exit-assistance posture on contract termination?',
     answer:
       'Customer-owned content (every uploaded artefact + every Decision Provenance Record) is exportable as a single account-data JSON bundle at any time during the contract and within 60 days of termination. Cohort export (anonymised outcome metadata the customer organisation contributed to Bias Genome) is available on quarterly cadence on Enterprise tier. After the 60-day exit window, customer content is cryptographically destroyed; audit log entries follow the retention window above.',
     verification: '/api/export/account · DPA § 5 · pilot agreement termination clause.',

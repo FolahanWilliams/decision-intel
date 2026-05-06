@@ -30,10 +30,7 @@ import {
   type ThinkingPartnerId,
   type ThinkingPartner,
 } from '@/lib/data/thinking-partners';
-import {
-  DEFAULT_FOUNDER_CHAT_MODEL_ID,
-  isFounderChatModelId,
-} from '@/lib/ai/founder-chat-models';
+import { DEFAULT_FOUNDER_CHAT_MODEL_ID, isFounderChatModelId } from '@/lib/ai/founder-chat-models';
 import { ModelPicker, ModelPickerPanel } from './ModelPicker';
 
 /**

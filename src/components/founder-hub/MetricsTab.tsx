@@ -423,8 +423,8 @@ export function MetricsTab({ founderPass }: MetricsTabProps) {
             The signals that decide Phase 1 graduation, kill, or pivot. Auto-refreshes every 60
             seconds. Founder-ratified GTM v3.5 thresholds: Vohra ≥{VOHRA_PMF_GRADUATION_THRESHOLD}%
             on HXC cohort + {PHASE_1_CUSTOMER_BASELINE_MIN}-{PHASE_1_CUSTOMER_BASELINE_MAX} paid HXC
-            customers retained 90+ days = graduation; &lt;{PHASE_1_CUSTOMER_KILL_BY_MONTH_4} by month
-            4 OR Vohra &lt;{VOHRA_PMF_KILL_THRESHOLD}% = kill criterion.
+            customers retained 90+ days = graduation; &lt;{PHASE_1_CUSTOMER_KILL_BY_MONTH_4} by
+            month 4 OR Vohra &lt;{VOHRA_PMF_KILL_THRESHOLD}% = kill criterion.
           </p>
         </div>
         <button
@@ -690,8 +690,7 @@ export function MetricsTab({ founderPass }: MetricsTabProps) {
           label="Micro-confirmation rate"
           value={formatPct(data.engagement.microDeliberationConfirmationRate)}
           subline={
-            data.engagement.microDeliberationConfirmed +
-              data.engagement.microDeliberationRefuted >=
+            data.engagement.microDeliberationConfirmed + data.engagement.microDeliberationRefuted >=
             5
               ? 'Predictions surfacing as expected'
               : 'Need more events for signal (5+ judged)'
@@ -784,7 +783,9 @@ export function MetricsTab({ founderPass }: MetricsTabProps) {
               ? '—'
               : `${data.cadence.daysSinceLastPaidCustomer}d ago`
           }
-          subline={data.funnel.paidCustomers === 0 ? 'No paid customers yet' : 'Most recent paid sign-up'}
+          subline={
+            data.funnel.paidCustomers === 0 ? 'No paid customers yet' : 'Most recent paid sign-up'
+          }
           status={paidCustomerCadenceStatus}
           icon={<Users size={13} />}
         />
@@ -841,11 +842,11 @@ export function MetricsTab({ founderPass }: MetricsTabProps) {
         <strong style={{ color: 'var(--text-primary)' }}>How to read this dashboard:</strong> green
         tiles mean the metric is at-or-above v3.5 baseline; amber means below baseline but above
         kill threshold; red means kill criterion fired. The Phase 1 graduation gate fires when the
-        Vohra HXC % crosses {VOHRA_PMF_GRADUATION_THRESHOLD}% AND paid HXC retained 90+ days hits
-        {' '}{PHASE_1_CUSTOMER_BASELINE_MIN}-{PHASE_1_CUSTOMER_BASELINE_MAX}. The kill criterion
-        fires at month 4 if either signal collapses below threshold — halt scaling, run a
-        product-discovery sprint with the somewhat-disappointed + not-disappointed cohorts. Last
-        refresh: {lastFetched ? lastFetched.toLocaleString() : '—'}.
+        Vohra HXC % crosses {VOHRA_PMF_GRADUATION_THRESHOLD}% AND paid HXC retained 90+ days hits{' '}
+        {PHASE_1_CUSTOMER_BASELINE_MIN}-{PHASE_1_CUSTOMER_BASELINE_MAX}. The kill criterion fires at
+        month 4 if either signal collapses below threshold — halt scaling, run a product-discovery
+        sprint with the somewhat-disappointed + not-disappointed cohorts. Last refresh:{' '}
+        {lastFetched ? lastFetched.toLocaleString() : '—'}.
       </div>
     </div>
   );

@@ -101,8 +101,7 @@ export const DISCOVERY_QUESTIONS: DiscoveryQuestion[] = [
   },
   {
     order: 4,
-    question:
-      'Who else is researching this space? Who should I talk to next?',
+    question: 'Who else is researching this space? Who should I talk to next?',
     why: 'Every discovery should produce 2 more conversations. Standard Steve Blank customer-development close. Also a generosity test — if they offer 2+ names, they are warmer than they may have signalled.',
     watchFor: [
       'Number of names offered (0 = cold; 1 = polite; 2+ = genuinely engaged)',
@@ -164,32 +163,28 @@ export const PERSONA_OPENERS: PersonaOpener[] = [
 
 export const PITCH_TRIGGERS: PitchTrigger[] = [
   {
-    ifRevealed:
-      'The reasoning trail dies in Slack threads / Google Docs / four-tool graveyard',
+    ifRevealed: 'The reasoning trail dies in Slack threads / Google Docs / four-tool graveyard',
     pitch:
-      "Decision Intel is the system of record for that reasoning trail — every flag carries an excerpt + a regulatory citation; decision history survives team transitions; audit-committee Q&A pulls reasoning in 60 seconds. The artefact is the Decision Provenance Record — hashed and tamper-evident, signed at audit time.",
+      'Decision Intel is the system of record for that reasoning trail — every flag carries an excerpt + a regulatory citation; decision history survives team transitions; audit-committee Q&A pulls reasoning in 60 seconds. The artefact is the Decision Provenance Record — hashed and tamper-evident, signed at audit time.',
     avoid:
       'Do not lead with R²F or the 12-node pipeline — they revealed an ARTEFACT pain, pitch the artefact answer.',
   },
   {
-    ifRevealed:
-      "We almost missed [a specific bias / blind spot] in the last memo",
+    ifRevealed: 'We almost missed [a specific bias / blind spot] in the last memo',
     pitch:
-      "The platform runs three professional lenses on every memo — equity-research skeptical, regulator-hostile, contrarian-strategist — and surfaces the bias each lens flags. Your memo would have caught [their blind spot] before the room did, with the academic citation underneath each flag.",
+      'The platform runs three professional lenses on every memo — equity-research skeptical, regulator-hostile, contrarian-strategist — and surfaces the bias each lens flags. Your memo would have caught [their blind spot] before the room did, with the academic citation underneath each flag.',
     avoid:
       'Do not lead with the 22-bias taxonomy count — they revealed a SPECIFIC failure mode, pitch the lens answer.',
   },
   {
-    ifRevealed:
-      "We can't get the reasoning back when audit committee asks 6 months later",
+    ifRevealed: "We can't get the reasoning back when audit committee asks 6 months later",
     pitch:
-      "The Decision Provenance Record is the artefact for exactly that moment — hashed and tamper-evident, EU AI Act Article 14 aligned, regulator-grade. Your audit committee gets the full reasoning trail in one PDF. SOX retention, audit-committee-ready cover page, every flag traced to its source.",
+      'The Decision Provenance Record is the artefact for exactly that moment — hashed and tamper-evident, EU AI Act Article 14 aligned, regulator-grade. Your audit committee gets the full reasoning trail in one PDF. SOX retention, audit-committee-ready cover page, every flag traced to its source.',
     avoid:
       'Do not lead with regulatory tailwinds globally — they revealed a SPECIFIC audit-committee Q&A pain, pitch the DPR artefact answer.',
   },
   {
-    ifRevealed:
-      "We're staring down a cross-border deal and the regulatory regime is a mess",
+    ifRevealed: "We're staring down a cross-border deal and the regulatory regime is a mess",
     pitch:
       "That's the cross-border M&A differentiator. The platform maps [their regions] flag-by-flag — NDPR if Nigeria, PoPIA if South Africa, WAEMU if Côte d'Ivoire — alongside EU AI Act + Basel III. Your GC carries one artefact home for the regional + cross-border counterparty review. The Dangote DPR specimen is the artefact to share — anonymised, public.",
     avoid:
@@ -197,8 +192,7 @@ export const PITCH_TRIGGERS: PitchTrigger[] = [
       'Do not lead with all 19 frameworks — pitch the SPECIFIC regimes they named in the conversation.',
   },
   {
-    ifRevealed:
-      "We've never paid for anything to fix this (Q3 negative answer)",
+    ifRevealed: "We've never paid for anything to fix this (Q3 negative answer)",
     pitch:
       "There's a free audit anyone can run on a memo at decision-intel.com — no login, 60 seconds. Want me to walk you through one on the memo you just described, no commitment? See if it surfaces anything you didn't catch first.",
     avoid:
@@ -206,27 +200,25 @@ export const PITCH_TRIGGERS: PitchTrigger[] = [
   },
   {
     ifRevealed:
-      "We pay [Cloverpop / McKinsey-grade consultant / internal analyst time] for it (Q3 positive answer)",
+      'We pay [Cloverpop / McKinsey-grade consultant / internal analyst time] for it (Q3 positive answer)',
     pitch:
       "You're paying for [X]. Decision Intel runs the same kind of audit on a memo in 60 seconds at £249 a month, with the regulatory provenance artefact your GC needs. The structural difference is logging vs. auditing — Cloverpop logs decisions; we audit them with three professional lenses + 19-framework regulatory mapping. Want to see it run on the memo you just described?",
     avoid:
       "Do not deny the alternative is good — they're already a believer. Convert by showing speed + provenance + price differential.",
   },
   {
-    ifRevealed:
-      "Memos are AI-assisted today (the founder writes, AI fills gaps)",
+    ifRevealed: 'Memos are AI-assisted today (the founder writes, AI fills gaps)',
     pitch:
       "That sharpens the positioning. Decision Intel audits the human-AI co-authored artefact — the same biases, the same regulatory exposure, the same procurement-grade DPR. The audit layer doesn't care whether a human or an AI drafted the language; it cares whether the reasoning survives three professional lenses.",
     avoid:
       'Do not pitch as a replacement for their AI assistant — pitch as the audit layer ON TOP of it.',
   },
   {
-    ifRevealed:
-      "Memos are agent-generated today (full agentic execution)",
+    ifRevealed: 'Memos are agent-generated today (full agentic execution)',
     pitch:
       "Decision Intel audits the reasoning, whether a human or an agent produced it. Same R²F architecture, same DPR output. The 12-node pipeline accepts any structured artefact — agent prompts + outputs map onto the same audit shape. This is where we're heading; if your team is already there, you're the design partner conversation I want to have.",
     avoid:
-      "Do not undersell the architectural fit — agent-generated memos ARE in scope; emphasise that.",
+      'Do not undersell the architectural fit — agent-generated memos ARE in scope; emphasise that.',
   },
 ];
 
@@ -282,9 +274,13 @@ export const PAIN_PATTERNS: PainPattern[] = [
       'Forgotten Questions engine + structural-assumptions audit. The pipeline runs the prospect\'s memo through a 33-question taxonomy of "what would a sceptical reviewer ask" (rooted in Klein\'s pre-mortem + RPD framework + the 22-bias detector taxonomy), surfaces the gaps the IC will catch first, and outputs the questions in the order the room is most likely to ask them.',
     demoMove:
       "Ask if they have a memo handy from a deal where IC pushed back hard. Run it through /demo live — the Forgotten Questions output is what they react to. Watch for the moment they say 'that's exactly what was asked' — that's the wedge.",
-    biasHookAnchors: ['WeWork S-1 (illusion of validity)', 'AOL-Time Warner (overconfidence)', 'Daimler-Chrysler (inside-view dominance)'],
+    biasHookAnchors: [
+      'WeWork S-1 (illusion of validity)',
+      'AOL-Time Warner (overconfidence)',
+      'Daimler-Chrysler (inside-view dominance)',
+    ],
     starterRationale:
-      "Highest-frequency pattern on the wedge personas. Mid-market corp dev heads + small-fund GPs name this pain unprompted in 60-70% of discovery calls (per the 4-Week Traction Plan post-mortem). The Forgotten Questions output is the single most demoable feature — they read 5 questions and recognise 2-3 they were asked.",
+      'Highest-frequency pattern on the wedge personas. Mid-market corp dev heads + small-fund GPs name this pain unprompted in 60-70% of discovery calls (per the 4-Week Traction Plan post-mortem). The Forgotten Questions output is the single most demoable feature — they read 5 questions and recognise 2-3 they were asked.',
   },
   {
     id: 'post_close_surprise',
@@ -292,14 +288,18 @@ export const PAIN_PATTERNS: PainPattern[] = [
     signalPhrases: [
       "The synergies didn't materialise the way the memo said they would.",
       "We integrated and discovered [X] that wasn't in any model.",
-      "We had to take a markdown 18 months in.",
+      'We had to take a markdown 18 months in.',
       "Looking back, the bias was obvious — we just couldn't see it at the time.",
     ],
     featureWedge:
       "Retrospective audit on a CLOSED deal. Run the audit on a memo from 12-24 months ago where the outcome is known. The DPR surfaces the structural assumptions that didn't hold + the biases that drove them. This is forensic, not predictive — and that's why it's safe.",
     demoMove:
       "Goldner's 'safest starter' move. Ask: 'Do you have an old memo handy — even one from 2 years ago? Send it over right now, I'll run it in the next 60 seconds and show you what we surface.' The retrospective frame removes political risk (no live deal in scope) and the reaction is immediate — they SEE the bias they missed.",
-    biasHookAnchors: ['Quibi launch (planning fallacy)', 'Boeing 737 MAX (optimism bias)', 'Theranos investor decisions (halo effect + authority bias)'],
+    biasHookAnchors: [
+      'Quibi launch (planning fallacy)',
+      'Boeing 737 MAX (optimism bias)',
+      'Theranos investor decisions (halo effect + authority bias)',
+    ],
     starterRationale:
       "Goldner's locked move from the 4-Week Traction Plan: 'safest starter' because the deal is already closed — there's no live political stake. Use this when the prospect is curious but hesitant to commit a live deal to the audit. Retrospective audits convert at higher rates than live audits when the prospect is in evaluation mode.",
   },
@@ -313,10 +313,14 @@ export const PAIN_PATTERNS: PainPattern[] = [
       "We don't have a way to compare this memo to past decisions.",
     ],
     featureWedge:
-      'Noise score (3-frame jury — analyst-skeptical, regulator-hostile, contrarian-strategist) + Decision Knowledge Graph cross-decision comparison. The noise score quantifies how much the audit verdict varies across professional lenses; high stdDev = the memo will be argued at IC because the reasoning is framing-sensitive. The Knowledge Graph surfaces decisions of the same shape from the prospect\'s history with their realised outcomes.',
+      "Noise score (3-frame jury — analyst-skeptical, regulator-hostile, contrarian-strategist) + Decision Knowledge Graph cross-decision comparison. The noise score quantifies how much the audit verdict varies across professional lenses; high stdDev = the memo will be argued at IC because the reasoning is framing-sensitive. The Knowledge Graph surfaces decisions of the same shape from the prospect's history with their realised outcomes.",
     demoMove:
       'Open the demo with the WeWork DPR specimen. Show the noise score panel (analyst-skeptical disagrees with regulator-hostile by 30+ points) and the explanation: "this is the conversation IC is going to have at length. The audit names it before the meeting." For a follow-on demo, run their actual memo through and show whether the same pattern appears.',
-    biasHookAnchors: ['Long-Term Capital Management (loss aversion mis-framing)', 'Sears retail strategy (status quo bias)', 'FTX investor decisions (authority bias)'],
+    biasHookAnchors: [
+      'Long-Term Capital Management (loss aversion mis-framing)',
+      'Sears retail strategy (status quo bias)',
+      'FTX investor decisions (authority bias)',
+    ],
     starterRationale:
       'Highest leverage on mid-market PE associates + small-fund GPs who already have IC infrastructure but feel friction. The noise score is the conversation differentiator — competitors quantify the audit verdict; we quantify the DISAGREEMENT.',
   },
@@ -379,7 +383,7 @@ learn from the next [10 / 30] conversations once the pattern's visible.
 
 export const WHAT_30_CONVERSATIONS_PRODUCE = [
   'The 5 words buyers use for the pain (your real marketing copy, not a guess).',
-  "The price band buyers have already paid for adjacent tools (your real ARR ceiling, not a fantasy 25% conversion).",
+  'The price band buyers have already paid for adjacent tools (your real ARR ceiling, not a fantasy 25% conversion).',
   'The surprise-question signal across personas (which biases / blind spots are most-cited; sharpens the pitch).',
   '3-5 of the 30 warm enough to come back to with the tailored-pitch second meeting.',
   'A real conversion rate (5-8% baseline; if higher, the wedge is unusually warm; if lower, the wedge is wrong).',

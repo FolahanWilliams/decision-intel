@@ -53,14 +53,22 @@ interface VoiceSessionEvent {
 interface VoiceActivityResponse {
   events: VoiceSessionEvent[];
   summary: Record<string, number>;
-  filters: { eventType: string | null; sessionId: string | null; personaId: string | null; limit: number };
+  filters: {
+    eventType: string | null;
+    sessionId: string | null;
+    personaId: string | null;
+    limit: number;
+  };
 }
 
 interface Props {
   founderPass: string;
 }
 
-const EVENT_TYPE_META: Record<string, { label: string; icon: React.ComponentType<{ size?: number }>; color: string }> = {
+const EVENT_TYPE_META: Record<
+  string,
+  { label: string; icon: React.ComponentType<{ size?: number }>; color: string }
+> = {
   // Write actions
   todo_created: { label: 'Todos created', icon: CheckSquare, color: '#16A34A' },
   demo_conversion: { label: 'Demo conversions', icon: TrendingUp, color: '#0EA5E9' },
@@ -114,8 +122,12 @@ function summariseEvent(ev: VoiceSessionEvent): string {
       return `Follow up with ${args.personName ?? 'someone'} on ${args.dueDate ?? '(no date)'}`;
     case 'idea_captured': {
       const title = typeof args.title === 'string' ? args.title : 'Idea';
-      const verdict = typeof args.reintegrationVerdict === 'string' ? args.reintegrationVerdict.replace(/_/g, ' ') : 'review';
-      const mechanism = typeof args.mechanism === 'string' ? ` · ${args.mechanism.slice(0, 100)}` : '';
+      const verdict =
+        typeof args.reintegrationVerdict === 'string'
+          ? args.reintegrationVerdict.replace(/_/g, ' ')
+          : 'review';
+      const mechanism =
+        typeof args.mechanism === 'string' ? ` · ${args.mechanism.slice(0, 100)}` : '';
       return `${title} [${verdict}]${mechanism}`;
     }
     case 'decision_lookup':
@@ -261,7 +273,11 @@ export function VoiceActivityTab({ founderPass }: Props) {
           }}
         >
           {Object.entries(data.summary).map(([type, count]) => {
-            const meta = EVENT_TYPE_META[type] ?? { label: type, icon: ActivityIcon, color: '#6B7280' };
+            const meta = EVENT_TYPE_META[type] ?? {
+              label: type,
+              icon: ActivityIcon,
+              color: '#6B7280',
+            };
             const Icon = meta.icon;
             const active = filterType === type;
             return (
@@ -281,7 +297,11 @@ export function VoiceActivityTab({ founderPass }: Props) {
                   cursor: 'pointer',
                   textAlign: 'left',
                 }}
-                title={active ? 'Click to clear filter' : `Click to filter to ${meta.label.toLowerCase()}`}
+                title={
+                  active
+                    ? 'Click to clear filter'
+                    : `Click to filter to ${meta.label.toLowerCase()}`
+                }
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <Icon size={14} />
@@ -344,10 +364,25 @@ export function VoiceActivityTab({ founderPass }: Props) {
                 }}
               >
                 <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{prospect}</div>
-                <div style={{ fontSize: 12, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {events.length} event{events.length === 1 ? '' : 's'} · last: {String(latestStatus)}
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: 'var(--text-secondary)',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {events.length} event{events.length === 1 ? '' : 's'} · last:{' '}
+                  {String(latestStatus)}
                 </div>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', fontVariantNumeric: 'tabular-nums' }}>
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: 'var(--text-muted)',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
                   {formatRelative(latestAt)}
                 </div>
               </div>
@@ -405,7 +440,8 @@ export function VoiceActivityTab({ founderPass }: Props) {
             <Mic size={20} style={{ marginBottom: 8, opacity: 0.5 }} />
             <div>No voice activity yet.</div>
             <div style={{ fontSize: 11, marginTop: 4 }}>
-              Voice agent tool calls (todos, demo conversions, lookups) appear here as you use voice mode.
+              Voice agent tool calls (todos, demo conversions, lookups) appear here as you use voice
+              mode.
             </div>
           </div>
         ) : (
@@ -435,7 +471,9 @@ export function VoiceActivityTab({ founderPass }: Props) {
                     <Icon size={14} />
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    <div style={{ fontSize: 13, color: 'var(--text-primary)' }}>{summariseEvent(ev)}</div>
+                    <div style={{ fontSize: 13, color: 'var(--text-primary)' }}>
+                      {summariseEvent(ev)}
+                    </div>
                     <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>
                       {meta.label.toLowerCase()}
                       {ev.personaId ? ` · ${ev.personaId}` : ''}

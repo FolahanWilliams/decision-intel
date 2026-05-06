@@ -26,9 +26,7 @@ export function DprStatCard({ label, value, foot, text = false }: DprStatCardPro
       <div className="dpr-stat-card-label">{label}</div>
       <div
         className={
-          text
-            ? 'dpr-stat-card-value dpr-stat-card-value--text dpr-display'
-            : 'dpr-stat-card-value'
+          text ? 'dpr-stat-card-value dpr-stat-card-value--text dpr-display' : 'dpr-stat-card-value'
         }
       >
         {value}

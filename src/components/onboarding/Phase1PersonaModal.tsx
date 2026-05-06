@@ -62,28 +62,25 @@ export function Phase1PersonaModal() {
       });
   }, []);
 
-  const persist = useCallback(
-    async (personaId: Phase1PersonaId, roleDetail?: string) => {
-      setSubmitting(true);
-      try {
-        await fetch('/api/onboarding', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            phase1Persona: personaId,
-            ...(roleDetail ? { phase1PersonaRoleDetail: roleDetail.slice(0, 200) } : {}),
-          }),
-        });
-        localStorage.setItem(STORAGE_KEY, 'true');
-      } catch (err) {
-        // Silent — UI flow continues even if persistence fails (it'll re-prompt next session)
-        console.warn('[Phase1PersonaModal] persist failed:', err);
-      } finally {
-        setSubmitting(false);
-      }
-    },
-    []
-  );
+  const persist = useCallback(async (personaId: Phase1PersonaId, roleDetail?: string) => {
+    setSubmitting(true);
+    try {
+      await fetch('/api/onboarding', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phase1Persona: personaId,
+          ...(roleDetail ? { phase1PersonaRoleDetail: roleDetail.slice(0, 200) } : {}),
+        }),
+      });
+      localStorage.setItem(STORAGE_KEY, 'true');
+    } catch (err) {
+      // Silent — UI flow continues even if persistence fails (it'll re-prompt next session)
+      console.warn('[Phase1PersonaModal] persist failed:', err);
+    } finally {
+      setSubmitting(false);
+    }
+  }, []);
 
   const handleConfirm = async () => {
     if (!selected) return;
@@ -118,9 +115,8 @@ export function Phase1PersonaModal() {
             <DialogHeader>
               <DialogTitle>Which of these best describes your work?</DialogTitle>
               <DialogDescription>
-                We&apos;re currently optimised for four specific roles — picking one
-                tunes the audit, the case studies we surface, and the network we
-                point you at.
+                We&apos;re currently optimised for four specific roles — picking one tunes the
+                audit, the case studies we surface, and the network we point you at.
               </DialogDescription>
             </DialogHeader>
 
@@ -269,11 +265,10 @@ export function Phase1PersonaModal() {
             <DialogHeader>
               <DialogTitle>Thanks — we&apos;ll keep you posted.</DialogTitle>
               <DialogDescription>
-                Decision Intel is currently optimised for fractional CSOs, mid-market
-                Heads of Corp Dev, GPs at smaller funds, and PE-backed founders.
-                You&apos;ll still be able to use the platform, but the Phase 1
-                experience may not be tuned for your use case yet. We&apos;ll reach
-                out when the platform extends.
+                Decision Intel is currently optimised for fractional CSOs, mid-market Heads of Corp
+                Dev, GPs at smaller funds, and PE-backed founders. You&apos;ll still be able to use
+                the platform, but the Phase 1 experience may not be tuned for your use case yet.
+                We&apos;ll reach out when the platform extends.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>

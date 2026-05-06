@@ -611,7 +611,7 @@ function BiasConstellation({ entries }: { entries: BiasEntry[] }) {
       acc[b.difficulty] = (acc[b.difficulty] ?? 0) + 1;
       return acc;
     },
-    { easy: 0, moderate: 0, hard: 0 } as Record<Difficulty, number>,
+    { easy: 0, moderate: 0, hard: 0 } as Record<Difficulty, number>
   );
   return (
     <div
@@ -643,7 +643,8 @@ function BiasConstellation({ entries }: { entries: BiasEntry[] }) {
               fontFamily: 'var(--font-mono, monospace)',
             }}
           >
-            {entries.length} biases · {difficultyCounts.easy}E / {difficultyCounts.moderate}M / {difficultyCounts.hard}H
+            {entries.length} biases · {difficultyCounts.easy}E / {difficultyCounts.moderate}M /{' '}
+            {difficultyCounts.hard}H
           </div>
           <div style={{ fontSize: 15, fontWeight: 700, color: C.slate900 }}>
             Every dot is a stable ID.

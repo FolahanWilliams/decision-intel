@@ -80,4 +80,3 @@ export const SILENT_OBJECTIONS: SilentObjection[] = [
 // =========================================================================
 // SECTION 15 · SIMPLIFIED 30-DAY CONVERSION FUNNEL
 // =========================================================================
-

@@ -19,11 +19,7 @@ export { ActionsTab } from './ActionsTab';
 export type { ActionsTabProps } from './ActionsTab';
 
 export { StressTestTab } from './StressTestTab';
-export type {
-  StressTestTabProps,
-  StressTestSubTab,
-  StressTestSlot,
-} from './StressTestTab';
+export type { StressTestTabProps, StressTestSubTab, StressTestSlot } from './StressTestTab';
 
 export { PerspectivesTab } from './PerspectivesTab';
 export type { PerspectivesTabProps, PerspectiveLens } from './PerspectivesTab';

@@ -37,7 +37,10 @@ export async function GET(request: Request) {
   }
 
   const url = new URL(request.url);
-  const limit = Math.min(Math.max(parseInt(url.searchParams.get('limit') ?? '26', 10) || 26, 1), 200);
+  const limit = Math.min(
+    Math.max(parseInt(url.searchParams.get('limit') ?? '26', 10) || 26, 1),
+    200
+  );
 
   try {
     const reviews = await prisma.founderOsWeeklyReview.findMany({

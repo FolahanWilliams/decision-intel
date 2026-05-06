@@ -258,8 +258,7 @@ export const V1_AUDIT_FAILURE_MODES = [
     failureMode: 'False-negative on "no email digest"',
     rootCause:
       'Auditor did not grep for `sendWeeklyDigest`. The function exists at src/lib/notifications/email.ts:190 and runs every Monday via /api/cron/dispatch.',
-    preventionRule:
-      'For any "no X" claim, the grep is mandatory. No grep result, no claim.',
+    preventionRule: 'For any "no X" claim, the grep is mandatory. No grep result, no claim.',
   },
   {
     failureMode: 'False-negative on "no African regulators"',
@@ -278,7 +277,7 @@ export const V1_AUDIT_FAILURE_MODES = [
   {
     failureMode: 'Persona overlap (3 of 5 personas were Sankore)',
     rootCause:
-      'v1 split Sankore into managing-partner / senior-associate / junior-analyst. This weighted one buyer org\'s pain 3× and produced redundant findings (versioning, copilot context, mentorship — all from the same buyer voice).',
+      "v1 split Sankore into managing-partner / senior-associate / junior-analyst. This weighted one buyer org's pain 3× and produced redundant findings (versioning, copilot context, mentorship — all from the same buyer voice).",
     preventionRule:
       'Each persona MUST come from a distinct buyer org. If two personas surface the same finding, consolidate to the strongest voice.',
   },

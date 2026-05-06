@@ -56,15 +56,10 @@ export function DprSeverityMeter({ severity, confidence, compact = false }: DprS
         ))}
       </div>
       {!compact && (
-        <span
-          className="dpr-severity-meter-label"
-          style={{ color }}
-        >
+        <span className="dpr-severity-meter-label" style={{ color }}>
           {severity.toUpperCase()}
           {confidence != null && (
-            <span className="dpr-severity-meter-conf">
-              · {Math.round(confidence * 100)}% conf.
-            </span>
+            <span className="dpr-severity-meter-conf">· {Math.round(confidence * 100)}% conf.</span>
           )}
         </span>
       )}

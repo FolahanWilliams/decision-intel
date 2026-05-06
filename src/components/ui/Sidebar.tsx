@@ -145,7 +145,10 @@ export default function Sidebar() {
         onClick={() => {
           if (mobileOpen) {
             setMobileOpen(false);
-          } else if (typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches) {
+          } else if (
+            typeof window !== 'undefined' &&
+            window.matchMedia('(max-width: 767px)').matches
+          ) {
             setMobileOpen(true);
           } else {
             setCollapsed((prev: boolean) => !prev);

@@ -107,8 +107,7 @@ export function DiscoveryPitchPanel() {
                 fontWeight: 800,
                 color: C.green,
                 lineHeight: 1,
-                fontFamily:
-                  'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+                fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
               }}
             >
               Q{q.order}
@@ -231,10 +230,7 @@ export function DiscoveryPitchPanel() {
                 padding: '8px 10px',
                 fontSize: 11.5,
                 fontWeight: persona === p.id ? 700 : 500,
-                background:
-                  persona === p.id
-                    ? C.indigoSoft
-                    : 'var(--bg-secondary)',
+                background: persona === p.id ? C.indigoSoft : 'var(--bg-secondary)',
                 border: `1px solid ${persona === p.id ? C.indigo : 'var(--border-color)'}`,
                 color: persona === p.id ? C.indigo : 'var(--text-primary)',
                 borderRadius: 'var(--radius-sm)',
@@ -301,9 +297,12 @@ export function DiscoveryPitchPanel() {
             marginBottom: 12,
           }}
         >
-          The pivot sentence: <em>&ldquo;Based on what you said about [their specific pain in their
-          words], I think I have something you should see.&rdquo;</em> Then this pitch keyed to
-          the signal. Click to expand each trigger.
+          The pivot sentence:{' '}
+          <em>
+            &ldquo;Based on what you said about [their specific pain in their words], I think I have
+            something you should see.&rdquo;
+          </em>{' '}
+          Then this pitch keyed to the signal. Click to expand each trigger.
         </div>
         {PITCH_TRIGGERS.map((trigger, i) => {
           const isExpanded = expandedTrigger === i;
@@ -342,8 +341,8 @@ export function DiscoveryPitchPanel() {
                   <ChevronRight size={14} style={{ flexShrink: 0, marginTop: 2 }} />
                 )}
                 <span style={{ flex: 1 }}>
-                  <strong style={{ color: C.amber }}>If they revealed:</strong>{' '}
-                  &ldquo;{trigger.ifRevealed}&rdquo;
+                  <strong style={{ color: C.amber }}>If they revealed:</strong> &ldquo;
+                  {trigger.ifRevealed}&rdquo;
                 </span>
               </button>
               {isExpanded && (
@@ -448,9 +447,7 @@ export function DiscoveryPitchPanel() {
             >
               <button
                 type="button"
-                onClick={() =>
-                  setExpandedPattern(isExpanded ? null : pattern.id)
-                }
+                onClick={() => setExpandedPattern(isExpanded ? null : pattern.id)}
                 style={{
                   width: '100%',
                   padding: '10px 12px',
@@ -499,8 +496,7 @@ export function DiscoveryPitchPanel() {
         </div>
         <pre
           style={{
-            fontFamily:
-              'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+            fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
             fontSize: 11.5,
             color: 'var(--text-primary)',
             background: 'var(--bg-secondary)',
@@ -568,9 +564,7 @@ export function DiscoveryPitchPanel() {
           padding: 14,
         }}
       >
-        <div style={blockEyebrow(C.green)}>
-          What 30 conversations produce
-        </div>
+        <div style={blockEyebrow(C.green)}>What 30 conversations produce</div>
         <ul
           style={{
             margin: 0,
@@ -663,7 +657,15 @@ function PatternDetailBlock({ pattern }: { pattern: PainPattern }) {
         >
           Signal phrases (their words)
         </div>
-        <ul style={{ margin: 0, paddingLeft: 16, fontSize: 11.5, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+        <ul
+          style={{
+            margin: 0,
+            paddingLeft: 16,
+            fontSize: 11.5,
+            color: 'var(--text-secondary)',
+            lineHeight: 1.55,
+          }}
+        >
           {pattern.signalPhrases.map(phrase => (
             <li key={phrase} style={{ marginBottom: 2 }}>
               &ldquo;{phrase}&rdquo;
@@ -705,7 +707,14 @@ function PatternDetailBlock({ pattern }: { pattern: PainPattern }) {
         >
           Demo move (run it on the call)
         </div>
-        <div style={{ fontSize: 11.5, color: 'var(--text-primary)', lineHeight: 1.55, fontStyle: 'italic' }}>
+        <div
+          style={{
+            fontSize: 11.5,
+            color: 'var(--text-primary)',
+            lineHeight: 1.55,
+            fontStyle: 'italic',
+          }}
+        >
           {pattern.demoMove}
         </div>
       </div>

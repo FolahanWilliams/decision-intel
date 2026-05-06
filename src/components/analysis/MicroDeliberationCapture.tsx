@@ -49,7 +49,11 @@ const EVENT_TYPES: Array<{ value: string; label: string; hint: string }> = [
     label: 'Predicted bias surfaced',
     hint: 'A reviewer named the exact bias the audit predicted',
   },
-  { value: 'cfo_objection', label: 'CFO objected', hint: 'CFO raised a financial / unit-economics concern' },
+  {
+    value: 'cfo_objection',
+    label: 'CFO objected',
+    hint: 'CFO raised a financial / unit-economics concern',
+  },
   {
     value: 'compliance_block',
     label: 'Compliance blocked',
@@ -61,7 +65,7 @@ const EVENT_TYPES: Array<{ value: string; label: string; hint: string }> = [
     label: 'Audit committee queried',
     hint: 'Audit committee formally queried the recommendation',
   },
-  { value: 'other', label: 'Other', hint: 'Anything that doesn\'t fit the categories above' },
+  { value: 'other', label: 'Other', hint: "Anything that doesn't fit the categories above" },
 ];
 
 interface CapturedEvent {
@@ -275,7 +279,9 @@ export function MicroDeliberationCapture({ analysisId }: MicroDeliberationCaptur
               padding: '8px 14px',
               background: showForm ? 'var(--bg-card)' : 'var(--accent-primary)',
               color: showForm ? 'var(--text-primary)' : '#fff',
-              border: showForm ? '1px solid var(--border-color)' : '1px solid var(--accent-primary)',
+              border: showForm
+                ? '1px solid var(--border-color)'
+                : '1px solid var(--accent-primary)',
               borderRadius: 'var(--radius-full)',
               fontSize: 13,
               fontWeight: 600,
@@ -293,8 +299,7 @@ export function MicroDeliberationCapture({ analysisId }: MicroDeliberationCaptur
               alignItems: 'center',
               gap: 14,
               padding: '10px 14px',
-              background:
-                'color-mix(in srgb, var(--accent-primary) 6%, transparent)',
+              background: 'color-mix(in srgb, var(--accent-primary) 6%, transparent)',
               border: '1px solid color-mix(in srgb, var(--accent-primary) 22%, transparent)',
               borderRadius: 'var(--radius-md)',
               fontSize: 13,
@@ -391,7 +396,14 @@ export function MicroDeliberationCapture({ analysisId }: MicroDeliberationCaptur
             </label>
 
             <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
-              <legend style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 6 }}>
+              <legend
+                style={{
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: 'var(--text-secondary)',
+                  marginBottom: 6,
+                }}
+              >
                 Did the audit&apos;s prediction match what surfaced?
               </legend>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -507,8 +519,8 @@ export function MicroDeliberationCapture({ analysisId }: MicroDeliberationCaptur
               borderRadius: 'var(--radius-md)',
             }}
           >
-            No deliberation events logged yet. Use this after the IC / board review to capture
-            which predictions surfaced — each event sharpens your per-org calibration.
+            No deliberation events logged yet. Use this after the IC / board review to capture which
+            predictions surfaced — each event sharpens your per-org calibration.
           </div>
         )}
 
@@ -547,7 +559,9 @@ export function MicroDeliberationCapture({ analysisId }: MicroDeliberationCaptur
                   </div>
                 )}
                 {event.notes && (
-                  <div style={{ fontSize: 12, color: 'var(--text-secondary)', fontStyle: 'italic' }}>
+                  <div
+                    style={{ fontSize: 12, color: 'var(--text-secondary)', fontStyle: 'italic' }}
+                  >
                     {event.notes}
                   </div>
                 )}

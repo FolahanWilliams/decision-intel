@@ -724,11 +724,11 @@ export function RoleOutreachPlaybooks() {
           }}
         >
           Founder-led marketing only scales if the channel + offer + delivery model are protected
-          from drift. The 1-1-1 framework (locked GTM v3.3 §6) is layered ABOVE the 8 role
-          playbooks below — every cold opener, discovery question, and killer pitch must funnel
-          into the same conversion mechanism (the 20-min audit on a real strategic memo) and the
-          same delivery model (Individual £249/mo). When a playbook tempts you toward a second
-          channel or a custom delivery shape, return here.
+          from drift. The 1-1-1 framework (locked GTM v3.3 §6) is layered ABOVE the 8 role playbooks
+          below — every cold opener, discovery question, and killer pitch must funnel into the same
+          conversion mechanism (the 20-min audit on a real strategic memo) and the same delivery
+          model (Individual £249/mo). When a playbook tempts you toward a second channel or a custom
+          delivery shape, return here.
         </div>
         <FounderLedMarketingRhythm />
       </div>

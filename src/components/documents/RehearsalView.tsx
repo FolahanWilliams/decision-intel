@@ -37,12 +37,7 @@ import {
 } from 'lucide-react';
 import type { AnalysisResult, BiasInstance } from '@/types';
 import { dqiColorFor, gradeFromScore } from '@/lib/utils/grade';
-import {
-  biasUplift,
-  formatBiasName,
-  rankBias,
-  severityColor,
-} from './_brief-shared';
+import { biasUplift, formatBiasName, rankBias, severityColor } from './_brief-shared';
 
 interface RehearsalViewProps {
   filename: string;
@@ -92,7 +87,10 @@ export function RehearsalView({
   // Pull a Skeptic-persona question from the simulation if present.
   const skepticQuestions = useMemo<string[]>(() => {
     const sim = analysis.simulation as
-      | { skeptic?: { questions?: string[] }; personas?: Array<{ role?: string; questions?: string[] }> }
+      | {
+          skeptic?: { questions?: string[] };
+          personas?: Array<{ role?: string; questions?: string[] }>;
+        }
       | null
       | undefined;
     if (!sim) return [];
@@ -340,8 +338,8 @@ export function RehearsalView({
                 lineHeight: 1.55,
               }}
             >
-              The boardroom simulation hasn&rsquo;t produced a Skeptic transcript for this
-              memo yet. Open the analyst dashboard for the full 5-persona output.
+              The boardroom simulation hasn&rsquo;t produced a Skeptic transcript for this memo yet.
+              Open the analyst dashboard for the full 5-persona output.
             </div>
           )}
         </div>

@@ -193,7 +193,14 @@ export function WhySfcSection() {
       >
         How SFC sabotages Decision Intel specifically
       </h4>
-      <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '0 0 12px', lineHeight: 1.55 }}>
+      <p
+        style={{
+          fontSize: 13,
+          color: 'var(--text-secondary)',
+          margin: '0 0 12px',
+          lineHeight: 1.55,
+        }}
+      >
         Each row maps a cognitive failure mode caused by SFC to a specific v3.5 phase failure. The
         consequences are not vibes — they&apos;re the exact mechanism by which the £10M ARR target
         becomes a quiet shutdown.
@@ -255,7 +262,14 @@ export function WhySfcSection() {
       >
         How SFC sabotages Stanford
       </h4>
-      <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '0 0 12px', lineHeight: 1.55 }}>
+      <p
+        style={{
+          fontSize: 13,
+          color: 'var(--text-secondary)',
+          margin: '0 0 12px',
+          lineHeight: 1.55,
+        }}
+      >
         The Nov 2027 application is 18 months out. The cognitive substrate that produces the
         application competitiveness gets built (or eroded) every single day between now and then.
       </p>
@@ -445,17 +459,14 @@ export function CommitmentRecord() {
             padding: '8px 14px',
             background: showForm ? 'var(--bg-card)' : 'var(--accent-primary)',
             color: showForm ? 'var(--text-primary)' : '#fff',
-            border: showForm
-              ? '1px solid var(--border-color)'
-              : '1px solid var(--accent-primary)',
+            border: showForm ? '1px solid var(--border-color)' : '1px solid var(--accent-primary)',
             borderRadius: 'var(--radius-full)',
             fontSize: 13,
             fontWeight: 600,
             cursor: 'pointer',
           }}
         >
-          {showForm ? <X size={14} /> : <Plus size={14} />}{' '}
-          {showForm ? 'Cancel' : 'Add commitment'}
+          {showForm ? <X size={14} /> : <Plus size={14} />} {showForm ? 'Cancel' : 'Add commitment'}
         </button>
       </div>
 
@@ -589,11 +600,12 @@ export function CommitmentRecord() {
             lineHeight: 1.55,
           }}
         >
-          No commitment written yet. <strong style={{ color: 'var(--text-primary)' }}>Write
-          one.</strong> A specific, dated, signed-off commitment to your future self about WHO you
-          are choosing to be in the next 6 years. Re-read it whenever the discipline feels
-          arbitrary. The point of writing it is so the future-you who is tired and tempted has a
-          message from the present-you who is clear and committed.
+          No commitment written yet.{' '}
+          <strong style={{ color: 'var(--text-primary)' }}>Write one.</strong> A specific, dated,
+          signed-off commitment to your future self about WHO you are choosing to be in the next 6
+          years. Re-read it whenever the discipline feels arbitrary. The point of writing it is so
+          the future-you who is tired and tempted has a message from the present-you who is clear
+          and committed.
         </div>
       )}
 
@@ -716,10 +728,10 @@ export function BuildInPublicSection() {
           lineHeight: 1.55,
         }}
       >
-        Audience-building and SFC-elimination are not in tension when you separate consumption
-        from production. Composition uses System 2 + the prefrontal cortex you are protecting.
-        Passive feed-receiving uses System 1 + the variable-reward cycle that suppresses it. The
-        cognitive damage the OS is built to prevent comes from the latter, not the former.
+        Audience-building and SFC-elimination are not in tension when you separate consumption from
+        production. Composition uses System 2 + the prefrontal cortex you are protecting. Passive
+        feed-receiving uses System 1 + the variable-reward cycle that suppresses it. The cognitive
+        damage the OS is built to prevent comes from the latter, not the former.
       </p>
 
       {/* THE ASYMMETRY RULE */}
@@ -743,7 +755,14 @@ export function BuildInPublicSection() {
         >
           {PRODUCER_CONSUMER_ASYMMETRY_RULE.rule}
         </div>
-        <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 12 }}>
+        <div
+          style={{
+            fontSize: 12.5,
+            color: 'var(--text-secondary)',
+            lineHeight: 1.6,
+            marginBottom: 12,
+          }}
+        >
           {PRODUCER_CONSUMER_ASYMMETRY_RULE.why}
         </div>
         <div
@@ -758,7 +777,15 @@ export function BuildInPublicSection() {
         >
           The four mechanics
         </div>
-        <ol style={{ margin: 0, paddingLeft: 20, fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.6 }}>
+        <ol
+          style={{
+            margin: 0,
+            paddingLeft: 20,
+            fontSize: 13,
+            color: 'var(--text-primary)',
+            lineHeight: 1.6,
+          }}
+        >
           {PRODUCER_CONSUMER_ASYMMETRY_RULE.fourMechanics.map((m, i) => (
             <li key={i} style={{ marginBottom: 4 }}>
               {m}
@@ -778,7 +805,14 @@ export function BuildInPublicSection() {
       >
         Format rules — what production looks like per surface
       </h4>
-      <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '0 0 12px', lineHeight: 1.55 }}>
+      <p
+        style={{
+          fontSize: 13,
+          color: 'var(--text-secondary)',
+          margin: '0 0 12px',
+          lineHeight: 1.55,
+        }}
+      >
         The moment a format pulls you back INTO the algorithmic ecosystem to study it (Shorts,
         Reels, daily shitposting), the asymmetry breaks and the OS starts losing.
       </p>
@@ -815,7 +849,8 @@ export function BuildInPublicSection() {
               key={idx}
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'minmax(120px, 0.7fr) minmax(280px, 1.6fr) minmax(280px, 1.4fr)',
+                gridTemplateColumns:
+                  'minmax(120px, 0.7fr) minmax(280px, 1.6fr) minmax(280px, 1.4fr)',
                 padding: '12px 14px',
                 gap: 16,
                 borderBottom:
@@ -913,7 +948,14 @@ export function BuildInPublicSection() {
       >
         Anchor cases — solo founders who proved the asymmetry works
       </h4>
-      <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '0 0 12px', lineHeight: 1.55 }}>
+      <p
+        style={{
+          fontSize: 13,
+          color: 'var(--text-secondary)',
+          margin: '0 0 12px',
+          lineHeight: 1.55,
+        }}
+      >
         Five primary-source existence proofs that compounding audiences get built without an
         algorithmic-feed motion. None of them have a TikTok strategy.
       </p>
@@ -944,7 +986,14 @@ export function BuildInPublicSection() {
             >
               {ex.founder}
             </div>
-            <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.55, marginBottom: 4 }}>
+            <div
+              style={{
+                fontSize: 12.5,
+                color: 'var(--text-secondary)',
+                lineHeight: 1.55,
+                marginBottom: 4,
+              }}
+            >
               <strong style={{ color: 'var(--text-primary)' }}>Motion:</strong> {ex.motion}
             </div>
             <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.55 }}>

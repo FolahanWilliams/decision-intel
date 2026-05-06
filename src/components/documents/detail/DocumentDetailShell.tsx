@@ -37,12 +37,7 @@ import styles from './DocumentDetailShell.module.css';
  * pages (deals, packages) supply their own union via the generic
  * `tabs` prop on `DecisionDetailShellProps`.
  */
-export type DocDetailTab =
-  | 'findings'
-  | 'actions'
-  | 'stress'
-  | 'perspectives'
-  | 'regulatory';
+export type DocDetailTab = 'findings' | 'actions' | 'stress' | 'perspectives' | 'regulatory';
 
 const DOC_TAB_DEFS: { id: DocDetailTab; label: string }[] = [
   { id: 'findings', label: 'Findings' },
@@ -96,7 +91,10 @@ export interface DecisionDetailShellProps {
 }
 
 /** Backward-compatible alias preserving the doc-detail page's existing import. */
-export interface DocumentDetailShellProps extends Omit<DecisionDetailShellProps, 'title' | 'tabs' | 'activeTab' | 'onTabChange'> {
+export interface DocumentDetailShellProps extends Omit<
+  DecisionDetailShellProps,
+  'title' | 'tabs' | 'activeTab' | 'onTabChange'
+> {
   filename: string;
   activeTab: DocDetailTab;
   onTabChange: (tab: DocDetailTab) => void;
@@ -104,11 +102,14 @@ export interface DocumentDetailShellProps extends Omit<DecisionDetailShellProps,
   activeBiasId?: string | null;
 }
 
-const CLASSIFICATION_TONE: Record<NonNullable<DocumentDetailShellProps['classification']>, {
-  bg: string;
-  fg: string;
-  border: string;
-}> = {
+const CLASSIFICATION_TONE: Record<
+  NonNullable<DocumentDetailShellProps['classification']>,
+  {
+    bg: string;
+    fg: string;
+    border: string;
+  }
+> = {
   specimen: {
     bg: 'color-mix(in srgb, var(--severity-medium) 10%, var(--bg-card))',
     fg: 'var(--severity-medium)',
@@ -257,9 +258,7 @@ export function DecisionDetailShell(props: DecisionDetailShellProps) {
         )}
       </header>
 
-      {outcomeStrip && (
-        <div style={{ padding: '12px 24px 0' }}>{outcomeStrip}</div>
-      )}
+      {outcomeStrip && <div style={{ padding: '12px 24px 0' }}>{outcomeStrip}</div>}
 
       {/* Two-pane body */}
       <div
@@ -289,11 +288,7 @@ export function DecisionDetailShell(props: DecisionDetailShellProps) {
             marginRight: 16,
           }}
         >
-          {hasPreview ? (
-            leftPane
-          ) : (
-            <EmptyPreviewState />
-          )}
+          {hasPreview ? leftPane : <EmptyPreviewState />}
         </section>
 
         {/* Right pane — tabs + active tab body */}
@@ -326,11 +321,7 @@ export function DecisionDetailShell(props: DecisionDetailShellProps) {
                   type="button"
                   disabled={disabled}
                   onClick={() => !disabled && onTabChange(t.id)}
-                  title={
-                    disabled
-                      ? `${t.label} — no data on this surface yet.`
-                      : t.label
-                  }
+                  title={disabled ? `${t.label} — no data on this surface yet.` : t.label}
                   style={{
                     padding: '10px 14px',
                     background: 'transparent',
@@ -369,9 +360,7 @@ export function DecisionDetailShell(props: DecisionDetailShellProps) {
                         fontWeight: 700,
                         padding: '1px 6px',
                         borderRadius: 999,
-                        background: active
-                          ? 'var(--accent-primary)'
-                          : 'var(--bg-tertiary)',
+                        background: active ? 'var(--accent-primary)' : 'var(--bg-tertiary)',
                         color: active ? '#fff' : 'var(--text-muted)',
                         minWidth: 16,
                         textAlign: 'center',
@@ -473,9 +462,8 @@ function EmptyPreviewState() {
           lineHeight: 1.55,
         }}
       >
-        This document type doesn&apos;t support inline preview. The audit on the right is
-        rendered against the extracted text — open the source file in your local app to
-        cross-reference.
+        This document type doesn&apos;t support inline preview. The audit on the right is rendered
+        against the extracted text — open the source file in your local app to cross-reference.
       </div>
     </div>
   );

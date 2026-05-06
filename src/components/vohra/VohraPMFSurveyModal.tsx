@@ -150,7 +150,8 @@ export function VohraPMFSurveyModal() {
         <DialogHeader>
           <DialogTitle>Quick check-in: how is Decision Intel for you?</DialogTitle>
           <DialogDescription>
-            Three minutes; one question that matters most. Your answer directly shapes what we build next.
+            Three minutes; one question that matters most. Your answer directly shapes what we build
+            next.
           </DialogDescription>
         </DialogHeader>
 
@@ -182,7 +183,9 @@ export function VohraPMFSurveyModal() {
                     gap: 10,
                     padding: '10px 12px',
                     border: `1px solid ${
-                      veryDisappointed === opt.value ? 'var(--accent-primary)' : 'var(--border-color)'
+                      veryDisappointed === opt.value
+                        ? 'var(--accent-primary)'
+                        : 'var(--border-color)'
                     }`,
                     borderRadius: 'var(--radius-md)',
                     cursor: 'pointer',

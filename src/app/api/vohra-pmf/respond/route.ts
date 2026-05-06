@@ -65,7 +65,12 @@ export async function POST(request: Request) {
   }
   const referral = body.referralWillingness;
   if (referral !== undefined && referral !== null) {
-    if (typeof referral !== 'number' || referral < 0 || referral > 10 || !Number.isFinite(referral)) {
+    if (
+      typeof referral !== 'number' ||
+      referral < 0 ||
+      referral > 10 ||
+      !Number.isFinite(referral)
+    ) {
       return apiError({ error: 'referralWillingness must be a number 0-10', status: 400 });
     }
   }

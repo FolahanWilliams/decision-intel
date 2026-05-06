@@ -156,9 +156,9 @@ export function ActionsTab(props: ActionsTabProps) {
                 color: 'var(--text-secondary)',
               }}
             >
-              Logging the outcome closes the calibration loop — the platform learns YOUR
-              specific bias patterns, and the per-org Brier score sharpens against your
-              decision history. This is the moat that compounds quarter over quarter.
+              Logging the outcome closes the calibration loop — the platform learns YOUR specific
+              bias patterns, and the per-org Brier score sharpens against your decision history.
+              This is the moat that compounds quarter over quarter.
             </p>
             {outcomeReporterSlot}
           </SeverityEdgeCard>

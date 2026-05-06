@@ -256,13 +256,7 @@ function VerdictSection({
   );
 }
 
-function FlagsSection({
-  topBiases,
-  isFree,
-}: {
-  topBiases: BiasInstance[];
-  isFree: boolean;
-}) {
+function FlagsSection({ topBiases, isFree }: { topBiases: BiasInstance[]; isFree: boolean }) {
   if (topBiases.length === 0) {
     return (
       <section style={{ padding: '64px 0', borderBottom: '1px solid var(--border-color)' }}>
@@ -291,7 +285,9 @@ function FlagsSection({
         >
           <Check size={20} style={{ color: 'var(--success)' }} aria-hidden />
           <div>
-            <div style={{ fontSize: 'var(--fs-md)', fontWeight: 600, color: 'var(--text-primary)' }}>
+            <div
+              style={{ fontSize: 'var(--fs-md)', fontWeight: 600, color: 'var(--text-primary)' }}
+            >
               No high-confidence biases surfaced.
             </div>
             <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-secondary)', marginTop: 2 }}>
@@ -409,9 +405,7 @@ function FlagsSection({
                       }}
                       aria-hidden
                     />
-                    {bias.excerpt.length > 240
-                      ? `${bias.excerpt.slice(0, 240)}…`
-                      : bias.excerpt}
+                    {bias.excerpt.length > 240 ? `${bias.excerpt.slice(0, 240)}…` : bias.excerpt}
                   </blockquote>
                 )}
                 {bias.suggestion && (
@@ -458,7 +452,10 @@ function SkepticSection({ analysis }: { analysis: DecisionBriefViewProps['analys
   // Fall back to a generic prompt that points the user toward the deep dive.
   const skepticQuestion = useMemo<string | null>(() => {
     const sim = analysis?.simulation as
-      | { skeptic?: { questions?: string[] }; personas?: Array<{ role?: string; questions?: string[] }> }
+      | {
+          skeptic?: { questions?: string[] };
+          personas?: Array<{ role?: string; questions?: string[] }>;
+        }
       | null
       | undefined;
     if (!sim) return null;
@@ -472,10 +469,22 @@ function SkepticSection({ analysis }: { analysis: DecisionBriefViewProps['analys
 
   const verdict = (analysis?.metaVerdict ?? '').toLowerCase();
   const stamp = verdict.includes('approv')
-    ? { label: 'Approve', color: 'var(--success)', bg: 'color-mix(in srgb, var(--success) 12%, transparent)' }
+    ? {
+        label: 'Approve',
+        color: 'var(--success)',
+        bg: 'color-mix(in srgb, var(--success) 12%, transparent)',
+      }
     : verdict.includes('reject')
-      ? { label: 'Reject', color: 'var(--error)', bg: 'color-mix(in srgb, var(--error) 12%, transparent)' }
-      : { label: 'Abstain', color: 'var(--warning)', bg: 'color-mix(in srgb, var(--warning) 14%, transparent)' };
+      ? {
+          label: 'Reject',
+          color: 'var(--error)',
+          bg: 'color-mix(in srgb, var(--error) 12%, transparent)',
+        }
+      : {
+          label: 'Abstain',
+          color: 'var(--warning)',
+          bg: 'color-mix(in srgb, var(--warning) 14%, transparent)',
+        };
 
   return (
     <section style={{ padding: '64px 0', borderBottom: '1px solid var(--border-color)' }}>
@@ -600,9 +609,8 @@ function SkepticSection({ analysis }: { analysis: DecisionBriefViewProps['analys
               lineHeight: 1.55,
             }}
           >
-            The boardroom simulation will surface the hardest objection here once the
-            simulation node has run. Open the deep-dive analyst view to inspect the
-            full 5-persona output.
+            The boardroom simulation will surface the hardest objection here once the simulation
+            node has run. Open the deep-dive analyst view to inspect the full 5-persona output.
           </div>
         )}
       </div>
@@ -665,8 +673,8 @@ function ActionFooter({
           marginBottom: 8,
         }}
       >
-        Hashed + tamper-evident. Maps onto EU AI Act Article 14, Basel III ICAAP, and
-        the {FRAMEWORK_COUNT} regulatory frameworks the platform tracks. Attach it to your board
+        Hashed + tamper-evident. Maps onto EU AI Act Article 14, Basel III ICAAP, and the{' '}
+        {FRAMEWORK_COUNT} regulatory frameworks the platform tracks. Attach it to your board
         pre-read or hand it to your GC.
       </p>
       <div

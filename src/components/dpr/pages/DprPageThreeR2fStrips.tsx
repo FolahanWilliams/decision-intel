@@ -71,36 +71,28 @@ export function DprPageThreeR2fStrips(props: DprPageThreeR2fStripsProps) {
           <DprNotice mark="Cold start">
             This audit predates the R²F instrumentation, or none of the five signals could be
             populated honestly. The audit verdict on page 1 stands; the procurement-grade
-            methodology strips below populate progressively as your organisation closes outcomes
-            and the platform calibrates.
+            methodology strips below populate progressively as your organisation closes outcomes and
+            the platform calibrates.
           </DprNotice>
         )}
 
-        {data.validityClassification && (
-          <ValidityStrip vc={data.validityClassification} />
-        )}
+        {data.validityClassification && <ValidityStrip vc={data.validityClassification} />}
 
-        {data.referenceClassForecast && (
-          <ReferenceClassStrip rc={data.referenceClassForecast} />
-        )}
+        {data.referenceClassForecast && <ReferenceClassStrip rc={data.referenceClassForecast} />}
 
         {data.feedbackAdequacy && <FeedbackAdequacyStrip fa={data.feedbackAdequacy} />}
 
-        {data.orgCalibration && (
-          <OrgCalibrationStrip oc={data.orgCalibration} />
-        )}
+        {data.orgCalibration && <OrgCalibrationStrip oc={data.orgCalibration} />}
 
-        {data.counterfactualImpact && (
-          <CounterfactualImpactStrip ci={data.counterfactualImpact} />
-        )}
+        {data.counterfactualImpact && <CounterfactualImpactStrip ci={data.counterfactualImpact} />}
       </DprSection>
 
       <DprNotice mark="On vocabulary">
-        The R²F is the platform&apos;s integration of Kahneman&apos;s rigour (System 2 debiasing) and
-        Klein&apos;s recognition (System 1 amplification), arbitrated in one pipeline. Anchor citation:
-        Kahneman & Klein (2009) &ldquo;Conditions for Intuitive Expertise: a failure to disagree.&rdquo;
-        Methodology version active at audit time is recorded with the prompt fingerprint on page 1
-        — divergent re-runs surface as fingerprint mismatches.
+        The R²F is the platform&apos;s integration of Kahneman&apos;s rigour (System 2 debiasing)
+        and Klein&apos;s recognition (System 1 amplification), arbitrated in one pipeline. Anchor
+        citation: Kahneman & Klein (2009) &ldquo;Conditions for Intuitive Expertise: a failure to
+        disagree.&rdquo; Methodology version active at audit time is recorded with the prompt
+        fingerprint on page 1 — divergent re-runs surface as fingerprint mismatches.
       </DprNotice>
     </DprPageShell>
   );
@@ -146,10 +138,10 @@ function ValidityStrip({ vc }: { vc: ValidityClassification }) {
         { k: 'Decision horizon', v: vc.signals.decisionHorizon ?? '—' },
       ]}
     >
-      {vc.rationale}. Per Kahneman & Klein (2009), validity is the first
-      precondition for trustworthy intuition; in low- and zero-validity environments the audit
-      methodology shifts weights to compensate for the documented unreliability of pattern
-      recognition in those domains.
+      {vc.rationale}. Per Kahneman & Klein (2009), validity is the first precondition for
+      trustworthy intuition; in low- and zero-validity environments the audit methodology shifts
+      weights to compensate for the documented unreliability of pattern recognition in those
+      domains.
     </DprRiskStrip>
   );
 }
@@ -266,18 +258,14 @@ function FeedbackAdequacyStrip({ fa }: { fa: FeedbackAdequacy }) {
       ]}
     >
       {fa.note} Per Kahneman & Klein (2009), the second precondition for trustworthy intuition is
-      adequate opportunity to learn from rapid feedback. Domains with sparse feedback (M&A,
-      market entry, long-horizon strategy) require independent base-rate cross-checks even when the
+      adequate opportunity to learn from rapid feedback. Domains with sparse feedback (M&A, market
+      entry, long-horizon strategy) require independent base-rate cross-checks even when the
       operator is highly experienced.
     </DprRiskStrip>
   );
 }
 
-function OrgCalibrationStrip({
-  oc,
-}: {
-  oc: NonNullable<ProvenanceRecordData['orgCalibration']>;
-}) {
+function OrgCalibrationStrip({ oc }: { oc: NonNullable<ProvenanceRecordData['orgCalibration']> }) {
   const isOrg = oc.source === 'org';
   const severity: DprSeverity =
     oc.brierCategory === 'excellent' || oc.brierCategory === 'good'
@@ -317,8 +305,7 @@ function OrgCalibrationStrip({
               { k: 'Outcomes closed', v: oc.outcomesClosed.toString() },
               {
                 k: 'Mean Brier',
-                v:
-                  oc.meanBrierScore != null ? oc.meanBrierScore.toFixed(3) : '—',
+                v: oc.meanBrierScore != null ? oc.meanBrierScore.toFixed(3) : '—',
               },
               { k: 'Calibration band', v: oc.brierCategory ?? '—' },
             ]
@@ -355,11 +342,7 @@ function CounterfactualImpactStrip({
   ci: NonNullable<ProvenanceRecordData['counterfactualImpact']>;
 }) {
   const severity: DprSeverity =
-    ci.weightedImprovementPct >= 12
-      ? 'high'
-      : ci.weightedImprovementPct >= 6
-        ? 'medium'
-        : 'low';
+    ci.weightedImprovementPct >= 12 ? 'high' : ci.weightedImprovementPct >= 6 ? 'medium' : 'low';
 
   const top = ci.scenarios[0];
 

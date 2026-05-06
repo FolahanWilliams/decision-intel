@@ -93,12 +93,7 @@ export function ToxicCombinationsRadial({
       </div>
 
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 20 }}>
-        <svg
-          width={size}
-          height={size}
-          viewBox={`0 0 ${size} ${size}`}
-          style={{ flexShrink: 0 }}
-        >
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ flexShrink: 0 }}>
           {/* Edges first so nodes paint on top */}
           {edges.map((edge, i) => {
             const a = positions[edge.a];

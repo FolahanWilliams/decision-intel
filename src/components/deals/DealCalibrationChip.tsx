@@ -95,9 +95,7 @@ export function DealCalibrationChip() {
         <Activity size={11} style={{ color: 'var(--accent-primary)' }} />
         <span>
           {cal.outcomesClosed} outcome{cal.outcomesClosed !== 1 ? 's' : ''} logged · Brier{' '}
-          <strong style={{ color: 'var(--text-primary)' }}>
-            {cal.meanBrierScore.toFixed(3)}
-          </strong>{' '}
+          <strong style={{ color: 'var(--text-primary)' }}>{cal.meanBrierScore.toFixed(3)}</strong>{' '}
           ({cal.brierCategory ?? 'unscored'})
         </span>
         {delta !== null && Math.abs(delta) >= 0.001 && (

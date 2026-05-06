@@ -120,14 +120,14 @@ export function RegulatoryTab(props: RegulatoryTabProps) {
               width: 44,
               height: 44,
               borderRadius: 8,
-              background: triggeredCount === 0
-                ? 'color-mix(in srgb, var(--severity-low) 12%, transparent)'
-                : 'color-mix(in srgb, var(--severity-high) 12%, transparent)',
+              background:
+                triggeredCount === 0
+                  ? 'color-mix(in srgb, var(--severity-low) 12%, transparent)'
+                  : 'color-mix(in srgb, var(--severity-high) 12%, transparent)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color:
-                triggeredCount === 0 ? 'var(--severity-low)' : 'var(--severity-high)',
+              color: triggeredCount === 0 ? 'var(--severity-low)' : 'var(--severity-high)',
               flexShrink: 0,
             }}
           >
@@ -224,12 +224,7 @@ interface RegionGroupProps {
   onFrameworkClick?: (framework: RegulatoryFramework) => void;
 }
 
-function RegionGroup({
-  label,
-  frameworks,
-  triggerById,
-  onFrameworkClick,
-}: RegionGroupProps) {
+function RegionGroup({ label, frameworks, triggerById, onFrameworkClick }: RegionGroupProps) {
   return (
     <div style={{ display: 'grid', gap: 8 }}>
       <div

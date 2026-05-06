@@ -57,10 +57,7 @@ const DOC_TYPE_LABELS: Record<string, string> = {
 };
 
 export function formatBiasName(key: string): string {
-  return (
-    BIAS_LABELS[key] ??
-    key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
-  );
+  return BIAS_LABELS[key] ?? key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
 export function severityColor(severity: string): string {

@@ -281,4 +281,3 @@ export const WEAKNESSES: Weakness[] = [
 // =========================================================================
 // SECTION 3 · ROLE OUTREACH PLAYBOOKS (8 personas — the centerpiece)
 // =========================================================================
-

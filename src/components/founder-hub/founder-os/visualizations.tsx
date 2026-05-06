@@ -16,16 +16,7 @@
  */
 
 import { useMemo } from 'react';
-import {
-  TrendingUp,
-  Flame,
-  BookOpen,
-  Activity,
-  Brain,
-  Shield,
-  Target,
-  Cpu,
-} from 'lucide-react';
+import { TrendingUp, Flame, BookOpen, Activity, Brain, Shield, Target, Cpu } from 'lucide-react';
 
 export interface CheckinRecord {
   date: string; // YYYY-MM-DD
@@ -88,18 +79,20 @@ export function StreakHeatmap({ checkins }: StreakHeatmapProps) {
   // Group into 13 columns of 7 days each, aligned so today is at the bottom-right.
   // We start with a partial week if today isn't Saturday.
   const todayDOW = dayOfWeek(todayLocalISO());
-  const columns: Array<Array<{ date: string; checkin: CheckinRecord | null; isToday: boolean } | null>> = [];
+  const columns: Array<
+    Array<{ date: string; checkin: CheckinRecord | null; isToday: boolean } | null>
+  > = [];
   // Pad-out the trailing column so today aligns with its real day-of-week.
   const queue = [...cells];
   // Build columns from oldest to newest.
-  const firstCol: Array<typeof cells[number] | null> = [];
+  const firstCol: Array<(typeof cells)[number] | null> = [];
   // First column: pad with nulls until the first cell's day-of-week aligns
   const firstDOW = dayOfWeek(queue[0].date);
   for (let i = 0; i < firstDOW; i++) firstCol.push(null);
   while (queue.length > 0 && firstCol.length < 7) firstCol.push(queue.shift()!);
   columns.push(firstCol);
   while (queue.length > 0) {
-    const col: Array<typeof cells[number] | null> = [];
+    const col: Array<(typeof cells)[number] | null> = [];
     while (queue.length > 0 && col.length < 7) col.push(queue.shift()!);
     while (col.length < 7) col.push(null);
     columns.push(col);
@@ -120,10 +113,7 @@ export function StreakHeatmap({ checkins }: StreakHeatmapProps) {
   const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
-    <div
-      className="card"
-      style={{ borderLeft: '3px solid var(--accent-primary)' }}
-    >
+    <div className="card" style={{ borderLeft: '3px solid var(--accent-primary)' }}>
       <div className="card-body">
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
           <Flame size={15} style={{ color: 'var(--accent-primary)' }} />
@@ -227,7 +217,9 @@ export function StreakHeatmap({ checkins }: StreakHeatmapProps) {
         >
           <span style={{ fontWeight: 600 }}>Less</span>
           <div style={{ display: 'flex', gap: 3 }}>
-            <div style={{ width: 12, height: 12, borderRadius: 2, background: 'var(--bg-tertiary)' }} />
+            <div
+              style={{ width: 12, height: 12, borderRadius: 2, background: 'var(--bg-tertiary)' }}
+            />
             <div
               style={{
                 width: 12,
@@ -244,7 +236,14 @@ export function StreakHeatmap({ checkins }: StreakHeatmapProps) {
                 background: 'color-mix(in srgb, var(--accent-primary) 60%, transparent)',
               }}
             />
-            <div style={{ width: 12, height: 12, borderRadius: 2, background: 'var(--accent-primary)' }} />
+            <div
+              style={{
+                width: 12,
+                height: 12,
+                borderRadius: 2,
+                background: 'var(--accent-primary)',
+              }}
+            />
           </div>
           <span style={{ fontWeight: 600 }}>More</span>
           <span style={{ marginLeft: 'auto' }}>
@@ -387,7 +386,13 @@ export function CognitiveTrendChart({ checkins }: CognitiveTrendChartProps) {
             {/* Deep work line */}
             <path d={deepWorkPath} fill="none" stroke="var(--accent-primary)" strokeWidth={2} />
             {/* Reading line */}
-            <path d={readingPath} fill="none" stroke="var(--info)" strokeWidth={2} strokeOpacity={0.8} />
+            <path
+              d={readingPath}
+              fill="none"
+              stroke="var(--info)"
+              strokeWidth={2}
+              strokeOpacity={0.8}
+            />
 
             {/* Today marker */}
             {(() => {
@@ -404,12 +409,7 @@ export function CognitiveTrendChart({ checkins }: CognitiveTrendChartProps) {
             })()}
 
             {/* X axis labels */}
-            <text
-              x={padding.left}
-              y={chartH - 6}
-              fontSize={10}
-              fill="var(--text-muted)"
-            >
+            <text x={padding.left} y={chartH - 6} fontSize={10} fill="var(--text-muted)">
               30 days ago
             </text>
             <text
@@ -423,20 +423,10 @@ export function CognitiveTrendChart({ checkins }: CognitiveTrendChartProps) {
             </text>
 
             {/* Y axis label */}
-            <text
-              x={4}
-              y={padding.top + 4}
-              fontSize={10}
-              fill="var(--text-muted)"
-            >
+            <text x={4} y={padding.top + 4} fontSize={10} fill="var(--text-muted)">
               {Math.ceil(maxDeepWork)}h
             </text>
-            <text
-              x={4}
-              y={padding.top + innerH}
-              fontSize={10}
-              fill="var(--text-muted)"
-            >
+            <text x={4} y={padding.top + innerH} fontSize={10} fill="var(--text-muted)">
               0
             </text>
           </svg>
@@ -478,9 +468,7 @@ export function PillarAdherenceRadar({
   // AI orchestration — proxy is "user has at least 1 in_progress or complete skill"
   const orchestrationPct = Math.min(skillsInProgressOrComplete / 2, 1);
   const distressPct =
-    last30.length === 0
-      ? 0
-      : last30.filter(c => c.exercise || c.meditation).length / 30;
+    last30.length === 0 ? 0 : last30.filter(c => c.exercise || c.meditation).length / 30;
   // Internal locus — proxy is weekly reviews completed (forces the reflection)
   const locusPct = Math.min(weeklyReviewsLast4Weeks / 4, 1);
 
@@ -554,7 +542,12 @@ export function PillarAdherenceRadar({
             style={{
               fontSize: 13,
               fontWeight: 700,
-              color: overallAdherence >= 0.7 ? 'var(--accent-primary)' : overallAdherence >= 0.5 ? 'var(--warning)' : 'var(--error)',
+              color:
+                overallAdherence >= 0.7
+                  ? 'var(--accent-primary)'
+                  : overallAdherence >= 0.5
+                    ? 'var(--warning)'
+                    : 'var(--error)',
               fontFamily: "'JetBrains Mono', monospace",
             }}
           >
@@ -602,15 +595,7 @@ export function PillarAdherenceRadar({
             {/* Axis dots */}
             {axes.map((a, i) => {
               const p = pointAt(a.value, i);
-              return (
-                <circle
-                  key={a.id}
-                  cx={p.x}
-                  cy={p.y}
-                  r={4}
-                  fill="var(--accent-primary)"
-                />
-              );
+              return <circle key={a.id} cx={p.x} cy={p.y} r={4} fill="var(--accent-primary)" />;
             })}
             {/* Axis labels */}
             {axes.map((a, i) => {
@@ -739,7 +724,14 @@ export function CompoundMathCallout({
             >
               {hoursSaved.toLocaleString()}
             </div>
-            <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.4, marginTop: 4 }}>
+            <div
+              style={{
+                fontSize: 12,
+                color: 'var(--text-secondary)',
+                lineHeight: 1.4,
+                marginTop: 4,
+              }}
+            >
               Hours reclaimed from SFC <br />
               <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>
                 ({sfcZeroDays} SFC-zero days × 3 hrs/day avg peer-time-on-platform)
@@ -758,7 +750,14 @@ export function CompoundMathCallout({
             >
               {totalDeepWorkHours.toFixed(0)}h
             </div>
-            <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.4, marginTop: 4 }}>
+            <div
+              style={{
+                fontSize: 12,
+                color: 'var(--text-secondary)',
+                lineHeight: 1.4,
+                marginTop: 4,
+              }}
+            >
               Deep work invested <br />
               <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>
                 Building the cognitive moat that closes Phase 1
@@ -777,7 +776,14 @@ export function CompoundMathCallout({
             >
               {totalReadingHours}h
             </div>
-            <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.4, marginTop: 4 }}>
+            <div
+              style={{
+                fontSize: 12,
+                color: 'var(--text-secondary)',
+                lineHeight: 1.4,
+                marginTop: 4,
+              }}
+            >
               Long-form reading <br />
               <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>
                 Primary-source neural architecture
@@ -806,21 +812,21 @@ export function CompoundMathCallout({
             <>
               <strong>You&apos;re {30 - sfcZeroDays} days from dopaminergic baseline reset.</strong>{' '}
               At 30 SFC-zero days, the variable-reward conditioning starts to break and your
-              prefrontal cortex regains its normal executive function. The first 30 days are
-              the hardest.
+              prefrontal cortex regains its normal executive function. The first 30 days are the
+              hardest.
             </>
           ) : sfcZeroDays < 90 ? (
             <>
               <strong>Baseline reset zone.</strong> Your dopaminergic baseline has reset; the
-              cravings are mostly residual. Past 90 days the discipline stops feeling like
-              effort and starts feeling like identity.
+              cravings are mostly residual. Past 90 days the discipline stops feeling like effort
+              and starts feeling like identity.
             </>
           ) : (
             <>
-              <strong>{yearsCompounded.toFixed(1)} years of compound advantage.</strong> The
-              gap you&apos;ve built over peers who didn&apos;t refuse to crash is now structural.
-              By 2032, this is the difference between &quot;built £10M ARR&quot; and &quot;tried
-              and got distracted.&quot;
+              <strong>{yearsCompounded.toFixed(1)} years of compound advantage.</strong> The gap
+              you&apos;ve built over peers who didn&apos;t refuse to crash is now structural. By
+              2032, this is the difference between &quot;built £10M ARR&quot; and &quot;tried and
+              got distracted.&quot;
             </>
           )}
         </div>

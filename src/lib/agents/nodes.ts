@@ -258,9 +258,7 @@ async function runJudgeCall(
   // withGeminiResilience wrapper for parity with the legacy 3-Gemini
   // jury.
   const model = createModelByName(modelName, { temperature });
-  const result = await withGeminiResilience(() =>
-    withTimeout(model.generateContent(prompts))
-  );
+  const result = await withGeminiResilience(() => withTimeout(model.generateContent(prompts)));
   const text = result.response?.text ? result.response.text() : '';
   return { text, modelName };
 }
@@ -742,7 +740,8 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
     const promises = [0, 1, 2].map(i => {
       const frame = NOISE_JUDGE_FRAMES[i];
       const framedPrompt = composeFramePrompt(frame.prompt);
-      const modelName = juryModels[i] ?? juryModels[juryModels.length - 1] ?? 'gemini-3-flash-preview';
+      const modelName =
+        juryModels[i] ?? juryModels[juryModels.length - 1] ?? 'gemini-3-flash-preview';
       return runJudgeCall(
         modelName,
         [
@@ -921,7 +920,9 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
       };
     }
 
-    log.warn('GDPR Anonymizer returned invalid response shape — falling back to regex-only redaction');
+    log.warn(
+      'GDPR Anonymizer returned invalid response shape — falling back to regex-only redaction'
+    );
   } catch (e) {
     log.warn(
       'GDPR Anonymizer LLM call failed — falling back to regex-only redaction:',

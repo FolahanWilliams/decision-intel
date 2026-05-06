@@ -52,27 +52,19 @@ describe('POST_ARCHETYPES integrity', () => {
 
 describe('pickArchetype keyword router', () => {
   it('routes catastrophe topics to Billion-Dollar Autopsy (rank 1)', () => {
-    expect(pickArchetype('Why WeWork collapsed in 33 days').id).toBe(
-      'billion_dollar_autopsy'
-    );
+    expect(pickArchetype('Why WeWork collapsed in 33 days').id).toBe('billion_dollar_autopsy');
     expect(pickArchetype('Lehman Brothers — a predictable failure').id).toBe(
       'billion_dollar_autopsy'
     );
   });
 
   it('routes IC / committee panic topics to Room Dynamics / FOMU (rank 2)', () => {
-    expect(pickArchetype('Walking into Thursday IC committee').id).toBe(
-      'room_dynamics_fomu'
-    );
-    expect(pickArchetype('Defending a deal under pressure').id).toBe(
-      'room_dynamics_fomu'
-    );
+    expect(pickArchetype('Walking into Thursday IC committee').id).toBe('room_dynamics_fomu');
+    expect(pickArchetype('Defending a deal under pressure').id).toBe('room_dynamics_fomu');
   });
 
   it('routes Pan-African / cross-border topics to Cross-Border Reality Check (rank 3)', () => {
-    expect(pickArchetype('Nigeria fund evaluating a Lagos target').id).toBe(
-      'cross_border_reality'
-    );
+    expect(pickArchetype('Nigeria fund evaluating a Lagos target').id).toBe('cross_border_reality');
     expect(pickArchetype('NDPR and CBN regulatory map').id).toBe('cross_border_reality');
   });
 
@@ -80,9 +72,7 @@ describe('pickArchetype keyword router', () => {
     expect(pickArchetype('Justifying my fractional CSO retainer').id).toBe(
       'retainer_justification'
     );
-    expect(pickArchetype('How to justify a £20k client invoice').id).toBe(
-      'retainer_justification'
-    );
+    expect(pickArchetype('How to justify a £20k client invoice').id).toBe('retainer_justification');
   });
 
   it('routes shipped-this-week topics to Naked Business Velocity (rank 5)', () => {

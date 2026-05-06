@@ -66,9 +66,7 @@ export interface FounderContextSection {
  * we can still include the introductory "You are the Decision Intel
  * Founder's strategic AI advisor..." opening line if a persona wants it.
  */
-export function splitFounderContextSections(
-  context: string
-): Map<string, FounderContextSection> {
+export function splitFounderContextSections(context: string): Map<string, FounderContextSection> {
   const sections = new Map<string, FounderContextSection>();
 
   // Find all section header positions

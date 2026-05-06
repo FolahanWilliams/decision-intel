@@ -80,7 +80,10 @@ function bumpVisitCount(documentId: string): number {
 }
 
 /** Auto-derive the state from outcome status + visit count, ignoring URL. */
-function deriveState(opts: { outcomeStatus?: string | null; visitCount: number }): DocumentViewState {
+function deriveState(opts: {
+  outcomeStatus?: string | null;
+  visitCount: number;
+}): DocumentViewState {
   if (opts.outcomeStatus === 'outcome_logged') return 'provenance';
   if (opts.visitCount > 1) return 'rehearsal';
   return 'discovery';

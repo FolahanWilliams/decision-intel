@@ -141,9 +141,7 @@ export function UnifiedDecisionsFeed({
             ? `Standalone audit · ${formatRelative(d.uploadedAt)}`
             : `Standalone audit · ${d.status}`,
         statusChip:
-          d.status && d.status !== 'analyzed'
-            ? { label: d.status, color: '#94a3b8' }
-            : undefined,
+          d.status && d.status !== 'analyzed' ? { label: d.status, color: '#94a3b8' } : undefined,
       });
     }
 
@@ -151,7 +149,7 @@ export function UnifiedDecisionsFeed({
     for (const deal of deals ?? []) {
       const dqi = deal.compositeDqi ?? null;
       const stage = deal.stage;
-      const stageColor = stage ? DEAL_STAGE_COLOR[stage] ?? '#6b7280' : '#6b7280';
+      const stageColor = stage ? (DEAL_STAGE_COLOR[stage] ?? '#6b7280') : '#6b7280';
       const docCount = deal._count?.documents ?? 0;
       out.push({
         kind: 'deal',
@@ -161,9 +159,7 @@ export function UnifiedDecisionsFeed({
         dqi,
         updatedAt: deal.updatedAt,
         subtitle: `M&A pipeline · ${docCount} document${docCount === 1 ? '' : 's'}`,
-        statusChip: stage
-          ? { label: stage.replace(/_/g, ' '), color: stageColor }
-          : undefined,
+        statusChip: stage ? { label: stage.replace(/_/g, ' '), color: stageColor } : undefined,
       });
     }
 
@@ -238,8 +234,8 @@ export function UnifiedDecisionsFeed({
             marginBottom: 12,
           }}
         >
-          No recent decisions yet. Upload a memo, start a deal, or assemble a decision
-          package to populate this feed.
+          No recent decisions yet. Upload a memo, start a deal, or assemble a decision package to
+          populate this feed.
         </div>
         <FeedFooterRails />
       </section>

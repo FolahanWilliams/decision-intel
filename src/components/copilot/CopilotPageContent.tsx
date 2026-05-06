@@ -52,7 +52,7 @@ const STARTER_DECISION_PROMPTS: Record<EmptyStateRole, string[]> = {
     'How does this IC memo stack against the last 5 deals we closed?',
     "What's the cross-fund pattern in our anchoring biases this vintage?",
     'Stress-test the FX assumption — what breaks the IRR if local currency drops 30%?',
-    "What would the LP procurement reader flag first in this DPR?",
+    'What would the LP procurement reader flag first in this DPR?',
   ],
   bizops: [
     'Which biases recur across this quarter’s strategic decisions?',
@@ -71,19 +71,19 @@ const STARTER_DECISION_PROMPTS: Record<EmptyStateRole, string[]> = {
 const STARTER_DECISION_QUESTIONS: Record<EmptyStateRole, string[]> = {
   cso: [
     'Should we pivot the strategic plan based on Q3 outcomes?',
-    "Is this market-entry recommendation IC-ready?",
+    'Is this market-entry recommendation IC-ready?',
     'How should we handle the dissent on the capital-allocation decision?',
     'Should we expand into the new market or defer another quarter?',
   ],
   ma: [
-    "Should we proceed to LOI on Project Phoenix given the diligence findings?",
+    'Should we proceed to LOI on Project Phoenix given the diligence findings?',
     'Is the FX risk on this deal tolerable for our fund mandate?',
     'How should we structure the earn-out given the seller’s revenue concentration?',
     'Should we pass on this deal or surface conditions to the IC?',
   ],
   pe_vc: [
-    "Should we lead the round or wait for a co-investor signal?",
-    "Is the founder-CEO transition risk priced into our entry valuation?",
+    'Should we lead the round or wait for a co-investor signal?',
+    'Is the founder-CEO transition risk priced into our entry valuation?',
     'How should we structure governance rights given the syndicate composition?',
     'Should we approve at this price or counter with structured terms?',
   ],

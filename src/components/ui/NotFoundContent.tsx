@@ -286,11 +286,7 @@ export function NotFoundContent({ fullPage = false }: NotFoundContentProps) {
                 r="6"
                 fill="var(--text-muted)"
                 opacity="0.4"
-                animate={
-                  reduceMotion
-                    ? undefined
-                    : { r: [6, 9, 6], opacity: [0.4, 0.7, 0.4] }
-                }
+                animate={reduceMotion ? undefined : { r: [6, 9, 6], opacity: [0.4, 0.7, 0.4] }}
                 transition={{
                   duration: 2.4,
                   repeat: Infinity,
@@ -370,8 +366,8 @@ export function NotFoundContent({ fullPage = false }: NotFoundContentProps) {
               marginInline: 'auto',
             }}
           >
-            The URL is broken, the resource was moved, or the audit you opened
-            wasn&rsquo;t scoped to your account. Pick a path below that actually exists.
+            The URL is broken, the resource was moved, or the audit you opened wasn&rsquo;t scoped
+            to your account. Pick a path below that actually exists.
           </p>
         </div>
 
@@ -402,8 +398,7 @@ export function NotFoundContent({ fullPage = false }: NotFoundContentProps) {
                 color: 'var(--text-primary)',
                 fontSize: 13.5,
                 fontWeight: 600,
-                transition:
-                  'border-color 0.15s ease, background 0.15s ease, transform 0.15s ease',
+                transition: 'border-color 0.15s ease, background 0.15s ease, transform 0.15s ease',
               }}
             >
               <span

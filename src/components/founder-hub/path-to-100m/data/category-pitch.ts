@@ -82,7 +82,6 @@ export const CATEGORY_DEFINITION: CategoryDefinition = {
 // SECTION 6 · KILLER OBJECTION RESPONSES (NotebookLM 2026-04-27 synthesis)
 // =========================================================================
 
-
 export type PersonaPitch = {
   id: string;
   persona: string;
@@ -225,4 +224,3 @@ export const LANGUAGE_PATTERNS: LanguagePattern[] = [
 // =========================================================================
 // SECTION 9 · 17 INVESTOR METRICS TRACKER
 // =========================================================================
-

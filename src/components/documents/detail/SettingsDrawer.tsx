@@ -39,8 +39,15 @@ export interface SettingsDrawerProps {
 }
 
 export function SettingsDrawer(props: SettingsDrawerProps) {
-  const { open, onClose, methodologySlot, reproducibilitySlot, sharingSlot, dangerSlot, blindPriorSlot } =
-    props;
+  const {
+    open,
+    onClose,
+    methodologySlot,
+    reproducibilitySlot,
+    sharingSlot,
+    dangerSlot,
+    blindPriorSlot,
+  } = props;
 
   // Close on Escape.
   useEffect(() => {

@@ -149,8 +149,8 @@ function CalibrationBand({
         {accuracyPct !== null && calibration.classificationCounts && (
           <span style={{ color: C.slate500 }}>
             · <strong style={{ color: C.slate900 }}>{accuracyPct}%</strong> classification accuracy
-            ({calibration.classificationCounts.correct} of{' '}
-            {calibration.classificationCounts.scored})
+            ({calibration.classificationCounts.correct} of {calibration.classificationCounts.scored}
+            )
           </span>
         )}
       </div>

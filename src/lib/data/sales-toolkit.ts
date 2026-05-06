@@ -1349,7 +1349,8 @@ export const BRINKMANSHIP_MOVES: SalesMove[] = [
   },
   {
     id: 'brinkmanship_live_60_second_demo',
-    framework: 'Brinkmanship · 60-Second Live Demo Mid-Call (Goldner archaeology, locked 2026-05-05)',
+    framework:
+      'Brinkmanship · 60-Second Live Demo Mid-Call (Goldner archaeology, locked 2026-05-05)',
     whenToFire:
       'WARM context only. The prospect has already articulated a specific pain pattern in the conversation (Pattern A pre-IC gap, Pattern B post-close surprise, or Pattern C IC friction). They are curious but non-committal. NOT for cold opens — the brinkmanship_evidence_ultimatum is the cold version.',
     verbatim:

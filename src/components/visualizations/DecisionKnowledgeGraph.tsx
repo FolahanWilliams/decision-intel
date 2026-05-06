@@ -560,10 +560,9 @@ export function DecisionKnowledgeGraph({
                   lineHeight: 1.55,
                 }}
               >
-                Every audit you run becomes a node here. Edges form when biases repeat,
-                outcomes confirm patterns, or assumptions chain across decisions. The graph
-                compounds quarter over quarter &mdash; the system gets sharper for the way
-                you specifically decide.
+                Every audit you run becomes a node here. Edges form when biases repeat, outcomes
+                confirm patterns, or assumptions chain across decisions. The graph compounds quarter
+                over quarter &mdash; the system gets sharper for the way you specifically decide.
               </p>
             </div>
           </div>
@@ -651,12 +650,11 @@ export function DecisionKnowledgeGraph({
               lineHeight: 1.55,
             }}
           >
-            <strong style={{ color: 'var(--text-primary)' }}>What lives here:</strong>{' '}
-            5 node types (decisions, biases, outcomes, themes, people) connected by 7 edge
-            types (caused-by, repeats, contradicts, confirmed-by, depends-on, similar-to,
-            attended-by). Density compounds with every closed-loop outcome &mdash; the
-            graph IS the moat. No customer data leaves the platform; everything you see
-            here derives from your own audits.
+            <strong style={{ color: 'var(--text-primary)' }}>What lives here:</strong> 5 node types
+            (decisions, biases, outcomes, themes, people) connected by 7 edge types (caused-by,
+            repeats, contradicts, confirmed-by, depends-on, similar-to, attended-by). Density
+            compounds with every closed-loop outcome &mdash; the graph IS the moat. No customer data
+            leaves the platform; everything you see here derives from your own audits.
           </div>
 
           <style>{`

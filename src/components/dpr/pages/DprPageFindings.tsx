@@ -123,9 +123,7 @@ function FindingCard({ finding, clientSafe }: { finding: DprFinding; clientSafe:
     <article className={`dpr-finding dpr-finding--${finding.severity}`}>
       <header className="dpr-finding-head">
         <div className="dpr-finding-head-left">
-          {finding.taxonomyId && (
-            <div className="dpr-finding-taxonomy">{finding.taxonomyId}</div>
-          )}
+          {finding.taxonomyId && <div className="dpr-finding-taxonomy">{finding.taxonomyId}</div>}
           <h3 className="dpr-finding-title dpr-display">{finding.biasLabel}</h3>
         </div>
         <DprSeverityMeter severity={finding.severity} confidence={finding.confidence} />
@@ -185,8 +183,8 @@ function FindingCard({ finding, clientSafe }: { finding: DprFinding; clientSafe:
         <span>
           {finding.expectedImprovementPct != null && (
             <>
-              <span className="dpr-finding-foot-key">Counterfactual:</span>{' '}
-              +{finding.expectedImprovementPct.toFixed(1)}% verdict if addressed
+              <span className="dpr-finding-foot-key">Counterfactual:</span> +
+              {finding.expectedImprovementPct.toFixed(1)}% verdict if addressed
               {finding.counterfactualSampleSize != null && (
                 <> · n={finding.counterfactualSampleSize}</>
               )}

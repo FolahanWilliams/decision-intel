@@ -111,7 +111,7 @@ export interface MicroDeliberationListItem {
  */
 export async function listMicroDeliberationsForAnalysis(
   analysisId: string,
-  userId: string,
+  userId: string
 ): Promise<MicroDeliberationListItem[]> {
   const rows = await prisma.microDeliberationOutcome
     .findMany({
@@ -174,7 +174,7 @@ export interface MicroDeliberationOrgStats {
  */
 export async function computeOrgMicroDeliberationStats(
   orgId: string,
-  windowDays: number = 90,
+  windowDays: number = 90
 ): Promise<MicroDeliberationOrgStats> {
   const windowStart = new Date(Date.now() - windowDays * 24 * 60 * 60 * 1000);
   const windowEnd = new Date();

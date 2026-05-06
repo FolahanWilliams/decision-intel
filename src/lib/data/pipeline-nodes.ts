@@ -109,7 +109,8 @@ export const PIPELINE_NODES: PipelineNode[] = [
     iconName: 'Scale',
     purpose:
       'Runs the same memo through three decorrelated scoring passes — three professional lenses (analyst-skeptical, regulator-hostile, contrarian-strategist) layered across two model architectures with random seed. The samples are decorrelated, not formally independent: LLMs share training data. We then measure the variance directly. Low variance means the reasoning is stable across framings; high variance tells you which audience will read the memo hardest.',
-    output: 'A noise score, the raw three frame-scored samples, and mean / stdDev / variance statistics.',
+    output:
+      'A noise score, the raw three frame-scored samples, and mean / stdDev / variance statistics.',
     academicAnchor: 'Kahneman, Sibony & Sunstein — Noise (2021).',
   },
   {

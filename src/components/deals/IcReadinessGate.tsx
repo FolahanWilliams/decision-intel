@@ -74,9 +74,7 @@ const DOC_TYPE_LABELS: Record<string, string> = {
 
 function computeGates(deal: DealDetail): Gate[] {
   const documents = deal.documents ?? [];
-  const docTypes = new Set(
-    documents.map(d => d.documentType).filter((t): t is string => !!t)
-  );
+  const docTypes = new Set(documents.map(d => d.documentType).filter((t): t is string => !!t));
 
   // Gate 1: required document set for this deal type
   const requiredDocs = REQUIRED_DOCS_BY_DEAL_TYPE[deal.dealType] ?? ['ic_memo'];
@@ -84,8 +82,7 @@ function computeGates(deal: DealDetail): Gate[] {
   const docsPassed = missingDocs.length === 0;
 
   // Gate 2: every document analyzed (no failures, none pending)
-  const allAnalyzed =
-    documents.length > 0 && documents.every(d => d.status === 'analyzed');
+  const allAnalyzed = documents.length > 0 && documents.every(d => d.status === 'analyzed');
 
   // Gate 3: composite DQI clears the C-grade threshold (55+).
   const composite = deal.aggregation?.compositeDqi ?? null;
@@ -96,8 +93,7 @@ function computeGates(deal: DealDetail): Gate[] {
   const highSeverityUnresolved = findings.filter(
     f => f.severity === 'high' || f.severity === 'critical'
   ).length;
-  const crossRefPassed =
-    deal.crossReference?.status === 'complete' && highSeverityUnresolved === 0;
+  const crossRefPassed = deal.crossReference?.status === 'complete' && highSeverityUnresolved === 0;
 
   // Gate 5: IC date scheduled
   const icDatePassed = !!deal.icDate;
@@ -110,9 +106,7 @@ function computeGates(deal: DealDetail): Gate[] {
         ? `${requiredDocs.length} of ${requiredDocs.length} required document types uploaded`
         : `Missing: ${missingDocs.map(t => DOC_TYPE_LABELS[t] ?? t).join(', ')}`,
       passed: docsPassed,
-      remediation: docsPassed
-        ? undefined
-        : 'Upload and tag the missing types from the deal page.',
+      remediation: docsPassed ? undefined : 'Upload and tag the missing types from the deal page.',
     },
     {
       id: 'all_analyzed',
@@ -124,9 +118,7 @@ function computeGates(deal: DealDetail): Gate[] {
             ? `All ${documents.length} documents have a completed analysis`
             : `${documents.filter(d => d.status === 'analyzed').length} of ${documents.length} analyzed; the rest are pending or failed`,
       passed: allAnalyzed,
-      remediation: allAnalyzed
-        ? undefined
-        : 'Re-run analysis on pending or failed documents.',
+      remediation: allAnalyzed ? undefined : 'Re-run analysis on pending or failed documents.',
     },
     {
       id: 'dqi_threshold',

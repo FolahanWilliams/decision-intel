@@ -46,7 +46,10 @@ export async function GET(request: Request) {
   }
 
   const url = new URL(request.url);
-  const limit = Math.min(Math.max(parseInt(url.searchParams.get('limit') ?? '50', 10) || 50, 1), 200);
+  const limit = Math.min(
+    Math.max(parseInt(url.searchParams.get('limit') ?? '50', 10) || 50, 1),
+    200
+  );
 
   try {
     const items = await prisma.founderOsContentLog.findMany({
@@ -78,7 +81,10 @@ export async function POST(request: Request) {
     return apiError({ error: 'title required (≤500 chars)', status: 400 });
   }
   if (!body.activeRecallSummary?.trim()) {
-    return apiError({ error: 'activeRecallSummary required (write from memory, no peeking)', status: 400 });
+    return apiError({
+      error: 'activeRecallSummary required (write from memory, no peeking)',
+      status: 400,
+    });
   }
   if (!body.source || !ALLOWED_SOURCES.has(body.source)) {
     return apiError({

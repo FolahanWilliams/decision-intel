@@ -222,7 +222,8 @@ export function InteractiveSfcMatrix() {
   const [expandedResearch, setExpandedResearch] = useState<number | null>(null);
   const [expandedConseq, setExpandedConseq] = useState<number | null>(null);
 
-  const rows: readonly SfcConsequenceRow[] = view === 'di' ? HOW_SFC_SABOTAGES_DI : HOW_SFC_SABOTAGES_STANFORD;
+  const rows: readonly SfcConsequenceRow[] =
+    view === 'di' ? HOW_SFC_SABOTAGES_DI : HOW_SFC_SABOTAGES_STANFORD;
 
   const scored = useMemo(
     () =>
@@ -426,7 +427,10 @@ export function InteractiveSfcMatrix() {
         >
           <button
             type="button"
-            onClick={() => { setView('di'); setExpandedConseq(null); }}
+            onClick={() => {
+              setView('di');
+              setExpandedConseq(null);
+            }}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -447,7 +451,10 @@ export function InteractiveSfcMatrix() {
           </button>
           <button
             type="button"
-            onClick={() => { setView('stanford'); setExpandedConseq(null); }}
+            onClick={() => {
+              setView('stanford');
+              setExpandedConseq(null);
+            }}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -495,9 +502,7 @@ export function InteractiveSfcMatrix() {
           {scored.filter(r => r.severity <= 2).length} medium
           {' · '}
           Average severity:{' '}
-          <strong style={{ color: severityColor(avgSeverity) }}>
-            {avgSeverity.toFixed(1)}/5
-          </strong>
+          <strong style={{ color: severityColor(avgSeverity) }}>{avgSeverity.toFixed(1)}/5</strong>
         </span>
       </div>
 
@@ -585,7 +590,9 @@ export function InteractiveSfcMatrix() {
                       marginBottom: 6,
                     }}
                   >
-                    {view === 'di' ? 'v3.5 Business consequence' : 'Stanford application consequence'}
+                    {view === 'di'
+                      ? 'v3.5 Business consequence'
+                      : 'Stanford application consequence'}
                   </div>
                   {row.v35BusinessConsequence}
                 </div>

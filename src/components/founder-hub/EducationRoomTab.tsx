@@ -409,13 +409,14 @@ function Hero() {
           maxWidth: 800,
         }}
       >
-        {DECKS.length} decks across {ALL_CARDS.length} cards covering DI&rsquo;s entire knowledge surface —
-        vocabulary discipline, the 7 buyer personas with verbatim phrases, Maalouf 6 + Satyam 5 +
-        {GRADING_DIMENSIONS.length}-dim Sales DQI rubric, the 5 silent objections with status, the {FRAMEWORK_COUNT} regulatory frameworks,
-        the 12-node pipeline, R²F&rsquo;s Kahneman+Klein integration. Three modes per deck:{' '}
-        <strong>Flashcard</strong> (passive recall, self-graded with SM-2 spaced repetition),{' '}
-        <strong>Recall</strong> (active recall, AI-graded against the canonical answer), and{' '}
-        <strong>Apply</strong> (scenario application drills).
+        {DECKS.length} decks across {ALL_CARDS.length} cards covering DI&rsquo;s entire knowledge
+        surface — vocabulary discipline, the 7 buyer personas with verbatim phrases, Maalouf 6 +
+        Satyam 5 +{GRADING_DIMENSIONS.length}-dim Sales DQI rubric, the 5 silent objections with
+        status, the {FRAMEWORK_COUNT} regulatory frameworks, the 12-node pipeline, R²F&rsquo;s
+        Kahneman+Klein integration. Three modes per deck: <strong>Flashcard</strong> (passive
+        recall, self-graded with SM-2 spaced repetition), <strong>Recall</strong> (active recall,
+        AI-graded against the canonical answer), and <strong>Apply</strong> (scenario application
+        drills).
       </p>
     </div>
   );

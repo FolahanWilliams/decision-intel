@@ -138,9 +138,7 @@ export function InlineDealUploadZone({ dealId, dealName, onUploaded }: Props) {
         cursor: uploading ? 'wait' : 'pointer',
         padding: '12px 14px',
         borderRadius: 'var(--radius-md)',
-        border: dragActive
-          ? '2px dashed var(--accent-primary)'
-          : '1px dashed var(--border-color)',
+        border: dragActive ? '2px dashed var(--accent-primary)' : '1px dashed var(--border-color)',
         background: dragActive ? 'rgba(22, 163, 74, 0.04)' : 'var(--bg-card)',
         display: 'flex',
         alignItems: 'center',
@@ -188,8 +186,8 @@ export function InlineDealUploadZone({ dealId, dealName, onUploaded }: Props) {
               : `Drop a document or click to upload to ${dealName}`}
         </div>
         <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>
-          PDF, DOCX, TXT, or Markdown · multi-file drops processed sequentially · analysis
-          starts automatically
+          PDF, DOCX, TXT, or Markdown · multi-file drops processed sequentially · analysis starts
+          automatically
         </div>
       </div>
       <input

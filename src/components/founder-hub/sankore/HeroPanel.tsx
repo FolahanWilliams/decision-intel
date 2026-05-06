@@ -120,12 +120,12 @@ export function HeroPanel() {
           Engagement
         </span>
         <span>
-          <strong style={{ color: 'var(--text-primary)' }}>London office</strong>, in-person
-          summer 2026 · Design Foundation rate{' '}
+          <strong style={{ color: 'var(--text-primary)' }}>London office</strong>, in-person summer
+          2026 · Design Foundation rate{' '}
           <strong style={{ color: 'var(--text-primary)' }}>£1,999/mo</strong> (20% off Strategy
-          tier) for the founding cohort, optional equity-warrant + outcome-share clause. Per the
-          GTM Plan v3.2 lock, Sankore is the design-partner bridge — not the GTM wedge — and
-          produces the published reference DPRs that unlock the F500 ceiling.
+          tier) for the founding cohort, optional equity-warrant + outcome-share clause. Per the GTM
+          Plan v3.2 lock, Sankore is the design-partner bridge — not the GTM wedge — and produces
+          the published reference DPRs that unlock the F500 ceiling.
         </span>
       </div>
 

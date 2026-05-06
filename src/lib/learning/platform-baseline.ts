@@ -52,11 +52,7 @@
  * answer to "show me your outcome calibration."
  */
 
-import {
-  ALL_CASES,
-  type CaseOutcome,
-  type CaseStudy,
-} from '@/lib/data/case-studies';
+import { ALL_CASES, type CaseOutcome, type CaseStudy } from '@/lib/data/case-studies';
 import { WEIGHTS } from '@/lib/scoring/dqi';
 import {
   computeBrier,
@@ -282,8 +278,7 @@ function computeBaselineUncached(): PlatformCalibrationBaseline {
   const briers = perCase.map(p => p.brier);
   const sortedBriers = [...briers].sort((a, b) => a - b);
 
-  const meanBrier =
-    briers.length === 0 ? 0 : briers.reduce((s, b) => s + b, 0) / briers.length;
+  const meanBrier = briers.length === 0 ? 0 : briers.reduce((s, b) => s + b, 0) / briers.length;
   const medianBrier = median(sortedBriers);
 
   const distribution: Record<BrierCategory, number> = {
@@ -321,8 +316,7 @@ function computeBaselineUncached(): PlatformCalibrationBaseline {
     const isActualFail = p.outcomeCode === 'failure' || p.outcomeCode === 'partial_failure';
     return isPredictedFail === isActualFail;
   }).length;
-  const classificationAccuracy =
-    labelled.length === 0 ? 0 : round4(correct / labelled.length);
+  const classificationAccuracy = labelled.length === 0 ? 0 : round4(correct / labelled.length);
 
   const brierCi95 = bootstrapMeanCi95(briers, BOOTSTRAP_ITERATIONS, BOOTSTRAP_SEED);
 
@@ -403,4 +397,3 @@ export function formatCalibrationFootnote(
   const date = computedAtOverride ?? baseline.computedAt.slice(0, 10);
   return `n = ${baseline.n} historical corporate decisions · mean Brier ${baseline.meanBrier.toFixed(3)} ± ${ci.halfWidth.toFixed(3)} (95% CI, ${baseline.bootstrapIterations.toLocaleString('en-US')}-iteration bootstrap, seed ${baseline.bootstrapSeed}) · methodology v${baseline.methodologyVersion} · computed ${date}`;
 }
-

@@ -68,7 +68,8 @@ export const NINETY_DAY_ACTIONS: NinetyDayAction[] = [
     week: 'Weeks 5-6 · June 2026',
     weekNumber: 5,
     category: 'gtm',
-    action: 'Strategy World London (June 9-10, BAFTA) + AI in Business Conference (May 14, Prospero House)',
+    action:
+      'Strategy World London (June 9-10, BAFTA) + AI in Business Conference (May 14, Prospero House)',
     why: 'GTM v3.5 ratified events list. Strategy World is the highest-signal CSO event in London; AI in Business is high-signal for fractional CSOs + mid-market Heads of Strategic Planning. Cap at 2/month maximum to protect 1-1-1 traffic-source discipline.',
     successCriterion:
       '5+ pre-booked 1:1 coffees with target-persona attendees per event · Hybrid Discovery + Tailored-Pitch script run in every conversation · post-event CRM record per conversation · 2-3 follow-up audits booked',
@@ -81,7 +82,8 @@ export const NINETY_DAY_ACTIONS: NinetyDayAction[] = [
     week: 'Weeks 5-12 · June-July 2026 (ramp to summer engagement)',
     weekNumber: 5,
     category: 'gtm',
-    action: 'Close Sankore on £1,999/mo founding-pilot contract — Phase 2 BRIDGE (NOT Phase 1 wedge)',
+    action:
+      'Close Sankore on £1,999/mo founding-pilot contract — Phase 2 BRIDGE (NOT Phase 1 wedge)',
     why: 'Sankore is the v3.5 Phase 2 design-partner BRIDGE, not the Phase 1 wedge. £1,999/mo founding-pilot rate (locked from v3.3 brief; £4,999/mo is the post-Sankore Phase 3 mid-market wedge price). Pan-African anchor IS the moat. 12-week structured engagement produces 3+ anonymised DPR specimens + 5+ warm intros to mid-market peer GPs / portfolio CSOs.',
     successCriterion:
       'Sankore signed at £1,999/mo · 12-week engagement plan with concrete deliverables · ≥3 anonymised DPRs published · ≥5 mid-market warm intros queued for Phase 3 activation · Outcome Gate enforced contractually',
@@ -248,4 +250,3 @@ export const NINETY_DAY_ACTIONS: NinetyDayAction[] = [
 // =========================================================================
 // SECTION 13 · NOTEBOOKLM FOLLOW-UP LAB (10 high-value next questions)
 // =========================================================================
-

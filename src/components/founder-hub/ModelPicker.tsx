@@ -17,10 +17,7 @@
  */
 
 import { ChevronDown, Cpu } from 'lucide-react';
-import {
-  FOUNDER_CHAT_MODELS,
-  type FounderChatModel,
-} from '@/lib/ai/founder-chat-models';
+import { FOUNDER_CHAT_MODELS, type FounderChatModel } from '@/lib/ai/founder-chat-models';
 
 interface Props {
   activeModelId: string;
@@ -35,12 +32,7 @@ interface Props {
 // is handled by ModelPickerPanel below. Earlier the `onChange` prop
 // was passed in here too but never wired (button doesn't fire it),
 // which produced an "unused parameter" warning. Removed 2026-05-06.
-export function ModelPicker({
-  activeModelId,
-  open,
-  onToggleOpen,
-  accentColor,
-}: Props) {
+export function ModelPicker({ activeModelId, open, onToggleOpen, accentColor }: Props) {
   const active: FounderChatModel =
     FOUNDER_CHAT_MODELS.find(m => m.id === activeModelId) ?? FOUNDER_CHAT_MODELS[0];
 

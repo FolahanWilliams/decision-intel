@@ -52,9 +52,7 @@ export function SeverityEdgeCard({
 }: SeverityEdgeCardProps) {
   const color = SEVERITY_TOKEN[severity];
   const edgeBorder =
-    edge === 'top'
-      ? { borderTop: `3px solid ${color}` }
-      : { borderLeft: `3px solid ${color}` };
+    edge === 'top' ? { borderTop: `3px solid ${color}` } : { borderLeft: `3px solid ${color}` };
 
   const interactive = !!onClick;
 

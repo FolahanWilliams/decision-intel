@@ -481,10 +481,10 @@ export function DecisionDNAPageContent() {
             {dna.totals.totalDecisions} of 3 unlocked
           </span>
           <span style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
-            Decision DNA gets sharper at <strong style={{ color: 'var(--text-primary)' }}>3+
-            closed decisions</strong>. Today the per-domain calibration trend, belief delta, and
-            follow-success rate render below; at 3+ they calibrate to <em>your</em> pattern. Log{' '}
-            {3 - dna.totals.totalDecisions} more closed{' '}
+            Decision DNA gets sharper at{' '}
+            <strong style={{ color: 'var(--text-primary)' }}>3+ closed decisions</strong>. Today the
+            per-domain calibration trend, belief delta, and follow-success rate render below; at 3+
+            they calibrate to <em>your</em> pattern. Log {3 - dna.totals.totalDecisions} more closed{' '}
             {dna.totals.totalDecisions === 2 ? 'decision' : 'decisions'} to unlock the populated
             view.
           </span>
@@ -503,7 +503,8 @@ export function DecisionDNAPageContent() {
               style={{
                 height: '100%',
                 width: `${Math.round((dna.totals.totalDecisions / 3) * 100)}%`,
-                background: 'linear-gradient(90deg, var(--accent-primary), rgba(99, 102, 241, 0.7))',
+                background:
+                  'linear-gradient(90deg, var(--accent-primary), rgba(99, 102, 241, 0.7))',
                 borderRadius: 999,
                 transition: 'width 0.4s ease',
               }}

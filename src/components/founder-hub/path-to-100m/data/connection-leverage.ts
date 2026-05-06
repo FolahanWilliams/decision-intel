@@ -43,12 +43,13 @@ export const CONNECTION_LEVERAGE_REFERRALS: ReferralAsk[] = [
     networkContext:
       'US enterprise SaaS, cybersecurity, governance + compliance practitioners. Best for warm intros to S&P 500 / Fortune 500 strategy / M&A / corp dev directors who would benefit from a 20-min discovery audit. Wiz-network-adjacent acquirers (LRQA, IBM watsonx.governance arm, Big-4 governance practices) are also reachable through this graph.',
     primaryAsk:
-      'Mr. Reiner — I\'m running 20-minute audits on real strategic memos with corporate strategy and corp dev leaders to sharpen the platform before opening Design Foundation pilots. Who in your network runs strategy, M&A, or corp dev at a US F500 / S&P 500 — and would benefit from a 60-second audit on a real memo? I\'m looking for 3-5 warm intros to people who\'d give me honest 20-minute feedback even if they\'re not buying. Anonymized WeWork S-1 specimen DPR attached for context — that\'s what they\'d see in the call.',
-    outputTarget: '3-5 US-side warm intros within 8 weeks; convert ≥1 to design-partner / paid Individual subscriber.',
+      "Mr. Reiner — I'm running 20-minute audits on real strategic memos with corporate strategy and corp dev leaders to sharpen the platform before opening Design Foundation pilots. Who in your network runs strategy, M&A, or corp dev at a US F500 / S&P 500 — and would benefit from a 60-second audit on a real memo? I'm looking for 3-5 warm intros to people who'd give me honest 20-minute feedback even if they're not buying. Anonymized WeWork S-1 specimen DPR attached for context — that's what they'd see in the call.",
+    outputTarget:
+      '3-5 US-side warm intros within 8 weeks; convert ≥1 to design-partner / paid Individual subscriber.',
     secondaryAsk:
-      'After the primary lands: "Any US-based seed funds you\'d suggest given my profile + traction? I\'m targeting Conviction (Sarah Guo), Cyberstarts (Gili Raanan), Elad Gil, Index Ventures (UK), Neo (Ali Partovi) — would value your read on which would be the best first conversation given Wiz\'s GTM trajectory."',
+      "After the primary lands: \"Any US-based seed funds you'd suggest given my profile + traction? I'm targeting Conviction (Sarah Guo), Cyberstarts (Gili Raanan), Elad Gil, Index Ventures (UK), Neo (Ali Partovi) — would value your read on which would be the best first conversation given Wiz's GTM trajectory.\"",
     followUpDiscipline:
-      'After every intro Mr. Reiner makes: send him a 4-line follow-up within 48 hours — who you met, what you learned, what\'s next. Builds his referral muscle; introducers who hear back ship more intros.',
+      "After every intro Mr. Reiner makes: send him a 4-line follow-up within 48 hours — who you met, what you learned, what's next. Builds his referral muscle; introducers who hear back ship more intros.",
   },
   {
     id: 'gabe_uk_csos',
@@ -56,8 +57,9 @@ export const CONNECTION_LEVERAGE_REFERRALS: ReferralAsk[] = [
     networkContext:
       'UK investor-side network — Megasuto helps investors receive capital. Best for warm intros to UK FTSE / mid-market CSOs, heads of strategic planning, heads of corporate development at companies his investor clients have invested in or sit on the board of. Apr 23 2026 meeting: greenlit DI to focus on first 5 paid customers + waitlist before pursuing investors; affirmed customers-before-investors discipline.',
     primaryAsk:
-      'Mr. Gabe — building on our Apr 23 conversation, I\'m focused on the first 5 paid Individual customers as you suggested. The UK companies your investor clients have invested in — do any of them have a CSO, head of strategic planning, or head of corporate development who\'d be the right person to give me 20 minutes of feedback on a 60-second audit? I\'m not pitching them to buy — I\'m collecting honest feedback on the audit to sharpen the product before I open Design Foundation pilots in the summer. Anonymized WeWork DPR attached for context.',
-    outputTarget: '3-5 UK-side warm intros within 8 weeks; pattern-match the discovery responses against the wedge-buyer Goldner script.',
+      "Mr. Gabe — building on our Apr 23 conversation, I'm focused on the first 5 paid Individual customers as you suggested. The UK companies your investor clients have invested in — do any of them have a CSO, head of strategic planning, or head of corporate development who'd be the right person to give me 20 minutes of feedback on a 60-second audit? I'm not pitching them to buy — I'm collecting honest feedback on the audit to sharpen the product before I open Design Foundation pilots in the summer. Anonymized WeWork DPR attached for context.",
+    outputTarget:
+      '3-5 UK-side warm intros within 8 weeks; pattern-match the discovery responses against the wedge-buyer Goldner script.',
     secondaryAsk:
       'Post-graduation (after 5 paid Individual customers fire): "Mr. Gabe, as the Design Foundation cohort opens (5 founding pilots at £1,999/mo, 12-month commitment), would you be open to making 1-2 introductions to the right UK corporate strategy team — someone where you\'d pre-vet the fit?"',
     followUpDiscipline:

@@ -61,7 +61,12 @@ interface MetricsResponse {
     graduationThreshold: number;
     killThreshold: number;
     daysSinceLastSurveyResponse: number | null;
-    perPersona: Array<{ personaId: string; personaLabel: string; respondents: number; veryDisappointedPct: number }>;
+    perPersona: Array<{
+      personaId: string;
+      personaLabel: string;
+      respondents: number;
+      veryDisappointedPct: number;
+    }>;
   };
   engagement: {
     totalAuditsAllTime: number;
@@ -119,7 +124,15 @@ export async function GET(request: Request) {
     .findMany({
       select: { userId: true, phase1Persona: true, phase1HxcEligible: true, createdAt: true },
     })
-    .catch(() => [] as Array<{ userId: string; phase1Persona: string | null; phase1HxcEligible: boolean; createdAt: Date }>);
+    .catch(
+      () =>
+        [] as Array<{
+          userId: string;
+          phase1Persona: string | null;
+          phase1HxcEligible: boolean;
+          createdAt: Date;
+        }>
+    );
 
   const totalSignUps = allSignUps.length;
   const hxcSignUps = allSignUps.filter(s => s.phase1HxcEligible).length;

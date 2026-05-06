@@ -92,9 +92,7 @@ export function StatusChip({
       {Icon && <Icon size={12} aria-hidden style={{ flexShrink: 0 }} />}
       <span>{label}</span>
       {value != null && (
-        <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>
-          {value}
-        </span>
+        <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>{value}</span>
       )}
     </span>
   );

@@ -203,7 +203,7 @@ export const POST_ARCHETYPES: ReadonlyArray<PostArchetype> = [
     oneLiner:
       'Drop into the emotional panic of submitting a memo to a hostile committee, name the exact question that will tear the deal apart, offer the simulator.',
     structuralShape: {
-      hook: 'Walking into [Thursday\'s IC / Monday\'s board / next quarter\'s steering committee] is terrifying. You know the model inside out, but you can\'t shake the feeling you missed something structural.',
+      hook: "Walking into [Thursday's IC / Monday's board / next quarter's steering committee] is terrifying. You know the model inside out, but you can't shake the feeling you missed something structural.",
       middle:
         'Name the specific adversarial reviewer ("the Dr. Red Team objection", "the one MD who attacks base-rate comparables"). Name the cognitive failure they will exploit (Reference-Class Blindness, Inside-View Dominance, Illusion of Validity). Show that the brain fails under pressure in predictable ways.',
       cta: 'Find your blind spot before they do. Protect your commission.',
@@ -274,7 +274,7 @@ export const POST_ARCHETYPES: ReadonlyArray<PostArchetype> = [
     oneLiner:
       'Clients pay for undeniable rigor, not data — show how the artefact makes the rigor visible.',
     structuralShape: {
-      hook: 'Clients don\'t pay £20k/month for data. They pay for undeniable rigor.',
+      hook: "Clients don't pay £20k/month for data. They pay for undeniable rigor.",
       middle: `A fractional CSO's biggest threat isn't a bad strategy; it's a client who can't visually distinguish brilliant strategy from a generic ChatGPT output. People judge a book by its cover. If your strategic memo doesn't look like a $1M McKinsey deliverable, you are leaving authority on the table. Show that the artefact converts the memo into a hashed, tamper-evident audit PDF in 60 seconds.`,
       cta: 'Generate the record that justifies your fee. Attach it to your next client invoice.',
     },
@@ -309,7 +309,7 @@ export const POST_ARCHETYPES: ReadonlyArray<PostArchetype> = [
     structuralShape: {
       hook: 'Last week between [AP Calculus / a school day / a study hall], [a Fortune 500 advisor / a procurement reader / a fund partner] pointed out a massive gap in my product.',
       middle:
-        'Name the gap honestly (specific blocker). Show the fix shipped within days. Show the comparable enterprise vendor cycle time (6 months / 4 quarters / a roadmap promise). Use Jason Cohen\'s Naked Business principle — vulnerability + proof of velocity.',
+        "Name the gap honestly (specific blocker). Show the fix shipped within days. Show the comparable enterprise vendor cycle time (6 months / 4 quarters / a roadmap promise). Use Jason Cohen's Naked Business principle — vulnerability + proof of velocity.",
       cta: 'If a solo founder ships [X] in [Y days], imagine what the product does for your deal flow.',
     },
     whyForFolahan:
@@ -317,7 +317,8 @@ export const POST_ARCHETYPES: ReadonlyArray<PostArchetype> = [
     workedExample: `Last week between AP Calculus and AP Cyber Security exams, a Fortune 500 advisor pointed out a gap in my startup: F500 General Counsels won't buy software from a solo founder without a Vendor Continuity Plan. He was right. So I documented a full engineering succession plan into the data room and shipped Client-Safe Export Mode (redacting entity names) to neutralise NDA fears. Live now. If a solo founder ships enterprise-grade continuity in 48 hours, imagine what the product does for your deal flow.`,
     avoid:
       'Arrogance. NEVER say "I am smarter than IBM." Say "I have fewer meetings than IBM, so I shipped the exact regulatory mapping you need overnight." Stage-of-company language is BANNED ("we are pre-seed", "we just launched"). The vulnerability anchors HONESTY, not weakness.',
-    bestForPersona: 'Fractional CSO / M&A head (respects raw hustle and lean execution) / fellow founder',
+    bestForPersona:
+      'Fractional CSO / M&A head (respects raw hustle and lean execution) / fellow founder',
     topicKeywords: [
       'shipped',
       'built',
@@ -380,16 +381,9 @@ export function pickArchetype(topic?: string): PostArchetype {
   let best: PostArchetype | null = null;
   let bestScore = 0;
   for (const arch of POST_ARCHETYPES) {
-    const score = arch.topicKeywords.reduce(
-      (sum, kw) => sum + (lower.includes(kw) ? 1 : 0),
-      0
-    );
+    const score = arch.topicKeywords.reduce((sum, kw) => sum + (lower.includes(kw) ? 1 : 0), 0);
     if (score === 0) continue;
-    if (
-      best === null ||
-      score > bestScore ||
-      (score === bestScore && arch.rank < best.rank)
-    ) {
+    if (best === null || score > bestScore || (score === bestScore && arch.rank < best.rank)) {
       best = arch;
       bestScore = score;
     }
@@ -447,9 +441,10 @@ export interface BuildPersonalSocialPromptOptions {
   tone?: string;
 }
 
-export function buildPersonalSocialSystemPrompt(
-  opts: BuildPersonalSocialPromptOptions
-): { systemPrompt: string; archetype: PostArchetype } {
+export function buildPersonalSocialSystemPrompt(opts: BuildPersonalSocialPromptOptions): {
+  systemPrompt: string;
+  archetype: PostArchetype;
+} {
   const archetype = opts.archetypeId
     ? getArchetypeById(opts.archetypeId)
     : pickArchetype(opts.topic);

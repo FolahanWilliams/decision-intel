@@ -419,10 +419,10 @@ export function DecisionPackageDetailClient({ packageId, initial }: Props) {
         onClose={() => setShowSettings(false)}
         methodologySlot={
           <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
-            Composite DQI averages the latest analysis from every analyzed document in the
-            package. Cross-reference flags surface contradictions across docs. The package-
-            level DPR carries the composite verdict + per-doc lineage in a single hashed
-            artefact for the audit committee.
+            Composite DQI averages the latest analysis from every analyzed document in the package.
+            Cross-reference flags surface contradictions across docs. The package- level DPR carries
+            the composite verdict + per-doc lineage in a single hashed artefact for the audit
+            committee.
           </div>
         }
         reproducibilitySlot={
@@ -528,8 +528,8 @@ function PackageDocumentsTab({
       >
         <div>
           <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: 12 }}>
-            {documents.length} doc{documents.length === 1 ? '' : 's'} attached. Add at least
-            two analyzed documents to enable cross-document review.
+            {documents.length} doc{documents.length === 1 ? '' : 's'} attached. Add at least two
+            analyzed documents to enable cross-document review.
           </p>
         </div>
         {isOwner && (
@@ -731,8 +731,8 @@ function PackageFindingsTab({
           borderRadius: 'var(--radius-md, 8px)',
         }}
       >
-        No recurring biases across the analyzed documents — clean signature, or audits are
-        too independent for cross-document patterns to surface yet.
+        No recurring biases across the analyzed documents — clean signature, or audits are too
+        independent for cross-document patterns to surface yet.
       </div>
     );
   }
@@ -760,8 +760,8 @@ function PackageFindingsTab({
           Recurring biases
         </h3>
         <p style={{ margin: '2px 0 14px', color: 'var(--text-muted)', fontSize: 12 }}>
-          Biases that appear in two-or-more member documents — the package&rsquo;s decision-
-          quality signature.
+          Biases that appear in two-or-more member documents — the package&rsquo;s decision- quality
+          signature.
         </p>
         <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: 6 }}>
           {aggregation.recurringBiases.slice(0, 12).map(b => (
@@ -895,8 +895,8 @@ function PackageVerdictTab({
             lineHeight: 1.55,
           }}
         >
-          No decision frame yet. The frame is the question this package answers — a single
-          sentence the audit committee can quote in their review.
+          No decision frame yet. The frame is the question this package answers — a single sentence
+          the audit committee can quote in their review.
           {isOwner && ' Click Edit to add one.'}
         </p>
       )}
@@ -978,9 +978,9 @@ function DeletePackageButton({
   return (
     <div style={{ display: 'grid', gap: 8 }}>
       <p style={{ margin: 0, fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-        Deleting <strong>{packageName}</strong> removes the package, its document
-        attachments, cross-reference runs, and outcome record. The underlying documents
-        themselves are NOT deleted — they remain accessible from /dashboard/documents.
+        Deleting <strong>{packageName}</strong> removes the package, its document attachments,
+        cross-reference runs, and outcome record. The underlying documents themselves are NOT
+        deleted — they remain accessible from /dashboard/documents.
       </p>
       <div style={{ display: 'flex', gap: 8 }}>
         <button

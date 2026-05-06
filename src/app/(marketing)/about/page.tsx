@@ -304,9 +304,9 @@ export default function AboutPage() {
               Record &mdash; the artefact your General Counsel hands to the audit committee or
               regulator. It maps onto EU AI Act Article 14 record-keeping, Basel III ICAAP, and SEC
               AI disclosure requirements, plus the cross-border M&amp;A coverage no US-only
-              incumbent carries: NDPR, CBN, WAEMU, PoPIA, SARB, ISA Nigeria 2007, FRC Nigeria,
-              CMA Kenya. The Africa-anchored coverage is the differentiator for Fortune 500
-              corporate development teams running cross-border acquisitions into emerging markets.
+              incumbent carries: NDPR, CBN, WAEMU, PoPIA, SARB, ISA Nigeria 2007, FRC Nigeria, CMA
+              Kenya. The Africa-anchored coverage is the differentiator for Fortune 500 corporate
+              development teams running cross-border acquisitions into emerging markets.
             </p>
           </div>
         </div>
@@ -340,7 +340,8 @@ export default function AboutPage() {
                 Security posture
               </div>
               <div style={{ fontSize: 13, color: C.slate600, lineHeight: 1.5 }}>
-                Encryption, key rotation, sub-processors, regulatory mapping across {FRAMEWORK_COUNT} frameworks.
+                Encryption, key rotation, sub-processors, regulatory mapping across{' '}
+                {FRAMEWORK_COUNT} frameworks.
               </div>
               <div
                 style={{

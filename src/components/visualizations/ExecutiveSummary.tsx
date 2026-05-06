@@ -65,11 +65,7 @@ const VERDICT_META: Record<string, { bg: string; fg: string; ring: string; copy:
   },
 };
 
-export function ExecutiveSummary({
-  overallScore,
-  summary,
-  verdict,
-}: ExecutiveSummaryProps) {
+export function ExecutiveSummary({ overallScore, summary, verdict }: ExecutiveSummaryProps) {
   const meta = getGradeMeta(Math.round(overallScore));
   const verdictMeta = verdict ? VERDICT_META[verdict] : null;
 

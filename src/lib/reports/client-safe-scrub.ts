@@ -59,7 +59,7 @@ export const CS_NAME_DENYLIST = new Set(
     'National Bank',
     'General Partner',
     'Limited Partner',
-  ].map(s => s.toLowerCase()),
+  ].map(s => s.toLowerCase())
 );
 
 export interface ScrubCounters {

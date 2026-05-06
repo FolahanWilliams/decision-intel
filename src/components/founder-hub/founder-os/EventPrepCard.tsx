@@ -296,7 +296,10 @@ function PersonaDetail({ personaId }: { personaId: WedgePersonaId }) {
       <BiasHookList persona={persona} />
       <DmTemplateBlock label="Cold opener (paste then edit)" body={template.opener} />
       <DmTemplateBlock label="Curiosity reply" body={template.curiosityReply} />
-      <DmTemplateBlock label="Discovery-call ask (after 1-2 exchanges)" body={template.discoveryAsk} />
+      <DmTemplateBlock
+        label="Discovery-call ask (after 1-2 exchanges)"
+        body={template.discoveryAsk}
+      />
       <DmTemplateBlock
         label="4-line follow-up to introducer (warm-intro discipline)"
         body={template.introducerFollowUp}

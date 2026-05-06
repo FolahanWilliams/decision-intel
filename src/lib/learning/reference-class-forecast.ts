@@ -131,7 +131,10 @@ const INDUSTRY_NORMALIZE: Record<string, string> = {
 
 function normalizeIndustry(raw: string | null | undefined): string | null {
   if (!raw) return null;
-  const lower = raw.toLowerCase().replace(/[^a-z]+/g, '_').replace(/^_|_$/g, '');
+  const lower = raw
+    .toLowerCase()
+    .replace(/[^a-z]+/g, '_')
+    .replace(/^_|_$/g, '');
   return INDUSTRY_NORMALIZE[lower] ?? lower;
 }
 
@@ -252,12 +255,7 @@ export function getReferenceClassForecast(input: {
     predictedOutcomeBand = 'reference_class_fails';
   }
 
-  const note = buildNote(
-    baselineFailureRate,
-    baselineSampleSize,
-    topAnalogs,
-    predictedOutcomeBand
-  );
+  const note = buildNote(baselineFailureRate, baselineSampleSize, topAnalogs, predictedOutcomeBand);
 
   return {
     poolSize: ALL_CASES.length,

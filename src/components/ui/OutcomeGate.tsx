@@ -252,30 +252,34 @@ function WhyThisMattersBlock() {
                   }}
                 >
                   <li>
-                    <strong style={{ color: 'var(--text-secondary)' }}>Per-org Brier
-                    recalibration:</strong> every closed outcome updates the Brier-scored
-                    weighting of your DQI components, so the score gets sharper at predicting how
-                    decisions like yours actually play out.
+                    <strong style={{ color: 'var(--text-secondary)' }}>
+                      Per-org Brier recalibration:
+                    </strong>{' '}
+                    every closed outcome updates the Brier-scored weighting of your DQI components,
+                    so the score gets sharper at predicting how decisions like yours actually play
+                    out.
                   </li>
                   <li>
-                    <strong style={{ color: 'var(--text-secondary)' }}>Pre-mortem framing
-                    (Klein &amp; Mitchell 1995):</strong> when you log lessons-learned in
-                    past-tense prospective-hindsight voice (&ldquo;the failure began when…&rdquo;),
-                    you produce 25–30% more failure-cause insights than asking &ldquo;what could
-                    go wrong?&rdquo; in conditional voice.
+                    <strong style={{ color: 'var(--text-secondary)' }}>
+                      Pre-mortem framing (Klein &amp; Mitchell 1995):
+                    </strong>{' '}
+                    when you log lessons-learned in past-tense prospective-hindsight voice
+                    (&ldquo;the failure began when…&rdquo;), you produce 25–30% more failure-cause
+                    insights than asking &ldquo;what could go wrong?&rdquo; in conditional voice.
                   </li>
                   <li>
-                    <strong style={{ color: 'var(--text-secondary)' }}>Audit-committee
-                    artefact:</strong> closed outcomes flow into your Decision Knowledge Graph —
-                    the institutional-memory record your CFO can pull up in 60 seconds when the
-                    audit committee asks &ldquo;what was the reasoning?&rdquo;
+                    <strong style={{ color: 'var(--text-secondary)' }}>
+                      Audit-committee artefact:
+                    </strong>{' '}
+                    closed outcomes flow into your Decision Knowledge Graph — the
+                    institutional-memory record your CFO can pull up in 60 seconds when the audit
+                    committee asks &ldquo;what was the reasoning?&rdquo;
                   </li>
                   <li>
-                    <strong style={{ color: 'var(--text-secondary)' }}>Cohort
-                    contribution:</strong> at ≥1 closed outcome you start sharpening bias patterns
-                    across the cross-org cohort. The platform-wide calibration baseline (Brier
-                    0.258 across 143 audited corporate decisions) tightens with every new closed
-                    outcome.
+                    <strong style={{ color: 'var(--text-secondary)' }}>Cohort contribution:</strong>{' '}
+                    at ≥1 closed outcome you start sharpening bias patterns across the cross-org
+                    cohort. The platform-wide calibration baseline (Brier 0.258 across 143 audited
+                    corporate decisions) tightens with every new closed outcome.
                   </li>
                 </ul>
               </motion.div>

@@ -100,9 +100,9 @@ export function DprPageRegulatoryCrosswalk(props: DprPageRegulatoryCrosswalkProp
         </div>
 
         <DprNotice mark="On registry coverage">
-          Frameworks not triggered by this audit are still on file — the platform monitors the
-          full {slots.length}-framework registry and flags new triggers as they fire. A reviewer
-          who needs a specific cross-border deal-shape covered (e.g. NDPR + WAEMU + EU AI Act on a
+          Frameworks not triggered by this audit are still on file — the platform monitors the full{' '}
+          {slots.length}-framework registry and flags new triggers as they fire. A reviewer who
+          needs a specific cross-border deal-shape covered (e.g. NDPR + WAEMU + EU AI Act on a
           Pan-African M&A) can request a per-framework deep-dive under the DPA.
         </DprNotice>
       </DprSection>

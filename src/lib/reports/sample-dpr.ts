@@ -453,7 +453,7 @@ export const SAMPLE_FINDINGS_AUGMENT: Record<
   },
   overconfidence_bias: {
     evidenceQuote:
-      'We project break-even at 18 months from go-live. This compares favourably to the 24-month industry benchmark and reflects our team\'s execution speed in prior expansions.',
+      "We project break-even at 18 months from go-live. This compares favourably to the 24-month industry benchmark and reflects our team's execution speed in prior expansions.",
     mitigation:
       'Surface explicit confidence intervals around the 18-month projection (P10 / P50 / P90). Pull the prior-expansion realised-vs-planned ratios for this team and apply them as a Bayesian prior. Commission an independent reference-class forecast against eight to twelve comparable European DACH expansions before the committee vote.',
   },

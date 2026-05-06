@@ -180,13 +180,9 @@ export async function GET(req: NextRequest) {
     // drop turn 2+ latency by 50-70%.
     systemPromptParts: [
       { role: 'system', content: VOICE_FOUNDER_IDENTITY_CORE },
-      ...(sliceResult.content
-        ? [{ role: 'system' as const, content: sliceResult.content }]
-        : []),
+      ...(sliceResult.content ? [{ role: 'system' as const, content: sliceResult.content }] : []),
       { role: 'system', content: persona.systemPrompt + voiceAddendum },
-      ...(recentMeetingsBlock
-        ? [{ role: 'system' as const, content: recentMeetingsBlock }]
-        : []),
+      ...(recentMeetingsBlock ? [{ role: 'system' as const, content: recentMeetingsBlock }] : []),
     ],
     voiceProfile: {
       defaultVoiceId: persona.voiceProfile.defaultVoiceId,

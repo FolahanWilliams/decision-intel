@@ -50,26 +50,16 @@ export function SwotMatrix({ data }: { data: SwotAnalysisResult }) {
           }}
         >
           <div className="flex items-center gap-2 mb-3">
-            <div
-              className="p-2"
-              style={{ background: s.bg, borderRadius: 'var(--radius-sm)' }}
-            >
+            <div className="p-2" style={{ background: s.bg, borderRadius: 'var(--radius-sm)' }}>
               <s.icon className="w-5 h-5" style={{ color: s.color }} />
             </div>
-            <h4
-              className="font-semibold"
-              style={{ color: 'var(--text-primary)' }}
-            >
+            <h4 className="font-semibold" style={{ color: 'var(--text-primary)' }}>
               {s.title}
             </h4>
           </div>
           <ul className="space-y-2">
             {s.items.map((item, i) => (
-              <li
-                key={i}
-                className="text-sm flex gap-2"
-                style={{ color: 'var(--text-secondary)' }}
-              >
+              <li key={i} className="text-sm flex gap-2" style={{ color: 'var(--text-secondary)' }}>
                 <span
                   className="mt-1.5 w-1.5 h-1.5 shrink-0"
                   style={{ background: s.color, opacity: 0.55, borderRadius: '50%' }}
@@ -95,10 +85,7 @@ export function SwotMatrix({ data }: { data: SwotAnalysisResult }) {
         >
           <Target className="w-4 h-4" /> Strategic Advice
         </h4>
-        <p
-          className="text-sm leading-relaxed"
-          style={{ color: 'var(--text-primary)' }}
-        >
+        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-primary)' }}>
           {data.strategicAdvice}
         </p>
       </div>

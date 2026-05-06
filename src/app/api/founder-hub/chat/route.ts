@@ -15,10 +15,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { streamChat, type GatewayMessage } from '@/lib/ai/providers/gateway';
 import { MODEL_FOUNDER_HUB } from '@/lib/ai/gateway-models';
-import {
-  getFounderChatModel,
-  isFounderChatModelId,
-} from '@/lib/ai/founder-chat-models';
+import { getFounderChatModel, isFounderChatModelId } from '@/lib/ai/founder-chat-models';
 import { formatSSE } from '@/lib/sse';
 import { createLogger } from '@/lib/utils/logger';
 import { verifyFounderPass } from '@/lib/utils/founder-auth';
@@ -137,7 +134,8 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { message, history, fileText, fileName, personaId, modelId } = await parseRequestBody(req);
+    const { message, history, fileText, fileName, personaId, modelId } =
+      await parseRequestBody(req);
 
     if (!message) {
       return NextResponse.json({ error: 'message is required' }, { status: 400 });
@@ -168,9 +166,7 @@ export async function POST(req: NextRequest) {
     // REPLACES the prior hardcoded coach instruction; FOUNDER_CONTEXT
     // and the recent-meetings block stay loaded above so every persona
     // sees the same grounding data, just through a different lens.
-    const persona = getThinkingPartner(
-      isThinkingPartnerId(personaId) ? personaId : null
-    );
+    const persona = getThinkingPartner(isThinkingPartnerId(personaId) ? personaId : null);
 
     const messages: GatewayMessage[] = [
       { role: 'system', content: FOUNDER_CONTEXT },
@@ -189,9 +185,7 @@ export async function POST(req: NextRequest) {
     // route through an off-allowlist gateway model. MODEL_FOUNDER_HUB
     // (the prior single-model constant) is kept as the import-time
     // default for any other surface that hasn't moved to the registry.
-    const selectedModel = isFounderChatModelId(modelId)
-      ? getFounderChatModel(modelId)
-      : null;
+    const selectedModel = isFounderChatModelId(modelId) ? getFounderChatModel(modelId) : null;
     const modelSlug = selectedModel?.slug ?? MODEL_FOUNDER_HUB;
 
     const result = streamChat({

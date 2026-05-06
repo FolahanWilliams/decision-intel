@@ -156,10 +156,7 @@ export function InteractivePillars({ adherence }: InteractivePillarsProps) {
     return vals.reduce((s, v) => s + v, 0) / vals.length;
   }, [adherence]);
 
-  const toggle = useCallback(
-    (id: string) => setExpandedId(prev => (prev === id ? null : id)),
-    []
-  );
+  const toggle = useCallback((id: string) => setExpandedId(prev => (prev === id ? null : id)), []);
 
   // SVG dimensions for the connection diagram
   const svgW = 360;
@@ -273,10 +270,8 @@ export function InteractivePillars({ adherence }: InteractivePillarsProps) {
                   if (tgtIdx === -1) return null;
                   const src = positions[srcIdx];
                   const tgt = positions[tgtIdx];
-                  const isHovered =
-                    hoveredId === p.id || hoveredId === targetId;
-                  const avgAdherence =
-                    (adherence[p.id] + adherence[targetId]) / 2;
+                  const isHovered = hoveredId === p.id || hoveredId === targetId;
+                  const avgAdherence = (adherence[p.id] + adherence[targetId]) / 2;
                   return (
                     <line
                       key={`${p.id}-${targetId}`}
@@ -424,12 +419,10 @@ export function InteractivePillars({ adherence }: InteractivePillarsProps) {
               (≥70%)
             </span>
             <span>
-              <span style={{ color: 'var(--warning)', fontWeight: 700 }}>●</span> At risk
-              (40-69%)
+              <span style={{ color: 'var(--warning)', fontWeight: 700 }}>●</span> At risk (40-69%)
             </span>
             <span>
-              <span style={{ color: 'var(--error)', fontWeight: 700 }}>●</span> Critical
-              (&lt;40%)
+              <span style={{ color: 'var(--error)', fontWeight: 700 }}>●</span> Critical (&lt;40%)
             </span>
             <span style={{ fontStyle: 'italic' }}>Click a node to expand</span>
           </div>

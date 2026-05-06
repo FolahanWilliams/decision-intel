@@ -146,8 +146,7 @@ export async function GET(
     // Forwards Supabase auth cookies so the headless browser arrives at
     // /dpr-render/document/[analysisId] already logged in as the caller.
     const reqUrl = new URL(_request.url);
-    const baseUrl =
-      process.env.NEXT_PUBLIC_APP_URL ?? `${reqUrl.protocol}//${reqUrl.host}`;
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? `${reqUrl.protocol}//${reqUrl.host}`;
     const { pdf } = await renderDprPdf({
       baseUrl,
       type: 'document',

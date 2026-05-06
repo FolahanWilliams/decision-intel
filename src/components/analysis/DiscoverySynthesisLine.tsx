@@ -68,9 +68,7 @@ export function DiscoverySynthesisLine({
   biasCount,
   variant = 'inline',
 }: DiscoverySynthesisLineProps) {
-  const [topMonetary, setTopMonetary] = useState<{ amount: number; currency: string } | null>(
-    null
-  );
+  const [topMonetary, setTopMonetary] = useState<{ amount: number; currency: string } | null>(null);
 
   useEffect(() => {
     if (!analysisId) return;
@@ -138,8 +136,8 @@ export function DiscoverySynthesisLine({
         <>
           <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>·</span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7 }}>
-            <ShieldAlert size={15} style={{ color: 'var(--accent-primary)' }} aria-hidden />
-            ~{moneyChip} of decision risk
+            <ShieldAlert size={15} style={{ color: 'var(--accent-primary)' }} aria-hidden />~
+            {moneyChip} of decision risk
           </span>
         </>
       )}

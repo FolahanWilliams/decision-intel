@@ -340,9 +340,8 @@ export function ProofPageClient() {
                 >
                   /taxonomy
                 </Link>
-                , DI-B-001 onward) against each: a blind test against your own library.
-                Our findings are the red flags the original authors, auditors, and committees missed
-                at the time.
+                , DI-B-001 onward) against each: a blind test against your own library. Our findings
+                are the red flags the original authors, auditors, and committees missed at the time.
               </p>
               <p style={{ fontSize: 13, color: C.slate400, margin: 0 }}>
                 Every flaggable bias links to its peer-reviewed academic source. No LLM storytelling

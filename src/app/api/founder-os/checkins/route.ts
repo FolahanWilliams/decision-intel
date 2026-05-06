@@ -40,7 +40,10 @@ export async function GET(request: Request) {
   }
 
   const url = new URL(request.url);
-  const days = Math.min(Math.max(parseInt(url.searchParams.get('days') ?? '180', 10) || 180, 7), 730);
+  const days = Math.min(
+    Math.max(parseInt(url.searchParams.get('days') ?? '180', 10) || 180, 7),
+    730
+  );
   const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
   try {

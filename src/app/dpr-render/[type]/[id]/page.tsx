@@ -331,10 +331,7 @@ function subtitleForData(data: ProvenanceRecordData, type: DprType): string {
 }
 
 function formatRecordId(data: ProvenanceRecordData): string {
-  const ts = data.generatedAt
-    .toISOString()
-    .replace(/[-:T]/g, '')
-    .slice(0, 12);
+  const ts = data.generatedAt.toISOString().replace(/[-:T]/g, '').slice(0, 12);
   const shortHash = data.inputHash.slice(0, 8);
   return `dpr_${ts}_${shortHash}`;
 }
@@ -345,9 +342,7 @@ function pipelineVersionFromLineage(data: ProvenanceRecordData): string {
 }
 
 function prettyCase(s: string): string {
-  return s
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase());
+  return s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
 /**
@@ -480,10 +475,7 @@ async function loadStructuralAssumptionsForDpr(
     const macro = MACRO_MAP[row.determinantId];
     if (!macro) continue;
     const existing = byMacro[macro];
-    if (
-      !existing ||
-      (SEVERITY_RANK[row.severity] ?? 0) > (SEVERITY_RANK[existing.severity] ?? 0)
-    ) {
+    if (!existing || (SEVERITY_RANK[row.severity] ?? 0) > (SEVERITY_RANK[existing.severity] ?? 0)) {
       byMacro[macro] = row;
     }
   }
@@ -493,9 +485,7 @@ async function loadStructuralAssumptionsForDpr(
     const row = byMacro[macro];
     if (!row) continue;
     const severity = (
-      ['critical', 'high', 'medium', 'low'].includes(row.severity)
-        ? row.severity
-        : 'medium'
+      ['critical', 'high', 'medium', 'low'].includes(row.severity) ? row.severity : 'medium'
     ) as DprStructuralAssumption['severity'];
 
     out.push({
@@ -523,12 +513,12 @@ function synthesiseOutsideView(defensibility: string, memoEvidence: string | nul
   if (band === 'contradicted') {
     return memoEvidence
       ? `Outside-view reading contradicts the memo's claim. Memo evidence on file: "${memoEvidence}"`
-      : 'Outside-view reading contradicts the memo\'s implicit assumption.';
+      : "Outside-view reading contradicts the memo's implicit assumption.";
   }
   if (band === 'unsupported') {
     return memoEvidence
       ? `Outside-view reading does not support the memo's claim. Memo evidence on file: "${memoEvidence}"`
-      : 'Outside-view reading does not support the memo\'s implicit assumption — base-rate evidence missing.';
+      : "Outside-view reading does not support the memo's implicit assumption — base-rate evidence missing.";
   }
   if (band === 'partially_supported') {
     return memoEvidence
@@ -537,5 +527,5 @@ function synthesiseOutsideView(defensibility: string, memoEvidence: string | nul
   }
   return memoEvidence
     ? `Outside-view reading aligns with the memo. Memo evidence on file: "${memoEvidence}"`
-    : 'Outside-view reading aligns with the memo\'s implicit assumption.';
+    : "Outside-view reading aligns with the memo's implicit assumption.";
 }

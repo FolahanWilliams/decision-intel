@@ -34,10 +34,7 @@ const CLASSIFICATION_LABEL: Record<NonNullable<DprPageShellProps['classification
   'client-safe-export': 'Client-safe export',
 };
 
-const CLASSIFICATION_FLAG_TONE: Record<
-  NonNullable<DprPageShellProps['classification']>,
-  string
-> = {
+const CLASSIFICATION_FLAG_TONE: Record<NonNullable<DprPageShellProps['classification']>, string> = {
   sample: 'dpr-page-band-flag',
   specimen: 'dpr-page-band-flag',
   confidential: 'dpr-page-band-flag',
@@ -53,9 +50,7 @@ export function DprPageShell({
   hideBand = false,
   children,
 }: DprPageShellProps) {
-  const formattedDate = auditTimestamp
-    ? new Date(auditTimestamp).toISOString().slice(0, 10)
-    : '';
+  const formattedDate = auditTimestamp ? new Date(auditTimestamp).toISOString().slice(0, 10) : '';
 
   // pageNumber + totalPages are accepted for back-compat but no longer
   // rendered in the inline footer — Puppeteer's displayHeaderFooter

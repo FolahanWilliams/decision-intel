@@ -16,15 +16,7 @@
 'use client';
 
 import { useState, useMemo, type ReactNode } from 'react';
-import {
-  Users,
-  GitBranch,
-  Shield,
-  Layers,
-  HelpCircle,
-  Globe,
-  type LucideIcon,
-} from 'lucide-react';
+import { Users, GitBranch, Shield, Layers, HelpCircle, Globe, type LucideIcon } from 'lucide-react';
 import { SeverityEdgeCard } from '../primitives';
 
 export type StressTestSubTab =
@@ -145,9 +137,7 @@ export function StressTestTab(props: StressTestTabProps) {
                 background: isActive
                   ? 'color-mix(in srgb, var(--accent-primary) 8%, var(--bg-card))'
                   : 'var(--bg-card)',
-                border: `1px solid ${
-                  isActive ? 'var(--accent-primary)' : 'var(--border-color)'
-                }`,
+                border: `1px solid ${isActive ? 'var(--accent-primary)' : 'var(--border-color)'}`,
                 borderRadius: 'var(--radius-md, 8px)',
                 cursor: enabled ? 'pointer' : 'not-allowed',
                 opacity: enabled ? 1 : 0.45,

@@ -809,7 +809,8 @@ export const CAPABILITY_SURFACES: CapabilitySurface[] = [
   },
   {
     title: '/security · Retention SLA + frameworks',
-    oneLiner: '12 African frameworks (incl. NDPR/CBN/WAEMU/ISA Nigeria 2007). Per-tier retention table.',
+    oneLiner:
+      '12 African frameworks (incl. NDPR/CBN/WAEMU/ISA Nigeria 2007). Per-tier retention table.',
     href: '/security#retention',
     internal: false,
     demoNote: 'Scroll to Retention SLA + then to Frameworks. Both are live.',

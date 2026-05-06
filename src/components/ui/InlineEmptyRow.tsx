@@ -59,34 +59,32 @@ export function InlineEmptyRow({
     </span>
   ) : null;
 
-  const ctaWrapper = ctaLabel
-    ? ctaHref
-      ? (
-          <Link
-            href={ctaHref}
-            style={{ textDecoration: 'none', flexShrink: 0 }}
-            className="inline-empty-row-cta"
-          >
-            {cta}
-          </Link>
-        )
-      : (
-          <button
-            type="button"
-            onClick={onCtaClick}
-            style={{
-              background: 'none',
-              border: 'none',
-              padding: 0,
-              cursor: 'pointer',
-              flexShrink: 0,
-            }}
-            className="inline-empty-row-cta"
-          >
-            {cta}
-          </button>
-        )
-    : null;
+  const ctaWrapper = ctaLabel ? (
+    ctaHref ? (
+      <Link
+        href={ctaHref}
+        style={{ textDecoration: 'none', flexShrink: 0 }}
+        className="inline-empty-row-cta"
+      >
+        {cta}
+      </Link>
+    ) : (
+      <button
+        type="button"
+        onClick={onCtaClick}
+        style={{
+          background: 'none',
+          border: 'none',
+          padding: 0,
+          cursor: 'pointer',
+          flexShrink: 0,
+        }}
+        className="inline-empty-row-cta"
+      >
+        {cta}
+      </button>
+    )
+  ) : null;
 
   return (
     <div
@@ -100,11 +98,7 @@ export function InlineEmptyRow({
         borderRadius: 'var(--radius-lg)',
       }}
     >
-      <Icon
-        size={18}
-        style={{ color: 'var(--text-muted)', flexShrink: 0 }}
-        aria-hidden
-      />
+      <Icon size={18} style={{ color: 'var(--text-muted)', flexShrink: 0 }} aria-hidden />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
           style={{

@@ -44,18 +44,12 @@ import { aggregateBlindPriors, type BlindPriorRow } from '@/lib/learning/blind-p
 import { computeCounterfactuals } from '@/lib/analysis/counterfactual';
 import { getOrgBrierStats, brierCategory } from '@/lib/learning/brier-scoring';
 import { computePlatformCalibrationBaseline } from '@/lib/learning/platform-baseline';
-import {
-  getFeedbackAdequacy,
-  type FeedbackAdequacy,
-} from '@/lib/learning/feedback-adequacy';
+import { getFeedbackAdequacy, type FeedbackAdequacy } from '@/lib/learning/feedback-adequacy';
 import {
   getReferenceClassForecast,
   type ReferenceClassForecast,
 } from '@/lib/learning/reference-class-forecast';
-import {
-  classifyValidity,
-  type ValidityClassification,
-} from '@/lib/learning/validity-classifier';
+import { classifyValidity, type ValidityClassification } from '@/lib/learning/validity-classifier';
 import {
   getUserPlan,
   getOrgPlan,
@@ -778,24 +772,23 @@ export async function assembleProvenanceRecordData(
   // narrower query if PromptVersion relation or Document.contentHash are
   // missing (P2021/P2022). Without the fallback, a missing migration
   // silently aborted every DPR generation with a generic 500.
-  let analysis: Awaited<ReturnType<typeof prisma.analysis.findUnique>> &
-    {
-      biases?: Array<{
-        biasType: string;
-        severity: string;
-        suggestion: string | null;
-        excerpt: string | null;
-        confidence: number | null;
-      }>;
-      promptVersion?: { hash: string; name: string; version: number } | null;
-      document: {
-        id: string;
-        filename: string;
-        contentHash: string | null;
-        userId: string;
-        orgId: string | null;
-      };
+  let analysis: Awaited<ReturnType<typeof prisma.analysis.findUnique>> & {
+    biases?: Array<{
+      biasType: string;
+      severity: string;
+      suggestion: string | null;
+      excerpt: string | null;
+      confidence: number | null;
+    }>;
+    promptVersion?: { hash: string; name: string; version: number } | null;
+    document: {
+      id: string;
+      filename: string;
+      contentHash: string | null;
+      userId: string;
+      orgId: string | null;
     };
+  };
   try {
     const full = await prisma.analysis.findUnique({
       where: { id: analysisId },
@@ -1023,11 +1016,10 @@ export async function assembleProvenanceRecordData(
   const userId = analysis.document.userId;
   const documentType =
     (analysis.document as unknown as { documentType?: string | null }).documentType ?? null;
-  const industry =
-    (analysis.document as unknown as { industry?: string | null }).industry ?? null;
+  const industry = (analysis.document as unknown as { industry?: string | null }).industry ?? null;
   const domainHint = documentType ?? industry;
-  const [counterfactualImpact, orgCalibration, dataLifecycle, feedbackAdequacy] =
-    await Promise.all([
+  const [counterfactualImpact, orgCalibration, dataLifecycle, feedbackAdequacy] = await Promise.all(
+    [
       buildCounterfactualImpact(analysis.id, orgId),
       buildOrgCalibration(
         orgId,
@@ -1035,7 +1027,8 @@ export async function assembleProvenanceRecordData(
       ),
       buildDataLifecycle(userId, orgId),
       getFeedbackAdequacy(prisma, userId, { domainHint }),
-    ]);
+    ]
+  );
   // Reference-class forecast — pure function, deterministic, runs in
   // <5ms. Computed synchronously after the Promise.all so it can use
   // the deduplicated biasTypes computed above.
