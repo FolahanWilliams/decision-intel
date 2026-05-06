@@ -134,16 +134,26 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile hamburger */}
+      {/* Sidebar toggle — unified for mobile (drawer) and desktop (collapse).
+          z-index 71 keeps it above the mobile overlay (69) and sidebar (70). */}
       <button
-        className="md:hidden"
-        onClick={() => setMobileOpen(true)}
-        aria-label="Open navigation menu"
+        onClick={() => {
+          if (mobileOpen) {
+            setMobileOpen(false);
+          } else if (typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches) {
+            setMobileOpen(true);
+          } else {
+            setCollapsed((prev: boolean) => !prev);
+          }
+        }}
+        aria-label={
+          mobileOpen ? 'Close navigation' : collapsed ? 'Expand sidebar' : 'Collapse sidebar'
+        }
         style={{
           position: 'fixed',
           top: '52px',
           left: '12px',
-          zIndex: 60,
+          zIndex: 71,
           background: 'var(--bg-card)',
           border: '1px solid var(--bg-elevated)',
           borderRadius: 'var(--radius-full)',
@@ -157,7 +167,7 @@ export default function Sidebar() {
           boxShadow: 'var(--liquid-shadow)',
         }}
       >
-        <Menu size={18} />
+        {mobileOpen ? <X size={18} /> : collapsed ? <Menu size={18} /> : <ChevronLeft size={18} />}
       </button>
 
       {/* Mobile overlay */}
@@ -199,14 +209,15 @@ export default function Sidebar() {
           boxShadow: '1px 0 0 var(--bg-card-hover) inset, var(--liquid-shadow)',
         }}
       >
-        {/* Brand */}
+        {/* Brand — toggle button lives in the fixed position above, so
+            this section is purely the logo + wordmark. */}
         <div
           style={{
             padding: collapsed ? '16px 12px' : '24px 20px',
             borderBottom: '1px solid var(--liquid-border)',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
+            justifyContent: collapsed ? 'center' : 'flex-start',
             minHeight: '72px',
           }}
         >
@@ -250,53 +261,6 @@ export default function Sidebar() {
                 display: 'block',
               }}
             />
-          )}
-          <button
-            onClick={() => {
-              if (mobileOpen) setMobileOpen(false);
-              else setCollapsed(!collapsed);
-            }}
-            aria-label={
-              mobileOpen ? 'Close navigation' : collapsed ? 'Expand sidebar' : 'Collapse sidebar'
-            }
-            className="hidden md:flex"
-            style={{
-              background: 'var(--bg-card)',
-              border: '1px solid var(--bg-elevated)',
-              borderRadius: 'var(--radius-full)',
-              color: 'var(--text-muted)',
-              cursor: 'pointer',
-              padding: '6px',
-              display: 'flex',
-              alignItems: 'center',
-              transition: 'all 0.15s',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-            }}
-          >
-            {mobileOpen ? (
-              <X size={16} />
-            ) : collapsed ? (
-              <Menu size={14} />
-            ) : (
-              <ChevronLeft size={14} />
-            )}
-          </button>
-          {mobileOpen && (
-            <button
-              onClick={() => setMobileOpen(false)}
-              aria-label="Close navigation"
-              className="md:hidden"
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--text-muted)',
-                cursor: 'pointer',
-                padding: '4px',
-              }}
-            >
-              <X size={18} />
-            </button>
           )}
         </div>
 
