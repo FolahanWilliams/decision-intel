@@ -246,6 +246,13 @@ async function main() {
   // route Gemini through the gateway in Phase 2/3.
   const geminiResult = await runGenerateTest('google/gemini-3.1-flash-lite');
 
+  // 3) generateText against Grok 4.3 — the load-bearing third arm of
+  // the cross-model noise jury (locked 2026-05-06). Every doc audit
+  // fires a Grok call on the regulator_hostile frame; this smoke test
+  // catches xAI auth / model-id regressions before they hit the
+  // pipeline at audit time.
+  const grokResult = await runGenerateTest('xai/grok-4.3');
+
   process.stdout.write('\n─── Summary ───\n');
   process.stdout.write(
     `openai/gpt-5.4 (streamText)            : ${streamResult.success ? 'OK' : `FAILED · ${streamResult.errorClass}`}\n`
@@ -253,10 +260,15 @@ async function main() {
   process.stdout.write(
     `google/gemini-3.1-flash-lite (generate): ${geminiResult.success ? 'OK' : `FAILED · ${geminiResult.errorClass}`}\n`
   );
-
-  const allErrors = [streamResult.errorClass, geminiResult.errorClass].filter(
-    (e): e is GatewayErrorClass => e !== undefined
+  process.stdout.write(
+    `xai/grok-4.3 (generate · noise jury)   : ${grokResult.success ? 'OK' : `FAILED · ${grokResult.errorClass}`}\n`
   );
+
+  const allErrors = [
+    streamResult.errorClass,
+    geminiResult.errorClass,
+    grokResult.errorClass,
+  ].filter((e): e is GatewayErrorClass => e !== undefined);
 
   // Special-case the free-credit restriction — it indicates the integration
   // is actually working, the founder just needs to top up Vercel credits.

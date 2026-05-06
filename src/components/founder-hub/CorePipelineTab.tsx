@@ -274,14 +274,20 @@ SYNTHESIS (Sequential)
             </li>
           </ul>
 
-          {/* TODO: Cross-model jury upgrade (activate when first customer lands) */}
+          {/* Cross-model jury — locked 2026-05-06. The card below
+             previously carried a "TODO upgrade before first customer"
+             warning; the upgrade shipped and the card now describes
+             the live architecture. Two model families across three
+             frames + the random-seed stochastic axis = three
+             orthogonal sources of variance the founder-hub reader can
+             cite verbatim in investor conversations. */}
           <div
             style={{
               marginTop: 12,
               padding: 10,
               borderRadius: 8,
-              background: 'rgba(234,179,8,0.08)',
-              border: '1px solid rgba(234,179,8,0.3)',
+              background: 'rgba(22,163,74,0.08)',
+              border: '1px solid rgba(22,163,74,0.3)',
               fontSize: 11,
               color: 'var(--text-secondary)',
               lineHeight: 1.5,
@@ -290,29 +296,32 @@ SYNTHESIS (Sequential)
             <div
               style={{
                 fontWeight: 700,
-                color: '#EAB308',
+                color: '#16A34A',
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px',
                 fontSize: 10,
                 marginBottom: 4,
               }}
             >
-              TODO · upgrade before first customer
+              Live · cross-model jury
             </div>
-            Current jury runs 3× same model at temp 0.3 — captures stochastic variance only, not
-            Kahneman-style judgment disagreement. Upgrade to cross-model jury by setting{' '}
-            <code style={{ fontSize: 10 }}>NOISE_JURY_MODELS</code> env var.
+            Three frames × two model families. Each frame applies the same 0-100 rubric through a
+            DIFFERENT professional lens (analyst-skeptical / regulator-hostile /
+            contrarian-strategist) AND a different model architecture (Gemini 3 Flash · Grok 4.3 ·
+            Gemini 3 Flash). Stochastic variance comes from a per-call random seed, architectural
+            variance from the Gemini ↔ Grok split, framing variance from the lens swap.
             <br />
-            {/* drift-tolerant — 2 refers to NOISE_JURY model count, not the 3-tier model policy. */}
             <strong style={{ color: '#16A34A' }}>
-              Locked 2026-04-24 policy (2 models only):
+              Default jury (locked 2026-05-06):
             </strong>{' '}
-            <code style={{ fontSize: 10 }}>gemini-3-flash-preview,gemini-3.1-flash-lite</code>
+            <code style={{ fontSize: 10 }}>
+              gemini-3-flash-preview,xai/grok-4.3,gemini-3-flash-preview
+            </code>
             <br />
             <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>
-              The prior third-juror pattern (adding gemini-2.5-pro) was retired with the two-model
-              lock; cross-model variance now relies on architectural diversity between the
-              flash-preview and flash-lite models, not three different model families.
+              Override via the <code>NOISE_JURY_MODELS</code> env var. The Gemini and Grok arms
+              run through separate circuit breakers (`gemini` vs `gateway`) so a single-provider
+              outage degrades to single-architecture diversity instead of failing the whole jury.
             </span>
           </div>
         </div>

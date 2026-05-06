@@ -202,6 +202,70 @@ function getStandardSafetyGroundedModel(): GenerativeModel {
 }
 
 /**
+ * Heuristic: treat any model name with a `<provider>/<model>` shape as
+ * a Vercel-AI-Gateway-routed call. Native Gemini names like
+ * `gemini-3-flash-preview` use the GoogleGenerativeAI SDK directly.
+ * Same convention as `src/lib/ai/providers/gateway.ts`.
+ */
+function isGatewayModel(name: string): boolean {
+  return /^[a-z][a-z0-9_-]*\//i.test(name);
+}
+
+/**
+ * Unified noise-jury judge call — routes by model name. Returns a
+ * normalised `{ text }` shape regardless of underlying provider so the
+ * jury aggregator stays single-path.
+ *
+ * Locked 2026-05-06 (cross-model jury ship). Two architectural arms
+ * are wired by default: native Gemini (gemini-3-flash-preview) +
+ * Grok 4.3 via the AI Gateway. Override via NOISE_JURY_MODELS env var.
+ *
+ * Each provider routes through its own circuit breaker (`gemini` vs
+ * `gateway`) so an outage on one side doesn't poison the other arm.
+ */
+async function runJudgeCall(
+  modelName: string,
+  prompts: string[],
+  options: { temperature?: number } = {}
+): Promise<{ text: string; modelName: string }> {
+  const temperature = options.temperature ?? 0.3;
+
+  if (isGatewayModel(modelName)) {
+    // Lazy-import the gateway provider so the noise-jury bundle stays
+    // lean when the env doesn't enable cross-model arms.
+    const { generateText } = await import('@/lib/ai/providers/gateway');
+    // The gateway expects a single string prompt. The noise-jury frame
+    // is structured as `[basePrompt, contentBlock, seedSuffix]`; join
+    // with double-newline separators so the gateway sees the same
+    // logical message Gemini receives via array-of-parts.
+    const combinedPrompt = prompts.join('\n\n');
+    const result = await withCircuitBreaker('gateway', () =>
+      withTimeout(
+        generateText(combinedPrompt, {
+          model: modelName,
+          temperature,
+          // Gateway's default 16384 matches Gemini's maxOutputTokens —
+          // keep cap aligned so JSON outputs from both arms have the
+          // same truncation tolerance.
+          maxOutputTokens: 16384,
+        })
+      )
+    );
+    return { text: result.text, modelName: result.model };
+  }
+
+  // Native Gemini path — uses the existing createModelByName +
+  // withGeminiResilience wrapper for parity with the legacy 3-Gemini
+  // jury.
+  const model = createModelByName(modelName, { temperature });
+  const result = await withGeminiResilience(() =>
+    withTimeout(model.generateContent(prompts))
+  );
+  const text = result.response?.text ? result.response.text() : '';
+  return { text, modelName };
+}
+
+/**
  * Create a model by explicit name — used for multi-model noise jury.
  * Not cached (each call creates a new instance) since model names vary.
  */
@@ -218,9 +282,29 @@ function createModelByName(name: string, options?: { temperature?: number }): Ge
  * Format: comma-separated model names, e.g. "gemini-3-flash-preview,gemini-2.5-pro,gemini-3.1-flash-lite"
  * Returns empty array if not set (falls back to default single-model jury).
  */
+/**
+ * Default cross-model jury — 2 architectures across 3 frames:
+ *   [0] analyst_skeptical    → gemini-3-flash-preview (Google)
+ *   [1] regulator_hostile    → xai/grok-4.3 (xAI via Vercel AI Gateway)
+ *   [2] contrarian_strategist → gemini-3-flash-preview (Google)
+ *
+ * The Grok arm fires on the regulator_hostile frame because that's the
+ * highest-leverage frame for architectural diversity — a different
+ * model family scrutinising the same memo against the same hostile-GC
+ * rubric uncovers framing-blind-spots a single-family jury misses. The
+ * 2:1 Gemini:Grok ratio means a Grok outage degrades gracefully to
+ * all-Gemini (jury still functional, just back to single-architecture
+ * diversity). Override via NOISE_JURY_MODELS env var.
+ */
+const DEFAULT_NOISE_JURY_MODELS = [
+  'gemini-3-flash-preview',
+  'xai/grok-4.3',
+  'gemini-3-flash-preview',
+] as const;
+
 function getNoiseJuryModels(): string[] {
   const envVal = getOptionalEnvVar('NOISE_JURY_MODELS', '');
-  if (!envVal) return [];
+  if (!envVal) return [...DEFAULT_NOISE_JURY_MODELS];
   return envVal
     .split(',')
     .map(s => s.trim())
@@ -632,54 +716,56 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
         ? `${basePrompt}\n\n--- STRATEGIC DECISION CONTEXT ---\n${investmentNoiseOverlay}`
         : basePrompt;
 
-    // Multi-model noise jury: uses NOISE_JURY_MODELS env var for cross-model
-    // architectural diversity. Frame diversity (analyst-skeptical /
-    // regulator-hostile / contrarian-strategist per NOISE_JUDGE_FRAMES) is the
-    // second axis — see prompts.ts for the theoretical anchor. Combined, the
-    // jury measures three orthogonal sources of variance: stochastic (random
-    // seed), architectural (model family), framing (professional lens).
+    // Cross-model noise jury (locked 2026-05-06): three orthogonal
+    // sources of variance —
+    //   • stochastic (random seed appended to each call)
+    //   • architectural (Gemini + Grok, different model families)
+    //   • framing (analyst_skeptical / regulator_hostile /
+    //     contrarian_strategist per NOISE_JUDGE_FRAMES)
+    //
+    // The model assignment lives in DEFAULT_NOISE_JURY_MODELS; override
+    // via NOISE_JURY_MODELS env var (comma-separated 3-model list).
+    // Each frame routes through the right circuit breaker (`gemini`
+    // for native Gemini calls, `gateway` for Vercel-AI-Gateway-routed
+    // models like Grok) so a single-provider outage doesn't poison
+    // the cross-model arm.
     const juryModels = getNoiseJuryModels();
-    const isMultiModelJury = juryModels.length >= 2;
-    if (isMultiModelJury) {
-      log.info(`Multi-model noise jury: ${juryModels.join(', ')}`);
-    }
     log.info(
-      `Multi-frame noise jury: ${NOISE_JUDGE_FRAMES.map(f => f.id).join(', ')}`
+      `Cross-model noise jury: ${juryModels.join(' / ')} × ${NOISE_JUDGE_FRAMES.map(f => f.id).join(' · ')}`
     );
 
-    // Parallel Judges for Noise Scoring (circuit breaker prevents pile-up if Gemini is down).
-    // Each judge uses a DIFFERENT frame prompt; if NOISE_JURY_MODELS is set, also a different
-    // model. Temperature 0.3 for deterministic scoring; random seed still injects variance.
+    // Parallel judges. Each frame fires on its assigned model — same
+    // 0-100 scoring rubric, same JSON output shape, different
+    // professional lens AND different model family. Temperature 0.3
+    // for deterministic scoring; random seed still injects stochastic
+    // variance even at low temperature.
     const promises = [0, 1, 2].map(i => {
       const frame = NOISE_JUDGE_FRAMES[i];
       const framedPrompt = composeFramePrompt(frame.prompt);
-      const model = juryModels[i]
-        ? createModelByName(juryModels[i], { temperature: 0.3 })
-        : createModelInstance({ safetyLevel: 'relaxed', temperature: 0.3 });
-      return withGeminiResilience(() =>
-        withTimeout(
-          model.generateContent([
-            framedPrompt,
-            `Decision Text to Rate:\n<input_text>\n${content}\n</input_text>${contextSuffix}`,
-            `\n(Frame: ${frame.label}; Random Seed: ${Math.random()})`,
-          ])
-        )
+      const modelName = juryModels[i] ?? juryModels[juryModels.length - 1] ?? 'gemini-3-flash-preview';
+      return runJudgeCall(
+        modelName,
+        [
+          framedPrompt,
+          `Decision Text to Rate:\n<input_text>\n${content}\n</input_text>${contextSuffix}`,
+          `\n(Frame: ${frame.label}; Random Seed: ${Math.random()})`,
+        ],
+        { temperature: 0.3 }
       );
     });
 
     const settled = await Promise.allSettled(promises);
 
     let extractedBenchmarks: NoiseBenchmark[] = [];
-    const scores = settled.map(r => {
+    const scores = settled.map((r, i) => {
       if (r.status === 'rejected') {
         log.warn(
-          'Noise judge failed:',
+          `Noise judge failed (frame=${NOISE_JUDGE_FRAMES[i].id}, model=${juryModels[i] ?? 'fallback'}):`,
           r.reason instanceof Error ? r.reason.message : String(r.reason)
         );
         return 0;
       }
-      const text = r.value.response?.text ? r.value.response.text() : '';
-      const data = parseJSON(text);
+      const data = parseJSON(r.value.text);
       // Capture benchmarks from the first successful judge
       if (data?.benchmarks?.length > 0 && extractedBenchmarks.length === 0) {
         extractedBenchmarks = data.benchmarks;

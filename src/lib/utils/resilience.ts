@@ -367,6 +367,13 @@ export class CircuitBreaker {
  */
 export const circuitBreakers = {
   gemini: new CircuitBreaker('Gemini', 5, 60_000),
+  /**
+   * Vercel AI Gateway (Grok, OpenAI, Anthropic, Google routed through
+   * the gateway). Separate from the native Gemini circuit so a Grok
+   * outage doesn't trip Gemini judges (and vice versa) — the noise
+   * jury can degrade gracefully when one provider is down.
+   */
+  gateway: new CircuitBreaker('Gateway', 5, 60_000),
   slack: new CircuitBreaker('Slack', 3, 30_000),
   resend: new CircuitBreaker('Resend', 3, 30_000),
 } as const;

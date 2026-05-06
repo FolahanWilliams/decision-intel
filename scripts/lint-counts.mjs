@@ -62,7 +62,12 @@ const SCAN_PATHS = [
 // the 12 IS PIPELINE_NODES.length but the literal is in a content
 // string). New count literals must replace one of these or annotate
 // with `// drift-tolerant`.
-const COUNT_BASELINE = 82;
+//
+// 2026-05-06: ratcheted 82 → 81 after the CorePipelineTab cross-model-
+// jury copy update removed a stale "2 models only" literal (the lock
+// it referenced was retired when the cross-model jury shipped the same
+// day). Reducing the baseline is encouraged per the file header.
+const COUNT_BASELINE = 81;
 
 // Plural nouns we audit. Each must have a canonical source-of-truth in
 // the codebase; adding a new noun here requires adding the canonical
