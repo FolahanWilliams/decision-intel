@@ -58,6 +58,21 @@ import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 import { LiveRedFlagsAlert } from '@/components/analysis/LiveRedFlagsAlert';
 import { LivePredictedQuestions } from '@/components/analysis/LivePredictedQuestions';
 import { StructuralAssumptionsPanel } from '@/components/analysis/StructuralAssumptionsPanel';
+import { CounterfactualPanel } from '@/components/ui/CounterfactualPanel';
+import { MetaVerdictPanel } from '@/components/ui/MetaVerdictPanel';
+import { RecommendationsPanel } from '@/components/ui/RecommendationsPanel';
+import { InterventionPanel } from '@/components/ui/InterventionPanel';
+import { LearningImpactCard } from '@/components/ui/LearningImpactCard';
+import { DrRedTeamCard } from '@/components/analysis/DrRedTeamCard';
+import { R2FDecompositionCard } from '@/components/documents/R2FDecompositionCard';
+import { ReferenceClassChip } from '@/components/documents/ReferenceClassChip';
+import { PaperApplicationsCard } from '@/components/analysis/PaperApplicationsCard';
+import { DecisionRoomList } from '@/components/ui/DecisionRoomCard';
+import { VersionHistoryStrip } from '@/components/analysis/VersionHistoryStrip';
+import { VersionDeltaCard } from '@/components/analysis/VersionDeltaCard';
+import { OutcomeReporter } from './OutcomeReporter';
+import { RegulatoryHorizonWidget } from './RegulatoryHorizonWidget';
+import { InstitutionalMemoryWidget } from './InstitutionalMemoryWidget';
 import type { Severity } from '@/components/documents/detail/primitives';
 
 /* ---------------- Lazy-loaded heavy components ---------------- */
@@ -137,6 +152,24 @@ interface Analysis {
   intelligenceContext?: IntelligenceContextSummary;
   forgottenQuestions?: import('@/types').ForgottenQuestionsResult;
   compliance?: ComplianceResult;
+  institutionalMemory?: import('@/types').InstitutionalMemoryResult;
+  metaVerdict?: string;
+  noiseStats?: { mean: number; stdDev: number; variance: number };
+  factCheck?: {
+    score: number;
+    flags?: string[];
+    verifications?: Array<{
+      claim: string;
+      verdict: string;
+      explanation: string;
+      sourceUrl?: string;
+    }>;
+  };
+  logicalAnalysis?: {
+    score: number;
+    fallacies?: Array<{ name: string; severity: string; explanation: string }>;
+  };
+  previousAnalysisId?: string | null;
   marketContextApplied?: MarketContext;
   marketContextOverride?: MarketContext | null;
 }
@@ -152,6 +185,12 @@ interface Document {
   isSample?: boolean;
   visibility?: string;
   analyses?: Analysis[];
+  deal?: {
+    id: string;
+    name: string;
+    sector?: string | null;
+    ticketSize?: number | null;
+  } | null;
 }
 
 const TAB_KEYS: DocDetailTab[] = ['findings', 'actions', 'stress', 'perspectives', 'regulatory'];
@@ -373,30 +412,154 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
     switch (activeTab) {
       case 'findings':
         return (
-          <FindingsTab
-            biases={biases}
-            r2fProtected={r2fProtected}
-            r2fSuppressed={r2fSuppressed}
-            r2fSummary="Mapped from your memo's flagged passages and structural assumptions."
-            activeBiasId={activeBiasId}
-            onBiasClick={handleBiasClick}
-            taxonomyIdByType={taxonomyIdByType}
-          />
+          <div style={{ display: 'grid', gap: 16 }}>
+            {/* Meta-judge verdict — adversarial-analysis sentence; the
+               highest-leverage single line on the audit. Renders ABOVE
+               the catalogue so a buyer sees the verdict before drilling. */}
+            {analysis?.metaVerdict && (
+              <ErrorBoundary sectionName="Meta verdict">
+                <MetaVerdictPanel verdict={analysis.metaVerdict} />
+              </ErrorBoundary>
+            )}
+
+            {/* Reference-class match chip + R²F decomposition card —
+               anchor the per-doc reasoning provenance ABOVE the catalogue
+               so the reader sees the academic-ground signal before the
+               bias list. */}
+            {analysis && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+                <ReferenceClassChip biasTypes={biases.map(b => b.biasType)} />
+              </div>
+            )}
+
+            {analysis && (
+              <ErrorBoundary sectionName="R²F decomposition">
+                <R2FDecompositionCard
+                  overallScore={analysis.overallScore}
+                  noiseScore={analysis.noiseScore}
+                  biasCount={biases.length}
+                />
+              </ErrorBoundary>
+            )}
+
+            {/* Paper-applications card — Validity / Reference-class /
+               Feedback-adequacy strips per Kahneman & Klein 2009 anchors. */}
+            {analysis && (
+              <ErrorBoundary sectionName="Paper applications">
+                <PaperApplicationsCard analysisId={analysis.id} />
+              </ErrorBoundary>
+            )}
+
+            <FindingsTab
+              biases={biases}
+              r2fProtected={r2fProtected}
+              r2fSuppressed={r2fSuppressed}
+              r2fSummary="Mapped from your memo's flagged passages and structural assumptions."
+              activeBiasId={activeBiasId}
+              onBiasClick={handleBiasClick}
+              taxonomyIdByType={taxonomyIdByType}
+            />
+          </div>
         );
       case 'actions':
         return (
-          <ActionsTab
-            biases={biases}
-            lifecycleStage={lifecycleStage}
-            auditedAt={analysis?.createdAt}
-            outcomeAt={analysis?.outcome?.occurredAt}
-            outcomeDueAt={analysis?.outcomeDueAt}
-            taxonomyIdByType={taxonomyIdByType}
-            onBiasClick={handleBiasClick}
-          />
+          <div style={{ display: 'grid', gap: 16 }}>
+            {/* Featured counterfactual — the "what would change" card with
+               ROI math. The single strongest action surface; drives
+               procurement-stage conversations. */}
+            {analysis && (
+              <ErrorBoundary sectionName="Featured counterfactual">
+                <CounterfactualPanel analysisId={analysis.id} variant="featured" />
+              </ErrorBoundary>
+            )}
+
+            <ActionsTab
+              biases={biases}
+              lifecycleStage={lifecycleStage}
+              auditedAt={analysis?.createdAt}
+              outcomeAt={analysis?.outcome?.occurredAt}
+              outcomeDueAt={analysis?.outcomeDueAt}
+              taxonomyIdByType={taxonomyIdByType}
+              onBiasClick={handleBiasClick}
+              outcomeReporterSlot={
+                analysis ? (
+                  <ErrorBoundary sectionName="Outcome reporter">
+                    <div data-outcome-reporter>
+                      <OutcomeReporter
+                        analysisId={analysis.id}
+                        analysisDate={analysis.createdAt}
+                        biases={biases}
+                      />
+                    </div>
+                  </ErrorBoundary>
+                ) : undefined
+              }
+            />
+
+            {/* Graph-powered recommendations — surfaced from the Decision
+               Knowledge Graph (cross-org pattern matching). */}
+            {analysis && (
+              <ErrorBoundary sectionName="Recommendations">
+                <RecommendationsPanel analysisId={analysis.id} />
+              </ErrorBoundary>
+            )}
+
+            {/* Bias-targeted intervention plays — concrete actions per
+               flagged bias, sourced from the playbook library. */}
+            {analysis && biases.length > 0 && (
+              <ErrorBoundary sectionName="Interventions">
+                <InterventionPanel analysisId={analysis.id} biases={biases} />
+              </ErrorBoundary>
+            )}
+
+            {/* Learning-impact card — what this audit contributes to the
+               compounding flywheel (per-org calibration delta). */}
+            {analysis && (
+              <ErrorBoundary sectionName="Learning impact">
+                <LearningImpactCard analysisId={analysis.id} />
+              </ErrorBoundary>
+            )}
+
+            {/* Adversarial pre-mortem (Dr Red Team) — additional red-team
+               angle complementing the Stress test → Red team sub-tab. */}
+            {analysis && (
+              <ErrorBoundary sectionName="Dr Red Team">
+                <DrRedTeamCard analysisId={analysis.id} />
+              </ErrorBoundary>
+            )}
+          </div>
         );
       case 'stress':
-        return <StressTestTab slots={stressSlots} />;
+        return (
+          <div style={{ display: 'grid', gap: 16 }}>
+            {document?.deal?.id ? (
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '8px 14px',
+                  background: 'var(--bg-tertiary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 8,
+                  fontSize: 12.5,
+                  color: 'var(--text-secondary)',
+                }}
+              >
+                <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
+                  {document.deal.name}
+                </span>
+                <a
+                  href={`/dashboard/deals/${document.deal.id}`}
+                  style={{ color: 'var(--accent-primary)', fontSize: 11, fontWeight: 600 }}
+                >
+                  View deal →
+                </a>
+              </div>
+            ) : null}
+            <StressTestTab slots={stressSlots} />
+          </div>
+        );
       case 'perspectives':
         return (
           <PerspectivesTab
@@ -454,15 +617,61 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
         );
       case 'regulatory':
         return (
-          <RegulatoryTab
-            triggers={regulatoryTriggers}
-            sovereignContexts={sovereignContexts}
-          />
+          <div style={{ display: 'grid', gap: 16 }}>
+            <RegulatoryTab
+              triggers={regulatoryTriggers}
+              sovereignContexts={sovereignContexts}
+            />
+            {/* Regulatory Horizon — calendared regulatory tailwinds (EU AI
+               Act, Basel III, SEC AI disclosure, GDPR Art 22, etc.) with
+               enforcement dates. Procurement reviewers ask "when does
+               this apply to us?" — this is the answer. */}
+            {analysis?.compliance && (
+              <ErrorBoundary sectionName="Regulatory horizon">
+                <RegulatoryHorizonWidget compliance={analysis.compliance} />
+              </ErrorBoundary>
+            )}
+            {/* Institutional Memory — past audits in the org with similar
+               regulatory triggers. The "have we seen this before?"
+               surface that compounds with every closed audit. */}
+            {analysis?.institutionalMemory && (
+              <ErrorBoundary sectionName="Institutional memory">
+                <InstitutionalMemoryWidget memory={analysis.institutionalMemory} />
+              </ErrorBoundary>
+            )}
+          </div>
         );
       default:
         return null;
     }
   })();
+
+  // Top-of-page strip: version history (when this audit is part of a
+  // version chain) + version-delta card (when this audit has a previous
+  // version, surfaces the score change side-by-side). Both auto-hide
+  // when not applicable.
+  const topStrip = (
+    <>
+      {document && (
+        <ErrorBoundary sectionName="Version history">
+          <VersionHistoryStrip documentId={document.id} isOwner={!!document.isOwner} />
+        </ErrorBoundary>
+      )}
+      {analysis?.previousAnalysisId && (
+        <ErrorBoundary sectionName="Version delta">
+          <VersionDeltaCard
+            current={{
+              id: analysis.id,
+              overallScore: analysis.overallScore,
+              noiseScore: analysis.noiseScore,
+              biases: biases,
+            }}
+            previousAnalysisId={analysis.previousAnalysisId}
+          />
+        </ErrorBoundary>
+      )}
+    </>
+  );
 
   return (
     <>
@@ -485,6 +694,7 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
         rightPaneContent={tabBody}
         hasPreview
         onOpenSettings={() => setShowSettings(true)}
+        outcomeStrip={topStrip}
         breadcrumbs={
           <Breadcrumbs
             items={[
@@ -495,6 +705,17 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
           />
         }
       />
+
+      {/* Decision rooms — collaborative pre-IC review surface attached
+         to this document. Lives BELOW the tabbed workspace so the daily
+         flow (audit → fix → log outcome) isn't gated by team activity. */}
+      {analysis && document && (
+        <div style={{ padding: '0 24px 32px', maxWidth: 1600, margin: '0 auto' }}>
+          <ErrorBoundary sectionName="Decision rooms">
+            <DecisionRoomList documentId={document.id} analysisId={analysis.id} />
+          </ErrorBoundary>
+        </div>
+      )}
 
       <SettingsDrawer
         open={showSettings}
