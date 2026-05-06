@@ -34,6 +34,7 @@ import {
   Compass,
   Package,
   Plus,
+  Briefcase,
 } from 'lucide-react';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useTheme } from 'next-themes';
@@ -134,11 +135,29 @@ export function CommandPalette() {
       },
       {
         id: 'documents',
-        label: 'Documents',
-        description: 'All uploaded files',
+        label: 'Decisions · Documents',
+        description: 'Standalone strategic memos + audits',
         icon: <FileText size={16} />,
         action: () => navigate('/dashboard?view=browse'),
-        keywords: ['files', 'uploads'],
+        keywords: ['files', 'uploads', 'documents', 'memos', 'audits', 'standalone'],
+      },
+      {
+        id: 'deals',
+        label: 'Decisions · Projects',
+        description: 'M&A pipeline — deal kanban + IC readiness',
+        icon: <Briefcase size={16} />,
+        action: () => navigate('/dashboard/deals'),
+        keywords: [
+          'deals',
+          'projects',
+          'm&a',
+          'mna',
+          'pipeline',
+          'kanban',
+          'ic',
+          'investment committee',
+          'fund',
+        ],
       },
       {
         id: 'analytics',
@@ -296,8 +315,8 @@ export function CommandPalette() {
       // it instantly via ⌘K. (B-#1, 2026-04-26.)
       {
         id: 'decision-packages',
-        label: 'Decision Packages',
-        description: 'Composite DQI + cross-doc audit across non-deal decisions',
+        label: 'Decisions · Packages',
+        description: 'Multi-doc decision packages — composite DQI + cross-doc audit',
         icon: <Package size={16} />,
         action: () => navigate('/dashboard/decisions'),
         keywords: [

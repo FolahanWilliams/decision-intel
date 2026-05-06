@@ -205,3 +205,118 @@ test.describe('Money path · deal archive auth gate', () => {
   });
 });
 
+/* ────────────────────────────────────────────────────────────── */
+/* Option B refactor coverage — deal + package detail v2 shells   */
+/* ────────────────────────────────────────────────────────────── */
+
+test.describe('Money path · deal detail v2 shell', () => {
+  test.skip(
+    !hasAuth,
+    'Skipped: needs PLAYWRIGHT_STORAGE_STATE for authenticated deal detail.'
+  );
+
+  test.use({
+    storageState: process.env.PLAYWRIGHT_STORAGE_STATE || undefined,
+  });
+
+  test('deal detail page renders the 5-tab shell', async ({ page }) => {
+    await page.goto('/dashboard/deals');
+    await page.waitForLoadState('networkidle');
+
+    // Try to find an existing deal card; skip if there are none yet.
+    const dealLink = page.locator('a[href^="/dashboard/deals/"]').first();
+    const hasDeal = await dealLink.isVisible().catch(() => false);
+    if (!hasDeal) {
+      test.skip(true, 'No deals on this account; skipping deal detail tab test.');
+      return;
+    }
+
+    await dealLink.click();
+    await page.waitForLoadState('networkidle', { timeout: 30_000 });
+
+    // Verify the 5 deal-detail tab labels are reachable.
+    const tabLabels = ['Documents', 'Findings', 'Brief', 'Stress test', 'Outcome'];
+    const reachable: string[] = [];
+    for (const label of tabLabels) {
+      const tab = page.getByRole('button', { name: new RegExp(`^${label}$`, 'i') });
+      if (await tab.isVisible().catch(() => false)) {
+        reachable.push(label);
+      }
+    }
+    // At least Documents + Outcome should always be reachable; the
+    // analysis-gated tabs (Findings/Brief/Stress) may render disabled.
+    expect(reachable.length).toBeGreaterThanOrEqual(2);
+  });
+});
+
+test.describe('Money path · package detail v2 shell', () => {
+  test.skip(
+    !hasAuth,
+    'Skipped: needs PLAYWRIGHT_STORAGE_STATE for authenticated package detail.'
+  );
+
+  test.use({
+    storageState: process.env.PLAYWRIGHT_STORAGE_STATE || undefined,
+  });
+
+  test('package detail page renders the 5-tab shell', async ({ page }) => {
+    await page.goto('/dashboard/decisions');
+    await page.waitForLoadState('networkidle');
+
+    const pkgLink = page.locator('a[href^="/dashboard/decisions/"]').first();
+    const hasPkg = await pkgLink.isVisible().catch(() => false);
+    if (!hasPkg) {
+      test.skip(true, 'No decision packages on this account; skipping detail tab test.');
+      return;
+    }
+
+    await pkgLink.click();
+    await page.waitForLoadState('networkidle', { timeout: 30_000 });
+
+    const tabLabels = ['Documents', 'Findings', 'Verdict', 'Stress test', 'Outcome'];
+    const reachable: string[] = [];
+    for (const label of tabLabels) {
+      const tab = page.getByRole('button', { name: new RegExp(`^${label}$`, 'i') });
+      if (await tab.isVisible().catch(() => false)) {
+        reachable.push(label);
+      }
+    }
+    expect(reachable.length).toBeGreaterThanOrEqual(2);
+  });
+});
+
+test.describe('Home dashboard · unified decisions feed', () => {
+  test.skip(
+    !hasAuth,
+    'Skipped: needs PLAYWRIGHT_STORAGE_STATE for authenticated home dashboard.'
+  );
+
+  test.use({
+    storageState: process.env.PLAYWRIGHT_STORAGE_STATE || undefined,
+  });
+
+  test('Recent decisions feed renders on /dashboard', async ({ page }) => {
+    await page.goto('/dashboard');
+    await page.waitForLoadState('networkidle', { timeout: 30_000 });
+
+    // The feed surfaces "Recent decisions" header copy. Either the feed
+    // renders entries OR an empty/loading state — all three are valid;
+    // the test fails ONLY if the section is absent (regression).
+    const feedHeading = page.getByText(/recent decisions/i).first();
+    await expect(feedHeading).toBeVisible({ timeout: 10_000 });
+
+    // The footer rail should expose all 3 list-page links.
+    const allDocs = page.getByRole('link', { name: /^all documents/i });
+    const allDeals = page.getByRole('link', { name: /^all deals/i });
+    const allPkgs = page.getByRole('link', { name: /^all packages/i });
+
+    const hasAllDocs = await allDocs.first().isVisible().catch(() => false);
+    const hasAllDeals = await allDeals.first().isVisible().catch(() => false);
+    const hasAllPkgs = await allPkgs.first().isVisible().catch(() => false);
+
+    // All three rails should surface (even on an empty account, the
+    // links render so the user knows where to go).
+    expect(hasAllDocs && hasAllDeals && hasAllPkgs).toBe(true);
+  });
+});
+

@@ -235,11 +235,13 @@ export function UnifiedDecisionsFeed({
             border: '1px dashed var(--border-color)',
             borderRadius: 'var(--radius-sm)',
             marginTop: 8,
+            marginBottom: 12,
           }}
         >
           No recent decisions yet. Upload a memo, start a deal, or assemble a decision
           package to populate this feed.
         </div>
+        <FeedFooterRails />
       </section>
     );
   }
@@ -259,55 +261,61 @@ export function UnifiedDecisionsFeed({
           <FeedRow key={`${entry.kind}-${entry.id}`} entry={entry} />
         ))}
       </div>
-      <div
+      <FeedFooterRails />
+    </section>
+  );
+}
+
+function FeedFooterRails() {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        gap: 12,
+        marginTop: 14,
+        paddingTop: 12,
+        borderTop: '1px solid var(--border-color)',
+        fontSize: 11.5,
+        fontWeight: 600,
+      }}
+    >
+      <Link
+        href="/dashboard?view=browse"
         style={{
-          display: 'flex',
-          gap: 12,
-          marginTop: 14,
-          paddingTop: 12,
-          borderTop: '1px solid var(--border-color)',
-          fontSize: 11.5,
-          fontWeight: 600,
+          color: 'var(--accent-primary)',
+          textDecoration: 'none',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 4,
         }}
       >
-        <Link
-          href="/dashboard?view=browse"
-          style={{
-            color: 'var(--accent-primary)',
-            textDecoration: 'none',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 4,
-          }}
-        >
-          All documents <ChevronRight size={11} />
-        </Link>
-        <Link
-          href="/dashboard/deals"
-          style={{
-            color: 'var(--accent-primary)',
-            textDecoration: 'none',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 4,
-          }}
-        >
-          All deals <ChevronRight size={11} />
-        </Link>
-        <Link
-          href="/dashboard/decisions"
-          style={{
-            color: 'var(--accent-primary)',
-            textDecoration: 'none',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 4,
-          }}
-        >
-          All packages <ChevronRight size={11} />
-        </Link>
-      </div>
-    </section>
+        All documents <ChevronRight size={11} />
+      </Link>
+      <Link
+        href="/dashboard/deals"
+        style={{
+          color: 'var(--accent-primary)',
+          textDecoration: 'none',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 4,
+        }}
+      >
+        All deals <ChevronRight size={11} />
+      </Link>
+      <Link
+        href="/dashboard/decisions"
+        style={{
+          color: 'var(--accent-primary)',
+          textDecoration: 'none',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 4,
+        }}
+      >
+        All packages <ChevronRight size={11} />
+      </Link>
+    </div>
   );
 }
 

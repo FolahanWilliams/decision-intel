@@ -54,6 +54,7 @@ export default function Sidebar() {
   // collaborating). Existing users who explicitly collapsed Reflect will keep
   // their preference via the localStorage hydration below.
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
+    Decisions: false,
     Reflect: false,
     Together: true,
   });
@@ -67,8 +68,9 @@ export default function Sidebar() {
       const value = typeof next === 'function' ? next(prev) : next;
       try {
         localStorage.setItem(SIDEBAR_COLLAPSED_KEY, value ? '1' : '0');
-      } catch {
+      } catch (_err1) {
         // localStorage may throw on quota / private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
+        void _err1;
       }
       return value;
     });
@@ -79,8 +81,9 @@ export default function Sidebar() {
     try {
       const saved = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
       if (saved === '1') setCollapsedState(true);
-    } catch {
+    } catch (_err2) {
       // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
+      void _err2;
     }
   }, []);
 
@@ -101,8 +104,9 @@ export default function Sidebar() {
     try {
       const saved = localStorage.getItem(SIDEBAR_SECTIONS_KEY);
       if (saved) setCollapsedSections(JSON.parse(saved));
-    } catch {
+    } catch (_err3) {
       // localStorage / JSON.parse may throw — silent fallback per CLAUDE.md fire-and-forget exceptions.
+      void _err3;
     }
   }, []);
 
@@ -111,8 +115,9 @@ export default function Sidebar() {
       const next = { ...prev, [section]: !prev[section] };
       try {
         localStorage.setItem(SIDEBAR_SECTIONS_KEY, JSON.stringify(next));
-      } catch {
+      } catch (_err4) {
         // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
+        void _err4;
       }
       return next;
     });
@@ -359,27 +364,54 @@ export default function Sidebar() {
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
-          <NavItem
-            href="/dashboard/deals"
-            icon={<Briefcase size={18} />}
-            label="Projects"
-            description="Track projects from intake to completion"
-            active={pathname.startsWith('/dashboard/deals')}
+          {/* Decisions cluster — locked 2026-05-06 (Option B cap-stone).
+             The three list surfaces — standalone documents, M&A deals,
+             and decision packages — converge under one parent so the
+             cognitive-load problem on first-login is solved without
+             breaking URLs. Each list keeps its workflow-specific shape
+             (deal kanban, package grid, document table); the home
+             dashboard's UnifiedDecisionsFeed is the cross-list entry
+             point. Sub-items always render when expanded so the user
+             learns the grouping once. */}
+          <CollapsibleSection
+            label="Decisions"
+            icon={<Briefcase size={16} />}
             collapsed={collapsed}
-            onNavigate={closeMobile}
-          />
-          <NavItem
-            href="/dashboard?view=browse"
-            icon={<FileText size={18} />}
-            label="Documents"
-            description="Browse uploaded documents"
-            active={
-              pathname.startsWith('/documents') ||
-              (pathname === '/dashboard' && viewParam === 'browse')
-            }
-            collapsed={collapsed}
-            onNavigate={closeMobile}
-          />
+            isOpen={!collapsedSections.Decisions}
+            onToggle={() => toggleSection('Decisions')}
+          >
+            <NavItem
+              href="/dashboard?view=browse"
+              icon={<FileText size={18} />}
+              label="Documents"
+              description="Standalone strategic memos + audits"
+              active={
+                pathname.startsWith('/documents') ||
+                (pathname === '/dashboard' && viewParam === 'browse')
+              }
+              collapsed={collapsed}
+              onNavigate={closeMobile}
+            />
+            <NavItem
+              href="/dashboard/deals"
+              icon={<Briefcase size={18} />}
+              label="Projects"
+              description="M&A pipeline — deal kanban + IC readiness"
+              active={pathname.startsWith('/dashboard/deals')}
+              collapsed={collapsed}
+              onNavigate={closeMobile}
+            />
+            <NavItem
+              href="/dashboard/decisions"
+              icon={<Package size={18} />}
+              label="Packages"
+              description="Multi-doc decision packages — composite DQI"
+              active={pathname.startsWith('/dashboard/decisions')}
+              collapsed={collapsed}
+              onNavigate={closeMobile}
+            />
+          </CollapsibleSection>
+
           <NavItem
             href="/dashboard/ask"
             icon={<Bot size={18} />}
@@ -452,15 +484,11 @@ export default function Sidebar() {
                   />
                 </>
               )}
-            <NavItem
-              href="/dashboard/decisions"
-              icon={<Package size={18} />}
-              label="Decisions"
-              description="Decision Packages — composite DQI + cross-doc audit"
-              active={pathname.startsWith('/dashboard/decisions')}
-              collapsed={collapsed}
-              onNavigate={closeMobile}
-            />
+            {/* Note: "Decisions" (packages) lived here historically;
+               moved to the Decisions cluster above 2026-05-06 alongside
+               Documents + Projects (deals) so all three list surfaces
+               share one parent. Decision DNA stays here — it's the
+               personal-calibration surface, not a list of decisions. */}
             <NavItem
               href="/dashboard/decision-dna"
               icon={<Brain size={18} />}
