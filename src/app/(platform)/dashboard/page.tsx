@@ -61,6 +61,7 @@ import { SampleBadge } from '@/components/ui/SampleBadge';
 import { JournalWidget } from '@/components/ui/JournalWidget';
 import { DecisionTriageWidget } from '@/components/ui/DecisionTriageWidget';
 import { NudgeWidget } from '@/components/dashboard/NudgeWidget';
+import { UnifiedDecisionsFeed } from '@/components/dashboard/UnifiedDecisionsFeed';
 import { useToast } from '@/components/ui/EnhancedToast';
 import { createClientLogger } from '@/lib/utils/logger';
 
@@ -1188,6 +1189,18 @@ export default function Dashboard() {
       <ErrorBoundary sectionName="Nudges">
         <NudgeWidget />
       </ErrorBoundary>
+
+      {/* Unified decisions feed — locked 2026-05-06 (Option B refactor).
+         The home dashboard's "across all my decisions" surface, merging
+         documents + deals + packages chronologically. Each row deep-
+         links to the McKinsey-grade detail page for that surface. The
+         list pages (deals kanban, packages grid, documents browse)
+         stay separate per the Option B architectural call — workflow
+         shape differs even if the underlying primitive doesn't. */}
+      <ErrorBoundary sectionName="Unified decisions feed">
+        <UnifiedDecisionsFeed />
+      </ErrorBoundary>
+
       <ErrorBoundary sectionName="Journal">
         <JournalWidget />
       </ErrorBoundary>
