@@ -269,8 +269,8 @@ export default function LandingPage() {
               }}
             >
               <Link
-                href="/demo"
-                onClick={() => trackEvent('hero_try_demo_clicked')}
+                href="/login?mode=signup&redirect=/dashboard%3Fonboarding%3D1"
+                onClick={() => trackEvent('hero_signup_clicked')}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -285,7 +285,7 @@ export default function LandingPage() {
                   boxShadow: '0 6px 20px rgba(22,163,74,0.28)',
                 }}
               >
-                One free audit. Paste your memo. <ArrowRight size={16} />
+                Start your first audit <ArrowRight size={16} />
               </Link>
               <Link
                 href="/how-it-works"
@@ -304,6 +304,28 @@ export default function LandingPage() {
                 How it works <ArrowRight size={14} />
               </Link>
             </div>
+            {/* Tertiary specimen link — for the cold reader who wants to
+                see what an audit looks like before committing to sign up.
+                Locked 2026-05-07 alongside the sign-in-first hero CTA so
+                we keep the cold-evidence door open while routing primary
+                intent through auth. */}
+            <p style={{ marginTop: -28, marginBottom: 32, textAlign: 'center' }}>
+              <Link
+                href="/demo"
+                onClick={() => trackEvent('hero_specimen_link_clicked')}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: C.slate500,
+                  textDecoration: 'none',
+                }}
+              >
+                See an audit we already ran <ArrowRight size={12} />
+              </Link>
+            </p>
             {/* PROBLEM / SOLUTION mini-cards — the McKinsey-anchored
                   visual rhythm break that anchors the hero in real data
                   + the product framing without competing with the H1.

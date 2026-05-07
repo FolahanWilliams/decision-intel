@@ -80,6 +80,12 @@ function LoginContent() {
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [signupSuccess, setSignupSuccess] = useState(false);
+  // Magic-link primary flow (locked 2026-05-07 founder direction). Single
+  // email field → signInWithOtp() works for both sign-in AND sign-up; the
+  // password form stays available behind a "Use password instead" toggle.
+  // 'magic' is the default to match the new lowest-friction primary path.
+  const [authMethod, setAuthMethod] = useState<'magic' | 'password'>('magic');
+  const [magicLinkSent, setMagicLinkSent] = useState(false);
 
   // Errors delivered in the URL hash fragment by Supabase (e.g. otp_expired).
   // The server callback redirects to /login?error=true and Supabase appends
@@ -156,6 +162,46 @@ function LoginContent() {
       return null;
     } catch {
       return null;
+    }
+  };
+
+  /**
+   * Magic-link primary flow. signInWithOtp() unifies sign-in + sign-up:
+   * if the email doesn't exist, Supabase creates the account; if it does,
+   * Supabase signs them in. The user clicks the email link → PKCE
+   * exchange via /api/auth/callback → redirected to `redirectTo`. The
+   * password form stays available behind the "Use password instead"
+   * toggle for users who want classic auth.
+   */
+  const handleMagicLinkSend = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setFormError(null);
+    if (!email) {
+      setFormError('Email is required.');
+      return;
+    }
+    setFormLoading(true);
+    const supabase = createClient();
+    trackEvent(mode === 'signin' ? 'signin_started' : 'signup_started', {
+      provider: 'magic_link',
+    });
+    try {
+      const callbackUrl = new URL('/api/auth/callback', location.origin);
+      if (redirectTo) callbackUrl.searchParams.set('redirect', redirectTo);
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: callbackUrl.toString(),
+          shouldCreateUser: true,
+        },
+      });
+      if (error) throw error;
+      setMagicLinkSent(true);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to send magic link.';
+      setFormError(cleanAuthError(message));
+    } finally {
+      setFormLoading(false);
     }
   };
 
@@ -1298,109 +1344,273 @@ function LoginContent() {
                   <div style={{ flex: 1, height: 1, background: 'var(--border-color, #E2E8F0)' }} />
                 </div>
 
-                {/* Email / password form */}
-                <form onSubmit={handleEmailAuth} style={{ display: 'grid', gap: 12 }}>
-                  <label style={{ display: 'grid', gap: 6 }}>
-                    <span
-                      style={{
-                        fontSize: '0.78rem',
-                        fontWeight: 600,
-                        color: 'var(--text-secondary, #475569)',
-                      }}
-                    >
-                      Work email
-                    </span>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={e => setEmail(e.target.value)}
-                      required
-                      autoComplete="email"
-                      placeholder="you@company.com"
-                      disabled={formLoading || loading}
-                      style={{
-                        padding: '11px 14px',
-                        fontSize: '0.88rem',
-                        color: 'var(--text-primary)',
-                        background: 'var(--bg-card, #FFFFFF)',
-                        border: '1px solid var(--border-color, #E2E8F0)',
-                        borderRadius: 10,
-                        outline: 'none',
-                        fontFamily: 'inherit',
-                      }}
-                    />
-                  </label>
-                  <label style={{ display: 'grid', gap: 6 }}>
-                    <span
-                      style={{
-                        fontSize: '0.78rem',
-                        fontWeight: 600,
-                        color: 'var(--text-secondary, #475569)',
-                      }}
-                    >
-                      Password
-                    </span>
-                    <input
-                      type="password"
-                      value={password}
-                      onChange={e => setPassword(e.target.value)}
-                      required
-                      minLength={mode === 'signup' ? 8 : undefined}
-                      autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
-                      placeholder={mode === 'signup' ? 'At least 8 characters' : 'Your password'}
-                      disabled={formLoading || loading}
-                      style={{
-                        padding: '11px 14px',
-                        fontSize: '0.88rem',
-                        color: 'var(--text-primary)',
-                        background: 'var(--bg-card, #FFFFFF)',
-                        border: '1px solid var(--border-color, #E2E8F0)',
-                        borderRadius: 10,
-                        outline: 'none',
-                        fontFamily: 'inherit',
-                      }}
-                    />
-                  </label>
-                  <button
-                    type="submit"
-                    disabled={formLoading || loading}
+                {/* Email auth form — magic-link primary, password as toggle.
+                    Locked 2026-05-07: signInWithOtp() unifies sign-in + sign-up
+                    via a single email field; the password form stays accessible
+                    behind the "Use password instead" toggle below. */}
+                {magicLinkSent ? (
+                  <div
                     style={{
-                      width: '100%',
-                      padding: '12px 16px',
-                      fontSize: '0.88rem',
-                      fontWeight: 600,
-                      color: 'var(--text-primary)',
-                      background: 'var(--bg-card, #FFFFFF)',
-                      border: '1px solid var(--border-color, #CBD5E1)',
+                      padding: '20px 18px',
                       borderRadius: 12,
-                      cursor: formLoading || loading ? 'not-allowed' : 'pointer',
-                      opacity: formLoading || loading ? 0.7 : 1,
-                      transition: 'all 0.15s',
-                      fontFamily: 'inherit',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 8,
+                      background: 'rgba(22, 163, 74, 0.06)',
+                      border: '1px solid rgba(22, 163, 74, 0.25)',
+                      textAlign: 'center',
                     }}
                   >
-                    {formLoading ? (
-                      <>
-                        <Loader2 size={16} className="animate-spin" />
-                        {mode === 'signin' ? 'Signing in…' : 'Creating account…'}
-                      </>
-                    ) : mode === 'signin' ? (
-                      <>
-                        Sign in with email
-                        <ArrowRight size={14} style={{ opacity: 0.6 }} />
-                      </>
-                    ) : (
-                      <>
-                        Create account
-                        <CheckCircle size={14} style={{ opacity: 0.6 }} />
-                      </>
-                    )}
-                  </button>
-                </form>
+                    <CheckCircle
+                      size={28}
+                      style={{ color: '#16A34A', marginBottom: 10 }}
+                      strokeWidth={2}
+                    />
+                    <p
+                      style={{
+                        fontSize: '0.95rem',
+                        fontWeight: 700,
+                        color: 'var(--text-primary)',
+                        margin: '0 0 6px',
+                      }}
+                    >
+                      Check your email
+                    </p>
+                    <p
+                      style={{
+                        fontSize: '0.85rem',
+                        color: 'var(--text-secondary)',
+                        margin: '0 0 14px',
+                        lineHeight: 1.55,
+                      }}
+                    >
+                      We sent a sign-in link to <strong>{email}</strong>. Click the link to finish.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMagicLinkSent(false);
+                        setFormError(null);
+                      }}
+                      style={{
+                        fontSize: '0.78rem',
+                        color: 'var(--text-muted)',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        textDecoration: 'underline',
+                        textUnderlineOffset: '2px',
+                        padding: 0,
+                        fontFamily: 'inherit',
+                      }}
+                    >
+                      Use a different email
+                    </button>
+                  </div>
+                ) : authMethod === 'magic' ? (
+                  <form onSubmit={handleMagicLinkSend} style={{ display: 'grid', gap: 12 }}>
+                    <label style={{ display: 'grid', gap: 6 }}>
+                      <span
+                        style={{
+                          fontSize: '0.78rem',
+                          fontWeight: 600,
+                          color: 'var(--text-secondary, #475569)',
+                        }}
+                      >
+                        Work email
+                      </span>
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        required
+                        autoComplete="email"
+                        placeholder="you@company.com"
+                        disabled={formLoading || loading}
+                        style={{
+                          padding: '11px 14px',
+                          fontSize: '0.88rem',
+                          color: 'var(--text-primary)',
+                          background: 'var(--bg-card, #FFFFFF)',
+                          border: '1px solid var(--border-color, #E2E8F0)',
+                          borderRadius: 10,
+                          outline: 'none',
+                          fontFamily: 'inherit',
+                        }}
+                      />
+                    </label>
+                    <button
+                      type="submit"
+                      disabled={formLoading || loading}
+                      style={{
+                        width: '100%',
+                        padding: '12px 16px',
+                        fontSize: '0.88rem',
+                        fontWeight: 600,
+                        color: 'var(--text-primary)',
+                        background: 'var(--bg-card, #FFFFFF)',
+                        border: '1px solid var(--border-color, #CBD5E1)',
+                        borderRadius: 12,
+                        cursor: formLoading || loading ? 'not-allowed' : 'pointer',
+                        opacity: formLoading || loading ? 0.7 : 1,
+                        transition: 'all 0.15s',
+                        fontFamily: 'inherit',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 8,
+                      }}
+                    >
+                      {formLoading ? (
+                        <>
+                          <Loader2 size={16} className="animate-spin" />
+                          Sending link…
+                        </>
+                      ) : (
+                        <>
+                          Send magic link
+                          <ArrowRight size={14} style={{ opacity: 0.6 }} />
+                        </>
+                      )}
+                    </button>
+                  </form>
+                ) : (
+                  <form onSubmit={handleEmailAuth} style={{ display: 'grid', gap: 12 }}>
+                    <label style={{ display: 'grid', gap: 6 }}>
+                      <span
+                        style={{
+                          fontSize: '0.78rem',
+                          fontWeight: 600,
+                          color: 'var(--text-secondary, #475569)',
+                        }}
+                      >
+                        Work email
+                      </span>
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        required
+                        autoComplete="email"
+                        placeholder="you@company.com"
+                        disabled={formLoading || loading}
+                        style={{
+                          padding: '11px 14px',
+                          fontSize: '0.88rem',
+                          color: 'var(--text-primary)',
+                          background: 'var(--bg-card, #FFFFFF)',
+                          border: '1px solid var(--border-color, #E2E8F0)',
+                          borderRadius: 10,
+                          outline: 'none',
+                          fontFamily: 'inherit',
+                        }}
+                      />
+                    </label>
+                    <label style={{ display: 'grid', gap: 6 }}>
+                      <span
+                        style={{
+                          fontSize: '0.78rem',
+                          fontWeight: 600,
+                          color: 'var(--text-secondary, #475569)',
+                        }}
+                      >
+                        Password
+                      </span>
+                      <input
+                        type="password"
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        required
+                        minLength={mode === 'signup' ? 8 : undefined}
+                        autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
+                        placeholder={mode === 'signup' ? 'At least 8 characters' : 'Your password'}
+                        disabled={formLoading || loading}
+                        style={{
+                          padding: '11px 14px',
+                          fontSize: '0.88rem',
+                          color: 'var(--text-primary)',
+                          background: 'var(--bg-card, #FFFFFF)',
+                          border: '1px solid var(--border-color, #E2E8F0)',
+                          borderRadius: 10,
+                          outline: 'none',
+                          fontFamily: 'inherit',
+                        }}
+                      />
+                    </label>
+                    <button
+                      type="submit"
+                      disabled={formLoading || loading}
+                      style={{
+                        width: '100%',
+                        padding: '12px 16px',
+                        fontSize: '0.88rem',
+                        fontWeight: 600,
+                        color: 'var(--text-primary)',
+                        background: 'var(--bg-card, #FFFFFF)',
+                        border: '1px solid var(--border-color, #CBD5E1)',
+                        borderRadius: 12,
+                        cursor: formLoading || loading ? 'not-allowed' : 'pointer',
+                        opacity: formLoading || loading ? 0.7 : 1,
+                        transition: 'all 0.15s',
+                        fontFamily: 'inherit',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 8,
+                      }}
+                    >
+                      {formLoading ? (
+                        <>
+                          <Loader2 size={16} className="animate-spin" />
+                          {mode === 'signin' ? 'Signing in…' : 'Creating account…'}
+                        </>
+                      ) : mode === 'signin' ? (
+                        <>
+                          Sign in with email
+                          <ArrowRight size={14} style={{ opacity: 0.6 }} />
+                        </>
+                      ) : (
+                        <>
+                          Create account
+                          <CheckCircle size={14} style={{ opacity: 0.6 }} />
+                        </>
+                      )}
+                    </button>
+                  </form>
+                )}
+
+                {/* Auth-method toggle — magic-link <-> password.
+                    Hidden when magic link has been sent (the "use a different
+                    email" button on the success card handles that case). */}
+                {!magicLinkSent && (
+                  <p
+                    style={{
+                      fontSize: '0.78rem',
+                      color: 'var(--text-muted)',
+                      textAlign: 'center',
+                      marginTop: '0.75rem',
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAuthMethod(authMethod === 'magic' ? 'password' : 'magic');
+                        setFormError(null);
+                        setPassword('');
+                      }}
+                      style={{
+                        fontSize: '0.78rem',
+                        color: 'var(--text-muted)',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        textDecoration: 'underline',
+                        textUnderlineOffset: '2px',
+                        padding: 0,
+                        fontFamily: 'inherit',
+                      }}
+                    >
+                      {authMethod === 'magic' ? 'Use password instead' : 'Use magic link instead'}
+                    </button>
+                  </p>
+                )}
 
                 {/* Forgot password link (sign-in only) */}
                 {mode === 'signin' && (
