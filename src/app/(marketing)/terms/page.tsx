@@ -38,7 +38,7 @@ export default function TermsOfServicePage() {
           Terms of Service
         </h1>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '48px' }}>
-          Last updated: April 30, 2026
+          Last updated: May 7, 2026
         </p>
 
         <div
@@ -81,7 +81,8 @@ export default function TermsOfServicePage() {
               3. Account Registration
             </h2>
             <p style={{ marginBottom: '12px' }}>
-              To use the Platform, you must create an account using Google OAuth. You are
+              To use the Platform, you must create an account. We support sign-in via Google OAuth,
+              email magic link, and email + password. Enterprise customers may use SAML SSO. You are
               responsible for:
             </p>
             <ul

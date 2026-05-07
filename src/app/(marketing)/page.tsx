@@ -468,8 +468,9 @@ export default function LandingPage() {
                     margin: 0,
                   }}
                 >
-                  Confirmation, anchoring, sunk cost, narrative coherence. Visible in the memo,
-                  missed by the team that wrote it.
+                  Confirmation, anchoring, sunk cost, narrative coherence — the most common patterns
+                  behind deal failures. Hard to spot from inside the document; easy to surface from
+                  outside.
                 </p>
               </div>
               {/* SOLUTION — green */}
@@ -512,7 +513,7 @@ export default function LandingPage() {
                     letterSpacing: '-0.02em',
                   }}
                 >
-                  60 seconds
+                  60
                 </p>
                 <p
                   style={{
@@ -522,8 +523,8 @@ export default function LandingPage() {
                     margin: 0,
                   }}
                 >
-                  Every memo gets a structured audit. Biases named, counterfactuals quantified, the
-                  record signed and shareable.
+                  second pre-emptive audit. Biases named, counterfactuals quantified, the record
+                  signed and shareable before the deal moves forward.
                 </p>
               </div>
             </div>
@@ -1385,9 +1386,7 @@ export default function LandingPage() {
               'Case Studies',
               'Proof',
               'Bias Genome',
-              'Decision Alpha',
               'Pricing',
-              'Resources',
             ].map(l => {
               const href =
                 l === 'How It Works'
@@ -1400,15 +1399,13 @@ export default function LandingPage() {
                         ? '/proof'
                         : l === 'Bias Genome'
                           ? '/bias-genome'
-                          : l === 'Decision Alpha'
-                            ? '/decision-alpha'
-                            : l === 'Pricing'
-                              ? '/pricing'
-                              : l === 'Privacy'
-                                ? '/privacy'
-                                : l === 'Security'
-                                  ? '/security'
-                                  : `#${l.toLowerCase().replace(/\s+/g, '-')}`;
+                          : l === 'Pricing'
+                            ? '/pricing'
+                            : l === 'Privacy'
+                              ? '/privacy'
+                              : l === 'Security'
+                                ? '/security'
+                                : `#${l.toLowerCase().replace(/\s+/g, '-')}`;
               return (
                 <a
                   key={l}

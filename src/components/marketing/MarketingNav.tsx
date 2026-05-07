@@ -40,7 +40,6 @@ import {
   Microscope,
   Scale,
   ShieldCheck,
-  TrendingUp,
   Workflow,
   Activity,
   X,
@@ -172,12 +171,6 @@ const MENUS: MegaMenu[] = [
             description:
               'Procurement-grade Brier evidence over the case library, with reproducibility seed.',
             href: '/calibration',
-          },
-          {
-            icon: TrendingUp,
-            label: 'Decision Alpha',
-            description: 'Quarterly sector index of bias-load and decision quality.',
-            href: '/decision-alpha',
           },
         ],
       },
