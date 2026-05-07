@@ -104,7 +104,7 @@ function buildTiers(_cycle: BillingCycle): Tier[] {
         'One avoided £5-15M strategic mistake per quarter pays for the entire team subscription five years over. The price is a rounding error against a single bad call.',
       priceMonthly: 2499,
       priceAnnual: 24990,
-      anchor: '$24,990/year — 2 months free · ~10× cheaper than one consulting week',
+      anchor: '$24,990/year · 2 months free · ~10× cheaper than one consulting week',
       highlights: [
         { label: 'Unlimited audits, 15 seats', strong: true },
         { label: 'Shared Decision Knowledge Graph', strong: true },
@@ -350,7 +350,7 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: 'How long are my documents retained, and can I delete them?',
-    a: 'Free 30 days · Individual 90 days · Strategy 12 months · Enterprise 360-day default (configurable per Order Form). Every tier has a 30-day soft-delete grace window before permanent purge — recoverable via support during the grace, irrecoverable after. Self-serve Delete button on every document detail page and on the post-upload reveal card. Full retention SLA at /security#retention.',
+    a: 'Free 30 days · Individual 90 days · Strategy 12 months · Enterprise 360-day default (configurable per Order Form). Every tier has a 30-day soft-delete grace window before permanent purge: recoverable via support during the grace, irrecoverable after. Self-serve Delete button on every document detail page and on the post-upload reveal card. Full retention SLA at /security#retention.',
   },
 ];
 
@@ -882,9 +882,9 @@ export function PricingPageClient() {
                       }}
                     >
                       <span style={{ color: C.green, fontWeight: 600 }}>
-                        See your number before any contact info —
+                        See your number before any contact info.
                       </span>{' '}
-                      live ACV, no email required.
+                      Live ACV, no email required.
                     </div>
                   )}
                   {/* Enterprise tiers with a quote-builder primary CTA also
@@ -901,9 +901,9 @@ export function PricingPageClient() {
                       }}
                     >
                       <span style={{ color: C.green, fontWeight: 600 }}>
-                        See your number before any contact info —
+                        See your number before any contact info.
                       </span>{' '}
-                      live ACV, no email required.
+                      Live ACV, no email required.
                     </div>
                   )}
                 </div>

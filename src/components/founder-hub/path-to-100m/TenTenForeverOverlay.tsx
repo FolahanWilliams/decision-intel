@@ -93,12 +93,12 @@ export function TenTenForeverOverlay() {
             color: 'var(--text-primary)',
           }}
         >
-          The existing Warm-Intro Network Map names Mr. Reiner / Mr. Gabe / Sankore as the load-bearing
-          relationships today. The 10-10 Forever rule (identify the 10 people you would invest in for
-          the next 10 years) catches the 7 specific person-types still missing — each maps to a Phase
-          1-4 risk the existing 3 nodes don&apos;t cover. Every slot below carries a channel back to
-          the existing roster (e.g. find the Vendor Continuity Engineer via Mr. Reiner&apos;s Wiz
-          network).
+          The existing Warm-Intro Network Map names Mr. Reiner / Mr. Gabe / Sankore as the
+          load-bearing relationships today. The 10-10 Forever rule (identify the 10 people you would
+          invest in for the next 10 years) catches the 7 specific person-types still missing — each
+          maps to a Phase 1-4 risk the existing 3 nodes don&apos;t cover. Every slot below carries a
+          channel back to the existing roster (e.g. find the Vendor Continuity Engineer via Mr.
+          Reiner&apos;s Wiz network).
         </p>
       </div>
 

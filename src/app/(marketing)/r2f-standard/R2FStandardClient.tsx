@@ -714,7 +714,8 @@ export function R2FStandardClient() {
             marginBottom: 12,
           }}
         >
-          Brier {PLATFORM_BASELINE_SNAPSHOT.meanBrier.toFixed(3)} ± {PLATFORM_BASELINE_SNAPSHOT.brierCi95.halfWidth.toFixed(3)} across{' '}
+          Brier {PLATFORM_BASELINE_SNAPSHOT.meanBrier.toFixed(3)} ±{' '}
+          {PLATFORM_BASELINE_SNAPSHOT.brierCi95.halfWidth.toFixed(3)} across{' '}
           {PLATFORM_BASELINE_SNAPSHOT.n} historical corporate decisions.
         </h2>
         <p
@@ -731,8 +732,9 @@ export function R2FStandardClient() {
           R²F methodology is run retrospectively over {PLATFORM_BASELINE_SNAPSHOT.n} historical
           corporate decisions where the outcome is known — Brier-fair (evidence dimension
           neutralised, no peek at ground truth). The proper-scoring rule does the rest. The 95% CI
-          comes from a {PLATFORM_BASELINE_SNAPSHOT.bootstrapIterations.toLocaleString('en-US')}-iteration
-          deterministic bootstrap with a pinned seed; the reproducibility recipe sits below.
+          comes from a {PLATFORM_BASELINE_SNAPSHOT.bootstrapIterations.toLocaleString('en-US')}
+          -iteration deterministic bootstrap with a pinned seed; the reproducibility recipe sits
+          below.
         </p>
 
         {/* Methodology version progression — Item 2 lock 2026-05-07.
@@ -775,8 +777,7 @@ export function R2FStandardClient() {
                 version: '2.0.0',
                 label: 'Legacy',
                 state: 'deprecated' as const,
-                blurb:
-                  'Pre-validity-weighted DQI. Surfaced on audits run before 2026-04-30.',
+                blurb: 'Pre-validity-weighted DQI. Surfaced on audits run before 2026-04-30.',
               },
               {
                 version: '2.0.0-seed',
@@ -1127,9 +1128,10 @@ const baseline = computePlatformCalibrationBaseline();
               lineHeight: 1.55,
             }}
           >
-            The function reads `ALL_CASES` from the case-study library, runs `computeBrierFairPredictedDqi`
-            (the no-evidence-peeking variant of the DQI formula) over each case, and bootstraps the
-            mean with a seeded mulberry32 PRNG. Same seed → same number across machines and dates.
+            The function reads `ALL_CASES` from the case-study library, runs
+            `computeBrierFairPredictedDqi` (the no-evidence-peeking variant of the DQI formula) over
+            each case, and bootstraps the mean with a seeded mulberry32 PRNG. Same seed → same
+            number across machines and dates.
           </div>
         </div>
       </section>

@@ -51,6 +51,7 @@ const HISTORICAL_CASE_COUNT_DISPLAY = HISTORICAL_CASE_COUNT;
 import { FounderHubMap } from './start-here/FounderHubMap';
 import { JourneySelector } from './start-here/JourneySelector';
 import { JourneyDetailStrip } from './start-here/JourneyDetailStrip';
+import { VohraHxcPmfTile } from './start-here/VohraHxcPmfTile';
 import { JOURNEYS, NODES, type Journey, type TabId } from './start-here/founder-hub-map-data';
 
 // Persistence keys — visited reuses the prior 2-day-plan key so progress
@@ -193,6 +194,13 @@ export function StartHereTab({ onNavigateToTab }: Props) {
   return (
     <div>
       {renderHero()}
+      {/* Phase 1 graduation gate meter — Item 2 lock 2026-05-07. The
+          Vohra HXC "very disappointed" % vs the 40% gate is the most
+          load-bearing Phase 1 → Phase 2 transition signal per CLAUDE.md
+          GTM v3.5; this tile makes it the first fact a founder reads
+          each morning. /api/founder-hub/metrics endpoint shipped
+          2026-05-04 with all the underlying data. */}
+      <VohraHxcPmfTile onNavigateToMetrics={() => onNavigateToTab('metrics')} />
       {renderPositioningAnchor()}
       {renderCalibrationCard(onNavigateToTab)}
       {renderInvestorAnswerCard()}

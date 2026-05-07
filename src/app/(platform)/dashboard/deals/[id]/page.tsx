@@ -188,10 +188,7 @@ export default function DealDetailPage() {
       {deal.status !== 'active' && <Chip color={statusColor}>{deal.status}</Chip>}
       {deal.icDate && <IcCountdownChip icDate={deal.icDate as unknown as string} />}
       {conflictCount > 0 && (
-        <ConflictCountChip
-          conflictCount={conflictCount}
-          highSeverityCount={conflictHighCount}
-        />
+        <ConflictCountChip conflictCount={conflictCount} highSeverityCount={conflictHighCount} />
       )}
       {deal.ticketSize && (
         <span
@@ -568,11 +565,7 @@ function ConflictCountChip({
   highSeverityCount: number;
 }) {
   const color =
-    highSeverityCount > 0
-      ? 'var(--error)'
-      : conflictCount >= 3
-        ? 'var(--warning)'
-        : 'var(--info)';
+    highSeverityCount > 0 ? 'var(--error)' : conflictCount >= 3 ? 'var(--warning)' : 'var(--info)';
   const label = `${conflictCount} conflict${conflictCount !== 1 ? 's' : ''}${
     highSeverityCount > 0 ? ` · ${highSeverityCount} high` : ''
   }`;

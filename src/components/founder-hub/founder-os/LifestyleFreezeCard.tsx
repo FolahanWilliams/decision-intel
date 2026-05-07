@@ -103,9 +103,9 @@ export function LifestyleFreezeCard() {
         }}
       >
         Sharran kept his family budget flat for 14 years while net worth grew 50×. Folahan is
-        already structurally frozen (no personal burn). The discipline isn&apos;t budgeting — it&apos;s
-        keeping the freeze in place as personal income grows post-seed → post-Series-A → post-exit,
-        AND weaponizing the commitment in pre-seed conversations.
+        already structurally frozen (no personal burn). The discipline isn&apos;t budgeting —
+        it&apos;s keeping the freeze in place as personal income grows post-seed → post-Series-A →
+        post-exit, AND weaponizing the commitment in pre-seed conversations.
       </p>
 
       <div

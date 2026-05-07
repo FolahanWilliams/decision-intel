@@ -16,6 +16,7 @@ import {
 
 import { MarketingNav } from '@/components/marketing/MarketingNav';
 import { EncryptionFlowViz } from '@/components/marketing/security/EncryptionFlowViz';
+import { EuAiActCountdown } from '@/components/marketing/security/EuAiActCountdown';
 import {
   SOC2_RECEIPTS,
   INDEMNIFICATION_LABEL,
@@ -1131,6 +1132,16 @@ export default function SecurityPage() {
               reviewed, not just generated. We built for this on purpose.
             </p>
           </div>
+
+          {/* EU AI Act Aug 2 countdown — Item 1 lock 2026-05-07. The EU
+              high-risk decision-support enforcement deadline is the single
+              highest calendar leverage moment of the next 90 days. Mounted
+              as the lead-in to the existing 6-card tailwinds grid below.
+              The countdown card carries the article-by-article DI mapping
+              (Art 13 / 14 / 15 / Annex III) so a procurement reader sees
+              the answer to "what does this do for our August 2 deadline?"
+              before reaching the supporting evidence grid. */}
+          <EuAiActCountdown palette={C} />
 
           <div
             style={{

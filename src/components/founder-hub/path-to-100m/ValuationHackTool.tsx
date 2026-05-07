@@ -33,9 +33,8 @@ import {
 } from './data/sharran-principles';
 
 export function ValuationHackTool() {
-  const [activePromptId, setActivePromptId] = useState<ValuationHackPrompt['id']>(
-    'path_to_benchmark'
-  );
+  const [activePromptId, setActivePromptId] =
+    useState<ValuationHackPrompt['id']>('path_to_benchmark');
 
   const activePrompt = VALUATION_HACK_PROMPTS.find(p => p.id === activePromptId);
 
@@ -61,9 +60,7 @@ export function ValuationHackTool() {
                 padding: '10px 14px',
                 background: 'transparent',
                 border: 'none',
-                borderBottom: active
-                  ? '2px solid var(--accent-primary)'
-                  : '2px solid transparent',
+                borderBottom: active ? '2px solid var(--accent-primary)' : '2px solid transparent',
                 marginBottom: -1,
                 color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
                 fontSize: 13,
@@ -361,9 +358,10 @@ function CaptureSurface({ promptId }: { promptId: ValuationHackPrompt['id'] }) {
           color: 'var(--text-secondary)',
         }}
       >
-        Each item only counts if the advisor explained <strong>WHY a specific enterprise buyer</strong>
-        {' '}(Audit Committee Chair / F500 GC / Big-4 acquirer) would pay a premium for it. Items
-        without an enterprise-buyer rationale are recorded but flagged amber.
+        Each item only counts if the advisor explained{' '}
+        <strong>WHY a specific enterprise buyer</strong> (Audit Committee Chair / F500 GC / Big-4
+        acquirer) would pay a premium for it. Items without an enterprise-buyer rationale are
+        recorded but flagged amber.
       </p>
 
       <div
