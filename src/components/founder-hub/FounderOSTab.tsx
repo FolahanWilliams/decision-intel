@@ -52,6 +52,7 @@ import {
 } from '@/components/founder-hub/founder-os/InteractivePillars';
 import { InteractiveSfcMatrix } from '@/components/founder-hub/founder-os/InteractiveSfcMatrix';
 import { EventPrepCard } from '@/components/founder-hub/founder-os/EventPrepCard';
+import { LifestyleFreezeCard } from '@/components/founder-hub/founder-os/LifestyleFreezeCard';
 
 interface DailyCheckin {
   id: string;
@@ -1438,6 +1439,12 @@ export function FounderOSTab() {
 
       {/* COMMITMENT RECORD */}
       <CommitmentRecord />
+
+      {/* LIFESTYLE FREEZE — Sharran principle 5 weaponised as investor-narrative
+          anchor. Sits between CommitmentRecord (the physical commitment) and
+          BuildInPublicSection (the public posture) per the founder-OS rhythm.
+          Item locked 2026-05-07 from master KB Q2 synthesis. */}
+      <LifestyleFreezeCard />
 
       {/* BUILD-IN-PUBLIC PROTOCOL — the SFC ↔ audience-building paradox dissolved */}
       <BuildInPublicSection />
