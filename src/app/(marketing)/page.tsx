@@ -219,7 +219,7 @@ export default function LandingPage() {
                 marginBottom: 18,
               }}
             >
-              Decisions worth defending
+              For decisions worth defending
             </p>
             <h1
               className="marketing-display"
@@ -247,8 +247,8 @@ export default function LandingPage() {
                 fontWeight: 500,
               }}
             >
-              Most tools audit your data. We audit your reasoning &mdash; and catch the fatal blind
-              spots in strategic memos before the committee does.
+              Most tools audit your data. We audit your reasoning, catching the fatal blind spots in
+              strategic memos before the outcome forces the lesson.
             </p>
             <div
               style={{
