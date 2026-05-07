@@ -49,6 +49,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
           contentEncrypted: true,
           contentIv: true,
           contentTag: true,
+          // Audit-evidence hash surfaced in the VerdictBand monospace
+          // strip (Item 1 lock 2026-05-07, James persona ask). Document
+          // hash is the load-bearing tamper-evidence signal procurement
+          // reviewers expect at first impression, not buried in Settings.
+          contentHash: true,
           uploadedAt: true,
           status: true,
           visibility: true,

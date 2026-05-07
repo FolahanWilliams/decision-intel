@@ -59,7 +59,6 @@ import { LiveRedFlagsAlert } from '@/components/analysis/LiveRedFlagsAlert';
 import { LivePredictedQuestions } from '@/components/analysis/LivePredictedQuestions';
 import { StructuralAssumptionsPanel } from '@/components/analysis/StructuralAssumptionsPanel';
 import { CounterfactualPanel } from '@/components/ui/CounterfactualPanel';
-import { MetaVerdictPanel } from '@/components/ui/MetaVerdictPanel';
 import { RecommendationsPanel } from '@/components/ui/RecommendationsPanel';
 import { InterventionPanel } from '@/components/ui/InterventionPanel';
 import { LearningImpactCard } from '@/components/ui/LearningImpactCard';
@@ -67,6 +66,8 @@ import { DrRedTeamCard } from '@/components/analysis/DrRedTeamCard';
 import { R2FDecompositionCard } from '@/components/documents/R2FDecompositionCard';
 import { ReferenceClassChip } from '@/components/documents/ReferenceClassChip';
 import { PaperApplicationsCard } from '@/components/analysis/PaperApplicationsCard';
+import { RemediationChecklist } from '@/components/analysis/RemediationChecklist';
+import { VerdictBand } from '@/components/documents/detail/VerdictBand';
 import { DecisionRoomList } from '@/components/ui/DecisionRoomCard';
 import { VersionHistoryStrip } from '@/components/analysis/VersionHistoryStrip';
 import { VersionDeltaCard } from '@/components/analysis/VersionDeltaCard';
@@ -177,6 +178,11 @@ interface Document {
   filename: string;
   fileType?: string;
   content?: string;
+  /** SHA-256 hash of the original document content. Surfaced in the
+   *  VerdictBand monospace strip per DESIGN.md James persona ask
+   *  (Item 1 lock 2026-05-07). May be null for legacy rows or rows where
+   *  hashing failed at upload time. */
+  contentHash?: string | null;
   uploadedAt: string;
   status: 'pending' | 'analyzing' | 'analyzed' | 'failed';
   isOwner?: boolean;
@@ -206,6 +212,12 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
   const [activeBiasId, setActiveBiasId] = useState<string | null>(null);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  // Cross-doc conflict count for the VerdictBand chip (Item 1 lock
+  // 2026-05-07). Only fetched when the document is part of a deal —
+  // pulls the deal's most-recent cross-reference run via
+  // /api/deals/[id] which already returns deal.crossReference shape.
+  const [dealConflictCount, setDealConflictCount] = useState<number | null>(null);
+  const [dealHighSeverityCount, setDealHighSeverityCount] = useState<number | null>(null);
 
   /* ───── data fetch ───── */
   const refetch = useCallback(async () => {
@@ -230,6 +242,43 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
   useEffect(() => {
     void refetch();
   }, [refetch]);
+
+  /* ───── deal cross-ref fetch (when document is part of a deal) ───── */
+  const dealId = document?.deal?.id ?? null;
+  useEffect(() => {
+    if (!dealId) {
+      setDealConflictCount(null);
+      setDealHighSeverityCount(null);
+      return;
+    }
+    let cancelled = false;
+    const run = async () => {
+      try {
+        const res = await fetch(`/api/deals/${dealId}`);
+        if (!res.ok) return;
+        const data = (await res.json()) as {
+          crossReference?: { conflictCount?: number; highSeverityCount?: number } | null;
+        };
+        if (cancelled) return;
+        const cr = data.crossReference;
+        setDealConflictCount(typeof cr?.conflictCount === 'number' ? cr.conflictCount : null);
+        setDealHighSeverityCount(
+          typeof cr?.highSeverityCount === 'number' ? cr.highSeverityCount : null
+        );
+      } catch (err) {
+        if (!cancelled) {
+          // Non-load-bearing on the doc page — verdict band hides the
+          // conflict chip silently when the fetch fails. Logged for
+          // diagnostics but never surfaces an error toast.
+          log.warn('deal cross-ref fetch failed:', err);
+        }
+      }
+    };
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, [dealId]);
 
   /* ───── derived ───── */
   const analysis = document?.analyses?.[0] ?? null;
@@ -412,19 +461,23 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
       case 'findings':
         return (
           <div style={{ display: 'grid', gap: 16 }}>
-            {/* Meta-judge verdict — adversarial-analysis sentence; the
-               highest-leverage single line on the audit. Renders ABOVE
-               the catalogue so a buyer sees the verdict before drilling. */}
-            {analysis?.metaVerdict && (
-              <ErrorBoundary sectionName="Meta verdict">
-                <MetaVerdictPanel verdict={analysis.metaVerdict} />
-              </ErrorBoundary>
-            )}
+            <FindingsTab
+              biases={biases}
+              r2fProtected={r2fProtected}
+              r2fSuppressed={r2fSuppressed}
+              r2fSummary="Mapped from your memo's flagged passages and structural assumptions."
+              activeBiasId={activeBiasId}
+              onBiasClick={handleBiasClick}
+              taxonomyIdByType={taxonomyIdByType}
+            />
 
             {/* Reference-class match chip + R²F decomposition card —
-               anchor the per-doc reasoning provenance ABOVE the catalogue
-               so the reader sees the academic-ground signal before the
-               bias list. */}
+               kept on the Findings tab AFTER the bias catalogue per
+               DESIGN.md universal point #9 (R²F branding demoted on the
+               live page; the IP-moat surface stays accessible but no
+               longer above-fold). The above-fold above-tabs cluster
+               carries Verdict Band + Top-3 Fix Tiles + R²F Signal Strip
+               (plain-language eyebrows). */}
             {analysis && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                 <ReferenceClassChip biasTypes={biases.map(b => b.biasType)} />
@@ -440,24 +493,6 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
                 />
               </ErrorBoundary>
             )}
-
-            {/* Paper-applications card — Validity / Reference-class /
-               Feedback-adequacy strips per Kahneman & Klein 2009 anchors. */}
-            {analysis && (
-              <ErrorBoundary sectionName="Paper applications">
-                <PaperApplicationsCard analysisId={analysis.id} />
-              </ErrorBoundary>
-            )}
-
-            <FindingsTab
-              biases={biases}
-              r2fProtected={r2fProtected}
-              r2fSuppressed={r2fSuppressed}
-              r2fSummary="Mapped from your memo's flagged passages and structural assumptions."
-              activeBiasId={activeBiasId}
-              onBiasClick={handleBiasClick}
-              taxonomyIdByType={taxonomyIdByType}
-            />
           </div>
         );
       case 'actions':
@@ -682,6 +717,49 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
         activeBiasId={activeBiasId}
         leftPane={leftPane}
         rightPaneContent={tabBody}
+        rightPaneAboveTabs={
+          analysis ? (
+            /* Persona-validated above-fold cluster (DESIGN.md universal
+               points #1, #2, #9 + Item 1 lock 2026-05-07):
+                 1. VerdictBand — status pill + adversarial verdict +
+                    cross-doc conflict chip (deal context) + monospace
+                    audit metadata strip (SHA-256 + methodology version
+                    + audit log link).
+                 2. RemediationChecklist — Top-3 Fix Tiles, sorted by
+                    severity × confidence with verbs (Fix / Address /
+                    Review).
+                 3. PaperApplicationsCard — R²F Signal Strip with
+                    plain-language eyebrows (Validity / Outside View /
+                    Author Calibration). Stays visible regardless of
+                    which tab is active so the procurement-grade signal
+                    surface doesn't get hidden behind a tab swap.
+            */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <ErrorBoundary sectionName="Verdict band">
+                <VerdictBand
+                  overallScore={analysis.overallScore}
+                  metaVerdict={analysis.metaVerdict ?? null}
+                  contentHash={document.contentHash ?? null}
+                  crossDocConflictCount={dealConflictCount}
+                  crossDocHighSeverityCount={dealHighSeverityCount}
+                  conflictHref={
+                    document.deal?.id ? `/dashboard/deals/${document.deal.id}` : null
+                  }
+                  auditedAt={analysis.createdAt}
+                  documentId={document.id}
+                />
+              </ErrorBoundary>
+              {biases.length > 0 && (
+                <ErrorBoundary sectionName="Remediation roadmap">
+                  <RemediationChecklist biases={biases} documentId={document.id} />
+                </ErrorBoundary>
+              )}
+              <ErrorBoundary sectionName="Paper applications">
+                <PaperApplicationsCard analysisId={analysis.id} />
+              </ErrorBoundary>
+            </div>
+          ) : null
+        }
         hasPreview
         onOpenSettings={() => setShowSettings(true)}
         outcomeStrip={topStrip}

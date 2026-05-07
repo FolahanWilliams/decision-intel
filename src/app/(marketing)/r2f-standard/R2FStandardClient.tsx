@@ -284,6 +284,29 @@ export function R2FStandardClient() {
             Opt in to the registry
             <ArrowRight size={15} strokeWidth={2.25} aria-hidden />
           </Link>
+          {/* Investor / procurement deep-link to the calibration section.
+              Item 2 lock 2026-05-07: the calibration section IS the
+              answer to "show me your outcome calibration"; the jumplink
+              makes it reachable without scrolling past the tenets. */}
+          <Link
+            href="#calibration"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '10px 16px',
+              background: 'transparent',
+              color: C.slate700,
+              fontSize: 14,
+              fontWeight: 600,
+              borderRadius: 8,
+              textDecoration: 'none',
+              border: `1px solid ${C.slate300}`,
+            }}
+          >
+            Investor diligence answer
+            <ArrowRight size={15} strokeWidth={2.25} aria-hidden />
+          </Link>
         </div>
       </section>
 
@@ -649,7 +672,12 @@ export function R2FStandardClient() {
         </div>
       </section>
 
-      {/* Calibration baseline — procurement-grade answer to "show me your outcome calibration" */}
+      {/* Calibration baseline — procurement-grade answer to "show me your outcome calibration".
+          Item 2 lock 2026-05-07: this section IS the calibration page. The
+          /calibration URL redirects here. The eyebrow names the section
+          for investor-diligence readers; the methodology timeline +
+          reproducibility code block + Tetlock-anchored scale are the
+          procurement evidence. */}
       <section
         id="calibration"
         style={{
@@ -669,11 +697,11 @@ export function R2FStandardClient() {
             fontWeight: 800,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
-            marginBottom: 12,
+            marginBottom: 8,
           }}
         >
           <Activity size={12} strokeWidth={2.5} aria-hidden />
-          Calibration baseline · seed
+          Calibration baseline · investor-diligence answer
         </div>
         <h2
           style={{
@@ -686,7 +714,7 @@ export function R2FStandardClient() {
             marginBottom: 12,
           }}
         >
-          Brier {PLATFORM_BASELINE_SNAPSHOT.meanBrier.toFixed(3)} across{' '}
+          Brier {PLATFORM_BASELINE_SNAPSHOT.meanBrier.toFixed(3)} ± {PLATFORM_BASELINE_SNAPSHOT.brierCi95.halfWidth.toFixed(3)} across{' '}
           {PLATFORM_BASELINE_SNAPSHOT.n} historical corporate decisions.
         </h2>
         <p
@@ -702,9 +730,169 @@ export function R2FStandardClient() {
           Procurement-stage diligence asks <em>show me your outcome calibration</em>. The published
           R²F methodology is run retrospectively over {PLATFORM_BASELINE_SNAPSHOT.n} historical
           corporate decisions where the outcome is known — Brier-fair (evidence dimension
-          neutralised, no peek at ground truth). The proper-scoring rule does the rest. Result
-          below, with reproducibility seed for any auditor who wants to re-run the bootstrap.
+          neutralised, no peek at ground truth). The proper-scoring rule does the rest. The 95% CI
+          comes from a {PLATFORM_BASELINE_SNAPSHOT.bootstrapIterations.toLocaleString('en-US')}-iteration
+          deterministic bootstrap with a pinned seed; the reproducibility recipe sits below.
         </p>
+
+        {/* Methodology version progression — Item 2 lock 2026-05-07.
+            Procurement readers ask "which methodology produced this number?"
+            The progression shows the audit trail: legacy 2.0.0 (deprecated)
+            → 2.0.0-seed (current platform baseline) → 2.1.0 (live audits,
+            validity-aware weight shift per Kahneman & Klein 2009) → per-org
+            Brier supersedes once outcomes accumulate via Outcome Gate
+            enforcement. */}
+        <div
+          style={{
+            background: C.white,
+            border: `1px solid ${C.slate200}`,
+            borderRadius: 14,
+            padding: '20px 24px',
+            marginBottom: 18,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.14em',
+              color: C.slate500,
+              marginBottom: 14,
+            }}
+          >
+            Methodology version progression
+          </div>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: 12,
+            }}
+          >
+            {[
+              {
+                version: '2.0.0',
+                label: 'Legacy',
+                state: 'deprecated' as const,
+                blurb:
+                  'Pre-validity-weighted DQI. Surfaced on audits run before 2026-04-30.',
+              },
+              {
+                version: '2.0.0-seed',
+                label: 'Platform seed baseline',
+                state: 'current-seed' as const,
+                blurb: `The number above. Computed retrospectively over the ${PLATFORM_BASELINE_SNAPSHOT.n}-case library; evidence dimension neutralised so predictions don't peek at ground truth.`,
+              },
+              {
+                version: '2.1.0',
+                label: 'Live audits',
+                state: 'live' as const,
+                blurb:
+                  'Validity-aware weight shift per Kahneman & Klein 2009 first condition. Active on every new audit since 2026-04-30.',
+              },
+              {
+                version: 'per-org',
+                label: 'Customer outcomes',
+                state: 'future' as const,
+                blurb:
+                  'When a customer org accumulates closed outcomes via Outcome Gate enforcement, per-org Brier replaces the seed baseline on every DPR they generate.',
+              },
+            ].map(v => {
+              const tone =
+                v.state === 'live'
+                  ? { color: C.green, bg: C.greenSoft, border: C.greenBorder, label: 'LIVE' }
+                  : v.state === 'current-seed'
+                    ? {
+                        color: C.blue,
+                        bg: C.blueSoft,
+                        border: 'rgba(37, 99, 235, 0.25)',
+                        label: 'SEED',
+                      }
+                    : v.state === 'deprecated'
+                      ? {
+                          color: C.slate500,
+                          bg: C.slate100,
+                          border: C.slate200,
+                          label: 'DEPRECATED',
+                        }
+                      : {
+                          color: C.amber,
+                          bg: C.amberSoft,
+                          border: 'rgba(217, 119, 6, 0.25)',
+                          label: 'FUTURE',
+                        };
+              return (
+                <div
+                  key={v.version}
+                  style={{
+                    background: tone.bg,
+                    border: `1px solid ${tone.border}`,
+                    borderRadius: 10,
+                    padding: '12px 14px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 4,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 8,
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: 'var(--font-mono, monospace)',
+                        fontSize: 13,
+                        fontWeight: 700,
+                        color: tone.color,
+                        letterSpacing: '-0.01em',
+                      }}
+                    >
+                      v{v.version}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 9.5,
+                        fontWeight: 800,
+                        letterSpacing: '0.1em',
+                        color: tone.color,
+                        background: C.white,
+                        border: `1px solid ${tone.border}`,
+                        padding: '2px 6px',
+                        borderRadius: 999,
+                      }}
+                    >
+                      {tone.label}
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: C.slate900,
+                    }}
+                  >
+                    {v.label}
+                  </div>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: 12,
+                      lineHeight: 1.5,
+                      color: C.slate600,
+                    }}
+                  >
+                    {v.blurb}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
 
         {/* Tetlock-anchored scale */}
         <div
@@ -853,6 +1041,95 @@ export function R2FStandardClient() {
             <p style={{ margin: 0, fontSize: 12, lineHeight: 1.55, color: C.slate700 }}>
               {PLATFORM_BASELINE_FOOTNOTE}.
             </p>
+          </div>
+        </div>
+
+        {/* Reproducibility recipe — Item 2 lock 2026-05-07. Procurement
+            auditors expect to reproduce the Brier number themselves; the
+            code block + the public API endpoint together close the
+            audit-trail loop. The seed is pinned and the bootstrap is
+            deterministic so an auditor running the recipe gets the same
+            number byte-for-byte. */}
+        <div
+          style={{
+            background: C.slate900,
+            color: C.slate100,
+            borderRadius: 12,
+            padding: '20px 22px',
+            marginTop: 18,
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 12,
+              marginBottom: 12,
+              flexWrap: 'wrap',
+            }}
+          >
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: '#86EFAC',
+              }}
+            >
+              Reproducibility recipe
+            </div>
+            <Link
+              href="/api/intelligence/calibration-baseline"
+              style={{
+                fontFamily: 'var(--font-mono, monospace)',
+                fontSize: 11.5,
+                color: '#86EFAC',
+                textDecoration: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+              }}
+            >
+              GET /api/intelligence/calibration-baseline
+              <ArrowRight size={11} strokeWidth={2.25} aria-hidden />
+            </Link>
+          </div>
+          <pre
+            style={{
+              margin: 0,
+              fontFamily: 'var(--font-mono, monospace)',
+              fontSize: 12,
+              lineHeight: 1.55,
+              color: C.slate100,
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
+            }}
+          >
+            {`# Reproduce the Brier baseline locally
+import { computePlatformCalibrationBaseline } from '@/lib/learning/platform-baseline';
+const baseline = computePlatformCalibrationBaseline();
+// → {
+//     n: ${PLATFORM_BASELINE_SNAPSHOT.n},
+//     meanBrier: ${PLATFORM_BASELINE_SNAPSHOT.meanBrier.toFixed(3)},
+//     brierCi95: { lower: ${PLATFORM_BASELINE_SNAPSHOT.brierCi95.lower.toFixed(3)}, upper: ${PLATFORM_BASELINE_SNAPSHOT.brierCi95.upper.toFixed(3)} },
+//     bootstrapIterations: ${PLATFORM_BASELINE_SNAPSHOT.bootstrapIterations.toLocaleString('en-US')},
+//     bootstrapSeed: ${PLATFORM_BASELINE_SNAPSHOT.bootstrapSeed},
+//     methodologyVersion: '${PLATFORM_BASELINE_SNAPSHOT.methodologyVersion}',
+//   }`}
+          </pre>
+          <div
+            style={{
+              fontSize: 11.5,
+              color: C.slate400,
+              marginTop: 12,
+              lineHeight: 1.55,
+            }}
+          >
+            The function reads `ALL_CASES` from the case-study library, runs `computeBrierFairPredictedDqi`
+            (the no-evidence-peeking variant of the DQI formula) over each case, and bootstraps the
+            mean with a seeded mulberry32 PRNG. Same seed → same number across machines and dates.
           </div>
         </div>
       </section>

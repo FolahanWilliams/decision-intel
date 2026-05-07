@@ -48,6 +48,9 @@ import {
   HelpCircle,
   AlertCircle,
   Filter,
+  Layers,
+  Coins,
+  Activity,
 } from 'lucide-react';
 import { NorthStarHero } from './path-to-100m/NorthStarHero';
 import { MarketRealityCheck } from './path-to-100m/MarketRealityCheck';
@@ -62,6 +65,10 @@ import { FailureModesWatchtower } from './path-to-100m/FailureModesWatchtower';
 import { WarmIntroNetworkMap } from './path-to-100m/WarmIntroNetworkMap';
 import { NinetyDayActionPlan } from './path-to-100m/NinetyDayActionPlan';
 import { NotebookLmFollowUpLab } from './path-to-100m/NotebookLmFollowUpLab';
+import { SharranOperatingPrinciples } from './path-to-100m/SharranOperatingPrinciples';
+import { ValuationHackTool } from './path-to-100m/ValuationHackTool';
+import { TwoXTomorrowStressTest } from './path-to-100m/TwoXTomorrowStressTest';
+import { TenTenForeverOverlay } from './path-to-100m/TenTenForeverOverlay';
 
 interface SectionProps {
   icon: React.ReactNode;
@@ -161,6 +168,15 @@ export function PathToHundredMillionTab() {
       </Section>
 
       <Section
+        icon={<Layers size={16} />}
+        title="Sharran Operating Principles · 7 mental models from a 5-exit operator"
+        subtitle="Sharran Srivatsaa (scaled 2 companies past $8B, 5 exits) — applied to Decision Intel via the master KB Q1-Q4 synthesis. Hero is the 1-1-1 violation table: DI today is Phase 4-architected for a Phase 1 buyer; the discipline is HIDE THE PLUMBING. Each principle carries the Sharran framing + the DI-applied framing + a phase tag (NOW / LATER / INAPPLICABLE) + a specific 90-day action when applicable. Three CTAs jump to dedicated sibling tools below: Valuation Hack · 2× Tomorrow · 10-10 Forever."
+        accent="#0F172A"
+      >
+        <SharranOperatingPrinciples />
+      </Section>
+
+      <Section
         icon={<BookOpen size={16} />}
         title="Category Definition + Persona Pitch Library"
         subtitle="What Decision Intel IS (warm category claim, cold descriptive, vocabulary-by-context bridge sentences) + what it IS NOT (8 things to never say). Persona-tailored pitches for CSOs, M&A heads, Pan-African funds, GCs, pre-seed VCs, McKinsey, LRQA-class firms — each with the killer line + the closing move."
@@ -197,6 +213,15 @@ export function PathToHundredMillionTab() {
       </Section>
 
       <Section
+        icon={<Coins size={16} />}
+        title="Valuation Hack · the up-sell + zero-value subtraction prompts"
+        subtitle="Sharran's $50M → $75M mechanic, specialised for advisors (Mr. Reiner / Mr. Gabe / Big-4 governance) instead of acquirers per the master KB Q4 synthesis. Two pre-built copy-paste prompts (Path-to-Benchmark for the up-sell · Zero-Value Subtraction for the cut-list) + three counter-pattern guardrails (VC scale-default trap · consulting dismissal trap · enterprise-buyer filter rule). Capture surface flags items amber when the advisor didn't explain WHY a specific enterprise buyer would pay a premium."
+        accent="#16A34A"
+      >
+        <ValuationHackTool />
+      </Section>
+
+      <Section
         icon={<AlertTriangle size={16} />}
         title="Failure Modes Watchtower · 3 internal traps + 3 external attack vectors"
         subtitle="Internal: Quantellia unscalable-consulting · Cloverpop manual-logging · DI cathedral-of-code (currently active). External: Cloverpop data advantage · IBM watsonx bundling · agentic-shift makes strategic-memo obsolete. Each with named tripwire + the named source to monitor + the countermove."
@@ -206,12 +231,30 @@ export function PathToHundredMillionTab() {
       </Section>
 
       <Section
+        icon={<Activity size={16} />}
+        title="2× Tomorrow Stress Test · interactive bottleneck simulator"
+        subtitle="Sharran's 'if the business doubled tomorrow, where would it break?' mechanic, run against current DI state numbers. Adjust 5 inputs (daily audits · paid Individuals · warm intros/wk · London events/mo · Founder Hub tabs); the bottleneck table auto-doubles each metric and surfaces the specific breaking point + the pre-emptive build needed today. Severity-coded (critical / high / medium / manageable) with the load-bearing risk first."
+        accent="#D97706"
+      >
+        <TwoXTomorrowStressTest />
+      </Section>
+
+      <Section
         icon={<Network size={16} />}
         title="Warm-Intro Network Map · Wiz advisor / TASIS / Sankore / LRQA / McKinsey / pre-seed / family"
         subtitle="8 network nodes with relationship type (family / advisor / school / design-partner / channel / untapped) + what they unlock + 3-tier ask hierarchy (Tier 1 ideal, Tier 2 high-value, Tier 3 fallback) + status + cadence + the next-step prompt."
         accent="#7C3AED"
       >
         <WarmIntroNetworkMap />
+      </Section>
+
+      <Section
+        icon={<Users size={16} />}
+        title="10-10 Forever Overlay · 7 missing relationship slots"
+        subtitle="Sharran's 'identify the 10 people you would invest in for the next 10 years' rule, applied to the existing 3 named nodes. Master KB Q3 synthesis identified 7 specific person-types missing — each maps to a Phase 1-4 risk Mr. Reiner / Mr. Gabe / Sankore alone don't cover. Vendor Continuity Engineer (F500 procurement key-person risk), Governance Coalition Insider (IBM watsonx bundling defense), Elite Consulting Channel Partner, F500 GC Validator, Agentic-Shift Technologist, Fractional CSO Evangelist, Behavioral Science Academic Anchor."
+        accent="#16A34A"
+      >
+        <TenTenForeverOverlay />
       </Section>
 
       <Section

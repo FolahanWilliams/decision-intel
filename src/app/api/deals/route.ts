@@ -229,10 +229,50 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const dealsWithComposite = deals.map(d => ({
-      ...d,
-      compositeDqi: compositeMap.get(d.id) ?? null,
-    }));
+    // Cross-doc conflict count per deal — Item 4 lock 2026-05-07. One
+    // raw query that picks the LATEST DealCrossReference per dealId and
+    // returns its conflictCount + highSeverityCount. Same fail-soft
+    // pattern as compositeDqi: skip quietly on schema drift so the
+    // kanban list still renders without conflict chips rather than 500ing.
+    const conflictMap = new Map<
+      string,
+      { conflictCount: number; highSeverityCount: number }
+    >();
+    if (dealIds.length > 0) {
+      try {
+        const rows = await prisma.$queryRaw<
+          Array<{ dealId: string; conflictCount: number; highSeverityCount: number }>
+        >`
+          SELECT DISTINCT ON ("dealId")
+                 "dealId",
+                 "conflictCount",
+                 "highSeverityCount"
+          FROM "DealCrossReference"
+          WHERE "dealId" = ANY(${dealIds}::text[])
+            AND "status" = 'complete'
+          ORDER BY "dealId", "runAt" DESC
+        `;
+        for (const r of rows) {
+          conflictMap.set(r.dealId, {
+            conflictCount: Number(r.conflictCount) || 0,
+            highSeverityCount: Number(r.highSeverityCount) || 0,
+          });
+        }
+      } catch (err) {
+        // @schema-drift-tolerant — pre-3.1 envs may not have the table.
+        log.warn('Cross-ref aggregation failed (rendering kanban without conflict chips):', err);
+      }
+    }
+
+    const dealsWithComposite = deals.map(d => {
+      const conflict = conflictMap.get(d.id);
+      return {
+        ...d,
+        compositeDqi: compositeMap.get(d.id) ?? null,
+        crossRefConflictCount: conflict?.conflictCount ?? null,
+        crossRefHighSeverityCount: conflict?.highSeverityCount ?? null,
+      };
+    });
 
     return NextResponse.json(
       {

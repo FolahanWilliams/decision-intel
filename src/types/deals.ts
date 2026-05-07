@@ -270,6 +270,18 @@ export interface DealSummary {
    *  endpoint includes a tiny version of this so cards can render the
    *  composite at-a-glance. */
   compositeDqi?: number | null;
+  /** Cross-document conflict count from the most-recent
+   *  `DealCrossReference` row, surfaced on the kanban card + deal page
+   *  header chip row. Richard persona (mid-market PE Head of M&A)
+   *  expected this as the second metric after composite DQI per the
+   *  2026-05-07 audit Section 8 finding. Null when no cross-reference
+   *  has run yet on the deal. Item 4 lock 2026-05-07. */
+  crossRefConflictCount?: number | null;
+  /** Subset of `crossRefConflictCount` — high + critical severity. The
+   *  chip color-codes by whether this is > 0 (red/amber) vs only
+   *  low/medium conflicts (info-blue). Null when no cross-reference
+   *  has run yet on the deal. */
+  crossRefHighSeverityCount?: number | null;
   _count: { documents: number };
   createdAt: string;
   updatedAt: string;
