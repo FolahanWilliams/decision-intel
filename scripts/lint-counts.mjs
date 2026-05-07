@@ -67,7 +67,14 @@ const SCAN_PATHS = [
 // jury copy update removed a stale "2 models only" literal (the lock
 // it referenced was retired when the cross-model jury shipped the same
 // day). Reducing the baseline is encouraged per the file header.
-const COUNT_BASELINE = 81;
+//
+// 2026-05-07: ratcheted 81 → 80 after the wedge-quad ship (Items 1+2+4)
+// removed the legacy "Calibration baseline · seed" eyebrow on /r2f-standard
+// (now reads "investor-diligence answer") which retired one stale
+// literal-shaped phrase that the linter previously counted in the
+// baseline budget. The actual count came in at 80, so the ratchet lands
+// at 80 to keep the trip-wire honest.
+const COUNT_BASELINE = 80;
 
 // Plural nouns we audit. Each must have a canonical source-of-truth in
 // the codebase; adding a new noun here requires adding the canonical

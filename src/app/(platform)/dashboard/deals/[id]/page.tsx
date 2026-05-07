@@ -172,12 +172,27 @@ export default function DealDetailPage() {
   const statusColor = STATUS_COLORS[deal.status] || '#6b7280';
   const nextStage = getNextStage(deal.stage);
 
+  // Cross-doc conflict count for the header chip — derived from the
+  // already-fetched `crossRefFindings` so no extra round-trip.
+  // Item 4 lock 2026-05-07: Richard persona expects this as the second
+  // metric after composite DQI in the procurement-grade verdict band.
+  const conflictCount = crossRefFindings.length;
+  const conflictHighCount = crossRefFindings.filter(
+    f => f.severity === 'high' || f.severity === 'critical'
+  ).length;
+
   const headerChips = (
     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
       <Chip color={typeColor}>{getDealTypeLabel(deal.dealType)}</Chip>
       <Chip color={stageColor}>{getStageLabel(deal.stage)}</Chip>
       {deal.status !== 'active' && <Chip color={statusColor}>{deal.status}</Chip>}
       {deal.icDate && <IcCountdownChip icDate={deal.icDate as unknown as string} />}
+      {conflictCount > 0 && (
+        <ConflictCountChip
+          conflictCount={conflictCount}
+          highSeverityCount={conflictHighCount}
+        />
+      )}
       {deal.ticketSize && (
         <span
           style={{
@@ -530,6 +545,59 @@ function IcCountdownChip({ icDate }: { icDate: string }) {
       }}
     >
       <Clock size={11} /> {label}
+    </span>
+  );
+}
+
+/**
+ * ConflictCountChip — header-row chip surfacing the cross-doc conflict
+ * count from the most-recent DealCrossReference run. Color-coded by
+ * highSeverityCount: any high/critical conflicts → red; ≥3 conflicts
+ * with no high severity → amber; 1-2 medium/low conflicts → info-blue.
+ *
+ * Item 4 lock 2026-05-07. Mounted in the deal page header chip row
+ * directly after IC countdown, BEFORE ticket size — Richard persona
+ * (mid-market PE Head of M&A) expects this as the second metric after
+ * composite DQI in the procurement-grade verdict band.
+ */
+function ConflictCountChip({
+  conflictCount,
+  highSeverityCount,
+}: {
+  conflictCount: number;
+  highSeverityCount: number;
+}) {
+  const color =
+    highSeverityCount > 0
+      ? 'var(--error)'
+      : conflictCount >= 3
+        ? 'var(--warning)'
+        : 'var(--info)';
+  const label = `${conflictCount} conflict${conflictCount !== 1 ? 's' : ''}${
+    highSeverityCount > 0 ? ` · ${highSeverityCount} high` : ''
+  }`;
+  const title =
+    highSeverityCount > 0
+      ? `${conflictCount} cross-doc conflict${conflictCount !== 1 ? 's' : ''} flagged · ${highSeverityCount} at high or critical severity`
+      : `${conflictCount} cross-doc conflict${conflictCount !== 1 ? 's' : ''} flagged across analyzed documents`;
+  return (
+    <span
+      title={title}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 4,
+        fontSize: 10.5,
+        fontWeight: 700,
+        color,
+        background: `color-mix(in srgb, ${color} 12%, transparent)`,
+        border: `1px solid ${color}`,
+        padding: '2px 8px',
+        borderRadius: 999,
+        letterSpacing: '0.04em',
+      }}
+    >
+      <GitCompareArrows size={11} /> {label}
     </span>
   );
 }

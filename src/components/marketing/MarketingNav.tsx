@@ -42,6 +42,7 @@ import {
   ShieldCheck,
   TrendingUp,
   Workflow,
+  Activity,
   X,
   type LucideIcon,
 } from 'lucide-react';
@@ -164,6 +165,13 @@ const MENUS: MegaMenu[] = [
             label: 'Bias Genome',
             description: 'Which biases predict failure, by industry. Sortable, citable.',
             href: '/bias-genome',
+          },
+          {
+            icon: Activity,
+            label: 'Calibration baseline',
+            description:
+              'Procurement-grade Brier evidence over the case library, with reproducibility seed.',
+            href: '/calibration',
           },
           {
             icon: TrendingUp,

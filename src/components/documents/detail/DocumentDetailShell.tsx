@@ -76,6 +76,12 @@ export interface DecisionDetailShellProps {
   leftPane: ReactNode;
   /** Right-pane tab content. Parent renders the active tab's body. */
   rightPaneContent: ReactNode;
+  /** Optional pre-tabs slot — content rendered in the right pane ABOVE
+   *  the tab bar. Used by the document-detail page for the
+   *  persona-validated above-fold cluster (VerdictBand + Top-3 Fix
+   *  Tiles + R²F signal strip) per DESIGN.md universal points #1 + #2.
+   *  Item 1 lock 2026-05-07. */
+  rightPaneAboveTabs?: ReactNode;
   /** Whether the active surface supports inline preview. False renders the empty-preview placeholder. */
   hasPreview?: boolean;
   /** Settings drawer trigger — parent owns drawer state. */
@@ -149,6 +155,7 @@ export function DecisionDetailShell(props: DecisionDetailShellProps) {
     onTabChange,
     leftPane,
     rightPaneContent,
+    rightPaneAboveTabs,
     hasPreview = true,
     onOpenSettings,
     outcomeStrip,
@@ -301,6 +308,12 @@ export function DecisionDetailShell(props: DecisionDetailShellProps) {
             minWidth: 0,
           }}
         >
+          {/* Optional above-tabs slot — VerdictBand + Top-3 Fix Tiles +
+              R²F signal strip per DESIGN.md persona-validated layout
+              direction (Item 1 lock 2026-05-07). When omitted, the right
+              pane reads as before-tab-bar with no extra spacing. */}
+          {rightPaneAboveTabs && <div style={{ marginBottom: 16 }}>{rightPaneAboveTabs}</div>}
+
           {/* Tab bar with corner settings gear */}
           <div
             style={{

@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import { FileText, MoreHorizontal, Calendar, Activity } from 'lucide-react';
+import { FileText, MoreHorizontal, Calendar, Activity, GitCompareArrows } from 'lucide-react';
 import {
   DEAL_STAGES,
   STAGE_COLORS,
@@ -125,13 +125,19 @@ function KanbanCard({
         )}
       </div>
 
-      {/* Footer row — doc count, IC date, composite DQI. A1 lock 2026-04-29:
-          M&A users (Adaeze persona) scan the card for IC date + composite
-          score first; both surfaces ship to-glance instead of requiring
-          a click into the deal page. */}
+      {/* Footer row — doc count, IC date, composite DQI, cross-doc conflicts.
+          A1 lock 2026-04-29 + Item 4 lock 2026-05-07: M&A users (Richard
+          persona) scan the card for IC date + composite score + cross-doc
+          conflict count first; all four surfaces ship to-glance instead
+          of requiring a click into the deal page. The conflict chip is
+          color-coded by highSeverity > 0 — red/amber if any high or
+          critical conflicts, info-blue otherwise. */}
       {(deal._count?.documents > 0 ||
         deal.icDate ||
-        (deal.compositeDqi !== null && deal.compositeDqi !== undefined)) && (
+        (deal.compositeDqi !== null && deal.compositeDqi !== undefined) ||
+        (deal.crossRefConflictCount !== null &&
+          deal.crossRefConflictCount !== undefined &&
+          deal.crossRefConflictCount > 0)) && (
         <div
           style={{
             display: 'flex',
@@ -194,6 +200,40 @@ function KanbanCard({
               DQI {Math.round(deal.compositeDqi)}
             </span>
           )}
+          {deal.crossRefConflictCount !== null &&
+            deal.crossRefConflictCount !== undefined &&
+            deal.crossRefConflictCount > 0 &&
+            (() => {
+              const high = deal.crossRefHighSeverityCount ?? 0;
+              const color =
+                high > 0
+                  ? 'var(--error)'
+                  : deal.crossRefConflictCount >= 3
+                    ? 'var(--warning)'
+                    : 'var(--info)';
+              const title =
+                high > 0
+                  ? `${deal.crossRefConflictCount} cross-doc conflict${deal.crossRefConflictCount !== 1 ? 's' : ''} flagged · ${high} at high or critical severity`
+                  : `${deal.crossRefConflictCount} cross-doc conflict${deal.crossRefConflictCount !== 1 ? 's' : ''} flagged across analyzed documents`;
+              return (
+                <span
+                  title={title}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    fontSize: 10,
+                    fontWeight: 700,
+                    color,
+                  }}
+                >
+                  <GitCompareArrows size={11} />
+                  {deal.crossRefConflictCount} conflict
+                  {deal.crossRefConflictCount !== 1 ? 's' : ''}
+                  {high > 0 ? ` · ${high} high` : null}
+                </span>
+              );
+            })()}
         </div>
       )}
 
