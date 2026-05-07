@@ -42,17 +42,23 @@ const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 const R2F_DETECTORS = [
   {
     id: 'R²F · Detector 1',
-    label: 'Validity Classifier',
+    /** Plain-language label — DESIGN.md universal point #9. Lead the
+     *  cold reader with what the output IS, not what the academic
+     *  literature calls it. The technical name lives in `technicalLabel`
+     *  as a subhead + the academic anchor below. Item 4 lock 2026-05-07. */
+    label: 'Validity',
+    technicalLabel: 'Validity Classifier',
     body: 'Classifies the decision domain into high / medium / low / zero validity. High-validity domains have stable rules and rapid feedback (chess, weather forecasting one week out). Low-validity domains are noisy with delayed feedback (M&A, market entry, long-horizon strategy). Most strategic memos sit in the low / zero band.',
     dqiShift:
       'Confidence-language is penalised harder in low-validity domains (the same rhetorical certainty that scores neutrally on a high-validity decision becomes an Illusion-of-Validity flag in low-validity contexts). Methodology v2.1.0.',
     anchor:
-      'Anchor: Kahneman & Klein, "Conditions for Intuitive Expertise: A Failure to Disagree" (American Psychologist, 2009) — first condition.',
+      'Anchor: Kahneman & Klein, "Conditions for Intuitive Expertise: A Failure to Disagree" (American Psychologist, 2009) · first condition.',
   },
   {
     id: 'R²F · Detector 2',
-    label: 'Reference Class Forecast',
-    body: `Pure-function similarity scoring against the ${PLATFORM_BASELINE_SNAPSHOT.n}-case reference-class corpus. Returns top-5 historical analogs + matched-class baseline failure rate + four-band predicted outcome (succeeds / mixed / struggles / fails / too-small-to-judge). Structurally novel decisions return "too small to judge" rather than a fabricated forecast — the cold-start posture is honest.`,
+    label: 'Outside View',
+    technicalLabel: 'Reference Class Forecast',
+    body: `Pure-function similarity scoring against the ${PLATFORM_BASELINE_SNAPSHOT.n}-case reference-class corpus. Returns top-5 historical analogs + matched-class baseline failure rate + four-band predicted outcome (succeeds / mixed / struggles / fails / too-small-to-judge). Structurally novel decisions return "too small to judge" rather than a fabricated forecast: the cold-start posture is honest.`,
     dqiShift:
       'When the matched class shows a higher base-rate failure than the memo concedes, the audit flags Inside-View Dominance (DI-B-022) and the audit-committee-ready hardening question lands on the cover of the DPR.',
     anchor:
@@ -60,12 +66,13 @@ const R2F_DETECTORS = [
   },
   {
     id: 'R²F · Detector 3',
-    label: 'Feedback Adequacy',
-    body: 'Audits the second condition for trustworthy intuition — has the decision-maker had enough closed-loop feedback in this specific domain for their experience to be calibrated? Verdict bands: adequate (≥10 closed outcomes in domain past 18 months) / sparse (3-9) / cold-start (<3) / unknown.',
+    label: 'Author Calibration',
+    technicalLabel: 'Feedback Adequacy',
+    body: 'Audits the second condition for trustworthy intuition. Has the decision-maker had enough closed-loop feedback in this specific domain for their experience to be calibrated? Verdict bands: adequate (≥10 closed outcomes in domain past 18 months) / sparse (3-9) / cold-start (<3) / unknown.',
     dqiShift:
       'Cold-start posture: an audit by a domain-novice carries the same scrutiny rules as one with high closed-outcome history but the experience-based confidence claims are flagged for the reviewer rather than discounted silently.',
     anchor:
-      'Anchor: Kahneman & Klein (2009) — second condition (adequate opportunity to learn from rapid feedback).',
+      'Anchor: Kahneman & Klein (2009) · second condition (adequate opportunity to learn from rapid feedback).',
   },
 ] as const;
 
@@ -226,7 +233,7 @@ const RESEARCH_CITATIONS = [
     title: 'Principles for Dealing with the Changing World Order',
     year: '2021',
     connection:
-      '18 rise-and-fall determinants (debt cycle, currency cycle, reserve-currency status, governance, infrastructure) feed the Structural Assumptions audit — the macro-layer pass that sits beside cognitive-bias detection, asking what the plan is betting on about the world.',
+      '18 rise-and-fall determinants (debt cycle, currency cycle, reserve-currency status, governance, infrastructure) feed the Structural Assumptions audit, the macro-layer pass that sits beside cognitive-bias detection, asking what the plan is betting on about the world.',
     featureName: 'Structural Assumptions',
   },
 ];
@@ -592,18 +599,27 @@ export function HowItWorksClient() {
         </div>
       </section>
 
-      {/* SECTION 5.25 — R²F DETECTORS ───────────────────────────── */}
+      {/* SECTION 5.25 — R²F DETECTORS ─────────────────────────────
+          Item 4 lock 2026-05-07. Per DESIGN.md universal point #9: cold
+          readers see the OUTPUTS by their plain-language names first
+          (Validity / Outside View / Author Calibration); the academic
+          framework name + citations live as supporting context. The
+          R²F brand stays in the eyebrow + footer because /how-it-works
+          IS the dedicated R²F explainer page — it's a warm-context
+          surface for procurement readers who arrived intentionally. */}
       <section id="r2f-detectors" style={{ padding: '72px 24px 0' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <SectionHeader
-            eyebrow="Recognition-Rigor Framework · the three detectors"
-            title="What R²F actually does on every audit. Three load-bearing checks, three published papers."
+            eyebrow="Three outputs on every audit · plain-language first"
+            title="Validity. Outside View. Author Calibration. Three load-bearing outputs, three published papers."
             body={
               <>
-                Three detectors fire on the audit before the DQI is finalised. Each is grounded in a
-                specific cognitive-science paper, each shifts the score, and each appears as a
-                first-class strip on the cover of the Decision Provenance Record. Procurement
-                readers can verify the methodology against the source paper directly.
+                Three signals fire on the audit before the DQI is finalised. Each one is named for
+                what the buyer reads on the cover of every Decision Provenance Record. Plain
+                language for the procurement reviewer, with the Recognition-Rigor Framework
+                technical names + the source-paper citations carried as the supporting context. Each
+                shifts the score, and each appears as a first-class strip on every audit so the
+                methodology is verifiable against the source paper directly.
               </>
             }
           />
@@ -639,17 +655,29 @@ export function HowItWorksClient() {
                 >
                   {d.id}
                 </div>
-                <h3
-                  style={{
-                    margin: 0,
-                    fontSize: 18,
-                    fontWeight: 700,
-                    color: C.slate900,
-                    letterSpacing: '-0.01em',
-                  }}
-                >
-                  {d.label}
-                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <h3
+                    style={{
+                      margin: 0,
+                      fontSize: 22,
+                      fontWeight: 700,
+                      color: C.slate900,
+                      letterSpacing: '-0.015em',
+                    }}
+                  >
+                    {d.label}
+                  </h3>
+                  <div
+                    style={{
+                      fontSize: 11.5,
+                      fontWeight: 600,
+                      color: C.slate500,
+                      letterSpacing: '0.02em',
+                    }}
+                  >
+                    Technical name · {d.technicalLabel}
+                  </div>
+                </div>
                 <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.55, color: C.slate600 }}>
                   {d.body}
                 </p>
@@ -730,7 +758,7 @@ export function HowItWorksClient() {
                 <strong style={{ color: C.slate900 }}>
                   {PLATFORM_BASELINE_SNAPSHOT.meanBrier.toFixed(3)}
                 </strong>{' '}
-                — fair band, between CIA-analyst (0.23) and motivated-amateur (0.35) per Tetlock
+                · fair band, between CIA-analyst (0.23) and motivated-amateur (0.35) per Tetlock
                 anchors.
               </div>
             </div>
@@ -763,7 +791,7 @@ export function HowItWorksClient() {
           <SectionHeader
             eyebrow="Counterfactual lift"
             title="What shifts when you remove the bias. Made visible."
-            body="Every flagged bias on a memo carries a reproducible lift weight: the exact number of DQI points that returns to the score if the bias is mitigated. Toggle the chips below on the actual WeWork S-1 audit and watch the gauge respond. Same memo, same lift, every time — the calculation is deterministic, not generative."
+            body="Every flagged bias on a memo carries a reproducible lift weight: the exact number of DQI points that returns to the score if the bias is mitigated. Toggle the chips below on the actual WeWork S-1 audit and watch the gauge respond. Same memo, same lift, every time. The calculation is deterministic, not generative."
           />
           <CounterfactualLiftViz />
         </div>
@@ -797,7 +825,7 @@ export function HowItWorksClient() {
           <SectionHeader
             eyebrow="The Decision Provenance Record"
             title="What comes out the end. Hashed, cited, and built to be defended."
-            body="Every audit produces a Decision Provenance Record — the artifact your team carries into the room when the decision is challenged. Each section below is a real part of the record we generate today; click any row to see what it contains, what regulatory provision it satisfies, and what an external reviewer can verify without leaving the document. Specimen records are publicly available so a procurement reviewer can read one before the conversation starts."
+            body="Every audit produces a Decision Provenance Record: the artifact your team carries into the room when the decision is challenged. Each section below is a real part of the record we generate today; click any row to see what it contains, what regulatory provision it satisfies, and what an external reviewer can verify without leaving the document. Specimen records are publicly available so a procurement reviewer can read one before the conversation starts."
           />
           <DprAnatomyViz />
           <div

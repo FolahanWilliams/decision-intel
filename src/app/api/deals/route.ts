@@ -234,10 +234,7 @@ export async function GET(request: NextRequest) {
     // returns its conflictCount + highSeverityCount. Same fail-soft
     // pattern as compositeDqi: skip quietly on schema drift so the
     // kanban list still renders without conflict chips rather than 500ing.
-    const conflictMap = new Map<
-      string,
-      { conflictCount: number; highSeverityCount: number }
-    >();
+    const conflictMap = new Map<string, { conflictCount: number; highSeverityCount: number }>();
     if (dealIds.length > 0) {
       try {
         const rows = await prisma.$queryRaw<

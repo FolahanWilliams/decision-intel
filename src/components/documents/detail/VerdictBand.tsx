@@ -137,18 +137,13 @@ export function VerdictBand({
   // conflicts attached. Color rule mirrors DealKanban + deal-page chip.
   const showConflictChip = conflictCount > 0;
   const conflictColor =
-    highCount > 0
-      ? 'var(--error)'
-      : conflictCount >= 3
-        ? 'var(--warning)'
-        : 'var(--info)';
+    highCount > 0 ? 'var(--error)' : conflictCount >= 3 ? 'var(--warning)' : 'var(--info)';
 
   // The meta-judge verdict is render-suppressed when missing or when the
   // pipeline emitted the "all clear" sentinel (mirrors MetaVerdictPanel).
   const hasInlineVerdict =
     !!metaVerdict &&
-    metaVerdict !==
-      'No significant adversarial points detected; proposal cleared baseline checks.';
+    metaVerdict !== 'No significant adversarial points detected; proposal cleared baseline checks.';
   const verdictPreview = hasInlineVerdict ? metaVerdict!.slice(0, 200) : '';
   const verdictNeedsTruncation = hasInlineVerdict && (metaVerdict?.length ?? 0) > 200;
 
@@ -286,9 +281,7 @@ export function VerdictBand({
                 whiteSpace: 'pre-wrap',
               }}
             >
-              {verdictExpanded || !verdictNeedsTruncation
-                ? metaVerdict
-                : `${verdictPreview}…`}
+              {verdictExpanded || !verdictNeedsTruncation ? metaVerdict : `${verdictPreview}…`}
             </p>
           </div>
           {verdictNeedsTruncation && (

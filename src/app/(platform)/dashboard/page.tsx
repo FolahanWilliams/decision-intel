@@ -2294,6 +2294,31 @@ export default function Dashboard() {
                           : `${sortedDocs.length} documents`}
                       </span>
                     </div>
+                    {/* Compare empty-state hint — Item C lock 2026-05-07.
+                        Users with exactly 1 audit see no Compare affordance
+                        because the chip below requires sortedDocs.length >= 2.
+                        This single-line hint surfaces the feature so the
+                        user knows Compare exists + unlocks on the next
+                        upload. Renders only at length === 1 so it never
+                        competes with the active chip below. */}
+                    {sortedDocs.length === 1 && (
+                      <span
+                        className="flex items-center gap-xs text-xs"
+                        style={{
+                          color: 'var(--text-muted)',
+                          padding: '4px 10px',
+                          borderRadius: 'var(--radius-full)',
+                          background: 'var(--bg-tertiary)',
+                          border: '1px solid var(--border-color)',
+                          fontStyle: 'italic',
+                          whiteSpace: 'nowrap',
+                        }}
+                        title="Side-by-side compare unlocks at 2+ audited memos"
+                      >
+                        <GitCompareArrows size={12} />
+                        Compare unlocks on your next audit
+                      </span>
+                    )}
                     {sortedDocs.length >= 2 &&
                       (() => {
                         // One verb, one chip, four progressive states.

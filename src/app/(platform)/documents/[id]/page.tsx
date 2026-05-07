@@ -68,6 +68,7 @@ import { ReferenceClassChip } from '@/components/documents/ReferenceClassChip';
 import { PaperApplicationsCard } from '@/components/analysis/PaperApplicationsCard';
 import { RemediationChecklist } from '@/components/analysis/RemediationChecklist';
 import { VerdictBand } from '@/components/documents/detail/VerdictBand';
+import { SovereignContextStrip } from '@/components/documents/detail/SovereignContextStrip';
 import { DecisionRoomList } from '@/components/ui/DecisionRoomCard';
 import { VersionHistoryStrip } from '@/components/analysis/VersionHistoryStrip';
 import { VersionDeltaCard } from '@/components/analysis/VersionDeltaCard';
@@ -742,9 +743,7 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
                   contentHash={document.contentHash ?? null}
                   crossDocConflictCount={dealConflictCount}
                   crossDocHighSeverityCount={dealHighSeverityCount}
-                  conflictHref={
-                    document.deal?.id ? `/dashboard/deals/${document.deal.id}` : null
-                  }
+                  conflictHref={document.deal?.id ? `/dashboard/deals/${document.deal.id}` : null}
                   auditedAt={analysis.createdAt}
                   documentId={document.id}
                 />
@@ -754,6 +753,18 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
                   <RemediationChecklist biases={biases} documentId={document.id} />
                 </ErrorBoundary>
               )}
+              {/* Sovereign-context strip — Item A lock 2026-05-07 (Adaeze
+                  persona ask). Renders only when the audit picked up
+                  emerging-market jurisdictions; the data is already
+                  populated by the structuralAssumptions pipeline node.
+                  Renders null gracefully on developed-market deals so
+                  it's safe to mount unconditionally. */}
+              <ErrorBoundary sectionName="Sovereign context">
+                <SovereignContextStrip
+                  marketContext={marketContext}
+                  overridden={!!analysis.marketContextOverride}
+                />
+              </ErrorBoundary>
               <ErrorBoundary sectionName="Paper applications">
                 <PaperApplicationsCard analysisId={analysis.id} />
               </ErrorBoundary>

@@ -217,8 +217,8 @@ export default function LandingPage() {
                   maxWidth: 520,
                 }}
               >
-                Only 8% of strategic moves break out of the middle &mdash; the other 92% carry
-                biases nobody named in the memo (McKinsey).
+                Only 8% of strategic moves break out of the middle. The other 92% carry biases
+                nobody named in the memo (McKinsey).
               </p>
               <p
                 style={{

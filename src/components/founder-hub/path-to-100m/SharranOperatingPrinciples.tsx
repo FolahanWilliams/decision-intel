@@ -173,16 +173,8 @@ function ViolationTable() {
               {v.pillar}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}>
-              <ViolationRow
-                label="Wedge claims"
-                tone="success"
-                body={v.claimed}
-              />
-              <ViolationRow
-                label="Platform actually ships"
-                tone="error"
-                body={v.actualShipped}
-              />
+              <ViolationRow label="Wedge claims" tone="success" body={v.claimed} />
+              <ViolationRow label="Platform actually ships" tone="error" body={v.actualShipped} />
               <ViolationRow label="The fix" tone="info" body={v.fix} />
             </div>
           </div>
@@ -202,11 +194,7 @@ function ViolationRow({
   body: string;
 }) {
   const color =
-    tone === 'success'
-      ? 'var(--success)'
-      : tone === 'error'
-        ? 'var(--error)'
-        : 'var(--info)';
+    tone === 'success' ? 'var(--success)' : tone === 'error' ? 'var(--error)' : 'var(--info)';
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       <span
@@ -408,7 +396,8 @@ function PrincipleCard({
               style={{
                 padding: '10px 12px',
                 background: 'color-mix(in srgb, var(--accent-primary) 6%, transparent)',
-                border: '1px solid color-mix(in srgb, var(--accent-primary) 25%, var(--border-color))',
+                border:
+                  '1px solid color-mix(in srgb, var(--accent-primary) 25%, var(--border-color))',
                 borderLeft: '3px solid var(--accent-primary)',
                 borderRadius: 'var(--radius-sm, 6px)',
               }}
