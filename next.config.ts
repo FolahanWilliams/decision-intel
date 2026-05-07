@@ -50,6 +50,18 @@ const nextConfig: NextConfig = {
         destination: '/dashboard/analytics?view=library',
         permanent: false,
       },
+      // Decision Alpha page deleted 2026-05-07 — the "Published Q2 2026"
+      // claim was a recurring-publication promise without a workflow,
+      // and the synthetic SECTOR_INDEX data carried "30+ biases" count
+      // drift vs the canonical 22-bias taxonomy. Redirect to /proof
+      // (the closest semantic neighbour: actual case-study evidence).
+      // Permanent (308) so search engines drop the URL — we don't plan
+      // to restore it.
+      {
+        source: '/decision-alpha',
+        destination: '/proof',
+        permanent: true,
+      },
     ];
   },
   async headers() {
