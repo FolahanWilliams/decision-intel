@@ -7,6 +7,10 @@
 // Grid coordinates for the landscape map are the founder's positional
 // judgment, not third-party data. They are transparent on the chart.
 
+import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+
+const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
+
 export type Incumbent = {
   id: string;
   name: string;
@@ -397,7 +401,7 @@ export const CATEGORY_THESIS = {
     },
     {
       label: 'Reasoning audit',
-      body: '30+ biases scored across 6 DQI components, mapped to 7 regulatory frameworks. Every score traceable.',
+      body: `30+ biases scored across 6 DQI components, mapped to ${FRAMEWORK_COUNT} regulatory frameworks. Every score traceable.`,
     },
     {
       label: 'Outcome loop',

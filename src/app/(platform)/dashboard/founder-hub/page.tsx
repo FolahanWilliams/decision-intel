@@ -752,10 +752,8 @@ const SEARCH_INDEX: SearchEntry[] = [
   },
   {
     tabId: 'education_room',
-    section:
-      'Education Room · Loss-aversion framing + 17 regulatory frameworks + R²F (Kahneman + Klein) + Founder one-liners',
-    preview:
-      'Kahneman & Tversky 1979 prospect theory applied to your sales pitch · the 17 regulatory frameworks card-by-card · how 3 nodes implement Kahneman + 3 implement Klein + metaJudge arbitrates · External Attack Vectors + ICP wedge vs ceiling.',
+    section: `Education Room · Loss-aversion framing + ${FRAMEWORK_COUNT} regulatory frameworks + R²F (Kahneman + Klein) + Founder one-liners`,
+    preview: `Kahneman & Tversky 1979 prospect theory applied to your sales pitch · the ${FRAMEWORK_COUNT} regulatory frameworks card-by-card · how 3 nodes implement Kahneman + 3 implement Klein + metaJudge arbitrates · External Attack Vectors + ICP wedge vs ceiling.`,
     keywords:
       'education room loss aversion framing kahneman tversky prospect theory regulatory frameworks eu ai act basel iii ndpr cbn waemu popia isa 2007 r2f kahneman klein recognition primed decision pre mortem external attack vectors icp wedge ceiling design partner contract',
   },
