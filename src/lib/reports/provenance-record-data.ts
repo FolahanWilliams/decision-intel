@@ -55,6 +55,15 @@ import {
   type CalibratedRejection,
 } from '@/lib/learning/calibrated-rejection';
 import {
+  getFractionationOfExpertise,
+  type FractionationOfExpertise,
+} from '@/lib/learning/fractionation-of-expertise';
+import { computeDecisionRubric, type DecisionRubric } from '@/lib/learning/decision-rubric';
+import {
+  computeAlgorithmAversion,
+  type AlgorithmAversion,
+} from '@/lib/learning/algorithm-aversion';
+import {
   getUserPlan,
   getOrgPlan,
   getRetentionDaysForUser,
@@ -181,6 +190,36 @@ export interface ProvenanceRecordData {
    * feedback is unknown.
    */
   calibratedRejection?: CalibratedRejection;
+  /**
+   * Fractionation of Expertise (R²F paper-app #1, locked 2026-05-07
+   * wedge-batch-4). Per-decision-class slicing of the author's outcome
+   * history. Names the detected decision class for THIS memo and
+   * compares this-class outcome calibration to other-class outcome
+   * calibration. Closes the Margaret-class "your feedback is sparse FOR
+   * WHICH class?" gap that Feedback Adequacy (paper-app #6) leaves
+   * ambiguous. Renders as §4.7 strip on the DPR cover.
+   */
+  fractionationOfExpertise?: FractionationOfExpertise;
+  /**
+   * Decision Rubric Structure (R²F paper-app #4, anchored in Dawes 1979
+   * "The Robust Beauty of Improper Linear Models"). Pure-function scan
+   * of bias-detective excerpts for structural rubric markers (numbered
+   * criteria, weighted criteria, comparison tables, options-vs-criteria
+   * language) vs narrative-coherence signals (illusion_of_validity +
+   * inside_view_dominance + narrative_fallacy bias hits). Renders as
+   * §4.8 strip on the DPR cover.
+   */
+  decisionRubric?: DecisionRubric;
+  /**
+   * Algorithm Aversion (R²F paper-app #7, anchored in Dietvorst,
+   * Simmons & Massey 2015 "Algorithm Aversion"). Pure-function scan
+   * for language patterns dismissing quantitative analysis in favor of
+   * intuition + authority claims. Counter-programs the most common
+   * buyer objection ("we don't want AI overriding our CSO") by naming
+   * the pattern as a documented decision-making error with citation.
+   * Renders as §4.9 strip on the DPR cover.
+   */
+  algorithmAversion?: AlgorithmAversion;
   /**
    * Data lifecycle / retention policy footer (DPR v2, P2 #4). Always
    * populated — this is the procurement-grade contractual statement of
@@ -1069,6 +1108,16 @@ export async function assembleProvenanceRecordData(
       industry,
     });
 
+  // Bias-input shape shared across the next 4 detectors. Severity is
+  // normalised to the 4-band canonical lowercase form once.
+  const dprNormalisedBiases = (analysis.biases ?? []).map(b => ({
+    biasType: b.biasType,
+    severity: (['critical', 'high', 'medium', 'low'].includes((b.severity ?? '').toLowerCase())
+      ? (b.severity ?? '').toLowerCase()
+      : 'medium') as 'critical' | 'high' | 'medium' | 'low',
+    excerpt: b.excerpt ?? null,
+  }));
+
   // Calibrated Rejection of Subjective Confidence — Item 3 lock
   // 2026-05-07. Pure function combining the validity class + feedback
   // adequacy + bias-detective hits on confidence-language patterns
@@ -1080,12 +1129,29 @@ export async function assembleProvenanceRecordData(
   const calibratedRejection = computeCalibratedRejection({
     validity: validityClassification,
     feedback: feedbackAdequacy,
-    biases: (analysis.biases ?? []).map(b => ({
-      biasType: b.biasType,
-      severity: ['critical', 'high', 'medium', 'low'].includes((b.severity ?? '').toLowerCase())
-        ? ((b.severity ?? '').toLowerCase() as 'critical' | 'high' | 'medium' | 'low')
-        : 'medium',
-    })),
+    biases: dprNormalisedBiases,
+  });
+
+  // Fractionation of Expertise — R²F paper-app #1 (wedge-batch-4 lock
+  // 2026-05-07). Per-decision-class slicing of the user's outcome
+  // history. Single Prisma query inside the detector with try/catch +
+  // 'cannot_assess' fallback — never crashes the DPR path.
+  const fractionationOfExpertise = await getFractionationOfExpertise(prisma, userId, {
+    documentType,
+  });
+
+  // Decision Rubric Structure — R²F paper-app #4 (Dawes 1979). Pure
+  // function over bias excerpts + summary; deterministic, no DB call.
+  const decisionRubric = computeDecisionRubric({
+    biases: dprNormalisedBiases,
+    summary: analysis.summary,
+  });
+
+  // Algorithm Aversion — R²F paper-app #7 (Dietvorst et al. 2015). Pure
+  // function over bias excerpts + summary; deterministic, no DB call.
+  const algorithmAversion = computeAlgorithmAversion({
+    biases: dprNormalisedBiases,
+    summary: analysis.summary,
   });
 
   // Phase 4 wire-in: build the per-bias findings augment from the live
@@ -1134,6 +1200,9 @@ export async function assembleProvenanceRecordData(
     referenceClassForecast,
     validityClassification,
     calibratedRejection,
+    fractionationOfExpertise,
+    decisionRubric,
+    algorithmAversion,
     dataLifecycle,
     clientSafe: undefined,
     schemaVersion: 2,
@@ -1276,6 +1345,10 @@ export async function assembleProvenanceRecordDataForPackage(
       feedbackAdequacy: undefined,
       referenceClassForecast: undefined,
       validityClassification: undefined,
+      calibratedRejection: undefined,
+      fractionationOfExpertise: undefined,
+      decisionRubric: undefined,
+      algorithmAversion: undefined,
       dataLifecycle: await buildDataLifecycle('', null),
       clientSafe: undefined,
       schemaVersion: 2,
@@ -1518,6 +1591,10 @@ export async function assembleProvenanceRecordDataForDeal(
       feedbackAdequacy: undefined,
       referenceClassForecast: undefined,
       validityClassification: undefined,
+      calibratedRejection: undefined,
+      fractionationOfExpertise: undefined,
+      decisionRubric: undefined,
+      algorithmAversion: undefined,
       dataLifecycle: await buildDataLifecycle('', null),
       clientSafe: undefined,
       schemaVersion: 2,

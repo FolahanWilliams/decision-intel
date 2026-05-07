@@ -1,12 +1,30 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Telescope, History, Activity, ExternalLink, Scale } from 'lucide-react';
+import {
+  Telescope,
+  History,
+  Activity,
+  ExternalLink,
+  Scale,
+  Layers,
+  ListChecks,
+  Calculator,
+} from 'lucide-react';
 import type { ValidityClassification } from '@/lib/learning/validity-classifier';
 import type { ReferenceClassForecast } from '@/lib/learning/reference-class-forecast';
 import type { FeedbackAdequacy } from '@/lib/learning/feedback-adequacy';
 import type { CalibratedRejection } from '@/lib/learning/calibrated-rejection';
 import { calibratedRejectionVerdictLabel } from '@/lib/learning/calibrated-rejection';
+import type { FractionationOfExpertise } from '@/lib/learning/fractionation-of-expertise';
+import {
+  fractionationVerdictLabel,
+  decisionClassLabel,
+} from '@/lib/learning/fractionation-of-expertise';
+import type { DecisionRubric } from '@/lib/learning/decision-rubric';
+import { decisionRubricVerdictLabel } from '@/lib/learning/decision-rubric';
+import type { AlgorithmAversion } from '@/lib/learning/algorithm-aversion';
+import { algorithmAversionVerdictLabel } from '@/lib/learning/algorithm-aversion';
 import { SignalBlock, SignalBlockGrid, type SignalBand } from '@/components/ui/SignalBlock';
 
 /**
@@ -38,6 +56,9 @@ interface InsightsResponse {
   referenceClassForecast: ReferenceClassForecast;
   feedbackAdequacy: FeedbackAdequacy;
   calibratedRejection: CalibratedRejection;
+  fractionationOfExpertise: FractionationOfExpertise;
+  decisionRubric: DecisionRubric;
+  algorithmAversion: AlgorithmAversion;
   validitySource: 'persisted' | 'live';
 }
 
@@ -97,6 +118,41 @@ const CR_BAND: Record<CalibratedRejection['verdict'], SignalBand> = {
   cannot_assess: 'unknown',
 };
 
+// Fractionation of Expertise — Kahneman & Klein 2009. Wedge-batch-4
+// lock 2026-05-07. Renders as the 5th SignalBlock answering the
+// Margaret-class question "your feedback is sparse FOR WHICH class?"
+const FRAC_BAND: Record<FractionationOfExpertise['verdict'], SignalBand> = {
+  class_calibrated: 'low',
+  broadly_calibrated: 'medium',
+  fractionated_uncalibrated: 'high',
+  broadly_cold_start: 'unknown',
+  cannot_assess: 'unknown',
+};
+
+// Decision Rubric Structure — Dawes 1979. Wedge-batch-4 lock 2026-05-07.
+// Renders as the 6th SignalBlock answering "did the memo follow Dawes'
+// robust pattern (criteria + weights + comparison) or argue narrative
+// coherence for a foregone conclusion?"
+const RUBRIC_BAND: Record<DecisionRubric['verdict'], SignalBand> = {
+  explicit_rubric: 'low',
+  partial_criteria: 'neutral',
+  narrative_dominant: 'medium',
+  narrative_only: 'critical',
+  cannot_assess: 'unknown',
+};
+
+// Algorithm Aversion — Dietvorst, Simmons & Massey 2015. Wedge-batch-4
+// lock 2026-05-07. Renders as the 7th SignalBlock counter-programming
+// the most common buyer objection ("we don't want AI overriding our
+// CSO") by naming it as a documented decision-making error.
+const AVERSION_BAND: Record<AlgorithmAversion['verdict'], SignalBand> = {
+  no_aversion_signal: 'low',
+  mild_aversion: 'neutral',
+  material_aversion: 'high',
+  severe_aversion: 'critical',
+  cannot_assess: 'unknown',
+};
+
 export function PaperApplicationsCard({ analysisId }: { analysisId: string }) {
   const [data, setData] = useState<InsightsResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -143,11 +199,21 @@ export function PaperApplicationsCard({ analysisId }: { analysisId: string }) {
     return null; // Silent failure — non-load-bearing on the audit page
   }
 
-  const { validityClassification, referenceClassForecast, feedbackAdequacy, calibratedRejection } =
-    data;
+  const {
+    validityClassification,
+    referenceClassForecast,
+    feedbackAdequacy,
+    calibratedRejection,
+    fractionationOfExpertise,
+    decisionRubric,
+    algorithmAversion,
+  } = data;
   const rc = referenceClassForecast;
   const fa = feedbackAdequacy;
   const cr = calibratedRejection;
+  const frac = fractionationOfExpertise;
+  const rubric = decisionRubric;
+  const aversion = algorithmAversion;
 
   return (
     <div style={{ marginBottom: 16 }}>
@@ -310,6 +376,184 @@ export function PaperApplicationsCard({ analysisId }: { analysisId: string }) {
                   </span>
                 ))}
               </div>
+            </div>
+          )}
+        </SignalBlock>
+
+        {/* Fractionation of Expertise — Kahneman & Klein 2009. Wedge-
+            batch-4 lock 2026-05-07. Per-class slicing of the author's
+            outcome history; surfaces the detected decision class for
+            this memo + the comparative track record on other classes.
+            The procurement-grade answer to "your feedback is sparse —
+            sparse FOR WHICH decision class?" */}
+        <SignalBlock
+          eyebrow="Class-Specific Calibration"
+          icon={Layers}
+          verdict={fractionationVerdictLabel(frac.verdict)}
+          band={FRAC_BAND[frac.verdict]}
+          metric={
+            frac.verdict !== 'cannot_assess'
+              ? `${decisionClassLabel(frac.detectedClass)} · ${frac.thisClassRecentOutcomes} this-class outcomes (18mo)`
+              : null
+          }
+          rationale={frac.note}
+          tooltip="Fractionation of Expertise — Kahneman & Klein 2009 finding that expert validity is sub-domain-specific. A senior expert can be calibrated on M&A integration but cold-start on market entry. The detector slices the author's outcome history by decision class and contrasts this-class to other-class calibration."
+          citation={<>Kahneman &amp; Klein 2009 · paper-application #1</>}
+        >
+          {frac.classBreakdown.length > 1 && (
+            <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div
+                style={{
+                  fontSize: 'var(--fs-3xs)',
+                  fontWeight: 600,
+                  color: 'var(--text-muted)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                }}
+              >
+                Track record by class
+              </div>
+              {frac.classBreakdown.slice(0, 4).map(row => (
+                <div
+                  key={row.decisionClass}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 8,
+                    padding: '4px 8px',
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: 'var(--fs-xs)',
+                    color: 'var(--text-primary)',
+                  }}
+                >
+                  <span>
+                    {decisionClassLabel(row.decisionClass)}
+                    {row.decisionClass === frac.detectedClass && (
+                      <span
+                        style={{
+                          marginLeft: 6,
+                          fontSize: 'var(--fs-3xs)',
+                          color: 'var(--accent-primary)',
+                          fontWeight: 600,
+                        }}
+                      >
+                        · this memo
+                      </span>
+                    )}
+                  </span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: 'var(--fs-3xs)' }}>
+                    {row.recentOutcomes} recent · {row.outcomes} total · {row.verdict}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </SignalBlock>
+
+        {/* Decision Rubric Structure — Dawes 1979 "Improper Linear
+            Models." Pure-function scan of bias excerpts for rubric
+            markers vs narrative-coherence signals. The procurement-grade
+            answer to "did the memo argue narrative coherence or follow
+            Dawes' robust pattern?" */}
+        <SignalBlock
+          eyebrow="Rubric Structure"
+          icon={ListChecks}
+          verdict={decisionRubricVerdictLabel(rubric.verdict)}
+          band={RUBRIC_BAND[rubric.verdict]}
+          metric={
+            rubric.verdict !== 'cannot_assess'
+              ? `structure ${rubric.structureScore.toFixed(2)} · narrative ${rubric.narrativeScore.toFixed(2)}`
+              : null
+          }
+          rationale={rubric.note}
+          tooltip="Decision Rubric Structure — Dawes (1979) 'The Robust Beauty of Improper Linear Models in Decision Making.' A simple equal-weight rubric outperforms expert intuition + rubric override. The detector scans for structural rubric markers (criteria + weights + comparison) and contrasts them with narrative-coherence signals (illusion_of_validity / inside_view_dominance hits)."
+          citation={<>Dawes 1979 · paper-application #4</>}
+        >
+          {rubric.structuralMarkers.length > 0 && (
+            <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div
+                style={{
+                  fontSize: 'var(--fs-3xs)',
+                  fontWeight: 600,
+                  color: 'var(--text-muted)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                }}
+              >
+                Structural markers detected
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                {rubric.structuralMarkers.slice(0, 4).map((marker, i) => (
+                  <span
+                    key={`${marker}-${i}`}
+                    style={{
+                      fontSize: 'var(--fs-3xs)',
+                      fontFamily: 'ui-monospace, monospace',
+                      padding: '2px 6px',
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: 'var(--radius-sm)',
+                      color: 'var(--text-secondary)',
+                    }}
+                  >
+                    {marker}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </SignalBlock>
+
+        {/* Algorithm Aversion — Dietvorst, Simmons & Massey 2015.
+            Counter-programs the most common buyer objection ("we don't
+            want AI overruling our CSO") by naming dismissive-of-
+            quantitative language as a documented decision-making error. */}
+        <SignalBlock
+          eyebrow="Algorithm Trust"
+          icon={Calculator}
+          verdict={algorithmAversionVerdictLabel(aversion.verdict)}
+          band={AVERSION_BAND[aversion.verdict]}
+          metric={
+            aversion.verdict !== 'cannot_assess' && aversion.dismissivePhraseCount > 0
+              ? `${aversion.dismissivePhraseCount} dismissive phrase${aversion.dismissivePhraseCount === 1 ? '' : 's'} · score ${aversion.aversionScore.toFixed(2)}`
+              : null
+          }
+          rationale={aversion.note}
+          tooltip="Algorithm Aversion — Dietvorst, Simmons & Massey (2015) 'Algorithm Aversion: People Erroneously Avoid Algorithms After Seeing Them Err.' Humans are systematically more forgiving of human errors than equivalent algorithm errors, even when the algorithm is statistically superior. The detector flags dismissive-of-quantitative language as a documented bias rather than letting it pass as judgment."
+          citation={<>Dietvorst, Simmons &amp; Massey 2015 · paper-application #7</>}
+        >
+          {aversion.flaggedSnippets.length > 0 && (
+            <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div
+                style={{
+                  fontSize: 'var(--fs-3xs)',
+                  fontWeight: 600,
+                  color: 'var(--text-muted)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                }}
+              >
+                Flagged language
+              </div>
+              {aversion.flaggedSnippets.slice(0, 2).map((snip, i) => (
+                <div
+                  key={`${snip}-${i}`}
+                  style={{
+                    fontSize: 'var(--fs-xs)',
+                    padding: '4px 8px',
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: 'var(--radius-sm)',
+                    color: 'var(--text-secondary)',
+                    fontStyle: 'italic',
+                  }}
+                >
+                  &ldquo;{snip.trim()}&rdquo;
+                </div>
+              ))}
             </div>
           )}
         </SignalBlock>

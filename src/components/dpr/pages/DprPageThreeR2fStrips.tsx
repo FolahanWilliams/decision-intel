@@ -1,8 +1,10 @@
 /**
  * DPR Page Three — R²F Procurement Strips.
  *
- * Locked 2026-05-05 (Phase 2). The third page of the legal-evidence-record
- * arc. Six R²F-anchored signals render as severity-colored strips:
+ * Locked 2026-05-05 (Phase 2), extended 2026-05-07 (wedge-batch-4 to 9
+ * strips, completing the K&K 2009 paper-application sprint to 10 of 10).
+ * The third page of the legal-evidence-record arc. Nine R²F-anchored
+ * signals render as severity-colored strips:
  *
  *   §4.1 — Validity Classification (Kahneman & Klein 2009 first condition)
  *   §4.2 — Reference Class Forecast (Kahneman & Lovallo 2003)
@@ -14,6 +16,17 @@
  *          calibrated against THIS org's outcomes)
  *   §4.6 — Counterfactual Impact (top-3 bias scenarios with expected
  *          improvement)
+ *   §4.7 — Class-Specific Calibration (paper-app #1, wedge-batch-4 lock
+ *          2026-05-07) — Fractionation of Expertise; per-class slice of
+ *          the author's outcome history. Closes the "your feedback is
+ *          sparse FOR WHICH class?" gap §4.3 leaves ambiguous.
+ *   §4.8 — Rubric Structure (paper-app #4, Dawes 1979 "The Robust
+ *          Beauty of Improper Linear Models") — pure-function scan for
+ *          rubric markers vs narrative-coherence signals.
+ *   §4.9 — Algorithm Trust (paper-app #7, Dietvorst, Simmons & Massey
+ *          2015 "Algorithm Aversion") — flags dismissive-of-quantitative
+ *          language as a documented decision-making error rather than
+ *          letting it pass as judgment.
  *
  * Each strip is independent — when an audit lacks data for a strip, that
  * strip is silently omitted (no fabrication). The procurement reader sees
@@ -29,6 +42,15 @@ import type { ValidityClassification } from '@/lib/learning/validity-classifier'
 import type { ReferenceClassForecast } from '@/lib/learning/reference-class-forecast';
 import type { FeedbackAdequacy } from '@/lib/learning/feedback-adequacy';
 import type { CalibratedRejection } from '@/lib/learning/calibrated-rejection';
+import type { FractionationOfExpertise } from '@/lib/learning/fractionation-of-expertise';
+import {
+  fractionationVerdictLabel,
+  decisionClassLabel,
+} from '@/lib/learning/fractionation-of-expertise';
+import type { DecisionRubric } from '@/lib/learning/decision-rubric';
+import { decisionRubricVerdictLabel } from '@/lib/learning/decision-rubric';
+import type { AlgorithmAversion } from '@/lib/learning/algorithm-aversion';
+import { algorithmAversionVerdictLabel } from '@/lib/learning/algorithm-aversion';
 
 export interface DprPageThreeR2fStripsProps {
   data: ProvenanceRecordData;
@@ -55,7 +77,10 @@ export function DprPageThreeR2fStrips(props: DprPageThreeR2fStripsProps) {
     data.feedbackAdequacy ||
     data.calibratedRejection ||
     data.orgCalibration ||
-    data.counterfactualImpact;
+    data.counterfactualImpact ||
+    data.fractionationOfExpertise ||
+    data.decisionRubric ||
+    data.algorithmAversion;
 
   return (
     <DprPageShell
@@ -69,7 +94,7 @@ export function DprPageThreeR2fStrips(props: DprPageThreeR2fStripsProps) {
         marker="§4"
         eyebrow="Recognition-Rigor Framework"
         title="Procurement-grade audit signals"
-        strap='The five strips below operationalise Kahneman & Klein (2009) "Conditions for Intuitive Expertise." Each strip independently answers a question a procurement reviewer should be able to ask of any AI-augmented decision audit. When a signal cannot be honestly produced (insufficient data, novel decision class), the strip is omitted rather than fabricated.'
+        strap='The nine strips below operationalise Kahneman & Klein (2009) "Conditions for Intuitive Expertise" plus Kahneman & Lovallo (2003), Dawes (1979), and Dietvorst, Simmons & Massey (2015). Each strip independently answers a question a procurement reviewer should be able to ask of any AI-augmented decision audit. When a signal cannot be honestly produced (insufficient data, novel decision class), the strip is omitted rather than fabricated.'
       >
         {!hasAnyStrip && (
           <DprNotice mark="Cold start">
@@ -91,6 +116,14 @@ export function DprPageThreeR2fStrips(props: DprPageThreeR2fStripsProps) {
         {data.orgCalibration && <OrgCalibrationStrip oc={data.orgCalibration} />}
 
         {data.counterfactualImpact && <CounterfactualImpactStrip ci={data.counterfactualImpact} />}
+
+        {data.fractionationOfExpertise && (
+          <FractionationStrip frac={data.fractionationOfExpertise} />
+        )}
+
+        {data.decisionRubric && <DecisionRubricStrip rubric={data.decisionRubric} />}
+
+        {data.algorithmAversion && <AlgorithmAversionStrip aversion={data.algorithmAversion} />}
       </DprSection>
 
       <DprNotice mark="On vocabulary">
@@ -436,6 +469,171 @@ function CounterfactualImpactStrip({
       {!ci.monetaryAnchorAvailable
         ? ' Estimates are capped to percentage points; this audit lacks a monetary anchor (no DecisionFrame value attached).'
         : ''}
+    </DprRiskStrip>
+  );
+}
+
+function FractionationStrip({ frac }: { frac: FractionationOfExpertise }) {
+  // Wedge-batch-4 lock 2026-05-07. R²F paper-app #1.
+  const severity: DprSeverity =
+    frac.verdict === 'class_calibrated'
+      ? 'low'
+      : frac.verdict === 'broadly_calibrated'
+        ? 'medium'
+        : frac.verdict === 'fractionated_uncalibrated'
+          ? 'high'
+          : 'info';
+
+  const headline =
+    frac.verdict === 'class_calibrated'
+      ? `Author has calibrated track record on ${decisionClassLabel(frac.detectedClass)} specifically.`
+      : frac.verdict === 'broadly_calibrated'
+        ? `Author has aggregate outcomes but only ${frac.thisClassRecentOutcomes} on ${decisionClassLabel(frac.detectedClass)} — sub-domain calibration matters per K&K 2009.`
+        : frac.verdict === 'fractionated_uncalibrated'
+          ? `Fractionation pattern: track record exists on adjacent classes but NOT on ${decisionClassLabel(frac.detectedClass)} — the canonical "senior expert, wrong sub-domain" failure mode.`
+          : frac.verdict === 'broadly_cold_start'
+            ? `Insufficient closed-loop outcomes across all decision classes — treat experience claims as cold-start.`
+            : `Fractionation cannot be assessed — outcome lookup unavailable.`;
+
+  const topClasses = frac.classBreakdown.slice(0, 3);
+
+  return (
+    <DprRiskStrip
+      label="§4.7 · Class-specific calibration"
+      band={fractionationVerdictLabel(frac.verdict)}
+      severity={severity}
+      headline={headline}
+      footRows={[
+        { k: 'Detected class', v: decisionClassLabel(frac.detectedClass) },
+        {
+          k: 'This-class outcomes (18mo)',
+          v: frac.thisClassRecentOutcomes.toString(),
+        },
+        ...topClasses.map(row => ({
+          k: decisionClassLabel(row.decisionClass),
+          v: `${row.recentOutcomes} recent · ${row.outcomes} total · ${row.verdict}`,
+        })),
+      ]}
+    >
+      {frac.note} Per Kahneman &amp; Klein (2009), expert validity is sub-domain-specific — a senior
+      expert can be calibrated on M&amp;A integration and cold-start on market entry. The
+      Fractionation of Expertise detector slices the author&apos;s outcome history per decision
+      class and contrasts this-class to other-class calibration.
+    </DprRiskStrip>
+  );
+}
+
+function DecisionRubricStrip({ rubric }: { rubric: DecisionRubric }) {
+  // Wedge-batch-4 lock 2026-05-07. R²F paper-app #4 (Dawes 1979).
+  const severity: DprSeverity =
+    rubric.verdict === 'explicit_rubric'
+      ? 'low'
+      : rubric.verdict === 'partial_criteria'
+        ? 'info'
+        : rubric.verdict === 'narrative_dominant'
+          ? 'medium'
+          : rubric.verdict === 'narrative_only'
+            ? 'critical'
+            : 'info';
+
+  const headline =
+    rubric.verdict === 'explicit_rubric'
+      ? `Memo follows Dawes' (1979) robust pattern — criteria + weights + systematic comparison.`
+      : rubric.verdict === 'partial_criteria'
+        ? `Some structural rubric markers detected but the full robust pattern is incomplete.`
+        : rubric.verdict === 'narrative_dominant'
+          ? `Narrative-dominant memo with confidence-language hits — the inside-view error pattern Dawes (1979) showed reduces predictive accuracy.`
+          : rubric.verdict === 'narrative_only'
+            ? `Procurement-blocker class: the canonical Dawes-failure pattern — narrative-only with multiple confidence-language hits and no structural counter-signal.`
+            : `Decision rubric structure cannot be assessed — insufficient signal in available excerpts.`;
+
+  return (
+    <DprRiskStrip
+      label="§4.8 · Rubric structure"
+      band={decisionRubricVerdictLabel(rubric.verdict)}
+      severity={severity}
+      headline={headline}
+      footRows={[
+        { k: 'Structure score', v: rubric.structureScore.toFixed(2) },
+        { k: 'Narrative score', v: rubric.narrativeScore.toFixed(2) },
+        {
+          k: 'Markers detected',
+          v:
+            rubric.structuralMarkers.length > 0
+              ? rubric.structuralMarkers.slice(0, 3).join(', ')
+              : 'none',
+        },
+        {
+          k: 'Narrative triggers',
+          v:
+            rubric.narrativeTriggers.length > 0
+              ? rubric.narrativeTriggers.slice(0, 2).join(', ')
+              : 'none',
+        },
+      ]}
+    >
+      {rubric.note} Per Dawes (1979) &ldquo;The Robust Beauty of Improper Linear Models in Decision
+      Making,&rdquo; a simple equal-weight rubric outperforms expert intuition + rubric override.
+      The most reliable memos identify decision criteria, weight them, and evaluate options
+      systematically; the least reliable argue narrative coherence for a foregone conclusion.
+    </DprRiskStrip>
+  );
+}
+
+function AlgorithmAversionStrip({ aversion }: { aversion: AlgorithmAversion }) {
+  // Wedge-batch-4 lock 2026-05-07. R²F paper-app #7 (Dietvorst 2015).
+  const severity: DprSeverity =
+    aversion.verdict === 'no_aversion_signal'
+      ? 'low'
+      : aversion.verdict === 'mild_aversion'
+        ? 'info'
+        : aversion.verdict === 'material_aversion'
+          ? 'high'
+          : aversion.verdict === 'severe_aversion'
+            ? 'critical'
+            : 'info';
+
+  const headline =
+    aversion.verdict === 'no_aversion_signal'
+      ? `Memo treats quantitative + systematic analysis on its merits — no algorithm-aversion signal detected.`
+      : aversion.verdict === 'mild_aversion'
+        ? `Mild algorithm-aversion language detected — surface but no audit-committee flag fires.`
+        : aversion.verdict === 'material_aversion'
+          ? `Material algorithm-aversion pattern — memo dismisses systematic analysis in a way Dietvorst et al. (2015) named as a documented decision-making error.`
+          : aversion.verdict === 'severe_aversion'
+            ? `Procurement-blocker class: severe algorithm-aversion pattern — the canonical "experienced operator overruling the data" failure mode.`
+            : `Algorithm-aversion verdict cannot be assessed — no scannable text.`;
+
+  return (
+    <DprRiskStrip
+      label="§4.9 · Algorithm trust"
+      band={algorithmAversionVerdictLabel(aversion.verdict)}
+      severity={severity}
+      headline={headline}
+      footRows={[
+        { k: 'Aversion score', v: aversion.aversionScore.toFixed(2) },
+        { k: 'Dismissive phrases', v: aversion.dismissivePhraseCount.toString() },
+        {
+          k: 'Patterns',
+          v:
+            aversion.patternsDetected.length > 0
+              ? aversion.patternsDetected.slice(0, 2).join(', ')
+              : 'none',
+        },
+        {
+          k: 'Compound bias hits',
+          v:
+            aversion.compoundBiasHits.length > 0
+              ? aversion.compoundBiasHits.slice(0, 2).join(', ')
+              : 'none',
+        },
+      ]}
+    >
+      {aversion.note} Per Dietvorst, Simmons &amp; Massey (2015) &ldquo;Algorithm Aversion: People
+      Erroneously Avoid Algorithms After Seeing Them Err,&rdquo; humans are systematically more
+      forgiving of human errors than equivalent algorithm errors. The detector flags dismissive-of-
+      quantitative language as a documented bias rather than letting it pass as judgment — the
+      counter-program to the most common buyer objection.
     </DprRiskStrip>
   );
 }

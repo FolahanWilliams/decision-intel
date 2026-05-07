@@ -32,6 +32,15 @@ import {
   computeCalibratedRejection,
   type CalibratedRejection,
 } from '@/lib/learning/calibrated-rejection';
+import {
+  getFractionationOfExpertise,
+  type FractionationOfExpertise,
+} from '@/lib/learning/fractionation-of-expertise';
+import { computeDecisionRubric, type DecisionRubric } from '@/lib/learning/decision-rubric';
+import {
+  computeAlgorithmAversion,
+  type AlgorithmAversion,
+} from '@/lib/learning/algorithm-aversion';
 
 const log = createLogger('AnalysisInsightsAPI');
 
@@ -46,6 +55,22 @@ export interface AnalysisInsightsResponse {
    *  Surfaces Margaret-class "does this memo's confidence match the
    *  evidence?" question as a verdict band on the live audit + DPR. */
   calibratedRejection: CalibratedRejection;
+  /** Fractionation of Expertise — R²F paper-app #1 (locked 2026-05-07,
+   *  wedge-batch-4). Per-decision-class slicing of the author's closed-
+   *  outcome history. Answers the Margaret-class question "your feedback
+   *  is sparse — sparse FOR WHICH decision class?" by naming the
+   *  detected class + comparing this-class to other-class track records. */
+  fractionationOfExpertise: FractionationOfExpertise;
+  /** Decision Rubric Structure — R²F paper-app #4, anchored in Dawes
+   *  (1979) "The Robust Beauty of Improper Linear Models." Pure-function
+   *  scan of bias excerpts for rubric markers (criteria + weights +
+   *  systematic option scoring) vs narrative-coherence signals. */
+  decisionRubric: DecisionRubric;
+  /** Algorithm Aversion — R²F paper-app #7, anchored in Dietvorst,
+   *  Simmons & Massey (2015) "Algorithm Aversion." Pure-function scan
+   *  for language patterns dismissing quantitative analysis in favor of
+   *  intuition + authority claims. */
+  algorithmAversion: AlgorithmAversion;
   /** Source of the validity classification — 'persisted' when the
    *  pipeline stored it on judgeOutputs at audit-completion time,
    *  'live' when computed at request time (legacy fallback). */
@@ -74,7 +99,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   let analysis: {
     id: string;
     judgeOutputs: unknown;
-    biases: Array<{ biasType: string; severity: string }>;
+    summary: string | null;
+    biases: Array<{ biasType: string; severity: string; excerpt: string | null }>;
     document: {
       userId: string;
       documentType: string | null;
@@ -86,8 +112,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       select: {
         id: true,
         judgeOutputs: true,
+        summary: true,
         biases: {
-          select: { biasType: true, severity: true },
+          select: { biasType: true, severity: true, excerpt: true },
         },
         document: {
           select: {
@@ -134,6 +161,16 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     domainHint: documentType,
   });
 
+  // Bias-input shape shared across the next 4 detectors. Severity is
+  // normalised to the 4-band canonical lowercase form once.
+  const normalisedBiases = analysis.biases.map(b => ({
+    biasType: b.biasType,
+    severity: (['critical', 'high', 'medium', 'low'].includes(b.severity.toLowerCase())
+      ? b.severity.toLowerCase()
+      : 'medium') as 'critical' | 'high' | 'medium' | 'low',
+    excerpt: b.excerpt,
+  }));
+
   // Calibrated Rejection — Item 3 lock 2026-05-07. Pure function over
   // the existing 3 detectors + the bias detective's confidence-language
   // hits. Margaret-class "does this memo's confidence match the
@@ -141,12 +178,33 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const calibratedRejection = computeCalibratedRejection({
     validity: validityClassification,
     feedback: feedbackAdequacy,
-    biases: analysis.biases.map(b => ({
-      biasType: b.biasType,
-      severity: ['critical', 'high', 'medium', 'low'].includes(b.severity.toLowerCase())
-        ? (b.severity.toLowerCase() as 'critical' | 'high' | 'medium' | 'low')
-        : 'medium',
-    })),
+    biases: normalisedBiases,
+  });
+
+  // Fractionation of Expertise — R²F paper-app #1 (wedge-batch-4 lock
+  // 2026-05-07). Per-class slicing of the author's outcome history.
+  // Single Prisma query, schema-drift-tolerant via try/catch inside the
+  // detector — never crashes this endpoint.
+  const fractionationOfExpertise = await getFractionationOfExpertise(
+    prisma,
+    analysis.document.userId,
+    {
+      documentType,
+    }
+  );
+
+  // Decision Rubric Structure — R²F paper-app #4 (Dawes 1979). Pure
+  // function over bias excerpts + summary; no DB call.
+  const decisionRubric = computeDecisionRubric({
+    biases: normalisedBiases,
+    summary: analysis.summary,
+  });
+
+  // Algorithm Aversion — R²F paper-app #7 (Dietvorst et al. 2015). Pure
+  // function over bias excerpts + summary; no DB call.
+  const algorithmAversion = computeAlgorithmAversion({
+    biases: normalisedBiases,
+    summary: analysis.summary,
   });
 
   const body: AnalysisInsightsResponse = {
@@ -155,6 +213,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     referenceClassForecast,
     feedbackAdequacy,
     calibratedRejection,
+    fractionationOfExpertise,
+    decisionRubric,
+    algorithmAversion,
     validitySource,
   };
 

@@ -334,12 +334,15 @@ function renderPositioningAnchor() {
         3 only. Canonical at <code>docs/gtm-plan-v3-5-2026-05-04.md</code> + Path-to-£100M tab.
       </div>
       <div style={anchorRow}>
-        <strong>R²F operationalisation (locked 2026-04-30):</strong> 22-bias taxonomy (DI-B-001
-        through DI-B-022) · DQI methodology v2.1.0 with validity-aware structural weight shift · six
-        paper-anchored signals on every DPR cover (Validity Classification → Org Calibration →
-        Feedback Adequacy → Reference Class Forecast → Counterfactual Impact → Recommended Action).
-        Academic anchors: Kahneman & Klein 2009, Kahneman & Lovallo 2003 HBR, Klein & Mitchell 1995.
-        Paper-application sprint: 6 of 10 ranked items shipped.
+        <strong>R²F operationalisation (sprint complete 2026-05-07 · 10 of 10):</strong> 22-bias
+        taxonomy (DI-B-001 through DI-B-022) · DQI methodology v2.1.0 with validity-aware structural
+        weight shift · 9 paper-anchored signals on every DPR cover (Validity Classification §4.1 →
+        Reference Class Forecast §4.2 → Feedback Adequacy §4.3 → Confidence Calibration §4.4 → Org
+        Calibration §4.5 → Counterfactual Impact §4.6 → Class-Specific Calibration §4.7 → Rubric
+        Structure §4.8 → Algorithm Trust §4.9). Five distinct academic anchors with DOIs: Kahneman &
+        Klein 2009, Kahneman & Lovallo 2003 HBR, Klein & Mitchell 1995, Dawes 1979, Dietvorst,
+        Simmons & Massey 2015. Live atlas at <code>/r2f-standard</code> · click any of the 10
+        detector cards to see mechanism + implementation file + signal-shape mini-viz.
       </div>
       <div style={anchorBanned}>
         <strong>Banned:</strong>{' '}

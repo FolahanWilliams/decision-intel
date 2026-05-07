@@ -33,6 +33,7 @@ import {
   PLATFORM_BASELINE_SNAPSHOT,
   PLATFORM_BASELINE_FOOTNOTE,
 } from '@/lib/learning/platform-baseline-snapshot';
+import { R2FDetectorAtlas } from '@/components/marketing/r2f-standard/R2FDetectorAtlas';
 
 // Tetlock-anchored Brier scale — ordered low→high (low = better calibration).
 // "self" marks where DI's seed baseline lands so the scale reads as procurement
@@ -671,6 +672,15 @@ export function R2FStandardClient() {
           ))}
         </div>
       </section>
+
+      {/* R²F Detector Atlas — wedge-batch-4 lock 2026-05-07. The 10
+          paper-application surface that gives a procurement reader /
+          advisor / investor a single canonical view of every detector
+          in the framework: what each one is, what paper it derives
+          from, where it lives in the codebase, and what the live
+          surfaces look like. Click any of the 10 cards → detail panel
+          opens inline with a per-detector mini-viz of the signal shape. */}
+      <R2FDetectorAtlas />
 
       {/* Calibration baseline — procurement-grade answer to "show me your outcome calibration".
           Item 2 lock 2026-05-07: this section IS the calibration page. The
