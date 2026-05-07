@@ -51,7 +51,8 @@ export type DeckId =
   | 'goldner_discovery'
   | 'learning_efficiency'
   | 'personal_social_archetypes'
-  | 'common_mistakes';
+  | 'common_mistakes'
+  | 'corp_dev';
 
 export type CardDifficulty = 'foundation' | 'core' | 'advanced';
 export type CardMode = 'flashcard' | 'recall' | 'apply';
@@ -287,6 +288,15 @@ export const DECKS: EducationDeck[] = [
     iconName: 'AlertTriangle',
     color: '#DC2626',
     order: 18,
+  },
+  {
+    id: 'corp_dev',
+    label: 'Corporate Development',
+    description:
+      'The career-arc + buyer-language layer. 12 cards covering what Corp Dev actually is (vs Strategy / IB / PE), the inorganic-growth toolkit, the 7-stage deal lifecycle, the 3 hottest bias hotspots, where DI plugs in, synergy types, accretion/dilution, earnouts, PMI failure mechanics, NIH syndrome, the analyst→Head of Corp Dev arc, and the Damien archetype. Drill before any Corp Dev internship interview, design-partner conversation, or pitch where the buyer is a Corp Dev head.',
+    iconName: 'Building2',
+    color: '#2563EB',
+    order: 19,
   },
 ];
 
@@ -2442,6 +2452,168 @@ const COMMON_MISTAKES_CARDS: EducationCard[] = [
   },
 ];
 
+// ─── Cards: Corporate Development (12) — locked 2026-05-07 ──────────
+//
+// Career-arc + buyer-language layer. Drill before any Corp Dev internship
+// interview, design-partner conversation, or pitch where the buyer is a
+// Corp Dev head. Sources cite the canonical practitioner texts: Bruner
+// Applied M&A; Lajoux & Reed The Art of M&A; HBR PMI failure-rate
+// research; Mergers & Inquisitions Corp Dev career guide.
+
+const CORP_DEV_CARDS: EducationCard[] = [
+  {
+    id: 'cd_what_is_corp_dev',
+    deckId: 'corp_dev',
+    prompt:
+      'What is Corporate Development, and how is it different from Corporate Strategy, IB, and PE/VC?',
+    canonicalAnswer:
+      "Corporate Development is the in-house team that EXECUTES inorganic growth — M&A, JVs, partnerships, divestitures, venture investments, licensing — to deliver the strategy the company chose. (a) vs Corp Strategy: Strategy answers what + why (the long-term direction); Corp Dev answers how (the deals that deliver it). At companies under ~$5B revenue the same person often wears both hats. (b) vs Investment Banking: IB advises on transactions for a fee and represents either side; Corp Dev is the client and owns the deal end-to-end including post-close integration. (c) vs PE/VC: PE/VC invests other people's money on a fund timeline; Corp Dev invests the company's own balance sheet on a strategic timeline.",
+    hint: 'In-house. Execution. Strategic timeline, not fund timeline.',
+    difficulty: 'foundation',
+    applicationContext:
+      "Chiemeka or any Corp Dev head asks: 'so what do you think Corp Dev actually does, in your own words?' This is the opening-credibility question.",
+    source: 'Founder School cd_1 + Mergers & Inquisitions Corp Dev guide',
+    tag: 'foundation',
+  },
+  {
+    id: 'cd_inorganic_growth_toolkit',
+    deckId: 'corp_dev',
+    prompt: 'What are the five levers in the Corp Dev inorganic-growth toolkit?',
+    canonicalAnswer:
+      'M&A (full or majority equity acquisitions — highest stakes, highest failure rate). Joint Ventures (two+ companies create a new shared entity, lower upfront capital, harder governance). Strategic Partnerships (contractual not equity — co-marketing, co-selling, integration). Divestitures + Spin-offs (the under-discussed half: selling or carving out business units; structurally harder than buying because status-quo bias compounds over time). Corporate Venture Capital (minority investments in early-stage companies for strategic option-value, often with ROFR on acquisition). Each lever has a distinct bias failure mode: M&A fails on synergy overconfidence, JVs on governance friction, partnerships on misaligned incentives, divestitures on status-quo bias, CVC on strategic-fit drift.',
+    difficulty: 'core',
+    applicationContext:
+      'A Corp Dev head asks which lever fits a specific strategic objective. Naming all five (especially divestitures + CVC, which most 16-year-olds miss) signals practitioner-level thinking.',
+    source: 'Founder School cd_2 + Bruner Applied M&A',
+    tag: 'foundation',
+  },
+  {
+    id: 'cd_deal_lifecycle',
+    deckId: 'corp_dev',
+    prompt:
+      'Walk through the 7 stages of an M&A deal lifecycle and the bias hotspot at each stage.',
+    canonicalAnswer:
+      '1. Target screening — availability heuristic + narrative fit. 2. Initial outreach + LOI — anchoring on the first valuation written down. 3. Due diligence — confirmation bias + sunk-cost escalation (once $400K + 6 weeks invested, team unconsciously looks for reasons to close). 4. Final valuation + IC memo — illusion of validity + synergy overconfidence (revenue synergies realised at 20-40% of projection per Bain/McKinsey). 5. Negotiation + signing — deal-fever + escalation of commitment. 6. Regulatory approval — planning fallacy (3-12mo realistic, often 2-3× projected). 7. Post-merger integration — NIH (not-invented-here) + cultural overconfidence. PMI is where 70-90% of large M&A deals fail.',
+    difficulty: 'core',
+    applicationContext:
+      'A partner asks during interview: "walk me through what happens after the LOI is signed." Naming the bias-at-stage map shows you understand WHY deals fail, not just the workflow.',
+    source: 'Founder School cd_3 + HBR Christensen "Why Do So Many Mergers Fail?"',
+    tag: 'core',
+  },
+  {
+    id: 'cd_three_hotspots',
+    deckId: 'corp_dev',
+    prompt: 'What are the three load-bearing bias hotspots that cause 70-90% of M&A failures?',
+    canonicalAnswer:
+      "1. Synergy overconfidence (illusion of validity, DI-B-021) — revenue synergies realised at 20-40% of projection; teams have every incentive to project optimistically and no accountability for the post-close miss. 2. Confirmation bias in due diligence — once LOI signed, framing silently shifts from 'should we do this?' to 'can we justify doing this?' 3. PMI cultural overconfidence + NIH — acquirer imposes its processes; acquired talent leaves; synergy thesis becomes mathematically impossible because the people who would have delivered it are at competitors. The three compound: a deal with hotspots 1 + 2 is structurally vulnerable to hotspot 3.",
+    difficulty: 'core',
+    applicationContext:
+      'A Corp Dev head talking about a deal that disappointed will recognise one of these three immediately. Naming them by bias name (illusion of validity / confirmation bias / NIH) signals technical fluency.',
+    source: 'Founder School cd_4 + KPMG M&A Integration Survey',
+    tag: 'core',
+  },
+  {
+    id: 'cd_di_six_artefacts',
+    deckId: 'corp_dev',
+    prompt: 'Where does Decision Intel plug into the Corp Dev workflow — name the 6 artefacts.',
+    canonicalAnswer:
+      '1. Strategic brief audit (target-screening stage) — audits the leadership-issued brief for hidden assumptions. 2. Pre-LOI valuation memo audit — comparables selection, synergy assumptions, anchoring. 3. Due diligence memo audit — framing-drift report between original brief and DD findings. 4. IC memo audit — the full R²F detector layer (10 detectors) producing the Decision Provenance Record with 9 strips. 5. PMI plan audit — cultural-overconfidence + NIH patterns in the 100-day plan. 6. Post-close decision-by-decision audits — recurring integration decisions over 18 months, building a Decision Knowledge Graph. A single deal generates 40-70 audit moments. A 4-6 deal/year team produces 160-420 annually.',
+    hint: 'Six artefacts, not three. Each is a specific named workflow point.',
+    difficulty: 'advanced',
+    applicationContext:
+      'The Corp Dev pitch — when a head asks "where exactly would your tool sit in our process?" Most founders answer abstractly; naming six specific artefacts wins.',
+    source: 'Founder School cd_5',
+    tag: 'pitch',
+  },
+  {
+    id: 'cd_synergy_types',
+    deckId: 'corp_dev',
+    prompt: 'What are the two types of synergy and what are their realisation rates?',
+    canonicalAnswer:
+      "Cost synergies (consolidation savings — duplicate functions, real estate, vendor contracts) realise at 60-80% of projection — manageable miss. Revenue synergies (cross-sell, upsell, new-market expansion enabled by combined capabilities) realise at 20-40% of projection — disaster. Most failed M&A theses depend on revenue synergies that don't materialise. The DI Validity Classifier specifically reweights revenue-synergy projections in low-validity environments (cross-border, cross-sector, technology-led) at lower confidence.",
+    difficulty: 'core',
+    applicationContext:
+      'During diligence-memo review or in any Corp Dev conversation about synergy assumptions. Knowing the asymmetric realisation rates is what separates a sophisticated analyst from a junior one.',
+    source: 'Bain + McKinsey M&A practice annual surveys',
+    tag: 'core',
+  },
+  {
+    id: 'cd_accretion_dilution',
+    deckId: 'corp_dev',
+    prompt: 'What is accretion/dilution analysis and why does it matter for an IC memo?',
+    canonicalAnswer:
+      "Accretion/dilution analysis tests whether a deal will INCREASE or DECREASE the acquirer's earnings per share (EPS) post-close. Mechanics: pro-forma combine the two companies' net incomes, adjust for deal financing (cash, debt issuance, stock issuance), divide by the new diluted share count. If pro-forma EPS > standalone acquirer EPS = accretive; if < = dilutive. Public-company boards weight accretive deals heavily because EPS dilution is visible to public-market investors. Private-company Corp Dev cares about cash-on-cash returns more than EPS, but the model still appears in IC memos because the discipline of pro-forma combining is the foundation for synergy modeling. Skill prerequisite: ability to build a pro-forma income statement + cap-table + deal-financing waterfall in Excel.",
+    difficulty: 'advanced',
+    applicationContext:
+      'Day-1 to day-30 of a Corp Dev internship — the partner will hand you a model and say "is this accretive in year 2 at the proposed price?" If you can\'t build it, you\'re not at year-1-associate level.',
+    source: 'Wall Street Prep M&A Modeling course + Macabacus tutorials',
+    tag: 'modeling',
+  },
+  {
+    id: 'cd_earnouts_reps_warranties',
+    deckId: 'corp_dev',
+    prompt:
+      'What are earnouts, R&W, and indemnification — and why do they matter in a Corp Dev deal?',
+    canonicalAnswer:
+      'Earnouts: a portion of purchase price contingent on the acquired company hitting specific post-close milestones (revenue, EBITDA, product launches). Aligns seller incentives with realised synergies. Common in deals where seller management is staying. Risk: disputes over whether milestones were met. Reps & Warranties (R&W): seller statements about the business at signing — financials are accurate, no undisclosed liabilities, IP is owned, key contracts are in force. Buyer relies on these to bring claims if facts turn out otherwise. Indemnification: the contractual mechanism for buyer to recover damages from seller for breached reps. Usually capped (often 10-15% of purchase price) and subject to time limits (12-24 months typical). R&W insurance now common — third-party insurer takes the risk for a premium, freeing up seller proceeds. These three together structure the post-close risk distribution; getting them wrong is how Corp Dev teams lose money silently after the close.',
+    difficulty: 'advanced',
+    applicationContext:
+      'Mid-deal during negotiation; in any conversation about why deals get re-traded after diligence; in PE/VC contexts where deal structuring sophistication separates funds.',
+    source: 'Lajoux & Reed The Art of M&A',
+    tag: 'negotiation',
+  },
+  {
+    id: 'cd_pmi_failure',
+    deckId: 'corp_dev',
+    prompt: 'Why does post-merger integration (PMI) cause 70-90% of M&A deals to fail?',
+    canonicalAnswer:
+      'The famous failure stat is overwhelmingly a PMI failure, not a deal-thesis failure. The mechanism: post-close, the acquirer installs its processes, performance reviews, IT systems, and reporting structures on the acquired team. The acquired talent — who actually create the value the deal was supposed to capture — leave. Within 18 months the synergy thesis is mathematically impossible because the people who would have delivered it are at competitors. Underlying biases: NIH (not-invented-here), cultural overconfidence, planning fallacy on integration timelines, sunk-cost commitment to the integration approach signed off pre-close. The deals that BEAT the failure rate (Constellation Software, Berkshire Hathaway, Cisco at its best) leave the acquired company largely autonomous and integrate selectively. Corp Dev teams that own PMI outcomes (not just deal close) deliver dramatically better synergy realisation.',
+    difficulty: 'core',
+    applicationContext:
+      'Discussion of any acquisition, especially a recent one in the news. The PMI conversation is where senior Corp Dev heads test whether you understand WHY deals fail vs just the headlines.',
+    source: 'Founder School cd_4 + Cisco Corp Dev public retrospectives',
+    tag: 'core',
+  },
+  {
+    id: 'cd_nih_syndrome',
+    deckId: 'corp_dev',
+    prompt: 'What is NIH syndrome and where does it appear in Corp Dev?',
+    canonicalAnswer:
+      'NIH = Not-Invented-Here. The bias where teams systematically prefer their own approaches/tools/processes over equivalent or better alternatives developed elsewhere. In Corp Dev it appears at THREE stages: (1) target screening — companies dismiss external targets that don\'t fit their existing model ("we build, we don\'t buy"); (2) due diligence — DD teams dismiss acquired-company processes as inferior to acquirer\'s without honest comparison; (3) PMI — the canonical failure mode, where acquirer team imposes its processes on acquired team and watches the value evaporate. The opposite-end of NIH is "shiny object syndrome" — overweighting external solutions because they\'re external. Both are biases; the discipline is honest comparative evaluation.',
+    difficulty: 'core',
+    applicationContext:
+      'PMI conversations specifically. NIH is the diagnosis when acquirer + acquired teams are arguing over "the right way to do X" 6 months post-close.',
+    source: 'Lajoux & Reed The Art of M&A integration chapters',
+    tag: 'pmi',
+  },
+  {
+    id: 'cd_career_arc',
+    deckId: 'corp_dev',
+    prompt:
+      'Walk through the Corp Dev career arc from analyst to Head of Corp Dev — comp + skills at each stage.',
+    canonicalAnswer:
+      'Analyst (yr 0-2): financial modeling, comparable analysis, basic DD support. $80-120K + 20-40% bonus. 50-65 hrs/wk. Associate (yr 2-5): leads workstreams, drafts IC memos, owns banker + DD-provider relationships. $120-180K + 30-50% bonus + early equity. Critical skill: judgment on when to recommend killing a deal. Director/VP (yr 5-10): owns mid-size deals end-to-end, manages 2-4 associates, presents to CEO + board. $200-350K + 50-100% bonus + meaningful equity. Head of Corp Dev (yr 10-15): owns the function; reports to CEO; manages team of 4-12. $400-800K total at growth-stage tech; $300-600K at F500. Exit paths: Chief Strategy Officer, CFO (especially deal-heavy companies), COO, occasionally CEO (especially PE-backed roll-up companies). The asymmetric skill that compounds: PMI execution. Most Corp Dev teams under-invest in it; the ones who own integration outcomes become Heads faster.',
+    difficulty: 'core',
+    applicationContext:
+      'Career-conversation cards. When Chiemeka or any Corp Dev head asks "what do you actually want to do long-term?" — naming the arc honestly (and the hedge case) reads as mature.',
+    source: 'Founder School cd_6 + Mergers & Inquisitions career guide',
+    tag: 'career',
+  },
+  {
+    id: 'cd_damien_archetype',
+    deckId: 'corp_dev',
+    prompt:
+      'Who is Damien (the mid-market Corp Dev head HXC archetype) and what does he care about?',
+    canonicalAnswer:
+      "Damien archetype = mid-market Corp Dev head at a $200M-revenue scale-up with personal £5-50K corporate-card budget. One of the four Phase 1 HXC personas in DI's GTM v3.5 wedge. Pain language he uses verbatim: 'we got burned on the [last deal] integration — looked obvious in hindsight, didn't see it pre-close.' He doesn't care about R²F naming, academic citations, or AI moats; he cares about whether the next deal he signs avoids the same pattern. Cold-context bridge: lead with 'we audit IC memos before they reach committee — flags the bias patterns that show up post-close so the partner doesn't' — NOT 'we're a reasoning audit platform' on first contact. His budget signs the £249/mo Individual tier without procurement; he upgrades to Strategy tier (£1,999/mo) only when 2-3 colleagues see value AND he has a specific incident he's trying not to repeat. Buyers in his class often have a £5-15M-class deal that disappointed within the past 24 months — that's the wedge moment.",
+    difficulty: 'advanced',
+    applicationContext:
+      'Cold-context conversation, LinkedIn DM, conference 1:1, or any time the founder needs to recognise the HXC pattern in a real interaction.',
+    source: 'CLAUDE.md GTM v3.5 wedge personas + sparring-room-data.ts midmarket_corpdev_head',
+    tag: 'persona',
+  },
+];
+
 // ─── Aggregator + Helpers ───────────────────────────────────────
 
 export const ALL_CARDS: EducationCard[] = [
@@ -2465,6 +2637,7 @@ export const ALL_CARDS: EducationCard[] = [
   ...LEARNING_EFFICIENCY_CARDS,
   ...PERSONAL_SOCIAL_ARCHETYPES_CARDS,
   ...COMMON_MISTAKES_CARDS,
+  ...CORP_DEV_CARDS,
 ];
 
 export function findDeck(id: DeckId): EducationDeck | undefined {

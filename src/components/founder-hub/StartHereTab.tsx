@@ -334,6 +334,16 @@ function renderPositioningAnchor() {
         3 only. Canonical at <code>docs/gtm-plan-v3-5-2026-05-04.md</code> + Path-to-£100M tab.
       </div>
       <div style={anchorRow}>
+        <strong>Career-arc lean (locked 2026-05-07):</strong> Corporate Development &gt; Corporate
+        Strategy &gt; M&amp;A IB. Founder is targeting Corp Dev because it is the in-house seat that
+        EXECUTES the strategy through deals — and it maps directly onto the mid-market Corp Dev head
+        (Damien archetype) HXC persona. Internship arc is summer 2026 (Cornerstone VC introduction
+        via Jide → Chiemeka warm intro, May 2026), with the long-term hedge case being Head of Corp
+        Dev at growth-stage tech ($400-800K total comp). See Founder School Corporate Development
+        track (cd_1 through cd_7) for the full thesis + Education Room <code>corp_dev</code> deck
+        (12 cards) for the buyer-language drilling layer.
+      </div>
+      <div style={anchorRow}>
         <strong>R²F operationalisation (sprint complete 2026-05-07 · 10 of 10):</strong> 22-bias
         taxonomy (DI-B-001 through DI-B-022) · DQI methodology v2.1.0 with validity-aware structural
         weight shift · 9 paper-anchored signals on every DPR cover (Validity Classification §4.1 →

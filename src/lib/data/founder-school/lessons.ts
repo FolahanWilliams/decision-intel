@@ -1549,6 +1549,236 @@ export const TRACKS: Track[] = [
       },
     ],
   },
+  // ─── Corporate Development track (locked 2026-05-07) ────────────
+  // Added when the founder narrowed the career-arc lean from
+  // M&A vs Corp Strategy → Corporate Development specifically. Corp
+  // Dev is the actual in-house seat where Decision Intel deploys —
+  // mid-market Corp Dev head (Damien archetype) is one of the four
+  // Phase 1 HXC personas per CLAUDE.md GTM v3.5. The track is built to
+  // produce two outcomes simultaneously: (a) procurement-grade
+  // vocabulary the founder can speak fluently with a working Corp Dev
+  // head on a discovery call, (b) a coherent career-arc narrative
+  // (analyst → associate → director → VP → Head of Corp Dev → CSO/CFO)
+  // the founder can articulate to advisors, investors, and
+  // internship interviewers (notably the Cornerstone VC introducer
+  // arrangement that triggered this track). Sources cite the canonical
+  // texts: Bruner Applied M&A; Lajoux & Reed The Art of M&A; Cisco
+  // case-study material; HBR archives on PMI failure rates.
+  {
+    id: 'corporate_development',
+    title: 'Corporate Development',
+    description:
+      'The in-house seat where strategy becomes deals — and where Decision Intel deploys',
+    color: '#2563EB',
+    emoji: '🏛️',
+    lessons: [
+      {
+        id: 'cd_1',
+        order: 1,
+        title: 'What Corporate Development Actually Is (vs Strategy, vs IB, vs PE/VC)',
+        readTime: '4 min',
+        summary:
+          'Corp Dev is in-house M&A — the team that turns strategy into deals. Different from strategy, IB, and PE in load-bearing ways.',
+        insight:
+          'Corporate Development is the in-house team that executes inorganic growth — M&A, joint ventures, partnerships, divestitures, venture investments, licensing — to deliver the strategy the company has chosen. The four functions adjacent to Corp Dev each play a different role:\n\n**Corporate Strategy** sets the long-term direction ("we will compete in cloud-native database infrastructure"). Strategy answers what + why; Corp Dev answers how. Strategy is internal-facing analytical work; Corp Dev is external-facing transactional work. At companies under ~$5B revenue, the same person often wears both hats — title is "Head of Strategy & Corp Dev" or "VP, Strategic Planning and Corp Dev."\n\n**Investment Banking (IB)** advises companies on transactions for a fee. Bankers represent EITHER the buyer OR the seller; they don\'t hold the deal end-to-end. Corp Dev is the client — IB is the agency. A Corp Dev director hires Goldman to run a sell-side process; the director still owns the strategic rationale, the post-close integration plan, and the board narrative.\n\n**Private Equity / Venture Capital** invest other people\'s money on a fund\'s timeline (typically 7-10 years). Corp Dev invests the company\'s own balance sheet on a strategic timeline (forever, in principle). PE/VC optimises for exit multiple; Corp Dev optimises for strategic synergy + earnings impact.\n\n**Operating units** run the day-to-day business that Corp Dev is buying for or divesting from. Corp Dev partners with operating leaders during diligence (do you actually want this asset?) and integration (will it survive contact with your team?).\n\nThe canonical Corp Dev workflow: target screening → outreach → preliminary valuation → letter of intent → due diligence → final valuation → negotiation → signing → regulatory approval → closing → post-merger integration. The whole arc is 3-12 months for mid-market deals; 12-24 months for cross-border or regulated deals.',
+        whyItMatters:
+          'For Decision Intel the persona-fit is exact. The mid-market Corp Dev head (Damien archetype, $200M-revenue scale-up corp dev with personal £5-50K corporate-card budget) is one of the four Phase 1 HXC personas the GTM v3.5 wedge filters to. Understanding what the seat IS — not what most 16-year-olds confuse it for — is the prerequisite for selling into it AND for occupying it as a career arc.',
+        action:
+          "For each of the four functions (Corp Strategy, IB, PE/VC, Corp Dev) write one sentence naming WHO holds the equivalent role at your top three target customer companies. If you can't name them, your discovery is incomplete — fix that before any pitch.",
+        reflection:
+          "Where does Decision Intel sit in this functional map — does it sell to Corp Strategy (planning), Corp Dev (execution), or both? What changes about your pitch depending on who you're talking to?",
+        sources: [
+          {
+            label: 'Mergers & Inquisitions — Corp Dev guide',
+            detail:
+              "Brian DeSimone's comprehensive walkthrough of Corp Dev career arc, comp, exits",
+          },
+          {
+            label: 'Wall Street Oasis — Corp Dev forum',
+            detail: 'Practitioner-grade discussions on day-in-the-life and deal-process detail',
+          },
+          {
+            label: 'corpdev.ai — practitioner blog',
+            detail: 'Active Corp Dev community sharing real-deal patterns + tooling reviews',
+          },
+        ],
+        mnaPitch:
+          "Your team executes 3-10 deals a year, each one with a strategic rationale signed off by the CEO and an integration plan signed off by the operating unit. The bias hotspots between those two signatures — confirmation bias on synergy estimates, anchoring on the LOI valuation, sunk-cost escalation when diligence surfaces problems — are exactly what DI audits before the IC memo lands. We're not replacing your bankers, your DD providers, or your integration playbook; we're the 60-second hygiene step between the analyst's draft memo and the partner review.",
+        corpStrategyPitch:
+          'Strategy and Corp Dev share a workflow — strategy says "we should be in this market," Corp Dev finds the asset. The friction point is the moment strategy hands the brief to Corp Dev and the brief gets reinterpreted (often optimistically). DI audits the reinterpretation gap: is the deal thesis actually delivering the strategic objective the brief asked for, or has it drifted into a comfortable target acquisition for a different reason? That question is structurally hard for either function to ask itself; we surface it.',
+      },
+      {
+        id: 'cd_2',
+        order: 2,
+        title: 'The Inorganic Growth Toolkit — More Than Just M&A',
+        readTime: '4 min',
+        summary:
+          "Corp Dev's job isn't just to buy companies. The toolkit includes JVs, divestitures, partnerships, licensing, and venture investing — each with different bias profiles.",
+        insight:
+          'Founders new to Corp Dev think of it as "M&A team." That undersells the toolkit by half. The full inventory of Corp Dev levers:\n\n**Mergers & Acquisitions (M&A)** — full or majority equity acquisitions. Seller becomes part of the buyer. Highest-stakes, highest-failure-rate move (70-90% of large M&A deals fail to deliver the projected synergies per the canonical HBR research). Use case: capability acquisition, market entry, talent acqui-hire, defensive consolidation.\n\n**Joint Ventures (JVs)** — two or more companies create a new entity, contribute assets, share governance + economics. Lower upfront capital than M&A; harder to govern long-term. Use case: market entry where local partner is regulatorily or culturally required (every Western auto OEM in China is in a JV).\n\n**Strategic Partnerships** — contractual rather than equity-based. Co-marketing, co-selling, technology integration, distribution. Reversible, lower-stakes. Use case: testing market fit before committing to acquisition.\n\n**Divestitures + Spin-offs** — selling or carving out a business unit. The under-discussed half of Corp Dev. The discipline to KILL the bad deal you inherited from the prior CEO is structurally harder than buying something new — status-quo bias compounds over time. Use case: portfolio rationalisation, regulatory pressure, capital reallocation.\n\n**Licensing + IP transactions** — buying or selling intellectual property rights without the underlying business. Common in pharma, media, deep-tech. Use case: capability acquisition without the integration overhead.\n\n**Corporate Venture Capital (CVC)** — minority investments in early-stage companies, often with strategic options (ROFR on acquisition, observer seat on board). Microsoft\'s M12, Google Ventures, Salesforce Ventures, AT&T\'s investments. Use case: strategic option-value on emerging technologies, founder relationships that may convert to acquisition later.\n\nEach lever has its own decision-quality failure mode. M&A fails on synergy overconfidence; JVs fail on governance friction; partnerships fail on misaligned incentives; divestitures fail on status-quo bias; CVC fails on strategic-fit drift. Decision Intel surfaces the lever-specific bias pattern.',
+        whyItMatters:
+          "When you sit in a Corp Dev internship this summer (or pitch a Corp Dev head at a design-partner conversation) you'll be asked which transaction shape they should use for a given strategic objective. Knowing the full toolkit — and the failure mode of each — is the difference between a sophisticated conversation and a generic one.",
+        action:
+          "Pick three of your Phase 1 wedge buyers (mid-market Corp Dev heads in your target cohort) and write one sentence each on which lever they're most likely to be using right now (M&A vs JV vs partnership vs divestiture vs CVC). If you can't tell from public data, ask Chiemeka in your call.",
+        reflection:
+          'Which lever does Decision Intel\'s product fit most cleanly — and which lever does it underserve today? (Hint: the "why most M&A fails" research is a strong fit; the divestiture-bias-detection use case is underdeveloped on the platform today and could be the next product surface.)',
+        sources: [
+          {
+            label: 'PwC — M&A Industry Trends',
+            detail:
+              'Annual report on global M&A activity by sector, deal-size distribution, regional breakdown',
+          },
+          {
+            label: 'Bain Global M&A Report',
+            detail: 'Strategic-deal vs scale-deal taxonomy; cross-border deal patterns',
+          },
+          {
+            label: 'CB Insights — CVC database',
+            detail: 'Active CVC programs by company, deal volume, sector exposure',
+          },
+        ],
+      },
+      {
+        id: 'cd_3',
+        order: 3,
+        title: 'The Deal Lifecycle — Where Bias Hides at Every Stage',
+        readTime: '5 min',
+        summary:
+          'From sourcing to PMI, every stage of a deal has a signature bias. Knowing where the bias hides is half the diligence.',
+        insight:
+          "Walk a deal end-to-end and the bias profile shifts at every stage:\n\n**1. Target screening / sourcing** — bias signature: availability heuristic + narrative fit. Corp Dev teams over-screen targets that resemble companies they've recently read about, talked to, or seen acquired. Hidden cost: opportunity cost of the targets you didn't look at. DI surface: the sourcing memo audit — does the target list reflect the strategic brief, or is it shaped by who answered the LinkedIn outreach?\n\n**2. Initial outreach + LOI** — bias signature: anchoring. The first valuation number written down (in the LOI, in the broker book) anchors the entire negotiation. Even when diligence later surfaces facts that should move the price, the anchor pulls back. Hidden cost: paying 15-30% over fair value because you anchored too high in the LOI. DI surface: pre-LOI valuation audit — is the proposed range justified by comparable transactions and intrinsic value, or is it shaped by what the seller asked for?\n\n**3. Due diligence (DD)** — bias signature: confirmation bias + sunk-cost escalation. Once a Corp Dev team has spent 6 weeks and $400K on diligence, they unconsciously look for reasons to close, not reasons to walk. Hidden cost: closing deals that surfaced clear red flags during DD. DI surface: the DD memo audit — does the memo summary match the underlying findings, or has the framing softened?\n\n**4. Final valuation + IC memo** — bias signature: illusion of validity (DI-B-021) + overconfidence on synergy estimates. The \"we'll capture $80M of synergies in year 2\" line in the IC memo is overwhelmingly likely to be wrong. Most synergy realisation is 30-60% of the projection per Bain + McKinsey research. Hidden cost: the deal has to deliver synergies that don't materialise to hit the projected returns. DI surface: the IC memo audit — flagged confidence-language paragraphs; comparison against the 143-case library of historical synergy realisations.\n\n**5. Negotiation + signing** — bias signature: deal-fever + escalation of commitment. Once the public announcement is drafted and the press release templates exist, walking away has emotional cost. Hidden cost: agreeing to seller-favorable reps & warranties + earn-outs to close. DI surface: pre-signing red-team review.\n\n**6. Regulatory approval (3-12 months)** — bias signature: planning fallacy. Cross-border or large deals routinely take 2-3× longer than projected for regulatory clearance. Hidden cost: integration delay; loss of key personnel during interregnum.\n\n**7. Post-merger integration (PMI)** — bias signature: NIH (not-invented-here) + cultural overconfidence. The acquirer's team imposes its own processes, alienates acquired talent, and watches the synergy thesis evaporate. Hidden cost: the 70-90% deal failure rate cited in the literature is overwhelmingly a PMI failure, not a deal-thesis failure. DI surface: integration-decision audits over the first 18 months post-close.",
+        whyItMatters:
+          "DI's value proposition is most defensible when articulated stage-by-stage, not as a generic 'we audit deals.' On the Cornerstone call (or any Corp Dev pitch), the founder who can name the bias-at-stage map wins more credibility than the founder who pitches the platform abstractly.",
+        action:
+          'Pick one famous failed deal (suggestions: AOL/Time Warner 2000, HP/Autonomy 2011, Microsoft/Nokia 2014, Bayer/Monsanto 2018, Kraft/Heinz 2015). Walk it through the seven stages above and identify which stage the bias most clearly fired at. Write the answer in 200 words. This is exactly the kind of artefact that lands in a Corp Dev interview.',
+        reflection:
+          'Which stage of the deal lifecycle does Decision Intel cover BEST today, and which stage is the next product expansion? (Hint: pre-IC audit is strongest; PMI-decision audit is the largest gap and the largest market — 70-90% deal failure happens at PMI.)',
+        sources: [
+          {
+            label: 'Bruner — Applied Mergers and Acquisitions',
+            detail:
+              'Robert Bruner (Wiley 2004) — the canonical academic textbook; readable and procurement-grade',
+          },
+          {
+            label: 'HBR — "Why Do So Many Mergers Fail?" — Christensen et al',
+            detail:
+              'The disruptive-innovation lens applied to M&A failure rates; published HBR 2011',
+          },
+          {
+            label: 'McKinsey M&A Practice — annual synergy-realisation surveys',
+            detail: 'Empirical data on synergy capture vs projection across thousands of deals',
+          },
+        ],
+        mnaPitch:
+          "Your team's failure mode isn't that you pick bad deals — it's that you pick reasonable deals and then a specific bias shows up at a specific stage. We've mapped seven stages × the bias signature at each one. Show me your last three deals and I'll show you which stage the post-mortem evidence points at. That's the conversation we want to have.",
+      },
+      {
+        id: 'cd_4',
+        order: 4,
+        title: 'Why Most Corp Dev Fails — The Three Hottest Bias Hotspots',
+        readTime: '4 min',
+        summary:
+          "70-90% of large M&A deals fail to deliver projected synergies. The failure isn't random — it concentrates on three biases.",
+        insight:
+          "The aggregate stat — 70-90% of large M&A fails — is famous and slightly misleading on its own. The failure is non-random: it concentrates on three load-bearing biases, each of which Decision Intel's R²F detector layer is built to flag.\n\n**Hotspot 1: Synergy overconfidence (illusion of validity, DI-B-021).** The IC memo projects $80M of cost synergies + $50M of revenue synergies. Empirically, cost synergies are realised at 60-80% of projection (manageable miss); revenue synergies are realised at 20-40% of projection (disaster). The bias mechanism: the team writing the synergy estimate has every incentive to project optimistically (the deal won't approve otherwise) and no accountability mechanism for the post-close miss (different team executes integration). DI surface: the validity classifier flags revenue-synergy projections in low-validity environments (cross-border, cross-sector, technology-led) at much lower confidence weights.\n\n**Hotspot 2: Confirmation bias in due diligence.** Once the LOI is signed and DD has started, the diligence team's incentive shifts. The deal has to close for the team to deliver on its quarter; for the partner to log a transaction; for the bankers to get their fee. The DD memo subtly shifts from 'find reasons not to do this deal' to 'document the deal thesis in a defensible form.' The bias mechanism: the original screening question ('should we do this?') silently becomes ('can we justify doing this?'). DI surface: the DD-memo audit flags whether the framing has softened relative to the original strategic brief.\n\n**Hotspot 3: PMI cultural-overconfidence + NIH.** Post-close, the acquirer team installs its processes, performance reviews, IT systems, and reporting structures on the acquired team. The acquired talent — who actually create the value the deal was supposed to capture — leave. Within 18 months the synergy thesis is mathematically impossible because the people who would have delivered it are at competitors. The bias mechanism: the acquirer's team genuinely believes their processes are better; they don't recognise that the acquired culture's specific quirks were load-bearing for the value the deal was buying. DI surface: PMI decision audits over the first 18 months — the integration-decision-by-decision evidence record makes the cumulative cultural cost visible.\n\nThe three hotspots compound. A deal with synergy overconfidence + DD confirmation bias is structurally vulnerable to PMI failure because the integration team is trying to deliver synergies that were never realistic from a base-rate too-optimistic estimate.",
+        whyItMatters:
+          'These three hotspots are the fastest discovery-call to procurement-call accelerator on the Decision Intel pitch. The Corp Dev head who has felt the pain of one of them in the last 24 months will SELL DI internally for you. Articulating the three hotspots fluently is a higher-leverage skill than memorising your own product features.',
+        action:
+          "Take the failed deal you analysed in cd_3 and write 100 words on which of these three hotspots it most clearly hit. If your answer is 'all three' — keep going; that's the canonical pattern, but the strongest hotspot is usually identifiable. The hotspot is also where the post-mortem most clearly missed the warning sign.",
+        reflection:
+          "Which of the three hotspots is your platform's R²F detector layer best calibrated for today, and which is the largest unaddressed surface? (Hint: synergy overconfidence is well-served by the validity classifier + illusion of validity detector; PMI cultural overconfidence is a wide-open product surface — measuring cultural-fit in advance is the unsolved problem in M&A.)",
+        sources: [
+          {
+            label: 'KPMG — M&A Integration Survey (annual)',
+            detail: 'Empirical data on PMI failure rates by deal size + sector',
+          },
+          {
+            label: 'Lajoux & Reed — The Art of M&A',
+            detail:
+              'McGraw-Hill — practitioner-grade reference, especially the integration chapters',
+          },
+          {
+            label: 'Cisco Systems — public Corp Dev case studies',
+            detail:
+              'Cisco has acquired 200+ companies; the public retrospective on integration successes + failures is gold',
+          },
+        ],
+      },
+      {
+        id: 'cd_5',
+        order: 5,
+        title: 'Where Decision Intel Plugs In — Stage-by-Stage Product Map',
+        readTime: '4 min',
+        summary:
+          "DI is not a generic 'audit tool' — it deploys at six specific Corp Dev artefacts, each with a different bias signature.",
+        insight:
+          "Decision Intel's product surface mapped onto the Corp Dev workflow:\n\n**1. Strategic brief audit** (target screening stage). The strategic brief is the document the Corp Dev team gets from leadership: \"we should be in cloud-native database infrastructure.\" DI audits the brief for hidden assumptions, narrative-coherence flags, and inside-view-dominance patterns. Output: a critique that hardens the brief BEFORE the team starts spending diligence dollars on the wrong target class.\n\n**2. Pre-LOI valuation memo audit** (LOI stage). The first internal valuation memo before the LOI gets sent. DI audits the comparables selection (selection bias), the synergy assumptions (overconfidence), the discount rate (anchoring), and the valuation framing. Output: a list of valuation-affecting biases the team should defend before signing the LOI.\n\n**3. Due diligence memo audit** (DD stage). The interim DD findings memos (financial, legal, commercial, operational, technical, cultural). DI audits the framing drift between the original strategic brief and the DD findings — has the DD softened on red flags that the brief originally said were dealbreakers? Output: the framing-drift report.\n\n**4. IC memo audit** (final valuation stage). The pre-IC memo that goes to the board / investment committee. DI audits the full memo against the R²F detector layer (10 detectors per the wedge-batch-4 lock 2026-05-07): validity classification, reference-class forecast, feedback adequacy, calibrated rejection, fractionation of expertise, decision rubric, algorithm aversion, illusion of validity, inside-view dominance, prospective hindsight. Output: the full Decision Provenance Record (DPR) with 9 R²F strips on the cover.\n\n**5. PMI plan audit** (post-signing stage). The 100-day integration plan. DI audits the integration-decision sequence for cultural-overconfidence patterns, NIH bias, and unrealistic timeline assumptions. Output: a flagged integration-plan critique.\n\n**6. Post-close decision-by-decision audits** (PMI stage, ongoing 18 months). The recurring decisions made during integration — keep the acquired CFO or replace? Migrate to the acquirer's ERP or keep theirs? Consolidate the salesforce? Each decision is a strategic memo in miniature. DI runs over each one. Output: the cumulative integration Decision Knowledge Graph that surfaces compounding NIH patterns BEFORE they cost the synergy thesis.\n\nThe six artefacts are sequential: a single deal generates 1 strategic brief + 1 pre-LOI memo + 4-8 DD memos + 1 IC memo + 1 PMI plan + 30-50 post-close decisions over 18 months. That's 40-70 audit artefacts per deal. A Corp Dev team running 4-6 deals/year produces 160-420 audits/year — enough volume that a £50K-£150K ACV is procurement-justifiable on the time-savings alone, before counting the bias-prevention upside.",
+        whyItMatters:
+          "This stage-by-stage map IS the Corp Dev pitch. When you sit on the Cornerstone call (or any Corp Dev customer call), the founder who can name the six artefacts and the bias-detector mapping for each one wins. The founder who pitches 'we audit memos for biases' loses — because every Corp Dev head has heard 50 generic AI pitches.",
+        action:
+          'Build a single-page artefact (paper or PDF) titled "Decision Intel × Corp Dev Workflow Map" that names the six artefacts above with the DI product surface mapped onto each. Bring it to the Cornerstone call and any Corp Dev pitch going forward. This becomes your primary leave-behind.',
+        reflection:
+          'Which of the six artefacts produces the most defensible product-market fit story today, and which is the gap? (Hint: IC memo audit is the strongest; post-close decision-by-decision audits are the largest unbuilt market — and the Decision Knowledge Graph product surface that already exists in DI is the natural product extension to capture it.)',
+        mnaPitch:
+          "Six artefacts per deal. 40-70 audit moments. Across your 4-6 deals/year that's 160-420 audit artefacts annually. We're not selling a tool — we're selling a hygiene layer that drops in at six specific named workflow points your team already executes. Show me your last deal's strategic brief, pre-LOI valuation memo, and IC memo, and I'll show you the same three artefacts re-rendered through the R²F detector layer. That's the demo we want to walk you through.",
+        corpStrategyPitch:
+          "Strategy and Corp Dev share artefacts. The strategic brief audit (artefact 1) is your team's output; the pre-LOI valuation memo (artefact 2) is Corp Dev's. The handoff between them is where strategic intent gets reinterpreted, and that's the bias-hotspot DI is built to flag. Your team produces 20-40 strategic briefs a year; Corp Dev produces 40-70 audit moments per deal. We're a single hygiene layer that runs across both functions — and your CSO + Head of Corp Dev can finally use the same vocabulary on quality.",
+      },
+      {
+        id: 'cd_6',
+        order: 6,
+        title: 'The Corp Dev Career Arc — Analyst → Head of Corp Dev → CSO/CFO/CEO',
+        readTime: '4 min',
+        summary:
+          'Corp Dev career compounds. Each stage builds skills the next stage needs. The exit path runs to the C-suite.',
+        insight:
+          "The Corp Dev career arc has more upside-with-optionality than IB or PE for someone with founder ambitions.\n\n**Analyst (years 0-2)** — building skills: financial modeling (DCF, LBO, accretion/dilution, synergy modeling), comparable transactions analysis, basic diligence support. Comp: $80-120K base + 20-40% bonus at growth-stage tech; $70-100K + 30-50% bonus at F500. Hours: 50-65/week (better than IB's 80-100, worse than steady-state Corp Dev).\n\n**Associate (years 2-5)** — leading workstreams: running diligence streams (commercial / financial / legal coordination), drafting IC memos, owning relationships with bankers + DD providers. Comp: $120-180K base + 30-50% bonus + early equity grants. Hours: 50-60/week. Critical skill at this stage: judgment on when to recommend killing a deal vs proceeding. Most associates can't do this — the ones who can are tracked for senior roles.\n\n**Director / VP (years 5-10)** — leading deals: end-to-end ownership of mid-size deals ($50-500M); managing a team of 2-4 associates; presenting to the CEO + board. Comp: $200-350K base + 50-100% bonus + meaningful equity. Hours: 40-55/week steady; spike during signing/closing.\n\n**Head of Corp Dev (years 10-15)** — owning the function: setting the strategic priorities for inorganic growth; reporting to CEO; managing a team of 4-12. Comp at growth-stage tech: $400K-$800K total. At F500: $300-600K + LTI grants. Hours: 50-60/week, more travel.\n\n**Exit paths from Head of Corp Dev**: Chief Strategy Officer (CSO), CFO (especially at deal-heavy companies), COO, occasionally CEO (especially at PE-backed roll-up companies where Corp Dev experience IS the job). Some exit to PE General Partner roles. Some exit to start their own companies — and the operator-with-deal-experience archetype is the strongest hire profile for a CFO/COO at a growth-stage startup.\n\nWhat Corp Dev teaches you that IB doesn't: ownership of the post-deal outcome (you stay around; bankers move to the next mandate), cross-functional execution (you work with operating teams, not just the deal team), and strategic context (you sit inside one company's strategy, deeply, for years).\n\nWhat Corp Dev teaches you that PE doesn't: how to build with capital, not just allocate it; how to operate inside a real company's politics; how to integrate, not just acquire.\n\nFor a 16-year-old founder thinking 5-15 years out: Corp Dev is the single best institutional path that compounds with founder skills. If Decision Intel succeeds, you sell Corp Dev capability into the function. If Decision Intel pivots or exits early, you have a direct path into a $400-800K Head of Corp Dev role at a growth-stage company that wants exactly your skill profile (founder + operator + deal experience).",
+        whyItMatters:
+          "Articulating this career arc honestly is what separates a 16-year-old who's done their homework from one repeating LinkedIn cliches. The Corp Dev head you talk to (Chiemeka included) will respect the founder who has thought through their hedge case as much as the upside case.",
+        action:
+          'Identify three Heads of Corp Dev at your Phase 1 wedge-target companies (mid-market scale-ups in your industry adjacencies — fintech, AI infrastructure, enterprise SaaS). LinkedIn-lookup their career arcs. Note where they came from (IB? Consulting? Earlier Corp Dev? Operator?) and how long they spent at each step. This benchmark exercise grounds your own arc planning.',
+        reflection:
+          "If Decision Intel doesn't succeed, what is your honest 5-year fallback path? If you can articulate it without flinching, you're operating from a position of strength on the founder path; if you can't articulate it, the optionality you have right now is invisible to you — that's the next exercise.",
+      },
+      {
+        id: 'cd_7',
+        order: 7,
+        title: 'The Practitioner Skills That Compound — Modeling, Negotiation, PMI Execution',
+        readTime: '4 min',
+        summary:
+          'The four skills that separate a Corp Dev associate from a director: financial modeling fluency, diligence judgment, negotiation tact, and PMI execution.',
+        insight:
+          'The skills that compound across the Corp Dev career arc:\n\n**1. Financial modeling — fluency, not just literacy.** A junior analyst can build a DCF; a senior associate can pressure-test the model in real time during a partner meeting and identify the assumptions where the value sensitivity sits. Critical sub-skills: accretion/dilution analysis (does this deal increase EPS in year 2?), synergy modeling (split into cost vs revenue, assign realisation probabilities by category), LBO modeling for take-privates and PE-shaped deals, comparable-transactions analysis (which precedents really compare? which are anchoring artefacts?). Resources: Wall Street Prep + Macabacus tutorials are the practitioner-grade canon. Aswath Damodaran\'s NYU valuation lectures (free on YouTube) are the academic foundation.\n\n**2. Diligence judgment — knowing what to look for and when to walk.** The number of diligence findings is high; the number that should change the deal is low. Diligence judgment is the ability to triage a 200-finding diligence memo into the 3 findings that matter and have the courage to escalate them. The DD red flags that experienced practitioners watch: deferred-revenue accounting, customer concentration, key-person dependency, environmental liability, regulatory pre-clearance gaps. The hidden DD red flags: cultural-fit signals from the management interviews; the rate at which key acquired-company talent has updated their LinkedIn since the deal rumor leaked.\n\n**3. Negotiation — anchoring, BATNA discipline, and earn-out structures.** Corp Dev negotiations are not zero-sum poker — they\'re long-form structured deals where the post-close relationship matters more than the closing price. Skills: knowing when to anchor first vs let the seller anchor (depends on information asymmetry), structuring earn-outs that align the seller\'s incentives with the realised synergies, negotiating reps & warranties + indemnification packages that reflect the actual risk distribution, knowing when to walk (the BATNA). Resources: "Getting to Yes" (Fisher & Ury); "Never Split the Difference" (Voss); "The Art of M&A" Lajoux & Reed integration chapters.\n\n**4. PMI execution — the skill 80% of Corp Dev teams underrate.** Executing post-merger integration is what separates the Corp Dev teams that deliver synergies from the ones that produce expensive acquisitions. The skills: 100-day plan design, key-talent retention package design, cultural-integration program management, technology systems migration sequencing, customer-communication coordination. PMI is where the deal succeeds or fails — and most Corp Dev teams hand the integration off to a separate PMI team without owning the outcome.\n\nThe asymmetric skill: most Corp Dev associates over-invest in modeling and under-invest in negotiation + PMI. The associates who invest in the second half of the skill stack become directors faster.',
+        whyItMatters:
+          "When you sit in your Corp Dev internship this summer, your immediate temptation will be to optimise for modeling output (it's measurable, the partner can grade it). The longer-term move is to seek out negotiation observation moments + PMI conversations, even if they don't show up in your performance review. Those are the skills that compound to the Head of Corp Dev arc; modeling is table stakes.",
+        action:
+          'Three concrete moves before your Cornerstone start-date: (1) Complete the Wall Street Prep accretion/dilution module (or Damodaran\'s YouTube alternative) so you arrive modeling-fluent. (2) Read "Getting to Yes" cover-to-cover. (3) Read the Cisco Corp Dev public retrospectives on a single integration (Cisco has 200+ integrations to choose from). These three together produce a starting baseline that puts you at year-1-associate level on day one.',
+        reflection:
+          "Of the four practitioner skills, which is your strongest right now and which is the largest gap? (Most 16-year-olds underestimate negotiation literacy because the school system doesn't teach it; the modeling skill is closer to standard math competence than people think; the PMI skill is the rarest and the highest-value at senior level.)",
+        sources: [
+          {
+            label: 'Wall Street Prep — M&A Modeling course',
+            detail:
+              'The practitioner-grade certification on accretion/dilution, synergy modeling, LBO',
+          },
+          {
+            label: 'Aswath Damodaran — NYU Valuation lectures (YouTube, free)',
+            detail:
+              'The academic foundation; covers DCF, comparables, real-options, and the limits of each method',
+          },
+          {
+            label: 'Voss — Never Split the Difference',
+            detail:
+              'Negotiation tactics with practitioner detail; complements Fisher & Ury "Getting to Yes"',
+          },
+          {
+            label: 'Cisco Corporate Development public retrospectives',
+            detail: '200+ acquisitions; the most-documented Corp Dev practice in tech',
+          },
+        ],
+      },
+    ],
+  },
 ];
 
 export const TOTAL_LESSONS = TRACKS.reduce((sum, t) => sum + t.lessons.length, 0);
