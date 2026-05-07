@@ -402,3 +402,136 @@ export const BIAS_GENOME_OWNERSHIP = [
     body: 'Enterprise customers contributing outcome metadata may request a quarterly extract of the cohort signal their organisation contributed to, anonymised, in CSV + JSON. Useful for internal calibration audits and audit-committee briefings.',
   },
 ];
+
+/**
+ * Sub-Processor Schedule — the canonical procurement-grade list a F500
+ * vendor-risk reviewer needs at first read. Item 2 lock 2026-05-07
+ * (James persona BLOCKER from the 2026-05-07 audit Section 8: "F500
+ * vendor-risk register opens with 'where does our data physically
+ * reside, who touches it, how do we get it back on termination?'").
+ *
+ * Mirrors and extends the lighter PROCESSORS list on /privacy with the
+ * region + service-category + customer-right-to-object fields a
+ * Schedule of Sub-Processors needs. Source-of-truth for /trust;
+ * /privacy still carries its own simplified list because it serves a
+ * different reader (data subject vs. procurement reviewer).
+ *
+ * Forward-looking rule: when adding a new sub-processor, update both
+ * /privacy PROCESSORS + this SUB_PROCESSORS array in the same commit
+ * so a procurement reader cross-reading the privacy policy and the
+ * sub-processor schedule sees consistent data flows. The
+ * change-notification SLA (≥30 days) is contractual via the DPA and
+ * cannot be reduced without a customer-acknowledgement re-signature.
+ */
+export interface SubProcessor {
+  /** Vendor / service name. */
+  name: string;
+  /** What kind of service they provide — drives grouping in the table. */
+  category:
+    | 'compute'
+    | 'database'
+    | 'ai_inference'
+    | 'email'
+    | 'monitoring'
+    | 'payment'
+    | 'dns_email_routing';
+  /** Human-readable category label rendered in the UI. */
+  categoryLabel: string;
+  /** Region(s) where Customer data physically resides. */
+  region: string;
+  /** What Customer data the sub-processor touches. */
+  dataTouched: string;
+  /** Compliance posture (SOC 2 etc) — optional. */
+  compliancePosture?: string;
+  /** Independent verification path (DPA section, audit report, public docs). */
+  verification: string;
+}
+
+export const SUB_PROCESSOR_CHANGE_NOTIFICATION_SLA =
+  '≥30 days written notice via security@decision-intel.com before activation; Customer right to object in writing within 14 days, with cure path defined per DPA §6.';
+
+export const SUB_PROCESSORS: SubProcessor[] = [
+  {
+    name: 'Vercel',
+    category: 'compute',
+    categoryLabel: 'Application hosting + serverless compute',
+    region: 'US (primary) · multi-region edge for static assets',
+    dataTouched:
+      'Application code, environment variables, server-side request handling. No persistent customer content storage.',
+    compliancePosture: 'SOC 2 Type II · ISO 27001',
+    verification:
+      'https://vercel.com/legal/dpa · https://trust.vercel.com (audit reports under NDA).',
+  },
+  {
+    name: 'Supabase',
+    category: 'database',
+    categoryLabel: 'Authentication + encrypted Postgres',
+    region:
+      'US (primary production region) · EU residency available on Enterprise design-partner configurations subject to confirmation before signature',
+    dataTouched:
+      'Customer accounts, user settings, encrypted document content (AES-256-GCM at rest), audit log rows, all platform metadata.',
+    compliancePosture: 'SOC 2 Type II · GDPR + UK GDPR DPA',
+    verification: 'https://supabase.com/dpa · https://supabase.com/security.',
+  },
+  {
+    name: 'Google AI (Gemini)',
+    category: 'ai_inference',
+    categoryLabel: 'Primary analysis model',
+    region: 'US region · processed under no-training enterprise terms',
+    dataTouched:
+      'Anonymised document text (PII scrubbed by the GDPR anonymizer node first). No training right; logged on Vercel-side cost-tracker only.',
+    compliancePosture: 'Google Cloud DPA · enterprise no-training contractual commitment',
+    verification:
+      'https://cloud.google.com/terms/data-processing-addendum · per-call cost telemetry on the Vercel AI Gateway dashboard.',
+  },
+  {
+    name: 'Anthropic (Claude)',
+    category: 'ai_inference',
+    categoryLabel: 'Fallback analysis model',
+    region: 'US region · invoked only on Gemini transient errors when AI_FALLBACK_ENABLED',
+    dataTouched:
+      'Anonymised document text (same anonymizer pre-pass as Gemini). No training right.',
+    compliancePosture: 'Anthropic Enterprise Terms · no-training contractual commitment',
+    verification: 'https://www.anthropic.com/legal/dpa.',
+  },
+  {
+    name: 'Stripe',
+    category: 'payment',
+    categoryLabel: 'Subscription + per-deal payment processing',
+    region: 'US + EU regional payment infrastructure',
+    dataTouched:
+      'Billing email, subscription state, payment intent IDs. Decision Intel never sees or stores card numbers; PCI-DSS responsibility lives with Stripe.',
+    compliancePosture: 'PCI-DSS Level 1 · SOC 1 + 2',
+    verification: 'https://stripe.com/dpa · https://stripe.com/security.',
+  },
+  {
+    name: 'Resend',
+    category: 'email',
+    categoryLabel: 'Transactional email',
+    region: 'US (primary) · EU regional capability on request',
+    dataTouched:
+      'Customer email address + transactional message content (auth flows, magic links, password resets, account notifications).',
+    compliancePosture: 'SOC 2 Type II',
+    verification: 'https://resend.com/legal/dpa.',
+  },
+  {
+    name: 'Sentry',
+    category: 'monitoring',
+    categoryLabel: 'Error + performance telemetry',
+    region: 'US (primary)',
+    dataTouched:
+      'Error stack traces, request metadata, performance spans. PII scrubbers enabled at the SDK layer; no body content captured.',
+    compliancePosture: 'SOC 2 Type II · ISO 27001 · GDPR DPA',
+    verification: 'https://sentry.io/trust/dpa.',
+  },
+  {
+    name: 'Cloudflare',
+    category: 'dns_email_routing',
+    categoryLabel: 'DNS + inbound email routing',
+    region: 'Global edge · EU + US DNS POPs',
+    dataTouched:
+      'DNS lookups for decision-intel.com domains; inbound *@decision-intel.com email routing to founder Gmail. No persistent message storage.',
+    compliancePosture: 'SOC 2 Type II · ISO 27001 · PCI-DSS · GDPR DPA',
+    verification: 'https://www.cloudflare.com/cloudflare-customer-dpa/.',
+  },
+];

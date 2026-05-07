@@ -20,13 +20,39 @@
 // ─── Types ──────────────────────────────────────────────────────────
 
 export type BuyerPersonaId =
+  // Phase 1 HXC wedge personas (locked v3.5 GTM 2026-05-04). These are
+  // the four buyer-class-continuous personas the £249/mo wedge motion
+  // targets. Sparring Room defaults to one of these.
+  | 'fractional_cso'
+  | 'midmarket_corpdev_head'
+  | 'smallfund_gp'
+  | 'pebacked_founder'
+  // Expansion personas — useful for rehearsal but NOT the Phase 1 wedge.
+  // Phase 4 ceiling buyers (F500 CSO + GC), Phase 2-3 bridge personas
+  // (Pan-African fund partner, mid-market PE associate), advisor /
+  // investor pathways (boutique M&A, pre-seed VC).
   | 'mid_market_pe_associate'
   | 'boutique_ma_advisor'
-  | 'fractional_cso'
   | 'f500_cso'
   | 'pan_african_fund_partner'
   | 'gc_audit_committee'
   | 'preseed_vc_associate';
+
+/**
+ * Persona tier — drives the Sparring Room UI grouping (Phase 1 HXC
+ * surfaced first, expansion personas below). Item 1 lock 2026-05-07.
+ *
+ * `phase1_hxc` — one of the four locked v3.5 HXC wedge personas. Founder
+ *   should rehearse against these BEFORE any high-signal CSO event
+ *   (Strategy World London June 9-10 BAFTA is the canonical T-33d
+ *   calendar leverage moment).
+ *
+ * `expansion` — useful rehearsal but NOT the Phase 1 wedge. Includes
+ *   Phase 4 ceiling buyers (F500 CSO + GC), Phase 2-3 bridge personas
+ *   (Pan-African fund partner, mid-market PE associate), and advisor /
+ *   investor pathways (boutique M&A, pre-seed VC associate).
+ */
+export type PersonaTier = 'phase1_hxc' | 'expansion';
 
 export type ScenarioMode =
   | 'networking_event_inperson'
@@ -43,6 +69,11 @@ export interface BuyerPersona {
   id: BuyerPersonaId;
   label: string;
   archetype: string;
+  /** Phase-1 HXC wedge vs expansion (Item 1 lock 2026-05-07). Drives
+   *  UI grouping in SparringRoomTab — HXC personas surface first under
+   *  a "Phase 1 wedge" eyebrow; expansion personas live in a collapsed
+   *  "Beyond Phase 1" section below. */
+  tier: PersonaTier;
   /** Title + company shape for the role-play introduction. */
   rolePlayIntro: string;
   /** What they care about above all else — the meta-objective. */
@@ -209,10 +240,187 @@ export interface SparringSessionResult {
 // ─── Buyer Personas ────────────────────────────────────────────────
 
 export const BUYER_PERSONAS: BuyerPersona[] = [
+  // ─── Phase 1 HXC wedge (locked v3.5 GTM 2026-05-04) ───────────────
+  // Four buyer-class-continuous personas at £249/mo. Surfaced first in
+  // the Sparring Room UI. Drill these BEFORE every high-signal event.
+  {
+    id: 'fractional_cso',
+    label: 'Fractional CSO',
+    archetype: 'Marcus',
+    tier: 'phase1_hxc',
+    rolePlayIntro:
+      'Independent fractional Chief Strategy Officer running 3-5 mid-market CEO clients simultaneously. Ex-MBB (Bain or McKinsey, 7 years). Charges $30-60K/quarter per client for board-prep and strategic-memo work. The £249/mo Individual tier comes out of personal corporate-card budget, no procurement gate.',
+    primaryConcern:
+      'My credibility is my product. If a client questions one of my recommendations, can I show them I stress-tested it with something more rigorous than my own brain? Will my clients see this as me cheating with AI, or as me bringing more rigor than they could buy elsewhere?',
+    verbalStyle:
+      'High-bandwidth, fast-talking, drops MBB framings ("the 2x2 here is…"), confident. Uses "obviously" and "clearly" too often when actually unsure. Three-clients-in-a-week pace; will give you 15 minutes max on a first call.',
+    defaultSkepticism: 'medium',
+    nativeVocabulary: [
+      'MECE',
+      '2x2',
+      'thesis',
+      'recommendation',
+      'so-what',
+      'frame',
+      'pyramid principle',
+      'sanity check',
+      'top-of-page',
+    ],
+    triggerWords: [
+      'consultant',
+      'consulting tool',
+      'systematic decision-making',
+      'rubber-stamp',
+      'commodity',
+      'AI-powered',
+    ],
+    topSilentObjections: [
+      'Will my clients see this as me cheating with AI rather than thinking?',
+      'How is this different from asking Claude to critique my deck?',
+      'Will the brand association make me look less senior in front of my client?',
+    ],
+    ticketBand: '£249/mo Individual personally-paid · Phase 1 wedge target',
+    conversionSpeed: 'fast',
+    color: '#16A34A',
+  },
+  {
+    id: 'midmarket_corpdev_head',
+    label: 'Mid-market corp dev head',
+    archetype: 'Damien',
+    tier: 'phase1_hxc',
+    rolePlayIntro:
+      'Head of Corporate Development at a $200M-revenue scale-up running 3-5 acquisitions per year. Reports to the CEO. Has personal corporate-card authority for $5-50K tooling budget pre-team-procurement (the team-procurement gate fires above $50K). Just got back from his fourth post-LOI walk-away in 18 months because the diligence missed something obvious in retrospect.',
+    primaryConcern:
+      'My CEO will fire me if I miss another bias trap in a target memo. I need a defensible second opinion that catches what my associate missed BEFORE the LOI goes out. Not a procurement-grade enterprise tool — something I can swipe my card on this week.',
+    verbalStyle:
+      'Direct, transactional, low-patience. Asks ROI questions immediately. References specific past walk-aways without naming companies. Uses "the deal" not "the engagement" or "the project". Closes meetings hard with a written next-step or a polite walk-away.',
+    defaultSkepticism: 'medium',
+    nativeVocabulary: [
+      'LOI',
+      'walk-away',
+      'target memo',
+      'IC',
+      'diligence list',
+      'CEO update',
+      'EBITDA bridge',
+      'synergy',
+      'integration risk',
+      'multiple expansion',
+    ],
+    triggerWords: [
+      'AI-powered',
+      'reasoning layer',
+      'enterprise platform',
+      'procurement',
+      'multi-stakeholder approval',
+      'change management',
+    ],
+    topSilentObjections: [
+      'My deal closes in 3 weeks. I do not have time for a vendor evaluation.',
+      'Show me ONE specific bias your tool would have caught on my last walk-away — or this is just generic GPT.',
+      'Why £249/mo and not $99 like every other AI tool? What am I paying the premium for?',
+    ],
+    ticketBand:
+      '£249/mo Individual personally-paid · upgrades to Strategy when 3+ deals close in same year',
+    conversionSpeed: 'fast',
+    color: '#0EA5E9',
+  },
+  {
+    id: 'smallfund_gp',
+    label: 'Small-fund GP / principal',
+    archetype: 'Aisha',
+    tier: 'phase1_hxc',
+    rolePlayIntro:
+      'GP at a £40M AUM emerging-manager fund (could be UK growth equity, US seed, or Pan-African mid-market). 3 prior funds as associate; first fund at the principal level. Active deal flow (1-2 IC memos / month) AND an LP committee that requires written reasoning trails post-investment. The £249/mo comes from the management fee personally before any team-tier procurement gate.',
+    primaryConcern:
+      'My LP letter has to defend every investment after the fact. I need a record of HOW I decided, not just WHAT I decided. When my LP committee asks "why this Lagos fintech over the Nairobi consumer-tech you also looked at," I need an artefact that holds up.',
+    verbalStyle:
+      'Measured, deliberate, asks two questions before answering one. References LPs constantly ("my LP would ask…"). Uses fund-level vocabulary natively. Will close politely if you waste her diligence time.',
+    defaultSkepticism: 'medium',
+    nativeVocabulary: [
+      'LP letter',
+      'IC memo',
+      'thesis',
+      'returns',
+      'vintage',
+      'concentration',
+      'reserve',
+      'follow-on',
+      'capital efficiency',
+      'sourcing channel',
+    ],
+    triggerWords: [
+      'AI-powered',
+      'enterprise',
+      'next-generation',
+      'we are pre-seed',
+      'we are 16',
+      'F500-grade',
+    ],
+    topSilentObjections: [
+      'Is your data residency LP-defensible? My LP letter has to address it.',
+      'You said you cover Pan-African / EM regulators — does the audit ACTUALLY map to ISA 2007 / NDPR / WAEMU, or just name them?',
+      'I have ChatGPT Pro for $200/mo. Why pay you on top?',
+    ],
+    ticketBand: '£249/mo Individual personally-paid · scales to fund-tier when team grows past 3',
+    conversionSpeed: 'medium',
+    color: '#7C3AED',
+  },
+  {
+    id: 'pebacked_founder',
+    label: 'PE-backed founder / CEO',
+    archetype: 'Henrik',
+    tier: 'phase1_hxc',
+    rolePlayIntro:
+      'CEO of a $80M-revenue PE-backed business, 18 months into the hold period. PE sponsor on the board with monthly board meetings and a quarterly value-creation plan review. Has personal-decisive budget under $5K/mo (the sponsor gate fires above that). Just had a board call where his strategy memo got picked apart on a bias the board chair flagged that he could have caught earlier.',
+    primaryConcern:
+      'Every board memo I send to my PE sponsor gets picked apart for bias. I want to ship the memo with the bias-flags ALREADY caught and addressed in-line, so the board call is about the DECISION, not about my analytical rigor.',
+    verbalStyle:
+      'Operator voice — clear, direct, slightly bruised by recent board feedback. Uses "the board" and "my sponsor" interchangeably. References specific KPIs without preamble. Will share a recent memo to test you in the second meeting if the first goes well.',
+    defaultSkepticism: 'medium',
+    nativeVocabulary: [
+      'value-creation plan',
+      'sponsor',
+      'board chair',
+      'EBITDA',
+      '100-day plan',
+      'hold period',
+      'exit',
+      'KPI',
+      'monthly close',
+      'budget v plan',
+    ],
+    triggerWords: [
+      'AI-powered',
+      'reasoning layer',
+      'enterprise procurement',
+      'multi-quarter rollout',
+      'change management',
+      'governance overhaul',
+    ],
+    topSilentObjections: [
+      'My PE sponsor will ask "did you write this with AI?" — what is your answer?',
+      'My COO already reviews these memos. Why pay you on top?',
+      'I have 90 days to show the sponsor a meaningful KPI shift. I do not have a quarter to evaluate vendors.',
+    ],
+    ticketBand:
+      '£249/mo Individual personally-paid out of CEO discretionary · upgrades when company-wide rollout',
+    conversionSpeed: 'fast',
+    color: '#D97706',
+  },
+
+  // ─── Expansion personas (NOT Phase 1 HXC) ─────────────────────────
+  // Useful for rehearsal but NOT the locked wedge motion. Phase 4
+  // ceiling (F500 CSO + GC), Phase 2-3 bridge (Pan-African fund partner,
+  // mid-market PE associate), advisor / investor pathways (boutique M&A,
+  // pre-seed VC). Surfaced second in the Sparring Room UI under a
+  // "Beyond Phase 1" eyebrow so the founder doesn't accidentally rehearse
+  // the wrong wedge.
   {
     id: 'mid_market_pe_associate',
     label: 'Mid-market PE associate',
     archetype: 'Adaeze',
+    tier: 'expansion',
     rolePlayIntro:
       'Vice President at a $400M-AUM mid-market PE fund, 4 years deep into deal cycle. Just closed her first lead deal six months ago. Has discretionary $5-50K corporate-card authority for tools that make her IC memos sharper.',
     primaryConcern:
@@ -252,6 +460,7 @@ export const BUYER_PERSONAS: BuyerPersona[] = [
     id: 'boutique_ma_advisor',
     label: 'Boutique sell-side M&A advisor',
     archetype: 'Potomac',
+    tier: 'expansion',
     rolePlayIntro:
       'Managing Director at a 12-person boutique sell-side M&A firm, 18-year career, ex-Goldman associate. Their deals close in 6-9 months and the CIM quality determines the buyer pool — every blind spot in the model becomes a price haircut at term sheet.',
     primaryConcern:
@@ -289,46 +498,10 @@ export const BUYER_PERSONAS: BuyerPersona[] = [
     color: '#0EA5E9',
   },
   {
-    id: 'fractional_cso',
-    label: 'Solo fractional CSO',
-    archetype: 'Marcus',
-    rolePlayIntro:
-      'Independent fractional Chief Strategy Officer working with 4 mid-market CEO clients simultaneously. Ex-MBB (Bain or McKinsey, 7 years). Charges $30-60K/quarter per client for board-prep and strategic-memo work.',
-    primaryConcern:
-      'My credibility is my product. If a client questions one of my recommendations, can I show them I stress-tested it with something more rigorous than my own brain?',
-    verbalStyle:
-      'High-bandwidth, fast-talking, drops MBB framings ("the 2x2 here is…"), confident. Uses "obviously" and "clearly" too often when actually unsure.',
-    defaultSkepticism: 'medium',
-    nativeVocabulary: [
-      'MECE',
-      '2x2',
-      'thesis',
-      'recommendation',
-      'so-what',
-      'frame',
-      'pyramid principle',
-      'sanity check',
-    ],
-    triggerWords: [
-      'consultant',
-      'consulting tool',
-      'systematic decision-making',
-      'rubber-stamp',
-      'commodity',
-    ],
-    topSilentObjections: [
-      'Will my clients see this as me cheating with AI?',
-      'How is this different from Asking Claude to critique my deck?',
-      'Will the brand association make me look less senior?',
-    ],
-    ticketBand: '$249/mo Individual, scaling to one Strategy seat across 3 clients',
-    conversionSpeed: 'fast',
-    color: '#8B5CF6',
-  },
-  {
     id: 'f500_cso',
     label: 'Fortune 500 Chief Strategy Officer',
     archetype: 'Margaret',
+    tier: 'expansion',
     rolePlayIntro:
       'Chief Strategy Officer at a $30B Fortune 500 industrial company, 12 years tenure, reports directly to the CEO. Strategy team of 14. Every memo she ships has board exposure. SOC 2, EU AI Act, and procurement vendor-risk register are baseline.',
     primaryConcern:
@@ -371,6 +544,7 @@ export const BUYER_PERSONAS: BuyerPersona[] = [
     id: 'pan_african_fund_partner',
     label: 'Pan-African fund partner',
     archetype: 'Titi',
+    tier: 'expansion',
     rolePlayIntro:
       'Partner at a $600M Pan-African PE fund based in Lagos, deploys across Nigeria / Kenya / Ghana / South Africa. 9-year track record. Reports to LPs in London, Singapore, and Abu Dhabi. Strict NDPR + CBN + WAEMU compliance posture.',
     primaryConcern:
@@ -412,6 +586,7 @@ export const BUYER_PERSONAS: BuyerPersona[] = [
     id: 'gc_audit_committee',
     label: 'GC at regulated entity',
     archetype: 'James',
+    tier: 'expansion',
     rolePlayIntro:
       'General Counsel at a $5B regulated financial-services company. Reports to the audit committee chair. Career-long focus on regulatory exposure, not business growth. Every new vendor gets a 90-day vendor-risk review.',
     primaryConcern:
@@ -452,6 +627,7 @@ export const BUYER_PERSONAS: BuyerPersona[] = [
     id: 'preseed_vc_associate',
     label: 'Pre-seed VC associate',
     archetype: 'Riya',
+    tier: 'expansion',
     rolePlayIntro:
       'Associate at a $100M pre-seed/seed B2B SaaS fund. 2 years in, sourcing for the partner. Sees 50 founders/month. Decision authority is "should we put this in the partner meeting" — partner makes the actual call.',
     primaryConcern:

@@ -236,8 +236,16 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
+      # `--archive=tgz` bundles the .vercel/output build artefacts into a
+      # single tarball before upload (locked 2026-05-07). Without it the
+      # free-tier Vercel CLI hits a 5000-files-per-deploy soft cap on this
+      # codebase (200+ components + the case-study library easily clear it)
+      # and aborts with `api-upload-free` after ~100MB of upload. The
+      # archive flag is the documented workaround at
+      # https://vercel.com/docs/cli/deploy#archive — same artefact, one
+      # upload, no per-file cap.
       - name: Deploy to Vercel (Production)
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel deploy --prebuilt --prod --archive=tgz --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -277,10 +285,12 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
+      # `--archive=tgz` mirrors the production fix (5000-file cap on
+      # the free Vercel tier — locked 2026-05-07).
       - name: Deploy Preview to Vercel
         id: vercel-deploy
         run: |
-          url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          url=$(vercel deploy --prebuilt --archive=tgz --token=${{ secrets.VERCEL_TOKEN }})
           echo "preview-url=$url" >> $GITHUB_OUTPUT
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}

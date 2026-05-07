@@ -200,6 +200,13 @@ const MENUS: MegaMenu[] = [
         links: [
           {
             icon: ShieldCheck,
+            label: 'Trust · procurement evidence',
+            description:
+              'Every answer your vendor-risk team needs in one page. SOC 2 receipts, sub-processor schedule, questionnaire, DPA, DPR specimens.',
+            href: '/trust',
+          },
+          {
+            icon: ShieldCheck,
             label: 'Security',
             description: 'AES-256-GCM with rotation, GDPR anonymizer, SOC 2 infrastructure.',
             href: '/security',

@@ -2,15 +2,17 @@
  * DPR Page Three — R²F Procurement Strips.
  *
  * Locked 2026-05-05 (Phase 2). The third page of the legal-evidence-record
- * arc. Five R²F-anchored signals (locked 2026-04-30 in the Kahneman & Klein
- * 2009 paper-application sprint) render as severity-colored strips:
+ * arc. Six R²F-anchored signals render as severity-colored strips:
  *
  *   §4.1 — Validity Classification (Kahneman & Klein 2009 first condition)
  *   §4.2 — Reference Class Forecast (Kahneman & Lovallo 2003)
  *   §4.3 — Feedback Adequacy (Kahneman & Klein 2009 second condition)
- *   §4.4 — Org Calibration (Cloverpop-defense — proves the DQI is
+ *   §4.4 — Confidence Calibration (paper-app #10, Item 3 lock 2026-05-07)
+ *          — integrates §4.1 + §4.3 against bias-detective confidence-
+ *          language hits to produce the Margaret-class verdict
+ *   §4.5 — Org Calibration (Cloverpop-defense — proves the DQI is
  *          calibrated against THIS org's outcomes)
- *   §4.5 — Counterfactual Impact (top-3 bias scenarios with expected
+ *   §4.6 — Counterfactual Impact (top-3 bias scenarios with expected
  *          improvement)
  *
  * Each strip is independent — when an audit lacks data for a strip, that
@@ -26,6 +28,7 @@ import type { ProvenanceRecordData } from '@/lib/reports/provenance-record-data'
 import type { ValidityClassification } from '@/lib/learning/validity-classifier';
 import type { ReferenceClassForecast } from '@/lib/learning/reference-class-forecast';
 import type { FeedbackAdequacy } from '@/lib/learning/feedback-adequacy';
+import type { CalibratedRejection } from '@/lib/learning/calibrated-rejection';
 
 export interface DprPageThreeR2fStripsProps {
   data: ProvenanceRecordData;
@@ -50,6 +53,7 @@ export function DprPageThreeR2fStrips(props: DprPageThreeR2fStripsProps) {
     data.validityClassification ||
     data.referenceClassForecast ||
     data.feedbackAdequacy ||
+    data.calibratedRejection ||
     data.orgCalibration ||
     data.counterfactualImpact;
 
@@ -81,6 +85,8 @@ export function DprPageThreeR2fStrips(props: DprPageThreeR2fStripsProps) {
         {data.referenceClassForecast && <ReferenceClassStrip rc={data.referenceClassForecast} />}
 
         {data.feedbackAdequacy && <FeedbackAdequacyStrip fa={data.feedbackAdequacy} />}
+
+        {data.calibratedRejection && <CalibratedRejectionStrip cr={data.calibratedRejection} />}
 
         {data.orgCalibration && <OrgCalibrationStrip oc={data.orgCalibration} />}
 
@@ -265,6 +271,71 @@ function FeedbackAdequacyStrip({ fa }: { fa: FeedbackAdequacy }) {
   );
 }
 
+function CalibratedRejectionStrip({ cr }: { cr: CalibratedRejection }) {
+  // Item 3 lock 2026-05-07. Severity ladder mirrors the verdict ladder:
+  // well_calibrated → low (green); mildly → info; materially → medium;
+  // severely → critical; cannot_assess → info (honest fallback).
+  const severity: DprSeverity =
+    cr.verdict === 'well_calibrated'
+      ? 'low'
+      : cr.verdict === 'mildly_overconfident'
+        ? 'info'
+        : cr.verdict === 'materially_overconfident'
+          ? 'medium'
+          : cr.verdict === 'severely_overconfident'
+            ? 'critical'
+            : 'info';
+
+  const band = (() => {
+    switch (cr.verdict) {
+      case 'well_calibrated':
+        return 'Calibrated';
+      case 'mildly_overconfident':
+        return 'Mildly overconfident';
+      case 'materially_overconfident':
+        return 'Materially overconfident';
+      case 'severely_overconfident':
+        return 'Severely overconfident';
+      case 'cannot_assess':
+        return 'Cannot assess';
+    }
+  })();
+
+  return (
+    <DprRiskStrip
+      label="§4.4 · Confidence calibration"
+      band={band}
+      severity={severity}
+      headline={
+        cr.verdict === 'well_calibrated'
+          ? 'Memo confidence in range of what validity + feedback adequacy support.'
+          : cr.verdict === 'mildly_overconfident'
+            ? 'Some confidence-language hits — surface but no audit-committee flag fires.'
+            : cr.verdict === 'materially_overconfident'
+              ? 'Audit-committee-readiness flag: memo projects more certainty than evidence supports.'
+              : cr.verdict === 'severely_overconfident'
+                ? 'Procurement-blocker: confidence language structurally unsupported by validity × feedback adequacy.'
+                : 'Calibration cannot be assessed — feedback adequacy lookup unavailable.'
+      }
+      footRows={[
+        { k: 'Calibration gap', v: cr.calibrationGap.toFixed(2) },
+        { k: 'Rhetorical confidence', v: cr.rhetoricalConfidenceScore.toFixed(2) },
+        { k: 'Earned confidence', v: cr.earnedConfidenceScore.toFixed(2) },
+        {
+          k: 'Triggers',
+          v: cr.triggers.length > 0 ? cr.triggers.slice(0, 2).join(', ') : 'none',
+        },
+      ]}
+    >
+      {cr.note} Per Kahneman &amp; Klein (2009) &ldquo;Conditions for Intuitive Expertise,&rdquo;
+      subjective confidence is a valid accuracy indicator only when BOTH conditions hold —
+      high-validity environment AND adequate closed-loop feedback. The Calibrated Rejection detector
+      is the procurement-grade integration of strips §4.1 + §4.3 against the bias detective&apos;s
+      confidence-language hits.
+    </DprRiskStrip>
+  );
+}
+
 function OrgCalibrationStrip({ oc }: { oc: NonNullable<ProvenanceRecordData['orgCalibration']> }) {
   const isOrg = oc.source === 'org';
   const severity: DprSeverity =
@@ -284,7 +355,7 @@ function OrgCalibrationStrip({ oc }: { oc: NonNullable<ProvenanceRecordData['org
 
   return (
     <DprRiskStrip
-      label="§4.4 · Org calibration"
+      label="§4.5 · Org calibration"
       band={band}
       severity={severity}
       headline={
@@ -348,7 +419,7 @@ function CounterfactualImpactStrip({
 
   return (
     <DprRiskStrip
-      label="§4.5 · Counterfactual impact"
+      label="§4.6 · Counterfactual impact"
       band={`+${ci.weightedImprovementPct.toFixed(1)}% if all flagged biases addressed`}
       severity={severity}
       headline={

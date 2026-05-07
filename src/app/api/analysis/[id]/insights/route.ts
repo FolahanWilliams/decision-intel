@@ -28,6 +28,10 @@ import {
   type ReferenceClassForecast,
 } from '@/lib/learning/reference-class-forecast';
 import { getFeedbackAdequacy, type FeedbackAdequacy } from '@/lib/learning/feedback-adequacy';
+import {
+  computeCalibratedRejection,
+  type CalibratedRejection,
+} from '@/lib/learning/calibrated-rejection';
 
 const log = createLogger('AnalysisInsightsAPI');
 
@@ -36,12 +40,15 @@ export interface AnalysisInsightsResponse {
   validityClassification: ValidityClassification;
   referenceClassForecast: ReferenceClassForecast;
   feedbackAdequacy: FeedbackAdequacy;
+  /** Calibrated Rejection of Subjective Confidence — R²F paper-app #10
+   *  (Item 3 lock 2026-05-07). Pure-function combination of validity +
+   *  feedback + bias-detective hits on confidence-language patterns.
+   *  Surfaces Margaret-class "does this memo's confidence match the
+   *  evidence?" question as a verdict band on the live audit + DPR. */
+  calibratedRejection: CalibratedRejection;
   /** Source of the validity classification — 'persisted' when the
    *  pipeline stored it on judgeOutputs at audit-completion time,
-   *  'live' when computed at request time (legacy fallback). The UI
-   *  surfaces this so a procurement reader can tell whether the band
-   *  in front of them was the one the audit was originally scored
-   *  against. */
+   *  'live' when computed at request time (legacy fallback). */
   validitySource: 'persisted' | 'live';
 }
 
@@ -67,7 +74,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   let analysis: {
     id: string;
     judgeOutputs: unknown;
-    biases: Array<{ biasType: string }>;
+    biases: Array<{ biasType: string; severity: string }>;
     document: {
       userId: string;
       documentType: string | null;
@@ -80,7 +87,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         id: true,
         judgeOutputs: true,
         biases: {
-          select: { biasType: true },
+          select: { biasType: true, severity: true },
         },
         document: {
           select: {
@@ -127,11 +134,27 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     domainHint: documentType,
   });
 
+  // Calibrated Rejection — Item 3 lock 2026-05-07. Pure function over
+  // the existing 3 detectors + the bias detective's confidence-language
+  // hits. Margaret-class "does this memo's confidence match the
+  // evidence?" verdict as a 4th first-class signal.
+  const calibratedRejection = computeCalibratedRejection({
+    validity: validityClassification,
+    feedback: feedbackAdequacy,
+    biases: analysis.biases.map(b => ({
+      biasType: b.biasType,
+      severity: ['critical', 'high', 'medium', 'low'].includes(b.severity.toLowerCase())
+        ? (b.severity.toLowerCase() as 'critical' | 'high' | 'medium' | 'low')
+        : 'medium',
+    })),
+  });
+
   const body: AnalysisInsightsResponse = {
     analysisId: analysis.id,
     validityClassification,
     referenceClassForecast,
     feedbackAdequacy,
+    calibratedRejection,
     validitySource,
   };
 
